@@ -10,6 +10,7 @@
  * \brief Main application class
  * \copyright maisvendoo
  * \author Dmitry Pritykin
+ * \date 01/09/2018
  */
 
 #ifndef     APP_H
@@ -66,6 +67,7 @@ private:
     /// Parsed command line parameters
     command_line_t      command_line;
 
+    /// Command line parsing
     CommandLineParesrResult parseCommandLine(QCommandLineParser &parser,
                                              command_line_t &command_line,
                                              QString &errorMessage);

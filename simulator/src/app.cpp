@@ -1,4 +1,21 @@
+//------------------------------------------------------------------------------
+//
+//      Main application class
+//      (c) maisvendoo, 01/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Main application class
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 01/09/2018
+ */
+
 #include    "app.h"
+#include    "CfgReader.h"
+#include    "global-const.h"
 
 //------------------------------------------------------------------------------
 //
@@ -21,6 +38,10 @@ AppCore::~AppCore()
 //------------------------------------------------------------------------------
 bool AppCore::init()
 {
+    // Common application data settings
+    this->setApplicationName(APPLICATION_NAME);
+    this->setApplicationVersion(APPLICATION_VERSION);
+
     QString errorMessage = "";
     switch (parseCommandLine(parser, command_line, errorMessage))
     {
@@ -74,6 +95,14 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     QCommandLineOption help = parser.addHelpOption();
     QCommandLineOption version = parser.addVersionOption();
 
+    // Train config file
+    QCommandLineOption trainConfig(QStringList() << "t" << "train-config",
+                                   QCoreApplication::translate("main", "Train configuration"),
+                                   QCoreApplication::translate("main", "train-config-file"));
+
+    parser.addOption(trainConfig);
+
+    // Parse command line arguments
     if (!parser.parse(this->arguments()))
     {
         errorMessage = parser.errorText();
@@ -88,6 +117,12 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     if (parser.isSet(help))
     {
         return CommandLineHelpRequired;
+    }
+
+    if (parser.isSet(trainConfig))
+    {
+        command_line.train_config.is_present = true;
+        command_line.train_config.value = parser.value(trainConfig);
     }
 
     return CommandLineOk;
