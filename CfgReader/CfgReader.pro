@@ -3,8 +3,6 @@ TEMPLATE = lib
 QT -= qui
 QT += xml
 
-CONFIG += staticlib
-
 TARGET = CfgReader
 
 DESTDIR = ../../lib
