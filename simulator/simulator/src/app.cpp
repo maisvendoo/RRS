@@ -17,6 +17,8 @@
 #include    "CfgReader.h"
 #include    "global-const.h"
 
+#include    "filesystem.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -43,12 +45,14 @@ bool AppCore::init()
     this->setApplicationVersion(APPLICATION_VERSION);
 
     QString errorMessage = "";
+
     switch (parseCommandLine(parser, command_line, errorMessage))
     {
     case CommandLineOk:
 
-        // Here will be application and train model initialization
-        return true;
+        // Creation and initialization of train model
+        model = new Model();
+        return model->init(command_line);
 
     case CommandLineError:
 

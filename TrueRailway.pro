@@ -3,4 +3,6 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS += ./CfgReader
-SUBDIRS += ./simulator
+SUBDIRS += ./filesystem
+SUBDIRS += ./simulator/model
+SUBDIRS += ./simulator/simulator

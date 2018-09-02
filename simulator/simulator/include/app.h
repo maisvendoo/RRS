@@ -20,6 +20,7 @@
 #include    <QCommandLineParser>
 
 #include    "command-line.h"
+#include    "model.h"
 
 /*!
  * \enum
@@ -66,6 +67,9 @@ private:
     QCommandLineParser  parser;
     /// Parsed command line parameters
     command_line_t      command_line;
+
+    /// Train motion model
+    Model               *model;
 
     /// Command line parsing
     CommandLineParesrResult parseCommandLine(QCommandLineParser &parser,
