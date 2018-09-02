@@ -41,11 +41,30 @@ public:
     /// Destructor
     virtual ~FileSystem();
 
+    QString getWorkingDirectory() const;
+
+    QString getHomeDirectory() const;
+
+    QString getSimDataDirectory() const;
+
+    QString getLogsDirectory() const;
+
 private:
 
     /// Working directory
     QString workingDir;
+    /// User home directory
+    QString homeDir;
+    /// Simulator data directory
+    QString simDataDir;
+    /// Logs directory
+    QString logsDirectory;
 
+    /// Directory creation
+    void createDirectory(const QString &path);
+
+    /// Get directory path with separator
+    QString getDirectoryPath(QString path) const;
 };
 
 #endif // FILESYSTEM_H

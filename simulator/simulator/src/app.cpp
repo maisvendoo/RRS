@@ -86,6 +86,9 @@ bool AppCore::init()
 //------------------------------------------------------------------------------
 int AppCore::exec()
 {
+    if (model != Q_NULLPTR)
+        model->start();
+
     return QCoreApplication::exec();
 }
 
@@ -105,6 +108,18 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
                                    QCoreApplication::translate("main", "train-config-file"));
 
     parser.addOption(trainConfig);
+
+    // Clear simulator log
+    QCommandLineOption clearLog(QStringList() << "c" << "clear-log",
+                                QCoreApplication::translate("main", "Clear simulator's log"));
+
+    parser.addOption(clearLog);
+
+    // Allow debug print
+    QCommandLineOption debugPrint(QStringList() << "o" << "debug-print",
+                                  QCoreApplication::translate("main", "Allow debug print"));
+
+    parser.addOption(debugPrint);
 
     // Parse command line arguments
     if (!parser.parse(this->arguments()))
@@ -127,6 +142,16 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     {
         command_line.train_config.is_present = true;
         command_line.train_config.value = parser.value(trainConfig);
+    }
+
+    if (parser.isSet(clearLog))
+    {
+        command_line.clear_log.is_present = command_line.clear_log.value = true;
+    }
+
+    if (parser.isSet(debugPrint))
+    {
+        command_line.debug_print.is_present = command_line.debug_print.value = true;
     }
 
     return CommandLineOk;

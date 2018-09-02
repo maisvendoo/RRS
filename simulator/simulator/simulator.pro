@@ -18,12 +18,14 @@ CONFIG(debug, debug|release) {
 
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
+    LIBS += -L../../../lib -llog_d
     LIBS += -L../../../lib -lmodel_d
 
 } else {
 
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -llog
     LIBS += -L../../../lib -lmodel
 }
 
@@ -32,6 +34,7 @@ INCLUDEPATH += ./include
 INCLUDEPATH += ../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../log/include
 
 INCLUDEPATH += ../model/include
 

@@ -44,7 +44,11 @@ struct option_t
 struct command_line_t
 {
     /// Train configuration file name
-    option_t<QString> train_config;
+    option_t<QString>   train_config;
+    /// Clear simulator log file
+    option_t<bool>      clear_log;
+    /// Debug print in simulation loop
+    option_t<bool>      debug_print;
 };
 
 Q_DECLARE_METATYPE(command_line_t)
