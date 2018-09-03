@@ -1,10 +1,18 @@
 //------------------------------------------------------------------------------
 //
-//
-//
-//
+//      Vehicle base class
+//      (c) maisvendoo, 03/09/2018
+//      Developer: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief  Vehicle base class
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 03/09/2018
+ */
+
 #ifndef     VEHICLE_H
 #define     VEHICLE_H
 
@@ -99,8 +107,9 @@ protected:
     /// Railsway curvature
     double  curv;
 
+    /// Active common forces
     state_vector_t  Q_a;
-
+    /// Reactive common forces
     state_vector_t  Q_r;
 
     /// User defined configuration load

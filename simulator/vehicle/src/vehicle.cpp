@@ -1,3 +1,18 @@
+//------------------------------------------------------------------------------
+//
+//      Vehicle base class
+//      (c) maisvendoo, 03/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief  Vehicle base class
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 03/09/2018
+ */
+
 #include    "vehicle.h"
 
 #include    "CfgReader.h"
