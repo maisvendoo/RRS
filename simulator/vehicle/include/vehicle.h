@@ -51,7 +51,10 @@ public:
     void setPayloadCoeff(double payload_coeff);
 
     /// Internal ODE integration step
-    void step(double t, double dt);
+    virtual void step(double t, double dt);
+
+    /// Common acceleration calculation
+    virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
 
 protected:
 
@@ -101,7 +104,7 @@ protected:
     state_vector_t  Q_r;
 
     /// User defined configuration load
-    void loadConfig(QString cfg_path);
+    virtual void loadConfig(QString cfg_path);
 
 private:
 

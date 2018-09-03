@@ -119,6 +119,46 @@ void Vehicle::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
+{
+    (void) t;
+
+    state_vector_t a;
+    a.resize(s);
+
+    double v = Y[idx + s];
+    double V = abs(v) * Physics::kmh;
+
+    double sin_beta = inc / 1000.0;
+    double G = full_mass * Physics::g * sin_beta;
+
+    double w = b0 + (b1 + b2 * V + b3 * V * V) / q0;
+    double wk = 700.0 * curv;
+    double W = full_mass * Physics::g * (w + wk) / 1000.0;
+
+    double sumCreepForces = 0;
+
+    double rk = wheel_diameter / 2.0;
+
+    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
+    {
+        double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], Y[idx + s + i])) / rk;
+        sumCreepForces += creepForce;
+    }
+
+    double Fr = Physics::fricForce(W + Q_r[0], v);
+
+    a[0] = (Q_a[0] - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
+
+    for (size_t i = 0; i < static_cast<size_t>(num_axis); i++)
+        a[i] = a[0] / rk;
+
+    return a;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::loadConfig(QString cfg_path)
 {
     (void) cfg_path;
