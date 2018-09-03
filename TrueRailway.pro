@@ -7,5 +7,6 @@ SUBDIRS += ./filesystem
 SUBDIRS += ./log
 
 SUBDIRS += ./simulator/solver
+SUBDIRS += ./simulator/vehicle
 SUBDIRS += ./simulator/model
 SUBDIRS += ./simulator/simulator
