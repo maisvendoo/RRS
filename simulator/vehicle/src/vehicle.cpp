@@ -1,6 +1,7 @@
 #include    "vehicle.h"
 
 #include    "CfgReader.h"
+#include    "physics.h"
 
 //------------------------------------------------------------------------------
 //
@@ -100,7 +101,7 @@ void Vehicle::setReactiveCommonForce(int idx, double value)
 //------------------------------------------------------------------------------
 void Vehicle::setPayloadCoeff(double payload_coeff)
 {
-    this->payload_coeff = payload_coeff;
+    this->payload_coeff = Physics::cut(payload_coeff, 0.0, 1.0);
     full_mass = empty_mass + payload_mass * this->payload_coeff;
 }
 
