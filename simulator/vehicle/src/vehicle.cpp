@@ -18,6 +18,8 @@
 #include    "CfgReader.h"
 #include    "physics.h"
 
+#include    <QLibrary>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -185,4 +187,26 @@ void Vehicle::loadConfig(QString cfg_path)
 void Vehicle::loadConfiguration(QString cfg_path)
 {
     loadConfig(cfg_path);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Vehicle *loadVehicle(QString lib_path)
+{
+    Vehicle *vehicle = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetVehicle getVehicle = (GetVehicle) lib.resolve("getVehicle");
+
+        if (getVehicle)
+        {
+            vehicle = getVehicle();
+        }
+    }
+
+    return vehicle;
 }

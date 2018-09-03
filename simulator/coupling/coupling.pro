@@ -3,9 +3,9 @@ TEMPLATE = lib
 QT -= gui
 QT += xml
 
-DEFINES += VEHICLE_LIB
+DEFINES += COUPLING_LIB
 
-TARGET = vehicle
+TARGET = coupling
 
 DESTDIR = ../../../lib
 
@@ -28,3 +28,4 @@ INCLUDEPATH += ../../CfgReader/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
+

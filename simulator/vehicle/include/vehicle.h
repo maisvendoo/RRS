@@ -17,13 +17,20 @@
 #define     VEHICLE_H
 
 #include    <QObject>
+#include    <QtGlobal>
 
 #include    "solver-types.h"
+
+#if defined(VEHICLE_LIB)
+    #define VEHICLE_EXPORT  Q_DECL_EXPORT
+#else
+    #define VEHICLE_EXPORT  Q_DECL_IMPORT
+#endif
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Vehicle : public QObject
+class VEHICLE_EXPORT Vehicle : public QObject
 {
     Q_OBJECT
 
@@ -120,5 +127,36 @@ private:
     /// Default configuration load
     void loadConfiguration(QString cfg_path);
 };
+
+/*!
+ * \typedef
+ * \brief Signature for getVehicle() function
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef Vehicle* (*GetVehicle)();
+
+/*!
+ * \def
+ * \brief Macro for generate getVehicle() function
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+#define GET_VEHICLE(ClassName) \
+    extern "C" Q_DECL_EXPORT Vehicle *getVehicle() \
+    {\
+        return new (ClassName)(); \
+    }
+
+/*!
+ * \fn
+ * \brief Load vehicle from library
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+extern "C" Q_DECL_EXPORT Vehicle *loadVehicle(QString lib_path);
 
 #endif // VEHICLE_H
