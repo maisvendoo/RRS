@@ -41,12 +41,13 @@ public:
     /// Destructor
     virtual ~FileSystem();
 
+    /// Get absolute path to working directory
     QString getWorkingDirectory() const;
-
+    /// Get absolute path to user home directory
     QString getHomeDirectory() const;
-
+    /// Get absolute path to simulator output data directory
     QString getSimDataDirectory() const;
-
+    /// Get absolute path to log files directory
     QString getLogsDirectory() const;
 
 private:
