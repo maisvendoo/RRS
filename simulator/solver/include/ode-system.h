@@ -16,6 +16,8 @@
 #ifndef     ODE_SYSTEM_H
 #define     ODE_SYSTEM_H
 
+#include    <QObject>
+
 #include    "solver-export.h"
 #include    "solver-types.h"
 
@@ -26,15 +28,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class SOLVER_EXPORT OdeSystem
+class SOLVER_EXPORT OdeSystem : public QObject
 {
+    Q_OBJECT
 
 public:
 
     /// Constructor
-    OdeSystem() {}
+    explicit OdeSystem(QObject *parent = Q_NULLPTR);
     /// Destructor
-    virtual ~OdeSystem() {}
+    virtual ~OdeSystem();
     /// Calculation of right part ODE system
     virtual void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
 
