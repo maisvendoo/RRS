@@ -20,6 +20,7 @@
 #include    "init_data.h"
 #include    "ode-system.h"
 #include    "vehicle.h"
+#include    "coupling.h"
 
 
 #if defined(TRAIN_LIB)
@@ -64,8 +65,12 @@ private:
 
     std::vector<Vehicle *> vehicles;
 
-    bool loadTrain(QString cfg_path);
+    std::vector<Couplings *> couplings;
 
+    /// Train's loading
+    bool loadTrain(QString cfg_path);
+    /// Couplings loading
+    bool loadCouplings(QString cfg_path);
 };
 
 #endif // TRAIN_H

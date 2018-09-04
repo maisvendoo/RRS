@@ -16,6 +16,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lfilesystem_d
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -lvehicle_d
+    LIBS += -L../../../lib -lcoupling_d
     LIBS += -L../../../lib -lsolver_d
 
 } else {
@@ -24,6 +25,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lfilesystem
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
+    LIBS += -L../../../lib -lcoupling
     LIBS += -L../../../lib -lsolver
 }
 
@@ -32,6 +34,7 @@ INCLUDEPATH += ../common-headers
 INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../vehicle/include
+INCLUDEPATH += ../coupling/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 

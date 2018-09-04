@@ -26,6 +26,20 @@ Train::~Train()
 //------------------------------------------------------------------------------
 bool Train::init(const init_data_t &init_data)
 {
+    QString full_config_path = fs->getTrainsDirectory() +
+            init_data.train_config_path + ".xml";
+
+    // Loading of train
+    if (!loadTrain(full_config_path))
+        return false;
+
+    // State vector initialization
+    y.resize(ode_order);
+    dydt.resize(ode_order);
+
+    for (size_t i = 0; i < y.size(); i++)
+        y[i] = dydt[i] = 0;
+
     return true;
 }
 
@@ -111,4 +125,19 @@ bool Train::loadTrain(QString cfg_path)
 
     // Check train is't empty and return
     return vehicles.size() != 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::loadCouplings(QString cfg_path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+
+    }
+
+    return couplings.size() != 0;
 }
