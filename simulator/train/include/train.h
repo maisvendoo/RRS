@@ -16,7 +16,11 @@
 #ifndef     TRAIN_H
 #define     TRAIN_H
 
+#include    "filesystem.h"
+#include    "init_data.h"
 #include    "ode-system.h"
+#include    "vehicle.h"
+
 
 #if defined(TRAIN_LIB)
     #define TRAIN_EXPORT    Q_DECL_EXPORT
@@ -26,19 +30,23 @@
 
 /*!
  * \class
- * \brief
+ * \brief Common train model
  */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 class TRAIN_EXPORT Train : public OdeSystem
 {
+    Q_OBJECT
+
 public:
 
     /// Constructor
-    explicit Train(QObject *parent = Q_NULLPTR);
+    explicit Train(FileSystem *fs, QObject *parent = Q_NULLPTR);
     /// Destructor
     virtual ~Train();
+
+    bool init(const init_data_t &init_data);
 
 signals:
 
@@ -46,7 +54,17 @@ signals:
 
 private:
 
+    FileSystem  *fs;
 
+    double      trainMass;
+    double      trainLength;
+
+    /// Order of system ODE motion
+    int         ode_order;
+
+    std::vector<Vehicle *> vehicles;
+
+    bool loadTrain(QString cfg_path);
 
 };
 

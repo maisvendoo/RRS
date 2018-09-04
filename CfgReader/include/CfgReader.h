@@ -13,14 +13,21 @@
  *  \date 17/09/2016
  */
 
-#ifndef CFGREADER_H
-#define CFGREADER_H
+#ifndef     CFGREADER_H
+#define     CFGREADER_H
 
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
-#include <QString>
-#include <QFile>
+#include    <QDomDocument>
+#include    <QDomElement>
+#include    <QDomNode>
+#include    <QString>
+#include    <QFile>
+#include    <QtGlobal>
+
+#if defined(CFG_READER_LIB)
+    #define CFG_READER_EXPORT Q_DECL_EXPORT
+#else
+    #define CFG_READER_EXPORT Q_DECL_IMPORT
+#endif
 
 /*!
  *  \class CfgReader
@@ -29,7 +36,7 @@
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-class CfgReader
+class CFG_READER_EXPORT CfgReader
 {
 public:
 

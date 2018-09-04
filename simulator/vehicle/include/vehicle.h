@@ -41,6 +41,9 @@ public:
     /// Destructor
     virtual ~Vehicle();
 
+    /// Vehicle initialization
+    void init(QString cfg_path);
+
     /// Set vehicle index
     void setIndex(int idx);
 
@@ -65,11 +68,25 @@ public:
     /// Set payload level
     void setPayloadCoeff(double payload_coeff);
 
+
+    /// Get vehicle mass
+    double getMass() const;
+
+    /// Get vehicle length
+    double getLength() const;
+
+    /// Get degrees of freedom
+    int getDegressOfFreedom() const;
+
     /// Internal ODE integration step
     virtual void step(double t, double dt);
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
+
+signals:
+
+    void logMessage(QString msg);
 
 protected:
 
@@ -118,6 +135,9 @@ protected:
     state_vector_t  Q_a;
     /// Reactive common forces
     state_vector_t  Q_r;
+
+    /// User defined initialization
+    virtual void initialization();
 
     /// User defined configuration load
     virtual void loadConfig(QString cfg_path);

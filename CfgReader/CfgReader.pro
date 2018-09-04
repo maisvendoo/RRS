@@ -5,6 +5,8 @@ QT += xml
 
 TARGET = CfgReader
 
+DEFINES += CFG_READER_LIB
+
 DESTDIR = ../../lib
 
 CONFIG(debug, debug|release) {

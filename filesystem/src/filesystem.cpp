@@ -20,13 +20,31 @@
 
 const       QString SIM_DATA_DIR = ".TrueRailway";
 const       QString LOGS_DIR = "logs";
+const       QString CFG_DIR = "cfg";
+const       QString TRAINS_DIR = "trains";
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 FileSystem::FileSystem()
 {
+    // Current working directory
     workingDir = QDir::currentPath();
+
+    // Calculate simulator root directory
+    QDir workDir(workingDir);
+    workDir.cdUp();
+    rootDirectory = workDir.path();
+
+    // Libraries directories
+    libDirectory = combinePath(rootDirectory, "lib");
+    modulesDirectory = combinePath(rootDirectory, "modules");
+
+    // Config directories
+    configDirectory = combinePath(rootDirectory, "cfg");
+    trainsDirectory = combinePath(configDirectory, "trains");
+    vehiclesDirectory = combinePath(configDirectory, "vehicles");
+
     homeDir = QDir::homePath();
     simDataDir = homeDir + QDir::separator() + SIM_DATA_DIR;
 
@@ -43,6 +61,30 @@ FileSystem::FileSystem()
 FileSystem::~FileSystem()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getRootDirectory() const
+{
+    return getDirectoryPath(rootDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getLibDirectory() const
+{
+    return getDirectoryPath(libDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getModulesDirectory() const
+{
+    return getDirectoryPath(modulesDirectory);
 }
 
 //------------------------------------------------------------------------------
@@ -75,6 +117,38 @@ QString FileSystem::getSimDataDirectory() const
 QString FileSystem::getLogsDirectory() const
 {
     return getDirectoryPath(logsDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getConfigDirectory() const
+{
+    return getDirectoryPath(configDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getTrainsDirectory() const
+{
+    return getDirectoryPath(trainsDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getVehiclesDirectory() const
+{
+    return getDirectoryPath(vehiclesDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::combinePath(const QString &path1, const QString &path2)
+{
+    return path1 + QDir::separator() + path2;
 }
 
 //------------------------------------------------------------------------------
