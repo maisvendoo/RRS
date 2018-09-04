@@ -68,6 +68,13 @@ public:
     /// Set payload level
     void setPayloadCoeff(double payload_coeff);
 
+    void setRailwayCoord(double value);
+
+    void setVelocity(double value);
+
+    void setWheelAngle(size_t i, double value);
+    void setWheelOmega(size_t i, double value);
+
 
     /// Get vehicle index
     int getIndex() const;
@@ -84,11 +91,25 @@ public:
     /// Get wheel diameter
     double getWheelDiameter() const;
 
-    /// Internal ODE integration step
-    virtual void step(double t, double dt);
+    double getRailwayCoord() const;
+
+    double getVelocity() const;
+
+    double getWheelAngle(size_t i);
+
+    double getWheelOmega(size_t i);
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
+
+    ///
+    void integrationPreStep(state_vector_t &Y, double t);
+
+    ///
+    void integrationStep(state_vector_t &Y, double t, double dt);
+
+    ///
+    void integrationPostStep(state_vector_t &Y, double t);
 
 signals:
 
@@ -143,7 +164,7 @@ protected:
 
     /// Vertical profile inclination
     double  inc;
-    /// Railsway curvature
+    /// Railway curvature
     double  curv;
 
     /// Active common forces
@@ -156,6 +177,15 @@ protected:
 
     /// User defined configuration load
     virtual void loadConfig(QString cfg_path);
+
+    /// User defined step prepare
+    virtual void preStep(double t);
+
+    /// Internal ODE integration step
+    virtual void step(double t, double dt);
+
+    /// User define step result processing
+    virtual void postStep(double t);
 
 private:
 

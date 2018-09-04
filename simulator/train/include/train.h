@@ -21,6 +21,7 @@
 #include    "ode-system.h"
 #include    "vehicle.h"
 #include    "coupling.h"
+#include    "solver.h"
 
 
 #if defined(TRAIN_LIB)
@@ -47,7 +48,17 @@ public:
     /// Destructor
     virtual ~Train();
 
+    ///
     bool init(const init_data_t &init_data);
+
+    ///
+    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t);
+
+    void preStep(double t);
+
+    bool step(double t, double &dt);
+
+    void postStep(double t);
 
 signals:
 
@@ -63,6 +74,10 @@ private:
     /// Order of system ODE motion
     int         ode_order;
 
+    int         dir;
+
+    Solver      *train_motion_solver;
+
     std::vector<Vehicle *> vehicles;
 
     std::vector<Coupling *> couplings;
@@ -73,7 +88,7 @@ private:
     bool loadCouplings(QString cfg_path);
 
     /// Set initial conditions
-    bool setInitConditions(const init_data_t &init_data);
+    void setInitConditions(const init_data_t &init_data);
 };
 
 #endif // TRAIN_H
