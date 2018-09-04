@@ -47,6 +47,9 @@ public:
     /// Reset coupling (reset getForce() calls count)
     virtual void reset();
 
+    /// Load configuration
+    void loadConfiguration(QString cfg_path);
+
 protected:
 
     /// Count of calls getForce()
@@ -57,6 +60,9 @@ protected:
 
     /// Construct shiffness
     double  ck;
+
+    ///
+    virtual void loadConfig(QString cfg_path);
 };
 
 /*!

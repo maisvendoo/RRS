@@ -69,6 +69,9 @@ public:
     void setPayloadCoeff(double payload_coeff);
 
 
+    /// Get vehicle index
+    int getIndex() const;
+
     /// Get vehicle mass
     double getMass() const;
 
@@ -77,6 +80,9 @@ public:
 
     /// Get degrees of freedom
     int getDegressOfFreedom() const;
+
+    /// Get wheel diameter
+    double getWheelDiameter() const;
 
     /// Internal ODE integration step
     virtual void step(double t, double dt);
@@ -119,6 +125,15 @@ protected:
 
     /// Number of degrees of freedom
     int     s;
+
+    /// Railway coordinate
+    double railway_coord;
+    /// Body velocity
+    double velocity;
+    /// Wheels rotation angles
+    std::vector<double> wheel_rotation_angle;
+    /// Wheels angular velocities
+    std::vector<double> wheel_omega;
 
     double  b0;
     double  b1;

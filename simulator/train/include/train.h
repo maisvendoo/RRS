@@ -65,12 +65,15 @@ private:
 
     std::vector<Vehicle *> vehicles;
 
-    std::vector<Couplings *> couplings;
+    std::vector<Coupling *> couplings;
 
     /// Train's loading
     bool loadTrain(QString cfg_path);
     /// Couplings loading
     bool loadCouplings(QString cfg_path);
+
+    /// Set initial conditions
+    bool setInitConditions(const init_data_t &init_data);
 };
 
 #endif // TRAIN_H

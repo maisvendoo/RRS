@@ -1,6 +1,7 @@
 #include    "train.h"
 
 #include    "CfgReader.h"
+#include    "physics.h"
 
 //------------------------------------------------------------------------------
 //
@@ -31,7 +32,10 @@ bool Train::init(const init_data_t &init_data)
 
     // Loading of train
     if (!loadTrain(full_config_path))
+    {
+        emit logMessage("ERROR: train is't loaded");
         return false;
+    }
 
     // State vector initialization
     y.resize(ode_order);
@@ -39,6 +43,16 @@ bool Train::init(const init_data_t &init_data)
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
+
+    // Loading of couplings
+    if (!loadCouplings(full_config_path))
+    {
+        emit logMessage("ERROR: couplings is't loaded");
+        return false;
+    }
+
+    // Set initial conditions
+    setInitConditions(init_data);
 
     return true;
 }
@@ -61,7 +75,7 @@ bool Train::loadTrain(QString cfg_path)
             QString module_name = "";
             if (!cfg.getString(vehicle_node, "Module", module_name))
             {
-                emit logMessage("FAIL: Module section is not find");
+                emit logMessage("ERROR: Module section is not find");
                 break;
             }
 
@@ -136,8 +150,50 @@ bool Train::loadCouplings(QString cfg_path)
 
     if (cfg.load(cfg_path))
     {
+        QString coupling_module = "";
+        if (!cfg.getString("Common", "CouplingModule", coupling_module))
+        {
+            coupling_module = "default-coupling";
+        }
 
+        int num_couplings = static_cast<int>(vehicles.size() - 1);
+
+        for (int i = 0; i < num_couplings; i++)
+        {
+            Coupling *coupling = loadCoupling(fs->getModulesDirectory() +
+                                              coupling_module);
+
+            coupling->loadConfiguration(fs->getCouplingsDirectory() +
+                                        coupling_module + ".xml");
+
+            coupling->reset();
+
+            couplings.push_back(coupling);
+        }
     }
 
     return couplings.size() != 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::setInitConditions(const init_data_t &init_data)
+{
+    for (size_t i = 0; i < vehicles.size(); i++)
+    {
+        Vehicle *vehicle = vehicles[i];
+
+        int s = vehicle->getDegressOfFreedom();
+        int idx = vehicle->getIndex();
+
+        y[idx + s] = init_data.init_velocity / Physics::kmh;
+
+        double wheel_radius = vehicle->getWheelDiameter() / 2.0;
+
+        for (size_t j = 1; j < static_cast<size_t>(s); j++)
+        {
+            y[idx + s + j] = y[idx + s] / wheel_radius;
+        }
+    }
 }
