@@ -182,7 +182,7 @@ bool Train::loadTrain(QString cfg_path)
 
                 if (vehicle == Q_NULLPTR)
                 {
-                    emit logMessage("FAIL: vehicle " + module_name + "is't loaded");
+                    emit logMessage("ERROR: vehicle " + module_name + "is't loaded");
                     break;
                 }
 

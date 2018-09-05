@@ -22,7 +22,7 @@
 #include    "vehicle.h"
 #include    "coupling.h"
 #include    "solver.h"
-
+#include    "solver-config.h"
 
 #if defined(TRAIN_LIB)
     #define TRAIN_EXPORT    Q_DECL_EXPORT
@@ -68,13 +68,17 @@ private:
 
     FileSystem  *fs;
 
-    double      trainMass;
-    double      trainLength;
+    /// Train mass
+    double          trainMass;
+    /// Train length
+    double          trainLength;
 
     /// Order of system ODE motion
-    int         ode_order;
+    int             ode_order;
 
-    int         dir;
+    int             dir;
+
+    solver_config_t solver_config;
 
     Solver      *train_motion_solver;
 
