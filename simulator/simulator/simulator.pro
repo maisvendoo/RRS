@@ -37,6 +37,10 @@ INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
 
 INCLUDEPATH += ../model/include
+INCLUDEPATH += ../train/include
+INCLUDEPATH += ../solver/include
+INCLUDEPATH += ../vehicle/include
+INCLUDEPATH += ../coupling/include
 
 HEADERS += $$files(./include/*.h) 
 SOURCES += $$files(./src/*.cpp)

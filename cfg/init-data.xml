@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <InitData>
+        <InitCoord>6.700</InitCoord>
+        <InitVelocity>0.0</InitVelocity>
+        <Profile>flat</Profile>
+        <Direction>1</Direction>
+        <TrainConfig>default-train</TrainConfig>
+        <IntegrationTimeInterval>100</IntegrationTimeInterval>
+        <DebugPrint>true</DebugPrint>
+    </InitData>
+</Config>

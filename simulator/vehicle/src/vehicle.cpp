@@ -19,6 +19,8 @@
 #include    "physics.h"
 
 #include    <QLibrary>
+#include    <QDir>
+#include    <QFileInfo>
 
 //------------------------------------------------------------------------------
 //
@@ -289,6 +291,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 {
+    (void) Y;
     preStep(t);
 }
 
@@ -340,7 +343,63 @@ void Vehicle::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void Vehicle::loadConfiguration(QString cfg_path)
 {
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Vehicle";
+
+        cfg.getDouble(secName, "EmptyMass", empty_mass);
+        cfg.getDouble(secName, "PayloadMass", payload_mass);
+        cfg.getDouble(secName, "Length", length);
+        cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
+        cfg.getInt(secName, "NumAxis", num_axis);
+
+        s = num_axis + 1;
+
+        cfg.getDouble(secName, "WheelInertia", J_axis);
+
+        QString main_resist_cfg = "";
+        cfg.getString(secName, "MainResist", main_resist_cfg);
+
+        loadMainResist(cfg_path, main_resist_cfg);
+    }
+    else
+    {
+        emit logMessage("ERROR: file " + cfg_path + "is't found");
+    }
+
     loadConfig(cfg_path);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
+{
+    QFileInfo info(cfg_path);
+    QDir dir(info.path());
+    dir.cdUp();
+    QString file_path = dir.path() + QDir::separator() +
+            "main-resist" + QDir::separator() +
+            main_resist_cfg + ".xml";
+
+    CfgReader cfg;
+
+    if (cfg.load(file_path))
+    {
+        QString secName = "MainResist";
+
+        cfg.getDouble(secName, "b0", b0);
+        cfg.getDouble(secName, "b1", b1);
+        cfg.getDouble(secName, "b2", b2);
+        cfg.getDouble(secName, "b3", b3);
+        cfg.getDouble(secName, "q0", q0);
+    }
+    else
+    {
+        emit logMessage("ERROR: file " + file_path + "is't found");
+    }
 }
 
 //------------------------------------------------------------------------------

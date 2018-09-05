@@ -54,7 +54,7 @@ void Coupling::loadConfiguration(QString cfg_path)
 //------------------------------------------------------------------------------
 void Coupling::loadConfig(QString cfg_path)
 {
-
+    (void) cfg_path;
 }
 
 //------------------------------------------------------------------------------

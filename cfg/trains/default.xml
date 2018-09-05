@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModel>default</CouplingModel>
+	</Common>
+	<Vehicle>
+		<Module>default-vehicle</Module>
+		<ModuleConfig>default-vehicle</ModuleConfig>
+		<Count>3</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+</Config>

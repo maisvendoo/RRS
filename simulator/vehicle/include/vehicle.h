@@ -191,6 +191,9 @@ private:
 
     /// Default configuration load
     void loadConfiguration(QString cfg_path);
+
+    /// Load main resistence coefficients
+    void loadMainResist(QString cfg_path, QString main_resist_cfg);
 };
 
 /*!

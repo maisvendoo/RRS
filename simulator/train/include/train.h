@@ -92,7 +92,7 @@ private:
     bool loadCouplings(QString cfg_path);
 
     /// Set initial conditions
-    void setInitConditions(const init_data_t &init_data);
+    void setInitConditions(const init_data_t &init_data);    
 };
 
 #endif // TRAIN_H

@@ -18,6 +18,8 @@
 
 #include    <QString>
 
+#include    "solver-config.h"
+
 /*!
  * \struct
  * \brief
@@ -33,6 +35,8 @@ struct init_data_t
     QString profile_path;
     QString train_config_path;
     int     integration_time_interval;
+    bool    debug_print;
+    solver_config_t solver_config;
 
     init_data_t()
         : init_coord(0)
@@ -41,6 +45,7 @@ struct init_data_t
         , profile_path("")
         , train_config_path("")
         , integration_time_interval(100)
+        , debug_print(false)
     {
 
     }

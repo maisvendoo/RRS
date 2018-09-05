@@ -27,6 +27,8 @@ Train::~Train()
 //------------------------------------------------------------------------------
 bool Train::init(const init_data_t &init_data)
 {
+    solver_config = init_data.solver_config;
+
     QString full_config_path = fs->getTrainsDirectory() +
             init_data.train_config_path + ".xml";
 
@@ -103,7 +105,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
 //------------------------------------------------------------------------------
 void Train::preStep(double t)
 {
-
+    (void) t;
 }
 
 //------------------------------------------------------------------------------
@@ -112,11 +114,16 @@ void Train::preStep(double t)
 bool Train::step(double t, double &dt)
 {
     // EDIT THIS SOLVER CALL. CONFIGURE SOLVER!!!!
-    bool done = train_motion_solver->step(this, y, dydt, t, dt, 0.0, 0.0);
+    bool done = train_motion_solver->step(this, y, dydt, t, dt,
+                                          solver_config.max_step,
+                                          solver_config.local_error);
 
     for (size_t i = 0; i < vehicles.size(); i++)
     {
         vehicles[i]->integrationStep(y, t, dt);
+
+        if (i < couplings.size())
+            couplings[i]->reset();
     }
 
     return done;
@@ -127,7 +134,7 @@ bool Train::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Train::postStep(double t)
 {
-
+    (void) t;
 }
 
 //------------------------------------------------------------------------------
@@ -182,7 +189,7 @@ bool Train::loadTrain(QString cfg_path)
 
                 if (vehicle == Q_NULLPTR)
                 {
-                    emit logMessage("ERROR: vehicle " + module_name + "is't loaded");
+                    emit logMessage("ERROR: vehicle " + module_name + " is't loaded");
                     break;
                 }
 
@@ -208,6 +215,10 @@ bool Train::loadTrain(QString cfg_path)
 
             vehicle_node = cfg.getNextSection();
         }
+    }
+    else
+    {
+        emit logMessage("ERROR: file " + cfg_path + " is't found");
     }
 
     // Check train is't empty and return
@@ -243,6 +254,10 @@ bool Train::loadCouplings(QString cfg_path)
 
             couplings.push_back(coupling);
         }
+    }
+    else
+    {
+        emit logMessage("ERROR: file " + cfg_path + " is't found");
     }
 
     return couplings.size() != 0;

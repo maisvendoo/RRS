@@ -23,6 +23,7 @@
 #include    "command-line.h"
 #include    "filesystem.h"
 #include    "log.h"
+#include    "train.h"
 
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
@@ -62,6 +63,9 @@ public slots:
     /// Main simulation loop
     void process();
 
+    /// Messages output
+    void outMessage(QString msg);
+
 private:
 
     /// Simulator's log object
@@ -92,6 +96,9 @@ private:
     /// Simulation thread
     QThread     model_thread;
 
+    /// Train model
+    Train       *train;
+
     /// Log initialization
     void logInit(bool clear_log = false);
 
@@ -104,6 +111,15 @@ private:
 
     /// Debug print to stdout
     void debugPrint();
+
+    /// Initial data loading
+    void loadInitData(init_data_t &init_data);
+
+    /// Override of initial data by command line
+    void overrideByCommandLine(init_data_t &init_data, const command_line_t &command_line);
+
+    /// Solver configuration loading
+    void configSolver(solver_config_t &solver_config);
 };
 
 #endif // MODEL_H

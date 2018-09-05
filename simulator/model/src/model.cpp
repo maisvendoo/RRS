@@ -17,6 +17,8 @@
 
 #include    <QTime>
 
+#include    "CfgReader.h"
+
 const       QString LOG_FILE_NAME = "simulator.log";
 
 //------------------------------------------------------------------------------
@@ -55,6 +57,29 @@ bool Model::init(const command_line_t &command_line)
 
     // Check is debug print allowed
     is_debug_print = command_line.debug_print.is_present;
+
+    init_data_t init_data;
+
+    // Load initial data configuration
+    loadInitData(init_data);
+
+    // Override init data by command line
+    overrideByCommandLine(init_data, command_line);
+
+    // Read solver configuration
+    configSolver(init_data.solver_config);
+
+    start_time = init_data.solver_config.start_time;
+    stop_time = init_data.solver_config.stop_time;
+    dt = init_data.solver_config.step;
+
+    // Train creation and initialization
+    train = new Train(&fs);
+
+    connect(train, &Train::logMessage, this, &Model::logMessage);
+
+    if (!train->init(init_data))
+        return false;
 
     return true;
 }
@@ -137,10 +162,19 @@ void Model::process()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::outMessage(QString msg)
+{
+    fputs(qPrintable(msg + "\n"), stdout);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::logInit(bool clear_log)
 {
     simLog = new Log(fs.getLogsDirectory() + LOG_FILE_NAME, clear_log, true);
     connect(this, &Model::logMessage, simLog, &Log::printMessage);
+    connect(this, &Model::logMessage, this, &Model::outMessage);
 }
 
 //------------------------------------------------------------------------------
@@ -148,7 +182,7 @@ void Model::logInit(bool clear_log)
 //------------------------------------------------------------------------------
 void Model::preStep(double t)
 {
-
+    train->preStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -156,6 +190,9 @@ void Model::preStep(double t)
 //------------------------------------------------------------------------------
 bool Model::step(double t, double &dt)
 {
+    if (!train->step(t, dt))
+        return false;
+
     return true;
 }
 
@@ -164,7 +201,7 @@ bool Model::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Model::postStep(double t)
 {
-
+    train->postStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -177,6 +214,97 @@ void Model::debugPrint()
             .arg(realtime_delay);
 
     fputs(qPrintable(debug_info), stdout);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::loadInitData(init_data_t &init_data)
+{
+    CfgReader cfg;
+    QString cfg_path = fs.getConfigDirectory() + "init-data.xml";
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "InitData";
+
+        if (!cfg.getDouble(secName, "InitCoord", init_data.init_coord))
+        {
+            init_data.init_coord = 1.0;
+        }
+
+        if (!cfg.getDouble(secName, "InitVelocity", init_data.init_velocity))
+        {
+            init_data.init_velocity = 0.0;
+        }
+
+        if (!cfg.getString(secName, "Profile", init_data.profile_path))
+        {
+            init_data.profile_path = "default";
+        }
+
+        if (!cfg.getString(secName, "TrainConfig", init_data.train_config_path))
+        {
+            init_data.train_config_path = "default-train";
+        }
+
+        if (!cfg.getInt(secName, "IntegrationTimeInterval", init_data.integration_time_interval))
+        {
+            init_data.integration_time_interval = 100;
+        }
+
+        if (!cfg.getBool(secName, "DebugPrint", init_data.debug_print))
+        {
+            init_data.debug_print = false;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::overrideByCommandLine(init_data_t &init_data,
+                                  const command_line_t &command_line)
+{
+    if (command_line.train_config.is_present)
+        init_data.train_config_path = command_line.train_config.value;
+
+    if (command_line.debug_print.is_present)
+        init_data.debug_print = command_line.debug_print.value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::configSolver(solver_config_t &solver_config)
+{
+    CfgReader cfg;
+    QString cfg_path = fs.getConfigDirectory() + "solver.xml";
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Solver";
+
+        if (!cfg.getString(secName, "Method", solver_config.method))
+        {
+            solver_config.method = "rkf5";
+        }
+
+        if (!cfg.getDouble(secName, "StartTime", solver_config.start_time))
+        {
+            solver_config.start_time = 0;
+        }
+
+        if (!cfg.getDouble(secName, "StopTime", solver_config.stop_time))
+        {
+            solver_config.stop_time = 10.0;
+        }
+
+        if (!cfg.getDouble(secName, "InitStep", solver_config.step))
+        {
+            solver_config.step = 1e-4;
+        }
+    }
 }
 
 
