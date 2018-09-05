@@ -313,11 +313,14 @@ void Vehicle::integrationPostStep(state_vector_t &Y, double t)
     railway_coord = railway_coord0 + Y[idx];
     velocity = Y[idx + s];
 
-    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    memcpy(wheel_rotation_angle.data(), Y.data() + idx + 1, sizeof(double) * (s-1));
+    memcpy(wheel_omega.data(), Y.data() + idx + s + 1, sizeof(double) * (s-1));
+
+    /*for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1];
         wheel_omega[i] = Y[idx + s + i + 1];
-    }
+    }*/
 
     postStep(t);
 }
@@ -356,6 +359,12 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getInt(secName, "NumAxis", num_axis);
 
         s = num_axis + 1;
+
+        wheel_rotation_angle.resize(num_axis);
+        wheel_omega.resize(num_axis);
+
+        for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+            wheel_omega[i] = wheel_rotation_angle[i] = 0;
 
         Q_a.resize(s);
         Q_r.resize(s);

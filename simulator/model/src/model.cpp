@@ -209,9 +209,10 @@ void Model::postStep(double t)
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3\n")
             .arg(t)
-            .arg(realtime_delay);
+            .arg(realtime_delay)
+            .arg(dt);
 
     fputs(qPrintable(debug_info), stdout);
 }

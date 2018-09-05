@@ -135,7 +135,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
             if (dt > max_step)
                 dt = max_step;
 
-            ready = true;
+            ready = false;
         }
 
         if ((delta > local_err / 32.0) && (delta < local_err))

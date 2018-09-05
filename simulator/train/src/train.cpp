@@ -131,12 +131,12 @@ bool Train::step(double t, double &dt)
                                           solver_config.max_step,
                                           solver_config.local_error);
 
-    for (size_t i = 0; i < vehicles.size(); i++)
+    for (size_t i = 0; i < vehicles.size(); ++i)
     {
-        vehicles[i]->integrationStep(y, t, dt);
+        vehicles[i]->integrationStep(y, t, dt);        
 
-        if (i < couplings.size())
-            couplings[i]->reset();
+        /*if (i < couplings.size())
+            couplings[i]->reset();*/
     }
 
     return done;
