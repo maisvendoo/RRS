@@ -6,7 +6,7 @@
         <Profile>flat</Profile>
         <Direction>1</Direction>
         <TrainConfig>default-train</TrainConfig>
-        <IntegrationTimeInterval>100</IntegrationTimeInterval>
+        <IntegrationTimeInterval>200</IntegrationTimeInterval>
         <DebugPrint>true</DebugPrint>
     </InitData>
 </Config>

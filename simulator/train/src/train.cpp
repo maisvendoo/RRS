@@ -313,6 +313,8 @@ void Train::setInitConditions(const init_data_t &init_data)
         double Li_1 = vehicles[i-1]->getLength();
         double Li = vehicles[i]->getLength();
 
-        vehicles[i]->setRailwayCoord(x0 - dir *(Li + Li_1) / 2);
+        double x = x0 - dir *(Li + Li_1) / 2;
+
+        vehicles[i]->setRailwayCoord(x);
     }
 }

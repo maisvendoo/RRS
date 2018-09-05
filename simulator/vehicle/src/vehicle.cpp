@@ -139,7 +139,7 @@ void Vehicle::setPayloadCoeff(double payload_coeff)
 //------------------------------------------------------------------------------
 void Vehicle::setRailwayCoord(double value)
 {
-    railway_coord = value;
+    railway_coord0 = railway_coord = value;
 }
 
 //------------------------------------------------------------------------------
@@ -310,8 +310,8 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
-    railway_coord += Y[idx];
-    velocity += Y[idx + s];
+    railway_coord = railway_coord0 + Y[idx];
+    velocity = Y[idx + s];
 
     for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
@@ -359,6 +359,9 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         Q_a.resize(s);
         Q_r.resize(s);
+
+        for (size_t i = 0; i < Q_a.size(); i++)
+            Q_a[i] = Q_r[i] = 0;
 
         cfg.getDouble(secName, "WheelInertia", J_axis);
 

@@ -147,6 +147,8 @@ protected:
     /// Number of degrees of freedom
     int     s;
 
+    /// Init railway coordinate
+    double railway_coord0;
     /// Railway coordinate
     double railway_coord;
     /// Body velocity
