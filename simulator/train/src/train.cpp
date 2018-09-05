@@ -31,6 +31,17 @@ bool Train::init(const init_data_t &init_data)
 {
     solver_config = init_data.solver_config;
 
+    // Solver loading
+    QString solver_path = fs->getLibDirectory() + solver_config.method;
+
+    train_motion_solver = loadSolver(solver_path);
+
+    if (train_motion_solver == Q_NULLPTR)
+    {
+        emit logMessage("ERROR: solver " + solver_config.method + " is't found");
+        return false;
+    }
+
     QString full_config_path = fs->getTrainsDirectory() +
             init_data.train_config_path + ".xml";
 
