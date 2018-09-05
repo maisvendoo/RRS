@@ -58,6 +58,9 @@ protected:
     /// Gap in coupling mechanism
     double  delta;
 
+    /// Maximal motion range
+    double lambda;
+
     /// Construct shiffness
     double  ck;
 

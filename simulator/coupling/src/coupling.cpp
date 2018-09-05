@@ -17,6 +17,8 @@
 
 #include    <QLibrary>
 
+#include    "CfgReader.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -46,6 +48,17 @@ void Coupling::reset()
 //------------------------------------------------------------------------------
 void Coupling::loadConfiguration(QString cfg_path)
 {
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Coupling";
+
+        cfg.getDouble(secName, "delta", delta);
+        cfg.getDouble(secName, "lambda", lambda);
+        cfg.getDouble(secName, "ck", ck);
+    }
+
     loadConfig(cfg_path);
 }
 
@@ -68,7 +81,7 @@ Coupling *loadCoupling(QString lib_path)
 
     if (lib.load())
     {
-        GetCoupling getCoupling = (GetCoupling) lib.resolve("getVehicle");
+        GetCoupling getCoupling = (GetCoupling) lib.resolve("getCoupling");
 
         if (getCoupling)
         {

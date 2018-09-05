@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Common>
-		<CouplingModel>default</CouplingModel>
+		<CouplingModule>default-coupling</CouplingModule>
 	</Common>
 	<Vehicle>
 		<Module>default-vehicle</Module>

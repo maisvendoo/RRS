@@ -357,6 +357,9 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         s = num_axis + 1;
 
+        Q_a.resize(s);
+        Q_r.resize(s);
+
         cfg.getDouble(secName, "WheelInertia", J_axis);
 
         QString main_resist_cfg = "";

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Coupling>
+		<delta>0.02</delta>
+		<lambda>0.11</lambda>
+		<ck>5e8</ck>
+		<c>2e7</c>
+	</Coupling>
+</Config>

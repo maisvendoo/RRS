@@ -10,5 +10,6 @@ SUBDIRS += ./coupling
 SUBDIRS += ./train
 SUBDIRS += ./model
 SUBDIRS += ./default-vehicle
+SUBDIRS += ./default-coupling
 SUBDIRS += ./simulator
 
