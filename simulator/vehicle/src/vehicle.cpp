@@ -380,6 +380,7 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
     QFileInfo info(cfg_path);
     QDir dir(info.path());
     dir.cdUp();
+    dir.cdUp();
     QString file_path = dir.path() + QDir::separator() +
             "main-resist" + QDir::separator() +
             main_resist_cfg + ".xml";

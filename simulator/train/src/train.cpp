@@ -10,6 +10,8 @@ Train::Train(FileSystem *fs, QObject *parent) : OdeSystem(parent)
   , fs(fs)
   , trainMass(0.0)
   , trainLength(0.0)
+  , ode_order(0)
+  , dir(1)
 {
 
 }
@@ -246,6 +248,12 @@ bool Train::loadCouplings(QString cfg_path)
         {
             Coupling *coupling = loadCoupling(fs->getModulesDirectory() +
                                               coupling_module);
+
+            if (coupling == Q_NULLPTR)
+            {
+                emit logMessage("ERROR: coupling module " + coupling_module + " is't found");
+                return false;
+            }
 
             coupling->loadConfiguration(fs->getCouplingsDirectory() +
                                         coupling_module + ".xml");
