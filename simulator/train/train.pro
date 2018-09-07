@@ -5,6 +5,8 @@ QT += xml
 
 DEFINES += TRAIN_LIB
 
+CONFIG += c++11
+
 TARGET = train
 
 DESTDIR = ../../../lib

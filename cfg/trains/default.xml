@@ -4,9 +4,15 @@
 		<CouplingModule>default-coupling</CouplingModule>
 	</Common>
 	<Vehicle>
+		<Module>test-loco</Module>
+		<ModuleConfig>test-loco</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
 		<Module>default-vehicle</Module>
 		<ModuleConfig>default-vehicle</ModuleConfig>
-		<Count>200</Count>
+		<Count>100</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>	
 </Config>

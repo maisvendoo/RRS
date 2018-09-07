@@ -249,13 +249,10 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-state_vector_t Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t)
+double Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     (void) t;
     (void) Y;
-
-    state_vector_t a;
-    a.resize(s);
 
     double v = dYdt[idx];
     double V = abs(v) * Physics::kmh;
@@ -271,18 +268,15 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt,
 
     double rk = wheel_diameter / 2.0;
 
-    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
+    for (size_t i = 0; i < static_cast<size_t>(num_axis); i++)
     {
         double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], dYdt[idx + i])) / rk;
         sumCreepForces += creepForce;
     }
 
-    double Fr = Physics::fricForce(W + Q_r[0], v);
+    double Fr = Physics::fricForce(W, v);
 
-    a[0] = (Q_a[0] - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
-
-    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
-        a[i] = a[0] / rk;
+    double a = (Fr + R1 - R2 + sumCreepForces - G) / (full_mass + num_axis * J_axis / rk / rk);
 
     return a;
 }
@@ -315,11 +309,10 @@ void Vehicle::integrationPostStep(state_vector_t &Y, state_vector_t &dYdt, doubl
     railway_coord = railway_coord0 + Y[idx];
     velocity = dYdt[idx];
 
-
     for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
-        wheel_rotation_angle[i] = Y[idx + i + 1];
-        wheel_omega[i] = dYdt[idx + i + 1];
+        wheel_rotation_angle[i] = 2 * Y[idx] / wheel_diameter;
+        wheel_omega[i] = 2 * dYdt[idx] / wheel_diameter;
     }
 
     postStep(t);
@@ -358,7 +351,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
         cfg.getInt(secName, "NumAxis", num_axis);
 
-        s = num_axis + 1;
+        s = 1;
 
         wheel_rotation_angle.resize(num_axis);
         wheel_omega.resize(num_axis);
@@ -366,8 +359,8 @@ void Vehicle::loadConfiguration(QString cfg_path)
         for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
             wheel_omega[i] = wheel_rotation_angle[i] = 0;
 
-        Q_a.resize(s);
-        Q_r.resize(s);
+        Q_a.resize(num_axis);
+        Q_r.resize(num_axis);
 
         for (size_t i = 0; i < Q_a.size(); i++)
             Q_a[i] = Q_r[i] = 0;

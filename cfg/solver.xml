@@ -5,7 +5,7 @@
 	<StartTime>0</StartTime>
 	<StopTime>1e7</StopTime>
         <MaxStep>1e-2</MaxStep>
-	<InitStep>1e-2</InitStep>
+	<InitStep>1e-5</InitStep>
 	<LocalError>1e-1</LocalError>
     </Solver>
 </Config>

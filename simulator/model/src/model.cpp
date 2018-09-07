@@ -74,7 +74,8 @@ bool Model::init(const command_line_t &command_line)
     dt = init_data.solver_config.step;
 
     // Train creation and initialization
-    train = new Train(&fs);
+    train = new Train();
+    train->setFileSystem(&fs);
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
@@ -182,7 +183,7 @@ void Model::logInit(bool clear_log)
 //------------------------------------------------------------------------------
 void Model::preStep(double t)
 {
-    train->preStep(t);
+    //train->preStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -201,7 +202,7 @@ bool Model::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Model::postStep(double t)
 {
-    train->postStep(t);
+    //train->postStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -209,11 +210,11 @@ void Model::postStep(double t)
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 v = %4\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3\n")
             .arg(t)
             .arg(realtime_delay)
-            .arg(dt)
-            .arg(train->getVelocity(0) * 3.6);
+            .arg(dt);
+
 
     fputs(qPrintable(debug_info), stdout);
 }

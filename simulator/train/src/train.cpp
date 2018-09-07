@@ -6,8 +6,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Train::Train(FileSystem *fs, QObject *parent) : OdeSystem(parent)
-  , fs(fs)
+Train::Train() : OdeSystem ()
+  , fs(nullptr)
   , trainMass(0.0)
   , trainLength(0.0)
   , half_ode_order(0)
@@ -55,6 +55,8 @@ bool Train::init(const init_data_t &init_data)
     // State vector initialization
     y.resize(half_ode_order);
     dydt.resize(half_ode_order);
+
+    train_motion_solver->init(half_ode_order);
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
@@ -105,20 +107,10 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector
         vehicle->setInclination(0.0);
         vehicle->setCurvature(0.0);
 
-        state_vector_t vehicle_accel = vehicle->getAcceleration(Y, dYdt, t);
-
-        memcpy(a.data() + idx, vehicle_accel.data(), sizeof(double) * s);
+        a[i] = vehicle->getAcceleration(Y, dYdt, t);
 
         vehicle->integrationStep(Y, dYdt, t, dt);
     }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Train::preStep(double t)
-{
-    (void) t;
 }
 
 //------------------------------------------------------------------------------
@@ -133,23 +125,9 @@ bool Train::step(double t, double &dt)
     return done;
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Train::postStep(double t)
+void Train::setFileSystem(FileSystem *fs)
 {
-    (void) t;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double Train::getVelocity(int i) const
-{
-    if (i < static_cast<int>(dydt.size()))
-        return dydt[i];
-
-    return 0.0;
+    this->fs = fs;
 }
 
 //------------------------------------------------------------------------------

@@ -35,7 +35,7 @@ class SOLVER_EXPORT OdeSystem : public QObject
 public:
 
     /// Constructor
-    explicit OdeSystem(QObject *parent = Q_NULLPTR);
+    OdeSystem();
     /// Destructor
     virtual ~OdeSystem();
     /// Calculation of right part ODE system
@@ -43,7 +43,7 @@ public:
                                 state_vector_t &dYdt,
                                 state_vector_t &a,
                                 double t,
-                                double dt) = 0;
+                                double dt) = 0;    
 
 protected:
 

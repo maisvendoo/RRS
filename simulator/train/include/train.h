@@ -44,23 +44,19 @@ class TRAIN_EXPORT Train : public OdeSystem
 public:
 
     /// Constructor
-    explicit Train(FileSystem *fs, QObject *parent = Q_NULLPTR);
+    Train();
     /// Destructor
-    virtual ~Train();
+    ~Train();
 
     ///
     bool init(const init_data_t &init_data);
 
     ///
-    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector_t &a, double t, double dt);
-
-    void preStep(double t);
+    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector_t &a, double t, double dt);    
 
     bool step(double t, double &dt);
 
-    void postStep(double t);
-
-    double getVelocity(int i) const;
+    void setFileSystem(FileSystem *fs);
 
 signals:
 
