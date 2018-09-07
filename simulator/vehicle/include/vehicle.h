@@ -100,16 +100,16 @@ public:
     double getWheelOmega(size_t i);
 
     /// Common acceleration calculation
-    virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
+    virtual state_vector_t getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t);
 
     ///
-    void integrationPreStep(state_vector_t &Y, double t);
+    void integrationPreStep(state_vector_t &Y, state_vector_t &dYdt, double t);
 
     ///
-    void integrationStep(state_vector_t &Y, double t, double dt);
+    void integrationStep(state_vector_t &Y, state_vector_t &dYdt, double t, double dt);
 
     ///
-    void integrationPostStep(state_vector_t &Y, double t);
+    void integrationPostStep(state_vector_t &Y, state_vector_t &dYdt, double t);
 
 signals:
 

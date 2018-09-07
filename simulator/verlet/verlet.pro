@@ -2,7 +2,7 @@ TEMPLATE = lib
 
 QT -= gui
 
-TARGET = rkf5
+TARGET = verlet
 
 DESTDIR = ../../../lib
 
@@ -20,3 +20,4 @@ INCLUDEPATH += ../solver/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
+

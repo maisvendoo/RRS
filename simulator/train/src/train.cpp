@@ -10,7 +10,7 @@ Train::Train(FileSystem *fs, QObject *parent) : OdeSystem(parent)
   , fs(fs)
   , trainMass(0.0)
   , trainLength(0.0)
-  , ode_order(0)
+  , half_ode_order(0)
   , dir(1)
 {
 
@@ -53,8 +53,8 @@ bool Train::init(const init_data_t &init_data)
     }
 
     // State vector initialization
-    y.resize(ode_order);
-    dydt.resize(ode_order);
+    y.resize(half_ode_order);
+    dydt.resize(half_ode_order);
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
@@ -75,7 +75,7 @@ bool Train::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
+void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector_t &a, double t, double dt)
 {
     size_t num_vehicles = vehicles.size();
 
@@ -89,13 +89,12 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
         {
             Vehicle *vehicle1 = vehicles[i+1];
             int idx1 = vehicle1->getIndex();
-            int s1 = vehicle1->getDegressOfFreedom();
 
             double ds = vehicle->getRailwayCoord() - vehicle1->getRailwayCoord() -
                     dir * vehicle->getLength() / 2 -
                     dir * vehicle1->getLength() / 2;
 
-            double dv = Y[idx + s] - Y[idx1 + s1];
+            double dv = dYdt[idx] - dYdt[idx1];
 
             double R = couplings[i]->getForce(ds, dv);
 
@@ -106,10 +105,11 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
         vehicle->setInclination(0.0);
         vehicle->setCurvature(0.0);
 
-        state_vector_t a = vehicle->getAcceleration(Y, t);
+        state_vector_t vehicle_accel = vehicle->getAcceleration(Y, dYdt, t);
 
-        memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
-        memcpy(dYdt.data() + idx + s, a.data(), sizeof(double) * s);
+        memcpy(a.data() + idx, vehicle_accel.data(), sizeof(double) * s);
+
+        vehicle->integrationStep(Y, dYdt, t, dt);
     }
 }
 
@@ -126,18 +126,9 @@ void Train::preStep(double t)
 //------------------------------------------------------------------------------
 bool Train::step(double t, double &dt)
 {
-    // EDIT THIS SOLVER CALL. CONFIGURE SOLVER!!!!
     bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
-                                          solver_config.local_error);
-
-    for (size_t i = 0; i < vehicles.size(); ++i)
-    {
-        vehicles[i]->integrationStep(y, t, dt);        
-
-        /*if (i < couplings.size())
-            couplings[i]->reset();*/
-    }
+                                          solver_config.local_error);    
 
     return done;
 }
@@ -148,6 +139,17 @@ bool Train::step(double t, double &dt)
 void Train::postStep(double t)
 {
     (void) t;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getVelocity(int i) const
+{
+    if (i < static_cast<int>(dydt.size()))
+        return dydt[i];
+
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -218,10 +220,10 @@ bool Train::loadTrain(QString cfg_path)
 
                 int s = vehicle->getDegressOfFreedom();
 
-                ode_order += 2 * s;
+                half_ode_order += s;
 
                 vehicle->setIndex(index);
-                index = ode_order;
+                index = half_ode_order;
 
                 vehicles.push_back(vehicle);
             }
@@ -294,13 +296,13 @@ void Train::setInitConditions(const init_data_t &init_data)
         int s = vehicle->getDegressOfFreedom();
         int idx = vehicle->getIndex();
 
-        y[idx + s] = init_data.init_velocity / Physics::kmh;
+        dydt[idx] = init_data.init_velocity / Physics::kmh;
 
         double wheel_radius = vehicle->getWheelDiameter() / 2.0;
 
         for (size_t j = 1; j < static_cast<size_t>(s); j++)
         {
-            y[idx + s + j] = y[idx + s] / wheel_radius;
+            dydt[idx + j] = dydt[idx] / wheel_radius;
         }
     }
 
@@ -313,7 +315,7 @@ void Train::setInitConditions(const init_data_t &init_data)
         double Li_1 = vehicles[i-1]->getLength();
         double Li = vehicles[i]->getLength();
 
-        double x = x0 - dir *(Li + Li_1) / 2;
+        double x = vehicles[i-1]->getRailwayCoord() - dir *(Li + Li_1) / 2;
 
         vehicles[i]->setRailwayCoord(x);
     }

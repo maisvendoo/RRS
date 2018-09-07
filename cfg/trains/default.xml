@@ -6,7 +6,7 @@
 	<Vehicle>
 		<Module>default-vehicle</Module>
 		<ModuleConfig>default-vehicle</ModuleConfig>
-		<Count>100</Count>
+		<Count>200</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>	
 </Config>

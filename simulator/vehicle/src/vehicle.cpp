@@ -249,14 +249,15 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
+state_vector_t Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     (void) t;
+    (void) Y;
 
     state_vector_t a;
     a.resize(s);
 
-    double v = Y[idx + s];
+    double v = dYdt[idx];
     double V = abs(v) * Physics::kmh;
 
     double sin_beta = inc / 1000.0;
@@ -272,7 +273,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
     {
-        double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], Y[idx + s + i])) / rk;
+        double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], dYdt[idx + i])) / rk;
         sumCreepForces += creepForce;
     }
 
@@ -280,7 +281,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     a[0] = (Q_a[0] - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
 
-    for (size_t i = 0; i < static_cast<size_t>(num_axis); i++)
+    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
         a[i] = a[0] / rk;
 
     return a;
@@ -289,38 +290,37 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPreStep(state_vector_t &Y, double t)
+void Vehicle::integrationPreStep(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     (void) Y;
+    (void) dYdt;
     preStep(t);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
+void Vehicle::integrationStep(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
 {
-    integrationPreStep(Y, t);
+    integrationPreStep(Y, dYdt, t);
     step(t, dt);
-    integrationPostStep(Y, t);
+    integrationPostStep(Y, dYdt, t);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPostStep(state_vector_t &Y, double t)
+void Vehicle::integrationPostStep(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     railway_coord = railway_coord0 + Y[idx];
-    velocity = Y[idx + s];
+    velocity = dYdt[idx];
 
-    memcpy(wheel_rotation_angle.data(), Y.data() + idx + 1, sizeof(double) * (s-1));
-    memcpy(wheel_omega.data(), Y.data() + idx + s + 1, sizeof(double) * (s-1));
 
-    /*for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1];
-        wheel_omega[i] = Y[idx + s + i + 1];
-    }*/
+        wheel_omega[i] = dYdt[idx + i + 1];
+    }
 
     postStep(t);
 }

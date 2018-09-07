@@ -39,12 +39,13 @@ public:
     /// Destructor
     virtual ~OdeSystem();
     /// Calculation of right part ODE system
-    virtual void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
+    virtual void calcDerivative(state_vector_t &Y,
+                                state_vector_t &dYdt,
+                                state_vector_t &a,
+                                double t,
+                                double dt) = 0;
 
 protected:
-
-    /// ODE system order
-    int n;
 
     /// ODE state vector
     state_vector_t  y;

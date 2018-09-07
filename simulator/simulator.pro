@@ -4,7 +4,7 @@ CONFIG += ordered
 
 SUBDIRS += ./physics
 SUBDIRS += ./solver
-SUBDIRS += ./rkf5
+SUBDIRS += ./verlet
 SUBDIRS += ./vehicle
 SUBDIRS += ./coupling
 SUBDIRS += ./train
