@@ -78,16 +78,18 @@ bool Train::init(const init_data_t &init_data)
 void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     size_t num_vehicles = vehicles.size();
+    auto end = vehicles.end();
+    auto coup_it = couplings.begin();
 
-    for (size_t i = 0; i < num_vehicles; i++)
+    for (auto it = vehicles.begin(); it != end; ++it)
     {
-        Vehicle *vehicle = vehicles[i];
+        Vehicle *vehicle = *it;
         int idx = vehicle->getIndex();
         int s = vehicle->getDegressOfFreedom();
 
-        if ( (num_vehicles > 1) && ( i != num_vehicles - 1) )
+        if ( (num_vehicles > 1) && ( it != end - 1) )
         {
-            Vehicle *vehicle1 = vehicles[i+1];
+            Vehicle *vehicle1 = *(it+1);
             int idx1 = vehicle1->getIndex();
             int s1 = vehicle1->getDegressOfFreedom();
 
@@ -97,7 +99,9 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
 
             double dv = Y[idx + s] - Y[idx1 + s1];
 
-            double R = couplings[i]->getForce(ds, dv);
+            Coupling *coup = *coup_it;
+            double R = coup->getForce(ds, dv);
+            ++coup_it;
 
             vehicle->setBackwardForce(R);
             vehicle1->setForwardForce(R);

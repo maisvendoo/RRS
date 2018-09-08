@@ -32,7 +32,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
                       double max_step,
                       double local_err)
 {
-    int n = Y.size();
+    size_t n = Y.size();
 
     // Share required memory
     if (first_step)
@@ -61,10 +61,9 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
         iter++;
 
         // Method step
-        ode_sys->calcDerivative(Y, dYdt, t);
+        ode_sys->calcDerivative(Y, dYdt, t);        
 
-
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; ++i)
         {
             k1[i] = dt * dYdt[i];
             Y1[i] = Y[i] + b21 * k1[i];
@@ -72,7 +71,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
 
         ode_sys->calcDerivative(Y1, dYdt, t + dt / 4.0);
 
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             k2[i] = dt * dYdt[i];
             Y1[i] = Y[i] + b31 * k1[i] + b32 * k2[i];
@@ -80,7 +79,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
 
         ode_sys->calcDerivative(Y1, dYdt, t + 3.0 * dt / 8.0);
 
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             k3[i] = dt * dYdt[i];
             Y1[i] = Y[i] + b41 * k1[i] + b42 * k2[i] + b43 * k3[i];
@@ -88,7 +87,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
 
         ode_sys->calcDerivative(Y1, dYdt, t + 12.0 * dt / 13.0);
 
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             k4[i] = dt * dYdt[i];
             Y1[i] = Y[i] + b51 * k1[i] + b52 * k2[i] + b53 * k3[i] +
@@ -97,7 +96,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
 
         ode_sys->calcDerivative(Y1, dYdt, t + dt);
 
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             k5[i] = dt * dYdt[i];
             Y1[i] = Y[i] + b61 * k1[i] + b62 * k2[i] + b63 * k3[i] +
@@ -107,7 +106,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
         ode_sys->calcDerivative(Y1, dYdt, t + dt / 2.0);
 
         // Local error calculation
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             k6[i] = dt * dYdt[i];
             eps_y[i] = abs(e1 * k1[i] + e3 * k3[i] + e4 * k4[i] +
