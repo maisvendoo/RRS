@@ -60,6 +60,11 @@ public:
 
     void postStep(double t);
 
+    Vehicle *getFirstVehicle() const;
+    Vehicle *getLastVehicle() const;
+
+    double getVelocity(size_t i) const;
+
 signals:
 
     void logMessage(QString msg);

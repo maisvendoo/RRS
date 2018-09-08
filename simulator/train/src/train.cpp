@@ -91,7 +91,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
             int idx1 = vehicle1->getIndex();
             int s1 = vehicle1->getDegressOfFreedom();
 
-            double ds = vehicle->getRailwayCoord() - vehicle1->getRailwayCoord() -
+            double ds = Y[idx] - Y[idx1] -
                     dir * vehicle->getLength() / 2 -
                     dir * vehicle1->getLength() / 2;
 
@@ -129,15 +129,7 @@ bool Train::step(double t, double &dt)
     // EDIT THIS SOLVER CALL. CONFIGURE SOLVER!!!!
     bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
-                                          solver_config.local_error);
-
-    for (size_t i = 0; i < vehicles.size(); i++)
-    {
-        vehicles[i]->integrationStep(y, t, dt);
-
-        if (i < couplings.size())
-            couplings[i]->reset();
-    }
+                                          solver_config.local_error);    
 
     return done;
 }
@@ -148,6 +140,34 @@ bool Train::step(double t, double &dt)
 void Train::postStep(double t)
 {
     (void) t;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Vehicle *Train::getFirstVehicle() const
+{
+    return *vehicles.begin();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Vehicle *Train::getLastVehicle() const
+{
+    return *(vehicles.end() - 1);
+}
+
+double Train::getVelocity(size_t i) const
+{
+    if (i < vehicles.size())
+    {
+        int idx = vehicles[i]->getIndex();
+        int s = vehicles[i]->getDegressOfFreedom();
+        return y[idx + s];
+    }
+
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -305,16 +325,17 @@ void Train::setInitConditions(const init_data_t &init_data)
     }
 
     double x0 = init_data.init_coord * 1000.0;
-    vehicles[0]->setRailwayCoord(x0);
+    y[0] = x0;
     dir = init_data.direction;
 
     for (size_t i = 1; i < vehicles.size(); i++)
     {
         double Li_1 = vehicles[i-1]->getLength();
+        int idxi_1 = vehicles[i-1]->getIndex();
+
         double Li = vehicles[i]->getLength();
+        int idxi = vehicles[i]->getIndex();
 
-        double x = x0 - dir *(Li + Li_1) / 2;
-
-        vehicles[i]->setRailwayCoord(x);
+        y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
     }
 }
