@@ -137,6 +137,20 @@ bool Train::step(double t, double &dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Train::vehiclesStep(double t, double dt)
+{
+    auto end = vehicles.end();
+
+    for (auto i = vehicles.begin(); i != end; ++i)
+    {
+        Vehicle *vehicle = *i;
+        vehicle->integrationStep(y, t, dt);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Train::postStep(double t)
 {
     (void) t;

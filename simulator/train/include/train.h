@@ -58,6 +58,8 @@ public:
 
     bool step(double t, double &dt);
 
+    void vehiclesStep(double t, double dt);
+
     void postStep(double t);
 
     Vehicle *getFirstVehicle() const;

@@ -2,7 +2,7 @@
 <Config>
     <InitData>
         <InitCoord>6.700</InitCoord>
-        <InitVelocity>100.0</InitVelocity>
+        <InitVelocity>0.0</InitVelocity>
         <Profile>flat</Profile>
         <Direction>1</Direction>
         <TrainConfig>default</TrainConfig>

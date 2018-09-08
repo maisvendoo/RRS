@@ -280,7 +280,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     a[0] = (Q_a[0] - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
 
-    for (size_t i = 0; i < static_cast<size_t>(num_axis); i++)
+    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
         a[i] = a[0] / rk;
 
     return a;
@@ -310,14 +310,14 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
-    railway_coord = railway_coord0 + Y[idx];
+    railway_coord = Y[idx];
     velocity = Y[idx + s];
 
-    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    /*for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1];
         wheel_omega[i] = Y[idx + s + i + 1];
-    }
+    }*/
 
     postStep(t);
 }
