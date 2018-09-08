@@ -199,7 +199,7 @@ bool Train::loadTrain(QString cfg_path)
     {
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 
-        int index = 0;
+        size_t index = 0;
 
         while (!vehicle_node.isNull())
         {
@@ -254,7 +254,7 @@ bool Train::loadTrain(QString cfg_path)
                 trainMass += vehicle->getMass();
                 trainLength += vehicle->getLength();
 
-                int s = vehicle->getDegressOfFreedom();
+                size_t s = vehicle->getDegressOfFreedom();
 
                 ode_order += 2 * s;
 
@@ -329,8 +329,8 @@ void Train::setInitConditions(const init_data_t &init_data)
     {
         Vehicle *vehicle = vehicles[i];
 
-        int s = vehicle->getDegressOfFreedom();
-        int idx = vehicle->getIndex();
+        size_t s = vehicle->getDegressOfFreedom();
+        size_t idx = vehicle->getIndex();
 
         y[idx + s] = init_data.init_velocity / Physics::kmh;
 
@@ -349,10 +349,10 @@ void Train::setInitConditions(const init_data_t &init_data)
     for (size_t i = 1; i < vehicles.size(); i++)
     {
         double Li_1 = vehicles[i-1]->getLength();
-        int idxi_1 = vehicles[i-1]->getIndex();
+        size_t idxi_1 = vehicles[i-1]->getIndex();
 
         double Li = vehicles[i]->getLength();
-        int idxi = vehicles[i]->getIndex();
+        size_t idxi = vehicles[i]->getIndex();
 
         y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
     }

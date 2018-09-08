@@ -48,21 +48,28 @@ public:
     /// Destructor
     virtual ~Train();
 
-    ///
+    /// Train initialization
     bool init(const init_data_t &init_data);
 
-    ///
+    /// Calculation of right part motion ODE's
     void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t);
 
+    /// Action before time step
     void preStep(double t);
 
+    /// Integration step
     bool step(double t, double &dt);
 
+    /// Integration step for vehicles ODE's
     void vehiclesStep(double t, double dt);
 
+    /// Action after integration step
     void postStep(double t);
 
+    /// Get first vehicle
     Vehicle *getFirstVehicle() const;
+
+    /// Get last vehicle
     Vehicle *getLastVehicle() const;
 
     double getVelocity(size_t i) const;
@@ -73,6 +80,7 @@ signals:
 
 private:
 
+    /// Pointer to filesystem object
     FileSystem  *fs;
 
     /// Train mass
@@ -81,16 +89,21 @@ private:
     double          trainLength;
 
     /// Order of system ODE motion
-    int             ode_order;
+    size_t          ode_order;
 
+    /// Direction of motion on railway
     int             dir;
 
+    /// Solver's configuration
     solver_config_t solver_config;
 
+    /// Motion ODE's solver
     Solver      *train_motion_solver;
 
+    /// All train's vehicles
     std::vector<Vehicle *> vehicles;
 
+    /// All train's couplings
     std::vector<Coupling *> couplings;
 
     /// Train's loading

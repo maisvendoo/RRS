@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Common>
-		<CouplingModule>default-coupling</CouplingModule>
+		<CouplingModule>ef-coupling</CouplingModule>
 	</Common>
 	<Vehicle>
 		<Module>test-loco</Module>

@@ -70,7 +70,7 @@ void Vehicle::init(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setIndex(int idx)
+void Vehicle::setIndex(size_t idx)
 {
     this->idx = idx;
 }
@@ -110,18 +110,18 @@ void Vehicle::setBackwardForce(double R2)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setActiveCommonForce(int idx, double value)
+void Vehicle::setActiveCommonForce(size_t idx, double value)
 {
-    if (static_cast<size_t>(idx) < Q_a.size())
+    if (idx < Q_a.size())
         Q_a[idx] = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setReactiveCommonForce(int idx, double value)
+void Vehicle::setReactiveCommonForce(size_t idx, double value)
 {
-    if (static_cast<size_t>(idx) < Q_r.size())
+    if (idx < Q_r.size())
         Q_r[idx] = value;
 }
 
@@ -171,7 +171,7 @@ void Vehicle::setWheelOmega(size_t i, double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Vehicle::getIndex() const
+size_t Vehicle::getIndex() const
 {
     return idx;
 }
@@ -195,7 +195,7 @@ double Vehicle::getLength() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Vehicle::getDegressOfFreedom() const
+size_t Vehicle::getDegressOfFreedom() const
 {
     return s;
 }
@@ -354,8 +354,11 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "PayloadMass", payload_mass);
         cfg.getDouble(secName, "Length", length);
         cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
-        cfg.getInt(secName, "NumAxis", num_axis);
 
+        int tmp = 0;
+        cfg.getInt(secName, "NumAxis", tmp);
+
+        num_axis = static_cast<size_t>(tmp);
         s = num_axis + 1;
 
         Q_a.resize(s);

@@ -45,7 +45,7 @@ public:
     void init(QString cfg_path);
 
     /// Set vehicle index
-    void setIndex(int idx);
+    void setIndex(size_t idx);
 
     /// Set inclination
     void setInclination(double inc);
@@ -60,10 +60,10 @@ public:
     void setBackwardForce(double R2);
 
     /// Set active common force
-    void setActiveCommonForce(int idx, double value);
+    void setActiveCommonForce(size_t idx, double value);
 
     /// Set reactive common force
-    void setReactiveCommonForce(int idx, double value);
+    void setReactiveCommonForce(size_t idx, double value);
 
     /// Set payload level
     void setPayloadCoeff(double payload_coeff);
@@ -77,7 +77,7 @@ public:
 
 
     /// Get vehicle index
-    int getIndex() const;
+    size_t getIndex() const;
 
     /// Get vehicle mass
     double getMass() const;
@@ -86,7 +86,7 @@ public:
     double getLength() const;
 
     /// Get degrees of freedom
-    int getDegressOfFreedom() const;
+    size_t getDegressOfFreedom() const;
 
     /// Get wheel diameter
     double getWheelDiameter() const;
@@ -118,7 +118,7 @@ signals:
 protected:
 
     /// Vehicle ODE system index
-    int     idx;
+    size_t     idx;
 
     /// Empty vehicle mass (without payload)
     double  empty_mass;
@@ -133,7 +133,7 @@ protected:
     double  length;
 
     /// Numder of axis
-    int     num_axis;
+    size_t     num_axis;
     /// Axis moment of inertia
     double  J_axis;
     /// Wheel diameter
@@ -145,7 +145,7 @@ protected:
     double  R2;
 
     /// Number of degrees of freedom
-    int     s;
+    size_t  s;
 
     /// Init railway coordinate
     double railway_coord0;

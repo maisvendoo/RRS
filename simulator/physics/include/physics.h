@@ -84,6 +84,10 @@ public:
      */
     static double fricForce(double Fmax, double v);
 
+    static double gapForce(double x, double c, double lambda);
+
+    static double gapMotion(double x, double a);
+
     /// Constructor
     Physics(){}
     /// Destructor
