@@ -53,6 +53,9 @@ public:
     /// Set curvature
     void setCurvature(double curv);
 
+    /// Set direction
+    void setDirection(int dir);
+
     /// Set forward coupling force
     void setForwardForce(double R1);
 
@@ -111,9 +114,13 @@ public:
     ///
     void integrationPostStep(state_vector_t &Y, double t);
 
+    ///
     double getBrakepipeBeginPressure() const;
+
+    ///
     double getBrakepipeAuxRate() const;
 
+    ///
     void setBrakepipePressure(double pTM);
 
 signals:
@@ -173,6 +180,9 @@ protected:
     double  inc;
     /// Railway curvature
     double  curv;
+
+    /// Railway motion direction
+    int     dir;
 
     /// Pressure in begin of brakepipe
     double p0;

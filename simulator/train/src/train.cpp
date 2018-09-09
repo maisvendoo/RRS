@@ -31,6 +31,8 @@ bool Train::init(const init_data_t &init_data)
 {
     solver_config = init_data.solver_config;
 
+    dir = init_data.direction;
+
     // Solver loading
     QString solver_path = fs->getLibDirectory() + solver_config.method;
 
@@ -295,6 +297,8 @@ bool Train::loadTrain(QString cfg_path)
 
                 vehicle->setPayloadCoeff(payload_coeff);
 
+                vehicle->setDirection(dir);
+
                 trainMass += vehicle->getMass();
                 trainLength += vehicle->getLength();
 
@@ -306,6 +310,9 @@ bool Train::loadTrain(QString cfg_path)
                 index = ode_order;
 
                 vehicles.push_back(vehicle);
+
+                emit logMessage("OK: Loaded vehicle: " + module_name +
+                                " with configuration: " + module_cfg_name + ".xml");
             }
 
             vehicle_node = cfg.getNextSection();
@@ -387,8 +394,7 @@ void Train::setInitConditions(const init_data_t &init_data)
     }
 
     double x0 = init_data.init_coord * 1000.0;
-    y[0] = x0;
-    dir = init_data.direction;
+    y[0] = x0;    
 
     for (size_t i = 1; i < vehicles.size(); i++)
     {

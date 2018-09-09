@@ -45,6 +45,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , q0(24.0)
   , inc(0.0)
   , curv(0.0)
+  , dir(1)
   , p0(0.0)
   , auxRate(0.0)
 {
@@ -91,6 +92,14 @@ void Vehicle::setInclination(double inc)
 void Vehicle::setCurvature(double curv)
 {
     this->curv = curv;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setDirection(int dir)
+{
+    this->dir = dir;
 }
 
 //------------------------------------------------------------------------------
@@ -280,7 +289,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     double Fr = Physics::fricForce(W + Q_r[0], v);
 
-    *a.begin() = (*Q_a.begin() - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
+    *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
 
     auto end = a.end();
     for (auto accel_it = a.begin(); accel_it != end; ++accel_it)
