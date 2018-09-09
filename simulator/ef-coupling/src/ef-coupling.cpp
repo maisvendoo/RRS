@@ -1,18 +1,42 @@
+//------------------------------------------------------------------------------
+//
+//      Elastic-friction train coupling model
+//      (c) maisvendoo, 09/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Elastic-friction train coupling model
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 09/09/2018
+ */
+
 #include    "ef-coupling.h"
 
 #include    "physics.h"
 #include    "CfgReader.h"
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 EfCoupling::EfCoupling()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 EfCoupling::~EfCoupling()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double EfCoupling::getForce(double ds, double dv)
 {
     double tmp = Physics::gapForce(ds, ck, delta / 2);
@@ -26,6 +50,9 @@ double EfCoupling::getForce(double ds, double dv)
     return preForce + gapForce + force;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void EfCoupling::loadConfig(QString cfg_path)
 {
     CfgReader cfg;

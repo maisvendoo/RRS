@@ -13,5 +13,6 @@ SUBDIRS += ./default-vehicle
 SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./test-loco
+SUBDIRS += ./brakepipe
 SUBDIRS += ./simulator
 
