@@ -10,7 +10,7 @@ DESTDIR = ../../../lib
 
 CONFIG(debug, debug|release) {
 
-    TARGET = $$join(TRAGET,,,_d)
+    TARGET = $$join(TARGET,,,_d)
 
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lphysics_d

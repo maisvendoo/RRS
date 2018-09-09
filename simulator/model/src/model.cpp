@@ -79,7 +79,7 @@ bool Model::init(const command_line_t &command_line)
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
     if (!train->init(init_data))
-        return false;
+        return false;    
 
     return true;
 }
@@ -311,5 +311,3 @@ void Model::configSolver(solver_config_t &solver_config)
         }
     }
 }
-
-

@@ -23,6 +23,7 @@
 #include    "coupling.h"
 #include    "solver.h"
 #include    "solver-config.h"
+#include    "brakepipe.h"
 
 #if defined(TRAIN_LIB)
     #define TRAIN_EXPORT    Q_DECL_EXPORT
@@ -74,6 +75,13 @@ public:
 
     double getVelocity(size_t i) const;
 
+    /// Get train mass
+    double getMass() const;
+    /// Get train length
+    double getLength() const;
+
+    size_t getVehiclesNumber() const;
+
 signals:
 
     void logMessage(QString msg);
@@ -99,6 +107,9 @@ private:
 
     /// Motion ODE's solver
     Solver      *train_motion_solver;
+
+    /// Brakepipe model
+    BrakePipe   *brakepipe;
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;

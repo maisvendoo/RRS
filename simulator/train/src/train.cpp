@@ -69,6 +69,12 @@ bool Train::init(const init_data_t &init_data)
     // Set initial conditions
     setInitConditions(init_data);
 
+    // Brakepipe initialization
+    brakepipe = new BrakePipe();
+    brakepipe->setLength(trainLength);
+    brakepipe->setNodesNum(static_cast<int>(vehicles.size()));
+    brakepipe->init(fs->getConfigDirectory() + "brakepipe.xml");
+
     return true;
 }
 
@@ -84,14 +90,14 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
     for (auto it = vehicles.begin(); it != end; ++it)
     {
         Vehicle *vehicle = *it;
-        int idx = vehicle->getIndex();
-        int s = vehicle->getDegressOfFreedom();
+        size_t idx = vehicle->getIndex();
+        size_t s = vehicle->getDegressOfFreedom();
 
         if ( (num_vehicles > 1) && ( it != end - 1) )
         {
             Vehicle *vehicle1 = *(it+1);
-            int idx1 = vehicle1->getIndex();
-            int s1 = vehicle1->getDegressOfFreedom();
+            size_t idx1 = vehicle1->getIndex();
+            size_t s1 = vehicle1->getDegressOfFreedom();
 
             double ds = Y[idx] - Y[idx1] -
                     dir * vehicle->getLength() / 2 -
@@ -130,10 +136,12 @@ void Train::preStep(double t)
 //------------------------------------------------------------------------------
 bool Train::step(double t, double &dt)
 {
-    // EDIT THIS SOLVER CALL. CONFIGURE SOLVER!!!!
+    // Train dynamics simulation
     bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
                                           solver_config.local_error);    
+    // Brakepipe simulation
+    brakepipe->step(t, dt);
 
     return done;
 }
@@ -144,11 +152,20 @@ bool Train::step(double t, double &dt)
 void Train::vehiclesStep(double t, double dt)
 {
     auto end = vehicles.end();
+    auto begin = vehicles.begin();
 
-    for (auto i = vehicles.begin(); i != end; ++i)
+    brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
+    int j = 0;
+
+    for (auto i = begin; i != end; ++i)
     {
         Vehicle *vehicle = *i;
+
+        brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
+        vehicle->setBrakepipePressure(brakepipe->getPressure(j));
         vehicle->integrationStep(y, t, dt);
+
+        ++j;
     }
 }
 
@@ -176,16 +193,43 @@ Vehicle *Train::getLastVehicle() const
     return *(vehicles.end() - 1);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double Train::getVelocity(size_t i) const
 {
     if (i < vehicles.size())
     {
-        int idx = vehicles[i]->getIndex();
-        int s = vehicles[i]->getDegressOfFreedom();
+        size_t idx = vehicles[i]->getIndex();
+        size_t s = vehicles[i]->getDegressOfFreedom();
         return y[idx + s];
     }
 
     return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getMass() const
+{
+    return trainMass;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getLength() const
+{
+    return trainLength;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+size_t Train::getVehiclesNumber() const
+{
+    return vehicles.size();
 }
 
 //------------------------------------------------------------------------------

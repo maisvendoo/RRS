@@ -24,6 +24,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lcoupling_d
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -ltrain_d
+    LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lmodel_d
 
 } else {
@@ -36,6 +37,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lcoupling
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -ltrain
+    LIBS += -L../../../lib -lbrakepipe
     LIBS += -L../../../lib -lmodel
 }
 
@@ -46,11 +48,13 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
 
+INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../model/include
 INCLUDEPATH += ../train/include
 INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../vehicle/include
 INCLUDEPATH += ../coupling/include
+INCLUDEPATH += ../brakepipe/include
 
 HEADERS += $$files(./include/*.h) 
 SOURCES += $$files(./src/*.cpp)

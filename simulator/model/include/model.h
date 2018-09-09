@@ -97,7 +97,7 @@ private:
     QThread     model_thread;
 
     /// Train model
-    Train       *train;
+    Train       *train;    
 
     /// Log initialization
     void logInit(bool clear_log = false);
@@ -119,7 +119,7 @@ private:
     void overrideByCommandLine(init_data_t &init_data, const command_line_t &command_line);
 
     /// Solver configuration loading
-    void configSolver(solver_config_t &solver_config);
+    void configSolver(solver_config_t &solver_config);    
 };
 
 #endif // MODEL_H

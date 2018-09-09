@@ -111,6 +111,11 @@ public:
     ///
     void integrationPostStep(state_vector_t &Y, double t);
 
+    double getBrakepipeBeginPressure() const;
+    double getBrakepipeAuxRate() const;
+
+    void setBrakepipePressure(double pTM);
+
 signals:
 
     void logMessage(QString msg);
@@ -168,6 +173,13 @@ protected:
     double  inc;
     /// Railway curvature
     double  curv;
+
+    /// Pressure in begin of brakepipe
+    double p0;
+    /// Aux brakepipe pressure rate
+    double auxRate;
+    /// Brakepipe pressure
+    double pTM;
 
     /// Active common forces
     state_vector_t  Q_a;
