@@ -3,7 +3,7 @@
     <InitData>
         <InitCoord>6.700</InitCoord>
         <InitVelocity>0.0</InitVelocity>
-        <Profile>flat</Profile>
+        <Profile>zds/kiev-shevchenko/profile.dat</Profile>
         <Direction>1</Direction>
         <TrainConfig>default</TrainConfig>
         <IntegrationTimeInterval>100</IntegrationTimeInterval>

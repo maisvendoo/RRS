@@ -63,6 +63,8 @@ public:
     QString getVehiclesDirectory() const;
     /// Get couplings directory
     QString getCouplingsDirectory() const;
+    /// Get routes directory
+    QString getRoutesDirectory() const;
 
     QString combinePath(const QString &path1, const QString &path2);
 
@@ -90,6 +92,8 @@ private:
     QString vehiclesDirectory;
     /// Couplings config directory
     QString couplingsDirectory;
+    /// Routes directory
+    QString routesDirectory;
 
     /// Directory creation
     void createDirectory(const QString &path);

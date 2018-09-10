@@ -24,6 +24,7 @@
 #include    "solver.h"
 #include    "solver-config.h"
 #include    "brakepipe.h"
+#include    "profile.h"
 
 #if defined(TRAIN_LIB)
     #define TRAIN_EXPORT    Q_DECL_EXPORT
@@ -110,6 +111,9 @@ private:
 
     /// Brakepipe model
     BrakePipe   *brakepipe;
+
+    /// Profile manager
+    Profile     *profile;
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;

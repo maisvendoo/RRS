@@ -26,7 +26,26 @@ protected:
 
     QStringList     file_content;
 
-    virtual profile_element_t *getProfileElement() = 0;
+    virtual profile_element_t *getProfileElement(QString line) = 0;
 };
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef     Loader* (*GetLoader)();
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+#define GET_LOADER(ClassName) \
+    extern "C" Q_DECL_EXPORT Loader *getLoader() \
+    {\
+        return new (ClassName)(); \
+    }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+extern "C" Q_DECL_EXPORT Loader *loadLoader(QString lib_path);
 
 #endif // LOADER_H

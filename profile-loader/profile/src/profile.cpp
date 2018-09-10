@@ -1,6 +1,49 @@
 #include    "profile.h"
 
-Profile::Profile(QObject *parent) : QObject(parent)
+#include    <QFileInfo>
+
+const   QString     ZDS_PROFILE = "dat";
+
+Profile::Profile(FileSystem *fs, QObject *parent) : QObject(parent)
+  , fs(fs)
 {
 
+}
+
+Profile::~Profile()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Profile::init(QString profile_path)
+{
+    loader = selectLoader(profile_path);
+
+    if (loader == Q_NULLPTR)
+        return false;
+
+    profile_data = loader->load(profile_path);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Loader *Profile::selectLoader(QString profile_path)
+{
+    QFileInfo   info(profile_path);
+    QString     ext = info.completeSuffix();
+    Loader      *loader = Q_NULLPTR;
+
+    // Get ZDSimulator profile loader
+    if (ext == ZDS_PROFILE)
+    {
+        loader = loadLoader(fs->getLibDirectory() + "zds-profile-loader");
+    }
+
+    return loader;
 }

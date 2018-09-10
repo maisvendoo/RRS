@@ -22,6 +22,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
+    LIBS += -L../../../lib -lprofile_d
 
 } else {
 
@@ -34,6 +35,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe
+    LIBS += -L../../../lib -lprofile
 }
 
 INCLUDEPATH += ./include
@@ -47,6 +49,7 @@ INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
+INCLUDEPATH += ../../profile-loader/profile/include
 
 HEADERS += $$files(./include/*.h)
 HEADERS += $$files(../common-headers/*.h)

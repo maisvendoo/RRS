@@ -46,6 +46,9 @@ FileSystem::FileSystem()
     vehiclesDirectory = combinePath(configDirectory, "vehicles");
     couplingsDirectory = combinePath(configDirectory, "couplings");
 
+    // Routes directory
+    routesDirectory = combinePath(rootDirectory, "routes");
+
     homeDir = QDir::homePath();
     simDataDir = homeDir + QDir::separator() + SIM_DATA_DIR;
 
@@ -150,6 +153,14 @@ QString FileSystem::getVehiclesDirectory() const
 QString FileSystem::getCouplingsDirectory() const
 {
     return getDirectoryPath(couplingsDirectory);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString FileSystem::getRoutesDirectory() const
+{
+    return getDirectoryPath(routesDirectory);
 }
 
 //------------------------------------------------------------------------------
