@@ -54,8 +54,6 @@ public:
                       double &dt,
                       double max_step,
                       double local_err) = 0;
-
-    virtual void init(size_t ode_order) = 0;
 };
 
 /*!

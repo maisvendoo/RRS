@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Solver>
-        <Method>verlet</Method>
+        <Method>rkf5</Method>
 	<StartTime>0</StartTime>
 	<StopTime>1e7</StopTime>
         <MaxStep>1e-2</MaxStep>
-	<InitStep>1e-5</InitStep>
+	<InitStep>2e-5</InitStep>
 	<LocalError>1e-1</LocalError>
     </Solver>
 </Config>
