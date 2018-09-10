@@ -5,7 +5,7 @@
         <InitVelocity>0.0</InitVelocity>
         <Profile>flat</Profile>
         <Direction>1</Direction>
-        <TrainConfig>default-train</TrainConfig>
+        <TrainConfig>default</TrainConfig>
         <IntegrationTimeInterval>100</IntegrationTimeInterval>
         <DebugPrint>true</DebugPrint>
     </InitData>

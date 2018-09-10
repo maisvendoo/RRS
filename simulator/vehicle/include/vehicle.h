@@ -45,13 +45,16 @@ public:
     void init(QString cfg_path);
 
     /// Set vehicle index
-    void setIndex(int idx);
+    void setIndex(size_t idx);
 
     /// Set inclination
     void setInclination(double inc);
 
     /// Set curvature
     void setCurvature(double curv);
+
+    /// Set direction
+    void setDirection(int dir);
 
     /// Set forward coupling force
     void setForwardForce(double R1);
@@ -60,10 +63,10 @@ public:
     void setBackwardForce(double R2);
 
     /// Set active common force
-    void setActiveCommonForce(int idx, double value);
+    void setActiveCommonForce(size_t idx, double value);
 
     /// Set reactive common force
-    void setReactiveCommonForce(int idx, double value);
+    void setReactiveCommonForce(size_t idx, double value);
 
     /// Set payload level
     void setPayloadCoeff(double payload_coeff);
@@ -77,7 +80,7 @@ public:
 
 
     /// Get vehicle index
-    int getIndex() const;
+    size_t getIndex() const;
 
     /// Get vehicle mass
     double getMass() const;
@@ -86,7 +89,7 @@ public:
     double getLength() const;
 
     /// Get degrees of freedom
-    int getDegressOfFreedom() const;
+    size_t getDegressOfFreedom() const;
 
     /// Get wheel diameter
     double getWheelDiameter() const;
@@ -100,16 +103,25 @@ public:
     double getWheelOmega(size_t i);
 
     /// Common acceleration calculation
-    virtual double getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t);
+    virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
 
     ///
-    void integrationPreStep(state_vector_t &Y, state_vector_t &dYdt, double t);
+    void integrationPreStep(state_vector_t &Y, double t);
 
     ///
-    void integrationStep(state_vector_t &Y, state_vector_t &dYdt, double t, double dt);
+    void integrationStep(state_vector_t &Y, double t, double dt);
 
     ///
-    void integrationPostStep(state_vector_t &Y, state_vector_t &dYdt, double t);
+    void integrationPostStep(state_vector_t &Y, double t);
+
+    ///
+    double getBrakepipeBeginPressure() const;
+
+    ///
+    double getBrakepipeAuxRate() const;
+
+    ///
+    void setBrakepipePressure(double pTM);
 
 signals:
 
@@ -118,7 +130,7 @@ signals:
 protected:
 
     /// Vehicle ODE system index
-    int     idx;
+    size_t     idx;
 
     /// Empty vehicle mass (without payload)
     double  empty_mass;
@@ -133,7 +145,7 @@ protected:
     double  length;
 
     /// Numder of axis
-    int     num_axis;
+    size_t     num_axis;
     /// Axis moment of inertia
     double  J_axis;
     /// Wheel diameter
@@ -145,7 +157,7 @@ protected:
     double  R2;
 
     /// Number of degrees of freedom
-    int     s;
+    size_t  s;
 
     /// Init railway coordinate
     double railway_coord0;
@@ -168,6 +180,16 @@ protected:
     double  inc;
     /// Railway curvature
     double  curv;
+
+    /// Railway motion direction
+    int     dir;
+
+    /// Pressure in begin of brakepipe
+    double p0;
+    /// Aux brakepipe pressure rate
+    double auxRate;
+    /// Brakepipe pressure
+    double pTM;
 
     /// Active common forces
     state_vector_t  Q_a;

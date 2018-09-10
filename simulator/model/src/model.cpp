@@ -74,13 +74,12 @@ bool Model::init(const command_line_t &command_line)
     dt = init_data.solver_config.step;
 
     // Train creation and initialization
-    train = new Train();
-    train->setFileSystem(&fs);
+    train = new Train(&fs);
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
     if (!train->init(init_data))
-        return false;
+        return false;    
 
     return true;
 }
@@ -146,6 +145,8 @@ void Model::process()
             postStep(t);
         }
 
+        train->vehiclesStep(t, integration_time);
+
         // Debug print, is allowed
         if (is_debug_print)
             debugPrint();
@@ -183,7 +184,7 @@ void Model::logInit(bool clear_log)
 //------------------------------------------------------------------------------
 void Model::preStep(double t)
 {
-    //train->preStep(t);
+    train->preStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -202,7 +203,7 @@ bool Model::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Model::postStep(double t)
 {
-    //train->postStep(t);
+    train->postStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -210,11 +211,12 @@ void Model::postStep(double t)
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 v[first] = %4 v[last] = %5\n")
             .arg(t)
             .arg(realtime_delay)
-            .arg(dt);
-
+            .arg(dt)
+            .arg(train->getVelocity(0) * 3.6)
+            .arg(train->getVelocity(99) * 3.6);
 
     fputs(qPrintable(debug_info), stdout);
 }
@@ -309,5 +311,3 @@ void Model::configSolver(solver_config_t &solver_config)
         }
     }
 }
-
-

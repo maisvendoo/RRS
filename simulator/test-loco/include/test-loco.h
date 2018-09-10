@@ -19,9 +19,11 @@ public:
 
 private:
 
-    double traction_force;
+    double traction_level;
 
     void step(double t, double dt);
+
+    double traction_char(double V);
 };
 
 #endif // TESTLOCO_H

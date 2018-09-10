@@ -6,11 +6,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Train::Train() : OdeSystem ()
-  , fs(nullptr)
+Train::Train(FileSystem *fs, QObject *parent) : OdeSystem(parent)
+  , fs(fs)
   , trainMass(0.0)
   , trainLength(0.0)
-  , half_ode_order(0)
+  , ode_order(0)
   , dir(1)
 {
 
@@ -30,6 +30,8 @@ Train::~Train()
 bool Train::init(const init_data_t &init_data)
 {
     solver_config = init_data.solver_config;
+
+    dir = init_data.direction;
 
     // Solver loading
     QString solver_path = fs->getLibDirectory() + solver_config.method;
@@ -53,10 +55,8 @@ bool Train::init(const init_data_t &init_data)
     }
 
     // State vector initialization
-    y.resize(half_ode_order);
-    dydt.resize(half_ode_order);
-
-    train_motion_solver->init(half_ode_order);
+    y.resize(ode_order);
+    dydt.resize(ode_order);
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
@@ -71,34 +71,45 @@ bool Train::init(const init_data_t &init_data)
     // Set initial conditions
     setInitConditions(init_data);
 
+    // Brakepipe initialization
+    brakepipe = new BrakePipe();
+    brakepipe->setLength(trainLength);
+    brakepipe->setNodesNum(static_cast<int>(vehicles.size()));
+    brakepipe->init(fs->getConfigDirectory() + "brakepipe.xml");
+
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector_t &a, double t, double dt)
+void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     size_t num_vehicles = vehicles.size();
+    auto end = vehicles.end();
+    auto coup_it = couplings.begin();
 
-    for (size_t i = 0; i < num_vehicles; i++)
+    for (auto it = vehicles.begin(); it != end; ++it)
     {
-        Vehicle *vehicle = vehicles[i];
-        int idx = vehicle->getIndex();
-        int s = vehicle->getDegressOfFreedom();
+        Vehicle *vehicle = *it;
+        size_t idx = vehicle->getIndex();
+        size_t s = vehicle->getDegressOfFreedom();
 
-        if ( (num_vehicles > 1) && ( i != num_vehicles - 1) )
+        if ( (num_vehicles > 1) && ( it != end - 1) )
         {
-            Vehicle *vehicle1 = vehicles[i+1];
-            int idx1 = vehicle1->getIndex();
+            Vehicle *vehicle1 = *(it+1);
+            size_t idx1 = vehicle1->getIndex();
+            size_t s1 = vehicle1->getDegressOfFreedom();
 
-            double ds = vehicle->getRailwayCoord() - vehicle1->getRailwayCoord() -
+            double ds = Y[idx] - Y[idx1] -
                     dir * vehicle->getLength() / 2 -
                     dir * vehicle1->getLength() / 2;
 
-            double dv = dYdt[idx] - dYdt[idx1];
+            double dv = Y[idx + s] - Y[idx1 + s1];
 
-            double R = couplings[i]->getForce(ds, dv);
+            Coupling *coup = *coup_it;
+            double R = coup->getForce(ds, dv);
+            ++coup_it;
 
             vehicle->setBackwardForce(R);
             vehicle1->setForwardForce(R);
@@ -107,10 +118,19 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector
         vehicle->setInclination(0.0);
         vehicle->setCurvature(0.0);
 
-        a[i] = vehicle->getAcceleration(Y, dYdt, t);
+        state_vector_t a = vehicle->getAcceleration(Y, t);
 
-        vehicle->integrationStep(Y, dYdt, t, dt);
+        memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
+        memcpy(dYdt.data() + idx + s, a.data(), sizeof(double) * s);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::preStep(double t)
+{
+    (void) t;
 }
 
 //------------------------------------------------------------------------------
@@ -118,16 +138,100 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector
 //------------------------------------------------------------------------------
 bool Train::step(double t, double &dt)
 {
+    // Train dynamics simulation
     bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
                                           solver_config.local_error);    
+    // Brakepipe simulation
+    brakepipe->step(t, dt);
 
     return done;
 }
 
-void Train::setFileSystem(FileSystem *fs)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::vehiclesStep(double t, double dt)
 {
-    this->fs = fs;
+    auto end = vehicles.end();
+    auto begin = vehicles.begin();
+
+    brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
+    int j = 0;
+
+    for (auto i = begin; i != end; ++i)
+    {
+        Vehicle *vehicle = *i;
+
+        brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
+        vehicle->setBrakepipePressure(brakepipe->getPressure(j));
+        vehicle->integrationStep(y, t, dt);
+
+        ++j;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::postStep(double t)
+{
+    (void) t;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Vehicle *Train::getFirstVehicle() const
+{
+    return *vehicles.begin();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Vehicle *Train::getLastVehicle() const
+{
+    return *(vehicles.end() - 1);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getVelocity(size_t i) const
+{
+    if (i < vehicles.size())
+    {
+        size_t idx = vehicles[i]->getIndex();
+        size_t s = vehicles[i]->getDegressOfFreedom();
+        return y[idx + s];
+    }
+
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getMass() const
+{
+    return trainMass;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getLength() const
+{
+    return trainLength;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+size_t Train::getVehiclesNumber() const
+{
+    return vehicles.size();
 }
 
 //------------------------------------------------------------------------------
@@ -141,7 +245,7 @@ bool Train::loadTrain(QString cfg_path)
     {
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 
-        int index = 0;
+        size_t index = 0;
 
         while (!vehicle_node.isNull())
         {
@@ -193,17 +297,22 @@ bool Train::loadTrain(QString cfg_path)
 
                 vehicle->setPayloadCoeff(payload_coeff);
 
+                vehicle->setDirection(dir);
+
                 trainMass += vehicle->getMass();
                 trainLength += vehicle->getLength();
 
-                int s = vehicle->getDegressOfFreedom();
+                size_t s = vehicle->getDegressOfFreedom();
 
-                half_ode_order += s;
+                ode_order += 2 * s;
 
                 vehicle->setIndex(index);
-                index = half_ode_order;
+                index = ode_order;
 
                 vehicles.push_back(vehicle);
+
+                emit logMessage("OK: Loaded vehicle: " + module_name +
+                                " with configuration: " + module_cfg_name + ".xml");
             }
 
             vehicle_node = cfg.getNextSection();
@@ -271,30 +380,30 @@ void Train::setInitConditions(const init_data_t &init_data)
     {
         Vehicle *vehicle = vehicles[i];
 
-        int s = vehicle->getDegressOfFreedom();
-        int idx = vehicle->getIndex();
+        size_t s = vehicle->getDegressOfFreedom();
+        size_t idx = vehicle->getIndex();
 
-        dydt[idx] = init_data.init_velocity / Physics::kmh;
+        y[idx + s] = init_data.init_velocity / Physics::kmh;
 
         double wheel_radius = vehicle->getWheelDiameter() / 2.0;
 
         for (size_t j = 1; j < static_cast<size_t>(s); j++)
         {
-            dydt[idx + j] = dydt[idx] / wheel_radius;
+            y[idx + s + j] = y[idx + s] / wheel_radius;
         }
     }
 
     double x0 = init_data.init_coord * 1000.0;
-    vehicles[0]->setRailwayCoord(x0);
-    dir = init_data.direction;
+    y[0] = x0;    
 
     for (size_t i = 1; i < vehicles.size(); i++)
     {
         double Li_1 = vehicles[i-1]->getLength();
+        size_t idxi_1 = vehicles[i-1]->getIndex();
+
         double Li = vehicles[i]->getLength();
+        size_t idxi = vehicles[i]->getIndex();
 
-        double x = vehicles[i-1]->getRailwayCoord() - dir *(Li + Li_1) / 2;
-
-        vehicles[i]->setRailwayCoord(x);
+        y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
     }
 }

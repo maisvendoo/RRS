@@ -53,3 +53,41 @@ double Physics::fricForce(double Fmax, double v)
 
     return Fmax * tanh(FricApproxCoeff * v);
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Physics::gapForce(double x, double c, double lambda)
+{
+    if (abs(x) <= lambda)
+        return 0.0;
+    else
+    {
+        if (x > lambda)
+            return c * (x - lambda);
+
+        if (x < -lambda)
+            return c * (x + lambda);
+    }
+
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Physics::gapMotion(double x, double a)
+{
+    if (abs(x) <= a)
+        return 0.0;
+    else
+    {
+        if (x > a)
+            return x - a;
+
+        if (x < -a)
+            return x + a;
+    }
+
+    return 0.0;
+}

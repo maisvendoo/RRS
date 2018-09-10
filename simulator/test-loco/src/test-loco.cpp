@@ -1,31 +1,57 @@
 #include    "test-loco.h"
 #include    "physics.h"
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 TestLoco::TestLoco() : Vehicle()
-  , traction_force(0.0)
+  , traction_level(0.0)
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 TestLoco::~TestLoco()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
-    double max_traction_force = 600e5;
-    double k = 1e4;
+    (void) t;
 
-    traction_force += k * dt;
+    traction_level += 0.01 * dt;
 
-    traction_force = Physics::cut(traction_force, 0.0, max_traction_force);
+    traction_level = Physics::cut(traction_level, 0.0, 1.0);
 
     for (size_t i = 0; i < Q_a.size(); i++)
     {
-        double torque = 2 * traction_force / wheel_diameter / num_axis;
+        double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
         Q_a[i] = torque;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double TestLoco::traction_char(double v)
+{
+    double max_traction = 600e3;
+
+    if (v < 0)
+        return 0.0;
+
+    double vn = 81.0 / Physics::kmh;
+
+    if (abs(v) <= vn)
+        return max_traction;
+    else
+        return max_traction * vn / v;
 }
 
 GET_VEHICLE(TestLoco)

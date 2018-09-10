@@ -23,6 +23,7 @@
 #include    "coupling.h"
 #include    "solver.h"
 #include    "solver-config.h"
+#include    "brakepipe.h"
 
 #if defined(TRAIN_LIB)
     #define TRAIN_EXPORT    Q_DECL_EXPORT
@@ -44,19 +45,42 @@ class TRAIN_EXPORT Train : public OdeSystem
 public:
 
     /// Constructor
-    Train();
+    explicit Train(FileSystem *fs, QObject *parent = Q_NULLPTR);
     /// Destructor
-    ~Train();
+    virtual ~Train();
 
-    ///
+    /// Train initialization
     bool init(const init_data_t &init_data);
 
-    ///
-    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, state_vector_t &a, double t, double dt);    
+    /// Calculation of right part motion ODE's
+    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t);
 
+    /// Action before time step
+    void preStep(double t);
+
+    /// Integration step
     bool step(double t, double &dt);
 
-    void setFileSystem(FileSystem *fs);
+    /// Integration step for vehicles ODE's
+    void vehiclesStep(double t, double dt);
+
+    /// Action after integration step
+    void postStep(double t);
+
+    /// Get first vehicle
+    Vehicle *getFirstVehicle() const;
+
+    /// Get last vehicle
+    Vehicle *getLastVehicle() const;
+
+    double getVelocity(size_t i) const;
+
+    /// Get train mass
+    double getMass() const;
+    /// Get train length
+    double getLength() const;
+
+    size_t getVehiclesNumber() const;
 
 signals:
 
@@ -64,6 +88,7 @@ signals:
 
 private:
 
+    /// Pointer to filesystem object
     FileSystem  *fs;
 
     /// Train mass
@@ -72,16 +97,24 @@ private:
     double          trainLength;
 
     /// Order of system ODE motion
-    int             half_ode_order;
+    size_t          ode_order;
 
+    /// Direction of motion on railway
     int             dir;
 
+    /// Solver's configuration
     solver_config_t solver_config;
 
+    /// Motion ODE's solver
     Solver      *train_motion_solver;
 
+    /// Brakepipe model
+    BrakePipe   *brakepipe;
+
+    /// All train's vehicles
     std::vector<Vehicle *> vehicles;
 
+    /// All train's couplings
     std::vector<Coupling *> couplings;
 
     /// Train's loading

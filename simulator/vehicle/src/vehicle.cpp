@@ -45,6 +45,9 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , q0(24.0)
   , inc(0.0)
   , curv(0.0)
+  , dir(1)
+  , p0(0.0)
+  , auxRate(0.0)
 {
 
 }
@@ -70,7 +73,7 @@ void Vehicle::init(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setIndex(int idx)
+void Vehicle::setIndex(size_t idx)
 {
     this->idx = idx;
 }
@@ -94,6 +97,14 @@ void Vehicle::setCurvature(double curv)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::setDirection(int dir)
+{
+    this->dir = dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::setForwardForce(double R1)
 {
     this->R1 = R1;
@@ -110,18 +121,18 @@ void Vehicle::setBackwardForce(double R2)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setActiveCommonForce(int idx, double value)
+void Vehicle::setActiveCommonForce(size_t idx, double value)
 {
-    if (static_cast<size_t>(idx) < Q_a.size())
+    if (idx < Q_a.size())
         Q_a[idx] = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setReactiveCommonForce(int idx, double value)
+void Vehicle::setReactiveCommonForce(size_t idx, double value)
 {
-    if (static_cast<size_t>(idx) < Q_r.size())
+    if (idx < Q_r.size())
         Q_r[idx] = value;
 }
 
@@ -171,7 +182,7 @@ void Vehicle::setWheelOmega(size_t i, double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Vehicle::getIndex() const
+size_t Vehicle::getIndex() const
 {
     return idx;
 }
@@ -195,7 +206,7 @@ double Vehicle::getLength() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Vehicle::getDegressOfFreedom() const
+size_t Vehicle::getDegressOfFreedom() const
 {
     return s;
 }
@@ -249,12 +260,14 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t)
+state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 {
     (void) t;
-    (void) Y;
 
-    double v = dYdt[idx];
+    state_vector_t a;
+    a.resize(s);
+
+    double v = Y[idx + s];
     double V = abs(v) * Physics::kmh;
 
     double sin_beta = inc / 1000.0;
@@ -268,15 +281,19 @@ double Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double 
 
     double rk = wheel_diameter / 2.0;
 
-    for (size_t i = 0; i < static_cast<size_t>(num_axis); i++)
+    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
     {
-        double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], dYdt[idx + i])) / rk;
+        double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], Y[idx + s + i])) / rk;
         sumCreepForces += creepForce;
     }
 
-    double Fr = Physics::fricForce(W, v);
+    double Fr = Physics::fricForce(W + Q_r[0], v);
 
-    double a = (Fr + R1 - R2 + sumCreepForces - G) / (full_mass + num_axis * J_axis / rk / rk);
+    *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
+
+    auto end = a.end();
+    for (auto accel_it = a.begin(); accel_it != end; ++accel_it)
+        *accel_it = *a.begin() / rk;
 
     return a;
 }
@@ -284,38 +301,61 @@ double Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPreStep(state_vector_t &Y, state_vector_t &dYdt, double t)
+void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 {
     (void) Y;
-    (void) dYdt;
     preStep(t);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationStep(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
+void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 {
-    integrationPreStep(Y, dYdt, t);
+    integrationPreStep(Y, t);
     step(t, dt);
-    integrationPostStep(Y, dYdt, t);
+    integrationPostStep(Y, t);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPostStep(state_vector_t &Y, state_vector_t &dYdt, double t)
+void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
-    railway_coord = railway_coord0 + Y[idx];
-    velocity = dYdt[idx];
+    railway_coord = Y[idx];
+    velocity = Y[idx + s];
 
-    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    /*for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
-        wheel_rotation_angle[i] = 2 * Y[idx] / wheel_diameter;
-        wheel_omega[i] = 2 * dYdt[idx] / wheel_diameter;
-    }
+        wheel_rotation_angle[i] = Y[idx + i + 1];
+        wheel_omega[i] = Y[idx + s + i + 1];
+    }*/
 
     postStep(t);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getBrakepipeBeginPressure() const
+{
+    return p0 * Physics::MPa + Physics::pA;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getBrakepipeAuxRate() const
+{
+    return auxRate * Physics::MPa;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setBrakepipePressure(double pTM)
+{
+    this->pTM = pTM;
 }
 
 //------------------------------------------------------------------------------
@@ -349,18 +389,15 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "PayloadMass", payload_mass);
         cfg.getDouble(secName, "Length", length);
         cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
-        cfg.getInt(secName, "NumAxis", num_axis);
 
-        s = 1;
+        int tmp = 0;
+        cfg.getInt(secName, "NumAxis", tmp);
 
-        wheel_rotation_angle.resize(num_axis);
-        wheel_omega.resize(num_axis);
+        num_axis = static_cast<size_t>(tmp);
+        s = num_axis + 1;
 
-        for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
-            wheel_omega[i] = wheel_rotation_angle[i] = 0;
-
-        Q_a.resize(num_axis);
-        Q_r.resize(num_axis);
+        Q_a.resize(s);
+        Q_r.resize(s);
 
         for (size_t i = 0; i < Q_a.size(); i++)
             Q_a[i] = Q_r[i] = 0;
