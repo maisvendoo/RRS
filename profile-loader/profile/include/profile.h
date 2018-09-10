@@ -25,14 +25,21 @@ class PROFILE_EXPORT Profile : public QObject
 
 public:
 
-    explicit Profile(FileSystem *fs, QObject *parent = Q_NULLPTR);
+    explicit Profile(FileSystem *fs, double prof_step = 100.0, QObject *parent = Q_NULLPTR);
     virtual ~Profile();
 
     bool init(QString profile_path);
 
 private:
 
+    /// Pointer to filesystem object
     FileSystem  *fs;
+
+    /// Profile step
+    double prof_step;
+
+    /// Zero element of profile
+    const profile_element_t ZERO_ELEMENT;
 
     /// Profile's data
     profile_t   profile_data;
@@ -40,6 +47,7 @@ private:
     /// Profile loader
     Loader      *loader;
 
+    /// Select loader by profile type
     Loader  *selectLoader(QString profile_path);
 };
 

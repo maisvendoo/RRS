@@ -32,7 +32,7 @@ bool Train::init(const init_data_t &init_data)
     solver_config = init_data.solver_config;
 
     // Load profile
-    profile = new Profile(fs);
+    profile = new Profile(fs, init_data.prof_step);
     profile->init(fs->getRoutesDirectory() + init_data.profile_path);
 
     dir = init_data.direction;

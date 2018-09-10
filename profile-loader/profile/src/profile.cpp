@@ -4,12 +4,19 @@
 
 const   QString     ZDS_PROFILE = "dat";
 
-Profile::Profile(FileSystem *fs, QObject *parent) : QObject(parent)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Profile::Profile(FileSystem *fs, double prof_step, QObject *parent) : QObject(parent)
   , fs(fs)
+  , prof_step(prof_step)
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Profile::~Profile()
 {
 

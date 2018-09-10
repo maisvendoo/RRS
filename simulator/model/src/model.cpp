@@ -248,6 +248,11 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.profile_path = "default";
         }
 
+        if (!cfg.getDouble(secName, "ProfileStep", init_data.prof_step))
+        {
+            init_data.prof_step = 100.0;
+        }
+
         if (!cfg.getString(secName, "TrainConfig", init_data.train_config_path))
         {
             init_data.train_config_path = "default-train";
