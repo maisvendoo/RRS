@@ -1,22 +1,29 @@
-#include    "app.h"
+//------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------------------------------
+#ifndef LAUNCHER_CONFIG_H
+#define LAUNCHER_CONFIG_H
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LauncherApp::LauncherApp(int argc, char **argv) : QApplication(argc, argv)
+struct launcher_config_t
 {
+    int     width;
+    int     height;
+    bool    fullscreen;
 
-}
+    launcher_config_t()
+        : width(1368)
+        , height(768)
+        , fullscreen(false)
+    {
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-LauncherApp::~LauncherApp()
-{
+    }
+};
 
-}
-
-launcher_config_t LauncherApp::getConfig() const
-{
-    return launcher_config;
-}
+#endif // LAUNCHERCONFIG_H

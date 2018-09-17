@@ -46,7 +46,7 @@ public:
     virtual ~Model();
 
     /// Model initialization
-    bool init(const command_line_t &command_line);
+    bool init(const simulator_command_line_t &command_line);
 
     /// Start simulation thread
     void start();
@@ -116,7 +116,7 @@ private:
     void loadInitData(init_data_t &init_data);
 
     /// Override of initial data by command line
-    void overrideByCommandLine(init_data_t &init_data, const command_line_t &command_line);
+    void overrideByCommandLine(init_data_t &init_data, const simulator_command_line_t &command_line);
 
     /// Solver configuration loading
     void configSolver(solver_config_t &solver_config);    

@@ -96,7 +96,7 @@ int AppCore::exec()
 //
 //------------------------------------------------------------------------------
 CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
-                                                  command_line_t &command_line,
+                                                  simulator_command_line_t &command_line,
                                                   QString &errorMessage)
 {
     QCommandLineOption help = parser.addHelpOption();

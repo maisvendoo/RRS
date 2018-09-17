@@ -10,6 +10,9 @@
 
 #include    <QApplication>
 
+#include    "launcher-command-line.h"
+#include    "launcher-config.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -22,9 +25,11 @@ public:
     explicit LauncherApp(int argc, char **argv);
     virtual ~LauncherApp();
 
+    launcher_config_t getConfig() const;
+
 private:
 
-
+    launcher_config_t   launcher_config;
 };
 
 #endif // APP_H

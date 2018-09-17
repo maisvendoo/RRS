@@ -42,6 +42,7 @@ CONFIG(debug, debug|release) {
 }
 
 INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
+INCLUDEPATH += ../common-headers/
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)

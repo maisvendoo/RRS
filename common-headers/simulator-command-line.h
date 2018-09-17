@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct command_line_t
+struct simulator_command_line_t
 {
     /// Train configuration file name
     option_t<QString>   train_config;

@@ -50,7 +50,7 @@ Model::~Model()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Model::init(const command_line_t &command_line)
+bool Model::init(const simulator_command_line_t &command_line)
 {
     // Log creation
     logInit(command_line.clear_log.is_present);
@@ -274,7 +274,7 @@ void Model::loadInitData(init_data_t &init_data)
 //
 //------------------------------------------------------------------------------
 void Model::overrideByCommandLine(init_data_t &init_data,
-                                  const command_line_t &command_line)
+                                  const simulator_command_line_t &command_line)
 {
     if (command_line.train_config.is_present)
         init_data.train_config_path = command_line.train_config.value;
