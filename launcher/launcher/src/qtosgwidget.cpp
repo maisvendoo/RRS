@@ -1,5 +1,7 @@
 #include    "qtosgwidget.h"
 
+#include    <QApplication>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -13,6 +15,8 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent)
                                                             this->height()))
     , mViewer(new osgViewer::Viewer)
 {
+    this->setFocusPolicy(Qt::StrongFocus);
+
     osg::Camera *camera = new osg::Camera;
     camera->setViewport(0, 0, this->width(), this->height());
     camera->setClearColor(osg::Vec4f(0.9f, 0.9f, 1.0f, 1.0f));
@@ -89,4 +93,21 @@ bool QtOSGWidget::event(QEvent *e)
     bool handled = QOpenGLWidget::event(e);
     this->update();
     return handled;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+        QApplication::quit();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::keyReleaseEvent(QKeyEvent *event)
+{
+
 }

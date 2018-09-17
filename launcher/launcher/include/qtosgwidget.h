@@ -52,6 +52,10 @@ protected:
     virtual void initializeGL();
 
     virtual bool event(QEvent *e);
+
+    virtual void keyPressEvent(QKeyEvent *event);
+
+    virtual void keyReleaseEvent(QKeyEvent *event);
 };
 
 #endif // QT_OSG_WIDGET_H
