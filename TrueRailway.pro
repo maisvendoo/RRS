@@ -8,4 +8,7 @@ SUBDIRS += ./log
 SUBDIRS += ./profile-loader
 SUBDIRS += ./simulator
 
+SUBDIRS += ./launcher
+
+
 
