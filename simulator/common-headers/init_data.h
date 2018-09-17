@@ -33,6 +33,7 @@ struct init_data_t
     double  init_velocity;
     int     direction;
     QString profile_path;
+    double  prof_step;
     QString train_config_path;
     int     integration_time_interval;
     bool    debug_print;
@@ -43,6 +44,7 @@ struct init_data_t
         , init_velocity(0)
         , direction(1)
         , profile_path("")
+        , prof_step(100.0)
         , train_config_path("")
         , integration_time_interval(100)
         , debug_print(false)
@@ -52,3 +54,4 @@ struct init_data_t
 };
 
 #endif // INIT_DATA_H
+
