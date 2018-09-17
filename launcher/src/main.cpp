@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    QApplication    app(argc, argv);
+    LauncherApp    app(argc, argv);
 
     QMainWindow window;
     QtOSGWidget *osgWidget = new QtOSGWidget(1.0f, 1.0f, &window);

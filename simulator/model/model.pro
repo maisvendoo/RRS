@@ -39,7 +39,7 @@ CONFIG(debug, debug|release) {
 }
 
 INCLUDEPATH += ./include
-INCLUDEPATH += ../common-headers
+INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../train/include
 INCLUDEPATH += ../solver/include
@@ -52,5 +52,6 @@ INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../profile-loader/profile/include
 
 HEADERS += $$files(./include/*.h)
-HEADERS += $$files(../common-headers/*.h)
+HEADERS += $$files(../../common-headers/*.h)
 SOURCES += $$files(./src/*.cpp)
+

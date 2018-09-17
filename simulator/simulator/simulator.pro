@@ -45,7 +45,7 @@ CONFIG(debug, debug|release) {
 
 INCLUDEPATH += ./include
 
-INCLUDEPATH += ../common-headers/
+INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include

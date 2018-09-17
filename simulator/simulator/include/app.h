@@ -19,23 +19,10 @@
 #include    <QCoreApplication>
 #include    <QCommandLineParser>
 
-#include    "command-line.h"
+#include    "simulator-command-line.h"
 #include    "model.h"
 
-/*!
- * \enum
- * \brief Command line parser result codes
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-enum CommandLineParesrResult
-{
-    CommandLineOk,
-    CommandLineError,
-    CommandLineVersionRequired,
-    CommandLineHelpRequired
-};
+
 
 /*!
  * \class

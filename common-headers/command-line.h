@@ -16,7 +16,6 @@
 #ifndef     COMMAND_LINE_H
 #define     COMMAND_LINE_H
 
-#include    <QMetaType>
 #include    <QString>
 
 /*!
@@ -38,19 +37,19 @@ struct option_t
     }
 };
 
+/*!
+ * \enum
+ * \brief Command line parser result codes
+ */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct command_line_t
+enum CommandLineParesrResult
 {
-    /// Train configuration file name
-    option_t<QString>   train_config;
-    /// Clear simulator log file
-    option_t<bool>      clear_log;
-    /// Debug print in simulation loop
-    option_t<bool>      debug_print;
+    CommandLineOk,
+    CommandLineError,
+    CommandLineVersionRequired,
+    CommandLineHelpRequired
 };
-
-Q_DECLARE_METATYPE(command_line_t)
 
 #endif // COMMAND_LINE_H

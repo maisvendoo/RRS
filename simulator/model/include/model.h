@@ -20,7 +20,7 @@
 #include    <QObject>
 #include    <QThread>
 
-#include    "command-line.h"
+#include    "simulator-command-line.h"
 #include    "filesystem.h"
 #include    "log.h"
 #include    "train.h"
