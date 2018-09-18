@@ -45,5 +45,6 @@ INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/scancode.h
 SOURCES += $$files(./src/*.cpp)

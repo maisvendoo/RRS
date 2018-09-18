@@ -29,6 +29,8 @@
 //------------------------------------------------------------------------------
 class QtOSGWidget : public QOpenGLWidget
 {
+    Q_OBJECT
+
 public:
 
     QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent = Q_NULLPTR);
@@ -46,6 +48,12 @@ private:
     Keyboard    keyboard;
 
     osgGA::EventQueue *getEventQueue() const;
+
+    void specialKeyPressed(QKeyEvent *event);
+
+signals:
+
+    void sendDataToSimulator(QByteArray data);
 
 protected:
 

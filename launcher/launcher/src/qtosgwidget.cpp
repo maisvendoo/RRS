@@ -1,4 +1,5 @@
 #include    "qtosgwidget.h"
+#include    "scancode.h"
 
 #include    <QDebug>
 
@@ -44,6 +45,57 @@ osgGA::EventQueue *QtOSGWidget::getEventQueue() const
 {
     osgGA::EventQueue *eventQueue = mGraphicsWindow->getEventQueue();
     return eventQueue;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::specialKeyPressed(QKeyEvent *event)
+{
+    quint32 scanCode = event->nativeScanCode();
+
+    switch (scanCode)
+    {
+    case KEY_L_SHIFT:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Shift_L);
+        break;
+
+    case KEY_R_SHIFT:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Shift_R);
+        break;
+
+    case KEY_L_CTRL:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Control_L);
+        break;
+
+    case KEY_R_CTRL:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Control_R);
+        break;
+
+    case KEY_L_ALT:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Alt_L);
+        break;
+
+    case KEY_R_ALT:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Alt_R);
+        break;
+
+    case KEY_UP:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Up);
+        break;
+
+    case KEY_DOWN:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Down);
+        break;
+
+    case KEY_LEFT:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Left);
+        break;
+
+    case KEY_RIGHT:
+        this->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Right);
+        break;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -101,6 +153,15 @@ bool QtOSGWidget::event(QEvent *e)
 void QtOSGWidget::keyPressEvent(QKeyEvent *event)
 {
     keyboard.setKey(event->key());
+
+    int c = *event->text().toLocal8Bit().data();
+
+    if (c == 0)
+        specialKeyPressed(event);
+    else
+        this->getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol) *(event->text().toLocal8Bit().data()));
+
+    emit sendDataToSimulator(keyboard.serialize());
 }
 
 //------------------------------------------------------------------------------
@@ -109,4 +170,6 @@ void QtOSGWidget::keyPressEvent(QKeyEvent *event)
 void QtOSGWidget::keyReleaseEvent(QKeyEvent *event)
 {
     keyboard.resetKey(event->key());
+
+    emit sendDataToSimulator(keyboard.serialize());
 }
