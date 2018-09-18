@@ -1,6 +1,6 @@
 #include    "qtosgwidget.h"
 
-#include    <QApplication>
+#include    <QDebug>
 
 //------------------------------------------------------------------------------
 //
@@ -100,8 +100,7 @@ bool QtOSGWidget::event(QEvent *e)
 //------------------------------------------------------------------------------
 void QtOSGWidget::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape)
-        QApplication::quit();
+    keyboard.setKey(event->key());
 }
 
 //------------------------------------------------------------------------------
@@ -109,5 +108,5 @@ void QtOSGWidget::keyPressEvent(QKeyEvent *event)
 //------------------------------------------------------------------------------
 void QtOSGWidget::keyReleaseEvent(QKeyEvent *event)
 {
-
+    keyboard.resetKey(event->key());
 }

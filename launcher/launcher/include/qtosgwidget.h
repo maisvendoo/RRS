@@ -22,6 +22,8 @@
 #include    <osgGA/EventQueue>
 #include    <osgGA/TrackballManipulator>
 
+#include    "keyboard.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -40,6 +42,8 @@ private:
 
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> mGraphicsWindow;
     osg::ref_ptr<osgViewer::Viewer> mViewer;
+
+    Keyboard    keyboard;
 
     osgGA::EventQueue *getEventQueue() const;
 
