@@ -1,6 +1,7 @@
 TEMPLATE = lib
 
 QT -= gui
+QT += network
 
 DESTDIR = ../../lib
 TARGET = tcp
@@ -15,6 +16,8 @@ CONFIG(debug, debug|release) {
 
 
 }
+
+INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
