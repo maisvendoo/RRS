@@ -3,6 +3,7 @@ TEMPLATE = app
 QT -= gui
 QT += core
 QT += xml
+QT += network
 
 CONFIG += c++11
 CONFIG += console
@@ -27,6 +28,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lmodel_d
     LIBS += -L../../../lib -lprofile_d
+    LIBS += -L../../../lib -ltcp_d
 
 } else {
 
@@ -41,6 +43,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lbrakepipe
     LIBS += -L../../../lib -lmodel
     LIBS += -L../../../lib -lprofile
+    LIBS += -L../../../lib -ltcp
 }
 
 INCLUDEPATH += ./include
