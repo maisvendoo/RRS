@@ -12,5 +12,6 @@
 
 #include    "app.h"
 #include    "qtosgwidget.h"
+#include    "tcp-client.h"
 
 #endif // MAIN_H

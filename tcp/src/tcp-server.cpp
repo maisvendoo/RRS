@@ -4,6 +4,7 @@
 //
 //------------------------------------------------------------------------------
 TcpServer::TcpServer(QObject *parent) : QObject(parent)
+  , server(new QTcpServer())
 {
 
 }
@@ -65,7 +66,11 @@ void TcpServer::onClientConnection()
 //------------------------------------------------------------------------------
 void TcpServer::onReceive()
 {
+    QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
 
+    QByteArray data = socket->readAll();
+
+    emit sendDataToTrain(data);
 }
 
 //------------------------------------------------------------------------------

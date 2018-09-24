@@ -3,6 +3,7 @@ TEMPLATE = app
 QT += core
 QT += gui
 QT += opengl
+QT += network
 
 CONFIG += c++11
 
@@ -32,6 +33,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
 
+    LIBS += -L../../../lib -ltcp_d
+
 } else {
 
     LIBS += -L$$OSG_LIB_DIRECTORY -losg
@@ -39,10 +42,13 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgDB
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
+
+    LIBS += -L../../../lib -ltcp_d
 }
 
 INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 INCLUDEPATH += ../../common-headers/
+INCLUDEPATH += ../../tcp/include
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h) \

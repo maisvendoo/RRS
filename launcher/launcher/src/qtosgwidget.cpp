@@ -173,3 +173,11 @@ void QtOSGWidget::keyReleaseEvent(QKeyEvent *event)
 
     emit sendDataToSimulator(keyboard.serialize());
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::getDataFromSimulator(QByteArray data)
+{
+
+}

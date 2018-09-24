@@ -68,6 +68,10 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void keyReleaseEvent(QKeyEvent *event);
+
+public slots:
+
+    void getDataFromSimulator(QByteArray data);
 };
 
 #endif // QT_OSG_WIDGET_H

@@ -39,7 +39,7 @@ private:
 
     QTcpServer      *server;
 
-    tcp_config_t    tcp_config;
+    tcp_sever_config_t    tcp_config;
 
     QMap<QTcpSocket *, Client *> clients;
 
