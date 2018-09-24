@@ -24,8 +24,15 @@ TestLoco::~TestLoco()
 void TestLoco::step(double t, double dt)
 {
     (void) t;
+    double traction_step = 0.0;
 
-    traction_level += 0.01 * dt;
+    if (keys[Qt::Key_A])
+        traction_step = 0.01;
+
+    if (keys[Qt::Key_D])
+        traction_step = -0.01;
+
+    traction_level +=  traction_step * dt;
 
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
 

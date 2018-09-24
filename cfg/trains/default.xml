@@ -2,6 +2,7 @@
 <Config>
 	<Common>
 		<CouplingModule>ef-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
 	</Common>
 	<Vehicle>
 		<Module>test-loco</Module>
@@ -12,7 +13,7 @@
 	<Vehicle>
 		<Module>default-vehicle</Module>
 		<ModuleConfig>default-vehicle</ModuleConfig>
-		<Count>100</Count>
+		<Count>40</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>	
 </Config>

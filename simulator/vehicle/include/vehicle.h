@@ -18,6 +18,7 @@
 
 #include    <QObject>
 #include    <QtGlobal>
+#include    <QMap>
 
 #include    "solver-types.h"
 
@@ -122,6 +123,10 @@ public:
 
     ///
     void setBrakepipePressure(double pTM);
+    
+public slots:
+    
+    void receiveData(QByteArray data);
 
 signals:
 
@@ -195,6 +200,8 @@ protected:
     state_vector_t  Q_a;
     /// Reactive common forces
     state_vector_t  Q_r;
+
+    QMap<int, bool> keys;
 
     /// User defined initialization
     virtual void initialization();

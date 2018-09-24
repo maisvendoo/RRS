@@ -21,6 +21,7 @@
 #include    <QLibrary>
 #include    <QDir>
 #include    <QFileInfo>
+#include    <QDataStream>
 
 //------------------------------------------------------------------------------
 //
@@ -356,6 +357,15 @@ double Vehicle::getBrakepipeAuxRate() const
 void Vehicle::setBrakepipePressure(double pTM)
 {
     this->pTM = pTM;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::receiveData(QByteArray data)
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    stream >> keys;
 }
 
 //------------------------------------------------------------------------------

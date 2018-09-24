@@ -321,6 +321,15 @@ bool Train::loadTrain(QString cfg_path)
 
             vehicle_node = cfg.getNextSection();
         }
+
+        int cabine_in_vehicle = -1;
+
+        if (cfg.getInt("Common", "CabineInVehicle", cabine_in_vehicle))
+        {
+            Vehicle *vehicle = vehicles[cabine_in_vehicle];
+            connect(this, &Train::sendDataToVehicle,
+                    vehicle, &Vehicle::receiveData);
+        }
     }
     else
     {
