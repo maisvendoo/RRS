@@ -52,6 +52,7 @@ INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
+INCLUDEPATH += ../../tcp/include
 INCLUDEPATH += ../../profile-loader/profile/include
 
 INCLUDEPATH += ../physics/include
