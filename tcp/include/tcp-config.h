@@ -5,18 +5,32 @@
 //
 //
 //------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief
+ * \copyright
+ * \author
+ * \date
+ */
+
 #ifndef     TCP_CONFIG_H
 #define     TCP_CONFIG_H
 
 #include    <QtGlobal>
 #include    <QString>
 
+/*!
+ * \struct
+ * \brief Server's configuration
+ */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct tcp_sever_config_t
 {
+    /// Server name
     QString     name;
+    /// Listener TCP-port
     quint16     port;
 
     tcp_sever_config_t()
@@ -27,14 +41,22 @@ struct tcp_sever_config_t
     }
 };
 
+/*!
+ * \struct
+ * \brief Clinet's configuration
+ */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct tcp_client_config_t
 {
+    /// Client name
     QString         name;
+    /// Host address
     QString         address;
+    /// Host port
     quint16         port;
+    /// Time interval between try of connection
     unsigned int    reconect_interval;
 
     tcp_client_config_t()
