@@ -10,6 +10,7 @@
 
 #include    "tcp-export.h"
 #include    "tcp-config.h"
+#include    "client.h"
 
 #include    <QObject>
 #include    <QTcpServer>
@@ -30,15 +31,25 @@ public:
     bool init();
     bool start();
 
+signals:
+
+    void sendDataToTrain(QByteArray data);
+
 private:
 
     QTcpServer      *server;
 
     tcp_config_t    tcp_config;
 
+    QMap<QTcpSocket *, Client *> clients;
+
 private slots:
 
     void onClientConnection();
+
+    void onReceive();
+
+    void onClientDisconnection();
 };
 
 #endif // TCP_SERVER_H

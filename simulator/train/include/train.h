@@ -26,6 +26,8 @@
 #include    "brakepipe.h"
 #include    "profile.h"
 
+#include    <QByteArray>
+
 #if defined(TRAIN_LIB)
     #define TRAIN_EXPORT    Q_DECL_EXPORT
 #else
@@ -86,6 +88,7 @@ public:
 signals:
 
     void logMessage(QString msg);
+    void sendDataToVehicle(QByteArray data);
 
 private:
 

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TcpServer::TcpServer(QObject *parent)
+TcpServer::TcpServer(QObject *parent) : QObject(parent)
 {
 
 }
@@ -46,5 +46,41 @@ bool TcpServer::start()
 //------------------------------------------------------------------------------
 void TcpServer::onClientConnection()
 {
+    QTcpSocket *socket = server->nextPendingConnection();
 
+    Client *client = new Client();
+    client->setSocket(socket);
+
+    clients.insert(socket, client);
+
+    connect(socket, &QTcpSocket::readyRead,
+            this, &TcpServer::onReceive);
+
+    connect(socket, &QTcpSocket::disconnected,
+            this, &TcpServer::onClientDisconnection);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::onReceive()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::onClientDisconnection()
+{
+    QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+
+    using ClientPtr = QScopedPointer<Client>;
+
+    ClientPtr client(clients.value(socket, Q_NULLPTR));
+
+    if (client.isNull())
+        return;
+
+    clients.remove(socket);
 }

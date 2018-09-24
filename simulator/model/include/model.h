@@ -23,6 +23,7 @@
 #include    "simulator-command-line.h"
 #include    "filesystem.h"
 #include    "log.h"
+#include    "tcp-server.h"
 #include    "train.h"
 
 #if defined(MODEL_LIB)
@@ -98,6 +99,9 @@ private:
 
     /// Train model
     Train       *train;    
+
+    /// TCP-server
+    TcpServer   *server;
 
     /// Log initialization
     void logInit(bool clear_log = false);

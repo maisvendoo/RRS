@@ -79,9 +79,16 @@ bool Model::init(const simulator_command_line_t &command_line)
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
     if (!train->init(init_data))
-        return false;    
+        return false;
 
-    return true;
+    server = new TcpServer();
+
+    connect(server, &TcpServer::sendDataToTrain, train, &Train::sendDataToVehicle);
+
+    if (!server->init())
+        return false;
+
+    return server->start();
 }
 
 //------------------------------------------------------------------------------

@@ -2,6 +2,7 @@ TEMPLATE = lib
 
 QT -= gui
 QT += xml
+QT += network
 
 DEFINES += MODEL_LIB
 
@@ -23,6 +24,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lprofile_d
+    LIBS += -L../../../lib -ltcp_d
 
 } else {
 
@@ -36,6 +38,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe
     LIBS += -L../../../lib -lprofile
+    LIBS += -L../../../lib -ltcp
 }
 
 INCLUDEPATH += ./include
@@ -49,6 +52,7 @@ INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
+INCLUDEPATH += ../../tcp/include
 INCLUDEPATH += ../../profile-loader/profile/include
 
 HEADERS += $$files(./include/*.h)

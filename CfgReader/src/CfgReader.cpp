@@ -40,18 +40,18 @@ bool CfgReader::load(QString path)
 {
     // Try open file
 	file_name = path;
-	file = new QFile(file_name);
+    QFile file(file_name);
 
-	if (!file->open(QFile::ReadOnly | QFile::Text))
+    if (!file.open(QFile::ReadOnly | QFile::Text))
     {
 		return false;
 	}
 
     // Read content of file
-	domDoc.setContent(file);
+    domDoc.setContent(&file);
 
     // Close file
-	file->close();
+    file.close();
 
     // Get root element
 	firstElement = domDoc.documentElement();
