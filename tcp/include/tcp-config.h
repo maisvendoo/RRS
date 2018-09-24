@@ -18,6 +18,13 @@ struct tcp_config_t
 {
     QString     name;
     quint16     port;
+
+    tcp_config_t()
+        : name("simulator")
+        , port(1992)
+    {
+
+    }
 };
 
 #endif // TCP_CONFIG_H
