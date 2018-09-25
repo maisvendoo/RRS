@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
     QtOSGWidget *osgWidget = new QtOSGWidget(1.0f, 1.0f, &window);
     window.setCentralWidget(osgWidget);
 
+    QObject::connect(osgWidget, &QtOSGWidget::startSimulation, &app, &LauncherApp::startSimulation);
+    QObject::connect(osgWidget, &QtOSGWidget::stopSimulation, &app, &LauncherApp::stopSimulation);
+
     // TCP-clinet initialization
     TcpClient tcp_client;
     tcp_client_config_t tcp_client_config;

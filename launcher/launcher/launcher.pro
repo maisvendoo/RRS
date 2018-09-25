@@ -35,6 +35,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
 
     LIBS += -L../../../lib -lCfgReader_d
+    LIBS += -L../../../lib -lfilesystem_d
     LIBS += -L../../../lib -ltcp_d
 
 } else {
@@ -46,12 +47,14 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
 
     LIBS += -L../../../lib -lCfgReader
-    LIBS += -L../../../lib -ltcp_d
+    LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -ltcp
 }
 
 INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
+INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp/include
 INCLUDEPATH += ./include
 

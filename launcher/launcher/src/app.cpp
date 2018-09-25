@@ -6,9 +6,14 @@
 //
 //------------------------------------------------------------------------------
 LauncherApp::LauncherApp(int argc, char **argv) : QApplication(argc, argv)
+  , sim_process(new SimProcess(&this->fs))
 {
     init();
     overrideByCommandLine(command_line, launcher_config);
+
+    connect(this, &LauncherApp::startSimulation, sim_process, &SimProcess::start);
+    connect(this, &LauncherApp::stopSimulation, sim_process, &SimProcess::abort);
+    connect(sim_process, &SimProcess::printOutput, this, &LauncherApp::debugPrint);
 }
 
 //------------------------------------------------------------------------------
@@ -181,4 +186,9 @@ void LauncherApp::overrideByCommandLine(const launcher_command_line_t &command_l
 
     if (command_line.remote_client.is_present)
         launcher_config.remote_client = command_line.remote_client.value;
+}
+
+void LauncherApp::debugPrint(QString msg)
+{
+    printf("%s", qPrintable(msg));
 }

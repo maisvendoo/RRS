@@ -55,6 +55,10 @@ signals:
 
     void sendDataToSimulator(QByteArray data);
 
+    void startSimulation();
+
+    void stopSimulation();
+
 protected:
 
     virtual void paintGL();

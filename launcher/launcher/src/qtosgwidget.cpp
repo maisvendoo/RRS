@@ -152,6 +152,12 @@ bool QtOSGWidget::event(QEvent *e)
 //------------------------------------------------------------------------------
 void QtOSGWidget::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_S)
+        emit startSimulation();
+
+    if (event->key() == Qt::Key_X)
+        emit stopSimulation();
+
     keyboard.setKey(event->key());
 
     int c = *event->text().toLocal8Bit().data();
