@@ -55,6 +55,5 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../tcp/include
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h) \
-    include/scancode.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
