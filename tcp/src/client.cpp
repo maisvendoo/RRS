@@ -1,3 +1,18 @@
+//------------------------------------------------------------------------------
+//
+//      Class for client description in server side
+//      (c) maisvendoo, 18/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Class for client description in server side
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 18/09/2018
+ */
+
 #include    "client.h"
 
 //------------------------------------------------------------------------------
@@ -16,6 +31,9 @@ Client::~Client()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Client::setSocket(QTcpSocket *socket)
 {
     this->socket = socket;

@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------------
 //
-//
-//
-//
+//      TCP-server
+//      (c) maisvendoo, 18/09/2018
+//      Developer: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
 /*!
  * \file
- * \brief
- * \copyright
- * \author
- * \date
+ * \brief TCP-server
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 18/09/2018
  */
 
 #ifndef     TCP_SERVER_H

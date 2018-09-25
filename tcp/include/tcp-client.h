@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------------
 //
-//
-//
-//
+//      TCP-client
+//      (c) maisvendoo, 24/09/2018
+//      Developer: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
 /*!
  * \file
- * \brief
- * \copyright
- * \author
- * \date
+ * \brief TCP-client
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 24/09/2018
  */
 
 #ifndef     TCP_CLIENT_H

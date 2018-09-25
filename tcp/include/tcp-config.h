@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------------
 //
-//
-//
-//
+//      Structures to store of TCP configuration data
+//      (c) maisvendoo, 20/09/2018
+//      Developer: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
 /*!
  * \file
- * \brief
- * \copyright
- * \author
- * \date
+ * \brief Structures to store of TCP configuration data
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 20/09/2018
  */
 
 #ifndef     TCP_CONFIG_H
