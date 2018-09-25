@@ -48,10 +48,7 @@ void TestLoco::step(double t, double dt)
 //------------------------------------------------------------------------------
 double TestLoco::traction_char(double v)
 {
-    double max_traction = 600e3;
-
-    if (v < 0)
-        return 0.0;
+    double max_traction = 600e3;    
 
     double vn = 81.0 / Physics::kmh;
 

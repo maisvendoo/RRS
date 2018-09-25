@@ -1,3 +1,18 @@
+//------------------------------------------------------------------------------
+//
+//      Keyboard processor
+//      (c) maisvendoo, 18/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Keyboard processor
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 18/09/2018
+ */
+
 #include    "keyboard.h"
 
 #include    <QDataStream>
