@@ -9,9 +9,9 @@ SUBDIRS += ./tcp
 SUBDIRS += ./profile-loader
 SUBDIRS += ./simulator
 
-
-
 SUBDIRS += ./launcher
+
+SUBDIRS += ./test-loco
 
 
 

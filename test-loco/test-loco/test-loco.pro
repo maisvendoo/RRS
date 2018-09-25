@@ -21,10 +21,11 @@ CONFIG(debug, debug|release) {
 }
 
 INCLUDEPATH += ./include
-INCLUDEPATH += ../solver/include
-INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../../CfgReader/include
-INCLUDEPATH += ../vehicle/include
+
+INCLUDEPATH += ../../simulator/solver/include
+INCLUDEPATH += ../../simulator/physics/include
+INCLUDEPATH += ../../simulator/vehicle/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
