@@ -1,7 +1,9 @@
 #ifndef     SCANCODE_H
 #define     SCANCODE_H
 
-#if defined(__WIN32__)
+#include    <QtGlobal>
+
+#if defined(Q_OS_WIN)
     enum
     {
         KEY_L_SHIFT = 42,

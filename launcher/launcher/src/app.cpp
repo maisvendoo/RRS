@@ -8,12 +8,7 @@
 LauncherApp::LauncherApp(int argc, char **argv) : QApplication(argc, argv)
   , sim_process(new SimProcess(&this->fs))
 {
-    init();
-    overrideByCommandLine(command_line, launcher_config);
 
-    connect(this, &LauncherApp::startSimulation, sim_process, &SimProcess::start);
-    connect(this, &LauncherApp::stopSimulation, sim_process, &SimProcess::abort);
-    connect(sim_process, &SimProcess::printOutput, this, &LauncherApp::debugPrint);
 }
 
 //------------------------------------------------------------------------------
@@ -27,9 +22,21 @@ LauncherApp::~LauncherApp()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-launcher_config_t LauncherApp::getConfig() const
+int LauncherApp::exec()
 {
-    return launcher_config;
+    // Signals and slots connection
+    connect(this, &LauncherApp::startSimulation, sim_process, &SimProcess::start);
+    connect(this, &LauncherApp::stopSimulation, sim_process, &SimProcess::abort);
+    connect(sim_process, &SimProcess::printOutput, this, &LauncherApp::debugPrint);
+
+    // Parse command line
+    commandLineProcess();
+    overrideByCommandLine(command_line, launcher_config);
+
+    // Application initialization
+    init(launcher_config);
+
+    return QApplication::exec();
 }
 
 //------------------------------------------------------------------------------
@@ -133,13 +140,13 @@ CommandLineParesrResult LauncherApp::parseCommandLine(QCommandLineParser &parser
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LauncherApp::init()
+void LauncherApp::commandLineProcess()
 {
     QString errorMessage = "";
 
     switch (parseCommandLine(parser, command_line, errorMessage))
     {
-    case CommandLineOk:
+    case CommandLineOk:        
         return;
 
     case CommandLineError:
@@ -161,6 +168,40 @@ void LauncherApp::init()
         quit();
         break;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LauncherApp::init(launcher_config_t launcher_config)
+{
+    // Windows size setting
+    window.setFixedWidth(launcher_config.width);
+    window.setFixedHeight(launcher_config.height);
+
+    // OSG widget creation
+    QtOSGWidget *osgWidget = new QtOSGWidget(1.0f, 1.0f, &window);
+    window.setCentralWidget(osgWidget);
+
+    connect(osgWidget, &QtOSGWidget::startSimulation, this, &LauncherApp::startSimulation);
+    connect(osgWidget, &QtOSGWidget::stopSimulation, this, &LauncherApp::stopSimulation);
+
+    // TCP-clinet initialization and start
+    tcp_client_config_t tcp_client_config;
+    tcp_client_config.address = launcher_config.host_address;
+    tcp_client_config.port = launcher_config.port;
+    tcp_client.init(tcp_client_config);
+
+    connect(osgWidget, &QtOSGWidget::sendDataToSimulator,
+            &tcp_client, &TcpClient::sendDataToServer);
+
+    tcp_client.start();
+
+    // Check fullscreen mode and set window mode
+    if (launcher_config.fullscreen)
+        window.showFullScreen();
+    else
+        window.show();
 }
 
 //------------------------------------------------------------------------------
@@ -188,6 +229,9 @@ void LauncherApp::overrideByCommandLine(const launcher_command_line_t &command_l
         launcher_config.remote_client = command_line.remote_client.value;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void LauncherApp::debugPrint(QString msg)
 {
     printf("%s", qPrintable(msg));

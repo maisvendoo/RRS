@@ -35,7 +35,7 @@ SimProcess::SimProcess(FileSystem *fs, QObject *parent) : QObject(parent)
   , proc(new QProcess(this))
   , train_config_name("default")
   , clear_log(false)
-  , debug_output(false)
+  , debug_output(true)
 {
     connect(proc, &QProcess::readyReadStandardOutput,
             this, &SimProcess::readStdOutput);
