@@ -52,7 +52,13 @@ bool TcpServer::start()
             this, &TcpServer::onClientConnection);
 
     if (!server->listen(QHostAddress::Any, tcp_config.port))
+    {
+        emit logMessage(QString("ERROR: can't start server. Unable listering on port %1")
+                        .arg(tcp_config.port));
         return false;
+    }
+
+    emit logMessage(QString("OK: server is started on port %1").arg(tcp_config.port));
 
     return true;
 }
@@ -66,6 +72,7 @@ void TcpServer::onClientConnection()
 
     Client *client = new Client();
     client->setSocket(socket);
+    client->setID(socket->socketDescriptor());
 
     clients.insert(socket, client);
 
@@ -74,6 +81,9 @@ void TcpServer::onClientConnection()
 
     connect(socket, &QTcpSocket::disconnected,
             this, &TcpServer::onClientDisconnection);
+
+    emit logMessage(QString("OK: Connected client id = %1")
+                    .arg(static_cast<int>(socket->socketDescriptor())));
 }
 
 //------------------------------------------------------------------------------
@@ -103,4 +113,7 @@ void TcpServer::onClientDisconnection()
         return;
 
     clients.remove(socket);
+
+    emit logMessage(QString("OK: Disconnected client id = %1")
+                    .arg(static_cast<int>(socket->socketDescriptor())));
 }

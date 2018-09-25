@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
     // TCP-clinet initialization
     TcpClient tcp_client;
     tcp_client_config_t tcp_client_config;
+    tcp_client_config.address = launcher_config.host_address;
+    tcp_client_config.port = launcher_config.port;
     tcp_client.init(tcp_client_config);
 
     QObject::connect(osgWidget, &QtOSGWidget::sendDataToSimulator,

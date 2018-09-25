@@ -20,6 +20,7 @@ struct launcher_config_t
     bool    fullscreen;
     QString host_address;
     int     port;
+    bool    remote_client;
 
     launcher_config_t()
         : width(1368)
@@ -27,6 +28,7 @@ struct launcher_config_t
         , fullscreen(false)
         , host_address("127.0.0.1")
         , port(1992)
+        , remote_client(false)
     {
 
     }

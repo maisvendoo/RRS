@@ -179,5 +179,5 @@ void QtOSGWidget::keyReleaseEvent(QKeyEvent *event)
 //------------------------------------------------------------------------------
 void QtOSGWidget::getDataFromSimulator(QByteArray data)
 {
-
+    (void) data;
 }

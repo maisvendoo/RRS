@@ -4,6 +4,7 @@ QT += core
 QT += gui
 QT += opengl
 QT += network
+QT += xml
 
 CONFIG += c++11
 
@@ -33,6 +34,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
 
+    LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -ltcp_d
 
 } else {
@@ -43,11 +45,13 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
 
+    LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -ltcp_d
 }
 
 INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 INCLUDEPATH += ../../common-headers/
+INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../tcp/include
 INCLUDEPATH += ./include
 

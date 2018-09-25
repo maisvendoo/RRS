@@ -10,10 +10,9 @@ DEFINES += TCP_LIB
 
 CONFIG(debug, debug|release) {
 
-    TARGET = $$join(TARGET,,,_d)
+    TARGET = $$join(TARGET,,,_d)    
 
 } else {
-
 
 }
 

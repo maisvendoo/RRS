@@ -40,6 +40,9 @@ public:
     /// Set client socket
     void setSocket(QTcpSocket *socket);
 
+    /// Set client ID
+    void setID(qintptr id);
+
 protected:
 
     /// Clinet name

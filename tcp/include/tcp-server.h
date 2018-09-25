@@ -52,6 +52,9 @@ signals:
     /// Send received data to train's model
     void sendDataToTrain(QByteArray data);
 
+    /// Print message to log
+    void logMessage(QString msg);
+
 private:
 
     /// Server object
