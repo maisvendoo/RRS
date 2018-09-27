@@ -92,6 +92,9 @@ private:
     void overrideByCommandLine(const launcher_command_line_t &command_line,
                                launcher_config_t &launcher_config);
 
+    /// Read parameters from config file
+    void loadConfig(QString cfg_path);
+
 private slots:
 
     void debugPrint(QString msg);

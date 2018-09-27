@@ -15,6 +15,7 @@
 
 #include    "app.h"
 
+#include    "CfgReader.h"
 #include    "convert.h"
 
 //------------------------------------------------------------------------------
@@ -43,6 +44,9 @@ int LauncherApp::exec()
     connect(this, &LauncherApp::startSimulation, sim_process, &SimProcess::start);
     connect(this, &LauncherApp::stopSimulation, sim_process, &SimProcess::abort);
     connect(sim_process, &SimProcess::printOutput, this, &LauncherApp::debugPrint);
+
+    // Load configuration from file
+    loadConfig(fs.combinePath(fs.getConfigDirectory(), "launcher.xml"));
 
     // Parse command line
     commandLineProcess();
@@ -250,4 +254,24 @@ void LauncherApp::overrideByCommandLine(const launcher_command_line_t &command_l
 void LauncherApp::debugPrint(QString msg)
 {
     printf("%s", qPrintable(msg));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LauncherApp::loadConfig(QString cfg_path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Launcher";
+
+        cfg.getInt(secName, "Width", launcher_config.width);
+        cfg.getInt(secName, "Height", launcher_config.height);
+        cfg.getBool(secName, "FullScreen", launcher_config.fullscreen);
+        cfg.getString(secName, "HostAddress", launcher_config.host_address);
+        cfg.getInt(secName, "Port", launcher_config.port);
+        cfg.getBool(secName, "RemoteClient", launcher_config.remote_client);
+    }
 }
