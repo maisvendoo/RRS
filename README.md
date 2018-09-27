@@ -4,7 +4,7 @@ Project's tree description:
 
 * *cfg/* - configuration files directory
 * *CfgReader/* - library for reading of configuration files in XML format
-* *common-headers/ - common C++ headers for all subprojects
+* *common-headers/* - common C++ headers for all subprojects
 * *filesystem/* - library for work with simulator directories and files tree
 * *launcher/* - graphical user interface (GUI)
 * *log/* - library for log files creation and processing
