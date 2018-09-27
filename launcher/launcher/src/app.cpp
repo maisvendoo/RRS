@@ -1,3 +1,18 @@
+//------------------------------------------------------------------------------
+//
+//      Application's functions implementation
+//      (c) maisvendoo, 18/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Application's functions implementation
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 18/09/2018
+ */
+
 #include    "app.h"
 
 #include    "convert.h"

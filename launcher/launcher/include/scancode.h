@@ -1,8 +1,26 @@
+//------------------------------------------------------------------------------
+//
+//      Scancodes for special keys in different platforms
+//      (c) maisvendoo, 18/09/2018
+//      Developer: Dmitry Pritykin
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Scancodes for special keys in different platforms
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 18/09/2018
+ */
+
 #ifndef     SCANCODE_H
 #define     SCANCODE_H
 
 #include    <QtGlobal>
 
+//------------------------------------------------------------------------------
+//      Platform depended scancodes
+//------------------------------------------------------------------------------
 #if defined(Q_OS_WIN)
     enum
     {

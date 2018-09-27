@@ -1,10 +1,18 @@
 //------------------------------------------------------------------------------
 //
-//
-//
-//
+//      OSG integration in Qt application
+//      (c) mainvendoo, 18/09/2018
+//      Developer: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief OSG integration in Qt application
+ * \copyright maisvendoo
+ * \author Dmitry Pritykin
+ * \date 18/09/2018
+ */
+
 #ifndef     QT_OSG_WIDGET_H
 #define     QT_OSG_WIDGET_H
 
@@ -24,6 +32,10 @@
 
 #include    "keyboard.h"
 
+/*!
+ * \class
+ * \brief OSG widget
+ */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -33,30 +45,39 @@ class QtOSGWidget : public QOpenGLWidget
 
 public:
 
+    /// Constructor
     QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent = Q_NULLPTR);
-
+    /// Destructor
     virtual ~QtOSGWidget();
 
 private:
 
+    /// Widget x scale
     qreal   m_scaleX;
+    /// Widget y scale
     qreal   m_scaleY;
 
+    /// OSG graphic window
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> mGraphicsWindow;
+    /// OSG viewer
     osg::ref_ptr<osgViewer::Viewer> mViewer;
 
+    /// Keyboard processor
     Keyboard    keyboard;
 
+    /// Get event from OSG queue
     osgGA::EventQueue *getEventQueue() const;
 
+    /// Parse special key (as Shift, Control, Alt etc.) pressing
     void specialKeyPressed(QKeyEvent *event);
 
 signals:
 
+    /// Send data to train simulator
     void sendDataToSimulator(QByteArray data);
-
+    /// Start train simulation
     void startSimulation();
-
+    /// Stop train simulation
     void stopSimulation();
 
 protected:
@@ -75,6 +96,7 @@ protected:
 
 public slots:
 
+    /// Get data from train simulator
     void getDataFromSimulator(QByteArray data);
 };
 
