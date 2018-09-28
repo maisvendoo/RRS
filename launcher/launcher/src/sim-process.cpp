@@ -35,7 +35,7 @@ SimProcess::SimProcess(FileSystem *fs, QObject *parent) : QObject(parent)
   , proc(new QProcess(this))
   , train_config_name("default")
   , clear_log(false)
-  , debug_output(true)
+  , debug_print(true)
 {
     connect(proc, &QProcess::readyReadStandardOutput,
             this, &SimProcess::readStdOutput);
@@ -63,7 +63,7 @@ void SimProcess::start()
     if (clear_log)
         args << "--clear-log";
 
-    if (debug_output)
+    if (debug_print)
         args << "--debug-print";
 
     proc->setProcessChannelMode(QProcess::MergedChannels);
@@ -77,6 +77,30 @@ void SimProcess::start()
 void SimProcess::abort()
 {
     proc->close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SimProcess::setTrainConfig(QString train_config_name)
+{
+    this->train_config_name = train_config_name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SimProcess::setDebugPrint(bool debug_print)
+{
+    this->debug_print = debug_print;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SimProcess::setClearLog(bool clear_log)
+{
+    this->clear_log = clear_log;
 }
 
 //------------------------------------------------------------------------------

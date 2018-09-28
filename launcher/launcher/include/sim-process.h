@@ -45,6 +45,15 @@ public slots:
     /// Stop simulation process
     void abort();
 
+    /// Set train config name
+    void setTrainConfig(QString train_config_name);
+
+    /// Set debug print
+    void setDebugPrint(bool debug_print);
+
+    /// Set clear log flag
+    void setClearLog(bool clear_log);
+
 private:
 
     static const QString SIMULATOR_EXECUTABLE;
@@ -56,7 +65,7 @@ private:
 
     QString     train_config_name;
     bool        clear_log;
-    bool        debug_output;
+    bool        debug_print;
 
 private slots:
 

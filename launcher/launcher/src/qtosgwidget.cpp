@@ -156,7 +156,7 @@ void QtOSGWidget::keyPressEvent(QKeyEvent *event)
         emit startSimulation();
 
     if (event->key() == Qt::Key_X)
-        emit stopSimulation();
+        emit stopSimulation();    
 
     keyboard.setKey(event->key());
 
