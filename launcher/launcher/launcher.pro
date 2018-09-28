@@ -33,6 +33,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgDBd
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
+    LIBS += -L$$OSG_LIB_DIRECTORY -losgWidgetd
 
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
