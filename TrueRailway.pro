@@ -9,6 +9,8 @@ SUBDIRS += ./tcp
 SUBDIRS += ./profile-loader
 SUBDIRS += ./simulator
 
+SUBDIRS += ./dmd
+
 SUBDIRS += ./launcher
 
 SUBDIRS += ./addons/default-vehicle
