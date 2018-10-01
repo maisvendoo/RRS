@@ -25,6 +25,8 @@
 
 #include    <iostream>
 
+#include    "dmd.h"
+
 /*!
  * \class
  * \brief Reader and writer of DMD-models
@@ -68,7 +70,11 @@ public:
 
 protected:
 
+    osg::Node *convertModelToSceneGraph(DMDObject &dmdObj,
+                                        const Options *options) const;
 
+    osg::Geometry *convertMeshToGeometry(dmd_mesh_t *mesh,
+                                         const Options *options) const;
 };
 
 #endif // READER_WRITER_DMD_H

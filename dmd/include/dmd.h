@@ -33,11 +33,17 @@ public:
 
     bool load(std::ifstream &fin);
 
+    std::vector<dmd_mesh_t *> getMeshes() const;
+
 private:
 
     size_t line_number;
 
     std::vector<dmd_mesh_t *> meshes;
+
+    void readNextMesh(std::ifstream &fin);
+
+    void readTextureBlock(std::ifstream &fin);
 };
 
 #endif // DMD_H

@@ -67,7 +67,13 @@ osgDB::ReaderWriter::ReadResult ReaderWriterDMD::doReadNode(std::ifstream &fin,
     (void) fileName;
     (void) options;
 
-    // Here do loading DMD-model!!!
+    DMDObject dmdObj;
+
+    if (dmdObj.load(fin))
+    {
+        osg::Node *node = convertModelToSceneGraph(dmdObj, options);
+        return node;
+    }
 
     return ReadResult::FILE_NOT_HANDLED;
 }
@@ -114,6 +120,47 @@ osgDB::ReaderWriter::WriteResult ReaderWriterDMD::doWriteNode(const osg::Node &n
     (void) options;
 
     return WriteResult::FILE_NOT_HANDLED;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
+                                                     const osgDB::ReaderWriter::Options *options) const
+{
+    std::vector<dmd_mesh_t *> meshes = dmdObj.getMeshes();
+
+    if (meshes.empty())
+        return nullptr;
+
+    osg::Group  *group = new osg::Group;
+
+    for (auto it = meshes.begin(); it != meshes.end(); ++it)
+    {
+        osg::Geometry *geometry = convertMeshToGeometry(*it, options);
+
+        osg::Geode *geode = new osg::Geode;
+        geode->addDrawable(geometry);
+
+        group->addChild(geode);
+    }
+
+    return group;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
+                                                      const osgDB::ReaderWriter::Options *options) const
+{
+    osg::Geometry *geometry = new osg::Geometry;
+
+    geometry->setVertexArray(mesh->vertices);
+
+
+
+    return geometry;
 }
 
 
