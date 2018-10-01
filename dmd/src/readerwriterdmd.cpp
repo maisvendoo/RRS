@@ -128,14 +128,14 @@ osgDB::ReaderWriter::WriteResult ReaderWriterDMD::doWriteNode(const osg::Node &n
 osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
                                                      const osgDB::ReaderWriter::Options *options) const
 {
-    std::vector<dmd_mesh_t *> meshes = dmdObj.getMeshes();
+    dmd_multymesh_t multyMesh = dmdObj.getMultyMesh();
 
-    if (meshes.empty())
+    if (multyMesh.meshes.empty())
         return nullptr;
 
     osg::Group  *group = new osg::Group;
 
-    for (auto it = meshes.begin(); it != meshes.end(); ++it)
+    for (auto it = multyMesh.meshes.begin(); it != multyMesh.meshes.end(); ++it)
     {
         osg::Geometry *geometry = convertMeshToGeometry(*it, options);
 
@@ -158,7 +158,22 @@ osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
 
     geometry->setVertexArray(mesh->vertices);
 
+    geometry->setNormalArray(mesh->smooth_normals, osg::Array::BIND_PER_VERTEX);
 
+    std::vector<osg::DrawElementsUInt *> meshPrimitiveSets;
+
+    for (size_t i = 0; i < mesh->faces.size(); i++)
+    {
+        osg::DrawElementsUInt *primitive = new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
+        meshPrimitiveSets.push_back(primitive);
+
+        osg::DrawElementsUInt *face = meshPrimitiveSets.back();
+
+        for (size_t j = 0; j < mesh->faces[i].indices.size(); j++)
+            face->push_back(mesh->faces[i].indices[j]);
+
+        geometry->addPrimitiveSet(face);
+    }
 
     return geometry;
 }
