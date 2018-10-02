@@ -139,6 +139,9 @@ osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
     {
         osg::Geometry *geometry = convertMeshToGeometry(*it, options);
 
+        if (multyMesh.texture_vertices->size() != 0)
+            geometry->setTexCoordArray(0, multyMesh.texture_vertices);
+
         osg::Geode *geode = new osg::Geode;
         geode->addDrawable(geometry);
 

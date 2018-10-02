@@ -2,6 +2,9 @@
 #include    "scancode.h"
 
 #include    <QDebug>
+#include    <osgDB/ReadFile>
+#include    <osg/PositionAttitudeTransform>
+#include    <osgUtil/Optimizer>
 
 //------------------------------------------------------------------------------
 //
@@ -25,7 +28,24 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent)
     camera->setProjectionMatrixAsPerspective(30.0f, aspectRatio, 1.0f, 1000.0f);
     camera->setGraphicsContext(mGraphicsWindow);
 
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+
+    osg::Node *ep20 = osgDB::readNodeFile("F:\\work\\vr\\TrueRailway\\test\\ep20.dmd");
+
+    osg::PositionAttitudeTransform *transform = new osg::PositionAttitudeTransform;
+    transform->setPosition(osg::Vec3(0.0f, 0.0f, 0.0f));
+
+    geode->addChild(transform);
+    transform->addChild(ep20);
+
     mViewer->setCamera(camera);
+    mViewer->setSceneData(geode);
+
+    osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator;
+    manipulator->setAllowThrow(false);
+    this->setMouseTracking(true);
+    mViewer->setCameraManipulator(manipulator);
+
     mViewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
     mViewer->realize();
 }
@@ -134,7 +154,12 @@ void QtOSGWidget::resizeGL(int width, int height)
 //------------------------------------------------------------------------------
 void QtOSGWidget::initializeGL()
 {
-
+    osg::Geode *geode = dynamic_cast<osg::Geode *>(mViewer->getSceneData());
+    osg::StateSet *stateSet = geode->getOrCreateStateSet();
+    osg::Material *mat = new osg::Material;
+    mat->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
+    stateSet->setAttributeAndModes(mat, osg::StateAttribute::ON);
+    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 }
 
 //------------------------------------------------------------------------------
@@ -183,7 +208,76 @@ void QtOSGWidget::keyReleaseEvent(QKeyEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void QtOSGWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    this->getEventQueue()->mouseMotion(event->x() * m_scaleX,
+                                       event->y() * m_scaleY);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::mousePressEvent(QMouseEvent *event)
+{
+    this->getEventQueue()->mouseButtonPress(event->x() * m_scaleX,
+                                            event->y() * m_scaleY,
+                                            this->getMouseButtonOSG(event));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    this->getEventQueue()->mouseButtonRelease(event->x() * m_scaleX,
+                                              event->y() * m_scaleY,
+                                              this->getMouseButtonOSG(event));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::wheelEvent(QWheelEvent *event)
+{
+    int delta = event->delta();
+
+    osgGA::GUIEventAdapter::ScrollingMotion motion = delta > 0 ?
+                osgGA::GUIEventAdapter::SCROLL_UP :
+                osgGA::GUIEventAdapter::SCROLL_DOWN;
+
+    this->getEventQueue()->mouseScroll(motion);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void QtOSGWidget::getDataFromSimulator(QByteArray data)
 {
     (void) data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+unsigned int QtOSGWidget::getMouseButtonOSG(QMouseEvent *event)
+{
+    unsigned int button = 0;
+
+    switch (event->button())
+    {
+    case Qt::LeftButton:
+        button = 1;
+        break;
+    case Qt::MiddleButton:
+        button = 2;
+        break;
+    case Qt::RightButton:
+        button = 3;
+        break;
+
+    default:
+        break;
+    }
+
+    return button;
 }

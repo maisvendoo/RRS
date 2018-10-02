@@ -32,6 +32,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgViewerd
     LIBS += -L$$OSG_LIB_DIRECTORY -losgDBd
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
+    LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
 
     LIBS += -L../../../lib -lCfgReader_d
@@ -44,6 +45,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L$$OSG_LIB_DIRECTORY -losgViewer
     LIBS += -L$$OSG_LIB_DIRECTORY -losgDB
     LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
+    LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
 
     LIBS += -L../../../lib -lCfgReader
