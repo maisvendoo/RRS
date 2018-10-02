@@ -199,7 +199,7 @@ void LauncherApp::init(launcher_config_t launcher_config)
     window.setFixedHeight(launcher_config.height);
 
     // OSG widget creation
-    QtOSGWidget *osgWidget = new QtOSGWidget(1.0f, 1.0f, &window);
+    QtOSGWidget *osgWidget = new QtOSGWidget(&fs, 1.0f, 1.0f, &window);
     window.setCentralWidget(osgWidget);
 
     connect(osgWidget, &QtOSGWidget::startSimulation, this, &LauncherApp::startSimulation);

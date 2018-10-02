@@ -9,8 +9,9 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent)
+QtOSGWidget::QtOSGWidget(FileSystem *fs, qreal scaleX, qreal scaleY, QWidget *parent)
     : QOpenGLWidget(parent)
+    , fs(fs)
     , m_scaleX(scaleX)
     , m_scaleY(scaleY)
     , mGraphicsWindow(new osgViewer::GraphicsWindowEmbedded(this->x(),
@@ -28,15 +29,12 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent)
     camera->setProjectionMatrixAsPerspective(30.0f, aspectRatio, 1.0f, 1000.0f);
     camera->setGraphicsContext(mGraphicsWindow);
 
+    RouteLoader *loader = initRouteLoader(fs->combinePath(fs->getLibDirectory(), "zds-route-loader"));
+    loader->setFileSystem(fs);
+    osg::Node *root = loader->load("Moskow-Vjazma");
+
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-
-    osg::Node *ep20 = osgDB::readNodeFile("F:\\work\\vr\\TrueRailway\\test\\ep20.dmd");
-
-    osg::PositionAttitudeTransform *transform = new osg::PositionAttitudeTransform;
-    transform->setPosition(osg::Vec3(0.0f, 0.0f, 0.0f));
-
-    geode->addChild(transform);
-    transform->addChild(ep20);
+    geode->addChild(root);
 
     mViewer->setCamera(camera);
     mViewer->setSceneData(geode);
@@ -56,6 +54,14 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent)
 QtOSGWidget::~QtOSGWidget()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QtOSGWidget::setFileSystem(FileSystem *fs)
+{
+    this->fs = fs;
 }
 
 //------------------------------------------------------------------------------

@@ -31,6 +31,8 @@
 #include    <osgGA/TrackballManipulator>
 
 #include    "keyboard.h"
+#include    "route-loader.h"
+#include    "filesystem.h"
 
 /*!
  * \class
@@ -46,11 +48,16 @@ class QtOSGWidget : public QOpenGLWidget
 public:
 
     /// Constructor
-    QtOSGWidget(qreal scaleX, qreal scaleY, QWidget *parent = Q_NULLPTR);
+    QtOSGWidget(FileSystem *fs, qreal scaleX, qreal scaleY, QWidget *parent = Q_NULLPTR);
     /// Destructor
     virtual ~QtOSGWidget();
 
+    void setFileSystem(FileSystem *fs);
+
 private:
+
+    ///
+    FileSystem  *fs;
 
     /// Widget x scale
     qreal   m_scaleX;
@@ -106,6 +113,8 @@ public slots:
 
     /// Get data from train simulator
     void getDataFromSimulator(QByteArray data);
+
+private:
 
     unsigned int getMouseButtonOSG(QMouseEvent *event);
 };

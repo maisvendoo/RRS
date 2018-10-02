@@ -139,8 +139,17 @@ osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
     {
         osg::Geometry *geometry = convertMeshToGeometry(*it, options);
 
+        osg::Vec2Array *texvertices = new osg::Vec2Array;
+
+        for (size_t j = 0; j < (*it)->vertices->size(); j++)
+        {
+            osg::Vec3f uv = multyMesh.texture_vertices->at(j);
+            texvertices->push_back(osg::Vec2(uv.x(), multyMesh.ty_max - uv.y()));
+        }
+
+
         if (multyMesh.texture_vertices->size() != 0)
-            geometry->setTexCoordArray(0, multyMesh.texture_vertices);
+            geometry->setTexCoordArray(0, texvertices);
 
         osg::Geode *geode = new osg::Geode;
         geode->addDrawable(geometry);

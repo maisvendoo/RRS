@@ -169,6 +169,12 @@ void DMDObject::readTextureBlock(std::ifstream &fin)
         float y = str_to_float(tex_vertex[1]);
         float z = str_to_float(tex_vertex[2]);
 
+        if (x > multyMesh.tx_max)
+            multyMesh.tx_max = x;
+
+        if (y > multyMesh.ty_max)
+            multyMesh.ty_max = y;
+
         multyMesh.texture_vertices->push_back(osg::Vec3(x, y, z));
     }
 

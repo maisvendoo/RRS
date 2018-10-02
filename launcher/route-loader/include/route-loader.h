@@ -52,7 +52,7 @@ protected:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef RouteLoader *(GetRouteLoader)();
+typedef RouteLoader* (*GetRouteLoader)();
 
 //------------------------------------------------------------------------------
 //
@@ -62,5 +62,7 @@ typedef RouteLoader *(GetRouteLoader)();
     {\
         return new (ClassName)(); \
     }
+
+extern "C" Q_DECL_EXPORT RouteLoader *initRouteLoader(QString lib_path);
 
 #endif // ROUTE_LOADER_H

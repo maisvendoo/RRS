@@ -27,9 +27,9 @@ ZdsRouteLoader::~ZdsRouteLoader()
 //------------------------------------------------------------------------------
 osg::Node *ZdsRouteLoader::load(QString route_path)
 {
-    osg::Node *routeRoot = new osg::Group;
-
     routeRootPath = fs->combinePath(fs->getRoutesDirectory(), route_path);
+
+    osg::Node *routeRoot = loadModel("traffic/ep20.dmd", "traffic/ep20.bmp");
 
     return routeRoot;
 }

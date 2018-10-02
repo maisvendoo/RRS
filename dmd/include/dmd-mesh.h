@@ -42,10 +42,7 @@ struct dmd_mesh_t
     osg::Vec3Array      *faset_normals;
     osg::Vec3Array      *smooth_normals;
     size_t              vertex_count;
-    size_t              faces_count;
-
-    float               tx_max;
-    float               ty_max;
+    size_t              faces_count;    
 
     dmd_mesh_t()
         : vertices(nullptr)        
@@ -53,9 +50,7 @@ struct dmd_mesh_t
         , faset_normals(nullptr)
         , smooth_normals(nullptr)
         , vertex_count(0)
-        , faces_count(0)
-        , tx_max(1.0f)
-        , ty_max(1.0f)
+        , faces_count(0)        
     {
 
     }
@@ -73,6 +68,9 @@ struct dmd_multymesh_t
     size_t                      tex_f_count;
     bool                        texture_present;
 
+    float                       tx_max;
+    float                       ty_max;
+
     dmd_multymesh_t()
         : meshes({})
         , texture_vertices(nullptr)
@@ -80,6 +78,8 @@ struct dmd_multymesh_t
         , tex_v_count(0)
         , tex_f_count(0)
         , texture_present(true)
+        , tx_max(1.0f)
+        , ty_max(1.0f)
     {
 
     }
