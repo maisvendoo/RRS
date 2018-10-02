@@ -1,16 +1,15 @@
-TEMPLATE = app
+TEMPLATE = lib
+
+DEFINES += ROUTE_LOADER_LIB
 
 QT += core
-QT += gui
-QT += opengl
-QT += network
-QT += xml
+QT -= gui
 
 CONFIG += c++11
 
-TARGET = launcher
+TARGET = route-loader
 
-DESTDIR = ../../../bin
+DESTDIR = ../../../lib
 
 win32 {
 
@@ -29,41 +28,27 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,_d)
 
     LIBS += -L$$OSG_LIB_DIRECTORY -losgd
-    LIBS += -L$$OSG_LIB_DIRECTORY -losgViewerd
     LIBS += -L$$OSG_LIB_DIRECTORY -losgDBd
-    LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
     LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
 
-    LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
-    LIBS += -L../../../lib -ltcp_d
-    LIBS += -L../../../lib -lroute-loader_d
 
 } else {
 
     LIBS += -L$$OSG_LIB_DIRECTORY -losg
-    LIBS += -L$$OSG_LIB_DIRECTORY -losgViewer
     LIBS += -L$$OSG_LIB_DIRECTORY -losgDB
-    LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
     LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
     LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
 
-    LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
-    LIBS += -L../../../lib -ltcp
-    LIBS += -L../../../lib -lroute-loader
 }
 
 INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 INCLUDEPATH += ../../common-headers/
-INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
-INCLUDEPATH += ../../tcp/include
-
-INCLUDEPATH += ../route-loader/include
-
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
+
