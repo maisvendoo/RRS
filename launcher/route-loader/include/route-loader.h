@@ -37,6 +37,9 @@ public:
     /// Load route
     virtual osg::Node *load(QString route_path) = 0;
 
+    /// Get cartesian position
+    virtual osg::Vec3f getPosition(float rail_coord) = 0;
+
     /// Setting up filesystem object
     void setFileSystem(FileSystem *fs);
 

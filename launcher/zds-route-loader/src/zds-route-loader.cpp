@@ -39,7 +39,23 @@ osg::Node *ZdsRouteLoader::load(QString route_path)
 
     loadTracks(routeRootPath);
 
+    osg::Vec3f pos = getPosition(31000.0f);
+
     return routeRoot;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Vec3f ZdsRouteLoader::getPosition(float rail_coord)
+{
+    track_t track = trackSearch(1, rail_coord);
+
+    float motion = rail_coord - track.rail_coord;
+    osg::Vec3f motion_vec = track.orth *= motion;
+    osg::Vec3f  pos = track.begin_point + motion_vec;
+
+    return pos;
 }
 
 //------------------------------------------------------------------------------
@@ -138,6 +154,8 @@ tracks_data_t ZdsRouteLoader::loadTrackFile(QString path)
     {
         QTextStream stream(&file);
 
+        float rail_coord = 0.0f;
+
         while (!stream.atEnd())
         {
             QString line = stream.readLine().remove(';');
@@ -167,11 +185,46 @@ tracks_data_t ZdsRouteLoader::loadTrackFile(QString path)
             track.length = dir_vector.length();
             track.orth = dir_vector *= (1 / track.length);
 
+            osg::Vec3f up(0, 0, 1);
+            track.right = track.orth ^ up;
+            track.right = track.right *= (1 / track.right.length());
+
+            track.rail_coord = rail_coord;
+            rail_coord += track.length;
+
             tracks_data.append(track);
         }
     }
 
     return tracks_data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+track_t ZdsRouteLoader::trackSearch(int track_idx, float rail_coord)
+{
+    track_t track;
+
+    tracks_data_t tracks_data = tracks[track_idx];
+
+    int left_idx = 0;
+    int right_idx = tracks_data.size() - 1;
+    int idx = (left_idx + right_idx) / 2;
+
+    while (idx != left_idx)
+    {
+        track = tracks_data.at(idx);
+
+        if (rail_coord < track.rail_coord)
+            right_idx = idx;
+        else
+            left_idx = idx;
+
+        idx = (left_idx + right_idx) / 2;
+    }
+
+    return track;
 }
 
 GET_ROUTE_LOADER(ZdsRouteLoader)

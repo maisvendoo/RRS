@@ -19,6 +19,8 @@ public:
 
     osg::Node   *load(QString route_path);
 
+    osg::Vec3f getPosition(float rail_coord);
+
 private:
 
     QString     routeRootPath;
@@ -36,6 +38,9 @@ private:
     void loadTracks(QString route_dir_path);
 
     tracks_data_t loadTrackFile(QString path);
+
+    /// Search track by railway coord
+    track_t trackSearch(int track_idx, float rail_coord);
 };
 
 #endif // ZDS_ROUTE_LOADER_H
