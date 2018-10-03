@@ -50,6 +50,7 @@ INCLUDEPATH += ../route-loader/include
 
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/object.h
 SOURCES += $$files(./src/*.cpp)
 

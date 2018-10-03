@@ -39,7 +39,7 @@ osg::Node *ZdsRouteLoader::load(QString route_path)
 
     loadTracks(routeRootPath);
 
-    osg::Vec3f pos = getPosition(31000.0f);
+    loadObjectRefs(routeRootPath);
 
     return routeRoot;
 }
@@ -65,16 +65,19 @@ osg::Node *ZdsRouteLoader::loadModel(QString model_path, QString texture_path)
 {
     osg::Node *modelNode = osgDB::readNodeFile(fs->combinePath(routeRootPath, model_path).toStdString());
 
-    osg::StateSet   *stateset = new osg::StateSet;
-    osg::Material   *material = new osg::Material;
-    stateset->setAttribute(material);
+    if (modelNode != nullptr)
+    {
+        osg::StateSet   *stateset = new osg::StateSet;
+        osg::Material   *material = new osg::Material;
+        stateset->setAttribute(material);
 
-    material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
-    material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+        material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+        material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-    loadTexture(texture_path, stateset, 0);
+        loadTexture(texture_path, stateset, 0);
 
-    modelNode->setStateSet(stateset);
+        modelNode->setStateSet(stateset);
+    }
 
     return modelNode;
 }
@@ -225,6 +228,49 @@ track_t ZdsRouteLoader::trackSearch(int track_idx, float rail_coord)
     }
 
     return track;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZdsRouteLoader::loadObjectRefs(QString route_dir)
+{
+    QFile file(fs->combinePath(route_dir, "objects.ref"));
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(&file);
+
+        QString mode = "";
+
+        while (!stream.atEnd())
+        {
+            QString line = stream.readLine();
+
+            if (line.at(0) == ';')
+                continue;
+
+            if (line.at(0) == '[')
+            {
+                mode = line.remove('[').remove(']');
+                continue;
+            }
+
+            QStringList tokens = line.split('\t');
+
+            object_t object;
+
+            object.name = tokens.at(0);
+            object.mode = mode;
+            object.model_path = tokens.at(1);
+            object.texture_path = tokens.at(2);
+
+            object.model_path = QDir::toNativeSeparators(object.model_path.remove(0, 1));
+            object.texture_path = QDir::toNativeSeparators(object.texture_path.remove(0, 1));
+
+            objects.insert(object.name, object);
+        }
+    }
 }
 
 GET_ROUTE_LOADER(ZdsRouteLoader)

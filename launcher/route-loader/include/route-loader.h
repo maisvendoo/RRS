@@ -43,6 +43,10 @@ public:
     /// Setting up filesystem object
     void setFileSystem(FileSystem *fs);
 
+signals:
+
+    void logMessage(QString msg);
+
 protected:
 
     FileSystem  *fs;
