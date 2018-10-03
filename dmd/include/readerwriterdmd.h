@@ -73,7 +73,7 @@ protected:
     osg::Node *convertModelToSceneGraph(DMDObject &dmdObj,
                                         const Options *options) const;
 
-    osg::Geometry *convertMeshToGeometry(dmd_mesh_t *mesh,
+    osg::Geometry *convertMeshToGeometry(dmd_mesh_t *mesh, dmd_multymesh_t &multyMesh,
                                          const Options *options) const;
 };
 
