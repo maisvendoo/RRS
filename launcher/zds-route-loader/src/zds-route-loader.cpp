@@ -35,7 +35,7 @@ osg::Node *ZdsRouteLoader::load(QString route_path)
 {
     routeRootPath = fs->combinePath(fs->getRoutesDirectory(), route_path);
 
-    osg::Node *routeRoot = loadModel("traffic/ep20.dmd", "traffic/ep20.bmp");
+    osg::Node *routeRoot = loadModel("models/sky.dmd", "textures/sky_day.bmp");
 
     loadTracks(routeRootPath);
 
