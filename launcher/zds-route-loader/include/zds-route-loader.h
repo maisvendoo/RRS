@@ -18,7 +18,7 @@ public:
 
     ~ZdsRouteLoader();
 
-    osg::Node   *load(QString route_path);
+    osg::Group   *load(QString route_path);
 
     osg::Vec3f getPosition(float rail_coord);
 
@@ -29,8 +29,12 @@ private:
 
     /// Tracks list
     QMap<int, tracks_data_t>    tracks;
-    /// Objects list
-    QMap<QString, object_t>     objects;
+    /// Objects refs list
+    QMap<QString, object_ref_t>     objects_refs;
+    /// Object from objects.data list
+    QList<objects_dat_t>         objects_dat;
+
+    QMap<QString, node_t>           nodes;
 
     /// Load 3D-model geometry
     osg::Node *loadModel(QString model_path, QString texture_path);
@@ -53,7 +57,14 @@ private:
     track_t trackSearch(int track_idx, float rail_coord);
 
     /// Load objects referecies
-    void loadObjectRefs(QString route_dir);
+    void loadObjectRefs(QString path);
+
+    /// Load objects from objects.dat
+    void loadObjectsDat(QString path);
+
+    void loadObjectsDatNodes(osg::Group *root_node);
+
+    osg::Vec3f getPosition(float rail_coord, track_t &track);
 };
 
 #endif // ZDS_ROUTE_LOADER_H

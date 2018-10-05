@@ -31,7 +31,7 @@ QtOSGWidget::QtOSGWidget(FileSystem *fs, qreal scaleX, qreal scaleY, QWidget *pa
 
     RouteLoader *loader = initRouteLoader(fs->combinePath(fs->getLibDirectory(), "zds-route-loader"));
     loader->setFileSystem(fs);
-    osg::Node *root = loader->load("Moskow-Vjazma");
+    osg::Group *root = loader->load("Moskow-Vjazma");
 
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addChild(root);

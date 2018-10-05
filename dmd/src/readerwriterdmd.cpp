@@ -212,5 +212,19 @@ osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
     return geometry;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Vec3 ReaderWriterDMD::toRightBasis(osg::Vec3 &v) const
+{
+    osg::Vec3 axis(1.0f, 0.0f, 0.0f);
+    osg::Quat q(osg::PIf / 2.0, axis);
+
+    osg::Vec3 tmp = q * v;
+
+    return osg::Vec3(tmp.x(), -tmp.y(), tmp.z());
+}
+
+
 
 REGISTER_OSGPLUGIN(dmd, ReaderWriterDMD)

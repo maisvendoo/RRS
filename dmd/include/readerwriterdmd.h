@@ -75,6 +75,8 @@ protected:
 
     osg::Geometry *convertMeshToGeometry(dmd_mesh_t *mesh, dmd_multymesh_t &multyMesh,
                                          const Options *options) const;
+
+    osg::Vec3 toRightBasis(osg::Vec3 &v) const;
 };
 
 #endif // READER_WRITER_DMD_H

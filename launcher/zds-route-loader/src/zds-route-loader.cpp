@@ -6,11 +6,13 @@
 #include    <osg/TexMat>
 #include    <osg/Material>
 #include    <osg/Geometry>
+#include    <osg/MatrixTransform>
 
 #include    <QDir>
 #include    <QString>
 #include    <QStringList>
 #include    <QTextStream>
+#include    <QDebug>
 
 //------------------------------------------------------------------------------
 //
@@ -31,17 +33,23 @@ ZdsRouteLoader::~ZdsRouteLoader()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Node *ZdsRouteLoader::load(QString route_path)
+osg::Group *ZdsRouteLoader::load(QString route_path)
 {
     routeRootPath = fs->combinePath(fs->getRoutesDirectory(), route_path);
 
-    osg::Node *routeRoot = loadModel("models/sky.dmd", "textures/sky_day.bmp");
+    osg::Node *skybox = loadModel("models/sky.dmd", "textures/sky_day.bmp");
 
     loadTracks(routeRootPath);
 
-    loadObjectRefs(routeRootPath);
+    loadObjectRefs(fs->combinePath(routeRootPath, "objects.ref"));
 
-    return routeRoot;
+    loadObjectsDat(fs->combinePath(routeRootPath, "objects.dat"));
+
+    osg::Group *group = new osg::Group;
+    loadObjectsDatNodes(group);
+    //group->addChild(skybox);
+
+    return group;
 }
 
 //------------------------------------------------------------------------------
@@ -49,13 +57,8 @@ osg::Node *ZdsRouteLoader::load(QString route_path)
 //------------------------------------------------------------------------------
 osg::Vec3f ZdsRouteLoader::getPosition(float rail_coord)
 {
-    track_t track = trackSearch(1, rail_coord);
-
-    float motion = rail_coord - track.rail_coord;
-    osg::Vec3f motion_vec = track.orth *= motion;
-    osg::Vec3f  pos = track.begin_point + motion_vec;
-
-    return pos;
+    track_t track;
+    return getPosition(rail_coord, track);
 }
 
 //------------------------------------------------------------------------------
@@ -63,7 +66,19 @@ osg::Vec3f ZdsRouteLoader::getPosition(float rail_coord)
 //------------------------------------------------------------------------------
 osg::Node *ZdsRouteLoader::loadModel(QString model_path, QString texture_path)
 {
-    osg::Node *modelNode = osgDB::readNodeFile(fs->combinePath(routeRootPath, model_path).toStdString());
+    osg::Node *modelNode = nullptr;
+
+    // Loading of model geometry
+    try
+    {
+        std::string m_path = fs->combinePath(routeRootPath, model_path).toStdString();
+        modelNode = osgDB::readNodeFile(m_path);
+    }
+    catch (std::exception &e)
+    {
+        qDebug() << e.what();
+        return nullptr;
+    }
 
     if (modelNode != nullptr)
     {
@@ -233,9 +248,9 @@ track_t ZdsRouteLoader::trackSearch(int track_idx, float rail_coord)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZdsRouteLoader::loadObjectRefs(QString route_dir)
+void ZdsRouteLoader::loadObjectRefs(QString path)
 {
-    QFile file(fs->combinePath(route_dir, "objects.ref"));
+    QFile file(path);
 
     if (file.open(QIODevice::ReadOnly))
     {
@@ -258,7 +273,7 @@ void ZdsRouteLoader::loadObjectRefs(QString route_dir)
 
             QStringList tokens = line.split('\t');
 
-            object_t object;
+            object_ref_t object;
 
             object.name = tokens.at(0);
             object.mode = mode;
@@ -268,9 +283,119 @@ void ZdsRouteLoader::loadObjectRefs(QString route_dir)
             object.model_path = QDir::toNativeSeparators(object.model_path.remove(0, 1));
             object.texture_path = QDir::toNativeSeparators(object.texture_path.remove(0, 1));
 
-            objects.insert(object.name, object);
+            objects_refs.insert(object.name, object);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZdsRouteLoader::loadObjectsDat(QString path)
+{
+    QFile file(path);
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(&file);
+
+        QChar   delimiter('\t');
+
+        while (!stream.atEnd())
+        {
+            QString line = stream.readLine();
+
+            // Ignore comments
+            if (line.at(0) == ';')
+                continue;
+
+            line.truncate(line.lastIndexOf(delimiter));
+            QStringList tokens = line.split(delimiter);
+
+            objects_dat_t object_dat;
+
+            object_dat.ordinate = tokens.at(0).toFloat();
+            object_dat.shift = tokens.at(1).toFloat();
+            object_dat.angle_horizontal = tokens.at(2).toFloat() * M_PI / 180.0f;
+            object_dat.angle_vertical = tokens.at(3).toFloat() * M_PI / 180.0f;
+            object_dat.height = tokens.at(4).toFloat();
+            object_dat.name = tokens.at(5);
+
+            objects_dat.append(object_dat);
+        }
+    }
+}
+
+void ZdsRouteLoader::loadObjectsDatNodes(osg::Group *root_node)
+{
+    size_t nodes_count = 0;
+
+    foreach (objects_dat_t object_dat, objects_dat)
+    {
+        node_t node;
+
+        auto it = nodes.find(object_dat.name);
+
+        if (it.key() != object_dat.name)
+        {
+            auto it = objects_refs.find(object_dat.name);
+
+            if (it.key() != object_dat.name)
+                continue;
+
+
+            object_ref_t object_ref = it.value();
+            node.name = object_dat.name;
+
+            qDebug() << "Loading " << object_dat.name << "...";
+
+            node.node = loadModel(object_ref.model_path, object_ref.texture_path);
+
+            if (node.node == nullptr)
+                continue;
+
+            nodes.insert(node.name, node);
+
+            qDebug() << "OK: Loaded " << object_dat.name << " successfuly... count: "
+                     << ++nodes_count;
+
+        }
+        else
+            node = it.value();
+
+        track_t track;
+        osg::Vec3f track_pos = getPosition(object_dat.ordinate, track);
+        track_pos += track.right *= object_dat.shift;
+        track_pos += osg::Vec3f(0, 0, 1.0f) *= object_dat.height;
+
+        osg::MatrixTransform *transform1 = new osg::MatrixTransform;
+
+
+        osg::Matrix m1 = osg::Matrix::translate(track_pos);
+        osg::Matrix m2 = osg::Matrix::rotate(object_dat.angle_horizontal, osg::Vec3f(0, 0, 1));
+        osg::Matrix m3 = osg::Matrix::rotate(object_dat.angle_vertical, osg::Vec3f(1, 0, 0));
+
+        osg::Matrix m = m1 * m2 * m3;
+
+        transform1->setMatrix(m);
+
+        transform1->addChild(node.node);
+        root_node->addChild(transform1);
+
+        if (nodes_count == 50)
+            break;
+    }
+}
+
+osg::Vec3f ZdsRouteLoader::getPosition(float rail_coord, track_t &track)
+{
+    track = trackSearch(1, rail_coord);
+
+    float motion = rail_coord - track.rail_coord;
+    osg::Vec3f motion_vec = track.orth *= motion;
+    osg::Vec3f  pos = track.begin_point + motion_vec;
+
+    return pos;
 }
 
 GET_ROUTE_LOADER(ZdsRouteLoader)

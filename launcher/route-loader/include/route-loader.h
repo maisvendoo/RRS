@@ -35,7 +35,7 @@ public:
     virtual ~RouteLoader();
 
     /// Load route
-    virtual osg::Node *load(QString route_path) = 0;
+    virtual osg::Group *load(QString route_path) = 0;
 
     /// Get cartesian position
     virtual osg::Vec3f getPosition(float rail_coord) = 0;

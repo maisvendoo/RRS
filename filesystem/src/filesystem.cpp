@@ -169,9 +169,9 @@ QString FileSystem::getRoutesDirectory() const
 QString FileSystem::combinePath(const QString &path1, const QString &path2)
 {
     if (*(path1.end() - 1) != QDir::separator())
-        return path1 + QDir::separator() + path2;
+        return QDir::toNativeSeparators(path1 + QDir::separator() + path2);
     else
-        return path1 + path2;
+        return QDir::toNativeSeparators(path1 + path2);
 }
 
 //------------------------------------------------------------------------------
