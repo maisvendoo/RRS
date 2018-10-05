@@ -5,6 +5,7 @@
 #include    <osgDB/ReadFile>
 #include    <osg/PositionAttitudeTransform>
 #include    <osgUtil/Optimizer>
+#include    <osg/BlendFunc>
 
 //------------------------------------------------------------------------------
 //
@@ -166,6 +167,9 @@ void QtOSGWidget::initializeGL()
     mat->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
     stateSet->setAttributeAndModes(mat, osg::StateAttribute::ON);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+
+    osg::BlendFunc* bf = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA );
+    stateSet->setAttributeAndModes(bf);
 }
 
 //------------------------------------------------------------------------------
