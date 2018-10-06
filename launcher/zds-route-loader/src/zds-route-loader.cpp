@@ -256,6 +256,8 @@ void ZdsRouteLoader::loadObjectRefs(QString path)
 {
     QFile file(path);
 
+    size_t lines_count = 0;
+
     if (file.open(QIODevice::ReadOnly))
     {
         QTextStream stream(&file);
@@ -265,6 +267,11 @@ void ZdsRouteLoader::loadObjectRefs(QString path)
         while (!stream.atEnd())
         {
             QString line = stream.readLine();
+
+            qDebug() << ++lines_count << ": " << line;
+
+            if (line.isEmpty())
+                continue;
 
             if (line.at(0) == ';')
                 continue;
@@ -278,6 +285,9 @@ void ZdsRouteLoader::loadObjectRefs(QString path)
             QStringList tokens = line.split('\t');
 
             object_ref_t object;
+
+            if (tokens.size() < 3)
+                continue;
 
             object.name = tokens.at(0);
             object.mode = mode;
@@ -299,6 +309,8 @@ void ZdsRouteLoader::loadObjectsDat(QString path)
 {
     QFile file(path);
 
+    size_t lines_count = 0;
+
     if (file.open(QIODevice::ReadOnly))
     {
         QTextStream stream(&file);
@@ -309,12 +321,20 @@ void ZdsRouteLoader::loadObjectsDat(QString path)
         {
             QString line = stream.readLine();
 
+            if (line.isEmpty())
+                continue;
+
+            qDebug() << ++lines_count << ": " << line;
+
             // Ignore comments
             if (line.at(0) == ';')
                 continue;
 
             line.truncate(line.lastIndexOf(delimiter));
             QStringList tokens = line.split(delimiter);
+
+            if (tokens.size() < 6)
+                continue;
 
             objects_dat_t object_dat;
 
@@ -441,7 +461,7 @@ void ZdsRouteLoader::loadRoute1MapNodes(osg::Group *group)
 {
     size_t nodes_count = 0;
 
-    osg::Vec3f pos = getPosition(3000.0f);
+    osg::Vec3f pos = getPosition(4338.0f);
 
     foreach (object_map_t object_map, objects_map)
     {
