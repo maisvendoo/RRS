@@ -39,6 +39,31 @@ struct objects_dat_t
     float       height;
 };
 
+struct object_map_t
+{
+    QString name;
+    float   x;
+    float   y;
+    float   z;
+    float   angle_x;
+    float   angle_y;
+    float   angle_z;
+    QString caption;
+
+    object_map_t()
+        : name("")
+        , x(0)
+        , y(0)
+        , z(0)
+        , angle_x(0)
+        , angle_y(0)
+        , angle_z(0)
+        , caption("")
+    {
+
+    }
+};
+
 struct node_t
 {
     QString     name;

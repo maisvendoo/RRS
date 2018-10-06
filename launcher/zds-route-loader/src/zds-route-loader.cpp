@@ -37,7 +37,7 @@ osg::Group *ZdsRouteLoader::load(QString route_path)
 {
     routeRootPath = fs->combinePath(fs->getRoutesDirectory(), route_path);
 
-    osg::Node *skybox = loadModel("models/sky.dmd", "textures/sky_day.bmp");
+    //osg::Node *model = loadModel("models/park_pass.dmd", "textures/park.tga");
 
     loadTracks(routeRootPath);
 
@@ -45,9 +45,13 @@ osg::Group *ZdsRouteLoader::load(QString route_path)
 
     loadObjectsDat(fs->combinePath(routeRootPath, "objects.dat"));
 
+    loadRoute1Map(fs->combinePath(routeRootPath, "route1.map"));
+
+    //createSortedObjectsList();
+
     osg::Group *group = new osg::Group;
-    loadObjectsDatNodes(group);
-    //group->addChild(skybox);
+    loadRoute1MapNodes(group);
+    //group->addChild(model);
 
     return group;
 }
@@ -326,6 +330,50 @@ void ZdsRouteLoader::loadObjectsDat(QString path)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZdsRouteLoader::loadRoute1Map(QString path)
+{
+    QFile   file(path);
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(&file);
+        QChar   delimiter(',');
+
+        size_t lines_count = 0;
+
+        while (!stream.atEnd())
+        {
+            QString line = stream.readLine();
+
+            if (line.at(0) == ';')
+                continue;
+
+            line.truncate(line.lastIndexOf(';'));
+            QStringList tokens = line.split(delimiter);
+
+            object_map_t object_map;
+
+            object_map.name = tokens.at(0);
+            object_map.x = tokens.at(1).toFloat();
+            object_map.y = tokens.at(2).toFloat();
+            object_map.z = tokens.at(3).toFloat();
+            object_map.angle_x = tokens.at(4).toFloat() * M_PI / 180.0f;
+            object_map.angle_y = tokens.at(5).toFloat() * M_PI / 180.0f;
+            object_map.angle_z = tokens.at(6).toFloat() * M_PI / 180.0f;
+
+            object_map.caption = stream.readLine();
+
+            objects_map.append(object_map);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ZdsRouteLoader::loadObjectsDatNodes(osg::Group *root_node)
 {
     size_t nodes_count = 0;
@@ -342,7 +390,6 @@ void ZdsRouteLoader::loadObjectsDatNodes(osg::Group *root_node)
 
             if (it.key() != object_dat.name)
                 continue;
-
 
             object_ref_t object_ref = it.value();
             node.name = object_dat.name;
@@ -387,6 +434,85 @@ void ZdsRouteLoader::loadObjectsDatNodes(osg::Group *root_node)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZdsRouteLoader::loadRoute1MapNodes(osg::Group *group)
+{
+    size_t nodes_count = 0;
+
+    osg::Vec3f pos = getPosition(3000.0f);
+
+    foreach (object_map_t object_map, objects_map)
+    {
+        if (object_map.name.isEmpty())
+            continue;
+
+        osg::Vec3f obj_pos(object_map.x, object_map.y, object_map.z);
+
+        osg::Vec3f dist = obj_pos - pos;
+
+        if (dist.length() > 1000.0f)
+            continue;
+
+        node_t node;
+
+        auto it =nodes.find(object_map.name);
+
+        if (it.key() != object_map.name)
+        {
+            auto it = objects_refs.find(object_map.name);
+
+            if (it.key() != object_map.name)
+                continue;
+
+            object_ref_t object_ref = it.value();
+            node.name = object_map.name;
+
+            qDebug() << "Loading " << object_map.name << "...";
+
+            node.node = loadModel(object_ref.model_path, object_ref.texture_path);
+
+            if (node.node == nullptr)
+                continue;
+
+            nodes.insert(node.name, node);
+
+            qDebug() << "OK: Loaded " << object_map.name << " successfuly... count: "
+                     << ++nodes_count;
+        }
+        else
+            node = it.value();
+
+        osg::MatrixTransform *transform1 = new osg::MatrixTransform;
+
+        osg::Matrix m1 = osg::Matrix::translate(obj_pos);
+        osg::Matrix m2 = osg::Matrix::rotate(-object_map.angle_z, osg::Vec3f(0, 0, 1));
+        osg::Matrix m3 = osg::Matrix::rotate(-object_map.angle_x, osg::Vec3f(1, 0, 0));
+        osg::Matrix m4 = osg::Matrix::rotate(-object_map.angle_y, osg::Vec3f(0, 1, 0));
+
+        osg::Matrix m = m2 * m3 * m4 * m1;
+
+        transform1->setMatrix(m);
+
+        transform1->addChild(node.node);
+        group->addChild(transform1);
+
+        //if (nodes_count == 100)
+           // break;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZdsRouteLoader::createSortedObjectsList()
+{
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Vec3f ZdsRouteLoader::getPosition(float rail_coord, track_t &track)
 {
     track = trackSearch(1, rail_coord);

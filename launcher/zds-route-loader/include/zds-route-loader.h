@@ -32,7 +32,11 @@ private:
     /// Objects refs list
     QMap<QString, object_ref_t>     objects_refs;
     /// Object from objects.data list
-    QList<objects_dat_t>         objects_dat;
+    QList<objects_dat_t>            objects_dat;
+
+    QList<object_map_t>             objects_map;
+
+    QList<object_map_t>             sort_objects_map;
 
     QMap<QString, node_t>           nodes;
 
@@ -62,7 +66,14 @@ private:
     /// Load objects from objects.dat
     void loadObjectsDat(QString path);
 
+    /// Load objects from route1.map
+    void loadRoute1Map(QString path);
+
     void loadObjectsDatNodes(osg::Group *root_node);
+
+    void loadRoute1MapNodes(osg::Group *group);
+
+    void createSortedObjectsList();
 
     osg::Vec3f getPosition(float rail_coord, track_t &track);
 };

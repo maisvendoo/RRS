@@ -146,7 +146,7 @@ osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
         for (size_t i = 0; i < multyMesh.texture_vertices->size(); i++)
         {
             osg::Vec3f tex_ver = multyMesh.texture_vertices->at(i);
-            texvertices->push_back(osg::Vec2(tex_ver.x(), tex_ver.y()));
+            texvertices->push_back(osg::Vec2(tex_ver.x(), multyMesh.ty_max - tex_ver.y()));
         }
 
         geometry->setTexCoordArray(0, texvertices);
