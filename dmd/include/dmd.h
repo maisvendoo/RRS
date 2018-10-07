@@ -33,7 +33,7 @@ public:
 
     bool load(std::ifstream &fin);
 
-    dmd_multymesh_t getMultyMesh() const;
+    dmd_multymesh_t *getMultyMesh();
 
 private:
 
@@ -45,8 +45,8 @@ private:
 
     void readTextureBlock(std::ifstream &fin);
 
-    void calcNormales(dmd_mesh_t *mesh);
-    void calcSmoothNormales(dmd_mesh_t *mesh);
+    void calcNormales(dmd_mesh_t &mesh);
+    void calcSmoothNormales(dmd_mesh_t &mesh);
 };
 
 #endif // DMD_H

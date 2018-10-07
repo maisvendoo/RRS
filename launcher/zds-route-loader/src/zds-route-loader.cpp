@@ -40,14 +40,8 @@ osg::Group *ZdsRouteLoader::load(QString route_path)
     //osg::Node *model = loadModel("models/park_pass.dmd", "textures/park.tga");
 
     loadTracks(routeRootPath);
-
     loadObjectRefs(fs->combinePath(routeRootPath, "objects.ref"));
-
-    loadObjectsDat(fs->combinePath(routeRootPath, "objects.dat"));
-
     loadRoute1Map(fs->combinePath(routeRootPath, "route1.map"));
-
-    //createSortedObjectsList();
 
     osg::Group *group = new osg::Group;
     loadRoute1MapNodes(group);
@@ -86,14 +80,14 @@ osg::Node *ZdsRouteLoader::loadModel(QString model_path, QString texture_path)
 
     if (modelNode != nullptr)
     {
-        osg::StateSet   *stateset = new osg::StateSet;
-        osg::Material   *material = new osg::Material;
-        stateset->setAttribute(material);
+        osg::ref_ptr<osg::StateSet>   stateset = new osg::StateSet;
+        osg::ref_ptr<osg::Material>   material = new osg::Material;
+        stateset->setAttribute(material.get());
 
         material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
         material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-        loadTexture(texture_path, stateset, 0);
+        loadTexture(texture_path, stateset.get(), 0);
 
         modelNode->setStateSet(stateset);
     }
@@ -115,7 +109,7 @@ void ZdsRouteLoader::loadTexture(QString texture_path,
 
         if (image.valid())
         {
-            osg::Texture2D *texture = new osg::Texture2D(image.get());
+            osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
             osg::Texture::WrapMode textureWrapMode = osg::Texture::REPEAT;
 
             texture->setWrap(osg::Texture2D::WRAP_R, textureWrapMode);
@@ -126,10 +120,12 @@ void ZdsRouteLoader::loadTexture(QString texture_path,
 
 
             osg::Matrix mat;
-            osg::TexMat *texmat = new osg::TexMat;
+            osg::ref_ptr<osg::TexMat> texmat = new osg::TexMat;
             texmat->setMatrix(mat);
             stateset->setTextureAttributeAndModes(texture_unit, texmat,
                                                   osg::StateAttribute::ON);
+
+            texture->setUnRefImageDataAfterApply(true);
         }
     }
 }
@@ -461,7 +457,7 @@ void ZdsRouteLoader::loadRoute1MapNodes(osg::Group *group)
 {
     size_t nodes_count = 0;
 
-    osg::Vec3f pos = getPosition(4338.0f);
+    osg::Vec3f pos = getPosition(20.0f);
 
     foreach (object_map_t object_map, objects_map)
     {
@@ -472,7 +468,7 @@ void ZdsRouteLoader::loadRoute1MapNodes(osg::Group *group)
 
         osg::Vec3f dist = obj_pos - pos;
 
-        if (dist.length() > 1000.0f)
+        if (dist.length() > 20000.0f)
             continue;
 
         node_t node;

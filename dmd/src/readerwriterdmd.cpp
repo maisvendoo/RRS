@@ -73,8 +73,8 @@ osgDB::ReaderWriter::ReadResult ReaderWriterDMD::doReadNode(std::ifstream &fin,
 
     if (dmdObj.load(fin))
     {
-        osg::Node *node = convertModelToSceneGraph(dmdObj, options);
-        return node;
+        osg::ref_ptr<osg::Node> node = convertModelToSceneGraph(dmdObj, options);
+        return node.get();
     }
 
     return ReadResult::FILE_NOT_HANDLED;
@@ -127,34 +127,34 @@ osgDB::ReaderWriter::WriteResult ReaderWriterDMD::doWriteNode(const osg::Node &n
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
+osg::ref_ptr<osg::Node> ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
                                                      const osgDB::ReaderWriter::Options *options) const
 {
-    dmd_multymesh_t multyMesh = dmdObj.getMultyMesh();
+    dmd_multymesh_t *multyMesh = dmdObj.getMultyMesh();
 
-    if (multyMesh.meshes.empty())
+    if (multyMesh->meshes.empty())
         return nullptr;
 
     osg::Group  *group = new osg::Group;
 
-    for (auto it = multyMesh.meshes.begin(); it != multyMesh.meshes.end(); ++it)
+    for (auto it = multyMesh->meshes.begin(); it != multyMesh->meshes.end(); ++it)
     {
-        osg::Geometry *geometry = convertMeshToGeometry(*it, multyMesh, options);
+        osg::ref_ptr<osg::Geometry> geometry = convertMeshToGeometry(*it, *multyMesh, options);
 
-        osg::Vec2Array *texvertices = new osg::Vec2Array;
+        osg::ref_ptr<osg::Vec2Array> texvertices = new osg::Vec2Array;
 
-        for (size_t i = 0; i < multyMesh.texture_vertices->size(); i++)
+        for (size_t i = 0; i < multyMesh->texture_vertices->size(); i++)
         {
-            osg::Vec3f tex_ver = multyMesh.texture_vertices->at(i);
-            texvertices->push_back(osg::Vec2(tex_ver.x(), multyMesh.ty_max - tex_ver.y()));
+            osg::Vec3f tex_ver = multyMesh->texture_vertices->at(i);
+            texvertices->push_back(osg::Vec2(tex_ver.x(), multyMesh->ty_max - tex_ver.y()));
         }
 
-        geometry->setTexCoordArray(0, texvertices);
+        geometry->setTexCoordArray(0, texvertices.get());
 
-        osg::Geode *geode = new osg::Geode;
-        geode->addDrawable(geometry);
+        osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+        geode->addDrawable(geometry.get());
 
-        group->addChild(geode);
+        group->addChild(geode.get());
     }
 
     return group;
@@ -163,11 +163,11 @@ osg::Node *ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
+osg::ref_ptr<osg::Geometry> ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t &mesh,
                                                       dmd_multymesh_t &multyMesh,
                                                       const osgDB::ReaderWriter::Options *options) const
 {
-    osg::Geometry *geometry = new osg::Geometry;
+    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
 
 
     osg::Vec3Array *vertexArray = new osg::Vec3Array;
@@ -176,9 +176,9 @@ osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
     vertexArray->resize(multyMesh.tex_v_count);
     normalArray->resize(multyMesh.tex_v_count);
 
-    for (size_t i = 0; i < mesh->faces.size(); i++)
+    for (size_t i = 0; i < mesh.faces.size(); i++)
     {
-        face_t face = mesh->faces[i];
+        face_t face = mesh.faces[i];
         face_t tex_face = multyMesh.texture_faces[i];
 
         for (size_t j = 0; j < face.indices.size(); j++)
@@ -186,8 +186,8 @@ osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
             size_t v_idx = face.indices[j];
             size_t tv_idx = tex_face.indices[j];
 
-            vertexArray->at(tv_idx).set(mesh->vertices->at(v_idx));
-            normalArray->at(tv_idx).set(mesh->smooth_normals->at(v_idx));
+            vertexArray->at(tv_idx).set(mesh.vertices->at(v_idx));
+            normalArray->at(tv_idx).set(mesh.smooth_normals->at(v_idx));
         }
     }
 
@@ -196,17 +196,17 @@ osg::Geometry *ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t *mesh,
 
     std::vector<osg::DrawElementsUInt *> meshPrimitiveSets;
 
-    for (size_t i = 0; i < mesh->faces.size(); i++)
+    for (size_t i = 0; i < mesh.faces.size(); i++)
     {
-        osg::DrawElementsUInt *primitive = new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
-        meshPrimitiveSets.push_back(primitive);
+        osg::ref_ptr<osg::DrawElementsUInt> primitive = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES, 0);
+        meshPrimitiveSets.push_back(primitive.get());
 
-        osg::DrawElementsUInt *face = meshPrimitiveSets.back();
+        osg::ref_ptr<osg::DrawElementsUInt> face = meshPrimitiveSets.back();
 
-        for (size_t j = 0; j < mesh->faces[i].indices.size(); j++)
+        for (size_t j = 0; j < mesh.faces[i].indices.size(); j++)
             face->push_back(multyMesh.texture_faces[i].indices[j]);
 
-        geometry->addPrimitiveSet(face);
+        geometry->addPrimitiveSet(face.get());
     }
 
     return geometry;

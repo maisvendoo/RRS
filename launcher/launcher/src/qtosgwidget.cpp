@@ -32,7 +32,7 @@ QtOSGWidget::QtOSGWidget(FileSystem *fs, qreal scaleX, qreal scaleY, QWidget *pa
 
     RouteLoader *loader = initRouteLoader(fs->combinePath(fs->getLibDirectory(), "zds-route-loader"));
     loader->setFileSystem(fs);
-    osg::Group *root = loader->load("konotop");
+    osg::Group *root = loader->load("Moskow-Vjazma");
 
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addChild(root);
@@ -168,8 +168,12 @@ void QtOSGWidget::initializeGL()
     stateSet->setAttributeAndModes(mat, osg::StateAttribute::ON);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
+    // Render alpha-channel
     osg::BlendFunc* bf = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA );
     stateSet->setAttributeAndModes(bf);
+
+    // Correct rendering of alpha channel
+    stateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 }
 
 //------------------------------------------------------------------------------

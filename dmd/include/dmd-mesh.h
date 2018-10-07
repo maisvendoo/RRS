@@ -37,12 +37,12 @@ struct face_t
 //------------------------------------------------------------------------------
 struct dmd_mesh_t
 {
-    osg::Vec3Array      *vertices;
+    osg::ref_ptr<osg::Vec3Array>      vertices;
     std::vector<face_t> faces;
-    osg::Vec3Array      *faset_normals;
-    osg::Vec3Array      *smooth_normals;
+    osg::ref_ptr<osg::Vec3Array>      faset_normals;
+    osg::ref_ptr<osg::Vec3Array>      smooth_normals;
     size_t              vertex_count;
-    size_t              faces_count;    
+    size_t              faces_count;
 
     dmd_mesh_t()
         : vertices(nullptr)        
@@ -61,15 +61,15 @@ struct dmd_mesh_t
 //------------------------------------------------------------------------------
 struct dmd_multymesh_t
 {
-    std::vector<dmd_mesh_t *>   meshes;
-    osg::Vec3Array              *texture_vertices;
-    std::vector<face_t>         texture_faces;
-    size_t                      tex_v_count;
-    size_t                      tex_f_count;
-    bool                        texture_present;
+    std::vector<dmd_mesh_t>         meshes;
+    osg::ref_ptr<osg::Vec3Array>    texture_vertices;
+    std::vector<face_t>             texture_faces;
+    size_t                          tex_v_count;
+    size_t                          tex_f_count;
+    bool                            texture_present;
 
-    float                       tx_max;
-    float                       ty_max;
+    float                           tx_max;
+    float                           ty_max;
 
     dmd_multymesh_t()
         : meshes({})
