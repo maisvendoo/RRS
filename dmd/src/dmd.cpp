@@ -55,6 +55,11 @@ bool DMDObject::load(std::ifstream &fin)
     return result;
 }
 
+dmd_mesh_t *DMDObject::getMesh()
+{
+    return &mesh;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -170,10 +175,13 @@ void DMDObject::readTextureBlock(DMDContainer &dmd_cont)
             int tv_idx = str_to_int(*it) - 1;
             face.indices.push_back(tv_idx);
 
-            std::vector<int> indices = mesh.faces[i].indices;
-            int v_idx = indices[face.indices.size() - 1];
+            face_t f = mesh.faces[i];
+            int v_idx = f.indices[face.indices.size() - 1];
 
             mesh.vertices_array->at(tv_idx).set(mesh.vertices[v_idx]);
+            osg::Vec3f n = mesh.smooth_normals->at(tv_idx);
+            n = n + f.normal;
+            mesh.smooth_normals->at(tv_idx).set(n);
         }
 
         mesh.texture_faces.push_back(face);

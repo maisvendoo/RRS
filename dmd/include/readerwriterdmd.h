@@ -73,7 +73,7 @@ protected:
     osg::ref_ptr<osg::Node> convertModelToSceneGraph(DMDObject &dmdObj,
                                         const Options *options) const;
 
-    osg::ref_ptr<osg::Geometry> convertMeshToGeometry(dmd_mesh_t &mesh, dmd_multymesh_t &multyMesh,
+    osg::ref_ptr<osg::Geometry> convertMeshToGeometry(dmd_mesh_t &mesh,
                                          const Options *options) const;
 
     osg::Vec3 toRightBasis(osg::Vec3 &v) const;

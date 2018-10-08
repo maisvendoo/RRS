@@ -32,7 +32,9 @@ public:
 
     bool load(const std::string &file_path);
 
-    bool load(std::ifstream &fin);    
+    bool load(std::ifstream &fin);
+
+    dmd_mesh_t *getMesh();
 
 private:    
 
