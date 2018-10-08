@@ -38,24 +38,18 @@ bool DMDObject::load(std::ifstream &fin)
 {
     bool result = true;
 
-    if (fin.is_open())
+    if (!dmd_container.load(fin))
+        return false;
+
+    while (!dmd_container.isEnd())
     {
-        std::string line;
+        std::string line = dmd_container.getLine();
 
-        while (!fin.eof())
-        {
-            std::getline(fin, line);
+        if (line == "New object")
+            readNextMesh(dmd_container);
 
-            if (line == "New object")
-                readNextMesh(fin);
-
-            if (line == "New Texture:")
-                readTextureBlock(fin);
-
-            line_number++;
-        }
-
-        fin.close();
+        if (line == "New Texture:")
+            readTextureBlock(dmd_container);
     }
 
     return result;
@@ -64,40 +58,28 @@ bool DMDObject::load(std::ifstream &fin)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-dmd_multymesh_t *DMDObject::getMultyMesh()
+void DMDObject::readNextMesh(DMDContainer &dmd_cont)
 {
-    return &multyMesh;
-}
+    std::string line = dmd_cont.getLine();
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void DMDObject::readNextMesh(std::ifstream &fin)
-{
-    std::string line;
-    std::getline(fin, line);
+    while ( (line != "numverts numfaces") && (!dmd_cont.isEnd()) )
+        line = dmd_cont.getLine();
 
-    while ( (line != "numverts numfaces") && (!fin.eof()) )
-        std::getline(fin, line);
-
-    if (fin.eof())
+    if (dmd_cont.isEnd())
         return;
 
-    std::getline(fin, line);
-
-    dmd_mesh_t mesh;
+    line = dmd_cont.getLine();
 
     std::vector<std::string> geom_data = parse_line(line);
     mesh.vertex_count = static_cast<size_t>(str_to_int(geom_data[0]));
     mesh.faces_count = static_cast<size_t>(str_to_int(geom_data[1]));
 
-    std::getline(fin, line);
-
-    mesh.vertices = new osg::Vec3Array;
+    line = dmd_cont.getLine();
 
     for (size_t i = 0; i < mesh.vertex_count; i++)
     {
-        std::getline(fin, line);
+        line = dmd_cont.getLine();
+
         std::string tmp = delete_symbol(line, '\t');
         std::vector<std::string> coords = parse_line(tmp);
 
@@ -105,15 +87,16 @@ void DMDObject::readNextMesh(std::ifstream &fin)
         float y = str_to_float(coords[1]);
         float z = str_to_float(coords[2]);
 
-        mesh.vertices->push_back(osg::Vec3(x, y, z));
+        mesh.vertices.push_back(osg::Vec3f(x, y, z));
     }
 
-    std::getline(fin, line);
-    std::getline(fin, line);
+    line = dmd_cont.getLine();
+    line = dmd_cont.getLine();
 
     for (size_t i = 0; i < mesh.faces_count; i++)
     {
-        std::getline(fin, line);
+        line = dmd_cont.getLine();
+
         std::string tmp = delete_symbol(line, '\t');
         std::vector<std::string> face_data = parse_line(tmp);
 
@@ -124,44 +107,43 @@ void DMDObject::readNextMesh(std::ifstream &fin)
             face.indices.push_back(str_to_int(*it) - 1);
         }
 
+        calcFaceNormal(mesh, face);
+
         mesh.faces.push_back(face);
     }
-
-    calcNormales(mesh);
-    calcSmoothNormales(mesh);
-
-    multyMesh.meshes.push_back(mesh);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void DMDObject::readTextureBlock(std::ifstream &fin)
+void DMDObject::readTextureBlock(DMDContainer &dmd_cont)
 {
-    std::string line;
-
-    std::getline(fin, line);
-    std::getline(fin, line);
+    std::string line = dmd_cont.getLine();
+    line = dmd_cont.getLine();
 
     std::vector<std::string> tex_data = parse_line(line);
+    mesh.tex_v_count = static_cast<size_t>(str_to_int(tex_data[0]));
+    mesh.tex_f_count = static_cast<size_t>(str_to_int(tex_data[1]));
 
-    multyMesh.tex_v_count = static_cast<size_t>(str_to_int(tex_data[0]));
-    multyMesh.tex_f_count = static_cast<size_t>(str_to_int(tex_data[1]));
-
-    std::getline(fin, line);
+    line = dmd_cont.getLine();
 
     if (line != "Texture vertices:")
     {
-        multyMesh.texture_present = false;
+        mesh.texture_present = false;
         return;
     }
 
-    multyMesh.texture_vertices = new osg::Vec3Array;
+    mesh.vertices_array = new osg::Vec3Array;
+    mesh.smooth_normals = new osg::Vec3Array;
+    mesh.texture_vertices = new osg::Vec2Array;
 
-    // Read texture vertices
-    for (size_t i = 0; i < multyMesh.tex_v_count; i++)
+    mesh.vertices_array->resize(mesh.tex_v_count);
+    mesh.smooth_normals->resize(mesh.tex_v_count);
+
+    for (size_t i = 0; i < mesh.tex_v_count; ++i)
     {
-        std::getline(fin, line);
+        line = dmd_cont.getLine();
+
         std::string tmp = delete_symbol(line, '\t');
         std::vector<std::string> tex_vertex = parse_line(tmp);
 
@@ -169,22 +151,15 @@ void DMDObject::readTextureBlock(std::ifstream &fin)
         float y = str_to_float(tex_vertex[1]);
         float z = str_to_float(tex_vertex[2]);
 
-        if (x > multyMesh.tx_max)
-            multyMesh.tx_max = x;
-
-        if (y > multyMesh.ty_max)
-            multyMesh.ty_max = y;
-
-        multyMesh.texture_vertices->push_back(osg::Vec3(x, y, z));
+        mesh.texture_vertices->push_back(osg::Vec2f(x, 1.0f - y));
     }
 
-    std::getline(fin, line);
-    std::getline(fin, line);
+    line = dmd_cont.getLine();
+    line = dmd_cont.getLine();
 
-    // Read texture faces
-    for (size_t i = 0; i < multyMesh.tex_f_count; i++)
+    for (size_t i = 0; i < mesh.tex_f_count; ++i)
     {
-        std::getline(fin, line);
+        line = dmd_cont.getLine();
         std::string tmp = delete_symbol(line, '\t');
         std::vector<std::string> face_data = parse_line(tmp);
 
@@ -192,38 +167,35 @@ void DMDObject::readTextureBlock(std::ifstream &fin)
 
         for (auto it = face_data.begin(); it != face_data.end(); ++it)
         {
-            face.indices.push_back(str_to_int(*it) - 1);
+            int tv_idx = str_to_int(*it) - 1;
+            face.indices.push_back(tv_idx);
+
+            std::vector<int> indices = mesh.faces[i].indices;
+            int v_idx = indices[face.indices.size() - 1];
+
+            mesh.vertices_array->at(tv_idx).set(mesh.vertices[v_idx]);
         }
 
-        multyMesh.texture_faces.push_back(face);
+        mesh.texture_faces.push_back(face);
     }
 
-    multyMesh.texture_present = true;
+    mesh.texture_present = true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void DMDObject::calcNormales(dmd_mesh_t &mesh)
+void DMDObject::calcFaceNormal(const dmd_mesh_t &mesh, face_t &face)
 {
-    mesh.faset_normals = new osg::Vec3Array;
+    osg::Vec3f vec1 = mesh.vertices[face.indices[0]];
+    osg::Vec3f vec2 = mesh.vertices[face.indices[1]];
+    osg::Vec3f vec3 = mesh.vertices[face.indices[2]];
 
-    for (auto face_it = mesh.faces.begin(); face_it != mesh.faces.end(); ++face_it)
-    {
-        std::vector<int> indices = (*face_it).indices;
+    osg::Vec3f v12 = vec1 - vec2;
+    osg::Vec3f v23 = vec2 - vec3;
 
-        osg::Vec3f vec1 = mesh.vertices->at(indices[0]);
-        osg::Vec3f vec2 = mesh.vertices->at(indices[1]);
-        osg::Vec3f vec3 = mesh.vertices->at(indices[2]);
-
-        osg::Vec3f v12 = vec1 - vec2;
-        osg::Vec3f v23 = vec2 - vec3;
-
-        osg::Vec3f n = v12 ^ v23;
-        float length = n.length();
-
-        mesh.faset_normals->push_back(n *= (1 / length));
-    }
+    osg::Vec3f n = v12 ^ v23;
+    face.normal = n *= (1 / n.length());
 }
 
 //------------------------------------------------------------------------------
@@ -231,7 +203,7 @@ void DMDObject::calcNormales(dmd_mesh_t &mesh)
 //------------------------------------------------------------------------------
 void DMDObject::calcSmoothNormales(dmd_mesh_t &mesh)
 {
-    mesh.smooth_normals = new osg::Vec3Array;
+    /*mesh.smooth_normals = new osg::Vec3Array;
     mesh.smooth_normals->resize(mesh.vertex_count);
 
     for (size_t i = 0; i < mesh.faces_count; i++)
@@ -245,5 +217,5 @@ void DMDObject::calcSmoothNormales(dmd_mesh_t &mesh)
             n = n *= (1/n.length());
             mesh.smooth_normals->at(indices[j]).set(n);
         }
-    }    
+    }*/
 }

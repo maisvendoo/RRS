@@ -131,14 +131,11 @@ osgDB::ReaderWriter::WriteResult ReaderWriterDMD::doWriteNode(const osg::Node &n
 osg::ref_ptr<osg::Node> ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmdObj,
                                                      const osgDB::ReaderWriter::Options *options) const
 {
-    dmd_multymesh_t *multyMesh = dmdObj.getMultyMesh();
-
-    if (multyMesh->meshes.empty())
-        return nullptr;
+    //dmd_multymesh_t *multyMesh = dmdObj.getMultyMesh();
 
     osg::Group  *group = new osg::Group;
 
-    for (auto it = multyMesh->meshes.begin(); it != multyMesh->meshes.end(); ++it)
+    /*for (auto it = multyMesh->meshes.begin(); it != multyMesh->meshes.end(); ++it)
     {
         osg::ref_ptr<osg::Geometry> geometry = convertMeshToGeometry(*it, *multyMesh, options);
 
@@ -156,7 +153,7 @@ osg::ref_ptr<osg::Node> ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmd
         geode->addDrawable(geometry.get());
 
         group->addChild(geode.get());
-    }
+    }*/
 
     return group;
 }
@@ -171,7 +168,7 @@ osg::ref_ptr<osg::Geometry> ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t &m
     osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
 
 
-    osg::Vec3Array *vertexArray = new osg::Vec3Array;
+    /*osg::Vec3Array *vertexArray = new osg::Vec3Array;
     osg::Vec3Array *normalArray = new osg::Vec3Array;
 
     vertexArray->resize(multyMesh.tex_v_count);
@@ -208,7 +205,7 @@ osg::ref_ptr<osg::Geometry> ReaderWriterDMD::convertMeshToGeometry(dmd_mesh_t &m
             face->push_back(multyMesh.texture_faces[i].indices[j]);
 
         geometry->addPrimitiveSet(face.get());
-    }
+    }*/
 
     return geometry;
 }

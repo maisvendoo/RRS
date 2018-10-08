@@ -21,6 +21,7 @@
 #include    <fstream>
 
 #include    "dmd-mesh.h"
+#include    "dmd-container.h"
 
 class DMDObject
 {
@@ -31,21 +32,21 @@ public:
 
     bool load(const std::string &file_path);
 
-    bool load(std::ifstream &fin);
+    bool load(std::ifstream &fin);    
 
-    dmd_multymesh_t *getMultyMesh();
+private:    
 
-private:
+    size_t          line_number;
 
-    size_t line_number;
+    dmd_mesh_t      mesh;
 
-    dmd_multymesh_t multyMesh;
+    DMDContainer    dmd_container;
 
-    void readNextMesh(std::ifstream &fin);
+    void readNextMesh(DMDContainer &dmd_cont);
 
-    void readTextureBlock(std::ifstream &fin);
+    void readTextureBlock(DMDContainer &dmd_cont);
 
-    void calcNormales(dmd_mesh_t &mesh);
+    void calcFaceNormal(const dmd_mesh_t &mesh, face_t &face);
     void calcSmoothNormales(dmd_mesh_t &mesh);
 };
 
