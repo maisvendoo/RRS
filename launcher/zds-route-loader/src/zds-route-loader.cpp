@@ -212,6 +212,8 @@ tracks_data_t ZdsRouteLoader::loadTrackFile(QString path)
 
             tracks_data.append(track);
         }
+
+        file.close();
     }
 
     return tracks_data;
@@ -295,6 +297,8 @@ void ZdsRouteLoader::loadObjectRefs(QString path)
 
             objects_refs.insert(object.name, object);
         }
+
+        file.close();
     }
 }
 
@@ -343,6 +347,8 @@ void ZdsRouteLoader::loadObjectsDat(QString path)
 
             objects_dat.append(object_dat);
         }
+
+        file.close();
     }
 }
 
@@ -384,6 +390,8 @@ void ZdsRouteLoader::loadRoute1Map(QString path)
 
             objects_map.append(object_map);
         }
+
+        file.close();
     }
 }
 

@@ -73,6 +73,7 @@ osgDB::ReaderWriter::ReadResult ReaderWriterDMD::doReadNode(std::ifstream &fin,
 
     if (dmdObj.load(fin))
     {
+        fin.close();
         osg::ref_ptr<osg::Node> node = convertModelToSceneGraph(dmdObj, options);
         return node.get();
     }
@@ -146,7 +147,7 @@ osg::ref_ptr<osg::Node> ReaderWriterDMD::convertModelToSceneGraph(DMDObject &dmd
         for (size_t i = 0; i < multyMesh->texture_vertices->size(); i++)
         {
             osg::Vec3f tex_ver = multyMesh->texture_vertices->at(i);
-            texvertices->push_back(osg::Vec2(tex_ver.x(), multyMesh->ty_max - tex_ver.y()));
+            texvertices->push_back(osg::Vec2(tex_ver.x(), 1.0f - tex_ver.y()));
         }
 
         geometry->setTexCoordArray(0, texvertices.get());
