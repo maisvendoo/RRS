@@ -1,4 +1,4 @@
-# True Railway simulator - realistic railway simulator
+# Russian Railway simulator - realistic railway simulator
 
 Project's tree description:
 
