@@ -18,8 +18,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lvehicle_d
     LIBS += -L../../../lib -lcoupling_d
     LIBS += -L../../../lib -lsolver_d
-    LIBS += -L../../../lib -lbrakepipe_d
-    LIBS += -L../../../lib -lprofile_d
+    LIBS += -L../../../lib -lbrakepipe_d    
 
 } else {
 
@@ -29,8 +28,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lvehicle
     LIBS += -L../../../lib -lcoupling
     LIBS += -L../../../lib -lsolver
-    LIBS += -L../../../lib -lbrakepipe
-    LIBS += -L../../../lib -lprofile
+    LIBS += -L../../../lib -lbrakepipe    
 }
 
 INCLUDEPATH += ./include
@@ -42,7 +40,6 @@ INCLUDEPATH += ../coupling/include
 INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
-INCLUDEPATH += ../../profile-loader/profile/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

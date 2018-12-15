@@ -24,7 +24,7 @@
 #include    "solver.h"
 #include    "solver-config.h"
 #include    "brakepipe.h"
-#include    "profile.h"
+//#include    "profile.h"
 
 #include    <QByteArray>
 
@@ -116,7 +116,7 @@ private:
     BrakePipe   *brakepipe;
 
     /// Profile manager
-    Profile     *profile;
+    //Profile     *profile;
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;

@@ -53,7 +53,6 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp/include
-INCLUDEPATH += ../../profile-loader/profile/include
 
 HEADERS += $$files(./include/*.h)
 HEADERS += $$files(../../common-headers/*.h)
