@@ -33,8 +33,8 @@ struct traj_element_t : public osg::Referenced
 
     traj_element_t()
         : route_id(0)
-        , coord_begin(1000.0f)
-        , coord_end(1000.0f)
+        , coord_begin(1200.0f)
+        , coord_end(1200.0f)
         , delta_time(3600.0f)
         , count(0)
     {

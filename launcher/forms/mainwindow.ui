@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Russian Railway Simulator</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="btnStart">
     <property name="geometry">
      <rect>
-      <x>860</x>
-      <y>580</y>
+      <x>920</x>
+      <y>620</y>
       <width>94</width>
       <height>36</height>
      </rect>
@@ -27,31 +27,90 @@
      <string>Старт</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnStart_2">
+   <widget class="QTabWidget" name="twMain">
     <property name="geometry">
      <rect>
-      <x>740</x>
-      <y>580</y>
-      <width>94</width>
-      <height>36</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Старт</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="gbRoutesInfo">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
+      <x>10</x>
       <y>0</y>
-      <width>1031</width>
-      <height>271</height>
+      <width>1011</width>
+      <height>611</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Выбор маршрута</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
+    <widget class="QWidget" name="rideSettings">
+     <attribute name="title">
+      <string>Параметры поездки</string>
+     </attribute>
+     <widget class="QGroupBox" name="gbRoutesInfo">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>981</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Выбор маршрута</string>
+      </property>
+      <widget class="QPlainTextEdit" name="ptRouteDescription">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>40</y>
+         <width>301</width>
+         <height>221</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QListWidget" name="lwRoutes">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>261</width>
+         <height>221</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lRouteScreenShot">
+       <property name="geometry">
+        <rect>
+         <x>600</x>
+         <y>50</y>
+         <width>361</width>
+         <height>203</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Нет скриншота</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="gbTrainsInfo">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>300</y>
+        <width>981</width>
+        <height>261</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Выбор поезда</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="graphSettings">
+     <attribute name="title">
+      <string>Настройки графики</string>
+     </attribute>
+    </widget>
    </widget>
   </widget>
  </widget>

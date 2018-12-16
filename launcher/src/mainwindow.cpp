@@ -2,6 +2,12 @@
 #include    "ui_mainwindow.h"
 
 #include    <QPushButton>
+#include    <QDir>
+#include    <QDirIterator>
+#include    <QStringList>
+
+#include    "filesystem.h"
+#include    "CfgReader.h"
 
 //------------------------------------------------------------------------------
 //
@@ -10,7 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
+
+    init();
+
+    connect(ui->lwRoutes, &QListWidget::itemSelectionChanged,
+            this, &MainWindow::onRouteSelection);
 }
 
 //------------------------------------------------------------------------------
@@ -19,4 +30,75 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::init()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    loadRoutesList(fs.getRouteRootDir());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadRoutesList(const std::string &routesDir)
+{
+    QDir routes(QString(routesDir.c_str()));
+    QDirIterator route_dirs(routes.path(), QStringList(), QDir::NoDotAndDotDot | QDir::Dirs);
+
+    while (route_dirs.hasNext())
+    {
+        route_info_t route_info;
+        route_info.route_dir = route_dirs.next();
+
+        CfgReader cfg;
+
+        if (cfg.load(route_info.route_dir + QDir::separator() + "description.xml"))
+        {
+            QString secName = "Route";
+
+            cfg.getString(secName, "Title", route_info.route_title);
+            cfg.getString(secName, "Description", route_info.route_description);
+        }
+
+        routes_info.push_back(route_info);
+    }
+
+    for (auto it = routes_info.begin(); it != routes_info.end(); ++it)
+    {
+        ui->lwRoutes->addItem((*it).route_title);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::setRouteScreenShot(const QString &path)
+{
+    if (path.isEmpty())
+    {
+        ui->lRouteScreenShot->setText("Нет скриншота");
+        return;
+    }
+
+    QImage image(ui->lRouteScreenShot->width(), ui->lRouteScreenShot->height(), QImage::Format_ARGB32);
+    image.load(path);
+    ui->lRouteScreenShot->setPixmap(QPixmap::fromImage(image));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onRouteSelection()
+{
+    size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
+
+    ui->ptRouteDescription->clear();
+    selectedRoutePath = (routes_info[item_idx].route_dir);
+    ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
+
+    setRouteScreenShot(selectedRoutePath + QDir::separator() + "shotcut.png");
 }
