@@ -19,17 +19,12 @@
 
 #include    "settings.h"
 #include    "command-line-parser.h"
-#include    "qt-events.h"
-#include    "network.h"
-#include    "route-info.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class RouteViewer : public QObject
+class RouteViewer
 {
-    Q_OBJECT
-
 public:
 
     /// Constructor
@@ -46,18 +41,16 @@ public:
 
 protected:
 
-    unsigned int                current_route_id;
-
     /// Viewer ready flag
     bool                        is_ready;
     /// Viewer settings
     settings_t                  settings;
 
     /// OSG viewer object
-    osgViewer::Viewer           viewer;          
+    osgViewer::Viewer           viewer;
 
-    /// TCP-client
-    NetworkClient               client;
+    /// OSG scene root node
+    osg::ref_ptr<osg::Group>    root;
 
     /// Initialization
     bool init(int argc, char *argv[]);   
@@ -67,13 +60,19 @@ protected:
 
     /// Override settings from command line
     void overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
-                                       settings_t settings);    
+                                       settings_t settings);
+
+    /// Load route form directory
+    bool loadRoute(const std::string &routeDir);
+
+    /// Init common graphical engine settings
+    bool initEngineSettings(osg::Group *root);
 
     /// Init display
     bool initDisplay(osgViewer::Viewer *viewer, const settings_t &settings);
 
     /// Init motion blur
-    bool initMotionBlurEffect(osgViewer::Viewer *viewer, const settings_t &settings);    
+    bool initMotionBlurEffect(osgViewer::Viewer *viewer, const settings_t &settings);
 };
 
 #endif // VIEWER_H

@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="btnStart">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>90</y>
+      <x>860</x>
+      <y>580</y>
       <width>94</width>
       <height>36</height>
      </rect>
@@ -30,14 +30,27 @@
    <widget class="QPushButton" name="btnStart_2">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>160</y>
+      <x>740</x>
+      <y>580</y>
       <width>94</width>
       <height>36</height>
      </rect>
     </property>
     <property name="text">
      <string>Старт</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="gbRoutesInfo">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1031</width>
+      <height>271</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Выбор маршрута</string>
     </property>
    </widget>
   </widget>

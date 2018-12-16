@@ -6,7 +6,7 @@ CONFIG -= qt
 
 TARGET = library
 
-DESTDIR = ../../lib
+DESTDIR = ../../../lib
 
 win32 {
 
@@ -20,14 +20,14 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgDBd
 
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
         LIBS += -L$$OSG_LIB_DIRECTORY -losg
         LIBS += -L$$OSG_LIB_DIRECTORY -losgDB
 
-        LIBS += -L../../lib -lfilesystem
+        LIBS += -L../../../lib -lfilesystem
 
     }
 
@@ -43,19 +43,19 @@ unix {
         LIBS += -losgd
         LIBS += -losgDBd
 
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
         LIBS +=  -losg
         LIBS +=  -losgDB
 
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lfilesystem_d
     }
 }
 
-INCLUDEPATH += ../include
-INCLUDEPATH += ../filesystem/include
+INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)

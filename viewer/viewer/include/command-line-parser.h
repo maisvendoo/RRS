@@ -20,7 +20,6 @@
 #include    <sstream>
 
 #include    "cmd-line.h"
-#include    "get-value.h"
 
 /*!
  * \class
@@ -46,5 +45,29 @@ protected:
 
     cmd_line_t cmd_line;
 };
+
+/*!
+ * \fn
+ * \brief Get value from string
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+template <class T>
+bool getValue(const std::string &str, T &value)
+{
+    std::istringstream ss(str);
+
+    try
+    {
+        ss >> value;
+    }
+    catch (std::exception)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 #endif

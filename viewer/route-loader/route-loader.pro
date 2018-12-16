@@ -6,7 +6,7 @@ CONFIG -= qt
 
 TARGET = route-loader
 
-DESTDIR = ../../lib
+DESTDIR = ../../../lib
 
 win32 {
 
@@ -25,8 +25,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
 
-        LIBS += -L../../lib -llibrary_d
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -llibrary_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
@@ -37,8 +37,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
 
-        LIBS += -L../../lib -llibrary
-        LIBS += -L../../lib -lfilesystem
+        LIBS += -L../../../lib -llibrary
+        LIBS += -L../../../lib -lfilesystem
 
     }    
 
@@ -58,8 +58,8 @@ unix {
         LIBS += -losgGAd
         LIBS += -losgUtild
 
-        LIBS += -L../../lib -llibrary_d
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -llibrary_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
@@ -70,15 +70,15 @@ unix {
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
 
-        LIBS += -L../../lib -llibrary
-        LIBS += -L../../lib -lfilesystem
+        LIBS += -L../../../lib -llibrary
+        LIBS += -L../../../lib -lfilesystem
 
     }
 }
 
 
-INCLUDEPATH += ../include
-INCLUDEPATH += ../filesystem/include
+INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../library/include
 INCLUDEPATH += ./include
 

@@ -51,14 +51,6 @@ bool ConfigReader::isOpenned() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osgDB::XmlNode *ConfigReader::getConfigNode()
-{
-    return findSection(root, "Config");
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 std::string ConfigReader::getStrValue(const std::string &section,
                                       const std::string &param)
 {

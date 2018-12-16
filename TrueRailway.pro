@@ -12,3 +12,5 @@ SUBDIRS += ./addons/default-vehicle
 SUBDIRS += ./addons/test-loco
 
 SUBDIRS += ./launcher
+
+SUBDIRS += ./viewer

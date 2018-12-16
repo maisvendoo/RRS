@@ -3,7 +3,6 @@
 #include    <osg/BlendFunc>
 #include    <osg/CullFace>
 #include    <osg/GraphicsContext>
-#include    <osgDB/ReadFile>
 
 #include    "filesystem.h"
 #include    "config-reader.h"
@@ -14,15 +13,12 @@
 #include    "abstract-loader.h"
 #include    "lighting.h"
 #include    "motion-blur.h"
-#include    "route-loading-handle.h"
-#include    "log.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 RouteViewer::RouteViewer(int argc, char *argv[])
-  : current_route_id(0),
-    is_ready(false)
+  : is_ready(false)
 {
     is_ready = init(argc, argv);
 }
@@ -48,11 +44,6 @@ bool RouteViewer::isReady() const
 //------------------------------------------------------------------------------
 int RouteViewer::run()
 {
-    viewer.addEventHandler(new QtEventsHandler());
-    viewer.addEventHandler(new RouteLoadingHandle());
-
-    client.init(settings, &viewer);    
-
     return viewer.run();
 }
 
@@ -61,11 +52,7 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char *argv[])
 {
-    FileSystem &fs = FileSystem::getInstance();    
-
-    // Notify configure
-    osg::setNotifyLevel(osg::WARN);
-    osg::setNotifyHandler(new LogFileHandler(fs.getLogsDir() + fs.separator() + "startup.log"));
+    FileSystem &fs = FileSystem::getInstance();
 
     // Read settings from config file
     settings = loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
@@ -73,7 +60,15 @@ bool RouteViewer::init(int argc, char *argv[])
     // Parse command line
     CommandLineParser parser(argc, argv);
     cmd_line_t cmd_line = parser.getCommadLine();
-    overrideSettingsByCommandLine(cmd_line, settings);            
+    overrideSettingsByCommandLine(cmd_line, settings);    
+
+    // Load selected route
+    if (!loadRoute(cmd_line.route_dir.value))
+        return false;
+
+    // Init graphical engine settings
+    if (!initEngineSettings(root.get()))
+        return false;
 
     // Init display settings
     if (!initDisplay(&viewer, settings))
@@ -114,10 +109,6 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "WindowDecoration", settings.window_decoration);
         cfg.getValue(secName, "DoubleBuffer", settings.double_buffer);
         cfg.getValue(secName, "Samples", settings.samples);
-        cfg.getValue(secName, "Name", settings.name);
-        cfg.getValue(secName, "RequestInterval", settings.request_interval);
-        cfg.getValue(secName, "MotionBlur", settings.mb_persistence);
-        cfg.getValue(secName, "ReconnectInterval", settings.reconnect_interval);
     }
 
     return settings;
@@ -151,18 +142,92 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool RouteViewer::loadRoute(const std::string &routeDir)
+{
+    if (routeDir.empty())
+        return false;
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string routeType = osgDB::findDataFile(routeDir + fs.separator() + "route-type");
+
+    if (routeType.empty())
+        return false;
+
+    std::ifstream stream(routeType);
+
+    if (!stream.is_open())
+        return false;
+
+    std::string routeExt = "";
+    stream >> routeExt;
+
+    if (routeExt.empty())
+        return false;
+
+    std::string routeLoaderPlugin = routeExt + "-route-loader";
+
+    osg::ref_ptr<RouteLoader> loader = loadRouteLoader("../plugins", routeLoaderPlugin);
+
+    if (!loader.valid())
+        return false;
+
+    loader->load(routeDir);
+    root = loader->getRoot();
+
+    viewer.addEventHandler(loader->getCameraEventHandler(1, 3.0f));
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool RouteViewer::initEngineSettings(osg::Group *root)
+{
+    if (root == nullptr)
+        return false;
+
+    // Common graphics settings
+    osg::StateSet *stateset = root->getOrCreateStateSet();
+    osg::BlendFunc *blendFunc = new osg::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    stateset->setAttributeAndModes(blendFunc);
+    stateset->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    stateset->setMode(GL_ALPHA, osg::StateAttribute::ON);
+    stateset->setMode(GL_BLEND, osg::StateAttribute::ON);
+    stateset->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+    stateset->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+
+    osg::ref_ptr<osg::CullFace> cull = new osg::CullFace;
+    cull->setMode(osg::CullFace::BACK);
+    stateset->setAttributeAndModes(cull.get(), osg::StateAttribute::ON);
+
+    // Set lighting
+    initEnvironmentLight(root,
+                         osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+                         1.0f,
+                         0.0f,
+                         90.0f);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
                               const settings_t &settings)
 {
     if (viewer == nullptr)
         return false;
 
+    viewer->setSceneData(root.get());
+
     osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     traits->x = settings.x;
     traits->y = settings.y;
     traits->width = settings.width;
     traits->height = settings.height;
-    traits->windowName = settings.name;
+    traits->windowName = settings.window_title;
     traits->windowDecoration = settings.window_decoration;
     traits->doubleBuffer = settings.double_buffer;
     traits->samples = settings.samples;
@@ -205,7 +270,7 @@ bool RouteViewer::initMotionBlurEffect(osgViewer::Viewer *viewer,
     viewer->getWindows(windows);
 
     for (auto it = windows.begin(); it != windows.end(); ++it)
-        (*it)->add(new MotionBlurOperation(settings.mb_persistence));
+        (*it)->add(new MotionBlurOperation(0.1));
 
     return true;
 }

@@ -7,7 +7,7 @@ CONFIG += no_plugin_name_prefix
 
 TARGET = zds-route-loader
 
-DESTDIR = ../../plugins
+DESTDIR = ../../../plugins
 
 win32 {
 
@@ -24,8 +24,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
 
-        LIBS += -L../../lib -lroute-loader_d
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lroute-loader_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
@@ -36,8 +36,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
 
-        LIBS += -L../../lib -lroute-loader
-        LIBS += -L../../lib -lfilesystem
+        LIBS += -L../../../lib -lroute-loader
+        LIBS += -L../../../lib -lfilesystem
 
     }
 
@@ -55,8 +55,8 @@ unix {
         LIBS += -losgGAd
         LIBS += -losgUtild
 
-        LIBS += -L../../lib -lroute-loader_d
-        LIBS += -L../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lroute-loader_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
@@ -67,13 +67,13 @@ unix {
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
 
-        LIBS += -L../../lib -lroute-loader
-        LIBS += -L../../lib -lfilesystem
+        LIBS += -L../../../lib -lroute-loader
+        LIBS += -L../../../lib -lfilesystem
     }
 }
 
-INCLUDEPATH += ../include
-INCLUDEPATH += ../filesystem/include
+INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ./include
 

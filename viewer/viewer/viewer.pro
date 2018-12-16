@@ -7,7 +7,7 @@ QT += network
 
 TARGET = viewer
 
-DESTDIR = ../../bin
+DESTDIR = ../../../bin
 
 win32 {
 
@@ -64,10 +64,9 @@ unix {
         LIBS += -losgGAd
         LIBS += -losgUtild
 
-        LIBS += -L../../lib -lroute-loader_d
-        LIBS += -L../../lib -llibrary_d
-        LIBS += -L../../lib -lfilesystem_d
-        LIBS += -L../../lib -lTcpConnection_d
+        LIBS += -L../../../lib -lroute-loader_d
+        LIBS += -L../../../lib -llibrary_d
+        LIBS += -L../../../lib -lfilesystem_d
 
     } else {
 
@@ -78,22 +77,19 @@ unix {
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
 
-        LIBS += -L../../lib -lroute-loader
-        LIBS += -L../../lib -llibrary
-        LIBS += -L../../lib -lfilesystem
-        LIBS += -L../../lib -lTcpConnection
+        LIBS += -L../../../lib -lroute-loader
+        LIBS += -L../../../lib -llibrary
+        LIBS += -L../../../lib -lfilesystem
     }
 
     LIBS += -lGL
 }
 
-INCLUDEPATH += ../include
-INCLUDEPATH += ../filesystem/include
+INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
-INCLUDEPATH += ../tcp-connection/include
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h) \
-    include/get-value.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
