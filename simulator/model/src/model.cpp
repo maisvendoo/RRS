@@ -74,7 +74,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     dt = init_data.solver_config.step;
 
     // Train creation and initialization
-    train = new Train(&fs);
+    train = new Train();
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
@@ -183,7 +183,8 @@ void Model::outMessage(QString msg)
 //------------------------------------------------------------------------------
 void Model::logInit(bool clear_log)
 {
-    simLog = new Log(fs.getLogsDirectory() + LOG_FILE_NAME, clear_log, true);
+    FileSystem &fs = FileSystem::getInstance();
+    simLog = new Log(QString(fs.getLogsDir().c_str()) + fs.separator() + LOG_FILE_NAME, clear_log, true);
     connect(this, &Model::logMessage, simLog, &Log::printMessage);
     connect(this, &Model::logMessage, this, &Model::outMessage);
 }
@@ -224,8 +225,8 @@ void Model::debugPrint()
             .arg(t)
             .arg(realtime_delay)
             .arg(dt)
-            .arg(train->getVelocity(0) * 3.6)
-            .arg(train->getVelocity(99) * 3.6);
+            .arg(train->getFirstVehicle()->getVelocity() * 3.6)
+            .arg(train->getLastVehicle()->getVelocity() * 3.6);
 
     fputs(qPrintable(debug_info), stdout);
 }
@@ -236,7 +237,8 @@ void Model::debugPrint()
 void Model::loadInitData(init_data_t &init_data)
 {
     CfgReader cfg;
-    QString cfg_path = fs.getConfigDirectory() + "init-data.xml";
+    FileSystem &fs = FileSystem::getInstance();
+    QString cfg_path = QString(fs.getConfigDir().c_str()) + fs.separator() + "init-data.xml";
 
     if (cfg.load(cfg_path))
     {
@@ -262,9 +264,9 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.prof_step = 100.0;
         }
 
-        if (!cfg.getString(secName, "TrainConfig", init_data.train_config_path))
+        if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
         {
-            init_data.train_config_path = "default-train";
+            init_data.train_config = "default-train";
         }
 
         if (!cfg.getInt(secName, "IntegrationTimeInterval", init_data.integration_time_interval))
@@ -286,7 +288,7 @@ void Model::overrideByCommandLine(init_data_t &init_data,
                                   const simulator_command_line_t &command_line)
 {
     if (command_line.train_config.is_present)
-        init_data.train_config_path = command_line.train_config.value;
+        init_data.train_config = command_line.train_config.value;
 
     if (command_line.debug_print.is_present)
         init_data.debug_print = command_line.debug_print.value;
@@ -298,7 +300,8 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 void Model::configSolver(solver_config_t &solver_config)
 {
     CfgReader cfg;
-    QString cfg_path = fs.getConfigDirectory() + "solver.xml";
+    FileSystem &fs = FileSystem::getInstance();
+    QString cfg_path = QString(fs.getConfigDir().c_str()) + fs.separator() + "solver.xml";
 
     if (cfg.load(cfg_path))
     {

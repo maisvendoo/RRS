@@ -34,7 +34,7 @@ struct init_data_t
     int     direction;
     QString profile_path;
     double  prof_step;
-    QString train_config_path;
+    QString train_config;
     int     integration_time_interval;
     bool    debug_print;
     solver_config_t solver_config;
@@ -45,7 +45,7 @@ struct init_data_t
         , direction(1)
         , profile_path("")
         , prof_step(100.0)
-        , train_config_path("")
+        , train_config("")
         , integration_time_interval(100)
         , debug_print(false)
     {

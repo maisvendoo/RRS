@@ -1,195 +1,154 @@
-//------------------------------------------------------------------------------
-//
-//      Library for work with paths of files and directories
-//      (c) maisvendoo, 02/09/2018
-//      Developer: Dmitry Pritykin
-//
-//------------------------------------------------------------------------------
-/*!
- * \file
- * \brief  Library for work with paths of files and directories
- * \copyright maisvendoo
- * \author Dmitry Pritykin
- * \date 02/09/2018
- */
-
 #include    "filesystem.h"
 
-#include    <QFileInfo>
-#include    <QDir>
-
-const       QString SIM_DATA_DIR = ".TrueRailway";
-const       QString LOGS_DIR = "logs";
-const       QString CFG_DIR = "cfg";
-const       QString TRAINS_DIR = "trains";
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-FileSystem::FileSystem()
+void FileSystem::setRouteRootDir(const std::string &path)
 {
-    // Current working directory
-    workingDir = QDir::currentPath();
-
-    // Calculate simulator root directory
-    QDir workDir(workingDir);
-    workDir.cdUp();
-    rootDirectory = workDir.path();
-
-    // Libraries directories
-    libDirectory = combinePath(rootDirectory, "lib");
-    modulesDirectory = combinePath(rootDirectory, "modules");
-
-    // Config directories
-    configDirectory = combinePath(rootDirectory, "cfg");
-    trainsDirectory = combinePath(configDirectory, "trains");
-    vehiclesDirectory = combinePath(configDirectory, "vehicles");
-    couplingsDirectory = combinePath(configDirectory, "couplings");
-
-    // Routes directory
-    routesDirectory = combinePath(rootDirectory, "routes");
-
-    homeDir = QDir::homePath();
-    simDataDir = homeDir + QDir::separator() + SIM_DATA_DIR;
-
-    createDirectory(simDataDir);
-
-    logsDirectory = simDataDir + QDir::separator() + LOGS_DIR;
-
-    createDirectory(logsDirectory);
+    routeRootDir = getNativePath(path);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-FileSystem::~FileSystem()
+void FileSystem::setConfigDir(const std::string &path)
 {
-
+    configDir = getNativePath(path);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getRootDirectory() const
+void FileSystem::setLogsDir(const std::string &path)
 {
-    return getDirectoryPath(rootDirectory);
+    logsDir = getNativePath(path);
+}
+
+void FileSystem::setLibraryDir(const std::string &path)
+{
+    libraryDir = getNativePath(path);
+}
+
+void FileSystem::setTrainsDir(const std::string &path)
+{
+    trainsDir = getNativePath(path);
+}
+
+void FileSystem::setModulesDir(const std::string &path)
+{
+    modulesDir = path;
+}
+
+void FileSystem::setVehiclesDir(const std::string &path)
+{
+    vehiclesDir = path;
+}
+
+void FileSystem::setCouplingsDir(const std::string &path)
+{
+    couplingsDir = path;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getLibDirectory() const
+std::string FileSystem::getRouteRootDir() const
 {
-    return getDirectoryPath(libDirectory);
+    return routeRootDir;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getModulesDirectory() const
+std::string FileSystem::getConfigDir() const
 {
-    return getDirectoryPath(modulesDirectory);
+    return configDir;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getWorkingDirectory() const
+std::string FileSystem::getLogsDir() const
 {
-    return getDirectoryPath(workingDir);
+    return logsDir;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getHomeDirectory() const
+std::string FileSystem::getLibraryDir() const
 {
-    return getDirectoryPath(homeDir);
+    return libraryDir;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getSimDataDirectory() const
+std::string FileSystem::getTrainsDir() const
 {
-    return getDirectoryPath(simDataDir);
+    return trainsDir;
+}
+
+std::string FileSystem::getModulesDir() const
+{
+    return modulesDir;
+}
+
+std::string FileSystem::getVehiclesDir() const
+{
+    return vehiclesDir;
+}
+
+std::string FileSystem::getCouplingsDir() const
+{
+    return couplingsDir;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getLogsDirectory() const
+std::string FileSystem::combinePath(const std::string &path1, const std::string &path2)
 {
-    return getDirectoryPath(logsDirectory);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString FileSystem::getConfigDirectory() const
-{
-    return getDirectoryPath(configDirectory);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString FileSystem::getTrainsDirectory() const
-{
-    return getDirectoryPath(trainsDirectory);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString FileSystem::getVehiclesDirectory() const
-{
-    return getDirectoryPath(vehiclesDirectory);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString FileSystem::getCouplingsDirectory() const
-{
-    return getDirectoryPath(couplingsDirectory);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString FileSystem::getRoutesDirectory() const
-{
-    return getDirectoryPath(routesDirectory);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString FileSystem::combinePath(const QString &path1, const QString &path2)
-{
-    if (*(path1.end() - 1) != QDir::separator())
-        return QDir::toNativeSeparators(path1 + QDir::separator() + path2);
+    if (*(path1.end() - 1) != separator())
+        return getNativePath(path1 + separator() + path2);
     else
-        return QDir::toNativeSeparators(path1 + path2);
+        return getNativePath(path1 + path2);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FileSystem::createDirectory(const QString &path)
+std::string FileSystem::getNativePath(const std::string &path)
 {
-    QDir dir(path);
-
-    if (!dir.exists())
-        dir.mkdir(path);
+    return osgDB::convertFileNameToNativeStyle(path);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString FileSystem::getDirectoryPath(QString path) const
+char FileSystem::separator() const
 {
-    QString tmp =  path + QDir::separator();
+    return osgDB::getNativePathSeparator();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels)
+{
+    std::vector<std::string> path_elems;
+    osgDB::getPathElements(path, path_elems);
+
+ #if __unix__
+    std::string tmp = "/";
+#else
+    std::string tmp = "";
+#endif
+
+    for (auto it = path_elems.begin(); it != path_elems.end() - num_levels; ++it)
+    {
+        tmp += (*it) + separator();
+    }
+
     return tmp;
 }

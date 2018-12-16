@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Viewer>
+		<posX>50</posX>
+		<posY>50</posY>
+		<Width>1360</Width>
+		<Height>768</Height>
+		<FullScreen>1</FullScreen>
+		<HostAddress>127.0.0.1</HostAddress>
+		<Port>1992</Port>
+		<LocalMode>0</LocalMode>
+		<FovY>30.0</FovY>
+		<zNear>1.0</zNear>
+		<zFar>1000.0</zFar>
+		<ScreenNumber>0</ScreenNumber>
+		<Name>videosystem</Name>
+		<WindowDecoration>1</WindowDecoration>
+		<DoubleBuffer>1</DoubleBuffer>
+		<Samples>4</Samples>
+		<RequestInterval>2000</RequestInterval>
+		<ReconnectInterval>1000</ReconnectInterval>
+		<MotionBlur>0.05</MotionBlur>
+	</Viewer>
+</Config>

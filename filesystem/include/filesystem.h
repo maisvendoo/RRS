@@ -1,34 +1,17 @@
-//------------------------------------------------------------------------------
-//
-//      Library for work with paths of files and directories
-//      (c) maisvendoo, 02/09/2018
-//      Developer: Dmitry Pritykin
-//
-//------------------------------------------------------------------------------
-/*!
- * \file
- * \brief  Library for work with paths of files and directories
- * \copyright maisvendoo
- * \author Dmitry Pritykin
- * \date 02/09/2018
- */
+#ifndef		FILESYSTEM_H
+#define		FILESYSTEM_H
 
-#ifndef     FILESYSTEM_H
-#define     FILESYSTEM_H
+#include    <osgDB/FileUtils>
+#include    <osgDB/FileNameUtils>
 
-#include    <QtGlobal>
-#include    <QString>
+#include    "import-export.h"
 
-#if defined(FILESYSTEM_LIB)
-    #define FILESYSTEM_EXPORT Q_DECL_EXPORT
+#ifdef FILESYSTEM_LIB
+    #define FILESYSTEM_EXPORT   DECL_EXPORT
 #else
-    #define FILESYSTEM_EXPORT Q_DECL_IMPORT
+    #define FILESYSTEM_EXPORT   DECL_IMPORT
 #endif
 
-/*!
- * \class
- * \brief Filesystem control
- */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -36,70 +19,84 @@ class FILESYSTEM_EXPORT FileSystem
 {
 public:
 
-    /// Constructor
-    FileSystem();
-    /// Destructor
-    virtual ~FileSystem();
+    /// Get instance byt filesystem singleton
+    static FileSystem &getInstance()
+    {
+        static FileSystem instance;
 
-    /// Get absolute path to simulator root directory
-    QString getRootDirectory() const;
-    /// Get libraries path
-    QString getLibDirectory() const;
-    /// Get modules directory
-    QString getModulesDirectory() const;
-    /// Get absolute path to working directory
-    QString getWorkingDirectory() const;
-    /// Get absolute path to user home directory
-    QString getHomeDirectory() const;
-    /// Get absolute path to simulator output data directory
-    QString getSimDataDirectory() const;
-    /// Get absolute path to log files directory
-    QString getLogsDirectory() const;
-    /// Get config directory
-    QString getConfigDirectory() const;
-    /// Get trains config directory
-    QString getTrainsDirectory() const;
-    /// Get vehicles config directory
-    QString getVehiclesDirectory() const;
-    /// Get couplings directory
-    QString getCouplingsDirectory() const;
-    /// Get routes directory
-    QString getRoutesDirectory() const;
+        std::string workDir = osgDB::getCurrentWorkingDirectory();
+        std::string tmp = instance.getLevelUpDirectory(workDir, 1);
+        instance.setRouteRootDir(tmp + "routes");
+        instance.setConfigDir(tmp + "cfg");
+        instance.setLogsDir(tmp + "logs");
+        instance.setLibraryDir(tmp + "lib");
+        instance.setTrainsDir(instance.getConfigDir() + instance.separator() + "trains");
+        instance.setModulesDir(tmp + "modules");
+        instance.setVehiclesDir(instance.getConfigDir() + instance.separator() + "vehicles");
+        instance.setCouplingsDir(instance.getConfigDir()+ instance.separator() + "couplings");
 
-    QString combinePath(const QString &path1, const QString &path2);
+        return instance;
+    }    
+
+    std::string getNativePath(const std::string &path);
+
+    /// Get route directory path
+    std::string getRouteRootDir() const;    
+
+    std::string getConfigDir() const;
+
+    std::string getLogsDir() const;
+
+    std::string getLibraryDir() const;
+
+    std::string getTrainsDir() const;
+
+    std::string getModulesDir() const;
+
+    std::string getVehiclesDir() const;
+
+    std::string getCouplingsDir() const;
+
+    std::string combinePath(const std::string &path1, const std::string &path2);
+
+    /// Get native path separator
+    char separator() const;
 
 private:
 
-    /// Root directory
-    QString rootDirectory;
-    /// Libraries path
-    QString libDirectory;
-    /// Modules directory
-    QString modulesDirectory;
-    /// Working directory
-    QString workingDir;
-    /// User home directory
-    QString homeDir;
-    /// Simulator data directory
-    QString simDataDir;
-    /// Logs directory
-    QString logsDirectory;
-    /// Config directory
-    QString configDirectory;
-    /// Trains config directory
-    QString trainsDirectory;
-    /// Vehicles config directory
-    QString vehiclesDirectory;
-    /// Couplings config directory
-    QString couplingsDirectory;
-    /// Routes directory
-    QString routesDirectory;
+    std::string routeRootDir;
+    std::string configDir;
+    std::string logsDir;
+    std::string libraryDir;
+    std::string trainsDir;
+    std::string modulesDir;
+    std::string vehiclesDir;
+    std::string couplingsDir;
 
-    /// Directory creation
-    void createDirectory(const QString &path);
+    FileSystem() {}
+    FileSystem(const FileSystem &) = delete;
+    FileSystem &operator=(FileSystem &) = delete;
 
-    /// Get directory path with separator
-    QString getDirectoryPath(QString path) const;
+    /// Set route direcory path in paltform native format
+    void setRouteRootDir(const std::string &path);
+
+    /// Set config directory path
+    void setConfigDir(const std::string &path);
+
+    void setLogsDir(const std::string &path);
+
+    void setLibraryDir(const std::string &path);
+
+    void setTrainsDir(const std::string &path);
+
+    void setModulesDir(const std::string &path);
+
+    void setVehiclesDir(const std::string &path);
+
+    void setCouplingsDir(const std::string &path);
+
+    /// Get directory by num_levels levels up
+    std::string getLevelUpDirectory(std::string path, int num_levels);
 };
 
-#endif // FILESYSTEM_H
+#endif

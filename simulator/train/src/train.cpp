@@ -6,8 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Train::Train(FileSystem *fs, QObject *parent) : OdeSystem(parent)
-  , fs(fs)
+Train::Train(QObject *parent) : OdeSystem(parent)
   , trainMass(0.0)
   , trainLength(0.0)
   , ode_order(0)
@@ -38,7 +37,8 @@ bool Train::init(const init_data_t &init_data)
     dir = init_data.direction;
 
     // Solver loading
-    QString solver_path = fs->getLibDirectory() + solver_config.method;
+    FileSystem &fs = FileSystem::getInstance();
+    QString solver_path = QString(fs.getLibraryDir().c_str()) + fs.separator() + solver_config.method;
 
     train_motion_solver = loadSolver(solver_path);
 
@@ -48,8 +48,9 @@ bool Train::init(const init_data_t &init_data)
         return false;
     }
 
-    QString full_config_path = fs->getTrainsDirectory() +
-            init_data.train_config_path + ".xml";
+    QString full_config_path = QString(fs.getTrainsDir().c_str()) +
+            fs.separator() +
+            init_data.train_config + ".xml";
 
     // Loading of train
     if (!loadTrain(full_config_path))
@@ -79,7 +80,7 @@ bool Train::init(const init_data_t &init_data)
     brakepipe = new BrakePipe();
     brakepipe->setLength(trainLength);
     brakepipe->setNodesNum(static_cast<int>(vehicles.size()));
-    brakepipe->init(fs->getConfigDirectory() + "brakepipe.xml");
+    brakepipe->init(QString(fs.getConfigDir().c_str()) + fs.separator() + "brakepipe.xml");
 
     return true;
 }
@@ -244,6 +245,7 @@ size_t Train::getVehiclesNumber() const
 bool Train::loadTrain(QString cfg_path)
 {
     CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
 
     if (cfg.load(cfg_path))
     {
@@ -267,7 +269,7 @@ bool Train::loadTrain(QString cfg_path)
             }
 
             // Calculate module library path
-            QString relModulePath = fs->combinePath(module_name, module_name);
+            QString relModulePath = QString(fs.combinePath(module_name.toStdString(), module_name.toStdString()).c_str());
 
             // Vehicles count
             int n_vehicles = 0;
@@ -285,7 +287,8 @@ bool Train::loadTrain(QString cfg_path)
 
             for (int i = 0; i < n_vehicles; i++)
             {
-                Vehicle *vehicle = loadVehicle(fs->getModulesDirectory() +
+                Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
+                                               fs.separator() +
                                                relModulePath);
 
                 if (vehicle == Q_NULLPTR)
@@ -296,8 +299,8 @@ bool Train::loadTrain(QString cfg_path)
 
                 connect(vehicle, &Vehicle::logMessage, this, &Train::logMessage);
 
-                QString relConfigPath = fs->combinePath(module_name, module_cfg_name);
-                vehicle->init(fs->getVehiclesDirectory() + relConfigPath + ".xml");
+                QString relConfigPath = QString(fs.combinePath(module_name.toStdString(), module_cfg_name.toStdString()).c_str());
+                vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
 
                 vehicle->setPayloadCoeff(payload_coeff);
 
@@ -346,6 +349,7 @@ bool Train::loadTrain(QString cfg_path)
 bool Train::loadCouplings(QString cfg_path)
 {
     CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
 
     if (cfg.load(cfg_path))
     {
@@ -359,7 +363,8 @@ bool Train::loadCouplings(QString cfg_path)
 
         for (int i = 0; i < num_couplings; i++)
         {
-            Coupling *coupling = loadCoupling(fs->getModulesDirectory() +
+            Coupling *coupling = loadCoupling(QString(fs.getModulesDir().c_str()) +
+                                              fs.separator() +
                                               coupling_module);
 
             if (coupling == Q_NULLPTR)
@@ -368,7 +373,8 @@ bool Train::loadCouplings(QString cfg_path)
                 return false;
             }
 
-            coupling->loadConfiguration(fs->getCouplingsDirectory() +
+            coupling->loadConfiguration(QString(fs.getCouplingsDir().c_str()) +
+                                        fs.separator() +
                                         coupling_module + ".xml");
 
             coupling->reset();

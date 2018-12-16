@@ -89,10 +89,7 @@ private:
     /// Minimal intergation interval
     int         integration_time_interval;
     /// Flag, which allow debug print
-    bool        is_debug_print;
-
-    /// Filesystem data object
-    FileSystem  fs;
+    bool        is_debug_print;    
 
     /// Simulation thread
     QThread     model_thread;

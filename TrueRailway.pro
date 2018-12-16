@@ -11,5 +11,4 @@ SUBDIRS += ./simulator
 SUBDIRS += ./addons/default-vehicle
 SUBDIRS += ./addons/test-loco
 
-
-
+SUBDIRS += ./launcher

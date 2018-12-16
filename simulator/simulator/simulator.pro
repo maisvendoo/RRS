@@ -26,8 +26,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
-    LIBS += -L../../../lib -lmodel_d
-    LIBS += -L../../../lib -lprofile_d
+    LIBS += -L../../../lib -lmodel_d    
     LIBS += -L../../../lib -ltcp_d
 
 } else {
@@ -41,8 +40,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe
-    LIBS += -L../../../lib -lmodel
-    LIBS += -L../../../lib -lprofile
+    LIBS += -L../../../lib -lmodel    
     LIBS += -L../../../lib -ltcp
 }
 

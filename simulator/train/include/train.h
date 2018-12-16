@@ -48,7 +48,7 @@ class TRAIN_EXPORT Train : public OdeSystem
 public:
 
     /// Constructor
-    explicit Train(FileSystem *fs, QObject *parent = Q_NULLPTR);
+    explicit Train(QObject *parent = Q_NULLPTR);
     /// Destructor
     virtual ~Train();
 
@@ -90,10 +90,7 @@ signals:
     void logMessage(QString msg);
     void sendDataToVehicle(QByteArray data);
 
-private:
-
-    /// Pointer to filesystem object
-    FileSystem  *fs;
+private:    
 
     /// Train mass
     double          trainMass;
