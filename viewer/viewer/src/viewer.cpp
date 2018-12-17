@@ -10,6 +10,7 @@
 #include    <sstream>
 #include    <fstream>
 
+#include    "notify.h"
 #include    "abstract-loader.h"
 #include    "lighting.h"
 #include    "motion-blur.h"
@@ -52,6 +53,9 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char *argv[])
 {
+    osg::setNotifyLevel(osg::FATAL);
+    osg::setNotifyHandler(new LogFileHandler("../logs/viewer.log"));
+
     FileSystem &fs = FileSystem::getInstance();
 
     // Read settings from config file
@@ -145,31 +149,47 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 bool RouteViewer::loadRoute(const std::string &routeDir)
 {
     if (routeDir.empty())
+    {
+        OSG_FATAL << "ERROR: Route path is empty" << std::endl;
+        OSG_FATAL << "Route path: " << routeDir << std::endl;
         return false;
+    }
 
     FileSystem &fs = FileSystem::getInstance();
     std::string routeType = osgDB::findDataFile(routeDir + fs.separator() + "route-type");
 
     if (routeType.empty())
+    {
+        OSG_FATAL << "ERROR: File route-type is not found in route directory" << std::endl;
         return false;
+    }
 
     std::ifstream stream(routeType);
 
     if (!stream.is_open())
+    {
+        OSG_FATAL << "ERROR: Stream for route-type file is't open" << std::endl;
         return false;
+    }
 
     std::string routeExt = "";
     stream >> routeExt;
 
     if (routeExt.empty())
+    {
+        OSG_FATAL << "ERROR: Unknown route type" << std::endl;
         return false;
+    }
 
     std::string routeLoaderPlugin = routeExt + "-route-loader";
 
     osg::ref_ptr<RouteLoader> loader = loadRouteLoader("../plugins", routeLoaderPlugin);
 
     if (!loader.valid())
+    {
+        OSG_FATAL << "ERROR: Not found route loader for this route" << std::endl;
         return false;
+    }
 
     loader->load(routeDir);
     root = loader->getRoot();

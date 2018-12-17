@@ -26,6 +26,7 @@ public:
 
         std::string workDir = osgDB::getCurrentWorkingDirectory();
         std::string tmp = instance.getLevelUpDirectory(workDir, 1);
+        instance.setBinaryDir(workDir);
         instance.setRouteRootDir(tmp + "routes");
         instance.setConfigDir(tmp + "cfg");
         instance.setLogsDir(tmp + "logs");
@@ -57,6 +58,8 @@ public:
 
     std::string getCouplingsDir() const;
 
+    std::string getBinaryDir() const;
+
     std::string combinePath(const std::string &path1, const std::string &path2);
 
     /// Get native path separator
@@ -72,6 +75,7 @@ private:
     std::string modulesDir;
     std::string vehiclesDir;
     std::string couplingsDir;
+    std::string binDir;
 
     FileSystem() {}
     FileSystem(const FileSystem &) = delete;
@@ -94,6 +98,8 @@ private:
     void setVehiclesDir(const std::string &path);
 
     void setCouplingsDir(const std::string &path);
+
+    void setBinaryDir(const std::string &path);
 
     /// Get directory by num_levels levels up
     std::string getLevelUpDirectory(std::string path, int num_levels);

@@ -36,17 +36,22 @@ void FileSystem::setTrainsDir(const std::string &path)
 
 void FileSystem::setModulesDir(const std::string &path)
 {
-    modulesDir = path;
+    modulesDir = getNativePath(path);
 }
 
 void FileSystem::setVehiclesDir(const std::string &path)
 {
-    vehiclesDir = path;
+    vehiclesDir = getNativePath(path);
 }
 
 void FileSystem::setCouplingsDir(const std::string &path)
 {
-    couplingsDir = path;
+    couplingsDir = getNativePath(path);
+}
+
+void FileSystem::setBinaryDir(const std::string &path)
+{
+    binDir = getNativePath(path);
 }
 
 //------------------------------------------------------------------------------
@@ -102,6 +107,11 @@ std::string FileSystem::getVehiclesDir() const
 std::string FileSystem::getCouplingsDir() const
 {
     return couplingsDir;
+}
+
+std::string FileSystem::getBinaryDir() const
+{
+    return binDir;
 }
 
 //------------------------------------------------------------------------------

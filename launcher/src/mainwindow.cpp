@@ -9,6 +9,8 @@
 #include    "filesystem.h"
 #include    "CfgReader.h"
 
+#include    "platform.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -25,6 +27,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
             this, &MainWindow::onTrainSelection);
+
+    connect(ui->btnStart, &QPushButton::pressed,
+            this, &MainWindow::onStartPressed);
+
+    connect(&simulatorProc, &QProcess::started,
+            this, &MainWindow::onSimulatorStarted);
+
+    connect(&simulatorProc, QOverload<int>::of(&QProcess::finished),
+            this, &MainWindow::onSimulatorFinished);
+
+    connect(&viewerProc, QOverload<int>::of(&QProcess::finished),
+            this, &MainWindow::onViewerFinished);
 }
 
 //------------------------------------------------------------------------------
@@ -128,6 +142,36 @@ void MainWindow::setRouteScreenShot(const QString &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::startSimulator()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString simPath = SIMULATOR_NAME + EXE_EXP;
+
+    QStringList args;
+    args << "--train-config=" + selectedTrain;
+
+    simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    simulatorProc.start(simPath, args);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::startViewer()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString viewerPath = VIEWER_NAME + EXE_EXP;
+
+    QStringList args;
+    args << "--route" << selectedRoutePath;
+
+    viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    viewerProc.start(viewerPath, args);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::onRouteSelection()
 {
     size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
@@ -149,4 +193,54 @@ void MainWindow::onTrainSelection()
     ui->ptTrainDescription->clear();
     selectedTrain = trains_info[item_idx].train_config_path;
     ui->ptTrainDescription->appendPlainText(trains_info[item_idx].description);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onStartPressed()
+{
+    // Check is train selected
+    if (selectedTrain.isEmpty())
+    {
+        return;
+    }
+
+    // Check is route selected
+    if (selectedRoutePath.isEmpty())
+    {
+        return;
+    }
+
+    startSimulator();
+
+    startViewer();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onSimulatorStarted()
+{
+    ui->btnStart->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onSimulatorFinished(int exitCode)
+{
+    Q_UNUSED(exitCode)
+
+    ui->btnStart->setEnabled(true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onViewerFinished(int exitCode)
+{
+    Q_UNUSED(exitCode)
+
+    simulatorProc.terminate();
 }

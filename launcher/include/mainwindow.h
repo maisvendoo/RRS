@@ -2,6 +2,7 @@
 #define     MAINWINDOW_H
 
 #include    <QMainWindow>
+#include    <QProcess>
 
 #include    "route-info.h"
 #include    "train-info.h"
@@ -36,6 +37,9 @@ private:
     std::vector<route_info_t>   routes_info;
     std::vector<train_info_t>   trains_info;
 
+    QProcess        simulatorProc;
+    QProcess        viewerProc;
+
     void init();
 
     void loadRoutesList(const std::string &routesDir);
@@ -44,11 +48,23 @@ private:
 
     void setRouteScreenShot(const QString &path);
 
+    void startSimulator();
+
+    void startViewer();
+
 private slots:
 
     void onRouteSelection();
 
     void onTrainSelection();
+
+    void onStartPressed();
+
+    void onSimulatorStarted();
+
+    void onSimulatorFinished(int exitCode);
+
+    void onViewerFinished(int exitCode);
 };
 
 #endif // MAINWINDOW_H
