@@ -104,6 +104,42 @@
       <property name="title">
        <string>Выбор поезда</string>
       </property>
+      <widget class="QListWidget" name="lwTrains">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>261</width>
+         <height>221</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="ptTrainDescription">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>30</y>
+         <width>301</width>
+         <height>221</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lTrainScreenShot">
+       <property name="geometry">
+        <rect>
+         <x>600</x>
+         <y>40</y>
+         <width>361</width>
+         <height>203</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Нет скриншота</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="graphSettings">

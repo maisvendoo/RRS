@@ -22,6 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->lwRoutes, &QListWidget::itemSelectionChanged,
             this, &MainWindow::onRouteSelection);
+
+    connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
+            this, &MainWindow::onTrainSelection);
 }
 
 //------------------------------------------------------------------------------
@@ -38,7 +41,9 @@ MainWindow::~MainWindow()
 void MainWindow::init()
 {
     FileSystem &fs = FileSystem::getInstance();
+
     loadRoutesList(fs.getRouteRootDir());
+    loadTrainsList(fs.getTrainsDir());
 }
 
 //------------------------------------------------------------------------------
@@ -76,6 +81,37 @@ void MainWindow::loadRoutesList(const std::string &routesDir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::loadTrainsList(const std::string &trainsDir)
+{
+    QDir    trains(QString(trainsDir.c_str()));
+    QDirIterator train_files(trains.path(), QStringList() << "*.xml", QDir::NoDotAndDotDot | QDir::Files);
+
+    while (train_files.hasNext())
+    {
+        train_info_t train_info;
+        QString fullPath = train_files.next();
+        QFileInfo fileInfo(fullPath);
+
+        train_info.train_config_path = fileInfo.baseName();
+
+        CfgReader cfg;
+
+        if (cfg.load(fullPath))
+        {
+            QString secName = "Common";
+
+            cfg.getString(secName, "Title", train_info.train_title);
+            cfg.getString(secName, "Description", train_info.description);
+        }
+
+        trains_info.push_back(train_info);
+        ui->lwTrains->addItem(train_info.train_title);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::setRouteScreenShot(const QString &path)
 {
     if (path.isEmpty())
@@ -97,8 +133,20 @@ void MainWindow::onRouteSelection()
     size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
 
     ui->ptRouteDescription->clear();
-    selectedRoutePath = (routes_info[item_idx].route_dir);
+    selectedRoutePath = routes_info[item_idx].route_dir;
     ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
 
     setRouteScreenShot(selectedRoutePath + QDir::separator() + "shotcut.png");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onTrainSelection()
+{
+    size_t item_idx = static_cast<size_t>(ui->lwTrains->currentRow());
+
+    ui->ptTrainDescription->clear();
+    selectedTrain = trains_info[item_idx].train_config_path;
+    ui->ptTrainDescription->appendPlainText(trains_info[item_idx].description);
 }
