@@ -23,7 +23,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
-    #LIBS += -L../../../lib -ltcp_d
+    LIBS += -L../../../lib -lTcpConnection_d
 
 } else {
 
@@ -36,7 +36,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe    
-    #LIBS += -L../../../lib -ltcp
+    LIBS += -L../../../lib -lTcpConnection
 }
 
 INCLUDEPATH += ./include
@@ -50,9 +50,8 @@ INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
-INCLUDEPATH += ../../tcp/include
+INCLUDEPATH += ../../tcp-connection/include
 
 HEADERS += $$files(./include/*.h)
 HEADERS += $$files(../../common-headers/*.h)
 SOURCES += $$files(./src/*.cpp)
-

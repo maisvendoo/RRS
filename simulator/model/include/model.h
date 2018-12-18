@@ -25,6 +25,8 @@
 #include    "log.h"
 #include    "train.h"
 
+#include    "server.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -98,6 +100,7 @@ private:
 
     /// TCP-server
     //TcpServer   *server;
+    Server      *server;
 
     /// Log initialization
     void logInit(bool clear_log = false);

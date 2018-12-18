@@ -27,7 +27,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lmodel_d    
-    #LIBS += -L../../../lib -ltcp_d
+    LIBS += -L../../../lib -lTcpConnection_d
 
 } else {
 
@@ -41,7 +41,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe
     LIBS += -L../../../lib -lmodel    
-    #LIBS += -L../../../lib -ltcp
+    LIBS += -L../../../lib -lTcpConnection
 }
 
 INCLUDEPATH += ./include
@@ -50,7 +50,7 @@ INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
-INCLUDEPATH += ../../tcp/include
+INCLUDEPATH += ../../tcp-connection/include
 
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../model/include

@@ -90,6 +90,12 @@ bool Model::init(const simulator_command_line_t &command_line)
     if (!server->init())
         return false;*/
 
+    server = new Server();
+
+    connect(server, &Server::logMessage, train, &Train::logMessage);
+
+    server->init(1992);
+
     return true;//server->start();
 }
 
