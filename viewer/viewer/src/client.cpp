@@ -2,6 +2,8 @@
 
 #include    <iostream>
 
+#include    "trajectory-element.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -76,7 +78,16 @@ void NetworkClient::onTimerRequest()
             QByteArray array = tcp_client->getBuffer();
             memcpy(&server_data, array.data(), sizeof (server_data_t));
 
-            std::cout << server_data.count << std::endl;
+            if (viewer != nullptr)
+            {
+                traj_element_t *traj_elem = new traj_element_t();
+
+                traj_elem->route_id = 1;
+                traj_elem->coord_end = server_data.cabine_coord;
+                traj_elem->delta_time = static_cast<float>(request_interval) / 1000.0f;
+
+                viewer->getEventQueue()->userEvent(traj_elem);
+            }
         }
 
         tcp_client->sendToServer(ATcp::tcGET);

@@ -345,6 +345,8 @@ void Model::configSolver(solver_config_t &solver_config)
 //------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
+    viewer_data.cabine_coord = static_cast<float>(train->getFirstVehicle()->getRailwayCoord());
+
     QByteArray array(sizeof(server_data_t), Qt::Uninitialized);
     memcpy(array.data(), &viewer_data, sizeof(server_data_t));
     emit sendDataToServer(array);
