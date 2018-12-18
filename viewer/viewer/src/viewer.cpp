@@ -15,6 +15,7 @@
 #include    "lighting.h"
 #include    "motion-blur.h"
 #include    "qt-events.h"
+#include    "keyboard.h"
 
 //------------------------------------------------------------------------------
 //
@@ -46,7 +47,10 @@ bool RouteViewer::isReady() const
 //------------------------------------------------------------------------------
 int RouteViewer::run()
 {
+    // Qt signals processing
     viewer.addEventHandler(new QtEventsHandler());
+    // Keyboard events handler
+    viewer.addEventHandler(new KeyboardHandler());
 
     client.init(settings, &viewer);
 
