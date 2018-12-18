@@ -62,6 +62,8 @@ signals:
 
     void sendDataToServer(QByteArray data);
 
+    void sendDataToTrain(QByteArray data);
+
 public slots:
 
     /// Main simulation loop

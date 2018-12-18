@@ -26,11 +26,11 @@ void TestLoco::step(double t, double dt)
     (void) t;
     double traction_step = 0.0;
 
-    if (keys[Qt::Key_A])
-        traction_step = 0.01;
+    if (keys[97])
+        traction_step = 0.1;
 
-    if (keys[Qt::Key_D])
-        traction_step = -0.01;
+    if (keys[101])
+        traction_step = -0.1;
 
     traction_level +=  traction_step * dt;
 

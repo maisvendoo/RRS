@@ -15,7 +15,8 @@
 #include    "lighting.h"
 #include    "motion-blur.h"
 #include    "qt-events.h"
-#include    "keyboard.h"
+
+#include    <QObject>
 
 //------------------------------------------------------------------------------
 //
@@ -49,10 +50,14 @@ int RouteViewer::run()
 {
     // Qt signals processing
     viewer.addEventHandler(new QtEventsHandler());
+
     // Keyboard events handler
-    viewer.addEventHandler(new KeyboardHandler());
+    keyboard = new KeyboardHandler();
+    viewer.addEventHandler(keyboard);
 
     client.init(settings, &viewer);
+
+    QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState, &client, &NetworkClient::receiveKeysState);
 
     return viewer.run();
 }

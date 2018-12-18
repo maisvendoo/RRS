@@ -42,6 +42,10 @@ private slots:
     void onClientDisconnected();
 
     void onTimerRequest();
+
+public slots:
+
+    void receiveKeysState(QByteArray data);
 };
 
 #endif // CLIENT_H

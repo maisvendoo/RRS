@@ -94,6 +94,7 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     connect(server, &Server::logMessage, train, &Train::logMessage);
     connect(this, &Model::sendDataToServer, server, &Server::sendDataToClient);
+    connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
     server->init(1992);
 
@@ -352,5 +353,7 @@ void Model::tcpFeedBack()
     emit sendDataToServer(array);
 
     viewer_data.count++;
+
+    emit sendDataToTrain(server->getReceivedData());
 }
 

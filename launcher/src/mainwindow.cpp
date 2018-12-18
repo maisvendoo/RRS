@@ -38,7 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::onSimulatorFinished);
 
     connect(&viewerProc, QOverload<int>::of(&QProcess::finished),
-            this, &MainWindow::onViewerFinished);
+            this, &MainWindow::onViewerFinished);    
+
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 //------------------------------------------------------------------------------
@@ -222,7 +224,7 @@ void MainWindow::onStartPressed()
 //------------------------------------------------------------------------------
 void MainWindow::onSimulatorStarted()
 {
-    ui->btnStart->setEnabled(false);
+    ui->btnStart->setEnabled(false);    
 }
 
 //------------------------------------------------------------------------------
@@ -243,4 +245,5 @@ void MainWindow::onViewerFinished(int exitCode)
     Q_UNUSED(exitCode)
 
     simulatorProc.terminate();
+    setFocusPolicy(Qt::StrongFocus);
 }

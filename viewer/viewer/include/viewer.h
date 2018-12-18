@@ -21,6 +21,8 @@
 #include    "command-line-parser.h"
 #include    "client.h"
 
+#include    "keyboard.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -54,6 +56,8 @@ protected:
     osg::ref_ptr<osg::Group>    root;
 
     NetworkClient   client;
+
+    KeyboardHandler *keyboard;
 
     /// Initialization
     bool init(int argc, char *argv[]);   

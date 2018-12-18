@@ -54,6 +54,8 @@ public:
 
     void init(quint16 port);
 
+    QByteArray getReceivedData();
+
 signals:
 
     void logMessage(QString msg);

@@ -1,5 +1,7 @@
 #include    "keyboard.h"
 
+#include    <QDataStream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -21,11 +23,13 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
     case osgGA::GUIEventAdapter::KEYDOWN:
 
         setKey(ea.getKey());
+        emit sendKeyBoardState(serialize());
         break;
 
     case osgGA::GUIEventAdapter::KEYUP:
 
         resetKey(ea.getKey());
+        emit sendKeyBoardState(serialize());
         break;
 
     default:
@@ -99,4 +103,17 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Y);
     addKey(osgGA::GUIEventAdapter::KEY_Z);
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QByteArray KeyboardHandler::serialize()
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    stream << keys;
+
+    return data;
 }

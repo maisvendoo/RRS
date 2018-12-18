@@ -18,6 +18,10 @@ public:
 
     virtual bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
+signals:
+
+    void sendKeyBoardState(QByteArray data);
+
 protected:
 
     QMap<int, bool>     keys;
@@ -29,6 +33,8 @@ protected:
     void resetKey(int key);
 
     void init();
+
+    QByteArray serialize();
 };
 
 #endif // KEYBOARD_H
