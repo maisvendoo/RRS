@@ -58,6 +58,10 @@ signals:
 
     void logMessage(QString msg);
 
+public slots:
+
+    void sendDataToClient(QByteArray data);
+
 private:
 
     PProcess    *process;

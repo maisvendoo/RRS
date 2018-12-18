@@ -16,5 +16,6 @@
 #define     MAIN_H
 
 #include    "viewer.h"
+#include    <QCoreApplication>
 
 #endif // MAIN_H

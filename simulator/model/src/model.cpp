@@ -93,8 +93,10 @@ bool Model::init(const simulator_command_line_t &command_line)
     server = new Server();
 
     connect(server, &Server::logMessage, train, &Train::logMessage);
+    connect(this, &Model::sendDataToServer, server, &Server::sendDataToClient);
 
     server->init(1992);
+
 
     return true;//server->start();
 }
@@ -145,6 +147,9 @@ void Model::process()
 
         double tau = 0;
         double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
+
+        // Feedback to viewer
+        tcpFeedBack();
 
         // Integrate all ODE in train motion model
         while ( (tau <= integration_time) &&
@@ -333,5 +338,17 @@ void Model::configSolver(solver_config_t &solver_config)
             solver_config.step = 1e-4;
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::tcpFeedBack()
+{
+    QByteArray array(sizeof(server_data_t), Qt::Uninitialized);
+    memcpy(array.data(), &viewer_data, sizeof(server_data_t));
+    emit sendDataToServer(array);
+
+    viewer_data.count++;
 }
 

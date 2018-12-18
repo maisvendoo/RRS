@@ -60,6 +60,8 @@ signals:
 
     void logMessage(QString msg);
 
+    void sendDataToServer(QByteArray data);
+
 public slots:
 
     /// Main simulation loop
@@ -99,8 +101,10 @@ private:
     Train       *train;    
 
     /// TCP-server
-    //TcpServer   *server;
     Server      *server;
+
+    /// Server data to clinet transmission
+    server_data_t   viewer_data;
 
     /// Log initialization
     void logInit(bool clear_log = false);
@@ -123,6 +127,9 @@ private:
 
     /// Solver configuration loading
     void configSolver(solver_config_t &solver_config);    
+
+    /// TCP feedback
+    void tcpFeedBack();
 };
 
 #endif // MODEL_H

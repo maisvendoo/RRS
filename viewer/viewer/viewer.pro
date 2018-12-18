@@ -67,6 +67,7 @@ unix {
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
+        LIBS += -L../../lib -lTcpConnection_d
 
     } else {
 
@@ -80,6 +81,7 @@ unix {
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
+        LIBS += -L../../lib -lTcpConnection
     }
 
     LIBS += -lGL
@@ -87,6 +89,7 @@ unix {
 
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
 INCLUDEPATH += ./include

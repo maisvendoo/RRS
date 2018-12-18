@@ -50,6 +50,17 @@ void Server::init(quint16 port)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Server::sendDataToClient(QByteArray data)
+{
+    if (clients.client)
+    {
+        clients.client->setOutputBuffer(data);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Server::clientAuthorized(ClientFace *clnt)
 {
     QString clientName = clnt->getName();

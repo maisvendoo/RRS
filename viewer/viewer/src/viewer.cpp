@@ -14,6 +14,7 @@
 #include    "abstract-loader.h"
 #include    "lighting.h"
 #include    "motion-blur.h"
+#include    "qt-events.h"
 
 //------------------------------------------------------------------------------
 //
@@ -45,6 +46,10 @@ bool RouteViewer::isReady() const
 //------------------------------------------------------------------------------
 int RouteViewer::run()
 {
+    viewer.addEventHandler(new QtEventsHandler());
+
+    client.init(settings, &viewer);
+
     return viewer.run();
 }
 
@@ -247,7 +252,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     traits->y = settings.y;
     traits->width = settings.width;
     traits->height = settings.height;
-    traits->windowName = settings.window_title;
+    traits->windowName = settings.name;
     traits->windowDecoration = settings.window_decoration;
     traits->doubleBuffer = settings.double_buffer;
     traits->samples = settings.samples;
