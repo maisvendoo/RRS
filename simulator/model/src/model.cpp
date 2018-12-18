@@ -82,15 +82,15 @@ bool Model::init(const simulator_command_line_t &command_line)
         return false;
 
     // TCP-server creation and initialize
-    server = new TcpServer();
+    /*server = new TcpServer();
 
     connect(server, &TcpServer::sendDataToTrain, train, &Train::sendDataToVehicle);
     connect(server, &TcpServer::logMessage, train, &Train::logMessage);
 
     if (!server->init())
-        return false;
+        return false;*/
 
-    return server->start();
+    return true;//server->start();
 }
 
 //------------------------------------------------------------------------------

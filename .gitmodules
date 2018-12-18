@@ -1,0 +1,3 @@
+[submodule "tcp-connection"]
+	path = tcp-connection
+	url = https://github.com/maisvendoo/tcp-connection.git
