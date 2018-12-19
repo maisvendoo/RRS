@@ -25,6 +25,7 @@ struct settings_t
     int             request_interval;
     int             reconnect_interval;
     double          persistence;
+    float           eye_height;
 
     settings_t()
         : route_dir("")
@@ -47,6 +48,7 @@ struct settings_t
         , request_interval(200)
         , reconnect_interval(1000)
         , persistence(0.05)
+        , eye_height(3.0)
     {
 
     }

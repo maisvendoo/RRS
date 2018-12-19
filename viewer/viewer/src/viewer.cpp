@@ -228,7 +228,7 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
     loader->load(routeDir);
     root = loader->getRoot();
 
-    viewer.addEventHandler(loader->getCameraEventHandler(1, 3.0f));
+    viewer.addEventHandler(loader->getCameraEventHandler(1, settings.eye_height));
 
     return true;
 }
