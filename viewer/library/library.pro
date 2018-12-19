@@ -2,7 +2,8 @@ DEFINES += LIBRARY_LIB
 
 TEMPLATE = lib
 
-CONFIG -= qt
+CONFIG += qt
+QT += core
 
 TARGET = library
 

@@ -261,6 +261,28 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool Vehicle::getDiscreteSignal(int i)
+{
+    if (i < NUM_DISCRETE_SIGNALS)
+        return discreteSignal[i];
+    else
+        return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float Vehicle::getAnalogSignal(int i)
+{
+    if (i < NUM_ANALOG_SIGNALS)
+        return analogSignal[i];
+    else
+        return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 {
     (void) t;

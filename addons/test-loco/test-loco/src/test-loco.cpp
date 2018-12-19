@@ -38,7 +38,7 @@ void TestLoco::step(double t, double dt)
         inc_loc = false;
     }
 
-    if (keys[101] && !dec_loc)
+    if (keys[100] && !dec_loc)
     {
         traction_level -=  traction_step;
         dec_loc = true;        
@@ -49,6 +49,7 @@ void TestLoco::step(double t, double dt)
     }
 
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
+    analogSignal[0] = static_cast<float>(traction_level);
 
     for (size_t i = 0; i < Q_a.size(); i++)
     {

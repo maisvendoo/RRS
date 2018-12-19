@@ -3,6 +3,8 @@
 #include    <osg/BlendFunc>
 #include    <osg/CullFace>
 #include    <osg/GraphicsContext>
+#include    <osgDB/FileUtils>
+#include    <osgDB/FileNameUtils>
 
 #include    "filesystem.h"
 #include    "config-reader.h"
@@ -127,6 +129,9 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "WindowDecoration", settings.window_decoration);
         cfg.getValue(secName, "DoubleBuffer", settings.double_buffer);
         cfg.getValue(secName, "Samples", settings.samples);
+        cfg.getValue(secName, "RequestInterval", settings.request_interval);
+        cfg.getValue(secName, "ReconnectInterval", settings.reconnect_interval);
+        cfg.getValue(secName, "MotionBlur", settings.persistence);
     }
 
     return settings;
@@ -280,8 +285,8 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
 
     camera->setAllowEventFocus(false);
 
-    if (settings.fullscreen)
-        viewer->setUpViewOnSingleScreen(settings.screen_number);
+    //if (settings.fullscreen)
+      //  viewer->setUpViewOnSingleScreen(settings.screen_number);
 
     return true;
 }
@@ -304,7 +309,12 @@ bool RouteViewer::initMotionBlurEffect(osgViewer::Viewer *viewer,
     viewer->getWindows(windows);
 
     for (auto it = windows.begin(); it != windows.end(); ++it)
-        (*it)->add(new MotionBlurOperation(0.1));
+    {
+        (*it)->add(new MotionBlurOperation(settings.persistence));
+
+        if (settings.fullscreen)
+            (*it)->setWindowRectangle(0, 0, settings.width, settings.height);
+    }
 
     return true;
 }

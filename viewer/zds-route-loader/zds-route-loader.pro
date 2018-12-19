@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-CONFIG -= qt
+CONFIG += qt
 
 CONFIG += plugin
 CONFIG += no_plugin_name_prefix

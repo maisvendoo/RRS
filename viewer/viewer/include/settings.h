@@ -24,6 +24,7 @@ struct settings_t
     bool            samples;
     int             request_interval;
     int             reconnect_interval;
+    double          persistence;
 
     settings_t()
         : route_dir("")
@@ -45,6 +46,7 @@ struct settings_t
         , samples(4)
         , request_interval(200)
         , reconnect_interval(1000)
+        , persistence(0.05)
     {
 
     }

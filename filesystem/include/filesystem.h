@@ -1,8 +1,7 @@
 #ifndef		FILESYSTEM_H
 #define		FILESYSTEM_H
 
-#include    <osgDB/FileUtils>
-#include    <osgDB/FileNameUtils>
+#include    <QDir>
 
 #include    "import-export.h"
 
@@ -24,7 +23,7 @@ public:
     {
         static FileSystem instance;
 
-        std::string workDir = osgDB::getCurrentWorkingDirectory();
+        std::string workDir = QDir::currentPath().toStdString();
         std::string tmp = instance.getLevelUpDirectory(workDir, 1);
         instance.setBinaryDir(workDir);
         instance.setRouteRootDir(tmp + "routes");

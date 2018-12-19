@@ -28,6 +28,9 @@
     #define VEHICLE_EXPORT  Q_DECL_IMPORT
 #endif
 
+const   int NUM_ANALOG_SIGNALS = 1000;
+const   int NUM_DISCRETE_SIGNALS = 1000;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -102,6 +105,10 @@ public:
     double getWheelAngle(size_t i);
 
     double getWheelOmega(size_t i);
+
+    bool getDiscreteSignal(int i);
+
+    float getAnalogSignal(int i);
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
@@ -202,6 +209,9 @@ protected:
     state_vector_t  Q_r;
 
     QMap<int, bool> keys;
+
+    bool    discreteSignal[NUM_DISCRETE_SIGNALS];
+    float   analogSignal[NUM_ANALOG_SIGNALS];
 
     /// User defined initialization
     virtual void initialization();

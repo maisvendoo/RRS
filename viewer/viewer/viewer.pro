@@ -28,10 +28,10 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
 
-        LIBS += -L../../lib -lroute-loader_d
-        LIBS += -L../../lib -llibrary_d
-        LIBS += -L../../lib -lfilesystem_d
-        LIBS += -L../../lib -lTcpConnection_d
+        LIBS += -L../../../lib -lroute-loader_d
+        LIBS += -L../../../lib -llibrary_d
+        LIBS += -L../../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lTcpConnection_d
 
     } else {
 
@@ -42,10 +42,10 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
 
-        LIBS += -L../../lib -lroute-loader
-        LIBS += -L../../lib -llibrary
-        LIBS += -L../../lib -lfilesystem
-        LIBS += -L../../lib -lTcpConnection
+        LIBS += -L../../../lib -lroute-loader
+        LIBS += -L../../../lib -llibrary
+        LIBS += -L../../../lib -lfilesystem
+        LIBS += -L../../../lib -lTcpConnection
     }
 
     LIBS += -lopengl32 -lglu32

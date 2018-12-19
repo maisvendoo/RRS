@@ -2,7 +2,7 @@ DEFINES += ROUTE_LOADER_LIB
 
 TEMPLATE = lib
 
-CONFIG -= qt
+CONFIG += qt
 
 TARGET = route-loader
 

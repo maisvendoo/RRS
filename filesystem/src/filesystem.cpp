@@ -130,7 +130,7 @@ std::string FileSystem::combinePath(const std::string &path1, const std::string 
 //------------------------------------------------------------------------------
 std::string FileSystem::getNativePath(const std::string &path)
 {
-    return osgDB::convertFileNameToNativeStyle(path);
+    return QDir::toNativeSeparators(QString(path.c_str())).toStdString();
 }
 
 //------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ std::string FileSystem::getNativePath(const std::string &path)
 //------------------------------------------------------------------------------
 char FileSystem::separator() const
 {
-    return osgDB::getNativePathSeparator();
+    return QDir::separator().toLatin1();
 }
 
 //------------------------------------------------------------------------------
@@ -146,8 +146,8 @@ char FileSystem::separator() const
 //------------------------------------------------------------------------------
 std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels)
 {
-    std::vector<std::string> path_elems;
-    osgDB::getPathElements(path, path_elems);
+    QStringList path_elems;
+    path_elems = QDir::toNativeSeparators(QString(path.c_str())).split(QDir::separator());
 
  #if __unix__
     std::string tmp = "/";
@@ -157,7 +157,7 @@ std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels)
 
     for (auto it = path_elems.begin(); it != path_elems.end() - num_levels; ++it)
     {
-        tmp += (*it) + separator();
+        tmp += (*it).toStdString() + separator();
     }
 
     return tmp;

@@ -1,6 +1,8 @@
 TEMPLATE = lib
 
-CONFIG -= qt
+CONFIG += qt
+
+QT += core
 
 DEFINES += FILESYSTEM_LIB
 

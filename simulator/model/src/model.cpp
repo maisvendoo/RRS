@@ -233,12 +233,13 @@ void Model::postStep(double t)
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 v[first] = %4 v[last] = %5\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 v[first] = %4 v[last] = %5 trac = %6\n")
             .arg(t)
             .arg(realtime_delay)
             .arg(dt)
             .arg(train->getFirstVehicle()->getVelocity() * 3.6)
-            .arg(train->getLastVehicle()->getVelocity() * 3.6);
+            .arg(train->getLastVehicle()->getVelocity() * 3.6)
+            .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(0)));
 
     fputs(qPrintable(debug_info), stdout);
 }

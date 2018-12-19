@@ -244,6 +244,6 @@ void MainWindow::onViewerFinished(int exitCode)
 {
     Q_UNUSED(exitCode)
 
-    simulatorProc.terminate();
+    simulatorProc.kill();
     setFocusPolicy(Qt::StrongFocus);
 }
