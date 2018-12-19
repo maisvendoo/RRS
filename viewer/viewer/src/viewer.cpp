@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Video client's window manager
+//      (c) maisvendoo
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Video client's window manager
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date
+ */
+
 #include    "viewer.h"
 
 #include    <osg/BlendFunc>
@@ -59,7 +73,8 @@ int RouteViewer::run()
 
     client.init(settings, &viewer);
 
-    QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState, &client, &NetworkClient::receiveKeysState);
+    QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
+                     &client, &NetworkClient::receiveKeysState);
 
     return viewer.run();
 }
@@ -285,8 +300,8 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
 
     camera->setAllowEventFocus(false);
 
-    //if (settings.fullscreen)
-      //  viewer->setUpViewOnSingleScreen(settings.screen_number);
+    if (settings.fullscreen)
+        viewer->setUpViewOnSingleScreen(settings.screen_number);
 
     return true;
 }
@@ -310,10 +325,7 @@ bool RouteViewer::initMotionBlurEffect(osgViewer::Viewer *viewer,
 
     for (auto it = windows.begin(); it != windows.end(); ++it)
     {
-        (*it)->add(new MotionBlurOperation(settings.persistence));
-
-        //if (settings.fullscreen)
-          //  (*it)->setWindowRectangle(0, 0, settings.width, settings.height);
+        (*it)->add(new MotionBlurOperation(settings.persistence));        
     }
 
     return true;

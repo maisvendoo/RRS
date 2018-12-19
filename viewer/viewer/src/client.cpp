@@ -1,7 +1,18 @@
+//------------------------------------------------------------------------------
+//
+//      TCP-client for chenge data with simulator physichs
+//      (c) maisvendoo, 18/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief TCP-client for chenge data with simulator physichs
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 18/12/2018
+ */
+
 #include    "client.h"
-
-#include    <iostream>
-
 #include    "trajectory-element.h"
 
 //------------------------------------------------------------------------------

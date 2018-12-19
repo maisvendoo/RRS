@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      RSS launcher main window
+//      (c) maisvendoo, 17/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief RSS launcher main window
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 17/12/2018
+ */
+
 #include    "mainwindow.h"
 #include    "ui_mainwindow.h"
 

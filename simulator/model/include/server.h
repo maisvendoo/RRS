@@ -1,15 +1,15 @@
 //------------------------------------------------------------------------------
 //
-//
-//
+//      Server to commect with viewer
+//      (c) maisvendoo, 18/12/2018
 //
 //------------------------------------------------------------------------------
 /*!
  * \file
- * \brief
- * \copyright
- * \author
- * \date
+ * \brief Server to commect with viewer
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 18/12/2018
  */
 
 #ifndef     SERVER_H
@@ -23,7 +23,6 @@
 class TcpServer;
 class QTimer;
 class ClientFace;
-class PProcess;
 
 //------------------------------------------------------------------------------
 //
@@ -48,36 +47,42 @@ class Server Q_DECL_FINAL : public QObject
 
 public:
 
+    /// Constructor
     Server(QObject *parent = Q_NULLPTR);
 
+    /// Destructor
     ~Server();
 
+    /// Initialization
     void init(quint16 port);
 
+    /// Get data received from client
     QByteArray getReceivedData();
 
 signals:
 
+    /// Print message to log
     void logMessage(QString msg);
 
 public slots:
 
+    /// Send data to client
     void sendDataToClient(QByteArray data);
 
-private:
+private:        
 
-    PProcess    *process;
-
-    QTimer      *timer;
-
+    /// Server object
     TcpServer   *server;
 
+    /// Connected clients objects
     clients_t   clients;
 
 private slots:
 
+    /// Perform when client authorized
     void clientAuthorized(ClientFace *clnt);
 
+    /// Perform when client disconnected
     void clientDisconnected(ClientFace *clnt);
 };
 

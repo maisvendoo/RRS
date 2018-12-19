@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Server to commect with viewer
+//      (c) maisvendoo, 18/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Server to commect with viewer
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 18/12/2018
+ */
+
 #include    "server.h"
 
 #include    "tcp-server.h"
@@ -31,6 +45,7 @@ void Server::init(quint16 port)
 {
     server = new TcpServer();
 
+    // Set data engine for viewer
     server->setEngineDefiner(new DataEngine());
 
     connect(server, &TcpServer::clientAuthorized,
@@ -39,6 +54,7 @@ void Server::init(quint16 port)
     connect(server, &TcpServer::clientAboutToDisconnect,
             this, &Server::clientDisconnected, Qt::AutoConnection);
 
+    // Start server on required port
     server->start(port);
 
     if (server->isListening())
