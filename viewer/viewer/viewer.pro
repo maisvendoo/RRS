@@ -3,6 +3,8 @@ TEMPLATE = app
 CONFIG += qt
 
 QT += core
+QT += gui
+QT += widgets
 QT += network
 
 TARGET = viewer

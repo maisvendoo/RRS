@@ -20,7 +20,7 @@ bool QtEventsHandler::handle(const osgGA::GUIEventAdapter &ea,
     {
     case osgGA::GUIEventAdapter::FRAME:
         {
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            QApplication::processEvents(QEventLoop::AllEvents);
 
             break;
         }

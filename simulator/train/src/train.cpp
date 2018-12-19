@@ -361,6 +361,9 @@ bool Train::loadCouplings(QString cfg_path)
 
         int num_couplings = static_cast<int>(vehicles.size() - 1);
 
+        if (num_couplings == 0)
+            return true;
+
         for (int i = 0; i < num_couplings; i++)
         {
             Coupling *coupling = loadCoupling(QString(fs.getModulesDir().c_str()) +

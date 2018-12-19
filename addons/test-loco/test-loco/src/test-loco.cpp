@@ -6,6 +6,8 @@
 //------------------------------------------------------------------------------
 TestLoco::TestLoco() : Vehicle()
   , traction_level(0.0)
+  , inc_loc(false)
+  , dec_loc(false)
 {
 
 }
@@ -24,15 +26,27 @@ TestLoco::~TestLoco()
 void TestLoco::step(double t, double dt)
 {
     (void) t;
-    double traction_step = 0.0;
+    double traction_step = 0.1;
 
-    if (keys[97])
-        traction_step = 0.1;
+    if (keys[97] && !inc_loc)
+    {
+        traction_level +=  traction_step;
+        inc_loc = true;        
+    }
+    else
+    {
+        inc_loc = false;
+    }
 
-    if (keys[101])
-        traction_step = -0.1;
-
-    traction_level +=  traction_step * dt;
+    if (keys[101] && !dec_loc)
+    {
+        traction_level -=  traction_step;
+        dec_loc = true;        
+    }
+    else
+    {
+        dec_loc = false;
+    }
 
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
 

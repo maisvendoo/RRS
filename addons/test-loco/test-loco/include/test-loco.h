@@ -21,6 +21,9 @@ private:
 
     double traction_level;
 
+    bool inc_loc;
+    bool dec_loc;
+
     void step(double t, double dt);
 
     double traction_char(double V);

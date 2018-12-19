@@ -90,7 +90,7 @@ void NetworkClient::onTimerRequest()
             }
         }
 
-        tcp_client->sendToServer(ATcp::tcGET);
+        tcp_client->sendToServer(ATcp::tcPOSTGET, key_data);
     }
 }
 
@@ -99,6 +99,5 @@ void NetworkClient::onTimerRequest()
 //------------------------------------------------------------------------------
 void NetworkClient::receiveKeysState(QByteArray data)
 {
-    std::cout << "OK: Key pressed" << std::endl;
-    tcp_client->sendToServer(ATcp::tcPOST, data);
+    key_data = data;
 }

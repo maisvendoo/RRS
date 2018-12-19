@@ -21,16 +21,32 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
     switch (ea.getEventType())
     {
     case osgGA::GUIEventAdapter::KEYDOWN:
+        {
 
-        setKey(ea.getKey());
-        emit sendKeyBoardState(serialize());
-        break;
+            int key = ea.getKey();
+
+            if (!getKey(key))
+            {
+                setKey(ea.getKey());
+                emit sendKeyBoardState(serialize());
+            }
+
+            break;
+        }
 
     case osgGA::GUIEventAdapter::KEYUP:
+        {
 
-        resetKey(ea.getKey());
-        emit sendKeyBoardState(serialize());
-        break;
+            int key = ea.getKey();
+
+            if (getKey(key))
+            {
+                resetKey(ea.getKey());
+                emit sendKeyBoardState(serialize());
+            }
+
+            break;
+        }
 
     default:
 
@@ -58,6 +74,19 @@ void KeyboardHandler::setKey(int key)
 
     if (it != keys.end())
         keys[key] = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool KeyboardHandler::getKey(int key)
+{
+    QMap<int, bool>::iterator it = keys.find(key);
+
+    if (it != keys.end())
+        return keys[key];
+
+    return false;
 }
 
 //------------------------------------------------------------------------------

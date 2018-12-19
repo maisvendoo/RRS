@@ -2,7 +2,7 @@
 #define     QT_EVENTS_H
 
 #include    <osgGA/GUIEventHandler>
-#include    <QtCore/QtCore>
+#include    <QApplication>
 
 class QtEventsHandler : public osgGA::GUIEventHandler
 {

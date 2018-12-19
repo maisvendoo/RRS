@@ -35,6 +35,8 @@ private:
 
     int     request_interval;
 
+    QByteArray  key_data;
+
 private slots:
 
     void onClientAuthorized();

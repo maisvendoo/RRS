@@ -30,6 +30,8 @@ protected:
 
     void setKey(int key);
 
+    bool getKey(int key);
+
     void resetKey(int key);
 
     void init();

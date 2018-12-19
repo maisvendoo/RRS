@@ -143,14 +143,14 @@ void Model::process()
     {
         QTime solveTime;
 
+        // Feedback to viewer
+        tcpFeedBack();
+
         int solve_time = 0;
         solveTime.start();
 
         double tau = 0;
-        double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
-
-        // Feedback to viewer
-        tcpFeedBack();
+        double integration_time = static_cast<double>(integration_time_interval) / 1000.0;        
 
         // Integrate all ODE in train motion model
         while ( (tau <= integration_time) &&

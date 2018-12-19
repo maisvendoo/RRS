@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     RouteViewer viewer(argc, argv);
 
     if (viewer.isReady())
