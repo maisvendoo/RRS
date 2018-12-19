@@ -87,6 +87,28 @@ ReadResult SceneLoader::loadDataFile(const std::string &filepath)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+std::vector<std::string> parse_line(const std::string &line)
+{
+    char delimiter = '\t';
+    std::string tmp = line + delimiter;
+    std::vector<std::string> tokens;
+
+    size_t pos = 0;
+
+    while ( (pos = tmp.find(delimiter)) != std::string::npos )
+    {
+        std::string token = tmp.substr(0, pos);
+        tmp.erase(0, pos + 1);
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ReadResult SceneLoader::loadObjectRef(std::istream &stream)
 {
     std::string mode = "";
@@ -111,20 +133,25 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
         }
 
         std::string tmp = delete_symbol(line, '\r');
-        std::replace(tmp.begin(), tmp.end(), '\t', ' ');
-
-        std::istringstream ss(tmp);
 
         object_ref_t object;
 
-        ss >> object.name >> object.model_path >> object.texture_path;
+        std::vector<std::string> tokens = parse_line(tmp);
 
-        FileSystem &fs = FileSystem::getInstance();
-        object.model_path = fs.getNativePath(object.model_path);
-        object.texture_path = fs.getNativePath(object.texture_path);
+        if (tokens.size() < 3)
+            continue;
+
+        object.name = tokens[0];
+        object.model_path = tokens[1];
+        object.texture_path = tokens[2];
+
+
+        FileSystem &fs = FileSystem::getInstance();        
 
         object.model_path = routeDir + object.model_path;
         object.texture_path = routeDir + object.texture_path;
+        object.model_path = fs.toNativeSeparators(object.model_path);
+        object.texture_path = fs.toNativeSeparators(object.texture_path);
 
         model_info_t model_info;
         model_info.name = object.name;

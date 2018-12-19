@@ -128,6 +128,20 @@ std::string FileSystem::combinePath(const std::string &path1, const std::string 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+std::string FileSystem::toNativeSeparators(const std::string &path)
+{
+    std::string tmp = path;
+
+#if __unix__
+    std::replace(tmp.begin(), tmp.end(), '\\', '/');
+#endif
+
+    return tmp;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::string FileSystem::getNativePath(const std::string &path)
 {
     return QDir::toNativeSeparators(QString(path.c_str())).toStdString();
@@ -146,19 +160,12 @@ char FileSystem::separator() const
 //------------------------------------------------------------------------------
 std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels)
 {
-    QStringList path_elems;
-    path_elems = QDir::toNativeSeparators(QString(path.c_str())).split(QDir::separator());
+    QDir dir(QString(path.c_str()));
 
- #if __unix__
-    std::string tmp = "/";
-#else
-    std::string tmp = "";
-#endif
+    for (int i = 0; i < num_levels; ++i)
+        dir.cdUp();
 
-    for (auto it = path_elems.begin(); it != path_elems.end() - num_levels; ++it)
-    {
-        tmp += (*it).toStdString() + separator();
-    }
+    QString tmp = dir.path() + QDir::separator();
 
-    return tmp;
+    return tmp.toStdString();
 }

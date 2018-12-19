@@ -61,6 +61,8 @@ public:
 
     std::string combinePath(const std::string &path1, const std::string &path2);
 
+    std::string toNativeSeparators(const std::string &path);
+
     /// Get native path separator
     char separator() const;
 

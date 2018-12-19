@@ -51,7 +51,7 @@ unix {
         LIBS +=  -losg
         LIBS +=  -losgDB
 
-        LIBS += -L../../../lib -lfilesystem_d
+        LIBS += -L../../../lib -lfilesystem
     }
 }
 

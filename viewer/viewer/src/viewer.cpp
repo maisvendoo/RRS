@@ -312,8 +312,8 @@ bool RouteViewer::initMotionBlurEffect(osgViewer::Viewer *viewer,
     {
         (*it)->add(new MotionBlurOperation(settings.persistence));
 
-        if (settings.fullscreen)
-            (*it)->setWindowRectangle(0, 0, settings.width, settings.height);
+        //if (settings.fullscreen)
+          //  (*it)->setWindowRectangle(0, 0, settings.width, settings.height);
     }
 
     return true;
