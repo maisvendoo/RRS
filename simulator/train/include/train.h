@@ -24,7 +24,7 @@
 #include    "solver.h"
 #include    "solver-config.h"
 #include    "brakepipe.h"
-//#include    "profile.h"
+#include    "profile.h"
 
 #include    <QByteArray>
 
@@ -48,7 +48,7 @@ class TRAIN_EXPORT Train : public OdeSystem
 public:
 
     /// Constructor
-    explicit Train(QObject *parent = Q_NULLPTR);
+    explicit Train(Profile *profile, QObject *parent = Q_NULLPTR);
     /// Destructor
     virtual ~Train();
 
@@ -103,6 +103,9 @@ private:
     /// Direction of motion on railway
     int             dir;
 
+    /// Profile manager
+    Profile     *profile;
+
     /// Solver's configuration
     solver_config_t solver_config;
 
@@ -110,10 +113,7 @@ private:
     Solver      *train_motion_solver;
 
     /// Brakepipe model
-    BrakePipe   *brakepipe;
-
-    /// Profile manager
-    //Profile     *profile;
+    BrakePipe   *brakepipe;    
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;

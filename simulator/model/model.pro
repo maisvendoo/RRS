@@ -24,6 +24,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lTcpConnection_d
+    LIBS += -L../../../lib -lprofile_d
 
 } else {
 
@@ -37,6 +38,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe    
     LIBS += -L../../../lib -lTcpConnection
+    LIBS += -L../../../lib -lprofile
 }
 
 INCLUDEPATH += ./include
@@ -47,6 +49,7 @@ INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../vehicle/include
 INCLUDEPATH += ../coupling/include
 INCLUDEPATH += ../brakepipe/include
+INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include

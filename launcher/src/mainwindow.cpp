@@ -165,6 +165,7 @@ void MainWindow::startSimulator()
 
     QStringList args;
     args << "--train-config=" + selectedTrain;
+    args << "--route=" + selectedRoutePath;
 
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     simulatorProc.start(simPath, args);

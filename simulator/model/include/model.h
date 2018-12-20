@@ -27,6 +27,8 @@
 
 #include    "server.h"
 
+#include    "profile.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -101,6 +103,9 @@ private:
 
     /// Train model
     Train       *train;    
+
+    /// Profile
+    Profile     *profile;
 
     /// TCP-server
     Server      *server;

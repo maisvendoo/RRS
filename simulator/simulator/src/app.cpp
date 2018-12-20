@@ -109,6 +109,13 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
     parser.addOption(trainConfig);
 
+    // Route directory
+    QCommandLineOption routeDir(QStringList() << "r" << "route",
+                                QCoreApplication::translate("main", "Route directory"),
+                                QCoreApplication::translate("main", "route-directory"));
+
+    parser.addOption(routeDir);
+
     // Clear simulator log
     QCommandLineOption clearLog(QStringList() << "c" << "clear-log",
                                 QCoreApplication::translate("main", "Clear simulator's log"));
@@ -119,7 +126,7 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     QCommandLineOption debugPrint(QStringList() << "o" << "debug-print",
                                   QCoreApplication::translate("main", "Allow debug print"));
 
-    parser.addOption(debugPrint);
+    parser.addOption(debugPrint);    
 
     // Parse command line arguments
     if (!parser.parse(this->arguments()))
@@ -142,6 +149,12 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     {
         command_line.train_config.is_present = true;
         command_line.train_config.value = parser.value(trainConfig);
+    }
+
+    if (parser.isSet(routeDir))
+    {
+        command_line.route_dir.is_present = true;
+        command_line.route_dir.value = parser.value(routeDir);
     }
 
     if (parser.isSet(clearLog))

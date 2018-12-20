@@ -4,7 +4,7 @@ CONFIG -= qt
 
 TARGET = profconv
 
-DESTDIR = ../../bin
+DESTDIR = ../../../bin
 
 INCLUDEPATH += ./include
 

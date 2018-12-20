@@ -260,7 +260,7 @@ void ProfConverter::writeProfileData(const std::vector<track_t> &tracks_data,
     {
         track_t track = *it;
 
-        stream << track.rail_coord << " "
+        stream << track.rail_coord / 1000.0f << " "
                << track.orth.z * 1000.0f << " "
                << "0.0" << std::endl;
     }

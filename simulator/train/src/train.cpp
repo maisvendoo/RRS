@@ -6,11 +6,12 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Train::Train(QObject *parent) : OdeSystem(parent)
+Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , trainMass(0.0)
   , trainLength(0.0)
   , ode_order(0)
   , dir(1)
+  , profile(profile)
 {
 
 }
@@ -120,8 +121,10 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
             vehicle1->setForwardForce(R);
         }
 
-        vehicle->setInclination(0.0);
-        vehicle->setCurvature(0.0);
+        profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
+
+        vehicle->setInclination(pe.inclination);
+        vehicle->setCurvature(pe.curvature);
 
         state_vector_t a = vehicle->getAcceleration(Y, t);
 

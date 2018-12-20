@@ -73,8 +73,11 @@ bool Model::init(const simulator_command_line_t &command_line)
     stop_time = init_data.solver_config.stop_time;
     dt = init_data.solver_config.step;
 
+    // Load profile
+    profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
+
     // Train creation and initialization
-    train = new Train();
+    train = new Train(profile);
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
@@ -293,6 +296,9 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 {
     if (command_line.train_config.is_present)
         init_data.train_config = command_line.train_config.value;
+
+    if (command_line.route_dir.is_present)
+        init_data.route_dir = command_line.route_dir.value;
 
     if (command_line.debug_print.is_present)
         init_data.debug_print = command_line.debug_print.value;

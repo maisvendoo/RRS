@@ -15,3 +15,5 @@ SUBDIRS += ./addons/test-loco
 SUBDIRS += ./launcher
 
 SUBDIRS += ./viewer
+
+SUBDIRS += ./tools/profconv

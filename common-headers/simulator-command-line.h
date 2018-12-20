@@ -10,10 +10,12 @@ struct simulator_command_line_t
 {
     /// Train configuration file name
     option_t<QString>   train_config;
+    /// Route directory
+    option_t<QString>   route_dir;
     /// Clear simulator log file
     option_t<bool>      clear_log;
     /// Debug print in simulation loop
-    option_t<bool>      debug_print;
+    option_t<bool>      debug_print;    
 };
 
 #endif // SIMULATOR_COMMAND_LINE
