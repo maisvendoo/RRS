@@ -71,14 +71,8 @@ bool AppCore::init()
     case CommandLineHelpRequired:
 
         parser.showHelp();
-        return false;
-
-    default:
-
-        return false;
+        return false;    
     }
-
-    return true;
 }
 
 //------------------------------------------------------------------------------
