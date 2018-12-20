@@ -242,7 +242,7 @@ bool ProfConverter::conversion(const std::string &routeDir)
         writeProfileData(tracks_data1, "profile1.conf");
 
     load(trk2_path, tracks_data2);
-        writeProfileData(tracks_data2, "profile2.conf");
+         writeProfileData(tracks_data2, "profile2.conf");
 
     return true;
 }
@@ -253,7 +253,19 @@ bool ProfConverter::conversion(const std::string &routeDir)
 void ProfConverter::writeProfileData(const std::vector<track_t> &tracks_data,
                                      const std::string &file_name)
 {
+    std::string path = compinePath(toNativeSeparators(routeDir), file_name);
+    std::ofstream stream(path.c_str(), std::ios::out);
 
+    for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
+    {
+        track_t track = *it;
+
+        stream << track.rail_coord << " "
+               << track.orth.z * 1000.0f << " "
+               << "0.0" << std::endl;
+    }
+
+    stream.close();
 }
 
 

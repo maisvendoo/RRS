@@ -3,6 +3,9 @@
 
 #include    <cmath>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class Vec3
 {
 public:
@@ -39,9 +42,9 @@ public:
     {
         Vec3 tmp;
 
-        tmp. x = this->x + b.x;
-        tmp. y = this->y + b.y;
-        tmp. z = this->z + b.z;
+        tmp. x = this->x - b.x;
+        tmp. y = this->y - b.y;
+        tmp. z = this->z - b.z;
 
         return tmp;
     }
