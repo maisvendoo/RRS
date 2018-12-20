@@ -20,6 +20,8 @@
 #include    "track.h"
 #include    "cmd-line.h"
 
+#include    <fstream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -37,9 +39,20 @@ private:
 
     std::string             routeDir;
 
-    std::vector<track_t>    tracks_data;
+    std::vector<track_t>    tracks_data1;
+
+    std::vector<track_t>    tracks_data2;
 
     CmdLineParseResult parseCommandLine(int argc, char *argv[]);
+
+    bool load(const std::string &path, std::vector<track_t> &track_data);
+
+    bool load(std::ifstream &stream, std::vector<track_t> &track_data);
+
+    bool conversion(const std::string &routeDir);
+
+    void writeProfileData(const std::vector<track_t> &tracks_data,
+                          const std::string &file_name);
 };
 
 #endif // CONVERTER_H
