@@ -34,6 +34,9 @@ public:
         instance.setModulesDir(tmp + "modules");
         instance.setVehiclesDir(instance.getConfigDir() + instance.separator() + "vehicles");
         instance.setCouplingsDir(instance.getConfigDir()+ instance.separator() + "couplings");
+        instance.setDataDir(tmp + "data");
+        instance.setVehicleModelsDir(instance.combinePath(instance.getDataDir(), "models"));
+        instance.setVehicleTexturesDir(instance.combinePath(instance.getDataDir(), "textures"));
 
         return instance;
     }    
@@ -59,6 +62,12 @@ public:
 
     std::string getBinaryDir() const;
 
+    std::string getDataDir() const;
+
+    std::string getVehicleModelsDir() const;
+
+    std::string getVehicleTexturesDir() const;
+
     std::string combinePath(const std::string &path1, const std::string &path2);
 
     std::string toNativeSeparators(const std::string &path);
@@ -77,6 +86,10 @@ private:
     std::string vehiclesDir;
     std::string couplingsDir;
     std::string binDir;
+
+    std::string dataDir;
+    std::string vehicleModelsDir;
+    std::string vehicleTexturesDir;
 
     FileSystem() {}
     FileSystem(const FileSystem &) = delete;
@@ -101,6 +114,12 @@ private:
     void setCouplingsDir(const std::string &path);
 
     void setBinaryDir(const std::string &path);
+
+    void setDataDir(const std::string &path);
+
+    void setVehicleModelsDir(const std::string &path);
+
+    void setVehicleTexturesDir(const std::string &path);
 
     /// Get directory by num_levels levels up
     std::string getLevelUpDirectory(std::string path, int num_levels);

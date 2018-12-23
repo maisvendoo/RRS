@@ -25,8 +25,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-RoutePath::RoutePath(const std::string &track_file_path)
-    : length(0.0f)
+RoutePath::RoutePath(const std::string &track_file_path) : MotionPath ()
 {
     load(track_file_path);
 }
@@ -57,60 +56,6 @@ osg::Vec3 RoutePath::getPosition(float railway_coord, osg::Vec3 &attitude)
     attitude += next_track.attitude * t;
 
     return pos;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float RoutePath::getLength() const
-{
-    return length;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-osg::Group *RoutePath::getTrackLine(const osg::Vec4 &color)
-{
-    if (track_data.size() == 0)
-        return nullptr;
-
-    osg::ref_ptr<osg::Group> trackLine = new osg::Group;
-
-
-    for (auto it = track_data.begin(); it != track_data.end(); ++it)
-    {
-        track_t track = *it;
-        osg::ref_ptr<osg::PagedLOD> line = new osg::PagedLOD;
-        line->setRange(0, 0.0f, FLT_MAX);
-
-        osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
-        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        osg::Vec3 h(0.0f, 0.0f, 1.0f);
-        vertices->push_back(track.begin_point + h);
-        vertices->push_back(track.end_point + h);
-        geom->setVertexArray(vertices.get());
-
-        osg::ref_ptr<osg::DrawArrays> da = new osg::DrawArrays(osg::PrimitiveSet::LINES,
-                                                               0,
-                                                               static_cast<int>(vertices->size()));
-        geom->addPrimitiveSet(da.get());
-
-        osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-        geode->addDrawable(geom.get());
-        geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-        osg::ref_ptr<osg::Material> material = new osg::Material;
-        material->setAmbient(osg::Material::FRONT_AND_BACK, color);
-        material->setDiffuse(osg::Material::FRONT_AND_BACK, color);
-        material->setEmission(osg::Material::FRONT_AND_BACK, color);
-        geode->getOrCreateStateSet()->setAttribute(material.get());
-
-        line->addChild(geode.get());
-        trackLine->addChild(line.get());
-    }
-
-    return trackLine.release();
 }
 
 //------------------------------------------------------------------------------

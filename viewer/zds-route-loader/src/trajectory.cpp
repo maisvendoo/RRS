@@ -19,8 +19,8 @@
 //------------------------------------------------------------------------------
 TrainTrajectory::TrainTrajectory(std::string routeDir,
                                  int direction,
-                                 float height)
-    : coord(0.0f)
+                                 float height) : Trajectory ()
+    , coord(0.0f)
     , direction(direction)
     , height(height)
     , init_yaw(0.0f)

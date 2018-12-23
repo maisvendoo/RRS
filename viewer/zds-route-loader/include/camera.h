@@ -33,7 +33,7 @@ class RailwayManipulator : public osgGA::GUIEventHandler
 public:
 
     /// Conastructor
-    RailwayManipulator(TrainTrajectory *train_traj);
+    RailwayManipulator(Trajectory *train_traj);
 
     /// Events handler
     virtual bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
@@ -41,7 +41,7 @@ public:
 protected:
 
     /// Train trajectory object
-    osg::ref_ptr<TrainTrajectory>   train_traj;
+    osg::ref_ptr<Trajectory>        train_traj;
     /// Reference time count between position data update
     double                          ref_time;
     /// Initial time of frame draw

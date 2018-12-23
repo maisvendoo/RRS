@@ -27,6 +27,9 @@
     #define ROUTE_LOADER_EXPORT DECL_IMPORT
 #endif
 
+#include    "abstract-trajectory.h"
+#include    "abstract-path.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -57,6 +60,10 @@ public:
     virtual osgGA::GUIEventHandler *getCameraEventHandler(int direction,
                                                           float camera_height) = 0;
 
+    Trajectory *getTrajectory();
+
+    MotionPath *getMotionPath();
+
 protected:    
 
     /// Route directory
@@ -64,6 +71,8 @@ protected:
 
     /// Route static scene root node
     osg::ref_ptr<osg::Group>    root;
+
+    osg::ref_ptr<Trajectory>    train_traj;
 
     /// Destructor
     virtual ~RouteLoader() {}

@@ -7,6 +7,8 @@
 		<WheelDiameter>1.25</WheelDiameter>
 		<MainResist>default</MainResist>
 		<NumAxis>6</NumAxis>				
-        <WheelInertia>2.0</WheelInertia>        
+        <WheelInertia>2.0</WheelInertia>
+
+        <ExtModelName>test-loco/kuzov.dmd</ExtModelName>        
 	</Vehicle>
 </Config>

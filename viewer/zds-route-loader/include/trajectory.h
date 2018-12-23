@@ -14,7 +14,7 @@
 #ifndef     TRAJECTORY_H
 #define     TRAJECTORY_H
 
-#include    <osg/Referenced>
+#include    "abstract-trajectory.h"
 
 #include    <string>
 
@@ -28,7 +28,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TrainTrajectory : public osg::Referenced
+class TrainTrajectory : public Trajectory
 {
 public:
 
@@ -57,8 +57,7 @@ private:
     float                       height;
     /// Initial yaw of camera
     float                       init_yaw;
-    /// Route path (tracks data processing)
-    osg::ref_ptr<RoutePath>     routePath;
+
     /// Route directory
     std::string                 routeDir;
 

@@ -54,6 +54,21 @@ void FileSystem::setBinaryDir(const std::string &path)
     binDir = getNativePath(path);
 }
 
+void FileSystem::setDataDir(const std::string &path)
+{
+    dataDir = getNativePath(path);
+}
+
+void FileSystem::setVehicleModelsDir(const std::string &path)
+{
+    vehicleModelsDir = getNativePath(path);
+}
+
+void FileSystem::setVehicleTexturesDir(const std::string &path)
+{
+    vehicleTexturesDir = getNativePath(path);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -114,6 +129,21 @@ std::string FileSystem::getBinaryDir() const
     return binDir;
 }
 
+std::string FileSystem::getDataDir() const
+{
+    return dataDir;
+}
+
+std::string FileSystem::getVehicleModelsDir() const
+{
+    return vehicleModelsDir;
+}
+
+std::string FileSystem::getVehicleTexturesDir() const
+{
+    return vehicleTexturesDir;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -134,6 +164,8 @@ std::string FileSystem::toNativeSeparators(const std::string &path)
 
 #if __unix__
     std::replace(tmp.begin(), tmp.end(), '\\', '/');
+#else
+    std::replace(tmp.begin(), tmp.end(), '/', '\\');
 #endif
 
     return tmp;

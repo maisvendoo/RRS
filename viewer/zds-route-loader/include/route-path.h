@@ -15,9 +15,10 @@
 #ifndef     ROUTE_PATH_H
 #define     ROUTE_PATH_H
 
+#include    "abstract-path.h"
+
 #include    <fstream>
 
-#include    <osg/Referenced>
 #include    <osgDB/FileUtils>
 #include    <osgDB/FileNameUtils>
 
@@ -26,7 +27,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class RoutePath : public osg::Referenced
+class RoutePath : public MotionPath
 {
 public:
 
@@ -39,16 +40,9 @@ public:
     /// Get cartesian position and camera's attitude
     osg::Vec3 getPosition(float railway_coord, osg::Vec3 &attitude);
 
-    /// Get full length of tracks
-    float getLength() const;
-
-    /// Get visual track line node (for debug)
-    osg::Group *getTrackLine(const osg::Vec4 &color);
 
 protected:
 
-    /// Tracks full length
-    float                   length;
     /// Tracks data
     std::vector<track_t>    track_data;
 

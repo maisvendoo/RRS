@@ -49,7 +49,7 @@ void SceneLoader::load(std::string routeDir)
 //------------------------------------------------------------------------------
 osgGA::GUIEventHandler *SceneLoader::getCameraEventHandler(int direction, float camera_height)
 {
-    osg::ref_ptr<TrainTrajectory> train_traj = new TrainTrajectory(routeDir, direction, camera_height);
+    train_traj = new TrainTrajectory(routeDir, direction, camera_height);
 
     return new RailwayManipulator(train_traj.get());
 }

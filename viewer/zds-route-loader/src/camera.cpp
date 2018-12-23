@@ -17,7 +17,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-RailwayManipulator::RailwayManipulator(TrainTrajectory *train_traj)
+RailwayManipulator::RailwayManipulator(Trajectory *train_traj)
     : train_traj(train_traj)
     , ref_time(0.0)
     , _startTime(0.0)

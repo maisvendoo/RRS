@@ -39,7 +39,7 @@ public:
 
     void load(std::string routeDir);
 
-    osgGA::GUIEventHandler *getCameraEventHandler(int direction, float camera_height);
+    osgGA::GUIEventHandler *getCameraEventHandler(int direction, float camera_height);    
 
 protected:
 
