@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct traj_element_t : public osg::Referenced
+struct network_data_t : public osg::Referenced
 {
     unsigned int    route_id;
     float           coord_begin;
@@ -31,7 +31,7 @@ struct traj_element_t : public osg::Referenced
     float           delta_time;
     unsigned long   count;
 
-    traj_element_t()
+    network_data_t()
         : route_id(0)
         , coord_begin(1200.0f)
         , coord_end(1200.0f)

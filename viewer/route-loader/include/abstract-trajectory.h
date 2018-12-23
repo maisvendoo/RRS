@@ -23,7 +23,7 @@ public:
 
     Trajectory();
 
-    virtual void update(const traj_element_t &traj_elem,
+    virtual void update(const network_data_t &traj_elem,
                         const float &delta_time) = 0;
 
     virtual osg::Vec3 getPosition() const = 0;

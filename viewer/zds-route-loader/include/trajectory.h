@@ -38,7 +38,7 @@ public:
                     float height);
 
     /// Update train position
-    void update(const traj_element_t &traj_elem, const float &delta_time);
+    void update(const network_data_t &traj_elem, const float &delta_time);
 
     /// Get trajectory positiob
     osg::Vec3   getPosition() const;

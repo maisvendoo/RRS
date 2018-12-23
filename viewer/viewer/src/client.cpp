@@ -91,7 +91,7 @@ void NetworkClient::onTimerRequest()
 
             if (viewer != nullptr)
             {
-                traj_element_t *traj_elem = new traj_element_t();
+                network_data_t *traj_elem = new network_data_t();
 
                 traj_elem->route_id = 1;
                 traj_elem->coord_end = server_data.cabine_coord;

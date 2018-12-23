@@ -56,7 +56,7 @@ bool RailwayManipulator::handle(const osgGA::GUIEventAdapter &ea,
 
     case osgGA::GUIEventAdapter::USER:
     {
-        const traj_element_t *te = dynamic_cast<const traj_element_t *>(ea.getUserData());
+        const network_data_t *te = dynamic_cast<const network_data_t *>(ea.getUserData());
 
         if (te->route_id != 0)
             setTrajectoryElement(te);
@@ -81,7 +81,7 @@ bool RailwayManipulator::handle(const osgGA::GUIEventAdapter &ea,
 //
 //------------------------------------------------------------------------------
 void RailwayManipulator::moveCamera(double ref_time,
-                                    const traj_element_t &traj_element,
+                                    const network_data_t &traj_element,
                                     osgViewer::Viewer *viewer)
 {
     // Update train position on trajectory
@@ -102,7 +102,7 @@ void RailwayManipulator::moveCamera(double ref_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void RailwayManipulator::setTrajectoryElement(const traj_element_t *te)
+void RailwayManipulator::setTrajectoryElement(const network_data_t *te)
 {
     switch (traj_element.count)
     {

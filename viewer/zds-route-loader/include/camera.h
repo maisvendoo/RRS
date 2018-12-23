@@ -47,17 +47,17 @@ protected:
     /// Initial time of frame draw
     double                          _startTime;
     /// Current trajectory element
-    traj_element_t                  traj_element;
+    network_data_t                  traj_element;
     /// Camera's view matrix
     osg::Matrix                     matrix;
 
     /// Camera motion
     void moveCamera(double ref_time,
-                    const traj_element_t &traj_element,
+                    const network_data_t &traj_element,
                     osgViewer::Viewer *viewer);
 
     /// Set data to processed trajectory element
-    void setTrajectoryElement(const traj_element_t *te);
+    void setTrajectoryElement(const network_data_t *te);
 };
 
 #endif // CAMERA_H

@@ -46,7 +46,7 @@ TrainTrajectory::TrainTrajectory(std::string routeDir,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainTrajectory::update(const traj_element_t &traj_elem, const float &delta_time)
+void TrainTrajectory::update(const network_data_t &traj_elem, const float &delta_time)
 {
     float t = delta_time / traj_elem.delta_time;
     coord = (1 - t) * traj_elem.coord_begin + traj_elem.coord_end * t;
