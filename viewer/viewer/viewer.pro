@@ -27,6 +27,7 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgTextd
 
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
@@ -41,6 +42,7 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgText
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
@@ -65,6 +67,7 @@ unix {
         LIBS += -lOpenThreadsd
         LIBS += -losgGAd
         LIBS += -losgUtild
+        LIBS += -losgTextd
 
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
@@ -79,6 +82,7 @@ unix {
         LIBS +=  -lOpenThreads
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
+        LIBS += -losgText
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary

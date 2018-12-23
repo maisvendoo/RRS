@@ -93,9 +93,7 @@ bool KeyboardHandler::getKey(int key)
 //
 //------------------------------------------------------------------------------
 void KeyboardHandler::resetKey(int key)
-{//------------------------------------------------------------------------------
-    //
-    //------------------------------------------------------------------------------
+{
     QMap<int, bool>::iterator it = keys.find(key);
 
     if (it != keys.end())
@@ -131,7 +129,6 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_X);
     addKey(osgGA::GUIEventAdapter::KEY_Y);
     addKey(osgGA::GUIEventAdapter::KEY_Z);
-
 }
 
 //------------------------------------------------------------------------------

@@ -31,6 +31,7 @@
 #include    "lighting.h"
 #include    "motion-blur.h"
 #include    "qt-events.h"
+#include    "switch-view.h"
 
 #include    <QObject>
 
@@ -70,6 +71,9 @@ int RouteViewer::run()
     // Keyboard events handler
     keyboard = new KeyboardHandler();
     viewer.addEventHandler(keyboard);
+
+    // Camera switch handler
+    viewer.addEventHandler(new CameraViewHandler());
 
     client.init(settings, &viewer);
 
