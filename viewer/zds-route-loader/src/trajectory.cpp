@@ -49,7 +49,7 @@ TrainTrajectory::TrainTrajectory(std::string routeDir,
 void TrainTrajectory::update(const network_data_t &traj_elem, const float &delta_time)
 {
     float t = delta_time / traj_elem.delta_time;
-    coord = (1 - t) * traj_elem.coord_begin + traj_elem.coord_end * t;
+    coord = (1 - t) * traj_elem.te[0].coord_begin + traj_elem.te[0].coord_end * t;
 
     position = routePath->getPosition(coord, attitude);
 

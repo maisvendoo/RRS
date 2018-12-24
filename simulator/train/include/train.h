@@ -85,6 +85,8 @@ public:
 
     size_t getVehiclesNumber() const;
 
+    std::vector<Vehicle *> *getVehicles();
+
 signals:
 
     void logMessage(QString msg);

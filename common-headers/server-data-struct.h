@@ -17,7 +17,22 @@
 
 #include    <qglobal.h>
 
-const   int MAX_NUM_VEHICLES = 150;
+#include    "global-const.h"
+
+#include    <array>
+
+struct vehicle_data_t
+{
+    float   railway_coord;
+    float   wheel_angle;
+
+    vehicle_data_t()
+        : railway_coord(0.0f)
+        , wheel_angle(0.0f)
+    {
+
+    }
+};
 
 /*!
  * \struct
@@ -31,13 +46,11 @@ const   int MAX_NUM_VEHICLES = 150;
 struct server_data_t
 {
     /// Senden data count
-    quint64             count;
-    float               cabine_coord;
-    float               railway_coords[MAX_NUM_VEHICLES];
+    quint64             count;    
+    std::array<vehicle_data_t, MAX_NUM_VEHICLES> vehicles_data;
 
     server_data_t()
-        : count(0)
-        , cabine_coord(0.0f)
+        : count(0)        
     {
 
     }

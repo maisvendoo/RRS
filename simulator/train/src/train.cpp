@@ -242,6 +242,11 @@ size_t Train::getVehiclesNumber() const
     return vehicles.size();
 }
 
+std::vector<Vehicle *> *Train::getVehicles()
+{
+    return &vehicles;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

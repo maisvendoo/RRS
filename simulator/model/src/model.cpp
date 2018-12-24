@@ -344,7 +344,15 @@ void Model::configSolver(solver_config_t &solver_config)
 //------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
-    viewer_data.cabine_coord = static_cast<float>(train->getFirstVehicle()->getRailwayCoord());
+    std::vector<Vehicle *> *vehicles = train->getVehicles();
+
+    size_t i = 0;
+    for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
+    {
+        viewer_data.vehicles_data[i].railway_coord = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.vehicles_data[i].wheel_angle = static_cast<float>((*it)->getWheelAngle(0));
+        ++i;
+    }
 
     QByteArray array(sizeof(server_data_t), Qt::Uninitialized);
     memcpy(array.data(), &viewer_data, sizeof(server_data_t));

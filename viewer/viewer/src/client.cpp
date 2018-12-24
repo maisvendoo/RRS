@@ -94,8 +94,13 @@ void NetworkClient::onTimerRequest()
                 network_data_t *traj_elem = new network_data_t();
 
                 traj_elem->route_id = 1;
-                traj_elem->coord_end = server_data.cabine_coord;
                 traj_elem->delta_time = static_cast<float>(request_interval) / 1000.0f;
+
+                for (size_t i = 0; i < server_data.vehicles_data.size(); ++i)
+                {
+                    traj_elem->te[i].coord_end = server_data.vehicles_data[i].railway_coord;
+                    traj_elem->te[i].angle_end = server_data.vehicles_data[i].wheel_angle;
+                }
 
                 viewer->getEventQueue()->userEvent(traj_elem);
             }

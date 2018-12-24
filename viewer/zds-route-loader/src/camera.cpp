@@ -108,14 +108,14 @@ void RailwayManipulator::setTrajectoryElement(const network_data_t *te)
     {
     case 0:
 
-        traj_element.coord_begin = traj_element.coord_end = te->coord_end;
+        traj_element.te[0].coord_begin = traj_element.te[0].coord_end = te->te[0].coord_end;
         traj_element.delta_time = te->delta_time;
         ref_time = 0.0;
         break;
 
     case 1:
 
-        traj_element.coord_end = te->coord_end;
+        traj_element.te[0].coord_end = te->te[0].coord_end;
         traj_element.delta_time = te->delta_time;
         ref_time = 0.0;
         break;
@@ -124,13 +124,10 @@ void RailwayManipulator::setTrajectoryElement(const network_data_t *te)
 
         float curr_coord = train_traj->getCurrentCoord();
 
-        if (curr_coord < te->coord_end)
-        {
-            traj_element.coord_begin = curr_coord;
-            traj_element.coord_end = te->coord_end;
-            traj_element.delta_time = te->delta_time;
-            ref_time = 0.0;
-        }
+        traj_element.te[0].coord_begin = curr_coord;
+        traj_element.te[0].coord_end = te->te[0].coord_end;
+        traj_element.delta_time = te->delta_time;
+        ref_time = 0.0;
 
         break;
     }
