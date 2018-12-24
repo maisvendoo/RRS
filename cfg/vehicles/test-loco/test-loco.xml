@@ -9,6 +9,7 @@
 		<NumAxis>6</NumAxis>				
         <WheelInertia>2.0</WheelInertia>
 
-        <ExtModelName>test-loco/kuzov.dmd</ExtModelName>        
+        <ExtModelName>test-loco/kuzov.dmd</ExtModelName>   
+        <ExtTextureName>test-loco/kuzov.bmp</ExtTextureName>     
 	</Vehicle>
 </Config>

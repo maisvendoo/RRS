@@ -10,5 +10,6 @@
 		<DegreesOfFreedom>5</DegreesOfFreedom>
         <WheelInertia>2.0</WheelInertia>
         <ExtModelName>default-vehicle/wag-1.dmd</ExtModelName>
+        <ExtTextureName>default-vehicle/zdsPassPlac_21071.tga</ExtTextureName>
 	</Vehicle>
 </Config>
