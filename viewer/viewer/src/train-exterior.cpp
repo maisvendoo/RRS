@@ -13,6 +13,7 @@
 //------------------------------------------------------------------------------
 TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath, const std::string &train_config)
     : osgGA::GUIEventHandler ()
+    , cur_vehicle(0)
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
@@ -43,6 +44,8 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             moveTrain(ref_time, nd);
 
+            moveCamera(viewer);
+
             break;
         }
 
@@ -56,6 +59,32 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             {
                 this->nd.count = 0;
                 ref_time = 0.0;
+            }
+
+            break;
+        }
+
+    case osgGA::GUIEventAdapter::KEYDOWN:
+        {
+            switch (ea.getKey())
+            {
+            case osgGA::GUIEventAdapter::KEY_Page_Down:
+
+                cur_vehicle++;
+
+                if (cur_vehicle > static_cast<int>(vehicles_ext.size() - 1))
+                    cur_vehicle = 0;
+
+                break;
+
+            case osgGA::GUIEventAdapter::KEY_Page_Up:
+
+                cur_vehicle--;
+
+                if (cur_vehicle < 0)
+                    cur_vehicle = static_cast<int>(vehicles_ext.size() - 1);
+
+                break;
             }
 
             break;
@@ -153,8 +182,8 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
 
         osg::Matrix  matrix;
+        matrix *= osg::Matrix::rotate(static_cast<double>(vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
         matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
-        matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
         matrix *= osg::Matrix::translate(vehicles_ext[i].position);
 
 
@@ -194,4 +223,27 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
 
     nd.count++;
     ref_time = 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
+{
+    osg::Matrix viewMatrix;
+
+    float coord = vehicles_ext[cur_vehicle].coord;
+    osg::Vec3 position;
+    osg::Vec3 attitude;
+
+    position = routePath->getPosition(coord, attitude);
+
+    position.z() += 3.0f;
+    attitude.x() = -osg::PIf / 2.0f + attitude.x();
+
+    viewMatrix = osg::Matrix::translate(position *= -1.0f);
+    viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
+    viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.z()), osg::Vec3(0.0f, 1.0f, 0.0f));
+
+    viewer->getCamera()->setViewMatrix(viewMatrix);
 }

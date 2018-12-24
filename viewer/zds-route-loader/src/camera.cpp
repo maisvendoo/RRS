@@ -18,7 +18,8 @@
 //
 //------------------------------------------------------------------------------
 RailwayManipulator::RailwayManipulator(Trajectory *train_traj)
-    : train_traj(train_traj)
+    : cur_vehicle(0)
+    , train_traj(train_traj)
     , ref_time(0.0)
     , _startTime(0.0)
 
@@ -108,14 +109,14 @@ void RailwayManipulator::setTrajectoryElement(const network_data_t *te)
     {
     case 0:
 
-        traj_element.te[0].coord_begin = traj_element.te[0].coord_end = te->te[0].coord_end;
+        traj_element.te[cur_vehicle].coord_begin = traj_element.te[cur_vehicle].coord_end = te->te[cur_vehicle].coord_end;
         traj_element.delta_time = te->delta_time;
         ref_time = 0.0;
         break;
 
     case 1:
 
-        traj_element.te[0].coord_end = te->te[0].coord_end;
+        traj_element.te[cur_vehicle].coord_end = te->te[cur_vehicle].coord_end;
         traj_element.delta_time = te->delta_time;
         ref_time = 0.0;
         break;
@@ -124,8 +125,8 @@ void RailwayManipulator::setTrajectoryElement(const network_data_t *te)
 
         float curr_coord = train_traj->getCurrentCoord();
 
-        traj_element.te[0].coord_begin = curr_coord;
-        traj_element.te[0].coord_end = te->te[0].coord_end;
+        traj_element.te[cur_vehicle].coord_begin = curr_coord;
+        traj_element.te[cur_vehicle].coord_end = te->te[cur_vehicle].coord_end;
         traj_element.delta_time = te->delta_time;
         ref_time = 0.0;
 

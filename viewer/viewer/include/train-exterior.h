@@ -14,6 +14,8 @@
 #include    "abstract-path.h"
 #include    "trajectory-element.h"
 
+#include    <osgViewer/Viewer>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -42,6 +44,8 @@ public:
 
 private:
 
+    int cur_vehicle;
+
     osg::ref_ptr<MotionPath> routePath;
 
     osg::ref_ptr<osg::Group> trainExterior;
@@ -58,6 +62,8 @@ private:
     void moveTrain(double ref_time, const network_data_t &nd);
 
     void processServerData(const network_data_t *server_data);
+
+    void moveCamera(osgViewer::Viewer *viewer);
 };
 
 #endif // TRAIN_EXTERIOR_H

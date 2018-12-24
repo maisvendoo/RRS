@@ -40,6 +40,7 @@ public:
 
 protected:
 
+    size_t  cur_vehicle;
     /// Train trajectory object
     osg::ref_ptr<Trajectory>        train_traj;
     /// Reference time count between position data update

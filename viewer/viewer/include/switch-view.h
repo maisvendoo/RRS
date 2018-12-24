@@ -39,6 +39,8 @@ private:
 
     double  angleHorizontal;
 
+    double  long_shift;
+
     void setCameraView(CameraView cameraView, osg::Camera *camera);
 };
 

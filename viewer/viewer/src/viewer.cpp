@@ -235,7 +235,7 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
     loader->load(routeDir);
     root = loader->getRoot();
 
-    viewer.addEventHandler(loader->getCameraEventHandler(1, settings.eye_height));
+    loader->getCameraEventHandler(1, settings.eye_height);
 
     train_ext_handler = new TrainExteriorHandler(loader->getMotionPath(), settings.train_config);
     root->addChild(train_ext_handler->getExterior());
