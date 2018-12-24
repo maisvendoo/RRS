@@ -16,9 +16,9 @@
         <WheelModel>default-vehicle/wheel-1.dmd</WheelModel>
         <WheelTexture>default-vehicle/zdsPassPlac_21071.tga</WheelTexture>
 
-        <Axis>0.0 -7.3 0.8</Axis>
-        <Axis>0.0 7.3 0.8</Axis>
-        <Axis>0.0 -9.6 0.8</Axis>
-        <Axis>0.0 9.6 0.8</Axis>
+        <Axis>0.0 -7.3 0.786</Axis>
+        <Axis>0.0 7.3 0.786</Axis>
+        <Axis>0.0 -9.7 0.786</Axis>
+        <Axis>0.0 9.7 0.786</Axis>
 	</Vehicle>
 </Config>
