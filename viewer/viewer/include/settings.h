@@ -6,6 +6,7 @@
 struct settings_t
 {
     std::string     route_dir;
+    std::string     train_config;
     std::string     host_addr;
     int             port;
     int             x;
@@ -29,6 +30,7 @@ struct settings_t
 
     settings_t()
         : route_dir("")
+        , train_config("")
         , host_addr("127.0.0.1")
         , port(1992)
         , x(50)

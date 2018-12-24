@@ -23,6 +23,8 @@
 
 #include    "keyboard.h"
 
+#include    "train-exterior.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -59,6 +61,8 @@ protected:
 
     KeyboardHandler *keyboard;
 
+    TrainExteriorHandler *train_ext_handler;
+
     /// Initialization
     bool init(int argc, char *argv[]);   
 
@@ -67,7 +71,7 @@ protected:
 
     /// Override settings from command line
     void overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
-                                       settings_t settings);
+                                       settings_t &settings);
 
     /// Load route form directory
     bool loadRoute(const std::string &routeDir);

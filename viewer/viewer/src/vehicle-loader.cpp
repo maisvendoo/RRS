@@ -10,9 +10,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::MatrixTransform *loadVehicle(const std::string &configPath)
+osg::Group *loadVehicle(const std::string &configPath)
 {
-    ConfigReader cfg(configPath);
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), configPath + fs.separator() + configPath + ".xml");
+    ConfigReader cfg(cfg_path);
 
     std::string modelName = "";
     std::string textureName = "";
@@ -24,17 +26,16 @@ osg::MatrixTransform *loadVehicle(const std::string &configPath)
         cfg.getValue(secName, "ExtTextureName", textureName);
     }
 
-    FileSystem &fs = FileSystem::getInstance();
     std::string modelPath = osgDB::findDataFile(fs.combinePath(fs.getVehicleModelsDir(), modelName));
 
-    osg::ref_ptr<osg::MatrixTransform> transform = new osg::MatrixTransform;
+    osg::ref_ptr<osg::Group> group = new osg::Group;
 
     if (!modelPath.empty())
     {
         modelPath = fs.toNativeSeparators(modelPath);
         osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(modelPath);
-        transform->addChild(model.get());
+        group->addChild(model.get());
     }
 
-    return transform.release();
+    return group.release();
 }

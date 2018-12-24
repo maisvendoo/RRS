@@ -21,6 +21,10 @@ public:
 
     bool isOpenned() const;
 
+    osgDB::XmlNode *getConfigNode();
+
+    osgDB::XmlNode *findSection(osgDB::XmlNode *node, const std::string &section);
+
     template<class T>
     bool getValue(const std::string &section, const std::string &param, T &value)
     {
@@ -50,8 +54,6 @@ protected:
     osg::ref_ptr<osgDB::XmlNode> root;
 
     std::string getStrValue(const std::string &section, const std::string &param);
-
-    osgDB::XmlNode *findSection(osgDB::XmlNode *node, const std::string &section);
 };
 
 #endif

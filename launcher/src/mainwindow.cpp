@@ -181,6 +181,7 @@ void MainWindow::startViewer()
 
     QStringList args;
     args << "--route" << selectedRoutePath;
+    args << "--train" << selectedTrain;
 
     viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     viewerProc.start(viewerPath, args);

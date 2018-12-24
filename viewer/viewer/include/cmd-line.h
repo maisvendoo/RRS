@@ -46,6 +46,7 @@ struct option_t
 struct cmd_line_t
 {
     option_t<std::string>     route_dir;
+    option_t<std::string>     train_config;
     option_t<std::string>     host_addr;
     option_t<int>             port;
     option_t<int>             width;

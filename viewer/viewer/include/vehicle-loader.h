@@ -13,6 +13,6 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::MatrixTransform *loadVehicle(const std::string &configPath);
+osg::Group *loadVehicle(const std::string &configPath);
 
 #endif // VEHICLE_LOADER_H

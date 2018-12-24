@@ -24,6 +24,7 @@ CommandLineParser::CommandLineParser(int argc, char *argv[])
     std::string value = "";
 
     cmd_line.route_dir.is_present = args.read("--route", cmd_line.route_dir.value);
+    cmd_line.train_config.is_present = args.read("--train", cmd_line.train_config.value);
     cmd_line.host_addr.is_present = args.read("--host-addr", cmd_line.host_addr.value);
 
     if (args.read("--port", value))

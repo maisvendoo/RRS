@@ -160,7 +160,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
 //
 //------------------------------------------------------------------------------
 void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
-                                                settings_t settings)
+                                                settings_t &settings)
 {
     if (cmd_line.host_addr.is_present)
         settings.host_addr = cmd_line.host_addr.value;
@@ -179,6 +179,9 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 
     if (cmd_line.localmode.is_present)
         settings.localmode = cmd_line.localmode.value;
+
+    if (cmd_line.train_config.is_present)
+        settings.train_config = cmd_line.train_config.value;
 }
 
 //------------------------------------------------------------------------------
@@ -233,6 +236,10 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
     root = loader->getRoot();
 
     viewer.addEventHandler(loader->getCameraEventHandler(1, settings.eye_height));
+
+    train_ext_handler = new TrainExteriorHandler(loader->getMotionPath(), settings.train_config);
+    root->addChild(train_ext_handler->getExterior());
+    viewer.addEventHandler(train_ext_handler);
 
     return true;
 }
