@@ -51,6 +51,8 @@ osg::Group *loadVehicle(const std::string &configPath)
 
     std::string modelName = "";
     std::string textureName = "";
+    std::string wheelModelName = "";
+    std::string wheelTextureName = "";
 
     if (cfg.isOpenned())
     {
@@ -91,4 +93,57 @@ osg::Group *loadVehicle(const std::string &configPath)
     }
 
     return group.release();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::MatrixTransform *loadWheels(const std::string &configPath)
+{
+    osg::ref_ptr<osg::MatrixTransform> rotate = new osg::MatrixTransform;
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), configPath + fs.separator() + configPath + ".xml");
+    ConfigReader cfg(cfg_path);
+
+    std::string wheelModelName = "";
+    std::string wheelTextureName = "";
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "WheelModel", wheelModelName);
+        cfg.getValue(secName, "WheelTexture", wheelTextureName);
+    }
+
+    std::string wheelModelPath = osgDB::findDataFile(fs.combinePath(fs.getVehicleModelsDir(), wheelModelName));
+
+    osg::ref_ptr<osg::Node> model;
+
+    if (!wheelModelName.empty())
+    {
+        wheelModelPath = fs.toNativeSeparators(wheelModelPath);
+        model = osgDB::readNodeFile(wheelModelPath);
+        rotate->addChild(model.get());
+    }
+
+    if (!wheelTextureName.empty())
+    {
+        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(), wheelTextureName);
+        osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
+
+        if (texture.valid())
+        {
+            model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
+
+            std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
+
+            if (ext == "tga")
+                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+            else
+                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
+        }
+    }
+
+    return rotate.release();
 }

@@ -8,12 +8,15 @@
 
 #include    <osgViewer/Viewer>
 
+#include    <sstream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath, const std::string &train_config)
     : osgGA::GUIEventHandler ()
     , cur_vehicle(0)
+    , long_shift(0.0f)
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
@@ -85,6 +88,18 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                     cur_vehicle = static_cast<int>(vehicles_ext.size() - 1);
 
                 break;
+
+            case osgGA::GUIEventAdapter::KEY_Home:
+
+                long_shift += 0.5f;
+
+                break;
+
+            case osgGA::GUIEventAdapter::KEY_End:
+
+                long_shift -= 0.5f;
+
+                break;
             }
 
             break;
@@ -153,12 +168,16 @@ void TrainExteriorHandler::load(const std::string &train_config)
             }
 
             osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(module_config_name);
+            osg::ref_ptr<osg::MatrixTransform> wheel_model = loadWheels(module_config_name);
+
+            setAxis(vehicle_model.get(), wheel_model.get(), module_config_name);
 
             for (int i = 0; i < count; ++i)
             {
                 vehicle_exterior_t vehicle_ext;
                 vehicle_ext.transform = new osg::MatrixTransform;
                 vehicle_ext.transform->addChild(vehicle_model.get());
+                vehicle_ext.wheel_rotation = wheel_model.get();
 
                 vehicles_ext.push_back(vehicle_ext);
                 trainExterior->addChild(vehicle_ext.transform.get());
@@ -176,10 +195,12 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
-        float coord = (1 - t) * nd.te[i].coord_begin + nd.te[i].coord_end * t;
+        float coord = (1.0f - t) * nd.te[i].coord_begin + nd.te[i].coord_end * t;
+        float angle = (1.0f - t) * nd.te[i].angle_begin + nd.te[i].angle_end * t;
+
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
         vehicles_ext[i].coord = coord;
-
+        vehicles_ext[i].wheel_angle = angle;
 
         osg::Matrix  matrix;
         matrix *= osg::Matrix::rotate(static_cast<double>(vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
@@ -188,6 +209,11 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
 
         vehicles_ext[i].transform->setMatrix(matrix);
+
+        osg::Matrix rotMat = osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].wheel_angle), osg::Vec3(1.0f, 0.0f, 0.0f));
+
+        if (vehicles_ext[i].wheel_rotation != nullptr)
+            vehicles_ext[i].wheel_rotation->setMatrix(rotMat);
     }
 }
 
@@ -203,19 +229,25 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
         case 0:
 
             nd.te[i].coord_begin = nd.te[i].coord_end = server_data->te[i].coord_end;
+            nd.te[i].angle_begin = nd.te[i].angle_end = server_data->te[i].angle_end;
             nd.delta_time = server_data->delta_time;
             break;
 
         case 1:
 
             nd.te[i].coord_end = server_data->te[i].coord_end;
+            nd.te[i].angle_end = server_data->te[i].angle_end;
             nd.delta_time = server_data->delta_time;
             break;
 
         default:
 
             nd.te[i].coord_begin = vehicles_ext[i].coord;
+            nd.te[i].angle_begin = vehicles_ext[i].wheel_angle;
+
             nd.te[i].coord_end = server_data->te[i].coord_end;
+            nd.te[i].angle_end = server_data->te[i].angle_end;
+
             nd.delta_time = server_data->delta_time;
             break;
         }
@@ -232,13 +264,15 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 {
     osg::Matrix viewMatrix;
 
-    float coord = vehicles_ext[cur_vehicle].coord;
+    float coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord;
     osg::Vec3 position;
     osg::Vec3 attitude;
 
     position = routePath->getPosition(coord, attitude);
 
     position.z() += 3.0f;
+    position.y() += long_shift;
+
     attitude.x() = -osg::PIf / 2.0f + attitude.x();
 
     viewMatrix = osg::Matrix::translate(position *= -1.0f);
@@ -246,4 +280,43 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.z()), osg::Vec3(0.0f, 1.0f, 0.0f));
 
     viewer->getCamera()->setViewMatrix(viewMatrix);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::setAxis(osg::Group *vehicle,
+                                   osg::MatrixTransform *wheel,
+                                   const std::string &config_name)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), config_name + fs.separator() + config_name + ".xml");
+    ConfigReader cfg(cfg_path);
+
+    osgDB::XmlNode *config_node = cfg.getConfigNode();
+
+    for (auto i = config_node->children.begin(); i != config_node->children.end(); ++i)
+    {
+        if ((*i)->name == "Vehicle")
+        {
+            osgDB::XmlNode *vehicle_node = *i;
+
+            for (auto j = vehicle_node->children.begin(); j != vehicle_node->children.end(); ++j)
+            {
+                if ((*j)->name == "Axis")
+                {
+                    std::string tmp = (*j)->contents;
+                    std::istringstream ss(tmp);
+
+                    osg::Vec3 pos;
+                    ss >> pos.x() >> pos.y() >> pos.z();
+
+                    osg::ref_ptr<osg::MatrixTransform> trans = new osg::MatrixTransform;
+                    trans->setMatrix(osg::Matrix::translate(pos));
+                    trans->addChild(wheel);
+                    vehicle->addChild(trans.get());
+                }
+            }
+        }
+    }
 }

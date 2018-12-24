@@ -348,11 +348,11 @@ void Vehicle::integrationPostStep(state_vector_t &Y, double t)
     railway_coord = Y[idx];
     velocity = Y[idx + s];
 
-    /*for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1];
         wheel_omega[i] = Y[idx + s + i + 1];
-    }*/
+    }
 
     postStep(t);
 }
@@ -426,6 +426,9 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getInt(secName, "NumAxis", tmp);
 
         num_axis = static_cast<size_t>(tmp);
+        wheel_rotation_angle.resize(num_axis);
+        wheel_omega.resize(num_axis);
+
         s = num_axis + 1;
 
         Q_a.resize(s);

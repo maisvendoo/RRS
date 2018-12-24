@@ -16,17 +16,7 @@
 
 #include    <osgViewer/Viewer>
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-struct vehicle_exterior_t
-{
-    osg::ref_ptr<osg::MatrixTransform> transform;
-    osg::Vec3   position;
-    osg::Vec3   attitude;
-    float       wheel_angle;
-    float       coord;
-};
+#include    "vehicle-exterior.h"
 
 //------------------------------------------------------------------------------
 //
@@ -45,6 +35,7 @@ public:
 private:
 
     int cur_vehicle;
+    float long_shift;
 
     osg::ref_ptr<MotionPath> routePath;
 
@@ -64,6 +55,10 @@ private:
     void processServerData(const network_data_t *server_data);
 
     void moveCamera(osgViewer::Viewer *viewer);
+
+    void setAxis(osg::Group *vehicle,
+                 osg::MatrixTransform *wheel,
+                 const std::string &config_name);
 };
 
 #endif // TRAIN_EXTERIOR_H
