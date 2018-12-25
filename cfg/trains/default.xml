@@ -4,7 +4,7 @@
 		<CouplingModule>ef-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
 		<Title>Тестовый поезд</Title>
-		<Description>Поезд из 40 полувагонов и тестового локомотива. Предназначен для отладки симулятора и будет удален впоследствии</Description>
+		<Description>Поезд из 20 пассажирских (плацкартных) вагонов и тестового локомотива. Предназначен для отладки симулятора и будет удален впоследствии</Description>
 	</Common>
 	<Vehicle>
 		<Module>test-loco</Module>

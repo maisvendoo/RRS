@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-//      TCP-client for chenge data with simulator physichs
+//      TCP-client for exchange data with simulator physichs
 //      (c) maisvendoo, 18/12/2018
 //
 //------------------------------------------------------------------------------

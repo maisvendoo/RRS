@@ -1,15 +1,27 @@
 //------------------------------------------------------------------------------
 //
-//
-//
+//      Motion blur effect operation (view post processing)
+//      (c) maisvendoo, 02/12/2018
 //
 //------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Motion blur effect operation (view post processing)
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 02/12/2018
+ */
+
 #ifndef     MOTION_BLUR_H
 #define     MOTION_BLUR_H
 
 #include    <osg/Object>
 #include    <osgUtil/Optimizer>
 
+/*!
+ * \class
+ * \brief Motion blur operation
+ */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -17,6 +29,7 @@ class MotionBlurOperation : public osg::Operation
 {
 public:
 
+    /// Constructor
     MotionBlurOperation(double persistence)
         : osg::Referenced(true)
         , osg::Operation("MotionBlur", true)
@@ -27,6 +40,7 @@ public:
 
     }
 
+    /// Motion blur handler
     virtual void operator() (osg::Object *object);
 
 protected:

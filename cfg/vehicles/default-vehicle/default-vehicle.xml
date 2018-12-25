@@ -2,8 +2,8 @@
 <Config>
 	<Vehicle>
 
-		<EmptyMass>24000</EmptyMass>
-		<PayloadMass>69000</PayloadMass>
+		<EmptyMass>53500</EmptyMass>
+		<PayloadMass>6000</PayloadMass>
 		<Length>25.0</Length>
 		<WheelDiameter>0.95</WheelDiameter>
 		<MainResist>default</MainResist>
@@ -22,6 +22,6 @@
 
         <Axis>0.0 7.3 0.786</Axis>        
         <Axis>0.0 9.7 0.786</Axis>
-        
+
 	</Vehicle>
 </Config>

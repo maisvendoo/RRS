@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Functions for loading external model of vehicle
+//      (c) maisvendoo, 24/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Functions for loading external model of vehicle
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 24/12/2018
+ */
+
 #include    "vehicle-loader.h"
 
 #include    "config-reader.h"
@@ -15,10 +29,14 @@ osg::Texture2D *createTexture(const std::string &path)
 {
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
 
+    // Loading texture from file
     std::string fileName = osgDB::findDataFile(path);
 
     if (fileName.empty())
+    {
+        OSG_FATAL << "ERROR: texture image " << path << " is't found" << std::endl;
         return nullptr;
+    }
 
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(fileName);
 
@@ -33,9 +51,12 @@ osg::Texture2D *createTexture(const std::string &path)
     }
 
     texture->setImage(image.get());
+
+    // Linear texture filtration (temporary!!!)
     texture->setNumMipmapLevels(0);
     texture->setFilter(osg::Texture::MIN_FILTER , osg::Texture::LINEAR);
     texture->setFilter(osg::Texture::MAG_FILTER , osg::Texture::LINEAR);
+
     texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture::REPEAT);
     texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture::REPEAT);
     texture->setUnRefImageDataAfterApply(true);
@@ -48,15 +69,19 @@ osg::Texture2D *createTexture(const std::string &path)
 //------------------------------------------------------------------------------
 osg::Group *loadVehicle(const std::string &configPath)
 {
+    // Group node for vehicle model loading
+    osg::ref_ptr<osg::Group> group = new osg::Group;
+
+    // Open vehicle config file
     FileSystem &fs = FileSystem::getInstance();
-    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), configPath + fs.separator() + configPath + ".xml");
+    std::string relative_config_path = configPath + fs.separator() + configPath + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
     ConfigReader cfg(cfg_path);
 
     std::string modelName = "";
-    std::string textureName = "";
-    std::string wheelModelName = "";
-    std::string wheelTextureName = "";
+    std::string textureName = "";    
 
+    // Reading data about body's 3D-model and texture
     if (cfg.isOpenned())
     {
         std::string secName = "Vehicle";
@@ -64,9 +89,9 @@ osg::Group *loadVehicle(const std::string &configPath)
         cfg.getValue(secName, "ExtTextureName", textureName);
     }
 
-    std::string modelPath = osgDB::findDataFile(fs.combinePath(fs.getVehicleModelsDir(), modelName));
-
-    osg::ref_ptr<osg::Group> group = new osg::Group;
+    // Loading 3D-model from file
+    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
+    std::string modelPath = osgDB::findDataFile(model_path);
 
     osg::ref_ptr<osg::Node> model;
 
@@ -75,6 +100,10 @@ osg::Group *loadVehicle(const std::string &configPath)
         modelPath = fs.toNativeSeparators(modelPath);
         model = osgDB::readNodeFile(modelPath);
         group->addChild(model.get());
+    }
+    else
+    {
+        OSG_FATAL << "ERROR: model " << model_path << " is't found";
     }
 
     if (!textureName.empty())
@@ -103,12 +132,16 @@ osg::Group *loadVehicle(const std::string &configPath)
 //------------------------------------------------------------------------------
 osg::MatrixTransform *loadWheels(const std::string &configPath)
 {
+    // Transformation for wheels own rotation (around own axis)
     osg::ref_ptr<osg::MatrixTransform> rotate = new osg::MatrixTransform;
 
+    // Loading vehicle config file
     FileSystem &fs = FileSystem::getInstance();
-    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), configPath + fs.separator() + configPath + ".xml");
+    std::string relative_config_path = configPath + fs.separator() + configPath + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
     ConfigReader cfg(cfg_path);
 
+    // Reading wheel parameters
     std::string wheelModelName = "";
     std::string wheelTextureName = "";
 
@@ -119,7 +152,9 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
         cfg.getValue(secName, "WheelTexture", wheelTextureName);
     }
 
-    std::string wheelModelPath = osgDB::findDataFile(fs.combinePath(fs.getVehicleModelsDir(), wheelModelName));
+    // Loading wheels 3D-model
+    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), wheelModelName);
+    std::string wheelModelPath = osgDB::findDataFile(model_path);
 
     osg::ref_ptr<osg::Node> model;
 
@@ -129,10 +164,17 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
         model = osgDB::readNodeFile(wheelModelPath);
         rotate->addChild(model.get());
     }
+    else
+    {
+        OSG_FATAL << "ERROR: model " << model_path << " is't found";
+    }
 
+    // Loading texture
     if (!wheelTextureName.empty())
     {
-        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(), wheelTextureName);
+        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(),
+                                              wheelTextureName);
+
         osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
 
         if (texture.valid())

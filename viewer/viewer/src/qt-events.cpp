@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Qt events loop handler
+//      (c) maisvendoo, 18/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Qt events loop handler
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 18/12/2018
+ */
+
 #include    "qt-events.h"
 
 //------------------------------------------------------------------------------
@@ -20,6 +34,7 @@ bool QtEventsHandler::handle(const osgGA::GUIEventAdapter &ea,
     {
     case osgGA::GUIEventAdapter::FRAME:
         {
+            // Process qt signals and event
             QApplication::processEvents(QEventLoop::AllEvents);
 
             break;

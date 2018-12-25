@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Motion blur effect operation (view post processing)
+//      (c) maisvendoo, 02/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Motion blur effect operation (view post processing)
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 02/12/2018
+ */
+
 #include    "motion-blur.h"
 
 //------------------------------------------------------------------------------

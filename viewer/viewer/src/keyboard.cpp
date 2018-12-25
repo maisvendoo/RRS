@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Keyboard processing to transmite keyboard state to server
+//      (c) maisvendoo, 18/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief
+ * \copyright
+ * \author
+ * \date
+ */
+
 #include    "keyboard.h"
 
 #include    <QDataStream>
