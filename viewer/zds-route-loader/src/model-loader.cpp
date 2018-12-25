@@ -54,7 +54,7 @@ void createTexture(const std::string &texture_path, osg::Texture2D *texture)
     }
 
     // Apply image for texture
-    texture->setImage(image.get());
+    texture->setImage(image.get());    
     texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture::REPEAT);
     texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture::REPEAT);    
     texture->setUnRefImageDataAfterApply(true);    

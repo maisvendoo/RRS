@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Loading and processing train exterior
+//      (c) maisvendoo, 24/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Loading and processing train exterior
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 24/12/2018
+ */
+
 #include    "train-exterior.h"
 
 #include    "config-reader.h"
@@ -13,7 +27,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath, const std::string &train_config)
+TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath,
+                                           const std::string &train_config)
     : osgGA::GUIEventHandler ()
     , cur_vehicle(0)
     , long_shift(0.0f)
@@ -191,25 +206,30 @@ void TrainExteriorHandler::load(const std::string &train_config)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 {
+    // Time to relative units conversion
     float t = static_cast<float>(ref_time) / nd.delta_time;
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
+        // Interframe railway coordinate and wheels angle linear interpolation
         float coord = (1.0f - t) * nd.te[i].coord_begin + nd.te[i].coord_end * t;
         float angle = (1.0f - t) * nd.te[i].angle_begin + nd.te[i].angle_end * t;
 
+        // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
+
+        // Store current railway coordinate and wheels angle
         vehicles_ext[i].coord = coord;
         vehicles_ext[i].wheel_angle = angle;
 
+        // Apply vehicle body matrix transform
         osg::Matrix  matrix;
         matrix *= osg::Matrix::rotate(static_cast<double>(vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
         matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
         matrix *= osg::Matrix::translate(vehicles_ext[i].position);
-
-
         vehicles_ext[i].transform->setMatrix(matrix);
 
+        // Apply wheel axis rotation
         osg::Matrix rotMat = osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].wheel_angle), osg::Vec3(1.0f, 0.0f, 0.0f));
 
         if (vehicles_ext[i].wheel_rotation != nullptr)
@@ -226,21 +246,21 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
     {
         switch (nd.count)
         {
-        case 0:
+        case 0: // Initialization of train position
 
             nd.te[i].coord_begin = nd.te[i].coord_end = server_data->te[i].coord_end;
             nd.te[i].angle_begin = nd.te[i].angle_end = server_data->te[i].angle_end;
             nd.delta_time = server_data->delta_time;
             break;
 
-        case 1:
+        case 1: // Set first moving interpolation piece
 
             nd.te[i].coord_end = server_data->te[i].coord_end;
             nd.te[i].angle_end = server_data->te[i].angle_end;
             nd.delta_time = server_data->delta_time;
             break;
 
-        default:
+        default: // Applay new data received from server
 
             nd.te[i].coord_begin = vehicles_ext[i].coord;
             nd.te[i].angle_begin = vehicles_ext[i].wheel_angle;
@@ -264,21 +284,23 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 {
     osg::Matrix viewMatrix;
 
+    // Get current vehicle cartesian position
     float coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord;
     osg::Vec3 position;
     osg::Vec3 attitude;
 
     position = routePath->getPosition(coord, attitude);
 
+    // Camera position and attitude calculation
     position.z() += 3.0f;
     position.y() += long_shift;
 
     attitude.x() = -osg::PIf / 2.0f + attitude.x();
 
+    // Calculate and set view matrix
     viewMatrix = osg::Matrix::translate(position *= -1.0f);
     viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
     viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.z()), osg::Vec3(0.0f, 1.0f, 0.0f));
-
     viewer->getCamera()->setViewMatrix(viewMatrix);
 }
 
@@ -289,9 +311,19 @@ void TrainExteriorHandler::setAxis(osg::Group *vehicle,
                                    osg::MatrixTransform *wheel,
                                    const std::string &config_name)
 {
+    // Calculate vehicle config path
     FileSystem &fs = FileSystem::getInstance();
-    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), config_name + fs.separator() + config_name + ".xml");
+    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
     ConfigReader cfg(cfg_path);
+
+    if (!cfg.isOpenned())
+    {
+        OSG_FATAL << "Vehicle config " << cfg_path << " is't foung" << std::endl;
+        return;
+    }
 
     osgDB::XmlNode *config_node = cfg.getConfigNode();
 
@@ -301,19 +333,23 @@ void TrainExteriorHandler::setAxis(osg::Group *vehicle,
         {
             osgDB::XmlNode *vehicle_node = *i;
 
+            // Read all "Axis" parameters in config
             for (auto j = vehicle_node->children.begin(); j != vehicle_node->children.end(); ++j)
             {
                 if ((*j)->name == "Axis")
                 {
                     std::string tmp = (*j)->contents;
-                    std::istringstream ss(tmp);
 
+                    // Parse coordinates of axis
+                    std::istringstream ss(tmp);
                     osg::Vec3 pos;
                     ss >> pos.x() >> pos.y() >> pos.z();
 
+                    // Shift axis transformation
                     osg::ref_ptr<osg::MatrixTransform> trans = new osg::MatrixTransform;
                     trans->setMatrix(osg::Matrix::translate(pos));
                     trans->addChild(wheel);
+                    // Add axis to vehicle model
                     vehicle->addChild(trans.get());
                 }
             }

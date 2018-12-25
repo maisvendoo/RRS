@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Vehicle>
+
 		<EmptyMass>24000</EmptyMass>
 		<PayloadMass>69000</PayloadMass>
 		<Length>25.0</Length>
@@ -17,8 +18,10 @@
         <WheelTexture>default-vehicle/zdsPassPlac_21071.tga</WheelTexture>
 
         <Axis>0.0 -7.3 0.786</Axis>
-        <Axis>0.0 7.3 0.786</Axis>
         <Axis>0.0 -9.7 0.786</Axis>
+
+        <Axis>0.0 7.3 0.786</Axis>        
         <Axis>0.0 9.7 0.786</Axis>
+        
 	</Vehicle>
 </Config>

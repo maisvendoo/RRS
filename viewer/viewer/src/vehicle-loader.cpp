@@ -33,6 +33,9 @@ osg::Texture2D *createTexture(const std::string &path)
     }
 
     texture->setImage(image.get());
+    texture->setNumMipmapLevels(0);
+    texture->setFilter(osg::Texture::MIN_FILTER , osg::Texture::LINEAR);
+    texture->setFilter(osg::Texture::MAG_FILTER , osg::Texture::LINEAR);
     texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture::REPEAT);
     texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture::REPEAT);
     texture->setUnRefImageDataAfterApply(true);
