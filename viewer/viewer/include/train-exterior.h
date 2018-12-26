@@ -85,12 +85,7 @@ private:
     void processServerData(const network_data_t *server_data);
 
     /// Move camera along track
-    void moveCamera(osgViewer::Viewer *viewer);
-
-    /// Set vehiclws wheels axis
-    void setAxis(osg::Group *vehicle,
-                 osg::MatrixTransform *wheel,
-                 const std::string &config_name);
+    void moveCamera(osgViewer::Viewer *viewer);    
 };
 
 #endif // TRAIN_EXTERIOR_H
