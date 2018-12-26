@@ -37,8 +37,17 @@ osg::Group *loadVehicle(const std::string &configPath);
 //------------------------------------------------------------------------------
 osg::MatrixTransform *loadWheels(const std::string &configPath);
 
+/*!
+ * \fn
+ * \brief Set wheels to vehicle
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void setAxis(osg::Group *vehicle,
              osg::MatrixTransform *wheel,
              const std::string &config_name);
+
+void loadCabine(osg::Group *vehicle, const std::string &config_name);
 
 #endif // VEHICLE_LOADER_H

@@ -206,6 +206,8 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
             setAxis(vehicle_model.get(), wheel_model.get(), module_config_name);
 
+            loadCabine(vehicle_model.get(), module_config_name);
+
             for (int i = 0; i < count; ++i)
             {
                 vehicle_exterior_t vehicle_ext;

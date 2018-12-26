@@ -196,7 +196,8 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void setAxis(osg::Group *vehicle, osg::MatrixTransform *wheel, const std::string &config_name)
+void setAxis(osg::Group *vehicle, osg::MatrixTransform *wheel,
+             const std::string &config_name)
 {
     // Calculate vehicle config path
     FileSystem &fs = FileSystem::getInstance();
@@ -240,6 +241,72 @@ void setAxis(osg::Group *vehicle, osg::MatrixTransform *wheel, const std::string
                     vehicle->addChild(trans.get());
                 }
             }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void loadCabine(osg::Group *vehicle, const std::string &config_name)
+{
+    // Calculate vehicle config path
+    FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (!cfg.isOpenned())
+    {
+        OSG_FATAL << "Vehicle config " << cfg_path << " is't foung" << std::endl;
+        return;
+    }
+
+    std::string cabineModelName = "";
+    std::string cabineTextureName = "";
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "CabineModel", cabineModelName);
+        cfg.getValue(secName, "CabineTexture", cabineTextureName);
+    }
+
+    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), cabineModelName);
+    std::string cabineModelPath = osgDB::findDataFile(model_path);
+
+    osg::ref_ptr<osg::Node> model;
+
+    if (!cabineModelName.empty())
+    {
+        cabineModelPath = fs.toNativeSeparators(cabineModelPath);
+        model = osgDB::readNodeFile(cabineModelPath);
+        vehicle->addChild(model.get());
+    }
+    else
+    {
+        OSG_FATAL << "ERROR: model " << model_path << " is't found";
+    }
+
+    if (!cabineTextureName.empty())
+    {
+        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(),
+                                              cabineTextureName);
+
+        osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
+
+        if (texture.valid())
+        {
+            model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
+
+            std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
+
+            if (ext == "tga")
+                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+            else
+                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
         }
     }
 }

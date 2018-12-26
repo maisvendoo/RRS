@@ -25,5 +25,8 @@
         <Axis>0.0 4.1 0.85</Axis>
         
 
+        <CabineModel>test-loco/cab.dmd</CabineModel>
+        <CabineTexture>test-loco/cab.bmp</CabineTexture>
+
 	</Vehicle>
 </Config>
