@@ -25,6 +25,32 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+osg::Node *loadModel(const std::string &modelName)
+{
+    FileSystem &fs = FileSystem::getInstance();
+
+    osg::ref_ptr<osg::Node> model;
+
+    // Loading 3D-model from file
+    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
+    std::string modelPath = osgDB::findDataFile(model_path);
+
+    if (!modelPath.empty())
+    {
+        modelPath = fs.toNativeSeparators(modelPath);
+        model = osgDB::readNodeFile(modelPath);
+    }
+    else
+    {
+        OSG_FATAL << "ERROR: model " << model_path << " is't found";
+    }
+
+    return model.release();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Texture2D *createTexture(const std::string &path)
 {
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
@@ -67,6 +93,32 @@ osg::Texture2D *createTexture(const std::string &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void applyTexture(osg::Node *model, const std::string &textureName)
+{
+    if (textureName.empty())
+        return;
+
+    FileSystem &fs = FileSystem::getInstance();
+
+    std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(), textureName);
+    osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
+
+    if (texture.valid())
+    {
+        model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
+
+        std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
+
+        if (ext == "tga")
+            model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+        else
+            model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Group *loadVehicle(const std::string &configPath)
 {
     // Group node for vehicle model loading
@@ -89,40 +141,12 @@ osg::Group *loadVehicle(const std::string &configPath)
         cfg.getValue(secName, "ExtTextureName", textureName);
     }
 
-    // Loading 3D-model from file
-    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
-    std::string modelPath = osgDB::findDataFile(model_path);
+    osg::ref_ptr<osg::Node> model = loadModel(modelName);
 
-    osg::ref_ptr<osg::Node> model;
-
-    if (!modelPath.empty())
-    {
-        modelPath = fs.toNativeSeparators(modelPath);
-        model = osgDB::readNodeFile(modelPath);
+    if (model.valid())
         group->addChild(model.get());
-    }
-    else
-    {
-        OSG_FATAL << "ERROR: model " << model_path << " is't found";
-    }
 
-    if (!textureName.empty())
-    {
-        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(), textureName);
-        osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
-
-        if (texture.valid())
-        {
-            model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
-
-            std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
-
-            if (ext == "tga")
-                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-            else
-                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
-        }
-    }
+    applyTexture(model.get(), textureName);
 
     return group.release();
 }
@@ -152,43 +176,12 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
         cfg.getValue(secName, "WheelTexture", wheelTextureName);
     }
 
-    // Loading wheels 3D-model
-    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), wheelModelName);
-    std::string wheelModelPath = osgDB::findDataFile(model_path);
 
-    osg::ref_ptr<osg::Node> model;
-
-    if (!wheelModelName.empty())
-    {
-        wheelModelPath = fs.toNativeSeparators(wheelModelPath);
-        model = osgDB::readNodeFile(wheelModelPath);
+    osg::ref_ptr<osg::Node> model = loadModel(wheelModelName);
+    if (model.valid())
         rotate->addChild(model.get());
-    }
-    else
-    {
-        OSG_FATAL << "ERROR: model " << model_path << " is't found";
-    }
 
-    // Loading texture
-    if (!wheelTextureName.empty())
-    {
-        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(),
-                                              wheelTextureName);
-
-        osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
-
-        if (texture.valid())
-        {
-            model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
-
-            std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
-
-            if (ext == "tga")
-                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-            else
-                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
-        }
-    }
+    applyTexture(model.get(), wheelTextureName);
 
     return rotate.release();
 }
@@ -274,39 +267,10 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
         cfg.getValue(secName, "CabineTexture", cabineTextureName);
     }
 
-    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), cabineModelName);
-    std::string cabineModelPath = osgDB::findDataFile(model_path);
 
-    osg::ref_ptr<osg::Node> model;
-
-    if (!cabineModelName.empty())
-    {
-        cabineModelPath = fs.toNativeSeparators(cabineModelPath);
-        model = osgDB::readNodeFile(cabineModelPath);
+    osg::ref_ptr<osg::Node> model = loadModel(cabineModelName);
+    if (model.valid())
         vehicle->addChild(model.get());
-    }
-    else
-    {
-        OSG_FATAL << "ERROR: model " << model_path << " is't found";
-    }
 
-    if (!cabineTextureName.empty())
-    {
-        std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(),
-                                              cabineTextureName);
-
-        osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
-
-        if (texture.valid())
-        {
-            model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
-
-            std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
-
-            if (ext == "tga")
-                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-            else
-                model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
-        }
-    }
+    applyTexture(model.get(), cabineTextureName);
 }
