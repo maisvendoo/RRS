@@ -37,9 +37,9 @@ public:
     /// Constructor for load route
     SceneLoader();
 
-    void load(std::string routeDir);
+    void load(std::string routeDir);      
 
-    osgGA::GUIEventHandler *getCameraEventHandler(int direction, float camera_height);    
+    MotionPath *getMotionPath(int direction);
 
 protected:
 

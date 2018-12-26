@@ -72,6 +72,9 @@ private:
     /// Data, received from server
     network_data_t  nd;
 
+    /// Keyboard handler (camera control)
+    void keyboardHandler(int key);
+
     /// Load train exterior from
     void load(const std::string &train_config);
 

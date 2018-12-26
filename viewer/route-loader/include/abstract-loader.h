@@ -54,15 +54,9 @@ public:
     virtual void load(std::string routeDir) = 0;
 
     /// Get route scene group node
-    virtual osg::Group *getRoot();
+    virtual osg::Group *getRoot();        
 
-    /// Get camera events handler
-    virtual osgGA::GUIEventHandler *getCameraEventHandler(int direction,
-                                                          float camera_height) = 0;
-
-    Trajectory *getTrajectory();
-
-    MotionPath *getMotionPath();
+    virtual MotionPath *getMotionPath(int direction) = 0;
 
 protected:    
 
@@ -70,9 +64,7 @@ protected:
     std::string routeDir;
 
     /// Route static scene root node
-    osg::ref_ptr<osg::Group>    root;
-
-    osg::ref_ptr<Trajectory>    train_traj;
+    osg::ref_ptr<osg::Group>    root;        
 
     /// Destructor
     virtual ~RouteLoader() {}

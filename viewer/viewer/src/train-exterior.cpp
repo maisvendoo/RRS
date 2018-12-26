@@ -84,38 +84,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
-            switch (ea.getKey())
-            {
-            case osgGA::GUIEventAdapter::KEY_Page_Down:
-
-                cur_vehicle++;
-
-                if (cur_vehicle > static_cast<int>(vehicles_ext.size() - 1))
-                    cur_vehicle = 0;
-
-                break;
-
-            case osgGA::GUIEventAdapter::KEY_Page_Up:
-
-                cur_vehicle--;
-
-                if (cur_vehicle < 0)
-                    cur_vehicle = static_cast<int>(vehicles_ext.size() - 1);
-
-                break;
-
-            case osgGA::GUIEventAdapter::KEY_Home:
-
-                long_shift += 0.5f;
-
-                break;
-
-            case osgGA::GUIEventAdapter::KEY_End:
-
-                long_shift -= 0.5f;
-
-                break;
-            }
+            keyboardHandler(ea.getKey());
 
             break;
         }
@@ -137,6 +106,56 @@ osg::Group *TrainExteriorHandler::getExterior()
         return trainExterior.get();
 
     return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::keyboardHandler(int key)
+{
+    switch (key)
+    {
+    case osgGA::GUIEventAdapter::KEY_Page_Down:
+
+        cur_vehicle++;
+
+        if (cur_vehicle > static_cast<int>(vehicles_ext.size() - 1))
+            cur_vehicle = 0;
+
+        long_shift = 0.0f;
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Page_Up:
+
+        cur_vehicle--;
+
+        if (cur_vehicle < 0)
+            cur_vehicle = static_cast<int>(vehicles_ext.size() - 1);
+
+        long_shift = 0.0f;
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Home:
+
+        long_shift += 0.5f;
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_End:
+
+        long_shift -= 0.5f;
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_1:
+
+        cur_vehicle = 0;
+        long_shift = 0.0f;
+
+        break;
+    }
 }
 
 //------------------------------------------------------------------------------

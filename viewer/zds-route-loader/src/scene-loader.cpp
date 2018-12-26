@@ -22,7 +22,7 @@
 
 #include    "filesystem.h"
 
-#include    "camera.h"
+#include    "route-path.h"
 
 //------------------------------------------------------------------------------
 //
@@ -47,11 +47,21 @@ void SceneLoader::load(std::string routeDir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osgGA::GUIEventHandler *SceneLoader::getCameraEventHandler(int direction, float camera_height)
+MotionPath *SceneLoader::getMotionPath(int direction)
 {
-    train_traj = new TrainTrajectory(routeDir, direction, camera_height);
+    FileSystem &fs = FileSystem::getInstance();
+    std::string track_name = routeDir + fs.separator() +  "route";
 
-    return new RailwayManipulator(train_traj.get());
+    if (direction > 0)
+    {
+        track_name += "1.trk";
+    }
+    else
+    {
+        track_name += "2.trk";
+    }
+
+    return new RoutePath(track_name);
 }
 
 //------------------------------------------------------------------------------

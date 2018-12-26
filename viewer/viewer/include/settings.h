@@ -68,8 +68,10 @@ struct settings_t
     int             reconnect_interval;
     /// Motion blur persistence
     double          persistence;
-    /// Set camine driver's eye height
+    /// Cabine driver's eye height
     float           eye_height;
+    /// Route motion direction
+    int             direction;
 
     settings_t()
         : route_dir("")
@@ -94,6 +96,7 @@ struct settings_t
         , reconnect_interval(1000)
         , persistence(0.05)
         , eye_height(3.0)
+        , direction(1)
     {
 
     }
