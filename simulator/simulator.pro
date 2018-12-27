@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS += ./physics
+SUBDIRS += ./device
 SUBDIRS += ./solver
 SUBDIRS += ./rkf5
 SUBDIRS += ./vehicle
