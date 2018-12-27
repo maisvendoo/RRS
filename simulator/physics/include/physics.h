@@ -17,7 +17,7 @@
 #define     PHYSICS_H
 
 #include    <QtGlobal>
-#include    <cmath>
+#include    "math-funcs.h"
 
 #if defined(PHYSICS_LIB)
     #define PHYSICS_EXPORT  Q_DECL_EXPORT
