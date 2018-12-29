@@ -13,13 +13,18 @@
  */
 
 #include    "device.h"
+#include    "filesystem.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Device::Device(QObject *parent) : QObject(parent)
 {
+    FileSystem &fs = FileSystem::getInstance();
+    cfg_dir = fs.getDevicesDir();
+    modules_dir = fs.getModulesDir();
 
+    qRegisterMetaType<state_vector_t>();
 }
 
 //------------------------------------------------------------------------------
@@ -69,8 +74,9 @@ double Device::getY(size_t i) const
 void Device::read_config(const QString &path)
 {
     CfgReader cfg;
+    QString cfg_path = QString(cfg_dir.c_str()) + QDir::separator() + path + ".xml";
 
-    if (cfg.load(path))
+    if (cfg.load(cfg_path))
     {
         int order = 0;
         QString secName = "Device";
@@ -83,6 +89,8 @@ void Device::read_config(const QString &path)
             std::fill(y.begin(), y.end(), 0.0);
             std::fill(dydt.begin(), dydt.end(), 0.0);
         }
+
+        load_config(cfg);
     }
 }
 

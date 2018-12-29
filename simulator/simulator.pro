@@ -16,3 +16,4 @@ SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
 
+SUBDIRS += ./krm395

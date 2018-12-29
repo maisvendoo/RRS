@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		
+		<Order>5</Order>
+		<EqReservoirVolume>0.02</EqReservoirVolume>
+		<LocoBrakePipeVolume>1e-4</LocoBrakePipeVolume>
+		<EqCameraVolume>1e-4</EqCameraVolume>
+
+		<k_leek>0.0</k_leek>
+		<k_stab>1e-6</k_stab>
+
+		<K1>1e-1</K1>
+		<K2>2e-3</K2>
+		<K3>1e-1</K3>
+		<K4>2e-5</K4>
+		<K5>0.0</K5>
+		<K6>0.0</K6>
+		<K7>0.0</K7>
+		<K8>0.0</K8>
+		<K9>0.0</K9>
+		<K10>0.0</K10>
+		<K11>0.0</K11>
+		<K12>0.0</K12>
+
+		<A1>1.0</A1>
+
+		<k1>1.0</k1>
+		<k2>1.0</k2>
+		<k3>1.0</k3>
+
+	</Device>
+</Config>

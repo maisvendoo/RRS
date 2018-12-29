@@ -6,9 +6,9 @@
 //
 //------------------------------------------------------------------------------
 BrakeCrane::BrakeCrane(QObject *parent) : Device (parent)
-  , Ver(1.0)
-  , Qer(0.0)
+  , Ver(1.0)  
   , Vbp(1.0)
+  , Qer(0.0)
   , Qbp(0.0)
 {
 

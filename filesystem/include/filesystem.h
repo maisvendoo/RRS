@@ -3,12 +3,10 @@
 
 #include    <QDir>
 
-#include    "import-export.h"
-
 #ifdef FILESYSTEM_LIB
-    #define FILESYSTEM_EXPORT   DECL_EXPORT
+    #define FILESYSTEM_EXPORT   Q_DECL_EXPORT
 #else
-    #define FILESYSTEM_EXPORT   DECL_IMPORT
+    #define FILESYSTEM_EXPORT   Q_DECL_IMPORT
 #endif
 
 //------------------------------------------------------------------------------
@@ -34,6 +32,7 @@ public:
         instance.setModulesDir(tmp + "modules");
         instance.setVehiclesDir(instance.getConfigDir() + instance.separator() + "vehicles");
         instance.setCouplingsDir(instance.getConfigDir()+ instance.separator() + "couplings");
+        instance.setDevicesDir(instance.getConfigDir()+ instance.separator() + "devices");
         instance.setDataDir(tmp + "data");
         instance.setVehicleModelsDir(instance.combinePath(instance.getDataDir(), "models"));
         instance.setVehicleTexturesDir(instance.combinePath(instance.getDataDir(), "textures"));
@@ -60,6 +59,8 @@ public:
 
     std::string getCouplingsDir() const;
 
+    std::string getDevicesDir() const;
+
     std::string getBinaryDir() const;
 
     std::string getDataDir() const;
@@ -85,6 +86,7 @@ private:
     std::string modulesDir;
     std::string vehiclesDir;
     std::string couplingsDir;
+    std::string devicesDir;
     std::string binDir;
 
     std::string dataDir;
@@ -112,6 +114,8 @@ private:
     void setVehiclesDir(const std::string &path);
 
     void setCouplingsDir(const std::string &path);
+
+    void setDevicesDir(const std::string &path);
 
     void setBinaryDir(const std::string &path);
 

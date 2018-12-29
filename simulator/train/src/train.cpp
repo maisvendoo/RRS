@@ -153,6 +153,8 @@ bool Train::step(double t, double &dt)
     // Brakepipe simulation
     brakepipe->step(t, dt);
 
+    vehiclesStep(t, dt);
+
     return done;
 }
 

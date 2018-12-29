@@ -160,7 +160,7 @@ void Model::process()
             postStep(t);
         }
 
-        train->vehiclesStep(t, integration_time);
+        //train->vehiclesStep(t, integration_time);
 
         // Debug print, is allowed
         if (is_debug_print)

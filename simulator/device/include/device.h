@@ -71,6 +71,11 @@ protected:
     /// Derivative of state vector
     state_vector_t dydt;
 
+    /// Config directory
+    std::string cfg_dir;
+
+    std::string modules_dir;
+
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
 

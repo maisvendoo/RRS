@@ -44,14 +44,9 @@ public:
 
 protected:
 
-
     double Ver;
 
-    double Qer;
-
     double Vbp;
-
-    double Qbp;
 
     double p0;
 
@@ -60,6 +55,11 @@ protected:
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t);
+private:
+
+    double Qer;
+
+    double Qbp;
 };
 
 //------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ typedef BrakeCrane* (*GetBrakeCrane)();
 //
 //------------------------------------------------------------------------------
 #define GET_BRAKE_CRANE(ClassName) \
-    extern "C" Q_DECL_EXPORT BrakeCrane *getVehicle() \
+    extern "C" Q_DECL_EXPORT BrakeCrane *getBrakeCrane() \
     { \
         return new (ClassName) (); \
     }

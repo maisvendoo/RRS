@@ -28,5 +28,7 @@
         <CabineModel>test-loco/cab.dmd</CabineModel>
         <CabineTexture>test-loco/cab.bmp</CabineTexture>
 
+        <BrakeCrane>krm395</BrakeCrane>
+
 	</Vehicle>
 </Config>

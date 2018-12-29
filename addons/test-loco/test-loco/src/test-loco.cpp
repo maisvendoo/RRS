@@ -1,6 +1,9 @@
 #include    "test-loco.h"
 #include    "physics.h"
 
+#include    "CfgReader.h"
+#include    "filesystem.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -8,6 +11,8 @@ TestLoco::TestLoco() : Vehicle()
   , traction_level(0.0)
   , inc_loc(false)
   , dec_loc(false)
+  , brake_crane_module("krm395")
+  , brake_crane(nullptr)
 {
 
 }
@@ -25,7 +30,6 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
-    (void) t;
     double traction_step = 0.1;
 
     if (keys[97] && !inc_loc)
@@ -56,6 +60,13 @@ void TestLoco::step(double t, double dt)
         double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
         Q_a[i] = torque;
     }
+
+    if (brake_crane != nullptr)
+    {
+        brake_crane->setChargePressure(0.5);
+        brake_crane->setFeedLinePressure(0.9);
+        brake_crane->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -71,6 +82,34 @@ double TestLoco::traction_char(double v)
         return max_traction;
     else
         return max_traction * vn / v;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TestLoco::initialization()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir(fs.getModulesDir().c_str());
+    brake_crane = loadBrakeCrane(modules_dir + fs.separator() + brake_crane_module);
+
+    if (brake_crane != nullptr)
+        brake_crane->read_config(brake_crane_module);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TestLoco::loadConfig(QString cfg_path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Vehicle";
+
+        cfg.getString(secName, "BrakeCrane", brake_crane_module);
+    }
 }
 
 GET_VEHICLE(TestLoco)

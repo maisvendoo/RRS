@@ -49,6 +49,11 @@ void FileSystem::setCouplingsDir(const std::string &path)
     couplingsDir = getNativePath(path);
 }
 
+void FileSystem::setDevicesDir(const std::string &path)
+{
+    devicesDir = getNativePath(path);
+}
+
 void FileSystem::setBinaryDir(const std::string &path)
 {
     binDir = getNativePath(path);
@@ -122,6 +127,11 @@ std::string FileSystem::getVehiclesDir() const
 std::string FileSystem::getCouplingsDir() const
 {
     return couplingsDir;
+}
+
+std::string FileSystem::getDevicesDir() const
+{
+    return devicesDir;
 }
 
 std::string FileSystem::getBinaryDir() const

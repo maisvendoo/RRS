@@ -5,30 +5,31 @@ TEMPLATE = lib
 QT -= gui
 QT += xml
 
-TARGET = device
+TARGET = krm395
 
-DESTDIR = ../../../lib
+DESTDIR = ../../../modules
 
 CONFIG(debug, debug|release) {
 
-    TARGET = $$join(TARGET,,,_d)
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lphysics_d
+    LIBS += -L../../../lib -ldevice_d
     LIBS += -L../../../lib -lfilesystem_d
 
 } else {
 
     LIBS += -L../../../lib -lCfgReader
-    LIBS += -L../../../lib -lphysics    
+    LIBS += -L../../../lib -lphysics
+    LIBS += -L../../../lib -ldevice
     LIBS += -L../../../lib -lfilesystem
 }
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../solver/include
+INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
-INCLUDEPATH += ../../common-headers/include
 
 
 HEADERS += $$files(./include/*.h)
