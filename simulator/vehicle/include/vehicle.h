@@ -116,6 +116,8 @@ public:
     ///
     void integrationPreStep(state_vector_t &Y, double t);
 
+    virtual void keyProcess();
+
     ///
     void integrationStep(state_vector_t &Y, double t, double dt);
 

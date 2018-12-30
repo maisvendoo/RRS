@@ -11,7 +11,8 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , k1(1.0)
   , k2(1.0)
   , k3(1.0)
-  , s3(0.0)
+  , T1(0.1)
+  , T2(0.1)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(pos.begin(), pos.end(), 0.0);
@@ -33,10 +34,12 @@ BrakeCrane395::~BrakeCrane395()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane395::setPosition(size_t position)
+void BrakeCrane395::setPosition(int &position)
 {
+    position = cut(position, static_cast<int>(POS_I), static_cast<int>(POS_VI));
+
     std::fill(pos.begin(), pos.end(), 0.0);
-    pos[position] = 1.0;
+    pos[static_cast<size_t>(position)] = 1.0;
 }
 
 //------------------------------------------------------------------------------
@@ -46,10 +49,6 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
                                state_vector_t &dYdt,
                                double t)
 {
-    double T1 = 0.1;
-
-    double T2 = 0.1;
-
     double u1 = Y[2] - p0;
 
     double u2 = dead_zone(u1, -0.005, 0.005);
@@ -58,7 +57,13 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
 
     double Qer = K[2] * (Y[2] - Y[ER_PRESSURE]);
 
-    double Qec = K[1] * (pFL - Y[2]) * Y[3] - k_stab * Y[2] - Qer;
+    double Q_brake = K[6] * Y[2] * pos[POS_Va] + K[7] * Y[2] * pos[POS_V];    
+
+    double Qec = K[1] * (pFL - Y[2]) * Y[3] * pos[POS_II]
+            - k_stab * Y[2] * pos[POS_II]
+            - Qer
+            - Q_brake
+            + K[10] * (pFL - Y[2]) * pos[POS_I];
 
     setEqResrvoirFlow(Qer);
 
@@ -68,7 +73,11 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
 
     double u6 = cut(nf(Y[4]), 0.0, 1.0);
 
-    double Qbp = K[3] * (pFL - Y[BP_PRESSURE]) * u5 - K[4] * Y[BP_PRESSURE] * u6;
+    double Qbp = K[3] * (pFL - Y[BP_PRESSURE]) * u5
+            - K[4] * Y[BP_PRESSURE] * u6
+            + K[5] * (Y[2] - Y[BP_PRESSURE]) * pos[POS_III]
+            + K[11] * (pFL - Y[BP_PRESSURE]) * pos[POS_I];
+
 
     setBrakePipeFlow(Qbp);
 
@@ -104,6 +113,8 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "k1", k1);
     cfg.getDouble(secName, "k2", k2);
     cfg.getDouble(secName, "k3", k3);
+    cfg.getDouble(secName, "T1", T1);
+    cfg.getDouble(secName, "T2", T2);
 }
 
 

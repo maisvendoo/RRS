@@ -25,6 +25,11 @@ private:
     bool inc_loc;
     bool dec_loc;
 
+    bool inc_crane_loc;
+    bool dec_crane_loc;
+
+    int crane_pos;
+
     QString brake_crane_module;
     BrakeCrane  *brake_crane;
 
@@ -35,6 +40,8 @@ private:
     void initialization();
 
     void loadConfig(QString cfg_path);
+
+    void keyProcess();
 };
 
 #endif // TESTLOCO_H

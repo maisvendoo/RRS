@@ -161,6 +161,7 @@ void Model::process()
         }
 
         //train->vehiclesStep(t, integration_time);
+        train->inputProcess();
 
         // Debug print, is allowed
         if (is_debug_print)
@@ -227,13 +228,15 @@ void Model::postStep(double t)
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 v[first] = %4 v[last] = %5 trac = %6\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 v[first] = %4 v[last] = %5 trac = %6 pos = %7 eq_press = %8\n")
             .arg(t)
             .arg(realtime_delay)
             .arg(dt)
             .arg(train->getFirstVehicle()->getVelocity() * 3.6)
             .arg(train->getLastVehicle()->getVelocity() * 3.6)
-            .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(0)));
+            .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(0)))
+            .arg(static_cast<int>(train->getFirstVehicle()->getAnalogSignal(3)))
+            .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(2)));
 
     fputs(qPrintable(debug_info), stdout);
 }
@@ -335,6 +338,11 @@ void Model::configSolver(solver_config_t &solver_config)
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
             solver_config.step = 1e-4;
+        }
+
+        if (!cfg.getDouble(secName, "MaxStep", solver_config.max_step))
+        {
+            solver_config.max_step = 1e-2;
         }
     }
 }

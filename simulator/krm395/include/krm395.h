@@ -45,7 +45,7 @@ public:
 
     ~BrakeCrane395();
 
-    void setPosition(size_t position);
+    void setPosition(int &position);
 
 private:
 
@@ -63,7 +63,9 @@ private:
 
     double k3;
 
-    double s3;
+    double T1;
+
+    double T2;
 
     DebugLog *debug_log;
 

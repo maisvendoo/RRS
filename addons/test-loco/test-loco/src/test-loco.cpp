@@ -4,6 +4,8 @@
 #include    "CfgReader.h"
 #include    "filesystem.h"
 
+#include    <iostream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -11,6 +13,9 @@ TestLoco::TestLoco() : Vehicle()
   , traction_level(0.0)
   , inc_loc(false)
   , dec_loc(false)
+  , inc_crane_loc(false)
+  , dec_crane_loc(false)
+  , crane_pos(1)
   , brake_crane_module("krm395")
   , brake_crane(nullptr)
 {
@@ -30,30 +35,8 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
-    double traction_step = 0.1;
-
-    if (keys[97] && !inc_loc)
-    {
-        traction_level +=  traction_step;
-        inc_loc = true;        
-    }
-    else
-    {
-        inc_loc = false;
-    }
-
-    if (keys[100] && !dec_loc)
-    {
-        traction_level -=  traction_step;
-        dec_loc = true;        
-    }
-    else
-    {
-        dec_loc = false;
-    }
-
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
-    analogSignal[0] = static_cast<float>(traction_level);
+
 
     for (size_t i = 0; i < Q_a.size(); i++)
     {
@@ -64,7 +47,7 @@ void TestLoco::step(double t, double dt)
     if (brake_crane != nullptr)
     {
         brake_crane->setChargePressure(0.5);
-        brake_crane->setFeedLinePressure(0.9);
+        brake_crane->setFeedLinePressure(0.9);        
         brake_crane->step(t, dt);
     }
 }
@@ -110,6 +93,63 @@ void TestLoco::loadConfig(QString cfg_path)
 
         cfg.getString(secName, "BrakeCrane", brake_crane_module);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TestLoco::keyProcess()
+{
+    double traction_step = 0.1;
+
+    if (keys[97] && !inc_loc)
+    {
+        traction_level +=  traction_step;
+        inc_loc = true;
+    }
+    else
+    {
+        inc_loc = false;
+    }
+
+    if (keys[100] && !dec_loc)
+    {
+        traction_level -=  traction_step;
+        dec_loc = true;
+    }
+    else
+    {
+        dec_loc = false;
+    }
+
+    if (keys[111] && !dec_crane_loc)
+    {
+        crane_pos--;
+        dec_crane_loc = true;
+
+        brake_crane->setPosition(crane_pos);
+    }
+    else
+    {
+        dec_crane_loc = false;
+    }
+
+    if (keys[112] && !inc_crane_loc)
+    {
+        crane_pos++;
+        inc_crane_loc = true;
+
+        brake_crane->setPosition(crane_pos);        
+    }
+    else
+    {
+        inc_crane_loc = false;
+    }
+
+    analogSignal[0] = static_cast<float>(traction_level);
+    analogSignal[1] = static_cast<float>(brake_crane->getBrakePipeInitPressure());
+    analogSignal[2] = static_cast<float>(brake_crane->getEqReservoirPressure());
+    analogSignal[3] = crane_pos;
 }
 
 GET_VEHICLE(TestLoco)

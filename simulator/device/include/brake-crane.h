@@ -40,7 +40,7 @@ public:
 
     void setFeedLinePressure(double pFL);
 
-    virtual void setPosition(size_t position) = 0;
+    virtual void setPosition(int &position) = 0;
 
 protected:
 

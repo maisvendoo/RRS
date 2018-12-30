@@ -184,6 +184,21 @@ void Train::vehiclesStep(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Train::inputProcess()
+{
+    auto end = vehicles.end();
+    auto begin = vehicles.begin();
+
+    for (auto i = begin; i != end; ++i)
+    {
+        Vehicle *vehicle = *i;
+        vehicle->keyProcess();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Train::postStep(double t)
 {
     (void) t;

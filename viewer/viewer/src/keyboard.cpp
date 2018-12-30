@@ -32,6 +32,8 @@ KeyboardHandler::KeyboardHandler(QObject *parent)
 bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
                              osgGA::GUIActionAdapter &aa)
 {
+    Q_UNUSED(aa)
+
     switch (ea.getEventType())
     {
     case osgGA::GUIEventAdapter::KEYDOWN:
@@ -143,6 +145,9 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_X);
     addKey(osgGA::GUIEventAdapter::KEY_Y);
     addKey(osgGA::GUIEventAdapter::KEY_Z);
+
+    addKey(osgGA::GUIEventAdapter::KEY_Leftbracket);
+    addKey(osgGA::GUIEventAdapter::KEY_Rightbracket);
 }
 
 //------------------------------------------------------------------------------

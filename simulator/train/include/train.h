@@ -67,6 +67,8 @@ public:
     /// Integration step for vehicles ODE's
     void vehiclesStep(double t, double dt);
 
+    void inputProcess();
+
     /// Action after integration step
     void postStep(double t);
 
