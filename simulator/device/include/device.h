@@ -71,6 +71,13 @@ protected:
     /// Derivative of state vector
     state_vector_t dydt;
 
+    state_vector_t y1;
+
+    state_vector_t k1;
+    state_vector_t k2;
+    state_vector_t k3;
+    state_vector_t k4;
+
     /// Config directory
     std::string cfg_dir;
 

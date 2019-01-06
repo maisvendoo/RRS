@@ -40,6 +40,8 @@ public:
 
     void setFeedLinePressure(double pFL);
 
+    void setBrakePipePressure(double pTM1);
+
     virtual void setPosition(int &position) = 0;
 
 protected:
@@ -51,6 +53,8 @@ protected:
     double p0;
 
     double pFL;
+
+    double pTM1;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

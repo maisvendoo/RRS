@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 enum
 {
-    MAX_FLOW_COEFFS = 12,
+    MAX_FLOW_COEFFS = 13,
     NUM_POSITIONS = 7
 };
 
@@ -67,9 +67,11 @@ private:
 
     double T2;
 
+    double K4_power;
+
     DebugLog *debug_log;
 
-    std::array<double, MAX_FLOW_COEFFS> K;
+    std::array<double, MAX_FLOW_COEFFS + 1> K;
 
     std::array<double, NUM_POSITIONS> pos;
 

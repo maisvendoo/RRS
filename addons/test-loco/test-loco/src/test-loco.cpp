@@ -47,7 +47,9 @@ void TestLoco::step(double t, double dt)
     if (brake_crane != nullptr)
     {
         brake_crane->setChargePressure(0.5);
-        brake_crane->setFeedLinePressure(0.9);        
+        brake_crane->setFeedLinePressure(0.9);
+        p0 = brake_crane->getBrakePipeInitPressure();
+        brake_crane->setBrakePipePressure(pTM);
         brake_crane->step(t, dt);
     }
 }
@@ -124,32 +126,31 @@ void TestLoco::keyProcess()
 
     if (keys[111] && !dec_crane_loc)
     {
-        crane_pos--;
         dec_crane_loc = true;
-
+        crane_pos--;
         brake_crane->setPosition(crane_pos);
     }
     else
     {
-        dec_crane_loc = false;
+        dec_crane_loc = false;        
     }
 
     if (keys[112] && !inc_crane_loc)
     {
-        crane_pos++;
         inc_crane_loc = true;
-
-        brake_crane->setPosition(crane_pos);        
+        crane_pos++;
+        brake_crane->setPosition(crane_pos);
     }
     else
     {
-        inc_crane_loc = false;
+        inc_crane_loc = false;        
     }
 
     analogSignal[0] = static_cast<float>(traction_level);
     analogSignal[1] = static_cast<float>(brake_crane->getBrakePipeInitPressure());
     analogSignal[2] = static_cast<float>(brake_crane->getEqReservoirPressure());
     analogSignal[3] = crane_pos;
+    analogSignal[4] = static_cast<float>(pTM);
 }
 
 GET_VEHICLE(TestLoco)
