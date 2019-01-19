@@ -19,6 +19,10 @@
 #include    <osgDB/ImageOptions>
 
 #include    "texture-loader.h"
+#include    "texture-func.h"
+
+#include    <osg/BlendFunc>
+#include    <osg/AlphaFunc>
 
 //------------------------------------------------------------------------------
 //
@@ -51,6 +55,7 @@ void createTexture(const std::string &texture_path, osg::Texture2D *texture)
     {
         //image->flipHorizontal();
         image->flipVertical();
+        convertTexture(image.get());
     }
 
     // Apply image for texture
@@ -88,10 +93,33 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
 
     // Apply transparency settings
     std::string ext = osgDB::getLowerCaseFileExtension(model_info.texture_path);
+
+    osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::ONE,
+                                                                osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+
+    osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
+
     if (ext == "tga")
-        pagedLOD->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+    {
+        osg::StateSet *ss = pagedLOD->getOrCreateStateSet();
+
+        ss->setAttributeAndModes(blendFunc.get());
+        ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+
+        ss->setAttributeAndModes(alphaFunc.get());
+        ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
+
+        ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+    }
     else
+    {
+        osg::StateSet *ss = pagedLOD->getOrCreateStateSet();
+
+        ss->setMode(GL_BLEND, osg::StateAttribute::OFF);
+        ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
+
         pagedLOD->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
+    }
 
     // Set callback for texture loading
     pagedLOD->setCullCallback(new TextureLoader(model_info.texture_path));

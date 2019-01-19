@@ -313,14 +313,15 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     position = routePath->getPosition(coord, attitude);
 
     // Camera position and attitude calculation
-    position.z() += 3.0f;
+    position.z() += 3.75f;
     position.y() += long_shift;
 
     attitude.x() = -osg::PIf / 2.0f + attitude.x();
 
-    // Calculate and set view matrix
+    // Calculate and set view matrix    
     viewMatrix = osg::Matrix::translate(position *= -1.0f);
     viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
     viewMatrix *= osg::Matrix::rotate(static_cast<double>(attitude.z()), osg::Vec3(0.0f, 1.0f, 0.0f));
+    viewMatrix *= osg::Matrix::translate(osg::Vec3(-0.75, 0, 0));
     viewer->getCamera()->setViewMatrix(viewMatrix);
 }

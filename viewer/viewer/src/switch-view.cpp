@@ -97,8 +97,10 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
     switch (cameraView)
     {
     case CABINE_VIEW:
+        {
 
-        break;
+            break;
+        }
 
     case OUTSIZE_VIEW:
         {

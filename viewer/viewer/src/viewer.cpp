@@ -253,11 +253,11 @@ bool RouteViewer::initEngineSettings(osg::Group *root)
 
     // Common graphics settings
     osg::StateSet *stateset = root->getOrCreateStateSet();
-    osg::BlendFunc *blendFunc = new osg::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    stateset->setAttributeAndModes(blendFunc);
+    //osg::BlendFunc *blendFunc = new osg::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //stateset->setAttributeAndModes(blendFunc);
     stateset->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-    stateset->setMode(GL_ALPHA, osg::StateAttribute::ON);
-    stateset->setMode(GL_BLEND, osg::StateAttribute::ON);
+    //stateset->setMode(GL_ALPHA, osg::StateAttribute::ON);
+    //stateset->setMode(GL_BLEND, osg::StateAttribute::ON);
     stateset->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateset->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
