@@ -23,7 +23,7 @@
 CameraViewHandler::CameraViewHandler() : osgGA::GUIEventHandler ()
   , cameraView(CABINE_VIEW)
   , angleVertical(0.0)
-  , angleHorizontal(0.0)  
+  , angleHorizontal(0.0)
 {
 
 }
@@ -108,6 +108,7 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
             matrix *= osg::Matrix::rotate(osg::PI_2 + angleVertical, osg::Vec3(0, 1, 0));
             matrix *= osg::Matrix::rotate(angleHorizontal, osg::Vec3(1, 0, 0));            
             matrix *= osg::Matrix::translate(osg::Vec3(0.0, 0.0, -20.0));
+
             viewMatrix *= matrix;
             break;
         }

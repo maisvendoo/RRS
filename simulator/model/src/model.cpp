@@ -359,7 +359,9 @@ void Model::tcpFeedBack()
     for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
     {
         viewer_data.vehicles_data[i].railway_coord = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.vehicles_data[i].velocity = static_cast<float>((*it)->getVelocity());
         viewer_data.vehicles_data[i].wheel_angle = static_cast<float>((*it)->getWheelAngle(0));
+        viewer_data.vehicles_data[i].omega = static_cast<float>((*it)->getWheelOmega(0));
         ++i;
     }
 

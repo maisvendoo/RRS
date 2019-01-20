@@ -26,14 +26,18 @@ struct traj_element_t
 {
     float           coord_begin;
     float           coord_end;
+    float           velocity;
     float           angle_begin;
     float           angle_end;
+    float           omega;
 
     traj_element_t()
         : coord_begin(0.0f)
         , coord_end(0.0f)
+        , velocity(0.0f)
         , angle_begin(0.0f)
         , angle_end(0.0f)
+        , omega(0.0f)
     {
 
     }

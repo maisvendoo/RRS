@@ -2,10 +2,10 @@
 
 struct pixel_t
 {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
+    unsigned short r;
+    unsigned short g;
+    unsigned short b;
+    unsigned short a;
 };
 
 void convertTexture(osg::Image *image)
@@ -25,8 +25,8 @@ void convertTexture(osg::Image *image)
         pixel.g = pixel.g * pixel.a / 255;
         pixel.b = pixel.b * pixel.a / 255;
 
-        data[i + 2] = pixel.r;
-        data[i + 1] = pixel.g;
-        data[i] = pixel.b;
+        data[i + 2] = static_cast<unsigned char>(pixel.r);
+        data[i + 1] = static_cast<unsigned char>(pixel.g);
+        data[i] = static_cast<unsigned char>(pixel.b);
     }
 }
