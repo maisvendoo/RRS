@@ -61,7 +61,7 @@ osgDB::ReaderWriter::ReadResult ReaderDMD::readNode(std::ifstream &stream,
             geom->addPrimitiveSet(mesh.faces[i].get());
     }
 
-    osgUtil::SmoothingVisitor::smooth(*geom);
+    osgUtil::SmoothingVisitor::smooth(*geom, 0.0);
 
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable(geom.get());

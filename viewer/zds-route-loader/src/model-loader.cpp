@@ -57,7 +57,7 @@ void createTexture(const std::string &texture_path, osg::Texture2D *texture)
     {
         //image->flipHorizontal();
         image->flipVertical();
-        convertTexture(image.get());
+        //convertTexture(image.get());
     }
 
     // Apply image for texture
@@ -96,7 +96,7 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
     // Apply transparency settings
     std::string ext = osgDB::getLowerCaseFileExtension(model_info.texture_path);
 
-    osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::ONE,
+    osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
                                                                 osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
 
     osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);

@@ -59,6 +59,8 @@ private:
     /// Horizontal view angle
     double  angleHorizontal;
 
+    double  dist;
+
     /// Camera view setting
     void setCameraView(CameraView cameraView, osg::Camera *camera);
 };

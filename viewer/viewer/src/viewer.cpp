@@ -88,7 +88,7 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char *argv[])
 {
-    osg::setNotifyLevel(osg::FATAL);
+    osg::setNotifyLevel(osg::WARN);
     osg::setNotifyHandler(new LogFileHandler("../logs/viewer.log"));
 
     FileSystem &fs = FileSystem::getInstance();
