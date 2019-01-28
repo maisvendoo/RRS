@@ -82,7 +82,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
-
+    
 
     return viewer.run();
 }
