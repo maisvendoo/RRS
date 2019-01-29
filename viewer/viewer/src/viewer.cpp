@@ -82,7 +82,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
-
+    viewer.setRunMaxFrameRate(200);
 
     return viewer.run();
 }
