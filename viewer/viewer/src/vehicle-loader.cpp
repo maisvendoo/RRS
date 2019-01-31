@@ -25,6 +25,25 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+osg::Vec3 readVector(osgDB::XmlNode *node, std::string name)
+{
+    osg::Vec3 vec;
+
+    if (node->name == name)
+    {
+        std::string tmp = node->contents;
+
+        // Parse coordinates of axis
+        std::istringstream ss(tmp);
+        ss >> vec.x() >> vec.y() >> vec.z();
+    }
+
+    return vec;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Node *loadModel(const std::string &modelName)
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -131,7 +150,10 @@ osg::Group *loadVehicle(const std::string &configPath)
     ConfigReader cfg(cfg_path);
 
     std::string modelName = "";
-    std::string textureName = "";    
+    std::string textureName = "";
+    std::string modelShift = "";
+
+    osg::Vec3 shift(0.0, 0.0, 0.0);
 
     // Reading data about body's 3D-model and texture
     if (cfg.isOpenned())
@@ -139,12 +161,21 @@ osg::Group *loadVehicle(const std::string &configPath)
         std::string secName = "Vehicle";
         cfg.getValue(secName, "ExtModelName", modelName);
         cfg.getValue(secName, "ExtTextureName", textureName);
+
+        if (cfg.getValue(secName, "ModelShift", modelShift))
+        {
+            std::istringstream ss(modelShift);
+            ss >> shift.x() >> shift.y() >> shift.z();
+        }
     }
 
+    osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
     osg::ref_ptr<osg::Node> model = loadModel(modelName);
 
     if (model.valid())
-        group->addChild(model.get());
+        transShift->addChild(model.get());
+
+    group->addChild(transShift.get());
 
     applyTexture(model.get(), textureName);
 
@@ -167,19 +198,20 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
 
     // Reading wheel parameters
     std::string wheelModelName = "";
-    std::string wheelTextureName = "";
+    std::string wheelTextureName = "";    
 
     if (cfg.isOpenned())
     {
         std::string secName = "Vehicle";
         cfg.getValue(secName, "WheelModel", wheelModelName);
-        cfg.getValue(secName, "WheelTexture", wheelTextureName);
-    }
+        cfg.getValue(secName, "WheelTexture", wheelTextureName);        
+    }    
 
 
     osg::ref_ptr<osg::Node> model = loadModel(wheelModelName);
+
     if (model.valid())
-        rotate->addChild(model.get());
+        rotate->addChild(model.get());    
 
     applyTexture(model.get(), wheelTextureName);
 
@@ -259,18 +291,30 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
 
     std::string cabineModelName = "";
     std::string cabineTextureName = "";
+    std::string cabineShift = "";
+
+    osg::Vec3 shift(0.0, 0.0, 0.0);
 
     if (cfg.isOpenned())
     {
         std::string secName = "Vehicle";
         cfg.getValue(secName, "CabineModel", cabineModelName);
         cfg.getValue(secName, "CabineTexture", cabineTextureName);
+
+        if (cfg.getValue(secName, "CabineShift", cabineShift))
+        {
+            std::istringstream ss(cabineShift);
+            ss >> shift.x() >> shift.y() >> shift.z();
+        }
     }
 
-
+    osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
     osg::ref_ptr<osg::Node> model = loadModel(cabineModelName);
+
     if (model.valid())
-        vehicle->addChild(model.get());
+        transShift->addChild(model.get());
+
+    vehicle->addChild(transShift.get());
 
     applyTexture(model.get(), cabineTextureName);
 }

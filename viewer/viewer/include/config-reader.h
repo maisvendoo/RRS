@@ -47,6 +47,18 @@ public:
         return true;
     }
 
+    bool getValue(const std::string &section, const std::string &param, std::string &value)
+    {
+        std::string contents = getStrValue(section, param);
+
+        if (!contents.empty())
+        {
+            value = contents;
+        }
+
+        return true;
+    }
+
 protected:
 
     bool    is_opened;

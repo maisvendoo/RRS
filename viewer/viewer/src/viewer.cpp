@@ -19,6 +19,7 @@
 #include    <osg/GraphicsContext>
 #include    <osgDB/FileUtils>
 #include    <osgDB/FileNameUtils>
+#include    <osgViewer/ViewerEventHandlers>
 
 #include    "filesystem.h"
 #include    "config-reader.h"
@@ -79,6 +80,9 @@ int RouteViewer::run()
 
     QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
                      &client, &NetworkClient::receiveKeysState);
+
+    viewer.addEventHandler(new osgViewer::StatsHandler);
+    viewer.setRunMaxFrameRate(200);
 
     return viewer.run();
 }

@@ -37,8 +37,7 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
 
         LIBS += -L../../../lib -lroute-loader
-        LIBS += -L../../../lib -lfilesystem
-
+        LIBS += -L../../../lib -lfilesystem        
     }
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY

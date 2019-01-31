@@ -8,27 +8,30 @@
 		<WheelDiameter>1.25</WheelDiameter>
 		<MainResist>default</MainResist>
 		<NumAxis>6</NumAxis>				
-        <WheelInertia>2.0</WheelInertia>
+                <WheelInertia>2.0</WheelInertia>
 
-        <ExtModelName>test-loco/kuzov.dmd</ExtModelName>   
-        <ExtTextureName>test-loco/kuzov.bmp</ExtTextureName>  
+                <ExtModelName>test-loco/kuzov.dmd</ExtModelName> 
+                <ModelShift>0.0 0.0 0.311</ModelShift>
 
-        <WheelModel>test-loco/kolpara_tepl.dmd</WheelModel>
-        <WheelTexture>test-loco/kolpara_tepl.bmp</WheelTexture>
+                <ExtTextureName>test-loco/kuzov.bmp</ExtTextureName>  
 
-        <Axis>0.0 -8.5 0.85</Axis>
-        <Axis>0.0 -6.2 0.85</Axis>
-        <Axis>0.0 -4.1 0.85</Axis>
+                <WheelModel>test-loco/kolpara_tepl.dmd</WheelModel>
+                <WheelTexture>test-loco/kolpara_tepl.bmp</WheelTexture>
 
-        <Axis>0.0 8.5 0.85</Axis>
-        <Axis>0.0 6.2 0.85</Axis>
-        <Axis>0.0 4.1 0.85</Axis>
-        
+                <Axis>0.0 -8.5 0.85</Axis>
+                <Axis>0.0 -6.2 0.85</Axis>
+                <Axis>0.0 -4.1 0.85</Axis>
 
-        <CabineModel>test-loco/cab.dmd</CabineModel>
-        <CabineTexture>test-loco/cab.bmp</CabineTexture>
+                <Axis>0.0 8.5 0.85</Axis>
+                <Axis>0.0 6.2 0.85</Axis>
+                <Axis>0.0 4.1 0.85</Axis>
+                
 
-        <BrakeCrane>krm395</BrakeCrane>
+                <CabineModel>test-loco/cab.dmd</CabineModel>
+                <CabineShift>0.0 0.0 0.311</CabineShift>
+                <CabineTexture>test-loco/cab.bmp</CabineTexture>
+
+                <BrakeCrane>krm395</BrakeCrane>
 
 	</Vehicle>
 </Config>

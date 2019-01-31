@@ -12,10 +12,16 @@
 
 #include    "solver-types.h"
 
+#if defined(DEVICE_LIB)
+    #define DEVICE_EXPORT   Q_DECL_EXPORT
+#else
+    #define DEVICE_EXPORT   Q_DECL_IMPORT
+#endif
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DebugLog : public QObject
+class DEVICE_EXPORT DebugLog : public QObject
 {
     Q_OBJECT
 

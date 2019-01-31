@@ -45,7 +45,7 @@ bool Train::init(const init_data_t &init_data)
 
     if (train_motion_solver == Q_NULLPTR)
     {
-        emit logMessage("ERROR: solver " + solver_config.method + " is't found");
+        emit logMessage("ERROR: solver " + solver_path + " is't found");
         return false;
     }
 
