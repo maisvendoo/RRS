@@ -26,19 +26,25 @@ void initEnvironmentLight(osg::Group *root,
     osg::ref_ptr<osg::Light> sun = new osg::Light;
     sun->setLightNum(0);
     sun->setDiffuse(color *= power);
-    sun->setAmbient(color *= power);
+    sun->setAmbient(color *= power * 0.0f);
     sun->setSpecular(color *= power);
-    sun->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+
+    float dist = 1000.0f;
 
     float rad = osg::PIf / 180.0f;
-    float dx = -cosf(theta * rad) * sinf(psi * rad);
-    float dy = -cosf(theta * rad) * cosf(psi * rad);
-    float dz = -sinf(theta * rad);
-    osg::Vec3 sunDir(dx, dy, dz);
+    float x = dist * cosf(theta * rad) * sinf(psi * rad);
+    float y = dist * cosf(theta * rad) * cosf(psi * rad);
+    float z = dist * sinf(theta * rad);
+
+    osg::Vec3 pos = osg::Vec3(x, y, z);
+    sun->setPosition(osg::Vec4(pos, 0.0f));
+
+    osg::Vec3 sunDir = pos *= (- 1.0f / pos.length());
     sun->setDirection(sunDir);
 
     osg::ref_ptr<osg::LightSource> light0 = new osg::LightSource;
-    light0->setLight(sun);
+    light0->setLight(sun);    
 
     root->getOrCreateStateSet()->setMode(GL_LIGHT0, osg::StateAttribute::ON);
     root->addChild(light0.get());

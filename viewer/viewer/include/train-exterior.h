@@ -54,6 +54,9 @@ private:
     /// Shift camera along train
     float long_shift;
 
+    /// Shift camera up/down
+    float height_shift;
+
     /// Route path (trajectory) contener
     osg::ref_ptr<MotionPath> routePath;
 

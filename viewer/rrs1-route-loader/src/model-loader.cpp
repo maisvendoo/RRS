@@ -88,6 +88,7 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
     pagedLOD->setFileName(0, fileName);
     pagedLOD->setRange(0, 0.0f, model_info.view_distance);
     pagedLOD->setDataVariance(osg::Object::STATIC);
+    //pagedLOD->setCullingActive(false);
 
     // Apply texture
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
@@ -102,8 +103,8 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
 
     osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
 
-    if (ext == "tga")
-    {
+    //if (ext == "tga")
+    //{
         osg::StateSet *ss = pagedLOD->getOrCreateStateSet();
 
         ss->setAttributeAndModes(blendFunc.get());
@@ -113,7 +114,7 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
         ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
 
         ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-    }
+    /*}
     else
     {
         osg::StateSet *ss = pagedLOD->getOrCreateStateSet();
@@ -122,10 +123,7 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
         ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
 
         pagedLOD->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
-    }
-
-    // Set callback for texture loading
-    pagedLOD->setCullCallback(new TextureLoader(model_info.texture_path));
+    } */
 
     return pagedLOD.release();
 }

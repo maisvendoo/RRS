@@ -21,25 +21,11 @@
 #include    <osgDB/FileNameUtils>
 #include    <osgDB/ReadFile>
 #include    <osg/Texture2D>
+#include    <osg/Material>
+#include    <osgUtil/SmoothingVisitor>
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-osg::Vec3 readVector(osgDB::XmlNode *node, std::string name)
-{
-    osg::Vec3 vec;
-
-    if (node->name == name)
-    {
-        std::string tmp = node->contents;
-
-        // Parse coordinates of axis
-        std::istringstream ss(tmp);
-        ss >> vec.x() >> vec.y() >> vec.z();
-    }
-
-    return vec;
-}
+#include    "model-smooth.h"
+#include    "texture-filtering.h"
 
 //------------------------------------------------------------------------------
 //
@@ -62,7 +48,14 @@ osg::Node *loadModel(const std::string &modelName)
     else
     {
         OSG_FATAL << "ERROR: model " << model_path << " is't found";
+        return nullptr;
     }
+
+    ModelSmoother  smoother;
+    model->accept(smoother);
+
+    ModelTextureFilter texfilter;
+    model->accept(texfilter);
 
     return model.release();
 }
@@ -119,7 +112,7 @@ void applyTexture(osg::Node *model, const std::string &textureName)
 
     FileSystem &fs = FileSystem::getInstance();
 
-    std::string tex_path = fs.combinePath(fs.getVehicleTexturesDir(), textureName);
+    std::string tex_path = fs.combinePath(fs.getVehicleModelsDir(), textureName);
     osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
 
     if (texture.valid())
@@ -173,11 +166,11 @@ osg::Group *loadVehicle(const std::string &configPath)
     osg::ref_ptr<osg::Node> model = loadModel(modelName);
 
     if (model.valid())
+    {
         transShift->addChild(model.get());
+    }
 
     group->addChild(transShift.get());
-
-    applyTexture(model.get(), textureName);
 
     return group.release();
 }
@@ -211,9 +204,7 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
     osg::ref_ptr<osg::Node> model = loadModel(wheelModelName);
 
     if (model.valid())
-        rotate->addChild(model.get());    
-
-    applyTexture(model.get(), wheelTextureName);
+        rotate->addChild(model.get());
 
     return rotate.release();
 }
@@ -301,6 +292,9 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
         cfg.getValue(secName, "CabineModel", cabineModelName);
         cfg.getValue(secName, "CabineTexture", cabineTextureName);
 
+        if (cabineModelName.empty() || cabineTextureName.empty())
+            return;
+
         if (cfg.getValue(secName, "CabineShift", cabineShift))
         {
             std::istringstream ss(cabineShift);
@@ -314,7 +308,5 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
     if (model.valid())
         transShift->addChild(model.get());
 
-    vehicle->addChild(transShift.get());
-
-    applyTexture(model.get(), cabineTextureName);
+    vehicle->addChild(transShift.get());    
 }

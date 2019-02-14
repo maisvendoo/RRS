@@ -19,6 +19,7 @@
 
 #include    "vehicle-exterior.h"
 
+
 /*!
  * \fn
  * \brief Load vehicle body model

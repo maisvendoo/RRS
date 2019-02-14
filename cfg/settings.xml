@@ -6,6 +6,7 @@
 		<Width>1366</Width>
 		<Height>768</Height>
 		<FullScreen>1</FullScreen>
+		<VSync>1</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
 		<Port>1992</Port>
 		<LocalMode>0</LocalMode>

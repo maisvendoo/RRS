@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		
+		<EmptyMass>61132</EmptyMass>
+		<PayloadMass>7160</PayloadMass>
+		<Length>28.5</Length>
+		<WheelDiameter>0.92</WheelDiameter>
+		<MainResist>sapsan</MainResist>
+		<NumAxis>4</NumAxis>				
+                <WheelInertia>2.0</WheelInertia>
+
+                <ExtModelName>sapsan/SR-T-04.osgt</ExtModelName> 
+                <ModelShift>0.0 0.0 0.3</ModelShift>
+
+                <ExtTextureName>sapsan/textures/4_.tga</ExtTextureName>  
+
+                <WheelModel>sapsan/wheel_m.osgt</WheelModel>
+                <WheelTexture>sapsan/textures/sapsan.tga</WheelTexture>
+
+                <Axis>0.0 -11.077 0.75</Axis>
+                <Axis>0.0 -7.905 0.75</Axis>
+                
+
+                <Axis>0.0 8.078 0.75</Axis>
+                <Axis>0.0 11.264 0.75</Axis>
+                
+
+	</Vehicle>
+</Config>

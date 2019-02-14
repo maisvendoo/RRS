@@ -44,6 +44,8 @@ struct settings_t
     int             height;
     /// Fullscreen flag
     bool            fullscreen;
+    ///
+    bool            vsync;
     /// Work in localmode (reserved)
     bool            localmode;
     /// Vertical view angle
@@ -83,6 +85,7 @@ struct settings_t
         , width(1366)
         , height(768)
         , fullscreen(false)
+        , vsync(true)
         , localmode(false)
         , fovy(30.0)
         , zNear(1.0)

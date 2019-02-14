@@ -18,6 +18,8 @@ SUBDIRS += ./simulator
 
 SUBDIRS += ./addons/default-vehicle
 SUBDIRS += ./addons/test-loco
+SUBDIRS += ./addons/sapsan-motor
+SUBDIRS += ./addons/sapsan-non-motor
 
 SUBDIRS += ./launcher
 

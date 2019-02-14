@@ -20,6 +20,7 @@
 #include    <osgDB/FileUtils>
 #include    <osgDB/FileNameUtils>
 #include    <osgViewer/ViewerEventHandlers>
+#include    <osg/LightModel>
 
 #include    "filesystem.h"
 #include    "config-reader.h"
@@ -82,7 +83,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
-    viewer.setRunMaxFrameRate(200);
+    viewer.setThreadingModel(osgViewer::Viewer::ThreadPerContext);
 
     return viewer.run();
 }
@@ -142,6 +143,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "Width", settings.width);
         cfg.getValue(secName, "Height", settings.height);
         cfg.getValue(secName, "FullScreen", settings.fullscreen);
+        cfg.getValue(secName, "VSync", settings.vsync);
         cfg.getValue(secName, "LocalMode", settings.localmode);
         cfg.getValue(secName, "posX", settings.x);
         cfg.getValue(secName, "posY", settings.y);
@@ -257,11 +259,9 @@ bool RouteViewer::initEngineSettings(osg::Group *root)
 
     // Common graphics settings
     osg::StateSet *stateset = root->getOrCreateStateSet();
-    //osg::BlendFunc *blendFunc = new osg::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //stateset->setAttributeAndModes(blendFunc);
+
     stateset->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-    //stateset->setMode(GL_ALPHA, osg::StateAttribute::ON);
-    //stateset->setMode(GL_BLEND, osg::StateAttribute::ON);
+
     stateset->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateset->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
@@ -273,8 +273,14 @@ bool RouteViewer::initEngineSettings(osg::Group *root)
     initEnvironmentLight(root,
                          osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
                          1.0f,
-                         0.0f,
-                         90.0f);
+                         -20.0f,
+                         75.0f);
+
+    osg::LightModel *lightmodel = new osg::LightModel;
+    float power = 0.4f;
+    lightmodel->setAmbientIntensity(osg::Vec4(power, power, power, 1.0));
+    lightmodel->setTwoSided(true);
+    stateset->setAttributeAndModes(lightmodel, osg::StateAttribute::ON);
 
     return true;
 }
@@ -299,6 +305,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     traits->windowDecoration = settings.window_decoration;
     traits->doubleBuffer = settings.double_buffer;
     traits->samples = settings.samples;
+    traits->vsync = settings.vsync;
 
     osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
     osg::Camera *camera = viewer->getCamera();

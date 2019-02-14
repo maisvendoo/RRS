@@ -324,7 +324,7 @@ bool Train::loadTrain(QString cfg_path)
 
                 connect(vehicle, &Vehicle::logMessage, this, &Train::logMessage);
 
-                QString relConfigPath = QString(fs.combinePath(module_name.toStdString(), module_cfg_name.toStdString()).c_str());
+                QString relConfigPath = QString(fs.combinePath(module_cfg_name.toStdString(), module_cfg_name.toStdString()).c_str());
                 vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
 
                 vehicle->setPayloadCoeff(payload_coeff);
@@ -352,9 +352,16 @@ bool Train::loadTrain(QString cfg_path)
 
         int cabine_in_vehicle = -1;
 
-        if (cfg.getInt("Common", "CabineInVehicle", cabine_in_vehicle))
+        /*if (cfg.getInt("Common", "CabineInVehicle", cabine_in_vehicle))
         {
             Vehicle *vehicle = vehicles[cabine_in_vehicle];
+            connect(this, &Train::sendDataToVehicle,
+                    vehicle, &Vehicle::receiveData);
+        }*/
+
+        for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
+        {
+            Vehicle *vehicle = *it;
             connect(this, &Train::sendDataToVehicle,
                     vehicle, &Vehicle::receiveData);
         }

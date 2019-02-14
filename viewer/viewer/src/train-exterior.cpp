@@ -32,6 +32,7 @@ TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath,
     : osgGA::GUIEventHandler ()
     , cur_vehicle(0)
     , long_shift(0.0f)
+    , height_shift(0.0f)
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
@@ -154,6 +155,16 @@ void TrainExteriorHandler::keyboardHandler(int key)
         cur_vehicle = 0;
         long_shift = 0.0f;
 
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Delete:
+
+        height_shift += 0.05f;
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Insert:
+
+        height_shift -= 0.05f;
         break;
     }
 }
@@ -321,7 +332,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     attitude.x() = -osg::PIf / 2.0f - attitude.x();
 
     // Calculate and set view matrix    
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(0.75f, 0.0f, -8.0f - long_shift));
+    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(0.75f, 0.0f + height_shift, -8.0f - long_shift));
     matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
     matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
     matrix *= osg::Matrix::translate(position);
