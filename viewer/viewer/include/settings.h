@@ -74,6 +74,8 @@ struct settings_t
     float           eye_height;
     /// Route motion direction
     int             direction;
+    /// Notify level
+    std::string     notify_level;
 
     settings_t()
         : route_dir("")
@@ -100,6 +102,7 @@ struct settings_t
         , persistence(0.05)
         , eye_height(3.0)
         , direction(1)
+        , notify_level("INFO")
     {
 
     }

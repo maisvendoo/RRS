@@ -38,6 +38,8 @@ CommandLineParser::CommandLineParser(int argc, char *argv[])
 
     cmd_line.fullscreen.is_present = cmd_line.fullscreen.value = args.read("--fullscreen", value);
     cmd_line.localmode.is_present = cmd_line.localmode.value = args.read("--localmode", value);
+
+    cmd_line.notify_level.is_present = args.read("--notify-level", cmd_line.notify_level.value);
 }
 
 //------------------------------------------------------------------------------

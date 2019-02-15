@@ -95,17 +95,29 @@ bool RouteViewer::init(int argc, char *argv[])
 {
     FileSystem &fs = FileSystem::getInstance();
 
-    osg::setNotifyLevel(osg::INFO);
-    std::string logs_path = fs.getLogsDir();
-    osg::setNotifyHandler(new LogFileHandler(logs_path + fs.separator() + "viewer.log"));
-
     // Read settings from config file
     settings = loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
 
     // Parse command line
     CommandLineParser parser(argc, argv);
     cmd_line_t cmd_line = parser.getCommadLine();
-    overrideSettingsByCommandLine(cmd_line, settings);    
+    overrideSettingsByCommandLine(cmd_line, settings);
+
+    // Notify settings
+    osg::NotifySeverity level = osg::INFO;
+
+    if (settings.notify_level == "INFO")
+        level = osg::INFO;
+
+    if (settings.notify_level == "WARN")
+        level = osg::WARN;
+
+    if (settings.notify_level == "FATAL")
+        level = osg::FATAL;
+
+    osg::setNotifyLevel(level);
+    std::string logs_path = fs.getLogsDir();
+    osg::setNotifyHandler(new LogFileHandler(logs_path + fs.separator() + "viewer.log"));
 
     // Load selected route
     if (!loadRoute(cmd_line.route_dir.value))
@@ -161,6 +173,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "RequestInterval", settings.request_interval);
         cfg.getValue(secName, "ReconnectInterval", settings.reconnect_interval);
         cfg.getValue(secName, "MotionBlur", settings.persistence);
+        cfg.getValue(secName, "NotifyLevel", settings.notify_level);
     }
 
     return settings;
@@ -192,6 +205,9 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 
     if (cmd_line.train_config.is_present)
         settings.train_config = cmd_line.train_config.value;
+
+    if (cmd_line.notify_level.is_present)
+        settings.notify_level = cmd_line.notify_level.value;
 }
 
 //------------------------------------------------------------------------------

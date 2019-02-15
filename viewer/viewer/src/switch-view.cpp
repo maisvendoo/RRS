@@ -45,6 +45,7 @@ bool CameraViewHandler::handle(const osgGA::GUIEventAdapter &ea,
             osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
             osg::Camera *camera = viewer->getCamera();
 
+            // Switching camera view (internal/external)
             setCameraView(cameraView, camera);
             break;
         }

@@ -62,15 +62,19 @@ private:
     /// External camera distance
     double  dist;
 
+    /// Internal camera horizontal view angle
     double camAngleHorizontal;
 
+    /// Internal camera vertical view angle
     double camAngleVertical;
 
     /// Camera view setting
     void setCameraView(CameraView cameraView, osg::Camera *camera);
 
+    /// Outside camera motion
     void outCameraMotion(int key);
 
+    /// Inside camera motion
     void intCameraMotion(int key);
 };
 

@@ -21,5 +21,6 @@
 		<RequestInterval>200</RequestInterval>
 		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
+		<NotifyLevel>WARN</NotifyLevel>
 	</Viewer>
 </Config>

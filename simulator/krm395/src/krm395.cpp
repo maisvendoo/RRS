@@ -19,9 +19,9 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[POS_II] = 1.0;
 
-    debug_log = new DebugLog("395.log");
+    /*debug_log = new DebugLog("395.log");
 
-    connect(this, &BrakeCrane395::DebugPrint, debug_log, &DebugLog::DebugPring);
+    connect(this, &BrakeCrane395::DebugPrint, debug_log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------

@@ -53,6 +53,7 @@ struct cmd_line_t
     option_t<int>             height;
     option_t<bool>            fullscreen;
     option_t<bool>            localmode;
+    option_t<std::string>     notify_level;
 };
 
 #endif // CMD_LINE_H
