@@ -13,7 +13,7 @@
 		<FovY>30.0</FovY>
 		<zNear>1.0</zNear>
 		<zFar>1000.0</zFar>
-		<ScreenNumber>1</ScreenNumber>
+		<ScreenNumber>0</ScreenNumber>
 		<Name>viewer</Name>
 		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>

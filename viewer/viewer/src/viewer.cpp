@@ -93,10 +93,11 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char *argv[])
 {
-    osg::setNotifyLevel(osg::WARN);
-    osg::setNotifyHandler(new LogFileHandler("../logs/viewer.log"));
-
     FileSystem &fs = FileSystem::getInstance();
+
+    osg::setNotifyLevel(osg::INFO);
+    std::string logs_path = fs.getLogsDir();
+    osg::setNotifyHandler(new LogFileHandler(logs_path + fs.separator() + "viewer.log"));
 
     // Read settings from config file
     settings = loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
@@ -108,7 +109,10 @@ bool RouteViewer::init(int argc, char *argv[])
 
     // Load selected route
     if (!loadRoute(cmd_line.route_dir.value))
+    {
+        OSG_FATAL << "Route from " << cmd_line.route_dir.value << " is't loaded" << std::endl;
         return false;
+    }
 
     // Init graphical engine settings
     if (!initEngineSettings(root.get()))

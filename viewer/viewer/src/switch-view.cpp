@@ -25,6 +25,8 @@ CameraViewHandler::CameraViewHandler() : osgGA::GUIEventHandler ()
   , angleVertical(0.0)
   , angleHorizontal(0.0)
   , dist(20.0)
+  , camAngleHorizontal(0.0)
+  , camAngleVertical(0.0)
 {
 
 }
@@ -61,30 +63,12 @@ bool CameraViewHandler::handle(const osgGA::GUIEventAdapter &ea,
             cameraView = OUTSIZE_VIEW;
             break;
 
-        case osgGA::GUIEventAdapter::KEY_Left:
-            angleVertical += 0.1;
-            break;
+        default:
 
-        case osgGA::GUIEventAdapter::KEY_Right:
-            angleVertical -= 0.1;
-            break;
-
-        case osgGA::GUIEventAdapter::KEY_Up:
-            angleHorizontal += 0.1;
-            break;
-
-        case osgGA::GUIEventAdapter::KEY_Down:
-            angleHorizontal -= 0.1;
-            break;        
-
-        case osgGA::GUIEventAdapter::KEY_Equals:
-            dist += 0.5;
-            break;
-
-        case osgGA::GUIEventAdapter::KEY_Minus:
-            dist -= 0.5;
-            if (dist <= 5.0) dist = 5.0;
-            break;
+            if (cameraView == OUTSIZE_VIEW)
+                outCameraMotion(ea.getKey());
+            else
+                intCameraMotion(ea.getKey());
         }
 
         break;
@@ -108,7 +92,11 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
     {
     case CABINE_VIEW:
         {
+            osg::Matrix matrix;
+            matrix *= osg::Matrix::rotate(camAngleVertical, osg::Vec3(0, 1, 0));
+            matrix *= osg::Matrix::rotate(camAngleHorizontal, osg::Vec3(1, 0, 0));
 
+            viewMatrix *= matrix;
             break;
         }
 
@@ -125,4 +113,63 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
     }
 
     camera->setViewMatrix(viewMatrix);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraViewHandler::outCameraMotion(int key)
+{
+    switch (key)
+    {
+        case osgGA::GUIEventAdapter::KEY_Left:
+            angleVertical += 0.1;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Right:
+            angleVertical -= 0.1;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Up:
+            angleHorizontal += 0.1;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Down:
+            angleHorizontal -= 0.1;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Equals:
+            dist += 0.5;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Minus:
+            dist -= 0.5;
+            if (dist <= 5.0) dist = 5.0;
+            break;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraViewHandler::intCameraMotion(int key)
+{
+    switch (key)
+    {
+        case osgGA::GUIEventAdapter::KEY_Left:
+            camAngleVertical -= 0.02;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Right:
+            camAngleVertical += 0.02;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Up:
+            camAngleHorizontal -= 0.02;
+            break;
+
+        case osgGA::GUIEventAdapter::KEY_Down:
+            camAngleHorizontal += 0.02;
+            break;
+    }
 }

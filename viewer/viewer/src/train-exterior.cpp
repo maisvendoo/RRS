@@ -174,49 +174,88 @@ void TrainExteriorHandler::keyboardHandler(int key)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::load(const std::string &train_config)
 {
+    // Check train config name
     if (train_config.empty())
+    {
+        OSG_FATAL << "Train config is't referenced" << std::endl;
         return;
+    }
 
+    // Loading train config XML-file
     FileSystem &fs = FileSystem::getInstance();
     std::string path = fs.combinePath(fs.getTrainsDir(), train_config + ".xml");
 
     ConfigReader cfg(path);
 
     if (!cfg.isOpenned())
+    {
+        OSG_FATAL << "Train's config file " << path << " is't opened" << std::endl;
         return;
+    }
 
     osgDB::XmlNode *config_node = cfg.getConfigNode();
 
     if (config_node == nullptr)
+    {
+        OSG_FATAL << "There is no Cnfig node in file " << path << std::endl;
         return;
+    }
 
+    // Parsing of train config file
     for (auto it = config_node->children.begin(); it != config_node->children.end(); ++it)
     {
         osgDB::XmlNode *child = *it;
 
+        // Check that node is Vehicle node
         if (child->name == "Vehicle")
         {
             int count = 0;
 
             osgDB::XmlNode *count_node = cfg.findSection(child, "Count");
 
-            if (count_node != nullptr)
-                getValue(count_node->contents, count);
+            if (count_node == nullptr)
+            {
+                OSG_FATAL << "Number of vehicles is't referenced" << std::endl;
+                continue;
+            }
+
+            // Read vehicles number
+            getValue(count_node->contents, count);
 
             std::string module_config_name = "";
 
             osgDB::XmlNode *module_config_node = cfg.findSection(child, "ModuleConfig");
 
-            if (module_config_node != nullptr)
+            if (module_config_node == nullptr)
             {
-                getValue(module_config_node->contents, module_config_name);
+                OSG_FATAL << "Vehicle module config is't referenced" << std::endl;
+                continue;
             }
 
+            // Load vehicle body model
+            getValue(module_config_node->contents, module_config_name);
+
             osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(module_config_name);
+
+            if (!vehicle_model.valid())
+            {
+                OSG_FATAL << "Vehicle model " << module_config_name << " is't loaded" << std::endl;
+                continue;
+            }
+
+            // Load wheels model
             osg::ref_ptr<osg::MatrixTransform> wheel_model = loadWheels(module_config_name);
 
+            if (!wheel_model.valid())
+            {
+                OSG_FATAL << "Wheels model is't loaded" << std::endl;
+                continue;
+            }
+
+            // Set wheels for each axis
             setAxis(vehicle_model.get(), wheel_model.get(), module_config_name);
 
+            // Load cabine model
             loadCabine(vehicle_model.get(), module_config_name);
 
             for (int i = 0; i < count; ++i)
@@ -332,7 +371,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     attitude.x() = -osg::PIf / 2.0f - attitude.x();
 
     // Calculate and set view matrix    
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(0.75f, 0.0f + height_shift, -8.0f - long_shift));
+    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(0.75f, 0.0f + height_shift, -8.3f - long_shift));
     matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
     matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
     matrix *= osg::Matrix::translate(position);

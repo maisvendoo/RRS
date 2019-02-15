@@ -59,10 +59,19 @@ private:
     /// Horizontal view angle
     double  angleHorizontal;
 
+    /// External camera distance
     double  dist;
+
+    double camAngleHorizontal;
+
+    double camAngleVertical;
 
     /// Camera view setting
     void setCameraView(CameraView cameraView, osg::Camera *camera);
+
+    void outCameraMotion(int key);
+
+    void intCameraMotion(int key);
 };
 
 #endif // SWITCH_VIEW_H
