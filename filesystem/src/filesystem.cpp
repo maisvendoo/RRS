@@ -59,6 +59,11 @@ void FileSystem::setBinaryDir(const std::string &path)
     binDir = getNativePath(path);
 }
 
+void FileSystem::setPluginsDir(const std::string &path)
+{
+    pluginsDir = getNativePath(path);
+}
+
 void FileSystem::setDataDir(const std::string &path)
 {
     dataDir = getNativePath(path);
@@ -137,6 +142,11 @@ std::string FileSystem::getDevicesDir() const
 std::string FileSystem::getBinaryDir() const
 {
     return binDir;
+}
+
+std::string FileSystem::getPluginsDir() const
+{
+    return  pluginsDir;
 }
 
 std::string FileSystem::getDataDir() const

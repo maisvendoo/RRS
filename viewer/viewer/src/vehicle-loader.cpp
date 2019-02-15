@@ -292,7 +292,7 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
         cfg.getValue(secName, "CabineModel", cabineModelName);
         cfg.getValue(secName, "CabineTexture", cabineTextureName);
 
-        if (cabineModelName.empty() || cabineTextureName.empty())
+        if (cabineModelName.empty())
             return;
 
         if (cfg.getValue(secName, "CabineShift", cabineShift))

@@ -36,6 +36,7 @@ public:
         instance.setDataDir(tmp + "data");
         instance.setVehicleModelsDir(instance.combinePath(instance.getDataDir(), "models"));
         instance.setVehicleTexturesDir(instance.combinePath(instance.getDataDir(), "textures"));
+        instance.setPluginsDir(tmp + "plugins");
 
         return instance;
     }    
@@ -63,6 +64,8 @@ public:
 
     std::string getBinaryDir() const;
 
+    std::string getPluginsDir() const;
+
     std::string getDataDir() const;
 
     std::string getVehicleModelsDir() const;
@@ -88,6 +91,7 @@ private:
     std::string couplingsDir;
     std::string devicesDir;
     std::string binDir;
+    std::string pluginsDir;
 
     std::string dataDir;
     std::string vehicleModelsDir;
@@ -118,6 +122,8 @@ private:
     void setDevicesDir(const std::string &path);
 
     void setBinaryDir(const std::string &path);
+
+    void setPluginsDir(const std::string &path);
 
     void setDataDir(const std::string &path);
 

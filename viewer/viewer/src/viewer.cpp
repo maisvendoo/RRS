@@ -250,7 +250,7 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
 
     std::string routeLoaderPlugin = routeExt + "-route-loader";
 
-    osg::ref_ptr<RouteLoader> loader = loadRouteLoader("../plugins", routeLoaderPlugin);
+    osg::ref_ptr<RouteLoader> loader = loadRouteLoader(fs.getPluginsDir(), routeLoaderPlugin);
 
     if (!loader.valid())
     {

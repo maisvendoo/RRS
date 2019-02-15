@@ -11,12 +11,9 @@
                 <WheelInertia>2.0</WheelInertia>
 
                 <ExtModelName>test-loco/kuzov.osgt</ExtModelName> 
-                <ModelShift>0.0 0.0 0.0</ModelShift>
+                <ModelShift>0.0 0.0 0.0</ModelShift>                
 
-                <ExtTextureName>test-loco/kuzov.bmp</ExtTextureName>  
-
-                <WheelModel>test-loco/kolpara_tepl.osgt</WheelModel>
-                <WheelTexture>test-loco/kolpara_tepl.bmp</WheelTexture>
+                <WheelModel>test-loco/kolpara_tepl.osgt</WheelModel>                
 
                 <Axis>0.0 -8.5 0.85</Axis>
                 <Axis>0.0 -6.2 0.85</Axis>
@@ -24,14 +21,12 @@
 
                 <Axis>0.0 8.5 0.85</Axis>
                 <Axis>0.0 6.2 0.85</Axis>
-                <Axis>0.0 4.1 0.85</Axis>
-                
+                <Axis>0.0 4.1 0.85</Axis>                
 
                 <CabineModel>test-loco/cab.osgt</CabineModel>
                 <CabineShift>0.0 0.0 0.0</CabineShift>
-                <CabineTexture>test-loco/cab.bmp</CabineTexture>
-
+                
                 <BrakeCrane>krm395</BrakeCrane>
-
+                
 	</Vehicle>
 </Config>
