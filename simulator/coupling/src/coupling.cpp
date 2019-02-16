@@ -81,7 +81,7 @@ Coupling *loadCoupling(QString lib_path)
 
     if (lib.load())
     {
-        GetCoupling getCoupling = (GetCoupling) lib.resolve("getCoupling");
+        GetCoupling getCoupling = reinterpret_cast<GetCoupling>(lib.resolve("getCoupling"));
 
         if (getCoupling)
         {

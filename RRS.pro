@@ -12,7 +12,6 @@ CONFIG(release, debug|release) {
 SUBDIRS += ./CfgReader
 SUBDIRS += ./filesystem
 SUBDIRS += ./log
-#SUBDIRS += ./tcp
 SUBDIRS += ./tcp-connection
 SUBDIRS += ./simulator
 
@@ -20,6 +19,7 @@ SUBDIRS += ./addons/default-vehicle
 SUBDIRS += ./addons/test-loco
 SUBDIRS += ./addons/sapsan-motor
 SUBDIRS += ./addons/sapsan-non-motor
+SUBDIRS += ./addons/passcar
 
 SUBDIRS += ./launcher
 

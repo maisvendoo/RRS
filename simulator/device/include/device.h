@@ -48,7 +48,7 @@ public:
     virtual ~Device();
 
     /// Step of ODE system solving
-    virtual void step(double t, double dt);    
+    virtual void step(double t, double dt);            
 
     /// Set state variable
     void setY(size_t i, double value);
@@ -88,6 +88,10 @@ protected:
 
     /// Device configuration loading
     virtual void load_config(CfgReader &cfg);
+
+    virtual void preStep(const state_vector_t &Y, double t);
+
+    virtual void postStep(const state_vector_t &Y, double t);
 };
 
 #endif // DEVICE_H

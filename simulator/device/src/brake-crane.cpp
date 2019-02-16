@@ -103,7 +103,7 @@ BrakeCrane *loadBrakeCrane(QString lib_path)
 
     if (lib.load())
     {
-        GetBrakeCrane getBrakeCrane = (GetBrakeCrane) lib.resolve("getBrakeCrane");
+        GetBrakeCrane getBrakeCrane = reinterpret_cast<GetBrakeCrane>(lib.resolve("getBrakeCrane"));
 
         if (getBrakeCrane)
         {

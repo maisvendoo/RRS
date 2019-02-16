@@ -13,8 +13,8 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	<Vehicle>
-		<Module>default-vehicle</Module>
-		<ModuleConfig>default-vehicle</ModuleConfig>
+		<Module>passcar</Module>
+		<ModuleConfig>passcar</ModuleConfig>
 		<Count>20</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>	

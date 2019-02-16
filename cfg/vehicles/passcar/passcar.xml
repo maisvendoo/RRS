@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+
+		<EmptyMass>53500</EmptyMass>
+		<PayloadMass>6000</PayloadMass>
+		<Length>25.0</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>4</NumAxis>		
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+        <WheelInertia>2.0</WheelInertia>
+
+        <ExtModelName>passcar/wag-1.osgt</ExtModelName>
+        
+        <WheelModel>passcar/wheel-1.osgt</WheelModel>
+        
+
+        <Axis>0.0 -7.3 0.786</Axis>
+        <Axis>0.0 -9.7 0.786</Axis>
+
+        <Axis>0.0 7.3 0.786</Axis>        
+        <Axis>0.0 9.7 0.786</Axis>
+
+        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+        <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+
+	</Vehicle>
+</Config>

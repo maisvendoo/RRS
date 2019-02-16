@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<MainResist>		
+		<b0>0.7</b0>
+		<b1>8.0</b1>
+		<b2>0.16</b2>
+		<b3>0.0023</b3>
+		<q0>15.0</q0>		
+	</MainResist>
+</Config>

@@ -42,6 +42,8 @@ void Device::step(double t, double dt)
 {
     emit DebugPrint(t, y);
 
+    preStep(y, t);
+
     ode_system(y, dydt, t);    
 
     for (size_t i = 0; i < y.size(); ++i)
@@ -73,6 +75,8 @@ void Device::step(double t, double dt)
         k4[i] = dydt[i];
         y[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dt / 6.0;
     }
+
+    postStep(y, t + dt);
 }
 
 //------------------------------------------------------------------------------
@@ -134,4 +138,16 @@ void Device::read_config(const QString &path)
 void Device::load_config(CfgReader &cfg)
 {
     Q_UNUSED(cfg)
+}
+
+void Device::preStep(const state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+}
+
+void Device::postStep(const state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 }

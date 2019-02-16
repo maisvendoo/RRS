@@ -502,7 +502,7 @@ Vehicle *loadVehicle(QString lib_path)
 
     if (lib.load())
     {
-        GetVehicle getVehicle = (GetVehicle) lib.resolve("getVehicle");
+        GetVehicle getVehicle = reinterpret_cast<GetVehicle>(lib.resolve("getVehicle"));
 
         if (getVehicle)
         {
