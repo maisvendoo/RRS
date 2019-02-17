@@ -36,6 +36,7 @@ void PassCarrige::initialization()
     {
         brake_mech->read_config(brake_mech_config);
         brake_mech->setEffFricRadius(wheel_diameter / 2.0);
+        brake_mech->setWheelDiameter(wheel_diameter);
     }
 }
 
@@ -69,7 +70,7 @@ void PassCarrige::keyProcess()
 {
     double step = 0.1;
 
-    if (keys['l'] && !inc_loc)
+    if (keys[KEY_L] && !inc_loc)
     {
         pz +=  step;
         inc_loc = true;
@@ -79,7 +80,7 @@ void PassCarrige::keyProcess()
         inc_loc = false;
     }
 
-    if (keys['k'] && !dec_loc)
+    if (keys[KEY_K] && !dec_loc)
     {
         pz -=  step;
         dec_loc = true;

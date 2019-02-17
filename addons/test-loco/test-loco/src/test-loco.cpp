@@ -20,6 +20,7 @@ TestLoco::TestLoco() : Vehicle()
   , inc_brake(false)
   , dec_brake(false)
   , brake_crane_module("krm395")
+  , brake_crane_config("krm395")
   , brake_crane(nullptr)  
   , brake_mech(nullptr)
   , brake_mech_module("carbrake-mech")
@@ -101,8 +102,11 @@ void TestLoco::initialization()
 
     if (brake_crane != nullptr)
     {
-        brake_crane->read_config(brake_crane_module);
+        brake_crane->read_config(brake_crane_config);
+
         brake_mech->read_config(brake_mech_config);
+        brake_mech->setEffFricRadius(wheel_diameter / 2.0);
+        brake_mech->setWheelDiameter(wheel_diameter);
     }
 }
 
@@ -117,7 +121,8 @@ void TestLoco::loadConfig(QString cfg_path)
     {
         QString secName = "Vehicle";
 
-        cfg.getString(secName, "BrakeCrane", brake_crane_module);
+        cfg.getString(secName, "BrakeCraneModule", brake_crane_module);
+        cfg.getString(secName, "BrakeCraneConfig", brake_crane_config);
 
         cfg.getString(secName, "BrakeMechModule", brake_mech_module);
         cfg.getString(secName, "BrakeMechCinfig", brake_mech_config);
@@ -131,7 +136,7 @@ void TestLoco::keyProcess()
 {
     double traction_step = 0.1;
 
-    if (keys[97] && !inc_loc)
+    if (keys[KEY_A] && !inc_loc)
     {
         traction_level +=  traction_step;
         inc_loc = true;
@@ -141,10 +146,13 @@ void TestLoco::keyProcess()
         inc_loc = false;
     }
 
-    if (keys[100] && !dec_loc)
+    if (keys[KEY_D] && !dec_loc)
     {
         traction_level -=  traction_step;
         dec_loc = true;
+
+        if (keys[KEY_Shift_L])
+            traction_level = 0.0;
     }
     else
     {
@@ -175,7 +183,7 @@ void TestLoco::keyProcess()
 
     double step = 0.1;
 
-    if (keys['l'] && !inc_brake)
+    if (keys[KEY_L] && !inc_brake)
     {
         pz +=  step;
         inc_brake = true;
@@ -185,7 +193,7 @@ void TestLoco::keyProcess()
         inc_brake = false;
     }
 
-    if (keys['k'] && !dec_brake)
+    if (keys[KEY_K] && !dec_brake)
     {
         pz -=  step;
         dec_brake = true;

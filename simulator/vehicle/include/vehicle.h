@@ -21,6 +21,7 @@
 #include    <QMap>
 
 #include    "solver-types.h"
+#include    "key-symbols.h"
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT

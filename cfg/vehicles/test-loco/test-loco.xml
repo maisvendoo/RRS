@@ -26,7 +26,8 @@
                 <CabineModel>test-loco/cab.osgt</CabineModel>
                 <CabineShift>0.0 0.0 0.0</CabineShift>
                 
-                <BrakeCrane>krm395</BrakeCrane>
+                <BrakeCraneModule>krm395</BrakeCraneModule>
+                <BrakeCraneConfig>krm395</BrakeCraneConfig>
 
                 <BrakeMechModule>carbrakes-mech</BrakeMechModule>
                 <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>

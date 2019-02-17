@@ -36,6 +36,8 @@ private:
     bool dec_brake;
 
     QString brake_crane_module;
+    QString brake_crane_config;
+
     BrakeCrane  *brake_crane;
     BrakeMech   *brake_mech;
 

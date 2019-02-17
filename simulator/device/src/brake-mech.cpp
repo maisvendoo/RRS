@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+//
+//      Vehicle brake mechanism abstract class
+//      (c) maisvendoo, 15/02/2019
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Vehicle brake mechanism abstract class
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 15/02/2019
+ */
+
 #include    "brake-mech.h"
 
 #include    <QLibrary>
@@ -5,8 +19,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BrakeMech::BrakeMech(QObject *parent) : Device(parent)
-  , numAxis(4)
+BrakeMech::BrakeMech(QObject *parent) : Device(parent)  
   , shoesCyl(16)
   , shoesAxis(4)
   , cylNum(1)
@@ -20,6 +33,7 @@ BrakeMech::BrakeMech(QObject *parent) : Device(parent)
   , F0(1649.0)
   , K(0.0)
   , effRadius(0.475)
+  , wheelDiameter(0.95)
   , velocity(0.0)
   , shoeType("iron")
 {
@@ -37,14 +51,6 @@ BrakeMech::~BrakeMech()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeMech::setAxisNumber(int numAxis)
-{
-    this->numAxis = numAxis;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void BrakeMech::setAirFlow(double Q)
 {
     this->Q = Q;
@@ -56,6 +62,14 @@ void BrakeMech::setAirFlow(double Q)
 void BrakeMech::setEffFricRadius(double radius)
 {
     effRadius = radius;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeMech::setWheelDiameter(double diameter)
+{
+    wheelDiameter = diameter;
 }
 
 //------------------------------------------------------------------------------
@@ -158,7 +172,8 @@ double BrakeMech::phi(double K, double v)
 
     if (shoeType == "composite")
     {
-        fric_coeff = 0.44 * (K1 + 20) * (V + 150) / (4 * K1 + 20) / (2 * V + 150);
+        double k = 2 * effRadius / wheelDiameter;
+        fric_coeff = 0.44 * (K1 + 20) * (V * k + 150) / (4 * K1 + 20) / (2 * V * k + 150);
     }
 
     return fric_coeff;
