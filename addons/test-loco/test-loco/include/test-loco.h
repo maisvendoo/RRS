@@ -10,6 +10,7 @@
 
 #include    "vehicle.h"
 #include    "brake-crane.h"
+#include    "brake-mech.h"
 
 class TestLoco : public Vehicle
 {
@@ -30,8 +31,16 @@ private:
 
     int crane_pos;
 
+    double pz;
+    bool inc_brake;
+    bool dec_brake;
+
     QString brake_crane_module;
     BrakeCrane  *brake_crane;
+    BrakeMech   *brake_mech;
+
+    QString     brake_mech_module;
+    QString     brake_mech_config;
 
     void step(double t, double dt);
 

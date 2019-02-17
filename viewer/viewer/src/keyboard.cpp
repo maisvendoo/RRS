@@ -148,6 +148,13 @@ void KeyboardHandler::init()
 
     addKey(osgGA::GUIEventAdapter::KEY_Leftbracket);
     addKey(osgGA::GUIEventAdapter::KEY_Rightbracket);
+
+    addKey(osgGA::GUIEventAdapter::KEY_Shift_L);
+    addKey(osgGA::GUIEventAdapter::KEY_Shift_R);
+    addKey(osgGA::GUIEventAdapter::KEY_Control_L);
+    addKey(osgGA::GUIEventAdapter::KEY_Control_R);
+    addKey(osgGA::GUIEventAdapter::KEY_Alt_L);
+    addKey(osgGA::GUIEventAdapter::KEY_Alt_R);
 }
 
 //------------------------------------------------------------------------------

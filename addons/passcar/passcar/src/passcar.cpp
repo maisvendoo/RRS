@@ -67,7 +67,7 @@ void PassCarrige::step(double t, double dt)
 //------------------------------------------------------------------------------
 void PassCarrige::keyProcess()
 {
-    double step = 0.05;
+    double step = 0.1;
 
     if (keys['l'] && !inc_loc)
     {

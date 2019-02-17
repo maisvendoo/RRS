@@ -16,8 +16,14 @@ TestLoco::TestLoco() : Vehicle()
   , inc_crane_loc(false)
   , dec_crane_loc(false)
   , crane_pos(1)
+  , pz(0.0)
+  , inc_brake(false)
+  , dec_brake(false)
   , brake_crane_module("krm395")
-  , brake_crane(nullptr)
+  , brake_crane(nullptr)  
+  , brake_mech(nullptr)
+  , brake_mech_module("carbrake-mech")
+  , brake_mech_config("tep70bs-mech")
 {
 
 }
@@ -37,11 +43,25 @@ void TestLoco::step(double t, double dt)
 {
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
 
+    if (brake_mech != nullptr)
+    {
+        brake_mech->setVelocity(velocity);
+
+        double p = brake_mech->getBrakeCylinderPressure();
+        double K1 = 1e-2;
+        pz = Physics::cut(pz, 0.0, 0.4);
+        double Q = K1 * (pz - p);
+
+        brake_mech->setAirFlow(Q);
+        brake_mech->step(t, dt);
+    }
 
     for (size_t i = 0; i < Q_a.size(); i++)
     {
         double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
+        double brakeTorque = brake_mech->getBrakeTorque();
         Q_a[i] = torque;
+        Q_r[i] = brakeTorque;
     }
 
     if (brake_crane != nullptr)
@@ -77,9 +97,13 @@ void TestLoco::initialization()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir(fs.getModulesDir().c_str());
     brake_crane = loadBrakeCrane(modules_dir + fs.separator() + brake_crane_module);
+    brake_mech = loadBrakeMech(modules_dir + fs.separator() + brake_mech_module);
 
     if (brake_crane != nullptr)
+    {
         brake_crane->read_config(brake_crane_module);
+        brake_mech->read_config(brake_mech_config);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -94,6 +118,9 @@ void TestLoco::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getString(secName, "BrakeCrane", brake_crane_module);
+
+        cfg.getString(secName, "BrakeMechModule", brake_mech_module);
+        cfg.getString(secName, "BrakeMechCinfig", brake_mech_config);
     }
 }
 
@@ -144,6 +171,28 @@ void TestLoco::keyProcess()
     else
     {
         inc_crane_loc = false;        
+    }
+
+    double step = 0.1;
+
+    if (keys['l'] && !inc_brake)
+    {
+        pz +=  step;
+        inc_brake = true;
+    }
+    else
+    {
+        inc_brake = false;
+    }
+
+    if (keys['k'] && !dec_brake)
+    {
+        pz -=  step;
+        dec_brake = true;
+    }
+    else
+    {
+        dec_brake = false;
     }
 
     analogSignal[0] = static_cast<float>(traction_level);

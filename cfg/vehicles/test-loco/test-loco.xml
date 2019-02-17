@@ -27,6 +27,9 @@
                 <CabineShift>0.0 0.0 0.0</CabineShift>
                 
                 <BrakeCrane>krm395</BrakeCrane>
+
+                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+                <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
                 
 	</Vehicle>
 </Config>
