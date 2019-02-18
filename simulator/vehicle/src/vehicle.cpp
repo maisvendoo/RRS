@@ -312,10 +312,10 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     double Fr = Physics::fricForce(W + Q_r[0], v);
 
-    *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumCreepForces - G) / full_mass;
+    *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumCreepForces - G) / ( full_mass + num_axis * J_axis / rk / rk);
 
     auto end = a.end();
-    for (auto accel_it = a.begin(); accel_it != end; ++accel_it)
+    for (auto accel_it = a.begin() + 1; accel_it != end; ++accel_it)
         *accel_it = *a.begin() / rk;
 
     return a;

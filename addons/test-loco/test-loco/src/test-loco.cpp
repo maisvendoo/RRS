@@ -57,7 +57,7 @@ void TestLoco::step(double t, double dt)
         brake_mech->step(t, dt);
     }
 
-    for (size_t i = 0; i < Q_a.size(); i++)
+    for (size_t i = 1; i < Q_a.size(); i++)
     {
         double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
         double brakeTorque = brake_mech->getBrakeTorque();
@@ -80,7 +80,7 @@ void TestLoco::step(double t, double dt)
 //------------------------------------------------------------------------------
 double TestLoco::traction_char(double v)
 {
-    double max_traction = 600e3;    
+    double max_traction = 280e3;
 
     double vn = 81.0 / Physics::kmh;
 

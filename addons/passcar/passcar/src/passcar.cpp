@@ -57,7 +57,7 @@ void PassCarrige::step(double t, double dt)
         brake_mech->step(t, dt);
     }
 
-    for (size_t i = 0; i < Q_r.size(); ++i)
+    for (size_t i = 1; i < Q_r.size(); ++i)
     {
         Q_r[i] = brake_mech->getBrakeTorque();
     }
