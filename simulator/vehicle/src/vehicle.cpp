@@ -36,6 +36,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , num_axis(4)
   , J_axis(2.0)
   , wheel_diameter(0.95)
+  , rk(0.475)
   , R1(0.0)
   , R2(0.0)
   , s(5)
@@ -287,33 +288,37 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 {
     (void) t;
 
-    state_vector_t a;
-    a.resize(s);
-
+    // Get body velocity from state vector
     double v = Y[idx + s];
+    // Convert velocity to kmh
     double V = abs(v) * Physics::kmh;
 
+    // Calculate gravity force from profile inclination
     double sin_beta = inc / 1000.0;
     double G = full_mass * Physics::g * sin_beta;
 
+    // Calculate main resistence force
     double w = b0 + (b1 + b2 * V + b3 * V * V) / q0;
     double wk = 700.0 * curv;
     double W = full_mass * Physics::g * (w + wk) / 1000.0;
 
-    double sumCreepForces = 0;
 
-    double rk = wheel_diameter / 2.0;
+    // Calculate equvivalent wheel forces
+    double sumEqWheelForce = 0;
 
     for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
     {
-        double creepForce = (Q_a[i] - Physics::fricForce(Q_r[i], Y[idx + s + i])) / rk;
-        sumCreepForces += creepForce;
+        double eqWheelForce = (Q_a[i] - Physics::fricForce(Q_r[i], Y[idx + s + i])) / rk;
+        sumEqWheelForce += eqWheelForce;
     }
 
+    // Calculate equvivalent resistence force
     double Fr = Physics::fricForce(W + Q_r[0], v);
 
-    *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumCreepForces - G) / ( full_mass + num_axis * J_axis / rk / rk);
+    // Vehicle body's acceleration
+    *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumEqWheelForce - G) / ( full_mass + num_axis * J_axis / rk / rk);
 
+    // Wheels angle accelerations
     auto end = a.end();
     for (auto accel_it = a.begin() + 1; accel_it != end; ++accel_it)
         *accel_it = *a.begin() / rk;
@@ -430,6 +435,8 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "Length", length);
         cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
 
+        rk = wheel_diameter / 2.0;
+
         int tmp = 0;
         cfg.getInt(secName, "NumAxis", tmp);
 
@@ -441,6 +448,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         Q_a.resize(s);
         Q_r.resize(s);
+        a.resize(s);
 
         for (size_t i = 0; i < Q_a.size(); i++)
             Q_a[i] = Q_r[i] = 0;

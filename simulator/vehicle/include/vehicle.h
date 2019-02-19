@@ -165,6 +165,8 @@ protected:
     double  J_axis;
     /// Wheel diameter
     double  wheel_diameter;
+    /// Wheel radius
+    double  rk;
 
     /// Forward coupling force
     double  R1;
@@ -210,6 +212,8 @@ protected:
     state_vector_t  Q_a;
     /// Reactive common forces
     state_vector_t  Q_r;
+    /// Vehicle common acceleration
+    state_vector_t  a;
 
     QMap<int, bool> keys;
 
