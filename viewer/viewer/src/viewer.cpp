@@ -34,6 +34,7 @@
 #include    "motion-blur.h"
 #include    "qt-events.h"
 #include    "switch-view.h"
+#include    "screen-capture.h"
 
 #include    <QObject>
 
@@ -137,6 +138,15 @@ bool RouteViewer::init(int argc, char *argv[])
     // Init motion blur
     if (!initMotionBlurEffect(&viewer, settings))
         return false;
+
+    osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile =
+            new WriteToFileOperation(fs.getScreenshotsDir());
+
+    osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler =
+            new osgViewer::ScreenCaptureHandler(writeFile.get());
+
+    viewer.addEventHandler(screenCaptureHandler.get());
+    viewer.addEventHandler(new ScreenCaptureHandler(screenCaptureHandler.get()));
 
     return true;
 }

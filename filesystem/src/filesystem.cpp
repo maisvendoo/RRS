@@ -79,6 +79,11 @@ void FileSystem::setVehicleTexturesDir(const std::string &path)
     vehicleTexturesDir = getNativePath(path);
 }
 
+void FileSystem::setScreenshotsDir(const std::string &path)
+{
+    screenshotsDir = getNativePath(path);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -162,6 +167,11 @@ std::string FileSystem::getVehicleModelsDir() const
 std::string FileSystem::getVehicleTexturesDir() const
 {
     return vehicleTexturesDir;
+}
+
+std::string FileSystem::getScreenshotsDir() const
+{
+    return screenshotsDir;
 }
 
 //------------------------------------------------------------------------------

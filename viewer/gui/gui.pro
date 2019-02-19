@@ -1,15 +1,12 @@
-TEMPLATE = app
+DEFINES += ROUTE_LOADER_LIB
+
+TEMPLATE = lib
 
 CONFIG += qt
 
-QT += core
-QT += gui
-QT += widgets
-QT += network
+TARGET = gui
 
-TARGET = viewer
-
-DESTDIR = ../../../bin
+DESTDIR = ../../../lib
 
 win32 {
 
@@ -27,12 +24,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgTextd
 
-        LIBS += -L../../../lib -lroute-loader_d
-        LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
-        LIBS += -L../../../lib -lTcpConnection_d
 
     } else {
 
@@ -42,15 +35,10 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgText
 
-        LIBS += -L../../../lib -lroute-loader
-        LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
-        LIBS += -L../../../lib -lTcpConnection
-    }
 
-    LIBS += -lopengl32 -lglu32
+    }
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 }
@@ -67,12 +55,8 @@ unix {
         LIBS += -lOpenThreadsd
         LIBS += -losgGAd
         LIBS += -losgUtild
-        LIBS += -losgTextd
 
-        LIBS += -L../../../lib -lroute-loader_d
-        LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
-        LIBS += -L../../lib -lTcpConnection_d
 
     } else {
 
@@ -82,24 +66,16 @@ unix {
         LIBS +=  -lOpenThreads
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
-        LIBS += -losgText
 
-        LIBS += -L../../../lib -lroute-loader
-        LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
-        LIBS += -L../../lib -lTcpConnection
     }
-
-    LIBS += -lGL
 }
+
 
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../filesystem/include
-INCLUDEPATH += ../../tcp-connection/include
-INCLUDEPATH += ../route-loader/include
-INCLUDEPATH += ../library/include
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h) \
-    include/screen-capture.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
+
