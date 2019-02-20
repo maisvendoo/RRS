@@ -25,6 +25,8 @@ Device::Device(QObject *parent) : QObject(parent)
     modules_dir = fs.getModulesDir();
 
     qRegisterMetaType<state_vector_t>();
+
+    DebugMsg = "";
 }
 
 //------------------------------------------------------------------------------
@@ -130,6 +132,14 @@ void Device::read_config(const QString &path)
 
         load_config(cfg);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Device::getDebugMsg() const
+{
+    return DebugMsg;
 }
 
 //------------------------------------------------------------------------------

@@ -59,6 +59,8 @@ public:
     /// Read device config file
     virtual void read_config(const QString &path);
 
+    QString getDebugMsg() const;
+
 signals:
 
     /// Print debug info into file
@@ -82,6 +84,8 @@ protected:
     std::string cfg_dir;
 
     std::string modules_dir;
+
+    QString     DebugMsg;
 
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
