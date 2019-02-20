@@ -42,7 +42,7 @@ private:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class KeyboardHUDHandler : public osgGA::EventHandler
+class KeyboardHUDHandler : public osgGA::GUIEventHandler
 {
 public:
 

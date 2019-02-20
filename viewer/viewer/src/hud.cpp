@@ -92,7 +92,9 @@ bool KeyboardHUDHandler::handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActi
         switch (ea.getKey())
         {
         case osgGA::GUIEventAdapter::KEY_F1:
-            switchNode->setValue(0, !switchNode->getValue(0));
+            bool state = switchNode->getValue(0);
+            state = !state;
+            switchNode->setValue(0, state);
             break;
         }
 
