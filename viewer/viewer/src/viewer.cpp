@@ -21,6 +21,7 @@
 #include    <osgDB/FileNameUtils>
 #include    <osgViewer/ViewerEventHandlers>
 #include    <osg/LightModel>
+#include    <osgViewer/View>
 
 #include    "filesystem.h"
 #include    "config-reader.h"
@@ -35,6 +36,7 @@
 #include    "qt-events.h"
 #include    "switch-view.h"
 #include    "screen-capture.h"
+#include    "hud.h"
 
 #include    <QObject>
 
@@ -147,6 +149,11 @@ bool RouteViewer::init(int argc, char *argv[])
 
     viewer.addEventHandler(screenCaptureHandler.get());
     viewer.addEventHandler(new ScreenCaptureHandler(screenCaptureHandler.get()));
+
+    HUD *hud = new HUD(settings.width, settings.height);
+    root->addChild(hud->getCamera());
+
+    viewer.addEventHandler(new KeyboardHUDHandler(hud->getScene()));
 
     return true;
 }
