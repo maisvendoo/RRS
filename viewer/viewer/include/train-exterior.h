@@ -15,6 +15,8 @@
 #ifndef     TRAINE_XTERIOR_H
 #define     TRAINE_XTERIOR_H
 
+#include    <QObject>
+
 #include    <osgGA/GUIEventHandler>
 #include    <osg/MatrixTransform>
 
@@ -32,8 +34,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TrainExteriorHandler : public osgGA::GUIEventHandler
+class TrainExteriorHandler : public QObject, public osgGA::GUIEventHandler
 {
+    Q_OBJECT
+
 public:
 
     /// Constructor
@@ -45,6 +49,10 @@ public:
 
     /// Get exterior scene group
     osg::Group *getExterior();
+
+signals:
+
+    void setStatusBar(QString msg);
 
 private:
 

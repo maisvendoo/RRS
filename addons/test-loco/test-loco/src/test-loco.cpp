@@ -73,6 +73,16 @@ void TestLoco::step(double t, double dt)
         brake_crane->setBrakePipePressure(pTM);
         brake_crane->step(t, dt);
     }
+
+    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8")
+            .arg(t, 7, 'f', 1)
+            .arg(railway_coord, 7, 'f', 2)
+            .arg(velocity * 3.6, 6, 'f', 1)
+            .arg(traction_level, 3, 'f', 1)
+            .arg(dt, 8, 'f', 6)
+            .arg(brake_crane->getEqReservoirPressure(), 4, 'f', 2)
+            .arg(brake_crane->getBrakePipeInitPressure(), 4, 'f', 2)
+            .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2);
 }
 
 //------------------------------------------------------------------------------

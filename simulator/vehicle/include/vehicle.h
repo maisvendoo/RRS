@@ -133,7 +133,9 @@ public:
 
     ///
     void setBrakepipePressure(double pTM);
-    
+
+    QString getDebugMsg() const;
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -208,6 +210,8 @@ protected:
     /// Brakepipe pressure
     double pTM;
 
+    QString DebugMsg;
+
     /// Active common forces
     state_vector_t  Q_a;
     /// Reactive common forces
@@ -218,7 +222,7 @@ protected:
     QMap<int, bool> keys;
 
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];
-    float   analogSignal[NUM_ANALOG_SIGNALS];
+    float   analogSignal[NUM_ANALOG_SIGNALS];    
 
     /// User defined initialization
     virtual void initialization();

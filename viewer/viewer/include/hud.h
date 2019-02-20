@@ -28,15 +28,23 @@ public:
 
     osgViewer::View *getView();
 
+public slots:
+
+    void setStatusBar(QString msg);
+
 private:
 
     osg::ref_ptr<osg::Camera>   camera;
     osg::ref_ptr<osg::Switch>   scene;
     std::string                 fontPath;
     osg::ref_ptr<osgViewer::View> view;
+    osg::ref_ptr<osgText::Text> statusBar;
 
     osg::Camera *createCamera(int width, int height);
-    osgText::Text *createText(const osg::Vec3 &position, std::wstring text, float size);
+    osgText::Text *createText(const osg::Vec3
+                              &position,
+                              std::wstring text,
+                              float size, const osg::Vec4 &color = osg::Vec4(1.0, 1.0, 1.0, 1.0));
 };
 
 //------------------------------------------------------------------------------

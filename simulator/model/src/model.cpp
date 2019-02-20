@@ -363,6 +363,7 @@ void Model::tcpFeedBack()
         viewer_data.vehicles_data[i].velocity = static_cast<float>((*it)->getVelocity());
         viewer_data.vehicles_data[i].wheel_angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.vehicles_data[i].omega = static_cast<float>((*it)->getWheelOmega(0));
+        (*it)->getDebugMsg().toWCharArray(viewer_data.vehicles_data[i].DebugMsg);
         ++i;
     }
 

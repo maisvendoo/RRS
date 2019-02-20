@@ -29,7 +29,8 @@
 //------------------------------------------------------------------------------
 TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath,
                                            const std::string &train_config)
-    : osgGA::GUIEventHandler ()
+    : QObject(Q_NULLPTR)
+    , osgGA::GUIEventHandler ()
     , cur_vehicle(0)
     , long_shift(0.0f)
     , height_shift(0.0f)
@@ -73,7 +74,9 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             const network_data_t *nd = dynamic_cast<const network_data_t *>(ea.getUserData());
 
             if (nd->route_id != 0)
+            {
                 processServerData(nd);
+            }
             else
             {
                 this->nd.count = 0;
@@ -346,6 +349,9 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
             break;
         }
     }
+
+    QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
+    emit setStatusBar(msg + server_data->te[static_cast<size_t>(cur_vehicle)].DebugMsg);
 
     nd.count++;
     ref_time = 0.0;

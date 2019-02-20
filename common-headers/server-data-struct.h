@@ -21,18 +21,21 @@
 
 #include    <array>
 
+#include    <QString>
+
 struct vehicle_data_t
 {
     float   railway_coord;
     float   velocity;
     float   wheel_angle;
     float   omega;
+    wchar_t DebugMsg[2048];
 
     vehicle_data_t()
         : railway_coord(0.0f)
         , velocity(0.0f)
         , wheel_angle(0.0f)
-        , omega(0.0f)
+        , omega(0.0f)        
     {
 
     }

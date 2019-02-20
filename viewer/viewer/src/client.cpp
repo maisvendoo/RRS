@@ -102,6 +102,7 @@ void NetworkClient::onTimerRequest()
                     traj_elem->te[i].angle_end = server_data.vehicles_data[i].wheel_angle;
                     traj_elem->te[i].velocity = server_data.vehicles_data[i].velocity;
                     traj_elem->te[i].omega = server_data.vehicles_data[i].omega;
+                    traj_elem->te[i].DebugMsg = QString::fromWCharArray(server_data.vehicles_data[i].DebugMsg);
                 }
 
                 viewer->getEventQueue()->userEvent(traj_elem);

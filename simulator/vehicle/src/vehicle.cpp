@@ -50,6 +50,8 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , dir(1)
   , p0(0.0)
   , auxRate(0.0)
+  , pTM(0.0)
+  , DebugMsg(" ")
 {
 
 }
@@ -392,6 +394,11 @@ double Vehicle::getBrakepipeAuxRate() const
 void Vehicle::setBrakepipePressure(double pTM)
 {
     this->pTM = pTM;
+}
+
+QString Vehicle::getDebugMsg() const
+{
+    return DebugMsg;
 }
 
 //------------------------------------------------------------------------------

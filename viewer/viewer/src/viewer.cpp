@@ -86,7 +86,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
-    viewer.setThreadingModel(osgViewer::Viewer::ThreadPerContext);
+    viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     return viewer.run();
 }
@@ -154,6 +154,9 @@ bool RouteViewer::init(int argc, char *argv[])
     root->addChild(hud->getCamera());
 
     viewer.addEventHandler(new KeyboardHUDHandler(hud->getScene()));
+
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
+                     hud, &HUD::setStatusBar);
 
     return true;
 }

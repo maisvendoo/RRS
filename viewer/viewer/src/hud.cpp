@@ -3,6 +3,8 @@
 
 #include    <osg/Geode>
 
+#include    <iostream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -10,35 +12,59 @@ HUD::HUD(int width, int height, QObject *parent) : QObject (parent)
   , camera(nullptr)
   , scene(new osg::Switch)
   , view(new osgViewer::View)
+  , statusBar(nullptr)
 {
     FileSystem &fs = FileSystem::getInstance();
-    fontPath = fs.getFontsDir() + fs.separator() + "arial.ttf";
+    fontPath = fs.getFontsDir() + fs.separator() + "dejavu-sans-mono.ttf";
 
     camera = createCamera(width, height);    
     camera->setViewport(0, 0, width, height);
     view->setCamera(camera.get());
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 HUD::~HUD()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Camera *HUD::getCamera()
 {
     return camera.get();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Switch *HUD::getScene()
 {
     return scene.get();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osgViewer::View *HUD::getView()
 {
     return view.get();
 }
 
+void HUD::setStatusBar(QString msg)
+{
+    std::cout << qPrintable(msg) << std::endl;
+
+    if (statusBar.valid())
+        statusBar->setText(msg.toStdWString().c_str());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 osg::Camera *HUD::createCamera(int width, int height)
 {
     osg::ref_ptr<osg::Camera> camera = new osg::Camera;
@@ -54,7 +80,9 @@ osg::Camera *HUD::createCamera(int width, int height)
     osg::StateSet* stateset = geode->getOrCreateStateSet();
     stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
-    geode->addDrawable(createText(osg::Vec3(width / 2, height / 2, 0), L"Всё заебись!!!", 60.0f));
+    statusBar = createText(osg::Vec3(10, 10, 0), L"", 14.0f);
+
+    geode->addDrawable(statusBar.get());
 
     scene->addChild(geode.get(), true);
     camera->addChild(geode.get());
@@ -62,26 +90,38 @@ osg::Camera *HUD::createCamera(int width, int height)
     return camera.release();
 }
 
-osgText::Text *HUD::createText(const osg::Vec3 &position, std::wstring content, float size)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osgText::Text *HUD::createText(const osg::Vec3 &position,
+                               std::wstring content,
+                               float size,
+                               const osg::Vec4 &color)
 {
     osg::ref_ptr<osgText::Text> text = new osgText::Text;
     text->setFont(fontPath);
     text->setCharacterSize(size);
     text->setPosition(position);
-    text->setText(content.c_str());
-    text->setAlignment(osgText::Text::CENTER_CENTER);
-    text->setColor(osg::Vec4(1.0, 0.0, 0.0, 1.0));
+    text->setText(content.c_str());    
+    text->setColor(color);
 
     return text.release();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 KeyboardHUDHandler::KeyboardHUDHandler(osg::Switch *switchNode)
     : switchNode(switchNode)
 {
 
 }
 
-bool KeyboardHUDHandler::handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool KeyboardHUDHandler::handle(const osgGA::GUIEventAdapter &ea,
+                                osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(aa)
 

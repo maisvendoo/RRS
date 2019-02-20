@@ -19,6 +19,8 @@
 
 #include    "global-const.h"
 
+#include    <QString>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -30,6 +32,7 @@ struct traj_element_t
     float           angle_begin;
     float           angle_end;
     float           omega;
+    QString         DebugMsg;
 
     traj_element_t()
         : coord_begin(0.0f)
@@ -38,6 +41,7 @@ struct traj_element_t
         , angle_begin(0.0f)
         , angle_end(0.0f)
         , omega(0.0f)
+        , DebugMsg(" ")
     {
 
     }
@@ -55,12 +59,13 @@ struct network_data_t : public osg::Referenced
     unsigned int    route_id;
     float           delta_time;
     unsigned long   count;
+
     std::array<traj_element_t, MAX_NUM_VEHICLES>    te;
 
     network_data_t()
         : route_id(0)        
         , delta_time(3600.0f)
-        , count(0)
+        , count(0)        
     {
 
     }
