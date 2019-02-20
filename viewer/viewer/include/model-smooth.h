@@ -14,23 +14,10 @@ class  ModelSmoother : public osg::NodeVisitor
 {
 public:
 
-    ModelSmoother() : osg::NodeVisitor ()
-    {
-        setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
-    }
+    ModelSmoother();
 
-    virtual void apply(osg::Geode &geode)
-    {
-        for (unsigned int i = 0; i < geode.getNumDrawables(); ++i)
-        {
-            osg::Drawable  *drawable = geode.getDrawable(i);
-            osg::Geometry  *geom = dynamic_cast<osg::Geometry *>(drawable);
+    virtual void apply(osg::Geode &geode);
 
-            osgUtil::SmoothingVisitor::smooth(*geom);            
-        }
-
-        traverse(geode);
-    }
 };
 
 #endif // MODELSMOOTH_H

@@ -100,6 +100,5 @@ INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h) \
-    include/screen-capture.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

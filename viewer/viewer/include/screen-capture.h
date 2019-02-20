@@ -17,20 +17,11 @@ class WriteToFileOperation : public osgViewer::ScreenCaptureHandler::CaptureOper
 {
 public:
 
-    WriteToFileOperation(const std::string &screenshotsDir)
-    {
-        this->screenshotsDir = screenshotsDir;
-    }
+    WriteToFileOperation(const std::string &screenshotsDir);
 
-    virtual void operator()(const osg::Image &image, const unsigned int context_id)
-    {
-        std::string fileName = screenshotsDir +
-                QDir::separator().toLatin1() +
-                "screenshot-" +
-                QDateTime::currentDateTime().toString().toStdString() + ".png";
 
-        osgDB::writeImageFile(image, fileName);
-    }
+    virtual void operator()(const osg::Image &image, const unsigned int context_id);
+
 
 private:
 
@@ -44,38 +35,13 @@ class ScreenCaptureHandler : public osgGA::GUIEventHandler
 {
 public:
 
-    ScreenCaptureHandler(osgViewer::ScreenCaptureHandler *sch)
-    {
-        this->sch = sch;
-    }
+    ScreenCaptureHandler(osgViewer::ScreenCaptureHandler *sch);
+
 
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
-                        osgGA::GUIActionAdapter &aa)
+                        osgGA::GUIActionAdapter &aa);
 
-    {
-        switch (ea.getEventType())
-        {
-        case osgGA::GUIEventAdapter::KEYUP:
-            {
-                if (ea.getKey() == osgGA::GUIEventAdapter::KEY_F12)
-                {
-                    osgViewer::Viewer *viewer = static_cast<osgViewer::Viewer *>(&aa);
-                    sch->setFramesToCapture(1);
-                    sch->captureNextFrame(*viewer);
-                    viewer->frame();
-                    sch->stopCapture();
-                }
 
-                break;
-            }
-
-        default:
-
-            break;
-        }
-
-        return false;
-    }
 
 private:
 
