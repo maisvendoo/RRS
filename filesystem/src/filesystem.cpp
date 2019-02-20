@@ -84,6 +84,11 @@ void FileSystem::setScreenshotsDir(const std::string &path)
     screenshotsDir = getNativePath(path);
 }
 
+void FileSystem::setFontsDir(const std::string &path)
+{
+    fontsDir = getNativePath(path);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -172,6 +177,11 @@ std::string FileSystem::getVehicleTexturesDir() const
 std::string FileSystem::getScreenshotsDir() const
 {
     return screenshotsDir;
+}
+
+std::string FileSystem::getFontsDir() const
+{
+    return fontsDir;
 }
 
 //------------------------------------------------------------------------------

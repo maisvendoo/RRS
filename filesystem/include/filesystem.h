@@ -38,6 +38,7 @@ public:
         instance.setVehicleTexturesDir(instance.combinePath(instance.getDataDir(), "textures"));
         instance.setPluginsDir(tmp + "plugins");
         instance.setScreenshotsDir(tmp + "screenshots");
+        instance.setFontsDir(tmp + "fonts");
 
         return instance;
     }    
@@ -75,6 +76,8 @@ public:
 
     std::string getScreenshotsDir() const;
 
+    std::string getFontsDir() const;
+
     std::string combinePath(const std::string &path1, const std::string &path2);
 
     std::string toNativeSeparators(const std::string &path);
@@ -101,6 +104,7 @@ private:
     std::string vehicleTexturesDir;
 
     std::string screenshotsDir;
+    std::string fontsDir;
 
     FileSystem() {}
     FileSystem(const FileSystem &) = delete;
@@ -137,6 +141,8 @@ private:
     void setVehicleTexturesDir(const std::string &path);
 
     void setScreenshotsDir(const std::string &path);
+
+    void setFontsDir(const std::string &path);
 
     /// Get directory by num_levels levels up
     std::string getLevelUpDirectory(std::string path, int num_levels);
