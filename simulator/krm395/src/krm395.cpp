@@ -19,9 +19,7 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[POS_II] = 1.0;
 
-    /*debug_log = new DebugLog("395.log");
-
-    connect(this, &BrakeCrane395::DebugPrint, debug_log, &DebugLog::DebugPring);*/
+    positions_names << "I" << "II" << "III" << "IV" << "Va" << "V" << "VI";
 }
 
 //------------------------------------------------------------------------------
@@ -41,6 +39,14 @@ void BrakeCrane395::setPosition(int &position)
 
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[static_cast<size_t>(position)] = 1.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString BrakeCrane395::getPositionName(int position)
+{
+    return positions_names[position];
 }
 
 //------------------------------------------------------------------------------

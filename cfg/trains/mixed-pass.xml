@@ -3,8 +3,8 @@
 	<Common>
 		<CouplingModule>ef-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
-		<Title>Тестовый поезд</Title>
-		<Description>Поезд пассажирский</Description>
+		<Title>Пассажирский поезд поезд</Title>
+		<Description>Поезд пассажирский с купейными вагонами Аммендорф</Description>
 	</Common>
 	<Vehicle>
 		<Module>test-loco</Module>

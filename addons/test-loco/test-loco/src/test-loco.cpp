@@ -1,5 +1,4 @@
 #include    "test-loco.h"
-#include    "physics.h"
 
 #include    "CfgReader.h"
 #include    "filesystem.h"
@@ -25,6 +24,7 @@ TestLoco::TestLoco() : Vehicle()
   , brake_mech(nullptr)
   , brake_mech_module("carbrake-mech")
   , brake_mech_config("tep70bs-mech")
+  , charge_press(0.5)
 {
 
 }
@@ -67,14 +67,15 @@ void TestLoco::step(double t, double dt)
 
     if (brake_crane != nullptr)
     {
-        brake_crane->setChargePressure(0.5);
+        brake_crane->setChargePressure(charge_press);
         brake_crane->setFeedLinePressure(0.9);
         p0 = brake_crane->getBrakePipeInitPressure();
         brake_crane->setBrakePipePressure(pTM);
+        brake_crane->setPosition(crane_pos);
         brake_crane->step(t, dt);
     }
 
-    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8")
+    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9")
             .arg(t, 7, 'f', 1)
             .arg(railway_coord, 10, 'f', 2)
             .arg(velocity * Physics::kmh, 6, 'f', 1)
@@ -82,7 +83,8 @@ void TestLoco::step(double t, double dt)
             .arg(dt, 8, 'f', 6)
             .arg(brake_crane->getEqReservoirPressure(), 4, 'f', 2)
             .arg(brake_crane->getBrakePipeInitPressure(), 4, 'f', 2)
-            .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2);
+            .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
+            .arg(brake_crane->getPositionName(crane_pos), 4);
 }
 
 //------------------------------------------------------------------------------
@@ -144,52 +146,15 @@ void TestLoco::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void TestLoco::keyProcess()
 {
-    double traction_step = 0.1;
+    incTracTrig.process(keys[KEY_A], traction_level);
+    decTracTrig.process(keys[KEY_D], traction_level);
 
-    if (keys[KEY_A] && !inc_loc)
-    {
-        traction_level +=  traction_step;
-        inc_loc = true;
-    }
-    else
-    {
-        inc_loc = false;
-    }
+    incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
+    decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
 
-    if (keys[KEY_D] && !dec_loc)
-    {
-        traction_level -=  traction_step;
-        dec_loc = true;
 
-        if (keys[KEY_Shift_L])
-            traction_level = 0.0;
-    }
-    else
-    {
-        dec_loc = false;
-    }
-
-    if (keys[111] && !dec_crane_loc)
-    {
-        dec_crane_loc = true;
-        crane_pos--;
-        brake_crane->setPosition(crane_pos);
-    }
-    else
-    {
-        dec_crane_loc = false;        
-    }
-
-    if (keys[112] && !inc_crane_loc)
-    {
-        inc_crane_loc = true;
-        crane_pos++;
-        brake_crane->setPosition(crane_pos);
-    }
-    else
-    {
-        inc_crane_loc = false;        
-    }
+    incChargePress.process(keys[KEY_H], charge_press);
+    decChargePress.process(keys[KEY_J], charge_press);
 
     double step = 0.1;
 

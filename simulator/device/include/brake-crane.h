@@ -44,6 +44,8 @@ public:
 
     virtual void setPosition(int &position) = 0;
 
+    virtual QString getPositionName(int position) = 0;
+
 protected:
 
     double Ver;

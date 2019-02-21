@@ -11,6 +11,9 @@
 #include    "vehicle.h"
 #include    "brake-crane.h"
 #include    "brake-mech.h"
+#include    "physics.h"
+#include    "controls.h"
+
 
 class TestLoco : public Vehicle
 {
@@ -44,6 +47,17 @@ private:
     QString     brake_mech_module;
     QString     brake_mech_config;
 
+    double charge_press;
+
+    IncTractionTrigger incTracTrig;
+    DecTractionTrigger decTracTrig;
+
+    IncBrakeCrane incBrakeCrane;
+    DecBrakeCrane decBrakeCrane;
+
+    IncChargePress incChargePress;
+    DecChargePress decChargePress;
+
     void step(double t, double dt);
 
     double traction_char(double V);
@@ -54,5 +68,8 @@ private:
 
     void keyProcess();
 };
+
+
+
 
 #endif // TESTLOCO_H

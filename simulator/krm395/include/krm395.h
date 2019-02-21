@@ -47,6 +47,8 @@ public:
 
     void setPosition(int &position);
 
+    QString getPositionName(int position);
+
 private:
 
     double k_leek;
@@ -74,6 +76,8 @@ private:
     std::array<double, MAX_FLOW_COEFFS + 1> K;
 
     std::array<double, NUM_POSITIONS> pos;
+
+    QStringList positions_names;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
