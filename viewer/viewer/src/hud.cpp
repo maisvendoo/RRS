@@ -84,8 +84,8 @@ osg::Camera *HUD::createCamera(int width, int height)
 
     geode->addDrawable(statusBar.get());
 
-    scene->addChild(geode.get(), true);
-    camera->addChild(geode.get());
+    scene->addChild(geode.get(), false);
+    camera->addChild(scene.get());
 
     return camera.release();
 }
