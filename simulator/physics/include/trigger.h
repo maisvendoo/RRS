@@ -1,34 +1,25 @@
 #ifndef     TRIGGER_H
 #define     TRIGGER_H
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 template<class T>
 class Trigger
 {
 public:
 
-    Trigger() : lock(false)
-    {
-
-    }
-
-    virtual ~Trigger()
-    {
-
-    }
+    Trigger() : lock(false) {}
+    virtual ~Trigger() {}
 
 protected:
 
     bool lock;
 
-    virtual void operate(double &)
+    virtual void operate(T &)
     {
 
-    }
-
-    virtual void operate (int &)
-    {
-
-    }
+    }    
 
 public:
 

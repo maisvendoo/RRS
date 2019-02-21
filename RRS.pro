@@ -13,6 +13,7 @@ SUBDIRS += ./CfgReader
 SUBDIRS += ./filesystem
 SUBDIRS += ./log
 SUBDIRS += ./tcp-connection
+SUBDIRS += ./asound
 SUBDIRS += ./simulator
 
 SUBDIRS += ./addons/default-vehicle
