@@ -23,8 +23,11 @@ public:
 
 private:
 
+    QMap<QString, ASound *> sounds;
 
+public slots:
 
+    void attachSound(const QString &name, const QString &path);
 };
 
 #endif // SOUND_MANAGER_H
