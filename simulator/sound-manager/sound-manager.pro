@@ -1,6 +1,8 @@
 TEMPLATE = lib
 
 QT -= gui
+QT += core
+QT +=  xml
 
 DEFINES += SOUND_MANAGER_LIB
 
@@ -13,10 +15,14 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,_d)
 
     LIBS += -L../../../lib -lasound_d
+    LIBS += -L../../../lib -lCfgReader_d
+    LIBS += -L../../../lib -lfilesystem_d
 
 } else {
 
     LIBS += -L../../../lib -lasound
+    LIBS += -L../../../lib -lCfgReader
+    LIBS += -L../../../lib -lfilesystem
 
 }
 
@@ -36,6 +42,8 @@ unix{
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../asound/include
+INCLUDEPATH += ../../CfgReader/include
+INCLUDEPATH += ../../filesystem/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

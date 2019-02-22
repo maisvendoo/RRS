@@ -89,6 +89,11 @@ void FileSystem::setFontsDir(const std::string &path)
     fontsDir = getNativePath(path);
 }
 
+void FileSystem::setSoundsDir(const std::string &path)
+{
+    soundsDir = getNativePath(path);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -182,6 +187,11 @@ std::string FileSystem::getScreenshotsDir() const
 std::string FileSystem::getFontsDir() const
 {
     return fontsDir;
+}
+
+std::string FileSystem::getSoundsDir() const
+{
+    return soundsDir;
 }
 
 //------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 #include    <QObject>
 #include    <QMap>
 
-#include    "asound.h"
+#include    "sound-config.h"
 
 //------------------------------------------------------------------------------
 //
@@ -19,13 +19,13 @@ public:
 
     SoundManager(QObject *parent = Q_NULLPTR);
 
-    ~SoundManager();
+    ~SoundManager();    
+
+    void loadSounds(const QString &vehicle_name);
 
 private:
 
-    QMap<QString, ASound *> sounds;
-
-public slots:
+    QMap<QString, sound_config_t> sounds;
 
     void attachSound(const QString &name, const QString &path);
 };

@@ -39,6 +39,7 @@ public:
         instance.setPluginsDir(tmp + "plugins");
         instance.setScreenshotsDir(tmp + "screenshots");
         instance.setFontsDir(tmp + "fonts");
+        instance.setSoundsDir(instance.combinePath(instance.getDataDir(), "sounds"));
 
         return instance;
     }    
@@ -78,6 +79,8 @@ public:
 
     std::string getFontsDir() const;
 
+    std::string getSoundsDir() const;
+
     std::string combinePath(const std::string &path1, const std::string &path2);
 
     std::string toNativeSeparators(const std::string &path);
@@ -105,6 +108,8 @@ private:
 
     std::string screenshotsDir;
     std::string fontsDir;
+
+    std::string soundsDir;
 
     FileSystem() {}
     FileSystem(const FileSystem &) = delete;
@@ -143,6 +148,8 @@ private:
     void setScreenshotsDir(const std::string &path);
 
     void setFontsDir(const std::string &path);
+
+    void setSoundsDir(const std::string &path);
 
     /// Get directory by num_levels levels up
     std::string getLevelUpDirectory(std::string path, int num_levels);
