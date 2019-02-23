@@ -144,6 +144,14 @@ signals:
 
     void logMessage(QString msg);
 
+    void soundPlay(QString name);
+
+    void soundStop(QString name);
+
+    void soundSetVolume(QString name, int volume);
+
+    void soundSetPitch(QString name, float pitch);
+
 protected:
 
     /// Vehicle ODE system index

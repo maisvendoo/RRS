@@ -53,6 +53,8 @@ bool Train::init(const init_data_t &init_data)
             fs.separator() +
             init_data.train_config + ".xml";
 
+    soundMan = new SoundManager();
+
     // Loading of train
     if (!loadTrain(full_config_path))
     {
@@ -310,6 +312,9 @@ bool Train::loadTrain(QString cfg_path)
                 payload_coeff = 0;
             }
 
+            // Loading sounds
+            soundMan->loadSounds(module_cfg_name);
+
             for (int i = 0; i < n_vehicles; i++)
             {
                 Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
@@ -341,16 +346,21 @@ bool Train::loadTrain(QString cfg_path)
                 vehicle->setIndex(index);
                 index = ode_order;
 
+                connect(vehicle, &Vehicle::soundPlay, soundMan, &SoundManager::play);
+                connect(vehicle, &Vehicle::soundStop, soundMan, &SoundManager::stop);
+                connect(vehicle, &Vehicle::soundSetVolume, soundMan, &SoundManager::setVolume);
+                connect(vehicle, &Vehicle::soundSetPitch, soundMan, &SoundManager::setPitch);
+
                 vehicles.push_back(vehicle);
 
                 emit logMessage("OK: Loaded vehicle: " + module_name +
                                 " with configuration: " + module_cfg_name + ".xml");
-            }
+            }            
 
-            vehicle_node = cfg.getNextSection();
+            vehicle_node = cfg.getNextSection();            
         }
 
-        int cabine_in_vehicle = -1;
+        //int cabine_in_vehicle = -1;
 
         /*if (cfg.getInt("Common", "CabineInVehicle", cabine_in_vehicle))
         {

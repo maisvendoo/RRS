@@ -75,6 +75,8 @@ void TestLoco::step(double t, double dt)
         brake_crane->step(t, dt);
     }
 
+    emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
+
     DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9")
             .arg(t, 7, 'f', 1)
             .arg(railway_coord, 10, 'f', 2)
@@ -176,6 +178,15 @@ void TestLoco::keyProcess()
     else
     {
         dec_brake = false;
+    }
+
+    if (keys[KEY_F])
+    {
+        emit soundSetVolume("Svistok", 100);
+    }
+    else
+    {
+        emit soundSetVolume("Svistok", 0);
     }
 
     analogSignal[0] = static_cast<float>(traction_level);

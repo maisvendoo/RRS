@@ -27,6 +27,9 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
 
+    LIBS += -L../../../lib -lasound_d
+    LIBS += -L../../../lib -lsound-manager_d
+
 } else {
 
     LIBS += -L../../../lib -lfilesystem
@@ -41,6 +44,23 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lTcpConnection
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
+
+    LIBS += -L../../../lib -lasound
+    LIBS += -L../../../lib -lsound-manager
+}
+
+win32{
+
+    OPENAL_LIB_DIR = $$(OPENAL_BIN)
+    OPENAL_INCLUDE_BIN = $$(OPENAL_INCLUDE)
+
+    LIBS += -L$$OPENAL_LIB_DIR -lOpenAL32
+    INCLUDEPATH += $$OPENAL_INCLUDE_BIN
+}
+
+unix{
+
+    LIBS += -lopenal
 }
 
 INCLUDEPATH += ./include
@@ -57,6 +77,10 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp-connection/include
+INCLUDEPATH += ../../asound/include
+INCLUDEPATH += ../sound-manager/include
+
+
 
 HEADERS += $$files(./include/*.h)
 HEADERS += $$files(../../common-headers/*.h)

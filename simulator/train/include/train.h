@@ -25,6 +25,7 @@
 #include    "solver-config.h"
 #include    "brakepipe.h"
 #include    "profile.h"
+#include    "sound-manager.h"
 
 #include    <QByteArray>
 
@@ -118,6 +119,9 @@ private:
 
     /// Brakepipe model
     BrakePipe   *brakepipe;    
+
+    /// Sound manager
+    SoundManager *soundMan;
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;

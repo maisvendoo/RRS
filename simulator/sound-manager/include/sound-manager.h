@@ -28,6 +28,16 @@ private:
     QMap<QString, sound_config_t> sounds;
 
     void attachSound(const QString &name, const QString &path);
+
+public slots:
+
+    void play(QString name);
+
+    void stop(QString name);
+
+    void setVolume(QString name, int volume);
+
+    void setPitch(QString name, float pitch);
 };
 
 #endif // SOUND_MANAGER_H
