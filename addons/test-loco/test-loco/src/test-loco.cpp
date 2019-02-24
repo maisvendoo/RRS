@@ -189,6 +189,15 @@ void TestLoco::keyProcess()
         emit soundSetVolume("Svistok", 0);
     }
 
+    if (keys[KEY_G])
+    {
+        emit soundSetVolume("Tifon", 100);
+    }
+    else
+    {
+        emit soundSetVolume("Tifon", 0);
+    }
+
     analogSignal[0] = static_cast<float>(traction_level);
     analogSignal[1] = static_cast<float>(brake_crane->getBrakePipeInitPressure());
     analogSignal[2] = static_cast<float>(brake_crane->getEqReservoirPressure());

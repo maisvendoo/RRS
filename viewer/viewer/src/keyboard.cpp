@@ -127,6 +127,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_D);
     addKey(osgGA::GUIEventAdapter::KEY_E);
     addKey(osgGA::GUIEventAdapter::KEY_F);
+    addKey(osgGA::GUIEventAdapter::KEY_G);
     addKey(osgGA::GUIEventAdapter::KEY_H);
     addKey(osgGA::GUIEventAdapter::KEY_I);
     addKey(osgGA::GUIEventAdapter::KEY_J);

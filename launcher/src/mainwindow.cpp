@@ -230,9 +230,7 @@ void MainWindow::onStartPressed()
         return;
     }
 
-    startSimulator();
-
-    startViewer();
+    startSimulator();    
 }
 
 //------------------------------------------------------------------------------
@@ -241,6 +239,8 @@ void MainWindow::onStartPressed()
 void MainWindow::onSimulatorStarted()
 {
     ui->btnStart->setEnabled(false);    
+
+    startViewer();
 }
 
 //------------------------------------------------------------------------------

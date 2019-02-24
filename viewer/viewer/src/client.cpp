@@ -47,6 +47,7 @@ void NetworkClient::init(const settings_t settings, osgViewer::Viewer *viewer)
 
     connect(tcp_client, &TcpClient::authorized, this, &NetworkClient::onClientAuthorized);
     connect(tcp_client, &TcpClient::disconnectedFromServer, this, &NetworkClient::onClientDisconnected);
+   // connect(tcp_client, &TcpClient::logPrint, this, &NetworkClient::logPrint);
 
     tcp_config_t tcp_config;
     tcp_config.host_addr = QString(settings.host_addr.c_str());
@@ -54,6 +55,8 @@ void NetworkClient::init(const settings_t settings, osgViewer::Viewer *viewer)
     tcp_config.port = static_cast<quint16>(settings.port);
     tcp_config.reconnect_interval = settings.reconnect_interval;
 
+
+    tcp_client->setRecvDataSize(static_cast<qint64>(sizeof (server_data_t)));
     tcp_client->init(tcp_config);
     tcp_client->start();
 }
@@ -65,6 +68,7 @@ void NetworkClient::onClientAuthorized()
 {
     if (tcp_client->isConnected())
     {
+        OSG_INFO << "TCP-CLIENT: Authorization is complete" << std::endl;
         timerRequester.start();
     }
 }
@@ -74,6 +78,7 @@ void NetworkClient::onClientAuthorized()
 //------------------------------------------------------------------------------
 void NetworkClient::onClientDisconnected()
 {
+    OSG_INFO << "TCP-CLIENT: Client is disconnected" << std::endl;
     timerRequester.stop();
 }
 
@@ -84,7 +89,10 @@ void NetworkClient::onTimerRequest()
 {
     if (tcp_client->isConnected())
     {
-        if (tcp_client->getBufferSize() == sizeof (server_data_t))
+        size_t in_size = static_cast<size_t>(tcp_client->getBufferSize());
+        size_t size = sizeof (server_data_t);
+
+        if (in_size == size)
         {
             QByteArray array = tcp_client->getBuffer();
             memcpy(&server_data, array.data(), sizeof (server_data_t));
@@ -120,3 +128,5 @@ void NetworkClient::receiveKeysState(QByteArray data)
 {
     key_data = data;
 }
+
+

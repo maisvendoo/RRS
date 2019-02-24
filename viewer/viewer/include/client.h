@@ -70,7 +70,7 @@ private slots:
 
 public slots:
 
-    void receiveKeysState(QByteArray data);
+    void receiveKeysState(QByteArray data);    
 };
 
 #endif // CLIENT_H

@@ -31,5 +31,6 @@ INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../common-headers/include
 
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/reservoir.h
 SOURCES += $$files(./src/*.cpp)
