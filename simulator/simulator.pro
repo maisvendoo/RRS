@@ -18,4 +18,6 @@ SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
 
 SUBDIRS += ./krm395
+SUBDIRS += ./vr242
 SUBDIRS += ./carbrakes-mech
+
