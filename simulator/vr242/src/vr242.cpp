@@ -31,7 +31,7 @@ void AirDist242::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void AirDist242::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 GET_AIR_DISTRIBUTOR(AirDist242)
