@@ -1,5 +1,7 @@
 #include    "airdistributor.h"
 
+#include    <QLibrary>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -41,4 +43,26 @@ void AirDistributor::setBrakeCylinderPressure(double pBC)
 double AirDistributor::getBrakeCylinderAirFlow() const
 {
     return Qbc;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+AirDistributor *loadAirDistributor(QString lib_path)
+{
+    AirDistributor *airdist = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetAriDistrubutor getAirDistributor = reinterpret_cast<GetAriDistrubutor>(lib.resolve("getAirDistributor"));
+
+        if (getAirDistributor)
+        {
+            airdist = getAirDistributor();
+        }
+    }
+
+    return airdist;
 }

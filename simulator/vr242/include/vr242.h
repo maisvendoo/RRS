@@ -16,7 +16,9 @@ public:
 
 private:
 
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
+    void load_config(CfgReader &cfg);
 };
 
 #endif // VR242
