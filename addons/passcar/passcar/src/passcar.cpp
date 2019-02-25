@@ -9,6 +9,9 @@ PassCarrige::PassCarrige() : Vehicle ()
   , supply_reservoir(nullptr)
   , brake_mech_module("carbrakes-mech")
   , brake_mech_config("carbrakes-mech")
+  , airdist(nullptr)
+  , airdist_module("vr242")
+  , airdist_config("vr242")
   , pz(0.0)
   , inc_loc(false)
   , dec_loc(false)
@@ -31,14 +34,26 @@ void PassCarrige::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir(fs.getModulesDir().c_str());
+
+    // Brake mechanics
     brake_mech = loadBrakeMech(modules_dir + fs.separator() + brake_mech_module);
+
+    // Air supply reservoir
     supply_reservoir = new Reservoir(0.078);
+
+    // Air distributor
+    airdist = loadAirDistributor(modules_dir + fs.separator() + airdist_module);
 
     if (brake_mech != nullptr)
     {
         brake_mech->read_config(brake_mech_config);
         brake_mech->setEffFricRadius(wheel_diameter / 2.0);
         brake_mech->setWheelDiameter(wheel_diameter);
+    }
+
+    if (airdist != nullptr)
+    {
+        airdist->read_config(airdist_config);
     }
 }
 
@@ -68,6 +83,14 @@ void PassCarrige::step(double t, double dt)
     {
         supply_reservoir->setAirFlow(0);
         supply_reservoir->step(t, dt);
+    }
+
+    if ( airdist != nullptr)
+    {
+        airdist->setBrakepipePressure(pTM);
+        airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
+
+        airdist->step(t, dt);
     }
 
     DebugMsg = QString("ТМ: %1 ЗР: %2")
@@ -116,6 +139,9 @@ void PassCarrige::loadConfig(QString cfg_path)
 
         cfg.getString(secName, "BrakeMechModule", brake_mech_module);
         cfg.getString(secName, "BrakeMechCinfig", brake_mech_config);
+
+        cfg.getString(secName, "AirDistModule", airdist_module);
+        cfg.getString(secName, "AirDistConfig", airdist_config);
     }
 }
 

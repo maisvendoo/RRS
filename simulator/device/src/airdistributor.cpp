@@ -56,7 +56,7 @@ AirDistributor *loadAirDistributor(QString lib_path)
 
     if (lib.load())
     {
-        GetAriDistrubutor getAirDistributor = reinterpret_cast<GetAriDistrubutor>(lib.resolve("getAirDistributor"));
+        GetAirDistributor getAirDistributor = reinterpret_cast<GetAirDistributor>(lib.resolve("getAirDistributor"));
 
         if (getAirDistributor)
         {

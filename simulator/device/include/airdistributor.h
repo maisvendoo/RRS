@@ -32,13 +32,13 @@ protected:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef AirDistributor* (*GetAriDistrubutor)();
+typedef AirDistributor* (*GetAirDistributor)();
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 #define GET_AIR_DISTRIBUTOR(ClassName) \
-    extern "C" Q_DECL_EXPORT AirDistributor *getAirDistrubutor() \
+    extern "C" Q_DECL_EXPORT AirDistributor *getAirDistributor() \
     { \
         return new (ClassName) (); \
     }

@@ -10,6 +10,7 @@
 #include    "vehicle.h"
 #include    "brake-mech.h"
 #include    "reservoir.h"
+#include    "airdistributor.h"
 
 //------------------------------------------------------------------------------
 //
@@ -29,6 +30,11 @@ private:
 
     QString     brake_mech_module;
     QString     brake_mech_config;
+
+    AirDistributor *airdist;
+
+    QString     airdist_module;
+    QString     airdist_config;
 
     double      pz;
     bool        inc_loc;
