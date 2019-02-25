@@ -9,6 +9,7 @@
 
 #include    "vehicle.h"
 #include    "brake-mech.h"
+#include    "reservoir.h"
 
 //------------------------------------------------------------------------------
 //
@@ -24,6 +25,7 @@ public:
 private:
 
     BrakeMech   *brake_mech;
+    Reservoir   *supply_reservoir;
 
     QString     brake_mech_module;
     QString     brake_mech_config;

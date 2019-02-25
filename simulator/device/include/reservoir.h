@@ -14,10 +14,16 @@ public:
 
     ~Reservoir();
 
+    void setAirFlow(double Q);
+
+    double getPressure() const;
+
 private:
 
     double  V;
     double  Q;
+
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 };
 
 #endif // RESERVOIR_H

@@ -104,6 +104,8 @@ protected:
     virtual void preStep(const state_vector_t &Y, double t);
 
     virtual void postStep(const state_vector_t &Y, double t);
+
+    void memory_alloc(int order);
 };
 
 #endif // DEVICE_H

@@ -27,6 +27,8 @@ Device::Device(QObject *parent) : QObject(parent)
     qRegisterMetaType<state_vector_t>();
 
     DebugMsg = "";
+
+    memory_alloc(1);
 }
 
 //------------------------------------------------------------------------------
@@ -114,21 +116,12 @@ void Device::read_config(const QString &path)
         int order = 0;
         QString secName = "Device";
 
-        if (cfg.getInt(secName, "Order", order))
+        if (!cfg.getInt(secName, "Order", order))
         {
-            y.resize(static_cast<size_t>(order));
-            dydt.resize(static_cast<size_t>(order));
-
-            y1.resize(static_cast<size_t>(order));
-
-            k1.resize(static_cast<size_t>(order));
-            k2.resize(static_cast<size_t>(order));
-            k3.resize(static_cast<size_t>(order));
-            k4.resize(static_cast<size_t>(order));
-
-            std::fill(y.begin(), y.end(), 0.0);
-            std::fill(dydt.begin(), dydt.end(), 0.0);
+            order = 1;
         }
+
+        memory_alloc(order);
 
         load_config(cfg);
     }
@@ -160,4 +153,20 @@ void Device::postStep(const state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
+}
+
+void Device::memory_alloc(int order)
+{
+    y.resize(static_cast<size_t>(order));
+    dydt.resize(static_cast<size_t>(order));
+
+    y1.resize(static_cast<size_t>(order));
+
+    k1.resize(static_cast<size_t>(order));
+    k2.resize(static_cast<size_t>(order));
+    k3.resize(static_cast<size_t>(order));
+    k4.resize(static_cast<size_t>(order));
+
+    std::fill(y.begin(), y.end(), 0.0);
+    std::fill(dydt.begin(), dydt.end(), 0.0);
 }
