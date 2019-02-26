@@ -46,15 +46,17 @@ void AirDist242::preStep(const state_vector_t &Y, double t)
     Qbc = K[2] * (Y[3] - pBC);
 
     // Темп дополнительной разрядки ТМ
+    double dpTMdt = dydt[0];
     auxRate = nf( - K[5] * Y[0] * u1 / Vmk );
 
-    DebugMsg = QString(" MK: %1 ЗК: %2 Пер. порш.: %3 ТЦ: %4 u1: %5 u2: %6")
+    DebugMsg = QString(" Темп: %7 MK: %1 ЗК: %2 Пер. порш.: %3 ТЦ: %4 u1: %5 u2: %6")
             .arg(Y[0], 4, 'f', 2)
             .arg(Y[2], 4, 'f', 2)
             .arg(s1, 7, 'f', 4)
             .arg(pBC, 4, 'f', 2)
             .arg(u1, 7, 'f', 4)
-            .arg(u2, 7, 'f', 4);
+            .arg(u2, 7, 'f', 4)
+            .arg(dpTMdt, 7, 'f', 4);
 }
 
 //------------------------------------------------------------------------------
@@ -77,14 +79,20 @@ void AirDist242::ode_system(const state_vector_t &Y,
     double Qy4 = K[8] * (pTM - Y[1]) - Qas;
 
     // Расход воздуха в магистральную камеру
-    double Qaux = K[5] * Y[0] * u1;
+    double u3 = hs_n(Y[4] - py2);
 
-    double Qmk = K[3] * (pTM - Y[0]) - Qaux;
+    double Qaux = K[5] * Y[0] * u1;
+    double Qsoft = K[11] * (Y[2] - Y[0]) * u3;
+
+    double Qmk = K[3] * (pTM - Y[0]) - Qaux + Qsoft;
 
     // Расход воздуха в ЗК
-    double Qzk = K[4] * (pAS - Y[2]) - K[6] * (Y[2] - Y[3]) * u1;
+    double u4 = dead_zone(u1, 0.0, 1e-4);
 
-    double Qat2 = K[6] * (Y[2] - Y[3]) * u1 - K[10] * Y[3] * u2 - Qbc;
+    double Qzk = K[4] * (pAS - Y[2]) - K[6] * (Y[2] - Y[3]) * u4 - Qsoft;
+
+    // Расход воздуха в АТ2
+    double Qat2 = K[6] * (Y[2] - Y[3]) * u4 - K[10] * Y[3] * u2 - Qbc;
 
     double Qy2 = K[7] * (Y[3] - Y[4]);
 
