@@ -48,6 +48,9 @@ bool Profile::isReady() const
 //------------------------------------------------------------------------------
 profile_element_t Profile::getElement(double railway_coord)
 {
+    if (profile_data.size() == 0)
+        return profile_element_t();
+
     if (railway_coord < (*profile_data.begin()).railway_coord)
         return profile_element_t();
 

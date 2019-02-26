@@ -81,7 +81,7 @@ void PassCarrige::step(double t, double dt)
 
     if ( supply_reservoir != nullptr )
     {
-        supply_reservoir->setAirFlow(0);
+        supply_reservoir->setAirFlow(airdist->getAirSupplyFlow());
         supply_reservoir->step(t, dt);
     }
 
@@ -89,13 +89,17 @@ void PassCarrige::step(double t, double dt)
     {
         airdist->setBrakepipePressure(pTM);
         airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
+        airdist->setAirSupplyPressure(supply_reservoir->getPressure());
 
         airdist->step(t, dt);
     }
 
-    DebugMsg = QString("ТМ: %1 ЗР: %2")
+    DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2")
             .arg(pTM, 4, 'f', 2)
-            .arg(supply_reservoir->getPressure(), 4, 'f', 2);
+            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
+            .arg(t, 10, 'f', 1);
+
+    DebugMsg += airdist->getDebugMsg();
 }
 
 //------------------------------------------------------------------------------

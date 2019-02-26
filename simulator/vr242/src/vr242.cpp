@@ -1,11 +1,19 @@
 #include	"vr242.h"
 
+/*
+    Y[0] - давление в магистральной камере (МК)
+    Y[1] - давление в камере У4
+    Y[2] - давление в ЗК
+
+ */
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 AirDist242::AirDist242() : AirDistributor ()
 {
-
+    K.fill(0.0);
+    k.fill(0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -19,11 +27,60 @@ AirDist242::~AirDist242()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void AirDist242::preStep(const state_vector_t &Y, double t)
+{
+    Q_UNUSED(t)
+
+    // Расход воздуха на наполнение ЗР из камеры У4
+    Qas = K[9] * (Y[1] - pAS);
+
+    // Перемещение поршня
+    double s1 = A1 * (Y[0] - Y[2]);
+
+    // Перемещение клапана доп. разрядки
+    double u1 = cut(nf(k[1] * s1), 0.0, 1.0);
+
+    double u2 = cut(pf(k[2] * s1), 0.0, 1.0);
+
+    DebugMsg = QString(" MK: %1 У4: %2 ЗК: %3 Пер. порш.: %4 Кл. доп. разр.: %5")
+            .arg(Y[0], 4, 'f', 2)
+            .arg(Y[1], 4, 'f', 2)
+            .arg(Y[2], 4, 'f', 2)
+            .arg(s1, 9, 'f', 5)
+            .arg(u1, 9, 'f', 5);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AirDist242::ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t)
 {
+    Q_UNUSED(t)
 
+    // Расход воздуха в камеру У4
+    double Qy4 = K[8] * (pTM - Y[1]) - Qas;
+
+    // Расход воздуха в магистральную камеру
+    double Qmk = K[3] * (pTM - Y[0]);
+
+    // Расход воздуха в ЗК
+    double Qzk = K[4] * (pAS - Y[2]);
+
+    // Перемещение поршня
+    double s1 = A1 * (Y[0] - Y[2]);
+
+    // Перемещение клапана доп. разрядки
+    double u1 = cut(nf(k[1] * s1), 0.0, 1.0);
+
+    double u2 = cut(pf(k[2] * s1), 0.0, 1.0);
+
+    dYdt[0] = Qmk / Vmk;
+
+    dYdt[1] = Qy4 / Vy4;
+
+    dYdt[2] = Qzk / Vzk;
 }
 
 //------------------------------------------------------------------------------
@@ -31,7 +88,24 @@ void AirDist242::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void AirDist242::load_config(CfgReader &cfg)
 {
+    QString secName = "Device";
 
+    for (size_t i = 0; i < K.size(); ++i)
+    {
+        QString coeff = QString("K%1").arg(i);
+        cfg.getDouble(secName, coeff, K[i]);
+    }
+
+    for (size_t i = 0; i < k.size(); ++i)
+    {
+        QString coeff = QString("k%1").arg(i);
+        cfg.getDouble(secName, coeff, k[i]);
+    }
+
+    cfg.getDouble(secName, "Vmk", Vmk);
+    cfg.getDouble(secName, "Vy4", Vy4);
+    cfg.getDouble(secName, "Vzk", Vzk);
+    cfg.getDouble(secName, "A1", A1);
 }
 
 GET_AIR_DISTRIBUTOR(AirDist242)

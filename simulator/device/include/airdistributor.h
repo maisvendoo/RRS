@@ -18,7 +18,11 @@ public:
 
     void setBrakeCylinderPressure(double pBC);
 
-    double getBrakeCylinderAirFlow() const;
+    void setAirSupplyPressure(double pAS);
+
+    virtual double getBrakeCylinderAirFlow() const;
+
+    virtual double getAirSupplyFlow() const;
 
 protected:
 
@@ -26,7 +30,11 @@ protected:
 
     double  pBC;
 
+    double  pAS;
+
     double  Qbc;
+
+    double  Qas;
 };
 
 //------------------------------------------------------------------------------
