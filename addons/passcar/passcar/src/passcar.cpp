@@ -69,7 +69,7 @@ void PassCarrige::step(double t, double dt)
         pz = Physics::cut(pz, 0.0, 0.4);
         double Q = K1 * (pz - p);
 
-        brake_mech->setAirFlow(Q);
+        brake_mech->setAirFlow(airdist->getBrakeCylinderAirFlow());
         brake_mech->setVelocity(velocity);
         brake_mech->step(t, dt);
 
@@ -91,6 +91,8 @@ void PassCarrige::step(double t, double dt)
         airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
         airdist->setAirSupplyPressure(supply_reservoir->getPressure());
 
+        auxRate = airdist->getAuxRate();
+
         airdist->step(t, dt);
     }
 
@@ -100,6 +102,9 @@ void PassCarrige::step(double t, double dt)
             .arg(t, 10, 'f', 1);
 
     DebugMsg += airdist->getDebugMsg();
+
+    DebugMsg += QString(" Тепм. ДР.: %1")
+            .arg(auxRate, 9, 'f', 4);
 }
 
 //------------------------------------------------------------------------------

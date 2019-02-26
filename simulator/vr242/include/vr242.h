@@ -21,6 +21,10 @@ private:
     double Vy4;
     double Vzk;
     double A1;
+    double Vat2;
+    double Vy2;
+
+    double py2;
 
     std::array<double, MAX_FLOW_COEFFS> K;
     std::array<double, MAX_GIAN_COEFFS> k;

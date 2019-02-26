@@ -24,6 +24,8 @@ public:
 
     virtual double getAirSupplyFlow() const;
 
+    double getAuxRate() const;
+
 protected:
 
     double  pTM;
@@ -35,6 +37,8 @@ protected:
     double  Qbc;
 
     double  Qas;
+
+    double  auxRate;
 };
 
 //------------------------------------------------------------------------------

@@ -11,6 +11,7 @@ AirDistributor::AirDistributor(QObject *parent) : Device(parent)
   , pAS(0.0)
   , Qbc(0.0)
   , Qas(0.0)
+  , auxRate(0.0)
 {
 
 }
@@ -61,6 +62,11 @@ double AirDistributor::getBrakeCylinderAirFlow() const
 double AirDistributor::getAirSupplyFlow() const
 {
     return Qas;
+}
+
+double AirDistributor::getAuxRate() const
+{
+    return auxRate;
 }
 
 //------------------------------------------------------------------------------
