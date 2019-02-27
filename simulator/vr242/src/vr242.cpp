@@ -13,8 +13,11 @@ AirDist242::AirDist242() : AirDistributor ()
     K.fill(0.0);
     k.fill(0.0);
 
-    DebugLog *log = new DebugLog("vr242.txt");
-    connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);
+    s1_min = 1e-3;
+    s1_max = 1e-3;
+
+    //DebugLog *log = new DebugLog("vr242.txt");
+    //connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);
 }
 
 //------------------------------------------------------------------------------
@@ -33,22 +36,24 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     double s1 = A1 * (Y[0] - pAS);
-    double s2 = A1 * (dead_zone(Y[0] - pAS, -0.03, 0.0));
-    double v1 = cut(nf(k[1] * s1), 0.0, 1.0);
-    double v2 = cut(pf(k[1] * s1), 0.0, 1.0);
+    double s2 = dead_zone(s1, s1_min, s1_max);
+
+    double v1 = cut(nf(k[1] * s2), 0.0, 1.0);
+    double v2 = cut(pf(k[1] * s2), 0.0, 1.0);
 
     double v3 = hs_n(Y[1] - py2);
-
-    double v4 = cut(nf(k[1] * s2), 0.0, 1.0);
 
     Qas = K[2] * (Y[0] - pAS) * v3 - pf( 2.0 * Qbc);
 
     Qbc = K[4] * (pAS - pBC) * v1 - K[4] * pBC * v2;// - K[7] * pBC * v3;
 
-    DebugMsg = QString(" МК: %1 ТЦ: %3 s1: %2")
+    DebugMsg = QString(" МК: %1 ТЦ: %3 s1: %2 v1: %4 v2: %5")
             .arg(Y[0], 4, 'f', 2)
             .arg(s1, 7, 'f', 4)
-            .arg(pBC, 4, 'f', 2);
+            .arg(pBC, 4, 'f', 2)
+            .arg(v1, 7, 'f', 4)
+            .arg(v2, 7, 'f', 4);
+
 
     //auxRate = Qas / 0.078;
 
@@ -66,9 +71,9 @@ void AirDist242::ode_system(const state_vector_t &Y,
     Q_UNUSED(t)
 
     double s1 = A1 * (Y[0] - pAS);
-    double s2 = A1 * (dead_zone(Y[0] - pAS, 0.0, 0.0));
-    double v1 = cut(nf(k[1] * s1), 0.0, 1.0);
-    double v2 = cut(pf(k[1] * s1), 0.0, 1.0);
+    double s2 = dead_zone(s1, s1_min, s1_max);
+    double v1 = cut(nf(k[1] * s2), 0.0, 1.0);
+    double v2 = cut(pf(k[1] * s2), 0.0, 1.0);
 
     double v3 = hs_n(Y[1] - py2);
 
@@ -110,6 +115,9 @@ void AirDist242::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "A1", A1);
 
     cfg.getDouble(secName, "Py2", py2);
+
+    cfg.getDouble(secName, "s1_min", s1_min);
+    cfg.getDouble(secName, "s1_max", s1_max);
 }
 
 GET_AIR_DISTRIBUTOR(AirDist242)
