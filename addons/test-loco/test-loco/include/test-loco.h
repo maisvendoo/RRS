@@ -13,6 +13,8 @@
 #include    "brake-mech.h"
 #include    "physics.h"
 #include    "controls.h"
+#include    "reservoir.h"
+#include    "airdistributor.h"
 
 
 class TestLoco : public Vehicle
@@ -57,6 +59,13 @@ private:
 
     IncChargePress incChargePress;
     DecChargePress decChargePress;
+
+    AirDistributor *airdist;
+
+    QString     airdist_module;
+    QString     airdist_config;
+
+    Reservoir   *supply_reservoir;
 
     void step(double t, double dt);
 

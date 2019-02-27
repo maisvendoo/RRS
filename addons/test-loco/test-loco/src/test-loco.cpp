@@ -53,7 +53,7 @@ void TestLoco::step(double t, double dt)
         pz = Physics::cut(pz, 0.0, 0.4);
         double Q = K1 * (pz - p);
 
-        brake_mech->setAirFlow(Q);
+        brake_mech->setAirFlow(airdist->getBrakeCylinderAirFlow());
         brake_mech->step(t, dt);
     }
 
@@ -73,6 +73,23 @@ void TestLoco::step(double t, double dt)
         brake_crane->setBrakePipePressure(pTM);
         brake_crane->setPosition(crane_pos);
         brake_crane->step(t, dt);
+    }
+
+    if ( supply_reservoir != nullptr )
+    {
+        supply_reservoir->setAirFlow(airdist->getAirSupplyFlow());
+        supply_reservoir->step(t, dt);
+    }
+
+    if ( airdist != nullptr)
+    {
+        airdist->setBrakepipePressure(pTM);
+        airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
+        airdist->setAirSupplyPressure(supply_reservoir->getPressure());
+
+        auxRate = airdist->getAuxRate();
+
+        airdist->step(t, dt);
     }
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
@@ -113,6 +130,9 @@ void TestLoco::initialization()
     QString modules_dir(fs.getModulesDir().c_str());
     brake_crane = loadBrakeCrane(modules_dir + fs.separator() + brake_crane_module);
     brake_mech = loadBrakeMech(modules_dir + fs.separator() + brake_mech_module);
+    supply_reservoir = new Reservoir(0.078);
+
+    airdist = loadAirDistributor(modules_dir + fs.separator() + airdist_module);
 
     if (brake_crane != nullptr)
     {
@@ -121,6 +141,8 @@ void TestLoco::initialization()
         brake_mech->read_config(brake_mech_config);
         brake_mech->setEffFricRadius(wheel_diameter / 2.0);
         brake_mech->setWheelDiameter(wheel_diameter);
+
+        airdist->read_config(airdist_config);
     }
 }
 
@@ -140,6 +162,9 @@ void TestLoco::loadConfig(QString cfg_path)
 
         cfg.getString(secName, "BrakeMechModule", brake_mech_module);
         cfg.getString(secName, "BrakeMechCinfig", brake_mech_config);
+
+        cfg.getString(secName, "AirDistModule", airdist_module);
+        cfg.getString(secName, "AirDistConfig", airdist_config);
     }
 }
 

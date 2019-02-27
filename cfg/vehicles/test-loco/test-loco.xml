@@ -31,6 +31,9 @@
 
                 <BrakeMechModule>carbrakes-mech</BrakeMechModule>
                 <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
+
+                <AirDistModule>vr242</AirDistModule>
+                <AirDistConfig>vr242</AirDistConfig>
                 
 	</Vehicle>
 </Config>
