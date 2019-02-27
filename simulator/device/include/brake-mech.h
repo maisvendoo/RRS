@@ -104,7 +104,7 @@ protected:
                             state_vector_t &dYdt,
                             double t);
 
-    virtual void preStep(const state_vector_t &Y, double t);
+    virtual void preStep(state_vector_t &Y, double t);
 
 private:
 

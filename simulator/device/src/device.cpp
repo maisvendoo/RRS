@@ -143,13 +143,13 @@ void Device::load_config(CfgReader &cfg)
     Q_UNUSED(cfg)
 }
 
-void Device::preStep(const state_vector_t &Y, double t)
+void Device::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
 }
 
-void Device::postStep(const state_vector_t &Y, double t)
+void Device::postStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)

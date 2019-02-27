@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModule>ef-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
+		<Title>Пассажирский поезд из одного вагона</Title>
+		<Description>Поезд пассажирский с купейным вагонам Аммендорф (для теста ВР242)</Description>
+	</Common>
+	<Vehicle>
+		<Module>test-loco</Module>
+		<ModuleConfig>test-loco</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>ammendorf-cupe</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>		
+</Config>

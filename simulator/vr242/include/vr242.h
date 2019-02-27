@@ -33,7 +33,7 @@ private:
 
     void load_config(CfgReader &cfg);
 
-    void preStep(const state_vector_t &Y, double t);
+    void preStep(state_vector_t &Y, double t);
 };
 
 #endif // VR242

@@ -113,7 +113,7 @@ void BrakeMech::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeMech::preStep(const state_vector_t &Y, double t)
+void BrakeMech::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 

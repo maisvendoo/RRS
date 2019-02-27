@@ -2,10 +2,7 @@
 
 /*
     Y[0] - давление в магистральной камере (МК)
-    Y[1] - давление в камере У4
-    Y[2] - давление в ЗК
-    Y[3] - давление в полости АТ2
-    Y[4] - давление в камере У2
+    Y[1] - давление в камере У2
 */
 
 //------------------------------------------------------------------------------
@@ -15,6 +12,9 @@ AirDist242::AirDist242() : AirDistributor ()
 {
     K.fill(0.0);
     k.fill(0.0);
+
+    DebugLog *log = new DebugLog("vr242.txt");
+    connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);
 }
 
 //------------------------------------------------------------------------------
@@ -28,35 +28,32 @@ AirDist242::~AirDist242()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDist242::preStep(const state_vector_t &Y, double t)
+void AirDist242::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    // Перемещение поршня
-    double s1 = A1 * (Y[0] - Y[2]);
-    // Перемещение клапана доп. разрядки
-    double u1 = cut(nf(k[1] * s1), 0.0, 1.0);
-    double u2 = cut(pf(k[2] * s1), 0.0, 1.0);
+    double s1 = A1 * (Y[0] - pAS);
+    double s2 = A1 * (dead_zone(Y[0] - pAS, -0.03, 0.0));
+    double v1 = cut(nf(k[1] * s1), 0.0, 1.0);
+    double v2 = cut(pf(k[1] * s1), 0.0, 1.0);
 
-    // Расход воздуха на наполнение ЗР из камеры У4
-    double u3 = hs_n(Y[4] - py2);
+    double v3 = hs_n(Y[1] - py2);
 
-    Qas = K[9] * (Y[1] - pAS) * u3 - K[4] * (pAS - Y[2]);
+    double v4 = cut(nf(k[1] * s2), 0.0, 1.0);
 
-    Qbc = K[2] * (Y[3] - pBC);
+    Qas = K[2] * (Y[0] - pAS) * v3 - pf( 2.0 * Qbc);
 
-    // Темп дополнительной разрядки ТМ
-    double dpTMdt = dydt[0];
-    auxRate = nf( - K[5] * Y[0] * u1 / Vmk );
+    Qbc = K[4] * (pAS - pBC) * v1 - K[4] * pBC * v2;// - K[7] * pBC * v3;
 
-    DebugMsg = QString(" Темп: %7 MK: %1 ЗК: %2 Пер. порш.: %3 ТЦ: %4 u1: %5 u2: %6")
+    DebugMsg = QString(" МК: %1 ТЦ: %3 s1: %2")
             .arg(Y[0], 4, 'f', 2)
-            .arg(Y[2], 4, 'f', 2)
             .arg(s1, 7, 'f', 4)
-            .arg(pBC, 4, 'f', 2)
-            .arg(u1, 7, 'f', 4)
-            .arg(u2, 7, 'f', 4)
-            .arg(dpTMdt, 7, 'f', 4);
+            .arg(pBC, 4, 'f', 2);
+
+    //auxRate = Qas / 0.078;
+
+    Y[2] = pAS;
+    Y[3] = pBC;
 }
 
 //------------------------------------------------------------------------------
@@ -68,43 +65,22 @@ void AirDist242::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    // Перемещение поршня
-    double s1 = A1 * (Y[0] - Y[2]);
-    // Перемещение клапана доп. разрядки
-    double u1 = cut(nf(k[1] * s1), 0.0, 1.0);
-    // Перемещение клапана опорожнения ТЦ
-    double u2 = cut(pf(k[2] * s1), 0.0, 1.0);
+    double s1 = A1 * (Y[0] - pAS);
+    double s2 = A1 * (dead_zone(Y[0] - pAS, 0.0, 0.0));
+    double v1 = cut(nf(k[1] * s1), 0.0, 1.0);
+    double v2 = cut(pf(k[1] * s1), 0.0, 1.0);
 
-    // Расход воздуха в камеру У4
-    double Qy4 = K[8] * (pTM - Y[1]) - Qas;
+    double v3 = hs_n(Y[1] - py2);
 
-    // Расход воздуха в магистральную камеру
-    double u3 = hs_n(Y[4] - py2);
+    double Qmk = K[1] * (pTM - Y[0])
+            - K[3] * Y[0] * v1 * v3
+            - K[2] * (Y[0] - pAS) * v3;
 
-    double Qaux = K[5] * Y[0] * u1;
-    double Qsoft = K[11] * (Y[2] - Y[0]) * u3;
-
-    double Qmk = K[3] * (pTM - Y[0]) - Qaux + Qsoft;
-
-    // Расход воздуха в ЗК
-    double u4 = dead_zone(u1, 0.0, 1e-4);
-
-    double Qzk = K[4] * (pAS - Y[2]) - K[6] * (Y[2] - Y[3]) * u4 - Qsoft;
-
-    // Расход воздуха в АТ2
-    double Qat2 = K[6] * (Y[2] - Y[3]) * u4 - K[10] * Y[3] * u2 - Qbc;
-
-    double Qy2 = K[7] * (Y[3] - Y[4]);
+    double Qy2 = K[6] * (pAS - Y[1]) * v1 - K[6] * Y[1] * v2;
 
     dYdt[0] = Qmk / Vmk;
 
-    dYdt[1] = Qy4 / Vy4;
-
-    dYdt[2] = Qzk / Vzk;
-
-    dYdt[3] = Qat2 / Vat2;
-
-    dYdt[4] = Qy2 / Vy2;
+    dYdt[1] = Qy2 / Vy2;
 }
 
 //------------------------------------------------------------------------------
@@ -114,13 +90,13 @@ void AirDist242::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
-    for (size_t i = 0; i < K.size(); ++i)
+    for (size_t i = 1; i < K.size(); ++i)
     {
         QString coeff = QString("K%1").arg(i);
         cfg.getDouble(secName, coeff, K[i]);
     }
 
-    for (size_t i = 0; i < k.size(); ++i)
+    for (size_t i = 1; i < k.size(); ++i)
     {
         QString coeff = QString("k%1").arg(i);
         cfg.getDouble(secName, coeff, k[i]);
