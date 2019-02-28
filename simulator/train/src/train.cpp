@@ -351,6 +351,13 @@ bool Train::loadTrain(QString cfg_path)
                 connect(vehicle, &Vehicle::soundSetVolume, soundMan, &SoundManager::setVolume);
                 connect(vehicle, &Vehicle::soundSetPitch, soundMan, &SoundManager::setPitch);
 
+                if (vehicles.size() !=0)
+                {
+                    Vehicle *prev =  *(vehicles.end() - 1);
+                    prev->setNextVehicle(vehicle);
+                    vehicle->setPrevVehicle(prev);
+                }
+
                 vehicles.push_back(vehicle);
 
                 emit logMessage("OK: Loaded vehicle: " + module_name +

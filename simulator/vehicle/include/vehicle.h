@@ -83,6 +83,9 @@ public:
     void setWheelAngle(size_t i, double value);
     void setWheelOmega(size_t i, double value);
 
+    void setPrevVehicle(Vehicle *vehicle);
+    void setNextVehicle(Vehicle *vehicle);
+
 
     /// Get vehicle index
     size_t getIndex() const;
@@ -219,6 +222,9 @@ protected:
     double pTM;
 
     QString DebugMsg;
+
+    Vehicle *prev_vehicle;
+    Vehicle *next_vehicle;
 
     /// Active common forces
     state_vector_t  Q_a;

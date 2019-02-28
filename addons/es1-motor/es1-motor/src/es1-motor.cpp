@@ -1,6 +1,9 @@
 #include    "es1-motor.h"
 #include    "physics.h"
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ES1Motor::ES1Motor() : Vehicle ()
   , traction_level(0.0)
   , inc_loc(false)
@@ -9,16 +12,22 @@ ES1Motor::ES1Motor() : Vehicle ()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ES1Motor::~ES1Motor()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ES1Motor::keyProcess()
 {
     double traction_step = 0.1;
 
-    if (keys[97] && !inc_loc)
+    if (keys[KEY_A] && !inc_loc)
     {
         traction_level +=  traction_step;
         inc_loc = true;
@@ -28,7 +37,7 @@ void ES1Motor::keyProcess()
         inc_loc = false;
     }
 
-    if (keys[100] && !dec_loc)
+    if (keys[KEY_D] && !dec_loc)
     {
         traction_level -=  traction_step;
         dec_loc = true;
@@ -36,9 +45,12 @@ void ES1Motor::keyProcess()
     else
     {
         dec_loc = false;
-    }
+    }    
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ES1Motor::step(double t, double dt)
 {
     Q_UNUSED(t)
@@ -46,18 +58,31 @@ void ES1Motor::step(double t, double dt)
 
     traction_level = Physics::cut(traction_level, -1.0, 1.0);
 
-    for (size_t i = 0; i < Q_a.size(); i++)
+    double actor_torque = traction_char(velocity) * wheel_diameter / num_axis / 2.0;
+
+    double trac_torque = actor_torque * pf(traction_level);
+    double brake_troque = actor_torque * nf(traction_level);
+
+    for (size_t i = 1; i < Q_a.size(); i++)
     {
-        double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
-        Q_a[i] = torque;
+        Q_a[i] = trac_torque;
+        Q_r[i] = brake_troque;
     }
 
-    DebugMsg = QString("Время: %1 Скор.: %2 Тяга: %3")
+    DebugMsg = QString("Время: %1 Скор.: %2 Тяга: %3 ")
             .arg(t, 10, 'f', 1)
             .arg(velocity, 6, 'f', 1)
             .arg(traction_level, 4, 'f', 1);
+
+    if (next_vehicle != nullptr)
+    {
+        DebugMsg += next_vehicle->getDebugMsg();
+    }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double ES1Motor::traction_char(double v)
 {
     double max_traction = 127.5e3;

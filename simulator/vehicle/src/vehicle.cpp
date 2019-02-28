@@ -52,6 +52,8 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , auxRate(0.0)
   , pTM(0.0)
   , DebugMsg(" ")
+  , prev_vehicle(nullptr)
+  , next_vehicle(nullptr)
 {
 
 }
@@ -181,6 +183,22 @@ void Vehicle::setWheelOmega(size_t i, double value)
 {
     if (i < wheel_omega.size())
         wheel_omega[i] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setPrevVehicle(Vehicle *vehicle)
+{
+    prev_vehicle = vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setNextVehicle(Vehicle *vehicle)
+{
+    next_vehicle = vehicle;
 }
 
 //------------------------------------------------------------------------------

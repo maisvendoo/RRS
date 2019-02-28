@@ -23,7 +23,9 @@
 
         <Axis>0.0 6.65 0.75</Axis>
         <Axis>0.0 9.4 0.75</Axis>
-                
+
+        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+        <BrakeMechConfig>es1-mech</BrakeMechConfig>                
 
 	</Vehicle>
 </Config>
