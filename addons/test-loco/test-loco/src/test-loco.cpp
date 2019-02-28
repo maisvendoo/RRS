@@ -46,14 +46,9 @@ void TestLoco::step(double t, double dt)
 
     if (brake_mech != nullptr)
     {
-        brake_mech->setVelocity(velocity);
+        brake_mech->setVelocity(velocity);        
 
-        double p = brake_mech->getBrakeCylinderPressure();
-        double K1 = 1e-2;
-        pz = Physics::cut(pz, 0.0, 0.4);
-        double Q = K1 * (pz - p);
-
-        brake_mech->setAirFlow(airdist->getBrakeCylinderAirFlow());
+        brake_mech->setAirFlow(repiter->getBrakeCylAirFlow());
         brake_mech->step(t, dt);
     }
 
@@ -84,13 +79,19 @@ void TestLoco::step(double t, double dt)
     if ( airdist != nullptr)
     {
         airdist->setBrakepipePressure(pTM);
-        airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
+        airdist->setBrakeCylinderPressure(repiter->getWorkPressure());
         airdist->setAirSupplyPressure(supply_reservoir->getPressure());
 
         auxRate = airdist->getAuxRate();
 
         airdist->step(t, dt);
     }
+
+    repiter->setPipelinePressure(0.9);
+    repiter->setBrakeCylPressure(brake_mech->getBrakeCylinderPressure());
+    repiter->setWorkAirFlow(airdist->getBrakeCylinderAirFlow());
+
+    repiter->step(t, dt);
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
@@ -104,6 +105,8 @@ void TestLoco::step(double t, double dt)
             .arg(brake_crane->getBrakePipeInitPressure(), 4, 'f', 2)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_crane->getPositionName(crane_pos), 4);
+
+    DebugMsg += airdist->getDebugMsg();
 }
 
 //------------------------------------------------------------------------------
@@ -133,6 +136,9 @@ void TestLoco::initialization()
     supply_reservoir = new Reservoir(0.078);
 
     airdist = loadAirDistributor(modules_dir + fs.separator() + airdist_module);
+
+    repiter = new PneumoReley();
+    repiter->read_config("rd304");
 
     if (brake_crane != nullptr)
     {
@@ -182,28 +188,6 @@ void TestLoco::keyProcess()
 
     incChargePress.process(keys[KEY_H], charge_press);
     decChargePress.process(keys[KEY_J], charge_press);
-
-    double step = 0.1;
-
-    if (keys[KEY_L] && !inc_brake)
-    {
-        pz +=  step;
-        inc_brake = true;
-    }
-    else
-    {
-        inc_brake = false;
-    }
-
-    if (keys[KEY_K] && !dec_brake)
-    {
-        pz -=  step;
-        dec_brake = true;
-    }
-    else
-    {
-        dec_brake = false;
-    }
 
     if (keys[KEY_F])
     {

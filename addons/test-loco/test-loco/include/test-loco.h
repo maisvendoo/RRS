@@ -15,6 +15,7 @@
 #include    "controls.h"
 #include    "reservoir.h"
 #include    "airdistributor.h"
+#include    "pneumo-relay.h"
 
 
 class TestLoco : public Vehicle
@@ -66,6 +67,8 @@ private:
     QString     airdist_config;
 
     Reservoir   *supply_reservoir;
+
+    PneumoReley *repiter;
 
     void step(double t, double dt);
 

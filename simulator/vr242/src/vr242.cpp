@@ -16,8 +16,8 @@ AirDist242::AirDist242() : AirDistributor ()
     s1_min = 1e-3;
     s1_max = 1e-3;
 
-    //DebugLog *log = new DebugLog("vr242.txt");
-    //connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);
+    DebugLog *log = new DebugLog("vr242.txt");
+    connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);
 }
 
 //------------------------------------------------------------------------------
