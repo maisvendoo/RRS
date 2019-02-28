@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Common>
-		<CouplingModule>ef-coupling</CouplingModule>
+		<CouplingModule>default-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
 		<Title>ЭС1 "Ласточка"</Title>
 		<Description>Скоростной электропоезд ЭС1 "Ласточка"</Description>

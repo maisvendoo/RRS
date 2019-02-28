@@ -2,6 +2,7 @@
 #define     SAPSAN_MOTOR_H
 
 #include    "vehicle.h"
+#include    "controls.h"
 
 
 //------------------------------------------------------------------------------
@@ -20,6 +21,15 @@ private:
     double  traction_level;
     bool    inc_loc;
     bool    dec_loc;
+
+    bool    auto_reg;
+
+    double  vz;
+
+    EnableSpeedReg enSpeedReg;
+
+    IncRefSpeed incRefSpeed;
+    DecRefSpeed decRefSpeed;
 
     void keyProcess();
 

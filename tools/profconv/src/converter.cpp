@@ -3,6 +3,9 @@
 #include    <iostream>
 #include    <algorithm>
 #include    <sstream>
+#include    <codecvt>
+#include    <cstdlib>
+#include    <locale>
 
 #include    "path-utils.h"
 
@@ -233,6 +236,79 @@ bool ProfConverter::load(std::ifstream &stream,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool ProfConverter::readWaypoints(const std::string &path,
+                                  std::vector<waypoint_t> &waypoints)
+{
+    if (path.empty())
+        return false;
+
+    std::wifstream stream(path.c_str(), std::ios::in);
+
+    stream.imbue(std::locale("ru_RU.UTF-8"));
+
+    if (!stream.is_open())
+    {
+        std::cout << "File " << path << " not opened" << std::endl;
+        return false;
+    }
+
+    return readWaypoints(stream, waypoints);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ProfConverter::readWaypoints(std::wifstream &stream,
+                                  std::vector<waypoint_t> &waypoints)
+{
+    while (!stream.eof())
+    {
+        std::wstring line = L"";
+        std::getline(stream, line);
+
+        if (line.empty())
+            continue;
+
+        std::wistringstream ss(line);
+
+        waypoint_t waypoint;
+
+        ss >> waypoint.name >> waypoint.begin_track >> waypoint.end_track;
+
+        waypoints.push_back(waypoint);
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProfConverter::writeWaypoints(const std::string &filename,
+                                   std::vector<waypoint_t> &waypoints)
+{
+    std::string path = compinePath(toNativeSeparators(routeDir), filename);
+    std::wofstream stream(path.c_str(), std::ios::out);
+
+    if (!stream.good())
+        return;
+
+    stream.imbue(std::locale("ru_RU.UTF-8"));
+
+    for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
+    {
+        track_t track = tracks_data1[(*it).begin_track];
+        float coord = track.rail_coord;
+
+        stream << (*it).name << " " <<  coord << std::endl;
+    }
+
+    stream.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ProfConverter::conversion(const std::string &routeDir)
 {
     std::string trk1_path = compinePath(routeDir, "route1.trk");
@@ -241,8 +317,11 @@ bool ProfConverter::conversion(const std::string &routeDir)
     if (load(trk1_path, tracks_data1))
         writeProfileData(tracks_data1, "profile1.conf");
 
-    load(trk2_path, tracks_data2);
+    if (load(trk2_path, tracks_data2))
          writeProfileData(tracks_data2, "profile2.conf");
+
+    if (readWaypoints(compinePath(routeDir, "start_kilometers.dat"), waypoints))
+        writeWaypoints("waypoints.conf", waypoints);
 
     return true;
 }

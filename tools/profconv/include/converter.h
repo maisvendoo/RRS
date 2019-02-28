@@ -18,6 +18,7 @@
 #include    <vector>
 
 #include    "track.h"
+#include    "waypoint.h"
 #include    "cmd-line.h"
 
 #include    <fstream>
@@ -43,11 +44,19 @@ private:
 
     std::vector<track_t>    tracks_data2;
 
+    std::vector<waypoint_t> waypoints;
+
     CmdLineParseResult parseCommandLine(int argc, char *argv[]);
 
     bool load(const std::string &path, std::vector<track_t> &track_data);
 
     bool load(std::ifstream &stream, std::vector<track_t> &track_data);
+
+    bool readWaypoints(const std::string &path, std::vector<waypoint_t> &waypoints);
+
+    bool readWaypoints(std::wifstream &stream, std::vector<waypoint_t> &waypoints);
+
+    void writeWaypoints(const std::string &filename, std::vector<waypoint_t> &waypoints);
 
     bool conversion(const std::string &routeDir);
 

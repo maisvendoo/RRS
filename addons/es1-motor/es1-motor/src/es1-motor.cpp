@@ -8,6 +8,7 @@ ES1Motor::ES1Motor() : Vehicle ()
   , traction_level(0.0)
   , inc_loc(false)
   , dec_loc(false)
+  , auto_reg(false)
 {
 
 }
@@ -45,7 +46,14 @@ void ES1Motor::keyProcess()
     else
     {
         dec_loc = false;
-    }    
+    }
+
+    enSpeedReg.process(keys[KEY_E], auto_reg);
+
+    incRefSpeed.process(keys[KEY_Q], vz);
+    decRefSpeed.process(keys[KEY_W], vz);
+
+    vz = cut(vz, 0.0, 160.0);
 }
 
 //------------------------------------------------------------------------------
@@ -55,6 +63,12 @@ void ES1Motor::step(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
+
+    if (auto_reg)
+    {
+        double K1 = 1.6;
+        traction_level = K1 * (vz / Physics::kmh - velocity);
+    }
 
     traction_level = Physics::cut(traction_level, -1.0, 1.0);
 
@@ -69,10 +83,12 @@ void ES1Motor::step(double t, double dt)
         Q_r[i] = brake_troque;
     }
 
-    DebugMsg = QString("Время: %1 Скор.: %2 Тяга: %3 ")
+    DebugMsg = QString("Время: %1 Коорд.: %5 Зад. Скор.: %4 Скор.: %2 Тяга: %3 ")
             .arg(t, 10, 'f', 1)
-            .arg(velocity, 6, 'f', 1)
-            .arg(traction_level, 4, 'f', 1);
+            .arg(velocity * Physics::kmh, 6, 'f', 1)
+            .arg(traction_level, 4, 'f', 1)
+            .arg(vz, 6, 'f', 1)
+            .arg(railway_coord, 7, 'f', 2);
 
     if (next_vehicle != nullptr)
     {

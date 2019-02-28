@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------------------------------
 ES1NonMotor::ES1NonMotor() : Vehicle ()
-    , brake_pos(0)
+    , brake_pos(MAX_BRAKE_POS)
     , brake_step(0.0)
     , pBC_max(0.5)
     , brake_mech(nullptr)
@@ -74,9 +74,7 @@ void ES1NonMotor::step(double t, double dt)
 
     brake_mech->step(t, dt);
 
-    DebugMsg = QString("Время: %1 Скор.: %2 КрМ: %4 ТЦ: %3")
-            .arg(t, 10, 'f', 1)
-            .arg(velocity, 5, 'f', 1)
+    DebugMsg = QString(" КрМ: %2 ТЦ: %1")
             .arg(p, 4, 'f', 2)
             .arg(brake_pos, 1);
 }
