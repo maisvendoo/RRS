@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <InitData>
-        <InitCoord>1.38328</InitCoord>
+        <InitCoord>1.0</InitCoord>
         <InitVelocity>0.0</InitVelocity>
         <Profile>zds/kiev-shevchenko/profile.dat</Profile>
         <ProfileStep>100</ProfileStep>

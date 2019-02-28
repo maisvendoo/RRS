@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		
+		<EmptyMass>60800</EmptyMass>
+		<PayloadMass>9900</PayloadMass>
+		<Length>24.8</Length>
+		<WheelDiameter>0.92</WheelDiameter>
+		<MainResist>lastochka</MainResist>
+		<NumAxis>4</NumAxis>				
+                <WheelInertia>2.0</WheelInertia>
+
+                <ExtModelName>lastochka/es1-A.osgt</ExtModelName> 
+                <ModelShift>0.0 0.0 0.411</ModelShift>
+                
+
+                <WheelModel>lastochka/wheel_m.osgt</WheelModel>
+                
+
+                <Axis>0.0 -10.25 0.75</Axis>
+                <Axis>0.0 -7.5 0.75</Axis>
+                
+
+                <Axis>0.0 7.5 0.75</Axis>
+                <Axis>0.0 10.25 0.75</Axis>
+                
+
+	</Vehicle>
+</Config>
