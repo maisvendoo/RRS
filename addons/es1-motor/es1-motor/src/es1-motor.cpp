@@ -53,6 +53,11 @@ void ES1Motor::keyProcess()
     incRefSpeed.process(keys[KEY_Q], vz);
     decRefSpeed.process(keys[KEY_W], vz);
 
+    if (keys[KEY_C])
+    {
+        vz = velocity * Physics::kmh;
+    }
+
     vz = cut(vz, 0.0, 160.0);
 }
 

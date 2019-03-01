@@ -310,3 +310,33 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
 
     vehicle->addChild(transShift.get());    
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float getLength(const std::string &config_name)
+{
+    float length = 16.0f;
+
+    // Calculate vehicle config path
+    FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (!cfg.isOpenned())
+    {
+        OSG_FATAL << "Vehicle config " << cfg_path << " is't foung" << std::endl;
+        return length;
+    }
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "Length", length);
+    }
+
+    return length;
+}

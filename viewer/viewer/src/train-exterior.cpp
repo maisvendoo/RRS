@@ -261,12 +261,15 @@ void TrainExteriorHandler::load(const std::string &train_config)
             // Load cabine model
             loadCabine(vehicle_model.get(), module_config_name);
 
+            float length = getLength(module_config_name);
+
             for (int i = 0; i < count; ++i)
             {
                 vehicle_exterior_t vehicle_ext;
                 vehicle_ext.transform = new osg::MatrixTransform;
                 vehicle_ext.transform->addChild(vehicle_model.get());
                 vehicle_ext.wheel_rotation = wheel_model.get();
+                vehicle_ext.length = length;
 
                 vehicles_ext.push_back(vehicle_ext);
                 trainExterior->addChild(vehicle_ext.transform.get());
@@ -295,6 +298,8 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         // Store current railway coordinate and wheels angle
         vehicles_ext[i].coord = coord;
         vehicles_ext[i].wheel_angle = angle;
+
+        recalcAttitude(i);
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
@@ -385,4 +390,46 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     viewMatrix = osg::Matrix::inverse(matrix);
 
     viewer->getCamera()->setViewMatrix(viewMatrix);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float arg(float cos_x, float sin_x)
+{
+    float angle = 0;
+
+    if (sin_x >= 0.0f)
+        angle = acosf(cos_x);
+    else
+        angle = -acosf(cos_x);
+
+    return angle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::recalcAttitude(size_t i)
+{
+    if (i == 0)
+        return;
+
+    vehicle_exterior_t prev = vehicles_ext[i-1];
+    vehicle_exterior_t curr = vehicles_ext[i];
+
+    osg::Vec3 prev_att = prev.attitude;
+    float pitch = prev_att.x();
+    float yaw = prev_att.z();
+    osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
+    osg::Vec3 tail_dir = tail_orth * (curr.length / 2.0f);
+
+    osg::Vec3 a = prev.position + tail_dir;
+    osg::Vec3 forward = a - curr.position;
+    osg::Vec3 f_orth = forward * (1 / forward.length());
+
+    float y_new = arg(f_orth.y(), f_orth.x());
+    float y_old = curr.attitude.z();
+
+    vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0f;
 }

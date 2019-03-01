@@ -96,7 +96,9 @@ private:
     void processServerData(const network_data_t *server_data);
 
     /// Move camera along track
-    void moveCamera(osgViewer::Viewer *viewer);    
+    void moveCamera(osgViewer::Viewer *viewer);
+
+    void recalcAttitude(size_t i);
 };
 
 #endif // TRAIN_EXTERIOR_H

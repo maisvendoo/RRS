@@ -49,6 +49,15 @@ void setAxis(osg::Group *vehicle,
              osg::MatrixTransform *wheel,
              const std::string &config_name);
 
+/*!
+ * \fn
+ * \brief Load cabine module
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void loadCabine(osg::Group *vehicle, const std::string &config_name);
+
+float getLength(const std::string &config_name);
 
 #endif // VEHICLE_LOADER_H
