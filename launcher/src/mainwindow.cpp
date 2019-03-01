@@ -19,6 +19,8 @@
 #include    <QDir>
 #include    <QDirIterator>
 #include    <QStringList>
+#include    <QComboBox>
+#include    <QTextStream>
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
@@ -28,9 +30,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -167,6 +168,13 @@ void MainWindow::startSimulator()
     args << "--train-config=" + selectedTrain;
     args << "--route=" + selectedRoutePath;
 
+    if (ui->cbStations->count() != 0)
+    {
+        size_t i = static_cast<size_t>(ui->cbStations->currentIndex());
+        double init_coord = waypoints[i].railway_coord / 1000.0;
+        args << "--init-coord=" + QString("%1").arg(init_coord);
+    }
+
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     simulatorProc.start(simPath, args);
 }
@@ -190,6 +198,35 @@ void MainWindow::startViewer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::loadStations(QString &routeDir)
+{
+    ui->cbStations->clear();
+
+    QFile file(routeDir + QDir::separator() + "waypoints.conf");
+
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    while (!file.atEnd())
+    {
+        QString line = file.readLine();
+
+        waypoint_t waypoint;
+
+        QTextStream ss(&line);
+
+        ss >> waypoint.name >> waypoint.railway_coord;
+
+        ui->cbStations->addItem(waypoint.name);
+        waypoints.push_back(waypoint);
+    }
+
+    ui->cbStations->setCurrentIndex(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::onRouteSelection()
 {
     size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
@@ -197,6 +234,8 @@ void MainWindow::onRouteSelection()
     ui->ptRouteDescription->clear();
     selectedRoutePath = routes_info[item_idx].route_dir;
     ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
+
+    loadStations(selectedRoutePath);
 
     setRouteScreenShot(selectedRoutePath + QDir::separator() + "shotcut.png");
 }

@@ -71,7 +71,7 @@
          <x>10</x>
          <y>40</y>
          <width>261</width>
-         <height>221</height>
+         <height>181</height>
         </rect>
        </property>
       </widget>
@@ -89,6 +89,16 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="cbStations">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>230</y>
+         <width>261</width>
+         <height>24</height>
+        </rect>
        </property>
       </widget>
      </widget>

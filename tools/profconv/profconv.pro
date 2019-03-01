@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-CONFIG -= qt
+QT += core
 
 TARGET = profconv
 

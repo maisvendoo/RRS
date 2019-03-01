@@ -62,6 +62,8 @@ private:
 
     void writeProfileData(const std::vector<track_t> &tracks_data,
                           const std::string &file_name);
+
+    void fileToUtf8(const std::string &path);
 };
 
 #endif // CONVERTER_H

@@ -15,7 +15,11 @@ struct simulator_command_line_t
     /// Clear simulator log file
     option_t<bool>      clear_log;
     /// Debug print in simulation loop
-    option_t<bool>      debug_print;    
+    option_t<bool>      debug_print;
+    /// Initial railway coordinate
+    option_t<double>    init_coord;
+    /// Initial direction
+    option_t<int>       direction;
 };
 
 #endif // SIMULATOR_COMMAND_LINE

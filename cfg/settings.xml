@@ -3,8 +3,8 @@
 	<Viewer>
 		<posX>0</posX>
 		<posY>0</posY>
-		<Width>1920</Width>
-		<Height>1080</Height>
+		<Width>1280</Width>
+		<Height>720</Height>
 		<FullScreen>0</FullScreen>
 		<VSync>1</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
@@ -15,7 +15,7 @@
 		<zFar>1000.0</zFar>
 		<ScreenNumber>0</ScreenNumber>
 		<Name>viewer</Name>
-		<WindowDecoration>0</WindowDecoration>
+		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
 		<Samples>16</Samples>
 		<RequestInterval>200</RequestInterval>

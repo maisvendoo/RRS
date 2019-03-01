@@ -20,6 +20,7 @@
 
 #include    "route-info.h"
 #include    "train-info.h"
+#include    "waypoint.h"
 
 //------------------------------------------------------------------------------
 //
@@ -48,7 +49,7 @@ public:
     /// Destructor
     ~MainWindow();
 
-private:
+private:    
 
     /// Selected route path
     QString         selectedRoutePath;
@@ -61,6 +62,8 @@ private:
     std::vector<route_info_t>   routes_info;
     /// Info about installed trains
     std::vector<train_info_t>   trains_info;
+
+    std::vector<waypoint_t>     waypoints;
 
     /// Simulation process
     QProcess        simulatorProc;
@@ -84,6 +87,8 @@ private:
 
     /// Start viewer
     void startViewer();
+
+    void loadStations(QString &routeDir);
 
 private slots:
 

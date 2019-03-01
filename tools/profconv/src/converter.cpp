@@ -9,6 +9,11 @@
 
 #include    "path-utils.h"
 
+#include    <QFile>
+#include    <QTextCodec>
+#include    <QTextDecoder>
+#include    <QTextStream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -242,6 +247,8 @@ bool ProfConverter::readWaypoints(const std::string &path,
     if (path.empty())
         return false;
 
+    fileToUtf8(path);
+
     std::wifstream stream(path.c_str(), std::ios::in);
 
     stream.imbue(std::locale("ru_RU.UTF-8"));
@@ -288,22 +295,23 @@ void ProfConverter::writeWaypoints(const std::string &filename,
                                    std::vector<waypoint_t> &waypoints)
 {
     std::string path = compinePath(toNativeSeparators(routeDir), filename);
-    std::wofstream stream(path.c_str(), std::ios::out);
 
-    if (!stream.good())
+    QFile file(QString(path.c_str()));
+
+    if (!file.open(QIODevice::WriteOnly))
         return;
 
-    stream.imbue(std::locale("ru_RU.UTF-8"));
+    QTextStream stream(&file);
 
     for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
     {
         track_t track = tracks_data1[(*it).begin_track];
         float coord = track.rail_coord;
 
-        stream << (*it).name << " " <<  coord << std::endl;
+        stream << QString::fromStdWString((*it).name) << " " << coord << "\n";
     }
 
-    stream.close();
+    file.close();
 }
 
 //------------------------------------------------------------------------------
@@ -345,6 +353,39 @@ void ProfConverter::writeProfileData(const std::vector<track_t> &tracks_data,
     }
 
     stream.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProfConverter::fileToUtf8(const std::string &path)
+{
+    QFile file(QString(path.c_str()));
+    QString new_data = "";
+
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    QByteArray data = file.readAll();
+    QTextCodec *codec_1251 = QTextCodec::codecForName("Windows-1251");
+    new_data = codec_1251->toUnicode(data);
+
+    file.close();
+
+
+    QFile::rename(QString(compinePath(routeDir, "start_kilometers.dat").c_str()),
+                  compinePath(routeDir, "start_kilometers.dat.bak").c_str());
+
+    QFile startKmDat(compinePath(routeDir, "start_kilometers.dat").c_str());
+
+    if (!startKmDat.open(QIODevice::WriteOnly))
+        return;
+
+    QTextStream stream(&startKmDat);
+
+    stream << new_data;
+
+    startKmDat.close();
 }
 
 

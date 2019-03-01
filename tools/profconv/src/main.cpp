@@ -19,6 +19,7 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    QCoreApplication app(argc, argv);
     ProfConverter profconv;
 
     return profconv.run(argc, argv);

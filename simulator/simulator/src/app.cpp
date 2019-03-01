@@ -122,6 +122,18 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
     parser.addOption(debugPrint);    
 
+    QCommandLineOption initCoord(QStringList() << "x" << "init-coord",
+                                 QCoreApplication::translate("main", "Initial railway coordinate"),
+                                 QCoreApplication::translate("main", "init-coord"));
+
+    parser.addOption(initCoord);
+
+    QCommandLineOption direction(QStringList() << "d" << "direction",
+                                 QCoreApplication::translate("main", "Motion's direction"),
+                                 QCoreApplication::translate("main", "direction"));
+
+    parser.addOption(direction);
+
     // Parse command line arguments
     if (!parser.parse(this->arguments()))
     {
@@ -159,6 +171,20 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     if (parser.isSet(debugPrint))
     {
         command_line.debug_print.is_present = command_line.debug_print.value = true;
+    }
+
+    if (parser.isSet(initCoord))
+    {
+        command_line.init_coord.is_present = true;
+        QString tmp = parser.value(initCoord);
+        command_line.init_coord.value = tmp.toDouble();
+    }
+
+    if (parser.isSet(direction))
+    {
+        command_line.direction.is_present = true;
+        QString tmp = parser.value(direction);
+        command_line.direction.value = tmp.toInt();
     }
 
     return CommandLineOk;
