@@ -13,6 +13,7 @@
  */
 
 #include    "main.h"
+#include    <iostream>
 
 /*!
  * \fn
@@ -24,10 +25,10 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    RouteViewer viewer(argc, argv);
+    RouteViewer *viewer = new RouteViewer(argc, argv);
 
-    if (viewer.isReady())
-        return viewer.run();
+    if (viewer->isReady())
+        return viewer->run();
 
     return 0;
 }

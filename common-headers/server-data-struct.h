@@ -29,7 +29,7 @@ struct vehicle_data_t
     float   velocity;
     float   wheel_angle;
     float   omega;
-    wchar_t DebugMsg[10240];
+    wchar_t DebugMsg[1024];
 
     vehicle_data_t()
         : railway_coord(0.0f)

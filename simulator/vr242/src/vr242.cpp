@@ -16,8 +16,8 @@ AirDist242::AirDist242() : AirDistributor ()
     s1_min = 1e-3;
     s1_max = 1e-3;
 
-    DebugLog *log = new DebugLog("vr242.txt");
-    connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);
+    /*DebugLog *log = new DebugLog("vr242.txt");
+    connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------
@@ -43,19 +43,14 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     double v3 = hs_n(Y[1] - py2);
 
-    Qas = K[2] * (Y[0] - pAS) * v3 - pf(2.0 * Qbc);
+    Qas = K[2] * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
 
-    Qbc = K[4] * (pAS - pBC) * v1 - K[4] * pBC * v2;// - K[7] * pBC * v3;
+    Qbc = K[4] * (pAS - pBC) * v1 - K[13] * pBC * v2 - K[7] * pBC * v3 * v2;
 
-    DebugMsg = QString(" МК: %1 ТЦ: %3 s1: %2 v1: %4 v2: %5")
-            .arg(Y[0], 4, 'f', 2)
-            .arg(s1, 7, 'f', 4)
-            .arg(pBC, 4, 'f', 2)
-            .arg(v1, 7, 'f', 4)
-            .arg(v2, 7, 'f', 4);
+    DebugMsg = QString(" Доп. разр.: %1")
+            .arg(auxRate, 7, 'f', 4);
 
-
-    //auxRate = Qas / 0.078;
+    auxRate = -K[14] * pTM * v1 * v3;
 
     Y[2] = pAS;
     Y[3] = pBC;
