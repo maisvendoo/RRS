@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		
+		<EmptyMass>138000</EmptyMass>
+		<PayloadMass>0</PayloadMass>
+		<Length>18.15</Length>
+		<WheelDiameter>1.050</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>6</NumAxis>				
+        <WheelInertia>2.0</WheelInertia>
+
+        <ExtModelName>2te116-b/2te116-b.osgt</ExtModelName> 
+        <ModelShift>0.0 0.0 0.311</ModelShift>                
+
+        <WheelModel>2te116-b/wheel.osgt</WheelModel>                
+
+        <Axis>0.0 -6.6898 0.85</Axis>
+        <Axis>0.0 -4.8488 0.85</Axis>
+        <Axis>0.0 -2.9933 0.85</Axis>
+
+        <Axis>0.0 6.6898 0.85</Axis>
+        <Axis>0.0 4.8488 0.85</Axis>
+        <Axis>0.0 2.9933 0.85</Axis>                                
+        
+        <BrakeCraneModule>krm395</BrakeCraneModule>
+        <BrakeCraneConfig>krm395</BrakeCraneConfig>
+
+        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+        <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
+
+        <AirDistModule>vr242</AirDistModule>
+        <AirDistConfig>vr242</AirDistConfig>
+                
+	</Vehicle>
+</Config>
