@@ -17,10 +17,13 @@ private:
     float       max_angle;
     float       angle;
     osg::Vec3   axis;
+    osg::Matrix matrix;
 
     void anim_step(float t, float dt);
 
     bool load_config(ConfigReader &cfg);
+
+    void update();
 };
 
 #endif // ANALOG_ROTATION_H

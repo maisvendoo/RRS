@@ -111,6 +111,9 @@ void NetworkClient::onTimerRequest()
                     traj_elem->te[i].velocity = server_data.vehicles_data[i].velocity;
                     traj_elem->te[i].omega = server_data.vehicles_data[i].omega;
                     traj_elem->te[i].DebugMsg = QString::fromWCharArray(server_data.vehicles_data[i].DebugMsg);
+
+                    memcpy(traj_elem->te[i].discreteSignal, server_data.vehicles_data[i].discreteSignal, sizeof (traj_elem->te[i].discreteSignal));
+                    memcpy(traj_elem->te[i].analogSignal, server_data.vehicles_data[i].analogSignal, sizeof (traj_elem->te[i].analogSignal));
                 }
 
                 viewer->getEventQueue()->userEvent(traj_elem);

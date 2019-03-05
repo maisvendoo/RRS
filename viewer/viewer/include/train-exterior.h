@@ -52,6 +52,8 @@ public:
     /// Get exterior scene group
     osg::Group *getExterior();
 
+    AnimationManager *getAnimationManager();
+
 signals:
 
     void setStatusBar(QString msg);
@@ -87,6 +89,7 @@ private:
 
     /// Animations list
     animations_t    animations;
+    AnimationManager *animation_manager;
 
     /// Keyboard handler (camera control)
     void keyboardHandler(int key);

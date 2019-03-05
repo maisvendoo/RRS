@@ -20,6 +20,15 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
     pos[POS_II] = 1.0;
 
     positions_names << "I" << "II" << "III" << "IV" << "Va" << "V" << "VI";
+
+    float max_angle = 115.0f;
+    positions.push_back(0.0f);
+    positions.push_back(35.0f / max_angle);
+    positions.push_back(52.0f / max_angle);
+    positions.push_back(59.0f / max_angle);
+    positions.push_back(63.0f / max_angle);
+    positions.push_back(80.0f / max_angle);
+    positions.push_back(1.0f);
 }
 
 //------------------------------------------------------------------------------
@@ -47,6 +56,13 @@ void BrakeCrane395::setPosition(int &position)
 QString BrakeCrane395::getPositionName(int position)
 {
     return positions_names[position];
+}
+
+float BrakeCrane395::getHandlePosition(int position)
+{
+    size_t pos = static_cast<size_t>(position);
+    if (pos < positions.size())
+        return positions[pos];
 }
 
 //------------------------------------------------------------------------------

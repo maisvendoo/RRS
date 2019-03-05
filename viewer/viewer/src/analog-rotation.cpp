@@ -8,6 +8,7 @@ AnalogRotation::AnalogRotation(osg::MatrixTransform *transform) : ProcAnimation 
     , max_angle(osg::PIf)
     , angle(0.0f)
     , axis(osg::Vec3(0.0, 0.0, 1.0))
+    , matrix(transform->getMatrix())
 {
 
 }
@@ -29,11 +30,9 @@ void AnalogRotation::anim_step(float t, float dt)
 
     float cur_pos = (angle - min_angle) / (max_angle - min_angle);
 
-    angle += duration * dt * dead_zone(pos - cur_pos, -precision / 2.0f, precision / 2.0f);
+    angle +=  duration * dt * dead_zone(pos - cur_pos, -precision / 2.0f, precision / 2.0f);
 
-    osg::Matrix matrix = transform->getMatrix();
-    matrix *= osg::Matrixf::rotate(angle * osg::PIf / 180.0f, axis);
-    transform->setMatrix(matrix);
+    update();
 }
 
 //------------------------------------------------------------------------------
@@ -59,4 +58,12 @@ bool AnalogRotation::load_config(ConfigReader &cfg)
     cfg.getValue(secName, "Precision", precision);
 
     return true;
+}
+
+void AnalogRotation::update()
+{
+    angle = cut(angle, min_angle, max_angle);
+
+    osg::Matrix rotate = osg::Matrixf::rotate(angle * osg::PIf / 180.0f, axis);
+    transform->setMatrix(rotate * matrix);
 }

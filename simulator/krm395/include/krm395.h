@@ -49,6 +49,8 @@ public:
 
     QString getPositionName(int position);
 
+    float getHandlePosition(int position);
+
 private:
 
     double k_leek;
@@ -78,6 +80,8 @@ private:
     std::array<double, NUM_POSITIONS> pos;
 
     QStringList positions_names;
+
+    std::vector<float> positions;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

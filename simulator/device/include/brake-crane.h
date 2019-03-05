@@ -46,6 +46,8 @@ public:
 
     virtual QString getPositionName(int position) = 0;
 
+    virtual float getHandlePosition(int position) = 0;
+
 protected:
 
     double Ver;

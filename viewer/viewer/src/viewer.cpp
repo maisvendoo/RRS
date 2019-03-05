@@ -285,6 +285,7 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
     train_ext_handler = new TrainExteriorHandler(motionPath, settings.train_config);
     root->addChild(train_ext_handler->getExterior());
     viewer.addEventHandler(train_ext_handler);
+    viewer.addEventHandler(train_ext_handler->getAnimationManager());
 
     return true;
 }

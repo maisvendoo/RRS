@@ -117,6 +117,14 @@ osg::Group *TrainExteriorHandler::getExterior()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+AnimationManager *TrainExteriorHandler::getAnimationManager()
+{
+    return animation_manager;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrainExteriorHandler::keyboardHandler(int key)
 {
     switch (key)
@@ -282,6 +290,8 @@ void TrainExteriorHandler::load(const std::string &train_config)
             }
         }
     }
+
+    animation_manager = new AnimationManager(&animations);
 }
 
 //------------------------------------------------------------------------------
@@ -320,6 +330,12 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         if (vehicles_ext[i].wheel_rotation != nullptr)
             vehicles_ext[i].wheel_rotation->setMatrix(rotMat);
     }
+
+    for (auto it = animations.begin(); it != animations.end(); ++it)
+    {
+        ProcAnimation *animation = it.value();
+        animation->setPosition(nd.te[cur_vehicle].analogSignal[animation->getSignalID()]);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -357,6 +373,9 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
             nd.te[i].angle_end = nd.te[i].angle_begin + server_data->te[i].omega * server_data->delta_time;
 
             nd.delta_time = server_data->delta_time;
+
+            memcpy(nd.te[i].analogSignal, server_data->te[i].analogSignal, sizeof (nd.te[i].analogSignal));
+
             break;
         }
     }

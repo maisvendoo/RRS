@@ -228,7 +228,7 @@ void Model::postStep(double t)
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 x = %10 v[first] = %4 v[last] = %5 trac = %6 pos = %7 eq_press = %8 bp_press = %9\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 x = %10 v[first] = %4 v[last] = %5 trac = %6 pos = %7 eq_press = %8 bp_press = %9 pos = %11\n")
             .arg(t)
             .arg(realtime_delay)
             .arg(dt)
@@ -238,7 +238,8 @@ void Model::debugPrint()
             .arg(static_cast<int>(train->getFirstVehicle()->getAnalogSignal(3)))
             .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(2)))
             .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(4)))
-            .arg(train->getFirstVehicle()->getRailwayCoord());
+            .arg(train->getFirstVehicle()->getRailwayCoord())
+            .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(20)));
 
     fputs(qPrintable(debug_info), stdout);
 }

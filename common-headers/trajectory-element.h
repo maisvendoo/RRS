@@ -33,6 +33,8 @@ struct traj_element_t
     float           angle_end;
     float           omega;
     QString         DebugMsg;
+    bool            discreteSignal[1000];
+    float           analogSignal[1000];
 
     traj_element_t()
         : coord_begin(0.0f)
