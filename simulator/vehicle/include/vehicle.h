@@ -114,6 +114,9 @@ public:
 
     float getAnalogSignal(int i);
 
+    bool    *getDiscreteSignals();
+    float   *getAnalogSignals();
+
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
 
@@ -236,7 +239,7 @@ protected:
     QMap<int, bool> keys;
 
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];
-    float   analogSignal[NUM_ANALOG_SIGNALS];    
+    float   analogSignal[NUM_ANALOG_SIGNALS];        
 
     /// User defined initialization
     virtual void initialization();

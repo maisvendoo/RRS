@@ -24,6 +24,8 @@
 
 #include    <sstream>
 
+#include    "anim-transform-visitor.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -259,9 +261,12 @@ void TrainExteriorHandler::load(const std::string &train_config)
             setAxis(vehicle_model.get(), wheel_model.get(), module_config_name);
 
             // Load cabine model
-            loadCabine(vehicle_model.get(), module_config_name);
+            osg::ref_ptr<osg::Node> cabine;
+            loadCabine(vehicle_model.get(), module_config_name, cabine);
 
             float length = getLength(module_config_name);
+
+            loadAnimations(module_config_name, cabine.get(), animations);
 
             for (int i = 0; i < count; ++i)
             {
@@ -270,6 +275,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
                 vehicle_ext.transform->addChild(vehicle_model.get());
                 vehicle_ext.wheel_rotation = wheel_model.get();
                 vehicle_ext.length = length;
+                vehicle_ext.cabine = cabine;
 
                 vehicles_ext.push_back(vehicle_ext);
                 trainExterior->addChild(vehicle_ext.transform.get());
@@ -432,4 +438,20 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     float y_old = curr.attitude.z();
 
     vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
+                                          osg::Node *cabine,
+                                          animations_t &animations)
+{
+    if (cabine == nullptr)
+        return;
+
+    AnimTransformVisitor atv(&animations, vehicle_name);
+    atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+
+    cabine->accept(atv);
 }

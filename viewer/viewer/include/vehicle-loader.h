@@ -56,7 +56,7 @@ void setAxis(osg::Group *vehicle,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void loadCabine(osg::Group *vehicle, const std::string &config_name);
+void loadCabine(osg::Group *vehicle, const std::string &config_name, osg::ref_ptr<osg::Node> &cabine_model);
 
 float getLength(const std::string &config_name);
 

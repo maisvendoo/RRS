@@ -428,6 +428,16 @@ void Vehicle::receiveData(QByteArray data)
     stream >> keys;
 }
 
+bool *Vehicle::getDiscreteSignals()
+{
+    return discreteSignal;
+}
+
+float *Vehicle::getAnalogSignals()
+{
+    return analogSignal;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

@@ -264,7 +264,9 @@ void setAxis(osg::Group *vehicle, osg::MatrixTransform *wheel,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void loadCabine(osg::Group *vehicle, const std::string &config_name)
+void loadCabine(osg::Group *vehicle,
+                const std::string &config_name,
+                osg::ref_ptr<osg::Node> &cabine_model)
 {
     // Calculate vehicle config path
     FileSystem &fs = FileSystem::getInstance();
@@ -303,10 +305,10 @@ void loadCabine(osg::Group *vehicle, const std::string &config_name)
     }
 
     osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
-    osg::ref_ptr<osg::Node> model = loadModel(cabineModelName);
+    cabine_model = loadModel(cabineModelName);
 
-    if (model.valid())
-        transShift->addChild(model.get());
+    if (cabine_model.valid())
+        transShift->addChild(cabine_model.get());
 
     vehicle->addChild(transShift.get());    
 }

@@ -27,6 +27,8 @@
 
 #include    "vehicle-exterior.h"
 
+#include    "animation-manager.h"
+
 /*!
  * \class
  * \brief Handler of train's exterior
@@ -83,6 +85,9 @@ private:
     /// Data, received from server
     network_data_t  nd;
 
+    /// Animations list
+    animations_t    animations;
+
     /// Keyboard handler (camera control)
     void keyboardHandler(int key);
 
@@ -98,7 +103,11 @@ private:
     /// Move camera along track
     void moveCamera(osgViewer::Viewer *viewer);
 
+    /// Calculate vehicles attiture
     void recalcAttitude(size_t i);
+
+    /// Load vehicle animations
+    void loadAnimations(const std::string vehicle_name, osg::Node *cabine, animations_t &animations);
 };
 
 #endif // TRAIN_EXTERIOR_H
