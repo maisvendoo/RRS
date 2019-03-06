@@ -29,5 +29,5 @@ SUBDIRS += ./launcher
 SUBDIRS += ./viewer
 
 SUBDIRS += ./tools/profconv
-
+SUBDIRS += ./tools/pathconv
 
