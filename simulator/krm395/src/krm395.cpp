@@ -1,5 +1,7 @@
 #include    "krm395.h"
 
+#include    <iostream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -14,6 +16,9 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , T1(0.1)
   , T2(0.1)
   , K4_power(10.0)
+  , Qbp(0.0)
+  , old_input(0)
+  , old_output(0)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(pos.begin(), pos.end(), 0.0);
@@ -68,6 +73,35 @@ float BrakeCrane395::getHandlePosition(int position)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void BrakeCrane395::preStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(t)
+
+    double k = 1e8;
+
+    int input_level = cut(static_cast<int>(k * pf(Qbp)), 0, 100);
+    int output_level = cut(static_cast<int>(k * nf(Qbp)), 0, 100);
+
+    if (Qbp > 0.0)
+    {
+        if (input_level != old_input)
+            emit soundSetVolume("AirInput", input_level);
+    }
+    else
+    {
+        if (output_level != old_output)
+            emit soundSetVolume("AirOutput", output_level);
+    }
+
+    std::cout << input_level << " " << output_level << std::endl;
+
+    old_input = input_level;
+    old_output = output_level;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void BrakeCrane395::ode_system(const state_vector_t &Y,
                                state_vector_t &dYdt,
                                double t)
@@ -104,7 +138,7 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
     else
         K4 = K[4];
 
-    double Qbp = K[3] * (pFL - Y[BP_PRESSURE]) * u5
+    Qbp = K[3] * (pFL - Y[BP_PRESSURE]) * u5
             - K4 * Y[BP_PRESSURE] * u6
             + K[5] * (Y[2] - Y[BP_PRESSURE]) * pos[POS_III]
             + K[11] * (pFL - Y[BP_PRESSURE]) * pos[POS_I]

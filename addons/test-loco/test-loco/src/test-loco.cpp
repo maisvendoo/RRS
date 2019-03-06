@@ -149,6 +149,8 @@ void TestLoco::initialization()
         brake_mech->setWheelDiameter(wheel_diameter);
 
         airdist->read_config(airdist_config);
+
+        connect(brake_crane, &BrakeCrane::soundSetVolume, this, &TestLoco::soundSetVolume);
     }
 }
 

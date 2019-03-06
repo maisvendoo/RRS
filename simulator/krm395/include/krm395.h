@@ -73,6 +73,12 @@ private:
 
     double K4_power;
 
+    double Qbp;
+
+    int old_input;
+
+    int old_output;
+
     DebugLog *debug_log;
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
@@ -82,6 +88,8 @@ private:
     QStringList positions_names;
 
     std::vector<float> positions;
+
+    void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
