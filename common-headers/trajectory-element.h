@@ -18,6 +18,7 @@
 #include    <array>
 
 #include    "global-const.h"
+#include    "vehicle-signals.h"
 
 #include    <QString>
 
@@ -33,8 +34,8 @@ struct traj_element_t
     float           angle_end;
     float           omega;
     QString         DebugMsg;
-    bool            discreteSignal[1000];
-    float           analogSignal[1000];
+    bool            discreteSignal[MAX_DISCRETE_SIGNALS];
+    float           analogSignal[MAX_ANALOG_SIGNALS];
 
     traj_element_t()
         : coord_begin(0.0f)

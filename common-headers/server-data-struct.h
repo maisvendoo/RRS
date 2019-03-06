@@ -23,12 +23,11 @@
 
 #include    <QString>
 
-enum
-{
-    MAX_DISCRETE_SIGNALS = 1000,
-    MAX_ANALOG_SIGNALS = 1000
-};
+#include    "vehicle-signals.h"
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct vehicle_data_t
 {
     float   railway_coord;

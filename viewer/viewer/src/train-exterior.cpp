@@ -331,10 +331,11 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
             vehicles_ext[i].wheel_rotation->setMatrix(rotMat);
     }
 
+    // Set parameters for animations
     for (auto it = animations.begin(); it != animations.end(); ++it)
     {
         ProcAnimation *animation = it.value();
-        animation->setPosition(nd.te[cur_vehicle].analogSignal[animation->getSignalID()]);
+        animation->setPosition(nd.te[static_cast<size_t>(cur_vehicle)].analogSignal[animation->getSignalID()]);
     }
 }
 
@@ -361,7 +362,7 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
             nd.delta_time = server_data->delta_time;
             break;
 
-        default: // Applay new data received from server
+        default: // Apply new data received from server
 
             nd.te[i].coord_begin = vehicles_ext[i].coord;
             nd.te[i].angle_begin = vehicles_ext[i].wheel_angle;
@@ -374,6 +375,7 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
 
             nd.delta_time = server_data->delta_time;
 
+            memcpy(nd.te[i].discreteSignal, server_data->te[i].discreteSignal, sizeof (nd.te[i].discreteSignal));
             memcpy(nd.te[i].analogSignal, server_data->te[i].analogSignal, sizeof (nd.te[i].analogSignal));
 
             break;

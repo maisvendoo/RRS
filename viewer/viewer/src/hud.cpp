@@ -56,7 +56,7 @@ osgViewer::View *HUD::getView()
 
 void HUD::setStatusBar(QString msg)
 {
-    std::cout << qPrintable(msg) << std::endl;
+    //std::cout << qPrintable(msg) << std::endl;
 
     if (statusBar.valid())
         statusBar->setText(msg.toStdWString().c_str());
