@@ -219,7 +219,11 @@ void TestLoco::keyProcess()
     analogSignal[21] = static_cast<float>(pTM / 1.0);
     analogSignal[22] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
     analogSignal[23] = static_cast<float>(0.9 / 1.6);
-    analogSignal[24] = static_cast<float>(brake_mech->getBrakeCylinderPressure() / 1.6);
+    analogSignal[24] = static_cast<float>(brake_mech->getBrakeCylinderPressure() / 1.0);
+    analogSignal[25] = static_cast<float>(brake_mech->getBrakeCylinderPressure() / 1.0);
+    analogSignal[26] = static_cast<float>(velocity * Physics::kmh / 220.0);
+    analogSignal[27] = static_cast<float>(velocity * Physics::kmh / 150.0);
+    analogSignal[28] = static_cast<float>(traction_level);
 }
 
 GET_VEHICLE(TestLoco)

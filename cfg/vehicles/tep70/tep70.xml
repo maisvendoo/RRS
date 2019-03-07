@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		
+		<EmptyMass>135000</EmptyMass>
+		<PayloadMass>0</PayloadMass>
+		<Length>21.7</Length>
+		<WheelDiameter>1.22</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>6</NumAxis>				
+                <WheelInertia>2.0</WheelInertia>
+
+                <ExtModelName>tep70/tep70-body.osgt</ExtModelName> 
+                <ModelShift>0.0 0.0 0.317</ModelShift>                
+
+                <WheelModel>tep70/tep70-wheel.osgt</WheelModel>                
+
+                <Axis>0.0 -8.23799 0.9</Axis>
+                <Axis>0.0 -5.90254 0.9</Axis>
+                <Axis>0.0 -3.92767 0.9</Axis>
+
+                <Axis>0.0 8.2941 0.9</Axis>
+                <Axis>0.0 5.95861 0.9</Axis>
+                <Axis>0.0 3.98374 0.9</Axis>                
+
+                <CabineModel>tep70/tep70-cabine.osgt</CabineModel>
+                <CabineShift>0.0 0.0 0.317</CabineShift>
+                
+                <BrakeCraneModule>krm395</BrakeCraneModule>
+                <BrakeCraneConfig>krm395</BrakeCraneConfig>
+
+                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+                <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
+
+                <AirDistModule>vr242</AirDistModule>
+                <AirDistConfig>vr242</AirDistConfig>
+                
+	</Vehicle>
+</Config>

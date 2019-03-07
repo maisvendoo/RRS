@@ -2,12 +2,12 @@
 
 void IncTractionTrigger::operate(double &value)
 {
-    value += 0.1;
+    value += 0.067;
 }
 
 void DecTractionTrigger::operate(double &value)
 {
-    value -= 0.1;
+    value -= 0.067;
 }
 
 void IncBrakeCrane::operate(int &value)
