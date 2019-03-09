@@ -344,43 +344,9 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::processServerData(const network_data_t *server_data)
 {
-    for (size_t i = 0; i < server_data->te.size(); ++i)
-    {
-        switch (nd.count)
-        {
-        case 0: // Initialization of train position
+    memcpy(&nd.te, &server_data->te, sizeof (nd.te));
 
-            nd.te[i].coord_begin = nd.te[i].coord_end = server_data->te[i].coord_end;
-            nd.te[i].angle_begin = nd.te[i].angle_end = server_data->te[i].angle_end;
-            nd.delta_time = server_data->delta_time;
-            break;
-
-        case 1: // Set first moving interpolation piece
-
-            nd.te[i].coord_end = server_data->te[i].coord_end;
-            nd.te[i].angle_end = server_data->te[i].angle_end;
-            nd.delta_time = server_data->delta_time;
-            break;
-
-        default: // Apply new data received from server
-
-            nd.te[i].coord_begin = vehicles_ext[i].coord;
-            nd.te[i].angle_begin = vehicles_ext[i].wheel_angle;
-
-            //nd.te[i].coord_end = server_data->te[i].coord_end;
-            //nd.te[i].angle_end = server_data->te[i].angle_end;
-
-            nd.te[i].coord_end = nd.te[i].coord_begin + server_data->te[i].velocity * server_data->delta_time;
-            nd.te[i].angle_end = nd.te[i].angle_begin + server_data->te[i].omega * server_data->delta_time;
-
-            nd.delta_time = server_data->delta_time;
-
-            memcpy(nd.te[i].discreteSignal, server_data->te[i].discreteSignal, sizeof (nd.te[i].discreteSignal));
-            memcpy(nd.te[i].analogSignal, server_data->te[i].analogSignal, sizeof (nd.te[i].analogSignal));
-
-            break;
-        }
-    }
+    nd.delta_time = server_data->delta_time;
 
     QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
     emit setStatusBar(msg + QString::fromStdWString(server_data->te[static_cast<size_t>(cur_vehicle)].DebugMsg));

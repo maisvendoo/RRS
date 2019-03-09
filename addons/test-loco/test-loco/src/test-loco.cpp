@@ -15,6 +15,8 @@ TestLoco::TestLoco() : Vehicle()
   , inc_crane_loc(false)
   , dec_crane_loc(false)
   , crane_pos(1)
+  , crane_motion(1.0)
+  , crane_duration(0.0)
   , pz(0.0)
   , inc_brake(false)
   , dec_brake(false)
@@ -42,18 +44,11 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
-    /*if (keys[KEY_Rightbracket])
-    {
-        crane_pos++;
-    }
-
-    if (keys[KEY_Leftbracket])
-    {
-        crane_pos--;
-    }*/
-
-
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
+
+    crane_motion += crane_duration * dt;
+    crane_motion = cut(crane_motion, 0.0, 6.0);
+    crane_pos = static_cast<int>(crane_motion);
 
     if (brake_mech != nullptr)
     {
@@ -195,8 +190,21 @@ void TestLoco::keyProcess()
     incTracTrig.process(keys[KEY_A], traction_level);
     decTracTrig.process(keys[KEY_D], traction_level);
 
-    incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
-    decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
+    //incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
+    //decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
+
+    crane_duration = 0.0;
+
+    if (keys[KEY_Rightbracket])
+    {
+        crane_duration = 1.0;
+    }
+
+    if (keys[KEY_Leftbracket])
+    {
+        crane_duration = -1.0;
+    }
+
 
     incChargePress.process(keys[KEY_H], charge_press);
     decChargePress.process(keys[KEY_J], charge_press);
@@ -225,7 +233,7 @@ void TestLoco::keyProcess()
     analogSignal[3] = crane_pos;
     analogSignal[4] = static_cast<float>(pTM);
 
-    analogSignal[20] = brake_crane->getHandlePosition(crane_pos);
+    analogSignal[20] = static_cast<float>(crane_motion / 6.0);
     analogSignal[21] = static_cast<float>(pTM / 1.0);
     analogSignal[22] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
     analogSignal[23] = static_cast<float>(0.9 / 1.6);

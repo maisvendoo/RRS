@@ -36,6 +36,8 @@ private:
     bool dec_crane_loc;
 
     int crane_pos;
+    double crane_motion;
+    double crane_duration;
 
     double pz;
     bool inc_brake;

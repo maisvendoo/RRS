@@ -104,7 +104,7 @@ void NetworkClient::onTimerRequest()
                 memcpy(&traj_elem->te, &server_data.te, sizeof (traj_element_t) * MAX_NUM_VEHICLES);
 
                 traj_elem->route_id = 1;
-                traj_elem->delta_time = static_cast<float>(request_interval) / 1000.0f;
+                traj_elem->delta_time = server_data.delta_time;
 
                 viewer->getEventQueue()->userEvent(traj_elem);
             }

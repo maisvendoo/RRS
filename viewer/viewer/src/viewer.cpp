@@ -86,7 +86,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
-    viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     return viewer.run();
 }

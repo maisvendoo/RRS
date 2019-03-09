@@ -6,7 +6,7 @@
 		<Width>1280</Width>
 		<Height>720</Height>
 		<FullScreen>0</FullScreen>
-		<VSync>1</VSync>
+		<VSync>0</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
 		<Port>1992</Port>
 		<LocalMode>0</LocalMode>
@@ -18,7 +18,7 @@
 		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
 		<Samples>16</Samples>
-		<RequestInterval>200</RequestInterval>
+		<RequestInterval>100</RequestInterval>
 		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>

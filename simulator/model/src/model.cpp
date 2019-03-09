@@ -363,13 +363,19 @@ void Model::tcpFeedBack()
 {
     std::vector<Vehicle *> *vehicles = train->getVehicles();
 
+    viewer_data.delta_time = static_cast<float>(integration_time_interval) / 1000.0f;
+
     size_t i = 0;
     for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
     {
-        viewer_data.te[i].coord_end = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.te[i].coord_begin = static_cast<float>((*it)->getRailwayCoord());
         viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
-        viewer_data.te[i].angle_end = static_cast<float>((*it)->getWheelAngle(0));
+        viewer_data.te[i].coord_end = viewer_data.te[i].coord_begin + viewer_data.te[i].velocity * viewer_data.delta_time;
+
+        viewer_data.te[i].angle_begin = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
+        viewer_data.te[i].angle_end = viewer_data.te[i].angle_begin + viewer_data.te[i].omega * viewer_data.delta_time;
+
         (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
         memcpy(viewer_data.te[i].discreteSignal,
