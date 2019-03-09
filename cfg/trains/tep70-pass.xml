@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Common>
-		<CouplingModule>ef-coupling</CouplingModule>
+		<CouplingModule>default-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
 		<Title>Ещё один тестовый поезд</Title>
 		<Description>Поезд из 20 пассажирских (плацкартных) вагонов под тепловозом ТЭП70. Предназначен для отладки симулятора</Description>

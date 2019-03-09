@@ -9,12 +9,15 @@
 //
 //------------------------------------------------------------------------------
 TestLoco::TestLoco() : Vehicle()
+  , tau(0.0)
+  , delay(0.25)
   , traction_level(0.0)
   , inc_loc(false)
   , dec_loc(false)
   , inc_crane_loc(false)
   , dec_crane_loc(false)
   , crane_pos(1)
+  , crane_step(0)
   , crane_motion(1.0)
   , crane_duration(0.0)
   , pz(0.0)
@@ -44,11 +47,13 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
-    traction_level = Physics::cut(traction_level, 0.0, 1.0);
+    traction_level = Physics::cut(traction_level, 0.0, 1.0);    
 
-    crane_motion += crane_duration * dt;
-    crane_motion = cut(crane_motion, 0.0, 6.0);
-    crane_pos = static_cast<int>(crane_motion);
+    if (tau >= delay)
+    {
+        tau = 0.0;
+        crane_pos += crane_step;
+    }
 
     if (brake_mech != nullptr)
     {
@@ -112,7 +117,9 @@ void TestLoco::step(double t, double dt)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_crane->getPositionName(crane_pos), 4);
 
-    DebugMsg += airdist->getDebugMsg();    
+    DebugMsg += airdist->getDebugMsg();
+
+    tau += dt;
 }
 
 //------------------------------------------------------------------------------
@@ -193,16 +200,16 @@ void TestLoco::keyProcess()
     //incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
     //decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
 
-    crane_duration = 0.0;
+    crane_step = 0;
 
-    if (keys[KEY_Rightbracket])
+    if (keys[KEY_Quote])
     {
-        crane_duration = 1.0;
+        crane_step = 1;
     }
 
-    if (keys[KEY_Leftbracket])
+    if (keys[KEY_Semicolon])
     {
-        crane_duration = -1.0;
+        crane_step = -1;
     }
 
 
@@ -233,7 +240,7 @@ void TestLoco::keyProcess()
     analogSignal[3] = crane_pos;
     analogSignal[4] = static_cast<float>(pTM);
 
-    analogSignal[20] = static_cast<float>(crane_motion / 6.0);
+    analogSignal[20] = brake_crane->getHandlePosition(crane_pos);
     analogSignal[21] = static_cast<float>(pTM / 1.0);
     analogSignal[22] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
     analogSignal[23] = static_cast<float>(0.9 / 1.6);

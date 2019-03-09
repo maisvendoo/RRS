@@ -66,8 +66,7 @@ QString BrakeCrane395::getPositionName(int position)
 float BrakeCrane395::getHandlePosition(int position)
 {
     size_t pos = static_cast<size_t>(position);
-    if (pos < positions.size())
-        return positions[pos];
+    return positions[pos];
 }
 
 //------------------------------------------------------------------------------

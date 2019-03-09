@@ -27,6 +27,9 @@ public:
 
 private:
 
+    double tau;
+    double delay;
+
     double traction_level;
 
     bool inc_loc;
@@ -36,6 +39,7 @@ private:
     bool dec_crane_loc;
 
     int crane_pos;
+    int crane_step;
     double crane_motion;
     double crane_duration;
 
