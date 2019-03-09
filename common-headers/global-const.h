@@ -19,6 +19,8 @@
 #define     APPLICATION_NAME    QString("simulator")
 #define     APPLICATION_VERSION QString("0.1.0")
 
-#define    MAX_NUM_VEHICLES      150
+#define     MAX_NUM_VEHICLES      150
+
+#define     DEBUG_SRING_SIZE      1024
 
 #endif // GLOBAL_CONST_H

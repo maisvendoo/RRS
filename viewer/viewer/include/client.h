@@ -17,6 +17,7 @@
 
 #include    "tcp-client.h"
 #include    "server-data-struct.h"
+#include    "trajectory-element.h"
 #include    "settings.h"
 
 #include    <QTimer>

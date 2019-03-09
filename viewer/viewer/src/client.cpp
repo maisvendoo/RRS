@@ -95,26 +95,16 @@ void NetworkClient::onTimerRequest()
         if (in_size == size)
         {
             QByteArray array = tcp_client->getBuffer();
-            memcpy(&server_data, array.data(), sizeof (server_data_t));
+            memcpy(static_cast<void *>(&server_data), array.data(), sizeof (server_data_t));
 
             if (viewer != nullptr)
             {
                 network_data_t *traj_elem = new network_data_t();
 
+                memcpy(&traj_elem->te, &server_data.te, sizeof (traj_element_t) * MAX_NUM_VEHICLES);
+
                 traj_elem->route_id = 1;
                 traj_elem->delta_time = static_cast<float>(request_interval) / 1000.0f;
-
-                for (size_t i = 0; i < server_data.vehicles_data.size(); ++i)
-                {
-                    traj_elem->te[i].coord_end = server_data.vehicles_data[i].railway_coord;
-                    traj_elem->te[i].angle_end = server_data.vehicles_data[i].wheel_angle;
-                    traj_elem->te[i].velocity = server_data.vehicles_data[i].velocity;
-                    traj_elem->te[i].omega = server_data.vehicles_data[i].omega;
-                    traj_elem->te[i].DebugMsg = QString::fromWCharArray(server_data.vehicles_data[i].DebugMsg);
-
-                    memcpy(traj_elem->te[i].discreteSignal, server_data.vehicles_data[i].discreteSignal, sizeof (traj_elem->te[i].discreteSignal));
-                    memcpy(traj_elem->te[i].analogSignal, server_data.vehicles_data[i].analogSignal, sizeof (traj_elem->te[i].analogSignal));
-                }
 
                 viewer->getEventQueue()->userEvent(traj_elem);
             }

@@ -24,7 +24,7 @@ TestLoco::TestLoco() : Vehicle()
   , brake_mech(nullptr)
   , brake_mech_module("carbrake-mech")
   , brake_mech_config("tep70bs-mech")
-  , charge_press(0.5)
+  , charge_press(0.5)  
 {
 
 }
@@ -42,6 +42,17 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
+    /*if (keys[KEY_Rightbracket])
+    {
+        crane_pos++;
+    }
+
+    if (keys[KEY_Leftbracket])
+    {
+        crane_pos--;
+    }*/
+
+
     traction_level = Physics::cut(traction_level, 0.0, 1.0);
 
     if (brake_mech != nullptr)
@@ -106,7 +117,7 @@ void TestLoco::step(double t, double dt)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_crane->getPositionName(crane_pos), 4);
 
-    DebugMsg += airdist->getDebugMsg();
+    DebugMsg += airdist->getDebugMsg();    
 }
 
 //------------------------------------------------------------------------------
@@ -187,7 +198,6 @@ void TestLoco::keyProcess()
     incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
     decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
 
-
     incChargePress.process(keys[KEY_H], charge_press);
     decChargePress.process(keys[KEY_J], charge_press);
 
@@ -224,6 +234,13 @@ void TestLoco::keyProcess()
     analogSignal[26] = static_cast<float>(velocity * Physics::kmh / 220.0);
     analogSignal[27] = static_cast<float>(velocity * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
+}
+
+void TestLoco::stepper(int &value, int duration, double dt)
+{
+    double tmp = static_cast<double>(value);
+    tmp += duration * dt;
+    value = static_cast<int>(tmp);
 }
 
 GET_VEHICLE(TestLoco)

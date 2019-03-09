@@ -19,8 +19,8 @@ void WriteToFileOperation::operator()(const osg::Image &image,
 
     std::string fileName = screenshotsDir +
             QDir::separator().toLatin1() +
-            "screenshot-" +
-            QDateTime::currentDateTime().toString().toStdString() + ".png";
+            "screenshot_" +
+            QDateTime::currentDateTime().toString("dd-MM-yyyy_hh-mm-ss").toStdString() + ".jpeg";
 
     osgDB::writeImageFile(image, fileName);
 }

@@ -33,7 +33,7 @@ struct traj_element_t
     float           angle_begin;
     float           angle_end;
     float           omega;
-    QString         DebugMsg;
+    wchar_t         DebugMsg[DEBUG_SRING_SIZE];
     bool            discreteSignal[MAX_DISCRETE_SIGNALS];
     float           analogSignal[MAX_ANALOG_SIGNALS];
 
@@ -44,11 +44,14 @@ struct traj_element_t
         , angle_begin(0.0f)
         , angle_end(0.0f)
         , omega(0.0f)
-        , DebugMsg(" ")
+        , DebugMsg(L"")
     {
-
+        memset(discreteSignal, 0, sizeof (bool) * MAX_DISCRETE_SIGNALS);
+        memset(analogSignal, 0, sizeof (float) * MAX_ANALOG_SIGNALS);
     }
 };
+
+
 
 /*!
  * \struct
@@ -57,6 +60,8 @@ struct traj_element_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+#pragma pack(push, 1)
+
 struct network_data_t : public osg::Referenced
 {
     unsigned int    route_id;
@@ -73,5 +78,7 @@ struct network_data_t : public osg::Referenced
 
     }
 };
+
+#pragma pack(pop)
 
 #endif // TRAJECTORY_ELEMENT_H

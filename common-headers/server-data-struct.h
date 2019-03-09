@@ -30,18 +30,22 @@
 //------------------------------------------------------------------------------
 struct vehicle_data_t
 {
-    float   railway_coord;
-    float   velocity;
-    float   wheel_angle;
-    float   omega;
-    wchar_t DebugMsg[1024];
-    bool    discreteSignal[MAX_DISCRETE_SIGNALS];
-    float   analogSignal[MAX_ANALOG_SIGNALS];
+    float           coord_begin;
+    float           coord_end;
+    float           velocity;
+    float           angle_begin;
+    float           angle_end;
+    float           omega;
+    wchar_t         DebugMsg[DEBUG_SRING_SIZE];
+    bool            discreteSignal[MAX_DISCRETE_SIGNALS];
+    float           analogSignal[MAX_ANALOG_SIGNALS];
 
     vehicle_data_t()
-        : railway_coord(0.0f)
+        : coord_begin(0.0f)
+        , coord_end(0.0f)
         , velocity(0.0f)
-        , wheel_angle(0.0f)
+        , angle_begin(0.0f)
+        , angle_end(0.0f)
         , omega(0.0f)
         , DebugMsg(L"")
     {
@@ -50,9 +54,11 @@ struct vehicle_data_t
     }
 };
 
+
+
 /*!
  * \struct
- * \brief Data structure, received from server
+ * \brief Trajectory element
  */
 //------------------------------------------------------------------------------
 //
@@ -61,12 +67,16 @@ struct vehicle_data_t
 
 struct server_data_t
 {
-    /// Senden data count
-    quint64             count;    
-    std::array<vehicle_data_t, MAX_NUM_VEHICLES> vehicles_data;
+    unsigned int    route_id;
+    float           delta_time;
+    unsigned long   count;
+
+    std::array<vehicle_data_t, MAX_NUM_VEHICLES>    te;
 
     server_data_t()
-        : count(0)        
+        : route_id(0)
+        , delta_time(3600.0f)
+        , count(0)
     {
 
     }

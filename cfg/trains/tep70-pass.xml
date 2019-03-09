@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModule>ef-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
+		<Title>Ещё один тестовый поезд</Title>
+		<Description>Поезд из 20 пассажирских (плацкартных) вагонов под тепловозом ТЭП70. Предназначен для отладки симулятора</Description>
+	</Common>
+	<Vehicle>
+		<Module>test-loco</Module>
+		<ModuleConfig>tep70</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>passcar</ModuleConfig>
+		<Count>20</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+</Config>

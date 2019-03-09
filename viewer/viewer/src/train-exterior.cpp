@@ -383,7 +383,7 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
     }
 
     QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
-    emit setStatusBar(msg + server_data->te[static_cast<size_t>(cur_vehicle)].DebugMsg);
+    emit setStatusBar(msg + QString::fromStdWString(server_data->te[static_cast<size_t>(cur_vehicle)].DebugMsg));
 
     nd.count++;
     ref_time = 0.0;

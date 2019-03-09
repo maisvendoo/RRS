@@ -366,19 +366,19 @@ void Model::tcpFeedBack()
     size_t i = 0;
     for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
     {
-        viewer_data.vehicles_data[i].railway_coord = static_cast<float>((*it)->getRailwayCoord());
-        viewer_data.vehicles_data[i].velocity = static_cast<float>((*it)->getVelocity());
-        viewer_data.vehicles_data[i].wheel_angle = static_cast<float>((*it)->getWheelAngle(0));
-        viewer_data.vehicles_data[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-        (*it)->getDebugMsg().toWCharArray(viewer_data.vehicles_data[i].DebugMsg);
+        viewer_data.te[i].coord_end = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
+        viewer_data.te[i].angle_end = static_cast<float>((*it)->getWheelAngle(0));
+        viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
-        memcpy(viewer_data.vehicles_data[i].discreteSignal,
+        memcpy(viewer_data.te[i].discreteSignal,
                (*it)->getDiscreteSignals(),
-               sizeof (viewer_data.vehicles_data[i].discreteSignal));
+               sizeof (viewer_data.te[i].discreteSignal));
 
-        memcpy(viewer_data.vehicles_data[i].analogSignal,
+        memcpy(viewer_data.te[i].analogSignal,
                (*it)->getAnalogSignals(),
-               sizeof (viewer_data.vehicles_data[i].analogSignal));
+               sizeof (viewer_data.te[i].analogSignal));
         ++i;
     }
 

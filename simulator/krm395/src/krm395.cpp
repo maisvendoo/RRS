@@ -77,7 +77,7 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    double k = 1e8;
+    /*double k = 1e8;
 
     int input_level = cut(static_cast<int>(k * pf(Qbp)), 0, 100);
     int output_level = cut(static_cast<int>(k * nf(Qbp)), 0, 100);
@@ -93,10 +93,10 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
             emit soundSetVolume("AirOutput", output_level);
     }
 
-    std::cout << input_level << " " << output_level << std::endl;
+    //std::cout << input_level << " " << output_level << std::endl;
 
     old_input = input_level;
-    old_output = output_level;
+    old_output = output_level;*/
 }
 
 //------------------------------------------------------------------------------

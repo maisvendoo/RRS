@@ -78,7 +78,9 @@ private:
 
     void loadConfig(QString cfg_path);
 
-    void keyProcess();
+    void keyProcess();    
+
+    void stepper(int &value, int duration, double dt);
 };
 
 

@@ -93,6 +93,11 @@ unix {
     LIBS += -lGL
 }
 
+#QMAKE_CXXFLAGS += -pg
+#QMAKE_LFLAGS += -pg
+#QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+#LIBS += -lgcov
+
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp-connection/include
