@@ -424,8 +424,13 @@ QString Vehicle::getDebugMsg() const
 //------------------------------------------------------------------------------
 void Vehicle::receiveData(QByteArray data)
 {
+    if (data.size() == 0)
+        return;
+
     QDataStream stream(&data, QIODevice::ReadOnly);
     stream >> keys;
+
+    int i = 0;
 }
 
 bool *Vehicle::getDiscreteSignals()

@@ -80,7 +80,7 @@ int RouteViewer::run()
     // Camera switch handler
     viewer.addEventHandler(new CameraViewHandler());
 
-    client.init(settings, &viewer);
+    //client.init(settings, &viewer);
 
     QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
                      &client, &NetworkClient::receiveKeysState);

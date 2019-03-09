@@ -19,6 +19,7 @@
 #include    <QtGlobal>
 #include    <QObject>
 #include    <QThread>
+#include    <QSharedMemory>
 
 #include    "simulator-command-line.h"
 #include    "filesystem.h"
@@ -113,6 +114,9 @@ private:
     /// Server data to clinet transmission
     server_data_t   viewer_data;
 
+    QSharedMemory   shared_memory;
+    QSharedMemory   keys_data;
+
     /// Log initialization
     void logInit(bool clear_log = false);
 
@@ -137,6 +141,9 @@ private:
 
     /// TCP feedback
     void tcpFeedBack();
+
+    /// Shered memory feedback
+    void sharedMemoryFeedback();
 };
 
 #endif // MODEL_H

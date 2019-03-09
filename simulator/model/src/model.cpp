@@ -36,7 +36,17 @@ Model::Model(QObject *parent) : QObject(parent)
   , integration_time_interval(100)
   , is_debug_print(false)
 {
+    shared_memory.setKey("sim");
 
+    if (!shared_memory.create(sizeof(server_data_t)))
+    {
+        shared_memory.attach();
+    }
+
+    keys_data.setKey("keys");
+
+    if (!keys_data.create(1024))
+        keys_data.attach();
 }
 
 //------------------------------------------------------------------------------
@@ -85,13 +95,14 @@ bool Model::init(const simulator_command_line_t &command_line)
         return false;
 
     // TCP-server creation and initialize
-    server = new Server();
+    //server = new Server();
 
-    connect(server, &Server::logMessage, train, &Train::logMessage);
-    connect(this, &Model::sendDataToServer, server, &Server::sendDataToClient);
+    //connect(server, &Server::logMessage, train, &Train::logMessage);
+    //connect(this, &Model::sendDataToServer, server, &Server::sendDataToClient);
+
     connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
-    server->init(1992);
+    //server->init(1992);
 
     return true;
 }
@@ -138,7 +149,9 @@ void Model::process()
         QTime solveTime;
 
         // Feedback to viewer
-        tcpFeedBack();
+        //tcpFeedBack();
+
+        sharedMemoryFeedback();
 
         int solve_time = 0;
         solveTime.start();
@@ -395,5 +408,56 @@ void Model::tcpFeedBack()
     viewer_data.count++;
 
     emit sendDataToTrain(server->getReceivedData());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::sharedMemoryFeedback()
+{
+    std::vector<Vehicle *> *vehicles = train->getVehicles();
+
+    viewer_data.delta_time = static_cast<float>(integration_time_interval) / 1000.0f;
+
+    size_t i = 0;
+    for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
+    {
+        viewer_data.te[i].coord_begin = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
+        viewer_data.te[i].coord_end = viewer_data.te[i].coord_begin + viewer_data.te[i].velocity * viewer_data.delta_time;
+
+        viewer_data.te[i].angle_begin = static_cast<float>((*it)->getWheelAngle(0));
+        viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
+        viewer_data.te[i].angle_end = viewer_data.te[i].angle_begin + viewer_data.te[i].omega * viewer_data.delta_time;
+
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
+
+        memcpy(viewer_data.te[i].discreteSignal,
+               (*it)->getDiscreteSignals(),
+               sizeof (viewer_data.te[i].discreteSignal));
+
+        memcpy(viewer_data.te[i].analogSignal,
+               (*it)->getAnalogSignals(),
+               sizeof (viewer_data.te[i].analogSignal));
+        ++i;
+    }
+
+    if (shared_memory.lock())
+    {
+        memcpy(shared_memory.data(), &viewer_data, sizeof (server_data_t));
+        shared_memory.unlock();
+    }
+
+    viewer_data.count++;
+
+    if (keys_data.lock())
+    {
+        QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
+
+        if (data.size() != 0)
+            emit sendDataToTrain(data);
+
+        keys_data.unlock();
+    }
 }
 

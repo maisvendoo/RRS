@@ -26,6 +26,8 @@
 
 #include    "anim-transform-visitor.h"
 
+#include    "server-data-struct.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -42,6 +44,13 @@ TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath,
     , start_time(0.0)
 {
     load(train_config);
+
+    shared_memory.setKey("sim");
+
+    if (!shared_memory.attach(QSharedMemory::ReadOnly))
+    {
+        OSG_FATAL << "Can't connect to shared memory" << std::endl;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -63,6 +72,8 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             double delta_time = time - start_time;
             ref_time += delta_time;
             start_time = time;
+
+            processSharedData(ref_time);
 
             moveTrain(ref_time, nd);
 
@@ -353,6 +364,33 @@ void TrainExteriorHandler::processServerData(const network_data_t *server_data)
 
     nd.count++;
     ref_time = 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::processSharedData(double &ref_time)
+{
+    double delay = 0.1;
+
+    if (ref_time >= delay)
+    {
+        ref_time = 0;
+
+        if (shared_memory.lock())
+        {
+            server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
+
+            memcpy(&nd.te, &sd->te, sizeof (nd.te));
+
+            nd.delta_time = sd->delta_time;
+
+            QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
+            emit setStatusBar(msg + QString::fromStdWString(sd->te[static_cast<size_t>(cur_vehicle)].DebugMsg));
+
+            shared_memory.unlock();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -24,6 +24,9 @@ KeyboardHandler::KeyboardHandler(QObject *parent)
     , osgGA::GUIEventHandler ()
 {
     init();
+
+    keys_data.setKey("keys");
+    keys_data.attach();
 }
 
 //------------------------------------------------------------------------------
@@ -44,7 +47,8 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
             if (!getKey(key))
             {
                 setKey(ea.getKey());
-                emit sendKeyBoardState(serialize());
+                //emit sendKeyBoardState(serialize());
+                sendKeysData(serialize());
             }
 
             break;
@@ -58,7 +62,8 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
             if (getKey(key))
             {
                 resetKey(ea.getKey());
-                emit sendKeyBoardState(serialize());
+                //emit sendKeyBoardState(serialize());
+                sendKeysData(serialize());
             }
 
             break;
@@ -171,4 +176,14 @@ QByteArray KeyboardHandler::serialize()
     stream << keys;
 
     return data;
+}
+
+void KeyboardHandler::sendKeysData(const QByteArray &data)
+{
+    if (keys_data.lock())
+    {
+        memcpy(keys_data.data(), data.data(), data.size());
+
+        keys_data.unlock();
+    }
 }

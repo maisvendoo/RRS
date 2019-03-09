@@ -21,7 +21,7 @@
 NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 {
     connect(&timerRequester, &QTimer::timeout,
-            this, &NetworkClient::onTimerRequest);
+            this, &NetworkClient::onTimerRequest);    
 }
 
 //------------------------------------------------------------------------------

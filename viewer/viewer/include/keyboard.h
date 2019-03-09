@@ -17,6 +17,7 @@
 
 #include    <QObject>
 #include    <QMap>
+#include    <QSharedMemory>
 #include    <osgGA/GUIEventHandler>
 
 /*!
@@ -66,6 +67,10 @@ protected:
 
     /// Serialization of keymap to transmite thow TCP-socket
     QByteArray serialize();
+
+    QSharedMemory   keys_data;
+
+    void sendKeysData(const QByteArray &data);
 };
 
 #endif // KEYBOARD_H

@@ -21,6 +21,7 @@
 #include    "settings.h"
 
 #include    <QTimer>
+#include    <QSharedMemory>
 #include    <osgViewer/Viewer>
 
 //------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ private:
     int     request_interval;
 
     /// Buffer for store keyboard state
-    QByteArray  key_data;
+    QByteArray  key_data;    
 
 private slots:
 

@@ -16,6 +16,7 @@
 #define     TRAINE_XTERIOR_H
 
 #include    <QObject>
+#include    <QSharedMemory>
 
 #include    <osgGA/GUIEventHandler>
 #include    <osg/MatrixTransform>
@@ -87,6 +88,8 @@ private:
     /// Data, received from server
     network_data_t  nd;
 
+    QSharedMemory   shared_memory;
+
     /// Animations list
     animations_t    animations;
     AnimationManager *animation_manager;
@@ -102,6 +105,8 @@ private:
 
     /// Processing movind data from server
     void processServerData(const network_data_t *server_data);
+
+    void processSharedData(double &ref_time);
 
     /// Move camera along track
     void moveCamera(osgViewer::Viewer *viewer);
