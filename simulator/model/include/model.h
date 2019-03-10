@@ -30,6 +30,8 @@
 
 #include    "profile.h"
 
+#include    "keys-control.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -99,6 +101,9 @@ private:
     /// Flag, which allow debug print
     bool        is_debug_print;    
 
+    double      control_time;
+    double      control_delay;
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -110,6 +115,8 @@ private:
 
     /// TCP-server
     Server      *server;
+
+    KeysControl keys_control;
 
     /// Server data to clinet transmission
     server_data_t   viewer_data;
@@ -144,6 +151,8 @@ private:
 
     /// Shered memory feedback
     void sharedMemoryFeedback();
+
+    void controlStep(double &control_time, const double control_delay);
 };
 
 #endif // MODEL_H

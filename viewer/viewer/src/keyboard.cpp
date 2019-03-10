@@ -163,6 +163,14 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Control_R);
     addKey(osgGA::GUIEventAdapter::KEY_Alt_L);
     addKey(osgGA::GUIEventAdapter::KEY_Alt_R);
+
+    addKey(osgGA::GUIEventAdapter::KEY_1);
+    addKey(osgGA::GUIEventAdapter::KEY_2);
+    addKey(osgGA::GUIEventAdapter::KEY_3);
+    addKey(osgGA::GUIEventAdapter::KEY_4);
+    addKey(osgGA::GUIEventAdapter::KEY_5);
+    addKey(osgGA::GUIEventAdapter::KEY_6);
+    addKey(osgGA::GUIEventAdapter::KEY_7);
 }
 
 //------------------------------------------------------------------------------
@@ -178,11 +186,14 @@ QByteArray KeyboardHandler::serialize()
     return data;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void KeyboardHandler::sendKeysData(const QByteArray &data)
 {
     if (keys_data.lock())
     {
-        memcpy(keys_data.data(), data.data(), data.size());
+        memcpy(keys_data.data(), data.data(), static_cast<size_t>(data.size()));
 
         keys_data.unlock();
     }

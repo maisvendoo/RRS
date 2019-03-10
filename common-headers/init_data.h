@@ -37,6 +37,8 @@ struct init_data_t
     QString train_config;
     QString route_dir;
     int     integration_time_interval;
+    int     control_time_interval;
+    int     keys_buffer_size;
     bool    debug_print;
     solver_config_t solver_config;
 
@@ -49,6 +51,8 @@ struct init_data_t
         , train_config("")
         , route_dir("")
         , integration_time_interval(100)
+        , control_time_interval(50)
+        , keys_buffer_size(1024)
         , debug_print(false)
     {
 

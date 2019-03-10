@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 TestLoco::TestLoco() : Vehicle()
   , tau(0.0)
-  , delay(0.25)
+  , delay(0.2)
   , traction_level(0.0)
   , inc_loc(false)
   , dec_loc(false)
@@ -212,6 +212,40 @@ void TestLoco::keyProcess()
         crane_step = -1;
     }
 
+    if (keys[KEY_1])
+    {
+        crane_pos = 0;
+    }
+
+    if (keys[KEY_2])
+    {
+        crane_pos = 1;
+    }
+
+    if (keys[KEY_3])
+    {
+        crane_pos = 2;
+    }
+
+    if (keys[KEY_4])
+    {
+        crane_pos = 3;
+    }
+
+    if (keys[KEY_5])
+    {
+        crane_pos = 4;
+    }
+
+    if (keys[KEY_6])
+    {
+        crane_pos = 5;
+    }
+
+    if (keys[KEY_7])
+    {
+        crane_pos = 6;
+    }
 
     incChargePress.process(keys[KEY_H], charge_press);
     decChargePress.process(keys[KEY_J], charge_press);

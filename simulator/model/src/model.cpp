@@ -35,18 +35,15 @@ Model::Model(QObject *parent) : QObject(parent)
   , realtime_delay(0)
   , integration_time_interval(100)
   , is_debug_print(false)
+  , control_time(0)
+  , control_delay(0.05)
 {
     shared_memory.setKey("sim");
 
     if (!shared_memory.create(sizeof(server_data_t)))
     {
         shared_memory.attach();
-    }
-
-    keys_data.setKey("keys");
-
-    if (!keys_data.create(1024))
-        keys_data.attach();
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -92,17 +89,19 @@ bool Model::init(const simulator_command_line_t &command_line)
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
     if (!train->init(init_data))
-        return false;
-
-    // TCP-server creation and initialize
-    //server = new Server();
-
-    //connect(server, &Server::logMessage, train, &Train::logMessage);
-    //connect(this, &Model::sendDataToServer, server, &Server::sendDataToClient);
+        return false;    
 
     connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
-    //server->init(1992);
+    keys_data.setKey("keys");
+
+    if (!keys_data.create(init_data.keys_buffer_size))
+    {
+        if (!keys_data.attach())
+        {
+            emit logMessage("ERROR: Can't attach to shared memory");
+        }
+    }
 
     return true;
 }
@@ -164,6 +163,8 @@ void Model::process()
                 is_step_correct)
         {
             preStep(t);
+
+            controlStep(control_time, control_delay);
 
             is_step_correct = step(t, dt);
 
@@ -300,9 +301,21 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.integration_time_interval = 100;
         }
 
+        if (!cfg.getInt(secName, "ControlTimeInterval", init_data.control_time_interval))
+        {
+            init_data.control_time_interval = 50;
+        }
+
+        control_delay = static_cast<double>(init_data.control_time_interval) / 1000.0;
+
         if (!cfg.getBool(secName, "DebugPrint", init_data.debug_print))
         {
             init_data.debug_print = false;
+        }
+
+        if (!cfg.getInt(secName, "KeysBufferSize", init_data.keys_buffer_size))
+        {
+            init_data.keys_buffer_size = 1024;
         }
     }
 }
@@ -448,16 +461,29 @@ void Model::sharedMemoryFeedback()
         shared_memory.unlock();
     }
 
-    viewer_data.count++;
+    viewer_data.count++;    
+}
 
-    if (keys_data.lock())
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::controlStep(double &control_time, const double control_delay)
+{
+    if (control_time >= control_delay)
     {
-        QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
+        control_time = 0;
 
-        if (data.size() != 0)
-            emit sendDataToTrain(data);
+        if (keys_data.lock())
+        {
+            QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
 
-        keys_data.unlock();
+            if (data.size() != 0)
+                emit sendDataToTrain(data);
+
+            keys_data.unlock();
+        }
     }
+
+    control_time += dt;
 }
 

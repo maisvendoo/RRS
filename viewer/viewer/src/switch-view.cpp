@@ -54,12 +54,12 @@ bool CameraViewHandler::handle(const osgGA::GUIEventAdapter &ea,
 
         switch (ea.getKey())
         {
-        case osgGA::GUIEventAdapter::KEY_1:
+        case osgGA::GUIEventAdapter::KEY_F2:
 
             cameraView = CABINE_VIEW;
             break;
 
-        case osgGA::GUIEventAdapter::KEY_2:
+        case osgGA::GUIEventAdapter::KEY_F3:
 
             cameraView = OUTSIZE_VIEW;
             break;
