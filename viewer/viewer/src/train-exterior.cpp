@@ -383,10 +383,24 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 
             memcpy(&nd.te, &sd->te, sizeof (nd.te));
 
+            if (nd.count > 1)
+            {
+                for (size_t i = 0; i < nd.te.size(); ++i)
+                {
+                    nd.te[i].coord_begin = vehicles_ext[i].coord;
+                    nd.te[i].coord_end = nd.te[i].coord_begin + nd.te[i].velocity * sd->delta_time;
+
+                    nd.te[i].angle_begin = vehicles_ext[i].wheel_angle;
+                    nd.te[i].angle_end = nd.te[i].angle_begin + nd.te[i].omega * sd->delta_time;
+                }
+            }
+
             nd.delta_time = sd->delta_time;
 
             QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
             emit setStatusBar(msg + QString::fromStdWString(sd->te[static_cast<size_t>(cur_vehicle)].DebugMsg));
+
+            nd.count++;
 
             shared_memory.unlock();
         }

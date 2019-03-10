@@ -148,8 +148,6 @@ void Model::process()
         QTime solveTime;
 
         // Feedback to viewer
-        //tcpFeedBack();
-
         sharedMemoryFeedback();
 
         int solve_time = 0;
@@ -187,7 +185,7 @@ void Model::process()
         realtime_delay = integration_time_interval - solve_time;
 
         if (realtime_delay > 0)
-            QThread::msleep(realtime_delay);
+            QThread::msleep(static_cast<unsigned long>(realtime_delay));
     }
 }
 
@@ -437,11 +435,15 @@ void Model::sharedMemoryFeedback()
     {
         viewer_data.te[i].coord_begin = static_cast<float>((*it)->getRailwayCoord());
         viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
-        viewer_data.te[i].coord_end = viewer_data.te[i].coord_begin + viewer_data.te[i].velocity * viewer_data.delta_time;
+
+        viewer_data.te[i].coord_end = viewer_data.te[i].coord_begin +
+                viewer_data.te[i].velocity * viewer_data.delta_time;
 
         viewer_data.te[i].angle_begin = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-        viewer_data.te[i].angle_end = viewer_data.te[i].angle_begin + viewer_data.te[i].omega * viewer_data.delta_time;
+
+        viewer_data.te[i].angle_end = viewer_data.te[i].angle_begin +
+                viewer_data.te[i].omega * viewer_data.delta_time;
 
         (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 

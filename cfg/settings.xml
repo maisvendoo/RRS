@@ -5,7 +5,7 @@
 		<posY>50</posY>
 		<Width>1280</Width>
 		<Height>720</Height>
-		<FullScreen>0</FullScreen>
+		<FullScreen>1</FullScreen>
 		<VSync>0</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
 		<Port>1992</Port>

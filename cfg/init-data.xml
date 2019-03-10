@@ -7,11 +7,11 @@
         <ProfileStep>100</ProfileStep>
         <Direction>1</Direction>
         <TrainConfig>default</TrainConfig>
-        <IntegrationTimeInterval>100</IntegrationTimeInterval>        
+        <IntegrationTimeInterval>200</IntegrationTimeInterval>        
         <DebugPrint>true</DebugPrint>
 
         <!-- Интервал опроса кнопок, мс -->
-        <ControlTimeInterval>10</ControlTimeInterval>
+        <ControlTimeInterval>100</ControlTimeInterval>
 
         <!-- Объем буфера клавиатуры, байт -->
         <KeysBufferSize>1024</KeysBufferSize>
