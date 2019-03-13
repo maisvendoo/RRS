@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+
+		<EmptyMass>23.7</EmptyMass>
+		<PayloadMass>70000</PayloadMass>
+		<Length>14.92</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>4</NumAxis>		
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+        <WheelInertia>2.0</WheelInertia>
+
+        <ExtModelName>poluvagon/poluvagon-body.osgt</ExtModelName>
+        <ModelShift>0.0 0.0 0.311</ModelShift> 
+        
+        <WheelModel>poluvagon/wheel.osgt</WheelModel>
+        
+
+        <Axis>0.0 -5.51 0.79</Axis>
+        <Axis>0.0 -3.67 0.79</Axis>
+
+        <Axis>0.0 5.51 0.79</Axis>        
+        <Axis>0.0 3.67 0.79</Axis>
+
+        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+        <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+
+        <AirDistModule>vr242</AirDistModule>
+        <AirDistConfig>vr242</AirDistConfig>
+
+	</Vehicle>
+</Config>

@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------------
 class FILESYSTEM_EXPORT FileSystem
 {
-public:
+public:    
 
     /// Get instance byt filesystem singleton
     static FileSystem &getInstance()
@@ -43,6 +43,9 @@ public:
 
         return instance;
     }    
+
+    /// Get directory by num_levels levels up
+    std::string getLevelUpDirectory(std::string path, int num_levels);
 
     std::string getNativePath(const std::string &path);
 
@@ -150,9 +153,6 @@ private:
     void setFontsDir(const std::string &path);
 
     void setSoundsDir(const std::string &path);
-
-    /// Get directory by num_levels levels up
-    std::string getLevelUpDirectory(std::string path, int num_levels);
 };
 
 #endif

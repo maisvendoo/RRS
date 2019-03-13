@@ -26,46 +26,19 @@
 
 #include    "model-smooth.h"
 #include    "texture-filtering.h"
+#include    "model-texturing.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Node *loadModel(const std::string &modelName)
+osg::Texture2D *createTexture(osg::Node* node, const std::string &path)
 {
-    FileSystem &fs = FileSystem::getInstance();
+    osg::StateSet *stateset = node->getOrCreateStateSet();
+    osg::StateAttribute *stateattr = stateset->getTextureAttribute(0, osg::StateAttribute::TEXTURE);
+    osg::ref_ptr<osg::Texture2D> texture = static_cast<osg::Texture2D *>(stateattr);
 
-    osg::ref_ptr<osg::Node> model;
-
-    // Loading 3D-model from file
-    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
-    std::string modelPath = osgDB::findDataFile(model_path);
-
-    if (!modelPath.empty())
-    {
-        modelPath = fs.toNativeSeparators(modelPath);
-        model = osgDB::readNodeFile(modelPath);
-    }
-    else
-    {
-        OSG_FATAL << "ERROR: model " << model_path << " is't found";
-        return nullptr;
-    }
-
-    ModelSmoother  smoother;
-    model->accept(smoother);
-
-    ModelTextureFilter texfilter;
-    model->accept(texfilter);
-
-    return model.release();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-osg::Texture2D *createTexture(const std::string &path)
-{
-    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
+    if (!texture.valid())
+        texture = new osg::Texture2D;
 
     // Loading texture from file
     std::string fileName = osgDB::findDataFile(path);
@@ -113,7 +86,7 @@ void applyTexture(osg::Node *model, const std::string &textureName)
     FileSystem &fs = FileSystem::getInstance();
 
     std::string tex_path = fs.combinePath(fs.getVehicleModelsDir(), textureName);
-    osg::ref_ptr<osg::Texture2D> texture = createTexture(tex_path);
+    osg::ref_ptr<osg::Texture2D> texture = createTexture(model, tex_path);
 
     if (texture.valid())
     {
@@ -126,6 +99,46 @@ void applyTexture(osg::Node *model, const std::string &textureName)
         else
             model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Node *loadModel(const std::string &modelName, const std::string &textureName)
+{
+    FileSystem &fs = FileSystem::getInstance();
+
+    osg::ref_ptr<osg::Node> model;
+
+    // Loading 3D-model from file
+    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
+    std::string modelPath = osgDB::findDataFile(model_path);
+
+    if (!modelPath.empty())
+    {
+        modelPath = fs.toNativeSeparators(modelPath);
+        model = osgDB::readNodeFile(modelPath);
+    }
+    else
+    {
+        OSG_FATAL << "ERROR: model " << model_path << " is't found";
+        return nullptr;
+    }
+
+    ModelSmoother  smoother;
+    model->accept(smoother);
+
+    ModelTextureFilter texfilter;
+    model->accept(texfilter);
+
+    if (!textureName.empty())
+    {
+        ModelTexturing mt(textureName);
+        mt.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+        model->accept(mt);
+    }
+
+    return model.release();
 }
 
 //------------------------------------------------------------------------------
@@ -153,7 +166,7 @@ osg::Group *loadVehicle(const std::string &configPath)
     {
         std::string secName = "Vehicle";
         cfg.getValue(secName, "ExtModelName", modelName);
-        cfg.getValue(secName, "ExtTextureName", textureName);
+        cfg.getValue(secName, "ExtTexturesDir", textureName);
 
         if (cfg.getValue(secName, "ModelShift", modelShift))
         {
@@ -163,7 +176,7 @@ osg::Group *loadVehicle(const std::string &configPath)
     }
 
     osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
-    osg::ref_ptr<osg::Node> model = loadModel(modelName);
+    osg::ref_ptr<osg::Node> model = loadModel(modelName, textureName);
 
     if (model.valid())
     {
@@ -197,11 +210,11 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
     {
         std::string secName = "Vehicle";
         cfg.getValue(secName, "WheelModel", wheelModelName);
-        cfg.getValue(secName, "WheelTexture", wheelTextureName);        
+        cfg.getValue(secName, "WheelTexturesDir", wheelTextureName);
     }    
 
 
-    osg::ref_ptr<osg::Node> model = loadModel(wheelModelName);
+    osg::ref_ptr<osg::Node> model = loadModel(wheelModelName, wheelTextureName);
 
     if (model.valid())
         rotate->addChild(model.get());
@@ -292,7 +305,7 @@ void loadCabine(osg::Group *vehicle,
     {
         std::string secName = "Vehicle";
         cfg.getValue(secName, "CabineModel", cabineModelName);
-        cfg.getValue(secName, "CabineTexture", cabineTextureName);
+        cfg.getValue(secName, "CabineTexturesDir", cabineTextureName);
 
         if (cabineModelName.empty())
             return;
@@ -305,7 +318,7 @@ void loadCabine(osg::Group *vehicle,
     }
 
     osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
-    cabine_model = loadModel(cabineModelName);
+    cabine_model = loadModel(cabineModelName, cabineTextureName);
 
     if (cabine_model.valid())
         transShift->addChild(cabine_model.get());
