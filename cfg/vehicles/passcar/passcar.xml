@@ -9,24 +9,24 @@
 		<MainResist>default</MainResist>
 		<NumAxis>4</NumAxis>		
 		<DegreesOfFreedom>5</DegreesOfFreedom>
-        <WheelInertia>2.0</WheelInertia>
+                <WheelInertia>2.0</WheelInertia>
 
-        <ExtModelName>passcar/wag-1.osgt</ExtModelName>
-        
-        <WheelModel>passcar/wheel-1.osgt</WheelModel>
-        
+                <ExtModelName>passcar/wag-1.osgt</ExtModelName>
+                
+                <WheelModel>passcar/wheel-1.osgt</WheelModel>
+                
 
-        <Axis>0.0 -7.3 0.786</Axis>
-        <Axis>0.0 -9.7 0.786</Axis>
+                <Axis>0.0 -7.3 0.786</Axis>
+                <Axis>0.0 -9.7 0.786</Axis>
 
-        <Axis>0.0 7.3 0.786</Axis>        
-        <Axis>0.0 9.7 0.786</Axis>
+                <Axis>0.0 7.3 0.786</Axis>        
+                <Axis>0.0 9.7 0.786</Axis>
 
-        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-        <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+                <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
 
-        <AirDistModule>vr242</AirDistModule>
-        <AirDistConfig>vr242</AirDistConfig>
+                <AirDistModule>vr242</AirDistModule>
+                <AirDistConfig>vr242</AirDistConfig>
 
 	</Vehicle>
 </Config>
