@@ -27,7 +27,8 @@
 enum CameraView
 {
     CABINE_VIEW,
-    OUTSIZE_VIEW
+    OUTSIZE_VIEW,
+    FREE_VIEW
 };
 
 /*!
@@ -67,6 +68,8 @@ private:
 
     /// Internal camera vertical view angle
     double camAngleVertical;
+
+    double baseViewMatrix;
 
     /// Camera view setting
     void setCameraView(CameraView cameraView, osg::Camera *camera);

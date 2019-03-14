@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModule>default-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
+		<Title>Проверка</Title>
+		<Description>Проверка</Description>
+	</Common>
+	
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>rrsFr_refsG-9167</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+</Config>

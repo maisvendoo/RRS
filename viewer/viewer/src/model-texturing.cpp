@@ -25,7 +25,7 @@ void ModelTexturing::apply(osg::Geode &geode)
         osg::StateSet *stateset = drawable->getOrCreateStateSet();
 
         osg::StateAttribute *stateattr =
-                stateset->getTextureAttribute(0, osg::StateAttribute::TEXTURE);
+                stateset->getTextureAttribute(0, osg::StateAttribute::TEXTURE);        
 
         osg::Texture2D *texture = static_cast<osg::Texture2D *>(stateattr);
 
@@ -42,7 +42,8 @@ void ModelTexturing::apply(osg::Geode &geode)
 void ModelTexturing::createTexture(const std::string &textureDir,
                                    osg::Texture2D *texture)
 {
-
+    Q_UNUSED(textureDir)
+    Q_UNUSED(texture)
 }
 
 //------------------------------------------------------------------------------

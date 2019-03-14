@@ -11,7 +11,7 @@
                 <WheelInertia>2.0</WheelInertia>
 
                 <ExtModelName>test-loco/kuzov.osgt</ExtModelName> 
-                <ExtTexturesDir>test-loco/add-textures</ExtTexturesDir>
+
 
                 <ModelShift>0.0 0.0 0.0</ModelShift>                
 

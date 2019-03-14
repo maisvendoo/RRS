@@ -24,6 +24,9 @@
 #include    <osg/Material>
 #include    <osgUtil/SmoothingVisitor>
 
+#include    <osg/BlendFunc>
+#include    <osg/AlphaFunc>
+
 #include    "model-smooth.h"
 #include    "texture-filtering.h"
 #include    "model-texturing.h"
@@ -125,6 +128,12 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
         return nullptr;
     }
 
+    if (!model.valid())
+    {
+        OSG_FATAL << "ERROR: model " << model_path << " loading failed";
+        return nullptr;
+    }
+
     ModelSmoother  smoother;
     model->accept(smoother);
 
@@ -137,6 +146,19 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
         mt.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
         model->accept(mt);
     }
+
+    osg::StateSet *ss = model->getOrCreateStateSet();
+
+    osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
+                                                                osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+
+    ss->setAttributeAndModes(blendFunc.get());
+    ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+    ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+    osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
+    ss->setAttributeAndModes(alphaFunc.get());
+    ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
 
     return model.release();
 }
