@@ -134,8 +134,8 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
         return nullptr;
     }
 
-    ModelSmoother  smoother;
-    model->accept(smoother);
+    //ModelSmoother  smoother;
+    //model->accept(smoother);
 
     ModelTextureFilter texfilter;
     model->accept(texfilter);
