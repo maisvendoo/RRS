@@ -17,6 +17,7 @@
 #include    "config-reader.h"
 #include    "get-value.h"
 #include    "filesystem.h"
+#include    "math-funcs.h"
 
 #include    "vehicle-loader.h"
 
@@ -25,7 +26,6 @@
 #include    <sstream>
 
 #include    "anim-transform-visitor.h"
-
 #include    "server-data-struct.h"
 
 //------------------------------------------------------------------------------
@@ -80,24 +80,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             moveCamera(viewer);
 
             break;
-        }
-
-    case osgGA::GUIEventAdapter::USER:
-        {
-            const network_data_t *nd = dynamic_cast<const network_data_t *>(ea.getUserData());
-
-            if (nd->route_id != 0)
-            {
-                processServerData(nd);
-            }
-            else
-            {
-                this->nd.count = 0;
-                ref_time = 0.0;
-            }
-
-            break;
-        }
+        }    
 
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
@@ -353,22 +336,6 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::processServerData(const network_data_t *server_data)
-{
-    memcpy(&nd.te, &server_data->te, sizeof (nd.te));
-
-    nd.delta_time = server_data->delta_time;
-
-    QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
-    emit setStatusBar(msg + QString::fromStdWString(server_data->te[static_cast<size_t>(cur_vehicle)].DebugMsg));
-
-    nd.count++;
-    ref_time = 0.0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void TrainExteriorHandler::processSharedData(double &ref_time)
 {
     double delay = 0.1;
@@ -381,7 +348,7 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         {
             server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
 
-            memcpy(&nd.te, &sd->te, sizeof (nd.te));
+            memcpy(nd.te.data(), sd->te.data(), sizeof (nd.te));
 
             if (nd.count > 1)
             {
@@ -440,42 +407,36 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float arg(float cos_x, float sin_x)
-{
-    float angle = 0;
-
-    if (sin_x >= 0.0f)
-        angle = acosf(cos_x);
-    else
-        angle = -acosf(cos_x);
-
-    return angle;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void TrainExteriorHandler::recalcAttitude(size_t i)
 {
+    // Don't recalculate from head vehicle
     if (i == 0)
         return;
 
+    // Get prevuos vehicle
     vehicle_exterior_t prev = vehicles_ext[i-1];
+    // Get current vehicles
     vehicle_exterior_t curr = vehicles_ext[i];
 
+    // Calculate vehicle tail orth
     osg::Vec3 prev_att = prev.attitude;
     float pitch = prev_att.x();
     float yaw = prev_att.z();
     osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
+
+    // Calculate bacward coupling point of previos vehicle
     osg::Vec3 tail_dir = tail_orth * (curr.length / 2.0f);
 
+    // Calculate forward coupling of current vehicle orth
     osg::Vec3 a = prev.position + tail_dir;
     osg::Vec3 forward = a - curr.position;
     osg::Vec3 f_orth = forward * (1 / forward.length());
 
+    // Calculate new attitude of current vehicle
     float y_new = arg(f_orth.y(), f_orth.x());
     float y_old = curr.attitude.z();
 
+    // "Smoothing" of vehicle oscillations
     vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0f;
 }
 

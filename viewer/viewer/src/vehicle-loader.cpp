@@ -34,79 +34,6 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Texture2D *createTexture(osg::Node* node, const std::string &path)
-{
-    osg::StateSet *stateset = node->getOrCreateStateSet();
-    osg::StateAttribute *stateattr = stateset->getTextureAttribute(0, osg::StateAttribute::TEXTURE);
-    osg::ref_ptr<osg::Texture2D> texture = static_cast<osg::Texture2D *>(stateattr);
-
-    if (!texture.valid())
-        texture = new osg::Texture2D;
-
-    // Loading texture from file
-    std::string fileName = osgDB::findDataFile(path);
-
-    if (fileName.empty())
-    {
-        OSG_FATAL << "ERROR: texture image " << path << " is't found" << std::endl;
-        return nullptr;
-    }
-
-    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(fileName);
-
-    if (!image.valid())
-        return nullptr;
-
-    std::string ext = osgDB::getLowerCaseFileExtension(fileName);
-
-    if (ext == "tga")
-    {
-        image->flipVertical();
-    }
-
-    texture->setImage(image.get());
-
-    // Linear texture filtration (temporary!!!)
-    texture->setNumMipmapLevels(0);
-    texture->setFilter(osg::Texture::MIN_FILTER , osg::Texture::LINEAR);
-    texture->setFilter(osg::Texture::MAG_FILTER , osg::Texture::LINEAR);
-
-    texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture::REPEAT);
-    texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture::REPEAT);
-    texture->setUnRefImageDataAfterApply(true);
-
-    return texture.release();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void applyTexture(osg::Node *model, const std::string &textureName)
-{
-    if (textureName.empty())
-        return;
-
-    FileSystem &fs = FileSystem::getInstance();
-
-    std::string tex_path = fs.combinePath(fs.getVehicleModelsDir(), textureName);
-    osg::ref_ptr<osg::Texture2D> texture = createTexture(model, tex_path);
-
-    if (texture.valid())
-    {
-        model->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
-
-        std::string ext = osgDB::getLowerCaseFileExtension(tex_path);
-
-        if (ext == "tga")
-            model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-        else
-            model->getOrCreateStateSet()->setRenderingHint(osg::StateSet::OPAQUE_BIN);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 osg::Node *loadModel(const std::string &modelName, const std::string &textureName)
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -132,10 +59,7 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
     {
         OSG_FATAL << "ERROR: model " << model_path << " loading failed";
         return nullptr;
-    }
-
-    //ModelSmoother  smoother;
-    //model->accept(smoother);
+    }    
 
     ModelTextureFilter texfilter;
     model->accept(texfilter);
@@ -149,13 +73,14 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
 
     osg::StateSet *ss = model->getOrCreateStateSet();
 
+    // Set blend function for model
     osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
-                                                                osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
-
+                                                                osg::BlendFunc::ONE_MINUS_SRC_ALPHA);    
     ss->setAttributeAndModes(blendFunc.get());
     ss->setMode(GL_BLEND, osg::StateAttribute::ON);
     ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
+    // Set alpha function for model
     osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
     ss->setAttributeAndModes(alphaFunc.get());
     ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
@@ -234,7 +159,6 @@ osg::MatrixTransform *loadWheels(const std::string &configPath)
         cfg.getValue(secName, "WheelModel", wheelModelName);
         cfg.getValue(secName, "WheelTexturesDir", wheelTextureName);
     }    
-
 
     osg::ref_ptr<osg::Node> model = loadModel(wheelModelName, wheelTextureName);
 

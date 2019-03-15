@@ -69,6 +69,7 @@ private:
     /// Internal camera vertical view angle
     double camAngleVertical;
 
+    /// Initial view matrix for free camera
     double baseViewMatrix;
 
     /// Camera view setting

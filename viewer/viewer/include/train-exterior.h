@@ -103,9 +103,7 @@ private:
     /// Moving train along track
     void moveTrain(double ref_time, const network_data_t &nd);
 
-    /// Processing movind data from server
-    void processServerData(const network_data_t *server_data);
-
+    /// Processing data from server
     void processSharedData(double &ref_time);
 
     /// Move camera along track
