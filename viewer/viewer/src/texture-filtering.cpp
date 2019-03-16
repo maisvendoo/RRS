@@ -1,5 +1,7 @@
 #include    "texture-filtering.h"
 
+#include    <osg/Material>
+
 
 ModelTextureFilter::ModelTextureFilter()
 {
@@ -26,6 +28,13 @@ void ModelTextureFilter::apply(osg::Geode &geode)
         texture->setNumMipmapLevels(0);
         texture->setFilter(osg::Texture::MIN_FILTER , osg::Texture::LINEAR);
         texture->setFilter(osg::Texture::MAG_FILTER , osg::Texture::LINEAR);
+
+        osg::Material *mat = static_cast<osg::Material *>(stateset->getAttribute(osg::StateAttribute::MATERIAL));
+
+        if (mat == nullptr)
+            continue;
+
+        mat->setColorMode(osg::Material::ColorMode::SPECULAR);
     }
 
     traverse(geode);

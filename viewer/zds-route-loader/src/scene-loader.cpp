@@ -24,6 +24,8 @@
 
 #include    "route-path.h"
 
+#include    "skybox.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -42,6 +44,9 @@ void SceneLoader::load(std::string routeDir)
 
     loadDataFile(this->routeDir + fs.separator() + "objects.ref");
     loadDataFile(this->routeDir + fs.separator() + "route1.map");
+
+    osg::ref_ptr<Skybox> skybox = new Skybox;
+    skybox->load(this->routeDir, root.get());
 }
 
 //------------------------------------------------------------------------------

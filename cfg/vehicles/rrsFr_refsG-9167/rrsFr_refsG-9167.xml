@@ -12,10 +12,10 @@
 
         <ExtModelName>rrsFr_refsDessau/rrsFr_refsG-9167.osgt</ExtModelName>
 
-        <!-- Перекраска -->
-        <ExtTexturesDir>rrsFr_refsDessau/TEXTURY-PERECRSKI</ExtTexturesDir>
+               
         
         <WheelModel>rrsFr_refsDessau/rrsFr_refs-wheel.osgt</WheelModel>
+        <!--<WheelTexturesDir>rrsFr_refsDessau/tex_rrsFr_refsG-9167</WheelTexturesDir>-->
         
 
         <Axis>0.0 -7.201 0.786</Axis>
