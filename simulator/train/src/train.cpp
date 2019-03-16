@@ -467,6 +467,8 @@ void Train::setInitConditions(const init_data_t &init_data)
     double x0 = init_data.init_coord * 1000.0;
     y[0] = x0;    
 
+    emit logMessage(QString("OK: Setting up of initial coordinate: %1").arg(x0));
+
     for (size_t i = 1; i < vehicles.size(); i++)
     {
         double Li_1 = vehicles[i-1]->getLength();

@@ -334,7 +334,12 @@ void Model::overrideByCommandLine(init_data_t &init_data,
         init_data.debug_print = command_line.debug_print.value;
 
     if (command_line.init_coord.is_present)
+    {
         init_data.init_coord = command_line.init_coord.value;
+
+        emit logMessage(QString("OK: Command line coordinate: %1").arg(command_line.init_coord.value));
+        emit logMessage(QString("OK: New initial line coordinate: %1").arg(init_data.init_coord));
+    }
 
     if (command_line.direction.is_present)
         init_data.direction = command_line.direction.value;

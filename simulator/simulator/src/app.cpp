@@ -176,7 +176,7 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     if (parser.isSet(initCoord))
     {
         command_line.init_coord.is_present = true;
-        QString tmp = parser.value(initCoord);
+        QString tmp = parser.value(initCoord);                
         command_line.init_coord.value = tmp.toDouble();
     }
 

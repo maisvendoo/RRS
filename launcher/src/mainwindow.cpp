@@ -172,7 +172,7 @@ void MainWindow::startSimulator()
     {
         size_t i = static_cast<size_t>(ui->cbStations->currentIndex());
         double init_coord = waypoints[i].railway_coord / 1000.0;
-        args << "--init-coord=" + QString("%1").arg(init_coord);
+        args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
 
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
@@ -201,6 +201,7 @@ void MainWindow::startViewer()
 void MainWindow::loadStations(QString &routeDir)
 {
     ui->cbStations->clear();
+    waypoints.clear();
 
     QFile file(routeDir + QDir::separator() + "waypoints.conf");
 
