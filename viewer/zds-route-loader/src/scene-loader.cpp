@@ -37,10 +37,11 @@ SceneLoader::SceneLoader() : RouteLoader()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SceneLoader::load(std::string routeDir)
+void SceneLoader::load(std::string routeDir, float view_dist)
 {
     FileSystem &fs = FileSystem::getInstance();
-    this->routeDir = fs.getNativePath(routeDir);    
+    this->routeDir = fs.getNativePath(routeDir);
+    view_distance = view_dist;
 
     loadDataFile(this->routeDir + fs.separator() + "objects.ref");
     loadDataFile(this->routeDir + fs.separator() + "route1.map");
@@ -177,6 +178,8 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
             model_info.mipmap = true;
         else
             model_info.mipmap = false;
+
+        model_info.view_distance = view_distance;
 
         object.model_node = createLODNode(model_info);        
 

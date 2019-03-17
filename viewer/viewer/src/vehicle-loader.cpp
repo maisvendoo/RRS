@@ -23,6 +23,7 @@
 #include    <osg/Texture2D>
 #include    <osg/Material>
 #include    <osgUtil/SmoothingVisitor>
+#include    <osg/Depth>
 
 #include    <osg/BlendFunc>
 #include    <osg/AlphaFunc>
@@ -85,6 +86,8 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
     ss->setAttributeAndModes(alphaFunc.get());
     ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
 
+    ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0));
+
     return model.release();
 }
 
@@ -128,7 +131,7 @@ osg::Group *loadVehicle(const std::string &configPath)
     if (model.valid())
     {
         transShift->addChild(model.get());
-    }
+    }    
 
     group->addChild(transShift.get());
 
@@ -293,11 +296,40 @@ float getLength(const std::string &config_name)
         return length;
     }
 
-    if (cfg.isOpenned())
-    {
-        std::string secName = "Vehicle";
-        cfg.getValue(secName, "Length", length);
-    }
+
+    std::string secName = "Vehicle";
+    cfg.getValue(secName, "Length", length);
 
     return length;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Vec3 getDirverPosition(const std::string &config_name)
+{
+    osg::Vec3 position(0.9255f, 9.0172f, 3.75f);
+
+    // Calculate vehicle config path
+    FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (!cfg.isOpenned())
+    {
+        OSG_FATAL << "Vehicle config " << cfg_path << " is't foung" << std::endl;
+        return position;
+    }
+
+    std::string secName = "Vehicle";
+    std::string tmp;
+    cfg.getValue(secName, "DriverPos", tmp);
+
+    std::istringstream ss(tmp);
+    ss >> position.x() >> position.y() >> position.z();
+
+    return position;
 }

@@ -87,6 +87,7 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
     pagedLOD->addDescription(model_info.name);
     pagedLOD->setFileName(0, fileName);
     pagedLOD->setRange(0, 0.0f, model_info.view_distance);
+    pagedLOD->setRangeMode(osg::LOD::RangeMode::DISTANCE_FROM_EYE_POINT);
     pagedLOD->setDataVariance(osg::Object::STATIC);
 
     // Apply texture

@@ -51,7 +51,7 @@ public:
     RouteLoader();
 
     /// Load route
-    virtual void load(std::string routeDir) = 0;
+    virtual void load(std::string routeDir, float view_dist = 1000.0f) = 0;
 
     /// Get route scene group node
     virtual osg::Group *getRoot();        

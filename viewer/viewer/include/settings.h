@@ -76,6 +76,8 @@ struct settings_t
     int             direction;
     /// Notify level
     std::string     notify_level;
+    /// View distance
+    float           view_distance;
 
     settings_t()
         : route_dir("")
@@ -103,6 +105,7 @@ struct settings_t
         , eye_height(3.0)
         , direction(1)
         , notify_level("INFO")
+        , view_distance(1000.0f)
     {
 
     }

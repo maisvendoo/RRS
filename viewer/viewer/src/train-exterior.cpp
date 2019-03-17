@@ -157,21 +157,22 @@ void TrainExteriorHandler::keyboardHandler(int key)
 
         break;
 
-    case osgGA::GUIEventAdapter::KEY_1:
+    case osgGA::GUIEventAdapter::KEY_F2:
 
         cur_vehicle = 0;
         long_shift = 0.0f;
+        height_shift = 0.0f;
 
         break;
 
     case osgGA::GUIEventAdapter::KEY_Delete:
 
-        height_shift += 0.05f;
+        height_shift -= 0.05f;
         break;
 
     case osgGA::GUIEventAdapter::KEY_Insert:
 
-        height_shift -= 0.05f;
+        height_shift += 0.05f;
         break;
     }
 }
@@ -268,6 +269,8 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
             float length = getLength(module_config_name);
 
+            osg::Vec3 driver_pos = getDirverPosition(module_config_name);
+
             loadAnimations(module_config_name, cabine.get(), animations);
 
             for (int i = 0; i < count; ++i)
@@ -278,6 +281,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
                 vehicle_ext.wheel_rotation = wheel_model.get();
                 vehicle_ext.length = length;
                 vehicle_ext.cabine = cabine;
+                vehicle_ext.driver_pos = driver_pos;
 
                 vehicles_ext.push_back(vehicle_ext);
                 trainExterior->addChild(vehicle_ext.transform.get());
@@ -389,12 +393,13 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     position = routePath->getPosition(coord, attitude);
 
     // Camera position and attitude calculation
-    position.z() += 3.75f;    
+    osg::Vec3 dp = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
+    position.z() += dp.z();
 
     attitude.x() = -osg::PIf / 2.0f - attitude.x();
 
     // Calculate and set view matrix    
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(0.75f, 0.0f + height_shift, -8.3f - long_shift));
+    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(dp.x(), height_shift, -dp.y() - long_shift));
     matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
     matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
     matrix *= osg::Matrix::translate(position);

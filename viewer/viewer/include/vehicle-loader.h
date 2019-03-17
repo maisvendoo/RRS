@@ -56,8 +56,19 @@ void setAxis(osg::Group *vehicle,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void loadCabine(osg::Group *vehicle, const std::string &config_name, osg::ref_ptr<osg::Node> &cabine_model);
+void loadCabine(osg::Group *vehicle,
+                const std::string &config_name,
+                osg::ref_ptr<osg::Node> &cabine_model);
 
+/*!
+ * \fn
+ * \brief Get lehgth of vehicle
+ */
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 float getLength(const std::string &config_name);
+
+osg::Vec3 getDirverPosition(const std::string &config_name);
 
 #endif // VEHICLE_LOADER_H

@@ -158,6 +158,10 @@ bool RouteViewer::init(int argc, char *argv[])
     QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
                      hud, &HUD::setStatusBar);
 
+    osgDB::DatabasePager *dp = viewer.getDatabasePager();
+    dp->setDoPreCompile(true);
+    dp->setTargetMaximumNumberOfPageLOD(1000);
+
     return true;
 }
 
@@ -194,6 +198,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "ReconnectInterval", settings.reconnect_interval);
         cfg.getValue(secName, "MotionBlur", settings.persistence);
         cfg.getValue(secName, "NotifyLevel", settings.notify_level);
+        cfg.getValue(secName, "ViewDistance", settings.view_distance);
     }
 
     return settings;
@@ -278,14 +283,17 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
         return false;
     }
 
-    loader->load(routeDir);
-    root = loader->getRoot();    
+    loader->load(routeDir, settings.view_distance);
 
     MotionPath *motionPath = loader->getMotionPath(settings.direction);
+
     train_ext_handler = new TrainExteriorHandler(motionPath, settings.train_config);
-    root->addChild(train_ext_handler->getExterior());
     viewer.addEventHandler(train_ext_handler);
     viewer.addEventHandler(train_ext_handler->getAnimationManager());
+
+    root = new osg::Group;
+    root->addChild(train_ext_handler->getExterior());
+    root->addChild(loader->getRoot());
 
     return true;
 }

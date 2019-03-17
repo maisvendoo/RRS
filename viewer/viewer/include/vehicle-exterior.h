@@ -16,6 +16,7 @@ struct vehicle_exterior_t
     float       wheel_angle;
     float       coord;
     float       length;
+    osg::Vec3   driver_pos;
 };
 
 #endif // VEHICLE_EXTERIOR_H

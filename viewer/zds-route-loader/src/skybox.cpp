@@ -9,6 +9,7 @@
 #include    <osg/ShapeDrawable>
 #include    <osg/TexGen>
 #include    <osg/Texture2D>
+#include    <osg/Material>
 
 #include    "filesystem.h"
 
@@ -21,9 +22,9 @@ Skybox::Skybox()
     setCullingActive(false);
 
     osg::StateSet *ss = getOrCreateStateSet();
-    ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 1.0f, 1.0f));
-    ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-    ss->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+    ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 1.0, 1.0));
+    ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+    ss->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
     ss->setRenderBinDetails(5, "RenderBin");
 }
 
@@ -149,13 +150,27 @@ void Skybox::load(const std::string &routeDir, osg::Group *scene)
         return;
     }
 
+    osg::ref_ptr<osg::Material> mat = new osg::Material;
+    mat->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4d(1.0, 1.0, 1.0, 1.0));
+    mat->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4d(1.0, 1.0, 1.0, 1.0));
+    mat->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4d(1.0, 1.0, 1.0, 1.0));
+
+    skymodel->getOrCreateStateSet()->setAttribute(mat.get());
+
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
     texture->setImage(image);
     texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture::REPEAT);
     texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture::REPEAT);
-    texture->setUnRefImageDataAfterApply(true);
+    texture->setResizeNonPowerOfTwoHint(false);
+    texture->setNumMipmapLevels(0);
+    texture->setFilter(osg::Texture::MIN_FILTER , osg::Texture::LINEAR);
+    texture->setFilter(osg::Texture::MAG_FILTER , osg::Texture::LINEAR);
+    texture->setMaxAnisotropy(1.0f);
 
-    skymodel->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
+    OSG_INFO << "SKY_TEXTURE: Texture size " << texture->getTextureWidth() << "x"
+             << texture->getTextureHeight() << std::endl;
+
+    skymodel->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get(), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
     this->addChild(skymodel);
 
     scene->addChild(this);

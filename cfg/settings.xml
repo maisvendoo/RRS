@@ -5,15 +5,15 @@
 		<posY>50</posY>
 		<Width>1280</Width>
 		<Height>720</Height>
-		<FullScreen>0</FullScreen>
+		<FullScreen>1</FullScreen>
 		<VSync>0</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
 		<Port>1992</Port>
 		<LocalMode>0</LocalMode>
-		<FovY>30.0</FovY>
-		<zNear>1.0</zNear>
+		<FovY>55.0</FovY>
+		<zNear>0.1</zNear>
 		<zFar>1000.0</zFar>
-		<ScreenNumber>0</ScreenNumber>
+		<ScreenNumber>1</ScreenNumber>
 		<Name>viewer</Name>
 		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
@@ -22,5 +22,6 @@
 		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>
+		<ViewDistance>1000.0</ViewDistance>
 	</Viewer>                
 </Config>

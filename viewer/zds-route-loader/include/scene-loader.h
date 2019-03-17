@@ -37,11 +37,13 @@ public:
     /// Constructor for load route
     SceneLoader();
 
-    void load(std::string routeDir);      
+    void load(std::string routeDir, float view_dist = 1000.0f);
 
     MotionPath *getMotionPath(int direction);
 
 protected:
+
+    float view_distance;
 
     /// List objects from file objects.ref
     std::map<std::string, object_ref_t> objectRef;
