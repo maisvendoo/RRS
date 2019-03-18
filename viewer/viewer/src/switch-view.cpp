@@ -27,6 +27,11 @@ CameraViewHandler::CameraViewHandler() : osgGA::GUIEventHandler ()
   , dist(20.0)
   , camAngleHorizontal(0.0)
   , camAngleVertical(0.0)
+  , baseViewMatrix(osg::Matrix())
+  , free_shift(osg::Vec3())
+  , free_dir(osg::Vec3())
+  , free_angle_vert(0.0)
+  , free_andle_horiz(0.0)
 {
 
 }
@@ -72,16 +77,32 @@ bool CameraViewHandler::handle(const osgGA::GUIEventAdapter &ea,
 
                 osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
                 baseViewMatrix = viewer->getCamera()->getViewMatrix();
+
+                free_angle_vert = -angleVertical;
+                free_andle_horiz = angleHorizontal;
             }
 
             break;
 
         default:
 
-            if (cameraView == OUTSIZE_VIEW)
-                outCameraMotion(ea.getKey());
-            else
-                intCameraMotion(ea.getKey());
+            switch (cameraView)
+            {
+            case OUTSIZE_VIEW:
+
+                outCameraMotion(ea);
+                break;
+
+            case CABINE_VIEW:
+
+                intCameraMotion(ea);
+                break;
+
+            case FREE_VIEW:
+
+                freeCameraMotion(ea);
+                break;
+            }
         }
 
         break;
@@ -126,12 +147,12 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
 
     case FREE_VIEW:
         {
-            osg::Matrix matrix;
-            /*matrix *= osg::Matrix::rotate(osg::PI_2 + angleVertical, osg::Vec3(0, 1, 0));
-            matrix *= osg::Matrix::rotate(angleHorizontal, osg::Vec3(1, 0, 0));
-            matrix *= osg::Matrix::translate(osg::Vec3(0.0, 0.0, -dist));*/
+            osg::Matrix tmp;
 
-            viewMatrix = baseViewMatrix * matrix;
+            tmp *= osg::Matrix::translate(-free_shift);
+            tmp *= osg::Matrix::rotate(free_angle_vert, osg::Y_AXIS);
+
+            viewMatrix = baseViewMatrix * tmp;
 
             break;
         }
@@ -143,16 +164,16 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraViewHandler::outCameraMotion(int key)
+void CameraViewHandler::outCameraMotion(const osgGA::GUIEventAdapter &ea)
 {
-    switch (key)
+    switch (ea.getKey())
     {
         case osgGA::GUIEventAdapter::KEY_Left:
-            angleVertical += 0.1;
+            angleVertical -= 0.1;
             break;
 
         case osgGA::GUIEventAdapter::KEY_Right:
-            angleVertical -= 0.1;
+            angleVertical += 0.1;
             break;
 
         case osgGA::GUIEventAdapter::KEY_Up:
@@ -177,9 +198,9 @@ void CameraViewHandler::outCameraMotion(int key)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraViewHandler::intCameraMotion(int key)
+void CameraViewHandler::intCameraMotion(const osgGA::GUIEventAdapter &ea)
 {
-    switch (key)
+    switch (ea.getKey())
     {
         case osgGA::GUIEventAdapter::KEY_Left:
             camAngleVertical -= 0.02;
@@ -196,5 +217,65 @@ void CameraViewHandler::intCameraMotion(int key)
         case osgGA::GUIEventAdapter::KEY_Down:
             camAngleHorizontal += 0.02;
             break;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraViewHandler::freeCameraMotion(const osgGA::GUIEventAdapter &ea)
+{
+    double alpha = osg::PI_2 + free_angle_vert;
+    free_dir = osg::Vec3d(cos(alpha), 0.0, sin(alpha));
+    osg::Vec3 up(0.0, 1.0, 0.0);
+    osg::Vec3 traverse = up ^ free_dir;
+
+    switch (ea.getKey())
+    {
+    case osgGA::GUIEventAdapter::KEY_Left:
+
+        if (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_CTRL)
+        {
+            free_angle_vert -= 0.01;
+        }
+        else
+        {
+            free_shift += traverse * 0.1f;
+        }
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Right:
+
+        if (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_CTRL)
+        {
+            free_angle_vert += 0.01;
+        }
+        else
+        {
+            free_shift -= traverse * 0.1f;
+        }
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Insert:
+
+        free_shift += up * 0.1f;
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Delete:
+
+        free_shift -= up * 0.1f;
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Up:
+
+        free_shift -= free_dir * 0.3f;
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Down:
+
+        free_shift += free_dir * 0.3f;
+        break;
     }
 }

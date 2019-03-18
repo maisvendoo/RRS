@@ -72,14 +72,23 @@ private:
     /// Initial view matrix for free camera
     osg::Matrix baseViewMatrix;
 
+    osg::Vec3   free_shift;
+    osg::Vec3   free_dir;
+
+    double      free_angle_vert;
+    double      free_andle_horiz;
+
     /// Camera view setting
     void setCameraView(CameraView cameraView, osg::Camera *camera);
 
     /// Outside camera motion
-    void outCameraMotion(int key);
+    void outCameraMotion(const osgGA::GUIEventAdapter &ea);
 
     /// Inside camera motion
-    void intCameraMotion(int key);
+    void intCameraMotion(const osgGA::GUIEventAdapter &ea);
+
+    /// Free outside camera motion
+    void freeCameraMotion(const osgGA::GUIEventAdapter &ea);
 };
 
 #endif // SWITCH_VIEW_H
