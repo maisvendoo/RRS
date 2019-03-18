@@ -70,7 +70,7 @@ private:
     double camAngleVertical;
 
     /// Initial view matrix for free camera
-    double baseViewMatrix;
+    osg::Matrix baseViewMatrix;
 
     /// Camera view setting
     void setCameraView(CameraView cameraView, osg::Camera *camera);

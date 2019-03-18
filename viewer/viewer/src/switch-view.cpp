@@ -64,6 +64,18 @@ bool CameraViewHandler::handle(const osgGA::GUIEventAdapter &ea,
             cameraView = OUTSIZE_VIEW;
             break;
 
+        case osgGA::GUIEventAdapter::KEY_F4:
+
+            if (cameraView == OUTSIZE_VIEW)
+            {
+                cameraView = FREE_VIEW;
+
+                osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
+                baseViewMatrix = viewer->getCamera()->getViewMatrix();
+            }
+
+            break;
+
         default:
 
             if (cameraView == OUTSIZE_VIEW)
@@ -109,6 +121,18 @@ void CameraViewHandler::setCameraView(CameraView cameraView, osg::Camera *camera
             matrix *= osg::Matrix::translate(osg::Vec3(0.0, 0.0, -dist));
 
             viewMatrix *= matrix;
+            break;
+        }
+
+    case FREE_VIEW:
+        {
+            osg::Matrix matrix;
+            /*matrix *= osg::Matrix::rotate(osg::PI_2 + angleVertical, osg::Vec3(0, 1, 0));
+            matrix *= osg::Matrix::rotate(angleHorizontal, osg::Vec3(1, 0, 0));
+            matrix *= osg::Matrix::translate(osg::Vec3(0.0, 0.0, -dist));*/
+
+            viewMatrix = baseViewMatrix * matrix;
+
             break;
         }
     }
