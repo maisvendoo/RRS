@@ -38,6 +38,8 @@
 #include    "screen-capture.h"
 #include    "hud.h"
 
+#include    "rails-manipulator.h"
+
 #include    <QObject>
 
 //------------------------------------------------------------------------------
@@ -78,7 +80,7 @@ int RouteViewer::run()
     viewer.addEventHandler(keyboard);
 
     // Camera switch handler
-    viewer.addEventHandler(new CameraViewHandler());
+    //viewer.addEventHandler(new CameraViewHandler());
 
     //client.init(settings, &viewer);
 
@@ -87,6 +89,12 @@ int RouteViewer::run()
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
     //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
+
+    osg::ref_ptr<RailsManipulator> rm = new RailsManipulator;
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendTrainPosition,
+                     rm, &RailsManipulator::getTrainPosition);
+
+    viewer.setCameraManipulator(rm.get());
 
     return viewer.run();
 }

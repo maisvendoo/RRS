@@ -30,6 +30,8 @@
 
 #include    "animation-manager.h"
 
+#include    "train-position.h"
+
 /*!
  * \class
  * \brief Handler of train's exterior
@@ -58,6 +60,8 @@ public:
 signals:
 
     void setStatusBar(QString msg);
+
+    void sendTrainPosition(train_position_t tp);
 
 private:
 

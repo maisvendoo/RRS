@@ -73,7 +73,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             ref_time += delta_time;
             start_time = time;
 
-            processSharedData(ref_time);
+            processSharedData(ref_time);            
 
             moveTrain(ref_time, nd);
 
@@ -342,7 +342,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::processSharedData(double &ref_time)
 {
-    double delay = 0.1;
+    double delay = 0.5;
 
     if (ref_time >= delay)
     {
@@ -383,30 +383,20 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 {
-    osg::Matrix viewMatrix;
-
     // Get current vehicle cartesian position
-    float coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord;
-    osg::Vec3 position;
-    osg::Vec3 attitude;
-
-    position = routePath->getPosition(coord, attitude);
-
-    // Camera position and attitude calculation
+    osg::Vec3 position = vehicles_ext[static_cast<size_t>(cur_vehicle)].position;
+    osg::Vec3 attitude = vehicles_ext[static_cast<size_t>(cur_vehicle)].attitude;
     osg::Vec3 dp = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
-    position.z() += dp.z();
 
     attitude.x() = -osg::PIf / 2.0f - attitude.x();
 
-    // Calculate and set view matrix    
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(dp.x(), height_shift, -dp.y() - long_shift));
-    matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
-    matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
-    matrix *= osg::Matrix::translate(position);
+    train_position_t tp;
+    tp.position = position;
+    tp.attitude = attitude;
+    tp.driver_pos = dp;
 
-    viewMatrix = osg::Matrix::inverse(matrix);
-
-    viewer->getCamera()->setViewMatrix(viewMatrix);
+    // Send train position to camera manipulator
+    emit sendTrainPosition(tp);
 }
 
 //------------------------------------------------------------------------------
