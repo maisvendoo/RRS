@@ -30,6 +30,12 @@ bool AbstractManipulator::handle(const osgGA::GUIEventAdapter &ea,
         releaseMouseProcess(ea, aa);
 
         break;
+
+    case osgGA::GUIEventAdapter::SCROLL:
+
+        scrollProcess(ea, aa);
+
+        break;
     }
 
     return false;
@@ -68,6 +74,11 @@ void AbstractManipulator::pushMouseProcess(const osgGA::GUIEventAdapter &ea, osg
 void AbstractManipulator::releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
+}
+
+void AbstractManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+{
+
 }
 
 void AbstractManipulator::getCameraPosition(camera_position_t cp)

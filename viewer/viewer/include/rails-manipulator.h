@@ -43,6 +43,8 @@ private:
 
     virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
+    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+
 };
 
 #endif // RAILS_MANIPULATOR_H

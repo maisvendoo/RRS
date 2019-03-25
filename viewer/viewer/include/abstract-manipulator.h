@@ -39,6 +39,8 @@ protected:
 
     virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
+    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+
 public slots:
 
     void getCameraPosition(camera_position_t cp);

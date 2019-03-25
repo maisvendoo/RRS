@@ -378,6 +378,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     camera->setClearColor(osg::Vec4(0.63f, 0.80f, 0.97f, 1.0f));
     camera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    camera-> setComputeNearFarMode (osg :: CullSettings :: DO_NOT_COMPUTE_NEAR_FAR);
     double aspect = static_cast<double>(traits->width) / static_cast<double>(traits->height);
     camera->setProjectionMatrixAsPerspective(settings.fovy, aspect, settings.zNear, settings.zFar);
 
