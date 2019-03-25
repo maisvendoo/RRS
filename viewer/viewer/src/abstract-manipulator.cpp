@@ -1,9 +1,11 @@
 #include    "abstract-manipulator.h"
+#include    <osgViewer/Viewer>
 
 AbstractManipulator::AbstractManipulator(QObject *parent)
     : QObject (parent)
     , osgGA::TrackballManipulator ()
     , cp(camera_position_t())
+    , start_time(0.0)
 {
     qRegisterMetaType<camera_position_t>();
 }
@@ -13,6 +15,20 @@ bool AbstractManipulator::handle(const osgGA::GUIEventAdapter &ea,
 {
     switch (ea.getEventType())
     {
+    case osgGA::GUIEventAdapter::FRAME:
+        {
+            osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
+
+            if (!viewer)
+                break;
+
+            double time = viewer->getFrameStamp()->getReferenceTime();
+            delta_time = static_cast<float>(time - start_time);
+            start_time = time;
+
+            break;
+        }
+
     case osgGA::GUIEventAdapter::KEYDOWN:
 
         keysDownProcess(ea, aa);
@@ -23,6 +39,11 @@ bool AbstractManipulator::handle(const osgGA::GUIEventAdapter &ea,
 
         dragMouseProcess(ea, aa);
 
+        break;
+
+    case osgGA::GUIEventAdapter::PUSH:
+
+        pushMouseProcess(ea, aa);
         break;
 
     case osgGA::GUIEventAdapter::RELEASE:

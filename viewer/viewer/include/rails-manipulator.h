@@ -6,6 +6,7 @@
 #include    <osgGA/TrackballManipulator>
 
 #include    "abstract-manipulator.h"
+#include    "settings.h"
 
 //------------------------------------------------------------------------------
 //
@@ -16,7 +17,7 @@ class RailsManipulator : public AbstractManipulator
 
 public:
 
-    RailsManipulator(QObject *parent = Q_NULLPTR);
+    RailsManipulator(settings_t settings, QObject *parent = Q_NULLPTR);
 
     virtual osg::Matrixd getMatrix() const;
 
@@ -28,6 +29,8 @@ protected:
 
 private:
 
+    settings_t  settings;
+
     float   pos_X0;
     float   pos_Y0;
 
@@ -37,9 +40,13 @@ private:
 
     osg::Vec3 rel_dp;
 
+    bool  move_height;
+
     void keysDownProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
     void dragMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+
+    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
     virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 

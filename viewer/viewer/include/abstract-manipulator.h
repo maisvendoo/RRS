@@ -25,6 +25,9 @@ protected:
 
     camera_position_t cp;
 
+    double  start_time;
+    float   delta_time;
+
     virtual ~AbstractManipulator();
 
     virtual void keysDownProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);

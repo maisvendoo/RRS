@@ -91,7 +91,7 @@ int RouteViewer::run()
     viewer.addEventHandler(new osgViewer::StatsHandler);
     //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
-    osg::ref_ptr<RailsManipulator> rm = new RailsManipulator();
+    osg::ref_ptr<RailsManipulator> rm = new RailsManipulator(settings);
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
                      rm, &RailsManipulator::getCameraPosition);
 
