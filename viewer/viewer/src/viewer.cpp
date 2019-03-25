@@ -37,8 +37,11 @@
 #include    "switch-view.h"
 #include    "screen-capture.h"
 #include    "hud.h"
+#include    "rails-manipulator.h"
 
 #include    <QObject>
+
+#include    <osgGA/KeySwitchMatrixManipulator>
 
 //------------------------------------------------------------------------------
 //
@@ -78,7 +81,7 @@ int RouteViewer::run()
     viewer.addEventHandler(keyboard);
 
     // Camera switch handler
-    viewer.addEventHandler(new CameraViewHandler());
+    //viewer.addEventHandler(new CameraViewHandler());
 
     //client.init(settings, &viewer);
 
@@ -87,6 +90,16 @@ int RouteViewer::run()
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
     //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
+
+    osg::ref_ptr<RailsManipulator> rm = new RailsManipulator();
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
+                     rm, &RailsManipulator::getCameraPosition);
+
+    osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> km = new osgGA::KeySwitchMatrixManipulator;
+
+    km->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F2, "cabine_view", rm.get());
+
+    viewer.setCameraManipulator(km.get());
 
     return viewer.run();
 }

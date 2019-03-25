@@ -383,30 +383,14 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 {
-    osg::Matrix viewMatrix;
+    camera_position_t cp;
+    cp.position = vehicles_ext[static_cast<size_t>(cur_vehicle)].position;
+    cp.attitude = vehicles_ext[static_cast<size_t>(cur_vehicle)].attitude;
+    cp.driver_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
 
-    // Get current vehicle cartesian position
-    float coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord;
-    osg::Vec3 position;
-    osg::Vec3 attitude;
+    cp.attitude.x() = -osg::PIf / 2.0f - cp.attitude.x();
 
-    position = routePath->getPosition(coord, attitude);
-
-    // Camera position and attitude calculation
-    osg::Vec3 dp = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
-    position.z() += dp.z();
-
-    attitude.x() = -osg::PIf / 2.0f - attitude.x();
-
-    // Calculate and set view matrix    
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(dp.x(), height_shift, -dp.y() - long_shift));
-    matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
-    matrix *= osg::Matrix::rotate(static_cast<double>(-attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
-    matrix *= osg::Matrix::translate(position);
-
-    viewMatrix = osg::Matrix::inverse(matrix);
-
-    viewer->getCamera()->setViewMatrix(viewMatrix);
+    emit sendCameraPosition(cp);
 }
 
 //------------------------------------------------------------------------------
