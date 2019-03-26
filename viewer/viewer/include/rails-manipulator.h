@@ -23,6 +23,16 @@ public:
 
     virtual osg::Matrixd getInverseMatrix() const;
 
+    bool performMovementRightMouseButton(const double eventTimeDelta,
+                                         const double dx,
+                                         const double dy);
+
+    bool handleMouseWheel(const osgGA::GUIEventAdapter &ea,
+                          osgGA::GUIActionAdapter &aa);
+
+    bool handleKeyDown(const osgGA::GUIEventAdapter &ea,
+                       osgGA::GUIActionAdapter &aa);
+
 protected:
 
     virtual ~RailsManipulator();
@@ -38,25 +48,9 @@ private:
     float   angle_V;
     bool    fixed;
 
-    osg::Vec3 rel_dp;
+    osg::Vec3 rel_pos;
 
     bool  move_height;
-
-    void keysDownProcess(const osgGA::GUIEventAdapter &ea,
-                         osgGA::GUIActionAdapter &aa);
-
-    void dragMouseProcess(const osgGA::GUIEventAdapter &ea,
-                          osgGA::GUIActionAdapter &aa);
-
-    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                  osgGA::GUIActionAdapter &aa);
-
-    virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                     osgGA::GUIActionAdapter &aa);
-
-    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea,
-                               osgGA::GUIActionAdapter &aa);
-
 };
 
 #endif // RAILS_MANIPULATOR_H

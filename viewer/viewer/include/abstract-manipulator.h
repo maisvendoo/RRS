@@ -16,10 +16,9 @@ class AbstractManipulator : public QObject, public osgGA::TrackballManipulator
 
 public:
 
-    AbstractManipulator(QObject *parent = Q_NULLPTR);
+    AbstractManipulator(QObject *parent = Q_NULLPTR);    
 
-    virtual bool handle(const osgGA::GUIEventAdapter &ea,
-                        osgGA::GUIActionAdapter &aa);
+    bool handleFrame(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
 protected:
 
@@ -28,30 +27,7 @@ protected:
     double  start_time;
     float   delta_time;
 
-    virtual ~AbstractManipulator();
-
-    virtual void keysDownProcess(const osgGA::GUIEventAdapter &ea,
-                                 osgGA::GUIActionAdapter &aa);
-
-    virtual void keysUpProcess(const osgGA::GUIEventAdapter &ea,
-                               osgGA::GUIActionAdapter &aa);
-
-    virtual void dragMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                  osgGA::GUIActionAdapter &aa);
-
-    virtual void moveMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                  osgGA::GUIActionAdapter &aa);
-
-    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                  osgGA::GUIActionAdapter &aa);
-
-    virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                     osgGA::GUIActionAdapter &aa);
-
-    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea,
-                               osgGA::GUIActionAdapter &aa);
-
-    virtual void update(osg::Camera *camera);
+    virtual ~AbstractManipulator();    
 
 public slots:
 

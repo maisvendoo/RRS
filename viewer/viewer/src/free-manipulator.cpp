@@ -68,24 +68,41 @@ void FreeManipulator::init(const osgGA::GUIEventAdapter &ea,
     init_pos = cp;
 
     osgViewer::Viewer *viewer = static_cast<osgViewer::Viewer *>(&aa);
-    camera = viewer->getCamera();
+    camera = viewer->getCamera();    
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-FreeManipulator::~FreeManipulator()
+bool FreeManipulator::performMovementRightMouseButton(const double eventTimeDelta,
+                                                      const double dx,
+                                                      const double dy)
 {
+    double k1 = 1.0;
 
+    angle_H += static_cast<float>(k1 * dx);
+    angle_V += static_cast<float>(k1 * dy);
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreeManipulator::keysDownProcess(const osgGA::GUIEventAdapter &ea,
-                                      osgGA::GUIActionAdapter &aa)
+bool FreeManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
+                                    osgGA::GUIActionAdapter &aa)
 {
-    float V = 5.0;
+    osg::Vec3 eye, center, up;
+    camera->getViewMatrixAsLookAt(eye, center, up);
+
+    osg::Vec3 front = center - eye;
+    front.z() = 0;
+    front.normalize();
+
+    osg::Vec3 traverse = front ^ up;
+    traverse.normalize();
+
+    float V = 5.0f;
 
     if ( (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_SHIFT) ||
          (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
@@ -93,97 +110,41 @@ void FreeManipulator::keysDownProcess(const osgGA::GUIEventAdapter &ea,
         V = 10.0f * V;
     }
 
-    osg::Vec3 motion = forward * (V * delta_time);
-    osg::Vec3 shift = traverse * (V * delta_time);
-
     switch (ea.getKey())
     {
     case osgGA::GUIEventAdapter::KEY_Up:
         {
-            rel_pos += motion;
-
+            rel_pos += front * (V * delta_time);
             break;
         }
 
     case osgGA::GUIEventAdapter::KEY_Down:
         {
-            rel_pos -= motion;
-
-            break;
-        }
-
-    case osgGA::GUIEventAdapter::KEY_Right:
-        {
-            rel_pos += shift;
-
+            rel_pos -= front * (V * delta_time);
             break;
         }
 
     case osgGA::GUIEventAdapter::KEY_Left:
         {
-            rel_pos -= shift;
-
+            rel_pos -= traverse * (V * delta_time);
             break;
         }
 
-    default:
-
-        break;
+    case osgGA::GUIEventAdapter::KEY_Right:
+        {
+            rel_pos += traverse * (V * delta_time);
+            break;
+        }
     }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreeManipulator::dragMouseProcess(const osgGA::GUIEventAdapter &ea,
+bool FreeManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
                                        osgGA::GUIActionAdapter &aa)
-{
-    if (ea.getButtonMask() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON)
-    {
-        float k1 = osg::PIf;
-        float k2 = osg::PI_2f;
-
-        float pos_X = ea.getXnormalized();
-        float pos_Y = ea.getYnormalized();
-
-        angle_H = k1 * pos_X;
-        angle_V = k2 * pos_Y;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void FreeManipulator::pushMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                       osgGA::GUIActionAdapter &aa)
-{
-    if (ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON)
-    {
-        float k1 = osg::PIf;
-        float k2 = osg::PI_2f;
-
-        float pos_X = ea.getXnormalized();
-        float pos_Y = ea.getYnormalized();
-
-        angle_H = k1 * pos_X;
-        angle_V = k2 * pos_Y;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void FreeManipulator::releaseMouseProcess(const osgGA::GUIEventAdapter &ea,
-                                          osgGA::GUIActionAdapter &aa)
-{
-    fixed = false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void FreeManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea,
-                                    osgGA::GUIActionAdapter &aa)
 {
     double fovy = 0;
     double aspectRatio = 0;
@@ -195,7 +156,7 @@ void FreeManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea,
     osgGA::GUIEventAdapter::ScrollingMotion sm = ea.getScrollingMotion();
 
     double step = 1.0;
-    float speed = 2.0f;
+    float speed = 5.0f;
 
     switch (sm)
     {
@@ -229,23 +190,15 @@ void FreeManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea,
     }
 
     camera->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreeManipulator::update(osg::Camera *camera)
+FreeManipulator::~FreeManipulator()
 {
-    osg::Vec3 eye;
-    osg::Vec3 center;
-    osg::Vec3 up;
 
-    camera->getViewMatrixAsLookAt(eye, center, up);
-
-    osg::Vec3 dir = center - eye;
-    dir.z() = 0.0;
-    dir.normalize();
-
-    forward = dir;
-    traverse = dir ^ osg::Z_AXIS;
 }
+

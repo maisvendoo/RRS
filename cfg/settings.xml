@@ -20,7 +20,7 @@
 		<Samples>16</Samples>
 		<RequestInterval>100</RequestInterval>
 		<ReconnectInterval>1000</ReconnectInterval>
-		<MotionBlur>0.05</MotionBlur>
+		<MotionBlur>0.0</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>
 		<ViewDistance>2000.0</ViewDistance>
 	</Viewer>                
