@@ -38,10 +38,10 @@
 #include    "screen-capture.h"
 #include    "hud.h"
 #include    "rails-manipulator.h"
+#include    "free-manipulator.h"
+#include    "camera-switcher.h"
 
 #include    <QObject>
-
-#include    <osgGA/KeySwitchMatrixManipulator>
 
 //------------------------------------------------------------------------------
 //
@@ -80,26 +80,27 @@ int RouteViewer::run()
     keyboard = new KeyboardHandler();
     viewer.addEventHandler(keyboard);
 
-    // Camera switch handler
-    //viewer.addEventHandler(new CameraViewHandler());
-
-    //client.init(settings, &viewer);
-
     QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
     //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
+    // Cabine camera manipulator
     osg::ref_ptr<RailsManipulator> rm = new RailsManipulator(settings);
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
                      rm, &RailsManipulator::getCameraPosition);
 
-    osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> km = new osgGA::KeySwitchMatrixManipulator;
+    // Free camera minipulator
+    osg::ref_ptr<FreeManipulator> fm = new FreeManipulator(settings);
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
+                     fm, &RailsManipulator::getCameraPosition);
 
-    km->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F2, "cabine_view", rm.get());
+    osg::ref_ptr<CameraSwitcher> cs = new CameraSwitcher;
+    cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F2, "cabine_view", rm.get());
+    cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F4, "free_view", fm.get());
 
-    viewer.setCameraManipulator(km.get());
+    viewer.setCameraManipulator(cs.get());
 
     return viewer.run();
 }

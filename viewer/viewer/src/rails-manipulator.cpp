@@ -88,16 +88,7 @@ void RailsManipulator::keysDownProcess(const osgGA::GUIEventAdapter &ea, osgGA::
 
         rel_dp.y() -= speed * delta_time;
         break;
-    }
-
-    if (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_CTRL)
-    {
-        move_height = true;
-    }
-    else
-    {
-        move_height = false;
-    }
+    }    
 }
 
 //------------------------------------------------------------------------------

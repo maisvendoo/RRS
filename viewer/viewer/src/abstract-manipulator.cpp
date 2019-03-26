@@ -32,6 +32,8 @@ bool AbstractManipulator::handle(const osgGA::GUIEventAdapter &ea,
             delta_time = static_cast<float>(time - start_time);
             start_time = time;
 
+            update(viewer->getCamera());
+
             break;
         }
 
@@ -141,6 +143,14 @@ void AbstractManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea,
                                         osgGA::GUIActionAdapter &aa)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::update(osg::Camera *camera)
+{
+    Q_UNUSED(camera)
 }
 
 void AbstractManipulator::getCameraPosition(camera_position_t cp)

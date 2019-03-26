@@ -51,6 +51,8 @@ protected:
     virtual void scrollProcess(const osgGA::GUIEventAdapter &ea,
                                osgGA::GUIActionAdapter &aa);
 
+    virtual void update(osg::Camera *camera);
+
 public slots:
 
     void getCameraPosition(camera_position_t cp);
