@@ -88,8 +88,6 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
 
     ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0));
 
-    model->setDataVariance(osg::Object::DYNAMIC);
-
     return model.release();
 }
 

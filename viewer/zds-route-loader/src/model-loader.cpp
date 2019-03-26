@@ -101,7 +101,7 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
     osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
                                                                 osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
 
-    osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.4f);
+    osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
 
     if (ext == "tga")
     {
