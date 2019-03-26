@@ -42,15 +42,20 @@ private:
 
     bool  move_height;
 
-    void keysDownProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    void keysDownProcess(const osgGA::GUIEventAdapter &ea,
+                         osgGA::GUIActionAdapter &aa);
 
-    void dragMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    void dragMouseProcess(const osgGA::GUIEventAdapter &ea,
+                          osgGA::GUIActionAdapter &aa);
 
-    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                  osgGA::GUIActionAdapter &aa);
 
-    virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                     osgGA::GUIActionAdapter &aa);
 
-    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea,
+                               osgGA::GUIActionAdapter &aa);
 
 };
 

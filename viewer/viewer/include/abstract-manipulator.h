@@ -30,19 +30,26 @@ protected:
 
     virtual ~AbstractManipulator();
 
-    virtual void keysDownProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void keysDownProcess(const osgGA::GUIEventAdapter &ea,
+                                 osgGA::GUIActionAdapter &aa);
 
-    virtual void keysUpProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void keysUpProcess(const osgGA::GUIEventAdapter &ea,
+                               osgGA::GUIActionAdapter &aa);
 
-    virtual void dragMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void dragMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                  osgGA::GUIActionAdapter &aa);
 
-    virtual void moveMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void moveMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                  osgGA::GUIActionAdapter &aa);
 
-    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void pushMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                  osgGA::GUIActionAdapter &aa);
 
-    virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void releaseMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                     osgGA::GUIActionAdapter &aa);
 
-    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    virtual void scrollProcess(const osgGA::GUIEventAdapter &ea,
+                               osgGA::GUIActionAdapter &aa);
 
 public slots:
 

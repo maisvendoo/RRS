@@ -1,6 +1,9 @@
 #include    "abstract-manipulator.h"
 #include    <osgViewer/Viewer>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AbstractManipulator::AbstractManipulator(QObject *parent)
     : QObject (parent)
     , osgGA::TrackballManipulator ()
@@ -10,6 +13,9 @@ AbstractManipulator::AbstractManipulator(QObject *parent)
     qRegisterMetaType<camera_position_t>();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool AbstractManipulator::handle(const osgGA::GUIEventAdapter &ea,
                                  osgGA::GUIActionAdapter &aa)
 {
@@ -57,47 +63,82 @@ bool AbstractManipulator::handle(const osgGA::GUIEventAdapter &ea,
         scrollProcess(ea, aa);
 
         break;
+
+    default:
+
+        break;
     }
 
     return false;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AbstractManipulator::~AbstractManipulator()
 {
 
 }
 
-void AbstractManipulator::keysDownProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::keysDownProcess(const osgGA::GUIEventAdapter &ea,
+                                          osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
 }
 
-void AbstractManipulator::keysUpProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::keysUpProcess(const osgGA::GUIEventAdapter &ea,
+                                        osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
 }
 
-void AbstractManipulator::dragMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::dragMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                           osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
 }
 
-void AbstractManipulator::moveMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::moveMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                           osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
 }
 
-void AbstractManipulator::pushMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::pushMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                           osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
 }
 
-void AbstractManipulator::releaseMouseProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::releaseMouseProcess(const osgGA::GUIEventAdapter &ea,
+                                              osgGA::GUIActionAdapter &aa)
 {
     Q_UNUSED(ea)
 }
 
-void AbstractManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractManipulator::scrollProcess(const osgGA::GUIEventAdapter &ea,
+                                        osgGA::GUIActionAdapter &aa)
 {
 
 }
