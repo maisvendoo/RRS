@@ -40,6 +40,11 @@ public:
     /// Get cartesian position and camera's attitude
     osg::Vec3 getPosition(float railway_coord, osg::Vec3 &attitude);
 
+    /// Get cartesian position and local basis
+    virtual osg::Vec3 getPosition(float railway_coord, basis_t &basis);
+
+    /// Get cartesian position, camera's attitude and local basis
+    virtual osg::Vec3 getPosition(float railway_coord, osg::Vec3 &attitude, basis_t &basis);
 
 protected:
 

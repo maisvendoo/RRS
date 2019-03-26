@@ -44,6 +44,24 @@ osg::Vec3 RoutePath::getPosition(float railway_coord)
 //------------------------------------------------------------------------------
 osg::Vec3 RoutePath::getPosition(float railway_coord, osg::Vec3 &attitude)
 {
+    basis_t basis;
+    return getPosition(railway_coord, attitude, basis);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Vec3 RoutePath::getPosition(float railway_coord, basis_t &basis)
+{
+    osg::Vec3 attitude;
+    return getPosition(railway_coord, attitude, basis);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osg::Vec3 RoutePath::getPosition(float railway_coord, osg::Vec3 &attitude, basis_t &basis)
+{
     track_t next_track;
     track_t track = findTrack(railway_coord, next_track);
 
@@ -54,6 +72,9 @@ osg::Vec3 RoutePath::getPosition(float railway_coord, osg::Vec3 &attitude)
     float t = motion / track.length;
     attitude = track.attitude * (1.0f - t);
     attitude += next_track.attitude * t;
+
+    basis.front = track.orth;
+    basis.right = track.right;
 
     return pos;
 }

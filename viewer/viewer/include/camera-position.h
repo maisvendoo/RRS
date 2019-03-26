@@ -5,6 +5,8 @@
 
 #include    <osg/Vec3>
 
+#include    "basis.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -13,6 +15,8 @@ struct camera_position_t
     osg::Vec3   position;
     osg::Vec3   attitude;
     osg::Vec3   driver_pos;
+    osg::Vec3   viewer_pos;
+    basis_t     view_basis;
 
     camera_position_t()
         : position(osg::Vec3())

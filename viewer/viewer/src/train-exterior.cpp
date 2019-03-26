@@ -390,6 +390,9 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 
     cp.attitude.x() = -osg::PIf / 2.0f - cp.attitude.x();
 
+    float viewer_coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord + 200.0f;
+    cp.viewer_pos = routePath->getPosition(viewer_coord, cp.view_basis);
+
     emit sendCameraPosition(cp);
 }
 
