@@ -12,7 +12,7 @@ FreeManipulator::FreeManipulator(settings_t settings, QObject *parent)
     : AbstractManipulator(parent)
     , settings(settings)
     , init_pos(camera_position_t())
-    , rel_pos(osg::Vec3(2.5, 0.0, -1.5))
+    , rel_pos(osg::Vec3(2.5, 0.0, -2.0))
     , angle_H(0.0f)
     , angle_V(0.0f)
     , pos_X0(0.0f)
@@ -213,7 +213,7 @@ bool FreeManipulator::handleMousePush(const osgGA::GUIEventAdapter &ea,
                                                  settings.zNear,
                                                  settings.zFar);
 
-        rel_pos = osg::Vec3(osg::Vec3(2.5, 0.0, -1.5));
+        rel_pos = osg::Vec3(osg::Vec3(2.5, 0.0, -2.0));
         angle_H = angle_V = 0;
     }
 
