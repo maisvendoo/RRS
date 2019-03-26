@@ -17,6 +17,10 @@ public:
 
     virtual osg::Matrixd getInverseMatrix() const;
 
+    bool performMovementRightMouseButton(const double eventTimeDelta,
+                                         const double dx,
+                                         const double dy);
+
 protected:
 
     virtual ~TrainManipulator();
@@ -24,6 +28,10 @@ protected:
 private:
 
     settings_t      settings;
+
+    osg::Vec3       rel_pos;
+    double          angle_H;
+    double          angle_V;
 };
 
 #endif // TRAIN_MANIPULATOR_H

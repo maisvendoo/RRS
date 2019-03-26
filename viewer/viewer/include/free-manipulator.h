@@ -27,6 +27,10 @@ public:
 
     bool handleMouseWheel(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 
+    bool handleMousePush(const osgGA::GUIEventAdapter &ea,
+                         osgGA::GUIActionAdapter &aa);
+
+
 protected:
 
     virtual ~FreeManipulator();

@@ -12,7 +12,7 @@ FreeManipulator::FreeManipulator(settings_t settings, QObject *parent)
     : AbstractManipulator(parent)
     , settings(settings)
     , init_pos(camera_position_t())
-    , rel_pos(osg::Vec3(2.5, 0.0, -1.0))
+    , rel_pos(osg::Vec3(2.5, 0.0, -1.5))
     , angle_H(0.0f)
     , angle_V(0.0f)
     , pos_X0(0.0f)
@@ -190,6 +190,32 @@ bool FreeManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
     }
 
     camera->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool FreeManipulator::handleMousePush(const osgGA::GUIEventAdapter &ea,
+                                       osgGA::GUIActionAdapter &aa)
+{
+    if (ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON)
+    {
+        osgViewer::Viewer *viewer = static_cast<osgViewer::Viewer *>(&aa);
+        osg::Camera *camera = viewer->getCamera();
+        const osg::GraphicsContext::Traits *tr = camera->getGraphicsContext()->getTraits();
+
+        double aspectRatio = static_cast<double>(tr->width) / static_cast<double>(tr->height);
+
+        camera->setProjectionMatrixAsPerspective(settings.fovy,
+                                                 aspectRatio,
+                                                 settings.zNear,
+                                                 settings.zFar);
+
+        rel_pos = osg::Vec3(osg::Vec3(2.5, 0.0, -1.5));
+        angle_H = angle_V = 0;
+    }
 
     return false;
 }

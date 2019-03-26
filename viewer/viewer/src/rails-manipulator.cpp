@@ -166,3 +166,29 @@ bool RailsManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
 
     return false;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool RailsManipulator::handleMousePush(const osgGA::GUIEventAdapter &ea,
+                                       osgGA::GUIActionAdapter &aa)
+{
+    if (ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON)
+    {
+        osgViewer::Viewer *viewer = static_cast<osgViewer::Viewer *>(&aa);
+        osg::Camera *camera = viewer->getCamera();
+        const osg::GraphicsContext::Traits *tr = camera->getGraphicsContext()->getTraits();
+
+        double aspectRatio = static_cast<double>(tr->width) / static_cast<double>(tr->height);
+
+        camera->setProjectionMatrixAsPerspective(settings.fovy,
+                                                 aspectRatio,
+                                                 settings.zNear,
+                                                 settings.zFar);
+
+        rel_pos = osg::Vec3();
+        angle_H = angle_V = 0;
+    }
+
+    return false;
+}
