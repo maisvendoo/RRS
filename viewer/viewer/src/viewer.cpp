@@ -38,6 +38,7 @@
 #include    "hud.h"
 #include    "rails-manipulator.h"
 #include    "free-manipulator.h"
+#include    "stat-manipulator.h"
 #include    "camera-switcher.h"
 
 #include    <QObject>
@@ -90,14 +91,20 @@ int RouteViewer::run()
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
                      rm, &RailsManipulator::getCameraPosition);
 
-    // Free camera minipulator
+    // Free camera manipulator
     osg::ref_ptr<FreeManipulator> fm = new FreeManipulator(settings);
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
-                     fm, &RailsManipulator::getCameraPosition);
+                     fm, &FreeManipulator::getCameraPosition);
+
+    // Static camera manipulator
+    osg::ref_ptr<StaticManipulator> sm = new StaticManipulator(settings);
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
+                     sm, &StaticManipulator::getCameraPosition);
 
     osg::ref_ptr<CameraSwitcher> cs = new CameraSwitcher;
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F2, "cabine_view", rm.get());
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F4, "free_view", fm.get());
+    cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F5, "static_view", sm.get());
 
     viewer.setCameraManipulator(cs.get());
 
