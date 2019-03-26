@@ -27,8 +27,8 @@
 #include    <osgViewer/Viewer>
 
 #include    "vehicle-exterior.h"
-
 #include    "animation-manager.h"
+#include    "camera-position.h"
 
 /*!
  * \class
@@ -58,6 +58,8 @@ public:
 signals:
 
     void setStatusBar(QString msg);
+
+    void sendCameraPosition(camera_position_t cp);
 
 private:
 

@@ -37,8 +37,11 @@
 #include    "switch-view.h"
 #include    "screen-capture.h"
 #include    "hud.h"
+#include    "rails-manipulator.h"
 
 #include    <QObject>
+
+#include    <osgGA/KeySwitchMatrixManipulator>
 
 //------------------------------------------------------------------------------
 //
@@ -78,7 +81,7 @@ int RouteViewer::run()
     viewer.addEventHandler(keyboard);
 
     // Camera switch handler
-    viewer.addEventHandler(new CameraViewHandler());
+    //viewer.addEventHandler(new CameraViewHandler());
 
     //client.init(settings, &viewer);
 
@@ -87,6 +90,16 @@ int RouteViewer::run()
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
     //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
+
+    osg::ref_ptr<RailsManipulator> rm = new RailsManipulator(settings);
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
+                     rm, &RailsManipulator::getCameraPosition);
+
+    osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> km = new osgGA::KeySwitchMatrixManipulator;
+
+    km->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F2, "cabine_view", rm.get());
+
+    viewer.setCameraManipulator(km.get());
 
     return viewer.run();
 }
@@ -365,6 +378,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     camera->setClearColor(osg::Vec4(0.63f, 0.80f, 0.97f, 1.0f));
     camera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    camera-> setComputeNearFarMode (osg :: CullSettings :: DO_NOT_COMPUTE_NEAR_FAR);
     double aspect = static_cast<double>(traits->width) / static_cast<double>(traits->height);
     camera->setProjectionMatrixAsPerspective(settings.fovy, aspect, settings.zNear, settings.zFar);
 
