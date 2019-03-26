@@ -34,7 +34,6 @@
 #include    "lighting.h"
 #include    "motion-blur.h"
 #include    "qt-events.h"
-#include    "switch-view.h"
 #include    "screen-capture.h"
 #include    "hud.h"
 #include    "rails-manipulator.h"
