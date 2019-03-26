@@ -62,6 +62,53 @@ bool TrainManipulator::performMovementRightMouseButton(const double eventTimeDel
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool TrainManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
+                                        osgGA::GUIActionAdapter &aa)
+{
+    osgGA::GUIEventAdapter::ScrollingMotion sm = ea.getScrollingMotion();
+
+    float speed = 5.0f;
+
+    switch (sm)
+    {
+    case osgGA::GUIEventAdapter::SCROLL_UP:
+
+        if (  (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_CTRL) ||
+              (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_CTRL))
+        {
+            rel_pos.y() -= speed * delta_time;
+        }
+        else
+        {
+            rel_pos.z() += speed * delta_time;
+        }
+
+        break;
+
+    case osgGA::GUIEventAdapter::SCROLL_DOWN:
+
+        if (  (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_CTRL) ||
+              (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_CTRL))
+        {
+            rel_pos.y() += speed * delta_time;
+        }
+        else
+        {
+            rel_pos.z() -= speed * delta_time;
+        }
+
+        break;
+    }
+
+    if (rel_pos.z() <= 5.0f)
+        rel_pos.z() = 5.0f;
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 TrainManipulator::~TrainManipulator()
 {
 

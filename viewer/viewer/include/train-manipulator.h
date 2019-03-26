@@ -21,6 +21,9 @@ public:
                                          const double dx,
                                          const double dy);
 
+    bool handleMouseWheel(const osgGA::GUIEventAdapter &ea,
+                          osgGA::GUIActionAdapter &aa);
+
 protected:
 
     virtual ~TrainManipulator();
