@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Viewer>
-		<posX>50</posX>
-		<posY>50</posY>
-		<Width>1280</Width>
-		<Height>720</Height>
+		<posX>0</posX>
+		<posY>0</posY>
+		<Width>1920</Width>
+		<Height>1080</Height>
 		<FullScreen>0</FullScreen>
 		<VSync>0</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
@@ -15,7 +15,7 @@
 		<zFar>10000.0</zFar>
 		<ScreenNumber>1</ScreenNumber>
 		<Name>viewer</Name>
-		<WindowDecoration>1</WindowDecoration>
+		<WindowDecoration>0</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
 		<Samples>16</Samples>
 		<RequestInterval>100</RequestInterval>
