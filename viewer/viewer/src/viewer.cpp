@@ -314,7 +314,7 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
 
     MotionPath *motionPath = loader->getMotionPath(settings.direction);
 
-    train_ext_handler = new TrainExteriorHandler(motionPath, settings.train_config);
+    train_ext_handler = new TrainExteriorHandler(settings, motionPath, settings.train_config);
     viewer.addEventHandler(train_ext_handler);
     viewer.addEventHandler(train_ext_handler->getAnimationManager());
 

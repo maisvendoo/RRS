@@ -110,6 +110,10 @@ bool TrainManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
         }
 
         break;
+
+    default:
+
+        break;
     }
 
     if (rel_pos.z() <= settings.ext_cam_min_dist)
