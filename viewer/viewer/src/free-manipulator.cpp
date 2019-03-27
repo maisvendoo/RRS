@@ -97,7 +97,7 @@ bool FreeManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
     Q_UNUSED(aa)
 
     osg::Vec3 eye, center, up;
-    camera->getViewMatrixAsLookAt(eye, center, up);
+    camera->getViewMatrixAsLookAt(eye, center, up, 100.0);
 
     osg::Vec3 front = center - eye;
     front.z() = 0;

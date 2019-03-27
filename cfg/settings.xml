@@ -49,10 +49,10 @@
                 <ExtCamSpeedCoeff>10.0</ExtCamSpeedCoeff>
                 <!-- Мнимальное расстояние, на которое подлетает камера к ПЕ -->
                 <ExtCamMinDist>5.0</ExtCamMinDist>
-                <!-- Начальный угол наклона к горизонту -->
-                <ExtCamInitAngleH>30.0</ExtCamInitAngleH>
-                <!-- Начальный поворот вокруг вертикальной оси -->
-                <ExtCamInitAngleV>45.0</ExtCamInitAngleV>
+                <!-- Начальный угол поворота в горизонтальной плоскости -->
+                <ExtCamInitAngleH>45.0</ExtCamInitAngleH>
+                <!-- Начальный угол поворота в вертикальной плоскости -->
+                <ExtCamInitAngleV>5.0</ExtCamInitAngleV>
 
                 <!-- Внешняя свободная камера (F4) -->
 

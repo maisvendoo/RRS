@@ -98,9 +98,14 @@ int RouteViewer::run()
                      fm, &FreeManipulator::getCameraPosition);
 
     // Static camera manipulator
-    osg::ref_ptr<StaticManipulator> sm = new StaticManipulator(settings);
+    osg::ref_ptr<StaticManipulator> sm_right = new StaticManipulator(settings, true);
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
-                     sm, &StaticManipulator::getCameraPosition);
+                     sm_right, &StaticManipulator::getCameraPosition);
+
+    // Static camera manipulator
+    osg::ref_ptr<StaticManipulator> sm_left = new StaticManipulator(settings, false);
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
+                     sm_left, &StaticManipulator::getCameraPosition);
 
     // Static camera manipulator
     osg::ref_ptr<TrainManipulator> tm = new TrainManipulator(settings);
@@ -111,7 +116,8 @@ int RouteViewer::run()
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F2, "cabine_view", rm.get());
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F3, "train_view", tm.get());
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F4, "free_view", fm.get());
-    cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F5, "static_view", sm.get());
+    cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F5, "static_view", sm_right.get());
+    cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F6, "static_view", sm_left.get());
 
     viewer.setCameraManipulator(cs.get());
 
@@ -226,6 +232,37 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "MotionBlur", settings.persistence);
         cfg.getValue(secName, "NotifyLevel", settings.notify_level);
         cfg.getValue(secName, "ViewDistance", settings.view_distance);
+
+        cfg.getValue(secName, "CabineCamRotCoeff", settings.cabine_cam_rot_coeff);
+        cfg.getValue(secName, "CabineCamFovYStep", settings.cabine_cam_fovy_step);
+        cfg.getValue(secName, "CabineCamSpeed", settings.cabine_cam_speed);
+
+        cfg.getValue(secName, "ExtCamInitDist", settings.ext_cam_init_dist);
+        cfg.getValue(secName, "ExtCamInitHeight", settings.ext_cam_init_height);
+        cfg.getValue(secName, "ExtCamInitShift", settings.ext_cam_init_shift);
+        cfg.getValue(secName, "ExtCamRotCoeff", settings.ext_cam_rot_coeff);
+        cfg.getValue(secName, "ExtCamSpeed", settings.ext_cam_speed);
+        cfg.getValue(secName, "ExtCamSpeedCoeff", settings.ext_cam_speed_coeff);
+        cfg.getValue(secName, "ExtCamMinDist", settings.ext_cam_min_dist);
+        cfg.getValue(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
+        cfg.getValue(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
+
+        std::string tmp = "";
+        cfg.getValue(secName, "FreeCamInitPos", tmp);
+        std::istringstream ss(tmp);
+
+        ss >> settings.free_cam_init_pos.x()
+           >> settings.free_cam_init_pos.y()
+           >> settings.free_cam_init_pos.z();
+
+        cfg.getValue(secName, "FreeCamRotCoeff", settings.free_cam_rot_coeff);
+        cfg.getValue(secName, "FreeCamSpeed", settings.free_cam_speed);
+        cfg.getValue(secName, "FreeCamSpeedCoeff", settings.free_cam_speed_coeff);
+        cfg.getValue(secName, "FreeCamFovY", settings.free_cam_fovy_step);
+
+        cfg.getValue(secName, "StatCamDist", settings.stat_cam_dist);
+        cfg.getValue(secName, "StatCamHeight", settings.stat_cam_height);
+        cfg.getValue(secName, "StatCamShift", settings.stat_cam_shift);
     }
 
     return settings;

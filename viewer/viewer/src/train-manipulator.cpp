@@ -9,8 +9,8 @@ TrainManipulator::TrainManipulator(settings_t settings, QObject *parent)
     , rel_pos(osg::Vec3f(settings.ext_cam_init_shift,
                          settings.ext_cam_init_height,
                          settings.ext_cam_init_dist))
-    , angle_H(static_cast<double>(settings.ext_cam_init_angle_H))
-    , angle_V(static_cast<double>(settings.ext_cam_init_angle_V))
+    , angle_H(static_cast<double>(osg::DegreesToRadians(settings.ext_cam_init_angle_H)))
+    , angle_V(static_cast<double>(osg::DegreesToRadians(settings.ext_cam_init_angle_V)))
 {
 
 }
@@ -120,6 +120,28 @@ bool TrainManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
         rel_pos.z() = settings.ext_cam_min_dist;
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool TrainManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
+                                     osgGA::GUIActionAdapter &aa)
+{
+    Q_UNUSED(aa)
+
+    switch (ea.getKey())
+    {
+    case osgGA::GUIEventAdapter::KEY_Left:
+
+        rel_pos.x() -= settings.ext_cam_speed * delta_time;
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Right:
+
+        rel_pos.x() += settings.ext_cam_speed * delta_time;
+        break;
+    }
 }
 
 //------------------------------------------------------------------------------

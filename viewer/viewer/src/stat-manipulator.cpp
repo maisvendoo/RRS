@@ -3,10 +3,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-StaticManipulator::StaticManipulator(settings_t settings, QObject *parent)
+StaticManipulator::StaticManipulator(settings_t settings, bool is_right, QObject *parent)
     : AbstractManipulator(parent)
     , settings(settings)
     , init_pos(camera_position_t())
+    , is_right(is_right)
 {
 
 }
@@ -40,7 +41,11 @@ osg::Matrixd StaticManipulator::getInverseMatrix() const
 {
     float dist = settings.stat_cam_dist;
 
-    osg::Vec3 shift = init_pos.view_basis.right * dist;
+    int dir = 1;
+
+    is_right ? dir = 1 : dir = -1;
+
+    osg::Vec3 shift = init_pos.view_basis.right * dist * dir;
     shift += osg::Vec3(0.0, 0.0, settings.stat_cam_height);
 
     osg::Matrix invMatrix = osg::Matrix::lookAt(init_pos.viewer_pos + shift, cp.position, osg::Z_AXIS);
