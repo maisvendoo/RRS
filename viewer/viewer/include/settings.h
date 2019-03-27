@@ -17,6 +17,8 @@
 
 #include    <string>
 
+#include    <osg/Vec3>
+
 /*!
  * \struct
  * \brief Main viewer settings
@@ -79,6 +81,50 @@ struct settings_t
     /// View distance
     float           view_distance;
 
+    /// Initial distance of extrnal camera
+    float           ext_cam_init_dist;
+    /// Initial height of extarnel camera
+    float           ext_cam_init_height;
+    /// Inital shift of external camera
+    float           ext_cam_init_shift;
+    /// External camera rotation coefficient
+    float           ext_cam_rot_coeff;
+    /// External camera motion speed
+    float           ext_cam_speed;
+    /// External camera speed coeff
+    float           ext_cam_speed_coeff;
+    /// External camera minimal distance
+    float           ext_cam_min_dist;
+    /// External camera initial horizontal angle
+    float           ext_cam_init_angle_H;
+    /// External camera initial vertical angle
+    float           ext_cam_init_angle_V;
+
+    /// Free camera initial position
+    osg::Vec3       free_cam_init_pos;
+    /// Free camera rotation coeff
+    float           free_cam_rot_coeff;
+    /// Free camera speed
+    float           free_cam_speed;
+    /// Free camera speed coeff
+    float           free_cam_speed_coeff;
+    /// Free camera FovY step
+    float           free_cam_fovy_step;
+
+    /// Cabine camera rotation coeff
+    float           cabine_cam_rot_coeff;
+    /// Cabine camera FovY step
+    float           cabine_cam_fovy_step;
+    /// Cabine camera speed
+    float           cabine_cam_speed;
+
+    /// Static camera shift
+    float           stat_cam_dist;
+    /// Static camera height
+    float           stat_cam_height;
+    /// Static camera shift
+    float           stat_cam_shift;
+
     settings_t()
         : route_dir("")
         , train_config("")
@@ -106,6 +152,27 @@ struct settings_t
         , direction(1)
         , notify_level("INFO")
         , view_distance(1000.0f)
+        , ext_cam_init_dist(25.0f)
+        , ext_cam_init_height(3.0f)
+        , ext_cam_init_shift(0.0f)
+        , ext_cam_rot_coeff(1.0f)
+        , ext_cam_speed(5.0f)
+        , ext_cam_speed_coeff(10.0f)
+        , ext_cam_min_dist(5.0f)
+        , ext_cam_init_angle_H(0.0f)
+        , ext_cam_init_angle_V(0.0f)
+        , free_cam_init_pos(osg::Vec3(2.5, 0.0, 1.75))
+        , free_cam_rot_coeff(1.0f)
+        , free_cam_speed(5.0f)
+        , free_cam_speed_coeff(10.0f)
+        , free_cam_fovy_step(1.0f)
+        , cabine_cam_rot_coeff(1.0f)
+        , cabine_cam_fovy_step(1.0f)
+        , cabine_cam_speed(2.0)
+        , stat_cam_dist(10.0f)
+        , stat_cam_height(1.75)
+        , stat_cam_shift(200.0f)
+
     {
 
     }

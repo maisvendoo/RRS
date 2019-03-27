@@ -9,13 +9,9 @@
 RailsManipulator::RailsManipulator(settings_t settings, QObject *parent)
     :   AbstractManipulator (parent)
     ,   settings(settings)
-    ,   pos_X0(0.0)
-    ,   pos_Y0(0.0)
     ,   angle_H(0.0)
     ,   angle_V(0.0)
-    ,   fixed(false)
     ,   rel_pos(osg::Vec3())
-    ,   move_height(false)
 {
 
 }
@@ -66,7 +62,9 @@ bool RailsManipulator::performMovementRightMouseButton(const double eventTimeDel
                                                        const double dx,
                                                        const double dy)
 {
-    double k1 = 1.0;
+    Q_UNUSED(eventTimeDelta)
+
+    double k1 = static_cast<double>(settings.cabine_cam_rot_coeff);
 
     angle_H += static_cast<float>(k1 * dx);
     angle_V += static_cast<float>(k1 * dy);
@@ -90,8 +88,8 @@ bool RailsManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
 
     osgGA::GUIEventAdapter::ScrollingMotion sm = ea.getScrollingMotion();
 
-    double step = 1.0;
-    float speed = 2.0f;
+    double step = static_cast<double>(settings.cabine_cam_fovy_step);
+    float speed = settings.cabine_cam_speed;
 
     switch (sm)
     {
@@ -122,6 +120,10 @@ bool RailsManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
         }
 
         break;
+
+    default:
+
+        break;
     }
 
     viewer->getCamera()->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
@@ -135,7 +137,9 @@ bool RailsManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
 bool RailsManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
                                     osgGA::GUIActionAdapter &aa)
 {
-    float V = 2.0f;
+    Q_UNUSED(aa)
+
+    float V = settings.cabine_cam_speed;
 
     switch (ea.getKey())
     {

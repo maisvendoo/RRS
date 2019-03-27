@@ -12,7 +12,7 @@ FreeManipulator::FreeManipulator(settings_t settings, QObject *parent)
     : AbstractManipulator(parent)
     , settings(settings)
     , init_pos(camera_position_t())
-    , rel_pos(osg::Vec3(2.5, 0.0, -2.0))
+    , rel_pos(settings.free_cam_init_pos)
     , angle_H(0.0f)
     , angle_V(0.0f)
     , pos_X0(0.0f)
@@ -30,9 +30,9 @@ FreeManipulator::FreeManipulator(settings_t settings, QObject *parent)
 //------------------------------------------------------------------------------
 osg::Matrixd FreeManipulator::getMatrix() const
 {
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(init_pos.driver_pos.x() + rel_pos.x(),
-                                                           init_pos.driver_pos.z() + rel_pos.z(),
-                                                           -init_pos.driver_pos.y() - rel_pos.y()));
+    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f( rel_pos.x(),
+                                                            rel_pos.z(),
+                                                           -rel_pos.y()));
     float a_x = -init_pos.attitude.x();
     float a_z = -init_pos.attitude.z();
 
@@ -78,7 +78,9 @@ bool FreeManipulator::performMovementRightMouseButton(const double eventTimeDelt
                                                       const double dx,
                                                       const double dy)
 {
-    double k1 = 1.0;
+    Q_UNUSED(eventTimeDelta)
+
+    double k1 = static_cast<double>(settings.free_cam_rot_coeff);
 
     angle_H += static_cast<float>(k1 * dx);
     angle_V += static_cast<float>(k1 * dy);
@@ -92,6 +94,8 @@ bool FreeManipulator::performMovementRightMouseButton(const double eventTimeDelt
 bool FreeManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
                                     osgGA::GUIActionAdapter &aa)
 {
+    Q_UNUSED(aa)
+
     osg::Vec3 eye, center, up;
     camera->getViewMatrixAsLookAt(eye, center, up);
 
@@ -102,12 +106,12 @@ bool FreeManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
     osg::Vec3 traverse = front ^ up;
     traverse.normalize();
 
-    float V = 5.0f;
+    float V = settings.free_cam_speed;
 
     if ( (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_SHIFT) ||
          (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
     {
-        V = 10.0f * V;
+        V = settings.free_cam_speed_coeff * V;
     }
 
     switch (ea.getKey())
@@ -146,6 +150,8 @@ bool FreeManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
 bool FreeManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
                                        osgGA::GUIActionAdapter &aa)
 {
+    Q_UNUSED(aa)
+
     double fovy = 0;
     double aspectRatio = 0;
     double zNear = 0;
@@ -155,8 +161,8 @@ bool FreeManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
 
     osgGA::GUIEventAdapter::ScrollingMotion sm = ea.getScrollingMotion();
 
-    double step = 1.0;
-    float speed = 5.0f;
+    double step = static_cast<double>(settings.free_cam_fovy_step);
+    float speed = settings.free_cam_speed;
 
     switch (sm)
     {
@@ -187,6 +193,10 @@ bool FreeManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
         }
 
         break;
+
+    default:
+
+        break;
     }
 
     camera->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
@@ -213,7 +223,7 @@ bool FreeManipulator::handleMousePush(const osgGA::GUIEventAdapter &ea,
                                                  settings.zNear,
                                                  settings.zFar);
 
-        rel_pos = osg::Vec3(osg::Vec3(2.5, 0.0, -2.0));
+        rel_pos = osg::Vec3(settings.free_cam_init_pos);
         angle_H = angle_V = 0;
     }
 
