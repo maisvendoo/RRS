@@ -44,16 +44,10 @@ private:
 
     settings_t  settings;
 
-    float   pos_X0;
-    float   pos_Y0;
+    float       angle_H;
+    float       angle_V;
 
-    float   angle_H;
-    float   angle_V;
-    bool    fixed;
-
-    osg::Vec3 rel_pos;
-
-    bool  move_height;
+    osg::Vec3   rel_pos;
 };
 
 #endif // RAILS_MANIPULATOR_H

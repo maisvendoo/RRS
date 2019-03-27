@@ -31,10 +31,12 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TrainExteriorHandler::TrainExteriorHandler(MotionPath *routePath,
+TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
+                                           MotionPath *routePath,
                                            const std::string &train_config)
     : QObject(Q_NULLPTR)
     , osgGA::GUIEventHandler ()
+    , settings(settings)
     , cur_vehicle(0)
     , long_shift(0.0f)
     , height_shift(0.0f)
@@ -383,6 +385,8 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 {
+    Q_UNUSED(viewer)
+
     camera_position_t cp;
     cp.position = vehicles_ext[static_cast<size_t>(cur_vehicle)].position;
     cp.attitude = vehicles_ext[static_cast<size_t>(cur_vehicle)].attitude;
@@ -390,7 +394,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 
     cp.attitude.x() = -osg::PIf / 2.0f - cp.attitude.x();
 
-    float viewer_coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord + 200.0f;
+    float viewer_coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord + settings.stat_cam_shift;
     cp.viewer_pos = routePath->getPosition(viewer_coord, cp.view_basis);
 
     emit sendCameraPosition(cp);

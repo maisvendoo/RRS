@@ -24,6 +24,9 @@ public:
     bool handleMouseWheel(const osgGA::GUIEventAdapter &ea,
                           osgGA::GUIActionAdapter &aa);
 
+    bool handleKeyDown(const osgGA::GUIEventAdapter &ea,
+                       osgGA::GUIActionAdapter &aa);
+
 protected:
 
     virtual ~TrainManipulator();

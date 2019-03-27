@@ -6,9 +6,11 @@
 TrainManipulator::TrainManipulator(settings_t settings, QObject *parent)
     : AbstractManipulator(parent)
     , settings(settings)
-    , rel_pos(osg::Vec3d(0.0, 3.0, 25.0))
-    , angle_H(0.0)
-    , angle_V(0.0)
+    , rel_pos(osg::Vec3f(settings.ext_cam_init_shift,
+                         settings.ext_cam_init_height,
+                         settings.ext_cam_init_dist))
+    , angle_H(static_cast<double>(osg::DegreesToRadians(settings.ext_cam_init_angle_H)))
+    , angle_V(static_cast<double>(osg::DegreesToRadians(settings.ext_cam_init_angle_V)))
 {
 
 }
@@ -51,7 +53,9 @@ bool TrainManipulator::performMovementRightMouseButton(const double eventTimeDel
                                                        const double dx,
                                                        const double dy)
 {
-    double k1 = 1.0;
+    Q_UNUSED(eventTimeDelta)
+
+    double k1 = static_cast<double>(settings.ext_cam_rot_coeff);
 
     angle_H += k1 * dx;
     angle_V += k1 * dy;
@@ -65,9 +69,17 @@ bool TrainManipulator::performMovementRightMouseButton(const double eventTimeDel
 bool TrainManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
                                         osgGA::GUIActionAdapter &aa)
 {
+    Q_UNUSED(aa)
+
     osgGA::GUIEventAdapter::ScrollingMotion sm = ea.getScrollingMotion();
 
-    float speed = 5.0f;
+    float speed = settings.ext_cam_speed;
+
+    if ( (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_SHIFT) ||
+         (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_SHIFT) )
+    {
+        speed = settings.ext_cam_speed_coeff * speed;
+    }
 
     switch (sm)
     {
@@ -98,12 +110,38 @@ bool TrainManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
         }
 
         break;
+
+    default:
+
+        break;
     }
 
-    if (rel_pos.z() <= 5.0f)
-        rel_pos.z() = 5.0f;
+    if (rel_pos.z() <= settings.ext_cam_min_dist)
+        rel_pos.z() = settings.ext_cam_min_dist;
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool TrainManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
+                                     osgGA::GUIActionAdapter &aa)
+{
+    Q_UNUSED(aa)
+
+    switch (ea.getKey())
+    {
+    case osgGA::GUIEventAdapter::KEY_Left:
+
+        rel_pos.x() -= settings.ext_cam_speed * delta_time;
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_Right:
+
+        rel_pos.x() += settings.ext_cam_speed * delta_time;
+        break;
+    }
 }
 
 //------------------------------------------------------------------------------

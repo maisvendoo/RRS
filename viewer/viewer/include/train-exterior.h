@@ -29,6 +29,7 @@
 #include    "vehicle-exterior.h"
 #include    "animation-manager.h"
 #include    "camera-position.h"
+#include    "settings.h"
 
 /*!
  * \class
@@ -44,7 +45,7 @@ class TrainExteriorHandler : public QObject, public osgGA::GUIEventHandler
 public:
 
     /// Constructor
-    TrainExteriorHandler(MotionPath *routePath, const std::string &train_config);
+    TrainExteriorHandler(settings_t settings, MotionPath *routePath, const std::string &train_config);
 
     /// Handle method
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
@@ -62,6 +63,8 @@ signals:
     void sendCameraPosition(camera_position_t cp);
 
 private:
+
+    settings_t  settings;
 
     /// Vehicle number? which is a referenced for camera
     int cur_vehicle;
