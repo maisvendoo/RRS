@@ -39,7 +39,7 @@ double SpringCoupling::getForce(double ds, double dv)
     if (ads > delta / 2 + lambda)
         force = ck * (ads - delta / 2 - lambda);
 
-    return force * Physics::sign(ds) + 0.01 * c *  dv;
+    return force * Physics::sign(ds) + beta * c *  dv;
 }
 
 //------------------------------------------------------------------------------

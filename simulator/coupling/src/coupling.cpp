@@ -23,6 +23,11 @@
 //
 //------------------------------------------------------------------------------
 Coupling::Coupling()
+    : calls_count(0)
+    , delta(0.02)
+    , lambda(0.11)
+    , ck(5e8)
+    , beta(0.01)
 {
 
 }
@@ -57,6 +62,7 @@ void Coupling::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "delta", delta);
         cfg.getDouble(secName, "lambda", lambda);
         cfg.getDouble(secName, "ck", ck);
+        cfg.getDouble(secName, "beta", beta);
     }
 
     loadConfig(cfg_path);

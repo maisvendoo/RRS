@@ -64,6 +64,9 @@ protected:
     /// Construct shiffness
     double  ck;
 
+    /// Friction coeff
+    double  beta;
+
     ///
     virtual void loadConfig(QString cfg_path);
 };
