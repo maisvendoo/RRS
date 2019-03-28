@@ -128,14 +128,11 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
 
     double u5 = pf(Y[4]);
 
-    double u6 = nf(Y[4]);
+    double u6 = hs_n(u4);
 
     double K4 = 0.0;
 
-    if (Y[BP_PRESSURE] >= p0)
-        K4 = K[4] * pow(Y[BP_PRESSURE] / p0, K4_power);
-    else
-        K4 = K[4];
+    K4 = K[4] * (1.0 + pow(pf(Y[BP_PRESSURE] / p0 - 1.0), K4_power));
 
     Qbp = K[3] * (pFL - Y[BP_PRESSURE]) * u5
             - K4 * Y[BP_PRESSURE] * u6
