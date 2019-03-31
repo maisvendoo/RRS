@@ -79,7 +79,7 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 
     if ( (static_cast<int>(pos[POS_II]) == 1) && pulse_II )
     {
-        Y[0] = pf(pFL  - Y[1]);
+        Y[0] = cut(pf(2 * p0  - Y[1]), 0.0, pFL);
         pulse_II = false;
     }
     else
@@ -105,7 +105,7 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
 
     double Q_brake = - K[5] * Y[1] * pos[POS_Va]
                      - K[6] * Y[1] * pos[POS_V]
-                     - K[1] * Y[1] * pos[POS_VI];
+                     - K[9] * Y[1] * pos[POS_VI];
 
     double Qer = Q_charge + Q_train + Q_stab + Q_brake;
 
