@@ -19,6 +19,7 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , Qbp(0.0)
   , old_input(0)
   , old_output(0)
+  , pulse_II(true)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(pos.begin(), pos.end(), 0.0);
@@ -76,26 +77,15 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    /*double k = 1e8;
-
-    int input_level = cut(static_cast<int>(k * pf(Qbp)), 0, 100);
-    int output_level = cut(static_cast<int>(k * nf(Qbp)), 0, 100);
-
-    if (Qbp > 0.0)
+    if ( (static_cast<int>(pos[POS_II]) == 1) && pulse_II )
     {
-        if (input_level != old_input)
-            emit soundSetVolume("AirInput", input_level);
+        Y[0] = pf(pFL  - Y[1]);
+        pulse_II = false;
     }
     else
     {
-        if (output_level != old_output)
-            emit soundSetVolume("AirOutput", output_level);
+        pulse_II = true;
     }
-
-    //std::cout << input_level << " " << output_level << std::endl;
-
-    old_input = input_level;
-    old_output = output_level;*/
 }
 
 //------------------------------------------------------------------------------
@@ -105,50 +95,36 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
                                state_vector_t &dYdt,
                                double t)
 {
-    double u1 = Y[2] - p0;
+    double Q_charge = K[1] * (pFL - Y[1]) * pos[POS_I];
 
-    double u2 = dead_zone(u1, -0.005, 0.005);
+    double u1 = hs_n(Y[1] - p0);
 
-    double u3 = cut(nf(u2), 0.0, 1.0);
+    double Q_train = K[1] * (pFL - Y[1]) * u1 * pos[POS_II];
 
-    double Qer = K[2] * (Y[2] - Y[ER_PRESSURE]);
+    double Q_stab = - k_stab * cut(k1 * Y[1], 0.0, 1.0) * pos[POS_II];
 
-    double Q_brake = K[6] * Y[2] * pos[POS_Va] + K[7] * Y[2] * pos[POS_V];    
+    double Q_brake = - K[5] * Y[1] * pos[POS_Va]
+                     - K[6] * Y[1] * pos[POS_V]
+                     - K[1] * Y[1] * pos[POS_VI];
 
-    double Qec = K[1] * (pFL - Y[2]) * Y[3] * pos[POS_II]
-            - k_stab * Y[2] * pos[POS_II]
-            - Qer
-            - Q_brake
-            + K[10] * (pFL - Y[2]) * pos[POS_I]
-            - K[8] * Y[2] * pos[POS_VI];
+    double Qer = Q_charge + Q_train + Q_stab + Q_brake;
 
-    setEqResrvoirFlow(Qer);
+    double s1 = A1 * (Y[0] - Y[1]);
 
-    double u4 = A1 * (Y[2] - Y[BP_PRESSURE]);
-
-    double u5 = pf(Y[4]);
-
-    double u6 = hs_n(u4);
-
-    double K4 = 0.0;
+    double K4 = 0;
 
     K4 = K[4] * (1.0 + pow(pf(Y[BP_PRESSURE] / p0 - 1.0), K4_power));
 
-    Qbp = K[3] * (pFL - Y[BP_PRESSURE]) * u5
-            - K4 * Y[BP_PRESSURE] * u6
-            + K[5] * (Y[2] - Y[BP_PRESSURE]) * pos[POS_III]
-            + K[11] * (pFL - Y[BP_PRESSURE]) * pos[POS_I]
-            - K[9] * Y[BP_PRESSURE] * pos[POS_VI]
-            - k_leek * Y[BP_PRESSURE];
+    double u2 = cut(k2 * nf(s1), 0.0, 1.0) * (1.0 - pos[POS_VI]);
+    double u3 = cut(k3 * pf(s1), 0.0, 1.0);
 
+    double Qbp =   K[2] * (pFL - Y[0]) * u2
+                 - K4 * Y[0] * u3
+                 - K[7] * Y[0] * pos[POS_VI]
+                 + K[8] * (pFL - Y[0]) * pos[POS_I];
 
     setBrakePipeFlow(Qbp);
-
-    dYdt[2] = Qec / Vec;
-
-    dYdt[3] = (u3 - Y[3]) / T1;
-
-    dYdt[4] = (u4 - Y[4]) / T2;
+    setEqResrvoirFlow(Qer);
 
     BrakeCrane::ode_system(Y, dYdt, t);
 }

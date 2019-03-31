@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 enum
 {
-    MAX_FLOW_COEFFS = 13,
+    MAX_FLOW_COEFFS = 14,
     NUM_POSITIONS = 7
 };
 
@@ -78,6 +78,8 @@ private:
     int old_input;
 
     int old_output;
+
+    bool    pulse_II;
 
     DebugLog *debug_log;
 

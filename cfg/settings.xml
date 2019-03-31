@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Viewer>
-		<posX>0</posX>
-		<posY>0</posY>
+		<posX>50</posX>
+		<posY>50</posY>
 		<Width>1280</Width>
 		<Height>720</Height>
 		<FullScreen>0</FullScreen>
