@@ -43,9 +43,11 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     double v3 = hs_n(Y[1] - py2);
 
+    double v4 = 1.0;
+
     Qas = K[2] * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
 
-    Qbc = K[4] * (pAS - pBC) * v1 - K[13] * pBC * v2 - K[7] * pBC * v3 * v2;
+    Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * v2; // - K[7] * pBC * v3 * v2;
 
     DebugMsg = QString(" Доп. разр.: %1")
             .arg(auxRate, 7, 'f', 4);
@@ -54,6 +56,7 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     Y[2] = pAS;
     Y[3] = pBC;
+    Y[4] = v2;
 }
 
 //------------------------------------------------------------------------------
