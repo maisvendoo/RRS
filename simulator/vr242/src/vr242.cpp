@@ -16,6 +16,11 @@ AirDist242::AirDist242() : AirDistributor ()
     s1_min = 1e-3;
     s1_max = 1e-3;
 
+    p_bv = 0.15;
+    p_UP = 1000.0;
+
+    long_train = 0.0;
+
     /*DebugLog *log = new DebugLog("vr242.txt");
     connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);*/
 }
@@ -43,7 +48,9 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     double v3 = hs_n(Y[1] - py2);
 
-    double v4 = 1.0;
+    double p_handle = p_bv + (1 - long_train) * p_UP;
+
+    double v4 = hs_n(pBC - p_handle);
 
     Qas = K[2] * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
 
@@ -52,7 +59,7 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     DebugMsg = QString(" Доп. разр.: %1")
             .arg(auxRate, 7, 'f', 4);
 
-    auxRate = -K[14] * pTM * v1 * v3;
+    auxRate = - K[14] * pTM * v1 * v3;
 
     Y[2] = pAS;
     Y[3] = pBC;
@@ -116,6 +123,9 @@ void AirDist242::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "s1_min", s1_min);
     cfg.getDouble(secName, "s1_max", s1_max);
+
+    cfg.getDouble(secName, "p_bv", p_bv);
+    cfg.getDouble(secName, "LongTrainReg", long_train);
 }
 
 GET_AIR_DISTRIBUTOR(AirDist242)

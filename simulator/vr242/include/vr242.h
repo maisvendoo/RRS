@@ -28,6 +28,10 @@ private:
     double s1_min;
     double s1_max;
 
+    double p_bv;
+    double p_UP;
+    double long_train;
+
     std::array<double, MAX_FLOW_COEFFS> K;
     std::array<double, MAX_GIAN_COEFFS> k;
 
