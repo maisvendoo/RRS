@@ -5,6 +5,5 @@
 		<lambda>0.11</lambda>
 		<ck>5e8</ck>
 		<c>2e7</c>
-		<beta>0.01</beta>
 	</Coupling>
 </Config>
