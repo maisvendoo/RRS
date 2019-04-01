@@ -106,7 +106,7 @@ void TestLoco::step(double t, double dt)
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
-    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9 ЗР: %10")
+    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9 ЗР: %10 v2: %11")
             .arg(t, 7, 'f', 1)
             .arg(railway_coord, 10, 'f', 2)
             .arg(velocity * Physics::kmh, 6, 'f', 1)
@@ -116,7 +116,8 @@ void TestLoco::step(double t, double dt)
             .arg(brake_crane->getBrakePipeInitPressure(), 4, 'f', 2)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_crane->getPositionName(crane_pos), 4)
-            .arg(supply_reservoir->getPressure(), 4, 'f', 2);
+            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
+            .arg(airdist->getY(4), 10, 'f', 6);
 
     DebugMsg += airdist->getDebugMsg();
 
