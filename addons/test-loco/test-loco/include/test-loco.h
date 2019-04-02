@@ -25,6 +25,8 @@ public:
     TestLoco();
     ~TestLoco();
 
+    void initBrakeDevices(double pTM);
+
 private:
 
     double tau;

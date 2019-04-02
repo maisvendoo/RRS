@@ -15,6 +15,8 @@ public:
 
     ~AirDist242();
 
+    void init(double pTM);
+
 private:
 
     double Vmk;

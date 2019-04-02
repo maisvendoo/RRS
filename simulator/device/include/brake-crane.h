@@ -6,7 +6,7 @@
 #ifndef     BRAKE_CRANE_H
 #define     BRAKE_CRANE_H
 
-#include    "device.h"
+#include    "brake-device.h"
 
 //------------------------------------------------------------------------------
 //
@@ -20,7 +20,7 @@ enum
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT BrakeCrane : public Device
+class DEVICE_EXPORT BrakeCrane : public BrakeDevice
 {
 public:
 

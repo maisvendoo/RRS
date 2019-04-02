@@ -1,12 +1,12 @@
 #ifndef     PNEUMO_RELAY_H
 #define     PNEUMO_RELAY_H
 
-#include    "device.h"
+#include    "brake-device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT PneumoReley : public Device
+class DEVICE_EXPORT PneumoReley : public BrakeDevice
 {
 public:
 

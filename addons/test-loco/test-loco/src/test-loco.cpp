@@ -45,6 +45,21 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TestLoco::initBrakeDevices(double pTM)
+{
+    if (supply_reservoir != nullptr)
+        supply_reservoir->setY(0, pTM);
+
+    if (brake_crane != nullptr)
+        brake_crane->init(pTM);
+
+    if (airdist != nullptr)
+        airdist->init(pTM);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
     traction_level = Physics::cut(traction_level, 0.0, 1.0);    

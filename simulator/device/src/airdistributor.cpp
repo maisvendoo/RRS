@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDistributor::AirDistributor(QObject *parent) : Device(parent)
+AirDistributor::AirDistributor(QObject *parent) : BrakeDevice(parent)
   , pTM(0.0)
   , pBC(0.0)
   , pAS(0.0)

@@ -1,12 +1,12 @@
 #ifndef     AIR_DISTRIBUTOR_H
 #define     AIR_DISTRIBUTOR_H
 
-#include    "device.h"
+#include    "brake-device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT AirDistributor : public Device
+class DEVICE_EXPORT AirDistributor : public BrakeDevice
 {
 public:
 

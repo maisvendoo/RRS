@@ -1,12 +1,12 @@
 #ifndef     RESERVOIR_H
 #define     RESERVOIR_H
 
-#include    "device.h"
+#include    "brake-device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT Reservoir : public Device
+class DEVICE_EXPORT Reservoir : public BrakeDevice
 {
 public:
 
@@ -16,7 +16,7 @@ public:
 
     void setAirFlow(double Q);
 
-    double getPressure() const;
+    double getPressure() const;    
 
 private:
 

@@ -30,6 +30,18 @@ PassCarrige::~PassCarrige()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PassCarrige::initBrakeDevices(double pTM)
+{
+    if (supply_reservoir != nullptr)
+        supply_reservoir->setY(0, pTM);
+
+    if (airdist != nullptr)
+        airdist->init(pTM);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PassCarrige::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();

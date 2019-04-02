@@ -51,6 +51,8 @@ public:
 
     float getHandlePosition(int position);
 
+    void init(double pTM);
+
 private:
 
     double k_leek;

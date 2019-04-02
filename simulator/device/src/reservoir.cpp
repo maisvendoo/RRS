@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Reservoir::Reservoir(double volume, QObject *parent) : Device(parent)
+Reservoir::Reservoir(double volume, QObject *parent) : BrakeDevice(parent)
     , V(volume)
     , Q(0.0)
 {

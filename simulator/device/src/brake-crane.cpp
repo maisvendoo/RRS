@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BrakeCrane::BrakeCrane(QObject *parent) : Device (parent)
+BrakeCrane::BrakeCrane(QObject *parent) : BrakeDevice (parent)
   , Ver(1.0)  
   , Vbp(1.0)
   , Qer(0.0)
