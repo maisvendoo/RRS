@@ -506,7 +506,7 @@ void Train::initVehiclesBrakes()
     for (size_t i = 0; i < vehicles.size(); ++i)
     {
         double pTM = brakepipe->getPressure(i);
-        vehicles[i]->initBrakeDevices(pTM);
+        vehicles[i]->initBrakeDevices(charging_pressure, pTM);
     }
 }
 

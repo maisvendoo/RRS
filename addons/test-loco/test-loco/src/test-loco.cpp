@@ -45,13 +45,17 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TestLoco::initBrakeDevices(double pTM)
+void TestLoco::initBrakeDevices(double p0, double pTM)
 {
     if (supply_reservoir != nullptr)
         supply_reservoir->setY(0, pTM);
 
     if (brake_crane != nullptr)
+    {
         brake_crane->init(pTM);
+        charge_press = p0;
+        brake_crane->setChargePressure(charge_press);
+    }
 
     if (airdist != nullptr)
         airdist->init(pTM);

@@ -23,7 +23,7 @@ public:
 
     ~PassCarrige();    
 
-    void initBrakeDevices(double pTM);
+    void initBrakeDevices(double p0, double pTM);
 
 private:
 
