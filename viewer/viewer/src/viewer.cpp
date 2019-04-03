@@ -171,8 +171,8 @@ bool RouteViewer::init(int argc, char *argv[])
         return false;
 
     // Init motion blur
-    if (!initMotionBlurEffect(&viewer, settings))
-        return false;
+    /*if (!initMotionBlurEffect(&viewer, settings))
+        return false;*/
 
     osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile =
             new WriteToFileOperation(fs.getScreenshotsDir());

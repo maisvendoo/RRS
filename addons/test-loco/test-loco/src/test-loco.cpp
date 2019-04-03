@@ -136,7 +136,7 @@ void TestLoco::step(double t, double dt)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_crane->getPositionName(crane_pos), 4)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
-            .arg(airdist->getY(4), 10, 'f', 6);
+            .arg(airdist->getY(5), 10, 'f', 6);
 
     DebugMsg += airdist->getDebugMsg();
 

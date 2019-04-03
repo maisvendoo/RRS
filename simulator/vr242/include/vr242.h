@@ -36,6 +36,7 @@ private:
 
     std::array<double, MAX_FLOW_COEFFS> K;
     std::array<double, MAX_GIAN_COEFFS> k;
+    std::array<double, MAX_TIME_CONST> T;
 
     double K2;
 

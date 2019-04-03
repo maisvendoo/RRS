@@ -13,6 +13,7 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , k1(1.0)
   , k2(1.0)
   , k3(1.0)
+  , k4(1.0)
   , T1(0.1)
   , T2(0.1)
   , K4_power(10.0)
@@ -20,6 +21,9 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , old_input(0)
   , old_output(0)
   , pulse_II(true)
+  , pulse_I(true)
+  , t_old(0)
+  , dt(0)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(pos.begin(), pos.end(), 0.0);
@@ -89,6 +93,8 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
+    t_old = t;
+
     if ( (static_cast<int>(pos[POS_II]) == 1) && pulse_II )
     {
         Y[0] = cut(pf(2 * p0  - Y[1]), 0.0, pFL);
@@ -98,6 +104,16 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
     {
         pulse_II = true;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane395::postStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+
+    dt = t - t_old;
 }
 
 //------------------------------------------------------------------------------
@@ -125,7 +141,8 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
 
     double K4 = 0;
 
-    K4 = K[4] * (1.0 + pow(pf(Y[BP_PRESSURE] / p0 - 1.0), K4_power));
+    //K4 = K[4] * (1.0 + pow(pf(Y[BP_PRESSURE] / p0 - 1.0), K4_power)) * hs_p(Y[0] - Y[1]);
+    K4 = K[4] * (1.0 + k4 * pf(Y[0] - Y[1]));
 
     double u2 = cut(k2 * nf(s1), 0.0, 1.0) * (1.0 - pos[POS_VI]);
     double u3 = cut(k3 * pf(s1), 0.0, 1.0);
@@ -164,6 +181,7 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "k1", k1);
     cfg.getDouble(secName, "k2", k2);
     cfg.getDouble(secName, "k3", k3);
+    cfg.getDouble(secName, "k4", k4);
     cfg.getDouble(secName, "T1", T1);
     cfg.getDouble(secName, "T2", T2);
     cfg.getDouble(secName, "K4_power", K4_power);

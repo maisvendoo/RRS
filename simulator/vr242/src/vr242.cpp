@@ -12,6 +12,7 @@ AirDist242::AirDist242() : AirDistributor ()
 {
     K.fill(0.0);
     k.fill(0.0);
+    T.fill(1.0);
 
     s1_min = 1e-3;
     s1_max = 1e-3;
@@ -57,7 +58,7 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     double s2 = dead_zone(s1, s1_min, s1_max);
 
     double v1 = cut(nf(k[1] * s2), 0.0, 1.0);
-    double v2 = cut(pf(k[1] * s2), 0.0, 1.0);
+    double v2 = cut(pf(k[2] * s2), 0.0, 1.0);
 
     double v3 = hs_n(Y[1] - py2);
 
@@ -67,7 +68,7 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     Qas = K2 * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
 
-    Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * v2;
+    Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * Y[5];
 
     /*DebugMsg = QString(" Доп. разр.: %1")
             .arg(auxRate, 7, 'f', 4);*/
@@ -91,7 +92,7 @@ void AirDist242::ode_system(const state_vector_t &Y,
     double s1 = A1 * (Y[0] - pAS);
     double s2 = dead_zone(s1, s1_min, s1_max);
     double v1 = cut(nf(k[1] * s2), 0.0, 1.0);
-    double v2 = cut(pf(k[1] * s2), 0.0, 1.0);
+    double v2 = cut(pf(k[2] * s2), 0.0, 1.0);
 
     double v3 = hs_n(Y[1] - py2);
 
@@ -99,11 +100,13 @@ void AirDist242::ode_system(const state_vector_t &Y,
             - K[3] * Y[0] * v1 * v3
             - K2 * (Y[0] - pAS) * v3;
 
-    double Qy2 = K[6] * (pAS - Y[1]) * v1 - K[6] * Y[1] * v2;
+    double Qy2 = K[6] * (pAS - Y[1]) * v1 - K[6] * Y[1] * Y[5];
 
     dYdt[0] = Qmk / Vmk;
 
     dYdt[1] = Qy2 / Vy2;
+
+    dYdt[5] = (v2 - Y[5]) / T[1];
 }
 
 //------------------------------------------------------------------------------
@@ -123,6 +126,12 @@ void AirDist242::load_config(CfgReader &cfg)
     {
         QString coeff = QString("k%1").arg(i);
         cfg.getDouble(secName, coeff, k[i]);
+    }
+
+    for (size_t i = 0; i < T.size(); ++i)
+    {
+        QString coeff = QString("T%1").arg(i);
+        cfg.getDouble(secName, coeff, T[i]);
     }
 
     cfg.getDouble(secName, "Vmk", Vmk);

@@ -354,6 +354,12 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         {
             server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
 
+            if (sd == nullptr)
+            {
+                shared_memory.unlock();
+                return;
+            }
+
             memcpy(nd.te.data(), sd->te.data(), sizeof (nd.te));
 
             if (nd.count > 1)

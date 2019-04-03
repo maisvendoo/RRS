@@ -69,6 +69,8 @@ private:
 
     double k3;
 
+    double k4;
+
     double T1;
 
     double T2;
@@ -83,6 +85,11 @@ private:
 
     bool    pulse_II;
 
+    bool    pulse_I;
+
+    double  t_old;
+    double  dt;
+
     DebugLog *debug_log;
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
@@ -94,6 +101,8 @@ private:
     std::vector<float> positions;
 
     void preStep(state_vector_t &Y, double t);
+
+    void postStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
