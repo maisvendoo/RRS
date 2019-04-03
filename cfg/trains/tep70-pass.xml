@@ -3,8 +3,12 @@
 	<Common>
 		<CouplingModule>default-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
+
+		<!-- Зарядное давление, МПа -->
 		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
+		
 		<Title>Ещё один тестовый поезд</Title>
 		<Description>Поезд из 20 пассажирских (плацкартных) вагонов под тепловозом ТЭП70. Предназначен для отладки симулятора</Description>
 	</Common>

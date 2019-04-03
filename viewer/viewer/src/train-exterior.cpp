@@ -344,7 +344,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::processSharedData(double &ref_time)
 {
-    double delay = 0.1;
+    double delay = static_cast<double>(settings.request_interval) / 1000.0;
 
     if (ref_time >= delay)
     {

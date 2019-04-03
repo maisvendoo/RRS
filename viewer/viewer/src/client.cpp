@@ -106,7 +106,7 @@ void NetworkClient::onTimerRequest()
                 traj_elem->route_id = 1;
                 traj_elem->delta_time = server_data.delta_time;
 
-                viewer->getEventQueue()->userEvent(traj_elem);
+                //viewer->getEventQueue()->userEvent(traj_elem);
             }
         }
 

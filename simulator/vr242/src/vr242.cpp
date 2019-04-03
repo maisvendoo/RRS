@@ -21,6 +21,8 @@ AirDist242::AirDist242() : AirDistributor ()
 
     long_train = 0.0;
 
+    K2 = 0;
+
     /*DebugLog *log = new DebugLog("vr242.txt");
     connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);*/
 }
@@ -49,6 +51,8 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
+    K2 = K[2] * (1 + k[4] * abs(Y[0] - pAS));
+
     double s1 = A1 * (Y[0] - pAS);
     double s2 = dead_zone(s1, s1_min, s1_max);
 
@@ -61,12 +65,12 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     double v4 = hs_n(pBC - p_handle);
 
-    Qas = K[2] * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
+    Qas = K2 * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
 
     Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * v2;
 
-    DebugMsg = QString(" Доп. разр.: %1")
-            .arg(auxRate, 7, 'f', 4);
+    /*DebugMsg = QString(" Доп. разр.: %1")
+            .arg(auxRate, 7, 'f', 4);*/
 
     auxRate = - K[14] * pTM * v1 * v3;
 
@@ -93,7 +97,7 @@ void AirDist242::ode_system(const state_vector_t &Y,
 
     double Qmk = K[1] * (pTM - Y[0])
             - K[3] * Y[0] * v1 * v3
-            - K[2] * (Y[0] - pAS) * v3;
+            - K2 * (Y[0] - pAS) * v3;
 
     double Qy2 = K[6] * (pAS - Y[1]) * v1 - K[6] * Y[1] * v2;
 

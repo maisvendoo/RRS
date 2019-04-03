@@ -37,6 +37,8 @@ private:
     std::array<double, MAX_FLOW_COEFFS> K;
     std::array<double, MAX_GIAN_COEFFS> k;
 
+    double K2;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);

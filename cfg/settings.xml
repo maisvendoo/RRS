@@ -6,7 +6,7 @@
 		<Width>1280</Width>
 		<Height>720</Height>
 		<FullScreen>1</FullScreen>
-		<VSync>0</VSync>
+		<VSync>1</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
 		<Port>1992</Port>
 		<LocalMode>0</LocalMode>
@@ -22,6 +22,6 @@
 		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>
-		<ViewDistance>1000.0</ViewDistance>
+		<ViewDistance>2000.0</ViewDistance>
 	</Viewer>                
 </Config>
