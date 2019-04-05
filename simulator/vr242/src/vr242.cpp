@@ -66,7 +66,11 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     double v4 = hs_n(pBC - p_handle);
 
-    Qas = K2 * (Y[0] - pAS) * v3 - pf(K[12] * Qbc);
+    double Qas_chagre = K2 * pf(Y[0] - pAS) * v3;
+
+    double Qas_soft = - K[16] * nf(Y[0] - pAS) * v3;
+
+    Qas = Qas_chagre + Qas_soft - pf(K[12] * Qbc);
 
     Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * Y[5];
 
