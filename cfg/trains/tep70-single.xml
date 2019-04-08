@@ -3,6 +3,12 @@
 	<Common>
 		<CouplingModule>ef-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
+
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>0</NoAir>
+
 		<Title>ТЭП70</Title>
 		<Description>Магистральный пассажирский тепловоз Коломенского завода</Description>
 	</Common>

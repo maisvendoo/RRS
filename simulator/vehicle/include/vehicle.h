@@ -142,6 +142,9 @@ public:
 
     QString getDebugMsg() const;
 
+    /// Init vehicle brake devices
+    virtual void initBrakeDevices(double p0, double pTM);
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -254,7 +257,7 @@ protected:
     virtual void step(double t, double dt);
 
     /// User define step result processing
-    virtual void postStep(double t);
+    virtual void postStep(double t);    
 
 private:
 

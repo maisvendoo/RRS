@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 enum
 {
-    MAX_FLOW_COEFFS = 13,
+    MAX_FLOW_COEFFS = 14,
     NUM_POSITIONS = 7
 };
 
@@ -51,6 +51,8 @@ public:
 
     float getHandlePosition(int position);
 
+    void init(double pTM);
+
 private:
 
     double k_leek;
@@ -67,6 +69,8 @@ private:
 
     double k3;
 
+    double k4;
+
     double T1;
 
     double T2;
@@ -79,6 +83,13 @@ private:
 
     int old_output;
 
+    bool    pulse_II;
+
+    bool    pulse_I;
+
+    double  t_old;
+    double  dt;
+
     DebugLog *debug_log;
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
@@ -90,6 +101,8 @@ private:
     std::vector<float> positions;
 
     void preStep(state_vector_t &Y, double t);
+
+    void postStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

@@ -36,7 +36,7 @@ struct vehicle_data_t
     float           angle_begin;
     float           angle_end;
     float           omega;
-    wchar_t         DebugMsg[DEBUG_SRING_SIZE];
+    wchar_t         DebugMsg[DEBUG_STRING_SIZE];
     bool            discreteSignal[MAX_DISCRETE_SIGNALS];
     float           analogSignal[MAX_ANALOG_SIGNALS];
 

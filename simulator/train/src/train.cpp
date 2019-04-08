@@ -83,7 +83,13 @@ bool Train::init(const init_data_t &init_data)
     brakepipe = new BrakePipe();
     brakepipe->setLength(trainLength);
     brakepipe->setNodesNum(static_cast<int>(vehicles.size()));
+
+    if (!no_air)
+        brakepipe->setBeginPressure(charging_pressure * Physics::MPa + Physics::pA);
+
     brakepipe->init(QString(fs.getConfigDir().c_str()) + fs.separator() + "brakepipe.xml");
+
+    initVehiclesBrakes();
 
     return true;
 }
@@ -276,6 +282,17 @@ bool Train::loadTrain(QString cfg_path)
 
     if (cfg.load(cfg_path))
     {
+        // Get charging pressure and no air flag
+        if (!cfg.getDouble("Common", "ChargingPressure", charging_pressure))
+        {
+            charging_pressure = 0.5;
+        }
+
+        if (!cfg.getBool("Common", "NoAir", no_air))
+        {
+            no_air = false;
+        }
+
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 
         size_t index = 0;
@@ -381,7 +398,7 @@ bool Train::loadTrain(QString cfg_path)
             Vehicle *vehicle = *it;
             connect(this, &Train::sendDataToVehicle,
                     vehicle, &Vehicle::receiveData);
-        }
+        }       
     }
     else
     {
@@ -478,6 +495,18 @@ void Train::setInitConditions(const init_data_t &init_data)
         size_t idxi = vehicles[i]->getIndex();
 
         y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::initVehiclesBrakes()
+{
+    for (size_t i = 0; i < vehicles.size(); ++i)
+    {
+        double pTM = brakepipe->getPressure(i);
+        vehicles[i]->initBrakeDevices(charging_pressure, pTM);
     }
 }
 

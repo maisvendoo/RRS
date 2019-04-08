@@ -21,6 +21,6 @@
 
 #define     MAX_NUM_VEHICLES      150
 
-#define     DEBUG_SRING_SIZE      1024
+#define     DEBUG_STRING_SIZE      2048
 
 #endif // GLOBAL_CONST_H

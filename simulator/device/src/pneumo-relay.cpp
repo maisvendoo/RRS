@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoReley::PneumoReley(double work_volume, QObject *parent) : Device(parent)
+PneumoReley::PneumoReley(double work_volume, QObject *parent) : BrakeDevice(parent)
   , V_work(work_volume)
   , K1(0.0)
   , K2(0.0)

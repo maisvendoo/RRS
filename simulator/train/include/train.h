@@ -111,6 +111,12 @@ private:
     /// Profile manager
     Profile     *profile;
 
+    /// Charging pressure
+    double      charging_pressure;
+
+    /// No air flag (for empty air system on start)
+    bool        no_air;
+
     /// Solver's configuration
     solver_config_t solver_config;
 
@@ -135,7 +141,10 @@ private:
     bool loadCouplings(QString cfg_path);
 
     /// Set initial conditions
-    void setInitConditions(const init_data_t &init_data);    
+    void setInitConditions(const init_data_t &init_data);
+
+    /// Initialization of vehicles brakes
+    void initVehiclesBrakes();
 };
 
 #endif // TRAIN_H

@@ -14,7 +14,6 @@
 #ifndef     TRAJECTORY_ELEMENT_H
 #define     TRAJECTORY_ELEMENT_H
 
-#include    <osg/Referenced>
 #include    <array>
 
 #include    "global-const.h"
@@ -33,7 +32,7 @@ struct traj_element_t
     float           angle_begin;
     float           angle_end;
     float           omega;
-    wchar_t         DebugMsg[DEBUG_SRING_SIZE];
+    wchar_t         DebugMsg[DEBUG_STRING_SIZE];
     bool            discreteSignal[MAX_DISCRETE_SIGNALS];
     float           analogSignal[MAX_ANALOG_SIGNALS];
 
@@ -62,7 +61,7 @@ struct traj_element_t
 //------------------------------------------------------------------------------
 #pragma pack(push, 1)
 
-struct network_data_t : public osg::Referenced
+struct network_data_t
 {
     unsigned int    route_id;
     float           delta_time;

@@ -85,7 +85,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
     viewer.addEventHandler(new osgViewer::StatsHandler);
-    //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // Cabine camera manipulator
     osg::ref_ptr<RailsManipulator> rm = new RailsManipulator(settings);
@@ -171,8 +171,8 @@ bool RouteViewer::init(int argc, char *argv[])
         return false;
 
     // Init motion blur
-    if (!initMotionBlurEffect(&viewer, settings))
-        return false;
+    /*if (!initMotionBlurEffect(&viewer, settings))
+        return false;*/
 
     osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile =
             new WriteToFileOperation(fs.getScreenshotsDir());

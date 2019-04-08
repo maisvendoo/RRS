@@ -23,6 +23,8 @@ public:
 
     ~PassCarrige();    
 
+    void initBrakeDevices(double p0, double pTM);
+
 private:
 
     BrakeMech   *brake_mech;

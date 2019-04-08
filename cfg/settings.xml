@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Viewer>
-		<posX>0</posX>
-		<posY>0</posY>
+		<posX>50</posX>
+		<posY>50</posY>
 		<Width>1280</Width>
 		<Height>720</Height>
 		<FullScreen>0</FullScreen>
-		<VSync>0</VSync>
+		<VSync>1</VSync>
 		<HostAddress>127.0.0.1</HostAddress>
 		<Port>1992</Port>
 		<LocalMode>0</LocalMode>
 		<FovY>55.0</FovY>
-		<zNear>0.001</zNear>
-		<zFar>10000.0</zFar>
+		<zNear>0.1</zNear>
+		<zFar>1000.0</zFar>
 		<ScreenNumber>1</ScreenNumber>
 		<Name>viewer</Name>
 		<WindowDecoration>1</WindowDecoration>
@@ -20,61 +20,8 @@
 		<Samples>16</Samples>
 		<RequestInterval>100</RequestInterval>
 		<ReconnectInterval>1000</ReconnectInterval>
-		<MotionBlur>0.0</MotionBlur>
+		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>
 		<ViewDistance>2000.0</ViewDistance>
-
-                <!-- Камера в ккабине (F2) -->
-
-                <!-- Чуствительность мыши -->
-                <CabineCamRotCoeff>1.0</CabineCamRotCoeff>
-                <!-- Шаг приближения/отдаления -->
-                <CabineCamFovYStep>1.0</CabineCamFovYStep>
-                <!-- Скорость перемещения по кабине -->
-                <CabineCamSpeed>2.0</CabineCamSpeed>
-
-                <!-- Внешняя камера (привязанная к ПЕ) (F3) -->
-
-                <!-- Начальная дистанция до ПЕ -->
-                <ExtCamInitDist>25.0</ExtCamInitDist>
-                <!-- Высота точки обзора над путями -->
-                <ExtCamInitHeight>3.0</ExtCamInitHeight>
-                <!-- Начальное смещение вдоль оси ПЕ -->
-                <ExtCamInitShift>0.0</ExtCamInitShift>
-                <!-- Чувствительность мыши -->
-                <ExtCamRotCoeff>1.0</ExtCamRotCoeff>
-                <!-- Скорость перемещения камеры -->
-                <ExtCamSpeed>5.0</ExtCamSpeed>
-                <!-- Коэффициент ускорения перемещения (по Shift) -->
-                <ExtCamSpeedCoeff>10.0</ExtCamSpeedCoeff>
-                <!-- Мнимальное расстояние, на которое подлетает камера к ПЕ -->
-                <ExtCamMinDist>5.0</ExtCamMinDist>
-                <!-- Начальный угол поворота в горизонтальной плоскости -->
-                <ExtCamInitAngleH>45.0</ExtCamInitAngleH>
-                <!-- Начальный угол поворота в вертикальной плоскости -->
-                <ExtCamInitAngleV>5.0</ExtCamInitAngleV>
-
-                <!-- Внешняя свободная камера (F4) -->
-
-                <!-- Начальное положение при выходе (в координатах ПЕ) -->
-                <FreeCamInitPos>2.5 0.0 1.75</FreeCamInitPos>
-                <!-- Чувствительность мыши -->
-                <FreeCamRotCoeff>1.0</FreeCamRotCoeff>
-                <!-- Скорость перемещения камеры -->
-                <FreeCamSpeed>5.0</FreeCamSpeed>
-                <!-- Коэффициент ускорения перемещения (по Shift) -->
-                <FreeCamSpeedCoeff>10.0</FreeCamSpeedCoeff>
-                <!-- Шаг приближения/отдаления -->
-                <FreeCamFovYStep>1.0</FreeCamFovYStep>
-
-                <!-- Стационарная "следящая" камера (F5/F6) -->
-
-                <!-- Смещение от оси пути -->
-                <StatCamDist>10.0</StatCamDist>
-                <!-- Высота точки обзора -->
-                <StatCamHeight>1.75</StatCamHeight>
-                <!-- Смещение вдоль пути от текущей ПЕ при переключении -->
-                <StatCamShift>200.0</StatCamShift>
-
 	</Viewer>                
 </Config>

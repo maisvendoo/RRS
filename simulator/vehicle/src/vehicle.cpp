@@ -587,3 +587,12 @@ void Vehicle::postStep(double t)
 {
     (void) t;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::initBrakeDevices(double p0, double pTM)
+{
+    Q_UNUSED(p0)
+    Q_UNUSED(pTM)
+}

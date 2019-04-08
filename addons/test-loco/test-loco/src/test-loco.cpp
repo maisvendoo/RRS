@@ -45,6 +45,25 @@ TestLoco::~TestLoco()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TestLoco::initBrakeDevices(double p0, double pTM)
+{
+    if (supply_reservoir != nullptr)
+        supply_reservoir->setY(0, pTM);
+
+    if (brake_crane != nullptr)
+    {
+        brake_crane->init(pTM);
+        charge_press = p0;
+        brake_crane->setChargePressure(charge_press);
+    }
+
+    if (airdist != nullptr)
+        airdist->init(pTM);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
     traction_level = Physics::cut(traction_level, 0.0, 1.0);    
@@ -106,7 +125,7 @@ void TestLoco::step(double t, double dt)
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
-    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9")
+    DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9 ЗР: %10 v2: %11")
             .arg(t, 7, 'f', 1)
             .arg(railway_coord, 10, 'f', 2)
             .arg(velocity * Physics::kmh, 6, 'f', 1)
@@ -115,7 +134,9 @@ void TestLoco::step(double t, double dt)
             .arg(brake_crane->getEqReservoirPressure(), 4, 'f', 2)
             .arg(brake_crane->getBrakePipeInitPressure(), 4, 'f', 2)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(brake_crane->getPositionName(crane_pos), 4);
+            .arg(brake_crane->getPositionName(crane_pos), 4)
+            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
+            .arg(airdist->getY(5), 10, 'f', 6);
 
     DebugMsg += airdist->getDebugMsg();
 
@@ -278,7 +299,7 @@ void TestLoco::keyProcess()
     analogSignal[21] = static_cast<float>(pTM / 1.0);
     analogSignal[22] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
     analogSignal[23] = static_cast<float>(0.9 / 1.6);
-    analogSignal[24] = static_cast<float>(brake_mech->getBrakeCylinderPressure() / 1.0);
+    analogSignal[24] = static_cast<float>(repiter->getWorkPressure() / 1.0);
     analogSignal[25] = static_cast<float>(brake_mech->getBrakeCylinderPressure() / 1.0);
     analogSignal[26] = static_cast<float>(velocity * Physics::kmh / 220.0);
     analogSignal[27] = static_cast<float>(velocity * Physics::kmh / 150.0);

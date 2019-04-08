@@ -98,6 +98,8 @@ unix {
 #QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 #LIBS += -lgcov
 
+#CONFIG += force_debug_info
+
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp-connection/include
