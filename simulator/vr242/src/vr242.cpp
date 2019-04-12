@@ -52,33 +52,8 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    K2 = K[2] * (1 + k[4] * abs(Y[0] - pAS));
-
-    double s1 = A1 * (Y[0] - pAS);
-    double s2 = dead_zone(s1, s1_min, s1_max);
-
-    double v1 = cut(nf(k[1] * s2), 0.0, 1.0);
-    double v2 = cut(pf(k[2] * s2), 0.0, 1.0);
-
-    double v3 = hs_n(pBC - py2);
-
-    double p_handle = p_bv + (1 - long_train) * p_UP;
-
-    double v4 = hs_n(pBC - p_handle);
-
-    double Qas_chagre = K2 * pf(Y[0] - pAS) * v3;
-
-    double Qas_soft = - K[16] * nf(Y[0] - pAS) * v3;
-
-    Qas = Qas_chagre + Qas_soft - pf(K[12] * Qbc);
-
-    Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * Y[5] - K[13] * pBC * v3;
-
-    auxRate = K[14] * pTM * v1 * v3;
-
     Y[2] = pAS;
     Y[3] = pBC;
-    Y[4] = v2;
 }
 
 //------------------------------------------------------------------------------
@@ -90,24 +65,31 @@ void AirDist242::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    double s1 = A1 * (Y[0] - pAS);
-    double s2 = dead_zone(s1, s1_min, s1_max);
-    double v1 = cut(nf(k[1] * s2), 0.0, 1.0);
-    double v2 = cut(pf(k[2] * s2), 0.0, 1.0);
+    // Перемещение главного поршня
+    double s1 = A1 * (pTM - pAS);
+    double s2 = dead_zone(s1, A1 * s1_min, A1 * s1_max);
 
-    double v3 = hs_n(Y[1] - py2);
+    // Перемещение клапана дополнительной зазрядки
+    double v1 = cut( nf(k[1] * s2), 0.0, 1.0 );
 
-    double Qmk = K[1] * (pTM - Y[0])
-            - K[3] * Y[0] * v1 * v3
-            - K2 * (Y[0] - pAS) * v3;
+    // Перемещение выпускного клапана
+    double v2 = cut( pf(k[2] * s2), 0.0, 1.0 );
 
-    double Qy2 = K[6] * (pAS - Y[1]) * v1 - K[6] * Y[1] * Y[5];
+    // Клапан, разобщающий ТМ и ЗР
+    double v3 = hs_n(pBC - py2);
 
-    dYdt[0] = Qmk / Vmk;
+    // Переключение режимов торможения/отпуска ("К" и "Д")
+    double p_handle = p_bv + (1 - long_train) * p_UP;
+    double v4 = hs_n(pBC - p_handle);
 
-    dYdt[1] = Qy2 / Vy2;
+    // Расход воздуха в ТЦ
+    Qbc = (K[4] + K[5] * v4) * (pAS - pBC) * v1 - (K[13] + K[15] * v4) * pBC * v2 - K[13] * pBC * v3;
 
-    dYdt[5] = (v2 - Y[5]) / T[1];
+    // Расход воздуха в ЗР
+    Qas = K[2] * (pTM - pAS) * v3 - pf( K[12] * Qbc );
+
+    // Темп дополнительной разрядки ТМ
+    auxRate = K[14] * pTM * v1 * v3;
 }
 
 //------------------------------------------------------------------------------
