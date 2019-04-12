@@ -51,7 +51,7 @@
 		<LongTrainReg>0</LongTrainReg>ы		
 
 		<!-- Темп дополнительной разрядки ТМ -->
-		<K14>1.0</K14>
+		<K14>0.5</K14>
 
 	</Device>
 </Config>
