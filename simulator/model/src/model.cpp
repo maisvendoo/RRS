@@ -79,6 +79,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     start_time = init_data.solver_config.start_time;
     stop_time = init_data.solver_config.stop_time;
     dt = init_data.solver_config.step;
+    integration_time_interval = init_data.integration_time_interval;
 
     // Load profile
     profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
@@ -390,20 +391,20 @@ void Model::configSolver(solver_config_t &solver_config)
 //------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
-    std::vector<Vehicle *> *vehicles = train->getVehicles();
+    /*std::vector<Vehicle *> *vehicles = train->getVehicles();
 
-    viewer_data.delta_time = static_cast<float>(integration_time_interval) / 1000.0f;
+    viewer_data.time = static_cast<float>(integration_time_interval) / 1000.0f;
 
     size_t i = 0;
     for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
     {
-        viewer_data.te[i].coord_begin = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.te[i].coord = static_cast<float>((*it)->getRailwayCoord());
         viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
-        viewer_data.te[i].coord_end = viewer_data.te[i].coord_begin + viewer_data.te[i].velocity * viewer_data.delta_time;
+        viewer_data.te[i].coord_end = viewer_data.te[i].coord + viewer_data.te[i].velocity * viewer_data.time;
 
-        viewer_data.te[i].angle_begin = static_cast<float>((*it)->getWheelAngle(0));
+        viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-        viewer_data.te[i].angle_end = viewer_data.te[i].angle_begin + viewer_data.te[i].omega * viewer_data.delta_time;
+        viewer_data.te[i].angle_end = viewer_data.te[i].angle + viewer_data.te[i].omega * viewer_data.time;
 
         (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
@@ -423,7 +424,7 @@ void Model::tcpFeedBack()
 
     viewer_data.count++;
 
-    emit sendDataToTrain(server->getReceivedData());
+    emit sendDataToTrain(server->getReceivedData());*/
 }
 
 //------------------------------------------------------------------------------
@@ -433,22 +434,17 @@ void Model::sharedMemoryFeedback()
 {
     std::vector<Vehicle *> *vehicles = train->getVehicles();
 
-    viewer_data.delta_time = static_cast<float>(integration_time_interval) / 1000.0f;
+    viewer_data.time = static_cast<float>(t);
 
     size_t i = 0;
+
     for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
     {
-        viewer_data.te[i].coord_begin = static_cast<float>((*it)->getRailwayCoord());
+        viewer_data.te[i].coord = static_cast<float>((*it)->getRailwayCoord());
         viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
 
-        viewer_data.te[i].coord_end = viewer_data.te[i].coord_begin +
-                viewer_data.te[i].velocity * viewer_data.delta_time;
-
-        viewer_data.te[i].angle_begin = static_cast<float>((*it)->getWheelAngle(0));
+        viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-
-        viewer_data.te[i].angle_end = viewer_data.te[i].angle_begin +
-                viewer_data.te[i].omega * viewer_data.delta_time;
 
         (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
@@ -462,11 +458,11 @@ void Model::sharedMemoryFeedback()
         ++i;
     }
 
-    if (shared_memory.lock())
-    {
+    //if (shared_memory.lock())
+    //{
         memcpy(shared_memory.data(), &viewer_data, sizeof (server_data_t));
-        shared_memory.unlock();
-    }
+      //  shared_memory.unlock();
+    //}
 
     viewer_data.count++;    
 }

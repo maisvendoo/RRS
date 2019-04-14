@@ -99,12 +99,12 @@ void NetworkClient::onTimerRequest()
 
             if (viewer != nullptr)
             {
-                network_data_t *traj_elem = new network_data_t();
+                //network_data_t *traj_elem = new network_data_t();
 
-                memcpy(&traj_elem->te, &server_data.te, sizeof (traj_element_t) * MAX_NUM_VEHICLES);
+                //memcpy(&traj_elem->te, &server_data.te, sizeof (traj_element_t) * MAX_NUM_VEHICLES);
 
-                traj_elem->route_id = 1;
-                traj_elem->delta_time = server_data.delta_time;
+                //traj_elem->route_id = 1;
+                //traj_elem->delta_time = server_data.time;
 
                 //viewer->getEventQueue()->userEvent(traj_elem);
             }

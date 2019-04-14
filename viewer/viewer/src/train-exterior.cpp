@@ -26,7 +26,6 @@
 #include    <sstream>
 
 #include    "anim-transform-visitor.h"
-#include    "server-data-struct.h"
 
 //------------------------------------------------------------------------------
 //
@@ -71,7 +70,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 break;
 
             double time = viewer->getFrameStamp()->getReferenceTime();
-            double delta_time = time - start_time;
+            delta_time = time - start_time;
             ref_time += delta_time;
             start_time = time;
 
@@ -299,14 +298,17 @@ void TrainExteriorHandler::load(const std::string &train_config)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 {
+    if (nd.sd.empty())
+        return;
+
     // Time to relative units conversion
     float t = static_cast<float>(ref_time) / nd.delta_time;
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
         // Interframe railway coordinate and wheels angle linear interpolation
-        float coord = (1.0f - t) * nd.te[i].coord_begin + nd.te[i].coord_end * t;
-        float angle = (1.0f - t) * nd.te[i].angle_begin + nd.te[i].angle_end * t;
+        float coord = (1.0f - t) * nd.sd.front().te[i].coord + nd.sd.back().te[i].coord * t;
+        float angle = (1.0f - t) * nd.sd.front().te[i].angle + nd.sd.back().te[i].angle * t;
 
         // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
@@ -335,7 +337,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
     for (auto it = animations.begin(); it != animations.end(); ++it)
     {
         ProcAnimation *animation = it.value();
-        animation->setPosition(nd.te[static_cast<size_t>(cur_vehicle)].analogSignal[animation->getSignalID()]);
+        animation->setPosition(nd.sd.back().te[static_cast<size_t>(cur_vehicle)].analogSignal[animation->getSignalID()]);
     }
 }
 
@@ -343,46 +345,38 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 //
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::processSharedData(double &ref_time)
-{
-    double delay = static_cast<double>(settings.request_interval) / 1000.0;
+{    
+    if (ref_time < static_cast<double>(settings.request_interval) / 1000.0)
+        return;
 
-    if (ref_time >= delay)
+    ref_time = 0;
+
+    if (shared_memory.lock())
     {
-        ref_time = 0;
+        server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
 
-        if (shared_memory.lock())
+        if (sd == nullptr)
         {
-            server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
-
-            if (sd == nullptr)
-            {
-                shared_memory.unlock();
-                return;
-            }
-
-            memcpy(nd.te.data(), sd->te.data(), sizeof (nd.te));
-
-            if (nd.count > 1)
-            {
-                for (size_t i = 0; i < nd.te.size(); ++i)
-                {
-                    nd.te[i].coord_begin = vehicles_ext[i].coord;
-                    nd.te[i].coord_end = nd.te[i].coord_begin + nd.te[i].velocity * sd->delta_time;
-
-                    nd.te[i].angle_begin = vehicles_ext[i].wheel_angle;
-                    nd.te[i].angle_end = nd.te[i].angle_begin + nd.te[i].omega * sd->delta_time;
-                }
-            }
-
-            nd.delta_time = sd->delta_time;
-
-            QString msg = QString("ПЕ #%1: ").arg(cur_vehicle);
-            emit setStatusBar(msg + QString::fromStdWString(sd->te[static_cast<size_t>(cur_vehicle)].DebugMsg));
-
-            nd.count++;
-
             shared_memory.unlock();
+            return;
         }
+
+        server_data_t server_data;
+
+        memcpy(&server_data, sd, sizeof (server_data_t));
+
+        nd.sd.push(server_data);
+
+        if (nd.sd.size() > 2)
+        {
+            nd.sd.pop();
+            nd.delta_time = nd.sd.back().time - nd.sd.front().time;
+        }
+
+        QString msg = QString("ПЕ #%1: delta_time: %2 nd.delta_time: %3").arg(cur_vehicle).arg(delta_time, 6, 'f', 4).arg(nd.delta_time, 6, 'f', 4);
+        emit setStatusBar(msg + QString::fromStdWString(server_data.te[static_cast<size_t>(cur_vehicle)].DebugMsg));
+
+        shared_memory.unlock();
     }
 }
 

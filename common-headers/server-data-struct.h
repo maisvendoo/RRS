@@ -30,22 +30,18 @@
 //------------------------------------------------------------------------------
 struct vehicle_data_t
 {
-    float           coord_begin;
-    float           coord_end;
+    float           coord;
     float           velocity;
-    float           angle_begin;
-    float           angle_end;
+    float           angle;
     float           omega;
     wchar_t         DebugMsg[DEBUG_STRING_SIZE];
     bool            discreteSignal[MAX_DISCRETE_SIGNALS];
     float           analogSignal[MAX_ANALOG_SIGNALS];
 
     vehicle_data_t()
-        : coord_begin(0.0f)
-        , coord_end(0.0f)
+        : coord(0.0f)
         , velocity(0.0f)
-        , angle_begin(0.0f)
-        , angle_end(0.0f)
+        , angle(0.0f)
         , omega(0.0f)
         , DebugMsg(L"")
     {
@@ -68,14 +64,14 @@ struct vehicle_data_t
 struct server_data_t
 {
     unsigned int    route_id;
-    float           delta_time;
+    float           time;
     unsigned long   count;
 
     std::array<vehicle_data_t, MAX_NUM_VEHICLES>    te;
 
     server_data_t()
         : route_id(0)
-        , delta_time(3600.0f)
+        , time(0.0f)
         , count(0)
     {
 

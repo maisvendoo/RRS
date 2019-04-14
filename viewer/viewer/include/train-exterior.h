@@ -30,6 +30,9 @@
 #include    "animation-manager.h"
 #include    "camera-position.h"
 #include    "settings.h"
+#include    "server-data-struct.h"
+
+#include    <queue>
 
 /*!
  * \class
@@ -92,6 +95,8 @@ private:
 
     /// Data, received from server
     network_data_t  nd;
+
+    double delta_time;
 
     QSharedMemory   shared_memory;
 

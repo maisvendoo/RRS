@@ -18,7 +18,7 @@
 		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
 		<Samples>16</Samples>
-		<RequestInterval>100</RequestInterval>
+		<RequestInterval>200</RequestInterval>
 		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>

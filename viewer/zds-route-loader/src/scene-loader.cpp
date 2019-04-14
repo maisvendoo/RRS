@@ -246,7 +246,7 @@ ReadResult SceneLoader::loadObjectMap(std::istream &stream)
             osg::Matrixf m4 = osg::Matrixf::rotate(-object.attitude.y(),
                                                    osg::Vec3(0, 1, 0));
 
-            transform->setMatrix(m3 * m2 * m4 * m1);
+            transform->setMatrix(m4 * m3 * m2 * m1);
 
             transform->addChild(objectRef[object.name].model_node.get());
             root->addChild(transform.get());
