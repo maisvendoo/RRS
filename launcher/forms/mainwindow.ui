@@ -26,6 +26,9 @@
     <property name="text">
      <string>Старт</string>
     </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QTabWidget" name="twMain">
     <property name="geometry">
