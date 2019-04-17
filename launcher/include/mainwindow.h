@@ -103,6 +103,8 @@ private slots:
     void onSimulatorFinished(int exitCode);
 
     void onViewerFinished(int exitCode);
+
+    void onStationSelected(int index);
 };
 
 #endif // MAINWINDOW_H

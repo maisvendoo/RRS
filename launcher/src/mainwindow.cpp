@@ -53,7 +53,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, &MainWindow::onSimulatorFinished);
 
     connect(&viewerProc, QOverload<int>::of(&QProcess::finished),
-            this, &MainWindow::onViewerFinished);    
+            this, &MainWindow::onViewerFinished);
+
+    connect(ui->cbStations, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onStationSelected);
 
     setCentralWidget(ui->twMain);
 
@@ -173,7 +176,7 @@ void MainWindow::startSimulator()
     if (ui->cbStations->count() != 0)
     {
         size_t i = static_cast<size_t>(ui->cbStations->currentIndex());
-        double init_coord = waypoints[i].railway_coord / 1000.0;
+        double init_coord = ui->dsbOrdinate->value() / 1000.0;
         args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
 
@@ -240,6 +243,8 @@ void MainWindow::onRouteSelection()
 
     loadStations(selectedRoutePath);
 
+    onStationSelected(ui->cbStations->currentIndex());
+
     setRouteScreenShot(selectedRoutePath + QDir::separator() + "shotcut.png");
 }
 
@@ -304,4 +309,14 @@ void MainWindow::onViewerFinished(int exitCode)
 
     simulatorProc.kill();
     setFocusPolicy(Qt::StrongFocus);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onStationSelected(int index)
+{
+    size_t idx = static_cast<size_t>(index);
+    if (idx < waypoints.size())
+        ui->dsbOrdinate->setValue(waypoints[idx].railway_coord);
 }
