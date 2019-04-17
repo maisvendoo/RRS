@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/translations">
+        <file>translations/launcher.ru_RU.qm</file>
+    </qresource>
+</RCC>

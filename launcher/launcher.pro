@@ -70,3 +70,8 @@ INCLUDEPATH += ./include
 SOURCES += $$files(./src/*.cpp)
 HEADERS += $$files(./include/*.h)
 FORMS += $$files(./forms/*.ui)
+
+TRANSLATIONS += ./translations/launcher.ru_RU.ts
+
+RESOURCES += $$files(./resources/*.qrc) \
+    resources/launcher.qrc
