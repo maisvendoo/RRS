@@ -55,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(&viewerProc, QOverload<int>::of(&QProcess::finished),
             this, &MainWindow::onViewerFinished);    
 
+    setCentralWidget(ui->twMain);
+
     setFocusPolicy(Qt::ClickFocus);
 }
 
