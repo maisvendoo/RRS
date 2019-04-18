@@ -75,7 +75,10 @@ profile_element_t Profile::getElement(double railway_coord)
         idx = (left_idx + right_idx) / 2;
     }
 
-    return profile_data.at(idx);
+    profile_element = profile_data.at(idx);
+    profile_element.inclination *= dir;
+
+    return profile_element;
 }
 
 //------------------------------------------------------------------------------
