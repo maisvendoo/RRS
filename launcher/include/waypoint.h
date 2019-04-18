@@ -6,11 +6,13 @@
 struct waypoint_t
 {
     QString     name;
-    double      railway_coord;
+    double      forward_coord;
+    double      backward_coord;
 
     waypoint_t()
         : name("")
-        , railway_coord(0.0)
+        , forward_coord(0.0)
+        , backward_coord(0.0)
     {
 
     }

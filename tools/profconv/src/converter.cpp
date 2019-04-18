@@ -280,7 +280,7 @@ bool ProfConverter::readWaypoints(std::wifstream &stream,
 
         waypoint_t waypoint;
 
-        ss >> waypoint.name >> waypoint.begin_track >> waypoint.end_track;
+        ss >> waypoint.name >> waypoint.forward_track >> waypoint.backward_track;
 
         waypoints.push_back(waypoint);
     }
@@ -305,10 +305,16 @@ void ProfConverter::writeWaypoints(const std::string &filename,
 
     for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
     {
-        track_t track = tracks_data1[(*it).begin_track];
-        float coord = track.rail_coord;
+        track_t fwd_track = tracks_data1[(*it).forward_track];
+        float fwd_coord = fwd_track.rail_coord;
 
-        stream << QString::fromStdWString((*it).name) << " " << coord << "\n";
+        track_t bwd_track = tracks_data1[(*it).backward_track];
+        float bwd_coord = bwd_track.rail_coord;
+
+        stream << QString::fromStdWString((*it).name)
+               << " " << fwd_coord
+               << " " << bwd_coord
+               << "\n";
     }
 
     file.close();

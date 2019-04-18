@@ -244,7 +244,7 @@ void MainWindow::loadStations(QString &routeDir)
 
         QTextStream ss(&line);
 
-        ss >> waypoint.name >> waypoint.railway_coord;
+        ss >> waypoint.name >> waypoint.forward_coord >> waypoint.backward_coord;
 
         ui->cbStations->addItem(waypoint.name);
         waypoints.push_back(waypoint);
@@ -340,6 +340,12 @@ void MainWindow::onViewerFinished(int exitCode)
 void MainWindow::onStationSelected(int index)
 {
     size_t idx = static_cast<size_t>(index);
+
     if (idx < waypoints.size())
-        ui->dsbOrdinate->setValue(waypoints[idx].railway_coord);
+    {
+        if (ui->checkboxDirection->isChecked())
+            ui->dsbOrdinate->setValue(waypoints[idx].backward_coord);
+        else
+            ui->dsbOrdinate->setValue(waypoints[idx].forward_coord);
+    }
 }

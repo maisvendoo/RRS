@@ -324,13 +324,13 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
-        matrix *= osg::Matrix::rotate(static_cast<double>(vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
+        matrix *= osg::Matrix::rotate(static_cast<double>(settings.direction * vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
         matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
         matrix *= osg::Matrix::translate(vehicles_ext[i].position);
         vehicles_ext[i].transform->setMatrix(matrix);
 
         // Apply wheel axis rotation
-        osg::Matrix rotMat = osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].wheel_angle), osg::Vec3(1.0f, 0.0f, 0.0f));
+        osg::Matrix rotMat = osg::Matrix::rotate(static_cast<double>(- settings.direction * vehicles_ext[i].wheel_angle), osg::Vec3(1.0f, 0.0f, 0.0f));
 
         if (vehicles_ext[i].wheel_rotation != nullptr)
             vehicles_ext[i].wheel_rotation->setMatrix(rotMat);
