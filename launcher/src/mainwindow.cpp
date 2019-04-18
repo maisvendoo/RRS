@@ -26,6 +26,7 @@
 #include    "CfgReader.h"
 
 #include    "platform.h"
+#include    "styles.h"
 
 //------------------------------------------------------------------------------
 //
@@ -61,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(ui->twMain);
 
     setFocusPolicy(Qt::ClickFocus);
+
+    setStyleSheet(readStyleSheet("../css/mainwindow.qss"));
 }
 
 //------------------------------------------------------------------------------
@@ -150,9 +153,11 @@ void MainWindow::loadTrainsList(const std::string &trainsDir)
 //------------------------------------------------------------------------------
 void MainWindow::setRouteScreenShot(const QString &path)
 {
-    if (path.isEmpty())
+    QFileInfo info(path);
+
+    if (!info.exists())
     {
-        ui->lRouteScreenShot->setText("Нет скриншота");
+        ui->lRouteScreenShot->setText(tr("No screenshot"));
         return;
     }
 

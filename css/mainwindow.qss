@@ -1,0 +1,24 @@
+QWidget {
+    background-color: #404040;
+    color: #ffffff;
+}
+
+QPushButton {
+	background-color: #00aa00;
+}
+
+QPushButton::pressed {
+	background-color: #ffb140;
+}
+
+QListWidget {
+	background-color: #606060;	
+}
+
+QListWidget::item::selected {
+	background-color: #ffb140;
+}
+
+QPlainTextEdit {
+	background-color: #606060;
+}

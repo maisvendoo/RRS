@@ -6,8 +6,7 @@
     <message>
         <location filename="../forms/mainwindow.ui" line="14"/>
         <source>Russian Railway Simulator</source>
-        <translation>Russian Railway Simulator
-</translation>
+        <translation>Russian Railway Simulator</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="37"/>
@@ -37,6 +36,7 @@
     <message>
         <location filename="../forms/mainwindow.ui" line="202"/>
         <location filename="../forms/mainwindow.ui" line="309"/>
+        <location filename="../src/mainwindow.cpp" line="158"/>
         <source>No screenshot</source>
         <translation>Нет скриншота</translation>
     </message>
