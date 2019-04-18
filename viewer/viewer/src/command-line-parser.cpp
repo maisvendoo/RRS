@@ -36,6 +36,9 @@ CommandLineParser::CommandLineParser(int argc, char *argv[])
     if (args.read("--height", value))
         cmd_line.height.is_present = getValue(value, cmd_line.height.value);
 
+    if (args.read("--direction", value))
+        cmd_line.direction.is_present = getValue(value, cmd_line.direction.value);
+
     cmd_line.fullscreen.is_present = cmd_line.fullscreen.value = args.read("--fullscreen", value);
     cmd_line.localmode.is_present = cmd_line.localmode.value = args.read("--localmode", value);
 

@@ -122,7 +122,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
             double dv = Y[idx + s] - Y[idx1 + s1];
 
             Coupling *coup = *coup_it;
-            double R = coup->getForce(ds, dv);
+            double R = dir * coup->getForce(ds, dv);
             ++coup_it;
 
             vehicle->setBackwardForce(R);

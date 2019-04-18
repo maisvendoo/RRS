@@ -25,7 +25,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-RoutePath::RoutePath(const std::string &track_file_path) : MotionPath ()
+RoutePath::RoutePath(const std::string &track_file_path, int direction) : MotionPath ()
+  , direction(direction)
 {
     load(track_file_path);
 }

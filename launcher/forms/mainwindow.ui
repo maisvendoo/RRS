@@ -115,12 +115,12 @@
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="maximum">
-                 <double>40000.000000000000000</double>
+                 <double>40000000.000000000000000</double>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="checkboxDirection">
                 <property name="maximumSize">
                  <size>
                   <width>10000</width>

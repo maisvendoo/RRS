@@ -178,9 +178,17 @@ void MainWindow::startSimulator()
     args << "--train-config=" + selectedTrain;
     args << "--route=" + selectedRoutePath;
 
-    if (ui->cbStations->count() != 0)
+    if (ui->checkboxDirection->isChecked())
     {
-        size_t i = static_cast<size_t>(ui->cbStations->currentIndex());
+        args << "--direction=-1";
+    }
+    else
+    {
+        args << "--direction=1";
+    }
+
+    if (ui->cbStations->count() != 0)
+    {        
         double init_coord = ui->dsbOrdinate->value() / 1000.0;
         args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
@@ -200,6 +208,16 @@ void MainWindow::startViewer()
     QStringList args;
     args << "--route" << selectedRoutePath;
     args << "--train" << selectedTrain;
+    args << "--direction";
+
+    if (ui->checkboxDirection->isChecked())
+    {
+        args << "-1";
+    }
+    else
+    {
+        args << "1";
+    }
 
     viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     viewerProc.start(viewerPath, args);

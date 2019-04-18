@@ -32,7 +32,7 @@ class RoutePath : public MotionPath
 public:
 
     /// Constructor with automatic track loading
-    RoutePath(const std::string &track_file_path);    
+    RoutePath(const std::string &track_file_path, int direction = 1);
 
     /// Get cartesian position of track point
     osg::Vec3 getPosition(float railway_coord);
@@ -47,6 +47,9 @@ public:
     virtual osg::Vec3 getPosition(float railway_coord, osg::Vec3 &attitude, basis_t &basis);
 
 protected:
+
+    /// Direction
+    int direction;
 
     /// Tracks data
     std::vector<track_t>    track_data;

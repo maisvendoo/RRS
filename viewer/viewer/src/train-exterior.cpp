@@ -313,6 +313,9 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
 
+        if (settings.direction == -1)
+            vehicles_ext[i].attitude.z() = osg::PIf + vehicles_ext[i].attitude.z();
+
         // Store current railway coordinate and wheels angle
         vehicles_ext[i].coord = coord;
         vehicles_ext[i].wheel_angle = angle;

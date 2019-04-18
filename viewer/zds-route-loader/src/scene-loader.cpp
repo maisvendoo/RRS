@@ -67,7 +67,7 @@ MotionPath *SceneLoader::getMotionPath(int direction)
         track_name += "2.trk";
     }
 
-    return new RoutePath(track_name);
+    return new RoutePath(track_name, direction);
 }
 
 //------------------------------------------------------------------------------
