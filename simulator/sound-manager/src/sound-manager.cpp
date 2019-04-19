@@ -78,7 +78,8 @@ void SoundManager::loadSounds(const QString &vehicle_name)
 //------------------------------------------------------------------------------
 void SoundManager::attachSound(const QString &name, const QString &path)
 {
-
+    Q_UNUSED(name)
+    Q_UNUSED(path)
 }
 
 //------------------------------------------------------------------------------

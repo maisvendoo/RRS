@@ -11,7 +11,7 @@
     const QString VIEWER_NAME = "viewer";
 #endif
 
-#ifdef __WIN32__ || __WIN64__
+#ifdef __WIN32__
     const QString EXE_EXP = ".exe";
 #else
     const QString EXE_EXP = "";

@@ -428,9 +428,7 @@ void Vehicle::receiveData(QByteArray data)
         return;
 
     QDataStream stream(&data, QIODevice::ReadOnly);
-    stream >> keys;
-
-    int i = 0;
+    stream >> keys;    
 }
 
 bool *Vehicle::getDiscreteSignals()

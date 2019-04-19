@@ -458,11 +458,11 @@ void Model::sharedMemoryFeedback()
         ++i;
     }
 
-    //if (shared_memory.lock())
-    //{
+    if (shared_memory.lock())
+    {
         memcpy(shared_memory.data(), &viewer_data, sizeof (server_data_t));
-      //  shared_memory.unlock();
-    //}
+        shared_memory.unlock();
+    }
 
     viewer_data.count++;    
 }

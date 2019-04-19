@@ -78,10 +78,7 @@ void PassCarrige::step(double t, double dt)
 {
     if ( brake_mech != nullptr )
     {
-        double p = brake_mech->getBrakeCylinderPressure();
-        double K1 = 1e-2;
         pz = Physics::cut(pz, 0.0, 0.4);
-        double Q = K1 * (pz - p);
 
         brake_mech->setAirFlow(airdist->getBrakeCylinderAirFlow());
         brake_mech->setVelocity(velocity);

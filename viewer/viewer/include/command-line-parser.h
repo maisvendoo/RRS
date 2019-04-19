@@ -62,8 +62,9 @@ bool getValue(const std::string &str, T &value)
     {
         ss >> value;
     }
-    catch (std::exception)
+    catch (std::exception ex)
     {
+        (void) ex;
         return false;
     }
 

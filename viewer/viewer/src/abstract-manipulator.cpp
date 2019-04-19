@@ -9,6 +9,7 @@ AbstractManipulator::AbstractManipulator(QObject *parent)
     , osgGA::TrackballManipulator ()
     , cp(camera_position_t())
     , start_time(0.0)
+    , delta_time(0.0f)
 {
     qRegisterMetaType<camera_position_t>();
 }

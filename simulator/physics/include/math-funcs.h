@@ -91,6 +91,8 @@ T dead_zone(T x, T min, T max)
 
     if (x < min)
         return x - min;
+
+    return x;
 }
 
 #endif // MATH_FUNCS_H

@@ -17,6 +17,8 @@ public:
 
     virtual osg::Matrixd getInverseMatrix() const;
 
+    void init(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+
     bool performMovementRightMouseButton(const double eventTimeDelta,
                                          const double dx,
                                          const double dy);

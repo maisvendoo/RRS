@@ -22,12 +22,9 @@ osg::Matrixd TrainManipulator::getMatrix() const
 {
     osg::Matrix matrix;
 
-    float a_x = -cp.attitude.x();
-    float a_z = -cp.attitude.z();
-
-    matrix *= osg::Matrix::rotate(static_cast<double>(a_x), osg::Vec3(1.0f, 0.0f, 0.0f));
-    matrix *= osg::Matrix::rotate(static_cast<double>(a_z), osg::Vec3(0.0f, 0.0f, 1.0f));
-    matrix *= osg::Matrix::translate(cp.position);
+    matrix *= osg::Matrixf::rotate(-cp.attitude.x(), osg::Vec3(1.0f, 0.0f, 0.0f));
+    matrix *= osg::Matrixf::rotate(-cp.attitude.z(), osg::Vec3(0.0f, 0.0f, 1.0f));
+    matrix *= osg::Matrixf::translate(cp.position);
 
     return matrix;
 }
@@ -44,6 +41,11 @@ osg::Matrixd TrainManipulator::getInverseMatrix() const
     invMatrix *= osg::Matrix::translate(-rel_pos);
 
     return invMatrix;
+}
+
+void TrainManipulator::init(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
+{
+    OSG_INFO << "!!!!!!INFO!!!!!: SWITCHED TO TRAIN CAMERA" << std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -142,6 +144,8 @@ bool TrainManipulator::handleKeyDown(const osgGA::GUIEventAdapter &ea,
         rel_pos.x() += settings.ext_cam_speed * delta_time;
         break;
     }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
