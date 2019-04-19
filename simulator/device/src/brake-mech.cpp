@@ -158,7 +158,7 @@ double BrakeMech::phi(double K, double v)
     double fric_coeff = 0.0;
 
     double K1 = K / 9.8;
-    double V = Physics::kmh * v;
+    double V = Physics::kmh * abs(v);
 
     if (shoeType == "iron")
     {

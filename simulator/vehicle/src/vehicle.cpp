@@ -328,12 +328,12 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
     {
-        double eqWheelForce = (Q_a[i] - Physics::fricForce(Q_r[i], Y[idx + s + i])) / rk;
+        double eqWheelForce = (Q_a[i] - Physics::fricForce(Q_r[i], dir * Y[idx + s + i])) / rk;
         sumEqWheelForce += eqWheelForce;
     }
 
     // Calculate equvivalent resistence force
-    double Fr = Physics::fricForce(W + Q_r[0], v);
+    double Fr = Physics::fricForce(W + Q_r[0], dir * v);
 
     // Vehicle body's acceleration
     *a.begin() = dir * (*Q_a.begin() - Fr + R1 - R2 + sumEqWheelForce - G) / ( full_mass + num_axis * J_axis / rk / rk);
