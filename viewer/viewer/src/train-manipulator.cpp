@@ -43,11 +43,6 @@ osg::Matrixd TrainManipulator::getInverseMatrix() const
     return invMatrix;
 }
 
-void TrainManipulator::init(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa)
-{
-    OSG_INFO << "!!!!!!INFO!!!!!: SWITCHED TO TRAIN CAMERA" << std::endl;
-}
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

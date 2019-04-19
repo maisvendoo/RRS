@@ -38,7 +38,7 @@ public:
             {
                 ss >> value;
             }
-            catch (std::exception)
+            catch (std::runtime_error &)
             {
                 return false;
             }

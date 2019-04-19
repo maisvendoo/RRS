@@ -26,3 +26,15 @@ QListWidget::item::selected {
 QPlainTextEdit {
 	background-color: #606060;
 }
+
+QTabBar::tab:selected {
+    background: #ffb140;
+}
+
+QTabBar::tab:!selected {
+    background: #404040;
+}
+
+QTabWidget::pane { 
+	border: 0; 
+}

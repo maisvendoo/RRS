@@ -20,6 +20,8 @@ AbstractManipulator::AbstractManipulator(QObject *parent)
 bool AbstractManipulator::handleFrame(const osgGA::GUIEventAdapter &ea,
                                       osgGA::GUIActionAdapter &aa)
 {
+    (void) ea;
+
     osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
 
     if (!viewer)

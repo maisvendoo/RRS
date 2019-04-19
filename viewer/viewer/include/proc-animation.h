@@ -4,7 +4,7 @@
 #include    <osg/MatrixTransform>
 #include    "math-funcs.h"
 #include    "config-reader.h"
-#include    <strstream>
+#include    <sstream>
 
 //------------------------------------------------------------------------------
 //
