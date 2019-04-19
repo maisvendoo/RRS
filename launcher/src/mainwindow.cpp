@@ -59,6 +59,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->cbStations, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onStationSelected);
 
+    connect(ui->cbDirection, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onDirectionSelected);
+
     setCentralWidget(ui->twMain);
 
     setFocusPolicy(Qt::ClickFocus);
@@ -178,7 +181,7 @@ void MainWindow::startSimulator()
     args << "--train-config=" + selectedTrain;
     args << "--route=" + selectedRoutePath;
 
-    if (ui->checkboxDirection->isChecked())
+    if (isBackward())
     {
         args << "--direction=-1";
     }
@@ -210,7 +213,7 @@ void MainWindow::startViewer()
     args << "--train" << selectedTrain;
     args << "--direction";
 
-    if (ui->checkboxDirection->isChecked())
+    if (isBackward())
     {
         args << "-1";
     }
@@ -251,6 +254,21 @@ void MainWindow::loadStations(QString &routeDir)
     }
 
     ui->cbStations->setCurrentIndex(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool MainWindow::isBackward()
+{
+    switch (ui->cbDirection->currentIndex())
+    {
+    case 0: return false;
+
+    case 1: return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -343,9 +361,21 @@ void MainWindow::onStationSelected(int index)
 
     if (idx < waypoints.size())
     {
-        if (ui->checkboxDirection->isChecked())
+        if (isBackward())
             ui->dsbOrdinate->setValue(waypoints[idx].backward_coord);
         else
             ui->dsbOrdinate->setValue(waypoints[idx].forward_coord);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onDirectionSelected(int index)
+{
+    Q_UNUSED(index)
+
+    int station_idx = ui->cbStations->currentIndex();
+
+    onStationSelected(station_idx);
 }

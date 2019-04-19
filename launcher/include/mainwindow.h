@@ -90,6 +90,8 @@ private:
 
     void loadStations(QString &routeDir);
 
+    bool isBackward();
+
 private slots:
 
     void onRouteSelection();
@@ -105,6 +107,8 @@ private slots:
     void onViewerFinished(int exitCode);
 
     void onStationSelected(int index);
+
+    void onDirectionSelected(int index);
 };
 
 #endif // MAINWINDOW_H

@@ -92,7 +92,7 @@
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3,1">
+             <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3,0">
               <item>
                <widget class="QLabel" name="label_3">
                 <property name="sizePolicy">
@@ -132,22 +132,20 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkboxDirection">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+               <widget class="QComboBox" name="cbDirection">
+                <property name="currentIndex">
+                 <number>0</number>
                 </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>10000</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Revert</string>
-                </property>
+                <item>
+                 <property name="text">
+                  <string>Forward</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Backward</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
