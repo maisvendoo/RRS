@@ -40,6 +40,7 @@ public:
         instance.setScreenshotsDir(tmp + "screenshots");
         instance.setFontsDir(tmp + "fonts");
         instance.setSoundsDir(instance.combinePath(instance.getDataDir(), "sounds"));
+        instance.setThemeDir(tmp + "themes");
 
         return instance;
     }    
@@ -84,6 +85,8 @@ public:
 
     std::string getSoundsDir() const;
 
+    std::string getThemeDir() const;
+
     std::string combinePath(const std::string &path1, const std::string &path2);
 
     std::string toNativeSeparators(const std::string &path);
@@ -113,6 +116,8 @@ private:
     std::string fontsDir;
 
     std::string soundsDir;
+
+    std::string themeDir;
 
     FileSystem() {}
     FileSystem(const FileSystem &) = delete;
@@ -153,6 +158,8 @@ private:
     void setFontsDir(const std::string &path);
 
     void setSoundsDir(const std::string &path);
+
+    void setThemeDir(const std::string &path);
 };
 
 #endif

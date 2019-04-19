@@ -88,9 +88,14 @@ private:
     /// Start viewer
     void startViewer();
 
+    /// Loading of stations list for selected route
     void loadStations(QString &routeDir);
 
+    /// Check backward direction
     bool isBackward();
+
+    /// Load theme
+    void loadTheme();
 
 private slots:
 

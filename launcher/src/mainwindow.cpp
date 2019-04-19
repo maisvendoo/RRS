@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setFocusPolicy(Qt::ClickFocus);
 
-    setStyleSheet(readStyleSheet("../css/mainwindow.qss"));
+    loadTheme();
 }
 
 //------------------------------------------------------------------------------
@@ -269,6 +269,35 @@ bool MainWindow::isBackward()
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadTheme()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "launcher.xml");
+
+    CfgReader cfg;
+
+    if ( cfg.load(QString(cfg_path.c_str())) )
+    {
+        QString secName = "Launcher";
+        QString theme_name = "";
+
+        if (!cfg.getString(secName, "Theme", theme_name))
+        {
+            theme_name = "dark-jedy";
+        }
+
+        std::string theme_dir = fs.getThemeDir();
+        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
+        QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
+
+        this->setStyleSheet(style_sheet);
+    }
 }
 
 //------------------------------------------------------------------------------

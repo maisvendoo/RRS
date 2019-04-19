@@ -97,6 +97,14 @@ void FileSystem::setSoundsDir(const std::string &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void FileSystem::setThemeDir(const std::string &path)
+{
+    themeDir = getNativePath(path);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::string FileSystem::getRouteRootDir() const
 {
     return routeRootDir;
@@ -192,6 +200,11 @@ std::string FileSystem::getFontsDir() const
 std::string FileSystem::getSoundsDir() const
 {
     return soundsDir;
+}
+
+std::string FileSystem::getThemeDir() const
+{
+    return themeDir;
 }
 
 //------------------------------------------------------------------------------
