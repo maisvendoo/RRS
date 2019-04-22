@@ -16,5 +16,6 @@ CONFIG(debug, debug|release) {
 
 }
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/neutral_insertion.h
 SOURCES += $$files(./src/*.cpp)

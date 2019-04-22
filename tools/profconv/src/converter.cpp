@@ -8,6 +8,7 @@
 #include    <locale>
 
 #include    "path-utils.h"
+#include    "profile.h"
 
 #include    <QFile>
 #include    <QTextCodec>
@@ -329,7 +330,10 @@ bool ProfConverter::conversion(const std::string &routeDir)
     std::string trk2_path = compinePath(routeDir, "route2.trk");
 
     if (load(trk1_path, tracks_data1))
+    {
         writeProfileData(tracks_data1, "profile1.conf");
+        createPowerLine(tracks_data1, power_line1);
+    }
 
     if (load(trk2_path, tracks_data2))
          writeProfileData(tracks_data2, "profile2.conf");
@@ -392,6 +396,67 @@ void ProfConverter::fileToUtf8(const std::string &path)
     stream << new_data;
 
     startKmDat.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+track_t ProfConverter::getNearestTrack(Vec3 point, const std::vector<track_t> &tracks_data)
+{
+    float dist = 1e10;
+    track_t result;
+
+    for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
+    {
+        track_t track = *it;
+
+        Vec3 r = point - track.begin_point;
+        Vec3 d = r ^ track.orth;
+
+        float len = d.length();
+
+        if (len < dist)
+        {
+            dist = len;
+            result = track;
+        }
+    }
+
+    return result;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProfConverter::createPowerLine(const std::vector<track_t> &tracks_data,
+                                    std::vector<power_line_element_t> &power_line)
+{
+    for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
+    {
+        track_t track = *it;
+
+        power_line_element_t p_line_emem;
+
+        p_line_emem.railway_coord = track.rail_coord;
+        p_line_emem.voltage = static_cast<float>(track.voltage);
+
+        switch (track.voltage)
+        {
+        case 3:
+            p_line_emem.current_kind = DC_CURRENT;
+            break;
+
+        case 25:
+            p_line_emem.current_kind = AC_CURRENT;
+            break;
+
+        default:
+            p_line_emem.current_kind = NOT_DEFINED_CURRENT;
+            break;
+        }
+
+        power_line.push_back(p_line_emem);
+    }
 }
 
 

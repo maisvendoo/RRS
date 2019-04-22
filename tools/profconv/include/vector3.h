@@ -22,6 +22,14 @@ public:
 
     }
 
+    Vec3(float x, float y, float z)
+        : x(x)
+        , y(y)
+        , z(z)
+    {
+
+    }
+
     float length()
     {
         return std::sqrt(x * x + y * y + z * z);
@@ -65,6 +73,17 @@ public:
 
             return tmp;
         }
+    }
+
+    Vec3 operator^(Vec3 &b)
+    {
+        Vec3 tmp;
+
+        tmp.x = this->y * b.z - b.y * this->z;
+        tmp.y = b.x * this->z - this->x * b.z;
+        tmp.z = this->x * b.y - b.y * this->x;
+
+        return tmp;
     }
 
 private:

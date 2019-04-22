@@ -19,6 +19,7 @@
 
 #include    "track.h"
 #include    "waypoint.h"
+#include    "power_line_element.h"
 #include    "cmd-line.h"
 
 #include    <fstream>
@@ -46,6 +47,10 @@ private:
 
     std::vector<waypoint_t> waypoints;
 
+    std::vector<power_line_element_t> power_line1;
+
+    std::vector<power_line_element_t> power_line2;
+
     CmdLineParseResult parseCommandLine(int argc, char *argv[]);
 
     bool load(const std::string &path, std::vector<track_t> &track_data);
@@ -63,7 +68,12 @@ private:
     void writeProfileData(const std::vector<track_t> &tracks_data,
                           const std::string &file_name);
 
-    void fileToUtf8(const std::string &path);
+    void fileToUtf8(const std::string &path);    
+
+    track_t getNearestTrack(Vec3 point, const std::vector<track_t> &tracks_data);
+
+    void createPowerLine(const std::vector<track_t> &tracks_data,
+                         std::vector<power_line_element_t> &power_line);
 };
 
 #endif // CONVERTER_H
