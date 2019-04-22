@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    Application app(argc, argv);
+    Application *app = new Application(argc, argv);
 
-    return app.exec();
+    return app->exec();
 }
