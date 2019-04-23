@@ -328,11 +328,13 @@ bool ProfConverter::conversion(const std::string &routeDir)
 {
     std::string trk1_path = compinePath(routeDir, "route1.trk");
     std::string trk2_path = compinePath(routeDir, "route2.trk");
+    std::string map_path = compinePath(routeDir, "route1.map");
 
     if (load(trk1_path, tracks_data1))
     {
         writeProfileData(tracks_data1, "profile1.conf");
         createPowerLine(tracks_data1, power_line1);
+        loadNeutralInsertions(map_path, neutral_insertions);
     }
 
     if (load(trk2_path, tracks_data2))
@@ -401,26 +403,28 @@ void ProfConverter::fileToUtf8(const std::string &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t ProfConverter::getNearestTrack(Vec3 point, const std::vector<track_t> &tracks_data)
+track_t ProfConverter::getNearestTrack(Vec3 point, const std::vector<track_t> &tracks_data, float &coord)
 {
-    float dist = 1e10;
     track_t result;
 
     for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
     {
         track_t track = *it;
 
-        Vec3 r = point - track.begin_point;
-        Vec3 d = r ^ track.orth;
+        Vec3 rho = point - track.begin_point;
+        float tau = Vec3::dot_product(rho, track.orth);
 
-        float len = d.length();
+        if ( tau < 0.0f )
+            continue;
 
-        if (len < dist)
-        {
-            dist = len;
-            result = track;
-        }
-    }
+        if ( tau > track.length )
+            continue;
+
+        result = track;
+        coord = track.rail_coord + tau;
+
+        break;
+    }    
 
     return result;
 }
@@ -457,6 +461,121 @@ void ProfConverter::createPowerLine(const std::vector<track_t> &tracks_data,
 
         power_line.push_back(p_line_emem);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ProfConverter::loadNeutralInsertions(const std::string &path,
+                                          std::vector<neutral_inserion_t> ni)
+{
+    if (path.empty())
+        return false;
+
+    std::ifstream stream(path.c_str(), std::ios::in);
+
+    if (!stream.is_open())
+    {
+        std::cout << "File " << path << " not opened" << std::endl;
+        return false;
+    }
+
+    return loadNeutralInsertions(stream, ni);
+}
+
+void add_element(float x, std::vector<float> &array)
+{
+    float eps = 1.0f;
+
+    if (array.size() != 0)
+    {
+        float last = *(array.end() - 1);
+
+        if ( abs(last - x) >= eps )
+            array.push_back(x);
+    }
+    else
+    {
+        array.push_back(x);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ProfConverter::loadNeutralInsertions(std::ifstream &stream,
+                                          std::vector<neutral_inserion_t> ni)
+{
+    std::vector<float> begins;
+    std::vector<float> ends;
+
+    while (!stream.eof())
+    {
+        std::string line;
+        std::getline(stream, line);
+
+        line = delete_symbol(line, '\r');
+        std::replace(line.begin(), line.end(), ',', ' ');
+
+        if (line.empty())
+            continue;
+
+        if (*(line.end() - 1) != ';')
+            continue;
+
+        if (line.at(0) == ',')
+            continue;
+
+        std::string obj_name = "";
+
+        std::istringstream ss(line);
+
+        Vec3 pos;
+
+        ss >> obj_name >> pos.x >> pos.y >> pos.z;
+
+        if (obj_name == "nvne")
+        {
+            neutral_inserion_t n_insertion;
+
+            float begin_coord = 0;
+            track_t track = getNearestTrack(pos, tracks_data1, begin_coord);
+
+            add_element(begin_coord, begins);
+        }
+
+        if (obj_name == "nvke")
+        {
+            neutral_inserion_t n_insertion;
+
+            float end_coord = 0;
+            track_t track = getNearestTrack(pos, tracks_data1, end_coord);
+
+            add_element(end_coord, ends);
+        }
+    }
+
+    std::sort(begins.begin(), begins.end(), std::less<float>());
+    std::sort(ends.begin(), ends.end(), std::less<float>());
+
+    if (begins.size() == ends.size())
+    {
+        float max_len = 500.0f;
+
+        for (size_t i = 0; i < begins.size(); ++i)
+        {
+            neutral_inserion_t n_ins;
+
+            n_ins.begin_coord = begins[i];
+            n_ins.end_coord = ends[i];
+            n_ins.length = abs(n_ins.end_coord - n_ins.begin_coord);
+
+            if (n_ins.length <= max_len)
+                ni.push_back(n_ins);
+        }
+    }
+
+    return ni.size() != 0;
 }
 
 
