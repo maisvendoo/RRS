@@ -109,7 +109,8 @@ void TestLoco::step(double t, double dt)
     if ( airdist != nullptr)
     {
         airdist->setBrakepipePressure(pTM);
-        airdist->setBrakeCylinderPressure(repiter->getWorkPressure());
+        //airdist->setBrakeCylinderPressure(repiter->getWorkPressure());
+        airdist->setBrakeCylinderPressure(zpk->getPressure1());
         airdist->setAirSupplyPressure(supply_reservoir->getPressure());
 
         auxRate = airdist->getAuxRate();
@@ -119,9 +120,16 @@ void TestLoco::step(double t, double dt)
 
     repiter->setPipelinePressure(0.9);
     repiter->setBrakeCylPressure(brake_mech->getBrakeCylinderPressure());
-    repiter->setWorkAirFlow(airdist->getBrakeCylinderAirFlow());
+    //repiter->setWorkAirFlow(airdist->getBrakeCylinderAirFlow());
+    repiter->setWorkAirFlow(zpk->getOutputFlow());
 
     repiter->step(t, dt);
+
+    zpk->setInputFlow2(0.0);
+    zpk->setInputFlow1(airdist->getBrakeCylinderAirFlow());
+    zpk->setOutputPressure(repiter->getWorkPressure());
+
+    zpk->step(t, dt);
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
@@ -173,6 +181,9 @@ void TestLoco::initialization()
 
     repiter = new PneumoReley();
     repiter->read_config("rd304");
+
+    zpk = new SwitchingValve();
+    zpk->read_config("zpk");
 
     if (brake_crane != nullptr)
     {

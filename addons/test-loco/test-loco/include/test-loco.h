@@ -16,6 +16,7 @@
 #include    "reservoir.h"
 #include    "airdistributor.h"
 #include    "pneumo-relay.h"
+#include    "switching-valve.h"
 
 
 class TestLoco : public Vehicle
@@ -77,6 +78,8 @@ private:
     Reservoir   *supply_reservoir;
 
     PneumoReley *repiter;
+
+    SwitchingValve *zpk;
 
     void step(double t, double dt);
 
