@@ -1,9 +1,16 @@
 #include    "loco-crane.h"
 
+#include    <QLibrary>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 LocoCrane::LocoCrane(QObject *parent) : BrakeDevice(parent)
+  , pFL(0.0)
+  , pBC(0.0)
+  , Qvr(0.0)
+  , Qbc(0.0)
+  , pos(0.0)
 {
 
 }
@@ -38,4 +45,42 @@ void LocoCrane::setBrakeCylinderPressure(double pBC)
 void LocoCrane::setAirDistributorFlow(double Qvr)
 {
     this->Qvr = Qvr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane::setHandlePosition(double pos)
+{
+    this->pos = pos;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double LocoCrane::getBrakeCylinderFlow() const
+{
+    return Qbc;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+LocoCrane *loadLocoCrane(QString lib_path)
+{
+    LocoCrane *crane = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetLocoCrane getLocoCrane = reinterpret_cast<GetLocoCrane>(lib.resolve("getLocoCrane"));
+
+        if (getLocoCrane)
+        {
+            crane = getLocoCrane();
+        }
+    }
+
+    return crane;
 }

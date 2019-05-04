@@ -29,6 +29,9 @@
                 <BrakeCraneModule>krm395</BrakeCraneModule>
                 <BrakeCraneConfig>krm395</BrakeCraneConfig>
 
+                <LocoCraneModule>kvt254</LocoCraneModule>
+                <LocoCraneConfig>kvt254</LocoCraneConfig>
+
                 <BrakeMechModule>carbrakes-mech</BrakeMechModule>
                 <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
 
