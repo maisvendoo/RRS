@@ -17,6 +17,7 @@
 #include    "airdistributor.h"
 #include    "pneumo-relay.h"
 #include    "switching-valve.h"
+#include    "loco-crane.h"
 
 
 class TestLoco : public Vehicle
@@ -61,6 +62,11 @@ private:
 
     double charge_press;
 
+    QString     loco_crane_module;
+    QString     loco_crane_config;
+
+    double  loco_crane_pos;
+
     IncTractionTrigger incTracTrig;
     DecTractionTrigger decTracTrig;
 
@@ -80,6 +86,8 @@ private:
     PneumoReley *repiter;
 
     SwitchingValve *zpk;
+
+    LocoCrane *loco_crane;
 
     void step(double t, double dt);
 

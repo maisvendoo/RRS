@@ -171,6 +171,11 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_5);
     addKey(osgGA::GUIEventAdapter::KEY_6);
     addKey(osgGA::GUIEventAdapter::KEY_7);
+    addKey(osgGA::GUIEventAdapter::KEY_8);
+    addKey(osgGA::GUIEventAdapter::KEY_9);
+    addKey(osgGA::GUIEventAdapter::KEY_0);
+    addKey(osgGA::GUIEventAdapter::KEY_Minus);
+    addKey(osgGA::GUIEventAdapter::KEY_Equals);
 }
 
 //------------------------------------------------------------------------------

@@ -30,6 +30,9 @@ TestLoco::TestLoco() : Vehicle()
   , brake_mech_module("carbrake-mech")
   , brake_mech_config("tep70bs-mech")
   , charge_press(0.5)  
+  , loco_crane_module("kvt254")
+  , loco_crane_config("kvt254")
+  , loco_crane_pos(0.0)
 {
 
 }
@@ -125,11 +128,18 @@ void TestLoco::step(double t, double dt)
 
     repiter->step(t, dt);
 
-    zpk->setInputFlow2(0.0);
+    zpk->setInputFlow2(loco_crane->getBrakeCylinderFlow());
     zpk->setInputFlow1(airdist->getBrakeCylinderAirFlow());
     zpk->setOutputPressure(repiter->getWorkPressure());
 
     zpk->step(t, dt);
+
+    loco_crane->setFeedlinePressure(0.9);
+    loco_crane->setAirDistributorFlow(0.0);
+    loco_crane->setBrakeCylinderPressure(zpk->getPressure2());
+    loco_crane->setHandlePosition(loco_crane_pos);
+
+    loco_crane->step(t, dt);
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
@@ -196,6 +206,13 @@ void TestLoco::initialization()
         airdist->read_config(airdist_config);
 
         connect(brake_crane, &BrakeCrane::soundSetVolume, this, &TestLoco::soundSetVolume);
+    }
+
+    loco_crane = loadLocoCrane(modules_dir + fs.separator() + loco_crane_module);
+
+    if (loco_crane != nullptr)
+    {
+        loco_crane->read_config(loco_crane_config);
     }
 }
 
@@ -279,6 +296,31 @@ void TestLoco::keyProcess()
         crane_pos = 6;
     }
 
+    if (keys[KEY_8])
+    {
+        loco_crane_pos = 0.0;
+    }
+
+    if (keys[KEY_9])
+    {
+        loco_crane_pos = 0.325;
+    }
+
+    if (keys[KEY_0])
+    {
+        loco_crane_pos = 0.5;
+    }
+
+    if (keys[KEY_Minus])
+    {
+        loco_crane_pos = 0.75;
+    }
+
+    if (keys[KEY_Equals])
+    {
+        loco_crane_pos = 1.0;
+    }
+
     incChargePress.process(keys[KEY_H], charge_press);
     decChargePress.process(keys[KEY_J], charge_press);
 
@@ -315,8 +357,12 @@ void TestLoco::keyProcess()
     analogSignal[26] = static_cast<float>(abs(velocity) * Physics::kmh / 220.0);
     analogSignal[27] = static_cast<float>(abs(velocity) * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
+    analogSignal[29] = static_cast<float>(loco_crane_pos);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TestLoco::stepper(int &value, int duration, double dt)
 {
     double tmp = static_cast<double>(value);

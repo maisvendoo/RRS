@@ -93,7 +93,7 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
 
     double Q_1sum = Q1 - K2 * Q_out1;
 
-    double Q_out2 = K1 * (Y[0] - p_out) * u2;
+    double Q_out2 = K1 * (Y[1] - p_out) * u2;
 
     double Q_2sum = Q2 - K2 * Q_out2;
 
