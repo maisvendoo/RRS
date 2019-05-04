@@ -4,6 +4,10 @@
 //
 //------------------------------------------------------------------------------
 LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
+  , V1(1e-4)
+  , V2(1e-4)
+  , Vpz(3e-4)
+  , delta_p(0.05)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
@@ -23,6 +27,14 @@ LocoCrane254::~LocoCrane254()
 double LocoCrane254::getHandlePosition() const
 {
     return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double LocoCrane254::getAirDistribPressure() const
+{
+    return getY(0);
 }
 
 //------------------------------------------------------------------------------
@@ -53,11 +65,27 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
     // Поток воздуха в ТЦ
     Qbc = K[1] * (pFL - pBC) * u3 - K[2] * pBC * u4;
 
-    dYdt[0] = Qvr / V1;
+    // Работа повторительной схемы
 
-    dYdt[1] = 0.0;
+    double dp12 =  Y[0] - Y[1];
 
-    dYdt[2] = 0.0;
+    double u5 = hs_p(dp12);
+
+    double u6 = hs_n(pos);
+
+    double Qpz = K[7] * (Y[1] - Y[2]);
+
+    double Q12 = K[5] * dp12;
+
+    double Q1 = K[4] * Qvr - Q12;
+
+    double Q2 = Q12 - Qpz - K[6] * Y[1] * u6;
+
+    dYdt[0] = Q1 / V1;
+
+    dYdt[1] = Q2 / V2;
+
+    dYdt[2] = Qpz / Vpz;
 }
 
 //------------------------------------------------------------------------------
@@ -82,6 +110,8 @@ void LocoCrane254::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "V1", V1);
     cfg.getDouble(secName, "V2", V2);
     cfg.getDouble(secName, "Vpz", Vpz);
+
+    cfg.getDouble(secName, "delta_p", delta_p);
 }
 
 GET_LOCO_CRANE(LocoCrane254)

@@ -113,7 +113,8 @@ void TestLoco::step(double t, double dt)
     {
         airdist->setBrakepipePressure(pTM);
         //airdist->setBrakeCylinderPressure(repiter->getWorkPressure());
-        airdist->setBrakeCylinderPressure(zpk->getPressure1());
+        //airdist->setBrakeCylinderPressure(zpk->getPressure1());
+        airdist->setBrakeCylinderPressure(loco_crane->getAirDistribPressure());
         airdist->setAirSupplyPressure(supply_reservoir->getPressure());
 
         auxRate = airdist->getAuxRate();
@@ -129,13 +130,15 @@ void TestLoco::step(double t, double dt)
     repiter->step(t, dt);
 
     zpk->setInputFlow2(loco_crane->getBrakeCylinderFlow());
-    zpk->setInputFlow1(airdist->getBrakeCylinderAirFlow());
+    //zpk->setInputFlow1(airdist->getBrakeCylinderAirFlow());
+    zpk->setInputFlow1(0.0);
     zpk->setOutputPressure(repiter->getWorkPressure());
 
     zpk->step(t, dt);
 
     loco_crane->setFeedlinePressure(0.9);
-    loco_crane->setAirDistributorFlow(0.0);
+    //loco_crane->setAirDistributorFlow(0.0);
+    loco_crane->setAirDistributorFlow(airdist->getBrakeCylinderAirFlow());
     loco_crane->setBrakeCylinderPressure(zpk->getPressure2());
     loco_crane->setHandlePosition(loco_crane_pos);
 
@@ -296,6 +299,15 @@ void TestLoco::keyProcess()
         crane_pos = 6;
     }
 
+    /*if (keys[KEY_Leftbracket])
+    {
+        loco_crane_pos = -0.05;
+    }
+    else
+    {
+        loco_crane_pos = 0.0;
+    }*/
+
     if (keys[KEY_8])
     {
         loco_crane_pos = 0.0;
@@ -357,7 +369,7 @@ void TestLoco::keyProcess()
     analogSignal[26] = static_cast<float>(abs(velocity) * Physics::kmh / 220.0);
     analogSignal[27] = static_cast<float>(abs(velocity) * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
-    analogSignal[29] = static_cast<float>(loco_crane_pos);
+    analogSignal[29] = static_cast<float>(loco_crane_pos + 0.05);
 }
 
 //------------------------------------------------------------------------------

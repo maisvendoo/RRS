@@ -25,6 +25,8 @@ public:
 
     double getHandlePosition() const;
 
+    double getAirDistribPressure() const;
+
 private:
 
     double V1;
@@ -32,6 +34,8 @@ private:
     double V2;
 
     double Vpz;
+
+    double delta_p;
 
     std::array<double, MAX_FLOW_COEFFS> K;
 

@@ -26,6 +26,8 @@ public:
 
     virtual double getHandlePosition() const = 0;
 
+    virtual double getAirDistribPressure() const;
+
 protected:
 
     double pFL;
