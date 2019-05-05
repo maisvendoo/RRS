@@ -299,14 +299,8 @@ void TestLoco::keyProcess()
         crane_pos = 6;
     }
 
-    /*if (keys[KEY_Leftbracket])
-    {
-        loco_crane_pos = -0.05;
-    }
-    else
-    {
-        loco_crane_pos = 0.0;
-    }*/
+
+    loco_crane->release(keys[KEY_Leftbracket]);
 
     if (keys[KEY_8])
     {

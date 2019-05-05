@@ -28,6 +28,8 @@ public:
 
     virtual double getAirDistribPressure() const;
 
+    void release(bool is_release);
+
 protected:
 
     double pFL;
@@ -39,6 +41,8 @@ protected:
     double Qbc;
 
     double pos;
+
+    double is_release;
 };
 
 //------------------------------------------------------------------------------

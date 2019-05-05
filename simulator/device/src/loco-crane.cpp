@@ -74,6 +74,14 @@ double LocoCrane::getAirDistribPressure() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void LocoCrane::release(bool is_release)
+{
+    this->is_release = static_cast<double>(is_release);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 LocoCrane *loadLocoCrane(QString lib_path)
 {
     LocoCrane *crane = nullptr;

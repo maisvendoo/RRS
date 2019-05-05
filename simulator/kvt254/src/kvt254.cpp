@@ -8,9 +8,13 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , V2(1e-4)
   , Vpz(3e-4)
   , delta_p(0.05)
+  , ps(0.1)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
+
+    DebugLog *log = new DebugLog("kvt254.txt");
+    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);
 }
 
 //------------------------------------------------------------------------------
@@ -69,17 +73,17 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
 
     double dp12 =  Y[0] - Y[1];
 
-    double u5 = hs_p(dp12);
+    double u5 = hs_n(dp12 - ps);
 
-    double u6 = hs_n(pos);
+    double u6 = hs_n(pos) + is_release;
 
     double Qpz = K[7] * (Y[1] - Y[2]);
 
-    double Q12 = K[5] * dp12;
+    double Q12 = K[5] * dp12 * u5;
 
-    double Q1 = K[4] * Qvr - Q12;
+    double Q1 = K[4] * Qvr - K[8] * Q12;
 
-    double Q2 = Q12 - Qpz - K[6] * Y[1] * u6;
+    double Q2 = pf(Q12) - Qpz - K[6] * Y[1] * u6;
 
     dYdt[0] = Q1 / V1;
 
@@ -112,6 +116,8 @@ void LocoCrane254::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "Vpz", Vpz);
 
     cfg.getDouble(secName, "delta_p", delta_p);
+
+    cfg.getDouble(secName, "ps", ps);
 }
 
 GET_LOCO_CRANE(LocoCrane254)

@@ -37,6 +37,8 @@ private:
 
     double delta_p;
 
+    double ps;
+
     std::array<double, MAX_FLOW_COEFFS> K;
 
     std::array<double, MAX_GIAN_COEFFS> k;
