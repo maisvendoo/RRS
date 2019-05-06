@@ -20,5 +20,6 @@ SUBDIRS += ./simulator
 SUBDIRS += ./krm395
 SUBDIRS += ./vr242
 SUBDIRS += ./kvt254
+SUBDIRS += ./epk150
 SUBDIRS += ./carbrakes-mech
 

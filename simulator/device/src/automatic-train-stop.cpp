@@ -6,6 +6,10 @@
 //
 //------------------------------------------------------------------------------
 AutoTrainStop::AutoTrainStop(QObject *parent) : BrakeDevice(parent)
+  , is_powered(0.0)
+  , is_key_on(0.0)
+  , pFL(0.0)
+  , pTM(0.0)
 {
 
 }
