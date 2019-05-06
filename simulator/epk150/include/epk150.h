@@ -25,6 +25,8 @@ public:
 
     double getEmergencyBrakeRate() const;
 
+    void init(double pTM);
+
 private:
 
     /// Постоянная времени срабатывание электромеханической части (катушки)

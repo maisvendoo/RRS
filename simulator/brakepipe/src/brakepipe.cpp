@@ -44,19 +44,19 @@ void BrakePipe::setLength(double L)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakePipe::setNodesNum(int N)
+void BrakePipe::setNodesNum(size_t N)
 {
     // Set nodes count
     this->N = N;
 
     // Share memory
-    p = new double[N + 2];
-    V = new double[N + 2];
+    p.resize(N + 2);
+    V.resize(N + 2);
 
     A = new double[N + 1];
     B = new double[N + 1];
     C = new double[N + 1];
-    f = new double[N + 1];
+    f.resize(N + 1);
 
     // Set length step
     h = L / (N + 1);
@@ -109,7 +109,7 @@ bool BrakePipe::step(double t, double dt)
     f[N] = -Q(N) - V[N] + p[N] / dt;
 
     // Linear equation system solution
-    sweep(N + 1, A, B, C, f, p + 1);
+    sweep(N + 1, A, B, C, f.data(), p.data() + 1);
 
     return true;
 }

@@ -11,6 +11,7 @@ LocoCrane::LocoCrane(QObject *parent) : BrakeDevice(parent)
   , Qvr(0.0)
   , Qbc(0.0)
   , pos(0.0)
+  , is_release(0.0)
 {
 
 }

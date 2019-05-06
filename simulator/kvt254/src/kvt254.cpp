@@ -41,6 +41,11 @@ double LocoCrane254::getAirDistribPressure() const
     return getY(0);
 }
 
+void LocoCrane254::preStep(state_vector_t &Y, double t)
+{
+    double k = 0;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

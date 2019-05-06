@@ -64,6 +64,12 @@ void TestLoco::initBrakeDevices(double p0, double pTM)
 
     if (airdist != nullptr)
         airdist->init(pTM);
+
+    if (autostop != nullptr)
+    {
+        autostop->setFeedlinePressure(0.9);
+        autostop->init(pTM);
+    }
 }
 
 //------------------------------------------------------------------------------

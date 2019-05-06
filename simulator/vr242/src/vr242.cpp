@@ -54,18 +54,6 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     Y[2] = pAS;
     Y[3] = pBC;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void AirDist242::ode_system(const state_vector_t &Y,
-                            state_vector_t &dYdt,
-                            double t)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
 
     // Перемещение главного поршня
     double s1 = A1 * (pTM - pAS);
@@ -92,6 +80,20 @@ void AirDist242::ode_system(const state_vector_t &Y,
 
     // Темп дополнительной разрядки ТМ
     auxRate = K[14] * pTM * v1 * v3;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AirDist242::ode_system(const state_vector_t &Y,
+                            state_vector_t &dYdt,
+                            double t)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+
+
 }
 
 //------------------------------------------------------------------------------

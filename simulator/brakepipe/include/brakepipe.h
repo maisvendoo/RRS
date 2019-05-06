@@ -21,6 +21,8 @@
 
 #include    "physics.h"
 
+#include    <vector>
+
 #if defined(BRAKEPIPE_LIB)
     #define BRAKEPIPE_EXPORT    Q_DECL_EXPORT
 #else
@@ -47,7 +49,7 @@ public:
     void setLength(double L);
 
     /// Set nodes count
-    void setNodesNum(int N);
+    void setNodesNum(size_t N);
 
     /// Set pressure in begin node of pipe
     void setBeginPressure(double p0);
@@ -71,20 +73,20 @@ private:
     double T;               ///< Air temperature
     double muf;             ///< Equal hode area (for 1 meter of pipe)
 
-    int N;                  ///< Nodes count
+    size_t N;                  ///< Nodes count
 
     double c0;
     double a;
     double a1;
     double L;               ///< Length of pipe tube
 
-    double *p;              ///< Pressures in nodes
-    double *V;              ///< Pressure rate in node
+    std::vector<double> p;              ///< Pressures in nodes
+    std::vector<double> V;              ///< Pressure rate in node
 
     double *A;              ///< Bottom matrix diagonal of node's equations
     double *B;              ///< Top matrix diagonal of node's equations
     double *C;              ///< Main matrix diagonal of node's equations
-    double *f;              ///< Right part column
+    std::vector<double> f;              ///< Right part column
 
     double h;
 
