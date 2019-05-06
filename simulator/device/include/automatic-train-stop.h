@@ -14,9 +14,25 @@ public:
 
     virtual ~AutoTrainStop();
 
+    void powerOn(bool on);
+
+    void keyOn(bool on);
+
+    void setFeedlinePressure(double pFL);
+
+    void setBrakepipePressure(double pTM);
+
+    virtual double getEmergencyBrakeRate() const;
+
 protected:
 
+    double is_powered;
 
+    double is_key_on;
+
+    double pFL;
+
+    double pTM;
 };
 
 //------------------------------------------------------------------------------
