@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void sweep(int n,      // system order
+void sweep(size_t n,      // system order
            double *A,  // Bottom diagonal
            double *B,  // Top diagonal
            double *C,  // Main diagonal
@@ -26,7 +26,7 @@ void sweep(int n,      // system order
            double *x)  // Solution vector
 {
     // Set zeros in bottom diagonal
-    for (int i = 1; i < n; i++)
+    for (size_t i = 1; i < n; i++)
     {
         double m = A[i] / C[i - 1];
 
@@ -37,6 +37,8 @@ void sweep(int n,      // system order
     // Calcuation of solution
     x[n-1] = f[n-1] / C[n-1];
 
-    for (int i = n-2; i >= 0; i--)
+    for (int i = static_cast<int>(n-2); i >= 0; i--)
+    {
         x[i] = (f[i] - B[i] * x[i+1]) / C[i];
+    }
 }

@@ -55,7 +55,7 @@ public:
     void setBeginPressure(double p0);
 
     /// Set pressure rate in node
-    void setAuxRate(int i, double auxRate);
+    void setAuxRate(size_t i, double auxRate);
 
     /// PDE integration step
     bool step(double t, double dt);
@@ -64,7 +64,7 @@ public:
     bool init(QString cfg_path);
 
     /// Get pressure in node
-    double getPressure(int i);
+    double getPressure(size_t i);
 
 private:
 
@@ -83,15 +83,15 @@ private:
     std::vector<double> p;              ///< Pressures in nodes
     std::vector<double> V;              ///< Pressure rate in node
 
-    double *A;              ///< Bottom matrix diagonal of node's equations
-    double *B;              ///< Top matrix diagonal of node's equations
-    double *C;              ///< Main matrix diagonal of node's equations
+    std::vector<double> A;              ///< Bottom matrix diagonal of node's equations
+    std::vector<double> B;              ///< Top matrix diagonal of node's equations
+    std::vector<double> C;              ///< Main matrix diagonal of node's equations
     std::vector<double> f;              ///< Right part column
 
     double h;
 
     /// Leak function
-    double Q(int i);
+    double Q(size_t i);
 
     /// Config loading
     bool loadCfg(QString cfg_path);

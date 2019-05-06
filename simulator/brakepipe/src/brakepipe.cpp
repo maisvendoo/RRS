@@ -53,9 +53,9 @@ void BrakePipe::setNodesNum(size_t N)
     p.resize(N + 2);
     V.resize(N + 2);
 
-    A = new double[N + 1];
-    B = new double[N + 1];
-    C = new double[N + 1];
+    A.resize(N + 1);
+    B.resize(N + 1);
+    C.resize(N + 1);
     f.resize(N + 1);
 
     // Set length step
@@ -73,7 +73,7 @@ void BrakePipe::setBeginPressure(double p0)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakePipe::setAuxRate(int i, double auxRate)
+void BrakePipe::setAuxRate(size_t i, double auxRate)
 {
     V[i] = auxRate;
 }
@@ -88,7 +88,7 @@ bool BrakePipe::step(double t, double dt)
     // Implicit method of parabolic PDE solution
 
     // Calculation of coefficients
-    for (int i = 0; i < N; i++)
+    for (size_t i = 0; i < N; i++)
     {
         A[i] = -c0 / h / h;
         B[i] = A[i];
@@ -109,7 +109,7 @@ bool BrakePipe::step(double t, double dt)
     f[N] = -Q(N) - V[N] + p[N] / dt;
 
     // Linear equation system solution
-    sweep(N + 1, A, B, C, f.data(), p.data() + 1);
+    sweep(N + 1, A.data(), B.data(), C.data(), f.data(), p.data() + 1);
 
     return true;
 }
@@ -130,7 +130,7 @@ bool BrakePipe::init(QString cfg_path)
     a1 = 0.1265*muf*muf*lambda / pow(d, 5);
 
     // Initial pressure distribution
-    for (int i = 1; i < N + 1; i++)
+    for (size_t i = 1; i < N + 1; i++)
     {
         double x = i*h;
         p[i] = p[0]*exp(-a1*(pow(L, 3) - pow(L - x, 3)));
@@ -152,7 +152,7 @@ bool BrakePipe::init(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double BrakePipe::getPressure(int i)
+double BrakePipe::getPressure(size_t i)
 {
     double press = (p[i] - Physics::pA) / Physics::MPa;
 
@@ -165,7 +165,7 @@ double BrakePipe::getPressure(int i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double BrakePipe::Q(int i)
+double BrakePipe::Q(size_t i)
 {
     double x = i*h;
 
