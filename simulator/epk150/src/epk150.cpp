@@ -80,7 +80,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double u5 = p1_rate = cut(nf(k[4] * sum_p2), 0.0, 1.0);
 
-    double Q2 = K[4] * (pFL - Y[1]) - K[5] * Y[1] * u5;
+    double Q2 = K[4] * (pFL - Y[1]) * hs_p(sum_p2) - K[5] * Y[1] * u5;
 
     double Q1 = K[1] * (pTM - Y[2]) - K[2] * Y[2] * u3;
 

@@ -238,6 +238,8 @@ void TestLoco::initialization()
         autostop->read_config(autostop_config);
         autostop->powerOn(true);
         autostop->keyOn(false);
+
+        connect(autostop, &AutoTrainStop::soundSetVolume, this, &TestLoco::soundSetVolume);
     }
 }
 
