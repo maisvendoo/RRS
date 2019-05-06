@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class AutoTrainStop : public BrakeDevice
+class DEVICE_EXPORT AutoTrainStop : public BrakeDevice
 {
 public:
 

@@ -33,6 +33,8 @@ TestLoco::TestLoco() : Vehicle()
   , loco_crane_module("kvt254")
   , loco_crane_config("kvt254")
   , loco_crane_pos(0.0)
+  , autostop_module("epk150")
+  , autostop_config("epk150")
 {
 
 }
@@ -117,7 +119,7 @@ void TestLoco::step(double t, double dt)
         airdist->setBrakeCylinderPressure(loco_crane->getAirDistribPressure());
         airdist->setAirSupplyPressure(supply_reservoir->getPressure());
 
-        auxRate = airdist->getAuxRate();
+        auxRate = airdist->getAuxRate() + autostop->getEmergencyBrakeRate();
 
         airdist->step(t, dt);
     }
@@ -144,6 +146,11 @@ void TestLoco::step(double t, double dt)
 
     loco_crane->step(t, dt);
 
+    autostop->setFeedlinePressure(0.9);
+    autostop->setBrakepipePressure(pTM);    
+
+    autostop->step(t, dt);
+
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
     DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9 ЗР: %10 v2: %11")
@@ -153,7 +160,7 @@ void TestLoco::step(double t, double dt)
             .arg(traction_level, 3, 'f', 1)
             .arg(dt, 8, 'f', 6)
             .arg(brake_crane->getEqReservoirPressure(), 4, 'f', 2)
-            .arg(brake_crane->getBrakePipeInitPressure(), 4, 'f', 2)
+            .arg(pTM, 4, 'f', 2)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_crane->getPositionName(crane_pos), 4)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
@@ -216,6 +223,15 @@ void TestLoco::initialization()
     if (loco_crane != nullptr)
     {
         loco_crane->read_config(loco_crane_config);
+    }
+
+    autostop = loadAutoTrainStop(modules_dir + fs.separator() + autostop_module);
+
+    if (autostop != nullptr)
+    {
+        autostop->read_config(autostop_config);
+        autostop->powerOn(true);
+        autostop->keyOn(false);
     }
 }
 
@@ -346,6 +362,26 @@ void TestLoco::keyProcess()
     else
     {
         emit soundSetVolume("Tifon", 0);
+    }
+
+    if (keys[KEY_N])
+    {
+        autostop->keyOn(true);
+    }
+
+    if (keys[KEY_B])
+    {
+        autostop->keyOn(false);
+    }
+
+    if (keys[KEY_L])
+    {
+        autostop->powerOn(true);
+    }
+
+    if (keys[KEY_K])
+    {
+        autostop->powerOn(false);
     }
 
     analogSignal[0] = static_cast<float>(traction_level);

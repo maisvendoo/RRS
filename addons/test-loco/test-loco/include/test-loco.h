@@ -18,6 +18,7 @@
 #include    "pneumo-relay.h"
 #include    "switching-valve.h"
 #include    "loco-crane.h"
+#include    "automatic-train-stop.h"
 
 
 class TestLoco : public Vehicle
@@ -63,9 +64,12 @@ private:
     double charge_press;
 
     QString     loco_crane_module;
-    QString     loco_crane_config;
+    QString     loco_crane_config;    
 
     double  loco_crane_pos;
+
+    QString     autostop_module;
+    QString     autostop_config;
 
     IncTractionTrigger incTracTrig;
     DecTractionTrigger decTracTrig;
@@ -88,6 +92,9 @@ private:
     SwitchingValve *zpk;
 
     LocoCrane *loco_crane;
+
+
+    AutoTrainStop *autostop;
 
     void step(double t, double dt);
 
