@@ -372,12 +372,12 @@ void TestLoco::keyProcess()
         emit soundSetVolume("Tifon", 0);
     }
 
-    if (keys[KEY_N])
+    if (keys[KEY_N] && keys[KEY_Shift_L])
     {
         autostop->keyOn(true);
     }
 
-    if (keys[KEY_B])
+    if (keys[KEY_N])
     {
         autostop->keyOn(false);
     }

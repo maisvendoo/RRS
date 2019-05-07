@@ -16,6 +16,8 @@
 
 #include    <QDataStream>
 
+#include    "cyrilic-translator.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -37,17 +39,17 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
 {
     Q_UNUSED(aa)
 
+    CyrilicTranslator ct;
+
     switch (ea.getEventType())
     {
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
-
-            int key = ea.getKey();
+            int key = ct.translate(ea.getUnmodifiedKey());
 
             if (!getKey(key))
             {
-                setKey(ea.getKey());
-                //emit sendKeyBoardState(serialize());
+                setKey(key);
                 sendKeysData(serialize());
             }
 
@@ -56,13 +58,11 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
 
     case osgGA::GUIEventAdapter::KEYUP:
         {
-
-            int key = ea.getKey();
+            int key = ct.translate(ea.getUnmodifiedKey());
 
             if (getKey(key))
             {
-                resetKey(ea.getKey());
-                //emit sendKeyBoardState(serialize());
+                resetKey(key);
                 sendKeysData(serialize());
             }
 
