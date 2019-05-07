@@ -20,7 +20,7 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     , V1(1e-4)
     , V2(1e-3)
     , emergencyRate(0.0)
-    , p1_rate(0.0)
+    , is_whistle_on(0.0)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
@@ -78,7 +78,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double sum_p2 = Y[0] + pk * (1.0 - is_key_on) - pd;
 
-    double u5 = p1_rate = cut(nf(k[4] * sum_p2), 0.0, 1.0);
+    double u5 = is_whistle_on = cut(nf(k[4] * sum_p2), 0.0, 1.0);
 
     double Q2 = K[4] * (pFL - Y[1]) * hs_p(sum_p2) - K[5] * Y[1] * u5;
 
@@ -98,7 +98,7 @@ void AutoTrainStopEPK150::preStep(state_vector_t &Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    emit soundSetVolume("EPK", static_cast<int>(p1_rate * 100.0));
+    emit soundSetVolume("EPK", static_cast<int>(is_whistle_on * 100.0));
 }
 
 //------------------------------------------------------------------------------
@@ -120,7 +120,14 @@ void AutoTrainStopEPK150::load_config(CfgReader &cfg)
         cfg.getDouble(secName, coeff, k[i]);
     }
 
+    cfg.getDouble(secName, "T1", T1);
+    cfg.getDouble(secName, "pd", pd);
+    cfg.getDouble(secName, "pk", pk);
+    cfg.getDouble(secName, "p_key", p_key);
     cfg.getDouble(secName, "ps1", ps1);
+    cfg.getDouble(secName, "ps2", ps2);
+    cfg.getDouble(secName, "V1", V1);
+    cfg.getDouble(secName, "V2", V2);
 }
 
 //------------------------------------------------------------------------------
