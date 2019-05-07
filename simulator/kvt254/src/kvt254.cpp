@@ -13,8 +13,8 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
 
-    /*DebugLog *log = new DebugLog("kvt254.txt");
-    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);*/
+    DebugLog *log = new DebugLog("kvt254.txt");
+    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);
 }
 
 //------------------------------------------------------------------------------
@@ -81,15 +81,15 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
 
     double Q12 = K[5] * dp12 * u5;
 
-    double Q1 = K[4] * Qvr - K[8] * Q12;
+    double Q1 = K[4] * Qvr;
 
-    double Q2 = pf(Q12) - Qpz - K[6] * Y[1] * u6;
+    double Q2 = Q12 - Qpz - K[6] * Y[1] * u6;
 
-    dYdt[0] = Q1 / V1;
+    dYdt[0] = Q1 / V1; // p1
 
-    dYdt[1] = Q2 / V2;
+    dYdt[1] = Q2 / V2; // p2
 
-    dYdt[2] = Qpz / Vpz;
+    dYdt[2] = Qpz / Vpz; // p_pz
 }
 
 //------------------------------------------------------------------------------
