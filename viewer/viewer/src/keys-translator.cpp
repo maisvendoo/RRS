@@ -28,7 +28,11 @@ int KeysTranslator::translate(int key)
 
     int code = 0;
 
-#if __unix__
+#if defined(Q_OS_WIN)
+
+    code = key;
+
+#else
 
     QMap<int, int>::iterator it = keymap.find(key);
 
@@ -36,10 +40,6 @@ int KeysTranslator::translate(int key)
     {
         code = keymap[key];
     }
-
-#else
-
-    code = key;
 
 #endif
 
