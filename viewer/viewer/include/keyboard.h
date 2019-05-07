@@ -62,6 +62,8 @@ protected:
     /// Reset key in keymap (set as not pressed)
     void resetKey(int key);
 
+    void setKeyState(int key, bool state);
+
     /// Keymap initialization
     void init();
 
@@ -71,6 +73,8 @@ protected:
     QSharedMemory   keys_data;
 
     void sendKeysData(const QByteArray &data);
+
+    void modkeyProcess(const osgGA::GUIEventAdapter &ea);
 };
 
 #endif // KEYBOARD_H

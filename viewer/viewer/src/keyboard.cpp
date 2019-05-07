@@ -39,6 +39,8 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
 {
     Q_UNUSED(aa)
 
+    modkeyProcess(ea);
+
     CyrilicTranslator ct;
 
     switch (ea.getEventType())
@@ -124,6 +126,17 @@ void KeyboardHandler::resetKey(int key)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void KeyboardHandler::setKeyState(int key, bool state)
+{
+    QMap<int, bool>::iterator it = keys.find(key);
+
+    if (it != keys.end())
+        keys[key] = state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void KeyboardHandler::init()
 {
     addKey(osgGA::GUIEventAdapter::KEY_A);
@@ -156,6 +169,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Rightbracket);
     addKey(osgGA::GUIEventAdapter::KEY_Quote);
     addKey(osgGA::GUIEventAdapter::KEY_Semicolon);
+    addKey(osgGA::GUIEventAdapter::KEY_Period);
 
     addKey(osgGA::GUIEventAdapter::KEY_Shift_L);
     addKey(osgGA::GUIEventAdapter::KEY_Shift_R);
@@ -176,6 +190,8 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_0);
     addKey(osgGA::GUIEventAdapter::KEY_Minus);
     addKey(osgGA::GUIEventAdapter::KEY_Equals);
+
+    addKey(osgGA::GUIEventAdapter::KEY_Space);
 }
 
 //------------------------------------------------------------------------------
@@ -202,4 +218,31 @@ void KeyboardHandler::sendKeysData(const QByteArray &data)
 
         keys_data.unlock();
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool getBit(int mask, int bit)
+{
+    int tmp = 1 << bit;
+
+    return static_cast<bool>( mask & tmp);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void KeyboardHandler::modkeyProcess(const osgGA::GUIEventAdapter &ea)
+{
+    int modkey_mask = ea.getModKeyMask();
+
+    setKeyState(osgGA::GUIEventAdapter::KEY_Shift_L, getBit(modkey_mask, 0));
+    setKeyState(osgGA::GUIEventAdapter::KEY_Shift_R, getBit(modkey_mask, 1));
+
+    setKeyState(osgGA::GUIEventAdapter::KEY_Control_L, getBit(modkey_mask, 2));
+    setKeyState(osgGA::GUIEventAdapter::KEY_Control_R, getBit(modkey_mask, 3));
+
+    setKeyState(osgGA::GUIEventAdapter::KEY_Alt_L, getBit(modkey_mask, 4));
+    setKeyState(osgGA::GUIEventAdapter::KEY_Alt_R, getBit(modkey_mask, 5));
 }

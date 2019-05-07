@@ -273,6 +273,9 @@ void TestLoco::keyProcess()
     incTracTrig.process(keys[KEY_A], traction_level);
     decTracTrig.process(keys[KEY_D], traction_level);
 
+    if (keys[KEY_Shift_L] && keys[KEY_D])
+        traction_level = 0.0;
+
     //incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
     //decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
 
