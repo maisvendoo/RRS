@@ -16,11 +16,15 @@
 #define     DEVICE_H
 
 #include    <QObject>
+#include    <QMap>
 
 #include    "solver-types.h"
 #include    "physics.h"
 #include    "CfgReader.h"
 #include    "debug.h"
+#include    "control-signals.h"
+#include    "feedback-signals.h"
+#include    "key-symbols.h"
 
 #if defined(DEVICE_LIB)
     #define DEVICE_EXPORT   Q_DECL_EXPORT
@@ -61,6 +65,13 @@ public:
 
     QString getDebugMsg() const;
 
+    ///
+    void setControl(const QMap<int, bool> &keys,
+                    const control_signals_t &control_signals = control_signals_t());
+
+    ///
+    feedback_signals_t getFeedback() const;
+
 signals:
 
     /// Print debug info into file
@@ -95,6 +106,11 @@ protected:
 
     QString     DebugMsg;
 
+    QMap<int, bool>     keys;
+    control_signals_t   control_signals;
+
+    feedback_signals_t  feedback;
+
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
 
@@ -106,6 +122,14 @@ protected:
     virtual void postStep(state_vector_t &Y, double t);
 
     void memory_alloc(int order);
+
+    virtual void stepKeysControl(double t, double dt);
+
+    virtual void stepExternalControl(double t, double dt);
+
+private:
+
+    void stepControl(double t, double dt);
 };
 
 #endif // DEVICE_H

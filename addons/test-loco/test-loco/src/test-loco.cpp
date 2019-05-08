@@ -148,8 +148,9 @@ void TestLoco::step(double t, double dt)
     //loco_crane->setAirDistributorFlow(0.0);
     loco_crane->setAirDistributorFlow(airdist->getBrakeCylinderAirFlow());
     loco_crane->setBrakeCylinderPressure(zpk->getPressure2());
-    loco_crane->setHandlePosition(loco_crane_pos);
+    //loco_crane->setHandlePosition(loco_crane_pos);
 
+    loco_crane->setControl(keys);
     loco_crane->step(t, dt);
 
     autostop->setFeedlinePressure(0.9);
@@ -406,7 +407,7 @@ void TestLoco::keyProcess()
     analogSignal[26] = static_cast<float>(abs(velocity) * Physics::kmh / 220.0);
     analogSignal[27] = static_cast<float>(abs(velocity) * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
-    analogSignal[29] = static_cast<float>(loco_crane_pos + 0.05);
+    analogSignal[29] = static_cast<float>(loco_crane->getHandlePosition() + 0.05);
 }
 
 //------------------------------------------------------------------------------

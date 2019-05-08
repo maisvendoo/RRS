@@ -1,5 +1,7 @@
 #include    "kvt254.h"
 
+#include    <sstream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -9,6 +11,11 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , Vpz(3e-4)
   , delta_p(0.05)
   , ps(0.1)
+  , min_pos(-0.05)
+  , max_pos(1.0)
+  , pos_duration(0.5)
+  , dir(0)
+  , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
@@ -30,7 +37,7 @@ LocoCrane254::~LocoCrane254()
 //------------------------------------------------------------------------------
 double LocoCrane254::getHandlePosition() const
 {
-    return 0.0;
+    return pos;
 }
 
 //------------------------------------------------------------------------------
@@ -123,6 +130,74 @@ void LocoCrane254::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "delta_p", delta_p);
 
     cfg.getDouble(secName, "ps", ps);
+
+    QString tmp = "";
+
+    cfg.getString(secName, "StepPressures", tmp);
+
+    std::istringstream ss(tmp.toStdString());
+
+    for (size_t i = 0; i < NUM_STEPS; ++i)
+    {
+        double step_press = 0.0;
+        ss >> step_press;
+
+        step_pressures[i] = step_press;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane254::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+
+    // Непрерывное движение ручки
+    if (keys[KEY_Leftbracket])
+        dir = -1;
+    else
+    {
+        if (pos < 0.0)
+            pos = 0.0;
+
+        if (keys[KEY_Rightbracket])
+            dir = 1;
+        else
+            dir = 0;
+    }
+
+    pos += dir * pos_duration * dt;
+
+    pos = cut(pos, min_pos, max_pos);
+
+    // Дискретное движение от кнопок
+    double max_step = *(step_pressures.end() - 1);
+
+    if (keys[KEY_8])
+    {
+        pos = step_pressures[0] / max_step;
+    }
+
+    if (keys[KEY_9])
+    {
+        pos = step_pressures[1] / max_step;
+    }
+
+    if (keys[KEY_0])
+    {
+        pos = step_pressures[2] / max_step;
+    }
+
+    if (keys[KEY_Minus])
+    {
+        pos = step_pressures[3] / max_step;
+    }
+
+    if (keys[KEY_Equals])
+    {
+        pos = step_pressures[4] / max_step;
+    }
 }
 
 GET_LOCO_CRANE(LocoCrane254)

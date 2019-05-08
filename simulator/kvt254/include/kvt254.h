@@ -9,7 +9,8 @@
 enum
 {
     MAX_FLOW_COEFFS = 10,
-    MAX_GIAN_COEFFS = 10
+    MAX_GIAN_COEFFS = 10,
+    NUM_STEPS = 5
 };
 
 //------------------------------------------------------------------------------
@@ -41,6 +42,16 @@ private:
 
     double ps;
 
+    double min_pos;
+
+    double max_pos;
+
+    double pos_duration;
+
+    int dir;
+
+    std::array<double, NUM_STEPS> step_pressures;
+
     std::array<double, MAX_FLOW_COEFFS> K;
 
     std::array<double, MAX_GIAN_COEFFS> k;
@@ -48,6 +59,8 @@ private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
+
+    void stepKeysControl(double t, double dt);
 };
 
 #endif // KVT254_H
