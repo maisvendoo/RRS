@@ -591,7 +591,7 @@ void Vehicle::postStep(double t)
 //------------------------------------------------------------------------------
 bool Vehicle::isShift() const
 {
-    return keys[KEY_Shift_L] || keys[KEY_Shift_R];
+    return getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
 }
 
 //------------------------------------------------------------------------------
@@ -599,7 +599,7 @@ bool Vehicle::isShift() const
 //------------------------------------------------------------------------------
 bool Vehicle::isControl() const
 {
-    return keys[KEY_Control_L] || keys[KEY_Control_R];
+    return getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
 }
 
 //------------------------------------------------------------------------------
@@ -607,7 +607,17 @@ bool Vehicle::isControl() const
 //------------------------------------------------------------------------------
 bool Vehicle::isAlt() const
 {
-    return keys[KEY_Alt_L] || keys[KEY_Alt_R];
+    return getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R);
+}
+
+bool Vehicle::getKeyState(int key) const
+{
+    auto it = keys.find(key);
+
+    if ( it != keys.end() )
+        return it.value();
+
+    return false;
 }
 
 //------------------------------------------------------------------------------

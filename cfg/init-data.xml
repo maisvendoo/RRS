@@ -14,7 +14,7 @@
         <ControlTimeInterval>100</ControlTimeInterval>
 
         <!-- Объем буфера клавиатуры, байт -->
-        <KeysBufferSize>1024</KeysBufferSize>
+        <KeysBufferSize>10240</KeysBufferSize>
 
     </InitData>
 </Config>

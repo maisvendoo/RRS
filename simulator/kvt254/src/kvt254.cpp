@@ -144,6 +144,10 @@ void LocoCrane254::load_config(CfgReader &cfg)
 
         step_pressures[i] = step_press;
     }
+
+    cfg.getDouble(secName, "MinPos", min_pos);
+    cfg.getDouble(secName, "MaxPos", max_pos);
+    cfg.getDouble(secName, "PosDuration", pos_duration);
 }
 
 //------------------------------------------------------------------------------
@@ -154,14 +158,14 @@ void LocoCrane254::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
 
     // Непрерывное движение ручки
-    if (keys[KEY_Leftbracket])
+    if (getKeyState(KEY_Leftbracket))
         dir = -1;
     else
     {
         if (pos < 0.0)
-            pos = 0.0;
+           pos = 0.0;
 
-        if (keys[KEY_Rightbracket])
+        if (getKeyState(KEY_Rightbracket))
             dir = 1;
         else
             dir = 0;
@@ -174,27 +178,27 @@ void LocoCrane254::stepKeysControl(double t, double dt)
     // Дискретное движение от кнопок
     double max_step = *(step_pressures.end() - 1);
 
-    if (keys[KEY_8])
+    if (getKeyState(KEY_8))
     {
         pos = step_pressures[0] / max_step;
     }
 
-    if (keys[KEY_9])
+    if (getKeyState(KEY_9))
     {
         pos = step_pressures[1] / max_step;
     }
 
-    if (keys[KEY_0])
+    if (getKeyState(KEY_0))
     {
         pos = step_pressures[2] / max_step;
     }
 
-    if (keys[KEY_Minus])
+    if (getKeyState(KEY_Minus))
     {
         pos = step_pressures[3] / max_step;
     }
 
-    if (keys[KEY_Equals])
+    if (getKeyState(KEY_Equals))
     {
         pos = step_pressures[4] / max_step;
     }

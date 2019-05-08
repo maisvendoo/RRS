@@ -24,6 +24,16 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , pulse_I(true)
   , t_old(0)
   , dt(0)
+  , handle_pos(static_cast<int>(POS_II))
+  , pos_angle(static_cast<int>(POS_II))
+  , pos_delay(0.3)
+  , min_pos(POS_I)
+  , max_pos(POS_VI)
+  , pos_duration(5.0)
+  , dir(0)
+  , pos_switch(true)
+  , tau(0.0)
+
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(pos.begin(), pos.end(), 0.0);
@@ -39,6 +49,12 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
     positions.push_back(63.0f / max_angle);
     positions.push_back(80.0f / max_angle);
     positions.push_back(1.0f);
+
+    incTimer = new Timer(pos_delay);
+    decTimer = new Timer(pos_delay);
+
+    connect(incTimer, &Timer::process, this, &BrakeCrane395::inc);
+    connect(decTimer, &Timer::process, this, &BrakeCrane395::dec);
 }
 
 //------------------------------------------------------------------------------
@@ -63,18 +79,17 @@ void BrakeCrane395::setPosition(int &position)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString BrakeCrane395::getPositionName(int position)
+QString BrakeCrane395::getPositionName()
 {
-    return positions_names[position];
+    return positions_names[handle_pos];
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float BrakeCrane395::getHandlePosition(int position)
+float BrakeCrane395::getHandlePosition()
 {
-    size_t pos = static_cast<size_t>(position);
-    return positions[pos];
+    return static_cast<float>(handle_pos) / 6.0f;
 }
 
 //------------------------------------------------------------------------------
@@ -187,5 +202,92 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "K4_power", K4_power);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane395::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+
+    if (getKeyState(KEY_Semicolon))
+    {
+        if (!decTimer->isStarted())
+            decTimer->start();
+    }
+    else
+    {
+        decTimer->stop();
+    }
+
+    if (getKeyState(KEY_Quote))
+    {
+        if (!incTimer->isStarted())
+            incTimer->start();
+    }
+    else
+    {
+        incTimer->stop();
+    }
+
+    if (getKeyState(KEY_1))
+    {
+        handle_pos = POS_I;
+    }
+
+    if (getKeyState(KEY_2))
+    {
+        handle_pos = POS_II;
+    }
+
+    if (getKeyState(KEY_3))
+    {
+        handle_pos = POS_III;
+    }
+
+    if (getKeyState(KEY_4))
+    {
+        handle_pos = POS_IV;
+    }
+
+    if (getKeyState(KEY_5))
+    {
+        handle_pos = POS_Va;
+    }
+
+    if (getKeyState(KEY_6))
+    {
+        handle_pos = POS_V;
+    }
+
+    if (getKeyState(KEY_7))
+    {
+        handle_pos = POS_VI;
+    }
+
+    setPosition(handle_pos);
+
+    incTimer->step(t, dt);
+    decTimer->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane395::inc()
+{
+   handle_pos++;
+
+   handle_pos = cut(handle_pos, min_pos, max_pos);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane395::dec()
+{
+    handle_pos--;
+
+    handle_pos = cut(handle_pos, min_pos, max_pos);
+}
 
 GET_BRAKE_CRANE(BrakeCrane395)

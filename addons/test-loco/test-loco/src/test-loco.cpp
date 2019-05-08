@@ -107,7 +107,8 @@ void TestLoco::step(double t, double dt)
         brake_crane->setFeedLinePressure(0.9);
         p0 = brake_crane->getBrakePipeInitPressure();
         brake_crane->setBrakePipePressure(pTM);
-        brake_crane->setPosition(crane_pos);
+        //brake_crane->setPosition(crane_pos);
+        brake_crane->setControl(keys);
         brake_crane->step(t, dt);
     }
 
@@ -169,7 +170,7 @@ void TestLoco::step(double t, double dt)
             .arg(brake_crane->getEqReservoirPressure(), 4, 'f', 2)
             .arg(pTM, 4, 'f', 2)
             .arg(brake_mech->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(brake_crane->getPositionName(crane_pos), 4)
+            .arg(brake_crane->getPositionName(), 4)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(airdist->getY(5), 10, 'f', 6);
 
@@ -271,94 +272,16 @@ void TestLoco::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void TestLoco::keyProcess()
 {
-    incTracTrig.process(keys[KEY_A], traction_level);
-    decTracTrig.process(keys[KEY_D], traction_level);
+    incTracTrig.process(getKeyState(KEY_A), traction_level);
+    decTracTrig.process(getKeyState(KEY_D), traction_level);
 
-    if (isShift() && keys[KEY_D])
+    if (isShift() && getKeyState(KEY_D))
         traction_level = 0.0;
 
     //incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
     //decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
 
-    crane_step = 0;
-
-    if (keys[KEY_Quote])
-    {
-        crane_step = 1;
-    }
-
-    if (keys[KEY_Semicolon])
-    {
-        crane_step = -1;
-    }
-
-    if (keys[KEY_1])
-    {
-        crane_pos = 0;
-    }
-
-    if (keys[KEY_2])
-    {
-        crane_pos = 1;
-    }
-
-    if (keys[KEY_3])
-    {
-        crane_pos = 2;
-    }
-
-    if (keys[KEY_4])
-    {
-        crane_pos = 3;
-    }
-
-    if (keys[KEY_5])
-    {
-        crane_pos = 4;
-    }
-
-    if (keys[KEY_6])
-    {
-        crane_pos = 5;
-    }
-
-    if (keys[KEY_7])
-    {
-        crane_pos = 6;
-    }
-
-
-    loco_crane->release(keys[KEY_Leftbracket]);
-
-    if (keys[KEY_8])
-    {
-        loco_crane_pos = 0.0;
-    }
-
-    if (keys[KEY_9])
-    {
-        loco_crane_pos = 0.325;
-    }
-
-    if (keys[KEY_0])
-    {
-        loco_crane_pos = 0.5;
-    }
-
-    if (keys[KEY_Minus])
-    {
-        loco_crane_pos = 0.75;
-    }
-
-    if (keys[KEY_Equals])
-    {
-        loco_crane_pos = 1.0;
-    }
-
-    incChargePress.process(keys[KEY_H], charge_press);
-    decChargePress.process(keys[KEY_J], charge_press);
-
-    if (keys[KEY_Space])
+    if (getKeyState(KEY_Space))
     {
         emit soundSetVolume("Svistok", 100);
     }
@@ -367,7 +290,7 @@ void TestLoco::keyProcess()
         emit soundSetVolume("Svistok", 0);
     }
 
-    if (keys[KEY_B])
+    if (getKeyState(KEY_B))
     {
         emit soundSetVolume("Tifon", 100);
     }
@@ -376,7 +299,7 @@ void TestLoco::keyProcess()
         emit soundSetVolume("Tifon", 0);
     }
 
-    if (keys[KEY_N])
+    if (getKeyState(KEY_N))
     {
         if (isShift())
             autostop->keyOn(true);
@@ -384,7 +307,7 @@ void TestLoco::keyProcess()
             autostop->keyOn(false);
     }
 
-    if (keys[KEY_K])
+    if (getKeyState(KEY_K))
     {
         if (isShift())
             autostop->powerOn(true);
@@ -398,7 +321,7 @@ void TestLoco::keyProcess()
     analogSignal[3] = crane_pos;
     analogSignal[4] = static_cast<float>(pTM);
 
-    analogSignal[20] = brake_crane->getHandlePosition(crane_pos);
+    analogSignal[20] = brake_crane->getHandlePosition();
     analogSignal[21] = static_cast<float>(pTM / 1.0);
     analogSignal[22] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
     analogSignal[23] = static_cast<float>(0.9 / 1.6);
@@ -407,7 +330,7 @@ void TestLoco::keyProcess()
     analogSignal[26] = static_cast<float>(abs(velocity) * Physics::kmh / 220.0);
     analogSignal[27] = static_cast<float>(abs(velocity) * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
-    analogSignal[29] = static_cast<float>(loco_crane->getHandlePosition() + 0.05);
+    analogSignal[29] = static_cast<float>(loco_crane->getHandlePosition());
 }
 
 //------------------------------------------------------------------------------

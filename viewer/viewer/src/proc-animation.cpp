@@ -76,7 +76,7 @@ bool ProcAnimation::load(ConfigReader &cfg)
 //------------------------------------------------------------------------------
 void ProcAnimation::setPosition(float pos)
 {
-    this->pos = cut(pos, 0.0f, 1.0f);
+    this->pos = pos;
 }
 
 //------------------------------------------------------------------------------

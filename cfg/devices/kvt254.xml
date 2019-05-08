@@ -38,8 +38,8 @@
 
 		<StepPressures>0.0 0.13 0.20 0.30 0.40</StepPressures>
 		
-		<MinAngle>-8.9</MinAngle>
-		<MaxAngle>177.0></MaxAngle>
+		<MinPos>-0.03</MinPos>
+		<MaxPos>1.0</MaxPos>
 
 	</Device>
 </Config>

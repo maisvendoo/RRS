@@ -25,6 +25,7 @@
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 #include    "key-symbols.h"
+#include    "timer.h"
 
 #if defined(DEVICE_LIB)
     #define DEVICE_EXPORT   Q_DECL_EXPORT
@@ -66,8 +67,8 @@ public:
     QString getDebugMsg() const;
 
     ///
-    void setControl(const QMap<int, bool> &keys,
-                    const control_signals_t &control_signals = control_signals_t());
+    void setControl(QMap<int, bool> keys,
+                    control_signals_t control_signals = control_signals_t());
 
     ///
     feedback_signals_t getFeedback() const;
@@ -126,6 +127,8 @@ protected:
     virtual void stepKeysControl(double t, double dt);
 
     virtual void stepExternalControl(double t, double dt);
+
+    bool getKeyState(int key) const;
 
 private:
 

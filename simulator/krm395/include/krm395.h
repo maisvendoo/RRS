@@ -47,9 +47,9 @@ public:
 
     void setPosition(int &position);
 
-    QString getPositionName(int position);
+    QString getPositionName();
 
-    float getHandlePosition(int position);
+    float getHandlePosition();
 
     void init(double pTM);
 
@@ -90,6 +90,27 @@ private:
     double  t_old;
     double  dt;
 
+    int handle_pos;
+
+    double pos_angle;
+
+    double pos_delay;
+
+    int min_pos;
+
+    int max_pos;
+
+    double pos_duration;
+
+    int dir;
+
+    bool pos_switch;
+
+    double tau;
+
+    Timer   *incTimer;
+    Timer   *decTimer;
+
     DebugLog *debug_log;
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
@@ -107,6 +128,14 @@ private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
+
+    void stepKeysControl(double t, double dt);
+
+private slots:
+
+    void inc();
+
+    void dec();
 };
 
 #endif

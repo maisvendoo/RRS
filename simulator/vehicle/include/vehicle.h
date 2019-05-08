@@ -270,6 +270,8 @@ protected:
 
     bool isAlt() const;
 
+    bool getKeyState(int key) const;
+
 private:
 
     /// Default configuration load

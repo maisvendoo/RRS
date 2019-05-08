@@ -123,27 +123,7 @@ void PassCarrige::step(double t, double dt)
 //------------------------------------------------------------------------------
 void PassCarrige::keyProcess()
 {
-    double step = 0.1;
 
-    if (keys[KEY_L] && !inc_loc)
-    {
-        pz +=  step;
-        inc_loc = true;
-    }
-    else
-    {
-        inc_loc = false;
-    }
-
-    if (keys[KEY_K] && !dec_loc)
-    {
-        pz -=  step;
-        dec_loc = true;
-    }
-    else
-    {
-        dec_loc = false;
-    }
 }
 
 //------------------------------------------------------------------------------
