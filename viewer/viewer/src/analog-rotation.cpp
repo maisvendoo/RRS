@@ -28,7 +28,7 @@ void AnalogRotation::anim_step(float t, float dt)
 {
     (void) t;
 
-    float cur_pos = (angle - min_angle) / (max_angle - min_angle);
+    float cur_pos = interpolate(angle);//(angle - min_angle) / (max_angle - min_angle);
 
     angle +=  duration * dt * dead_zone(pos - cur_pos, -precision / 2.0f, precision / 2.0f);
 

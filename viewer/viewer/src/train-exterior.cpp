@@ -206,7 +206,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
     if (config_node == nullptr)
     {
-        OSG_FATAL << "There is no Cnfig node in file " << path << std::endl;
+        OSG_FATAL << "There is no Config node in file " << path << std::endl;
         return;
     }
 
