@@ -171,6 +171,8 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Semicolon);
     addKey(osgGA::GUIEventAdapter::KEY_Period);
 
+    addKey(osgGA::GUIEventAdapter::KEY_Menu);
+
     addKey(osgGA::GUIEventAdapter::KEY_Shift_L);
     addKey(osgGA::GUIEventAdapter::KEY_Shift_R);
     addKey(osgGA::GUIEventAdapter::KEY_Control_L);
@@ -225,9 +227,7 @@ void KeyboardHandler::sendKeysData(const QByteArray &data)
 //------------------------------------------------------------------------------
 bool getBit(int mask, int bit)
 {
-    int tmp = 1 << bit;
-
-    return static_cast<bool>( mask & tmp);
+    return static_cast<bool>( mask & (1 << bit) );
 }
 
 //------------------------------------------------------------------------------

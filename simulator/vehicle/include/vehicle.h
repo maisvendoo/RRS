@@ -239,9 +239,12 @@ protected:
     /// Vehicle common acceleration
     state_vector_t  a;
 
+    /// Keyboard state
     QMap<int, bool> keys;
 
+    /// Discrete signals for outpput
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];
+    /// Analog signals for output
     float   analogSignal[NUM_ANALOG_SIGNALS];        
 
     /// User defined initialization
@@ -257,7 +260,15 @@ protected:
     virtual void step(double t, double dt);
 
     /// User define step result processing
-    virtual void postStep(double t);    
+    virtual void postStep(double t);
+
+    /* Modkeys extended functions */
+
+    bool isShift() const;
+
+    bool isControl() const;
+
+    bool isAlt() const;
 
 private:
 

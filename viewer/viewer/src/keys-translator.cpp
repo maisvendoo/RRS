@@ -43,5 +43,5 @@ int KeysTranslator::translate(int key)
 
 #endif
 
-    return code;
+    return code;    
 }

@@ -273,7 +273,7 @@ void TestLoco::keyProcess()
     incTracTrig.process(keys[KEY_A], traction_level);
     decTracTrig.process(keys[KEY_D], traction_level);
 
-    if (keys[KEY_Shift_L] && keys[KEY_D])
+    if (isShift() && keys[KEY_D])
         traction_level = 0.0;
 
     //incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
@@ -357,7 +357,7 @@ void TestLoco::keyProcess()
     incChargePress.process(keys[KEY_H], charge_press);
     decChargePress.process(keys[KEY_J], charge_press);
 
-    if (keys[KEY_F])
+    if (keys[KEY_Space])
     {
         emit soundSetVolume("Svistok", 100);
     }
@@ -366,7 +366,7 @@ void TestLoco::keyProcess()
         emit soundSetVolume("Svistok", 0);
     }
 
-    if (keys[KEY_G])
+    if (keys[KEY_B])
     {
         emit soundSetVolume("Tifon", 100);
     }
@@ -375,24 +375,20 @@ void TestLoco::keyProcess()
         emit soundSetVolume("Tifon", 0);
     }
 
-    if (keys[KEY_N] && keys[KEY_Shift_L])
-    {
-        autostop->keyOn(true);
-    }
-
     if (keys[KEY_N])
     {
-        autostop->keyOn(false);
-    }
-
-    if (keys[KEY_L])
-    {
-        autostop->powerOn(true);
+        if (isShift())
+            autostop->keyOn(true);
+        else
+            autostop->keyOn(false);
     }
 
     if (keys[KEY_K])
     {
-        autostop->powerOn(false);
+        if (isShift())
+            autostop->powerOn(true);
+        else
+            autostop->powerOn(false);
     }
 
     analogSignal[0] = static_cast<float>(traction_level);
