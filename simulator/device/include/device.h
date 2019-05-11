@@ -120,9 +120,7 @@ protected:
 
     virtual void preStep(state_vector_t &Y, double t);
 
-    virtual void postStep(state_vector_t &Y, double t);
-
-    void memory_alloc(int order);
+    virtual void postStep(state_vector_t &Y, double t);    
 
     virtual void stepKeysControl(double t, double dt);
 
@@ -131,6 +129,8 @@ protected:
     bool getKeyState(int key) const;
 
 private:
+
+    void memory_alloc(int order);
 
     void stepControl(double t, double dt);
 };

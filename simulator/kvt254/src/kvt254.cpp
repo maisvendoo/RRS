@@ -20,8 +20,8 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
 
-    DebugLog *log = new DebugLog("kvt254.txt");
-    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);
+    /*DebugLog *log = new DebugLog("kvt254.txt");
+    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------

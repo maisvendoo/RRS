@@ -19,6 +19,7 @@
 #include    "switching-valve.h"
 #include    "loco-crane.h"
 #include    "automatic-train-stop.h"
+#include    "traction-controller.h"
 
 
 class TestLoco : public Vehicle
@@ -71,6 +72,9 @@ private:
     QString     autostop_module;
     QString     autostop_config;
 
+    QString     traction_controller_module;
+    QString     traction_controller_config;
+
     IncTractionTrigger incTracTrig;
     DecTractionTrigger decTracTrig;
 
@@ -95,6 +99,8 @@ private:
 
 
     AutoTrainStop *autostop;
+
+    TractionController *trac_controller;
 
     void step(double t, double dt);
 

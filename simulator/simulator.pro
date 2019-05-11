@@ -21,5 +21,6 @@ SUBDIRS += ./krm395
 SUBDIRS += ./vr242
 SUBDIRS += ./kvt254
 SUBDIRS += ./epk150
+SUBDIRS += ./km2202
 SUBDIRS += ./carbrakes-mech
 

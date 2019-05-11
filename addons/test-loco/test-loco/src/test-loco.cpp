@@ -35,6 +35,8 @@ TestLoco::TestLoco() : Vehicle()
   , loco_crane_pos(0.0)
   , autostop_module("epk150")
   , autostop_config("epk150")
+  , traction_controller_module("km2202")
+  , traction_controller_config("km2202")
 {
 
 }
@@ -159,6 +161,9 @@ void TestLoco::step(double t, double dt)
 
     autostop->step(t, dt);
 
+    trac_controller->setControl(keys);
+    trac_controller->step(t, dt);
+
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
     DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9 ЗР: %10 v2: %11")
@@ -242,6 +247,14 @@ void TestLoco::initialization()
         autostop->keyOn(false);
 
         connect(autostop, &AutoTrainStop::soundSetVolume, this, &TestLoco::soundSetVolume);
+    }
+
+    trac_controller = loadTractionController(modules_dir + fs.separator() + traction_controller_module);
+
+
+    if (trac_controller != nullptr)
+    {
+        trac_controller->read_config(traction_controller_config);
     }
 }
 

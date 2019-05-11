@@ -32,8 +32,8 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
 
-    DebugLog *log = new DebugLog("epk150.txt");
-    connect(this, &AutoTrainStopEPK150::DebugPrint, log, &DebugLog::DebugPring);
+    /*DebugLog *log = new DebugLog("epk150.txt");
+    connect(this, &AutoTrainStopEPK150::DebugPrint, log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------

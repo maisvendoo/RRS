@@ -84,7 +84,12 @@ int RouteViewer::run()
     QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
                      &client, &NetworkClient::receiveKeysState);
 
-    viewer.addEventHandler(new osgViewer::StatsHandler);
+
+    osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new osgViewer::StatsHandler;
+    statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
+    viewer.addEventHandler(statsHandler.get());
+
+
     viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // Cabine camera manipulator

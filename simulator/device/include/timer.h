@@ -1,8 +1,18 @@
+//------------------------------------------------------------------------------
+//
+//      Timer for execute periodic actions synchronously with ODE solving
+//      (c) maisvendoo, 09/05/2019
+//
+//------------------------------------------------------------------------------
+
 #ifndef     TIMER_H
 #define     TIMER_H
 
 #include    <QObject>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class Timer : public QObject
 {
     Q_OBJECT
@@ -13,28 +23,38 @@ public:
 
     ~Timer();
 
+    /// Step (excecuted in integraion step)
     void step(double t, double dt);
 
+    /// Start timer
     void start();
 
+    /// Stop timer
     void stop();
 
+    /// Reset timer
     void reset();
 
+    /// Check is timer started
     bool isStarted() const;
 
 signals:
 
+    /// Signal for actions exectute
     void process();
 
 private:
 
+    /// Time counter
     double  tau;
 
+    /// Timer  timeout
     double  timeout;
 
+    /// First timer action
     bool    first_process;
 
+    /// is started flag
     bool    is_started;
 };
 
