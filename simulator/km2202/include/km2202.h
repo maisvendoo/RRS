@@ -29,12 +29,17 @@ private:
 
     int reversor_dir;
 
-    Timer   *incTimer;
-    Timer   *decTimer;
+    double trac_timeout;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    double revers_timeout;
 
-    void preStep(state_vector_t &Y, double t);
+    Timer   *incTracTimer;
+    Timer   *decTracTimer;
+
+    Timer   *incReversTimer;
+    Timer   *decReversTimer;
+
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);    
 
     void load_config(CfgReader &cfg);
 
@@ -49,6 +54,8 @@ private slots:
     void  inc_reversor_dir();
 
     void  dec_reversor_dir();
+
+    void stepFeedback();
 };
 
 #endif

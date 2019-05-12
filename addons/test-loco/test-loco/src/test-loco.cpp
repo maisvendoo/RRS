@@ -79,13 +79,9 @@ void TestLoco::initBrakeDevices(double p0, double pTM)
 //------------------------------------------------------------------------------
 void TestLoco::step(double t, double dt)
 {
-    traction_level = Physics::cut(traction_level, 0.0, 1.0);    
+    feedback_signals_t trac_feedback = trac_controller->getFeedback();
 
-    if (tau >= delay)
-    {
-        tau = 0.0;
-        crane_pos += crane_step;
-    }
+    traction_level = Physics::cut(static_cast<double>(trac_feedback.analogSignal[0]), 0.0, 1.0);
 
     if (brake_mech != nullptr)
     {
@@ -99,7 +95,7 @@ void TestLoco::step(double t, double dt)
     {
         double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
         double brakeTorque = brake_mech->getBrakeTorque();
-        Q_a[i] = torque;
+        Q_a[i] = torque * static_cast<double>(trac_feedback.analogSignal[1]);
         Q_r[i] = brakeTorque;
     }
 
@@ -285,15 +281,6 @@ void TestLoco::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void TestLoco::keyProcess()
 {
-    incTracTrig.process(getKeyState(KEY_A), traction_level);
-    decTracTrig.process(getKeyState(KEY_D), traction_level);
-
-    if (isShift() && getKeyState(KEY_D))
-        traction_level = 0.0;
-
-    //incBrakeCrane.process(keys[KEY_Rightbracket], crane_pos);
-    //decBrakeCrane.process(keys[KEY_Leftbracket], crane_pos);
-
     if (getKeyState(KEY_Space))
     {
         emit soundSetVolume("Svistok", 100);
@@ -344,16 +331,7 @@ void TestLoco::keyProcess()
     analogSignal[27] = static_cast<float>(abs(velocity) * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
     analogSignal[29] = static_cast<float>(loco_crane->getHandlePosition());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TestLoco::stepper(int &value, int duration, double dt)
-{
-    double tmp = static_cast<double>(value);
-    tmp += duration * dt;
-    value = static_cast<int>(tmp);
+    analogSignal[30] = trac_controller->getFeedback().analogSignal[1];
 }
 
 GET_VEHICLE(TestLoco)
