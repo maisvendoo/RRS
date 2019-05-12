@@ -20,6 +20,7 @@
 #include    "loco-crane.h"
 #include    "automatic-train-stop.h"
 #include    "traction-controller.h"
+#include    "train-horn.h"
 
 
 class TestLoco : public Vehicle
@@ -101,6 +102,8 @@ private:
     AutoTrainStop *autostop;
 
     TractionController *trac_controller;
+
+    TrainHorn   *horn;
 
     void step(double t, double dt);
 

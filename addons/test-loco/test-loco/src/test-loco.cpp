@@ -160,6 +160,9 @@ void TestLoco::step(double t, double dt)
     trac_controller->setControl(keys);
     trac_controller->step(t, dt);
 
+    horn->setControl(keys);
+    horn->step(t, dt);
+
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);
 
     DebugMsg = QString("Время: %1 Шаг: %5 Коорд.: %2 Скор.: %3 Тяга: %4 УР: %6 ТМ: %7 ТЦ: %8 КрМ: %9 ЗР: %10 v2: %11")
@@ -252,6 +255,9 @@ void TestLoco::initialization()
     {
         trac_controller->read_config(traction_controller_config);
     }
+
+    horn = new TrainHorn();
+    connect(horn, &TrainHorn::soundSetVolume, this, &TestLoco::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------
@@ -281,7 +287,7 @@ void TestLoco::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void TestLoco::keyProcess()
 {
-    if (getKeyState(KEY_Space))
+    /*if (getKeyState(KEY_Space))
     {
         emit soundSetVolume("Svistok", 100);
     }
@@ -297,7 +303,7 @@ void TestLoco::keyProcess()
     else
     {
         emit soundSetVolume("Tifon", 0);
-    }
+    }*/
 
     if (getKeyState(KEY_N))
     {
