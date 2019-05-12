@@ -287,40 +287,6 @@ void TestLoco::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void TestLoco::keyProcess()
 {
-    /*if (getKeyState(KEY_Space))
-    {
-        emit soundSetVolume("Svistok", 100);
-    }
-    else
-    {
-        emit soundSetVolume("Svistok", 0);
-    }
-
-    if (getKeyState(KEY_B))
-    {
-        emit soundSetVolume("Tifon", 100);
-    }
-    else
-    {
-        emit soundSetVolume("Tifon", 0);
-    }*/
-
-    if (getKeyState(KEY_N))
-    {
-        if (isShift())
-            autostop->keyOn(true);
-        else
-            autostop->keyOn(false);
-    }
-
-    if (getKeyState(KEY_K))
-    {
-        if (isShift())
-            autostop->powerOn(true);
-        else
-            autostop->powerOn(false);
-    }
-
     analogSignal[0] = static_cast<float>(traction_level);
     analogSignal[1] = static_cast<float>(brake_crane->getBrakePipeInitPressure());
     analogSignal[2] = static_cast<float>(brake_crane->getEqReservoirPressure());

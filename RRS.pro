@@ -17,6 +17,7 @@ SUBDIRS += ./addons/es1-motor
 SUBDIRS += ./addons/es1-non-motor
 SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/vl60
+SUBDIRS += ./addons/tep70
 
 SUBDIRS += ./launcher
 

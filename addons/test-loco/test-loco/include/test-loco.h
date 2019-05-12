@@ -22,7 +22,6 @@
 #include    "traction-controller.h"
 #include    "train-horn.h"
 
-
 class TestLoco : public Vehicle
 {
 public:

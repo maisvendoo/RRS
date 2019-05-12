@@ -75,6 +75,8 @@ private:
     void preStep(state_vector_t &Y, double t);
 
     void load_config(CfgReader &cfg);
+
+    void stepKeysControl(double t, double dt);
 };
 
 #endif // EPK150_H

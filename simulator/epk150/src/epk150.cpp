@@ -143,4 +143,29 @@ void AutoTrainStopEPK150::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void AutoTrainStopEPK150::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    if (getKeyState(KEY_N))
+    {
+        if ( getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R) )
+            keyOn(true);
+        else
+            keyOn(false);
+    }
+
+    if (getKeyState(KEY_K))
+    {
+        if ( getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R) )
+            powerOn(true);
+        else
+            powerOn(false);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 GET_AUTO_TRAIN_STOP(AutoTrainStopEPK150)
