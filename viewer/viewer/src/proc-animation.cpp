@@ -166,6 +166,9 @@ key_point_t ProcAnimation::findBeginKeyPoint(float value, size_t &next_idx)
 {
     key_point_t key_point;
 
+    if (keypoints.size() == 0)
+        return key_point;
+
     size_t left_idx = 0;
     size_t right_idx = keypoints.size() - 1;
     size_t idx = (left_idx + right_idx) / 2;

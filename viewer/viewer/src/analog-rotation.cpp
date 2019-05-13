@@ -28,9 +28,9 @@ void AnalogRotation::anim_step(float t, float dt)
 {
     (void) t;
 
-    float cur_pos = interpolate(angle);//(angle - min_angle) / (max_angle - min_angle);
+    float cur_pos = interpolate(angle);
 
-    angle +=  duration * dt * dead_zone(pos - cur_pos, -precision / 2.0f, precision / 2.0f);
+    angle +=  duration * dt * cut((pos - cur_pos), -1.0f, 1.0f);
 
     update();
 }
@@ -60,8 +60,14 @@ bool AnalogRotation::load_config(ConfigReader &cfg)
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnalogRotation::update()
 {
+    if (keypoints.size() == 0)
+        return;
+
     angle = cut(angle, (*keypoints.begin()).value, (*(keypoints.end() - 1)).value);
 
     osg::Matrix rotate = osg::Matrixf::rotate(angle * osg::PIf / 180.0f, axis);
