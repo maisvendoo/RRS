@@ -94,7 +94,7 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
-    keys_data.setKey("keys");
+    keys_data.setKey("keys");    
 
     if (!keys_data.create(init_data.keys_buffer_size))
     {
@@ -478,7 +478,9 @@ void Model::controlStep(double &control_time, const double control_delay)
 
         if (keys_data.lock())
         {            
-            QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
+            //QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
+            data.resize(keys_data.size());
+            memcpy(data.data(), keys_data.data(), static_cast<size_t>(keys_data.size()));
 
             if (keys_data.size() != 0)
                 emit sendDataToTrain(data);

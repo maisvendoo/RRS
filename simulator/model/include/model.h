@@ -123,6 +123,7 @@ private:
 
     QSharedMemory   shared_memory;
     QSharedMemory   keys_data;
+    QByteArray      data;
 
     /// Log initialization
     void logInit(bool clear_log = false);

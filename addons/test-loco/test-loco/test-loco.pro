@@ -7,6 +7,8 @@ TARGET = test-loco
 
 DESTDIR = ../../../../modules/$$join(TARGET,,,)
 
+CONFIG += force_debug_info
+
 CONFIG(debug, debug|release) {
 
     LIBS += -L../../../../lib -lCfgReader_d

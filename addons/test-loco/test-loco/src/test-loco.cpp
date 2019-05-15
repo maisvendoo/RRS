@@ -160,7 +160,7 @@ void TestLoco::step(double t, double dt)
     trac_controller->setControl(keys);
     trac_controller->step(t, dt);
 
-    horn->setControl(keys);
+    //horn->setControl(keys);
     horn->step(t, dt);
 
     emit soundSetPitch("Disel", 1.0f + static_cast<float>(traction_level) / 1.0f);

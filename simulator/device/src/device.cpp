@@ -143,7 +143,7 @@ QString Device::getDebugMsg() const
 void Device::setControl(QMap<int, bool> keys,
                         control_signals_t control_signals)
 {
-    this->keys = keys;
+    this->keys = QMap<int, bool>(keys);
     this->control_signals = control_signals;
 }
 
@@ -223,6 +223,9 @@ void Device::stepExternalControl(double t, double dt)
 //------------------------------------------------------------------------------
 bool Device::getKeyState(int key) const
 {
+    if (keys.size() == 0)
+        return false;
+
     auto it = keys.find(key);
 
     if ( it != keys.end() )

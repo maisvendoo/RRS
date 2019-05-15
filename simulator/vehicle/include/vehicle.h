@@ -242,7 +242,7 @@ protected:
 
     /// Keyboard state
     QMap<int, bool> keys;
-    QMutex          keys_mutex;
+    QMutex          keys_mutex;    
 
     /// Discrete signals for outpput
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];

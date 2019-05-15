@@ -9,6 +9,8 @@ TARGET = device
 
 DESTDIR = ../../../lib
 
+CONFIG += force_debug_info
+
 CONFIG(debug, debug|release) {
 
     TARGET = $$join(TARGET,,,_d)
