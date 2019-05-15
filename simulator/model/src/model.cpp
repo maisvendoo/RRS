@@ -478,10 +478,10 @@ void Model::controlStep(double &control_time, const double control_delay)
 
         if (keys_data.lock())
         {            
-            //QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
+            QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
 
             if (keys_data.size() != 0)
-                emit sendDataToTrain(QByteArray(static_cast<char*>(keys_data.data()), keys_data.size()));
+                emit sendDataToTrain(data);
 
             keys_data.unlock();
         }

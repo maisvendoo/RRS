@@ -17,6 +17,8 @@ enum
 //------------------------------------------------------------------------------
 class ControllerKM2202 : public TractionController
 {
+    Q_OBJECT
+
 public:
 
     ControllerKM2202(QObject *parent = Q_NULLPTR);
@@ -45,6 +47,8 @@ private:
 
     void stepKeysControl(double t, double dt);
 
+    void stepFeedback();
+
 private slots:
 
     void inc_trac_position();
@@ -54,8 +58,6 @@ private slots:
     void  inc_reversor_dir();
 
     void  dec_reversor_dir();
-
-    void stepFeedback();
 };
 
 #endif

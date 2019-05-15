@@ -53,8 +53,11 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
     incTimer = new Timer(pos_delay);
     decTimer = new Timer(pos_delay);
 
-    connect(incTimer, &Timer::process, this, &BrakeCrane395::inc);
-    connect(decTimer, &Timer::process, this, &BrakeCrane395::dec);
+    //connect(incTimer, &Timer::process, this, &BrakeCrane395::inc);
+    //connect(decTimer, &Timer::process, this, &BrakeCrane395::dec);
+
+    connect(incTimer, SIGNAL(process()), this, SLOT(inc()), Qt::DirectConnection);
+    connect(decTimer, SIGNAL(process()), this, SLOT(dec()), Qt::DirectConnection);
 }
 
 //------------------------------------------------------------------------------

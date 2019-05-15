@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
 CONFIG += ordered
+CONFIG += force_debug_info
 
 SUBDIRS += ./sound-manager
 SUBDIRS += ./physics

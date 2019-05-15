@@ -15,6 +15,8 @@
 #ifndef     DEVICE_H
 #define     DEVICE_H
 
+#include    "device-export.h"
+
 #include    <QObject>
 #include    <QMap>
 
@@ -26,12 +28,6 @@
 #include    "feedback-signals.h"
 #include    "key-symbols.h"
 #include    "timer.h"
-
-#if defined(DEVICE_LIB)
-    #define DEVICE_EXPORT   Q_DECL_EXPORT
-#else
-    #define DEVICE_EXPORT   Q_DECL_IMPORT
-#endif
 
 /*!
  * \class

@@ -427,8 +427,12 @@ void Vehicle::receiveData(QByteArray data)
     if (data.size() == 0)
         return;
 
+    keys_mutex.lock();
+
     QDataStream stream(&data, QIODevice::ReadOnly);
-    stream >> keys;    
+    stream >> keys;
+
+    keys_mutex.unlock();
 }
 
 bool *Vehicle::getDiscreteSignals()

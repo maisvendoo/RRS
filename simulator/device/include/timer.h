@@ -10,10 +10,12 @@
 
 #include    <QObject>
 
+#include    "device-export.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Timer : public QObject
+class DEVICE_EXPORT Timer : public QObject
 {
     Q_OBJECT
 

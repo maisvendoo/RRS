@@ -49,8 +49,10 @@ void ControllerKM2202::load_config(CfgReader &cfg)
     incTracTimer = new Timer(trac_timeout);
     decTracTimer = new Timer(trac_timeout);
 
-    connect(incTracTimer, &Timer::process, this, &ControllerKM2202::inc_trac_position);
-    connect(decTracTimer, &Timer::process, this, &ControllerKM2202::dec_trac_position);
+    //connect(incTracTimer, &Timer::process, this, &ControllerKM2202::inc_trac_position);
+    //connect(decTracTimer, &Timer::process, this, &ControllerKM2202::dec_trac_position);
+    connect(incTracTimer, SIGNAL(process()), this, SLOT(inc_trac_position()), Qt::DirectConnection);
+    connect(decTracTimer, SIGNAL(process()), this, SLOT(dec_trac_position()), Qt::DirectConnection);
 
     cfg.getInt(secName, "ReversTimeout", tmp);
     revers_timeout = static_cast<double>(tmp) / 1000.0;
@@ -58,8 +60,10 @@ void ControllerKM2202::load_config(CfgReader &cfg)
     incReversTimer = new Timer(revers_timeout);
     decReversTimer = new Timer(revers_timeout);
 
-    connect(incReversTimer, &Timer::process, this, &ControllerKM2202::inc_reversor_dir);
-    connect(decReversTimer, &Timer::process, this, &ControllerKM2202::dec_reversor_dir);
+    //connect(incReversTimer, &Timer::process, this, &ControllerKM2202::inc_reversor_dir);
+    //connect(decReversTimer, &Timer::process, this, &ControllerKM2202::dec_reversor_dir);
+    connect(incReversTimer, SIGNAL(process()), this, SLOT(inc_reversor_dir()), Qt::DirectConnection);
+    connect(decReversTimer, SIGNAL(process()), this, SLOT(dec_reversor_dir()), Qt::DirectConnection);
 }
 
 //------------------------------------------------------------------------------

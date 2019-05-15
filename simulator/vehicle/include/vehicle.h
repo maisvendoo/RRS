@@ -19,6 +19,7 @@
 #include    <QObject>
 #include    <QtGlobal>
 #include    <QMap>
+#include    <QMutex>
 
 #include    "solver-types.h"
 #include    "key-symbols.h"
@@ -241,6 +242,7 @@ protected:
 
     /// Keyboard state
     QMap<int, bool> keys;
+    QMutex          keys_mutex;
 
     /// Discrete signals for outpput
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];

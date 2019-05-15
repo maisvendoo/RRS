@@ -39,6 +39,8 @@ enum
 //------------------------------------------------------------------------------
 class BrakeCrane395 : public BrakeCrane
 {
+    Q_OBJECT
+
 public:
 
     BrakeCrane395(QObject *parent = Q_NULLPTR);
