@@ -114,14 +114,9 @@ void Model::start()
 {
     if (!isStarted())
     {
-        this->moveToThread(&model_thread);        
-
-        connect(&model_thread, &QThread::started,
-                this, &Model::process);
-
         is_simulation_started = true;
-
-        model_thread.start();
+        t = start_time;
+        this->startTimer(integration_time_interval);
     }
 }
 
@@ -131,63 +126,6 @@ void Model::start()
 bool Model::isStarted() const
 {
     return is_simulation_started;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::process()
-{
-    // Current time initialization
-    t = start_time;
-
-    // Main simulation loop
-    while ( (t <= stop_time) &&
-            is_step_correct &&
-            is_simulation_started)
-    {
-        QTime solveTime;
-
-        // Feedback to viewer
-        sharedMemoryFeedback();
-
-        int solve_time = 0;
-        solveTime.start();
-
-        double tau = 0;
-        double integration_time = static_cast<double>(integration_time_interval) / 1000.0;        
-
-        // Integrate all ODE in train motion model
-        while ( (tau <= integration_time) &&
-                is_step_correct)
-        {
-            preStep(t);
-
-            controlStep(control_time, control_delay);
-
-            is_step_correct = step(t, dt);
-
-            tau += dt;
-            t += dt;
-
-            postStep(t);
-        }
-
-        //train->vehiclesStep(t, integration_time);
-        train->inputProcess();
-
-        // Debug print, is allowed
-        if (is_debug_print)
-            debugPrint();
-
-        solve_time = solveTime.elapsed();
-
-        // Make delay for realtime simulation
-        realtime_delay = integration_time_interval - solve_time;
-
-        if (realtime_delay > 0)
-            QThread::msleep(static_cast<unsigned long>(realtime_delay));
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -478,7 +416,6 @@ void Model::controlStep(double &control_time, const double control_delay)
 
         if (keys_data.lock())
         {            
-            //QByteArray data(static_cast<char*>(keys_data.data()), keys_data.size());
             data.resize(keys_data.size());
             memcpy(data.data(), keys_data.data(), static_cast<size_t>(keys_data.size()));
 
@@ -490,5 +427,42 @@ void Model::controlStep(double &control_time, const double control_delay)
     }
 
     control_time += dt;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::timerEvent(QTimerEvent *event)
+{
+    Q_UNUSED(event)
+
+    // Feedback to viewer
+    sharedMemoryFeedback();
+
+    double tau = 0;
+    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
+
+    // Integrate all ODE in train motion model
+    while ( (tau <= integration_time) &&
+            is_step_correct)
+    {
+        preStep(t);
+
+        controlStep(control_time, control_delay);
+
+        is_step_correct = step(t, dt);
+
+        tau += dt;
+        t += dt;
+
+        postStep(t);
+    }
+
+    //train->vehiclesStep(t, integration_time);
+    train->inputProcess();
+
+    // Debug print, is allowed
+    if (is_debug_print)
+        debugPrint();
 }
 

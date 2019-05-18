@@ -363,10 +363,10 @@ bool Train::loadTrain(QString cfg_path)
                 vehicle->setIndex(index);
                 index = ode_order;
 
-                connect(vehicle, &Vehicle::soundPlay, soundMan, &SoundManager::play);
-                connect(vehicle, &Vehicle::soundStop, soundMan, &SoundManager::stop);
-                connect(vehicle, &Vehicle::soundSetVolume, soundMan, &SoundManager::setVolume);
-                connect(vehicle, &Vehicle::soundSetPitch, soundMan, &SoundManager::setPitch);
+                connect(vehicle, &Vehicle::soundPlay, soundMan, &SoundManager::play, Qt::DirectConnection);
+                connect(vehicle, &Vehicle::soundStop, soundMan, &SoundManager::stop, Qt::DirectConnection);
+                connect(vehicle, &Vehicle::soundSetVolume, soundMan, &SoundManager::setVolume, Qt::DirectConnection);
+                connect(vehicle, &Vehicle::soundSetPitch, soundMan, &SoundManager::setPitch, Qt::DirectConnection);
 
                 if (vehicles.size() !=0)
                 {
@@ -382,22 +382,13 @@ bool Train::loadTrain(QString cfg_path)
             }            
 
             vehicle_node = cfg.getNextSection();            
-        }
-
-        //int cabine_in_vehicle = -1;
-
-        /*if (cfg.getInt("Common", "CabineInVehicle", cabine_in_vehicle))
-        {
-            Vehicle *vehicle = vehicles[cabine_in_vehicle];
-            connect(this, &Train::sendDataToVehicle,
-                    vehicle, &Vehicle::receiveData);
-        }*/
+        }        
 
         for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
         {
             Vehicle *vehicle = *it;
             connect(this, &Train::sendDataToVehicle,
-                    vehicle, &Vehicle::receiveData);
+                    vehicle, &Vehicle::receiveData, Qt::DirectConnection);
         }       
     }
     else

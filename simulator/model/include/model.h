@@ -71,9 +71,6 @@ signals:
 
 public slots:
 
-    /// Main simulation loop
-    void process();
-
     /// Messages output
     void outMessage(QString msg);
 
@@ -154,6 +151,8 @@ private:
     void sharedMemoryFeedback();
 
     void controlStep(double &control_time, const double control_delay);
+
+    void timerEvent(QTimerEvent *event);
 };
 
 #endif // MODEL_H
