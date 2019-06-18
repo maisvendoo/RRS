@@ -44,6 +44,11 @@
 
 #include    <QObject>
 
+#include    "openvrdevice.h"
+#include    "openvrviewer.h"
+#include    "openvreventhandler.h"
+#include    "openvr-events-handler.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -415,9 +420,37 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     if (viewer == nullptr)
         return false;
 
-    viewer->setSceneData(root.get());
+    if (!OpenVRDevice::hmdPresent())
+    {
+        osg::notify(osg::FATAL) << "Error: No valid HMD present!" << std::endl;
+        return false;
+    }
 
-    osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+    osg::ref_ptr<OpenVRDevice> openvrDevice = new OpenVRDevice(settings.zNear, settings.zFar, 1.0f, settings.samples);
+
+    osg::ref_ptr<osg::GraphicsContext::Traits> traits = openvrDevice->graphicsContextTraits();
+    osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits);
+    //viewer->getCamera()->setGraphicsContext(gc);
+
+    if (!openvrDevice->hmdInitialized())
+    {
+        return false;
+    }
+
+    osg::ref_ptr<OpenVRRealizeOperation> openvrReleaseOperation = new OpenVRRealizeOperation(openvrDevice);
+
+    viewer->setRealizeOperation(openvrReleaseOperation.get());
+
+    osg::ref_ptr<OpenVRViewer> openvrViewer = new OpenVRViewer(viewer, openvrDevice, openvrReleaseOperation);
+    openvrViewer->addChild(root.get());
+
+    viewer->setSceneData(openvrViewer.get());
+
+    viewer->addEventHandler(new OpenVREventHandler(openvrDevice));
+
+    viewer->addEventHandler(new OpenVREventsHandler(openvrDevice.get()));
+
+    //osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     traits->x = settings.x;
     traits->y = settings.y;
     traits->width = settings.width;
@@ -428,7 +461,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     traits->samples = settings.samples;
     traits->vsync = settings.vsync;
 
-    osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
+    //osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
     osg::Camera *camera = viewer->getCamera();
 
     camera->setGraphicsContext(gc.get());

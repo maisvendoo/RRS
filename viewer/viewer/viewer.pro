@@ -69,6 +69,10 @@ unix {
         LIBS += -losgUtild
         LIBS += -losgTextd
 
+        LIBS += -lopenvr_api
+
+        LIBS += -L../../lib -losgVRViewer_d
+
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
@@ -83,6 +87,10 @@ unix {
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
         LIBS += -losgText
+
+        LIBS += -lopenvr_api
+
+        LIBS += -L../../lib -losgVRViewer
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
@@ -105,6 +113,7 @@ INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
+INCLUDEPATH += ../osgvrviewer/include
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)
