@@ -29,7 +29,7 @@ public:
 
     }
 
-    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter &);
+    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter &ad);
 
 protected:
 

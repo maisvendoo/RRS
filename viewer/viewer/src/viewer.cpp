@@ -47,7 +47,7 @@
 #include    "openvrdevice.h"
 #include    "openvrviewer.h"
 #include    "openvreventhandler.h"
-#include    "openvr-events-handler.h"
+#include    "openvr-input-handler.h"
 
 //------------------------------------------------------------------------------
 //
@@ -448,7 +448,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
 
     viewer->addEventHandler(new OpenVREventHandler(openvrDevice));
 
-    viewer->addEventHandler(new OpenVREventsHandler(openvrDevice.get()));
+    viewer->addEventHandler(new OpenVRInputHandler(openvrDevice.get()));
 
     //osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     traits->x = settings.x;

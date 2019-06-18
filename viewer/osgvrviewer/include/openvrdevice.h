@@ -238,7 +238,7 @@ public:
 
 	void blitMirrorTexture(osg::GraphicsContext* gc);
 
-	osg::GraphicsContext::Traits* graphicsContextTraits() const;
+    osg::GraphicsContext::Traits* graphicsContextTraits() const;
 
     vr::IVRSystem *getVrSystem();
 

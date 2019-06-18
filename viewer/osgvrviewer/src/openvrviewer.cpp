@@ -65,7 +65,7 @@ void OpenVRViewer::configure()
 	m_view->setLightingMode(osg::View::SKY_LIGHT);
 
 	// Disable rendering of main camera since its being overwritten by the swap texture anyway
-	camera->setGraphicsContext(nullptr);
+    camera->setGraphicsContext(nullptr);
 
 	m_configured = true;
 }

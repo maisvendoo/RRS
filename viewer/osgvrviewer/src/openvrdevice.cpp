@@ -629,7 +629,7 @@ osg::GraphicsContext::Traits* OpenVRDevice::graphicsContextTraits() const
 		osg::notify(osg::INFO) << "Couldn't get screen number, setting to 0" << std::endl;
 	}
 
-	unsigned int width, height;
+    unsigned int width, height;
 	wsi->getScreenResolution(si, width, height);
 
 	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
@@ -639,8 +639,8 @@ osg::GraphicsContext::Traits* OpenVRDevice::graphicsContextTraits() const
 	traits->windowDecoration = true;
 	traits->x = 50;
 	traits->y = 50;
-	traits->width = 800;
-	traits->height = 450;
+    traits->width = 800;
+    traits->height = 450;
 	traits->doubleBuffer = true;
 	traits->sharedContext = nullptr;
 	traits->vsync = false; // VSync should always be disabled for because HMD submit handles the timing of the swap.
@@ -648,6 +648,9 @@ osg::GraphicsContext::Traits* OpenVRDevice::graphicsContextTraits() const
     return traits.release();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 vr::IVRSystem *OpenVRDevice::getVrSystem()
 {
     return m_vrSystem;

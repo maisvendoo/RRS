@@ -25,12 +25,10 @@ bool OpenVREventHandler::handle(const osgGA::GUIEventAdapter& ea,
                     m_openvrDevice->resetSensorOrientation();
 					break;
 			}
-		}
-
-    default:
-
-           break;
+		}    
 	}
 
-	return osgGA::GUIEventHandler::handle(ea, ad);
+
+
+    return osgGA::GUIEventHandler::handle(ea, ad);
 }
