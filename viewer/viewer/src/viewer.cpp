@@ -44,7 +44,6 @@
 
 #include    <QObject>
 
-#include    "openvrdevice.h"
 #include    "openvrviewer.h"
 #include    "openvreventhandler.h"
 #include    "openvr-input-handler.h"
@@ -131,7 +130,11 @@ int RouteViewer::run()
 
     viewer.setCameraManipulator(cs.get());
 
-    return viewer.run();
+    viewer.run();
+
+    vr::VR_Shutdown();
+
+    return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -204,6 +207,11 @@ bool RouteViewer::init(int argc, char *argv[])
     osgDB::DatabasePager *dp = viewer.getDatabasePager();
     dp->setDoPreCompile(true);
     dp->setTargetMaximumNumberOfPageLOD(1000);
+
+    std::string action_manifest_dir = fs.combinePath(fs.getConfigDir(), "actions");
+    std::string action_manifest_path = fs.combinePath(action_manifest_dir, "default.json");
+    std::cout << action_manifest_path << std::endl;
+    viewer.addEventHandler(new OpenVRInputHandler(openvrDevice.get(), action_manifest_path));
 
     return true;
 }
@@ -426,7 +434,7 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
         return false;
     }
 
-    osg::ref_ptr<OpenVRDevice> openvrDevice = new OpenVRDevice(settings.zNear, settings.zFar, 1.0f, settings.samples);
+    openvrDevice = new OpenVRDevice(settings.zNear, settings.zFar, 1.0f, settings.samples);
 
     osg::ref_ptr<osg::GraphicsContext::Traits> traits = openvrDevice->graphicsContextTraits();
     osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits);
@@ -447,8 +455,6 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     viewer->setSceneData(openvrViewer.get());
 
     viewer->addEventHandler(new OpenVREventHandler(openvrDevice));
-
-    viewer->addEventHandler(new OpenVRInputHandler(openvrDevice.get()));
 
     //osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     traits->x = settings.x;

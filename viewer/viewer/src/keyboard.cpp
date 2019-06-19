@@ -47,7 +47,8 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
     {
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
-            int key = ct.translate(ea.getUnmodifiedKey());
+            int unmodKey = ea.getUnmodifiedKey();
+            int key = ct.translate(unmodKey);
 
             if (!getKey(key))
             {

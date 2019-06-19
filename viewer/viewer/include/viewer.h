@@ -25,6 +25,8 @@
 
 #include    "train-exterior.h"
 
+#include    "openvrdevice.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -62,6 +64,8 @@ protected:
     KeyboardHandler *keyboard;
 
     TrainExteriorHandler *train_ext_handler;
+
+    osg::ref_ptr<OpenVRDevice>  openvrDevice;
 
     /// Initialization
     bool init(int argc, char *argv[]);   

@@ -1,0 +1,49 @@
+{
+	"default_bindings": [
+		{
+			"controller_type": "vive_controller",
+			"binding_url": "binding.json"
+		}
+	],
+
+	"actions": [
+
+		{
+	      	"name": "/actions/suggested/in/IncTraction",
+	      	"type": "boolean"
+	    },
+	    {
+	      	"name": "/actions/suggested/in/DecTraction",
+	      	"type": "boolean"
+	    },
+	    {
+      		"name": "/actions/suggested/in/Hand_Right",
+      		"type": "pose"
+    	},
+	    {
+	      	"name": "/actions/suggested/in/Hand_Left",
+	      	"type": "pose"
+	    },
+
+	    {
+	      	"name": "/actions/suggested/in/IncBrake",
+	      	"type": "boolean"
+	    },
+	    {
+	      	"name": "/actions/suggested/in/DecBrake",
+	      	"type": "boolean"
+	    }
+	],
+	
+	"localization" : [
+        {
+            "language_tag": "ru_RU",
+            "/actions/suggested/in/IncTraction" : "Увеличить тягу",
+            "/actions/suggested/in/DecTraction" : "Уменьшить тягу",
+            "/actions/suggested/in/Hand_Right"  : "Положение правой руки",
+            "/actions/suggested/in/Hand_Left"  : "Положение левой руки",
+            "/actions/suggested/in/IncBrake"   : "Увеличить позицию крана 395",
+            "/actions/suggested/in/DecBrake"   : "Уменьшить позицию крана 395"
+        }
+    ]
+}

@@ -26,7 +26,7 @@
 static const OSG_GLExtensions* getGLExtensions(const osg::State& state)
 {
 #if(OSG_VERSION_GREATER_OR_EQUAL(3, 4, 0))
-	return state.get<osg::GLExtensions>();
+    return state.get<osg::GLExtensions>();
 #else
 	return osg::FBOExtensions::instance(state.getContextID(), true);
 #endif
@@ -277,7 +277,7 @@ void OpenVRMirrorTexture::blitTexture(osg::GraphicsContext* gc,
 
 void OpenVRMirrorTexture::destroy(osg::GraphicsContext* gc)
 {
-	const OSG_GLExtensions* fbo_ext = getGLExtensions(*gc->getState());
+    const OSG_GLExtensions* fbo_ext = getGLExtensions(*gc->getState());
 	if (fbo_ext)
 	{
 		fbo_ext->glDeleteFramebuffers(1, &m_mirrorFBO);
