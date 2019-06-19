@@ -3,11 +3,17 @@
 	<Common>
 		<CouplingModule>ef-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
+
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>0</NoAir>
+
 		<Title>ВЛ60пк-1543</Title>
-		<Description>Магистральный пассажирский электропоз переменного тока</Description>
+		<Description>Магистральный пассажирский тепловоз Коломенского завода</Description>
 	</Common>
 	<Vehicle>
-		<Module>vl60</Module>
+		<Module>test-loco</Module>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>

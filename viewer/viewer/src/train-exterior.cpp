@@ -298,7 +298,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 {
-    if (nd.sd.empty())
+    if (nd.sd.size() < 2)
         return;
 
     // Time to relative units conversion
@@ -368,15 +368,19 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 
         memcpy(&server_data, sd, sizeof (server_data_t));
 
-        nd.sd.push(server_data);
+        nd.sd.push_back(server_data);
 
         if (nd.sd.size() > 2)
         {
-            nd.sd.pop();
+            nd.sd.pop_front();
             nd.delta_time = nd.sd.back().time - nd.sd.front().time;
         }
 
-        QString msg = QString("ПЕ #%1: delta_time: %2 nd.delta_time: %3").arg(cur_vehicle).arg(delta_time, 6, 'f', 4).arg(nd.delta_time, 6, 'f', 4);
+        QString msg = QString("ПЕ #%1: delta_time: %2 nd.delta_time: %3")
+                .arg(cur_vehicle)
+                .arg(delta_time, 6, 'f', 4)
+                .arg(nd.delta_time, 6, 'f', 4);
+
         emit setStatusBar(msg + QString::fromStdWString(server_data.te[static_cast<size_t>(cur_vehicle)].DebugMsg));
 
         shared_memory.unlock();

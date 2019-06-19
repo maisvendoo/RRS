@@ -22,7 +22,7 @@
 
 #include    <QString>
 
-#include    <queue>
+#include    <deque>
 
 /*!
  * \struct
@@ -34,7 +34,7 @@
 struct network_data_t
 {
     float                       delta_time;
-    std::queue<server_data_t>   sd;
+    std::deque<server_data_t>   sd;
 
     network_data_t()
         : delta_time(0.1f)

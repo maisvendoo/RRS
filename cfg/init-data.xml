@@ -7,7 +7,7 @@
         <ProfileStep>100</ProfileStep>
         <Direction>1</Direction>
         <TrainConfig>default</TrainConfig>
-        <IntegrationTimeInterval>50</IntegrationTimeInterval>        
+        <IntegrationTimeInterval>20</IntegrationTimeInterval>        
         <DebugPrint>true</DebugPrint>
 
         <!-- Интервал опроса кнопок, мс -->
