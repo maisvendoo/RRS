@@ -34,7 +34,13 @@ public:
 
 private:
 
+    float   pant1_pos;
+    float   pant2_pos;
+    float   gv_pos;
 
+    void step(double t, double dt);
+
+    void keyProcess();
 };
 
 #endif // VL60_H

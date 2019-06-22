@@ -13,7 +13,7 @@
 		<Description>Магистральный пассажирский тепловоз Коломенского завода</Description>
 	</Common>
 	<Vehicle>
-		<Module>test-loco</Module>
+		<Module>vl60</Module>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>

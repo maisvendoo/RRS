@@ -124,6 +124,8 @@ private:
 
     /// Load vehicle animations
     void loadAnimations(const std::string vehicle_name, osg::Node *cabine, animations_t &animations);
+
+    void loadModelAnimations(const std::string vehicle_name, osg::Node *model, animations_t &animations);
 };
 
 #endif // TRAIN_EXTERIOR_H

@@ -162,7 +162,7 @@ float ProcAnimation::interpolate(float value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-key_point_t ProcAnimation::findBeginKeyPoint(float value, size_t &next_idx)
+ProcAnimation::key_point_t ProcAnimation::findBeginKeyPoint(float value, size_t &next_idx)
 {
     key_point_t key_point;
 

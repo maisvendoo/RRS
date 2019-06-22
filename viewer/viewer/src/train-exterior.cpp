@@ -27,6 +27,11 @@
 
 #include    "anim-transform-visitor.h"
 
+#include    <QDir>
+#include    <QDirIterator>
+
+#include    "model-animation.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -272,6 +277,8 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
             osg::Vec3 driver_pos = getDirverPosition(module_config_name);
 
+            loadModelAnimations(module_config_name, vehicle_model.get(), animations);
+
             loadAnimations(module_config_name, cabine.get(), animations);
 
             for (int i = 0; i < count; ++i)
@@ -461,4 +468,52 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
     atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
     cabine->accept(atv);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::loadModelAnimations(const std::string vehicle_name,
+                                               osg::Node *model,
+                                               animations_t &animations)
+{
+    FileSystem &fs = FileSystem::getInstance();
+
+    std::string animations_dir = fs.combinePath(fs.getDataDir(), "animations");
+    animations_dir = fs.combinePath(animations_dir, vehicle_name);
+
+    QDir animDir(QString(animations_dir.c_str()));
+
+    QDirIterator animFiles(animDir.path(),
+                           QStringList() << "*.xml",
+                           QDir::NoDotAndDotDot | QDir::Files);
+
+    while (animFiles.hasNext())
+    {
+        QString fullPath = animFiles.next();
+        QFileInfo fileInfo(fullPath);
+
+        QString animation_name = fileInfo.baseName();
+
+        ConfigReader cfg(fullPath.toStdString());
+
+        if (!cfg.isOpenned())
+        {
+            continue;
+        }
+
+        osgDB::XmlNode *rootNode = cfg.getConfigNode();
+
+        for (auto it = rootNode->children.begin(); it != rootNode->children.end(); ++it)
+        {
+            osgDB::XmlNode  *child = *it;
+
+            if (child->name == "ModelAnimation")
+            {
+                ModelAnimation *animation = new ModelAnimation(model, animation_name.toStdString());
+                animation->load(cfg);
+                animations.insert(animation->getSignalID(), animation);
+            }
+        }
+    }
 }

@@ -55,7 +55,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , prev_vehicle(nullptr)
   , next_vehicle(nullptr)
 {
-
+    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);
 }
 
 //------------------------------------------------------------------------------

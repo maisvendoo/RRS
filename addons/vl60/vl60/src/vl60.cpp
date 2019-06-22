@@ -17,6 +17,9 @@
 //
 //------------------------------------------------------------------------------
 VL60::VL60() : Vehicle ()
+  , pant1_pos(0.0)
+  , pant2_pos(0.0)
+  , gv_pos(0.0)
 {
 
 }
@@ -27,6 +30,40 @@ VL60::VL60() : Vehicle ()
 VL60::~VL60()
 {
 
+}
+
+void VL60::step(double t, double dt)
+{
+    analogSignal[40] = pant1_pos;
+    analogSignal[41] = pant2_pos;
+    analogSignal[42] = gv_pos;
+}
+
+void VL60::keyProcess()
+{
+    if (getKeyState(KEY_O))
+    {
+        if (isShift())
+            pant1_pos = 0.8f;
+        else
+            pant1_pos = 0.0f;
+    }
+
+    if (getKeyState(KEY_I))
+    {
+        if (isShift())
+            pant2_pos = 0.8f;
+        else
+            pant2_pos = 0.0f;
+    }
+
+    if (getKeyState(KEY_P))
+    {
+        if (isShift())
+            gv_pos = 1.0f;
+        else
+            gv_pos = 0.0f;
+    }
 }
 
 //------------------------------------------------------------------------------
