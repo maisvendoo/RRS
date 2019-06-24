@@ -467,7 +467,7 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
     AnimTransformVisitor atv(&animations, vehicle_name);
     atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
-    cabine->accept(atv);
+    cabine->accept(atv);    
 }
 
 //------------------------------------------------------------------------------

@@ -39,6 +39,9 @@ private:
     float   pant2_pos;
     float   gv_pos;
 
+    float   test_lamp;
+    int     sig;
+
     void step(double t, double dt);
 
     void keyProcess();

@@ -2,6 +2,7 @@
 #include    "filesystem.h"
 #include    "config-reader.h"
 #include    "analog-rotation.h"
+#include    "material-animation.h"
 
 //------------------------------------------------------------------------------
 //
@@ -68,6 +69,38 @@ ProcAnimation *AnimTransformVisitor::create_animation(const std::string &name,
             animation = new AnalogRotation(transform);
             animation->load(cfg);
             return animation;
+        }
+
+        if (child->name == "MaterialAnimation")
+        {
+            for (unsigned int i = 0; i < transform->getNumChildren(); ++i)
+            {
+                osg::Geode *geode = transform->getChild(i)->asGeode();
+
+                if (geode != nullptr)
+                {
+                    for (unsigned int j = 0; j < geode->getNumDrawables(); ++j)
+                    {
+                        osg::Drawable *drawable = geode->getDrawable(j);
+
+                        if (drawable == nullptr)
+                            continue;
+
+                        osg::StateSet *stateset = drawable->getOrCreateStateSet();
+                        osg::StateAttribute *stateattr = stateset->getAttribute(osg::StateAttribute::MATERIAL);
+
+                        osg::Material *mat = static_cast<osg::Material *>(stateattr);
+
+                        if (mat == nullptr)
+                            continue;
+
+                        animation = new MaterialAnimation(mat, drawable);
+                        animation->load(cfg);
+
+                        return animation;
+                    }
+                }
+            }
         }
     }
 
