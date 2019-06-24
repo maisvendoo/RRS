@@ -38,11 +38,7 @@ void CHS4T::step(double t, double dt)
 
     glavV->setP0(0.5);
     glavV->setP1(0.3);
-//    if(pantographs[0]->getUout()  25000 || pantographs[1]->getUout() == 25000)
-//    glavV->setUkr()
-
-
-
+    glavV->setUkr(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
@@ -75,7 +71,7 @@ void CHS4T::keyProcess()
         pantographs[0]->setState(isShift());
     }
 
-    if (getKeyState(KEY_P))
+    if (getKeyState(KEY_I))
     {
         pantographs[1]->setState(isShift());
     }
