@@ -9,14 +9,13 @@ public:
 
     Pantograph(QObject *parent = Q_NULLPTR);
 
-
-    void setState(bool state);
-
     double getH();
 
     double getUout();
 
     void setUks(double _Uks);
+
+    void setState(bool state);
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

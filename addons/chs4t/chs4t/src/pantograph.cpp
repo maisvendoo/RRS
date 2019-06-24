@@ -10,11 +10,6 @@ Pantograph::Pantograph(QObject* parent) : Device(parent)
 
 }
 
-void Pantograph::setState(bool state)
-{
-    this->state = state;
-}
-
 double Pantograph::getH()
 {
     return h;
@@ -30,6 +25,11 @@ void Pantograph::setUks(double _Uks)
     this->Uks = _Uks;
 }
 
+void Pantograph::setState(bool state)
+{
+    this->state = state;
+}
+
 
 void Pantograph::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
@@ -39,8 +39,6 @@ void Pantograph::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
 void Pantograph::load_config(CfgReader& cfg)
 {
     cfg.getDouble("Pantograph", "height", hMax);
-//    cfg.getDouble("Pantograph", "upTime", upTime);
-//    cfg.getDouble("Pantograph", "downTime", downTime);
     cfg.getDouble("Pantograph", "speed", V);
 }
 

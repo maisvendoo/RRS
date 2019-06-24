@@ -8,12 +8,15 @@
 //------------------------------------------------------------------------------
 CHS4T::CHS4T() : Vehicle()
   , pantograph_config("chs4t-pantograph")
+  , gv_config("chs4t-gv")
 {
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantographs[i] = new Pantograph();
         pantographs[i]->read_config(pantograph_config);
     }
+    glavV = new GV();
+    glavV->read_config(gv_config);
 }
 
 //------------------------------------------------------------------------------
@@ -32,6 +35,13 @@ void CHS4T::step(double t, double dt)
 {
     pantographs[0]->setUks(25000);
     pantographs[1]->setUks(25000);
+
+    glavV->setP0(0.5);
+    glavV->setP1(0.3);
+//    if(pantographs[0]->getUout()  25000 || pantographs[1]->getUout() == 25000)
+//    glavV->setUkr()
+
+
 
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)

@@ -15,6 +15,7 @@
 
 #include    "vehicle-api.h"
 #include    "pantograph.h"
+#include    "gv.h"
 
 enum
 {
@@ -41,8 +42,11 @@ public:
 private:
 
     QString     pantograph_config;
+    QString     gv_config;
 
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
+
+    GV *glavV;
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
