@@ -1,4 +1,5 @@
 #include    "model-part-animation.h"
+#include    "animation-path-callback.h"
 
 //------------------------------------------------------------------------------
 //
@@ -13,20 +14,20 @@ ModelPartAnimation::ModelPartAnimation(osg::MatrixTransform *transform)
     callback = dynamic_cast<osg::AnimationPathCallback *>(transform->getUpdateCallback());
 
     if (callback == nullptr)
-        return;
+        return;    
 
     callback->setPause(true);
-    callback->reset();
 
     path = callback->getAnimationPath();
 
     if (!path.valid())
         return;
 
-    path->setLoopMode(osg::AnimationPath::NO_LOOPING);
-    update();
-
     lastTime = path->getLastTime();
+
+    osg::ref_ptr<AnimationPathCallback> new_callback = new AnimationPathCallback;
+    new_callback->setAnimationPath(path.get());
+    callback = new_callback;
 }
 
 //------------------------------------------------------------------------------
