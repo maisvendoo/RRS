@@ -17,6 +17,7 @@
 //
 //------------------------------------------------------------------------------
 VL60::VL60() : Vehicle ()
+  , Uks(30000.0f)
   , pant1_pos(0.0)
   , pant2_pos(0.0)
   , gv_pos(0.0)
@@ -34,6 +35,12 @@ VL60::~VL60()
 
 void VL60::step(double t, double dt)
 {
+    analogSignal[33] = 0.0;
+    analogSignal[31] = 0.0;
+    analogSignal[32] = 0.0;
+
+    analogSignal[37] = Uks / 30000.0f;
+
     analogSignal[40] = pant1_pos;
     analogSignal[41] = pant2_pos;
     analogSignal[42] = gv_pos;

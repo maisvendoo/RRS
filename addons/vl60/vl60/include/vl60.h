@@ -13,7 +13,7 @@
 #ifndef     VL60_H
 #define     VL60_H
 
-#include    "vehicle.h"
+#include    "vehicle-api.h"
 
 /*!
  * \class
@@ -34,6 +34,7 @@ public:
 
 private:
 
+    float   Uks;
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
