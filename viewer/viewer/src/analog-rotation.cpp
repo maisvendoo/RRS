@@ -7,6 +7,7 @@ AnalogRotation::AnalogRotation(osg::MatrixTransform *transform) : ProcAnimation 
     , min_angle(0.0f)
     , max_angle(osg::PIf)
     , angle(0.0f)
+    , cur_pos(0.0f)
     , axis(osg::Vec3(0.0, 0.0, 1.0))
     , matrix(transform->getMatrix())
 {
@@ -28,9 +29,9 @@ void AnalogRotation::anim_step(float t, float dt)
 {
     (void) t;
 
-    float cur_pos = interpolate(angle);
+    cur_pos += (pos - cur_pos) * duration * dt;
 
-    angle +=  duration * dt * cut((pos - cur_pos), -1.0f, 1.0f);
+    angle = interpolate(cur_pos);
 
     update();
 }

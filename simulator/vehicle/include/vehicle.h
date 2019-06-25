@@ -247,7 +247,7 @@ protected:
     /// Discrete signals for outpput
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];
     /// Analog signals for output
-    float   analogSignal[NUM_ANALOG_SIGNALS];        
+    float   analogSignal[NUM_ANALOG_SIGNALS];
 
     /// User defined initialization
     virtual void initialization();

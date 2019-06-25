@@ -48,10 +48,7 @@ void ES1Motor::keyProcess()
         dec_loc = false;
     }
 
-    enSpeedReg.process(keys[KEY_E], auto_reg);
 
-    incRefSpeed.process(keys[KEY_Q], vz);
-    decRefSpeed.process(keys[KEY_W], vz);
 
     if (keys[KEY_C])
     {

@@ -47,10 +47,7 @@ void ES1NonMotor::initialization()
 //------------------------------------------------------------------------------
 void ES1NonMotor::keyProcess()
 {
-    incBrakePos.process(keys[KEY_Rightbracket], brake_pos);
-    deccBrakePos.process(keys[KEY_Leftbracket], brake_pos);
-
-    brake_pos = cut(brake_pos, 0, static_cast<int>(MAX_BRAKE_POS));
+   brake_pos = cut(brake_pos, 0, static_cast<int>(MAX_BRAKE_POS));
 }
 
 //------------------------------------------------------------------------------

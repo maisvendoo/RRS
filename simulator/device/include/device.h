@@ -28,6 +28,7 @@
 #include    "feedback-signals.h"
 #include    "key-symbols.h"
 #include    "timer.h"
+#include    "trigger.h"
 
 /*!
  * \class

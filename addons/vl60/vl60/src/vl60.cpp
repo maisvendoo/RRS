@@ -17,6 +17,13 @@
 //
 //------------------------------------------------------------------------------
 VL60::VL60() : Vehicle ()
+  , Uks(30000.0f)
+  , pant1_pos(0.0)
+  , pant2_pos(0.0)
+  , gv_pos(0.0)
+  , gv_return(0.0)
+  , test_lamp(0.0)
+  , sig(1)
 {
 
 }
@@ -27,6 +34,93 @@ VL60::VL60() : Vehicle ()
 VL60::~VL60()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::step(double t, double dt)
+{
+    test_lamp += sig * 1.0f * dt;
+
+    if (test_lamp > 1.0f)
+    {
+        sig = -1;
+
+    }
+
+    if (test_lamp < 0.0f)
+    {
+        sig = 1;
+    }
+
+
+
+    analogSignal[33] = 0.0;
+    analogSignal[31] = static_cast<float>(pant1_trig.getState());
+    analogSignal[32] = static_cast<float>(pant2_trig.getState());
+    analogSignal[35] = gv_return;
+
+    analogSignal[37] = Uks / 30000.0f;
+
+    analogSignal[40] = pant1_pos;
+    analogSignal[41] = pant2_pos;
+    analogSignal[42] = gv_pos;
+
+    analogSignal[47] = cut(test_lamp, 0.0f, 1.0f);
+
+    analogSignal[60] = 1.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::keyProcess()
+{
+    if (getKeyState(KEY_O))
+    {
+        if (isShift())
+        {
+            pant1_pos = 0.8f;
+            pant1_trig.set();
+        }
+        else
+        {
+            pant1_pos = 0.0f;
+            pant1_trig.reset();
+        }
+    }
+
+    if (getKeyState(KEY_I))
+    {
+        if (isShift())
+        {
+            pant2_pos = 0.8f;
+            pant2_trig.set();
+        }
+        else
+        {
+            pant2_pos = 0.0f;
+            pant2_trig.reset();
+        }
+    }
+
+    if (getKeyState(KEY_P))
+    {
+        if (isShift())
+            gv_pos = 1.0f;
+        else
+            gv_pos = 0.0f;
+    }
+
+    if (getKeyState(KEY_K))
+    {
+        gv_return = 1.0f;
+    }
+    else
+    {
+        gv_return = 0.0f;
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -21,10 +21,24 @@
 
         <Axis>0.0 2.9 0.93</Axis>
         <Axis>0.0 5.2 0.93</Axis>
-        <Axis>0.0 7.5 0.93</Axis>          
+        <Axis>0.0 7.5 0.93</Axis> 
 
-        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-        <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+	<CabineModel>rrsloco_VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
+        <CabineShift>0.0 0.0 0.317</CabineShift>         
 
-        </Vehicle>
+         <BrakeCraneModule>krm395</BrakeCraneModule>
+         <BrakeCraneConfig>krm395</BrakeCraneConfig>
+
+         <LocoCraneModule>kvt254</LocoCraneModule>
+         <LocoCraneConfig>kvt254</LocoCraneConfig>
+
+         <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+         <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
+
+         <AirDistModule>vr242</AirDistModule>
+         <AirDistConfig>vr242</AirDistConfig>
+
+         <DriverPos>0.8 8.4 3.6</DriverPos>
+                
+	</Vehicle>
 </Config>

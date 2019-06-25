@@ -16,6 +16,9 @@ private:
     float       min_angle;
     float       max_angle;
     float       angle;
+
+    float       cur_pos;
+
     osg::Vec3   axis;
     osg::Matrix matrix;
 

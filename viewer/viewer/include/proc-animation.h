@@ -9,25 +9,13 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct key_point_t
-{
-    float param;
-    float value;
-
-    key_point_t()
-        : param(0.0f)
-        , value(0.0f)
-    {
-
-    }
-};
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 class ProcAnimation
 {
 public:
+
+    ProcAnimation() {}
+
+    ProcAnimation(const std::string &name) { this->name = name; }
 
     ProcAnimation(osg::MatrixTransform *transform);
 
@@ -48,6 +36,19 @@ public:
     size_t getSignalID() const;
 
 protected:
+
+    struct key_point_t
+    {
+        float param;
+        float value;
+
+        key_point_t()
+            : param(0.0f)
+            , value(0.0f)
+        {
+
+        }
+    };
 
     osg::MatrixTransform    *transform;
     std::string             name;

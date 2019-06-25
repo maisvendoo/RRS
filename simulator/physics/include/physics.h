@@ -18,7 +18,6 @@
 
 #include    <QtGlobal>
 #include    "math-funcs.h"
-#include    "trigger.h"
 
 #if defined(PHYSICS_LIB)
     #define PHYSICS_EXPORT  Q_DECL_EXPORT
