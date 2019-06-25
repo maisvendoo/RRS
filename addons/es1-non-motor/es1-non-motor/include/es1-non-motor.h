@@ -2,7 +2,6 @@
 #define     SAPSAN_MOTOR_H
 
 #include    "vehicle.h"
-#include    "controls.h"
 #include    "brake-mech.h"
 
 //------------------------------------------------------------------------------
@@ -34,10 +33,7 @@ private:
 
     QString     brake_mech_module;
     QString     brake_mech_config;
-
-    IncBrakePos incBrakePos;
-
-    DecBrakePos deccBrakePos;
+    
 
     void initialization();
 

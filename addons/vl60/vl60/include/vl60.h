@@ -38,9 +38,13 @@ private:
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
+    float   gv_return;
 
     float   test_lamp;
     int     sig;
+
+    Trigger pant1_trig;
+    Trigger pant2_trig;
 
     void step(double t, double dt);
 

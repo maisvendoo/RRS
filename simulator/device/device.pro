@@ -33,6 +33,5 @@ INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../common-headers/include
 
 
-HEADERS += $$files(./include/*.h) \
-    include/device-export.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
