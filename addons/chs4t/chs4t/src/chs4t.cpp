@@ -43,12 +43,17 @@ void CHS4T::step(double t, double dt)
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
 
-    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5")
+    glavV->step(t, dt);
+
+    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 x = %7")
             .arg(t, 10, 'f', 1)
             .arg(pantographs[0]->getH(), 4, 'f', 2)
             .arg(pantographs[0]->getUout(), 5, 'f', 0)
             .arg(pantographs[1]->getH(), 4, 'f', 2)
-            .arg(pantographs[1]->getUout(), 5, 'f', 0);
+            .arg(pantographs[1]->getUout(), 5, 'f', 0)
+            .arg(glavV->getUout(), 5, 'f', 0)
+            .arg(glavV->getX(), 5, 'f', 0);
+
 }
 
 //------------------------------------------------------------------------------
@@ -74,6 +79,11 @@ void CHS4T::keyProcess()
     if (getKeyState(KEY_I))
     {
         pantographs[1]->setState(isShift());
+    }
+
+    if (getKeyState(KEY_P))
+    {
+        glavV->setState(isShift());
     }
 
 

@@ -3,8 +3,8 @@
 GV::GV(QObject* parent) : Device(parent)
   , state(false)
   , phc(true)
-  , x(0)
-  , x2(0)
+//  , x(0)
+//  , x2(0)
   , sdk(0)
 {
 
@@ -12,7 +12,7 @@ GV::GV(QObject* parent) : Device(parent)
 
 double GV::getX()
 {
-    return x;
+    return y[0];
 }
 
 double GV::getUout()
@@ -47,7 +47,22 @@ void GV::setPhc(bool phc)
 
 void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    double s0 = static_cast<double>(state);
+    double s01 = static_cast<double>(phc);
 
+
+    double s1 = Y[0] - 1;
+    double s2 = s0 * hs_n(s1);
+    double s5 = Fp * hs_p(s1) - Fk * hs_p(s1) * s01;
+    double s3 = ((1.0 - s0) + hs_p(s5)) * hs_p(Y[0]);
+    double s4 = s2 - s3;
+    double s6 = hs_p(s5) * (P0 - Y[1]) *  K1 - Y[1] * K2 * hs_p(sdk);
+
+    sdk = hs_n(Y[1] - P1);
+    Uout = Ukr * sdk * hs_p(s1);
+
+    dYdt[0] = Vn * s4;
+    dYdt[1] = s6 / Vdk;
 }
 
 void GV::load_config(CfgReader& cfg)
@@ -67,17 +82,5 @@ void GV::preStep(state_vector_t& Y, double t)
 
 void GV::stepKeysControl(double t, double dt)
 {
-    double s0 = static_cast<double>(state);
-    double s01 = static_cast<double>(phc);
 
-    double s1 = x - 1;
-    double s2 = s0 * hs_n(s1);
-    double s5 = Fp * hs_p(s1) - Fk * hs_p(s1) * s01;
-    double s3 = (1.0 - s0) + hs_p(s5);
-    double s4 = s2 - s3;
-    double s6 = hs_p(s5) * (P0 - x2) *  K1 - x2 * K2 * hs_p(sdk);
-    x += Vn * s4 * dt;
-    x2 += s6 / Vdk * dt;
-    sdk = hs_n(x2 - P1);
-    Uout = Ukr * sdk * hs_p(s1);
 }

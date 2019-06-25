@@ -23,6 +23,7 @@ public:
 
     void setPhc(bool phc);
 
+
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
@@ -32,25 +33,28 @@ private:
 
 
     CfgReader cfg_;
-    std::vector<double> Y;
+
 
     double  Uout;
     double  Ukr;
 
     double Vn;
     double Vdk;
+
     double Fk;
     double Fp;
+
     double P0;
     double P1;
+
     double K1;
     double K2;
 
-    double x;
-    double x2;
+//    double x;
+//    double x2;
+
     double sdk;
     double Pdk;
-
 
     bool state;
     ///
