@@ -87,6 +87,7 @@ public:
     void setPrevVehicle(Vehicle *vehicle);
     void setNextVehicle(Vehicle *vehicle);
 
+    void setConfigDir(QString config_dir);
 
     /// Get vehicle index
     size_t getIndex() const;
@@ -232,6 +233,8 @@ protected:
 
     Vehicle *prev_vehicle;
     Vehicle *next_vehicle;
+
+    QString config_dir;
 
     /// Active common forces
     state_vector_t  Q_a;

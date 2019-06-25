@@ -54,6 +54,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , DebugMsg(" ")
   , prev_vehicle(nullptr)
   , next_vehicle(nullptr)
+  , config_dir("")
 {
     memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);
 }
@@ -199,6 +200,14 @@ void Vehicle::setPrevVehicle(Vehicle *vehicle)
 void Vehicle::setNextVehicle(Vehicle *vehicle)
 {
     next_vehicle = vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setConfigDir(QString config_dir)
+{
+    this->config_dir = config_dir;
 }
 
 //------------------------------------------------------------------------------

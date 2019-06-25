@@ -375,6 +375,9 @@ bool Train::loadTrain(QString cfg_path)
                     vehicle->setPrevVehicle(prev);
                 }
 
+                QString config_dir(fs.combinePath(fs.getConfigDir(), module_cfg_name.toStdString()).c_str());
+                vehicle->setConfigDir(config_dir);
+
                 vehicles.push_back(vehicle);
 
                 emit logMessage("OK: Loaded vehicle: " + module_name +

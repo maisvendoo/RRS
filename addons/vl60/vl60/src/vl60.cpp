@@ -54,8 +54,6 @@ void VL60::step(double t, double dt)
         sig = 1;
     }
 
-
-
     analogSignal[33] = 0.0;
     analogSignal[31] = static_cast<float>(pant1_trig.getState());
     analogSignal[32] = static_cast<float>(pant2_trig.getState());
@@ -70,6 +68,14 @@ void VL60::step(double t, double dt)
     analogSignal[47] = cut(test_lamp, 0.0f, 1.0f);
 
     analogSignal[60] = 1.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepPantographsControl(double t, double dt)
+{
+
 }
 
 //------------------------------------------------------------------------------

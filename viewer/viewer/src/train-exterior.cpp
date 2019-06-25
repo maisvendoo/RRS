@@ -26,7 +26,6 @@
 #include    <sstream>
 
 #include    "anim-transform-visitor.h"
-
 #include    <QDir>
 #include    <QDirIterator>
 

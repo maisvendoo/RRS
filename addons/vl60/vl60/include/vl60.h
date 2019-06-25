@@ -15,6 +15,8 @@
 
 #include    "vehicle-api.h"
 
+#include    "pantograph.h"
+
 /*!
  * \class
  * \brief Основной класс, описывающий весь электровоз
@@ -34,6 +36,11 @@ public:
 
 private:
 
+    enum
+    {
+        NUM_PANTOGRAPHS = 2
+    };
+
     float   Uks;
     float   pant1_pos;
     float   pant2_pos;
@@ -46,7 +53,11 @@ private:
     Trigger pant1_trig;
     Trigger pant2_trig;
 
+    std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
+
     void step(double t, double dt);
+
+    void stepPantographsControl(double t, double dt);
 
     void keyProcess();
 };
