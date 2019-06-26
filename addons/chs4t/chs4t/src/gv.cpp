@@ -1,10 +1,9 @@
 #include "gv.h"
 
 GV::GV(QObject* parent) : Device(parent)
-  , state(false)
+  , GVstate(false)
+  , VZstate(false)
   , phc(true)
-//  , x(0)
-//  , x2(0)
   , sdk(0)
 {
 
@@ -35,9 +34,14 @@ void GV::setUkr(double Ukr)
     this->Ukr = Ukr;
 }
 
-void GV::setState(bool state)
+void GV::setGVState(bool state)
 {
-    this->state = state;
+    this->GVstate = state;
+}
+
+void GV::setVZState(bool state)
+{
+    this->VZstate = state;
 }
 
 void GV::setPhc(bool phc)
@@ -47,9 +51,13 @@ void GV::setPhc(bool phc)
 
 void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    double s0 = static_cast<double>(state);
     double s01 = static_cast<double>(phc);
+    double s02 = static_cast<double>(GVstate);
+    double s03 = static_cast<double>(VZstate);
 
+
+//    double s0 = s02 * hs_p(Y[2] - tVZ);
+    double s0 = s02;
 
     double s1 = Y[0] - 1;
     double s2 = s0 * hs_n(s1);
@@ -63,6 +71,7 @@ void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 
     dYdt[0] = Vn * s4;
     dYdt[1] = s6 / Vdk;
+    //dYdt[2] = s7 * Vn;
 }
 
 void GV::load_config(CfgReader& cfg)
@@ -73,6 +82,7 @@ void GV::load_config(CfgReader& cfg)
     cfg.getDouble("GV", "Fp", Fp);
     cfg.getDouble("GV", "K1", K1);
     cfg.getDouble("GV", "K2", K2);
+    cfg.getDouble("GV", "tVZ", tVZ);
 }
 
 void GV::preStep(state_vector_t& Y, double t)

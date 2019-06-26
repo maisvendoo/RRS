@@ -19,10 +19,10 @@ public:
 
     void setUkr(double Ukr);
 
-    void setState(bool state);
+    void setGVState(bool state);
+    void setVZState(bool state);
 
     void setPhc(bool phc);
-
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -50,13 +50,12 @@ private:
     double K1;
     double K2;
 
-//    double x;
-//    double x2;
-
     double sdk;
     double Pdk;
 
-    bool state;
+    bool GVstate;
+    bool VZstate;
+    double tVZ;
     ///
     bool phc;
 

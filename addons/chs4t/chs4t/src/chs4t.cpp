@@ -83,10 +83,10 @@ void CHS4T::keyProcess()
 
     if (getKeyState(KEY_P))
     {
-        glavV->setState(isShift());
+        glavV->setGVState(isShift());
     }
 
-
+    glavV->setVZState(getKeyState(KEY_K));
 }
 
 GET_VEHICLE(CHS4T)
