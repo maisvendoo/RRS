@@ -347,7 +347,12 @@ bool Train::loadTrain(QString cfg_path)
                 connect(vehicle, &Vehicle::logMessage, this, &Train::logMessage);
 
                 QString relConfigPath = QString(fs.combinePath(module_cfg_name.toStdString(), module_cfg_name.toStdString()).c_str());
-                vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
+
+
+                QString config_dir(fs.combinePath(fs.getVehiclesDir(), module_cfg_name.toStdString()).c_str());
+                vehicle->setConfigDir(config_dir);
+
+                vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");                
 
                 vehicle->setPayloadCoeff(payload_coeff);
 
@@ -373,10 +378,7 @@ bool Train::loadTrain(QString cfg_path)
                     Vehicle *prev =  *(vehicles.end() - 1);
                     prev->setNextVehicle(vehicle);
                     vehicle->setPrevVehicle(prev);
-                }
-
-                QString config_dir(fs.combinePath(fs.getConfigDir(), module_cfg_name.toStdString()).c_str());
-                vehicle->setConfigDir(config_dir);
+                }                
 
                 vehicles.push_back(vehicle);
 

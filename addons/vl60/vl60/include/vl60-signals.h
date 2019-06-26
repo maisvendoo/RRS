@@ -1,0 +1,34 @@
+#ifndef     VL60_SIGNALS_H
+#define     VL60_SIGNALS_H
+
+enum
+{
+    TUMBLER_PNT = 33,
+    TUMBLER_PNT1 = 31,
+    TUMBLER_PNT2 = 32,
+
+    SIG_LIGHT_PSS_L = 50,
+    SIG_LIGHT_PSS_PROPUSK = 51,
+    SIG_LIGHT_RB = 52,
+    SIG_LIGHT_RP = 53,
+    SIG_LIGHT_RPO = 54,
+    SIG_LIGHT_RZ_RKZ = 55,
+
+    SIG_LIGHT_GV = 43,
+
+    SIG_LIGHT_O = 44,
+    SIG_LIGHT_P = 45,
+    SIG_LIGHT_T = 46,
+
+    SIG_LIGHT_0HP = 47,
+
+    SIG_LIGHT_FR = 48,
+    SIG_LIGHT_GU = 49,
+
+    SIG_LIGHT_TD = 56,
+    SIG_LIGHT_TR = 57,
+    SIG_LIGHT_VU1 = 58,
+    SIG_LIGHT_VU2 = 59,
+};
+
+#endif // VL60_SIGNALS_H

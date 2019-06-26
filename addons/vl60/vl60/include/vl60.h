@@ -15,6 +15,7 @@
 
 #include    "vehicle-api.h"
 
+#include    "vl60-signals.h"
 #include    "pantograph.h"
 
 /*!
@@ -38,7 +39,8 @@ private:
 
     enum
     {
-        NUM_PANTOGRAPHS = 2
+        NUM_PANTOGRAPHS = 2,
+        WIRE_VOLTAGE = 25000
     };
 
     float   Uks;
@@ -50,14 +52,23 @@ private:
     float   test_lamp;
     int     sig;
 
-    Trigger pant1_trig;
-    Trigger pant2_trig;
+    /// Тригер тумблера "Токоприемники"
+    Trigger pants_tumbler;
+    /// Триггер тумблера "Токоприемник передний"
+    Trigger pant1_tumbler;
+    /// Триггер тумблера "Токоприемник задний"
+    Trigger pant2_tumbler;
 
+    /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
+
+    void initialization();
 
     void step(double t, double dt);
 
     void stepPantographsControl(double t, double dt);
+
+    void stepSignalsOutput();
 
     void keyProcess();
 };

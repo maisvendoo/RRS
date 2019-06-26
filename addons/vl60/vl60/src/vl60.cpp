@@ -13,6 +13,8 @@
 
 #include    "vl60.h"
 
+#include    <QDir>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -39,35 +41,24 @@ VL60::~VL60()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::initialization()
+{
+    QString pant_cfg_path = config_dir + QDir::separator() + "pantograph.xml";
+
+    for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
+    {
+        pantographs[i] = new Pantograph(pant_cfg_path);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::step(double t, double dt)
 {
-    test_lamp += sig * 1.0f * dt;
+    stepPantographsControl(t, dt);
 
-    if (test_lamp > 1.0f)
-    {
-        sig = -1;
-
-    }
-
-    if (test_lamp < 0.0f)
-    {
-        sig = 1;
-    }
-
-    analogSignal[33] = 0.0;
-    analogSignal[31] = static_cast<float>(pant1_trig.getState());
-    analogSignal[32] = static_cast<float>(pant2_trig.getState());
-    analogSignal[35] = gv_return;
-
-    analogSignal[37] = Uks / 30000.0f;
-
-    analogSignal[40] = pant1_pos;
-    analogSignal[41] = pant2_pos;
-    analogSignal[42] = gv_pos;
-
-    analogSignal[47] = cut(test_lamp, 0.0f, 1.0f);
-
-    analogSignal[60] = 1.0f;
+    stepSignalsOutput();
 }
 
 //------------------------------------------------------------------------------
@@ -75,7 +66,47 @@ void VL60::step(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepPantographsControl(double t, double dt)
 {
+    for (auto pant : pantographs)
+    {
+        pant->setUks(WIRE_VOLTAGE);
+        pant->step(t, dt);
+    }
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepSignalsOutput()
+{
+    // Состояние токоприемников
+    analogSignal[40] = static_cast<float>(pantographs[0]->getHeight());
+    analogSignal[41] = static_cast<float>(pantographs[1]->getHeight());
+
+    // Состояние тумблеров на пульте машиниста
+    analogSignal[TUMBLER_PNT] = static_cast<float>(pants_tumbler.getState());
+    analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler.getState());
+    analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler.getState());
+
+    analogSignal[35] = gv_return;
+
+    // Вольтметр КС
+    analogSignal[37] = 0.0;
+
+    // Состояние главного выключателя
+    analogSignal[42] = gv_pos;
+
+    // Состояние локомотивного светофора
+    analogSignal[60] = 1.0f;
+
+    // Состояние контрольных ламп
+    analogSignal[SIG_LIGHT_GV] = 1.0f;
+    analogSignal[SIG_LIGHT_GU] = 1.0f;
+    analogSignal[SIG_LIGHT_FR] = 1.0f;
+    analogSignal[SIG_LIGHT_0HP] = 1.0f;
+    analogSignal[SIG_LIGHT_TR] = 1.0;
+    analogSignal[SIG_LIGHT_VU1] = 1.0;
+    analogSignal[SIG_LIGHT_VU2] = 1.0;
+    analogSignal[SIG_LIGHT_TD] = 1.0;
 }
 
 //------------------------------------------------------------------------------
@@ -83,32 +114,39 @@ void VL60::stepPantographsControl(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::keyProcess()
 {
+    // Управление тумблером "Токоприемники"
     if (getKeyState(KEY_O))
     {
         if (isShift())
-        {
-            pant1_pos = 0.8f;
-            pant1_trig.set();
-        }
+            pants_tumbler.set();
         else
-        {
-            pant1_pos = 0.0f;
-            pant1_trig.reset();
-        }
+            pants_tumbler.reset();
     }
 
+    // Подъем/опускание переднего токоприемника
+    if (getKeyState(KEY_U))
+    {
+        // Переводим тумблер внужное фиксированное положени
+        if (isShift())                    
+            pant1_tumbler.set();
+        else        
+            pant1_tumbler.reset();
+
+        // Задаем статус токоприемнику
+        pantographs[0]->setState(isShift() && pants_tumbler.getState());
+    }
+
+    // Подъем/опускание заднего токоприемника
     if (getKeyState(KEY_I))
     {
+        // Переводим тумблер внужное фиксированное положени
         if (isShift())
-        {
-            pant2_pos = 0.8f;
-            pant2_trig.set();
-        }
+            pant2_tumbler.set();
         else
-        {
-            pant2_pos = 0.0f;
-            pant2_trig.reset();
-        }
+            pant2_tumbler.reset();
+
+        // Задаем статус токоприемнику
+        pantographs[1]->setState(isShift() && pants_tumbler.getState());
     }
 
     if (getKeyState(KEY_P))
