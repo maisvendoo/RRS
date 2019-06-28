@@ -67,7 +67,7 @@ void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     double s6 = hs_p(s5) * (P0 - Y[1]) *  K1 - Y[1] * K2 * hs_p(sdk);
 
     sdk = hs_n(Y[1] - P1);
-    Uout = Ukr * sdk * hs_p(s0);
+    Uout = Ukr * sdk * hs_p(s1);
 
     dYdt[0] = Vn * s4;
     dYdt[1] = s6 / Vdk;
