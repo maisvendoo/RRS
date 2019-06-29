@@ -79,24 +79,24 @@ void VL60::stepPantographsControl(double t, double dt)
 void VL60::stepSignalsOutput()
 {
     // Состояние токоприемников
-    analogSignal[40] = static_cast<float>(pantographs[0]->getHeight());
-    analogSignal[41] = static_cast<float>(pantographs[1]->getHeight());
+    analogSignal[PANT1_POS] = static_cast<float>(pantographs[0]->getHeight());
+    analogSignal[PANT2_POS] = static_cast<float>(pantographs[1]->getHeight());
 
     // Состояние тумблеров на пульте машиниста
     analogSignal[TUMBLER_PNT] = static_cast<float>(pants_tumbler.getState());
     analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler.getState());
     analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler.getState());
 
-    analogSignal[35] = gv_return;
+    analogSignal[TUMBLER_GV_ON] = gv_return;
 
     // Вольтметр КС
-    analogSignal[37] = 0.0;
+    analogSignal[STRELKA_KV2] = 0.0;
 
     // Состояние главного выключателя
-    analogSignal[42] = gv_pos;
+    analogSignal[GV_POS] = gv_pos;
 
     // Состояние локомотивного светофора
-    analogSignal[60] = 1.0f;
+    analogSignal[LS_G] = 1.0f;
 
     // Состояние контрольных ламп
     analogSignal[SIG_LIGHT_GV] = 1.0f;

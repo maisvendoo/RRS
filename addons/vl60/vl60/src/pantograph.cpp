@@ -61,7 +61,11 @@ void Pantograph::ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t)
 {
+    Q_UNUSED(t)
+
     double ref_height = static_cast<double>(state) * max_height;
+
+    Uout = Uks * hs_p(Y[0] - 0.95 * max_height);
 
     dYdt[0] = 3.0 * (ref_height - Y[0]) / motion_time;
 }
