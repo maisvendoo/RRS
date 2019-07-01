@@ -7,4 +7,8 @@
         <speed>0.2</speed>
                 
     </Pantograph>
+
+    <Device>
+        <Order>1</Order>
+    </Device>
 </Config>
