@@ -57,7 +57,7 @@ void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 
 
     double s0 = s02 * hs_p(Y[2] - tVZ);
-//    double s0 = s02;
+//    double s0 = s02; 
 
     double s1 = Y[0] - 1;
     double s2 = s0 * hs_n(s1);

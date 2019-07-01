@@ -23,7 +23,7 @@ VL60::VL60() : Vehicle ()
   , pant1_pos(0.0)
   , pant2_pos(0.0)
   , gv_pos(0.0)
-  , gv_return(0.0)
+  , gv_return(false)
   , test_lamp(0.0)
   , sig(1)
 {
@@ -49,6 +49,10 @@ void VL60::initialization()
     {
         pantographs[i] = new Pantograph(pant_cfg_path);
     }
+
+    QString gv_cfg_path = config_dir + QDir::separator() + "main-switch.xml";
+
+    main_switch = new MainSwitch(gv_cfg_path);
 }
 
 //------------------------------------------------------------------------------
@@ -57,6 +61,8 @@ void VL60::initialization()
 void VL60::step(double t, double dt)
 {
     stepPantographsControl(t, dt);
+
+    stepMainSwitchControl(t, dt);
 
     stepSignalsOutput();
 }
@@ -68,9 +74,31 @@ void VL60::stepPantographsControl(double t, double dt)
 {
     for (auto pant : pantographs)
     {
+        // Задаем текущее напряжение КС (пока что через константу)
         pant->setUks(WIRE_VOLTAGE);
+        // Моделируем работу токоприемников
         pant->step(t, dt);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepMainSwitchControl(double t, double dt)
+{
+    // Подаем на вход напряжение с крышевой шины, на которую включены
+    // оба токоприемника
+    main_switch->setU_in(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
+
+    // Задаем состояние органов управления ГВ
+    main_switch->setState(gv_tumbler.getState());
+    main_switch->setReturn(gv_return);
+
+    // Подаем питание на удерживающую катушку ГВ
+    main_switch->setHoldingCoilState(getHoldingCoilState());
+
+    // Моделируем работу ГВ
+    main_switch->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -87,13 +115,14 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler.getState());
     analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler.getState());
 
-    analogSignal[TUMBLER_GV_ON] = gv_return;
+    analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return);
+    analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
 
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = 0.0;
 
     // Состояние главного выключателя
-    analogSignal[GV_POS] = gv_pos;
+    analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
 
     // Состояние локомотивного светофора
     analogSignal[LS_G] = 1.0f;
@@ -106,7 +135,17 @@ void VL60::stepSignalsOutput()
     analogSignal[SIG_LIGHT_TR] = 1.0;
     analogSignal[SIG_LIGHT_VU1] = 1.0;
     analogSignal[SIG_LIGHT_VU2] = 1.0;
-    analogSignal[SIG_LIGHT_TD] = 1.0;
+    analogSignal[SIG_LIGHT_TD] = 1.0;    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VL60::getHoldingCoilState() const
+{
+    bool state = false; //getKeyState(KEY_T);
+
+    return state;
 }
 
 //------------------------------------------------------------------------------
@@ -126,7 +165,7 @@ void VL60::keyProcess()
     // Подъем/опускание переднего токоприемника
     if (getKeyState(KEY_U))
     {
-        // Переводим тумблер внужное фиксированное положени
+        // Переводим тумблер в нужное фиксированное положение
         if (isShift())                    
             pant1_tumbler.set();
         else        
@@ -139,7 +178,7 @@ void VL60::keyProcess()
     // Подъем/опускание заднего токоприемника
     if (getKeyState(KEY_I))
     {
-        // Переводим тумблер внужное фиксированное положени
+        // Переводим тумблер в нужное фиксированное положение
         if (isShift())
             pant2_tumbler.set();
         else
@@ -149,22 +188,16 @@ void VL60::keyProcess()
         pantographs[1]->setState(isShift() && pants_tumbler.getState());
     }
 
+    // Включение/выключение ГВ
     if (getKeyState(KEY_P))
     {
         if (isShift())
-            gv_pos = 1.0f;
+            gv_tumbler.set();
         else
-            gv_pos = 0.0f;
+            gv_tumbler.reset();
     }
 
-    if (getKeyState(KEY_K))
-    {
-        gv_return = 1.0f;
-    }
-    else
-    {
-        gv_return = 0.0f;
-    }
+    gv_return = getKeyState(KEY_K);
 }
 
 //------------------------------------------------------------------------------

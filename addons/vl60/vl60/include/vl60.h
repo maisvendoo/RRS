@@ -17,6 +17,7 @@
 
 #include    "vl60-signals.h"
 #include    "pantograph.h"
+#include    "main-switch.h"
 
 /*!
  * \class
@@ -47,7 +48,7 @@ private:
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
-    float   gv_return;
+    bool    gv_return;
 
     float   test_lamp;
     int     sig;
@@ -59,8 +60,14 @@ private:
     /// Триггер тумблера "Токоприемник задний"
     Trigger pant2_tumbler;
 
+    /// Триггер тумблера "ГВ вкл/выкл"
+    Trigger gv_tumbler;
+
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
+
+    /// Главный выключатель (ГВ)
+    MainSwitch      *main_switch;
 
     void initialization();
 
@@ -68,7 +75,11 @@ private:
 
     void stepPantographsControl(double t, double dt);
 
+    void stepMainSwitchControl(double t, double dt);
+
     void stepSignalsOutput();
+
+    bool getHoldingCoilState() const;
 
     void keyProcess();
 };

@@ -8,6 +8,7 @@ enum
     TUMBLER_PNT2 = 32,
 
     TUMBLER_GV_ON = 35,
+    TUMBLER_GV_ON_OFF = 36,
 
     STRELKA_KV2 = 37,
 
