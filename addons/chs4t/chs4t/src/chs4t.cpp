@@ -92,7 +92,7 @@ void CHS4T::keyProcess()
     }
 
     glavV->setVZState(getKeyState(KEY_K));
-
+//glavV->setVZState(true);
 }
 
 GET_VEHICLE(CHS4T)

@@ -11,7 +11,7 @@ GV::GV(QObject* parent) : Device(parent)
 
 double GV::getX()
 {
-    return y[0];
+    return getY(0);
 }
 
 double GV::getUout()
@@ -55,12 +55,16 @@ void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     double s02 = static_cast<double>(GVstate);
     double s03 = static_cast<double>(VZstate);
 
-    double s0 = s02 * hs_p(Y[2] - tVZ);
 
-    double s1 = Y[0] - 1;
-    double s2 = s0 * hs_n(s1);
-    double s5 = Fp * hs_p(s1) - Fk * hs_p(s1) * s01;
-    double s3 = ((1.0 - s0) + hs_p(s5)) * hs_p(Y[0]);
+    double on = s03 * s02;
+    double off = 1.0 - s02;
+
+    double s1 = Y[0] - 0.95;
+    double s2 = on * hs_n(s1);
+
+    double s5 = Fp * pf(Y[0]) - Fk * s02 * s01;
+
+    double s3 = hs_p(Y[0]) * (hs_p(s5) + off);
     double s4 = s2 - s3;
     double s6 = hs_p(s5) * (P0 - Y[1]) *  K1 - Y[1] * K2 * hs_p(sdk);
 
@@ -69,7 +73,6 @@ void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 
     dYdt[0] = Vn * s4;
     dYdt[1] = s6 / Vdk;
-    dYdt[2] = s02 * s03 * hs_p(1.0 - Y[2]) - hs_p(Y[2] - s0) * !s03;
 
 }
 
