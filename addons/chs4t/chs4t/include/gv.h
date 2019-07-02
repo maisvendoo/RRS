@@ -5,7 +5,7 @@
 //
 //      (c) RRS development team:
 //          Дмитрий Притыкин (maisvendoo),
-//          Авилкин Николай (avilkinnick)
+//          Николай Авилкин (avilkin.nick)
 //
 //      Дата: 16/06/2019
 //
