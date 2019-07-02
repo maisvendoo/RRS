@@ -1,3 +1,16 @@
+//------------------------------------------------------------------------------
+//
+//      Магистральный пассажирский электровоз переменного тока ЧС4т.
+//      Дополнение для Russian Railway Simulator (RRS)
+//
+//      (c) RRS development team:
+//          Дмитрий Притыкин (maisvendoo),
+//          Николай Авилкин (avilkin.nick)
+//
+//      Дата: 16/06/2019
+//
+//------------------------------------------------------------------------------
+
 #include    "chs4t.h"
 
 
@@ -69,6 +82,9 @@ void CHS4T::loadConfig(QString cfg_path)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CHS4T::keyProcess()
 {
     if (getKeyState(KEY_O))
@@ -86,7 +102,13 @@ void CHS4T::keyProcess()
         glavV->setGVState(isShift());
     }
 
+    if (getKeyState(KEY_J))
+    {
+        glavV->setPhc(isShift());
+    }
+
     glavV->setVZState(getKeyState(KEY_K));
+//glavV->setVZState(true);
 }
 
 GET_VEHICLE(CHS4T)
