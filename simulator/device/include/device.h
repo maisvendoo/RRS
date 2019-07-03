@@ -125,6 +125,10 @@ protected:
 
     bool getKeyState(int key) const;
 
+    bool isShift() const;
+
+    bool isControl() const;
+
 private:
 
     void memory_alloc(int order);
