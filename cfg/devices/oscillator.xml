@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>2</Order>
+		<Omega>1.6</Omega>
+		<Beta>1.0</Beta>
+		<Coeff>1.0</Coeff>
+	</Device>
+</Config>

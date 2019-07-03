@@ -18,6 +18,7 @@
 #include    "vl60-signals.h"
 #include    "pantograph.h"
 #include    "main-switch.h"
+#include    "oscillator.h"
 
 /*!
  * \class
@@ -68,6 +69,9 @@ private:
 
     /// Главный выключатель (ГВ)
     MainSwitch      *main_switch;
+
+    /// Механизм киловольтметра КС
+    Oscillator      *gauge_KV_ks;
 
     void initialization();
 

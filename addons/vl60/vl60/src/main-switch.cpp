@@ -17,12 +17,13 @@ MainSwitch::MainSwitch(QString config_path, QObject *parent) : Device(parent)
   , K2(1e-2)
   , p0(0.5)
   , p1(0.3)
+  , lamp_state(1.0f)
 
 {
     load_config(config_path);
 
-    DebugLog *log = new DebugLog("gv.txt");
-    connect(this, &MainSwitch::DebugPrint, log, &DebugLog::DebugPring);
+    /*DebugLog *log = new DebugLog("gv.txt");
+    connect(this, &MainSwitch::DebugPrint, log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------
@@ -76,6 +77,14 @@ double MainSwitch::getKnifePos() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+float MainSwitch::getLampState() const
+{
+    return lamp_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double MainSwitch::getU_out() const
 {
     return U_out;
@@ -90,28 +99,27 @@ void MainSwitch::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    double s_on = static_cast<double>(is_return);
-    double s_off = 1.0 - static_cast<double>(is_on);
+    double s_on_off = static_cast<double>(is_on);
+
+    double s_on = static_cast<double>(is_return) * s_on_off;
+    double s_off = 1.0 - s_on_off;
+
     double s_hc = static_cast<double>(holding_coil);
 
     double dx = Y[0] - 1.0;
     double s2 = s_on * hs_n(dx);
 
-    double s5 = hs_p(Fp * hs_p(Y[0] - 0.1) - Fk * hs_p(dx) * s_hc);
+    double s5 = hs_p(Fp * pf(Y[0]) - Fk * s_on_off * s_hc);
 
     double s3 = (s_off + s5) * hs_p(Y[0]);
 
     double s1 = s2 - s3;
 
-    double Q1 = K1 * (p0 - Y[1]) * s5;
+    U_out = U_in * hs_p(dx);
 
-    double sdk = hs_n(Y[1] - p1);
-
-    double Q2 = K2 * Y[1] * (1.0 - sdk);
+    lamp_state = static_cast<float>(1.0 - hs_p(dx));
 
     dYdt[0] = s1 * Vn;
-
-    dYdt[1] = (Q1 - Q2) / Vdk;
 }
 
 //------------------------------------------------------------------------------

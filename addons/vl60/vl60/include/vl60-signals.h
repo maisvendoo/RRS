@@ -10,7 +10,7 @@ enum
     TUMBLER_GV_ON = 35,
     TUMBLER_GV_ON_OFF = 36,
 
-    STRELKA_KV2 = 37,
+    STRELKA_KV2 = 99,
 
     SIG_LIGHT_PSS_L = 50,
     SIG_LIGHT_PSS_PROPUSK = 51,

@@ -53,6 +53,9 @@ void VL60::initialization()
     QString gv_cfg_path = config_dir + QDir::separator() + "main-switch.xml";
 
     main_switch = new MainSwitch(gv_cfg_path);
+
+    gauge_KV_ks = new Oscillator();
+    gauge_KV_ks->read_config("oscillator");
 }
 
 //------------------------------------------------------------------------------
@@ -97,8 +100,12 @@ void VL60::stepMainSwitchControl(double t, double dt)
     // Подаем питание на удерживающую катушку ГВ
     main_switch->setHoldingCoilState(getHoldingCoilState());
 
+    gauge_KV_ks->setInput(main_switch->getU_out() / 30000.0);
+
     // Моделируем работу ГВ
     main_switch->step(t, dt);
+
+    gauge_KV_ks->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -119,7 +126,7 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
 
     // Вольтметр КС
-    analogSignal[STRELKA_KV2] = 0.0;
+    analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
 
     // Состояние главного выключателя
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
@@ -128,7 +135,7 @@ void VL60::stepSignalsOutput()
     analogSignal[LS_G] = 1.0f;
 
     // Состояние контрольных ламп
-    analogSignal[SIG_LIGHT_GV] = 1.0f;
+    analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();
     analogSignal[SIG_LIGHT_GU] = 1.0f;
     analogSignal[SIG_LIGHT_FR] = 1.0f;
     analogSignal[SIG_LIGHT_0HP] = 1.0f;
@@ -143,7 +150,7 @@ void VL60::stepSignalsOutput()
 //------------------------------------------------------------------------------
 bool VL60::getHoldingCoilState() const
 {
-    bool state = false; //getKeyState(KEY_T);
+    bool state = true;
 
     return state;
 }

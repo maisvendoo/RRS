@@ -26,6 +26,8 @@ public:
 
     double getKnifePos() const;
 
+    float getLampState() const;
+
 private:
 
     /// Напряжение на входе ГВ
@@ -64,6 +66,8 @@ private:
 
     /// Давление срабатывания разрывных контактов
     double p1;
+
+    float lamp_state;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
