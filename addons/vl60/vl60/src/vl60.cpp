@@ -143,6 +143,8 @@ void VL60::stepSignalsOutput()
     analogSignal[SIG_LIGHT_VU1] = 1.0;
     analogSignal[SIG_LIGHT_VU2] = 1.0;
     analogSignal[SIG_LIGHT_TD] = 1.0;    
+
+    analogSignal[KONTROLLER] = -0.5;
 }
 
 //------------------------------------------------------------------------------

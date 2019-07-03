@@ -3,6 +3,8 @@
 
 enum
 {
+    KONTROLLER = 0,
+
     TUMBLER_PNT = 33,
     TUMBLER_PNT1 = 31,
     TUMBLER_PNT2 = 32,
