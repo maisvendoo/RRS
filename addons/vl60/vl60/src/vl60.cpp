@@ -27,7 +27,10 @@ VL60::VL60() : Vehicle ()
   , test_lamp(0.0)
   , sig(1)
 {
-
+    connect(&pants_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+    connect(&pant1_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+    connect(&pant2_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+    connect(&gv_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
 }
 
 //------------------------------------------------------------------------------
@@ -53,6 +56,7 @@ void VL60::initialization()
     QString gv_cfg_path = config_dir + QDir::separator() + "main-switch.xml";
 
     main_switch = new MainSwitch(gv_cfg_path);
+    connect(main_switch, &MainSwitch::soundPlay, this, &VL60::soundPlay);
 
     gauge_KV_ks = new Oscillator();
     gauge_KV_ks->read_config("oscillator");
@@ -145,6 +149,8 @@ void VL60::stepSignalsOutput()
     analogSignal[SIG_LIGHT_TD] = 1.0;    
 
     analogSignal[KONTROLLER] = -0.5;
+
+    analogSignal[STRELKA_AMP_EPT] = 0;
 }
 
 //------------------------------------------------------------------------------

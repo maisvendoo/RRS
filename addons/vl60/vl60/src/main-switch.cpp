@@ -18,6 +18,8 @@ MainSwitch::MainSwitch(QString config_path, QObject *parent) : Device(parent)
   , p0(0.5)
   , p1(0.3)
   , lamp_state(1.0f)
+  , state(0)
+  , old_state(0)
 
 {
     load_config(config_path);
@@ -85,6 +87,29 @@ float MainSwitch::getLampState() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainSwitch::preStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
+    old_state = state;
+    state = static_cast<int>(hs_p(Y[0] - 1.0));
+
+    lamp_state = 1 - state;
+
+    if (state != old_state)
+    {
+        if (state == 1)
+            emit soundPlay("GV_On");
+
+        if (state == 0)
+            emit soundPlay("GV_Off");
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double MainSwitch::getU_out() const
 {
     return U_out;
@@ -115,9 +140,7 @@ void MainSwitch::ode_system(const state_vector_t &Y,
 
     double s1 = s2 - s3;
 
-    U_out = U_in * hs_p(dx);
-
-    lamp_state = static_cast<float>(1.0 - hs_p(dx));
+    U_out = U_in * hs_p(dx);    
 
     dYdt[0] = s1 * Vn;
 }

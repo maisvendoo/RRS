@@ -1,11 +1,15 @@
 #ifndef     TRIGGER_H
 #define     TRIGGER_H
 
-class   Trigger
+#include    <QObject>
+
+class   Trigger : public QObject
 {
+    Q_OBJECT
+
 public:
 
-    Trigger();
+    Trigger(QObject *parent = Q_NULLPTR);
 
     ~Trigger();
 
@@ -14,6 +18,16 @@ public:
     void set();
 
     void reset();
+
+signals:
+
+    void soundPlay(QString name);
+
+    void soundStop(QString name);
+
+    void soundSetVolume(QString name, int volume);
+
+    void soundSetPitch(QString name, float pitch);
 
 private:
 

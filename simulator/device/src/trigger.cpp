@@ -1,7 +1,12 @@
 #include    "trigger.h"
 
-Trigger::Trigger()
-    : state(false)
+Trigger::Trigger(QObject *parent) : QObject(parent)
+    , state(false)
+{
+
+}
+
+Trigger::~Trigger()
 {
 
 }
@@ -14,9 +19,13 @@ bool Trigger::getState() const
 void Trigger::set()
 {
     state = true;
+
+    emit soundPlay("Tumbler");
 }
 
 void Trigger::reset()
 {
     state = false;
+
+    emit soundPlay("Tumbler");
 }

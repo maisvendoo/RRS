@@ -69,6 +69,11 @@ private:
 
     float lamp_state;
 
+    int state;
+    int old_state;
+
+    void preStep(state_vector_t &Y, double t);
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
