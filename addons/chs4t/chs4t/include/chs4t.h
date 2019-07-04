@@ -18,6 +18,7 @@
 #include    "gv.h"
 #include    "auto-transformer.h"
 #include    "km-21kr2.h"
+#include    "stepswitch.h"
 
 enum
 {
@@ -52,8 +53,9 @@ private:
 
     AutoTransformer *autoTrans;
 
-    Km21KR2 * km21KR2;
-    ControlState ctrlState;
+    Km21KR2 *km21KR2;
+
+    StepSwitch *stepSwitch;
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);

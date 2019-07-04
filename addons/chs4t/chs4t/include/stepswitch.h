@@ -10,8 +10,8 @@
 //      Дата: 16/06/2019
 //
 //------------------------------------------------------------------------------
-#ifndef KM21KR2_H
-#define KM21KR2_H
+#ifndef STEPSWITCH_H
+#define STEPSWITCH_H
 
 #include "device.h"
 #include "km-21kr2-state.h"
@@ -19,12 +19,12 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Km21KR2 : public Device
+class StepSwitch : public Device
 {
 public:
-    Km21KR2(QObject *parent = Q_NULLPTR);
+    StepSwitch(QObject *parent = Q_NULLPTR);
 
-    ControllerState getCtrlState();
+    void setCtrlState(ControllerState controlState);
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -32,13 +32,8 @@ private:
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
-    bool up;
-    bool up1;
-    bool zero;
-    bool down1;
-    bool down;
-
     ControllerState controlState;
 };
 
-#endif // KM21KR2_H
+
+#endif // STEPSWITCH_H

@@ -33,6 +33,9 @@ CHS4T::CHS4T() : Vehicle()
 
     km21KR2 = new Km21KR2();
 //    km21KR2->read_config();
+
+    stepSwitch = new StepSwitch();
+    //    stepSwitch->read_config();
 }
 
 //------------------------------------------------------------------------------
@@ -58,27 +61,31 @@ void CHS4T::step(double t, double dt)
 
     autoTrans->setUin(glavV->getUout());
 
+    stepSwitch->setCtrlState(km21KR2->getCtrlState());
+
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
 
     glavV->step(t, dt);
 
+    km21KR2->setControl(keys);
     km21KR2->step(t, dt);
 
-    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 x = %7 up = %8 up1 = %9 zero = %10 down1 = %11 down %12")
+    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 x = %7")
             .arg(t, 10, 'f', 1)
             .arg(pantographs[0]->getH(), 4, 'f', 2)
             .arg(pantographs[0]->getUout(), 5, 'f', 0)
             .arg(pantographs[1]->getH(), 4, 'f', 2)
             .arg(pantographs[1]->getUout(), 5, 'f', 0)
             .arg(glavV->getUout(), 5, 'f', 0)
-            .arg(glavV->getX(), 5, 'f', 0)
-            .arg(ctrlState.a2b2, 5, 'f', 0)
-            .arg(ctrlState.c2d2, 5, 'f', 0)
-            .arg(ctrlState.e2f2, 5, 'f', 0)
-            .arg(ctrlState.i2g2, 5, 'f', 0)
-            .arg(ctrlState.j2k2, 5, 'f', 0);
+            .arg(glavV->getX(), 5, 'f', 0);
 
+    DebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5")
+            .arg(km21KR2->getCtrlState().a2b2, 5, 'f', 0)
+            .arg(km21KR2->getCtrlState().c2d2, 5, 'f', 0)
+            .arg(km21KR2->getCtrlState().e2f2, 5, 'f', 0)
+            .arg(km21KR2->getCtrlState().i2g2, 5, 'f', 0)
+            .arg(km21KR2->getCtrlState().j2k2, 5, 'f', 0);
 
 }
 
