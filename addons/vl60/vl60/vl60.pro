@@ -12,12 +12,14 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../../lib -lCfgReader_d
     LIBS += -L../../../../lib -lphysics_d
     LIBS += -L../../../../lib -lvehicle_d
+    LIBS += -L../../../../lib -ldevice_d
 
 } else {
 
     LIBS += -L../../../../lib -lCfgReader
     LIBS += -L../../../../lib -lphysics
     LIBS += -L../../../../lib -lvehicle
+    LIBS += -L../../../../lib -ldevice
 }
 
 INCLUDEPATH += ./include

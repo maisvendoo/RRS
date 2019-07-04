@@ -3,7 +3,9 @@
 
 #include    "device.h"
 
-class Oscillator : public Device
+#include    "device-export.h"
+
+class DEVICE_EXPORT Oscillator : public Device
 {
 public:
 

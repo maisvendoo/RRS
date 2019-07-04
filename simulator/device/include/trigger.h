@@ -3,7 +3,9 @@
 
 #include    <QObject>
 
-class   Trigger : public QObject
+#include    "device-export.h"
+
+class DEVICE_EXPORT  Trigger : public QObject
 {
     Q_OBJECT
 
@@ -32,6 +34,7 @@ signals:
 private:
 
     bool state;
+    bool old_state;
 };
 
 #endif // TRIGGER_H

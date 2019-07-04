@@ -7,6 +7,7 @@ Pantograph::Pantograph(QString config_path, QObject *parent) : Device(parent)
   , Uks(0.0)
   , Uout(0.0)
   , state(false)
+  , old_state(false)
   , max_height(1.0)
   , motion_time(6.0)
 
@@ -27,6 +28,7 @@ Pantograph::~Pantograph()
 //------------------------------------------------------------------------------
 void Pantograph::setState(bool state)
 {
+    old_state = this->state;
     this->state = state;
 }
 
@@ -52,6 +54,23 @@ double Pantograph::getHeight() const
 double Pantograph::getUout() const
 {
     return Uout;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Pantograph::preStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+
+    if (state != old_state)
+    {
+        if (state)
+            emit soundPlay("Pantograph_Up");
+        else
+            emit soundPlay("Pantograph_Down");
+    }
 }
 
 //------------------------------------------------------------------------------

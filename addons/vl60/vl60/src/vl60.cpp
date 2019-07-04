@@ -51,6 +51,7 @@ void VL60::initialization()
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantographs[i] = new Pantograph(pant_cfg_path);
+        connect(pantographs[i], &Pantograph::soundPlay, this, &VL60::soundPlay);
     }
 
     QString gv_cfg_path = config_dir + QDir::separator() + "main-switch.xml";

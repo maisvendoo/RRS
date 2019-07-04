@@ -2,6 +2,7 @@
 
 Trigger::Trigger(QObject *parent) : QObject(parent)
     , state(false)
+    , old_state(false)
 {
 
 }
@@ -18,14 +19,18 @@ bool Trigger::getState() const
 
 void Trigger::set()
 {
+    old_state = state;
     state = true;
 
-    emit soundPlay("Tumbler");
+    if (state != old_state)
+        emit soundPlay("Tumbler");
 }
 
 void Trigger::reset()
 {
+    old_state = state;
     state = false;
 
-    emit soundPlay("Tumbler");
+    if (state != old_state)
+        emit soundPlay("Tumbler");
 }

@@ -32,12 +32,15 @@ private:
 
     /// Состояние токоприемника (true - подъем, false - опускание)
     bool    state;
+    bool    old_state;
 
     /// Максимальная высота подъема (в относительном выражении)
     double  max_height;
 
     /// Время подъема/опускания ТП
     double  motion_time;
+
+    void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
