@@ -71,6 +71,8 @@ void CHS4T::step(double t, double dt)
     km21KR2->setControl(keys);
     km21KR2->step(t, dt);
 
+    stepSwitch->step(t, dt);
+
     DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 x = %7")
             .arg(t, 10, 'f', 1)
             .arg(pantographs[0]->getH(), 4, 'f', 2)
@@ -80,7 +82,7 @@ void CHS4T::step(double t, double dt)
             .arg(glavV->getUout(), 5, 'f', 0)
             .arg(glavV->getX(), 5, 'f', 0);
 
-    DebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5")
+    QString dDebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5")
             .arg(km21KR2->getCtrlState().a2b2, 5, 'f', 0)
             .arg(km21KR2->getCtrlState().c2d2, 5, 'f', 0)
             .arg(km21KR2->getCtrlState().e2f2, 5, 'f', 0)

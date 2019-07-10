@@ -17,7 +17,13 @@
 //
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
+  , KL(0)
+  , UV(0)
+  , s62(0)
+  , s67(0)
+  , s69(0)
 {
+    rs = new Trigger();
 
 }
 
@@ -26,11 +32,6 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
 //------------------------------------------------------------------------------
 void StepSwitch::setCtrlState(ControllerState controlState)
 {
-
-    void setUpState(bool state);
-    void setUp1State(bool state);
-    void setDown1State(bool state);
-    void setDownState(bool state);
     this->controlState = controlState;
 }
 
@@ -63,4 +64,18 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void StepSwitch::stepKeysControl(double t, double dt)
 {
+    if (controlState.a2b2)
+        rs->set();
+    if (1.0 - KL)
+        rs->reset();
+
+    double s01 = static_cast<double>(rs->getState());
+
+    double s1 = s01 * KL;
+
+    double s2 = s1 * controlState.c2d2 * UV;
+
+    s62 = 1.0 - s2;
+    s67 = s2;
+    s69 = s2;
 }

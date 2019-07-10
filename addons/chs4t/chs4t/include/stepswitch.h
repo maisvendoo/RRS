@@ -33,6 +33,15 @@ private:
     void stepKeysControl(double t, double dt);
 
     ControllerState controlState;
+
+    Trigger *rs;
+
+    double KL;
+    double UV;
+
+    double s62;
+    double s67;
+    double s69;
 };
 
 
