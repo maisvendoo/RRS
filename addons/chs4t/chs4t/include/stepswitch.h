@@ -38,10 +38,15 @@ private:
 
     double KL;
     double UV;
+    double MN;
+    double GH;
 
     double s62;
     double s67;
     double s69;
+    double s45;
+    double s43;
+    double s410;
 };
 
 

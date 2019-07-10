@@ -65,8 +65,9 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void StepSwitch::stepKeysControl(double t, double dt)
 {
-    if (controlState.a2b2)
+    if (controlState.a2b2 || controlState.e2f2)
         rs->set();
+
     if (1.0 - KL)
         rs->reset();
 
@@ -79,4 +80,20 @@ void StepSwitch::stepKeysControl(double t, double dt)
     s62 = 1.0 - s2;
     s67 = s2;
     s69 = s2;
+
+    if (controlState.a2b2 || controlState.j2k2)
+        rs->set();
+
+    if (1.0 - MN)
+        rs->reset();
+
+    s01 = static_cast<double>(rs->getState());
+
+    s1 = s01 * MN;
+
+    s2 = s1 * controlState.i2g2 * GH;
+
+    s45 = 1.0 - s2;
+    s43 = s2;
+    s410 = s2;
 }
