@@ -308,7 +308,9 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         return;
 
     // Time to relative units conversion
-    float t = static_cast<float>(ref_time) / nd.delta_time;
+    float Delta_t = static_cast<float>(settings.request_interval) / 1000.0f;
+
+    float t = static_cast<float>(ref_time) / Delta_t;
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
