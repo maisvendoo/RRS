@@ -8,11 +8,12 @@ PhaseSplitter::PhaseSplitter(QObject *parent) : Device(parent)
   , s_kr(0.022)
   , Un(380.0)
   , omega0(157.08)
-  , Mxx(0.5)
+  , Mxx(1.5)
   , J(0.1)
   , U_power(0.0)
   , omega_r(141.4)
   , is_not_ready(1.0f)
+  , k_eds(2.389)
 {
 
 }
@@ -41,6 +42,11 @@ float PhaseSplitter::isNotReady() const
     return is_not_ready;
 }
 
+double PhaseSplitter::getU_out() const
+{
+    return U_out;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -50,6 +56,8 @@ void PhaseSplitter::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     is_not_ready = static_cast<float>(hs_n(Y[0] - omega_r));
+
+    U_out = k_eds * Y[0];
 
     emit soundSetPitch("Phase_Splitter", static_cast<float>(Y[0] / omega0));
 }
@@ -75,7 +83,7 @@ void PhaseSplitter::ode_system(const state_vector_t &Y,
     // Расчитываем момент сил сопротивления
     double Mr = Physics::fricForce(Mxx, Y[0]);
 
-    // Рачитываем угловое ускорения вращающейся части
+    // Раcчитываем угловое ускорения вращающейся части
     dYdt[0] = (Ma - Mr) / J;
 }
 

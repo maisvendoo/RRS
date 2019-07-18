@@ -18,6 +18,8 @@ public:
 
     float isNotReady() const;
 
+    double getU_out() const;
+
 private:
 
     /// Максимальный крутящий момент
@@ -46,6 +48,10 @@ private:
 
     /// Признак запуска ФР (задает состояние контрольной лампы ФР на пульте)
     float   is_not_ready;
+
+    double  k_eds;
+
+    double  U_out;
 
     void preStep(state_vector_t &Y, double t);
 

@@ -21,6 +21,7 @@
 #include    "oscillator.h"
 #include    "trac-transformer.h"
 #include    "phase-splitter.h"
+#include    "motor-fan.h"
 
 /*!
  * \class
@@ -44,7 +45,18 @@ private:
     enum
     {
         NUM_PANTOGRAPHS = 2,
-        WIRE_VOLTAGE = 25000
+        WIRE_VOLTAGE = 25000,
+        NUM_MOTOR_FANS = 6
+    };
+
+    enum
+    {
+        MV1 = 0,
+        MV2 = 1,
+        MV3 = 2,
+        MV4 = 3,
+        MV5 = 4,
+        MV6 = 5
     };
 
     float   Uks;
@@ -69,6 +81,9 @@ private:
     /// Тригер тумблера "Фазорасщепитель"
     Trigger fr_tumbler;
 
+    /// Триггеры тумблеров управления мотор-вентиляторами
+    std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
+
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 
@@ -84,6 +99,9 @@ private:
     /// Асинхронный расщепитель фаз
     PhaseSplitter   *phase_spliter;
 
+    /// Мотор-вентиляторы
+    std::array<MotorFan *, NUM_MOTOR_FANS> motor_fans;
+
     void initialization();
 
     void step(double t, double dt);
@@ -95,6 +113,8 @@ private:
     void stepTracTransformer(double t, double dt);
 
     void stepPhaseSplitter(double t, double dt);
+
+    void stepMotorFans(double t, double dt);
 
     void stepSignalsOutput();
 

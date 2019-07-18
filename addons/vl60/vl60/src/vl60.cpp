@@ -32,6 +32,11 @@ VL60::VL60() : Vehicle ()
     connect(&pant2_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
     connect(&gv_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
     connect(&fr_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    for (size_t i = 0; i < mv_tumblers.size(); ++i)
+    {
+        connect(&mv_tumblers[i], &Trigger::soundPlay, this, &VL60::soundPlay);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -68,6 +73,12 @@ void VL60::initialization()
 
     phase_spliter = new PhaseSplitter();
     connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60::soundSetPitch);
+
+    for (size_t i = 0; i < motor_fans.size(); ++i)
+    {
+        motor_fans[i] = new MotorFan(i + 1);
+        connect(motor_fans[i], &MotorFan::soundSetPitch, this, &VL60::soundSetPitch);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -82,6 +93,8 @@ void VL60::step(double t, double dt)
     stepTracTransformer(t, dt);
 
     stepPhaseSplitter(t, dt);
+
+    stepMotorFans(t, dt);
 
     stepSignalsOutput();
 }
@@ -149,6 +162,19 @@ void VL60::stepPhaseSplitter(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::stepMotorFans(double t, double dt)
+{
+    for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
+    {
+        MotorFan *mf = motor_fans[i];
+        mf->setU_power(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[i].getState()));
+        mf->step(t, dt);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::stepSignalsOutput()
 {
     // Состояние токоприемников
@@ -164,6 +190,13 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
 
     analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler.getState());
+
+    analogSignal[TUMBLER_MV1] = static_cast<float>(mv_tumblers[MV1].getState());
+    analogSignal[TUMBLER_MV2] = static_cast<float>(mv_tumblers[MV2].getState());
+    analogSignal[TUMBLER_MV3] = static_cast<float>(mv_tumblers[MV3].getState());
+    analogSignal[TUMBLER_MV4] = static_cast<float>(mv_tumblers[MV4].getState());
+    analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[MV5].getState());
+    analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[MV6].getState());
 
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
@@ -257,6 +290,55 @@ void VL60::keyProcess()
             fr_tumbler.set();
         else
             fr_tumbler.reset();
+    }
+
+    // Включение/выключение мотор-верниляторов
+    if (getKeyState(KEY_R))
+    {
+        if (isShift())
+            mv_tumblers[MV1].set();
+        else
+            mv_tumblers[MV1].reset();
+    }
+
+    if (getKeyState(KEY_F))
+    {
+        if (isShift())
+            mv_tumblers[MV2].set();
+        else
+            mv_tumblers[MV2].reset();
+    }
+
+    if (getKeyState(KEY_G))
+    {
+        if (isShift())
+            mv_tumblers[MV3].set();
+        else
+            mv_tumblers[MV3].reset();
+    }
+
+    if (getKeyState(KEY_Y))
+    {
+        if (isShift())
+            mv_tumblers[MV4].set();
+        else
+            mv_tumblers[MV4].reset();
+    }
+
+    if (getKeyState(KEY_L))
+    {
+        if (isShift())
+            mv_tumblers[MV5].set();
+        else
+            mv_tumblers[MV5].reset();
+    }
+
+    if (getKeyState(KEY_M))
+    {
+        if (isShift())
+            mv_tumblers[MV6].set();
+        else
+            mv_tumblers[MV6].reset();
     }
 }
 
