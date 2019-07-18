@@ -22,22 +22,24 @@ class Pantograph : public Device
 {
 public:
 
+    ///Конструктор
     Pantograph(QObject *parent = Q_NULLPTR);
 
-    double getH();
+    ///Деструктор
+    ~Pantograph();
 
-    double getUout();
+    void setUks(double Uks)   { this->Uks = Uks; }
+    void setState(bool state) { this->state = state; }
 
-    void setUks(double _Uks);
+    double getH()    { return h; }
+    double getUout() { return Uout; }
 
-    void setState(bool state);
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
-
 
 
     CfgReader cfg_;
@@ -47,18 +49,12 @@ private:
     double  h;
     double hMax;
 
-//    double  upTime;
-//    double  downTime;
-
     double  V;
 
     double  Uout;
     double  Uks;
 
     bool state;
-
-//    enum PantOrder{PANT_FORWARD,
-//                  PANT_BACKWARD};
 
 };
 

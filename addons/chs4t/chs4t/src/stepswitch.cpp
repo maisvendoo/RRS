@@ -15,7 +15,7 @@
 #include "stepswitch.h"
 
 //------------------------------------------------------------------------------
-//
+// Конструктор
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , KL(0)
@@ -24,16 +24,17 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , s67(0)
   , s69(0)
 {
+
     rs = new Trigger();
 
 }
 
 //------------------------------------------------------------------------------
-//
+// Деструктор
 //------------------------------------------------------------------------------
-void StepSwitch::setCtrlState(ControllerState controlState)
+StepSwitch::~StepSwitch()
 {
-    this->controlState = controlState;
+
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +46,7 @@ void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
 }
 
 //------------------------------------------------------------------------------
-//
+// Загрузка данных из конфигурационного файла
 //------------------------------------------------------------------------------
 void StepSwitch::load_config(CfgReader& cfg)
 {
@@ -65,7 +66,7 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void StepSwitch::stepKeysControl(double t, double dt)
 {
-    if (controlState.a2b2 || controlState.e2f2)
+    if (ctrlState.a2b2 || ctrlState.e2f2)
         rs->set();
 
     if (1.0 - KL)
@@ -75,13 +76,15 @@ void StepSwitch::stepKeysControl(double t, double dt)
 
     double s1 = s01 * KL;
 
-    double s2 = s1 * controlState.c2d2 * UV;
+    double s2 = s1 * ctrlState.c2d2 * UV;
 
     s62 = 1.0 - s2;
     s67 = s2;
     s69 = s2;
 
-    if (controlState.a2b2 || controlState.j2k2)
+    //-----------------------------------------------
+
+    if (ctrlState.a2b2 || ctrlState.j2k2)
         rs->set();
 
     if (1.0 - MN)
@@ -91,7 +94,7 @@ void StepSwitch::stepKeysControl(double t, double dt)
 
     s1 = s01 * MN;
 
-    s2 = s1 * controlState.i2g2 * GH;
+    s2 = s1 * ctrlState.i2g2 * GH;
 
     s45 = 1.0 - s2;
     s43 = s2;

@@ -21,9 +21,15 @@
 class AutoTransformer : public Device
 {
 public:
+
+    /// Конструктор
     AutoTransformer(QObject *parent = Q_NULLPTR);
-    void setUin(double Uin);
-    double getUout();
+
+    /// Деструктор
+    ~AutoTransformer();
+
+    void setUin(double Uin) { this->Uin = Uin; }
+    double getUout()        { return Uout; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -34,11 +40,6 @@ private:
     double Uin;
     double Uout;
     int nPoz;
-
-
-
-
-
 
 };
 

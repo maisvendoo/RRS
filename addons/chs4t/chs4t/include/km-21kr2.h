@@ -22,9 +22,13 @@
 class Km21KR2 : public Device
 {
 public:
+    /// Конструктор
     Km21KR2(QObject *parent = Q_NULLPTR);
 
-    ControllerState getCtrlState();
+    ///Деструктор
+    ~Km21KR2();
+
+    ControllerState getCtrlState() { return controlState; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

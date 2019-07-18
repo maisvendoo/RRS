@@ -22,9 +22,14 @@
 class StepSwitch : public Device
 {
 public:
+
+    ///Конструктор
     StepSwitch(QObject *parent = Q_NULLPTR);
 
-    void setCtrlState(ControllerState controlState);
+    ///Деструктор
+    ~StepSwitch();
+
+    void setCtrlState(ControllerState ctrlState) { this->ctrlState = ctrlState; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -32,7 +37,7 @@ private:
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
-    ControllerState controlState;
+    ControllerState ctrlState;
 
     Trigger *rs;
 
