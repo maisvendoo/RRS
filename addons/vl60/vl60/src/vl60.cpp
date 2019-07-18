@@ -31,6 +31,7 @@ VL60::VL60() : Vehicle ()
     connect(&pant1_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
     connect(&pant2_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
     connect(&gv_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+    connect(&fr_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
 }
 
 //------------------------------------------------------------------------------
@@ -61,6 +62,12 @@ void VL60::initialization()
 
     gauge_KV_ks = new Oscillator();
     gauge_KV_ks->read_config("oscillator");
+
+    trac_trans = new TracTransformer();
+    connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60::soundSetVolume);
+
+    phase_spliter = new PhaseSplitter();
+    connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60::soundSetPitch);
 }
 
 //------------------------------------------------------------------------------
@@ -71,6 +78,10 @@ void VL60::step(double t, double dt)
     stepPantographsControl(t, dt);
 
     stepMainSwitchControl(t, dt);
+
+    stepTracTransformer(t, dt);
+
+    stepPhaseSplitter(t, dt);
 
     stepSignalsOutput();
 }
@@ -116,6 +127,28 @@ void VL60::stepMainSwitchControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::stepTracTransformer(double t, double dt)
+{
+    // Задаем напряжение на первичной обмотке (с выхода ГВ)
+    trac_trans->setU1(main_switch->getU_out());
+
+    trac_trans->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepPhaseSplitter(double t, double dt)
+{
+    double U_power = trac_trans->getU_sn() * static_cast<double>(fr_tumbler.getState());
+    phase_spliter->setU_power(U_power);
+
+    phase_spliter->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::stepSignalsOutput()
 {
     // Состояние токоприемников
@@ -130,6 +163,8 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return);
     analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
 
+    analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler.getState());
+
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
 
@@ -142,7 +177,7 @@ void VL60::stepSignalsOutput()
     // Состояние контрольных ламп
     analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();
     analogSignal[SIG_LIGHT_GU] = 1.0f;
-    analogSignal[SIG_LIGHT_FR] = 1.0f;
+    analogSignal[SIG_LIGHT_FR] = phase_spliter->isNotReady();
     analogSignal[SIG_LIGHT_0HP] = 1.0f;
     analogSignal[SIG_LIGHT_TR] = 1.0;
     analogSignal[SIG_LIGHT_VU1] = 1.0;
@@ -214,6 +249,15 @@ void VL60::keyProcess()
     }
 
     gv_return = getKeyState(KEY_K);
+
+    // Включение/выключение расщепителя фаз
+    if (getKeyState(KEY_T))
+    {
+        if (isShift())
+            fr_tumbler.set();
+        else
+            fr_tumbler.reset();
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -19,6 +19,8 @@
 #include    "pantograph.h"
 #include    "main-switch.h"
 #include    "oscillator.h"
+#include    "trac-transformer.h"
+#include    "phase-splitter.h"
 
 /*!
  * \class
@@ -64,6 +66,9 @@ private:
     /// Триггер тумблера "ГВ вкл/выкл"
     Trigger gv_tumbler;
 
+    /// Тригер тумблера "Фазорасщепитель"
+    Trigger fr_tumbler;
+
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 
@@ -73,6 +78,12 @@ private:
     /// Механизм киловольтметра КС
     Oscillator      *gauge_KV_ks;
 
+    /// Тяговый трансформатор
+    TracTransformer *trac_trans;
+
+    /// Асинхронный расщепитель фаз
+    PhaseSplitter   *phase_spliter;
+
     void initialization();
 
     void step(double t, double dt);
@@ -80,6 +91,10 @@ private:
     void stepPantographsControl(double t, double dt);
 
     void stepMainSwitchControl(double t, double dt);
+
+    void stepTracTransformer(double t, double dt);
+
+    void stepPhaseSplitter(double t, double dt);
 
     void stepSignalsOutput();
 

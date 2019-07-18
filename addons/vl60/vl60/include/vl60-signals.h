@@ -46,7 +46,9 @@ enum
     LS_R = 61,
     LS_W = 62,
     LS_Y = 63,
-    LS_YK = 64
+    LS_YK = 64,
+
+    TUMBLER_FR = 65
 };
 
 #endif // VL60_SIGNALS_H
