@@ -7,6 +7,8 @@ enum
 
     STRELKA_AMP_EPT = 10,
 
+    STRELKA_M_HM = 23,
+
     TUMBLER_PNT = 33,
     TUMBLER_PNT1 = 31,
     TUMBLER_PNT2 = 32,
@@ -49,11 +51,14 @@ enum
     LS_YK = 64,
 
     TUMBLER_FR = 65,
+    TUMBLER_MK = 66,
 
     TUMBLER_MV1 = 67,
     TUMBLER_MV2 = 68,
     TUMBLER_MV3 = 69,
+
     TUMBLER_MV4 = 70,
+
     TUMBLER_MV5 = 86,
     TUMBLER_MV6 = 84
 };

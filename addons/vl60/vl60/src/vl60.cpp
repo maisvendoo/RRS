@@ -37,6 +37,8 @@ VL60::VL60() : Vehicle ()
     {
         connect(&mv_tumblers[i], &Trigger::soundPlay, this, &VL60::soundPlay);
     }
+
+    connect(&mk_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
 }
 
 //------------------------------------------------------------------------------
@@ -79,6 +81,14 @@ void VL60::initialization()
         motor_fans[i] = new MotorFan(i + 1);
         connect(motor_fans[i], &MotorFan::soundSetPitch, this, &VL60::soundSetPitch);
     }
+
+    main_reservoir = new Reservoir(static_cast<double>(MAIN_RESERVOIR_VOLUME) / 1000.0);
+
+    QString mk_cfg_path = config_dir + QDir::separator() + "motor-compressor.xml";
+    motor_compressor = new MotorCompressor(mk_cfg_path);
+    connect(motor_compressor, &MotorCompressor::soundSetPitch, this, &VL60::soundSetPitch);
+
+    press_reg = new PressureRegulator();
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +105,8 @@ void VL60::step(double t, double dt)
     stepPhaseSplitter(t, dt);
 
     stepMotorFans(t, dt);
+
+    stepBrakeSubsystem(t, dt);
 
     stepSignalsOutput();
 }
@@ -175,6 +187,24 @@ void VL60::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::stepBrakeSubsystem(double t, double dt)
+{
+    double k_flow = 5e-3;
+    main_reservoir->setFlowCoeff(k_flow);
+    main_reservoir->setAirFlow(motor_compressor->getAirFlow());
+    main_reservoir->step(t, dt);
+
+    motor_compressor->setExternalPressure(main_reservoir->getPressure());
+    motor_compressor->setU_power(phase_spliter->getU_out() * static_cast<double>(mk_tumbler.getState()) * press_reg->getState());
+    motor_compressor->step(t, dt);
+
+    press_reg->setPressure(main_reservoir->getPressure());
+    press_reg->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::stepSignalsOutput()
 {
     // Состояние токоприемников
@@ -198,6 +228,8 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[MV5].getState());
     analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[MV6].getState());
 
+    analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler.getState());
+
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
 
@@ -220,6 +252,9 @@ void VL60::stepSignalsOutput()
     analogSignal[KONTROLLER] = -0.5;
 
     analogSignal[STRELKA_AMP_EPT] = 0;
+
+    // Манометр питательной магистрали
+    analogSignal[STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
 }
 
 //------------------------------------------------------------------------------
@@ -293,6 +328,8 @@ void VL60::keyProcess()
     }
 
     // Включение/выключение мотор-верниляторов
+
+    // МВ1
     if (getKeyState(KEY_R))
     {
         if (isShift())
@@ -301,6 +338,7 @@ void VL60::keyProcess()
             mv_tumblers[MV1].reset();
     }
 
+    // МВ2
     if (getKeyState(KEY_F))
     {
         if (isShift())
@@ -309,6 +347,7 @@ void VL60::keyProcess()
             mv_tumblers[MV2].reset();
     }
 
+    // МВ3
     if (getKeyState(KEY_G))
     {
         if (isShift())
@@ -317,6 +356,7 @@ void VL60::keyProcess()
             mv_tumblers[MV3].reset();
     }
 
+    // МВ4
     if (getKeyState(KEY_Y))
     {
         if (isShift())
@@ -325,6 +365,7 @@ void VL60::keyProcess()
             mv_tumblers[MV4].reset();
     }
 
+    // МВ5
     if (getKeyState(KEY_L))
     {
         if (isShift())
@@ -333,12 +374,22 @@ void VL60::keyProcess()
             mv_tumblers[MV5].reset();
     }
 
+    // МВ6
     if (getKeyState(KEY_M))
     {
         if (isShift())
             mv_tumblers[MV6].set();
         else
             mv_tumblers[MV6].reset();
+    }
+
+    // Включение/выключение мотор-компрессора
+    if (getKeyState(KEY_C))
+    {
+        if (isShift())
+            mk_tumbler.set();
+        else
+            mk_tumbler.reset();
     }
 }
 

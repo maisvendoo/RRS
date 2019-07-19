@@ -22,6 +22,9 @@
 #include    "trac-transformer.h"
 #include    "phase-splitter.h"
 #include    "motor-fan.h"
+#include    "reservoir.h"
+#include    "motor-compressor.h"
+#include    "pressure-regulator.h"
 
 /*!
  * \class
@@ -45,18 +48,23 @@ private:
     enum
     {
         NUM_PANTOGRAPHS = 2,
-        WIRE_VOLTAGE = 25000,
-        NUM_MOTOR_FANS = 6
+        WIRE_VOLTAGE = 25000
     };
 
     enum
     {
+        NUM_MOTOR_FANS = 6,
         MV1 = 0,
         MV2 = 1,
         MV3 = 2,
         MV4 = 3,
         MV5 = 4,
         MV6 = 5
+    };
+
+    enum
+    {
+        MAIN_RESERVOIR_VOLUME = 1000
     };
 
     float   Uks;
@@ -84,6 +92,9 @@ private:
     /// Триггеры тумблеров управления мотор-вентиляторами
     std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
 
+    /// Тригер тумблера управления мотор-компрессором
+    Trigger mk_tumbler;
+
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 
@@ -102,6 +113,15 @@ private:
     /// Мотор-вентиляторы
     std::array<MotorFan *, NUM_MOTOR_FANS> motor_fans;
 
+    /// Главный резервуар
+    Reservoir   *main_reservoir;
+
+    /// Мотор-компрессор
+    MotorCompressor *motor_compressor;
+
+    /// Регулятор давления в ГР
+    PressureRegulator *press_reg;
+
     void initialization();
 
     void step(double t, double dt);
@@ -115,6 +135,8 @@ private:
     void stepPhaseSplitter(double t, double dt);
 
     void stepMotorFans(double t, double dt);
+
+    void stepBrakeSubsystem(double t, double dt);
 
     void stepSignalsOutput();
 
