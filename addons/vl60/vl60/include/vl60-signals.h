@@ -4,9 +4,14 @@
 enum
 {
     KONTROLLER = 0,
+    KRAN_KOMBIN = 1,
+    KLUCH_367 = 2,
 
     STRELKA_AMP_EPT = 10,
 
+    KRAN395_RUK = 20,
+    STRELKA_M_TM = 21,
+    STRELKA_M_UR = 22,
     STRELKA_M_HM = 23,
 
     TUMBLER_PNT = 33,

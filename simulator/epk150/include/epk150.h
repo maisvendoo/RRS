@@ -32,7 +32,7 @@ public:
 
     double getEmergencyBrakeRate() const;
 
-    void init(double pTM);
+    void init(double pTM, double pFL);
 
 private:
 

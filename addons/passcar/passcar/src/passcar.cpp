@@ -30,7 +30,7 @@ PassCarrige::~PassCarrige()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCarrige::initBrakeDevices(double p0, double pTM)
+void PassCarrige::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Q_UNUSED(p0)
 
@@ -38,7 +38,7 @@ void PassCarrige::initBrakeDevices(double p0, double pTM)
         supply_reservoir->setY(0, pTM);
 
     if (airdist != nullptr)
-        airdist->init(pTM);
+        airdist->init(pTM, pFL);
 }
 
 //------------------------------------------------------------------------------

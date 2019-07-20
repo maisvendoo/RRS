@@ -25,6 +25,7 @@
 #include    "reservoir.h"
 #include    "motor-compressor.h"
 #include    "pressure-regulator.h"
+#include    "ubt367m.h"
 
 /*!
  * \class
@@ -42,6 +43,9 @@ public:
 
     /// Деструктор
     ~VL60();
+
+    /// Инициализация тормозных приборов
+    void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
 
@@ -75,6 +79,9 @@ private:
 
     float   test_lamp;
     int     sig;
+
+    /// Зарядное давление
+    double  charge_press;
 
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler;
@@ -122,6 +129,15 @@ private:
     /// Регулятор давления в ГР
     PressureRegulator *press_reg;
 
+    /// Устройство блогировки тормозов усл. №367М
+    BrakeLock   *ubt;
+
+    /// Поездной кран машиниста (КрМ)
+    BrakeCrane  *brake_crane;
+
+    /// Кран впомогательного тормоза (КВТ)
+    LocoCrane   *loco_crane;
+
     void initialization();
 
     void step(double t, double dt);
@@ -136,7 +152,9 @@ private:
 
     void stepMotorFans(double t, double dt);
 
-    void stepBrakeSubsystem(double t, double dt);
+    void stepMotorCompressor(double t, double dt);
+
+    void stepBrakeControl(double t, double dt);
 
     void stepSignalsOutput();
 

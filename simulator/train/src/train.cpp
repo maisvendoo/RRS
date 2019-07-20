@@ -288,6 +288,11 @@ bool Train::loadTrain(QString cfg_path)
             charging_pressure = 0.5;
         }
 
+        if (!cfg.getDouble("Common", "InitMainResPressure", init_main_res_pressure))
+        {
+            init_main_res_pressure = 0.9;
+        }
+
         if (!cfg.getBool("Common", "NoAir", no_air))
         {
             no_air = false;
@@ -502,7 +507,7 @@ void Train::initVehiclesBrakes()
     for (size_t i = 0; i < vehicles.size(); ++i)
     {
         double pTM = brakepipe->getPressure(i);
-        vehicles[i]->initBrakeDevices(charging_pressure, pTM);
+        vehicles[i]->initBrakeDevices(charging_pressure, pTM, init_main_res_pressure);
     }
 }
 

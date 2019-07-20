@@ -117,6 +117,9 @@ private:
     /// No air flag (for empty air system on start)
     bool        no_air;
 
+    /// Initial main reservoir pressure
+    double      init_main_res_pressure;
+
     /// Solver's configuration
     solver_config_t solver_config;
 

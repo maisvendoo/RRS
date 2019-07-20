@@ -6,11 +6,13 @@
 
 		<!-- Зарядное давление, МПа -->
 		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Начальное давление в ГР, МПа -->
+		<InitMainResPressure>0.9</InitMainResPressure>
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
 
 		<Title>ВЛ60пк-1543</Title>
-		<Description>Магистральный пассажирский тепловоз Коломенского завода</Description>
+		<Description>Магистральный пассажирский электровоз переменного тока производства НЭВЗ</Description>
 	</Common>
 	<Vehicle>
 		<Module>vl60</Module>

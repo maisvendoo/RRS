@@ -55,7 +55,7 @@ double AutoTrainStopEPK150::getEmergencyBrakeRate() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStopEPK150::init(double pTM)
+void AutoTrainStopEPK150::init(double pTM, double pFL)
 {
     setY(0, 0.0);
     setY(2, pTM);

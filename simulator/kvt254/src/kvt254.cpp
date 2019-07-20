@@ -50,9 +50,13 @@ double LocoCrane254::getAirDistribPressure() const
     return getY(0);
 }
 
-void LocoCrane254::init(double pTM)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane254::init(double pTM, double pFL)
 {
     Q_UNUSED(pTM)
+    Q_UNUSED(pFL)
 }
 
 //------------------------------------------------------------------------------

@@ -98,8 +98,10 @@ float BrakeCrane395::getHandlePosition()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane395::init(double pTM)
+void BrakeCrane395::init(double pTM, double pFL)
 {
+    Q_UNUSED(pFL)
+
     y[0] = pTM;
     y[1] = pTM;
 }

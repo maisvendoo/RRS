@@ -145,7 +145,7 @@ public:
     QString getDebugMsg() const;
 
     /// Init vehicle brake devices
-    virtual void initBrakeDevices(double p0, double pTM);
+    virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
 public slots:
     

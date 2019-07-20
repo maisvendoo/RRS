@@ -642,8 +642,9 @@ bool Vehicle::getKeyState(int key) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::initBrakeDevices(double p0, double pTM)
+void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Q_UNUSED(p0)
     Q_UNUSED(pTM)
+    Q_UNUSED(pFL)
 }

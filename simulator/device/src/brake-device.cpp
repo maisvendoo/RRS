@@ -10,7 +10,8 @@ BrakeDevice::~BrakeDevice()
 
 }
 
-void BrakeDevice::init(double pTM)
+void BrakeDevice::init(double pTM, double pFL)
 {
     Q_UNUSED(pTM)
+    Q_UNUSED(pFL)
 }

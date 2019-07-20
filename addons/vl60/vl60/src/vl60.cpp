@@ -12,6 +12,7 @@
 //------------------------------------------------------------------------------
 
 #include    "vl60.h"
+#include    "filesystem.h"
 
 #include    <QDir>
 
@@ -26,6 +27,7 @@ VL60::VL60() : Vehicle ()
   , gv_return(false)
   , test_lamp(0.0)
   , sig(1)
+  , charge_press(0.0)
 {
     connect(&pants_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
     connect(&pant1_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
@@ -47,6 +49,15 @@ VL60::VL60() : Vehicle ()
 VL60::~VL60()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initBrakeDevices(double p0, double pTM, double pFL)
+{
+    main_reservoir->setY(0, pFL);
+    charge_press = p0;
 }
 
 //------------------------------------------------------------------------------
@@ -89,6 +100,18 @@ void VL60::initialization()
     connect(motor_compressor, &MotorCompressor::soundSetPitch, this, &VL60::soundSetPitch);
 
     press_reg = new PressureRegulator();
+
+    ubt = new BrakeLock();
+    ubt->read_config("ubt367m");
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    brake_crane = loadBrakeCrane(modules_dir + QDir::separator() + "krm395");
+    brake_crane->read_config("krm395");
+
+    loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
+    loco_crane->read_config("kvt254");
 }
 
 //------------------------------------------------------------------------------
@@ -106,7 +129,9 @@ void VL60::step(double t, double dt)
 
     stepMotorFans(t, dt);
 
-    stepBrakeSubsystem(t, dt);
+    stepMotorCompressor(t, dt);
+
+    stepBrakeControl(t, dt);
 
     stepSignalsOutput();
 }
@@ -187,7 +212,7 @@ void VL60::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepBrakeSubsystem(double t, double dt)
+void VL60::stepMotorCompressor(double t, double dt)
 {
     double k_flow = 5e-3;
     main_reservoir->setFlowCoeff(k_flow);
@@ -200,6 +225,24 @@ void VL60::stepBrakeSubsystem(double t, double dt)
 
     press_reg->setPressure(main_reservoir->getPressure());
     press_reg->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepBrakeControl(double t, double dt)
+{
+    ubt->setLocoFLpressure(main_reservoir->getPressure());
+    ubt->setCraneTMpressure(brake_crane->getBrakePipeInitPressure());
+    ubt->setControl(keys);
+    p0 = ubt->getLocoTMpressure();
+    ubt->step(t, dt);
+
+    brake_crane->setFeedLinePressure(ubt->getCraneFLpressure());
+    brake_crane->setChargePressure(charge_press);
+    brake_crane->setBrakePipePressure(pTM);
+    brake_crane->setControl(keys);
+    brake_crane->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -251,10 +294,22 @@ void VL60::stepSignalsOutput()
 
     analogSignal[KONTROLLER] = -0.5;
 
+    // Положение рукоятки комбинированного крана
+    analogSignal[KRAN_KOMBIN] = ubt->getCombCranePos();
+    // Положение рукоятки УБТ
+    analogSignal[KLUCH_367] = ubt->getMainHandlePos();
+
     analogSignal[STRELKA_AMP_EPT] = 0;
 
     // Манометр питательной магистрали
     analogSignal[STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
+    // Манометр тормозной магистрали
+    analogSignal[STRELKA_M_TM] = static_cast<float>(pTM / 1.0);
+    // Манометр уравнительного резервуара
+    analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
+
+    // Положение рукоятки КрМ
+    analogSignal[KRAN395_RUK] = static_cast<float>(brake_crane->getHandlePosition());
 }
 
 //------------------------------------------------------------------------------
@@ -366,7 +421,7 @@ void VL60::keyProcess()
     }
 
     // МВ5
-    if (getKeyState(KEY_L))
+    if (getKeyState(KEY_J))
     {
         if (isShift())
             mv_tumblers[MV5].set();
