@@ -280,9 +280,14 @@ void BrakeCrane395::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void BrakeCrane395::inc()
 {
+   int old_pos = handle_pos;
+
    handle_pos++;
 
    handle_pos = cut(handle_pos, min_pos, max_pos);
+
+   if (handle_pos != old_pos)
+       emit soundPlay("Kran_395_ruk");
 }
 
 //------------------------------------------------------------------------------
@@ -290,9 +295,14 @@ void BrakeCrane395::inc()
 //------------------------------------------------------------------------------
 void BrakeCrane395::dec()
 {
+    int old_pos = handle_pos;
+
     handle_pos--;
 
     handle_pos = cut(handle_pos, min_pos, max_pos);
+
+    if (handle_pos != old_pos)
+        emit soundPlay("Kran_395_ruk");
 }
 
 GET_BRAKE_CRANE(BrakeCrane395)

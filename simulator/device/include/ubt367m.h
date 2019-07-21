@@ -36,7 +36,7 @@ private:
 
     double  p1;
 
-    double  state;
+    int  state;
 
     double  crane_pTM;
 
@@ -44,7 +44,7 @@ private:
 
     double  crane_pFL;
 
-    float   comb_crane_pos;
+    int    comb_crane_pos;
 
     bool   handle_unlocked;
 
@@ -73,6 +73,8 @@ private:
     void combCraneInc();
 
     void combCraneDec();
+
+    void setState(int state);
 };
 
 #endif // UBT367M_H

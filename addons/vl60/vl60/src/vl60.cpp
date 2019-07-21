@@ -103,12 +103,14 @@ void VL60::initialization()
 
     ubt = new BrakeLock();
     ubt->read_config("ubt367m");
+    connect(ubt, &BrakeLock::soundPlay, this, &VL60::soundPlay);
 
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
 
     brake_crane = loadBrakeCrane(modules_dir + QDir::separator() + "krm395");
     brake_crane->read_config("krm395");
+    connect(brake_crane, &BrakeCrane::soundPlay, this, &VL60::soundPlay);
 
     loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
     loco_crane->read_config("kvt254");

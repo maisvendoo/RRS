@@ -6,11 +6,11 @@
 BrakeLock::BrakeLock(QObject *parent) : BrakeDevice(parent)
   , V0(1e-3)
   , p1(0.1)
-  , state(0.0)
+  , state(0)
   , crane_pTM(0.0)
   , loco_pFL(0.0)
   , crane_pFL(0.0)
-  , comb_crane_pos(-1.0)
+  , comb_crane_pos(-1)
   , handle_unlocked(true)
 
 {
@@ -87,7 +87,7 @@ double BrakeLock::getLocoTMpressure() const
 //------------------------------------------------------------------------------
 float BrakeLock::getCombCranePos() const
 {
-    return comb_crane_pos;
+    return static_cast<float>(comb_crane_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ void BrakeLock::preStep(state_vector_t &Y, double t)
 
     crane_pFL = loco_pFL * state;
 
-    switch (static_cast<int>(comb_crane_pos))
+    switch (comb_crane_pos)
     {
     case -1:
 
@@ -189,9 +189,13 @@ void BrakeLock::stepKeysControl(double t, double dt)
     if (getKeyState(KEY_BackSpace) && handle_unlocked)
     {
         if (keys[KEY_Shift_L] || keys[KEY_Shift_R])
-            state = 1.0;
+        {
+            setState(1);
+        }
         else
-            state = 0.0;
+        {
+            setState(0);
+        }
     }
 
     incCompCrane->step(t, dt);
@@ -203,9 +207,14 @@ void BrakeLock::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void BrakeLock::combCraneInc()
 {
-    comb_crane_pos += 1.0f;
+    int old_pos = comb_crane_pos;
 
-    comb_crane_pos = cut(comb_crane_pos, -1.0f, 1.0f);
+    comb_crane_pos++;
+
+    comb_crane_pos = cut(comb_crane_pos, -1, 1);
+
+    if (old_pos != comb_crane_pos)
+        emit soundPlay("Komb_kran");
 }
 
 //------------------------------------------------------------------------------
@@ -213,7 +222,24 @@ void BrakeLock::combCraneInc()
 //------------------------------------------------------------------------------
 void BrakeLock::combCraneDec()
 {
-    comb_crane_pos -= 1.0f;
+    int old_pos = comb_crane_pos;
 
-    comb_crane_pos = cut(comb_crane_pos, -1.0f, 1.0f);
+    comb_crane_pos--;
+
+    comb_crane_pos = cut(comb_crane_pos, -1, 1);
+
+    if (old_pos != comb_crane_pos)
+        emit soundPlay("Komb_kran");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeLock::setState(int state)
+{
+    int prev_state = this->state;
+    this->state = state;
+
+    if (prev_state != state)
+        emit soundPlay("UBT_367_ruk");
 }
