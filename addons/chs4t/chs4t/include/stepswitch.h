@@ -37,14 +37,26 @@ private:
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
+
     ControllerState ctrlState;
 
     Trigger *rs;
 
+    int steps;
+
+//    double f1 - Y[0];
+    double shaft_rel;
+
+    double PI;
     double KL;
-    double UV;
-    double MN;
+    double AB;
     double GH;
+    double CD;
+    double EF;
+    double IJ;
+    double NM;
+    double UV;
+
 
     double s62;
     double s67;

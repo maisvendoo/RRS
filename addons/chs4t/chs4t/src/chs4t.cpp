@@ -35,7 +35,7 @@ CHS4T::CHS4T() : Vehicle()
 //    km21KR2->read_config();
 
     stepSwitch = new StepSwitch();
-    //    stepSwitch->read_config();
+//    stepSwitch->read_config();
 }
 
 //------------------------------------------------------------------------------
@@ -122,7 +122,6 @@ void CHS4T::keyProcess()
         glavV->setPhc(isShift());
 
     glavV->setVZState(getKeyState(KEY_K));
-
 
 
 //glavV->setVZState(true);
