@@ -87,6 +87,7 @@ int RouteViewer::run()
 
     osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new osgViewer::StatsHandler;
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
+
     viewer.addEventHandler(statsHandler.get());
 
 

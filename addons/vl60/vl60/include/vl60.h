@@ -93,6 +93,9 @@ private:
     /// Триггер тумблера "ГВ вкл/выкл"
     Trigger gv_tumbler;
 
+    /// Тригер тумблена "ГВ вкл. Возврат защиты"
+    Trigger gv_return_tumbler;
+
     /// Тригер тумблера "Фазорасщепитель"
     Trigger fr_tumbler;
 

@@ -29,17 +29,39 @@ VL60::VL60() : Vehicle ()
   , sig(1)
   , charge_press(0.0)
 {
+    pants_tumbler.setOnSoundName("K_Tumbler_On");
+    pants_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&pants_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    pant1_tumbler.setOnSoundName("K_Tumbler_On");
+    pant1_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&pant1_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    pant2_tumbler.setOnSoundName("K_Tumbler_On");
+    pant2_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&pant2_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    gv_tumbler.setOnSoundName("K_Tumbler_On");
+    gv_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&gv_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    gv_return_tumbler.setOnSoundName("K_Tumbler_Nofixed_On");
+    gv_return_tumbler.setOffSoundName("K_Tumbler_Nofixed_Off");
+    connect(&gv_return_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    fr_tumbler.setOnSoundName("K_Tumbler_On");
+    fr_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&fr_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
 
     for (size_t i = 0; i < mv_tumblers.size(); ++i)
     {
+        mv_tumblers[i].setOnSoundName("K_Tumbler_On");
+        mv_tumblers[i].setOffSoundName("K_Tumbler_Off");
         connect(&mv_tumblers[i], &Trigger::soundPlay, this, &VL60::soundPlay);
     }
 
+    mk_tumbler.setOnSoundName("K_Tumbler_On");
+    mk_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&mk_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
 }
 
@@ -163,7 +185,7 @@ void VL60::stepMainSwitchControl(double t, double dt)
 
     // Задаем состояние органов управления ГВ
     main_switch->setState(gv_tumbler.getState());
-    main_switch->setReturn(gv_return);
+    main_switch->setReturn(gv_return_tumbler.getState());
 
     // Подаем питание на удерживающую катушку ГВ
     main_switch->setHoldingCoilState(getHoldingCoilState());
@@ -261,7 +283,7 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler.getState());
     analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler.getState());
 
-    analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return);
+    analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler.getState());
     analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
 
     analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler.getState());
@@ -373,7 +395,11 @@ void VL60::keyProcess()
             gv_tumbler.reset();
     }
 
-    gv_return = getKeyState(KEY_K);
+    // Возврат защиты
+    if (getKeyState(KEY_K))
+        gv_return_tumbler.set();
+    else
+        gv_return_tumbler.reset();
 
     // Включение/выключение расщепителя фаз
     if (getKeyState(KEY_T))

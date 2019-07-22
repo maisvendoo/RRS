@@ -21,6 +21,10 @@ public:
 
     void reset();
 
+    void setOnSoundName(QString soundName);
+
+    void setOffSoundName(QString soundName);
+
 signals:
 
     void soundPlay(QString name);
@@ -34,7 +38,12 @@ signals:
 private:
 
     bool state;
+
     bool old_state;
+
+    QString onSoundName;
+
+    QString offSoundName;
 };
 
 #endif // TRIGGER_H

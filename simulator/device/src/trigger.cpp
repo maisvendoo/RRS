@@ -3,6 +3,8 @@
 Trigger::Trigger(QObject *parent) : QObject(parent)
     , state(false)
     , old_state(false)
+    , onSoundName("on")
+    , offSoundName("off")
 {
 
 }
@@ -23,7 +25,7 @@ void Trigger::set()
     state = true;
 
     if (state != old_state)
-        emit soundPlay("Tumbler");
+        emit soundPlay(onSoundName);
 }
 
 void Trigger::reset()
@@ -32,5 +34,15 @@ void Trigger::reset()
     state = false;
 
     if (state != old_state)
-        emit soundPlay("Tumbler");
+        emit soundPlay(offSoundName);
+}
+
+void Trigger::setOnSoundName(QString soundName)
+{
+    onSoundName = soundName;
+}
+
+void Trigger::setOffSoundName(QString soundName)
+{
+    offSoundName = soundName;
 }

@@ -10,7 +10,7 @@ struct sound_config_t
     QString     name;
     QString     path;
     int         init_volume;
-    int         max_volume;
+    int         max_volume;    
     float       init_pitch;
     bool        loop;
     bool        play_on_start;
