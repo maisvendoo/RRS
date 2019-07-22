@@ -84,7 +84,7 @@ void MotorCompressor::ode_system(const state_vector_t &Y,
     // Расчитываем электромагнитный момент (формула Клосса)
     double Ma = 2 * M_maximal / ( s / s_kr + s_kr / s );
 
-    double Mr = Physics::fricForce(Mxx + K[5] * Y[1], Y[0]);
+    double Mr = Physics::fricForce(Mxx, Y[0]);
 
     double Qnk =  K[1] * Y[0] - K[2] * Y[1] - K[3] * pf(Y[1] - p);
 

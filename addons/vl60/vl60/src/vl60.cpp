@@ -441,7 +441,7 @@ void VL60::keyProcess()
     }
 
     // Включение/выключение мотор-компрессора
-    if (getKeyState(KEY_C))
+    if (getKeyState(KEY_E))
     {
         if (isShift())
             mk_tumbler.set();
