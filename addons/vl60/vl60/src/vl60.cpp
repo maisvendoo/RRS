@@ -137,12 +137,15 @@ void VL60::initialization()
     loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
     loco_crane->read_config("kvt254");
 
-    for (size_t i = 0; i < trolley_mech.size(); ++i)
-    {
-        trolley_mech[i] = new TrolleyBrakeMech(config_dir +
-                                               QDir::separator() +
-                                               "trolley-brake-mech.xml");
-    }
+
+    trolley_mech[TROLLEY_FWD] = new TrolleyBrakeMech(config_dir +
+                                           QDir::separator() +
+                                           "fwd-trolley-brake-mech.xml");
+
+    trolley_mech[TROLLEY_BWD] = new TrolleyBrakeMech(config_dir +
+                                           QDir::separator() +
+                                           "bwd-trolley-brake-mech.xml");
+
 
     switch_valve = new SwitchingValve();
     switch_valve->read_config("zpk");
@@ -152,6 +155,11 @@ void VL60::initialization()
 
     pneumo_splitter = new PneumoSplitter();
     pneumo_splitter->read_config("pneumo-splitter");
+
+    supply_reservoir = new Reservoir(0.078);
+
+    air_disr = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
+    air_disr->read_config("vr242");
 }
 
 //------------------------------------------------------------------------------
@@ -174,6 +182,8 @@ void VL60::step(double t, double dt)
     stepBrakeControl(t, dt);
 
     stepTrolleysBrakeMech(t, dt);
+
+    stepAirDistributors(t, dt);
 
     stepSignalsOutput();
 }
@@ -298,7 +308,7 @@ void VL60::stepBrakeControl(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepTrolleysBrakeMech(double t, double dt)
 {
-    switch_valve->setInputFlow1(0.0);
+    switch_valve->setInputFlow1(air_disr->getBrakeCylinderAirFlow());
     switch_valve->setInputFlow2(loco_crane->getBrakeCylinderFlow());
     switch_valve->setOutputPressure(pneumo_splitter->getP_in());
     switch_valve->step(t, dt);
@@ -321,6 +331,29 @@ void VL60::stepTrolleysBrakeMech(double t, double dt)
     // Задняя тележка подключена через тройник от ЗПК
     trolley_mech[TROLLEY_BWD]->setAirFlow(pneumo_splitter->getQ_out2());
     trolley_mech[TROLLEY_BWD]->step(t, dt);
+
+    Q_r[1] = trolley_mech[TROLLEY_FWD]->getBrakeTorque();
+    Q_r[2] = trolley_mech[TROLLEY_FWD]->getBrakeTorque();
+    Q_r[3] = trolley_mech[TROLLEY_FWD]->getBrakeTorque();
+
+    Q_r[4] = trolley_mech[TROLLEY_BWD]->getBrakeTorque();
+    Q_r[5] = trolley_mech[TROLLEY_BWD]->getBrakeTorque();
+    Q_r[6] = trolley_mech[TROLLEY_BWD]->getBrakeTorque();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepAirDistributors(double t, double dt)
+{
+    supply_reservoir->setAirFlow(air_disr->getAirSupplyFlow());
+    supply_reservoir->step(t, dt);
+
+    air_disr->setBrakeCylinderPressure(switch_valve->getPressure1());
+    air_disr->setAirSupplyPressure(supply_reservoir->getPressure());
+    air_disr->setBrakepipePressure(pTM);
+    auxRate = air_disr->getAuxRate();
+    air_disr->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

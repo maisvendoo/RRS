@@ -164,6 +164,12 @@ private:
     /// Разветвитель трубопроводов (тройник)
     PneumoSplitter  *pneumo_splitter;
 
+    /// Запасный резервуар
+    Reservoir       *supply_reservoir;
+
+    /// Воздухораспределитель
+    AirDistributor  *air_disr;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -185,6 +191,8 @@ private:
     void stepBrakeControl(double t, double dt);
 
     void stepTrolleysBrakeMech(double t, double dt);
+
+    void stepAirDistributors(double t, double dt);
 
     void stepSignalsOutput();
 
