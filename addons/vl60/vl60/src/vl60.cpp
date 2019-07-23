@@ -311,9 +311,9 @@ void VL60::stepSignalsOutput()
     analogSignal[SIG_LIGHT_GU] = 1.0f;
     analogSignal[SIG_LIGHT_FR] = phase_spliter->isNotReady();
     analogSignal[SIG_LIGHT_0HP] = 1.0f;
-    analogSignal[SIG_LIGHT_TR] = 1.0;
-    analogSignal[SIG_LIGHT_VU1] = 1.0;
-    analogSignal[SIG_LIGHT_VU2] = 1.0;
+    analogSignal[SIG_LIGHT_TR] = cut (motor_fans[MV3]->isNoReady() + motor_fans[MV4]->isNoReady(), 0.0f, 1.0f);
+    analogSignal[SIG_LIGHT_VU1] = cut (motor_fans[MV1]->isNoReady() + motor_fans[MV2]->isNoReady(), 0.0f, 1.0f);
+    analogSignal[SIG_LIGHT_VU2] = cut (motor_fans[MV5]->isNoReady() + motor_fans[MV6]->isNoReady(), 0.0f, 1.0f);
     analogSignal[SIG_LIGHT_TD] = 1.0;    
 
     analogSignal[KONTROLLER] = -0.5;

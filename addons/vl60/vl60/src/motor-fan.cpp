@@ -10,8 +10,10 @@ MotorFan::MotorFan(size_t idx, QObject *parent) : Device(parent)
   , Un(380.0)
   , U_power(0.0)
   , omega0(157.08)
+  , omega_nom(152.89)
   , kr(0.0154)
   , J(0.5)
+  , is_no_ready(1.0)
 {
 
 }
@@ -24,6 +26,9 @@ MotorFan::~MotorFan()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MotorFan::setU_power(double value)
 {
     U_power = value;
@@ -32,9 +37,19 @@ void MotorFan::setU_power(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+float MotorFan::isNoReady()
+{
+    return static_cast<float>(is_no_ready);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MotorFan::preStep(state_vector_t &Y, double t)
 {
     QString sndName = QString("Motor_Fan%1").arg(idx);
+
+    is_no_ready = hs_n(Y[0] - 0.95 * omega_nom);
 
     emit soundSetPitch(sndName, static_cast<float>(Y[0] / omega0));
 }

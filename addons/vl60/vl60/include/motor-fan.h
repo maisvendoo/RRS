@@ -16,6 +16,8 @@ public:
 
     void setU_power(double value);
 
+    float isNoReady();
+
 private:
 
     /// Индекс (по сути номер мотор-вентилятора в схеме)
@@ -31,9 +33,13 @@ private:
 
     double  omega0;
 
+    double  omega_nom;
+
     double  kr;
 
     double  J;
+
+    double  is_no_ready;
 
     void preStep(state_vector_t &Y, double t);
 
