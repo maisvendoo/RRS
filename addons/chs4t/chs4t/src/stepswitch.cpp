@@ -18,13 +18,23 @@
 // Конструктор
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
-  , KL(0)
-  , UV(0)
   , s62(0)
   , s67(0)
   , s69(0)
+  , s45(0)
+  , s43(0)
+  , s410(0)
   , shaft_rel(0)
   , PI(Physics::PI)
+  , p1(0)
+  , p2(PI / 2.0)
+  , p3(PI)
+  , p4(3.0 * PI / 2.0)
+  , KL(0)
+  , UV(0)
+  , v1(0)
+  , v2(0)
+  , ang_vel(2.96)
 {
     rs = new Trigger();
 }
@@ -63,18 +73,58 @@ void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
     if (ctrlState.a2b2 || ctrlState.j2k2)
         rs->set();
 
-    if (1.0 - MN)
+    if (1.0 - NM)
         rs->reset();
 
     s01 = static_cast<double>(rs->getState());
 
-    s1 = s01 * MN;
+    s1 = s01 * NM;
 
     s2 = s1 * ctrlState.i2g2 * GH;
 
     s45 = 1.0 - s2;
     s43 = s2;
     s410 = s2;
+
+    //----------------------------------------
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    KL = ((shaft_rel >= p1 && shaft_rel <= p2) ||
+          (shaft_rel >= p3 && shaft_rel <= p4));
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    AB = (shaft_rel >= p1 && shaft_rel <= p2);
+
+    GH = (shaft_rel == p3);
+
+    CD = (shaft_rel >= p2 && shaft_rel <= p3);
+
+    EF = (shaft_rel == p1 || shaft_rel == p4);
+
+    IJ = (shaft_rel >= p3 && shaft_rel <= p4);
+
+    NM = ((shaft_rel == p1) ||
+          (shaft_rel >= p2 && shaft_rel <= p3) ||
+          (shaft_rel == p4));
+
+    double s3 = s62 * GH;
+
+    v1 = s67 * AB + s3;
+    if (v1 > 1)
+        v1 = 1;
+
+    v2 = s69 * CD + s3;
+    if (v2 > 1)
+        v2 = 1;
+
+
+
+
+
+
+
+
+
 }
 
 //------------------------------------------------------------------------------
@@ -98,17 +148,6 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void StepSwitch::stepKeysControl(double t, double dt)
 {
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if((shaft_rel >= 0 && shaft_rel <= PI / 2.0) ||
-       (shaft_rel >= PI && shaft_rel <= PI * 3.0 / 2.0))
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    {
-        KL = 1.0;
-    }
-    else
-    {
-        KL = 0.0;
-    }
 
-    AB = (shaft_rel >= 0 && shaft_rel <= PI / 2.0);
+
 }

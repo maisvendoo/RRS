@@ -42,12 +42,25 @@ private:
 
     Trigger *rs;
 
-    int steps;
+//    int steps;
 
-//    double f1 - Y[0];
+//    double f1 -- Y[0];
+
+    double s62;
+    double s67;
+    double s69;
+    double s45;
+    double s43;
+    double s410;
+
     double shaft_rel;
 
     double PI;
+    double p1;
+    double p2;
+    double p3;
+    double p4;
+
     double KL;
     double AB;
     double GH;
@@ -57,13 +70,11 @@ private:
     double NM;
     double UV;
 
+    double v1;
+    double v2;
 
-    double s62;
-    double s67;
-    double s69;
-    double s45;
-    double s43;
-    double s410;
+    double ang_vel;
+
 };
 
 
