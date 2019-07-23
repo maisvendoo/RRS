@@ -26,6 +26,8 @@
 #include    "motor-compressor.h"
 #include    "pressure-regulator.h"
 #include    "ubt367m.h"
+#include    "trolley-brake-mech.h"
+#include    "pneumo-splitter.h"
 
 /*!
  * \class
@@ -66,9 +68,11 @@ private:
         MV6 = 5
     };
 
+
     enum
     {
-        MAIN_RESERVOIR_VOLUME = 1000
+        /// Объем главного резервуара (ГР), литров
+        MAIN_RESERVOIR_VOLUME = 1200
     };
 
     float   Uks;
@@ -132,7 +136,7 @@ private:
     /// Регулятор давления в ГР
     PressureRegulator *press_reg;
 
-    /// Устройство блогировки тормозов усл. №367М
+    /// Устройство блокировки тормозов усл. №367М
     BrakeLock   *ubt;
 
     /// Поездной кран машиниста (КрМ)
@@ -141,8 +145,29 @@ private:
     /// Кран впомогательного тормоза (КВТ)
     LocoCrane   *loco_crane;
 
+    enum
+    {
+        NUM_TROLLEYS = 2,
+        TROLLEY_FWD = 0,
+        TROLLEY_BWD = 1
+    };
+
+    /// Тормозные механизмы тележек
+    std::array<TrolleyBrakeMech *, NUM_TROLLEYS> trolley_mech;
+
+    /// Переключательный клапан ЗПК
+    SwitchingValve  *switch_valve;
+
+    /// Реле давления усл. №304
+    PneumoReley     *pneumo_relay;
+
+    /// Разветвитель трубопроводов (тройник)
+    PneumoSplitter  *pneumo_splitter;
+
+    /// Общая инициализация локомотива
     void initialization();
 
+    /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
 
     void stepPantographsControl(double t, double dt);
@@ -159,10 +184,13 @@ private:
 
     void stepBrakeControl(double t, double dt);
 
+    void stepTrolleysBrakeMech(double t, double dt);
+
     void stepSignalsOutput();
 
     bool getHoldingCoilState() const;
 
+    /// Обработка нажатий клавиш
     void keyProcess();
 };
 

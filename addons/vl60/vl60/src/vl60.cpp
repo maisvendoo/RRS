@@ -136,6 +136,22 @@ void VL60::initialization()
 
     loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
     loco_crane->read_config("kvt254");
+
+    for (size_t i = 0; i < trolley_mech.size(); ++i)
+    {
+        trolley_mech[i] = new TrolleyBrakeMech(config_dir +
+                                               QDir::separator() +
+                                               "trolley-brake-mech.xml");
+    }
+
+    switch_valve = new SwitchingValve();
+    switch_valve->read_config("zpk");
+
+    pneumo_relay = new PneumoReley();
+    pneumo_relay->read_config("rd304");
+
+    pneumo_splitter = new PneumoSplitter();
+    pneumo_splitter->read_config("pneumo-splitter");
 }
 
 //------------------------------------------------------------------------------
@@ -156,6 +172,8 @@ void VL60::step(double t, double dt)
     stepMotorCompressor(t, dt);
 
     stepBrakeControl(t, dt);
+
+    stepTrolleysBrakeMech(t, dt);
 
     stepSignalsOutput();
 }
@@ -267,6 +285,42 @@ void VL60::stepBrakeControl(double t, double dt)
     brake_crane->setBrakePipePressure(pTM);
     brake_crane->setControl(keys);
     brake_crane->step(t, dt);
+
+    loco_crane->setFeedlinePressure(ubt->getCraneFLpressure());
+    loco_crane->setBrakeCylinderPressure(switch_valve->getPressure2());
+    loco_crane->setAirDistributorFlow(0.0);
+    loco_crane->setControl(keys);
+    loco_crane->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepTrolleysBrakeMech(double t, double dt)
+{
+    switch_valve->setInputFlow1(0.0);
+    switch_valve->setInputFlow2(loco_crane->getBrakeCylinderFlow());
+    switch_valve->setOutputPressure(pneumo_splitter->getP_in());
+    switch_valve->step(t, dt);
+
+    // Тройник подключен к ЗПК
+    pneumo_splitter->setQ_in(switch_valve->getOutputFlow());
+    pneumo_splitter->setP_out1(pneumo_relay->getWorkPressure());
+    pneumo_splitter->setP_out2(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure());
+    pneumo_splitter->step(t, dt);
+
+    pneumo_relay->setPipelinePressure(main_reservoir->getPressure());
+    pneumo_relay->setWorkAirFlow(pneumo_splitter->getQ_out1());
+    pneumo_relay->setBrakeCylPressure(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure());
+    pneumo_relay->step(t, dt);
+
+    // Передняя тележка наполняется через реле давления 304
+    trolley_mech[TROLLEY_FWD]->setAirFlow(pneumo_relay->getBrakeCylAirFlow());
+    trolley_mech[TROLLEY_FWD]->step(t, dt);
+
+    // Задняя тележка подключена через тройник от ЗПК
+    trolley_mech[TROLLEY_BWD]->setAirFlow(pneumo_splitter->getQ_out2());
+    trolley_mech[TROLLEY_BWD]->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -331,9 +385,14 @@ void VL60::stepSignalsOutput()
     analogSignal[STRELKA_M_TM] = static_cast<float>(pTM / 1.0);
     // Манометр уравнительного резервуара
     analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
+    // Манометр давления в ТЦ
+    analogSignal[STRELKA_M_TC] = static_cast<float>(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure() / 1.0);
 
     // Положение рукоятки КрМ
     analogSignal[KRAN395_RUK] = static_cast<float>(brake_crane->getHandlePosition());
+
+    // Положение рукоятки КВТ
+    analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane->getHandlePosition());
 }
 
 //------------------------------------------------------------------------------

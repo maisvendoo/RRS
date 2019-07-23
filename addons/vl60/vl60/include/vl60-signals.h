@@ -13,6 +13,8 @@ enum
     STRELKA_M_TM = 21,
     STRELKA_M_UR = 22,
     STRELKA_M_HM = 23,
+    STRELKA_M_TC = 24,
+    KRAN254_RUK = 29,
 
     TUMBLER_PNT = 33,
     TUMBLER_PNT1 = 31,
