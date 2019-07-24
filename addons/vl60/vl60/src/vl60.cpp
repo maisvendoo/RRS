@@ -85,7 +85,7 @@ void VL60::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initialization()
+void VL60::initPantographs()
 {
     QString pant_cfg_path = config_dir + QDir::separator() + "pantograph.xml";
 
@@ -94,7 +94,13 @@ void VL60::initialization()
         pantographs[i] = new Pantograph(pant_cfg_path);
         connect(pantographs[i], &Pantograph::soundPlay, this, &VL60::soundPlay);
     }
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initHighVoltageScheme()
+{
     QString gv_cfg_path = config_dir + QDir::separator() + "main-switch.xml";
 
     main_switch = new MainSwitch(gv_cfg_path);
@@ -105,7 +111,13 @@ void VL60::initialization()
 
     trac_trans = new TracTransformer();
     connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60::soundSetVolume);
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initSupplyMachines()
+{
     phase_spliter = new PhaseSplitter();
     connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60::soundSetPitch);
 
@@ -122,13 +134,16 @@ void VL60::initialization()
     connect(motor_compressor, &MotorCompressor::soundSetPitch, this, &VL60::soundSetPitch);
 
     press_reg = new PressureRegulator();
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initBrakeControls(QString modules_dir)
+{
     ubt = new BrakeLock();
     ubt->read_config("ubt367m");
     connect(ubt, &BrakeLock::soundPlay, this, &VL60::soundPlay);
-
-    FileSystem &fs = FileSystem::getInstance();
-    QString modules_dir = QString(fs.getModulesDir().c_str());
 
     brake_crane = loadBrakeCrane(modules_dir + QDir::separator() + "krm395");
     brake_crane->read_config("krm395");
@@ -136,8 +151,13 @@ void VL60::initialization()
 
     loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
     loco_crane->read_config("kvt254");
+}
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initBrakeMechanics()
+{
     trolley_mech[TROLLEY_FWD] = new TrolleyBrakeMech(config_dir +
                                            QDir::separator() +
                                            "fwd-trolley-brake-mech.xml");
@@ -145,8 +165,13 @@ void VL60::initialization()
     trolley_mech[TROLLEY_BWD] = new TrolleyBrakeMech(config_dir +
                                            QDir::separator() +
                                            "bwd-trolley-brake-mech.xml");
+}
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initBrakeEquipment(QString modules_dir)
+{
     switch_valve = new SwitchingValve();
     switch_valve->read_config("zpk");
 
@@ -160,6 +185,27 @@ void VL60::initialization()
 
     air_disr = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
     air_disr->read_config("vr242");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initialization()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    initPantographs();
+
+    initHighVoltageScheme();
+
+    initSupplyMachines();
+
+    initBrakeControls(modules_dir);
+
+    initBrakeMechanics();
+
+    initBrakeEquipment(modules_dir);
 }
 
 //------------------------------------------------------------------------------
@@ -187,11 +233,12 @@ void VL60::step(double t, double dt)
 
     stepSignalsOutput();
 
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4")
+    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН")
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2);
+            .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2)
+            .arg(trolley_mech[TROLLEY_FWD]->getShoeForce() / 1000.0, 5, 'f', 1);
 }
 
 //------------------------------------------------------------------------------
@@ -295,7 +342,7 @@ void VL60::stepBrakeControl(double t, double dt)
     // Подключаем к УБТ трубопровод ТМ от КрМ
     ubt->setCraneTMpressure(brake_crane->getBrakePipeInitPressure());    
     ubt->setControl(keys);
-    // Зазаем давление в начале ТМ
+    // Задаем давление в начале ТМ
     p0 = ubt->getLocoTMpressure();
     ubt->step(t, dt);
 

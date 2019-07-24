@@ -173,6 +173,24 @@ private:
     /// Общая инициализация локомотива
     void initialization();
 
+    /// Инициализация токоприемников
+    void initPantographs();
+
+    /// Иницаализация высоковольтной части схемы (ГВ, тяговый трансформатор)
+    void initHighVoltageScheme();
+
+    /// Инициализация вспомогательных машин (ФР, МК, МВ1 - МВ6)
+    void initSupplyMachines();
+
+    /// Инициализация приборов управления тормозами
+    void initBrakeControls(QString modules_dir);
+
+    /// Инициализация тормозной рычажной передачи
+    void initBrakeMechanics();
+
+    /// Инициализация приборов торможения (ВР и сопуствующая обвязка)
+    void initBrakeEquipment(QString modules_dir);
+
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
 
@@ -200,6 +218,7 @@ private:
 
     /// Обработка нажатий клавиш
     void keyProcess();
+
 };
 
 #endif // VL60_H

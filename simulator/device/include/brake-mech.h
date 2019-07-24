@@ -50,6 +50,8 @@ public:
     /// Get brake cylinder pressure
     double getBrakeCylinderPressure() const;
 
+    double getShoeForce() const;
+
 protected:
 
     /// Number of shoes for one brake cylinder

@@ -96,6 +96,11 @@ double BrakeMech::getBrakeCylinderPressure() const
     return getY(0);
 }
 
+double BrakeMech::getShoeForce() const
+{
+    return K;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

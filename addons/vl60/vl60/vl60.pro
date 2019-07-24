@@ -33,5 +33,6 @@ INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/km-state.h
 SOURCES += $$files(./src/*.cpp)
