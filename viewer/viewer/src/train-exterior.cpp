@@ -384,10 +384,8 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
             nd.delta_time = nd.sd.back().time - nd.sd.front().time;
         }
 
-        QString msg = QString("ПЕ #%1: delta_time: %2 nd.delta_time: %3")
-                .arg(cur_vehicle)
-                .arg(delta_time, 6, 'f', 4)
-                .arg(nd.delta_time, 6, 'f', 4);
+        QString msg = QString("ПЕ #%1: ")
+                .arg(cur_vehicle);
 
         emit setStatusBar(msg + QString::fromStdWString(server_data.te[static_cast<size_t>(cur_vehicle)].DebugMsg));
 

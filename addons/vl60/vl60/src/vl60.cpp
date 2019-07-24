@@ -186,6 +186,12 @@ void VL60::step(double t, double dt)
     stepAirDistributors(t, dt);
 
     stepSignalsOutput();
+
+    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4")
+            .arg(t, 10, 'f', 2)
+            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
+            .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
+            .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2);
 }
 
 //------------------------------------------------------------------------------
@@ -284,9 +290,12 @@ void VL60::stepMotorCompressor(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepBrakeControl(double t, double dt)
 {
+    // Подключаем к УБТ трубопровод от ГР
     ubt->setLocoFLpressure(main_reservoir->getPressure());
-    ubt->setCraneTMpressure(brake_crane->getBrakePipeInitPressure());
+    // Подключаем к УБТ трубопровод ТМ от КрМ
+    ubt->setCraneTMpressure(brake_crane->getBrakePipeInitPressure());    
     ubt->setControl(keys);
+    // Зазаем давление в начале ТМ
     p0 = ubt->getLocoTMpressure();
     ubt->step(t, dt);
 
