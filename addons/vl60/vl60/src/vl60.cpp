@@ -206,6 +206,8 @@ void VL60::initialization()
     initBrakeMechanics();
 
     initBrakeEquipment(modules_dir);
+
+    controller = new ControllerKME_60_044();
 }
 
 //------------------------------------------------------------------------------
@@ -232,6 +234,8 @@ void VL60::step(double t, double dt)
     stepAirDistributors(t, dt);
 
     stepSignalsOutput();
+
+    stepTractionControl(t, dt);
 
     DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН")
             .arg(t, 10, 'f', 2)
@@ -415,6 +419,15 @@ void VL60::stepAirDistributors(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::stepTractionControl(double t, double dt)
+{
+    controller->setControl(keys);
+    controller->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::stepSignalsOutput()
 {
     // Состояние токоприемников
@@ -459,7 +472,8 @@ void VL60::stepSignalsOutput()
     analogSignal[SIG_LIGHT_VU2] = cut (motor_fans[MV5]->isNoReady() + motor_fans[MV6]->isNoReady(), 0.0f, 1.0f);
     analogSignal[SIG_LIGHT_TD] = 1.0;    
 
-    analogSignal[KONTROLLER] = -0.5;
+    analogSignal[KONTROLLER] = controller->getMainHandlePos();
+    analogSignal[REVERS] = controller->getReversHandlePos();
 
     // Положение рукоятки комбинированного крана
     analogSignal[KRAN_KOMBIN] = ubt->getCombCranePos();

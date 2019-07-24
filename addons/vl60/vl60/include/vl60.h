@@ -28,6 +28,7 @@
 #include    "ubt367m.h"
 #include    "trolley-brake-mech.h"
 #include    "pneumo-splitter.h"
+#include    "kme-60-044.h"
 
 /*!
  * \class
@@ -170,6 +171,9 @@ private:
     /// Воздухораспределитель
     AirDistributor  *air_disr;
 
+    /// Контроллер машиниста
+    ControllerKME_60_044    *controller;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -211,6 +215,8 @@ private:
     void stepTrolleysBrakeMech(double t, double dt);
 
     void stepAirDistributors(double t, double dt);
+
+    void stepTractionControl(double t, double dt);
 
     void stepSignalsOutput();
 

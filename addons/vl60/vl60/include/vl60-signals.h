@@ -16,7 +16,9 @@ enum
     STRELKA_M_TC = 24,
     KRAN254_RUK = 29,
 
-    TUMBLER_PNT = 33,
+    REVERS = 30,
+
+    TUMBLER_PNT = 33,    
     TUMBLER_PNT1 = 31,
     TUMBLER_PNT2 = 32,
 
