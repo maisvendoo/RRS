@@ -62,6 +62,8 @@ public:
     /// Read device config file
     virtual void read_config(const QString &path);
 
+    virtual void read_custom_config(const QString &path);
+
     QString getDebugMsg() const;
 
     ///

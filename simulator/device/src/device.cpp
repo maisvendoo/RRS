@@ -132,6 +132,29 @@ void Device::read_config(const QString &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Device::read_custom_config(const QString &path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(path))
+    {
+        int order = 0;
+        QString secName = "Device";
+
+        if (!cfg.getInt(secName, "Order", order))
+        {
+            order = 1;
+        }
+
+        memory_alloc(order);
+
+        load_config(cfg);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString Device::getDebugMsg() const
 {
     return DebugMsg;
