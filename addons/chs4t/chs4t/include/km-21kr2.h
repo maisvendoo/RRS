@@ -36,11 +36,9 @@ private:
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
-    bool up;
-    bool up1;
-    bool zero;
-    bool down1;
-    bool down;
+    bool k21;
+    bool k22;
+    bool k23;
 
     ControllerState controlState;
 };

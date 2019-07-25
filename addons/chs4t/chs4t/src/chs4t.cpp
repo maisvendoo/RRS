@@ -82,12 +82,16 @@ void CHS4T::step(double t, double dt)
             .arg(glavV->getUout(), 5, 'f', 0)
             .arg(glavV->getX(), 5, 'f', 0);
 
-    DebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5")
-            .arg(km21KR2->getCtrlState().a2b2, 5, 'f', 0)
-            .arg(km21KR2->getCtrlState().c2d2, 5, 'f', 0)
-            .arg(km21KR2->getCtrlState().e2f2, 5, 'f', 0)
-            .arg(km21KR2->getCtrlState().i2g2, 5, 'f', 0)
-            .arg(km21KR2->getCtrlState().j2k2, 5, 'f', 0);
+    DebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5 poz = %6 v1 = %7 v2 = %8 shaft_rel = %9")
+            .arg(km21KR2->getCtrlState().a2b2, 1, 'f', 0)
+            .arg(km21KR2->getCtrlState().c2d2, 1, 'f', 0)
+            .arg(km21KR2->getCtrlState().e2f2, 1, 'f', 0)
+            .arg(km21KR2->getCtrlState().i2g2, 1, 'f', 0)
+            .arg(km21KR2->getCtrlState().j2k2, 1, 'f', 0)
+            .arg(stepSwitch->getPoz(), 3)
+            .arg(stepSwitch->getv1(), 3)
+            .arg(stepSwitch->getv2(), 3)
+            .arg(stepSwitch->getSr(), 3);
 
 }
 

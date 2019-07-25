@@ -32,9 +32,12 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , p4(3.0 * PI / 2.0)
   , KL(0)
   , UV(0)
+  , HG(0)
   , v1(0)
   , v2(0)
+  , u(0)
   , ang_vel(2.96)
+  , poz(0)
 {
     rs = new Trigger();
 }
@@ -52,6 +55,7 @@ StepSwitch::~StepSwitch()
 //------------------------------------------------------------------------------
 void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+
     if (ctrlState.a2b2 || ctrlState.e2f2)
         rs->set();
 
@@ -80,7 +84,7 @@ void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
 
     s1 = s01 * NM;
 
-    s2 = s1 * ctrlState.i2g2 * GH;
+    s2 = s1 * ctrlState.i2g2 * HG;
 
     s45 = 1.0 - s2;
     s43 = s2;
@@ -117,14 +121,20 @@ void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
     if (v2 > 1)
         v2 = 1;
 
+    if (ctrlState.e2f2)
+        u = (v1 != v2);
+    if (ctrlState.j2k2)
+        u = -(v1 != v2);
 
+    dYdt[0] = ang_vel * u * hs_p(32 * PI - Y[0]) * hs_p(Y[0]);
 
+    shaft_rel = Y[0] - static_cast<int>(Y[0] / (2 * PI)) * 2 * PI;
 
+    poz = static_cast<int>(Y[0] / PI);
 
+    UV = hs_p(32 - poz);
 
-
-
-
+    HG = hs_p(poz);
 }
 
 //------------------------------------------------------------------------------

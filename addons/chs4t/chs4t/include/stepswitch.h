@@ -31,6 +31,11 @@ public:
 
     void setCtrlState(ControllerState ctrlState) { this->ctrlState = ctrlState; }
 
+    double getv1() { return  v1; }
+    double getv2() { return  v2; }
+    int getPoz() { return poz; }
+    double getSr() { return shaft_rel; }
+
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
@@ -69,11 +74,14 @@ private:
     double IJ;
     double NM;
     double UV;
+    double HG;
 
     double v1;
     double v2;
+    double u;
 
     double ang_vel;
+    int poz;
 
 };
 
