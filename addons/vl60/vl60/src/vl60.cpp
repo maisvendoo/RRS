@@ -114,6 +114,7 @@ void VL60::initHighVoltageScheme()
     gauge_KV_ks->read_config("oscillator");
 
     trac_trans = new TracTransformer();
+    trac_trans->read_custom_config(config_dir + QDir::separator() + "trac-transformer");
     connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60::soundSetVolume);
 }
 
@@ -245,12 +246,14 @@ void VL60::step(double t, double dt)
 
     stepTractionControl(t, dt);
 
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН")
+    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uвых: %6 Поз.: %7")
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(trolley_mech[TROLLEY_FWD]->getShoeForce() / 1000.0, 5, 'f', 1);
+            .arg(trolley_mech[TROLLEY_FWD]->getShoeForce() / 1000.0, 5, 'f', 1)
+            .arg(trac_trans->getTracVoltage(), 6, 'f', 1)
+            .arg(trac_trans->getPosName(), 2);
 }
 
 //------------------------------------------------------------------------------
@@ -298,6 +301,7 @@ void VL60::stepTracTransformer(double t, double dt)
 {
     // Задаем напряжение на первичной обмотке (с выхода ГВ)
     trac_trans->setU1(main_switch->getU_out());
+    trac_trans->setPosition(main_controller->getPosition());
 
     trac_trans->step(t, dt);
 }

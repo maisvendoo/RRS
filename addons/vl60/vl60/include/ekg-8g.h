@@ -24,6 +24,8 @@ public:
 
     void enable(bool value);
 
+    int getPosition() const;
+
 private:
 
     enum
