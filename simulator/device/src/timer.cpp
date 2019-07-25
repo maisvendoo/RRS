@@ -75,3 +75,11 @@ bool Timer::isStarted() const
 {
     return is_started;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Timer::setTimeout(double timeout)
+{
+    this->timeout = timeout;
+}

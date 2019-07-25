@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+
+		<Order>1</Order>
+
+		<!-- Время переключения на одну позицию, мс -->
+		<PosSwitchIntelval>756</PosSwitchIntelval>ss
+
+	</Device>
+</Config>

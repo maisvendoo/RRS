@@ -50,6 +50,8 @@ void Device::step(double t, double dt)
 
     stepControl(t, dt);
 
+    stepDiscrete(t, dt);
+
     ode_system(y, dydt, t);    
 
     for (size_t i = 0; i < y.size(); ++i)
@@ -136,7 +138,7 @@ void Device::read_custom_config(const QString &path)
 {
     CfgReader cfg;
 
-    if (cfg.load(path))
+    if (cfg.load(path + ".xml"))
     {
         int order = 0;
         QString secName = "Device";
@@ -236,6 +238,15 @@ void Device::stepKeysControl(double t, double dt)
 //
 //------------------------------------------------------------------------------
 void Device::stepExternalControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)

@@ -7,6 +7,7 @@ enum
     KRAN_KOMBIN = 1,
     KLUCH_367 = 2,
 
+    STRELKA_SELSIN = 9,
     STRELKA_AMP_EPT = 10,
 
     KRAN395_RUK = 20,

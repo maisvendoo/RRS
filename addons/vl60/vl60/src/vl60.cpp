@@ -208,6 +208,10 @@ void VL60::initialization()
     initBrakeEquipment(modules_dir);
 
     controller = new ControllerKME_60_044();
+
+    main_controller = new EKG_8G();
+    main_controller->read_custom_config(config_dir + QDir::separator() + "ekg-8g");
+    connect(main_controller, &EKG_8G::soundPlay, this, &VL60::soundPlay);
 }
 
 //------------------------------------------------------------------------------
@@ -423,6 +427,9 @@ void VL60::stepTractionControl(double t, double dt)
 {
     controller->setControl(keys);
     controller->step(t, dt);
+
+    main_controller->setKMstate(controller->getState());
+    main_controller->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -474,6 +481,7 @@ void VL60::stepSignalsOutput()
 
     analogSignal[KONTROLLER] = controller->getMainHandlePos();
     analogSignal[REVERS] = controller->getReversHandlePos();
+    analogSignal[STRELKA_SELSIN] = main_controller->getSelsinPosition();
 
     // Положение рукоятки комбинированного крана
     analogSignal[KRAN_KOMBIN] = ubt->getCombCranePos();

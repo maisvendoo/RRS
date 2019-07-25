@@ -126,6 +126,8 @@ protected:
 
     virtual void stepExternalControl(double t, double dt);
 
+    virtual void stepDiscrete(double t, double dt);
+
     bool getKeyState(int key) const;
 
 private:

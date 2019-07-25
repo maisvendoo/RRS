@@ -29,6 +29,7 @@
 #include    "trolley-brake-mech.h"
 #include    "pneumo-splitter.h"
 #include    "kme-60-044.h"
+#include    "ekg-8g.h"
 
 /*!
  * \class
@@ -173,6 +174,9 @@ private:
 
     /// Контроллер машиниста
     ControllerKME_60_044    *controller;
+
+    /// Главный контроллер (переключение обмоток тягового трансформатора)
+    EKG_8G                  *main_controller;
 
     /// Общая инициализация локомотива
     void initialization();

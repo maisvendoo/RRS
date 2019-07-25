@@ -40,6 +40,9 @@ public:
     /// Check is timer started
     bool isStarted() const;
 
+    /// Set timeout
+    void setTimeout(double timeout);
+
 signals:
 
     /// Signal for actions exectute
