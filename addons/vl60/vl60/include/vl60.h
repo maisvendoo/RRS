@@ -30,6 +30,7 @@
 #include    "pneumo-splitter.h"
 #include    "kme-60-044.h"
 #include    "ekg-8g.h"
+#include    "rectifier.h"
 
 /*!
  * \class
@@ -180,6 +181,19 @@ private:
 
     /// Главный контроллер (переключение обмоток тягового трансформатора)
     EKG_8G                  *main_controller;
+
+    enum
+    {
+        NUM_VU = 2,
+        VU1 = 0,
+        VU2 = 1
+    };
+
+    /// Выпрямительные установки
+    std::array<Rectifier *, NUM_VU> vu;
+
+    /// Механизм киловольтметра ТЭД
+    Oscillator  *gauge_KV_motors;
 
     /// Общая инициализация локомотива
     void initialization();

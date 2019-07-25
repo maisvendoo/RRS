@@ -27,7 +27,7 @@ enum
     TUMBLER_GV_ON = 35,
     TUMBLER_GV_ON_OFF = 36,
 
-    STRELKA_KV2 = 99,
+
 
     SIG_LIGHT_PSS_L = 50,
     SIG_LIGHT_PSS_PROPUSK = 51,
@@ -71,7 +71,10 @@ enum
     TUMBLER_MV4 = 70,
 
     TUMBLER_MV5 = 86,
-    TUMBLER_MV6 = 84
+    TUMBLER_MV6 = 84,
+
+    STRELKA_KV1 = 98,
+    STRELKA_KV2 = 99
 };
 
 #endif // VL60_SIGNALS_H

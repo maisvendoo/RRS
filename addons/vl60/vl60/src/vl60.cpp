@@ -217,6 +217,15 @@ void VL60::initialization()
     main_controller = new EKG_8G();
     main_controller->read_custom_config(config_dir + QDir::separator() + "ekg-8g");
     connect(main_controller, &EKG_8G::soundPlay, this, &VL60::soundPlay);
+
+    for (size_t i = 0; i < vu.size(); ++i)
+    {
+        vu[i] = new Rectifier();
+        vu[i]->read_custom_config(config_dir + QDir::separator() + "VU");
+    }
+
+    gauge_KV_motors = new Oscillator();
+    gauge_KV_motors->read_custom_config(config_dir + QDir::separator() + "KV1-osc");
 }
 
 //------------------------------------------------------------------------------
@@ -439,6 +448,15 @@ void VL60::stepTractionControl(double t, double dt)
     main_controller->enable(cu_tumbler.getState() && static_cast<bool>(ubt->getState()));
     main_controller->setKMstate(controller->getState());
     main_controller->step(t, dt);
+
+    for (auto v : vu)
+    {
+        v->setU_in(trac_trans->getTracVoltage());
+        v->step(t, dt);
+    }
+
+    gauge_KV_motors->setInput(vu[VU1]->getU_out());
+    gauge_KV_motors->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -473,6 +491,9 @@ void VL60::stepSignalsOutput()
 
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
+
+    // Вольтметр ТЭД
+    analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 1500.0);
 
     // Состояние главного выключателя
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
