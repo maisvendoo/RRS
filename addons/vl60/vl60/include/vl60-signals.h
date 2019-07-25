@@ -23,6 +23,7 @@ enum
     TUMBLER_PNT1 = 31,
     TUMBLER_PNT2 = 32,
 
+    TUMBLER_CU = 34,
     TUMBLER_GV_ON = 35,
     TUMBLER_GV_ON_OFF = 36,
 

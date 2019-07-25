@@ -20,6 +20,10 @@ public:
 
     float getSelsinPosition() const;
 
+    bool isLongMotionPos() const;
+
+    void enable(bool value);
+
 private:
 
     enum
@@ -38,6 +42,12 @@ private:
     /// Время переключения одной позиции, с
     double  switch_time;
 
+    /// Признак подачи управляющего питания на серводвигатель ЭКГ
+    bool    is_enabled;
+
+    /// Признак готовности ЭКГ к работе
+    bool    is_ready;
+
     /// Таймер управления переключением позиций
     Timer   pos_switcher;
 
@@ -50,6 +60,22 @@ private:
     /// Тригер для фиксации выключения
     Trigger      fix_off;
 
+    /// Признаки нулевой и ходовых позиций
+    std::array<bool, NUM_POSITIONS> is_long_motion;
+
+    enum
+    {
+        LM_POS0 = 0,
+        LM_POS1 = 5,
+        LM_POS2 = 9,
+        LM_POS3 = 13,
+        LM_POS4 = 17,
+        LM_POS5 = 25,
+        LM_POS6 = 29,
+        LM_POS7 = 33,
+        LM_POS8 = 37
+    };
+
     void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -57,6 +83,8 @@ private:
     void load_config(CfgReader &cfg);
 
     void stepDiscrete(double t, double dt);
+
+    void process();
 
 private slots:
 

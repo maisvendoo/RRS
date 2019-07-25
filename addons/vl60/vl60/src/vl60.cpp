@@ -63,6 +63,10 @@ VL60::VL60() : Vehicle ()
     mk_tumbler.setOnSoundName("K_Tumbler_On");
     mk_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&mk_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    cu_tumbler.setOnSoundName("K_Tumbler_On");
+    cu_tumbler.setOffSoundName("K_Tumbler_Off");
+    connect(&cu_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
 }
 
 //------------------------------------------------------------------------------
@@ -428,6 +432,7 @@ void VL60::stepTractionControl(double t, double dt)
     controller->setControl(keys);
     controller->step(t, dt);
 
+    main_controller->enable(cu_tumbler.getState() && static_cast<bool>(ubt->getState()));
     main_controller->setKMstate(controller->getState());
     main_controller->step(t, dt);
 }
@@ -460,6 +465,8 @@ void VL60::stepSignalsOutput()
 
     analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler.getState());
 
+    analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler.getState());
+
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
 
@@ -473,7 +480,7 @@ void VL60::stepSignalsOutput()
     analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();
     analogSignal[SIG_LIGHT_GU] = 1.0f;
     analogSignal[SIG_LIGHT_FR] = phase_spliter->isNotReady();
-    analogSignal[SIG_LIGHT_0HP] = 1.0f;
+    analogSignal[SIG_LIGHT_0HP] = static_cast<float>(main_controller->isLongMotionPos());
     analogSignal[SIG_LIGHT_TR] = cut (motor_fans[MV3]->isNoReady() + motor_fans[MV4]->isNoReady(), 0.0f, 1.0f);
     analogSignal[SIG_LIGHT_VU1] = cut (motor_fans[MV1]->isNoReady() + motor_fans[MV2]->isNoReady(), 0.0f, 1.0f);
     analogSignal[SIG_LIGHT_VU2] = cut (motor_fans[MV5]->isNoReady() + motor_fans[MV6]->isNoReady(), 0.0f, 1.0f);
@@ -643,6 +650,15 @@ void VL60::keyProcess()
             mk_tumbler.set();
         else
             mk_tumbler.reset();
+    }
+
+    // Включение/выключение цепей управления
+    if (getKeyState(KEY_Q))
+    {
+        if (isShift())
+            cu_tumbler.set();
+        else
+            cu_tumbler.reset();
     }
 }
 

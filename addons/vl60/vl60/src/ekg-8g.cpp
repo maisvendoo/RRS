@@ -7,9 +7,22 @@ EKG_8G::EKG_8G(QObject *parent) : Device(parent)
   , position(0)
   , ref_position(0)
   , switch_time(1.0)
+  , is_enabled(false)
+  , is_ready(false)
 {
     connect(&pos_switcher, &Timer::process, this, &EKG_8G::slotPosSwitch);
-    pos_switcher.start();
+
+    std::fill(is_long_motion.begin(), is_long_motion.end(), false);
+
+    is_long_motion[LM_POS0] = true;
+    is_long_motion[LM_POS1] = true;
+    is_long_motion[LM_POS2] = true;
+    is_long_motion[LM_POS3] = true;
+    is_long_motion[LM_POS4] = true;
+    is_long_motion[LM_POS5] = true;
+    is_long_motion[LM_POS6] = true;
+    is_long_motion[LM_POS7] = true;
+    is_long_motion[LM_POS8] = true;
 }
 
 //------------------------------------------------------------------------------
@@ -39,7 +52,23 @@ float EKG_8G::getSelsinPosition() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EKG_8G::preStep(state_vector_t &Y, double t)
+bool EKG_8G::isLongMotionPos() const
+{
+    return is_long_motion[static_cast<size_t>(position)];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EKG_8G::enable(bool value)
+{
+    is_enabled = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EKG_8G::process()
 {
     if (km_state.pos_state[POS_AV])
     {
@@ -77,6 +106,37 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
     {
         if (ref_position == position)
             ref_position++;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EKG_8G::preStep(state_vector_t &Y, double t)
+{
+    // Если на ЭКГ подано питание
+    if (is_enabled)
+    {
+        // Запускаем схему переключения позиций
+        if (!pos_switcher.isStarted())
+        {
+            pos_switcher.start();
+
+            // Если вал не в нулевой позиции, возвращаем его туда
+            if (position != 0)
+                ref_position = 0;
+        }
+
+        if (is_ready)
+            process();
+        else
+            // Устанавливаем готовность по состоянию рукоятки КМ
+            is_ready = km_state.pos_state[POS_ZERO];
+    }
+    else
+    {
+        pos_switcher.stop();
+        is_ready = false;
     }
 
     ref_position = cut(ref_position, 0, static_cast<int>(NUM_POSITIONS - 1));

@@ -111,6 +111,9 @@ private:
     /// Тригер тумблера управления мотор-компрессором
     Trigger mk_tumbler;
 
+    /// Триггер тумблера "Цепи управления"
+    Trigger cu_tumbler;
+
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 
