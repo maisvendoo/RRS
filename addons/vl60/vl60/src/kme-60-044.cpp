@@ -117,7 +117,7 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     if (getKeyState(KEY_D))
     {
         if (getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R))
-            main_pos = 0;
+            main_pos = POS_ZERO;
         else
         {
             if (!decMainPos->isStarted())
@@ -191,7 +191,7 @@ void ControllerKME_60_044::decMain()
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::incRevers()
 {
-    if ( (revers_pos < REVERS_FORWARD) && (main_pos != POS_ZERO) )
+    if ( (revers_pos == REVERS_BACKWARD) && (main_pos != POS_ZERO) )
         return;
 
     revers_pos++;
@@ -204,7 +204,7 @@ void ControllerKME_60_044::incRevers()
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::decRevers()
 {
-    if ( (revers_pos < REVERS_FORWARD) && (main_pos != POS_ZERO) )
+    if ( (revers_pos == REVERS_FORWARD) && (main_pos != POS_ZERO) )
         return;
 
     revers_pos--;

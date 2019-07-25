@@ -180,6 +180,11 @@ feedback_signals_t Device::getFeedback() const
     return feedback;
 }
 
+void Device::setCustomConfigDir(const QString &value)
+{
+    custom_config_dir = value;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

@@ -73,6 +73,8 @@ enum
     TUMBLER_MV5 = 86,
     TUMBLER_MV6 = 84,
 
+    STRELKA_AMP1 = 96,
+    STRELKA_AMP2 = 97,
     STRELKA_KV1 = 98,
     STRELKA_KV2 = 99
 };

@@ -226,6 +226,13 @@ void VL60::initialization()
 
     gauge_KV_motors = new Oscillator();
     gauge_KV_motors->read_custom_config(config_dir + QDir::separator() + "KV1-osc");
+
+    for (size_t i = 0; i < motor.size(); ++i)
+    {
+        motor[i] = new DCMotor();
+        motor[i]->setCustomConfigDir(config_dir);
+        motor[i]->read_custom_config(config_dir + QDir::separator() + "HB-412K");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -457,6 +464,23 @@ void VL60::stepTractionControl(double t, double dt)
 
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
     gauge_KV_motors->step(t, dt);
+
+    double ip = 2.73;
+
+    motor[TED1]->setU(vu[VU1]->getU_out());
+    motor[TED2]->setU(vu[VU1]->getU_out());
+    motor[TED3]->setU(vu[VU1]->getU_out());
+
+    motor[TED4]->setU(vu[VU2]->getU_out());
+    motor[TED5]->setU(vu[VU2]->getU_out());
+    motor[TED6]->setU(vu[VU2]->getU_out());
+
+    for (size_t i = 0; i < motor.size(); ++i)
+    {
+        motor[i]->setOmega(ip * wheel_omega[i]);
+        Q_a[i+1] = motor[i]->getTorque() * ip;
+        motor[i]->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -536,6 +560,9 @@ void VL60::stepSignalsOutput()
 
     // Положение рукоятки КВТ
     analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane->getHandlePosition());
+
+    analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
+    analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
 }
 
 //------------------------------------------------------------------------------
@@ -543,7 +570,9 @@ void VL60::stepSignalsOutput()
 //------------------------------------------------------------------------------
 bool VL60::getHoldingCoilState() const
 {
-    bool state = true;
+    km_state_t km_state = controller->getState();
+
+    bool state = !km_state.pos_state[POS_BV];
 
     return state;
 }

@@ -73,6 +73,8 @@ public:
     ///
     feedback_signals_t getFeedback() const;
 
+    void setCustomConfigDir(const QString &value);
+
 signals:
 
     /// Print debug info into file
@@ -111,6 +113,8 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback;
+
+    QString custom_config_dir;
 
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;

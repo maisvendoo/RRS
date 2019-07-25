@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>1</Order>
+		<R_a>0.031</R_a>
+		<R_gp>0.0238</R_gp>
+		<R_dp>0.032</R_dp>
+		<L_af>0.01</L_af>
+		<cPhi>nb-412k.txt</cPhi>
+	</Device>
+</Config>

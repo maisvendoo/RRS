@@ -31,6 +31,7 @@
 #include    "kme-60-044.h"
 #include    "ekg-8g.h"
 #include    "rectifier.h"
+#include    "dc-motor.h"
 
 /*!
  * \class
@@ -194,6 +195,20 @@ private:
 
     /// Механизм киловольтметра ТЭД
     Oscillator  *gauge_KV_motors;
+
+    enum
+    {
+        NUM_MOTORS = 6,
+        TED1 = 0,
+        TED2 = 1,
+        TED3 = 2,
+        TED4 = 3,
+        TED5 = 4,
+        TED6 = 5
+    };
+
+    /// Тяговые электродвигатели
+    std::array<DCMotor *, NUM_MOTORS>  motor;
 
     /// Общая инициализация локомотива
     void initialization();
