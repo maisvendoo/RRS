@@ -17,11 +17,9 @@
 // Конструктор
 //------------------------------------------------------------------------------
 Km21KR2::Km21KR2(QObject* parent) : Device(parent)
-  , up(false)
-  , up1(false)
-  , zero(true)
-  , down1(false)
-  , down(false)
+  , k21(true)
+  , k22(true)
+  , k23(false)
 {
 
 }
@@ -55,7 +53,7 @@ void Km21KR2::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void Km21KR2::preStep(state_vector_t& Y, double t)
 {
-//    int zu = 0;
+
 }
 
 //------------------------------------------------------------------------------
@@ -63,44 +61,54 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void Km21KR2::stepKeysControl(double t, double dt)
 {
-    up = getKeyState(KEY_Q);
-    up1 = getKeyState(KEY_A);
-
+    // Авт. набор
+    if (getKeyState(KEY_Q))
+    {
+        k21 = true;
+        k22 = true;
+        k23 = true;
+    }
+    // 1 вверх
     if (getKeyState(KEY_E))
     {
-        down = true;
-    }
-    if (getKeyState(KEY_D) && isControl())
-    {
-        down = false;
-    }
-    if (getKeyState(KEY_D) && !isControl())
-    {
-        down1 = true;
+        k21 = false;
+        k22 = true;
+        k23 = true;
     }
     else
     {
-        down1 = false;
+        k21 = true;
+        k22 = true;
+        k23 = false;
     }
-
-    if (!up && !up1 && !down1 && !down)
+    // 1 вниз
+    if (getKeyState(KEY_A))
     {
-        zero = true;
+        k21 = false;
+        k22 = false;
+        k23 = false;
     }
-    else
+
+    // Авт. сброс
+    if (getKeyState(KEY_D))
     {
-        zero = false;
+        k21 = true;
+        k22 = false;
+        k23 = false;
+    }
+    // Ноль
+    if (getKeyState(KEY_Z))
+    {
+        k21 = true;
+        k22 = true;
+        k23 = false;
     }
 
-    double s01 = static_cast<double>(up);
-    double s02 = static_cast<double>(up1);
-    double s03 = static_cast<double>(zero);
-    double s04 = static_cast<double>(down1);
-    double s05 = static_cast<double>(down);
 
-    controlState.a2b2 = s01 + s03 + s05;
-    controlState.c2d2 = s01 + s02 + s03;
-    controlState.e2f2 = s01 + s02;
-    controlState.i2g2 = s03 + s04 + s05;
-    controlState.j2k2 = s04 + s05;
+    controlState.up = k21 * k23;
+    controlState.up1 = !k21 * k23;
+    controlState.zero = k22 * !k23;
+    controlState.down1 = !k21 * !k22;
+    controlState.down = k21 * !k22;
+
 }

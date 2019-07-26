@@ -18,18 +18,18 @@
 //------------------------------------------------------------------------------
 struct ControllerState
 {
-    double a2b2;
-    double c2d2;
-    double e2f2;
-    double i2g2;
-    double j2k2;
+    double up;
+    double up1;
+    double zero;
+    double down1;
+    double down;
 
     ControllerState()
-        : a2b2(0)
-        , c2d2(0)
-        , e2f2(0)
-        , i2g2(0)
-        , j2k2(0)
+        : up(0)
+        , up1(0)
+        , zero(0)
+        , down1(0)
+        , down(0)
     {
 
     }

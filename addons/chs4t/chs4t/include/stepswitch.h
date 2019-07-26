@@ -31,10 +31,10 @@ public:
 
     void setCtrlState(ControllerState ctrlState) { this->ctrlState = ctrlState; }
 
-    double getv1() { return  v1; }
-    double getv2() { return  v2; }
+//    double getv1() { return  v1; }
+//    double getv2() { return  v2; }
     int getPoz() { return poz; }
-    double getSr() { return shaft_rel; }
+//    double getSr() { return shaft_rel; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -45,43 +45,46 @@ private:
 
     ControllerState ctrlState;
 
-    Trigger *rs;
+    double V;
 
-//    int steps;
+    double poz_d;
+
+    int poz;
+
+//    Trigger *rs;
 
 //    double f1 -- Y[0];
 
-    double s62;
-    double s67;
-    double s69;
-    double s45;
-    double s43;
-    double s410;
+//    double s62;
+//    double s67;
+//    double s69;
+//    double s45;
+//    double s43;
+//    double s410;
 
-    double shaft_rel;
+//    double shaft_rel;
 
-    double PI;
-    double p1;
-    double p2;
-    double p3;
-    double p4;
+//    double PI;
+//    double p1;
+//    double p2;
+//    double p3;
+//    double p4;
 
-    double KL;
-    double AB;
-    double GH;
-    double CD;
-    double EF;
-    double IJ;
-    double NM;
-    double UV;
-    double HG;
+//    double KL;
+//    double AB;
+//    double GH;
+//    double CD;
+//    double EF;
+//    double IJ;
+//    double NM;
+//    double UV;
+//    double HG;
 
-    double v1;
-    double v2;
-    double u;
+//    double v1;
+//    double v2;
+//    double u;
 
-    double ang_vel;
-    int poz;
+//    double ang_vel;
 
 };
 
