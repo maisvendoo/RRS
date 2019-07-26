@@ -39,3 +39,5 @@ void TEP70::loadConfig(QString cfg_path)
 
     }
 }
+
+GET_VEHICLE(TEP70)
