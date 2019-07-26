@@ -262,14 +262,16 @@ void VL60::step(double t, double dt)
 
     stepTractionControl(t, dt);
 
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uвых: %6 Поз.: %7")
+    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uвых: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getShoeForce() / 1000.0, 5, 'f', 1)
             .arg(trac_trans->getTracVoltage(), 6, 'f', 1)
-            .arg(trac_trans->getPosName(), 2);
+            .arg(trac_trans->getPosName(), 2)
+            .arg(motor[TED1]->getIa(), 6,'f',1)
+            .arg(motor[TED1]->getIf(), 6,'f',1);
 }
 
 //------------------------------------------------------------------------------
@@ -517,7 +519,7 @@ void VL60::stepSignalsOutput()
     analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
 
     // Вольтметр ТЭД
-    analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 1500.0);
+    analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
 
     // Состояние главного выключателя
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
