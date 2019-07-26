@@ -32,6 +32,7 @@
 #include    "ekg-8g.h"
 #include    "rectifier.h"
 #include    "dc-motor.h"
+#include    "overload-relay.h"
 
 /*!
  * \class
@@ -210,6 +211,9 @@ private:
     /// Тяговые электродвигатели
     std::array<DCMotor *, NUM_MOTORS>  motor;
 
+    /// Реле перегрузки ТЭД
+    std::array<OverloadRelay *, NUM_MOTORS> overload_relay;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -261,6 +265,8 @@ private:
     /// Обработка нажатий клавиш
     void keyProcess();
 
+    void initTractionControl();
+    void debugPrint(double t);
 };
 
 #endif // VL60_H

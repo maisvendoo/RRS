@@ -25,7 +25,11 @@ public:
 
     double getIf() const;
 
+    double getUd() const;
+
     void setBeta(double value);
+
+    void setDirection(int revers_state);
 
 private:
 
@@ -54,6 +58,10 @@ private:
 
     /// Момент на валу
     double torque;
+
+    double  omega_max;
+
+    int     direction;
 
     MotorMagneticChar cPhi;
 

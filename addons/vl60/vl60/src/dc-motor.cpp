@@ -15,6 +15,8 @@ DCMotor::DCMotor(QObject *parent) : Device(parent)
     , omega(0.0)
     , U(0.0)
     , torque(0.0)
+    , omega_max(100.0)
+    , direction(1)
 {
 
 }
@@ -70,6 +72,14 @@ double DCMotor::getIf() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+double DCMotor::getUd() const
+{
+    return U - getIa() * R_r;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void DCMotor::setBeta(double value)
 {
     beta = value;
@@ -78,9 +88,22 @@ void DCMotor::setBeta(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void DCMotor::setDirection(int revers_state)
+{
+    if (revers_state == 0)
+        return;
+    else
+        direction = revers_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void DCMotor::preStep(state_vector_t &Y, double t)
 {
-    torque = Y[0] * cPhi.getValue(Y[0] * beta);
+    torque = Y[0] * cPhi.getValue(Y[0] * beta * direction);
+
+    emit soundSetPitch("TED", static_cast<float>(omega / omega_max));
 }
 
 //------------------------------------------------------------------------------
@@ -91,7 +114,7 @@ void DCMotor::ode_system(const state_vector_t &Y,
                          double t)
 {
     double R = R_a + beta * R_gp + R_dp + R_r;
-    double E = omega * cPhi.getValue(Y[0] * beta);
+    double E = omega * cPhi.getValue(Y[0] * beta * direction);
 
     dYdt[0] = (U - R * Y[0] - E) / L_af;
 }
@@ -108,6 +131,7 @@ void DCMotor::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "R_dp", R_dp);
     cfg.getDouble(secName, "R_r", R_r);
     cfg.getDouble(secName, "L_af", L_af);
+    cfg.getDouble(secName, "OmegaMax", omega_max);
 
     QString cPhiFileName = "";
 

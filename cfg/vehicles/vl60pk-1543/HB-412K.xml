@@ -8,5 +8,6 @@
 		<R_r>0.516</R_r>
 		<L_af>0.01</L_af>
 		<cPhi>nb-412k.txt</cPhi>
+		<OmegaMax>175.9</OmegaMax>
 	</Device>
 </Config>

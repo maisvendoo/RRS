@@ -195,23 +195,8 @@ void VL60::initBrakeEquipment(QString modules_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initialization()
+void VL60::initTractionControl()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString modules_dir = QString(fs.getModulesDir().c_str());
-
-    initPantographs();
-
-    initHighVoltageScheme();
-
-    initSupplyMachines();
-
-    initBrakeControls(modules_dir);
-
-    initBrakeMechanics();
-
-    initBrakeEquipment(modules_dir);
-
     controller = new ControllerKME_60_044();
 
     main_controller = new EKG_8G();
@@ -232,7 +217,50 @@ void VL60::initialization()
         motor[i] = new DCMotor();
         motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_custom_config(config_dir + QDir::separator() + "HB-412K");
+
+        overload_relay[i] = new OverloadRelay();
+        overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initialization()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    initPantographs();
+
+    initHighVoltageScheme();
+
+    initSupplyMachines();
+
+    initBrakeControls(modules_dir);
+
+    initBrakeMechanics();
+
+    initBrakeEquipment(modules_dir);
+
+    initTractionControl();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::debugPrint(double t)
+{
+    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uтэд: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
+            .arg(t, 10, 'f', 2)
+            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
+            .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
+            .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2)
+            .arg(trolley_mech[TROLLEY_FWD]->getShoeForce() / 1000.0, 5, 'f', 1)
+            .arg(motor[TED1]->getUd(), 6, 'f', 1)
+            .arg(trac_trans->getPosName(), 2)
+            .arg(motor[TED1]->getIa(), 6,'f',1)
+            .arg(motor[TED1]->getIf(), 6,'f',1);
 }
 
 //------------------------------------------------------------------------------
@@ -262,16 +290,7 @@ void VL60::step(double t, double dt)
 
     stepTractionControl(t, dt);
 
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uвых: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
-            .arg(t, 10, 'f', 2)
-            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
-            .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(trolley_mech[TROLLEY_FWD]->getShoeForce() / 1000.0, 5, 'f', 1)
-            .arg(trac_trans->getTracVoltage(), 6, 'f', 1)
-            .arg(trac_trans->getPosName(), 2)
-            .arg(motor[TED1]->getIa(), 6,'f',1)
-            .arg(motor[TED1]->getIf(), 6,'f',1);
+    debugPrint(t);
 }
 
 //------------------------------------------------------------------------------
@@ -464,7 +483,7 @@ void VL60::stepTractionControl(double t, double dt)
         v->step(t, dt);
     }
 
-    gauge_KV_motors->setInput(vu[VU1]->getU_out());
+    gauge_KV_motors->setInput(motor[TED1]->getUd());
     gauge_KV_motors->step(t, dt);
 
     double ip = 2.73;
@@ -477,11 +496,17 @@ void VL60::stepTractionControl(double t, double dt)
     motor[TED5]->setU(vu[VU2]->getU_out());
     motor[TED6]->setU(vu[VU2]->getU_out());
 
+    km_state_t km_state = controller->getState();
+
     for (size_t i = 0; i < motor.size(); ++i)
     {
+        motor[i]->setDirection(km_state.revers_ref_state);
         motor[i]->setOmega(ip * wheel_omega[i]);
         Q_a[i+1] = motor[i]->getTorque() * ip;
         motor[i]->step(t, dt);
+
+        overload_relay[i]->setCurrent(motor[i]->getIa());
+        overload_relay[i]->step(t, dt);
     }
 }
 
@@ -574,7 +599,14 @@ bool VL60::getHoldingCoilState() const
 {
     km_state_t km_state = controller->getState();
 
-    bool state = !km_state.pos_state[POS_BV];
+    bool no_overload = true;
+
+    for (auto ov_relay : overload_relay)
+    {
+        no_overload = no_overload && (!static_cast<bool>(ov_relay->getState()));
+    }
+
+    bool state = !km_state.pos_state[POS_BV] && no_overload;
 
     return state;
 }
