@@ -4,8 +4,8 @@
 
 		<Order>1</Order>
 
-		<!-- Время переключения на одну позицию, мс -->
-		<PosSwitchIntelval>540</PosSwitchIntelval>ss
+		<!-- Время рабора позиций с 0 до 33 -->
+		<PosSwitchTime>17</PosSwitchTime>
 
 	</Device>
 </Config>

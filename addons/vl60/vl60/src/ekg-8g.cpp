@@ -169,9 +169,9 @@ void EKG_8G::load_config(CfgReader &cfg)
 
     int switch_interval = 0;
 
-    if (cfg.getInt(secName, "PosSwitchIntelval", switch_interval))
+    if (cfg.getInt(secName, "PosSwitchTime", switch_interval))
     {
-        switch_time = static_cast<double>(switch_interval) / 1000.0;
+        switch_time = static_cast<double>(switch_interval) / NUM_POSITIONS;
     }
 
     pos_switcher.setTimeout(switch_time);

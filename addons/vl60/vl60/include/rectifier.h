@@ -18,6 +18,8 @@ public:
 
     double getU_out() const;
 
+    void setI_out(double value);
+
 private:
 
     /// Коэффициент, связывающией входное и выходное напряжение
@@ -25,7 +27,11 @@ private:
 
     double U_in;
 
+    double I_out;
+
     double U_out;
+
+    double r;
 
     void preStep(state_vector_t &Y, double t);
 

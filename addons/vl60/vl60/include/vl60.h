@@ -214,6 +214,9 @@ private:
     /// Реле перегрузки ТЭД
     std::array<OverloadRelay *, NUM_MOTORS> overload_relay;
 
+    /// Линейные контакторы ТЭД
+    std::array<Trigger, NUM_MOTORS> line_contactor;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -257,6 +260,12 @@ private:
     void stepAirDistributors(double t, double dt);
 
     void stepTractionControl(double t, double dt);
+
+    void stepLineContactors(double t, double dt);
+
+    void lineContactorsControl(bool state);
+
+    float isLineContactorsOff();
 
     void stepSignalsOutput();
 

@@ -251,7 +251,7 @@ void VL60::initialization()
 //------------------------------------------------------------------------------
 void VL60::debugPrint(double t)
 {
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uтэд: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
+    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 Uтэд: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
@@ -260,7 +260,8 @@ void VL60::debugPrint(double t)
             .arg(motor[TED1]->getUd(), 6, 'f', 1)
             .arg(trac_trans->getPosName(), 2)
             .arg(motor[TED1]->getIa(), 6,'f',1)
-            .arg(motor[TED1]->getIf(), 6,'f',1);
+            .arg(motor[TED1]->getIf(), 6,'f',1)
+            .arg(vu[VU1]->getU_out(), 6, 'f', 1);
 }
 
 //------------------------------------------------------------------------------
@@ -289,6 +290,8 @@ void VL60::step(double t, double dt)
     stepSignalsOutput();
 
     stepTractionControl(t, dt);
+
+    stepLineContactors(t, dt);
 
     debugPrint(t);
 }
@@ -477,37 +480,93 @@ void VL60::stepTractionControl(double t, double dt)
     main_controller->setKMstate(controller->getState());
     main_controller->step(t, dt);
 
-    for (auto v : vu)
-    {
-        v->setU_in(trac_trans->getTracVoltage());
-        v->step(t, dt);
-    }
-
-    gauge_KV_motors->setInput(motor[TED1]->getUd());
+    gauge_KV_motors->setInput(vu[VU1]->getU_out());
     gauge_KV_motors->step(t, dt);
 
     double ip = 2.73;
 
-    motor[TED1]->setU(vu[VU1]->getU_out());
-    motor[TED2]->setU(vu[VU1]->getU_out());
-    motor[TED3]->setU(vu[VU1]->getU_out());
+    motor[TED1]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED1].getState()));
+    motor[TED2]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED2].getState()));
+    motor[TED3]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED3].getState()));
 
-    motor[TED4]->setU(vu[VU2]->getU_out());
-    motor[TED5]->setU(vu[VU2]->getU_out());
-    motor[TED6]->setU(vu[VU2]->getU_out());
+    motor[TED4]->setU(vu[VU2]->getU_out() * static_cast<double>(line_contactor[TED4].getState()));
+    motor[TED5]->setU(vu[VU2]->getU_out() * static_cast<double>(line_contactor[TED5].getState()));
+    motor[TED6]->setU(vu[VU2]->getU_out() * static_cast<double>(line_contactor[TED6].getState()));
 
     km_state_t km_state = controller->getState();
+
+    double I_vu = 0;
 
     for (size_t i = 0; i < motor.size(); ++i)
     {
         motor[i]->setDirection(km_state.revers_ref_state);
         motor[i]->setOmega(ip * wheel_omega[i]);
+        motor[i]->setBetaStep(km_state.field_loosen_pos);
         Q_a[i+1] = motor[i]->getTorque() * ip;
         motor[i]->step(t, dt);
+
+        I_vu += motor[i]->getIa();
 
         overload_relay[i]->setCurrent(motor[i]->getIa());
         overload_relay[i]->step(t, dt);
     }
+
+    for (auto v : vu)
+    {
+        v->setI_out(I_vu);
+        v->setU_in(trac_trans->getTracVoltage());
+        v->step(t, dt);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepLineContactors(double t, double dt)
+{
+    km_state_t km_state = controller->getState();
+
+    bool motor_fans_state = true;
+
+    for (auto mv: motor_fans)
+    {
+        motor_fans_state = motor_fans_state && !static_cast<bool>(mv->isNoReady());
+    }
+
+    bool lk_state = !km_state.pos_state[POS_BV] &&
+                    !km_state.pos_state[POS_ZERO] &&
+                    motor_fans_state;
+
+    lineContactorsControl(lk_state);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::lineContactorsControl(bool state)
+{
+    for (size_t i = 0; i < line_contactor.size(); ++i)
+    {
+        if (state)
+            line_contactor[i].set();
+        else
+            line_contactor[i].reset();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float VL60::isLineContactorsOff()
+{
+    bool state = true;
+
+    for (size_t i = 0; i < line_contactor.size(); ++i)
+    {
+        state = state && line_contactor[i].getState();
+    }
+
+    return 1.0f - static_cast<float>(state);
 }
 
 //------------------------------------------------------------------------------
@@ -554,13 +613,13 @@ void VL60::stepSignalsOutput()
 
     // Состояние контрольных ламп
     analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();
-    analogSignal[SIG_LIGHT_GU] = 1.0f;
+    analogSignal[SIG_LIGHT_GU] = phase_spliter->isNotReady();
     analogSignal[SIG_LIGHT_FR] = phase_spliter->isNotReady();
     analogSignal[SIG_LIGHT_0HP] = static_cast<float>(main_controller->isLongMotionPos());
     analogSignal[SIG_LIGHT_TR] = cut (motor_fans[MV3]->isNoReady() + motor_fans[MV4]->isNoReady(), 0.0f, 1.0f);
     analogSignal[SIG_LIGHT_VU1] = cut (motor_fans[MV1]->isNoReady() + motor_fans[MV2]->isNoReady(), 0.0f, 1.0f);
     analogSignal[SIG_LIGHT_VU2] = cut (motor_fans[MV5]->isNoReady() + motor_fans[MV6]->isNoReady(), 0.0f, 1.0f);
-    analogSignal[SIG_LIGHT_TD] = 1.0;    
+    analogSignal[SIG_LIGHT_TD] = isLineContactorsOff();
 
     analogSignal[KONTROLLER] = controller->getMainHandlePos();
     analogSignal[REVERS] = controller->getReversHandlePos();
@@ -589,7 +648,7 @@ void VL60::stepSignalsOutput()
     analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane->getHandlePosition());
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
-    analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
+    analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);    
 }
 
 //------------------------------------------------------------------------------

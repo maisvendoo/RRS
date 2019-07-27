@@ -5,6 +5,10 @@
 //------------------------------------------------------------------------------
 Rectifier::Rectifier(QObject *parent) : Device(parent)
   , coeff(1.0)
+  , U_in(0.0)
+  , I_out(0.0)
+  , U_out(0.0)
+  , r(0.086)
 {
 
 }
@@ -33,12 +37,17 @@ double Rectifier::getU_out() const
     return U_out;
 }
 
+void Rectifier::setI_out(double value)
+{
+    I_out = value;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void Rectifier::preStep(state_vector_t &Y, double t)
 {
-    U_out = coeff * U_in;
+    U_out = coeff * U_in - r * I_out;
 }
 
 //------------------------------------------------------------------------------

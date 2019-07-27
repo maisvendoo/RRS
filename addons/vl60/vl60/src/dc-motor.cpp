@@ -85,6 +85,14 @@ void DCMotor::setBeta(double value)
     beta = value;
 }
 
+void DCMotor::setBetaStep(int step)
+{
+    if (fieldStep.contains(step))
+    {
+        setBeta(fieldStep[step]);
+    }
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -138,4 +146,21 @@ void DCMotor::load_config(CfgReader &cfg)
     cfg.getString(secName, "cPhi", cPhiFileName);
 
     cPhi.load((custom_config_dir + QDir::separator() + cPhiFileName).toStdString());
+
+    QDomNode secNode;
+
+    secNode = cfg.getFirstSection("FieldPos");
+
+    while (!secNode.isNull())
+    {
+        double field_step = 0.95;
+        int number = 0;
+
+        cfg.getInt(secNode, "Number", number);
+        cfg.getDouble(secNode, "beta", field_step);
+
+        fieldStep.insert(number, field_step);
+
+        secNode = cfg.getNextSection();
+    }
 }

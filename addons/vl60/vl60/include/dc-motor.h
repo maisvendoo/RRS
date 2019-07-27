@@ -29,6 +29,8 @@ public:
 
     void setBeta(double value);
 
+    void setBetaStep(int step);
+
     void setDirection(int revers_state);
 
 private:
@@ -64,6 +66,8 @@ private:
     int     direction;
 
     MotorMagneticChar cPhi;
+
+    QMap<int, double> fieldStep;
 
     void preStep(state_vector_t &Y, double t);
 
