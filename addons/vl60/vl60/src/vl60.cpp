@@ -249,6 +249,9 @@ void VL60::initialization()
     speed_meter->setWheelDiameter(wheel_diameter);
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
     connect(speed_meter, &SL2M::soundSetVolume, this, &VL60::soundSetVolume);
+
+    horn = new TrainHorn();
+    connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------
@@ -300,6 +303,9 @@ void VL60::step(double t, double dt)
 
     speed_meter->setOmega(wheel_omega[TED1]);
     speed_meter->step(t, dt);
+
+    horn->setControl(keys);
+    horn->step(t, dt);
 
     debugPrint(t);
 }

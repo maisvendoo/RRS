@@ -221,6 +221,9 @@ private:
     /// Локомотивный скоростемер
     SL2M    *speed_meter;
 
+    /// Свисток и тифон
+    TrainHorn   *horn;
+
     /// Общая инициализация локомотива
     void initialization();
 
