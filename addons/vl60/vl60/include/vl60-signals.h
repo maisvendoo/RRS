@@ -7,6 +7,8 @@ enum
     KRAN_KOMBIN = 1,
     KLUCH_367 = 2,
 
+    VAL_PR_SKOR2 = 7,
+    VAL_PR_SKOR1 = 8,
     STRELKA_SELSIN = 9,
     STRELKA_AMP_EPT = 10,
 
@@ -15,6 +17,7 @@ enum
     STRELKA_M_UR = 22,
     STRELKA_M_HM = 23,
     STRELKA_M_TC = 24,
+    STRELKA_SPEED = 26,
     KRAN254_RUK = 29,
 
     REVERS = 30,

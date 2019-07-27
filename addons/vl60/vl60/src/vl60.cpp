@@ -244,6 +244,11 @@ void VL60::initialization()
     initBrakeEquipment(modules_dir);
 
     initTractionControl();
+
+    speed_meter = new SL2M();
+    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
+    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------
@@ -292,6 +297,9 @@ void VL60::step(double t, double dt)
     stepTractionControl(t, dt);
 
     stepLineContactors(t, dt);
+
+    speed_meter->setOmega(wheel_omega[TED1]);
+    speed_meter->step(t, dt);
 
     debugPrint(t);
 }
@@ -535,7 +543,7 @@ void VL60::stepLineContactors(double t, double dt)
 
     bool lk_state = !km_state.pos_state[POS_BV] &&
                     !km_state.pos_state[POS_ZERO] &&
-                    motor_fans_state;
+                    motor_fans_state && main_controller->isReady();
 
     lineContactorsControl(lk_state);
 }
@@ -649,6 +657,10 @@ void VL60::stepSignalsOutput()
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
     analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);    
+
+    analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
+    analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
+    analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
 }
 
 //------------------------------------------------------------------------------

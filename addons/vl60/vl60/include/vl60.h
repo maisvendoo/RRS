@@ -33,6 +33,7 @@
 #include    "rectifier.h"
 #include    "dc-motor.h"
 #include    "overload-relay.h"
+#include    "sl2m.h"
 
 /*!
  * \class
@@ -216,6 +217,9 @@ private:
 
     /// Линейные контакторы ТЭД
     std::array<Trigger, NUM_MOTORS> line_contactor;
+
+    /// Локомотивный скоростемер
+    SL2M    *speed_meter;
 
     /// Общая инициализация локомотива
     void initialization();

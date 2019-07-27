@@ -26,6 +26,8 @@ public:
 
     int getPosition() const;
 
+    bool isReady() const;
+
 private:
 
     enum
