@@ -1,0 +1,4 @@
+#ifndef REGISTRATOR_H
+#define REGISTRATOR_H
+
+#endif // REGISTRATOR_H
