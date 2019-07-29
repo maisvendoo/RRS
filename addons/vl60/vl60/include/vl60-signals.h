@@ -78,8 +78,8 @@ enum
 
     STRELKA_AMP1 = 96,
     STRELKA_AMP2 = 97,
-    STRELKA_KV1 = 98,
-    STRELKA_KV2 = 99
+    STRELKA_KV1 = 99,
+    STRELKA_KV2 = 98
 };
 
 #endif // VL60_SIGNALS_H

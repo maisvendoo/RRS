@@ -111,8 +111,8 @@ void DCMotor::preStep(state_vector_t &Y, double t)
 {
     torque = Y[0] * calcCPhi(Y[0] * beta * direction);
 
-    emit soundSetPitch("TED", static_cast<float>(2 * omega / omega_nom));
-    emit soundSetVolume("TED", static_cast<int>(Y[0] / 50.0));
+    emit soundSetPitch("TED", static_cast<float>(omega / omega_nom));
+    emit soundSetVolume("TED", static_cast<int>(Y[0]));
 }
 
 //------------------------------------------------------------------------------
