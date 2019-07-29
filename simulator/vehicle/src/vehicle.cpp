@@ -385,7 +385,8 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPostStep(state_vector_t &Y, double t)
+void Vehicle::
+integrationPostStep(state_vector_t &Y, double t)
 {
     railway_coord = Y[idx];
     velocity = Y[idx + s];

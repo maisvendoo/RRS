@@ -3,6 +3,19 @@
 
 #include    "device.h"
 
+struct internal_resist_t
+{
+    double U;
+    double r;
+
+    internal_resist_t()
+        : U(0)
+        , r(0)
+    {
+
+    }
+};
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -33,11 +46,17 @@ private:
 
     double r;
 
+    std::vector<internal_resist_t> internal_resist;
+
     void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
+
+    internal_resist_t findResist(double u, internal_resist_t &next_res);
+
+    double getResist(double u);
 };
 
 #endif // RECTIFIER_H

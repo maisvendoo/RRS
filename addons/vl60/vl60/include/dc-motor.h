@@ -61,9 +61,9 @@ private:
     /// Момент на валу
     double torque;
 
-    double  omega_max;
+    double  omega_nom;
 
-    int     direction;
+    int     direction;    
 
     MotorMagneticChar cPhi;
 
@@ -75,7 +75,7 @@ private:
 
     void load_config(CfgReader &cfg);
 
-
+    double calcCPhi(double I);
 };
 
 #endif // DC_MOTOR_H

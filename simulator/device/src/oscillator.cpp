@@ -6,8 +6,7 @@ Oscillator::Oscillator(QObject *parent) : Device(parent)
   , coeff(1.0)
   , input(0.0)
 {
-    DebugLog *log = new DebugLog("osc.txt");
-    connect(this, &Oscillator::DebugPrint, log, &DebugLog::DebugPring);
+
 }
 
 Oscillator::~Oscillator()

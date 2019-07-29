@@ -34,6 +34,7 @@
 #include    "dc-motor.h"
 #include    "overload-relay.h"
 #include    "sl2m.h"
+#include    "registrator.h"
 
 /*!
  * \class
@@ -224,6 +225,9 @@ private:
     /// Свисток и тифон
     TrainHorn   *horn;
 
+    /// Регистратор, для записи параметров
+    Registrator *reg;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -244,6 +248,9 @@ private:
 
     /// Инициализация приборов торможения (ВР и сопуствующая обвязка)
     void initBrakeEquipment(QString modules_dir);
+
+    /// Инициализация схемы управления тягой
+    void initTractionControl();
 
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
@@ -276,12 +283,16 @@ private:
 
     void stepSignalsOutput();
 
+    void registration(double t, double dt);
+
+    double getTractionForce();
+
     bool getHoldingCoilState() const;
 
     /// Обработка нажатий клавиш
     void keyProcess();
 
-    void initTractionControl();
+
     void debugPrint(double t);
 };
 

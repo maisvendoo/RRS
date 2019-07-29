@@ -217,6 +217,8 @@ void VL60::initTractionControl()
         motor[i] = new DCMotor();
         motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_custom_config(config_dir + QDir::separator() + "HB-412K");
+        connect(motor[i], &DCMotor::soundSetPitch, this, &VL60::soundSetPitch);
+        connect(motor[i], &DCMotor::soundSetVolume, this, &VL60::soundSetVolume);
 
         overload_relay[i] = new OverloadRelay();
         overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
@@ -252,6 +254,8 @@ void VL60::initialization()
 
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
+
+    reg = new Registrator("vl60");
 }
 
 //------------------------------------------------------------------------------
@@ -259,7 +263,7 @@ void VL60::initialization()
 //------------------------------------------------------------------------------
 void VL60::debugPrint(double t)
 {
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 Uтэд: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
+    DebugMsg = QString("t: %1 v: %11 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 Uтэд: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
@@ -269,7 +273,8 @@ void VL60::debugPrint(double t)
             .arg(trac_trans->getPosName(), 2)
             .arg(motor[TED1]->getIa(), 6,'f',1)
             .arg(motor[TED1]->getIf(), 6,'f',1)
-            .arg(vu[VU1]->getU_out(), 6, 'f', 1);
+            .arg(vu[VU1]->getU_out(), 6, 'f', 1)
+            .arg(velocity * Physics::kmh, 6, 'f', 1);
 }
 
 //------------------------------------------------------------------------------
@@ -308,6 +313,8 @@ void VL60::step(double t, double dt)
     horn->step(t, dt);
 
     debugPrint(t);
+
+    registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -667,6 +674,42 @@ void VL60::stepSignalsOutput()
     analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
     analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::registration(double t, double dt)
+{
+    QString line = QString("%1 %2 %3 %4 %5 %6 %7")
+            .arg(t)
+            .arg(velocity * Physics::kmh)
+            .arg(motor[TED1]->getUd())
+            .arg(motor[TED1]->getIa())
+            .arg(motor[TED1]->getIf())
+            .arg(getTractionForce() / Physics::g)
+            .arg(R2 / Physics::g);
+
+    reg->print(line, t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double VL60::getTractionForce()
+{
+    double ip = 2.73;
+
+    double sumTorque = 0;
+
+    for (auto m : motor)
+    {
+        sumTorque += m->getTorque();
+    }
+
+    double force = sumTorque * ip * 2.0 / wheel_diameter;
+
+    return force;
 }
 
 //------------------------------------------------------------------------------

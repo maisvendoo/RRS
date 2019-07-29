@@ -15,8 +15,8 @@ DCMotor::DCMotor(QObject *parent) : Device(parent)
     , omega(0.0)
     , U(0.0)
     , torque(0.0)
-    , omega_max(100.0)
-    , direction(1)
+    , omega_nom(100.0)
+    , direction(1)    
 {
 
 }
@@ -109,9 +109,10 @@ void DCMotor::setDirection(int revers_state)
 //------------------------------------------------------------------------------
 void DCMotor::preStep(state_vector_t &Y, double t)
 {
-    torque = Y[0] * cPhi.getValue(Y[0] * beta * direction);
+    torque = Y[0] * calcCPhi(Y[0] * beta * direction);
 
-    emit soundSetPitch("TED", static_cast<float>(omega / omega_max));
+    emit soundSetPitch("TED", static_cast<float>(2 * omega / omega_nom));
+    emit soundSetVolume("TED", static_cast<int>(Y[0] / 50.0));
 }
 
 //------------------------------------------------------------------------------
@@ -122,7 +123,7 @@ void DCMotor::ode_system(const state_vector_t &Y,
                          double t)
 {
     double R = R_a + beta * R_gp + R_dp + R_r;
-    double E = omega * cPhi.getValue(Y[0] * beta * direction);
+    double E = omega * calcCPhi(Y[0] * beta * direction);
 
     dYdt[0] = (U - R * Y[0] - E) / L_af;
 }
@@ -139,7 +140,7 @@ void DCMotor::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "R_dp", R_dp);
     cfg.getDouble(secName, "R_r", R_r);
     cfg.getDouble(secName, "L_af", L_af);
-    cfg.getDouble(secName, "OmegaMax", omega_max);
+    cfg.getDouble(secName, "OmegaNom", omega_nom);
 
     QString cPhiFileName = "";
 
@@ -164,3 +165,13 @@ void DCMotor::load_config(CfgReader &cfg)
         secNode = cfg.getNextSection();
     }
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double DCMotor::calcCPhi(double I)
+{
+    return cPhi.getValue(I);
+}
+
+
