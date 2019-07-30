@@ -12,7 +12,7 @@ class Pantograph : public Device
 public:
 
     /// Конструктор
-    Pantograph(QString config_path, QObject *parent = Q_NULLPTR);
+    Pantograph(QObject *parent = Q_NULLPTR);
 
     /// Деструктор
     ~Pantograph();
@@ -49,9 +49,9 @@ private:
 
     enum KindCurrent
     {
-        NOT_SPECIFIED, // Род тока неопредлен
-        ALTERNATING_CURRENT, // Переменный ток
-        DIRECT_CURRENT // Постоянный ток
+        NOT_SPECIFIED = 0, // Род тока неопредлен
+        CURRENT_AC = 1, // Переменный ток
+        CURRENT_DC = 2 // Постоянный ток
     };
 
     double RTout;

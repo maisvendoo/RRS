@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 // Конструктор класса
 //------------------------------------------------------------------------------
-Pantograph::Pantograph(QString config_path, QObject *parent) : Device(parent)
+Pantograph::Pantograph(QObject *parent) : Device(parent)
   , Uks(0.0)
   , Uout(0.0)
   , state(false)

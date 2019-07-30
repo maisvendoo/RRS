@@ -14,6 +14,7 @@
 #define     EP20_H
 
 #include    "vehicle-api.h"
+#include    "pantograph.h"
 
 /*!
  * \class
@@ -34,8 +35,25 @@ public:
 
 private:
 
+    enum
+    {
+        NUM_PANTOGRAPHS = 4,
+        PANT_AC1 = 0,
+        PANT_DC1 = 1,
+        PANT_AC2 = 2,
+        PANT_DC2 = 3
+    };
+
+    std::array<Pantograph *, NUM_PANTOGRAPHS> pantograph;
+
+    void initialization();
+
+    void initHighVoltageScheme();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    void stepHighVoltageScheme(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
