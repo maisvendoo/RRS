@@ -11,16 +11,15 @@
 //
 //------------------------------------------------------------------------------
 
-#include "gv.h"
+#include "km-21kr2.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-GV::GV(QObject* parent) : Device(parent)
-  , GVstate(false)
-  , VZstate(false)
-  , phc(true)
-  , sdk(0)
+Km21KR2::Km21KR2(QObject* parent) : Device(parent)
+  , k21(true)
+  , k22(true)
+  , k23(false)
 {
 
 }
@@ -28,7 +27,7 @@ GV::GV(QObject* parent) : Device(parent)
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-GV::~GV()
+Km21KR2::~Km21KR2()
 {
 
 }
@@ -36,51 +35,15 @@ GV::~GV()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void GV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
+void Km21KR2::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    double s01 = static_cast<double>(phc);
-    double s02 = static_cast<double>(GVstate);
-    double s03 = static_cast<double>(VZstate);
 
-    double on = s03 * s02;
-    double off = 1.0 - s02;
-
-    double s1 = Y[0] - 0.95;
-
-    double s2 = on * hs_n(s1);
-
-    double s5 = Fp * pf(Y[0]) - Fk * s02 * s01;
-
-    double s3 = hs_p(Y[0]) * (hs_p(s5) + off);
-
-    double s4 = s2 - s3;
-
-    double s6 = hs_p(s5) * (P0 - Y[1]) *  K1 - Y[1] * K2 * hs_p(sdk);
-
-    sdk = hs_n(Y[1] - P1);
-    Uout = Ukr * sdk * hs_p(s1);
-
-    dYdt[0] = Vn * s4;
-    dYdt[1] = s6 / Vdk;
 }
 
 //------------------------------------------------------------------------------
 // Загрузка данных из конфигурационного файла
 //------------------------------------------------------------------------------
-void GV::load_config(CfgReader& cfg)
-{
-    cfg.getDouble("GV", "Vn", Vn);
-    cfg.getDouble("GV", "Vdk", Vdk);
-    cfg.getDouble("GV", "Fk", Fk);
-    cfg.getDouble("GV", "Fp", Fp);
-    cfg.getDouble("GV", "K1", K1);
-    cfg.getDouble("GV", "K2", K2);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void GV::preStep(state_vector_t& Y, double t)
+void Km21KR2::load_config(CfgReader& cfg)
 {
 
 }
@@ -88,7 +51,64 @@ void GV::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void GV::stepKeysControl(double t, double dt)
+void Km21KR2::preStep(state_vector_t& Y, double t)
 {
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Km21KR2::stepKeysControl(double t, double dt)
+{
+    // Авт. набор
+    if (getKeyState(KEY_Q))
+    {
+        k21 = true;
+        k22 = true;
+        k23 = true;
+    }
+    // 1 вверх
+    if (getKeyState(KEY_E))
+    {
+        k21 = false;
+        k22 = true;
+        k23 = true;
+    }
+    else
+    {
+        k21 = true;
+        k22 = true;
+        k23 = false;
+    }
+    // 1 вниз
+    if (getKeyState(KEY_A))
+    {
+        k21 = false;
+        k22 = false;
+        k23 = false;
+    }
+
+    // Авт. сброс
+    if (getKeyState(KEY_D))
+    {
+        k21 = true;
+        k22 = false;
+        k23 = false;
+    }
+    // Ноль
+    if (getKeyState(KEY_Z))
+    {
+        k21 = true;
+        k22 = true;
+        k23 = false;
+    }
+
+
+    controlState.up = k21 * k23;
+    controlState.up1 = !k21 * k23;
+    controlState.zero = k22 * !k23;
+    controlState.down1 = !k21 * !k22;
+    controlState.down = k21 * !k22;
 
 }

@@ -24,9 +24,9 @@
         <Axis>0.0 7.043 0.912</Axis> 
 
         <CabineModel>chs4t/chs4t-cab.osgt</CabineModel>
-        <CabineShift>0.0 0.0 0.0</CabineShift> 
-
-        <DriverPos>0.5 9.0 0.0</DriverPos>
+        <CabineShift>0.0 0.0 0.0</CabineShift>
+        
+        <DriverPos>0.93 9.02 3.75</DriverPos>
 
 	</Vehicle>
 </Config>

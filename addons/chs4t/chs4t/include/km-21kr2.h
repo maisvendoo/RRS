@@ -10,30 +10,25 @@
 //      Дата: 16/06/2019
 //
 //------------------------------------------------------------------------------
-#ifndef PANTOGRAPH_H
-#define PANTOGRAPH_H
+#ifndef KM21KR2_H
+#define KM21KR2_H
 
-#include    "device.h"
+#include "device.h"
+#include "km-21kr2-state.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Pantograph : public Device
+class Km21KR2 : public Device
 {
 public:
-
-    ///Конструктор
-    Pantograph(QObject *parent = Q_NULLPTR);
+    /// Конструктор
+    Km21KR2(QObject *parent = Q_NULLPTR);
 
     ///Деструктор
-    ~Pantograph();
+    ~Km21KR2();
 
-    void setUks(double Uks)   { this->Uks = Uks; }
-    void setState(bool state) { this->state = state; }
-
-    double getH()    { return h; }
-    double getUout() { return Uout; }
-
+    ControllerState getCtrlState() { return controlState; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -41,21 +36,11 @@ private:
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
+    bool k21;
+    bool k22;
+    bool k23;
 
-    CfgReader cfg_;
-
-    double  tau;
-
-    double  h;
-    double hMax;
-
-    double  V;
-
-    double  Uout;
-    double  Uks;
-
-    bool state;
-
+    ControllerState controlState;
 };
 
-#endif // PANTOGRAPH_H
+#endif // KM21KR2_H

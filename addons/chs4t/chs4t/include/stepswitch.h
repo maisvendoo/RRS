@@ -10,30 +10,31 @@
 //      Дата: 16/06/2019
 //
 //------------------------------------------------------------------------------
-#ifndef PANTOGRAPH_H
-#define PANTOGRAPH_H
+#ifndef STEPSWITCH_H
+#define STEPSWITCH_H
 
-#include    "device.h"
+#include "device.h"
+#include "km-21kr2-state.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Pantograph : public Device
+class StepSwitch : public Device
 {
 public:
 
     ///Конструктор
-    Pantograph(QObject *parent = Q_NULLPTR);
+    StepSwitch(QObject *parent = Q_NULLPTR);
 
     ///Деструктор
-    ~Pantograph();
+    ~StepSwitch();
 
-    void setUks(double Uks)   { this->Uks = Uks; }
-    void setState(bool state) { this->state = state; }
+    void setCtrlState(ControllerState ctrlState) { this->ctrlState = ctrlState; }
 
-    double getH()    { return h; }
-    double getUout() { return Uout; }
-
+//    double getv1() { return  v1; }
+//    double getv2() { return  v2; }
+    int getPoz() { return poz; }
+//    double getSr() { return shaft_rel; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -42,20 +43,50 @@ private:
     void stepKeysControl(double t, double dt);
 
 
-    CfgReader cfg_;
+    ControllerState ctrlState;
 
-    double  tau;
+    double V;
 
-    double  h;
-    double hMax;
+    double poz_d;
 
-    double  V;
+    int poz;
 
-    double  Uout;
-    double  Uks;
+//    Trigger *rs;
 
-    bool state;
+//    double f1 -- Y[0];
+
+//    double s62;
+//    double s67;
+//    double s69;
+//    double s45;
+//    double s43;
+//    double s410;
+
+//    double shaft_rel;
+
+//    double PI;
+//    double p1;
+//    double p2;
+//    double p3;
+//    double p4;
+
+//    double KL;
+//    double AB;
+//    double GH;
+//    double CD;
+//    double EF;
+//    double IJ;
+//    double NM;
+//    double UV;
+//    double HG;
+
+//    double v1;
+//    double v2;
+//    double u;
+
+//    double ang_vel;
 
 };
 
-#endif // PANTOGRAPH_H
+
+#endif // STEPSWITCH_H
