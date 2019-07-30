@@ -54,8 +54,8 @@ bool TrainManipulator::performMovementRightMouseButton(const double eventTimeDel
 
     double k1 = static_cast<double>(settings.ext_cam_rot_coeff);
 
-    angle_H -= k1 * dx;
-    angle_V -= k1 * dy;
+    angle_H += k1 * dx;
+    angle_V += k1 * dy;
 
     return false;
 }

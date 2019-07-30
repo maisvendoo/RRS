@@ -9,6 +9,7 @@ EKG_8G::EKG_8G(QObject *parent) : Device(parent)
   , switch_time(1.0)
   , is_enabled(false)
   , is_ready(false)
+  , is_LK_allow(false)
 {
     connect(&pos_switcher, &Timer::process, this, &EKG_8G::slotPosSwitch);
 
@@ -81,8 +82,22 @@ bool EKG_8G::isReady() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool EKG_8G::isLKallow() const
+{
+    return is_LK_allow;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void EKG_8G::process()
 {
+    if (km_state.pos_state[POS_ZERO])
+    {
+        if (position != LM_POS0)
+            is_ready = false;
+    }
+
     if (km_state.pos_state[POS_AV])
     {
         if (ref_position == position)
@@ -133,18 +148,20 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
         // Запускаем схему переключения позиций
         if (!pos_switcher.isStarted())
         {
-            pos_switcher.start();
-
-            // Если вал не в нулевой позиции, возвращаем его туда
-            if (position != 0)
-                ref_position = 0;
+            pos_switcher.start();            
         }
 
         if (is_ready)
             process();
         else
-            // Устанавливаем готовность по состоянию рукоятки КМ
-            is_ready = km_state.pos_state[POS_ZERO];
+        {
+            // Устанавливаем готовность по состоянию рукоятки КМ положению вала ЭКГ
+            is_ready = km_state.pos_state[POS_ZERO] && (position == LM_POS0);
+
+            // Если вал не в нулевой позиции, возвращаем его туда
+            if (position != 0)
+                ref_position = 0;
+        }
     }
     else
     {
