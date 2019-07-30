@@ -254,19 +254,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
             {
                 OSG_FATAL << "Vehicle model " << module_config_name << " is't loaded" << std::endl;
                 continue;
-            }
-
-            // Load wheels model
-            osg::ref_ptr<osg::MatrixTransform> wheel_model = loadWheels(module_config_name);
-
-            if (!wheel_model.valid())
-            {
-                OSG_FATAL << "Wheels model is't loaded" << std::endl;
-                continue;
-            }
-
-            // Set wheels for each axis
-            setAxis(vehicle_model.get(), wheel_model.get(), module_config_name);
+            }            
 
             // Load cabine model
             osg::ref_ptr<osg::Node> cabine;
@@ -278,14 +266,14 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
             loadModelAnimations(module_config_name, vehicle_model.get(), animations);
 
+            loadAnimations(module_config_name, vehicle_model.get(), animations);
             loadAnimations(module_config_name, cabine.get(), animations);
 
             for (int i = 0; i < count; ++i)
             {
                 vehicle_exterior_t vehicle_ext;
                 vehicle_ext.transform = new osg::MatrixTransform;
-                vehicle_ext.transform->addChild(vehicle_model.get());
-                vehicle_ext.wheel_rotation = wheel_model.get();
+                vehicle_ext.transform->addChild(vehicle_model.get());                
                 vehicle_ext.length = length;
                 vehicle_ext.cabine = cabine;
                 vehicle_ext.driver_pos = driver_pos;
@@ -316,7 +304,6 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
     {
         // Interframe railway coordinate and wheels angle linear interpolation
         float coord = (1.0f - t) * nd.sd.front().te[i].coord + nd.sd.back().te[i].coord * t;
-        float angle = (1.0f - t) * nd.sd.front().te[i].angle + nd.sd.back().te[i].angle * t;
 
         // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
@@ -326,7 +313,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
         // Store current railway coordinate and wheels angle
         vehicles_ext[i].coord = coord;
-        vehicles_ext[i].wheel_angle = angle;
+        //vehicles_ext[i].wheel_angle = angle;
 
         recalcAttitude(i);
 
@@ -335,13 +322,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         matrix *= osg::Matrix::rotate(static_cast<double>(settings.direction * vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
         matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
         matrix *= osg::Matrix::translate(vehicles_ext[i].position);
-        vehicles_ext[i].transform->setMatrix(matrix);
-
-        // Apply wheel axis rotation
-        osg::Matrix rotMat = osg::Matrix::rotate(static_cast<double>(- settings.direction * vehicles_ext[i].wheel_angle), osg::Vec3(1.0f, 0.0f, 0.0f));
-
-        if (vehicles_ext[i].wheel_rotation != nullptr)
-            vehicles_ext[i].wheel_rotation->setMatrix(rotMat);
+        vehicles_ext[i].transform->setMatrix(matrix);        
     }
 
     // Set parameters for animations
