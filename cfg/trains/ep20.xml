@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModule>default-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
+
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>0</NoAir>
+
+		<Title>ЭП20</Title>
+		<Description>Двухсистемный пассажирский электровоз с асинхронным тяговым приводом</Description>
+	</Common>
+	
+	<Vehicle>
+		<Module>ep20</Module>
+		<ModuleConfig>ep20</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+	
+</Config>
+
+ 
