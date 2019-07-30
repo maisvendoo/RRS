@@ -67,6 +67,13 @@ VL60::VL60() : Vehicle ()
     cu_tumbler.setOnSoundName("K_Tumbler_On");
     cu_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&cu_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    for (size_t i = 0; i < rb.size(); ++i)
+    {
+        rb[i].setOnSoundName("RB_Down");
+        rb[i].setOffSoundName("RB_Up");
+        connect(&rb[i], &Trigger::soundPlay, this, &VL60::soundPlay);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -675,6 +682,8 @@ void VL60::stepSignalsOutput()
     analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
     analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
+
+    analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[RB_1].getState());
 }
 
 //------------------------------------------------------------------------------
@@ -869,6 +878,12 @@ void VL60::keyProcess()
         else
             cu_tumbler.reset();
     }
+
+    // Нажатие РБ-1
+    if (getKeyState(KEY_Z))
+        rb[RB_1].set();
+    else
+        rb[RB_1].reset();
 }
 
 //------------------------------------------------------------------------------

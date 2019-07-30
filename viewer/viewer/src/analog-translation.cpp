@@ -42,12 +42,9 @@ void AnalogTranslation::anim_step(float t, float dt)
 //------------------------------------------------------------------------------
 bool AnalogTranslation::load_config(ConfigReader &cfg)
 {
-    std::string secName = "AnalogRotation";
+    std::string secName = "AnalogTranslation";
 
-    cfg.getValue(secName, "SignalID", signal_id);
-    cfg.getValue(secName, "MinAngle", min_motion);
-    cfg.getValue(secName, "MaxAngle", max_motion);
-    cfg.getValue(secName, "InitAngle", motion);
+    cfg.getValue(secName, "SignalID", signal_id);    
     cfg.getValue(secName, "Duration", duration);
 
     std::string tmp;
@@ -69,6 +66,8 @@ void AnalogTranslation::update()
 {
     if (keypoints.size() == 0)
         return;
+
+    motion = cut(motion, (*keypoints.begin()).value, (*(keypoints.end() - 1)).value);
 
     osg::Matrix translate = osg::Matrixf::translate(axis * motion);
     transform->setMatrix(translate * matrix);

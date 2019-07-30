@@ -119,6 +119,17 @@ private:
     /// Триггер тумблера "Цепи управления"
     Trigger cu_tumbler;
 
+    enum
+    {
+        NUM_RB = 3,
+        RB_1 = 0,
+        RBP = 1,
+        RBS = 2
+    };
+
+    /// Триггеры рукояток бдительности
+    std::array<Trigger, NUM_RB>  rb;
+
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 

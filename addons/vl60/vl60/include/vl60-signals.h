@@ -7,6 +7,10 @@ enum
     KRAN_KOMBIN = 1,
     KLUCH_367 = 2,
 
+    KNOPKA_RB_1 = 4,
+    KNOPKA_RBP = 5,
+    KNOPKA_RBS = 6,
+
     VAL_PR_SKOR2 = 7,
     VAL_PR_SKOR1 = 8,
     STRELKA_SELSIN = 9,
@@ -29,8 +33,6 @@ enum
     TUMBLER_CU = 34,
     TUMBLER_GV_ON = 35,
     TUMBLER_GV_ON_OFF = 36,
-
-
 
     SIG_LIGHT_PSS_L = 50,
     SIG_LIGHT_PSS_PROPUSK = 51,
