@@ -362,7 +362,15 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
 
     train_ext_handler = new TrainExteriorHandler(settings, motionPath, settings.train_config);
     viewer.addEventHandler(train_ext_handler);
-    viewer.addEventHandler(train_ext_handler->getAnimationManager());
+
+
+    //viewer.addEventHandler(train_ext_handler->getAnimationManager());
+    std::vector<AnimationManager *> anims_manager = train_ext_handler->getAnimManagers();
+
+    for (auto am : anims_manager)
+    {
+        viewer.addEventHandler(am);
+    }
 
     root = new osg::Group;
     root->addChild(train_ext_handler->getExterior());

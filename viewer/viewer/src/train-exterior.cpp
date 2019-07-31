@@ -121,6 +121,11 @@ AnimationManager *TrainExteriorHandler::getAnimationManager()
     return animation_manager;
 }
 
+std::vector<AnimationManager *> TrainExteriorHandler::getAnimManagers()
+{
+    return anim_managers;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -246,31 +251,26 @@ void TrainExteriorHandler::load(const std::string &train_config)
             }
 
             // Load vehicle body model
-            getValue(module_config_node->contents, module_config_name);
-
-            osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(module_config_name);
-
-            if (!vehicle_model.valid())
-            {
-                OSG_FATAL << "Vehicle model " << module_config_name << " is't loaded" << std::endl;
-                continue;
-            }            
-
-            // Load cabine model
-            osg::ref_ptr<osg::Node> cabine;
-            loadCabine(vehicle_model.get(), module_config_name, cabine);
-
-            float length = getLength(module_config_name);
-
-            osg::Vec3 driver_pos = getDirverPosition(module_config_name);
-
-            loadModelAnimations(module_config_name, vehicle_model.get(), animations);
-
-            loadAnimations(module_config_name, vehicle_model.get(), animations);
-            loadAnimations(module_config_name, cabine.get(), animations);
+            getValue(module_config_node->contents, module_config_name);            
 
             for (int i = 0; i < count; ++i)
             {
+                osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(module_config_name);
+
+                if (!vehicle_model.valid())
+                {
+                    OSG_FATAL << "Vehicle model " << module_config_name << " is't loaded" << std::endl;
+                    continue;
+                }
+
+                // Load cabine model
+                osg::ref_ptr<osg::Node> cabine;
+                loadCabine(vehicle_model.get(), module_config_name, cabine);
+
+                float length = getLength(module_config_name);
+
+                osg::Vec3 driver_pos = getDirverPosition(module_config_name);
+
                 vehicle_exterior_t vehicle_ext;
                 vehicle_ext.transform = new osg::MatrixTransform;
                 vehicle_ext.transform->addChild(vehicle_model.get());                
@@ -278,13 +278,21 @@ void TrainExteriorHandler::load(const std::string &train_config)
                 vehicle_ext.cabine = cabine;
                 vehicle_ext.driver_pos = driver_pos;
 
+                vehicle_ext.anims = new animations_t();
+
+                loadModelAnimations(module_config_name, vehicle_model.get(), *vehicle_ext.anims);
+                loadAnimations(module_config_name, vehicle_model.get(), *vehicle_ext.anims);
+                loadAnimations(module_config_name, cabine.get(), *vehicle_ext.anims);
+
+                anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
+
                 vehicles_ext.push_back(vehicle_ext);
                 trainExterior->addChild(vehicle_ext.transform.get());
             }
         }
     }
 
-    animation_manager = new AnimationManager(&animations);
+    //animation_manager = new AnimationManager(&animations);
 }
 
 //------------------------------------------------------------------------------
@@ -323,14 +331,20 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
         matrix *= osg::Matrix::translate(vehicles_ext[i].position);
         vehicles_ext[i].transform->setMatrix(matrix);        
+
+        for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
+        {
+            ProcAnimation *animation = it.value();
+            animation->setPosition(nd.sd.back().te[i].analogSignal[animation->getSignalID()]);
+        }
     }
 
     // Set parameters for animations
-    for (auto it = animations.begin(); it != animations.end(); ++it)
+    /*for (auto it = animations.begin(); it != animations.end(); ++it)
     {
         ProcAnimation *animation = it.value();
         animation->setPosition(nd.sd.back().te[static_cast<size_t>(cur_vehicle)].analogSignal[animation->getSignalID()]);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
