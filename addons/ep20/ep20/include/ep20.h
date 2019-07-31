@@ -35,6 +35,7 @@ public:
 
 private:
 
+    /// Нумеротор токоприемников (АС - переменный, DC - постоянный)
     enum
     {
         NUM_PANTOGRAPHS = 4,
@@ -44,15 +45,19 @@ private:
         PANT_DC2 = 3
     };
 
+    /// Массив токоприемников
     std::array<Pantograph *, NUM_PANTOGRAPHS> pantograph;
 
+    /// Инициализация
     void initialization();
 
+    /// Инициализация высоковольтной схемы
     void initHighVoltageScheme();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
+    /// Шаг моделирования высоковольтной схемы
     void stepHighVoltageScheme(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов

@@ -21,6 +21,7 @@ EP20::~EP20()
 
 void EP20::initialization()
 {
+    initHighVoltageScheme();
 
 }
 
@@ -38,7 +39,7 @@ void EP20::initHighVoltageScheme()
 //------------------------------------------------------------------------------
 void EP20::step(double t, double dt)
 {
-
+    stepHighVoltageScheme(t, dt);
 }
 
 void EP20::stepHighVoltageScheme(double t, double dt)
@@ -47,7 +48,8 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     for (auto pant : pantograph)
     {
         pant->setUks(25000.0);
-        pant->step(t, dt);
+        pant->setCurrentKindIn(1);
+        pant->step(t, dt);      
     }
 }
 

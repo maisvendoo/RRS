@@ -23,13 +23,23 @@ public:
     /// Установить напряжение в кс
     void setUks(double Uks);
 
+    /// Установить род тока на входе
+    void setCurrentKindIn(int kindCurrent);
+
     /// Получить высоту
     double getHeight() const;
 
     /// Получить напряжение на выходе
     double getUout() const;
 
-private:     
+    /// Получить род на выходе
+    int getCurrentKindOut() const;
+
+    bool isUp() const;
+
+    bool isDown() const;
+
+private:
 
     /// Напряжение в контактной сети
     double Uks;
@@ -47,22 +57,25 @@ private:
     /// Время подъема/опускания ТП
     double  motion_time;
 
-    enum KindCurrent
-    {
-        NOT_SPECIFIED = 0, // Род тока неопредлен
-        CURRENT_AC = 1, // Переменный ток
-        CURRENT_DC = 2 // Постоянный ток
-    };
+    /// Входное значение рода тока
+    int current_kind_in;
 
-    double RTout;
+    /// Выходное значение рода тока
+    int current_kind_out;
 
+    /// Токоприемник поднят
+    bool is_up;
 
+    /// Токоприемник опущен
+    bool is_down;
+
+    /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);
 
-
+    /// Вычисление напряжения
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-
+    /// Загрузка конфига
     void load_config(CfgReader &cfg);
 
 };
