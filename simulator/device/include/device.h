@@ -138,6 +138,8 @@ protected:
 
     bool isControl() const;
 
+    bool isAlt() const;
+
 private:
 
     void memory_alloc(int order);

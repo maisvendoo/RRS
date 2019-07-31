@@ -684,6 +684,8 @@ void VL60::stepSignalsOutput()
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
 
     analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[RB_1].getState());
+    analogSignal[KNOPKA_RBS] = static_cast<float>(rb[RBS].getState());
+    analogSignal[KNOPKA_RBP] = static_cast<float>(rb[RBP].getState());
 
     analogSignal[WHEEL_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
@@ -833,7 +835,7 @@ void VL60::keyProcess()
     }
 
     // МВ3
-    if (getKeyState(KEY_G))
+    if (getKeyState(KEY_Y))
     {
         if (isShift())
             mv_tumblers[MV3].set();
@@ -842,7 +844,7 @@ void VL60::keyProcess()
     }
 
     // МВ4
-    if (getKeyState(KEY_Y))
+    if (getKeyState(KEY_5))
     {
         if (isShift())
             mv_tumblers[MV4].set();
@@ -851,7 +853,7 @@ void VL60::keyProcess()
     }
 
     // МВ5
-    if (getKeyState(KEY_J))
+    if (getKeyState(KEY_6))
     {
         if (isShift())
             mv_tumblers[MV5].set();
@@ -860,7 +862,7 @@ void VL60::keyProcess()
     }
 
     // МВ6
-    if (getKeyState(KEY_M))
+    if (getKeyState(KEY_7))
     {
         if (isShift())
             mv_tumblers[MV6].set();
@@ -878,7 +880,7 @@ void VL60::keyProcess()
     }
 
     // Включение/выключение цепей управления
-    if (getKeyState(KEY_Q))
+    if (getKeyState(KEY_J))
     {
         if (isShift())
             cu_tumbler.set();
@@ -891,6 +893,16 @@ void VL60::keyProcess()
         rb[RB_1].set();
     else
         rb[RB_1].reset();
+
+    if (getKeyState(KEY_M))
+        rb[RBS].set();
+    else
+        rb[RBS].reset();
+
+    if (getKeyState(KEY_Q))
+        rb[RBP].set();
+    else
+        rb[RBP].reset();
 }
 
 //------------------------------------------------------------------------------
