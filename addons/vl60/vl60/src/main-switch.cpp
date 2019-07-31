@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MainSwitch::MainSwitch(QString config_path, QObject *parent) : Device(parent)
+MainSwitch::MainSwitch(QObject *parent) : Device(parent)
   , U_in(0.0)
   , U_out(0.0)
   , is_on(false)
@@ -22,10 +22,7 @@ MainSwitch::MainSwitch(QString config_path, QObject *parent) : Device(parent)
   , old_state(0)
 
 {
-    load_config(config_path);
 
-    /*DebugLog *log = new DebugLog("gv.txt");
-    connect(this, &MainSwitch::DebugPrint, log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------
@@ -151,25 +148,13 @@ void MainSwitch::ode_system(const state_vector_t &Y,
 void MainSwitch::load_config(CfgReader &cfg)
 {
     Q_UNUSED(cfg)
-}
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainSwitch::load_config(QString cfg_path)
-{
-    CfgReader cfg;
+    QString secName = "Device";
 
-
-    if (cfg.load(cfg_path))
+    int order = 1;
+    if (cfg.getInt(secName, "Order", order))
     {
-        QString secName = "Device";
-
-        int order = 1;
-        if (cfg.getInt(secName, "Order", order))
-        {
-            y.resize(static_cast<size_t>(order));
-            std::fill(y.begin(), y.end(), 0);
-        }
+        y.resize(static_cast<size_t>(order));
+        std::fill(y.begin(), y.end(), 0);
     }
 }

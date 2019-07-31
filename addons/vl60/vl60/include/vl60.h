@@ -54,8 +54,8 @@ public:
     ~VL60();
 
     /// Инициализация тормозных приборов
-    void initBrakeDevices(double p0, double pTM, double pFL);
-
+    void initBrakeDevices(double p0, double pTM, double pFL);    
+    
 private:
 
     enum
@@ -263,6 +263,9 @@ private:
     /// Инициализация схемы управления тягой
     void initTractionControl();
 
+    void initOtherEquipment();
+
+
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
 
@@ -288,6 +291,8 @@ private:
 
     void stepLineContactors(double t, double dt);
 
+    void stepOtherEquipment(double t, double dt);
+
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
@@ -303,8 +308,9 @@ private:
     /// Обработка нажатий клавиш
     void keyProcess();
 
-
     void debugPrint(double t);
+
+    void load_brakes_config(QString path);
 };
 
 #endif // VL60_H

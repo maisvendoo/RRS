@@ -10,7 +10,7 @@ class Pantograph : public Device
 {
 public:
 
-    Pantograph(QString config_path, QObject *parent = Q_NULLPTR);
+    Pantograph(QObject *parent = Q_NULLPTR);
 
     ~Pantograph();
 
@@ -44,9 +44,7 @@ private:
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-    void load_config(CfgReader &cfg);
-
-    void load_config(QString cfg_path);
+    void load_config(CfgReader &cfg);    
 };
 
 #endif // PANTOGRAPH_H

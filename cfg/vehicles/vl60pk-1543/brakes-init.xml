@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<BrakesState>
+		
+		<!-- Давление в главных резервуарах, МПа -->
+		<MainReservoirPressure>0.9</MainReservoirPressure>
+
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+
+		<!-- Положение рукоятки крана машиниста -->
+		<TrainCranePos>2</TrainCranePos>
+
+		<!-- Положение рукоятки КВТ -->
+		<LocoCranePos>6</LocoCranePos>
+
+		<!-- Состояние устройства блокировки тормозов 
+		(1 - разблокирована, 0 - заблокирована) -->
+		<BrakeLockDevice>1</BrakeLockDevice>
+		
+	</BrakesState>
+</Config>
