@@ -24,8 +24,22 @@ EP20::~EP20()
 //------------------------------------------------------------------------------
 void EP20::initialization()
 {
+    initMPCS();
+
     // Вызываем метод
     initHighVoltageScheme();
+}
+
+//------------------------------------------------------------------------------
+// Инициализация МПСУ
+//------------------------------------------------------------------------------
+void EP20::initMPCS()
+{
+    mpcs = new MPCS();
+
+    mpcs->read_custom_config(config_dir + QDir::separator() + "mpcs");
+    mpcs->setStoragePath(config_dir + QDir::separator() + "storage" + QDir::separator());
+    mpcs->init();
 }
 
 //------------------------------------------------------------------------------
@@ -43,19 +57,36 @@ void EP20::initHighVoltageScheme()
 }
 
 //------------------------------------------------------------------------------
-// Шаги моделирования
+// Общие шаги моделирования
 //------------------------------------------------------------------------------
 void EP20::step(double t, double dt)
 {
     // Вызываем метод
+    stepMPCS(t, dt);
+
+    // Вызываем метод
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s PANT_AC1: %2 m %3 kV %4")
+    DebugMsg = QString("t: %1 s PANT_AC1: %2 m: %3 kV: %4 Kind: %5 Up: %6: Down")
             .arg(t, 10, 'f', 2)
             .arg(pantograph[PANT_AC1]->getHeight(), 4, 'f', 2)
             .arg(pantograph[PANT_AC1]->getUout() / 1000.0, 4, 'f', 1)
-            .arg(pantograph[PANT_AC1]->getCurrentKindOut(), 1);
+            .arg(pantograph[PANT_AC1]->getCurrentKindOut(), 1)
+            .arg(pantograph[PANT_AC1]->isUp(), 1)
+            .arg(pantograph[PANT_AC1]->isDown(), 1);
+
+}
+
+//------------------------------------------------------------------------------
+// Шаг моделирования МПСУ
+//------------------------------------------------------------------------------
+void EP20::stepMPCS(double t, double dt)
+{
+    // Задаем начальные значения
+    mpcs->setSignalInputMPCS(mpcsInput);
+    mpcsOutput = mpcs->getSignalOutputMPCS();
+    mpcs->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -64,11 +95,16 @@ void EP20::step(double t, double dt)
 void EP20::stepHighVoltageScheme(double t, double dt)
 {
     // Пускаем цикл по пантографам и задаем начальные значения
-    for (auto pant : pantograph)
+    for (size_t i = 0; i < pantograph.size(); ++i)
     {
-        pant->setUks(25000.0);
-        pant->setCurrentKindIn(1);
-        pant->step(t, dt);      
+        mpcsInput.pant_up[i] = pantograph[i]->isUp();
+        mpcsInput.pant_down[i] = pantograph[i]->isDown();
+
+        pantograph[i]->setState(mpcsOutput.pant_state[i]);
+
+        pantograph[i]->setUks(25000.0);
+        pantograph[i]->setCurrentKindIn(1);
+        pantograph[i]->step(t, dt);
     }
 }
 

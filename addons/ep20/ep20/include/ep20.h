@@ -5,9 +5,9 @@
 //
 //      (c) RRS development team:
 //          Дмитрий Притыкин (maisvendoo),
-//          Роман Бирюков (РомычРЖДУЗ)
+//          Балашов Евгений (MrJecson)
 //
-//      Дата: 12/05/2019
+//      Дата: 1/08/2019
 //
 //------------------------------------------------------------------------------
 #ifndef     EP20_H
@@ -15,6 +15,8 @@
 
 #include    "vehicle-api.h"
 #include    "pantograph.h"
+#include    "mpcs.h"
+#include    "pant-description.h"
 
 /*!
  * \class
@@ -35,15 +37,15 @@ public:
 
 private:
 
-    /// Нумеротор токоприемников (АС - переменный, DC - постоянный)
-    enum
-    {
-        NUM_PANTOGRAPHS = 4,
-        PANT_AC1 = 0,
-        PANT_DC1 = 1,
-        PANT_AC2 = 2,
-        PANT_DC2 = 3
-    };
+    /// Выбор кабины
+    int selectedCab;
+
+    /// Микропроцессорная система управления электровозом
+    MPCS    *mpcs;
+
+    mpcs_input_t mpcsInput;
+
+    mpcs_output_t mpcsOutput;
 
     /// Массив токоприемников
     std::array<Pantograph *, NUM_PANTOGRAPHS> pantograph;
@@ -54,8 +56,12 @@ private:
     /// Инициализация высоковольтной схемы
     void initHighVoltageScheme();
 
+    void initMPCS();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    void stepMPCS(double t, double dt);
 
     /// Шаг моделирования высоковольтной схемы
     void stepHighVoltageScheme(double t, double dt);

@@ -128,7 +128,9 @@ void Pantograph::ode_system(const state_vector_t &Y, state_vector_t &dYdt, doubl
     dYdt[0] = 3.0 * (ref_height - Y[0]) / motion_time;
 }
 
-
+//----------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------
 void Pantograph::load_config(CfgReader &cfg)
 {
     Q_UNUSED(cfg)
