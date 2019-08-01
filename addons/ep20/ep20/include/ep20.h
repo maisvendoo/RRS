@@ -62,6 +62,8 @@ private:
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
+
+    void keyProcess();
 };
 
 #endif // EP20_H

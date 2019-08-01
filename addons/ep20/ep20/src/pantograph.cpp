@@ -10,6 +10,7 @@ Pantograph::Pantograph(QObject *parent) : Device(parent)
   , old_state(false)
   , max_height(1.0)
   , motion_time(4.0)
+  , current_kind_in(0)
   , current_kind_out(0)
 
 {
@@ -39,7 +40,7 @@ void Pantograph::setState(bool state)
 //------------------------------------------------------------------------------
 void Pantograph::setUks(double Uks)
 {
-    Uks = this->Uks;
+    this->Uks = Uks;
 }
 
 //------------------------------------------------------------------------------
@@ -47,7 +48,7 @@ void Pantograph::setUks(double Uks)
 //------------------------------------------------------------------------------
 void Pantograph::setCurrentKindIn(int kindCurrent)
 {
-    kindCurrent = this->current_kind_in;
+    this->current_kind_in = kindCurrent;
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +105,11 @@ void Pantograph::preStep(state_vector_t &Y, double t)
             emit soundPlay("Pantograph_Up");
         else
             emit soundPlay("Pantograph_Down");
+    }
+
+    Uout = Uks * hs_p(Y[0] - 0.95 * max_height);
+
+    current_kind_out = current_kind_in * static_cast<int>(hs_p(Y[0] - 0.95 * max_height));
 
     is_up = static_cast<bool>(hs_p(Y[0] - 0.95 * max_height));
 
@@ -113,20 +119,15 @@ void Pantograph::preStep(state_vector_t &Y, double t)
 //----------------------------------------------------------------------------
 // Вычисление выходного напряжения, рода тока!
 //----------------------------------------------------------------------------
-void Pantograph::ode_system(const state_vector_t &Y,
-                            state_vector_t &dYdt,
-                            double t)
+void Pantograph::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     Q_UNUSED(t)
 
     double ref_height = static_cast<double>(state) * max_height;
 
-    Uout = Uks * hs_p(Y[0] - 0.95 * max_height);
-
-    current_kind_out = current_kind_in * static_cast<int>(hs_p(Y[0] - 0.95 * max_height));
-
     dYdt[0] = 3.0 * (ref_height - Y[0]) / motion_time;
 }
+
 
 void Pantograph::load_config(CfgReader &cfg)
 {
