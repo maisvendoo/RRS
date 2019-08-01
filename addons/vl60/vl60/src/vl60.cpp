@@ -249,7 +249,7 @@ void VL60::initOtherEquipment()
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 
-    reg = new Registrator("vl60");
+    //reg = new Registrator("vl60");
 }
 
 //------------------------------------------------------------------------------
@@ -311,7 +311,7 @@ void VL60::stepOtherEquipment(double t, double dt)
 
     debugPrint(t);
 
-    registration(t, dt);
+    //registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -425,8 +425,8 @@ void VL60::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepMotorCompressor(double t, double dt)
 {
-    double k_flow = 5e-3;
-    main_reservoir->setFlowCoeff(k_flow);
+    //double k_flow = 5e-3;
+    //main_reservoir->setFlowCoeff(k_flow);
     main_reservoir->setAirFlow(motor_compressor->getAirFlow());
     main_reservoir->step(t, dt);
 
@@ -944,6 +944,13 @@ void VL60::load_brakes_config(QString path)
         if (cfg.getDouble(secName, "MainReservoirPressure", pFL))
         {
             main_reservoir->setY(0, pFL);
+        }
+
+        double k_flow = 0.0;
+
+        if (cfg.getDouble(secName, "MainReservoirFlow", k_flow))
+        {
+            main_reservoir->setFlowCoeff(k_flow);
         }
 
         double ch_press = 0.0;
