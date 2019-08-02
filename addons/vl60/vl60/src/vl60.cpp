@@ -20,13 +20,10 @@
 //
 //------------------------------------------------------------------------------
 VL60::VL60() : Vehicle ()
-  , Uks(30000.0f)
   , pant1_pos(0.0)
   , pant2_pos(0.0)
   , gv_pos(0.0)
-  , gv_return(false)
-  , test_lamp(0.0)
-  , sig(1)
+  , gv_return(false)  
   , charge_press(0.0)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
@@ -260,6 +257,9 @@ void VL60::initialization()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
 
+    Uks = WIRE_VOLTAGE;
+    current_kind = 1;
+
     initPantographs();
 
     initHighVoltageScheme();
@@ -354,7 +354,7 @@ void VL60::stepPantographsControl(double t, double dt)
     for (auto pant : pantographs)
     {
         // Задаем текущее напряжение КС (пока что через константу)
-        pant->setUks(WIRE_VOLTAGE);
+        pant->setUks(Uks);
         // Моделируем работу токоприемников
         pant->step(t, dt);
     }

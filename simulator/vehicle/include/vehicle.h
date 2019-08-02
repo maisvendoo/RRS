@@ -147,6 +147,10 @@ public:
     /// Init vehicle brake devices
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
+    void setUks(double value);
+
+    void setCurrentKind(int value);
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -235,6 +239,12 @@ protected:
     Vehicle *next_vehicle;
 
     QString config_dir;
+
+    /// Напряжение в КС
+    double      Uks;
+
+    /// Род тока в КС
+    int         current_kind;
 
     /// Active common forces
     state_vector_t  Q_a;
