@@ -24,6 +24,7 @@ EP20::~EP20()
 //------------------------------------------------------------------------------
 void EP20::initialization()
 {
+    //
     initMPCS();
 
     // Вызываем метод
@@ -38,7 +39,9 @@ void EP20::initMPCS()
     mpcs = new MPCS();
 
     mpcs->read_custom_config(config_dir + QDir::separator() + "mpcs");
+
     mpcs->setStoragePath(config_dir + QDir::separator() + "storage" + QDir::separator());
+
     mpcs->init();
 }
 
@@ -94,11 +97,16 @@ void EP20::stepMPCS(double t, double dt)
 //------------------------------------------------------------------------------
 void EP20::stepHighVoltageScheme(double t, double dt)
 {
+    int current_kind = 0;
+
     // Пускаем цикл по пантографам и задаем начальные значения
     for (size_t i = 0; i < pantograph.size(); ++i)
     {
         mpcsInput.pant_up[i] = pantograph[i]->isUp();
         mpcsInput.pant_down[i] = pantograph[i]->isDown();
+
+        if (pantograph[i]->getCurrentKindOut() > current_kind)
+            current_kind = pantograph[i]->getCurrentKindOut();
 
         pantograph[i]->setState(mpcsOutput.pant_state[i]);
 
@@ -106,6 +114,8 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         pantograph[i]->setCurrentKindIn(1);
         pantograph[i]->step(t, dt);
     }
+
+    mpcsInput.current_kind = current_kind;
 }
 
 //------------------------------------------------------------------------------
@@ -123,7 +133,7 @@ void EP20::loadConfig(QString cfg_path)
 
 void EP20::keyProcess()
 {
-    pantograph[PANT_AC1]->setState(getKeyState(KEY_P));
+//    pantograph[PANT_AC1]->setState(getKeyState(KEY_P));
 }
 
 GET_VEHICLE(EP20)

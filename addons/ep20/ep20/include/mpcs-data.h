@@ -9,12 +9,16 @@
 //------------------------------------------------------------------------------
 struct mpcs_input_t
 {
+    int current_kind;
+
     std::array<bool, NUM_PANTOGRAPHS> pant_up;
 
     std::array<bool, NUM_PANTOGRAPHS> pant_down;
 
+
     mpcs_input_t()
     {
+        current_kind = 0;
         std::fill(pant_up.begin(), pant_up.end(), false);
         std::fill(pant_down.begin(), pant_down.end(), false);
     }
