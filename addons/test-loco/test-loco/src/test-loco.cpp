@@ -304,6 +304,13 @@ void TestLoco::keyProcess()
     analogSignal[28] = static_cast<float>(traction_level);
     analogSignal[29] = static_cast<float>(loco_crane->getHandlePosition());
     analogSignal[30] = trac_controller->getFeedback().analogSignal[1];
+
+    analogSignal[194] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[195] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[196] = static_cast<float>(wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[197] = static_cast<float>(wheel_rotation_angle[3] / 2.0 / Physics::PI);
+    analogSignal[198] = static_cast<float>(wheel_rotation_angle[4] / 2.0 / Physics::PI);
+    analogSignal[199] = static_cast<float>(wheel_rotation_angle[5] / 2.0 / Physics::PI);
 }
 
 GET_VEHICLE(TestLoco)

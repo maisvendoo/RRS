@@ -3,6 +3,8 @@
 
 enum
 {
+    GEN_KARDAN = 192,
+    GEN_MUFTA1 = 193,
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

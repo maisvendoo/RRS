@@ -62,7 +62,8 @@ void ModelPartAnimation::update()
     if (path == nullptr)
         return;
 
-    osg::Matrix matrix;
+    osg::Matrix matrix;    
+
     path->getMatrix(pos * path->getLastTime(), matrix);
 
     transform->setMatrix(matrix);
