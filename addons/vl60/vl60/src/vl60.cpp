@@ -20,13 +20,10 @@
 //
 //------------------------------------------------------------------------------
 VL60::VL60() : Vehicle ()
-  , Uks(30000.0f)
   , pant1_pos(0.0)
   , pant2_pos(0.0)
   , gv_pos(0.0)
-  , gv_return(false)
-  , test_lamp(0.0)
-  , sig(1)
+  , gv_return(false)  
   , charge_press(0.0)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
@@ -249,7 +246,7 @@ void VL60::initOtherEquipment()
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 
-    reg = new Registrator("vl60");
+    //reg = new Registrator("vl60");
 }
 
 //------------------------------------------------------------------------------
@@ -259,6 +256,9 @@ void VL60::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    Uks = WIRE_VOLTAGE;
+    current_kind = 1;
 
     initPantographs();
 
@@ -311,7 +311,7 @@ void VL60::stepOtherEquipment(double t, double dt)
 
     debugPrint(t);
 
-    registration(t, dt);
+    //registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -354,7 +354,7 @@ void VL60::stepPantographsControl(double t, double dt)
     for (auto pant : pantographs)
     {
         // Задаем текущее напряжение КС (пока что через константу)
-        pant->setUks(WIRE_VOLTAGE);
+        pant->setUks(Uks);
         // Моделируем работу токоприемников
         pant->step(t, dt);
     }
@@ -425,8 +425,8 @@ void VL60::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepMotorCompressor(double t, double dt)
 {
-    double k_flow = 5e-3;
-    main_reservoir->setFlowCoeff(k_flow);
+    //double k_flow = 5e-3;
+    //main_reservoir->setFlowCoeff(k_flow);
     main_reservoir->setAirFlow(motor_compressor->getAirFlow());
     main_reservoir->step(t, dt);
 
@@ -944,6 +944,13 @@ void VL60::load_brakes_config(QString path)
         if (cfg.getDouble(secName, "MainReservoirPressure", pFL))
         {
             main_reservoir->setY(0, pFL);
+        }
+
+        double k_flow = 0.0;
+
+        if (cfg.getDouble(secName, "MainReservoirFlow", k_flow))
+        {
+            main_reservoir->setFlowCoeff(k_flow);
         }
 
         double ch_press = 0.0;

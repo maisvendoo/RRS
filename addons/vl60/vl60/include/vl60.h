@@ -82,14 +82,10 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
-    float   Uks;
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
     bool    gv_return;
-
-    float   test_lamp;
-    int     sig;
 
     /// Зарядное давление
     double  charge_press;
