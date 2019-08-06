@@ -71,14 +71,12 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s PANT_AC1: %2 m: %3 kV: %4 Kind: %5 Up: %6: Down")
+    DebugMsg = QString("t: %1 s, PANT_AC1: %2 m, PANT_AC2: %3 m, PANT_DC1: %4 m, PANT_DC2: %5 m")
             .arg(t, 10, 'f', 2)
             .arg(pantograph[PANT_AC1]->getHeight(), 4, 'f', 2)
-            .arg(pantograph[PANT_AC1]->getUout() / 1000.0, 4, 'f', 1)
-            .arg(pantograph[PANT_AC1]->getCurrentKindOut(), 1)
-            .arg(pantograph[PANT_AC1]->isUp(), 1)
-            .arg(pantograph[PANT_AC1]->isDown(), 1);
-
+            .arg(pantograph[PANT_AC2]->getHeight(), 4, 'f', 2)
+            .arg(pantograph[PANT_DC1]->getHeight(), 4, 'f', 2)
+            .arg(pantograph[PANT_DC2]->getHeight(), 4, 'f', 2);
 }
 
 //------------------------------------------------------------------------------
@@ -88,6 +86,7 @@ void EP20::stepMPCS(double t, double dt)
 {
     // Задаем начальные значения
     mpcs->setSignalInputMPCS(mpcsInput);
+    mpcs->setControl(keys);
     mpcsOutput = mpcs->getSignalOutputMPCS();
     mpcs->step(t, dt);
 }

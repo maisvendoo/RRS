@@ -9,19 +9,21 @@
 // Конструктор
 //------------------------------------------------------------------------------
 MPCS::MPCS(QObject *parent) : Device(parent)
-  , selectedCab(1)
+  , selectedCab(2)
   , last_current_kind(1)
   , taskPantState(INITIAL_STATE)
   , ref_current_kind(last_current_kind)
   , pantPriority(0)
   , prevPant(-1)
 {
-    pantUpWaitingTimer = new Timer(10.0, false);
+    pantUpWaitingTimer = new Timer(10.0, false, Q_NULLPTR);
+    pantDownWaitingTimer = new Timer(10.0, false, Q_NULLPTR);
     connect(pantUpWaitingTimer, &Timer::process, this, &MPCS::pantUpTimerHandler);
+    connect(pantDownWaitingTimer, &Timer::process, this, &MPCS::pantDownTimerHandler);
 }
 
 //------------------------------------------------------------------------------
-//
+// Деструктор
 //------------------------------------------------------------------------------
 MPCS::~MPCS()
 {
@@ -29,7 +31,7 @@ MPCS::~MPCS()
 }
 
 //------------------------------------------------------------------------------
-//
+// установить входной сигнал
 //------------------------------------------------------------------------------
 void MPCS::setSignalInputMPCS(const mpcs_input_t &mpcs_input)
 {
@@ -37,7 +39,7 @@ void MPCS::setSignalInputMPCS(const mpcs_input_t &mpcs_input)
 }
 
 //------------------------------------------------------------------------------
-//
+// Устаноновить путь к файлу значения последнего активного рода тока
 //------------------------------------------------------------------------------
 void MPCS::setStoragePath(QString path)
 {
@@ -45,7 +47,7 @@ void MPCS::setStoragePath(QString path)
 }
 
 //------------------------------------------------------------------------------
-//
+// Считать файл значения последнего активного рода тока
 //------------------------------------------------------------------------------
 void MPCS::readLastCurrentKind()
 {
@@ -64,7 +66,7 @@ void MPCS::readLastCurrentKind()
 }
 
 //------------------------------------------------------------------------------
-//
+// Записать значение рода тока в файл
 //------------------------------------------------------------------------------
 void MPCS::writeLastCurrentKind()
 {
@@ -82,7 +84,7 @@ void MPCS::writeLastCurrentKind()
 }
 
 //------------------------------------------------------------------------------
-//
+// Конечный автомат (Задача поднятия ТП)
 //------------------------------------------------------------------------------
 void MPCS::taskPantUp(state_vector_t &Y, double t)
 {
@@ -98,6 +100,8 @@ void MPCS::taskPantUp(state_vector_t &Y, double t)
         }
         case UP_PRIORETY_PANT:
         {
+            int p = pants[ref_current_kind][pantPriority];
+
             mpcs_output.pant_state[pants[ref_current_kind][pantPriority]] = true;
             taskPantState = WAITING_UP;
             break;
@@ -145,13 +149,27 @@ void MPCS::taskPantUp(state_vector_t &Y, double t)
         }
         case  LOWER_FIRST_PANT:
         {
-            if (prevPant < 0)
+            bool more_one_up = false;
+            size_t p = 0;
+
+            for (size_t i = 0; i < mpcs_input.pant_up.size(); ++i)
             {
-                taskPantState = WAITING_DOWN;
+                if (i != prevPant)
+                {
+                    more_one_up = more_one_up || mpcs_input.pant_up[i];
+
+                    if (mpcs_input.pant_up[i])
+                        p = i;
+                }
+            }
+
+            if (more_one_up)
+            {
+                mpcs_output.pant_state[p] = false;
             }
             else
             {
-                mpcs_output.pant_state[static_cast<size_t>(prevPant)] = false;
+                taskPantState = WAITING_DOWN;
             }
 
             break;
@@ -174,6 +192,14 @@ void MPCS::taskPantUp(state_vector_t &Y, double t)
         }
         case  WAITING_DOWN:
         {
+            pantDownWaitingTimer->start();
+
+            if (mpcs_input.pant_down[static_cast<size_t>(prevPant)])
+            {
+                pantDownWaitingTimer->stop();
+
+                taskPantState = READY;
+            }
 
             break;
         }
@@ -185,14 +211,17 @@ void MPCS::taskPantUp(state_vector_t &Y, double t)
         case  FAULT:
         {
 
-
             break;
         }
         default:
+
             break;
     }
 }
 
+//------------------------------------------------------------------------------
+//  Управление клавишами
+//------------------------------------------------------------------------------
 void MPCS::stepKeysControl(double t, double dt)
 {
     if (getKeyState(KEY_I))
@@ -206,17 +235,25 @@ void MPCS::stepKeysControl(double t, double dt)
             pantControlButton.set();
         }
     }
-
     pantUpWaitingTimer->step(t, dt);
+    pantDownWaitingTimer->step(t, dt);
 }
 
+//------------------------------------------------------------------------------
+//  Управление таймером поднятия ТП
+//------------------------------------------------------------------------------
 void MPCS::pantUpTimerHandler()
 {
     taskPantState = UP_RESERVE_PANT;
 }
 
+void MPCS::pantDownTimerHandler()
+{
+    taskPantState = FAULT;
+}
+
 //------------------------------------------------------------------------------
-//
+// Получить выходной сигнал МПСУ
 //------------------------------------------------------------------------------
 mpcs_output_t MPCS::getSignalOutputMPCS()
 {
@@ -225,45 +262,46 @@ mpcs_output_t MPCS::getSignalOutputMPCS()
 
 void MPCS::init()
 {
-    pant_group_t dc_group;
-    pant_group_t ac_group;
 
     switch (selectedCab)
     {
     case 1:
 
-        dc_group[0] = PANT_DC2;
-        dc_group[1] = PANT_DC1;
-        ac_group[0] = PANT_AC2;
-        ac_group[1] = PANT_AC1;
+
+        //ac_group[0] = PANT_AC2;
+        //ac_group[1] = PANT_AC1;
+
+        pants[CURRENT_DC].push_back(PANT_DC2);
+        pants[CURRENT_DC].push_back(PANT_DC1);
+        pants[CURRENT_AC].push_back(PANT_AC2);
+        pants[CURRENT_AC].push_back(PANT_AC1);
+        //pants.insert(CURRENT_AC, std::array<size_t, NUM_PANTS_GROUP>({2, 0}));
+
         break;
 
     case 2:
-        dc_group[1] = PANT_DC2;
-        dc_group[0] = PANT_DC1;
-        ac_group[1] = PANT_AC2;
-        ac_group[0] = PANT_AC1;
+
+        //pants.insert(CURRENT_DC, std::array<size_t, NUM_PANTS_GROUP>({PANT_DC1, PANT_DC2}));
+        //pants.insert(CURRENT_AC, std::array<size_t, NUM_PANTS_GROUP>({PANT_AC1, PANT_AC2}));
+
+        pants[CURRENT_DC].push_back(PANT_DC1);
+        pants[CURRENT_DC].push_back(PANT_DC2);
+        pants[CURRENT_AC].push_back(PANT_AC1);
+        pants[CURRENT_AC].push_back(PANT_AC2);
 
         break;
     }
 
-    pants.insert(CURRENT_AC, ac_group);
-    pants.insert(CURRENT_DC, dc_group);
 
     readLastCurrentKind();
 }
 
 //------------------------------------------------------------------------------
-//
+// Пердварительные шаги
 //------------------------------------------------------------------------------
 void MPCS::preStep(state_vector_t &Y, double t)
 {
     taskPantUp(Y, t);
-
-    // Подъем приоритетного токоприеника данного рода тока
-//     mpcs_output.pant_state[pants[last_current_kind][0]] = true;
-
-
 }
 
 //------------------------------------------------------------------------------

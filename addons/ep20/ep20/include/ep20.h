@@ -43,8 +43,10 @@ private:
     /// Микропроцессорная система управления электровозом
     MPCS    *mpcs;
 
+    /// Входные значения
     mpcs_input_t mpcsInput;
 
+    /// Выходные значения
     mpcs_output_t mpcsOutput;
 
     /// Массив токоприемников
@@ -56,11 +58,13 @@ private:
     /// Инициализация высоковольтной схемы
     void initHighVoltageScheme();
 
+    /// Инициализация МПСУ
     void initMPCS();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
+    /// Шаг моделирования МПСУ
     void stepMPCS(double t, double dt);
 
     /// Шаг моделирования высоковольтной схемы
@@ -69,6 +73,7 @@ private:
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
 
+    /// Обработчик клавиш
     void keyProcess();
 };
 
