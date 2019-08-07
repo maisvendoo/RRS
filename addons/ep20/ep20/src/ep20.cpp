@@ -38,6 +38,8 @@ void EP20::initMPCS()
 {
     mpcs = new MPCS();
 
+//    mtpu = new TaskPantUp();
+
     mpcs->read_custom_config(config_dir + QDir::separator() + "mpcs");
 
     mpcs->setStoragePath(config_dir + QDir::separator() + "storage" + QDir::separator());
