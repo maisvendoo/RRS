@@ -58,7 +58,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , Uks(0.0)
   , current_kind(0)
 {
-    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);
+    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);    
 }
 
 //------------------------------------------------------------------------------
@@ -447,11 +447,25 @@ void Vehicle::receiveData(QByteArray data)
     keys_mutex.unlock();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::getControlSignals(control_signals_t control_signals)
+{
+    this->control_signals = control_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::setCurrentKind(int value)
 {
     current_kind = value;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::setUks(double value)
 {
     Uks = value;

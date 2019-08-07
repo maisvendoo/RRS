@@ -122,13 +122,13 @@ void PassCarrige::step(double t, double dt)
 //------------------------------------------------------------------------------
 void PassCarrige::stepSignalsOutput()
 {
-    analogSignal[WHEEL_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_2] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_3] = static_cast<float>(wheel_rotation_angle[2] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_4] = static_cast<float>(wheel_rotation_angle[3] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
 
-    analogSignal[GEN_MUFTA1] = static_cast<float>(wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
-    analogSignal[GEN_KARDAN] = static_cast<float>(wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
+    analogSignal[GEN_MUFTA1] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
+    analogSignal[GEN_KARDAN] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------

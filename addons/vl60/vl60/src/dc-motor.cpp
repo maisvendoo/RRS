@@ -123,7 +123,7 @@ void DCMotor::ode_system(const state_vector_t &Y,
                          double t)
 {
     double R = R_a + beta * R_gp + R_dp + R_r;
-    double E = omega * calcCPhi(Y[0] * beta * direction);
+    double E = abs(omega) * calcCPhi(Y[0] * beta * direction);
 
     dYdt[0] = (U - R * Y[0] - E) / L_af;
 }

@@ -24,6 +24,9 @@
 #include    "solver-types.h"
 #include    "key-symbols.h"
 
+#include    "control-signals.h"
+#include    "feedback-signals.h"
+
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
 #else
@@ -155,6 +158,8 @@ public slots:
     
     void receiveData(QByteArray data);
 
+    void getControlSignals(control_signals_t control_signals);
+
 signals:
 
     void logMessage(QString msg);
@@ -166,6 +171,8 @@ signals:
     void soundSetVolume(QString name, int volume);
 
     void soundSetPitch(QString name, float pitch);
+
+    void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
 protected:
 
@@ -261,6 +268,10 @@ protected:
     bool    discreteSignal[NUM_DISCRETE_SIGNALS];
     /// Analog signals for output
     float   analogSignal[NUM_ANALOG_SIGNALS];
+
+    control_signals_t   control_signals;
+
+    feedback_signals_t  feedback_signals;
 
     /// User defined initialization
     virtual void initialization();

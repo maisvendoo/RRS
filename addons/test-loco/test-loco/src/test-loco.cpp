@@ -81,7 +81,7 @@ void TestLoco::step(double t, double dt)
 {
     feedback_signals_t trac_feedback = trac_controller->getFeedback();
 
-    traction_level = Physics::cut(static_cast<double>(trac_feedback.analogSignal[0]), 0.0, 1.0);
+    //traction_level = Physics::cut(static_cast<double>(trac_feedback.analogSignal[0]), 0.0, 1.0);
 
     if (brake_mech != nullptr)
     {
@@ -95,7 +95,7 @@ void TestLoco::step(double t, double dt)
     {
         double torque = traction_level * traction_char(velocity) * wheel_diameter / num_axis / 2.0;
         double brakeTorque = brake_mech->getBrakeTorque();
-        Q_a[i] = torque * static_cast<double>(trac_feedback.analogSignal[1]);
+        //Q_a[i] = torque * static_cast<double>(trac_feedback.analogSignal[1]);
         Q_r[i] = brakeTorque;
     }
 
@@ -303,7 +303,6 @@ void TestLoco::keyProcess()
     analogSignal[27] = static_cast<float>(abs(velocity) * Physics::kmh / 150.0);
     analogSignal[28] = static_cast<float>(traction_level);
     analogSignal[29] = static_cast<float>(loco_crane->getHandlePosition());
-    analogSignal[30] = trac_controller->getFeedback().analogSignal[1];
 
     analogSignal[194] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[195] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
@@ -311,6 +310,8 @@ void TestLoco::keyProcess()
     analogSignal[197] = static_cast<float>(wheel_rotation_angle[3] / 2.0 / Physics::PI);
     analogSignal[198] = static_cast<float>(wheel_rotation_angle[4] / 2.0 / Physics::PI);
     analogSignal[199] = static_cast<float>(wheel_rotation_angle[5] / 2.0 / Physics::PI);
+
+    //analogSignal[30] = trac_controller->getFeedback().analogSignal[1];
 }
 
 GET_VEHICLE(TestLoco)
