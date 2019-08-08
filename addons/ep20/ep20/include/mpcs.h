@@ -1,12 +1,11 @@
 #ifndef MPCS_H
 #define MPCS_H
 
-#include "device.h"
-#include "mpcs-data.h"
-#include "pant-description.h"
-#include "task-pant-state.h"
-#include "timer.h"
-#include "mpcs-task-pant-up.h"
+#include    "device.h"
+#include    "mpcs-data.h"
+#include    "pant-description.h"
+#include    "timer.h"
+#include    "mpcs-task-pant.h"
 
 class MPCS : public Device
 {
@@ -33,18 +32,13 @@ private:
     /// Путь к файлу рода тока
     QString pathStorage;
 
-    ///
-    TaskPant    *taskPantUp;
-
-    TaskPant    *taskPantDown;
-
-    /// Управление кнопками ТП
-    Trigger pantControlButton;
+    /// Состояния ТП
+    TaskPant    *taskPant;
 
     /// Выходные значения
     mpcs_input_t mpcs_input;
 
-    /// выходные значения
+    /// Выходные значения
     mpcs_output_t mpcs_output;
 
     /// Управление клавишами

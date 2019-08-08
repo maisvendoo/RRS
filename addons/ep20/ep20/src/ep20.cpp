@@ -24,7 +24,7 @@ EP20::~EP20()
 //------------------------------------------------------------------------------
 void EP20::initialization()
 {
-    //
+    // Вызваем метод
     initMPCS();
 
     // Вызываем метод
@@ -37,8 +37,6 @@ void EP20::initialization()
 void EP20::initMPCS()
 {
     mpcs = new MPCS();
-
-//    mtpu = new TaskPantUp();
 
     mpcs->read_custom_config(config_dir + QDir::separator() + "mpcs");
 

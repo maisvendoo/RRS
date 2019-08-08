@@ -1,31 +1,46 @@
-#include <fstream>
-#include <iostream>
-#include "qobject.h"
+#include    <fstream>
+#include    <iostream>
+#include    "qobject.h"
 
-#include "mpcs-task-pant.h"
-#include "current-kind.h"
+#include    "mpcs-task-pant.h"
+#include    "current-kind.h"
 
+//------------------------------------------------------------------------------
+// Конструктор
+//------------------------------------------------------------------------------
 TaskPant::TaskPant(QObject *parent) : QObject(parent)
   , selectedCab(1)
   , last_current_kind(1)
-  , taskPantState(INITIAL_STATE)
+  , taskPantStateUp(INITIAL_STATE_IS_UP)
+  , taskPantStateDown(INITIAL_STATE_IS_DOWN)
+  , isMainSwitch(false)
+  , isHighSpeedSwitch(false)
   , ref_current_kind(last_current_kind)
   , pantPriority(0)
   , prevPant(-1)
+  , downedPant(0)
 {
     std::fill(ctrl_signals.begin(), ctrl_signals.end(), false);
 
     pantUpWaitingTimer = new Timer(10.0, false, Q_NULLPTR);
     pantDownWaitingTimer = new Timer(10.0, false, Q_NULLPTR);
+    protectionDeviceWaitingTimer = new Timer(1.0, false, Q_NULLPTR);
     connect(pantUpWaitingTimer, &Timer::process, this, &TaskPant::pantUpTimerHandler);
     connect(pantDownWaitingTimer, &Timer::process, this, &TaskPant::pantDownTimerHandler);
+    connect(protectionDeviceWaitingTimer, &Timer::process, this, &TaskPant::protectionDeviceTimerHandler);
 }
 
+//------------------------------------------------------------------------------
+// Деструктор
+//------------------------------------------------------------------------------
 TaskPant::~TaskPant()
 {
 
 }
 
+//------------------------------------------------------------------------------
+// Установка контрольных сигналов
+//------------------------------------------------------------------------------
 void TaskPant::setControlSignal(size_t id, bool value)
 {
     ctrl_signals[id] = value;
@@ -68,6 +83,9 @@ void TaskPant::writeLastCurrentKind()
     }
 }
 
+//------------------------------------------------------------------------------
+// Команда на подъем ТП
+//------------------------------------------------------------------------------
 bool TaskPant::isCommandUp()
 {
     if (ctrl_signals[FORWARD_UP])
@@ -79,6 +97,9 @@ bool TaskPant::isCommandUp()
     return ctrl_signals[FORWARD_UP] || ctrl_signals[BACKWARD_UP];
 }
 
+//------------------------------------------------------------------------------
+// Команда на опускание ТП
+//------------------------------------------------------------------------------
 bool TaskPant::isCommandDown()
 {
     if (ctrl_signals[FORWARD_DOWN])
@@ -119,23 +140,28 @@ void TaskPant::init()
     readLastCurrentKind();
 }
 
+//------------------------------------------------------------------------------
+// Деление на цело (для проверки на опускание предыдущего поднятого ТП)
+//------------------------------------------------------------------------------
 bool isEven(int num)
 {
     return ( (num % 2) == 0);
 }
 
+//------------------------------------------------------------------------------
+// Обработка поднятие ТП
+//------------------------------------------------------------------------------
 void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
 {
     bool is_command_up = isCommandUp();
 
-    switch (taskPantState)
+    switch (taskPantStateUp)
     {
-        case  INITIAL_STATE:
+        case  INITIAL_STATE_IS_UP:
         {
-
             if (is_command_up)
             {
-                taskPantState = UP_PRIORETY_PANT;
+                taskPantStateUp = UP_PRIORETY_PANT;
             }
 
             break;
@@ -147,23 +173,10 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
             ctrl_signals[FORWARD_UP] = false;
             ctrl_signals[BACKWARD_UP] = false;
 
-            taskPantState = WAITING_UP;
+            taskPantStateUp = WAITING_UP;
 
             break;
         }
-
-        case DOWN_PRIORETY_PANT:
-        {
-            mpcs_output.pant_state[pants[ref_current_kind][pantPriority]] = false;
-
-            ctrl_signals[FORWARD_DOWN] = false;
-            ctrl_signals[BACKWARD_DOWN] = false;
-
-            taskPantState = WAITING_DOWN;
-
-            break;
-        }
-
         case  WAITING_UP:
         {
             pantUpWaitingTimer->start();
@@ -174,7 +187,7 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
 
                 prevPant = static_cast<int>(pants[ref_current_kind][pantPriority]);
 
-                taskPantState = CONTROL_CURRENT_KIND;
+                taskPantStateUp = CONTROL_CURRENT_KIND;
             }
             break;
         }
@@ -182,11 +195,11 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
         {
             if (mpcs_input.current_kind == ref_current_kind)
             {
-                taskPantState = LOWER_FIRST_PANT;
+                taskPantStateUp = LOWER_FIRST_PANT;
             }
             else
             {
-                taskPantState = CHANGE_KURRENT_KIND;
+                taskPantStateUp = CHANGE_KURRENT_KIND;
             }
             break;
         }
@@ -201,7 +214,7 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
                 ref_current_kind = CURRENT_AC;
             }
 
-            taskPantState = UP_PRIORETY_PANT;
+            taskPantStateUp = UP_PRIORETY_PANT;
 
             break;
         }
@@ -224,63 +237,170 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
 
             if (!(isEven(p) ^ isEven(prevPant)))
             {
-                taskPantState = READY;
+                taskPantStateUp = READY;
                 break;
             }
 
             if (more_one_up)
             {
                 mpcs_output.pant_state[p] = false;
-                taskPantState = WAITING_DOWN;
+                taskPantStateUp = WAITING_DOWN_UPON_UP;
                 pantDownWaitingTimer->start();
             }
             else
             {
-                taskPantState = READY;
+                taskPantStateUp = READY;
             }
             break;
         }
 
-        case  WAITING_DOWN:
+        case  WAITING_DOWN_UPON_UP:
         {
             if (mpcs_input.pant_down[static_cast<size_t>(prevPant)])
             {
                 pantDownWaitingTimer->stop();
-                taskPantState = READY;
+                taskPantStateUp = READY;
             }
 
             break;
         }
         case  READY:
         {
-            taskPantState = INITIAL_STATE;
+            writeLastCurrentKind();
+            taskPantStateUp = INITIAL_STATE_IS_UP;
             break;
         }
-        case  FAULT:
+        case  FAULT_IS_UP:
         {
-            taskPantState = INITIAL_STATE;
+            taskPantStateUp = INITIAL_STATE_IS_UP;
             break;
         }
         default:
-
             break;
     }
 }
 
+//------------------------------------------------------------------------------
+// Обработка опускания ТП
+//------------------------------------------------------------------------------
+void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
+{
+    bool is_command_down = isCommandDown();
+
+    switch (taskPantStateDown)
+    {
+        case INITIAL_STATE_IS_DOWN:
+        {
+           if (is_command_down)
+           {
+               taskPantStateDown = IS_OFF_MS_HSS;
+           }
+
+           break;
+        }
+        case IS_OFF_MS_HSS:
+        {
+            if (!isMainSwitch && !isHighSpeedSwitch)
+            {
+                taskPantStateDown = LOWER_PANT;
+            }
+            else
+            {
+                taskPantStateDown = TURN_OFF_PROTECTION_DEVICE;
+            }
+
+            break;
+        }
+        case TURN_OFF_PROTECTION_DEVICE:
+        {
+
+            isMainSwitch = true;
+            isHighSpeedSwitch = true;
+            taskPantStateDown = WAITING_TURN_OFF;
+
+            break;
+        }
+        case WAITING_TURN_OFF:
+        {
+            protectionDeviceWaitingTimer->start();
+
+            if(isMainSwitch && isHighSpeedSwitch)
+            {
+                protectionDeviceWaitingTimer->stop();
+
+                taskPantStateDown = LOWER_PANT;
+            }
+            else
+            {
+                taskPantStateDown = FAULT_IS_DOWN;
+            }
+
+            break;
+        }
+        case LOWER_PANT:
+        {
+            int downedPant = pants[ref_current_kind][pantPriority];
+            mpcs_output.pant_state[downedPant] = false;
+            ctrl_signals[FORWARD_DOWN] = false;
+            ctrl_signals[BACKWARD_DOWN] = false;
+
+            taskPantStateDown = WAITING_DOWN_UPON_DOWN;
+            pantDownWaitingTimer->start();
+
+            break;
+        }
+        case WAITING_DOWN_UPON_DOWN:
+        {
+            if (mpcs_input.pant_down[static_cast<size_t>(downedPant)])
+            {
+                pantDownWaitingTimer->stop();
+                taskPantStateDown = INITIAL_STATE_IS_DOWN;
+            }
+
+            break;
+        }
+        case FAULT_IS_DOWN:
+        {
+            taskPantStateDown = INITIAL_STATE_IS_DOWN;
+            break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// Шаг моделирования
+//------------------------------------------------------------------------------
 void TaskPant::step(state_vector_t &Y, double t, double dt, const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
 {
     pantUp(mpcs_input, mpcs_output);
 
+    pantDown(mpcs_input, mpcs_output);
+
     pantUpWaitingTimer->step(t, dt);
     pantDownWaitingTimer->step(t, dt);
+    protectionDeviceWaitingTimer->step(t, dt);
 }
 
+//------------------------------------------------------------------------------
+// Таймер поднятия ТП
+//------------------------------------------------------------------------------
 void TaskPant::pantUpTimerHandler()
 {
-    taskPantState = FAULT;
+    taskPantStateUp = FAULT_IS_UP;
 }
 
+//------------------------------------------------------------------------------
+// Таймер опускания ТП
+//------------------------------------------------------------------------------
 void TaskPant::pantDownTimerHandler()
 {
-    taskPantState = FAULT;
+    taskPantStateUp = FAULT_IS_UP;
+}
+
+//------------------------------------------------------------------------------
+// Таймер отключения АЗ
+//------------------------------------------------------------------------------
+void TaskPant::protectionDeviceTimerHandler()
+{
+    taskPantStateDown = FAULT_IS_DOWN;
 }

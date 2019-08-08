@@ -15,7 +15,6 @@ struct mpcs_input_t
 
     std::array<bool, NUM_PANTOGRAPHS> pant_down;
 
-
     mpcs_input_t()
     {
         current_kind = 0;

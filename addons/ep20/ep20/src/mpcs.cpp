@@ -21,11 +21,14 @@ MPCS::~MPCS()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MPCS::init()
 {
-    taskPantUp = new TaskPant();
-    taskPantUp->init();
-    // вызвать инит класс такс пант ап
+    taskPant = new TaskPant();
+
+    taskPant->init();
 }
 
 void MPCS::setSignalInputMPCS(const mpcs_input_t &mpcs_input)
@@ -52,11 +55,11 @@ void MPCS::stepKeysControl(double t, double dt)
     {
         if (isShift())
         {
-            taskPantUp->setControlSignal(BACKWARD_UP, true);
+            taskPant->setControlSignal(BACKWARD_UP, true);
         }
         else
         {
-            taskPantDown->setControlSignal(BACKWARD_DOWN, true);
+            taskPant->setControlSignal(BACKWARD_DOWN, true);
         }
     }
 
@@ -64,21 +67,18 @@ void MPCS::stepKeysControl(double t, double dt)
     {
         if (isShift())
         {
-            taskPantUp->setControlSignal(FORWARD_UP, true);
+            taskPant->setControlSignal(FORWARD_UP, true);
         }
         else
         {
-            taskPantDown->setControlSignal(FORWARD_DOWN, true);
+            taskPant->setControlSignal(FORWARD_DOWN, true);
         }
     }
 }
 
 void MPCS::stepDiscrete(double t, double dt)
-{
-    //taskPantUp->setControlSignal(FORWARD_UP, false);
-    //taskPantUp->setControlSignal(BACWARD_UP, pantControlButton.getState());
-    taskPantUp->step(y, t, dt, mpcs_input, mpcs_output);
-    // Вызвать степ класса такс пант ап
+{   
+    taskPant->step(y, t, dt, mpcs_input, mpcs_output);
 }
 
 //------------------------------------------------------------------------------

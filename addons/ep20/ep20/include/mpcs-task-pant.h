@@ -1,12 +1,12 @@
 #ifndef MPCSTASKPANTUP_H
 #define MPCSTASKPANTUP_H
 
-#include "mpcs-task.h"
-#include "task-pant-state.h"
-#include "timer.h"
-#include "trigger.h"
+#include    "mpcs-task.h"
+#include    "task-pant-state-up.h"
+#include    "task-pant-state-down.h"
+#include    "timer.h"
 
-#include <QString>
+#include    <QString>
 
 //------------------------------------------------------------------------------
 // Нумератор поднятия переднего или заднего ТП
@@ -23,7 +23,7 @@ enum
 
 
 //------------------------------------------------------------------------------
-// Задача поднятия ТП
+// Класс реализация поднятия/опускания ТП
 //------------------------------------------------------------------------------
 class TaskPant : public QObject
 {
@@ -34,6 +34,7 @@ public:
     /// Конструктор
     TaskPant(QObject *parent = Q_NULLPTR);
 
+    /// Деструктор
     ~TaskPant();
 
     /// Инициализация
@@ -45,6 +46,7 @@ public:
               const mpcs_input_t &mpcs_input,
               mpcs_output_t &mpcs_output);
 
+    /// Установить контрольные сигналы
     void setControlSignal(size_t id, bool value);
 
 private:
@@ -58,8 +60,17 @@ private:
     /// Последнее значение рода тока
     int last_current_kind;
 
-    /// Состояние ТП
-    TASK_PANT taskPantState;
+    /// Состояние поднятия ТП
+    TASK_PANT_UP taskPantStateUp;
+
+    /// Состояние опускания ТП
+    TASK_PANT_DOWN taskPantStateDown;
+
+    /// Состояние ГВ
+    bool isMainSwitch;
+
+    /// Состояние БВ
+    bool isHighSpeedSwitch;
 
     /// Изменеяемое значение рода тока
     int ref_current_kind;
@@ -70,6 +81,9 @@ private:
     /// Предыдущий ТП
     int prevPant;
 
+    /// Опускаем ТП
+    int downedPant;
+
     enum
     {
         NUM_PANTS_GROUP = 2
@@ -79,14 +93,14 @@ private:
     typedef std::vector<size_t> pant_group_t;
     std::array<pant_group_t, 3> pants;
 
-//    /// Управление кнопками ТП
-//    Trigger pantControlButton;
-
     /// Таймер ожидания поднятия ТП
     Timer *pantUpWaitingTimer;
 
     /// Таймер ожидания опускания ТП
     Timer *pantDownWaitingTimer;
+
+    /// Таймер ождания отключения АЗ
+    Timer *protectionDeviceWaitingTimer;
 
     /// Сигналы управления токоприемниками
     std::array<bool, NUM_CONTROLS> ctrl_signals;
@@ -97,11 +111,17 @@ private:
     /// Записать в файл последний род тока
     void writeLastCurrentKind();
 
+    /// Команда поднятия ТП
     bool isCommandUp();
 
+    /// Команда опускания ТП
     bool isCommandDown();
 
+    /// Обработка состояний поднятия ТП
     void pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output);
+
+    /// Обработка состояний опускания ТП
+    void pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output);
 
 private slots:
 
@@ -110,6 +130,9 @@ private slots:
 
     /// Управление таймером опускания ТП
     void pantDownTimerHandler();
+
+    /// Управление таймером отключения ГВ/БВ
+    void protectionDeviceTimerHandler();
 };
 
 #endif // MPCSTASKPANTUP_H
