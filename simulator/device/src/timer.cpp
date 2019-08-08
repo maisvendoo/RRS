@@ -8,6 +8,7 @@ Timer::Timer(double timeout, bool first_process, QObject *parent)
     , tau(0.0)
     , timeout(timeout)
     , first_process(first_process)
+    , fprocess_prev(first_process)
     , is_started(false)
 {
 
@@ -34,6 +35,7 @@ void Timer::step(double t, double dt)
         {
             emit process();
             tau = 0;
+            fprocess_prev = first_process;
             first_process = false;
         }
 
@@ -64,7 +66,7 @@ void Timer::stop()
 //------------------------------------------------------------------------------
 void Timer::reset()
 {
-    first_process = true;
+    first_process = fprocess_prev;
     tau = 0.0;
 }
 

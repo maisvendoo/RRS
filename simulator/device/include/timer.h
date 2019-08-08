@@ -59,6 +59,8 @@ private:
     /// First timer action
     bool    first_process;
 
+    bool    fprocess_prev;
+
     /// is started flag
     bool    is_started;
 };
