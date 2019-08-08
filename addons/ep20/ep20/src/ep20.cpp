@@ -112,7 +112,7 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         pantograph[i]->setState(mpcsOutput.pant_state[i]);
 
         pantograph[i]->setUks(25000.0);
-        pantograph[i]->setCurrentKindIn(1);
+        pantograph[i]->setCurrentKindIn(2);
         pantograph[i]->step(t, dt);
     }
 

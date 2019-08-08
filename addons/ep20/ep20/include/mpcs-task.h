@@ -7,7 +7,7 @@
 
 #include    <QObject>
 
-class DEVICE_EXPORT Task : public QObject
+class Task : public QObject
 {
     Q_OBJECT
 

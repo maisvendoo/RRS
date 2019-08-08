@@ -5,7 +5,7 @@
 #include "mpcs-task-pant-up.h"
 #include "current-kind.h"
 
-TaskPantUp::TaskPantUp(QObject *parent) : Task(parent)
+TaskPantUp::TaskPantUp(QObject *parent) : QObject(parent)
   , selectedCab(1)
   , last_current_kind(1)
   , taskPantState(INITIAL_STATE)
