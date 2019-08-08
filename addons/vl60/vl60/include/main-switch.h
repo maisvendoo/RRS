@@ -10,7 +10,7 @@ class MainSwitch : public Device
 {
 public:
 
-    MainSwitch(QString config_path,  QObject *parent = Q_NULLPTR);
+    MainSwitch(QObject *parent = Q_NULLPTR);
 
     ~MainSwitch();
 
@@ -76,9 +76,7 @@ private:
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-    void load_config(CfgReader &cfg);
-
-    void load_config(QString cfg_path);
+    void load_config(CfgReader &cfg);    
 };
 
 #endif // MAIN_SWITCH_H

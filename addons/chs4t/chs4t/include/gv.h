@@ -22,22 +22,26 @@ class GV : public Device
 {
 public:
 
+    /// Конструктор
     GV(QObject *parent = Q_NULLPTR);
 
+    /// Деструктор
+    ~GV();
+
+    void setP0(double P0)       { this->P0 = P0; }
+    void setP1(double P1)       { this->P1 = P1; }
+
+    void setUkr(double Ukr)     { this->Ukr = Ukr; }
+
+    void setGVState(bool state) { this->GVstate = state; }
+    void setVZState(bool state) { this->VZstate = state; }
+
+    void setPhc(bool phc)       { this->phc = phc; }
 
 
-    double getX();
-    double getUout();
+    double getX()    { return getY(0); }
+    double getUout() { return Uout; }
 
-    void setP0(double _P0);
-    void setP1(double _P1);
-
-    void setUkr(double Ukr);
-
-    void setGVState(bool state);
-    void setVZState(bool state);
-
-    void setPhc(bool phc);
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -46,9 +50,7 @@ private:
     void stepKeysControl(double t, double dt);
 
 
-
     CfgReader cfg_;
-
 
     double  Uout;
     double  Ukr;
@@ -68,10 +70,13 @@ private:
     double sdk;
     double Pdk;
 
+    /// Состояние главного выключателя
     bool GVstate;
+
+    /// Состояние возврата защиты
     bool VZstate;
-    double tVZ;
-    ///
+
+    /// Питание удерживающей катушки
     bool phc;
 
 };

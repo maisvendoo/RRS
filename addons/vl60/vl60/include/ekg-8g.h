@@ -28,6 +28,8 @@ public:
 
     bool isReady() const;
 
+    bool isLKallow() const;
+
 private:
 
     enum
@@ -51,6 +53,9 @@ private:
 
     /// Признак готовности ЭКГ к работе
     bool    is_ready;
+
+    /// Признак разрешения на включение линейных контакторов
+    bool    is_LK_allow;
 
     /// Таймер управления переключением позиций
     Timer   pos_switcher;

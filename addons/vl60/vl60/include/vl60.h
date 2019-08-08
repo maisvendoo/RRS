@@ -34,6 +34,7 @@
 #include    "dc-motor.h"
 #include    "overload-relay.h"
 #include    "sl2m.h"
+#include    "registrator.h"
 
 /*!
  * \class
@@ -53,8 +54,8 @@ public:
     ~VL60();
 
     /// Инициализация тормозных приборов
-    void initBrakeDevices(double p0, double pTM, double pFL);
-
+    void initBrakeDevices(double p0, double pTM, double pFL);    
+    
 private:
 
     enum
@@ -81,14 +82,10 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
-    float   Uks;
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
     bool    gv_return;
-
-    float   test_lamp;
-    int     sig;
 
     /// Зарядное давление
     double  charge_press;
@@ -117,6 +114,17 @@ private:
 
     /// Триггер тумблера "Цепи управления"
     Trigger cu_tumbler;
+
+    enum
+    {
+        NUM_RB = 3,
+        RB_1 = 0,
+        RBP = 1,
+        RBS = 2
+    };
+
+    /// Триггеры рукояток бдительности
+    std::array<Trigger, NUM_RB>  rb;
 
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
@@ -224,6 +232,9 @@ private:
     /// Свисток и тифон
     TrainHorn   *horn;
 
+    /// Регистратор, для записи параметров
+    Registrator *reg;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -244,6 +255,12 @@ private:
 
     /// Инициализация приборов торможения (ВР и сопуствующая обвязка)
     void initBrakeEquipment(QString modules_dir);
+
+    /// Инициализация схемы управления тягой
+    void initTractionControl();
+
+    void initOtherEquipment();
+
 
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
@@ -270,19 +287,26 @@ private:
 
     void stepLineContactors(double t, double dt);
 
+    void stepOtherEquipment(double t, double dt);
+
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
 
     void stepSignalsOutput();
 
+    void registration(double t, double dt);
+
+    double getTractionForce();
+
     bool getHoldingCoilState() const;
 
     /// Обработка нажатий клавиш
     void keyProcess();
 
-    void initTractionControl();
     void debugPrint(double t);
+
+    void load_brakes_config(QString path);
 };
 
 #endif // VL60_H

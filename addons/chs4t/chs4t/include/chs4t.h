@@ -16,6 +16,9 @@
 #include    "vehicle-api.h"
 #include    "pantograph.h"
 #include    "gv.h"
+#include    "auto-transformer.h"
+#include    "km-21kr2.h"
+#include    "stepswitch.h"
 
 enum
 {
@@ -47,6 +50,12 @@ private:
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
     GV *glavV;
+
+    AutoTransformer *autoTrans;
+
+    Km21KR2 *km21KR2;
+
+    StepSwitch *stepSwitch;
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);

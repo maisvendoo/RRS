@@ -234,39 +234,42 @@ void BrakeCrane395::stepKeysControl(double t, double dt)
         incTimer->stop();
     }
 
-    if (getKeyState(KEY_1))
+    if (isAlt())
     {
-        handle_pos = POS_I;
-    }
+        if (getKeyState(KEY_1))
+        {
+            handle_pos = POS_I;
+        }
 
-    if (getKeyState(KEY_2))
-    {
-        handle_pos = POS_II;
-    }
+        if (getKeyState(KEY_2))
+        {
+            handle_pos = POS_II;
+        }
 
-    if (getKeyState(KEY_3))
-    {
-        handle_pos = POS_III;
-    }
+        if (getKeyState(KEY_3))
+        {
+            handle_pos = POS_III;
+        }
 
-    if (getKeyState(KEY_4))
-    {
-        handle_pos = POS_IV;
-    }
+        if (getKeyState(KEY_4))
+        {
+            handle_pos = POS_IV;
+        }
 
-    if (getKeyState(KEY_5))
-    {
-        handle_pos = POS_Va;
-    }
+        if (getKeyState(KEY_5))
+        {
+            handle_pos = POS_Va;
+        }
 
-    if (getKeyState(KEY_6))
-    {
-        handle_pos = POS_V;
-    }
+        if (getKeyState(KEY_6))
+        {
+            handle_pos = POS_V;
+        }
 
-    if (getKeyState(KEY_7))
-    {
-        handle_pos = POS_VI;
+        if (getKeyState(KEY_7))
+        {
+            handle_pos = POS_VI;
+        }
     }
 
     setPosition(handle_pos);

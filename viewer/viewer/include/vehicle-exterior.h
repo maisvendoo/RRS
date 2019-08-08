@@ -2,6 +2,7 @@
 #define     VEHICLE_EXTERIOR_H
 
 #include    <osg/MatrixTransform>
+#include    <animations-list.h>
 
 //------------------------------------------------------------------------------
 //
@@ -17,6 +18,8 @@ struct vehicle_exterior_t
     float       coord;
     float       length;
     osg::Vec3   driver_pos;
+
+    animations_t *anims;
 };
 
 #endif // VEHICLE_EXTERIOR_H

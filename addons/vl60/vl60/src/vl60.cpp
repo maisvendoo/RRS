@@ -20,13 +20,10 @@
 //
 //------------------------------------------------------------------------------
 VL60::VL60() : Vehicle ()
-  , Uks(30000.0f)
   , pant1_pos(0.0)
   , pant2_pos(0.0)
   , gv_pos(0.0)
-  , gv_return(false)
-  , test_lamp(0.0)
-  , sig(1)
+  , gv_return(false)  
   , charge_press(0.0)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
@@ -67,6 +64,13 @@ VL60::VL60() : Vehicle ()
     cu_tumbler.setOnSoundName("K_Tumbler_On");
     cu_tumbler.setOffSoundName("K_Tumbler_Off");
     connect(&cu_tumbler, &Trigger::soundPlay, this, &VL60::soundPlay);
+
+    for (size_t i = 0; i < rb.size(); ++i)
+    {
+        rb[i].setOnSoundName("RB_Down");
+        rb[i].setOffSoundName("RB_Up");
+        connect(&rb[i], &Trigger::soundPlay, this, &VL60::soundPlay);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -84,6 +88,8 @@ void VL60::initBrakeDevices(double p0, double pTM, double pFL)
 {
     main_reservoir->setY(0, pFL);
     charge_press = p0;
+
+    load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
 }
 
 //------------------------------------------------------------------------------
@@ -91,11 +97,12 @@ void VL60::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 void VL60::initPantographs()
 {
-    QString pant_cfg_path = config_dir + QDir::separator() + "pantograph.xml";
+    QString pant_cfg_path = config_dir + QDir::separator() + "pantograph";
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
-        pantographs[i] = new Pantograph(pant_cfg_path);
+        pantographs[i] = new Pantograph();
+        pantographs[i]->read_custom_config(pant_cfg_path);
         connect(pantographs[i], &Pantograph::soundPlay, this, &VL60::soundPlay);
     }
 }
@@ -105,9 +112,10 @@ void VL60::initPantographs()
 //------------------------------------------------------------------------------
 void VL60::initHighVoltageScheme()
 {
-    QString gv_cfg_path = config_dir + QDir::separator() + "main-switch.xml";
+    QString gv_cfg_path = config_dir + QDir::separator() + "main-switch";
 
-    main_switch = new MainSwitch(gv_cfg_path);
+    main_switch = new MainSwitch();
+    main_switch->read_custom_config(gv_cfg_path);
     connect(main_switch, &MainSwitch::soundPlay, this, &VL60::soundPlay);
 
     gauge_KV_ks = new Oscillator();
@@ -217,6 +225,8 @@ void VL60::initTractionControl()
         motor[i] = new DCMotor();
         motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_custom_config(config_dir + QDir::separator() + "HB-412K");
+        connect(motor[i], &DCMotor::soundSetPitch, this, &VL60::soundSetPitch);
+        connect(motor[i], &DCMotor::soundSetVolume, this, &VL60::soundSetVolume);
 
         overload_relay[i] = new OverloadRelay();
         overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
@@ -226,10 +236,29 @@ void VL60::initTractionControl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::initOtherEquipment()
+{
+    speed_meter = new SL2M();
+    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
+    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60::soundSetVolume);
+
+    horn = new TrainHorn();
+    connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
+
+    //reg = new Registrator("vl60");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    Uks = WIRE_VOLTAGE;
+    current_kind = 1;
 
     initPantographs();
 
@@ -245,13 +274,7 @@ void VL60::initialization()
 
     initTractionControl();
 
-    speed_meter = new SL2M();
-    speed_meter->setWheelDiameter(wheel_diameter);
-    speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
-    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60::soundSetVolume);
-
-    horn = new TrainHorn();
-    connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
+    initOtherEquipment();
 }
 
 //------------------------------------------------------------------------------
@@ -259,7 +282,8 @@ void VL60::initialization()
 //------------------------------------------------------------------------------
 void VL60::debugPrint(double t)
 {
-    DebugMsg = QString("t: %1 ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 Uтэд: %6 Поз.: %7 Iя: %8 А Iв: %9 А")
+    DebugMsg = QString("t: %1 v: %11 км/ч ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 В Uтэд: %6 В Поз.: %7 Iя: %8 А Iв: %9 А")
+
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
             .arg(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure(), 4, 'f', 2)
@@ -269,7 +293,25 @@ void VL60::debugPrint(double t)
             .arg(trac_trans->getPosName(), 2)
             .arg(motor[TED1]->getIa(), 6,'f',1)
             .arg(motor[TED1]->getIf(), 6,'f',1)
-            .arg(vu[VU1]->getU_out(), 6, 'f', 1);
+            .arg(vu[VU1]->getU_out(), 6, 'f', 1)
+            .arg(velocity * Physics::kmh, 6, 'f', 1);
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::stepOtherEquipment(double t, double dt)
+{
+    speed_meter->setOmega(wheel_omega[TED1]);
+    speed_meter->step(t, dt);
+
+    horn->setControl(keys);
+    horn->step(t, dt);
+
+    debugPrint(t);
+
+    //registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -301,13 +343,7 @@ void VL60::step(double t, double dt)
 
     stepLineContactors(t, dt);
 
-    speed_meter->setOmega(wheel_omega[TED1]);
-    speed_meter->step(t, dt);
-
-    horn->setControl(keys);
-    horn->step(t, dt);
-
-    debugPrint(t);
+    stepOtherEquipment(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -318,7 +354,7 @@ void VL60::stepPantographsControl(double t, double dt)
     for (auto pant : pantographs)
     {
         // Задаем текущее напряжение КС (пока что через константу)
-        pant->setUks(WIRE_VOLTAGE);
+        pant->setUks(Uks);
         // Моделируем работу токоприемников
         pant->step(t, dt);
     }
@@ -389,8 +425,8 @@ void VL60::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepMotorCompressor(double t, double dt)
 {
-    double k_flow = 5e-3;
-    main_reservoir->setFlowCoeff(k_flow);
+    //double k_flow = 5e-3;
+    //main_reservoir->setFlowCoeff(k_flow);
     main_reservoir->setAirFlow(motor_compressor->getAirFlow());
     main_reservoir->step(t, dt);
 
@@ -667,6 +703,53 @@ void VL60::stepSignalsOutput()
     analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
     analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
+
+    analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[RB_1].getState());
+    analogSignal[KNOPKA_RBS] = static_cast<float>(rb[RBS].getState());
+    analogSignal[KNOPKA_RBP] = static_cast<float>(rb[RBP].getState());
+
+    analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_5] = static_cast<float>(dir * wheel_rotation_angle[4] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_6] = static_cast<float>(dir * wheel_rotation_angle[5] / 2.0 / Physics::PI);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::registration(double t, double dt)
+{
+    QString line = QString("%1 %2 %3 %4 %5 %6 %7")
+            .arg(t)
+            .arg(velocity * Physics::kmh)
+            .arg(motor[TED1]->getUd())
+            .arg(motor[TED1]->getIa())
+            .arg(motor[TED1]->getIf())
+            .arg(getTractionForce() / Physics::g)
+            .arg(R2 / Physics::g);
+
+    reg->print(line, t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double VL60::getTractionForce()
+{
+    double ip = 2.73;
+
+    double sumTorque = 0;
+
+    for (auto m : motor)
+    {
+        sumTorque += m->getTorque();
+    }
+
+    double force = sumTorque * ip * 2.0 / wheel_diameter;
+
+    return force;
 }
 
 //------------------------------------------------------------------------------
@@ -773,7 +856,7 @@ void VL60::keyProcess()
     }
 
     // МВ3
-    if (getKeyState(KEY_G))
+    if (getKeyState(KEY_Y))
     {
         if (isShift())
             mv_tumblers[MV3].set();
@@ -782,7 +865,7 @@ void VL60::keyProcess()
     }
 
     // МВ4
-    if (getKeyState(KEY_Y))
+    if (getKeyState(KEY_5))
     {
         if (isShift())
             mv_tumblers[MV4].set();
@@ -791,7 +874,7 @@ void VL60::keyProcess()
     }
 
     // МВ5
-    if (getKeyState(KEY_J))
+    if (getKeyState(KEY_6))
     {
         if (isShift())
             mv_tumblers[MV5].set();
@@ -800,7 +883,7 @@ void VL60::keyProcess()
     }
 
     // МВ6
-    if (getKeyState(KEY_M))
+    if (getKeyState(KEY_7))
     {
         if (isShift())
             mv_tumblers[MV6].set();
@@ -818,12 +901,92 @@ void VL60::keyProcess()
     }
 
     // Включение/выключение цепей управления
-    if (getKeyState(KEY_Q))
+    if (getKeyState(KEY_J))
     {
         if (isShift())
             cu_tumbler.set();
         else
             cu_tumbler.reset();
+    }
+
+    // Нажатие РБ-1
+    if (getKeyState(KEY_Z))
+        rb[RB_1].set();
+    else
+        rb[RB_1].reset();
+
+    // Нажатие РБС
+    if (getKeyState(KEY_M))
+        rb[RBS].set();
+    else
+        rb[RBS].reset();
+
+    // Нажатие РБП
+    if (getKeyState(KEY_Q))
+        rb[RBP].set();
+    else
+        rb[RBP].reset();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::load_brakes_config(QString path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(path))
+    {
+        QString secName = "BrakesState";
+
+        double pFL = 0.0;
+
+        if (cfg.getDouble(secName, "MainReservoirPressure", pFL))
+        {
+            main_reservoir->setY(0, pFL);
+        }
+
+        double k_flow = 0.0;
+
+        if (cfg.getDouble(secName, "MainReservoirFlow", k_flow))
+        {
+            main_reservoir->setFlowCoeff(k_flow);
+        }
+
+        double ch_press = 0.0;
+
+        if (cfg.getDouble(secName, "ChargingPressure", ch_press))
+        {
+            charge_press = ch_press;
+        }
+
+        int train_crane_pos = 6;
+
+        if (cfg.getInt(secName, "TrainCranePos", train_crane_pos))
+        {
+            brake_crane->setPosition(train_crane_pos);
+        }
+
+        int loco_crane_pos = 0;
+
+        if (cfg.getInt(secName, "LocoCranePos", loco_crane_pos))
+        {
+            loco_crane->setHandlePosition(loco_crane_pos);
+        }
+
+        int brake_lock = 0;
+
+        if (cfg.getInt(secName, "BrakeLockDevice", brake_lock))
+        {
+            ubt->setState(brake_lock);
+
+            if (brake_lock == 1)
+            {
+                ubt->setY(0, charge_press);
+                brake_crane->init(charge_press, pFL);
+                supply_reservoir->setY(0, charge_press);
+            }
+        }
     }
 }
 

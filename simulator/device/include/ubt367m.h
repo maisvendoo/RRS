@@ -30,6 +30,8 @@ public:
 
     float getMainHandlePos() const;
 
+    void setState(int state);
+
 private:
 
     double  V0;
@@ -74,7 +76,6 @@ private:
 
     void combCraneDec();
 
-    void setState(int state);
 };
 
 #endif // UBT367M_H

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Pantograph::Pantograph(QString config_path, QObject *parent) : Device(parent)
+Pantograph::Pantograph(QObject *parent) : Device(parent)
   , Uks(0.0)
   , Uout(0.0)
   , state(false)
@@ -12,7 +12,7 @@ Pantograph::Pantograph(QString config_path, QObject *parent) : Device(parent)
   , motion_time(6.0)
 
 {
-    load_config(config_path);
+
 }
 
 //------------------------------------------------------------------------------
@@ -95,21 +95,9 @@ void Pantograph::ode_system(const state_vector_t &Y,
 void Pantograph::load_config(CfgReader &cfg)
 {
     Q_UNUSED(cfg)
-}
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Pantograph::load_config(QString cfg_path)
-{
-    CfgReader cfg;
+    QString secName = "Device";
 
-
-    if (cfg.load(cfg_path))
-    {
-        QString secName = "Device";
-
-        cfg.getDouble(secName, "MaxHeight", max_height);
-        cfg.getDouble(secName, "MotionTime", motion_time);
-    }
+    cfg.getDouble(secName, "MaxHeight", max_height);
+    cfg.getDouble(secName, "MotionTime", motion_time);
 }

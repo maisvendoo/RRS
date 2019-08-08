@@ -7,6 +7,10 @@ enum
     KRAN_KOMBIN = 1,
     KLUCH_367 = 2,
 
+    KNOPKA_RB_1 = 4,
+    KNOPKA_RBP = 5,
+    KNOPKA_RBS = 6,
+
     VAL_PR_SKOR2 = 7,
     VAL_PR_SKOR1 = 8,
     STRELKA_SELSIN = 9,
@@ -29,8 +33,6 @@ enum
     TUMBLER_CU = 34,
     TUMBLER_GV_ON = 35,
     TUMBLER_GV_ON_OFF = 36,
-
-
 
     SIG_LIGHT_PSS_L = 50,
     SIG_LIGHT_PSS_PROPUSK = 51,
@@ -78,8 +80,15 @@ enum
 
     STRELKA_AMP1 = 96,
     STRELKA_AMP2 = 97,
-    STRELKA_KV1 = 98,
-    STRELKA_KV2 = 99
+    STRELKA_KV1 = 99,
+    STRELKA_KV2 = 98,
+
+    WHEEL_1 = 194,
+    WHEEL_2 = 195,
+    WHEEL_3 = 196,
+    WHEEL_4 = 197,
+    WHEEL_5 = 198,
+    WHEEL_6 = 199
 };
 
 #endif // VL60_SIGNALS_H

@@ -4,7 +4,7 @@
 //
 //------------------------------------------------------------------------------
 Rectifier::Rectifier(QObject *parent) : Device(parent)
-  , coeff(1.0)
+  , coeff(0.9)
   , U_in(0.0)
   , I_out(0.0)
   , U_out(0.0)
@@ -37,6 +37,9 @@ double Rectifier::getU_out() const
     return U_out;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Rectifier::setI_out(double value)
 {
     I_out = value;
@@ -60,9 +63,6 @@ void Rectifier::ode_system(const state_vector_t &Y,
 
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Rectifier::load_config(CfgReader &cfg)
 {
     cfg.getDouble("Device", "Coeff", coeff);

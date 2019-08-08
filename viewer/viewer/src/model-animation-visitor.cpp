@@ -1,5 +1,7 @@
 #include    "model-animation-visitor.h"
 
+#include    <QString>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -20,9 +22,11 @@ void ModelAnimationVisitor::apply(osg::Transform &transform)
     osg::MatrixTransform *matrix_trans = static_cast<osg::MatrixTransform *>(&transform);
     std::string name = matrix_trans->getName();
 
+    QString n = QString(name.c_str());
+
     size_t pos = name.find(anim_name);
 
-    if (pos != std::string::npos)
+    if (pos == 0)
     {
         parts->push_back(new ModelPartAnimation(matrix_trans));
     }

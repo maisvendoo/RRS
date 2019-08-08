@@ -59,6 +59,8 @@ public:
 
     AnimationManager *getAnimationManager();
 
+    std::vector<AnimationManager *> getAnimManagers();
+
 signals:
 
     void setStatusBar(QString msg);
@@ -101,8 +103,9 @@ private:
     QSharedMemory   shared_memory;
 
     /// Animations list
-    animations_t    animations;
     AnimationManager *animation_manager;
+
+    std::vector<AnimationManager *> anim_managers;
 
     /// Keyboard handler (camera control)
     void keyboardHandler(int key);
