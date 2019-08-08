@@ -17,6 +17,7 @@
 #include    "pantograph.h"
 #include    "mpcs.h"
 #include    "pant-description.h"
+#include    "current-kind-switch.h"
 
 /*!
  * \class
@@ -37,11 +38,13 @@ public:
 
 private:
 
-    /// Выбор кабины
-    int selectedCab;
+//    /// Выбор кабины
+//    int selectedCab;
 
     /// Микропроцессорная система управления электровозом
     MPCS    *mpcs;
+
+    CurrentKindSwitch   *kindSwitch;
 
     /// Входные значения
     mpcs_input_t mpcsInput;

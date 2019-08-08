@@ -8,7 +8,8 @@
 //------------------------------------------------------------------------------
 EP20::EP20()
 {
-
+    Uks = 25000.0;
+    current_kind = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -97,6 +98,7 @@ void EP20::stepMPCS(double t, double dt)
 void EP20::stepHighVoltageScheme(double t, double dt)
 {
     int current_kind = 0;
+    double Ukr_in = 0;
 
     // Пускаем цикл по пантографам и задаем начальные значения
     for (size_t i = 0; i < pantograph.size(); ++i)
@@ -107,14 +109,20 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         if (pantograph[i]->getCurrentKindOut() > current_kind)
             current_kind = pantograph[i]->getCurrentKindOut();
 
+        if (pantograph[i]->getUout() > Ukr_in)
+            Ukr_in = pantograph[i]->getUout();
+
         pantograph[i]->setState(mpcsOutput.pant_state[i]);
 
-        pantograph[i]->setUks(25000.0);
-        pantograph[i]->setCurrentKindIn(2);
+        pantograph[i]->setUks(Uks);
+        pantograph[i]->setCurrentKindIn(this->current_kind);
         pantograph[i]->step(t, dt);
     }
 
     mpcsInput.current_kind = current_kind;
+
+
+    // Отсюда передать state и u-kr-in!
 }
 
 //------------------------------------------------------------------------------

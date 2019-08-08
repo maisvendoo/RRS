@@ -34,5 +34,7 @@ INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
 HEADERS += $$files(./include/*.h) \
-    include/task-pant-state-down.h
-SOURCES += $$files(./src/*.cpp)
+    include/task-pant-state-down.h \
+    include/current-kind-switch.h
+SOURCES += $$files(./src/*.cpp) \
+    src/current-kind-switch.cpp
