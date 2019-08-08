@@ -34,7 +34,9 @@ private:
     QString pathStorage;
 
     ///
-    TaskPantUp    *taskPantUp;
+    TaskPant    *taskPantUp;
+
+    TaskPant    *taskPantDown;
 
     /// Управление кнопками ТП
     Trigger pantControlButton;

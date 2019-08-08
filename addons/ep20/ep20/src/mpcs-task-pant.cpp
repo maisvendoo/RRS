@@ -2,10 +2,10 @@
 #include <iostream>
 #include "qobject.h"
 
-#include "mpcs-task-pant-up.h"
+#include "mpcs-task-pant.h"
 #include "current-kind.h"
 
-TaskPantUp::TaskPantUp(QObject *parent) : QObject(parent)
+TaskPant::TaskPant(QObject *parent) : QObject(parent)
   , selectedCab(1)
   , last_current_kind(1)
   , taskPantState(INITIAL_STATE)
@@ -13,18 +13,20 @@ TaskPantUp::TaskPantUp(QObject *parent) : QObject(parent)
   , pantPriority(0)
   , prevPant(-1)
 {
+    std::fill(ctrl_signals.begin(), ctrl_signals.end(), false);
+
     pantUpWaitingTimer = new Timer(10.0, false, Q_NULLPTR);
     pantDownWaitingTimer = new Timer(10.0, false, Q_NULLPTR);
-    connect(pantUpWaitingTimer, &Timer::process, this, &TaskPantUp::pantUpTimerHandler);
-    connect(pantDownWaitingTimer, &Timer::process, this, &TaskPantUp::pantDownTimerHandler);
+    connect(pantUpWaitingTimer, &Timer::process, this, &TaskPant::pantUpTimerHandler);
+    connect(pantDownWaitingTimer, &Timer::process, this, &TaskPant::pantDownTimerHandler);
 }
 
-TaskPantUp::~TaskPantUp()
+TaskPant::~TaskPant()
 {
 
 }
 
-void TaskPantUp::setControlSignal(size_t id, bool value)
+void TaskPant::setControlSignal(size_t id, bool value)
 {
     ctrl_signals[id] = value;
 }
@@ -32,7 +34,7 @@ void TaskPantUp::setControlSignal(size_t id, bool value)
 //------------------------------------------------------------------------------
 // Чтение из файла значения последнего активного рода тока
 //------------------------------------------------------------------------------
-void TaskPantUp::readLastCurrentKind()
+void TaskPant::readLastCurrentKind()
 {
     std::ifstream file(pathStorage.toStdString() + "last_current_kind");
 
@@ -51,7 +53,7 @@ void TaskPantUp::readLastCurrentKind()
 //------------------------------------------------------------------------------
 // Записать значение рода тока в файл
 //------------------------------------------------------------------------------
-void TaskPantUp::writeLastCurrentKind()
+void TaskPant::writeLastCurrentKind()
 {
     std::ofstream file(pathStorage.toStdString() + "last_current_kind");
 
@@ -66,40 +68,46 @@ void TaskPantUp::writeLastCurrentKind()
     }
 }
 
-bool TaskPantUp::isCommandUp()
+bool TaskPant::isCommandUp()
 {
     if (ctrl_signals[FORWARD_UP])
         pantPriority = 1;
 
-    if (ctrl_signals[BACWARD_UP])
+    if (ctrl_signals[BACKWARD_UP])
         pantPriority = 0;
 
-    return ctrl_signals[FORWARD_UP] || ctrl_signals[BACWARD_UP];
+    return ctrl_signals[FORWARD_UP] || ctrl_signals[BACKWARD_UP];
+}
+
+bool TaskPant::isCommandDown()
+{
+    if (ctrl_signals[FORWARD_DOWN])
+        pantPriority = 1;
+
+    if (ctrl_signals[BACKWARD_DOWN])
+        pantPriority = 0;
+
+    return ctrl_signals[FORWARD_DOWN] || ctrl_signals[BACKWARD_DOWN];
 }
 
 //------------------------------------------------------------------------------
-// Инициализация(Задача поднятия ТП)
+// Инициализация (Определение группы ТП в соответсвии с номером кабины)
 //------------------------------------------------------------------------------
-void TaskPantUp::init()
+void TaskPant::init()
 {
     switch (selectedCab)
     {
     case 1:
 
-        //ac_group[0] = PANT_AC2;
-        //ac_group[1] = PANT_AC1;
         pants[CURRENT_DC].push_back(PANT_DC2);
         pants[CURRENT_DC].push_back(PANT_DC1);
         pants[CURRENT_AC].push_back(PANT_AC2);
         pants[CURRENT_AC].push_back(PANT_AC1);
-        //pants.insert(CURRENT_AC, std::array<size_t, NUM_PANTS_GROUP>({2, 0}));
 
         break;
 
     case 2:
 
-        //pants.insert(CURRENT_DC, std::array<size_t, NUM_PANTS_GROUP>({PANT_DC1, PANT_DC2}));
-        //pants.insert(CURRENT_AC, std::array<size_t, NUM_PANTS_GROUP>({PANT_AC1, PANT_AC2}));
         pants[CURRENT_DC].push_back(PANT_DC1);
         pants[CURRENT_DC].push_back(PANT_DC2);
         pants[CURRENT_AC].push_back(PANT_AC1);
@@ -111,7 +119,12 @@ void TaskPantUp::init()
     readLastCurrentKind();
 }
 
-void TaskPantUp::step(state_vector_t &Y, double t, double dt, const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
+bool isEven(int num)
+{
+    return ( (num % 2) == 0);
+}
+
+void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
 {
     bool is_command_up = isCommandUp();
 
@@ -119,22 +132,38 @@ void TaskPantUp::step(state_vector_t &Y, double t, double dt, const mpcs_input_t
     {
         case  INITIAL_STATE:
         {
+
             if (is_command_up)
             {
                 taskPantState = UP_PRIORETY_PANT;
             }
+
             break;
         }
         case UP_PRIORETY_PANT:
         {
-            //int p = pants[ref_current_kind][pantPriority];
-
             mpcs_output.pant_state[pants[ref_current_kind][pantPriority]] = true;
+
+            ctrl_signals[FORWARD_UP] = false;
+            ctrl_signals[BACKWARD_UP] = false;
 
             taskPantState = WAITING_UP;
 
             break;
         }
+
+        case DOWN_PRIORETY_PANT:
+        {
+            mpcs_output.pant_state[pants[ref_current_kind][pantPriority]] = false;
+
+            ctrl_signals[FORWARD_DOWN] = false;
+            ctrl_signals[BACKWARD_DOWN] = false;
+
+            taskPantState = WAITING_DOWN;
+
+            break;
+        }
+
         case  WAITING_UP:
         {
             pantUpWaitingTimer->start();
@@ -193,43 +222,30 @@ void TaskPantUp::step(state_vector_t &Y, double t, double dt, const mpcs_input_t
                 }
             }
 
+            if (!(isEven(p) ^ isEven(prevPant)))
+            {
+                taskPantState = READY;
+                break;
+            }
+
             if (more_one_up)
             {
                 mpcs_output.pant_state[p] = false;
+                taskPantState = WAITING_DOWN;
+                pantDownWaitingTimer->start();
             }
             else
             {
-                taskPantState = WAITING_DOWN;
+                taskPantState = READY;
             }
             break;
         }
 
-        /*case  UP_RESERVE_PANT:
-        {
-            pantPriority++;
-
-            if (pantPriority > 1)
-            {
-                taskPantState = FAULT;
-            }
-            else
-            {
-                mpcs_output.pant_state[pants[ref_current_kind][pantPriority]] = true;
-
-                taskPantState = WAITING_UP;
-            }
-
-            break;
-        }*/
-
         case  WAITING_DOWN:
         {
-            pantDownWaitingTimer->start();
-
             if (mpcs_input.pant_down[static_cast<size_t>(prevPant)])
             {
                 pantDownWaitingTimer->stop();
-
                 taskPantState = READY;
             }
 
@@ -249,17 +265,22 @@ void TaskPantUp::step(state_vector_t &Y, double t, double dt, const mpcs_input_t
 
             break;
     }
+}
+
+void TaskPant::step(state_vector_t &Y, double t, double dt, const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
+{
+    pantUp(mpcs_input, mpcs_output);
 
     pantUpWaitingTimer->step(t, dt);
     pantDownWaitingTimer->step(t, dt);
 }
 
-void TaskPantUp::pantUpTimerHandler()
+void TaskPant::pantUpTimerHandler()
 {
     taskPantState = FAULT;
 }
 
-void TaskPantUp::pantDownTimerHandler()
+void TaskPant::pantDownTimerHandler()
 {
     taskPantState = FAULT;
 }

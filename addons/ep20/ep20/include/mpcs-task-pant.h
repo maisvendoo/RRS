@@ -13,24 +13,28 @@
 //------------------------------------------------------------------------------
 enum
 {
-    NUM_CONTROLS = 2,
+    NUM_CONTROLS = 4,
     FORWARD_UP = 0,
-    BACWARD_UP = 1
+    BACKWARD_UP = 1,
+    FORWARD_DOWN = 2,
+    BACKWARD_DOWN = 3
 };
+
+
 
 //------------------------------------------------------------------------------
 // Задача поднятия ТП
 //------------------------------------------------------------------------------
-class TaskPantUp : public QObject
+class TaskPant : public QObject
 {
     Q_OBJECT
 
 public:
 
     /// Конструктор
-    TaskPantUp(QObject *parent = Q_NULLPTR);
+    TaskPant(QObject *parent = Q_NULLPTR);
 
-    ~TaskPantUp();
+    ~TaskPant();
 
     /// Инициализация
     void init();
@@ -75,8 +79,8 @@ private:
     typedef std::vector<size_t> pant_group_t;
     std::array<pant_group_t, 3> pants;
 
-    /// Управление кнопками ТП
-    Trigger pantControlButton;
+//    /// Управление кнопками ТП
+//    Trigger pantControlButton;
 
     /// Таймер ожидания поднятия ТП
     Timer *pantUpWaitingTimer;
@@ -94,6 +98,10 @@ private:
     void writeLastCurrentKind();
 
     bool isCommandUp();
+
+    bool isCommandDown();
+
+    void pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output);
 
 private slots:
 
