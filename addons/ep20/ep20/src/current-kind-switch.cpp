@@ -14,12 +14,12 @@ CurrentKindSwitch::~CurrentKindSwitch()
 
 void CurrentKindSwitch::setState(double state)
 {
-
+    this->state = state;
 }
 
 void CurrentKindSwitch::setUkrIn(double Ukr_in)
 {
-
+    this->Ukr_in = Ukr_in;
 }
 
 
@@ -29,7 +29,7 @@ double CurrentKindSwitch::getUoutDC() const
     return Uout_dc;
 }
 
-double CurrentKindSwitch::getUotAC() const
+double CurrentKindSwitch::getUoutAC() const
 {
     return Uout_ac;
 }

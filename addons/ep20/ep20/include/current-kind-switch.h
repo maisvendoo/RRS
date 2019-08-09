@@ -23,7 +23,7 @@ public:
     double getUoutDC() const;
 
     /// Получить выходное постоянное напряжение
-    double getUotAC() const;
+    double getUoutAC() const;
 
 private:
 

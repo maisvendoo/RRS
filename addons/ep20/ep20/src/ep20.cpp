@@ -8,8 +8,8 @@
 //------------------------------------------------------------------------------
 EP20::EP20()
 {
-    Uks = 25000.0;
-    current_kind = 1;
+    Uks = 3000.0;
+    current_kind = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -58,6 +58,8 @@ void EP20::initHighVoltageScheme()
         // Читаем конфиг
         pantograph[i]->read_custom_config(config_dir + QDir::separator() + "pantograph");
     }
+
+    kindSwitch = new CurrentKindSwitch();
 }
 
 //------------------------------------------------------------------------------
@@ -72,12 +74,14 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, PANT_AC1: %2 m, PANT_AC2: %3 m, PANT_DC1: %4 m, PANT_DC2: %5 m")
+    DebugMsg = QString("t: %1 s, PANT_AC1: %2 m, PANT_AC2: %3 m, PANT_DC1: %4 m, PANT_DC2: %5 m, UoutDC: %6, UoutAC: %7")
             .arg(t, 10, 'f', 2)
             .arg(pantograph[PANT_AC1]->getHeight(), 4, 'f', 2)
             .arg(pantograph[PANT_AC2]->getHeight(), 4, 'f', 2)
             .arg(pantograph[PANT_DC1]->getHeight(), 4, 'f', 2)
-            .arg(pantograph[PANT_DC2]->getHeight(), 4, 'f', 2);
+            .arg(pantograph[PANT_DC2]->getHeight(), 4, 'f', 2)
+            .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
+            .arg(kindSwitch->getUoutAC(), 4, 'f', 2);
 }
 
 //------------------------------------------------------------------------------
@@ -113,7 +117,6 @@ void EP20::stepHighVoltageScheme(double t, double dt)
             Ukr_in = pantograph[i]->getUout();
 
         pantograph[i]->setState(mpcsOutput.pant_state[i]);
-
         pantograph[i]->setUks(Uks);
         pantograph[i]->setCurrentKindIn(this->current_kind);
         pantograph[i]->step(t, dt);
@@ -123,6 +126,10 @@ void EP20::stepHighVoltageScheme(double t, double dt)
 
 
     // Отсюда передать state и u-kr-in!
+    kindSwitch->setUkrIn(Ukr_in);
+    kindSwitch->setState(current_kind - 1);
+    kindSwitch->step(t, dt);
+
 }
 
 //------------------------------------------------------------------------------
