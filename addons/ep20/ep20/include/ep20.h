@@ -18,6 +18,7 @@
 #include    "mpcs.h"
 #include    "pant-description.h"
 #include    "current-kind-switch.h"
+#include    "protective-device.h"
 
 /*!
  * \class
@@ -46,6 +47,12 @@ private:
 
     /// Перекрлючатель рода тока
     CurrentKindSwitch   *kindSwitch;
+
+    /// Аппарат защиты (ГВ)
+    ProtectiveDevice    *mainSwitch;
+
+    /// Аппарат защиты (БВ)
+    ProtectiveDevice    *fastSwitch;
 
     /// Входные значения
     mpcs_input_t mpcsInput;

@@ -1,8 +1,10 @@
 #include    "current-kind-switch.h"
 
 CurrentKindSwitch::CurrentKindSwitch(QObject *parent) : Device (parent)
-  ,state(0)
-
+  , state(0)
+  , Ukr_in(0)
+  , Uout_ac(0)
+  , Uout_dc(0)
 {
 
 }
