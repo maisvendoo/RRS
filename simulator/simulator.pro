@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 CONFIG += force_debug_info
 
+SUBDIRS += ./modbus
 SUBDIRS += ./sound-manager
 SUBDIRS += ./physics
 SUBDIRS += ./device

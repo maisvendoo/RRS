@@ -46,7 +46,7 @@ protected:
 //------------------------------------------------------------------------------
 typedef VirtualInterfaceDevice* (*GetInterfaceDevice)();
 
-#define GET_INTERFACE_DEVIC(ClassName) \
+#define GET_INTERFACE_DEVICE(ClassName) \
     extern "C" Q_DECL_EXPORT VirtualInterfaceDevice *getInterfaceDevice() \
     { \
         return new (ClassName) (); \
