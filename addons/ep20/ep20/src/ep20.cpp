@@ -8,7 +8,8 @@
 //------------------------------------------------------------------------------
 EP20::EP20()
 {
-
+    Uks = 3000.0;
+    current_kind = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ EP20::~EP20()
 //------------------------------------------------------------------------------
 void EP20::initialization()
 {
-    //
+    // Вызваем метод
     initMPCS();
 
     // Вызываем метод
@@ -37,8 +38,6 @@ void EP20::initialization()
 void EP20::initMPCS()
 {
     mpcs = new MPCS();
-
-//    mtpu = new TaskPantUp();
 
     mpcs->read_custom_config(config_dir + QDir::separator() + "mpcs");
 
@@ -59,6 +58,12 @@ void EP20::initHighVoltageScheme()
         // Читаем конфиг
         pantograph[i]->read_custom_config(config_dir + QDir::separator() + "pantograph");
     }
+
+    kindSwitch = new CurrentKindSwitch();
+
+    mainSwitch = new ProtectiveDevice();
+
+    fastSwitch = new ProtectiveDevice();
 }
 
 //------------------------------------------------------------------------------
@@ -73,12 +78,12 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, PANT_AC1: %2 m, PANT_AC2: %3 m, PANT_DC1: %4 m, PANT_DC2: %5 m")
+    DebugMsg = QString("t: %1 s, UoutDC: %2, UoutAC: %3, MainSwitch: %4, FastSwitch: %5")
             .arg(t, 10, 'f', 2)
-            .arg(pantograph[PANT_AC1]->getHeight(), 4, 'f', 2)
-            .arg(pantograph[PANT_AC2]->getHeight(), 4, 'f', 2)
-            .arg(pantograph[PANT_DC1]->getHeight(), 4, 'f', 2)
-            .arg(pantograph[PANT_DC2]->getHeight(), 4, 'f', 2);
+            .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
+            .arg(kindSwitch->getUoutAC(), 4, 'f', 2)
+            .arg(mainSwitch->getU_out(), 4, 'f', 2)
+            .arg(fastSwitch->getU_out(), 4, 'f', 2);
 }
 
 //------------------------------------------------------------------------------
@@ -99,6 +104,10 @@ void EP20::stepMPCS(double t, double dt)
 void EP20::stepHighVoltageScheme(double t, double dt)
 {
     int current_kind = 0;
+    double Ukr_in = 0;
+
+    double Uout_ac = 0;
+    double Uout_dc = 0;
 
     // Пускаем цикл по пантографам и задаем начальные значения
     for (size_t i = 0; i < pantograph.size(); ++i)
@@ -109,14 +118,30 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         if (pantograph[i]->getCurrentKindOut() > current_kind)
             current_kind = pantograph[i]->getCurrentKindOut();
 
-        pantograph[i]->setState(mpcsOutput.pant_state[i]);
+        if (pantograph[i]->getUout() > Ukr_in)
+            Ukr_in = pantograph[i]->getUout();
 
-        pantograph[i]->setUks(25000.0);
-        pantograph[i]->setCurrentKindIn(2);
+        pantograph[i]->setState(mpcsOutput.pant_state[i]);
+        pantograph[i]->setUks(Uks);
+        pantograph[i]->setCurrentKindIn(this->current_kind);
         pantograph[i]->step(t, dt);
     }
 
     mpcsInput.current_kind = current_kind;
+
+    // Передаем данные для Переключателя рода тока!
+    kindSwitch->setUkrIn(Ukr_in);
+    kindSwitch->setState(current_kind - 1);
+    kindSwitch->step(t, dt);
+
+    // Передаем данные для ГВ
+    mainSwitch->setU_in(kindSwitch->getUoutAC());
+    fastSwitch->setU_in(kindSwitch->getUoutDC());
+//    mainSwitch->setState();
+//    fastSwitch->setState();
+
+    mainSwitch->step(t, dt);
+    fastSwitch->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

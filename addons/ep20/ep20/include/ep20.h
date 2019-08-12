@@ -17,6 +17,8 @@
 #include    "pantograph.h"
 #include    "mpcs.h"
 #include    "pant-description.h"
+#include    "current-kind-switch.h"
+#include    "protective-device.h"
 
 /*!
  * \class
@@ -37,11 +39,20 @@ public:
 
 private:
 
-    /// Выбор кабины
-    int selectedCab;
+//    /// Выбор кабины
+//    int selectedCab;
 
     /// Микропроцессорная система управления электровозом
     MPCS    *mpcs;
+
+    /// Перекрлючатель рода тока
+    CurrentKindSwitch   *kindSwitch;
+
+    /// Аппарат защиты (ГВ)
+    ProtectiveDevice    *mainSwitch;
+
+    /// Аппарат защиты (БВ)
+    ProtectiveDevice    *fastSwitch;
 
     /// Входные значения
     mpcs_input_t mpcsInput;
