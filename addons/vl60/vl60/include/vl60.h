@@ -17,7 +17,7 @@
 
 #include    "vl60-signals.h"
 #include    "pantograph.h"
-#include    "main-switch.h"
+#include    "protective-device.h"
 #include    "oscillator.h"
 #include    "trac-transformer.h"
 #include    "phase-splitter.h"
@@ -130,7 +130,7 @@ private:
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 
     /// Главный выключатель (ГВ)
-    MainSwitch      *main_switch;
+    ProtectiveDevice    *main_switch;
 
     /// Механизм киловольтметра КС
     Oscillator      *gauge_KV_ks;

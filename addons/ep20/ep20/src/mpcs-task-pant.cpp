@@ -370,7 +370,8 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
 //------------------------------------------------------------------------------
 // Шаг моделирования
 //------------------------------------------------------------------------------
-void TaskPant::step(state_vector_t &Y, double t, double dt, const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
+void TaskPant::step(state_vector_t &Y, double t, double dt,
+                    const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
 {
     pantUp(mpcs_input, mpcs_output);
 

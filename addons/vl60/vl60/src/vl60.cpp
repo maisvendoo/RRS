@@ -114,9 +114,9 @@ void VL60::initHighVoltageScheme()
 {
     QString gv_cfg_path = config_dir + QDir::separator() + "main-switch";
 
-    main_switch = new MainSwitch();
+    main_switch = new ProtectiveDevice();
     main_switch->read_custom_config(gv_cfg_path);
-    connect(main_switch, &MainSwitch::soundPlay, this, &VL60::soundPlay);
+    connect(main_switch, &ProtectiveDevice::soundPlay, this, &VL60::soundPlay);
 
     gauge_KV_ks = new Oscillator();
     gauge_KV_ks->read_config("oscillator");
