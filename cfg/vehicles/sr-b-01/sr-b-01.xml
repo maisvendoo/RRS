@@ -8,23 +8,15 @@
 		<WheelDiameter>0.92</WheelDiameter>
 		<MainResist>sapsan</MainResist>
 		<NumAxis>4</NumAxis>				
-                <WheelInertia>2.0</WheelInertia>
+        <WheelInertia>2.0</WheelInertia>
 
-                <ExtModelName>sapsan/SR-B-01.osgt</ExtModelName> 
-                <ModelShift>0.0 0.0 0.311</ModelShift>
+        <ExtModelName>sapsan/SR-B-01.osgt</ExtModelName> 
+        <ModelShift>0.0 0.0 0.311</ModelShift>
 
-                <ExtTextureName>sapsan/textures/1_.tga</ExtTextureName>  
+        <CabineModel>sapsan/cabina.osgt</CabineModel>
+        <CabineShift>0.0 0.0 0.311</CabineShift> 
 
-                <WheelModel>sapsan/wheel_m.osgt</WheelModel>
-                <WheelTexture>sapsan/textures/sapsan.tga</WheelTexture>
-
-                <Axis>0.0 -11.49 0.75</Axis>
-                <Axis>0.0 -8.32 0.75</Axis>
-                
-
-                <Axis>0.0 7.68 0.75</Axis>
-                <Axis>0.0 10.85 0.75</Axis>
-                
+        <ExtTextureName>sapsan/textures/1_.tga</ExtTextureName>                                                  
 
 	</Vehicle>
 </Config>
