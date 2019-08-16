@@ -16,7 +16,9 @@
         <CabineModel>sapsan/cabina.osgt</CabineModel>
         <CabineShift>0.0 0.0 0.311</CabineShift> 
 
-        <ExtTextureName>sapsan/textures/1_.tga</ExtTextureName>                                                  
+        <ExtTextureName>sapsan/textures/1_.tga</ExtTextureName>     
+
+        <DriverPos>0.0 11.227 2.8</DriverPos>                                             
 
 	</Vehicle>
 </Config>
