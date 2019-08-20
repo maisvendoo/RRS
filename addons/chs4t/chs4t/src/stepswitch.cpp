@@ -39,6 +39,7 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , V(2.96)
   , poz_d(0)
   , poz(0)
+  , n(0)
 
 {
     /*rs = new Trigger()*/;
@@ -170,19 +171,28 @@ void StepSwitch::stepKeysControl(double t, double dt)
     if (ctrlState.up)
     {
         poz_d += V * hs_p(32 - poz_d) * dt;
+        n = 0;
     }
-    if (ctrlState.up1 && poz_d < 32)
+    if (ctrlState.up1 && poz_d < 32 && n == 0)
     {
         poz += 1;
-        poz_d = poz;;
+        poz_d = poz;
+        n = 1;
     }
-    if (ctrlState.down1 && poz_d > 1)
+    if (ctrlState.down1 && poz_d > 0 && n == 0)
     {
-        poz_d -= 1 * dt;
+        poz -= 1;
+        poz_d = poz;
+        n = 1;
     }
     if (ctrlState.down)
     {
         poz_d -= V * hs_p(poz_d) * dt;
+        n = 0;
+    }
+    if (ctrlState.zero)
+    {
+        n = 0;
     }
 
     poz = static_cast<int>(poz_d);
