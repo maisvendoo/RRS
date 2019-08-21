@@ -19,6 +19,7 @@ SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/vl60
 SUBDIRS += ./addons/tep70
 SUBDIRS += ./addons/chs4t
+SUBDIRS += ./addons/chs2t
 
 SUBDIRS += ./launcher
 
@@ -26,4 +27,3 @@ SUBDIRS += ./viewer
 
 SUBDIRS += ./tools/profconv
 SUBDIRS += ./tools/pathconv
-
