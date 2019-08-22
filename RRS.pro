@@ -18,7 +18,7 @@ SUBDIRS += ./addons/es1-non-motor
 SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/vl60
 SUBDIRS += ./addons/tep70
-SUBDIRS += ./addons/chs4t
+#SUBDIRS += ./addons/chs4t
 SUBDIRS += ./addons/chs2t
 SUBDIRS += ./addons/ep20
 

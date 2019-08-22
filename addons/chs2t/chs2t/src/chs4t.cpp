@@ -26,7 +26,7 @@ CHS4T::CHS4T() : Vehicle()
         pantographs[i] = new Pantograph();
         pantographs[i]->read_config(pantograph_config);
     }
-    bistV = new BV();
+    bistV = new ProtectiveDevice();
     bistV->read_config(gv_config);
 
     puskRez = new PuskRez;
@@ -39,6 +39,8 @@ CHS4T::CHS4T() : Vehicle()
 
     stepSwitch = new StepSwitch();
 //    stepSwitch->read_config();
+
+    Uks = 3000;
 }
 
 //------------------------------------------------------------------------------
@@ -55,18 +57,17 @@ CHS4T::~CHS4T()
 //------------------------------------------------------------------------------
 void CHS4T::step(double t, double dt)
 {
-    pantographs[0]->setUks(25000);
-    pantographs[1]->setUks(25000);
+    pantographs[0]->setUks(Uks);
+    pantographs[1]->setUks(Uks);
 
-    bistV->setP0(0.5);
-    bistV->setP1(0.3);
-    bistV->setUkr(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
+    bistV->setU_in(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
 
     stepSwitch->setCtrlState(km21KR2->getCtrlState());
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
 
+    bistV->setHoldingCoilState(true);
     bistV->step(t, dt);
 
     km21KR2->setControl(keys);
@@ -83,12 +84,12 @@ void CHS4T::step(double t, double dt)
 
     DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 x = %7")
             .arg(t, 10, 'f', 1)
-            .arg(pantographs[0]->getH(), 4, 'f', 2)
+            .arg(pantographs[0]->getHeight(), 4, 'f', 2)
             .arg(pantographs[0]->getUout(), 5, 'f', 0)
-            .arg(pantographs[1]->getH(), 4, 'f', 2)
+            .arg(pantographs[1]->getHeight(), 4, 'f', 2)
             .arg(pantographs[1]->getUout(), 5, 'f', 0)
-            .arg(bistV->getUout(), 5, 'f', 0)
-            .arg(bistV->getX(), 5, 'f', 0);
+            .arg(bistV->getU_out(), 5, 'f', 0)
+            .arg(bistV->getKnifePos(), 5, 'f', 0);
 
 //    DebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5 poz = %6 v1 = %7 v2 = %8 shaft_rel = %9")
 //    DebugMsg = QString(" poz = %1 R = %2")
@@ -122,17 +123,9 @@ void CHS4T::keyProcess()
         pantographs[1]->setState(isShift());
 
     if (getKeyState(KEY_P))
-        bistV->setBVState(isShift());
+        bistV->setState(isShift());
 
-    if (getKeyState(KEY_J))
-        bistV->setPhc(isShift());
-
-    bistV->setVZState(getKeyState(KEY_K));
-
-
-//glavV->setVZState(true);
-
-
+    bistV->setReturn(true);
 }
 
 GET_VEHICLE(CHS4T)

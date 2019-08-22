@@ -15,7 +15,7 @@
 
 #include    "vehicle-api.h"
 #include    "pantograph.h"
-#include    "bv.h"
+#include    "protective-device.h"
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
@@ -51,7 +51,7 @@ private:
 
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
-    BV *bistV;
+    ProtectiveDevice *bistV;
 
     PuskRez *puskRez;
 

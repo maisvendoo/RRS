@@ -53,6 +53,4 @@ void Engine::stepKeysControl(double t, double dt)
         else
             n = 2;
     }
-
-
 }
