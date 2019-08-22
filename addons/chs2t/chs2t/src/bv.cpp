@@ -1,23 +1,26 @@
 //------------------------------------------------------------------------------
 //
-//      Магистральный пассажирский электровоз переменного тока ЧС4т.
+//      Магистральный пассажирский электровоз постоянного тока ЧС2т.
 //      Дополнение для Russian Railway Simulator (RRS)
 //
 //      (c) RRS development team:
 //          Дмитрий Притыкин (maisvendoo),
 //          Николай Авилкин (avilkin.nick)
 //
-//      Дата: 16/06/2019
+//      Дата: 21/08/2019
 //
 //------------------------------------------------------------------------------
 
-#include "auto-transformer.h"
+#include "bv.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-AutoTransformer::AutoTransformer(QObject* parent) : Device(parent)
-//  , nPoz()
+BV::BV(QObject* parent) : Device(parent)
+  , BVstate(false)
+  , VZstate(false)
+  , phc(true)
+  , sdk(0)
 {
 
 }
@@ -25,7 +28,7 @@ AutoTransformer::AutoTransformer(QObject* parent) : Device(parent)
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-AutoTransformer::~AutoTransformer()
+BV::~BV()
 {
 
 }
@@ -33,15 +36,51 @@ AutoTransformer::~AutoTransformer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTransformer::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
+void BV::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    double s01 = static_cast<double>(phc);
+    double s02 = static_cast<double>(BVstate);
+    double s03 = static_cast<double>(VZstate);
 
+    double on = s03 * s02;
+    double off = 1.0 - s02;
+
+    double s1 = Y[0] - 0.95;
+
+    double s2 = on * hs_n(s1);
+
+    double s5 = Fp * pf(Y[0]) - Fk * s02 * s01;
+
+    double s3 = hs_p(Y[0]) * (hs_p(s5) + off);
+
+    double s4 = s2 - s3;
+
+    double s6 = hs_p(s5) * (P0 - Y[1]) *  K1 - Y[1] * K2 * hs_p(sdk);
+
+    sdk = hs_n(Y[1] - P1);
+    Uout = Ukr * sdk * hs_p(s1);
+
+    dYdt[0] = Vn * s4;
+    dYdt[1] = s6 / Vdk;
 }
 
 //------------------------------------------------------------------------------
 // Загрузка данных из конфигурационного файла
 //------------------------------------------------------------------------------
-void AutoTransformer::load_config(CfgReader& cfg)
+void BV::load_config(CfgReader& cfg)
+{
+    cfg.getDouble("GV", "Vn", Vn);
+    cfg.getDouble("GV", "Vdk", Vdk);
+    cfg.getDouble("GV", "Fk", Fk);
+    cfg.getDouble("GV", "Fp", Fp);
+    cfg.getDouble("GV", "K1", K1);
+    cfg.getDouble("GV", "K2", K2);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BV::preStep(state_vector_t& Y, double t)
 {
 
 }
@@ -49,15 +88,7 @@ void AutoTransformer::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTransformer::preStep(state_vector_t& Y, double t)
+void BV::stepKeysControl(double t, double dt)
 {
 
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void AutoTransformer::stepKeysControl(double t, double dt)
-{
-    Uout = Uin / 32.0 * nPoz;
 }

@@ -1,35 +1,36 @@
 //------------------------------------------------------------------------------
 //
-//      Магистральный пассажирский электровоз переменного тока ЧС4т.
+//      Магистральный пассажирский электровоз постоянного тока ЧС2т.
 //      Дополнение для Russian Railway Simulator (RRS)
 //
 //      (c) RRS development team:
 //          Дмитрий Притыкин (maisvendoo),
 //          Николай Авилкин (avilkin.nick)
 //
-//      Дата: 16/06/2019
+//      Дата: 21/08/2019
 //
 //------------------------------------------------------------------------------
-#ifndef AUTOTRANSFORMER_H
-#define AUTOTRANSFORMER_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include "device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class AutoTransformer : public Device
+class Engine : public Device
 {
 public:
 
-    /// Конструктор
-    AutoTransformer(QObject *parent = Q_NULLPTR);
+    ///Конструктор
+    Engine(QObject *parent = Q_NULLPTR);
 
-    /// Деструктор
-    ~AutoTransformer();
+    ///Деструктор
+    ~Engine();
 
-    void setUin(double Uin) { this->Uin = Uin; }
-    double getUout()        { return Uout; }
+    void setPoz(int poz) { this->poz = poz; }
+
+    void setR(double R) { this->R = R; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -37,10 +38,12 @@ private:
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
-    double Uin;
-    double Uout;
-    int nPoz;
+    int poz;
+
+    int n;
+
+    double R;
 
 };
 
-#endif // AUTOTRANSFORMER_H
+#endif // ENGINE_H

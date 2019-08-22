@@ -1,39 +1,39 @@
 //------------------------------------------------------------------------------
 //
-//      Магистральный пассажирский электровоз переменного тока ЧС4т.
+//      Магистральный пассажирский электровоз постоянного тока ЧС2т.
 //      Дополнение для Russian Railway Simulator (RRS)
 //
 //      (c) RRS development team:
 //          Дмитрий Притыкин (maisvendoo),
 //          Николай Авилкин (avilkin.nick)
 //
-//      Дата: 16/06/2019
+//      Дата: 21/08/2019
 //
 //------------------------------------------------------------------------------
-#ifndef GV_H
-#define GV_H
+#ifndef BV_H
+#define BV_H
 
 #include    "device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class GV : public Device
+class BV : public Device
 {
 public:
 
     /// Конструктор
-    GV(QObject *parent = Q_NULLPTR);
+    BV(QObject *parent = Q_NULLPTR);
 
     /// Деструктор
-    ~GV();
+    ~BV();
 
     void setP0(double P0)       { this->P0 = P0; }
     void setP1(double P1)       { this->P1 = P1; }
 
     void setUkr(double Ukr)     { this->Ukr = Ukr; }
 
-    void setGVState(bool state) { this->GVstate = state; }
+    void setBVState(bool state) { this->BVstate = state; }
     void setVZState(bool state) { this->VZstate = state; }
 
     void setPhc(bool phc)       { this->phc = phc; }
@@ -71,7 +71,7 @@ private:
     double Pdk;
 
     /// Состояние главного выключателя
-    bool GVstate;
+    bool BVstate;
 
     /// Состояние возврата защиты
     bool VZstate;
@@ -81,4 +81,4 @@ private:
 
 };
 
-#endif // GV_H
+#endif // BV_H

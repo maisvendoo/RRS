@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
 //
-//      Магистральный пассажирский электровоз переменного тока ЧС4т.
+//      Магистральный пассажирский электровоз постоянного тока ЧС2т.
 //      Дополнение для Russian Railway Simulator (RRS)
 //
 //      (c) RRS development team:
 //          Дмитрий Притыкин (maisvendoo),
 //          Николай Авилкин (avilkin.nick)
 //
-//      Дата: 16/06/2019
+//      Дата: 21/08/2019
 //
 //------------------------------------------------------------------------------
 #ifndef     CHS4T_H
@@ -15,11 +15,11 @@
 
 #include    "vehicle-api.h"
 #include    "pantograph.h"
-#include    "gv.h"
-#include    "auto-transformer.h"
+#include    "bv.h"
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
+#include    "engine.h"
 
 enum
 {
@@ -51,11 +51,11 @@ private:
 
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
-    GV *glavV;
+    BV *bistV;
 
     PuskRez *puskRez;
 
-    AutoTransformer *autoTrans;
+    Engine *engine;
 
     Km21KR2 *km21KR2;
 

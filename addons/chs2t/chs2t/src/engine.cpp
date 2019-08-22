@@ -10,29 +10,49 @@
 //      Дата: 21/08/2019
 //
 //------------------------------------------------------------------------------
-#ifndef KM21KR2STATE_H
-#define KM21KR2STATE_H
+
+#include "engine.h"
 
 //------------------------------------------------------------------------------
-//
+// Конструктор
 //------------------------------------------------------------------------------
-struct ControllerState
+Engine::Engine(QObject* parent) : Device(parent)
+  , n(0)
 {
-    double up;
-    double up1;
-    double zero;
-    double down1;
-    double down;
 
-    ControllerState()
-        : up(0)
-        , up1(0)
-        , zero(0)
-        , down1(0)
-        , down(0)
+}
+
+Engine::~Engine()
+{
+
+}
+
+void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
+{
+
+}
+
+void Engine::load_config(CfgReader& cfg)
+{
+
+}
+
+void Engine::preStep(state_vector_t& Y, double t)
+{
+
+}
+
+void Engine::stepKeysControl(double t, double dt)
+{
+    if (poz < 21)
+        n = 6;
+    else
     {
-
+        if (poz < 34)
+            n = 3;
+        else
+            n = 2;
     }
-};
 
-#endif // KM21KR2STATE_H
+
+}

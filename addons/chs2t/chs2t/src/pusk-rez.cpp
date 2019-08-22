@@ -16,7 +16,7 @@
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-PuskRez::PuskRez(QObject* parent)
+PuskRez::PuskRez(QObject* parent) : Device(parent)
 {
 
 }
@@ -62,6 +62,7 @@ void PuskRez::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void PuskRez::stepKeysControl(double t, double dt)
 {
+
     R = steps[poz];
 
 }
