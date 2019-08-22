@@ -46,7 +46,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
-    , start_time(0.0)
+
 {
     load(train_config);
 
@@ -56,6 +56,8 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     {
         OSG_FATAL << "Can't connect to shared memory" << std::endl;
     }
+
+    //startTimer(settings.request_interval);
 }
 
 //------------------------------------------------------------------------------
@@ -73,10 +75,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             if (!viewer)
                 break;
 
-            double time = viewer->getFrameStamp()->getReferenceTime();
-            delta_time = time - start_time;
-            ref_time += delta_time;
-            start_time = time;
+            ref_time += viewer->getFrameStamp()->getReferenceTime();
 
             processSharedData(ref_time);
 
@@ -90,6 +89,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
             keyboardHandler(ea.getKey());
+
 
             break;
         }
@@ -301,7 +301,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
 void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 {
     if (nd.sd.size() < 2)
-        return;
+        return;    
 
     // Time to relative units conversion
     float Delta_t = static_cast<float>(settings.request_interval) / 1000.0f;
@@ -327,10 +327,11 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
-        matrix *= osg::Matrix::rotate(static_cast<double>(settings.direction * vehicles_ext[i].attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
-        matrix *= osg::Matrix::rotate(static_cast<double>(-vehicles_ext[i].attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
-        matrix *= osg::Matrix::translate(vehicles_ext[i].position);
-        vehicles_ext[i].transform->setMatrix(matrix);        
+        matrix *= osg::Matrixf::rotate(settings.direction * vehicles_ext[i].attitude.x(), osg::Vec3(1.0f, 0.0f, 0.0f));
+        matrix *= osg::Matrixf::rotate(-vehicles_ext[i].attitude.z(), osg::Vec3(0.0f, 0.0f, 1.0f));
+        matrix *= osg::Matrixf::translate(vehicles_ext[i].position);
+
+        vehicles_ext[i].transform->setMatrix(matrix);
 
         for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
         {

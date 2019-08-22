@@ -63,13 +63,13 @@ void SL2M::preStep(state_vector_t &Y, double t)
 
     double velocity = omega * Dk / 2.0 + cut(1000.0 * omega, -wear_gap, wear_gap) * sin(Y[1]);
 
-    arrow_pos = cut(static_cast<float>(velocity * Physics::kmh / max_speed), 0.0f, 1.0f);
+    arrow_pos = cut(static_cast<float>(abs(velocity) * Physics::kmh / max_speed), 0.0f, 1.0f);
 
     double shaft_angle = Y[0];
 
-    shaft_pos = static_cast<float>(shaft_angle / 2.0 / Physics::PI);
+    shaft_pos = static_cast<float>(abs(shaft_angle) / 2.0 / Physics::PI);
 
-    emit soundSetVolume("Skorostemer", static_cast<int>(100 * hs_p(omega * Dk / 2.0 - sound_speed)));
+    emit soundSetVolume("Skorostemer", static_cast<int>(100 * hs_p(abs(omega) * Dk / 2.0 - sound_speed)));
 }
 
 //------------------------------------------------------------------------------

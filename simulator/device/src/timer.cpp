@@ -34,8 +34,7 @@ void Timer::step(double t, double dt)
         if ( first_process || (tau >= timeout) )
         {
             emit process();
-            tau = 0;
-            fprocess_prev = first_process;
+            tau = 0;            
             first_process = false;
         }
 
