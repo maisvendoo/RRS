@@ -1,9 +1,7 @@
 TEMPLATE = subdirs
 
 CONFIG += ordered
-CONFIG += force_debug_info
 
-SUBDIRS += ./modbus
 SUBDIRS += ./sound-manager
 SUBDIRS += ./physics
 SUBDIRS += ./device
@@ -18,6 +16,8 @@ SUBDIRS += ./model
 SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
+
+SUBDIRS += ./modbus
 
 SUBDIRS += ./krm395
 SUBDIRS += ./vr242

@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProtectiveDevice : public Device
+class DEVICE_EXPORT ProtectiveDevice : public Device
 {
 public:
 
