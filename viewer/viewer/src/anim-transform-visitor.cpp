@@ -2,6 +2,7 @@
 #include    "filesystem.h"
 #include    "config-reader.h"
 #include    "analog-rotation.h"
+#include    "analog-translation.h"
 #include    "material-animation.h"
 
 //------------------------------------------------------------------------------
@@ -64,6 +65,7 @@ ProcAnimation *AnimTransformVisitor::create_animation(const std::string &name,
 
         ProcAnimation *animation = nullptr;
 
+        // Анимация поворота (в том числе и бесконечного)
         if (child->name == "AnalogRotation")
         {
             animation = new AnalogRotation(transform);
@@ -71,6 +73,15 @@ ProcAnimation *AnimTransformVisitor::create_animation(const std::string &name,
             return animation;
         }
 
+        // Анимация перемещения
+        if (child->name == "AnalogTranslation")
+        {
+            animation = new AnalogTranslation(transform);
+            animation->load(cfg);
+            return animation;
+        }
+
+        // Анимация материала
         if (child->name == "MaterialAnimation")
         {
             for (unsigned int i = 0; i < transform->getNumChildren(); ++i)

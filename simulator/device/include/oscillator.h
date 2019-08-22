@@ -3,20 +3,25 @@
 
 #include    "device.h"
 
-class Oscillator : public Device
+#include    "device-export.h"
+
+class DEVICE_EXPORT Oscillator : public Device
 {
 public:
 
-    Oscillator(QObject *parent);
+    Oscillator(QObject *parent = Q_NULLPTR);
 
     ~Oscillator();
 
     double getOutput() const;
 
+    void setInput(double value);
+
 private:
 
     double      omega;
     double      beta;
+    double      coeff;
 
     double      input;
 

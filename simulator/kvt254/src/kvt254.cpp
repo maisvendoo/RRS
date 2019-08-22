@@ -13,7 +13,7 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , ps(0.1)
   , min_pos(-0.05)
   , max_pos(1.0)
-  , pos_duration(0.5)
+  , pos_duration(1.0)
   , dir(0)
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
 {
@@ -50,9 +50,13 @@ double LocoCrane254::getAirDistribPressure() const
     return getY(0);
 }
 
-void LocoCrane254::init(double pTM)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane254::init(double pTM, double pFL)
 {
     Q_UNUSED(pTM)
+    Q_UNUSED(pFL)
 }
 
 //------------------------------------------------------------------------------
@@ -180,29 +184,32 @@ void LocoCrane254::stepKeysControl(double t, double dt)
     // Дискретное движение от кнопок
     double max_step = *(step_pressures.end() - 1);
 
-    if (getKeyState(KEY_8))
+    if (isAlt())
     {
-        pos = step_pressures[0] / max_step;
-    }
+        if (getKeyState(KEY_8))
+        {
+            pos = step_pressures[0] / max_step;
+        }
 
-    if (getKeyState(KEY_9))
-    {
-        pos = step_pressures[1] / max_step;
-    }
+        if (getKeyState(KEY_9))
+        {
+            pos = step_pressures[1] / max_step;
+        }
 
-    if (getKeyState(KEY_0))
-    {
-        pos = step_pressures[2] / max_step;
-    }
+        if (getKeyState(KEY_0))
+        {
+            pos = step_pressures[2] / max_step;
+        }
 
-    if (getKeyState(KEY_Minus))
-    {
-        pos = step_pressures[3] / max_step;
-    }
+        if (getKeyState(KEY_Minus))
+        {
+            pos = step_pressures[3] / max_step;
+        }
 
-    if (getKeyState(KEY_Equals))
-    {
-        pos = step_pressures[4] / max_step;
+        if (getKeyState(KEY_Equals))
+        {
+            pos = step_pressures[4] / max_step;
+        }
     }
 }
 

@@ -30,6 +30,7 @@
 #include    "timer.h"
 #include    "trigger.h"
 
+
 /*!
  * \class
  * \brief Deivce base class
@@ -61,6 +62,8 @@ public:
     /// Read device config file
     virtual void read_config(const QString &path);
 
+    virtual void read_custom_config(const QString &path);
+
     QString getDebugMsg() const;
 
     ///
@@ -69,6 +72,8 @@ public:
 
     ///
     feedback_signals_t getFeedback() const;
+
+    void setCustomConfigDir(const QString &value);
 
 signals:
 
@@ -109,6 +114,8 @@ protected:
 
     feedback_signals_t  feedback;
 
+    QString custom_config_dir;
+
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
 
@@ -123,11 +130,15 @@ protected:
 
     virtual void stepExternalControl(double t, double dt);
 
+    virtual void stepDiscrete(double t, double dt);
+
     bool getKeyState(int key) const;
 
     bool isShift() const;
 
     bool isControl() const;
+
+    bool isAlt() const;
 
 private:
 

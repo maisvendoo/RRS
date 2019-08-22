@@ -1,5 +1,6 @@
 #include    "passcar.h"
 #include    "filesystem.h"
+#include    "passcar-signals.h"
 
 //------------------------------------------------------------------------------
 //
@@ -12,9 +13,7 @@ PassCarrige::PassCarrige() : Vehicle ()
   , airdist(nullptr)
   , airdist_module("vr242")
   , airdist_config("vr242")
-  , pz(0.0)
-  , inc_loc(false)
-  , dec_loc(false)
+
 {
 
 }
@@ -30,7 +29,7 @@ PassCarrige::~PassCarrige()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCarrige::initBrakeDevices(double p0, double pTM)
+void PassCarrige::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Q_UNUSED(p0)
 
@@ -38,7 +37,7 @@ void PassCarrige::initBrakeDevices(double p0, double pTM)
         supply_reservoir->setY(0, pTM);
 
     if (airdist != nullptr)
-        airdist->init(pTM);
+        airdist->init(pTM, pFL);
 }
 
 //------------------------------------------------------------------------------
@@ -78,8 +77,6 @@ void PassCarrige::step(double t, double dt)
 {
     if ( brake_mech != nullptr )
     {
-        pz = Physics::cut(pz, 0.0, 0.4);
-
         brake_mech->setAirFlow(airdist->getBrakeCylinderAirFlow());
         brake_mech->setVelocity(velocity);
         brake_mech->step(t, dt);
@@ -107,6 +104,8 @@ void PassCarrige::step(double t, double dt)
         airdist->step(t, dt);
     }
 
+    stepSignalsOutput();
+
     DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2")
             .arg(pTM, 4, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
@@ -115,7 +114,21 @@ void PassCarrige::step(double t, double dt)
     DebugMsg += airdist->getDebugMsg();
 
     DebugMsg += QString(" Тепм. ДР.: %1")
-            .arg(auxRate, 9, 'f', 4);
+            .arg(auxRate, 9, 'f', 4);   
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PassCarrige::stepSignalsOutput()
+{
+    analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
+
+    analogSignal[GEN_MUFTA1] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
+    analogSignal[GEN_KARDAN] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------

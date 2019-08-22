@@ -19,6 +19,8 @@ private:
 
     float       cur_pos;
 
+    bool        infinity;
+
     osg::Vec3   axis;
     osg::Matrix matrix;
 

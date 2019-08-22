@@ -26,6 +26,7 @@ INCLUDEPATH += ../../../CfgReader/include
 INCLUDEPATH += ../../../simulator/solver/include
 INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include
+INCLUDEPATH += ../../../simulator/device/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

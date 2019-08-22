@@ -11,23 +11,22 @@ ModelPartAnimation::ModelPartAnimation(osg::MatrixTransform *transform)
     , ref_pos(0.0)
     , lastTime(1.0)
 {
-    callback = dynamic_cast<osg::AnimationPathCallback *>(transform->getUpdateCallback());
+    osg::AnimationPathCallback *callback = dynamic_cast<osg::AnimationPathCallback *>(transform->getUpdateCallback());
 
     if (callback == nullptr)
         return;    
-
-    callback->setPause(true);
 
     path = callback->getAnimationPath();
 
     if (!path.valid())
         return;
 
+    path->setLoopMode(osg::AnimationPath::NO_LOOPING);
     lastTime = path->getLastTime();
 
-    osg::ref_ptr<AnimationPathCallback> new_callback = new AnimationPathCallback;
-    new_callback->setAnimationPath(path.get());
-    callback = new_callback;
+    transform->removeUpdateCallback(callback);
+
+    update();
 }
 
 //------------------------------------------------------------------------------
@@ -63,7 +62,8 @@ void ModelPartAnimation::update()
     if (path == nullptr)
         return;
 
-    osg::Matrix matrix;
+    osg::Matrix matrix;    
+
     path->getMatrix(pos * path->getLastTime(), matrix);
 
     transform->setMatrix(matrix);

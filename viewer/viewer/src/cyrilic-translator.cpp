@@ -41,6 +41,7 @@ CyrilicTranslator::CyrilicTranslator(QObject *parent) : KeysTranslator(parent)
     keymap.insert(Cyrillic_shcha,       osgGA::GUIEventAdapter::KEY_O);
     keymap.insert(Cyrillic_che,         osgGA::GUIEventAdapter::KEY_X);
     keymap.insert(Cyrillic_hardsign,    osgGA::GUIEventAdapter::KEY_Rightbracket);
+    keymap.insert(osgGA::GUIEventAdapter::KEY_BackSpace, osgGA::GUIEventAdapter::KEY_BackSpace);
 }
 
 //------------------------------------------------------------------------------

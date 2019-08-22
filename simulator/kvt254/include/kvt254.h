@@ -28,7 +28,7 @@ public:
 
     double getAirDistribPressure() const;
 
-    void init(double pTM);
+    void init(double pTM, double pFL);
 
 private:
 

@@ -105,6 +105,8 @@ bool Model::init(const simulator_command_line_t &command_line)
         }
     }
 
+    initControlPanel("control-panel");
+
     return true;
 }
 
@@ -135,6 +137,14 @@ bool Model::isStarted() const
 void Model::outMessage(QString msg)
 {
     fputs(qPrintable(msg + "\n"), stdout);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::controlProcess()
+{
+    control_panel->process();
 }
 
 //------------------------------------------------------------------------------
@@ -328,6 +338,63 @@ void Model::configSolver(solver_config_t &solver_config)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::initControlPanel(QString cfg_path)
+{
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+    QString full_path = QString(fs.getConfigDir().c_str()) + fs.separator() + cfg_path + ".xml";
+
+    if (cfg.load(full_path))
+    {
+        QString secName = "ControlPanel";
+        QString module_name = "";
+
+        if (!cfg.getString(secName, "Plugin", module_name))
+            return;
+
+        control_panel = Q_NULLPTR;
+        QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
+        control_panel = loadInterfaceDevice(module_path);
+
+        if (control_panel == Q_NULLPTR)
+            return;
+
+        QString config_dir = "";
+
+        if (!cfg.getString(secName, "ConfigDir", config_dir))
+            return;
+
+        if (!control_panel->init(QString(fs.getPluginsDir().c_str()) + fs.separator() + config_dir))
+            return;
+
+        int request_interval = 0;
+
+        if (!cfg.getInt(secName, "RequestInterval", request_interval))
+            request_interval = 100;
+
+        controlTimer.setInterval(request_interval);
+        connect(&controlTimer, &QTimer::timeout, this, &Model::controlProcess);
+
+        int v_idx = 0;
+
+        if (!cfg.getInt(secName, "Vehicle", v_idx))
+            v_idx = 0;
+
+        Vehicle *vehicle = train->getVehicles()->at(static_cast<size_t>(v_idx));
+
+        connect(vehicle, &Vehicle::sendFeedBackSignals,
+                control_panel, &VirtualInterfaceDevice::receiveFeedback);
+
+        connect(control_panel, &VirtualInterfaceDevice::sendControlSignals,
+                vehicle, &Vehicle::getControlSignals);
+
+        controlTimer.start();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
     /*std::vector<Vehicle *> *vehicles = train->getVehicles();
@@ -438,7 +505,7 @@ void Model::timerEvent(QTimerEvent *event)
     Q_UNUSED(event)
 
     // Feedback to viewer
-    sharedMemoryFeedback();
+    //sharedMemoryFeedback();
 
     double tau = 0;
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
@@ -448,6 +515,9 @@ void Model::timerEvent(QTimerEvent *event)
             is_step_correct)
     {
         preStep(t);
+
+        // Feedback to viewer
+        sharedMemoryFeedback();
 
         controlStep(control_time, control_delay);
 

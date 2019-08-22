@@ -8,6 +8,7 @@ Timer::Timer(double timeout, bool first_process, QObject *parent)
     , tau(0.0)
     , timeout(timeout)
     , first_process(first_process)
+    , fprocess_prev(first_process)
     , is_started(false)
 {
 
@@ -33,7 +34,7 @@ void Timer::step(double t, double dt)
         if ( first_process || (tau >= timeout) )
         {
             emit process();
-            tau = 0;
+            tau = 0;            
             first_process = false;
         }
 
@@ -64,7 +65,7 @@ void Timer::stop()
 //------------------------------------------------------------------------------
 void Timer::reset()
 {
-    first_process = true;
+    first_process = fprocess_prev;
     tau = 0.0;
 }
 
@@ -74,4 +75,12 @@ void Timer::reset()
 bool Timer::isStarted() const
 {
     return is_started;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Timer::setTimeout(double timeout)
+{
+    this->timeout = timeout;
 }

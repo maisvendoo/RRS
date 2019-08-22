@@ -104,18 +104,52 @@ void SoundManager::stop(QString name)
         it.value().sound->stop();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SoundManager::setVolume(QString name, int volume)
 {
     auto it = sounds.find(name);
 
     if (it.key() == name)
-        it.value().sound->setVolume(volume);
+    {
+        if (volume < 0)
+            it.value().sound->setVolume(0);
+
+        if (volume <= it.value().max_volume)
+            it.value().sound->setVolume(volume);
+        else
+            it.value().sound->setVolume(it.value().max_volume);
+
+        if (volume > 0)
+        {
+            if (!it.value().sound->isPlaying())
+                it.value().sound->play();
+        }
+        else
+        {
+            it.value().sound->stop();
+        }
+    }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SoundManager::setPitch(QString name, float pitch)
 {
     auto it = sounds.find(name);
 
     if (it.key() == name)
+    {
         it.value().sound->setPitch(pitch);
+
+        if (pitch < 0.1f)
+            it.value().sound->stop();
+        else
+        {
+            if (!it.value().sound->isPlaying())
+                it.value().sound->play();
+        }
+    }
 }

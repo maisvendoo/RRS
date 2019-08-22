@@ -160,6 +160,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_S);
     addKey(osgGA::GUIEventAdapter::KEY_T);
     addKey(osgGA::GUIEventAdapter::KEY_V);
+    addKey(osgGA::GUIEventAdapter::KEY_U);
     addKey(osgGA::GUIEventAdapter::KEY_W);
     addKey(osgGA::GUIEventAdapter::KEY_X);
     addKey(osgGA::GUIEventAdapter::KEY_Y);
@@ -194,6 +195,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Equals);
 
     addKey(osgGA::GUIEventAdapter::KEY_Space);
+    addKey(osgGA::GUIEventAdapter::KEY_BackSpace);
 }
 
 //------------------------------------------------------------------------------

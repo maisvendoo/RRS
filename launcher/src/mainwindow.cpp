@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setFocusPolicy(Qt::ClickFocus);
 
     loadTheme();
+
+    QIcon icon(":/images/images/RRS_logo.png");
+    setWindowIcon(icon);
 }
 
 //------------------------------------------------------------------------------

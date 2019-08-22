@@ -11,16 +11,7 @@
 		<DegreesOfFreedom>5</DegreesOfFreedom>
                 <WheelInertia>2.0</WheelInertia>
 
-                <ExtModelName>passcar/wag-1.osgt</ExtModelName>
-                
-                <WheelModel>passcar/wheel-1.osgt</WheelModel>
-                
-
-                <Axis>0.0 -7.3 0.786</Axis>
-                <Axis>0.0 -9.7 0.786</Axis>
-
-                <Axis>0.0 7.3 0.786</Axis>        
-                <Axis>0.0 9.7 0.786</Axis>
+                <ExtModelName>passcar/tvz-21071.osgt</ExtModelName>
 
                 <BrakeMechModule>carbrakes-mech</BrakeMechModule>
                 <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>

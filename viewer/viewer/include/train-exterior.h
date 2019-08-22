@@ -59,6 +59,8 @@ public:
 
     AnimationManager *getAnimationManager();
 
+    std::vector<AnimationManager *> getAnimManagers();
+
 signals:
 
     void setStatusBar(QString msg);
@@ -85,24 +87,20 @@ private:
     osg::ref_ptr<osg::Group> trainExterior;
 
     /// Time between current and previous frame drawing
-    double ref_time;
-
-    /// Frame rendering begin time
-    double start_time;
+    double ref_time;        
 
     /// Info about train's vehicles exterior
     std::vector<vehicle_exterior_t> vehicles_ext;
 
     /// Data, received from server
-    network_data_t  nd;
-
-    double delta_time;
+    network_data_t  nd;    
 
     QSharedMemory   shared_memory;
 
     /// Animations list
-    animations_t    animations;
     AnimationManager *animation_manager;
+
+    std::vector<AnimationManager *> anim_managers;
 
     /// Keyboard handler (camera control)
     void keyboardHandler(int key);
@@ -125,7 +123,7 @@ private:
     /// Load vehicle animations
     void loadAnimations(const std::string vehicle_name, osg::Node *cabine, animations_t &animations);
 
-    void loadModelAnimations(const std::string vehicle_name, osg::Node *model, animations_t &animations);
+    void loadModelAnimations(const std::string vehicle_name, osg::Node *model, animations_t &animations);    
 };
 
 #endif // TRAIN_EXTERIOR_H
