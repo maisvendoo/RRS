@@ -17,28 +17,28 @@
 // Конструктор
 //------------------------------------------------------------------------------
 CHS4T::CHS4T() : Vehicle()
-  , pantograph_config("chs2t-pantograph")
-  , gv_config("chs2t-gv")
-  , puskrez_config("chs2t-puskrez")
+  , vehicle_path("../vehicles/chs2t/")
+  , pantograph_config(vehicle_path + "pantograph")
+  , gv_config(vehicle_path + "bv")
+  , puskrez_config(vehicle_path + "puskrez")
 {
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantographs[i] = new Pantograph();
-        pantographs[i]->read_config(pantograph_config);
+        pantographs[i]->read_custom_config(pantograph_config);
     }
+
     bistV = new ProtectiveDevice();
-    bistV->read_config(gv_config);
+    bistV->read_custom_config(gv_config);
 
     puskRez = new PuskRez;
-    puskRez->read_config(puskrez_config);
+    puskRez->read_custom_config(puskrez_config);
 
     engine = new Engine;
 
     km21KR2 = new Km21KR2();
-//    km21KR2->read_config();
 
     stepSwitch = new StepSwitch();
-//    stepSwitch->read_config();
 
     Uks = 3000;
 }

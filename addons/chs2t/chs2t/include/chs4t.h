@@ -45,6 +45,7 @@ public:
 
 private:
 
+    QString     vehicle_path;
     QString     pantograph_config;
     QString     gv_config;
     QString     puskrez_config;

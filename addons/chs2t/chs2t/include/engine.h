@@ -14,6 +14,7 @@
 #define ENGINE_H
 
 #include "device.h"
+#include "motor-magnetic-char.h"
 
 //------------------------------------------------------------------------------
 //
@@ -30,19 +31,76 @@ public:
 
     void setPoz(int poz) { this->poz = poz; }
 
-    void setR(double R) { this->R = R; }
+    void setR(double R)  { this->R = R; }
+
+    void setOmega(double value) { omega = value; }
+
+    void setU(double value) { U = value; }
+
+    double getTorque() const { return  torque; }
+
+    double getIa() const { return getY(0); }
+
+    double getIf() const { return getIa() * beta; }
+
+    double getUd() const { return U - getIa() * R_r; }
+
+    void setBeta(double value) { beta = value; }
+
+    void setBetaStep(int step);
+
+    void setDirection(int revers_state);
 
 private:
+
+    int    poz;
+
+    int    n;
+
+    double R;
+
+    /// Степень ослабления возбуждения
+    double  beta;
+
+    /// Сопротивление обмотки якоря (ОЯ)
+    double  R_a;
+
+    /// Сопротивление главных полюсов ОВ
+    double  R_gp;
+
+    /// Сопротивление добавочных полюсов
+    double  R_dp;
+
+    double  R_r;
+
+    /// Эквивадентная индуктивность обмоток
+    double  L_af;
+
+    /// Угловая скорость вала
+    double  omega;
+
+    /// Напряжение
+    double  U;
+
+    /// Момент на валу
+    double  torque;
+
+    double  omega_nom;
+
+    int     direction;
+
+    MotorMagneticChar cPhi;
+
+    QMap<int, double> fieldStep;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
-    int poz;
+    double calcCPhi(double I);
 
-    int n;
 
-    double R;
 
 };
 
