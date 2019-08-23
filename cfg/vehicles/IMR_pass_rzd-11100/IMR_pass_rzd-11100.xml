@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+
+		<EmptyMass>56500</EmptyMass>
+		<PayloadMass>4000</PayloadMass>
+		<Length>25.0</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>4</NumAxis>		
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+                <WheelInertia>2.0</WheelInertia>
+
+                <ExtModelName>IMR_pass_rzd/Pass_CupAmm4.osgt</ExtModelName>
+
+                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+                <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+
+                <AirDistModule>vr242</AirDistModule>
+                <AirDistConfig>vr242</AirDistConfig>
+
+	</Vehicle>
+</Config>
