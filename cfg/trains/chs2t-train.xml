@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModule>ef-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
+
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>0</NoAir>
+
+		<Title>ЧС2т с поездом</Title>
+		<Description>Пассажирский электровоз постоянного тока ЧС2т с поездом</Description>
+	</Common>
+	<Vehicle>
+		<Module>chs2t</Module>
+		<ModuleConfig>chs2t</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>passcar</ModuleConfig>
+		<Count>15</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	
+</Config>

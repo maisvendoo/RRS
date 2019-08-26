@@ -31,7 +31,7 @@ public:
 
     void setPoz(int poz) { this->poz = poz; }
 
-    void setR(double R)  { this->R = R; }
+    void setR(double R)  { this->R_r = R; }
 
     void setOmega(double value) { omega = value; }
 
@@ -57,8 +57,6 @@ private:
 
     int    n;
 
-    double R;
-
     /// Степень ослабления возбуждения
     double  beta;
 
@@ -71,6 +69,7 @@ private:
     /// Сопротивление добавочных полюсов
     double  R_dp;
 
+    ///  Сопротивление реостата
     double  R_r;
 
     /// Эквивадентная индуктивность обмоток
@@ -79,11 +78,11 @@ private:
     /// Угловая скорость вала
     double  omega;
 
-    /// Напряжение
-    double  U;
-
     /// Момент на валу
     double  torque;
+
+    /// Напряжение
+    double  U;
 
     double  omega_nom;
 

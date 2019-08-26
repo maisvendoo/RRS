@@ -11,12 +11,16 @@
 //
 //------------------------------------------------------------------------------
 
-#include    "chs4t.h"
+#include    "chs2t.h"
+#include    "filesystem.h"
+
+#include    <QDir>
+
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-CHS4T::CHS4T() : Vehicle()
+CHS2T::CHS2T() : Vehicle()
   , vehicle_path("../vehicles/chs2t/")
   , pantograph_config(vehicle_path + "pantograph")
   , gv_config(vehicle_path + "bv")
@@ -31,14 +35,7 @@ CHS4T::CHS4T() : Vehicle()
     bistV = new ProtectiveDevice();
     bistV->read_custom_config(gv_config);
 
-    puskRez = new PuskRez;
-    puskRez->read_custom_config(puskrez_config);
 
-    engine = new Engine;
-
-    km21KR2 = new Km21KR2();
-
-    stepSwitch = new StepSwitch();
 
     Uks = 3000;
 }
@@ -46,16 +43,71 @@ CHS4T::CHS4T() : Vehicle()
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-CHS4T::~CHS4T()
+CHS2T::~CHS2T()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::initialization()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    Uks = WIRE_VOLTAGE;
+    current_kind = 1;
+
+//    initPantographs();
+
+//    initHighVoltageScheme();
+
+//    initSupplyMachines();
+
+//    initBrakeControls(modules_dir);
+
+//    initBrakeMechanics();
+
+//    initBrakeEquipment(modules_dir);
+
+    initTractionControl();
+
+//    initOtherEquipment();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::initTractionControl()
+{
+    km21KR2 = new Km21KR2();
+
+    stepSwitch = new StepSwitch();
+//    stepSwitch->read_custom_config(config_dir + QDir::separator() + "ekg-8g");
+//    connect(stepSwitch, &StepSwitch::soundPlay, this, &Engine::soundPlay);
+
+//    gauge_KV_motors = new Oscillator();
+//    gauge_KV_motors->read_custom_config(config_dir + QDir::separator() + "KV1-osc");
+
+        motor = new Engine();
+        motor->setCustomConfigDir(config_dir);
+        motor->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
+
+        puskRez = new PuskRez;
+        puskRez->read_custom_config(config_dir + QDir::separator() + "puskrez");
+//        connect(motor[i], &Engine::soundSetPitch, this, &Engine::soundSetPitch);
+//        connect(motor[i], &Engine::soundSetVolume, this, &Engine::soundSetVolume);
+
+//        overload_relay[i] = new OverloadRelay();
+//        overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
 }
 
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS4T::step(double t, double dt)
+void CHS2T::step(double t, double dt)
 {
     pantographs[0]->setUks(Uks);
     pantographs[1]->setUks(Uks);
@@ -78,18 +130,30 @@ void CHS4T::step(double t, double dt)
     puskRez->setPoz(stepSwitch->getPoz());
     puskRez->step(t, dt);
 
-    engine->setPoz(stepSwitch->getPoz());
-    engine->setR(puskRez->getR());
-    engine->step(t, dt);
+    double ip = 1.75;
 
-    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 x = %7")
+    motor->setPoz(stepSwitch->getPoz());
+    motor->setR(puskRez->getR());
+    motor->setU(bistV->getU_out() * stepSwitch->getSchemeState());
+    motor->setOmega(wheel_omega[0] * ip);
+    motor->step(t, dt);
+
+    for (size_t i = 0; i <= Q_a.size(); ++i)
+        Q_a[i] = motor->getTorque() * ip;
+
+
+    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 poz = %7 Ia = %8 R = %9" )
             .arg(t, 10, 'f', 1)
             .arg(pantographs[0]->getHeight(), 4, 'f', 2)
             .arg(pantographs[0]->getUout(), 5, 'f', 0)
             .arg(pantographs[1]->getHeight(), 4, 'f', 2)
             .arg(pantographs[1]->getUout(), 5, 'f', 0)
             .arg(bistV->getU_out(), 5, 'f', 0)
-            .arg(bistV->getKnifePos(), 5, 'f', 0);
+            .arg(stepSwitch->getPoz(), 3)
+            .arg(motor->getIa(), 5)
+            .arg(puskRez->getR(), 5);
+
+
 
 //    DebugMsg = QString(" A2B2 = %1 C2D2 = %2 E2F2 = %3 I2G2 = %4 J2K2 = %5 poz = %6 v1 = %7 v2 = %8 shaft_rel = %9")
 //    DebugMsg = QString(" poz = %1 R = %2")
@@ -101,7 +165,7 @@ void CHS4T::step(double t, double dt)
 //------------------------------------------------------------------------------
 // Загрузка данных из конфигурационного файла
 //------------------------------------------------------------------------------
-void CHS4T::loadConfig(QString cfg_path)
+void CHS2T::loadConfig(QString cfg_path)
 {
     CfgReader cfg;
 
@@ -114,7 +178,7 @@ void CHS4T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS4T::keyProcess()
+void CHS2T::keyProcess()
 {
     if (getKeyState(KEY_O))
         pantographs[0]->setState(isShift());
@@ -128,4 +192,4 @@ void CHS4T::keyProcess()
     bistV->setReturn(true);
 }
 
-GET_VEHICLE(CHS4T)
+GET_VEHICLE(CHS2T)

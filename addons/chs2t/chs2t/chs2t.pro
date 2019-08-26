@@ -33,5 +33,6 @@ INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/oscillator.h
 SOURCES += $$files(./src/*.cpp)

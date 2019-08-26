@@ -10,8 +10,8 @@
 //      Дата: 21/08/2019
 //
 //------------------------------------------------------------------------------
-#ifndef     CHS4T_H
-#define     CHS4T_H
+#ifndef     CHS2T_H
+#define     CHS2T_H
 
 #include    "vehicle-api.h"
 #include    "pantograph.h"
@@ -28,20 +28,20 @@ enum
 
 /*!
  * \class
- * \brief Основной класс, описывающий весь тепловоз
+ * \brief Основной класс, описывающий весь электровоз
  */
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class CHS4T : public Vehicle
+class CHS2T : public Vehicle
 {
 public:
 
     /// Конструктор
-    CHS4T();
+    CHS2T();
 
     /// Деструктор
-    ~CHS4T();    
+    ~CHS2T();
 
 private:
 
@@ -49,6 +49,18 @@ private:
     QString     pantograph_config;
     QString     gv_config;
     QString     puskrez_config;
+
+    enum
+    {
+        NUM_PANTOGRAPHS = 2,
+        WIRE_VOLTAGE = 3000
+    };
+
+    /// Механизм киловольтметра ТЭД
+//    Oscillator  *gauge_KV_motors;
+
+    /// Тяговые электродвигатели
+    Engine *motor;
 
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
@@ -58,9 +70,16 @@ private:
 
     Engine *engine;
 
+    /// Контроллер машиниста
     Km21KR2 *km21KR2;
 
     StepSwitch *stepSwitch;
+
+    /// Общая инициализация локомотива
+    void initialization();
+
+    /// Инициализация схемы управления тягой
+    void initTractionControl();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
@@ -71,4 +90,4 @@ private:
     void keyProcess();
 };
 
-#endif // CHS4T
+#endif // CHS2T

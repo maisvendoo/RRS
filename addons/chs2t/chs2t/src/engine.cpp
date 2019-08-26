@@ -20,6 +20,18 @@
 //------------------------------------------------------------------------------
 Engine::Engine(QObject* parent) : Device(parent)
   , n(0)
+  , beta(1)
+  , R_a(0.032)
+  , R_gp(0.0232)
+  , R_dp(0.0127)
+  , R_r(0)
+  , L_af(0.001)
+  , omega(0.0)
+  , U(0.0)
+  , torque(0.0)
+  , omega_nom(73.8)
+  , direction(1)
+
 {
 
 }
@@ -32,14 +44,26 @@ Engine::~Engine()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Engine::setBetaStep(int step)
 {
-
+    if (fieldStep.contains(step))
+    {
+        setBeta(fieldStep[step]);
+    }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Engine::setDirection(int revers_state)
 {
-
+    if (revers_state == 0)
+        return;
+    else
+        direction = revers_state;
 }
 
 //------------------------------------------------------------------------------
@@ -47,6 +71,10 @@ void Engine::setDirection(int revers_state)
 //------------------------------------------------------------------------------
 void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    double R;
+    R = R_r / n + R_a + R_gp * beta + R_dp;
+    dYdt[0] = (U / n - R * Y[0] - calcCPhi(Y[0] * beta ) * omega) / L_af;
+
 
 }
 
@@ -93,6 +121,8 @@ void Engine::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void Engine::preStep(state_vector_t& Y, double t)
 {
+
+    torque = calcCPhi(Y[0] * beta) * Y[0];
 
 }
 
