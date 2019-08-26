@@ -74,12 +74,45 @@ void MPCS::stepKeysControl(double t, double dt)
             taskPant->setControlSignal(FORWARD_DOWN, true);
         }
     }
+
+    if (getKeyState(KEY_P))
+    {
+        if (isShift())
+            ms_fs_on.set();
+        else
+            ms_fs_on.reset();
+    }
+
 }
 
 void MPCS::stepDiscrete(double t, double dt)
 {   
     taskPant->step(y, t, dt, mpcs_input, mpcs_output);
+
+    stepMainSwitchControl(t, dt);
+
+    stepFastSwitchControl(t, dt);
 }
+
+
+void MPCS::stepMainSwitchControl(double t, double dt)
+{
+    mpcs_output.turn_on_ms = ms_fs_on.getState();
+    mpcs_output.turn_on_ms = mpcs_output.turn_on_ms && mpcs_input.isOff_fs;
+    mpcs_output.turn_on_ms = mpcs_output.turn_on_ms && (mpcs_input.current_kind_switch_state == 0);
+    mpcs_output.turn_on_ms = mpcs_output.turn_on_ms && (mpcs_input.Uin_ms >= 19000.0)
+            && (mpcs_input.Uin_ms <= 29000.0);
+}
+
+void MPCS::stepFastSwitchControl(double t, double dt)
+{
+    mpcs_output.turn_on_fs = ms_fs_on.getState();
+    mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && mpcs_input.isOff_ms;
+    mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && (mpcs_input.current_kind_switch_state == 1);
+    mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && (mpcs_input.Uin_fs >= 2200.0)
+            && (mpcs_input.Uin_fs <= 4000.0);
+}
+
 
 //------------------------------------------------------------------------------
 // Пердварительные шаги

@@ -41,10 +41,17 @@ private:
     /// Выходные значения
     mpcs_output_t mpcs_output;
 
+    /// Кнопка ГВ/БВ
+    Trigger ms_fs_on;
+
     /// Управление клавишами
     void stepKeysControl(double t, double dt);
 
     void stepDiscrete(double t, double dt);
+
+    void stepMainSwitchControl(double t, double dt);
+
+    void stepFastSwitchControl(double t, double dt);
 
     /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);

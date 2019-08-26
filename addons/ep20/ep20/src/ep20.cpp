@@ -137,8 +137,20 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     // Передаем данные для ГВ
     mainSwitch->setU_in(kindSwitch->getUoutAC());
     fastSwitch->setU_in(kindSwitch->getUoutDC());
-//    mainSwitch->setState();
-//    fastSwitch->setState();
+
+    mpcsInput.Uin_ms = kindSwitch->getUoutAC();
+    mpcsInput.current_kind_switch_state = current_kind - 1;
+    mpcsInput.isOff_fs = fastSwitch->getState();
+    mainSwitch->setReturn(true);
+    mainSwitch->setHoldingCoilState(true);
+    mainSwitch->setState(mpcsOutput.turn_on_ms);
+
+    mpcsInput.Uin_fs = kindSwitch->getUoutDC();
+    mpcsInput.current_kind_switch_state = current_kind - 1;
+    mpcsInput.isOff_ms = mainSwitch->getState();
+    fastSwitch->setReturn(true);
+    fastSwitch->setHoldingCoilState(true);
+    fastSwitch->setState(mpcsOutput.turn_on_fs);
 
     mainSwitch->step(t, dt);
     fastSwitch->step(t, dt);

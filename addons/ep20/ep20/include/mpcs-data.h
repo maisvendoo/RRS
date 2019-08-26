@@ -15,11 +15,38 @@ struct mpcs_input_t
 
     std::array<bool, NUM_PANTOGRAPHS> pant_down;
 
+
+    /// Отключен ли БВ
+    bool isOff_fs;
+
+    /// ПРТ
+    int current_kind_switch_state;
+
+    /// Входное напряжение на ГВ
+    double Uin_ms;
+
+    /// Нажатие кнопки
+    bool pressedButton;
+
+    /// Отключен ли ГВ
+    bool isOff_ms;
+
+    /// Входное напряжение на БВ
+    double Uin_fs;
+
     mpcs_input_t()
     {
         current_kind = 0;
         std::fill(pant_up.begin(), pant_up.end(), false);
         std::fill(pant_down.begin(), pant_down.end(), false);
+
+        isOff_fs = false;
+        current_kind_switch_state = 0;
+        Uin_ms = 0;
+        pressedButton = false;
+
+        isOff_ms = false;
+        Uin_fs = 0;
     }
 };
 
@@ -29,6 +56,12 @@ struct mpcs_input_t
 struct mpcs_output_t
 {
     std::array<bool, NUM_PANTOGRAPHS> pant_state;
+
+    /// Включение ГВ
+    bool turn_on_ms = false;
+
+    /// Включение БВ
+    bool turn_on_fs = false;
 
     mpcs_output_t()
     {

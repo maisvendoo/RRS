@@ -28,15 +28,19 @@ public:
 
     float getLampState() const;
 
+    bool getState() const;
+
 private:
 
     /// Напряжение на входе ГВ
     double  U_in;
+
     /// Напряжение на выходе ГВ
     double  U_out;
 
     /// Сигнал включения ГВ
     bool    is_on;
+
     /// Возврат защиты
     bool    is_return;
 
