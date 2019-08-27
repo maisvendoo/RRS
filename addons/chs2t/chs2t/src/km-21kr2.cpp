@@ -69,11 +69,35 @@ void Km21KR2::stepKeysControl(double t, double dt)
         {
             n = 0;
         }
-        else if (n == 0)
+        else
+        {
+            if (isShift() && fieldStep != 0 && p == 0 && hod)
+            {
+                fieldStep -= 1;
+                p = 1;
+            }
+            else if (n == 0 && !isShift())
+            {
+                k21 = false;
+                k22 = false;
+                k23 = false;
+            }
+        }
+    }
+
+    // 1 вниз
+    if (getKeyState(KEY_A))
+    {
+        if(isShift() && fieldStep != 5 && p == 0 && hod)
+        {
+            fieldStep += 1;
+            p = 1;
+        }
+        else if(n == 0 && !isShift())
         {
             k21 = false;
-            k22 = false;
-            k23 = false;
+            k22 = true;
+            k23 = true;
         }
     }
 
@@ -99,18 +123,11 @@ void Km21KR2::stepKeysControl(double t, double dt)
         n = 1;
     }
 
-    // 1 вниз
-    if (getKeyState(KEY_A))
-    {
-        k21 = false;
-        k22 = true;
-        k23 = true;
-    }
-
     // Ноль
     if (!getKeyState(KEY_Q) && !getKeyState(KEY_E) &&
         !getKeyState(KEY_A) && !getKeyState(KEY_D) )
     {
+        p = 0;
         k21 = true;
         k22 = true;
         k23 = false;

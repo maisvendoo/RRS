@@ -20,6 +20,7 @@
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
 #include    "engine.h"
+#include    "registrator.h"
 
 enum
 {
@@ -68,12 +69,14 @@ private:
 
     PuskRez *puskRez;
 
-    Engine *engine;
+    Registrator *reg;
 
     /// Контроллер машиниста
     Km21KR2 *km21KR2;
 
     StepSwitch *stepSwitch;
+
+    double tracForce_kN;
 
     /// Общая инициализация локомотива
     void initialization();
@@ -88,6 +91,8 @@ private:
     void loadConfig(QString cfg_path);
 
     void keyProcess();
+
+    void registrate(double t, double dt);
 };
 
 #endif // CHS2T

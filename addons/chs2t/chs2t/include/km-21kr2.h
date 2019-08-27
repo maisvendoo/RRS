@@ -28,7 +28,10 @@ public:
     ///Деструктор
     ~Km21KR2();
 
+    void setHod(bool hod) { this->hod = hod; }
+
     ControllerState getCtrlState() { return controlState; }
+    int getFieldStep() { return fieldStep ;}
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -40,6 +43,9 @@ private:
     bool k22;
     bool k23;
     int n;
+    int p;
+    bool hod;
+    int fieldStep;
 
     ControllerState controlState;
 };

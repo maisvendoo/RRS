@@ -18,7 +18,8 @@
 // Конструктор
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
-  , V(2.96)
+//  , V(2.96)
+  , V(4.12)
   , poz_d(0)
   , poz(0)
   , n(0)
@@ -97,5 +98,7 @@ void StepSwitch::stepKeysControl(double t, double dt)
     }
 
     poz = static_cast<int>(poz_d);
+
+    hod = (poz == 20 || poz == 33 || poz == 42);
 
 }

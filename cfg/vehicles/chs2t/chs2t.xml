@@ -2,7 +2,7 @@
 <Config>
 	<Vehicle>
 		
-		<EmptyMass>135000</EmptyMass>
+		<EmptyMass>125000</EmptyMass>
 		<PayloadMass>0</PayloadMass>
 		<Length>19.98</Length>
 		<WheelDiameter>1.25</WheelDiameter>

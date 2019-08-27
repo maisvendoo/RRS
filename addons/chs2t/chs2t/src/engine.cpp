@@ -104,7 +104,7 @@ void Engine::load_config(CfgReader& cfg)
 
     while (!secNode.isNull())
     {
-        double field_step = 0.95;
+        double field_step = 1.0;
         int number = 0;
 
         cfg.getInt(secNode, "Number", number);
@@ -147,5 +147,5 @@ void Engine::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 double Engine::calcCPhi(double I)
 {
-    return cPhi.getValue(I);
+    return 1.2 * cPhi.getValue(I);
 }

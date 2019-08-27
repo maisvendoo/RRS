@@ -35,6 +35,8 @@ public:
 
     double getSchemeState() const;
 
+    bool getHod() { return hod; }
+
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
@@ -51,6 +53,8 @@ private:
     int poz;
 
     int n;
+
+    bool hod;
 
 };
 

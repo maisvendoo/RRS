@@ -51,6 +51,8 @@ public:
 
     void setDirection(int revers_state);
 
+    double getBeta() { return beta; }
+
 private:
 
     int    poz;
