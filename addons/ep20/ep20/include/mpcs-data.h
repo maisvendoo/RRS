@@ -25,9 +25,6 @@ struct mpcs_input_t
     /// Входное напряжение на ГВ
     double Uin_ms;
 
-    /// Нажатие кнопки
-    bool pressedButton;
-
     /// Отключен ли ГВ
     bool isOff_ms;
 
@@ -43,7 +40,6 @@ struct mpcs_input_t
         isOff_fs = false;
         current_kind_switch_state = 0;
         Uin_ms = 0;
-        pressedButton = false;
 
         isOff_ms = false;
         Uin_fs = 0;

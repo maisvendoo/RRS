@@ -19,6 +19,7 @@
 #include    "pant-description.h"
 #include    "current-kind-switch.h"
 #include    "protective-device.h"
+#include    "traction-transformer.h"
 
 /*!
  * \class
@@ -53,6 +54,8 @@ private:
 
     /// Аппарат защиты (БВ)
     ProtectiveDevice    *fastSwitch;
+
+    TractionTransformer *tractionTrans;
 
     /// Входные значения
     mpcs_input_t mpcsInput;
