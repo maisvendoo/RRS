@@ -8,8 +8,8 @@
 //------------------------------------------------------------------------------
 EP20::EP20()
 {
-    Uks = 25000.0;
-    current_kind = 1;
+    Uks = 3000.0;
+    current_kind = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -66,6 +66,9 @@ void EP20::initHighVoltageScheme()
     fastSwitch = new ProtectiveDevice();
 
     tractionTrans = new TractionTransformer();
+
+    for (size_t i = 0; i < trac_conv.size(); ++i)
+        trac_conv[i] = new TractionConverter();
 }
 
 //------------------------------------------------------------------------------
@@ -80,14 +83,14 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, UoutDC: %2, UoutAC: %3, MainSwitch: %4, FastSwitch: %5, TractionTrans: %6, TR: %7")
+    DebugMsg = QString("t: %1 s, UoutDC: %2, UoutAC: %3, MainSwitch: %4, FastSwitch: %5, TractionTrans: %6, U4: %7")
             .arg(t, 10, 'f', 2)
             .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
             .arg(kindSwitch->getUoutAC(), 4, 'f', 2)
             .arg(mainSwitch->getU_out(), 4, 'f', 2)
             .arg(fastSwitch->getU_out(), 4, 'f', 2)
             .arg(tractionTrans->getTractionVoltage(0))
-            .arg(tractionTrans->getVoltageHeatingCoil());
+            .arg(trac_conv[0]->getU4());
 }
 
 //------------------------------------------------------------------------------
@@ -161,6 +164,14 @@ void EP20::stepHighVoltageScheme(double t, double dt)
 
     tractionTrans->setU1(mainSwitch->getU_out());
     tractionTrans->step(t, dt);
+
+    for (size_t i = 0; i < trac_conv.size(); ++i)
+    {
+        trac_conv[i]->setUdcIn(fastSwitch->getU_out());
+        trac_conv[i]->setUt(tractionTrans->getTractionVoltage(2 * i), 0);
+        trac_conv[i]->setUt(tractionTrans->getTractionVoltage(2 * i + 1), 1);
+        trac_conv[i]->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------

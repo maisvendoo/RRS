@@ -20,6 +20,7 @@
 #include    "current-kind-switch.h"
 #include    "protective-device.h"
 #include    "traction-transformer.h"
+#include    "traction-converter.h"
 
 /*!
  * \class
@@ -55,7 +56,15 @@ private:
     /// Аппарат защиты (БВ)
     ProtectiveDevice    *fastSwitch;
 
+
     TractionTransformer *tractionTrans;
+
+    enum
+    {
+        NUM_TRAC_CONV = 3
+    };
+
+    std::array<TractionConverter *, NUM_TRAC_CONV> trac_conv;
 
     /// Входные значения
     mpcs_input_t mpcsInput;
