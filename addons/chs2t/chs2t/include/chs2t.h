@@ -21,6 +21,7 @@
 #include    "pusk-rez.h"
 #include    "engine.h"
 #include    "registrator.h"
+#include    "overload-relay.h"
 
 enum
 {
@@ -78,6 +79,11 @@ private:
 
     double tracForce_kN;
 
+    bool bv_return;
+
+    /// Реле перегрузки ТЭД
+    OverloadRelay *overload_relay;
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -93,6 +99,8 @@ private:
     void keyProcess();
 
     void registrate(double t, double dt);
+
+    bool getHoldingCoilState() const;
 };
 
 #endif // CHS2T

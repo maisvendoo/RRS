@@ -32,6 +32,7 @@ public:
 
     ControllerState getCtrlState() { return controlState; }
     int getFieldStep() { return fieldStep ;}
+    int getReverseState() { return reverseState; }
 
 private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -42,10 +43,17 @@ private:
     bool k21;
     bool k22;
     bool k23;
+
+    bool k01;
+    bool k02;
+
     int n;
     int p;
+    int re;
     bool hod;
     int fieldStep;
+    int reverseState;
+
 
     ControllerState controlState;
 };

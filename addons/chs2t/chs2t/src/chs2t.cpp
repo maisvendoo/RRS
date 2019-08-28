@@ -36,6 +36,7 @@ CHS2T::CHS2T() : Vehicle()
     bistV->read_custom_config(gv_config);
 
     tracForce_kN = 0;
+    bv_return = false;
 
     Uks = 3000;
 }
@@ -101,8 +102,8 @@ void CHS2T::initTractionControl()
 //        connect(motor[i], &Engine::soundSetPitch, this, &Engine::soundSetPitch);
 //        connect(motor[i], &Engine::soundSetVolume, this, &Engine::soundSetVolume);
 
-//        overload_relay[i] = new OverloadRelay();
-//        overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
+        overload_relay = new OverloadRelay();
+        overload_relay->read_custom_config(config_dir + QDir::separator() + "PT-140A");
 }
 
 
@@ -121,7 +122,10 @@ void CHS2T::step(double t, double dt)
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
 
-    bistV->setHoldingCoilState(true);
+//    bistV->setHoldingCoilState(true);
+    bistV->setHoldingCoilState(getHoldingCoilState());
+    bv_return = getHoldingCoilState() && bv_return;
+    bistV->setReturn(bv_return);
     bistV->step(t, dt);
 
     km21KR2->setHod(stepSwitch->getHod());
@@ -136,6 +140,7 @@ void CHS2T::step(double t, double dt)
 
     double ip = 1.75;
 
+    motor->setDirection(km21KR2->getReverseState());
     motor->setBetaStep(km21KR2->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());
@@ -151,9 +156,12 @@ void CHS2T::step(double t, double dt)
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
 
+    overload_relay->setCurrent(motor->getIa());
+    overload_relay->step(t, dt);
 
 
-    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 poz = %7 Ia = %8 R = %9 beta = %10" )
+
+    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 poz = %7 Ia = %8 R = %9 beta = %10 re = %11" )
             .arg(t, 10, 'f', 1)
             .arg(pantographs[0]->getHeight(), 3, 'f', 2)
             .arg(pantographs[0]->getUout(), 4, 'f', 0)
@@ -163,7 +171,8 @@ void CHS2T::step(double t, double dt)
             .arg(stepSwitch->getPoz(), 2)
             .arg(motor->getIa(), 5)
             .arg(puskRez->getR(), 5)
-            .arg(motor->getBeta(), 5);
+            .arg(motor->getBeta(), 5)
+            .arg(km21KR2->getReverseState(), 3);
 
 
 
@@ -199,9 +208,12 @@ void CHS2T::keyProcess()
         pantographs[1]->setState(isShift());
 
     if (getKeyState(KEY_P))
+    {
         bistV->setState(isShift());
+        bv_return = isShift();
+    }
 
-    bistV->setReturn(true);
+
 }
 
 void CHS2T::registrate(double t, double dt)
@@ -213,6 +225,20 @@ void CHS2T::registrate(double t, double dt)
             .arg(motor->getIa());
 
     reg->print(msg, t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool CHS2T::getHoldingCoilState() const
+{
+    bool no_overload = true;
+
+    no_overload = no_overload && (!static_cast<bool>(overload_relay->getState()));
+
+    bool state = no_overload;
+
+    return state;
 }
 
 GET_VEHICLE(CHS2T)

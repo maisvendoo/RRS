@@ -21,6 +21,9 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , k22(true)
   , k23(false)
   , n(0)
+  , p(0)
+  , re(0)
+  , reverseState(0)
 {
 
 }
@@ -62,6 +65,22 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void Km21KR2::stepKeysControl(double t, double dt)
 {
+    if (getKeyState(KEY_W) && reverseState != 1 && re == 0)
+    {
+        reverseState += 1;
+        re = 1;
+    }
+    if (getKeyState(KEY_S) && reverseState != -1 && re == 0)
+    {
+        reverseState -= 1;
+        re = 1;
+    }
+    if (!getKeyState(KEY_W) && !getKeyState(KEY_S))
+        re = 0;
+
+    if (reverseState == 0)
+        return;
+
     // Авт. сброс
     if (getKeyState(KEY_D))
     {
@@ -125,13 +144,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
 
     // Ноль
     if (!getKeyState(KEY_Q) && !getKeyState(KEY_E) &&
-        !getKeyState(KEY_A) && !getKeyState(KEY_D) )
+        !getKeyState(KEY_A) && !getKeyState(KEY_D))
     {
         p = 0;
         k21 = true;
         k22 = true;
         k23 = false;
     }
+
+
 
 
     controlState.up = k21 * k23;
