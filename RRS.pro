@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS += ./CfgReader
+SUBDIRS += ./CfgEditor
 SUBDIRS += ./filesystem
 SUBDIRS += ./log
 SUBDIRS += ./tcp-connection
@@ -27,4 +28,5 @@ SUBDIRS += ./viewer
 
 SUBDIRS += ./tools/profconv
 SUBDIRS += ./tools/pathconv
+SUBDIRS += ./tools/routeconv
 
