@@ -786,7 +786,7 @@ bool VL60::getHoldingCoilState() const
 void VL60::keyProcess()
 {
     // Управление тумблером "Токоприемники"
-    if (getKeyState(KEY_O))
+    if (getKeyState(KEY_U))
     {
         if (isShift())
             pants_tumbler.set();
@@ -795,7 +795,7 @@ void VL60::keyProcess()
     }
 
     // Подъем/опускание переднего токоприемника
-    if (getKeyState(KEY_U))
+    if (getKeyState(KEY_I))
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())                    
@@ -808,7 +808,7 @@ void VL60::keyProcess()
     }
 
     // Подъем/опускание заднего токоприемника
-    if (getKeyState(KEY_I))
+    if (getKeyState(KEY_O))
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())

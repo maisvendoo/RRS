@@ -26,9 +26,9 @@ enum
 
     REVERS = 30,
 
-    TUMBLER_PNT = 33,    
-    TUMBLER_PNT1 = 31,
-    TUMBLER_PNT2 = 32,
+    TUMBLER_PNT = 31,
+    TUMBLER_PNT1 = 32,
+    TUMBLER_PNT2 = 33,
 
     TUMBLER_CU = 34,
     TUMBLER_GV_ON = 35,
