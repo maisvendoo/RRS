@@ -170,12 +170,6 @@ void MainWindow::slotConvert()
 //------------------------------------------------------------------------------
 void MainWindow::slotIsPathconvFinished(int error_code)
 {
-    if (error_code != 0)
-    {
-        ui->lStatus->setText(tr("Error: path converter failed"));
-        return;
-    }
-
     startProfConverter(routeDir);
 }
 
@@ -184,12 +178,5 @@ void MainWindow::slotIsPathconvFinished(int error_code)
 //------------------------------------------------------------------------------
 void MainWindow::slotIsProfconvFinished(int error_code)
 {
-    if (error_code != 0)
-    {
-        ui->lStatus->setText(tr("Error: profile converter failed"));
-    }
-    else
-    {
-        ui->lStatus->setText(tr("OK: conversion complete"));
-    }
+    ui->lStatus->setText(tr("OK: conversion complete"));
 }
