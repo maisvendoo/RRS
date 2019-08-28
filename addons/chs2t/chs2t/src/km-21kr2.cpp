@@ -153,12 +153,9 @@ void Km21KR2::stepKeysControl(double t, double dt)
     }
 
 
-
-
     controlState.up = k21 * k23;
     controlState.up1 = !k21 * k23;
     controlState.zero = k22 * !k23;
     controlState.down1 = !k21 * !k22;
     controlState.down = k21 * !k22;
-
 }
