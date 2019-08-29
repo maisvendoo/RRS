@@ -252,6 +252,28 @@ void VL60::initOtherEquipment()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60::initTriggers()
+{
+    triggers.push_back(&pants_tumbler);
+    triggers.push_back(&pant2_tumbler);
+    triggers.push_back(&gv_tumbler);
+    triggers.push_back(&gv_return_tumbler);
+    triggers.push_back(&fr_tumbler);
+    triggers.push_back(&mk_tumbler);
+
+    for (size_t i = 0; i < mv_tumblers.size(); ++i)
+        triggers.push_back(&mv_tumblers[i]);
+
+    triggers.push_back(&cu_tumbler);
+
+    autoStartTimer = new Timer(0.5);
+    connect(autoStartTimer, &Timer::process, this, &VL60::slotAutoStart);
+    start_count = 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -275,6 +297,8 @@ void VL60::initialization()
     initTractionControl();
 
     initOtherEquipment();
+
+    initTriggers();
 }
 
 //------------------------------------------------------------------------------
@@ -353,6 +377,8 @@ void VL60::step(double t, double dt)
         else
             gv_tumbler.reset();
     }
+
+    autoStartTimer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -360,6 +386,9 @@ void VL60::step(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepPantographsControl(double t, double dt)
 {
+    pantographs[0]->setState(pant1_tumbler.getState() && pants_tumbler.getState());
+    pantographs[1]->setState(pant2_tumbler.getState() && pants_tumbler.getState());
+
     for (auto pant : pantographs)
     {
         // Задаем текущее напряжение КС (пока что через константу)
@@ -785,6 +814,9 @@ bool VL60::getHoldingCoilState() const
 //------------------------------------------------------------------------------
 void VL60::keyProcess()
 {
+    if (autoStartTimer->isStarted())
+        return;
+
     // Управление тумблером "Токоприемники"
     if (getKeyState(KEY_U))
     {
@@ -804,7 +836,7 @@ void VL60::keyProcess()
             pant1_tumbler.reset();
 
         // Задаем статус токоприемнику
-        pantographs[0]->setState(isShift() && pants_tumbler.getState());
+        //pantographs[0]->setState(pants_tumbler.getState());
     }
 
     // Подъем/опускание заднего токоприемника
@@ -817,7 +849,7 @@ void VL60::keyProcess()
             pant2_tumbler.reset();
 
         // Задаем статус токоприемнику
-        pantographs[1]->setState(isShift() && pants_tumbler.getState());
+        //pantographs[1]->setState(pants_tumbler.getState());
     }
 
     // Включение/выключение ГВ
@@ -935,6 +967,12 @@ void VL60::keyProcess()
         rb[RBP].set();
     else
         rb[RBP].reset();
+
+    if (getKeyState(KEY_R))
+    {
+        if (isAlt() && !autoStartTimer->isStarted())
+            autoStartTimer->start();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -985,6 +1023,13 @@ void VL60::load_brakes_config(QString path)
 
         int brake_lock = 0;
 
+        int combine_crane_pos = -1;
+
+        if (cfg.getInt(secName, "CombineCranePos", combine_crane_pos))
+        {
+            ubt->setCombineCranePos(combine_crane_pos);
+        }
+
         if (cfg.getInt(secName, "BrakeLockDevice", brake_lock))
         {
             ubt->setState(brake_lock);
@@ -996,6 +1041,32 @@ void VL60::load_brakes_config(QString path)
                 supply_reservoir->setY(0, charge_press);
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::slotAutoStart()
+{
+    if (start_count < triggers.size())
+    {
+        triggers[start_count]->set();
+
+        if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
+                (triggers[start_count] == &gv_tumbler))
+            return;
+
+        if (!static_cast<bool>(main_switch->getLampState()))
+            gv_return_tumbler.reset();
+
+        start_count++;
+    }
+    else
+    {
+        autoStartTimer->stop();
+        controller->setReversPos(REVERS_FORWARD);
+        start_count = 0;
     }
 }
 
