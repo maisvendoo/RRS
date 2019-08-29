@@ -18,11 +18,12 @@
 // Конструктор
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
-//  , V(2.96)
   , V(4.12)
+  , V1(7.2)
   , poz_d(0)
   , poz(0)
   , n(0)
+  , p(0)
 
 {
 
@@ -36,6 +37,9 @@ StepSwitch::~StepSwitch()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double StepSwitch::getSchemeState() const
 {
     return static_cast<double>(poz != 0);
@@ -72,10 +76,10 @@ void StepSwitch::stepKeysControl(double t, double dt)
 {
     if (ctrlState.up)
     {
-        poz_d += V * hs_p(42 - poz_d) * dt;
+        poz_d += V * hs_p(MPOS_P - poz_d) * dt;
         n = 0;
     }
-    if (ctrlState.up1 && poz_d < 42 && n == 0)
+    if (ctrlState.up1 && poz_d < MPOS_P && n == 0)
     {
         poz += 1;
         poz_d = poz;
@@ -97,8 +101,31 @@ void StepSwitch::stepKeysControl(double t, double dt)
         n = 0;
     }
 
+    if (getKeyState(KEY_Z) || p == 1)
+    {
+        if (poz > MPOS_SP)
+        {
+            poz_d -= V1 * hs_p(poz_d - MPOS_SP) * dt;
+            p = hs_p(poz_d - MPOS_SP);
+            return;
+        }
+        if (poz > MPOS_S)
+        {
+            poz_d -= V1 * hs_p(poz_d - MPOS_S) * dt;
+            p = hs_p(poz_d - MPOS_S);
+            return;
+        }
+        if (poz > 0)
+        {
+            poz_d -= V1 * hs_p(poz_d) * dt;
+            p = hs_p(poz_d);
+        }
+    }
+
+
     poz = static_cast<int>(poz_d);
 
-    hod = (poz == 20 || poz == 33 || poz == 42);
+    hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
+
 
 }

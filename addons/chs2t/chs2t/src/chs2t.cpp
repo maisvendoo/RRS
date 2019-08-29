@@ -103,7 +103,7 @@ void CHS2T::initTractionControl()
 //        connect(motor[i], &Engine::soundSetVolume, this, &Engine::soundSetVolume);
 
         overload_relay = new OverloadRelay();
-        overload_relay->read_custom_config(config_dir + QDir::separator() + "PT-140A");
+        overload_relay->read_custom_config(config_dir + QDir::separator() + "1RPD6");
 }
 
 
@@ -122,7 +122,6 @@ void CHS2T::step(double t, double dt)
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
 
-//    bistV->setHoldingCoilState(true);
     bistV->setHoldingCoilState(getHoldingCoilState());
     bv_return = getHoldingCoilState() && bv_return;
     bistV->setReturn(bv_return);
@@ -212,10 +211,11 @@ void CHS2T::keyProcess()
         bistV->setState(isShift());
         bv_return = isShift();
     }
-
-
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CHS2T::registrate(double t, double dt)
 {
     QString msg = QString("%1 %2 %3 %4")

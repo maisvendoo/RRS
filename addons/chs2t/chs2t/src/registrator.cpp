@@ -4,6 +4,9 @@
 #include    <QDateTime>
 #include    <QTextStream>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Registrator::Registrator(QString fileName, double interval, QObject *parent)
     : QObject(parent)
     , first_print(true)
@@ -19,11 +22,17 @@ Registrator::Registrator(QString fileName, double interval, QObject *parent)
     file->close();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Registrator::~Registrator()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Registrator::print(QString line, double t, double dt)
 {
     if ( first_print || (tau > interval))

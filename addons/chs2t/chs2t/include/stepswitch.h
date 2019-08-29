@@ -44,15 +44,25 @@ private:
     void stepKeysControl(double t, double dt);
 
 
+    enum
+    {
+        MPOS_S = 20,
+        MPOS_SP = 33,
+        MPOS_P = 42
+    };
+
     ControllerState ctrlState;
 
     double V;
+    double V1;
+
 
     double poz_d;
 
     int poz;
 
     int n;
+    int p;
 
     bool hod;
 
