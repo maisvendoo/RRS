@@ -261,7 +261,7 @@ bool ProfConverter::readWaypoints(const std::string &path,
     }
 
     QTextStream stream(&file);
-    stream.setCodec("UTF-8");
+    //stream.setCodec("UTF-8");
 
     return readWaypoints(stream, waypoints);
 }
@@ -302,10 +302,11 @@ void ProfConverter::writeWaypoints(const std::string &filename,
 
     QFile file(QString(path.c_str()));
 
-    if (!file.open(QIODevice::WriteOnly))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
 
     QTextStream stream(&file);
+    stream.setCodec("UTF-8");
 
     for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
     {
@@ -315,7 +316,7 @@ void ProfConverter::writeWaypoints(const std::string &filename,
         track_t bwd_track = tracks_data1[(*it).backward_track];
         float bwd_coord = bwd_track.rail_coord;
 
-        stream << (*it).name
+        stream << (*it).name.toUtf8()
                << " " << fwd_coord
                << " " << bwd_coord
                << "\n";
