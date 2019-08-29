@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 TractionConverter::TractionConverter(QObject *parent) : Device (parent)
   ,Udc_in(0)
-  ,K4QS(0)
+  ,K4QS(1.808)
   ,U4(0)
 {
     std::fill(Ut.begin(), Ut.end(), 0);

@@ -21,6 +21,7 @@
 #include    "protective-device.h"
 #include    "traction-transformer.h"
 #include    "traction-converter.h"
+#include    "auxiliary-converter.h"
 
 /*!
  * \class
@@ -65,6 +66,8 @@ private:
     };
 
     std::array<TractionConverter *, NUM_TRAC_CONV> trac_conv;
+
+    AuxiliaryConverter  *auxConv;
 
     /// Входные значения
     mpcs_input_t mpcsInput;

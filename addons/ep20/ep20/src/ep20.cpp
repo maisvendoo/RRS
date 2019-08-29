@@ -8,8 +8,8 @@
 //------------------------------------------------------------------------------
 EP20::EP20()
 {
-    Uks = 3000.0;
-    current_kind = 2;
+    Uks = 25000.0;
+    current_kind = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -69,6 +69,8 @@ void EP20::initHighVoltageScheme()
 
     for (size_t i = 0; i < trac_conv.size(); ++i)
         trac_conv[i] = new TractionConverter();
+
+    auxConv = new AuxiliaryConverter();
 }
 
 //------------------------------------------------------------------------------
@@ -83,14 +85,14 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, UoutDC: %2, UoutAC: %3, MainSwitch: %4, FastSwitch: %5, TractionTrans: %6, U4: %7")
+    DebugMsg = QString("t: %1 s, UoutDC: %2, UoutAC: %3, MainSwitch: %4, FastSwitch: %5, TractionTrans: %6, U2: %7")
             .arg(t, 10, 'f', 2)
             .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
             .arg(kindSwitch->getUoutAC(), 4, 'f', 2)
             .arg(mainSwitch->getU_out(), 4, 'f', 2)
             .arg(fastSwitch->getU_out(), 4, 'f', 2)
             .arg(tractionTrans->getTractionVoltage(0))
-            .arg(trac_conv[0]->getU4());
+            .arg(auxConv->getU2());
 }
 
 //------------------------------------------------------------------------------
@@ -172,6 +174,9 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         trac_conv[i]->setUt(tractionTrans->getTractionVoltage(2 * i + 1), 1);
         trac_conv[i]->step(t, dt);
     }
+
+    auxConv->setU4(trac_conv[0]->getU4());
+    auxConv->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
