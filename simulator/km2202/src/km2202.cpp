@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 ControllerKM2202::ControllerKM2202(QObject *parent) : TractionController(parent)
   , position(0)
-  , reversor_dir(0)
+  , reversor_dir(1)
   , trac_timeout(0.3)
   , revers_timeout(0.3)
 {

@@ -399,8 +399,8 @@ void OpenVRDevice::createRenderBuffers(osg::ref_ptr<osg::State> state)
 //------------------------------------------------------------------------------
 void OpenVRDevice::init()
 {
-	calculateEyeAdjustment();
-	calculateProjectionMatrices();
+    calculateEyeAdjustment();
+    calculateProjectionMatrices();
 }
 
 //------------------------------------------------------------------------------

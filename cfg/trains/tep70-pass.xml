@@ -9,8 +9,8 @@
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
 		
-		<Title>Ещё один тестовый поезд</Title>
-		<Description>Поезд из 20 пассажирских (плацкартных) вагонов под тепловозом ТЭП70. Предназначен для отладки симулятора</Description>
+		<Title>ТЭП70 с поездом</Title>
+		<Description>Поезд из 15 пассажирских вагонов под тепловозом ТЭП70. </Description>
 	</Common>
 	<Vehicle>
 		<Module>test-loco</Module>
@@ -20,8 +20,14 @@
 	</Vehicle>
 	<Vehicle>
 		<Module>passcar</Module>
+		<ModuleConfig>ammendorf-cupe</ModuleConfig>
+		<Count>5</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
 		<ModuleConfig>passcar</ModuleConfig>
-		<Count>15</Count>
+		<Count>10</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>	
 </Config>

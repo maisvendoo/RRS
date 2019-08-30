@@ -2,7 +2,7 @@
 #define     OPENVR_INPUT_HANDLER_H
 
 #include    <osgGA/GUIEventHandler>
-#include    <openvr/openvr.h>
+#include    <openvr/openvr_mingw.hpp>
 
 #include    "openvrdevice.h"
 

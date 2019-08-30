@@ -1,15 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Config>
-	<Common>
-		<CouplingModule>ef-coupling</CouplingModule>
-		<CabineInVehicle>0</CabineInVehicle>
-		<Title>Одиночный вагон</Title>
-		<Description>Одиночный пассажирский вагон</Description>
-	</Common>
-	<Vehicle>
-		<Module>passcar</Module>
-		<ModuleConfig>passcar</ModuleConfig>
-		<Count>1</Count>
-		<PayloadCoeff>1</PayloadCoeff>
-	</Vehicle>	
-</Config>

@@ -6,7 +6,7 @@
 #include    <osgViewer/Viewer>
 
 #include    "openvrviewer.h"
-#include    "openvreventhandler.h"
+//#include    "openvreventhandler.h"
 
 //------------------------------------------------------------------------------
 //

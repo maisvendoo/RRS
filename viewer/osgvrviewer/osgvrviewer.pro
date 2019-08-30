@@ -1,8 +1,12 @@
 TEMPLATE = lib
 
+QT += opengl
+
 TARGET = osgVRViewer
 
 DESTDIR = ../../../lib
+
+CONFIG += c++11
 
 win32 {
 
@@ -15,18 +19,27 @@ win32 {
         TARGET = $$join(TARGET,,,_d)
 
         LIBS += -L$$OSG_LIB_DIRECTORY -losgd
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgViewerd
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreadsd
+
+        LIBS += -L$$(OPENVR_LIB) -lopenvr_api
 
     } else {
 
         LIBS += -L$$OSG_LIB_DIRECTORY -losg
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgViewer
         LIBS += -L$$OSG_LIB_DIRECTORY -lOpenThreads
 
+        LIBS += -L$$(OPENVR_LIB) -lopenvr_api
+
     }
 
+    LIBS += -lopengl32 -lglu32
+
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
+    INCLUDEPATH += $$(OPENVR_INCLUDE)
 }
 
 unix {

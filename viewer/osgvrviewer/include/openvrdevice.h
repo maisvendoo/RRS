@@ -9,7 +9,7 @@
 #define     OSG_OPENVRDEVICE_H
 
 // Include the OpenVR SDK
-#include    <openvr/openvr.h>
+#include    <openvr/openvr_mingw.hpp>
 
 #include    <osg/Geode>
 #include    <osg/Texture2D>

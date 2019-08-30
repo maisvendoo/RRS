@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setFocusPolicy(Qt::ClickFocus);
 
     loadTheme();
+
+    QIcon icon(":/img/img/logo.png");
+    setWindowIcon(icon);
 }
 
 //------------------------------------------------------------------------------

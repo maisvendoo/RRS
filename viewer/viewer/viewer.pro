@@ -11,6 +11,8 @@ TARGET = viewer
 
 DESTDIR = ../../../bin
 
+CONFIG += c++11
+
 win32 {
 
     OSG_LIB_DIRECTORY = $$(OSG_BIN_PATH)
@@ -34,6 +36,10 @@ win32 {
         LIBS += -L../../../lib -lfilesystem_d
         LIBS += -L../../../lib -lTcpConnection_d
 
+        LIBS += -L../../lib -losgVRViewer_d
+
+        LIBS += -L$$(OPENVR_LIB) -lopenvr_api
+
     } else {
 
         LIBS += -L$$OSG_LIB_DIRECTORY -losg
@@ -48,11 +54,16 @@ win32 {
         LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
         LIBS += -L../../../lib -lTcpConnection
+
+        LIBS += -L../../lib -losgVRViewer
+
+        LIBS += -L$$(OPENVR_LIB) -lopenvr_api
     }
 
     LIBS += -lopengl32 -lglu32
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
+    INCLUDEPATH += $$(OPENVR_INCLUDE)
 }
 
 unix {
@@ -106,7 +117,7 @@ unix {
 #QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 #LIBS += -lgcov
 
-#CONFIG += force_debug_info
+CONFIG += force_debug_info
 
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../filesystem/include
