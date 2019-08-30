@@ -57,16 +57,19 @@ private:
     /// Аппарат защиты (БВ)
     ProtectiveDevice    *fastSwitch;
 
-
+    /// Тяговый трансформатор
     TractionTransformer *tractionTrans;
 
+    /// Нумератор тяговых преобразователей
     enum
     {
         NUM_TRAC_CONV = 3
     };
 
+    /// Массив тяговых преобразователей
     std::array<TractionConverter *, NUM_TRAC_CONV> trac_conv;
 
+    /// Преобразователь собственных нужд
     AuxiliaryConverter  *auxConv;
 
     /// Входные значения

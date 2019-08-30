@@ -3,20 +3,26 @@
 
 #include "device.h"
 
+
+/// Класс Тягового Трансформатора
 class TractionTransformer : public Device
 {
 
 public:
 
-    ///
+    /// Конструктор
     TractionTransformer(QObject *parent = Q_NULLPTR);
 
+    /// Деструктор
     ~TractionTransformer();
 
+    /// Установить напряжение с выхода ГВ
     void setU1(double U1);
 
+    /// Получить напряжение тяговой обмотки
     double getTractionVoltage(size_t i);
 
+    /// Получить напряжение обмотки отопления
     double getVoltageHeatingCoil();
 
 private:

@@ -143,10 +143,12 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     kindSwitch->setState(current_kind - 1);
     kindSwitch->step(t, dt);
 
-    // Передаем данные для ГВ
+    // Передаем данные для ГВ/БВ
     mainSwitch->setU_in(kindSwitch->getUoutAC());
     fastSwitch->setU_in(kindSwitch->getUoutDC());
 
+
+    // Передаем данные для ГВ
     mpcsInput.Uin_ms = kindSwitch->getUoutAC();
     mpcsInput.current_kind_switch_state = current_kind - 1;
     mpcsInput.isOff_fs = fastSwitch->getState();
@@ -154,6 +156,7 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     mainSwitch->setHoldingCoilState(true);
     mainSwitch->setState(mpcsOutput.turn_on_ms);
 
+    // Передаем данные для БВ
     mpcsInput.Uin_fs = kindSwitch->getUoutDC();
     mpcsInput.current_kind_switch_state = current_kind - 1;
     mpcsInput.isOff_ms = mainSwitch->getState();
@@ -164,9 +167,11 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     mainSwitch->step(t, dt);
     fastSwitch->step(t, dt);
 
+    // Передаем данные для тягового трансформатора
     tractionTrans->setU1(mainSwitch->getU_out());
     tractionTrans->step(t, dt);
 
+    // Передаем данные для тягового преобразователя
     for (size_t i = 0; i < trac_conv.size(); ++i)
     {
         trac_conv[i]->setUdcIn(fastSwitch->getU_out());
@@ -175,6 +180,7 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         trac_conv[i]->step(t, dt);
     }
 
+    // Передаем данные для преобразователя собственных нужд
     auxConv->setU4(trac_conv[0]->getU4());
     auxConv->step(t, dt);
 }
@@ -192,6 +198,9 @@ void EP20::loadConfig(QString cfg_path)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void EP20::keyProcess()
 {
 //    pantograph[PANT_AC1]->setState(getKeyState(KEY_P));

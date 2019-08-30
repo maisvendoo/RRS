@@ -49,8 +49,10 @@ private:
 
     void stepDiscrete(double t, double dt);
 
+    /// Контроль ГВ
     void stepMainSwitchControl(double t, double dt);
 
+    /// Контроль БВ
     void stepFastSwitchControl(double t, double dt);
 
     /// Предварительный шаг

@@ -9,12 +9,14 @@
 //------------------------------------------------------------------------------
 struct mpcs_input_t
 {
+    /// Род тока
     int current_kind;
 
+    /// Поднятые ТП
     std::array<bool, NUM_PANTOGRAPHS> pant_up;
 
+    /// Опущеные ТП
     std::array<bool, NUM_PANTOGRAPHS> pant_down;
-
 
     /// Отключен ли БВ
     bool isOff_fs;
@@ -51,6 +53,7 @@ struct mpcs_input_t
 //------------------------------------------------------------------------------
 struct mpcs_output_t
 {
+    /// Состояние ТП
     std::array<bool, NUM_PANTOGRAPHS> pant_state;
 
     /// Включение ГВ

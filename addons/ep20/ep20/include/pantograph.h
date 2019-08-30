@@ -35,6 +35,7 @@ public:
     /// Получить род на выходе
     int getCurrentKindOut() const;
 
+
     bool isUp() const;
 
     bool isDown() const;
