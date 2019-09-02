@@ -1,17 +1,3 @@
-//------------------------------------------------------------------------------
-//
-//      Магистральный пассажирский электровоз постоянного тока ЧС2т.
-//      Дополнение для Russian Railway Simulator (RRS)
-//
-//      (c) RRS development team:
-//          Дмитрий Притыкин (maisvendoo),
-//          Николай Авилкин (avilkin.nick)
-//
-//      Дата: 21/08/2019
-//
-//------------------------------------------------------------------------------
-
-
 #include "stepswitch.h"
 
 //------------------------------------------------------------------------------
@@ -19,7 +5,7 @@
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , V(4.12)
-  , V1(7.2)
+  , V1(10.6)
   , poz_d(0)
   , poz(0)
   , n(0)
@@ -74,6 +60,8 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void StepSwitch::stepKeysControl(double t, double dt)
 {
+    hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
+
     if (ctrlState.up)
     {
         poz_d += V * hs_p(MPOS_P - poz_d) * dt;
@@ -101,29 +89,33 @@ void StepSwitch::stepKeysControl(double t, double dt)
         n = 0;
     }
 
-    if (getKeyState(KEY_Z) || p == 1)
+    if ((getKeyState(KEY_Z) || p == 1))
     {
-        if (poz > MPOS_SP)
-        {
-            poz_d -= V1 * hs_p(poz_d - MPOS_SP) * dt;
-            p = hs_p(poz_d - MPOS_SP);
-            return;
-        }
-        if (poz > MPOS_S)
-        {
-            poz_d -= V1 * hs_p(poz_d - MPOS_S) * dt;
-            p = hs_p(poz_d - MPOS_S);
-            return;
-        }
-        if (poz > 0)
-        {
-            poz_d -= V1 * hs_p(poz_d) * dt;
-            p = hs_p(poz_d);
-        }
+//        if (poz > MPOS_SP)
+//        {
+//            poz_d -= V1 * hs_p(poz - MPOS_SP) * dt;
+//            p = hs_p(poz_d - MPOS_SP);
+//        }
+//        else if (poz > MPOS_S)
+//        {
+//            poz_d -= V1 * hs_p(poz - MPOS_S) * dt;
+//            p = hs_p(poz_d - MPOS_S);
+//        }
+//        else if (poz > 0)
+//        {
+//            poz_d -= V1 * hs_p(poz) * dt;
+//            p = hs_p(poz_d);
+//         }
+
+        p = 1;
+        poz_d -= V1 * dt;
+        if (hod || poz == 0)
+            p = 0;
     }
 
-
     poz = static_cast<int>(poz_d);
+
+
 
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 

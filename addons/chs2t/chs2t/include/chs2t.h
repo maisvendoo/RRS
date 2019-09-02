@@ -61,28 +61,36 @@ private:
     /// Механизм киловольтметра ТЭД
 //    Oscillator  *gauge_KV_motors;
 
-    /// Тяговые электродвигатели
+    /// Тяговый электродвигатель
     Engine *motor;
 
+    /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
+    /// Быстрый выключатель
     ProtectiveDevice *bistV;
 
+    /// Пусковой резистор
     PuskRez *puskRez;
 
+    /// Регистратор
     Registrator *reg;
 
     /// Контроллер машиниста
     Km21KR2 *km21KR2;
 
+    /// Переключатель ступеней
     StepSwitch *stepSwitch;
 
     double tracForce_kN;
 
+    /// Возврат защиты
     bool bv_return;
 
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
+
+    Reservoir *mainReservoir;
 
     /// Общая инициализация локомотива
     void initialization();

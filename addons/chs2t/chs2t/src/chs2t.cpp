@@ -131,6 +131,7 @@ void CHS2T::step(double t, double dt)
     km21KR2->setControl(keys);
     km21KR2->step(t, dt);
 
+    stepSwitch->setControl(keys);
     stepSwitch->step(t, dt);
 
 
