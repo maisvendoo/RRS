@@ -69,8 +69,13 @@ private:
     /// Массив тяговых преобразователей
     std::array<TractionConverter *, NUM_TRAC_CONV> trac_conv;
 
+    enum
+    {
+        NUM_AUX_CONV = 4
+    };
+
     /// Преобразователь собственных нужд
-    AuxiliaryConverter  *auxConv;
+    std::array<AuxiliaryConverter *, NUM_AUX_CONV> auxConv;
 
     /// Входные значения
     mpcs_input_t mpcsInput;

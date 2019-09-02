@@ -22,7 +22,7 @@ public:
     void setUdcIn(double Udc_in);
 
     /// Получить напряжение на преобразователь собственных нужд
-    double getU4();
+    double getU4(size_t i);
 
 private:
 
@@ -42,7 +42,7 @@ private:
     std::array<double, 2> Udc;
 
     /// Напряжение преобразователя собственных нужд
-    double U4;
+    std::array<double, 2> U4;
 
     /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);

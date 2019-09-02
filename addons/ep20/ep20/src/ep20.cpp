@@ -70,7 +70,8 @@ void EP20::initHighVoltageScheme()
     for (size_t i = 0; i < trac_conv.size(); ++i)
         trac_conv[i] = new TractionConverter();
 
-    auxConv = new AuxiliaryConverter();
+    for (size_t i = 0; i <auxConv.size(); ++i)
+        auxConv[i] = new AuxiliaryConverter();
 }
 
 //------------------------------------------------------------------------------
@@ -85,14 +86,20 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, UoutDC: %2, UoutAC: %3, MainSwitch: %4, FastSwitch: %5, TractionTrans: %6, U2: %7")
+    DebugMsg = QString("t: %1 s, U2_1: %2, U2_2: %3, U2_3: %4, U2_4: %5")
             .arg(t, 10, 'f', 2)
-            .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
-            .arg(kindSwitch->getUoutAC(), 4, 'f', 2)
-            .arg(mainSwitch->getU_out(), 4, 'f', 2)
-            .arg(fastSwitch->getU_out(), 4, 'f', 2)
-            .arg(tractionTrans->getTractionVoltage(0))
-            .arg(auxConv->getU2());
+            .arg(auxConv[0]->getU2())
+            .arg(auxConv[1]->getU2())
+            .arg(auxConv[2]->getU2())
+            .arg(auxConv[3]->getU2());
+
+//    .arg(t, 10, 'f', 2)
+//    .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
+//    .arg(kindSwitch->getUoutAC(), 4, 'f', 2)
+//    .arg(mainSwitch->getU_out(), 4, 'f', 2)
+//    .arg(fastSwitch->getU_out(), 4, 'f', 2)
+//    .arg(tractionTrans->getTractionVoltage(0))
+//    .arg(auxConv[1]->getU2());
 }
 
 //------------------------------------------------------------------------------
@@ -181,8 +188,14 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     }
 
     // Передаем данные для преобразователя собственных нужд
-    auxConv->setU4(trac_conv[0]->getU4());
-    auxConv->step(t, dt);
+    auxConv[0]->setU4(trac_conv[0]->getU4(0));
+    auxConv[1]->setU4(trac_conv[1]->getU4(0));
+    auxConv[2]->setU4(trac_conv[1]->getU4(1));
+    auxConv[3]->setU4(trac_conv[2]->getU4(0));
+    for (size_t i = 0; i < auxConv.size(); ++i)
+    {
+        auxConv[i]->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
