@@ -151,7 +151,7 @@ void PassCarrige::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getString(secName, "BrakeMechModule", brake_mech_module);
-        cfg.getString(secName, "BrakeMechCinfig", brake_mech_config);
+        cfg.getString(secName, "BrakeMechConfig", brake_mech_config);
 
         cfg.getString(secName, "AirDistModule", airdist_module);
         cfg.getString(secName, "AirDistConfig", airdist_config);

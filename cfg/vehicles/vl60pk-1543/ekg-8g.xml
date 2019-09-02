@@ -5,7 +5,7 @@
 		<Order>1</Order>
 
 		<!-- Время рабора позиций с 0 до 33 -->
-		<PosSwitchTime>17</PosSwitchTime>
+		<PosSwitchTime>22</PosSwitchTime>
 
 	</Device>
 </Config>

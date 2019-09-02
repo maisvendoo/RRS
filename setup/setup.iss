@@ -1,23 +1,23 @@
 #define Name          "RRS"
-#define Version       "1.0.0"
+#define Version       "1.0.1"
 #define arch          "x86_64"
 #define Publisher     "maisvendoo"
 
-#define RRS_ROOT      GetEnv("RRS_ROOT")      
-#define BinDir        RRS_ROOT + "\bin"
-#define LibDir        RRS_ROOT + "\lib"
-#define ModulesDir    RRS_ROOT + "\modules"
-#define PluginsDir    RRS_ROOT + "\plugins"
-#define CfgDir        RRS_ROOT + "\cfg"
-#define DataDir       RRS_ROOT + "\data"
-#define RoutesDir     RRS_ROOT + "\routes"
-#define LogsDir       RRS_ROOT + "\logs"
+#define RRS_DEV_ROOT      GetEnv("RRS_DEV_ROOT")      
+#define BinDir        RRS_DEV_ROOT + "\bin"
+#define LibDir        RRS_DEV_ROOT + "\lib"
+#define ModulesDir    RRS_DEV_ROOT + "\modules"
+#define PluginsDir    RRS_DEV_ROOT + "\plugins"
+#define CfgDir        RRS_DEV_ROOT + "\cfg"
+#define DataDir       RRS_DEV_ROOT + "\data"
+#define RoutesDir     RRS_DEV_ROOT + "\routes"
+#define LogsDir       RRS_DEV_ROOT + "\logs"
 #define SrcDir        "..\"
 #define ResourceDir   "..\resources"
-#define FontsDir      RRS_ROOT + "\fonts"
-#define DocsDir       RRS_ROOT + "\docs"
-#define SdkDir        RRS_ROOT + "\sdk"
-#define ThemesDir     RRS_ROOT + "\themes"
+#define FontsDir      RRS_DEV_ROOT + "\fonts"
+#define DocsDir       RRS_DEV_ROOT + "\docs"
+#define SdkDir        RRS_DEV_ROOT + "\sdk"
+#define ThemesDir     RRS_DEV_ROOT + "\themes"
 #define ExeName       "launcher.exe" 
 
 [Setup]
@@ -65,8 +65,8 @@ Source: "{#SdkDir}\*.*"; DestDir: "{app}\sdk"; Flags: ignoreversion recursesubdi
 Source: "{#ThemesDir}\*.*"; DestDir: "{app}\themes"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#FontsDir}\*.*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#DocsDir}\*.*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#RRS_ROOT}\LICENSE"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
-Source: "{#RRS_ROOT}\LICENSE-Russian"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
+Source: "{#RRS_DEV_ROOT}\LICENSE"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
+Source: "{#RRS_DEV_ROOT}\LICENSE-Russian"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
 
 
 [Icons]
@@ -74,9 +74,9 @@ Name: "{group}\{#Name}"; Filename: "{app}\bin\{#ExeName}"; IconFilename: "{app}\
 Name: "{commondesktop}\{#Name}"; Filename: "{app}\bin\{#ExeName}"; IconFilename: "{app}\bin\RRS_logo.ico"; Tasks: desktopicon
 
 [Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "{#RRS_ROOT}\LICENSE"
-Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "{#RRS_ROOT}\LICENSE-Russian"
-Name: "ua"; MessagesFile: "compiler:Languages\Ukrainian.isl"; LicenseFile: "{#RRS_ROOT}\LICENSE-Russian"
+Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE-Russian"
+Name: "ua"; MessagesFile: "compiler:Languages\Ukrainian.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE-Russian"
 
 [Registry]
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "RRS_ROOT"; ValueData: "{app}"
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "RRS_DEV_ROOT"; ValueData: "{app}"

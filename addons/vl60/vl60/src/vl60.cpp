@@ -688,7 +688,7 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler.getState());
 
     // Вольтметр КС
-    analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
+    analogSignal[STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
 
     // Вольтметр ТЭД
     analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
