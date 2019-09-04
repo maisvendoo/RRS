@@ -35,6 +35,8 @@ CHS2T::CHS2T() : Vehicle()
     bistV = new ProtectiveDevice();
     bistV->read_custom_config(gv_config);
 
+//    mainReservoir = new Reservoir();
+
     tracForce_kN = 0;
     bv_return = false;
 

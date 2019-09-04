@@ -4,17 +4,25 @@
 //
 //------------------------------------------------------------------------------
 DCMotorCompressor::DCMotorCompressor(QString config_path, QObject *parent) : Device(parent)
+//  , p0(1.5)
+//  , p0(2.1)
+//  , Mmax(455.8)
+//  , s_kr(0.154)
+//  , Un(380.0)
+//  , J(0.5)
+//  , Mxx(50.0)
+//  , Vnk(0.05)
+
   , p(0.0)
   , Q(0.0)
-  , p0(1.5)
-  , Mmax(455.8)
-  , s_kr(0.154)
-  , Un(380.0)
   , U_power(0.0)
   , omega0(157.08)
-  , J(0.5)
-  , Mxx(50.0)
-  , Vnk(0.05)
+
+  , R(56.9)
+  , U(0.0)
+  , cPhi(14.2)
+  , I(0.0)
+  , Ma(0.0)
 
 {
     std::fill(K.begin(), K.end(), 0);
@@ -49,14 +57,6 @@ double DCMotorCompressor::getAirFlow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void DCMotorCompressor::setU_power(double value)
-{
-    U_power = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void DCMotorCompressor::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
@@ -75,22 +75,27 @@ void DCMotorCompressor::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    // Расчитывает текущее скольжение ротора
-    double s = 1 - Y[0] / omega0;
+//    // Расчитывает текущее скольжение ротора
+//    double s = 1 - Y[0] / omega0;
 
-    // Рачитываем максимальный момент при данном напряжении питания
-    double M_maximal = Mmax * pow(U_power / Un, 2.0);
+//    // Рачитываем максимальный момент при данном напряжении питания
+//    double M_maximal = Mmax * pow(U_power / Un, 2.0);
 
-    // Расчитываем электромагнитный момент (формула Клосса)
-    double Ma = 2 * M_maximal / ( s / s_kr + s_kr / s );
+//    // Расчитываем электромагнитный момент (формула Клосса)
+//    double Ma = 2 * M_maximal / ( s / s_kr + s_kr / s );
 
-    double Mr = Physics::fricForce(Mxx, Y[0]);
+//    double Mr = Physics::fricForce(Mxx, Y[0]);
 
-    double Qnk =  K[1] * Y[0] - K[2] * Y[1] - K[3] * pf(Y[1] - p);
+//    double Qnk =  K[1] * Y[0] - K[2] * Y[1] - K[3] * pf(Y[1] - p);
 
-    dYdt[0] = (Ma - Mr) / J;
+//    dYdt[0] = (Ma - Mr) / J;
 
-    dYdt[1] = Qnk / Vnk;
+//    dYdt[1] = Qnk / Vnk;
+
+    I = (U - cPhi * Y[0]) / R;
+
+    Ma = cPhi * I;
+
 }
 
 //------------------------------------------------------------------------------

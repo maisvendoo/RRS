@@ -18,9 +18,16 @@ public:
 
     double getAirFlow() const;
 
-    void setU_power(double value);
+    void setU(double value) { U = value; };
 
 private:
+//    double  Mmax;
+
+//    double  s_kr;
+
+//    double  Mxx;
+
+//    double  Vnk;
 
     /// Внешнее противодавление
     double  p;
@@ -28,24 +35,15 @@ private:
     /// Расход возхуа
     double  Q;
 
-    /// "Подача" компрессора
-    double  p0;
-
-    double  Mmax;
-
-    double  s_kr;
-
-    double  Un;
-
     double  U_power;
+    double omega0;
 
-    double  omega0;
+    double R;
+    double U;
+    double cPhi;
+    double I;
+    double Ma;
 
-    double  J;
-
-    double  Mxx;
-
-    double  Vnk;
 
     enum
     {
