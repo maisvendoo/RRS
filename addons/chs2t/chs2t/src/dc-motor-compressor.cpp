@@ -9,14 +9,15 @@ DCMotorCompressor::DCMotorCompressor(QString config_path, QObject *parent) : Dev
 //  , Mmax(455.8)
 //  , s_kr(0.154)
 //  , Un(380.0)
-//  , J(0.5)
-//  , Mxx(50.0)
 //  , Vnk(0.05)
 
   , p(0.0)
   , Q(0.0)
   , U_power(0.0)
   , omega0(157.08)
+
+  , Mxx(50.0)
+  , J(0.5)
 
   , R(56.9)
   , U(0.0)
@@ -75,27 +76,13 @@ void DCMotorCompressor::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-//    // Расчитывает текущее скольжение ротора
-//    double s = 1 - Y[0] / omega0;
-
-//    // Рачитываем максимальный момент при данном напряжении питания
-//    double M_maximal = Mmax * pow(U_power / Un, 2.0);
-
-//    // Расчитываем электромагнитный момент (формула Клосса)
-//    double Ma = 2 * M_maximal / ( s / s_kr + s_kr / s );
-
-//    double Mr = Physics::fricForce(Mxx, Y[0]);
-
-//    double Qnk =  K[1] * Y[0] - K[2] * Y[1] - K[3] * pf(Y[1] - p);
-
-//    dYdt[0] = (Ma - Mr) / J;
-
-//    dYdt[1] = Qnk / Vnk;
+    double Mr = Physics::fricForce(Mxx, Y[0]);
 
     I = (U - cPhi * Y[0]) / R;
 
     Ma = cPhi * I;
 
+    dYdt[0] = (Ma - Mr) / J;
 }
 
 //------------------------------------------------------------------------------

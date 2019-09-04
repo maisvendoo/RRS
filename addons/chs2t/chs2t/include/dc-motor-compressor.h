@@ -21,13 +21,7 @@ public:
     void setU(double value) { U = value; };
 
 private:
-//    double  Mmax;
 
-//    double  s_kr;
-
-//    double  Mxx;
-
-//    double  Vnk;
 
     /// Внешнее противодавление
     double  p;
@@ -37,6 +31,9 @@ private:
 
     double  U_power;
     double omega0;
+
+    double  Mxx;
+    double J;
 
     double R;
     double U;
