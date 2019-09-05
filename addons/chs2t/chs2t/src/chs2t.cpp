@@ -106,6 +106,20 @@ void CHS2T::initTractionControl()
 
         overload_relay = new OverloadRelay();
         overload_relay->read_custom_config(config_dir + QDir::separator() + "1RPD6");
+
+        mainReservoir = new Reservoir(1);
+        motor_compressor = new DCMotorCompressor();
+        motor_compressor->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
+        pressReg = new PressureRegulator();
+
+        FileSystem &fs = FileSystem::getInstance();
+        QString module_path = QString(fs.getModulesDir().c_str());
+
+        brakeCrane = loadBrakeCrane(module_path + QDir::separator() + "krm395");
+
+
+
+
 }
 
 
@@ -161,9 +175,23 @@ void CHS2T::step(double t, double dt)
     overload_relay->setCurrent(motor->getIa());
     overload_relay->step(t, dt);
 
+    motor_compressor->setU(bistV->getU_out() * static_cast<double>(mk_tumbler.getState()) * pressReg->getState());
+    motor_compressor->setPressure(mainReservoir->getPressure());
+    motor_compressor->step(t, dt);
 
 
-    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 poz = %7 Ia = %8 R = %9 beta = %10 re = %11" )
+    mainReservoir->setAirFlow(motor_compressor->getAirFlow());
+    mainReservoir->step(t, dt);
+
+    pressReg->setPressure(mainReservoir->getPressure());
+    pressReg->step(t, dt);
+
+
+//            brakeCrane->setChargePressure();
+//            brakeCrane->setFeedLinePressure();
+//            brakeCrane->setBrakePipePressure();
+
+    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 poz = %7 Ia = %8 beta = %9 re = %10 press = %11" )
             .arg(t, 10, 'f', 1)
             .arg(pantographs[0]->getHeight(), 3, 'f', 2)
             .arg(pantographs[0]->getUout(), 4, 'f', 0)
@@ -172,9 +200,10 @@ void CHS2T::step(double t, double dt)
             .arg(bistV->getU_out(), 4, 'f', 0)
             .arg(stepSwitch->getPoz(), 2)
             .arg(motor->getIa(), 5)
-            .arg(puskRez->getR(), 5)
+//            .arg(puskRez->getR(), 5)
             .arg(motor->getBeta(), 5)
-            .arg(km21KR2->getReverseState(), 3);
+            .arg(km21KR2->getReverseState(), 2)
+            .arg(mainReservoir->getPressure(), 4);
 
 
 
@@ -213,6 +242,16 @@ void CHS2T::keyProcess()
     {
         bistV->setState(isShift());
         bv_return = isShift();
+    }
+
+    if (getKeyState(KEY_8))
+    {
+        if (isShift())
+            mk_tumbler.set();
+        else
+        {
+            mk_tumbler.reset();
+        }
     }
 }
 

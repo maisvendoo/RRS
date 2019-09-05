@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-DCMotorCompressor::DCMotorCompressor(QString config_path, QObject *parent) : Device(parent)
+DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
 //  , p0(1.5)
 //  , p0(2.1)
 //  , Mmax(455.8)
@@ -24,11 +24,12 @@ DCMotorCompressor::DCMotorCompressor(QString config_path, QObject *parent) : Dev
   , cPhi(14.2)
   , I(0.0)
   , Ma(0.0)
+  , Vnk(0.05)
 
 {
     std::fill(K.begin(), K.end(), 0);
 
-    load_config(config_path);
+    //load_config(config_path);
 }
 
 //------------------------------------------------------------------------------
@@ -53,6 +54,11 @@ void DCMotorCompressor::setExternalPressure(double press)
 double DCMotorCompressor::getAirFlow() const
 {
     return Q;
+}
+
+void DCMotorCompressor::setPressure(double value)
+{
+    p = value;
 }
 
 //------------------------------------------------------------------------------
@@ -82,7 +88,12 @@ void DCMotorCompressor::ode_system(const state_vector_t &Y,
 
     Ma = cPhi * I;
 
+    double Qnk =  K[1] * Y[0] - K[2] * Y[1] - K[3] * pf(Y[1] - p);
+
     dYdt[0] = (Ma - Mr) / J;
+
+
+    dYdt[1] = Qnk / Vnk;
 }
 
 //------------------------------------------------------------------------------
@@ -90,31 +101,11 @@ void DCMotorCompressor::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void DCMotorCompressor::load_config(CfgReader &cfg)
 {
-    Q_UNUSED(cfg)
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void DCMotorCompressor::load_config(QString cfg_path)
-{
-    CfgReader cfg;
-
-    if (cfg.load(cfg_path))
-    {
         QString secName = "Device";
-
-        int order = 1;
-        if (cfg.getInt(secName, "Order", order))
-        {
-            y.resize(static_cast<size_t>(order));
-            std::fill(y.begin(), y.end(), 0);
-        }
 
         for (size_t i = 1; i < K.size(); ++i)
         {
             QString coeff = QString("K%1").arg(i);
             cfg.getDouble(secName, coeff, K[i]);
         }
-    }
 }

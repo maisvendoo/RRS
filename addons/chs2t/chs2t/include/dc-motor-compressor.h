@@ -10,7 +10,7 @@ class DCMotorCompressor : public Device
 {
 public:
 
-    DCMotorCompressor(QString config_path, QObject *parent = Q_NULLPTR);
+    DCMotorCompressor(QObject *parent = Q_NULLPTR);
 
     ~DCMotorCompressor();
 
@@ -19,6 +19,8 @@ public:
     double getAirFlow() const;
 
     void setU(double value) { U = value; };
+
+    void setPressure(double value);
 
 private:
 
@@ -40,6 +42,7 @@ private:
     double cPhi;
     double I;
     double Ma;
+    double Vnk;
 
 
     enum
@@ -54,8 +57,6 @@ private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
-
-    void load_config(QString cfg_path);
 };
 
 #endif // DC_MOTOR_COMPRESSOR_H

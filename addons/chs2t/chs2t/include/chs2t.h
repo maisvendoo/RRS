@@ -22,6 +22,8 @@
 #include    "engine.h"
 #include    "registrator.h"
 #include    "overload-relay.h"
+#include    "dc-motor-compressor.h"
+#include    "pressure-regulator.h"
 
 enum
 {
@@ -91,6 +93,14 @@ private:
     OverloadRelay *overload_relay;
 
     Reservoir *mainReservoir;
+
+    PressureRegulator *pressReg;
+
+    DCMotorCompressor *motor_compressor;
+
+    Trigger     mk_tumbler;
+
+    BrakeCrane *brakeCrane;
 
     /// Общая инициализация локомотива
     void initialization();
