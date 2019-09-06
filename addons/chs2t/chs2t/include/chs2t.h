@@ -24,6 +24,7 @@
 #include    "overload-relay.h"
 #include    "dc-motor-compressor.h"
 #include    "pressure-regulator.h"
+#include    "chs2t-brake-mech.h"
 
 enum
 {
@@ -58,6 +59,11 @@ private:
     {
         NUM_PANTOGRAPHS = 2,
         WIRE_VOLTAGE = 3000
+    };
+
+    enum
+    {
+        NUM_BRAKE_MECH = 2
     };
 
     /// Механизм киловольтметра ТЭД
@@ -102,8 +108,14 @@ private:
 
     BrakeCrane *brakeCrane;
 
+    std::array<CHS2tBrakeMech *, NUM_BRAKE_MECH>    brakeMechs;
+
+    double charging_press;
+
     /// Общая инициализация локомотива
     void initialization();
+
+    void initBrakeDevices(double p0, double pTM, double pFL);
 
     /// Инициализация схемы управления тягой
     void initTractionControl();

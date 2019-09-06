@@ -26,16 +26,7 @@ CHS2T::CHS2T() : Vehicle()
   , gv_config(vehicle_path + "bv")
   , puskrez_config(vehicle_path + "puskrez")
 {
-    for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
-    {
-        pantographs[i] = new Pantograph();
-        pantographs[i]->read_custom_config(pantograph_config);
-    }
 
-    bistV = new ProtectiveDevice();
-    bistV->read_custom_config(gv_config);
-
-//    mainReservoir = new Reservoir();
 
     tracForce_kN = 0;
     bv_return = false;
@@ -76,7 +67,31 @@ void CHS2T::initialization()
 
     initTractionControl();
 
-//    initOtherEquipment();
+    //    initOtherEquipment();
+
+    for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
+    {
+        pantographs[i] = new Pantograph();
+        pantographs[i]->read_custom_config(pantograph_config);
+    }
+    for (size_t i = 0; i < NUM_BRAKE_MECH; ++i)
+    {
+        brakeMechs[i] = new CHS2tBrakeMech();
+    }
+
+    brakeMechs[0]->read_custom_config(config_dir + QDir::separator() + "brake-mech-front");
+    brakeMechs[1]->read_custom_config(config_dir + QDir::separator() + "brake-mech-back");
+
+    bistV = new ProtectiveDevice();
+    bistV->read_custom_config(gv_config);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
+{
+    charging_press = p0;
 }
 
 //------------------------------------------------------------------------------
@@ -116,10 +131,7 @@ void CHS2T::initTractionControl()
         QString module_path = QString(fs.getModulesDir().c_str());
 
         brakeCrane = loadBrakeCrane(module_path + QDir::separator() + "krm395");
-
-
-
-
+        brakeCrane->read_config("krm395");
 }
 
 
@@ -187,23 +199,44 @@ void CHS2T::step(double t, double dt)
     pressReg->step(t, dt);
 
 
-//            brakeCrane->setChargePressure();
-//            brakeCrane->setFeedLinePressure();
-//            brakeCrane->setBrakePipePressure();
+    brakeCrane->setChargePressure(charging_press);
+    brakeCrane->setFeedLinePressure(mainReservoir->getPressure());
+    brakeCrane->setBrakePipePressure(pTM);
+    brakeCrane->setControl(keys);
+    p0 = brakeCrane->getBrakePipeInitPressure();
+    brakeCrane->step(t, dt);
 
-    DebugMsg = QString("t = %1 h1 = %2 U1 = %3 h2 = %4 U2 = %5 UGV = %6 poz = %7 Ia = %8 beta = %9 re = %10 press = %11" )
+
+    for (size_t i = 0; i < NUM_BRAKE_MECH; ++i)
+        brakeMechs[i]->step(t, dt);
+
+    Q_r[1] = brakeMechs[0]->getBrakeTorque();
+    Q_r[2] = brakeMechs[0]->getBrakeTorque();
+    Q_r[3] = brakeMechs[0]->getBrakeTorque();
+
+    Q_r[4] = brakeMechs[1]->getBrakeTorque();
+    Q_r[5] = brakeMechs[1]->getBrakeTorque();
+    Q_r[6] = brakeMechs[1]->getBrakeTorque();
+
+
+    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 eqResPress = %7 pipePress = %8 state = %9 shForce = %10" )
             .arg(t, 10, 'f', 1)
-            .arg(pantographs[0]->getHeight(), 3, 'f', 2)
-            .arg(pantographs[0]->getUout(), 4, 'f', 0)
-            .arg(pantographs[1]->getHeight(), 3, 'f', 2)
-            .arg(pantographs[1]->getUout(), 4, 'f', 0)
+//            .arg(pantographs[0]->getHeight(), 3, 'f', 2)
+//            .arg(pantographs[0]->getUout(), 4, 'f', 0)
+//            .arg(pantographs[1]->getHeight(), 3, 'f', 2)
+//            .arg(pantographs[1]->getUout(), 4, 'f', 0)
             .arg(bistV->getU_out(), 4, 'f', 0)
             .arg(stepSwitch->getPoz(), 2)
             .arg(motor->getIa(), 5)
 //            .arg(puskRez->getR(), 5)
-            .arg(motor->getBeta(), 5)
+//            .arg(motor->getBeta(), 5)
             .arg(km21KR2->getReverseState(), 2)
-            .arg(mainReservoir->getPressure(), 4);
+            .arg(mainReservoir->getPressure(), 4, 'f', 2)
+            .arg(brakeCrane->getEqReservoirPressure(), 5, 'f', 2)
+            .arg(brakeCrane->getBrakePipeInitPressure(), 5, 'f', 2)
+            .arg(brakeCrane->getPositionName(), 3)
+            .arg(brakeMechs[0]->getShoeForce() / 1000, 5, 'f', 2);
+
 
 
 
