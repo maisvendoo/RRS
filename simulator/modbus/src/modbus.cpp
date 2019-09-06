@@ -4,6 +4,7 @@
 //
 //------------------------------------------------------------------------------
 Modbus::Modbus(QObject *parent) : VirtualInterfaceDevice(parent)
+  , master(Q_NULLPTR)
 {
 
 }
@@ -21,6 +22,16 @@ Modbus::~Modbus()
 //------------------------------------------------------------------------------
 bool Modbus::init(QString cfg_path)
 {
+    master = new Master();
+
+    if (master == Q_NULLPTR)
+        return false;
+
+    if (!master->init(cfg_path))
+    {
+        return false;
+    }
+
     return true;
 }
 

@@ -24,7 +24,7 @@
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>passcar</ModuleConfig>
-		<Count>14</Count>
+		<Count>30</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	
