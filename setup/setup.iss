@@ -79,4 +79,4 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "{#RRS_
 Name: "ua"; MessagesFile: "compiler:Languages\Ukrainian.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE-Russian"
 
 [Registry]
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "RRS_DEV_ROOT"; ValueData: "{app}"
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "RRS_ROOT"; ValueData: "{app}"

@@ -25,6 +25,7 @@ VL60::VL60() : Vehicle ()
   , gv_pos(0.0)
   , gv_return(false)  
   , charge_press(0.0)
+  , ip(2.73)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
     pants_tumbler.setOffSoundName("K_Tumbler_Off");
@@ -526,10 +527,12 @@ void VL60::stepTrolleysBrakeMech(double t, double dt)
 
     // Передняя тележка наполняется через реле давления 304
     trolley_mech[TROLLEY_FWD]->setAirFlow(pneumo_relay->getBrakeCylAirFlow());
+    trolley_mech[TROLLEY_FWD]->setVelocity(velocity);
     trolley_mech[TROLLEY_FWD]->step(t, dt);
 
     // Задняя тележка подключена через тройник от ЗПК
     trolley_mech[TROLLEY_BWD]->setAirFlow(pneumo_splitter->getQ_out2());
+    trolley_mech[TROLLEY_FWD]->setVelocity(velocity);
     trolley_mech[TROLLEY_BWD]->step(t, dt);
 
     Q_r[1] = trolley_mech[TROLLEY_FWD]->getBrakeTorque();
@@ -571,7 +574,7 @@ void VL60::stepTractionControl(double t, double dt)
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
     gauge_KV_motors->step(t, dt);
 
-    double ip = 2.73;
+    //double ip = 2.73;
 
     motor[TED1]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED1].getState()));
     motor[TED2]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED2].getState()));
@@ -1041,6 +1044,21 @@ void VL60::load_brakes_config(QString path)
                 supply_reservoir->setY(0, charge_press);
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::loadConfig(QString cfg_path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Vehicle";
+
+        cfg.getDouble(secName, "ReductorCoeff", ip);
     }
 }
 

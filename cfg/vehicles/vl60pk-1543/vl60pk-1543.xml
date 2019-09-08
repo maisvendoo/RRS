@@ -29,6 +29,8 @@
          <AirDistConfig>vr242</AirDistConfig>
 
          <DriverPos>0.8 8.4 3.6</DriverPos>
+
+         <ReductorCoeff>3.83</ReductorCoeff>
                 
 	</Vehicle>
 </Config>

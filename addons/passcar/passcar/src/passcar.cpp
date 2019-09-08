@@ -106,10 +106,11 @@ void PassCarrige::step(double t, double dt)
 
     stepSignalsOutput();
 
-    DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2")
+    DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2 Наж. на колодку: %4")
             .arg(pTM, 4, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
-            .arg(t, 10, 'f', 1);
+            .arg(t, 10, 'f', 1)
+            .arg(brake_mech->getShoeForce() / 1000.0, 10, 'f', 2);
 
     DebugMsg += airdist->getDebugMsg();
 
