@@ -8,7 +8,7 @@
 		<CylNum>1</CylNum>
 		<DeadVolume>0.0</DeadVolume>
 		<CylinderDiameter>0.356</CylinderDiameter>
-		<MechCoeff>15.0</MechCoeff>
+		<MechCoeff>10.0</MechCoeff>
 		<StockOut>0.085</StockOut>
 		<SpringForce>1649.0</SpringForce>
 		<InitPressure>0.0</InitPressure>
