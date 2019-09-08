@@ -247,7 +247,7 @@ void VL60::initOtherEquipment()
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 
-    //reg = new Registrator("vl60");
+    reg = new Registrator("vl60");
 }
 
 //------------------------------------------------------------------------------
@@ -337,7 +337,7 @@ void VL60::stepOtherEquipment(double t, double dt)
 
     debugPrint(t);
 
-    //registration(t, dt);
+    registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -762,14 +762,15 @@ void VL60::stepSignalsOutput()
 //------------------------------------------------------------------------------
 void VL60::registration(double t, double dt)
 {
-    QString line = QString("%1 %2 %3 %4 %5 %6 %7")
+    if (next_vehicle == Q_NULLPTR)
+        return;
+
+    double dx = railway_coord  - next_vehicle->getRailwayCoord();
+
+    QString line = QString("%1 %2")
             .arg(t)
-            .arg(velocity * Physics::kmh)
-            .arg(motor[TED1]->getUd())
-            .arg(motor[TED1]->getIa())
-            .arg(motor[TED1]->getIf())
-            .arg(getTractionForce() / Physics::g)
-            .arg(R2 / Physics::g);
+            .arg(a[0]);
+
 
     reg->print(line, t, dt);
 }
