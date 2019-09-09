@@ -4,12 +4,6 @@
 //
 //------------------------------------------------------------------------------
 DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
-//  , p0(1.5)
-//  , p0(2.1)
-//  , Mmax(455.8)
-//  , s_kr(0.154)
-//  , Un(380.0)
-//  , Vnk(0.05)
 
   , p(0.0)
   , Q(0.0)
@@ -28,8 +22,6 @@ DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
 
 {
     std::fill(K.begin(), K.end(), 0);
-
-    //load_config(config_path);
 }
 
 //------------------------------------------------------------------------------
@@ -38,27 +30,6 @@ DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
 DCMotorCompressor::~DCMotorCompressor()
 {
 
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void DCMotorCompressor::setExternalPressure(double press)
-{
-    p = press;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double DCMotorCompressor::getAirFlow() const
-{
-    return Q;
-}
-
-void DCMotorCompressor::setPressure(double value)
-{
-    p = value;
 }
 
 //------------------------------------------------------------------------------

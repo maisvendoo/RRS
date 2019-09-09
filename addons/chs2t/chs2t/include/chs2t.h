@@ -25,11 +25,7 @@
 #include    "dc-motor-compressor.h"
 #include    "pressure-regulator.h"
 #include    "chs2t-brake-mech.h"
-
-enum
-{
-    NUM_PANTOGRAPHS = 2
-};
+#include    "dako.h"
 
 /*!
  * \class
@@ -50,24 +46,11 @@ public:
 
 private:
 
-    QString     vehicle_path;
-    QString     pantograph_config;
-    QString     gv_config;
-    QString     puskrez_config;
-
     enum
     {
         NUM_PANTOGRAPHS = 2,
         WIRE_VOLTAGE = 3000
     };
-
-    enum
-    {
-        NUM_BRAKE_MECH = 2
-    };
-
-    /// Механизм киловольтметра ТЭД
-//    Oscillator  *gauge_KV_motors;
 
     /// Тяговый электродвигатель
     Engine *motor;
@@ -108,20 +91,15 @@ private:
 
     BrakeCrane *brakeCrane;
 
-    std::array<CHS2tBrakeMech *, NUM_BRAKE_MECH>    brakeMechs;
+    std::array<CHS2tBrakeMech *, 2>    brakesMech;
+
+    Dako *dako;
 
     double charging_press;
 
-    /// Общая инициализация локомотива
-    void initialization();
+
 
     void initBrakeDevices(double p0, double pTM, double pFL);
-
-    /// Инициализация схемы управления тягой
-    void initTractionControl();
-
-    /// Шаг моделирования всех систем локомотива в целом
-    void step(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
@@ -131,6 +109,53 @@ private:
     void registrate(double t, double dt);
 
     bool getHoldingCoilState() const;
+
+
+
+    void initPantographs();
+
+    void initBrakesMech();
+
+    void initFastSwitch();
+
+    void initBrakesControl(QString module_path);
+
+    void initProtection();
+
+    void initAirSupplySubsystem();
+
+    /// Инициализация схемы управления тягой
+    void initTractionControl();
+
+    void initDako();
+
+    void initRegistrator();
+
+
+    /// Общая инициализация локомотива
+    void initialization();
+
+
+
+    void stepPantographs(double t, double dt);
+
+    void stepBrakesMech(double t, double dt);
+
+    void stepFastSwitch(double t, double dt);
+
+    void stepProtection(double t, double dt);
+
+    void stepTractionControl(double t, double dt);
+
+    void stepAirSupplySubsystem(double t, double dt);
+
+    void stepBrakesControl(double t, double dt);
+
+    void stepDebugMsg(double t, double dt);
+
+    /// Шаг моделирования всех систем локомотива в целом
+    void step(double t, double dt);
+
 };
 
 #endif // CHS2T

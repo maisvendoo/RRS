@@ -108,9 +108,7 @@ void Engine::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void Engine::preStep(state_vector_t& Y, double t)
 {
-
     torque = calcCPhi(Y[0] * beta * direction) * Y[0];
-
 }
 
 //------------------------------------------------------------------------------

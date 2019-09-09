@@ -14,16 +14,15 @@ public:
 
     ~DCMotorCompressor();
 
-    void setExternalPressure(double press);
+    void setExternalPressure(double press) { p = press; }
 
-    double getAirFlow() const;
+    double getAirFlow() const { return Q; }
 
-    void setU(double value) { U = value; };
+    void setU(double value) { U = value; }
 
-    void setPressure(double value);
+    void setPressure(double value) { p = value; }
 
 private:
-
 
     /// Внешнее противодавление
     double  p;

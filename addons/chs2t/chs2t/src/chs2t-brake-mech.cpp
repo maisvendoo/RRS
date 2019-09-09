@@ -6,6 +6,7 @@
 CHS2tBrakeMech::CHS2tBrakeMech(QObject *parent)
     : BrakeMech(parent)
 {
+
 }
 
 //------------------------------------------------------------------------------
