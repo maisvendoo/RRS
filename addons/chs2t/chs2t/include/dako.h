@@ -17,6 +17,41 @@ public:
     ///Деструктор
     ~Dako();
 
+    void setPgr(double value) { pgr = value; }
+    void setQvr(double value) { Qvr = value; }
+    void setPtc(double value) { ptc = value; }
+    void setU(double value) { U = value; }
+
+    double getP1() const { return p1; }
+    double getPy() const { return py; }
+    double getQtc() const { return Qtc; }
+
+    double V1;
+    double Vy;
+    double U1;
+    double U2;
+
+    double pgr;
+    double Qvr;
+    double ptc;
+    double U;
+
+    double p1;
+    double py;
+    double Qtc;
+
+    double A1;
+    double A2;
+    double A3;
+    double K1;
+    double K2;
+    double K3;
+    double K4;
+
+    double k1;
+    double k2;
+
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     /// Загрузка данных из конфигурационных файлов
@@ -24,6 +59,8 @@ public:
 
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
+
+
 
 };
 
