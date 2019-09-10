@@ -72,6 +72,10 @@ void EP20::initHighVoltageScheme()
 
     for (size_t i = 0; i <auxConv.size(); ++i)
         auxConv[i] = new AuxiliaryConverter();
+
+    reservoir = new Reservoir(1000);
+
+    motorCompAC = new ACMotorCompressor("p");
 }
 
 //------------------------------------------------------------------------------
@@ -196,6 +200,11 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     {
         auxConv[i]->step(t, dt);
     }
+
+
+    reservoir->step(t, dt);
+
+    motorCompAC->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

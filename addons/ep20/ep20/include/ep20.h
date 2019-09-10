@@ -22,6 +22,7 @@
 #include    "traction-transformer.h"
 #include    "traction-converter.h"
 #include    "auxiliary-converter.h"
+#include    "ac-motor-compressor.h"
 
 /*!
  * \class
@@ -76,6 +77,12 @@ private:
 
     /// Преобразователь собственных нужд
     std::array<AuxiliaryConverter *, NUM_AUX_CONV> auxConv;
+
+    /// Резервуар
+    Reservoir   *reservoir;
+
+    /// Мотор компрессор
+    ACMotorCompressor   *motorCompAC;
 
     /// Входные значения
     mpcs_input_t mpcsInput;
