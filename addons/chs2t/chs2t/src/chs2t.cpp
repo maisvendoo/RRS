@@ -114,10 +114,23 @@ void CHS2T::initTractionControl()
     puskRez->read_custom_config(config_dir + QDir::separator() + "puskrez");
 }
 
-void CHS2T::initDako()
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::initBrakesEquipment(QString module_path)
 {
     dako = new Dako();
     dako->read_custom_config(config_dir + QDir::separator() + "dako");
+
+    airDistr = loadAirDistributor(module_path + QDir::separator() + "vr242");
+    airDistr->read_config("vr242");
+
+    locoCrane = loadLocoCrane(module_path + QDir::separator() + "kvt254");
+    locoCrane->read_config("kvt254");
+
+    zpk = new SwitchingValve();
+    zpk->read_config("zpk");
+
 }
 
 
@@ -155,6 +168,8 @@ void CHS2T::initialization()
     initAirSupplySubsystem();
 
     initTractionControl();
+
+    initBrakesEquipment(modules_dir);
 
     initRegistrator();
 }
@@ -284,6 +299,31 @@ void CHS2T::stepBrakesControl(double t, double dt)
     brakeCrane->step(t, dt);
 }
 
+void CHS2T::stepBrakesEquipment(double t, double dt)
+{
+    dako->setPgr(mainReservoir->getPressure());
+    dako->setPtc(zpk->getPressure1());
+    dako->setQvr(airDistr->getBrakeCylinderAirFlow());
+    dako->setU(velocity);
+    dako->setQ1(locoCrane->getBrakeCylinderFlow());
+
+    locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
+    locoCrane->setControl(keys);
+
+    zpk->setInputFlow1(dako->getQtc());
+    zpk->setInputFlow2(locoCrane->getBrakeCylinderFlow());
+    zpk->setOutputPressure(brakesMech[0]->getBrakeCylinderPressure());
+
+    brakesMech[0]->setAirFlow(zpk->getOutputFlow());
+
+    airDistr->setBrakeCylinderPressure(dako->getPy());
+
+    dako->step(t, dt);
+    locoCrane->step(t, dt);
+    zpk->step(t, dt);
+    airDistr->step(t, dt);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -320,6 +360,8 @@ void CHS2T::step(double t, double dt)
     stepBrakesControl(t, dt);
 
     stepBrakesMech(t , dt);
+
+    stepBrakesEquipment(t, dt);
 
     stepDebugMsg(t, dt);
 

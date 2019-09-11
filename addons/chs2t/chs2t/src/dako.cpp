@@ -34,19 +34,17 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     double s5 = Y[0] * A1 + Y[1] * A2 - ptc * A3;
 
     int s6 = static_cast<int>(pf(s5));
-    double s7 = cut(s6, 0, 1);
-    U2 = s7;
+    double s7 = cut(s6, 0, 1) * U2;
 
     int s8 = static_cast<int>(nf(s5));
-    double s9 = cut(s8, 0, 1);
-    U1 = s9;
+    double s9 = cut(s8, 0, 1) * U1;
 
     Qtc = (pgr - ptc) * K4 * s7 - ptc * K3 * s9;
 
     dYdt[0] = Qvr / Vy;
     py = Y[0];
 
-    dYdt[1] = ((Y[0] - Y[1]) * K1 * s2 - Y[1] * K2 * s4) / V1;
+    dYdt[1] = (Q1 * s2 - Y[1] * K2 * s4) / V1;
     p1 = Y[1];
 }
 

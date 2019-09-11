@@ -21,6 +21,7 @@ public:
     void setQvr(double value) { Qvr = value; }
     void setPtc(double value) { ptc = value; }
     void setU(double value) { U = value; }
+    void setQ1(double value);
 
     double getP1() const { return p1; }
     double getPy() const { return py; }
@@ -32,6 +33,7 @@ public:
     double U2;
 
     double pgr;
+    double Q1;
     double Qvr;
     double ptc;
     double U;

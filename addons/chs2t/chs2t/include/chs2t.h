@@ -95,6 +95,14 @@ private:
 
     Dako *dako;
 
+    AirDistributor *airDistr;
+
+    LocoCrane *locoCrane;
+
+    SwitchingValve *zpk;
+
+
+
     double charging_press;
 
 
@@ -127,7 +135,7 @@ private:
     /// Инициализация схемы управления тягой
     void initTractionControl();
 
-    void initDako();
+    void initBrakesEquipment(QString module_path);
 
     void initRegistrator();
 
@@ -150,6 +158,8 @@ private:
     void stepAirSupplySubsystem(double t, double dt);
 
     void stepBrakesControl(double t, double dt);
+
+    void stepBrakesEquipment(double t, double dt);
 
     void stepDebugMsg(double t, double dt);
 
