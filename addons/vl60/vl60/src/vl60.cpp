@@ -344,6 +344,14 @@ void VL60::step(double t, double dt)
     stepLineContactors(t, dt);
 
     stepOtherEquipment(t, dt);
+
+    if (control_signals.analogSignal[0].is_active)
+    {
+        if (control_signals.analogSignal[0].value > 0.9f)
+            gv_tumbler.set();
+        else
+            gv_tumbler.reset();
+    }
 }
 
 //------------------------------------------------------------------------------
