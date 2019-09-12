@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		
+		<EmptyMass>125000</EmptyMass>
+		<PayloadMass>0</PayloadMass>
+		<Length>19.98</Length>
+		<WheelDiameter>1.25</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>6</NumAxis>				
+                <WheelInertia>2.0</WheelInertia>        
+        
+
+                <CabineModel>chs2t/chs2t-cabview.osgt</CabineModel>
+                <CabineShift>0.0 0.0 0.0</CabineShift>
+        
+                <DriverPos>0.492 7.776 3.668</DriverPos>
+
+	</Vehicle>
+</Config>

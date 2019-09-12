@@ -36,10 +36,13 @@ public:
 
     void setEqResrvoirFlow(double Qer);
 
+    //
     void setChargePressure(double p0);
 
+    //
     void setFeedLinePressure(double pFL);
 
+    //
     void setBrakePipePressure(double pTM1);
 
     virtual void setPosition(int &position) = 0;

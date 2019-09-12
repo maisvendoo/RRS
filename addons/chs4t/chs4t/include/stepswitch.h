@@ -51,6 +51,8 @@ private:
 
     int poz;
 
+    int n;
+
 //    Trigger *rs;
 
 //    double f1 -- Y[0];

@@ -1,15 +1,3 @@
-//------------------------------------------------------------------------------
-//
-//      Магистральный пассажирский электровоз переменного тока ЧС4т.
-//      Дополнение для Russian Railway Simulator (RRS)
-//
-//      (c) RRS development team:
-//          Дмитрий Притыкин (maisvendoo),
-//          Николай Авилкин (avilkin.nick)
-//
-//      Дата: 16/06/2019
-//
-//------------------------------------------------------------------------------
 #ifndef KM21KR2_H
 #define KM21KR2_H
 
@@ -28,9 +16,16 @@ public:
     ///Деструктор
     ~Km21KR2();
 
+    void setHod(bool hod) { this->hod = hod; }
+
     ControllerState getCtrlState() { return controlState; }
+    int getFieldStep() { return fieldStep ;}
+    int getReverseState() { return reverseState; }
+
+    double getMainShaftPos() { return mainShaftPos; }
 
 private:
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
     void preStep(state_vector_t &Y, double t);
@@ -39,7 +34,19 @@ private:
     bool k21;
     bool k22;
     bool k23;
+
+    bool k01;
+    bool k02;
+
     int n;
+    int p;
+    int re;
+    bool hod;
+    int fieldStep;
+    int reverseState;
+
+    double mainShaftPos;
+
 
     ControllerState controlState;
 };
