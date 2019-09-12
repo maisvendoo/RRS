@@ -61,9 +61,6 @@ public:
 
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
-
-
-
 };
 
 
