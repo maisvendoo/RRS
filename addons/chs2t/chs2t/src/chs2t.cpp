@@ -92,6 +92,8 @@ void CHS2T::initBrakesControl(QString module_path)
 void CHS2T::initAirSupplySubsystem()
 {
     mainReservoir = new Reservoir(1);
+    spareReservoir = new Reservoir(0.078);
+
     motor_compressor = new DCMotorCompressor();
     motor_compressor->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
     pressReg = new PressureRegulator();
@@ -180,6 +182,12 @@ void CHS2T::initialization()
 void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
 {
     charging_press = p0;
+
+    mainReservoir->setY(0, pFL);
+    spareReservoir->setY(0, charging_press);
+    brakeCrane->init(pTM, pFL);
+    locoCrane->init(pTM, pFL);
+    airDistr->init(pTM, pFL);
 }
 
 //------------------------------------------------------------------------------
@@ -305,8 +313,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     dako->setPtc(zpk->getPressure1());
     dako->setQvr(airDistr->getBrakeCylinderAirFlow());
     dako->setU(velocity);
-    dako->setQ1(locoCrane->getBrakeCylinderFlow());
+    //dako->setQ1(locoCrane->getBrakeCylinderFlow());
+    dako->setPkvt(zpk->getPressure2());
 
+    locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
     locoCrane->setControl(keys);
 
@@ -317,11 +327,16 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     brakesMech[0]->setAirFlow(zpk->getOutputFlow());
 
     airDistr->setBrakeCylinderPressure(dako->getPy());
+    airDistr->setBrakepipePressure(pTM);
+    airDistr->setAirSupplyPressure(spareReservoir->getPressure());
+
+    spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
     dako->step(t, dt);
     locoCrane->step(t, dt);
     zpk->step(t, dt);
     airDistr->step(t, dt);
+    spareReservoir->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -329,7 +344,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepDebugMsg(double t, double dt)
 {
-    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 eqResPress = %7 pipePress = %8 state = %9 shForce = %10" )
+    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11" )
         .arg(t, 10, 'f', 1)
         .arg(bistV->getU_out(), 4, 'f', 0)
         .arg(stepSwitch->getPoz(), 2)
@@ -339,7 +354,8 @@ void CHS2T::stepDebugMsg(double t, double dt)
         .arg(brakeCrane->getEqReservoirPressure(), 3, 'f', 2)
         .arg(brakeCrane->getBrakePipeInitPressure(), 3, 'f', 2)
         .arg(brakeCrane->getPositionName(), 3)
-        .arg(brakesMech[0]->getShoeForce() / 1000, 3, 'f', 2);
+        .arg(brakesMech[0]->getShoeForce() / 1000, 3, 'f', 2)
+        .arg(velocity * Physics::kmh, 3, 'f', 2);
 }
 
 //------------------------------------------------------------------------------

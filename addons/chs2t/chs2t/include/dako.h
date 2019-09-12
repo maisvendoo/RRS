@@ -21,7 +21,8 @@ public:
     void setQvr(double value) { Qvr = value; }
     void setPtc(double value) { ptc = value; }
     void setU(double value) { U = value; }
-    void setQ1(double value);
+    void setQ1(double value) { Q1 = value; }
+    void setPkvt(double value) { p_kvt = value; }
 
     double getP1() const { return p1; }
     double getPy() const { return py; }
@@ -41,6 +42,7 @@ public:
     double p1;
     double py;
     double Qtc;
+    double p_kvt;
 
     double A1;
     double A2;
@@ -52,15 +54,15 @@ public:
 
     double k1;
     double k2;
-
+    double k3;
+    double k4;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     /// Загрузка данных из конфигурационных файлов
     void load_config(CfgReader &cfg);
 
-    void preStep(state_vector_t &Y, double t);
-    void stepKeysControl(double t, double dt);
+    void preStep(state_vector_t &Y, double t);    
 };
 
 

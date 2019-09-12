@@ -83,6 +83,8 @@ private:
 
     Reservoir *mainReservoir;
 
+    Reservoir *spareReservoir;
+
     PressureRegulator *pressReg;
 
     DCMotorCompressor *motor_compressor;
