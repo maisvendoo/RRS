@@ -103,6 +103,11 @@ private:
 
     SwitchingValve *zpk;
 
+    PneumoReley *rd304;
+
+    PneumoSplitter *pnSplit;
+
+
 
 
     double charging_press;
@@ -138,6 +143,7 @@ private:
     void initTractionControl();
 
     void initBrakesEquipment(QString module_path);
+
 
     void initRegistrator();
 

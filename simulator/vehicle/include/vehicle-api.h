@@ -8,6 +8,7 @@
 #include    "reservoir.h"
 #include    "airdistributor.h"
 #include    "pneumo-relay.h"
+#include    "pneumo-splitter.h"
 #include    "switching-valve.h"
 #include    "loco-crane.h"
 #include    "automatic-train-stop.h"

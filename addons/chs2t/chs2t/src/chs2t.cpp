@@ -135,6 +135,12 @@ void CHS2T::initBrakesEquipment(QString module_path)
     zpk = new SwitchingValve();
     zpk->read_config("zpk");
 
+    pnSplit = new PneumoSplitter();
+    pnSplit->read_config("pneumo-splitter");
+
+    rd304 = new PneumoReley();
+    rd304->read_config("rd304");
+
 }
 
 
@@ -324,9 +330,9 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     zpk->setInputFlow1(dako->getQtc());
     zpk->setInputFlow2(locoCrane->getBrakeCylinderFlow());
-    zpk->setOutputPressure(brakesMech[0]->getBrakeCylinderPressure());
+    zpk->setOutputPressure(pnSplit->getP_in());
 
-    brakesMech[0]->setAirFlow(zpk->getOutputFlow());
+    brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
 
     airDistr->setBrakeCylinderPressure(dako->getPy());
     airDistr->setBrakepipePressure(pTM);
@@ -334,11 +340,23 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
+    rd304->setBrakeCylPressure(brakesMech[1]->getBrakeCylinderPressure());
+    rd304->setPipelinePressure(mainReservoir->getPressure());
+    rd304->setWorkAirFlow(pnSplit->getQ_out2());
+
+    brakesMech[1]->setAirFlow(rd304->getBrakeCylAirFlow());
+
+    pnSplit->setP_out2(rd304->getWorkPressure());
+    pnSplit->setP_out1(brakesMech[0]->getBrakeCylinderPressure());
+    pnSplit->setQ_in(zpk->getOutputFlow());
+
     dako->step(t, dt);
     locoCrane->step(t, dt);
     zpk->step(t, dt);
     airDistr->step(t, dt);
     spareReservoir->step(t, dt);
+    pnSplit->step(t, dt);
+    rd304->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -371,7 +389,7 @@ void CHS2T::stepSignals()
 
     analogSignal[STRELKA_PM] = static_cast<float>(mainReservoir->getPressure() / 1.6);
     analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);
-    analogSignal[STRELKA_EDT] = 0.0f;
+    analogSignal[STRELKA_EDT] =static_cast<float>(brakesMech[1]->getBrakeCylinderPressure() / 1.0);
     analogSignal[STRELKA_UR] = static_cast<float>(brakeCrane->getEqReservoirPressure() / 1.0);
     analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.0);
 

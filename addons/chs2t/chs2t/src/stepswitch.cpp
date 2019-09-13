@@ -10,6 +10,7 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , poz(0)
   , n(0)
   , p(0)
+  , hod(false)
 
 {
 

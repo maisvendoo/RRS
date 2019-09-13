@@ -4,17 +4,22 @@
 // Конструктор
 //------------------------------------------------------------------------------
 Km21KR2::Km21KR2(QObject* parent) : Device(parent)
+  , k21(true)
+  , k22(true)
+  , k23(false)
+
+  , k01(false)
+  , k02(false)
+
+  , n(0)
+  , p(0)
+  , re(0)
+  , hod(0)
+  , fieldStep(0)
+  , reverseState(0)
+  , mainShaftPos(0.0)
 
 {
-    mainShaftPos = 0;
-    reverseState = 0;
-
-    k21 = true;
-    k22 = true;
-    k23 = false;
-    n = 0;
-    p = 0;
-    re = 0;
 }
 
 //------------------------------------------------------------------------------

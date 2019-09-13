@@ -6,6 +6,7 @@
 // Конструктор
 //------------------------------------------------------------------------------
 Engine::Engine(QObject* parent) : Device(parent)
+  , poz(0)
   , n(0)
   , beta(1)
   , R_a(0.032)
@@ -14,8 +15,8 @@ Engine::Engine(QObject* parent) : Device(parent)
   , R_r(0)
   , L_af(0.001)
   , omega(0.0)
-  , U(0.0)
   , torque(0.0)
+  , U(0.0)
   , omega_nom(73.8)
   , direction(1)
 

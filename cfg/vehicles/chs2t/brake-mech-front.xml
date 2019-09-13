@@ -9,7 +9,7 @@
         <DeadVolume>0.0</DeadVolume>
         <CylinderDiameter>0.305</CylinderDiameter>
         <MechCoeff>5.6</MechCoeff>
-        <StockOut>0.0875</StockOut>
+        <StockOut>0.08</StockOut>
         <SpringForce>1649.0</SpringForce>
         <InitPressure>0.0</InitPressure>
     </Device>
