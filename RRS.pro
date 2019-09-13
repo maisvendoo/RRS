@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS += ./CfgReader
+SUBDIRS += ./CfgEditor
 SUBDIRS += ./filesystem
 SUBDIRS += ./log
 SUBDIRS += ./tcp-connection
@@ -17,7 +18,7 @@ SUBDIRS += ./addons/es1-motor
 SUBDIRS += ./addons/es1-non-motor
 SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/vl60
-SUBDIRS += ./addons/tep70
+#SUBDIRS += ./addons/tep70
 #SUBDIRS += ./addons/chs4t
 SUBDIRS += ./addons/chs2t
 SUBDIRS += ./addons/ep20
@@ -28,3 +29,4 @@ SUBDIRS += ./viewer
 
 SUBDIRS += ./tools/profconv
 SUBDIRS += ./tools/pathconv
+SUBDIRS += ./tools/routeconv

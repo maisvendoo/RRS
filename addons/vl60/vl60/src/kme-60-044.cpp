@@ -56,6 +56,14 @@ float ControllerKME_60_044::getReversHandlePos() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ControllerKME_60_044::setReversPos(int pos)
+{
+    revers_pos = pos;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
 {
     std::fill(state.pos_state.begin(), state.pos_state.end(), false);

@@ -22,6 +22,8 @@ public:
 
     float getReversHandlePos() const;
 
+    void setReversPos(int pos);
+
 private:
 
     /// Состояние главного вала

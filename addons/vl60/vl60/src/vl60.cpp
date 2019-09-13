@@ -25,6 +25,7 @@ VL60::VL60() : Vehicle ()
   , gv_pos(0.0)
   , gv_return(false)  
   , charge_press(0.0)
+  , ip(2.73)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
     pants_tumbler.setOffSoundName("K_Tumbler_Off");
@@ -246,7 +247,29 @@ void VL60::initOtherEquipment()
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 
-    //reg = new Registrator("vl60");
+    reg = new Registrator("vl60");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::initTriggers()
+{
+    triggers.push_back(&pants_tumbler);
+    triggers.push_back(&pant2_tumbler);
+    triggers.push_back(&gv_tumbler);
+    triggers.push_back(&gv_return_tumbler);
+    triggers.push_back(&fr_tumbler);
+    triggers.push_back(&mk_tumbler);
+
+    for (size_t i = 0; i < mv_tumblers.size(); ++i)
+        triggers.push_back(&mv_tumblers[i]);
+
+    triggers.push_back(&cu_tumbler);
+
+    autoStartTimer = new Timer(0.5);
+    connect(autoStartTimer, &Timer::process, this, &VL60::slotAutoStart);
+    start_count = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -275,6 +298,8 @@ void VL60::initialization()
     initTractionControl();
 
     initOtherEquipment();
+
+    initTriggers();
 }
 
 //------------------------------------------------------------------------------
@@ -282,7 +307,7 @@ void VL60::initialization()
 //------------------------------------------------------------------------------
 void VL60::debugPrint(double t)
 {
-    DebugMsg = QString("t: %1 v: %11 км/ч ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 В Uтэд: %6 В Поз.: %7 Iя: %8 А Iв: %9 А")
+    DebugMsg = QString("t: %1 x: %12 км v: %11 км/ч ЗР: %2 МПа ТЦ1: %3 ТЦ2: %4 Наж. на колодку: %5 кН Uву: %10 В Uтэд: %6 В Поз.: %7 Iя: %8 А Iв: %9 А")
 
             .arg(t, 10, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
@@ -294,7 +319,8 @@ void VL60::debugPrint(double t)
             .arg(motor[TED1]->getIa(), 6,'f',1)
             .arg(motor[TED1]->getIf(), 6,'f',1)
             .arg(vu[VU1]->getU_out(), 6, 'f', 1)
-            .arg(velocity * Physics::kmh, 6, 'f', 1);
+            .arg(velocity * Physics::kmh, 6, 'f', 1)
+            .arg(railway_coord / 1000.0, 7, 'f', 2);
 }
 
 
@@ -311,7 +337,7 @@ void VL60::stepOtherEquipment(double t, double dt)
 
     debugPrint(t);
 
-    //registration(t, dt);
+    registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -352,6 +378,8 @@ void VL60::step(double t, double dt)
         else
             gv_tumbler.reset();
     }
+
+    autoStartTimer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -359,6 +387,9 @@ void VL60::step(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60::stepPantographsControl(double t, double dt)
 {
+    pantographs[0]->setState(pant1_tumbler.getState() && pants_tumbler.getState());
+    pantographs[1]->setState(pant2_tumbler.getState() && pants_tumbler.getState());
+
     for (auto pant : pantographs)
     {
         // Задаем текущее напряжение КС (пока что через константу)
@@ -496,10 +527,12 @@ void VL60::stepTrolleysBrakeMech(double t, double dt)
 
     // Передняя тележка наполняется через реле давления 304
     trolley_mech[TROLLEY_FWD]->setAirFlow(pneumo_relay->getBrakeCylAirFlow());
+    trolley_mech[TROLLEY_FWD]->setVelocity(velocity);
     trolley_mech[TROLLEY_FWD]->step(t, dt);
 
     // Задняя тележка подключена через тройник от ЗПК
     trolley_mech[TROLLEY_BWD]->setAirFlow(pneumo_splitter->getQ_out2());
+    trolley_mech[TROLLEY_FWD]->setVelocity(velocity);
     trolley_mech[TROLLEY_BWD]->step(t, dt);
 
     Q_r[1] = trolley_mech[TROLLEY_FWD]->getBrakeTorque();
@@ -541,7 +574,7 @@ void VL60::stepTractionControl(double t, double dt)
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
     gauge_KV_motors->step(t, dt);
 
-    double ip = 2.73;
+    //double ip = 2.73;
 
     motor[TED1]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED1].getState()));
     motor[TED2]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED2].getState()));
@@ -658,7 +691,7 @@ void VL60::stepSignalsOutput()
     analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler.getState());
 
     // Вольтметр КС
-    analogSignal[STRELKA_KV2] = static_cast<float>(gauge_KV_ks->getOutput());
+    analogSignal[STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
 
     // Вольтметр ТЭД
     analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
@@ -729,14 +762,15 @@ void VL60::stepSignalsOutput()
 //------------------------------------------------------------------------------
 void VL60::registration(double t, double dt)
 {
-    QString line = QString("%1 %2 %3 %4 %5 %6 %7")
+    if (next_vehicle == Q_NULLPTR)
+        return;
+
+    double dx = railway_coord  - next_vehicle->getRailwayCoord();
+
+    QString line = QString("%1 %2")
             .arg(t)
-            .arg(velocity * Physics::kmh)
-            .arg(motor[TED1]->getUd())
-            .arg(motor[TED1]->getIa())
-            .arg(motor[TED1]->getIf())
-            .arg(getTractionForce() / Physics::g)
-            .arg(R2 / Physics::g);
+            .arg(a[0]);
+
 
     reg->print(line, t, dt);
 }
@@ -784,8 +818,11 @@ bool VL60::getHoldingCoilState() const
 //------------------------------------------------------------------------------
 void VL60::keyProcess()
 {
+    if (autoStartTimer->isStarted())
+        return;
+
     // Управление тумблером "Токоприемники"
-    if (getKeyState(KEY_O))
+    if (getKeyState(KEY_U))
     {
         if (isShift())
             pants_tumbler.set();
@@ -794,7 +831,7 @@ void VL60::keyProcess()
     }
 
     // Подъем/опускание переднего токоприемника
-    if (getKeyState(KEY_U))
+    if (getKeyState(KEY_I))
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())                    
@@ -803,11 +840,11 @@ void VL60::keyProcess()
             pant1_tumbler.reset();
 
         // Задаем статус токоприемнику
-        pantographs[0]->setState(isShift() && pants_tumbler.getState());
+        //pantographs[0]->setState(pants_tumbler.getState());
     }
 
     // Подъем/опускание заднего токоприемника
-    if (getKeyState(KEY_I))
+    if (getKeyState(KEY_O))
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())
@@ -816,7 +853,7 @@ void VL60::keyProcess()
             pant2_tumbler.reset();
 
         // Задаем статус токоприемнику
-        pantographs[1]->setState(isShift() && pants_tumbler.getState());
+        //pantographs[1]->setState(pants_tumbler.getState());
     }
 
     // Включение/выключение ГВ
@@ -934,6 +971,12 @@ void VL60::keyProcess()
         rb[RBP].set();
     else
         rb[RBP].reset();
+
+    if (getKeyState(KEY_R))
+    {
+        if (isAlt() && !autoStartTimer->isStarted())
+            autoStartTimer->start();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -984,6 +1027,13 @@ void VL60::load_brakes_config(QString path)
 
         int brake_lock = 0;
 
+        int combine_crane_pos = -1;
+
+        if (cfg.getInt(secName, "CombineCranePos", combine_crane_pos))
+        {
+            ubt->setCombineCranePos(combine_crane_pos);
+        }
+
         if (cfg.getInt(secName, "BrakeLockDevice", brake_lock))
         {
             ubt->setState(brake_lock);
@@ -995,6 +1045,47 @@ void VL60::load_brakes_config(QString path)
                 supply_reservoir->setY(0, charge_press);
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::loadConfig(QString cfg_path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Vehicle";
+
+        cfg.getDouble(secName, "ReductorCoeff", ip);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60::slotAutoStart()
+{
+    if (start_count < triggers.size())
+    {
+        triggers[start_count]->set();
+
+        if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
+                (triggers[start_count] == &gv_tumbler))
+            return;
+
+        if (!static_cast<bool>(main_switch->getLampState()))
+            gv_return_tumbler.reset();
+
+        start_count++;
+    }
+    else
+    {
+        autoStartTimer->stop();
+        controller->setReversPos(REVERS_FORWARD);
+        start_count = 0;
     }
 }
 

@@ -4,6 +4,8 @@ TEMPLATE = lib
 
 QT -= gui
 QT += xml
+QT += serialbus
+
 
 TARGET = modbus
 
@@ -32,5 +34,6 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/rs485.h
 SOURCES += $$files(./src/*.cpp)

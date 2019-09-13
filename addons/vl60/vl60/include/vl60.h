@@ -90,6 +90,9 @@ private:
     /// Зарядное давление
     double  charge_press;
 
+    /// Передаточное число редуктора
+    double  ip;
+
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler;
     /// Триггер тумблера "Токоприемник передний"
@@ -235,6 +238,11 @@ private:
     /// Регистратор, для записи параметров
     Registrator *reg;
 
+    std::vector<Trigger *> triggers;
+    Timer   *autoStartTimer;
+    size_t  start_count;
+
+
     /// Общая инициализация локомотива
     void initialization();
 
@@ -260,6 +268,8 @@ private:
     void initTractionControl();
 
     void initOtherEquipment();
+
+    void initTriggers();
 
 
     /// Шаг симуляции всех систем электровоза
@@ -307,6 +317,12 @@ private:
     void debugPrint(double t);
 
     void load_brakes_config(QString path);
+
+    void loadConfig(QString cfg_path);
+
+private slots:
+
+    void slotAutoStart();
 };
 
 #endif // VL60_H

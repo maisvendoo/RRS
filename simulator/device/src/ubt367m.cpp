@@ -243,3 +243,11 @@ void BrakeLock::setState(int state)
     if (prev_state != state)
         emit soundPlay("UBT_367_ruk");
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeLock::setCombineCranePos(int pos)
+{
+    comb_crane_pos = pos;
+}

@@ -10,6 +10,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+enum InterfaceDeviceMessageType
+{
+    ID_INFO = 0,
+    ID_WARNING = 1,
+    ID_ERROR = 2
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class DEVICE_EXPORT VirtualInterfaceDevice : public QObject
 {
     Q_OBJECT
@@ -29,6 +39,8 @@ public:
 signals:
 
     void sendControlSignals(control_signals_t control_signals);
+
+    void logMessage(int error_code, QString msg);
 
 public slots:
 

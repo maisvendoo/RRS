@@ -1,52 +1,82 @@
-#define Name        "RussianRailwaySimulator"
-#define Version       "0.0.1"
+#define Name          "RRS"
+#define Version       "1.0.1"
 #define arch          "x86_64"
 #define Publisher     "maisvendoo"
-#define BinDir        "..\..\bin-win\bin"
-#define LibDir        "..\..\bin-win\lib"
-#define ModulesDir    "..\..\bin-win\modules"
-#define PluginsDir    "..\..\bin-win\plugins"
-#define CfgDir        "..\..\bin-win\cfg"
-#define DataDir       "..\..\bin-win\data"
-#define RoutesDir     "..\..\bin-win\routes"
-#define LogsDir       "..\..\bin-win\logs"
+
+#define RRS_DEV_ROOT      GetEnv("RRS_DEV_ROOT")      
+#define BinDir        RRS_DEV_ROOT + "\bin"
+#define LibDir        RRS_DEV_ROOT + "\lib"
+#define ModulesDir    RRS_DEV_ROOT + "\modules"
+#define PluginsDir    RRS_DEV_ROOT + "\plugins"
+#define CfgDir        RRS_DEV_ROOT + "\cfg"
+#define DataDir       RRS_DEV_ROOT + "\data"
+#define RoutesDir     RRS_DEV_ROOT + "\routes"
+#define LogsDir       RRS_DEV_ROOT + "\logs"
 #define SrcDir        "..\"
 #define ResourceDir   "..\resources"
-#define FontsDir      "..\..\fonts"
+#define FontsDir      RRS_DEV_ROOT + "\fonts"
+#define DocsDir       RRS_DEV_ROOT + "\docs"
+#define SdkDir        RRS_DEV_ROOT + "\sdk"
+#define ThemesDir     RRS_DEV_ROOT + "\themes"
 #define ExeName       "launcher.exe" 
 
 [Setup]
-AppId={{78497FC5-5BDD-485A-A0EC-DF0E340651F7}}
+AppId={{5BA4EB09-C456-4F39-BFA0-64020141EDCC}}
 
 AppName={#Name}
 AppVersion={#Version}
 AppPublisher={#Publisher}
 
-DefaultDirName={pf}\{#Name}
+DefaultDirName={sd}\{#Name}
 DefaultGroupName={#Name}
+DisableDirPage=no
 
 OutputDir=..\..\bin-setup
 OutputBaseFilename={#Name}-{#arch}-v{#Version}-setup
 
-SetupIconFile={#BinDir}\logo.ico
+SetupIconFile={#BinDir}\RRS_logo.ico
 
 Compression=lzma
 SolidCompression=yes
 
+WizardImageFile="images\wizard.bmp"
+WizardSmallImageFile="images\small-wizard.bmp"
+WizardImageAlphaFormat=none
+
+ChangesEnvironment=yes
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
+[Dirs]
+Name: "{app}\logs"
+Name: "{app}\screenshots"
 
 [Files]
 
 Source: "{#BinDir}\*.*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#BinDir}\logo.ico"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirsSource: "{#LibDir}\*.*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BinDir}\RRS_logo.ico"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirsSource: "{#LibDir}\*.*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#ModulesDir}\*.*"; DestDir: "{app}\modules"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#PluginsDir}\*.*"; DestDir: "{app}\plugins"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#CfgDir}\*.*"; DestDir: "{app}\cfg"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#DataDir}\*.*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#RoutesDir}\*.*"; DestDir: "{app}\routes"; Flags: ignoreversion recursesubdirs createallsubdirs  
-Source: "{#LogsDir}\*.*"; DestDir: "{app}\logs"; Flags: ignoreversion recursesubdirs createallsubdirs  
+Source: "{#SdkDir}\*.*"; DestDir: "{app}\sdk"; Flags: ignoreversion recursesubdirs createallsubdirs 
+Source: "{#ThemesDir}\*.*"; DestDir: "{app}\themes"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#FontsDir}\*.*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#DocsDir}\*.*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#RRS_DEV_ROOT}\LICENSE"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
+Source: "{#RRS_DEV_ROOT}\LICENSE-Russian"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
+
 
 [Icons]
-Name: "{group}\{#Name}"; Filename: "{app}\bin\{#ExeName}"; IconFilename: "{app}\bin\logo.ico"                            
-Name: "{commondesktop}\{#Name}"; Filename: "{app}\bin\{#ExeName}"; IconFilename: "{app}\bin\logo.ico"; Tasks: desktopicon
+Name: "{group}\{#Name}"; Filename: "{app}\bin\{#ExeName}"; IconFilename: "{app}\bin\RRS_logo.ico"                            
+Name: "{commondesktop}\{#Name}"; Filename: "{app}\bin\{#ExeName}"; IconFilename: "{app}\bin\RRS_logo.ico"; Tasks: desktopicon
+
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE-Russian"
+Name: "ua"; MessagesFile: "compiler:Languages\Ukrainian.isl"; LicenseFile: "{#RRS_DEV_ROOT}\LICENSE-Russian"
+
+[Registry]
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "RRS_ROOT"; ValueData: "{app}"

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+
+		<EmptyMass>54200</EmptyMass>
+		<PayloadMass>4500</PayloadMass>
+		<Length>25.0</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>4</NumAxis>		
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+                <WheelInertia>2.0</WheelInertia>
+
+                <ExtModelName>Od_pass_uz/Pass_TVZ_61-826-kvr.osgt</ExtModelName>
+	<ExtTexturesDir>Od_pass_uz/zdsPassBagaz_50290</ExtTexturesDir>
+
+                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+                <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+
+                <AirDistModule>vr242</AirDistModule>
+                <AirDistConfig>vr242</AirDistConfig>
+
+	</Vehicle>
+</Config>
