@@ -22,7 +22,10 @@ public:
     int getFieldStep() { return fieldStep ;}
     int getReverseState() { return reverseState; }
 
+    double getMainShaftPos() { return mainShaftPos; }
+
 private:
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
     void preStep(state_vector_t &Y, double t);
@@ -41,6 +44,8 @@ private:
     bool hod;
     int fieldStep;
     int reverseState;
+
+    double mainShaftPos;
 
 
     ControllerState controlState;

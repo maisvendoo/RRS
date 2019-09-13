@@ -16,6 +16,8 @@
 
 #include    <QDir>
 
+#include    "chs2t-signals.h"
+
 
 //------------------------------------------------------------------------------
 // Конструктор
@@ -355,7 +357,31 @@ void CHS2T::stepDebugMsg(double t, double dt)
         .arg(brakeCrane->getBrakePipeInitPressure(), 3, 'f', 2)
         .arg(brakeCrane->getPositionName(), 3)
         .arg(brakesMech[0]->getShoeForce() / 1000, 3, 'f', 2)
-        .arg(velocity * Physics::kmh, 3, 'f', 2);
+            .arg(velocity * Physics::kmh, 3, 'f', 2);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::stepSignals()
+{
+    analogSignal[STRELKA_POS] = static_cast<float>(stepSwitch->getPoz()) / 42.0f;
+    analogSignal[STRELKA_AMP1] = static_cast<float>(motor->getIa() / 1000.0);
+    analogSignal[STRELKA_AMP2] = static_cast<float>(motor->getIf() / 1000.0);
+
+    analogSignal[STRELKA_PM] = static_cast<float>(mainReservoir->getPressure() / 1.6);
+    analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);
+    analogSignal[STRELKA_EDT] = 0.0f;
+    analogSignal[STRELKA_UR] = static_cast<float>(brakeCrane->getEqReservoirPressure() / 1.0);
+    analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.0);
+
+    analogSignal[STRELKA_UKS] = static_cast<float>(bistV->getU_out() / 4000.0);
+
+    analogSignal[KRAN395_RUK] = static_cast<float>(brakeCrane->getHandlePosition());
+    analogSignal[KRAN254_RUK] = static_cast<float>(locoCrane->getHandlePosition());
+
+    analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
+    analogSignal[REVERSOR] = static_cast<float>(km21KR2->getReverseState());
 }
 
 //------------------------------------------------------------------------------
@@ -380,6 +406,8 @@ void CHS2T::step(double t, double dt)
     stepBrakesEquipment(t, dt);
 
     stepDebugMsg(t, dt);
+
+    stepSignals();
 
     registrate(t, dt);
 }

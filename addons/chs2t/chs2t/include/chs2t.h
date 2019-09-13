@@ -165,6 +165,8 @@ private:
 
     void stepDebugMsg(double t, double dt);
 
+    void stepSignals();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 

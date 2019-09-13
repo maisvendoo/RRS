@@ -1,0 +1,27 @@
+#ifndef     CHS2T_SIGNALS_H
+#define     CHS2T_SIGNALS_H
+
+enum
+{
+    KONTROLLER = 0,
+    REVERSOR = 1,
+
+    STRELKA_POS = 10,
+
+    STRELKA_AMP1 = 11,
+    STRELKA_AMP2 = 12,
+    STRELKA_AMP3 = 13,
+
+    STRELKA_PM = 14,
+    STRELKA_TC = 15,
+    STRELKA_EDT = 16,
+    STRELKA_UR = 17,
+    STRELKA_TM = 18,
+
+    STRELKA_UKS = 19,
+
+    KRAN395_RUK = 20,
+    KRAN254_RUK = 21
+};
+
+#endif // CHS2T_SIGNALS_H

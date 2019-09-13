@@ -33,5 +33,6 @@ INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/chs2t-signals.h
 SOURCES += $$files(./src/*.cpp)

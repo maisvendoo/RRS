@@ -4,15 +4,17 @@
 // Конструктор
 //------------------------------------------------------------------------------
 Km21KR2::Km21KR2(QObject* parent) : Device(parent)
-  , k21(true)
-  , k22(true)
-  , k23(false)
-  , n(0)
-  , p(0)
-  , re(0)
-  , reverseState(0)
-{
 
+{
+    mainShaftPos = 0;
+    reverseState = 0;
+
+    k21 = true;
+    k22 = true;
+    k23 = false;
+    n = 0;
+    p = 0;
+    re = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +89,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
                 k21 = false;
                 k22 = false;
                 k23 = false;
+
+                mainShaftPos = 0.5;
             }
         }
     }
@@ -104,6 +108,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
             k21 = false;
             k22 = true;
             k23 = true;
+
+            mainShaftPos = -0.5;
         }
     }
 
@@ -118,6 +124,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k21 = true;
         k22 = true;
         k23 = true;
+
+        mainShaftPos = -1.0;
     }
 
     // 1 вверх
@@ -127,6 +135,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k22 = false;
         k23 = false;
         n = 1;
+
+        mainShaftPos = 1.0;
     }
 
     // Ноль
@@ -137,6 +147,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k21 = true;
         k22 = true;
         k23 = false;
+
+        mainShaftPos = 0.0;
     }
 
     controlState.up = k21 * k23;
