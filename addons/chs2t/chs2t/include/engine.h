@@ -1,8 +1,9 @@
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef     ENGINE_H
+#define     ENGINE_H
 
-#include "device.h"
-#include "motor-magnetic-char.h"
+#include    "device.h"
+#include    "motor-magnetic-char.h"
+#include    "ampermeters-state.h"
 
 //------------------------------------------------------------------------------
 //
@@ -39,7 +40,15 @@ public:
 
     void setDirection(int revers_state);
 
+    void setAmpermetersState(ampermeters_state_t state) { amp_state = state; }
+
     double getBeta() { return beta; }
+
+    double getI12() const;
+
+    double getI34() const;
+
+    double getI56() const;
 
 private:
     /// Номер позиции
@@ -83,18 +92,16 @@ private:
 
     QMap<int, double> fieldStep;
 
+    ampermeters_state_t amp_state;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     /// Загрузка данных из конфигурационных файлов
     void load_config(CfgReader &cfg);
 
-    void preStep(state_vector_t &Y, double t);
-    void stepKeysControl(double t, double dt);
+    void preStep(state_vector_t &Y, double t);    
 
     double calcCPhi(double I);
-
-
-
 };
 
 #endif // ENGINE_H

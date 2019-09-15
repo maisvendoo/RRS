@@ -22,7 +22,7 @@ public:
     int getFieldStep() { return fieldStep ;}
     int getReverseState() { return reverseState; }
 
-    double getMainShaftPos() { return mainShaftPos; }
+    double getMainShaftPos() { return mainShaftPos; }    
 
 private:
 

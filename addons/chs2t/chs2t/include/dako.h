@@ -52,10 +52,10 @@ public:
     double K3;
     double K4;
 
-    double k1;
-    double k2;
-    double k3;
-    double k4;
+    double k_1;
+    double k_2;
+    double k_3;
+    double k_4;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
