@@ -21,7 +21,19 @@ enum
     STRELKA_UKS = 19,
 
     KRAN395_RUK = 20,
-    KRAN254_RUK = 21
+    KRAN254_RUK = 21,
+
+    SIGLIGHT_P = 22,
+    SIGLIGHT_SP = 23,
+    SIGLIGHT_S = 24,
+    SIGLIGHT_ZERO = 25,
+
+    WHEEL_1 = 194,
+    WHEEL_2 = 195,
+    WHEEL_3 = 196,
+    WHEEL_4 = 197,
+    WHEEL_5 = 198,
+    WHEEL_6 = 199
 };
 
 #endif // CHS2T_SIGNALS_H

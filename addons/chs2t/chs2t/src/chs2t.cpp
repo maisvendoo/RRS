@@ -389,7 +389,7 @@ void CHS2T::stepSignals()
 
     analogSignal[STRELKA_PM] = static_cast<float>(mainReservoir->getPressure() / 1.6);
     analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);
-    analogSignal[STRELKA_EDT] =static_cast<float>(brakesMech[1]->getBrakeCylinderPressure() / 1.0);
+    analogSignal[STRELKA_EDT] = 0.0f;
     analogSignal[STRELKA_UR] = static_cast<float>(brakeCrane->getEqReservoirPressure() / 1.0);
     analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.0);
 
@@ -400,6 +400,18 @@ void CHS2T::stepSignals()
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
     analogSignal[REVERSOR] = static_cast<float>(km21KR2->getReverseState());
+
+    analogSignal[SIGLIGHT_P] = 0.0f;
+    analogSignal[SIGLIGHT_SP] = 0.0f;
+    analogSignal[SIGLIGHT_S] = 0.0f;
+    analogSignal[SIGLIGHT_ZERO] = 1.0f;
+
+    analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_5] = static_cast<float>(dir * wheel_rotation_angle[4] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_6] = static_cast<float>(dir * wheel_rotation_angle[5] / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------
