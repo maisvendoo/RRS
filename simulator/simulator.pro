@@ -7,6 +7,7 @@ SUBDIRS += ./physics
 SUBDIRS += ./device
 SUBDIRS += ./solver
 SUBDIRS += ./rkf5
+SUBDIRS += ./rk4
 SUBDIRS += ./vehicle
 SUBDIRS += ./coupling
 SUBDIRS += ./brakepipe
