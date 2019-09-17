@@ -122,8 +122,9 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    double F = S * Y[0] * Physics::MPa - F0;
-    K = pf(F) * ip / shoesCyl;
+    //double F = S * Y[0] * Physics::MPa - F0;
+    //K = pf(F) * ip / shoesCyl;
+    K = pf(76925.0 * Y[0] - 7716.5);
 
     double shoe_brake_force = K * phi(K, velocity);
     brakeTorque = shoesAxis * shoe_brake_force * effRadius;

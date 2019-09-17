@@ -767,9 +767,10 @@ void VL60::registration(double t, double dt)
 
     double dx = railway_coord  - next_vehicle->getRailwayCoord();
 
-    QString line = QString("%1 %2")
+    QString line = QString("%1 %2 %3")
             .arg(t)
-            .arg(a[0]);
+            .arg(railway_coord)
+            .arg(velocity);
 
 
     reg->print(line, t, dt);
