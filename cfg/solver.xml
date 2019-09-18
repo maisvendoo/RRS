@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Solver>
-	    <Method>rkf5</Method>
+	    <Method>rk4</Method>
 		<StartTime>0</StartTime>
 		<StopTime>1e7</StopTime>
 	    <MaxStep>1e-3</MaxStep>
-		<InitStep>2e-5</InitStep>
+		<InitStep>2e-3</InitStep>
 		<LocalError>1e-1</LocalError>
     </Solver>
 </Config>

@@ -276,6 +276,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     motor->setR(puskRez->getR());
     motor->setU(bistV->getU_out() * stepSwitch->getSchemeState());
     motor->setOmega(wheel_omega[0] * ip);
+    motor->setAmpermetersState(stepSwitch->getAmpermetersState());
     motor->step(t, dt);
 
     tracForce_kN = 0;
@@ -365,6 +366,8 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepDebugMsg(double t, double dt)
 {
+    Q_UNUSED(dt)
+
     DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11" )
         .arg(t, 10, 'f', 1)
         .arg(bistV->getU_out(), 4, 'f', 0)
@@ -385,12 +388,14 @@ void CHS2T::stepDebugMsg(double t, double dt)
 void CHS2T::stepSignals()
 {
     analogSignal[STRELKA_POS] = static_cast<float>(stepSwitch->getPoz()) / 42.0f;
-    analogSignal[STRELKA_AMP1] = static_cast<float>(motor->getIa() / 1000.0);
-    analogSignal[STRELKA_AMP2] = static_cast<float>(motor->getIf() / 1000.0);
+
+    analogSignal[STRELKA_AMP1] = static_cast<float>(motor->getI12() / 1000.0);
+    analogSignal[STRELKA_AMP2] = static_cast<float>(motor->getI34() / 1000.0);
+    analogSignal[STRELKA_AMP3] = static_cast<float>(motor->getI56() / 1000.0);
 
     analogSignal[STRELKA_PM] = static_cast<float>(mainReservoir->getPressure() / 1.6);
     analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);
-    analogSignal[STRELKA_EDT] =static_cast<float>(brakesMech[1]->getBrakeCylinderPressure() / 1.0);
+    analogSignal[STRELKA_EDT] = 0.0f;
     analogSignal[STRELKA_UR] = static_cast<float>(brakeCrane->getEqReservoirPressure() / 1.0);
     analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.0);
 
@@ -401,6 +406,23 @@ void CHS2T::stepSignals()
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
     analogSignal[REVERSOR] = static_cast<float>(km21KR2->getReverseState());
+
+    analogSignal[SIGLIGHT_P] = static_cast<float>(stepSwitch->isParallel());
+    analogSignal[SIGLIGHT_SP] = static_cast<float>(stepSwitch->isSeriesParallel());
+    analogSignal[SIGLIGHT_S] = static_cast<float>(stepSwitch->isSeries());
+    analogSignal[SIGLIGHT_ZERO] = static_cast<float>(stepSwitch->isZero());
+
+    analogSignal[SIGLIGHT_NO_BRAKES_RELEASE] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() >= 0.1);
+
+    analogSignal[PANT1] = static_cast<float>(pantographs[0]->getHeight());
+    analogSignal[PANT2] = static_cast<float>(pantographs[1]->getHeight());
+
+    analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_5] = static_cast<float>(dir * wheel_rotation_angle[4] / 2.0 / Physics::PI);
+    analogSignal[WHEEL_6] = static_cast<float>(dir * wheel_rotation_angle[5] / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------

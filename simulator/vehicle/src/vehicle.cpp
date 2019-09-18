@@ -396,7 +396,7 @@ integrationPostStep(state_vector_t &Y, double t)
     for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1];
-        wheel_omega[i] = Y[idx + s + i + 1];
+        wheel_omega[i] = Y[idx + s + i + 1] * dir;
     }
 
     postStep(t);

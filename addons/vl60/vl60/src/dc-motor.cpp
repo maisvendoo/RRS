@@ -112,7 +112,7 @@ void DCMotor::preStep(state_vector_t &Y, double t)
     torque = Y[0] * calcCPhi(Y[0] * beta * direction);
 
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
-    emit soundSetVolume("TED", static_cast<int>(abs(Y[0])));
+    emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 300)));
 }
 
 //------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ void DCMotor::ode_system(const state_vector_t &Y,
                          double t)
 {
     double R = R_a + beta * R_gp + R_dp + R_r;
-    double E = abs(omega) * calcCPhi(Y[0] * beta * direction);
+    double E = omega * calcCPhi(Y[0] * beta * direction);
 
     dYdt[0] = (U - R * Y[0] - E) / L_af;
 }

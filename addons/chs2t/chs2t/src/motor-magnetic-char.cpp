@@ -40,10 +40,7 @@ void MotorMagneticChar::load(const std::string &path)
             ss >> p.current >> p.value;
 
             points.push_back(p);
-        }
-
-        double cphi = getValue(500.0);
-        double zu = 0;
+        }        
     }
 }
 

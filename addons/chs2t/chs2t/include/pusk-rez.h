@@ -21,17 +21,18 @@ public:
     double getR() { return R; }
 
 private:
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
     void preStep(state_vector_t &Y, double t);
     void stepKeysControl(double t, double dt);
 
-    QMap<int, double> steps;
 
     int poz;
 
     double R;
 
+    QMap<int, double> steps;
 };
 
 #endif // PUSKREZ_H

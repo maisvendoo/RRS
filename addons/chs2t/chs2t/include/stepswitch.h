@@ -1,8 +1,10 @@
-#ifndef STEPSWITCH_H
-#define STEPSWITCH_H
+#ifndef     STEPSWITCH_H
+#define     STEPSWITCH_H
 
-#include "device.h"
-#include "km-21kr2-state.h"
+#include    "device.h"
+#include    "km-21kr2-state.h"
+
+#include   "ampermeters-state.h"
 
 //------------------------------------------------------------------------------
 //
@@ -25,7 +27,19 @@ public:
 
     bool getHod() { return hod; }
 
+    bool isZero() const;
+
+    bool isSeries() const;
+
+    bool isSeriesParallel() const;
+
+    bool isParallel() const;
+
+    ampermeters_state_t getAmpermetersState();
+
 private:
+
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
     void load_config(CfgReader &cfg);
     void preStep(state_vector_t &Y, double t);
@@ -39,7 +53,6 @@ private:
         MPOS_P = 42
     };
 
-    ControllerState ctrlState;
 
     double V;
     double V1;
@@ -54,6 +67,7 @@ private:
 
     bool hod;
 
+    ControllerState ctrlState;
 };
 
 

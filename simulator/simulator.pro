@@ -7,6 +7,7 @@ SUBDIRS += ./physics
 SUBDIRS += ./device
 SUBDIRS += ./solver
 SUBDIRS += ./rkf5
+SUBDIRS += ./rk4
 SUBDIRS += ./vehicle
 SUBDIRS += ./coupling
 SUBDIRS += ./brakepipe
@@ -17,7 +18,7 @@ SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
 
-SUBDIRS += ./modbus
+#SUBDIRS += ./modbus
 
 SUBDIRS += ./krm395
 SUBDIRS += ./vr242

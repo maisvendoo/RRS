@@ -57,6 +57,30 @@ void Engine::setDirection(int revers_state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+double Engine::getI12() const
+{
+    return getIa() * static_cast<double>(amp_state.is12on);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Engine::getI34() const
+{
+    return getIa() * static_cast<double>(amp_state.is34on);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Engine::getI56() const
+{
+    return getIa() * static_cast<double>(amp_state.is56on);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
     double R;
@@ -110,13 +134,7 @@ void Engine::load_config(CfgReader& cfg)
 void Engine::preStep(state_vector_t& Y, double t)
 {
     torque = calcCPhi(Y[0] * beta * direction) * Y[0];
-}
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Engine::stepKeysControl(double t, double dt)
-{
     if (poz < 21)
         n = 6;
     else

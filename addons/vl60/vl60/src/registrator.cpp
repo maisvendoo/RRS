@@ -12,7 +12,8 @@ Registrator::Registrator(QString fileName, double interval, QObject *parent)
     , path("")
 {
     path = "../graphs/";
-    path += fileName + QDateTime::currentDateTime().toString("_dd-MM-yyyy_hh-mm-ss") + ".txt";
+    //path += fileName + QDateTime::currentDateTime().toString("_dd-MM-yyyy_hh-mm-ss") + ".txt";
+    path += fileName + ".txt";
 
     file = new QFile(path);
     file->open(QIODevice::WriteOnly);

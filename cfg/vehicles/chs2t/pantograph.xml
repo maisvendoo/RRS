@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Pantograph>
-        <height>1.2</height>
-        <upTime>6.0</upTime>
-        <downTime>6.0</downTime>
-        <speed>0.2</speed>
-                
-    </Pantograph>
-
     <Device>
-        <Order>1</Order>
+        <MaxHeight>0.65</MaxHeight>
+        <MotionTime>3.0</MotionTime>                
     </Device>
 </Config>

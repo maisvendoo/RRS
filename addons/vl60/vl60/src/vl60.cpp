@@ -90,6 +90,11 @@ void VL60::initBrakeDevices(double p0, double pTM, double pFL)
     main_reservoir->setY(0, pFL);
     charge_press = p0;
 
+    brake_crane->setChargePressure(charge_press);
+    brake_crane->init(pTM, pFL);
+    loco_crane->init(pTM, pFL);
+    air_disr->init(pTM, pFL);
+
     load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
 }
 
@@ -247,7 +252,7 @@ void VL60::initOtherEquipment()
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 
-    reg = new Registrator("vl60");
+    reg = new Registrator("brakes");
 }
 
 //------------------------------------------------------------------------------
@@ -762,14 +767,11 @@ void VL60::stepSignalsOutput()
 //------------------------------------------------------------------------------
 void VL60::registration(double t, double dt)
 {
-    if (next_vehicle == Q_NULLPTR)
-        return;
-
-    double dx = railway_coord  - next_vehicle->getRailwayCoord();
-
-    QString line = QString("%1 %2")
+    QString line = QString("%1 %2 %3 %4")
             .arg(t)
-            .arg(a[0]);
+            .arg(railway_coord)
+            .arg(velocity * Physics::kmh)
+            .arg(pTM * Physics::g);
 
 
     reg->print(line, t, dt);
