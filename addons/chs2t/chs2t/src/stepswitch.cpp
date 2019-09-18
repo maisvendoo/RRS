@@ -4,8 +4,8 @@
 // Конструктор
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
-  , V(4.12)
-  , V1(10.6)
+  , V(0.0)
+  , V1(0.0)
   , poz_d(0)
   , poz(0)
   , n(0)
@@ -45,7 +45,8 @@ void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
 //------------------------------------------------------------------------------
 void StepSwitch::load_config(CfgReader& cfg)
 {
-
+    cfg.getDouble("Device", "V", V);
+    cfg.getDouble("Device", "V1", V1);
 }
 
 //------------------------------------------------------------------------------

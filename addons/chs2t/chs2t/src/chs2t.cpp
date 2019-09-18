@@ -109,6 +109,7 @@ void CHS2T::initTractionControl()
     km21KR2 = new Km21KR2();
 
     stepSwitch = new StepSwitch();
+    stepSwitch->read_custom_config(config_dir + QDir::separator() + "step-switch");
 
     motor = new Engine();
     motor->setCustomConfigDir(config_dir);
