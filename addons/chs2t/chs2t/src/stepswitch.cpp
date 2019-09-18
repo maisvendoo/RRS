@@ -8,8 +8,10 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , V1(0.0)
   , poz_d(0)
   , poz(0)
-  , n(0)
-  , p(0)
+  , n(false)
+  , p(false)
+  , s(false)
+  , prevPos(0)
   , hod(false)
 
 {
@@ -110,55 +112,48 @@ void StepSwitch::stepKeysControl(double t, double dt)
 {
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
-    if (ctrlState.up)
+    if (ctrlState.up && !s )
     {
         poz_d += V * hs_p(MPOS_P - poz_d) * dt;
-        n = 0;
+        n = false;
+        if ((poz == MPOS_S || poz == MPOS_SP) && prevPos != poz)
+        {
+            s = true;
+            prevPos = poz;
+        }
+        if (poz != prevPos)
+            prevPos = 0;
     }
-    if (ctrlState.up1 && poz_d < MPOS_P && n == 0)
+
+    if (ctrlState.up1 && poz_d < MPOS_P && !n)
     {
         poz += 1;
         poz_d = poz;
-        n = 1;
+        n = true;
+
     }
-    if (ctrlState.down1 && poz_d > 0 && n == 0)
+    if (ctrlState.down1 && poz_d > 0 && !n)
     {
         poz -= 1;
         poz_d = poz;
-        n = 1;
+        n = true;
     }
     if (ctrlState.down)
     {
         poz_d -= V * hs_p(poz_d) * dt;
-        n = 0;
+        n = false;
     }
     if (ctrlState.zero)
     {
-        n = 0;
+        n = false;
+        s = false;
     }
 
-    if ((getKeyState(KEY_Z) || p == 1))
+    if ((getKeyState(KEY_Z) || p))
     {
-//        if (poz > MPOS_SP)
-//        {
-//            poz_d -= V1 * hs_p(poz - MPOS_SP) * dt;
-//            p = hs_p(poz_d - MPOS_SP);
-//        }
-//        else if (poz > MPOS_S)
-//        {
-//            poz_d -= V1 * hs_p(poz - MPOS_S) * dt;
-//            p = hs_p(poz_d - MPOS_S);
-//        }
-//        else if (poz > 0)
-//        {
-//            poz_d -= V1 * hs_p(poz) * dt;
-//            p = hs_p(poz_d);
-//         }
-
-        p = 1;
+        p = true;
         poz_d -= V1 * dt;
-        if (hod || poz == 0)
-            p = 0;
+        p = !(hod || poz == 0);
     }
 
     poz = static_cast<int>(poz_d);

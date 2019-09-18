@@ -47,6 +47,8 @@ void CHS2T::initPantographs()
         pantographs[i] = new Pantograph();
         pantographs[i]->read_custom_config(config_dir + QDir::separator() + "pantograph");
     }
+
+    pantoSwitcher->setKeyCode(KEY_I);
 }
 
 //------------------------------------------------------------------------------

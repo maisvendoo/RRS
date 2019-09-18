@@ -62,8 +62,10 @@ private:
 
     int poz;
 
-    int n;
-    int p;
+    bool n;
+    bool p;
+    bool s;
+    int prevPos;
 
     bool hod;
 

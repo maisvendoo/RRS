@@ -1,4 +1,4 @@
-#include    "trigger.h"
+    #include    "trigger.h"
 
 Trigger::Trigger(QObject *parent) : QObject(parent)
     , state(false)
