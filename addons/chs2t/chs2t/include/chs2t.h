@@ -107,7 +107,9 @@ private:
 
     PneumoSplitter *pnSplit;
 
-    Switcher *pantoSwitcher;
+    Switcher *panto1Switcher;
+
+    Switcher *panto2Switcher;
 
 
     double charging_press;

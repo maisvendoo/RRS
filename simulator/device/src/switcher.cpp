@@ -3,6 +3,8 @@
 Switcher::Switcher(QObject* parent) : Device(parent)
   , keyCode(0)
   , state(0)
+  , kolStates(0)
+  , p(false)
 {
 
 }
@@ -16,10 +18,19 @@ void Switcher::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double 
 {
     if (getKeyState(keyCode))
     {
-        if(isShift()&& state > 0)
-            state -= 1;
-        if (state < 3)
-            state += 1;
+        if (p)
+        {
+            if(isShift()&& state > 0)
+                state -= 1;
+
+            else if (state < kolStates - 1)
+                state += 1;
+            p = false;
+        }
+    }
+    else
+    {
+        p = true;
     }
 }
 
