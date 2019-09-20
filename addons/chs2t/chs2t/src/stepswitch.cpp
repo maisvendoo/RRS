@@ -85,7 +85,9 @@ ampermeters_state_t StepSwitch::getAmpermetersState()
 //------------------------------------------------------------------------------
 void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
 }
 
 //------------------------------------------------------------------------------
@@ -102,7 +104,8 @@ void StepSwitch::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void StepSwitch::preStep(state_vector_t& Y, double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
 }
 
 //------------------------------------------------------------------------------
@@ -110,6 +113,8 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void StepSwitch::stepKeysControl(double t, double dt)
 {
+    Q_UNUSED(t)
+
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
     if (ctrlState.up && !s )

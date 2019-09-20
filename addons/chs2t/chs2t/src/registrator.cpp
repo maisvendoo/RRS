@@ -35,6 +35,8 @@ Registrator::~Registrator()
 //------------------------------------------------------------------------------
 void Registrator::print(QString line, double t, double dt)
 {
+    Q_UNUSED(t)
+
     if ( first_print || (tau > interval))
     {
         file->open(QIODevice::Append);

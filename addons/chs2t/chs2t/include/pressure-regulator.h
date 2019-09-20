@@ -18,7 +18,7 @@ public:
 
     void setPressure(double press);
 
-    double getState() const;
+    double getState() const { return state; }
 
 private:
 

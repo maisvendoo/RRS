@@ -83,6 +83,8 @@ double Engine::getI56() const
 //------------------------------------------------------------------------------
 void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    Q_UNUSED(t)
+
     double R;
     R = R_r / n + R_a + R_gp * beta + R_dp;
     dYdt[0] = (U / n - R * Y[0] - calcCPhi(Y[0] * beta * direction) * omega) / L_af;
@@ -133,6 +135,8 @@ void Engine::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void Engine::preStep(state_vector_t& Y, double t)
 {
+    Q_UNUSED(t)
+
     torque = calcCPhi(Y[0] * beta * direction) * Y[0];
 
     if (poz < 21)

@@ -152,7 +152,6 @@ void CHS2T::initBrakesEquipment(QString module_path)
 
     rd304 = new PneumoReley();
     rd304->read_config("rd304");
-
 }
 
 
@@ -217,9 +216,9 @@ void CHS2T::stepPantographs(double t, double dt)
 {
     panto1Switcher->setControl(keys);
     panto1Switcher->step(t, dt);
+
     panto2Switcher->setControl(keys);
     panto2Switcher->step(t, dt);
-
 
     pantographs[0]->setState(hs_p(panto1Switcher->getState() - 1));
     pantographs[1]->setState(hs_p(panto2Switcher->getState() - 1));

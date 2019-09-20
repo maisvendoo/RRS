@@ -14,9 +14,9 @@ public:
 
     ~OverloadRelay();
 
-    void setCurrent(double value);
+    void setCurrent(double value) { current = value; }
 
-    double getState() const;
+    double getState() const { return state; }
 
 private:
 

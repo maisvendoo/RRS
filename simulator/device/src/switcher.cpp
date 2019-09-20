@@ -1,5 +1,8 @@
 #include "switcher.h"
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Switcher::Switcher(QObject* parent) : Device(parent)
   , keyCode(0)
   , state(0)
@@ -9,13 +12,22 @@ Switcher::Switcher(QObject* parent) : Device(parent)
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Switcher::~Switcher()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Switcher::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
     if (getKeyState(keyCode))
     {
         if (p)
@@ -29,9 +41,7 @@ void Switcher::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double 
         }
     }
     else
-    {
         p = true;
-    }
 }
 
 
