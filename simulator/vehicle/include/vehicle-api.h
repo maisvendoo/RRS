@@ -14,5 +14,6 @@
 #include    "automatic-train-stop.h"
 #include    "traction-controller.h"
 #include    "train-horn.h"
+#include    "switcher.h"
 
 #endif // VEHICLE_API_H

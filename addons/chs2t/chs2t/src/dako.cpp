@@ -72,11 +72,3 @@ void Dako::load_config(CfgReader& cfg)
     cfg.getDouble(secName, "k3", k_3);
     cfg.getDouble(secName, "k4", k_4);
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Dako::preStep(state_vector_t& Y, double t)
-{
-
-}

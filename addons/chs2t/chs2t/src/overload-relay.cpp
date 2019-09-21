@@ -22,19 +22,6 @@ OverloadRelay::~OverloadRelay()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void OverloadRelay::setCurrent(double value)
-{
-    current = value;
-}
-
-double OverloadRelay::getState() const
-{
-    return state;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void OverloadRelay::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)

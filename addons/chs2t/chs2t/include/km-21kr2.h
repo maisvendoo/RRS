@@ -38,9 +38,9 @@ private:
     bool k01;
     bool k02;
 
-    int n;
-    int p;
-    int re;
+    bool n;
+    bool p;
+    bool re;
     bool hod;
     int fieldStep;
     int reverseState;

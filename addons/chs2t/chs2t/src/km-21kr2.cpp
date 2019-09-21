@@ -11,10 +11,10 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , k01(false)
   , k02(false)
 
-  , n(0)
-  , p(0)
-  , re(0)
-  , hod(0)
+  , n(false)
+  , p(false)
+  , re(false)
+  , hod(false)
   , fieldStep(0)
   , reverseState(0)
   , mainShaftPos(0.0)
@@ -35,7 +35,9 @@ Km21KR2::~Km21KR2()
 //------------------------------------------------------------------------------
 void Km21KR2::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
 }
 
 //------------------------------------------------------------------------------
@@ -43,6 +45,7 @@ void Km21KR2::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t
 //------------------------------------------------------------------------------
 void Km21KR2::load_config(CfgReader& cfg)
 {
+    Q_UNUSED(cfg)
 
 }
 
@@ -51,7 +54,8 @@ void Km21KR2::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void Km21KR2::preStep(state_vector_t& Y, double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
 }
 
 //------------------------------------------------------------------------------
@@ -59,18 +63,21 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void Km21KR2::stepKeysControl(double t, double dt)
 {
-    if (getKeyState(KEY_W) && reverseState != 1 && re == 0)
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    if (getKeyState(KEY_W) && reverseState != 1 && !re)
     {
         reverseState += 1;
-        re = 1;
+        re = true;
     }
-    if (getKeyState(KEY_S) && reverseState != -1 && re == 0)
+    if (getKeyState(KEY_S) && reverseState != -1 && !re)
     {
         reverseState -= 1;
-        re = 1;
+        re = true;
     }
     if (!getKeyState(KEY_W) && !getKeyState(KEY_S))
-        re = 0;
+        re = false;
 
     if (reverseState == 0)
         return;
@@ -79,17 +86,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
     if (getKeyState(KEY_D))
     {
         if (isControl())
-        {
-            n = 0;
-        }
+            n = false;
         else
         {
-            if (isShift() && fieldStep != 0 && p == 0 && hod)
+            if (isShift() && fieldStep != 0 && !p && hod)
             {
                 fieldStep -= 1;
-                p = 1;
+                p = true;
             }
-            else if (n == 0 && !isShift())
+            else if (!n && !isShift())
             {
                 k21 = false;
                 k22 = false;
@@ -103,12 +108,12 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // 1 вниз
     if (getKeyState(KEY_A))
     {
-        if(isShift() && fieldStep != 5 && p == 0 && hod)
+        if(isShift() && fieldStep != 5 && !p && hod)
         {
             fieldStep += 1;
-            p = 1;
+            p = true;
         }
-        else if(n == 0 && !isShift())
+        else if(!n && !isShift())
         {
             k21 = false;
             k22 = true;
@@ -118,10 +123,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
         }
     }
 
-    if (n == 1)
-    {
+    if (n)
         return;
-    }
 
     // Авт. набор
     if (getKeyState(KEY_Q))
@@ -139,7 +142,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k21 = true;
         k22 = false;
         k23 = false;
-        n = 1;
+        n = true;
 
         mainShaftPos = 1.0;
     }
@@ -148,7 +151,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
     if (!getKeyState(KEY_Q) && !getKeyState(KEY_E) &&
         !getKeyState(KEY_A) && !getKeyState(KEY_D))
     {
-        p = 0;
+        p = false;
         k21 = true;
         k22 = true;
         k23 = false;
@@ -156,9 +159,9 @@ void Km21KR2::stepKeysControl(double t, double dt)
         mainShaftPos = 0.0;
     }
 
-    controlState.up = k21 * k23;
-    controlState.up1 = !k21 * k23;
-    controlState.zero = k22 * !k23;
-    controlState.down1 = !k21 * !k22;
-    controlState.down = k21 * !k22;
+    controlState.up = (k21 && k23);
+    controlState.up1 = (!k21 && k23);
+    controlState.zero = (k22 && !k23);
+    controlState.down1 = (!k21 && !k22);
+    controlState.down = (k21 && !k22);
 }

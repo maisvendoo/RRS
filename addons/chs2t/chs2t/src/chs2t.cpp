@@ -47,6 +47,17 @@ void CHS2T::initPantographs()
         pantographs[i] = new Pantograph();
         pantographs[i]->read_custom_config(config_dir + QDir::separator() + "pantograph");
     }
+
+    pantographs[0]->setUks(Uks);
+    pantographs[1]->setUks(Uks);
+
+    panto1Switcher = new Switcher();
+    panto1Switcher->setKeyCode(KEY_I);
+    panto1Switcher->setKolStates(4);
+
+    panto2Switcher = new Switcher();
+    panto2Switcher->setKeyCode(KEY_O);
+    panto2Switcher->setKolStates(4);
 }
 
 //------------------------------------------------------------------------------
@@ -109,6 +120,7 @@ void CHS2T::initTractionControl()
     km21KR2 = new Km21KR2();
 
     stepSwitch = new StepSwitch();
+    stepSwitch->read_custom_config(config_dir + QDir::separator() + "step-switch");
 
     motor = new Engine();
     motor->setCustomConfigDir(config_dir);
@@ -140,7 +152,6 @@ void CHS2T::initBrakesEquipment(QString module_path)
 
     rd304 = new PneumoReley();
     rd304->read_config("rd304");
-
 }
 
 
@@ -203,8 +214,14 @@ void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 void CHS2T::stepPantographs(double t, double dt)
 {
-    pantographs[0]->setUks(Uks);
-    pantographs[1]->setUks(Uks);
+    panto1Switcher->setControl(keys);
+    panto1Switcher->step(t, dt);
+
+    panto2Switcher->setControl(keys);
+    panto2Switcher->step(t, dt);
+
+    pantographs[0]->setState(hs_p(panto1Switcher->getState() - 1));
+    pantographs[1]->setState(hs_p(panto2Switcher->getState() - 1));
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
         pantographs[i]->step(t, dt);
@@ -234,7 +251,8 @@ void CHS2T::stepBrakesMech(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepFastSwitch(double t, double dt)
 {
-    bistV->setU_in(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
+    bistV->setU_in(max(pantographs[0]->getUout() * !hs_p(panto1Switcher->getState() - 2) ,
+                       pantographs[1]->getUout() * !hs_p(panto2Switcher->getState() - 2)));
     bistV->setHoldingCoilState(getHoldingCoilState());
     bv_return = getHoldingCoilState() && bv_return;
     bistV->setReturn(bv_return);
@@ -322,7 +340,6 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     dako->setPtc(zpk->getPressure1());
     dako->setQvr(airDistr->getBrakeCylinderAirFlow());
     dako->setU(velocity);
-    //dako->setQ1(locoCrane->getBrakeCylinderFlow());
     dako->setPkvt(zpk->getPressure2());
 
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
@@ -470,12 +487,6 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::keyProcess()
 {
-    if (getKeyState(KEY_O))
-        pantographs[0]->setState(isShift());
-
-    if (getKeyState(KEY_I))
-        pantographs[1]->setState(isShift());
-
     if (getKeyState(KEY_P))
     {
         bistV->setState(isShift());
