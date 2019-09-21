@@ -46,6 +46,7 @@ void CHS2T::initPantographs()
     {
         pantographs[i] = new Pantograph();
         pantographs[i]->read_custom_config(config_dir + QDir::separator() + "pantograph");
+        connect(pantographs[i], &Pantograph::soundPlay, this, &CHS2T::soundPlay);
     }
 }
 
@@ -143,7 +144,14 @@ void CHS2T::initBrakesEquipment(QString module_path)
 
 }
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::initOtherEquipment()
+{
+    horn = new TrainHorn();
+    connect(horn, &TrainHorn::soundSetVolume, this, &CHS2T::soundSetVolume);
+}
 
 //------------------------------------------------------------------------------
 // Инициализация регистратора
@@ -180,6 +188,8 @@ void CHS2T::initialization()
     initTractionControl();
 
     initBrakesEquipment(modules_dir);
+
+    initOtherEquipment();
 
     initRegistrator();
 }
@@ -450,6 +460,9 @@ void CHS2T::step(double t, double dt)
     stepSignals();
 
     registrate(t, dt);
+
+    horn->setControl(keys);
+    horn->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

@@ -107,12 +107,9 @@ private:
 
     PneumoSplitter *pnSplit;
 
-
-
+    TrainHorn   *horn;
 
     double charging_press;
-
-
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -144,6 +141,7 @@ private:
 
     void initBrakesEquipment(QString module_path);
 
+    void initOtherEquipment();
 
     void initRegistrator();
 
