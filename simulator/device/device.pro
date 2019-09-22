@@ -9,7 +9,7 @@ TARGET = device
 
 DESTDIR = ../../../lib
 
-CONFIG += force_debug_info
+#CONFIG += force_debug_info
 
 CONFIG(debug, debug|release) {
 

@@ -252,7 +252,7 @@ void VL60::initOtherEquipment()
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
 
-    reg = new Registrator("brakes");
+    //reg = new Registrator("brakes");
 }
 
 //------------------------------------------------------------------------------
@@ -342,7 +342,7 @@ void VL60::stepOtherEquipment(double t, double dt)
 
     debugPrint(t);
 
-    registration(t, dt);
+    //registration(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -774,7 +774,7 @@ void VL60::registration(double t, double dt)
             .arg(pTM * Physics::g);
 
 
-    reg->print(line, t, dt);
+    //reg->print(line, t, dt);
 }
 
 //------------------------------------------------------------------------------

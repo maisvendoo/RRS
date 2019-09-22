@@ -1,5 +1,5 @@
 #define Name          "RRS"
-#define Version       "1.0.1"
+#define Version       "1.0.3"
 #define arch          "x86_64"
 #define Publisher     "maisvendoo"
 
@@ -66,7 +66,7 @@ Source: "{#ThemesDir}\*.*"; DestDir: "{app}\themes"; Flags: ignoreversion recurs
 Source: "{#FontsDir}\*.*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#DocsDir}\*.*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#RRS_DEV_ROOT}\LICENSE"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
-Source: "{#RRS_DEV_ROOT}\LICENSE-Russian"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
+Source: "{#RRS_DEV_ROOT}\LICENSE-Russian"; DestDir: "{app}\LICENSE-Russian"; Flags: ignoreversion
 
 
 [Icons]
