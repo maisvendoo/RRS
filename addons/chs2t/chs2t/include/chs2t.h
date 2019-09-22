@@ -109,7 +109,23 @@ private:
 
     TrainHorn   *horn;
 
+    std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
+
+    /// Галетник управления БВ
+    Switcher    *fastSwitchSw;
+
     double charging_press;
+
+    double U_kr;
+
+    /// Разъединители токоприемников
+    std::array<Trigger, NUM_PANTOGRAPHS> pant_switch;
+
+    /// Тригеры поднятия/опускания ТП
+    std::array<Trigger, NUM_PANTOGRAPHS> pantup_trigger;
+
+    /// Тригер включения БВ
+    Trigger     fast_switch_trigger;
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 

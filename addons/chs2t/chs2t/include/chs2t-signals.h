@@ -40,9 +40,15 @@ enum
     SIGLIGHT_MK = 35,
     SIGLIGHT_ACCUM2 = 36,
     SIGLIGHT_ACCUM1 = 37,
+    SIGLIGHT_RAZED = 38,
 
     PANT1 = 40,
     PANT2 = 41,
+
+    SW_PNT1 = 42,
+    SW_PNT2 = 43,
+    INDICATOR_BV = 44,
+    SW_BV = 45,
 
     WHEEL_1 = 194,
     WHEEL_2 = 195,

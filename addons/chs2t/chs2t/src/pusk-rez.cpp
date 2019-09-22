@@ -23,7 +23,9 @@ PuskRez::~PuskRez()
 //------------------------------------------------------------------------------
 void PuskRez::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
 }
 
 //------------------------------------------------------------------------------
@@ -43,7 +45,8 @@ void PuskRez::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 void PuskRez::preStep(state_vector_t& Y, double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
 }
 
 //------------------------------------------------------------------------------
@@ -51,7 +54,8 @@ void PuskRez::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void PuskRez::stepKeysControl(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
 
     R = steps[poz];
-
 }

@@ -6,11 +6,11 @@
 //------------------------------------------------------------------------------
 struct ControllerState
 {
-    double up;
-    double up1;
-    double zero;
-    double down1;
-    double down;
+    bool up;
+    bool up1;
+    bool zero;
+    bool down1;
+    bool down;
 
     ControllerState()
         : up(0)
