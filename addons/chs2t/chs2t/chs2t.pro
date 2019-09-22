@@ -35,3 +35,5 @@ INCLUDEPATH += ../../../filesystem/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
+
+#CONFIG += force_debug_info

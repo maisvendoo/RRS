@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <GV>
+    <Device>
+        <Order>2</Order>
         <Vn>3.33</Vn>
         <Vdk>1e-3</Vdk>
         <Fk>1.1</Fk>
         <Fp>1.0</Fp>
         <K1>1e-3</K1>
         <K2>1e-3</K2>
-        <tVZ>0.3</tVZ>
-    </GV>
-    
-    <Device>
-        <Order>2</Order>
+        <tVZ>0.3</tVZ>    
     </Device>
 </Config>

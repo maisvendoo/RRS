@@ -119,7 +119,7 @@ void Model::start()
     {
         is_simulation_started = true;
         t = start_time;
-        this->startTimer(integration_time_interval);
+        this->startTimer(integration_time_interval, Qt::TimerType::PreciseTimer);
     }
 }
 
@@ -505,7 +505,7 @@ void Model::timerEvent(QTimerEvent *event)
     Q_UNUSED(event)
 
     // Feedback to viewer
-    //sharedMemoryFeedback();
+    sharedMemoryFeedback();
 
     double tau = 0;
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
@@ -517,7 +517,7 @@ void Model::timerEvent(QTimerEvent *event)
         preStep(t);
 
         // Feedback to viewer
-        sharedMemoryFeedback();
+        //sharedMemoryFeedback();
 
         controlStep(control_time, control_delay);
 

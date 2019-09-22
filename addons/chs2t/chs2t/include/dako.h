@@ -24,9 +24,11 @@ public:
     void setQ1(double value) { Q1 = value; }
     void setPkvt(double value) { p_kvt = value; }
 
-    double getP1() const { return p1; }
-    double getPy() const { return py; }
+    double getP1() const { return getY(1); }
+    double getPy() const { return getY(0); }
     double getQtc() const { return Qtc; }
+
+private:
 
     double V1;
     double Vy;

@@ -22,17 +22,16 @@ public:
 
 private:
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
-    void load_config(CfgReader &cfg);
-    void preStep(state_vector_t &Y, double t);
-    void stepKeysControl(double t, double dt);
-
-
     int poz;
 
     double R;
 
     QMap<int, double> steps;
+
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    void load_config(CfgReader &cfg);
+    void preStep(state_vector_t &Y, double t);
+
 };
 
 #endif // PUSKREZ_H

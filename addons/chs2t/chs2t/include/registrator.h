@@ -28,7 +28,6 @@ private:
     QString path;
 
     QFile   *file;
-
 };
 
 

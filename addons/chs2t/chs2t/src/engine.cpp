@@ -88,8 +88,6 @@ void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     double R;
     R = R_r / n + R_a + R_gp * beta + R_dp;
     dYdt[0] = (U / n - R * Y[0] - calcCPhi(Y[0] * beta * direction) * omega) / L_af;
-
-
 }
 
 //------------------------------------------------------------------------------

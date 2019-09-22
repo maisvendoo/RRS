@@ -39,11 +39,9 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 
     Qtc = (pgr - ptc) * K4 * s7 - ptc * K3 * s9;
 
-    dYdt[0] = Qvr / Vy;
-    py = Y[0];
+    dYdt[0] = Qvr / Vy;    
 
-    dYdt[1] = ((p_kvt - Y[1]) * K1 * s2 - Y[1] * K2 * s4) / V1;
-    p1 = Y[1];
+    dYdt[1] = ((p_kvt - Y[1]) * K1 * s2 - Y[1] * K2 * s4) / V1;    
 }
 
 //------------------------------------------------------------------------------

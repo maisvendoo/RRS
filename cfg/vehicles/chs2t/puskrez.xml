@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Steps>
+    <Device>
         <s0>13.78</s0>
         <s1>13.78</s1>
         <s2>8.844</s2>
@@ -44,5 +44,5 @@
         <s40>0.22</s40>
         <s41>0.117</s41>
         <s42>0</s42>
-    </Steps>
+    </Device>
 </Config>

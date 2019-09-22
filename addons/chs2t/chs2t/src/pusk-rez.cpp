@@ -35,7 +35,7 @@ void PuskRez::load_config(CfgReader& cfg)
 {
     for (int i = 0; i < 43; i++)
     {
-        cfg.getDouble("Steps", "s" + QString::number(i), R);
+        cfg.getDouble("Device", "s" + QString::number(i), R);
         steps.insert(i, R);
     }
 }
@@ -47,15 +47,6 @@ void PuskRez::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PuskRez::stepKeysControl(double t, double dt)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
 
     R = steps[poz];
 }

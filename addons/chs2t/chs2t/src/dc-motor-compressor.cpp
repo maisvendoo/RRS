@@ -21,7 +21,7 @@ DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
   , Vnk(0.05)
 
 {
-    std::fill(K.begin(), K.end(), 0);
+
 }
 
 //------------------------------------------------------------------------------
@@ -72,11 +72,13 @@ void DCMotorCompressor::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void DCMotorCompressor::load_config(CfgReader &cfg)
 {
-        QString secName = "Device";
+    QString secName = "Device";
 
-        for (size_t i = 1; i < K.size(); ++i)
-        {
-            QString coeff = QString("K%1").arg(i);
-            cfg.getDouble(secName, coeff, K[i]);
-        }
+    std::fill(K.begin(), K.end(), 0);
+
+    for (size_t i = 1; i < K.size(); ++i)
+    {
+        QString coeff = QString("K%1").arg(i);
+        cfg.getDouble(secName, coeff, K[i]);
+    }
 }

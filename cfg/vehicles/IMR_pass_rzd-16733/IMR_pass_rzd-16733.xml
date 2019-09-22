@@ -14,7 +14,7 @@
                 <ExtModelName>IMR_pass_rzd/Pass_CupAmm7.osgt</ExtModelName>
 
                 <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-                <BrakeMechConfig>carbrakes-mech</BrakeMechConfig>
+                <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
                 <AirDistModule>vr242</AirDistModule>
                 <AirDistConfig>vr242</AirDistConfig>

@@ -176,7 +176,7 @@ void CHS2T::initOtherEquipment()
 //------------------------------------------------------------------------------
 void CHS2T::initRegistrator()
 {
-    reg = new Registrator("trackforce", 0.1, Q_NULLPTR);
+    //reg = new Registrator("trackforce", 0.1, Q_NULLPTR);
 }
 
 
@@ -522,7 +522,7 @@ void CHS2T::step(double t, double dt)
 
     stepSignals();
 
-    registrate(t, dt);
+    //registrate(t, dt);
 
     horn->setControl(keys);
     horn->step(t, dt);
