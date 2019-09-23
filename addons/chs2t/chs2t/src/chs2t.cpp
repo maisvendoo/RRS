@@ -130,7 +130,7 @@ void CHS2T::initTractionControl()
     stepSwitch = new StepSwitch();
     stepSwitch->read_custom_config(config_dir + QDir::separator() + "step-switch");
 
-    motor = new Engine();
+    motor = new Motor();
     motor->setCustomConfigDir(config_dir);
     motor->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
 
@@ -160,6 +160,16 @@ void CHS2T::initBrakesEquipment(QString module_path)
 
     rd304 = new PneumoReley();
     rd304->read_config("rd304");
+}
+
+void CHS2T::initEDB()
+{
+    generator = new Generator();
+    generator->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
+
+    pulseConv = new PulseConverter();
+
+    BrakeReg = new BrakeRegulator();
 }
 
 //------------------------------------------------------------------------------
@@ -206,6 +216,8 @@ void CHS2T::initialization()
     initTractionControl();
 
     initBrakesEquipment(modules_dir);
+
+    initEDB();
 
     initOtherEquipment();
 
@@ -424,6 +436,23 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     rd304->step(t, dt);
 }
 
+void CHS2T::stepEDB(double t, double dt)
+{
+    pulseConv->setUakb(110.0);
+    pulseConv->setU(BrakeReg->getU());
+    pulseConv->setUt(generator->getUt());
+
+    generator->setUf(pulseConv->getUf());
+
+    BrakeReg->setIa(generator->getIa());
+    BrakeReg->setIf(generator->getIf());
+    BrakeReg->setBref(0);
+
+    pulseConv->step(t, dt);
+    generator->step(t, dt);
+    BrakeReg->step(t, dt);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -517,6 +546,8 @@ void CHS2T::step(double t, double dt)
     stepBrakesMech(t , dt);
 
     stepBrakesEquipment(t, dt);
+
+    stepEDB(t, dt);
 
     stepDebugMsg(t, dt);
 

@@ -19,13 +19,16 @@
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
-#include    "engine.h"
+#include    "motor.h"
 #include    "registrator.h"
 #include    "overload-relay.h"
 #include    "dc-motor-compressor.h"
 #include    "pressure-regulator.h"
 #include    "chs2t-brake-mech.h"
 #include    "dako.h"
+#include    "generator.h"
+#include    "pulse-converter.h"
+#include    "brake-regulator.h"
 
 /*!
  * \class
@@ -53,7 +56,7 @@ private:
     };
 
     /// Тяговый электродвигатель
-    Engine *motor;
+    Motor *motor;
 
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
@@ -109,6 +112,12 @@ private:
 
     TrainHorn   *horn;
 
+    Generator   *generator;
+
+    PulseConverter  *pulseConv;
+
+    BrakeRegulator  *BrakeReg;
+
     std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
 
     /// Галетник управления БВ
@@ -157,6 +166,8 @@ private:
 
     void initBrakesEquipment(QString module_path);
 
+    void initEDB();
+
     void initOtherEquipment();
 
     void initRegistrator();
@@ -182,6 +193,8 @@ private:
     void stepBrakesControl(double t, double dt);
 
     void stepBrakesEquipment(double t, double dt);
+
+    void stepEDB(double t, double dt);
 
     void stepDebugMsg(double t, double dt);
 
