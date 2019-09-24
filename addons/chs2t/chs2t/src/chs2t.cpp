@@ -114,6 +114,7 @@ void CHS2T::initAirSupplySubsystem()
 {
     mainReservoir = new Reservoir(1);
     spareReservoir = new Reservoir(0.078);
+    brakeRefRes = new Reservoir(0.008);
 
     motor_compressor = new DCMotorCompressor();
     motor_compressor->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
@@ -165,11 +166,14 @@ void CHS2T::initBrakesEquipment(QString module_path)
 void CHS2T::initEDB()
 {
     generator = new Generator();
+    generator->setCustomConfigDir(config_dir);
     generator->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
 
     pulseConv = new PulseConverter();
 
     BrakeReg = new BrakeRegulator();
+
+
 }
 
 //------------------------------------------------------------------------------
@@ -350,7 +354,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     motor->setBetaStep(km21KR2->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());
-    motor->setU(bistV->getU_out() * stepSwitch->getSchemeState());
+    motor->setU(bistV->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT));
     motor->setOmega(wheel_omega[0] * ip);
     motor->setAmpermetersState(stepSwitch->getAmpermetersState());
     motor->step(t, dt);
@@ -397,7 +401,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     dako->setPgr(mainReservoir->getPressure());
     dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airDistr->getBrakeCylinderAirFlow());
+    dako->setQvr(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(!EDBValve.getState()));
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
 
@@ -411,7 +415,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
 
-    airDistr->setBrakeCylinderPressure(dako->getPy());
+    airDistr->setBrakeCylinderPressure(dako->getPy() * static_cast<double>(!EDBValve.getState()) + brakeRefRes->getPressure() * static_cast<double>(EDBValve.getState()));
     airDistr->setBrakepipePressure(pTM);
     airDistr->setAirSupplyPressure(spareReservoir->getPressure());
 
@@ -427,6 +431,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     pnSplit->setP_out1(brakesMech[0]->getBrakeCylinderPressure());
     pnSplit->setQ_in(zpk->getOutputFlow());
 
+    brakeRefRes->setAirFlow(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(EDBValve.getState()));
+
+    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
+
     dako->step(t, dt);
     locoCrane->step(t, dt);
     zpk->step(t, dt);
@@ -434,13 +442,14 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     spareReservoir->step(t, dt);
     pnSplit->step(t, dt);
     rd304->step(t, dt);
+    brakeRefRes->step(t, dt);
 }
 
 void CHS2T::stepEDB(double t, double dt)
 {
-    pulseConv->setUakb(110.0);
+    pulseConv->setUakb(110.0 * static_cast<double>(EDT));
     pulseConv->setU(BrakeReg->getU());
-    pulseConv->setUt(generator->getUt());
+    pulseConv->setUt(generator->getUt() * static_cast<double>(EDT));
 
     generator->setUf(pulseConv->getUf());
 
@@ -487,7 +496,7 @@ void CHS2T::stepSignals()
 
     analogSignal[STRELKA_PM] = static_cast<float>(mainReservoir->getPressure() / 1.6);
     analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);
-    analogSignal[STRELKA_EDT] = 0.0f;
+    analogSignal[STRELKA_EDT] = static_cast<float>(brakeRefRes->getPressure() / 1.0);
     analogSignal[STRELKA_UR] = static_cast<float>(brakeCrane->getEqReservoirPressure() / 1.0);
     analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.0);
 
@@ -584,6 +593,16 @@ void CHS2T::keyProcess()
         else
         {
             mk_tumbler.reset();
+        }
+    }
+
+    if (getKeyState(KEY_9))
+    {
+        if (isShift())
+            EDBValve.set();
+        else
+        {
+            EDBValve.reset();
         }
     }
 }

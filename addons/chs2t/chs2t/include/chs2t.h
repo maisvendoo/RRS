@@ -88,6 +88,8 @@ private:
 
     Reservoir *spareReservoir;
 
+    Reservoir *brakeRefRes;
+
     PressureRegulator *pressReg;
 
     DCMotorCompressor *motor_compressor;
@@ -135,6 +137,8 @@ private:
 
     /// Тригер включения БВ
     Trigger     fast_switch_trigger;
+
+    Trigger     EDBValve;
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -203,6 +207,7 @@ private:
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
+    bool EDT;
 };
 
 #endif // CHS2T
