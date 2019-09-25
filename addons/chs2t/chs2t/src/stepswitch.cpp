@@ -164,7 +164,6 @@ void StepSwitch::stepKeysControl(double t, double dt)
     poz = static_cast<int>(poz_d);
 
 
-
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
 

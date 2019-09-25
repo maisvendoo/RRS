@@ -457,13 +457,14 @@ void CHS2T::stepEDB(double t, double dt)
     pulseConv->setU(BrakeReg->getU());
     pulseConv->setUt(generator->getUt() * static_cast<double>(EDT));
 
+
     generator->setUf(pulseConv->getUf());
     generator->setOmega(wheel_omega[0] * ip);
     generator->setRt(puskRez->getStepR(34) / 2);
 
     BrakeReg->setIa(generator->getIa());
     BrakeReg->setIf(generator->getIf());
-    BrakeReg->setBref(0);
+    BrakeReg->setBref(brakeRefRes->getPressure());
 
     EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
 

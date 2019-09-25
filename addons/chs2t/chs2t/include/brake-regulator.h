@@ -26,6 +26,9 @@ private:
     double Bref;
     double u;
 
+    double k1;
+    double k2;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void preStep(state_vector_t &Y, double t);
