@@ -140,6 +140,10 @@ private:
 
     Trigger     EDBValve;
 
+    Trigger     allowTrac;
+
+    double      ip;
+
     void initBrakeDevices(double p0, double pTM, double pFL);
 
     /// Загрузка данных из конфигурационных файлов

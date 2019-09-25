@@ -29,6 +29,8 @@ CHS2T::CHS2T() : Vehicle()
     Uks = 3000;
 
     U_kr = 0;
+
+    EDT = false;
 }
 
 //------------------------------------------------------------------------------
@@ -295,15 +297,16 @@ void CHS2T::stepBrakesMech(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepFastSwitch(double t, double dt)
 {
+    bistV->setHoldingCoilState(getHoldingCoilState());
+    bv_return = getHoldingCoilState() && bv_return;
+    bistV->setReturn(bv_return);
+
     U_kr = max(pantographs[0]->getUout() * pant_switch[0].getState() ,
             pantographs[1]->getUout() * pant_switch[1].getState());
 
     bistV->setU_in(U_kr);
 
     bistV->setState(fast_switch_trigger.getState());
-    bistV->setHoldingCoilState(getHoldingCoilState());
-    bv_return = getHoldingCoilState() && bv_return;
-    bistV->setReturn(bv_return);
     bistV->step(t, dt);
 
     if (fastSwitchSw->getState() == 3)
@@ -336,7 +339,7 @@ void CHS2T::stepProtection(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepTractionControl(double t, double dt)
 {
-    double ip = 1.75;
+    ip = 1.75;
 
 
     km21KR2->setHod(stepSwitch->getHod());
@@ -350,11 +353,16 @@ void CHS2T::stepTractionControl(double t, double dt)
     puskRez->setPoz(stepSwitch->getPoz());
     puskRez->step(t, dt);
 
+    if (EDT)
+        allowTrac.reset();
+    if (stepSwitch->getPoz() == 0)
+        allowTrac.set();
+
     motor->setDirection(km21KR2->getReverseState());
     motor->setBetaStep(km21KR2->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());
-    motor->setU(bistV->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT));
+    motor->setU(bistV->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT) * allowTrac.getState());
     motor->setOmega(wheel_omega[0] * ip);
     motor->setAmpermetersState(stepSwitch->getAmpermetersState());
     motor->step(t, dt);
@@ -363,7 +371,7 @@ void CHS2T::stepTractionControl(double t, double dt)
 
     for (size_t i = 0; i <= Q_a.size(); ++i)
     {
-        Q_a[i] = motor->getTorque() * ip;
+        Q_a[i] = (motor->getTorque() + generator->getM()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
 }
@@ -433,8 +441,6 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     brakeRefRes->setAirFlow(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(EDBValve.getState()));
 
-    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
-
     dako->step(t, dt);
     locoCrane->step(t, dt);
     zpk->step(t, dt);
@@ -452,10 +458,14 @@ void CHS2T::stepEDB(double t, double dt)
     pulseConv->setUt(generator->getUt() * static_cast<double>(EDT));
 
     generator->setUf(pulseConv->getUf());
+    generator->setOmega(wheel_omega[0] * ip);
+    generator->setRt(puskRez->getStepR(34) / 2);
 
     BrakeReg->setIa(generator->getIa());
     BrakeReg->setIf(generator->getIf());
     BrakeReg->setBref(0);
+
+    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
 
     pulseConv->step(t, dt);
     generator->step(t, dt);
@@ -469,7 +479,7 @@ void CHS2T::stepDebugMsg(double t, double dt)
 {
     Q_UNUSED(dt)
 
-    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11" )
+    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11 " )
         .arg(t, 10, 'f', 1)
         .arg(bistV->getU_out(), 4, 'f', 0)
         .arg(stepSwitch->getPoz(), 2)
@@ -491,8 +501,17 @@ void CHS2T::stepSignals()
     analogSignal[STRELKA_POS] = static_cast<float>(stepSwitch->getPoz()) / 42.0f;
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor->getI12() / 1000.0);
-    analogSignal[STRELKA_AMP2] = static_cast<float>(motor->getI34() / 1000.0);
-    analogSignal[STRELKA_AMP3] = static_cast<float>(motor->getI56() / 1000.0);
+
+    if (EDT)
+    {
+        analogSignal[STRELKA_AMP3] = static_cast<float>(abs(generator->getIa()) / 1000.0);
+        analogSignal[STRELKA_AMP2] = static_cast<float>(abs(generator->getIf()) / 1000.0);
+    }
+    else
+    {
+        analogSignal[STRELKA_AMP3] = static_cast<float>(motor->getI56() / 1000.0);
+        analogSignal[STRELKA_AMP2] = static_cast<float>(motor->getI34() / 1000.0);
+    }
 
     analogSignal[STRELKA_PM] = static_cast<float>(mainReservoir->getPressure() / 1.6);
     analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);

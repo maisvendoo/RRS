@@ -21,13 +21,13 @@ public:
 
     void setRf(double value) { Rf = value; }
 
-    double getIf() const { return If; }
+    double getIf() const { return getY(0); }
 
     void setOmega(double value) { omega = value; }
 
     void setE(double value) { E = value; }
 
-    double getIa() const { return  Ia; }
+    double getIa() const { return  getY(1); }
 
     void setLa(double value) { La = value; }
 
@@ -57,6 +57,8 @@ private:
     double Rdp;
 
     MotorMagneticChar cPhi;
+
+    void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

@@ -2,7 +2,7 @@
 
 BrakeRegulator::BrakeRegulator(QObject* parent) : Device(parent)
 {
-
+    u = 1.0;
 }
 
 BrakeRegulator::~BrakeRegulator()

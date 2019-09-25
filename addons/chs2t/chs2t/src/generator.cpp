@@ -3,13 +3,13 @@
 
 Generator::Generator(QObject* parent) : Device(parent)
   , Uf(0.0)
-  , Lf(0.0)
+  , Lf(0.001)
   , Rf(0.0)
   , If(0.0)
   , omega(0.0)
   , E(0.0)
   , Ia(0.0)
-  , La(0.0)
+  , La(0.001)
   , Ra(0.0)
   , Rt(0.0)
   , M(0.0)
@@ -23,25 +23,19 @@ Generator::~Generator()
 
 }
 
+void Generator::preStep(state_vector_t& Y, double t)
+{
+    M = calcCPhi((Y[0])) * Y[1];
+    Ut = Y[1] * Rt;
+}
+
 void Generator::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    double s1 = calcCPhi(Y[0]);
-    double s2 = s1 * omega;
+    E = calcCPhi(Y[0]) * omega;
 
-    E = s2;
+    dYdt[0] = (Uf - Y[0] * 6 * Rf) / Lf;
 
-    M = s1 * Y[1];
-
-    Ia = Y[1];
-
-    Ut = Y[1] * Rt;
-
-    If = Y[0];
-
-    dYdt[0] = (Uf - Y[0] * Rf) / Lf;
-
-    dYdt[1] = (s2 - Y[1] * (Ra + Rt)) / La;
-
+    dYdt[1] = -(E + Y[1] * (Ra + Rt)) / La;
 }
 
 void Generator::load_config(CfgReader& cfg)
