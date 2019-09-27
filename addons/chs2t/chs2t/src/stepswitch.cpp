@@ -154,7 +154,7 @@ void StepSwitch::stepKeysControl(double t, double dt)
         s = false;
     }
 
-    if ((getKeyState(KEY_Z) || p ) && poz != 0)
+    if ((getKeyState(KEY_Z) || p ))
     {
         p = true;
         poz_d -= V1 * dt;

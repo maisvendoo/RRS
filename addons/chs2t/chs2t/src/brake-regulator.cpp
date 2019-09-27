@@ -3,7 +3,7 @@
 BrakeRegulator::BrakeRegulator(QObject* parent) : Device(parent)
 {
     u = 0.0;
-    k1 = 8e-4;
+    k1 = 1.6e-6;
     k2 = 1;
 
 }

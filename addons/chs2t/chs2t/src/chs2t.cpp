@@ -610,20 +610,18 @@ void CHS2T::keyProcess()
     {
         if (isShift())
             mk_tumbler.set();
+
         else
-        {
             mk_tumbler.reset();
-        }
     }
 
     if (getKeyState(KEY_9))
     {
         if (isShift())
             EDBValve.set();
+
         else
-        {
             EDBValve.reset();
-        }
     }
 }
 
