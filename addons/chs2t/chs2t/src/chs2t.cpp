@@ -165,7 +165,7 @@ void CHS2T::initBrakesEquipment(QString module_path)
     rd304->read_config("rd304");
 }
 
-void CHS2T::initEDB()
+void CHS2T::initEDT()
 {
     generator = new Generator();
     generator->setCustomConfigDir(config_dir);
@@ -223,7 +223,7 @@ void CHS2T::initialization()
 
     initBrakesEquipment(modules_dir);
 
-    initEDB();
+    initEDT();
 
     initOtherEquipment();
 
@@ -409,7 +409,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     dako->setPgr(mainReservoir->getPressure());
     dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(!EDBValve.getState()));
+    dako->setQvr(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(!EDTValve.getState()));
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
 
@@ -423,7 +423,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
 
-    airDistr->setBrakeCylinderPressure(dako->getPy() * static_cast<double>(!EDBValve.getState()) + brakeRefRes->getPressure() * static_cast<double>(EDBValve.getState()));
+    airDistr->setBrakeCylinderPressure(dako->getPy() * static_cast<double>(!EDTValve.getState()) + brakeRefRes->getPressure() * static_cast<double>(EDTValve.getState()));
     airDistr->setBrakepipePressure(pTM);
     airDistr->setAirSupplyPressure(spareReservoir->getPressure());
 
@@ -439,7 +439,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     pnSplit->setP_out1(brakesMech[0]->getBrakeCylinderPressure());
     pnSplit->setQ_in(zpk->getOutputFlow());
 
-    brakeRefRes->setAirFlow(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(EDBValve.getState()));
+    brakeRefRes->setAirFlow(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(EDTValve.getState()));
 
     dako->step(t, dt);
     locoCrane->step(t, dt);
@@ -451,22 +451,24 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     brakeRefRes->step(t, dt);
 }
 
-void CHS2T::stepEDB(double t, double dt)
+void CHS2T::stepEDT(double t, double dt)
 {
     pulseConv->setUakb(110.0 * static_cast<double>(EDT));
     pulseConv->setU(BrakeReg->getU());
     pulseConv->setUt(generator->getUt() * static_cast<double>(EDT));
 
-
     generator->setUf(pulseConv->getUf());
     generator->setOmega(wheel_omega[0] * ip);
-    generator->setRt(puskRez->getStepR(34) / 2);
+    generator->setRt(3.35);
 
     BrakeReg->setIa(generator->getIa());
     BrakeReg->setIf(generator->getIf());
     BrakeReg->setBref(brakeRefRes->getPressure());
 
-    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
+    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07)) && dako->isEDTAllow();
+
+    if (!dako->isEDTAllow())
+        EDTValve.reset();
 
     pulseConv->step(t, dt);
     generator->step(t, dt);
@@ -480,7 +482,7 @@ void CHS2T::stepDebugMsg(double t, double dt)
 {
     Q_UNUSED(dt)
 
-    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11 " )
+    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11 E = %12" )
         .arg(t, 10, 'f', 1)
         .arg(bistV->getU_out(), 4, 'f', 0)
         .arg(stepSwitch->getPoz(), 2)
@@ -491,7 +493,8 @@ void CHS2T::stepDebugMsg(double t, double dt)
         .arg(brakeCrane->getBrakePipeInitPressure(), 3, 'f', 2)
         .arg(brakeCrane->getPositionName(), 3)
         .arg(brakesMech[0]->getShoeForce() / 1000, 3, 'f', 2)
-            .arg(velocity * Physics::kmh, 3, 'f', 2);
+        .arg(velocity * Physics::kmh, 3, 'f', 2)
+        .arg(EDT);
 }
 
 //------------------------------------------------------------------------------
@@ -576,7 +579,7 @@ void CHS2T::step(double t, double dt)
 
     stepBrakesEquipment(t, dt);
 
-    stepEDB(t, dt);
+    stepEDT(t, dt);
 
     stepDebugMsg(t, dt);
 
@@ -618,10 +621,9 @@ void CHS2T::keyProcess()
     if (getKeyState(KEY_9))
     {
         if (isShift())
-            EDBValve.set();
-
+            EDTValve.set();
         else
-            EDBValve.reset();
+            EDTValve.reset();
     }
 }
 

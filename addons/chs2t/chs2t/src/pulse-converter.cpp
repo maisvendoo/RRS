@@ -21,5 +21,5 @@ void PulseConverter::ode_system(const state_vector_t& Y, state_vector_t& dYdt, d
 
 void PulseConverter::preStep(state_vector_t& Y, double t)
 {
-    Uf = max(Uakb, Ut) * u;
+    Uf = cut(max(Uakb, cut(abs(Ut), 0.0, 110.0)) * u, 0.0, 107.0);
 }

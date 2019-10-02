@@ -28,6 +28,8 @@ public:
     double getPy() const { return getY(0); }
     double getQtc() const { return Qtc; }
 
+    bool isEDTAllow() const { return  EDT_state; }
+
 private:
 
     double V1;
@@ -59,7 +61,11 @@ private:
     double k_3;
     double k_4;
 
+    bool EDT_state;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+
+    void preStep(state_vector_t &Y, double t);
 
     /// Загрузка данных из конфигурационных файлов
     void load_config(CfgReader &cfg); 

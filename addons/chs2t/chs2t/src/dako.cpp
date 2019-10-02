@@ -32,6 +32,8 @@ Dako::Dako(QObject* parent) : Device(parent)
   , k_2(0.0)
   , k_3(0.0)
   , k_4(0.0)
+
+  , EDT_state(false)
 {
 
 }
@@ -69,8 +71,15 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 
     dYdt[0] = Qvr / Vy;    
 
-    dYdt[1] = ((p_kvt - Y[1]) * K1 * s2 - Y[1] * K2 * s4) / V1;    
+    dYdt[1] = ((p_kvt - Y[1]) * K1 * s2 - Y[1] * K2 * s4) / V1;
 }
+
+void Dako::preStep(state_vector_t& Y, double t)
+{
+    EDT_state = (U * Physics::kmh > 50);
+}
+
+
 
 //------------------------------------------------------------------------------
 //

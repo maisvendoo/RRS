@@ -138,7 +138,7 @@ private:
     /// Тригер включения БВ
     Trigger     fast_switch_trigger;
 
-    Trigger     EDBValve;
+    Trigger     EDTValve;
 
     Trigger     allowTrac;
 
@@ -174,7 +174,7 @@ private:
 
     void initBrakesEquipment(QString module_path);
 
-    void initEDB();
+    void initEDT();
 
     void initOtherEquipment();
 
@@ -202,7 +202,7 @@ private:
 
     void stepBrakesEquipment(double t, double dt);
 
-    void stepEDB(double t, double dt);
+    void stepEDT(double t, double dt);
 
     void stepDebugMsg(double t, double dt);
 
