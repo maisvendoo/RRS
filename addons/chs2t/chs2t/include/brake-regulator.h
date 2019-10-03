@@ -20,6 +20,8 @@ public:
 
     double getU() const { return u; }
 
+    void setAllowEDT(bool value) { allowEDT = value; }
+
 private:
     double Ia;
     double If;
@@ -28,6 +30,8 @@ private:
 
     double k1;
     double k2;
+
+    bool allowEDT;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

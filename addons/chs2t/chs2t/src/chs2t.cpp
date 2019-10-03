@@ -116,7 +116,7 @@ void CHS2T::initAirSupplySubsystem()
 {
     mainReservoir = new Reservoir(1);
     spareReservoir = new Reservoir(0.078);
-    brakeRefRes = new Reservoir(0.008);
+    brakeRefRes = new Reservoir(0.004);
 
     motor_compressor = new DCMotorCompressor();
     motor_compressor->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
@@ -160,6 +160,9 @@ void CHS2T::initBrakesEquipment(QString module_path)
 
     pnSplit = new PneumoSplitter();
     pnSplit->read_config("pneumo-splitter");
+
+    airSplit = new PneumoSplitter();
+    airSplit->read_config("pneumo-splitter");
 
     rd304 = new PneumoReley();
     rd304->read_config("rd304");
@@ -402,16 +405,17 @@ void CHS2T::stepBrakesControl(double t, double dt)
     brakeCrane->setBrakePipePressure(pTM);
     brakeCrane->setControl(keys);
     p0 = brakeCrane->getBrakePipeInitPressure();
-    brakeCrane->step(t, dt);
-}
+    brakeCrane->step(t, dt);}
 
 void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     dako->setPgr(mainReservoir->getPressure());
     dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(!EDTValve.getState()));
+    dako->setQvr(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(!allowEDT));
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
+    dako->setQ1(airSplit->getQ_out1());
+
 
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
@@ -423,9 +427,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
 
-    airDistr->setBrakeCylinderPressure(dako->getPy() * static_cast<double>(!EDTValve.getState()) + brakeRefRes->getPressure() * static_cast<double>(EDTValve.getState()));
+    //airDistr->setBrakeCylinderPressure(dako->getPy() * static_cast<double>(!allowEDT) + brakeRefRes->getPressure() * static_cast<double>(allowEDT));
     airDistr->setBrakepipePressure(pTM);
     airDistr->setAirSupplyPressure(spareReservoir->getPressure());
+    airDistr->setBrakeCylinderPressure(airSplit->getP_in());
 
     spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
@@ -439,7 +444,11 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     pnSplit->setP_out1(brakesMech[0]->getBrakeCylinderPressure());
     pnSplit->setQ_in(zpk->getOutputFlow());
 
-    brakeRefRes->setAirFlow(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(EDTValve.getState()));
+    airSplit->setQ_in(airDistr->getBrakeCylinderAirFlow());
+    airSplit->setP_out1(dako->getP1());
+    airSplit->setP_out2(brakeRefRes->getPressure());
+
+    brakeRefRes->setAirFlow(airSplit->getQ_out2());
 
     dako->step(t, dt);
     locoCrane->step(t, dt);
@@ -449,6 +458,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     pnSplit->step(t, dt);
     rd304->step(t, dt);
     brakeRefRes->step(t, dt);
+    airSplit->step(t, dt);
 }
 
 void CHS2T::stepEDT(double t, double dt)
@@ -461,11 +471,14 @@ void CHS2T::stepEDT(double t, double dt)
     generator->setOmega(wheel_omega[0] * ip);
     generator->setRt(3.35);
 
+    BrakeReg->setAllowEDT(dako->isEDTAllow());
     BrakeReg->setIa(generator->getIa());
     BrakeReg->setIf(generator->getIf());
     BrakeReg->setBref(brakeRefRes->getPressure());
 
-    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07)) && dako->isEDTAllow();
+    allowEDT = EDTValve.getState();
+
+    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07)) && EDTValve.getState();
 
     if (!dako->isEDTAllow())
         EDTValve.reset();
@@ -482,7 +495,7 @@ void CHS2T::stepDebugMsg(double t, double dt)
 {
     Q_UNUSED(dt)
 
-    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11 E = %12" )
+    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11" )
         .arg(t, 10, 'f', 1)
         .arg(bistV->getU_out(), 4, 'f', 0)
         .arg(stepSwitch->getPoz(), 2)
@@ -493,12 +506,10 @@ void CHS2T::stepDebugMsg(double t, double dt)
         .arg(brakeCrane->getBrakePipeInitPressure(), 3, 'f', 2)
         .arg(brakeCrane->getPositionName(), 3)
         .arg(brakesMech[0]->getShoeForce() / 1000, 3, 'f', 2)
-        .arg(velocity * Physics::kmh, 3, 'f', 2)
-        .arg(EDT);
+        .arg(velocity * Physics::kmh, 3, 'f', 2);
 }
 
-//------------------------------------------------------------------------------
-//
+//------------------------------------------------------------------------------//
 //------------------------------------------------------------------------------
 void CHS2T::stepSignals()
 {

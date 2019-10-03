@@ -15,7 +15,7 @@ BrakeRegulator::~BrakeRegulator()
 
 void BrakeRegulator::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    dYdt[0] = (Bref * k1 - abs(Ia)) * k2;
+    dYdt[0] = (Bref * k1 * allowEDT - abs(Ia)) * k2;
 }
 
 void BrakeRegulator::preStep(state_vector_t& Y, double t)

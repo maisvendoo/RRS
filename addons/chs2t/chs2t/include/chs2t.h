@@ -112,6 +112,8 @@ private:
 
     PneumoSplitter *pnSplit;
 
+    PneumoSplitter *airSplit;
+
     TrainHorn   *horn;
 
     Generator   *generator;
@@ -143,6 +145,10 @@ private:
     Trigger     allowTrac;
 
     double      ip;
+
+    bool EDT;
+
+    bool allowEDT;
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -211,7 +217,7 @@ private:
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
-    bool EDT;
+
 };
 
 #endif // CHS2T
