@@ -4,7 +4,7 @@
 		<Order>2</Order>
 		
 		<MaxSpeed>150</MaxSpeed>
-		<WearGap>1.0</WearGap>
+		<WearGap>0.0</WearGap>
 		<SoundSpeed>2.0</SoundSpeed>
 		<FreqCoeff>2.0</FreqCoeff>
 
