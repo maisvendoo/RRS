@@ -119,7 +119,10 @@ void Model::start()
     {
         is_simulation_started = true;
         t = start_time;
-        this->startTimer(integration_time_interval, Qt::TimerType::PreciseTimer);
+
+        connect(&simTimer, &ElapsedTimer::process, this, &Model::process, Qt::DirectConnection);
+        simTimer.setInterval(static_cast<quint64>(integration_time_interval));
+        simTimer.start();
     }
 }
 
@@ -500,15 +503,13 @@ void Model::controlStep(double &control_time, const double control_delay)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::timerEvent(QTimerEvent *event)
+void Model::process()
 {
-    Q_UNUSED(event)
-
     // Feedback to viewer
-    sharedMemoryFeedback();
+    //sharedMemoryFeedback();
 
     double tau = 0;
-    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
+    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;    
 
     // Integrate all ODE in train motion model
     while ( (tau <= integration_time) &&
@@ -517,7 +518,7 @@ void Model::timerEvent(QTimerEvent *event)
         preStep(t);
 
         // Feedback to viewer
-        //sharedMemoryFeedback();
+        sharedMemoryFeedback();
 
         controlStep(control_time, control_delay);
 
@@ -534,6 +535,6 @@ void Model::timerEvent(QTimerEvent *event)
 
     // Debug print, is allowed
     if (is_debug_print)
-        debugPrint();
+        debugPrint();    
 }
 

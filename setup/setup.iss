@@ -65,8 +65,8 @@ Source: "{#SdkDir}\*.*"; DestDir: "{app}\sdk"; Flags: ignoreversion recursesubdi
 Source: "{#ThemesDir}\*.*"; DestDir: "{app}\themes"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#FontsDir}\*.*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#DocsDir}\*.*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#RRS_DEV_ROOT}\LICENSE"; DestDir: "{app}\LICENSE"; Flags: ignoreversion
-Source: "{#RRS_DEV_ROOT}\LICENSE-Russian"; DestDir: "{app}\LICENSE-Russian"; Flags: ignoreversion
+Source: "{#RRS_DEV_ROOT}\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#RRS_DEV_ROOT}\LICENSE-Russian"; DestDir: "{app}"; Flags: ignoreversion
 
 
 [Icons]

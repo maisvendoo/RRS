@@ -20,6 +20,8 @@
 		<!-- Состояние устройства блокировки тормозов 
 		(1 - разблокирована, 0 - заблокирована) -->
 		<BrakeLockDevice>1</BrakeLockDevice>
+
+		<CombineCranePos>0</CombineCranePos>
 		
 	</BrakesState>
 </Config>
