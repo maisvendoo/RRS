@@ -1,11 +1,11 @@
-#include "engine.h"
+#include "motor.h"
 
 #include    <QDir>
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-Engine::Engine(QObject* parent) : Device(parent)
+Motor::Motor(QObject* parent) : Device(parent)
   , poz(0)
   , n(0)
   , beta(1)
@@ -27,7 +27,7 @@ Engine::Engine(QObject* parent) : Device(parent)
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-Engine::~Engine()
+Motor::~Motor()
 {
 
 }
@@ -35,7 +35,7 @@ Engine::~Engine()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Engine::setBetaStep(int step)
+void Motor::setBetaStep(int step)
 {
     if (fieldStep.contains(step))
     {
@@ -46,7 +46,7 @@ void Engine::setBetaStep(int step)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Engine::setDirection(int revers_state)
+void Motor::setDirection(int revers_state)
 {
     if (revers_state == 0)
         return;
@@ -57,7 +57,7 @@ void Engine::setDirection(int revers_state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Engine::getI12() const
+double Motor::getI12() const
 {
     return getIa() * static_cast<double>(amp_state.is12on);
 }
@@ -65,7 +65,7 @@ double Engine::getI12() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Engine::getI34() const
+double Motor::getI34() const
 {
     return getIa() * static_cast<double>(amp_state.is34on);
 }
@@ -73,7 +73,7 @@ double Engine::getI34() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Engine::getI56() const
+double Motor::getI56() const
 {
     return getIa() * static_cast<double>(amp_state.is56on);
 }
@@ -81,7 +81,7 @@ double Engine::getI56() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
+void Motor::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
     Q_UNUSED(t)
 
@@ -93,7 +93,7 @@ void Engine::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Engine::load_config(CfgReader& cfg)
+void Motor::load_config(CfgReader& cfg)
 {
     QString secName = "Device";
 
@@ -131,7 +131,7 @@ void Engine::load_config(CfgReader& cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Engine::preStep(state_vector_t& Y, double t)
+void Motor::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
 
@@ -151,7 +151,7 @@ void Engine::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Engine::calcCPhi(double I)
+double Motor::calcCPhi(double I)
 {
     return 1.2 * cPhi.getValue(I);
 }

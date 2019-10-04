@@ -27,6 +27,7 @@ enum
     SIGLIGHT_SP = 23,
     SIGLIGHT_S = 24,
     SIGLIGHT_ZERO = 25,
+    SIGLIGHT_R = 26,
 
     SGILIGHT_R = 26,
     SIGLIGHT_T = 27,

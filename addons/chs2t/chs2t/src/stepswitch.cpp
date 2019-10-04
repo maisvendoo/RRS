@@ -130,14 +130,14 @@ void StepSwitch::stepKeysControl(double t, double dt)
             prevPos = 0;
     }
 
-    if (ctrlState.up1 && poz_d < MPOS_P && !n)
+    if (ctrlState.up1 && poz < MPOS_P && !n)
     {
         poz += 1;
         poz_d = poz;
         n = true;
 
     }
-    if (ctrlState.down1 && poz_d > 0 && !n)
+    if (ctrlState.down1 && poz > 0 && !n)
     {
         poz -= 1;
         poz_d = poz;
@@ -154,7 +154,7 @@ void StepSwitch::stepKeysControl(double t, double dt)
         s = false;
     }
 
-    if ((getKeyState(KEY_Z) || p))
+    if ((getKeyState(KEY_Z) || p ))
     {
         p = true;
         poz_d -= V1 * dt;
@@ -162,7 +162,6 @@ void StepSwitch::stepKeysControl(double t, double dt)
     }
 
     poz = static_cast<int>(poz_d);
-
 
 
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);

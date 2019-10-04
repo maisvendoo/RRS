@@ -19,13 +19,16 @@
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
-#include    "engine.h"
+#include    "motor.h"
 #include    "registrator.h"
 #include    "overload-relay.h"
 #include    "dc-motor-compressor.h"
 #include    "pressure-regulator.h"
 #include    "chs2t-brake-mech.h"
 #include    "dako.h"
+#include    "generator.h"
+#include    "pulse-converter.h"
+#include    "brake-regulator.h"
 
 /*!
  * \class
@@ -53,7 +56,7 @@ private:
     };
 
     /// Тяговый электродвигатель
-    Engine *motor;
+    Motor *motor;
 
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
@@ -85,6 +88,8 @@ private:
 
     Reservoir *spareReservoir;
 
+    Reservoir *brakeRefRes;
+
     PressureRegulator *pressReg;
 
     DCMotorCompressor *motor_compressor;
@@ -107,7 +112,15 @@ private:
 
     PneumoSplitter *pnSplit;
 
+    PneumoSplitter *airSplit;
+
     TrainHorn   *horn;
+
+    Generator   *generator;
+
+    PulseConverter  *pulseConv;
+
+    BrakeRegulator  *BrakeReg;
 
     std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
 
@@ -126,6 +139,16 @@ private:
 
     /// Тригер включения БВ
     Trigger     fast_switch_trigger;
+
+    Trigger     EDTSwitch;
+
+    Trigger     allowTrac;
+
+    double      ip;
+
+    bool EDT;
+
+    bool allowEDT;
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -157,6 +180,8 @@ private:
 
     void initBrakesEquipment(QString module_path);
 
+    void initEDT();
+
     void initOtherEquipment();
 
     void initRegistrator();
@@ -183,12 +208,15 @@ private:
 
     void stepBrakesEquipment(double t, double dt);
 
+    void stepEDT(double t, double dt);
+
     void stepDebugMsg(double t, double dt);
 
     void stepSignals();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
 
 };
 

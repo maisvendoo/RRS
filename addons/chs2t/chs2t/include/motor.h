@@ -8,15 +8,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Engine : public Device
+class Motor : public Device
 {
 public:
 
     ///Конструктор
-    Engine(QObject *parent = Q_NULLPTR);
+    Motor(QObject *parent = Q_NULLPTR);
 
     ///Деструктор
-    ~Engine();
+    ~Motor();
 
     void setPoz(int poz) { this->poz = poz; }
 

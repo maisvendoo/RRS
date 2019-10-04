@@ -20,6 +20,8 @@ public:
 
     double getR() { return R; }
 
+    double getStepR(int pos) {return steps[pos];}
+
 private:
 
     int poz;
