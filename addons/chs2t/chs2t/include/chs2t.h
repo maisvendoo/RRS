@@ -140,7 +140,7 @@ private:
     /// Тригер включения БВ
     Trigger     fast_switch_trigger;
 
-    Trigger     EDTValve;
+    Trigger     EDTSwitch;
 
     Trigger     allowTrac;
 

@@ -51,10 +51,12 @@ private:
     double A1;
     double A2;
     double A3;
+
     double K1;
     double K2;
     double K3;
     double K4;
+    double K5;
 
     double k_1;
     double k_2;

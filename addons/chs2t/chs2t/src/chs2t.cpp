@@ -133,9 +133,9 @@ void CHS2T::keyProcess()
     if (getKeyState(KEY_9))
     {
         if (isShift())
-            EDTValve.set();
+            EDTSwitch.set();
         else
-            EDTValve.reset();
+            EDTSwitch.reset();
     }
 }
 

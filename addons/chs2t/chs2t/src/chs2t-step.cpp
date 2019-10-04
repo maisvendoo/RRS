@@ -165,10 +165,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     dako->setPgr(mainReservoir->getPressure());
     dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airDistr->getBrakeCylinderAirFlow() * static_cast<double>(!allowEDT));
+    dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT));
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
-    dako->setQ1(airSplit->getQ_out1());
+    //dako->setQ1(airSplit->getQ_out1());
 
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
@@ -180,10 +180,9 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
 
-    //airDistr->setBrakeCylinderPressure(dako->getPy() * static_cast<double>(!allowEDT) + brakeRefRes->getPressure() * static_cast<double>(allowEDT));
     airDistr->setBrakepipePressure(pTM);
     airDistr->setAirSupplyPressure(spareReservoir->getPressure());
-    airDistr->setBrakeCylinderPressure(airSplit->getP_in());
+    airDistr->setBrakeCylinderPressure(airSplit->getP_in() * static_cast<double>(!allowEDT));
 
     spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
@@ -198,7 +197,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     pnSplit->setQ_in(zpk->getOutputFlow());
 
     airSplit->setQ_in(airDistr->getBrakeCylinderAirFlow());
-    airSplit->setP_out1(dako->getP1());
+    airSplit->setP_out1(dako->getPy());
     airSplit->setP_out2(brakeRefRes->getPressure());
 
     brakeRefRes->setAirFlow(airSplit->getQ_out2());
@@ -229,12 +228,12 @@ void CHS2T::stepEDT(double t, double dt)
     BrakeReg->setIf(generator->getIf());
     BrakeReg->setBref(brakeRefRes->getPressure());
 
-    allowEDT = EDTValve.getState();
+    allowEDT = EDTSwitch.getState() && dako->isEDTAllow();
 
-    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07)) && EDTValve.getState();
+    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
 
-    if (!dako->isEDTAllow())
-        EDTValve.reset();
+    /*if (!dako->isEDTAllow())
+        EDTValve.reset();*/
 
     pulseConv->step(t, dt);
     generator->step(t, dt);
@@ -299,6 +298,8 @@ void CHS2T::stepSignals()
     analogSignal[SIGLIGHT_SP] = static_cast<float>(stepSwitch->isSeriesParallel());
     analogSignal[SIGLIGHT_S] = static_cast<float>(stepSwitch->isSeries());
     analogSignal[SIGLIGHT_ZERO] = static_cast<float>(stepSwitch->isZero());
+
+    analogSignal[SIGLIGHT_R] = static_cast<float>(EDT);
 
     analogSignal[SIGLIGHT_NO_BRAKES_RELEASE] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() >= 0.1);
 

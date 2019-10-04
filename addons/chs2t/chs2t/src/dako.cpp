@@ -23,10 +23,12 @@ Dako::Dako(QObject* parent) : Device(parent)
   , A1(0.0)
   , A2(0.0)
   , A3(0.0)
+
   , K1(0.0)
   , K2(0.0)
   , K3(0.0)
   , K4(0.0)
+  , K5(0.0)
 
   , k_1(0.0)
   , k_2(0.0)
@@ -69,7 +71,7 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 
     Qtc = (pgr - ptc) * K4 * s7 - ptc * K3 * s9;
 
-    dYdt[0] = Qvr / Vy;    
+    dYdt[0] = Qvr * K5 / Vy;
 
     dYdt[1] = ((p_kvt - Y[1]) * K1 * s2 - Y[1] * K2 * s4) / V1;
 }
@@ -101,6 +103,7 @@ void Dako::load_config(CfgReader& cfg)
     cfg.getDouble(secName, "K2", K2);
     cfg.getDouble(secName, "K3", K3);
     cfg.getDouble(secName, "K4", K4);
+    cfg.getDouble(secName, "K5", K5);
 
     cfg.getDouble(secName, "k1", k_1);
     cfg.getDouble(secName, "k2", k_2);
