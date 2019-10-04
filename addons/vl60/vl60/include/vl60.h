@@ -13,28 +13,7 @@
 #ifndef     VL60_H
 #define     VL60_H
 
-#include    "vehicle-api.h"
-
-#include    "vl60-signals.h"
-#include    "pantograph.h"
-#include    "protective-device.h"
-#include    "oscillator.h"
-#include    "trac-transformer.h"
-#include    "phase-splitter.h"
-#include    "motor-fan.h"
-#include    "reservoir.h"
-#include    "motor-compressor.h"
-#include    "pressure-regulator.h"
-#include    "ubt367m.h"
-#include    "trolley-brake-mech.h"
-#include    "pneumo-splitter.h"
-#include    "kme-60-044.h"
-#include    "ekg-8g.h"
-#include    "rectifier.h"
-#include    "dc-motor.h"
-#include    "overload-relay.h"
-#include    "sl2m.h"
-#include    "registrator.h"
+#include    "vl60-headers.h"
 
 /*!
  * \class
@@ -303,9 +282,7 @@ private:
 
     float isLineContactorsOff();
 
-    void stepSignalsOutput();
-
-    void registration(double t, double dt);
+    void stepSignalsOutput();   
 
     double getTractionForce();
 
@@ -319,6 +296,8 @@ private:
     void load_brakes_config(QString path);
 
     void loadConfig(QString cfg_path);
+
+    void test();
 
 private slots:
 
