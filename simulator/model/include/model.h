@@ -136,10 +136,7 @@ private:
     ElapsedTimer    simTimer;
 
     /// Log initialization
-    void logInit(bool clear_log = false);
-
-    /// Journal initialization
-    void journalInit(QString journalPath);
+    void logInit(bool clear_log = false);    
 
     /// Actions, which prerare integration step
     void preStep(double t);
@@ -168,9 +165,7 @@ private:
     /// Shered memory feedback
     void sharedMemoryFeedback();
 
-    void controlStep(double &control_time, const double control_delay);
-
-    //void timerEvent(QTimerEvent *event);
+    void controlStep(double &control_time, const double control_delay);    
 
 private slots:
 

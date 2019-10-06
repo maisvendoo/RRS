@@ -65,9 +65,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Log creation
     logInit(command_line.clear_log.is_present);
 
-    FileSystem &fs = FileSystem::getInstance();
-    QString path = QString(fs.combinePath(fs.getLogsDir(), "journal.log").c_str());
-    journalInit(path);
+    //FileSystem &fs = FileSystem::getInstance();
+    //QString path = QString(fs.combinePath(fs.getLogsDir(), "journal.log").c_str());
+    //journalInit(path);
 
     // Check is debug print allowed
     is_debug_print = command_line.debug_print.is_present;
@@ -95,6 +95,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     Journal::instance()->info("==== Profile data loading ====");
     profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
 
+    Journal::instance()->info(QString("State Profile object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(profile), 0, 16));
+
     if (profile->isReady())
         Journal::instance()->info("Profile loaded successfully");
     else
@@ -105,6 +108,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Train creation and initialization
     Journal::instance()->info("==== Train initialization ====");
     train = new Train(profile);
+
+    Journal::instance()->info(QString("Created Train object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(train), 0, 16));
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
@@ -184,25 +190,6 @@ void Model::logInit(bool clear_log)
     simLog = new Log(QString(fs.getLogsDir().c_str()) + fs.separator() + LOG_FILE_NAME, clear_log, true);
     connect(this, &Model::logMessage, simLog, &Log::printMessage);
     connect(this, &Model::logMessage, this, &Model::outMessage);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::journalInit(QString journalPath)
-{
-    Journal::instance()->addStorage( new JournalFile(journalPath, JournalLevel::All) );
-
-    QString line = "";
-
-    for (int i = 0; i < 80; ++i)
-        line += "=";
-
-    Journal::instance()->message(" ");
-    Journal::instance()->message(line);
-    Journal::instance()->message("Started new session");
-    Journal::instance()->message("Journal subsystem is initialized successfully");
-    Journal::instance()->message(line);
 }
 
 //------------------------------------------------------------------------------

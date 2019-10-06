@@ -253,18 +253,8 @@ void CHS2T::stepDebugMsg(double t, double dt)
 {
     Q_UNUSED(dt)
 
-    DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11" )
-        .arg(t, 10, 'f', 1)
-        .arg(bv->getU_out(), 4, 'f', 0)
-        .arg(stepSwitch->getPoz(), 2)
-        .arg(motor->getIa(), 5, 'f', 2)
-        .arg(km21KR2->getReverseState(), 2)
-        .arg(mainReservoir->getPressure(), 4, 'f', 2)
-        .arg(brakeCrane->getEqReservoirPressure(), 3, 'f', 2)
-        .arg(brakeCrane->getBrakePipeInitPressure(), 3, 'f', 2)
-        .arg(brakeCrane->getPositionName(), 3)
-        .arg(brakesMech[0]->getShoeForce() / 1000, 3, 'f', 2)
-        .arg(velocity * Physics::kmh, 3, 'f', 2);
+    DebugMsg = QString("t = %1")
+        .arg(t, 10, 'f', 1);
 }
 
 //------------------------------------------------------------------------------

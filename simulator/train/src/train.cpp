@@ -40,6 +40,9 @@ bool Train::init(const init_data_t &init_data)
 
     train_motion_solver = loadSolver(solver_path);
 
+    Journal::instance()->info(QString("Created Solver object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(train_motion_solver), 0, 16));
+
     if (train_motion_solver == Q_NULLPTR)
     {
         emit logMessage("ERROR: solver " + solver_path + " is't found");
@@ -58,7 +61,8 @@ bool Train::init(const init_data_t &init_data)
     soundMan = new SoundManager();
 
     if (soundMan != Q_NULLPTR)
-        Journal::instance()->info("Created sound manager");
+        Journal::instance()->info(QString("Created SoundManager at address: 0x%1")
+                                  .arg(reinterpret_cast<quint64>(soundMan), 0, 16));
     else
         Journal::instance()->error("Sound mamager is;t created");
 
@@ -75,6 +79,12 @@ bool Train::init(const init_data_t &init_data)
     dydt.resize(ode_order);
 
     Journal::instance()->info(QString("Allocated memory for %1 ODE's").arg(ode_order));
+
+    Journal::instance()->info(QString("State vector address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(y.data()), 0, 16));
+
+    Journal::instance()->info(QString("State vector derivative address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(dydt.data()), 0, 16));
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
@@ -93,8 +103,12 @@ bool Train::init(const init_data_t &init_data)
 
     // Brakepipe initialization
     brakepipe = new BrakePipe();
+
+    Journal::instance()->info(QString("Created brakepipe object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(brakepipe), 0, 16));
+
     brakepipe->setLength(trainLength);
-    brakepipe->setNodesNum(static_cast<int>(vehicles.size()));
+    brakepipe->setNodesNum(vehicles.size());
 
     if (!no_air)
         brakepipe->setBeginPressure(charging_pressure * Physics::MPa + Physics::pA);
@@ -361,7 +375,7 @@ bool Train::loadTrain(QString cfg_path)
             {
                 Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
                                                fs.separator() +
-                                               relModulePath);
+                                               relModulePath);                
 
                 if (vehicle == Q_NULLPTR)
                 {
@@ -369,6 +383,9 @@ bool Train::loadTrain(QString cfg_path)
                     Journal::instance()->error("Vehicle " + module_name + " is't loaded");
                     break;
                 }
+
+                Journal::instance()->info(QString("Created Vehicle object at address: 0x%1")
+                                          .arg(reinterpret_cast<quint64>(vehicle), 0, 16));
 
                 connect(vehicle, &Vehicle::logMessage, this, &Train::logMessage);
 
@@ -464,6 +481,9 @@ bool Train::loadCouplings(QString cfg_path)
                 emit logMessage("ERROR: coupling module " + coupling_module + " is't found");
                 return false;
             }
+
+            Journal::instance()->info(QString("Created Coupling object at address: 0x%1")
+                                      .arg(reinterpret_cast<quint64>(coupling), 0, 16));
 
             Journal::instance()->info("Loaded coupling model from: " + coupling_module);
 

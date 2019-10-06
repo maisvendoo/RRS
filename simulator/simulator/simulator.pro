@@ -92,5 +92,5 @@ INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include
 
-HEADERS += $$files(./include/*.h) 
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
