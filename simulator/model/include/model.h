@@ -138,6 +138,9 @@ private:
     /// Log initialization
     void logInit(bool clear_log = false);
 
+    /// Journal initialization
+    void journalInit(QString journalPath);
+
     /// Actions, which prerare integration step
     void preStep(double t);
     /// Simulation step

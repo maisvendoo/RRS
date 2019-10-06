@@ -13,6 +13,7 @@ Registrator::Registrator(QString fileName, double interval, QObject *parent)
     , tau(0.0)
     , interval(interval)
     , path("")
+    , file(Q_NULLPTR)
 {
     path = "../graphs/";
     path += fileName + QDateTime::currentDateTime().toString("_dd-MM-yyyy_hh-mm-ss") + ".txt";

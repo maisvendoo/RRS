@@ -12,7 +12,9 @@
 //------------------------------------------------------------------------------
 
 #include    "chs2t.h"
+
 #include    "filesystem.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
@@ -46,6 +48,8 @@ void CHS2T::initialization()
 
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
+
+    Journal::instance()->info("Started DC electrical locomotive CS2t initialization...");
 
     initPantographs();
 

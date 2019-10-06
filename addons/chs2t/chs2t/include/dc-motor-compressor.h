@@ -43,7 +43,6 @@ private:
     double Ma;
     double Vnk;
 
-
     enum
     {
         NUM_COEFFS = 6

@@ -55,17 +55,17 @@ void CHS2T::stepBrakesMech(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepFastSwitch(double t, double dt)
 {
-    bistV->setHoldingCoilState(getHoldingCoilState());
+    bv->setHoldingCoilState(getHoldingCoilState());
     bv_return = getHoldingCoilState() && bv_return;
-    bistV->setReturn(bv_return);
+    bv->setReturn(bv_return);
 
     U_kr = max(pantographs[0]->getUout() * pant_switch[0].getState() ,
             pantographs[1]->getUout() * pant_switch[1].getState());
 
-    bistV->setU_in(U_kr);
+    bv->setU_in(U_kr);
 
-    bistV->setState(fast_switch_trigger.getState());
-    bistV->step(t, dt);
+    bv->setState(fast_switch_trigger.getState());
+    bv->step(t, dt);
 
     if (fastSwitchSw->getState() == 3)
     {
@@ -119,7 +119,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     motor->setBetaStep(km21KR2->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());
-    motor->setU(bistV->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT) * allowTrac.getState());
+    motor->setU(bv->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT) * allowTrac.getState());
     motor->setOmega(wheel_omega[0] * ip);
     motor->setAmpermetersState(stepSwitch->getAmpermetersState());
     motor->step(t, dt);
@@ -128,7 +128,7 @@ void CHS2T::stepTractionControl(double t, double dt)
 
     for (size_t i = 0; i <= Q_a.size(); ++i)
     {
-        Q_a[i] = (motor->getTorque() + generator->getM()) * ip;
+        Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
 }
@@ -138,7 +138,7 @@ void CHS2T::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepAirSupplySubsystem(double t, double dt)
 {
-    motor_compressor->setU(bistV->getU_out() * static_cast<double>(mk_tumbler.getState()) * pressReg->getState());
+    motor_compressor->setU(bv->getU_out() * static_cast<double>(mk_tumbler.getState()) * pressReg->getState());
     motor_compressor->setPressure(mainReservoir->getPressure());
     motor_compressor->step(t, dt);
 
@@ -161,6 +161,9 @@ void CHS2T::stepBrakesControl(double t, double dt)
     p0 = brakeCrane->getBrakePipeInitPressure();
     brakeCrane->step(t, dt);}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     dako->setPgr(mainReservoir->getPressure());
@@ -213,6 +216,9 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     airSplit->step(t, dt);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CHS2T::stepEDT(double t, double dt)
 {
     pulseConv->setUakb(110.0 * static_cast<double>(EDT));
@@ -249,7 +255,7 @@ void CHS2T::stepDebugMsg(double t, double dt)
 
     DebugMsg = QString("t = %1 UGV = %2 poz = %3 Ia = %4  re = %5 press = %6 pQ = %7 pTM = %8 state = %9 K = %10 V = %11" )
         .arg(t, 10, 'f', 1)
-        .arg(bistV->getU_out(), 4, 'f', 0)
+        .arg(bv->getU_out(), 4, 'f', 0)
         .arg(stepSwitch->getPoz(), 2)
         .arg(motor->getIa(), 5, 'f', 2)
         .arg(km21KR2->getReverseState(), 2)
@@ -261,7 +267,8 @@ void CHS2T::stepDebugMsg(double t, double dt)
         .arg(velocity * Physics::kmh, 3, 'f', 2);
 }
 
-//------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------
+//
 //------------------------------------------------------------------------------
 void CHS2T::stepSignals()
 {
@@ -311,7 +318,7 @@ void CHS2T::stepSignals()
 
     analogSignal[SIGLIGHT_RAZED] = static_cast<float>( !pant_switch[0].getState() && !pant_switch[1].getState() );
 
-    analogSignal[INDICATOR_BV] = static_cast<float>(bistV->getLampState());
+    analogSignal[INDICATOR_BV] = static_cast<float>(bv->getLampState());
 
     analogSignal[SW_BV] = fastSwitchSw->getHandlePos();
 

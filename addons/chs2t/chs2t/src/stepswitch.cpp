@@ -111,7 +111,7 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void StepSwitch::stepKeysControl(double t, double dt)
+void StepSwitch::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
 
@@ -165,6 +165,4 @@ void StepSwitch::stepKeysControl(double t, double dt)
 
 
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
-
-
 }
