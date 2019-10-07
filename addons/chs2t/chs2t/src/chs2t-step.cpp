@@ -185,7 +185,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     airDistr->setBrakepipePressure(pTM);
     airDistr->setAirSupplyPressure(spareReservoir->getPressure());
-    airDistr->setBrakeCylinderPressure(airSplit->getP_in() * static_cast<double>(!allowEDT));
+    airDistr->setBrakeCylinderPressure(airSplit->getP_in());
 
     spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
@@ -200,7 +200,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     pnSplit->setQ_in(zpk->getOutputFlow());
 
     airSplit->setQ_in(airDistr->getBrakeCylinderAirFlow());
-    airSplit->setP_out1(dako->getPy());
+    airSplit->setP_out1(dako->getPy() * static_cast<double>(!allowEDT));
     airSplit->setP_out2(brakeRefRes->getPressure());
 
     brakeRefRes->setAirFlow(airSplit->getQ_out2());
