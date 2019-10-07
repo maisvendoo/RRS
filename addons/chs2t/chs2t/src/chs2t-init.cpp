@@ -91,7 +91,7 @@ void CHS2T::initAirSupplySubsystem()
     Journal::instance()->info("Init air suplly subsystem");
 
     mainReservoir = new Reservoir(1);
-    spareReservoir = new Reservoir(0.078);
+    spareReservoir = new Reservoir(0.057);
     brakeRefRes = new Reservoir(0.004);
 
     motor_compressor = new DCMotorCompressor();
