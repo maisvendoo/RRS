@@ -29,6 +29,7 @@
 #include    "generator.h"
 #include    "pulse-converter.h"
 #include    "brake-regulator.h"
+#include    "handle-edt.h"
 
 /*!
  * \class
@@ -140,6 +141,9 @@ private:
 
     /// Регулятор тормозного усилия (САРТ)
     BrakeRegulator  *BrakeReg;
+
+    /// Рукоятка задатчика тормозного усилия
+    HandleEDT       *handleEDT;
 
     /// Галетники управления токоприемниками
     std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;

@@ -159,7 +159,13 @@ void CHS2T::stepBrakesControl(double t, double dt)
     brakeCrane->setBrakePipePressure(pTM);
     brakeCrane->setControl(keys);
     p0 = brakeCrane->getBrakePipeInitPressure();
-    brakeCrane->step(t, dt);}
+    brakeCrane->step(t, dt);
+
+    handleEDT->setPipiLinePressure(mainReservoir->getPressure());
+    handleEDT->setBrefPressure(brakeRefRes->getPressure());
+    handleEDT->setControl(keys);
+    handleEDT->step(t, dt);
+}
 
 //------------------------------------------------------------------------------
 //
@@ -203,7 +209,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     airSplit->setP_out1(dako->getPy() * static_cast<double>(!allowEDT));
     airSplit->setP_out2(brakeRefRes->getPressure());
 
-    brakeRefRes->setAirFlow(airSplit->getQ_out2());
+    brakeRefRes->setAirFlow(airSplit->getQ_out2() + handleEDT->getQ_bref());
 
     dako->step(t, dt);
     locoCrane->step(t, dt);
@@ -290,6 +296,8 @@ void CHS2T::stepSignals()
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
     analogSignal[REVERSOR] = static_cast<float>(km21KR2->getReverseState());
+
+    analogSignal[HANDLE_RT] = handleEDT->getHandlePos();
 
     analogSignal[SIGLIGHT_P] = static_cast<float>(stepSwitch->isParallel());
     analogSignal[SIGLIGHT_SP] = static_cast<float>(stepSwitch->isSeriesParallel());

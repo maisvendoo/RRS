@@ -5,6 +5,7 @@ enum
 {
     KONTROLLER = 0,
     REVERSOR = 1,
+    HANDLE_RT = 2,
 
     STRELKA_POS = 10,
 

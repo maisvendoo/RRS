@@ -81,6 +81,11 @@ void CHS2T::initBrakesControl(QString module_path)
 
     locoCrane = loadLocoCrane(module_path + QDir::separator() + "kvt254");
     locoCrane->read_config("kvt254");
+
+    handleEDT = new HandleEDT();
+    handleEDT->read_custom_config(config_dir + QDir::separator() + "handle-edt");
+    handleEDT->setBrakeKey(KEY_Period);
+    handleEDT->setReleaseKey(KEY_Comma);
 }
 
 //------------------------------------------------------------------------------
