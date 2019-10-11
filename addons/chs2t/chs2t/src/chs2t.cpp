@@ -69,6 +69,8 @@ void CHS2T::initialization()
 
     initEDT();
 
+    initSupportEquipment();
+
     initOtherEquipment();
 
     initRegistrator();

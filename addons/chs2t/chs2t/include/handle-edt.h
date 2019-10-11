@@ -21,17 +21,17 @@ public:
 
     ~HandleEDT();
 
-    void setPipiLinePressure(double press);
+    void setPipiLinePressure(double press) { pFL = press; }
 
-    void setBrefPressure(double press);
+    void setBrefPressure(double press) { p_bref = press; }
 
-    void setBrakeKey(int key);
+    void setBrakeKey(int key) { brakeKey = key; }
 
-    void setReleaseKey(int key);
+    void setReleaseKey(int key) { releaseKey = key; }
 
-    float getHandlePos() const;
+    float getHandlePos() const { return static_cast<float>(pos); }
 
-    double getQ_bref() const;
+    double getQ_bref() const { return Q_bref; }
 
 private:
 

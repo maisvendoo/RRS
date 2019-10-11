@@ -30,6 +30,8 @@
 #include    "pulse-converter.h"
 #include    "brake-regulator.h"
 #include    "handle-edt.h"
+#include    "dc-motor-fan.h"
+#include    "release-valve.h"
 
 /*!
  * \class
@@ -130,6 +132,10 @@ private:
     /// Разветвитель от ВР к ДАКО и ЗТ
     PneumoSplitter *airSplit;
 
+    ReleaseValve *relValve;
+
+    DCMotorFan *motor_fan;
+
     /// Свисток и тифон
     TrainHorn   *horn;
 
@@ -222,6 +228,9 @@ private:
 
     /// Инициализация ЭДТ
     void initEDT();
+
+    /// Инициализация вспомогательного оборудования
+    void initSupportEquipment();
 
     /// Инициализация прочего оборудования
     void initOtherEquipment();

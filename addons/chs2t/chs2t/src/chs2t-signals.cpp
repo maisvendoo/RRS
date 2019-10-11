@@ -53,7 +53,7 @@ void CHS2T::stepSignals()
 
     analogSignal[SIGLIGHT_RAZED] = static_cast<float>( !pant_switch[0].getState() && !pant_switch[1].getState() );
 
-    analogSignal[INDICATOR_BV] = static_cast<float>(bistV->getLampState());
+    analogSignal[INDICATOR_BV] = static_cast<float>(bv->getLampState());
 
     analogSignal[SW_BV] = fastSwitchSw->getHandlePos();
 
