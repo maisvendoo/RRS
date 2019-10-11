@@ -84,3 +84,11 @@ void Timer::setTimeout(double timeout)
 {
     this->timeout = timeout;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Timer::firstProcess(bool first_process)
+{
+    this->first_process = first_process;
+}

@@ -35,7 +35,7 @@ private:
     enum
     {
         NUM_POSITIONS = 38,
-        PP_MIN = 17,
+        PP_MIN = 18,
         PP_MAX = 22
     };
 
@@ -56,6 +56,14 @@ private:
 
     /// Признак разрешения на включение линейных контакторов
     bool    is_LK_allow;
+
+    bool    is_fix_start;
+
+    bool    is_fix_off;
+
+    int     dir;
+
+    bool    is_auto;
 
     /// Таймер управления переключением позиций
     Timer   pos_switcher;

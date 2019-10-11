@@ -10,6 +10,10 @@ EKG_8G::EKG_8G(QObject *parent) : Device(parent)
   , is_enabled(false)
   , is_ready(false)
   , is_LK_allow(false)
+  , is_fix_start(false)
+  , is_fix_off(false)
+  , dir(0)
+  , is_auto(false)
 {
     connect(&pos_switcher, &Timer::process, this, &EKG_8G::slotPosSwitch);
 
@@ -92,49 +96,56 @@ bool EKG_8G::isLKallow() const
 //------------------------------------------------------------------------------
 void EKG_8G::process()
 {
-    if (km_state.pos_state[POS_ZERO])
+    // Нулевая позиция
+    if (km_state.pos_state[POS_ZERO] && (position != 0) && !is_auto)
     {
-        if (position != LM_POS0)
-            is_ready = false;
+        pos_switcher.start();
+        dir = -1;
     }
 
-    if (km_state.pos_state[POS_AV])
-    {
-        if (ref_position == position)
-            ref_position--;
-    }
-
-    if (km_state.pos_state[POS_FV])
-        fix_off.set();
-
-    if ( km_state.pos_state[POS_RV] && fix_off.getState() )
-    {
-        if ( (position > PP_MIN) && (position <= PP_MAX) )
-            ref_position = PP_MIN;
-        else
-            ref_position--;
-
-        fix_off.reset();
-    }
-
+    // Фиксация пуска
     if (km_state.pos_state[POS_FP])
-        fix_start.set();
-
-    if ( km_state.pos_state[POS_RP] && fix_start.getState() )
     {
-        if ( (position >= PP_MIN) && (position < PP_MAX) )
-            ref_position = PP_MAX;
-        else
-            ref_position++;
-
-        fix_start.reset();
+        is_fix_start = true;
+        dir = 1;
     }
 
-    if (km_state.pos_state[POS_AP])
+    // Ручной пуск
+    if (km_state.pos_state[POS_RP] && is_fix_start)
     {
-        if (ref_position == position)
-            ref_position++;
+        is_fix_start = false;
+        pos_switcher.start();
     }
+
+    // Фиксация выключения
+    if (km_state.pos_state[POS_FV])
+    {
+        is_fix_off = true;
+        dir = -1;
+    }
+
+    // Ручное выключение
+    if (km_state.pos_state[POS_RV] && is_fix_off)
+    {
+        is_fix_off = false;
+        pos_switcher.start();
+    }
+
+    // Автоматический пуск
+    if (km_state.pos_state[POS_AP] && !is_auto)
+    {
+        pos_switcher.start();
+        dir = 1;
+    }
+
+    // Автоматический пуск
+    if (km_state.pos_state[POS_AV] && !is_auto)
+    {
+        pos_switcher.start();
+        dir = -1;
+    }
+
+    is_auto = km_state.pos_state[POS_AV] || km_state.pos_state[POS_AP] || km_state.pos_state[POS_ZERO];
 }
 
 //------------------------------------------------------------------------------
@@ -145,22 +156,12 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
     // Если на ЭКГ подано питание
     if (is_enabled)
     {
-        // Запускаем схему переключения позиций
-        if (!pos_switcher.isStarted())
-        {
-            pos_switcher.start();            
-        }
-
         if (is_ready)
             process();
         else
         {
             // Устанавливаем готовность по состоянию рукоятки КМ положению вала ЭКГ
-            is_ready = km_state.pos_state[POS_ZERO] && (position == LM_POS0);
-
-            // Если вал не в нулевой позиции, возвращаем его туда
-            if (position != 0)
-                ref_position = 0;
+            is_ready = km_state.pos_state[POS_ZERO] && (position == LM_POS0);            
         }
     }
     else
@@ -168,8 +169,6 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
         pos_switcher.stop();
         is_ready = false;
     }
-
-    ref_position = cut(ref_position, 0, static_cast<int>(NUM_POSITIONS - 1));
 }
 
 //------------------------------------------------------------------------------
@@ -179,7 +178,9 @@ void EKG_8G::ode_system(const state_vector_t &Y,
                         state_vector_t &dYdt,
                         double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -212,8 +213,15 @@ void EKG_8G::stepDiscrete(double t, double dt)
 //------------------------------------------------------------------------------
 void EKG_8G::slotPosSwitch()
 {
-    if (ref_position != position)
+    // Набирам/сбрасываем позицию
+    position += dir;
+
+    position = cut(position, 0, static_cast<int>(NUM_POSITIONS - 1));
+
+    if ( (position != 0) && (position != NUM_POSITIONS - 1) )
         emit soundPlay("EKG_serv");
 
-    position += sign(ref_position - position);
+    // Останавливаемся, если не находимся на переходных позициях
+    if ( ( (position < PP_MIN) || (position > PP_MAX) ) && !is_auto )
+        pos_switcher.stop();
 }
