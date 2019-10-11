@@ -34,6 +34,7 @@ INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
 HEADERS += $$files(./include/*.h)
-SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(./src/*.cpp) \
+    src/chs2t-signals.cpp
 
 #CONFIG += force_debug_info
