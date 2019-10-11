@@ -18,7 +18,7 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , fieldStep(0)
   , reverseState(0)
   , mainShaftPos(0.0)
-
+  , mainShaftHeight(0.0)
 {
 }
 
@@ -100,7 +100,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
                 k22 = false;
                 k23 = false;
 
-                mainShaftPos = 0.5;
+                mainShaftPos = -0.5;
             }
         }
     }
@@ -119,7 +119,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
             k22 = true;
             k23 = true;
 
-            mainShaftPos = -0.5;
+            mainShaftPos = 0.2;
         }
     }
 
@@ -133,7 +133,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k22 = true;
         k23 = true;
 
-        mainShaftPos = -1.0;
+        mainShaftPos = 0.4;
     }
 
     // 1 вверх
@@ -144,7 +144,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k23 = false;
         n = true;
 
-        mainShaftPos = 1.0;
+        mainShaftPos = -1.0;
     }
 
     // Ноль
@@ -157,6 +157,16 @@ void Km21KR2::stepKeysControl(double t, double dt)
         k23 = false;
 
         mainShaftPos = 0.0;
+    }
+
+    if (fieldStep > 0)
+    {
+        mainShaftHeight = 1.0;
+        mainShaftPos = 0.2 * fieldStep;
+    }
+    else
+    {
+        mainShaftHeight = 0.0;
     }
 
     controlState.up = (k21 && k23);

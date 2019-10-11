@@ -4,6 +4,8 @@
 //
 //------------------------------------------------------------------------------
 TrainHorn::TrainHorn(QObject *parent) : Device(parent)
+  , is_svistok(false)
+  , is_tifon(false)
 {
 
 }
@@ -44,7 +46,7 @@ void TrainHorn::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    if (getKeyState(KEY_Space))
+    if (is_svistok = getKeyState(KEY_Space))
     {
         emit soundSetVolume("Svistok", 100);
     }
@@ -53,7 +55,7 @@ void TrainHorn::stepKeysControl(double t, double dt)
         emit soundSetVolume("Svistok", 0);
     }
 
-    if (getKeyState(KEY_B))
+    if (is_tifon = getKeyState(KEY_B))
     {
         emit soundSetVolume("Tifon", 100);
     }

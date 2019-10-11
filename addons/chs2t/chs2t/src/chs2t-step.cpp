@@ -295,6 +295,10 @@ void CHS2T::stepSignals()
     analogSignal[KRAN254_RUK] = static_cast<float>(locoCrane->getHandlePosition());
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
+    analogSignal[SHTURVAL] = static_cast<float>(km21KR2->getMainShaftHeight());
+
+    analogSignal[SHTUR_SVISTOK] = static_cast<float>(horn->isSvistok());
+
     analogSignal[REVERSOR] = static_cast<float>(km21KR2->getReverseState());
 
     analogSignal[HANDLE_RT] = handleEDT->getHandlePos();
