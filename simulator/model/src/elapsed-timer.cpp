@@ -4,6 +4,11 @@
 #include    <QTimer>
 #include    <QEventLoop>
 
+#include    "Journal.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ElapsedTimer::ElapsedTimer(QObject *parent) : QObject(parent)
   , is_started(false)
   , interval(0)
@@ -11,16 +16,25 @@ ElapsedTimer::ElapsedTimer(QObject *parent) : QObject(parent)
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ElapsedTimer::~ElapsedTimer()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ElapsedTimer::setInterval(quint64 interval)
 {
     this->interval = interval;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ElapsedTimer::start()
 {
     is_started = true;
@@ -28,12 +42,17 @@ void ElapsedTimer::start()
     thread.start();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ElapsedTimer::loop()
 {
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &ElapsedTimer::process, Qt::DirectConnection);
     timer->setTimerType(Qt::PreciseTimer);
     timer->start(static_cast<int>(interval));
+
+    Journal::instance()->info(QString("Started simulation timer with interval %1").arg(interval));
 
     QEventLoop eventLoop;
 

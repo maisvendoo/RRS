@@ -17,6 +17,7 @@
 
 #include    "CfgReader.h"
 #include    "physics.h"
+#include    "Journal.h"
 
 #include    <QLibrary>
 #include    <QDir>
@@ -74,9 +75,13 @@ Vehicle::~Vehicle()
 //------------------------------------------------------------------------------
 void Vehicle::init(QString cfg_path)
 {
+    Journal::instance()->info("Started base class Vehicle initialization...");
     loadConfiguration(cfg_path);
+    Journal::instance()->info("Base class initialization finished");
 
+    Journal::instance()->info("Call of Vehicle::initialize() method...");
     initialization();
+    Journal::instance()->info("Custom initialization finished");
 }
 
 //------------------------------------------------------------------------------
@@ -512,6 +517,8 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
     if (cfg.load(cfg_path))
     {
+        Journal::instance()->info("Loaded config file: " + cfg_path);
+
         QString secName = "Vehicle";
 
         cfg.getDouble(secName, "EmptyMass", empty_mass);
@@ -519,14 +526,21 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "Length", length);
         cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
 
+        Journal::instance()->info(QString("EmptyMass: %1 kg").arg(empty_mass));
+        Journal::instance()->info(QString("PayloadMass: %1 kg").arg(payload_mass));
+        Journal::instance()->info(QString("Length: %1 m").arg(length));
+        Journal::instance()->info(QString("WheelDiameter: %1 m").arg(wheel_diameter));
+
         rk = wheel_diameter / 2.0;
 
         int tmp = 0;
-        cfg.getInt(secName, "NumAxis", tmp);
+        cfg.getInt(secName, "NumAxis", tmp);        
 
         num_axis = static_cast<size_t>(tmp);
         wheel_rotation_angle.resize(num_axis);
         wheel_omega.resize(num_axis);
+
+        Journal::instance()->info(QString("NumAxis: %1").arg(num_axis));
 
         s = num_axis + 1;
 
@@ -539,6 +553,8 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         cfg.getDouble(secName, "WheelInertia", J_axis);
 
+        Journal::instance()->info(QString("WheelInertia: %1 kg*m^2").arg(J_axis));
+
         QString main_resist_cfg = "";
         cfg.getString(secName, "MainResist", main_resist_cfg);
 
@@ -547,6 +563,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
     else
     {
         emit logMessage("ERROR: file " + cfg_path + "is't found");
+        Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
     loadConfig(cfg_path);
@@ -576,10 +593,14 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
         cfg.getDouble(secName, "b2", b2);
         cfg.getDouble(secName, "b3", b3);
         cfg.getDouble(secName, "q0", q0);
+
+        Journal::instance()->info("Main resist formula: " + QString("w = %1 + (%2 + %3 * V + %4 * V^2) / %5")
+                                  .arg(b0).arg(b1).arg(b2).arg(b3).arg(q0));
     }
     else
     {
         emit logMessage("ERROR: file " + file_path + "is't found");
+        Journal::instance()->error("File " + file_path + " is't found");
     }
 }
 
@@ -600,6 +621,14 @@ Vehicle *loadVehicle(QString lib_path)
         {
             vehicle = getVehicle();
         }
+        else
+        {
+            Journal::instance()->error(lib.errorString());
+        }
+    }
+    else
+    {
+        Journal::instance()->error(lib.errorString());
     }
 
     return vehicle;
@@ -656,6 +685,9 @@ bool Vehicle::isAlt() const
     return getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Vehicle::getKeyState(int key) const
 {
     auto it = keys.find(key);

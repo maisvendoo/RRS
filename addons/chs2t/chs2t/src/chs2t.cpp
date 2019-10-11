@@ -12,7 +12,9 @@
 //------------------------------------------------------------------------------
 
 #include    "chs2t.h"
+
 #include    "filesystem.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
@@ -25,7 +27,7 @@ CHS2T::CHS2T() : Vehicle()
 
     U_kr = 0;
 
-    EDT = false;
+    EDT = false;    
 }
 
 //------------------------------------------------------------------------------
@@ -46,6 +48,8 @@ void CHS2T::initialization()
 
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
+
+    Journal::instance()->info("Started DC electrical locomotive CS2t initialization...");
 
     initPantographs();
 
@@ -75,30 +79,42 @@ void CHS2T::initialization()
 //------------------------------------------------------------------------------
 void CHS2T::step(double t, double dt)
 {
-    stepPantographs(t, dt);
+    //Journal::instance()->info("Step pantographs");
+    stepPantographs(t, dt);    
 
+    //Journal::instance()->info("Step fast switch");
     stepFastSwitch(t, dt);
 
+    //Journal::instance()->info("Step traction control");
     stepTractionControl(t, dt);
 
+    //Journal::instance()->info("Step protection");
     stepProtection(t, dt);
 
+    //Journal::instance()->info("Step air supply");
     stepAirSupplySubsystem(t, dt);
 
+    //Journal::instance()->info("Step brakes control");
     stepBrakesControl(t, dt);
 
+    //Journal::instance()->info("Step brake mech");
     stepBrakesMech(t , dt);
 
+    //Journal::instance()->info("Step brake equipment");
     stepBrakesEquipment(t, dt);
 
+    //Journal::instance()->info("Step EDT");
     stepEDT(t, dt);
 
+    //Journal::instance()->info("Step debug");
     stepDebugMsg(t, dt);
 
+    //Journal::instance()->info("Step signals");
     stepSignals();
 
     //registrate(t, dt);
 
+    //Journal::instance()->info("Step horn");
     horn->setControl(keys);
     horn->step(t, dt);
 }

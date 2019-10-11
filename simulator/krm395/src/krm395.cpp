@@ -115,15 +115,13 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 
     t_old = t;
 
+    pulse_II = static_cast<bool>(hs_n(Y[0] - p0));
+
     if ( (static_cast<int>(pos[POS_II]) == 1) && pulse_II )
     {
         Y[0] = cut(pf(2 * p0  - Y[1]), 0.0, pFL);
         pulse_II = false;
-    }
-    else
-    {
-        pulse_II = true;
-    }
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -161,7 +159,6 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
 
     double K4 = 0;
 
-    //K4 = K[4] * (1.0 + pow(pf(Y[BP_PRESSURE] / p0 - 1.0), K4_power)) * hs_p(Y[0] - Y[1]);
     K4 = K[4] * (1.0 + k4 * pf(Y[0] - Y[1]));
 
     double u2 = cut(k2 * nf(s1), 0.0, 1.0) * (1.0 - pos[POS_VI]);

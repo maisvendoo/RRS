@@ -35,7 +35,7 @@ public:
 
     void setRt(double value) { Rt = value; }
 
-    double getM() const { return M; }
+    double getTorque() const { return M; }
 
     double getUt() const { return  Ut; }
 
@@ -44,15 +44,17 @@ private:
     double Uf;
     double Lf;
     double Rf;
-    double If;
+
     double omega;
     double E;
-    double Ia;
+
     double La;
     double Ra;
     double Rt;
+
     double M;
     double Ut;
+
     double Rgp;
     double Rdp;
 

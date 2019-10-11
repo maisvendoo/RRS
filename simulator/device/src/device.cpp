@@ -13,7 +13,9 @@
  */
 
 #include    "device.h"
+
 #include    "filesystem.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -117,6 +119,8 @@ void Device::read_config(const QString &path)
 
     if (cfg.load(cfg_path))
     {
+        Journal::instance()->info("Loaded file: " + cfg_path);
+
         int order = 0;
         QString secName = "Device";
 
@@ -129,6 +133,10 @@ void Device::read_config(const QString &path)
 
         load_config(cfg);
     }
+    else
+    {
+        Journal::instance()->error("File " + cfg_path + " is't found");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -140,6 +148,8 @@ void Device::read_custom_config(const QString &path)
 
     if (cfg.load(path + ".xml"))
     {
+        Journal::instance()->info("Loaded file: " + path);
+
         int order = 0;
         QString secName = "Device";
 
@@ -151,6 +161,10 @@ void Device::read_custom_config(const QString &path)
         memory_alloc(order);
 
         load_config(cfg);
+    }
+    else
+    {
+        Journal::instance()->error("File " + path + " is't found");
     }
 }
 

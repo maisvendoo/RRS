@@ -295,9 +295,7 @@ private:
 
     void load_brakes_config(QString path);
 
-    void loadConfig(QString cfg_path);
-
-    void test();
+    void loadConfig(QString cfg_path);    
 
 private slots:
 

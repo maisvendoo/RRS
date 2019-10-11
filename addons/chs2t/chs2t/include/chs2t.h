@@ -29,6 +29,7 @@
 #include    "generator.h"
 #include    "pulse-converter.h"
 #include    "brake-regulator.h"
+#include    "handle-edt.h"
 
 /*!
  * \class
@@ -55,14 +56,14 @@ private:
         WIRE_VOLTAGE = 3000
     };
 
-    /// Тяговый электродвигатель
+    /// Схема тяги
     Motor *motor;
 
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
     /// Быстрый выключатель
-    ProtectiveDevice *bistV;
+    ProtectiveDevice *bv;
 
     /// Пусковой резистор
     PuskRez *puskRez;
@@ -84,51 +85,76 @@ private:
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
+    /// Главный резервуар (ГР)
     Reservoir *mainReservoir;
 
+    /// Запасный резервуар (ЗР)
     Reservoir *spareReservoir;
 
+    /// Задатчик тормозного усилия ЭДТ (ЗТ)
     Reservoir *brakeRefRes;
 
+    /// Регулятор давления ГР
     PressureRegulator *pressReg;
 
+    /// Мотор-компрессор (МК)
     DCMotorCompressor *motor_compressor;
 
+    /// Тумблер включенияМК
     Trigger     mk_tumbler;
 
+    /// Поездной кран машиниста (КрМ)
     BrakeCrane *brakeCrane;
 
+    /// Тормозная рычажная передача тележек
     std::array<CHS2tBrakeMech *, 2>    brakesMech;
 
+    /// Скоростной клапан ДАКО
     Dako *dako;
 
+    /// Воздухораспределитель (ВР)
     AirDistributor *airDistr;
 
+    /// Кран вспомогательного тормоза (КВТ)
     LocoCrane *locoCrane;
 
+    /// Переключательный клапан (ЗПК)
     SwitchingValve *zpk;
 
+    /// Реле давления РД304 (РД)
     PneumoReley *rd304;
 
+    /// Разветвитель потока воздуха от ДАКО к тележке 1 и РД304
     PneumoSplitter *pnSplit;
 
+    /// Разветвитель от ВР к ДАКО и ЗТ
     PneumoSplitter *airSplit;
 
+    /// Свисток и тифон
     TrainHorn   *horn;
 
+    /// Схема реостатного тормоза
     Generator   *generator;
 
+    /// Импульсный преобразователь возбуждения
     PulseConverter  *pulseConv;
 
+    /// Регулятор тормозного усилия (САРТ)
     BrakeRegulator  *BrakeReg;
 
+    /// Рукоятка задатчика тормозного усилия
+    HandleEDT       *handleEDT;
+
+    /// Галетники управления токоприемниками
     std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
 
     /// Галетник управления БВ
     Switcher    *fastSwitchSw;
 
+    /// Зарядное давление
     double charging_press;
 
+    /// Напряжение на крышевой шине токоприемников
     double U_kr;
 
     /// Разъединители токоприемников
@@ -140,60 +166,76 @@ private:
     /// Тригер включения БВ
     Trigger     fast_switch_trigger;
 
+    /// Выключатель ЭДТ
     Trigger     EDTSwitch;
 
+    /// Разрешение тяги
     Trigger     allowTrac;
 
+    /// Передаточное число тягового редуктора
     double      ip;
 
-    bool EDT;
+    /// Флаг сбора схемы ЭДТ
+    bool        EDT;
 
-    bool allowEDT;
+    /// Флаг разрешения работы ЭДТ
+    bool        allowEDT;
 
+    /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
 
+    /// Обработка клавиш
     void keyProcess();
 
+    /// Сброс данных в регистратор
     void registrate(double t, double dt);
 
+    /// Состояние удерживающей катошки БВ
     bool getHoldingCoilState() const;
 
-
-
+    /// Инициализация токоприемников
     void initPantographs();
 
+    /// Инициадизация рычажки
     void initBrakesMech();
 
+    /// Инициализация БВ
     void initFastSwitch();
 
+    /// Инициализация приборов управления тормозами
     void initBrakesControl(QString module_path);
 
+    /// Инициализация защит
     void initProtection();
 
+    /// Инициализация подсистемы снабжения электровоза сжатым воздухом
     void initAirSupplySubsystem();
 
     /// Инициализация схемы управления тягой
     void initTractionControl();
 
+    /// Инициализация тормозного оборудования
     void initBrakesEquipment(QString module_path);
 
+    /// Инициализация ЭДТ
     void initEDT();
 
+    /// Инициализация прочего оборудования
     void initOtherEquipment();
 
+    /// Инициализация регистратора
     void initRegistrator();
-
 
     /// Общая инициализация локомотива
     void initialization();
 
-
-
+    /// Моделирование работы токоприемников
     void stepPantographs(double t, double dt);
 
+    /// Моделирование работы рычажки
     void stepBrakesMech(double t, double dt);
 
     void stepFastSwitch(double t, double dt);
@@ -216,8 +258,6 @@ private:
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
-
-
 };
 
 #endif // CHS2T

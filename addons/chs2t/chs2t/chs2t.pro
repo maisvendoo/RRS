@@ -14,6 +14,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../../lib -lvehicle_d
     LIBS += -L../../../../lib -ldevice_d
     LIBS += -L../../../lib -lfilesystem_d
+    LIBS += -L../../../lib -lJournal_d
 
 } else {
 
@@ -22,6 +23,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../../lib -lvehicle
     LIBS += -L../../../../lib -ldevice
     LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -lJournal
 }
 
 INCLUDEPATH += ./include
@@ -32,9 +34,9 @@ INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
+INCLUDEPATH += ../../../libJournal/include
 
 HEADERS += $$files(./include/*.h)
-SOURCES += $$files(./src/*.cpp) \
-    src/chs2t-signals.cpp
+SOURCES += $$files(./src/*.cpp)
 
 #CONFIG += force_debug_info

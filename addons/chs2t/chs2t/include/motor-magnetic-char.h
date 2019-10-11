@@ -25,6 +25,13 @@ private:
     {
         double  current;
         double  value;
+
+        point_t()
+            : current(0.0)
+            , value(0.0)
+        {
+
+        }
     };
 
     std::vector<point_t> points;

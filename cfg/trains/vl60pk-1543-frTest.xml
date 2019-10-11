@@ -24,7 +24,7 @@
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
-		<Count>40</Count>
+		<Count>150</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	

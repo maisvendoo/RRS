@@ -18,6 +18,7 @@
 #include    "global-const.h"
 
 #include    "filesystem.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -46,12 +47,20 @@ bool AppCore::init()
 
     QString errorMessage = "";
 
+    QString cmd_line = "";
+    for (QString s : this->arguments())
+        cmd_line += " " + s;
+
+    Journal::instance()->info("Process " + APPLICATION_NAME + " started with command line: " + cmd_line);
+    Journal::instance()->info("Started " + APPLICATION_NAME + " initialization");
+
     switch (parseCommandLine(parser, command_line, errorMessage))
     {
     case CommandLineOk:
 
         // Creation and initialization of train model
         model = new Model();
+        Journal::instance()->info(QString("Created Model object at address: 0x%1").arg(reinterpret_cast<quint64>(model), 0, 16));
         return model->init(command_line);
 
     case CommandLineError:
@@ -86,6 +95,40 @@ int AppCore::exec()
         model->start();
 
     return QCoreApplication::exec();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AppCore::notify(QObject *receiver, QEvent *event)
+{
+    try
+    {
+        return QCoreApplication::notify(receiver, event);
+
+    }
+    catch (std::exception &ex)
+    {
+        QString msg = QString("Error %1 sending event %2 to object %4 (%4)")
+                .arg(ex.what())
+                .arg(typeid (*event).name())
+                .arg(qPrintable(receiver->objectName()))
+                .arg(typeid (*receiver).name());
+
+        Journal::instance()->critical(msg);
+    }
+    catch (...)
+    {
+        QString msg = QString("Error %1 sending event %2 to object %4 (%4)")
+                .arg("<unknown>")
+                .arg(typeid (*event).name())
+                .arg(qPrintable(receiver->objectName()))
+                .arg(typeid (*receiver).name());
+
+        Journal::instance()->critical(msg);
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------

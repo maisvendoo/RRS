@@ -18,6 +18,8 @@
 #include    <QTime>
 
 #include    "CfgReader.h"
+#include    "Journal.h"
+#include    "JournalFile.h"
 
 const       QString LOG_FILE_NAME = "simulator.log";
 
@@ -63,18 +65,25 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Log creation
     logInit(command_line.clear_log.is_present);
 
+    //FileSystem &fs = FileSystem::getInstance();
+    //QString path = QString(fs.combinePath(fs.getLogsDir(), "journal.log").c_str());
+    //journalInit(path);
+
     // Check is debug print allowed
     is_debug_print = command_line.debug_print.is_present;
 
     init_data_t init_data;
 
     // Load initial data configuration
+    Journal::instance()->info("==== Init data loading ====");
     loadInitData(init_data);
 
     // Override init data by command line
+    Journal::instance()->info("==== Command line processing ====");
     overrideByCommandLine(init_data, command_line);
 
     // Read solver configuration
+    Journal::instance()->info("==== Solver configurating ====");
     configSolver(init_data.solver_config);
 
     start_time = init_data.solver_config.start_time;
@@ -83,10 +92,25 @@ bool Model::init(const simulator_command_line_t &command_line)
     integration_time_interval = init_data.integration_time_interval;
 
     // Load profile
+    Journal::instance()->info("==== Profile data loading ====");
     profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
 
+    Journal::instance()->info(QString("State Profile object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(profile), 0, 16));
+
+    if (profile->isReady())
+        Journal::instance()->info("Profile loaded successfully");
+    else
+    {
+        Journal::instance()->warning("Profile is't loaded. Using flat profile");
+    }
+
     // Train creation and initialization
+    Journal::instance()->info("==== Train initialization ====");
     train = new Train(profile);
+
+    Journal::instance()->info(QString("Created Train object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(train), 0, 16));
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
@@ -102,10 +126,17 @@ bool Model::init(const simulator_command_line_t &command_line)
         if (!keys_data.attach())
         {
             emit logMessage("ERROR: Can't attach to shared memory");
+            Journal::instance()->error("Can't attach to shread memory. Unable process keyboard");
         }
+    }
+    else
+    {
+        Journal::instance()->info("Created shared memory for keysboard processing");
     }
 
     initControlPanel("control-panel");
+
+    Journal::instance()->info("Train is initialized successfully");
 
     return true;
 }
@@ -268,6 +299,12 @@ void Model::loadInitData(init_data_t &init_data)
         {
             init_data.keys_buffer_size = 1024;
         }
+
+        Journal::instance()->info("Loaded settings from: " + cfg_path);
+    }
+    else
+    {
+        Journal::instance()->error("File " + cfg_path + " not found");
     }
 }
 
@@ -296,6 +333,8 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     if (command_line.direction.is_present)
         init_data.direction = command_line.direction.value;
+
+    Journal::instance()->info("Apply command line settinds");
 }
 
 //------------------------------------------------------------------------------
@@ -316,25 +355,39 @@ void Model::configSolver(solver_config_t &solver_config)
             solver_config.method = "rkf5";
         }
 
+        Journal::instance()->info("Integration method: " + solver_config.method);
+
         if (!cfg.getDouble(secName, "StartTime", solver_config.start_time))
         {
             solver_config.start_time = 0;
         }
+
+        Journal::instance()->info("Start time: " + QString("%1").arg(solver_config.start_time));
 
         if (!cfg.getDouble(secName, "StopTime", solver_config.stop_time))
         {
             solver_config.stop_time = 10.0;
         }
 
+        Journal::instance()->info("Stop time: " + QString("%1").arg(solver_config.stop_time));
+
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
             solver_config.step = 1e-4;
         }
 
+        Journal::instance()->info("Initial integration step: " + QString("%1").arg(solver_config.step));
+
         if (!cfg.getDouble(secName, "MaxStep", solver_config.max_step))
         {
             solver_config.max_step = 1e-2;
         }
+
+        Journal::instance()->info("Maximal integration step: " + QString("%1").arg(solver_config.max_step));
+    }
+    else
+    {
+        Journal::instance()->error("File " + cfg_path + " not found");
     }
 }
 
@@ -505,9 +558,6 @@ void Model::controlStep(double &control_time, const double control_delay)
 //------------------------------------------------------------------------------
 void Model::process()
 {
-    // Feedback to viewer
-    //sharedMemoryFeedback();
-
     double tau = 0;
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;    
 

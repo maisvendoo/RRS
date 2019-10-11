@@ -51,6 +51,7 @@ public:
     double getI56() const;
 
 private:
+
     /// Номер позиции
     int    poz;
 
