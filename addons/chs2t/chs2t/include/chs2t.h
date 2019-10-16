@@ -261,6 +261,8 @@ private:
 
     void stepEDT(double t, double dt);
 
+    void stepSupportEquipment(double t, double dt);
+
     void stepDebugMsg(double t, double dt);
 
     void stepSignals();

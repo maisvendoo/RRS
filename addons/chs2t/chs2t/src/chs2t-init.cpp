@@ -182,10 +182,13 @@ void CHS2T::initOtherEquipment()
 //------------------------------------------------------------------------------
 void CHS2T::initSupportEquipment()
 {
+    Journal::instance()->info("Init support equipment");
+
     relValve = new ReleaseValve();
 
     motor_fan = new DCMotorFan();
     motor_fan->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");
+    connect(motor_fan, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
 }
 
 //------------------------------------------------------------------------------

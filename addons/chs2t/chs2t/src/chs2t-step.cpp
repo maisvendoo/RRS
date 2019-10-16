@@ -250,29 +250,15 @@ void CHS2T::stepEDT(double t, double dt)
     BrakeReg->step(t, dt);
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::stepDebugMsg(double t, double dt)
+void CHS2T::stepSupportEquipment(double t, double dt)
 {
-    Q_UNUSED(dt)
+    double R = 0.59;
+    bool hod = stepSwitch->getHod();
 
-    DebugMsg = QString("t = %1")
-        .arg(t, 10, 'f', 1);
-}
+    relValve->step(t, dt);
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::registrate(double t, double dt)
-{
-    QString msg = QString("%1 %2 %3 %4")
-            .arg(t)
-            .arg(velocity * Physics::kmh)
-            .arg(tracForce_kN)
-            .arg(motor->getIa());
-
-    reg->print(msg, t, dt);
+    motor_fan->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
+    motor_fan->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -280,9 +266,7 @@ void CHS2T::registrate(double t, double dt)
 //------------------------------------------------------------------------------
 bool CHS2T::getHoldingCoilState() const
 {
-    bool no_overload = true;
-
-    no_overload = no_overload && (!static_cast<bool>(overload_relay->getState()));
+    bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
     bool state = no_overload;
 

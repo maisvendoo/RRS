@@ -15,6 +15,8 @@ public:
 
     ~DCMotorFan();
 
+    void setU(double value) { U = value; }
+
 private:
 
     double U;
@@ -26,16 +28,15 @@ private:
     double E;
     double omega_nom;
     double omega;
-
-    MotorMagneticChar cPhi;
+    double CPhi;
+    double ks;
+    double J;
 
     void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
-
-    double calcCPhi(double I);
 };
 
 #endif // DCMOTORFAN_H

@@ -108,6 +108,9 @@ void CHS2T::step(double t, double dt)
     //Journal::instance()->info("Step EDT");
     stepEDT(t, dt);
 
+    //Journal::instance()->info("Step support equipment");
+    stepSupportEquipment(t, dt);
+
     //Journal::instance()->info("Step debug");
     stepDebugMsg(t, dt);
 

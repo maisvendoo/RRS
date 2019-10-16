@@ -13,6 +13,9 @@ DCMotorFan::DCMotorFan(QObject* parent) : Device(parent)
   , E(0.0)
   , omega_nom(0.0)
   , omega(0.0)
+  , CPhi(0.0)
+  , ks(0.0)
+  , J(0.0)
 {
 
 }
@@ -30,7 +33,7 @@ DCMotorFan::~DCMotorFan()
 //------------------------------------------------------------------------------
 void DCMotorFan::preStep(state_vector_t& Y, double t)
 {
-
+    emit soundSetPitch("PTR_fan", static_cast<float>(Y[0] / 250.0));
 }
 
 //------------------------------------------------------------------------------
@@ -38,8 +41,11 @@ void DCMotorFan::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void DCMotorFan::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    dYdt[0] = (U - Y[0] * calcCPhi(In)) / R * calcCPhi(In) - sign(Y[0]);
-    omega = Y[0];
+    double E = Y[0] * CPhi * sign(U);
+    double I = (U - E) / R;
+    double M = I * CPhi;
+    double Ms = ks * Y[0] * Y[0] * sign(Y[0]);
+    dYdt[0] = (M - Ms) / J;
 }
 
 //------------------------------------------------------------------------------
@@ -55,12 +61,7 @@ void DCMotorFan::load_config(CfgReader& cfg)
     cfg.getDouble(secName, "Pn", Pn);
     cfg.getDouble(secName, "R", R);
     cfg.getDouble(secName, "omega_nom", omega_nom);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double DCMotorFan::calcCPhi(double I)
-{
-    return 1.23 * cPhi.getValue(I);
+    cfg.getDouble(secName, "CPhi", CPhi);
+    cfg.getDouble(secName, "ks", ks);
+    cfg.getDouble(secName, "J", J);
 }
