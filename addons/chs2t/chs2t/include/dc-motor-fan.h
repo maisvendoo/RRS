@@ -17,20 +17,18 @@ public:
 
     void setU(double value) { U = value; }
 
+    void setSoundName(QString name) { soundName = name; }
+
 private:
 
     double U;
-    double Un;
-    double In;
-    double Nn;
-    double Pn;
     double R;
-    double E;
     double omega_nom;
-    double omega;
     double CPhi;
     double ks;
     double J;
+
+    QString soundName;
 
     void preStep(state_vector_t &Y, double t);
 

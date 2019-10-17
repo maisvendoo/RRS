@@ -2,10 +2,6 @@
 <Config>
     <Device>
         <Order>1</Order>
-        <Un>280.0</Un>
-        <In>160.0</In>
-        <Nn>2140.0</Nn>
-        <Pn>39000.0</Pn>
         <R>0.0309</R>
         <omega_nom>224.0</omega_nom>
         <CPhi>1.23</CPhi>
