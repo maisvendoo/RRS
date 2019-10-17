@@ -20,6 +20,8 @@ public:
 
     double getQrv() const { return  Qrv; }
 
+    void setRelease(bool release) { this->release = release; }
+
 private:
 
     double Py;
