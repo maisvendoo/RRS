@@ -8,6 +8,10 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , k22(true)
   , k23(false)
 
+  , k31(false)
+  , k32(false)
+  , k33(false)
+
   , k01(false)
   , k02(false)
 
@@ -15,9 +19,9 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , p(false)
   , re(false)
   , hod(false)
-  , fieldStep(0)
   , reverseState(0)
   , mainShaftPos(0.0)
+  , fieldWeakShaft(0.0)
   , mainShaftHeight(0.0)
 {
 }
@@ -89,18 +93,14 @@ void Km21KR2::stepKeysControl(double t, double dt)
             n = false;
         else
         {
-            if (isShift() && fieldStep != 0 && !p && hod)
+            if (isShift() && fieldWeakShaft != 0 && !p && hod)
             {
-                fieldStep -= 1;
+                fieldWeakShaft -= 2;
                 p = true;
             }
             else if (!n && !isShift())
             {
-                k21 = false;
-                k22 = false;
-                k23 = false;
-
-                mainShaftPos = -0.5;
+                mainShaftPos = -5;
             }
         }
     }
@@ -108,18 +108,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // 1 вниз
     if (getKeyState(KEY_A))
     {
-        if(isShift() && fieldStep != 5 && !p && hod)
+        if(isShift() && fieldWeakShaft != 10 && !p && hod)
         {
-            fieldStep += 1;
+            fieldWeakShaft += 2;
+
             p = true;
         }
         else if(!n && !isShift())
         {
-            k21 = false;
-            k22 = true;
-            k23 = true;
-
-            mainShaftPos = 0.2;
+            mainShaftPos = 2;
         }
     }
 
@@ -129,22 +126,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // Авт. набор
     if (getKeyState(KEY_Q))
     {
-        k21 = true;
-        k22 = true;
-        k23 = true;
-
-        mainShaftPos = 0.4;
+        mainShaftPos = 4;
     }
 
     // 1 вверх
     if (getKeyState(KEY_E))
     {
-        k21 = true;
-        k22 = false;
-        k23 = false;
         n = true;
 
-        mainShaftPos = -1.0;
+        mainShaftPos = -10;
     }
 
     // Ноль
@@ -152,26 +142,25 @@ void Km21KR2::stepKeysControl(double t, double dt)
         !getKeyState(KEY_A) && !getKeyState(KEY_D))
     {
         p = false;
-        k21 = true;
-        k22 = true;
-        k23 = false;
 
-        mainShaftPos = 0.0;
+        mainShaftPos = 0;
     }
 
-    if (fieldStep > 0)
-    {
-        mainShaftHeight = 1.0;
-        mainShaftPos = 0.2 * fieldStep;
-    }
-    else
-    {
-        mainShaftHeight = 0.0;
-    }
+    k21 = (mainShaftPos == -10 || mainShaftPos == 0 || mainShaftPos == 4);
+    k22 = (mainShaftPos == 0 || mainShaftPos == 2 || mainShaftPos == 4);
+    k23 = (mainShaftPos == 2 || mainShaftPos == 4);
+
+    k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10);
+    k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
+    k33 = (fieldWeakShaft == 6 || fieldWeakShaft == 10);
 
     controlState.up = (k21 && k23);
     controlState.up1 = (!k21 && k23);
     controlState.zero = (k22 && !k23);
     controlState.down1 = (!k21 && !k22);
     controlState.down = (k21 && !k22);
+
+    controlState.k31 = k31;
+    controlState.k32 = k32;
+    controlState.k33 = k33;
 }

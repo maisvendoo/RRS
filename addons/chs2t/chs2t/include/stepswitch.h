@@ -21,11 +21,15 @@ public:
 
     void setCtrlState(ControllerState ctrlState) { this->ctrlState = ctrlState; }
 
+    void setDropPosition(bool value) { dropPosition = value; }
+
     int getPoz() { return poz; }
 
     double getSchemeState() const;
 
     bool getHod() { return hod; }
+
+    int getFieldStep() const { return fieldStep; }
 
     bool isZero() const;
 
@@ -37,6 +41,8 @@ public:
 
     ampermeters_state_t getAmpermetersState();
 
+
+
 private:
 
     enum
@@ -47,17 +53,19 @@ private:
     };
 
     double V;
-    double V1;
-
 
     double poz_d;
 
     int poz;
 
+    int fieldStep;
+
     bool n;
     bool p;
     bool s;
     int prevPos;
+
+    bool dropPosition;
 
     bool hod;
 

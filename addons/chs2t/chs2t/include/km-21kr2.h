@@ -20,11 +20,9 @@ public:
 
     ControllerState getCtrlState() { return controlState; }
 
-    int getFieldStep() const { return fieldStep ; }
-
     int getReverseState() const { return reverseState; }
 
-    double getMainShaftPos() const { return mainShaftPos; }
+    double getMainShaftPos() const { return mainShaftPos * 0.1; }
 
     double getMainShaftHeight() const { return mainShaftHeight; }
 
@@ -42,6 +40,10 @@ private:
     bool k22;
     bool k23;
 
+    bool k31;
+    bool k32;
+    bool k33;
+
     bool k01;
     bool k02;
 
@@ -49,10 +51,11 @@ private:
     bool p;
     bool re;
     bool hod;
-    int fieldStep;
+
     int reverseState;
 
-    double mainShaftPos;
+    int mainShaftPos;
+    int fieldWeakShaft;
 
     double mainShaftHeight;
 

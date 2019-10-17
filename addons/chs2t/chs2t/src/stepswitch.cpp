@@ -5,13 +5,16 @@
 //------------------------------------------------------------------------------
 StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , V(0.0)
-  , V1(0.0)
-  , poz_d(0)
+  , poz_d(0.0)
   , poz(0)
+
+  , fieldStep(0)
+
   , n(false)
   , p(false)
   , s(false)
   , prevPos(0)
+  , dropPosition(false)
   , hod(false)
 
 {
@@ -96,7 +99,6 @@ void StepSwitch::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
 void StepSwitch::load_config(CfgReader& cfg)
 {
     cfg.getDouble("Device", "V", V);
-    cfg.getDouble("Device", "V1", V1);
 }
 
 //------------------------------------------------------------------------------
@@ -143,7 +145,7 @@ void StepSwitch::stepDiscrete(double t, double dt)
         poz_d = poz;
         n = true;
     }
-    if (ctrlState.down)
+    if (ctrlState.down || dropPosition)
     {
         poz_d -= V * hs_p(poz_d) * dt;
         n = false;
@@ -157,12 +159,15 @@ void StepSwitch::stepDiscrete(double t, double dt)
     if ((getKeyState(KEY_Z) || p ))
     {
         p = true;
-        poz_d -= V1 * dt;
+        poz_d -= V * dt;
         p = !(hod || poz == 0);
     }
 
+    fieldStep = 1 * (ctrlState.k31 && !ctrlState.k32) +
+                2 * (ctrlState.k32 && !ctrlState.k31) +
+                3 * (ctrlState.k33 && !ctrlState.k31) +
+                4 * (ctrlState.k31 && ctrlState.k32) +
+                5 * (ctrlState.k31 && ctrlState.k33);
+
     poz = static_cast<int>(poz_d);
-
-
-    hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 }

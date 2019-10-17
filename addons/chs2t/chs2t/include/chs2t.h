@@ -178,6 +178,10 @@ private:
     /// Разрешение тяги
     Trigger     allowTrac;
 
+    bool dropPosition;
+
+    Timer timer;
+
     /// Передаточное число тягового редуктора
     double      ip;
 
@@ -260,6 +264,8 @@ private:
     void stepBrakesEquipment(double t, double dt);
 
     void stepEDT(double t, double dt);
+
+    void stepEDT2(double t, double dt);
 
     void stepSupportEquipment(double t, double dt);
 

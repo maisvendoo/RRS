@@ -28,6 +28,8 @@ DCMotorFan::~DCMotorFan()
 //------------------------------------------------------------------------------
 void DCMotorFan::preStep(state_vector_t& Y, double t)
 {
+    Q_UNUSED(t)
+
     emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega_nom));
 }
 
@@ -36,6 +38,8 @@ void DCMotorFan::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void DCMotorFan::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    Q_UNUSED(t)
+
     double E = Y[0] * CPhi * sign(U);
     double I = (U - E) / R;
     double M = I * CPhi;

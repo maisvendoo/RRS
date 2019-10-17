@@ -38,6 +38,8 @@ Generator::~Generator()
 //------------------------------------------------------------------------------
 void Generator::preStep(state_vector_t& Y, double t)
 {
+    Q_UNUSED(t)
+
     M = calcCPhi((Y[0])) * Y[1];
     Ut = Y[1] * Rt;
 }
@@ -47,6 +49,8 @@ void Generator::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void Generator::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    Q_UNUSED(t)
+
     E = calcCPhi(Y[0]) * omega;
 
     dYdt[0] = (Uf - Y[0] * 6 * Rf) / Lf;

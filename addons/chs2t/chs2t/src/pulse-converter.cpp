@@ -25,7 +25,9 @@ PulseConverter::~PulseConverter()
 //------------------------------------------------------------------------------
 void PulseConverter::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -33,5 +35,8 @@ void PulseConverter::ode_system(const state_vector_t& Y, state_vector_t& dYdt, d
 //------------------------------------------------------------------------------
 void PulseConverter::preStep(state_vector_t& Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     Uf = cut(max(Uakb, cut(abs(Ut), 0.0, 110.0)) * u, 0.0, 107.0);
 }
