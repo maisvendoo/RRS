@@ -21,14 +21,8 @@ public:
 private:
 
     double U;
-    double Un;
-    double In;
-    double Nn;
-    double Pn;
     double R;
-    double E;
     double omega_nom;
-    double omega;
     double CPhi;
     double ks;
     double J;

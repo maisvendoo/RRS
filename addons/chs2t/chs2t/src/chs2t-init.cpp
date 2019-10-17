@@ -185,6 +185,7 @@ void CHS2T::initSupportEquipment()
     Journal::instance()->info("Init support equipment");
 
     relValve = new ReleaseValve();
+    relValve->read_custom_config(config_dir + QDir::separator() + "release-valve");
 
     motor_fan = new DCMotorFan();
     motor_fan->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");

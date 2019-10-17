@@ -28,7 +28,6 @@ void ReleaseValve::ode_system(const state_vector_t& Y, state_vector_t& dYdt, dou
     Q_UNUSED(Y)
     Q_UNUSED(dYdt)
     Q_UNUSED(t)
-
 }
 
 //------------------------------------------------------------------------------
@@ -36,7 +35,8 @@ void ReleaseValve::ode_system(const state_vector_t& Y, state_vector_t& dYdt, dou
 //------------------------------------------------------------------------------
 void ReleaseValve::load_config(CfgReader& cfg)
 {
-    Q_UNUSED(cfg)
+    QString secName = "Device";
+    cfg.getDouble(secName, "K1", K1);
 }
 
 //------------------------------------------------------------------------------
@@ -47,5 +47,5 @@ void ReleaseValve::preStep(state_vector_t& Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    Qrv = Py * K1 * static_cast<double>(release);
+    Qrv = - Py * K1 * static_cast<double>(release);
 }

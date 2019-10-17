@@ -172,7 +172,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     dako->setPgr(mainReservoir->getPressure());
     dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT));
+    dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT) + relValve->getQrv());
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
     //dako->setQ1(airSplit->getQ_out1());
@@ -255,11 +255,14 @@ void CHS2T::stepEDT(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepSupportEquipment(double t, double dt)
 {
-    double R = 0.59;
+    double R = 0.6;
     bool hod = stepSwitch->getHod();
 
+    // Отпускной вентиль
+    relValve->setPy(dako->getPy());
     relValve->step(t, dt);
 
+    // Мотор-вентилятор ПТР
     motor_fan->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
     motor_fan->step(t, dt);
 
