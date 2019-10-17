@@ -2,7 +2,6 @@
 #define DCMOTORFAN_H
 
 #include    "device.h"
-#include    "motor-magnetic-char.h"
 
 //------------------------------------------------------------------------------
 //
@@ -16,6 +15,8 @@ public:
     ~DCMotorFan();
 
     void setU(double value) { U = value; }
+
+    void setSoundName(QString name) { soundName = name; }
 
 private:
 
@@ -31,6 +32,8 @@ private:
     double CPhi;
     double ks;
     double J;
+
+    QString soundName;
 
     void preStep(state_vector_t &Y, double t);
 

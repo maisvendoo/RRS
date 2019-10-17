@@ -54,6 +54,8 @@ enum
     INDICATOR_BV = 44,
     SW_BV = 45,
 
+    BLINDS = 50,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

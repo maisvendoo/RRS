@@ -32,6 +32,7 @@
 #include    "handle-edt.h"
 #include    "dc-motor-fan.h"
 #include    "release-valve.h"
+#include    "blinds.h"
 
 /*!
  * \class
@@ -186,6 +187,9 @@ private:
 
     /// Флаг разрешения работы ЭДТ
     bool        allowEDT;
+
+    /// Жалюзи пуско-тормозных резисторов
+    Blinds      *blinds;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);

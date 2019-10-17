@@ -16,6 +16,7 @@ DCMotorFan::DCMotorFan(QObject* parent) : Device(parent)
   , CPhi(0.0)
   , ks(0.0)
   , J(0.0)
+  , soundName("")
 {
 
 }
@@ -33,7 +34,7 @@ DCMotorFan::~DCMotorFan()
 //------------------------------------------------------------------------------
 void DCMotorFan::preStep(state_vector_t& Y, double t)
 {
-    emit soundSetPitch("PTR_fan", static_cast<float>(Y[0] / 250.0));
+    emit soundSetPitch(soundName, static_cast<float>(Y[0] / 250.0));
 }
 
 //------------------------------------------------------------------------------
@@ -41,7 +42,7 @@ void DCMotorFan::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void DCMotorFan::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    double E = Y[0] * CPhi * sign(U);
+    double E = Y[0] * CPhi * hs_p(U);
     double I = (U - E) / R;
     double M = I * CPhi;
     double Ms = ks * Y[0] * Y[0] * sign(Y[0]);

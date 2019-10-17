@@ -250,6 +250,9 @@ void CHS2T::stepEDT(double t, double dt)
     BrakeReg->step(t, dt);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CHS2T::stepSupportEquipment(double t, double dt)
 {
     double R = 0.59;
@@ -259,6 +262,9 @@ void CHS2T::stepSupportEquipment(double t, double dt)
 
     motor_fan->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
     motor_fan->step(t, dt);
+
+    blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
+    blinds->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

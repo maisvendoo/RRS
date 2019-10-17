@@ -188,7 +188,11 @@ void CHS2T::initSupportEquipment()
 
     motor_fan = new DCMotorFan();
     motor_fan->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");
+    motor_fan->setSoundName("PTR_fan");
     connect(motor_fan, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
+
+    blinds = new Blinds();
+    blinds->read_custom_config(config_dir + QDir::separator() + "blinds");
 }
 
 //------------------------------------------------------------------------------
