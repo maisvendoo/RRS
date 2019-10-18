@@ -275,6 +275,16 @@ private:
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    void disableEDT() { EDT = allowEDT = false; }
+
+private slots:
+
+    void enableEDT()
+    {
+        EDT = allowEDT = true;
+        timer.stop();
+    }
 };
 
-#endif // CHS2T
+#endif // CHS2TOO

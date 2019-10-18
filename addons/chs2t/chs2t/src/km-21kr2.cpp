@@ -15,9 +15,9 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , k01(false)
   , k02(false)
 
-  , n(false)
+  , autoReset(false)
   , p(false)
-  , re(false)
+  , isPressedOneTime(false)
   , hod(false)
   , reverseState(0)
   , mainShaftPos(0.0)
@@ -70,18 +70,12 @@ void Km21KR2::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    if (getKeyState(KEY_W) && reverseState != 1 && !re)
-    {
-        reverseState += 1;
-        re = true;
-    }
-    if (getKeyState(KEY_S) && reverseState != -1 && !re)
-    {
-        reverseState -= 1;
-        re = true;
-    }
-    if (!getKeyState(KEY_W) && !getKeyState(KEY_S))
-        re = false;
+
+    if (!isPressedOneTime)
+        reverseState += ((getKeyState(KEY_W) && reverseState != 1) -
+                         (getKeyState(KEY_S) && reverseState != -1));
+
+    isPressedOneTime = (getKeyState(KEY_W) || getKeyState(KEY_S));
 
     if (reverseState == 0)
         return;
@@ -90,20 +84,24 @@ void Km21KR2::stepKeysControl(double t, double dt)
     if (getKeyState(KEY_D))
     {
         if (isControl())
-            n = false;
-        else
+            autoReset = false;
+
+        if (!autoReset)
         {
             if (isShift() && fieldWeakShaft != 0 && !p && hod)
             {
                 fieldWeakShaft -= 2;
                 p = true;
             }
-            else if (!n && !isShift())
+            else if (!isShift())
             {
                 mainShaftPos = -5;
             }
         }
     }
+
+    if (autoReset)
+        return;
 
     // 1 вниз
     if (getKeyState(KEY_A))
@@ -114,14 +112,12 @@ void Km21KR2::stepKeysControl(double t, double dt)
 
             p = true;
         }
-        else if(!n && !isShift())
+        else if(!isShift())
         {
             mainShaftPos = 2;
         }
     }
 
-    if (n)
-        return;
 
     // Авт. набор
     if (getKeyState(KEY_Q))
@@ -132,7 +128,7 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // 1 вверх
     if (getKeyState(KEY_E))
     {
-        n = true;
+        autoReset = true;
 
         mainShaftPos = -10;
     }

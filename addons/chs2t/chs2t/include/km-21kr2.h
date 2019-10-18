@@ -47,9 +47,9 @@ private:
     bool k01;
     bool k02;
 
-    bool n;
+    bool autoReset;
     bool p;
-    bool re;
+    bool isPressedOneTime;
     bool hod;
 
     int reverseState;

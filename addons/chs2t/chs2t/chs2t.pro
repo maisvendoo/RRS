@@ -37,7 +37,6 @@ INCLUDEPATH += ../../../filesystem/include
 INCLUDEPATH += ../../../libJournal/include
 
 HEADERS += $$files(./include/*.h)
-SOURCES += $$files(./src/*.cpp) \
-    src/chs2t-step-edt.cpp
+SOURCES += $$files(./src/*.cpp)
 
 #CONFIG += force_debug_info

@@ -109,6 +109,7 @@ void CHS2T::step(double t, double dt)
 
     //Journal::instance()->info("Step EDT");
     stepEDT(t, dt);
+    stepEDT2(t, dt);
 
     //Journal::instance()->info("Step support equipment");
     stepSupportEquipment(t, dt);
@@ -125,6 +126,7 @@ void CHS2T::step(double t, double dt)
     horn->setControl(keys);
     horn->step(t, dt);
 }
+
 
 //------------------------------------------------------------------------------
 // Загрузка данных из конфигурационного файла
