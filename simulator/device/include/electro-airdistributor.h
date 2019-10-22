@@ -16,4 +16,23 @@ protected:
 
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef ElectroAirDistributor* (*GetElectroAirDistributor)();
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+#define GET_ELECTRO_AIRDISTRIBUTOR(ClassName) \
+    extern "C" Q_DECL_EXPORT ElectroAirDistributor *getElectroAirDistributor() \
+    { \
+        return new (ClassName) (); \
+    }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+extern "C" Q_DECL_EXPORT ElectroAirDistributor *loadElectroAirDistributor(QString lib_path);
+
 #endif // ELECTRO_AIRDISTRIBUTOR_H

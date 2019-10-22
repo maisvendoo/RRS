@@ -6,6 +6,7 @@
 #include    <QtSerialPort/QSerialPortInfo>
 
 #include    "rs485.h"
+#include    "slave.h"
 
 //------------------------------------------------------------------------------
 //
@@ -22,16 +23,23 @@ public:
 
 private:
 
-    QModbusClient   *modbusDevice;
+    QModbusClient           *modbusDevice;
 
-    port_config_t   port_config;
+    port_config_t           port_config;
+
+public:
+
+    QMap<quint16, Slave *>  slave;
+
+private:
 
     enum
     {
         MASTER_INFO = 0,
         MASTER_WARNING = 1,
         MASTER_ERROR = 2
-    };
+    };    
+
 
     bool loadPortConfig(const QString &path, port_config_t &port_config);
 

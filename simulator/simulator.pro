@@ -18,7 +18,7 @@ SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
 
-#SUBDIRS += ./modbus
+SUBDIRS += ./modbus
 
 SUBDIRS += ./krm395
 SUBDIRS += ./vr242
