@@ -3,7 +3,7 @@ TEMPLATE = lib
 QT -= gui
 QT += xml
 
-TARGET = vl60
+TARGET = vl60pk
 
 DESTDIR = ../../../../modules/$$join(TARGET,,,)
 
@@ -24,7 +24,10 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../../lib -lfilesystem
 }
 
+LIBS += -L../../../../modules/vl60-common -lvl60-equipment
+
 INCLUDEPATH += ./include
+INCLUDEPATH += ../vl60-equipment/include
 INCLUDEPATH += ../../../CfgReader/include
 INCLUDEPATH += ../../../filesystem/include
 

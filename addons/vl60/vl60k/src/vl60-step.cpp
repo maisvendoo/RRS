@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepOtherEquipment(double t, double dt)
+void VL60k::stepOtherEquipment(double t, double dt)
 {
     speed_meter->setOmega(wheel_omega[TED1]);
     speed_meter->step(t, dt);
@@ -17,7 +17,7 @@ void VL60::stepOtherEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::step(double t, double dt)
+void VL60k::step(double t, double dt)
 {
     stepPantographsControl(t, dt);
 
@@ -51,7 +51,7 @@ void VL60::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::slotAutoStart()
+void VL60k::slotAutoStart()
 {
     if (start_count < triggers.size())
     {
@@ -77,7 +77,7 @@ void VL60::slotAutoStart()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepPantographsControl(double t, double dt)
+void VL60k::stepPantographsControl(double t, double dt)
 {
     pantographs[0]->setState(pant1_tumbler.getState() && pants_tumbler.getState());
     pantographs[1]->setState(pant2_tumbler.getState() && pants_tumbler.getState());
@@ -94,7 +94,7 @@ void VL60::stepPantographsControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepMainSwitchControl(double t, double dt)
+void VL60k::stepMainSwitchControl(double t, double dt)
 {
     // Подаем на вход напряжение с крышевой шины, на которую включены
     // оба токоприемника
@@ -118,7 +118,7 @@ void VL60::stepMainSwitchControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepTracTransformer(double t, double dt)
+void VL60k::stepTracTransformer(double t, double dt)
 {
     // Задаем напряжение на первичной обмотке (с выхода ГВ)
     trac_trans->setU1(main_switch->getU_out());
@@ -130,7 +130,7 @@ void VL60::stepTracTransformer(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepPhaseSplitter(double t, double dt)
+void VL60k::stepPhaseSplitter(double t, double dt)
 {
     double U_power = trac_trans->getU_sn() * static_cast<double>(fr_tumbler.getState());
     phase_spliter->setU_power(U_power);
@@ -141,7 +141,7 @@ void VL60::stepPhaseSplitter(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepMotorFans(double t, double dt)
+void VL60k::stepMotorFans(double t, double dt)
 {
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
     {
@@ -154,7 +154,7 @@ void VL60::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepMotorCompressor(double t, double dt)
+void VL60k::stepMotorCompressor(double t, double dt)
 {
     //double k_flow = 5e-3;
     //main_reservoir->setFlowCoeff(k_flow);
@@ -172,7 +172,7 @@ void VL60::stepMotorCompressor(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepBrakeControl(double t, double dt)
+void VL60k::stepBrakeControl(double t, double dt)
 {
     // Подключаем к УБТ трубопровод от ГР
     ubt->setLocoFLpressure(main_reservoir->getPressure());
@@ -190,8 +190,8 @@ void VL60::stepBrakeControl(double t, double dt)
     brake_crane->step(t, dt);
 
     loco_crane->setFeedlinePressure(ubt->getCraneFLpressure());
-    loco_crane->setBrakeCylinderPressure(switch_valve->getPressure2());
-    loco_crane->setAirDistributorFlow(0.0);
+    loco_crane->setBrakeCylinderPressure(pneumo_splitter->getP_in());
+    loco_crane->setAirDistributorFlow(air_disr->getAirSupplyFlow());
     loco_crane->setControl(keys);
     loco_crane->step(t, dt);
 }
@@ -199,15 +199,15 @@ void VL60::stepBrakeControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepTrolleysBrakeMech(double t, double dt)
+void VL60k::stepTrolleysBrakeMech(double t, double dt)
 {
-    switch_valve->setInputFlow1(air_disr->getBrakeCylinderAirFlow());
-    switch_valve->setInputFlow2(loco_crane->getBrakeCylinderFlow());
-    switch_valve->setOutputPressure(pneumo_splitter->getP_in());
-    switch_valve->step(t, dt);
+    //switch_valve->setInputFlow1(air_disr->getBrakeCylinderAirFlow());
+    //switch_valve->setInputFlow2(loco_crane->getBrakeCylinderFlow());
+    //switch_valve->setOutputPressure(pneumo_splitter->getP_in());
+    //switch_valve->step(t, dt);
 
     // Тройник подключен к ЗПК
-    pneumo_splitter->setQ_in(switch_valve->getOutputFlow());
+    pneumo_splitter->setQ_in(loco_crane->getBrakeCylinderFlow());
     pneumo_splitter->setP_out1(pneumo_relay->getWorkPressure());
     pneumo_splitter->setP_out2(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure());
     pneumo_splitter->step(t, dt);
@@ -239,12 +239,12 @@ void VL60::stepTrolleysBrakeMech(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepAirDistributors(double t, double dt)
+void VL60k::stepAirDistributors(double t, double dt)
 {
     supply_reservoir->setAirFlow(air_disr->getAirSupplyFlow());
     supply_reservoir->step(t, dt);
 
-    air_disr->setBrakeCylinderPressure(switch_valve->getPressure1());
+    air_disr->setBrakeCylinderPressure(loco_crane->getAirDistribPressure());
     air_disr->setAirSupplyPressure(supply_reservoir->getPressure());
     air_disr->setBrakepipePressure(pTM);
     auxRate = air_disr->getAuxRate();
@@ -254,7 +254,7 @@ void VL60::stepAirDistributors(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepTractionControl(double t, double dt)
+void VL60k::stepTractionControl(double t, double dt)
 {
     controller->setControl(keys);
     controller->step(t, dt);
@@ -303,7 +303,7 @@ void VL60::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepLineContactors(double t, double dt)
+void VL60k::stepLineContactors(double t, double dt)
 {
     km_state_t km_state = controller->getState();
 
@@ -324,7 +324,7 @@ void VL60::stepLineContactors(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::lineContactorsControl(bool state)
+void VL60k::lineContactorsControl(bool state)
 {
     for (size_t i = 0; i < line_contactor.size(); ++i)
     {
@@ -338,7 +338,7 @@ void VL60::lineContactorsControl(bool state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float VL60::isLineContactorsOff()
+float VL60k::isLineContactorsOff()
 {
     bool state = true;
 
@@ -353,7 +353,7 @@ float VL60::isLineContactorsOff()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double VL60::getTractionForce()
+double VL60k::getTractionForce()
 {
     double ip = 2.73;
 
@@ -372,7 +372,7 @@ double VL60::getTractionForce()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VL60::getHoldingCoilState() const
+bool VL60k::getHoldingCoilState() const
 {
     km_state_t km_state = controller->getState();
 

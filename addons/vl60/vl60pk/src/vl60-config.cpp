@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::load_brakes_config(QString path)
+void VL60pk::load_brakes_config(QString path)
 {
     CfgReader cfg;
 
@@ -72,7 +72,7 @@ void VL60::load_brakes_config(QString path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::loadConfig(QString cfg_path)
+void VL60pk::loadConfig(QString cfg_path)
 {
     CfgReader cfg;
 
