@@ -91,6 +91,8 @@ void Modbus::controlSignalsProcess()
 //------------------------------------------------------------------------------
 void Modbus::feedbackSignalsProcess()
 {
+
+
     for (Slave *slave: master->slave)
     {
         QMap<quint16, slave_data_t>::iterator it;

@@ -33,6 +33,7 @@
 #include    "dc-motor-fan.h"
 #include    "release-valve.h"
 #include    "blinds.h"
+#include    "hardware-signals.h"
 
 /*!
  * \class
@@ -199,6 +200,9 @@ private:
 
     /// Обработка клавиш
     void keyProcess();
+
+    /// Вывод данных на внешние СОИ
+    void hardwareOutput();
 
     /// Сброс данных в регистратор
     void registrate(double t, double dt);

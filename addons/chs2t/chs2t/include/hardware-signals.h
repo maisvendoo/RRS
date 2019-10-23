@@ -16,7 +16,9 @@ enum
     KM_K33 = 8,
 
     KM_SVISTOK = 9,
-    KM_STURVAL_DOWN = 10
+    KM_STURVAL_DOWN = 10,
+
+    TEST_COUNT = 11
 };
 
 #endif // HARDWARESIGNALS_H

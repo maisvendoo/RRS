@@ -160,4 +160,12 @@ void CHS2T::keyProcess()
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::hardwareOutput()
+{
+    feedback_signals.analogSignal[TEST_COUNT].value += 1.0f;
+}
+
 GET_VEHICLE(CHS2T)
