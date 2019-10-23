@@ -43,6 +43,8 @@ private:
 
     bool loadPortConfig(const QString &path, port_config_t &port_config);
 
+    bool loadNetworkMap(const QString &path);
+
     bool serialConnection(port_config_t port_config);
 
 private slots:

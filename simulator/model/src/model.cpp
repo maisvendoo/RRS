@@ -420,7 +420,9 @@ void Model::initControlPanel(QString cfg_path)
         if (!cfg.getString(secName, "ConfigDir", config_dir))
             return;
 
-        if (!control_panel->init(QString(fs.getPluginsDir().c_str()) + fs.separator() + config_dir))
+        config_dir = QString(fs.toNativeSeparators(config_dir.toStdString()).c_str());
+
+        if (!control_panel->init(QString(fs.getConfigDir().c_str()) + fs.separator() + config_dir))
             return;
 
         int request_interval = 0;

@@ -90,25 +90,21 @@ void Modbus::feedbackSignalsProcess()
     for (Slave *slave: master->slave)
     {
         QMap<quint16, slave_data_t>::iterator it;
-    }
-}
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-slave_data_t *Modbus::searchByIndex(size_t index, data_map_t &data)
-{
-    QMap<quint16, slave_data_t>::iterator it;
-
-    for (it = data.begin(); it != data.end(); ++it)
-    {
-        if (it.value().index == index)
+        // Пишем дискретные выходы
+        for (it = slave->coil.begin(); it != slave->coil.end(); ++it)
         {
-            return &it.value();
+            slave_data_t *coil = &it.value();
+            coil->value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].value);
+        }
+
+        // Пишем регистры вывода
+        for (it = slave->holding_register.begin(); it != slave->holding_register.end(); ++it)
+        {
+            slave_data_t *holding_reg = &it.value();
+            holding_reg->value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].value);
         }
     }
-
-    return nullptr;
 }
 
 //------------------------------------------------------------------------------

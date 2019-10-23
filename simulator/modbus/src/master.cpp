@@ -4,6 +4,8 @@
 
 #include    <QVariant>
 #include    <QModbusRtuSerialMaster>
+#include    <QDir>
+#include    <QFileInfo>
 
 //------------------------------------------------------------------------------
 //
@@ -27,7 +29,12 @@ Master::~Master()
 //------------------------------------------------------------------------------
 bool Master::init(QString cfg_path)
 {
-    loadPortConfig(cfg_path, port_config);
+    loadPortConfig(cfg_path + QDir::separator() + "rs485.xml", port_config);
+
+    if (!loadNetworkMap(cfg_path + QDir::separator() + "modbus-map.xml"))
+    {
+        return false;
+    }
 
     if (modbusDevice != Q_NULLPTR)
     {
@@ -71,6 +78,60 @@ bool Master::loadPortConfig(const QString &path, port_config_t &port_config)
     cfg.getInt(secName, "StopBits", port_config.stop_bits);
     cfg.getInt(secName, "Parity", port_config.parity);
     cfg.getInt(secName, "Timeout", port_config.timeout);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Master::loadNetworkMap(const QString &path)
+{
+    if (path.isEmpty())
+    {
+        return false;
+    }
+
+    CfgReader cfg;
+
+    if (!cfg.load(path))
+    {
+        return false;
+    }
+
+    QFileInfo info(path);
+    QDir cfg_dir = info.dir();
+
+    QDomNode secNode = cfg.getFirstSection("Slave");
+
+    while (!secNode.isNull())
+    {
+        Slave *slave = new Slave();
+
+        QString config_name = "";
+        cfg.getString(secNode, "Config", config_name);
+
+        if (slave->load_config(cfg_dir.path() + QDir::separator() + config_name + ".xml"))
+        {
+            int tmp = 0;
+            if (cfg.getInt(secNode, "id", tmp))
+            {
+                slave->id = static_cast<quint16>(tmp);
+            }
+
+            cfg.getString(secNode, "Description", slave->description);
+            cfg.getBool(secNode, "ConfigRequired", slave->is_config_required);
+
+            if (cfg.getInt(secNode, "CellsMask", tmp))
+            {
+                slave->cells_mask = static_cast<quint16>(tmp);
+            }
+
+            this->slave.insert(slave->id, slave);
+        }
+
+        secNode = cfg.getNextSection();
+    }
 
     return true;
 }

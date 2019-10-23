@@ -28,11 +28,11 @@ private:
     /// Флаг передачи данных
     bool    is_transmit;
 
+    /// Прием данных из Modbus
     void controlSignalsProcess();
 
-    void feedbackSignalsProcess();
-
-     slave_data_t *searchByIndex(size_t index, data_map_t &data);
+    /// Передача данных в Modbus
+    void feedbackSignalsProcess();    
 };
 
 #endif // MODBUS_H
