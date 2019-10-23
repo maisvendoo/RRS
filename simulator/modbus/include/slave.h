@@ -64,10 +64,16 @@ public:
 
     bool load_config(QString cfg_path);
 
+    void incErrosCount();
+
 private:
 
     /// Загрузка конфигурации структуры данных определенного типа
     void load_data_structure(QString name, CfgReader &cfg, data_map_t &data);
+
+public slots:
+
+    void slotReadDiscreteInputs();
 };
 
 

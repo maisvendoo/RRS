@@ -21,6 +21,8 @@ public:
 
     bool init(QString cfg_path);
 
+    void readDiscreteInputsRequest(Slave *slave);
+
 private:
 
     QModbusClient           *modbusDevice;
@@ -46,6 +48,7 @@ private:
     bool loadNetworkMap(const QString &path);
 
     bool serialConnection(port_config_t port_config);
+
 
 private slots:
 

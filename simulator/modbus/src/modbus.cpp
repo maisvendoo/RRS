@@ -66,7 +66,9 @@ void Modbus::controlSignalsProcess()
     // Перебираем все ведомые устройства
     for (Slave *slave : master->slave)
     {
-        // Передаем значение дискретных входов
+        // Послыаем запрос на чтение дискретных входов
+        master->readDiscreteInputsRequest(slave);
+        // Передаем значение дискретных входов        
         for (slave_data_t data : slave->discrete_input)
         {
             control_signals.analogSignal[data.index].is_active = true;
@@ -80,6 +82,8 @@ void Modbus::controlSignalsProcess()
             control_signals.analogSignal[data.index].value = static_cast<float>(data.value);
         }
     }
+
+    emit sendControlSignals(control_signals);
 }
 
 //------------------------------------------------------------------------------
