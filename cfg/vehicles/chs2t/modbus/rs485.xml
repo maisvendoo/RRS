@@ -3,7 +3,7 @@
     <SerialPort>
         <!-- <Name>/dev/rs485</Name> -->
         <Name>/dev/ttyUSB0</Name>
-        <Baudrate>250000</Baudrate>        
+        <Baudrate>115200</Baudrate>        
         <DataBits>8</DataBits>
         <StopBits>1</StopBits>
         <Parity>0</Parity>

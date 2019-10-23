@@ -98,7 +98,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     ip = 1.75;
 
     km21KR2->setHod(stepSwitch->getHod());
-    km21KR2->setControl(keys);
+    km21KR2->setControl(keys, control_signals);
     km21KR2->step(t, dt);
 
     stepSwitch->setDropPosition(dropPosition);

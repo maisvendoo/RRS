@@ -1,5 +1,7 @@
 #include "km-21kr2.h"
 
+
+
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
@@ -165,4 +167,59 @@ void Km21KR2::stepKeysControl(double t, double dt)
     controlState.k31 = k31;
     controlState.k32 = k32;
     controlState.k33 = k33;
+}
+
+void Km21KR2::stepExternalControl(double t, double dt)
+{
+    connectSignals(KM_K01, k01);
+    connectSignals(KM_K02, k02);
+    connectSignals(KM_K21, k21);
+    connectSignals(KM_K22, k22);
+    connectSignals(KM_K23, k23);
+    connectSignals(KM_K31, k31);
+    connectSignals(KM_K32, k32);
+    connectSignals(KM_K33, k33);
+
+    if (control_signals.analogSignal[KM_K01].is_active)
+        k01 = static_cast<bool>(control_signals.analogSignal[KM_K01].value);
+
+    if (control_signals.analogSignal[KM_K02].is_active)
+        k02 = static_cast<bool>(control_signals.analogSignal[KM_K02].value);
+
+    if (control_signals.analogSignal[KM_K21].is_active)
+        k21 = static_cast<bool>(control_signals.analogSignal[KM_K21].value);
+
+    if (control_signals.analogSignal[KM_K22].is_active)
+        k22 = static_cast<bool>(control_signals.analogSignal[KM_K22].value);
+
+    if (control_signals.analogSignal[KM_K23].is_active)
+        k23 = static_cast<bool>(control_signals.analogSignal[KM_K23].value);
+
+    if (control_signals.analogSignal[KM_K31].is_active)
+        k31 = static_cast<bool>(control_signals.analogSignal[KM_K31].value);
+
+    if (control_signals.analogSignal[KM_K32].is_active)
+        k32 = static_cast<bool>(control_signals.analogSignal[KM_K32].value);
+
+    if (control_signals.analogSignal[KM_K33].is_active)
+        k33 = static_cast<bool>(control_signals.analogSignal[KM_K33].value);
+
+    controlState.k01 = k01;
+    controlState.k02 = k02;
+
+    controlState.up = (k21 && k23);
+    controlState.up1 = (!k21 && k23);
+    controlState.zero = (k22 && !k23);
+    controlState.down1 = (!k21 && !k22);
+    controlState.down = (k21 && !k22);
+
+    controlState.k31 = k31;
+    controlState.k32 = k32;
+    controlState.k33 = k33;
+}
+
+void Km21KR2::connectSignals(ControllerSignals cs, bool k)
+{
+    if (control_signals.analogSignal[cs].is_active)
+        k = static_cast<bool>(control_signals.analogSignal[cs].value);
 }

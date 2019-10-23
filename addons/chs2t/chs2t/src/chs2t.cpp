@@ -141,30 +141,7 @@ void CHS2T::loadConfig(QString cfg_path)
     }
 }
 
-<<<<<<< HEAD
-=======
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::keyProcess()
-{
-    if (getKeyState(KEY_8))
-    {
-        if (isShift())
-            mk_tumbler.set();
 
-        else
-            mk_tumbler.reset();
-    }
-
-    if (getKeyState(KEY_9))
-    {
-        if (isShift())
-            EDTSwitch.set();
-        else
-            EDTSwitch.reset();
-    }
-}
 
 //------------------------------------------------------------------------------
 //
@@ -174,5 +151,4 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[TEST_COUNT].value += 1.0f;
 }
 
->>>>>>> a3a24dc0bc9749b2fabea96fc3b6aec0058bfda9
 GET_VEHICLE(CHS2T)

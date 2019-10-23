@@ -1,7 +1,7 @@
 #ifndef     HARDWARE_SIGNALS_H
 #define     HARDWARE_SIGNALS_H
 
-enum
+enum ControllerSignals
 {
     KM_K01 = 0,
     KM_K02 = 1,

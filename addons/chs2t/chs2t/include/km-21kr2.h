@@ -3,6 +3,7 @@
 
 #include "device.h"
 #include "km-21kr2-state.h"
+#include  "hardware-signals.h"
 
 //------------------------------------------------------------------------------
 //
@@ -33,6 +34,10 @@ private:
     void preStep(state_vector_t &Y, double t);
 
     void stepKeysControl(double t, double dt);
+
+    void stepExternalControl(double t, double dt);
+
+    void connectSignals(ControllerSignals cs, bool k);
 
     bool k21;
     bool k22;
