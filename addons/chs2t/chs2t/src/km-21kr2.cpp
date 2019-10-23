@@ -15,6 +15,7 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , k01(false)
   , k02(false)
 
+  , autoSet(false)
   , autoReset(false)
   , p(false)
   , isPressedOneTime(false)
@@ -91,17 +92,14 @@ void Km21KR2::stepKeysControl(double t, double dt)
             if (isShift() && fieldWeakShaft != 0 && !p && hod)
             {
                 fieldWeakShaft -= 2;
-                p = true;
-            }
-            else if (!isShift())
-            {
-                mainShaftPos = -5;
             }
         }
     }
 
     if (autoReset)
+    {
         return;
+    }
 
     // 1 вниз
     if (getKeyState(KEY_A))
@@ -109,12 +107,6 @@ void Km21KR2::stepKeysControl(double t, double dt)
         if(isShift() && fieldWeakShaft != 10 && !p && hod)
         {
             fieldWeakShaft += 2;
-
-            p = true;
-        }
-        else if(!isShift())
-        {
-            mainShaftPos = 2;
         }
     }
 
@@ -122,24 +114,32 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // Авт. набор
     if (getKeyState(KEY_Q))
     {
-        mainShaftPos = 4;
+        autoSet = true;
+    }
+    else
+    {
+        autoSet = false;
     }
 
     // 1 вверх
     if (getKeyState(KEY_E))
     {
         autoReset = true;
-
         mainShaftPos = -10;
     }
 
-    // Ноль
-    if (!getKeyState(KEY_Q) && !getKeyState(KEY_E) &&
-        !getKeyState(KEY_A) && !getKeyState(KEY_D))
+    if (!autoReset)
     {
-        p = false;
-
-        mainShaftPos = 0;
+        if (autoSet)
+        {
+            mainShaftPos = 4;
+        }
+        else
+        {
+            mainShaftPos = (!isShift() && !isControl()) * (-5 * getKeyState(KEY_D) +
+                                                            2 * getKeyState(KEY_A));
+            p = (mainShaftPos != 0);
+        }
     }
 
     k21 = (mainShaftPos == -10 || mainShaftPos == 0 || mainShaftPos == 4);

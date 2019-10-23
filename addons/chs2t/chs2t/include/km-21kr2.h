@@ -47,6 +47,7 @@ private:
     bool k01;
     bool k02;
 
+    bool autoSet;
     bool autoReset;
     bool p;
     bool isPressedOneTime;

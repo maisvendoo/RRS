@@ -176,7 +176,6 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT) + relValve->getQrv());
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
-    //dako->setQ1(airSplit->getQ_out1());
 
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
