@@ -164,6 +164,11 @@ void CHS2T::initEDT()
     pulseConv = new PulseConverter();
 
     BrakeReg = new BrakeRegulator();
+    BrakeReg->read_custom_config(config_dir + QDir::separator() + "brake-regulator");
+
+    timer.setTimeout(3.0);
+    timer.firstProcess(false);
+    connect(&timer, &Timer::process, this, &CHS2T::enableEDT);
 }
 
 //------------------------------------------------------------------------------

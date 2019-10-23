@@ -21,11 +21,17 @@ public:
 
     void setCtrlState(ControllerState ctrlState) { this->ctrlState = ctrlState; }
 
+    void setDropPosition(bool value) { dropPosition = value; }
+
     int getPoz() { return poz; }
 
     double getSchemeState() const;
 
     bool getHod() { return hod; }
+
+    int getFieldStep() const { return fieldStep; }
+
+    int getReverseState() const { return reverseState; }
 
     bool isZero() const;
 
@@ -47,17 +53,20 @@ private:
     };
 
     double V;
-    double V1;
-
 
     double poz_d;
 
     int poz;
 
+    int fieldStep;
+    int reverseState;
+
     bool n;
     bool p;
     bool s;
     int prevPos;
+
+    bool dropPosition;
 
     bool hod;
 

@@ -26,6 +26,8 @@ public:
 
     void setAllowEDT(bool value) { allowEDT = value; }
 
+    void reset() { setY(0, 0); setY(1, 0); }
+
 private:
 
     /// Текущий ток якорей ТЭД
@@ -49,9 +51,14 @@ private:
     /// Флаг разрешающий работу ЭДТ
     bool allowEDT;
 
+    /// Постоянная времени нарастания заданного тока
+    double T;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void preStep(state_vector_t &Y, double t);
+
+    void load_config(CfgReader &cfg);
 };
 
 #endif // BRAKEREGULATOR_H

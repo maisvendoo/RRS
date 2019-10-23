@@ -36,6 +36,8 @@ public:
 
     signal_t getControlSignal(size_t id);
 
+    QString getConfigDirectoryName() const;
+
 signals:
 
     void sendControlSignals(control_signals_t control_signals);
@@ -47,6 +49,8 @@ public slots:
     void receiveFeedback(feedback_signals_t feedback_signals);
 
 protected:
+
+    QString             cfg_dir;
 
     control_signals_t   control_signals;
 

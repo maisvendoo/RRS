@@ -24,6 +24,15 @@ private:
 
     /// Мастер-устройство
     Master  *master;
+
+    /// Флаг передачи данных
+    bool    is_transmit;
+
+    /// Прием данных из Modbus
+    void controlSignalsProcess();
+
+    /// Передача данных в Modbus
+    void feedbackSignalsProcess();    
 };
 
 #endif // MODBUS_H

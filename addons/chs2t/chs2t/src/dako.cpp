@@ -79,6 +79,9 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 //------------------------------------------------------------------------------
 void Dako::preStep(state_vector_t& Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     EDT_state = (U * Physics::kmh > 50);
 }
 

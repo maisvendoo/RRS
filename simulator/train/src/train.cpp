@@ -227,6 +227,7 @@ void Train::inputProcess()
     {
         Vehicle *vehicle = *i;
         vehicle->keyProcess();
+        vehicle->hardwareProcess();
     }
 }
 

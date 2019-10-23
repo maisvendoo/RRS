@@ -28,6 +28,8 @@ CHS2T::CHS2T() : Vehicle()
     U_kr = 0;
 
     EDT = false;    
+
+    dropPosition = false;
 }
 
 //------------------------------------------------------------------------------
@@ -107,6 +109,7 @@ void CHS2T::step(double t, double dt)
 
     //Journal::instance()->info("Step EDT");
     stepEDT(t, dt);
+    stepEDT2(t, dt);
 
     //Journal::instance()->info("Step support equipment");
     stepSupportEquipment(t, dt);
@@ -124,6 +127,7 @@ void CHS2T::step(double t, double dt)
     horn->step(t, dt);
 }
 
+
 //------------------------------------------------------------------------------
 // Загрузка данных из конфигурационного файла
 //------------------------------------------------------------------------------
@@ -137,27 +141,14 @@ void CHS2T::loadConfig(QString cfg_path)
     }
 }
 
+
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS2T::keyProcess()
+void CHS2T::hardwareOutput()
 {
-    if (getKeyState(KEY_8))
-    {
-        if (isShift())
-            mk_tumbler.set();
-
-        else
-            mk_tumbler.reset();
-    }
-
-    if (getKeyState(KEY_9))
-    {
-        if (isShift())
-            EDTSwitch.set();
-        else
-            EDTSwitch.reset();
-    }
+    feedback_signals.analogSignal[TEST_COUNT].value += 1.0f;
 }
 
 GET_VEHICLE(CHS2T)

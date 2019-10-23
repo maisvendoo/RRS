@@ -8,6 +8,7 @@ BrakeRegulator::BrakeRegulator(QObject* parent) : Device(parent)
     u = 0.0;
     k_1 = 1250;
     k_2 = 5e-3;
+    T = 1.0;
 }
 
 //------------------------------------------------------------------------------
@@ -29,6 +30,8 @@ void BrakeRegulator::ode_system(const state_vector_t& Y,
     Q_UNUSED(t)
 
     dYdt[0] = (Bref * k_1 * allowEDT - abs(Ia)) * k_2;
+
+    dYdt[1] = (Y[0] - Y[1]) / T;
 }
 
 //------------------------------------------------------------------------------
@@ -39,6 +42,18 @@ void BrakeRegulator::preStep(state_vector_t& Y, double t)
     Q_UNUSED(t)
 
     Y[0] = cut(Y[0], 0.0, 1.0);
-    u = Y[0];
+    u = Y[1];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeRegulator::load_config(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    cfg.getDouble(secName, "K1", k_1);
+    cfg.getDouble(secName, "K2", k_2);
+    cfg.getDouble(secName, "T", T);
 }
 

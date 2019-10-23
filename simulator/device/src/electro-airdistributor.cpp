@@ -1,5 +1,7 @@
 #include    "electro-airdistributor.h"
 
+#include    <QLibrary>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -26,6 +28,7 @@ ElectroAirDistributor::~ElectroAirDistributor()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+
 void ElectroAirDistributor::setControlLinesNumber(size_t num)
 {
     control_line.resize(num);
@@ -41,14 +44,42 @@ void ElectroAirDistributor::setControlLine(double value, size_t idx)
         control_line[idx] = cut(value, -1.0, 1.0);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ElectroAirDistributor::setInputSupplyReservoirFlow(double Qar_in)
 {
     this->Qar_in = Qar_in;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double ElectroAirDistributor::getOutputSupplyReservoirFlow()
 {
     return Qar_out;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ElectroAirDistributor *loadElectroAirDistributor(QString lib_path)
+{
+
+        ElectroAirDistributor *electro_airdist = nullptr;
+
+        QLibrary lib(lib_path);
+
+        if (lib.load())
+        {
+            GetElectroAirDistributor getElectroAirDistributor = reinterpret_cast<GetElectroAirDistributor>(lib.resolve("getElectroAirDistributor"));
+
+            if (getElectroAirDistributor)
+            {
+                electro_airdist = getElectroAirDistributor();
+            }
+        }
+
+        return electro_airdist;
+}
 
