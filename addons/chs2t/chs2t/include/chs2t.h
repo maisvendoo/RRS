@@ -180,6 +180,10 @@ private:
     /// Разрешение тяги
     Trigger     allowTrac;
 
+    bool dropPosition;
+
+    Timer timer;
+
     /// Передаточное число тягового редуктора
     double      ip;
 
@@ -269,6 +273,8 @@ private:
 
     void stepEDT(double t, double dt);
 
+    void stepEDT2(double t, double dt);
+
     void stepSupportEquipment(double t, double dt);
 
     void stepDebugMsg(double t, double dt);
@@ -277,6 +283,16 @@ private:
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    void disableEDT() { EDT = allowEDT = false; }
+
+private slots:
+
+    void enableEDT()
+    {
+        EDT = allowEDT = true;
+        timer.stop();
+    }
 };
 
-#endif // CHS2T
+#endif // CHS2TOO

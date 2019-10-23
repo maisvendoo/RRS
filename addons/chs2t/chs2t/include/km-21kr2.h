@@ -3,6 +3,7 @@
 
 #include "device.h"
 #include "km-21kr2-state.h"
+#include  "hardware-signals.h"
 
 //------------------------------------------------------------------------------
 //
@@ -20,11 +21,7 @@ public:
 
     ControllerState getCtrlState() { return controlState; }
 
-    int getFieldStep() const { return fieldStep ; }
-
-    int getReverseState() const { return reverseState; }
-
-    double getMainShaftPos() const { return mainShaftPos; }
+    double getMainShaftPos() const { return mainShaftPos * 0.1; }
 
     double getMainShaftHeight() const { return mainShaftHeight; }
 
@@ -38,21 +35,31 @@ private:
 
     void stepKeysControl(double t, double dt);
 
+    void stepExternalControl(double t, double dt);
+
+    void connectSignals(ControllerSignals cs, bool k);
+
     bool k21;
     bool k22;
     bool k23;
 
+    bool k31;
+    bool k32;
+    bool k33;
+
     bool k01;
     bool k02;
 
-    bool n;
+    bool autoSet;
+    bool autoReset;
     bool p;
-    bool re;
+    bool isPressedOneTime;
     bool hod;
-    int fieldStep;
+
     int reverseState;
 
-    double mainShaftPos;
+    int mainShaftPos;
+    int fieldWeakShaft;
 
     double mainShaftHeight;
 

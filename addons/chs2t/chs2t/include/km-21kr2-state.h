@@ -12,6 +12,13 @@ struct ControllerState
     bool down1;
     bool down;
 
+    bool k01;
+    bool k02;
+
+    bool k31;
+    bool k32;
+    bool k33;
+
     ControllerState()
         : up(0)
         , up1(0)

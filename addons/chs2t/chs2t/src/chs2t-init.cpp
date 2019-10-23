@@ -164,6 +164,10 @@ void CHS2T::initEDT()
     pulseConv = new PulseConverter();
 
     BrakeReg = new BrakeRegulator();
+
+    timer.setTimeout(3.0);
+    timer.firstProcess(false);
+    connect(&timer, &Timer::process, this, &CHS2T::enableEDT);
 }
 
 //------------------------------------------------------------------------------

@@ -90,5 +90,5 @@ void Timer::setTimeout(double timeout)
 //------------------------------------------------------------------------------
 void Timer::firstProcess(bool first_process)
 {
-    this->first_process = first_process;
+    this->first_process = this->fprocess_prev = first_process;
 }

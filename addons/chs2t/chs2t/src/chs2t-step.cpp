@@ -98,9 +98,10 @@ void CHS2T::stepTractionControl(double t, double dt)
     ip = 1.75;
 
     km21KR2->setHod(stepSwitch->getHod());
-    km21KR2->setControl(keys);
+    km21KR2->setControl(keys, control_signals);
     km21KR2->step(t, dt);
 
+    stepSwitch->setDropPosition(dropPosition);
     stepSwitch->setCtrlState(km21KR2->getCtrlState());
     stepSwitch->setControl(keys);
     stepSwitch->step(t, dt);
@@ -113,8 +114,8 @@ void CHS2T::stepTractionControl(double t, double dt)
     if (stepSwitch->getPoz() == 0)
         allowTrac.set();
 
-    motor->setDirection(km21KR2->getReverseState());
-    motor->setBetaStep(km21KR2->getFieldStep());
+    motor->setDirection(stepSwitch->getReverseState());
+    motor->setBetaStep(stepSwitch->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());
     motor->setU(bv->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT) * allowTrac.getState());
@@ -175,7 +176,6 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT) + relValve->getQrv());
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
-    //dako->setQ1(airSplit->getQ_out1());
 
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
@@ -218,36 +218,6 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     rd304->step(t, dt);
     brakeRefRes->step(t, dt);
     airSplit->step(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::stepEDT(double t, double dt)
-{
-    pulseConv->setUakb(110.0 * static_cast<double>(EDT));
-    pulseConv->setU(BrakeReg->getU());
-    pulseConv->setUt(generator->getUt() * static_cast<double>(EDT));
-
-    generator->setUf(pulseConv->getUf());
-    generator->setOmega(wheel_omega[0] * ip);
-    generator->setRt(3.35);
-
-    BrakeReg->setAllowEDT(dako->isEDTAllow());
-    BrakeReg->setIa(generator->getIa());
-    BrakeReg->setIf(generator->getIf());
-    BrakeReg->setBref(brakeRefRes->getPressure());
-
-    allowEDT = EDTSwitch.getState() && dako->isEDTAllow();
-
-    EDT = static_cast<bool>(hs_p(brakeRefRes->getPressure() - 0.07));
-
-    /*if (!dako->isEDTAllow())
-        EDTValve.reset();*/
-
-    pulseConv->step(t, dt);
-    generator->step(t, dt);
-    BrakeReg->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
