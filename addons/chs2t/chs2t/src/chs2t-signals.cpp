@@ -34,7 +34,7 @@ void CHS2T::stepSignals()
     analogSignal[KRAN254_RUK] = static_cast<float>(locoCrane->getHandlePosition());
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
-    analogSignal[REVERSOR] = static_cast<float>(km21KR2->getReverseState());
+    analogSignal[REVERSOR] = static_cast<float>(stepSwitch->getReverseState());
 
     analogSignal[SIGLIGHT_P] = static_cast<float>(stepSwitch->isParallel());
     analogSignal[SIGLIGHT_SP] = static_cast<float>(stepSwitch->isSeriesParallel());

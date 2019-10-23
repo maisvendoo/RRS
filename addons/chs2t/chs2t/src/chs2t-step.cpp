@@ -114,7 +114,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     if (stepSwitch->getPoz() == 0)
         allowTrac.set();
 
-    motor->setDirection(km21KR2->getReverseState());
+    motor->setDirection(stepSwitch->getReverseState());
     motor->setBetaStep(stepSwitch->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());

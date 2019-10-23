@@ -78,6 +78,12 @@ void Km21KR2::stepKeysControl(double t, double dt)
 
     isPressedOneTime = (getKeyState(KEY_W) || getKeyState(KEY_S));
 
+    k01 = (reverseState == 1);
+    k02 = (reverseState == -1);
+
+    controlState.k01 = k01;
+    controlState.k02 = k02;
+
     if (reverseState == 0)
         return;
 

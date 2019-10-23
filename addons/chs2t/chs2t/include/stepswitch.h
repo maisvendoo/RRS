@@ -31,6 +31,8 @@ public:
 
     int getFieldStep() const { return fieldStep; }
 
+    int getReverseState() const { return reverseState; }
+
     bool isZero() const;
 
     bool isSeries() const;
@@ -40,8 +42,6 @@ public:
     bool isParallel() const;
 
     ampermeters_state_t getAmpermetersState();
-
-
 
 private:
 
@@ -59,6 +59,7 @@ private:
     int poz;
 
     int fieldStep;
+    int reverseState;
 
     bool n;
     bool p;

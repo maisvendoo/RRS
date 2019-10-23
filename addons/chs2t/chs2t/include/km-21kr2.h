@@ -20,8 +20,6 @@ public:
 
     ControllerState getCtrlState() { return controlState; }
 
-    int getReverseState() const { return reverseState; }
-
     double getMainShaftPos() const { return mainShaftPos * 0.1; }
 
     double getMainShaftHeight() const { return mainShaftHeight; }

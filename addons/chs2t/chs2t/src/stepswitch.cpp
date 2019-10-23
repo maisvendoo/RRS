@@ -169,5 +169,8 @@ void StepSwitch::stepDiscrete(double t, double dt)
                 4 * (ctrlState.k31 && ctrlState.k32) +
                 5 * (ctrlState.k31 && ctrlState.k33);
 
+    reverseState = (-1 * (!ctrlState.k01 && ctrlState.k02)) +
+                    (1 * (ctrlState.k01 && !ctrlState.k02));
+
     poz = static_cast<int>(poz_d);
 }
