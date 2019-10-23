@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 VirtualInterfaceDevice::VirtualInterfaceDevice(QObject *parent)
     : QObject(parent)
+    , cfg_dir("")
 {
     qRegisterMetaType<signal_t>();
     qRegisterMetaType<control_signals_t>();
@@ -27,6 +28,14 @@ VirtualInterfaceDevice::~VirtualInterfaceDevice()
 signal_t VirtualInterfaceDevice::getControlSignal(size_t id)
 {
     return control_signals.analogSignal[id];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString VirtualInterfaceDevice::getConfigDirectoryName() const
+{
+    return cfg_dir;
 }
 
 //------------------------------------------------------------------------------

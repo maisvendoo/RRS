@@ -38,9 +38,13 @@ void DCMotorFan::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 void DCMotorFan::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+<<<<<<< HEAD
     Q_UNUSED(t)
 
     double E = Y[0] * CPhi * sign(U);
+=======
+    double E = Y[0] * CPhi * hs_p(U);
+>>>>>>> a3a24dc0bc9749b2fabea96fc3b6aec0058bfda9
     double I = (U - E) / R;
     double M = I * CPhi;
     double Ms = ks * Y[0] * Y[0] * sign(Y[0]);

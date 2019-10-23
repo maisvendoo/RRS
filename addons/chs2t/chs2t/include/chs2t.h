@@ -32,6 +32,8 @@
 #include    "handle-edt.h"
 #include    "dc-motor-fan.h"
 #include    "release-valve.h"
+#include    "blinds.h"
+#include    "hardware-signals.h"
 
 /*!
  * \class
@@ -191,6 +193,9 @@ private:
     /// Флаг разрешения работы ЭДТ
     bool        allowEDT;
 
+    /// Жалюзи пуско-тормозных резисторов
+    Blinds      *blinds;
+
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -199,6 +204,9 @@ private:
 
     /// Обработка клавиш
     void keyProcess();
+
+    /// Вывод данных на внешние СОИ
+    void hardwareOutput();
 
     /// Сброс данных в регистратор
     void registrate(double t, double dt);

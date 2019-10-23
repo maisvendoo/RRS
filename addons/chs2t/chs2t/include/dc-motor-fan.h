@@ -2,7 +2,6 @@
 #define DCMOTORFAN_H
 
 #include    "device.h"
-#include    "motor-magnetic-char.h"
 
 //------------------------------------------------------------------------------
 //

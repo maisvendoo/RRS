@@ -235,6 +235,9 @@ void CHS2T::stepSupportEquipment(double t, double dt)
     // Мотор-вентилятор ПТР
     motor_fan->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
     motor_fan->step(t, dt);
+
+    blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
+    blinds->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

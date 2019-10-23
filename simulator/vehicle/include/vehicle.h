@@ -130,6 +130,8 @@ public:
 
     virtual void keyProcess();
 
+    virtual void hardwareProcess();
+
     ///
     void integrationStep(state_vector_t &Y, double t, double dt);
 
@@ -287,6 +289,8 @@ protected:
 
     /// User define step result processing
     virtual void postStep(double t);
+
+    virtual void hardwareOutput();
 
     /* Modkeys extended functions */
 

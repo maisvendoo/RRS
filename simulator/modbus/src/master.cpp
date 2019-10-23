@@ -4,6 +4,10 @@
 
 #include    <QVariant>
 #include    <QModbusRtuSerialMaster>
+#include    <QModbusDataUnit>
+#include    <QModbusReply>
+#include    <QDir>
+#include    <QFileInfo>
 
 //------------------------------------------------------------------------------
 //
@@ -27,7 +31,12 @@ Master::~Master()
 //------------------------------------------------------------------------------
 bool Master::init(QString cfg_path)
 {
-    loadPortConfig(cfg_path, port_config);
+    loadPortConfig(cfg_path + QDir::separator() + "rs485.xml", port_config);
+
+    if (!loadNetworkMap(cfg_path + QDir::separator() + "modbus-map.xml"))
+    {
+        return false;
+    }
 
     if (modbusDevice != Q_NULLPTR)
     {
@@ -78,6 +87,60 @@ bool Master::loadPortConfig(const QString &path, port_config_t &port_config)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool Master::loadNetworkMap(const QString &path)
+{
+    if (path.isEmpty())
+    {
+        return false;
+    }
+
+    CfgReader cfg;
+
+    if (!cfg.load(path))
+    {
+        return false;
+    }
+
+    QFileInfo info(path);
+    QDir cfg_dir = info.dir();
+
+    QDomNode secNode = cfg.getFirstSection("Slave");
+
+    while (!secNode.isNull())
+    {
+        Slave *slave = new Slave();
+
+        QString config_name = "";
+        cfg.getString(secNode, "Config", config_name);
+
+        if (slave->load_config(cfg_dir.path() + QDir::separator() + config_name + ".xml"))
+        {
+            int tmp = 0;
+            if (cfg.getInt(secNode, "id", tmp))
+            {
+                slave->id = static_cast<quint16>(tmp);
+            }
+
+            cfg.getString(secNode, "Description", slave->description);
+            cfg.getBool(secNode, "ConfigRequired", slave->is_config_required);
+
+            if (cfg.getInt(secNode, "CellsMask", tmp))
+            {
+                slave->cells_mask = static_cast<quint16>(tmp);
+            }
+
+            this->slave.insert(slave->id, slave);
+        }
+
+        secNode = cfg.getNextSection();
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Master::serialConnection(port_config_t port_config)
 {
     if (modbusDevice == Q_NULLPTR)
@@ -110,9 +173,90 @@ bool Master::serialConnection(port_config_t port_config)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Master::readDiscreteInputsRequest(Slave *slave)
+{
+    if (!slave->isConnected())
+        return;
+
+    quint16 addr = slave->discrete_input.begin().value().address;
+    QModbusDataUnit unit(QModbusDataUnit::DiscreteInputs, addr, static_cast<quint16>(slave->discrete_input.size()));
+
+    QModbusReply *reply = modbusDevice->sendReadRequest(unit, slave->id);
+
+    if (reply != Q_NULLPTR)
+    {
+        if (!reply->isFinished())
+        {
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotReadDiscreteInputs, Qt::QueuedConnection);
+
+            connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
+        }
+        else
+        {
+            reply->deleteLater();
+        }
+    }
+    else
+    {
+        slave->incErrosCount();
+        return;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Master::slotErrorModbus(QModbusDevice::Error error)
 {
+    if (error == QModbusDevice::NoError)
+        return;
 
+    QString error_msg = modbusDevice->errorString();
+
+    switch (error)
+    {
+    case QModbusDevice::NoError:
+
+        break;
+
+    case QModbusDevice::ReadError:
+
+        break;
+
+    case QModbusDevice::WriteError:
+
+        break;
+
+    case QModbusDevice::ConnectionError:
+
+        break;
+
+    case QModbusDevice::ConfigurationError:
+
+        break;
+
+    case  QModbusDevice::TimeoutError:
+        {
+            QModbusReply *reply = qobject_cast<QModbusReply *>(sender());
+            quint16 id = static_cast<quint16>(reply->serverAddress());
+
+            slave[id]->incErrosCount();
+
+            break;
+        }
+
+    case QModbusDevice::ProtocolError:
+
+        break;
+
+    case QModbusDevice::UnknownError:
+
+        break;
+
+    case QModbusDevice::ReplyAbortedError:
+
+        break;
+    }
 }
 
 //------------------------------------------------------------------------------

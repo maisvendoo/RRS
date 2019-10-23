@@ -34,6 +34,5 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 
 
-HEADERS += $$files(./include/*.h) \
-    include/rs485.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
