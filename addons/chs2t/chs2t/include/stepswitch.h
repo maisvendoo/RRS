@@ -68,9 +68,10 @@ private:
     bool down;
 
     bool onePositionIsChanged;
-    bool p;
+    bool dropPositionsWithZ;
     bool s;
     int prevPos;
+    int prevPos2;
 
     bool dropPosition;
 
@@ -78,7 +79,6 @@ private:
 
     ControllerState ctrlState;
     Trigger trigger;
-    Timer timer;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

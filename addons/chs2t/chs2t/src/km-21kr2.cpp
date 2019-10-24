@@ -65,7 +65,8 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
-//    addSignalsInControllerState();
+
+    addSignalsInControllerState();
 }
 
 //------------------------------------------------------------------------------
@@ -75,7 +76,6 @@ void Km21KR2::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
-
 
     k01 = (reverseState == 1);
     k02 = (reverseState == -1);
@@ -94,9 +94,6 @@ void Km21KR2::stepKeysControl(double t, double dt)
                          (getKeyState(KEY_S) && reverseState != -1));
 
     isPressedOneTime = (getKeyState(KEY_W) || getKeyState(KEY_S));
-
-    controlState.k01 = k01;
-    controlState.k02 = k02;
 
     if (reverseState == 0)
         return;
@@ -162,28 +159,13 @@ void Km21KR2::stepKeysControl(double t, double dt)
             p = (mainShaftPos != 0);
         }
     }
-
-    k21 = (mainShaftPos == -10 || mainShaftPos == 0 || mainShaftPos == 4);
-    k22 = (mainShaftPos == 0 || mainShaftPos == 2 || mainShaftPos == 4);
-    k23 = (mainShaftPos == 2 || mainShaftPos == 4);
-    k25 = (mainShaftPos == -10 || mainShaftPos == -5 || mainShaftPos == 0);
-
-    k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10);
-    k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
-    k33 = (fieldWeakShaft == 6 || fieldWeakShaft == 10);
-
-    controlState.k21 = k21;
-    controlState.k22 = k22;
-    controlState.k23 = k23;
-    controlState.k25 = k25;
-
-    controlState.k31 = k31;
-    controlState.k32 = k32;
-    controlState.k33 = k33;
 }
 
 void Km21KR2::stepExternalControl(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     connectSignals(KM_K01, k01);
     connectSignals(KM_K02, k02);
     connectSignals(KM_K21, k21);
@@ -193,33 +175,6 @@ void Km21KR2::stepExternalControl(double t, double dt)
     connectSignals(KM_K31, k31);
     connectSignals(KM_K32, k32);
     connectSignals(KM_K33, k33);
-
-
-//    if (control_signals.analogSignal[KM_K01].is_active)
-//        k01 = static_cast<bool>(control_signals.analogSignal[KM_K01].value);
-
-//    if (control_signals.analogSignal[KM_K02].is_active)
-//        k02 = static_cast<bool>(control_signals.analogSignal[KM_K02].value);
-
-//    if (control_signals.analogSignal[KM_K21].is_active)
-//        k21 = static_cast<bool>(control_signals.analogSignal[KM_K21].value);
-
-//    if (control_signals.analogSignal[KM_K22].is_active)
-//        k22 = static_cast<bool>(control_signals.analogSignal[KM_K22].value);
-
-//    if (control_signals.analogSignal[KM_K23].is_active)
-//        k23 = static_cast<bool>(control_signals.analogSignal[KM_K23].value);
-
-//    if (control_signals.analogSignal[KM_K31].is_active)
-//        k31 = static_cast<bool>(control_signals.analogSignal[KM_K31].value);
-
-//    if (control_signals.analogSignal[KM_K32].is_active)
-//        k32 = static_cast<bool>(control_signals.analogSignal[KM_K32].value);
-
-//    if (control_signals.analogSignal[KM_K33].is_active)
-//        k33 = static_cast<bool>(control_signals.analogSignal[KM_K33].value);
-
-    addSignalsInControllerState();
 }
 
 void Km21KR2::connectSignals(ControllerSignals cs, bool &k)
