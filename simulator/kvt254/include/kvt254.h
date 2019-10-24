@@ -26,6 +26,8 @@ public:
 
     double getHandlePosition() const;
 
+    double getHandleShift() const;
+
     double getAirDistribPressure() const;
 
     void init(double pTM, double pFL);

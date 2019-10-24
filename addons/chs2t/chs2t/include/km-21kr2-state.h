@@ -12,6 +12,7 @@ struct ControllerState
     bool k21;
     bool k22;
     bool k23;
+    bool k25;
 
     bool k31;
     bool k32;
@@ -23,6 +24,7 @@ struct ControllerState
         , k21(false)
         , k22(false)
         , k23(false)
+        , k25(false)
         , k31(false)
         , k32(false)
         , k33(false)

@@ -75,6 +75,7 @@ void Modbus::controlSignalsProcess()
             control_signals.analogSignal[data.index].value = static_cast<float>(data.value);
         }
 
+        master->readInputRegistersRequest(slave);
         // Передаем значения регистров ввода
         for (slave_data_t data : slave->input_register)
         {
@@ -91,8 +92,6 @@ void Modbus::controlSignalsProcess()
 //------------------------------------------------------------------------------
 void Modbus::feedbackSignalsProcess()
 {
-
-
     for (Slave *slave: master->slave)
     {
         QMap<quint16, slave_data_t>::iterator it;

@@ -2,7 +2,7 @@
 <Config>
     <SerialPort>
         <!-- <Name>/dev/rs485</Name> -->
-        <Name>/dev/ttyUSB0</Name>
+        <Name>/dev/ttyUSB1</Name>
         <Baudrate>115200</Baudrate>        
         <DataBits>8</DataBits>
         <StopBits>1</StopBits>

@@ -9,6 +9,8 @@
 
 typedef  QMap<quint16, slave_data_t> data_map_t;
 
+class QModbusDataUnit;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -71,9 +73,15 @@ private:
     /// Загрузка конфигурации структуры данных определенного типа
     void load_data_structure(QString name, CfgReader &cfg, data_map_t &data);
 
+    bool getModbusDataUnit(QModbusDataUnit &unit);
+
 public slots:
 
     void slotReadDiscreteInputs();
+
+    void slotReadInputRegisters();
+
+    void slotWrited();
 };
 
 

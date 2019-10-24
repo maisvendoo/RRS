@@ -83,6 +83,8 @@ enum
     STRELKA_KV1 = 99,
     STRELKA_KV2 = 98,
 
+    KRAN254_SHIFT = 193,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

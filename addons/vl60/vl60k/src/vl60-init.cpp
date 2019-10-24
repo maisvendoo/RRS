@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initBrakeDevices(double p0, double pTM, double pFL)
+void VL60k::initBrakeDevices(double p0, double pTM, double pFL)
 {
     main_reservoir->setY(0, pFL);
     charge_press = p0;
@@ -24,7 +24,7 @@ void VL60::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initPantographs()
+void VL60k::initPantographs()
 {
     QString pant_cfg_path = config_dir + QDir::separator() + "pantograph";
 
@@ -32,48 +32,48 @@ void VL60::initPantographs()
     {
         pantographs[i] = new Pantograph();
         pantographs[i]->read_custom_config(pant_cfg_path);
-        connect(pantographs[i], &Pantograph::soundPlay, this, &VL60::soundPlay);
+        connect(pantographs[i], &Pantograph::soundPlay, this, &VL60k::soundPlay);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initHighVoltageScheme()
+void VL60k::initHighVoltageScheme()
 {
     QString gv_cfg_path = config_dir + QDir::separator() + "main-switch";
 
     main_switch = new ProtectiveDevice();
     main_switch->read_custom_config(gv_cfg_path);
-    connect(main_switch, &ProtectiveDevice::soundPlay, this, &VL60::soundPlay);
+    connect(main_switch, &ProtectiveDevice::soundPlay, this, &VL60k::soundPlay);
 
     gauge_KV_ks = new Oscillator();
     gauge_KV_ks->read_config("oscillator");
 
     trac_trans = new TracTransformer();
     trac_trans->read_custom_config(config_dir + QDir::separator() + "trac-transformer");
-    connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60::soundSetVolume);
+    connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60k::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initSupplyMachines()
+void VL60k::initSupplyMachines()
 {
     phase_spliter = new PhaseSplitter();
-    connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60::soundSetPitch);
+    connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60k::soundSetPitch);
 
     for (size_t i = 0; i < motor_fans.size(); ++i)
     {
         motor_fans[i] = new MotorFan(i + 1);
-        connect(motor_fans[i], &MotorFan::soundSetPitch, this, &VL60::soundSetPitch);
+        connect(motor_fans[i], &MotorFan::soundSetPitch, this, &VL60k::soundSetPitch);
     }
 
     main_reservoir = new Reservoir(static_cast<double>(MAIN_RESERVOIR_VOLUME) / 1000.0);
 
     QString mk_cfg_path = config_dir + QDir::separator() + "motor-compressor.xml";
     motor_compressor = new MotorCompressor(mk_cfg_path);
-    connect(motor_compressor, &MotorCompressor::soundSetPitch, this, &VL60::soundSetPitch);
+    connect(motor_compressor, &MotorCompressor::soundSetPitch, this, &VL60k::soundSetPitch);
 
     press_reg = new PressureRegulator();
 }
@@ -81,15 +81,15 @@ void VL60::initSupplyMachines()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initBrakeControls(QString modules_dir)
+void VL60k::initBrakeControls(QString modules_dir)
 {
     ubt = new BrakeLock();
     ubt->read_config("ubt367m");
-    connect(ubt, &BrakeLock::soundPlay, this, &VL60::soundPlay);
+    connect(ubt, &BrakeLock::soundPlay, this, &VL60k::soundPlay);
 
     brake_crane = loadBrakeCrane(modules_dir + QDir::separator() + "krm395");
     brake_crane->read_config("krm395");
-    connect(brake_crane, &BrakeCrane::soundPlay, this, &VL60::soundPlay);
+    connect(brake_crane, &BrakeCrane::soundPlay, this, &VL60k::soundPlay);
 
     loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
     loco_crane->read_config("kvt254");
@@ -98,7 +98,7 @@ void VL60::initBrakeControls(QString modules_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initBrakeMechanics()
+void VL60k::initBrakeMechanics()
 {
     trolley_mech[TROLLEY_FWD] = new TrolleyBrakeMech(config_dir +
                                            QDir::separator() +
@@ -112,7 +112,7 @@ void VL60::initBrakeMechanics()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initBrakeEquipment(QString modules_dir)
+void VL60k::initBrakeEquipment(QString modules_dir)
 {
     switch_valve = new SwitchingValve();
     switch_valve->read_config("zpk");
@@ -132,13 +132,13 @@ void VL60::initBrakeEquipment(QString modules_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initTractionControl()
+void VL60k::initTractionControl()
 {
     controller = new ControllerKME_60_044();
 
     main_controller = new EKG_8G();
     main_controller->read_custom_config(config_dir + QDir::separator() + "ekg-8g");
-    connect(main_controller, &EKG_8G::soundPlay, this, &VL60::soundPlay);
+    connect(main_controller, &EKG_8G::soundPlay, this, &VL60k::soundPlay);
 
     for (size_t i = 0; i < vu.size(); ++i)
     {
@@ -154,8 +154,8 @@ void VL60::initTractionControl()
         motor[i] = new DCMotor();
         motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_custom_config(config_dir + QDir::separator() + "HB-412K");
-        connect(motor[i], &DCMotor::soundSetPitch, this, &VL60::soundSetPitch);
-        connect(motor[i], &DCMotor::soundSetVolume, this, &VL60::soundSetVolume);
+        connect(motor[i], &DCMotor::soundSetPitch, this, &VL60k::soundSetPitch);
+        connect(motor[i], &DCMotor::soundSetVolume, this, &VL60k::soundSetVolume);
 
         overload_relay[i] = new OverloadRelay();
         overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
@@ -165,15 +165,15 @@ void VL60::initTractionControl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initOtherEquipment()
+void VL60k::initOtherEquipment()
 {
     speed_meter = new SL2M();
     speed_meter->setWheelDiameter(wheel_diameter);
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
-    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60::soundSetVolume);
+    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60k::soundSetVolume);
 
     horn = new TrainHorn();
-    connect(horn, &TrainHorn::soundSetVolume, this, &VL60::soundSetVolume);
+    connect(horn, &TrainHorn::soundSetVolume, this, &VL60k::soundSetVolume);
 
     //reg = new Registrator("brakes");
 }
@@ -181,7 +181,7 @@ void VL60::initOtherEquipment()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initTriggers()
+void VL60k::initTriggers()
 {
     triggers.push_back(&pants_tumbler);
     triggers.push_back(&pant2_tumbler);
@@ -196,14 +196,14 @@ void VL60::initTriggers()
     triggers.push_back(&cu_tumbler);
 
     autoStartTimer = new Timer(0.5);
-    connect(autoStartTimer, &Timer::process, this, &VL60::slotAutoStart);
+    connect(autoStartTimer, &Timer::process, this, &VL60k::slotAutoStart);
     start_count = 0;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::initialization()
+void VL60k::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());

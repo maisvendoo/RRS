@@ -9,16 +9,20 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , poz(0)
 
   , fieldStep(0)
+  , reverseState(0)
 
-  , n(false)
+  , onePositionIsChanged(false)
   , p(false)
   , s(false)
   , prevPos(0)
   , dropPosition(false)
   , hod(false)
-
+  , ctrlState(ControllerState())
 {
-
+    trigger.set();
+//    timer.setTimeout(0.7);
+//    timer.firstProcess(false);
+//    connect(timer, &Timer::process, this, &StepSwitch::changeOnePosition);
 }
 
 //------------------------------------------------------------------------------
@@ -123,12 +127,16 @@ void StepSwitch::stepDiscrete(double t, double dt)
     down1 = (!ctrlState.k21 && !ctrlState.k22);
     down = (ctrlState.k21 && !ctrlState.k22);
 
+    if (ctrlState.k25)
+        trigger.set();
+
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
     if (up && !s )
     {
+//        timer.reset();
         poz_d += V * hs_p(MPOS_P - poz_d) * dt;
-        n = false;
+        onePositionIsChanged = false;
         if ((poz == MPOS_S || poz == MPOS_SP) && prevPos != poz)
         {
             s = true;
@@ -138,27 +146,31 @@ void StepSwitch::stepDiscrete(double t, double dt)
             prevPos = 0;
     }
 
-    if (up1 && poz < MPOS_P && !n)
+    if (up1 && poz < MPOS_P && !onePositionIsChanged && trigger.getState())
     {
+//        timer.start();
+
+        trigger.reset();
+
         poz += 1;
         poz_d = poz;
-        n = true;
-
+        onePositionIsChanged = true;
     }
-    if (down1 && poz > 0 && !n)
+    if (down1 && poz > 0 && !onePositionIsChanged)
     {
         poz -= 1;
         poz_d = poz;
-        n = true;
+        onePositionIsChanged = true;
     }
     if (down || dropPosition)
     {
         poz_d -= V * hs_p(poz_d) * dt;
-        n = false;
+        onePositionIsChanged = false;
     }
     if (zero)
     {
-        n = false;
+//        timer.reset();
+        onePositionIsChanged = false;
         s = false;
     }
 
@@ -179,4 +191,11 @@ void StepSwitch::stepDiscrete(double t, double dt)
                     (1 * (ctrlState.k01 && !ctrlState.k02));
 
     poz = static_cast<int>(poz_d);
+
+
+}
+
+void StepSwitch::changeOnePosition()
+{
+
 }

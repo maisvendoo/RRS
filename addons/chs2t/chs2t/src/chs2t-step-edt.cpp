@@ -16,14 +16,7 @@ void CHS2T::stepEDT(double t, double dt)
     BrakeReg->setAllowEDT(dako->isEDTAllow());
     BrakeReg->setIa(generator->getIa());
     BrakeReg->setIf(generator->getIf());
-    BrakeReg->setBref(brakeRefRes->getPressure());
-
-    //'allowEDT = EDTSwitch.getState() && dako->isEDTAllow();
-
-
-
-    /*if (!dako->isEDTAllow())
-        EDTValve.reset();*/
+    BrakeReg->setBref(brakeRefRes->getPressure());    
 
     pulseConv->step(t, dt);
     generator->step(t, dt);
@@ -47,11 +40,12 @@ void CHS2T::stepEDT2(double t, double dt)
         {
             relValve->setRelease(abs(generator->getIa()) >= 100.0);
 
-            if (!dako->isEDTAllow())
+            if (!dako->isEDTAllow() || (brakeRefRes->getPressure() < 0.07) )
             {
                 disableEDT();
                 dropPosition = false;
                 relValve->setRelease(false);
+                BrakeReg->reset();
             }
         }
     }

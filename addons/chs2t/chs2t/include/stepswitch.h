@@ -67,7 +67,7 @@ private:
     bool down1;
     bool down;
 
-    bool n;
+    bool onePositionIsChanged;
     bool p;
     bool s;
     int prevPos;
@@ -77,6 +77,8 @@ private:
     bool hod;
 
     ControllerState ctrlState;
+    Trigger trigger;
+    Timer timer;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
@@ -85,6 +87,9 @@ private:
     void preStep(state_vector_t &Y, double t);
 
     void stepDiscrete(double t, double dt);
+
+private slots:
+    void changeOnePosition();
 };
 
 

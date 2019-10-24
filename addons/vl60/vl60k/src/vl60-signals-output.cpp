@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60::stepSignalsOutput()
+void VL60k::stepSignalsOutput()
 {
     // Состояние токоприемников
     analogSignal[PANT1_POS] = static_cast<float>(pantographs[0]->getHeight());
@@ -77,6 +77,7 @@ void VL60::stepSignalsOutput()
 
     // Положение рукоятки КВТ
     analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane->getHandlePosition());
+    analogSignal[KRAN254_SHIFT] = static_cast<float>(loco_crane->getHandleShift());
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
     analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);

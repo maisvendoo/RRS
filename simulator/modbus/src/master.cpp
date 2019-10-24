@@ -198,8 +198,76 @@ void Master::readDiscreteInputsRequest(Slave *slave)
     }
     else
     {
-        slave->incErrosCount();
+        slave->incErrosCount();        
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Master::readInputRegistersRequest(Slave *slave)
+{
+    if (!slave->isConnected())
         return;
+
+    quint16 addr = slave->input_register.begin().value().address;
+    QModbusDataUnit unit(QModbusDataUnit::InputRegisters, addr, static_cast<quint16>(slave->input_register.size()));
+
+    QModbusReply *reply = modbusDevice->sendReadRequest(unit, slave->id);
+
+    if (reply != Q_NULLPTR)
+    {
+        if (!reply->isFinished())
+        {
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotReadInputRegisters, Qt::QueuedConnection);
+
+            connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
+        }
+        else
+        {
+            reply->deleteLater();
+        }
+    }
+    else
+    {
+        slave->incErrosCount();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Master::writeCoils(Slave *slave)
+{
+    if (!slave->isConnected())
+        return;
+
+    quint16 addr = slave->coil.begin().value().address;
+    QModbusDataUnit unit(QModbusDataUnit::Coils, addr, static_cast<quint16>(slave->coil.size()));
+
+    for (int i = 0; i < slave->coil.size(); ++i)
+    {
+        unit.setValue(i, static_cast<quint16>(slave->coil[i].value));
+    }
+
+    QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
+
+    if (reply != Q_NULLPTR)
+    {
+        if (!reply->isFinished())
+        {
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+
+            connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
+        }
+        else
+        {
+            reply->deleteLater();
+        }
+    }
+    else
+    {
+        slave->incErrosCount();
     }
 }
 
@@ -264,6 +332,23 @@ void Master::slotErrorModbus(QModbusDevice::Error error)
 //------------------------------------------------------------------------------
 void Master::slotStateModbus(QModbusDevice::State state)
 {
+    switch (state)
+    {
+    case QModbusDevice::State::ConnectingState:
 
+        break;
+
+    case QModbusDevice::State::ConnectedState:
+
+        break;
+
+    case QModbusDevice::State::UnconnectedState:
+
+        break;
+
+    case QModbusDevice::State::ClosingState:
+
+        break;
+    }
 }
 

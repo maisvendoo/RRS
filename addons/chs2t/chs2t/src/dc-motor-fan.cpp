@@ -5,11 +5,11 @@
 //------------------------------------------------------------------------------
 DCMotorFan::DCMotorFan(QObject* parent) : Device(parent)
   , U(0.0)  
-  , R(0.0)
-  , omega_nom(0.0)
-  , CPhi(0.0)
-  , ks(0.0)
-  , J(0.0)
+  , R(0.0309)
+  , omega_nom(224.0)
+  , CPhi(1.23)
+  , ks(3.46e-3)
+  , J(0.5)
   , soundName("")
 {
 
@@ -44,7 +44,7 @@ void DCMotorFan::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
     double E = Y[0] * CPhi * hs_p(U);
 
     double I = (U - E) / R;
-    double M = I * CPhi;
+    double M = I * CPhi * hs_p(U);
     double Ms = ks * Y[0] * Y[0] * sign(Y[0]);
 
     dYdt[0] = (M - Ms) / J;
