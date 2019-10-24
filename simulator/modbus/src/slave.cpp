@@ -102,23 +102,38 @@ void Slave::load_data_structure(QString name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Slave::slotReadDiscreteInputs()
+bool Slave::getModbusDataUnit(QModbusDataUnit &unit)
 {
     // Получаем данные ответа устройства
     QModbusReply *reply = qobject_cast<QModbusReply *>(sender());
 
     // Пустые данные - выходим
     if (!reply)
-        return;
+        return false;
 
     // Извлекаем PDU
-    QModbusDataUnit unit = reply->result();
+    unit = reply->result();
 
     // Проверяем ID
     quint16 id = static_cast<quint16>(reply->serverAddress());
 
     // не моё - выходим!
     if (this->id != id)
+        return false;
+
+    reply->deleteLater();
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Slave::slotReadDiscreteInputs()
+{
+    QModbusDataUnit unit;
+
+    if (!getModbusDataUnit(unit))
         return;
 
     // Читаем полученные данные о состоянии дискретных входов
@@ -130,7 +145,40 @@ void Slave::slotReadDiscreteInputs()
     for (quint16 i = 0; i < count; ++i)
     {
         this->discrete_input[addr + i].value = unit.value(i);
-    }
+    }    
+}
 
-    reply->deleteLater();
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Slave::slotReadInputRegisters()
+{
+    QModbusDataUnit unit;
+
+    if (!getModbusDataUnit(unit))
+        return;
+
+    // Читаем полученные данные о состоянии регистров ввода
+    quint16 addr = static_cast<quint16>(unit.startAddress());
+    quint16 count = static_cast<quint16>(unit.valueCount());
+
+    this->errors = 0;
+
+    for (quint16 i = 0; i < count; ++i)
+    {
+        this->input_register[addr + i].value = unit.value(i);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Slave::slotWrited()
+{
+    QModbusDataUnit unit;
+
+    if (!getModbusDataUnit(unit))
+        return;
+
+    this->errors = 0;
 }

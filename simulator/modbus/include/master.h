@@ -23,6 +23,12 @@ public:
 
     void readDiscreteInputsRequest(Slave *slave);
 
+    void readInputRegistersRequest(Slave *slave);
+
+    void writeCoils(Slave *slave);
+
+    void writeHoldingRegisters(Slave *slave, size_t count = 1);
+
 private:
 
     QModbusClient           *modbusDevice;
