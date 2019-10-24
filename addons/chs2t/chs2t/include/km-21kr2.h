@@ -37,7 +37,7 @@ private:
 
     void stepExternalControl(double t, double dt);
 
-    void connectSignals(ControllerSignals cs, bool k);
+    void connectSignals(ControllerSignals cs, bool &k);
 
     bool k21;
     bool k22;

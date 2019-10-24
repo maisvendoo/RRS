@@ -117,9 +117,15 @@ void StepSwitch::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
 
+    up = (ctrlState.k21 && ctrlState.k23);
+    up1 = (!ctrlState.k21 && ctrlState.k23);
+    zero = (ctrlState.k22 && !ctrlState.k23);
+    down1 = (!ctrlState.k21 && !ctrlState.k22);
+    down = (ctrlState.k21 && !ctrlState.k22);
+
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
-    if (ctrlState.up && !s )
+    if (up && !s )
     {
         poz_d += V * hs_p(MPOS_P - poz_d) * dt;
         n = false;
@@ -132,25 +138,25 @@ void StepSwitch::stepDiscrete(double t, double dt)
             prevPos = 0;
     }
 
-    if (ctrlState.up1 && poz < MPOS_P && !n)
+    if (up1 && poz < MPOS_P && !n)
     {
         poz += 1;
         poz_d = poz;
         n = true;
 
     }
-    if (ctrlState.down1 && poz > 0 && !n)
+    if (down1 && poz > 0 && !n)
     {
         poz -= 1;
         poz_d = poz;
         n = true;
     }
-    if (ctrlState.down || dropPosition)
+    if (down || dropPosition)
     {
         poz_d -= V * hs_p(poz_d) * dt;
         n = false;
     }
-    if (ctrlState.zero)
+    if (zero)
     {
         n = false;
         s = false;

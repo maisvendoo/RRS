@@ -61,6 +61,12 @@ private:
     int fieldStep;
     int reverseState;
 
+    bool up;
+    bool up1;
+    bool zero;
+    bool down1;
+    bool down;
+
     bool n;
     bool p;
     bool s;

@@ -144,8 +144,9 @@ void Km21KR2::stepKeysControl(double t, double dt)
         }
         else
         {
-            mainShaftPos = (!isShift() && !isControl()) * (-5 * getKeyState(KEY_D) +
-                                                            2 * getKeyState(KEY_A));
+            mainShaftPos = (!isShift() && !isControl()) *
+                           (-5 * getKeyState(KEY_D) +
+                             2 * getKeyState(KEY_A));
             p = (mainShaftPos != 0);
         }
     }
@@ -158,11 +159,9 @@ void Km21KR2::stepKeysControl(double t, double dt)
     k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
     k33 = (fieldWeakShaft == 6 || fieldWeakShaft == 10);
 
-    controlState.up = (k21 && k23);
-    controlState.up1 = (!k21 && k23);
-    controlState.zero = (k22 && !k23);
-    controlState.down1 = (!k21 && !k22);
-    controlState.down = (k21 && !k22);
+    controlState.k21 = k21;
+    controlState.k22 = k22;
+    controlState.k23 = k23;
 
     controlState.k31 = k31;
     controlState.k32 = k32;
@@ -180,45 +179,43 @@ void Km21KR2::stepExternalControl(double t, double dt)
     connectSignals(KM_K32, k32);
     connectSignals(KM_K33, k33);
 
-    if (control_signals.analogSignal[KM_K01].is_active)
-        k01 = static_cast<bool>(control_signals.analogSignal[KM_K01].value);
+//    if (control_signals.analogSignal[KM_K01].is_active)
+//        k01 = static_cast<bool>(control_signals.analogSignal[KM_K01].value);
 
-    if (control_signals.analogSignal[KM_K02].is_active)
-        k02 = static_cast<bool>(control_signals.analogSignal[KM_K02].value);
+//    if (control_signals.analogSignal[KM_K02].is_active)
+//        k02 = static_cast<bool>(control_signals.analogSignal[KM_K02].value);
 
-    if (control_signals.analogSignal[KM_K21].is_active)
-        k21 = static_cast<bool>(control_signals.analogSignal[KM_K21].value);
+//    if (control_signals.analogSignal[KM_K21].is_active)
+//        k21 = static_cast<bool>(control_signals.analogSignal[KM_K21].value);
 
-    if (control_signals.analogSignal[KM_K22].is_active)
-        k22 = static_cast<bool>(control_signals.analogSignal[KM_K22].value);
+//    if (control_signals.analogSignal[KM_K22].is_active)
+//        k22 = static_cast<bool>(control_signals.analogSignal[KM_K22].value);
 
-    if (control_signals.analogSignal[KM_K23].is_active)
-        k23 = static_cast<bool>(control_signals.analogSignal[KM_K23].value);
+//    if (control_signals.analogSignal[KM_K23].is_active)
+//        k23 = static_cast<bool>(control_signals.analogSignal[KM_K23].value);
 
-    if (control_signals.analogSignal[KM_K31].is_active)
-        k31 = static_cast<bool>(control_signals.analogSignal[KM_K31].value);
+//    if (control_signals.analogSignal[KM_K31].is_active)
+//        k31 = static_cast<bool>(control_signals.analogSignal[KM_K31].value);
 
-    if (control_signals.analogSignal[KM_K32].is_active)
-        k32 = static_cast<bool>(control_signals.analogSignal[KM_K32].value);
+//    if (control_signals.analogSignal[KM_K32].is_active)
+//        k32 = static_cast<bool>(control_signals.analogSignal[KM_K32].value);
 
-    if (control_signals.analogSignal[KM_K33].is_active)
-        k33 = static_cast<bool>(control_signals.analogSignal[KM_K33].value);
+//    if (control_signals.analogSignal[KM_K33].is_active)
+//        k33 = static_cast<bool>(control_signals.analogSignal[KM_K33].value);
 
     controlState.k01 = k01;
     controlState.k02 = k02;
 
-    controlState.up = (k21 && k23);
-    controlState.up1 = (!k21 && k23);
-    controlState.zero = (k22 && !k23);
-    controlState.down1 = (!k21 && !k22);
-    controlState.down = (k21 && !k22);
+    controlState.k21 = k21;
+    controlState.k22 = k22;
+    controlState.k23 = k23;
 
     controlState.k31 = k31;
     controlState.k32 = k32;
     controlState.k33 = k33;
 }
 
-void Km21KR2::connectSignals(ControllerSignals cs, bool k)
+void Km21KR2::connectSignals(ControllerSignals cs, bool &k)
 {
     if (control_signals.analogSignal[cs].is_active)
         k = static_cast<bool>(control_signals.analogSignal[cs].value);
