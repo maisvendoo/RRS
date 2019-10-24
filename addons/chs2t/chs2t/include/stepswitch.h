@@ -61,16 +61,24 @@ private:
     int fieldStep;
     int reverseState;
 
-    bool n;
-    bool p;
+    bool up;
+    bool up1;
+    bool zero;
+    bool down1;
+    bool down;
+
+    bool onePositionIsChanged;
+    bool dropPositionsWithZ;
     bool s;
     int prevPos;
+    int prevPos2;
 
     bool dropPosition;
 
     bool hod;
 
     ControllerState ctrlState;
+    Trigger trigger;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
@@ -79,6 +87,9 @@ private:
     void preStep(state_vector_t &Y, double t);
 
     void stepDiscrete(double t, double dt);
+
+private slots:
+    void changeOnePosition();
 };
 
 

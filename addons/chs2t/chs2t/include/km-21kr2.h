@@ -39,16 +39,20 @@ private:
 
     void connectSignals(ControllerSignals cs, bool &k);
 
+    void addSignalsInControllerState();
+
+    bool k01;
+    bool k02;
+
     bool k21;
     bool k22;
     bool k23;
+    bool k25;
 
     bool k31;
     bool k32;
     bool k33;
 
-    bool k01;
-    bool k02;
 
     bool autoSet;
     bool autoReset;

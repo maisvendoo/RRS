@@ -11,15 +11,16 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , fieldStep(0)
   , reverseState(0)
 
-  , n(false)
-  , p(false)
+  , onePositionIsChanged(false)
+  , dropPositionsWithZ(false)
   , s(false)
   , prevPos(0)
+  , prevPos2(0)
   , dropPosition(false)
   , hod(false)
   , ctrlState(ControllerState())
 {
-
+    trigger.set();
 }
 
 //------------------------------------------------------------------------------
@@ -118,12 +119,21 @@ void StepSwitch::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
 
+    up = (ctrlState.k21 && ctrlState.k23);
+    up1 = (!ctrlState.k21 && ctrlState.k23);
+    zero = (ctrlState.k22 && !ctrlState.k23);
+    down1 = (!ctrlState.k21 && !ctrlState.k22);
+    down = (ctrlState.k21 && !ctrlState.k22);
+
+    if (ctrlState.k25)
+        trigger.set();
+
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
-    if (ctrlState.up && !s )
+    if (up && !s )
     {
         poz_d += V * hs_p(MPOS_P - poz_d) * dt;
-        n = false;
+        onePositionIsChanged = false;
         if ((poz == MPOS_S || poz == MPOS_SP) && prevPos != poz)
         {
             s = true;
@@ -133,35 +143,42 @@ void StepSwitch::stepDiscrete(double t, double dt)
             prevPos = 0;
     }
 
-    if (ctrlState.up1 && poz < MPOS_P && !n)
+    if (up1 && poz < MPOS_P && !onePositionIsChanged && trigger.getState())
     {
+        trigger.reset();
+
         poz += 1;
         poz_d = poz;
-        n = true;
-
+        onePositionIsChanged = true;
     }
-    if (ctrlState.down1 && poz > 0 && !n)
+    if (down1 && poz > 0 && !onePositionIsChanged)
     {
         poz -= 1;
         poz_d = poz;
-        n = true;
+        onePositionIsChanged = true;
     }
-    if (ctrlState.down || dropPosition)
+    if (down || dropPosition)
     {
         poz_d -= V * hs_p(poz_d) * dt;
-        n = false;
+        onePositionIsChanged = false;
     }
-    if (ctrlState.zero)
+    if (zero)
     {
-        n = false;
+        onePositionIsChanged = false;
         s = false;
     }
 
-    if ((getKeyState(KEY_Z) || p ))
+    if (getKeyState(KEY_Z))
     {
-        p = true;
+        prevPos2 = poz;
+        dropPositionsWithZ = true;
+    }
+
+    if (dropPositionsWithZ)
+    {
         poz_d -= V * dt;
-        p = !(hod || poz == 0);
+        if (static_cast<int>(poz_d) != prevPos2)
+            dropPositionsWithZ = !(hod || poz == 0);
     }
 
     fieldStep = 1 * (ctrlState.k31 && !ctrlState.k32) +
@@ -174,4 +191,9 @@ void StepSwitch::stepDiscrete(double t, double dt)
                     (1 * (ctrlState.k01 && !ctrlState.k02));
 
     poz = static_cast<int>(poz_d);
+}
+
+void StepSwitch::changeOnePosition()
+{
+
 }

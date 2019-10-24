@@ -6,27 +6,25 @@
 //------------------------------------------------------------------------------
 struct ControllerState
 {
-    bool up;
-    bool up1;
-    bool zero;
-    bool down1;
-    bool down;
-
     bool k01;
     bool k02;
+
+    bool k21;
+    bool k22;
+    bool k23;
+    bool k25;
 
     bool k31;
     bool k32;
     bool k33;
 
     ControllerState()
-        : up(0)
-        , up1(0)
-        , zero(0)
-        , down1(0)
-        , down(0)
-        , k01(false)
+        : k01(false)
         , k02(false)
+        , k21(false)
+        , k22(false)
+        , k23(false)
+        , k25(false)
         , k31(false)
         , k32(false)
         , k33(false)
