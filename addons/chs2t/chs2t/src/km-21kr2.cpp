@@ -22,7 +22,7 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , autoSet(false)
   , autoReset(false)
   , p(false)
-  , isPressedOneTime(false)
+  , reverseIsPressedOneTime(false)
   , hod(false)
   , reverseState(0)
   , mainShaftPos(0.0)
@@ -85,15 +85,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
     k23 = (mainShaftPos == 2 || mainShaftPos == 4);
     k25 = (mainShaftPos == -10 || mainShaftPos == -5 || mainShaftPos == 0);
 
-    k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10);
+    k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10 );
     k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
     k33 = (fieldWeakShaft == 6 || fieldWeakShaft == 10);
 
-    if (!isPressedOneTime)
+    if (!reverseIsPressedOneTime)
         reverseState += ((getKeyState(KEY_W) && reverseState != 1) -
                          (getKeyState(KEY_S) && reverseState != -1));
 
-    isPressedOneTime = (getKeyState(KEY_W) || getKeyState(KEY_S));
+    reverseIsPressedOneTime = (getKeyState(KEY_W) || getKeyState(KEY_S));
 
     if (reverseState == 0)
         return;
@@ -127,38 +127,20 @@ void Km21KR2::stepKeysControl(double t, double dt)
         }
     }
 
-
     // Авт. набор
-    if (getKeyState(KEY_Q))
-    {
-        autoSet = true;
-    }
-    else
-    {
-        autoSet = false;
-    }
+    autoSet = getKeyState(KEY_Q);
 
     // 1 вверх
     if (getKeyState(KEY_E))
     {
         autoReset = true;
-        mainShaftPos = -10;
     }
 
-    if (!autoReset)
-    {
-        if (autoSet)
-        {
-            mainShaftPos = 4;
-        }
-        else
-        {
-            mainShaftPos = (!isShift() && !isControl()) *
-                           (-5 * getKeyState(KEY_D) +
-                             2 * getKeyState(KEY_A));
-            p = (mainShaftPos != 0);
-        }
-    }
+    mainShaftPos = (-10 * autoReset) + (4 * autoSet) +
+                   (!autoReset && !autoSet && !isShift() && !isControl()) *
+                   (-5 * getKeyState(KEY_D) +
+                     2 * getKeyState(KEY_A));
+    p = (mainShaftPos != 0);
 }
 
 void Km21KR2::stepExternalControl(double t, double dt)

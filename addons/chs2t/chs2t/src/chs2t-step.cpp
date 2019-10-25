@@ -233,8 +233,29 @@ void CHS2T::stepSupportEquipment(double t, double dt)
     relValve->step(t, dt);
 
     // Мотор-вентилятор ПТР
-    motor_fan->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
-    motor_fan->step(t, dt);
+    motor_fan_ptr->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
+    motor_fan_ptr->step(t, dt);
+
+    motor_fan_switcher->setControl(keys);
+
+    if (motor_fan_switcher->getState() == 0)
+    {
+
+    }
+
+    if (motor_fan_switcher->getState() == 1)
+    {
+
+    }
+
+    if (motor_fan_switcher->getState() == 2)
+    {
+
+    }
+
+    motor_fan_switcher->step(t, dt);
+    motor_fan[0]->step(t, dt);
+    motor_fan[1]->step(t, dt);
 
     blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
     blinds->step(t, dt);
@@ -247,7 +268,5 @@ bool CHS2T::getHoldingCoilState() const
 {
     bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
-    bool state = no_overload;
-
-    return state;
+    return no_overload;
 }

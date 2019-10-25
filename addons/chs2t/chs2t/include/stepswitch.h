@@ -69,7 +69,8 @@ private:
 
     bool onePositionIsChanged;
     bool dropPositionsWithZ;
-    bool s;
+    bool ableToGainPositions;
+
     int prevPos;
     int prevPos2;
 
@@ -78,7 +79,7 @@ private:
     bool hod;
 
     ControllerState ctrlState;
-    Trigger trigger;
+    Trigger ableToChangeOnePosition;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
@@ -88,8 +89,7 @@ private:
 
     void stepDiscrete(double t, double dt);
 
-private slots:
-    void changeOnePosition();
+    void changeOnePosition(int dir);
 };
 
 

@@ -16,15 +16,16 @@ public:
     ///Деструктор
     ~BrakeRegulator();
 
-    void setIa(double value) { Ia = value; }
+    void setIa(double value)     { Ia = value; }
 
-    void setIf(double value) { If = value; }
+    void setIf(double value)     { If = value; }
 
-    void setBref(double value) { Bref = value; }
-
-    double getU() const { return u; }
+    void setBref(double value)   { Bref = value; }
 
     void setAllowEDT(bool value) { allowEDT = value; }
+
+
+    double getU() const             { return u; }
 
     void reset() { setY(0, 0); setY(1, 0); }
 

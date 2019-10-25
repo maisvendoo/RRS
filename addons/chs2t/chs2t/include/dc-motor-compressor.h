@@ -16,11 +16,11 @@ public:
 
     void setExternalPressure(double press) { p = press; }
 
-    double getAirFlow() const { return Q; }
-
     void setU(double value) { U = value; }
 
     void setPressure(double value) { p = value; }
+
+    double getAirFlow() const { return Q; }
 
 private:
 

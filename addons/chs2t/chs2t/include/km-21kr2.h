@@ -57,7 +57,7 @@ private:
     bool autoSet;
     bool autoReset;
     bool p;
-    bool isPressedOneTime;
+    bool reverseIsPressedOneTime;
     bool hod;
 
     int reverseState;

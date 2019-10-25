@@ -16,15 +16,15 @@ public:
     ///Деструктор
     ~Dako();
 
-    void setPgr(double value) { pgr = value; }
-    void setQvr(double value) { Qvr = value; }
-    void setPtc(double value) { ptc = value; }
-    void setU(double value) { U = value; }
-    void setPkvt(double value) { p_kvt = value; }
+    void setPgr(double value)   { pgr = value; }
+    void setQvr(double value)   { Qvr = value; }
+    void setPtc(double value)   { ptc = value; }
+    void setU(double value)     { U = value; }
+    void setPkvt(double value)  { p_kvt = value; }
 
-    double getP1() const { return getY(1); }
-    double getPy() const { return getY(0); }
-    double getQtc() const { return Qtc; }
+    double getP1() const    { return getY(1); }
+    double getPy() const    { return getY(0); }
+    double getQtc() const   { return Qtc; }
 
     bool isEDTAllow() const { return  EDT_state; }
 

@@ -136,7 +136,7 @@ private:
 
     ReleaseValve *relValve;
 
-    DCMotorFan *motor_fan;
+    DCMotorFan *motor_fan_ptr;
 
     /// Свисток и тифон
     TrainHorn   *horn;
@@ -158,6 +158,9 @@ private:
 
     /// Галетник управления БВ
     Switcher    *fastSwitchSw;
+
+    std::array<DCMotorFan*, 2> motor_fan;
+    Switcher *motor_fan_switcher;
 
     /// Зарядное давление
     double charging_press;
