@@ -47,6 +47,9 @@ void Timer::step(double t, double dt)
 //------------------------------------------------------------------------------
 void Timer::start()
 {
+    if (is_started)
+        return;
+
     is_started = true;
     reset();
 }

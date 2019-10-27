@@ -190,8 +190,8 @@ void VL60k::stepBrakeControl(double t, double dt)
     brake_crane->step(t, dt);
 
     loco_crane->setFeedlinePressure(ubt->getCraneFLpressure());
-    loco_crane->setBrakeCylinderPressure(pneumo_splitter->getP_in());
-    loco_crane->setAirDistributorFlow(air_disr->getAirSupplyFlow());
+    loco_crane->setBrakeCylinderPressure(trolley_pneumo_splitter->getP_in());
+    loco_crane->setAirDistributorFlow(airdist_splitter->getQ_out2());
     loco_crane->setControl(keys);
     loco_crane->step(t, dt);
 }
@@ -201,29 +201,27 @@ void VL60k::stepBrakeControl(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60k::stepTrolleysBrakeMech(double t, double dt)
 {
-    //switch_valve->setInputFlow1(air_disr->getBrakeCylinderAirFlow());
-    //switch_valve->setInputFlow2(loco_crane->getBrakeCylinderFlow());
-    //switch_valve->setOutputPressure(pneumo_splitter->getP_in());
-    //switch_valve->step(t, dt);
+    airdist_splitter->setQ_in(air_disr->getBrakeCylinderAirFlow());
+    airdist_splitter->setP_out1(fake_cylinder->getPressure());
+    airdist_splitter->setP_out2(loco_crane->getAirDistribPressure());
+    airdist_splitter->step(t, dt);
+
+    fake_cylinder->setAirFlow(airdist_splitter->getQ_out1());
+    fake_cylinder->step(t, dt);
 
     // Тройник подключен к ЗПК
-    pneumo_splitter->setQ_in(loco_crane->getBrakeCylinderFlow());
-    pneumo_splitter->setP_out1(pneumo_relay->getWorkPressure());
-    pneumo_splitter->setP_out2(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure());
-    pneumo_splitter->step(t, dt);
+    trolley_pneumo_splitter->setQ_in(loco_crane->getBrakeCylinderFlow());
+    trolley_pneumo_splitter->setP_out1(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure());
+    trolley_pneumo_splitter->setP_out2(trolley_mech[TROLLEY_BWD]->getBrakeCylinderPressure());
+    trolley_pneumo_splitter->step(t, dt);
 
-    pneumo_relay->setPipelinePressure(main_reservoir->getPressure());
-    pneumo_relay->setWorkAirFlow(pneumo_splitter->getQ_out1());
-    pneumo_relay->setBrakeCylPressure(trolley_mech[TROLLEY_FWD]->getBrakeCylinderPressure());
-    pneumo_relay->step(t, dt);
-
-    // Передняя тележка наполняется через реле давления 304
-    trolley_mech[TROLLEY_FWD]->setAirFlow(pneumo_relay->getBrakeCylAirFlow());
+    // Передняя тележка
+    trolley_mech[TROLLEY_FWD]->setAirFlow(trolley_pneumo_splitter->getQ_out1());
     trolley_mech[TROLLEY_FWD]->setVelocity(velocity);
     trolley_mech[TROLLEY_FWD]->step(t, dt);
 
-    // Задняя тележка подключена через тройник от ЗПК
-    trolley_mech[TROLLEY_BWD]->setAirFlow(pneumo_splitter->getQ_out2());
+    // Задняя тележка
+    trolley_mech[TROLLEY_BWD]->setAirFlow(trolley_pneumo_splitter->getQ_out2());
     trolley_mech[TROLLEY_FWD]->setVelocity(velocity);
     trolley_mech[TROLLEY_BWD]->step(t, dt);
 
@@ -244,7 +242,7 @@ void VL60k::stepAirDistributors(double t, double dt)
     supply_reservoir->setAirFlow(air_disr->getAirSupplyFlow());
     supply_reservoir->step(t, dt);
 
-    air_disr->setBrakeCylinderPressure(loco_crane->getAirDistribPressure());
+    air_disr->setBrakeCylinderPressure(airdist_splitter->getP_in());
     air_disr->setAirSupplyPressure(supply_reservoir->getPressure());
     air_disr->setBrakepipePressure(pTM);
     auxRate = air_disr->getAuxRate();

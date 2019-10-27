@@ -233,7 +233,8 @@ void CHS2T::stepSupportEquipment(double t, double dt)
     relValve->step(t, dt);
 
     // Мотор-вентилятор ПТР
-    motor_fan->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
+    double Rt = R * static_cast<double>(!hod || EDT);
+    motor_fan->setU(Rt * (motor->getIa() + abs(generator->getIa())));
     motor_fan->step(t, dt);
 
     blinds->setState((!hod && !stepSwitch->isZero()) || EDT);

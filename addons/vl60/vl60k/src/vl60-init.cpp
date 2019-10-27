@@ -120,10 +120,15 @@ void VL60k::initBrakeEquipment(QString modules_dir)
     pneumo_relay = new PneumoReley();
     pneumo_relay->read_config("rd304");
 
-    pneumo_splitter = new PneumoSplitter();
-    pneumo_splitter->read_config("pneumo-splitter");
+    trolley_pneumo_splitter = new PneumoSplitter();
+    trolley_pneumo_splitter->read_config("pneumo-splitter");
+
+    airdist_splitter = new PneumoSplitter();
+    airdist_splitter->read_custom_config(config_dir + QDir::separator() + "airdist-splitter");
 
     supply_reservoir = new Reservoir(0.078);
+
+    fake_cylinder = new Reservoir(0.007);
 
     air_disr = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
     air_disr->read_config("vr242");

@@ -11,12 +11,12 @@
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
 
-		<Title>ВЛ60пк-1543 с грузовыми вагонами</Title>
-		<Description>Магистральный грузо-пассажирский электровоз переменного тока производства НЭВЗ</Description>
+		<Title>ВЛ60пк-1737 с грузовым поездом</Title>
+		<Description>Магистральный грузовой электровоз переменного тока производства НЭВЗ</Description>
 	</Common>
 	<Vehicle>
-		<Module>vl60pk</Module>
-		<ModuleConfig>vl60pk-1543</ModuleConfig>
+		<Module>vl60k</Module>
+		<ModuleConfig>VL60k-1737</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
@@ -24,7 +24,7 @@
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
-		<Count>150</Count>
+		<Count>50</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	

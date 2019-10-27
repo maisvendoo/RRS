@@ -3,7 +3,7 @@
 
 #include    "device.h"
 
-class BrakeDevice : public Device
+class DEVICE_EXPORT BrakeDevice : public Device
 {
 public:
 

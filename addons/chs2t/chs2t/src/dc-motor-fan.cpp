@@ -41,10 +41,12 @@ void DCMotorFan::ode_system(const state_vector_t& Y, state_vector_t& dYdt, doubl
     Q_UNUSED(t)
 
 
-    double E = Y[0] * CPhi * hs_p(U);
+    double cPhi = 0.074 * sqrt(U);
+
+    double E = Y[0] * cPhi;
 
     double I = (U - E) / R;
-    double M = I * CPhi * hs_p(U);
+    double M = I * cPhi;
     double Ms = ks * Y[0] * Y[0] * sign(Y[0]);
 
     dYdt[0] = (M - Ms) / J;
