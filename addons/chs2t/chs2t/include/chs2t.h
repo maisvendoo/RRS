@@ -185,7 +185,7 @@ private:
 
     bool dropPosition;
 
-    Timer timer;
+    Timer EDT_timer;
 
     /// Передаточное число тягового редуктора
     double      ip;
@@ -294,7 +294,7 @@ private slots:
     void enableEDT()
     {
         EDT = allowEDT = true;
-        timer.stop();
+        EDT_timer.stop();
     }
 };
 

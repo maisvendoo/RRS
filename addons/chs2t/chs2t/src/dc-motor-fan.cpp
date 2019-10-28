@@ -5,11 +5,10 @@
 //------------------------------------------------------------------------------
 DCMotorFan::DCMotorFan(QObject* parent) : Device(parent)
   , U(0.0)  
-  , R(0.0309)
-  , omega_nom(224.0)
-  , CPhi(1.23)
-  , ks(3.46e-3)
-  , J(0.5)
+  , R(0.0)
+  , omega_nom(0.0)
+  , ks(0.0)
+  , J(0.0)
   , soundName("")
 {
 
@@ -61,7 +60,6 @@ void DCMotorFan::load_config(CfgReader& cfg)
 
     cfg.getDouble(secName, "R", R);
     cfg.getDouble(secName, "omega_nom", omega_nom);
-    cfg.getDouble(secName, "CPhi", CPhi);
     cfg.getDouble(secName, "ks", ks);
     cfg.getDouble(secName, "J", J);
 }

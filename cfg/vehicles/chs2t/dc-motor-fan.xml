@@ -4,7 +4,6 @@
         <Order>1</Order>
         <R>0.0309</R>
         <omega_nom>224.0</omega_nom>
-        <CPhi>1.23</CPhi>
         <ks>3.46e-3</ks>
         <J>0.5</J>
     </Device>

@@ -23,7 +23,6 @@ private:
     double U;
     double R;
     double omega_nom;
-    double CPhi;
     double ks;
     double J;
 

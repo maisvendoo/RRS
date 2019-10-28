@@ -166,9 +166,9 @@ void CHS2T::initEDT()
     BrakeReg = new BrakeRegulator();
     BrakeReg->read_custom_config(config_dir + QDir::separator() + "brake-regulator");
 
-    timer.setTimeout(3.0);
-    timer.firstProcess(false);
-    connect(&timer, &Timer::process, this, &CHS2T::enableEDT);
+    EDT_timer.setTimeout(3.0);
+    EDT_timer.firstProcess(false);
+    connect(&EDT_timer, &Timer::process, this, &CHS2T::enableEDT);
 }
 
 //------------------------------------------------------------------------------

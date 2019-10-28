@@ -30,10 +30,10 @@ void CHS2T::stepEDT2(double t, double dt)
 {
     if (EDTSwitch.getState())
     {
-        if ( (brakeRefRes->getPressure() >= 0.07) && !timer.isStarted())
+        if ( (brakeRefRes->getPressure() >= 0.07) && !EDT_timer.isStarted())
         {
             dropPosition = true;
-            timer.start();
+            EDT_timer.start();
         }
 
         if (allowEDT)
@@ -49,5 +49,5 @@ void CHS2T::stepEDT2(double t, double dt)
             }
         }
     }
-    timer.step(t, dt);
+    EDT_timer.step(t, dt);
 }

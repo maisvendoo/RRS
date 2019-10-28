@@ -126,58 +126,24 @@ void StepSwitch::stepDiscrete(double t, double dt)
     down1 = (!ctrlState.k21 && !ctrlState.k22);
     down = (ctrlState.k21 && !ctrlState.k22);
 
-//    if (ctrlState.k25)
-//        trigger.set();
-
     hod = (poz == MPOS_S  || poz == MPOS_SP || poz == MPOS_P);
 
     if (up && ableToGainPositions )
     {
         poz_d += V * hs_p(MPOS_P - poz_d) * dt;
 
-        if ((poz == MPOS_S || poz == MPOS_SP) && prevPos != poz)
+        if (hod && prevPos != poz)
         {
             ableToGainPositions = false;
             prevPos = poz;
         }
-        if (poz != prevPos)
-            prevPos = 0;
     }
 
-    if (up1)
-    {
-        changeOnePosition(1);
-    }
-    if (down1)
-    {
-        changeOnePosition(-1);
-    }
+    changeOnePosition(up1 - down1);
 
     if (down || dropPosition)
     {
         poz_d -= V * hs_p(poz_d) * dt;
-    }
-    if (zero)
-    {
-        ableToChangeOnePosition.set();
-        ableToGainPositions = true;
-    }
-
-    if (getKeyState(KEY_Z))
-    {
-        prevPos2 = static_cast<int>(poz_d);
-        dropPositionsWithZ = true;
-    }
-
-    if (dropPositionsWithZ)
-    {
-        poz_d -= V * dt;
-        if (static_cast<int>(poz_d) != prevPos2)
-            dropPositionsWithZ = !(hod || poz == 0);
-    }
-
-    if (down || dropPosition)
-    {
         fieldStep = 0;
     }
     else
@@ -189,6 +155,28 @@ void StepSwitch::stepDiscrete(double t, double dt)
                     5 * (ctrlState.k31 && ctrlState.k33);
     }
 
+    if (zero)
+    {
+        ableToChangeOnePosition = true;
+        ableToGainPositions = true;
+    }
+
+    if (getKeyState(KEY_Z))
+    {
+        prevPos2 = poz;
+        dropPositionsWithZ = true;
+    }
+
+    if (dropPositionsWithZ)
+    {
+        poz_d -= V * dt;
+
+        if ((poz == 0 || hod) && (poz != prevPos2))
+        {
+            dropPositionsWithZ = false;
+        }
+    }
+
     reverseState = (-1 * (!ctrlState.k01 && ctrlState.k02)) +
                     (1 * (ctrlState.k01 && !ctrlState.k02));
 
@@ -197,10 +185,10 @@ void StepSwitch::stepDiscrete(double t, double dt)
 
 void StepSwitch::changeOnePosition(int dir)
 {
-    if (ableToChangeOnePosition.getState())
+    if (ableToChangeOnePosition)
     {
         poz_d += dir;
         poz_d = cut(poz_d, 0.0, static_cast<double>(MPOS_P));
-        ableToChangeOnePosition.reset();
+        ableToChangeOnePosition = false;
     }
 }

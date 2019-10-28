@@ -79,7 +79,7 @@ private:
     bool hod;
 
     ControllerState ctrlState;
-    Trigger ableToChangeOnePosition;
+    bool ableToChangeOnePosition;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

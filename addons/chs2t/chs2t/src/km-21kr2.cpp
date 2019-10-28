@@ -21,13 +21,12 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
 
   , autoSet(false)
   , autoReset(false)
-  , p(false)
+  , lastControllerPositionIsZero(false)
   , reverseIsPressedOneTime(false)
   , hod(false)
   , reverseState(0)
   , mainShaftPos(0.0)
   , fieldWeakShaft(0.0)
-  , mainShaftHeight(0.0)
 {
 }
 
@@ -102,14 +101,13 @@ void Km21KR2::stepKeysControl(double t, double dt)
     if (getKeyState(KEY_D))
     {
         if (isControl())
-            autoReset = false;
-
-        if (!autoReset)
         {
-            if (isShift() && fieldWeakShaft != 0 && !p && hod)
-            {
-                fieldWeakShaft -= 2;
-            }
+            autoReset = false;
+        }
+
+        if (!autoReset && isShift() && fieldWeakShaft != 0 && lastControllerPositionIsZero && hod)
+        {
+            fieldWeakShaft -= 2;
         }
     }
 
@@ -121,9 +119,10 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // 1 вниз
     if (getKeyState(KEY_A))
     {
-        if(isShift() && fieldWeakShaft != 10 && !p && hod)
+        if(isShift() && fieldWeakShaft != 10 && lastControllerPositionIsZero && hod)
         {
             fieldWeakShaft += 2;
+            lastControllerPositionIsZero = false;
         }
     }
 
@@ -140,7 +139,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
                    (!autoReset && !autoSet && !isShift() && !isControl()) *
                    (-5 * getKeyState(KEY_D) +
                      2 * getKeyState(KEY_A));
-    p = (mainShaftPos != 0);
+
+    lastControllerPositionIsZero = (mainShaftPos == 0);
 }
 
 void Km21KR2::stepExternalControl(double t, double dt)
