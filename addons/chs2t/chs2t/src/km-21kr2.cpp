@@ -180,7 +180,7 @@ void Km21KR2::stepExternalControl(double t, double dt)
 void Km21KR2::connectSignals(ControllerSignals cs, bool &k)
 {
     if (control_signals.analogSignal[cs].is_active)
-        k = static_cast<bool>(control_signals.analogSignal[cs].value);
+        k = static_cast<bool>(control_signals.analogSignal[cs].cur_value);
 }
 
 void Km21KR2::addSignalsInControllerState()
