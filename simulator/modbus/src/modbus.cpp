@@ -72,7 +72,7 @@ void Modbus::controlSignalsProcess()
         for (slave_data_t data : slave->discrete_input)
         {
             control_signals.analogSignal[data.index].is_active = true;
-            control_signals.analogSignal[data.index].value = static_cast<float>(data.value);
+            control_signals.analogSignal[data.index].setValue(static_cast<float>(data.value));
         }
 
         master->readInputRegistersRequest(slave);
@@ -80,7 +80,7 @@ void Modbus::controlSignalsProcess()
         for (slave_data_t data : slave->input_register)
         {
             control_signals.analogSignal[data.index].is_active = true;
-            control_signals.analogSignal[data.index].value = static_cast<float>(data.value);
+            control_signals.analogSignal[data.index].setValue(static_cast<float>(data.value));
         }
     }
 
@@ -100,15 +100,21 @@ void Modbus::feedbackSignalsProcess()
         for (it = slave->coil.begin(); it != slave->coil.end(); ++it)
         {
             slave_data_t *coil = &it.value();
-            coil->value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].value);
+            coil->value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value);
         }
+
+        // Отправляем их в шину
+        master->writeCoils(slave);
 
         // Пишем регистры вывода
         for (it = slave->holding_register.begin(); it != slave->holding_register.end(); ++it)
         {
             slave_data_t *holding_reg = &it.value();
-            holding_reg->value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].value);
+            holding_reg->value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value);
         }
+
+        // Шлем в шину
+        master->writeHoldingRegisters(slave);
     }
 }
 

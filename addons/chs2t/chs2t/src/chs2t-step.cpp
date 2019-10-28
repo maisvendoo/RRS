@@ -240,7 +240,8 @@ void CHS2T::stepSupportEquipment(double t, double dt)
 
     if (motor_fan_switcher->getState() == 0)
     {
-
+//        motor_fan[0]->setU()
+//        motor_fan[1]
     }
 
     if (motor_fan_switcher->getState() == 1)

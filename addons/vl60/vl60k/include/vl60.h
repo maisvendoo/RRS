@@ -161,10 +161,14 @@ private:
     PneumoReley     *pneumo_relay;
 
     /// Разветвитель трубопроводов (тройник)
-    PneumoSplitter  *pneumo_splitter;
+    PneumoSplitter  *trolley_pneumo_splitter;
+
+    PneumoSplitter  *airdist_splitter;
 
     /// Запасный резервуар
     Reservoir       *supply_reservoir;
+
+    Reservoir       *fake_cylinder;
 
     /// Воздухораспределитель
     AirDistributor  *air_disr;

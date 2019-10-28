@@ -53,7 +53,7 @@ bool StepSwitch::isZero() const
 //------------------------------------------------------------------------------
 bool StepSwitch::isSeries() const
 {
-    return (poz > 0 ) && (poz <= MPOS_S);
+    return (poz > 0 ) && (poz <= MPOS_S) && !hod;
 }
 
 //------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ bool StepSwitch::isSeries() const
 //------------------------------------------------------------------------------
 bool StepSwitch::isSeriesParallel() const
 {
-    return (poz > MPOS_S ) && (poz <= MPOS_SP);
+    return (poz > MPOS_S ) && (poz <= MPOS_SP) &&!hod;
 }
 
 //------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ bool StepSwitch::isSeriesParallel() const
 //------------------------------------------------------------------------------
 bool StepSwitch::isParallel() const
 {
-    return (poz > MPOS_SP );
+    return (poz > MPOS_SP ) && !hod;
 }
 
 //------------------------------------------------------------------------------

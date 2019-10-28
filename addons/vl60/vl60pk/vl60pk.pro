@@ -24,7 +24,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../../lib -lfilesystem
 }
 
-LIBS += -L../../../../modules/vl60-common -lvl60-equipment
+#LIBS += -L../../../../modules/vl60-common -lvl60-equipment
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../vl60-equipment/include
@@ -37,4 +37,6 @@ INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 
 HEADERS += $$files(./include/*.h)
+HEADERS += $$files(../vl60-equipment/include/*.h)
 SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(../vl60-equipment/src/*.cpp)

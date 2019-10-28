@@ -148,7 +148,7 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::hardwareOutput()
 {
-    feedback_signals.analogSignal[TEST_COUNT].value += 1.0f;
+    feedback_signals.analogSignal[TEST_COUNT].cur_value += 1.0f;
 }
 
 GET_VEHICLE(CHS2T)

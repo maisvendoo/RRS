@@ -52,7 +52,6 @@ private:
     /// Флаг разрешающий работу ЭДТ
     bool allowEDT;
 
-    /// Постоянная времени нарастания заданного тока
     double T;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

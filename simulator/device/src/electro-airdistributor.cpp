@@ -63,6 +63,14 @@ double ElectroAirDistributor::getOutputSupplyReservoirFlow()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ElectroAirDistributor::setSupplyReservoirPressure(double press)
+{
+    p_ar = press;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ElectroAirDistributor *loadElectroAirDistributor(QString lib_path)
 {
 

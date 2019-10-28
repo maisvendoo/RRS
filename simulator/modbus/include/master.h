@@ -27,7 +27,7 @@ public:
 
     void writeCoils(Slave *slave);
 
-    void writeHoldingRegisters(Slave *slave, size_t count = 1);
+    void writeHoldingRegisters(Slave *slave);
 
 private:
 

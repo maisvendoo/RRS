@@ -22,6 +22,8 @@ public:
 
     double getOutputSupplyReservoirFlow();
 
+    void setSupplyReservoirPressure(double press);
+
 protected:
 
     /// Расход воздуха на пополнение ЗР от ВР
