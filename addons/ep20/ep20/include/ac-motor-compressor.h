@@ -10,7 +10,7 @@ class ACMotorCompressor : public Device
 {
 public:
 
-    ACMotorCompressor(QString config_path, QObject *parent = Q_NULLPTR);
+    ACMotorCompressor(QObject *parent = Q_NULLPTR);
 
     ~ACMotorCompressor();
 
@@ -59,8 +59,6 @@ private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
-
-    void load_config(QString cfg_path);
 };
 
 #endif // ACMOTORCOMPRESSOR_H

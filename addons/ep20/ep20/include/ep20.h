@@ -79,10 +79,11 @@ private:
     std::array<AuxiliaryConverter *, NUM_AUX_CONV> auxConv;
 
     /// Резервуар
-    Reservoir   *reservoir;
+    Reservoir   *main_reservoir;
 
-    /// Мотор компрессор
-    ACMotorCompressor   *motorCompAC;
+    /// Мотор компрессор   
+    std::array<ACMotorCompressor *, 2> motorCompAC;
+//    ACMotorCompressor   *motorCompAC;
 
     /// Входные значения
     mpcs_input_t mpcsInput;

@@ -104,6 +104,8 @@ void MPCS::stepDiscrete(double t, double dt)
     stepMainSwitchControl(t, dt);
 
     stepFastSwitchControl(t, dt);
+
+    stepToggleSwitchMK(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -128,6 +130,15 @@ void MPCS::stepFastSwitchControl(double t, double dt)
     mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && (mpcs_input.current_kind_switch_state == 1);
     mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && (mpcs_input.Uin_fs >= 2200.0)
             && (mpcs_input.Uin_fs <= 4000.0);
+}
+
+//------------------------------------------------------------------------------
+// Шаг контроля MK
+//------------------------------------------------------------------------------
+void MPCS::stepToggleSwitchMK(double t, double dt)
+{
+    if (mpcs_output.turn_on_ms || mpcs_output.turn_on_fs)
+        std::fill(mpcs_output.toggleSwitchMK.begin(), mpcs_output.toggleSwitchMK.end(), true);
 }
 
 

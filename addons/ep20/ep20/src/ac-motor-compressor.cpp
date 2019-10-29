@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ACMotorCompressor::ACMotorCompressor(QString config_path, QObject *parent) : Device(parent)
+ACMotorCompressor::ACMotorCompressor(QObject *parent) : Device(parent)
   , p(0.0)
   , Q(0.0)
   , p0(1.5)
@@ -18,8 +18,6 @@ ACMotorCompressor::ACMotorCompressor(QString config_path, QObject *parent) : Dev
 
 {
     std::fill(K.begin(), K.end(), 0);
-
-    load_config(config_path);
 }
 
 //------------------------------------------------------------------------------
@@ -97,32 +95,12 @@ void ACMotorCompressor::ode_system(const state_vector_t &Y,
 //
 //------------------------------------------------------------------------------
 void ACMotorCompressor::load_config(CfgReader &cfg)
-{
-    Q_UNUSED(cfg)
-}
+{  
+    QString secName = "Device";
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ACMotorCompressor::load_config(QString cfg_path)
-{
-    CfgReader cfg;
-
-    if (cfg.load(cfg_path))
+    for (size_t i = 1; i < K.size(); ++i)
     {
-        QString secName = "Device";
-
-        int order = 1;
-        if (cfg.getInt(secName, "Order", order))
-        {
-            y.resize(static_cast<size_t>(order));
-            std::fill(y.begin(), y.end(), 0);
-        }
-
-        for (size_t i = 1; i < K.size(); ++i)
-        {
-            QString coeff = QString("K%1").arg(i);
-            cfg.getDouble(secName, coeff, K[i]);
-        }
+        QString coeff = QString("K%1").arg(i);
+        cfg.getDouble(secName, coeff, K[i]);
     }
 }

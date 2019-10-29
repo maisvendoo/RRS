@@ -55,6 +55,8 @@ private:
     /// Контроль БВ
     void stepFastSwitchControl(double t, double dt);
 
+    void stepToggleSwitchMK(double t, double dt);
+
     /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);
 

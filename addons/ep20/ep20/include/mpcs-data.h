@@ -62,9 +62,13 @@ struct mpcs_output_t
     /// Включение БВ
     bool turn_on_fs = false;
 
+    /// Тумблеры управления мотор-компрессорами
+    std::array<bool, 2> toggleSwitchMK;
+
     mpcs_output_t()
     {
         std::fill(pant_state.begin(), pant_state.end(), false);
+        std::fill(toggleSwitchMK.begin(), toggleSwitchMK.end(), false);
     }
 };
 

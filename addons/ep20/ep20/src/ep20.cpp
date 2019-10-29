@@ -73,10 +73,15 @@ void EP20::initHighVoltageScheme()
     for (size_t i = 0; i <auxConv.size(); ++i)
         auxConv[i] = new AuxiliaryConverter();
 
-    reservoir = new Reservoir(1000);
+    main_reservoir = new Reservoir(1);
 
-    motorCompAC = new ACMotorCompressor("p");
+    for (size_t i = 0; i < motorCompAC.size(); ++i)
+    {
+        motorCompAC[i] = new ACMotorCompressor();
+        motorCompAC[i]->read_custom_config(config_dir + QDir::separator() + "ac-motor-compressor");
+    }
 }
+
 
 //------------------------------------------------------------------------------
 // Общие шаги моделирования
@@ -90,12 +95,14 @@ void EP20::step(double t, double dt)
     stepHighVoltageScheme(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, U2_1: %2, U2_2: %3, U2_3: %4, U2_4: %5")
+    DebugMsg = QString("t: %1 s, U2_1: %2, U2_2: %3, U2_3: %4, U2_4: %5, Q: %6")
             .arg(t, 10, 'f', 2)
             .arg(auxConv[0]->getU2())
             .arg(auxConv[1]->getU2())
             .arg(auxConv[2]->getU2())
-            .arg(auxConv[3]->getU2());
+            .arg(auxConv[3]->getU2())
+            .arg(main_reservoir->getPressure()); // НАДО ВЫВЕСТИ ВОЗДУХ НА РЕЗЕРВУАРЕ! ПОМЕНЯТЬ!
+    //________________________________________________
 
 //    .arg(t, 10, 'f', 2)
 //    .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
@@ -201,10 +208,20 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         auxConv[i]->step(t, dt);
     }
 
+    // Передаем данные для
+//    double k_flow = 5e-3;
+//    main_reservoir->setFlowCoeff(k_flow);
 
-    reservoir->step(t, dt);
+    main_reservoir->setAirFlow(motorCompAC[0]->getAirFlow() + motorCompAC[1]->getAirFlow());
+    main_reservoir->step(t, dt);
 
-    motorCompAC->step(t, dt);
+
+    for(size_t i = 0; i < motorCompAC.size(); ++i)
+    {
+        motorCompAC[i]->setExternalPressure(main_reservoir->getPressure());
+        motorCompAC[i]->setU_power(auxConv[3]->getU2() * static_cast<double>(mpcsOutput.toggleSwitchMK[i]));
+        motorCompAC[i]->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
