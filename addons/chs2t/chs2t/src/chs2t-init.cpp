@@ -166,9 +166,9 @@ void CHS2T::initEDT()
     BrakeReg = new BrakeRegulator();
     BrakeReg->read_custom_config(config_dir + QDir::separator() + "brake-regulator");
 
-    timer.setTimeout(3.0);
-    timer.firstProcess(false);
-    connect(&timer, &Timer::process, this, &CHS2T::enableEDT);
+    EDT_timer.setTimeout(3.0);
+    EDT_timer.firstProcess(false);
+    connect(&EDT_timer, &Timer::process, this, &CHS2T::enableEDT);
 }
 
 //------------------------------------------------------------------------------
@@ -192,10 +192,23 @@ void CHS2T::initSupportEquipment()
     relValve = new ReleaseValve();
     relValve->read_custom_config(config_dir + QDir::separator() + "release-valve");
 
-    motor_fan = new DCMotorFan();
-    motor_fan->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");
-    motor_fan->setSoundName("PTR_fan");
-    connect(motor_fan, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
+    motor_fan_ptr = new DCMotorFan();
+    motor_fan_ptr->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");
+    motor_fan_ptr->setSoundName("PTR_fan");
+
+    for (int i = 0; i < 2; ++i)
+    {
+        motor_fan[i] = new DCMotorFan();
+        motor_fan[i]->read_custom_config(config_dir + QDir::separator() + "motor-fan");
+        connect(motor_fan[i], &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
+        motor_fan[i]->setSoundName(QString("Motor_Fan").arg(i+1));
+    }
+
+    motor_fan_switcher = new Switcher();
+    motor_fan_switcher->setKolStates(3);
+    motor_fan_switcher->setKeyCode(KEY_F);
+
+    connect(motor_fan_ptr, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
 
     blinds = new Blinds();
     blinds->read_custom_config(config_dir + QDir::separator() + "blinds");

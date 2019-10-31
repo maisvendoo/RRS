@@ -20,7 +20,7 @@ public:
 
     double getQrv() const { return  Qrv; }
 
-    void setRelease(bool release) { this->release = release; }
+    void setRelease(bool value) { this->release = value; }
 
 private:
 

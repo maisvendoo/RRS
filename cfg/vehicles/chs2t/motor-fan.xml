@@ -2,9 +2,9 @@
 <Config>
     <Device>
         <Order>1</Order>
-        <R>0.0309</R>
-        <omega_nom>224.0</omega_nom>
-        <ks>3.46e-3</ks>
+        <R>9.2</R>
+        <omega_nom>188.5</omega_nom>
+        <ks>4.2e-3</ks>
         <J>0.5</J>
     </Device>
 </Config>

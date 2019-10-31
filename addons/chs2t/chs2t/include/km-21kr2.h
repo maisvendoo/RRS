@@ -23,8 +23,6 @@ public:
 
     double getMainShaftPos() const { return mainShaftPos * 0.1; }
 
-    double getMainShaftHeight() const { return mainShaftHeight; }
-
 private:
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -56,8 +54,8 @@ private:
 
     bool autoSet;
     bool autoReset;
-    bool p;
-    bool isPressedOneTime;
+    bool lastControllerPositionIsZero;
+    bool reverseIsPressedOneTime;
     bool hod;
 
     int reverseState;
