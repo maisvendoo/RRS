@@ -201,7 +201,7 @@ void CHS2T::initSupportEquipment()
         motor_fan[i] = new DCMotorFan();
         motor_fan[i]->read_custom_config(config_dir + QDir::separator() + "motor-fan");
         connect(motor_fan[i], &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
-        motor_fan[i]->setSoundName(QString("Motor_Fan").arg(i+1));
+        motor_fan[i]->setSoundName(QString("Motor_Fan%1").arg(i+1));
     }
 
     motor_fan_switcher = new Switcher();
