@@ -18,11 +18,19 @@ public:
 
     void setControlLine(double value, size_t idx = 0);
 
-    void setInputSupplyReservoirFlow(double Qar_in);
+    void setQbc_in(double qbc_in) { this->Qbc_in = qbc_in; }
 
-    double getOutputSupplyReservoirFlow();
+    void setPbc_in(double pbc_in) { this->pbc_in = pbc_in; }
 
-    void setSupplyReservoirPressure(double press);
+    void setSupplyReservoirPressure(double press) { p_ar = press; }
+
+    void setInputSupplyReservoirFlow(double Qar_in) { this->Qar_in = Qar_in; }
+
+    double getQbc_out() { return Qbc_out; }
+
+    double getPbc_out() { return pbc_out; }
+
+    double getOutputSupplyReservoirFlow() { return Qar_out; }
 
 protected:
 

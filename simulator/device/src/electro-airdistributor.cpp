@@ -47,30 +47,6 @@ void ElectroAirDistributor::setControlLine(double value, size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ElectroAirDistributor::setInputSupplyReservoirFlow(double Qar_in)
-{
-    this->Qar_in = Qar_in;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double ElectroAirDistributor::getOutputSupplyReservoirFlow()
-{
-    return Qar_out;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ElectroAirDistributor::setSupplyReservoirPressure(double press)
-{
-    p_ar = press;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 ElectroAirDistributor *loadElectroAirDistributor(QString lib_path)
 {
 
