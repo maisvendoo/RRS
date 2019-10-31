@@ -54,7 +54,18 @@ enum
     INDICATOR_BV = 44,
     SW_BV = 45,
 
+    SW_EPT = 46,
+    SW_MK1 = 47,
+    SW_MK2 = 48,
+    SW_VK = 49,
+
     BLINDS = 50,
+
+    SW_MV = 51,
+    SW_CAB_LIGHT = 52,
+    SW_BF_LEFT = 53,
+    SW_BF_RIGHT = 54,
+    SW_SPOT_LIGHT = 55,
 
     WHEEL_1 = 194,
     WHEEL_2 = 195,

@@ -56,6 +56,9 @@ void CHS2T::stepSignals()
     analogSignal[INDICATOR_BV] = static_cast<float>(bv->getLampState());
 
     analogSignal[SW_BV] = fastSwitchSw->getHandlePos();
+    analogSignal[SW_MV] = motor_fan_switcher->getHandlePos();
+    analogSignal[SW_MK1] = mk_switcher[0]->getHandlePos();
+    analogSignal[SW_MK2] = mk_switcher[1]->getHandlePos();
 
     analogSignal[BLINDS] = blinds->getPosition();
     analogSignal[SIGLIGHT_GALYZI] = static_cast<float>(blinds->isOpened());
