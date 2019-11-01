@@ -130,6 +130,8 @@ void CHS2T::stepTractionControl(double t, double dt)
         Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
+
+    emit soundSetPitch("Motion", static_cast<float>(abs(velocity * Physics::kmh) / 160));
 }
 
 //------------------------------------------------------------------------------

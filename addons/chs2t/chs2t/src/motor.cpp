@@ -146,6 +146,9 @@ void Motor::preStep(state_vector_t& Y, double t)
         else
             n = 2;
     }
+
+    emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
+    emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 100)));
 }
 
 //------------------------------------------------------------------------------

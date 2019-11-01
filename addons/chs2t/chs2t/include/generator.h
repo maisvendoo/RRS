@@ -57,6 +57,7 @@ private:
 
     double Rgp;
     double Rdp;
+    double omega_nom;
 
     MotorMagneticChar cPhi;
 

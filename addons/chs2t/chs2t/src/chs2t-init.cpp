@@ -132,6 +132,8 @@ void CHS2T::initTractionControl()
     motor = new Motor();
     motor->setCustomConfigDir(config_dir);
     motor->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
+    connect(motor, &Motor::soundSetVolume, this, &CHS2T::soundSetVolume);
+    connect(motor, &Motor::soundSetPitch, this, &CHS2T::soundSetPitch);
 
     puskRez = new PuskRez;
     puskRez->read_custom_config(config_dir + QDir::separator() + "puskrez");
@@ -173,6 +175,8 @@ void CHS2T::initEDT()
     generator = new Generator();
     generator->setCustomConfigDir(config_dir);
     generator->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
+    connect(generator, &Generator::soundSetPitch, this, &CHS2T::soundSetPitch);
+    connect(generator, &Generator::soundSetVolume, this, &CHS2T::soundSetVolume);
 
     pulseConv = new PulseConverter();
 

@@ -21,6 +21,7 @@ Generator::Generator(QObject* parent) : Device(parent)
 
   , Rgp(0.0)
   , Rdp(0.0)
+  , omega_nom(73.0)
 {
 
 }
@@ -42,6 +43,9 @@ void Generator::preStep(state_vector_t& Y, double t)
 
     M = calcCPhi((Y[0])) * Y[1];
     Ut = Y[1] * Rt;
+
+    emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
+    emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 100)));
 }
 
 //------------------------------------------------------------------------------
@@ -68,6 +72,7 @@ void Generator::load_config(CfgReader& cfg)
     cfg.getDouble(secName, "R_a", Ra);
     cfg.getDouble(secName, "R_gp", Rgp);
     cfg.getDouble(secName, "R_dp", Rdp);
+    cfg.getDouble(secName, "omega_nom", omega_nom);
 
     Rf = Rgp + Rdp;
 
