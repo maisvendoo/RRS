@@ -24,13 +24,18 @@ public:
 
     void setSupplyReservoirPressure(double press) { p_ar = press; }
 
+    double getSupplyReservoirPressure() { return p_ar; }
+
     void setInputSupplyReservoirFlow(double Qar_in) { this->Qar_in = Qar_in; }
+
+    double getOutputSupplyReservoirFlow() { return Qar_out; }
+
+
+
 
     double getQbc_out() { return Qbc_out; }
 
     double getPbc_out() { return pbc_out; }
-
-    double getOutputSupplyReservoirFlow() { return Qar_out; }
 
 protected:
 
@@ -51,6 +56,10 @@ protected:
     double pbc_out;
     /// Давление в ТЦ, передаваемое в модель ВР
     double pbc_in;
+
+
+    double P1;
+
 
     std::vector<double> control_line;
 };

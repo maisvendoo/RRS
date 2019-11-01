@@ -113,6 +113,8 @@ private:
     /// Поездной кран машиниста (КрМ)
     BrakeCrane *brakeCrane;
 
+    ElectroAirDistributor *electroAirDistr;
+
     /// Тормозная рычажная передача тележек
     std::array<CHS2tBrakeMech *, 2>    brakesMech;
 

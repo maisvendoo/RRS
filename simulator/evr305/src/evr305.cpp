@@ -12,13 +12,11 @@
 //------------------------------------------------------------------------------
 EVR305::EVR305(QObject *parent)
     : ElectroAirDistributor(parent)
-    , a(0)
     , A1(0.0)
     , Vpk(0.0)
-    , pzpk_in(0.0)
-    , ptc(0.0)
+    , Q1(0.0)
 {
-
+    zpk = new SwitchingValve();
 }
 
 //------------------------------------------------------------------------------
@@ -36,13 +34,24 @@ void EVR305::ode_system(const state_vector_t &Y,
                                      state_vector_t &dYdt,
                                      double t)
 {
-    double s1 = abs(a) * pf(a) * ((p_ar - Y[0]) * K[0]);
+    double s1 = abs(control_line[0]) * pf(control_line[0]) * ((p_ar - Y[0]) * K[0]);
 
-    double s2 = (p_ar - pzpk_in) * K[3] * cut(pf((Y[0] - ptc) * A1) * k[0], 0.0, 1.0);
+    double s2 = (p_ar - P1) * K[3] * cut(pf((Y[0] - pbc_in) * A1) * k[0], 0.0, 1.0);
+
+    P1 = zpk->getPressure1();
+
+    zpk->setInputFlow2(Qbc_in);
+    Qbc_out = zpk->getOutputFlow();
+
+    zpk->setOutputPressure(pbc_in);
+    pbc_out = zpk->getPressure2();
 
     Qar_out = Qar_in - s1 * K[2] - s2 * K[4];
 
-    dYdt[0] = (s1 - (!abs(a) * Y[0] * K[1])) / Vpk;
+    Q1 = s2 - (P1 * K[5] * cut(nf((Y[0] - pbc_in) * A1) * k[1], 0.0, 1.0));
+    zpk->setInputFlow1(Q1);
+
+    dYdt[0] = (s1 - (!static_cast<bool>(abs(control_line[0])) * Y[0] * K[1])) / Vpk;
 }
 
 //------------------------------------------------------------------------------
@@ -52,7 +61,6 @@ void EVR305::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
-
 }
 
 //------------------------------------------------------------------------------
@@ -75,6 +83,8 @@ void EVR305::load_config(CfgReader &cfg)
     }
 
     cfg.getDouble(secName, "A1", A1);
+
+    cfg.getDouble(secName, "Vpk", Vpk);
 }
 
 //------------------------------------------------------------------------------

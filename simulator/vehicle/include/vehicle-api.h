@@ -6,6 +6,7 @@
 #include    "brake-mech.h"
 #include    "physics.h"
 #include    "reservoir.h"
+#include    "electro-airdistributor.h"
 #include    "airdistributor.h"
 #include    "pneumo-relay.h"
 #include    "pneumo-splitter.h"

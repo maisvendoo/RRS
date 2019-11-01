@@ -12,6 +12,7 @@ const int MAX_COEFFS = 6;
 const int MAX_LCOEFFS = 2;
 
 #include    "electro-airdistributor.h"
+#include    "switching-valve.h"
 
 //------------------------------------------------------------------------------
 //
@@ -24,18 +25,15 @@ public:
 
     ~EVR305();
 
-    void setPzpk_in(double value) { pzpk_in = value; }
-
 private:
-
-    int a;
-    double A1;
-    double Vpk;
-    double pzpk_in;
-    double ptc;
-
     std::array<double, MAX_COEFFS> K;
     std::array<double, MAX_LCOEFFS> k;
+
+    SwitchingValve *zpk;
+
+    double A1;
+    double Vpk;
+    double Q1;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

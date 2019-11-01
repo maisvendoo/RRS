@@ -210,6 +210,9 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
 
+    //-------------------------------------------------------------------------
+    dako->setQvr(electroAirDistr->getQbc_out());
+    //-------------------------------------------------------------------------
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
     locoCrane->setControl(keys);
@@ -220,9 +223,21 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
 
+    //-------------------------------------------------------------------------
+    electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
+    electroAirDistr->setSupplyReservoirPressure(brakeRefRes->getPressure());
+    electroAirDistr->setPbc_in(dako->getPy());
+    electroAirDistr->setQbc_in(dako->getQtc());
+    //-------------------------------------------------------------------------
+
     airDistr->setBrakepipePressure(pTM);
     airDistr->setAirSupplyPressure(spareReservoir->getPressure());
     airDistr->setBrakeCylinderPressure(airSplit->getP_in());
+
+    //-------------------------------------------------------------------------
+    airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
+    airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
+    //-------------------------------------------------------------------------
 
     spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
@@ -241,6 +256,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     airSplit->setP_out2(brakeRefRes->getPressure());
 
     brakeRefRes->setAirFlow(airSplit->getQ_out2() + handleEDT->getQ_bref());
+
+    //-------------------------------------------------------------------------
+    brakeRefRes->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());
+    //-------------------------------------------------------------------------
 
     dako->step(t, dt);
     locoCrane->step(t, dt);
