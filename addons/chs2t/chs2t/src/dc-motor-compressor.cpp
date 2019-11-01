@@ -19,6 +19,7 @@ DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
   , I(0.0)
   , Ma(0.0)
   , Vnk(0.05)
+  , soundName("")
 
 {
 
@@ -35,13 +36,21 @@ DCMotorCompressor::~DCMotorCompressor()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void DCMotorCompressor::setSoundName(const QString &value)
+{
+    soundName = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void DCMotorCompressor::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
     Q = K[4] * pf(Y[1] - p);
 
-    emit soundSetPitch("Motor_Compressor", static_cast<float>(Y[0] / omega0));
+    emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega0));
 }
 
 //------------------------------------------------------------------------------

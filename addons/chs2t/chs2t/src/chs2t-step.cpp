@@ -137,15 +137,48 @@ void CHS2T::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepAirSupplySubsystem(double t, double dt)
 {
-    motor_compressor->setU(bv->getU_out() * static_cast<double>(mk_tumbler.getState()) * pressReg->getState());
-    motor_compressor->setPressure(mainReservoir->getPressure());
-    motor_compressor->step(t, dt);
 
-    mainReservoir->setAirFlow(motor_compressor->getAirFlow());
+    for (size_t i = 0; i < motor_compressor.size(); ++i)
+    {
+        double mk_on = 0;
+
+        switch (mk_switcher[i]->getState())
+        {
+        case 0:
+
+            mk_on = 0;
+            break;
+
+        case 1:
+
+            mk_on = 0;
+            break;
+
+        case 2:
+
+            mk_on = pressReg->getState();
+            break;
+
+        case 3:
+
+            mk_on = 1.0;
+            break;
+        }
+
+        motor_compressor[i]->setU(bv->getU_out() * mk_on);
+        motor_compressor[i]->setPressure(mainReservoir->getPressure());
+        motor_compressor[i]->step(t, dt);
+
+        mk_switcher[i]->setControl(keys);
+        mk_switcher[i]->step(t, dt);
+    }
+
+    mainReservoir->setAirFlow(motor_compressor[0]->getAirFlow() + motor_compressor[1]->getAirFlow());
+    mainReservoir->setFlowCoeff(1e-3);
     mainReservoir->step(t, dt);
 
     pressReg->setPressure(mainReservoir->getPressure());
-    pressReg->step(t, dt);
+    pressReg->step(t, dt);    
 }
 
 //------------------------------------------------------------------------------

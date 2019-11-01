@@ -101,11 +101,14 @@ private:
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
 
-    /// Мотор-компрессор (МК)
-    DCMotorCompressor *motor_compressor;
+    /// Мотор-компрессоры (МК)
+    std::array<DCMotorCompressor *, 2> motor_compressor;
 
     /// Тумблер включенияМК
     Trigger     mk_tumbler;
+
+    /// Галетники управления МК
+    std::array<Switcher *, 2> mk_switcher;
 
     /// Поездной кран машиниста (КрМ)
     BrakeCrane *brakeCrane;

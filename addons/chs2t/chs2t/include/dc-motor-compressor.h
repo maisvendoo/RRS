@@ -22,6 +22,8 @@ public:
 
     double getAirFlow() const { return Q; }
 
+    void setSoundName(const QString &value);
+
 private:
 
     /// Внешнее противодавление
@@ -42,6 +44,8 @@ private:
     double I;
     double Ma;
     double Vnk;
+
+    QString soundName;
 
     enum
     {

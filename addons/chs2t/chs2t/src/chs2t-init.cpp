@@ -99,8 +99,21 @@ void CHS2T::initAirSupplySubsystem()
     spareReservoir = new Reservoir(0.078);
     brakeRefRes = new Reservoir(0.004);
 
-    motor_compressor = new DCMotorCompressor();
-    motor_compressor->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
+    for (size_t i = 0; i < motor_compressor.size(); ++i)
+    {
+        motor_compressor[i] = new DCMotorCompressor();
+        motor_compressor[i]->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
+        connect(motor_compressor[i], &DCMotorCompressor::soundSetPitch, this, &CHS2T::soundSetPitch);
+
+        motor_compressor[i]->setSoundName(QString("Motor_Compressor%1").arg(i+1));
+
+        mk_switcher[i] = new Switcher();
+        mk_switcher[i]->setKolStates(4);
+    }
+
+    mk_switcher[0]->setKeyCode(KEY_7);
+    mk_switcher[1]->setKeyCode(KEY_8);
+
     pressReg = new PressureRegulator();
 }
 
