@@ -149,6 +149,9 @@ void CHS2T::initBrakesEquipment(QString module_path)
     dako = new Dako();
     dako->read_custom_config(config_dir + QDir::separator() + "dako");
 
+    electroAirDistr = loadElectroAirDistributor(module_path + QDir::separator() + "evr305");
+    electroAirDistr->read_config("evr305");
+
     airDistr = loadAirDistributor(module_path + QDir::separator() + "vr242");
     airDistr->read_config("vr242");    
 

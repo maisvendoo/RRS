@@ -13,6 +13,8 @@ ElectroAirDistributor::ElectroAirDistributor(QObject *parent) : BrakeDevice(pare
   , Qbc_in(0.0)
   , pbc_out(0.0)
   , pbc_in(0.0)
+
+  , P1(0.0)
 {
     setControlLinesNumber(1);
 }
@@ -42,30 +44,6 @@ void ElectroAirDistributor::setControlLine(double value, size_t idx)
 {
     if (idx < control_line.size())
         control_line[idx] = cut(value, -1.0, 1.0);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ElectroAirDistributor::setInputSupplyReservoirFlow(double Qar_in)
-{
-    this->Qar_in = Qar_in;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double ElectroAirDistributor::getOutputSupplyReservoirFlow()
-{
-    return Qar_out;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ElectroAirDistributor::setSupplyReservoirPressure(double press)
-{
-    p_ar = press;
 }
 
 //------------------------------------------------------------------------------
