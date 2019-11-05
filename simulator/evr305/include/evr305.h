@@ -8,8 +8,8 @@
 #ifndef     EVR305_H
 #define     EVR305_H
 
-const int MAX_COEFFS = 6;
-const int MAX_LCOEFFS = 2;
+const int MAX_COEFFS = 7;
+const int MAX_LCOEFFS = 3;
 
 #include    "electro-airdistributor.h"
 #include    "switching-valve.h"
