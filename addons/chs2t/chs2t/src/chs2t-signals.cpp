@@ -63,6 +63,8 @@ void CHS2T::stepSignals()
     analogSignal[BLINDS] = blinds->getPosition();
     analogSignal[SIGLIGHT_GALYZI] = static_cast<float>(blinds->isOpened());
 
+    analogSignal[HANDLE_RT] = handleEDT->getHandlePos();
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);

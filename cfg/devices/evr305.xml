@@ -15,7 +15,7 @@
 
         <A1>1</A1>
 
-        <Vpk>1e-3</Vpk>
+        <Vpk>1.5e-3</Vpk>
 
     </Device>
 </Config>

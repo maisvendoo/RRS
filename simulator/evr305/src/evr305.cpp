@@ -4,11 +4,7 @@
 //
 //
 //------------------------------------------------------------------------------
-
 #include    "evr305.h"
-
-#include    "filesystem.h"
-#include    <QDir>
 
 //------------------------------------------------------------------------------
 //
@@ -89,10 +85,7 @@ void EVR305::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "Vpk", Vpk);
 
-
-    FileSystem &fs = FileSystem::getInstance();
-    QString zpk_config(fs.combinePath(fs.getConfigDir(), "devices").c_str());
-    zpk->read_custom_config(zpk_config + QDir::separator() + "zpk");
+    zpk->read_config("zpk");
 }
 
 //------------------------------------------------------------------------------

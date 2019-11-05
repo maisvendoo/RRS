@@ -9,6 +9,7 @@
 #define     HANDLE_EDT_H
 
 #include    "device.h"
+#include    "timer.h"
 
 //------------------------------------------------------------------------------
 //
@@ -19,19 +20,15 @@ public:
 
     HandleEDT(QObject *parent = Q_NULLPTR);
 
-    ~HandleEDT();
-
-    void setPipiLinePressure(double press) { pFL = press; }
-
-    void setBrefPressure(double press) { p_bref = press; }
+    ~HandleEDT();    
 
     void setBrakeKey(int key) { brakeKey = key; }
 
     void setReleaseKey(int key) { releaseKey = key; }
 
-    float getHandlePos() const { return static_cast<float>(pos); }
+    float getHandlePos() const { return static_cast<float>(pos) / 2.0f; }
 
-    double getQ_bref() const { return Q_bref; }
+    double getControlSignal() const { return control_signal; }
 
 private:
 
@@ -41,17 +38,15 @@ private:
 
     int pos;
 
-    double Q_bref;
+    int pos_ref;
 
-    double p_bref;
-
-    double pFL;
+    double control_signal;
 
     enum
     {
-        POS_RELEASE = -1,
-        POS_HOLD = 0,
-        POS_BRAKE = 1
+        POS_RELEASE = 0,
+        POS_HOLD = 1,
+        POS_BRAKE = 2
     };
 
     enum
@@ -61,6 +56,8 @@ private:
 
     std::array<double, NUM_COEFFS> K;
 
+    Timer motionTimer;
+
     void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
@@ -68,6 +65,10 @@ private:
     void load_config(CfgReader &cfg);
 
     void stepKeysControl(double t, double dt);
+
+private slots:
+
+    void slotHandleMove();
 };
 
 #endif // HANDLEEDT_H

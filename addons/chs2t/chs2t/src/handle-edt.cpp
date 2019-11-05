@@ -6,9 +6,16 @@
 HandleEDT::HandleEDT(QObject *parent) : Device(parent)
   , brakeKey(0)
   , releaseKey(0)
-  , pos(0)
+  , pos(POS_RELEASE)
+  , pos_ref(pos)
+  , control_signal(0.0)
 {
     std::fill(K.begin(), K.end(), 0.0);
+
+    connect(&motionTimer, &Timer::process, this, &HandleEDT::slotHandleMove);
+    motionTimer.setTimeout(0.1);
+    motionTimer.firstProcess(true);
+    motionTimer.start();
 }
 
 //------------------------------------------------------------------------------
@@ -27,11 +34,23 @@ void HandleEDT::preStep(state_vector_t &Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    double u1 = static_cast<double>(pos == POS_BRAKE);
+    switch (pos)
+    {
+    case POS_RELEASE:
 
-    double u2 = static_cast<double>(pos == POS_RELEASE);
+        control_signal = 0.0;
+        break;
 
-    Q_bref = K[1] * (pFL - p_bref) * u1 - K[2] * p_bref * u2;
+    case POS_HOLD:
+
+        control_signal = -1.0;
+        break;
+
+    case POS_BRAKE:
+
+        control_signal = 1.0;
+        break;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -70,17 +89,32 @@ void HandleEDT::stepKeysControl(double t, double dt)
 
     if (getKeyState(brakeKey))
     {
-        pos = POS_BRAKE;
+        pos_ref = POS_BRAKE;
     }
     else
     {
         if (getKeyState(releaseKey))
         {
-            pos = POS_RELEASE;
+            pos_ref = POS_RELEASE;
         }
         else
         {
-            pos = POS_HOLD;
+            if (pos == POS_BRAKE)
+                pos_ref = POS_HOLD;
+            else
+                pos_ref = pos;
         }
     }
+
+    motionTimer.step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HandleEDT::slotHandleMove()
+{
+    pos += pos_ref - pos;
+
+    pos = cut(pos, static_cast<int>(POS_RELEASE), static_cast<int>(POS_BRAKE));
 }
