@@ -206,15 +206,15 @@ void CHS2T::stepBrakesControl(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepBrakesEquipment(double t, double dt)
 {
+    /*
+    // Давление в ГР для ДАКО
     dako->setPgr(mainReservoir->getPressure());
     dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT) + relValve->getQrv());
+    // Наполнение управляющей камеры ДАКО от ЭВР305
+    dako->setQvr(electroAirDistr->getQbc_out() * static_cast<double>(!allowEDT) + relValve->getQrv());
     dako->setU(velocity);
     dako->setPkvt(zpk->getPressure2());
 
-    //-------------------------------------------------------------------------
-    dako->setQvr(electroAirDistr->getQbc_out());
-    //-------------------------------------------------------------------------
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
     locoCrane->setControl(keys);
@@ -227,19 +227,14 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     //-------------------------------------------------------------------------
     electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
-    electroAirDistr->setSupplyReservoirPressure(brakeRefRes->getPressure());
+    electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
     electroAirDistr->setPbc_in(dako->getPy());
-    electroAirDistr->setQbc_in(dako->getQtc());
+    electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
     //-------------------------------------------------------------------------
 
-    airDistr->setBrakepipePressure(pTM);
-    airDistr->setAirSupplyPressure(spareReservoir->getPressure());
-    airDistr->setBrakeCylinderPressure(airSplit->getP_in());
-
-    //-------------------------------------------------------------------------
+    airDistr->setBrakepipePressure(pTM);    
     airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
     airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
-    //-------------------------------------------------------------------------
 
     spareReservoir->setAirFlow(airDistr->getAirSupplyFlow());
 
@@ -272,6 +267,64 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     rd304->step(t, dt);
     brakeRefRes->step(t, dt);
     airSplit->step(t, dt);
+    electroAirDistr->step(t, dt);*/
+
+    brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
+    brakesMech[0]->step(t, dt);
+
+    brakesMech[1]->setAirFlow(rd304->getBrakeCylAirFlow());
+    brakesMech[1]->step(t, dt);
+
+    rd304->setPipelinePressure(mainReservoir->getPressure());
+    rd304->setWorkAirFlow(pnSplit->getQ_out2());
+    rd304->setBrakeCylPressure(brakesMech[1]->getBrakeCylinderPressure());
+    rd304->step(t, dt);
+
+    pnSplit->setQ_in(zpk->getOutputFlow());
+    pnSplit->setP_out1(brakesMech[0]->getBrakeCylinderPressure());
+    pnSplit->setP_out2(rd304->getWorkPressure());
+    pnSplit->step(t, dt);
+
+    zpk->setInputFlow1(dako->getQtc());
+    zpk->setInputFlow2(locoCrane->getBrakeCylinderFlow());
+    zpk->setOutputPressure(pnSplit->getP_in());
+    zpk->step(t, dt);
+
+    locoCrane->setFeedlinePressure(mainReservoir->getPressure());
+    locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
+    locoCrane->setControl(keys);
+    locoCrane->step(t, dt);
+
+    dako->setPgr(mainReservoir->getPressure());
+    dako->setPkvt(zpk->getPressure2());
+    dako->setPtc(zpk->getPressure1());
+    dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT) + relValve->getQrv());
+    dako->setVelocity(velocity);
+    dako->step(t, dt);
+
+    airSplit->setP_out1(dako->getPy() * static_cast<double>(!allowEDT));
+    airSplit->setP_out2(brakeRefRes->getPressure());
+    airSplit->setQ_in(electroAirDistr->getQbc_out());
+    airSplit->step(t, dt);
+
+    brakeRefRes->setAirFlow(airSplit->getQ_out2());
+    brakeRefRes->step(t, dt);
+
+
+    electroAirDistr->setPbc_in(airSplit->getP_in());
+    electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
+    electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
+    electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
+    electroAirDistr->setControlLine(0, 0);
+    electroAirDistr->step(t, dt);
+
+    spareReservoir->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());
+    spareReservoir->step(t, dt);
+
+    airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
+    airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
+    airDistr->setBrakepipePressure(pTM);
+    airDistr->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

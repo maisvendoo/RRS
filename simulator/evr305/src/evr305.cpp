@@ -95,3 +95,15 @@ void EVR305::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EVR305::step(double t, double dt)
+{
+    zpk->step(t, dt);
+
+    ElectroAirDistributor::step(t, dt);
+}
+
+GET_ELECTRO_AIRDISTRIBUTOR(EVR305)

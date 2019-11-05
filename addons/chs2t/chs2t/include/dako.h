@@ -19,7 +19,7 @@ public:
     void setPgr(double value)   { pgr = value; }
     void setQvr(double value)   { Qvr = value; }
     void setPtc(double value)   { ptc = value; }
-    void setU(double value)     { U = value; }
+    void setVelocity(double value)     { U = value; }
     void setPkvt(double value)  { p_kvt = value; }
 
     double getP1() const    { return getY(1); }
