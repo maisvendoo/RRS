@@ -401,8 +401,7 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::
-integrationPostStep(state_vector_t &Y, double t)
+void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
     railway_coord = Y[idx];
     velocity = Y[idx + s];
@@ -475,6 +474,17 @@ void Vehicle::getControlSignals(control_signals_t control_signals)
 void Vehicle::setCurrentKind(int value)
 {
     current_kind = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+EPTControlLine *Vehicle::getEPTLine(size_t i)
+{
+    if (i < eptLine.size())
+        return eptLine[i];
+
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------

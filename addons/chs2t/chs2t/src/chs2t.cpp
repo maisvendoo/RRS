@@ -75,6 +75,8 @@ void CHS2T::initialization()
 
     initOtherEquipment();
 
+    initEPT();
+
     initRegistrator();
 }
 
@@ -113,6 +115,8 @@ void CHS2T::step(double t, double dt)
 
     //Journal::instance()->info("Step support equipment");
     stepSupportEquipment(t, dt);
+
+    stepEPT(t, dt);
 
     //Journal::instance()->info("Step debug");
     stepDebugMsg(t, dt);

@@ -17,6 +17,7 @@ ElectroAirDistributor::ElectroAirDistributor(QObject *parent) : BrakeDevice(pare
   , P1(0.0)
 {
     setControlLinesNumber(1);
+    setValvesNumber(2);
 }
 
 //------------------------------------------------------------------------------
@@ -40,10 +41,27 @@ void ElectroAirDistributor::setControlLinesNumber(size_t num)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ElectroAirDistributor::setValvesNumber(size_t num)
+{
+    valve_state.resize(num);
+    std::fill(valve_state.begin(), valve_state.end(), 0.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ElectroAirDistributor::setControlLine(double value, size_t idx)
 {
     if (idx < control_line.size())
         control_line[idx] = cut(value, -1.0, 1.0);
+}
+
+double ElectroAirDistributor::getValveState(size_t i)
+{
+    if (i < valve_state.size())
+        return valve_state[i];
+    else
+        return 0.0;
 }
 
 //------------------------------------------------------------------------------

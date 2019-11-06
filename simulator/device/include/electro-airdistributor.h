@@ -16,6 +16,8 @@ public:
 
     void setControlLinesNumber(size_t num);
 
+    void setValvesNumber(size_t num);
+
     void setControlLine(double value, size_t idx = 0);
 
     void setQbc_in(double qbc_in) { this->Qbc_in = qbc_in; }
@@ -30,8 +32,7 @@ public:
 
     double getOutputSupplyReservoirFlow() { return Qar_out; }
 
-
-
+    double getValveState(size_t i);
 
     double getQbc_out() { return Qbc_out; }
 
@@ -62,6 +63,8 @@ protected:
 
 
     std::vector<double> control_line;
+
+    std::vector<double> valve_state;
 };
 
 //------------------------------------------------------------------------------

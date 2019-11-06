@@ -27,6 +27,8 @@
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
+#include    "ept-control-line.h"
+
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
 #else
@@ -154,7 +156,9 @@ public:
 
     void setUks(double value);
 
-    void setCurrentKind(int value);
+    void setCurrentKind(int value);    
+
+    EPTControlLine *getEPTLine(size_t i);
 
 public slots:
     
@@ -274,6 +278,9 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
+
+    /// Линии управления ЭПТ
+    std::vector<EPTControlLine *> eptLine;
 
     /// User defined initialization
     virtual void initialization();

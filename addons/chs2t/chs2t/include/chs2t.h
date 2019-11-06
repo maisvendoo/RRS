@@ -255,6 +255,9 @@ private:
     /// Инициализация прочего оборудования
     void initOtherEquipment();
 
+    /// Инициализация приборов ЭПТ
+    void initEPT();
+
     /// Инициализация регистратора
     void initRegistrator();
 
@@ -284,6 +287,8 @@ private:
     void stepEDT2(double t, double dt);
 
     void stepSupportEquipment(double t, double dt);
+
+    void stepEPT(double t, double dt);
 
     void stepDebugMsg(double t, double dt);
 

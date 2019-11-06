@@ -60,6 +60,9 @@ void EVR305::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
+
+    valve_state[0] = abs(control_line[0]);
+    valve_state[1] = pf(control_line[0]);
 }
 
 //------------------------------------------------------------------------------
