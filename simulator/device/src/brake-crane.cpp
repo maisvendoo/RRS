@@ -11,6 +11,8 @@ BrakeCrane::BrakeCrane(QObject *parent) : BrakeDevice (parent)
   , p0(5.0)
   , pFL(0.0)
   , pTM1(0.0)
+  , is_hold(false)
+  , is_brake(false)
   , Qer(0.0)
   , Qbp(0.0)
 {

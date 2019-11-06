@@ -30,6 +30,9 @@ void CHS2T::stepSignals()
 
     analogSignal[STRELKA_UKS] = static_cast<float>(U_kr / 4000.0);
 
+    analogSignal[STRELKA_U_BAT] = static_cast<float>(U_bat / 100.0);
+    analogSignal[STRELKA_U_EPT] = static_cast<float>(ept_converter->getU_out() / 100.0);
+
     analogSignal[KRAN395_RUK] = static_cast<float>(brakeCrane->getHandlePosition());
     analogSignal[KRAN254_RUK] = static_cast<float>(locoCrane->getHandlePosition());
 
@@ -42,6 +45,10 @@ void CHS2T::stepSignals()
     analogSignal[SIGLIGHT_ZERO] = static_cast<float>(stepSwitch->isZero());
 
     analogSignal[SIGLIGHT_R] = static_cast<float>(EDT);
+
+    analogSignal[SIGLIGHT_O] = ept_pass_control->stateReleaseLamp();
+    analogSignal[SIGLIGHT_PEREKRISHA] = ept_pass_control->stateHoldLamp();
+    analogSignal[SIGLIGHT_T] = ept_pass_control->stateBrakeLamp();
 
     analogSignal[SIGLIGHT_NO_BRAKES_RELEASE] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() >= 0.1);
 
@@ -59,6 +66,8 @@ void CHS2T::stepSignals()
     analogSignal[SW_MV] = motor_fan_switcher->getHandlePos();
     analogSignal[SW_MK1] = mk_switcher[0]->getHandlePos();
     analogSignal[SW_MK2] = mk_switcher[1]->getHandlePos();
+
+    analogSignal[SW_EPT] = static_cast<float>(eptSwitch.getState());
 
     analogSignal[BLINDS] = blinds->getPosition();
     analogSignal[SIGLIGHT_GALYZI] = static_cast<float>(blinds->isOpened());

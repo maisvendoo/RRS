@@ -4,8 +4,14 @@
 
 void CHS2T::initEPT()
 {
-    EPTControlLine *line = new EPTControlLine();
-    line->read_custom_config(config_dir + QDir::separator() + "ept-line");
+    ept_control.resize(1);
+    ept_control[0] = 0;
 
-    eptLine.push_back(line);
+    ept_current.resize(1);
+    ept_current[0] = 0;
+
+    ept_converter = new EPTConverter();
+    ept_converter->read_config("ept-converter");
+
+    ept_pass_control = new EPTPassControl();
 }

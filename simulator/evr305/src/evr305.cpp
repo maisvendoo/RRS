@@ -14,6 +14,8 @@ EVR305::EVR305(QObject *parent)
     , A1(0.0)
     , Vpk(0.0)
     , Q1(0.0)
+    , Ip_max(0.2)
+    , It_max(0.2)
 {
     zpk = new SwitchingValve();
 }
@@ -61,8 +63,8 @@ void EVR305::preStep(state_vector_t &Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    valve_state[0] = abs(control_line[0]);
-    valve_state[1] = pf(control_line[0]);
+    valve_state[0] = Ip_max * abs(control_line[0]);
+    valve_state[1] = It_max * pf(control_line[0]);
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +89,10 @@ void EVR305::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "A1", A1);
 
     cfg.getDouble(secName, "Vpk", Vpk);
+
+    cfg.getDouble(secName, "Ip_max", Ip_max);
+
+    cfg.getDouble(secName, "It_max", It_max);
 
     zpk->read_config("zpk");
 }

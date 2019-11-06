@@ -34,6 +34,8 @@
 #include    "release-valve.h"
 #include    "blinds.h"
 #include    "hardware-signals.h"
+#include    "ept-converter.h"
+#include    "ept-pass-control.h"
 
 /*!
  * \class
@@ -59,6 +61,9 @@ private:
         NUM_PANTOGRAPHS = 2,
         WIRE_VOLTAGE = 3000
     };
+
+    /// Напряжение аккумуляторной батареи
+    double U_bat;
 
     /// Схема тяги
     Motor *motor;
@@ -187,6 +192,15 @@ private:
 
     /// Разрешение тяги
     Trigger     allowTrac;
+
+    /// Выключатель ЭПТ
+    Trigger     eptSwitch;
+
+    /// Преобразователь питания ЭПТ
+    EPTConverter *ept_converter;
+
+    /// Блок управления ЭПТ
+    EPTPassControl *ept_pass_control;
 
     bool dropPosition;
 

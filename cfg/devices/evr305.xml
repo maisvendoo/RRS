@@ -17,5 +17,8 @@
 
         <Vpk>1.5e-3</Vpk>
 
+        <Ip_max>0.2</Ip_max>
+        <It_max>0.2</It_max>
+
     </Device>
 </Config>
