@@ -51,6 +51,10 @@ public:
 
     virtual float getHandlePosition() = 0;
 
+    bool isHold() const { return is_hold; }
+
+    bool isBrake() const {return is_brake; }
+
 protected:
 
     double Ver;
@@ -62,6 +66,9 @@ protected:
     double pFL;
 
     double pTM1;
+
+    bool is_hold;
+    bool is_brake;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

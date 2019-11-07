@@ -16,6 +16,5 @@
 #include    "traction-controller.h"
 #include    "train-horn.h"
 #include    "switcher.h"
-#include    "ept-control-line.h"
 
 #endif // VEHICLE_API_H

@@ -12,4 +12,12 @@ void CHS2T::keyProcess()
         else
             EDTSwitch.reset();
     }
+
+    if (getKeyState(KEY_V))
+    {
+        if (isShift())
+            eptSwitch.set();
+        else
+            eptSwitch.reset();
+    }
 }

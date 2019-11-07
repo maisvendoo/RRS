@@ -23,5 +23,7 @@
 #include    "overload-relay.h"
 #include    "sl2m.h"
 #include    "registrator.h"
+#include    "ept-converter.h"
+#include    "ept-pass-control.h"
 
 #endif // VL60_HEADERS_H

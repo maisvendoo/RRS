@@ -164,4 +164,13 @@ void VL60pk::keyProcess()
         if (isAlt() && !autoStartTimer->isStarted())
             autoStartTimer->start();
     }
+
+    // Включение/выключение ЭПТ
+    if (getKeyState(KEY_V))
+    {
+        if (isShift())
+            ept_switch.set();
+        else
+            ept_switch.reset();
+    }
 }

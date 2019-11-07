@@ -67,6 +67,9 @@ enum
     SW_BF_RIGHT = 54,
     SW_SPOT_LIGHT = 55,
 
+    STRELKA_U_BAT = 56,
+    STRELKA_U_EPT = 57,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

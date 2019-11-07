@@ -79,6 +79,7 @@ void PassCarrige::initialization()
         electroAirDist->read_config(electro_airdist_config);
     }
 
+    initEPT();
 }
 
 //------------------------------------------------------------------------------
@@ -125,6 +126,8 @@ void PassCarrige::step(double t, double dt)
     }
 
     stepSignalsOutput();
+
+    stepEPT(t, dt);
 
     DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2 Kкол: %4 ТЦ: %5")
             .arg(pTM, 4, 'f', 2)

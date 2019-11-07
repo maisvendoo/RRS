@@ -228,4 +228,6 @@ void VL60pk::initialization()
     initOtherEquipment();
 
     initTriggers();
+
+    initEPT(modules_dir);
 }

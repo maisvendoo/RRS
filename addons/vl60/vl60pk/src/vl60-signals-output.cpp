@@ -61,7 +61,11 @@ void VL60pk::stepSignalsOutput()
     // Положение рукоятки УБТ
     analogSignal[KLUCH_367] = ubt->getMainHandlePos();
 
-    analogSignal[STRELKA_AMP_EPT] = 0;
+    analogSignal[STRELKA_AMP_EPT] =static_cast<float>(ept_current[0] /  10.0);
+    analogSignal[SIG_LIGHT_O] = ept_pass_control->stateReleaseLamp();
+    analogSignal[SIG_LIGHT_P] = ept_pass_control->stateHoldLamp();
+    analogSignal[SIG_LIGHT_T] = ept_pass_control->stateBrakeLamp();
+    analogSignal[EPT_ON_OFF] = static_cast<float>(ept_switch.getState());
 
     // Манометр питательной магистрали
     analogSignal[STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);

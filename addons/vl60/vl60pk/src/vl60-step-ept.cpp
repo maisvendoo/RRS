@@ -1,17 +1,17 @@
-#include    "chs2t.h"
+#include    "vl60.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS2T::stepEPT(double t, double dt)
+void VL60pk::stepEPT(double t, double dt)
 {
     ept_converter->setU_bat(U_bat);
     ept_converter->setI_out(ept_current[0]);
     ept_converter->step(t, dt);
 
-    ept_pass_control->setU(ept_converter->getU_out() * static_cast<double>(eptSwitch.getState()));
-    ept_pass_control->setHoldState(brakeCrane->isHold());
-    ept_pass_control->setBrakeState(brakeCrane->isBrake());
+    ept_pass_control->setU(ept_converter->getU_out() * static_cast<double>(ept_switch.getState()));
+    ept_pass_control->setHoldState(brake_crane->isHold());
+    ept_pass_control->setBrakeState(brake_crane->isBrake());
     ept_pass_control->step(t, dt);
 
     ept_control[0] = ept_pass_control->getControlSignal();
@@ -29,5 +29,5 @@ void CHS2T::stepEPT(double t, double dt)
         next_vehicle->setEPTControl(0, ept_control[0]);
     }
 
-    ept_current[0] += electroAirDistr->getValveState(0) + electroAirDistr->getValveState(1);
+    ept_current[0] += electroAirDist->getValveState(0) + electroAirDist->getValveState(1);
 }

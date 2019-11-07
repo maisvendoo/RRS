@@ -35,6 +35,9 @@ private:
     double Vpk;
     double Q1;
 
+    double Ip_max;
+    double It_max;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void preStep(state_vector_t &Y, double t);

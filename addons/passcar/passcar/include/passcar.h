@@ -53,6 +53,10 @@ private:
     void keyProcess();
 
     void loadConfig(QString cfg_path);
+
+    void initEPT();
+
+    void stepEPT(double t, double dt);
 };
 
 #endif // PASSCAR_H

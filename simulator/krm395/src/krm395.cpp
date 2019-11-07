@@ -121,7 +121,10 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
     {
         Y[0] = cut(pf(2 * p0  - Y[1]), 0.0, pFL);
         pulse_II = false;
-    }    
+    }
+
+    is_hold = static_cast<bool>(pos[POS_III] + pos[POS_IV]);
+    is_brake = static_cast<bool>(pos[POS_Va] + pos[POS_V] + pos[POS_VI]);
 }
 
 //------------------------------------------------------------------------------

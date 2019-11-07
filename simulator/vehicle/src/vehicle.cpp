@@ -476,15 +476,26 @@ void Vehicle::setCurrentKind(int value)
     current_kind = value;
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-EPTControlLine *Vehicle::getEPTLine(size_t i)
+void Vehicle::setEPTControl(size_t i, double value)
 {
-    if (i < eptLine.size())
-        return eptLine[i];
+    if (i < ept_control.size())
+        ept_control[i] = value;
+}
 
-    return nullptr;
+double Vehicle::getEPTCurrent(size_t i)
+{
+    if (i < ept_current.size())
+        return ept_current[i];
+
+    return 0;
+}
+
+double Vehicle::getEPTControl(size_t i)
+{
+    if (i < ept_control.size())
+        return ept_control[i];
+
+    return 0;
 }
 
 //------------------------------------------------------------------------------
