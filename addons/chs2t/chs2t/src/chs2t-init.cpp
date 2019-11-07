@@ -240,7 +240,8 @@ void CHS2T::initSupportEquipment()
 void CHS2T::initRegistrator()
 {
     Journal::instance()->info("Init registraion subsystem");
-    //reg = new Registrator("trackforce", 0.1, Q_NULLPTR);
+    reg = nullptr;
+    reg = new Registrator("brakeReg", 0.1, Q_NULLPTR);
 }
 
 //------------------------------------------------------------------------------

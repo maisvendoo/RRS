@@ -5,11 +5,15 @@
 //------------------------------------------------------------------------------
 void CHS2T::registrate(double t, double dt)
 {
-    QString msg = QString("%1 %2 %3 %4")
+    if (reg == nullptr)
+        return;
+
+    QString msg = QString("%1 %2 %3 %4 %5")
             .arg(t)
             .arg(velocity * Physics::kmh)
-            .arg(tracForce_kN)
-            .arg(motor->getIa());
+            .arg(abs(generator->getIa()))
+            .arg(BrakeReg->getU())
+            .arg(pulseConv->getUf());
 
     reg->print(msg, t, dt);
 }

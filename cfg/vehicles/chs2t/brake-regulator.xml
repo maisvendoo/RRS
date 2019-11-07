@@ -3,7 +3,7 @@
     <Device>
         <Order>2</Order>
         <K1>1250</K1>
-        <K2>20e-4</K2>
+        <K2>2e-4</K2>
         <T>10.0</T>
     </Device>
 </Config>
