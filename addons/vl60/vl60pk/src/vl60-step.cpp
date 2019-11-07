@@ -45,6 +45,8 @@ void VL60pk::step(double t, double dt)
 
     stepOtherEquipment(t, dt);
 
+    stepEPT(t, dt);
+
     autoStartTimer->step(t, dt);
 }
 
@@ -201,7 +203,7 @@ void VL60pk::stepBrakeControl(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepTrolleysBrakeMech(double t, double dt)
 {
-    switch_valve->setInputFlow1(air_disr->getBrakeCylinderAirFlow());
+    switch_valve->setInputFlow1(electroAirDist->getQbc_out());
     switch_valve->setInputFlow2(loco_crane->getBrakeCylinderFlow());
     switch_valve->setOutputPressure(pneumo_splitter->getP_in());
     switch_valve->step(t, dt);
@@ -241,14 +243,21 @@ void VL60pk::stepTrolleysBrakeMech(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepAirDistributors(double t, double dt)
 {
-    supply_reservoir->setAirFlow(air_disr->getAirSupplyFlow());
+    supply_reservoir->setAirFlow(electroAirDist->getOutputSupplyReservoirFlow());
     supply_reservoir->step(t, dt);
 
-    air_disr->setBrakeCylinderPressure(switch_valve->getPressure1());
-    air_disr->setAirSupplyPressure(supply_reservoir->getPressure());
+    air_disr->setBrakeCylinderPressure(electroAirDist->getPbc_out());
+    air_disr->setAirSupplyPressure(electroAirDist->getSupplyReservoirPressure());
     air_disr->setBrakepipePressure(pTM);
     auxRate = air_disr->getAuxRate();
     air_disr->step(t, dt);
+
+    electroAirDist->setControlLine(ept_control[0]);
+    electroAirDist->setQbc_in(air_disr->getBrakeCylinderAirFlow());
+    electroAirDist->setPbc_in(switch_valve->getPressure1());
+    electroAirDist->setInputSupplyReservoirFlow(air_disr->getAirSupplyFlow());
+    electroAirDist->setSupplyReservoirPressure(supply_reservoir->getPressure());
+    electroAirDist->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

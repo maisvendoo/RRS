@@ -61,6 +61,8 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
+    double  U_bat;
+
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
@@ -221,6 +223,19 @@ private:
     Timer   *autoStartTimer;
     size_t  start_count;
 
+    // ЭПТ -------------------------
+
+    /// Тумблер включения ЭПТ
+    Trigger         ept_switch;
+
+    /// Источник питания ЭПТ
+    EPTConverter    *ept_converter;
+
+    /// Блок управления ЭПТ
+    EPTPassControl  *ept_pass_control;
+
+    /// Электровоздухораспределитель
+    ElectroAirDistributor *electroAirDist;
 
     /// Общая инициализация локомотива
     void initialization();
@@ -250,6 +265,8 @@ private:
 
     void initTriggers();
 
+    /// Инициализация ЭПТ
+    void initEPT(const QString &modules_dir);
 
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
@@ -278,11 +295,13 @@ private:
 
     void stepOtherEquipment(double t, double dt);
 
+    void stepEPT(double t, double dt);
+
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
 
-    void stepSignalsOutput();   
+    void stepSignalsOutput();
 
     double getTractionForce();
 
