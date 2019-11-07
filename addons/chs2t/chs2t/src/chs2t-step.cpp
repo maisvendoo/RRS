@@ -143,6 +143,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
     for (size_t i = 0; i < motor_compressor.size(); ++i)
     {
         double mk_on = 0;
+        int switcherState = mk_switcher[i]->getState();
 
         switch (mk_switcher[i]->getState())
         {
@@ -166,6 +167,9 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
             mk_on = 1.0;
             break;
         }
+
+//        mk_on = static_cast<double>((switcherState == 2 && static_cast<bool>(pressReg->getState()))
+//                                  || switcherState == 3);
 
         motor_compressor[i]->setU(bv->getU_out() * mk_on);
         motor_compressor[i]->setPressure(mainReservoir->getPressure());

@@ -124,17 +124,6 @@ void PassCarrige::step(double t, double dt)
         electroAirDist->step(t, dt);
     }
 
-//    if ( airdist != nullptr)
-//    {
-//        airdist->setBrakepipePressure(pTM);
-//        airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
-//        airdist->setAirSupplyPressure(supply_reservoir->getPressure());
-
-//        auxRate = airdist->getAuxRate();
-
-//        airdist->step(t, dt);
-//    }
-
     stepSignalsOutput();
 
     DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2 Kкол: %4 ТЦ: %5")
