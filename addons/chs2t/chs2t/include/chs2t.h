@@ -160,6 +160,8 @@ private:
     /// Регулятор тормозного усилия (САРТ)
     BrakeRegulator  *BrakeReg;
 
+    AutoTrainStop *autoTrainStop;
+
     /// Рукоятка задатчика тормозного усилия
     HandleEDT       *handleEDT;
 
@@ -171,6 +173,8 @@ private:
 
     std::array<DCMotorFan*, 2> motor_fan;
     Switcher *motor_fan_switcher;
+
+    Switcher *blindsSwitcher;
 
     /// Зарядное давление
     double charging_press;
