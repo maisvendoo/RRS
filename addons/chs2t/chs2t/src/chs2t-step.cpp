@@ -143,7 +143,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
     for (size_t i = 0; i < motor_compressor.size(); ++i)
     {
         double mk_on = 0;
-        int switcherState = mk_switcher[i]->getState();
+        int mk_switcher_state = mk_switcher[i]->getState();
 
         switch (mk_switcher[i]->getState())
         {
@@ -168,7 +168,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
             break;
         }
 
-//        mk_on = static_cast<double>((switcherState == 2 && static_cast<bool>(pressReg->getState()))
+//        mk_on = 1.0 * ((switcherState == 2 && static_cast<bool>(pressReg->getState()))
 //                                  || switcherState == 3);
 
         motor_compressor[i]->setU(bv->getU_out() * mk_on);
@@ -249,7 +249,6 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     brakeRefRes->setAirFlow(airSplit->getQ_out2());
     brakeRefRes->step(t, dt);
 
-
     electroAirDistr->setPbc_in(airSplit->getP_in());
     electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
     electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
@@ -264,6 +263,13 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
     airDistr->setBrakepipePressure(pTM);
     airDistr->step(t, dt);
+
+    autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
+    autoTrainStop->setBrakepipePressure(pTM);
+    autoTrainStop->setControl(keys);
+    autoTrainStop->step(t, dt);
+
+    auxRate = autoTrainStop->getEmergencyBrakeRate() + airDistr->getAuxRate();
 }
 
 //------------------------------------------------------------------------------
@@ -306,7 +312,24 @@ void CHS2T::stepSupportEquipment(double t, double dt)
     motor_fan[0]->step(t, dt);
     motor_fan[1]->step(t, dt);
 
-    blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
+    blindsSwitcher->setControl(keys);
+
+    if (blindsSwitcher->getState() == 0 || blindsSwitcher->getState() == 1)
+    {
+        blinds->setState(false);
+    }
+
+    if (blindsSwitcher->getState() == 2)
+    {
+        blinds->setState(true);
+    }
+
+    if (blindsSwitcher->getState() == 3 || blindsSwitcher->getState() == 4)
+    {
+        blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
+    }
+
+    blindsSwitcher->step(t, dt);
     blinds->step(t, dt);
 }
 

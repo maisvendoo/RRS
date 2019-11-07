@@ -153,7 +153,11 @@ void CHS2T::initBrakesEquipment(QString module_path)
     electroAirDistr->read_config("evr305");
 
     airDistr = loadAirDistributor(module_path + QDir::separator() + "vr242");
-    airDistr->read_config("vr242");    
+    airDistr->read_config("vr242");
+
+    autoTrainStop = loadAutoTrainStop(module_path + QDir::separator() + "epk150");
+    autoTrainStop->read_config("epk150");
+    connect(autoTrainStop, &AutoTrainStop::soundSetVolume, this, &CHS2T::soundSetVolume);
 
     zpk = new SwitchingValve();
     zpk->read_config("zpk");
@@ -232,6 +236,10 @@ void CHS2T::initSupportEquipment()
 
     blinds = new Blinds();
     blinds->read_custom_config(config_dir + QDir::separator() + "blinds");
+
+    blindsSwitcher = new Switcher();
+    blindsSwitcher->setKolStates(5);
+    blindsSwitcher->setKeyCode(KEY_G);
 }
 
 //------------------------------------------------------------------------------
@@ -257,4 +265,5 @@ void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
     brakeCrane->init(pTM, pFL);
     locoCrane->init(pTM, pFL);
     airDistr->init(pTM, pFL);
+    autoTrainStop->init(pTM, pFL);
 }
