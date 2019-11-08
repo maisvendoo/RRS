@@ -83,7 +83,7 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    double s1 = A1 * (Y[0] - Y[1]);
+    /*double s1 = A1 * (Y[0] - Y[1]);
 
     double u1 = cut(pf(k * s1), 0.0, 1.0);
 
@@ -101,8 +101,22 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
 
     dYdt[0] = Q_1sum / V_work;
 
-    dYdt[1] = Q_2sum / V_work;
-}
+    dYdt[1] = Q_2sum / V_work;*/
+
+    double v = A1 * (Y[0] - Y[1]);
+
+    double u1 = pf(Y[2]);
+
+    double u2 = nf(Y[2]);
+
+    Q_out = K1 * (Y[0] - p_out) * u1 + K1 * (Y[1] - p_out) * u2;
+
+    dYdt[0] = Q1 / V_work;
+
+    dYdt[1] = Q2 / V_work;
+
+    dYdt[2] = v;
+ }
 
 //------------------------------------------------------------------------------
 //
@@ -111,6 +125,8 @@ void SwitchingValve::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
+
+    Y[2] = cut(Y[2], -1.0, 1.0);
 }
 
 //------------------------------------------------------------------------------

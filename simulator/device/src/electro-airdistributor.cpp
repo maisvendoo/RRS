@@ -10,11 +10,11 @@ ElectroAirDistributor::ElectroAirDistributor(QObject *parent) : BrakeDevice(pare
   , Qar_out(0.0)
   , p_ar(0.0)
   , Qbc_out(0.0)
-  , Qbc_in(0.0)
+  , Q2(0.0)
   , pbc_out(0.0)
   , pbc_in(0.0)
 
-  , P1(0.0)
+  , p1(0.0)
 {
     setControlLinesNumber(1);
     setValvesNumber(2);

@@ -69,6 +69,8 @@ void CHS2T::stepSignals()
 
     analogSignal[SW_EPT] = static_cast<float>(eptSwitch.getState());
 
+    analogSignal[SW_VK] = blindsSwitcher->getHandlePos();
+
     analogSignal[BLINDS] = blinds->getPosition();
     analogSignal[SIGLIGHT_GALYZI] = static_cast<float>(blinds->isOpened());
 
