@@ -3,13 +3,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Switcher::Switcher(QObject* parent) : Device(parent)
+Switcher::Switcher(QObject* parent, int key_code, int kol_states) : Device(parent)
   , keyCode(0)
   , state(0)
-  , kolStates(2)
-  , p(false)
+  , kolStates(0)
+  , ableToPress(false)
 {
-
+    setKolStates(kol_states);
+    setKeyCode(key_code);
 }
 
 //------------------------------------------------------------------------------
@@ -37,20 +38,28 @@ void Switcher::stepKeysControl(double t, double dt)
 {
     if (getKeyState(keyCode))
     {
-        if (p)
+        if (ableToPress)
         {
             if(isShift())
+            {
                 state++;
+            }
+
             else
+            {
                 state--;
+            }
 
             state = cut(state, 0, kolStates - 1);
 
-            p = false;
+            ableToPress = false;
         }
     }
+
     else
-        p = true;
+    {
+        ableToPress = true;
+    }
 
     std::fill(is_switched.begin(), is_switched.end(), false);
     is_switched[static_cast<size_t>(state)] = true;
