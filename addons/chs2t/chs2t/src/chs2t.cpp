@@ -126,7 +126,7 @@ void CHS2T::step(double t, double dt)
     //Journal::instance()->info("Step signals");
     stepSignals();
 
-    //registrate(t, dt);
+    registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
     horn->setControl(keys);
