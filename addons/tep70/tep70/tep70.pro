@@ -33,5 +33,8 @@ INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
-HEADERS += $$files(./include/*.h)
-SOURCES += $$files(./src/*.cpp)
+HEADERS += $$files(./include/*.h) \
+    include/tep70-headers.h
+SOURCES += $$files(./src/*.cpp) \
+    src/tep70-init-cabine-controls.cpp \
+    src/tep70-step-cabine-controls.cpp
