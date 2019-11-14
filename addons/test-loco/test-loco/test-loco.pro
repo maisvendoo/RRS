@@ -7,7 +7,7 @@ TARGET = test-loco
 
 DESTDIR = ../../../../modules/$$join(TARGET,,,)
 
-CONFIG += force_debug_info
+#CONFIG += force_debug_info
 
 CONFIG(debug, debug|release) {
 

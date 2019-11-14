@@ -14,7 +14,15 @@ public:
 
     virtual ~TrainHorn();
 
+    bool isSvistok() const { return is_svistok; }
+
+    bool isTifon() const { return is_tifon; }
+
 protected:
+
+    bool is_svistok;
+
+    bool is_tifon;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

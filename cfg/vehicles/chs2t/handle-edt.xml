@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+	<Order>1</Order>
+        
+        <K1>0.001</K1>
+        <K2>0.001</K2>        
+        
+    </Device>    
+</Config>

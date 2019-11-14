@@ -26,6 +26,7 @@
 #include    "filesystem.h"
 #include    "log.h"
 #include    "train.h"
+#include    "elapsed-timer.h"
 
 #include    "server.h"
 
@@ -132,8 +133,10 @@ private:
 
     QTimer          controlTimer;
 
+    ElapsedTimer    simTimer;
+
     /// Log initialization
-    void logInit(bool clear_log = false);
+    void logInit(bool clear_log = false);    
 
     /// Actions, which prerare integration step
     void preStep(double t);
@@ -162,9 +165,11 @@ private:
     /// Shered memory feedback
     void sharedMemoryFeedback();
 
-    void controlStep(double &control_time, const double control_delay);
+    void controlStep(double &control_time, const double control_delay);    
 
-    void timerEvent(QTimerEvent *event);
+private slots:
+
+    void process();
 };
 
 #endif // MODEL_H

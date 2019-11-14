@@ -4,6 +4,8 @@ TEMPLATE = lib
 
 QT -= gui
 QT += xml
+QT += serialbus
+
 
 TARGET = modbus
 

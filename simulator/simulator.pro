@@ -7,6 +7,7 @@ SUBDIRS += ./physics
 SUBDIRS += ./device
 SUBDIRS += ./solver
 SUBDIRS += ./rkf5
+SUBDIRS += ./rk4
 SUBDIRS += ./vehicle
 SUBDIRS += ./coupling
 SUBDIRS += ./brakepipe
@@ -24,5 +25,6 @@ SUBDIRS += ./vr242
 SUBDIRS += ./kvt254
 SUBDIRS += ./epk150
 SUBDIRS += ./km2202
+SUBDIRS += ./evr305
 SUBDIRS += ./carbrakes-mech
 

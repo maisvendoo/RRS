@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>1</Order>
+        <MotionTime>1.0</MotionTime>
+        <MaxPos>1.0</MaxPos>
+    </Device>
+</Config>

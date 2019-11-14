@@ -10,6 +10,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+enum InterfaceDeviceMessageType
+{
+    ID_INFO = 0,
+    ID_WARNING = 1,
+    ID_ERROR = 2
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class DEVICE_EXPORT VirtualInterfaceDevice : public QObject
 {
     Q_OBJECT
@@ -26,15 +36,21 @@ public:
 
     signal_t getControlSignal(size_t id);
 
+    QString getConfigDirectoryName() const;
+
 signals:
 
     void sendControlSignals(control_signals_t control_signals);
+
+    void logMessage(int error_code, QString msg);
 
 public slots:
 
     void receiveFeedback(feedback_signals_t feedback_signals);
 
 protected:
+
+    QString             cfg_dir;
 
     control_signals_t   control_signals;
 

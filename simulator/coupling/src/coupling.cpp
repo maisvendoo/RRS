@@ -18,6 +18,7 @@
 #include    <QLibrary>
 
 #include    "CfgReader.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -93,6 +94,14 @@ Coupling *loadCoupling(QString lib_path)
         {
             coupling = getCoupling();
         }
+        else
+        {
+            Journal::instance()->error(lib.errorString());
+        }
+    }
+    else
+    {
+        Journal::instance()->error(lib.errorString());
     }
 
     return coupling;

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>1</Order>
+		<ShoeType>composite</ShoeType>
+		<ShoesCyl>16</ShoesCyl>
+		<ShoesAxis>4</ShoesAxis>
+		<CylNum>1</CylNum>
+		<DeadVolume>0.0</DeadVolume>
+		<CylinderDiameter>0.356</CylinderDiameter>
+		<MechCoeff>12.7</MechCoeff>
+		<StockOut>0.085</StockOut>
+		<SpringForce>10864.8</SpringForce>
+		<InitPressure>0.0</InitPressure>
+	</Device>
+</Config>

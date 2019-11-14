@@ -8,23 +8,16 @@
 	</Common>
 
 	<Vehicle>
-		<Module>test-loco</Module>
+		<Module>vl60pk</Module>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
-
-	<Vehicle>
-		<Module>passcar</Module>
-		<ModuleConfig>pass_rzd-17669</ModuleConfig>
-		<Count>1</Count>
-		<PayloadCoeff>1</PayloadCoeff>
-	</Vehicle>
-
+	
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>passcar</ModuleConfig>
-		<Count>14</Count>
+		<Count>15</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	

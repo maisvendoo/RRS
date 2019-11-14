@@ -15,6 +15,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,_d)
 
     LIBS += -L../../../lib -lfilesystem_d
+    LIBS += -L../../../lib -lJournal_d
     LIBS += -L../../../lib -llog_d
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lphysics_d
@@ -33,6 +34,7 @@ CONFIG(debug, debug|release) {
 } else {
 
     LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -lJournal
     LIBS += -L../../../lib -llog
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lphysics
@@ -75,6 +77,7 @@ INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../../asound/include

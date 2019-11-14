@@ -130,6 +130,8 @@ public:
 
     virtual void keyProcess();
 
+    virtual void hardwareProcess();
+
     ///
     void integrationStep(state_vector_t &Y, double t, double dt);
 
@@ -152,7 +154,13 @@ public:
 
     void setUks(double value);
 
-    void setCurrentKind(int value);
+    void setCurrentKind(int value);    
+
+    void setEPTControl(size_t i, double value);
+
+    double getEPTCurrent(size_t i);
+
+    double getEPTControl(size_t i);
 
 public slots:
     
@@ -273,6 +281,12 @@ protected:
 
     feedback_signals_t  feedback_signals;
 
+    /// Линии управления ЭПТ
+    std::vector<double> ept_control;
+
+    /// Ток в линии управления ЭПТ
+    std::vector<double> ept_current;
+
     /// User defined initialization
     virtual void initialization();
 
@@ -287,6 +301,8 @@ protected:
 
     /// User define step result processing
     virtual void postStep(double t);
+
+    virtual void hardwareOutput();
 
     /* Modkeys extended functions */
 

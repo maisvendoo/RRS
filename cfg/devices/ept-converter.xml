@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>1</Order>
+
+        <r>1.87</r>
+        <ks>1.145</ks>
+
+    </Device>
+</Config>

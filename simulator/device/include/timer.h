@@ -43,6 +43,8 @@ public:
     /// Set timeout
     void setTimeout(double timeout);
 
+    void firstProcess(bool first_process);
+
 signals:
 
     /// Signal for actions exectute

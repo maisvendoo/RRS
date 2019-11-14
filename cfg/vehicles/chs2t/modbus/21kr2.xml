@@ -1,0 +1,86 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+	<!-- Контакт К01 -->
+	<DiscreteInput>
+		<Address>0</Address>
+		<Index>0</Index>		
+	</DiscreteInput>
+
+	<!-- Реверсивный вал -->
+
+	<!-- Контакт К01 -->
+	<DiscreteInput>
+		<Address>1</Address>
+		<Index>1</Index>		
+	</DiscreteInput>
+
+	<!-- Контакт К02 -->
+	<DiscreteInput>
+		<Address>2</Address>
+		<Index>2</Index>		
+	</DiscreteInput>
+
+	<!-- Главный вал -->
+
+	<!-- Контакт К21 -->
+	<DiscreteInput>
+		<Address>3</Address>
+		<Index>3</Index>		
+	</DiscreteInput>
+
+	<!-- Контакт К22 -->
+	<DiscreteInput>
+		<Address>4</Address>
+		<Index>4</Index>		
+	</DiscreteInput>
+
+	<!-- Контакт К23 -->
+	<DiscreteInput>
+		<Address>5</Address>
+		<Index>5</Index>		
+	</DiscreteInput>
+
+	<!-- Контакт К25 -->
+	<DiscreteInput>
+		<Address>6</Address>
+		<Index>6</Index>		
+	</DiscreteInput>
+
+	<!-- Вал ослабления возбуждения -->
+
+	<!-- Контакт К31 -->
+	<DiscreteInput>
+		<Address>7</Address>
+		<Index>7</Index>		
+	</DiscreteInput>
+
+	<!-- Контакт К32 -->
+	<DiscreteInput>
+		<Address>8</Address>
+		<Index>8</Index>		
+	</DiscreteInput>
+
+	<!-- Контакт К33 -->
+	<DiscreteInput>
+		<Address>9</Address>
+		<Index>9</Index>		
+	</DiscreteInput>
+
+	<!-- Прочее -->
+
+
+	<!-- Кнопка "Свисток" -->
+	<DiscreteInput>
+		<Address>10</Address>
+		<Index>10</Index>		
+	</DiscreteInput>
+
+
+	<!-- Нажатие штурвала (контакт, нажимаемый при опускании штурвала) -->
+	<DiscreteInput>
+		<Address>11</Address>
+		<Index>11</Index>		
+	</DiscreteInput>
+
+</Config>

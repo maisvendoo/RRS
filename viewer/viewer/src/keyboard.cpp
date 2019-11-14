@@ -197,6 +197,7 @@ void KeyboardHandler::init()
 
     addKey(osgGA::GUIEventAdapter::KEY_Space);
     addKey(osgGA::GUIEventAdapter::KEY_BackSpace);
+    addKey(osgGA::GUIEventAdapter::KEY_Comma);
 }
 
 //------------------------------------------------------------------------------

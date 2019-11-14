@@ -14,6 +14,8 @@
  */
 
 #include    "main.h"
+#include    "exceptions.h"
+#include    "sim-journal.h"
 
 /*!
  * \fn
@@ -24,6 +26,9 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    init_journal();
+    register_handlers();
+
     AppCore app(argc, argv);
 
     if (!app.init())

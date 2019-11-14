@@ -73,7 +73,7 @@ bool TrainManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
     float speed = settings.ext_cam_speed;
 
     if ( (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_SHIFT) ||
-         (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_LEFT_SHIFT) )
+         (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
     {
         speed = settings.ext_cam_speed_coeff * speed;
     }
