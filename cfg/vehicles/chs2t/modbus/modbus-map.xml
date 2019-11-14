@@ -8,5 +8,14 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+	
+	<Slave>
+		<id>4</id>
+		<Description>Панель манометров</Description>
+		<Config>manometers</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
 
 </Config>
