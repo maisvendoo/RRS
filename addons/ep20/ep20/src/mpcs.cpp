@@ -29,6 +29,8 @@ void MPCS::init()
     taskPant = new TaskPant();
 
     taskPant->init();
+
+    auxConv = new AuxiliaryConverter();
 }
 
 //------------------------------------------------------------------------------
@@ -137,7 +139,7 @@ void MPCS::stepFastSwitchControl(double t, double dt)
 //------------------------------------------------------------------------------
 void MPCS::stepToggleSwitchMK(double t, double dt)
 {
-    if (mpcs_output.turn_on_ms || mpcs_output.turn_on_fs)
+    if (auxConv->getU2() > 0)
         std::fill(mpcs_output.toggleSwitchMK.begin(), mpcs_output.toggleSwitchMK.end(), true);
 }
 

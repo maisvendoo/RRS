@@ -1,4 +1,4 @@
-#include    "ep20.h"
+ #include    "ep20.h"
 
 #include    <CfgReader.h>
 #include    <QDir>
@@ -207,10 +207,6 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     {
         auxConv[i]->step(t, dt);
     }
-
-    // Передаем данные для
-//    double k_flow = 5e-3;
-//    main_reservoir->setFlowCoeff(k_flow);
 
     main_reservoir->setAirFlow(motorCompAC[0]->getAirFlow() + motorCompAC[1]->getAirFlow());
     main_reservoir->step(t, dt);

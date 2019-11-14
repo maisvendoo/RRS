@@ -6,6 +6,7 @@
 #include    "pant-description.h"
 #include    "timer.h"
 #include    "mpcs-task-pant.h"
+#include    "auxiliary-converter.h"
 
 class MPCS : public Device
 {
@@ -43,6 +44,9 @@ private:
 
     /// Кнопка ГВ/БВ
     Trigger ms_fs_on;
+
+    AuxiliaryConverter  *auxConv;
+
 
     /// Управление клавишами
     void stepKeysControl(double t, double dt);
