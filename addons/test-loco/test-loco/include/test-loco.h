@@ -12,7 +12,6 @@
 #include    "brake-crane.h"
 #include    "brake-mech.h"
 #include    "physics.h"
-#include    "controls.h"
 #include    "reservoir.h"
 #include    "airdistributor.h"
 #include    "pneumo-relay.h"
@@ -29,7 +28,7 @@ public:
     TestLoco();
     ~TestLoco();
 
-    void initBrakeDevices(double p0, double pTM);
+    void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
 
@@ -73,16 +72,7 @@ private:
     QString     autostop_config;
 
     QString     traction_controller_module;
-    QString     traction_controller_config;
-
-    IncTractionTrigger incTracTrig;
-    DecTractionTrigger decTracTrig;
-
-    IncBrakeCrane incBrakeCrane;
-    DecBrakeCrane decBrakeCrane;
-
-    IncChargePress incChargePress;
-    DecChargePress decChargePress;
+    QString     traction_controller_config;    
 
     AirDistributor *airdist;
 

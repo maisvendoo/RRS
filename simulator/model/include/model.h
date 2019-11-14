@@ -20,6 +20,7 @@
 #include    <QObject>
 #include    <QThread>
 #include    <QSharedMemory>
+#include    <QTimer>
 
 #include    "simulator-command-line.h"
 #include    "filesystem.h"
@@ -31,6 +32,8 @@
 #include    "profile.h"
 
 #include    "keys-control.h"
+
+#include    "virtual-interface-device.h"
 
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
@@ -74,6 +77,9 @@ public slots:
     /// Messages output
     void outMessage(QString msg);
 
+    ///
+    void controlProcess();
+
 private:
 
     /// Simulator's log object
@@ -113,6 +119,8 @@ private:
     /// TCP-server
     Server      *server;
 
+    VirtualInterfaceDevice  *control_panel;
+
     KeysControl keys_control;
 
     /// Server data to clinet transmission
@@ -121,6 +129,8 @@ private:
     QSharedMemory   shared_memory;
     QSharedMemory   keys_data;
     QByteArray      data;
+
+    QTimer          controlTimer;
 
     /// Log initialization
     void logInit(bool clear_log = false);
@@ -142,7 +152,9 @@ private:
     void overrideByCommandLine(init_data_t &init_data, const simulator_command_line_t &command_line);
 
     /// Solver configuration loading
-    void configSolver(solver_config_t &solver_config);    
+    void configSolver(solver_config_t &solver_config);
+
+    void initControlPanel(QString cfg_path);
 
     /// TCP feedback
     void tcpFeedBack();

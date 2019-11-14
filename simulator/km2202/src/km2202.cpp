@@ -178,9 +178,7 @@ void ControllerKM2202::dec_reversor_dir()
 //------------------------------------------------------------------------------
 void ControllerKM2202::stepFeedback()
 {
-    feedback.analogSignal[0] = static_cast<float>(position) / MAX_POSITION;
-    feedback.analogSignal[1] = static_cast<float>(reversor_dir);
-}
 
+}
 
 GET_TRACTION_CONTROLLER(ControllerKM2202)

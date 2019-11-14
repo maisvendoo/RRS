@@ -23,7 +23,7 @@ public:
 
     ~PassCarrige();    
 
-    void initBrakeDevices(double p0, double pTM);
+    void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
 
@@ -36,15 +36,13 @@ private:
     AirDistributor *airdist;
 
     QString     airdist_module;
-    QString     airdist_config;
-
-    double      pz;
-    bool        inc_loc;
-    bool        dec_loc;
+    QString     airdist_config;   
 
     void initialization();
 
     void step(double t, double dt);
+
+    void stepSignalsOutput();
 
     void keyProcess();
 

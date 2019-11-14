@@ -140,29 +140,29 @@ bool ProcAnimation::loadKeyPoints(ConfigReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float ProcAnimation::interpolate(float value)
+float ProcAnimation::interpolate(float param)
 {
     if (keypoints.size() <= 1)
         return 0.0f;
 
     size_t next_idx = 0;
-    key_point_t begin_point = findBeginKeyPoint(value, next_idx);
+    key_point_t begin_point = findBeginKeyPoint(param, next_idx);
     key_point_t next_point = keypoints.at(next_idx);
 
-    float range = next_point.value - begin_point.value;
+    float range = next_point.param - begin_point.param;
 
     if (range < 1e-6f)
         return 0.0f;
 
-    float param = begin_point.param + (value - begin_point.value) * (next_point.param - begin_point.param) / range;
+    float value = begin_point.value + (param - begin_point.param) * (next_point.value - begin_point.value) / range;
 
-    return param;
+    return value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-key_point_t ProcAnimation::findBeginKeyPoint(float value, size_t &next_idx)
+ProcAnimation::key_point_t ProcAnimation::findBeginKeyPoint(float param, size_t &next_idx)
 {
     key_point_t key_point;
 
@@ -177,7 +177,7 @@ key_point_t ProcAnimation::findBeginKeyPoint(float value, size_t &next_idx)
     {
         key_point = keypoints.at(idx);
 
-        if (value <= key_point.value)
+        if (param <= key_point.param)
             right_idx = idx;
         else
             left_idx = idx;

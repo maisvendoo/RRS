@@ -68,7 +68,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     loadTheme();
 
-    QIcon icon(":/img/img/logo.png");
+    QIcon icon(":/images/images/RRS_logo.png");
+
     setWindowIcon(icon);
 }
 

@@ -50,6 +50,8 @@ void Device::step(double t, double dt)
 
     stepControl(t, dt);
 
+    stepDiscrete(t, dt);
+
     ode_system(y, dydt, t);    
 
     for (size_t i = 0; i < y.size(); ++i)
@@ -132,6 +134,29 @@ void Device::read_config(const QString &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Device::read_custom_config(const QString &path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(path + ".xml"))
+    {
+        int order = 0;
+        QString secName = "Device";
+
+        if (!cfg.getInt(secName, "Order", order))
+        {
+            order = 1;
+        }
+
+        memory_alloc(order);
+
+        load_config(cfg);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString Device::getDebugMsg() const
 {
     return DebugMsg;
@@ -153,6 +178,11 @@ void Device::setControl(QMap<int, bool> keys,
 feedback_signals_t Device::getFeedback() const
 {
     return feedback;
+}
+
+void Device::setCustomConfigDir(const QString &value)
+{
+    custom_config_dir = value;
 }
 
 //------------------------------------------------------------------------------
@@ -221,6 +251,15 @@ void Device::stepExternalControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Device::stepDiscrete(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Device::getKeyState(int key) const
 {
     if (keys.size() == 0)
@@ -232,6 +271,30 @@ bool Device::getKeyState(int key) const
         return it.value();
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Device::isShift() const
+{
+    return getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Device::isControl() const
+{
+    return getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Device::isAlt() const
+{
+    return getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R);
 }
 
 //------------------------------------------------------------------------------

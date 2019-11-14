@@ -11,6 +11,9 @@
                 <WheelInertia>2.0</WheelInertia>
 
                 <ExtModelName>test-loco/kuzov.osgt</ExtModelName> 
+                
+
+                <!-- ПЕРЕКРАСКА КУЗОВА -->
                 <ExtTexturesDir>test-loco/add-textures</ExtTexturesDir>
 
 

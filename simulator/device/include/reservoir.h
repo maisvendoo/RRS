@@ -16,12 +16,16 @@ public:
 
     void setAirFlow(double Q);
 
+    void setFlowCoeff(double coeff);
+
     double getPressure() const;    
 
 private:
 
     double  V;
     double  Q;
+
+    double  k_flow;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 };

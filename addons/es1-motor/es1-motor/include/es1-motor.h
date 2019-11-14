@@ -2,8 +2,6 @@
 #define     SAPSAN_MOTOR_H
 
 #include    "vehicle.h"
-#include    "controls.h"
-
 
 //------------------------------------------------------------------------------
 //
@@ -25,11 +23,6 @@ private:
     bool    auto_reg;
 
     double  vz;
-
-    EnableSpeedReg enSpeedReg;
-
-    IncRefSpeed incRefSpeed;
-    DecRefSpeed decRefSpeed;
 
     void keyProcess();
 

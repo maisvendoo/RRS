@@ -54,8 +54,11 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , DebugMsg(" ")
   , prev_vehicle(nullptr)
   , next_vehicle(nullptr)
+  , config_dir("")
+  , Uks(0.0)
+  , current_kind(0)
 {
-
+    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);    
 }
 
 //------------------------------------------------------------------------------
@@ -199,6 +202,14 @@ void Vehicle::setPrevVehicle(Vehicle *vehicle)
 void Vehicle::setNextVehicle(Vehicle *vehicle)
 {
     next_vehicle = vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setConfigDir(QString config_dir)
+{
+    this->config_dir = config_dir;
 }
 
 //------------------------------------------------------------------------------
@@ -376,7 +387,8 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPostStep(state_vector_t &Y, double t)
+void Vehicle::
+integrationPostStep(state_vector_t &Y, double t)
 {
     railway_coord = Y[idx];
     velocity = Y[idx + s];
@@ -433,6 +445,30 @@ void Vehicle::receiveData(QByteArray data)
     stream >> keys;
 
     keys_mutex.unlock();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::getControlSignals(control_signals_t control_signals)
+{
+    this->control_signals = control_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setCurrentKind(int value)
+{
+    current_kind = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setUks(double value)
+{
+    Uks = value;
 }
 
 //------------------------------------------------------------------------------
@@ -633,8 +669,9 @@ bool Vehicle::getKeyState(int key) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::initBrakeDevices(double p0, double pTM)
+void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Q_UNUSED(p0)
     Q_UNUSED(pTM)
+    Q_UNUSED(pFL)
 }

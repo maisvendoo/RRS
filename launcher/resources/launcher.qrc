@@ -2,8 +2,8 @@
     <qresource prefix="/translations">
         <file>translations/launcher.ru_RU.qm</file>
     </qresource>
-    <qresource prefix="/img">
-        <file>img/rrs-logo.ico</file>
-        <file>img/rrs-logo.png</file>
+    <qresource prefix="/images">
+        <file>images/RRS_logo.png</file>
+        <file>images/RRS_logo.ico</file>
     </qresource>
 </RCC>

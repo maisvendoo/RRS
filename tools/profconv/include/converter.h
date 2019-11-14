@@ -24,6 +24,7 @@
 #include    "cmd-line.h"
 
 #include    <fstream>
+#include    <QTextStream>
 
 //------------------------------------------------------------------------------
 //
@@ -62,7 +63,7 @@ private:
 
     bool readWaypoints(const std::string &path, std::vector<waypoint_t> &waypoints);
 
-    bool readWaypoints(std::wifstream &stream, std::vector<waypoint_t> &waypoints);
+    bool readWaypoints(QTextStream &stream, std::vector<waypoint_t> &waypoints);
 
     void writeWaypoints(const std::string &filename, std::vector<waypoint_t> &waypoints);
 

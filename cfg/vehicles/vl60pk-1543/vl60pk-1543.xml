@@ -10,20 +10,10 @@
         <DegreesOfFreedom>7</DegreesOfFreedom>
         <WheelInertia>2.0</WheelInertia>
 
-        <ExtModelName>rrsloco_VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
+        <ExtModelName>VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
         <ModelShift>0.0 0.0 0.312</ModelShift>
-
-        <WheelModel>rrsloco_VL60pk-1543/VL60pk-wheel.osgt</WheelModel>
         
-        <Axis>0.0 -7.5 0.93</Axis>
-        <Axis>0.0 -5.2 0.93</Axis>
-        <Axis>0.0 -2.9 0.93</Axis>
-
-        <Axis>0.0 2.9 0.93</Axis>
-        <Axis>0.0 5.2 0.93</Axis>
-        <Axis>0.0 7.5 0.93</Axis> 
-
-	<CabineModel>rrsloco_VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
+	<CabineModel>VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
         <CabineShift>0.0 0.0 0.317</CabineShift>         
 
          <BrakeCraneModule>krm395</BrakeCraneModule>
@@ -32,13 +22,15 @@
          <LocoCraneModule>kvt254</LocoCraneModule>
          <LocoCraneConfig>kvt254</LocoCraneConfig>
 
+
          <BrakeMechModule>carbrakes-mech</BrakeMechModule>
          <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
 
          <AirDistModule>vr242</AirDistModule>
          <AirDistConfig>vr242</AirDistConfig>
 
-         <DriverPos>0.8 8.69 3.6</DriverPos>
+         <DriverPos>0.8 8.4 3.6</DriverPos>
+
                 
 	</Vehicle>
 </Config>
