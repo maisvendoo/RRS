@@ -47,6 +47,11 @@ private:
 
     AuxiliaryConverter  *auxConv;
 
+    Timer               mkStartTimer;
+
+    std::array<double, 2> mk_start;
+
+    size_t                mk_count;
 
     /// Управление клавишами
     void stepKeysControl(double t, double dt);
@@ -69,6 +74,10 @@ private:
 
     /// Загрузка конфига
     void load_config(CfgReader &cfg);
+
+private slots:
+
+    void slotMKStart();
 };
 
 #endif // MPCS_H

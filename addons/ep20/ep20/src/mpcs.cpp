@@ -10,7 +10,12 @@
 //------------------------------------------------------------------------------
 MPCS::MPCS(QObject *parent) : Device(parent)
 {
+    std:fill(mk_start.begin(), mk_start.end(), 0);
 
+    mkStartTimer.setTimeout(1.0);
+    connect(&mkStartTimer, &Timer::process, this, &MPCS::slotMKStart);
+
+    mk_count = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -30,7 +35,7 @@ void MPCS::init()
 
     taskPant->init();
 
-    auxConv = new AuxiliaryConverter();
+    auxConv = new AuxiliaryConverter();  
 }
 
 //------------------------------------------------------------------------------
@@ -139,8 +144,24 @@ void MPCS::stepFastSwitchControl(double t, double dt)
 //------------------------------------------------------------------------------
 void MPCS::stepToggleSwitchMK(double t, double dt)
 {
-    if (auxConv->getU2() > 0)
-        std::fill(mpcs_output.toggleSwitchMK.begin(), mpcs_output.toggleSwitchMK.end(), true);
+    bool is_all_mk_started = true;
+
+    for (size_t i = 0; i < mpcs_output.toggleSwitchMK.size(); ++i)
+    {
+        is_all_mk_started = is_all_mk_started && static_cast<bool>(mk_start[i]);
+        mpcs_output.toggleSwitchMK[i] = static_cast<bool>(mk_start[i]);
+    }
+
+    if ( (mpcs_input.aux_const_U[3] >= 300.0))
+    {
+        if (!mkStartTimer.isStarted() && !is_all_mk_started)
+        {
+            mk_count = 0;
+            mkStartTimer.start();
+        }
+    }
+
+    mkStartTimer.step(t, dt);
 }
 
 
@@ -166,4 +187,17 @@ void MPCS::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 void MPCS::load_config(CfgReader &cfg)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MPCS::slotMKStart()
+{
+    mk_start[mk_count] = 1;
+
+    mk_count++;
+
+    if (mk_count == 2)
+        mkStartTimer.stop();
 }

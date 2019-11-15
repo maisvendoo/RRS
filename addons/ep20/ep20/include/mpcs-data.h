@@ -33,6 +33,10 @@ struct mpcs_input_t
     /// Входное напряжение на БВ
     double Uin_fs;
 
+    std::array<double, 4> aux_const_U;
+
+    // принимать данные давление в ГР
+
     mpcs_input_t()
     {
         current_kind = 0;
@@ -45,6 +49,8 @@ struct mpcs_input_t
 
         isOff_ms = false;
         Uin_fs = 0;
+
+        std::fill(aux_const_U.begin(), aux_const_U.end(), 0);
     }
 };
 

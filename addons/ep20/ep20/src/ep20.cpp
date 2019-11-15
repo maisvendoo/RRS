@@ -101,7 +101,7 @@ void EP20::step(double t, double dt)
             .arg(auxConv[1]->getU2())
             .arg(auxConv[2]->getU2())
             .arg(auxConv[3]->getU2())
-            .arg(main_reservoir->getPressure()); // НАДО ВЫВЕСТИ ВОЗДУХ НА РЕЗЕРВУАРЕ! ПОМЕНЯТЬ!
+            .arg(main_reservoir->getPressure());
     //________________________________________________
 
 //    .arg(t, 10, 'f', 2)
@@ -205,15 +205,18 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     auxConv[3]->setU4(trac_conv[2]->getU4(0));
     for (size_t i = 0; i < auxConv.size(); ++i)
     {
+        mpcsInput.aux_const_U[i] = auxConv[i]->getU2();
         auxConv[i]->step(t, dt);
     }
 
+    // Передаем данные на Мотор-компрессоры и Главный резервуар!
     main_reservoir->setAirFlow(motorCompAC[0]->getAirFlow() + motorCompAC[1]->getAirFlow());
     main_reservoir->step(t, dt);
 
 
     for(size_t i = 0; i < motorCompAC.size(); ++i)
     {
+
         motorCompAC[i]->setExternalPressure(main_reservoir->getPressure());
         motorCompAC[i]->setU_power(auxConv[3]->getU2() * static_cast<double>(mpcsOutput.toggleSwitchMK[i]));
         motorCompAC[i]->step(t, dt);
