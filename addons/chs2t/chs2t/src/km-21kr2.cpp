@@ -66,17 +66,9 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
     Q_UNUSED(Y)
 
     addSignalsInControllerState();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Km21KR2::stepKeysControl(double t, double dt)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
 
     k01 = (reverseState == 1);
+
     k02 = (reverseState == -1);
 
     k21 = (mainShaftPos == -10 || mainShaftPos == 0 || mainShaftPos == 4);
@@ -87,6 +79,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
     k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10 );
     k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
     k33 = (fieldWeakShaft == 6 || fieldWeakShaft == 10);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Km21KR2::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
 
     if (!reverseIsPressedOneTime)
         reverseState += ((getKeyState(KEY_W) && reverseState != 1) -

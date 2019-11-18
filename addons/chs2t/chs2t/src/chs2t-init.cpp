@@ -53,8 +53,6 @@ void CHS2T::initFastSwitch()
     bv->read_custom_config(config_dir + QDir::separator() + "bv");
 
     fastSwitchSw = new Switcher(Q_NULLPTR, KEY_P, 4);
-//    fastSwitchSw->setKeyCode(KEY_P);
-//    fastSwitchSw->setKolStates(4);
 }
 
 //------------------------------------------------------------------------------
@@ -107,7 +105,6 @@ void CHS2T::initAirSupplySubsystem()
         motor_compressor[i]->setSoundName(QString("Motor_Compressor%1").arg(i+1));
 
         mk_switcher[i] = new Switcher(Q_NULLPTR, 0, 4);
-//        mk_switcher[i]->setKolStates(4);
     }
 
     mk_switcher[0]->setKeyCode(KEY_7);
