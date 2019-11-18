@@ -35,24 +35,45 @@ void EVR305::ode_system(const state_vector_t &Y,
                                      state_vector_t &dYdt,
                                      double t)
 {
-    double s1 = abs(control_line[0]) * pf(control_line[0]) * ((p_ar - Y[0]) * K[1]);
+    // Состояние вентиля перекрыши
+    double up = abs(control_line[0]);
 
-    double s2 = (p_ar - P1) * K[4] * cut(pf((Y[0] - pbc_in) * A1) * k[1], 0.0, 1.0);
+    // Состояние тормозного вентиля
+    double ut = pf(control_line[0]);
 
-    P1 = zpk->getPressure1();
+    // Поток воздуха из ЗР в РК
+    double Qar_pk = K[1] * (p_ar - Y[0]) * up * ut;
 
-    zpk->setInputFlow2(Qbc_in);
-    Qbc_out = zpk->getOutputFlow();
+    // Поток воздуха из РК а атмосферу
+    double Qpk_at = K[2] * Y[0] * (1.0 - up);
 
-    zpk->setOutputPressure(pbc_in);
+    // Перемещение диафрагмы реле давления
+    double s = A1 * (Y[0] - pbc_in);
+
+    // Состояние клапана наполнения ТЦ
+    double u1 = cut(pf(k[1] * s), 0.0, 1.0);
+
+    // Состояние клапана опорожнения ТЦ
+    double u2 = cut(nf(k[2] * s), 0.0, 1.0);
+
+    // Поток воздуха на заполнение ТЦ
+    double p1 = zpk->getPressure1();
+    double Qar_bc = K[4] * (p_ar - p1) * u1;
+
+    // Поток воздуха на опорожнение ТЦ
+    double Qbc_at = K[6] * p1 * u2;
+
+    zpk->setInputFlow1(Qar_bc - Qbc_at);
+
+    zpk->setInputFlow2(Q2);
     pbc_out = zpk->getPressure2();
 
-    Qar_out = Qar_in - s1 * K[3] - s2 * K[5];
+    zpk->setOutputPressure(pbc_in);
+    Qbc_out = zpk->getOutputFlow();
 
-    Q1 = s2 - (P1 * K[6] * cut(nf((Y[0] - pbc_in) * A1) * k[2], 0.0, 1.0));
-    zpk->setInputFlow1(Q1);
+    Qar_out = Qar_in - K[3] * Qar_pk - K[5] * Qar_bc;
 
-    dYdt[0] = (s1 - (!static_cast<bool>(abs(control_line[0])) * Y[0] * K[2])) / Vpk;
+    dYdt[0] = (Qar_pk - Qpk_at) / Vpk;
 }
 
 //------------------------------------------------------------------------------

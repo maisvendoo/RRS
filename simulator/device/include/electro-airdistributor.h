@@ -20,7 +20,7 @@ public:
 
     void setControlLine(double value, size_t idx = 0);
 
-    void setQbc_in(double qbc_in) { this->Qbc_in = qbc_in; }
+    void setQbc_in(double qbc_in) { this->Q2 = qbc_in; }
 
     void setPbc_in(double pbc_in) { this->pbc_in = pbc_in; }
 
@@ -51,7 +51,7 @@ protected:
     /// Расход воздуха на наполнение ТЦ
     double Qbc_out;
     /// Расход воздуха от ВР на наполнение ТЦ
-    double Qbc_in;
+    double Q2;
 
     /// Давление в ТЦ
     double pbc_out;
@@ -59,7 +59,7 @@ protected:
     double pbc_in;
 
 
-    double P1;
+    double p1;
 
 
     std::vector<double> control_line;
