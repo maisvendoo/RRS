@@ -71,10 +71,10 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 
     k02 = (reverseState == -1);
 
-    k21 = (mainShaftPos == -10 || mainShaftPos == 0 || mainShaftPos == 4);
-    k22 = (mainShaftPos == 0 || mainShaftPos == 2 || mainShaftPos == 4);
-    k23 = (mainShaftPos == 2 || mainShaftPos == 4);
     k25 = (mainShaftPos == -10 || mainShaftPos == -5 || mainShaftPos == 0);
+    k21 = (mainShaftPos == -10 || mainShaftPos == 0  || mainShaftPos == 4);
+    k22 = (mainShaftPos == 0   || mainShaftPos == 2  || mainShaftPos == 4);
+    k23 = (mainShaftPos == 2   || mainShaftPos == 4);
 
     k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10 );
     k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
