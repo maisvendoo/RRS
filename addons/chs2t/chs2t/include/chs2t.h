@@ -36,6 +36,7 @@
 #include    "hardware-signals.h"
 #include    "ept-converter.h"
 #include    "ept-pass-control.h"
+#include    "convert-physics-to-modbus.h"
 
 /*!
  * \class
@@ -102,6 +103,13 @@ private:
 
     /// Задатчик тормозного усилия ЭДТ (ЗТ)
     Reservoir *brakeRefRes;
+
+    PhysToModbus *TM_manometer;
+    PhysToModbus *UR_manometer;
+    PhysToModbus *ZT_manometer;
+    PhysToModbus *GR_manometer;
+    PhysToModbus *TC_manometer;
+
 
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
@@ -275,6 +283,9 @@ private:
 
     /// Инициализация приборов ЭПТ
     void initEPT();
+
+    ///
+    void initModbus();
 
     /// Инициализация регистратора
     void initRegistrator();

@@ -79,6 +79,8 @@ void CHS2T::initialization()
 
     initEPT();
 
+    initModbus();
+
     initRegistrator();
 }
 
@@ -154,7 +156,8 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::hardwareOutput()
 {
-    feedback_signals.analogSignal[0].cur_value = 255.0;
+    feedback_signals.analogSignal[2].cur_value = 255.0;
+    feedback_signals.analogSignal[3].cur_value = 255.0;
 }
 
 GET_VEHICLE(CHS2T)

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <0>
+        <Phys>0.0</Phys>
+        <Modbus>0.0</Modbus>
+    </0>
+
+    <1>
+        <Phys>0.16</Phys>
+        <Modbus>50.0</Modbus>
+    </1>
+
+    <2>
+        <Phys>0.33</Phys>
+        <Modbus>100.0</Modbus>
+    </2>
+
+    <3>
+        <Phys>0.49</Phys>
+        <Modbus>150.0</Modbus>
+    </3>
+
+    <4>
+        <Phys>0.68</Phys>
+        <Modbus>200.0</Modbus>
+    </4>
+
+    <5>
+        <Phys>0.94</Phys>
+        <Modbus>250.0</Modbus>
+    </5>
+
+    <6>
+        <Phys>0.96</Phys>
+        <Modbus>255.0</Modbus>
+    </6>
+</Config>
