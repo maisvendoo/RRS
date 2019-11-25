@@ -29,6 +29,8 @@ public:
 
     void writeHoldingRegisters(Slave *slave);
 
+    void writeHoldingRegister(Slave* slave, slave_data_t hreg);
+
 private:
 
     QModbusClient           *modbusDevice;

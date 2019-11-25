@@ -241,8 +241,22 @@ void CHS2T::initModbus()
 {
     Journal::instance()->info("Init modbus");
 
-    TM_manometer = new PhysToModbus();
+    QString modbusCfgDir = config_dir + QDir::separator() + "modbus";
 
+    TM_manometer = new PhysToModbus();
+    TM_manometer->load((modbusCfgDir + QDir::separator() + "manometer-TM").toStdString());
+
+    UR_manometer = new PhysToModbus();
+    UR_manometer->load((modbusCfgDir + QDir::separator() + "manometer-UR").toStdString());
+
+    ZT_manometer = new PhysToModbus();
+    ZT_manometer->load((modbusCfgDir + QDir::separator() + "manometer-ZT").toStdString());
+
+    GR_manometer = new PhysToModbus();
+    GR_manometer->load((modbusCfgDir + QDir::separator() + "manometer-GR").toStdString());
+
+    TC_manometer = new PhysToModbus();
+    TC_manometer->load((modbusCfgDir + QDir::separator() + "manometer-TC").toStdString());
 
 }
 

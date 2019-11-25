@@ -1,7 +1,8 @@
 #ifndef CONVERTPHYSICSTOMODBUS_H
 #define CONVERTPHYSICSTOMODBUS_H
 
-#include    "device.h"
+#include    <QString>
+#include    <vector>
 
 //------------------------------------------------------------------------------
 //
@@ -13,18 +14,33 @@ public:
 
     ~PhysToModbus();
 
-    void setPhysValue(double value) { physValue = value; }
+    double getModbus(double physValue) { return interpolate(physValue); }
 
-    double getModbus() { return calculateModbus(); }
+    void load(const std::string &path);
 
 private:
-    QMap <double, double> modbusValues;
+    struct point_t
+    {
+        double  current;
+        double  value;
 
-    void load_config(CfgReader &cfg);
+        point_t()
+            : current(0.0)
+            , value(0.0)
+        {
+
+        }
+    };
+
+    std::vector<point_t> points;
 
     double physValue;
 
-    double calculateModbus();
+    point_t findPoint(double physValue, point_t &next_point);
+
+    double  interpolate(double physValue);
+
+    double calculateModbus(double physValue);
 };
 
 #endif // CONVERTPHYSICSTOMODBUS_H

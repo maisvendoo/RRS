@@ -110,7 +110,6 @@ private:
     PhysToModbus *GR_manometer;
     PhysToModbus *TC_manometer;
 
-
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
 

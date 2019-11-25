@@ -144,7 +144,7 @@ void Slave::slotReadDiscreteInputs()
 
     for (quint16 i = 0; i < count; ++i)
     {
-        this->discrete_input[addr + i].value = unit.value(i);
+        this->discrete_input[addr + i].cur_value = unit.value(i);
     }    
 }
 
@@ -166,7 +166,7 @@ void Slave::slotReadInputRegisters()
 
     for (quint16 i = 0; i < count; ++i)
     {
-        this->input_register[addr + i].value = unit.value(i);
+        this->input_register[addr + i].cur_value = unit.value(i);
     }
 }
 
