@@ -38,6 +38,8 @@ void CHS2T::stepSignals()
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
     analogSignal[REVERSOR] = static_cast<float>(stepSwitch->getReverseState());
+    analogSignal[SHTURVAL] = static_cast<float>(km21KR2->getHandleHeight());
+    analogSignal[SHTUR_SVISTOK] = static_cast<float>(horn->isSvistok());
 
     analogSignal[SIGLIGHT_P] = static_cast<float>(stepSwitch->isParallel());
     analogSignal[SIGLIGHT_SP] = static_cast<float>(stepSwitch->isSeriesParallel());

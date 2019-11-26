@@ -15,6 +15,7 @@
 
 #include    "vehicle-api.h"
 #include    "tep70-headers.h"
+#include    "tep70-signals.h"
 
 /*!
  * \class
@@ -49,6 +50,8 @@ private:
 
     /// Шаг моделирования органов управления в кабине
     void stepCabineControls(double t, double dt);
+
+    void stepSignalsOutput(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);

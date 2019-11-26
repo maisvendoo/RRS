@@ -8,7 +8,7 @@ ControllerKM2202::ControllerKM2202(QObject *parent) : Device(parent)
   , rs_delay(0.2)
   , ms_position(MS_ZERO)
   , ms_dir(0)
-  , rs_position(RS_BACKWARD)
+  , rs_position(RS_ZERO)
   , rs_dir(0)
 {
     main_shaft_timer.firstProcess(true);
@@ -26,6 +26,14 @@ ControllerKM2202::ControllerKM2202(QObject *parent) : Device(parent)
 ControllerKM2202::~ControllerKM2202()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float ControllerKM2202::getMainShaftPos() const
+{
+    return ms_position / MS_MAX_POSITION;
 }
 
 //------------------------------------------------------------------------------
@@ -83,6 +91,7 @@ void ControllerKM2202::stepKeysControl(double t, double dt)
         main_shaft_timer.start();
     }
 
+
     if (getKeyState(KEY_D))
     {
         if (!isControl())
@@ -96,17 +105,20 @@ void ControllerKM2202::stepKeysControl(double t, double dt)
         }
     }
 
+
     if (getKeyState(KEY_W))
     {
         rs_dir = 1;
         revers_shaft_timer.start();
     }
 
+
     if (getKeyState(KEY_S))
     {
         rs_dir = -1;
         revers_shaft_timer.start();
     }
+
 
     main_shaft_timer.step(t, dt);
     revers_shaft_timer.step(t, dt);
@@ -126,6 +138,7 @@ void ControllerKM2202::slotRotateMainShaft()
     }
 
     main_shaft_timer.stop();
+    main_shaft_timer.firstProcess(false);
 }
 
 //------------------------------------------------------------------------------

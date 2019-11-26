@@ -27,6 +27,9 @@ public:
     /// Вернуть текущую позицию реверсивки
     int getReversState() const { return rs_position; }
 
+    /// Вернуть положение главного вала
+    float getMainShaftPos() const;
+
 private:
 
     enum
@@ -58,9 +61,12 @@ private:
     /// Направление вращения реверсивного вала
     int     rs_dir;
 
+    bool is_inc;
+
     Timer   main_shaft_timer;
 
     Timer   revers_shaft_timer;
+
 
     void preStep(state_vector_t &Y, double t);
 

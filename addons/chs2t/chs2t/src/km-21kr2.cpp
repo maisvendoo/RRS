@@ -27,7 +27,11 @@ Km21KR2::Km21KR2(QObject* parent) : Device(parent)
   , reverseState(0)
   , mainShaftPos(0.0)
   , fieldWeakShaft(0.0)
+  , mainShaftHeight(0.0)
+  , is_inc(true)
+  , is_dec(true)
 {
+    y.resize(1);
 }
 
 //------------------------------------------------------------------------------
@@ -46,6 +50,8 @@ void Km21KR2::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t
     Q_UNUSED(t)
     Q_UNUSED(Y)
     Q_UNUSED(dYdt)
+
+    dYdt[0] = (mainShaftHeight - Y[0]) / 0.1;
 }
 
 //------------------------------------------------------------------------------
@@ -97,6 +103,9 @@ void Km21KR2::stepKeysControl(double t, double dt)
     if (reverseState == 0)
         return;
 
+    if (fieldWeakShaft == 0)
+        mainShaftHeight = 0.0;
+
     // Авт. сброс
     if (getKeyState(KEY_D))
     {
@@ -105,10 +114,15 @@ void Km21KR2::stepKeysControl(double t, double dt)
             autoReset = false;
         }
 
-        if (!autoReset && isShift() && fieldWeakShaft != 0 && lastControllerPositionIsZero && hod)
+        if (!autoReset && isShift() && fieldWeakShaft != 0 && lastControllerPositionIsZero && is_dec)
         {
             fieldWeakShaft -= 2;
+            is_dec = false;
         }
+    }
+    else
+    {
+        is_dec = true;
     }
 
     if (autoReset)
@@ -119,11 +133,23 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // 1 вниз
     if (getKeyState(KEY_A))
     {
-        if(isShift() && fieldWeakShaft != 10 && lastControllerPositionIsZero && hod)
+        if(isShift() && fieldWeakShaft != 10 && lastControllerPositionIsZero && is_inc)
         {
-            fieldWeakShaft += 2;
+            if (fieldWeakShaft == 0)
+                mainShaftHeight = 1.0;
+
+            if (getY(0) > 0.99)
+            {
+                fieldWeakShaft += 2;
+                is_inc = false;
+            }
+
             lastControllerPositionIsZero = false;
         }
+    }
+    else
+    {
+        is_inc = true;
     }
 
     // Авт. набор
@@ -143,6 +169,9 @@ void Km21KR2::stepKeysControl(double t, double dt)
     lastControllerPositionIsZero = (mainShaftPos == 0);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Km21KR2::stepExternalControl(double t, double dt)
 {
     Q_UNUSED(t)
@@ -159,12 +188,18 @@ void Km21KR2::stepExternalControl(double t, double dt)
     connectSignals(KM_K33, k33);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Km21KR2::connectSignals(ControllerSignals cs, bool &k)
 {
     if (control_signals.analogSignal[cs].is_active)
         k = static_cast<bool>(control_signals.analogSignal[cs].cur_value);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Km21KR2::addSignalsInControllerState()
 {
     controlState.k01 = k01;
