@@ -12,8 +12,8 @@ ACMotorCompressor::ACMotorCompressor(QObject *parent) : Device(parent)
   , Un(380.0)
   , U_power(0.0)
   , omega0(157.08)
-  , J(0.5)
-  , Mxx(50.0)
+  , J(0.1)
+  , Mxx(110.0)
   , Vnk(0.05)
 
 {

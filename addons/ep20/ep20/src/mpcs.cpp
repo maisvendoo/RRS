@@ -10,6 +10,12 @@
 //------------------------------------------------------------------------------
 MPCS::MPCS(QObject *parent) : Device(parent)
 {
+    p_prev = 0;
+
+    p_min = 0.75;
+
+    p_max = 0.9;
+
     std:fill(mk_start.begin(), mk_start.end(), 0);
 
     mkStartTimer.setTimeout(1.0);
@@ -164,13 +170,34 @@ void MPCS::stepToggleSwitchMK(double t, double dt)
     mkStartTimer.step(t, dt);
 }
 
+void MPCS::PressureReg()
+{
+    double dp = mpcs_input.PressMR - p_prev;
+
+    if (mpcs_input.PressMR < p_min)
+        mpcs_output.MKstate = 1.0;
+
+    if (mpcs_input.PressMR > p_max)
+        mpcs_output.MKstate = 0.0;
+
+    if ( (mpcs_input.PressMR >= p_min) && (mpcs_input.PressMR <= p_max) )
+    {
+        mpcs_output.MKstate = hs_p(dp);
+    }
+}
+
 
 //------------------------------------------------------------------------------
 // Пердварительные шаги
 //------------------------------------------------------------------------------
 void MPCS::preStep(state_vector_t &Y, double t)
 {
+    PressureReg();
+}
 
+void MPCS::postStep(state_vector_t &Y, double t)
+{
+    p_prev = mpcs_input.PressMR;
 }
 
 //------------------------------------------------------------------------------

@@ -53,6 +53,12 @@ private:
 
     size_t                mk_count;
 
+    double p_prev;
+
+    double p_min;
+
+    double p_max;
+
     /// Управление клавишами
     void stepKeysControl(double t, double dt);
 
@@ -66,8 +72,12 @@ private:
 
     void stepToggleSwitchMK(double t, double dt);
 
+    void PressureReg();
+
     /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);
+
+    void postStep(state_vector_t &Y, double t);
 
     /// Вычисление напряжения
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

@@ -36,6 +36,8 @@ struct mpcs_input_t
     std::array<double, 4> aux_const_U;
 
     // принимать данные давление в ГР
+    /// Входное давление с главного резервуара
+    double PressMR;
 
     mpcs_input_t()
     {
@@ -70,6 +72,8 @@ struct mpcs_output_t
 
     /// Тумблеры управления мотор-компрессорами
     std::array<bool, 2> toggleSwitchMK;
+
+    double MKstate;
 
     mpcs_output_t()
     {

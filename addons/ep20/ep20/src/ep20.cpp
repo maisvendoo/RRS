@@ -210,15 +210,16 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     }
 
     // Передаем данные на Мотор-компрессоры и Главный резервуар!
+    main_reservoir->setFlowCoeff(0.001);
     main_reservoir->setAirFlow(motorCompAC[0]->getAirFlow() + motorCompAC[1]->getAirFlow());
     main_reservoir->step(t, dt);
 
+    mpcsInput.PressMR = main_reservoir->getPressure();
 
     for(size_t i = 0; i < motorCompAC.size(); ++i)
     {
-
         motorCompAC[i]->setExternalPressure(main_reservoir->getPressure());
-        motorCompAC[i]->setU_power(auxConv[3]->getU2() * static_cast<double>(mpcsOutput.toggleSwitchMK[i]));
+        motorCompAC[i]->setU_power(auxConv[3]->getU2() * static_cast<double>(mpcsOutput.toggleSwitchMK[i]) * mpcsOutput.MKstate);
         motorCompAC[i]->step(t, dt);
     }
 }
