@@ -17,5 +17,12 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 
+	<Slave>
+		<id>2</id>
+		<Description>Панель кулачковых переключателей (верх)</Description>
+		<Config>switch-panel1</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
 
 </Config>

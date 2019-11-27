@@ -140,7 +140,7 @@ void Slave::slotReadDiscreteInputs()
     quint16 addr = static_cast<quint16>(unit.startAddress());
     quint16 count = static_cast<quint16>(unit.valueCount());
 
-    this->errors = 0;
+    //this->errors = 0;
 
     for (quint16 i = 0; i < count; ++i)
     {
@@ -162,7 +162,7 @@ void Slave::slotReadInputRegisters()
     quint16 addr = static_cast<quint16>(unit.startAddress());
     quint16 count = static_cast<quint16>(unit.valueCount());
 
-    this->errors = 0;
+    //this->errors = 0;
 
     for (quint16 i = 0; i < count; ++i)
     {
@@ -180,5 +180,5 @@ void Slave::slotWrited()
     if (!getModbusDataUnit(unit))
         return;
 
-    this->errors = 0;
+    //this->errors = 0;
 }

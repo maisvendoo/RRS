@@ -82,6 +82,9 @@ void CHS2T::initialization()
     initModbus();
 
     initRegistrator();
+
+    for (size_t i = POWER_0; i <= POWER_10; ++i)
+        feedback_signals.analogSignal[i].cur_value = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -128,10 +131,12 @@ void CHS2T::step(double t, double dt)
     //Journal::instance()->info("Step signals");
     stepSignals();
 
+    stepSwitcherPanel();
+
     registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
-    horn->setControl(keys);
+    horn->setControl(keys, control_signals);
     horn->step(t, dt);
 }
 

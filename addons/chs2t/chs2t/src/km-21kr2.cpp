@@ -149,15 +149,15 @@ void Km21KR2::stepExternalControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-//    connectSignals(KM_K01, k01);
-//    connectSignals(KM_K02, k02);
-//    connectSignals(KM_K21, k21);
-//    connectSignals(KM_K22, k22);
-//    connectSignals(KM_K23, k23);
-//    connectSignals(KM_K25, k25);
-//    connectSignals(KM_K31, k31);
-//    connectSignals(KM_K32, k32);
-//    connectSignals(KM_K33, k33);
+    connectSignals(KM_K01, k01);
+    connectSignals(KM_K02, k02);
+    connectSignals(KM_K21, k21);
+    connectSignals(KM_K22, k22);
+    connectSignals(KM_K23, k23);
+    connectSignals(KM_K25, k25);
+    connectSignals(KM_K31, k31);
+    connectSignals(KM_K32, k32);
+    connectSignals(KM_K33, k33);
 }
 
 void Km21KR2::connectSignals(ControllerSignals cs, bool &k)

@@ -51,7 +51,7 @@ void Modbus::process()
     }
     else
     {
-        //controlSignalsProcess();
+        controlSignalsProcess();
     }
 
     // Переключаемся с приема на передачу
@@ -104,7 +104,7 @@ void Modbus::feedbackSignalsProcess()
         }
 
         // Отправляем их в шину
-        //master->writeCoils(slave);
+        master->writeCoils(slave);
 
         // Пишем регистры вывода
         for (it = slave->holding_register.begin(); it != slave->holding_register.end(); ++it)

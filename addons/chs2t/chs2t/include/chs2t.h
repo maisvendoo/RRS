@@ -37,6 +37,7 @@
 #include    "ept-converter.h"
 #include    "ept-pass-control.h"
 #include    "convert-physics-to-modbus.h"
+#include    "chs2t-horn.h"
 
 /*!
  * \class
@@ -179,6 +180,7 @@ private:
     Switcher    *fastSwitchSw;
 
     std::array<DCMotorFan*, 2> motor_fan;
+
     Switcher *motor_fan_switcher;
 
     Switcher *blindsSwitcher;
@@ -321,6 +323,8 @@ private:
     void stepDebugMsg(double t, double dt);
 
     void stepSignals();
+
+    void stepSwitcherPanel();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);

@@ -20,7 +20,31 @@ enum ControllerSignals
     KM_SVISTOK = 10,
     KM_STURVAL_DOWN = 11,
 
-    TEST_COUNT = 12
+    SWP1_EPT = 12,
+    SWP1_MK1 = 13,
+    SWP1_TP2 = 14,
+    SWP1_BV = 15
+};
+
+enum FeedbackSignals
+{
+    MAN_TM = 0,
+    MAN_UR = 1,
+    MAN_ZT = 2,
+    MAN_GR = 3,
+    MAN_TC = 4,
+
+    POWER_0 = 5,
+    POWER_1 = 6,
+    POWER_2 = 7,
+    POWER_3 = 8,
+    POWER_4 = 9,
+    POWER_5 = 10,
+    POWER_6 = 11,
+    POWER_7 = 12,
+    POWER_8 = 13,
+    POWER_9 = 14,
+    POWER_10 = 15
 };
 
 #endif // HARDWARESIGNALS_H

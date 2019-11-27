@@ -28,7 +28,7 @@ protected:
 
     void load_config(CfgReader &cfg);
 
-    void stepKeysControl(double t, double dt);
+    virtual void stepKeysControl(double t, double dt);
 };
 
 #endif // TRAIN_HORN_H

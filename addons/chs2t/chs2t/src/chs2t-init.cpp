@@ -198,7 +198,7 @@ void CHS2T::initOtherEquipment()
 {
     Journal::instance()->info("Init whistle and typhoid");
 
-    horn = new TrainHorn();
+    horn = new CHS2tHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &CHS2T::soundSetVolume);
 }
 

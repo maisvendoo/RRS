@@ -17,7 +17,11 @@ public:
 
     void setKolStates(int value) { kolStates = value; is_switched.resize(static_cast<size_t>(kolStates)); }
 
+    void setState(int value) { state = value; }
+
     int getState() const { return state; }
+
+    int getKolStates() const { return kolStates; }
 
     float getHandlePos() const { return static_cast<float>(state) / static_cast<float>(kolStates - 1) ; }
 
