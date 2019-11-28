@@ -1,13 +1,13 @@
 TEMPLATE = subdirs
 
 CONFIG += ordered
-CONFIG += force_debug_info
 
 SUBDIRS += ./sound-manager
 SUBDIRS += ./physics
 SUBDIRS += ./device
 SUBDIRS += ./solver
 SUBDIRS += ./rkf5
+SUBDIRS += ./rk4
 SUBDIRS += ./vehicle
 SUBDIRS += ./coupling
 SUBDIRS += ./brakepipe
@@ -18,11 +18,14 @@ SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
 
+SUBDIRS += ./modbus
+
 SUBDIRS += ./krm395
 SUBDIRS += ./krm130
 SUBDIRS += ./vr242
 SUBDIRS += ./kvt254
 SUBDIRS += ./epk150
 SUBDIRS += ./km2202
+SUBDIRS += ./evr305
 SUBDIRS += ./carbrakes-mech
 

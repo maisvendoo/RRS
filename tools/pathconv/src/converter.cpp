@@ -149,6 +149,9 @@ bool Converter::rewriteObjectsRef()
                 {
                     key = fileInfo.baseName().toLower();
 
+                    if (key.isEmpty())
+                        continue;
+
                     auto model_it = model_names.find(key);
 
                     if (model_it.key() != key)
@@ -159,6 +162,9 @@ bool Converter::rewriteObjectsRef()
                 else
                 {
                     key = fileInfo.fileName().toLower();
+
+                    if (key.isEmpty())
+                        continue;
 
                     auto texture_it = texture_names.find(key);
 

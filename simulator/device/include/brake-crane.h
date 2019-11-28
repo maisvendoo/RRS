@@ -36,10 +36,13 @@ public:
 
     void setEqResrvoirFlow(double Qer);
 
+    //
     void setChargePressure(double p0);
 
+    //
     void setFeedLinePressure(double pFL);
 
+    //
     void setBrakePipePressure(double pTM1);
 
     virtual void setPosition(int &position) = 0;
@@ -47,6 +50,10 @@ public:
     virtual QString getPositionName() = 0;
 
     virtual float getHandlePosition() = 0;
+
+    bool isHold() const { return is_hold; }
+
+    bool isBrake() const {return is_brake; }
 
 protected:
 
@@ -59,6 +66,9 @@ protected:
     double pFL;
 
     double pTM1;
+
+    bool is_hold;
+    bool is_brake;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

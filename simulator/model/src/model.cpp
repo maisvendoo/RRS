@@ -18,6 +18,8 @@
 #include    <QTime>
 
 #include    "CfgReader.h"
+#include    "Journal.h"
+#include    "JournalFile.h"
 
 const       QString LOG_FILE_NAME = "simulator.log";
 
@@ -63,18 +65,25 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Log creation
     logInit(command_line.clear_log.is_present);
 
+    //FileSystem &fs = FileSystem::getInstance();
+    //QString path = QString(fs.combinePath(fs.getLogsDir(), "journal.log").c_str());
+    //journalInit(path);
+
     // Check is debug print allowed
     is_debug_print = command_line.debug_print.is_present;
 
     init_data_t init_data;
 
     // Load initial data configuration
+    Journal::instance()->info("==== Init data loading ====");
     loadInitData(init_data);
 
     // Override init data by command line
+    Journal::instance()->info("==== Command line processing ====");
     overrideByCommandLine(init_data, command_line);
 
     // Read solver configuration
+    Journal::instance()->info("==== Solver configurating ====");
     configSolver(init_data.solver_config);
 
     start_time = init_data.solver_config.start_time;
@@ -83,10 +92,25 @@ bool Model::init(const simulator_command_line_t &command_line)
     integration_time_interval = init_data.integration_time_interval;
 
     // Load profile
+    Journal::instance()->info("==== Profile data loading ====");
     profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
 
+    Journal::instance()->info(QString("State Profile object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(profile), 0, 16));
+
+    if (profile->isReady())
+        Journal::instance()->info("Profile loaded successfully");
+    else
+    {
+        Journal::instance()->warning("Profile is't loaded. Using flat profile");
+    }
+
     // Train creation and initialization
+    Journal::instance()->info("==== Train initialization ====");
     train = new Train(profile);
+
+    Journal::instance()->info(QString("Created Train object at address: 0x%1")
+                              .arg(reinterpret_cast<quint64>(train), 0, 16));
 
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
@@ -102,8 +126,17 @@ bool Model::init(const simulator_command_line_t &command_line)
         if (!keys_data.attach())
         {
             emit logMessage("ERROR: Can't attach to shared memory");
+            Journal::instance()->error("Can't attach to shread memory. Unable process keyboard");
         }
     }
+    else
+    {
+        Journal::instance()->info("Created shared memory for keysboard processing");
+    }
+
+    initControlPanel("control-panel");
+
+    Journal::instance()->info("Train is initialized successfully");
 
     return true;
 }
@@ -117,7 +150,10 @@ void Model::start()
     {
         is_simulation_started = true;
         t = start_time;
-        this->startTimer(integration_time_interval);
+
+        connect(&simTimer, &ElapsedTimer::process, this, &Model::process, Qt::DirectConnection);
+        simTimer.setInterval(static_cast<quint64>(integration_time_interval));
+        simTimer.start();
     }
 }
 
@@ -135,6 +171,14 @@ bool Model::isStarted() const
 void Model::outMessage(QString msg)
 {
     fputs(qPrintable(msg + "\n"), stdout);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::controlProcess()
+{
+    control_panel->process();
 }
 
 //------------------------------------------------------------------------------
@@ -255,6 +299,12 @@ void Model::loadInitData(init_data_t &init_data)
         {
             init_data.keys_buffer_size = 1024;
         }
+
+        Journal::instance()->info("Loaded settings from: " + cfg_path);
+    }
+    else
+    {
+        Journal::instance()->error("File " + cfg_path + " not found");
     }
 }
 
@@ -283,6 +333,8 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     if (command_line.direction.is_present)
         init_data.direction = command_line.direction.value;
+
+    Journal::instance()->info("Apply command line settinds");
 }
 
 //------------------------------------------------------------------------------
@@ -303,25 +355,98 @@ void Model::configSolver(solver_config_t &solver_config)
             solver_config.method = "rkf5";
         }
 
+        Journal::instance()->info("Integration method: " + solver_config.method);
+
         if (!cfg.getDouble(secName, "StartTime", solver_config.start_time))
         {
             solver_config.start_time = 0;
         }
+
+        Journal::instance()->info("Start time: " + QString("%1").arg(solver_config.start_time));
 
         if (!cfg.getDouble(secName, "StopTime", solver_config.stop_time))
         {
             solver_config.stop_time = 10.0;
         }
 
+        Journal::instance()->info("Stop time: " + QString("%1").arg(solver_config.stop_time));
+
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
             solver_config.step = 1e-4;
         }
 
+        Journal::instance()->info("Initial integration step: " + QString("%1").arg(solver_config.step));
+
         if (!cfg.getDouble(secName, "MaxStep", solver_config.max_step))
         {
             solver_config.max_step = 1e-2;
         }
+
+        Journal::instance()->info("Maximal integration step: " + QString("%1").arg(solver_config.max_step));
+    }
+    else
+    {
+        Journal::instance()->error("File " + cfg_path + " not found");
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::initControlPanel(QString cfg_path)
+{
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+    QString full_path = QString(fs.getConfigDir().c_str()) + fs.separator() + cfg_path + ".xml";
+
+    if (cfg.load(full_path))
+    {
+        QString secName = "ControlPanel";
+        QString module_name = "";
+
+        if (!cfg.getString(secName, "Plugin", module_name))
+            return;
+
+        control_panel = Q_NULLPTR;
+        QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
+        control_panel = loadInterfaceDevice(module_path);
+
+        if (control_panel == Q_NULLPTR)
+            return;
+
+        QString config_dir = "";
+
+        if (!cfg.getString(secName, "ConfigDir", config_dir))
+            return;
+
+        config_dir = QString(fs.toNativeSeparators(config_dir.toStdString()).c_str());
+
+        if (!control_panel->init(QString(fs.getConfigDir().c_str()) + fs.separator() + config_dir))
+            return;
+
+        int request_interval = 0;
+
+        if (!cfg.getInt(secName, "RequestInterval", request_interval))
+            request_interval = 100;
+
+        controlTimer.setInterval(request_interval);
+        connect(&controlTimer, &QTimer::timeout, this, &Model::controlProcess);
+
+        int v_idx = 0;
+
+        if (!cfg.getInt(secName, "Vehicle", v_idx))
+            v_idx = 0;
+
+        Vehicle *vehicle = train->getVehicles()->at(static_cast<size_t>(v_idx));
+
+        connect(vehicle, &Vehicle::sendFeedBackSignals,
+                control_panel, &VirtualInterfaceDevice::receiveFeedback);
+
+        connect(control_panel, &VirtualInterfaceDevice::sendControlSignals,
+                vehicle, &Vehicle::getControlSignals);
+
+        controlTimer.start();
     }
 }
 
@@ -433,15 +558,10 @@ void Model::controlStep(double &control_time, const double control_delay)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::timerEvent(QTimerEvent *event)
+void Model::process()
 {
-    Q_UNUSED(event)
-
-    // Feedback to viewer
-    //sharedMemoryFeedback();
-
     double tau = 0;
-    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
+    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;    
 
     // Integrate all ODE in train motion model
     while ( (tau <= integration_time) &&
@@ -467,6 +587,6 @@ void Model::timerEvent(QTimerEvent *event)
 
     // Debug print, is allowed
     if (is_debug_print)
-        debugPrint();
+        debugPrint();    
 }
 

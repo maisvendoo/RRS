@@ -6,10 +6,12 @@
 		<Title>Одиночный вагон</Title>
 		<Description>Одиночный пассажирский вагон</Description>
 	</Common>
+	
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>passcar</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
-	</Vehicle>	
+	</Vehicle>
+	
 </Config>

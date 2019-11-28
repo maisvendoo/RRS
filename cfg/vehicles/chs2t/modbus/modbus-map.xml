@@ -1,0 +1,12 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+	<Slave>
+		<id>1</id>
+		<Description>Контроллер машиниста</Description>
+		<Config>21kr2</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
+</Config>

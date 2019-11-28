@@ -11,11 +11,11 @@
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
 
-		<Title>ВЛ60пк-1543</Title>
+		<Title>ВЛ60пк-1543 резервом</Title>
 		<Description>Магистральный пассажирский электровоз переменного тока производства НЭВЗ</Description>
 	</Common>
 	<Vehicle>
-		<Module>vl60</Module>
+		<Module>vl60pk</Module>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		
+		<Order>1</Order>
+
+		<V0>8e-3</V0>
+		
+		<K1>1e-2</K1>
+
+		<K2>1e-2</K2>		
+
+		<K3>1e-2</K3>		
+
+        <K4>0</K4>
+
+	</Device>
+</Config>

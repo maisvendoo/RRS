@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <MaxHeight>0.84</MaxHeight>
+        <MotionTime>3.0</MotionTime>                
+    </Device>
+</Config>

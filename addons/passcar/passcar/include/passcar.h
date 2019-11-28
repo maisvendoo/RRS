@@ -11,6 +11,7 @@
 #include    "brake-mech.h"
 #include    "reservoir.h"
 #include    "airdistributor.h"
+#include    "electro-airdistributor.h"
 
 //------------------------------------------------------------------------------
 //
@@ -38,6 +39,11 @@ private:
     QString     airdist_module;
     QString     airdist_config;   
 
+    ElectroAirDistributor *electroAirDist;
+
+    QString     electro_airdist_module;
+    QString     electro_airdist_config;
+
     void initialization();
 
     void step(double t, double dt);
@@ -47,6 +53,10 @@ private:
     void keyProcess();
 
     void loadConfig(QString cfg_path);
+
+    void initEPT();
+
+    void stepEPT(double t, double dt);
 };
 
 #endif // PASSCAR_H

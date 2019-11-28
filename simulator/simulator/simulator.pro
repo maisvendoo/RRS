@@ -19,6 +19,7 @@ CONFIG(debug, debug|release) {
 
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
+    LIBS += -L../../../lib -lJournal_d
     LIBS += -L../../../lib -llog_d
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -lvehicle_d
@@ -38,6 +39,7 @@ CONFIG(debug, debug|release) {
 
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -lJournal
     LIBS += -L../../../lib -llog
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
@@ -73,6 +75,7 @@ INCLUDEPATH += ./include
 INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp-connection/include
 
@@ -89,5 +92,5 @@ INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include
 
-HEADERS += $$files(./include/*.h) 
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

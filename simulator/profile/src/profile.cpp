@@ -4,6 +4,7 @@
 #include    <sstream>
 
 #include    "filesystem.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -15,13 +16,17 @@ Profile::Profile(int dir, const std::string &routeDir)
     FileSystem &fs = FileSystem::getInstance();
     std::string path = fs.toNativeSeparators(routeDir);
 
+    Journal::instance()->info("Route directory: " + QString(routeDir.c_str()));
+
     if (dir > 0)
     {
         path = fs.combinePath(path, "profile1.conf");
+        Journal::instance()->info("Direction: forward");
     }
     else
     {
         path = fs.combinePath(path, "profile2.conf");
+        Journal::instance()->info("Direction: backward");
     }
 
     is_ready = load(path);
@@ -87,13 +92,17 @@ profile_element_t Profile::getElement(double railway_coord)
 bool Profile::load(const std::string &path)
 {
     if (path.empty())
+    {
+        Journal::instance()->error("Profile path is empty");
         return false;
+    }
 
     std::ifstream stream(path.c_str(), std::ios::in);
 
     if (!stream.is_open())
     {
         std::cout << "File " << path << " not opened" << std::endl;
+        Journal::instance()->error("File " + QString(path.c_str()) + " is't found");
         return false;
     }
 

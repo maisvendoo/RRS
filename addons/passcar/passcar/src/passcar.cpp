@@ -13,6 +13,9 @@ PassCarrige::PassCarrige() : Vehicle ()
   , airdist(nullptr)
   , airdist_module("vr242")
   , airdist_config("vr242")
+  , electroAirDist(nullptr)
+  , electro_airdist_module("evr305")
+  , electro_airdist_config("evr305")
 
 {
 
@@ -57,6 +60,8 @@ void PassCarrige::initialization()
     // Air distributor
     airdist = loadAirDistributor(modules_dir + fs.separator() + airdist_module);
 
+    electroAirDist = loadElectroAirDistributor(modules_dir + fs.separator() + electro_airdist_module);
+
     if (brake_mech != nullptr)
     {
         brake_mech->read_config(brake_mech_config);
@@ -68,6 +73,13 @@ void PassCarrige::initialization()
     {
         airdist->read_config(airdist_config);
     }
+
+    if (electroAirDist != nullptr)
+    {
+        electroAirDist->read_config(electro_airdist_config);
+    }
+
+    initEPT();
 }
 
 //------------------------------------------------------------------------------
@@ -75,9 +87,20 @@ void PassCarrige::initialization()
 //------------------------------------------------------------------------------
 void PassCarrige::step(double t, double dt)
 {
+    if ( airdist != nullptr)
+    {
+        airdist->setBrakepipePressure(pTM);
+        airdist->setBrakeCylinderPressure(electroAirDist->getPbc_out());
+        airdist->setAirSupplyPressure(electroAirDist->getSupplyReservoirPressure());
+
+        auxRate = airdist->getAuxRate();
+
+        airdist->step(t, dt);
+    }
+
     if ( brake_mech != nullptr )
     {
-        brake_mech->setAirFlow(airdist->getBrakeCylinderAirFlow());
+        brake_mech->setAirFlow(electroAirDist->getQbc_out());
         brake_mech->setVelocity(velocity);
         brake_mech->step(t, dt);
 
@@ -89,27 +112,29 @@ void PassCarrige::step(double t, double dt)
 
     if ( supply_reservoir != nullptr )
     {
-        supply_reservoir->setAirFlow(airdist->getAirSupplyFlow());
+        supply_reservoir->setAirFlow(electroAirDist->getOutputSupplyReservoirFlow());
         supply_reservoir->step(t, dt);
     }
 
-    if ( airdist != nullptr)
+    if ( electroAirDist != nullptr )
     {
-        airdist->setBrakepipePressure(pTM);
-        airdist->setBrakeCylinderPressure(brake_mech->getBrakeCylinderPressure());
-        airdist->setAirSupplyPressure(supply_reservoir->getPressure());
-
-        auxRate = airdist->getAuxRate();
-
-        airdist->step(t, dt);
+        electroAirDist->setPbc_in(brake_mech->getBrakeCylinderPressure());
+        electroAirDist->setQbc_in(airdist->getBrakeCylinderAirFlow());
+        electroAirDist->setSupplyReservoirPressure(supply_reservoir->getPressure());
+        electroAirDist->setInputSupplyReservoirFlow(airdist->getAirSupplyFlow());
+        electroAirDist->step(t, dt);
     }
 
     stepSignalsOutput();
 
-    DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2")
+    stepEPT(t, dt);
+
+    DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2 Kкол: %4 ТЦ: %5")
             .arg(pTM, 4, 'f', 2)
             .arg(supply_reservoir->getPressure(), 4, 'f', 2)
-            .arg(t, 10, 'f', 1);
+            .arg(t, 10, 'f', 1)
+            .arg(brake_mech->getShoeForce() / 1000.0, 6, 'f', 2)
+            .arg(brake_mech->getBrakeCylinderPressure(), 5, 'f', 2);
 
     DebugMsg += airdist->getDebugMsg();
 
@@ -151,10 +176,13 @@ void PassCarrige::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getString(secName, "BrakeMechModule", brake_mech_module);
-        cfg.getString(secName, "BrakeMechCinfig", brake_mech_config);
+        cfg.getString(secName, "BrakeMechConfig", brake_mech_config);
 
         cfg.getString(secName, "AirDistModule", airdist_module);
         cfg.getString(secName, "AirDistConfig", airdist_config);
+
+        cfg.getString(secName, "ElectroAirDistModule", electro_airdist_module);
+        cfg.getString(secName, "ElectroAirDistConfig", electro_airdist_config);
     }
 }
 

@@ -48,6 +48,8 @@ public:
     /// Overrided exec() method (start signals processing loop)
     int exec();
 
+    bool notify(QObject *receiver, QEvent *event);
+
 private:
 
     /// Command line parser

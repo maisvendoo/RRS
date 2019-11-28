@@ -39,6 +39,7 @@ private:
     bool k21;
     bool k22;
     bool k23;
+    int n;
 
     ControllerState controlState;
 };

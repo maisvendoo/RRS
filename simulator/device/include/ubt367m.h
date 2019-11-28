@@ -32,6 +32,8 @@ public:
 
     void setState(int state);
 
+    void setCombineCranePos(int pos);
+
 private:
 
     double  V0;

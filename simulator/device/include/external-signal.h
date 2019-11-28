@@ -8,14 +8,28 @@
 //------------------------------------------------------------------------------
 struct signal_t
 {
-    float       value;
+    float       cur_value;
+    float       prev_value;
     bool    is_active;
 
     signal_t()
-        : value(0)
+        : cur_value(0)
+        , prev_value(0)
         , is_active(false)
     {
 
+    }
+
+    void setValue(float value)
+    {
+        prev_value = cur_value;
+        cur_value = value;
+    }
+
+    bool isChanged() const
+    {
+        float eps = 0.01f;
+        return abs(prev_value - cur_value) < eps;
     }
 };
 

@@ -11,7 +11,7 @@
         <DebugPrint>true</DebugPrint>
 
         <!-- Интервал опроса кнопок, мс -->
-        <ControlTimeInterval>100</ControlTimeInterval>
+        <ControlTimeInterval>20</ControlTimeInterval>
 
         <!-- Объем буфера клавиатуры, байт -->
         <KeysBufferSize>10240</KeysBufferSize>

@@ -26,6 +26,8 @@ public:
 
     virtual double getHandlePosition() const = 0;
 
+    virtual double getHandleShift() const = 0;
+
     virtual double getAirDistribPressure() const;
 
     void release(bool is_release);

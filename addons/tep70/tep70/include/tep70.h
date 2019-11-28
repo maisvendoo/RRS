@@ -14,6 +14,8 @@
 #define     TEP70_H
 
 #include    "vehicle-api.h"
+#include    "tep70-headers.h"
+#include    "tep70-signals.h"
 
 /*!
  * \class
@@ -34,8 +36,22 @@ public:
 
 private:
 
+    /// Контроллер машиниста
+    ControllerKM2202 *km;
+
+    /// Инициализация всех систем тепловоза
+    void initialization();
+
+    /// Инициализация органов управления в кабине
+    void initCabineControls();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    /// Шаг моделирования органов управления в кабине
+    void stepCabineControls(double t, double dt);
+
+    void stepSignalsOutput(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
