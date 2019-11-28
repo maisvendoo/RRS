@@ -182,7 +182,7 @@ void CHS2T::stepBrakesControl(double t, double dt)
     p0 = brakeCrane->getBrakePipeInitPressure();
     brakeCrane->step(t, dt);    
 
-    handleEDT->setControl(keys);
+    handleEDT->setControl(keys, control_signals);
     handleEDT->step(t, dt);
 }
 

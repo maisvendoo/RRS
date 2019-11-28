@@ -274,6 +274,38 @@ void Master::writeCoils(Slave *slave)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Master::writeCoil(Slave* slave, slave_data_t coil)
+{
+    if (!slave->isConnected())
+        return;
+
+    QModbusDataUnit unit(QModbusDataUnit::Coils, coil.address, 1);
+    unit.setValue(0, static_cast<quint16>(coil.cur_value));
+
+    QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
+
+    if (reply != Q_NULLPTR)
+    {
+        if (!reply->isFinished())
+        {
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+
+            connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
+        }
+        else
+        {
+            reply->deleteLater();
+        }
+    }
+    else
+    {
+        slave->incErrosCount();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Master::writeHoldingRegisters(Slave *slave)
 {
     if (!slave->isConnected())

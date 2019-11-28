@@ -25,4 +25,12 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 
+	<Slave>
+		<id>5</id>
+		<Description>Карандаш задатчика реостатного тормоза</Description>
+		<Config>reostat</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
 </Config>

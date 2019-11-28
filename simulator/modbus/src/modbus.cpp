@@ -101,10 +101,13 @@ void Modbus::feedbackSignalsProcess()
         {
             slave_data_t *coil = &it.value();
             coil->cur_value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value);
-        }
 
-        // Отправляем их в шину
-        master->writeCoils(slave);
+            if (coil->cur_value != coil->prev_value)
+            {
+                master->writeCoil(slave, *coil);
+                coil->prev_value = coil->cur_value;
+            }
+        }
 
         // Пишем регистры вывода
         for (it = slave->holding_register.begin(); it != slave->holding_register.end(); ++it)
@@ -117,10 +120,7 @@ void Modbus::feedbackSignalsProcess()
                 master->writeHoldingRegister(slave, *holding_reg);
                 holding_reg->prev_value = holding_reg->cur_value;
             }
-        }
-
-        // Шлем в шину
-        //master->writeHoldingRegisters(slave);
+        }        
     }
 }
 

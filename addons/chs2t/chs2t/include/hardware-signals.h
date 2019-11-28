@@ -23,7 +23,14 @@ enum ControllerSignals
     SWP1_EPT = 12,
     SWP1_MK1 = 13,
     SWP1_TP2 = 14,
-    SWP1_BV = 15
+    SWP1_BV = 15,
+
+    EDT_T = 23,
+    EDT_D = 24,
+    EDT_SBROS = 25,
+    EDT_CHECK_RT = 26,
+    EDT_RELEASE = 27,
+    EDT_BRAKE = 28
 };
 
 enum FeedbackSignals

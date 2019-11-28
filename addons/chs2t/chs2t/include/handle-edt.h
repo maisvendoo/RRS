@@ -66,6 +66,8 @@ private:
 
     void stepKeysControl(double t, double dt);
 
+    void stepExternalControl(double t, double dt);
+
 private slots:
 
     void slotHandleMove();
