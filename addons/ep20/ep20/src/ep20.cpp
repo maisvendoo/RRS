@@ -3,6 +3,8 @@
 #include    <CfgReader.h>
 #include    <QDir>
 
+#include    "filesystem.h"
+
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
@@ -20,16 +22,30 @@ EP20::~EP20()
 
 }
 
+void EP20::initBrakeDevices(double p0, double pTM, double pFL)
+{
+    main_reservoir->setY(0, pFL);
+    charge_press = p0;
+
+    load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
+}
+
 //------------------------------------------------------------------------------
 // Инициализация
 //------------------------------------------------------------------------------
 void EP20::initialization()
 {
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir(fs.getModulesDir().c_str());
+
     // Вызваем метод
     initMPCS();
 
     // Вызываем метод
     initHighVoltageScheme();
+
+    // Вызываем метод
+    initBrakeControls(modules_dir);
 }
 
 //------------------------------------------------------------------------------
@@ -82,6 +98,12 @@ void EP20::initHighVoltageScheme()
     }
 }
 
+void EP20::initBrakeControls(QString modules_dir)
+{
+    krm = loadBrakeCrane(modules_dir + QDir::separator() + "krm130");
+    krm->read_config("krm130");
+}
+
 
 //------------------------------------------------------------------------------
 // Общие шаги моделирования
@@ -94,14 +116,16 @@ void EP20::step(double t, double dt)
     // Вызываем метод
     stepHighVoltageScheme(t, dt);
 
+    stepBrakeControls(t, dt);
+
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, U2_1: %2, U2_2: %3, U2_3: %4, U2_4: %5, Q: %6")
+    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5 KrM: %6")
             .arg(t, 10, 'f', 2)
-            .arg(auxConv[0]->getU2())
-            .arg(auxConv[1]->getU2())
-            .arg(auxConv[2]->getU2())
-            .arg(auxConv[3]->getU2())
-            .arg(main_reservoir->getPressure());
+            .arg(auxConv[3]->getU2(), 5, 'f', 1)
+            .arg(main_reservoir->getPressure(), 4, 'f', 2)
+            .arg(krm->getEqReservoirPressure(), 4, 'f', 2)
+            .arg(pTM, 4, 'f', 2)
+            .arg(krm->getPositionName(), 4);
     //________________________________________________
 
 //    .arg(t, 10, 'f', 2)
@@ -210,7 +234,6 @@ void EP20::stepHighVoltageScheme(double t, double dt)
     }
 
     // Передаем данные на Мотор-компрессоры и Главный резервуар!
-    main_reservoir->setFlowCoeff(0.001);
     main_reservoir->setAirFlow(motorCompAC[0]->getAirFlow() + motorCompAC[1]->getAirFlow());
     main_reservoir->step(t, dt);
 
@@ -222,6 +245,17 @@ void EP20::stepHighVoltageScheme(double t, double dt)
         motorCompAC[i]->setU_power(auxConv[3]->getU2() * static_cast<double>(mpcsOutput.toggleSwitchMK[i]) * mpcsOutput.MKstate);
         motorCompAC[i]->step(t, dt);
     }
+}
+
+void EP20::stepBrakeControls(double t, double dt)
+{
+    krm->setChargePressure(charge_press);
+    krm->setFeedLinePressure(main_reservoir->getPressure());
+    krm->setBrakePipePressure(pTM);
+    krm->setControl(keys);
+    krm->step(t, dt);
+
+    p0 = krm->getBrakePipeInitPressure();
 }
 
 //------------------------------------------------------------------------------
@@ -242,7 +276,52 @@ void EP20::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void EP20::keyProcess()
 {
-//    pantograph[PANT_AC1]->setState(getKeyState(KEY_P));
+    //    pantograph[PANT_AC1]->setState(getKeyState(KEY_P));
+}
+
+void EP20::load_brakes_config(QString path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(path))
+    {
+        QString secName = "BrakesState";
+
+        double pFL = 0.0;
+
+        if (cfg.getDouble(secName, "MainReservoirPressure", pFL))
+        {
+            main_reservoir->setY(0, pFL);
+        }
+
+        double k_flow = 0.0;
+
+        if (cfg.getDouble(secName, "MainReservoirFlow", k_flow))
+        {
+            main_reservoir->setFlowCoeff(k_flow);
+        }
+
+        double ch_press = 0.0;
+
+        if (cfg.getDouble(secName, "ChargingPressure", ch_press))
+        {
+            charge_press = ch_press;
+        }
+
+        int train_crane_pos = 6;
+
+        if (cfg.getInt(secName, "TrainCranePos", train_crane_pos))
+        {
+            krm->setPosition(train_crane_pos);
+        }
+
+        int loco_crane_pos = 0;
+
+        /*if (cfg.getInt(secName, "LocoCranePos", loco_crane_pos))
+        {
+            loco_crane->setHandlePosition(loco_crane_pos);
+        }*/
+    }
 }
 
 GET_VEHICLE(EP20)

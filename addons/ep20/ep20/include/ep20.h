@@ -41,6 +41,8 @@ public:
     /// Деструктор
     ~EP20();
 
+    void initBrakeDevices(double p0, double pTM, double pFL);
+
 private:
 
 //    /// Выбор кабины
@@ -94,11 +96,17 @@ private:
     /// Массив токоприемников
     std::array<Pantograph *, NUM_PANTOGRAPHS> pantograph;
 
+    double charge_press;
+    BrakeCrane *krm;
+
     /// Инициализация
     void initialization();
 
     /// Инициализация высоковольтной схемы
     void initHighVoltageScheme();
+
+    /// Инициализация тормозного крана
+    void initBrakeControls(QString modules_dir);
 
     /// Инициализация МПСУ
     void initMPCS();
@@ -112,11 +120,16 @@ private:
     /// Шаг моделирования высоковольтной схемы
     void stepHighVoltageScheme(double t, double dt);
 
+    /// Шаг моделирования тормозного крана
+    void stepBrakeControls(double t, double dt);
+
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
 
     /// Обработчик клавиш
     void keyProcess();
+
+    void load_brakes_config(QString path);
 };
 
 #endif // EP20_H
