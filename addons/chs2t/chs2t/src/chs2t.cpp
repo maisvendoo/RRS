@@ -83,7 +83,7 @@ void CHS2T::initialization()
 
     initRegistrator();
 
-    for (size_t i = POWER_0; i <= POWER_10; ++i)
+    for (size_t i = POWER_1; i <= POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
 }
 

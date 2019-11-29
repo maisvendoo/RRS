@@ -23,7 +23,19 @@
     <InputRegister>
         <Address>5</Address>
         <Index>15</Index>
-    </InputRegister>    
+    </InputRegister> 
+
+    <!-- Управление жалюзи, пескоподачей, впомогательным компрессором -->
+    <InputRegister>
+        <Address>6</Address>
+        <Index>16</Index>
+    </InputRegister>
+
+    <!-- Задний токоприемник и разъединитель -->
+    <InputRegister>
+        <Address>7</Address>
+        <Index>17</Index>
+    </InputRegister>
 
     <Coil>
         <Address>0</Address>

@@ -22,8 +22,11 @@ enum ControllerSignals
 
     SWP1_EPT = 12,
     SWP1_MK1 = 13,
-    SWP1_TP2 = 14,
+    SWP1_TP1 = 14,
     SWP1_BV = 15,
+    SWP1_VK = 16,
+    SWP1_TP2 = 17,
+
 
     EDT_T = 23,
     EDT_D = 24,
