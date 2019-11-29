@@ -99,6 +99,10 @@ private:
     double charge_press;
     BrakeCrane *krm;
 
+    LocoCrane *kvt;
+
+    SwitchingValve *zpk;
+
     /// Инициализация
     void initialization();
 

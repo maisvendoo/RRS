@@ -28,6 +28,8 @@ void EP20::initBrakeDevices(double p0, double pTM, double pFL)
     charge_press = p0;
 
     load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
+
+    krm->init(pTM, pFL);
 }
 
 //------------------------------------------------------------------------------
@@ -102,6 +104,12 @@ void EP20::initBrakeControls(QString modules_dir)
 {
     krm = loadBrakeCrane(modules_dir + QDir::separator() + "krm130");
     krm->read_config("krm130");
+
+    kvt = loadLocoCrane(modules_dir + QDir::separator() + "kvt224");
+    kvt->read_config("kvt224");
+
+    zpk = new SwitchingValve();
+    zpk->read_config("zpk");
 }
 
 
@@ -119,13 +127,14 @@ void EP20::step(double t, double dt)
     stepBrakeControls(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5 KrM: %6")
+    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5 KrM: %6 pTC: %7")
             .arg(t, 10, 'f', 2)
             .arg(auxConv[3]->getU2(), 5, 'f', 1)
             .arg(main_reservoir->getPressure(), 4, 'f', 2)
             .arg(krm->getEqReservoirPressure(), 4, 'f', 2)
             .arg(pTM, 4, 'f', 2)
-            .arg(krm->getPositionName(), 4);
+            .arg(krm->getPositionName(), 4)
+            .arg(zpk->getPressure2(), 4, 'f', 2);
     //________________________________________________
 
 //    .arg(t, 10, 'f', 2)
@@ -256,6 +265,15 @@ void EP20::stepBrakeControls(double t, double dt)
     krm->step(t, dt);
 
     p0 = krm->getBrakePipeInitPressure();
+
+    kvt->setFeedlinePressure(main_reservoir->getPressure());
+    kvt->setBrakeCylinderPressure(zpk->getPressure2());
+    kvt->setControl(keys);
+    kvt->step(t, dt);
+
+    zpk->setInputFlow1(0.0);
+    zpk->setInputFlow2(kvt->getBrakeCylinderFlow());
+    zpk->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
