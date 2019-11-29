@@ -45,4 +45,8 @@ void CHS2T::stepSwitcherPanel()
     setSwitcherState(pantoSwitcher[0], control_signals.analogSignal[SWP1_TP1]);
     setSwitcherState(blindsSwitcher, control_signals.analogSignal[SWP1_VK]);
     setSwitcherState(pantoSwitcher[1], control_signals.analogSignal[SWP1_TP2]);
+
+    // Нижняя половина панели
+    setSwitcherState(mk_switcher[1], control_signals.analogSignal[SWP2_MK2]);
+    setSwitcherState(motor_fan_switcher, control_signals.analogSignal[SWP2_MV]);
 }

@@ -33,4 +33,12 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 
+	<Slave>
+		<id>3</id>
+		<Description>Панель кулачковых переключателей (низ)</Description>
+		<Config>switch-panel2</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
 </Config>
