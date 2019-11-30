@@ -110,6 +110,14 @@ private:
 
     double tau;
 
+    int volume_in;
+
+    int volume_out;
+
+    double Kv_in;
+
+    double Kv_out;
+
     Timer   *incTimer;
     Timer   *decTimer;
 
@@ -123,6 +131,7 @@ private:
 
     std::vector<float> positions;
 
+
     void preStep(state_vector_t &Y, double t);
 
     void postStep(state_vector_t &Y, double t);
@@ -133,7 +142,7 @@ private:
 
     void stepKeysControl(double t, double dt);
 
-private slots:
+private slots:    
 
     void inc();
 

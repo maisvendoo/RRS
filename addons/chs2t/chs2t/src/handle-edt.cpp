@@ -1,4 +1,5 @@
 #include    "handle-edt.h"
+#include    "hardware-signals.h"
 
 //------------------------------------------------------------------------------
 //
@@ -107,6 +108,28 @@ void HandleEDT::stepKeysControl(double t, double dt)
     }
 
     motionTimer.step(t, dt);
+}
+
+void HandleEDT::stepExternalControl(double t, double dt)
+{
+    if (control_signals.analogSignal[EDT_BRAKE].is_active &&
+        control_signals.analogSignal[EDT_RELEASE].is_active    )
+    {
+        if (static_cast<bool>(control_signals.analogSignal[EDT_BRAKE].cur_value))
+        {
+            pos_ref = POS_BRAKE;
+        }
+
+        else if (static_cast<bool>(control_signals.analogSignal[EDT_RELEASE].cur_value))
+        {
+            pos_ref = POS_RELEASE;
+        }
+
+        else
+        {
+            pos_ref = POS_HOLD;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

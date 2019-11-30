@@ -48,5 +48,8 @@
 
 		<K4_power>10.0</K4_power>
 
+		<Kv_in>1e9</Kv_in>
+		<Kv_out>2e7</Kv_out>
+
 	</Device>
 </Config>

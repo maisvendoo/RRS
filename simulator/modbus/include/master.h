@@ -27,7 +27,11 @@ public:
 
     void writeCoils(Slave *slave);
 
+    void writeCoil(Slave *slave, slave_data_t coil);
+
     void writeHoldingRegisters(Slave *slave);
+
+    void writeHoldingRegister(Slave* slave, slave_data_t hreg);
 
 private:
 

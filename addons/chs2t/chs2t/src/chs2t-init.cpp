@@ -21,8 +21,7 @@ void CHS2T::initPantographs()
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
-        pantoSwitcher[i] = new Switcher();
-        pantoSwitcher[i]->setKolStates(4);
+        pantoSwitcher[i] = new Switcher(Q_NULLPTR, 0, 4);
     }
 
     pantoSwitcher[0]->setKeyCode(KEY_I);
@@ -53,9 +52,7 @@ void CHS2T::initFastSwitch()
     bv = new ProtectiveDevice();
     bv->read_custom_config(config_dir + QDir::separator() + "bv");
 
-    fastSwitchSw = new Switcher();
-    fastSwitchSw->setKeyCode(KEY_P);
-    fastSwitchSw->setKolStates(4);
+    fastSwitchSw = new Switcher(Q_NULLPTR, KEY_P, 4);
 }
 
 //------------------------------------------------------------------------------
@@ -78,6 +75,8 @@ void CHS2T::initBrakesControl(QString module_path)
 
     brakeCrane = loadBrakeCrane(module_path + QDir::separator() + "krm395");
     brakeCrane->read_config("krm395");
+    connect(brakeCrane, &BrakeCrane::soundPlay, this, &CHS2T::soundPlay);
+    connect(brakeCrane, &BrakeCrane::soundSetVolume, this, &CHS2T::soundSetVolume);
 
     locoCrane = loadLocoCrane(module_path + QDir::separator() + "kvt254");
     locoCrane->read_config("kvt254");
@@ -107,8 +106,7 @@ void CHS2T::initAirSupplySubsystem()
 
         motor_compressor[i]->setSoundName(QString("Motor_Compressor%1").arg(i+1));
 
-        mk_switcher[i] = new Switcher();
-        mk_switcher[i]->setKolStates(4);
+        mk_switcher[i] = new Switcher(Q_NULLPTR, 0, 4);
     }
 
     mk_switcher[0]->setKeyCode(KEY_7);
@@ -202,7 +200,7 @@ void CHS2T::initOtherEquipment()
 {
     Journal::instance()->info("Init whistle and typhoid");
 
-    horn = new TrainHorn();
+    horn = new CHS2tHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &CHS2T::soundSetVolume);
 }
 
@@ -220,7 +218,7 @@ void CHS2T::initSupportEquipment()
     motor_fan_ptr->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");
     motor_fan_ptr->setSoundName("PTR_fan");
 
-    for (int i = 0; i < 2; ++i)
+    for (size_t i = 0; i < motor_fan.size(); ++i)
     {
         motor_fan[i] = new DCMotorFan();
         motor_fan[i]->read_custom_config(config_dir + QDir::separator() + "motor-fan");
@@ -228,18 +226,40 @@ void CHS2T::initSupportEquipment()
         motor_fan[i]->setSoundName(QString("Motor_Fan%1").arg(i+1));
     }
 
-    motor_fan_switcher = new Switcher();
-    motor_fan_switcher->setKolStates(3);
-    motor_fan_switcher->setKeyCode(KEY_F);
+    motor_fan_switcher = new Switcher(Q_NULLPTR, KEY_F, 3);
 
     connect(motor_fan_ptr, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
 
     blinds = new Blinds();
     blinds->read_custom_config(config_dir + QDir::separator() + "blinds");
 
-    blindsSwitcher = new Switcher();
-    blindsSwitcher->setKolStates(5);
-    blindsSwitcher->setKeyCode(KEY_G);
+    blindsSwitcher = new Switcher(Q_NULLPTR, KEY_G, 5);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::initModbus()
+{
+    Journal::instance()->info("Init modbus");
+
+    QString modbusCfgDir = config_dir + QDir::separator() + "modbus";
+
+    TM_manometer = new PhysToModbus();
+    TM_manometer->load((modbusCfgDir + QDir::separator() + "manometer-TM").toStdString());
+
+    UR_manometer = new PhysToModbus();
+    UR_manometer->load((modbusCfgDir + QDir::separator() + "manometer-UR").toStdString());
+
+    ZT_manometer = new PhysToModbus();
+    ZT_manometer->load((modbusCfgDir + QDir::separator() + "manometer-ZT").toStdString());
+
+    GR_manometer = new PhysToModbus();
+    GR_manometer->load((modbusCfgDir + QDir::separator() + "manometer-GR").toStdString());
+
+    TC_manometer = new PhysToModbus();
+    TC_manometer->load((modbusCfgDir + QDir::separator() + "manometer-TC").toStdString());
+
 }
 
 //------------------------------------------------------------------------------
@@ -248,6 +268,7 @@ void CHS2T::initSupportEquipment()
 void CHS2T::initRegistrator()
 {
     Journal::instance()->info("Init registraion subsystem");
+
     reg = nullptr;
     reg = new Registrator("brakeReg", 0.1, Q_NULLPTR);
 }

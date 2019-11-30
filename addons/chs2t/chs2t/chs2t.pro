@@ -36,7 +36,8 @@ INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 INCLUDEPATH += ../../../libJournal/include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/chs2t-horn.h
 SOURCES += $$files(./src/*.cpp)
 
 #CONFIG += force_debug_info

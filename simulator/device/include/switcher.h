@@ -9,7 +9,7 @@
 class DEVICE_EXPORT Switcher : public Device
 {
 public:
-    Switcher(QObject *parent = Q_NULLPTR);
+    Switcher(QObject *parent = Q_NULLPTR, int key_code = 0, int kol_states = 0);
 
     ~Switcher();
 
@@ -17,7 +17,11 @@ public:
 
     void setKolStates(int value) { kolStates = value; is_switched.resize(static_cast<size_t>(kolStates)); }
 
+    void setState(int value) { state = value; }
+
     int getState() const { return state; }
+
+    int getKolStates() const { return kolStates; }
 
     float getHandlePos() const { return static_cast<float>(state) / static_cast<float>(kolStates - 1) ; }
 
@@ -37,7 +41,7 @@ protected:
 
     int kolStates;
 
-    bool p;
+    bool ableToPress;
 
     std::vector<bool> is_switched;
 

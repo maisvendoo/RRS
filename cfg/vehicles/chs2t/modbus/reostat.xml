@@ -1,0 +1,40 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <!--  -->
+    <DiscreteInput>
+        <Address>2</Address>
+        <Index>24</Index>
+    </DiscreteInput>
+
+    <!--  -->
+    <DiscreteInput>
+        <Address>3</Address>
+        <Index>25</Index>
+    </DiscreteInput>
+
+    <!-- Сброс до ближайшей ходовой -->
+    <DiscreteInput>
+        <Address>4</Address>
+        <Index>26</Index>
+    </DiscreteInput>
+
+    <!-- Проверка реостата -->
+    <DiscreteInput>
+        <Address>5</Address>
+        <Index>27</Index>
+    </DiscreteInput>
+
+    <!-- Отпуск -->
+    <DiscreteInput>
+        <Address>6</Address>
+        <Index>28</Index>
+    </DiscreteInput>
+
+    <!-- Торможение -->
+    <DiscreteInput>
+        <Address>7</Address>
+        <Index>29</Index>
+    </DiscreteInput>
+
+</Config>
