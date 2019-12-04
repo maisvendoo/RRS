@@ -30,6 +30,8 @@ void EP20::initBrakeDevices(double p0, double pTM, double pFL)
     load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
 
     krm->init(pTM, pFL);
+    kvt->init(pTM, pFL);
+    spareReservoir->setY(0, pTM);
 }
 
 //------------------------------------------------------------------------------
@@ -93,6 +95,8 @@ void EP20::initHighVoltageScheme()
 
     main_reservoir = new Reservoir(1);
 
+    spareReservoir = new Reservoir(0.078);
+
     for (size_t i = 0; i < motorCompAC.size(); ++i)
     {
         motorCompAC[i] = new ACMotorCompressor();
@@ -110,12 +114,19 @@ void EP20::initBrakeControls(QString modules_dir)
 
     zpk = new SwitchingValve();
     zpk->read_config("zpk");
+
+    airDistr = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
+    airDistr->read_config("vr242");
+
+    electroAirDistr = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
+    electroAirDistr->read_config("evr305");
 }
 
 
 //------------------------------------------------------------------------------
 // Общие шаги моделирования
 //------------------------------------------------------------------------------
+
 void EP20::step(double t, double dt)
 {
     // Вызываем метод
@@ -127,14 +138,18 @@ void EP20::step(double t, double dt)
     stepBrakeControls(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5 KrM: %6 pTC: %7")
+    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5, KrM: %6, pTC_2: %7, pTC_1: %8 pZR: %9")
             .arg(t, 10, 'f', 2)
             .arg(auxConv[3]->getU2(), 5, 'f', 1)
             .arg(main_reservoir->getPressure(), 4, 'f', 2)
             .arg(krm->getEqReservoirPressure(), 4, 'f', 2)
             .arg(pTM, 4, 'f', 2)
             .arg(krm->getPositionName(), 4)
-            .arg(zpk->getPressure2(), 4, 'f', 2);
+            .arg(zpk->getPressure2(), 4, 'f', 2)
+            .arg(zpk->getPressure1(), 4, 'f', 2)
+            .arg(spareReservoir->getPressure(), 4, 'f', 2);
+
+    stepSignals();
     //________________________________________________
 
 //    .arg(t, 10, 'f', 2)
@@ -271,9 +286,36 @@ void EP20::stepBrakeControls(double t, double dt)
     kvt->setControl(keys);
     kvt->step(t, dt);
 
-    zpk->setInputFlow1(0.0);
+    zpk->setInputFlow1(electroAirDistr->getQbc_out());
     zpk->setInputFlow2(kvt->getBrakeCylinderFlow());
     zpk->step(t, dt);
+
+//    electroAirDistr->setPbc_in(airSplit->getP_in());
+
+    electroAirDistr->setPbc_in(zpk->getPressure1());
+
+    // Устанавливаем подачу давления с запасного резервуара
+    electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
+
+    // Устанавливаем входной поток воздуха Qзр
+    electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
+    // Устанавливаем воздушный поток Qтц
+    electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
+
+//    electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0]);
+    electroAirDistr->step(t, dt);
+
+
+
+    spareReservoir->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());
+    spareReservoir->step(t, dt);
+
+
+
+    airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
+    airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
+    airDistr->setBrakepipePressure(pTM);
+    airDistr->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

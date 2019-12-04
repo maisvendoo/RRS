@@ -23,6 +23,7 @@
 #include    "traction-converter.h"
 #include    "auxiliary-converter.h"
 #include    "ac-motor-compressor.h"
+#include    "ep20-signals.h"
 
 /*!
  * \class
@@ -83,6 +84,9 @@ private:
     /// Резервуар
     Reservoir   *main_reservoir;
 
+    /// Запасный резервуар (ЗР)
+    Reservoir   *spareReservoir;
+
     /// Мотор компрессор   
     std::array<ACMotorCompressor *, 2> motorCompAC;
 //    ACMotorCompressor   *motorCompAC;
@@ -96,12 +100,23 @@ private:
     /// Массив токоприемников
     std::array<Pantograph *, NUM_PANTOGRAPHS> pantograph;
 
+    /// Зарядное давление
     double charge_press;
+
+    /// Поездной кран машиниста (КрМ)
     BrakeCrane *krm;
 
+    /// Кран вспомогательного тормоза (КВТ)
     LocoCrane *kvt;
 
+    /// Переключательный клапан (ЗПК)
     SwitchingValve *zpk;
+
+    /// Воздухораспределитель (ВР)
+    AirDistributor  *airDistr;
+
+    /// Электро-воздухораспределитель (ЭВР)
+    ElectroAirDistributor   *electroAirDistr;
 
     /// Инициализация
     void initialization();
@@ -134,6 +149,8 @@ private:
     void keyProcess();
 
     void load_brakes_config(QString path);
+
+    void stepSignals();
 };
 
 #endif // EP20_H
