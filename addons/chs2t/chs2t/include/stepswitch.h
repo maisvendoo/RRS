@@ -33,6 +33,8 @@ public:
 
     int getReverseState() const { return reverseState; }
 
+    void setDropPositionsWithZ(bool value) { dropPositionsWithZ = value; }
+
     bool isZero() const;
 
     bool isSeries() const;

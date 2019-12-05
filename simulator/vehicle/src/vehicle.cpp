@@ -59,7 +59,9 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , Uks(0.0)
   , current_kind(0)
 {
-    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);    
+    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);
+
+    is_controlled = false;
 }
 
 //------------------------------------------------------------------------------
@@ -496,6 +498,11 @@ double Vehicle::getEPTControl(size_t i)
         return ept_control[i];
 
     return 0;
+}
+
+void Vehicle::setIsControlled(bool value)
+{
+    is_controlled = value;
 }
 
 //------------------------------------------------------------------------------

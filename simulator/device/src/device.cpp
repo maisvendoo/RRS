@@ -316,6 +316,8 @@ bool Device::isAlt() const
 //------------------------------------------------------------------------------
 void Device::stepControl(double t, double dt)
 {
-    stepKeysControl(t, dt);
-    stepExternalControl(t, dt);
+    if (control_signals.is_controlled)
+        stepExternalControl(t, dt);
+    else
+        stepKeysControl(t, dt);
 }

@@ -162,6 +162,8 @@ public:
 
     double getEPTControl(size_t i);
 
+    void setIsControlled(bool value);
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -280,6 +282,8 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
+
+    bool is_controlled;
 
     /// Линии управления ЭПТ
     std::vector<double> ept_control;

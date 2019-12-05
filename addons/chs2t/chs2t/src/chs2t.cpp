@@ -88,6 +88,8 @@ void CHS2T::initialization()
 
     for (size_t i = SWP2_POWER_1; i <= SWP2_POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
+
+
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +97,8 @@ void CHS2T::initialization()
 //------------------------------------------------------------------------------
 void CHS2T::step(double t, double dt)
 {
+    control_signals.is_controlled = is_controlled;
+
     //Journal::instance()->info("Step pantographs");
     stepPantographs(t, dt);    
 

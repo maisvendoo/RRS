@@ -104,6 +104,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     stepSwitch->setDropPosition(dropPosition);
     stepSwitch->setCtrlState(km21KR2->getCtrlState());
     stepSwitch->setControl(keys);
+    stepSwitch->setDropPositionsWithZ(handleEDT->getDropPositions());
     stepSwitch->step(t, dt);
 
     puskRez->setPoz(stepSwitch->getPoz());

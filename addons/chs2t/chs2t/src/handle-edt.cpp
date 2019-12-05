@@ -130,6 +130,13 @@ void HandleEDT::stepExternalControl(double t, double dt)
             pos_ref = POS_HOLD;
         }
     }
+
+    if (control_signals.analogSignal[EDT_SBROS].is_active)
+    {
+        dropPositions = static_cast<bool>(control_signals.analogSignal[EDT_SBROS].cur_value);
+    }
+
+    motionTimer.step(t, dt);
 }
 
 //------------------------------------------------------------------------------
