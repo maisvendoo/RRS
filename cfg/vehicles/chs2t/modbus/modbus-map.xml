@@ -8,7 +8,7 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-	
+<!--
 	<Slave>
 		<id>4</id>
 		<Description>Панель манометров</Description>
@@ -16,7 +16,8 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-
+	-->
+<!--
 	<Slave>
 		<id>2</id>
 		<Description>Панель кулачковых переключателей (верх)</Description>
@@ -24,15 +25,15 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-
+-->
 	<Slave>
-		<id>5</id>
+		<id>2</id>
 		<Description>Карандаш задатчика реостатного тормоза</Description>
 		<Config>reostat</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-
+<!--
 	<Slave>
 		<id>3</id>
 		<Description>Панель кулачковых переключателей (низ)</Description>
@@ -40,5 +41,6 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+	-->
 
 </Config>

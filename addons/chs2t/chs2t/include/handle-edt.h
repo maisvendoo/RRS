@@ -32,6 +32,8 @@ public:
 
     bool getDropPositions() const { return dropPositions; }
 
+    void setDropPositions(bool state) { dropPositions = state; }
+
 private:
 
     int brakeKey;

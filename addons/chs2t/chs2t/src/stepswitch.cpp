@@ -163,12 +163,13 @@ void StepSwitch::stepDiscrete(double t, double dt)
 
     if (getKeyState(KEY_Z))
     {
-        prevPos2 = poz;
+//        prevPos2 = poz;
         dropPositionsWithZ = true;
     }
 
     if (dropPositionsWithZ)
     {
+        prevPos2 = poz;
         poz_d -= V * dt;
 
         if ((poz == 0 || hod) && (poz != prevPos2))

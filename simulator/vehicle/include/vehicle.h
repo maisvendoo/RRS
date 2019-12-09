@@ -263,6 +263,8 @@ protected:
     /// Род тока в КС
     int         current_kind;
 
+    bool is_controlled;
+
     /// Active common forces
     state_vector_t  Q_a;
     /// Reactive common forces
@@ -283,7 +285,6 @@ protected:
 
     feedback_signals_t  feedback_signals;
 
-    bool is_controlled;
 
     /// Линии управления ЭПТ
     std::vector<double> ept_control;

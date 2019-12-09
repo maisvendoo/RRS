@@ -58,10 +58,9 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , config_dir("")
   , Uks(0.0)
   , current_kind(0)
+  , is_controlled(false)
 {
-    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);
-
-    is_controlled = false;
+    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);    
 }
 
 //------------------------------------------------------------------------------

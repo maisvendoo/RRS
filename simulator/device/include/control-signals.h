@@ -15,11 +15,11 @@ struct control_signals_t
     };
 
     std::array<signal_t, MAX_CONTROL_SIGNALS>  analogSignal;
-    bool is_controlled;
+    //bool is_controlled;
 
     control_signals_t()
     {
-        is_controlled = false;
+        //is_controlled = false;
     }
 };
 

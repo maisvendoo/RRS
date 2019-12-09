@@ -35,6 +35,8 @@ public:
 
     void setDropPositionsWithZ(bool value) { dropPositionsWithZ = value; }
 
+    bool getDropPositionsWithZ() { return dropPositionsWithZ; }
+
     bool isZero() const;
 
     bool isSeries() const;

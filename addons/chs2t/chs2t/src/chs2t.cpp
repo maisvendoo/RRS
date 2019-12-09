@@ -97,7 +97,7 @@ void CHS2T::initialization()
 //------------------------------------------------------------------------------
 void CHS2T::step(double t, double dt)
 {
-    control_signals.is_controlled = is_controlled;
+    control_signals.analogSignal[999].cur_value = static_cast<float>(is_controlled);
 
     //Journal::instance()->info("Step pantographs");
     stepPantographs(t, dt);    
