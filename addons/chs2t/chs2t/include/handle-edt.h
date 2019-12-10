@@ -34,6 +34,8 @@ public:
 
     void setDropPositions(bool state) { dropPositions = state; }
 
+    bool getEPTState() const { return 0; }
+
 private:
 
     int brakeKey;
@@ -61,6 +63,8 @@ private:
     std::array<double, NUM_COEFFS> K;
 
     bool dropPositions;
+
+    bool EPTState;
 
     Timer motionTimer;
 

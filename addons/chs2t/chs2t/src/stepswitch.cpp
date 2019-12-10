@@ -163,19 +163,18 @@ void StepSwitch::stepDiscrete(double t, double dt)
 
     if (getKeyState(KEY_Z))
     {
-//        prevPos2 = poz;
         dropPositionsWithZ = true;
     }
 
     if (dropPositionsWithZ)
     {
-        prevPos2 = poz;
-        poz_d -= V * dt;
-
         if ((poz == 0 || hod) && (poz != prevPos2))
         {
             dropPositionsWithZ = false;
         }
+        prevPos2 = poz;
+        poz_d -= V * dt;
+        poz = static_cast<int>(poz_d);
     }
 
     reverseState = (-1 * (!ctrlState.k01 && ctrlState.k02)) +

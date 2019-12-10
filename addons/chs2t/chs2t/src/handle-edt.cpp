@@ -10,6 +10,8 @@ HandleEDT::HandleEDT(QObject *parent) : Device(parent)
   , pos(POS_RELEASE)
   , pos_ref(pos)
   , control_signal(0.0)
+  , dropPositions(false)
+  , EPTState(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
 
@@ -135,6 +137,8 @@ void HandleEDT::stepExternalControl(double t, double dt)
     {
         dropPositions = true;
     }
+
+//    if (control_signals.analogSignal[EDT_CHECK_RT])
 
     motionTimer.step(t, dt);
 }
