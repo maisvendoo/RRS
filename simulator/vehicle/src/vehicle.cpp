@@ -456,6 +456,7 @@ void Vehicle::receiveData(QByteArray data)
     keys_mutex.lock();
 
     QDataStream stream(&data, QIODevice::ReadOnly);
+    keys.clear();
     stream >> keys;
 
     keys_mutex.unlock();
