@@ -35,10 +35,10 @@ enum ControllerSignals
     SWP2_SPOT_LIGHT = 23,
 
 
-    EDT_T = 24,
-    EDT_D = 25,
+    EDT_OFF = 24,
+    EDT_ON = 25,
     EDT_SBROS = 26,
-    EDT_CHECK_RT = 27,
+    LOCO_RELEASE = 27,
     EDT_RELEASE = 28,
     EDT_BRAKE = 29
 };

@@ -1,13 +1,13 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
-    <!--  -->
+    <!-- Выключить реостат -->
     <DiscreteInput>
         <Address>2</Address>
         <Index>24</Index>
     </DiscreteInput>
 
-    <!--  -->
+    <!-- Включить реостат -->
     <DiscreteInput>
         <Address>3</Address>
         <Index>25</Index>
@@ -19,7 +19,7 @@
         <Index>26</Index>
     </DiscreteInput>
 
-    <!-- Проверка реостата -->
+    <!-- Отпуск электровоза -->
     <DiscreteInput>
         <Address>5</Address>
         <Index>27</Index>

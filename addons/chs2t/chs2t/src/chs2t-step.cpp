@@ -238,7 +238,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
     electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
     electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
-    electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0]);
+
+
+    electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0] * !locoRelease);
+
     electroAirDistr->step(t, dt);
 
     spareReservoir->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());

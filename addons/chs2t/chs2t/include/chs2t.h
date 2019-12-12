@@ -228,6 +228,8 @@ private:
     /// Флаг разрешения работы ЭДТ
     bool        allowEDT;
 
+    bool        locoRelease;
+
     /// Жалюзи пуско-тормозных резисторов
     Blinds      *blinds;
 

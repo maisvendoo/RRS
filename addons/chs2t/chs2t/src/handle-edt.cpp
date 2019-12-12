@@ -11,7 +11,7 @@ HandleEDT::HandleEDT(QObject *parent) : Device(parent)
   , pos_ref(pos)
   , control_signal(0.0)
   , dropPositions(false)
-  , EPTState(false)
+  , EDTState(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
 
@@ -136,6 +136,15 @@ void HandleEDT::stepExternalControl(double t, double dt)
     if (control_signals.analogSignal[EDT_SBROS].is_active && control_signals.analogSignal[EDT_SBROS].cur_value == 1)
     {
         dropPositions = true;
+    }
+
+    if (control_signals.analogSignal[EDT_OFF].is_active && control_signals.analogSignal[EDT_OFF].cur_value == 1)
+    {
+        EDTState = false;
+    }
+    if (control_signals.analogSignal[EDT_ON].is_active && control_signals.analogSignal[EDT_ON].cur_value == 1)
+    {
+        EDTState = true;
     }
 
 //    if (control_signals.analogSignal[EDT_CHECK_RT])

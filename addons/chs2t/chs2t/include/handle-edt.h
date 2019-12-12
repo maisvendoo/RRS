@@ -34,7 +34,7 @@ public:
 
     void setDropPositions(bool state) { dropPositions = state; }
 
-    bool getEPTState() const { return 0; }
+    bool getEDTState() const { return EDTState; }
 
 private:
 
@@ -64,7 +64,7 @@ private:
 
     bool dropPositions;
 
-    bool EPTState;
+    bool EDTState;
 
     Timer motionTimer;
 
