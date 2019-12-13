@@ -118,6 +118,14 @@ private:
 
     double Kv_out;
 
+    int volume_1;
+    int volume_2;
+    int volume_5;
+
+    double Kv_1;
+    double Kv_2;
+    double Kv_5;
+
     Timer   *incTimer;
     Timer   *decTimer;
 
