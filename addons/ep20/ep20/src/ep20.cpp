@@ -120,6 +120,23 @@ void EP20::initBrakeControls(QString modules_dir)
 
     electroAirDistr = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
     electroAirDistr->read_config("evr305");
+
+    for (size_t i = 0; i < brake_mech.size(); ++i)
+    {
+        brake_mech[i] = new EP20BrakeMech();
+        rd304[i] = new PneumoReley();
+        rd304[i]->read_config("rd304");
+    }
+
+    brake_mech[FWD_TROLLEY]->read_custom_config(config_dir + QDir::separator() + "fwd-trolley-brake-mech");
+    brake_mech[MDL_TROLLEY]->read_custom_config(config_dir + QDir::separator() + "mdl-trolley-brake-mech");
+    brake_mech[BWD_TROLLEY]->read_custom_config(config_dir + QDir::separator() + "bwd-trolley-brake-mech");
+
+    pSplit[0] = new PneumoSplitter();
+    pSplit[1] = new PneumoSplitter();
+
+    pSplit[0]->read_config("pneumo-splitter");
+    pSplit[1]->read_config("pneumo-splitter");
 }
 
 
@@ -145,8 +162,8 @@ void EP20::step(double t, double dt)
             .arg(krm->getEqReservoirPressure(), 4, 'f', 2)
             .arg(pTM, 4, 'f', 2)
             .arg(krm->getPositionName(), 4)
-            .arg(zpk->getPressure2(), 4, 'f', 2)
-            .arg(zpk->getPressure1(), 4, 'f', 2)
+            .arg(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
+            .arg(brake_mech[BWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(spareReservoir->getPressure(), 4, 'f', 2);
 
     stepSignals();
@@ -288,6 +305,7 @@ void EP20::stepBrakeControls(double t, double dt)
 
     zpk->setInputFlow1(electroAirDistr->getQbc_out());
     zpk->setInputFlow2(kvt->getBrakeCylinderFlow());
+    zpk->setOutputPressure(pSplit[0]->getP_in());
     zpk->step(t, dt);
 
 //    electroAirDistr->setPbc_in(airSplit->getP_in());
@@ -316,6 +334,49 @@ void EP20::stepBrakeControls(double t, double dt)
     airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
     airDistr->setBrakepipePressure(pTM);
     airDistr->step(t, dt);
+
+    pSplit[0]->setQ_in(zpk->getOutputFlow());
+    pSplit[0]->setP_out1(rd304[FWD_TROLLEY]->getWorkPressure());
+    pSplit[0]->setP_out2(pSplit[1]->getP_in());
+    pSplit[0]->step(t, dt);
+
+    pSplit[1]->setQ_in(pSplit[0]->getQ_out2());
+    pSplit[1]->setP_out1(rd304[MDL_TROLLEY]->getWorkPressure());
+    pSplit[1]->setP_out2(rd304[BWD_TROLLEY]->getWorkPressure());
+    pSplit[1]->step(t, dt);
+
+    rd304[FWD_TROLLEY]->setWorkAirFlow(pSplit[0]->getQ_out1());
+    rd304[FWD_TROLLEY]->setPipelinePressure(main_reservoir->getPressure());
+    rd304[FWD_TROLLEY]->setBrakeCylPressure(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure());
+    rd304[FWD_TROLLEY]->step(t, dt);
+
+    rd304[MDL_TROLLEY]->setWorkAirFlow(pSplit[1]->getQ_out1());
+    rd304[MDL_TROLLEY]->setPipelinePressure(main_reservoir->getPressure());
+    rd304[MDL_TROLLEY]->setBrakeCylPressure(brake_mech[MDL_TROLLEY]->getBrakeCylinderPressure());
+    rd304[MDL_TROLLEY]->step(t, dt);
+
+    rd304[BWD_TROLLEY]->setWorkAirFlow(pSplit[1]->getQ_out2());
+    rd304[BWD_TROLLEY]->setPipelinePressure(main_reservoir->getPressure());
+    rd304[BWD_TROLLEY]->setBrakeCylPressure(brake_mech[BWD_TROLLEY]->getBrakeCylinderPressure());
+    rd304[BWD_TROLLEY]->step(t, dt);
+
+    brake_mech[FWD_TROLLEY]->setAirFlow(rd304[FWD_TROLLEY]->getBrakeCylAirFlow());
+    brake_mech[FWD_TROLLEY]->step(t, dt);
+
+    brake_mech[MDL_TROLLEY]->setAirFlow(rd304[MDL_TROLLEY]->getBrakeCylAirFlow());
+    brake_mech[MDL_TROLLEY]->step(t, dt);
+
+    brake_mech[BWD_TROLLEY]->setAirFlow(rd304[BWD_TROLLEY]->getBrakeCylAirFlow());
+    brake_mech[BWD_TROLLEY]->step(t, dt);
+
+    Q_r[1] = brake_mech[FWD_TROLLEY]->getBrakeTorque();
+    Q_r[2] = brake_mech[FWD_TROLLEY]->getBrakeTorque();
+
+    Q_r[3] = brake_mech[MDL_TROLLEY]->getBrakeTorque();
+    Q_r[4] = brake_mech[MDL_TROLLEY]->getBrakeTorque();
+
+    Q_r[5] = brake_mech[BWD_TROLLEY]->getBrakeTorque();
+    Q_r[6] = brake_mech[BWD_TROLLEY]->getBrakeTorque();
 }
 
 //------------------------------------------------------------------------------

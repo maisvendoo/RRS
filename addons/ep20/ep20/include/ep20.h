@@ -24,6 +24,7 @@
 #include    "auxiliary-converter.h"
 #include    "ac-motor-compressor.h"
 #include    "ep20-signals.h"
+#include    "ep20-brake-mech.h"
 
 /*!
  * \class
@@ -117,6 +118,18 @@ private:
 
     /// Электро-воздухораспределитель (ЭВР)
     ElectroAirDistributor   *electroAirDistr;
+
+    enum
+    {
+        NUM_TROLLEYS = 3,
+        FWD_TROLLEY = 0,
+        MDL_TROLLEY = 1,
+        BWD_TROLLEY = 2
+    };
+
+    std::array<EP20BrakeMech *, NUM_TROLLEYS> brake_mech;
+    std::array<PneumoReley *, NUM_TROLLEYS> rd304;
+    std::array<PneumoSplitter *, 2> pSplit;
 
     /// Инициализация
     void initialization();
