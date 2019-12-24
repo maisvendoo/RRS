@@ -73,7 +73,14 @@ enum FeedbackSignals
     SWP2_POWER_7 = 23,
     SWP2_POWER_8 = 24,
     SWP2_POWER_9 = 25,
-    SWP2_POWER_10 = 26
+    SWP2_POWER_10 = 26,
+
+    VOLT_BAT = 27,
+    VOLT_EPT = 28,
+    VOLT_NETWORK = 29,
+    AMPER_1_2 = 30,
+    AMPER_3_4 = 31,
+    AMPER_5_6 = 32
 };
 
 #endif // HARDWARESIGNALS_H

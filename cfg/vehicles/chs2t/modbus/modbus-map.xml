@@ -43,4 +43,12 @@
 	</Slave>
 	-->
 
+	<Slave>
+		<id>5</id>
+		<Description>Панель амперметров и вольтметров</Description>
+		<Config>ampervolt</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
 </Config>
