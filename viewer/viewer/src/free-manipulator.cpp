@@ -83,7 +83,7 @@ bool FreeManipulator::performMovementRightMouseButton(const double eventTimeDelt
     double k1 = static_cast<double>(settings.free_cam_rot_coeff);
 
     angle_H += static_cast<float>(k1 * dx);
-    angle_V += static_cast<float>(k1 * dy);
+    angle_V -= static_cast<float>(k1 * dy);
 
     return false;
 }
