@@ -136,6 +136,7 @@ rem Генерируем рантайм Qt
 
 cd %RRS_DEV_ROOT%\bin
 windeployqt %RRS_DEV_ROOT%\bin\launcher.exe
+windeployqt %RRS_DEV_ROOT%\bin\launcher2.exe --qmldir ..\launcher2\qml
 windeployqt %RRS_DEV_ROOT%\bin\simulator.exe
 windeployqt %RRS_DEV_ROOT%\bin\viewer.exe
 windeployqt %RRS_DEV_ROOT%\bin\pathconv.exe
