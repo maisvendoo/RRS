@@ -1,6 +1,7 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
+<!--
 	<Slave>
 		<id>1</id>
 		<Description>Контроллер машиниста</Description>
@@ -8,6 +9,7 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+	-->
 <!--
 	<Slave>
 		<id>4</id>
@@ -47,6 +49,14 @@
 		<id>5</id>
 		<Description>Панель амперметров и вольтметров</Description>
 		<Config>ampervolt</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
+	<Slave>
+		<id>1</id>
+		<Description>Указатель позиций</Description>
+		<Config>pos-indicator</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>

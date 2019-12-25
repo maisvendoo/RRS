@@ -260,6 +260,26 @@ void CHS2T::initModbus()
     TC_manometer = new PhysToModbus();
     TC_manometer->load((modbusCfgDir + QDir::separator() + "manometer-TC").toStdString());
 
+    PtM_U_bat = new PhysToModbus();
+    PtM_U_bat->load((modbusCfgDir + QDir::separator() + "U-bat").toStdString());
+
+    EPT_U = new PhysToModbus();
+    EPT_U->load((modbusCfgDir + QDir::separator() + "EPT-U").toStdString());
+
+    Network_U = new PhysToModbus();
+    Network_U->load((modbusCfgDir + QDir::separator() + "Network-U").toStdString());
+
+    Amper_12 = new PhysToModbus();
+    Amper_12->load((modbusCfgDir + QDir::separator() + "Amper-12").toStdString());
+
+    Amper_34 = new PhysToModbus();
+    Amper_34->load((modbusCfgDir + QDir::separator() + "Amper-34").toStdString());
+
+    Amper_56 = new PhysToModbus();
+    Amper_56->load((modbusCfgDir + QDir::separator() + "Amper-56").toStdString());
+
+    Pos_Indicator = new PhysToModbus();
+    Pos_Indicator->load((modbusCfgDir + QDir::separator() + "Pos-Indicator").toStdString());
 }
 
 //------------------------------------------------------------------------------

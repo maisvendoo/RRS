@@ -111,6 +111,16 @@ private:
     PhysToModbus *GR_manometer;
     PhysToModbus *TC_manometer;
 
+    PhysToModbus *PtM_U_bat;
+    PhysToModbus *EPT_U;
+    PhysToModbus *Network_U;
+
+    PhysToModbus *Amper_12;
+    PhysToModbus *Amper_34;
+    PhysToModbus *Amper_56;
+
+    PhysToModbus *Pos_Indicator;
+
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
 

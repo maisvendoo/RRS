@@ -173,7 +173,12 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brakeRefRes->getPressure());
     feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(mainReservoir->getPressure());
     feedback_signals.analogSignal[4].cur_value = TC_manometer->getModbus(brakesMech[0]->getBrakeCylinderPressure());
-    feedback_signals.analogSignal[27].cur_value = ;
+
+    feedback_signals.analogSignal[27].cur_value = PtM_U_bat->getModbus(U_bat);
+    feedback_signals.analogSignal[28].cur_value = EPT_U->getModbus(ept_converter->getU_out());
+//    feedback_signals.analogSignal[29].cur_value =
+
+    feedback_signals.analogSignal[33].cur_value = Pos_Indicator->getModbus(stepSwitch->getPoz());
 }
 
 GET_VEHICLE(CHS2T)
