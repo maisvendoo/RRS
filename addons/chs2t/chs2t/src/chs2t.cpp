@@ -176,7 +176,23 @@ void CHS2T::hardwareOutput()
 
     feedback_signals.analogSignal[27].cur_value = PtM_U_bat->getModbus(U_bat);
     feedback_signals.analogSignal[28].cur_value = EPT_U->getModbus(ept_converter->getU_out());
-//    feedback_signals.analogSignal[29].cur_value =
+    double a = U_kr / 1000.0;
+    double b = Network_U->getModbus(a);
+    feedback_signals.analogSignal[29].cur_value = b;
+//            Network_U->getModbus(U_kr / 1000.0);
+
+    feedback_signals.analogSignal[30].cur_value = Amper_12->getModbus(motor->getI12() / 1000.0);
+
+    if (EDT)
+    {
+        feedback_signals.analogSignal[31].cur_value = Amper_34->getModbus(abs(generator->getIf()) / 1000.0);
+        feedback_signals.analogSignal[32].cur_value = Amper_56->getModbus(abs(generator->getIa()) / 1000.0);
+    }
+    else
+    {
+        feedback_signals.analogSignal[31].cur_value = Amper_34->getModbus(motor->getI34() / 1000.0);
+        feedback_signals.analogSignal[32].cur_value = Amper_56->getModbus(motor->getI56() / 1000.0);
+    }
 
     feedback_signals.analogSignal[33].cur_value = Pos_Indicator->getModbus(stepSwitch->getPoz());
 }

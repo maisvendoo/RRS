@@ -14,7 +14,7 @@ public:
 
     ~PhysToModbus();
 
-    double getModbus(double physValue) { return interpolate(physValue) * 1.0; }
+    double getModbus(double physValue) { return interpolate(physValue); }
 
     void load(const std::string &path);
 

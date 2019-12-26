@@ -28,13 +28,13 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 -->
-	<Slave>
+	<!-- <Slave>
 		<id>2</id>
 		<Description>Карандаш задатчика реостатного тормоза</Description>
 		<Config>reostat</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
-	</Slave>
+	</Slave> -->
 <!--
 	<Slave>
 		<id>3</id>
@@ -54,7 +54,7 @@
 	</Slave>
 
 	<Slave>
-		<id>1</id>
+		<id>6</id>
 		<Description>Указатель позиций</Description>
 		<Config>pos-indicator</Config>
 		<ConfigRequired>0</ConfigRequired>
