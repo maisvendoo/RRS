@@ -176,10 +176,7 @@ void CHS2T::hardwareOutput()
 
     feedback_signals.analogSignal[27].cur_value = PtM_U_bat->getModbus(U_bat);
     feedback_signals.analogSignal[28].cur_value = EPT_U->getModbus(ept_converter->getU_out());
-    double a = U_kr / 1000.0;
-    double b = Network_U->getModbus(a);
-    feedback_signals.analogSignal[29].cur_value = b;
-//            Network_U->getModbus(U_kr / 1000.0);
+    feedback_signals.analogSignal[29].cur_value = Network_U->getModbus(U_kr / 1000.0);
 
     feedback_signals.analogSignal[30].cur_value = Amper_12->getModbus(motor->getI12() / 1000.0);
 

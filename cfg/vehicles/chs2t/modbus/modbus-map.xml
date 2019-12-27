@@ -61,4 +61,12 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 
+	<Slave>
+		<id>17</id>
+		<Description>Кран машиниста</Description>
+		<Config>krm395</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
 </Config>

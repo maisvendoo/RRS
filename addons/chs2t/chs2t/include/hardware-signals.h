@@ -40,7 +40,16 @@ enum ControllerSignals
     EDT_SBROS = 26,
     LOCO_RELEASE = 27,
     EDT_RELEASE = 28,
-    EDT_BRAKE = 29
+    EDT_BRAKE = 29,
+
+
+    KRM_1 = 30,
+    KRM_2 = 31,
+    KRM_3 = 32,
+    KRM_4 = 33,
+    KRM_5 = 34,
+    KRM_6 = 35,
+    KRM_7 = 36
 };
 
 enum FeedbackSignals
