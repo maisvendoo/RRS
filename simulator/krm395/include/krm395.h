@@ -47,6 +47,8 @@ public:
 
     ~BrakeCrane395();
 
+    void setHandlePos(int &position);
+
     void setPosition(int &position);
 
     QString getPositionName();
