@@ -141,6 +141,10 @@ void CHS2T::step(double t, double dt)
     //Journal::instance()->info("Step horn");
     horn->setControl(keys, control_signals);
     horn->step(t, dt);
+
+    speed_meter->setOmega(wheel_omega[0]);
+    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->step(t, dt);
 }
 
 

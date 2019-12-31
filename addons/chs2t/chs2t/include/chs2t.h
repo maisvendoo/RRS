@@ -38,6 +38,7 @@
 #include    "ept-pass-control.h"
 #include    "convert-physics-to-modbus.h"
 #include    "chs2t-horn.h"
+#include    "sl2m.h"
 
 /*!
  * \class
@@ -230,6 +231,9 @@ private:
 
     /// Жалюзи пуско-тормозных резисторов
     Blinds      *blinds;
+
+    /// Скоростемер 3СЛ2М
+    SL2M        *speed_meter;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);

@@ -202,6 +202,10 @@ void CHS2T::initOtherEquipment()
 
     horn = new CHS2tHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &CHS2T::soundSetVolume);
+
+    speed_meter = new SL2M();
+    speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
+    connect(speed_meter, &SL2M::soundSetVolume, this, &CHS2T::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------
