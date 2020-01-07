@@ -44,6 +44,9 @@ private:
     QString     electro_airdist_module;
     QString     electro_airdist_config;
 
+    //QString     sound_module;
+    //QString     sound_config;
+
     void initialization();
 
     void step(double t, double dt);
@@ -55,6 +58,8 @@ private:
     void loadConfig(QString cfg_path);
 
     void initEPT();
+
+    //void initSounds();
 
     void stepEPT(double t, double dt);
 };

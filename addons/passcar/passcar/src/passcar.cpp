@@ -80,6 +80,7 @@ void PassCarrige::initialization()
     }
 
     initEPT();
+    emit soundPlay("Pass_5_10");
 }
 
 //------------------------------------------------------------------------------

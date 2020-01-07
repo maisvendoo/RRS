@@ -34,4 +34,5 @@ INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
 HEADERS += $$files(./include/*.h)
-SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(./src/*.cpp) \
+    src/passcar-sound.cpp

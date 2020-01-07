@@ -1,6 +1,7 @@
 #include	"sound-manager.h"
 #include    "CfgReader.h"
 #include    "filesystem.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -30,6 +31,7 @@ void SoundManager::loadSounds(const QString &vehicle_name)
             + vehicle_name.toStdString();
 
     std::string path = soundsDir + fs.separator() + "sounds.xml";
+    Journal::instance()->info("Loaded sound config file: " + QString(path.c_str()));
 
     CfgReader cfg;
 
