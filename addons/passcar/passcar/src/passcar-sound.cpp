@@ -1,10 +1,25 @@
-//#include    "passcar.h"
+#include    "passcar.h"
+#include    "filesystem.h"
+#include    "sound-config.h"
 
-//#include    <QDir>
+#include    <QDir>
 
-//void PassCarrige::initSounds()
-//{
+//------------------------------------------------------------------------------
+// Инициализация звуков, воспроизведение их на нулевой громкости
+//------------------------------------------------------------------------------
+void PassCarrige::initSounds()
+{
+    emit soundPlay("Pass_5_10");
+}
 
-    //soundMan->play();
-    //connect(, &BrakeCrane::soundPlay, this, &VL60pk::soundPlay);
-//}
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PassCarrige::soundStep()
+{
+    if (velocity * 3.6 > 5) {
+        emit soundSetVolume("Pass_5_10", 100);
+    } else {
+        emit soundSetVolume("Pass_5_10", 0);
+    }
+}

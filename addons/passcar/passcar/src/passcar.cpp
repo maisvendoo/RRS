@@ -80,7 +80,7 @@ void PassCarrige::initialization()
     }
 
     initEPT();
-    emit soundPlay("Pass_5_10");
+    initSounds();
 }
 
 //------------------------------------------------------------------------------
@@ -140,7 +140,9 @@ void PassCarrige::step(double t, double dt)
     DebugMsg += airdist->getDebugMsg();
 
     DebugMsg += QString(" Тепм. ДР.: %1")
-            .arg(auxRate, 9, 'f', 4);   
+            .arg(auxRate, 9, 'f', 4);
+
+    soundStep();
 }
 
 //------------------------------------------------------------------------------
