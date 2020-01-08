@@ -48,7 +48,7 @@ private:
 
     QString     soundDir;
 
-    QMap<QString, int> sounds;
+    QMap<int, QString> sounds;
 
     void initialization();
 
@@ -65,6 +65,10 @@ private:
     void initSounds();
 
     void soundStep();
+
+    void getSoundList();
+
+    void playPasscarSound(QString sound_name);
 
     void stepEPT(double t, double dt);
 };
