@@ -15,6 +15,7 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , max_pos(1.0)
   , pos_duration(1.0)
   , dir(0)
+  , positions({0.0, 0.325, 0.5, 0.752, 1.0})
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
 {
     std::fill(K.begin(), K.end(), 0.0);
@@ -185,6 +186,8 @@ void LocoCrane254::stepKeysControl(double t, double dt)
             dir = 0;
     }
 
+    int old_pos_n = pos_num;
+
     pos += dir * pos_duration * dt;
 
     pos = cut(pos, min_pos, max_pos);
@@ -219,6 +222,33 @@ void LocoCrane254::stepKeysControl(double t, double dt)
             pos = step_pressures[4] / max_step;
         }
     }
+
+    pos_num = getPositionNumber();
+
+    if (pos_num != old_pos_n && pos_num != -1)
+        emit soundPlay("254-chelk");
+}
+
+//------------------------------------------------------------------------------
+// Позиция крана по канавкам (только для звуков)
+//------------------------------------------------------------------------------
+int LocoCrane254::getPositionNumber() const
+{
+    int pos_n = -1;
+
+    if (pos == 0.0)
+        return 0;
+
+    if (pos == 1.0)
+        return 4;
+
+    for (uint i = 0; i < positions.size() - (dir == -1 ? 2 : 1); ++i)
+    {
+        if (pos >= positions[i] && pos <= positions[i+1])
+            pos_n = static_cast<int>(i);
+    }
+
+    return pos_n;
 }
 
 GET_LOCO_CRANE(LocoCrane254)

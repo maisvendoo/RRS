@@ -30,6 +30,9 @@ public:
 
     double getAirDistribPressure() const;
 
+    /// Получение номера позиции
+    int getPositionNumber() const;
+
     void init(double pTM, double pFL);
 
 private:
@@ -51,6 +54,10 @@ private:
     double pos_duration;
 
     int dir;
+
+    int pos_num;
+
+    std::array<double, NUM_STEPS> positions;
 
     std::array<double, NUM_STEPS> step_pressures;
 
