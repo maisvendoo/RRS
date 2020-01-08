@@ -1,6 +1,5 @@
 #include    "passcar.h"
 #include    "filesystem.h"
-#include    "sound-config.h"
 
 #include    <QDir>
 

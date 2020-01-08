@@ -31,7 +31,6 @@ INCLUDEPATH += ../../../simulator/solver/include
 INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
-INCLUDEPATH += ../../../simulator/sound-manager/include
 INCLUDEPATH += ../../../filesystem/include
 
 HEADERS += $$files(./include/*.h)

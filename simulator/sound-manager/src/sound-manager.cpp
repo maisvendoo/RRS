@@ -48,8 +48,6 @@ void SoundManager::loadSounds(const QString &vehicle_name)
             cfg.getInt(secNode, "InitVolume", sound_config.init_volume);
             cfg.getInt(secNode, "MaxVolume", sound_config.max_volume);
 
-            Journal::instance()->info("Loading sounds, config name: " + QString(sound_config.name));
-
             double tmp;
             cfg.getDouble(secNode, "InitPitch", tmp);
             sound_config.init_pitch = static_cast<float>(tmp);

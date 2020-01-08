@@ -369,14 +369,11 @@ bool Train::loadTrain(QString cfg_path)
                 payload_coeff = 0;
             }
 
-            // Loading sounds            
-            soundMan->loadSounds(module_cfg_name);
-
             for (int i = 0; i < n_vehicles; i++)
             {
                 Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
                                                fs.separator() +
-                                               relModulePath);                
+                                               relModulePath);
 
                 if (vehicle == Q_NULLPTR)
                 {
@@ -411,6 +408,9 @@ bool Train::loadTrain(QString cfg_path)
 
                 vehicle->setIndex(index);
                 index = ode_order;
+
+                // Loading sounds
+                soundMan->loadSounds(vehicle->getSoundsDir());
 
                 connect(vehicle, &Vehicle::soundPlay, soundMan, &SoundManager::play, Qt::DirectConnection);
                 connect(vehicle, &Vehicle::soundStop, soundMan, &SoundManager::stop, Qt::DirectConnection);

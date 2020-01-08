@@ -149,6 +149,9 @@ public:
 
     QString getDebugMsg() const;
 
+    /// vehicle get sounds directory
+    QString getSoundsDir() const;
+
     /// Init vehicle brake devices
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -195,6 +198,8 @@ protected:
     double  payload_coeff;
     /// Full vehicle mass
     double  full_mass;
+    /// Vehicle sounds directory
+    QString soundDirectory;
 
     /// Length between coupling's axis
     double  length;
