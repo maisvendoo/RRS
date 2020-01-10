@@ -1,0 +1,44 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <HoldingRegister>
+        <Address>0</Address>
+        <Index>0</Index>
+    </HoldingRegister>
+
+    <HoldingRegister>
+        <Address>1</Address>
+        <Index>1</Index>
+    </HoldingRegister>
+
+    <!-- Манометр ТМ -->
+    <HoldingRegister>
+        <Address>2</Address>
+        <Index>0</Index>
+    </HoldingRegister>
+
+    <!-- Манометр УР -->
+    <HoldingRegister>
+        <Address>3</Address>
+        <Index>1</Index>
+    </HoldingRegister>
+
+    <!-- Манометр ЗТ -->
+    <HoldingRegister>
+        <Address>4</Address>
+        <Index>2</Index>
+    </HoldingRegister>
+
+    <!-- Манометр ГР -->
+    <HoldingRegister>
+        <Address>5</Address>
+        <Index>3</Index>
+    </HoldingRegister>
+
+    <!-- Манометр ТЦ -->
+    <HoldingRegister>
+        <Address>6</Address>
+        <Index>4</Index>
+    </HoldingRegister>
+
+</Config>

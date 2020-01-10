@@ -369,7 +369,7 @@ bool Train::loadTrain(QString cfg_path)
                 payload_coeff = 0;
             }
 
-            // Loading sounds
+            // Loading sounds            
             soundMan->loadSounds(module_cfg_name);
 
             for (int i = 0; i < n_vehicles; i++)

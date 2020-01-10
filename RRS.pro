@@ -25,6 +25,7 @@ SUBDIRS += ./addons/chs2t
 SUBDIRS += ./addons/ep20
 
 SUBDIRS += ./launcher
+SUBDIRS += ./launcher2
 
 SUBDIRS += ./viewer
 

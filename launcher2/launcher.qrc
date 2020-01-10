@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/TripSettingsPage.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/BaseElements/BasePage.qml</file>
+        <file>qml/BaseElements/Constants.qml</file>
+        <file>qml/CustomElements/CustomComboBox.qml</file>
+        <file>qml/BaseElements/BaseDelegate.qml</file>
+        <file>qml/ImageComponent.qml</file>
+        <file>qml/ApplicationIsRunning.qml</file>
+        <file>qml/BaseElements/BaseButton.qml</file>
+        <file>qml/CustomElements/CustomSpinBox.qml</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>images/RRS_logo.png</file>
+        <file>images/RRS_logo.ico</file>
+    </qresource>
+    <qresource prefix="/translation">
+        <file>translations/launcher.ru_RU.qm</file>
+    </qresource>
+</RCC>

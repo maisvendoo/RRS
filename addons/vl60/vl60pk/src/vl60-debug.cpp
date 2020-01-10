@@ -19,4 +19,6 @@ void VL60pk::debugPrint(double t)
             .arg(vu[VU1]->getU_out(), 6, 'f', 1)
             .arg(velocity * Physics::kmh, 6, 'f', 1)
             .arg(railway_coord / 1000.0, 7, 'f', 2);
+
+    //DebugMsg = brake_crane->getDebugMsg();
 }

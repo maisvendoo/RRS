@@ -247,8 +247,40 @@ void Master::writeCoils(Slave *slave)
 
     for (int i = 0; i < slave->coil.size(); ++i)
     {
-        unit.setValue(i, static_cast<quint16>(slave->coil[i].value));
+        unit.setValue(i, static_cast<quint16>(slave->coil[i].cur_value));
     }
+
+    QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
+
+    if (reply != Q_NULLPTR)
+    {
+        if (!reply->isFinished())
+        {
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+
+            connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
+        }
+        else
+        {
+            reply->deleteLater();
+        }
+    }
+    else
+    {
+        slave->incErrosCount();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Master::writeCoil(Slave* slave, slave_data_t coil)
+{
+    if (!slave->isConnected())
+        return;
+
+    QModbusDataUnit unit(QModbusDataUnit::Coils, coil.address, 1);
+    unit.setValue(0, static_cast<quint16>(coil.cur_value));
 
     QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
 
@@ -284,8 +316,38 @@ void Master::writeHoldingRegisters(Slave *slave)
 
     for (int i = 0; i < slave->holding_register.size(); ++i)
     {
-        unit.setValue(i, static_cast<quint16>(slave->holding_register[i].value));
+        unit.setValue(i, static_cast<quint16>(slave->holding_register[i].cur_value));
     }
+
+    QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
+
+    if (reply != Q_NULLPTR)
+    {
+        if (!reply->isFinished())
+        {
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+
+            connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
+        }
+        else
+        {
+            reply->deleteLater();
+        }
+    }
+    else
+    {
+        slave->incErrosCount();
+    }
+}
+
+void Master::writeHoldingRegister(Slave *slave, slave_data_t hreg)
+{
+    if (!slave->isConnected())
+        return;
+
+    QModbusDataUnit unit(QModbusDataUnit::HoldingRegisters, hreg.address, 1);
+
+    unit.setValue(0, hreg.cur_value);
 
     QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
 

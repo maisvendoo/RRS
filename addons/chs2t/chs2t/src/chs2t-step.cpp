@@ -142,34 +142,17 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
 
     for (size_t i = 0; i < motor_compressor.size(); ++i)
     {
-        double mk_on = 0;
-        int mk_switcher_state = mk_switcher[i]->getState();
+        double mk_on = 0.0;
 
-        switch (mk_switcher[i]->getState())
+        if ((mk_switcher[i]->getState() == 2 && static_cast<bool>(pressReg->getState())) ||
+             mk_switcher[i]->getState() == 3)
         {
-        case 0:
-
-            mk_on = 0;
-            break;
-
-        case 1:
-
-            mk_on = 0;
-            break;
-
-        case 2:
-
-            mk_on = pressReg->getState();
-            break;
-
-        case 3:
-
             mk_on = 1.0;
-            break;
         }
-
-//        mk_on = 1.0 * ((switcherState == 2 && static_cast<bool>(pressReg->getState()))
-//                                  || switcherState == 3);
+        else
+        {
+            mk_on = 0.0;
+        }
 
         motor_compressor[i]->setU(bv->getU_out() * mk_on);
         motor_compressor[i]->setPressure(mainReservoir->getPressure());
@@ -199,7 +182,7 @@ void CHS2T::stepBrakesControl(double t, double dt)
     p0 = brakeCrane->getBrakePipeInitPressure();
     brakeCrane->step(t, dt);    
 
-    handleEDT->setControl(keys);
+    handleEDT->setControl(keys, control_signals);
     handleEDT->step(t, dt);
 }
 
