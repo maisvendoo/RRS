@@ -155,7 +155,7 @@ void EP20::step(double t, double dt)
     stepBrakeControls(t, dt);
 
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5, KrM: %6, pTC_2: %7, pTC_1: %8 pZR: %9")
+    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5, KrM: %6, pTC_2: %7, pTC_1: %8 pZR: %9 pos: %10")
             .arg(t, 10, 'f', 2)
             .arg(auxConv[3]->getU2(), 5, 'f', 1)
             .arg(main_reservoir->getPressure(), 4, 'f', 2)
@@ -164,7 +164,8 @@ void EP20::step(double t, double dt)
             .arg(krm->getPositionName(), 4)
             .arg(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
             .arg(brake_mech[BWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(spareReservoir->getPressure(), 4, 'f', 2);
+            .arg(spareReservoir->getPressure(), 4, 'f', 2)
+            .arg(kvt->getHandlePosition(), 4, 'f', 2);
 
     stepSignals();
     //________________________________________________

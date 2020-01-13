@@ -159,11 +159,9 @@ void LocoCrane224::load_config(CfgReader &cfg)
         step_pressures[i] = step_press;
     }
 
-    double max_press = *(step_pressures.end() - 1);
-
     for (size_t i = 0; i < step_pressures.size(); ++i)
     {
-        fixed_pos[i] = step_pressures[i] / max_press;
+        fixed_pos[i] = static_cast<double>(i) / (NUM_STEPS - 1);
     }
 
     cfg.getDouble(secName, "MinPos", min_pos);
