@@ -81,6 +81,11 @@ float ProtectiveDevice::getLampState() const
     return lamp_state;
 }
 
+bool ProtectiveDevice::getState() const
+{
+    return static_cast<bool>(lamp_state);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

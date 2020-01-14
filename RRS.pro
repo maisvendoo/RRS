@@ -22,7 +22,7 @@ SUBDIRS += ./addons/vl60
 SUBDIRS += ./addons/tep70
 #SUBDIRS += ./addons/chs4t
 SUBDIRS += ./addons/chs2t
-#SUBDIRS += ./addons/ep20
+SUBDIRS += ./addons/ep20
 
 SUBDIRS += ./launcher
 SUBDIRS += ./launcher2

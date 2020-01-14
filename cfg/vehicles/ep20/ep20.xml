@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Vehicle>
-		
-		<EmptyMass>129000</EmptyMass>
-		<PayloadMass>0</PayloadMass>
-		<Length>22.532</Length>
-		<WheelDiameter>1.25</WheelDiameter>
-		<MainResist>default</MainResist>
-		<NumAxis>6</NumAxis>				
-        <WheelInertia>2.0</WheelInertia>                
+
+		<EmptyMass>54200</EmptyMass>
+		<PayloadMass>4500</PayloadMass>
+		<Length>25.0</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>passcar</MainResist>
+		<NumAxis>4</NumAxis>		
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+                <WheelInertia>2.0</WheelInertia>
+
+                <ExtModelName>ep20/EP20_2.osgt</ExtModelName>
+				<CabineModel>ep20/Cab.osgt</CabineModel>
                 
+
+                
+		<DriverPos>0.6 9.0 3.35</DriverPos>
+                
+
 	</Vehicle>
 </Config>
-
- 
