@@ -50,6 +50,8 @@ void EP20::initialization()
 
     // Вызываем метод
     initBrakeControls(modules_dir);
+
+    initKMB2();
 }
 
 //------------------------------------------------------------------------------
@@ -64,6 +66,17 @@ void EP20::initMPCS()
     mpcs->setStoragePath(config_dir + QDir::separator() + "storage" + QDir::separator());
 
     mpcs->init();
+}
+
+
+//------------------------------------------------------------------------------
+// Инициализация КМБ2
+//------------------------------------------------------------------------------
+void EP20::initKMB2()
+{
+    kmb2 = new KMB2();
+
+    kmb2->read_custom_config(config_dir + QDir::separator() + "kmb2");
 }
 
 //------------------------------------------------------------------------------
@@ -154,20 +167,34 @@ void EP20::step(double t, double dt)
 
     stepBrakeControls(t, dt);
 
+    stepKMB2(t, dt);
+
     // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
-    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5, KrM: %6, pTC_2: %7, pTC_1: %8 pZR: %9 pos: %10")
+//    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5, KrM: %6, pTC_2: %7, pTC_1: %8 pZR: %9 pos: %10 trac_pos: %11")
+//            .arg(t, 10, 'f', 2)
+//            .arg(auxConv[3]->getU2(), 5, 'f', 1)
+//            .arg(main_reservoir->getPressure(), 4, 'f', 2)
+//            .arg(krm->getEqReservoirPressure(), 4, 'f', 2)
+//            .arg(pTM, 4, 'f', 2)
+//            .arg(krm->getPositionName(), 4)
+//            .arg(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
+//            .arg(brake_mech[BWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
+//            .arg(spareReservoir->getPressure(), 4, 'f', 2)
+//            .arg(kvt->getHandlePosition(), 4, 'f', 2);
+
+
+
+    DebugMsg = QString("t: %1 s, Reverse_State: %2, Trac_Level: %3, Vel_Level: %4, Reverse_Dir: %5, Trac_Pos: %6, Vel_Pos: %7")
             .arg(t, 10, 'f', 2)
-            .arg(auxConv[3]->getU2(), 5, 'f', 1)
-            .arg(main_reservoir->getPressure(), 4, 'f', 2)
-            .arg(krm->getEqReservoirPressure(), 4, 'f', 2)
-            .arg(pTM, 4, 'f', 2)
-            .arg(krm->getPositionName(), 4)
-            .arg(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(brake_mech[BWD_TROLLEY]->getBrakeCylinderPressure(), 4, 'f', 2)
-            .arg(spareReservoir->getPressure(), 4, 'f', 2)
-            .arg(kvt->getHandlePosition(), 4, 'f', 2);
+            .arg(kmb2->getReverseState(), 2)
+            .arg(kmb2->getTractionLevel(), 2)
+            .arg(kmb2->getVelocityLevel(), 2)
+            .arg(kmb2->getReverseDir(), 2)
+            .arg(kmb2->getTractionPosition(), 2)
+            .arg(kmb2->getVelocityPosition(), 2);
 
     stepSignals();
+
     //________________________________________________
 
 //    .arg(t, 10, 'f', 2)
@@ -378,6 +405,12 @@ void EP20::stepBrakeControls(double t, double dt)
 
     Q_r[5] = brake_mech[BWD_TROLLEY]->getBrakeTorque();
     Q_r[6] = brake_mech[BWD_TROLLEY]->getBrakeTorque();
+}
+
+void EP20::stepKMB2(double t, double dt)
+{
+    kmb2->setControl(keys);
+    kmb2->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

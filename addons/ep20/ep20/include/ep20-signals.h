@@ -6,6 +6,11 @@ enum
     KONTROLLER = 0,
     RUK_KRM130 = 1,
     RUK_KVT224 = 2,
+    KMB2_Real = 3,
+    KMB2_Fake = 4,
+    KeyCard_Fake = 5,
+    KeyCard_Low = 6,
+
 
     STRELKA_pTM = 10,
     STRELKA_pGR = 11,

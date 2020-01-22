@@ -39,7 +39,7 @@ LocoCrane224::~LocoCrane224()
 //------------------------------------------------------------------------------
 double LocoCrane224::getHandlePosition() const
 {
-    return pos;
+    return cur_pos;
 }
 
 //------------------------------------------------------------------------------
@@ -204,27 +204,27 @@ void LocoCrane224::stepKeysControl(double t, double dt)
     {
         if (getKeyState(KEY_8))
         {
-            pos = fixed_pos[0];
+            cur_pos = fixed_pos[0];
         }
 
         if (getKeyState(KEY_9))
         {
-            pos = fixed_pos[1];
+            cur_pos = fixed_pos[1];
         }
 
         if (getKeyState(KEY_0))
         {
-            pos = fixed_pos[2];
+            cur_pos = fixed_pos[2];
         }
 
         if (getKeyState(KEY_Minus))
         {
-            pos = fixed_pos[3];
+            cur_pos = fixed_pos[3];
         }
 
         if (getKeyState(KEY_Equals))
         {
-            pos = fixed_pos[4];
+            cur_pos = fixed_pos[4];
         }
     }
 }

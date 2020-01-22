@@ -9,4 +9,11 @@ void EP20::stepSignals()
 
     analogSignal[RUK_KRM130] = krm->getHandlePosition();
     analogSignal[RUK_KVT224] = static_cast<float>(kvt->getHandlePosition());
+
+    analogSignal[KMB2_Real] = kmb2->getTractionPosition();
+    analogSignal[KMB2_Fake] = kmb2->getVelocityPosition();
+
+    analogSignal[KeyCard_Fake] = kmb2->getPovorot();
+    analogSignal[KeyCard_Low] = kmb2->getS3();
+//    analogSignal[KeyCard_Fake] = kmb2->getReverseDir();
 }
