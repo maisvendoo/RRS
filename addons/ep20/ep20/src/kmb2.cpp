@@ -9,11 +9,11 @@ KMB2::KMB2(QObject *parent)
     : reverse_dir(0),
       traction_pos(0),
       velocity_pos(0),
-      traction_level(0),
-      velocity_level(0),
+      traction_level(0.0),
+      velocity_level(0.0),
       reverse_state(0),
-      traction_rate(0),
-      velocity_rate(0),
+      traction_rate(0.0),
+      velocity_rate(0.0),
       T(0.5),
       S1(0),
       S2(0),
@@ -47,14 +47,6 @@ float KMB2::getReverseDir()
     return reverse_dir;
 }
 
-
-
-
-
-
-
-
-
 //------------------------------------------------------------------------------
 // Деструктор класса
 //------------------------------------------------------------------------------
@@ -74,7 +66,7 @@ float KMB2::getVelocityPosition()
 //------------------------------------------------------------------------------
 // Деструктор класса
 //------------------------------------------------------------------------------
-float KMB2::getTractionLevel()
+double KMB2::getTractionLevel()
 {
     return  traction_level;
 }
@@ -82,7 +74,7 @@ float KMB2::getTractionLevel()
 //------------------------------------------------------------------------------
 // Деструктор класса
 //------------------------------------------------------------------------------
-float KMB2::getVelocityLevel()
+double KMB2::getVelocityLevel()
 {
     return velocity_level;
 }
@@ -95,7 +87,7 @@ float KMB2::getReverseState()
     return  reverse_state;
 }
 
-double KMB2::getPovorot()
+double KMB2::getTurn()
 {
     return getY(0);
 }
@@ -107,7 +99,7 @@ double KMB2::getS3()
 
 void KMB2::preStep(state_vector_t &Y, double t)
 {
-    S1 = Y[0] - 0.95;
+    S1 = Y[0] - 0.995;
     S2 = hs_p(S1);
     S3 = S2 + pf(reverse_state);
 }
@@ -121,8 +113,8 @@ void KMB2::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
-    cfg.getInt(secName, "traction_rate", traction_rate);
-    cfg.getInt(secName, "velocity_rate", velocity_rate);
+    cfg.getDouble(secName, "traction_rate", traction_rate);
+    cfg.getDouble(secName, "velocity_rate", velocity_rate);
 }
 
 //------------------------------------------------------------------------------
@@ -166,10 +158,12 @@ void KMB2::stepKeysControl(double t, double dt)
     }
     if(getKeyState(KEY_D))
     {
-        traction_pos = -1;
+        if(!isControl())
+            traction_pos = -1;
     }
     if (!getKeyState(KEY_A) && !getKeyState(KEY_D))
         traction_pos = 0;
+
 
     // Положение скорости
     if(getKeyState(KEY_Q))
@@ -204,10 +198,10 @@ void KMB2::levelTimerHandler()
         return;
 
     traction_level += traction_pos * traction_rate;
-    traction_level = cut(traction_level, -1, 1);
+    traction_level = cut(traction_level, -1.0, 1.0);
 
     velocity_level += velocity_pos * velocity_rate;
-    velocity_level = cut(velocity_level, 0, 1);
+    velocity_level = cut(velocity_level, 0.0, 1.0);
 }
 
 void KMB2::reverseTimerHandler()
