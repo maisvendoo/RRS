@@ -584,6 +584,11 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
 
             loadDisplayModule(display_config, dc, model);
 
+            if (dc->display == nullptr)
+                continue;
+
+            dc->display->setConfigDir(QString(vehicles_config_dir.c_str()));
+
             displays.push_back(dc);
         }
     }

@@ -26,13 +26,18 @@ public:
 
     display_signals_t getOutputSignals();
 
+    void setConfigDir(QString config_dir);
+
 protected:
 
     /// Входные сигналы, отображаемые на интерфейсе дисплея и управляющие его поведением
-    display_signals_t input_signals;
+    display_signals_t   input_signals;
 
-    /// Выходные (командные) сигнала, передаваемые с дисплея
-    display_signals_t output_signals;
+    /// Выходные (командные) сигналы, передаваемые с дисплея
+    display_signals_t   output_signals;
+
+    /// Путь к каталогу конфигурации
+    QString             config_dir;
 };
 
 //------------------------------------------------------------------------------

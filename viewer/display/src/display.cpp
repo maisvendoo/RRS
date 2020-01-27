@@ -59,6 +59,14 @@ display_signals_t AbstractDisplay::getOutputSignals()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void AbstractDisplay::setConfigDir(QString config_dir)
+{
+    this->config_dir = config_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AbstractDisplay *loadDisplay(QString lib_path)
 {
     AbstractDisplay *display = Q_NULLPTR;
