@@ -15,5 +15,7 @@ void EP20::stepSignals()
 
     analogSignal[KeyCard_Fake] = kmb2->getPovorot();
     analogSignal[KeyCard_Low] = kmb2->getS3();
-//    analogSignal[KeyCard_Fake] = kmb2->getReverseDir();
+
+    analogSignal[BLOK_TEST] = static_cast<float>(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure());
+
 }

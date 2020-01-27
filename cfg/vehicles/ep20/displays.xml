@@ -5,7 +5,7 @@
 	<Display>
 		<Module>blok-display</Module>
 		<SurfaceName>BLOK_display</SurfaceName>
-	</Display>
+	</Display> 
 
 
 </Config>

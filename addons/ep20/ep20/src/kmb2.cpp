@@ -107,7 +107,7 @@ double KMB2::getS3()
 
 void KMB2::preStep(state_vector_t &Y, double t)
 {
-    S1 = Y[0] - 0.95;
+    S1 = Y[0] - 0.99;
     S2 = hs_p(S1);
     S3 = S2 + pf(reverse_state);
 }

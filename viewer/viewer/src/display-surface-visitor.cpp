@@ -3,10 +3,11 @@
 #include    <osgQt/QWidgetImage>
 #include    <osgViewer/ViewerEventHandlers>
 #include    <osg/Material>
+#include    <osg/Texture2D>
 
-DisplaySurfaceVisitor::DisplaySurfaceVisitor(osgQt::QWidgetImage *widgetImage)
+DisplaySurfaceVisitor::DisplaySurfaceVisitor(display_container_t *dc)
     : osg::NodeVisitor()
-    , widgetImage(widgetImage)
+    , dc(dc)
 
 {
 
@@ -14,24 +15,17 @@ DisplaySurfaceVisitor::DisplaySurfaceVisitor(osgQt::QWidgetImage *widgetImage)
 
 void DisplaySurfaceVisitor::apply(osg::Geode &geode)
 {
-    osgViewer::InteractiveImageHandler *handler = new osgViewer::InteractiveImageHandler(widgetImage);
-    geode.setEventCallback(handler);
-    geode.setCullCallback(handler);
+    dc->widgetImage = new osgQt::QWidgetImage(dc->display);
+    dc->texture = new osg::Texture2D(dc->widgetImage.get());
+    dc->texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+    dc->texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
-    for (unsigned int i = 0; i < geode.getNumDrawables(); ++i)
-    {
-        /*osg::Drawable *drawable = geode.getDrawable(i);
-        osg::ref_ptr<osg::StateSet> stateset = new osg::StateSet(*drawable->getOrCreateStateSet(), osg::CopyOp::DEEP_COPY_STATESETS);
-        osg::ref_ptr<osg::Material> mat = new osg::Material;
+    osg::StateSet *stateset = geode.getOrCreateStateSet();
+    stateset->setTextureAttributeAndModes(0, dc->texture.get());
 
-        mat->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        mat->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-        stateset->setAttribute(mat.get());
-        drawable->setStateSet(stateset.get());
-
-        int zu = 0;*/
-    }
+    dc->handler = new osgViewer::InteractiveImageHandler(dc->widgetImage.get());
+    geode.getDrawable(0)->setEventCallback(dc->handler.get());
+    geode.getDrawable(0)->setCullCallback(dc->handler.get());
 
     traverse(geode);
 }

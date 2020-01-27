@@ -3,6 +3,9 @@
 
 #include    "display.h"
 
+#include    <QTimer>
+#include    <QLabel>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -17,7 +20,14 @@ public:
 
 private:
 
+    QTimer  *updateTimer;
+    QLabel  *test;
 
+
+
+private slots:
+
+    void slotUpdateTimer();
 };
 
 #endif // BLOK_DISPLAY_H

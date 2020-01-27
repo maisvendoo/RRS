@@ -6,10 +6,10 @@
 
 #include    "display-surface-visitor.h"
 
-DisplayVisitor::DisplayVisitor(AbstractDisplay *display, QString surfaceName)
+DisplayVisitor::DisplayVisitor(display_container_t *dc, display_config_t display_config)
     : osg::NodeVisitor()
-    , display(display)
-    , surfaceName(surfaceName)
+    , dc(dc)
+    , display_config(display_config)
 {
 
 }
@@ -18,21 +18,9 @@ void DisplayVisitor::apply(osg::Transform &transform)
 {
     osg::MatrixTransform *matrix_trans = static_cast<osg::MatrixTransform *>(&transform);
 
-    if (matrix_trans->getName() == surfaceName.toStdString())
+    if (matrix_trans->getName() == display_config.surface_name.toStdString())
     {
-        osg::ref_ptr<osgQt::QWidgetImage> widgetImage = new osgQt::QWidgetImage(display);
-
-        osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(widgetImage.get());
-
-        texture->setResizeNonPowerOfTwoHint(false);
-        texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
-        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-
-        osg::StateSet *stateset = matrix_trans->getOrCreateStateSet();
-        stateset->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
-
-        DisplaySurfaceVisitor dsv(widgetImage.get());
+        DisplaySurfaceVisitor dsv(dc);
         dsv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
         matrix_trans->accept(dsv);
     }

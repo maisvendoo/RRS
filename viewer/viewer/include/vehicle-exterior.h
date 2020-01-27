@@ -3,7 +3,7 @@
 
 #include    <osg/MatrixTransform>
 #include    "animations-list.h"
-#include    "display.h"
+#include    "display-container.h"
 
 //------------------------------------------------------------------------------
 //

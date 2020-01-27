@@ -5,20 +5,20 @@
 #include    <osg/NodeVisitor>
 #include    <QString>
 
-#include    "display.h"
+#include    "display-container.h"
 
 class DisplayVisitor : public osg::NodeVisitor
 {
 public:
 
-    DisplayVisitor(AbstractDisplay *display, QString surfaceName);
+    DisplayVisitor(display_container_t *dc, display_config_t display_config);
 
     virtual void apply(osg::Transform &transform);
 
 private:
 
-    AbstractDisplay *display;
-    QString         surfaceName;
+    display_container_t *dc;
+    display_config_t    display_config;
 };
 
 #endif // DISPLAY_VISITOR_H

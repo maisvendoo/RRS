@@ -113,5 +113,7 @@ INCLUDEPATH += ../library/include
 INCLUDEPATH += ../display/include
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.h) \
+    include/display-config.h \
+    include/display-container.h
 SOURCES += $$files(./src/*.cpp)

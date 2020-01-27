@@ -15,7 +15,9 @@ enum
     STRELKA_pTM = 10,
     STRELKA_pGR = 11,
     STRELKA_pTC = 12,
-    STRELKA_pUR = 13
+    STRELKA_pUR = 13,
+
+    BLOK_TEST = 100
 };
 
 #endif // EP20_SIGNALS_H

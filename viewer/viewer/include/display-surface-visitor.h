@@ -1,7 +1,7 @@
 #ifndef     DISPLAY_SURFACE_VISITOR_H
 #define     DISPLAY_SURFACE_VISITOR_H
 
-#include    "display.h"
+#include    "display-container.h"
 
 #include    <osg/Geode>
 #include    <osg/NodeVisitor>
@@ -12,13 +12,13 @@ class DisplaySurfaceVisitor : public osg::NodeVisitor
 {
 public:
 
-    DisplaySurfaceVisitor(osgQt::QWidgetImage *widgetImage);
+    DisplaySurfaceVisitor(display_container_t *dc);
 
     virtual void apply(osg::Geode &geode);
 
 private:
 
-    osgQt::QWidgetImage *widgetImage;
+    display_container_t *dc;
 };
 
 #endif // DISPLAY_VISITOR_H

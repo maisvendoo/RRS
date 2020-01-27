@@ -346,8 +346,8 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 
         for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
         {
-            AbstractDisplay *display = *it;
-            display->setInputSignals(nd.sd.back().te[i].analogSignal);
+            display_container_t *dc = *it;
+            dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
         }
     }    
 }
@@ -571,16 +571,20 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
 
         if (display_node->name == "Display")
         {
+            display_config_t display_config;
+
             osgDB::XmlNode *module_node = displays_cfg.findSection(display_node, "Module");
             std::string module_path = fs.combinePath(modules_dir, module_node->contents);
-            QString mp(module_path.c_str());
+            display_config.module_name = QString(module_path.c_str());
 
             osgDB::XmlNode *surface_name_node = displays_cfg.findSection(display_node, "SurfaceName");
-            QString sn(surface_name_node->contents.c_str());
+            display_config.surface_name = QString(surface_name_node->contents.c_str());
 
-            AbstractDisplay *display = loadDisplayModule(mp, sn, model);
+            display_container_t *dc = new display_container_t();
 
-            displays.push_back(display);
+            loadDisplayModule(display_config, dc, model);
+
+            displays.push_back(dc);
         }
     }
 }
