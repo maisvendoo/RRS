@@ -25,6 +25,5 @@ CONFIG(debug, debug|release) {
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../common-headers
 
-HEADERS += $$files(./include/*.h) \
-    include/display-types.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

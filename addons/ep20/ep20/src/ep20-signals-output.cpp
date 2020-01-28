@@ -16,6 +16,12 @@ void EP20::stepSignals()
     analogSignal[KeyCard_Fake] = kmb2->getPovorot();
     analogSignal[KeyCard_Low] = kmb2->getS3();
 
-    analogSignal[BLOK_TEST] = static_cast<float>(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure());
+    analogSignal[BLOK_TC_PRESS] = static_cast<float>(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure());
+    analogSignal[BLOK_TM_PRESS] = static_cast<float>(pTM);
+    analogSignal[BLOK_UR_PRESS] = static_cast<float>(krm->getEqReservoirPressure());
 
+    analogSignal[BLOK_RAILWAY_COORD] = static_cast<float>(railway_coord / 1000.0);
+    analogSignal[BLOK_VELOCITY] = static_cast<float>(velocity * Physics::kmh);
+    analogSignal[BLOK_VELOCITY_CURRENT_LIMIT] = 200.0f;
+    analogSignal[BLOK_VELOCITY_NEXT_LIMIT] = 200.0f;
 }

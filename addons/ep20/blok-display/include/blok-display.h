@@ -2,9 +2,13 @@
 #define     BLOK_DISPLAY_H
 
 #include    "display.h"
+#include    "blok-funcs.h"
+#include    "structures-BLOK.h"
 
 #include    <QTimer>
 #include    <QLabel>
+
+#include    "TopBlock.h"
 
 //------------------------------------------------------------------------------
 //
@@ -18,12 +22,19 @@ public:
 
     ~BlokDisplay();
 
+    void init();
+
 private:
 
-    QTimer  *updateTimer;
-    QLabel  *test;
+    QTimer          *updateTimer;
 
+    TopBlock        *topBlock;
 
+    structs_BLOK_t  structsBLOK;
+
+    void initMainWindow();
+
+    void initTopBlock();
 
 private slots:
 
