@@ -10,6 +10,7 @@ enum
     KMB2_Fake = 4,
     KeyCard_Fake = 5,
     KeyCard_Low = 6,
+    Key = 7,
 
 
     STRELKA_pTM = 10,

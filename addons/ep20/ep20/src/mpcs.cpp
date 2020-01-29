@@ -22,6 +22,8 @@ MPCS::MPCS(QObject *parent) : Device(parent)
     connect(&mkStartTimer, &Timer::process, this, &MPCS::slotMKStart);
 
     mk_count = 0;
+
+    keyPosition = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -68,6 +70,11 @@ mpcs_output_t MPCS::getSignalOutputMPCS()
     return mpcs_output;
 }
 
+float MPCS::getKeyPosition()
+{
+    return keyPosition;
+}
+
 //------------------------------------------------------------------------------
 //  Управление клавишами
 //------------------------------------------------------------------------------
@@ -105,6 +112,18 @@ void MPCS::stepKeysControl(double t, double dt)
             ms_fs_on.reset();
     }
 
+
+    if (getKeyState(KEY_J))
+    {
+        if (isControl())
+        {
+           keyPosition = 1;
+        }
+        else
+        {
+           keyPosition = 0;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -112,6 +131,9 @@ void MPCS::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void MPCS::stepDiscrete(double t, double dt)
 {   
+    if (keyPosition == 0)
+        return;
+
     taskPant->step(y, t, dt, mpcs_input, mpcs_output);
 
     stepMainSwitchControl(t, dt);
