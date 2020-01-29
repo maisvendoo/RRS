@@ -1,3 +1,9 @@
+//------------------------------------------------------------------------------
+//
+//
+//
+//
+//------------------------------------------------------------------------------
 #ifndef     DISPLAY_H
 #define     DISPLAY_H
 
@@ -18,19 +24,26 @@ public:
 
     virtual ~AbstractDisplay();
 
+    /// Инициализация дисплея
+    virtual void init();
+
+    /// Задать входной сигнал
     void setInputSignal(size_t index, float value);
 
-    float getOutputSignal(size_t index);
-
+    /// Задать массив входных сигналов
     void setInputSignals(const display_signals_t &input_signals);
 
+    /// Получить выходной сигнал
+    float getOutputSignal(size_t index);
+
+    /// Получить массив выходных сигналов
     display_signals_t getOutputSignals();
 
+    /// Задать каталог с конфигруционными файлами
     void setConfigDir(QString config_dir);
 
+    /// Получить путь к каталогу с конфигами
     QString getConfigDir() const;
-
-    virtual void init();
 
 protected:
 

@@ -11,6 +11,8 @@ SUBDIRS += ./tcp-connection
 SUBDIRS += ./asound
 SUBDIRS += ./simulator
 
+SUBDIRS += ./viewer
+
 SUBDIRS += ./addons/default-vehicle
 SUBDIRS += ./addons/test-loco
 SUBDIRS += ./addons/sapsan-motor
@@ -27,7 +29,6 @@ SUBDIRS += ./addons/ep20
 SUBDIRS += ./launcher
 SUBDIRS += ./launcher2
 
-SUBDIRS += ./viewer
 
 SUBDIRS += ./tools/profconv
 SUBDIRS += ./tools/pathconv

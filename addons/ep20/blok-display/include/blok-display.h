@@ -4,6 +4,7 @@
 #include    "display.h"
 #include    "blok-funcs.h"
 #include    "structures-BLOK.h"
+#include    "elapsed-timer.h"
 
 #include    <QTimer>
 #include    <QLabel>
@@ -27,6 +28,7 @@ public:
 private:
 
     QTimer          *updateTimer;
+    ElapsedTimer    *timer;
 
     TopBlock        *topBlock;
 
