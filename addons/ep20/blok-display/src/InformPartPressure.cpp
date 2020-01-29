@@ -20,7 +20,7 @@
 //  Конструктор
 //-----------------------------------------------------------------------------
 InformPartPressure::InformPartPressure(QString strHead, QWidget *parent)
-    : QLabel(parent)
+    : ImageLabel(parent)
 {
     this->setGeometry(0, 0, 70, 550);
     this->setStyleSheet("border: 2px solid yellow;"
@@ -65,7 +65,7 @@ InformPartPressure::InformPartPressure(QString strHead, QWidget *parent)
     labelTop->setPixmap(QPixmap::fromImage(img));
 
     //
-    labelPressureBar_ = new QLabel(this);
+    labelPressureBar_ = new ImageLabel(this);
     labelPressureBar_->setGeometry(labelTop->geometry());
 
     img_ = QImage(QSize(labelTop->width(), labelTop->height() - 10),
@@ -118,7 +118,8 @@ void InformPartPressure::setValPressure(double val)
          << QPoint(54, (pressureBarH)*(1.0 - val));
     paint.drawPolygon(rect);
     paint.end();
-    labelPressureBar_->setPixmap(QPixmap::fromImage(img_));
+    pm = QPixmap::fromImage(img_);
+    labelPressureBar_->setPixmap(&pm);
 }
 
 

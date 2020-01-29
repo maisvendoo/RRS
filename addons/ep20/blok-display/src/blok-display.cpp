@@ -104,7 +104,7 @@ void BlokDisplay::slotUpdateTimer()
 
     topBlock->set_ip2Val(&structsBLOK.ip2_val);
 
-    /*structsBLOK.ip_val.coordinate = static_cast<double>(input_signals[BLOK_RAILWAY_COORD]);
+    structsBLOK.ip_val.coordinate = static_cast<double>(input_signals[BLOK_RAILWAY_COORD]);
     structsBLOK.ip_val.acceleration = 0.0;
     strcpy(structsBLOK.ip_val.station, "Ростов Гл.");
 
@@ -115,7 +115,7 @@ void BlokDisplay::slotUpdateTimer()
     structsBLOK.other_val.nextSpeedLimit = qRound(input_signals[BLOK_VELOCITY_NEXT_LIMIT]);
 
     topBlock->setCurSpeed(structsBLOK.other_val.curSpeed);
-    topBlock->setSpeedLimits(structsBLOK.other_val.curSpeedLimit, structsBLOK.other_val.nextSpeedLimit);*/
+    topBlock->setSpeedLimits(structsBLOK.other_val.curSpeedLimit, structsBLOK.other_val.nextSpeedLimit);
 }
 
 GET_DISPLAY(BlokDisplay)

@@ -21,12 +21,13 @@
 #include <QPainter>
 #include <QImage>
 
+#include "ImageLabel.h"
 
 /*!
  * \class InformPart
  * \brief Класс, описывающий элемент блока информации
  */
-class InformPart : public QLabel
+class InformPart : public ImageLabel
 {
     Q_OBJECT
 
@@ -73,6 +74,8 @@ private:
     QString colorText_;
     int fontSize_;
     // --------------------- //
+
+    QPixmap pm;
 
     /// Чтение конфигураций
     bool loadInformPartCfg(QString cfg_path);

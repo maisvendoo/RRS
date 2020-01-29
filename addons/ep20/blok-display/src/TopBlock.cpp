@@ -167,7 +167,6 @@ void TopBlock::set_ipVal(ip_val_t *val)
 {
     informPartMap_[ip_->coordinate]->setText(getCoordinateStr_(val->coordinate));
     informPartMap_[ip_->time]->setText(val->time);
-//    informPartMap_[ip_->grafic]->setText(val->grafic);
     informPartMap_[ip_->station]->setText(QString(val->station));
     informPartMap_[ip_->numRoad]->setText(QString(val->numRoad));
     informPartMap_[ip_->chanel]->setText(QString(val->chanel));
@@ -231,17 +230,13 @@ QString TopBlock::getCoordinateStr_(double coordinate)
     {
         return "0км 0пк 0м";
     }
-    else
-    {
-        int coord_km        = coordinate;
-        int coord_ostatok   = round((coordinate - coord_km)*1000);
-        int coord_pk        = coord_ostatok/100;// + 1;
-        int coord_m         = coord_ostatok % 100;
 
-        return  QString::number(coord_km) + "км " +
-                QString::number(coord_pk) + "пк " +
-                QString::number(coord_m) + "м";
-    }
+    int coord_km        = static_cast<int>(coordinate);
+    int coord_ostatok   = qRound((coordinate - coord_km) * 1000);
+    int coord_pk        = coord_ostatok / 100;// + 1;
+    int coord_m         = ((coord_ostatok - 100 * coord_pk) / 10) * 10;
+
+    return  QString("%1км %2пк %3м").arg(coord_km).arg(coord_pk).arg(coord_m);
 }
 
 //-----------------------------------------------------------------------------

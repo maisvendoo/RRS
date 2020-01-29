@@ -20,8 +20,9 @@
 #include <QLabel>
 #include <QPainter>
 #include <QImage>
+#include "ImageLabel.h"
 
-class InformPartPressure : public QLabel
+class InformPartPressure : public ImageLabel
 {
 public:
     InformPartPressure(QString strHead, QWidget *parent = Q_NULLPTR);
@@ -29,10 +30,11 @@ public:
     void setValPressure(double val);
 
 private:
-    QLabel* labelPressureBar_;
+    ImageLabel* labelPressureBar_;
     QLabel* labelPressureVal_;
 
     QImage img_;
+    QPixmap pm;
 
     void drawLabel(QString val, int posY);
 

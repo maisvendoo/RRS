@@ -25,7 +25,7 @@ const	QString		INFORMPART_CFG = "../cfg/BLOK/InformPart.xml";
 //-----------------------------------------------------------------------------
 InformPart::InformPart(QRect geo, QString strHead, QString strText,
                         Qt::Alignment align,
-                        QWidget *parent , QString config_path, int marginLeft, bool isDrawX, bool isDrawO) : QLabel(parent)
+                        QWidget *parent , QString config_path, int marginLeft, bool isDrawX, bool isDrawO) : ImageLabel(parent)
 {
     // устанавливаем геометрию класса
     this->setGeometry(geo);
@@ -53,6 +53,9 @@ InformPart::InformPart(QRect geo, QString strHead, QString strText,
 
     // 2. Текст внутри прямоугольника
     labelText_ = new QLabel("", this);
+    QFont font = labelText_->font();
+    font.setStyleStrategy(QFont::NoAntialias);
+    labelText_->setFont(font);
     // задаем шрифт и размер
     labelText_->setFont(QFont("Arial", fontSize_));
     // задаем цвет текста
@@ -156,7 +159,8 @@ void InformPart::drawX()
 
     paint.end();
 
-    this->setPixmap(QPixmap::fromImage(img));
+    pm = QPixmap::fromImage(img);
+    this->setPixmap(&pm);
 }
 
 //-----------------------------------------------------------------------------
@@ -181,8 +185,8 @@ void InformPart::drawO()
                       this->height()/4-6);
 
     paint.end();
-
-    this->setPixmap(QPixmap::fromImage(img));
+    pm = QPixmap::fromImage(img);
+    this->setPixmap(&pm);
 }
 
 //-----------------------------------------------------------------------------
