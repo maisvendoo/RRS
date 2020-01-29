@@ -512,11 +512,11 @@ void Model::sharedMemoryFeedback()
 
         (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
-        memcpy(viewer_data.te[i].discreteSignal,
+        memcpy(viewer_data.te[i].discreteSignal.data(),
                (*it)->getDiscreteSignals(),
                sizeof (viewer_data.te[i].discreteSignal));
 
-        memcpy(viewer_data.te[i].analogSignal,
+        memcpy(viewer_data.te[i].analogSignal.data(),
                (*it)->getAnalogSignals(),
                sizeof (viewer_data.te[i].analogSignal));
         ++i;

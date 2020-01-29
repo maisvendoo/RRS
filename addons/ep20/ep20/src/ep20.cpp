@@ -472,10 +472,10 @@ void EP20::load_brakes_config(QString path)
 
         int loco_crane_pos = 0;
 
-        /*if (cfg.getInt(secName, "LocoCranePos", loco_crane_pos))
+        if (cfg.getInt(secName, "LocoCranePos", loco_crane_pos))
         {
-            loco_crane->setHandlePosition(loco_crane_pos);
-        }*/
+            kvt->setHandlePosition(loco_crane_pos);
+        }
     }
 }
 
