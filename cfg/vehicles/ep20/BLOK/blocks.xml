@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+<!-- √еометри€, центрального блока -->
+	<MiddleBlock>
+		<Left>112</Left>
+		<Top>90</Top>
+		<Width>800</Width>
+		<Height>588</Height>
+	</MiddleBlock>
+<!-- √еометри€, список кнопок, размер кнопок верхнего блока -->
+	<TopBlock>
+		<Left>112</Left>
+		<Top>0</Top>
+		<Width>800</Width>
+		<Height>90</Height>
+		<Children>onoff;brightness;nothingcolor;language;viewdisplays;events;solvebydriver;solvebytech;nothingpaper</Children>
+		<ChildrenWidth>70</ChildrenWidth>
+		<ChildrenHeight>70</ChildrenHeight>
+	</TopBlock>
+<!-- √еометри€, список кнопок, размер кнопок правого блока -->
+	<RightBlock>
+		<Left>912</Left>
+		<Top>0</Top>
+		<Width>112</Width>
+		<Height>768</Height>
+		<Children>correction;left;right;up;down;input</Children>;
+		<ChildrenWidth>70</ChildrenWidth>
+		<ChildrenHeight>70</ChildrenHeight>
+	</RightBlock>
+<!-- √еометри€, список кнопок, размер кнопок нижнего блока -->
+	<BottomBlock>
+		<Left>112</Left>
+		<Top>678</Top>
+		<Width>800</Width>
+		<Height>90</Height>
+		<Children>digit0;digit1;digit2;digit3;digit4;digit5;digit6;digit7;digit8;digit9</Children>
+		<ChildrenWidth>70</ChildrenWidth>
+		<ChildrenHeight>70</ChildrenHeight>
+	</BottomBlock>
+<!-- √еометри€, размер блока индикации левого блока -->
+	<LeftBlock>
+		<Left>0</Left>
+		<Top>0</Top>
+		<Width>112</Width>
+		<Height>768</Height>
+		<ChildrenWidth>70</ChildrenWidth>
+		<ChildrenHeight>70</ChildrenHeight>
+	</LeftBlock>
+<!-- –азмер, цвет светодиодов блока индикации -->
+	<IndicationBlock>
+		<ChildrenWidth>20</ChildrenWidth>
+		<ChildrenHeight>20</ChildrenHeight>
+		<LED1>00ff00</LED1>
+		<LED2>ffff00</LED2>
+		<LED3>ff0000</LED3>
+	</IndicationBlock>
+</Config>

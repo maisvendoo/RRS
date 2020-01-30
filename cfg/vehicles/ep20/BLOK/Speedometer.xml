@@ -12,13 +12,13 @@
 		<labelValVCenter_x>0</labelValVCenter_x>
 		<labelValVCenter_y>0</labelValVCenter_y>
 		<labelValVCenter_color>#ffffff</labelValVCenter_color>
-		<labelValVCenter_fontSize>34</labelValVCenter_fontSize>
+		<labelValVCenter_fontSize>38</labelValVCenter_fontSize>
 		
 		<!-- Ограничение скорости под центральным кругом спидометра -->
 		<labelSpeedLimit_x>0</labelSpeedLimit_x>
-		<labelSpeedLimit_y>75</labelSpeedLimit_y>
+		<labelSpeedLimit_y>110</labelSpeedLimit_y>
 		<labelSpeedLimit_color>#ff0000</labelSpeedLimit_color>
-		<labelSpeedLimit_fontSize>34</labelSpeedLimit_fontSize>
+		<labelSpeedLimit_fontSize>38</labelSpeedLimit_fontSize>
 		
 		<!-- макс. значение скорости на шкале спидометра -->
 		<valV_max_OnScale>300</valV_max_OnScale>
