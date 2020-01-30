@@ -71,8 +71,8 @@ void BlokDisplay::initMainWindow()
     this->setPalette(QPalette(QColor(0, 0, 0)));
 
     updateTimer = new QTimer;
-    connect(updateTimer, &QTimer::timeout, this, &BlokDisplay::slotUpdateTimer);
-    updateTimer->setInterval(timeInterval);    
+    connect(updateTimer, &QTimer::timeout, this, &BlokDisplay::slotUpdateTimer, Qt::QueuedConnection);
+    updateTimer->setInterval(timeInterval);        
     updateTimer->start();
 }
 

@@ -90,7 +90,6 @@ int RouteViewer::run()
 
     viewer.addEventHandler(statsHandler.get());
 
-
     viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // Cabine camera manipulator

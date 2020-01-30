@@ -20,7 +20,7 @@ void DisplayVisitor::apply(osg::Transform &transform)
 
     if (matrix_trans->getName() == display_config.surface_name.toStdString())
     {
-        DisplaySurfaceVisitor dsv(dc);
+        DisplaySurfaceVisitor dsv(dc, display_config);
         dsv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
         matrix_trans->accept(dsv);
     }

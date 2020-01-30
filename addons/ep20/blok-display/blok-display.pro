@@ -27,7 +27,6 @@ INCLUDEPATH += ../../../common-headers/
 INCLUDEPATH += ../../../CfgReader/include
 INCLUDEPATH += ../../../viewer/display/include
 
-HEADERS += $$files(./include/*.h) \
-    include/ImageLabel.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
 RESOURCES += $$files(./resources/*.qrc)
