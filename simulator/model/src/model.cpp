@@ -485,19 +485,15 @@ void Model::sharedMemoryFeedback()
         viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
 
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);        
 
-        /*memcpy(viewer_data.te[i].discreteSignal.data(),
-               (*it)->getDiscreteSignals(),
-               sizeof (viewer_data.te[i].discreteSignal));
+        std::copy((*it)->getDiscreteSignals().begin(),
+                  (*it)->getDiscreteSignals().end(),
+                  viewer_data.te[i].discreteSignal.begin());
 
-        memcpy(viewer_data.te[i].analogSignal.data(),
-               (*it)->getAnalogSignals(),
-               sizeof (viewer_data.te[i].analogSignal));*/
-
-        std::copy((*it)->getDiscreteSignals().begin(), (*it)->getDiscreteSignals().end(), viewer_data.te[i].discreteSignal.begin());
-        std::copy((*it)->getAnalogSignals().begin(), (*it)->getAnalogSignals().end(), viewer_data.te[i].analogSignal.begin());
-
+        std::copy((*it)->getAnalogSignals().begin(),
+                  (*it)->getAnalogSignals().end(),
+                  viewer_data.te[i].analogSignal.begin());
 
         ++i;
     }
@@ -562,7 +558,6 @@ void Model::process()
         postStep(t);
     }
 
-    //train->vehiclesStep(t, integration_time);
     train->inputProcess();
 
     // Debug print, is allowed

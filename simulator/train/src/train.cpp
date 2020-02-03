@@ -198,7 +198,7 @@ void Train::vehiclesStep(double t, double dt)
     auto begin = vehicles.begin();
 
     brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
-    int j = 1;
+    size_t j = 1;
 
     for (auto i = begin; i != end; ++i)
     {
@@ -549,4 +549,3 @@ void Train::initVehiclesBrakes()
         vehicles[i]->initBrakeDevices(charging_pressure, pTM, init_main_res_pressure);
     }
 }
-
