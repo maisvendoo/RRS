@@ -24,7 +24,6 @@
 
 #include    "simulator-command-line.h"
 #include    "filesystem.h"
-#include    "log.h"
 #include    "train.h"
 #include    "elapsed-timer.h"
 
@@ -83,9 +82,6 @@ public slots:
 
 private:
 
-    /// Simulator's log object
-    Log         *simLog;
-
     /// Current simulation time
     double      t;
     /// Current simulation time step
@@ -133,10 +129,7 @@ private:
 
     QTimer          controlTimer;
 
-    ElapsedTimer    simTimer;
-
-    /// Log initialization
-    void logInit(bool clear_log = false);    
+    ElapsedTimer    simTimer;       
 
     /// Actions, which prerare integration step
     void preStep(double t);

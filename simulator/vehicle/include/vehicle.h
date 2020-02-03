@@ -24,6 +24,7 @@
 #include    "solver-types.h"
 #include    "key-symbols.h"
 
+#include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
@@ -32,9 +33,6 @@
 #else
     #define VEHICLE_EXPORT  Q_DECL_IMPORT
 #endif
-
-const   int NUM_ANALOG_SIGNALS = 1000;
-const   int NUM_DISCRETE_SIGNALS = 1000;
 
 //------------------------------------------------------------------------------
 //
@@ -115,12 +113,12 @@ public:
 
     double getWheelOmega(size_t i);
 
-    bool getDiscreteSignal(int i);
+    bool getDiscreteSignal(size_t i);
 
-    float getAnalogSignal(int i);
+    float getAnalogSignal(size_t i);
 
-    bool    *getDiscreteSignals();
-    float   *getAnalogSignals();
+    std::array<bool, MAX_DISCRETE_SIGNALS> getDiscreteSignals();
+    std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
@@ -273,9 +271,9 @@ protected:
     QMutex          keys_mutex;    
 
     /// Discrete signals for outpput
-    bool    discreteSignal[NUM_DISCRETE_SIGNALS];
+    std::array<bool, MAX_DISCRETE_SIGNALS>  discreteSignal;
     /// Analog signals for output
-    float   analogSignal[NUM_ANALOG_SIGNALS];
+    std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     control_signals_t   control_signals;
 

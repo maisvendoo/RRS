@@ -24,6 +24,7 @@ CONFIG(debug, debug|release) {
 INCLUDEPATH += ./include
 INCLUDEPATH += ../ep20/include
 INCLUDEPATH += ../../../common-headers/
+INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../CfgReader/include
 INCLUDEPATH += ../../../viewer/display/include
 
