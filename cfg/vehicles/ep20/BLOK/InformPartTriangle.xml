@@ -3,13 +3,13 @@
 
 	<!-- треугольник ограничения скорости 1 (желтый) -->
 	<InformPartTriangle1>
-		<widthTriangle>100</widthTriangle>
+		<widthTriangle>120</widthTriangle>
 		<colorTriangle>#ffff00</colorTriangle>
 	</InformPartTriangle1>
 	
 	<!-- треугольник ограничения скорости 2 (красный) -->
 	<InformPartTriangle2>
-		<widthTriangle>100</widthTriangle>
+		<widthTriangle>120</widthTriangle>
 		<colorTriangle>#ff0000</colorTriangle>
 	</InformPartTriangle2>
 

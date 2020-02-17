@@ -45,7 +45,6 @@ bool Train::init(const init_data_t &init_data)
 
     if (train_motion_solver == Q_NULLPTR)
     {
-        emit logMessage("ERROR: solver " + solver_path + " is't found");
         Journal::instance()->error("Solver " + solver_path + " is't found");
         return false;
     }
@@ -69,7 +68,6 @@ bool Train::init(const init_data_t &init_data)
     // Loading of train
     if (!loadTrain(full_config_path))
     {
-        emit logMessage("ERROR: train is't loaded");
         Journal::instance()->error("Train is't loaded");
         return false;
     }
@@ -92,7 +90,6 @@ bool Train::init(const init_data_t &init_data)
     // Loading of couplings
     if (!loadCouplings(full_config_path))
     {
-        emit logMessage("ERROR: couplings is't loaded");
         Journal::instance()->error("Coupling model is't loaded");
         return false;
     }
@@ -201,7 +198,7 @@ void Train::vehiclesStep(double t, double dt)
     auto begin = vehicles.begin();
 
     brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
-    int j = 1;
+    size_t j = 1;
 
     for (auto i = begin; i != end; ++i)
     {
@@ -339,7 +336,6 @@ bool Train::loadTrain(QString cfg_path)
             QString module_name = "";
             if (!cfg.getString(vehicle_node, "Module", module_name))
             {
-                emit logMessage("ERROR: Module section is not find");
                 Journal::instance()->error("Module section is not found");
                 break;
             }
@@ -380,7 +376,6 @@ bool Train::loadTrain(QString cfg_path)
 
                 if (vehicle == Q_NULLPTR)
                 {
-                    emit logMessage("ERROR: vehicle " + module_name + " is't loaded");
                     Journal::instance()->error("Vehicle " + module_name + " is't loaded");
                     break;
                 }
@@ -424,10 +419,7 @@ bool Train::loadTrain(QString cfg_path)
                     vehicle->setPrevVehicle(prev);
                 }                
 
-                vehicles.push_back(vehicle);
-
-                emit logMessage("OK: Loaded vehicle: " + module_name +
-                                " with configuration: " + module_cfg_name + ".xml");
+                vehicles.push_back(vehicle);                
             }            
 
             vehicle_node = cfg.getNextSection();            
@@ -442,7 +434,6 @@ bool Train::loadTrain(QString cfg_path)
     }
     else
     {
-        emit logMessage("ERROR: file " + cfg_path + " is't found");
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
@@ -479,7 +470,6 @@ bool Train::loadCouplings(QString cfg_path)
 
             if (coupling == Q_NULLPTR)
             {
-                emit logMessage("ERROR: coupling module " + coupling_module + " is't found");
                 return false;
             }
 
@@ -499,7 +489,6 @@ bool Train::loadCouplings(QString cfg_path)
     }
     else
     {
-        emit logMessage("ERROR: file " + cfg_path + " is't found");
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
@@ -531,8 +520,6 @@ void Train::setInitConditions(const init_data_t &init_data)
     double x0 = init_data.init_coord * 1000.0;
     y[0] = x0;    
 
-    emit logMessage(QString("OK: Setting up of initial coordinate: %1").arg(x0));
-
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
 
     for (size_t i = 1; i < vehicles.size(); i++)
@@ -562,4 +549,3 @@ void Train::initVehiclesBrakes()
         vehicles[i]->initBrakeDevices(charging_pressure, pTM, init_main_res_pressure);
     }
 }
-

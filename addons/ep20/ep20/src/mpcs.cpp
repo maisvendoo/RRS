@@ -235,7 +235,7 @@ void MPCS::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 //------------------------------------------------------------------------------
 void MPCS::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 //------------------------------------------------------------------------------

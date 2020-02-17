@@ -25,7 +25,7 @@
 		
 		<!-- круг в центре спидометра -->
 		<circleCener_color>#0096ff</circleCener_color>
-		<circleCener_width>100</circleCener_width>
+		<circleCener_width>110</circleCener_width>
 	
 	</SScale>
 

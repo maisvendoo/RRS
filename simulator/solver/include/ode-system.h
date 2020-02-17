@@ -43,9 +43,6 @@ public:
 
 protected:
 
-    /// ODE system order
-    int n;
-
     /// ODE state vector
     state_vector_t  y;
     /// State vector derivative by time

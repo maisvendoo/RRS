@@ -5,9 +5,10 @@
 #include    <osg/Material>
 #include    <osg/Texture2D>
 
-DisplaySurfaceVisitor::DisplaySurfaceVisitor(display_container_t *dc)
+DisplaySurfaceVisitor::DisplaySurfaceVisitor(display_container_t *dc, display_config_t display_config)
     : osg::NodeVisitor()
     , dc(dc)
+    , display_config(display_config)
 
 {
 
@@ -24,8 +25,12 @@ void DisplaySurfaceVisitor::apply(osg::Geode &geode)
     stateset->setTextureAttributeAndModes(0, dc->texture.get());
 
     dc->handler = new osgViewer::InteractiveImageHandler(dc->widgetImage.get());
+
     geode.getDrawable(0)->setEventCallback(dc->handler.get());
     geode.getDrawable(0)->setCullCallback(dc->handler.get());
+
+    osg::Geometry *geom = static_cast<osg::Geometry *>(geode.getDrawable(0));
+    geom->setTexCoordArray(0, display_config.texcoord.get());
 
     traverse(geode);
 }

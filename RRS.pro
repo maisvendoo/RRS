@@ -6,19 +6,12 @@ SUBDIRS += ./CfgReader
 SUBDIRS += ./CfgEditor
 SUBDIRS += ./filesystem
 SUBDIRS += ./libJournal
-SUBDIRS += ./log
 SUBDIRS += ./tcp-connection
 SUBDIRS += ./asound
 SUBDIRS += ./simulator
 
 SUBDIRS += ./viewer
 
-SUBDIRS += ./addons/default-vehicle
-SUBDIRS += ./addons/test-loco
-SUBDIRS += ./addons/sapsan-motor
-SUBDIRS += ./addons/sapsan-non-motor
-SUBDIRS += ./addons/es1-motor
-SUBDIRS += ./addons/es1-non-motor
 SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/vl60
 SUBDIRS += ./addons/tep70

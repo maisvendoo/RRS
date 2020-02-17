@@ -21,13 +21,10 @@
 #include    "Journal.h"
 #include    "JournalFile.h"
 
-const       QString LOG_FILE_NAME = "simulator.log";
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Model::Model(QObject *parent) : QObject(parent)
-  , simLog(Q_NULLPTR)
   , t(0.0)
   , dt(0.001)
   , start_time(0.0)
@@ -62,13 +59,6 @@ Model::~Model()
 //------------------------------------------------------------------------------
 bool Model::init(const simulator_command_line_t &command_line)
 {
-    // Log creation
-    logInit(command_line.clear_log.is_present);
-
-    //FileSystem &fs = FileSystem::getInstance();
-    //QString path = QString(fs.combinePath(fs.getLogsDir(), "journal.log").c_str());
-    //journalInit(path);
-
     // Check is debug print allowed
     is_debug_print = command_line.debug_print.is_present;
 
@@ -125,7 +115,6 @@ bool Model::init(const simulator_command_line_t &command_line)
     {
         if (!keys_data.attach())
         {
-            emit logMessage("ERROR: Can't attach to shared memory");
             Journal::instance()->error("Can't attach to shread memory. Unable process keyboard");
         }
     }
@@ -179,17 +168,6 @@ void Model::outMessage(QString msg)
 void Model::controlProcess()
 {
     control_panel->process();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::logInit(bool clear_log)
-{
-    FileSystem &fs = FileSystem::getInstance();
-    simLog = new Log(QString(fs.getLogsDir().c_str()) + fs.separator() + LOG_FILE_NAME, clear_log, true);
-    connect(this, &Model::logMessage, simLog, &Log::printMessage);
-    connect(this, &Model::logMessage, this, &Model::outMessage);
 }
 
 //------------------------------------------------------------------------------
@@ -325,10 +303,7 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     if (command_line.init_coord.is_present)
     {
-        init_data.init_coord = command_line.init_coord.value;
-
-        emit logMessage(QString("OK: Command line coordinate: %1").arg(command_line.init_coord.value));
-        emit logMessage(QString("OK: New initial line coordinate: %1").arg(init_data.init_coord));
+        init_data.init_coord = command_line.init_coord.value;        
     }
 
     if (command_line.direction.is_present)
@@ -510,15 +485,16 @@ void Model::sharedMemoryFeedback()
         viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
 
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);        
 
-        memcpy(viewer_data.te[i].discreteSignal.data(),
-               (*it)->getDiscreteSignals(),
-               sizeof (viewer_data.te[i].discreteSignal));
+        std::copy((*it)->getDiscreteSignals().begin(),
+                  (*it)->getDiscreteSignals().end(),
+                  viewer_data.te[i].discreteSignal.begin());
 
-        memcpy(viewer_data.te[i].analogSignal.data(),
-               (*it)->getAnalogSignals(),
-               sizeof (viewer_data.te[i].analogSignal));
+        std::copy((*it)->getAnalogSignals().begin(),
+                  (*it)->getAnalogSignals().end(),
+                  viewer_data.te[i].analogSignal.begin());
+
         ++i;
     }
 
@@ -582,7 +558,6 @@ void Model::process()
         postStep(t);
     }
 
-    //train->vehiclesStep(t, integration_time);
     train->inputProcess();
 
     // Debug print, is allowed
