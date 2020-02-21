@@ -115,7 +115,7 @@ void MPCS::stepKeysControl(double t, double dt)
 
     if (getKeyState(KEY_J))
     {
-        if (isControl())
+        if (isShift())
         {
            keyPosition = 1;
         }
