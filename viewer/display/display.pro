@@ -24,6 +24,7 @@ CONFIG(debug, debug|release) {
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../simulator/vehicle/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

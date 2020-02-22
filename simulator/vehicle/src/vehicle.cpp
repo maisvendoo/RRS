@@ -59,7 +59,8 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , Uks(0.0)
   , current_kind(0)
 {
-    memset(analogSignal, 0, sizeof (float) * NUM_ANALOG_SIGNALS);    
+    std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
+    std::fill(discreteSignal.begin(), discreteSignal.end(), false);
 }
 
 //------------------------------------------------------------------------------
@@ -298,9 +299,9 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Vehicle::getDiscreteSignal(int i)
+bool Vehicle::getDiscreteSignal(size_t i)
 {
-    if (i < NUM_DISCRETE_SIGNALS)
+    if (i < discreteSignal.size())
         return discreteSignal[i];
     else
         return false;
@@ -309,9 +310,9 @@ bool Vehicle::getDiscreteSignal(int i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float Vehicle::getAnalogSignal(int i)
+float Vehicle::getAnalogSignal(size_t i)
 {
-    if (i < NUM_ANALOG_SIGNALS)
+    if (i < analogSignal.size())
         return analogSignal[i];
     else
         return 0.0f;
@@ -526,7 +527,7 @@ void Vehicle::setUks(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool *Vehicle::getDiscreteSignals()
+std::array<bool, MAX_DISCRETE_SIGNALS> Vehicle::getDiscreteSignals()
 {
     return discreteSignal;
 }
@@ -534,7 +535,7 @@ bool *Vehicle::getDiscreteSignals()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float *Vehicle::getAnalogSignals()
+std::array<float, MAX_ANALOG_SIGNALS> Vehicle::getAnalogSignals()
 {
     return analogSignal;
 }
@@ -609,7 +610,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
     }
     else
     {
-        emit logMessage("ERROR: file " + cfg_path + "is't found");
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
@@ -646,7 +646,6 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
     }
     else
     {
-        emit logMessage("ERROR: file " + file_path + "is't found");
         Journal::instance()->error("File " + file_path + " is't found");
     }
 }

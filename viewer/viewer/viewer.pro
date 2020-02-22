@@ -110,6 +110,7 @@ unix {
 #CONFIG += force_debug_info
 
 INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../simulator/vehicle/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../route-loader/include
@@ -117,7 +118,5 @@ INCLUDEPATH += ../library/include
 INCLUDEPATH += ../display/include
 INCLUDEPATH += ./include
 
-HEADERS += $$files(./include/*.h) \
-    include/display-config.h \
-    include/display-container.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
