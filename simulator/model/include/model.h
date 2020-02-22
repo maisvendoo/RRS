@@ -74,6 +74,8 @@ signals:
 
     void sendDataToTrain(QByteArray data);
 
+    void getRecvData(sim_dispatcher_data_t &disp_data);
+
 public slots:
 
     /// Messages output

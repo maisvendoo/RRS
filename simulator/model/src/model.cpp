@@ -461,6 +461,7 @@ void Model::initSimClient(QString cfg_path)
         tcp_config.name = train->getClientName();
 
         sim_client = new SimTcpClient();
+        connect(this, &Model::getRecvData, sim_client, &SimTcpClient::getRecvData);
         sim_client->init(tcp_config);
         sim_client->start();
 
@@ -528,7 +529,7 @@ void Model::virtualRailwayFeedback()
         return;
 
     sim_dispatcher_data_t disp_data;
-    sim_client->getRecvData(disp_data);
+    emit getRecvData(disp_data);
 
     alsn_info_t alsn_info;
     alsn_info.code_alsn = disp_data.code_alsn;

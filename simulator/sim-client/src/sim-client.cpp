@@ -1,6 +1,8 @@
 #include    "sim-client.h"
 #include    "tcp-client.h"
 
+#include    <QDebug>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -37,14 +39,14 @@ void SimTcpClient::getRecvData(sim_dispatcher_data_t &disp_data)
 
     QByteArray recv_data = tcp_client->getBuffer();
 
-    if (recv_data.size() != sizeof (sim_dispatcher_data_t))
+    if (recv_data.size() < static_cast<int>(sizeof (sim_dispatcher_data_t)))
     {
         return;
     }
 
     sim_dispatcher_data_t *dsp = static_cast<sim_dispatcher_data_t *>(static_cast<void *>(recv_data.data()));
 
-    disp_data = *dsp;
+    disp_data = *dsp;    
 
     return;
 }
