@@ -20,7 +20,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
     LIBS += -L../../../lib -lJournal_d
-    LIBS += -L../../../lib -llog_d
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -lvehicle_d
     LIBS += -L../../../lib -lcoupling_d
@@ -41,7 +40,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
     LIBS += -L../../../lib -lJournal
-    LIBS += -L../../../lib -llog
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
     LIBS += -L../../../lib -lcoupling

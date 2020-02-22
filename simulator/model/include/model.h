@@ -82,6 +82,9 @@ public slots:
     ///
     void controlProcess();
 
+    /// Обмен данными с ВЖД
+    void virtualRailwayFeedback();
+
 private:
 
     /// Current simulation time
@@ -134,6 +137,7 @@ private:
     QByteArray      data;
 
     QTimer          controlTimer;
+    QTimer          networkTimer;
 
     ElapsedTimer    simTimer;       
 
@@ -163,8 +167,6 @@ private:
     /// TCP feedback
     void tcpFeedBack();
 
-    /// Обмен данными с ВЖД
-    void virtualRailwayFeedback();
 
     /// Shered memory feedback
     void sharedMemoryFeedback();

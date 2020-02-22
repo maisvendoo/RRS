@@ -43,6 +43,8 @@ Model::Model(QObject *parent) : QObject(parent)
     {
         shared_memory.attach();
     }    
+
+    sim_client = Q_NULLPTR;
 }
 
 //------------------------------------------------------------------------------
@@ -463,6 +465,9 @@ void Model::initSimClient(QString cfg_path)
         sim_client->start();
 
         Journal::instance()->info("Started virtual railway TCP-client...");
+
+        connect(&networkTimer, &QTimer::timeout, this, &Model::virtualRailwayFeedback);
+        networkTimer.start(100);
     }
     else
     {
@@ -516,6 +521,9 @@ void Model::tcpFeedBack()
 //------------------------------------------------------------------------------
 void Model::virtualRailwayFeedback()
 {
+    if (sim_client == Q_NULLPTR)
+        return;
+
     if (!sim_client->isConnected())
         return;
 
@@ -535,7 +543,7 @@ void Model::virtualRailwayFeedback()
     strcpy(train_data.train_id, train->getTrainID().toStdString().c_str());
     train_data.direction = train->getDirection();
     train_data.coord = train->getFirstVehicle()->getRailwayCoord();
-    train_data.speed = train->getFirstVehicle()->getVelocity() * Physics::kmh;
+    train_data.speed = train->getFirstVehicle()->getVelocity();
 
     sim_client->sendTrainData(train_data);
 }
@@ -632,9 +640,7 @@ void Model::process()
         postStep(t);
     }
 
-    train->inputProcess();
-
-    virtualRailwayFeedback();
+    train->inputProcess();    
 
     // Debug print, is allowed
     if (is_debug_print)
