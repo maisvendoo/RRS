@@ -35,6 +35,8 @@
 
 #include    "virtual-interface-device.h"
 
+#include    "sim-client.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -116,7 +118,11 @@ private:
     /// TCP-server
     Server      *server;
 
+    /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel;
+
+    /// Клиент для связи с ВЖД
+    SimTcpClient *sim_client;
 
     KeysControl keys_control;
 
@@ -152,8 +158,13 @@ private:
 
     void initControlPanel(QString cfg_path);
 
+    void initSimClient(QString cfg_path);
+
     /// TCP feedback
     void tcpFeedBack();
+
+    /// Обмен данными с ВЖД
+    void virtualRailwayFeedback();
 
     /// Shered memory feedback
     void sharedMemoryFeedback();

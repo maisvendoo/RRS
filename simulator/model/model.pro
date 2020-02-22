@@ -25,6 +25,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lTcpConnection_d
+    LIBS += -L../../../lib -lsim-client_d
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
 
@@ -44,6 +45,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lbrakepipe    
     LIBS += -L../../../lib -lTcpConnection
+    LIBS += -L../../../lib -lsim-client
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
 
@@ -75,6 +77,7 @@ INCLUDEPATH += ../coupling/include
 INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
+INCLUDEPATH += ../sim-client/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include

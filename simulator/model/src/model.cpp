@@ -125,6 +125,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initControlPanel("control-panel");
 
+    initSimClient("virtual-railway");
+
     Journal::instance()->info("Train is initialized successfully");
 
     return true;
@@ -428,6 +430,49 @@ void Model::initControlPanel(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::initSimClient(QString cfg_path)
+{
+    if (train->getTrainID().isEmpty())
+        return;
+
+    if (train->getClientName().isEmpty())
+        return;
+
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+    QString full_path = QString(fs.getConfigDir().c_str()) + fs.separator() + cfg_path + ".xml";
+
+    if (cfg.load(full_path))
+    {
+        QString secName = "VRServer";
+        tcp_config_t tcp_config;
+
+        cfg.getString(secName, "HostAddr", tcp_config.host_addr);
+        int port = 0;
+
+        if (!cfg.getInt(secName, "Port", port))
+        {
+            port = 1993;
+        }
+
+        tcp_config.port = static_cast<quint16>(port);
+        tcp_config.name = train->getClientName();
+
+        sim_client = new SimTcpClient();
+        sim_client->init(tcp_config);
+        sim_client->start();
+
+        Journal::instance()->info("Started virtual railway TCP-client...");
+    }
+    else
+    {
+        Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
     /*std::vector<Vehicle *> *vehicles = train->getVehicles();
@@ -464,6 +509,35 @@ void Model::tcpFeedBack()
     viewer_data.count++;
 
     emit sendDataToTrain(server->getReceivedData());*/
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::virtualRailwayFeedback()
+{
+    if (!sim_client->isConnected())
+        return;
+
+    sim_dispatcher_data_t disp_data;
+    sim_client->getRecvData(disp_data);
+
+    alsn_info_t alsn_info;
+    alsn_info.code_alsn = disp_data.code_alsn;
+    alsn_info.num_free_block = disp_data.num_free_block;
+    alsn_info.response_code = disp_data.response_code;
+    alsn_info.signal_dist = disp_data.signal_dist;
+    strcpy(alsn_info.current_time, disp_data.current_time);
+
+    train->getFirstVehicle()->setASLN(alsn_info);
+
+    sim_train_data_t train_data;
+    strcpy(train_data.train_id, train->getTrainID().toStdString().c_str());
+    train_data.direction = train->getDirection();
+    train_data.coord = train->getFirstVehicle()->getRailwayCoord();
+    train_data.speed = train->getFirstVehicle()->getVelocity() * Physics::kmh;
+
+    sim_client->sendTrainData(train_data);
 }
 
 //------------------------------------------------------------------------------
@@ -559,6 +633,8 @@ void Model::process()
     }
 
     train->inputProcess();
+
+    virtualRailwayFeedback();
 
     // Debug print, is allowed
     if (is_debug_print)

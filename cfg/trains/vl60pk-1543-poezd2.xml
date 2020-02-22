@@ -3,21 +3,23 @@
 	<Common>
 		<CouplingModule>ef-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
-		<Title>ВЛ60пк-1543</Title>
-		<Description>Пассажирский поезд</Description>
+		<Title>Поезд №2</Title>
+		<Description>Сетевая конфигурация для ВЖД РГУПС</Description>
+		<ClientName>vl60pk</ClientName>
+		<TrainID>50331782</TrainID>
 	</Common>
 
 	<Vehicle>
-		<Module>vl60</Module>
+		<Module>vl60pk</Module>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
-
+	
 	<Vehicle>
 		<Module>passcar</Module>
-		<ModuleConfig>IMR_pass_rzd-21071</ModuleConfig>
-		<Count>5</Count>
+		<ModuleConfig>passcar</ModuleConfig>
+		<Count>15</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	
