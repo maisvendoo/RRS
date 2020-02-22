@@ -298,6 +298,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
     }
 
     //animation_manager = new AnimationManager(&animations);
+    this->startTimer(100);
 }
 
 //------------------------------------------------------------------------------
@@ -342,13 +343,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         {
             ProcAnimation *animation = it.value();
             animation->setPosition(nd.sd.back().te[i].analogSignal[animation->getSignalID()]);
-        }
-
-        for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
-        {
-            display_container_t *dc = *it;
-            dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
-        }
+        }        
     }    
 }
 
@@ -604,6 +599,21 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
             dc->display->init();
 
             displays.push_back(dc);
+        }
+    }
+}
+
+void TrainExteriorHandler::timerEvent(QTimerEvent *)
+{
+    if (nd.sd.size() == 0)
+        return;
+
+    for (size_t i = 0; i < vehicles_ext.size(); ++i)
+    {
+        for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
+        {
+            display_container_t *dc = *it;
+            dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
         }
     }
 }

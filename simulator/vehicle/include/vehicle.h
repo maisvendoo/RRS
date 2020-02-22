@@ -27,6 +27,8 @@
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
+#include    "alsn-struct.h"
+
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
 #else
@@ -162,6 +164,8 @@ public:
 
     double getEPTControl(size_t i);
 
+    void setASLN(alsn_info_t alsn_info);
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -286,6 +290,9 @@ protected:
 
     /// Ток в линии управления ЭПТ
     std::vector<double> ept_current;
+
+    /// Информация АЛСН
+    alsn_info_t     alsn_info;
 
     /// User defined initialization
     virtual void initialization();
