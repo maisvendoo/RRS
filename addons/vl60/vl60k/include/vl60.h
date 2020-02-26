@@ -288,6 +288,8 @@ private:
 
     void stepSignalsOutput();   
 
+    void stepDecodeAlsn();
+
     double getTractionForce();
 
     bool getHoldingCoilState() const;

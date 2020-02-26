@@ -554,7 +554,7 @@ void Train::setInitConditions(const init_data_t &init_data)
         }
     }
 
-    double x0 = init_data.init_coord * 1000.0;
+    double x0 = init_data.init_coord * 1000.0 - dir * this->getFirstVehicle()->getLength() / 2.0;
     y[0] = x0;    
 
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
