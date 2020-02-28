@@ -32,6 +32,5 @@ INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../libJournal/include
 
-HEADERS += $$files(./include/*.h) \
-    include/alsn-struct.h
+HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

@@ -79,7 +79,6 @@ INCLUDEPATH += ../sim-client/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
-INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include

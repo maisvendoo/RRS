@@ -76,7 +76,6 @@ INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
-INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp-connection/include
 
 INCLUDEPATH += ../physics/include
