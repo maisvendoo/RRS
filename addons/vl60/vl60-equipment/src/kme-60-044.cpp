@@ -66,6 +66,9 @@ void ControllerKME_60_044::setReversPos(int pos)
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     std::fill(state.pos_state.begin(), state.pos_state.end(), false);
     state.pos_state[static_cast<size_t>(main_pos)] = true;
 
@@ -91,7 +94,9 @@ void ControllerKME_60_044::ode_system(const state_vector_t &Y,
                                       state_vector_t &dYdt,
                                       double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -99,7 +104,7 @@ void ControllerKME_60_044::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 //------------------------------------------------------------------------------

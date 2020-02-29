@@ -55,7 +55,7 @@ win32 {
         LIBS += -L../../../lib -ldisplay
     }
 
-    LIBS += -lopengl32 -lglu32
+    #LIBS += -lopengl32 -lglu32
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 }
@@ -99,7 +99,7 @@ unix {
         LIBS += -L../../lib -ldisplay
     }
 
-    LIBS += -lGL
+    #LIBS += -lGL
 }
 
 #QMAKE_CXXFLAGS += -pg

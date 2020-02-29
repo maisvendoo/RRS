@@ -359,7 +359,7 @@ bool Train::loadTrain(QString cfg_path)
         if (!cfg.getString("Common", "TrainID", train_id))
         {
             train_id = "";
-        }
+        }        
 
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 

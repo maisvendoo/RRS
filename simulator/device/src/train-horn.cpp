@@ -46,7 +46,9 @@ void TrainHorn::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    if (is_svistok = getKeyState(KEY_Space))
+    is_svistok = getKeyState(KEY_Space);
+
+    if (is_svistok)
     {
         emit soundSetVolume("Svistok", 100);
     }
@@ -55,7 +57,9 @@ void TrainHorn::stepKeysControl(double t, double dt)
         emit soundSetVolume("Svistok", 0);
     }
 
-    if (is_tifon = getKeyState(KEY_B))
+    is_tifon = getKeyState(KEY_B);
+
+    if (is_tifon)
     {
         emit soundSetVolume("Tifon", 100);
     }

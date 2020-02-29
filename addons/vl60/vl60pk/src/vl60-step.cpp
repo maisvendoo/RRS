@@ -314,6 +314,9 @@ void VL60pk::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepLineContactors(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     km_state_t km_state = controller->getState();
 
     bool motor_fans_state = true;

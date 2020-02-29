@@ -16,11 +16,85 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	
+	<!-- Купейные (К) -->
 	<Vehicle>
 		<Module>passcar</Module>
-		<ModuleConfig>passcar</ModuleConfig>
-		<Count>15</Count>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
-	
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+
+	<!-- Вагон-буфет -->
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-17669</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-16733</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<!-- Плацкартные (ПЛ) -->
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
+		<Count>5</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<!-- Купейные -->
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
 </Config>

@@ -15,6 +15,9 @@ mkdir %RRS_DEV_ROOT%\themes
 mkdir %RRS_DEV_ROOT%\sdk
 mkdir %RRS_DEV_ROOT%\sdk\include
 
+mkdir %RRS_DEV_ROOT%\logs
+mkdir %RRS_DEV_ROOT%\screenshots
+
 rem Копируем бинарные файлы
 
 xcopy  ..\..\bin\*.exe %RRS_DEV_ROOT%\bin\
@@ -145,3 +148,4 @@ windeployqt %RRS_DEV_ROOT%\bin\profconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
 windeployqt %RRS_DEV_ROOT%\bin\TcpConnection.dll
+windeployqt %RRS_DEV_ROOT%\bin\libosgQt5.dll

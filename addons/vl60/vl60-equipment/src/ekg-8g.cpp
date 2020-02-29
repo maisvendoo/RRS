@@ -153,6 +153,9 @@ void EKG_8G::process()
 //------------------------------------------------------------------------------
 void EKG_8G::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     // Если на ЭКГ подано питание
     if (is_enabled)
     {
