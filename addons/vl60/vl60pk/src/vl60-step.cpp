@@ -17,6 +17,47 @@ void VL60pk::stepOtherEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60pk::stepTapSound()
+{
+    double speed = abs(this->velocity) * 3.6;
+
+    QMap<int, QString>::const_iterator i = tap_sounds.constBegin();
+
+    QString soundPlay = "";
+
+    while (i != tap_sounds.constEnd())
+    {
+        if (speed >= i.key())
+        {
+            soundPlay = i.value();
+        }
+        if (speed < i.key())
+        {
+            break;
+        }
+        ++i;
+    }
+
+    i = tap_sounds.constBegin();
+
+    int volume;
+
+    while (i != tap_sounds.constEnd())
+    {
+        if (soundPlay == i.value())
+        {
+            volume = 100;
+        } else {
+            volume = 0;
+        }
+        emit soundSetVolume(i.value(), volume);
+        ++i;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60pk::step(double t, double dt)
 {
     stepPantographsControl(t, dt);
@@ -46,6 +87,8 @@ void VL60pk::step(double t, double dt)
     stepOtherEquipment(t, dt);
 
     stepEPT(t, dt);
+
+    stepTapSound();
 
     autoStartTimer->step(t, dt);
 }
