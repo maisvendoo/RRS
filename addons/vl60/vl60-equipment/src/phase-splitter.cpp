@@ -31,6 +31,12 @@ PhaseSplitter::~PhaseSplitter()
 //------------------------------------------------------------------------------
 void PhaseSplitter::setU_power(double value)
 {
+    if (floor(value) > 0 && floor(U_power) == 0)
+        emit soundPlay("Phase_Splitter");
+
+    if (floor(value) == 0 && floor(U_power) > 0)
+        emit soundStop("Phase_Splitter");
+
     U_power = value;
 }
 
@@ -59,7 +65,7 @@ void PhaseSplitter::preStep(state_vector_t &Y, double t)
 
     U_out = k_eds * Y[0];
 
-    emit soundSetPitch("Phase_Splitter", static_cast<float>(Y[0] / omega0));
+    //emit soundSetPitch("Phase_Splitter", static_cast<float>(Y[0] / omega0));
 }
 
 //------------------------------------------------------------------------------

@@ -34,14 +34,11 @@ void MotorFan::setU_power(double value)
     QString sndName = QString("Motor_Fan%1").arg(idx);
 
     if (floor(value) > 0 && floor(U_power) == 0)
-    {
         emit soundPlay(sndName);
-    }
 
     if (floor(value) == 0 && floor(U_power) > 0)
-    {
         emit soundStop(sndName);
-    }
+
 
     U_power = value;
 }

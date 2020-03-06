@@ -61,7 +61,8 @@ void VL60pk::initHighVoltageScheme()
 void VL60pk::initSupplyMachines()
 {
     phase_spliter = new PhaseSplitter();
-    connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60pk::soundSetPitch);
+    connect(phase_spliter, &PhaseSplitter::soundPlay, this, &VL60pk::soundPlay);
+    connect(phase_spliter, &PhaseSplitter::soundStop, this, &VL60pk::soundStop);
 
     for (size_t i = 0; i < motor_fans.size(); ++i)
     {
