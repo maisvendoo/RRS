@@ -573,11 +573,14 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble(secName, "PayloadMass", payload_mass);
         cfg.getDouble(secName, "Length", length);
         cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
+        cfg.getString(secName, "SoundDir", soundDirectory);
+
 
         Journal::instance()->info(QString("EmptyMass: %1 kg").arg(empty_mass));
         Journal::instance()->info(QString("PayloadMass: %1 kg").arg(payload_mass));
         Journal::instance()->info(QString("Length: %1 m").arg(length));
         Journal::instance()->info(QString("WheelDiameter: %1 m").arg(wheel_diameter));
+        Journal::instance()->info(QString("SoundsDirectory: " + soundDirectory));
 
         rk = wheel_diameter / 2.0;
 
@@ -760,4 +763,12 @@ void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
     Q_UNUSED(p0)
     Q_UNUSED(pTM)
     Q_UNUSED(pFL)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Vehicle::getSoundsDir() const
+{
+    return soundDirectory;
 }

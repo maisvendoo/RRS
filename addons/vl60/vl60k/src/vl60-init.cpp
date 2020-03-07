@@ -61,12 +61,14 @@ void VL60k::initHighVoltageScheme()
 void VL60k::initSupplyMachines()
 {
     phase_spliter = new PhaseSplitter();
-    connect(phase_spliter, &PhaseSplitter::soundSetPitch, this, &VL60k::soundSetPitch);
+    connect(phase_spliter, &PhaseSplitter::soundPlay, this, &VL60k::soundPlay);
+    connect(phase_spliter, &PhaseSplitter::soundStop, this, &VL60k::soundStop);
 
     for (size_t i = 0; i < motor_fans.size(); ++i)
     {
         motor_fans[i] = new MotorFan(i + 1);
-        connect(motor_fans[i], &MotorFan::soundSetPitch, this, &VL60k::soundSetPitch);
+        connect(motor_fans[i], &MotorFan::soundPlay, this, &VL60k::soundPlay);
+        connect(motor_fans[i], &MotorFan::soundStop, this, &VL60k::soundStop);
     }
 
     main_reservoir = new Reservoir(static_cast<double>(MAIN_RESERVOIR_VOLUME) / 1000.0);
@@ -141,6 +143,7 @@ void VL60k::initBrakeEquipment(QString modules_dir)
 void VL60k::initTractionControl()
 {
     controller = new ControllerKME_60_044();
+    connect(controller, &ControllerKME_60_044::soundPlay, this, &VL60k::soundPlay);
 
     main_controller = new EKG_8G();
     main_controller->read_custom_config(config_dir + QDir::separator() + "ekg-8g");
@@ -180,6 +183,8 @@ void VL60k::initOtherEquipment()
 
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60k::soundSetVolume);
+    connect(horn, &TrainHorn::soundPlay, this, &VL60k::soundPlay);
+    connect(horn, &TrainHorn::soundStop, this, &VL60k::soundStop);
 
     //reg = new Registrator("brakes");
 }
@@ -204,6 +209,23 @@ void VL60k::initTriggers()
     autoStartTimer = new Timer(0.5);
     connect(autoStartTimer, &Timer::process, this, &VL60k::slotAutoStart);
     start_count = 0;
+}
+
+void VL60k::initTapSounds() {
+    QString f_p = "tap_";
+
+    tap_sounds.insert(5, f_p + "5-10");
+    tap_sounds.insert(10, f_p + "10-20");
+    tap_sounds.insert(20, f_p + "20-30");
+    tap_sounds.insert(30, f_p + "30-40");
+    tap_sounds.insert(40, f_p + "40-50");
+    tap_sounds.insert(50, f_p + "50-60");
+    tap_sounds.insert(60, f_p + "60-70");
+    tap_sounds.insert(70, f_p + "70-80");
+    tap_sounds.insert(80, f_p + "80-90");
+    tap_sounds.insert(90, f_p + "90-100");
+    tap_sounds.insert(100, f_p + "100-110");
+    tap_sounds.insert(110, f_p + "110-~");
 }
 
 //------------------------------------------------------------------------------
@@ -234,4 +256,6 @@ void VL60k::initialization()
     initOtherEquipment();
 
     initTriggers();
+
+    initTapSounds();
 }

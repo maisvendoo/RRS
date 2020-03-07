@@ -570,9 +570,9 @@ void Model::sharedMemoryFeedback()
 
         (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);        
 
-        std::copy((*it)->getDiscreteSignals().begin(),
+        /*std::copy((*it)->getDiscreteSignals().begin(),
                   (*it)->getDiscreteSignals().end(),
-                  viewer_data.te[i].discreteSignal.begin());
+                  viewer_data.te[i].discreteSignal.begin());*/
 
         std::copy((*it)->getAnalogSignals().begin(),
                   (*it)->getAnalogSignals().end(),

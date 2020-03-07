@@ -46,25 +46,34 @@ void TrainHorn::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
+    bool is_svistok_old = is_svistok;
     is_svistok = getKeyState(KEY_Space);
 
-    if (is_svistok)
+    if (is_svistok_old != is_svistok)
+
     {
-        emit soundSetVolume("Svistok", 100);
-    }
-    else
-    {
-        emit soundSetVolume("Svistok", 0);
+        if (is_svistok)
+        {
+            emit soundPlay("Svistok");
+        }
+        else
+        {
+            emit soundStop("Svistok");
+        }
     }
 
+    bool is_tifon_old = is_tifon;
     is_tifon = getKeyState(KEY_B);
 
-    if (is_tifon)
+    if (is_tifon_old != is_tifon)
     {
-        emit soundSetVolume("Tifon", 100);
-    }
-    else
-    {
-        emit soundSetVolume("Tifon", 0);
+        if (is_tifon)
+        {
+            emit soundPlay("Tifon");
+        }
+        else
+        {
+            emit soundStop("Tifon");
+        }
     }
 }

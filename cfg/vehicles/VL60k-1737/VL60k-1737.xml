@@ -9,6 +9,7 @@
                 <NumAxis>6</NumAxis>            
                 <DegreesOfFreedom>7</DegreesOfFreedom>
                 <WheelInertia>2.0</WheelInertia>
+				<SoundDir>vl60</SoundDir>
 
                 <ReguctorCoeff>3.83</ReguctorCoeff>
 
