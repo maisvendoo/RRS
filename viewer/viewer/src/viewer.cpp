@@ -127,8 +127,6 @@ int RouteViewer::run()
 
     viewer.setCameraManipulator(cs.get());
 
-    if (viewer.getCameraManipulator()->getName() == "cabine_view")
-
     return viewer.run();
 }
 

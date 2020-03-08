@@ -214,18 +214,18 @@ void VL60k::initTriggers()
 void VL60k::initTapSounds() {
     QString f_p = "tap_";
 
-    tap_sounds.insert(5, f_p + "5-10");
-    tap_sounds.insert(10, f_p + "10-20");
-    tap_sounds.insert(20, f_p + "20-30");
-    tap_sounds.insert(30, f_p + "30-40");
-    tap_sounds.insert(40, f_p + "40-50");
-    tap_sounds.insert(50, f_p + "50-60");
-    tap_sounds.insert(60, f_p + "60-70");
-    tap_sounds.insert(70, f_p + "70-80");
-    tap_sounds.insert(80, f_p + "80-90");
-    tap_sounds.insert(90, f_p + "90-100");
-    tap_sounds.insert(100, f_p + "100-110");
-    tap_sounds.insert(110, f_p + "110-~");
+    tap_sounds << (f_p + "5-10");
+    tap_sounds << (f_p + "10-20");
+    tap_sounds << (f_p + "20-30");
+    tap_sounds << (f_p + "30-40");
+    tap_sounds << (f_p + "40-50");
+    tap_sounds << (f_p + "50-60");
+    tap_sounds << (f_p + "60-70");
+    tap_sounds << (f_p + "70-80");
+    tap_sounds << (f_p + "80-90");
+    tap_sounds << (f_p + "90-100");
+    tap_sounds << (f_p + "100-110");
+    tap_sounds << (f_p + "110-~");
 }
 
 //------------------------------------------------------------------------------

@@ -38,6 +38,8 @@ public slots:
     void setVolume(QString name, int volume);
 
     void setPitch(QString name, float pitch);
+
+    void volumeCurveStep(QString name, float param);
 };
 
 #endif // SOUND_MANAGER_H
