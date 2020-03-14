@@ -50,6 +50,8 @@ xcopy ..\cfg\vehicles\IMR_pass_rzd-13819\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pas
 xcopy ..\cfg\vehicles\IMR_pass_rzd-16733\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-16733\
 xcopy ..\cfg\vehicles\IMR_pass_rzd-17669\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-17669\
 xcopy ..\cfg\vehicles\IMR_pass_rzd-25924\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-25924\
+xcopy ..\cfg\vehicles\IMR_pass_rzd-21071\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-21071\
+xcopy ..\cfg\vehicles\IMR_pass_rzd-65361\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-65361\
 xcopy ..\cfg\vehicles\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\cfg\vehicles\Fr_hopper_RZD-2851\
 
 xcopy ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\
@@ -82,12 +84,11 @@ rem Копируем данные игры (модели, звуки, конфи
 
 rem ВЛ60пк
 xcopy /S ..\..\data\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
-xcopy /S ..\..\data\sounds\vl60pk-1543\*.* %RRS_DEV_ROOT%\data\sounds\vl60pk-1543\
+xcopy /S ..\..\data\sounds\vl60pk-1543\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
 xcopy /S ..\..\data\animations\vl60pk-1543\*.* %RRS_DEV_ROOT%\data\animations\vl60pk-1543\
 
 rem ВЛ60к
 xcopy /S ..\..\data\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
-xcopy /S ..\..\data\sounds\VL60k-1737\*.* %RRS_DEV_ROOT%\data\sounds\VL60k-1737\
 xcopy /S ..\..\data\animations\VL60k-1737\*.* %RRS_DEV_ROOT%\data\animations\VL60k-1737\
 
 rem Пассажирские вагоны
@@ -97,6 +98,9 @@ xcopy /S ..\..\data\animations\IMR_pass_rzd-13819\*.* %RRS_DEV_ROOT%\data\animat
 xcopy /S ..\..\data\animations\IMR_pass_rzd-16733\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-16733\
 xcopy /S ..\..\data\animations\IMR_pass_rzd-17669\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-17669\
 xcopy /S ..\..\data\animations\IMR_pass_rzd-25924\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-25924\
+xcopy /S ..\..\data\animations\IMR_pass_rzd-21071\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-21071\
+xcopy /S ..\..\data\animations\IMR_pass_rzd-15563\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-15563\
+
 
 rem Вагоны-хоперы
 xcopy /S ..\..\data\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
@@ -121,7 +125,9 @@ xcopy /Q ..\simulator\solver\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\physics\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\vehicle\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\device\include\*.h %RRS_DEV_ROOT%\sdk\include\
-xcopy /S ..\..\sdk\examples\*.* %RRS_DEV_ROOT%\sdk\examples\
+xcopy /Q ..\viewer\display\include\*.h %RRS_DEV_ROOT%\sdk\include\
+xcopy /S ..\..\sdk\examples\*.* %RRS_DEV_ROOT%
+\sdk\examples\
 
 rem Копируем иконку
 
@@ -148,4 +154,4 @@ windeployqt %RRS_DEV_ROOT%\bin\profconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
 windeployqt %RRS_DEV_ROOT%\bin\TcpConnection.dll
-windeployqt %RRS_DEV_ROOT%\bin\libosgQt5.dll
+rem windeployqt %RRS_DEV_ROOT%\bin\libosgQt5.dll

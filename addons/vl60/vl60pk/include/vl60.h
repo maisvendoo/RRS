@@ -62,7 +62,7 @@ private:
     };
 
     /// Список звуков перестука
-    QMap   <int, QString>tap_sounds;
+    QList<QString> tap_sounds;
 
     double  U_bat;
 

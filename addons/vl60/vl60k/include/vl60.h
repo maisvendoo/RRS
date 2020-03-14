@@ -62,7 +62,7 @@ private:
     };
 
     /// Список звуков перестука
-    QMap   <int, QString>tap_sounds;
+    QList<QString>   tap_sounds;
 
     float   pant1_pos;
     float   pant2_pos;

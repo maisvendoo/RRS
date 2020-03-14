@@ -65,6 +65,9 @@ private:
 
     bool    is_auto;
 
+    /// Имя звука ЭКГ-8Ж
+    QString sound_name;
+
     /// Таймер управления переключением позиций
     Timer   pos_switcher;
 

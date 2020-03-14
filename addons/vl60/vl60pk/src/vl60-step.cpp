@@ -21,37 +21,9 @@ void VL60pk::stepTapSound()
 {
     double speed = abs(this->velocity) * 3.6;
 
-    QMap<int, QString>::const_iterator i = tap_sounds.constBegin();
-
-    QString soundPlay = "";
-
-    while (i != tap_sounds.constEnd())
+    for (int i = 0; i < tap_sounds.count(); ++i)
     {
-        if (speed >= i.key())
-        {
-            soundPlay = i.value();
-        }
-        if (speed < i.key())
-        {
-            break;
-        }
-        ++i;
-    }
-
-    i = tap_sounds.constBegin();
-
-    int volume;
-
-    while (i != tap_sounds.constEnd())
-    {
-        if (soundPlay == i.value())
-        {
-            volume = 100;
-        } else {
-            volume = 0;
-        }
-        emit soundSetVolume(i.value(), volume);
-        ++i;
+        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
     }
 }
 

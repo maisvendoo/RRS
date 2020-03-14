@@ -185,6 +185,8 @@ signals:
 
     void soundSetPitch(QString name, float pitch);
 
+    void volumeCurveStep(QString name, float param);
+
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
 protected:

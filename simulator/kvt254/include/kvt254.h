@@ -53,6 +53,10 @@ private:
 
     double pos_duration;
 
+    double volume;
+
+    double p_volume;
+
     int dir;
 
     int pos_num;
@@ -65,11 +69,15 @@ private:
 
     std::array<double, MAX_GIAN_COEFFS> k;
 
+    bool isStop;
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
 
     void stepKeysControl(double t, double dt);
+
+    void stepSound();
 };
 
 #endif // KVT254_H

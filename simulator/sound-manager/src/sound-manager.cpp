@@ -55,6 +55,16 @@ void SoundManager::loadSounds(const QString &vehicle_name)
             cfg.getBool(secNode, "Loop", sound_config.loop);
             cfg.getBool(secNode, "PlayOnStart", sound_config.play_on_start);
 
+            QString t_Str;
+            cfg.getString(secNode, "VolumeCurve", t_Str);
+            QRegExp rx("([+-]?\\d*\\.?\\d+)(?:\\t*)([+-]?\\d*\\.?\\d+)");
+            foreach(const QString &lst1, t_Str.split(QLatin1Char('\n')))
+            {
+                if (rx.indexIn(lst1) > -1)
+                    sound_config.volume_curve.insert(rx.cap(1).toDouble(),
+                                                     static_cast<int>((rx.cap(2).toDouble())));
+            }
+
             sound_config.sound = new ASound(QString((soundsDir + fs.separator()).c_str())
                                             + sound_config.path);
 
@@ -153,5 +163,33 @@ void SoundManager::setPitch(QString name, float pitch)
             if (!it.value().sound->isPlaying())
                 it.value().sound->play();
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SoundManager::volumeCurveStep(QString name, float param)
+{
+    auto it = sounds.find(name);
+
+    if (it.key() == name)
+    {
+        QMap<double, int>::const_iterator i = it->volume_curve.constBegin();
+
+        int volume = 0;
+
+        while (i != it->volume_curve.constEnd())
+        {
+            if (param >= static_cast<float>(i.key()))
+            {
+                volume = i.value();
+            } else {
+                break;
+            }
+            ++i;
+        }
+
+        it.value().sound->setVolume(volume);
     }
 }
