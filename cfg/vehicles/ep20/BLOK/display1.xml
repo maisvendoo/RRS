@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Window>
+		<CustomX>0</CustomX>
+		<CustomY>0</CustomY>
+		<ShowName>0</ShowName>
+	</Window>
+	<TCP>
+		<!-- Запрос 3 - GET_DISPLAY1_DATA -->
+		<command>3</command>
+		<host>127.0.0.1</host>
+		<name>display1</name>
+		<port>1992</port>
+		<timeout>500</timeout>
+	</TCP>
+	<Interface>
+		<!-- Экран, который будет показан при включении -->
+		<tree>main</tree>
+	</Interface>
+</Config>

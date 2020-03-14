@@ -103,6 +103,8 @@ float BrakeLock::getMainHandlePos() const
 //------------------------------------------------------------------------------
 void BrakeLock::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(t)
+
     handle_unlocked = static_cast<bool>(hs_n(Y[0] - p1));
 
     crane_pFL = loco_pFL * state;
@@ -141,6 +143,8 @@ void BrakeLock::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)
 {
+    Q_UNUSED(t)
+
     double Q0 = K[2] * (crane_pTM * state - Y[0]) * is_comb_opened - K[1] * Y[0] * is_emerg_brake;
 
     dYdt[0] = Q0 / V0;

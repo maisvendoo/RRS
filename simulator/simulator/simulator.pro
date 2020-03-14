@@ -20,7 +20,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
     LIBS += -L../../../lib -lJournal_d
-    LIBS += -L../../../lib -llog_d
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -lvehicle_d
     LIBS += -L../../../lib -lcoupling_d
@@ -29,6 +28,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lmodel_d    
     LIBS += -L../../../lib -lTcpConnection_d
+    LIBS += -L../../../lib -lsim-client_d
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
 
@@ -40,7 +40,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
     LIBS += -L../../../lib -lJournal
-    LIBS += -L../../../lib -llog
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
     LIBS += -L../../../lib -lcoupling
@@ -49,6 +48,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lbrakepipe
     LIBS += -L../../../lib -lmodel    
     LIBS += -L../../../lib -lTcpConnection
+    LIBS += -L../../../lib -lsim-client
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
 
@@ -76,7 +76,6 @@ INCLUDEPATH += ../../common-headers/
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
-INCLUDEPATH += ../../log/include
 INCLUDEPATH += ../../tcp-connection/include
 
 INCLUDEPATH += ../physics/include
@@ -88,6 +87,7 @@ INCLUDEPATH += ../coupling/include
 INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
+INCLUDEPATH += ../sim-client/include
 
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include

@@ -16,6 +16,9 @@ EPTPassControl::~EPTPassControl()
 
 void EPTPassControl::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     control_signal = 0.0;
 
     if (is_hold)
@@ -33,10 +36,12 @@ void EPTPassControl::preStep(state_vector_t &Y, double t)
 
 void EPTPassControl::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 void EPTPassControl::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }

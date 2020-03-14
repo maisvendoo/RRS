@@ -2,17 +2,17 @@
 <Config>
 	<Vehicle>
 
-		<EmptyMass>54200</EmptyMass>
-		<PayloadMass>4500</PayloadMass>
-		<Length>25.0</Length>
-		<WheelDiameter>0.95</WheelDiameter>
-		<MainResist>passcar</MainResist>
-		<NumAxis>4</NumAxis>		
-		<DegreesOfFreedom>5</DegreesOfFreedom>
-                <WheelInertia>2.0</WheelInertia>
+		<EmptyMass>135000</EmptyMass>
+		<PayloadMass>0</PayloadMass>
+		<Length>22.55</Length>
+		<WheelDiameter>1.25</WheelDiameter>
+		<MainResist>loco-resist</MainResist>
+		<NumAxis>6</NumAxis>		
+		<DegreesOfFreedom>7</DegreesOfFreedom>
+        <WheelInertia>2.0</WheelInertia>
 
-                <ExtModelName>ep20/EP20_2.osgt</ExtModelName>
-				<CabineModel>ep20/Cab.osgt</CabineModel>
+        <ExtModelName>ep20/EP20_2.osgt</ExtModelName>
+		<CabineModel>ep20/Cab.osgt</CabineModel>
                 
 
                 

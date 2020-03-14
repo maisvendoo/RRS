@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<SArrow>
+		<!-- стрелка спидометра -->
+		<koef_length>0.92</koef_length>
+		<width>17.0</width>
+		<color>#0096ff</color>
+		
+	</SArrow>
+	
+</Config>

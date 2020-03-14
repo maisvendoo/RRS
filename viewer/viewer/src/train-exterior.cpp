@@ -31,6 +31,8 @@
 
 #include    "model-animation.h"
 
+#include    "display-loader.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -279,12 +281,15 @@ void TrainExteriorHandler::load(const std::string &train_config)
                 vehicle_ext.driver_pos = driver_pos;
 
                 vehicle_ext.anims = new animations_t();
+                vehicle_ext.displays = new displays_t();
 
                 loadModelAnimations(module_config_name, vehicle_model.get(), *vehicle_ext.anims);
                 loadAnimations(module_config_name, vehicle_model.get(), *vehicle_ext.anims);
                 loadAnimations(module_config_name, cabine.get(), *vehicle_ext.anims);
 
                 anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
+
+                loadDisplays(cfg, child, cabine.get(), *vehicle_ext.displays);
 
                 vehicles_ext.push_back(vehicle_ext);
                 trainExterior->addChild(vehicle_ext.transform.get());
@@ -293,6 +298,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
     }
 
     //animation_manager = new AnimationManager(&animations);
+    this->startTimer(100);
 }
 
 //------------------------------------------------------------------------------
@@ -337,15 +343,8 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         {
             ProcAnimation *animation = it.value();
             animation->setPosition(nd.sd.back().te[i].analogSignal[animation->getSignalID()]);
-        }
-    }
-
-    // Set parameters for animations
-    /*for (auto it = animations.begin(); it != animations.end(); ++it)
-    {
-        ProcAnimation *animation = it.value();
-        animation->setPosition(nd.sd.back().te[static_cast<size_t>(cur_vehicle)].analogSignal[animation->getSignalID()]);
-    }*/
+        }        
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -509,6 +508,112 @@ void TrainExteriorHandler::loadModelAnimations(const std::string vehicle_name,
                 animation->load(cfg);
                 animations.insert(animation->getSignalID(), animation);
             }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
+                                        osgDB::XmlNode *vehicle_node,
+                                        osg::Node *model,
+                                        displays_t &displays)
+{
+    // Определяем имя модуля для формирования пути к библиотекам дисплеев
+    osgDB::XmlNode *module_node = cfg.findSection(vehicle_node, "Module");
+
+    if (module_node == nullptr)
+    {
+        OSG_FATAL << "Vehicle's module is't represented";
+        return;
+    }
+
+    std::string module_name;
+    getValue(module_node->contents, module_name);
+    FileSystem &fs = FileSystem::getInstance();
+    std::string modules_dir = fs.combinePath(fs.getModulesDir(), module_name);
+    QString md(modules_dir.c_str());
+
+    // Определяем имя конфига для формирования пути к файлу displays.xml,
+    // где хранится список дисплеев
+    osgDB::XmlNode *module_config_node = cfg.findSection(vehicle_node, "ModuleConfig");
+
+    if (module_node == nullptr)
+    {
+        OSG_FATAL << "Vehicle's module config is't represented";
+        return;
+    }
+
+    std::string module_config_name;
+    getValue(module_config_node->contents, module_config_name);
+    std::string vehicles_config_dir = fs.combinePath(fs.getConfigDir(), fs.combinePath("vehicles", module_config_name));
+    std::string displays_config = fs.combinePath(vehicles_config_dir, "displays.xml");
+
+    ConfigReader displays_cfg(displays_config);
+
+    if (!displays_cfg.isOpenned())
+    {
+        OSG_FATAL << "File " << displays_config << " is't found";
+        return;
+    }
+
+    osgDB::XmlNode *config_node = displays_cfg.getConfigNode();
+
+    for (auto it = config_node->children.begin(); it != config_node->children.end(); ++it)
+    {
+        osgDB::XmlNode *display_node = *it;
+
+        if (display_node->name == "Display")
+        {
+            display_config_t display_config;
+
+            osgDB::XmlNode *module_node = displays_cfg.findSection(display_node, "Module");
+            std::string module_path = fs.combinePath(modules_dir, module_node->contents);
+            display_config.module_name = QString(module_path.c_str());
+
+            osgDB::XmlNode *surface_name_node = displays_cfg.findSection(display_node, "SurfaceName");
+            display_config.surface_name = QString(surface_name_node->contents.c_str());
+
+            display_config.texcoord = new osg::Vec2Array;
+            for (size_t i = 0; i < 4; ++i)
+            {
+                QString corner_name = QString("Corner%1").arg(i+1);
+                osgDB::XmlNode *corner_node = displays_cfg.findSection(display_node, corner_name.toStdString());
+
+                std::stringstream ss(corner_node->contents);
+                float x, y;
+                ss >> x >> y;
+                osg::Vec2 texel(x, y);
+                display_config.texcoord->push_back(texel);
+            }
+
+            display_container_t *dc = new display_container_t();
+
+            loadDisplayModule(display_config, dc, model);
+
+            if (dc->display == nullptr)
+                continue;
+
+            dc->display->setConfigDir(QString(vehicles_config_dir.c_str()));
+            dc->display->init();
+
+            displays.push_back(dc);
+        }
+    }
+}
+
+void TrainExteriorHandler::timerEvent(QTimerEvent *)
+{
+    if (nd.sd.size() == 0)
+        return;
+
+    for (size_t i = 0; i < vehicles_ext.size(); ++i)
+    {
+        for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
+        {
+            display_container_t *dc = *it;
+            dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
         }
     }
 }

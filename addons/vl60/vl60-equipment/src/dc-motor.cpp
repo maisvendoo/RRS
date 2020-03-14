@@ -109,6 +109,8 @@ void DCMotor::setDirection(int revers_state)
 //------------------------------------------------------------------------------
 void DCMotor::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(t)
+
     torque = Y[0] * calcCPhi(Y[0] * beta * direction);
 
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
@@ -122,6 +124,8 @@ void DCMotor::ode_system(const state_vector_t &Y,
                          state_vector_t &dYdt,
                          double t)
 {
+    Q_UNUSED(t)
+
     double R = R_a + beta * R_gp + R_dp + R_r;
     double E = omega * calcCPhi(Y[0] * beta * direction);
 

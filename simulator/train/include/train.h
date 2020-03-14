@@ -88,6 +88,12 @@ public:
 
     size_t getVehiclesNumber() const;
 
+    QString getClientName();
+
+    QString getTrainID();
+
+    int getDirection() const;
+
     std::vector<Vehicle *> *getVehicles();
 
 signals:
@@ -131,6 +137,12 @@ private:
 
     /// Sound manager
     SoundManager *soundMan;
+
+    /// Имя сетевого клиента для ВЖД
+    QString     client_name;
+
+    /// Идентификатор поезда для ВЖД
+    QString     train_id;
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;

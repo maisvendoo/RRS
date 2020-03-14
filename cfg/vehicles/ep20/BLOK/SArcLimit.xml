@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<SArcLimit>
+		<!-- дуга ограничения шкалы спидометра -->		
+		<arcLimit_width>12</arcLimit_width>
+		<arcLimit_color>#ff0000</arcLimit_color>
+		<arcLimitNext_color>#ffff00</arcLimitNext_color>
+		
+	</SArcLimit>
+	
+</Config>

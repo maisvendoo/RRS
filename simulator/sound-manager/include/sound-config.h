@@ -14,6 +14,7 @@ struct sound_config_t
     float       init_pitch;
     bool        loop;
     bool        play_on_start;
+    QMap<double,int>    volume_curve;
 
     sound_config_t()
         : sound(Q_NULLPTR)

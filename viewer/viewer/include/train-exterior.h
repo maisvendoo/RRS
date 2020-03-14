@@ -31,6 +31,8 @@
 #include    "camera-position.h"
 #include    "settings.h"
 #include    "server-data-struct.h"
+#include    "config-reader.h"
+#include    "display.h"
 
 #include    <queue>
 
@@ -123,7 +125,11 @@ private:
     /// Load vehicle animations
     void loadAnimations(const std::string vehicle_name, osg::Node *cabine, animations_t &animations);
 
-    void loadModelAnimations(const std::string vehicle_name, osg::Node *model, animations_t &animations);    
+    void loadModelAnimations(const std::string vehicle_name, osg::Node *model, animations_t &animations);
+
+    void loadDisplays(ConfigReader &cfg, osgDB::XmlNode *vehicle_node, osg::Node *model, displays_t &displays);
+
+    void timerEvent(QTimerEvent *);
 };
 
 #endif // TRAIN_EXTERIOR_H

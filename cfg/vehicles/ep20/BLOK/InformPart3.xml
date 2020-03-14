@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<InformPart3>
+		<!-- параметры элемента информационного блока 3 (давление цилиндра) -->		
+		<widthElem>180</widthElem>
+		<heightElem>29</heightElem>
+		<colorBorder>#ffff00</colorBorder>
+		<colorText>#ffffff</colorText>
+		<fontSize>15</fontSize>
+	</InformPart3>
+	
+</Config>

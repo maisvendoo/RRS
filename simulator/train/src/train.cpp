@@ -45,7 +45,6 @@ bool Train::init(const init_data_t &init_data)
 
     if (train_motion_solver == Q_NULLPTR)
     {
-        emit logMessage("ERROR: solver " + solver_path + " is't found");
         Journal::instance()->error("Solver " + solver_path + " is't found");
         return false;
     }
@@ -69,7 +68,6 @@ bool Train::init(const init_data_t &init_data)
     // Loading of train
     if (!loadTrain(full_config_path))
     {
-        emit logMessage("ERROR: train is't loaded");
         Journal::instance()->error("Train is't loaded");
         return false;
     }
@@ -92,7 +90,6 @@ bool Train::init(const init_data_t &init_data)
     // Loading of couplings
     if (!loadCouplings(full_config_path))
     {
-        emit logMessage("ERROR: couplings is't loaded");
         Journal::instance()->error("Coupling model is't loaded");
         return false;
     }
@@ -201,7 +198,7 @@ void Train::vehiclesStep(double t, double dt)
     auto begin = vehicles.begin();
 
     brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
-    int j = 1;
+    size_t j = 1;
 
     for (auto i = begin; i != end; ++i)
     {
@@ -294,6 +291,33 @@ size_t Train::getVehiclesNumber() const
     return vehicles.size();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Train::getClientName()
+{
+    return client_name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Train::getTrainID()
+{
+    return train_id;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int Train::getDirection() const
+{
+    return dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::vector<Vehicle *> *Train::getVehicles()
 {
     return &vehicles;
@@ -327,6 +351,16 @@ bool Train::loadTrain(QString cfg_path)
             no_air = false;
         }
 
+        if (!cfg.getString("Common", "ClientName", client_name))
+        {
+            client_name = "";
+        }
+
+        if (!cfg.getString("Common", "TrainID", train_id))
+        {
+            train_id = "";
+        }        
+
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 
         if (vehicle_node.isNull())
@@ -339,7 +373,6 @@ bool Train::loadTrain(QString cfg_path)
             QString module_name = "";
             if (!cfg.getString(vehicle_node, "Module", module_name))
             {
-                emit logMessage("ERROR: Module section is not find");
                 Journal::instance()->error("Module section is not found");
                 break;
             }
@@ -369,18 +402,14 @@ bool Train::loadTrain(QString cfg_path)
                 payload_coeff = 0;
             }
 
-            // Loading sounds            
-            soundMan->loadSounds(module_cfg_name);
-
             for (int i = 0; i < n_vehicles; i++)
             {
                 Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
                                                fs.separator() +
-                                               relModulePath);                
+                                               relModulePath);
 
                 if (vehicle == Q_NULLPTR)
                 {
-                    emit logMessage("ERROR: vehicle " + module_name + " is't loaded");
                     Journal::instance()->error("Vehicle " + module_name + " is't loaded");
                     break;
                 }
@@ -412,10 +441,14 @@ bool Train::loadTrain(QString cfg_path)
                 vehicle->setIndex(index);
                 index = ode_order;
 
+                // Loading sounds
+                soundMan->loadSounds(vehicle->getSoundsDir());
+
                 connect(vehicle, &Vehicle::soundPlay, soundMan, &SoundManager::play, Qt::DirectConnection);
                 connect(vehicle, &Vehicle::soundStop, soundMan, &SoundManager::stop, Qt::DirectConnection);
                 connect(vehicle, &Vehicle::soundSetVolume, soundMan, &SoundManager::setVolume, Qt::DirectConnection);
                 connect(vehicle, &Vehicle::soundSetPitch, soundMan, &SoundManager::setPitch, Qt::DirectConnection);
+                connect(vehicle, &Vehicle::volumeCurveStep, soundMan, &SoundManager::volumeCurveStep, Qt::DirectConnection);
 
                 if (vehicles.size() !=0)
                 {
@@ -424,10 +457,7 @@ bool Train::loadTrain(QString cfg_path)
                     vehicle->setPrevVehicle(prev);
                 }                
 
-                vehicles.push_back(vehicle);
-
-                emit logMessage("OK: Loaded vehicle: " + module_name +
-                                " with configuration: " + module_cfg_name + ".xml");
+                vehicles.push_back(vehicle);                
             }            
 
             vehicle_node = cfg.getNextSection();            
@@ -442,7 +472,6 @@ bool Train::loadTrain(QString cfg_path)
     }
     else
     {
-        emit logMessage("ERROR: file " + cfg_path + " is't found");
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
@@ -479,7 +508,6 @@ bool Train::loadCouplings(QString cfg_path)
 
             if (coupling == Q_NULLPTR)
             {
-                emit logMessage("ERROR: coupling module " + coupling_module + " is't found");
                 return false;
             }
 
@@ -499,7 +527,6 @@ bool Train::loadCouplings(QString cfg_path)
     }
     else
     {
-        emit logMessage("ERROR: file " + cfg_path + " is't found");
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
@@ -528,10 +555,8 @@ void Train::setInitConditions(const init_data_t &init_data)
         }
     }
 
-    double x0 = init_data.init_coord * 1000.0;
+    double x0 = init_data.init_coord * 1000.0 - dir * this->getFirstVehicle()->getLength() / 2.0;
     y[0] = x0;    
-
-    emit logMessage(QString("OK: Setting up of initial coordinate: %1").arg(x0));
 
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
 
@@ -562,4 +587,3 @@ void Train::initVehiclesBrakes()
         vehicles[i]->initBrakeDevices(charging_pressure, pTM, init_main_res_pressure);
     }
 }
-

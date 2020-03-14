@@ -1,15 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Config>
-	<Common>
-		<CouplingModule>ef-coupling</CouplingModule>
-		<CabineInVehicle>0</CabineInVehicle>
-		<Title>Тестовый локомотив (резервом)</Title>
-		<Description>Тестовый локомотив резервом</Description>
-	</Common>
-	<Vehicle>
-		<Module>test-loco</Module>
-		<ModuleConfig>test-loco</ModuleConfig>
-		<Count>1</Count>
-		<PayloadCoeff>1</PayloadCoeff>
-	</Vehicle>	
-</Config>

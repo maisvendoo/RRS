@@ -25,6 +25,7 @@
 #include    "ac-motor-compressor.h"
 #include    "ep20-signals.h"
 #include    "ep20-brake-mech.h"
+#include    "kmb2.h"
 
 /*!
  * \class
@@ -90,7 +91,6 @@ private:
 
     /// Мотор компрессор   
     std::array<ACMotorCompressor *, 2> motorCompAC;
-//    ACMotorCompressor   *motorCompAC;
 
     /// Входные значения
     mpcs_input_t mpcsInput;
@@ -131,6 +131,9 @@ private:
     std::array<PneumoReley *, NUM_TROLLEYS> rd304;
     std::array<PneumoSplitter *, 2> pSplit;
 
+    /// Бесконтактный контроллер машиниста
+    KMB2    *kmb2;
+
     /// Инициализация
     void initialization();
 
@@ -143,6 +146,9 @@ private:
     /// Инициализация МПСУ
     void initMPCS();
 
+    /// Инициализация КМБ2
+    void initKMB2();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
@@ -154,6 +160,9 @@ private:
 
     /// Шаг моделирования тормозного крана
     void stepBrakeControls(double t, double dt);
+
+    /// Шаг моделирования бесконтактного контроллера машиниста
+    void stepKMB2(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
