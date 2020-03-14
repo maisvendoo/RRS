@@ -17,6 +17,7 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , dir(0)
   , positions({0.0, 0.325, 0.5, 0.752, 1.0})
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
+  , isStop(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
@@ -117,6 +118,53 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
     dYdt[1] = Q2 / V2; // p2
 
     dYdt[2] = Qpz / Vpz; // p_pz
+
+    stepSound();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane254::stepSound()
+{
+    p_volume = volume;
+
+    // 250000 поправочный коэффициент для перевода 1кг/cм^3 в 1кг/м^3
+    // Для звуков взято 400000 с малым запасом
+    volume = abs(Qbc) * 400000;
+
+    if (volume > 30)
+    {
+        if (Qbc > 0)
+        {
+            if (p_volume <= 30)
+            {
+                emit soundPlay("254_vpusk");
+            }
+            emit soundSetVolume("254_vypusk", 0);
+            emit soundSetVolume("254_vpusk", volume);
+        }
+
+        if (Qbc < 0)
+        {
+            if (p_volume <= 30)
+            {
+                emit soundPlay("254_vypusk");
+            }
+            emit soundSetVolume("254_vpusk", 0);
+            emit soundSetVolume("254_vypusk", volume);
+        }
+        isStop = false;
+    }
+    else
+    {
+        if (!isStop)
+        {
+            emit soundStop("254_vpusk");
+            emit soundStop("254_vypusk");
+            isStop = true;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
