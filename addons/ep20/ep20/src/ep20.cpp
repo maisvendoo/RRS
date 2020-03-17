@@ -1,4 +1,4 @@
- #include    "ep20.h"
+   #include    "ep20.h"
 
 #include    <CfgReader.h>
 #include    <QDir>
@@ -11,7 +11,7 @@
 EP20::EP20()
 {
     Uks = 25000.0;
-    current_kind = 1;
+    current_kind = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -20,18 +20,6 @@ EP20::EP20()
 EP20::~EP20()
 {
 
-}
-
-void EP20::initBrakeDevices(double p0, double pTM, double pFL)
-{
-    main_reservoir->setY(0, pFL);
-    charge_press = p0;
-
-    load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
-
-    krm->init(pTM, pFL);
-    kvt->init(pTM, pFL);
-    spareReservoir->setY(0, pTM);
 }
 
 //------------------------------------------------------------------------------
@@ -152,6 +140,20 @@ void EP20::initBrakeControls(QString modules_dir)
     pSplit[1]->read_config("pneumo-splitter");
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EP20::initBrakeDevices(double p0, double pTM, double pFL)
+{
+    main_reservoir->setY(0, pFL);
+    charge_press = p0;
+
+    load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
+
+    krm->init(pTM, pFL);
+    kvt->init(pTM, pFL);
+    spareReservoir->setY(0, pTM);
+}
 
 //------------------------------------------------------------------------------
 // Общие шаги моделирования
@@ -169,7 +171,7 @@ void EP20::step(double t, double dt)
 
     stepKMB2(t, dt);
 
-    // Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
+//     Выводим на экран симулятор, высоту подъема/спуска, выходное напряжение, род ток!
 //    DebugMsg = QString("t: %1 s, U2_4: %2, Q: %3, pUR: %4, pTM: %5, KrM: %6, pTC_2: %7, pTC_1: %8 pZR: %9 pos: %10 trac_pos: %11")
 //            .arg(t, 10, 'f', 2)
 //            .arg(auxConv[3]->getU2(), 5, 'f', 1)
@@ -182,16 +184,22 @@ void EP20::step(double t, double dt)
 //            .arg(spareReservoir->getPressure(), 4, 'f', 2)
 //            .arg(kvt->getHandlePosition(), 4, 'f', 2);
 
+        DebugMsg = QString("t: %1 s, H_AC1 %2, H_DC1 %3, H_AC2 %4, H_DC2 %5")
+                .arg(t, 10, 'f', 2)
+                .arg(pantograph[PANT_AC1]->getHeight(), 4, 'f', 2)
+                .arg(pantograph[PANT_DC1]->getHeight(), 4, 'f', 2)
+                .arg(pantograph[PANT_AC2]->getHeight(), 4, 'f', 2)
+                .arg(pantograph[PANT_DC2]->getHeight(), 4, 'f', 2);
 
 
-    DebugMsg = QString("t: %1 s, Reverse_State: %2, Trac_Level: %3, Vel_Level: %4, Reverse_Dir: %5, Trac_Pos: %6, Vel_Pos: %7")
-            .arg(t, 10, 'f', 2)
-            .arg(kmb2->getReverseState(), 2)
-            .arg(kmb2->getTractionLevel(), 5, 'f', 2)
-            .arg(kmb2->getVelocityLevel(), 5, 'f', 2)
-            .arg(kmb2->getReverseDir(), 2)
-            .arg(kmb2->getTractionPosition(), 2)
-            .arg(kmb2->getVelocityPosition(), 2);
+//    DebugMsg = QString("t: %1 s, Reverse_State: %2, Trac_Level: %3, Vel_Level: %4, Reverse_Dir: %5, Trac_Pos: %6, Vel_Pos: %7")
+//            .arg(t, 10, 'f', 2)
+//            .arg(kmb2->getReverseState(), 2)
+//            .arg(kmb2->getTractionLevel(), 5, 'f', 2)
+//            .arg(kmb2->getVelocityLevel(), 5, 'f', 2)
+//            .arg(kmb2->getReverseDir(), 2)
+//            .arg(kmb2->getTractionPosition(), 2)
+//            .arg(kmb2->getVelocityPosition(), 2);
 
     stepSignals();
 
@@ -201,7 +209,7 @@ void EP20::step(double t, double dt)
 //    .arg(kindSwitch->getUoutDC(), 4, 'f', 2)
 //    .arg(kindSwitch->getUoutAC(), 4, 'f', 2)
 //    .arg(mainSwitch->getU_out(), 4, 'f', 2)
-//    .arg(fastSwitch->getU_out(), 4, 'f', 2)
+//     .arg(fastSwitch->getU_out(), 4, 'f', 2)
 //    .arg(tractionTrans->getTractionVoltage(0))
 //    .arg(auxConv[1]->getU2());
 }

@@ -32,6 +32,17 @@ void EP20::stepSignals()
     analogSignal[PANTOGRAPH_AC2] = static_cast<float>(pantograph[PANT_AC2]->getHeight());
     analogSignal[PANTOGRAPH_DC2] = static_cast<float>(pantograph[PANT_DC2]->getHeight());
 
+    analogSignal[sigLight_Pant_fwd] = static_cast<float>(pantograph[PANT_DC1]->isUp());
+
+    analogSignal[LS_G4] = 1;
+    analogSignal[LS_G3] = 1;
+    analogSignal[LS_G2] = 1;
+    analogSignal[LS_G1] = 1;
+    analogSignal[LS_Y] = 1;
+    analogSignal[LS_RY] = 1;
+    analogSignal[LS_R] = 1;
+    analogSignal[LS_W] = 1;
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
