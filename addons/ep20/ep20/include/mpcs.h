@@ -28,6 +28,8 @@ public:
     /// Получение выходного сигнала
     mpcs_output_t getSignalOutputMPCS();
 
+    float getKeyPosition();
+
 private:
 
     /// Путь к файлу рода тока
@@ -58,6 +60,9 @@ private:
     double p_min;
 
     double p_max;
+
+    // Позиция ключа старта ЭП20
+    int keyPosition;
 
     /// Управление клавишами
     void stepKeysControl(double t, double dt);

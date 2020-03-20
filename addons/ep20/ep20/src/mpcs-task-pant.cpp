@@ -46,6 +46,11 @@ void TaskPant::setControlSignal(size_t id, bool value)
     ctrl_signals[id] = value;
 }
 
+void TaskPant::setStoragePath(QString path)
+{
+    pathStorage = path;
+}
+
 //------------------------------------------------------------------------------
 // Чтение из файла значения последнего активного рода тока
 //------------------------------------------------------------------------------
@@ -68,13 +73,13 @@ void TaskPant::readLastCurrentKind()
 //------------------------------------------------------------------------------
 // Записать значение рода тока в файл
 //------------------------------------------------------------------------------
-void TaskPant::writeLastCurrentKind()
+void TaskPant::writeLastCurrentKind(mpcs_input_t mpcs_input)
 {
     std::ofstream file(pathStorage.toStdString() + "last_current_kind");
 
     if (file.is_open())
     {
-        file << last_current_kind;
+        file << mpcs_input.current_kind;
         file.close();
     }
     else
@@ -266,13 +271,13 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
         }
         case  READY:
         {
-            writeLastCurrentKind();
+            writeLastCurrentKind(mpcs_input);
             taskPantStateUp = INITIAL_STATE_IS_UP;
             break;
         }
         case  FAULT_IS_UP:
         {
-            taskPantStateUp = INITIAL_STATE_IS_UP;
+            taskPantStateUp = READY;
             break;
         }
         default:

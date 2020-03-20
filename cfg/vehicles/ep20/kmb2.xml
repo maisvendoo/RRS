@@ -3,9 +3,9 @@
 
 		<Order>1</Order>
 		
-		<traction_rate>1</traction_rate>
+		<traction_rate>0.05</traction_rate>
 
-		<velocity_rate>1</velocity_rate>
+		<velocity_rate>0.05</velocity_rate>
 
 	</Device>
 </Config>

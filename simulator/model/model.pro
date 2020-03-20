@@ -34,7 +34,7 @@ CONFIG(debug, debug|release) {
 } else {
 
     LIBS += -L../../../lib -lfilesystem
-    LIBS += -L../../../lib -lJournal    
+    LIBS += -L../../../lib -lJournal
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
