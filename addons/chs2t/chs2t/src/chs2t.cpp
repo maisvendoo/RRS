@@ -95,8 +95,11 @@ void CHS2T::initialization()
 //------------------------------------------------------------------------------
 void CHS2T::step(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     //Journal::instance()->info("Step pantographs");
-    stepPantographs(t, dt);    
+    stepPantographs(t, dt);
 
     //Journal::instance()->info("Step fast switch");
     stepFastSwitch(t, dt);
@@ -142,6 +145,7 @@ void CHS2T::step(double t, double dt)
     horn->setControl(keys, control_signals);
     horn->step(t, dt);
 
+    //Journal::instance()->info("Step speed meter");
     speed_meter->setOmega(wheel_omega[0]);
     speed_meter->setWheelDiameter(wheel_diameter);
     speed_meter->step(t, dt);

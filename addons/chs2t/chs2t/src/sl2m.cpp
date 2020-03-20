@@ -59,6 +59,8 @@ float SL2M::getShaftPos() const
 //------------------------------------------------------------------------------
 void SL2M::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(t)
+
     omega_s = ip * omega;
 
     double velocity = omega * Dk / 2.0 + cut(1000.0 * omega, -wear_gap, wear_gap) * sin(Y[1]);
@@ -77,6 +79,9 @@ void SL2M::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void SL2M::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     dYdt[0] = omega_s;
     dYdt[1] = freq_coeff * omega;
 }

@@ -125,7 +125,7 @@ void CHS2T::stepTractionControl(double t, double dt)
 
     tracForce_kN = 0;
 
-    for (size_t i = 0; i <= Q_a.size(); ++i)
+    for (size_t i = 1; i < Q_a.size(); ++i)
     {
         Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
