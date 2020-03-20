@@ -11,7 +11,7 @@
 		<DegreesOfFreedom>7</DegreesOfFreedom>
         <WheelInertia>2.0</WheelInertia>
 
-        <ExtModelName>ep20/EP20_2.osgt</ExtModelName>
+        <ExtModelName>ep20/EP20.osgt</ExtModelName>
 		<CabineModel>ep20/Cab.osgt</CabineModel>
                 
 

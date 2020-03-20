@@ -13,8 +13,10 @@ void EP20::stepSignals()
     analogSignal[KMB2_Real] = kmb2->getTractionPosition();
     analogSignal[KMB2_Fake] = kmb2->getVelocityPosition();
 
-    analogSignal[KeyCard_Fake] = kmb2->getPovorot();
+    analogSignal[KeyCard_Fake] = kmb2->getTurn();
     analogSignal[KeyCard_Low] = kmb2->getS3();
+
+    analogSignal[Key] = mpcs->getKeyPosition();
 
     analogSignal[BLOK_TC_PRESS] = static_cast<float>(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure());
     analogSignal[BLOK_TM_PRESS] = static_cast<float>(pTM);
@@ -25,10 +27,27 @@ void EP20::stepSignals()
     analogSignal[BLOK_VELOCITY_CURRENT_LIMIT] = 200.0f;
     analogSignal[BLOK_VELOCITY_NEXT_LIMIT] = 200.0f;
 
+    analogSignal[PANTOGRAPH_AC1] = static_cast<float>(pantograph[PANT_AC1]->getHeight());
+    analogSignal[PANTOGRAPH_DC1] = static_cast<float>(pantograph[PANT_DC1]->getHeight());
+    analogSignal[PANTOGRAPH_AC2] = static_cast<float>(pantograph[PANT_AC2]->getHeight());
+    analogSignal[PANTOGRAPH_DC2] = static_cast<float>(pantograph[PANT_DC2]->getHeight());
+
+    analogSignal[sigLight_Pant_fwd] = static_cast<float>(pantograph[PANT_DC1]->isUp());
+
+    analogSignal[LS_G4] = 1;
+    analogSignal[LS_G3] = 1;
+    analogSignal[LS_G2] = 1;
+    analogSignal[LS_G1] = 1;
+    analogSignal[LS_Y] = 1;
+    analogSignal[LS_RY] = 1;
+    analogSignal[LS_R] = 1;
+    analogSignal[LS_W] = 1;
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
     analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
     analogSignal[WHEEL_5] = static_cast<float>(dir * wheel_rotation_angle[4] / 2.0 / Physics::PI);
     analogSignal[WHEEL_6] = static_cast<float>(dir * wheel_rotation_angle[5] / 2.0 / Physics::PI);
+
 }

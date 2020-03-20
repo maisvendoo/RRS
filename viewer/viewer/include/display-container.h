@@ -2,6 +2,7 @@
 #define     DISPLAY_CONTAINER_H
 
 #include    <osgQt/QWidgetImage>
+
 #include    <osgViewer/ViewerEventHandlers>
 #include    <osg/Texture2D>
 

@@ -25,17 +25,18 @@ public:
     float getVelocityPosition();
 
     // Получить уровень тяги
-    float getTractionLevel();
+    double getTractionLevel();
 
     // Получить уровень скорости
-    float getVelocityLevel();
+    double getVelocityLevel();
 
     // Получить реверсивное состояние
     float getReverseState();
 
+    // Получить состояние разварота Ключ-карты для анимации
+    double getTurn();
 
-    double getPovorot();
-
+    // Получить состояние опускания Ключ-карты для анимации
     double getS3();
 
 private:
@@ -56,20 +57,21 @@ private:
     int   velocity_pos;
 
     // Уровень тяги (для таймера)
-    int   traction_level;
+    double   traction_level;
 
     // Уровень скорости (для таймера)
-    int   velocity_level;
+    double   velocity_level;
 
     // Реверсивное состояние (для таймера)
     int   reverse_state;
 
     //Коэффициент из конфига
-    int traction_rate;
+    double traction_rate;
 
     //Коэффициент из конфига
-    int velocity_rate;
+    double velocity_rate;
 
+    // Блок переменных для анимации Ключ-карты
     double T;
 
     double S1;
@@ -80,6 +82,7 @@ private:
 
     bool old_state_W;
     bool old_state_S;
+    //----------------------------------------
 
     void preStep(state_vector_t &Y, double t);
 
