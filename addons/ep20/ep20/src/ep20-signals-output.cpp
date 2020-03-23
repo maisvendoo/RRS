@@ -32,7 +32,10 @@ void EP20::stepSignals()
     analogSignal[PANTOGRAPH_AC2] = static_cast<float>(pantograph[PANT_AC2]->getHeight());
     analogSignal[PANTOGRAPH_DC2] = static_cast<float>(pantograph[PANT_DC2]->getHeight());
 
-    analogSignal[sigLight_Pant_fwd] = static_cast<float>(pantograph[PANT_DC1]->isUp());
+    analogSignal[sigLight_Pant_fwd] = SIG_LIGHT_RED;
+    analogSignal[sigLight_Pant_bwd] = SIG_LIGHT_GREEN;
+    analogSignal[sigLight_GV] = SIG_LIGHT_YELLOW;
+    analogSignal[sigLight_Train_heating] = SIG_LIGHT_BLUE;
 
     analogSignal[LS_G4] = 1;
     analogSignal[LS_G3] = 1;
