@@ -265,6 +265,15 @@ void MPCS::buttonsOn()
     mpcs_output.lamps_state.auto_driver = SIG_LIGHT_YELLOW;
     mpcs_output.lamps_state.speed_control = SIG_LIGHT_YELLOW;
     mpcs_output.lamps_state.vz = SIG_LIGHT_YELLOW;
+
+    mpcs_output.lamps_state.ept = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.gs = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.pv = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.wheel_clean = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.saund1 = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.brake_release = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.test = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.res_purge = SIG_LIGHT_YELLOW;
 }
 
 //------------------------------------------------------------------------------

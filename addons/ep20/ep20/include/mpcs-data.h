@@ -70,6 +70,15 @@ struct lamps_state_t
     float speed_control;
     float vz;
 
+    float ept;
+    float gs;
+    float pv;
+    float wheel_clean;
+    float saund1;
+    float brake_release;
+    float test;
+    float res_purge;
+
     lamps_state_t()
         : pant_fwd(0.0)
         , pant_bwd(0.0)
@@ -79,6 +88,15 @@ struct lamps_state_t
         , auto_driver(0.0)
         , speed_control(0.0)
         , vz(0.0)
+
+        , ept(0.0)
+        , gs(0.0)
+        , pv(0.0)
+        , wheel_clean(0.0)
+        , saund1(0.0)
+        , brake_release(0.0)
+        , test(0.0)
+        , res_purge(0.0)
     {
 
     }
