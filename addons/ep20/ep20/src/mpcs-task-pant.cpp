@@ -5,6 +5,8 @@
 #include    "mpcs-task-pant.h"
 #include    "current-kind.h"
 
+#include    "ep20-signals.h"
+
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
@@ -154,6 +156,17 @@ bool isEven(int num)
 }
 
 //------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void setPantLampsState(mpcs_output_t &mpcs_output, unsigned long pantPriority, float state)
+{
+    mpcs_output.lamps_state.pant_fwd.is_blinked = mpcs_output.lamps_state.pant_bwd.is_blinked = false;
+
+    pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd.state = state :
+                        mpcs_output.lamps_state.pant_bwd.state = state;
+}
+
+//------------------------------------------------------------------------------
 // Обработка поднятие ТП
 //------------------------------------------------------------------------------
 void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
@@ -167,6 +180,9 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
             if (is_command_up)
             {
                 taskPantStateUp = UP_PRIORETY_PANT;
+
+                pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd.is_blinked = true :
+                                    mpcs_output.lamps_state.pant_bwd.is_blinked = true;
             }
 
             break;
@@ -273,6 +289,9 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
         {
             writeLastCurrentKind(mpcs_input);
             taskPantStateUp = INITIAL_STATE_IS_UP;
+
+            setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_GREEN);
+
             break;
         }
         case  FAULT_IS_UP:
@@ -299,6 +318,9 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
            if (is_command_down)
            {
                taskPantStateDown = IS_OFF_MS_HSS;
+
+               pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd.is_blinked = true :
+                                   mpcs_output.lamps_state.pant_bwd.is_blinked = true;
            }
 
            break;
@@ -360,6 +382,7 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
             {
                 pantDownWaitingTimer->stop();
                 taskPantStateDown = INITIAL_STATE_IS_DOWN;
+                setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_YELLOW);
             }
 
             break;

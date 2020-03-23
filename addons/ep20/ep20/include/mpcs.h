@@ -51,6 +51,8 @@ private:
 
     Timer               mkStartTimer;
 
+    Timer               blinkButtonsTimer;
+
     std::array<double, 2> mk_start;
 
     size_t                mk_count;
@@ -90,9 +92,17 @@ private:
     /// Загрузка конфига
     void load_config(CfgReader &cfg);
 
+    /// Включение ламп на сенсорных кнопках
+    void buttonsOn();
+
+    /// Выключение ламп на сенсорных кнопках
+    void buttonsOff();
+
 private slots:
 
     void slotMKStart();
+
+    void slotBlinkButtons();
 };
 
 #endif // MPCS_H

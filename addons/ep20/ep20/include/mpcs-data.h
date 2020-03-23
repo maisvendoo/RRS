@@ -57,6 +57,57 @@ struct mpcs_input_t
 };
 
 //------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct lamp_t
+{
+    float   state;
+    bool    is_blinked;
+    bool    blink_state;
+
+    lamp_t()
+        : state(0.0)
+        , is_blinked(false)
+        , blink_state(false)
+    {
+
+    }
+
+    void blink(float state1, float state2)
+    {
+        if (is_blinked)
+        {
+            blink_state ? state = state1 : state = state2;
+            blink_state = !blink_state;
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+//  Состояние ламп сенсорных кнопок
+//------------------------------------------------------------------------------
+struct lamps_state_t
+{
+    lamp_t pant_fwd;
+    lamp_t pant_bwd;
+    lamp_t gv;
+    lamp_t train_heating;
+    lamp_t recup_disable;
+    lamp_t auto_driver;
+    lamp_t speed_control;
+    lamp_t vz;
+
+    lamp_t ept;
+    lamp_t gs;
+    lamp_t pv;
+    lamp_t wheel_clean;
+    lamp_t saund1;
+    lamp_t brake_release;
+    lamp_t test;
+    lamp_t res_purge;
+};
+
+//------------------------------------------------------------------------------
 // Структура выходных сигналов
 //------------------------------------------------------------------------------
 struct mpcs_output_t
@@ -74,6 +125,8 @@ struct mpcs_output_t
     std::array<bool, 2> toggleSwitchMK;
 
     double MKstate;
+
+    lamps_state_t lamps_state;
 
     mpcs_output_t()
     {

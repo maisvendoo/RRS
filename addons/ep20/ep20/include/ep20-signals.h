@@ -75,4 +75,12 @@ enum
     WHEEL_6 = 199
 };
 
+enum
+{
+    SIG_LIGHT_RED = 1,
+    SIG_LIGHT_GREEN = 2,
+    SIG_LIGHT_YELLOW = 3,
+    SIG_LIGHT_BLUE = 4
+};
+
 #endif // EP20_SIGNALS_H

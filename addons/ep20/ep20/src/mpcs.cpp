@@ -4,6 +4,7 @@
 #include "mpcs.h"
 #include "current-kind.h"
 
+#include "ep20-signals.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
@@ -20,6 +21,10 @@ MPCS::MPCS(QObject *parent) : Device(parent)
 
     mkStartTimer.setTimeout(1.0);
     connect(&mkStartTimer, &Timer::process, this, &MPCS::slotMKStart);
+
+    blinkButtonsTimer.setTimeout(0.5);
+    connect(&blinkButtonsTimer, &Timer::process, this, &MPCS::slotBlinkButtons);
+    blinkButtonsTimer.start();
 
     mk_count = 0;
 
@@ -81,6 +86,26 @@ float MPCS::getKeyPosition()
 //------------------------------------------------------------------------------
 void MPCS::stepKeysControl(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    if (getKeyState(KEY_J))
+    {
+        if (isShift())
+        {
+           keyPosition = 1;
+           buttonsOn();
+        }
+        else
+        {
+           keyPosition = 0;
+           buttonsOff();
+        }
+    }
+
+    if (keyPosition == 0)
+        return;
+
     if (getKeyState(KEY_I))
     {
         if (isShift())
@@ -114,17 +139,6 @@ void MPCS::stepKeysControl(double t, double dt)
     }
 
 
-    if (getKeyState(KEY_J))
-    {
-        if (isShift())
-        {
-           keyPosition = 1;
-        }
-        else
-        {
-           keyPosition = 0;
-        }
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -142,6 +156,8 @@ void MPCS::stepDiscrete(double t, double dt)
     stepFastSwitchControl(t, dt);
 
     stepToggleSwitchMK(t, dt);
+
+    blinkButtonsTimer.step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -193,6 +209,9 @@ void MPCS::stepToggleSwitchMK(double t, double dt)
     mkStartTimer.step(t, dt);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MPCS::PressureReg()
 {
     double dp = mpcs_input.PressMR - p_prev;
@@ -242,6 +261,38 @@ void MPCS::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MPCS::buttonsOn()
+{
+    mpcs_output.lamps_state.pant_fwd.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.pant_bwd.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.gv.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.train_heating.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.recup_disable.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.auto_driver.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.speed_control.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.vz.state = SIG_LIGHT_YELLOW;
+
+    mpcs_output.lamps_state.ept.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.gs.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.pv.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.wheel_clean.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.saund1.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.brake_release.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.test.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.res_purge.state = SIG_LIGHT_YELLOW;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MPCS::buttonsOff()
+{
+    mpcs_output.lamps_state = lamps_state_t();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MPCS::slotMKStart()
 {
     mk_start[mk_count] = 1;
@@ -250,4 +301,13 @@ void MPCS::slotMKStart()
 
     if (mk_count == 2)
         mkStartTimer.stop();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MPCS::slotBlinkButtons()
+{
+    mpcs_output.lamps_state.pant_fwd.blink(SIG_LIGHT_YELLOW, SIG_LIGHT_GREEN);
+    mpcs_output.lamps_state.pant_bwd.blink(SIG_LIGHT_YELLOW, SIG_LIGHT_GREEN);
 }
