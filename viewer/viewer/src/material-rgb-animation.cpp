@@ -86,9 +86,9 @@ void MaterialRGBAnimation::update()
     pos_b = getChannelState(pos, 2);
 
     osg::Vec4 new_color;
-    new_color.r() *= cur_pos_r;
-    new_color.g() *= cur_pos_g;
-    new_color.b() *= cur_pos_b;
+    new_color.r() = color.r() * interpolate(cur_pos_r);
+    new_color.g() = color.g() * interpolate(cur_pos_g);
+    new_color.b() = color.b() * interpolate(cur_pos_b);
     new_color.a() = 1.0f;
 
     osg::Vec4 new_emission_color;

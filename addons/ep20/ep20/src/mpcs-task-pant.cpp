@@ -5,6 +5,8 @@
 #include    "mpcs-task-pant.h"
 #include    "current-kind.h"
 
+#include    "ep20-signals.h"
+
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
@@ -153,6 +155,11 @@ bool isEven(int num)
     return ( (num % 2) == 0);
 }
 
+void setPantLampsState(mpcs_output_t &mpcs_output, unsigned long pantPriority, float state)
+{
+    pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd = state : mpcs_output.lamps_state.pant_bwd = state;
+}
+
 //------------------------------------------------------------------------------
 // Обработка поднятие ТП
 //------------------------------------------------------------------------------
@@ -167,6 +174,7 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
             if (is_command_up)
             {
                 taskPantStateUp = UP_PRIORETY_PANT;
+                setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_RED);
             }
 
             break;
@@ -273,6 +281,9 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
         {
             writeLastCurrentKind(mpcs_input);
             taskPantStateUp = INITIAL_STATE_IS_UP;
+
+            setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_GREEN);
+
             break;
         }
         case  FAULT_IS_UP:
@@ -299,6 +310,7 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
            if (is_command_down)
            {
                taskPantStateDown = IS_OFF_MS_HSS;
+               setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_RED);
            }
 
            break;
@@ -360,6 +372,7 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
             {
                 pantDownWaitingTimer->stop();
                 taskPantStateDown = INITIAL_STATE_IS_DOWN;
+                setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_YELLOW);
             }
 
             break;

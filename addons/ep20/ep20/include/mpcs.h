@@ -90,6 +90,12 @@ private:
     /// Загрузка конфига
     void load_config(CfgReader &cfg);
 
+    /// Включение ламп на сенсорных кнопках
+    void buttonsOn();
+
+    /// Выключение ламп на сенсорных кнопках
+    void buttonsOff();
+
 private slots:
 
     void slotMKStart();

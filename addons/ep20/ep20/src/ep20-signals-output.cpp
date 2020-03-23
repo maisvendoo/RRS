@@ -32,10 +32,14 @@ void EP20::stepSignals()
     analogSignal[PANTOGRAPH_AC2] = static_cast<float>(pantograph[PANT_AC2]->getHeight());
     analogSignal[PANTOGRAPH_DC2] = static_cast<float>(pantograph[PANT_DC2]->getHeight());
 
-    analogSignal[sigLight_Pant_fwd] = SIG_LIGHT_RED;
-    analogSignal[sigLight_Pant_bwd] = SIG_LIGHT_GREEN;
-    analogSignal[sigLight_GV] = SIG_LIGHT_YELLOW;
-    analogSignal[sigLight_Train_heating] = SIG_LIGHT_BLUE;
+    analogSignal[sigLight_Pant_fwd] = mpcsOutput.lamps_state.pant_fwd;
+    analogSignal[sigLight_Pant_bwd] = mpcsOutput.lamps_state.pant_bwd;
+    analogSignal[sigLight_GV] = mpcsOutput.lamps_state.gv;
+    analogSignal[sigLight_Train_heating] = mpcsOutput.lamps_state.train_heating;
+    analogSignal[sigLight_Recap_disable] = mpcsOutput.lamps_state.recup_disable;
+    analogSignal[sigLight_AutoDriver] = mpcsOutput.lamps_state.auto_driver;
+    analogSignal[sigLight_SpeedControl] = mpcsOutput.lamps_state.speed_control;
+    analogSignal[sigLight_VZ] = mpcsOutput.lamps_state.vz;
 
     analogSignal[LS_G4] = 1;
     analogSignal[LS_G3] = 1;
