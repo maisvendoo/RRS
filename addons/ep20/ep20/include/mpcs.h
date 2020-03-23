@@ -51,6 +51,8 @@ private:
 
     Timer               mkStartTimer;
 
+    Timer               blinkButtonsTimer;
+
     std::array<double, 2> mk_start;
 
     size_t                mk_count;
@@ -99,6 +101,8 @@ private:
 private slots:
 
     void slotMKStart();
+
+    void slotBlinkButtons();
 };
 
 #endif // MPCS_H

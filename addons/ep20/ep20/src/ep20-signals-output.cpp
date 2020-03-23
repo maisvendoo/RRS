@@ -33,24 +33,24 @@ void EP20::stepSignals()
     analogSignal[PANTOGRAPH_DC2] = static_cast<float>(pantograph[PANT_DC2]->getHeight());
 
     // Левая панель сенсорных клавиш
-    analogSignal[sigLight_Pant_fwd] = mpcsOutput.lamps_state.pant_fwd;
-    analogSignal[sigLight_Pant_bwd] = mpcsOutput.lamps_state.pant_bwd;
-    analogSignal[sigLight_GV] = mpcsOutput.lamps_state.gv;
-    analogSignal[sigLight_Train_heating] = mpcsOutput.lamps_state.train_heating;
-    analogSignal[sigLight_Recap_disable] = mpcsOutput.lamps_state.recup_disable;
-    analogSignal[sigLight_AutoDriver] = mpcsOutput.lamps_state.auto_driver;
-    analogSignal[sigLight_SpeedControl] = mpcsOutput.lamps_state.speed_control;
-    analogSignal[sigLight_VZ] = mpcsOutput.lamps_state.vz;
+    analogSignal[sigLight_Pant_fwd] = mpcsOutput.lamps_state.pant_fwd.state;
+    analogSignal[sigLight_Pant_bwd] = mpcsOutput.lamps_state.pant_bwd.state;
+    analogSignal[sigLight_GV] = mpcsOutput.lamps_state.gv.state;
+    analogSignal[sigLight_Train_heating] = mpcsOutput.lamps_state.train_heating.state;
+    analogSignal[sigLight_Recap_disable] = mpcsOutput.lamps_state.recup_disable.state;
+    analogSignal[sigLight_AutoDriver] = mpcsOutput.lamps_state.auto_driver.state;
+    analogSignal[sigLight_SpeedControl] = mpcsOutput.lamps_state.speed_control.state;
+    analogSignal[sigLight_VZ] = mpcsOutput.lamps_state.vz.state;
 
     // Правая панель сенсорных клавиш
-    analogSignal[sigLight_EPT] = mpcsOutput.lamps_state.ept;
-    analogSignal[sigLight_GS] = mpcsOutput.lamps_state.gs;
-    analogSignal[sigLight_PV] = mpcsOutput.lamps_state.pv;
-    analogSignal[sigLight_Whell_clean] = mpcsOutput.lamps_state.wheel_clean;
-    analogSignal[sigLight_Saund1] = mpcsOutput.lamps_state.saund1;
-    analogSignal[sigLight_Brake_release] = mpcsOutput.lamps_state.brake_release;
-    analogSignal[sigLight_Test] = mpcsOutput.lamps_state.test;
-    analogSignal[sigLight_Res_Purge] = mpcsOutput.lamps_state.res_purge;
+    analogSignal[sigLight_EPT] = mpcsOutput.lamps_state.ept.state;
+    analogSignal[sigLight_GS] = mpcsOutput.lamps_state.gs.state;
+    analogSignal[sigLight_PV] = mpcsOutput.lamps_state.pv.state;
+    analogSignal[sigLight_Whell_clean] = mpcsOutput.lamps_state.wheel_clean.state;
+    analogSignal[sigLight_Saund1] = mpcsOutput.lamps_state.saund1.state;
+    analogSignal[sigLight_Brake_release] = mpcsOutput.lamps_state.brake_release.state;
+    analogSignal[sigLight_Test] = mpcsOutput.lamps_state.test.state;
+    analogSignal[sigLight_Res_Purge] = mpcsOutput.lamps_state.res_purge.state;
 
     analogSignal[LS_G4] = 1;
     analogSignal[LS_G3] = 1;

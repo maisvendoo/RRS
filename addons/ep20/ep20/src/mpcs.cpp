@@ -22,6 +22,10 @@ MPCS::MPCS(QObject *parent) : Device(parent)
     mkStartTimer.setTimeout(1.0);
     connect(&mkStartTimer, &Timer::process, this, &MPCS::slotMKStart);
 
+    blinkButtonsTimer.setTimeout(0.5);
+    connect(&blinkButtonsTimer, &Timer::process, this, &MPCS::slotBlinkButtons);
+    blinkButtonsTimer.start();
+
     mk_count = 0;
 
     keyPosition = 0;
@@ -152,6 +156,8 @@ void MPCS::stepDiscrete(double t, double dt)
     stepFastSwitchControl(t, dt);
 
     stepToggleSwitchMK(t, dt);
+
+    blinkButtonsTimer.step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -257,23 +263,23 @@ void MPCS::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void MPCS::buttonsOn()
 {
-    mpcs_output.lamps_state.pant_fwd = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.pant_bwd = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.gv = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.train_heating = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.recup_disable = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.auto_driver = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.speed_control = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.vz = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.pant_fwd.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.pant_bwd.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.gv.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.train_heating.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.recup_disable.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.auto_driver.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.speed_control.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.vz.state = SIG_LIGHT_YELLOW;
 
-    mpcs_output.lamps_state.ept = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.gs = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.pv = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.wheel_clean = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.saund1 = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.brake_release = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.test = SIG_LIGHT_YELLOW;
-    mpcs_output.lamps_state.res_purge = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.ept.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.gs.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.pv.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.wheel_clean.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.saund1.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.brake_release.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.test.state = SIG_LIGHT_YELLOW;
+    mpcs_output.lamps_state.res_purge.state = SIG_LIGHT_YELLOW;
 }
 
 //------------------------------------------------------------------------------
@@ -295,4 +301,13 @@ void MPCS::slotMKStart()
 
     if (mk_count == 2)
         mkStartTimer.stop();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MPCS::slotBlinkButtons()
+{
+    mpcs_output.lamps_state.pant_fwd.blink(SIG_LIGHT_YELLOW, SIG_LIGHT_GREEN);
+    mpcs_output.lamps_state.pant_bwd.blink(SIG_LIGHT_YELLOW, SIG_LIGHT_GREEN);
 }

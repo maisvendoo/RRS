@@ -155,9 +155,15 @@ bool isEven(int num)
     return ( (num % 2) == 0);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void setPantLampsState(mpcs_output_t &mpcs_output, unsigned long pantPriority, float state)
 {
-    pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd = state : mpcs_output.lamps_state.pant_bwd = state;
+    mpcs_output.lamps_state.pant_fwd.is_blinked = mpcs_output.lamps_state.pant_bwd.is_blinked = false;
+
+    pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd.state = state :
+                        mpcs_output.lamps_state.pant_bwd.state = state;
 }
 
 //------------------------------------------------------------------------------
@@ -174,7 +180,9 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
             if (is_command_up)
             {
                 taskPantStateUp = UP_PRIORETY_PANT;
-                setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_RED);
+
+                pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd.is_blinked = true :
+                                    mpcs_output.lamps_state.pant_bwd.is_blinked = true;
             }
 
             break;
@@ -310,7 +318,9 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
            if (is_command_down)
            {
                taskPantStateDown = IS_OFF_MS_HSS;
-               setPantLampsState(mpcs_output, pantPriority, SIG_LIGHT_RED);
+
+               pantPriority == 1 ? mpcs_output.lamps_state.pant_fwd.is_blinked = true :
+                                   mpcs_output.lamps_state.pant_bwd.is_blinked = true;
            }
 
            break;

@@ -57,49 +57,54 @@ struct mpcs_input_t
 };
 
 //------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct lamp_t
+{
+    float   state;
+    bool    is_blinked;
+    bool    blink_state;
+
+    lamp_t()
+        : state(0.0)
+        , is_blinked(false)
+        , blink_state(false)
+    {
+
+    }
+
+    void blink(float state1, float state2)
+    {
+        if (is_blinked)
+        {
+            blink_state ? state = state1 : state = state2;
+            blink_state = !blink_state;
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
 //  Состояние ламп сенсорных кнопок
 //------------------------------------------------------------------------------
 struct lamps_state_t
 {
-    float pant_fwd;
-    float pant_bwd;
-    float gv;
-    float train_heating;
-    float recup_disable;
-    float auto_driver;
-    float speed_control;
-    float vz;
+    lamp_t pant_fwd;
+    lamp_t pant_bwd;
+    lamp_t gv;
+    lamp_t train_heating;
+    lamp_t recup_disable;
+    lamp_t auto_driver;
+    lamp_t speed_control;
+    lamp_t vz;
 
-    float ept;
-    float gs;
-    float pv;
-    float wheel_clean;
-    float saund1;
-    float brake_release;
-    float test;
-    float res_purge;
-
-    lamps_state_t()
-        : pant_fwd(0.0)
-        , pant_bwd(0.0)
-        , gv(0.0)
-        , train_heating(0.0)
-        , recup_disable(0.0)
-        , auto_driver(0.0)
-        , speed_control(0.0)
-        , vz(0.0)
-
-        , ept(0.0)
-        , gs(0.0)
-        , pv(0.0)
-        , wheel_clean(0.0)
-        , saund1(0.0)
-        , brake_release(0.0)
-        , test(0.0)
-        , res_purge(0.0)
-    {
-
-    }
+    lamp_t ept;
+    lamp_t gs;
+    lamp_t pv;
+    lamp_t wheel_clean;
+    lamp_t saund1;
+    lamp_t brake_release;
+    lamp_t test;
+    lamp_t res_purge;
 };
 
 //------------------------------------------------------------------------------
