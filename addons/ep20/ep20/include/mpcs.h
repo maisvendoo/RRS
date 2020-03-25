@@ -63,8 +63,11 @@ private:
 
     double p_max;
 
-    // Позиция ключа старта ЭП20
+    // Позиция ключа МПСУ
     int keyPosition;
+
+    // Позиция выключателя цепей управления
+    int controlSwitch;
 
     /// Управление клавишами
     void stepKeysControl(double t, double dt);

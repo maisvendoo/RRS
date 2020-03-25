@@ -124,9 +124,14 @@ struct mpcs_output_t
     /// Тумблеры управления мотор-компрессорами
     std::array<bool, 2> toggleSwitchMK;
 
+    /// Состояние мотор-копрессоров
     double MKstate;
 
+    /// Состояние подсветки сенсорных клавиш
     lamps_state_t lamps_state;
+
+    /// Положение выключателя "Цепи управления"
+    float control_switch;
 
     mpcs_output_t()
     {
