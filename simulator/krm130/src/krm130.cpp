@@ -161,7 +161,6 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
 
     double K4 = 0;
 
-    //K4 = K[4] * (1.0 + pow(pf(Y[BP_PRESSURE] / p0 - 1.0), K4_power)) * hs_p(Y[0] - Y[1]);
     K4 = K[4] * (1.0 + k4 * pf(Y[0] - Y[1]));
 
     double u2 = cut(k2 * nf(s1), 0.0, 1.0) * (1.0 - pos[POS_VI]);
@@ -222,6 +221,9 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
     else
     {
         decTimer->stop();
+
+        if (handle_pos == POS_I)
+            handle_pos = POS_II;
     }
 
     if (getKeyState(KEY_Quote))

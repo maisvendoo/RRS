@@ -52,14 +52,14 @@ void EP20::stepSignals()
     analogSignal[sigLight_Test] = mpcsOutput.lamps_state.test.state;
     analogSignal[sigLight_Res_Purge] = mpcsOutput.lamps_state.res_purge.state;
 
-    analogSignal[LS_G4] = 1;
-    analogSignal[LS_G3] = 1;
-    analogSignal[LS_G2] = 1;
+    analogSignal[LS_G4] = 0;
+    analogSignal[LS_G3] = 0;
+    analogSignal[LS_G2] = 0;
     analogSignal[LS_G1] = 1;
-    analogSignal[LS_Y] = 1;
-    analogSignal[LS_RY] = 1;
-    analogSignal[LS_R] = 1;
-    analogSignal[LS_W] = 1;
+    analogSignal[LS_Y] = 0;
+    analogSignal[LS_RY] = 0;
+    analogSignal[LS_R] = 0;
+    analogSignal[LS_W] = 0;
 
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
