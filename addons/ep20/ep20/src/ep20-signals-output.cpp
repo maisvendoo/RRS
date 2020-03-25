@@ -61,6 +61,9 @@ void EP20::stepSignals()
     analogSignal[LS_R] = 0;
     analogSignal[LS_W] = 0;
 
+    analogSignal[CU] = mpcsOutput.control_switch;
+    analogSignal[EPK] = 0;
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);

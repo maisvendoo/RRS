@@ -41,6 +41,9 @@ enum
     PANTOGRAPH_AC2 = 109,
     PANTOGRAPH_DC2 = 110,
 
+    CU = 138,
+    EPK = 139,
+
     sigLight_Pant_fwd = 140,
     sigLight_Pant_bwd = 143,
     sigLight_GV = 146,

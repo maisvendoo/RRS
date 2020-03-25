@@ -222,6 +222,7 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
     {
         decTimer->stop();
 
+        // Воазврат ручки из сверхзарядки в поездное
         if (handle_pos == POS_I)
             handle_pos = POS_II;
     }
