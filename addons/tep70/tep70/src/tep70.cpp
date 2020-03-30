@@ -5,7 +5,12 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TEP70::TEP70()
+TEP70::TEP70() : Vehicle()
+  , km(nullptr)
+  , button_disel_start(false)
+  , button_brake_release(false)
+  , button_svistok(false)
+  , button_tifon(false)
 {
 
 }

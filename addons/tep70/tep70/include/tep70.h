@@ -39,6 +39,36 @@ private:
     /// Контроллер машиниста
     ControllerKM2202 *km;
 
+    /// Кнопка "Пуск дизеля"
+    bool    button_disel_start;
+
+    /// Кнопка "Отпуск тормозов"
+    bool    button_brake_release;
+
+    /// Кнопка "Свисток"
+    bool    button_svistok;
+
+    /// Кнопка "Тифон"
+    bool    button_tifon;
+
+    /// АЗВ "Управление общее"
+    Trigger azv_common_control;
+
+    /// АЗВ "Управление тепловозом"
+    Trigger azv_upr_tepl;
+
+    /// АЗВ "Топливный насос"
+    Trigger azv_fuel_pump;
+
+    /// АЗВ "ЭДТ"
+    Trigger azv_edt_on;
+
+    /// АЗВ "Тормоз питание"
+    Trigger azv_edt_power;
+
+    /// АЗВ "ЭПТ"
+    Trigger azv_ept_on;
+
     /// Инициализация всех систем тепловоза
     void initialization();
 
@@ -55,6 +85,9 @@ private:
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
+
+    /// Обработка клавиш
+    void keyProcess();
 };
 
 #endif // TEP70_H
