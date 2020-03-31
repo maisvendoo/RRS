@@ -28,6 +28,19 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[STRELKA_WATER_TEMP] = 0.0;
     analogSignal[STRELKA_OIL_PRESS] = 0.0;
 
+    analogSignal[LS_G] = 1.0f;
+
+    analogSignal[TUMBLER_VOLTMETER] = static_cast<float>(tumbler_voltage.getState());
+    analogSignal[TUMBLER_DISEL_STOP] = static_cast<float>(tumbler_disel_stop.getState());
+
+    analogSignal[TUMBLER_FIELD_WEAK1] = static_cast<float>(tumbler_field_weak1.getHandlePos());
+    analogSignal[TUMBLER_FIELD_WEAK2] = static_cast<float>(tumbler_field_weak2.getHandlePos());
+    analogSignal[TUMBLER_WATER_ZALUZI] = static_cast<float>(tumbler_water_zaluzi.getHandlePos());
+    analogSignal[TUMBLER_OIL_ZALUZI] = static_cast<float>(tumbler_oil_zaluzi.getHandlePos());
+
+    analogSignal[STRELKA_BAT_CURRENT] = static_cast<float>(battery->getCargeCurrent() / 150.0);
+    analogSignal[STRELKA_BAT_VOLTAGE] = static_cast<float>(Ucc / 150.0);
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>1</Order>
+
+		<Emax>96.0</Emax>
+		<Emin>84.0</Emin>
+		<r>0.05</r>
+		<Rd>3.46</Rd>
+		<Capacity>450</Capacity>		
+
+	</Device>
+</Config>

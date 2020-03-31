@@ -84,4 +84,28 @@ void TEP70::keyProcess()
             azv_ept_on.reset();
         }
     }
+
+    if (getKeyState(KEY_1))
+    {
+        if (isShift())
+        {
+            tumbler_voltage.set();
+        }
+        else
+        {
+            tumbler_voltage.reset();
+        }
+    }
+
+    if (getKeyState(KEY_2))
+    {
+        if (isShift())
+        {
+            tumbler_disel_stop.set();
+        }
+        else
+        {
+            tumbler_disel_stop.reset();
+        }
+    }
 }

@@ -7,10 +7,12 @@
 //------------------------------------------------------------------------------
 TEP70::TEP70() : Vehicle()
   , km(nullptr)
+  , battery(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
   , button_tifon(false)
+  , Ucc(0.0)
 {
 
 }
@@ -29,6 +31,8 @@ TEP70::~TEP70()
 void TEP70::initialization()
 {
     initCabineControls();
+
+    initControlCircuit();
 }
 
 //------------------------------------------------------------------------------
@@ -40,6 +44,8 @@ void TEP70::step(double t, double dt)
     Q_UNUSED(dt)
 
     stepCabineControls(t, dt);
+
+    stepControlCircuit(t, dt);
 
     stepSignalsOutput(t, dt);
 }

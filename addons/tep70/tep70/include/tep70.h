@@ -17,6 +17,8 @@
 #include    "tep70-headers.h"
 #include    "tep70-signals.h"
 
+#include    "battery.h"
+
 /*!
  * \class
  * \brief Основной класс, описывающий весь тепловоз
@@ -39,6 +41,9 @@ private:
     /// Контроллер машиниста
     ControllerKM2202 *km;
 
+    /// Аккумуляторная батарея
+    Battery         *battery;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
@@ -50,6 +55,9 @@ private:
 
     /// Кнопка "Тифон"
     bool    button_tifon;
+
+    /// Напряжение цепей управления
+    double  Ucc;
 
     /// АЗВ "Управление общее"
     Trigger azv_common_control;
@@ -69,11 +77,32 @@ private:
     /// АЗВ "ЭПТ"
     Trigger azv_ept_on;
 
+    /// Тумблер "Напряжение ЦУ. Напряжение ЭПТ"
+    Trigger tumbler_voltage;
+
+    /// Тумблер "Аварийная остановка дизеля"
+    Trigger tumbler_disel_stop;
+
+    /// Тумблер "Ослабление поля I ступени руч./авт."
+    Switcher tumbler_field_weak1;
+
+    /// Тумблер "Ослабление поля II ступени руч./авт."
+    Switcher tumbler_field_weak2;
+
+    /// Тумблер "Управление жалюзи воды руч./авт."
+    Switcher tumbler_water_zaluzi;
+
+    /// Тумблер "Управление жалюзи масла руч./авт."
+    Switcher tumbler_oil_zaluzi;
+
     /// Инициализация всех систем тепловоза
     void initialization();
 
     /// Инициализация органов управления в кабине
     void initCabineControls();
+
+    /// Инициализация цепей управления
+    void initControlCircuit();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
@@ -81,6 +110,10 @@ private:
     /// Шаг моделирования органов управления в кабине
     void stepCabineControls(double t, double dt);
 
+    /// Шаг моделирования цепей управления
+    void stepControlCircuit(double t, double dt);
+
+    /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
