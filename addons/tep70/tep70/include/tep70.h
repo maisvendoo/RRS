@@ -21,6 +21,7 @@
 #include    "relay.h"
 #include    "fuel-tank.h"
 #include    "electric-fuel-pump.h"
+#include    "disel.h"
 
 /*!
  * \class
@@ -55,6 +56,9 @@ private:
 
     /// Электрический топливный насос (ЭНТ)
     ElectricFuelPump    *electro_fuel_pump;
+
+    /// Дизель
+    Disel               *disel;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
@@ -119,6 +123,9 @@ private:
     /// Инициализация топливной системы
     void initFuelSystem();
 
+    /// Инициализация дизеля
+    void initDisel();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -133,6 +140,9 @@ private:
 
     /// Шаг моделирования топливной системы
     void stepFuelSystem(double t, double dt);
+
+    /// Шаг моделирования дизеля
+    void stepDisel(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

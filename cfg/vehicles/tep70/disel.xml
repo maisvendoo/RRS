@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+
+		<Order>4</Order>
+
+		<V_oil>1.5</V_oil>
+
+		<K0>15.0</K0>
+		<K1>0.0774</K1>		
+
+	</Device>
+</Config>
