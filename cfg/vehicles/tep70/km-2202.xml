@@ -3,11 +3,8 @@
 	<Device>
 		<Order>1</Order>
 
-		<Emax>96.0</Emax>
-		<Emin>84.0</Emin>
-		<r>0.01</r>
-		<Rd>3.46</Rd>
-		<Capacity>450</Capacity>		
+		<MainShaftDelay>300.0</MainShaftDelay>
+		<ReversShaftDelay>300.0</ReversShaftDelay>		
 
 	</Device>
 </Config>

@@ -33,7 +33,7 @@ ControllerKM2202::~ControllerKM2202()
 //------------------------------------------------------------------------------
 float ControllerKM2202::getMainShaftPos() const
 {
-    return ms_position / MS_MAX_POSITION;
+    return static_cast<float>(ms_position) / MS_MAX_POSITION;
 }
 
 //------------------------------------------------------------------------------
@@ -85,38 +85,46 @@ void ControllerKM2202::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void ControllerKM2202::stepKeysControl(double t, double dt)
 {
-    if (getKeyState(KEY_A))
+    if (getKeyState(KEY_A) || getKeyState(KEY_D) )
     {
-        ms_dir = 1;
-        main_shaft_timer.start();
-    }
-
-
-    if (getKeyState(KEY_D))
-    {
-        if (!isControl())
+        if (getKeyState(KEY_A))
         {
-            ms_dir = -1;
+            ms_dir = 1;
             main_shaft_timer.start();
         }
-        else
+
+        if (getKeyState(KEY_D))
         {
-            ms_position = MS_ZERO;
+            if (!isControl())
+            {
+                ms_dir = -1;
+                main_shaft_timer.start();
+            }
+            else
+            {
+                ms_position = MS_ZERO;
+            }
         }
     }
-
-
-    if (getKeyState(KEY_W))
+    else
     {
-        rs_dir = 1;
-        revers_shaft_timer.start();
+        main_shaft_timer.stop();
     }
 
 
-    if (getKeyState(KEY_S))
+    if (getKeyState(KEY_W) || getKeyState(KEY_S))
     {
-        rs_dir = -1;
+        if (getKeyState(KEY_W))
+            rs_dir = 1;
+
+        if (getKeyState(KEY_S))
+            rs_dir = -1;
+
         revers_shaft_timer.start();
+    }
+    else
+    {
+        revers_shaft_timer.stop();
     }
 
 
@@ -131,14 +139,13 @@ void ControllerKM2202::slotRotateMainShaft()
 {
     // Механическая блокировка поворота главного вала
     // в нулевом положении реверсивного
-    if (rs_position != RS_ZERO)
+    if (rs_position == RS_ZERO)
     {
-        ms_position += ms_dir;
-        ms_position = cut(ms_position, static_cast<int>(MS_ZERO), static_cast<int>(MS_MAX_POSITION));
+        return;
     }
 
-    main_shaft_timer.stop();
-    main_shaft_timer.firstProcess(false);
+    ms_position += ms_dir;
+    ms_position = cut(ms_position, static_cast<int>(MS_ZERO), static_cast<int>(MS_MAX_POSITION));
 }
 
 //------------------------------------------------------------------------------
@@ -147,11 +154,11 @@ void ControllerKM2202::slotRotateMainShaft()
 void ControllerKM2202::slotRotateReversShaft()
 {
     // Механическая блокировка реверсивки на рабочих позициях
-    if (ms_position == MS_ZERO)
+    if (ms_position != MS_ZERO)
     {
-        rs_position += rs_dir;
-        rs_position = cut(rs_position, static_cast<int>(RS_BACKWARD), static_cast<int>(RS_FORWARD));
+        return;
     }
 
-    revers_shaft_timer.stop();
+    rs_position += rs_dir;
+    rs_position = cut(rs_position, static_cast<int>(RS_BACKWARD), static_cast<int>(RS_FORWARD));
 }

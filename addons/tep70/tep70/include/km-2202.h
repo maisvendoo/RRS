@@ -30,6 +30,9 @@ public:
     /// Вернуть положение главного вала
     float getMainShaftPos() const;
 
+    /// Контакт нулевой позиции
+    bool isZero() const { return ms_position == MS_ZERO; }
+
 private:
 
     enum
