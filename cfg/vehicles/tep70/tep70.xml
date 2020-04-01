@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
         <Vehicle>
-                <EmptyMass>135000</EmptyMass>
+                <EmptyMass>129000</EmptyMass>
                 <PayloadMass>0</PayloadMass>
+                <FuelCapacity>6000</FuelCapacity>
+                <FuelLevel>1.0</FuelLevel>
                 <Length>21.7</Length>
                 <WheelDiameter>1.22</WheelDiameter>
                 <MainResist>loco-resist</MainResist>

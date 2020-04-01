@@ -18,6 +18,9 @@
 #include    "tep70-signals.h"
 
 #include    "battery.h"
+#include    "relay.h"
+#include    "fuel-tank.h"
+#include    "electric-fuel-pump.h"
 
 /*!
  * \class
@@ -39,10 +42,19 @@ public:
 private:
 
     /// Контроллер машиниста
-    ControllerKM2202 *km;
+    ControllerKM2202    *km;
 
     /// Аккумуляторная батарея
-    Battery         *battery;
+    Battery             *battery;
+
+    /// Контактор топливного насоса (КТН)
+    Relay               *kontaktor_fuel_pump;
+
+    /// Топливный бак
+    FuelTank            *fuel_tank;
+
+    /// Электрический топливный насос (ЭНТ)
+    ElectricFuelPump    *electro_fuel_pump;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
@@ -104,6 +116,12 @@ private:
     /// Инициализация цепей управления
     void initControlCircuit();
 
+    /// Инициализация топливной системы
+    void initFuelSystem();
+
+    /// Инициализация звуков
+    void initSounds();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
@@ -113,8 +131,14 @@ private:
     /// Шаг моделирования цепей управления
     void stepControlCircuit(double t, double dt);
 
+    /// Шаг моделирования топливной системы
+    void stepFuelSystem(double t, double dt);
+
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);
+
+    /// Вывод отладочной строки
+    void debugOutput(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);

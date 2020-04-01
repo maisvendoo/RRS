@@ -8,6 +8,9 @@
 TEP70::TEP70() : Vehicle()
   , km(nullptr)
   , battery(nullptr)
+  , kontaktor_fuel_pump(nullptr)
+  , fuel_tank(nullptr)
+  , electro_fuel_pump(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -33,6 +36,10 @@ void TEP70::initialization()
     initCabineControls();
 
     initControlCircuit();
+
+    initFuelSystem();
+
+    initSounds();
 }
 
 //------------------------------------------------------------------------------
@@ -47,7 +54,11 @@ void TEP70::step(double t, double dt)
 
     stepControlCircuit(t, dt);
 
+    stepFuelSystem(t, dt);
+
     stepSignalsOutput(t, dt);
+
+    debugOutput(t, dt);    
 }
 
 //------------------------------------------------------------------------------
@@ -59,7 +70,17 @@ void TEP70::loadConfig(QString cfg_path)
 
     if (cfg.load(cfg_path))
     {
+        QString secName = "Vehicle";
 
+        double fuel_capacity = 0;
+        cfg.getDouble(secName, "FuelCapacity", fuel_capacity);
+
+        double fuel_level = 0;
+        cfg.getDouble(secName, "FuelLevel", fuel_level);
+
+        fuel_tank = new FuelTank();
+        fuel_tank->setCapacity(fuel_capacity);
+        fuel_tank->setFuelLevel(fuel_level);
     }
 }
 

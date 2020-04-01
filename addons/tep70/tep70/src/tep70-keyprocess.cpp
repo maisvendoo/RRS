@@ -13,6 +13,7 @@ void TEP70::keyProcess()
 
     button_tifon = getKeyState(KEY_B);
 
+    // Включение АЗВ "Управление общее"
     if (getKeyState(KEY_J))
     {
         if (isShift())
@@ -25,6 +26,7 @@ void TEP70::keyProcess()
         }
     }
 
+    // Включение АЗВ "Управление тепловозом"
     if (getKeyState(KEY_U))
     {
         if (isShift())
@@ -37,7 +39,8 @@ void TEP70::keyProcess()
         }
     }
 
-    if (getKeyState(KEY_I))
+    // Включение АЗВ "Топливный насос"
+    if (getKeyState(KEY_P))
     {
         if (isShift())
         {

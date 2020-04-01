@@ -62,9 +62,7 @@ private:
     int     rs_position;
 
     /// Направление вращения реверсивного вала
-    int     rs_dir;
-
-    bool is_inc;
+    int     rs_dir;    
 
     Timer   main_shaft_timer;
 

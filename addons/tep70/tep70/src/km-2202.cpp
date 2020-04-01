@@ -41,7 +41,8 @@ float ControllerKM2202::getMainShaftPos() const
 //------------------------------------------------------------------------------
 void ControllerKM2202::preStep(state_vector_t &Y, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -51,7 +52,9 @@ void ControllerKM2202::ode_system(const state_vector_t &Y,
                                   state_vector_t &dYdt,
                                   double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
