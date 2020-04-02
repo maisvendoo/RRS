@@ -3,11 +3,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TimeRelay::TimeRelay(size_t num_contacts, QObject *parent) : Device(parent)
-  , relay(new Relay(num_contacts))
+TimeRelay::TimeRelay(size_t num_contacts, QObject *parent) : Relay(num_contacts, parent)
   , timer(new Timer())
+  , Uc(0.0)
+  , U_nom(110)
+  , Rc(300)
+  , start_level(0.7)
+  , is_started(false)
 {
-
+    timer->firstProcess(false);
+    connect(timer, &Timer::process, this, &TimeRelay::slotTimeoutProcess);
 }
 
 //------------------------------------------------------------------------------
@@ -16,4 +21,82 @@ TimeRelay::TimeRelay(size_t num_contacts, QObject *parent) : Device(parent)
 TimeRelay::~TimeRelay()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::setTimeout(double timeout)
+{
+    timer->setTimeout(timeout);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::setControlVoltage(double Uc)
+{
+    this->Uc = Uc;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double TimeRelay::getCurrent() const
+{
+    return getY(0) + Uc / Rc;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::step(double t, double dt)
+{
+    timer->step(t, dt);
+    Relay::step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::preStep(state_vector_t &Y, double t)
+{
+    if ( (Uc >= U_nom * start_level) && !is_started)
+    {
+        timer->start();
+    }
+
+    if ( (Uc < U_nom * start_level) && is_started)
+    {
+        setVoltage(0.0);
+    }
+
+    Relay::preStep(Y, t);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::ode_system(const state_vector_t &Y,
+                           state_vector_t &dYdt,
+                           double t)
+{
+    Relay::ode_system(Y, dYdt, t);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::load_config(CfgReader &cfg)
+{
+    Relay::load_config(cfg);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeRelay::slotTimeoutProcess()
+{
+    setVoltage(Uc);
+    timer->stop();
 }

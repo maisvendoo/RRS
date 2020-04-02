@@ -23,7 +23,7 @@ public:
 
     double getCurrent() const;
 
-private:
+protected:
 
     /// Текущее состояние якоря реле
     bool    ancor_state_cur;
