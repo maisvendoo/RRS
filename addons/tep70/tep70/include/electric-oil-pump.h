@@ -14,6 +14,8 @@ public:
 
     ~ElectricOilPump();
 
+    void setVoltage(double U) { this->U = U; }
+
     double getOilFlow() const;
 
     double getCurrent() const;

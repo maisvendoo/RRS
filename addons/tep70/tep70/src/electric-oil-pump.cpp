@@ -14,7 +14,7 @@ ElectricOilPump::ElectricOilPump(QObject *parent) : Device(parent)
   , omega_nom(157.1)
   , kc(0.3)
   , Q_oil(0.0)
-  , Q_nom(9.0)
+  , Q_nom(0.9)
   , is_started(false)
 {
 

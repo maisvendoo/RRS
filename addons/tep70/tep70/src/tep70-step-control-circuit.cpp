@@ -9,7 +9,10 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     // Расчитываем ток, потребляемый цепями управления
     double Icc = kontaktor_fuel_pump->getCurrent() +
-                 electro_fuel_pump->getCurrent();
+                 electro_fuel_pump->getCurrent() +
+                 ru8->getCurrent() +
+                 kontaktor_oil_pump->getCurrent() +
+                 electro_oil_pump->getCurrent();
 
     battery->setLoadCurrent(Icc);
     battery->step(t, dt);
@@ -29,4 +32,7 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     ru8->setVoltage(Ucc * static_cast<double>(is_RU8_on));
     ru8->step(t, dt);
+
+    kontaktor_oil_pump->setVoltage(Ucc * static_cast<double>(is_RU8_on));
+    kontaktor_oil_pump->step(t, dt);
 }

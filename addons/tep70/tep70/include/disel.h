@@ -17,6 +17,8 @@ public:
     /// Задать расход масла от электрического маслопрокачивающего насоса (ЭМН)
     void setQ_emn(double Q_emn);
 
+    double getOilPressure() const { getY(0); }
+
 private:
 
     enum
