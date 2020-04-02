@@ -22,6 +22,8 @@
 #include    "fuel-tank.h"
 #include    "electric-fuel-pump.h"
 #include    "disel.h"
+#include    "time-relay.h"
+#include    "electric-oil-pump.h"
 
 /*!
  * \class
@@ -59,6 +61,21 @@ private:
 
     /// Дизель
     Disel               *disel;
+
+    /// Реле РУ8
+    Relay               *ru8;
+
+    /// Контактор маслопрокачивающего насоса (КМН)
+    Relay               *kontaktor_oil_pump;
+
+    /// Реле времени прокачки масла
+    TimeRelay           *oilpump_time_relay;
+
+    /// Реле времени прокрутки стартера
+    TimeRelay           *starter_time_relay;
+
+    /// Электрический маслопрокачивающий насос (ЭМН)
+    ElectricOilPump     *electro_oil_pump;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
@@ -126,6 +143,9 @@ private:
     /// Инициализация дизеля
     void initDisel();
 
+    /// Инициализация маслянной системы
+    void initOilSystem();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -143,6 +163,9 @@ private:
 
     /// Шаг моделирования дизеля
     void stepDisel(double t, double dt);
+
+    /// Шаг моделирвания масляной системы
+    void stepOilSystem(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

@@ -12,6 +12,11 @@ TEP70::TEP70() : Vehicle()
   , fuel_tank(nullptr)
   , electro_fuel_pump(nullptr)
   , disel(nullptr)
+  , ru8(nullptr)
+  , kontaktor_oil_pump(nullptr)
+  , oilpump_time_relay(nullptr)
+  , starter_time_relay(nullptr)
+  , electro_oil_pump(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -42,6 +47,8 @@ void TEP70::initialization()
 
     initDisel();
 
+    initOilSystem();
+
     initSounds();
 }
 
@@ -60,6 +67,8 @@ void TEP70::step(double t, double dt)
     stepFuelSystem(t, dt);
 
     stepDisel(t, dt);
+
+    stepOilSystem(t, dt);
 
     stepSignalsOutput(t, dt);
 

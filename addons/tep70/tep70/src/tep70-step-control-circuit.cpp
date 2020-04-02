@@ -21,4 +21,12 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     kontaktor_fuel_pump->setVoltage(Ucc * static_cast<double>(is_KTH_on));
     kontaktor_fuel_pump->step(t, dt);
+
+    // Определяем состояние цепи атоматического пуска дизеля
+    bool is_RU8_on = azv_common_control.getState() &&
+                     km->isZero() &&
+                     (button_disel_start || ru8->getContactState(0));
+
+    ru8->setVoltage(Ucc * static_cast<double>(is_RU8_on));
+    ru8->step(t, dt);
 }
