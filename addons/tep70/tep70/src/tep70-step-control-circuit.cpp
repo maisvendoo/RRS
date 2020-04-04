@@ -5,16 +5,19 @@
 //------------------------------------------------------------------------------
 void TEP70::stepControlCircuit(double t, double dt)
 {
-    Ucc = max(battery->getVoltage(), 0.0);
+    Ucc = max(battery->getVoltage(), starter_generator->getVoltage());
 
     // Расчитываем ток, потребляемый цепями управления
-    double Icc = kontaktor_fuel_pump->getCurrent() +
-                 electro_fuel_pump->getCurrent() +
-                 ru8->getCurrent() +
-                 kontaktor_oil_pump->getCurrent() +
-                 electro_oil_pump->getCurrent() +
-                 oilpump_time_relay->getCurrent();
+    Icc = kontaktor_fuel_pump->getCurrent() +
+          electro_fuel_pump->getCurrent() +
+          ru8->getCurrent() +
+          kontaktor_oil_pump->getCurrent() +
+          electro_oil_pump->getCurrent() +
+          oilpump_time_relay->getCurrent() +
+          kontaktor_starter->getCurrent();
 
+    battery->setChargeVoltage(starter_generator->getVoltage());
+    battery->setStarterCurrent(starter_generator->getAncorCurrent());
     battery->setLoadCurrent(Icc);
     battery->step(t, dt);
 
@@ -39,4 +42,7 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     oilpump_time_relay->setControlVoltage(Ucc * static_cast<double>(is_RU8_on));
     oilpump_time_relay->step(t, dt);
+
+    kontaktor_starter->setVoltage(Ucc * static_cast<double>(oilpump_time_relay->getContactState(0)) );
+    kontaktor_starter->step(t, dt);
 }

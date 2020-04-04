@@ -3,6 +3,8 @@
 
 #include    "device.h"
 
+#include    "motor-magnetic-char.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -13,6 +15,24 @@ public:
     StarterGenerator(QObject *parent = Q_NULLPTR);
 
     ~StarterGenerator();
+
+    void init(QString magnetic_char_file);
+
+    void step(double t, double dt);
+
+    void setMotorMode(bool is_motor);
+
+    void setLoadCurrent(double In);
+
+    void setOmega(double omega);
+
+    void setAncorVoltage(double Ua) { this->Ua = Ua; }
+
+    double getVoltage() const;
+
+    double getTorque();
+
+    double getAncorCurrent() const { return Ia; }
 
 private:
 
@@ -40,8 +60,29 @@ private:
     /// Постоянная времени нарастания тока возбуждения
     double  Tf;
 
+    /// Угловая скорость вращения вала
+    double  omega;
+
+    /// Момент на валу
+    double  M;
+
     /// Признак двигательного режима
     bool    is_motor;
+
+    /// Ток нагрузки в генераторном режиме
+    double  In;
+
+    /// Напряжение, вырабатываемое в генераторном режиме
+    double  U;
+
+    /// Флаг запуска
+    bool is_started;
+
+    /// Тамер переключения схемы
+    Timer   *switch_timer;
+
+    /// Характеристика намагничивания обмотки возбуждения
+    MotorMagneticChar   magnetic_char;
 
     void preStep(state_vector_t &Y, double t);
 
@@ -49,9 +90,19 @@ private:
 
     void load_config(CfgReader &cfg);
 
+    void preStep_motor(state_vector_t &Y, double t);
+
+    void preStep_generator(state_vector_t &Y, double t);
+
     void ode_system_motor(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void ode_system_generator(const state_vector_t &Y, state_vector_t &dYdt, double t);
+
+    double cPhi(double If);
+
+private slots:
+
+    void slotSwitchMode();
 };
 
 #endif // STARTER_GENERATOR_H

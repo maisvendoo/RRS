@@ -24,6 +24,7 @@
 #include    "disel.h"
 #include    "time-relay.h"
 #include    "electric-oil-pump.h"
+#include    "starter-generator.h"
 
 /*!
  * \class
@@ -77,6 +78,12 @@ private:
     /// Электрический маслопрокачивающий насос (ЭМН)
     ElectricOilPump     *electro_oil_pump;
 
+    /// Стратер-генератор
+    StarterGenerator    *starter_generator;
+
+    /// Контактор стартер-генератора (КД)
+    Relay               *kontaktor_starter;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
@@ -91,6 +98,9 @@ private:
 
     /// Напряжение цепей управления
     double  Ucc;
+
+    /// Ток цепей управления
+    double  Icc;
 
     /// АЗВ "Управление общее"
     Trigger azv_common_control;

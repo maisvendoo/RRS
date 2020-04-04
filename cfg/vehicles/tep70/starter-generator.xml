@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>2</Order>
+
+		<Ra>0.039</Ra>
+		<Rf>6.4</Rf>
+		<Ta>0.1</Ta>
+		<Tf>0.1</Tf>
+		<SwitchDelay>1.0</SwitchDelay>		
+
+	</Device>
+</Config>

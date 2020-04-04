@@ -22,6 +22,8 @@ public:
 
     void setStarterCurrent(double Is);
 
+    void setChargeVoltage(double U_gen);
+
 private:
 
     /// Внутреннее сопротивление батареи

@@ -17,7 +17,17 @@ public:
     /// Задать расход масла от электрического маслопрокачивающего насоса (ЭМН)
     void setQ_emn(double Q_emn);
 
-    double getOilPressure() const { getY(0); }
+    /// Задать крутящий момент от стартер-генератора
+    void setStarterTorque(double M_sg);
+
+    /// Вернуть давление в системе смазки
+    double getOilPressure() const { return getY(0); }
+
+    /// Вернуть частоту вращения привода стартер-генератора
+    double getStarterOmega() const { return ip * getY(1); }
+
+    /// Вернуть частоту вращения тягового генератора
+    double getOmega() const { return getY(1); }
 
 private:
 
