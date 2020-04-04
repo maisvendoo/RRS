@@ -12,7 +12,8 @@ void TEP70::stepControlCircuit(double t, double dt)
                  electro_fuel_pump->getCurrent() +
                  ru8->getCurrent() +
                  kontaktor_oil_pump->getCurrent() +
-                 electro_oil_pump->getCurrent();
+                 electro_oil_pump->getCurrent() +
+                 oilpump_time_relay->getCurrent();
 
     battery->setLoadCurrent(Icc);
     battery->step(t, dt);
@@ -35,4 +36,7 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     kontaktor_oil_pump->setVoltage(Ucc * static_cast<double>(is_RU8_on));
     kontaktor_oil_pump->step(t, dt);
+
+    oilpump_time_relay->setControlVoltage(Ucc * static_cast<double>(is_RU8_on));
+    oilpump_time_relay->step(t, dt);
 }
