@@ -84,6 +84,15 @@ private:
     /// Контактор стартер-генератора (КД)
     Relay               *kontaktor_starter;
 
+    /// Реле РУ10
+    Relay               *ru10;
+
+    /// Реле РУ6
+    Relay               *ru6;
+
+    /// Реле РУ42
+    Relay               *ru42;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
