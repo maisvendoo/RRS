@@ -16,3 +16,5 @@ void TEP70::debugOutput(double t, double dt)
             .arg(disel->getFuelFlow(), 6, 'f', 3)
             .arg(disel->getOmega() * 30.0 / Physics::PI, 6, 'f', 1);
 }
+
+

@@ -44,10 +44,23 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[STRELKA_FUEL_PRESS] = static_cast<float>(electro_fuel_pump->getFuelPressure() * Physics::g / 15.0);
     analogSignal[STRELKA_OIL_PRESS] = static_cast<float>(disel->getOilPressure() * Physics::g / 15.0);
 
+    analogSignal[SIGLIGHT_OIL_PRESS] = getLampState(hs_p(0.1 - disel->getOilPressure()));
+    analogSignal[SIGLIGHT_ZB] = getLampState(1.0);
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);
     analogSignal[WHEEL_4] = static_cast<float>(dir * wheel_rotation_angle[3] / 2.0 / Physics::PI);
     analogSignal[WHEEL_5] = static_cast<float>(dir * wheel_rotation_angle[4] / 2.0 / Physics::PI);
     analogSignal[WHEEL_6] = static_cast<float>(dir * wheel_rotation_angle[5] / 2.0 / Physics::PI);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float TEP70::getLampState(double signal)
+{
+    bool state = azv_common_control.getState() && static_cast<bool>(signal);
+
+    return static_cast<float>(state);
 }

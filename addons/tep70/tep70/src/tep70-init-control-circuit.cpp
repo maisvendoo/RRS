@@ -49,11 +49,12 @@ void TEP70::initControlCircuit()
     ru10->setInitContactState(0, false);
     ru10->setInitContactState(1, false);
 
-    ru6 = new Relay(3);
+    ru6 = new Relay(4);
     ru6->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
     ru6->setInitContactState(0, false);
     ru6->setInitContactState(1, true);
     ru6->setInitContactState(2, false);
+    ru6->setInitContactState(3, true);
 
     ru42 = new Relay(3);
     ru42->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
@@ -70,4 +71,15 @@ void TEP70::initControlCircuit()
     ru4 = new Relay(1);
     ru4->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
     ru4->setInitContactState(0, true);
+
+    ru15 = new Relay(3);
+    ru15->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    ru15->setInitContactState(0, false);
+    ru15->setInitContactState(1, false);
+    ru15->setInitContactState(2, false);
+
+    rv4 = new TimeRelay(1);
+    rv4->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    rv4->setTimeout(60.0);
+    rv4->setInitContactState(0, true);
 }

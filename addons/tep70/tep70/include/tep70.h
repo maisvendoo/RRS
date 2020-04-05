@@ -99,7 +99,7 @@ private:
     /// Реле РУ15
     Relay               *ru15;
 
-    /// Вентиль МВ6
+    /// Блок-магнит МВ6
     Relay               *mv6;
 
     /// Вентиль топливных насосов (ВТН)
@@ -107,6 +107,9 @@ private:
 
     /// Реле РУ4
     Relay               *ru4;
+
+    /// Реле времени РВ4
+    TimeRelay           *rv4;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
@@ -206,6 +209,9 @@ private:
 
     /// Вывод отладочной строки
     void debugOutput(double t, double dt);
+
+    /// Формирование состояния сигнальных ламп
+    float getLampState(double signal);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);

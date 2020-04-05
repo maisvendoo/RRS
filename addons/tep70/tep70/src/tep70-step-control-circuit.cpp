@@ -21,7 +21,9 @@ void TEP70::stepControlCircuit(double t, double dt)
           ru42->getCurrent() +
           mv6->getCurrent() +
           vtn->getCurrent() +
-          ru4->getCurrent();
+          ru4->getCurrent() +
+          ru15->getCurrent() +
+          rv4->getCurrent();
 
 
     battery->setChargeVoltage(starter_generator->getVoltage());
@@ -51,10 +53,15 @@ void TEP70::stepControlCircuit(double t, double dt)
     ru8->step(t, dt);
 
 
-    // Состояние цепи контактора маслянного насоса (КМН)
-    bool is_KMH_on = is_Button_Start_on && ru42->getContactState(0);
+    // Состояние цепи контактора маслянного насоса (КМН) при пуске
+    bool is_KMH_on_start = is_Button_Start_on && ru42->getContactState(0);
 
-    kontaktor_oil_pump->setVoltage(Ucc * static_cast<double>(is_KMH_on));
+    // Состояние цепи КМН при остановке дизеля (прокачка после остановки)
+    bool is_KMN_on_stop = azv_common_control.getState() &&
+                          ru6->getContactState(3) &&
+                          ru15->getContactState(2);
+
+    kontaktor_oil_pump->setVoltage(Ucc * static_cast<double>(is_KMH_on_start || is_KMN_on_stop));
     kontaktor_oil_pump->step(t, dt);
 
     // Состояние цепи реле времени РВ3 (задает время предпусковой прокачки)
@@ -111,4 +118,18 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     ru42->setVoltage(Ucc * static_cast<double>(is_RU6_on));
     ru42->step(t, dt);
+
+    bool is_RU15_on = azv_common_control.getState() &&
+                      rv4->getContactState(0) &&
+                      (ru6->getContactState(2) || ru15->getContactState(0));
+
+    ru15->setVoltage(Ucc * static_cast<double>(is_RU15_on));
+    ru15->step(t, dt);
+
+    bool is_RV4_on = azv_common_control.getState() &&
+                     ru6->getContactState(3) &&
+                     ru15->getContactState(1);
+
+    rv4->setControlVoltage(Ucc * static_cast<double>(is_RV4_on));
+    rv4->step(t, dt);
 }
