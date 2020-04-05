@@ -93,6 +93,15 @@ private:
     /// Реле РУ42
     Relay               *ru42;
 
+    /// Реле РУ7
+    Relay               *ru7;
+
+    /// Реле РУ15
+    Relay               *ru15;
+
+    /// Вентиль МВ6
+    Relay               *mv6;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 

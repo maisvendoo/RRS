@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 void TEP70::stepFuelSystem(double t, double dt)
 {
-    fuel_tank->setFuelConsumption(0.0);
+    fuel_tank->setFuelConsumption(disel->getFuelFlow());
     fuel_tank->step(t, dt);
 
     // Пересчитываем массу тепловоза, с учетом текущем массы топлива в баке

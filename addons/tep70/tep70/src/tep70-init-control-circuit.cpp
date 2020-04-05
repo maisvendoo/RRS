@@ -12,15 +12,17 @@ void TEP70::initControlCircuit()
 
     tumbler_disel_stop.set();
 
-    kontaktor_fuel_pump = new Relay(1);
+    kontaktor_fuel_pump = new Relay(2);
     kontaktor_fuel_pump->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kontaktor_fuel_pump->setInitContactState(0, false);
+    kontaktor_fuel_pump->setInitContactState(1, false);
 
-    ru8 = new Relay(3);
+    ru8 = new Relay(4);
     ru8->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
     ru8->setInitContactState(0, false);
     ru8->setInitContactState(1, false);
     ru8->setInitContactState(2, false);
+    ru8->setInitContactState(3, false);
 
     kontaktor_oil_pump = new Relay(1);
     kontaktor_oil_pump->read_custom_config(config_dir + QDir::separator() + "mk-6");
@@ -56,4 +58,8 @@ void TEP70::initControlCircuit()
     ru42 = new Relay(3);
     ru42->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
     ru42->setInitContactState(0, true);
+
+    mv6 = new Relay(1);
+    mv6->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    mv6->setInitContactState(0, false);
 }
