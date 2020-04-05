@@ -81,6 +81,23 @@ void ControllerKM2202::load_config(CfgReader &cfg)
     }
 
     revers_shaft_timer.setTimeout(rs_delay);
+
+    QDomNode secNode = cfg.getFirstSection("Pos");
+
+    while (!secNode.isNull())
+    {
+        int number = 0;
+
+        cfg.getInt(secNode, "Number", number);
+
+        double shaft_freq = 0;
+
+        cfg.getDouble(secNode, "ShaftFreq", shaft_freq);
+
+        n_ref.insert(number, shaft_freq);
+
+        secNode = cfg.getNextSection();
+    }
 }
 
 //------------------------------------------------------------------------------

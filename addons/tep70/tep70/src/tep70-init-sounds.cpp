@@ -19,4 +19,9 @@ void TEP70::initSounds()
     connect(starter_generator, &StarterGenerator::soundStop, this, &TEP70::soundStop);
     connect(starter_generator, &StarterGenerator::soundSetPitch, this, &TEP70::soundSetPitch);
     connect(starter_generator, &StarterGenerator::soundSetVolume, this, &TEP70::soundSetVolume);
+
+    connect(disel, &Disel::soundPlay, this, &TEP70::soundPlay);
+    connect(disel, &Disel::soundStop, this, &TEP70::soundStop);
+    connect(disel, &Disel::soundSetPitch, this, &TEP70::soundSetPitch);
+    connect(disel, &Disel::soundSetVolume, this, &TEP70::soundSetVolume);
 }

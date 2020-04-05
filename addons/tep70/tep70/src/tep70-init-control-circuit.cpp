@@ -62,4 +62,12 @@ void TEP70::initControlCircuit()
     mv6 = new Relay(1);
     mv6->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
     mv6->setInitContactState(0, false);
+
+    vtn = new Relay(1);
+    vtn->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    vtn->setInitContactState(0, true);
+
+    ru4 = new Relay(1);
+    ru4->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    ru4->setInitContactState(0, true);
 }

@@ -33,6 +33,12 @@ public:
     /// Контакт нулевой позиции
     bool isZero() const { return ms_position == MS_ZERO; }
 
+    /// Контакт позиций выше 1-й
+    bool isMoreFirst() const {return ms_position > 1; }
+
+    /// Получить заданную частоту вращения коленчатого вала дизеля
+    double getRefFreq() const { return n_ref[ms_position]; }
+
 private:
 
     enum
@@ -68,6 +74,7 @@ private:
 
     Timer   revers_shaft_timer;
 
+    QMap<int, double>   n_ref;
 
     void preStep(state_vector_t &Y, double t);
 

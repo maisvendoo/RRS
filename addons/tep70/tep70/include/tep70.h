@@ -102,6 +102,12 @@ private:
     /// Вентиль МВ6
     Relay               *mv6;
 
+    /// Вентиль топливных насосов (ВТН)
+    Relay               *vtn;
+
+    /// Реле РУ4
+    Relay               *ru4;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 

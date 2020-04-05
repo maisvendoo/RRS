@@ -79,6 +79,9 @@ void Disel::preStep(state_vector_t &Y, double t)
         {
             timer->start();
         }
+
+        if (Y[1] < 1.0)
+            emit soundStop("Disel");
     }
     else
     {
@@ -104,6 +107,9 @@ void Disel::preStep(state_vector_t &Y, double t)
     double M2 = K[3] * Q2;
 
     M_d = (M1 + M2) * static_cast<double>(is_fuel_ignition);
+
+    emit soundSetPitch("Disel", static_cast<float>(Y[1] / 36.7));
+    emit soundSetVolume("Disel", static_cast<float>(Y[1] * 100.0 / 36.7));
 }
 
 //------------------------------------------------------------------------------
@@ -153,5 +159,6 @@ void Disel::load_config(CfgReader &cfg)
 void Disel::slotFuelIgnition()
 {
     is_fuel_ignition = state_mv6 && static_cast<bool>(hs_p(fuel_pressure - 0.1));
+    emit soundPlay("Disel");
     timer->stop();
 }

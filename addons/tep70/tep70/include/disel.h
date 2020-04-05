@@ -31,6 +31,9 @@ public:
     /// Задать давление топлива перед ТНВД
     void setFuelPressure(double fuel_pressure) { this->fuel_pressure = fuel_pressure; }
 
+    /// Задать чатоту вращения коленчатого вала
+    void setRefFreq(double n_ref) { this->n_ref = n_ref; }
+
     /// Вернуть давление в системе смазки
     double getOilPressure() const { return getY(0); }
 

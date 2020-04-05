@@ -19,7 +19,9 @@ void TEP70::stepControlCircuit(double t, double dt)
           ru10->getCurrent() +
           ru6->getCurrent() +
           ru42->getCurrent() +
-          mv6->getCurrent();
+          mv6->getCurrent() +
+          vtn->getCurrent() +
+          ru4->getCurrent();
 
 
     battery->setChargeVoltage(starter_generator->getVoltage());
@@ -96,6 +98,16 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     ru6->setVoltage(Ucc * static_cast<double>(is_RU6_on));
     ru6->step(t, dt);
+
+    bool is_VTN_on = ru6->getContactState(0) && ru4->getContactState(0);
+
+    vtn->setVoltage(Ucc * static_cast<double>(is_VTN_on));
+    vtn->step(t, dt);
+
+    bool is_RU4_on = km->isMoreFirst();
+
+    ru4->setVoltage(Ucc * static_cast<double>(is_RU4_on));
+    ru4->step(t, dt);
 
     ru42->setVoltage(Ucc * static_cast<double>(is_RU6_on));
     ru42->step(t, dt);
