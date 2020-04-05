@@ -53,8 +53,9 @@ void TEP70::stepControlCircuit(double t, double dt)
     kontaktor_starter->setVoltage(Ucc * static_cast<double>(oilpump_time_relay->getContactState(0)));
     kontaktor_starter->step(t, dt);
 
-    starter_time_relay->setVoltage(Ucc * static_cast<double>(oilpump_time_relay->getContactState(1)));
+    starter_time_relay->setControlVoltage(Ucc * static_cast<double>(oilpump_time_relay->getContactState(1)));
     starter_time_relay->step(t, dt);
+
 
     // Проверяем давление масла
     bool is_RDM4_on = static_cast<bool>(hs_p(disel->getOilPressure() - 0.05));

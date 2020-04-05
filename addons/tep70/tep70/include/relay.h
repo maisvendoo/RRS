@@ -15,13 +15,13 @@ public:
     ~Relay();
 
 
-    void setInitContactState(size_t number, bool state);
+    virtual void setInitContactState(size_t number, bool state);
 
-    void setVoltage(double U);
+    virtual void setVoltage(double U);
 
-    bool getContactState(size_t number) const;
+    virtual bool getContactState(size_t number) const;
 
-    double getCurrent() const;
+    virtual double getCurrent() const;
 
 protected:
 
@@ -51,11 +51,11 @@ protected:
 
     std::vector<bool>    contact;
 
-    void preStep(state_vector_t &Y, double t);
+    virtual void preStep(state_vector_t &Y, double t);
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-    void load_config(CfgReader &cfg);
+    virtual void load_config(CfgReader &cfg);
 
     void change_contacts_state();
 

@@ -21,9 +21,9 @@ public:
     void setControlVoltage(double Uc);
 
     /// Получить потребляемый ток
-    double getCurrent() const;
+    double getCurrent() const override;
 
-    void step(double t, double dt);
+    void step(double t, double dt) override;
 
 private:
 
@@ -44,11 +44,13 @@ private:
     /// Флаг срабатывания
     bool        is_started;
 
-    void preStep(state_vector_t &Y, double t);
+    void setVoltage(double U) override;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    void preStep(state_vector_t &Y, double t) override;
 
-    void load_config(CfgReader &cfg);
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
+
+    void load_config(CfgReader &cfg) override;
 
 private slots:
 

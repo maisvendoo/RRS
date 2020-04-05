@@ -4,7 +4,7 @@
 //
 //------------------------------------------------------------------------------
 TimeRelay::TimeRelay(size_t num_contacts, QObject *parent) : Relay(num_contacts, parent)
-  , timer(new Timer())
+  , timer(new Timer(0.1, false))
   , Uc(0.0)
   , U_nom(110)
   , Rc(300)
@@ -59,16 +59,26 @@ void TimeRelay::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TimeRelay::setVoltage(double U)
+{
+    this->U = U;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TimeRelay::preStep(state_vector_t &Y, double t)
 {
     if ( (Uc >= U_nom * start_level) && !is_started)
     {
         timer->start();
+        is_started = true;
     }
 
     if ( (Uc < U_nom * start_level) && is_started)
     {
         setVoltage(0.0);
+        is_started = false;
     }
 
     Relay::preStep(Y, t);
