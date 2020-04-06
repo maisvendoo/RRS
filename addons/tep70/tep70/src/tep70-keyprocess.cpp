@@ -111,4 +111,16 @@ void TEP70::keyProcess()
             tumbler_disel_stop.reset();
         }
     }
+
+    if (getKeyState(KEY_7))
+    {
+        if (isShift())
+        {
+            azv_motor_compressor.set();
+        }
+        else
+        {
+            azv_motor_compressor.reset();
+        }
+    }
 }

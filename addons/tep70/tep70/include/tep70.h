@@ -26,6 +26,9 @@
 #include    "electric-oil-pump.h"
 #include    "starter-generator.h"
 #include    "voltage-regulator.h"
+#include    "dc-motor-compressor.h"
+#include    "pressure-regulator.h"
+#include    "ubt367m.h"
 
 /*!
  * \class
@@ -118,8 +121,60 @@ private:
     /// Контактор регулятора напряжения
     Relay               *krn;
 
-    /// Регулятор напряжения
+    /// Регулятор напряжения заряда АКБ
     VoltageRegulator    *voltage_regulator;
+
+    /// Главный воздушный резервуар (ГР)
+    Reservoir           *main_reservoir;
+
+    /// Мотор-компрессор
+    DCMotorCompressor   *motor_compressor;
+
+    /// Регулятор давления в ГР
+    PressureRegulator   *press_reg;
+
+    /// Реле РУ18
+    Relay               *ru18;
+
+    /// Контактор мотор-компрессора КТК1
+    Relay               *ktk1;
+
+    /// Контактор мотор-компрессора КТК2
+    Relay               *ktk2;
+
+    /// Реле времени РВ6
+    TimeRelay           *rv6;
+
+    /// Устройство блокировки тормозов усл. №367М
+    BrakeLock           *ubt367m;
+
+    /// Кран машиниста усл. №395
+    BrakeCrane          *krm;
+
+    /// Кран вспомогательного тормоза усл. №254
+    LocoCrane           *kvt;
+
+    /// Воздухораспределитель усл. №242
+    AirDistributor      *vr;
+
+    /// Электровоздухораспределитель усл. №305
+    ElectroAirDistributor   *evr;
+
+    /// Переключательный клапан
+    SwitchingValve          *zpk;
+
+    /// Реле давления усл. №304
+    PneumoReley             *rd304;
+
+    /// Тройник для распределения воздуха от переключательного клапана
+    /// к тележкам
+    PneumoSplitter          *pneumo_splitter;
+
+    /// Передняя тележка
+    BrakeMech               *fwd_trolley;
+
+    /// Задняя тележка
+    BrakeMech               *bwd_trolley;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
@@ -157,6 +212,9 @@ private:
     /// АЗВ "ЭПТ"
     Trigger azv_ept_on;
 
+    /// АЗВ "Компрессор"
+    Trigger azv_motor_compressor;
+
     /// Тумблер "Напряжение ЦУ. Напряжение ЭПТ"
     Trigger tumbler_voltage;
 
@@ -193,6 +251,9 @@ private:
     /// Инициализация маслянной системы
     void initOilSystem();
 
+    /// Инициализация тормозной системы
+    void initPneumoBrakeSystem();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -213,6 +274,9 @@ private:
 
     /// Шаг моделирвания масляной системы
     void stepOilSystem(double t, double dt);
+
+    /// Шаг моделирования пневматической тормозной системы
+    void stepPneumoBrakeSystem(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

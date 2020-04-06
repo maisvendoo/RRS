@@ -30,11 +30,30 @@ TEP70::TEP70() : Vehicle()
   , rv4(nullptr)
   , rv9(nullptr)
   , krn(nullptr)
+  , voltage_regulator(nullptr)
+  , main_reservoir(nullptr)
+  , motor_compressor(nullptr)
+  , press_reg(nullptr)
+  , ru18(nullptr)
+  , ktk1(nullptr)
+  , ktk2(nullptr)
+  , rv6(nullptr)
+  , ubt367m(nullptr)
+  , krm(nullptr)
+  , kvt(nullptr)
+  , vr(nullptr)
+  , evr(nullptr)
+  , zpk(nullptr)
+  , rd304(nullptr)
+  , pneumo_splitter(nullptr)
+  , fwd_trolley(nullptr)
+  , bwd_trolley(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
   , button_tifon(false)
   , Ucc(0.0)
+  , Icc(0.0)
 {
 
 }
@@ -62,6 +81,8 @@ void TEP70::initialization()
 
     initOilSystem();
 
+    initPneumoBrakeSystem();
+
     initSounds();
 }
 
@@ -82,6 +103,8 @@ void TEP70::step(double t, double dt)
     stepDisel(t, dt);
 
     stepOilSystem(t, dt);
+
+    stepPneumoBrakeSystem(t, dt);
 
     stepSignalsOutput(t, dt);
 

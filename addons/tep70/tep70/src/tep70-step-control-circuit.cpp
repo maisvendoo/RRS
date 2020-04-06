@@ -25,7 +25,11 @@ void TEP70::stepControlCircuit(double t, double dt)
           ru15->getCurrent() +
           rv4->getCurrent() +
           rv9->getCurrent() +
-          krn->getCurrent();
+          krn->getCurrent() +
+          ru18->getCurrent() +
+          ktk1->getCurrent() +
+          ktk2->getCurrent() +
+          rv6->getCurrent();
 
 
     battery->setChargeVoltage(starter_generator->getVoltage());

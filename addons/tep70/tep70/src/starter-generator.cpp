@@ -93,7 +93,7 @@ double StarterGenerator::getTorque()
     }
     else
     {
-        return -cPhi(If) * Ia;
+        return -cPhi(If) * Ia * sign(omega);
     }
 }
 

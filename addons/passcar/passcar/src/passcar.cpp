@@ -157,6 +157,7 @@ void PassCarrige::stepSignalsOutput()
 
     analogSignal[GEN_MUFTA1] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
     analogSignal[GEN_KARDAN] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
+    analogSignal[GEN_AXIS] = static_cast<float>(dir * wheel_rotation_angle[2] * 2.96 / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------

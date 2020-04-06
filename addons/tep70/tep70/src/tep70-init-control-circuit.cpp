@@ -89,10 +89,12 @@ void TEP70::initControlCircuit()
     rv9->setTimeout(5.0);
     rv9->setInitContactState(0, false);
 
-    krn = new Relay(4);
+    krn = new Relay(6);
     krn->read_custom_config(config_dir + QDir::separator() + "mk-6");
     krn->setInitContactState(0, false);
     krn->setInitContactState(1, false);
     krn->setInitContactState(2, true);
     krn->setInitContactState(3, true);
+    krn->setInitContactState(4, false);
+    krn->setInitContactState(5, false);
 }
