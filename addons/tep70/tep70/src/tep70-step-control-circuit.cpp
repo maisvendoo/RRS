@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 void TEP70::stepControlCircuit(double t, double dt)
 {
-    Ucc = max(battery->getVoltage(), starter_generator->getVoltage());
+    Ucc = max(battery->getVoltage(), starter_generator->getVoltage() * static_cast<double>(krn->getContactState(1)));
 
     // Расчитываем ток, потребляемый цепями управления
     Icc = kontaktor_fuel_pump->getCurrent() +
@@ -23,7 +23,9 @@ void TEP70::stepControlCircuit(double t, double dt)
           vtn->getCurrent() +
           ru4->getCurrent() +
           ru15->getCurrent() +
-          rv4->getCurrent();
+          rv4->getCurrent() +
+          rv9->getCurrent() +
+          krn->getCurrent();
 
 
     battery->setChargeVoltage(starter_generator->getVoltage());
@@ -132,4 +134,10 @@ void TEP70::stepControlCircuit(double t, double dt)
 
     rv4->setControlVoltage(Ucc * static_cast<double>(is_RV4_on));
     rv4->step(t, dt);
+
+    rv9->setControlVoltage(Ucc * static_cast<double>(ru42->getContactState(1)));
+    rv9->step(t, dt);
+
+    krn->setVoltage(Ucc * static_cast<double>(rv9->getContactState(0)));
+    krn->step(t, dt);
 }

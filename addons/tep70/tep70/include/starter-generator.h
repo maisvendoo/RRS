@@ -28,6 +28,8 @@ public:
 
     void setAncorVoltage(double Ua) { this->Ua = Ua; }
 
+    void setFieldVoltage(double Uf) { this->Uf = Uf; }
+
     double getVoltage() const;
 
     double getTorque();

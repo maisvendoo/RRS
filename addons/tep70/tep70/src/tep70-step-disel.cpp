@@ -14,7 +14,14 @@ void TEP70::stepDisel(double t, double dt)
     disel->step(t, dt);
 
     starter_generator->setAncorVoltage( battery->getVoltage() *  static_cast<double>(kontaktor_starter->getContactState(0)));
+    starter_generator->setFieldVoltage(voltage_regulator->getFieldVoltage() * static_cast<double>(krn->getContactState(0)));
     starter_generator->setLoadCurrent(Icc);
     starter_generator->setOmega(disel->getStarterOmega());
+    starter_generator->setMotorMode(krn->getContactState(2));
     starter_generator->step(t, dt);
+
+    voltage_regulator->setBatteryVoltage(battery->getVoltage());
+    voltage_regulator->setRefVoltage(110.0);
+    voltage_regulator->setVoltage(starter_generator->getVoltage());
+    voltage_regulator->step(t, dt);
 }

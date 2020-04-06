@@ -25,6 +25,7 @@
 #include    "time-relay.h"
 #include    "electric-oil-pump.h"
 #include    "starter-generator.h"
+#include    "voltage-regulator.h"
 
 /*!
  * \class
@@ -110,6 +111,15 @@ private:
 
     /// Реле времени РВ4
     TimeRelay           *rv4;
+
+    /// Реле времени РВ9
+    TimeRelay           *rv9;
+
+    /// Контактор регулятора напряжения
+    Relay               *krn;
+
+    /// Регулятор напряжения
+    VoltageRegulator    *voltage_regulator;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;

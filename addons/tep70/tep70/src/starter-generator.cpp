@@ -21,7 +21,7 @@ StarterGenerator::StarterGenerator(QObject *parent) : Device(parent)
   , switch_timer(new Timer)
 
 {
-
+    connect(switch_timer, &Timer::process, this, &StarterGenerator::slotSwitchMode);
 }
 
 //------------------------------------------------------------------------------
