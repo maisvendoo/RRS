@@ -7,7 +7,7 @@ void TEP70::keyProcess()
 {
     button_disel_start = getKeyState(KEY_K);
 
-    button_brake_release = getKeyState(KEY_R);
+    button_brake_release = !getKeyState(KEY_R);
 
     button_svistok = getKeyState(KEY_Space);
 

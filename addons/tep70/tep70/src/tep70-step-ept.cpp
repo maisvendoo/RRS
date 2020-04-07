@@ -11,7 +11,9 @@ void TEP70::stepEPT(double t, double dt)
     ept_pass_control->setBrakeState(krm->isBrake());
     ept_pass_control->step(t, dt);
 
-    ept_control[0] = ept_pass_control->getControlSignal();
+    bool is_EPT_on = button_brake_release;
+
+    ept_control[0] = ept_pass_control->getControlSignal() * static_cast<double>(is_EPT_on);
 
     if (prev_vehicle != nullptr)
     {
