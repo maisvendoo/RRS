@@ -11,7 +11,7 @@ void TEP70::initPneumoBrakeSystem()
 {
     // Главный резервуар
     main_reservoir = new Reservoir(1.0);
-    main_reservoir->setAirFlow(5e-4);
+    main_reservoir->setAirFlow(1e-3);
 
     // Мотор-компрессор
     motor_compressor = new DCMotorCompressor();

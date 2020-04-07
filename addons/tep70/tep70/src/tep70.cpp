@@ -59,6 +59,7 @@ TEP70::TEP70() : Vehicle()
   , button_RB1(false)
   , Ucc(0.0)
   , Icc(0.0)
+  , charge_press(0.5)
 {
 
 }
@@ -69,6 +70,24 @@ TEP70::TEP70() : Vehicle()
 TEP70::~TEP70()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TEP70::initBrakeDevices(double p0, double pTM, double pFL)
+{
+    main_reservoir->setY(0, pFL);
+    charge_press = p0;
+
+    krm->setChargePressure(charge_press);
+    krm->init(pTM, pFL);
+    kvt->init(pTM, pFL);
+    vr->init(pTM, pFL);
+    zr->init(pTM, pFL);
+
+    ubt367m->setState(1);
+    ubt367m->setCombineCranePos(0);
 }
 
 //------------------------------------------------------------------------------

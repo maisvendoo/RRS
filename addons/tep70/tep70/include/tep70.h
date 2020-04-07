@@ -31,6 +31,7 @@
 #include    "ubt367m.h"
 #include    "ept-converter.h"
 #include    "ept-pass-control.h"
+#include    "tep70-switcher.h"
 
 /*!
  * \class
@@ -48,6 +49,9 @@ public:
 
     /// Деструктор
     ~TEP70();
+
+    /// Инициализация тормозных приборов
+    void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
 
@@ -211,6 +215,9 @@ private:
     /// Ток цепей управления
     double  Icc;
 
+    /// Pарядное давление ТМ
+    double  charge_press;
+
     /// АЗВ "Управление общее"
     Trigger azv_common_control;
 
@@ -239,16 +246,16 @@ private:
     Trigger tumbler_disel_stop;
 
     /// Тумблер "Ослабление поля I ступени руч./авт."
-    Switcher tumbler_field_weak1;
+    TEP70Switcher tumbler_field_weak1;
 
     /// Тумблер "Ослабление поля II ступени руч./авт."
-    Switcher tumbler_field_weak2;
+    TEP70Switcher tumbler_field_weak2;
 
     /// Тумблер "Управление жалюзи воды руч./авт."
-    Switcher tumbler_water_zaluzi;
+    TEP70Switcher tumbler_water_zaluzi;
 
     /// Тумблер "Управление жалюзи масла руч./авт."
-    Switcher tumbler_oil_zaluzi;
+    TEP70Switcher tumbler_oil_zaluzi;
 
     /// Ключ ЭПК
     Trigger  epk_key;

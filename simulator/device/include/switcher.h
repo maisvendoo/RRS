@@ -9,6 +9,7 @@
 class DEVICE_EXPORT Switcher : public Device
 {
 public:
+
     Switcher(QObject *parent = Q_NULLPTR, int key_code = 0, int kol_states = 0);
 
     ~Switcher();
