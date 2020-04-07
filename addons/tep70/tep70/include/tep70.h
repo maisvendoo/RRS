@@ -29,6 +29,8 @@
 #include    "dc-motor-compressor.h"
 #include    "pressure-regulator.h"
 #include    "ubt367m.h"
+#include    "ept-converter.h"
+#include    "ept-pass-control.h"
 
 /*!
  * \class
@@ -182,6 +184,12 @@ private:
     /// ЭПК автостопа
     AutoTrainStop           *epk;
 
+    /// Преобразователь питания ЭПТ
+    EPTConverter            *ept_converter;
+
+    /// Блок управления ЭПТ
+    EPTPassControl          *ept_pass_control;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
@@ -266,6 +274,9 @@ private:
     /// Инициализация тормозной системы
     void initPneumoBrakeSystem();
 
+    /// Инициализация ЭПТ
+    void initEPT();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -289,6 +300,9 @@ private:
 
     /// Шаг моделирования пневматической тормозной системы
     void stepPneumoBrakeSystem(double t, double dt);
+
+    /// Шаг моделирования ЭПТ
+    void stepEPT(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

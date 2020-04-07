@@ -68,16 +68,6 @@ void TEP70::initPneumoBrakeSystem()
     evr = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
     evr->read_config("evr305");
 
-    // Инициализация линии управления ЭПТ
-    ept_control.resize(1);
-    ept_current.resize(1);
-
-    ept_control[0] = ept_current[0];
-
-    // Инициализайия источника питания ЭПТ (ПОЗЖЕ!!!)
-
-    // Инициализация блока управления ЭПТ (ПОЗЖЕ!!!)
-
     // Переключательный клапан
     zpk = new SwitchingValve();
     zpk->read_config("zpk");

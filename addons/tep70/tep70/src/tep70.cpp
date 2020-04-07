@@ -49,6 +49,9 @@ TEP70::TEP70() : Vehicle()
   , fwd_trolley(nullptr)
   , bwd_trolley(nullptr)
   , zr(nullptr)
+  , epk(nullptr)
+  , ept_converter(nullptr)
+  , ept_pass_control(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -85,6 +88,8 @@ void TEP70::initialization()
 
     initPneumoBrakeSystem();
 
+    initEPT();
+
     initSounds();
 }
 
@@ -107,6 +112,8 @@ void TEP70::step(double t, double dt)
     stepOilSystem(t, dt);
 
     stepPneumoBrakeSystem(t, dt);
+
+    stepEPT(t, dt);
 
     stepSignalsOutput(t, dt);
 
