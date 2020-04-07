@@ -58,8 +58,10 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[STRELKA_TC1] = static_cast<float>(fwd_trolley->getBrakeCylinderPressure() / 1.0);
     analogSignal[STRELKA_TC2] = static_cast<float>(bwd_trolley->getBrakeCylinderPressure() / 1.0);
 
-
     analogSignal[STRELKA_UR] = static_cast<float>(krm->getEqReservoirPressure() / 1.0);
+
+    analogSignal[KRAN_254_POD] = static_cast<float>(kvt->getHandleShift());
+    analogSignal[KRAN_254_RUK] = static_cast<float>(kvt->getHandlePosition());
 
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);

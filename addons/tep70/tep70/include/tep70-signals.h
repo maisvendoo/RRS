@@ -91,6 +91,8 @@ enum
     RUK_367 = 66,
     COMB_KRAN = 67,
     KRAN_395_RUK = 68,
+    KRAN_254_POD = 69,
+    KRAN_254_RUK = 70,
 
     WHEEL_1 = 194,
     WHEEL_2 = 195,

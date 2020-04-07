@@ -58,4 +58,50 @@ void TEP70::stepPneumoBrakeSystem(double t, double dt)
     krm->setBrakePipePressure(pTM);
     krm->setControl(keys);
     krm->step(t, dt);
+
+    kvt->setFeedlinePressure(ubt367m->getCraneFLpressure());
+    kvt->setBrakeCylinderPressure(zpk->getPressure2());
+    kvt->setAirDistributorFlow(0.0);
+    kvt->setControl(keys);
+    kvt->step(t, dt);
+
+    zpk->setInputFlow1(evr->getQbc_out());
+    zpk->setInputFlow2(kvt->getBrakeCylinderFlow());
+    zpk->setOutputPressure(pneumo_splitter->getP_in());
+    zpk->step(t, dt);
+
+    pneumo_splitter->setQ_in(zpk->getOutputFlow());
+    pneumo_splitter->setP_out1(rd304->getWorkPressure());
+    pneumo_splitter->setP_out2(bwd_trolley->getBrakeCylinderPressure());
+    pneumo_splitter->step(t, dt);
+
+    rd304->setPipelinePressure(main_reservoir->getPressure());
+    rd304->setWorkAirFlow(pneumo_splitter->getQ_out1());
+    rd304->setBrakeCylPressure(fwd_trolley->getBrakeCylinderPressure());
+    rd304->step(t, dt);
+
+    fwd_trolley->setAirFlow(rd304->getBrakeCylAirFlow());
+    fwd_trolley->setVelocity(velocity);
+    fwd_trolley->step(t, dt);
+
+    bwd_trolley->setAirFlow(pneumo_splitter->getQ_out2());
+    bwd_trolley->setVelocity(velocity);
+    bwd_trolley->step(t, dt);
+
+    zr->setAirFlow(evr->getOutputSupplyReservoirFlow());
+    zr->step(t, dt);
+
+    vr->setBrakeCylinderPressure(evr->getPbc_out());
+    vr->setAirSupplyPressure(evr->getSupplyReservoirPressure());
+    vr->setBrakepipePressure(pTM);
+    vr->step(t, dt);
+
+    auxRate = vr->getAuxRate();
+
+    evr->setControlLine(ept_control[0]);
+    evr->setQbc_in(vr->getBrakeCylinderAirFlow());
+    evr->setPbc_in(zpk->getPressure1());
+    evr->setInputSupplyReservoirFlow(vr->getAirSupplyFlow());
+    evr->setSupplyReservoirPressure(zr->getPressure());
+    evr->step(t, dt);
 }
