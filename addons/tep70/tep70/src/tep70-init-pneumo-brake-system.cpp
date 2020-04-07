@@ -99,4 +99,8 @@ void TEP70::initPneumoBrakeSystem()
 
     // Запасный резервуар
     zr = new Reservoir(0.078);
+
+    // ЭПК
+    epk = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
+    epk->read_config("epk150");
 }

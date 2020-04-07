@@ -53,6 +53,7 @@ TEP70::TEP70() : Vehicle()
   , button_brake_release(false)
   , button_svistok(false)
   , button_tifon(false)
+  , button_RB1(false)
   , Ucc(0.0)
   , Icc(0.0)
 {

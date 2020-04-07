@@ -13,6 +13,8 @@ void TEP70::keyProcess()
 
     button_tifon = getKeyState(KEY_B);
 
+    button_RB1 = getKeyState(KEY_Z);
+
     // Включение АЗВ "Управление общее"
     if (getKeyState(KEY_J))
     {
@@ -121,6 +123,18 @@ void TEP70::keyProcess()
         else
         {
             azv_motor_compressor.reset();
+        }
+    }
+
+    if (getKeyState(KEY_N))
+    {
+        if (isShift())
+        {
+            epk_key.set();
+        }
+        else
+        {
+            epk_key.reset();
         }
     }
 }

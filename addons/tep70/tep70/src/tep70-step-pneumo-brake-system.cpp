@@ -104,4 +104,10 @@ void TEP70::stepPneumoBrakeSystem(double t, double dt)
     evr->setInputSupplyReservoirFlow(vr->getAirSupplyFlow());
     evr->setSupplyReservoirPressure(zr->getPressure());
     evr->step(t, dt);
+
+    epk->setFeedlinePressure(main_reservoir->getPressure());
+    epk->setBrakepipePressure(pTM);
+    epk->powerOn(true);
+    epk->keyOn(epk_key.getState());
+    epk->step(t, dt);
 }

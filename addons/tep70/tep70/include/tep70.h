@@ -179,6 +179,9 @@ private:
     /// Запасный резервуар
     Reservoir               *zr;
 
+    /// ЭПК автостопа
+    AutoTrainStop           *epk;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
@@ -190,6 +193,9 @@ private:
 
     /// Кнопка "Тифон"
     bool    button_tifon;
+
+    /// Рукоятка бдительности (РБ1)
+    bool    button_RB1;
 
     /// Напряжение цепей управления
     double  Ucc;
@@ -235,6 +241,9 @@ private:
 
     /// Тумблер "Управление жалюзи масла руч./авт."
     Switcher tumbler_oil_zaluzi;
+
+    /// Ключ ЭПК
+    Trigger  epk_key;
 
     /// Инициализация всех систем тепловоза
     void initialization();

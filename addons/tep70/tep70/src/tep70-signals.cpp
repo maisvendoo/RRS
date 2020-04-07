@@ -63,6 +63,9 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[KRAN_254_POD] = static_cast<float>(kvt->getHandleShift());
     analogSignal[KRAN_254_RUK] = static_cast<float>(kvt->getHandlePosition());
 
+    analogSignal[KLUCH_EPK] = static_cast<float>(epk_key.getState());
+    analogSignal[RB1] = static_cast<float>(button_RB1);
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);

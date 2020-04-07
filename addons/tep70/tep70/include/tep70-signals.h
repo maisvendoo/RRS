@@ -94,6 +94,9 @@ enum
     KRAN_254_POD = 69,
     KRAN_254_RUK = 70,
 
+    KLUCH_EPK = 71,
+    RB1 = 72,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,
