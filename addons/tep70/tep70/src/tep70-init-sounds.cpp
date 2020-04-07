@@ -92,4 +92,61 @@ void TEP70::initSounds()
 
     tumbler_oil_zaluzi.setSoundName("Switcher");
     connect(&tumbler_oil_zaluzi, &TEP70Switcher::soundPlay, this, &TEP70::soundPlay);
+
+    ru8->setSoundName("Relay");
+    connect(ru8, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    kontaktor_fuel_pump->setSoundName("Relay");
+    connect(kontaktor_fuel_pump, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    kontaktor_oil_pump->setSoundName("Relay");
+    connect(kontaktor_oil_pump, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    oilpump_time_relay->setSoundName("Relay");
+    connect(oilpump_time_relay, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    starter_time_relay->setSoundName("Relay");
+    connect(starter_time_relay, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    kontaktor_starter->setSoundName("Relay");
+    connect(kontaktor_starter, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ru10->setSoundName("Relay");
+    connect(ru10, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ru6->setSoundName("Relay");
+    connect(ru6, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ru42->setSoundName("Relay");
+    connect(ru42, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ru15->setSoundName("Relay");
+    connect(ru15, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    vtn->setSoundName("Relay");
+    connect(vtn, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    mv6->setSoundName("Relay");
+    connect(mv6, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ru4->setSoundName("Relay");
+    connect(ru4, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    rv9->setSoundName("Relay");
+    connect(rv9, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    krn->setSoundName("Relay");
+    connect(krn, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ru18->setSoundName("Relay");
+    connect(ru18, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ktk1->setSoundName("Relay");
+    connect(ktk1, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    ktk2->setSoundName("Relay");
+    connect(ktk2, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    rv6->setSoundName("Relay");
+    connect(rv6, &Relay::soundPlay, this, &TEP70::soundPlay);
 }

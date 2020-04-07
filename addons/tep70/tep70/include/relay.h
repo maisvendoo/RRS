@@ -23,6 +23,8 @@ public:
 
     virtual double getCurrent() const;
 
+    void setSoundName(QString soundName) { this->soundName = soundName; }
+
 protected:
 
     /// Текущее состояние якоря реле
@@ -48,6 +50,9 @@ protected:
 
     /// Значение тока на предыдущем шаге
     double  I_prev;
+
+    /// Имя звука при включении и выключении
+    QString soundName;
 
     std::vector<bool>    contact;
 

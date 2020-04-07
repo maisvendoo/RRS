@@ -12,6 +12,7 @@ Relay::Relay(size_t num_contacts, QObject *parent) : Device(parent)
   , I_on(1.9)
   , I_off(1.0)
   , I_prev(0.0)
+  , soundName("Relay")
 {
     contact.resize(num_contacts);
     std::fill(contact.begin(), contact.end(), false);
@@ -116,6 +117,8 @@ void Relay::change_contacts_state()
     {
         contact[i] = !contact[i];
     }
+
+    emit soundPlay(soundName);
 }
 
 //------------------------------------------------------------------------------
