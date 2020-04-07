@@ -81,4 +81,22 @@ void TEP70::initPneumoBrakeSystem()
     // Переключательный клапан
     zpk = new SwitchingValve();
     zpk->read_config("zpk");
+
+    // Реле давления
+    rd304 = new PneumoReley();
+    rd304->read_config("rd304");
+
+    // Тройник
+    pneumo_splitter = new PneumoSplitter();
+    pneumo_splitter->read_config("pneumo-splitter");
+
+    // Тележки (тормозная механика)
+    fwd_trolley = new BrakeMech();
+    fwd_trolley->read_custom_config(config_dir + QDir::separator() + "fwd-trolley-brake-mech");
+
+    bwd_trolley = new BrakeMech();
+    bwd_trolley->read_custom_config(config_dir + QDir::separator() + "bwd-trolley-brake-mech");
+
+    // Запасный резервуар
+    zr = new Reservoir(0.078);
 }

@@ -44,4 +44,18 @@ void TEP70::stepPneumoBrakeSystem(double t, double dt)
 
     press_reg->setPressure(main_reservoir->getPressure());
     press_reg->step(t, dt);
+
+    // Работа тормозов
+
+    ubt367m->setLocoFLpressure(main_reservoir->getPressure());
+    ubt367m->setCraneTMpressure(krm->getBrakePipeInitPressure());
+    ubt367m->setControl(keys);
+    p0 = ubt367m->getLocoTMpressure();
+    ubt367m->step(t, dt);
+
+    krm->setFeedLinePressure(ubt367m->getCraneFLpressure());
+    krm->setChargePressure(0.5);
+    krm->setBrakePipePressure(pTM);
+    krm->setControl(keys);
+    krm->step(t, dt);
 }

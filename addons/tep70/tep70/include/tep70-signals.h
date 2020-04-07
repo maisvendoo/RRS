@@ -88,6 +88,9 @@ enum
     TUMBLER_VOLTMETER = 62,
     TUMBLER_DISEL_STOP = 63,
 
+    RUK_367 = 66,
+    COMB_KRAN = 67,
+    KRAN_395_RUK = 68,
 
     WHEEL_1 = 194,
     WHEEL_2 = 195,

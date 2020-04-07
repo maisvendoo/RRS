@@ -176,6 +176,9 @@ private:
     /// Задняя тележка
     BrakeMech               *bwd_trolley;
 
+    /// Запасный резервуар
+    Reservoir               *zr;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
