@@ -149,4 +149,10 @@ void TEP70::initSounds()
 
     rv6->setSoundName("Relay");
     connect(rv6, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    kvv->setSoundName("Relay");
+    connect(kvv, &Relay::soundPlay, this, &TEP70::soundPlay);
+
+    kvg->setSoundName("Relay");
+    connect(kvg, &Relay::soundPlay, this, &TEP70::soundPlay);
 }

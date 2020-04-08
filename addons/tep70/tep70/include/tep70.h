@@ -32,6 +32,9 @@
 #include    "ept-converter.h"
 #include    "ept-pass-control.h"
 #include    "tep70-switcher.h"
+#include    "field-generator.h"
+#include    "trac-generator.h"
+#include    "field-regulator.h"
 
 /*!
  * \class
@@ -194,6 +197,24 @@ private:
     /// Блок управления ЭПТ
     EPTPassControl          *ept_pass_control;
 
+    /// Возбудитель главного генератора
+    FieldGenerator          *field_gen;
+
+    /// Контактор возбуждения возбудителя (КВВ)
+    Relay                   *kvv;
+
+    /// Контактор возбуждения генератора (КВГ)
+    Relay                   *kvg;
+
+    /// Главный (тяговый) генератор
+    TracGenerator           *trac_gen;
+
+    /// Регулятор возбуждения тягового генератора
+    FieldRegulator          *field_reg;
+
+    /// Ток, потребляемый от главного генератора
+    double                  I_gen;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
@@ -284,6 +305,9 @@ private:
     /// Инициализация ЭПТ
     void initEPT();
 
+    /// Инициализация электрической передачи
+    void initElectroTransmission();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -310,6 +334,9 @@ private:
 
     /// Шаг моделирования ЭПТ
     void stepEPT(double t, double dt);
+
+    /// Шаг моделирования электрической передачи
+    void stepElectroTransmission(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

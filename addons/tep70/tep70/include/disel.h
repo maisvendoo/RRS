@@ -22,6 +22,12 @@ public:
     /// Задать крутящий момент от стартер-генератора
     void setStarterTorque(double M_sg);
 
+    /// Задать момент от возбудителя
+    void setFGTorque(double M_fg) { this->M_fg = M_fg; }
+
+    /// Задать момент от главного генератора
+    void setGenTorque(double M_gen) { this->M_gen = M_gen; }
+
     /// Задать состояние МВ6
     void setMV6state(bool state_mv6) { this->state_mv6 = state_mv6; }
 
@@ -67,6 +73,12 @@ private:
 
     /// Момент от стартер-генератора
     double  M_sg;
+
+    /// Момент от возбудителя
+    double  M_fg;
+
+    /// Момент от главного генератора
+    double  M_gen;
 
     /// Момент сопротивления на валу
     double  Mc;

@@ -52,6 +52,11 @@ TEP70::TEP70() : Vehicle()
   , epk(nullptr)
   , ept_converter(nullptr)
   , ept_pass_control(nullptr)
+  , field_gen(nullptr)
+  , kvv(nullptr)
+  , kvg(nullptr)
+  , trac_gen(nullptr)
+  , I_gen(0.0)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -109,6 +114,8 @@ void TEP70::initialization()
 
     initEPT();
 
+    initElectroTransmission();
+
     initSounds();
 }
 
@@ -133,6 +140,8 @@ void TEP70::step(double t, double dt)
     stepPneumoBrakeSystem(t, dt);
 
     stepEPT(t, dt);
+
+    stepElectroTransmission(t, dt);
 
     stepSignalsOutput(t, dt);
 

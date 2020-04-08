@@ -5,19 +5,12 @@
 //------------------------------------------------------------------------------
 void TEP70::debugOutput(double t, double dt)
 {
-    DebugMsg = QString("t: %1 КТН: %2 Давл. топ.: %3 КД: %4 РУ6: %5 РВ1: %6 Давл. масл.: %7 Расх. топл.: %8 Обороты: %9 Uзар : %10 КРМ: %11 ЗР: %12")
+    DebugMsg = QString("t: %1 ЗР: %2 КД: %3 Обороты: %4 Uвозб.: %5")
             .arg(t, 10, 'f', 2)
-            .arg(static_cast<int>(kontaktor_fuel_pump->getContactState(0)), 2)
-            .arg(electro_fuel_pump->getFuelPressure(), 4, 'f', 2)
-            .arg(static_cast<int>(kontaktor_starter->getContactState(0)), 2)
-            .arg(static_cast<int>(ru6->getContactState(0)), 2)
-            .arg(static_cast<int>(starter_time_relay->getContactState(0)), 2)
-            .arg(disel->getOilPressure(), 4, 'f', 2)
-            .arg(disel->getFuelFlow(), 6, 'f', 3)
-            .arg(disel->getOmega() * 30.0 / Physics::PI, 6, 'f', 1)
-            .arg(starter_generator->getVoltage(), 5, 'f', 1)
-            .arg(krm->getPositionName(), 3)
-            .arg(zr->getPressure(), 4, 'f', 2);
+            .arg(zr->getPressure(), 4, 'f',2)
+            .arg(static_cast<int>(kontaktor_starter->getContactState(1)), 1)
+            .arg(disel->getOmega() * 30.0 / Physics::PI, 7, 'f', 1)
+            .arg(field_gen->getVoltage(), 7, 'f', 1);
 }
 
 

@@ -7,6 +7,8 @@ void TEP70::stepDisel(double t, double dt)
 {
     disel->setQ_emn(electro_oil_pump->getOilFlow());
     disel->setStarterTorque(starter_generator->getTorque());
+    disel->setFGTorque(field_gen->getTorque());
+    disel->setGenTorque(trac_gen->getTorque());
     disel->setFuelPressure(electro_fuel_pump->getFuelPressure());
     disel->setMV6state(mv6->getContactState(0));
     disel->setVTNstate(vtn->getContactState(0));

@@ -7,6 +7,8 @@ Disel::Disel(QObject *parent) : Device(parent)
   , V_oil(1.5)
   , Q_emn(0.0)
   , M_sg(0.0)
+  , M_fg(0.0)
+  , M_gen(0.0)
   , Mc(0.0)
   , ip(3.3)
   , J_shaft(1.0)
@@ -123,7 +125,7 @@ void Disel::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
     dYdt[0] = (Q_emn + K[1] * Y[1] - K[0] * Y[0]) / V_oil;
 
     // Частота вращения коленчатого вала
-    dYdt[1] = (M_d + ip * M_sg - Mc * Y[1] / 20.0) / J_shaft;
+    dYdt[1] = (M_d + ip * M_sg - ip * M_fg - M_gen - Mc * Y[1] / 20.0) / J_shaft;
 
     dYdt[2] = delta_omega;
 }

@@ -89,6 +89,9 @@ MotorMagneticChar::point_t MotorMagneticChar::findPoint(double I, point_t &next_
 //------------------------------------------------------------------------------
 double MotorMagneticChar::interpolate(double I)
 {
+    if (points.empty())
+        return 0;
+
     point_t p1;
     point_t p0 = findPoint(I, p1);
 
