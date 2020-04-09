@@ -22,7 +22,7 @@ public:
 
     void setOmega(double omega) { this->omega = omega; }
 
-    void setLoadCurrent(double In) { this->In = In; }
+    void setLoadCurrent(double In) { this->In = In; }    
 
 private:
 

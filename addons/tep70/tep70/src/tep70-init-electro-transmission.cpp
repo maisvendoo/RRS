@@ -11,15 +11,16 @@ void TEP70::initElectroTransmission()
     field_gen = new FieldGenerator();
 
     kvv = new Relay(1);
-    kvv->read_custom_config(config_dir + QDir::separator() + "rpu-8m");
+    kvv->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kvv->setInitContactState(0, false);
 
     kvg = new Relay(1);
-    kvg->read_custom_config(config_dir + QDir::separator() + "rpu-8m");
+    kvg->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kvg->setInitContactState(0, false);
 
     trac_gen = new TracGenerator();
     trac_gen->read_custom_config(config_dir + QDir::separator() + "trac-generator");
+    trac_gen->init(config_dir + QDir::separator() + "gs-504a.txt");
 
     field_reg = new FieldRegulator();
     field_reg->read_custom_config(config_dir + QDir::separator() + "field-regulator");

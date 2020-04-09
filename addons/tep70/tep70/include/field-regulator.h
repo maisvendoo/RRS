@@ -17,6 +17,18 @@ public:
     /// Загрузить уставки из файла
     void load_settings(QString file_path);
 
+    void setKMPosition(int km_pos) { this->km_pos = km_pos; }
+
+    void setOmega(double omega) { this->omega = omega; }
+
+    void setFGVoltage(double U_fg) { this->U_fg = U_fg; }
+
+    void setGenVoltage(double U) { this->U = U; }
+
+    void setGenCurrent(double I) { this->I = I; }
+
+    double getFieldVoltage() const { return Uf; }
+
 private:
 
     /// Структура для хранения уставок регулятора на определенной позиции
@@ -68,6 +80,9 @@ private:
     /// Напряжение возбуждения ТГ
     double  Uf;
 
+    /// Текущая позиция КМ
+    int     km_pos;
+
     enum
     {
         NUM_COEFS = 6
@@ -76,7 +91,7 @@ private:
     std::array<double, NUM_COEFS>   K;
 
     /// Уставки регулятора
-    QMap<int, reg_settings_t>       reg_settings;
+    QVector<reg_settings_t>         reg_settings;
 
     void preStep(state_vector_t &Y, double t);
 
@@ -86,6 +101,8 @@ private:
 
     /// Вернуть уставку мощности на данной частоте вращения
     double getRefPower(double omega);
+
+    reg_settings_t findPoint(double omega, reg_settings_t &next_point);
 };
 
 #endif // FIELD_REGULATOR_H

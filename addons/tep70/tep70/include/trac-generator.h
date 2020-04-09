@@ -25,6 +25,10 @@ public:
 
     double getVoltage() const { return U; }
 
+    double getFieldCurrent() const { return getY(0); }
+
+    void init(QString file_name);
+
 private:
 
     double  Uf;

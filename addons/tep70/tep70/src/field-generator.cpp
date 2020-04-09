@@ -6,12 +6,12 @@
 FieldGenerator::FieldGenerator(QObject *parent) : Device(parent)
   , omega(0.0)
   , In(0.0)
-  , Ra(0.747)
+  , Ra(0.0747)
   , Rf(8.0)
   , Uf(0.0)
   , U(0.0)
   , M(0.0)
-  , Kf(0.037)
+  , Kf(0.07)
   , Tf(0.1)
 {
 
