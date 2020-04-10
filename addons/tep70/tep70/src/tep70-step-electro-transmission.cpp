@@ -27,7 +27,24 @@ void TEP70::stepElectroTransmission(double t, double dt)
     field_gen->step(t, dt);
 
     // Ток, потребляемый от главного генератора
-    I_gen = trac_gen->getVoltage() / 0.01;
+    I_gen = 0.0;
+
+    // Состояние цепи поездных контакторов
+    bool is_KP_on = azv_upr_tepl.getState() && km->isNoZero();
+
+    for (size_t i = 0; i < motor.size(); ++i)
+    {
+        kp[i]->setVoltage(Ucc * static_cast<double>(is_KP_on));
+        kp[i]->step(t, dt);
+
+        motor[i]->setAncorVoltage(trac_gen->getVoltage() * static_cast<double>(kp[i]->getContactState(0)));
+        motor[i]->setOmega(ip * wheel_omega[i]);
+        motor[i]->step(t, dt);
+
+        Q_a[i+1] = motor[i]->getTorque() * ip;
+
+        I_gen += motor[i]->getAncorCurrent();
+    }
 
     // Состояние цепи возбуждения главного генератора
     bool is_TGF_on = kvg->getContactState(0);
@@ -43,4 +60,5 @@ void TEP70::stepElectroTransmission(double t, double dt)
     field_reg->setGenCurrent(I_gen);
     field_reg->setKMPosition(km->getPositionNumber());
     field_reg->step(t, dt);
+
 }

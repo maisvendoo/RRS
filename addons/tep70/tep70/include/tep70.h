@@ -35,6 +35,9 @@
 #include    "field-generator.h"
 #include    "trac-generator.h"
 #include    "field-regulator.h"
+#include    "trac-motor.h"
+
+#include    "registrator.h"
 
 /*!
  * \class
@@ -215,6 +218,9 @@ private:
     /// Ток, потребляемый от главного генератора
     double                  I_gen;
 
+    /// Регистратор, для постоения графиков
+    Registrator             *reg;
+
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
 
@@ -238,6 +244,20 @@ private:
 
     /// Pарядное давление ТМ
     double  charge_press;
+
+    /// Передаточное число тягового редуктора
+    double  ip;
+
+    enum
+    {
+        NUM_MOTORS = 6
+    };
+
+    /// Тяговые двигатели
+    std::array<TractionMotor *, NUM_MOTORS> motor;
+
+    /// Поездные контакторы
+    std::array<Relay *, NUM_MOTORS> kp;
 
     /// АЗВ "Управление общее"
     Trigger azv_common_control;

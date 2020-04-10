@@ -57,6 +57,7 @@ TEP70::TEP70() : Vehicle()
   , kvg(nullptr)
   , trac_gen(nullptr)
   , I_gen(0.0)
+  , reg(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -65,6 +66,7 @@ TEP70::TEP70() : Vehicle()
   , Ucc(0.0)
   , Icc(0.0)
   , charge_press(0.5)
+  , ip(3.12)
 {
 
 }
@@ -90,6 +92,7 @@ void TEP70::initBrakeDevices(double p0, double pTM, double pFL)
     kvt->init(pTM, pFL);
     vr->init(pTM, pFL);
     zr->init(pTM, pFL);
+    zr->setY(0, pTM);
 
     ubt367m->setState(1);
     ubt367m->setCombineCranePos(0);
@@ -117,6 +120,8 @@ void TEP70::initialization()
     initElectroTransmission();
 
     initSounds();
+
+    reg = new Registrator("../charts/tep70-char", 0.1);
 }
 
 //------------------------------------------------------------------------------
@@ -145,7 +150,10 @@ void TEP70::step(double t, double dt)
 
     stepSignalsOutput(t, dt);
 
-    debugOutput(t, dt);    
+    debugOutput(t, dt);
+
+    QString line = QString("%1 %2").arg(I_gen, 6, 'f', 1).arg(trac_gen->getVoltage(), 6, 'f', 1);
+    reg->print(line, t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -168,6 +176,8 @@ void TEP70::loadConfig(QString cfg_path)
         fuel_tank = new FuelTank();
         fuel_tank->setCapacity(fuel_capacity);
         fuel_tank->setFuelLevel(fuel_level);
+
+        cfg.getDouble(secName, "ReductorCoeff", ip);
     }
 }
 

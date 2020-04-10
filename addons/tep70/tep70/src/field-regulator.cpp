@@ -15,7 +15,12 @@ FieldRegulator::FieldRegulator(QObject *parent) : Device(parent)
   , omega(0.0)
   , U_fg(0.0)
   , Uf(0.0)
+  , Uf_prev(0.0)
   , km_pos(0)
+  , Tp(5.0)
+  , Ti(1.0)
+  , Tu(1.0)
+  , u(0.0)
 {
     std::fill(K.begin(), K.end(), 0.0);
 }
@@ -70,23 +75,55 @@ void FieldRegulator::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
+    // Уставки
+    double I_max = Y[4];
+    double U_max = Y[5];
+    double P_max = Y[3];
+
+    // Ограничение интеграторов
     Y[0] = cut(Y[0], 0.0, 1.0);
     Y[1] = cut(Y[1], 0.0, 1.0);
     Y[2] = cut(Y[2], 0.0, 1.0);
 
-    dP = reg_settings[km_pos].P_ref * 1000.0 - U * I;
+    double P = U * I / 1000.0;
 
-    double U_max = reg_settings[km_pos].U_max;
+    // Рассогласования
+    dI = I_max - I;
+    dU = U_max - U;
+    dP = P_max - P;
 
-    dU = U - U_max;
+    if (static_cast<bool>(hs_n(dP)))
+    {
+        current_lock.set();
+        power_lock.reset();
+        Y[2] = 0;
+    }
 
-    double I_max = reg_settings[km_pos].I_max;
+    if (static_cast<bool>(hs_n(dU)))
+    {
+        power_lock.set();
+        Uf_prev = Uf;
+    }
 
-    dI = I - I_max;
+    if (static_cast<bool>(hs_n(dI)))
+        current_lock.reset();
 
-    double s = K[0] * dP + Y[0];
+    // Канал стабилизации тока
+    double s1 = (K[0] * dI + Y[0]);
 
-    double u = cut(cut(s, 0.0, 1.0) - Y[1] - Y[2], 0.0, 1.0);
+    double u1 = cut(s1, 0.0, 1.0) * (1.0 - static_cast<double>(current_lock.getState()));
+
+    // Канал стабилизации мощности
+    double s2 = (K[2] * dP + Y[1] - K[4] * nf(dU) - Y[2]);
+
+    double u2 = cut(s2, 0.0, 1.0) * static_cast<double>(current_lock.getState());// * (1.0 - static_cast<double>(power_lock.getState()));
+
+    // Кнал стабилизации напряжения
+    double s3 = (K[4] * dU + Y[2]);
+
+    //double u3 = cut(s3, -1.0, 0.0) * static_cast<double>(power_lock.getState());;
+
+    double u = u1 + u2;// + u3;
 
     Uf = u * U_fg;
 }
@@ -98,9 +135,12 @@ void FieldRegulator::ode_system(const state_vector_t &Y, state_vector_t &dYdt, d
 {
     Q_UNUSED(t)
 
-    dYdt[0] = K[1] * dP;
-    dYdt[1] = K[2] * dU;
-    dYdt[2] = K[3] * dI;
+    dYdt[0] = K[1] * dI;
+    dYdt[1] = K[3] * dP;
+    dYdt[2] = K[5] * dU;
+    dYdt[3] = (reg_settings[km_pos].P_ref - Y[3]) / Tp;
+    dYdt[4] = (reg_settings[km_pos].I_max - Y[4]) / Ti;
+    dYdt[5] = (reg_settings[km_pos].U_max - Y[5]) / Tu;
 }
 
 //------------------------------------------------------------------------------
@@ -137,7 +177,7 @@ double FieldRegulator::getRefPower(double omega)
     reg_settings_t p0 = findPoint(omega, p1);
 
 
-    return (p0.P_ref + (p1.P_ref - p0.P_ref) * (n - p0.n_ref) / (p1.n_ref - p0.n_ref)) * 1000.0;
+    return (p0.P_ref + (p1.P_ref - p0.P_ref) * (n - p0.n_ref) / (p1.n_ref - p0.n_ref));
 }
 
 //------------------------------------------------------------------------------

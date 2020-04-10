@@ -3,6 +3,8 @@
 
 #include    "device.h"
 
+#include    <QVector>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -80,8 +82,23 @@ private:
     /// Напряжение возбуждения ТГ
     double  Uf;
 
+    double  Uf_prev;
+
     /// Текущая позиция КМ
     int     km_pos;
+
+    ///
+    double  Tp;
+
+    double  Ti;
+
+    double  Tu;
+
+    double  u;
+
+    Trigger current_lock;
+
+    Trigger power_lock;
 
     enum
     {
@@ -91,7 +108,7 @@ private:
     std::array<double, NUM_COEFS>   K;
 
     /// Уставки регулятора
-    QVector<reg_settings_t>         reg_settings;
+    QVector<FieldRegulator::reg_settings_t>         reg_settings;
 
     void preStep(state_vector_t &Y, double t);
 

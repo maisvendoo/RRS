@@ -2,12 +2,16 @@
 <Config>
 	<Device>
 
-		<Order>4</Order>
+		<Order>6</Order>
 
-		<K0>1e-6</K0>
-		<K1>0</K1>
-		<K2>1e-2</K2>
-		<K3>0.8e-4</K3>		
+		<K0>2e-4</K0>
+		<K1>0.0</K1>
+
+		<K2>0.1e-2</K2>
+		<K3>2e-4</K3>
+
+		<K4>2e-2</K4>
+		<K5>1e-3</K5>				
 
 	</Device>
 </Config>

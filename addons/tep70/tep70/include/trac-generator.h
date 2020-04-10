@@ -27,7 +27,9 @@ public:
 
     double getFieldCurrent() const { return getY(0); }
 
-    void init(QString file_name);
+    void load_marnetic_char(QString file_name);
+
+    void load_eff_coeff(QString file_name);
 
 private:
 
@@ -48,6 +50,8 @@ private:
     double  Tf;
 
     MotorMagneticChar   magnetic_char;
+
+    MotorMagneticChar   eff_coef;
 
     void preStep(state_vector_t &Y, double t);
 
