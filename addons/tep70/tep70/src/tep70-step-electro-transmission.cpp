@@ -83,15 +83,17 @@ void TEP70::stepElectroTransmission(double t, double dt)
     ru1->step(t, dt);
 
     // Цепь контактора КШ1
-    bool is_KSH1_on = (tumbler_field_weak1.getState() == 0) &&
-                      ru1->getContactState(0);
+    bool is_KSH1_on = ( (tumbler_field_weak1.getState() == 0) &&
+                      ru1->getContactState(0) ) ||
+                      ( (tumbler_field_weak1.getState() == 2) && (abs(wheel_omega[0]) >= 32.8) && azv_upr_tepl.getState() );
 
     ksh1->setVoltage(Ucc * static_cast<double>(is_KSH1_on));
     ksh1->step(t, dt);
 
     // Цепь контактора КШ1
-    bool is_KSH2_on = (tumbler_field_weak2.getState() == 0) &&
-                      ru1->getContactState(1);
+    bool is_KSH2_on = ( (tumbler_field_weak2.getState() == 0) &&
+                      ru1->getContactState(1) ) ||
+                      ( (tumbler_field_weak2.getState() == 2) && (abs(wheel_omega[0]) >= 43.7) && azv_upr_tepl.getState() );
 
     ksh2->setVoltage(Ucc * static_cast<double>(is_KSH2_on));
     ksh2->step(t, dt);
