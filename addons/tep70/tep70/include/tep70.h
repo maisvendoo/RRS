@@ -252,6 +252,20 @@ private:
     /// Передаточное число тягового редуктора
     double  ip;
 
+    /// Контактор шунта 1 (КШ1)
+    Relay   *ksh1;
+
+    /// Контактор шунта 2 (КШ2)
+    Relay   *ksh2;
+
+    /// Реле управления РУ1
+    Relay   *ru1;
+
+    /// Свисток и тифон
+    TrainHorn   *horn;
+
+    double tracForce;
+
     enum
     {
         NUM_MOTORS = 6
@@ -262,6 +276,7 @@ private:
 
     /// Поездные контакторы
     std::array<Relay *, NUM_MOTORS> kp;
+
 
     /// АЗВ "Управление общее"
     Trigger azv_common_control;
@@ -332,6 +347,9 @@ private:
     /// Инициализация электрической передачи
     void initElectroTransmission();
 
+    /// Инициализация прочего оборудования
+    void initOther();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -361,6 +379,9 @@ private:
 
     /// Шаг моделирования электрической передачи
     void stepElectroTransmission(double t, double dt);
+
+    /// Шаг моделирования прочего оборудования
+    void stepOther(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

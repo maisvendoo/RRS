@@ -39,6 +39,9 @@ public:
     /// Контакт позиций выше 1-й
     bool isMoreFirst() const {return ms_position > 1; }
 
+    /// Контакт позиций выше 12
+    bool is12orMore() const {return ms_position >= 12; }
+
     /// Получить заданную частоту вращения коленчатого вала дизеля
     double getRefFreq() const { return n_ref[ms_position]; }
 

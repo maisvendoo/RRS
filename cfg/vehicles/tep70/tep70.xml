@@ -13,7 +13,7 @@
                 <WheelInertia>2.0</WheelInertia>
 		<SoundDir>tep70</SoundDir>
 
-                <ReguctorCoeff>3.12</ReguctorCoeff>
+                <ReductorCoeff>3.12</ReductorCoeff>
 
                 <ExtModelName>tep70/tep70.osgt</ExtModelName>
                 <ModelShift>0.0 0.0 0.312</ModelShift>            

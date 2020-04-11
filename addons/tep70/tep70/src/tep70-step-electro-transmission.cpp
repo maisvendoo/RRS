@@ -32,6 +32,8 @@ void TEP70::stepElectroTransmission(double t, double dt)
     // Состояние цепи поездных контакторов
     bool is_KP_on = azv_upr_tepl.getState() && km->isNoZero();
 
+    tracForce = 0;
+
     for (size_t i = 0; i < motor.size(); ++i)
     {
         kp[i]->setVoltage(Ucc * static_cast<double>(is_KP_on));
@@ -39,9 +41,18 @@ void TEP70::stepElectroTransmission(double t, double dt)
 
         motor[i]->setAncorVoltage(trac_gen->getVoltage() * static_cast<double>(kp[i]->getContactState(0)));
         motor[i]->setOmega(ip * wheel_omega[i]);
+
+        // Ослабление возбуждения
+        double beta = 1.0 - 0.58 * static_cast<double>(ksh1->getContactState(0))
+                          - 0.08 * static_cast<double>(ksh2->getContactState(0));
+
+        motor[i]->setFieldWeak(beta);
+
         motor[i]->step(t, dt);
 
         Q_a[i+1] = motor[i]->getTorque() * ip;
+
+        tracForce += Q_a[i+1] * 2 / wheel_diameter;
 
         I_gen += motor[i]->getAncorCurrent();
     }
@@ -64,4 +75,24 @@ void TEP70::stepElectroTransmission(double t, double dt)
     speed_meter->setWheelDiameter(wheel_diameter);
     speed_meter->setOmega(wheel_omega[0]);
     speed_meter->step(t, dt);
+
+    // Цепь реле РУ1
+    bool is_RU1_on = azv_upr_tepl.getState() && km->is12orMore();
+
+    ru1->setVoltage(Ucc * static_cast<double>(is_RU1_on));
+    ru1->step(t, dt);
+
+    // Цепь контактора КШ1
+    bool is_KSH1_on = (tumbler_field_weak1.getState() == 0) &&
+                      ru1->getContactState(0);
+
+    ksh1->setVoltage(Ucc * static_cast<double>(is_KSH1_on));
+    ksh1->step(t, dt);
+
+    // Цепь контактора КШ1
+    bool is_KSH2_on = (tumbler_field_weak2.getState() == 0) &&
+                      ru1->getContactState(1);
+
+    ksh2->setVoltage(Ucc * static_cast<double>(is_KSH2_on));
+    ksh2->step(t, dt);
 }

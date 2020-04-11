@@ -107,5 +107,5 @@ void TractionMotor::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 double TractionMotor::cPhi(double If)
 {
-    return magnetic_char.getValue(If);
+    return 0.93 * magnetic_char.getValue(If);
 }

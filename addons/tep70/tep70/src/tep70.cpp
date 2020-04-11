@@ -67,6 +67,11 @@ TEP70::TEP70() : Vehicle()
   , Icc(0.0)
   , charge_press(0.5)
   , ip(3.12)
+  , ksh1(nullptr)
+  , ksh2(nullptr)
+  , ru1(nullptr)
+  , horn(nullptr)
+  , tracForce(0.0)
 {
 
 }
@@ -119,6 +124,8 @@ void TEP70::initialization()
 
     initElectroTransmission();
 
+    initOther();
+
     initSounds();
 
     reg = new Registrator("../charts/tep70-char", 0.1);
@@ -147,6 +154,8 @@ void TEP70::step(double t, double dt)
     stepEPT(t, dt);
 
     stepElectroTransmission(t, dt);
+
+    stepOther(t, dt);
 
     stepSignalsOutput(t, dt);
 

@@ -38,6 +38,8 @@ public:
 
     double getEMF() const { return E; }
 
+    void setFieldWeak(double beta) { this->beta = beta; }
+
 private:
 
     /// Напряжение якоря
