@@ -3,7 +3,7 @@
 	<Device>
 		<Order>2</Order>
 		
-		<MaxSpeed>150</MaxSpeed>
+		<MaxSpeed>220</MaxSpeed>
 		<WearGap>0.0</WearGap>
 		<SoundSpeed>2.0</SoundSpeed>
 		<FreqCoeff>2.0</FreqCoeff>

@@ -36,6 +36,7 @@
 #include    "trac-generator.h"
 #include    "field-regulator.h"
 #include    "trac-motor.h"
+#include    "sl2m.h"
 
 #include    "registrator.h"
 
@@ -220,6 +221,9 @@ private:
 
     /// Регистратор, для постоения графиков
     Registrator             *reg;
+
+    /// Скоростемер
+    SL2M                    *speed_meter;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
