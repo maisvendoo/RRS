@@ -8,8 +8,10 @@
 //------------------------------------------------------------------------------
 FieldRegulator::FieldRegulator(QObject *parent) : Device(parent)
   , dP(0.0)
+  , dP_prev(0.0)
   , dU(0.0)
   , dI(0.0)
+  , dI_prev(0.0)
   , U(0.0)
   , I(0.0)
   , omega(0.0)
@@ -18,9 +20,10 @@ FieldRegulator::FieldRegulator(QObject *parent) : Device(parent)
   , Uf_prev(0.0)
   , km_pos(0)
   , Tp(1.0)
-  , Ti(1.0)
-  , Tu(1.0)
+  , Ti(0.5)
+  , Tu(0.5)
   , u(0.0)
+  , T1(0.2)
 {
     std::fill(K.begin(), K.end(), 0.0);
 }
@@ -76,9 +79,27 @@ void FieldRegulator::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Уставки
-    double I_max = Y[4];
-    double U_max = Y[5];
-    double P_max = Y[3];
+    double I_max = reg_settings[km_pos].I_max;
+    double U_max = reg_settings[km_pos].U_max;
+    double P_max = reg_settings[km_pos].P_ref;
+
+    if (U >= reg_settings[km_pos].P_ref * 1000.0 / reg_settings[km_pos].I_max)
+    {
+        if (I < reg_settings[km_pos].P_ref * 1000.0 / reg_settings[km_pos].U_max)
+        {
+            P_max = reg_settings[km_pos].U_max * I / 1000.0;
+            I_max = I;
+        }
+        else
+        {
+            P_max = reg_settings[km_pos].P_ref;
+            I_max = reg_settings[km_pos].P_ref * 1000.0 / U;
+        }
+    }
+    else
+    {
+        I_max = reg_settings[km_pos].I_max;
+    }
 
     // Ограничение интеграторов
     Y[0] = cut(Y[0], 0.0, 1.0);
@@ -88,42 +109,21 @@ void FieldRegulator::preStep(state_vector_t &Y, double t)
     double P = U * I / 1000.0;
 
     // Рассогласования
+    dI_prev = dI;
     dI = I_max - I;
     dU = U_max - U;
-    dP = P_max - P;
+    dP_prev = dP;
+    dP = P_max - P;    
 
-    if (static_cast<bool>(hs_n(dP)))
-    {
-        current_lock.set();
-        power_lock.reset();
-        Y[2] = 0;
-    }
+    double s1 = K[0] * dI + Y[0];
 
-    if (static_cast<bool>(hs_n(dU)))
-    {
-        power_lock.set();
-        Uf_prev = Uf;
-    }
+    double s2 = K[2] * nf(dP);
 
-    if (static_cast<bool>(hs_n(dI)))
-        current_lock.reset();
+    double s3 = K[4] * nf(dU);
 
-    // Канал стабилизации тока
-    double s1 = (K[0] * dI + Y[0]);
+    double u_max = 1.0 / (1 + s2 + s3);
 
-    double u1 = cut(s1, 0.0, 1.0) * (1.0 - static_cast<double>(current_lock.getState()));
-
-    // Канал стабилизации мощности
-    double s2 = (K[2] * dP + Y[1] - K[4] * nf(dU) - Y[2]);
-
-    double u2 = cut(s2, 0.0, 1.0) * static_cast<double>(current_lock.getState());// * (1.0 - static_cast<double>(power_lock.getState()));
-
-    // Кнал стабилизации напряжения
-    double s3 = (K[4] * dU + Y[2]);
-
-    //double u3 = cut(s3, -1.0, 0.0) * static_cast<double>(power_lock.getState());;
-
-    double u = u1 + u2;// + u3;
+    u = cut(s1, 0.0, u_max);
 
     Uf = u * U_fg;
 }
@@ -138,9 +138,12 @@ void FieldRegulator::ode_system(const state_vector_t &Y, state_vector_t &dYdt, d
     dYdt[0] = K[1] * dI;
     dYdt[1] = K[3] * dP;
     dYdt[2] = K[5] * dU;
+
     dYdt[3] = (reg_settings[km_pos].P_ref - Y[3]) / Tp;
     dYdt[4] = (reg_settings[km_pos].I_max - Y[4]) / Ti;
     dYdt[5] = (reg_settings[km_pos].U_max - Y[5]) / Tu;
+
+    dYdt[6] = (u - Y[6]) / T1;
 }
 
 //------------------------------------------------------------------------------

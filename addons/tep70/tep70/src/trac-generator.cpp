@@ -49,7 +49,7 @@ void TracGenerator::preStep(state_vector_t &Y, double t)
 
     U = pf(cPhi(Y[0]) * omega - Ra * In);
 
-    M = 0.1 * cPhi(Y[0]) * In * eff_coef.getValue(In);
+    M = 0.1 * cPhi(Y[0]) * In;
 }
 
 //------------------------------------------------------------------------------

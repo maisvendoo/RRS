@@ -61,11 +61,15 @@ private:
     /// Ошибка по мощности
     double  dP;
 
+    double  dP_prev;
+
     /// Ошибка по напряжению
     double  dU;
 
     /// Ошибка по току
     double  dI;
+
+    double  dI_prev;
 
     /// Текущее напряжение
     double  U;
@@ -95,6 +99,8 @@ private:
     double  Tu;
 
     double  u;
+
+    double  T1;
 
     Trigger current_lock;
 
