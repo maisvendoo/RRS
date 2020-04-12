@@ -137,4 +137,35 @@ void TEP70::keyProcess()
             epk_key.reset();
         }
     }
+
+    bool is_svistok_old = is_svistok;
+    is_svistok = getKeyState(KEY_Space);
+
+    if (is_svistok_old != is_svistok)
+
+    {
+        if (is_svistok)
+        {
+            emit soundPlay("Svistok");
+        }
+        else
+        {
+            emit soundStop("Svistok");
+        }
+    }
+
+    bool is_tifon_old = is_tifon;
+    is_tifon = getKeyState(KEY_B);
+
+    if (is_tifon_old != is_tifon)
+    {
+        if (is_tifon)
+        {
+            emit soundPlay("Tifon");
+        }
+        else
+        {
+            emit soundStop("Tifon");
+        }
+    }
 }

@@ -165,6 +165,6 @@ void TEP70::initSounds()
     ru1->setSoundName("Relay");
     connect(ru1, &Relay::soundPlay, this, &TEP70::soundPlay);
 
-    connect(horn, &TrainHorn::soundPlay, this, &TEP70::soundPlay);
-    connect(horn, &TrainHorn::soundStop, this, &TEP70::soundStop);
+    //connect(horn, &TEP70Horn::soundPlay, this, &TEP70::soundPlay);
+    //connect(horn, &TEP70Horn::soundStop, this, &TEP70::soundStop);
 }

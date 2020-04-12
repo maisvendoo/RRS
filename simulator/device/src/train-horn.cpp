@@ -18,6 +18,16 @@ TrainHorn::~TrainHorn()
 
 }
 
+bool TrainHorn::isSvistok() const
+{
+    return is_svistok;
+}
+
+bool TrainHorn::isTifon() const
+{
+    return is_tifon;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

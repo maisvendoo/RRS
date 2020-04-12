@@ -56,8 +56,10 @@ TEP70::TEP70() : Vehicle()
   , kvv(nullptr)
   , kvg(nullptr)
   , trac_gen(nullptr)
+  , field_reg(nullptr)
   , I_gen(0.0)
   , reg(nullptr)
+  , speed_meter(nullptr)
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -72,8 +74,11 @@ TEP70::TEP70() : Vehicle()
   , ru1(nullptr)
   , horn(nullptr)
   , tracForce(0.0)
+  , is_svistok(false)
+  , is_tifon(false)
 {
-
+    railway_coord = railway_coord0 = 0;
+    velocity = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -128,7 +133,7 @@ void TEP70::initialization()
 
     initSounds();
 
-    reg = new Registrator("../charts/tep70-char", 0.1);
+    //reg = new Registrator("../charts/tep70-char", 0.1);
 }
 
 //------------------------------------------------------------------------------
@@ -161,8 +166,8 @@ void TEP70::step(double t, double dt)
 
     debugOutput(t, dt);
 
-    QString line = QString("%1 %2").arg(I_gen, 6, 'f', 1).arg(trac_gen->getVoltage(), 6, 'f', 1);
-    reg->print(line, t, dt);
+    //QString line = QString("%1 %2").arg(I_gen, 6, 'f', 1).arg(trac_gen->getVoltage(), 6, 'f', 1);
+    //reg->print(line, t, dt);
 }
 
 //------------------------------------------------------------------------------

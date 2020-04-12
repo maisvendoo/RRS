@@ -231,10 +231,6 @@ protected:
     double railway_coord;
     /// Body velocity
     double velocity;
-    /// Wheels rotation angles
-    std::vector<double> wheel_rotation_angle;
-    /// Wheels angular velocities
-    std::vector<double> wheel_omega;
 
     double  b0;
     double  b1;
@@ -269,6 +265,11 @@ protected:
 
     /// Род тока в КС
     int         current_kind;
+
+    /// Wheels rotation angles
+    std::vector<double> wheel_rotation_angle;
+    /// Wheels angular velocities
+    std::vector<double> wheel_omega;
 
     /// Active common forces
     state_vector_t  Q_a;

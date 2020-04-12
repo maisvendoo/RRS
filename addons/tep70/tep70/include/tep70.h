@@ -37,6 +37,7 @@
 #include    "field-regulator.h"
 #include    "trac-motor.h"
 #include    "sl2m.h"
+#include    "tep70-horn.h"
 
 #include    "registrator.h"
 
@@ -262,9 +263,13 @@ private:
     Relay   *ru1;
 
     /// Свисток и тифон
-    TrainHorn   *horn;
+    TEP70Horn   *horn;
 
     double tracForce;
+
+    bool    is_svistok;
+
+    bool    is_tifon;
 
     enum
     {

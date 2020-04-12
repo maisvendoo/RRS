@@ -12,7 +12,7 @@ void TEP70::stepPneumoBrakeSystem(double t, double dt)
 
     // Состояние цепи реле РУ18
     bool is_RU18_on = azv_motor_compressor.getState() &&
-                    static_cast<double>(press_reg->getState());
+                    static_cast<bool>(press_reg->getState());
 
     ru18->setVoltage(Ucc * static_cast<double>(is_RU18_on));
     ru18->step(t, dt);
@@ -98,7 +98,9 @@ void TEP70::stepPneumoBrakeSystem(double t, double dt)
 
     auxRate = vr->getAuxRate();
 
-    evr->setControlLine(ept_control[0]);
+    bool is_EPT_on = button_brake_release;
+
+    evr->setControlLine(ept_control[0] * static_cast<double>(is_EPT_on));
     evr->setQbc_in(vr->getBrakeCylinderAirFlow());
     evr->setPbc_in(zpk->getPressure1());
     evr->setInputSupplyReservoirFlow(vr->getAirSupplyFlow());
@@ -111,11 +113,11 @@ void TEP70::stepPneumoBrakeSystem(double t, double dt)
     epk->keyOn(epk_key.getState());
     epk->step(t, dt);
 
-    Q_r[0] = fwd_trolley->getBrakeTorque();
     Q_r[1] = fwd_trolley->getBrakeTorque();
     Q_r[2] = fwd_trolley->getBrakeTorque();
+    Q_r[3] = fwd_trolley->getBrakeTorque();
 
-    Q_r[3] = bwd_trolley->getBrakeTorque();
     Q_r[4] = bwd_trolley->getBrakeTorque();
     Q_r[5] = bwd_trolley->getBrakeTorque();
+    Q_r[6] = bwd_trolley->getBrakeTorque();
 }
