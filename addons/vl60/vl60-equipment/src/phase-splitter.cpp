@@ -14,6 +14,7 @@ PhaseSplitter::PhaseSplitter(QObject *parent) : Device(parent)
   , omega_r(141.4)
   , is_not_ready(1.0f)
   , k_eds(2.389)
+  , U_out(0.0)
 {
 
 }

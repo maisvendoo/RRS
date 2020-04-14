@@ -12,6 +12,8 @@ BrakeLock::BrakeLock(QObject *parent) : BrakeDevice(parent)
   , crane_pFL(0.0)
   , comb_crane_pos(-1)
   , handle_unlocked(true)
+  , is_emerg_brake(false)
+  , is_comb_opened(false)
 
 {
     std::fill(K.begin(), K.end(), 0.0);

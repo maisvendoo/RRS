@@ -20,6 +20,7 @@ DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
   , Ma(0.0)
   , Vnk(0.05)
   , soundName("")
+  , rd(0.0)
 
 {
 

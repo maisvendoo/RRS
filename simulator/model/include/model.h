@@ -111,9 +111,6 @@ private:
     double      control_time;
     double      control_delay;
 
-    /// Simulation thread
-    QThread     model_thread;
-
     /// Train model
     Train       *train;    
 
@@ -128,6 +125,9 @@ private:
 
     /// Клиент для связи с ВЖД
     SimTcpClient *sim_client;
+
+    /// Simulation thread
+    QThread     model_thread;
 
     KeysControl keys_control;
 

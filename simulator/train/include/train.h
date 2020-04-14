@@ -126,9 +126,6 @@ private:
     /// Initial main reservoir pressure
     double      init_main_res_pressure;
 
-    /// Solver's configuration
-    solver_config_t solver_config;
-
     /// Motion ODE's solver
     Solver      *train_motion_solver;
 
@@ -149,6 +146,9 @@ private:
 
     /// All train's couplings
     std::vector<Coupling *> couplings;
+
+    /// Solver's configuration
+    solver_config_t solver_config;
 
     /// Train's loading
     bool loadTrain(QString cfg_path);

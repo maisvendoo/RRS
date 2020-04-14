@@ -111,9 +111,7 @@ private:
     double tau;
 
     Timer   *incTimer;
-    Timer   *decTimer;
-
-    DebugLog *debug_log;
+    Timer   *decTimer;   
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
 

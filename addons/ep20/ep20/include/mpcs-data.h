@@ -52,6 +52,8 @@ struct mpcs_input_t
         isOff_ms = false;
         Uin_fs = 0;
 
+        PressMR = 0;
+
         std::fill(aux_const_U.begin(), aux_const_U.end(), 0);
     }
 };
@@ -112,28 +114,33 @@ struct lamps_state_t
 //------------------------------------------------------------------------------
 struct mpcs_output_t
 {
-    /// Состояние ТП
-    std::array<bool, NUM_PANTOGRAPHS> pant_state;
 
     /// Включение ГВ
-    bool turn_on_ms = false;
+    bool turn_on_ms;
 
     /// Включение БВ
-    bool turn_on_fs = false;
-
-    /// Тумблеры управления мотор-компрессорами
-    std::array<bool, 2> toggleSwitchMK;
+    bool turn_on_fs;
 
     /// Состояние мотор-копрессоров
     double MKstate;
 
-    /// Состояние подсветки сенсорных клавиш
-    lamps_state_t lamps_state;
-
     /// Положение выключателя "Цепи управления"
     float control_switch;
 
+    /// Тумблеры управления мотор-компрессорами
+    std::array<bool, 2> toggleSwitchMK;
+
+    /// Состояние подсветки сенсорных клавиш
+    lamps_state_t lamps_state;
+
+    /// Состояние ТП
+    std::array<bool, NUM_PANTOGRAPHS> pant_state;
+
     mpcs_output_t()
+        : turn_on_ms(false)
+        , turn_on_fs(false)
+        , MKstate(0.0)
+        , control_switch(0.0f)
     {
         std::fill(pant_state.begin(), pant_state.end(), false);
         std::fill(toggleSwitchMK.begin(), toggleSwitchMK.end(), false);
@@ -141,3 +148,4 @@ struct mpcs_output_t
 };
 
 #endif // MPCS_DATA_H
+

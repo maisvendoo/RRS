@@ -14,10 +14,13 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , min_pos(-0.05)
   , max_pos(1.0)
   , pos_duration(1.0)
+  , volume(0)
+  , p_volume(0)
   , dir(0)
+  , pos_num(0)
+  , isStop(false)
   , positions({0.0, 0.325, 0.5, 0.752, 1.0})
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
-  , isStop(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);

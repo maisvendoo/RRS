@@ -13,6 +13,12 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , ode_order(0)
   , dir(1)
   , profile(profile)
+  , charging_pressure(0.0)
+  , no_air(false)
+  , init_main_res_pressure(0.0)
+  , train_motion_solver(nullptr)
+  , brakepipe(nullptr)
+  , soundMan(nullptr)
 {
 
 }

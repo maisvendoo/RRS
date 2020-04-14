@@ -9,6 +9,7 @@ ProcAnimation::ProcAnimation(osg::MatrixTransform *transform)
     , name("")
     , pos(0.0f)
     , duration(0.0f)
+    , signal_id(0)
 {
 
 }

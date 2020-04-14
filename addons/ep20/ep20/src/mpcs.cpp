@@ -17,7 +17,7 @@ MPCS::MPCS(QObject *parent) : Device(parent)
 
     p_max = 0.9;
 
-    std:fill(mk_start.begin(), mk_start.end(), 0);
+    std::fill(mk_start.begin(), mk_start.end(), 0.0);
 
     mkStartTimer.setTimeout(1.0);
     connect(&mkStartTimer, &Timer::process, this, &MPCS::slotMKStart);
@@ -30,6 +30,9 @@ MPCS::MPCS(QObject *parent) : Device(parent)
 
     keyPosition = 0;
     controlSwitch = 0;
+
+    taskPant = nullptr;
+    auxConv = nullptr;
 }
 
 //------------------------------------------------------------------------------

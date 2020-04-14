@@ -12,6 +12,8 @@ Pantograph::Pantograph(QObject *parent) : Device(parent)
   , motion_time(4.0)
   , current_kind_in(0)
   , current_kind_out(0)
+  , is_up(false)
+  , is_down(true)
 
 {
 

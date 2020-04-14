@@ -61,6 +61,8 @@ private:
 
     int pos_num;
 
+    bool isStop;
+
     std::array<double, NUM_STEPS> positions;
 
     std::array<double, NUM_STEPS> step_pressures;
@@ -69,7 +71,6 @@ private:
 
     std::array<double, MAX_GIAN_COEFFS> k;
 
-    bool isStop;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

@@ -5,6 +5,9 @@ EPTPassControl::EPTPassControl(QObject *parent) : Device(parent)
   , is_brake(false)
   , U(0)
   , control_signal(0)
+  , lampRelease(0.0f)
+  , lampHold(0.0f)
+  , lampBrake(0.0f)
 {
 
 }

@@ -55,7 +55,6 @@ protected:
 
     float                   pos;
     float                   duration;
-    float                   precision;
 
     size_t                  signal_id;
 

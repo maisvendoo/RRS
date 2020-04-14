@@ -36,6 +36,10 @@ Model::Model(QObject *parent) : QObject(parent)
   , is_debug_print(false)
   , control_time(0)
   , control_delay(0.05)
+  , train(nullptr)
+  , profile(nullptr)
+  , server(nullptr)
+  , control_panel(nullptr)
 {
     shared_memory.setKey("sim");
 

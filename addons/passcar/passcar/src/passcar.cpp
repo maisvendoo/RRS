@@ -88,43 +88,33 @@ void PassCarrige::initialization()
 //------------------------------------------------------------------------------
 void PassCarrige::step(double t, double dt)
 {
-    if ( airdist != nullptr)
+    airdist->setBrakepipePressure(pTM);
+    airdist->setBrakeCylinderPressure(electroAirDist->getPbc_out());
+    airdist->setAirSupplyPressure(electroAirDist->getSupplyReservoirPressure());
+
+    auxRate = airdist->getAuxRate();
+
+    airdist->step(t, dt);
+
+
+
+    brake_mech->setAirFlow(electroAirDist->getQbc_out());
+    brake_mech->setVelocity(velocity);
+    brake_mech->step(t, dt);
+
+    for (size_t i = 1; i < Q_r.size(); ++i)
     {
-        airdist->setBrakepipePressure(pTM);
-        airdist->setBrakeCylinderPressure(electroAirDist->getPbc_out());
-        airdist->setAirSupplyPressure(electroAirDist->getSupplyReservoirPressure());
-
-        auxRate = airdist->getAuxRate();
-
-        airdist->step(t, dt);
+        Q_r[i] = brake_mech->getBrakeTorque();
     }
 
-    if ( brake_mech != nullptr )
-    {
-        brake_mech->setAirFlow(electroAirDist->getQbc_out());
-        brake_mech->setVelocity(velocity);
-        brake_mech->step(t, dt);
+    supply_reservoir->setAirFlow(electroAirDist->getOutputSupplyReservoirFlow());
+    supply_reservoir->step(t, dt);
 
-        for (size_t i = 1; i < Q_r.size(); ++i)
-        {
-            Q_r[i] = brake_mech->getBrakeTorque();
-        }
-    }
-
-    if ( supply_reservoir != nullptr )
-    {
-        supply_reservoir->setAirFlow(electroAirDist->getOutputSupplyReservoirFlow());
-        supply_reservoir->step(t, dt);
-    }
-
-    if ( electroAirDist != nullptr )
-    {
-        electroAirDist->setPbc_in(brake_mech->getBrakeCylinderPressure());
-        electroAirDist->setQbc_in(airdist->getBrakeCylinderAirFlow());
-        electroAirDist->setSupplyReservoirPressure(supply_reservoir->getPressure());
-        electroAirDist->setInputSupplyReservoirFlow(airdist->getAirSupplyFlow());
-        electroAirDist->step(t, dt);
-    }
+    electroAirDist->setPbc_in(brake_mech->getBrakeCylinderPressure());
+    electroAirDist->setQbc_in(airdist->getBrakeCylinderAirFlow());
+    electroAirDist->setSupplyReservoirPressure(supply_reservoir->getPressure());
+    electroAirDist->setInputSupplyReservoirFlow(airdist->getAirSupplyFlow());
+    electroAirDist->step(t, dt);
 
     stepSignalsOutput();
 
