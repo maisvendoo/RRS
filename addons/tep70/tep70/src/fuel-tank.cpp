@@ -36,7 +36,7 @@ void FuelTank::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    dYdt[0] = fuel_consumption;
+    dYdt[0] = -fuel_consumption;
 }
 
 //------------------------------------------------------------------------------

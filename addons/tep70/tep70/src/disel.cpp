@@ -102,7 +102,7 @@ void Disel::preStep(state_vector_t &Y, double t)
 
     double Q2 = u * Q_max;
 
-    Q_fuel = Q1 + Q2;
+    Q_fuel = K[6] * (Q1 + Q2);
 
     double M1 = K[2] * Q1;
 
