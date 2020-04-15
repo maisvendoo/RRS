@@ -30,15 +30,15 @@ InformPartPressure::InformPartPressure(QString strHead, QWidget *parent)
     // --- ВЕРХНЯЯ ЧАСТЬ ЭЛЕМЕНТА --- //
     QLabel* labelTop = new QLabel(this);
     labelTop->setGeometry(0, 0,
-                          this->width(), this->height()*0.8);
+                          this->width(), static_cast<int>(this->height() * 0.8));
 
-    double deltaY = (labelTop->height()-20)/5;
+    int deltaY = (labelTop->height() - 20)/5;
     drawLabel("1.00", 3);
     drawLabel("0.80", deltaY);
-    drawLabel("0.60", deltaY*2);
-    drawLabel("0.40", deltaY*3);
-    drawLabel("0.20", deltaY*4);
-    drawLabel("0.00", deltaY*5);
+    drawLabel("0.60", deltaY * 2);
+    drawLabel("0.40", deltaY * 3);
+    drawLabel("0.20", deltaY * 4);
+    drawLabel("0.00", deltaY * 5);
 
     QImage img(QSize(labelTop->width(), labelTop->height() - 10),
                QImage::Format_ARGB32_Premultiplied);

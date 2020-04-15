@@ -4,6 +4,8 @@
 //
 //------------------------------------------------------------------------------
 FuelTank::FuelTank(QObject *parent) : Device(parent)
+  , fuel_capacity(0.0)
+  , fuel_consumption(0.0)
 {
 
 }

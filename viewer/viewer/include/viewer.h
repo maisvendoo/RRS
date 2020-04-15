@@ -48,6 +48,9 @@ protected:
 
     /// Viewer ready flag
     bool                        is_ready;
+
+    KeyboardHandler             *keyboard;
+
     /// Viewer settings
     settings_t                  settings;
 
@@ -57,9 +60,8 @@ protected:
     /// OSG scene root node
     osg::ref_ptr<osg::Group>    root;
 
-    NetworkClient   client;
+    NetworkClient               client;
 
-    KeyboardHandler *keyboard;
 
     TrainExteriorHandler *train_ext_handler;
 

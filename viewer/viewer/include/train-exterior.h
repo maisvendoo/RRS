@@ -59,8 +59,6 @@ public:
     /// Get exterior scene group
     osg::Group *getExterior();
 
-    AnimationManager *getAnimationManager();
-
     std::vector<AnimationManager *> getAnimManagers();
 
 signals:
@@ -100,8 +98,6 @@ private:
     QSharedMemory   shared_memory;
 
     /// Animations list
-    AnimationManager *animation_manager;
-
     std::vector<AnimationManager *> anim_managers;
 
     /// Keyboard handler (camera control)

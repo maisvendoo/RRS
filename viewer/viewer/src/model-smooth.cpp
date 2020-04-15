@@ -13,6 +13,9 @@ void ModelSmoother::apply(osg::Geode &geode)
         osg::Drawable  *drawable = geode.getDrawable(i);
         osg::Geometry  *geom = dynamic_cast<osg::Geometry *>(drawable);
 
+        if (geom == nullptr)
+            continue;
+
         osgUtil::SmoothingVisitor::smooth(*geom);
     }
 

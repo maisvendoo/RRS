@@ -5,11 +5,11 @@
 //
 //------------------------------------------------------------------------------
 ProcAnimation::ProcAnimation(osg::MatrixTransform *transform)
-    : transform(transform)
-    , name("")
-    , pos(0.0f)
+    : pos(0.0f)
     , duration(0.0f)
     , signal_id(0)
+    , transform(transform)
+    , name("")
 {
 
 }

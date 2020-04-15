@@ -25,10 +25,14 @@ Modbus::~Modbus()
 //------------------------------------------------------------------------------
 bool Modbus::init(QString cfg_path)
 {
-    master = new Master();
+    try
+    {
+        master = new Master();
 
-    if (master == Q_NULLPTR)
+    } catch (const std::bad_alloc &)
+    {
         return false;
+    }
 
     if (!master->init(cfg_path))
     {

@@ -118,11 +118,6 @@ osg::Group *TrainExteriorHandler::getExterior()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AnimationManager *TrainExteriorHandler::getAnimationManager()
-{
-    return animation_manager;
-}
-
 std::vector<AnimationManager *> TrainExteriorHandler::getAnimManagers()
 {
     return anim_managers;
@@ -539,7 +534,7 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
     // где хранится список дисплеев
     osgDB::XmlNode *module_config_node = cfg.findSection(vehicle_node, "ModuleConfig");
 
-    if (module_node == nullptr)
+    if (module_config_node == nullptr)
     {
         OSG_FATAL << "Vehicle's module config is't represented";
         return;

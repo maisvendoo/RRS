@@ -7,6 +7,8 @@ ControllerKME_60_044::ControllerKME_60_044(QObject *parent)
     : TractionController(parent)
     , main_pos(POS_ZERO)
     , revers_pos(REVERS_ZERO)
+    , main_handle_pos(0.0f)
+    , revers_handle_pos(0.0f)
 {
     incMainPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
     connect(incMainPos, &Timer::process, this, &ControllerKME_60_044::incMain);

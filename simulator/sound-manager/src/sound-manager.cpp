@@ -99,6 +99,9 @@ void SoundManager::attachSound(const QString &name, const QString &path)
 //------------------------------------------------------------------------------
 void SoundManager::play(QString name)
 {
+    if ( name.isEmpty() || name.isNull() )
+        return;
+
     auto it = sounds.find(name);
 
     if (it.key() == name)
@@ -110,6 +113,9 @@ void SoundManager::play(QString name)
 //------------------------------------------------------------------------------
 void SoundManager::stop(QString name)
 {
+    if ( name.isEmpty() || name.isNull() )
+        return;
+
     auto it = sounds.find(name);
 
     if (it.key() == name)
@@ -121,6 +127,9 @@ void SoundManager::stop(QString name)
 //------------------------------------------------------------------------------
 void SoundManager::setVolume(QString name, int volume)
 {
+    if ( name.isEmpty() || name.isNull() )
+        return;
+
     auto it = sounds.find(name);
 
     if (it.key() == name)
@@ -150,6 +159,9 @@ void SoundManager::setVolume(QString name, int volume)
 //------------------------------------------------------------------------------
 void SoundManager::setPitch(QString name, float pitch)
 {
+    if ( name.isEmpty() || name.isNull() )
+        return;
+
     auto it = sounds.find(name);
 
     if (it.key() == name)

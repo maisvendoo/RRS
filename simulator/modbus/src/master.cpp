@@ -45,11 +45,12 @@ bool Master::init(QString cfg_path)
         modbusDevice = Q_NULLPTR;
     }
 
-    modbusDevice = new QModbusRtuSerialMaster(this);
-
-    if (!modbusDevice)
+    try
     {
+        modbusDevice = new QModbusRtuSerialMaster(this);
 
+    } catch (const std::bad_alloc &)
+    {
         return false;
     }
 

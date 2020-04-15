@@ -13,9 +13,23 @@ class ProcAnimation
 {
 public:
 
-    ProcAnimation() {}
+    ProcAnimation()
+        : pos(0.0)
+        , duration(0.0)
+        , signal_id(0)
+    {
 
-    ProcAnimation(const std::string &name) { this->name = name; }
+    }
+
+    ProcAnimation(const std::string &name)
+        : pos(0.0)
+        , duration(0.0)
+        , signal_id(0)
+        , transform(nullptr)
+        , name(name)
+    {
+
+    }
 
     ProcAnimation(osg::MatrixTransform *transform);
 
@@ -50,13 +64,14 @@ protected:
         }
     };
 
-    osg::MatrixTransform    *transform;
-    std::string             name;
-
     float                   pos;
     float                   duration;
 
     size_t                  signal_id;
+
+    osg::MatrixTransform    *transform;
+    std::string             name;
+
 
     std::vector<key_point_t> keypoints;
 

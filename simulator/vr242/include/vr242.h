@@ -19,12 +19,7 @@ public:
 
 private:
 
-    double Vmk;
-    double Vy4;
-    double Vzk;
     double A1;
-    double Vat2;
-    double Vy2;
     double py2;
 
     double s1_min;
@@ -33,12 +28,11 @@ private:
     double p_bv;
     double p_UP;
     double long_train;
+    double K2;
 
     std::array<double, MAX_FLOW_COEFFS> K;
     std::array<double, MAX_GIAN_COEFFS> k;
     std::array<double, MAX_TIME_CONST> T;
-
-    double K2;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

@@ -11,6 +11,8 @@
 //------------------------------------------------------------------------------
 BlokDisplay::BlokDisplay(QWidget *parent, Qt::WindowFlags f)
     : AbstractDisplay(parent, f)
+    , updateTimer(Q_NULLPTR)
+    , topBlock(Q_NULLPTR)
 
 {
     this->setWindowFlag(Qt::WindowType::FramelessWindowHint);

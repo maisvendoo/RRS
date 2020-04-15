@@ -423,7 +423,7 @@ void TaskPant::pantUpTimerHandler()
 //------------------------------------------------------------------------------
 void TaskPant::pantDownTimerHandler()
 {
-    taskPantStateUp = FAULT_IS_UP;
+    taskPantStateDown = FAULT_IS_DOWN;
 }
 
 //------------------------------------------------------------------------------

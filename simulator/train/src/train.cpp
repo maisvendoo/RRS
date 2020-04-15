@@ -63,13 +63,17 @@ bool Train::init(const init_data_t &init_data)
 
     Journal::instance()->info("Train config from file: " + full_config_path);
 
-    soundMan = new SoundManager();
+    try
+    {
+        soundMan = new SoundManager();
 
-    if (soundMan != Q_NULLPTR)
         Journal::instance()->info(QString("Created SoundManager at address: 0x%1")
-                                  .arg(reinterpret_cast<quint64>(soundMan), 0, 16));
-    else
+                                      .arg(reinterpret_cast<quint64>(soundMan), 0, 16));
+
+    } catch (const std::bad_alloc &)
+    {
         Journal::instance()->error("Sound mamager is;t created");
+    }
 
     // Loading of train
     if (!loadTrain(full_config_path))

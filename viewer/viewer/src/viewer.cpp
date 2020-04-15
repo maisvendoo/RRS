@@ -48,6 +48,7 @@
 //------------------------------------------------------------------------------
 RouteViewer::RouteViewer(int argc, char *argv[])
   : is_ready(false)
+  , keyboard(nullptr)
 {
     is_ready = init(argc, argv);
 }
