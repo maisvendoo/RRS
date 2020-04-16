@@ -11,6 +11,12 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , fieldStep(0)
   , reverseState(0)
 
+  , up(false)
+  , up1(false)
+  , zero(false)
+  , down1(false)
+  , down(false)
+
   , onePositionIsChanged(false)
   , dropPositionsWithZ(false)
   , ableToGainPositions(false)
@@ -20,6 +26,7 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , dropPosition(false)
   , hod(false)
   , ctrlState(ControllerState())
+  , ableToChangeOnePosition(false)
 {
 
 }

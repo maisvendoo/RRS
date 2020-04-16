@@ -167,4 +167,6 @@ void TEP70::initSounds()
 
     //connect(horn, &TEP70Horn::soundPlay, this, &TEP70::soundPlay);
     //connect(horn, &TEP70Horn::soundStop, this, &TEP70::soundStop);
+
+    connect(km, &ControllerKM2202::soundPlay, this, &TEP70::soundPlay);
 }

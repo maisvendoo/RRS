@@ -38,6 +38,7 @@
 #include    "trac-motor.h"
 #include    "sl2m.h"
 #include    "tep70-horn.h"
+#include    "aperiodic-filter.h"
 
 #include    "registrator.h"
 
@@ -270,6 +271,8 @@ private:
     bool    is_svistok;
 
     bool    is_tifon;
+
+    AperiodicFilter *genAmpermeter;
 
     enum
     {

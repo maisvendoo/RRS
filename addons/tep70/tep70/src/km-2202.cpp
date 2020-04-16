@@ -181,4 +181,6 @@ void ControllerKM2202::slotRotateReversShaft()
 
     rs_position += rs_dir;
     rs_position = cut(rs_position, static_cast<int>(RS_BACKWARD), static_cast<int>(RS_FORWARD));
+
+    emit soundPlay("Revers_Ruk");
 }

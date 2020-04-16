@@ -6,4 +6,6 @@
 void TEP70::initOther()
 {
     horn = new TEP70Horn();
+
+    genAmpermeter = new AperiodicFilter(0.6);
 }

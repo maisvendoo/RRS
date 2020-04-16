@@ -17,6 +17,8 @@ public:
         : pos(0.0)
         , duration(0.0)
         , signal_id(0)
+        , transform(nullptr)
+        , name("")
     {
 
     }
