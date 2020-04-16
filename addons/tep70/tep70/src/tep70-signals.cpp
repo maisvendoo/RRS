@@ -82,7 +82,7 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[SIGLIGHT_EPT_P] = ept_pass_control->stateHoldLamp();
     analogSignal[SIGLIGHT_EPT_T] = ept_pass_control->stateBrakeLamp();
 
-    analogSignal[STRELKA_GEN_CURRENT] = static_cast<float>(genAmpermeter->getOutput() / 10000.0);
+    analogSignal[STRELKA_GEN_CURRENT] = static_cast<float>(I_gen / 10000.0);
     analogSignal[STRELKA_GEN_VOLTAGE] = static_cast<float>(trac_gen->getVoltage() / 1000.0);
 
     analogSignal[STRELKA_SPEED] = static_cast<float>(speed_meter->getArrowPos());

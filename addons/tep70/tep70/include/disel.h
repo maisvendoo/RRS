@@ -38,7 +38,11 @@ public:
     void setFuelPressure(double fuel_pressure) { this->fuel_pressure = fuel_pressure; }
 
     /// Задать чатоту вращения коленчатого вала
-    void setRefFreq(double n_ref) { this->n_ref = n_ref; }
+    void setRefFreq(double n_ref)
+    {
+        this->n_ref_prev = this->n_ref;
+        this->n_ref = n_ref;
+    }
 
     /// Вернуть давление в системе смазки
     double getOilPressure() const { return getY(0); }
@@ -48,6 +52,9 @@ public:
 
     /// Вернуть частоту вращения тягового генератора
     double getOmega() const { return getY(1); }
+
+    /// Вернуть частоту вращения коленчатого вала в об/мин
+    double getShaftFreq() const { return getY(1) * 30.0 / Physics::PI; }
 
     /// Вернуть фактический расход топлива
     double getFuelFlow() const { return Q_fuel; }
@@ -101,6 +108,9 @@ private:
     /// Заданная частота вращения коленчатого вала, об/мин
     double  n_ref;
 
+    /// Пердыдущая заданная частота
+    double  n_ref_prev;
+
     /// Максимальный расход топлива, кг/с
     double  Q_max;
 
@@ -122,7 +132,20 @@ private:
     /// Давление топлива перед ТНВД
     double  fuel_pressure;
 
+    /// Рассогласование скорости вращения вала
     double  delta_omega;
+
+    /// Счетчик позиций
+    int     pos_count;
+
+    /// Имя текущего проигрываемого звука
+    QString soundName;
+
+    enum
+    {
+        MIN_POS = 0,
+        MAX_POS = 15
+    };
 
     std::array<double, NUM_COEFFS>  K;
 
@@ -131,6 +154,8 @@ private:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
+
+    void switchDiselSound(double n_ref_prev, double n_ref);
 
 private:
 

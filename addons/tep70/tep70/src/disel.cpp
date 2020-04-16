@@ -16,6 +16,7 @@ Disel::Disel(QObject *parent) : Device(parent)
   , state_mv6(false)
   , state_vtn(false)
   , n_ref(350.0)
+  , n_ref_prev(n_ref)
   , Q_max(0.166)
   , Q_fuel(0.0)
   , M_d(0.0)
@@ -24,6 +25,8 @@ Disel::Disel(QObject *parent) : Device(parent)
   , timer(new Timer)
   , fuel_pressure(0.0)
   , delta_omega(0.0)
+  , pos_count(0)
+  , soundName("pos0")
 {
     std::fill(K.begin(), K.end(), 0.0);
 
@@ -110,8 +113,10 @@ void Disel::preStep(state_vector_t &Y, double t)
 
     M_d = (M1 + M2) * static_cast<double>(is_fuel_ignition);
 
-    emit soundSetPitch("Disel", static_cast<float>(Y[1] / 36.7));
-    emit soundSetVolume("Disel", static_cast<float>(Y[1] * 100.0 / 36.7));
+    switchDiselSound(n_ref_prev, n_ref);
+
+    emit soundSetPitch(soundName, static_cast<float>(getShaftFreq() / n_ref));
+    emit soundSetVolume(soundName, static_cast<int>(Y[1] * 100.0 / 36.7));
 }
 
 //------------------------------------------------------------------------------
@@ -160,9 +165,36 @@ void Disel::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Disel::switchDiselSound(double n_ref_prev, double n_ref)
+{
+    int n0 = static_cast<int>(n_ref_prev);
+    int n1 = static_cast<int>(n_ref);
+
+    if (n0 != n1)
+    {
+        if (n1 > n0)
+        {
+            pos_count++;
+        }
+        else
+        {
+            pos_count--;
+        }
+
+        pos_count = cut(pos_count, static_cast<int>(MIN_POS), static_cast<int>(MAX_POS));
+
+        emit soundStop(soundName);
+        soundName = QString("pos%1").arg(pos_count);
+        emit soundPlay(soundName);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Disel::slotFuelIgnition()
 {
     is_fuel_ignition = state_mv6 && static_cast<bool>(hs_p(fuel_pressure - 0.1));
-    emit soundPlay("Disel");
+    emit soundPlay(soundName);
     timer->stop();
 }
