@@ -10,6 +10,8 @@ ControllerKM2202::ControllerKM2202(QObject *parent) : Device(parent)
   , ms_dir(0)
   , rs_position(RS_ZERO)
   , rs_dir(0)
+  , is_forward(false)
+  , is_backward(false)
 {
     main_shaft_timer.firstProcess(true);
     connect(&main_shaft_timer, &Timer::process,

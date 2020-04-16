@@ -48,6 +48,8 @@ void TEP70::stepElectroTransmission(double t, double dt)
 
         motor[i]->setFieldWeak(beta);
 
+        motor[i]->setReversSate(reversor->getSatate());
+
         motor[i]->step(t, dt);
 
         Q_a[i+1] = motor[i]->getTorque() * ip;
@@ -97,4 +99,15 @@ void TEP70::stepElectroTransmission(double t, double dt)
 
     ksh2->setVoltage(Ucc * static_cast<double>(is_KSH2_on));
     ksh2->step(t, dt);
+
+
+    // Цепь вентиля реврсора вперед
+    bool is_Revers_Forward = azv_upr_tepl.getState() && km->isForward();
+
+    // Цепь вентиля реверсора назад
+    bool is_Revers_Backward = azv_upr_tepl.getState() && km->isBackward();
+
+    reversor->setForwardValveState(is_Revers_Forward);
+    reversor->setBackwardValveState(is_Revers_Backward);
+    reversor->step(t, dt);
 }

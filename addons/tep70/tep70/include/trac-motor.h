@@ -40,6 +40,8 @@ public:
 
     void setFieldWeak(double beta) { this->beta = beta; }
 
+    void setReversSate(int revers_state) { this->revers_state = revers_state; }
+
 private:
 
     /// Напряжение якоря

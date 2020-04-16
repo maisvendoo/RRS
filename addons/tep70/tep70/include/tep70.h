@@ -38,7 +38,7 @@
 #include    "trac-motor.h"
 #include    "sl2m.h"
 #include    "tep70-horn.h"
-#include    "aperiodic-filter.h"
+#include    "reversor.h"
 
 #include    "registrator.h"
 
@@ -272,7 +272,7 @@ private:
 
     bool    is_tifon;
 
-    AperiodicFilter *genAmpermeter;
+    Reversor    *reversor;
 
     enum
     {

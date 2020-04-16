@@ -45,6 +45,12 @@ public:
     /// Получить заданную частоту вращения коленчатого вала дизеля
     double getRefFreq() const { return n_ref[ms_position]; }
 
+    /// Получить состояние контакта "Вперед"
+    bool isForward() const { return rs_position == RS_FORWARD; }
+
+    /// Получить состояние контакта "Назад"
+    bool isBackward() const { return rs_position == RS_BACKWARD; }
+
 private:
 
     enum
@@ -75,6 +81,12 @@ private:
 
     /// Направление вращения реверсивного вала
     int     rs_dir;    
+
+    /// Контакт "Вперед" реверсивного вала
+    bool    is_forward;
+
+    /// Котакт "Назад" реверсивного вала
+    bool    is_backward;
 
     Timer   main_shaft_timer;
 

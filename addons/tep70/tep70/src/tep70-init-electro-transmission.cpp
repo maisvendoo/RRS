@@ -14,9 +14,10 @@ void TEP70::initElectroTransmission()
     kvv->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kvv->setInitContactState(0, false);
 
-    kvg = new Relay(1);
+    kvg = new Relay(2);
     kvg->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kvg->setInitContactState(0, false);
+    kvg->setInitContactState(1, true);
 
     trac_gen = new TracGenerator();
     trac_gen->read_custom_config(config_dir + QDir::separator() + "trac-generator");
@@ -64,4 +65,7 @@ void TEP70::initElectroTransmission()
     ru1->setInitContactState(0, false);
     ru1->setInitContactState(1, false);
     ru1->setInitContactState(2, false);
+
+    reversor = new Reversor();
+    reversor->read_custom_config(config_dir + QDir::separator() + "reversor");
 }

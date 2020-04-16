@@ -76,6 +76,7 @@ TEP70::TEP70() : Vehicle()
   , tracForce(0.0)
   , is_svistok(false)
   , is_tifon(false)
+  , reversor(nullptr)
 {
     railway_coord = railway_coord0 = 0;
     velocity = 0;
