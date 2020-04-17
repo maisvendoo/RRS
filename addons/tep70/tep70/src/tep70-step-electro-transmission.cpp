@@ -5,34 +5,19 @@
 //------------------------------------------------------------------------------
 void TEP70::stepElectroTransmission(double t, double dt)
 {
-    // Состояние цепи контактора возбуждения возбудителя
-    bool is_KVV_on = azv_upr_tepl.getState() && km->isNoZero();
-
-    kvv->setVoltage(Ucc * static_cast<double>(is_KVV_on));
-    kvv->step(t, dt);
-
-    // Состояние цепи контактора возбуждения генератора
-    bool is_KVG_on = azv_upr_tepl.getState() && km->isNoZero();
-
-    kvg->setVoltage(Ucc * static_cast<double>(is_KVG_on));
-    kvg->step(t, dt);
-
-    // Состояние цепи обмотки возбуждения возбудителя
-    bool is_FGF_on = kontaktor_starter->getContactState(1) ||
-                     kvv->getContactState(0);
-
-    field_gen->setFieldVoltage(Ucc * static_cast<double>(is_FGF_on));
-    field_gen->setLoadCurrent(trac_gen->getFieldCurrent());
-    field_gen->setOmega(disel->getStarterOmega());
-    field_gen->step(t, dt);
-
     // Ток, потребляемый от главного генератора
     I_gen = 0.0;
 
     // Состояние цепи поездных контакторов
-    bool is_KP_on = azv_upr_tepl.getState() && km->isNoZero();
+    bool is_KP_on = azv_upr_tepl.getState() && brake_switcher->isTraction();
 
     tracForce = 0;
+
+    // Состояние последовательной цепи размыкающих контактов КП1 - КП7
+    bool is_KP1_KP7_off = true;
+
+    // Состояние последовательной цепи замыкающих контактор КП1 - КП6
+    bool is_KP1_KP6_on = true;
 
     for (size_t i = 0; i < motor.size(); ++i)
     {
@@ -50,6 +35,8 @@ void TEP70::stepElectroTransmission(double t, double dt)
 
         motor[i]->setReversSate(reversor->getSatate());
 
+        motor[i]->setMode(brake_switcher->getState());
+
         motor[i]->step(t, dt);
 
         Q_a[i+1] = motor[i]->getTorque() * ip;
@@ -57,7 +44,33 @@ void TEP70::stepElectroTransmission(double t, double dt)
         tracForce += Q_a[i+1] * 2 / wheel_diameter;
 
         I_gen += motor[i]->getAncorCurrent();
+
+        is_KP1_KP7_off = is_KP1_KP7_off && kp[i]->getContactState(1);
+        is_KP1_KP6_on = is_KP1_KP6_on && kp[i]->getContactState(2);
     }
+
+    is_KP1_KP7_off = is_KP1_KP7_off && kp[6]->getContactState(1);
+
+    // Состояние цепи контактора возбуждения возбудителя
+    bool is_KVV_on = azv_upr_tepl.getState() && is_KP1_KP6_on;
+
+    kvv->setVoltage(Ucc * static_cast<double>(is_KVV_on));
+    kvv->step(t, dt);
+
+    // Состояние цепи контактора возбуждения генератора
+    bool is_KVG_on = azv_upr_tepl.getState() && is_KP1_KP6_on;
+
+    kvg->setVoltage(Ucc * static_cast<double>(is_KVG_on));
+    kvg->step(t, dt);
+
+    // Состояние цепи обмотки возбуждения возбудителя
+    bool is_FGF_on = kontaktor_starter->getContactState(1) ||
+                     kvv->getContactState(0);
+
+    field_gen->setFieldVoltage(Ucc * static_cast<double>(is_FGF_on));
+    field_gen->setLoadCurrent(trac_gen->getFieldCurrent());
+    field_gen->setOmega(disel->getStarterOmega());
+    field_gen->step(t, dt);    
 
     // Состояние цепи возбуждения главного генератора
     bool is_TGF_on = kvg->getContactState(0);
@@ -110,4 +123,13 @@ void TEP70::stepElectroTransmission(double t, double dt)
     reversor->setForwardValveState(is_Revers_Forward);
     reversor->setBackwardValveState(is_Revers_Backward);
     reversor->step(t, dt);
+
+    // Цепь вентиля "Тяга" тормозного переключателя
+    bool is_TRAC_on = azv_upr_tepl.getState() &&
+                     (is_KP1_KP7_off || brake_switcher->isTraction()) &&
+                     km->isNoZero();
+
+    brake_switcher->setTracValeState(is_TRAC_on);
+    brake_switcher->setBrakeValveState(false);
+    brake_switcher->step(t, dt);
 }

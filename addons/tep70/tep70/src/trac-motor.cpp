@@ -14,7 +14,7 @@ TractionMotor::TractionMotor(QObject *parent) : Device(parent)
   , beta(1.0)
   , revers_state(1)
   , M(0.0)
-  , is_motor(true)
+  , mode(1)
   , omega(0.0)
   , In(0.0)
   , E(0.0)
@@ -53,15 +53,35 @@ void TractionMotor::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    if (is_motor)
+    switch (mode)
     {
-        E = cPhi(beta * Y[0] * revers_state) * omega;
+    case 1:
+        {
+            E = cPhi(beta * Y[0] * revers_state) * omega;
 
-        M = Y[0] * cPhi(beta * Y[0] * revers_state) * eff_coef.getValue(Y[0]);
-    }
-    else
-    {
+            M = Y[0] * cPhi(beta * Y[0] * revers_state) * eff_coef.getValue(Y[0]);
 
+            break;
+        }
+
+    case 0:
+        {
+            E = 0;
+
+            M = 0;
+
+            Y[0] = Y[1] = 0.0;
+
+            break;
+        }
+    case -1:
+        {
+            break;
+        }
+
+    default:
+
+            break;
     }
 }
 
@@ -74,17 +94,33 @@ void TractionMotor::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    if (is_motor)
+    switch (mode)
     {
-        double R = Ra + beta * (Rf + Rd);        
+    case 1:
+        {
+            double R = Ra + beta * (Rf + Rd);
 
-        dYdt[0] = (Ua - Y[0] * R - E) / Ta / Ra;
+            dYdt[0] = (Ua - Y[0] * R - E) / Ta / Ra;
 
-        dYdt[1] = 0;
-    }
-    else
-    {
+            dYdt[1] = 0;
 
+            break;
+        }
+
+    case -1:
+        {
+
+            break;
+        }
+
+    case 0:
+
+    default:
+        {
+            dYdt[0] = 0.0;
+            dYdt[1] = 0.0;
+            break;
+        }
     }
 }
 

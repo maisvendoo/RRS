@@ -39,6 +39,7 @@
 #include    "sl2m.h"
 #include    "tep70-horn.h"
 #include    "reversor.h"
+#include    "brake-switcher.h"
 
 #include    "registrator.h"
 
@@ -272,7 +273,11 @@ private:
 
     bool    is_tifon;
 
+    /// Реверсор
     Reversor    *reversor;
+
+    /// Тормозной переключатель
+    BrakeSwitcher *brake_switcher;
 
     enum
     {
@@ -283,7 +288,7 @@ private:
     std::array<TractionMotor *, NUM_MOTORS> motor;
 
     /// Поездные контакторы
-    std::array<Relay *, NUM_MOTORS> kp;
+    std::array<Relay *, NUM_MOTORS + 1> kp;
 
 
     /// АЗВ "Управление общее"

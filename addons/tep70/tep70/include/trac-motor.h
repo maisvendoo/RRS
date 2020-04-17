@@ -26,7 +26,7 @@ public:
 
     double getTorque() const { return M; }
 
-    void setMode(bool is_motor) { this->is_motor = is_motor; }
+    void setMode(bool is_motor) { this->mode = is_motor; }
 
     void setOmega(double omega) { this->omega = omega; }
 
@@ -74,8 +74,8 @@ private:
     /// Момент на валу
     double  M;
 
-    /// Признак двигательного режима
-    bool    is_motor;
+    /// Признак режима работы (1 - двигатель, 0 - выключенный, -1 - генератор)
+    int     mode;
 
     /// Угловая скорость вращения вала
     double  omega;

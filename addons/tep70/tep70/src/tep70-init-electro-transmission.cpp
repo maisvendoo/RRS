@@ -38,12 +38,18 @@ void TEP70::initElectroTransmission()
         kp[i] = new Relay(3);
         kp[i]->read_custom_config(config_dir + QDir::separator() + "mk-6");
         kp[i]->setInitContactState(0, false);
-        kp[i]->setInitContactState(1, false);
+        kp[i]->setInitContactState(1, true);
         kp[i]->setInitContactState(2, false);
 
         kp[i]->setSoundName("Relay");
         connect(kp[i], &Relay::soundPlay, this, &TEP70::soundPlay);
     }
+
+    kp[6] = new Relay(3);
+    kp[6]->read_custom_config(config_dir + QDir::separator() + "mk-6");
+    kp[6]->setInitContactState(0, false);
+    kp[6]->setInitContactState(1, true);
+    kp[6]->setInitContactState(2, false);
 
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
@@ -68,4 +74,7 @@ void TEP70::initElectroTransmission()
 
     reversor = new Reversor();
     reversor->read_custom_config(config_dir + QDir::separator() + "reversor");
+
+    brake_switcher = new BrakeSwitcher();
+    brake_switcher->read_custom_config(config_dir + QDir::separator() + "brake-switcher");
 }

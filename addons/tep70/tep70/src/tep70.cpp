@@ -77,6 +77,7 @@ TEP70::TEP70() : Vehicle()
   , is_svistok(false)
   , is_tifon(false)
   , reversor(nullptr)
+  , brake_switcher(nullptr)
 {
     railway_coord = railway_coord0 = 0;
     velocity = 0;
