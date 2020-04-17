@@ -20,7 +20,6 @@
 //
 //------------------------------------------------------------------------------
 BrakeMech::BrakeMech(QObject *parent) : Device(parent)  
-  , shoesCyl(16)
   , shoesAxis(4)
   , cylNum(1)
   , Q(0.0)
@@ -28,14 +27,14 @@ BrakeMech::BrakeMech(QObject *parent) : Device(parent)
   , V0(0.0)
   , S(0.1)
   , cylDiam(0.356)
-  , ip(12.0)
   , Lmax(0.085)
-  , F0(1649.0)
   , K(0.0)
   , effRadius(0.475)
   , wheelDiameter(0.95)
   , velocity(0.0)
   , shoeType("iron")
+  , Kmax(3.0)
+  , p_max(0.4)
 {
 
 }
@@ -96,6 +95,9 @@ double BrakeMech::getBrakeCylinderPressure() const
     return getY(0);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double BrakeMech::getShoeForce() const
 {
     return K;
@@ -122,10 +124,13 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    double F = S * Y[0] * Physics::MPa - F0;
-    K = pf(F) * ip / shoesCyl;
+    // Вычисляем нажатие на одну колодку (кгс)
+    K = Kmax * Y[0] / p_max;
 
-    double shoe_brake_force = K * phi(K, velocity);
+    // Вычисляем тормозную силу, получаемую от одной колодки
+    double shoe_brake_force = K * phi(K, velocity) * Physics::g * 1000.0;
+
+    // Вычисляем момент на оси колесной пары
     brakeTorque = shoesAxis * shoe_brake_force * effRadius;
 }
 
@@ -137,7 +142,6 @@ void BrakeMech::load_config(CfgReader &cfg)
     QString secName = "Device";
 
     cfg.getString(secName, "ShoeType", shoeType);
-    cfg.getInt(secName, "ShoesCyl", shoesCyl);
     cfg.getInt(secName, "ShoesAxis", shoesAxis);
     cfg.getInt(secName, "CylNum", cylNum);
     cfg.getDouble(secName, "DeadVolume", V0);
@@ -145,9 +149,10 @@ void BrakeMech::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "CylinderDiameter", cylDiam);
     S = Physics::PI * cylDiam * cylDiam / 4.0;
 
-    cfg.getDouble(secName, "MechCoeff", ip);
     cfg.getDouble(secName, "StockOut", Lmax);
-    cfg.getDouble(secName, "SpringForce", F0);
+
+    cfg.getDouble(secName, "Kmax", Kmax);
+    cfg.getDouble(secName, "p_max", p_max);
 
     double p_cyl_begin = 0.0;
     cfg.getDouble(secName, "InitPressure", p_cyl_begin);
@@ -162,23 +167,22 @@ double BrakeMech::phi(double K, double v)
 {
     double fric_coeff = 0.0;
 
-    double K1 = K / 9.8 / 1000.0;
     double V = Physics::kmh * abs(v);
 
     if (shoeType == "iron")
     {
-        fric_coeff = 0.6 * (16 * K1 + 100) *(V + 100) / (80 * K1 + 100) / (5 * V + 100);
+        fric_coeff = 0.6 * (16 * K + 100) *(V + 100) / (80 * K + 100) / (5 * V + 100);
     }
 
     if (shoeType == "iron-ph")
     {
-        fric_coeff = 0.5 * (16 * K1 + 100) * (V + 100) / (52 * K1 + 100) / (5 * V + 100);
+        fric_coeff = 0.5 * (16 * K + 100) * (V + 100) / (52 * K + 100) / (5 * V + 100);
     }
 
     if (shoeType == "composite")
     {
         double k = 2 * effRadius / wheelDiameter;
-        fric_coeff = 0.44 * (K1 + 20) * (V * k + 150) / (4 * K1 + 20) / (2 * V * k + 150);
+        fric_coeff = 0.44 * (K + 20) * (V * k + 150) / (4 * K + 20) / (2 * V * k + 150);
     }
 
     return fric_coeff;
