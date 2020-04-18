@@ -64,7 +64,7 @@ void TEP70::initElectroTransmission()
     ksh2->read_custom_config(config_dir + QDir::separator() + "mk-6");
     ksh2->setInitContactState(0, false);
     ksh2->setInitContactState(1, false);
-    ksh2->setInitContactState(2, false);
+    ksh2->setInitContactState(2, true);
 
     ru1 = new Relay(3);
     ru1->read_custom_config(config_dir + QDir::separator() + "mk-6");
@@ -77,4 +77,17 @@ void TEP70::initElectroTransmission()
 
     brake_switcher = new BrakeSwitcher();
     brake_switcher->read_custom_config(config_dir + QDir::separator() + "brake-switcher");
+
+    rp1 = new HysteresisRelay(0.079, 0.162);
+    rp2 = new HysteresisRelay(0.079, 0.162);
+
+    ksh2_delay = new TimeRelay(1);
+    ksh2_delay->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    ksh2_delay->setTimeout(2.0);
+    ksh2_delay->setInitContactState(0, false);
+
+    ksh1_delay = new TimeRelay(1);
+    ksh1_delay->read_custom_config(config_dir + QDir::separator() + "rpu-3m");
+    ksh1_delay->setTimeout(2.0);
+    ksh1_delay->setInitContactState(0, true);
 }

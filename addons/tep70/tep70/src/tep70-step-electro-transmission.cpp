@@ -28,8 +28,8 @@ void TEP70::stepElectroTransmission(double t, double dt)
         motor[i]->setOmega(ip * wheel_omega[i]);
 
         // Ослабление возбуждения
-        double beta = 1.0 - 0.58 * static_cast<double>(ksh1->getContactState(0))
-                          - 0.08 * static_cast<double>(ksh2->getContactState(0));
+        double beta = 1.0 - 0.42 * static_cast<double>(ksh1->getContactState(0))
+                          - 0.24 * static_cast<double>(ksh2->getContactState(0));
 
         motor[i]->setFieldWeak(beta);
 
@@ -97,18 +97,39 @@ void TEP70::stepElectroTransmission(double t, double dt)
     ru1->setVoltage(Ucc * static_cast<double>(is_RU1_on));
     ru1->step(t, dt);
 
+    double k_field = 0;
+
+    // Работа реле перехода
+    if (I_gen >= 1.0)
+        k_field = trac_gen->getVoltage() / I_gen;
+
+    rp1->setActive(tumbler_field_weak1.getState() == 2);
+    rp1->setLocked(ksh1_delay->getContactState(0));
+    rp1->setInput(k_field);
+    rp1->step(t, dt);
+
+    rp2->setActive( (tumbler_field_weak2.getState() == 2) && ksh2_delay->getContactState(0) );
+    rp2->setInput(k_field);
+    rp2->step(t, dt);
+
+    // Цепь контактора КШ2
+    bool is_KSH2_on = ( (tumbler_field_weak2.getState() == 0) &&
+                      ru1->getContactState(1) ) ||
+                      ( (tumbler_field_weak2.getState() == 2) && static_cast<bool>(rp2->getOutput()) );
+
     // Цепь контактора КШ1
     bool is_KSH1_on = ( (tumbler_field_weak1.getState() == 0) &&
                       ru1->getContactState(0) ) ||
-                      ( (tumbler_field_weak1.getState() == 2) && (abs(wheel_omega[0]) >= 32.8) && azv_upr_tepl.getState() );
+                      ( static_cast<bool>(rp1->getOutput() ) && tumbler_field_weak1.getState() == 2);
+
+    ksh2_delay->setControlVoltage(Ucc * static_cast<double>(ksh1->getContactState(1)));
+    ksh2_delay->step(t, dt);
+
+    ksh1_delay->setControlVoltage(Ucc * static_cast<double>(ksh2->getContactState(2)));
+    ksh1_delay->step(t, dt);
 
     ksh1->setVoltage(Ucc * static_cast<double>(is_KSH1_on));
     ksh1->step(t, dt);
-
-    // Цепь контактора КШ1
-    bool is_KSH2_on = ( (tumbler_field_weak2.getState() == 0) &&
-                      ru1->getContactState(1) ) ||
-                      ( (tumbler_field_weak2.getState() == 2) && (abs(wheel_omega[0]) >= 43.7) && azv_upr_tepl.getState() );
 
     ksh2->setVoltage(Ucc * static_cast<double>(is_KSH2_on));
     ksh2->step(t, dt);

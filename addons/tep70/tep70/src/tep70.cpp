@@ -78,6 +78,10 @@ TEP70::TEP70() : Vehicle()
   , is_tifon(false)
   , reversor(nullptr)
   , brake_switcher(nullptr)
+  , rp1(nullptr)
+  , rp2(nullptr)
+  , ksh2_delay(nullptr)
+  , ksh1_delay(nullptr)
 {
     railway_coord = railway_coord0 = 0;
     velocity = 0;

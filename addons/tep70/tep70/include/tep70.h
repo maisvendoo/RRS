@@ -40,6 +40,7 @@
 #include    "tep70-horn.h"
 #include    "reversor.h"
 #include    "brake-switcher.h"
+#include    "hysteresis-relay.h"
 
 #include    "registrator.h"
 
@@ -278,6 +279,19 @@ private:
 
     /// Тормозной переключатель
     BrakeSwitcher *brake_switcher;
+
+    /// Реле перехода РП1
+    HysteresisRelay     *rp1;
+
+    /// Реле перехода PП2
+    HysteresisRelay     *rp2;
+
+    /// Реле времени для выдержки включения КШ2 (нет в схеме!)
+    TimeRelay           *ksh2_delay;
+
+    /// Реле выдержки времени для предотвращение отключения КШ1
+    /// при выключении КШ2 (нет в схеме!)
+    TimeRelay           *ksh1_delay;
 
     enum
     {
