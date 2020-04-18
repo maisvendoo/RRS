@@ -97,6 +97,9 @@ enum
     KLUCH_EPK = 71,
     RB1 = 72,
 
+    VAL_PRSKOR1 = 73,
+    VAL_PRSKOR2 = 74,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,
