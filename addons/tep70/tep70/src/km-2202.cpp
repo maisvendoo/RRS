@@ -124,7 +124,7 @@ void ControllerKM2202::stepKeysControl(double t, double dt)
             }
             else
             {
-                ms_position = MS_ZERO;
+                //ms_position = MS_ZERO;
             }
         }
     }
@@ -166,8 +166,12 @@ void ControllerKM2202::slotRotateMainShaft()
         return;
     }
 
+    int pos_old = ms_position;
     ms_position += ms_dir;
     ms_position = cut(ms_position, static_cast<int>(MS_ZERO), static_cast<int>(MS_MAX_POSITION));
+
+    if (ms_position != pos_old)
+        emit soundPlay("Shturval");
 }
 
 //------------------------------------------------------------------------------
@@ -181,8 +185,10 @@ void ControllerKM2202::slotRotateReversShaft()
         return;
     }
 
+    int pos_old = rs_position;
     rs_position += rs_dir;
     rs_position = cut(rs_position, static_cast<int>(RS_BACKWARD), static_cast<int>(RS_FORWARD));
 
-    emit soundPlay("Revers_Ruk");
+    if (rs_position != pos_old)
+        emit soundPlay("Revers_Ruk");
 }

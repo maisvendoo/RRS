@@ -24,6 +24,7 @@ FieldRegulator::FieldRegulator(QObject *parent) : Device(parent)
   , Tu(0.5)
   , u(0.0)
   , T1(0.2)
+  , is_active(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
 }
@@ -77,6 +78,13 @@ void FieldRegulator::load_settings(QString file_path)
 void FieldRegulator::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
+
+    if (!is_active)
+    {
+        Y[0] = 0;
+        u = 0;
+        return;
+    }
 
     // Уставки
     double I_max = reg_settings[km_pos].I_max;
@@ -138,12 +146,6 @@ void FieldRegulator::ode_system(const state_vector_t &Y, state_vector_t &dYdt, d
     dYdt[0] = K[1] * dI;
     dYdt[1] = K[3] * dP;
     dYdt[2] = K[5] * dU;
-
-    dYdt[3] = (reg_settings[km_pos].P_ref - Y[3]) / Tp;
-    dYdt[4] = (reg_settings[km_pos].I_max - Y[4]) / Ti;
-    dYdt[5] = (reg_settings[km_pos].U_max - Y[5]) / Tu;
-
-    dYdt[6] = (u - Y[6]) / T1;
 }
 
 //------------------------------------------------------------------------------

@@ -80,6 +80,7 @@ void TEP70::stepElectroTransmission(double t, double dt)
     trac_gen->setOmega(disel->getOmega());
     trac_gen->step(t, dt);
 
+    field_reg->setActive(kvg->getContactState(2));
     field_reg->setFGVoltage(field_gen->getVoltage());
     field_reg->setOmega(disel->getOmega());
     field_reg->setGenVoltage(trac_gen->getVoltage());

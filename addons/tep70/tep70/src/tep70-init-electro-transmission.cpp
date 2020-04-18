@@ -14,10 +14,11 @@ void TEP70::initElectroTransmission()
     kvv->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kvv->setInitContactState(0, false);
 
-    kvg = new Relay(2);
+    kvg = new Relay(3);
     kvg->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kvg->setInitContactState(0, false);
     kvg->setInitContactState(1, true);
+    kvg->setInitContactState(2, false);
 
     trac_gen = new TracGenerator();
     trac_gen->read_custom_config(config_dir + QDir::separator() + "trac-generator");

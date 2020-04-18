@@ -31,6 +31,8 @@ public:
 
     double getFieldVoltage() const { return Uf; }
 
+    void setActive(bool is_active) { this->is_active = is_active; }
+
 private:
 
     /// Структура для хранения уставок регулятора на определенной позиции
@@ -102,9 +104,7 @@ private:
 
     double  T1;
 
-    Trigger current_lock;
-
-    Trigger power_lock;
+    bool    is_active;
 
     enum
     {
