@@ -139,7 +139,7 @@ void CHS2T::step(double t, double dt)
 
     stepSwitcherPanel();
 
-    //registrate(t, dt);
+    registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
     horn->setControl(keys, control_signals);

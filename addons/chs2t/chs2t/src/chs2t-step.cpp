@@ -314,6 +314,10 @@ void CHS2T::stepSupportEquipment(double t, double dt)
 
     blindsSwitcher->step(t, dt);
     blinds->step(t, dt);
+
+    energy_counter->setFullPower(Uks * (motor->getI12() + motor->getI34() + motor->getI56()) );
+    energy_counter->setResistorsPower( puskRez->getR() * ( pow(motor->getI12(), 2) + pow(motor->getI34(), 2) + pow(motor->getI56(), 2) ) );
+    energy_counter->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

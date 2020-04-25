@@ -155,11 +155,11 @@ void StepSwitch::stepDiscrete(double t, double dt)
     }
     else
     {
-        fieldStep = 1 * (ctrlState.k31 && !ctrlState.k32) +
+        fieldStep = (1 * (ctrlState.k31 && !ctrlState.k32) +
                     2 * (ctrlState.k32 && !ctrlState.k31) +
                     3 * (ctrlState.k33 && !ctrlState.k31) +
                     4 * (ctrlState.k31 && ctrlState.k32) +
-                    5 * (ctrlState.k31 && ctrlState.k33);
+                    5 * (ctrlState.k31 && ctrlState.k33)) * hod;
     }
 
     if (zero)

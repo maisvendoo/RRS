@@ -12,6 +12,7 @@ BrakeRegulator::BrakeRegulator(QObject* parent) : Device(parent)
   , k_2(5e-3)
   , allowEDT(false)
   , T(4.0)
+  , is_active(false)
 {
 
 }
@@ -47,6 +48,13 @@ void BrakeRegulator::ode_system(const state_vector_t& Y,
 void BrakeRegulator::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
+
+    if (!is_active)
+    {
+        Y[0] = 0.0;
+        Y[1] = 0.0;
+        return;
+    }
 
     Y[0] = cut(Y[0], 0.0, 1.0);
     u = Y[1];
