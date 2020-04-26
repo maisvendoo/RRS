@@ -12,14 +12,14 @@ public:
 
     ~CHS2tHorn() {}
 
-private:
+/*private:
 
     void stepKeysControl(double t, double dt)
     {
         //TrainHorn::stepKeysControl(t, dt);
 
-        if (control_signals.analogSignal[KM_SVISTOK].is_active)
-        {
+        //if (control_signals.analogSignal[KM_SVISTOK].is_active)
+        //{
             if (is_svistok = static_cast<bool>(control_signals.analogSignal[KM_SVISTOK].cur_value))
             {
                 emit soundSetVolume("Svistok", 100);
@@ -28,8 +28,8 @@ private:
             {
                 emit soundSetVolume("Svistok", 0);
             }
-        }
-    }
+        //}
+    }*/
 };
 
 #endif // CHS2T_HORN_H

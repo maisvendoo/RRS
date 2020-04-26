@@ -94,6 +94,9 @@ private:
     /// Возврат защиты
     bool bv_return;
 
+    /// Список звуков перестука
+    QList<QString> tap_sounds;
+
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
@@ -292,11 +295,17 @@ private:
     ///
     void initModbus();
 
+    /// Инициализация списка звуков перестука
+    void initTapSounds();
+
     /// Инициализация регистратора
     void initRegistrator();
 
     /// Общая инициализация локомотива
     void initialization();
+
+    /// Подпрограмма изменения положения пакетника
+    void setSwitcherState(Switcher *sw, signal_t signal);
 
     /// Моделирование работы токоприемников
     void stepPantographs(double t, double dt);
@@ -329,6 +338,8 @@ private:
     void stepSignals();
 
     void stepSwitcherPanel();
+
+    void stepTapSound();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
