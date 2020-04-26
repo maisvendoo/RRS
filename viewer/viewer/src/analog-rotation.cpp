@@ -60,9 +60,7 @@ bool AnalogRotation::load_config(ConfigReader &cfg)
 
     std::istringstream ss(tmp);
 
-    ss >> axis.x() >> axis.y() >> axis.z();
-
-    cfg.getValue(secName, "Precision", precision);
+    ss >> axis.x() >> axis.y() >> axis.z();    
 
     return true;
 }

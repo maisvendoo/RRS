@@ -24,7 +24,6 @@
 
 #include    "simulator-command-line.h"
 #include    "filesystem.h"
-#include    "log.h"
 #include    "train.h"
 #include    "elapsed-timer.h"
 
@@ -35,6 +34,8 @@
 #include    "keys-control.h"
 
 #include    "virtual-interface-device.h"
+
+#include    "sim-client.h"
 
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
@@ -73,6 +74,8 @@ signals:
 
     void sendDataToTrain(QByteArray data);
 
+    void getRecvData(sim_dispatcher_data_t &disp_data);
+
 public slots:
 
     /// Messages output
@@ -81,10 +84,10 @@ public slots:
     ///
     void controlProcess();
 
-private:
+    /// Обмен данными с ВЖД
+    void virtualRailwayFeedback();
 
-    /// Simulator's log object
-    Log         *simLog;
+private:
 
     /// Current simulation time
     double      t;
@@ -108,9 +111,6 @@ private:
     double      control_time;
     double      control_delay;
 
-    /// Simulation thread
-    QThread     model_thread;
-
     /// Train model
     Train       *train;    
 
@@ -120,7 +120,14 @@ private:
     /// TCP-server
     Server      *server;
 
+    /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel;
+
+    /// Клиент для связи с ВЖД
+    SimTcpClient *sim_client;
+
+    /// Simulation thread
+    QThread     model_thread;
 
     KeysControl keys_control;
 
@@ -132,11 +139,9 @@ private:
     QByteArray      data;
 
     QTimer          controlTimer;
+    QTimer          networkTimer;
 
-    ElapsedTimer    simTimer;
-
-    /// Log initialization
-    void logInit(bool clear_log = false);    
+    ElapsedTimer    simTimer;       
 
     /// Actions, which prerare integration step
     void preStep(double t);
@@ -159,8 +164,11 @@ private:
 
     void initControlPanel(QString cfg_path);
 
+    void initSimClient(QString cfg_path);
+
     /// TCP feedback
     void tcpFeedBack();
+
 
     /// Shered memory feedback
     void sharedMemoryFeedback();

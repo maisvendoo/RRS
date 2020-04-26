@@ -40,7 +40,7 @@ void VL60k::stepSignalsOutput()
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
 
     // Состояние локомотивного светофора
-    analogSignal[LS_G] = 1.0f;
+    stepDecodeAlsn();
 
     // Состояние контрольных ламп
     analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();

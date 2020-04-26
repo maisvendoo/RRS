@@ -14,9 +14,9 @@ public:
 
     virtual ~TrainHorn();
 
-    bool isSvistok() const { return is_svistok; }
+    bool isSvistok() const;
 
-    bool isTifon() const { return is_tifon; }
+    bool isTifon() const;
 
 protected:
 

@@ -30,6 +30,9 @@ public:
 
     double getAirDistribPressure() const;
 
+    /// Получение номера позиции
+    int getPositionNumber() const;
+
     void init(double pTM, double pFL);
 
 private:
@@ -50,7 +53,17 @@ private:
 
     double pos_duration;
 
+    double volume;
+
+    double p_volume;
+
     int dir;
+
+    int pos_num;
+
+    bool isStop;
+
+    std::array<double, NUM_STEPS> positions;
 
     std::array<double, NUM_STEPS> step_pressures;
 
@@ -58,11 +71,14 @@ private:
 
     std::array<double, MAX_GIAN_COEFFS> k;
 
+
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
 
     void stepKeysControl(double t, double dt);
+
+    void stepSound();
 };
 
 #endif // KVT254_H

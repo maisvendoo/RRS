@@ -112,6 +112,9 @@ void HandleEDT::stepKeysControl(double t, double dt)
 
 void HandleEDT::stepExternalControl(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     if (control_signals.analogSignal[EDT_BRAKE].is_active &&
         control_signals.analogSignal[EDT_RELEASE].is_active    )
     {

@@ -49,6 +49,8 @@ public:
     /// Установить контрольные сигналы
     void setControlSignal(size_t id, bool value);
 
+    void setStoragePath(QString path);
+
 private:
 
     /// Путь к файлу рода тока
@@ -109,7 +111,7 @@ private:
     void readLastCurrentKind();
 
     /// Записать в файл последний род тока
-    void writeLastCurrentKind();
+    void writeLastCurrentKind(mpcs_input_t mpcs_input);
 
     /// Команда поднятия ТП
     bool isCommandUp();

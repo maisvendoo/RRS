@@ -32,9 +32,11 @@ EVR305::~EVR305()
 //
 //------------------------------------------------------------------------------
 void EVR305::ode_system(const state_vector_t &Y,
-                                     state_vector_t &dYdt,
-                                     double t)
+                        state_vector_t &dYdt,
+                        double t)
 {
+    Q_UNUSED(t)
+
     // Состояние вентиля перекрыши
     double up = abs(control_line[0]);
 

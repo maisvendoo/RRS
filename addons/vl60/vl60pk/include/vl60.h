@@ -61,6 +61,9 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
+    /// Список звуков перестука
+    QList<QString> tap_sounds;
+
     double  U_bat;
 
     float   pant1_pos;
@@ -265,6 +268,8 @@ private:
 
     void initTriggers();
 
+    void initTapSounds();
+
     /// Инициализация ЭПТ
     void initEPT(const QString &modules_dir);
 
@@ -297,11 +302,15 @@ private:
 
     void stepEPT(double t, double dt);
 
+    void stepTapSound();
+
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
 
     void stepSignalsOutput();
+
+    void stepDecodeAlsn();
 
     double getTractionForce();
 

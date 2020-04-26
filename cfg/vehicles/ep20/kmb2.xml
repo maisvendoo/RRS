@@ -1,0 +1,11 @@
+<Config>
+	<Device>
+
+		<Order>1</Order>
+		
+		<traction_rate>0.05</traction_rate>
+
+		<velocity_rate>0.05</velocity_rate>
+
+	</Device>
+</Config>

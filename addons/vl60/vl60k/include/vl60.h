@@ -61,6 +61,9 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
+    /// Список звуков перестука
+    QList<QString>   tap_sounds;
+
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
@@ -254,6 +257,8 @@ private:
 
     void initTriggers();
 
+    void initTapSounds();
+
 
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
@@ -282,11 +287,15 @@ private:
 
     void stepOtherEquipment(double t, double dt);
 
+    void stepTapSound();
+
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
 
     void stepSignalsOutput();   
+
+    void stepDecodeAlsn();
 
     double getTractionForce();
 

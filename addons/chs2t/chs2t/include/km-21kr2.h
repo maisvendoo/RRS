@@ -79,4 +79,6 @@ private:
     ControllerState controlState;
 };
 
+#define TO_INT(variable) static_cast<int>(variable)
+
 #endif // KM21KR2_H

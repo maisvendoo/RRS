@@ -75,6 +75,8 @@ double PneumoSplitter::getP_in() const
 //------------------------------------------------------------------------------
 void PneumoSplitter::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(t)
+
     Q_out1 = K[1] * (Y[0] - p_out1) + K[4] * (p_out2 - p_out1);
     Q_out2 = K[2] * (Y[0] - p_out2) + K[4] * (p_out1 - p_out2);
 }
@@ -86,8 +88,10 @@ void PneumoSplitter::ode_system(const state_vector_t &Y,
                                 state_vector_t &dYdt,
                                 double t)
 {
-    dYdt[0] = ( Q_in - K[3] *(Q_out1 + Q_out2) ) / V0;
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 
+    dYdt[0] = ( Q_in - K[3] *(Q_out1 + Q_out2) ) / V0;
 }
 
 //------------------------------------------------------------------------------

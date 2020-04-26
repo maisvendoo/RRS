@@ -215,9 +215,8 @@ void CHS2T::initOtherEquipment()
     Journal::instance()->info("Init whistle and typhoid");
 
     horn = new CHS2tHorn();
-    connect(horn, &TrainHorn::soundSetVolume, this, &CHS2T::soundSetVolume);
-    connect(horn, &TrainHorn::soundPlay, this, &CHS2T::soundPlay);
-    connect(horn, &TrainHorn::soundStop, this, &CHS2T::soundStop);
+    connect(horn, &CHS2tHorn::soundPlay, this, &CHS2T::soundPlay);
+    connect(horn, &CHS2tHorn::soundStop, this, &CHS2T::soundStop);
 
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
@@ -263,6 +262,9 @@ void CHS2T::initSupportEquipment()
     blindsSwitcher->setPlusSoundName("tumbler");
     blindsSwitcher->setMinusSoundName("tumbler");
     connect(blindsSwitcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
+
+    energy_counter = new EnergyCounter();
+    energy_counter->read_custom_config(config_dir + QDir::separator() + "energy-counter");
 }
 
 //------------------------------------------------------------------------------
@@ -299,7 +301,7 @@ void CHS2T::initRegistrator()
     Journal::instance()->info("Init registraion subsystem");
 
     reg = nullptr;
-    reg = new Registrator("brakeReg", 0.1, Q_NULLPTR);
+    reg = new Registrator("../charts/energy", 1.0, Q_NULLPTR);
 }
 
 //------------------------------------------------------------------------------

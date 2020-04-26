@@ -170,6 +170,8 @@ void MainWindow::slotConvert()
 //------------------------------------------------------------------------------
 void MainWindow::slotIsPathconvFinished(int error_code)
 {
+    Q_UNUSED(error_code)
+
     startProfConverter(routeDir);
 }
 
@@ -178,5 +180,7 @@ void MainWindow::slotIsPathconvFinished(int error_code)
 //------------------------------------------------------------------------------
 void MainWindow::slotIsProfconvFinished(int error_code)
 {
+    Q_UNUSED(error_code)
+
     ui->lStatus->setText(tr("OK: conversion complete"));
 }

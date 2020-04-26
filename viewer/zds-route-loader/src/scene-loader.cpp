@@ -30,6 +30,7 @@
 //
 //------------------------------------------------------------------------------
 SceneLoader::SceneLoader() : RouteLoader()
+  , view_distance(1000.0f)
 {
 
 }
@@ -129,7 +130,7 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
 {
     std::string mode = "";
 
-    while (!stream.eof())
+    while ( !stream.eof() && !stream.fail() )
     {
         std::string line;
         std::getline(stream, line);
@@ -196,7 +197,7 @@ ReadResult SceneLoader::loadObjectMap(std::istream &stream)
 {
     std::string prev_name = "";    
 
-    while (!stream.eof())
+    while ( !stream.eof() && !stream.fail() )
     {
         std::string line = "";
         std::getline(stream, line);

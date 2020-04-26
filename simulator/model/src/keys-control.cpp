@@ -1,4 +1,5 @@
 #include    "keys-control.h"
+#include    "Journal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -12,7 +13,7 @@ KeysControl::KeysControl(QObject *parent) : QObject(parent)
     {
         if (!keys_data.attach())
         {
-            emit logMessage("ERROR: Can't attach to shared memory");
+            Journal::instance()->error("ERROR: Can't attach to shared memory");
         }
     }
 }

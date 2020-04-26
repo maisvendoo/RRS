@@ -19,6 +19,7 @@ public:
     void load(const std::string &path);
 
 private:
+
     struct point_t
     {
         double  current;
@@ -32,9 +33,9 @@ private:
         }
     };
 
-    std::vector<point_t> points;
-
     double physValue;
+
+    std::vector<point_t> points;
 
     point_t findPoint(double physValue, point_t &next_point);
 
