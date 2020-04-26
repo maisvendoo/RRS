@@ -50,14 +50,15 @@ private:
     /// Pointer to OSG viewer
     osgViewer::Viewer *viewer;
 
+    /// Requests time interval (ms)
+    int     request_interval;
+
     /// Timer for send data requests
     QTimer      timerRequester;
 
     /// Data structure, reseived from server
     server_data_t   server_data;
 
-    /// Requests time interval (ms)
-    int     request_interval;
 
     /// Buffer for store keyboard state
     QByteArray  key_data;    

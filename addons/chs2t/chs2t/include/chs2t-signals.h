@@ -71,6 +71,8 @@ enum
 
     STRELKA_SPEED = 58,
 
+    SW_EDT = 59,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

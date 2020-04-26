@@ -24,7 +24,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../../lib -lfilesystem
 }
 
-#LIBS += -L../../../../modules/vl60-common -lvl60-equipment
+#CONFIG += force_debug_info
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../vl60-equipment/include

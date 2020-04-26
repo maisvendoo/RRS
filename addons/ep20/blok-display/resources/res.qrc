@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/cassete">
+        <file alias="img-cassete">img/img-cassete.png</file>
+    </qresource>
+</RCC>

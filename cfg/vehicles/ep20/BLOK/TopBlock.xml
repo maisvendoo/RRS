@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<TopBlock>
+		<!-- Размер и положение спидометра -->
+		<speedometerWidth>500</speedometerWidth>
+		
+		<!--<speedometerHeight>541</speedometerHeight>-->
+		
+		<!--<speedometerX>150</speedometerX>
+		<speedometerY>0</speedometerY>-->
+
+	</TopBlock>
+
+	
+</Config>

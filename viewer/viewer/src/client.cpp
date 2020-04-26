@@ -19,6 +19,9 @@
 //
 //------------------------------------------------------------------------------
 NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
+  , tcp_client(nullptr)
+  , viewer(nullptr)
+  , request_interval(100)
 {
     connect(&timerRequester, &QTimer::timeout,
             this, &NetworkClient::onTimerRequest);    

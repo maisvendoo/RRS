@@ -87,8 +87,10 @@ void readNextMesh(std::ifstream &stream, dmd_mesh_t &mesh)
         mesh.vertices->push_back(point);
     }
 
+    std::string empty_line = getLine(stream);
     line = getLine(stream);
-    line = getLine(stream);
+
+    mesh.normals = new osg::Vec3Array;
 
     for (int i = 0; i < numfaces; ++i)
     {
@@ -104,9 +106,10 @@ void readNextMesh(std::ifstream &stream, dmd_mesh_t &mesh)
             unsigned int idx = 0;
             ss >> idx;
             face->push_back(idx - 1);
-        }
+        }        
 
         mesh.faces.push_back(face);
+        mesh.normals->push_back(mesh.calcFaceNormal(face));
     }
 }
 

@@ -26,6 +26,9 @@ EPTConverter::~EPTConverter()
 //------------------------------------------------------------------------------
 void EPTConverter::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     U_out = ks * U_bat - r * I_out;
 }
 
@@ -35,7 +38,9 @@ void EPTConverter::preStep(state_vector_t &Y, double t)
 void EPTConverter::ode_system(const state_vector_t &Y,
                               state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------

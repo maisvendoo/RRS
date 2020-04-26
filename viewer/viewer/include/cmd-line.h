@@ -31,8 +31,10 @@ struct option_t
     bool is_present;
 
     option_t()
+        : value(T())
+        , is_present(false)
     {
-        is_present = false;
+
     }
 };
 

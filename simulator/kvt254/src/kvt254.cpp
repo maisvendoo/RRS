@@ -14,7 +14,12 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , min_pos(-0.05)
   , max_pos(1.0)
   , pos_duration(1.0)
+  , volume(0)
+  , p_volume(0)
   , dir(0)
+  , pos_num(0)
+  , isStop(false)
+  , positions({0.0, 0.325, 0.5, 0.752, 1.0})
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
 {
     std::fill(K.begin(), K.end(), 0.0);
@@ -116,6 +121,53 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
     dYdt[1] = Q2 / V2; // p2
 
     dYdt[2] = Qpz / Vpz; // p_pz
+
+    stepSound();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane254::stepSound()
+{
+    p_volume = volume;
+
+    // 250000 поправочный коэффициент для перевода 1кг/cм^3 в 1кг/м^3
+    // Для звуков взято 400000 с малым запасом
+    volume = abs(Qbc) * 400000;
+
+    if (volume > 30)
+    {
+        if (Qbc > 0)
+        {
+            if (p_volume <= 30)
+            {
+                emit soundPlay("254_vpusk");
+            }
+            emit soundSetVolume("254_vypusk", 0);
+            emit soundSetVolume("254_vpusk", volume);
+        }
+
+        if (Qbc < 0)
+        {
+            if (p_volume <= 30)
+            {
+                emit soundPlay("254_vypusk");
+            }
+            emit soundSetVolume("254_vpusk", 0);
+            emit soundSetVolume("254_vypusk", volume);
+        }
+        isStop = false;
+    }
+    else
+    {
+        if (!isStop)
+        {
+            emit soundStop("254_vpusk");
+            emit soundStop("254_vypusk");
+            isStop = true;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -185,6 +237,8 @@ void LocoCrane254::stepKeysControl(double t, double dt)
             dir = 0;
     }
 
+    int old_pos_n = pos_num;
+
     pos += dir * pos_duration * dt;
 
     pos = cut(pos, min_pos, max_pos);
@@ -219,6 +273,33 @@ void LocoCrane254::stepKeysControl(double t, double dt)
             pos = step_pressures[4] / max_step;
         }
     }
+
+    pos_num = getPositionNumber();
+
+    if (pos_num != old_pos_n && pos_num != -1)
+        emit soundPlay("254-chelk");
+}
+
+//------------------------------------------------------------------------------
+// Позиция крана по канавкам (только для звуков)
+//------------------------------------------------------------------------------
+int LocoCrane254::getPositionNumber() const
+{
+    int pos_n = -1;
+
+    if (pos == 0.0)
+        return 0;
+
+    if (pos == 1.0)
+        return 4;
+
+    for (uint i = 0; i < positions.size() - (dir == -1 ? 2 : 1); ++i)
+    {
+        if (pos >= positions[i] && pos <= positions[i+1])
+            pos_n = static_cast<int>(i);
+    }
+
+    return pos_n;
 }
 
 GET_LOCO_CRANE(LocoCrane254)

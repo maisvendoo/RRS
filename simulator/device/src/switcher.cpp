@@ -38,6 +38,9 @@ void Switcher::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double 
 //------------------------------------------------------------------------------
 void Switcher::stepKeysControl(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     if (getKeyState(keyCode))
     {
         if (ableToPress)

@@ -125,7 +125,7 @@ bool RoutePath::load(std::istream &stream)
 {
     track_data_t tmp_data;
 
-    while (!stream.eof())
+    while ( !stream.eof() && !stream.fail() )
     {
         std::string line = getLine(stream);
 

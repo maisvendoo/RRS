@@ -12,6 +12,8 @@ Pantograph::Pantograph(QObject *parent) : Device(parent)
   , motion_time(4.0)
   , current_kind_in(0)
   , current_kind_out(0)
+  , is_up(false)
+  , is_down(true)
 
 {
 
@@ -106,13 +108,15 @@ void Pantograph::preStep(state_vector_t &Y, double t)
             emit soundPlay("Pantograph_Down");
     }
 
-    Uout = Uks * hs_p(Y[0] - 0.95 * max_height);
+    double level = 0.999;
 
-    current_kind_out = current_kind_in * static_cast<int>(hs_p(Y[0] - 0.95 * max_height));
+    Uout = Uks * hs_p(Y[0] - level * max_height);
 
-    is_up = static_cast<bool>(hs_p(Y[0] - 0.95 * max_height));
+    current_kind_out = current_kind_in * static_cast<int>(hs_p(Y[0] - level * max_height));
 
-    is_down = static_cast<bool>(hs_n(Y[0] - 0.05 * max_height));
+    is_up = static_cast<bool>(hs_p(Y[0] - level * max_height));
+
+    is_down = static_cast<bool>(hs_n(Y[0] - (1.0 - level) * max_height));
 }
 
 //----------------------------------------------------------------------------

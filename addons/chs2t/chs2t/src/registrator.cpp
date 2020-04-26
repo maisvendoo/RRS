@@ -40,6 +40,9 @@ void Registrator::print(QString line, double t, double dt)
 
     if ( first_print || (tau > interval))
     {
+        tau = 0.0;
+        first_print = false;
+
         file->open(QIODevice::Append);
 
         QTextStream stream(file);

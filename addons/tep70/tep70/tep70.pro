@@ -24,6 +24,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lfilesystem
 }
 
+CONFIG += force_debug_info
+
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../../CfgReader/include
 

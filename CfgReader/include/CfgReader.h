@@ -73,8 +73,6 @@ public:
 
 private:
 
-    /// File object
-    QFile *file;
     /// File name
 	QString file_name;
     /// Document object

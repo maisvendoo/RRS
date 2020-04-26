@@ -6,6 +6,7 @@ QT += core
 QT += gui
 QT += widgets
 QT += network
+QT += opengl
 
 TARGET = viewer
 
@@ -28,11 +29,13 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
         LIBS += -L$$OSG_LIB_DIRECTORY -losgTextd
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5d
 
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
         LIBS += -L../../../lib -lTcpConnection_d
+        LIBS += -L../../../lib -ldisplay_d
 
     } else {
 
@@ -43,14 +46,16 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
         LIBS += -L$$OSG_LIB_DIRECTORY -losgText
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
         LIBS += -L../../../lib -lTcpConnection
+        LIBS += -L../../../lib -ldisplay
     }
 
-    LIBS += -lopengl32 -lglu32
+    #LIBS += -lopengl32 -lglu32
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 }
@@ -68,11 +73,13 @@ unix {
         LIBS += -losgGAd
         LIBS += -losgUtild
         LIBS += -losgTextd
+        LIBS += -losgQt5d
 
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
         LIBS += -L../../lib -lTcpConnection_d
+        LIBS += -L../../lib -ldisplay_d
 
     } else {
 
@@ -83,14 +90,16 @@ unix {
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
         LIBS += -losgText
+        LIBS += -losgQt5
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
         LIBS += -L../../lib -lTcpConnection
+        LIBS += -L../../lib -ldisplay
     }
 
-    LIBS += -lGL
+    #LIBS += -lGL
 }
 
 #QMAKE_CXXFLAGS += -pg
@@ -101,10 +110,12 @@ unix {
 #CONFIG += force_debug_info
 
 INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../simulator/vehicle/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
+INCLUDEPATH += ../display/include
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)

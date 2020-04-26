@@ -29,6 +29,8 @@ public:
 
     void reset() { setY(0, 0); setY(1, 0); }
 
+    void setActive(bool is_active) { this->is_active = is_active; }
+
 private:
 
     /// Текущий ток якорей ТЭД
@@ -53,6 +55,8 @@ private:
     bool allowEDT;
 
     double T;
+
+    bool is_active;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

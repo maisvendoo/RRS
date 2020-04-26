@@ -4,12 +4,15 @@
 //
 //------------------------------------------------------------------------------
 DCMotorFan::DCMotorFan(QObject* parent) : Device(parent)
-  , U(0.0)  
+  , U(0.0)
+  , cPhi(0.0)
   , R(0.0)
   , omega_nom(0.0)
   , ks(0.0)
   , J(0.0)
   , soundName("")
+  , Unom(0.0)
+  , kf(0.0)
 {
 
 }

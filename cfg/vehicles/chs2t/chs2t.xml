@@ -9,7 +9,7 @@
 		<MainResist>default</MainResist>
 		<NumAxis>6</NumAxis>				
                 <WheelInertia>2.0</WheelInertia>        
-        
+		<SoundDir>chs2t</SoundDir>        
                 
                 <ExtModelName>chs2t/chs2t.osgt</ExtModelName>
                 <ModelShift>0.0 0.0 0.312</ModelShift>
