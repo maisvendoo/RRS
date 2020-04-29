@@ -73,6 +73,9 @@ enum
 
     SW_EDT = 59,
 
+    VAL_PR_SKOR1 = 60,
+    VAL_PR_SKOR2 = 61,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

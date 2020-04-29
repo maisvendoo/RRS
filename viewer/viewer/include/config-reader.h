@@ -37,6 +37,7 @@ public:
             try
             {
                 ss >> value;
+                return true;
             }
             catch (std::runtime_error &)
             {
@@ -44,7 +45,7 @@ public:
             }
         }
 
-        return true;
+        return false;
     }
 
     bool getValue(const std::string &section, const std::string &param, std::string &value)
@@ -54,9 +55,10 @@ public:
         if (!contents.empty())
         {
             value = contents;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
 protected:

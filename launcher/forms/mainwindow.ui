@@ -30,7 +30,7 @@
      </sizepolicy>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -381,7 +381,7 @@
         <x>30</x>
         <y>20</y>
         <width>261</width>
-        <height>336</height>
+        <height>355</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -468,7 +468,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="spinBox">
+            <widget class="QSpinBox" name="spScreenNumber">
              <property name="maximum">
               <number>10</number>
              </property>
@@ -490,7 +490,34 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="5,1">
+          <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="5,0">
+           <item>
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>FovY</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="dspFovY">
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="decimals">
+              <number>1</number>
+             </property>
+             <property name="minimum">
+              <double>10.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>120.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="5,3">
            <item>
             <widget class="QLabel" name="label_9">
              <property name="text">
@@ -499,12 +526,25 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit"/>
+            <widget class="QDoubleSpinBox" name="dspNear">
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="decimals">
+              <number>1</number>
+             </property>
+             <property name="minimum">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>10000.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="5,1">
+          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="5,2">
            <item>
             <widget class="QLabel" name="label_10">
              <property name="text">
@@ -513,7 +553,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_2"/>
+            <widget class="QDoubleSpinBox" name="dspFar">
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="minimum">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>10000.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -530,7 +580,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="spinBox_2">
+            <widget class="QSpinBox" name="spViewDist">
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
@@ -546,35 +596,6 @@
             </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Notify level</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cboxNotifyLevel">
-           <item>
-            <property name="text">
-             <string>INFO</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>WARNING</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>ERROR</string>
-            </property>
-           </item>
-          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">

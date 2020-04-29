@@ -79,6 +79,8 @@ void CHS2T::stepSignals()
     analogSignal[HANDLE_RT] = handleEDT->getHandlePos();
 
     analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
+    analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
+    analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
 
     analogSignal[SW_EDT] = EDTSwitch.getState();
 

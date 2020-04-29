@@ -73,16 +73,14 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 
     addSignalsInControllerState();
 
-    bool is_field_weak = k31 || k32 || k33;
-
     k01 = (reverseState == 1);
 
     k02 = (reverseState == -1);
 
     k25 = (mainShaftPos == -10 || mainShaftPos == -5 || mainShaftPos == 0);
-    k21 = (mainShaftPos == -10 || mainShaftPos == 0  || mainShaftPos == 4) && !is_field_weak;
-    k22 = (mainShaftPos == 0   || mainShaftPos == 2  || mainShaftPos == 4) && !is_field_weak;
-    k23 = (mainShaftPos == 2   || mainShaftPos == 4) && !is_field_weak;
+    k21 = (mainShaftPos == -10 || mainShaftPos == 0  || mainShaftPos == 4);
+    k22 = (mainShaftPos == 0   || mainShaftPos == 2  || mainShaftPos == 4);
+    k23 = (mainShaftPos == 2   || mainShaftPos == 4);
 
     k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10 );
     k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
@@ -165,6 +163,8 @@ void Km21KR2::stepKeysControl(double t, double dt)
                    (!autoReset && !autoSet && !isShift() && !isControl()) *
                    (-5 * getKeyState(KEY_D) +
                      2 * getKeyState(KEY_A));
+
+    mainShaftPos = mainShaftPos * TO_INT(hs_n(mainShaftHeight - 0.99));
 
     lastControllerPositionIsZero = (TO_INT(mainShaftPos) == 0);
 }

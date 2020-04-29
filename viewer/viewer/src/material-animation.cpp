@@ -35,6 +35,7 @@ bool MaterialAnimation::load_config(ConfigReader &cfg)
 
     cfg.getValue(secName, "SignalID", signal_id);
     cfg.getValue(secName, "Duration", duration);
+    is_fixed_signal = cfg.getValue(secName, "FixedSignal", fixed_signal);
 
     std::string tmp;
     cfg.getValue(secName, "EmissionColor", tmp);

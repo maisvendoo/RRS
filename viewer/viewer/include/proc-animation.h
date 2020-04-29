@@ -74,6 +74,8 @@ protected:
     osg::MatrixTransform    *transform;
     std::string             name;
 
+    bool                    is_fixed_signal;
+    float                   fixed_signal;
 
     std::vector<key_point_t> keypoints;
 
