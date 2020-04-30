@@ -44,6 +44,12 @@ public:
         this->n_ref = n_ref;
     }
 
+    /// Задать уровень топлива бака
+    void setFuelLevel(double fuel_level)
+    {
+        this->fuel_level = fuel_level;
+    }
+
     /// Вернуть давление в системе смазки
     double getOilPressure() const { return getY(0); }
 
@@ -140,6 +146,9 @@ private:
 
     /// Имя текущего проигрываемого звука
     QString soundName;
+
+    /// Уровень топлива в баке
+    double fuel_level;
 
     enum
     {

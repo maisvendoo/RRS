@@ -76,6 +76,12 @@ enum
     VAL_PR_SKOR1 = 60,
     VAL_PR_SKOR2 = 61,
 
+    LS_G = 62,
+    LS_R = 63,
+    LS_W = 64,
+    LS_Y = 65,
+    LS_YR = 66,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,
