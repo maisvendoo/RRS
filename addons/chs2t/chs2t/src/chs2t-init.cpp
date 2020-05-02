@@ -22,8 +22,8 @@ void CHS2T::initPantographs()
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantoSwitcher[i] = new Switcher(Q_NULLPTR, 0, 4);
-        pantoSwitcher[i]->setPlusSoundName("tumbler");
-        pantoSwitcher[i]->setMinusSoundName("tumbler");
+        //pantoSwitcher[i]->setPlusSoundName("tumbler");
+        //pantoSwitcher[i]->setMinusSoundName("tumbler");
         connect(pantoSwitcher[i], &Switcher::soundPlay, this, &CHS2T::soundPlay);
     }
 
@@ -56,8 +56,8 @@ void CHS2T::initFastSwitch()
     bv->read_custom_config(config_dir + QDir::separator() + "bv");
 
     fastSwitchSw = new Switcher(Q_NULLPTR, KEY_P, 4);
-    fastSwitchSw->setPlusSoundName("tumbler");
-    fastSwitchSw->setMinusSoundName("tumbler");
+    //fastSwitchSw->setPlusSoundName("tumbler");
+    //fastSwitchSw->setMinusSoundName("tumbler");
     connect(fastSwitchSw, &Switcher::soundPlay, this, &CHS2T::soundPlay);
 }
 
@@ -117,8 +117,8 @@ void CHS2T::initAirSupplySubsystem()
         motor_compressor[i]->setSoundName(QString("kompressor%1").arg(i+1));
 
         mk_switcher[i] = new Switcher(Q_NULLPTR, 0, 4);
-        mk_switcher[i]->setPlusSoundName("tumbler");
-        mk_switcher[i]->setMinusSoundName("tumbler");
+        //mk_switcher[i]->setPlusSoundName("tumbler");
+        //mk_switcher[i]->setMinusSoundName("tumbler");
         connect(mk_switcher[i], &Switcher::soundPlay, this, &CHS2T::soundPlay);
     }
 
@@ -249,8 +249,8 @@ void CHS2T::initSupportEquipment()
     }
 
     motor_fan_switcher = new Switcher(Q_NULLPTR, KEY_F, 3);
-    motor_fan_switcher->setPlusSoundName("tumbler");
-    motor_fan_switcher->setMinusSoundName("tumbler");
+    //motor_fan_switcher->setPlusSoundName("tumbler");
+    //motor_fan_switcher->setMinusSoundName("tumbler");
     connect(motor_fan_switcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
 
     connect(motor_fan_ptr, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
@@ -259,8 +259,8 @@ void CHS2T::initSupportEquipment()
     blinds->read_custom_config(config_dir + QDir::separator() + "blinds");
 
     blindsSwitcher = new Switcher(Q_NULLPTR, KEY_G, 5);
-    blindsSwitcher->setPlusSoundName("tumbler");
-    blindsSwitcher->setMinusSoundName("tumbler");
+    //blindsSwitcher->setPlusSoundName("tumbler");
+    //blindsSwitcher->setMinusSoundName("tumbler");
     connect(blindsSwitcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
 
     energy_counter = new EnergyCounter();

@@ -345,6 +345,8 @@ private:
 
     void stepTapSound();
 
+    void stepDecodeAlsn();
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 

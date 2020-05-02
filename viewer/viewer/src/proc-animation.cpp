@@ -10,6 +10,8 @@ ProcAnimation::ProcAnimation(osg::MatrixTransform *transform)
     , signal_id(0)
     , transform(transform)
     , name("")
+    , is_fixed_signal(false)
+    , fixed_signal(0.0f)
 {
 
 }
@@ -77,7 +79,10 @@ bool ProcAnimation::load(ConfigReader &cfg)
 //------------------------------------------------------------------------------
 void ProcAnimation::setPosition(float pos)
 {
-    this->pos = pos;
+    if (is_fixed_signal)
+        this->pos = fixed_signal;
+    else
+        this->pos = pos;
 }
 
 //------------------------------------------------------------------------------

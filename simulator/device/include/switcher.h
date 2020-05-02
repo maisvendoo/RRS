@@ -34,10 +34,6 @@ public:
             return false;
     }
 
-    void setPlusSoundName(QString soundName);
-
-    void setMinusSoundName(QString soundName);
-
 protected:
 
     int keyCode;
@@ -53,10 +49,6 @@ protected:
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void stepKeysControl(double t, double dt);
-
-    QString PlusSoundName;
-
-    QString MinusSoundName;
 };
 
 #endif // SWITCHER_H

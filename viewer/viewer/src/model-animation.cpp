@@ -42,6 +42,7 @@ bool ModelAnimation::load_config(ConfigReader &cfg)
     std::string secName = "ModelAnimation";
 
     cfg.getValue(secName, "SignalID", signal_id);
+    is_fixed_signal = cfg.getValue(secName, "FixedSignal", fixed_signal);
     double lastTime = 0.0;
 
     if (cfg.getValue(secName, "Time", lastTime))

@@ -13,6 +13,7 @@ void TEP70::stepDisel(double t, double dt)
     disel->setMV6state(mv6->getContactState(0));
     disel->setVTNstate(vtn->getContactState(0));
     disel->setRefFreq(km->getRefFreq());
+    disel->setFuelLevel(fuel_tank->getFuelLevel());
     disel->step(t, dt);
 
     double I_gen = Icc + motor_compressor->getCurrent();

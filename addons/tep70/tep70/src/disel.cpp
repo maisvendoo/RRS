@@ -27,6 +27,7 @@ Disel::Disel(QObject *parent) : Device(parent)
   , delta_omega(0.0)
   , pos_count(0)
   , soundName("pos0")
+  , fuel_level(0.0)
 {
     std::fill(K.begin(), K.end(), 0.0);
 
@@ -90,7 +91,7 @@ void Disel::preStep(state_vector_t &Y, double t)
     }
     else
     {
-        is_fuel_ignition = state_mv6;
+        is_fuel_ignition = state_mv6 && (fuel_level >= 0.01);
     }
 
     delta_omega = n_ref * Physics::PI / 30.0 - Y[1];
