@@ -119,7 +119,6 @@ void Km21KR2::stepKeysControl(double t, double dt)
                 emit soundPlay("21KR_-A_0");
             autoReset = false;
         }
-
         if (!autoReset && isShift() && fieldWeakShaft != 0 && lastControllerPositionIsZero && is_dec)
         {
             fieldWeakShaft -= 2;

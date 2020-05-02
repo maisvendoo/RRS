@@ -265,6 +265,9 @@ void CHS2T::initSupportEquipment()
 
     energy_counter = new EnergyCounter();
     energy_counter->read_custom_config(config_dir + QDir::separator() + "energy-counter");
+
+    energy_counter = new EnergyCounter();
+    energy_counter->read_custom_config(config_dir + QDir::separator() + "energy-counter");
 }
 
 //------------------------------------------------------------------------------
