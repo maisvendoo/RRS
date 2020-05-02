@@ -40,6 +40,7 @@
 #include    "chs2t-horn.h"
 #include    "sl2m.h"
 #include    "energy-counter.h"
+#include    "chs2t-switcher.h"
 
 /*!
  * \class
@@ -126,7 +127,7 @@ private:
     Trigger     mk_tumbler;
 
     /// Галетники управления МК
-    std::array<Switcher *, 2> mk_switcher;
+    std::array<CHS2TSwitcher *, 2> mk_switcher;
 
     /// Поездной кран машиниста (КрМ)
     BrakeCrane *brakeCrane;
@@ -179,16 +180,16 @@ private:
     HandleEDT       *handleEDT;
 
     /// Галетники управления токоприемниками
-    std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
+    std::array<CHS2TSwitcher *, NUM_PANTOGRAPHS> pantoSwitcher;
 
     /// Галетник управления БВ
-    Switcher    *fastSwitchSw;
+    CHS2TSwitcher    *fastSwitchSw;
 
     std::array<DCMotorFan*, 2> motor_fan;
 
-    Switcher *motor_fan_switcher;
+    CHS2TSwitcher *motor_fan_switcher;
 
-    Switcher *blindsSwitcher;
+    CHS2TSwitcher *blindsSwitcher;
 
     /// Зарядное давление
     double charging_press;
