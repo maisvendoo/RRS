@@ -17,11 +17,15 @@ public:
 
     void setSoundName(QString soundName) { this->soundName = soundName; }
 
+    void setSpring(int state, int spring_state) { springStates.insert(state, spring_state); }
+
 protected:
 
     int     old_state;
 
     QString soundName;
+
+    QMap<int, int> springStates;
 
     void preStep(state_vector_t &Y, double t);
 };

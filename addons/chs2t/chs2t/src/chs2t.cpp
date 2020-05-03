@@ -147,6 +147,8 @@ void CHS2T::step(double t, double dt)
 
     stepDecodeAlsn();
 
+    stepTapSound();
+
     registrate(t, dt);
 
     //Journal::instance()->info("Step horn");

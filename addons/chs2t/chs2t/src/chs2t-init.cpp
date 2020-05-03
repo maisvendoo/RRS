@@ -22,6 +22,7 @@ void CHS2T::initPantographs()
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantoSwitcher[i] = new CHS2TSwitcher(Q_NULLPTR, 0, 4);
+        pantoSwitcher[i]->setSpring(3,2);
         pantoSwitcher[i]->setSoundName("tumbler");
         connect(pantoSwitcher[i], &Switcher::soundPlay, this, &CHS2T::soundPlay);
     }
@@ -55,6 +56,7 @@ void CHS2T::initFastSwitch()
     bv->read_custom_config(config_dir + QDir::separator() + "bv");
 
     fastSwitchSw = new CHS2TSwitcher(Q_NULLPTR, KEY_P, 4);
+    fastSwitchSw->setSpring(3, 2);
     fastSwitchSw->setSoundName("tumbler");
     connect(fastSwitchSw, &Switcher::soundPlay, this, &CHS2T::soundPlay);
 }
