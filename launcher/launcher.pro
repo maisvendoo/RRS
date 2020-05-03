@@ -53,6 +53,7 @@ unix {
 
         LIBS += -L../../lib -lfilesystem_d
         LIBS += -L../../lib -lCfgReader_d
+        LIBS += -L../../lib -lCfgEditor_d
 
     } else {
 
@@ -61,6 +62,7 @@ unix {
 
         LIBS += -L../../lib -lfilesystem
         LIBS += -L../../lib -lCfgReader
+        LIBS += -L../../lib -lCfgEditor
     }
 }
 
