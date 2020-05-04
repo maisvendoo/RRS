@@ -4,7 +4,8 @@
 #include    <QObject>
 
 #include    "track.h"
-#include    "connector.h"
+
+class       Connector;
 
 //------------------------------------------------------------------------------
 //
@@ -25,15 +26,31 @@ public:
 
     vec3d getPosition(double x, vec3d &attitude);
 
+    void setFwdConnector(Connector *conn) { this->fwdConnector = conn; }
+
+    void setBwdConnector(Connector *conn) { this->bwdConnector = conn; }
+
+    double getLength() const { return length; }
+
+    Connector *getFwdConnector() const { return fwdConnector; }
+
+    Connector *getBwdConnector() const { return bwdConnector; }
+
+    void setBusy(double is_busy) { this->is_busy = is_busy; }
+
+    bool isBusy() const { return is_busy; }
+
 protected:
 
-    QString                 name;
+    QString         name;
 
-    double                  length;
+    double          length;
 
-    Connector               *fwdConnector;
+    Connector       *fwdConnector;
 
-    Connector               *bwdConnector;
+    Connector       *bwdConnector;
+
+    bool            is_busy;
 
     std::vector<track_t>    tracks;
 

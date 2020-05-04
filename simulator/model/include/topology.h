@@ -4,12 +4,7 @@
 #include    <QObject>
 #include    <QMap>
 
-#include    "trajectory.h"
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef     QMap<QString, Trajectory *> traj_list_t;
+#include    "topology-types.h"
 
 //------------------------------------------------------------------------------
 //
@@ -32,8 +27,17 @@ protected:
     /// Контейнер данных по всем траекториям на полигоне
     traj_list_t     traj_list;
 
+    /// Контейнер изостыков
+    conn_list_t     joints;
+
+    /// Контейнер стрелок
+    conn_list_t     switches;
+
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);
+
+    /// Загрузка топологии
+    bool load_topology(QString route_dir);
 };
 
 #endif // TOPOLOGY_H

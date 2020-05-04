@@ -2,9 +2,9 @@
 #define     CONNECTOR_H
 
 #include    <QObject>
-
-#include    "trajectory.h"
 #include    "CfgReader.h"
+
+#include    "topology-types.h"
 
 //------------------------------------------------------------------------------
 //
@@ -25,7 +25,9 @@ public:
 
     virtual void setState(int state) { this->state = state; }
 
-    virtual void configure(QDomNode secNode) = 0;
+    virtual void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list);
+
+    QString getName() const { return this->name; }
 
 protected:
 
@@ -34,6 +36,8 @@ protected:
     Trajectory *bwdTraj;
 
     int state;
+
+    QString name;
 };
 
 #endif // CONNECTOR_H

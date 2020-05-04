@@ -5,6 +5,7 @@
 #include    <QTextStream>
 
 #include    "physics.h"
+#include    "connector.h"
 
 //------------------------------------------------------------------------------
 //
@@ -14,6 +15,7 @@ Trajectory::Trajectory(QObject *parent) : QObject(parent)
   , length(0.0)
   , fwdConnector(Q_NULLPTR)
   , bwdConnector(Q_NULLPTR)
+  , is_busy(false)
 {
 
 }

@@ -14,13 +14,13 @@ public:
 
     Switch(QObject *parent = Q_NULLPTR);
 
-    ~Switch();
-
-    void configure(QDomNode secNode);
+    ~Switch();    
 
     Trajectory *getFwdTraj() const;
 
     Trajectory *getBwdTraj() const;
+
+    void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list);
 
 private:
 
