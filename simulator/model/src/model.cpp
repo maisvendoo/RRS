@@ -21,7 +21,7 @@
 #include    "Journal.h"
 #include    "JournalFile.h"
 
-#include    "trajectory.h"
+#include    "topology.h"
 
 //------------------------------------------------------------------------------
 //
@@ -137,8 +137,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     Journal::instance()->info("Train is initialized successfully");
 
-    Trajectory traj;
-    traj.load(init_data.route_dir, "forward");
+    Topology topology;
+    topology.load(init_data.route_dir);
 
     return true;
 }

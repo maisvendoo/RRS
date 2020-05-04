@@ -4,6 +4,7 @@
 #include    <QObject>
 
 #include    "track.h"
+#include    "connector.h"
 
 //------------------------------------------------------------------------------
 //
@@ -29,6 +30,10 @@ protected:
     QString                 name;
 
     double                  length;
+
+    Connector               *fwdConnector;
+
+    Connector               *bwdConnector;
 
     std::vector<track_t>    tracks;
 
