@@ -19,11 +19,11 @@ public:
 
     virtual ~Connector();
 
-    Trajectory *getFwdTraj() const { return fwdTraj; }
+    virtual Trajectory *getFwdTraj() const { return fwdTraj; }
 
-    Trajectory *getBwdTraj() const { return bwdTraj; }
+    virtual Trajectory *getBwdTraj() const { return bwdTraj; }
 
-    void setState(int state) { this->state = state; }
+    virtual void setState(int state) { this->state = state; }
 
     virtual void configure(QDomNode secNode) = 0;
 
