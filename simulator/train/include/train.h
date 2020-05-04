@@ -94,7 +94,7 @@ public:
 
     int getDirection() const;
 
-    std::vector<Vehicle *> *getVehicles();
+    std::vector<Vehicle *> *getVehicles();    
 
 signals:
 
@@ -142,7 +142,7 @@ private:
     QString     train_id;
 
     /// All train's vehicles
-    std::vector<Vehicle *> vehicles;
+    std::vector<Vehicle *> vehicles;    
 
     /// All train's couplings
     std::vector<Coupling *> couplings;

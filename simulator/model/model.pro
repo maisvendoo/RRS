@@ -83,7 +83,7 @@ INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include
 
-
+INCLUDEPATH += ../../vmmlib/include
 
 HEADERS += $$files(./include/*.h)
 HEADERS += $$files(../../common-headers/*.h)

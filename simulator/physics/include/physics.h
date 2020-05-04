@@ -52,6 +52,8 @@ public:
     static const double c;
     /// Zero equivalent
     static const double ZERO;
+    /// Radian
+    static const double RAD;
 
     /*!
      * \brief Signum function

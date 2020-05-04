@@ -24,6 +24,7 @@ const double Physics::Rmu = 8.31;
 const double Physics::Mair = 0.029;
 const double Physics::c = 340.0;
 const double Physics::ZERO = 1e-10;
+const double Physics::RAD = Physics::PI / 180.0;
 
 const double Physics::FricApproxCoeff = 1e3;
 

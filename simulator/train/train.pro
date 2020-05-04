@@ -74,5 +74,7 @@ INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../sound-manager/include
 INCLUDEPATH += ../../asound/include
 
+INCLUDEPATH += ../../vmmlib/include
+
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
