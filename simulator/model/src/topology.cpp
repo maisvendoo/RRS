@@ -55,11 +55,16 @@ bool Topology::load(QString route_dir)
 //------------------------------------------------------------------------------
 bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 {
+    if (vehicles->empty())
+    {
+        return false;
+    }
+
     vehicle_control.resize(vehicles->size());
 
     vehicle_control[0] = new VehicleController;
     vehicle_control[0]->setTrajCoord(tp.traj_coord);
-    vehicle_control[0]->setCurrentTraj(traj_list[tp.traj_name]);
+    vehicle_control[0]->setInitCurrentTraj(traj_list[tp.traj_name]);
     vehicle_control[0]->setDirection(tp.dir);
     vehicle_control[0]->setInitRailwayCoord((*vehicles)[0]->getRailwayCoord());
 
@@ -115,7 +120,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
         }
 
         vehicle_control[i]->setTrajCoord(traj_coord);
-        vehicle_control[i]->setCurrentTraj(cur_traj);
+        vehicle_control[i]->setInitCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
         vehicle_control[i]->setInitRailwayCoord((*vehicles)[i]->getRailwayCoord());
 

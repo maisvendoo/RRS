@@ -137,12 +137,12 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     Journal::instance()->info("Train is initialized successfully");
 
-    Topology topology;
+
     topology.load(init_data.route_dir);
     topology_pos_t tp;
-    tp.traj_name = "s01-2p";
-    tp.traj_coord = 900.0;
-    tp.dir = -1;
+    tp.traj_name = "s01-chp1";
+    tp.traj_coord = 700.0;
+    tp.dir = 1;
 
     topology.init(tp, train->getVehicles());
 
@@ -583,7 +583,20 @@ void Model::sharedMemoryFeedback()
         viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
 
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);        
+        VehicleController *vc = topology.getVehicleController(i);
+
+        vec3d att;
+        vec3d pos = vc->getPosition(att);
+
+        QString topDbg = QString("Тр: %1 Тр. коорд: %2 x: %3 y: %4 z: %5")
+                .arg(vc->getCurrentTraj()->getName(), 10)
+                .arg(vc->getTrajCoord(), 7, 'f', 2)
+                .arg(pos.x(), 8, 'f', 1)
+                .arg(pos.y(), 8, 'f', 1)
+                .arg(pos.z(), 8, 'f', 1);
+
+        topDbg.toWCharArray(viewer_data.te[i].DebugMsg);
+        //(*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
         /*std::copy((*it)->getDiscreteSignals().begin(),
                   (*it)->getDiscreteSignals().end(),
@@ -632,6 +645,18 @@ void Model::controlStep(double &control_time, const double control_delay)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::topologyStep()
+{
+    for (size_t i = 0; i < train->getVehicles()->size(); ++i)
+    {
+        VehicleController *vc = topology.getVehicleController(i);
+        vc[i].setRailwayCoord(train->getVehicles()->at(i)->getRailwayCoord());
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::process()
 {
     double tau = 0;
@@ -646,9 +671,11 @@ void Model::process()
         // Feedback to viewer
         sharedMemoryFeedback();
 
-        controlStep(control_time, control_delay);
+        controlStep(control_time, control_delay);        
 
         is_step_correct = step(t, dt);
+
+        topologyStep();
 
         tau += dt;
         t += dt;

@@ -97,7 +97,7 @@ vec3d Trajectory::getPosition(double x, vec3d &attitude)
 
     track = findTrack(x, next_track);
 
-    pos = (x - track.x0) * track.orth;
+    pos = track.p0 + (x - track.x0) * track.orth;
 
     attitude.x() = asin(track.orth.z()) / Physics::RAD;
     attitude.y() = 0.0;

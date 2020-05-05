@@ -37,6 +37,8 @@
 
 #include    "sim-client.h"
 
+#include    "topology.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -141,7 +143,9 @@ private:
     QTimer          controlTimer;
     QTimer          networkTimer;
 
-    ElapsedTimer    simTimer;       
+    ElapsedTimer    simTimer;
+
+    Topology topology;
 
     /// Actions, which prerare integration step
     void preStep(double t);
@@ -173,7 +177,9 @@ private:
     /// Shered memory feedback
     void sharedMemoryFeedback();
 
-    void controlStep(double &control_time, const double control_delay);    
+    void controlStep(double &control_time, const double control_delay);
+
+    void topologyStep();
 
 private slots:
 

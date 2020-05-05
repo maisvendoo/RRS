@@ -56,7 +56,7 @@ void VehicleController::setRailwayCoord(double x)
         {
             current_traj = prev_traj;
             traj_coord = prev_coord;
-            return;
+            break;
         }
     }
 
@@ -76,10 +76,16 @@ void VehicleController::setRailwayCoord(double x)
         {
             current_traj = prev_traj;
             traj_coord = prev_coord;
-            return;
+            break;
         }
 
         traj_coord = current_traj->getLength() + traj_coord;
+    }
+
+    if (current_traj != prev_traj)
+    {
+        prev_traj->setBusy(false);
+        current_traj->setBusy(true);
     }
 }
 
@@ -94,9 +100,9 @@ void VehicleController::setInitRailwayCoord(double x)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleController::setCurrentTraj(Trajectory *traj)
+void VehicleController::setInitCurrentTraj(Trajectory *traj)
 {
-    current_traj = traj;
+    current_traj = prev_traj = traj;
 }
 
 //------------------------------------------------------------------------------
