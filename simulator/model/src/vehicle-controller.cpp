@@ -75,3 +75,29 @@ void VehicleController::setRailwayCoord(double x)
         return;
     }
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleController::setInitRailwayCoord(double x)
+{
+    x_prev = x_cur = x;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleController::setCurrentTraj(Trajectory *traj)
+{
+    current_traj = traj;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vec3d VehicleController::getPosition(vec3d &attitude) const
+{
+    vec3d pos = current_traj->getPosition(traj_coord, attitude);
+
+    return pos;
+}

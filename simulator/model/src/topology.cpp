@@ -53,6 +53,61 @@ bool Topology::load(QString route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
+{
+    vehicle_control.resize(vehicles->size());
+
+    vehicle_control[0]->setTrajCoord(tp.traj_coord);
+    vehicle_control[0]->setCurrentTraj(traj_list[tp.traj_name]);
+    vehicle_control[0]->setDirection(tp.dir);
+    vehicle_control[0]->setInitRailwayCoord((*vehicles)[0]->getRailwayCoord());
+
+    double traj_coord = tp.traj_coord;
+    Trajectory *cur_traj = traj_list[tp.traj_name];
+
+    for (size_t i = 0; i < vehicles->size(); ++i)
+    {
+        double L = (vehicles->at(i - 1)->getLength() + vehicles->at(i)->getLength()) / 2.0;
+
+        double new_traj_coord = traj_coord - tp.dir * L;
+
+        if (new_traj_coord < 0)
+        {
+            traj_coord = cur_traj->getLength() + new_traj_coord;
+            cur_traj = cur_traj->getBwdConnector()->getBwdTraj();
+        }
+
+        if (new_traj_coord > cur_traj->getLength())
+        {
+            traj_coord = new_traj_coord - cur_traj->getLength();
+            cur_traj = cur_traj->getFwdConnector()->getFwdTraj();
+        }
+
+        if (cur_traj == Q_NULLPTR)
+        {
+            return false;
+        }
+
+        vehicle_control[i]->setTrajCoord(traj_coord);
+        vehicle_control[i]->setCurrentTraj(cur_traj);
+        vehicle_control[i]->setDirection(tp.dir);
+        vehicle_control[i]->setInitRailwayCoord((*vehicles)[i]->getRailwayCoord());
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+VehicleController *Topology::getVehicleController(size_t idx) const
+{
+    return vehicle_control[idx];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QStringList Topology::getTrajNamesList(QString route_dir)
 {
     QDir traj_dir(route_dir + QDir::separator() + "trajectories");

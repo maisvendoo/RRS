@@ -20,6 +20,16 @@ public:
 
     void setRailwayCoord(double x);
 
+    void setInitRailwayCoord(double x);
+
+    void setCurrentTraj(Trajectory *traj);
+
+    void setTrajCoord(double traj_coord) { this->traj_coord = traj_coord; }
+
+    void setDirection(int dir) { this->dir = dir; }
+
+    vec3d getPosition(vec3d &attitude) const;
+
 protected:
 
     /// Предыдущее значение дуговой координаты ПЕ

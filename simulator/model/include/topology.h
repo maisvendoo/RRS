@@ -5,6 +5,9 @@
 #include    <QMap>
 
 #include    "topology-types.h"
+#include    "vehicle-controller.h"
+
+#include    "vehicle.h"
 
 //------------------------------------------------------------------------------
 //
@@ -22,6 +25,12 @@ public:
     /// Загрузка топологии ж/д полигона
     bool load(QString route_dir);
 
+    /// Общая инициализация
+    bool init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles);
+
+    /// Вернуть контроллер конкретной ПЕ
+    VehicleController *getVehicleController(size_t idx) const;
+
 protected:
 
     /// Контейнер данных по всем траекториям на полигоне
@@ -32,6 +41,9 @@ protected:
 
     /// Контейнер стрелок
     conn_list_t     switches;
+
+    /// Контейнер контроллеров ПЕ
+    std::vector<VehicleController *> vehicle_control;
 
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);
