@@ -57,6 +57,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 {
     vehicle_control.resize(vehicles->size());
 
+    vehicle_control[0] = new VehicleController;
     vehicle_control[0]->setTrajCoord(tp.traj_coord);
     vehicle_control[0]->setCurrentTraj(traj_list[tp.traj_name]);
     vehicle_control[0]->setDirection(tp.dir);
@@ -65,33 +66,60 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
     double traj_coord = tp.traj_coord;
     Trajectory *cur_traj = traj_list[tp.traj_name];
 
-    for (size_t i = 0; i < vehicles->size(); ++i)
+    cur_traj->setBusy(true);
+
+    for (size_t i = 1; i < vehicles->size(); ++i)
     {
-        double L = (vehicles->at(i - 1)->getLength() + vehicles->at(i)->getLength()) / 2.0;
+        vehicle_control[i] = new VehicleController;
 
-        double new_traj_coord = traj_coord - tp.dir * L;
+        double L = ((*vehicles)[i-1]->getLength() + (*vehicles)[i]->getLength()) / 2.0;
 
-        if (new_traj_coord < 0)
+        traj_coord = traj_coord - tp.dir * L;
+
+        while (traj_coord < 0)
         {
-            traj_coord = cur_traj->getLength() + new_traj_coord;
-            cur_traj = cur_traj->getBwdConnector()->getBwdTraj();
+            Connector *conn = cur_traj->getBwdConnector();
+
+            if (conn == Q_NULLPTR)
+            {
+                return false;
+            }
+
+            cur_traj = conn->getBwdTraj();
+
+            if (cur_traj == Q_NULLPTR)
+            {
+                return false;
+            }
+
+            traj_coord = cur_traj->getLength() + traj_coord;
         }
 
-        if (new_traj_coord > cur_traj->getLength())
+        while (traj_coord > cur_traj->getLength())
         {
-            traj_coord = new_traj_coord - cur_traj->getLength();
-            cur_traj = cur_traj->getFwdConnector()->getFwdTraj();
-        }
+            traj_coord = traj_coord - cur_traj->getLength();
 
-        if (cur_traj == Q_NULLPTR)
-        {
-            return false;
+            Connector *conn = cur_traj->getFwdConnector();
+
+            if (conn == Q_NULLPTR)
+            {
+                return false;
+            }
+
+            cur_traj = conn->getFwdTraj();
+
+            if (cur_traj == Q_NULLPTR)
+            {
+                return false;
+            }
         }
 
         vehicle_control[i]->setTrajCoord(traj_coord);
         vehicle_control[i]->setCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
         vehicle_control[i]->setInitRailwayCoord((*vehicles)[i]->getRailwayCoord());
+
+        cur_traj->setBusy(true);
     }
 
     return true;

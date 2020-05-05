@@ -11,6 +11,7 @@ VehicleController::VehicleController(QObject *parent) : QObject(parent)
   , dir(1)
   , traj_coord(0.0)
   , current_traj(Q_NULLPTR)
+  , prev_traj(Q_NULLPTR)
 {
 
 }
@@ -31,48 +32,54 @@ void VehicleController::setRailwayCoord(double x)
     x_prev = x_cur;
     x_cur = x;
 
+    double prev_coord = traj_coord;
+
     traj_coord += dir * (x_cur - x_prev);
 
-    Trajectory *prev_traj = current_traj;
+    prev_traj = current_traj;
 
-    if (traj_coord < 0)
+    while (traj_coord > current_traj->getLength())
     {
-        current_traj = current_traj->getBwdConnector()->getBwdTraj();
+        Connector *conn = current_traj->getFwdConnector();
+
+        if (conn == Q_NULLPTR)
+        {
+            traj_coord = prev_coord;
+            return;
+        }
+
+        traj_coord = traj_coord - current_traj->getLength();
+
+        current_traj = conn->getFwdTraj();
 
         if (current_traj == Q_NULLPTR)
         {
             current_traj = prev_traj;
-            current_traj->setBusy(true);
-            traj_coord = 0;
+            traj_coord = prev_coord;
             return;
         }
-
-        traj_coord = current_traj->getLength();
-
-        prev_traj->setBusy(false);
-        current_traj->setBusy(true);
-
-        return;
     }
 
-    if (traj_coord > current_traj->getLength())
+    while (traj_coord < 0)
     {
-        current_traj = current_traj->getFwdConnector()->getFwdTraj();
+        Connector *conn = current_traj->getBwdConnector();
+
+        if (conn == Q_NULLPTR)
+        {
+            traj_coord = prev_coord;
+            return;
+        }
+
+        current_traj = conn->getBwdTraj();
 
         if (current_traj == Q_NULLPTR)
         {
             current_traj = prev_traj;
-            current_traj->setBusy(true);
-            traj_coord = current_traj->getLength();
+            traj_coord = prev_coord;
             return;
         }
 
-        traj_coord = 0;
-
-        prev_traj->setBusy(false);
-        current_traj->setBusy(true);
-
-        return;
+        traj_coord = current_traj->getLength() + traj_coord;
     }
 }
 

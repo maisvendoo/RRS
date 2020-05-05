@@ -139,6 +139,12 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     Topology topology;
     topology.load(init_data.route_dir);
+    topology_pos_t tp;
+    tp.traj_name = "s01-2p";
+    tp.traj_coord = 900.0;
+    tp.dir = -1;
+
+    topology.init(tp, train->getVehicles());
 
     return true;
 }

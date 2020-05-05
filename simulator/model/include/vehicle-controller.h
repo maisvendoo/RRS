@@ -45,6 +45,8 @@ protected:
     double traj_coord;
 
     Trajectory *current_traj;
+
+    Trajectory *prev_traj;
 };
 
 #endif // VEHICLE_CONTROLLER_H
