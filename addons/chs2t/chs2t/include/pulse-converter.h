@@ -3,16 +3,16 @@
 
 #include "device.h"
 
-class PulseConverter : public Device
+class DCPulseConverter : public Device
 {
 
 public:
 
     ///Конструктор
-    PulseConverter(QObject *parent = Q_NULLPTR);
+    DCPulseConverter(QObject *parent = Q_NULLPTR);
 
     ///Деструктор
-    ~PulseConverter();
+    ~DCPulseConverter();
 
     void setU(double value) { u = value; }
 

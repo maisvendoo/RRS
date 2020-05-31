@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>2</Order>
+        <Ra>0.03145</Ra>
+        <Rf>0.01709</Rf>
+        <Rd>0.02758</Rd>
+        <Ta>5.0</Ta>
+        <Tf>1.0</Tf>
+    </Device>
+</Config>

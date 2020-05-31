@@ -183,7 +183,7 @@ void CHS2T::initEDT()
     connect(generator, &Generator::soundSetPitch, this, &CHS2T::soundSetPitch);
     connect(generator, &Generator::soundSetVolume, this, &CHS2T::soundSetVolume);
 
-    pulseConv = new PulseConverter();
+    pulseConv = new DCPulseConverter();
 
     BrakeReg = new BrakeRegulator();
     BrakeReg->read_custom_config(config_dir + QDir::separator() + "brake-regulator");

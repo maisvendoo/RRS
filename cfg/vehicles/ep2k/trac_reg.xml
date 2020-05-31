@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>1</Order>
+        <I_max>565</I_max>
+        <omega_nom>25.5</omega_nom>
+        <K>100.0</K>
+        <beta_min>0.4</beta_min>
+    </Device>
+</Config>

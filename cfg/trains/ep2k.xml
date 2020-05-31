@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+ 
+    <Common>
+        <CouplingModule>default-coupling</CouplingModule>
+        <CabineInVehicle>0</CabineInVehicle>
+        <ChargingPressure>0.5</ChargingPressure>
+        <InitMainResPressure>0.9</InitMainResPressure>
+        <NoAir>0</NoAir>
+        <Title>ЭП2К (импульсный)</Title>
+        <Description>Модель электровоза для дипломников</Description>            
+    </Common>
+ 
+    <Vehicle>
+         <Module>ep2k</Module>
+         <ModuleConfig>ep2k</ModuleConfig>
+         <Count>1</Count>
+         <PayloadCoeff>1</PayloadCoeff>    
+    </Vehicle>
+ 
+</Config>

@@ -138,13 +138,13 @@ bool Model::init(const simulator_command_line_t &command_line)
     Journal::instance()->info("Train is initialized successfully");
 
 
-    topology.load(init_data.route_dir);
+    /*topology.load(init_data.route_dir);
     topology_pos_t tp;
     tp.traj_name = "s01-chp1";
     tp.traj_coord = 700.0;
     tp.dir = 1;
 
-    topology.init(tp, train->getVehicles());
+    topology.init(tp, train->getVehicles());*/
 
     return true;
 }
@@ -583,7 +583,7 @@ void Model::sharedMemoryFeedback()
         viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
 
-        VehicleController *vc = topology.getVehicleController(i);
+        /*VehicleController *vc = topology.getVehicleController(i);
 
         vec3d att;
         vec3d pos = vc->getPosition(att);
@@ -593,10 +593,10 @@ void Model::sharedMemoryFeedback()
                 .arg(vc->getTrajCoord(), 7, 'f', 2)
                 .arg(pos.x(), 8, 'f', 1)
                 .arg(pos.y(), 8, 'f', 1)
-                .arg(pos.z(), 8, 'f', 1);
+                .arg(pos.z(), 8, 'f', 1);*/
 
-        topDbg.toWCharArray(viewer_data.te[i].DebugMsg);
-        //(*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
+        //topDbg.toWCharArray(viewer_data.te[i].DebugMsg);
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
         /*std::copy((*it)->getDiscreteSignals().begin(),
                   (*it)->getDiscreteSignals().end(),
@@ -675,7 +675,7 @@ void Model::process()
 
         is_step_correct = step(t, dt);
 
-        topologyStep();
+        //topologyStep();
 
         tau += dt;
         t += dt;

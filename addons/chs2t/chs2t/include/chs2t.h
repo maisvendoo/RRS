@@ -165,7 +165,7 @@ private:
     Generator   *generator;
 
     /// Импульсный преобразователь возбуждения
-    PulseConverter  *pulseConv;
+    DCPulseConverter  *pulseConv;
 
     /// Регулятор тормозного усилия (САРТ)
     BrakeRegulator  *BrakeReg;
