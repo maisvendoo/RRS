@@ -21,6 +21,10 @@
 //------------------------------------------------------------------------------
 CHS2T::CHS2T() : Vehicle()
 {
+    eptSwitch.setOnSoundName("tumbler");
+    eptSwitch.setOffSoundName("tumbler");
+    connect(&eptSwitch, &Trigger::soundPlay, this, &CHS2T::soundPlay);
+
     U_bat = 55.0;
 
     tracForce_kN = 0;
@@ -83,6 +87,8 @@ void CHS2T::initialization()
 
     initRegistrator();
 
+    initTapSounds();
+
     for (size_t i = SWP1_POWER_1; i <= SWP1_POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
 
@@ -140,6 +146,8 @@ void CHS2T::step(double t, double dt)
     stepSwitcherPanel();
 
     stepDecodeAlsn();
+
+    stepTapSound();
 
     registrate(t, dt);
 

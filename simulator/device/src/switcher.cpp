@@ -28,7 +28,7 @@ void Switcher::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double 
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
-    Q_UNUSED(dYdt)    
+    Q_UNUSED(dYdt)
 }
 
 //------------------------------------------------------------------------------
@@ -67,7 +67,6 @@ void Switcher::stepKeysControl(double t, double dt)
     std::fill(is_switched.begin(), is_switched.end(), false);
     is_switched[static_cast<size_t>(state)] = true;
 }
-
 
 
 
