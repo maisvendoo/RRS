@@ -85,7 +85,7 @@ void CHS2T::initialization()
 
     initModbus();
 
-    initRegistrator();
+    //initRegistrator();
 
     initTapSounds();
 
@@ -149,7 +149,7 @@ void CHS2T::step(double t, double dt)
 
     stepTapSound();
 
-    registrate(t, dt);
+    //registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
     horn->setControl(keys, control_signals);

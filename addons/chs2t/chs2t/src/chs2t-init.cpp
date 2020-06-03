@@ -204,6 +204,11 @@ void CHS2T::initEDT()
     EDT_timer.setTimeout(3.0);
     EDT_timer.firstProcess(false);
     connect(&EDT_timer, &Timer::process, this, &CHS2T::enableEDT);
+
+    EDTSwitch.setOnSoundName("tumbler");
+    EDTSwitch.setOffSoundName("tumbler");
+    connect(&EDTSwitch, &Trigger::soundPlay, this, &CHS2T::soundPlay);
+    connect(&EDTSwitch, &Trigger::soundStop, this, &CHS2T::soundStop);
 }
 
 //------------------------------------------------------------------------------
