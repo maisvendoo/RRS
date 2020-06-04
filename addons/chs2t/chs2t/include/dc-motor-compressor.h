@@ -16,7 +16,7 @@ public:
 
     void setExternalPressure(double press) { p = press; }
 
-    void setU(double value) { U = value; }
+    void setU(double value);
 
     void setPressure(double value) { p = value; }
 

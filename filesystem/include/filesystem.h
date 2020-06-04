@@ -2,6 +2,7 @@
 #define		FILESYSTEM_H
 
 #include    <QDir>
+#include    <QCoreApplication>
 
 #ifdef FILESYSTEM_LIB
     #define FILESYSTEM_EXPORT   Q_DECL_EXPORT
@@ -21,8 +22,16 @@ public:
     {
         static FileSystem instance;
 
-        std::string workDir = QDir::currentPath().toStdString();
+        std::string workDir = QCoreApplication::applicationDirPath().toStdString();
+
+#ifdef __WIN32__
         std::string tmp = instance.getLevelUpDirectory(workDir, 1);
+#else
+        std::string tmp = QDir::homePath().toStdString() +
+                instance.separator() +
+                ".RRS" + instance.separator();
+#endif
+
         instance.setBinaryDir(workDir);
         instance.setRouteRootDir(tmp + "routes");
         instance.setConfigDir(tmp + "cfg");

@@ -14,7 +14,7 @@ public:
 
     ~DCMotorFan();
 
-    void setU(double value) { U = value; }
+    void setU(double value);
     double getU() { return U; }
 
     void setSoundName(QString name) { soundName = name; }

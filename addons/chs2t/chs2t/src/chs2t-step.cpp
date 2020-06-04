@@ -68,6 +68,8 @@ void CHS2T::stepFastSwitch(double t, double dt)
     if (fastSwitchSw->getState() == 3)
     {
         fast_switch_trigger.set();
+        if (!bv_return)
+            emit soundPlay("BV-on");
         bv_return = true;
     }
 
@@ -130,8 +132,6 @@ void CHS2T::stepTractionControl(double t, double dt)
         Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
-
-    emit soundSetPitch("Motion", static_cast<float>(abs(velocity * Physics::kmh) / 160));
 }
 
 //------------------------------------------------------------------------------
@@ -328,4 +328,17 @@ bool CHS2T::getHoldingCoilState() const
     bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
     return no_overload;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::stepTapSound()
+{
+    double speed = abs(this->velocity) * 3.6;
+
+    for (int i = 0; i < tap_sounds.count(); ++i)
+    {
+        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
+    }
 }
