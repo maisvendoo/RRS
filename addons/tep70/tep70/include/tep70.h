@@ -348,7 +348,7 @@ private:
     Trigger  epk_key;
 
     /// Инициализация всех систем тепловоза
-    void initialization();
+    void initialization() override;
 
     /// Инициализация органов управления в кабине
     void initCabineControls();
@@ -381,7 +381,7 @@ private:
     void initSounds();
 
     /// Шаг моделирования всех систем локомотива в целом
-    void step(double t, double dt);
+    void step(double t, double dt) override;
 
     /// Шаг моделирования органов управления в кабине
     void stepCabineControls(double t, double dt);
@@ -420,10 +420,10 @@ private:
     float getLampState(double signal);
 
     /// Загрузка данных из конфигурационных файлов
-    void loadConfig(QString cfg_path);
+    void loadConfig(QString cfg_path) override;
 
     /// Обработка клавиш
-    void keyProcess();
+    void keyProcess() override;
 };
 
 #endif // TEP70_H
