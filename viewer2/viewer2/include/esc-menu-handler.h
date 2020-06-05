@@ -26,10 +26,6 @@ private:
     QMenu   *menu;    
 
     void showMenu(osgViewer::View *view);
-
-private slots:    
-
-    void quit();
 };
 
 

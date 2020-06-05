@@ -22,11 +22,9 @@ EscMenuHandler::EscMenuHandler(QObject *parent)
     menu->addAction(saveAction);
     menu->addAction(optionsAction);
     menu->addSeparator();
-    menu->addAction(quitAction);
+    menu->addAction(quitAction);    
 
-    connect(menu, &QMenu::aboutToShow, this, &EscMenuHandler::showed);
-
-    connect(quitAction, &QAction::triggered, this, &EscMenuHandler::quit);
+    connect(quitAction, &QAction::triggered, this, &QApplication::quit);
 }
 
 //------------------------------------------------------------------------------
@@ -75,12 +73,4 @@ void EscMenuHandler::showMenu(osgViewer::View *view)
     int h = menu->height();
 
     menu->setGeometry(center_x - w / 2, center_y - h / 2, w, h);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EscMenuHandler::quit()
-{
-    QApplication::quit();
 }
