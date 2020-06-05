@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    
+    <View>
+        <pos>0.0 0.0 0.0</pos>
+        <rot>0.0 0.0 0.0</rot>
+        <x>50</x>
+        <y>50</y>
+        <width>1280</width>
+        <height>720</height>
+        <fullscreen>0</fullscreen>
+        <show_title>1</show_title>
+        <screen_num>0</screen_num>
+    </View>
+
+</Config>

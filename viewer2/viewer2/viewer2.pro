@@ -8,6 +8,7 @@ QT += gui
 QT += widgets
 QT += network
 QT += opengl
+QT += xml
 
 TARGET = viewer2
 
@@ -30,7 +31,9 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
         LIBS += -L$$OSG_LIB_DIRECTORY -losgTextd
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5d        
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5d
+
+        LIBS += -L../../../lib -lCfgReader_d
 
     } else {
 
@@ -42,6 +45,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
         LIBS += -L$$OSG_LIB_DIRECTORY -losgText
         LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5        
+
+        LIBS += -L../../../lib -lCfgReader
     }
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
@@ -60,7 +65,9 @@ unix {
         LIBS += -losgGAd
         LIBS += -losgUtild
         LIBS += -losgTextd
-        LIBS += -losgQt5d        
+        LIBS += -losgQt5d
+
+        LIBS += -L../../../lib -lCfgReader_d
 
     } else {
 
@@ -71,11 +78,14 @@ unix {
         LIBS += -losgGA
         LIBS += -losgUtil
         LIBS += -losgText
-        LIBS += -losgQt5        
+        LIBS += -losgQt5
+
+        LIBS += -L../../../lib -lCfgReader
     }
 }
 
 INCLUDEPATH += ./include
+INCLUDEPATH += ../../CfgReader/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
