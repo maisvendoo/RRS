@@ -11,6 +11,7 @@ SUBDIRS += ./asound
 SUBDIRS += ./simulator
 
 SUBDIRS += ./viewer
+SUBDIRS += ./viewer2
 
 SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/vl60
