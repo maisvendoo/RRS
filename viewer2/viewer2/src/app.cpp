@@ -45,14 +45,13 @@ int App::exec()
     case CmdlineHelp:
 
         parser.showHelp();
-        return 0;
 
     case CmdlineVersion:
 
-        return 0;
+        parser.showVersion();
     }
 
-    return QApplication::exec();
+    return viewer.run();
 }
 
 //------------------------------------------------------------------------------
@@ -94,12 +93,12 @@ App::CmdlineParseResult App::parseCmdLine(QCommandLineParser &p,
 
     if (p.isSet(train_cfg))
     {
-        train_config = p.value(train_cfg);
+        cmd_line.train_config = p.value(train_cfg);
     }
 
     if (p.isSet(route))
     {
-        route_dir = p.value(route);
+        cmd_line.route_dir = p.value(route);
     }
 
     return CmdlineOk;
@@ -110,26 +109,30 @@ App::CmdlineParseResult App::parseCmdLine(QCommandLineParser &p,
 //------------------------------------------------------------------------------
 bool App::init()
 {
-    QString work_dir = QApplication::applicationDirPath();
-    QDir root_dir(work_dir);
-    root_dir.cdUp();
+    load_settings(get_config_dir() + QDir::separator() + "settings.xml");
 
-    QString route_path = root_dir.path() +
-            QDir::separator() +
-            "routes" +
-            QDir::separator() +
-            route_dir;
+    viewer.setUpViewInWindow(0, 0, 1280, 720);
 
-    QString train_path = root_dir.path() +
-            QDir::separator() +
-            "cfg" +
-            QDir::separator() +
-            "trains" +
-            QDir::separator() +
-            train_config + ".xml";
+    return true;
+}
 
-    viewer = new QThreadViewer(root_dir.path(), route_path, train_path);
-    viewer->start();
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString App::get_config_dir()
+{
+    QDir work_dir(this->applicationDirPath());
+    work_dir.cdUp();
 
+    QString cfg_path = QDir::toNativeSeparators(work_dir.path()) + QDir::separator() + "cfg";
+
+    return cfg_path;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool App::load_settings(QString cfg_path)
+{
     return true;
 }

@@ -4,12 +4,13 @@
 #include    <QApplication>
 #include    <QCommandLineParser>
 
-#include    "qthread-viewer.h"
+#include    "command-line.h"
+#include    "qviewer.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class App : public QApplication
+class App : QApplication
 {
 public:
 
@@ -21,13 +22,11 @@ public:
 
 private:
 
-    QString route_dir;
-
-    QString train_config;
-
     QCommandLineParser  parser;
 
-    QThreadViewer       *viewer;
+    command_line_t      cmd_line;
+
+    QViewer             viewer;
 
     enum CmdlineParseResult
     {
@@ -40,6 +39,10 @@ private:
     CmdlineParseResult parseCmdLine(QCommandLineParser &p, QString &errorMessage);
 
     bool init();
+
+    QString get_config_dir();
+
+    bool load_settings(QString cfg_path);
 };
 
 #endif // APP_H
