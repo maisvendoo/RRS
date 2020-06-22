@@ -5,6 +5,9 @@
 
 #include    <osgViewer/Viewer>
 
+#include    "settings.h"
+#include    "command-line.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -20,9 +23,14 @@ public:
 
     int run();
 
+    void init(const settings_t &settings,
+              const command_line_t &cmd_line);
+
 private:
 
+    osg::ref_ptr<osg::Camera>   camera;
 
+    void initWindow(const settings_t &settings);
 };
 
 #endif // QVIEWER_H

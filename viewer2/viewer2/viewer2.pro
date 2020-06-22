@@ -32,6 +32,7 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
         LIBS += -L$$OSG_LIB_DIRECTORY -losgTextd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5d
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgWidgetd
 
         LIBS += -L../../../lib -lCfgReader_d
 
@@ -44,7 +45,8 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
         LIBS += -L$$OSG_LIB_DIRECTORY -losgText
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5        
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5
+        LIBS += -L$$OSG_LIB_DIRECTORY -losgWidget
 
         LIBS += -L../../../lib -lCfgReader
     }
@@ -66,6 +68,7 @@ unix {
         LIBS += -losgUtild
         LIBS += -losgTextd
         LIBS += -losgQt5d
+        LIBS += -losgWidgetd
 
         LIBS += -L../../../lib -lCfgReader_d
 
@@ -79,6 +82,7 @@ unix {
         LIBS += -losgUtil
         LIBS += -losgText
         LIBS += -losgQt5
+        LIBS += -losgWidget
 
         LIBS += -L../../../lib -lCfgReader
     }

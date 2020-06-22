@@ -1,5 +1,7 @@
 #include    "app.h"
 
+#include    "CfgReader.h"
+
 #include    <QDir>
 
 //------------------------------------------------------------------------------
@@ -111,7 +113,7 @@ bool App::init()
 {
     load_settings(get_config_dir() + QDir::separator() + "settings.xml");
 
-    viewer.setUpViewInWindow(0, 0, 1280, 720);
+    viewer.init(settings, cmd_line);
 
     return true;
 }
@@ -134,5 +136,36 @@ QString App::get_config_dir()
 //------------------------------------------------------------------------------
 bool App::load_settings(QString cfg_path)
 {
+    CfgReader cfg;
+
+    if (!cfg.load(cfg_path))
+    {
+        return false;
+    }
+
+    QString secName = "Viewer";
+
+    cfg.getInt(secName, "posX", settings.posX);
+    cfg.getInt(secName, "posY", settings.posY);
+    cfg.getInt(secName, "Width", settings.width);
+    cfg.getInt(secName, "Height", settings.height);
+    cfg.getBool(secName, "FullScreen", settings.fullscreen);
+
+    int screen_num = 0;
+    cfg.getInt(secName, "ScreenNumber", screen_num);
+    settings.screen_num = static_cast<unsigned int>(screen_num);
+
+    cfg.getBool(secName, "WindowDecoration", settings.window_title);
+    cfg.getDouble(secName, "FovY", settings.fovY);
+    cfg.getDouble(secName, "zNear", settings.zNear);
+    cfg.getDouble(secName, "zFar", settings.zFar);
+    cfg.getBool(secName, "DoubleBuffer", settings.double_buffer);
+
+    int samples = 4;
+    cfg.getInt(secName, "Samples", samples);
+    settings.samples = static_cast<unsigned int>(samples);
+
+    cfg.getDouble(secName, "ViewDistance", settings.view_distance);
+
     return true;
 }

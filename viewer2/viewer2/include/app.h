@@ -5,6 +5,7 @@
 #include    <QCommandLineParser>
 
 #include    "command-line.h"
+#include    "settings.h"
 #include    "qviewer.h"
 
 //------------------------------------------------------------------------------
@@ -25,6 +26,8 @@ private:
     QCommandLineParser  parser;
 
     command_line_t      cmd_line;
+
+    settings_t          settings;
 
     QViewer             viewer;
 
