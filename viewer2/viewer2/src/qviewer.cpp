@@ -2,6 +2,11 @@
 
 #include    "qt-events-handler.h"
 
+#include    "menu.h"
+
+#include    <osgWidget/WindowManager>
+#include    <osgWidget/ViewerEventHandlers>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -37,6 +42,8 @@ void QViewer::init(const settings_t &settings,
                    const command_line_t &cmd_line)
 {
     initWindow(settings);
+
+    initMainMenu();
 }
 
 //------------------------------------------------------------------------------
@@ -44,6 +51,8 @@ void QViewer::init(const settings_t &settings,
 //------------------------------------------------------------------------------
 void QViewer::initWindow(const settings_t &settings)
 {
+    this->settings = settings;
+
     osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     traits->x = settings.posX;
     traits->y = settings.posY;
@@ -68,4 +77,51 @@ void QViewer::initWindow(const settings_t &settings)
         setUpViewOnSingleScreen(settings.screen_num);
     else
         setUpViewInWindow(traits->x, traits->y, traits->width, traits->height);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void QViewer::initMainMenu()
+{
+    osg::ref_ptr<osgWidget::WindowManager> wm = new osgWidget::WindowManager(this,
+                                                                settings.width,
+                                                                settings.height,
+                                                                0xF0000000);
+
+    osg::ref_ptr<osgWidget::Window> menu = new osgWidget::Box();
+    osgWidget::Label *label = new osgWidget::Label;
+    label->setFontSize(14);
+    label->setAlignHorizontal(osgWidget::Label::HA_CENTER);
+
+    int width = 200;
+    int height = 36;
+
+    label->addWidth(width);
+    label->addHeight(height);
+    label->setColor(0.0, 0.0, 0.0, 1.0);
+    label->setLabel(L"Return");
+    menu->addWidget(label);
+
+    menu->setX((settings.width - width) / 2);
+    menu->setY((settings.height - height) / 2);
+
+    wm->addChild(menu.get());
+    wm->resizeAllWindows();
+
+    menu->getBackground()->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //menu->resizePercent(100.0f);
+
+    osg::ref_ptr<osg::Group> root = new osg::Group;
+
+    osg::Camera *cam = wm->createParentOrthoCamera();
+
+    root->addChild(cam);
+
+    addEventHandler(new osgWidget::MouseHandler(wm.get()) );
+    addEventHandler(new osgWidget::KeyboardHandler(wm.get()) );
+    addEventHandler(new osgWidget::ResizeHandler(wm.get(), cam) );
+    addEventHandler(new osgWidget::CameraSwitchHandler(wm.get(), cam) );
+
+    this->setSceneData(root.get());
 }

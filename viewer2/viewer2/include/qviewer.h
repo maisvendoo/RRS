@@ -4,6 +4,7 @@
 #include    <QObject>
 
 #include    <osgViewer/Viewer>
+#include    <osgWidget/WindowManager>
 
 #include    "settings.h"
 #include    "command-line.h"
@@ -30,7 +31,13 @@ private:
 
     osg::ref_ptr<osg::Camera>   camera;
 
+    settings_t settings;
+
+    osg::ref_ptr<osgWidget::WindowManager> wm;
+
     void initWindow(const settings_t &settings);
+
+    void initMainMenu();
 };
 
 #endif // QVIEWER_H
