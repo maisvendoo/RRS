@@ -1,38 +1,49 @@
 #ifndef     LABEL_H
 #define     LABEL_H
 
-#include    <QString>
+#include    <QObject>
 
 #include    <osgWidget/Label>
 
-class Label : public osgWidget::Label
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class Label : public QObject, public osgWidget::Label
 {
+    Q_OBJECT
+
 public:
 
-    Label(const QString &label);
+    Label(int width = 100, int height = 50);
 
-    bool mousePush(double, double, const osgWidget::WindowManager *)
-    {
-        return true;
-    }
+    bool mousePush(double cx, double cy, const osgWidget::WindowManager *wm) override;
 
-    bool mouseEnter(double, double, const osgWidget::WindowManager *)
-    {
-        setColor(0.6f, 0.6f, 0.6f, 1.0f);
+    bool mouseEnter(double cx, double cy, const osgWidget::WindowManager *wm) override;
 
-        return true;
-    }
+    bool mouseLeave(double cx, double cy, const osgWidget::WindowManager *wm) override;
 
-    bool mouseLeave(double, double, const osgWidget::WindowManager *)
-    {
-        setColor(0.3f, 0.3f, 0.3f, 1.0f);
-
-        return true;
-    }
+    bool isActive() const { return is_active; }
 
 private:
 
-    wchar_t str[2048];
+    std::string font_name;
+
+    int width;
+
+    int height;
+
+    osgWidget::Color    font_color;
+
+    osgWidget::Color    back_color;
+
+    osgWidget::Color    active_color;
+
+    bool                is_active;
+
+signals:
+
+    void action();
 };
 
 #endif // LABEL_H

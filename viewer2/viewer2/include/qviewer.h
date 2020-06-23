@@ -38,6 +38,7 @@ private:
     void initWindow(const settings_t &settings);
 
     void initMainMenu();
+
 };
 
 #endif // QVIEWER_H

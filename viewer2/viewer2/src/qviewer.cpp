@@ -1,11 +1,15 @@
 #include    "qviewer.h"
 
 #include    "qt-events-handler.h"
+#include    "quit-handler.h"
+#include    "esc-press-handler.h"
 
 #include    "menu.h"
+#include    "label.h"
 
 #include    <osgWidget/WindowManager>
 #include    <osgWidget/ViewerEventHandlers>
+
 
 //------------------------------------------------------------------------------
 //
@@ -31,6 +35,8 @@ int QViewer::run()
 {
     osg::ref_ptr<QtEventsHandler> qt_events_hendler = new QtEventsHandler;
     this->addEventHandler(qt_events_hendler.get());
+
+    this->setKeyEventSetsDone(0);
 
     return osgViewer::Viewer::run();
 }
@@ -89,34 +95,33 @@ void QViewer::initMainMenu()
                                                                 settings.height,
                                                                 0xF0000000);
 
-    osg::ref_ptr<osgWidget::Window> menu = new osgWidget::Box();
-    osgWidget::Label *label = new osgWidget::Label;
-    label->setFontSize(14);
-    label->setAlignHorizontal(osgWidget::Label::HA_CENTER);
+    osg::ref_ptr<MainMenu> menu = new MainMenu;
 
-    int width = 200;
-    int height = 36;
+    menu->addItem("Выход");
+    osg::ref_ptr<QuitHandler> quit_handler = new QuitHandler;
+    connect(menu->getItem(0), &Label::action, quit_handler, &QuitHandler::quit);
+    this->addEventHandler(quit_handler.get());
 
-    label->addWidth(width);
-    label->addHeight(height);
-    label->setColor(0.0, 0.0, 0.0, 1.0);
-    label->setLabel(L"Return");
-    menu->addWidget(label);
+    menu->addItem("Назад");
+    osg::ref_ptr<EscPressHandler> esc_handler = new EscPressHandler(menu.get());
+    connect(menu->getItem(1), &Label::action, esc_handler, &EscPressHandler::slotHide);
+    this->addEventHandler(esc_handler.get());
 
-    menu->setX((settings.width - width) / 2);
-    menu->setY((settings.height - height) / 2);
+
+    menu->setX((settings.width - static_cast<int>(menu->getWidth())) / 2);
+    menu->setY((settings.height - static_cast<int>(menu->getHeight())) / 2);
 
     wm->addChild(menu.get());
-    wm->resizeAllWindows();
-
-    menu->getBackground()->setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    //menu->resizePercent(100.0f);
+    wm->resizeAllWindows();    
 
     osg::ref_ptr<osg::Group> root = new osg::Group;
 
     osg::Camera *cam = wm->createParentOrthoCamera();
 
     root->addChild(cam);
+
+    menu->hide();
+
 
     addEventHandler(new osgWidget::MouseHandler(wm.get()) );
     addEventHandler(new osgWidget::KeyboardHandler(wm.get()) );
@@ -125,3 +130,5 @@ void QViewer::initMainMenu()
 
     this->setSceneData(root.get());
 }
+
+

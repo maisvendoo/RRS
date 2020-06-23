@@ -1,17 +1,46 @@
 #include    "label.h"
 
-#include    <osgText/String>
-
-Label::Label(const QString &label) : osgWidget::Label()
+Label::Label(int width, int height)
+  : QObject(nullptr)
+  , osgWidget::Label()
+  , font_name("../fonts/arial.ttf")
+  , width(width)
+  , height(height)
+  , font_color(osg::Vec4(1.0, 1.0, 1.0, 1.0))
+  , back_color(osg::Vec4(0.25, 0.25, 0.25, 1.0))
+  , active_color(osg::Vec4(0.0, 0.5, 0.0, 1.0))
+  , is_active(false)
 {
-    label.toWCharArray(str);
-
-    setFont("../fonts/dejavu-sans-mono.ttf");
-    setLabel(osgText::String(str));
-    setFontSize(14);
-    setFontColor(1.0f, 1.0f, 1.0f, 1.0f);
-    setColor(1.0f, 0.0f, 0.0f, 1.0);
-    addHeight(18);
-    setCanFill(true);
+    setFont(font_name);
+    setFontColor(font_color);
+    setColor(back_color);
+    setFontSize(18);
+    addWidth(width);
+    addHeight(height);
     setEventMask(osgWidget::EVENT_MOUSE_PUSH | osgWidget::EVENT_MASK_MOUSE_MOVE);
+    setAlignHorizontal(osgWidget::Label::HA_CENTER);
+}
+
+bool Label::mousePush(double cx, double cy, const osgWidget::WindowManager *wm)
+{
+    emit action();
+    return true;
+}
+
+bool Label::mouseEnter(double cx, double cy, const osgWidget::WindowManager *wm)
+{
+    setColor(active_color);
+
+    is_active = true;
+
+    return true;
+}
+
+bool Label::mouseLeave(double cx, double cy, const osgWidget::WindowManager *wm)
+{
+    setColor(back_color);
+
+    is_active = false;
+
+    return true;
 }
