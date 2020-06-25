@@ -31,6 +31,8 @@ private:
 
     QViewer             viewer;
 
+    QString             root_dir;
+
     enum CmdlineParseResult
     {
         CmdlineOk,

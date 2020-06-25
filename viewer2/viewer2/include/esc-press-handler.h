@@ -12,38 +12,23 @@ class EscPressHandler : public QObject, public osgGA::GUIEventHandler
 
 public:
 
-    EscPressHandler(osgWidget::Window *menu)
-        : QObject(Q_NULLPTR)
-        , osgGA::GUIEventHandler()
-        , menu(menu)
-    {
+    EscPressHandler(osgWidget::Window *menu, osgWidget::WindowManager *wm);
 
-    }
 
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
-                        osgGA::GUIActionAdapter &)
-    {
-        if (ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
-        {
-            if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Escape)
-            {
-                menu->show();
-            }
-        }
-
-        return false;
-    }
+                        osgGA::GUIActionAdapter &aa);
 
 public slots:
 
-    void slotHide()
-    {
-        menu->hide();
-    }
+    void slotHide();
 
 private:
 
     osgWidget::Window *menu;
+
+    osgWidget::WindowManager *wm;
+
+    void showMenu(osgViewer::Viewer *v);
 };
 
 #endif // ESC_PRESS_HANDLER_H

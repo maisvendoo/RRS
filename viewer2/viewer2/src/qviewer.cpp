@@ -5,17 +5,20 @@
 #include    "esc-press-handler.h"
 
 #include    "menu.h"
-#include    "label.h"
 
 #include    <osgWidget/WindowManager>
 #include    <osgWidget/ViewerEventHandlers>
 
+#include    <QDir>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 QViewer::QViewer(QObject *parent) : QObject(parent), osgViewer::Viewer()
   , camera(new osg::Camera)
+  , settings(settings_t())
+  , wm(nullptr)
+  , root_dir("")
 {
 
 }
@@ -45,8 +48,11 @@ int QViewer::run()
 //
 //------------------------------------------------------------------------------
 void QViewer::init(const settings_t &settings,
-                   const command_line_t &cmd_line)
+                   const command_line_t &cmd_line,
+                   QString root_dir)
 {
+    this->root_dir = root_dir;
+
     initWindow(settings);
 
     initMainMenu();
@@ -97,19 +103,18 @@ void QViewer::initMainMenu()
 
     osg::ref_ptr<MainMenu> menu = new MainMenu;
 
+    menu->init(QDir::toNativeSeparators(root_dir) + QDir::separator() + "cfg" + QDir::separator() + "gui.xml",
+               QDir::toNativeSeparators(root_dir) + QDir::separator() + "fonts");
+
     menu->addItem("Выход");
     osg::ref_ptr<QuitHandler> quit_handler = new QuitHandler;
     connect(menu->getItem(0), &Label::action, quit_handler, &QuitHandler::quit);
     this->addEventHandler(quit_handler.get());
 
     menu->addItem("Назад");
-    osg::ref_ptr<EscPressHandler> esc_handler = new EscPressHandler(menu.get());
+    osg::ref_ptr<EscPressHandler> esc_handler = new EscPressHandler(menu.get(), wm.get());
     connect(menu->getItem(1), &Label::action, esc_handler, &EscPressHandler::slotHide);
-    this->addEventHandler(esc_handler.get());
-
-
-    menu->setX((settings.width - static_cast<int>(menu->getWidth())) / 2);
-    menu->setY((settings.height - static_cast<int>(menu->getHeight())) / 2);
+    this->addEventHandler(esc_handler.get());    
 
     wm->addChild(menu.get());
     wm->resizeAllWindows();    

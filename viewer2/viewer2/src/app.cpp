@@ -113,7 +113,7 @@ bool App::init()
 {
     load_settings(get_config_dir() + QDir::separator() + "settings.xml");
 
-    viewer.init(settings, cmd_line);
+    viewer.init(settings, cmd_line, root_dir);
 
     return true;
 }
@@ -125,6 +125,8 @@ QString App::get_config_dir()
 {
     QDir work_dir(this->applicationDirPath());
     work_dir.cdUp();
+
+    root_dir = work_dir.path();
 
     QString cfg_path = QDir::toNativeSeparators(work_dir.path()) + QDir::separator() + "cfg";
 

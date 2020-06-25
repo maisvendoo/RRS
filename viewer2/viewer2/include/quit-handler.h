@@ -15,36 +15,20 @@ class QuitHandler : public QObject, public osgGA::GUIEventHandler
 
 public:
 
-    QuitHandler(QObject *parent = Q_NULLPTR)
-        : QObject(parent)
-        , osgGA::GUIEventHandler()
-        , done(false)
-    {
+    QuitHandler(QObject *parent = Q_NULLPTR);
 
-    }
 
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
-                        osgGA::GUIActionAdapter &aa)
-    {
-        if ( (ea.getEventType() == osgGA::GUIEventAdapter::FRAME))
-        {
-            osgViewer::Viewer *v = static_cast<osgViewer::Viewer *>(&aa);
-            v->setDone(done);
-        }
+                        osgGA::GUIActionAdapter &aa);
 
-        return false;
-    }
 
 public slots:
 
-    void quit()
-    {
-        done = true;
-    }
+    void quit();
 
 private:
 
     bool done;
 };
 
-#endif // QUITHANDLER_H
+#endif // QUIT_HANDLER_H

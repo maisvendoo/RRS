@@ -25,7 +25,8 @@ public:
     int run();
 
     void init(const settings_t &settings,
-              const command_line_t &cmd_line);
+              const command_line_t &cmd_line,
+              QString root_dir);
 
 private:
 
@@ -35,10 +36,11 @@ private:
 
     osg::ref_ptr<osgWidget::WindowManager> wm;
 
+    QString     root_dir;
+
     void initWindow(const settings_t &settings);
 
     void initMainMenu();
-
 };
 
 #endif // QVIEWER_H

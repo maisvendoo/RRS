@@ -25,6 +25,12 @@ public:
 
     bool isActive() const { return is_active; }
 
+    osgWidget::Color    font_color;
+
+    osgWidget::Color    back_color;
+
+    osgWidget::Color    active_color;
+
 private:
 
     std::string font_name;
@@ -33,11 +39,6 @@ private:
 
     int height;
 
-    osgWidget::Color    font_color;
-
-    osgWidget::Color    back_color;
-
-    osgWidget::Color    active_color;
 
     bool                is_active;
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    
+        <MainMenu>
+            <Width>200</Width>
+            <ItemHeight>36</ItemHeight>
+            <Font>arial</Font>
+            <FontSize>18</FontSize>
+            <FontColor>#ffffffff</FontColor>
+            <BackColor>#444444ff</BackColor>
+            <ActiveColor>#00aa00ff</ActiveColor>
+        </MainMenu>
+
+</Config>

@@ -14,7 +14,7 @@ class MainMenu : public osgWidget::Box
 {
 public:
 
-    MainMenu(QString name = "Main menu", BoxType box_type = osgWidget::Box::VERTICAL);
+    MainMenu(QString name = "Main menu", BoxType = osgWidget::Box::VERTICAL);
 
     void setWidth(int width);
 
@@ -22,11 +22,21 @@ public:
 
     Label *getItem(unsigned int idx);
 
+    void init(QString cfg_path, QString fonts_dir);
+
 private:
 
     int width;
 
     int height;
+
+    std::string font_path;
+
+    int font_size;
+
+    osgWidget::Color font_color;
+    osgWidget::Color back_color;
+    osgWidget::Color active_color;
 
     std::vector<Label *> items;
 };
