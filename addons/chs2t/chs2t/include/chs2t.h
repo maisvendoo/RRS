@@ -127,6 +127,11 @@ private:
 
     PhysToModbus *Pos_Indicator;
 
+//    PhysToModbus *P_Pos;
+//    PhysToModbus *SP_Pos;
+//    PhysToModbus *S_Pos;
+//    PhysToModbus *Zero_Pos;
+
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
 

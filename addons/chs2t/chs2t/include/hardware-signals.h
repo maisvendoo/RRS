@@ -90,8 +90,35 @@ enum FeedbackSignals
     AMPER_1_2 = 30,
     AMPER_3_4 = 31,
     AMPER_5_6 = 32,
-    POS_INDICATOR = 33
+    POS_INDICATOR = 33,
 
+    LAMP_P = 34,
+    LAMP_SP = 35,
+    LAMP_S = 36,
+    LAMP_ZERO = 37,
+
+    LAMP_R = 38,
+    LAMP_T = 39,
+    LAMP_PEREKRISHA = 40,
+    LAMP_O = 41,
+
+    LAMP_NAR_SYNC = 42,
+    LAMP_NO_BRAKES_RELEASE = 43,
+    LAMP_PESOK = 44,
+    LAMP_ZASHITA = 45,
+
+    LAMP_GALYZI = 46,
+    LAMP_MK = 47,
+    LAMP_ACCUM2 = 48,
+    LAMP_ACCUM1 = 49,
+
+    LAMP_RAZED = 50,
+
+    SV_LAMP_G = 51,
+    SV_LAMP_R = 52,
+    SV_LAMP_W = 53,
+    SV_LAMP_Y = 54,
+    SV_LAMP_YR = 55,
 };
 
 #endif // HARDWARESIGNALS_H

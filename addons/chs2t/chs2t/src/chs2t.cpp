@@ -210,6 +210,33 @@ void CHS2T::hardwareOutput()
     }
 
     feedback_signals.analogSignal[33].cur_value = Pos_Indicator->getModbus(stepSwitch->getPoz());
+
+//    feedback_signals.analogSignal[LAMP_P].cur_value = analogSignal[]
+//    feedback_signals.analogSignal[LAMP_SP].cur_value =
+//    feedback_signals.analogSignal[LAMP_S].cur_value =
+//    feedback_signals.analogSignal[LAMP_ZERO].cur_value =
+
+//    feedback_signals.analogSignal[LAMP_R].cur_value =
+//    feedback_signals.analogSignal[LAMP_T].cur_value =
+//    feedback_signals.analogSignal[LAMP_PEREKRISHA].cur_value =
+//    feedback_signals.analogSignal[LAMP_O].cur_value =
+
+//    feedback_signals.analogSignal[LAMP_NAR_SYNC].cur_value =
+//    feedback_signals.analogSignal[LAMP_NO_BRAKES_RELEASE].cur_value =
+//    feedback_signals.analogSignal[LAMP_PESOK].cur_value =
+//    feedback_signals.analogSignal[LAMP_ZASHITA].cur_value =
+
+//    feedback_signals.analogSignal[LAMP_GALYZI].cur_value =
+//    feedback_signals.analogSignal[LAMP_MK].cur_value =
+//    feedback_signals.analogSignal[LAMP_ACCUM2].cur_value =
+//    feedback_signals.analogSignal[LAMP_ACCUM1].cur_value =
+
+//    feedback_signals.analogSignal[50].cur_value =
+//    feedback_signals.analogSignal[51].cur_value =
+//    feedback_signals.analogSignal[52].cur_value =
+//    feedback_signals.analogSignal[53].cur_value =
+//    feedback_signals.analogSignal[54].cur_value =
+//    feedback_signals.analogSignal[55].cur_value =
 }
 
 GET_VEHICLE(CHS2T)

@@ -1,0 +1,53 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <HoldingRegister>
+        <Address>0</Address>
+        <Index>0</Index>
+    </HoldingRegister>
+
+    <HoldingRegister>
+        <Address>1</Address>
+        <Index>1</Index>
+    </HoldingRegister>
+
+    <!-- RAZED -->
+    <Coil>
+        <Address>2</Address>
+        <Index>50</Index>
+    </Coil>
+
+
+
+
+    <!-- SV-G -->
+    <Coil>
+        <Address>3</Address>
+        <Index>51</Index>
+    </Coil>
+
+    <!-- SV-R -->
+    <Coil>
+        <Address>4</Address>
+        <Index>52</Index>
+    </Coil>
+
+    <!-- SV-W -->
+    <Coil>
+        <Address>5</Address>
+        <Index>53</Index>
+    </Coil>
+
+    <!-- SV-Y -->
+    <Coil>
+        <Address>6</Address>
+        <Index>54</Index>
+    </Coil>
+
+    <!-- SV-YR -->
+    <Coil>
+        <Address>7</Address>
+        <Index>55</Index>
+    </Coil>
+
+</Config>
