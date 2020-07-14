@@ -9,7 +9,7 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-	-->
+-->
 <!--
 	<Slave>
 		<id>4</id>
@@ -44,7 +44,7 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 	-->
-
+<!--
 	<Slave>
 		<id>5</id>
 		<Description>Панель амперметров и вольтметров</Description>
@@ -60,7 +60,7 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-
+-->
 	<Slave>
 		<id>17</id>
 		<Description>Кран машиниста</Description>
