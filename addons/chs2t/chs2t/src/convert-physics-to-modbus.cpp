@@ -4,6 +4,7 @@
 #include    <sstream>
 
 PhysToModbus::PhysToModbus()
+    : physValue(0.0)
 {
 
 }

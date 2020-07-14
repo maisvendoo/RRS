@@ -78,6 +78,7 @@ unix {
 
 
 INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../simulator/vehicle/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../library/include
 INCLUDEPATH += ./include

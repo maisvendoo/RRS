@@ -10,9 +10,16 @@ RK4Solver::~RK4Solver()
 
 }
 
-bool RK4Solver::step(OdeSystem *ode_sys, state_vector_t &Y, state_vector_t &dYdt, double t, double &dt, double max_step, double local_err)
+bool RK4Solver::step(OdeSystem *ode_sys,
+                     state_vector_t &Y,
+                     state_vector_t &dYdt,
+                     double t,
+                     double &dt,
+                     double max_step,
+                     double local_err)
 {
-
+    Q_UNUSED(max_step)
+    Q_UNUSED(local_err)
 
     // Share required memory
     if (first_step)

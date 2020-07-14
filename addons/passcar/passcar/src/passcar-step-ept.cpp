@@ -1,8 +1,13 @@
 #include    "passcar.h"
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PassCarrige::stepEPT(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     ept_control[0] = 0;
 
     if (prev_vehicle != nullptr)
@@ -20,5 +25,6 @@ void PassCarrige::stepEPT(double t, double dt)
 
     electroAirDist->setControlLine(ept_control[0]);
 
-    ept_current[0] += electroAirDist->getValveState(0) + electroAirDist->getValveState(1);
+    ept_current[0] += electroAirDist->getValveState(0) +
+                      electroAirDist->getValveState(1);
 }

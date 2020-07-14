@@ -3,11 +3,13 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void setSwitcherState(Switcher *sw, signal_t signal)
+void CHS2T::setSwitcherState(Switcher *sw, signal_t signal)
 {
     if (signal.is_active)
     {
         int pos = signal.cur_value - 1;
+
+        emit soundPlay("tumbler");
 
         if (pos >= 0)
             sw->setState(pos);

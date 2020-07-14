@@ -20,7 +20,12 @@ class Profile
 {
 public:
 
-    Profile() {}
+    Profile()
+        : is_ready(false)
+        , dir(1)
+    {
+
+    }
 
     Profile(int dir, const std::string &routeDir);
 

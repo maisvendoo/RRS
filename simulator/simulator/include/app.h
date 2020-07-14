@@ -52,13 +52,14 @@ public:
 
 private:
 
+    /// Train motion model
+    Model               *model;
+
     /// Command line parser
     QCommandLineParser  parser;
     /// Parsed command line parameters
     simulator_command_line_t      command_line;
 
-    /// Train motion model
-    Model               *model;
 
     /// Command line parsing
     CommandLineParesrResult parseCommandLine(QCommandLineParser &parser,

@@ -32,7 +32,6 @@ enum
     SIGLIGHT_ZERO = 25,
     SIGLIGHT_R = 26,
 
-    SGILIGHT_R = 26,
     SIGLIGHT_T = 27,
     SIGLIGHT_PEREKRISHA = 28,
     SIGLIGHT_O = 29,
@@ -69,6 +68,19 @@ enum
 
     STRELKA_U_BAT = 56,
     STRELKA_U_EPT = 57,
+
+    STRELKA_SPEED = 58,
+
+    SW_EDT = 59,
+
+    VAL_PR_SKOR1 = 60,
+    VAL_PR_SKOR2 = 61,
+
+    LS_G = 62,
+    LS_R = 63,
+    LS_W = 64,
+    LS_Y = 65,
+    LS_YR = 66,
 
     WHEEL_1 = 194,
     WHEEL_2 = 195,

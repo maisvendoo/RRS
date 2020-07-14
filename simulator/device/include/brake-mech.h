@@ -54,9 +54,6 @@ public:
 
 protected:
 
-    /// Number of shoes for one brake cylinder
-    int     shoesCyl;
-
     /// Number of shoes for one axis
     int     shoesAxis;
 
@@ -76,16 +73,10 @@ protected:
     double  S;
 
     /// Brake cylinder diameter
-    double  cylDiam;
-
-    /// Brake mechanism force coeff
-    double  ip;
+    double  cylDiam;    
 
     ///
-    double  Lmax;
-
-    /// Springs equialent force
-    double  F0;
+    double  Lmax;    
 
     /// Brake press force
     double  K;
@@ -102,13 +93,19 @@ protected:
     /// Shoes type (iron/iron-ph/composite)
     QString shoeType;
 
+    /// Максимальное действительное нажатие на колодку
+    double  Kmax;
+
+    /// Максимальное давление в ТЦ
+    double  p_max;
+
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t);
 
     virtual void preStep(state_vector_t &Y, double t);
 
-private:
+protected:
 
     /// Load configuration
     virtual void load_config(CfgReader &cfg);

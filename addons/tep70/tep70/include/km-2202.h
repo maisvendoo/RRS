@@ -30,6 +30,27 @@ public:
     /// Вернуть положение главного вала
     float getMainShaftPos() const;
 
+    /// Контакт нулевой позиции
+    bool isZero() const { return ms_position == MS_ZERO; }
+
+    /// Контакт всех ненулявых позиций
+    bool isNoZero() const { return ms_position != MS_ZERO; }
+
+    /// Контакт позиций выше 1-й
+    bool isMoreFirst() const {return ms_position > 1; }
+
+    /// Контакт позиций выше 12
+    bool is12orMore() const {return ms_position >= 12; }
+
+    /// Получить заданную частоту вращения коленчатого вала дизеля
+    double getRefFreq() const { return n_ref[ms_position]; }
+
+    /// Получить состояние контакта "Вперед"
+    bool isForward() const { return rs_position == RS_FORWARD; }
+
+    /// Получить состояние контакта "Назад"
+    bool isBackward() const { return rs_position == RS_BACKWARD; }
+
 private:
 
     enum
@@ -59,14 +80,19 @@ private:
     int     rs_position;
 
     /// Направление вращения реверсивного вала
-    int     rs_dir;
+    int     rs_dir;    
 
-    bool is_inc;
+    /// Контакт "Вперед" реверсивного вала
+    bool    is_forward;
+
+    /// Котакт "Назад" реверсивного вала
+    bool    is_backward;
 
     Timer   main_shaft_timer;
 
     Timer   revers_shaft_timer;
 
+    QMap<int, double>   n_ref;
 
     void preStep(state_vector_t &Y, double t);
 

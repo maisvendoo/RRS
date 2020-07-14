@@ -120,10 +120,16 @@ private:
 
     double Kv_out;
 
-    Timer   *incTimer;
-    Timer   *decTimer;
+    int volume_1;
+    int volume_2;
+    int volume_5;
 
-    DebugLog *debug_log;
+    double Kv_1;
+    double Kv_2;
+    double Kv_5;
+
+    Timer   *incTimer;
+    Timer   *decTimer;    
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
 

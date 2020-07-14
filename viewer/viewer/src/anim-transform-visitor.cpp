@@ -6,6 +6,7 @@
 #include    "material-animation.h"
 
 #include    "material-animation-visitor.h"
+#include    "material-rgb-animation-visitor.h"
 
 //------------------------------------------------------------------------------
 //
@@ -87,6 +88,15 @@ ProcAnimation *AnimTransformVisitor::create_animation(const std::string &name,
         if (child->name == "MaterialAnimation")
         {
             MaterialAnimationVisitor mav(animations, &cfg);
+            mav.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+
+            transform->accept(mav);
+        }
+
+        // RGB-анимация материала
+        if (child->name == "MaterialRGBAnimation")
+        {
+            MaterialRGBAnimationVisitor mav(animations, &cfg);
             mav.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
             transform->accept(mav);

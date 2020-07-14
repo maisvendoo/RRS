@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<CouplingModule>ef-coupling</CouplingModule>
+		<CabineInVehicle>0</CabineInVehicle>
+
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Начальное давление в ГР, МПа -->
+		<InitMainResPressure>0.9</InitMainResPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>0</NoAir>
+
+		<Title>ВЛ60пк-1543_Поезд 33</Title>
+		<Description>Состав из 15 вагонов и вагона-ресторана</Description>
+	</Common>
+	<Vehicle>
+		<Module>vl60pk</Module>
+		<ModuleConfig>vl60pk-1543</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
+		<Count>3</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>2</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-65361</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-16733</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>2</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
+		<Count>2</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+</Config>

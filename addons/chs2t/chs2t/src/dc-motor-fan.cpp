@@ -4,12 +4,15 @@
 //
 //------------------------------------------------------------------------------
 DCMotorFan::DCMotorFan(QObject* parent) : Device(parent)
-  , U(0.0)  
+  , U(0.0)
+  , cPhi(0.0)
   , R(0.0)
   , omega_nom(0.0)
   , ks(0.0)
   , J(0.0)
   , soundName("")
+  , Unom(0.0)
+  , kf(0.0)
 {
 
 }
@@ -23,13 +26,31 @@ DCMotorFan::~DCMotorFan()
 }
 
 //------------------------------------------------------------------------------
+// Задать напряжение МВ ТЭД
+//------------------------------------------------------------------------------
+void DCMotorFan::setU(double value)
+{
+    if (floor(value) > 0 && floor(U) == 0)
+    {
+        emit soundPlay(soundName);
+    }
+
+    if (floor(value) == 0 && floor(U) > 0)
+    {
+        emit soundStop(soundName);
+    }
+
+    U = value;
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void DCMotorFan::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
 
-    emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega_nom));
+    //emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega_nom));
 }
 
 //------------------------------------------------------------------------------

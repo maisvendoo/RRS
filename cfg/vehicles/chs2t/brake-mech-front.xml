@@ -12,5 +12,8 @@
         <StockOut>0.08</StockOut>
         <SpringForce>1649.0</SpringForce>
         <InitPressure>0.0</InitPressure>
+
+        <Kmax>3.0</Kmax>
+        <p_max>0.4</p_max>
     </Device>
 </Config>

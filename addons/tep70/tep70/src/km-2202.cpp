@@ -10,6 +10,8 @@ ControllerKM2202::ControllerKM2202(QObject *parent) : Device(parent)
   , ms_dir(0)
   , rs_position(RS_ZERO)
   , rs_dir(0)
+  , is_forward(false)
+  , is_backward(false)
 {
     main_shaft_timer.firstProcess(true);
     connect(&main_shaft_timer, &Timer::process,
@@ -33,7 +35,7 @@ ControllerKM2202::~ControllerKM2202()
 //------------------------------------------------------------------------------
 float ControllerKM2202::getMainShaftPos() const
 {
-    return ms_position / MS_MAX_POSITION;
+    return static_cast<float>(ms_position) / MS_MAX_POSITION;
 }
 
 //------------------------------------------------------------------------------
@@ -41,7 +43,8 @@ float ControllerKM2202::getMainShaftPos() const
 //------------------------------------------------------------------------------
 void ControllerKM2202::preStep(state_vector_t &Y, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -51,7 +54,9 @@ void ControllerKM2202::ode_system(const state_vector_t &Y,
                                   state_vector_t &dYdt,
                                   double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -78,6 +83,23 @@ void ControllerKM2202::load_config(CfgReader &cfg)
     }
 
     revers_shaft_timer.setTimeout(rs_delay);
+
+    QDomNode secNode = cfg.getFirstSection("Pos");
+
+    while (!secNode.isNull())
+    {
+        int number = 0;
+
+        cfg.getInt(secNode, "Number", number);
+
+        double shaft_freq = 0;
+
+        cfg.getDouble(secNode, "ShaftFreq", shaft_freq);
+
+        n_ref.insert(number, shaft_freq);
+
+        secNode = cfg.getNextSection();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -85,38 +107,46 @@ void ControllerKM2202::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void ControllerKM2202::stepKeysControl(double t, double dt)
 {
-    if (getKeyState(KEY_A))
+    if (getKeyState(KEY_A) || getKeyState(KEY_D) )
     {
-        ms_dir = 1;
-        main_shaft_timer.start();
-    }
-
-
-    if (getKeyState(KEY_D))
-    {
-        if (!isControl())
+        if (getKeyState(KEY_A))
         {
-            ms_dir = -1;
+            ms_dir = 1;
             main_shaft_timer.start();
         }
-        else
+
+        if (getKeyState(KEY_D))
         {
-            ms_position = MS_ZERO;
+            if (!isControl())
+            {
+                ms_dir = -1;
+                main_shaft_timer.start();
+            }
+            else
+            {
+                //ms_position = MS_ZERO;
+            }
         }
     }
-
-
-    if (getKeyState(KEY_W))
+    else
     {
-        rs_dir = 1;
-        revers_shaft_timer.start();
+        main_shaft_timer.stop();
     }
 
 
-    if (getKeyState(KEY_S))
+    if (getKeyState(KEY_W) || getKeyState(KEY_S))
     {
-        rs_dir = -1;
+        if (getKeyState(KEY_W))
+            rs_dir = 1;
+
+        if (getKeyState(KEY_S))
+            rs_dir = -1;
+
         revers_shaft_timer.start();
+    }
+    else
+    {
+        revers_shaft_timer.stop();
     }
 
 
@@ -131,14 +161,17 @@ void ControllerKM2202::slotRotateMainShaft()
 {
     // Механическая блокировка поворота главного вала
     // в нулевом положении реверсивного
-    if (rs_position != RS_ZERO)
+    if (rs_position == RS_ZERO)
     {
-        ms_position += ms_dir;
-        ms_position = cut(ms_position, static_cast<int>(MS_ZERO), static_cast<int>(MS_MAX_POSITION));
+        return;
     }
 
-    main_shaft_timer.stop();
-    main_shaft_timer.firstProcess(false);
+    int pos_old = ms_position;
+    ms_position += ms_dir;
+    ms_position = cut(ms_position, static_cast<int>(MS_ZERO), static_cast<int>(MS_MAX_POSITION));
+
+    if (ms_position != pos_old)
+        emit soundPlay("Shturval");
 }
 
 //------------------------------------------------------------------------------
@@ -147,11 +180,15 @@ void ControllerKM2202::slotRotateMainShaft()
 void ControllerKM2202::slotRotateReversShaft()
 {
     // Механическая блокировка реверсивки на рабочих позициях
-    if (ms_position == MS_ZERO)
+    if (ms_position != MS_ZERO)
     {
-        rs_position += rs_dir;
-        rs_position = cut(rs_position, static_cast<int>(RS_BACKWARD), static_cast<int>(RS_FORWARD));
+        return;
     }
 
-    revers_shaft_timer.stop();
+    int pos_old = rs_position;
+    rs_position += rs_dir;
+    rs_position = cut(rs_position, static_cast<int>(RS_BACKWARD), static_cast<int>(RS_FORWARD));
+
+    if (rs_position != pos_old)
+        emit soundPlay("Revers_Ruk");
 }

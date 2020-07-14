@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Main>
+		<!-- Размеры окна -->
+		<sizeWindow_X>1024</sizeWindow_X>
+		<sizeWindow_Y>768</sizeWindow_Y>
+		
+		<!-- видимость курсора -->
+		<hideCursor>true</hideCursor>
+		
+		<!-- интервал таймера -->
+		<timeInterval>100</timeInterval>
+
+    </Main>
+    
+</Config>

@@ -45,7 +45,7 @@
     <message>
         <location filename="../forms/mainwindow.ui" line="218"/>
         <location filename="../forms/mainwindow.ui" line="325"/>
-        <location filename="../src/mainwindow.cpp" line="163"/>
+        <location filename="../src/mainwindow.cpp" line="166"/>
         <source>No screenshot</source>
         <translation>Нет скриншота</translation>
     </message>
@@ -68,6 +68,86 @@
         <location filename="../forms/mainwindow.ui" line="376"/>
         <source>Graphics settings</source>
         <translation>Настройки графики</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="393"/>
+        <source>Window size</source>
+        <translation>Размер окна</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="418"/>
+        <source>Х</source>
+        <translation>X</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="443"/>
+        <source>Fullscreen mode</source>
+        <translation>Полноэкранный режим</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="450"/>
+        <source>Window decoration</source>
+        <translation>Заголовок окна</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="457"/>
+        <source>Double buffering</source>
+        <translation>Двойная буферизация</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="466"/>
+        <source>Screen number</source>
+        <translation>Номер монитора</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="485"/>
+        <source>Frustum</source>
+        <translation>Параметры пирамиды отсечения</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="497"/>
+        <source>Near clip plane</source>
+        <translation>Ближняя плоскость</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="511"/>
+        <source>Far clip plane</source>
+        <translation>Дальняя плоскость</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="525"/>
+        <source>View distance</source>
+        <translation>Дальность обзора</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="553"/>
+        <source>Notify level</source>
+        <translation>Уровень сообщений в лог</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="564"/>
+        <source>INFO</source>
+        <translation>INFO</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="569"/>
+        <source>WARNING</source>
+        <translation>WARNING</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="574"/>
+        <source>ERROR</source>
+        <translation>ERROR</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="584"/>
+        <source>Apply</source>
+        <translation>Применить</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="591"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
     </message>
 </context>
 </TS>

@@ -21,6 +21,10 @@
 //------------------------------------------------------------------------------
 CHS2T::CHS2T() : Vehicle()
 {
+    eptSwitch.setOnSoundName("tumbler");
+    eptSwitch.setOffSoundName("tumbler");
+    connect(&eptSwitch, &Trigger::soundPlay, this, &CHS2T::soundPlay);
+
     U_bat = 55.0;
 
     tracForce_kN = 0;
@@ -81,7 +85,9 @@ void CHS2T::initialization()
 
     initModbus();
 
-    initRegistrator();
+    //initRegistrator();
+
+    initTapSounds();
 
     for (size_t i = SWP1_POWER_1; i <= SWP1_POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
@@ -99,8 +105,11 @@ void CHS2T::step(double t, double dt)
 {
     control_signals.analogSignal[999].cur_value = static_cast<float>(is_controlled);
 
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     //Journal::instance()->info("Step pantographs");
-    stepPantographs(t, dt);    
+    stepPantographs(t, dt);
 
     //Journal::instance()->info("Step fast switch");
     stepFastSwitch(t, dt);
@@ -140,11 +149,20 @@ void CHS2T::step(double t, double dt)
 
     stepSwitcherPanel();
 
+    stepDecodeAlsn();
+
+    stepTapSound();
+
     //registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
     horn->setControl(keys, control_signals);
     horn->step(t, dt);
+
+    //Journal::instance()->info("Step speed meter");
+    speed_meter->setOmega(wheel_omega[0]);
+    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->step(t, dt);
 }
 
 

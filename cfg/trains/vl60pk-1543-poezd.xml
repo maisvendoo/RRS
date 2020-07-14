@@ -3,8 +3,8 @@
 	<Common>
 		<CouplingModule>ef-coupling</CouplingModule>
 		<CabineInVehicle>0</CabineInVehicle>
-		<Title>ВЛ60пк-1543 (с поездом)</Title>
-		<Description>Магистральный пассажирский электропоз переменного тока с поездом из 15 вагонов</Description>
+		<Title>ВЛ60пк-1543 с поездом</Title>
+		<Description>ВЛ60пк с пассажирским поезлом</Description>
 	</Common>
 
 	<Vehicle>
@@ -16,9 +16,82 @@
 	
 	<Vehicle>
 		<Module>passcar</Module>
-		<ModuleConfig>passcar</ModuleConfig>
-		<Count>15</Count>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
-	
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>	
+
+	<!-- �����-����� -->
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-17669</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-16733</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<!-- ����������� (��) -->
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
+		<Count>5</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<!-- �������� -->
+	<Vehicle>
+		<Module>passcar</Module>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
 </Config>

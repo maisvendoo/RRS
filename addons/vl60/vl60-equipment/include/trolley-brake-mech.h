@@ -16,9 +16,7 @@ public:
 
 private:
 
-    void load_config(CfgReader &cfg);
-
-    void load_config(QString cfg_path);
+    void load_config(CfgReader &cfg);    
 };
 
 #endif // TROLLEY_BRAKE_MECH_H

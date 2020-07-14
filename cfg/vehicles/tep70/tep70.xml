@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Vehicle>
-		
-		<EmptyMass>135000</EmptyMass>
-		<PayloadMass>0</PayloadMass>
-		<Length>21.7</Length>
-		<WheelDiameter>1.22</WheelDiameter>
-		<MainResist>default</MainResist>
-		<NumAxis>6</NumAxis>				
+        <Vehicle>
+                <EmptyMass>129000</EmptyMass>
+                <PayloadMass>0</PayloadMass>
+                <FuelCapacity>6000</FuelCapacity>
+                <FuelLevel>1.0</FuelLevel>
+                <Length>21.7</Length>
+                <WheelDiameter>1.22</WheelDiameter>
+                <MainResist>loco-resist</MainResist>
+                <NumAxis>6</NumAxis>            
+                <DegreesOfFreedom>7</DegreesOfFreedom>
                 <WheelInertia>2.0</WheelInertia>
+		<SoundDir>tep70</SoundDir>
 
-                <ExtModelName>tep70/tep70-body.osgt</ExtModelName> 
-                <ModelShift>0.0 0.0 0.317</ModelShift>
+                <ReductorCoeff>3.12</ReductorCoeff>
+
+                <ExtModelName>tep70/tep70.osgt</ExtModelName>
+                <ModelShift>0.0 0.0 0.312</ModelShift>            
                 
-                <CabineModel>tep70/tep70-cabine.osgt</CabineModel>
-                <CabineShift>0.0 0.0 0.317</CabineShift>
-                
+        	<CabineModel>tep70/tep70-cabview.osgt</CabineModel>
+                <CabineShift>0.0 -0.05 0.465</CabineShift>         
+
                 <BrakeCraneModule>krm395</BrakeCraneModule>
                 <BrakeCraneConfig>krm395</BrakeCraneConfig>
 
@@ -28,7 +33,6 @@
                 <AirDistModule>vr242</AirDistModule>
                 <AirDistConfig>vr242</AirDistConfig>
 
-                <DriverPos>0.93 9.02 3.75</DriverPos>
-                
+                <DriverPos>1.0 9.2 3.6</DriverPos>                
 	</Vehicle>
 </Config>

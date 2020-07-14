@@ -50,6 +50,9 @@
 
 		<Kv_in>1e9</Kv_in>
 		<Kv_out>2e7</Kv_out>
+		<Kv_1>3e5</Kv_1>
+		<Kv_2>2e7</Kv_2>
+		<Kv_5>2e5</Kv_5>
 
 	</Device>
 </Config>

@@ -68,6 +68,8 @@ void CHS2T::stepFastSwitch(double t, double dt)
     if (fastSwitchSw->getState() == 3)
     {
         fast_switch_trigger.set();
+        if (!bv_return)
+            emit soundPlay("BV-on");
         bv_return = true;
     }
 
@@ -126,13 +128,11 @@ void CHS2T::stepTractionControl(double t, double dt)
 
     tracForce_kN = 0;
 
-    for (size_t i = 0; i <= Q_a.size(); ++i)
+    for (size_t i = 1; i < Q_a.size(); ++i)
     {
         Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
-
-    emit soundSetPitch("Motion", static_cast<float>(abs(velocity * Physics::kmh) / 160));
 }
 
 //------------------------------------------------------------------------------
@@ -338,6 +338,10 @@ void CHS2T::stepSupportEquipment(double t, double dt)
 
     blindsSwitcher->step(t, dt);
     blinds->step(t, dt);
+
+    energy_counter->setFullPower(Uks * (motor->getI12() + motor->getI34() + motor->getI56()) );
+    energy_counter->setResistorsPower( puskRez->getR() * ( pow(motor->getI12(), 2) + pow(motor->getI34(), 2) + pow(motor->getI56(), 2) ) );
+    energy_counter->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -348,4 +352,17 @@ bool CHS2T::getHoldingCoilState() const
     bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
     return no_overload;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::stepTapSound()
+{
+    double speed = abs(this->velocity) * 3.6;
+
+    for (int i = 0; i < tap_sounds.count(); ++i)
+    {
+        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
+    }
 }

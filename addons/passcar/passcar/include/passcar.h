@@ -7,6 +7,8 @@
 #ifndef     PASSCAR_H
 #define     PASSCAR_H
 
+#include    <QMap>
+
 #include    "vehicle.h"
 #include    "brake-mech.h"
 #include    "reservoir.h"
@@ -44,6 +46,10 @@ private:
     QString     electro_airdist_module;
     QString     electro_airdist_config;
 
+    QString     soundDir;
+
+    QMap<int, QString> sounds;
+
     void initialization();
 
     void step(double t, double dt);
@@ -55,6 +61,14 @@ private:
     void loadConfig(QString cfg_path);
 
     void initEPT();
+
+    void initSounds();
+
+    void soundStep();
+
+    void getSoundList();
+
+    void playPasscarSound(QString sound_name);
 
     void stepEPT(double t, double dt);
 };

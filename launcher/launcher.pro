@@ -27,6 +27,7 @@ win32 {
 
         LIBS += -L../../lib -lfilesystem_d
         LIBS += -L../../lib -lCfgReader_d
+        LIBS += -L../../lib -lCfgEditor_d
 
     } else {
 
@@ -35,6 +36,7 @@ win32 {
 
         LIBS += -L../../lib -lfilesystem
         LIBS += -L../../lib -lCfgReader
+        LIBS += -L../../lib -lCfgEditor
     }
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
@@ -51,6 +53,7 @@ unix {
 
         LIBS += -L../../lib -lfilesystem_d
         LIBS += -L../../lib -lCfgReader_d
+        LIBS += -L../../lib -lCfgEditor_d
 
     } else {
 
@@ -59,12 +62,14 @@ unix {
 
         LIBS += -L../../lib -lfilesystem
         LIBS += -L../../lib -lCfgReader
+        LIBS += -L../../lib -lCfgEditor
     }
 }
 
 INCLUDEPATH += ../common-headers
 INCLUDEPATH += ../filesystem/include
 INCLUDEPATH += ../CfgReader/include
+INCLUDEPATH += ../CfgEditor/include
 INCLUDEPATH += ./include
 
 SOURCES += $$files(./src/*.cpp)

@@ -88,6 +88,12 @@ public:
 
     size_t getVehiclesNumber() const;
 
+    QString getClientName();
+
+    QString getTrainID();
+
+    int getDirection() const;
+
     std::vector<Vehicle *> *getVehicles();
 
 signals:
@@ -120,9 +126,6 @@ private:
     /// Initial main reservoir pressure
     double      init_main_res_pressure;
 
-    /// Solver's configuration
-    solver_config_t solver_config;
-
     /// Motion ODE's solver
     Solver      *train_motion_solver;
 
@@ -132,11 +135,20 @@ private:
     /// Sound manager
     SoundManager *soundMan;
 
+    /// Имя сетевого клиента для ВЖД
+    QString     client_name;
+
+    /// Идентификатор поезда для ВЖД
+    QString     train_id;
+
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;
 
     /// All train's couplings
     std::vector<Coupling *> couplings;
+
+    /// Solver's configuration
+    solver_config_t solver_config;
 
     /// Train's loading
     bool loadTrain(QString cfg_path);
