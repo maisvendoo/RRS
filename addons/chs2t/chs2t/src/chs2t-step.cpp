@@ -257,10 +257,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
     electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
     electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
-
-
     electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0] * !locoRelease);
-
     electroAirDistr->step(t, dt);
 
     spareReservoir->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());
@@ -321,7 +318,7 @@ void CHS2T::stepSupportEquipment(double t, double dt)
 
     blindsSwitcher->setControl(keys);
 
-    if (blindsSwitcher->getState() == 0 || blindsSwitcher->getState() == 1)
+    if (blindsSwitcher->getState() < 2)
     {
         blinds->setState(false);
     }
@@ -331,7 +328,7 @@ void CHS2T::stepSupportEquipment(double t, double dt)
         blinds->setState(true);
     }
 
-    if (blindsSwitcher->getState() == 3 || blindsSwitcher->getState() == 4)
+    if (blindsSwitcher->getState() > 2)
     {
         blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
     }
