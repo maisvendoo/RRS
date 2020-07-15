@@ -14,7 +14,6 @@ public:
 
 /*private:
 
-<<<<<<< HEAD
     void stepKeysControl(double t, double dt)
     {
         //TrainHorn::stepKeysControl(t, dt);

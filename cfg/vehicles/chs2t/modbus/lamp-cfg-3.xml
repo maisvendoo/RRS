@@ -1,24 +1,21 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
-    <HoldingRegister>
+    <Coil>
         <Address>0</Address>
         <Index>0</Index>
-    </HoldingRegister>
+    </Coil>
 
-    <HoldingRegister>
+    <Coil>
         <Address>1</Address>
         <Index>1</Index>
-    </HoldingRegister>
+    </Coil>
 
     <!-- RAZED -->
     <Coil>
         <Address>2</Address>
         <Index>50</Index>
     </Coil>
-
-
-
 
     <!-- SV-G -->
     <Coil>

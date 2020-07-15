@@ -1,15 +1,15 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
-    <HoldingRegister>
+    <Coil>
         <Address>0</Address>
         <Index>0</Index>
-    </HoldingRegister>
+    </Coil>
 
-    <HoldingRegister>
+    <Coil>
         <Address>1</Address>
         <Index>1</Index>
-    </HoldingRegister>
+    </Coil>
 
     <!-- NAR_SYNC -->
     <Coil>
@@ -34,9 +34,6 @@
         <Address>5</Address>
         <Index>45</Index>
     </Coil>
-
-
-
 
     <!-- GALYZI -->
     <Coil>

@@ -183,13 +183,13 @@ void CHS2T::stepBrakesControl(double t, double dt)
 
     if (control_signals.analogSignal[30].is_active)
     {
-        int krm_position = control_signals.analogSignal[30].cur_value * 1 +
-                           control_signals.analogSignal[31].cur_value * 2 +
-                           control_signals.analogSignal[32].cur_value * 3 +
-                           control_signals.analogSignal[33].cur_value * 4 +
-                           control_signals.analogSignal[34].cur_value * 5 +
-                           control_signals.analogSignal[35].cur_value * 6 +
-                           control_signals.analogSignal[36].cur_value * 7;
+        int krm_position = control_signals.analogSignal[KRM_1].cur_value * 1 +
+                           control_signals.analogSignal[KRM_2].cur_value * 2 +
+                           control_signals.analogSignal[KRM_3].cur_value * 3 +
+                           control_signals.analogSignal[KRM_4].cur_value * 4 +
+                           control_signals.analogSignal[KRM_5].cur_value * 5 +
+                           control_signals.analogSignal[KRM_6].cur_value * 6 +
+                           control_signals.analogSignal[KRM_7].cur_value * 7;
         if (krm_position != 0)
         {
             krm_position -= 1;

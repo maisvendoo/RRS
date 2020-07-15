@@ -12,6 +12,7 @@
 //------------------------------------------------------------------------------
 
 #include    "chs2t.h"
+#include    "chs2t-signals.h"
 
 #include    "filesystem.h"
 #include    "Journal.h"
@@ -86,6 +87,8 @@ void CHS2T::initialization()
     initModbus();
 
     //initRegistrator();
+
+    initSounds();
 
     initTapSounds();
 
@@ -186,57 +189,58 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::hardwareOutput()
 {
-    feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(pTM);
-    feedback_signals.analogSignal[1].cur_value = UR_manometer->getModbus(brakeCrane->getEqReservoirPressure());
-    feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brakeRefRes->getPressure());
-    feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(mainReservoir->getPressure());
-    feedback_signals.analogSignal[4].cur_value = TC_manometer->getModbus(brakesMech[0]->getBrakeCylinderPressure());
+    feedback_signals.analogSignal[MAN_TM].cur_value = TM_manometer->getModbus(pTM);
+    feedback_signals.analogSignal[MAN_UR].cur_value = UR_manometer->getModbus(brakeCrane->getEqReservoirPressure());
+    feedback_signals.analogSignal[MAN_ZT].cur_value = ZT_manometer->getModbus(brakeRefRes->getPressure());
+    feedback_signals.analogSignal[MAN_GR].cur_value = GR_manometer->getModbus(mainReservoir->getPressure());
+    feedback_signals.analogSignal[MAN_TC].cur_value = TC_manometer->getModbus(brakesMech[0]->getBrakeCylinderPressure());
 
-    feedback_signals.analogSignal[27].cur_value = PtM_U_bat->getModbus(U_bat);
-    feedback_signals.analogSignal[28].cur_value = EPT_U->getModbus(ept_converter->getU_out());
-    feedback_signals.analogSignal[29].cur_value = Network_U->getModbus(U_kr / 1000.0);
+    feedback_signals.analogSignal[VOLT_BAT].cur_value = PtM_U_bat->getModbus(U_bat);
+    feedback_signals.analogSignal[VOLT_EPT].cur_value = EPT_U->getModbus(ept_converter->getU_out());
+    feedback_signals.analogSignal[VOLT_NETWORK].cur_value = Network_U->getModbus(U_kr / 1000.0);
 
-    feedback_signals.analogSignal[30].cur_value = Amper_12->getModbus(motor->getI12() / 1000.0);
+    feedback_signals.analogSignal[AMPER_1_2].cur_value = Amper_12->getModbus(motor->getI12() / 1000.0);
 
     if (EDT)
     {
-        feedback_signals.analogSignal[31].cur_value = Amper_34->getModbus(abs(generator->getIf()) / 1000.0);
-        feedback_signals.analogSignal[32].cur_value = Amper_56->getModbus(abs(generator->getIa()) / 1000.0);
+        feedback_signals.analogSignal[AMPER_3_4].cur_value = Amper_34->getModbus(abs(generator->getIf()) / 1000.0);
+        feedback_signals.analogSignal[AMPER_5_6].cur_value = Amper_56->getModbus(abs(generator->getIa()) / 1000.0);
     }
     else
     {
-        feedback_signals.analogSignal[31].cur_value = Amper_34->getModbus(motor->getI34() / 1000.0);
-        feedback_signals.analogSignal[32].cur_value = Amper_56->getModbus(motor->getI56() / 1000.0);
+        feedback_signals.analogSignal[AMPER_3_4].cur_value = Amper_34->getModbus(motor->getI34() / 1000.0);
+        feedback_signals.analogSignal[AMPER_5_6].cur_value = Amper_56->getModbus(motor->getI56() / 1000.0);
     }
 
-    feedback_signals.analogSignal[33].cur_value = Pos_Indicator->getModbus(stepSwitch->getPoz());
+    feedback_signals.analogSignal[POS_INDICATOR].cur_value = Pos_Indicator->getModbus(stepSwitch->getPoz());
 
-//    feedback_signals.analogSignal[LAMP_P].cur_value = analogSignal[]
-//    feedback_signals.analogSignal[LAMP_SP].cur_value =
-//    feedback_signals.analogSignal[LAMP_S].cur_value =
-//    feedback_signals.analogSignal[LAMP_ZERO].cur_value =
+    feedback_signals.analogSignal[LAMP_P].cur_value = analogSignal[SIGLIGHT_P];
+    feedback_signals.analogSignal[LAMP_SP].cur_value = analogSignal[SIGLIGHT_SP];
+    feedback_signals.analogSignal[LAMP_S].cur_value = analogSignal[SIGLIGHT_S];
+    feedback_signals.analogSignal[LAMP_ZERO].cur_value = analogSignal[SIGLIGHT_ZERO];
 
-//    feedback_signals.analogSignal[LAMP_R].cur_value =
-//    feedback_signals.analogSignal[LAMP_T].cur_value =
-//    feedback_signals.analogSignal[LAMP_PEREKRISHA].cur_value =
-//    feedback_signals.analogSignal[LAMP_O].cur_value =
+    feedback_signals.analogSignal[LAMP_R].cur_value = analogSignal[SIGLIGHT_R];
+    feedback_signals.analogSignal[LAMP_T].cur_value = analogSignal[SIGLIGHT_T];
+    feedback_signals.analogSignal[LAMP_PEREKRISHA].cur_value = analogSignal[SIGLIGHT_PEREKRISHA];
+    feedback_signals.analogSignal[LAMP_O].cur_value = analogSignal[SIGLIGHT_O];
 
-//    feedback_signals.analogSignal[LAMP_NAR_SYNC].cur_value =
-//    feedback_signals.analogSignal[LAMP_NO_BRAKES_RELEASE].cur_value =
-//    feedback_signals.analogSignal[LAMP_PESOK].cur_value =
-//    feedback_signals.analogSignal[LAMP_ZASHITA].cur_value =
+    feedback_signals.analogSignal[LAMP_NAR_SYNC].cur_value = analogSignal[SIGLIGHT_NAR_SYNC];
+    feedback_signals.analogSignal[LAMP_NO_BRAKES_RELEASE].cur_value = analogSignal[SIGLIGHT_NO_BRAKES_RELEASE];
+    feedback_signals.analogSignal[LAMP_PESOK].cur_value = analogSignal[SIGLIGHT_PESOK];
+    feedback_signals.analogSignal[LAMP_ZASHITA].cur_value = analogSignal[SIGLIGHT_ZASHITA];
 
-//    feedback_signals.analogSignal[LAMP_GALYZI].cur_value =
-//    feedback_signals.analogSignal[LAMP_MK].cur_value =
-//    feedback_signals.analogSignal[LAMP_ACCUM2].cur_value =
-//    feedback_signals.analogSignal[LAMP_ACCUM1].cur_value =
+    feedback_signals.analogSignal[LAMP_GALYZI].cur_value = analogSignal[SIGLIGHT_GALYZI];
+    feedback_signals.analogSignal[LAMP_MK].cur_value = analogSignal[SIGLIGHT_MK];
+    feedback_signals.analogSignal[LAMP_ACCUM2].cur_value = analogSignal[SIGLIGHT_ACCUM2];
+    feedback_signals.analogSignal[LAMP_ACCUM1].cur_value = analogSignal[SIGLIGHT_ACCUM1];
 
-//    feedback_signals.analogSignal[50].cur_value =
-//    feedback_signals.analogSignal[51].cur_value =
-//    feedback_signals.analogSignal[52].cur_value =
-//    feedback_signals.analogSignal[53].cur_value =
-//    feedback_signals.analogSignal[54].cur_value =
-//    feedback_signals.analogSignal[55].cur_value =
+    feedback_signals.analogSignal[LAMP_RAZED].cur_value = analogSignal[SIGLIGHT_RAZED];
+
+    feedback_signals.analogSignal[SV_LAMP_G].cur_value = analogSignal[LS_G];
+    feedback_signals.analogSignal[SV_LAMP_R].cur_value = analogSignal[LS_R];
+    feedback_signals.analogSignal[SV_LAMP_W].cur_value = analogSignal[LS_W];
+    feedback_signals.analogSignal[SV_LAMP_Y].cur_value = analogSignal[LS_Y];
+    feedback_signals.analogSignal[SV_LAMP_YR].cur_value = analogSignal[LS_YR];
 }
 
 GET_VEHICLE(CHS2T)

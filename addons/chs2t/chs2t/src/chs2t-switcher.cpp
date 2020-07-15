@@ -25,8 +25,8 @@ CHS2TSwitcher::~CHS2TSwitcher()
 //------------------------------------------------------------------------------
 void CHS2TSwitcher::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(Y);
-    Q_UNUSED(t);
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 
     QMap<int, int>::const_iterator springs_i = springStates.constBegin();
 

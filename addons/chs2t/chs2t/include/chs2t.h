@@ -241,24 +241,24 @@ private:
     Timer EDT_timer;
 
     /// Передаточное число тягового редуктора
-    double      ip;
+    double ip;
 
     /// Флаг сбора схемы ЭДТ
-    bool        EDT;
+    bool EDT;
 
     /// Флаг разрешения работы ЭДТ
-    bool        allowEDT;
+    bool allowEDT;
 
-    bool        locoRelease;
+    bool locoRelease;
 
     /// Жалюзи пуско-тормозных резисторов
-    Blinds      *blinds;
+    Blinds *blinds;
 
     /// Скоростемер 3СЛ2М
-    SL2M        *speed_meter;   
+    SL2M *speed_meter;
 
     /// Счетчик энергии
-    EnergyCounter   *energy_counter;
+    EnergyCounter *energy_counter;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
@@ -316,6 +316,8 @@ private:
 
     ///
     void initModbus();
+
+    void initSounds();
 
     /// Инициализация списка звуков перестука
     void initTapSounds();
