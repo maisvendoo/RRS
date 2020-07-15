@@ -66,7 +66,7 @@ private:
     void preStep(state_vector_t &Y, double t);
 
     /// Загрузка данных из конфигурационных файлов
-    void load_config(CfgReader &cfg); 
+    void load_config(CfgReader &cfg);
 };
 
 
