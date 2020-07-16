@@ -44,11 +44,11 @@ public:
 
     double getBeta() { return beta; }
 
-    double getI12() const;
+    double getI12() const { return getIa() * static_cast<double>(amp_state.is12on); }
 
-    double getI34() const;
+    double getI34() const { return getIa() * static_cast<double>(amp_state.is34on); }
 
-    double getI56() const;
+    double getI56() const { return getIa() * static_cast<double>(amp_state.is56on); }
 
 private:
 

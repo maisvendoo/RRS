@@ -241,6 +241,8 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[SV_LAMP_W].cur_value = analogSignal[LS_W];
     feedback_signals.analogSignal[SV_LAMP_Y].cur_value = analogSignal[LS_Y];
     feedback_signals.analogSignal[SV_LAMP_YR].cur_value = analogSignal[LS_YR];
+
+    feedback_signals.analogSignal[INDICATOR_BV].cur_value = analogSignal[INDICATOR_BV];
 }
 
 GET_VEHICLE(CHS2T)

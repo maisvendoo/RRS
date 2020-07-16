@@ -284,20 +284,25 @@ void CHS2T::initSounds()
         connect(pantographs[i], &Pantograph::soundPlay, this, &CHS2T::soundPlay);
     }
 
+
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantoSwitcher[i]->setSoundName("tumbler");
         connect(pantoSwitcher[i], &Switcher::soundPlay, this, &CHS2T::soundPlay);
     }
 
+
     fastSwitchSw->setSoundName("tumbler");
     connect(fastSwitchSw, &Switcher::soundPlay, this, &CHS2T::soundPlay);
+
 
     connect(brakeCrane, &BrakeCrane::soundPlay, this, &CHS2T::soundPlay);
     connect(brakeCrane, &BrakeCrane::soundSetVolume, this, &CHS2T::soundSetVolume);
 
+
     connect(locoCrane, &LocoCrane::soundPlay, this, &CHS2T::soundPlay);
     connect(locoCrane, &LocoCrane::soundSetVolume, this, &CHS2T::soundSetVolume);
+
 
     for (size_t i = 0; i < motor_compressor.size(); ++i)
     {
@@ -309,29 +314,38 @@ void CHS2T::initSounds()
         connect(mk_switcher[i], &Switcher::soundPlay, this, &CHS2T::soundPlay);
     }
 
+
     connect(km21KR2, &Km21KR2::soundPlay, this, &CHS2T::soundPlay);
+
 
     connect(motor, &Motor::soundSetVolume, this, &CHS2T::soundSetVolume);
     connect(motor, &Motor::soundSetPitch, this, &CHS2T::soundSetPitch);
 
+
     connect(autoTrainStop, &AutoTrainStop::soundSetVolume, this, &CHS2T::soundSetVolume);
+
 
     connect(generator, &Generator::soundSetPitch, this, &CHS2T::soundSetPitch);
     connect(generator, &Generator::soundSetVolume, this, &CHS2T::soundSetVolume);
+
 
     EDTSwitch.setOnSoundName("tumbler");
     EDTSwitch.setOffSoundName("tumbler");
     connect(&EDTSwitch, &Trigger::soundPlay, this, &CHS2T::soundPlay);
     connect(&EDTSwitch, &Trigger::soundStop, this, &CHS2T::soundStop);
 
+
     connect(horn, &CHS2tHorn::soundPlay, this, &CHS2T::soundPlay);
     connect(horn, &CHS2tHorn::soundStop, this, &CHS2T::soundStop);
 
+
     connect(speed_meter, &SL2M::soundSetVolume, this, &CHS2T::soundSetVolume);
+
 
     motor_fan_ptr->setSoundName("PTR_fan");
     connect(motor_fan_ptr, &DCMotorFan::soundPlay, this, &CHS2T::soundPlay);
     connect(motor_fan_ptr, &DCMotorFan::soundStop, this, &CHS2T::soundStop);
+
 
     for (size_t i = 0; i < motor_fan.size(); ++i)
     {
@@ -340,10 +354,13 @@ void CHS2T::initSounds()
         connect(motor_fan[i], &DCMotorFan::soundStop, this, &CHS2T::soundStop);
     }
 
+
     motor_fan_switcher->setSoundName("tumbler");
     connect(motor_fan_switcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
 
+
     connect(motor_fan_ptr, &DCMotorFan::soundSetPitch, this, &CHS2T::soundSetPitch);
+
 
     blindsSwitcher->setSoundName("tumbler");
     connect(blindsSwitcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
