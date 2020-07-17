@@ -61,6 +61,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , config_dir("")
   , Uks(0.0)
   , current_kind(0)
+  , is_controlled(false)
 {
     std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     std::fill(discreteSignal.begin(), discreteSignal.end(), false);
@@ -459,6 +460,7 @@ void Vehicle::receiveData(QByteArray data)
     keys_mutex.lock();
 
     QDataStream stream(&data, QIODevice::ReadOnly);
+    keys.clear();
     stream >> keys;
 
     keys_mutex.unlock();
@@ -509,6 +511,11 @@ double Vehicle::getEPTControl(size_t i)
         return ept_control[i];
 
     return 0;
+}
+
+void Vehicle::setIsControlled(bool value)
+{
+    is_controlled = value;
 }
 
 //------------------------------------------------------------------------------

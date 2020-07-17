@@ -30,6 +30,12 @@ public:
 
     double getControlSignal() const { return control_signal; }
 
+    bool getDropPositions() const { return dropPositions; }
+
+    void setDropPositions(bool state) { dropPositions = state; }
+
+    bool getEDTState() const { return EDTState; }
+
 private:
 
     int brakeKey;
@@ -55,6 +61,10 @@ private:
     };
 
     std::array<double, NUM_COEFFS> K;
+
+    bool dropPositions;
+
+    bool EDTState;
 
     Timer motionTimer;
 

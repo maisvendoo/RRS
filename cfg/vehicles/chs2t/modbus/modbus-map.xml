@@ -3,40 +3,99 @@
 
 	<Slave>
 		<id>1</id>
-		<Description>Контроллер машиниста</Description>
-		<Config>21kr2</Config>
+		<Description>Кран машиниста</Description>
+		<Config>krm395</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-	
+
+<!--
 	<Slave>
-		<id>4</id>
+		<id>2</id>
 		<Description>Панель манометров</Description>
 		<Config>manometers</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+-->
 
+<!--
 	<Slave>
-		<id>2</id>
+		<id>4</id>
+		<Description>Контроллер машиниста</Description>
+		<Config>21kr2</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+-->
+
+<!--
+	<Slave>
+		<id>   </id>
 		<Description>Панель кулачковых переключателей (верх)</Description>
 		<Config>switch-panel1</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+-->
 
-	<Slave>
-		<id>5</id>
+	<!-- <Slave>
+		<id>   </id>
 		<Description>Карандаш задатчика реостатного тормоза</Description>
 		<Config>reostat</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave> -->
+
+<!--
+	<Slave>
+		<id>   </id>
+		<Description>Панель кулачковых переключателей (низ)</Description>
+		<Config>switch-panel2</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+	-->
+
+<!--
+	<Slave>
+		<id>   </id>
+		<Description>Панель амперметров и вольтметров</Description>
+		<Config>ampervolt</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
 
 	<Slave>
-		<id>3</id>
-		<Description>Панель кулачковых переключателей (низ)</Description>
-		<Config>switch-panel2</Config>
+		<id>   </id>
+		<Description>Указатель позиций</Description>
+		<Config>pos-indicator</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+-->
+
+	<Slave>
+		<id>7</id>
+		<Description>Светофор и разъединитель</Description>
+		<Config>lamp-cfg-3</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
+
+	<Slave>
+		<id>8</id>
+		<Description></Description>
+		<Config>lamp-cfg-2</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+
+	<Slave>
+		<id>9</id>
+		<Description></Description>
+		<Config>lamp-cfg-1</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>

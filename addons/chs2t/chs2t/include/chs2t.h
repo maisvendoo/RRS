@@ -40,6 +40,7 @@
 #include    "chs2t-horn.h"
 #include    "sl2m.h"
 #include    "energy-counter.h"
+#include    "chs2t-switcher.h"
 
 /*!
  * \class
@@ -95,6 +96,9 @@ private:
     /// Возврат защиты
     bool bv_return;
 
+    /// Список звуков перестука
+    QList<QString> tap_sounds;
+
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
@@ -113,6 +117,16 @@ private:
     PhysToModbus *GR_manometer;
     PhysToModbus *TC_manometer;
 
+    PhysToModbus *PtM_U_bat;
+    PhysToModbus *EPT_U;
+    PhysToModbus *Network_U;
+
+    PhysToModbus *Amper_12;
+    PhysToModbus *Amper_34;
+    PhysToModbus *Amper_56;
+
+    PhysToModbus *Pos_Indicator;
+
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
 
@@ -123,7 +137,7 @@ private:
     Trigger     mk_tumbler;
 
     /// Галетники управления МК
-    std::array<Switcher *, 2> mk_switcher;
+    std::array<CHS2TSwitcher *, 2> mk_switcher;
 
     /// Поездной кран машиниста (КрМ)
     BrakeCrane *brakeCrane;
@@ -176,16 +190,16 @@ private:
     HandleEDT       *handleEDT;
 
     /// Галетники управления токоприемниками
-    std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
+    std::array<CHS2TSwitcher *, NUM_PANTOGRAPHS> pantoSwitcher;
 
     /// Галетник управления БВ
-    Switcher    *fastSwitchSw;
+    CHS2TSwitcher    *fastSwitchSw;
 
     std::array<DCMotorFan*, 2> motor_fan;
 
-    Switcher *motor_fan_switcher;
+    CHS2TSwitcher *motor_fan_switcher;
 
-    Switcher *blindsSwitcher;
+    CHS2TSwitcher *blindsSwitcher;
 
     /// Зарядное давление
     double charging_press;
@@ -222,22 +236,24 @@ private:
     Timer EDT_timer;
 
     /// Передаточное число тягового редуктора
-    double      ip;
+    double ip;
 
     /// Флаг сбора схемы ЭДТ
-    bool        EDT;
+    bool EDT;
 
     /// Флаг разрешения работы ЭДТ
-    bool        allowEDT;
+    bool allowEDT;
+
+    bool locoRelease;
 
     /// Жалюзи пуско-тормозных резисторов
-    Blinds      *blinds;
+    Blinds *blinds;
 
     /// Скоростемер 3СЛ2М
-    SL2M        *speed_meter;   
+    SL2M *speed_meter;
 
     /// Счетчик энергии
-    EnergyCounter   *energy_counter;
+    EnergyCounter *energy_counter;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
@@ -296,11 +312,19 @@ private:
     ///
     void initModbus();
 
+    void initSounds();
+
+    /// Инициализация списка звуков перестука
+    void initTapSounds();
+
     /// Инициализация регистратора
     void initRegistrator();
 
     /// Общая инициализация локомотива
     void initialization();
+
+    /// Подпрограмма изменения положения пакетника
+    void setSwitcherState(Switcher *sw, signal_t signal);
 
     /// Моделирование работы токоприемников
     void stepPantographs(double t, double dt);
@@ -333,6 +357,8 @@ private:
     void stepSignals();
 
     void stepSwitcherPanel();
+
+    void stepTapSound();
 
     void stepDecodeAlsn();
 

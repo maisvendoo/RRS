@@ -42,46 +42,6 @@ StepSwitch::~StepSwitch()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double StepSwitch::getSchemeState() const
-{
-    return static_cast<double>(poz != 0);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool StepSwitch::isZero() const
-{
-    return poz == 0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool StepSwitch::isSeries() const
-{
-    return (poz > 0 ) && (poz <= MPOS_S) && !hod;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool StepSwitch::isSeriesParallel() const
-{
-    return (poz > MPOS_S ) && (poz <= MPOS_SP) &&!hod;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool StepSwitch::isParallel() const
-{
-    return (poz > MPOS_SP ) && !hod;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 ampermeters_state_t StepSwitch::getAmpermetersState()
 {
     ampermeters_state_t state;
@@ -170,18 +130,18 @@ void StepSwitch::stepDiscrete(double t, double dt)
 
     if (getKeyState(KEY_Z))
     {
-        prevPos2 = poz;
         dropPositionsWithZ = true;
     }
 
     if (dropPositionsWithZ)
     {
-        poz_d -= V * dt;
-
         if ((poz == 0 || hod) && (poz != prevPos2))
         {
             dropPositionsWithZ = false;
         }
+        prevPos2 = poz;
+        poz_d -= V * dt;
+        poz = static_cast<int>(poz_d);
     }
 
     reverseState = (-1 * (!ctrlState.k01 && ctrlState.k02)) +

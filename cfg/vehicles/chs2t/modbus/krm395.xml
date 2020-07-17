@@ -1,0 +1,48 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <!-- 1 положение -->
+    <DiscreteInput>
+        <Address>1</Address>
+        <Index>30</Index>        
+    </DiscreteInput>
+
+    <!-- 2 положение -->
+    <DiscreteInput>
+        <Address>2</Address>
+        <Index>31</Index>        
+    </DiscreteInput>
+
+    <!-- 3 положение -->
+    <DiscreteInput>
+        <Address>3</Address>
+        <Index>32</Index>        
+    </DiscreteInput>
+
+    <!-- 4 положение -->
+    <DiscreteInput>
+        <Address>4</Address>
+        <Index>33</Index>        
+    </DiscreteInput>
+
+    <!-- 5 положение -->
+    <DiscreteInput>
+        <Address>5</Address>
+        <Index>34</Index>        
+    </DiscreteInput>
+
+    <!-- 6 положение -->
+    <DiscreteInput>
+        <Address>6</Address>
+        <Index>35</Index>        
+    </DiscreteInput>
+
+    <!-- 7 положение -->
+    <DiscreteInput>
+        <Address>7</Address>
+        <Index>36</Index>        
+    </DiscreteInput>
+
+
+
+</Config>

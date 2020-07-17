@@ -35,12 +35,21 @@ enum ControllerSignals
     SWP2_SPOT_LIGHT = 23,
 
 
-    EDT_T = 24,
-    EDT_D = 25,
+    EDT_OFF = 24,
+    EDT_ON = 25,
     EDT_SBROS = 26,
-    EDT_CHECK_RT = 27,
+    LOCO_RELEASE = 27,
     EDT_RELEASE = 28,
-    EDT_BRAKE = 29
+    EDT_BRAKE = 29,
+
+
+    KRM_1 = 30,
+    KRM_2 = 31,
+    KRM_3 = 32,
+    KRM_4 = 33,
+    KRM_5 = 34,
+    KRM_6 = 35,
+    KRM_7 = 36
 };
 
 enum FeedbackSignals
@@ -73,7 +82,45 @@ enum FeedbackSignals
     SWP2_POWER_7 = 23,
     SWP2_POWER_8 = 24,
     SWP2_POWER_9 = 25,
-    SWP2_POWER_10 = 26
+    SWP2_POWER_10 = 26,
+
+    VOLT_BAT = 27,
+    VOLT_EPT = 28,
+    VOLT_NETWORK = 29,
+    AMPER_1_2 = 30,
+    AMPER_3_4 = 31,
+    AMPER_5_6 = 32,
+    POS_INDICATOR = 33,
+
+    LAMP_P = 34,
+    LAMP_SP = 35,
+    LAMP_S = 36,
+    LAMP_ZERO = 37,
+
+    LAMP_R = 38,
+    LAMP_T = 39,
+    LAMP_PEREKRISHA = 40,
+    LAMP_O = 41,
+
+    LAMP_NAR_SYNC = 42,
+    LAMP_NO_BRAKES_RELEASE = 43,
+    LAMP_PESOK = 44,
+    LAMP_ZASHITA = 45,
+
+    LAMP_GALYZI = 46,
+    LAMP_MK = 47,
+    LAMP_ACCUM2 = 48,
+    LAMP_ACCUM1 = 49,
+
+    LAMP_RAZED = 50,
+
+    SV_LAMP_G = 51,
+    SV_LAMP_R = 52,
+    SV_LAMP_W = 53,
+    SV_LAMP_Y = 54,
+    SV_LAMP_YR = 55,
+
+    INDICATOR_BV = 56
 };
 
 #endif // HARDWARESIGNALS_H

@@ -429,6 +429,8 @@ void Model::initControlPanel(QString cfg_path)
         connect(control_panel, &VirtualInterfaceDevice::sendControlSignals,
                 vehicle, &Vehicle::getControlSignals);
 
+        vehicle->setIsControlled(true);
+
         controlTimer.start();
     }
 }

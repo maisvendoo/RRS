@@ -25,7 +25,7 @@ public:
 
     int getPoz() { return poz; }
 
-    double getSchemeState() const;
+    double getSchemeState() const { return static_cast<double>(poz != 0); }
 
     bool getHod() { return hod; }
 
@@ -33,13 +33,17 @@ public:
 
     int getReverseState() const { return reverseState; }
 
-    bool isZero() const;
+    void setDropPositionsWithZ(bool value) { dropPositionsWithZ = value; }
 
-    bool isSeries() const;
+    bool getDropPositionsWithZ() { return dropPositionsWithZ; }
 
-    bool isSeriesParallel() const;
+    bool isZero() const { return poz == 0; }
 
-    bool isParallel() const;
+    bool isSeries() const { return (poz > 0 ) && (poz <= MPOS_S) && !hod; }
+
+    bool isSeriesParallel() const { return (poz > MPOS_S ) && (poz <= MPOS_SP) &&!hod; }
+
+    bool isParallel() const { return (poz > MPOS_SP ) && !hod; }
 
     ampermeters_state_t getAmpermetersState();
 
