@@ -43,6 +43,9 @@
         <Index>36</Index>        
     </DiscreteInput>
 
-
+    <Coil>
+	<Address>1</Address>
+	<Index>998</Index>
+    </Coil>
 
 </Config>

@@ -193,6 +193,7 @@ void CHS2T::initOtherEquipment()
 
     horn = new CHS2tHorn();
 
+
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
 
@@ -391,7 +392,7 @@ void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
     mainReservoir->setY(0, pFL);
     spareReservoir->setY(0, charging_press);
     brakeCrane->init(pTM, pFL);
-    locoCrane->init(pTM, pFL);
+    locoCrane->init(pTM, pFL);    
     airDistr->init(pTM, pFL);
     autoTrainStop->init(pTM, pFL);
 }

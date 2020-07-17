@@ -397,7 +397,7 @@ void MainWindow::onSimulatorStarted()
 {
     ui->btnStart->setEnabled(false);    
 
-    startViewer();
+    //startViewer();
 }
 
 //------------------------------------------------------------------------------

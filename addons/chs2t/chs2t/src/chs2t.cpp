@@ -98,7 +98,7 @@ void CHS2T::initialization()
     for (size_t i = SWP2_POWER_1; i <= SWP2_POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
 
-
+    hardwareOutput();
 }
 
 //------------------------------------------------------------------------------
@@ -242,7 +242,9 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[SV_LAMP_Y].cur_value = analogSignal[LS_Y];
     feedback_signals.analogSignal[SV_LAMP_YR].cur_value = analogSignal[LS_YR];
 
-    feedback_signals.analogSignal[INDICATOR_BV].cur_value = analogSignal[INDICATOR_BV];
+    feedback_signals.analogSignal[IND_BV].cur_value = 1.0f - analogSignal[INDICATOR_BV];
+
+    feedback_signals.analogSignal[998].cur_value = 1.0;
 }
 
 GET_VEHICLE(CHS2T)

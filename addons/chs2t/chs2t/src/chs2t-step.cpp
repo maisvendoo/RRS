@@ -236,6 +236,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
     locoCrane->setControl(keys);
+    locoCrane->setHandlePosition(0);
     locoCrane->step(t, dt);
 
     dako->setPgr(mainReservoir->getPressure());

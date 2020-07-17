@@ -120,7 +120,7 @@ enum FeedbackSignals
     SV_LAMP_Y = 54,
     SV_LAMP_YR = 55,
 
-    INDICATOR_BV = 56
+    IND_BV = 56
 };
 
 #endif // HARDWARESIGNALS_H
