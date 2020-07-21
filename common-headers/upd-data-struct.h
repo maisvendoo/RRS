@@ -25,8 +25,6 @@
 
 #include "vehicle-signals.h"
 
-
-#include "QFile"
 #include "QDataStream"
 
 //------------------------------------------------------------------------------
@@ -48,6 +46,48 @@ struct udp_vehicle_data_t
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
+
+    QByteArray serialize()
+    {
+        QByteArray result;
+
+        QDataStream ds(&result, QIODevice::WriteOnly);
+
+        ds << this->coord;
+
+        ds << this->velocity;
+
+        ds << this->routePath;
+
+        ds << QString::fromWCharArray(this->DebugMsg);
+
+        foreach (float signal, this->analogSignal)
+        {
+            ds << signal;
+        }
+
+        return result;
+    }
+
+    void deserialize(QByteArray& array)
+    {
+        QDataStream ds(array);
+
+        ds >> this->coord;
+
+        ds >> this->velocity;
+
+        ds >> this->routePath;
+
+        QString str;
+        ds >> str;
+        str.toWCharArray(this->DebugMsg);
+
+        foreach (float signal, &this->analogSignal)
+        {
+            ds >> signal;
+        }
+    }
 };
 
 /*!
@@ -61,7 +101,7 @@ struct udp_vehicle_data_t
 struct udp_server_data_t
 {
     float           time;
-    unsigned long   msgCount;
+    unsigned int    msgCount;
     unsigned int    vehicleCount;
 
     QVector<udp_vehicle_data_t> vehicles;
@@ -73,20 +113,44 @@ struct udp_server_data_t
     {
 
     }
+
+    QByteArray serialize()
+    {
+        QByteArray result;
+
+        QDataStream ds(&result, QIODevice::WriteOnly);
+
+        ds << this->time;
+
+        ds << this->msgCount;
+
+        ds << this->vehicleCount;
+
+        foreach (udp_vehicle_data_t vehicle, this->vehicles)
+        {
+            ds << vehicle.serialize();
+        }
+
+        return result;
+    }
+
+    void deserialize(QByteArray& array)
+    {
+        QDataStream ds(array);
+
+        ds >> this->time;
+
+        ds >> this->msgCount;
+
+        ds >> this->vehicleCount;
+
+        foreach (udp_vehicle_data_t vehicle, this->vehicles)
+        {
+//            vehicle.deserialize();
+        }
+    }
+
+
 };
-
-QByteArray serialize()
-{
-    return 0;
-}
-
-void desirialize(QByteArray array)
-{
-
-}
-
-QFile file("");
-
-QDataStream ss(&file);
 
 #endif // UPDDATASTRUCT_H
