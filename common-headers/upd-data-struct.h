@@ -74,18 +74,23 @@ struct udp_vehicle_data_t
         QDataStream ds(array);
 
         ds >> this->coord;
+        array.remove(0, sizeof (this->coord));
 
         ds >> this->velocity;
+        array.remove(0, sizeof (this->velocity));
 
         ds >> this->routePath;
+        array.remove(0, sizeof (this->routePath));
 
         QString str;
         ds >> str;
         str.toWCharArray(this->DebugMsg);
+        array.remove(0, sizeof (str));
 
         foreach (float signal, &this->analogSignal)
         {
             ds >> signal;
+            array.remove(0, sizeof (signal));
         }
     }
 };
@@ -140,17 +145,21 @@ struct udp_server_data_t
 
         ds >> this->time;
 
+        array.remove(0, sizeof (this->time));
+
         ds >> this->msgCount;
+
+        array.remove(0, sizeof (this->msgCount));
 
         ds >> this->vehicleCount;
 
-        foreach (udp_vehicle_data_t vehicle, this->vehicles)
+        array.remove(0, sizeof (this->vehicleCount));
+
+        foreach (udp_vehicle_data_t vehicle, &this->vehicles)
         {
-//            vehicle.deserialize();
+            vehicle.deserialize(array);
         }
     }
-
-
 };
 
 #endif // UPDDATASTRUCT_H
