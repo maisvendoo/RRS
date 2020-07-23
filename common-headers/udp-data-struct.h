@@ -12,8 +12,8 @@
  * \date
  */
 
-#ifndef UPDDATASTRUCT_H
-#define UPDDATASTRUCT_H
+#ifndef UDPDATASTRUCT_H
+#define UDPDATASTRUCT_H
 
 #include <qglobal.h>
 
@@ -162,4 +162,4 @@ struct udp_server_data_t
     }
 };
 
-#endif // UPDDATASTRUCT_H
+#endif // UDPDATASTRUCT_H
