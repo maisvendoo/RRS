@@ -1,6 +1,7 @@
 TEMPLATE = lib
 
 QT -= gui
+QT += xml
 QT += network
 
 DEFINES += UDP_SERVER_LIB
@@ -22,6 +23,7 @@ CONFIG(debug, debug|release) {
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../vehicle/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../udp-client/include
 

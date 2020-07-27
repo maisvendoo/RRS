@@ -494,6 +494,8 @@ void Model::initUdpServer(QString cfg_path)
         udp_server = new UdpServer();
         connect(this, &Model::getRecvData, udp_server, &UdpServer::setServerData);
 //        udp_server->setServerData()
+
+        connect(&networkTimer, &QTimer::timeout, this, &Model::udpFeedBack);
     }
 }
 
