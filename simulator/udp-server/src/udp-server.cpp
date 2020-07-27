@@ -10,22 +10,41 @@ UdpServer::~UdpServer()
 
 }
 
-void UdpServer::initSocket()
+bool UdpServer::isConnected() const
 {
+    return udpClient->isConnected();
+}
+
+void UdpServer::init(QString &cfg_path)
+{
+    load_config(cfg_path);
+
     udpSocket = new QUdpSocket();
     udpSocket->bind(QHostAddress::LocalHost, port);
 
     connect(udpSocket, &QUdpSocket::readyRead,
-            this, &UdpServer::getServerData);
+            this, &UdpServer::receive);
 }
 
-void UdpServer::getServerData(udp_server_data_t &data)
+void UdpServer::setServerData(udp_server_data_t &data)
 {
-    QByteArray byteData = data.serialize();
-    server_data = data.deserialize(byteData);
+    server_data = data;
 }
 
-void UdpServer::load_config(CfgReader& cfg)
+void UdpServer::receive()
 {
+    QByteArray recv_data = udpSocket->readAll();
+
+    if (recv_data.at(0) == 1)
+    {
+        QByteArray raw_data = server_data.serialize();
+        udpSocket->write(raw_data);
+    }
+}
+
+void UdpServer::load_config(QString &path)
+{
+    CfgReader cfg;
+    cfg.load(path);
     cfg.getInt("UdpServer", "Port", port);
 }

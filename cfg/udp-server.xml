@@ -2,6 +2,6 @@
 <Config>
     <UdpServer>
         <HostAddr>127.0.0.1</HostAddr>
-        <Port>0000</Port>
+        <Port>1994</Port>
     </UdpServer>
 </Config>

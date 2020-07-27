@@ -37,6 +37,10 @@
 
 #include    "sim-client.h"
 
+#include    "udp-server.h"
+
+#include    "udp-data-struct.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -75,6 +79,8 @@ signals:
     void sendDataToTrain(QByteArray data);
 
     void getRecvData(sim_dispatcher_data_t &disp_data);
+
+    void getUdpRecvData(udp_server_data_t &server_data);
 
 public slots:
 
@@ -126,6 +132,9 @@ private:
     /// Клиент для связи с ВЖД
     SimTcpClient *sim_client;
 
+    ///
+    UdpServer *udp_server;
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -166,9 +175,13 @@ private:
 
     void initSimClient(QString cfg_path);
 
+    void initUdpServer(QString cfg_path);
+
     /// TCP feedback
     void tcpFeedBack();
 
+    /// UDP feedback
+    void udpFeedBack();
 
     /// Shered memory feedback
     void sharedMemoryFeedback();

@@ -7,6 +7,7 @@
 
 #include    "udp-data-struct.h"
 #include    "CfgReader.h"
+#include    "udp-client.h"
 
 Q_DECLARE_METATYPE(udp_server_data_t);
 
@@ -19,19 +20,27 @@ public:
 
     ~UdpServer();
 
-    void initSocket();
+    bool isConnected() const;
 
-public slots:
-    void getServerData(udp_server_data_t &data);
+    void init(QString &cfg_path);
 
-    void load_config(CfgReader &cfg);
+    void setServerData(udp_server_data_t &data);
+
+
+private slots:
+
+    void receive();
 
 private:
+    UdpClient *udpClient;
+
     QUdpSocket *udpSocket;
 
     udp_server_data_t server_data;
 
     int port;
+
+    void load_config(QString &path);
 };
 
 #endif // UDPSERVER_H

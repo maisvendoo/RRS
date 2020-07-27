@@ -27,6 +27,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsim-client_d
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
+    LIBS += -L../../../lib -ludp-server_d
 
     LIBS += -L../../../lib -lasound_d
     LIBS += -L../../../lib -lsound-manager_d
@@ -46,6 +47,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsim-client
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
+    LIBS += -L../../../lib -ludp-server
 
     LIBS += -L../../../lib -lasound
     LIBS += -L../../../lib -lsound-manager
@@ -76,6 +78,7 @@ INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../sim-client/include
+INCLUDEPATH += ../udp-server/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include

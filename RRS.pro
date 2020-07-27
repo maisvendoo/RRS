@@ -9,6 +9,7 @@ SUBDIRS += ./libJournal
 SUBDIRS += ./tcp-connection
 SUBDIRS += ./asound
 SUBDIRS += ./simulator
+SUBDIRS += ./udp-client
 
 #SUBDIRS += ./viewer
 
