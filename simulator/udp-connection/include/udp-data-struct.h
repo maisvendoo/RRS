@@ -17,8 +17,6 @@
 
 #include <qglobal.h>
 
-#include "global-const.h"
-
 #include <array>
 
 #include <QString>
@@ -35,14 +33,14 @@ struct udp_vehicle_data_t
     float       coord;
     float       velocity;
     QString     routePath;
-    wchar_t     DebugMsg[DEBUG_STRING_SIZE];
+    QString     DebugMsg;
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     udp_vehicle_data_t()
         : coord(0.0f)
         , velocity(0.0f)
         , routePath("")
-        , DebugMsg(L"")
+        , DebugMsg("")
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
@@ -59,7 +57,7 @@ struct udp_vehicle_data_t
 
         ds << this->routePath;
 
-        ds << QString::fromWCharArray(this->DebugMsg);
+        ds << this->DebugMsg;
 
         foreach (float signal, this->analogSignal)
         {
@@ -84,10 +82,10 @@ struct udp_vehicle_data_t
 
         QString str;
         ds >> str;
-        str.toWCharArray(this->DebugMsg);
+        ds >> DebugMsg;
         array.remove(0, sizeof (str));
 
-        foreach (float signal, &this->analogSignal)
+        for (float signal : analogSignal)
         {
             ds >> signal;
             array.remove(0, sizeof (signal));
@@ -155,7 +153,7 @@ struct udp_server_data_t
 
         array.remove(0, sizeof (this->vehicleCount));
 
-        foreach (udp_vehicle_data_t vehicle, &this->vehicles)
+        for (udp_vehicle_data_t vehicle : this->vehicles)
         {
             vehicle.deserialize(array);
         }

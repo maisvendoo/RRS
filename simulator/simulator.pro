@@ -2,8 +2,7 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-SUBDIRS += ./sound-manager \
-    udp-server
+SUBDIRS += ./sound-manager
 SUBDIRS += ./physics
 SUBDIRS += ./device
 SUBDIRS += ./solver
@@ -15,6 +14,7 @@ SUBDIRS += ./brakepipe
 SUBDIRS += ./profile
 SUBDIRS += ./train
 SUBDIRS += ./sim-client
+SUBDIRS += ./udp-server
 SUBDIRS += ./model
 SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling

@@ -14,15 +14,12 @@ CONFIG(debug, debug|release) {
 
     TARGET = $$join(TARGET,,,_d)
     LIBS += -L../../../lib -lCfgReader_d
-    LIBS += -L../../../lib -ludp-client_d
 
 } else {
     LIBS += -L../../../lib -lCfgReader
-    LIBS += -L../../../lib -ludp-client_d
 }
 
 INCLUDEPATH += ./include
-INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../vehicle/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../udp-client/include

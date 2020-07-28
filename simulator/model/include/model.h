@@ -39,8 +39,6 @@
 
 #include    "udp-server.h"
 
-#include    "udp-data-struct.h"
-
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else

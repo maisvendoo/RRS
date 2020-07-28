@@ -12,7 +12,7 @@ UdpServer::~UdpServer()
 
 bool UdpServer::isConnected() const
 {
-    return udpClient->isConnected();
+    return true;
 }
 
 void UdpServer::init(QString &cfg_path)
