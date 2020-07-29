@@ -4,9 +4,9 @@ QT -= gui
 QT += xml
 QT += network
 
-DEFINES += UDP_SERVER_LIB
+DEFINES += UDP_CONNECTION_LIB
 
-TARGET = udp-server
+TARGET = udp-connection
 
 DESTDIR = ../../../lib
 
@@ -22,8 +22,6 @@ CONFIG(debug, debug|release) {
 INCLUDEPATH += ./include
 INCLUDEPATH += ../vehicle/include
 INCLUDEPATH += ../../CfgReader/include
-INCLUDEPATH += ../../udp-client/include
 
 HEADERS += $$files(./include/*.h)
-HEADERS += $$files(../../common-headers/*.h)
 SOURCES += $$files(./src/*.cpp)

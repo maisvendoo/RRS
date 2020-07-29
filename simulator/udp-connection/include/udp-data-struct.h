@@ -32,8 +32,10 @@ struct udp_vehicle_data_t
 {
     float       coord;
     float       velocity;
+
     QString     routePath;
     QString     DebugMsg;
+
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     udp_vehicle_data_t()
@@ -52,14 +54,12 @@ struct udp_vehicle_data_t
         QDataStream ds(&result, QIODevice::WriteOnly);
 
         ds << this->coord;
-
         ds << this->velocity;
 
         ds << this->routePath;
-
         ds << this->DebugMsg;
 
-        foreach (float signal, this->analogSignal)
+        for (float signal : this->analogSignal)
         {
             ds << signal;
         }
@@ -80,12 +80,10 @@ struct udp_vehicle_data_t
         ds >> this->routePath;
         array.remove(0, sizeof (this->routePath));
 
-        QString str;
-        ds >> str;
-        ds >> DebugMsg;
-        array.remove(0, sizeof (str));
+        ds >> this->DebugMsg;
+        array.remove(0, sizeof (this->DebugMsg));
 
-        for (float signal : analogSignal)
+        for (float signal : this->analogSignal)
         {
             ds >> signal;
             array.remove(0, sizeof (signal));
@@ -104,6 +102,7 @@ struct udp_vehicle_data_t
 struct udp_server_data_t
 {
     float           time;
+
     unsigned int    msgCount;
     unsigned int    vehicleCount;
 
@@ -126,10 +125,9 @@ struct udp_server_data_t
         ds << this->time;
 
         ds << this->msgCount;
-
         ds << this->vehicleCount;
 
-        foreach (udp_vehicle_data_t vehicle, this->vehicles)
+        for (udp_vehicle_data_t vehicle : this->vehicles)
         {
             ds << vehicle.serialize();
         }

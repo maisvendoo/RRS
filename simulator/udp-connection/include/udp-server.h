@@ -3,8 +3,8 @@
 
 #include    <QUdpSocket>
 
-#include    "udp-data-struct.h"
 #include    "CfgReader.h"
+#include    "udp-data-struct.h"
 
 Q_DECLARE_METATYPE(udp_server_data_t);
 
@@ -17,20 +17,20 @@ public:
 
     ~UdpServer();
 
-    bool isConnected() const;
-
     void init(QString &cfg_path);
+
+    bool isConnected();
 
     void setServerData(udp_server_data_t &data);
 
+//    void sendServerData();
 
 private slots:
 
     void receive();
 
 private:
-
-    QUdpSocket *udpSocket;
+    QUdpSocket *serverSocket;
 
     udp_server_data_t server_data;
 

@@ -19,6 +19,10 @@
 #include <QtGlobal>
 #include <QObject>
 #include <QDataStream>
+#include <QUdpSocket>
+
+#include "CfgReader.h"
+#include "udp-data-struct.h"
 
 #if defined(UDP_CLIENT_LIB)
 # define UDP_CLIENT_EXPORT Q_DECL_EXPORT
@@ -42,24 +46,21 @@ public:
 
     ~UdpClient();
 
-    void init();
+    void init(QString& cfg_path);
 
     bool isConnected();
 
-    void start();
-
-    void stop();
-
-signals:
-
-public slots:
-
-protected:
-
 private:
+    QUdpSocket *clientSocket;
+
+    udp_server_data_t client_data;
+
+    int port;
+
+    void load_config(QString &path);
 
 private slots:
-
+    void receive();
 };
 
 #endif // UDP_CLIENT_H

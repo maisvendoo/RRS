@@ -78,7 +78,7 @@ signals:
 
     void getRecvData(sim_dispatcher_data_t &disp_data);
 
-    void getUdpRecvData(udp_server_data_t &server_data);
+//    void getUdpRecvData(udp_server_data_t &server_data);
 
 public slots:
 
@@ -131,7 +131,7 @@ private:
     SimTcpClient *sim_client;
 
     ///
-    UdpServer *udp_server;
+//    UdpServer *udp_server;
 
     /// Simulation thread
     QThread     model_thread;
@@ -173,13 +173,13 @@ private:
 
     void initSimClient(QString cfg_path);
 
-    void initUdpServer(QString cfg_path);
+//    void initUdpServer(QString cfg_path);
 
     /// TCP feedback
     void tcpFeedBack();
 
-    /// UDP feedback
-    void udpFeedBack();
+//    /// UDP feedback
+//    void udpFeedBack();
 
     /// Shered memory feedback
     void sharedMemoryFeedback();
