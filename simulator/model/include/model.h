@@ -37,8 +37,6 @@
 
 #include    "sim-client.h"
 
-#include    "udp-server.h"
-
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else

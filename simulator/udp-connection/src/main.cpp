@@ -23,4 +23,10 @@ int main()
     server->setServerData(data);
 
     client->init(cfg_path);
+
+    server->receive();
+
+    client->receive();
+
+    return 0;
 }

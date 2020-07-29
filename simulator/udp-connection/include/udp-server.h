@@ -25,7 +25,7 @@ public:
 
 //    void sendServerData();
 
-private slots:
+public slots:
 
     void receive();
 

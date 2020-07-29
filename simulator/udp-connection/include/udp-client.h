@@ -59,7 +59,7 @@ private:
 
     void load_config(QString &path);
 
-private slots:
+public slots:
     void receive();
 };
 
