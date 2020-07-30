@@ -21,6 +21,8 @@
 #include    "Journal.h"
 #include    "JournalFile.h"
 
+#include    "main.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -65,6 +67,8 @@ Model::~Model()
 //------------------------------------------------------------------------------
 bool Model::init(const simulator_command_line_t &command_line)
 {
+    test();
+
     // Check is debug print allowed
     is_debug_print = command_line.debug_print.is_present;
 

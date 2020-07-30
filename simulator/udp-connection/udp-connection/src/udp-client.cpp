@@ -10,15 +10,21 @@ UdpClient::~UdpClient()
 
 }
 
-void UdpClient::init(QString &cfg_path)
+void UdpClient::init(const QString &cfg_path)
 {
     load_config(cfg_path);
 
     clientSocket = new QUdpSocket();
-    clientSocket->bind(QHostAddress::LocalHost, port);
+
+    clientSocket->connectToHost(QHostAddress::LocalHost, port);
 
     connect(clientSocket, &QUdpSocket::readyRead,
             this, &UdpClient::receive);
+
+    QByteArray tmp;
+    tmp.append(1);
+
+    clientSocket->writeDatagram(tmp, QHostAddress::LocalHost, port);
 }
 
 bool UdpClient::isConnected()
@@ -29,11 +35,17 @@ bool UdpClient::isConnected()
     return  clientSocket->state() == QUdpSocket::ConnectedState;
 }
 
-void UdpClient::load_config(QString &path)
+void UdpClient::sendData(const QByteArray& data)
+{
+    clientSocket->write(data);
+    clientSocket->flush();
+}
+
+void UdpClient::load_config(const QString &path)
 {
     CfgReader cfg;
     cfg.load(path);
-    cfg.getInt("UdpServer", "SPort", port);
+    cfg.getInt("UdpServer", "Port", port);
 }
 
 void UdpClient::receive()

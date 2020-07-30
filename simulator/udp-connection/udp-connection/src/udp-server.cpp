@@ -15,6 +15,7 @@ void UdpServer::init(QString &cfg_path)
     load_config(cfg_path);
 
     serverSocket = new QUdpSocket();
+
     serverSocket->bind(QHostAddress::LocalHost, port);
 
     connect(serverSocket, &QUdpSocket::readyRead,
@@ -24,9 +25,11 @@ void UdpServer::init(QString &cfg_path)
 bool UdpServer::isConnected()
 {
     if (serverSocket == Q_NULLPTR)
+    {
         return false;
+    }
 
-    return serverSocket->state() == QUdpSocket::ConnectedState;
+    return serverSocket->state() == QUdpSocket::BoundState;
 }
 
 void UdpServer::setServerData(udp_server_data_t &data)
@@ -37,6 +40,9 @@ void UdpServer::setServerData(udp_server_data_t &data)
 void UdpServer::receive()
 {
     QByteArray recv_data = serverSocket->readAll();
+
+    if (recv_data.isEmpty())
+        return;
 
     if (recv_data.at(0) == 1)
     {

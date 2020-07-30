@@ -46,9 +46,11 @@ public:
 
     ~UdpClient();
 
-    void init(QString& cfg_path);
+    void init(const QString& cfg_path);
 
     bool isConnected();
+
+    void sendData(const QByteArray &data);
 
 private:
     QUdpSocket *clientSocket;
@@ -57,7 +59,7 @@ private:
 
     int port;
 
-    void load_config(QString &path);
+    void load_config(const QString& path);
 
 public slots:
     void receive();
