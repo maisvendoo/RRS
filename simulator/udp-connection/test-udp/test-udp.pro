@@ -7,11 +7,11 @@ QT += network
 
 CONFIG += c++11
 CONFIG += console
-CONFIG -= app_bundle
 
-DESTDIR += ../../../../bin
 
-TARGET = simulator
+DESTDIR = ../../../../bin
+
+TARGET = test-udp
 
 CONFIG(debug, debug|release) {
 
@@ -24,20 +24,6 @@ CONFIG(debug, debug|release) {
 
     LIBS += -L../../../../lib -lCfgReader
     LIBS += -L../../../../lib -ludp-connection
-}
-
-win32{
-
-    OPENAL_LIB_DIR = $$(OPENAL_BIN)
-    OPENAL_INCLUDE_BIN = $$(OPENAL_INCLUDE)
-
-    LIBS += -L$$OPENAL_LIB_DIR -lOpenAL32
-    INCLUDEPATH += $$OPENAL_INCLUDE_BIN
-}
-
-unix{
-
-    LIBS += -lopenal
 }
 
 INCLUDEPATH += ./include

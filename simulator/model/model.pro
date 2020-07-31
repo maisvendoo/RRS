@@ -78,14 +78,13 @@ INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../sim-client/include
-INCLUDEPATH += ../udp-connection/include
+INCLUDEPATH += ../udp-connection/udp-connection/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include
-
 
 
 HEADERS += $$files(./include/*.h)

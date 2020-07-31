@@ -10,7 +10,7 @@ UdpServer::~UdpServer()
 
 }
 
-void UdpServer::init(QString &cfg_path)
+void UdpServer::init(const QString &cfg_path)
 {
     load_config(cfg_path);
 
@@ -20,6 +20,9 @@ void UdpServer::init(QString &cfg_path)
 
     connect(serverSocket, &QUdpSocket::readyRead,
             this, &UdpServer::receive);
+
+    connect(serverSocket, &QUdpSocket::connected,
+            this, &UdpServer::slotConnected);
 }
 
 bool UdpServer::isConnected()
@@ -51,7 +54,12 @@ void UdpServer::receive()
     }
 }
 
-void UdpServer::load_config(QString &path)
+void UdpServer::slotConnected()
+{
+    int zu = 0;
+}
+
+void UdpServer::load_config(const QString &path)
 {
     CfgReader cfg;
     cfg.load(path);

@@ -17,7 +17,7 @@ public:
 
     ~UdpServer();
 
-    void init(QString &cfg_path);
+    void init(const QString& cfg_path);
 
     bool isConnected();
 
@@ -29,6 +29,8 @@ public slots:
 
     void receive();
 
+    void slotConnected();
+
 private:
     QUdpSocket *serverSocket;
 
@@ -36,7 +38,7 @@ private:
 
     int port;
 
-    void load_config(QString &path);
+    void load_config(const QString& path);
 };
 
 #endif // UDPSERVER_H

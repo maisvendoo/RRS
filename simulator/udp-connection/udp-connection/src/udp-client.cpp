@@ -19,12 +19,7 @@ void UdpClient::init(const QString &cfg_path)
     clientSocket->connectToHost(QHostAddress::LocalHost, port);
 
     connect(clientSocket, &QUdpSocket::readyRead,
-            this, &UdpClient::receive);
-
-    QByteArray tmp;
-    tmp.append(1);
-
-    clientSocket->writeDatagram(tmp, QHostAddress::LocalHost, port);
+            this, &UdpClient::receive);    
 }
 
 bool UdpClient::isConnected()
@@ -51,6 +46,9 @@ void UdpClient::load_config(const QString &path)
 void UdpClient::receive()
 {
     QByteArray recv_data = clientSocket->readAll();
+
+    if (recv_data.isEmpty())
+        return;
 
     if(recv_data.at(0) == 1)
     {

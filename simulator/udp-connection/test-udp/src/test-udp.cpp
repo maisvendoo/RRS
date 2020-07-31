@@ -3,18 +3,34 @@
 
 #include    "udp-client.h"
 
+/*class Foo : public QObject
+{
+    //Q_OBJECT
+
+public:
+
+    Foo();
+
+    ~Foo();
+
+private:
+
+};*/
+
+
+
 class Transmiter : public QObject
 {
-    Q_OBJECT
+
 
 public:
 
     Transmiter(QObject *parent = Q_NULLPTR) : QObject(parent)
-        , client(new UdpClient)
-        , timer(new QTimer)
+        , client(new UdpClient())
+        , timer(new QTimer())
     {
-        client->init("../cfg/udp-server.xml");
-        connect(timer, &QTimer::timeout, this, &Transmiter::slotSentRequest);
+        client->init("../cfg/udp-Sserver.xml");
+        connect(timer, &QTimer::timeout, this, &Transmiter::slotSendRequest);
 
         timer->start(100);
     }
@@ -32,9 +48,9 @@ private:
 
     QTimer *timer;
 
-private:
+private slots:
 
-    void slotSentRequest()
+    void slotSendRequest()
     {
         QByteArray request;
         request.append(1);
@@ -49,6 +65,9 @@ int main(int argc, char** argv)
 
     Transmiter *transmiter = new Transmiter;
     transmiter->init();
+
+    //Foo *foo;
+    //foo = new Foo();
 
     return app.exec();
 }
