@@ -124,7 +124,7 @@ private:
     /// TCP-server
     Server      *server;
 
-    UdpServer   *udps;
+//    UdpServer   *udps;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel;
@@ -133,7 +133,7 @@ private:
     SimTcpClient *sim_client;
 
     ///
-//    UdpServer *udp_server;
+    UdpServer *udps;
 
     /// Simulation thread
     QThread     model_thread;

@@ -16,7 +16,7 @@ void UdpServer::init(const QString &cfg_path)
 
     serverSocket = new QUdpSocket();
 
-    serverSocket->bind(QHostAddress::LocalHost, port);
+    serverSocket->bind(host, port);
 
     connect(serverSocket, &QUdpSocket::readyRead,
             this, &UdpServer::receive);
@@ -63,5 +63,12 @@ void UdpServer::load_config(const QString &path)
 {
     CfgReader cfg;
     cfg.load(path);
-    cfg.getInt("UdpServer", "Port", port);
+
+    QString host_str;
+    cfg.getString("UdpServer", "HostAddr", host_str);
+    host.setAddress(host_str);
+
+    int port_int;
+    cfg.getInt("UdpServer", "Port", port_int);
+    port = static_cast<unsigned short>(port_int) ;
 }

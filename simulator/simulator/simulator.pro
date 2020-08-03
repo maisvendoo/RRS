@@ -31,6 +31,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsim-client_d
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
+    LIBS += -L../../../lib -ludp-connection_d
 
     LIBS += -L../../../lib -lasound_d
     LIBS += -L../../../lib -lsound-manager_d
@@ -51,6 +52,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lsim-client
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
+    LIBS += -L../../../lib -ludp-connection
 
     LIBS += -L../../../lib -lasound
     LIBS += -L../../../lib -lsound-manager
@@ -77,6 +79,7 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../../tcp-connection/include
+INCLUDEPATH += ../udp-connection/udp-connection/include
 
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../model/include
