@@ -2,6 +2,7 @@
 #define     UDP_SERVER_H
 
 #include    <QUdpSocket>
+#include    <QNetworkDatagram>
 
 #include    "CfgReader.h"
 #include    "udp-data-struct.h"
@@ -27,7 +28,7 @@ public:
 
 public slots:
 
-    void receive();
+    void readPendingDatagrams();
 
     void slotConnected();
 

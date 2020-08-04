@@ -485,23 +485,6 @@ void Model::initSimClient(QString cfg_path)
     }
 }
 
-//void Model::initUdpServer(QString cfg_path)
-//{
-//    CfgReader cfg;
-//    FileSystem &fs = FileSystem::getInstance();
-//    QString full_path = QString(fs.getConfigDir().c_str()) + fs.separator() + cfg_path + ".xml";
-
-//    if (cfg.load(full_path))
-//    {
-//        udp_server->init(full_path);
-//        udp_server = new UdpServer();
-//        connect(this, &Model::getRecvData, udp_server, &UdpServer::setServerData);
-//        udp_server->setServerData()
-
-//        connect(&networkTimer, &QTimer::timeout, this, &Model::udpFeedBack);
-//    }
-//}
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -552,8 +535,6 @@ void Model::tcpFeedBack()
 //        return;
 
 //    udp_server_data_t server_data;
-//    emit getUdpRecvData(server_data);
-
 
 //}
 

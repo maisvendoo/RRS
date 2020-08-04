@@ -29,7 +29,7 @@ public:
         , client(new UdpClient())
         , timer(new QTimer())
     {
-        client->init("../cfg/udp-Sserver.xml");
+        client->init("../cfg/udp-client.xml");
         connect(timer, &QTimer::timeout, this, &Transmiter::slotSendRequest);
 
         timer->start(100);

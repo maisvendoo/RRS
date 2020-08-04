@@ -16,10 +16,12 @@ void UdpClient::init(const QString &cfg_path)
 
     clientSocket = new QUdpSocket();
 
+    clientSocket->bind(host, port);
+
     clientSocket->connectToHost(host, port);
 
     connect(clientSocket, &QUdpSocket::readyRead,
-            this, &UdpClient::receive);    
+            this, &UdpClient::readPendingDatagrams);
 }
 
 bool UdpClient::isConnected()
@@ -32,7 +34,7 @@ bool UdpClient::isConnected()
 
 void UdpClient::sendData(const QByteArray& data)
 {
-    clientSocket->write(data);
+    clientSocket->writeDatagram(data, host, port);
     clientSocket->flush();
 }
 
@@ -50,15 +52,20 @@ void UdpClient::load_config(const QString &path)
     port = static_cast<unsigned short>(port_int);
 }
 
-void UdpClient::receive()
+void UdpClient::readPendingDatagrams()
 {
-    QByteArray recv_data = clientSocket->readAll();
-
-    if (recv_data.isEmpty())
-        return;
-
-    if(recv_data.at(0) == 1)
+    while (clientSocket->hasPendingDatagrams())
     {
-        client_data.deserialize(recv_data);
+        QNetworkDatagram recv_data_net = clientSocket->receiveDatagram();
+
+        QByteArray recv_data = recv_data_net.data();
+
+        if (recv_data.isEmpty())
+            return;
+
+        if(recv_data.at(0) == 1)
+        {
+            client_data.deserialize(recv_data);
+        }
     }
 }

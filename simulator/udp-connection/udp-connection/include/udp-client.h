@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QDataStream>
 #include <QUdpSocket>
+#include <QNetworkDatagram>
 
 #include "CfgReader.h"
 #include "udp-data-struct.h"
@@ -64,7 +65,7 @@ private:
     void load_config(const QString& path);
 
 public slots:
-    void receive();
+    void readPendingDatagrams();
 };
 
 #endif // UDP_CLIENT_H

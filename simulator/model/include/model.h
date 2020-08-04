@@ -124,8 +124,6 @@ private:
     /// TCP-server
     Server      *server;
 
-//    UdpServer   *udps;
-
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel;
 
@@ -174,8 +172,6 @@ private:
     void initControlPanel(QString cfg_path);
 
     void initSimClient(QString cfg_path);
-
-//    void initUdpServer(QString cfg_path);
 
     /// TCP feedback
     void tcpFeedBack();

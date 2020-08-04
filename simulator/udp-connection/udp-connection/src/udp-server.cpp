@@ -19,7 +19,7 @@ void UdpServer::init(const QString &cfg_path)
     serverSocket->bind(host, port);
 
     connect(serverSocket, &QUdpSocket::readyRead,
-            this, &UdpServer::receive);
+            this, &UdpServer::readPendingDatagrams);
 
     connect(serverSocket, &QUdpSocket::connected,
             this, &UdpServer::slotConnected);
@@ -40,17 +40,22 @@ void UdpServer::setServerData(udp_server_data_t &data)
     server_data = data;
 }
 
-void UdpServer::receive()
+void UdpServer::readPendingDatagrams()
 {
-    QByteArray recv_data = serverSocket->readAll();
-
-    if (recv_data.isEmpty())
-        return;
-
-    if (recv_data.at(0) == 1)
+    while (serverSocket->hasPendingDatagrams())
     {
-        QByteArray raw_data = server_data.serialize();
-        serverSocket->write(raw_data);
+        serverSocket->writeDatagram(serverSocket->receiveDatagram());
+//        QNetworkDatagram recv_data_net = serverSocket->receiveDatagram();
+//        QByteArray recv_data = recv_data_net.data();
+
+//        if (recv_data.isEmpty())
+//            return;
+
+//        if (recv_data.at(0) == 1)
+//        {
+//            QByteArray raw_data = server_data.serialize();
+//            serverSocket->writeDatagram(raw_data, host, port);
+//        }
     }
 }
 
