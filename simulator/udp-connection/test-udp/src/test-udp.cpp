@@ -3,6 +3,8 @@
 
 #include    "udp-client.h"
 
+#include    "udp-server.h"
+
 /*class Foo : public QObject
 {
     //Q_OBJECT
@@ -29,7 +31,7 @@ public:
         , client(new UdpClient())
         , timer(new QTimer())
     {
-        client->init("../cfg/udp-client.xml");
+        client->init("../cfg/udp-connection.xml");
         connect(timer, &QTimer::timeout, this, &Transmiter::slotSendRequest);
 
         timer->start(100);
@@ -43,7 +45,6 @@ public:
     void init() {}
 
 private:
-
     UdpClient *client;
 
     QTimer *timer;
@@ -53,7 +54,7 @@ private slots:
     void slotSendRequest()
     {
         QByteArray request;
-        request.append(1);
+        request.append(64);
 
         client->sendData(request);
     }

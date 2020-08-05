@@ -35,11 +35,13 @@ public slots:
 private:
     QUdpSocket *serverSocket;
 
-    udp_server_data_t server_data;
+//    udp_server_data_t server_data;
 
-    QHostAddress host;
+    QHostAddress server_host;
+    QHostAddress client_host;
 
-    unsigned short port;
+    unsigned short server_port;
+    unsigned short client_port;
 
     void load_config(const QString& path);
 };

@@ -134,7 +134,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     initSimClient("virtual-railway");
 
     udps = new UdpServer();
-    udps->init("../cfg/udp-server.xml");
+    udps->init("../cfg/udp-connection.xml");
 
     Journal::instance()->info("Train is initialized successfully");
 

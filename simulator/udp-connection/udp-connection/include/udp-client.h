@@ -58,9 +58,11 @@ private:
 
     udp_server_data_t client_data;
 
-    QHostAddress host;
+    QHostAddress client_host;
+    QHostAddress server_host;
 
-    unsigned short port;
+    unsigned short client_port;
+    unsigned short server_port;
 
     void load_config(const QString& path);
 
