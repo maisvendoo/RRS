@@ -39,10 +39,10 @@ struct udp_vehicle_data_t
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     udp_vehicle_data_t()
-        : coord(0.0f)
-        , velocity(0.0f)
-        , routePath("")
-        , DebugMsg("")
+        : coord(1100.0f)
+        , velocity(100.0f)
+        , routePath("../route/experimental-polygon")
+        , DebugMsg("hello")
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
@@ -110,10 +110,11 @@ struct udp_server_data_t
 
     udp_server_data_t()
         : time(0.0f)
-        , msgCount(0)
-        , vehicleCount(0)
+        , msgCount(1)
+        , vehicleCount(1)
     {
-
+        udp_vehicle_data_t test;
+        vehicles.append(test);
     }
 
     QByteArray serialize()

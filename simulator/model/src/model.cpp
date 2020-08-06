@@ -49,6 +49,20 @@ Model::Model(QObject *parent) : QObject(parent)
     }    
 
     sim_client = Q_NULLPTR;
+
+//------------------------------------------------------------------------------
+
+    /*udp_vehicle_data_t vehicle;
+    vehicle.coord = 100.0f;
+    vehicle.velocity = 100.f;
+    vehicle.routePath = "../route/test";
+    vehicle.DebugMsg = "debug";
+    vehicle.analogSignal[0] = 1.0f;
+
+    server_data.time = 40.0f;
+    server_data.msgCount = 10;
+    server_data.vehicles.append(vehicle);
+    server_data.vehicleCount = 1;*/
 }
 
 //------------------------------------------------------------------------------
@@ -133,8 +147,7 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initSimClient("virtual-railway");
 
-    udps = new UdpServer();
-    udps->init("../cfg/udp-connection.xml");
+    initUdpServer("../cfg/udp-connection.xml");
 
     Journal::instance()->info("Train is initialized successfully");
 
@@ -179,6 +192,18 @@ void Model::outMessage(QString msg)
 void Model::controlProcess()
 {
     control_panel->process();
+}
+
+void Model::udpDataUpdate()
+{
+    udp_server_data_t udp_data;
+
+    udp_data.time = static_cast<float>(t);
+//    udp_data.msgCount =
+//    udp_data.vehicle
+
+
+    udps->setServerData(udp_data);
 }
 
 //------------------------------------------------------------------------------
@@ -483,6 +508,16 @@ void Model::initSimClient(QString cfg_path)
     {
         Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
     }
+}
+
+void Model::initUdpServer(QString cfg_path)
+{
+    udps = new UdpServer();
+    udps->init(cfg_path);
+
+    udpTimer.setInterval(100);
+    connect(&udpTimer, &QTimer::timeout, this, &Model::udpDataUpdate);
+    udpTimer.start();
 }
 
 //------------------------------------------------------------------------------

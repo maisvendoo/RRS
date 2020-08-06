@@ -88,6 +88,8 @@ public slots:
     ///
     void controlProcess();
 
+    void udpDataUpdate();
+
     /// Обмен данными с ВЖД
     void virtualRailwayFeedback();
 
@@ -146,9 +148,14 @@ private:
     QByteArray      data;
 
     QTimer          controlTimer;
+    QTimer          udpTimer;
     QTimer          networkTimer;
 
-    ElapsedTimer    simTimer;       
+    ElapsedTimer    simTimer;
+
+    udp_server_data_t server_data;
+
+
 
     /// Actions, which prerare integration step
     void preStep(double t);
@@ -172,6 +179,8 @@ private:
     void initControlPanel(QString cfg_path);
 
     void initSimClient(QString cfg_path);
+
+    void initUdpServer(QString cfg_path);
 
     /// TCP feedback
     void tcpFeedBack();

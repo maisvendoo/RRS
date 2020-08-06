@@ -53,6 +53,15 @@ public:
 
     void sendData(const QByteArray &data);
 
+    //
+    float getDataTime() {return client_data.time;}
+
+    unsigned int getMsgCount() { return client_data.msgCount; }
+
+    float getVehicleCoord() { return client_data.vehicles.at(0).coord; }
+
+    QString getVehicleRPath() { return client_data.vehicles.at(0).routePath; }
+
 private:
     QUdpSocket *clientSocket;
 

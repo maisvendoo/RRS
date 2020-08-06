@@ -63,16 +63,15 @@ void UdpClient::readPendingDatagrams()
 {
     while (clientSocket->hasPendingDatagrams())
     {
-        QNetworkDatagram recv_data_net = clientSocket->receiveDatagram();
+        QByteArray buffer;
 
-        QByteArray recv_data = recv_data_net.data();
+        buffer.resize(static_cast<int>(clientSocket->pendingDatagramSize()));
 
-        if (recv_data.isEmpty())
-            return;
+        clientSocket->readDatagram(buffer.data(), buffer.size(), &client_host, &client_port);
 
-        if(recv_data.at(0) == 1)
+        if (!buffer.isEmpty())
         {
-            client_data.deserialize(recv_data);
+            client_data.deserialize(buffer);
         }
     }
 }

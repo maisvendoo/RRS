@@ -5,26 +5,8 @@
 
 #include    "udp-server.h"
 
-/*class Foo : public QObject
-{
-    //Q_OBJECT
-
-public:
-
-    Foo();
-
-    ~Foo();
-
-private:
-
-};*/
-
-
-
 class Transmiter : public QObject
 {
-
-
 public:
 
     Transmiter(QObject *parent = Q_NULLPTR) : QObject(parent)
@@ -32,7 +14,9 @@ public:
         , timer(new QTimer())
     {
         client->init("../cfg/udp-connection.xml");
+
         connect(timer, &QTimer::timeout, this, &Transmiter::slotSendRequest);
+        connect(timer, &QTimer::timeout, this, &Transmiter::debug);
 
         timer->start(100);
     }
@@ -53,10 +37,23 @@ private slots:
 
     void slotSendRequest()
     {
-        QByteArray request;
-        request.append(64);
+        QString request = "request";
+        QByteArray data;
 
-        client->sendData(request);
+        data = request.toUtf8();
+
+        client->sendData(data);
+    }
+
+    void debug()
+    {
+        QString debug_info = QString("t = %1 msgCount = %2 vehicleCoord = %3 vehicleRPath = %4 \n")
+                .arg(static_cast<double>(client->getDataTime()))
+                .arg(client->getMsgCount())
+                .arg(client->getVehicleCoord())
+                .arg(client->getVehicleRPath());
+
+        fputs(qPrintable(debug_info), stdout);
     }
 };
 
@@ -66,9 +63,6 @@ int main(int argc, char** argv)
 
     Transmiter *transmiter = new Transmiter;
     transmiter->init();
-
-    //Foo *foo;
-    //foo = new Foo();
 
     return app.exec();
 }

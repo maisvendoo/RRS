@@ -35,7 +35,7 @@ public slots:
 private:
     QUdpSocket *serverSocket;
 
-//    udp_server_data_t server_data;
+    udp_server_data_t server_data;
 
     QHostAddress server_host;
     QHostAddress client_host;
