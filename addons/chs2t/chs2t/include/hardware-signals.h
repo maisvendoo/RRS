@@ -49,7 +49,11 @@ enum ControllerSignals
     KRM_4 = 33,
     KRM_5 = 34,
     KRM_6 = 35,
-    KRM_7 = 36
+    KRM_7 = 36,
+
+    LOCO_CRANE = 37,
+
+    KPD3_READY = 38
 };
 
 enum FeedbackSignals
@@ -120,7 +124,9 @@ enum FeedbackSignals
     SV_LAMP_Y = 54,
     SV_LAMP_YR = 55,
 
-    INDICATOR_BV = 56
+    IND_BV = 56,
+
+    KPD3_VELOCITY = 57
 };
 
 #endif // HARDWARESIGNALS_H

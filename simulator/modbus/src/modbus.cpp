@@ -76,7 +76,7 @@ void Modbus::controlSignalsProcess()
         for (slave_data_t data : slave->discrete_input)
         {
             control_signals.analogSignal[data.index].is_active = true;
-            control_signals.analogSignal[data.index].setValue(static_cast<float>(data.cur_value));
+            control_signals.analogSignal[data.index].cur_value = static_cast<float>(data.cur_value);
         }
 
         master->readInputRegistersRequest(slave);
@@ -84,7 +84,7 @@ void Modbus::controlSignalsProcess()
         for (slave_data_t data : slave->input_register)
         {
             control_signals.analogSignal[data.index].is_active = true;
-            control_signals.analogSignal[data.index].setValue(static_cast<float>(data.cur_value));
+            control_signals.analogSignal[data.index].cur_value = static_cast<float>(data.cur_value);
         }
     }
 
@@ -101,30 +101,32 @@ void Modbus::feedbackSignalsProcess()
         QMap<quint16, slave_data_t>::iterator it;
 
         // Пишем дискретные выходы
+        bool is_changed = false;
+
         for (it = slave->coil.begin(); it != slave->coil.end(); ++it)
         {
             slave_data_t *coil = &it.value();
-            coil->cur_value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value);
+            coil->setValue(static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value));
 
-            if (coil->cur_value != coil->prev_value)
-            {
-                master->writeCoil(slave, *coil);
-                coil->prev_value = coil->cur_value;
-            }
+            is_changed = is_changed || coil->isChanged();
         }
 
+        if (is_changed)
+            master->writeCoils(slave);
+
         // Пишем регистры вывода
+        is_changed = false;
+
         for (it = slave->holding_register.begin(); it != slave->holding_register.end(); ++it)
         {
             slave_data_t *holding_reg = &it.value();
-            holding_reg->cur_value = static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value);
+            holding_reg->setValue(static_cast<quint16>(feedback_signals.analogSignal[it.value().index].cur_value));
 
-            if (holding_reg->cur_value != holding_reg->prev_value)
-            {
-                master->writeHoldingRegister(slave, *holding_reg);
-                holding_reg->prev_value = holding_reg->cur_value;
-            }
+            is_changed = is_changed || holding_reg->isChanged();
         }        
+
+        if (is_changed)
+            master->writeHoldingRegisters(slave);
     }
 }
 

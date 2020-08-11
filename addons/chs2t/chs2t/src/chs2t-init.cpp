@@ -193,6 +193,7 @@ void CHS2T::initOtherEquipment()
 
     horn = new CHS2tHorn();
 
+
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
 
@@ -272,6 +273,12 @@ void CHS2T::initModbus()
 
     Pos_Indicator = new PhysToModbus();
     Pos_Indicator->load((modbusCfgDir + QDir::separator() + "Pos-Indicator").toStdString());
+
+    Loco_Crane = new PhysToModbus();
+    Loco_Crane->load((modbusCfgDir + QDir::separator() + "kvt254").toStdString());
+
+    KPD3_Velocity = new PhysToModbus();
+    KPD3_Velocity->load((modbusCfgDir + QDir::separator() + "kpd3").toStdString());
 }
 
 //------------------------------------------------------------------------------
@@ -391,7 +398,7 @@ void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
     mainReservoir->setY(0, pFL);
     spareReservoir->setY(0, charging_press);
     brakeCrane->init(pTM, pFL);
-    locoCrane->init(pTM, pFL);
+    locoCrane->init(pTM, pFL);    
     airDistr->init(pTM, pFL);
     autoTrainStop->init(pTM, pFL);
 }

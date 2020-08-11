@@ -16,15 +16,24 @@ struct slave_data_t
     quint16      cur_value;
     quint16      prev_value;
 
-
-
     slave_data_t()
         : address(0)
         , index(0)
         , cur_value(0)
-        , prev_value(0)
+        , prev_value(0)        
     {
 
+    }
+
+    void setValue(quint16 value)
+    {
+        prev_value = cur_value;
+        cur_value = value;
+    }
+
+    bool isChanged()
+    {
+        return cur_value != prev_value;
     }
 };
 

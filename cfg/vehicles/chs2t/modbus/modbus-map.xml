@@ -9,7 +9,7 @@
 		<CellsMask>0</CellsMask>
 	</Slave>
 
-<!--
+
 	<Slave>
 		<id>2</id>
 		<Description>Панель манометров</Description>
@@ -17,9 +17,9 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
--->
 
-<!--
+
+
 	<Slave>
 		<id>4</id>
 		<Description>Контроллер машиниста</Description>
@@ -27,39 +27,39 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
--->
 
-<!--
+
+
 	<Slave>
-		<id>   </id>
+		<id>11</id>
 		<Description>Панель кулачковых переключателей (верх)</Description>
 		<Config>switch-panel1</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
--->
 
-	<!-- <Slave>
-		<id>   </id>
+
+	<Slave>
+		<id>3</id>
 		<Description>Карандаш задатчика реостатного тормоза</Description>
 		<Config>reostat</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
-	</Slave> -->
+	</Slave>
 
-<!--
+
 	<Slave>
-		<id>   </id>
+		<id>10</id>
 		<Description>Панель кулачковых переключателей (низ)</Description>
 		<Config>switch-panel2</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-	-->
 
-<!--
+
+
 	<Slave>
-		<id>   </id>
+		<id>6</id>
 		<Description>Панель амперметров и вольтметров</Description>
 		<Config>ampervolt</Config>
 		<ConfigRequired>0</ConfigRequired>
@@ -67,13 +67,13 @@
 	</Slave>
 
 	<Slave>
-		<id>   </id>
+		<id>5</id>
 		<Description>Указатель позиций</Description>
 		<Config>pos-indicator</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
--->
+
 
 	<Slave>
 		<id>7</id>
@@ -85,7 +85,7 @@
 
 
 	<Slave>
-		<id>8</id>
+		<id>16</id>
 		<Description></Description>
 		<Config>lamp-cfg-2</Config>
 		<ConfigRequired>0</ConfigRequired>
@@ -99,5 +99,14 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+	
+	<Slave>
+		<id>12</id>
+		<Description></Description>
+		<Config>kpd3</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+	
 
 </Config>
