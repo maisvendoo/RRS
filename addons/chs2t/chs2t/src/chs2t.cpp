@@ -30,7 +30,7 @@ CHS2T::CHS2T() : Vehicle()
 
     tracForce_kN = 0;
     bv_return = false;
-    Uks = 3000;
+    Uks = 4000;
 
     U_kr = 0;
 
@@ -242,9 +242,12 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[SV_LAMP_Y].cur_value = analogSignal[LS_Y];
     feedback_signals.analogSignal[SV_LAMP_YR].cur_value = analogSignal[LS_YR];
 
-    feedback_signals.analogSignal[IND_BV].cur_value = 1.0f - analogSignal[INDICATOR_BV];
+    feedback_signals.analogSignal[IND_BV].cur_value = analogSignal[INDICATOR_BV];
 
-    feedback_signals.analogSignal[998].cur_value = 1.0;
+    feedback_signals.analogSignal[998].cur_value = 1.0f;
+    feedback_signals.analogSignal[997].cur_value = 1.0f;
+
+    feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = KPD3_Velocity->getModbus(velocity * 3.6);
 }
 
 GET_VEHICLE(CHS2T)

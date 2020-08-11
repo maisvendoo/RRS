@@ -236,7 +236,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
     locoCrane->setControl(keys);
-    locoCrane->setHandlePosition(0);
+
+    double pos = Loco_Crane->getModbus(control_signals.analogSignal[LOCO_CRANE].cur_value);
+    locoCrane->setHandlePosition(cut(pos, 0.0, 1.0));
+
     locoCrane->step(t, dt);
 
     dako->setPgr(mainReservoir->getPressure());

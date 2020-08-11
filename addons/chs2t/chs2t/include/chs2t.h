@@ -127,6 +127,10 @@ private:
 
     PhysToModbus *Pos_Indicator;
 
+    PhysToModbus *Loco_Crane;
+
+    PhysToModbus *KPD3_Velocity;
+
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
 

@@ -50,6 +50,7 @@ void CHS2T::stepSwitcherPanel()
 
     // Нижняя половина панели
     setSwitcherState(mk_switcher[1], control_signals.analogSignal[SWP2_MK2]);
+    control_signals.analogSignal[SWP2_MV].cur_value -= 1.0;
     setSwitcherState(motor_fan_switcher, control_signals.analogSignal[SWP2_MV]);
 
     if (control_signals.analogSignal[EDT_OFF].is_active && control_signals.analogSignal[EDT_ON].is_active)

@@ -47,5 +47,15 @@
 	<Address>1</Address>
 	<Index>998</Index>
     </Coil>
+    
+    <Coil>
+	<Address>2</Address>
+	<Index>997</Index>
+    </Coil>
+    
+    <InputRegister>
+	<Address>2</Address>
+	<Index>37</Index>
+    </InputRegister>
 
 </Config>
