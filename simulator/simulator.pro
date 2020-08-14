@@ -18,6 +18,7 @@ SUBDIRS += ./model
 SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
+SUBDIRS += ./udp-connection
 
 SUBDIRS += ./modbus
 
