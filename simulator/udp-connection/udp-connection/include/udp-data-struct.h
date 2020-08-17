@@ -31,18 +31,20 @@
 struct udp_vehicle_data_t
 {
     float       coord;
+
     float       velocity;
 
-    QString     routePath;
+    int         direction;
+
     QString     DebugMsg;
 
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     udp_vehicle_data_t()
-        : coord(1100.0f)
-        , velocity(100.0f)
-        , routePath("../route/experimental-polygon")
-        , DebugMsg("hello")
+        : coord(0.0f)
+        , velocity(0.0f)
+        , direction(1)
+        , DebugMsg("")
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
@@ -54,12 +56,14 @@ struct udp_vehicle_data_t
         QDataStream ds(&result, QIODevice::WriteOnly);
 
         ds << this->coord;
+
         ds << this->velocity;
 
-        ds << this->routePath;
+        ds << this->direction;
+
         ds << this->DebugMsg;
 
-        for (float signal : this->analogSignal)
+        for (float &signal : this->analogSignal)
         {
             ds << signal;
         }
@@ -72,21 +76,21 @@ struct udp_vehicle_data_t
         QDataStream ds(array);
 
         ds >> this->coord;
-        array.remove(0, sizeof (this->coord));
+        //array.remove(0, sizeof (this->coord));
 
         ds >> this->velocity;
-        array.remove(0, sizeof (this->velocity));
+        //array.remove(0, sizeof (this->velocity));
 
-        ds >> this->routePath;
-        array.remove(0, sizeof (this->routePath));
+        ds >> this->direction;
+        //array.remove(0, sizeof (this->direction));
 
         ds >> this->DebugMsg;
-        array.remove(0, sizeof (this->DebugMsg));
+        //array.remove(0, sizeof (this->DebugMsg));
 
-        for (float signal : this->analogSignal)
+        for (float &signal : this->analogSignal)
         {
             ds >> signal;
-            array.remove(0, sizeof (signal));
+            //array.remove(0, sizeof (signal));
         }
     }
 };
@@ -104,14 +108,18 @@ struct udp_server_data_t
     float           time;
 
     unsigned int    msgCount;
+
     unsigned int    vehicleCount;
+
+    QString         routeName;
 
     QVector<udp_vehicle_data_t> vehicles;
 
     udp_server_data_t()
         : time(0.0f)
-        , msgCount(1)
-        , vehicleCount(1)
+        , msgCount(0)
+        , vehicleCount(0)
+        , routeName("agryz-krugloe_pole")
     {
         udp_vehicle_data_t test;
         vehicles.append(test);
@@ -126,9 +134,12 @@ struct udp_server_data_t
         ds << this->time;
 
         ds << this->msgCount;
+
         ds << this->vehicleCount;
 
-        for (udp_vehicle_data_t vehicle : this->vehicles)
+        ds << this->routeName;
+
+        for (udp_vehicle_data_t &vehicle : this->vehicles)
         {
             ds << vehicle.serialize();
         }
@@ -141,20 +152,26 @@ struct udp_server_data_t
         QDataStream ds(array);
 
         ds >> this->time;
-
-        array.remove(0, sizeof (this->time));
+        //array.remove(0, sizeof (this->time));
 
         ds >> this->msgCount;
-
-        array.remove(0, sizeof (this->msgCount));
+        //array.remove(0, sizeof (this->msgCount));
 
         ds >> this->vehicleCount;
+        //array.remove(0, sizeof (this->vehicleCount));
 
+        ds >> this->routeName;
+        //array.remove(0, sizeof (this->routeName));
+
+        array.remove(0, sizeof (this->time));
+        array.remove(0, sizeof (this->msgCount));
         array.remove(0, sizeof (this->vehicleCount));
+        array.remove(0, sizeof (this->routeName));
 
-        for (udp_vehicle_data_t vehicle : this->vehicles)
+        for (udp_vehicle_data_t &vehicle : this->vehicles)
         {
             vehicle.deserialize(array);
+            int zu = 0;
         }
     }
 };

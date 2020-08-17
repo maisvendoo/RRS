@@ -22,9 +22,7 @@ public:
 
     bool isConnected();
 
-    void setServerData(udp_server_data_t &data);
-
-//    void sendServerData();
+    void setServerData(udp_server_data_t &data) { server_data = data; }
 
 public slots:
 
