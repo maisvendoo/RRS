@@ -155,6 +155,8 @@ private:
 
     udp_server_data_t server_data;
 
+    init_data_t init_data_for_udp;
+
 
 
     /// Actions, which prerare integration step

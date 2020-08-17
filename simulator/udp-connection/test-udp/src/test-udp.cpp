@@ -47,13 +47,13 @@ private slots:
 
     void debug()
     {
-        QString debug_info = QString("t = %1 msgCount = %2 vehicleCoord = %3 vehicleRPath = %4 \n")
-                .arg(static_cast<double>(client->getDataTime()))
-                .arg(client->getMsgCount())
-                .arg(client->getVehicleCoord())
-                .arg(client->getVehicleRPath());
+//        QString debug_info = QString("t = %1 msgCount = %2 vehicleCoord = %3 vehicleRPath = %4 \n")
+//                .arg(static_cast<double>(client->getDataTime()))
+//                .arg(client->getMsgCount())
+//                .arg(client->getVehicleCoord())
+//                .arg(client->getVehicleRPath());
 
-        fputs(qPrintable(debug_info), stdout);
+//        fputs(qPrintable(debug_info), stdout);
     }
 };
 

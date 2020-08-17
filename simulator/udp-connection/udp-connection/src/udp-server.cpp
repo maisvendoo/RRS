@@ -47,7 +47,7 @@ void UdpServer::readPendingDatagrams()
 
         if (buffer == "request")
         {
-            server_data.msgCount++;
+//            server_data.msgCount++;
             QByteArray raw_data = server_data.serialize();
             serverSocket->writeDatagram(raw_data, client_host, client_port);
         }

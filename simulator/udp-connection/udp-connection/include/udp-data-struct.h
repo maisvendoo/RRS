@@ -111,15 +111,15 @@ struct udp_server_data_t
 
     unsigned int    vehicleCount;
 
-    QString         routeName;
+    QString         routeDir;
 
     QVector<udp_vehicle_data_t> vehicles;
 
     udp_server_data_t()
         : time(0.0f)
-        , msgCount(0)
-        , vehicleCount(0)
-        , routeName("agryz-krugloe_pole")
+        , msgCount(1)
+        , vehicleCount(1)
+        , routeDir("")
     {
         udp_vehicle_data_t test;
         vehicles.append(test);
@@ -137,7 +137,7 @@ struct udp_server_data_t
 
         ds << this->vehicleCount;
 
-        ds << this->routeName;
+        ds << this->routeDir;
 
         for (udp_vehicle_data_t &vehicle : this->vehicles)
         {
@@ -152,26 +152,22 @@ struct udp_server_data_t
         QDataStream ds(array);
 
         ds >> this->time;
-        //array.remove(0, sizeof (this->time));
 
         ds >> this->msgCount;
-        //array.remove(0, sizeof (this->msgCount));
 
         ds >> this->vehicleCount;
-        //array.remove(0, sizeof (this->vehicleCount));
 
-        ds >> this->routeName;
-        //array.remove(0, sizeof (this->routeName));
+        ds >> this->routeDir;
 
         array.remove(0, sizeof (this->time));
         array.remove(0, sizeof (this->msgCount));
         array.remove(0, sizeof (this->vehicleCount));
-        array.remove(0, sizeof (this->routeName));
+        array.remove(0, sizeof (this->routeDir));
 
         for (udp_vehicle_data_t &vehicle : this->vehicles)
         {
             vehicle.deserialize(array);
-            int zu = 0;
+            array.remove(0, sizeof (vehicle));
         }
     }
 };

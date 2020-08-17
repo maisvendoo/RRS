@@ -49,20 +49,6 @@ Model::Model(QObject *parent) : QObject(parent)
     }    
 
     sim_client = Q_NULLPTR;
-
-//------------------------------------------------------------------------------
-
-    /*udp_vehicle_data_t vehicle;
-    vehicle.coord = 100.0f;
-    vehicle.velocity = 100.f;
-    vehicle.routePath = "../route/test";
-    vehicle.DebugMsg = "debug";
-    vehicle.analogSignal[0] = 1.0f;
-
-    server_data.time = 40.0f;
-    server_data.msgCount = 10;
-    server_data.vehicles.append(vehicle);
-    server_data.vehicleCount = 1;*/
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +81,8 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Read solver configuration
     Journal::instance()->info("==== Solver configurating ====");
     configSolver(init_data.solver_config);
+
+    init_data_for_udp = init_data;
 
     start_time = init_data.solver_config.start_time;
     stop_time = init_data.solver_config.stop_time;
@@ -200,6 +188,7 @@ void Model::udpDataUpdate()
 
     udp_data.time = static_cast<float>(t);
     udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
+    udp_data.routeDir = init_data_for_udp.route_dir;
 //    udp_data.vehicles[0].velocity
 //    udp_data.msgCount =
 //    udp_data.vehicle
