@@ -25,6 +25,8 @@
 
 #include "QDataStream"
 
+#include "QTextStream"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -46,7 +48,7 @@ struct udp_vehicle_data_t
         , direction(1)
         , DebugMsg("")
     {
-        std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
+        std::fill(analogSignal.begin(), analogSignal.end(), 1.0f);
     }
 
     QByteArray serialize()
@@ -76,21 +78,16 @@ struct udp_vehicle_data_t
         QDataStream ds(array);
 
         ds >> this->coord;
-        //array.remove(0, sizeof (this->coord));
 
         ds >> this->velocity;
-        //array.remove(0, sizeof (this->velocity));
 
         ds >> this->direction;
-        //array.remove(0, sizeof (this->direction));
 
         ds >> this->DebugMsg;
-        //array.remove(0, sizeof (this->DebugMsg));
 
         for (float &signal : this->analogSignal)
         {
             ds >> signal;
-            //array.remove(0, sizeof (signal));
         }
     }
 };
