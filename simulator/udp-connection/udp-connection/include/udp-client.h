@@ -53,6 +53,9 @@ public:
 
     void sendData(const QByteArray &data);
 
+    /// Отключение прокси
+    void setNoProxy(bool no_proxy = true);
+
     udp_server_data_t getClientData() { return client_data; }
 
 private:

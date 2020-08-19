@@ -43,10 +43,10 @@ struct udp_vehicle_data_t
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     udp_vehicle_data_t()
-        : coord(0.0f)
-        , velocity(0.0f)
+        : coord(1.0f)
+        , velocity(1.0f)
         , direction(1)
-        , DebugMsg("")
+        , DebugMsg("debug")
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 1.0f);
     }
@@ -65,7 +65,7 @@ struct udp_vehicle_data_t
 
         ds << this->DebugMsg;
 
-        for (float &signal : this->analogSignal)
+        for (float signal : this->analogSignal)
         {
             ds << signal;
         }
@@ -104,19 +104,19 @@ struct udp_server_data_t
 {
     float           time;
 
-    unsigned int    msgCount;
+    int             msgCount;
 
-    unsigned int    vehicleCount;
+    int             vehicleCount;
 
     QString         routeDir;
 
     QVector<udp_vehicle_data_t> vehicles;
 
     udp_server_data_t()
-        : time(0.0f)
+        : time(1.0f)
         , msgCount(1)
         , vehicleCount(1)
-        , routeDir("")
+        , routeDir("routeDir")
     {
         udp_vehicle_data_t test;
         vehicles.append(test);
@@ -136,9 +136,10 @@ struct udp_server_data_t
 
         ds << this->routeDir;
 
-        for (udp_vehicle_data_t &vehicle : this->vehicles)
+        for (udp_vehicle_data_t vehicle : this->vehicles)
         {
-            ds << vehicle.serialize();
+//            ds << vehicle.serialize();
+            result.append(vehicle.serialize());
         }
 
         return result;
@@ -156,15 +157,19 @@ struct udp_server_data_t
 
         ds >> this->routeDir;
 
-        array.remove(0, sizeof (this->time));
-        array.remove(0, sizeof (this->msgCount));
-        array.remove(0, sizeof (this->vehicleCount));
-        array.remove(0, sizeof (this->routeDir));
+//        int timeSize = sizeof (this->time); // = 4
+//        int msgCountSize = sizeof (this->msgCount); // = 4
+//        int vehicleCountSize = sizeof (this->vehicleCount); // = 4
+//        int routeDirSize = this->routeDir.length(); // = 28
+
+//        int serverSize = timeSize + msgCountSize + vehicleCountSize + routeDirSize;
+
+        array.remove(0, 20 + this->routeDir.length() * 2);
 
         for (udp_vehicle_data_t &vehicle : this->vehicles)
         {
             vehicle.deserialize(array);
-            array.remove(0, sizeof (vehicle));
+//            array.remove(0, sizeof (vehicle));
         }
     }
 };

@@ -187,10 +187,13 @@ void Model::udpDataUpdate()
     udp_server_data_t udp_data;
 
     udp_data.time = static_cast<float>(t);
-    udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
+    udp_data.msgCount = 1;
+    udp_data.vehicleCount = 1;
     udp_data.routeDir = init_data_for_udp.route_dir;
-//    udp_data.vehicles[0].velocity
-//    udp_data.msgCount =
+
+    udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
+//    udp_data.vehicles[0].velocity = 100.f;
+//    udp_data.vehicles[0].direction =1;
 //    udp_data.vehicle
 
 

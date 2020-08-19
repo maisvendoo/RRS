@@ -1,5 +1,7 @@
 #include "udp-client.h"
 
+#include <QNetworkProxy>
+
 UdpClient::UdpClient()
 {
 
@@ -49,6 +51,12 @@ bool UdpClient::isConnected()
 void UdpClient::sendData(const QByteArray& data)
 {
     clientSocket->writeDatagram(data, server_host, server_port);
+}
+
+void UdpClient::setNoProxy(bool no_proxy)
+{
+    if (no_proxy)
+        clientSocket->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
 }
 
 void UdpClient::load_config(const QString &path)
