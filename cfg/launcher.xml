@@ -2,5 +2,8 @@
 <Config>
 	<Launcher>
 		<Theme>dark-jedy</Theme>
+		<StartAuxViewer>1</StartAuxViewer>
+		<Screen1>1</Screen1>
+		<Screen2>0</Screen2>
 	</Launcher>
 </Config>

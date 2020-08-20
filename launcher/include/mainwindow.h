@@ -21,6 +21,7 @@
 #include    "route-info.h"
 #include    "train-info.h"
 #include    "waypoint.h"
+#include    "launch-settings.h"
 
 //------------------------------------------------------------------------------
 //
@@ -65,10 +66,14 @@ private:
 
     std::vector<waypoint_t>     waypoints;
 
+    launch_settings_t           settings;
+
     /// Simulation process
     QProcess        simulatorProc;
     /// Visaulization process
     QProcess        viewerProc;
+    ///
+    QProcess        auxViewerProc;
 
     /// Launcer initialization
     void init();

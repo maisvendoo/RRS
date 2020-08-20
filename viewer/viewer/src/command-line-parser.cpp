@@ -43,6 +43,9 @@ CommandLineParser::CommandLineParser(int argc, char *argv[])
     cmd_line.localmode.is_present = cmd_line.localmode.value = args.read("--localmode", value);
 
     cmd_line.notify_level.is_present = args.read("--notify-level", cmd_line.notify_level.value);
+
+    if (args.read("--screen", value))
+        cmd_line.screen.is_present = getValue(value, cmd_line.screen.value);
 }
 
 //------------------------------------------------------------------------------

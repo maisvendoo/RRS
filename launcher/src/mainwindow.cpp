@@ -300,6 +300,10 @@ void MainWindow::loadTheme()
         QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
 
         this->setStyleSheet(style_sheet);
+
+        cfg.getBool("Launcher", "StartAuxViewer", settings.start_aux_viewer);
+        cfg.getInt("Launcher", "Screen1", settings.screen1);
+        cfg.getInt("Launcher", "Screen2", settings.screen2);
     }
 }
 

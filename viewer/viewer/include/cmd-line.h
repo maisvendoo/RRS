@@ -55,6 +55,7 @@ struct cmd_line_t
     option_t<bool>            localmode;
     option_t<std::string>     notify_level;
     option_t<int>             direction;
+    option_t<int>             screen;
 };
 
 #endif // CMD_LINE_H
