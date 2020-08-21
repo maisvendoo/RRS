@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
+SUBDIRS += ./udp-connection
 SUBDIRS += ./sound-manager
 SUBDIRS += ./physics
 SUBDIRS += ./device
@@ -18,7 +19,6 @@ SUBDIRS += ./model
 SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling
 SUBDIRS += ./simulator
-SUBDIRS += ./udp-connection
 
 SUBDIRS += ./modbus
 

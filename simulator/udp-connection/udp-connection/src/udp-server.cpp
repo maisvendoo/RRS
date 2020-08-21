@@ -1,4 +1,5 @@
 #include    "udp-server.h"
+#include     <QNetworkProxy>
 
 UdpServer::UdpServer(QObject* parent) : QObject(parent)
 {
@@ -35,6 +36,12 @@ bool UdpServer::isConnected()
     return serverSocket->state() == QUdpSocket::BoundState;
 }
 
+void UdpServer::setNoProxy(bool no_proxy)
+{
+    if (no_proxy)
+        serverSocket->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+}
+
 void UdpServer::readPendingDatagrams()
 {
     while (serverSocket->hasPendingDatagrams())
@@ -47,7 +54,6 @@ void UdpServer::readPendingDatagrams()
 
         if (buffer == "request")
         {
-//            server_data.msgCount++;
             QByteArray raw_data = server_data.serialize();
             serverSocket->writeDatagram(raw_data, client_host, client_port);
         }

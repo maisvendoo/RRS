@@ -22,6 +22,9 @@ public:
 
     bool isConnected();
 
+    /// Отключение прокси
+    void setNoProxy(bool no_proxy = true);
+
     void setServerData(udp_server_data_t &data)
     {
         server_data = data;
