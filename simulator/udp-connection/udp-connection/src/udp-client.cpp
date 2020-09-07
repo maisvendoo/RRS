@@ -1,5 +1,7 @@
 #include "udp-client.h"
 
+#include <QNetworkProxy>
+
 UdpClient::UdpClient()
 {
 
@@ -18,7 +20,10 @@ void UdpClient::init(const QString &cfg_path)
 
     clientSocket->bind(client_host, client_port);
 
-//    clientSocket->connectToHost(host, port);
+    if (this->isConnected())
+    {
+        emit authorized();
+    }
 
     connect(clientSocket, &QUdpSocket::readyRead,
             this, &UdpClient::readPendingDatagrams);
@@ -27,15 +32,31 @@ void UdpClient::init(const QString &cfg_path)
 bool UdpClient::isConnected()
 {
     if (clientSocket == Q_NULLPTR)
+    {
         return false;
+    }
 
-    return  clientSocket->state() == QUdpSocket::ConnectedState;
+    if (clientSocket->state() == QUdpSocket::BoundState)
+    {
+        return true;
+    }
+
+    else
+    {
+        emit disconnectedFromServer();
+        return false;
+    }
 }
 
 void UdpClient::sendData(const QByteArray& data)
 {
     clientSocket->writeDatagram(data, server_host, server_port);
-//    clientSocket->flush();
+}
+
+void UdpClient::setNoProxy(bool no_proxy)
+{
+    if (no_proxy)
+        clientSocket->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
 }
 
 void UdpClient::load_config(const QString &path)
@@ -63,15 +84,14 @@ void UdpClient::readPendingDatagrams()
 {
     while (clientSocket->hasPendingDatagrams())
     {
-        QByteArray buffer;
+        incomingData_.resize(static_cast<int>(clientSocket->pendingDatagramSize()));
 
-        buffer.resize(static_cast<int>(clientSocket->pendingDatagramSize()));
+        clientSocket->readDatagram(incomingData_.data(), incomingData_.size(), &client_host, &client_port);
 
-        clientSocket->readDatagram(buffer.data(), buffer.size(), &client_host, &client_port);
-
-        if (!buffer.isEmpty())
+        if (!incomingData_.isEmpty())
         {
-            client_data.deserialize(buffer);
+            client_data.deserialize(incomingData_);
+            int zu = 0;
         }
     }
 }

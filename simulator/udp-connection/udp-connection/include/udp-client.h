@@ -53,17 +53,15 @@ public:
 
     void sendData(const QByteArray &data);
 
-    //
-    float getDataTime() {return client_data.time;}
+    /// Отключение прокси
+    void setNoProxy(bool no_proxy = true);
 
-    unsigned int getMsgCount() { return client_data.msgCount; }
-
-    float getVehicleCoord() { return client_data.vehicles.at(0).coord; }
-
-    QString getVehicleRPath() { return client_data.vehicles.at(0).routePath; }
+    udp_server_data_t getClientData() { return client_data; }
 
 private:
     QUdpSocket *clientSocket;
+
+    QByteArray incomingData_;
 
     udp_server_data_t client_data;
 
@@ -74,6 +72,11 @@ private:
     unsigned short server_port;
 
     void load_config(const QString& path);
+
+signals:
+    void authorized();
+
+    void disconnectedFromServer();
 
 public slots:
     void readPendingDatagrams();
