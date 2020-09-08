@@ -6,7 +6,6 @@
     </UdpClient>
 
     <UdpServer>
-        <HostAddr>172.30.60.19</HostAddr>
         <Port>1995</Port>
     </UdpServer>
 </Config>

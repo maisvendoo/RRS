@@ -18,7 +18,7 @@ void UdpClient::init(const QString &cfg_path)
 
     clientSocket = new QUdpSocket();
 
-    clientSocket->bind(client_host, client_port);
+    clientSocket->bind(QHostAddress::LocalHost, client_port);
 
     if (this->isConnected())
     {
@@ -70,14 +70,14 @@ void UdpClient::load_config(const QString &path)
     cfg.getString("UdpServer", "HostAddr", host_str);
     server_host.setAddress(host_str);
 
-    cfg.getString("UdpClient", "HostAddr", host_str);
-    client_host.setAddress(host_str);
+//    cfg.getString("UdpClient", "HostAddr", host_str);
+//    client_host.setAddress(host_str);
 
     cfg.getInt("UdpServer", "Port", port_int);
     server_port = static_cast<unsigned short>(port_int);
 
-    cfg.getInt("UdpClient", "Port", port_int);
-    client_port = static_cast<unsigned short>(port_int);
+//    cfg.getInt("UdpClient", "Port", port_int);
+//    client_port = static_cast<unsigned short>(port_int);
 }
 
 void UdpClient::readPendingDatagrams()
@@ -86,12 +86,11 @@ void UdpClient::readPendingDatagrams()
     {
         incomingData_.resize(static_cast<int>(clientSocket->pendingDatagramSize()));
 
-        clientSocket->readDatagram(incomingData_.data(), incomingData_.size(), &client_host, &client_port);
+        clientSocket->readDatagram(incomingData_.data(), incomingData_.size(), &server_host, &server_port);
 
         if (!incomingData_.isEmpty())
         {
             client_data.deserialize(incomingData_);
-            int zu = 0;
         }
     }
 }
