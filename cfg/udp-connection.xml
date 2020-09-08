@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <UdpClient>
-        <HostAddr>172.30.60.240</HostAddr>
+        <HostAddr>172.30.60.20</HostAddr>
         <Port>1994</Port>
     </UdpClient>
 
