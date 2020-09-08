@@ -22,13 +22,7 @@ public:
 
     bool isConnected();
 
-    /// Отключение прокси
-    void setNoProxy(bool no_proxy = true);
-
-    void setServerData(udp_server_data_t &data)
-    {
-        server_data = data;
-    }
+    void setServerData(udp_server_data_t &data) { server_data = data; }
 
 public slots:
 
@@ -41,7 +35,7 @@ private:
 
     udp_server_data_t server_data;
 
-    QHostAddress server_host;
+//    QHostAddress server_host;
     QHostAddress client_host;
 
     unsigned short server_port;
