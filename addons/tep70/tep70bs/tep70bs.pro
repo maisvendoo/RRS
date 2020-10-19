@@ -3,7 +3,7 @@ TEMPLATE = lib
 QT -= gui
 QT += xml
 
-TARGET = tep70
+TARGET = tep70bs
 
 DESTDIR = ../../../../modules/$$join(TARGET,,,)
 
