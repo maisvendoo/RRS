@@ -5,7 +5,7 @@
 
 #include    <osg/Geode>
 #include    <osg/NodeVisitor>
-#include    <osgQt/QWidgetImage>
+#include    "QWidgetImage.h"
 #include    <QString>
 
 class DisplaySurfaceVisitor : public osg::NodeVisitor
