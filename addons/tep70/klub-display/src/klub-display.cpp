@@ -15,6 +15,7 @@ KlubDisplay::KlubDisplay(QWidget *parent, Qt::WindowFlags f)
 
     this->setLayout(new QVBoxLayout);
     this-> setFocusPolicy(Qt::FocusPolicy::NoFocus);
+    this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 //------------------------------------------------------------------------------

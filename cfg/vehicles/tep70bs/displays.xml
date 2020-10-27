@@ -6,10 +6,10 @@
 		<Module>klub-display</Module>
 		<SurfaceName>KLUB_BIL_v3</SurfaceName>
 		
-		<Corner3>1.0 1.0</Corner3>
-		<Corner4>0.0 1.0</Corner4>
-		<Corner1>0.0 0.0</Corner1>
-		<Corner2>1.0 0.0</Corner2>
+		<Corner1>1.0 1.0</Corner1>
+		<Corner2>0.0 1.0</Corner2>
+		<Corner3>0.0 0.0</Corner3>
+		<Corner4>1.0 0.0</Corner4>
 	</Display> 
 
 
