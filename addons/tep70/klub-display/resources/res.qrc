@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/klub">
+        <file alias="img-background">img/klub-bil-v3-2048.png</file>
+    </qresource>
+</RCC>

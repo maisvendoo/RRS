@@ -13,7 +13,7 @@
 		<Description>Магистральный пассажирский тепловоз Коломенского завода</Description>
 	</Common>
 	<Vehicle>
-		<Module>tep70</Module>
+		<Module>tep70bs</Module>
 		<ModuleConfig>tep70bs</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>

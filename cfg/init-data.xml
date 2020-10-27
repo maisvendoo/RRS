@@ -2,7 +2,7 @@
 <Config>
     <InitData>
         <InitCoord>1.0</InitCoord>
-        <InitVelocity>200.0</InitVelocity>
+        <InitVelocity>0.0</InitVelocity>
         <Direction>1</Direction>
         <TrainConfig>default</TrainConfig>
         <IntegrationTimeInterval>20</IntegrationTimeInterval>        
