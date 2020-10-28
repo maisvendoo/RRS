@@ -1,6 +1,6 @@
 #include    "display-surface-visitor.h"
 
-#include    <osgQt/QWidgetImage>
+#include    "QWidgetImage.h"
 #include    <osgViewer/ViewerEventHandlers>
 #include    <osg/Material>
 #include    <osg/Texture2D>

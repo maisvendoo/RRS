@@ -14,13 +14,13 @@
 #ifndef QWIDGETIMAGE
 #define QWIDGETIMAGE
 
-#include <osgQt/QGraphicsViewAdapter>
+#include "QGraphicsViewAdapter.h"
 #include <osg/Image>
 
 namespace osgQt
 {
 
-class OSGQT_EXPORT QWidgetImage : public osg::Image
+class QWidgetImage : public osg::Image
 {
     public:
 

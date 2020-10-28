@@ -18,7 +18,7 @@
 
 #include <osg/Image>
 #include <osg/observer_ptr>
-#include <osgQt/Export>
+#include "Export.h"
 
 #include <QPointer>
 #include <QGraphicsScene>
@@ -30,9 +30,9 @@
 namespace osgQt
 {
 
-extern OSGQT_EXPORT QCoreApplication* getOrCreateQApplication();
+QCoreApplication* getOrCreateQApplication();
 
-class OSGQT_EXPORT QGraphicsViewAdapter : public QObject
+class QGraphicsViewAdapter : public QObject
 {
     Q_OBJECT
 
