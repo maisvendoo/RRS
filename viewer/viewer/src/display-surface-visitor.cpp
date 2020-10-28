@@ -30,6 +30,9 @@ void DisplaySurfaceVisitor::apply(osg::Geode &geode)
     geode.getDrawable(0)->setCullCallback(dc->handler.get());
 
     osg::Geometry *geom = static_cast<osg::Geometry *>(geode.getDrawable(0));
+
+    osg::Vec3Array *verts = (osg::Vec3Array *) geom->getVertexArray();
+
     geom->setTexCoordArray(0, display_config.texcoord.get());
 
     traverse(geode);
