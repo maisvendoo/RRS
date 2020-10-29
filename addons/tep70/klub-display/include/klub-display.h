@@ -3,6 +3,10 @@
 
 #include    "display.h"
 
+#include    "led-lamp.h"
+
+#include    <QTimer>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -19,10 +23,17 @@ public:
 
 private:
 
+    bool alarm_state;
 
+    LEDLamp *alarm;
+
+
+
+    QTimer update_timer;
 
 private slots:
 
+    void slotUpdateTimer();
 };
 
 #endif
