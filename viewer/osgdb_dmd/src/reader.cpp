@@ -66,7 +66,7 @@ osgDB::ReaderWriter::ReadResult ReaderDMD::readNode(std::ifstream &stream,
 
     osgUtil::SmoothingVisitor::smooth(*geom);
 
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;   
     geode->addDrawable(geom.get());
 
     return geode.release();

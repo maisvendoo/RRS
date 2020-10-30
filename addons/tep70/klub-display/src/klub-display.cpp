@@ -13,6 +13,7 @@ KlubDisplay::KlubDisplay(QWidget *parent, Qt::WindowFlags f) : AbstractDisplay(p
     this->resize(2048, 638);
     this->setAutoFillBackground(true);
     this->setPalette(QPalette(QColor(255, 255, 255)));
+    this->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     this->setLayout(new QVBoxLayout);
     this-> setFocusPolicy(Qt::FocusPolicy::NoFocus);
@@ -50,6 +51,8 @@ void KlubDisplay::init()
     background->setFixedHeight(pic.height());
 
     background->setPixmap(pic);
+
+    background->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     alarm = new LEDLamp(background);
     alarm->setOnImage(":/klub/alarm_on");

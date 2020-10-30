@@ -105,8 +105,8 @@ unix {
 
 #CONFIG += force_debug_info
 
-QMAKE_CXXFLAGS_DEBUG += -pg
-QMAKE_LFLAGS_DEBUG += -pg
+#MAKE_CXXFLAGS_DEBUG += -pg
+#QMAKE_LFLAGS_DEBUG += -pg
 
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../simulator/vehicle/include
