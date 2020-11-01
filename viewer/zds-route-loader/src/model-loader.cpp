@@ -23,6 +23,7 @@
 
 #include    <osg/BlendFunc>
 #include    <osg/AlphaFunc>
+#include    <osg/CullFace>
 
 #include    <osgDB/WriteFile>
 

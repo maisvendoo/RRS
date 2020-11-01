@@ -170,7 +170,7 @@ void TEP70::initSounds()
 
     connect(km, &ControllerKM2202::soundPlay, this, &TEP70::soundPlay);
 
-    connect(speed_meter, &SL2M::soundPlay, this, &TEP70::soundPlay);
-    connect(speed_meter, &SL2M::soundStop, this, &TEP70::soundStop);
-    connect(speed_meter, &SL2M::soundSetVolume, this, &TEP70::soundSetVolume);
+    //connect(speed_meter, &SL2M::soundPlay, this, &TEP70::soundPlay);
+    //connect(speed_meter, &SL2M::soundStop, this, &TEP70::soundStop);
+    //connect(speed_meter, &SL2M::soundSetVolume, this, &TEP70::soundSetVolume);
 }

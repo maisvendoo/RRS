@@ -106,7 +106,7 @@ void readNextMesh(std::ifstream &stream, dmd_mesh_t &mesh)
             unsigned int idx = 0;
             ss >> idx;
             face->push_back(idx - 1);
-        }        
+        }
 
         mesh.faces.push_back(face);
         mesh.normals->push_back(mesh.calcFaceNormal(face));

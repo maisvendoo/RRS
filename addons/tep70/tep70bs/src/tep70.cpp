@@ -139,7 +139,7 @@ void TEP70::initialization()
 
     initSounds();
 
-    reg = new Registrator("../charts/tep70-char", 1.0);
+    //reg = new Registrator("../charts/tep70-char", 1.0);
 }
 
 //------------------------------------------------------------------------------
@@ -172,11 +172,11 @@ void TEP70::step(double t, double dt)
 
     debugOutput(t, dt);
 
-    QString line = QString("%1 %2 %3")
+    /*QString line = QString("%1 %2 %3")
             .arg(velocity * Physics::kmh, 6, 'f', 1)
             .arg(tracForce / 1000.0, 6, 'f', 1)
             .arg(motor[0]->getAncorCurrent(), 6, 'f', 1);
-    reg->print(line, t, dt);
+    reg->print(line, t, dt);*/
 }
 
 //------------------------------------------------------------------------------
