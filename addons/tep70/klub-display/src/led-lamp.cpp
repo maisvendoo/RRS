@@ -38,6 +38,8 @@ void LEDLamp::setState(bool state)
             this->setPixmap(&pic_on);
         else
             this->setPixmap(&pic_off);
+
+        this->update();
     }
 }
 

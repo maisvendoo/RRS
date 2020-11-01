@@ -42,6 +42,8 @@
 #include    "brake-switcher.h"
 #include    "hysteresis-relay.h"
 
+#include    "msut.h"
+
 #include    "registrator.h"
 
 /*!
@@ -227,7 +229,7 @@ private:
     Registrator             *reg;
 
     /// Скоростемер
-    SL2M                    *speed_meter;
+    //SL2M                    *speed_meter;
 
     /// Кнопка "Пуск дизеля"
     bool    button_disel_start;
@@ -292,6 +294,9 @@ private:
     /// Реле выдержки времени для предотвращение отключения КШ1
     /// при выключении КШ2 (нет в схеме!)
     TimeRelay           *ksh1_delay;
+
+    /// Микропроцессорная система управления тепловозом
+    MSUT                *msut;
 
     enum
     {
@@ -377,6 +382,9 @@ private:
     /// Инициализация прочего оборудования
     void initOther();
 
+    /// Инициализация МСУТ
+    void initMSUT();
+
     /// Инициализация звуков
     void initSounds();
 
@@ -409,6 +417,9 @@ private:
 
     /// Шаг моделирования прочего оборудования
     void stepOther(double t, double dt);
+
+    /// Шаг работы МСУТ
+    void stepMSUT(double t, double dt);
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);

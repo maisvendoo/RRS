@@ -100,6 +100,9 @@ enum
     VAL_PRSKOR1 = 73,
     VAL_PRSKOR2 = 74,
 
+    KLUB_ON = 90,
+    KLUB_ALARM = 91,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

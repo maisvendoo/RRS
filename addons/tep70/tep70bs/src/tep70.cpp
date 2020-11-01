@@ -58,8 +58,7 @@ TEP70::TEP70() : Vehicle()
   , trac_gen(nullptr)
   , field_reg(nullptr)
   , I_gen(0.0)
-  , reg(nullptr)
-  , speed_meter(nullptr)
+  , reg(nullptr)  
   , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
@@ -82,6 +81,7 @@ TEP70::TEP70() : Vehicle()
   , rp2(nullptr)
   , ksh2_delay(nullptr)
   , ksh1_delay(nullptr)
+  , msut(nullptr)
 {
     railway_coord = railway_coord0 = 0;
     velocity = 0;

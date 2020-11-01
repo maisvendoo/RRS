@@ -88,9 +88,9 @@ void TEP70::stepElectroTransmission(double t, double dt)
     field_reg->setKMPosition(km->getPositionNumber());
     field_reg->step(t, dt);
 
-    speed_meter->setWheelDiameter(wheel_diameter);
-    speed_meter->setOmega(wheel_omega[0]);
-    speed_meter->step(t, dt);
+    //speed_meter->setWheelDiameter(wheel_diameter);
+    //speed_meter->setOmega(wheel_omega[0]);
+    //speed_meter->step(t, dt);
 
     // Цепь реле РУ1
     bool is_RU1_on = azv_upr_tepl.getState() && km->is12orMore();

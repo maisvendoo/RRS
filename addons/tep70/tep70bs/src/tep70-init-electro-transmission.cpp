@@ -52,8 +52,8 @@ void TEP70::initElectroTransmission()
     kp[6]->setInitContactState(1, true);
     kp[6]->setInitContactState(2, false);
 
-    speed_meter = new SL2M();
-    speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
+    //speed_meter = new SL2M();
+    //speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
 
     ksh1 = new Relay(3);
     ksh1->read_custom_config(config_dir + QDir::separator() + "mk-6");

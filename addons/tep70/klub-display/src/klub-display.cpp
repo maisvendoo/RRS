@@ -3,6 +3,8 @@
 #include    <QLabel>
 #include    <QLayout>
 
+#include    "tep70-signals.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -20,7 +22,7 @@ KlubDisplay::KlubDisplay(QWidget *parent, Qt::WindowFlags f) : AbstractDisplay(p
     this->layout()->setContentsMargins(0, 0, 0, 0);
 
     connect(&update_timer, &QTimer::timeout, this, &KlubDisplay::slotUpdateTimer);
-    update_timer.setInterval(100);
+    update_timer.setInterval(500);
     update_timer.start();
 }
 
@@ -49,19 +51,15 @@ void KlubDisplay::init()
 
     background->setFixedWidth(pic.width());
     background->setFixedHeight(pic.height());
-
     background->setPixmap(pic);
 
-    background->setAttribute(Qt::WA_TransparentForMouseEvents);
-
+    // Лампа проверки бдительности (треугольная)
     alarm = new LEDLamp(background);
     alarm->setOnImage(":/klub/alarm_on");
     alarm->setOffImage(":/klub/alarm_off");
     alarm->setPosition(1935, 137);
 
     this->layout()->addWidget(background);
-
-
 
     AbstractDisplay::init();
 }
@@ -71,10 +69,10 @@ void KlubDisplay::init()
 //------------------------------------------------------------------------------
 void KlubDisplay::slotUpdateTimer()
 {
-    //alarm->setState(true);
-    alarm->setState(alarm_state);
+    if (!TO_BOOL(input_signals[KLUB_ON]))
+        return;
 
-    alarm_state = !alarm_state;
+    alarm->setState(TO_BOOL(input_signals[KLUB_ALARM]));
 }
 
 GET_DISPLAY(KlubDisplay)
