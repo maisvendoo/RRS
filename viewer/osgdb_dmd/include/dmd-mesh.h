@@ -4,17 +4,18 @@
 #include    <osg/Array>
 #include    <osg/Drawable>
 
+typedef  std::vector<unsigned int> face_t;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct dmd_mesh_t
 {
     osg::ref_ptr<osg::Vec3Array>                        vertices;
-    osg::ref_ptr<osg::Vec3Array>                        normals;
-    osg::ref_ptr<osg::Vec3Array>                        texvertices;
-    std::vector<osg::ref_ptr<osg::DrawElementsUInt>>    faces;
+    osg::ref_ptr<osg::Vec3Array>                        normals;    
+    std::vector<face_t>                                 faces;
     osg::ref_ptr<osg::Vec2Array>                        texcoords;
-    std::vector<osg::ref_ptr<osg::DrawElementsUInt>>    texfaces;
+    std::vector<face_t>                                 texfaces;
     bool                                                is_texture_present;
 
     osg::Vec3 calcFaceNormal(osg::DrawElementsUInt *face) const

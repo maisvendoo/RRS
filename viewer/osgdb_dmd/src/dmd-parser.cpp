@@ -73,7 +73,7 @@ void readNextMesh(std::ifstream &stream, dmd_mesh_t &mesh)
 
     line = getLine(stream);
 
-    mesh.vertices = new osg::Vec3Array;
+    mesh.vertices = new osg::Vec3Array;    
 
     for (int i = 0; i < numverts; ++i)
     {
@@ -95,21 +95,20 @@ void readNextMesh(std::ifstream &stream, dmd_mesh_t &mesh)
     for (int i = 0; i < numfaces; ++i)
     {
         line = getLine(stream);
-        line = delete_symbol(line, '\t');
-
-        osg::ref_ptr<osg::DrawElementsUInt> face = new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
+        line = delete_symbol(line, '\t');        
 
         std::istringstream ss(line);
+
+        face_t face;
 
         while (!ss.eof())
         {
             unsigned int idx = 0;
             ss >> idx;
-            face->push_back(idx - 1);
+            face.push_back(idx-1);
         }
 
         mesh.faces.push_back(face);
-        mesh.normals->push_back(mesh.calcFaceNormal(face));
     }
 }
 
@@ -136,7 +135,8 @@ void readTextureBlock(std::ifstream &stream, dmd_mesh_t &mesh)
 
     mesh.is_texture_present = true;
 
-    mesh.texcoords = new osg::Vec2Array;    
+    // Текстурные координаты
+    mesh.texcoords = new osg::Vec2Array;
 
     for (unsigned int i = 0; i < tex_v_count; ++i)
     {
@@ -147,31 +147,30 @@ void readTextureBlock(std::ifstream &stream, dmd_mesh_t &mesh)
         float z = 0;
         ss >> texel.x() >> texel.y() >> z;
 
+        texel.y() = 1.0f - texel.y();
+
         mesh.texcoords->push_back(texel);
     }    
 
     line = getLine(stream);
     line = getLine(stream);
 
-    mesh.texvertices = new osg::Vec3Array;
-    mesh.texvertices->resize(tex_v_count);
-
     for (unsigned int i = 0; i < tex_f_count; ++i)
     {
         line = delete_symbol(getLine(stream), '\t');
-        std::istringstream ss(line);
+        std::istringstream ss(line);        
 
-        osg::ref_ptr<osg::DrawElementsUInt> texface = new osg::DrawElementsUInt(osg::PrimitiveSet::POLYGON, 0);
+
+        face_t texface;
 
         while (!ss.eof())
-        {
-            unsigned long v_idx = mesh.faces[i]->at(texface->size());
+        {            
             unsigned int idx = 0;
-            ss >> idx;
-            texface->push_back(idx - 1);
-            mesh.texvertices->at(idx - 1).set(mesh.vertices->at(v_idx));
+            ss >> idx;            
+
+            texface.push_back(idx-1);
         }
 
         mesh.texfaces.push_back(texface);
-    }
+    }    
 }

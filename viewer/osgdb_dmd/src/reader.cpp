@@ -43,30 +43,39 @@ osgDB::ReaderWriter::ReadResult ReaderDMD::readNode(std::ifstream &stream,
 
     dmd_mesh_t mesh = load_dmd(stream);
 
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
+    osg::ref_ptr<osg::DrawElementsUInt> indices = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES);
+
+    for (size_t i = 0; i < mesh.faces.size(); ++i)
+    {
+        face_t face = mesh.faces[i];
+        face_t texface = mesh.texfaces[i];
+
+        vertices->push_back(mesh.vertices->at(face[0]));
+        vertices->push_back(mesh.vertices->at(face[1]));
+        vertices->push_back(mesh.vertices->at(face[2]));
+
+        texcoords->push_back(mesh.texcoords->at(texface[0]));
+        texcoords->push_back(mesh.texcoords->at(texface[1]));
+        texcoords->push_back(mesh.texcoords->at(texface[2]));
+
+        indices->push_back(vertices->size() - 3);
+        indices->push_back(vertices->size() - 2);
+        indices->push_back(vertices->size() - 1);
+    }
+
     osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
+    geom->setVertexArray(vertices.get());
+    geom->addPrimitiveSet(indices.get());
 
     if (mesh.is_texture_present)
-    {
-        geom->setVertexArray(mesh.texvertices.get());
-        geom->setTexCoordArray(0, mesh.texcoords.get());
-
-        for (size_t i = 0; i < mesh.texfaces.size(); ++i)
-            geom->addPrimitiveSet(mesh.texfaces[i].get());
-    }
-    else
-    {
-        geom->setVertexArray(mesh.vertices.get());
-
-        for (size_t i = 0; i < mesh.faces.size(); ++i)
-            geom->addPrimitiveSet(mesh.faces[i].get());
-    }
-
-    //geom->setNormalArray(mesh.normals.get());
-    //geom->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+        geom->setTexCoordArray(0, texcoords.get());
 
     osgUtil::SmoothingVisitor::smooth(*geom);
 
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;   
     geode->addDrawable(geom.get());
 
     return geode.release();
