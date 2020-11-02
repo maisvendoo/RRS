@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/msut">
+        <file alias="msut-main">img/msut-main.png</file>
+    </qresource>
+</RCC>

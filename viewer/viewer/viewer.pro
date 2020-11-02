@@ -29,7 +29,6 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGAd
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtild
         LIBS += -L$$OSG_LIB_DIRECTORY -losgTextd
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5d
 
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
@@ -46,7 +45,6 @@ win32 {
         LIBS += -L$$OSG_LIB_DIRECTORY -losgGA
         LIBS += -L$$OSG_LIB_DIRECTORY -losgUtil
         LIBS += -L$$OSG_LIB_DIRECTORY -losgText
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgQt5
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
@@ -73,7 +71,6 @@ unix {
         LIBS += -losgGAd
         LIBS += -losgUtild
         LIBS += -losgTextd
-        LIBS += -losgQt5d
 
         LIBS += -L../../../lib -lroute-loader_d
         LIBS += -L../../../lib -llibrary_d
@@ -90,7 +87,6 @@ unix {
         LIBS +=  -losgGA
         LIBS +=  -losgUtil
         LIBS += -losgText
-        LIBS += -losgQt5
 
         LIBS += -L../../../lib -lroute-loader
         LIBS += -L../../../lib -llibrary
@@ -108,6 +104,9 @@ unix {
 #LIBS += -lgcov
 
 #CONFIG += force_debug_info
+
+#MAKE_CXXFLAGS_DEBUG += -pg
+#QMAKE_LFLAGS_DEBUG += -pg
 
 INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../simulator/vehicle/include

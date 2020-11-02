@@ -61,12 +61,12 @@ osgDB::ReaderWriter::ReadResult ReaderDMD::readNode(std::ifstream &stream,
             geom->addPrimitiveSet(mesh.faces[i].get());
     }
 
-    geom->setNormalArray(mesh.normals.get());
-    geom->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    //geom->setNormalArray(mesh.normals.get());
+    //geom->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
 
     osgUtil::SmoothingVisitor::smooth(*geom);
 
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;   
     geode->addDrawable(geom.get());
 
     return geode.release();

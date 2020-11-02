@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+
+		<Order>1</Order>
+
+		<ShaftOmega>2.0</ShaftOmega>	
+		<K>10.0</K>
+		<eps>0.99</eps>			
+
+	</Device>
+</Config>

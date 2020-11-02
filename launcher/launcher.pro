@@ -17,7 +17,7 @@ win32 {
 
     CONFIG(debug, debug|release) {
 
-        TARGET = $$join(TARGET,,,_d)        
+        TARGET = $$join(TARGET,,,_d)
 
         LIBS += -L../../lib -lfilesystem_d
         LIBS += -L../../lib -lCfgReader_d

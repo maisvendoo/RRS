@@ -21,7 +21,7 @@
         <RequestInterval>100</RequestInterval>
         <ReconnectInterval>1000</ReconnectInterval>
         <MotionBlur>0.05</MotionBlur>
-        <NotifyLevel>INFO</NotifyLevel>
+        <NotifyLevel>ERROR</NotifyLevel>
         <ViewDistance>5000</ViewDistance>
     </Viewer>
 </Config>
