@@ -99,5 +99,14 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
+	
+	<Slave>
+		<id>12</id>
+		<Description></Description>
+		<Config>kpd3</Config>
+		<ConfigRequired>0</ConfigRequired>
+		<CellsMask>0</CellsMask>
+	</Slave>
+	
 
 </Config>

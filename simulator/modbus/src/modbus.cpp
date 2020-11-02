@@ -76,7 +76,7 @@ void Modbus::controlSignalsProcess()
         for (slave_data_t data : slave->discrete_input)
         {
             control_signals.analogSignal[data.index].is_active = true;
-            control_signals.analogSignal[data.index].setValue(static_cast<float>(data.cur_value));
+            control_signals.analogSignal[data.index].cur_value = static_cast<float>(data.cur_value);
         }
 
         master->readInputRegistersRequest(slave);
@@ -84,7 +84,7 @@ void Modbus::controlSignalsProcess()
         for (slave_data_t data : slave->input_register)
         {
             control_signals.analogSignal[data.index].is_active = true;
-            control_signals.analogSignal[data.index].setValue(static_cast<float>(data.cur_value));
+            control_signals.analogSignal[data.index].cur_value = static_cast<float>(data.cur_value);
         }
     }
 

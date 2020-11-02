@@ -20,7 +20,7 @@ struct signal_t
 
     }
 
-    void setValue(float value)
+    /*void setValue(float value)
     {
         prev_value = cur_value;
         cur_value = value;
@@ -30,7 +30,7 @@ struct signal_t
     {
         float eps = 0.01f;
         return abs(prev_value - cur_value) < eps;
-    }
+    }*/
 };
 
 Q_DECLARE_METATYPE(signal_t)

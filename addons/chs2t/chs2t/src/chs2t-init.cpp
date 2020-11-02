@@ -273,6 +273,12 @@ void CHS2T::initModbus()
 
     Pos_Indicator = new PhysToModbus();
     Pos_Indicator->load((modbusCfgDir + QDir::separator() + "Pos-Indicator").toStdString());
+
+    Loco_Crane = new PhysToModbus();
+    Loco_Crane->load((modbusCfgDir + QDir::separator() + "kvt254").toStdString());
+
+    KPD3_Velocity = new PhysToModbus();
+    KPD3_Velocity->load((modbusCfgDir + QDir::separator() + "kpd3").toStdString());
 }
 
 //------------------------------------------------------------------------------
