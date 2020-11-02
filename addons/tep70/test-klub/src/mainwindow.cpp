@@ -2,14 +2,14 @@
 
 #include    <QVBoxLayout>
 
-MainWindow::MainWindow(QWidget *parent)
-    : display(Q_NULLPTR)
+MainWindow::MainWindow(QString module_path, QWidget *parent) : QWidget(parent)
+    , display(Q_NULLPTR)
 {
-    display = loadDisplay("../modules/tep70bs/klub-display");
+    display = loadDisplay(module_path);
     display->init();
 
     this->setWindowFlags(Qt::FramelessWindowHint);
-    this->resize(2048, 638);
+    this->resize(display->width(), display->height());
     this->setAutoFillBackground(true);
     this->setPalette(QPalette(QColor(255, 255, 255)));
 
