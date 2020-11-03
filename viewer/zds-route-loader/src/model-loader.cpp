@@ -54,10 +54,10 @@ void createTexture(const std::string &texture_path, osg::Texture2D *texture)
     // Vertical flipping of *.bmp image
     std::string ext = osgDB::getLowerCaseFileExtension(fileName);
 
-    if (ext == "tga")
+    if (ext == "bmp")
     {
         //image->flipHorizontal();
-        //image->flipVertical();
+        image->flipVertical();
         //convertTexture(image.get());
     }
 
