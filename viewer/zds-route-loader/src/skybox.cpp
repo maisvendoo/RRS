@@ -137,6 +137,8 @@ void Skybox::load(const std::string &routeDir, osg::Group *scene)
     std::string textureDir = fs.combinePath(routeDir, "textures");
     osg::Image *image = loadImage(fs.combinePath(textureDir, "sky_day.bmp"));
 
+    image->flipVertical();
+
     if (image == nullptr)
     {
         return;
