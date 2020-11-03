@@ -5,11 +5,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : display(Q_NULLPTR)
 {
-    display = loadDisplay("../modules/tep70bs/klub-display");
+    display = loadDisplay("../modules/tep70bs/msut-display");
     display->init();
 
     this->setWindowFlags(Qt::FramelessWindowHint);
-    this->resize(2048, 638);
+    //this->resize(2048, 638);
+    this->resize(display->size());
     this->setAutoFillBackground(true);
     this->setPalette(QPalette(QColor(255, 255, 255)));
 
