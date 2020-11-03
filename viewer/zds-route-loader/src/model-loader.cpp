@@ -57,7 +57,7 @@ void createTexture(const std::string &texture_path, osg::Texture2D *texture)
     if (ext == "tga")
     {
         //image->flipHorizontal();
-        image->flipVertical();
+        //image->flipVertical();
         //convertTexture(image.get());
     }
 
