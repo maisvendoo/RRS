@@ -67,7 +67,7 @@ void MsutDisplay::init()
     //scaleArrow_->setStyleSheet("border: 2px solid red;");
     scaleArrow_->setVal(/*60*/ 1.00 + 1.0);
 
-    labelArrow_ = new QLabel("11", this);
+    labelArrow_ = new QLabel(this);
     drawNumberLabel_(labelArrow_, QRect(376,220, 30,20), 12, "red", Qt::AlignRight);
     labelArrow_->setText("120");
 
@@ -79,7 +79,7 @@ void MsutDisplay::init()
     //scaleSpeed_->setStyleSheet("border: 2px solid red;");
     scaleSpeed_->setVal(/*2*/1.0);
 
-    labelSpeed_ = new QLabel("11", this);
+    labelSpeed_ = new QLabel(this);
     drawNumberLabel_(labelSpeed_, QRect(315,105, 30,15), 10, "black", Qt::AlignRight);
     labelSpeed_->setText("120");
 
@@ -91,10 +91,94 @@ void MsutDisplay::init()
     //scaleAcceleration_->setStyleSheet("border: 2px solid red;");
     scaleAcceleration_->setVal(/*2*/ 1.00 + 1.0);
 
-    labelAcceleration_ = new QLabel("11", this);
+    labelAcceleration_ = new QLabel(this);
     drawNumberLabel_(labelAcceleration_, QRect(428,105, 30,15), 10, "black", Qt::AlignRight);
     labelAcceleration_->setText("120");
 
+
+    // ВУ1
+    //
+    frameVU1_Ited_ = new QFrame(this);
+    frameVU1_Ited_->setAutoFillBackground(true);
+    frameVU1_Ited_->setPalette(QPalette(Qt::blue));
+    frameVU1_Ited_->resize(13, 230);
+    frameVU1_Ited_->move(179, 68);
+
+    labelVU1_Ited_ = new QLabel(this);
+    drawNumberLabel_(labelVU1_Ited_, QRect(150,314, 50,20), 14, "blue");
+    labelVU1_Ited_->setText("0");
+
+    //
+    frameVU1_I_ = new QFrame(this);
+    frameVU1_I_->setAutoFillBackground(true);
+    frameVU1_I_->setPalette(QPalette(Qt::red));
+    frameVU1_I_->resize(13, 230);
+    frameVU1_I_->move(229, 68);
+
+    labelVU1_I_ = new QLabel(this);
+    drawNumberLabel_(labelVU1_I_, QRect(204,314, 50,20), 14, "red");
+    labelVU1_I_->setText("0");
+
+    //
+    frameVU1_U_ = new QFrame(this);
+    frameVU1_U_->setAutoFillBackground(true);
+    frameVU1_U_->setPalette(QPalette(Qt::blue));
+    frameVU1_U_->resize(13, 230);
+    frameVU1_U_->move(280, 68);
+
+    labelVU1_U_ = new QLabel(this);
+    drawNumberLabel_(labelVU1_U_, QRect(258,314, 50,20), 14, "blue");
+    labelVU1_U_->setText("0");
+
+    // ВУ1
+    //
+    frameVU2_U_ = new QFrame(this);
+    frameVU2_U_->setAutoFillBackground(true);
+    frameVU2_U_->setPalette(QPalette(Qt::blue));
+    frameVU2_U_->resize(13, 230);
+    frameVU2_U_->move(540, 68);
+
+    labelVU2_U_ = new QLabel(this);
+    drawNumberLabel_(labelVU2_U_, QRect(530,314, 50,20), 14, "blue");
+    labelVU2_U_->setText("0");
+
+    //
+    frameVU2_I_ = new QFrame(this);
+    frameVU2_I_->setAutoFillBackground(true);
+    frameVU2_I_->setPalette(QPalette(Qt::red));
+    frameVU2_I_->resize(13, 230);
+    frameVU2_I_->move(596, 68);
+
+    labelVU2_I_ = new QLabel(this);
+    drawNumberLabel_(labelVU2_I_, QRect(592,314, 50,20), 14, "red");
+    labelVU2_I_->setText("0");
+
+
+
+
+    // kW
+    //
+    label_kW_left_ = new QLabel(this);
+    drawNumberLabel_(label_kW_left_, QRect(327,256, 50,20), 14, "blue", Qt::AlignLeft);
+    label_kW_left_->setText("0");
+
+    //
+    label_kW_right_ = new QLabel(this);
+    drawNumberLabel_(label_kW_right_, QRect(456,256, 50,20), 14, "red", Qt::AlignRight);
+    label_kW_right_->setText("0");
+
+
+    // РЕВЕРСОР
+
+    // ПОЗИЦИЯ
+    labelPositin_ = new QLabel(this);
+    drawNumberLabel_(labelPositin_, QRect(35,146, 80,48), 35, "white");
+    labelPositin_->setText("0");
+
+    // РЕЖИМ
+    labelRezim_ = new QLabel(this);
+    drawNumberLabel_(labelRezim_, QRect(15,244, 115,45), 14, "white");
+    labelRezim_->setText("СТОП");
 
 
 
