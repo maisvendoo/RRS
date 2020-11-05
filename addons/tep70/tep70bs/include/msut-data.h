@@ -6,9 +6,16 @@
 //------------------------------------------------------------------------------
 struct msut_input_t
 {
-    double velocity;
+    double  velocity;
+
+    bool    is_KP1_KP6_on;
+
+    double  bc_pressure;
 
     msut_input_t()
+     : velocity(0.0)
+     , is_KP1_KP6_on(false)
+     , bc_pressure(0.0)
     {
 
     }
@@ -19,9 +26,13 @@ struct msut_input_t
 //------------------------------------------------------------------------------
 struct msut_output_t
 {
-    double acceleration;
+    double  acceleration;
+
+    int     mode;
 
     msut_output_t()
+        : acceleration(0.0)
+        , mode(0)
     {
 
     }

@@ -5,6 +5,8 @@ void TEP70::stepMSUTsignals(double t, double dt)
     msut_input_t msut_input;
 
     msut_input.velocity = velocity;
+    msut_input.is_KP1_KP6_on = is_KP1_KP6_on;
+    msut_input.bc_pressure = fwd_trolley->getBrakeCylinderPressure();
 
     msut->setInputData(msut_input);
 
@@ -35,4 +37,6 @@ void TEP70::stepMSUTsignals(double t, double dt)
     }
 
     analogSignal[MSUT_ET_T] = traction / Physics::g / 1000.0;
+
+    analogSignal[MSUT_MODE] = msut_output.mode;
 }

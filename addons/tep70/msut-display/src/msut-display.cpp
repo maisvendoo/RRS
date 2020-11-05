@@ -330,6 +330,15 @@ void MsutDisplay::slotUpdateTimer()
     case 1:
         labelRezim_->setText("ТЯГА");
         break;
+    case 2:
+        labelRezim_->setText("ВЫБЕГ");
+        break;
+    case 3:
+        labelRezim_->setText("ЭДТ");
+        break;
+    case 4:
+        labelRezim_->setText("ЗАМЕЩЕНИЕ");
+        break;
 
     default:
         labelRezim_->setText("СТОП");
