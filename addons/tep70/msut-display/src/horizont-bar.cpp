@@ -20,8 +20,8 @@ void HorizontBar::draw_()
     QPainter paint(&pix);
     paint.setRenderHint(QPainter::Antialiasing, true);
 
-    paint.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
-    paint.setBrush(Qt::blue);
+    paint.setPen(QPen(QColor("#000080"), 1, Qt::SolidLine));
+    paint.setBrush(QColor("#000080"));
 
 
     QPolygonF p1;

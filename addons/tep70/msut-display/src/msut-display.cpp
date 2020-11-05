@@ -9,11 +9,6 @@
 #include    <QDate>
 
 
-
-// zБогос. Скорректировать цвета
-
-
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -69,14 +64,14 @@ void MsutDisplay::init()
     // Текущая дата
     labelCurDate_ = new QLabel(background);
     labelCurDate_->setFont(QFont("Arial", 10, 57));
-    //labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
+    labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
     labelCurDate_->setStyleSheet("color: black;");
     labelCurDate_->move(18, 4);
 
     // Текущее время
     labelCurTime_ = new QLabel(background);
     labelCurTime_->setFont(QFont("Arial", 10, 57));
-    //labelCurTime_->setText(QTime::currentTime().toString());
+    labelCurTime_->setText(QTime::currentTime().toString());
     labelCurTime_->setStyleSheet("color: black;");
     labelCurTime_->move(558, 4);
 
@@ -91,7 +86,7 @@ void MsutDisplay::init()
     scaleArrow_->setVal(0.00 + 30.0);
 
     labelArrow_ = new QLabel(this);
-    drawNumberLabel_(labelArrow_, QRect(376,220, 30,20), 12, "red", Qt::AlignRight);
+    drawNumberLabel_(labelArrow_, QRect(376,220, 30,20), 12, "#000080", Qt::AlignRight);
     //labelArrow_->setText("120");
 
 
@@ -123,57 +118,57 @@ void MsutDisplay::init()
     //
     frameVU1_Ited_ = new QFrame(background);
     frameVU1_Ited_->setAutoFillBackground(true);
-    frameVU1_Ited_->setPalette(QPalette(Qt::blue));
+    frameVU1_Ited_->setPalette(QPalette(QColor("#000080")));
     frameVU1_Ited_->resize(13, 0);
     frameVU1_Ited_->move(179, 68);
 
     labelVU1_Ited_ = new QLabel(background);
-    drawNumberLabel_(labelVU1_Ited_, QRect(150,314, 50,20), 14, "blue");
+    drawNumberLabel_(labelVU1_Ited_, QRect(150,314, 50,20), 14, "#000080");
     labelVU1_Ited_->setText("0");
 
     //
     frameVU1_I_ = new QFrame(background);
     frameVU1_I_->setAutoFillBackground(true);
-    frameVU1_I_->setPalette(QPalette(Qt::red));
+    frameVU1_I_->setPalette(QPalette(QColor("#800080")));
     frameVU1_I_->resize(13, 0);
     frameVU1_I_->move(229, 68);
 
     labelVU1_I_ = new QLabel(background);
-    drawNumberLabel_(labelVU1_I_, QRect(204,314, 50,20), 14, "red");
+    drawNumberLabel_(labelVU1_I_, QRect(204,314, 50,20), 14, "#800080");
     labelVU1_I_->setText("0");
 
     //
     frameVU1_U_ = new QFrame(background);
     frameVU1_U_->setAutoFillBackground(true);
-    frameVU1_U_->setPalette(QPalette(Qt::blue));
+    frameVU1_U_->setPalette(QPalette(QColor("#000080")));
     frameVU1_U_->resize(13, 0);
     frameVU1_U_->move(280, 68);
 
     labelVU1_U_ = new QLabel(background);
-    drawNumberLabel_(labelVU1_U_, QRect(258,314, 50,20), 14, "blue");
+    drawNumberLabel_(labelVU1_U_, QRect(258,314, 50,20), 14, "#000080");
     labelVU1_U_->setText("0");
 
     // ВУ1
     //
     frameVU2_U_ = new QFrame(background);
     frameVU2_U_->setAutoFillBackground(true);
-    frameVU2_U_->setPalette(QPalette(Qt::blue));
+    frameVU2_U_->setPalette(QPalette(QColor("#000080")));
     frameVU2_U_->resize(13, 0);
     frameVU2_U_->move(540, 68);
 
     labelVU2_U_ = new QLabel(background);
-    drawNumberLabel_(labelVU2_U_, QRect(530,314, 50,20), 14, "blue");
+    drawNumberLabel_(labelVU2_U_, QRect(530,314, 50,20), 14, "#000080");
     labelVU2_U_->setText("0");
 
     //
     frameVU2_I_ = new QFrame(background);
     frameVU2_I_->setAutoFillBackground(true);
-    frameVU2_I_->setPalette(QPalette(Qt::red));
+    frameVU2_I_->setPalette(QPalette(QColor("#800080")));
     frameVU2_I_->resize(13, 0);
     frameVU2_I_->move(596, 68);
 
     labelVU2_I_ = new QLabel(background);
-    drawNumberLabel_(labelVU2_I_, QRect(592,314, 50,20), 14, "red");
+    drawNumberLabel_(labelVU2_I_, QRect(592,314, 50,20), 14, "#800080");
     labelVU2_I_->setText("0");
 
 
@@ -182,12 +177,12 @@ void MsutDisplay::init()
     // kW
     //
     label_kW_left_ = new QLabel(background);
-    drawNumberLabel_(label_kW_left_, QRect(327,256, 50,20), 14, "blue", Qt::AlignLeft);
+    drawNumberLabel_(label_kW_left_, QRect(327,256, 50,20), 14, "#000080", Qt::AlignLeft);
     label_kW_left_->setText("0");
 
     //
     label_kW_right_ = new QLabel(background);
-    drawNumberLabel_(label_kW_right_, QRect(456,256, 50,20), 14, "red", Qt::AlignRight);
+    drawNumberLabel_(label_kW_right_, QRect(456,256, 50,20), 14, "#800080", Qt::AlignRight);
     label_kW_right_->setText("0");
 
     //
@@ -199,7 +194,7 @@ void MsutDisplay::init()
     // РЕВЕРСОР
     labelReversorFwd_ = new QLabel(background);
     labelReversorFwd_->move(55, 48);
-    labelReversorFwd_->setStyleSheet("border: 1px solid blue");
+    //labelReversorFwd_->setStyleSheet("border: 1px solid blue");
     QPixmap picReversorArrowFwd;
     picReversorArrowFwd.load(":/msut/reversor-arrow-fwd");
     labelReversorFwd_->setPixmap(picReversorArrowFwd);
@@ -207,7 +202,7 @@ void MsutDisplay::init()
 
     labelReversorBwd_ = new QLabel(background);
     labelReversorBwd_->move(55, 48);
-    labelReversorBwd_->setStyleSheet("border: 1px solid blue");
+    //labelReversorBwd_->setStyleSheet("border: 1px solid blue");
     QPixmap picReversorArrowBwd;
     picReversorArrowBwd.load(":/msut/reversor-arrow-bwd");
     labelReversorBwd_->setPixmap(picReversorArrowBwd);
