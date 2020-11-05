@@ -4,6 +4,7 @@
 #include    "device.h"
 
 #include    "msut-data.h"
+#include    "msut-derivative-calculator.h"
 
 //------------------------------------------------------------------------------
 //
@@ -26,11 +27,15 @@ public:
         return msut_output;
     }
 
+    void step(double t, double dt);
+
 private:
 
-    msut_input_t    msut_input;
+    msut_input_t            msut_input;
 
-    msut_output_t   msut_output;
+    msut_output_t           msut_output;
+
+    DerivativeCalculator    *accel_calc;
 
     void preStep(state_vector_t &Y, double t);
 
