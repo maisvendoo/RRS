@@ -424,6 +424,9 @@ private:
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);
 
+    /// Вывод сигналов на дисплей МСУ-ТЭ
+    void stepMSUTsignals(double t, double dt);
+
     /// Вывод отладочной строки
     void debugOutput(double t, double dt);
 

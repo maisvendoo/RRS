@@ -170,6 +170,8 @@ void TEP70::step(double t, double dt)
 
     stepSignalsOutput(t, dt);
 
+    stepMSUTsignals(t, dt);
+
     debugOutput(t, dt);
 
     /*QString line = QString("%1 %2 %3")

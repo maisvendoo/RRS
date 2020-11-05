@@ -10,6 +10,7 @@ MainWindow::MainWindow(QString module_path, QWidget *parent) : QWidget(parent)
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->resize(display->width(), display->height());
+
     this->setAutoFillBackground(true);
     this->setPalette(QPalette(QColor(255, 255, 255)));
 

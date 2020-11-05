@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 struct msut_input_t
 {
+    double velocity;
 
     msut_input_t()
     {
@@ -18,6 +19,7 @@ struct msut_input_t
 //------------------------------------------------------------------------------
 struct msut_output_t
 {
+    double acceleration;
 
     msut_output_t()
     {

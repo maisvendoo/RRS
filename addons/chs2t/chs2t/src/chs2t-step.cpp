@@ -68,6 +68,8 @@ void CHS2T::stepFastSwitch(double t, double dt)
     if (fastSwitchSw->getState() == 3)
     {
         fast_switch_trigger.set();
+        if (!bv_return)
+            emit soundPlay("BV-on");
         bv_return = true;
     }
 
@@ -104,6 +106,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     stepSwitch->setDropPosition(dropPosition);
     stepSwitch->setCtrlState(km21KR2->getCtrlState());
     stepSwitch->setControl(keys);
+    stepSwitch->setDropPositionsWithZ(handleEDT->getDropPositions());
     stepSwitch->step(t, dt);
 
     puskRez->setPoz(stepSwitch->getPoz());
@@ -130,8 +133,6 @@ void CHS2T::stepTractionControl(double t, double dt)
         Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
         tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
     }
-
-    emit soundSetPitch("Motion", static_cast<float>(abs(velocity * Physics::kmh) / 160));
 }
 
 //------------------------------------------------------------------------------
@@ -179,9 +180,29 @@ void CHS2T::stepBrakesControl(double t, double dt)
     brakeCrane->setFeedLinePressure(mainReservoir->getPressure());
     brakeCrane->setBrakePipePressure(pTM);
     brakeCrane->setControl(keys);
+
+    if (control_signals.analogSignal[30].is_active)
+    {
+        int krm_position = control_signals.analogSignal[KRM_1].cur_value * 1 +
+                           control_signals.analogSignal[KRM_2].cur_value * 2 +
+                           control_signals.analogSignal[KRM_3].cur_value * 3 +
+                           control_signals.analogSignal[KRM_4].cur_value * 4 +
+                           control_signals.analogSignal[KRM_5].cur_value * 5 +
+                           control_signals.analogSignal[KRM_6].cur_value * 6 +
+                           control_signals.analogSignal[KRM_7].cur_value * 7;
+        if (krm_position != 0)
+        {
+            krm_position -= 1;
+            brakeCrane->setPosition(krm_position);
+            brakeCrane->setHandlePos(krm_position);
+        }
+
+    }
+
     p0 = brakeCrane->getBrakePipeInitPressure();
     brakeCrane->step(t, dt);    
 
+    handleEDT->setDropPositions(stepSwitch->getDropPositionsWithZ());
     handleEDT->setControl(keys, control_signals);
     handleEDT->step(t, dt);
 }
@@ -215,6 +236,10 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     locoCrane->setFeedlinePressure(mainReservoir->getPressure());
     locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
     locoCrane->setControl(keys);
+
+    double pos = Loco_Crane->getModbus(control_signals.analogSignal[LOCO_CRANE].cur_value);
+    locoCrane->setHandlePosition(cut(pos, 0.0, 1.0));
+
     locoCrane->step(t, dt);
 
     dako->setPgr(mainReservoir->getPressure());
@@ -236,7 +261,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
     electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
     electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
-    electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0]);
+    electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0] * !locoRelease);
     electroAirDistr->step(t, dt);
 
     spareReservoir->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());
@@ -297,7 +322,7 @@ void CHS2T::stepSupportEquipment(double t, double dt)
 
     blindsSwitcher->setControl(keys);
 
-    if (blindsSwitcher->getState() == 0 || blindsSwitcher->getState() == 1)
+    if (blindsSwitcher->getState() < 2)
     {
         blinds->setState(false);
     }
@@ -307,7 +332,7 @@ void CHS2T::stepSupportEquipment(double t, double dt)
         blinds->setState(true);
     }
 
-    if (blindsSwitcher->getState() == 3 || blindsSwitcher->getState() == 4)
+    if (blindsSwitcher->getState() > 2)
     {
         blinds->setState((!hod && !stepSwitch->isZero()) || EDT);
     }
@@ -328,4 +353,17 @@ bool CHS2T::getHoldingCoilState() const
     bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
     return no_overload;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CHS2T::stepTapSound()
+{
+    double speed = abs(this->velocity) * 3.6;
+
+    for (int i = 0; i < tap_sounds.count(); ++i)
+    {
+        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
+    }
 }

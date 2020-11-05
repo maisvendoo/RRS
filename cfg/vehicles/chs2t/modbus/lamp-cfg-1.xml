@@ -1,0 +1,52 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <!-- Нулевая позиция -->
+    <Coil>
+        <Address>0</Address>
+        <Index>37</Index>
+    </Coil>
+
+    <!-- С-соединение -->
+    <Coil>
+        <Address>1</Address>
+        <Index>36</Index>
+    </Coil>
+
+    <!-- СП-соединение -->
+    <Coil>
+        <Address>2</Address>
+        <Index>35</Index>
+    </Coil>
+
+    <!-- П-соединение -->
+    <Coil>
+        <Address>3</Address>
+        <Index>34</Index>
+    </Coil>
+
+    <!-- R -->
+    <Coil>
+        <Address>4</Address>
+        <Index>38</Index>
+    </Coil>
+
+    <!-- T -->
+    <Coil>
+        <Address>5</Address>
+        <Index>39</Index>
+    </Coil>
+
+    <!-- P -->
+    <Coil>
+        <Address>6</Address>
+        <Index>40</Index>
+    </Coil>
+
+    <!-- S -->
+    <Coil>
+        <Address>7</Address>
+        <Index>41</Index>
+    </Coil>
+
+</Config>

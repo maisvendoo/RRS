@@ -1,0 +1,52 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <!-- ACCUM1 -->
+    <Coil>
+        <Address>0</Address>
+        <Index>49</Index>
+    </Coil>
+
+    <!-- ACCUM2 -->
+    <Coil>
+        <Address>1</Address>
+        <Index>48</Index>
+    </Coil>
+
+    <!-- MK -->
+    <Coil>
+        <Address>2</Address>
+        <Index>47</Index>
+    </Coil>
+
+    <!-- GALYZI -->
+    <Coil>
+        <Address>3</Address>
+        <Index>46</Index>
+    </Coil>
+
+    <!-- ZASHITA -->
+    <Coil>
+        <Address>4</Address>
+        <Index>45</Index>
+    </Coil>
+
+    <!-- PESOK -->
+    <Coil>
+        <Address>5</Address>
+        <Index>44</Index>
+    </Coil>
+    
+    <!-- NO_BRAKES_RELEASE -->
+    <Coil>
+        <Address>6</Address>
+        <Index>43</Index>
+    </Coil>
+
+    <!-- NAR_SYNC -->
+    <Coil>
+        <Address>7</Address>
+        <Index>42</Index>
+    </Coil>
+
+</Config>

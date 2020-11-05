@@ -17,15 +17,9 @@ win32 {
 
     CONFIG(debug, debug|release) {
 
-        TARGET = $$join(TARGET,,,_d)
-
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgd
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgDBd
+        TARGET = $$join(TARGET,,,_d)        
 
     } else {
-
-        LIBS += -L$$OSG_LIB_DIRECTORY -losg
-        LIBS += -L$$OSG_LIB_DIRECTORY -losgDB
 
     }
 
@@ -36,15 +30,10 @@ unix {
 
     CONFIG(debug, debug|release) {
 
-        TARGET = $$join(TARGET,,,_d)
-
-        LIBS += -losgd
-        LIBS += -losgDBd
+        TARGET = $$join(TARGET,,,_d)        
 
     } else {
 
-        LIBS +=  -losg
-        LIBS +=  -losgDB
     }
 }
 

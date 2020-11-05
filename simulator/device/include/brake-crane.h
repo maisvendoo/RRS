@@ -45,6 +45,8 @@ public:
     //
     void setBrakePipePressure(double pTM1);
 
+    virtual void setHandlePos(int &position) = 0;
+
     virtual void setPosition(int &position) = 0;
 
     virtual QString getPositionName() = 0;

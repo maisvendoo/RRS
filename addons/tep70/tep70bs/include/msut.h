@@ -16,7 +16,21 @@ public:
 
     ~MSUT();
 
+    void setInputData(const msut_input_t &msut_input)
+    {
+        this->msut_input = msut_input;
+    }
+
+    msut_output_t getOutputData() const
+    {
+        return msut_output;
+    }
+
 private:
+
+    msut_input_t    msut_input;
+
+    msut_output_t   msut_output;
 
     void preStep(state_vector_t &Y, double t);
 

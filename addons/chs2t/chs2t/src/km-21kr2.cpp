@@ -85,6 +85,9 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
     k31 = (fieldWeakShaft == 2 || fieldWeakShaft == 8 || fieldWeakShaft == 10 );
     k32 = (fieldWeakShaft == 4 || fieldWeakShaft == 8);
     k33 = (fieldWeakShaft == 6 || fieldWeakShaft == 10);
+
+    if ((k01 != controlState.k01) || (k02 != controlState.k02))
+        emit soundPlay("revers");
 }
 
 //------------------------------------------------------------------------------
@@ -110,14 +113,27 @@ void Km21KR2::stepKeysControl(double t, double dt)
     // Авт. сброс
     if (getKeyState(KEY_D))
     {
+        if (isControl())
+        {
+            if (autoReset)
+                emit soundPlay("21KR_-A_0");
+            autoReset = false;
+        }
         if (!autoReset && isShift() && fieldWeakShaft != 0 && lastControllerPositionIsZero && is_dec)
         {
             fieldWeakShaft -= 2;
+            emit soundPlay("21KR_op-");
+            is_dec = false;
+        } else {
+            if(is_dec && fieldWeakShaft == 0 && !isControl())
+                emit soundPlay("21KR_0_-");
             is_dec = false;
         }
     }
     else
     {
+        if (!is_dec && fieldWeakShaft == 0)
+            emit soundPlay("21KR_-_0");
         //if (TO_INT(fieldWeakShaft) == 0)
         is_dec = true;
     }
@@ -139,23 +155,43 @@ void Km21KR2::stepKeysControl(double t, double dt)
             if (getY(0) > 0.99)
             {
                 fieldWeakShaft += 2;
+                emit soundPlay("21KR_op+");
                 is_inc = false;
             }
 
             lastControllerPositionIsZero = false;
+        } else {
+            if (is_inc && fieldWeakShaft == 0)
+                emit soundPlay("21KR_0_+");
+            is_inc = false;
         }
     }
     else
     {
+        if (!is_inc && fieldWeakShaft == 0)
+            emit soundPlay("21KR_+_0");
         is_inc = true;
     }
 
     // Авт. набор
-    autoSet = getKeyState(KEY_Q);
+    if (getKeyState(KEY_Q))
+    {
+        if (!autoSet)
+            emit soundPlay("21KR_0_+A");
+        autoSet = true;
+    }
+    else
+    {
+        if (autoSet)
+            emit soundPlay("21KR_+A_0");
+        autoSet = false;
+    }
 
     // 1 вверх
     if (getKeyState(KEY_E))
     {
+        if (!autoReset)
+            emit soundPlay("21KR_0_-A");
         autoReset = true;
     }
 

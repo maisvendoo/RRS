@@ -165,6 +165,8 @@ public:
 
     double getEPTControl(size_t i);
 
+    void setIsControlled(bool value);
+
     void setASLN(alsn_info_t alsn_info);
 
 public slots:
@@ -266,6 +268,8 @@ protected:
     /// Род тока в КС
     int         current_kind;
 
+    bool is_controlled;
+
     /// Wheels rotation angles
     std::vector<double> wheel_rotation_angle;
     /// Wheels angular velocities
@@ -290,6 +294,7 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
+
 
     /// Линии управления ЭПТ
     std::vector<double> ept_control;
@@ -343,7 +348,8 @@ private:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef Vehicle* (*GetVehicle)();
+//typedef Vehicle* (*GetVehicle)();
+using GetVehicle = Vehicle* (*)();
 
 /*!
  * \def

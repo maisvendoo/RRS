@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 void CHS2T::keyProcess()
 {
-    if (getKeyState(KEY_9))
+    if (getKeyState(KEY_R))
     {
         if (isShift())
             EDTSwitch.set();
@@ -19,5 +19,13 @@ void CHS2T::keyProcess()
             eptSwitch.set();
         else
             eptSwitch.reset();
+    }
+
+    if (getKeyState(KEY_T))
+    {
+        if (isShift())
+            locoRelease = true;
+        else
+            locoRelease = false;
     }
 }

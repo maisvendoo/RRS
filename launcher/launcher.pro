@@ -28,28 +28,20 @@ win32 {
         LIBS += -L../../lib -lfilesystem
         LIBS += -L../../lib -lCfgReader
         LIBS += -L../../lib -lCfgEditor
-    }
-
-    INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
+    }    
 }
 
 unix {
 
     CONFIG(debug, debug|release) {
 
-        TARGET = $$join(TARGET,,,_d)
-
-        LIBS += -losgd
-        LIBS += -losgDBd
+        TARGET = $$join(TARGET,,,_d)        
 
         LIBS += -L../../lib -lfilesystem_d
         LIBS += -L../../lib -lCfgReader_d
         LIBS += -L../../lib -lCfgEditor_d
 
     } else {
-
-        LIBS +=  -losg
-        LIBS +=  -losgDB
 
         LIBS += -L../../lib -lfilesystem
         LIBS += -L../../lib -lCfgReader

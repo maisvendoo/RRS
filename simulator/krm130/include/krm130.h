@@ -49,6 +49,8 @@ public:
 
     void setPosition(int &position);
 
+    void setHandlePos(int &position){}
+
     QString getPositionName();
 
     float getHandlePosition();

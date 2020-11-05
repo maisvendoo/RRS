@@ -36,7 +36,6 @@ void CHS2T::stepEDT2(double t, double dt)
             dropPosition = true;
             EDT_timer.start();
         }
-
         if (allowEDT)
         {
             relValve->setRelease(abs(generator->getIa()) >= 100.0);
@@ -50,5 +49,6 @@ void CHS2T::stepEDT2(double t, double dt)
             }
         }
     }
+
     EDT_timer.step(t, dt);
 }

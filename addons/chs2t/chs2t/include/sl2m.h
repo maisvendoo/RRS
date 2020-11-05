@@ -14,13 +14,13 @@ public:
 
     ~SL2M();
 
-    void setOmega(double value);
+    void setOmega(double value) { omega = value; }
 
-    void setWheelDiameter(double diam);
+    void setWheelDiameter(double diam) { Dk = diam; }
 
-    float getArrowPos() const;
+    float getArrowPos() const { return arrow_pos; }
 
-    float getShaftPos() const;
+    float getShaftPos() const { return shaft_pos; }
 
 private:
 

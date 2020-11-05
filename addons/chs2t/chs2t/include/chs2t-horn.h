@@ -14,7 +14,9 @@ public:
 
 private:
 
-    void stepKeysControl(double t, double dt);
+    bool lock;
+
+    void preStep(state_vector_t &Y, double t);
 };
 
 #endif // CHS2T_HORN_H

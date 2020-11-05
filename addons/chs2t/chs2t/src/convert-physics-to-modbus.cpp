@@ -1,4 +1,5 @@
 #include "convert-physics-to-modbus.h"
+#include "math-funcs.h"
 
 #include    <fstream>
 #include    <sstream>
@@ -12,6 +13,11 @@ PhysToModbus::PhysToModbus()
 PhysToModbus::~PhysToModbus()
 {
 
+}
+
+double PhysToModbus::getModbus(double physValue)
+{
+    return cut(interpolate(physValue), 0.0, 255.0);
 }
 
 void PhysToModbus::load(const std::string& path)

@@ -26,13 +26,31 @@ DCMotorFan::~DCMotorFan()
 }
 
 //------------------------------------------------------------------------------
+// Задать напряжение МВ ТЭД
+//------------------------------------------------------------------------------
+void DCMotorFan::setU(double value)
+{
+    if (floor(value) > 0 && floor(U) == 0)
+    {
+        emit soundPlay(soundName);
+    }
+
+    if (floor(value) == 0 && floor(U) > 0)
+    {
+        emit soundStop(soundName);
+    }
+
+    U = value;
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void DCMotorFan::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
 
-    emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega_nom));
+    //emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega_nom));
 }
 
 //------------------------------------------------------------------------------

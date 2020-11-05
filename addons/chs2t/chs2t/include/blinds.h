@@ -20,13 +20,13 @@ public:
     ~Blinds();
 
     /// Задать состояние жалюзи (открыто/закрыто)
-    void setState(bool state);
+    void setState(bool state) { this->state = state; }
 
     /// Признак полностью открытых жалюзи
-    bool isOpened() const;
+    bool isOpened() const { return is_opened; }
 
     /// Получить текущее положение жалюзи
-    float getPosition() const;
+    float getPosition() const { return static_cast<float>(getY(0)); }
 
 private:
 
