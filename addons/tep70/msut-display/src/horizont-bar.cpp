@@ -21,7 +21,16 @@ void HorizontBar::draw_()
     paint.setRenderHint(QPainter::Antialiasing, true);
 
     paint.setPen(QPen(QColor("#000080"), 1, Qt::SolidLine));
-    paint.setBrush(QColor("#000080"));
+
+    QLinearGradient lineGr;
+    lineGr.setStart(this->width(), 0);
+    lineGr.setFinalStop(this->width(), this->height());
+    lineGr.setColorAt(0.0, QColor("#000080"));
+    lineGr.setColorAt(0.1, QColor("#0000a0"));
+    lineGr.setColorAt(0.4, QColor("#4040a9"));
+    lineGr.setColorAt(0.7, QColor("#000080"));
+    lineGr.setColorAt(1.0, QColor("#000080"));
+    paint.setBrush(lineGr);
 
 
     QPolygonF p1;

@@ -66,14 +66,14 @@ void MsutDisplay::init()
     labelCurDate_->setFont(QFont("Arial", 10, 57));
     labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
     labelCurDate_->setStyleSheet("color: black;");
-    labelCurDate_->move(18, 4);
+    labelCurDate_->move(18, 5);
 
     // Текущее время
     labelCurTime_ = new QLabel(background);
     labelCurTime_->setFont(QFont("Arial", 10, 57));
     labelCurTime_->setText(QTime::currentTime().toString());
     labelCurTime_->setStyleSheet("color: black;");
-    labelCurTime_->move(558, 4);
+    labelCurTime_->move(558, 5);
 
 
 
@@ -157,7 +157,7 @@ void MsutDisplay::init()
     frameVU2_U_->move(540, 68);
 
     labelVU2_U_ = new QLabel(background);
-    drawNumberLabel_(labelVU2_U_, QRect(530,314, 50,20), 14, "#000080");
+    drawNumberLabel_(labelVU2_U_, QRect(525,314, 50,20), 14, "#000080");
     labelVU2_U_->setText("0");
 
     //
@@ -168,7 +168,7 @@ void MsutDisplay::init()
     frameVU2_I_->move(596, 68);
 
     labelVU2_I_ = new QLabel(background);
-    drawNumberLabel_(labelVU2_I_, QRect(592,314, 50,20), 14, "#800080");
+    drawNumberLabel_(labelVU2_I_, QRect(582,314, 50,20), 14, "#800080");
     labelVU2_I_->setText("0");
 
 
@@ -270,7 +270,7 @@ void MsutDisplay::slotUpdateTimer()
     labelAcceleration_->setText(QString::number(input_signals[MSUT_ACCELLERATION]));
 
 
-    int fooH = 230;
+    int fooH = 231;
     int fooW = 13;
     int fooY0 = 68;
     // для виду. Удалить. zБогос
@@ -295,9 +295,9 @@ void MsutDisplay::slotUpdateTimer()
     frameVU2_I_->resize(fooW, fooH*input_signals[MSUT_VU2_I]/250);
     frameVU2_I_->move(frameVU2_I_->x(), fooY0 + fooH*(250 - input_signals[MSUT_VU2_I])/250);
     labelVU2_I_->setText(QString::number(input_signals[MSUT_VU2_I]));
+
     label_kW_left_->setText(QString::number(input_signals[MSUT_POWER]));
     label_kW_right_->setText(QString::number(input_signals[MSUT_POWER]));
-
 
 
     switch (static_cast<int>(input_signals[MSUT_REVERSOR]))
