@@ -1,10 +1,18 @@
 #include    "msut-display.h"
 
+#include    "tep70-signals.h"
+
 #include    <QLayout>
 #include    <QLabel>
 #include    <QPainter>
 #include    <QtCore/qmath.h>
 #include    <QDate>
+
+
+
+// zБогос. Скорректировать цвета
+
+
 
 //------------------------------------------------------------------------------
 //
@@ -23,12 +31,10 @@ MsutDisplay::MsutDisplay(QWidget *parent, Qt::WindowFlags f)
     this->layout()->setContentsMargins(0, 0, 0, 0);
 
 
+    connect(&update_timer, &QTimer::timeout, this, &MsutDisplay::slotUpdateTimer);
+    update_timer.setInterval(500);
+    update_timer.start();
 
-
-    w_2_ = this->width()/2.0;
-    h_2_ = this->height()/2.0;
-
-    img_ = QImage(this->size(), QImage::Format_ARGB32_Premultiplied);
 }
 
 //------------------------------------------------------------------------------
@@ -63,14 +69,14 @@ void MsutDisplay::init()
     // Текущая дата
     labelCurDate_ = new QLabel(background);
     labelCurDate_->setFont(QFont("Arial", 10, 57));
-    labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
+    //labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
     labelCurDate_->setStyleSheet("color: black;");
     labelCurDate_->move(18, 4);
 
     // Текущее время
     labelCurTime_ = new QLabel(background);
     labelCurTime_->setFont(QFont("Arial", 10, 57));
-    labelCurTime_->setText(QTime::currentTime().toString());
+    //labelCurTime_->setText(QTime::currentTime().toString());
     labelCurTime_->setStyleSheet("color: black;");
     labelCurTime_->move(558, 4);
 
@@ -79,38 +85,38 @@ void MsutDisplay::init()
     // ЭТ/Тяга
     scaleArrow_ = new ScaleArrow(QSize(220, 100), 28, background);
     scaleArrow_->setIsArrow(true);
-    scaleArrow_->setMaxVal(/*60*/2.0);
+    scaleArrow_->setMaxVal(60);
     scaleArrow_->move(307, 145);
     //scaleArrow_->setStyleSheet("border: 2px solid red;");
-    scaleArrow_->setVal(/*60*/ 1.00 + 1.0);
+    scaleArrow_->setVal(0.00 + 30.0);
 
     labelArrow_ = new QLabel(this);
     drawNumberLabel_(labelArrow_, QRect(376,220, 30,20), 12, "red", Qt::AlignRight);
-    labelArrow_->setText("120");
+    //labelArrow_->setText("120");
 
 
     // Скорость
     scaleSpeed_ = new ScaleArrow(QSize(94, 90), 40, background);
-    scaleSpeed_->setMaxVal(/*200*/1.0);
+    scaleSpeed_->setMaxVal(200);
     scaleSpeed_->move(312, 40);
     //scaleSpeed_->setStyleSheet("border: 2px solid red;");
-    scaleSpeed_->setVal(/*2*/1.0);
+    scaleSpeed_->setVal(0.0);
 
     labelSpeed_ = new QLabel(this);
     drawNumberLabel_(labelSpeed_, QRect(315,105, 30,15), 10, "black", Qt::AlignRight);
-    labelSpeed_->setText("120");
+    //labelSpeed_->setText("120");
 
 
     // Ускорение
     scaleAcceleration_ = new ScaleArrow(QSize(94, 90), 40, background);
-    scaleAcceleration_->setMaxVal(/*4*/2);
+    scaleAcceleration_->setMaxVal(4);
     scaleAcceleration_->move(427, 40);
     //scaleAcceleration_->setStyleSheet("border: 2px solid red;");
-    scaleAcceleration_->setVal(/*2*/ 1.00 + 1.0);
+    scaleAcceleration_->setVal(0.0 + 2.0);
 
     labelAcceleration_ = new QLabel(this);
     drawNumberLabel_(labelAcceleration_, QRect(428,105, 30,15), 10, "black", Qt::AlignRight);
-    labelAcceleration_->setText("120");
+    //labelAcceleration_->setText("120");
 
 
     // ВУ1
@@ -118,7 +124,7 @@ void MsutDisplay::init()
     frameVU1_Ited_ = new QFrame(background);
     frameVU1_Ited_->setAutoFillBackground(true);
     frameVU1_Ited_->setPalette(QPalette(Qt::blue));
-    frameVU1_Ited_->resize(13, 230);
+    frameVU1_Ited_->resize(13, 0);
     frameVU1_Ited_->move(179, 68);
 
     labelVU1_Ited_ = new QLabel(background);
@@ -129,7 +135,7 @@ void MsutDisplay::init()
     frameVU1_I_ = new QFrame(background);
     frameVU1_I_->setAutoFillBackground(true);
     frameVU1_I_->setPalette(QPalette(Qt::red));
-    frameVU1_I_->resize(13, 230);
+    frameVU1_I_->resize(13, 0);
     frameVU1_I_->move(229, 68);
 
     labelVU1_I_ = new QLabel(background);
@@ -140,7 +146,7 @@ void MsutDisplay::init()
     frameVU1_U_ = new QFrame(background);
     frameVU1_U_->setAutoFillBackground(true);
     frameVU1_U_->setPalette(QPalette(Qt::blue));
-    frameVU1_U_->resize(13, 230);
+    frameVU1_U_->resize(13, 0);
     frameVU1_U_->move(280, 68);
 
     labelVU1_U_ = new QLabel(background);
@@ -152,7 +158,7 @@ void MsutDisplay::init()
     frameVU2_U_ = new QFrame(background);
     frameVU2_U_->setAutoFillBackground(true);
     frameVU2_U_->setPalette(QPalette(Qt::blue));
-    frameVU2_U_->resize(13, 230);
+    frameVU2_U_->resize(13, 0);
     frameVU2_U_->move(540, 68);
 
     labelVU2_U_ = new QLabel(background);
@@ -163,7 +169,7 @@ void MsutDisplay::init()
     frameVU2_I_ = new QFrame(background);
     frameVU2_I_->setAutoFillBackground(true);
     frameVU2_I_->setPalette(QPalette(Qt::red));
-    frameVU2_I_->resize(13, 230);
+    frameVU2_I_->resize(13, 0);
     frameVU2_I_->move(596, 68);
 
     labelVU2_I_ = new QLabel(background);
@@ -184,6 +190,11 @@ void MsutDisplay::init()
     drawNumberLabel_(label_kW_right_, QRect(456,256, 50,20), 14, "red", Qt::AlignRight);
     label_kW_right_->setText("0");
 
+    //
+    hBar_ = new HorizontBar(QSize(202, 25), background);
+    hBar_->move(316, 284);
+
+
 
     // РЕВЕРСОР
     labelReversorFwd_ = new QLabel(background);
@@ -192,6 +203,7 @@ void MsutDisplay::init()
     QPixmap picReversorArrowFwd;
     picReversorArrowFwd.load(":/msut/reversor-arrow-fwd");
     labelReversorFwd_->setPixmap(picReversorArrowFwd);
+    labelReversorFwd_->setVisible(false);
 
     labelReversorBwd_ = new QLabel(background);
     labelReversorBwd_->move(55, 48);
@@ -199,36 +211,8 @@ void MsutDisplay::init()
     QPixmap picReversorArrowBwd;
     picReversorArrowBwd.load(":/msut/reversor-arrow-bwd");
     labelReversorBwd_->setPixmap(picReversorArrowBwd);
+    labelReversorBwd_->setVisible(false);
 
-    // удалить/переделать под приходящие данные
-    int fooRev = 1;
-    switch (fooRev)
-    {
-    case 0:
-        labelReversorFwd_->setVisible(false);
-        labelReversorBwd_->setVisible(false);
-        break;
-    case 1:
-        labelReversorFwd_->setVisible(true);
-        labelReversorBwd_->setVisible(false);
-        break;
-    case -1:
-        labelReversorFwd_->setVisible(false);
-        labelReversorBwd_->setVisible(true);
-        break;
-
-    default:
-        labelReversorFwd_->setVisible(false);
-        labelReversorBwd_->setVisible(false);
-    }
-
-
-
-
-
-//    labelReversor_ = new QLabel(background);
-//    drawNumberLabel_(labelReversor_, QRect(15,60, 115,45), 14, "white");
-//    labelReversor_->setText("ВПЕРЕД");
 
     // ПОЗИЦИЯ
     labelPositin_ = new QLabel(background);
@@ -242,19 +226,8 @@ void MsutDisplay::init()
 
 
 
-    //
-    hBar_ = new HorizontBar(QSize(202, 25), background);
-    hBar_->move(316, 284);
-
-
 
     //
-    //createLab_();
-    //drawScaleArrow(background);
-    //background->setPixmap(pic);
-
-
-
     this->layout()->addWidget(background);
 
     AbstractDisplay::init();
@@ -274,56 +247,100 @@ void MsutDisplay::drawNumberLabel_(QLabel* lab, QRect geo, int fontSize, QString
 
 
 
-////------------------------------------------------------------------------------
-////
-////------------------------------------------------------------------------------
-//void MsutDisplay::createLab_()
-//{
-//    label_ = new QLabel(this);
-//    label_->resize(200, 150);
-//    label_->setStyleSheet("border: 1px solid red;");
-//}
+void MsutDisplay::slotUpdateTimer()
+{
+    labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
+    labelCurTime_->setText(QTime::currentTime().toString());
+
+//    if (    (!TO_BOOL(input_signals[MSUT_SPEED])) ||
+//            (!TO_BOOL(input_signals[MSUT_ACCELLERATION])) ||
+//            (!TO_BOOL(input_signals[MSUT_ET_T])) ||
+//            (!TO_BOOL(input_signals[MSUT_REVERSOR])) ||
+//            (!TO_BOOL(input_signals[MSUT_POSITION])) ||
+//            (!TO_BOOL(input_signals[MSUT_MODE])) ||
+//            (!TO_BOOL(input_signals[MSUT_VU1_I_TED])) ||
+//            (!TO_BOOL(input_signals[MSUT_VU1_I])) ||
+//            (!TO_BOOL(input_signals[MSUT_VU1_U])) ||
+//            (!TO_BOOL(input_signals[MSUT_VU2_U])) ||
+//            (!TO_BOOL(input_signals[MSUT_VU2_I])) ||
+//            (!TO_BOOL(input_signals[MSUT_POWER]))       )
+//        return;
 
 
-////------------------------------------------------------------------------------
-////
-////------------------------------------------------------------------------------
-//void MsutDisplay::drawScaleArrow(QLabel* label)
-//{
-//    img_.fill(Qt::transparent);
-//    QPixmap pix = QPixmap::fromImage(img_);
-//    QPainter paint(&pix);
-//    paint.setRenderHint(QPainter::Antialiasing, true);
-
-//    int sgp_angleArcEnd = 90;
-//    int sgp_maxSpeedScale = 30;
-//    int stepDeg_ = 10;
-//    double koefLength_ = 0.8;
-//    int widthBase_ = 5;
+    scaleArrow_->setVal(30.0 + input_signals[MSUT_ET_T]);
+    labelArrow_->setText(QString::number(input_signals[MSUT_ET_T]));
+    scaleSpeed_->setVal(input_signals[MSUT_SPEED]);
+    labelSpeed_->setText(QString::number(input_signals[MSUT_SPEED]));
+    scaleAcceleration_->setVal(2.0 + input_signals[MSUT_ACCELLERATION]);
+    labelAcceleration_->setText(QString::number(input_signals[MSUT_ACCELLERATION]));
 
 
+    int fooH = 230;
+    int fooW = 13;
+    int fooY0 = 68;
+    // для виду. Удалить. zБогос
+    input_signals[MSUT_VU1_I_TED] = 1.2;
+    input_signals[MSUT_VU1_I] = 7;
+    input_signals[MSUT_VU1_U] = 0.8;
+    input_signals[MSUT_VU2_U] = 3.2;
+    input_signals[MSUT_VU2_I] = 200;
 
-//    double angleInDeg = (360.0-sgp_angleArcEnd) - (sgp_maxSpeedScale - 0)*stepDeg_;
+    frameVU1_Ited_->resize(fooW, fooH*input_signals[MSUT_VU1_I_TED]/1.5);
+    frameVU1_Ited_->move(frameVU1_Ited_->x(), fooY0 + fooH*(1.5 - input_signals[MSUT_VU1_I_TED])/1.5);
+    labelVU1_Ited_->setText(QString::number(input_signals[MSUT_VU1_I_TED]));
+    frameVU1_I_->resize(fooW, fooH*input_signals[MSUT_VU1_I]/8);
+    frameVU1_I_->move(frameVU1_I_->x(), fooY0 + fooH*(8 - input_signals[MSUT_VU1_I])/8);
+    labelVU1_I_->setText(QString::number(input_signals[MSUT_VU1_I]));
+    frameVU1_U_->resize(fooW, fooH*input_signals[MSUT_VU1_U]);
+    frameVU1_U_->move(frameVU1_U_->x(), fooY0 + fooH*(1 - input_signals[MSUT_VU1_U]));
+    labelVU1_U_->setText(QString::number(input_signals[MSUT_VU1_U]));
+    frameVU2_U_->resize(fooW, fooH*input_signals[MSUT_VU2_U]/4);
+    frameVU2_U_->move(frameVU2_U_->x(), fooY0 + fooH*(4 - input_signals[MSUT_VU2_U])/4);
+    labelVU2_U_->setText(QString::number(input_signals[MSUT_VU2_U]));
+    frameVU2_I_->resize(fooW, fooH*input_signals[MSUT_VU2_I]/250);
+    frameVU2_I_->move(frameVU2_I_->x(), fooY0 + fooH*(250 - input_signals[MSUT_VU2_I])/250);
+    labelVU2_I_->setText(QString::number(input_signals[MSUT_VU2_I]));
+    label_kW_left_->setText(QString::number(input_signals[MSUT_POWER]));
+    label_kW_right_->setText(QString::number(input_signals[MSUT_POWER]));
 
-//    double angle = qDegreesToRadians(angleInDeg);
-//    double foo   = qDegreesToRadians(90.0);
 
-//    paint.setPen(QPen(Qt::red, 1, Qt::SolidLine));
-//    paint.setBrush(Qt::red);
 
-//    QPolygonF triangle;
-//    triangle << QPointF( w_2_ + (w_2_*koefLength_)*cos(angle),
-//                         h_2_ + (h_2_*koefLength_)*sin(angle) )
-//             << QPointF( w_2_ + widthBase_*cos(angle+foo),
-//                         h_2_ + widthBase_*sin(angle+foo) )
-//             << QPointF( w_2_ + widthBase_*cos(angle-foo),
-//                         h_2_ + widthBase_*sin(angle-foo) );
+    switch (static_cast<int>(input_signals[MSUT_REVERSOR]))
+    {
+    case 0:
+        labelReversorFwd_->setVisible(false);
+        labelReversorBwd_->setVisible(false);
+        break;
+    case 1:
+        labelReversorFwd_->setVisible(true);
+        labelReversorBwd_->setVisible(false);
+        break;
+    case -1:
+        labelReversorFwd_->setVisible(false);
+        labelReversorBwd_->setVisible(true);
+        break;
 
-//    paint.drawPolygon(triangle);
+    default:
+        labelReversorFwd_->setVisible(false);
+        labelReversorBwd_->setVisible(false);
+    }
 
-//    paint.end();
-//    label->setPixmap(pix);
-//}
+    labelPositin_->setText(QString::number(static_cast<int>(input_signals[MSUT_POSITION])));
+
+    switch (static_cast<int>(input_signals[MSUT_MODE]))
+    {
+    case 0:
+        labelRezim_->setText("СТОП");
+        break;
+    case 1:
+        labelRezim_->setText("ТЯГА");
+        break;
+
+    default:
+        labelRezim_->setText("СТОП");
+    }
+
+}
 
 
 
