@@ -5,6 +5,7 @@
 #include <QLabel>
 
 #include "scale-arrow.h"
+#include "horizont-bar.h"
 
 //------------------------------------------------------------------------------
 //
@@ -21,6 +22,9 @@ public:
     void init();
 
 private:
+    QLabel* labelCurDate_;
+    QLabel* labelCurTime_;
+
     ScaleArrow* scaleArrow_;
     ScaleArrow* scaleSpeed_;
     ScaleArrow* scaleAcceleration_;
@@ -54,10 +58,13 @@ private:
     QLabel* label_kW_right_;
 
 
-    QLabel* labelReversor_;
+    QLabel* labelReversorFwd_;
+    QLabel* labelReversorBwd_;
     QLabel* labelPositin_;
     QLabel* labelRezim_;
 
+
+    HorizontBar* hBar_;
 
 
 

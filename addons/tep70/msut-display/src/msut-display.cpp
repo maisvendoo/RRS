@@ -4,6 +4,7 @@
 #include    <QLabel>
 #include    <QPainter>
 #include    <QtCore/qmath.h>
+#include    <QDate>
 
 //------------------------------------------------------------------------------
 //
@@ -57,6 +58,22 @@ void MsutDisplay::init()
     background->setFixedHeight(pic.height());
 
     background->setPixmap(pic);
+
+
+    // Текущая дата
+    labelCurDate_ = new QLabel(background);
+    labelCurDate_->setFont(QFont("Arial", 10, 57));
+    labelCurDate_->setText(QDate::currentDate().toString("dd.MM.yyyy"));
+    labelCurDate_->setStyleSheet("color: black;");
+    labelCurDate_->move(18, 4);
+
+    // Текущее время
+    labelCurTime_ = new QLabel(background);
+    labelCurTime_->setFont(QFont("Arial", 10, 57));
+    labelCurTime_->setText(QTime::currentTime().toString());
+    labelCurTime_->setStyleSheet("color: black;");
+    labelCurTime_->move(558, 4);
+
 
 
     // ЭТ/Тяга
@@ -169,6 +186,49 @@ void MsutDisplay::init()
 
 
     // РЕВЕРСОР
+    labelReversorFwd_ = new QLabel(background);
+    labelReversorFwd_->move(55, 48);
+    labelReversorFwd_->setStyleSheet("border: 1px solid blue");
+    QPixmap picReversorArrowFwd;
+    picReversorArrowFwd.load(":/msut/reversor-arrow-fwd");
+    labelReversorFwd_->setPixmap(picReversorArrowFwd);
+
+    labelReversorBwd_ = new QLabel(background);
+    labelReversorBwd_->move(55, 48);
+    labelReversorBwd_->setStyleSheet("border: 1px solid blue");
+    QPixmap picReversorArrowBwd;
+    picReversorArrowBwd.load(":/msut/reversor-arrow-bwd");
+    labelReversorBwd_->setPixmap(picReversorArrowBwd);
+
+    // удалить/переделать под приходящие данные
+    int fooRev = 1;
+    switch (fooRev)
+    {
+    case 0:
+        labelReversorFwd_->setVisible(false);
+        labelReversorBwd_->setVisible(false);
+        break;
+    case 1:
+        labelReversorFwd_->setVisible(true);
+        labelReversorBwd_->setVisible(false);
+        break;
+    case -1:
+        labelReversorFwd_->setVisible(false);
+        labelReversorBwd_->setVisible(true);
+        break;
+
+    default:
+        labelReversorFwd_->setVisible(false);
+        labelReversorBwd_->setVisible(false);
+    }
+
+
+
+
+
+//    labelReversor_ = new QLabel(background);
+//    drawNumberLabel_(labelReversor_, QRect(15,60, 115,45), 14, "white");
+//    labelReversor_->setText("ВПЕРЕД");
 
     // ПОЗИЦИЯ
     labelPositin_ = new QLabel(background);
@@ -179,6 +239,12 @@ void MsutDisplay::init()
     labelRezim_ = new QLabel(background);
     drawNumberLabel_(labelRezim_, QRect(15,244, 115,45), 14, "white");
     labelRezim_->setText("СТОП");
+
+
+
+    //
+    hBar_ = new HorizontBar(QSize(202, 25), background);
+    hBar_->move(316, 284);
 
 
 
