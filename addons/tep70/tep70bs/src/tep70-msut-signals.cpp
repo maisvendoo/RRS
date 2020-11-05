@@ -31,7 +31,7 @@ void TEP70::stepMSUTsignals(double t, double dt)
 
     double traction = 0;
 
-    for (size_t i = 0; i < Q_a.size(); ++i)
+    for (size_t i = 1; i < Q_a.size(); ++i)
     {
         traction += 2 * Q_a[i] / wheel_diameter;
     }

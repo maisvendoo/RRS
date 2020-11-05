@@ -37,7 +37,7 @@
 
 #include    "sim-client.h"
 
-#include    "udp-server.h"
+//#include    "udp-server.h"
 
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
@@ -133,7 +133,7 @@ private:
     SimTcpClient *sim_client;
 
     ///
-    UdpServer *udps;
+    //UdpServer *udps;
 
     /// Simulation thread
     QThread     model_thread;
@@ -153,7 +153,7 @@ private:
 
     ElapsedTimer    simTimer;
 
-    udp_server_data_t server_data;
+    //udp_server_data_t server_data;
 
     init_data_t init_data_for_udp;
 

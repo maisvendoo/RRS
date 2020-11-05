@@ -184,20 +184,20 @@ void Model::controlProcess()
 
 void Model::udpDataUpdate()
 {
-    udp_server_data_t udp_data;
+    /*udp_server_data_t udp_data;
 
     udp_data.time = static_cast<float>(t);
     udp_data.msgCount = 1;
     udp_data.vehicleCount = 1;
     udp_data.routeDir = init_data_for_udp.route_dir;
 
-    udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
+    udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());*/
 //    udp_data.vehicles[0].velocity = 100.f;
 //    udp_data.vehicles[0].direction =1;
 //    udp_data.vehicle
 
 
-    udps->setServerData(udp_data);
+    //udps->setServerData(udp_data);
 }
 
 //------------------------------------------------------------------------------
@@ -506,13 +506,13 @@ void Model::initSimClient(QString cfg_path)
 
 void Model::initUdpServer(QString cfg_path)
 {
-    udps = new UdpServer();
-    udps->init(cfg_path);
+    //udps = new UdpServer();
+    //udps->init(cfg_path);
     //udps->setNoProxy();
 
-    udpTimer.setInterval(100);
-    connect(&udpTimer, &QTimer::timeout, this, &Model::udpDataUpdate);
-    udpTimer.start();
+    //udpTimer.setInterval(100);
+    //connect(&udpTimer, &QTimer::timeout, this, &Model::udpDataUpdate);
+    //udpTimer.start();
 }
 
 //------------------------------------------------------------------------------
