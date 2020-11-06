@@ -103,6 +103,20 @@ enum
     KLUB_ON = 90,
     KLUB_ALARM = 91,
 
+    MSUT_POWER1 = 181,
+    MSUT_POWER2 = 182,           // мощность
+    MSUT_VU2_I = 183,
+    MSUT_VU2_U = 184,
+    MSUT_VU1_U = 185,
+    MSUT_VU1_I = 186,
+    MSUT_VU1_I_TED = 187,
+    MSUT_MODE = 188,            // РЕЖИМ
+    MSUT_POSITION = 189,        // ПОЗИЦИЯ
+    MSUT_REVERSOR = 190,        // РЕВЕРСОР
+    MSUT_ET_T = 191,            // ЭТ/Тяга
+    MSUT_ACCELLERATION = 192,   // Ускорение
+    MSUT_SPEED = 193,           // Скорость
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,

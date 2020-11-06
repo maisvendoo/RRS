@@ -309,6 +309,11 @@ private:
     /// Поездные контакторы
     std::array<Relay *, NUM_MOTORS + 1> kp;
 
+    // Состояние последовательной цепи размыкающих контактов КП1 - КП7
+    bool is_KP1_KP7_off;
+
+    // Состояние последовательной цепи замыкающих контактор КП1 - КП6
+    bool is_KP1_KP6_on;
 
     /// АЗВ "Управление общее"
     Trigger azv_common_control;
@@ -423,6 +428,9 @@ private:
 
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);
+
+    /// Вывод сигналов на дисплей МСУ-ТЭ
+    void stepMSUTsignals(double t, double dt);
 
     /// Вывод отладочной строки
     void debugOutput(double t, double dt);

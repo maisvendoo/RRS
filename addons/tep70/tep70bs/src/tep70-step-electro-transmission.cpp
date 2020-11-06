@@ -14,10 +14,10 @@ void TEP70::stepElectroTransmission(double t, double dt)
     tracForce = 0;
 
     // Состояние последовательной цепи размыкающих контактов КП1 - КП7
-    bool is_KP1_KP7_off = true;
+    is_KP1_KP7_off = true;
 
     // Состояние последовательной цепи замыкающих контактор КП1 - КП6
-    bool is_KP1_KP6_on = true;
+    is_KP1_KP6_on = true;
 
     for (size_t i = 0; i < motor.size(); ++i)
     {

@@ -137,6 +137,8 @@ void TEP70::initialization()
 
     initOther();
 
+    initMSUT();
+
     initSounds();
 
     //reg = new Registrator("../charts/tep70-char", 1.0);
@@ -169,6 +171,10 @@ void TEP70::step(double t, double dt)
     stepOther(t, dt);
 
     stepSignalsOutput(t, dt);
+
+    stepMSUTsignals(t, dt);
+
+    stepMSUT(t, dt);
 
     debugOutput(t, dt);
 
