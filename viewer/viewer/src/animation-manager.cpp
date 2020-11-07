@@ -32,7 +32,10 @@ bool AnimationManager::handle(const osgGA::GUIEventAdapter &ea,
             double delta_time = time - start_time;
             start_time = time;
 
-            step(static_cast<float>(time), static_cast<float>(delta_time));
+            if (delta_time <= 0.04)
+            {
+                step(static_cast<float>(time), static_cast<float>(delta_time));
+            }
 
             break;
         }
