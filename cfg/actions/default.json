@@ -32,6 +32,18 @@
 	    {
 	      	"name": "/actions/suggested/in/DecBrake",
 	      	"type": "boolean"
+	    },
+	    {
+	      	"name": "/actions/suggested/in/Reset",
+	      	"type": "boolean"
+	    },
+	    {
+	      	"name": "/actions/suggested/in/returnGV",
+	      	"type": "boolean"
+	    },
+	    {
+	      	"name": "/actions/suggested/in/Start",
+	      	"type": "boolean"
 	    }
 	],
 	
@@ -43,7 +55,8 @@
             "/actions/suggested/in/Hand_Right"  : "Положение правой руки",
             "/actions/suggested/in/Hand_Left"  : "Положение левой руки",
             "/actions/suggested/in/IncBrake"   : "Увеличить позицию крана 395",
-            "/actions/suggested/in/DecBrake"   : "Уменьшить позицию крана 395"
+            "/actions/suggested/in/DecBrake"   : "Уменьшить позицию крана 395",
+            "/actions/suggested/in/Reset"   : "Сбросить сенсор"
         }
     ]
 }

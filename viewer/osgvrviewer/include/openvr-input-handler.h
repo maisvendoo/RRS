@@ -30,6 +30,9 @@ protected:
     vr::VRActionHandle_t m_action_Hand_Right;
     vr::VRActionHandle_t m_actionIncBrake;
     vr::VRActionHandle_t m_actionDecBrake;
+    vr::VRActionHandle_t m_Reset;
+    vr::VRActionHandle_t m_ReturnGV;
+    vr::VRActionHandle_t m_Start;
 
     vr::VRActionSetHandle_t m_actionset;
 

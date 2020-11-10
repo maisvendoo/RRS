@@ -20,9 +20,10 @@ bool OpenVREventHandler::handle(const osgGA::GUIEventAdapter& ea,
 		{
 			switch (ea.getKey())
 			{
-				case osgGA::GUIEventAdapter::KEY_R:
+                case osgGA::GUIEventAdapter::KEY_V:
 
                     m_openvrDevice->resetSensorOrientation();
+
 					break;
 			}
 		}    

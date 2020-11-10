@@ -15,14 +15,14 @@
 		<TrainCranePos>2</TrainCranePos>
 
 		<!-- Положение рукоятки КВТ -->
-		<LocoCranePos>1</LocoCranePos>
+		<LocoCranePos>0</LocoCranePos>
 
 		<!-- Состояние устройства блокировки тормозов 
 		(1 - разблокирована, 0 - заблокирована) -->
 		<BrakeLockDevice>1</BrakeLockDevice>
 
 		<!-- Положение комбинированного крана -->
-		<CombineCranePos>-1</CombineCranePos>		
+		<CombineCranePos>0</CombineCranePos>		
 		
 	</BrakesState>
 </Config>

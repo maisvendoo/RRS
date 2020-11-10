@@ -159,9 +159,9 @@ void VL60k::keyProcess()
     else
         rb[RBP].reset();
 
-    if (getKeyState(KEY_R))
+    if (getKeyState(KEY_N))
     {
-        if (isAlt() && !autoStartTimer->isStarted())
+        if (!autoStartTimer->isStarted())
             autoStartTimer->start();
     }
 }

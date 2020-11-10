@@ -31,6 +31,12 @@ OpenVRInputHandler::OpenVRInputHandler(OpenVRDevice *device, const std::string &
 
     vr::VRInput()->GetActionHandle("/actions/suggested/in/IncBrake", &m_actionIncBrake);
     vr::VRInput()->GetActionHandle("/actions/suggested/in/DecBrake", &m_actionDecBrake);
+
+    vr::VRInput()->GetActionHandle("/actions/suggested/in/Reset", &m_Reset);
+
+    vr::VRInput()->GetActionHandle("/actions/suggested/in/ReturnGV", &m_ReturnGV);
+
+    vr::VRInput()->GetActionHandle("/actions/suggested/in/Start", &m_Start);
 }
 
 bool GetDigitalActionState(vr::VRActionHandle_t action, bool &state)
@@ -92,6 +98,28 @@ bool OpenVRInputHandler::handle(const osgGA::GUIEventAdapter &ea,
                     viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_Semicolon);
                 else
                     viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_Semicolon);
+            }
+
+            if (GetDigitalActionState(m_Reset, state))
+            {
+                if (state)
+                    device->resetSensorOrientation();
+            }
+
+            if (GetDigitalActionState(m_ReturnGV, state))
+            {
+                if (state)
+                    viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_K);
+                else
+                    viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_K);
+            }
+
+            if (GetDigitalActionState(m_Start, state))
+            {
+                if (state)
+                    viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_N);
+                else
+                    viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_N);
             }
 
             vr::InputPoseActionData_t rPoseData;

@@ -50,6 +50,33 @@
                },
                "mode" : "button",
                "path" : "/user/hand/right/input/trackpad"
+            },            
+            {
+               "path": "/user/hand/left/input/application_menu",
+               "mode": "button",
+               "inputs": {
+                  "click": {
+                     "output": "/actions/suggested/in/returngv"
+                  }
+               }
+            },
+            {
+               "path": "/user/hand/left/input/grip",
+               "mode": "button",
+               "inputs": {
+                  "click": {
+                     "output": "/actions/suggested/in/reset"
+                  }
+               }
+            },
+            {
+               "path": "/user/hand/right/input/application_menu",
+               "mode": "button",
+               "inputs": {
+                  "click": {
+                     "output": "/actions/suggested/in/start"
+                  }
+               }
             }
          ]
       }
@@ -57,7 +84,7 @@
    "category" : "steamvr_input",
    "controller_type" : "vive_controller",
    "description" : "RRS binding test",
-   "name" : "My viewer_d configuration for Vive Controller",
+   "name" : "VR locomotive configuration for Vive Controller",
    "options" : {},
    "simulated_actions" : []
 }
