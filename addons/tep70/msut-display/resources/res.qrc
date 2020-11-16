@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/msut">
-        <file alias="msut-main">img/msut-main.png</file>
+        <file alias="msut-main-move">img/msut-main-move.png</file>
+        <file alias="msut-main-parking">img/msut-main-parking.png</file>
+
         <file alias="reversor-arrow-fwd">img/reversor-arrow-fwd.png</file>
         <file alias="reversor-arrow-bwd">img/reversor-arrow-bwd.png</file>
     </qresource>

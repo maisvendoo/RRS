@@ -2,15 +2,15 @@
 
 void TEP70::stepMSUTsignals(double t, double dt)
 {
-    msut_input_t msut_input;
-
     msut_input.velocity = velocity;
     msut_input.is_KP1_KP6_on = is_KP1_KP6_on;
     msut_input.bc_pressure = fwd_trolley->getBrakeCylinderPressure();
+    msut_input.button_start_state = button_disel_start;
+    msut_input.button_stop_state = false;
 
     msut->setInputData(msut_input);
 
-    msut_output_t msut_output = msut->getOutputData();
+    msut_output = msut->getOutputData();
 
     analogSignal[MSUT_REVERSOR] = reversor->getSatate();
     analogSignal[MSUT_SPEED] = velocity * 3.6;
@@ -39,4 +39,14 @@ void TEP70::stepMSUTsignals(double t, double dt)
     analogSignal[MSUT_ET_T] = traction / Physics::g / 1000.0;
 
     analogSignal[MSUT_MODE] = msut_output.mode;
+
+    analogSignal[MSUT_NOMER_KADR_DISP] = 2;
+
+    analogSignal[MSUT_T_OIL] = 75;
+    analogSignal[MSUT_T_WHATER] = 95;
+
+    analogSignal[MSUT_P_OIL] = disel->getOilPressure() * Physics::g;
+    analogSignal[MSUT_P_FUEL] = electro_fuel_pump->getFuelPressure() * Physics::g;
+    analogSignal[MSUT_I_AB] = hs_p(battery->getCargeCurrent());
+    analogSignal[MSUT_U_CHAIN] = Ucc;
 }

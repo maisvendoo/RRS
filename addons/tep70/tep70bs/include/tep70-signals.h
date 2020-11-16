@@ -103,8 +103,20 @@ enum
     KLUB_ON = 90,
     KLUB_ALARM = 91,
 
-    MSUT_POWER = 181,
-    MSUT_POWER_OTOPLENIE = 182,           // мощность
+
+
+    MSUT_NOMER_KADR_DISP = 171, // номер кадра дисплея
+    MSUT_TIMER_OSTANOV = 172,
+    MSUT_TIMER_PROKRUTKA = 173,
+    MSUT_TIMER_PROKACHKA = 174,
+    MSUT_U_CHAIN = 175,     // Напряжение борт. сети
+    MSUT_P_FUEL = 176,      // Давление топлива
+    MSUT_I_AB = 177,        // Ток заряда АБ
+    MSUT_T_OIL = 178,       // Температура масла
+    MSUT_T_WHATER = 179,    // Температура воды
+    MSUT_P_OIL = 180,       // Давление масла
+    MSUT_POWER_OTOPLENIE = 181, // мощность на отопление
+    MSUT_POWER = 182,           // мощность
     MSUT_VU2_I = 183,
     MSUT_VU2_U = 184,
     MSUT_VU1_U = 185,

@@ -37,6 +37,9 @@ private:
 
     DerivativeCalculator    *accel_calc;
 
+    /// Тригер, имитирующий цепь включения КТН старой схемы
+    Trigger                 fuel_pump_control;
+
     void preStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

@@ -42,6 +42,8 @@ void TEP70::stepControlCircuit(double t, double dt)
                      tumbler_disel_stop.getState() &&
                      ru6->getContactState(1);
 
+    //bool is_KTH_on = msut_output.is_KTN_on && ru6->getContactState(1);
+
     kontaktor_fuel_pump->setVoltage(Ucc * static_cast<double>(is_KTH_on));
     kontaktor_fuel_pump->step(t, dt);
 

@@ -357,6 +357,10 @@ private:
     /// Ключ ЭПК
     Trigger  epk_key;
 
+    msut_input_t msut_input;
+
+    msut_output_t msut_output;
+
     /// Инициализация всех систем тепловоза
     void initialization();
 

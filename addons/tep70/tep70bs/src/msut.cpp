@@ -35,6 +35,14 @@ void MSUT::preStep(state_vector_t &Y, double t)
 {
     msut_output.acceleration = accel_calc->getDerivative();
 
+    if (msut_input.button_start_state)
+        fuel_pump_control.set();
+
+    if (msut_input.button_stop_state)
+        fuel_pump_control.reset();
+
+    msut_output.is_KTN_on = fuel_pump_control.getState();
+
     select_mode();
 }
 
