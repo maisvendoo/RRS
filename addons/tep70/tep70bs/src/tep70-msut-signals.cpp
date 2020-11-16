@@ -5,7 +5,7 @@ void TEP70::stepMSUTsignals(double t, double dt)
     msut_input.velocity = velocity;
     msut_input.is_KP1_KP6_on = is_KP1_KP6_on;
     msut_input.bc_pressure = fwd_trolley->getBrakeCylinderPressure();
-    msut_input.button_start_state = button_disel_start;
+    msut_input.button_start_state = button_start_disel.getState();
     msut_input.button_stop_state = false;
 
     msut->setInputData(msut_input);

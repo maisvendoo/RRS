@@ -25,4 +25,8 @@ void TEP70::initCabineControls()
     tumbler_oil_zaluzi.setKolStates(3);
     tumbler_oil_zaluzi.setKeyCode(KEY_6);
     tumbler_oil_zaluzi.setState(1);
+
+    tumbler_revers.setKolStates(3);
+    tumbler_revers.setKeyCode(KEY_W);
+    tumbler_revers.setState(1);
 }

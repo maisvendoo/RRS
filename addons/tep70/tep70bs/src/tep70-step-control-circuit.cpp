@@ -50,7 +50,7 @@ void TEP70::stepControlCircuit(double t, double dt)
     // Состояние цепи кнопки "Пуск дизеля"
     bool is_Button_Start_on = azv_common_control.getState() &&
                               km->isZero() &&
-                              (button_disel_start || ru8->getContactState(0));
+                              (button_start_disel.getState() || ru8->getContactState(0));
 
     // Определяем состояние цепи катушки реле РУ8
     bool is_RU8_on = is_Button_Start_on &&

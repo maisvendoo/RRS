@@ -137,10 +137,10 @@ void TEP70::stepElectroTransmission(double t, double dt)
 
 
     // Цепь вентиля реврсора вперед
-    bool is_Revers_Forward = azv_upr_tepl.getState() && km->isForward();
+    bool is_Revers_Forward = azv_upr_tepl.getState() && (tumbler_revers.getState() == 2);
 
     // Цепь вентиля реверсора назад
-    bool is_Revers_Backward = azv_upr_tepl.getState() && km->isBackward();
+    bool is_Revers_Backward = azv_upr_tepl.getState() && (tumbler_revers.getState() == 0);
 
     reversor->setForwardValveState(is_Revers_Forward);
     reversor->setBackwardValveState(is_Revers_Backward);

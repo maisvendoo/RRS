@@ -4,9 +4,9 @@
 void TEP70::stepSignalsOutput(double t, double dt)
 {
     analogSignal[KM_SHTURVAL] = km->getMainShaftPos();
-    analogSignal[KM_REVERSOR] = km->getReversState();
+    analogSignal[KM_REVERSOR] = tumbler_revers.getState() - 1;
 
-    analogSignal[BUTTON_DISEL_START] = static_cast<float>(button_disel_start);
+    analogSignal[BUTTON_DISEL_START] = static_cast<float>(button_start_disel.getState());
     analogSignal[BUTTON_BRAKE_RELEASE] = static_cast<float>(!button_brake_release);
     analogSignal[BUTTON_SVISTOK] = static_cast<float>(button_svistok);
     analogSignal[BUTTON_TIFON] = static_cast<float>(button_tifon);

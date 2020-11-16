@@ -49,7 +49,7 @@ public:
     bool isForward() const { return rs_position == RS_FORWARD; }
 
     /// Получить состояние контакта "Назад"
-    bool isBackward() const { return rs_position == RS_BACKWARD; }
+    bool isBackward() const { return rs_position == RS_BACKWARD; }    
 
 private:
 

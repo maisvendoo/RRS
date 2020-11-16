@@ -24,9 +24,10 @@ void TEP70::initControlCircuit()
     ru8->setInitContactState(2, false);
     ru8->setInitContactState(3, false);
 
-    kontaktor_oil_pump = new Relay(1);
+    kontaktor_oil_pump = new Relay(2);
     kontaktor_oil_pump->read_custom_config(config_dir + QDir::separator() + "mk-6");
     kontaktor_oil_pump->setInitContactState(0, false);
+    kontaktor_oil_pump->setInitContactState(1, false);
 
     oilpump_time_relay = new TimeRelay(3);
     oilpump_time_relay->read_custom_config(config_dir + QDir::separator() + "rpu-3m");

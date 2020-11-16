@@ -5,9 +5,15 @@
 //------------------------------------------------------------------------------
 void TEP70::keyProcess()
 {
-    button_disel_start = getKeyState(KEY_K);
+    if (autoStartTimer.isStarted())
+        return;
 
-    button_brake_release = !getKeyState(KEY_R);
+    if (getKeyState(KEY_K))
+        button_start_disel.set();
+    else
+        button_start_disel.reset();
+
+    button_brake_release = !getKeyState(KEY_Y);
 
     button_svistok = getKeyState(KEY_Space);
 
@@ -167,5 +173,11 @@ void TEP70::keyProcess()
         {
             emit soundStop("Tifon");
         }
+    }
+
+    if (getKeyState(KEY_R))
+    {
+        if (isAlt() && !autoStartTimer.isStarted())
+            autoStartTimer.start();
     }
 }

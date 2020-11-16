@@ -231,9 +231,6 @@ private:
     /// Скоростемер
     //SL2M                    *speed_meter;
 
-    /// Кнопка "Пуск дизеля"
-    bool    button_disel_start;
-
     /// Кнопка "Отпуск тормозов"
     bool    button_brake_release;
 
@@ -342,6 +339,9 @@ private:
     /// Тумблер "Аварийная остановка дизеля"
     Trigger tumbler_disel_stop;
 
+    /// Кнопка пуска дизеля
+    Trigger button_start_disel;
+
     /// Тумблер "Ослабление поля I ступени руч./авт."
     TEP70Switcher tumbler_field_weak1;
 
@@ -354,12 +354,20 @@ private:
     /// Тумблер "Управление жалюзи масла руч./авт."
     TEP70Switcher tumbler_oil_zaluzi;
 
+    TEP70Switcher tumbler_revers;
+
     /// Ключ ЭПК
     Trigger  epk_key;
 
     msut_input_t msut_input;
 
     msut_output_t msut_output;
+
+    std::vector<Trigger *> triggers;
+
+    size_t start_count;
+
+    Timer autoStartTimer;
 
     /// Инициализация всех систем тепловоза
     void initialization();
@@ -396,6 +404,9 @@ private:
 
     /// Инициализация звуков
     void initSounds();
+
+    /// Инициализация процедуры автозапуска
+    void initAutostart();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
@@ -436,6 +447,8 @@ private:
     /// Вывод сигналов на дисплей МСУ-ТЭ
     void stepMSUTsignals(double t, double dt);
 
+    void stepAutostart(double t, double dt);
+
     /// Вывод отладочной строки
     void debugOutput(double t, double dt);
 
@@ -447,6 +460,10 @@ private:
 
     /// Обработка клавиш
     void keyProcess();
+
+private slots:
+
+    void slotAutostart();
 };
 
 #endif // TEP70_H

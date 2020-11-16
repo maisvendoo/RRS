@@ -93,6 +93,9 @@ void TEP70::initSounds()
     tumbler_oil_zaluzi.setSoundName("Switcher");
     connect(&tumbler_oil_zaluzi, &TEP70Switcher::soundPlay, this, &TEP70::soundPlay);
 
+    tumbler_revers.setSoundName("Switcher");
+    connect(&tumbler_revers, &TEP70Switcher::soundPlay, this, &TEP70::soundPlay);
+
     ru8->setSoundName("Relay");
     connect(ru8, &Relay::soundPlay, this, &TEP70::soundPlay);
 

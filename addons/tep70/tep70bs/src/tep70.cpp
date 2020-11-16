@@ -59,7 +59,6 @@ TEP70::TEP70() : Vehicle()
   , field_reg(nullptr)
   , I_gen(0.0)
   , reg(nullptr)  
-  , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
   , button_tifon(false)
@@ -85,7 +84,10 @@ TEP70::TEP70() : Vehicle()
 {
     railway_coord = railway_coord0 = 0;
     velocity = 0;
+
+    start_count = 0;
 }
+
 
 //------------------------------------------------------------------------------
 //
@@ -112,6 +114,8 @@ void TEP70::initBrakeDevices(double p0, double pTM, double pFL)
 
     ubt367m->setState(1);
     ubt367m->setCombineCranePos(0);
+
+    kvt->setHandlePosition(0);
 }
 
 //------------------------------------------------------------------------------
@@ -138,6 +142,8 @@ void TEP70::initialization()
     initOther();
 
     initMSUT();
+
+    initAutostart();
 
     initSounds();
 
@@ -175,6 +181,8 @@ void TEP70::step(double t, double dt)
     stepMSUTsignals(t, dt);
 
     stepMSUT(t, dt);
+
+    stepAutostart(t, dt);
 
     debugOutput(t, dt);
 

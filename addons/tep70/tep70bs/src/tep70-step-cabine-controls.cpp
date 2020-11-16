@@ -19,4 +19,7 @@ void TEP70::stepCabineControls(double t, double dt)
 
     tumbler_oil_zaluzi.setControl(keys);
     tumbler_oil_zaluzi.step(t, dt);
+
+    tumbler_revers.setControl(keys);
+    tumbler_revers.step(t, dt);
 }
