@@ -8,6 +8,9 @@ void TEP70::stepMSUTsignals(double t, double dt)
     msut_input.button_start_state = button_start_disel.getState();
     msut_input.button_stop_state = false;
 
+    msut_input.is_KMN_on = kontaktor_oil_pump->getContactState(1);
+    msut_input.is_KD_on = kontaktor_starter->getContactState(1);
+
     msut->setInputData(msut_input);
 
     msut_output = msut->getOutputData();
@@ -49,4 +52,8 @@ void TEP70::stepMSUTsignals(double t, double dt)
     analogSignal[MSUT_P_FUEL] = electro_fuel_pump->getFuelPressure() * Physics::g;
     analogSignal[MSUT_I_AB] = hs_p(battery->getCargeCurrent());
     analogSignal[MSUT_U_CHAIN] = Ucc;
+
+    analogSignal[MSUT_TIMER_PROKACHKA] = msut_output.oil_pump_timer;
+    analogSignal[MSUT_TIMER_PROKRUTKA] = msut_output.starter_timer;
+    analogSignal[MSUT_TIMER_OSTANOV] = msut_output.stop_timer;
 }

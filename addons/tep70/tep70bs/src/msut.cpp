@@ -2,6 +2,8 @@
 
 #include    "tep70-signals.h"
 
+
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -48,6 +50,15 @@ void MSUT::preStep(state_vector_t &Y, double t)
     else
         msut_output.screen_num = 2;
 
+    /*if (msut_output.mode == 0)
+    {
+        msut_output.stop_timer = 60;
+        msut_output.starter_timer = 12;
+        msut_output.oil_pump_timer = 60;
+    }*/
+
+
+
     select_mode();
 }
 
@@ -65,6 +76,42 @@ void MSUT::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 void MSUT::load_config(CfgReader &cfg)
 {
 
+}
+
+void MSUT::stepDiscrete(double t, double dt)
+{
+    (void) t;
+
+
+    if (msut_input.is_KMN_on)
+    {
+        if (msut_output.is_KTN_on)
+        {
+            msut_output.mode = 5;
+            msut_output.oil_pump_timer -= dt;
+        }
+        else
+        {
+            msut_output.mode = 7;
+            msut_output.stop_timer -= dt;
+        }
+    }
+    else
+    {
+        msut_output.stop_timer = 60;
+        msut_output.oil_pump_timer = 60;
+    }
+
+    if (msut_input.is_KD_on)
+    {
+        msut_output.mode = 6;
+        msut_output.starter_timer -= dt;
+    }
+
+
+    msut_output.oil_pump_timer = cut(msut_output.oil_pump_timer, 0.0, 60.0);
+    msut_output.starter_timer = cut(msut_output.starter_timer, 0.0, 12.0);
+    msut_output.stop_timer = cut(msut_output.stop_timer, 0.0, 60.0);
 }
 
 //------------------------------------------------------------------------------

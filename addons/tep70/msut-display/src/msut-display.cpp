@@ -261,20 +261,17 @@ void MsutDisplay::slotUpdateTimer()
     case 5:
         labelRezim_->setText("ПРОКАЧКА");
         timerCount_ = static_cast<int>(input_signals[MSUT_TIMER_PROKACHKA]);
-        if (!timerObratniyOtschet_.isActive())
-            timerObratniyOtschet_.start();
+        labelPositin_->setText(QString::number(static_cast<int>(timerCount_)));
         break;
     case 6:
         labelRezim_->setText("ПРОКРУТКА");
         timerCount_ = static_cast<int>(input_signals[MSUT_TIMER_PROKRUTKA]);
-        if (!timerObratniyOtschet_.isActive())
-            timerObratniyOtschet_.start();
+        labelPositin_->setText(QString::number(static_cast<int>(timerCount_)));
         break;
     case 7:
         labelRezim_->setText("ОСТАНОВ");
         timerCount_ = static_cast<int>(input_signals[MSUT_TIMER_OSTANOV]);
-        if (!timerObratniyOtschet_.isActive())
-            timerObratniyOtschet_.start();
+        labelPositin_->setText(QString::number(static_cast<int>(timerCount_)));
         break;
     case 8:
         labelRezim_->setText("ХОЛ. ХОД");
@@ -284,16 +281,13 @@ void MsutDisplay::slotUpdateTimer()
         labelRezim_->setText("СТОП");
     }
 
+
+
 }
 
 void MsutDisplay::slotTimerObratniyOtschet_()
 {
-    labelPositin_->setText(QString::number(timerCount_));
 
-    if (timerCount_ <= 0)
-        timerObratniyOtschet_.stop();
-
-    --timerCount_;
 }
 
 

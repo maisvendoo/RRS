@@ -46,6 +46,8 @@ private:
 
     void load_config(CfgReader &cfg);
 
+    void stepDiscrete(double t, double dt);
+
     void select_mode();
 };
 
