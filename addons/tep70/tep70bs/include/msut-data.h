@@ -38,10 +38,13 @@ struct msut_output_t
 
     bool    is_KTN_on;
 
+    int     screen_num;
+
     msut_output_t()
         : acceleration(0.0)
         , mode(0)
         , is_KTN_on(false)
+        , screen_num(2)
     {
 
     }

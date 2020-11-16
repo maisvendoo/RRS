@@ -44,8 +44,8 @@ MsutMainDispMove::MsutMainDispMove(QLabel *parent)
     scaleAcceleration_->setVal(0.0 + 2.0);
 
     labelAcceleration_ = new QLabel(parent);
-    drawNumberLabel_(labelAcceleration_, QRect(428,105, 30,15), 10, "black", Qt::AlignRight);
-    //labelAcceleration_->setText("120");
+    drawNumberLabel_(labelAcceleration_, QRect(418,105, 40,15), 10, "black", Qt::AlignRight);
+//    labelAcceleration_->setText("-0.04");
 
 
     // ВУ1
@@ -131,11 +131,11 @@ MsutMainDispMove::MsutMainDispMove(QLabel *parent)
 void MsutMainDispMove::updateData(display_signals_t input_signals)
 {
     scaleArrow_->setVal(30.0 + input_signals[MSUT_ET_T]);
-    labelArrow_->setText(QString::number(input_signals[MSUT_ET_T]));
+    labelArrow_->setText(QString::number(qRound(input_signals[MSUT_ET_T])));
     scaleSpeed_->setVal(input_signals[MSUT_SPEED]);
-    labelSpeed_->setText(QString::number(input_signals[MSUT_SPEED]));
+    labelSpeed_->setText(QString::number(qRound(input_signals[MSUT_SPEED])));
     scaleAcceleration_->setVal(2.0 + input_signals[MSUT_ACCELLERATION]);
-    labelAcceleration_->setText(QString::number(input_signals[MSUT_ACCELLERATION]));
+    labelAcceleration_->setText(QString::number(input_signals[MSUT_ACCELLERATION], 'f', 2));
 
 
     int fooH = 231;
@@ -143,22 +143,22 @@ void MsutMainDispMove::updateData(display_signals_t input_signals)
     int fooY0 = 68;
     frameVU1_Ited_->resize(fooW, fooH*input_signals[MSUT_VU1_I_TED]/1.5);
     frameVU1_Ited_->move(frameVU1_Ited_->x(), fooY0 + fooH*(1.5 - input_signals[MSUT_VU1_I_TED])/1.5);
-    labelVU1_Ited_->setText(QString::number(input_signals[MSUT_VU1_I_TED]));
+    labelVU1_Ited_->setText(QString::number(qRound(input_signals[MSUT_VU1_I_TED]*1000)));
     frameVU1_I_->resize(fooW, fooH*input_signals[MSUT_VU1_I]/8);
     frameVU1_I_->move(frameVU1_I_->x(), fooY0 + fooH*(8 - input_signals[MSUT_VU1_I])/8);
-    labelVU1_I_->setText(QString::number(input_signals[MSUT_VU1_I]));
+    labelVU1_I_->setText(QString::number(qRound(input_signals[MSUT_VU1_I]*1000)));
     frameVU1_U_->resize(fooW, fooH*input_signals[MSUT_VU1_U]);
     frameVU1_U_->move(frameVU1_U_->x(), fooY0 + fooH*(1 - input_signals[MSUT_VU1_U]));
-    labelVU1_U_->setText(QString::number(input_signals[MSUT_VU1_U]));
+    labelVU1_U_->setText(QString::number(qRound(input_signals[MSUT_VU1_U]*1000)));
     frameVU2_U_->resize(fooW, fooH*input_signals[MSUT_VU2_U]/4);
     frameVU2_U_->move(frameVU2_U_->x(), fooY0 + fooH*(4 - input_signals[MSUT_VU2_U])/4);
-    labelVU2_U_->setText(QString::number(input_signals[MSUT_VU2_U]));
+    labelVU2_U_->setText(QString::number(qRound(input_signals[MSUT_VU2_U]*1000)));
     frameVU2_I_->resize(fooW, fooH*input_signals[MSUT_VU2_I]/250);
     frameVU2_I_->move(frameVU2_I_->x(), fooY0 + fooH*(250 - input_signals[MSUT_VU2_I])/250);
-    labelVU2_I_->setText(QString::number(input_signals[MSUT_VU2_I]));
+    labelVU2_I_->setText(QString::number(qRound(input_signals[MSUT_VU2_I]*1000)));
 
-    label_kW_left_->setText(QString::number(input_signals[MSUT_POWER] - input_signals[MSUT_POWER_OTOPLENIE]));
-    label_kW_right_->setText(QString::number(input_signals[MSUT_POWER_OTOPLENIE]));
+    label_kW_left_->setText(QString::number(qRound(input_signals[MSUT_POWER] - input_signals[MSUT_POWER_OTOPLENIE])));
+    label_kW_right_->setText(QString::number(qRound(input_signals[MSUT_POWER_OTOPLENIE])));
 }
 
 

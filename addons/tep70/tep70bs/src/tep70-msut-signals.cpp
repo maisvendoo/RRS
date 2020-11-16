@@ -40,7 +40,7 @@ void TEP70::stepMSUTsignals(double t, double dt)
 
     analogSignal[MSUT_MODE] = msut_output.mode;
 
-    analogSignal[MSUT_NOMER_KADR_DISP] = 2;
+    analogSignal[MSUT_NOMER_KADR_DISP] = msut_output.screen_num;
 
     analogSignal[MSUT_T_OIL] = 75;
     analogSignal[MSUT_T_WHATER] = 95;

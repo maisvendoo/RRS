@@ -43,6 +43,11 @@ void MSUT::preStep(state_vector_t &Y, double t)
 
     msut_output.is_KTN_on = fuel_pump_control.getState();
 
+    if (msut_input.is_KP1_KP6_on || (msut_input.velocity >= 1.0 / Physics::kmh))
+        msut_output.screen_num = 1;
+    else
+        msut_output.screen_num = 2;
+
     select_mode();
 }
 
