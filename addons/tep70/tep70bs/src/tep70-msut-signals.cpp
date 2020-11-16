@@ -25,7 +25,7 @@ void TEP70::stepMSUTsignals(double t, double dt)
     analogSignal[MSUT_POSITION] = km->getPositionNumber();
 
     double power_kW = I_gen * trac_gen->getVoltage() / 1000.0;
-    analogSignal[MSUT_POWER1] = power_kW;
+    analogSignal[MSUT_POWER] = power_kW;
 
     analogSignal[MSUT_ACCELLERATION] = msut_output.acceleration;
 

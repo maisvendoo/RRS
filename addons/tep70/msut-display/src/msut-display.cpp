@@ -296,8 +296,8 @@ void MsutDisplay::slotUpdateTimer()
     frameVU2_I_->move(frameVU2_I_->x(), fooY0 + fooH*(250 - input_signals[MSUT_VU2_I])/250);
     labelVU2_I_->setText(QString::number(qRound(input_signals[MSUT_VU2_I] * 1000)));
 
-    label_kW_left_->setText(QString::number(qRound(input_signals[MSUT_POWER1])));
-    label_kW_right_->setText(QString::number(qRound(input_signals[MSUT_POWER2])));
+    label_kW_left_->setText(QString::number(qRound(input_signals[MSUT_POWER] - input_signals[MSUT_POWER_OTOPLENIE])));
+    label_kW_right_->setText(QString::number(qRound(input_signals[MSUT_POWER_OTOPLENIE])));
 
 
     switch (static_cast<int>(input_signals[MSUT_REVERSOR]))

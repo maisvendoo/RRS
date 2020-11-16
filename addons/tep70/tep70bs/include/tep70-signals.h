@@ -103,8 +103,8 @@ enum
     KLUB_ON = 90,
     KLUB_ALARM = 91,
 
-    MSUT_POWER1 = 181,
-    MSUT_POWER2 = 182,           // мощность
+    MSUT_POWER = 181,
+    MSUT_POWER_OTOPLENIE = 182,           // мощность
     MSUT_VU2_I = 183,
     MSUT_VU2_U = 184,
     MSUT_VU1_U = 185,
