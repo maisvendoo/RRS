@@ -20,6 +20,8 @@
 #include    <QDirIterator>
 #include    <QStringList>
 #include    <QComboBox>
+#include    <QSpinBox>
+#include    <QDoubleSpinBox>
 #include    <QTextStream>
 
 #include    "filesystem.h"
@@ -62,6 +64,39 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->cbDirection, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onDirectionSelected);
 
+    connect(ui->spWidth, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->spHeight, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->cbFullScreen, QOverload<int>::of(&QCheckBox::stateChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->cbDoubleBuffer, QOverload<int>::of(&QCheckBox::stateChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->cbWindowDecoration, QOverload<int>::of(&QCheckBox::stateChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->dspFovY, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->dspNear, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->dspFar, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->spViewDist, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
+    connect(ui->spScreenNumber, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));   
+
+    connect(ui->pbCancel, &QPushButton::released, this, &MainWindow::slotCancelGraphSettings);
+    connect(ui->pbApply, &QPushButton::released, this, &MainWindow::slotApplyGraphSettings);
+
     setCentralWidget(ui->twMain);
 
     setFocusPolicy(Qt::ClickFocus);
@@ -90,6 +125,8 @@ void MainWindow::init()
 
     loadRoutesList(fs.getRouteRootDir());
     loadTrainsList(fs.getTrainsDir());
+
+    loadGraphicsSettings("settings");
 }
 
 //------------------------------------------------------------------------------
@@ -411,4 +448,251 @@ void MainWindow::onDirectionSelected(int index)
     int station_idx = ui->cbStations->currentIndex();
 
     onStationSelected(station_idx);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotChangedGraphSetting(int)
+{
+    ui->pbApply->setEnabled(true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotChangedGraphSetting(double)
+{
+    ui->pbApply->setEnabled(true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotCancelGraphSettings()
+{
+    updateGraphSettings(fd_list, ui);
+    ui->pbApply->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotApplyGraphSettings()
+{
+    applyGraphSettings(fd_list, ui);
+
+    updateGraphSettings(fd_list, ui);
+
+    saveGraphSettings(fd_list);
+
+    ui->pbApply->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const   QString MainWindow::WIDTH = "Width";
+const   QString MainWindow::HEIGHT = "Height";
+const   QString MainWindow::FULLSCREEN = "FullScreen";
+const   QString MainWindow::FOV_Y = "FovY";
+const   QString MainWindow::ZNEAR = "zNear";
+const   QString MainWindow::ZFAR = "zFar";
+const   QString MainWindow::SCREEN_NUM = "ScreenNumber";
+const   QString MainWindow::WIN_DECOR = "WindowDecoration";
+const   QString MainWindow::DOUBLE_BUFF = "DoubleBuffer";
+const   QString MainWindow::NOTIFY_LEVEL = "NofifyLevel";
+const   QString MainWindow::VIEW_DIST = "ViewDistance";
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadGraphicsSettings(QString file_name)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString config_dir = QString(fs.getConfigDir().c_str());
+
+    settings_path = config_dir + fs.separator() + file_name + ".xml";
+
+    QString secName = "Viewer";
+
+    CfgReader   cfg;
+
+    if (cfg.load(settings_path))
+    {
+        int width = 0;
+        cfg.getInt(secName, WIDTH, width);
+        fd_list.append(QPair<QString, QVariant>(WIDTH, width));
+
+        int height = 0;
+        cfg.getInt(secName, HEIGHT, height);
+        fd_list.append(QPair<QString, QVariant>(HEIGHT, height));
+
+        int fullscreen = 0;
+        cfg.getInt(secName, FULLSCREEN, fullscreen);
+        fd_list.append(QPair<QString, QVariant>(FULLSCREEN, fullscreen));
+
+        double fovY = 0;
+        cfg.getDouble(secName, FOV_Y, fovY);
+        fd_list.append(QPair<QString, QVariant>(FOV_Y, fovY));
+
+        double zNear = 0;
+        cfg.getDouble(secName, ZNEAR, zNear);
+        fd_list.append(QPair<QString, QVariant>(ZNEAR, zNear));
+
+        double zFar = 0;
+        cfg.getDouble(secName, ZFAR, zFar);
+        fd_list.append(QPair<QString, QVariant>(ZFAR, zFar));
+
+        int screen_num = 0;
+        cfg.getInt(secName, SCREEN_NUM, screen_num);
+        fd_list.append(QPair<QString, QVariant>(SCREEN_NUM, screen_num));
+
+        int win_decor = 0;
+        cfg.getInt(secName, WIN_DECOR, win_decor);
+        fd_list.append(QPair<QString, QVariant>(WIN_DECOR, win_decor));
+
+        int double_buff = 0;
+        cfg.getInt(secName, DOUBLE_BUFF, double_buff);
+        fd_list.append(QPair<QString, QVariant>(DOUBLE_BUFF, double_buff));
+
+        double view_dist = 0;
+        cfg.getDouble(secName, VIEW_DIST, view_dist);
+        fd_list.append(QPair<QString, QVariant>(VIEW_DIST, view_dist));
+
+        updateGraphSettings(fd_list, ui);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QPair<QString, QVariant> findSetting(QString setting,
+                                     FieldsDataList &fd_list,
+                                     int &idx)
+{
+    QPair<QString, QVariant> pair;
+
+    for (int i = 0; i < fd_list.size(); ++i)
+    {
+        pair = fd_list[i];
+
+        if (pair.first == setting)
+        {
+            idx = i;
+            return pair;
+        }
+    }
+
+    return pair;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QPair<QString, QVariant> findSetting(QString setting, FieldsDataList &fd_list)
+{
+    int idx = 0;
+    QPair<QString, QVariant> pair = findSetting(setting, fd_list, idx);
+
+    return pair;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
+{
+    ui->spWidth->setValue(findSetting(WIDTH, fd_list).second.toInt());
+    ui->spHeight->setValue(findSetting(HEIGHT, fd_list).second.toInt());
+
+    findSetting(FULLSCREEN, fd_list).second == 1 ?
+                ui->cbFullScreen->setCheckState(Qt::CheckState::Checked) :
+                ui->cbFullScreen->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(WIN_DECOR, fd_list).second == 1 ?
+                ui->cbWindowDecoration->setCheckState(Qt::CheckState::Checked) :
+                ui->cbWindowDecoration->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(DOUBLE_BUFF, fd_list).second == 1 ?
+                ui->cbDoubleBuffer->setCheckState(Qt::CheckState::Checked) :
+                ui->cbDoubleBuffer->setCheckState(Qt::CheckState::Unchecked);
+
+    ui->spScreenNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
+    ui->dspFovY->setValue(findSetting(FOV_Y, fd_list).second.toDouble());
+    ui->dspNear->setValue(findSetting(ZNEAR, fd_list).second.toDouble());
+    ui->dspFar->setValue(findSetting(ZFAR, fd_list).second.toDouble());
+
+    ui->spViewDist->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());    
+
+    ui->pbApply->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
+{
+    int idx = 0;
+
+    findSetting(WIDTH, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(WIDTH, ui->spWidth->value());
+
+    findSetting(HEIGHT, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(HEIGHT, ui->spHeight->value());
+
+    findSetting(FULLSCREEN, fd_list, idx);
+    if (ui->cbFullScreen->checkState() == Qt::CheckState::Checked)
+    {
+        fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 1);
+    }
+    else
+    {
+        fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 0);
+    }
+
+    findSetting(DOUBLE_BUFF, fd_list, idx);
+    if (ui->cbDoubleBuffer->checkState() == Qt::CheckState::Checked)
+    {
+        fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 1);
+    }
+    else
+    {
+        fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 0);
+    }
+
+    findSetting(WIN_DECOR, fd_list, idx);
+    if (ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked)
+    {
+        fd_list[idx] = QPair<QString, QVariant>(WIN_DECOR, 1);
+    }
+    else
+    {
+        fd_list[idx] = QPair<QString, QVariant>(WIN_DECOR, 0);
+    }
+
+    findSetting(SCREEN_NUM, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(SCREEN_NUM, ui->spScreenNumber->value());
+
+    findSetting(FOV_Y, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(FOV_Y, ui->dspFovY->value());
+
+    findSetting(ZNEAR, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(ZNEAR, ui->dspNear->value());
+
+    findSetting(ZFAR, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(ZFAR, ui->dspFar->value());
+
+    findSetting(VIEW_DIST, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->spViewDist->value());   
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
+{
+    CfgEditor editor;
+
+    editor.editFile(settings_path, "Viewer", fd_list);
 }

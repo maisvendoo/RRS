@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Speedometer>
+		<!-- <fonColor></fonColor> -->
+	
+		<!-- основные черточки на шкале спидометра -->
+		<majorLine_color>#ffffff</majorLine_color>
+		<majorLine_width>2</majorLine_width>
+		<majorLine_length>26</majorLine_length>
+		
+		<!-- Текущее значение скорости в центре спидометра -->
+		<labelValVCenter_x>0</labelValVCenter_x>
+		<labelValVCenter_y>0</labelValVCenter_y>
+		<labelValVCenter_color>#ffffff</labelValVCenter_color>
+		<labelValVCenter_fontSize>38</labelValVCenter_fontSize>
+		
+		<!-- Ограничение скорости под центральным кругом спидометра -->
+		<labelSpeedLimit_x>0</labelSpeedLimit_x>
+		<labelSpeedLimit_y>110</labelSpeedLimit_y>
+		<labelSpeedLimit_color>#ff0000</labelSpeedLimit_color>
+		<labelSpeedLimit_fontSize>38</labelSpeedLimit_fontSize>
+		
+		<!-- макс. значение скорости на шкале спидометра -->
+		<valV_max_OnScale>300</valV_max_OnScale>
+		<!-- значение шага скорости на шкале -->
+		<valV_step_OnScale>20</valV_step_OnScale>
+		
+		<!-- угол центра разрыва дуги  -->
+		<arc_splitPoint>270</arc_splitPoint>
+		<!-- длина дуги-разрыва -->
+		<arc_splitAngle>90</arc_splitAngle>
+		
+	</Speedometer>
+
+	
+</Config>

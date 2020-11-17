@@ -24,6 +24,7 @@
 //
 //------------------------------------------------------------------------------
 AppCore::AppCore(int &argc, char **argv) : QCoreApplication(argc, argv)
+  , model(nullptr)
 {
 
 }

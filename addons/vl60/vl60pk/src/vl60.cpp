@@ -73,6 +73,10 @@ VL60pk::VL60pk() : Vehicle ()
         rb[i].setOffSoundName("RB_Up");
         connect(&rb[i], &Trigger::soundPlay, this, &VL60pk::soundPlay);
     }
+
+    ept_switch.setOnSoundName("EPT_On");
+    ept_switch.setOffSoundName("EPT_Off");
+    connect(&ept_switch, &Trigger::soundPlay, this, &VL60pk::soundPlay);
 }
 
 //------------------------------------------------------------------------------

@@ -36,6 +36,10 @@
 #include    "hardware-signals.h"
 #include    "ept-converter.h"
 #include    "ept-pass-control.h"
+#include    "convert-physics-to-modbus.h"
+#include    "chs2t-horn.h"
+#include    "sl2m.h"
+#include    "energy-counter.h"
 
 /*!
  * \class
@@ -102,6 +106,12 @@ private:
 
     /// Задатчик тормозного усилия ЭДТ (ЗТ)
     Reservoir *brakeRefRes;
+
+    PhysToModbus *TM_manometer;
+    PhysToModbus *UR_manometer;
+    PhysToModbus *ZT_manometer;
+    PhysToModbus *GR_manometer;
+    PhysToModbus *TC_manometer;
 
     /// Регулятор давления ГР
     PressureRegulator *pressReg;
@@ -172,6 +182,7 @@ private:
     Switcher    *fastSwitchSw;
 
     std::array<DCMotorFan*, 2> motor_fan;
+
     Switcher *motor_fan_switcher;
 
     Switcher *blindsSwitcher;
@@ -221,6 +232,12 @@ private:
 
     /// Жалюзи пуско-тормозных резисторов
     Blinds      *blinds;
+
+    /// Скоростемер 3СЛ2М
+    SL2M        *speed_meter;   
+
+    /// Счетчик энергии
+    EnergyCounter   *energy_counter;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
@@ -276,6 +293,9 @@ private:
     /// Инициализация приборов ЭПТ
     void initEPT();
 
+    ///
+    void initModbus();
+
     /// Инициализация регистратора
     void initRegistrator();
 
@@ -311,6 +331,10 @@ private:
     void stepDebugMsg(double t, double dt);
 
     void stepSignals();
+
+    void stepSwitcherPanel();
+
+    void stepDecodeAlsn();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);

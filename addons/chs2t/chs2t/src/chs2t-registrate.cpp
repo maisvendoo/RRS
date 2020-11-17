@@ -8,12 +8,16 @@ void CHS2T::registrate(double t, double dt)
     if (reg == nullptr)
         return;
 
-    QString msg = QString("%1 %2 %3 %4 %5")
+    QString msg = QString("%1 %2 %3 %4 %5 %6 %7 %8 %9")
             .arg(t)
+            .arg(railway_coord / 1000.0)
             .arg(velocity * Physics::kmh)
-            .arg(abs(generator->getIa()))
-            .arg(BrakeReg->getU())
-            .arg(pulseConv->getUf());
+            .arg(energy_counter->getFullEnergy())
+            .arg(energy_counter->getResistorEnergy())
+            .arg(energy_counter->getTracEnergy())
+            .arg(energy_counter->getFullPower())
+            .arg(energy_counter->getResistorPower())
+            .arg(energy_counter->getTracPower());
 
     reg->print(msg, t, dt);
 }

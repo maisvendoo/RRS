@@ -30,6 +30,8 @@ public:
 
     virtual double getAirDistribPressure() const;
 
+    virtual void stepSound();
+
     void release(bool is_release);
 
 protected:

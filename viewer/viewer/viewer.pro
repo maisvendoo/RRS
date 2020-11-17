@@ -6,6 +6,7 @@ QT += core
 QT += gui
 QT += widgets
 QT += network
+QT += opengl
 
 TARGET = viewer
 
@@ -35,6 +36,7 @@ win32 {
         LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
         LIBS += -L../../../lib -lTcpConnection_d
+        LIBS += -L../../../lib -ldisplay_d
 
         LIBS += -L../../lib -losgVRViewer_d
 
@@ -58,9 +60,12 @@ win32 {
         LIBS += -L../../lib -losgVRViewer
 
         LIBS += -L$$(OPENVR_LIB) -lopenvr_api
+
+        LIBS += -L../../../lib -ldisplay
+
     }
 
-    LIBS += -lopengl32 -lglu32
+    #LIBS += -lopengl32 -lglu32
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
     INCLUDEPATH += $$(OPENVR_INCLUDE)
@@ -88,6 +93,7 @@ unix {
         LIBS += -L../../../lib -llibrary_d
         LIBS += -L../../../lib -lfilesystem_d
         LIBS += -L../../lib -lTcpConnection_d
+        LIBS += -L../../lib -ldisplay_d
 
     } else {
 
@@ -107,9 +113,10 @@ unix {
         LIBS += -L../../../lib -llibrary
         LIBS += -L../../../lib -lfilesystem
         LIBS += -L../../lib -lTcpConnection
+        LIBS += -L../../lib -ldisplay
     }
 
-    LIBS += -lGL
+    #LIBS += -lGL
 }
 
 #QMAKE_CXXFLAGS += -pg
@@ -117,14 +124,19 @@ unix {
 #QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 #LIBS += -lgcov
 
-CONFIG += force_debug_info
+#CONFIG += force_debug_info
+
+#MAKE_CXXFLAGS_DEBUG += -pg
+#QMAKE_LFLAGS_DEBUG += -pg
 
 INCLUDEPATH += ../../common-headers
+INCLUDEPATH += ../../simulator/vehicle/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
 INCLUDEPATH += ../osgvrviewer/include
+INCLUDEPATH += ../display/include
 INCLUDEPATH += ./include
 
 HEADERS += $$files(./include/*.h)

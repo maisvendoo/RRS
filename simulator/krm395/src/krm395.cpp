@@ -33,6 +33,16 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , dir(0)
   , pos_switch(true)
   , tau(0.0)
+  , volume_in(0)
+  , volume_out(0)
+  , Kv_in(1e9)
+  , Kv_out(1e7)
+  , volume_1(0)
+  , volume_2(0)
+  , volume_5(0)
+  , Kv_1(3e5)
+  , Kv_2(2e7)
+  , Kv_5(2e6)
 
 {
     std::fill(K.begin(), K.end(), 0.0);
@@ -65,7 +75,7 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
 //------------------------------------------------------------------------------
 BrakeCrane395::~BrakeCrane395()
 {
-    delete debug_log;
+
 }
 
 //------------------------------------------------------------------------------
@@ -125,6 +135,19 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 
     is_hold = static_cast<bool>(pos[POS_III] + pos[POS_IV]);
     is_brake = static_cast<bool>(pos[POS_Va] + pos[POS_V] + pos[POS_VI]);
+
+
+
+    emit soundSetVolume("KRM395_vpusk", cut(volume_in, 0, 100));
+    emit soundSetVolume("KRM395_vipusk", cut(volume_out, 0, 100));
+    emit soundSetVolume("KRM395_2", cut(volume_2, 0, 100));
+
+    DebugMsg = QString("out: %1 in: %2 1: %3 2: %4 5: %5")
+            .arg(volume_out, 10)
+            .arg(volume_in, 10)
+            .arg(volume_1, 10)
+            .arg(volume_2, 10)
+            .arg(volume_5, 10);
 }
 
 //------------------------------------------------------------------------------
@@ -172,6 +195,12 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
                  - K[7] * Y[0] * pos[POS_VI]
                  + K[8] * (pFL - Y[0]) * pos[POS_I];
 
+    volume_in = static_cast<int>(Kv_in * pf(Qbp));
+    volume_out = static_cast<int>(Kv_out * nf(Qbp));
+    volume_1 = static_cast<int>(Kv_1 * pf(Q_charge));
+    volume_2 = static_cast<int>(Kv_2 * nf(Q_stab));
+    volume_5 = static_cast<int>(Kv_5 * nf(Q_brake));
+
     setBrakePipeFlow(Qbp);
     setEqResrvoirFlow(Qer);
 
@@ -205,6 +234,11 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "T1", T1);
     cfg.getDouble(secName, "T2", T2);
     cfg.getDouble(secName, "K4_power", K4_power);
+    cfg.getDouble(secName, "Kv_in", Kv_in);
+    cfg.getDouble(secName, "Kv_out", Kv_out);
+    cfg.getDouble(secName, "Kv_1", Kv_1);
+    cfg.getDouble(secName, "Kv_2", Kv_2);
+    cfg.getDouble(secName, "Kv_5", Kv_5);
 }
 
 //------------------------------------------------------------------------------

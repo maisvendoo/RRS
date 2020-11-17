@@ -21,6 +21,7 @@
 #include    "route-info.h"
 #include    "train-info.h"
 #include    "waypoint.h"
+#include    "CfgEditor.h"
 
 //------------------------------------------------------------------------------
 //
@@ -70,6 +71,23 @@ private:
     /// Visaulization process
     QProcess        viewerProc;
 
+    /// Viewer settings
+    FieldsDataList  fd_list;
+
+    static const   QString WIDTH;
+    static const   QString HEIGHT;
+    static const   QString FULLSCREEN;
+    static const   QString FOV_Y;
+    static const   QString ZNEAR;
+    static const   QString ZFAR;
+    static const   QString SCREEN_NUM;
+    static const   QString WIN_DECOR;
+    static const   QString DOUBLE_BUFF;
+    static const   QString NOTIFY_LEVEL;
+    static const   QString VIEW_DIST;
+
+    QString settings_path;
+
     /// Launcer initialization
     void init();
 
@@ -97,6 +115,18 @@ private:
     /// Load theme
     void loadTheme();
 
+    /// Load graphics settings
+    void loadGraphicsSettings(QString file_name);
+
+    /// Update graphics settings
+    void updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
+
+    /// Apply new graph settings
+    void applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
+
+    /// Save graph settings to file
+    void saveGraphSettings(FieldsDataList &fd_list);
+
 private slots:
 
     void onRouteSelection();
@@ -114,6 +144,14 @@ private slots:
     void onStationSelected(int index);
 
     void onDirectionSelected(int index);
+
+    void slotChangedGraphSetting(int);
+
+    void slotChangedGraphSetting(double);
+
+    void slotCancelGraphSettings();
+
+    void slotApplyGraphSettings();
 };
 
 #endif // MAINWINDOW_H

@@ -7,6 +7,8 @@ ControllerKME_60_044::ControllerKME_60_044(QObject *parent)
     : TractionController(parent)
     , main_pos(POS_ZERO)
     , revers_pos(REVERS_ZERO)
+    , main_handle_pos(0.0f)
+    , revers_handle_pos(0.0f)
 {
     incMainPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
     connect(incMainPos, &Timer::process, this, &ControllerKME_60_044::incMain);
@@ -66,6 +68,9 @@ void ControllerKME_60_044::setReversPos(int pos)
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     std::fill(state.pos_state.begin(), state.pos_state.end(), false);
     state.pos_state[static_cast<size_t>(main_pos)] = true;
 
@@ -91,7 +96,9 @@ void ControllerKME_60_044::ode_system(const state_vector_t &Y,
                                       state_vector_t &dYdt,
                                       double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -99,7 +106,7 @@ void ControllerKME_60_044::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 //------------------------------------------------------------------------------
@@ -176,9 +183,14 @@ void ControllerKME_60_044::incMain()
     if (revers_pos == REVERS_ZERO)
         return;
 
+    int main_pos_old = main_pos;
+
     main_pos++;
 
     main_pos = cut(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
+
+    if (main_pos_old != main_pos)
+        emit soundPlay("kme_60_044");
 }
 
 //------------------------------------------------------------------------------
@@ -189,9 +201,14 @@ void ControllerKME_60_044::decMain()
     if (revers_pos == REVERS_ZERO)
         return;
 
+    int main_pos_old = main_pos;
+
     main_pos--;
 
     main_pos = cut(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
+
+    if (main_pos_old != main_pos)
+        emit soundPlay("kme_60_044");
 }
 
 //------------------------------------------------------------------------------
@@ -202,9 +219,14 @@ void ControllerKME_60_044::incRevers()
     if ( (revers_pos == REVERS_BACKWARD) && (main_pos != POS_ZERO) )
         return;
 
+    int revers_pos_old = revers_pos;
+
     revers_pos++;
 
     revers_pos = cut(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
+
+    if (revers_pos_old != revers_pos)
+        emit soundPlay("revers");
 }
 
 //------------------------------------------------------------------------------
@@ -215,7 +237,12 @@ void ControllerKME_60_044::decRevers()
     if ( (revers_pos == REVERS_FORWARD) && (main_pos != POS_ZERO) )
         return;
 
+    int revers_pos_old = revers_pos;
+
     revers_pos--;
 
     revers_pos = cut(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
+
+    if (revers_pos_old != revers_pos)
+        emit soundPlay("revers");
 }

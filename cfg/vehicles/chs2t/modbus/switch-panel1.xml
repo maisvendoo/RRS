@@ -1,0 +1,95 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <!-- Выключатель ЭПТ -->
+    <InputRegister>
+        <Address>2</Address>
+        <Index>12</Index>
+    </InputRegister>
+
+    <!-- Управление МК1 -->
+    <InputRegister>
+        <Address>3</Address>
+        <Index>13</Index>
+    </InputRegister>
+
+    <!-- Передний токоприемник и разъединитель -->
+    <InputRegister>
+        <Address>4</Address>
+        <Index>14</Index>
+    </InputRegister>
+
+    <!-- Управление БВ -->
+    <InputRegister>
+        <Address>5</Address>
+        <Index>15</Index>
+    </InputRegister> 
+
+    <!-- Управление жалюзи, пескоподачей, впомогательным компрессором -->
+    <InputRegister>
+        <Address>6</Address>
+        <Index>16</Index>
+    </InputRegister>
+
+    <!-- Задний токоприемник и разъединитель -->
+    <InputRegister>
+        <Address>7</Address>
+        <Index>17</Index>
+    </InputRegister>
+
+    <Coil>
+        <Address>0</Address>
+        <Index>5</Index>
+    </Coil>
+
+    <Coil>
+        <Address>1</Address>
+        <Index>6</Index>
+    </Coil>
+
+    <Coil>
+        <Address>2</Address>
+        <Index>7</Index>
+    </Coil>
+
+    <Coil>
+        <Address>3</Address>
+        <Index>8</Index>
+    </Coil>
+
+    <Coil>
+        <Address>4</Address>
+        <Index>9</Index>
+    </Coil>
+
+    <Coil>
+        <Address>5</Address>
+        <Index>10</Index>
+    </Coil>
+
+    <Coil>
+        <Address>6</Address>
+        <Index>11</Index>
+    </Coil>
+
+    <Coil>
+        <Address>7</Address>
+        <Index>12</Index>
+    </Coil>
+
+    <Coil>
+        <Address>8</Address>
+        <Index>13</Index>
+    </Coil>
+
+    <Coil>
+        <Address>9</Address>
+        <Index>14</Index>
+    </Coil>
+
+    <Coil>
+        <Address>10</Address>
+        <Index>15</Index>
+    </Coil>
+
+</Config>

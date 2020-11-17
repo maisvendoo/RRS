@@ -17,6 +17,19 @@ void VL60k::stepOtherEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60k::stepTapSound()
+{
+    double speed = abs(this->velocity) * 3.6;
+
+    for (int i = 0; i < tap_sounds.count(); ++i)
+    {
+        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60k::step(double t, double dt)
 {
     stepPantographsControl(t, dt);
@@ -44,6 +57,8 @@ void VL60k::step(double t, double dt)
     stepLineContactors(t, dt);
 
     stepOtherEquipment(t, dt);
+
+    stepTapSound();
 
     autoStartTimer->step(t, dt);
 }

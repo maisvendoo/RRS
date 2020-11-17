@@ -110,10 +110,24 @@ private:
 
     double tau;
 
-    Timer   *incTimer;
-    Timer   *decTimer;
+    int volume_in;
 
-    DebugLog *debug_log;
+    int volume_out;
+
+    double Kv_in;
+
+    double Kv_out;
+
+    int volume_1;
+    int volume_2;
+    int volume_5;
+
+    double Kv_1;
+    double Kv_2;
+    double Kv_5;
+
+    Timer   *incTimer;
+    Timer   *decTimer;    
 
     std::array<double, MAX_FLOW_COEFFS + 1> K;
 
@@ -122,6 +136,7 @@ private:
     QStringList positions_names;
 
     std::vector<float> positions;
+
 
     void preStep(state_vector_t &Y, double t);
 
@@ -133,7 +148,7 @@ private:
 
     void stepKeysControl(double t, double dt);
 
-private slots:
+private slots:    
 
     void inc();
 

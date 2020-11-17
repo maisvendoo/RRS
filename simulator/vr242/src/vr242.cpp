@@ -9,23 +9,18 @@
 //
 //------------------------------------------------------------------------------
 AirDist242::AirDist242() : AirDistributor ()
+  , A1(1.0)
+  , py2(0.05)
+  , s1_min(1e-3)
+  , s1_max(1e-3)
+  , p_bv(0.15)
+  , p_UP(1000.0)
+  , long_train(0.0)
+  , K2(0.0)
 {
     K.fill(0.0);
     k.fill(0.0);
-    T.fill(1.0);
-
-    s1_min = 1e-3;
-    s1_max = 1e-3;
-
-    p_bv = 0.15;
-    p_UP = 1000.0;
-
-    long_train = 0.0;
-
-    K2 = 0;
-
-    /*DebugLog *log = new DebugLog("vr242.txt");
-    connect(this, &AirDist242::DebugPrint, log, &DebugLog::DebugPring);*/
+    T.fill(1.0);      
 }
 
 //------------------------------------------------------------------------------
@@ -123,11 +118,6 @@ void AirDist242::load_config(CfgReader &cfg)
         cfg.getDouble(secName, coeff, T[i]);
     }
 
-    cfg.getDouble(secName, "Vmk", Vmk);
-    cfg.getDouble(secName, "Vy4", Vy4);
-    cfg.getDouble(secName, "Vzk", Vzk);
-    cfg.getDouble(secName, "Vat2", Vat2);
-    cfg.getDouble(secName, "Vy2", Vy2);
     cfg.getDouble(secName, "A1", A1);
 
     cfg.getDouble(secName, "Py2", py2);

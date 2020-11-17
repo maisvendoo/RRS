@@ -1,27 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <Config>
-	<Viewer>
-		<posX>50</posX>
-		<posY>50</posY>
-		<Width>1280</Width>
-		<Height>720</Height>
-		<FullScreen>0</FullScreen>
-		<VSync>1</VSync>
-		<HostAddress>127.0.0.1</HostAddress>
-		<Port>1992</Port>
-		<LocalMode>0</LocalMode>
-		<FovY>55.0</FovY>
-		<zNear>0.1</zNear>
-		<zFar>10000.0</zFar>
-		<ScreenNumber>1</ScreenNumber>
-		<Name>viewer</Name>
-		<WindowDecoration>1</WindowDecoration>
-		<DoubleBuffer>1</DoubleBuffer>
-		<Samples>16</Samples>
-		<RequestInterval>100</RequestInterval>
-		<ReconnectInterval>1000</ReconnectInterval>
-		<MotionBlur>0.05</MotionBlur>
-		<NotifyLevel>INFO</NotifyLevel>
-		<ViewDistance>1000.0</ViewDistance>
-	</Viewer>                
+    <Viewer>
+        <posX>50</posX>
+        <posY>50</posY>
+        <Width>1280</Width>
+        <Height>720</Height>
+        <FullScreen>0</FullScreen>
+        <VSync>1</VSync>
+        <HostAddress>127.0.0.1</HostAddress>
+        <Port>1992</Port>
+        <LocalMode>0</LocalMode>
+        <FovY>55</FovY>
+        <zNear>0.1</zNear>
+        <zFar>10000</zFar>
+        <ScreenNumber>1</ScreenNumber>
+        <Name>viewer</Name>
+        <WindowDecoration>1</WindowDecoration>
+        <DoubleBuffer>1</DoubleBuffer>
+        <Samples>16</Samples>
+        <RequestInterval>100</RequestInterval>
+        <ReconnectInterval>1000</ReconnectInterval>
+        <MotionBlur>0.05</MotionBlur>
+        <NotifyLevel>ERROR</NotifyLevel>
+        <ViewDistance>5000</ViewDistance>
+    </Viewer>
 </Config>

@@ -17,6 +17,19 @@ void VL60pk::stepOtherEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60pk::stepTapSound()
+{
+    double speed = abs(this->velocity) * 3.6;
+
+    for (int i = 0; i < tap_sounds.count(); ++i)
+    {
+        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60pk::step(double t, double dt)
 {
     stepPantographsControl(t, dt);
@@ -46,6 +59,8 @@ void VL60pk::step(double t, double dt)
     stepOtherEquipment(t, dt);
 
     stepEPT(t, dt);
+
+    stepTapSound();
 
     autoStartTimer->step(t, dt);
 }
@@ -314,6 +329,9 @@ void VL60pk::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepLineContactors(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     km_state_t km_state = controller->getState();
 
     bool motor_fans_state = true;

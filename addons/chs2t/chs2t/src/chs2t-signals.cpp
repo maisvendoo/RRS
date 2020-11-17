@@ -38,6 +38,8 @@ void CHS2T::stepSignals()
 
     analogSignal[KONTROLLER] = static_cast<float>(km21KR2->getMainShaftPos());
     analogSignal[REVERSOR] = static_cast<float>(stepSwitch->getReverseState());
+    analogSignal[SHTURVAL] = static_cast<float>(km21KR2->getHandleHeight());
+    analogSignal[SHTUR_SVISTOK] = static_cast<float>(horn->isSvistok());
 
     analogSignal[SIGLIGHT_P] = static_cast<float>(stepSwitch->isParallel());
     analogSignal[SIGLIGHT_SP] = static_cast<float>(stepSwitch->isSeriesParallel());
@@ -75,6 +77,12 @@ void CHS2T::stepSignals()
     analogSignal[SIGLIGHT_GALYZI] = static_cast<float>(blinds->isOpened());
 
     analogSignal[HANDLE_RT] = handleEDT->getHandlePos();
+
+    analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
+    analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
+    analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
+
+    analogSignal[SW_EDT] = EDTSwitch.getState();
 
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);

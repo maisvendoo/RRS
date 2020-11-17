@@ -24,17 +24,17 @@
 #include    "solver-types.h"
 #include    "key-symbols.h"
 
+#include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
+
+#include    "alsn-struct.h"
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
 #else
     #define VEHICLE_EXPORT  Q_DECL_IMPORT
 #endif
-
-const   int NUM_ANALOG_SIGNALS = 1000;
-const   int NUM_DISCRETE_SIGNALS = 1000;
 
 //------------------------------------------------------------------------------
 //
@@ -115,12 +115,12 @@ public:
 
     double getWheelOmega(size_t i);
 
-    bool getDiscreteSignal(int i);
+    bool getDiscreteSignal(size_t i);
 
-    float getAnalogSignal(int i);
+    float getAnalogSignal(size_t i);
 
-    bool    *getDiscreteSignals();
-    float   *getAnalogSignals();
+    std::array<bool, MAX_DISCRETE_SIGNALS> getDiscreteSignals();
+    std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
@@ -149,6 +149,9 @@ public:
 
     QString getDebugMsg() const;
 
+    /// vehicle get sounds directory
+    QString getSoundsDir() const;
+
     /// Init vehicle brake devices
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -161,6 +164,8 @@ public:
     double getEPTCurrent(size_t i);
 
     double getEPTControl(size_t i);
+
+    void setASLN(alsn_info_t alsn_info);
 
 public slots:
     
@@ -180,6 +185,8 @@ signals:
 
     void soundSetPitch(QString name, float pitch);
 
+    void volumeCurveStep(QString name, float param);
+
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
 protected:
@@ -195,6 +202,8 @@ protected:
     double  payload_coeff;
     /// Full vehicle mass
     double  full_mass;
+    /// Vehicle sounds directory
+    QString soundDirectory;
 
     /// Length between coupling's axis
     double  length;
@@ -222,10 +231,6 @@ protected:
     double railway_coord;
     /// Body velocity
     double velocity;
-    /// Wheels rotation angles
-    std::vector<double> wheel_rotation_angle;
-    /// Wheels angular velocities
-    std::vector<double> wheel_omega;
 
     double  b0;
     double  b1;
@@ -261,6 +266,11 @@ protected:
     /// Род тока в КС
     int         current_kind;
 
+    /// Wheels rotation angles
+    std::vector<double> wheel_rotation_angle;
+    /// Wheels angular velocities
+    std::vector<double> wheel_omega;
+
     /// Active common forces
     state_vector_t  Q_a;
     /// Reactive common forces
@@ -273,9 +283,9 @@ protected:
     QMutex          keys_mutex;    
 
     /// Discrete signals for outpput
-    bool    discreteSignal[NUM_DISCRETE_SIGNALS];
+    std::array<bool, MAX_DISCRETE_SIGNALS>  discreteSignal;
     /// Analog signals for output
-    float   analogSignal[NUM_ANALOG_SIGNALS];
+    std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     control_signals_t   control_signals;
 
@@ -286,6 +296,9 @@ protected:
 
     /// Ток в линии управления ЭПТ
     std::vector<double> ept_current;
+
+    /// Информация АЛСН
+    alsn_info_t     alsn_info;
 
     /// User defined initialization
     virtual void initialization();

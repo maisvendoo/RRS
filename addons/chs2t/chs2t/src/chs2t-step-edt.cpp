@@ -13,6 +13,7 @@ void CHS2T::stepEDT(double t, double dt)
     generator->setOmega(wheel_omega[0] * ip);
     generator->setRt(3.35);
 
+    BrakeReg->setActive(EDTSwitch.getState());
     BrakeReg->setAllowEDT(dako->isEDTAllow());
     BrakeReg->setIa(generator->getIa());
     BrakeReg->setIf(generator->getIf());

@@ -79,7 +79,15 @@ void CHS2T::initialization()
 
     initEPT();
 
+    initModbus();
+
     initRegistrator();
+
+    for (size_t i = SWP1_POWER_1; i <= SWP1_POWER_10; ++i)
+        feedback_signals.analogSignal[i].cur_value = 1;
+
+    for (size_t i = SWP2_POWER_1; i <= SWP2_POWER_10; ++i)
+        feedback_signals.analogSignal[i].cur_value = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -87,8 +95,11 @@ void CHS2T::initialization()
 //------------------------------------------------------------------------------
 void CHS2T::step(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
     //Journal::instance()->info("Step pantographs");
-    stepPantographs(t, dt);    
+    stepPantographs(t, dt);
 
     //Journal::instance()->info("Step fast switch");
     stepFastSwitch(t, dt);
@@ -126,11 +137,20 @@ void CHS2T::step(double t, double dt)
     //Journal::instance()->info("Step signals");
     stepSignals();
 
+    stepSwitcherPanel();
+
+    stepDecodeAlsn();
+
     registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
-    horn->setControl(keys);
+    horn->setControl(keys, control_signals);
     horn->step(t, dt);
+
+    //Journal::instance()->info("Step speed meter");
+    speed_meter->setOmega(wheel_omega[0]);
+    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->step(t, dt);
 }
 
 
@@ -154,7 +174,11 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::hardwareOutput()
 {
-    feedback_signals.analogSignal[TEST_COUNT].cur_value += 1.0f;
+    feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(pTM);
+    feedback_signals.analogSignal[1].cur_value = UR_manometer->getModbus(brakeCrane->getEqReservoirPressure());
+    feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brakeRefRes->getPressure());
+    feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(mainReservoir->getPressure());
+    feedback_signals.analogSignal[4].cur_value = TC_manometer->getModbus(brakesMech[0]->getBrakeCylinderPressure());
 }
 
 GET_VEHICLE(CHS2T)

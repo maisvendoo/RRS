@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Config>
-   <ControlPanel>
-   		<Plugin>modbus</Plugin>
-   		<ConfigDir>vehicles/chs2t/modbus</ConfigDir>
-   		<Vehicle>0</Vehicle>
-   		<RequestInterval>50</RequestInterval>
-   </ControlPanel>
-</Config>

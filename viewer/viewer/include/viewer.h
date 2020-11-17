@@ -50,6 +50,9 @@ protected:
 
     /// Viewer ready flag
     bool                        is_ready;
+
+    KeyboardHandler             *keyboard;
+
     /// Viewer settings
     settings_t                  settings;
 
@@ -59,9 +62,8 @@ protected:
     /// OSG scene root node
     osg::ref_ptr<osg::Group>    root;
 
-    NetworkClient   client;
+    NetworkClient               client;
 
-    KeyboardHandler *keyboard;
 
     TrainExteriorHandler *train_ext_handler;
 
@@ -84,10 +86,7 @@ protected:
     bool initEngineSettings(osg::Group *root);
 
     /// Init display
-    bool initDisplay(osgViewer::Viewer *viewer, const settings_t &settings);
-
-    /// Init motion blur
-    bool initMotionBlurEffect(osgViewer::Viewer *viewer, const settings_t &settings);
+    bool initDisplay(osgViewer::Viewer *viewer, const settings_t &settings);    
 };
 
 #endif // VIEWER_H

@@ -55,7 +55,7 @@ void ModelTexturing::changeTexture(const std::string &textureDir,
     FileSystem &fs = FileSystem::getInstance();
 
     osg::Image *image = texture->getImage();
-    std::string fullPath = image->getFileName();
+    std::string fullPath = fs.toNativeSeparators(image->getFileName());
 
     QFileInfo info(QFile(QString(fullPath.c_str())));
     std::string fileName  = info.fileName().toStdString();

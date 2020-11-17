@@ -17,12 +17,14 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lasound_d
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
+    LIBS += -L../../../lib -lJournal_d
 
 } else {
 
     LIBS += -L../../../lib -lasound
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -lJournal
 
 }
 
@@ -44,6 +46,7 @@ INCLUDEPATH += ./include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../libJournal/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

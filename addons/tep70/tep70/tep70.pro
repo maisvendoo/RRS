@@ -24,6 +24,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lfilesystem
 }
 
+CONFIG += force_debug_info
+
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../../CfgReader/include
 
@@ -32,6 +34,10 @@ INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include
 INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
+INCLUDEPATH += ../tep70-equipment/include
 
 HEADERS += $$files(./include/*.h)
+HEADERS += $$files(../tep70-equipment/include/*.h)
 SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(../tep70-equipment/src/*.cpp)
+

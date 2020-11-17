@@ -40,3 +40,4 @@ HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
 
 #CONFIG += force_debug_info
+#QMAKE_CXXFLAGS += -Werror -pedantic-errors -Wall -Wextra -Wpedantic -Wmaybe-uninitialized -Wreturn-type -Warray-bounds=1

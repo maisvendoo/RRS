@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <TCP>
+		<host>127.0.0.1</host>
+		<name>BLOK</name>
+		<port>1992</port>
+		<timeout>500</timeout>
+    </TCP>
+</Config>

@@ -1,0 +1,95 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+
+    <!-- Управление МК2 -->
+    <InputRegister>
+        <Address>2</Address>
+        <Index>18</Index>
+    </InputRegister>
+
+    <!-- Управление МВ -->
+    <InputRegister>
+        <Address>3</Address>
+        <Index>19</Index>
+    </InputRegister>
+
+    <!-- Освещение кабины -->
+    <InputRegister>
+        <Address>4</Address>
+        <Index>20</Index>
+    </InputRegister>
+
+    <!-- Буферный фонарь левый -->
+    <InputRegister>
+        <Address>5</Address>
+        <Index>21</Index>
+    </InputRegister> 
+
+    <!-- Буферный фонарь правый -->
+    <InputRegister>
+        <Address>6</Address>
+        <Index>22</Index>
+    </InputRegister>
+
+    <!-- Прожектор -->
+    <InputRegister>
+        <Address>7</Address>
+        <Index>23</Index>
+    </InputRegister>
+
+    <Coil>
+        <Address>0</Address>
+        <Index>16</Index>
+    </Coil>
+
+    <Coil>
+        <Address>1</Address>
+        <Index>17</Index>
+    </Coil>
+
+    <Coil>
+        <Address>2</Address>
+        <Index>18</Index>
+    </Coil>
+
+    <Coil>
+        <Address>3</Address>
+        <Index>19</Index>
+    </Coil>
+
+    <Coil>
+        <Address>4</Address>
+        <Index>20</Index>
+    </Coil>
+
+    <Coil>
+        <Address>5</Address>
+        <Index>21</Index>
+    </Coil>
+
+    <Coil>
+        <Address>6</Address>
+        <Index>22</Index>
+    </Coil>
+
+    <Coil>
+        <Address>7</Address>
+        <Index>23</Index>
+    </Coil>
+
+    <Coil>
+        <Address>8</Address>
+        <Index>24</Index>
+    </Coil>
+
+    <Coil>
+        <Address>9</Address>
+        <Index>25</Index>
+    </Coil>
+
+    <Coil>
+        <Address>10</Address>
+        <Index>26</Index>
+    </Coil>
+
+</Config>

@@ -21,7 +21,15 @@ public:
 
     ControllerState getCtrlState() { return controlState; }
 
-    double getMainShaftPos() const { return mainShaftPos * 0.1; }
+    double getMainShaftPos() const
+    {
+        if (fieldWeakShaft == 0)
+            return mainShaftPos * 0.1;
+        else
+            return fieldWeakShaft * 0.1;
+    }
+
+    double getHandleHeight() const { return getY(0); }
 
 private:
 
@@ -65,7 +73,12 @@ private:
 
     double mainShaftHeight;
 
+    bool is_inc;
+    bool is_dec;
+
     ControllerState controlState;
 };
+
+#define TO_INT(variable) static_cast<int>(variable)
 
 #endif // KM21KR2_H

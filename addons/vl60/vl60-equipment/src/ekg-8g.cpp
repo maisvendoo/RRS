@@ -14,6 +14,7 @@ EKG_8G::EKG_8G(QObject *parent) : Device(parent)
   , is_fix_off(false)
   , dir(0)
   , is_auto(false)
+  , sound_name("")
 {
     connect(&pos_switcher, &Timer::process, this, &EKG_8G::slotPosSwitch);
 
@@ -99,6 +100,7 @@ void EKG_8G::process()
     // Нулевая позиция
     if (km_state.pos_state[POS_ZERO] && (position != 0) && !is_auto)
     {
+        sound_name = "EKG_serv_auto";
         pos_switcher.start();
         dir = -1;
     }
@@ -106,6 +108,7 @@ void EKG_8G::process()
     // Фиксация пуска
     if (km_state.pos_state[POS_FP])
     {
+        sound_name = "";
         is_fix_start = true;
         dir = 1;
     }
@@ -113,6 +116,7 @@ void EKG_8G::process()
     // Ручной пуск
     if (km_state.pos_state[POS_RP] && is_fix_start)
     {
+        sound_name = "EKG_serv_rp";
         is_fix_start = false;
         pos_switcher.start();
     }
@@ -120,6 +124,7 @@ void EKG_8G::process()
     // Фиксация выключения
     if (km_state.pos_state[POS_FV])
     {
+        sound_name = "";
         is_fix_off = true;
         dir = -1;
     }
@@ -127,6 +132,7 @@ void EKG_8G::process()
     // Ручное выключение
     if (km_state.pos_state[POS_RV] && is_fix_off)
     {
+        sound_name = "EKG_serv_rp";
         is_fix_off = false;
         pos_switcher.start();
     }
@@ -134,6 +140,7 @@ void EKG_8G::process()
     // Автоматический пуск
     if (km_state.pos_state[POS_AP] && !is_auto)
     {
+        sound_name = "EKG_serv_auto";
         pos_switcher.start();
         dir = 1;
     }
@@ -141,6 +148,7 @@ void EKG_8G::process()
     // Автоматический пуск
     if (km_state.pos_state[POS_AV] && !is_auto)
     {
+        sound_name = "EKG_serv_auto";
         pos_switcher.start();
         dir = -1;
     }
@@ -153,6 +161,9 @@ void EKG_8G::process()
 //------------------------------------------------------------------------------
 void EKG_8G::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     // Если на ЭКГ подано питание
     if (is_enabled)
     {
@@ -219,7 +230,7 @@ void EKG_8G::slotPosSwitch()
     position = cut(position, 0, static_cast<int>(NUM_POSITIONS - 1));
 
     if ( (position != 0) && (position != NUM_POSITIONS - 1) )
-        emit soundPlay("EKG_serv");
+            emit soundPlay(sound_name);
 
     // Останавливаемся, если не находимся на переходных позициях
     if ( ( (position < PP_MIN) || (position > PP_MAX) ) && !is_auto )

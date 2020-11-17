@@ -32,7 +32,6 @@
 #include    "notify.h"
 #include    "abstract-loader.h"
 #include    "lighting.h"
-#include    "motion-blur.h"
 #include    "qt-events.h"
 #include    "screen-capture.h"
 #include    "hud.h"
@@ -53,6 +52,7 @@
 //------------------------------------------------------------------------------
 RouteViewer::RouteViewer(int argc, char *argv[])
   : is_ready(false)
+  , keyboard(nullptr)
 {
     is_ready = init(argc, argv);
 }
@@ -93,7 +93,6 @@ int RouteViewer::run()
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
 
     viewer.addEventHandler(statsHandler.get());
-
 
     viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
@@ -493,31 +492,6 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
 
     if (settings.fullscreen)
         viewer->setUpViewOnSingleScreen(settings.screen_number);
-
-    return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool RouteViewer::initMotionBlurEffect(osgViewer::Viewer *viewer,
-                                       const settings_t &settings)
-{
-    (void) settings;
-
-    if (viewer == nullptr)
-        return false;
-
-    osg::DisplaySettings::instance()->setMinimumNumAccumBits(8, 8, 8, 8);
-    viewer->realize();
-
-    osgViewer::Viewer::Windows windows;
-    viewer->getWindows(windows);
-
-    for (auto it = windows.begin(); it != windows.end(); ++it)
-    {
-        (*it)->add(new MotionBlurOperation(settings.persistence));        
-    }
 
     return true;
 }
