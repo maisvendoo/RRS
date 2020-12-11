@@ -138,7 +138,6 @@ struct udp_server_data_t
 
         for (udp_vehicle_data_t vehicle : this->vehicles)
         {
-//            ds << vehicle.serialize();
             result.append(vehicle.serialize());
         }
 
@@ -157,19 +156,11 @@ struct udp_server_data_t
 
         ds >> this->routeDir;
 
-//        int timeSize = sizeof (this->time); // = 4
-//        int msgCountSize = sizeof (this->msgCount); // = 4
-//        int vehicleCountSize = sizeof (this->vehicleCount); // = 4
-//        int routeDirSize = this->routeDir.length(); // = 28
-
-//        int serverSize = timeSize + msgCountSize + vehicleCountSize + routeDirSize;
-
         array.remove(0, 20 + this->routeDir.length() * 2);
 
         for (udp_vehicle_data_t &vehicle : this->vehicles)
         {
             vehicle.deserialize(array);
-//            array.remove(0, sizeof (vehicle));
         }
     }
 };
