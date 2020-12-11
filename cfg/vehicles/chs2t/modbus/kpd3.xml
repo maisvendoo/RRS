@@ -1,14 +1,26 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
+<!--
     <DiscreteInput>
 	<Address>0</Address>
 	<Index>38</Index>
     </DiscreteInput>
+-->
 
     <HoldingRegister>
 	<Address>0</Address>
 	<Index>57</Index>
+    </HoldingRegister>
+
+    <HoldingRegister>
+	<Address>1</Address>
+	<Index>58</Index>
+    </HoldingRegister>
+
+    <HoldingRegister>
+	<Address>2</Address>
+	<Index>59</Index>
     </HoldingRegister>
     
 </Config>

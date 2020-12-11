@@ -98,6 +98,8 @@ void CHS2T::initialization()
     for (size_t i = SWP2_POWER_1; i <= SWP2_POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
 
+//    velocity = 0;
+
     hardwareOutput();
 }
 
@@ -247,7 +249,18 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[998].cur_value = 1.0f;
     feedback_signals.analogSignal[997].cur_value = 1.0f;
 
-    feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = KPD3_Velocity->getModbus(velocity * 3.6);
+    if (velocity < 1)
+    {
+        double bz = 0;
+        feedback_signals.analogSignal[KPD3_STRELKA].cur_value = KPD3_Velocity->getModbus(bz);
+        feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = bz;
+    }
+    else
+    {
+        feedback_signals.analogSignal[KPD3_STRELKA].cur_value = KPD3_Velocity->getModbus(velocity * 3.6);
+        feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = velocity * 3.6;
+//        feedback_signals.analogSignal[KPD3_].cur_value = ...
+    }
 }
 
 GET_VEHICLE(CHS2T)

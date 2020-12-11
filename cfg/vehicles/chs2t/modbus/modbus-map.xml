@@ -99,15 +99,14 @@
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-	<!--
+
 	<Slave>
 		<id>17</id>
-		<Description></Description>
+		<Description>Скоростемер</Description>
 		<Config>kpd3</Config>
 		<ConfigRequired>0</ConfigRequired>
 		<CellsMask>0</CellsMask>
 	</Slave>
-	-->
 	
-
+	
 </Config>

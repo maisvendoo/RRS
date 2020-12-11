@@ -126,7 +126,10 @@ enum FeedbackSignals
 
     IND_BV = 56,
 
-    KPD3_VELOCITY = 57
+    KPD3_STRELKA = 57,
+    KPD3_VELOCITY = 58,
+    KPD3_ = 59
+
 };
 
 #endif // HARDWARESIGNALS_H

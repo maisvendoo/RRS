@@ -508,7 +508,7 @@ void Model::initUdpServer(QString cfg_path)
 {
     udps = new UdpServer();
     udps->init(cfg_path);
-    udps->setNoProxy();
+    //udps->setNoProxy();
 
     udpTimer.setInterval(100);
     connect(&udpTimer, &QTimer::timeout, this, &Model::udpDataUpdate);
