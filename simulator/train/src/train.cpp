@@ -363,12 +363,12 @@ bool Train::loadTrain(QString cfg_path)
 
         if (!cfg.getString("Common", "ClientName", client_name))
         {
-            client_name = "";
+            client_name = "chs2t";
         }
 
         if (!cfg.getString("Common", "TrainID", train_id))
         {
-            train_id = "";
+            train_id = "50331697";
         }        
 
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");

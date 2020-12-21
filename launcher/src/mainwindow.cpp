@@ -235,7 +235,7 @@ void MainWindow::startSimulator()
         double init_coord = ui->dsbOrdinate->value() / 1000.0;
         args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
-
+args[1] = "--route=../routes/agryz-krugloe_pole";
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     simulatorProc.start(simPath, args);
 }

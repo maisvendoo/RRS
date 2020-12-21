@@ -128,7 +128,7 @@ enum FeedbackSignals
 
     KPD3_STRELKA = 57,
     KPD3_VELOCITY = 58,
-    KPD3_ = 59
+    KPD3_TARGET_DISTANCE = 59
 
 };
 

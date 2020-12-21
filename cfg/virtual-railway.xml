@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <VRServer>
-	<HostAddr>127.0.0.1</HostAddr>
+	<!--<HostAddr>127.0.0.1</HostAddr>-->
+	<HostAddr>172.18.120.244</HostAddr>
 	<Port>1993</Port>
     </VRServer>
 </Config>

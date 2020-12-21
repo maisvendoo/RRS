@@ -261,6 +261,8 @@ void CHS2T::hardwareOutput()
         feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = velocity * 3.6;
 //        feedback_signals.analogSignal[KPD3_].cur_value = ...
     }
+
+    feedback_signals.analogSignal[KPD3_TARGET_DISTANCE].cur_value = alsn_info.signal_dist;
 }
 
 GET_VEHICLE(CHS2T)
