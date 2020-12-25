@@ -35,8 +35,11 @@
 //------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , btnStartState(false)
 {
     ui->setupUi(this);
+
+    ui->btnStart->setStyleSheet("background-color: green;");
 
     init();
 
@@ -218,8 +221,14 @@ void MainWindow::startSimulator()
     QString simPath = SIMULATOR_NAME + EXE_EXP;
 
     QStringList args;
+
+    QString strr = selectedRoutePath;
+    int idxRP =  strr.indexOf("route");
+    strr.remove(0, idxRP);
+    strr.prepend("../");
+
     args << "--train-config=" + selectedTrain;
-    args << "--route=" + selectedRoutePath;
+    args << "--route=" + strr/*selectedRoutePath*/;
 
     if (isBackward())
     {
@@ -235,7 +244,7 @@ void MainWindow::startSimulator()
         double init_coord = ui->dsbOrdinate->value() / 1000.0;
         args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
-args[1] = "--route=../routes/agryz-krugloe_pole";
+//args[1] = "--route=../routes/agryz-krugloe_pole";
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     simulatorProc.start(simPath, args);
 }
@@ -387,7 +396,24 @@ void MainWindow::onStartPressed()
         return;
     }
 
-    startSimulator();    
+
+    btnStartState = !btnStartState;
+
+    //startSimulator();
+    QString ssss(ui->btnStart->styleSheet());
+
+    if (btnStartState)
+    {
+        startSimulator();
+        ui->btnStart->setText("Стоп");
+        ui->btnStart->setStyleSheet("background-color: red;");
+    }
+    else
+    {
+        simulatorProc.kill();
+        ui->btnStart->setText("Старт");
+        ui->btnStart->setStyleSheet("background-color: green;");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -395,7 +421,7 @@ void MainWindow::onStartPressed()
 //------------------------------------------------------------------------------
 void MainWindow::onSimulatorStarted()
 {
-    ui->btnStart->setEnabled(false);    
+    //ui->btnStart->setEnabled(false);
 
     //startViewer();
 }
@@ -407,7 +433,7 @@ void MainWindow::onSimulatorFinished(int exitCode)
 {
     Q_UNUSED(exitCode)
 
-    ui->btnStart->setEnabled(true);
+    //ui->btnStart->setEnabled(true);
 }
 
 //------------------------------------------------------------------------------

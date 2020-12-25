@@ -88,6 +88,8 @@ private:
 
     QString settings_path;
 
+    bool btnStartState; // 0 - stoped, 1 - started
+
     /// Launcer initialization
     void init();
 
