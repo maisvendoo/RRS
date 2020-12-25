@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ui->setupUi(this);
 
     ui->btnStart->setStyleSheet("background-color: green;");
+    ui->lwRoutes->setFont(QFont("Arial", 14));
+    ui->lwTrains->setFont(QFont("Arial", 14));
 
     init();
 
