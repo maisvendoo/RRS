@@ -104,7 +104,7 @@ struct udp_server_data_t
 {
     float           time;
 
-    int             msgCount;
+    quint64         msgCount;
 
     int             vehicleCount;
 
@@ -114,7 +114,7 @@ struct udp_server_data_t
 
     udp_server_data_t()
         : time(1.0f)
-        , msgCount(1)
+        , msgCount(0)
         , vehicleCount(1)
         , routeDir("routeDir")
     {

@@ -187,7 +187,7 @@ void Model::udpDataUpdate()
     udp_server_data_t udp_data;
 
     udp_data.time = static_cast<float>(t);
-    udp_data.msgCount = 1;
+    udp_data.msgCount++;
     udp_data.vehicleCount = 1;
     udp_data.routeDir = init_data_for_udp.route_dir;
 
