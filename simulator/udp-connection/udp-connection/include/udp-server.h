@@ -28,14 +28,13 @@ public slots:
 
     void readPendingDatagrams();
 
-    void slotConnected();
+    //void slotConnected();
 
 private:
     QUdpSocket *serverSocket;
 
     udp_server_data_t server_data;
 
-//    QHostAddress server_host;
     QHostAddress client_host;
 
     unsigned short server_port;
