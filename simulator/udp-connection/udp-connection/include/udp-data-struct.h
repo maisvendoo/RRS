@@ -104,7 +104,7 @@ struct udp_server_data_t
 {
     float           time;
 
-    quint64         msgCount;
+    int         msgCount;
 
     int             vehicleCount;
 

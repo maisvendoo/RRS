@@ -134,6 +134,7 @@ private:
 
     ///
     UdpServer *udps;
+    int msgCount_;
 
     /// Simulation thread
     QThread     model_thread;

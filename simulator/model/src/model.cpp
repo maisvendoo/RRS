@@ -40,6 +40,7 @@ Model::Model(QObject *parent) : QObject(parent)
   , profile(nullptr)
   , server(nullptr)
   , control_panel(nullptr)
+  , msgCount_(0)
 {
     shared_memory.setKey("sim");
 
@@ -187,13 +188,14 @@ void Model::udpDataUpdate()
     udp_server_data_t udp_data;
 
     udp_data.time = static_cast<float>(t);
-    udp_data.msgCount++;
+    ++msgCount_;
+    udp_data.msgCount = msgCount_;
     udp_data.vehicleCount = 1;
     udp_data.routeDir = init_data_for_udp.route_dir;
 
     udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
 //    udp_data.vehicles[0].velocity = 100.f;
-//    udp_data.vehicles[0].direction =1;
+    udp_data.vehicles[0].direction =1;
 //    udp_data.vehicle
 
 
