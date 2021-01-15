@@ -1,5 +1,4 @@
 #include    "udp-server.h"
-#include     <QNetworkProxy>
 
 UdpServer::UdpServer(QObject* parent) : QObject(parent)
 {
@@ -18,6 +17,8 @@ void UdpServer::init(const QString &cfg_path)
     serverSocket = new QUdpSocket();
 
     serverSocket->bind(QHostAddress::Any, server_port);
+    //serverSocket->bind(QHostAddress::LocalHost, server_port);
+
 
     connect(serverSocket, &QUdpSocket::readyRead,
             this, &UdpServer::readPendingDatagrams);
@@ -34,12 +35,6 @@ bool UdpServer::isConnected()
     }
 
     return serverSocket->state() == QUdpSocket::BoundState;
-}
-
-void UdpServer::setNoProxy(bool no_proxy)
-{
-//    if (no_proxy)
-//        serverSocket->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
 }
 
 void UdpServer::readPendingDatagrams()

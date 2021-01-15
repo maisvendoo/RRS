@@ -56,6 +56,8 @@ public:
     /// Отключение прокси
     void setNoProxy(bool no_proxy = true);
 
+    void setPort(unsigned short port) { client_port = port; }
+
     udp_server_data_t getClientData() { return client_data; }
 
 private:
@@ -65,7 +67,7 @@ private:
 
     udp_server_data_t client_data;
 
-    QHostAddress client_host;
+//    QHostAddress client_host;
     QHostAddress server_host;
 
     unsigned short client_port;
