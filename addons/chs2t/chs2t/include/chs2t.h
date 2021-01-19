@@ -16,6 +16,7 @@
 #include    "vehicle-api.h"
 #include    "pantograph.h"
 #include    "protective-device.h"
+#include    "chs2t-fast-switch.h"
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
@@ -77,7 +78,7 @@ private:
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
     /// Быстрый выключатель
-    ProtectiveDevice *bv;
+    CHS2TFastSwitch *bv;
 
     /// Пусковой резистор
     PuskRez *puskRez;

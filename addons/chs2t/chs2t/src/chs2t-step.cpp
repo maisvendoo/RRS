@@ -62,14 +62,13 @@ void CHS2T::stepFastSwitch(double t, double dt)
 
     bv->setU_in(U_kr);
 
+    // Включаем БВ исключительно на 0 позиции ПБК
     bv->setState(fast_switch_trigger.getState());
     bv->step(t, dt);
 
     if (fastSwitchSw->getState() == 3)
     {
         fast_switch_trigger.set();
-        if (!bv_return)
-            emit soundPlay("BV-on");
         bv_return = true;
     }
 
@@ -368,7 +367,9 @@ bool CHS2T::getHoldingCoilState() const
         bv_off_button = static_cast<bool>(control_signals.analogSignal[BV_OFF].cur_value);
     }
 
-    return no_overload && bv_off_button;
+    bool is_allow_on = !bv->getState() || stepSwitch->isZero();
+
+    return no_overload && bv_off_button && is_allow_on;
 }
 
 //------------------------------------------------------------------------------
