@@ -156,13 +156,13 @@ void AutoTrainStopEPK150::stepKeysControl(double t, double dt)
             keyOn(false);
     }
 
-    if (getKeyState(KEY_K))
+/*    if (getKeyState(KEY_K))
     {
         if ( getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R) )
             powerOn(true);
         else
             powerOn(false);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------

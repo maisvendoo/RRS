@@ -53,7 +53,17 @@ enum ControllerSignals
 
     LOCO_CRANE = 37,
 
-    KPD3_READY = 38
+    KPD3_READY = 38,
+
+    RBP_BUTTON = 39,
+    BV_OFF = 40,
+
+    TIFON_PEDAL = 41,
+    SVISTOK_PEDAL = 42,
+    SAND_PEDAL = 43,
+
+    RB1 = 44,
+    KEY_EPK = 45
 };
 
 enum FeedbackSignals

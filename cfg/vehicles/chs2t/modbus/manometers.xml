@@ -41,4 +41,41 @@
         <Index>4</Index>
     </HoldingRegister>
 
+
+
+    <!-- РБ -->
+    <DiscreteInput>
+	<Address>1</Address>
+	<Index>44</Index>
+    </DiscreteInput>
+
+    <!-- ЭПК -->    
+    <DiscreteInput>
+	<Address>5</Address>
+	<Index>45</Index>
+    </DiscreteInput>
+
+
+    <!-- Педали -->
+    <!-- Песок -->
+    <DiscreteInput>
+	<Address>6</Address>
+	<Index>43</Index>
+    </DiscreteInput>
+
+    <!-- Свисток -->
+    <DiscreteInput>
+	<Address>7</Address>
+	<Index>42</Index>
+    </DiscreteInput>
+
+    <!-- Тифон -->
+    <DiscreteInput>
+	<Address>8</Address>
+	<Index>41</Index>
+    </DiscreteInput>
+    
+    
+
+
 </Config>

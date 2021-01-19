@@ -276,6 +276,14 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
     autoTrainStop->setBrakepipePressure(pTM);
     autoTrainStop->setControl(keys);
+
+    if (static_cast<bool>(control_signals.analogSignal[999].cur_value))
+    {
+        autoTrainStop->keyOn(static_cast<bool>(control_signals.analogSignal[KEY_EPK].cur_value));
+    }
+
+    autoTrainStop->powerOn(true);
+
     autoTrainStop->step(t, dt);
 
     auxRate = autoTrainStop->getEmergencyBrakeRate() + airDistr->getAuxRate();
@@ -353,7 +361,14 @@ bool CHS2T::getHoldingCoilState() const
 {
     bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
-    return no_overload;
+    bool bv_off_button = true;
+
+    if (control_signals.analogSignal[BV_OFF].is_active)
+    {
+        bv_off_button = static_cast<bool>(control_signals.analogSignal[BV_OFF].cur_value);
+    }
+
+    return no_overload && bv_off_button;
 }
 
 //------------------------------------------------------------------------------
