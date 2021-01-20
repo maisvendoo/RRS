@@ -195,7 +195,7 @@ void Model::udpDataUpdate()
 
     udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
 //    udp_data.vehicles[0].velocity = 100.f;
-    udp_data.vehicles[0].direction =1;
+    udp_data.vehicles[0].direction =init_data_for_udp.direction;
 //    udp_data.vehicle
 
 

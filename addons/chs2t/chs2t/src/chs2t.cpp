@@ -249,19 +249,9 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[998].cur_value = 1.0f;
     feedback_signals.analogSignal[997].cur_value = 1.0f;
 
-    if (std::abs(velocity) < 0.1)
-    {
-        double bz = 0;
-        feedback_signals.analogSignal[KPD3_STRELKA].cur_value = KPD3_Velocity->getModbus(bz);
-        feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = bz;
-    }
-    else
-    {
-        feedback_signals.analogSignal[KPD3_STRELKA].cur_value = std::abs(KPD3_Velocity->getModbus(velocity * 3.6));
-        feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = std::abs(velocity * 3.6);
-//        feedback_signals.analogSignal[KPD3_].cur_value = ...
-    }
 
+    feedback_signals.analogSignal[KPD3_STRELKA].cur_value = KPD3_Velocity->getModbus(abs(velocity * 3.6));
+    feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = std::abs(velocity * 3.6);
     feedback_signals.analogSignal[KPD3_TARGET_DISTANCE].cur_value = alsn_info.signal_dist;
 }
 
