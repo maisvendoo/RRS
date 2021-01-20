@@ -24,6 +24,9 @@ public:
 
     virtual double getEmergencyBrakeRate() const;
 
+    bool getState();
+
+
 protected:
 
     double is_powered;

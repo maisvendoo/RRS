@@ -62,6 +62,11 @@ double AutoTrainStop::getEmergencyBrakeRate() const
     return 0.0;
 }
 
+bool AutoTrainStop::getState()
+{
+    return static_cast<bool>(is_key_on);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

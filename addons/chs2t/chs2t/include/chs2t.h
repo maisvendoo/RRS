@@ -42,6 +42,7 @@
 #include    "sl2m.h"
 #include    "energy-counter.h"
 #include    "chs2t-switcher.h"
+#include    "chs2t-autostop.h"
 
 /*!
  * \class

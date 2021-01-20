@@ -11,6 +11,8 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , fieldStep(0)
   , reverseState(0)
 
+  , up_unlock(false)
+
   , up(false)
   , up1(false)
   , zero(false)
@@ -87,8 +89,8 @@ void StepSwitch::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
 
-    up = (ctrlState.k21 && ctrlState.k23);
-    up1 = (!ctrlState.k21 && ctrlState.k23);
+    up = (ctrlState.k21 && ctrlState.k23) && up_unlock;
+    up1 = (!ctrlState.k21 && ctrlState.k23) && up_unlock;
     zero = (ctrlState.k22 && !ctrlState.k23);
     down1 = (!ctrlState.k21 && !ctrlState.k22);
     down = (ctrlState.k21 && !ctrlState.k22);

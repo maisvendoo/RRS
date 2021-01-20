@@ -47,6 +47,8 @@ public:
 
     ampermeters_state_t getAmpermetersState();
 
+    void setUpUnlock(bool up_unlock) { this->up_unlock = up_unlock; }
+
 private:
 
     enum
@@ -64,6 +66,8 @@ private:
 
     int fieldStep;
     int reverseState;
+
+    bool up_unlock;
 
     bool up;
     bool up1;

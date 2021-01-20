@@ -106,6 +106,11 @@ void CHS2T::stepTractionControl(double t, double dt)
     stepSwitch->setCtrlState(km21KR2->getCtrlState());
     stepSwitch->setControl(keys);
     stepSwitch->setDropPositionsWithZ(handleEDT->getDropPositions());
+
+    bool ast = autoTrainStop->getState();
+
+    stepSwitch->setUpUnlock( (pTM >= 0.3) && ast);
+
     stepSwitch->step(t, dt);
 
     puskRez->setPoz(stepSwitch->getPoz());
