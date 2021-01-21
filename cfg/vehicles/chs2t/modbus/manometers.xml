@@ -51,7 +51,7 @@
 
     <!-- ЭПК -->    
     <DiscreteInput>
-	<Address>5</Address>
+	<Address>4</Address>
 	<Index>45</Index>
     </DiscreteInput>
 

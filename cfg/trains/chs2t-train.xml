@@ -10,7 +10,7 @@
 		<NoAir>0</NoAir>
 
 		<Title>ЧС2т с поездом</Title>
-		<Description>Пассажирский электровоз постоянного тока ЧС2т с поездом из 20 вагонов</Description>
+		<Description>Пассажирский электровоз постоянного тока ЧС2т с поездом из 15 вагонов</Description>
 		
 		<ClientName>chs2t</ClientName>
 		<TrainID>50331697</TrainID>
@@ -26,7 +26,7 @@
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
-		<Count>20</Count>
+		<Count>15</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	
