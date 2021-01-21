@@ -43,6 +43,7 @@
 #include    "energy-counter.h"
 #include    "chs2t-switcher.h"
 #include    "chs2t-autostop.h"
+#include    "alsn.h"
 
 /*!
  * \class
@@ -261,6 +262,9 @@ private:
     /// Счетчик энергии
     EnergyCounter *energy_counter;
 
+    /// АЛСН
+    ALSN    *alsn;
+
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -367,6 +371,8 @@ private:
     void stepTapSound();
 
     void stepDecodeAlsn();
+
+    void stepOtherEquipment(double t, double dt);
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);

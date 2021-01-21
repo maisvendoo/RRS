@@ -10,6 +10,7 @@ AutoTrainStop::AutoTrainStop(QObject *parent) : BrakeDevice(parent)
   , is_key_on(0.0)
   , pFL(0.0)
   , pTM(0.0)
+  , state(false)
 {
 
 }
@@ -64,7 +65,7 @@ double AutoTrainStop::getEmergencyBrakeRate() const
 
 bool AutoTrainStop::getState()
 {
-    return static_cast<bool>(is_key_on);
+    return state;
 }
 
 //------------------------------------------------------------------------------

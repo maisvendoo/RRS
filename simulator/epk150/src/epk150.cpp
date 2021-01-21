@@ -71,7 +71,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    double u1 = is_powered;
+    double u1 = is_powered * is_key_on;
 
     double dp1 = Y[1] - ps2;
 
@@ -97,7 +97,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     dYdt[2] = Q1 / V1;
 
-    emergencyRate = K[3] * pTM * u4;
+    emergencyRate = K[3] * pTM * u4;    
 }
 
 //------------------------------------------------------------------------------
@@ -109,6 +109,8 @@ void AutoTrainStopEPK150::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     emit soundSetVolume("EPK", static_cast<int>(is_whistle_on * 100.0));
+
+    state = static_cast<bool>(pf(Y[0] - 0.95 * pk));
 }
 
 //------------------------------------------------------------------------------

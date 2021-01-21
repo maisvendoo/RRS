@@ -286,7 +286,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
         autoTrainStop->keyOn(static_cast<bool>(control_signals.analogSignal[KEY_EPK].cur_value));
     }
 
-    autoTrainStop->powerOn(true);
+    autoTrainStop->powerOn(alsn->getSafetyState());
 
     autoTrainStop->step(t, dt);
 
@@ -388,4 +388,12 @@ void CHS2T::stepTapSound()
     {
         emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
     }
+}
+
+void CHS2T::stepOtherEquipment(double t, double dt)
+{
+    alsn->setAlsnCode(alsn_info.code_alsn);
+    alsn->setEPKstate(autoTrainStop->getState());
+    alsn->setControl(keys, control_signals);
+    alsn->step(t, dt);
 }
