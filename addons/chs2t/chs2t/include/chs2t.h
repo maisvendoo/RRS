@@ -44,6 +44,7 @@
 #include    "chs2t-switcher.h"
 #include    "chs2t-autostop.h"
 #include    "alsn.h"
+#include    "kpd3.h"
 
 /*!
  * \class
@@ -264,6 +265,9 @@ private:
 
     /// АЛСН
     ALSN    *alsn;
+
+    /// Скоростемер КПД3
+    KPD3    *kpd3;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);

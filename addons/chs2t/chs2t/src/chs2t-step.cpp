@@ -286,7 +286,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
         autoTrainStop->keyOn(static_cast<bool>(control_signals.analogSignal[KEY_EPK].cur_value));
     }
 
-    autoTrainStop->powerOn(alsn->getSafetyState());
+    autoTrainStop->powerOn(alsn->getSafetyState() && kpd3->getSafetyRelayState());
 
     autoTrainStop->step(t, dt);
 
@@ -396,4 +396,10 @@ void CHS2T::stepOtherEquipment(double t, double dt)
     alsn->setEPKstate(autoTrainStop->getState());
     alsn->setControl(keys, control_signals);
     alsn->step(t, dt);
+
+    kpd3->setWheelDiameter(wheel_diameter);
+    kpd3->setOmega(wheel_omega[0]);
+    kpd3->setCodeALSN(alsn_info.code_alsn);
+    kpd3->setControl(keys, control_signals);
+    kpd3->step(t, dt);
 }

@@ -198,6 +198,8 @@ void CHS2T::initOtherEquipment()
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
 
     alsn = new ALSN();
+
+    kpd3 = new KPD3();
 }
 
 //------------------------------------------------------------------------------
