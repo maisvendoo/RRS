@@ -26,6 +26,10 @@ public:
 
     bool getState();
 
+    bool getStateKey() const
+    {
+        return static_cast<bool>(is_key_on);
+    }
 
 protected:
 

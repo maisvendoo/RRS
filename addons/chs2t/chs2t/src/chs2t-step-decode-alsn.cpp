@@ -9,7 +9,7 @@ void CHS2T::stepDecodeAlsn()
     analogSignal[LS_Y] = 0.0f;
     analogSignal[LS_G] = 0.0f;
 
-    float is_epk_on = static_cast<float>(autoTrainStop->getState());
+    float is_epk_on = static_cast<float>(autoTrainStop->getStateKey());
 
     switch (alsn_info.code_alsn)
     {

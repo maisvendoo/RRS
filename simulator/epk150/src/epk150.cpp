@@ -110,6 +110,8 @@ void AutoTrainStopEPK150::preStep(state_vector_t &Y, double t)
 
     emit soundSetVolume("EPK", static_cast<int>(is_whistle_on * 100.0));
 
+    emit soundSetVolume("EPK-flow", static_cast<int>(emergencyRate * 1000));
+
     state = static_cast<bool>(pf(Y[0] - 0.95 * pk));
 }
 
