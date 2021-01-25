@@ -11,7 +11,7 @@ DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
   , omega0(157.08)
 
   , Mxx(50.0)
-  , J(0.5)
+  , J(0.1)
 
   , R(56.9)
   , U(0.0)
@@ -46,12 +46,12 @@ void DCMotorCompressor::setSoundName(const QString &value)
 //------------------------------------------------------------------------------
 void DCMotorCompressor::setU(double value)
 {
-    if (floor(value) > 0 && floor(U) == 0)
+    if (floor(value) > 0 && U < 0.1)
     {
         emit soundPlay(soundName);
     }
 
-    if (floor(value) == 0 && floor(U) > 0)
+    if (value < 0.1 && U >= 0.1)
     {
         emit soundStop(soundName);
     }
@@ -68,7 +68,7 @@ void DCMotorCompressor::preStep(state_vector_t &Y, double t)
 
     Q = K[4] * pf(Y[1] - p);
 
-    emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega0));
+//    emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega0));
 }
 
 //------------------------------------------------------------------------------

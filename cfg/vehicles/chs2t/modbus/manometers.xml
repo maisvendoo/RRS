@@ -59,19 +59,19 @@
     <!-- Педали -->
     <!-- Песок -->
     <DiscreteInput>
-	<Address>6</Address>
+	<Address>5</Address>
 	<Index>43</Index>
     </DiscreteInput>
 
     <!-- Свисток -->
     <DiscreteInput>
-	<Address>7</Address>
+	<Address>6</Address>
 	<Index>42</Index>
     </DiscreteInput>
 
     <!-- Тифон -->
     <DiscreteInput>
-	<Address>8</Address>
+	<Address>7</Address>
 	<Index>41</Index>
     </DiscreteInput>
     
