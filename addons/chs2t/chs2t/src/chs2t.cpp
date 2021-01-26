@@ -100,6 +100,8 @@ void CHS2T::initialization()
 
 //    velocity = 0;
 
+    feedback_signals.analogSignal[KPD3_RESET].cur_value = 1.0f;
+
     hardwareOutput();
 }
 
@@ -255,6 +257,31 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[KPD3_STRELKA].cur_value = KPD3_Velocity->getModbus(kpd3->getVelocityKmh());
     feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = static_cast<float>(kpd3->getVelocityKmh());
     feedback_signals.analogSignal[KPD3_TARGET_DISTANCE].cur_value = alsn_info.signal_dist;
+
+    switch (static_cast<int>(control_signals.analogSignal[SWP2_CAB_LIGHT].cur_value))
+    {
+    case 1:
+    case 2:
+        {
+            feedback_signals.analogSignal[PODSVETKA].cur_value = 1.0f;
+            feedback_signals.analogSignal[PLAFON].cur_value = 0.0f;
+            break;
+        }
+    case 3:
+        {
+            feedback_signals.analogSignal[PODSVETKA].cur_value = 0.0f;
+            feedback_signals.analogSignal[PLAFON].cur_value = 0.0f;
+            break;
+        }
+
+    case 4:
+        {
+            feedback_signals.analogSignal[PODSVETKA].cur_value =
+                    0.0f;
+            feedback_signals.analogSignal[PLAFON].cur_value = 1.0f;
+            break;
+        }
+    }
 }
 
 GET_VEHICLE(CHS2T)

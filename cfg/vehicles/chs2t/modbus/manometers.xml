@@ -76,6 +76,19 @@
     </DiscreteInput>
     
     
+    
+    
+    <!-- Подсветка -->
+    <Coil>
+	<Address>3</Address>
+	<Index>61</Index>
+    </Coil>
+
+    <!-- Плафон -->
+    <Coil>
+	<Address>2</Address>
+	<Index>62</Index>
+    </Coil>
 
 
 </Config>

@@ -23,4 +23,9 @@
 	<Index>59</Index>
     </HoldingRegister>
     
+    <Coil>
+	<Address>16</Address>
+	<Index>60</Index>
+    </Coil>
+    
 </Config>
