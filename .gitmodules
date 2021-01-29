@@ -4,3 +4,6 @@
 [submodule "asound"]
 	path = asound
 	url = https://github.com/maisvendoo/asound.git
+[submodule "osgdb_dmd"]
+	path = osgdb_dmd
+	url = https://github.com/maisvendoo/osgdb_dmd.git
