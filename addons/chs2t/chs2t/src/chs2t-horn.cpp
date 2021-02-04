@@ -47,6 +47,23 @@ void CHS2tHorn::stepExternalControl(double t, double dt)
             emit soundStop("Tifon");
         }
     }
+
+
+    // zБогос
+    bool is_sand_old = is_sand;
+    is_sand = static_cast<bool>(control_signals.analogSignal[SAND_PEDAL].cur_value);
+
+    if (is_sand_old != is_sand)
+    {
+        if (is_sand)
+        {
+            emit soundPlay("Sand");
+        }
+        else
+        {
+            emit soundStop("Sand");
+        }
+    }
 }
 
 

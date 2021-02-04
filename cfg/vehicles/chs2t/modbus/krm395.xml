@@ -44,6 +44,11 @@
     </DiscreteInput>
 
     <Coil>
+	<Address>0</Address>
+	<Index>996</Index>
+    </Coil>
+
+    <Coil>
 	<Address>1</Address>
 	<Index>998</Index>
     </Coil>

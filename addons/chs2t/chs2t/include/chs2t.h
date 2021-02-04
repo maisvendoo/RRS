@@ -269,6 +269,9 @@ private:
     /// Скоростемер КПД3
     KPD3    *kpd3;
 
+    /// Таймер сброса скоростемера
+    Timer   *kpd3_reset;
+
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -390,6 +393,8 @@ private slots:
         EDT = allowEDT = true;
         EDT_timer.stop();
     }
+
+    void slotKpd3Reset();
 };
 
 #endif // CHS2TOO

@@ -13,7 +13,7 @@
 		<Description>Пассажирский электровоз постоянного тока ЧС2т с поездом из 15 вагонов</Description>
 		
 		<ClientName>chs2t</ClientName>
-		<TrainID>50331697</TrainID>
+		<TrainID>50331685</TrainID>
 	</Common>
 
 	<Vehicle>

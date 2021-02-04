@@ -142,7 +142,10 @@ enum FeedbackSignals
     KPD3_RESET = 60,
 
     PODSVETKA = 61,
-    PLAFON = 62
+    PLAFON = 62,
+
+    POS_RESET1 = 63,
+    POS_RESET2 = 64
 
 };
 

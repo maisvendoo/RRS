@@ -6,6 +6,7 @@
 TrainHorn::TrainHorn(QObject *parent) : Device(parent)
   , is_svistok(false)
   , is_tifon(false)
+  , is_sand(false)
 {
 
 }
