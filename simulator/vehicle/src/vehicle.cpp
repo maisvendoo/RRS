@@ -64,6 +64,9 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
 {
     std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     std::fill(discreteSignal.begin(), discreteSignal.end(), false);
+
+    std::fill(inputs.begin(), inputs.end(), 0.0f);
+    std::fill(outputs.begin(), outputs.end(), 0.0f);
 }
 
 //------------------------------------------------------------------------------
@@ -517,6 +520,26 @@ double Vehicle::getEPTControl(size_t i)
 void Vehicle::setASLN(alsn_info_t alsn_info)
 {
     this->alsn_info = alsn_info;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float Vehicle::getInput(size_t index) const
+{
+    if (index < inputs.size())
+        return inputs[index];
+
+    return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setOutput(size_t index, float value)
+{
+    if (index < outputs.size())
+        outputs[index] = value;
 }
 
 //------------------------------------------------------------------------------

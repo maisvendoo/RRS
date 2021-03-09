@@ -167,6 +167,10 @@ public:
 
     void setASLN(alsn_info_t alsn_info);
 
+    float getInput(size_t index) const;
+
+    void setOutput(size_t index, float value);
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -299,6 +303,11 @@ protected:
 
     /// Информация АЛСН
     alsn_info_t     alsn_info;
+
+    /// Входные сигналы СМЕ
+    std::array<float, INPUTS_NUMBER>    inputs;
+    /// Выходные сигналы СМЕ
+    std::array<float, OUTPUTS_NUMBER>   outputs;
 
     /// User defined initialization
     virtual void initialization();
