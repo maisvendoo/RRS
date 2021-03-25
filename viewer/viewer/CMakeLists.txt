@@ -9,7 +9,7 @@ add_executable(viewer ${SOURCES})
 
 target_link_libraries(viewer ${OPENSCENEGRAPH_LIBRARIES})
 
-target_link_libraries(viewer ${OSG_QT_LIB})
+#target_link_libraries(viewer ${OSG_QT_LIB})
 
 target_link_libraries(viewer Qt::Widgets)
 

@@ -36,7 +36,7 @@ add_custom_target(clobber
 set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ON)
 
 find_package(OpenSceneGraph COMPONENTS osgUtil osgDB osgText osgGA osgFX osgSim osgViewer REQUIRED)
-find_library(OSG_QT_LIB osgQOpenGL REQUIRED)
+#find_library(OSG_QT_LIB osgQOpenGL REQUIRED)
 
 
 add_subdirectory(tcp-connection)
