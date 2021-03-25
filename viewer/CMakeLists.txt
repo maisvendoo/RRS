@@ -1,0 +1,7 @@
+add_subdirectory(library)
+add_subdirectory(osgdb_dmd.bak)
+add_subdirectory(route-loader)
+add_subdirectory(zds-route-loader)
+add_subdirectory(display)
+add_subdirectory(display-player)
+add_subdirectory(viewer)
