@@ -45,6 +45,7 @@ add_subdirectory(CfgEditor)
 add_subdirectory(filesystem)
 add_subdirectory(libJournal)
 add_subdirectory(asound)
+add_subdirectory(osgdb_dmd)
 add_subdirectory(simulator)
 add_subdirectory(viewer)
 

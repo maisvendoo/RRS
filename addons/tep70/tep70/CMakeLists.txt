@@ -1,6 +1,8 @@
 file(GLOB SOURCES
     include/*.h
     src/*.cpp
+    ../tep70-equipment/include/*.h
+    ../tep70-equipment/src/*.cpp
 )
 
 add_library(tep70 SHARED ${SOURCES})
@@ -20,6 +22,8 @@ target_link_libraries(tep70 filesystem)
 target_link_libraries(tep70 Journal)
 
 target_include_directories(tep70 PRIVATE ../../../simulator/solver/include)
+
+target_include_directories(tep70 PRIVATE ../tep70-equipment/include)
 
 target_include_directories(tep70 PRIVATE ../../../simulator/physics/include)
 

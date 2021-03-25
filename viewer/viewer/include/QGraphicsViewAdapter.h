@@ -14,7 +14,7 @@
 #ifndef QGRAPHICSVIEWADAPTER
 #define QGRAPHICSVIEWADAPTER
 
-#include <QGLWidget>
+#include <osgQOpenGLWidget>
 
 #include <osg/Image>
 #include <osg/observer_ptr>
