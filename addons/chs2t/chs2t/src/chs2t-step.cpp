@@ -113,7 +113,8 @@ void CHS2T::stepTractionControl(double t, double dt)
 
     if (EDT)
         allowTrac.reset();
-    if (stepSwitch->getPoz() == 0)
+
+    if ( (stepSwitch->getPoz() == 0) && (autoTrainStop->getStateKey()) )
         allowTrac.set();
 
     motor->setDirection(stepSwitch->getReverseState());
