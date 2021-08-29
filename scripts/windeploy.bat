@@ -1,3 +1,7 @@
+rem Определяем необходимые переменные окружения
+
+set OSG_PLUGINS_DIR=osgPlugins-3.6.5
+
 rem Создаем структуру каталогов игры
 
 mkdir %RRS_DEV_ROOT%
@@ -71,9 +75,9 @@ xcopy %OSG_BIN_PATH%\libosgUtil.dll %RRS_DEV_ROOT%\bin\
 xcopy %OSG_BIN_PATH%\libosgViewer.dll %RRS_DEV_ROOT%\bin\
 xcopy %OSG_BIN_PATH%\libosgQt5.dll %RRS_DEV_ROOT%\bin\
 
-xcopy %OSG_BIN_PATH%\osgPlugins-3.7.0\*.dll %RRS_DEV_ROOT%\bin\osgPlugins-3.7.0\
-del /S %RRS_DEV_ROOT%\bin\osgPlugins-3.7.0\*d.dll
-xcopy %OSG_BIN_PATH%\osgPlugins-3.7.0\*dmd.dll %RRS_DEV_ROOT%\bin\osgPlugins-3.7.0\
+xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
+del /S %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\*d.dll
+xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
 
 rem Копируем прочие необходимые DLL
 
