@@ -220,6 +220,8 @@ void CHS2T::initOtherEquipment()
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
     connect(speed_meter, &SL2M::soundSetVolume, this, &CHS2T::soundSetVolume);
+
+    safety_device = new SafetyDevice();
 }
 
 //------------------------------------------------------------------------------

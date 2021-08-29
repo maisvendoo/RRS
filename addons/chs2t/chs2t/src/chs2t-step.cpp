@@ -250,6 +250,7 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
     autoTrainStop->setBrakepipePressure(pTM);
     autoTrainStop->setControl(keys);
+    autoTrainStop->powerOn(safety_device->getEPKstate());
     autoTrainStop->step(t, dt);
 
     auxRate = autoTrainStop->getEmergencyBrakeRate() + airDistr->getAuxRate();
@@ -318,6 +319,13 @@ void CHS2T::stepSupportEquipment(double t, double dt)
     energy_counter->setFullPower(Uks * (motor->getI12() + motor->getI34() + motor->getI56()) );
     energy_counter->setResistorsPower( puskRez->getR() * ( pow(motor->getI12(), 2) + pow(motor->getI34(), 2) + pow(motor->getI56(), 2) ) );
     energy_counter->step(t, dt);
+
+    safety_device->setRBstate(state_RB);
+    safety_device->setRBSstate(state_RBS);
+    safety_device->setAlsnCode(alsn_info.code_alsn);
+    safety_device->setVelocity(velocity);
+    safety_device->setKeyEPK(autoTrainStop->getStateKey());
+    safety_device->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

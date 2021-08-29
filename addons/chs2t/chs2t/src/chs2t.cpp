@@ -36,6 +36,10 @@ CHS2T::CHS2T() : Vehicle()
     EDT = false;    
 
     dropPosition = false;
+
+    state_RB = false;
+
+    state_RBS = false;
 }
 
 //------------------------------------------------------------------------------

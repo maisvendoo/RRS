@@ -41,6 +41,7 @@
 #include    "sl2m.h"
 #include    "energy-counter.h"
 #include    "chs2t-switcher.h"
+#include    "alsn-ukbm.h"
 
 /*!
  * \class
@@ -242,6 +243,14 @@ private:
 
     /// Счетчик энергии
     EnergyCounter   *energy_counter;
+
+    /// Устройство безопасности
+    SafetyDevice    *safety_device;
+
+    /// Состояния РБ и РБС
+    bool state_RB;
+
+    bool state_RBS;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
