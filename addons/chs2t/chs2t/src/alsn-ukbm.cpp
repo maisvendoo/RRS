@@ -53,7 +53,7 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     if (code_alsn < old_code_alsn)
         epk_state.reset();
 
-    if ( (old_code_alsn == 1) && (code_alsn > old_code_alsn) )
+    /*if ( (old_code_alsn == 1) && (code_alsn == 3) )
         is_red.set();
 
     if (is_red.getState())
@@ -61,7 +61,7 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
         epk_state.reset();
         lamps[RED_LAMP] = 1.0f;
         return;
-    }
+    }*/
 
     alsn_process(code_alsn);
 
@@ -74,7 +74,13 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
         }
 
         if ( (!safety_timer->isStarted()) && (v_kmh > 5) )
+        {
             safety_timer->start();
+        }
+        else
+        {
+            safety_timer->stop();
+        }
     }
 
     if (code_alsn == 2)
@@ -83,6 +89,10 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
         {
             if (!safety_timer->isStarted())
                 safety_timer->start();
+        }
+        else
+        {
+            safety_timer->stop();
         }
     }
 
