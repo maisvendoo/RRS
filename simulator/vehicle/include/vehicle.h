@@ -305,9 +305,14 @@ protected:
     alsn_info_t     alsn_info;
 
     /// Входные сигналы СМЕ
-    std::array<float, INPUTS_NUMBER>    inputs;
+    std::array<float, INPUTS_NUMBER>    forward_inputs;
     /// Выходные сигналы СМЕ
-    std::array<float, OUTPUTS_NUMBER>   outputs;
+    std::array<float, OUTPUTS_NUMBER>   forward_outputs;
+
+    /// Входные сигналы СМЕ
+    std::array<float, INPUTS_NUMBER>    backward_inputs;
+    /// Выходные сигналы СМЕ
+    std::array<float, OUTPUTS_NUMBER>   backward_outputs;
 
     /// User defined initialization
     virtual void initialization();
