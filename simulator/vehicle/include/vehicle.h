@@ -167,9 +167,13 @@ public:
 
     void setASLN(alsn_info_t alsn_info);
 
-    float getInput(size_t index) const;
+    float getFwdInput(size_t index) const;
 
-    void setOutput(size_t index, float value);
+    void setFwdOutput(size_t index, float value);
+
+    float getBwdInput(size_t index) const;
+
+    void setBwdOutput(size_t index, float value);
 
 public slots:
     
