@@ -528,30 +528,10 @@ void Vehicle::setASLN(alsn_info_t alsn_info)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float Vehicle::getFwdInput(size_t index) const
-{
-    if (index < forward_inputs.size())
-        return forward_inputs[index];
-
-    return 0.0f;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::setFwdOutput(size_t index, float value)
+float Vehicle::getFwdOutput(size_t index) const
 {
     if (index < forward_outputs.size())
-        forward_outputs[index] = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float Vehicle::getBwdInput(size_t index) const
-{
-    if (index < backward_inputs.size())
-        return backward_inputs[index];
+        return forward_outputs[index];
 
     return 0.0f;
 }
@@ -559,10 +539,30 @@ float Vehicle::getBwdInput(size_t index) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setBwdOutput(size_t index, float value)
+void Vehicle::setFwdInput(size_t index, float value)
+{
+    if (index < forward_inputs.size())
+        forward_inputs[index] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float Vehicle::getBwdOutput(size_t index) const
 {
     if (index < backward_outputs.size())
-        backward_outputs[index] = value;
+        return backward_outputs[index];
+
+    return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setBwdInput(size_t index, float value)
+{
+    if (index < backward_inputs.size())
+        backward_inputs[index] = value;
 }
 
 //------------------------------------------------------------------------------
