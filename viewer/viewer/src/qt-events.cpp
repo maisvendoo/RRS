@@ -14,6 +14,8 @@
 
 #include    "qt-events.h"
 
+#include    <osgViewer/Viewer>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -35,7 +37,12 @@ bool QtEventsHandler::handle(const osgGA::GUIEventAdapter &ea,
     case osgGA::GUIEventAdapter::FRAME:
         {
             // Process qt signals and event
-            QApplication::processEvents(QEventLoop::AllEvents);
+            osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
+
+            unsigned int frame_num = viewer->getFrameStamp()->getFrameNumber();
+
+            if (frame_num % 10 == 0)
+                QApplication::processEvents(QEventLoop::AllEvents);
 
             break;
         }
