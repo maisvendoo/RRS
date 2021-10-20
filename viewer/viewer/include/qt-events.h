@@ -32,7 +32,6 @@ public:
 
 protected:
 
-
 };
 
 #endif // QT_EVENTS_H

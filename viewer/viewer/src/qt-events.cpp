@@ -16,10 +16,14 @@
 
 #include    <osgViewer/Viewer>
 
+#include    <QtCore>
+
+extern unsigned int qGlobalPostedEventsCount();
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QtEventsHandler::QtEventsHandler()
+QtEventsHandler::QtEventsHandler()    
 {
 
 }
@@ -39,10 +43,12 @@ bool QtEventsHandler::handle(const osgGA::GUIEventAdapter &ea,
             // Process qt signals and event
             osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
 
-            unsigned int frame_num = viewer->getFrameStamp()->getFrameNumber();
+            unsigned int frame = viewer->getFrameStamp()->getFrameNumber();
 
-            if (frame_num % 10 == 0)
+            if (frame % 100 == 0)
+            {
                 QApplication::processEvents(QEventLoop::AllEvents);
+            }
 
             break;
         }
