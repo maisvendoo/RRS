@@ -23,7 +23,8 @@ extern unsigned int qGlobalPostedEventsCount();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QtEventsHandler::QtEventsHandler()    
+QtEventsHandler::QtEventsHandler(unsigned int frame_div) : osgGA::GUIEventHandler()
+  , frame_div(frame_div)
 {
 
 }
@@ -45,7 +46,7 @@ bool QtEventsHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             unsigned int frame = viewer->getFrameStamp()->getFrameNumber();
 
-            if (frame % 10 == 0)
+            if (frame % frame_div == 0)
             {
                 QApplication::processEvents(QEventLoop::AllEvents);
             }

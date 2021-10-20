@@ -23,5 +23,6 @@
         <MotionBlur>0.05</MotionBlur>
         <NotifyLevel>ERROR</NotifyLevel>
         <ViewDistance>5000</ViewDistance>
+        <FrameDiv>20</FrameDiv>
     </Viewer>
 </Config>

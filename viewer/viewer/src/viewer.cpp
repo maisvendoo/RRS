@@ -75,7 +75,7 @@ bool RouteViewer::isReady() const
 int RouteViewer::run()
 {
     // Qt signals processing
-    viewer.addEventHandler(new QtEventsHandler());
+    viewer.addEventHandler(new QtEventsHandler(settings.frame_div));
 
     // Keyboard events handler
     keyboard = new KeyboardHandler();
@@ -268,6 +268,8 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "StatCamDist", settings.stat_cam_dist);
         cfg.getValue(secName, "StatCamHeight", settings.stat_cam_height);
         cfg.getValue(secName, "StatCamShift", settings.stat_cam_shift);
+
+        cfg.getValue(secName, "FrameDiv", settings.frame_div);
     }
 
     return settings;
