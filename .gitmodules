@@ -1,9 +1,9 @@
 [submodule "tcp-connection"]
 	path = tcp-connection
-	url = https://github.com/maisvendoo/tcp-connection.git
+	url = https://github.com/asafran/tcp-connection.git
 [submodule "asound"]
 	path = asound
-	url = https://github.com/maisvendoo/asound.git
+	url = https://github.com/asafran/asound.git
 [submodule "osgdb_dmd"]
 	path = osgdb_dmd
-	url = https://github.com/maisvendoo/osgdb_dmd.git
+	url = https://github.com/asafran/osgdb_dmd.git
