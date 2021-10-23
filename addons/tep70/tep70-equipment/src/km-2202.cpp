@@ -134,7 +134,7 @@ void ControllerKM2202::stepKeysControl(double t, double dt)
     }
 
 
-    /*if (getKeyState(KEY_W) || getKeyState(KEY_S))
+    if (getKeyState(KEY_W) || getKeyState(KEY_S))
     {
         if (getKeyState(KEY_W))
             rs_dir = 1;
@@ -147,7 +147,7 @@ void ControllerKM2202::stepKeysControl(double t, double dt)
     else
     {
         revers_shaft_timer.stop();
-    }*/
+    }
 
 
     main_shaft_timer.step(t, dt);
@@ -161,10 +161,10 @@ void ControllerKM2202::slotRotateMainShaft()
 {
     // Механическая блокировка поворота главного вала
     // в нулевом положении реверсивного
-    /*if (rs_position == RS_ZERO)
+    if (rs_position == RS_ZERO)
     {
         return;
-    }*/
+    }
 
     int pos_old = ms_position;
     ms_position += ms_dir;
