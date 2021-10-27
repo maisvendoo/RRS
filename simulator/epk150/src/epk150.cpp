@@ -106,33 +106,19 @@ void AutoTrainStopEPK150::preStep(state_vector_t &Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    //emit soundSetVolume("EPK", static_cast<int>(is_whistle_on * 100.0));
-<<<<<<< HEAD
-=======
-
->>>>>>> 77e2e285be337753e60bc9b3e531a2458aed1395
     if (static_cast<bool>(is_whistle_on))
     {
         if (!is_whistle)
         {
-<<<<<<< HEAD
-            emit soundPlay("EPK");
-            is_whistle = true;
-=======
             is_whistle = true;
             emit soundPlay("EPK");
->>>>>>> 77e2e285be337753e60bc9b3e531a2458aed1395
+
         }
     }
     else
     {
-<<<<<<< HEAD
-        emit soundStop("EPK");
-        is_whistle = false;
-=======
         is_whistle = false;
         emit soundStop("EPK");
->>>>>>> 77e2e285be337753e60bc9b3e531a2458aed1395
     }
 }
 
