@@ -48,7 +48,7 @@ bool QtEventsHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             if (frame % frame_div == 0)
             {
-                QApplication::processEvents(QEventLoop::AllEvents, 10);
+                QApplication::processEvents(QEventLoop::AllEvents, 1);
             }
 
             break;
