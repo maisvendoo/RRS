@@ -21,6 +21,9 @@
 #include    "Journal.h"
 #include    "JournalFile.h"
 
+#include "film-server.h"
+
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -39,6 +42,7 @@ Model::Model(QObject *parent) : QObject(parent)
   , train(nullptr)
   , profile(nullptr)
   , server(nullptr)
+  , filmServer_(nullptr)
   , control_panel(nullptr)
 {
     shared_memory.setKey("sim");
@@ -132,6 +136,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     initControlPanel("control-panel");
 
     initSimClient("virtual-railway");
+
+    filmServer_ = new FilmServer(this);
+    filmServer_->start();
 
     Journal::instance()->info("Train is initialized successfully");
 

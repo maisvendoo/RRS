@@ -37,6 +37,10 @@
 
 #include    "sim-client.h"
 
+
+class FilmServer;
+
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -119,6 +123,7 @@ private:
 
     /// TCP-server
     Server      *server;
+    FilmServer  *filmServer_;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel;
