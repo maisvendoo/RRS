@@ -18,6 +18,13 @@
 #include    <osgGA/GUIEventHandler>
 #include    <QApplication>
 
+struct TimerInfo : public osg::Referenced
+{
+    TimerInfo(unsigned int c) : _count(c) {}
+    unsigned int _count;
+};
+
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -25,14 +32,17 @@ class QtEventsHandler : public osgGA::GUIEventHandler
 {
 public:
 
-    QtEventsHandler(unsigned int frame_div);
+    QtEventsHandler(unsigned int interval = 100);
 
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
                         osgGA::GUIActionAdapter &aa);
 
 protected:
 
-    unsigned int frame_div;
+    unsigned int _count;
+    double _startTime;
+    unsigned int _interval;
+    unsigned int _time;
 };
 
 #endif // QT_EVENTS_H
