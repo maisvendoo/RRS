@@ -137,8 +137,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initSimClient("virtual-railway");
 
-    filmServer_ = new FilmServer(this);
-    filmServer_->start();
+    // Сервер для Демонстрационного фильма
+    filmServerStart_(init_data.route_dir);
 
     Journal::instance()->info("Train is initialized successfully");
 
@@ -485,6 +485,35 @@ void Model::initSimClient(QString cfg_path)
     {
         Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
     }
+}
+
+//------------------------------------------------------------------------------
+//  Сервер для Демонстрационного фильма
+//------------------------------------------------------------------------------
+void Model::filmServerStart_(QString routeDir)
+{
+    routeName_ = "";
+    QString routeName(routeDir.right(routeDir.length() - routeDir.lastIndexOf('/') - 1));
+    if (routeName == "experimental-polygon")
+        routeName_ = "S-KB";
+    if (routeName == "experimental-polygon2")
+        routeName_ = "S-ZB";
+
+
+    filmServer_ = new FilmServer(this);
+    filmServer_->start();
+
+    connect(&filmDataSendTimer_, &QTimer::timeout,
+            this, [&]()
+    {
+        data_client_t film_dc;
+        film_dc.routeName = routeName_;
+        film_dc.trainCoordinate = train->getFirstVehicle()->getRailwayCoord();
+        film_dc.trainVelocity = train->getFirstVehicle()->getVelocity();
+
+        filmServer_->slotSendDataClient(film_dc);
+    });
+    filmDataSendTimer_.start(100);
 }
 
 //------------------------------------------------------------------------------

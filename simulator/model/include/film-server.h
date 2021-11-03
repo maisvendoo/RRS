@@ -70,8 +70,12 @@ class FilmServer : public QTcpServer
 public:
     FilmServer(QObject *parent = Q_NULLPTR);
 
-
     void start();
+
+
+public slots:
+    // Отправка данных клиенту
+    void slotSendDataClient(data_client_t data);
 
 
 private:
@@ -84,13 +88,10 @@ private:
     void loadCfg_();
 
 
-
 private slots:
     void slotClientAutorized();
     void slotClientDisconnected();
 
-    // Отправка данных клиенту
-    void slotSendDataClient(data_client_t data);
 
 
 };

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>5</Order>
+
+		<k>0.033</k>
+
+		<T_gt>0.5</T_gt>
+
+		<T_gm>0.5</T_gm>
+
+		<T_gb>0.5</T_gb>
+
+		<i_min>0.87</i_min>
+
+		<i_max>0.93</i_max>
+
+		<T_revers>1.0</T_revers>
+
+		<P_gb>300</P_gb>
+		<omega_gb_max>162</omega_gb_max>
+
+		<Kp>2.0</Kp>
+		<Ki>0.0</Ki>			
+
+	</Device>
+</Config>

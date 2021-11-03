@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+			<Order>2</Order>
+	
+			<P_nom>70000.0</P_nom>
+			<omega_nom>314.2</omega_nom>
+			<I_nom>101</I_nom>
+			<U_nom>400</U_nom>
+			<J>0.1</J>
+			
+			<U_110>110.0</U_110>			
+			<U_27>27.0</U_27>
+			
+			<Mc>30.0</Mc>
+
+			<K1>0.06</K1>
+			<K2>100.0</K2>
+			
+			<K3>0.1</K3>
+			<K4>0.01</K4>
+	</Device>
+</Config>

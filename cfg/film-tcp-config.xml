@@ -2,6 +2,6 @@
 <Config>
     <TcpConfig>
         <Port>1999</Port>				
-				<DataSendInterval>220</DataSendInterval>
+				<DataSendInterval>100</DataSendInterval>
     </TcpConfig>
 </Config>

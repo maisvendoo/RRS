@@ -13,6 +13,8 @@ FilmServer::FilmServer(QObject *parent)
 {
     loadCfg_();
 
+    client_ = new QTcpSocket(this);
+
 //    timerSend_ = new QTimer();
 //    connect(timerSend_, &QTimer::timeout, this, &FilmServer::slotSendDataClient);
 //    timerSend_->setInterval(tcp_conf_.data_send_interval);
@@ -94,6 +96,13 @@ void FilmServer::slotClientDisconnected()
 //-----------------------------------------------------------------------------
 void FilmServer::slotSendDataClient(data_client_t data)
 {
+    if (client_ == Q_NULLPTR)
+        return;
+
+    if (client_->state() != QTcpSocket::ConnectedState)
+        return;
+
+
     QByteArray arr;
     arr.resize(sizeof(data_client_t));
 
