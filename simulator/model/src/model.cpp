@@ -492,13 +492,7 @@ void Model::initSimClient(QString cfg_path)
 //------------------------------------------------------------------------------
 void Model::filmServerStart_(QString routeDir)
 {
-    routeName_ = "";
-    QString routeName(routeDir.right(routeDir.length() - routeDir.lastIndexOf('/') - 1));
-    if (routeName == "experimental-polygon")
-        routeName_ = "S-KB";
-    if (routeName == "experimental-polygon2")
-        routeName_ = "S-ZB";
-
+    routeName_ = routeDir.right(routeDir.length() - routeDir.lastIndexOf('/') - 1);
 
     filmServer_ = new FilmServer(this);
     filmServer_->start();
