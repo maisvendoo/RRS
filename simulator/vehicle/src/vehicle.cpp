@@ -28,6 +28,7 @@
 //
 //------------------------------------------------------------------------------
 Vehicle::Vehicle(QObject *parent) : QObject(parent)
+  , route_dir("")
   , idx(0)
   , empty_mass(24000.0)
   , payload_mass(68000.0)

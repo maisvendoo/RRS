@@ -76,11 +76,11 @@ bool Train::init(const init_data_t &init_data)
     }
 
     // Loading of train
-    if (!loadTrain(full_config_path))
+    if (!loadTrain(full_config_path, init_data))
     {
         Journal::instance()->error("Train is't loaded");
         return false;
-    }
+    }    
 
     // State vector initialization
     y.resize(ode_order);
@@ -336,7 +336,7 @@ std::vector<Vehicle *> *Train::getVehicles()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Train::loadTrain(QString cfg_path)
+bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 {
     CfgReader cfg;
     FileSystem &fs = FileSystem::getInstance();
@@ -434,7 +434,7 @@ bool Train::loadTrain(QString cfg_path)
 
                 QString config_dir(fs.combinePath(fs.getVehiclesDir(), module_cfg_name.toStdString()).c_str());
                 vehicle->setConfigDir(config_dir);
-
+                vehicle->setRouteDir(init_data.route_dir);
                 vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");                
 
                 vehicle->setPayloadCoeff(payload_coeff);

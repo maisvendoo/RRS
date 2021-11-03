@@ -324,7 +324,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         vehicles_ext[i].coord = coord;
         //vehicles_ext[i].wheel_angle = angle;
 
-        recalcAttitude(i);
+        //recalcAttitude(i);
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;

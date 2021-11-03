@@ -175,6 +175,8 @@ public:
 
     void setBwdInput(size_t index, float value);
 
+    void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -198,6 +200,9 @@ signals:
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
 protected:
+
+    /// Current route directory
+    QString route_dir;
 
     /// Vehicle ODE system index
     size_t     idx;
