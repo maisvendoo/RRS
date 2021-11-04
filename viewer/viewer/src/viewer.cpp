@@ -307,6 +307,9 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 
     if (cmd_line.direction.is_present)
         settings.direction = cmd_line.direction.value;
+
+    if (cmd_line.route_dir.is_present)
+        settings.route_dir = cmd_line.route_dir.value;
 }
 
 //------------------------------------------------------------------------------
