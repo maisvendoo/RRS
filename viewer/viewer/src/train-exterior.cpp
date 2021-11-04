@@ -591,6 +591,7 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
                 continue;
 
             dc->display->setConfigDir(QString(vehicles_config_dir.c_str()));
+            dc->display->setRouteDir(QString(settings.route_dir.c_str()));
             dc->display->init();
 
             displays.push_back(dc);
