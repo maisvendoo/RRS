@@ -90,7 +90,7 @@ int RouteViewer::run()
 
     viewer.addEventHandler(statsHandler.get());
 
-    viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    //viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // Cabine camera manipulator
     osg::ref_ptr<RailsManipulator> rm = new RailsManipulator(settings);

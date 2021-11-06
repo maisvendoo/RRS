@@ -324,7 +324,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         vehicles_ext[i].coord = coord;
         //vehicles_ext[i].wheel_angle = angle;
 
-        //recalcAttitude(i);
+        recalcAttitude(i);
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
@@ -439,8 +439,15 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     float y_new = arg(f_orth.y(), f_orth.x());
     float y_old = curr.attitude.z();
 
+    float dy = y_new - y_old;
+
+    if (fabs(dy) > osg::PIf / 2.0)
+    {
+        y_new = (y_new - 2.0 * osg::PIf) * osg::sign(dy);
+    }
+
     // "Smoothing" of vehicle oscillations
-    vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0f;
+    vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0;
 }
 
 //------------------------------------------------------------------------------
