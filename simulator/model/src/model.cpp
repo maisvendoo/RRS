@@ -21,6 +21,9 @@
 #include    "Journal.h"
 #include    "JournalFile.h"
 
+#include "film-server.h"
+
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -39,6 +42,7 @@ Model::Model(QObject *parent) : QObject(parent)
   , train(nullptr)
   , profile(nullptr)
   , server(nullptr)
+  , filmServer_(nullptr)
   , control_panel(nullptr)
 {
     shared_memory.setKey("sim");
@@ -132,6 +136,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     initControlPanel("control-panel");
 
     initSimClient("virtual-railway");
+
+    // Сервер для Демонстрационного фильма
+    filmServerStart_(init_data.route_dir);
 
     Journal::instance()->info("Train is initialized successfully");
 
@@ -478,6 +485,29 @@ void Model::initSimClient(QString cfg_path)
     {
         Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
     }
+}
+
+//------------------------------------------------------------------------------
+//  Сервер для Демонстрационного фильма
+//------------------------------------------------------------------------------
+void Model::filmServerStart_(QString routeDir)
+{
+    routeName_ = routeDir.right(routeDir.length() - routeDir.lastIndexOf('/') - 1);
+
+    filmServer_ = new FilmServer(this);
+    filmServer_->start();
+
+    connect(&filmDataSendTimer_, &QTimer::timeout,
+            this, [&]()
+    {
+        data_client_t film_dc;
+        film_dc.routeName = routeName_;
+        film_dc.trainCoordinate = train->getFirstVehicle()->getRailwayCoord();
+        film_dc.trainVelocity = train->getFirstVehicle()->getVelocity();
+
+        filmServer_->slotSendDataClient(film_dc);
+    });
+    filmDataSendTimer_.start(100);
 }
 
 //------------------------------------------------------------------------------

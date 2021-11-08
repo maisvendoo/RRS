@@ -37,6 +37,10 @@
 
 #include    "sim-client.h"
 
+
+class FilmServer;
+
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -119,6 +123,8 @@ private:
 
     /// TCP-server
     Server      *server;
+    FilmServer  *filmServer_;
+    QString routeName_;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel;
@@ -140,6 +146,7 @@ private:
 
     QTimer          controlTimer;
     QTimer          networkTimer;
+    QTimer          filmDataSendTimer_;
 
     ElapsedTimer    simTimer;       
 
@@ -165,6 +172,8 @@ private:
     void initControlPanel(QString cfg_path);
 
     void initSimClient(QString cfg_path);
+
+    void filmServerStart_(QString routeDir);
 
     /// TCP feedback
     void tcpFeedBack();

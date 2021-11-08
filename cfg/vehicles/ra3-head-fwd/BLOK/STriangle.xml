@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<!-- треугольник ограничения скорости 1 (желтый) -->
+	<STriangle1>
+		<widthTriangle>6</widthTriangle>
+		<lengthTriangle>20</lengthTriangle>
+		<colorTriangle>#ffff00</colorTriangle>
+	</STriangle1>
+	
+	<!-- треугольник ограничения скорости 2 (красный) -->
+	<STriangle2>
+		<widthTriangle>6</widthTriangle>
+		<lengthTriangle>20</lengthTriangle>
+		<colorTriangle>#ff0000</colorTriangle>
+	</STriangle2>
+
+	
+</Config>

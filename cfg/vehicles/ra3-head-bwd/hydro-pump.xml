@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+						
+			<K_press>0.06</K_press>
+			<T>0.5</T>			
+			
+	</Device>
+</Config>

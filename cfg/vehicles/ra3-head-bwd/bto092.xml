@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+    	
+        <pPB_max>0.4</pPB_max>
+        <pBC_max>0.38</pBC_max>
+        <A>0.47</A>
+        <ps>0.49</ps>
+        <U_nom>110</U_nom>
+
+        <!-- Темп выпуска из ЦСТ в атмосферу -->
+        <K1>8.5e-4</K1>
+
+        <!-- Темп наполнения ЦСТ -->
+        <K2>1.3e-3</K2>
+
+        <K3>100.0</K3>
+        <K5>100.0</K5>
+
+        <K4>5e-2</K4>
+        <K6>5e-2</K6>
+
+        <K7>0.1</K7>
+
+        <K8>2e-3</K8>
+        <K9>2e-3</K9>
+
+        <ept_eps>0.01</ept_eps>
+        <p_min>0.1</p_min>
+
+    </Device>
+</Config>

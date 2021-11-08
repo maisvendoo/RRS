@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<!-- желтый квадрат -->
+	<InformPartSquare>
+		<posX>270</posX>
+		<posY>390</posY>
+		<widthSquare>35</widthSquare>
+		<colorSquare>#ffff00</colorSquare>
+	</InformPartSquare>
+	
+</Config>
+

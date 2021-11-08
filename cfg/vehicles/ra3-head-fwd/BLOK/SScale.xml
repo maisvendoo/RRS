@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<SScale>
+		
+		<!-- вспомогательные черточки на шкале спидометра -->
+		<minorLine_isDraw>false</minorLine_isDraw>
+		<minorLine_color>#ffffff</minorLine_color>
+		<minorLine_width>2</minorLine_width>
+		<minorLine_length>10</minorLine_length>
+		<minorLine_count>4</minorLine_count>
+		
+		<!-- вспомогательные точки на шкале спидометра -->
+		<points_isDraw>false</points_isDraw>
+		<points_color>#ffffff</points_color>
+		<points_width>5</points_width>
+		
+		<!-- значения скоростей на шкале спидометра -->
+		<valV_color>#ffffff</valV_color>
+		<valV_fontSize>19</valV_fontSize>
+		<valV_margin>70</valV_margin>
+		
+		<!-- дуга шкалы спидометра -->
+		<arc_color>#ffffff</arc_color>
+		<arc_width>2</arc_width>
+		
+		<!-- круг в центре спидометра -->
+		<circleCener_color>#0096ff</circleCener_color>
+		<circleCener_width>110</circleCener_width>
+	
+	</SScale>
+
+</Config>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Core>
+		<HideCursor>1</HideCursor>
+		<RequestTimerInterval>100</RequestTimerInterval>
+	</Core>
+	<MainWindow>
+		<CustomPos>1</CustomPos>
+		<OffScreenColor>#c8c8c8</OffScreenColor>
+	</MainWindow>
+	<ControlElements>
+		<BlinkInterval>250</BlinkInterval>
+		<ResponseWaiting>10000</ResponseWaiting>
+		<UntouchableTime>500</UntouchableTime>
+	</ControlElements>
+	<ScreenChangeSystem>
+		<ImmuneTime>500</ImmuneTime>
+	</ScreenChangeSystem>
+</Config>

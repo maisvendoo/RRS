@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<BottomBlock>
+	
+		<border_color>#ffffff</border_color>
+		
+		<textInfo_color>#ffffff</textInfo_color>
+		<textInfo_fontSize>11</textInfo_fontSize>
+		
+		<textSvetofor_color>#ffffff</textSvetofor_color>
+		
+		<svetofor_color>#ffffff</svetofor_color>
+		<textSvetofor_fontSize>12</textSvetofor_fontSize>
+		
+		<train_color>#0096ff</train_color>
+
+	</BottomBlock>
+
+</Config>
