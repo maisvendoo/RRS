@@ -27,6 +27,7 @@
 
 #include    <osg/BlendFunc>
 #include    <osg/AlphaFunc>
+#include    <osg/PolygonMode>
 
 #include    "model-smooth.h"
 #include    "texture-filtering.h"
@@ -87,6 +88,10 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
     ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
 
     ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0));
+
+    osg::ref_ptr<osg::PolygonMode> pm = new osg::PolygonMode;
+    pm->setMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
+    ss->setAttribute(pm.get());
 
     return model.release();
 }

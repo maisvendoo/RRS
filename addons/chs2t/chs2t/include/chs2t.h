@@ -40,6 +40,8 @@
 #include    "chs2t-horn.h"
 #include    "sl2m.h"
 #include    "energy-counter.h"
+#include    "chs2t-switcher.h"
+#include    "alsn-ukbm.h"
 
 /*!
  * \class
@@ -95,6 +97,9 @@ private:
     /// Возврат защиты
     bool bv_return;
 
+    /// Список звуков перестука
+    QList<QString> tap_sounds;
+
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
@@ -123,7 +128,7 @@ private:
     Trigger     mk_tumbler;
 
     /// Галетники управления МК
-    std::array<Switcher *, 2> mk_switcher;
+    std::array<CHS2TSwitcher *, 2> mk_switcher;
 
     /// Поездной кран машиниста (КрМ)
     BrakeCrane *brakeCrane;
@@ -176,16 +181,16 @@ private:
     HandleEDT       *handleEDT;
 
     /// Галетники управления токоприемниками
-    std::array<Switcher *, NUM_PANTOGRAPHS> pantoSwitcher;
+    std::array<CHS2TSwitcher *, NUM_PANTOGRAPHS> pantoSwitcher;
 
     /// Галетник управления БВ
-    Switcher    *fastSwitchSw;
+    CHS2TSwitcher    *fastSwitchSw;
 
     std::array<DCMotorFan*, 2> motor_fan;
 
-    Switcher *motor_fan_switcher;
+    CHS2TSwitcher *motor_fan_switcher;
 
-    Switcher *blindsSwitcher;
+    CHS2TSwitcher *blindsSwitcher;
 
     /// Зарядное давление
     double charging_press;
@@ -238,6 +243,14 @@ private:
 
     /// Счетчик энергии
     EnergyCounter   *energy_counter;
+
+    /// Устройство безопасности
+    SafetyDevice    *safety_device;
+
+    /// Состояния РБ и РБС
+    bool state_RB;
+
+    bool state_RBS;
 
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
@@ -296,11 +309,17 @@ private:
     ///
     void initModbus();
 
+    /// Инициализация списка звуков перестука
+    void initTapSounds();
+
     /// Инициализация регистратора
     void initRegistrator();
 
     /// Общая инициализация локомотива
     void initialization();
+
+    /// Подпрограмма изменения положения пакетника
+    void setSwitcherState(Switcher *sw, signal_t signal);
 
     /// Моделирование работы токоприемников
     void stepPantographs(double t, double dt);
@@ -333,6 +352,8 @@ private:
     void stepSignals();
 
     void stepSwitcherPanel();
+
+    void stepTapSound();
 
     void stepDecodeAlsn();
 

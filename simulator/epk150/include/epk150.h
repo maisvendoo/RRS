@@ -66,6 +66,8 @@ private:
     /// Флаг работы свистка
     double is_whistle_on;
 
+    bool is_whistle;
+
     std::array<double, MAX_FLOW_COEFFS> K;
 
     std::array<double, MAX_GIAN_COEFFS> k;

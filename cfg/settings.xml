@@ -12,7 +12,7 @@
         <LocalMode>0</LocalMode>
         <FovY>55</FovY>
         <zNear>0.1</zNear>
-        <zFar>10000</zFar>
+        <zFar>1000</zFar>
         <ScreenNumber>1</ScreenNumber>
         <Name>viewer</Name>
         <WindowDecoration>1</WindowDecoration>
@@ -22,6 +22,7 @@
         <ReconnectInterval>1000</ReconnectInterval>
         <MotionBlur>0.05</MotionBlur>
         <NotifyLevel>ERROR</NotifyLevel>
-        <ViewDistance>5000</ViewDistance>
+        <ViewDistance>1000</ViewDistance>
+        <FrameDiv>1000</FrameDiv>
     </Viewer>
 </Config>

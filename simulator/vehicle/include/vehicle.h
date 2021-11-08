@@ -167,6 +167,16 @@ public:
 
     void setASLN(alsn_info_t alsn_info);
 
+    float getFwdOutput(size_t index) const;
+
+    void setFwdInput(size_t index, float value);
+
+    float getBwdOutput(size_t index) const;
+
+    void setBwdInput(size_t index, float value);
+
+    void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
+
 public slots:
     
     void receiveData(QByteArray data);
@@ -190,6 +200,9 @@ signals:
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
 protected:
+
+    /// Current route directory
+    QString route_dir;
 
     /// Vehicle ODE system index
     size_t     idx;
@@ -299,6 +312,16 @@ protected:
 
     /// Информация АЛСН
     alsn_info_t     alsn_info;
+
+    /// Входные сигналы СМЕ
+    std::array<float, INPUTS_NUMBER>    forward_inputs;
+    /// Выходные сигналы СМЕ
+    std::array<float, OUTPUTS_NUMBER>   forward_outputs;
+
+    /// Входные сигналы СМЕ
+    std::array<float, INPUTS_NUMBER>    backward_inputs;
+    /// Выходные сигналы СМЕ
+    std::array<float, OUTPUTS_NUMBER>   backward_outputs;
 
     /// User defined initialization
     virtual void initialization();

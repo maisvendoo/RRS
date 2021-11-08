@@ -20,4 +20,7 @@ void CHS2T::keyProcess()
         else
             eptSwitch.reset();
     }
+
+    state_RB = getKeyState(KEY_M);
+    state_RBS = getKeyState(KEY_Z);
 }

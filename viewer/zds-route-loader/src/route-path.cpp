@@ -22,6 +22,8 @@
 #include    <osg/Geode>
 #include    <osg/Material>
 
+#include    "filesystem.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -113,7 +115,7 @@ float arg(float cos_x, float sin_x)
     if (sin_x >= 0.0f)
         angle = acosf(cos_x);
     else
-        angle = -acosf(cos_x);
+        angle = 2.0f * osg::PIf -acosf(cos_x);
 
     return angle;
 }
@@ -179,6 +181,12 @@ bool RoutePath::load(std::istream &stream)
         track_data.push_back(next_track);
     }
 
+    debugPrint("tracks.log");
+
+    attitudeFiltering(track_data);
+
+    debugPrint("tracks2.log");
+
     return false;
 }
 
@@ -227,6 +235,40 @@ track_t RoutePath::findTrack(float railway_coord, track_t &next_track)
         next_track = track_data.at(idx);
 
     return track_data.at(idx);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RoutePath::debugPrint(const std::string &file_name)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string path = fs.getLogsDir() + fs.separator() + file_name;
+
+    std::fstream log(path, std::ios::out);
+
+    for (size_t i = 0; i < track_data.size(); ++i)
+    {
+        log << track_data[i].rail_coord << " " << track_data[i].attitude.x() << " " << track_data[i].attitude.z() << std::endl;
+    }
+
+    log.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RoutePath::attitudeFiltering(std::vector<track_t> &tracks)
+{
+    for (size_t i = 0; i < tracks.size() - 1; ++i)
+    {
+        float dYaw = tracks[i+1].attitude.z() - tracks[i].attitude.z();
+
+        if (fabs(dYaw) > osg::PIf / 2.0f)
+        {
+            tracks[i+1].attitude.z() = (tracks[i+1].attitude.z() - 2.0f * osg::PIf) * osg::sign(dYaw);
+        }
+    }
 }
 
 

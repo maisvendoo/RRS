@@ -151,7 +151,7 @@ private:
     solver_config_t solver_config;
 
     /// Train's loading
-    bool loadTrain(QString cfg_path);
+    bool loadTrain(QString cfg_path, const init_data_t &init_data);
     /// Couplings loading
     bool loadCouplings(QString cfg_path);
 

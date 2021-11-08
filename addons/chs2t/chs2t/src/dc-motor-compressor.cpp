@@ -42,6 +42,24 @@ void DCMotorCompressor::setSoundName(const QString &value)
 }
 
 //------------------------------------------------------------------------------
+// Задать напряжение компрессора
+//------------------------------------------------------------------------------
+void DCMotorCompressor::setU(double value)
+{
+    if (floor(value) > 0 && floor(U) == 0)
+    {
+        emit soundPlay(soundName);
+    }
+
+    if (floor(value) == 0 && floor(U) > 0)
+    {
+        emit soundStop(soundName);
+    }
+
+    U = value;
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void DCMotorCompressor::preStep(state_vector_t &Y, double t)

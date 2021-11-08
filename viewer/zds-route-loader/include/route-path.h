@@ -65,6 +65,10 @@ protected:
 
     /// Find track for some railway coordinate
     track_t findTrack(float railway_coord, track_t &next_track);
+
+    void debugPrint(const std::string &file_name);
+
+    void attitudeFiltering(std::vector<track_t> &tracks);
 };
 
 #endif // ROUTE_PATH_H

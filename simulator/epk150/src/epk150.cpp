@@ -28,12 +28,10 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     , V2(1e-3)
     , emergencyRate(0.0)
     , is_whistle_on(0.0)
+    , is_whistle(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
-    std::fill(k.begin(), k.end(), 0.0);
-
-    /*DebugLog *log = new DebugLog("epk150.txt");
-    connect(this, &AutoTrainStopEPK150::DebugPrint, log, &DebugLog::DebugPring);*/
+    std::fill(k.begin(), k.end(), 0.0);   
 }
 
 //------------------------------------------------------------------------------
@@ -108,7 +106,20 @@ void AutoTrainStopEPK150::preStep(state_vector_t &Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    emit soundSetVolume("EPK", static_cast<int>(is_whistle_on * 100.0));
+    if (static_cast<bool>(is_whistle_on))
+    {
+        if (!is_whistle)
+        {
+            is_whistle = true;
+            emit soundPlay("EPK");
+
+        }
+    }
+    else
+    {
+        is_whistle = false;
+        emit soundStop("EPK");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -156,13 +167,13 @@ void AutoTrainStopEPK150::stepKeysControl(double t, double dt)
             keyOn(false);
     }
 
-    if (getKeyState(KEY_K))
+    /*if (getKeyState(KEY_K))
     {
         if ( getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R) )
             powerOn(true);
         else
             powerOn(false);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------

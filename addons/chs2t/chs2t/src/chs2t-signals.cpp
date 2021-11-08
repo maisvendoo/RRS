@@ -84,6 +84,8 @@ void CHS2T::stepSignals()
 
     analogSignal[SW_EDT] = EDTSwitch.getState();
 
+    analogSignal[EPK] = static_cast<float>(autoTrainStop->getStateKey());
+
     analogSignal[WHEEL_1] = static_cast<float>(dir * wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(dir * wheel_rotation_angle[1] / 2.0 / Physics::PI);
     analogSignal[WHEEL_3] = static_cast<float>(dir * wheel_rotation_angle[2] / 2.0 / Physics::PI);

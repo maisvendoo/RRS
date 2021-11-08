@@ -125,6 +125,8 @@ struct settings_t
     /// Static camera shift
     float           stat_cam_shift;
 
+    unsigned int    interval;
+
     settings_t()
         : route_dir("")
         , train_config("")
@@ -172,6 +174,7 @@ struct settings_t
         , stat_cam_dist(10.0f)
         , stat_cam_height(1.75)
         , stat_cam_shift(200.0f)
+        , interval(10)
 
     {
 

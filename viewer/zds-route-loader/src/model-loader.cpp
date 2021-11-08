@@ -24,6 +24,7 @@
 #include    <osg/BlendFunc>
 #include    <osg/AlphaFunc>
 #include    <osg/CullFace>
+#include    <osg/PolygonMode>
 
 #include    <osgDB/WriteFile>
 
@@ -95,6 +96,10 @@ osg::PagedLOD *createLODNode(const model_info_t &model_info)
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
 
     pagedLOD->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture.get());
+
+    osg::ref_ptr<osg::PolygonMode> pm = new osg::PolygonMode;
+    pm->setMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
+    pagedLOD->getOrCreateStateSet()->setAttribute(pm.get());
 
     // Apply transparency settings
     std::string ext = osgDB::getLowerCaseFileExtension(model_info.texture_path);

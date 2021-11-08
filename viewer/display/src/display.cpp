@@ -7,7 +7,10 @@
 //------------------------------------------------------------------------------
 AbstractDisplay::AbstractDisplay(QWidget *parent, Qt::WindowFlags f)
     : QWidget(parent, f)
-
+    , input_signals(display_signals_t())
+    , output_signals(display_signals_t())
+    , config_dir("")
+    , route_dir("")
 {
 
 }

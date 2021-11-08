@@ -82,6 +82,8 @@ enum
     LS_Y = 65,
     LS_YR = 66,
 
+    EPK = 67,
+
     WHEEL_1 = 194,
     WHEEL_2 = 195,
     WHEEL_3 = 196,
