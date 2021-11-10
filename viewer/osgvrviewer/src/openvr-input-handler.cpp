@@ -109,17 +109,17 @@ bool OpenVRInputHandler::handle(const osgGA::GUIEventAdapter &ea,
             if (GetDigitalActionState(m_ReturnGV, state))
             {
                 if (state)
-                    viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_K);
+                    viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_B);
                 else
-                    viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_K);
+                    viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_B);
             }
 
             if (GetDigitalActionState(m_Start, state))
             {
                 if (state)
-                    viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_N);
+                    viewer->getEventQueue()->keyPress(0, osgGA::GUIEventAdapter::KEY_Space);
                 else
-                    viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_N);
+                    viewer->getEventQueue()->keyRelease(0, osgGA::GUIEventAdapter::KEY_Space);
             }
 
             vr::InputPoseActionData_t rPoseData;
