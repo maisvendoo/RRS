@@ -45,7 +45,17 @@ AbstractManipulator::~AbstractManipulator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void AbstractManipulator::process_displays_lock()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AbstractManipulator::getCameraPosition(camera_position_t cp)
 {
     this->cp = cp;
+
+    process_displays_lock();
 }

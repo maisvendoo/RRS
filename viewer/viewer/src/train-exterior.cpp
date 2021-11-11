@@ -48,6 +48,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
+    , is_displays_locked(false)
 
 {
     load(train_config);
@@ -169,6 +170,19 @@ void TrainExteriorHandler::keyboardHandler(int key)
         cur_vehicle = 0;
         long_shift = 0.0f;
         height_shift = 0.0f;
+        is_displays_locked = false;
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_F3:
+
+    case osgGA::GUIEventAdapter::KEY_F4:
+
+    case osgGA::GUIEventAdapter::KEY_F5:
+
+    case osgGA::GUIEventAdapter::KEY_F6:
+
+        is_displays_locked = true;
 
         break;
 
@@ -611,6 +625,9 @@ void TrainExteriorHandler::timerEvent(QTimerEvent *)
     if (nd.sd.size() == 0)
         return;
 
+    if (is_displays_locked)
+        return;
+
     for (size_t i = 0; i < vehicles_ext.size(); ++i)
     {
         for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
@@ -619,4 +636,9 @@ void TrainExteriorHandler::timerEvent(QTimerEvent *)
             dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
         }
     }
+}
+
+void TrainExteriorHandler::lock_display(bool lock)
+{
+    is_displays_locked = lock;
 }
