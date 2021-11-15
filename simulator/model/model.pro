@@ -31,6 +31,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lasound_d
     LIBS += -L../../../lib -lsound-manager_d
 
+    LIBS += -L../../../lib -lsignaling_d
+
 } else {
 
     LIBS += -L../../../lib -lfilesystem
@@ -49,6 +51,8 @@ CONFIG(debug, debug|release) {
 
     LIBS += -L../../../lib -lasound
     LIBS += -L../../../lib -lsound-manager
+
+    LIBS += -L../../../lib -lsignaling
 }
 
 win32{
