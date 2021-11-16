@@ -32,6 +32,7 @@ INCLUDEPATH += ./include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
+INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../device/include
 

@@ -1,7 +1,7 @@
 #ifndef     ABSTRACT_SIGNAL_H
 #define     ABSTRACT_SIGNAL_H
 
-#include    <QObject>
+#include    "device.h"
 
 //------------------------------------------------------------------------------
 //
@@ -19,10 +19,8 @@ using lens_state_t = std::array<bool, NUM_LENS>;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Signal : public QObject
+class Signal : public Device
 {
-    Q_OBJECT
-
 public:
 
     Signal(QObject *parent = Q_NULLPTR);
@@ -34,6 +32,15 @@ public:
 protected:
 
      lens_state_t lens_state;
+
+     virtual void preStep(state_vector_t &Y, double t);
+
+     virtual void ode_system(const state_vector_t &Y,
+                             state_vector_t &dYdt,
+                             double t);
+
+
+     virtual void load_config(CfgReader &cfg);
 };
 
 #endif // ABSTRACT_SIGNAL_H

@@ -1,17 +1,9 @@
-#include    "abstract-signal.h"
+#include    "line-signal.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Signal::Signal(QObject *parent) : Device(parent)
-{
-    std::fill(lens_state.begin(), lens_state.end(), false);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Signal::~Signal()
+LineSignal::LineSignal(QObject *parent) : Signal(parent)
 {
 
 }
@@ -19,26 +11,23 @@ Signal::~Signal()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signal::preStep(state_vector_t &Y, double t)
+LineSignal::~LineSignal()
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
+
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signal::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
+void LineSignal::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
+
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signal::load_config(CfgReader &cfg)
+void LineSignal::load_config(CfgReader &cfg)
 {
-    Q_UNUSED(cfg)
+
 }

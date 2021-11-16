@@ -34,6 +34,8 @@ public:
 
     void setSignal(Signal *signal) { this->signal = signal; }
 
+    void setBusy(bool is_busy) { this->is_busy = is_busy; }
+
 protected:
 
     double  x_begin;
