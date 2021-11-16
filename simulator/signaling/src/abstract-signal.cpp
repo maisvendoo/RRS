@@ -4,6 +4,7 @@
 //
 //------------------------------------------------------------------------------
 Signal::Signal(QObject *parent) : Device(parent)
+  , prev_signal_closed(false)
 {
     std::fill(lens_state.begin(), lens_state.end(), false);
 }
@@ -14,6 +15,22 @@ Signal::Signal(QObject *parent) : Device(parent)
 Signal::~Signal()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::close(bool is_closed)
+{
+    Q_UNUSED(is_closed)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::slotRecvPreviosState(bool closed_state)
+{
+    prev_signal_closed = closed_state;
 }
 
 //------------------------------------------------------------------------------
@@ -41,4 +58,12 @@ void Signal::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 void Signal::load_config(CfgReader &cfg)
 {
     Q_UNUSED(cfg)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::slotChangeState()
+{
+
 }

@@ -24,7 +24,7 @@ public:
 
     virtual void step(double t, double dt);
 
-    bool load_signals(int dir, const QString &route_dir);
+    bool init(int dir, const QString &route_dir);
 
 protected:
 
@@ -36,6 +36,9 @@ protected:
 
     /// Создание сигнала соотвествующего типа
     Signal *createSignal(const QString &type, const QString &liter);
+
+    /// Инициализация связей между сигналами
+    void init_signal_links();
 };
 
 #endif // SIGNALING_H

@@ -20,6 +20,10 @@ public:
 
     void setBeginCoord(double x_begin) { this->x_begin = x_begin; }
 
+    double getBeginCoord() const { return x_begin; }
+
+    double getEndCoord() const { return x_end; }
+
     void setEndCoord(double x_end) { this->x_end = x_end; }
 
     double getLenght() const { return qAbs(x_end - x_begin); }
@@ -33,6 +37,8 @@ public:
     BlockSection *getPrevSection() const { return prev_section; }
 
     void setSignal(Signal *signal) { this->signal = signal; }
+
+    Signal *getSignal() const { return signal; }
 
     void setBusy(bool is_busy) { this->is_busy = is_busy; }
 

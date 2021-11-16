@@ -2,6 +2,8 @@
 
 #include    <QDir>
 
+#include    "line-signal.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -29,7 +31,7 @@ void Signaling::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Signaling::load_signals(int dir, const QString &route_dir)
+bool Signaling::init(int dir, const QString &route_dir)
 {
     QString file_name = "signals";
 
@@ -48,6 +50,8 @@ bool Signaling::load_signals(int dir, const QString &route_dir)
         return false;
 
     signals_parse(cfg);
+
+    init_signal_links();
 
     return !sections.empty();
 }
@@ -90,5 +94,28 @@ void Signaling::signals_parse(CfgReader &cfg)
 //------------------------------------------------------------------------------
 Signal *Signaling::createSignal(const QString &type, const QString &liter)
 {
-    return Q_NULLPTR;
+    Signal *signal = Q_NULLPTR;
+
+    // ДЛЯ ТЕСТА!!! Все сигналы проходные
+    signal = new LineSignal;
+
+    signal->setType(type);
+    signal->setLiter(liter);
+
+    return signal;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signaling::init_signal_links()
+{
+    if (sections.empty())
+        return;
+
+    for (size_t i = 0; i < sections.size() - 1; ++i)
+    {
+        connect(sections[i+1]->getSignal(), &Signal::sendClosedState,
+                sections[i]->getSignal(), &Signal::slotRecvPreviosState);
+    }
 }

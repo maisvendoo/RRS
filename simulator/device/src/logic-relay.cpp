@@ -89,4 +89,6 @@ void LogicRelay::change_contact_state()
     {
         contact[i] = !contact[i];
     }
+
+    emit changeState();
 }

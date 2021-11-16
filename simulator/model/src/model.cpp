@@ -489,7 +489,7 @@ void Model::initSignaling(const init_data_t &init_data)
 {
     signaling = new Signaling;
 
-    if (!signaling->load_signals(init_data.direction, init_data.route_dir))
+    if (!signaling->init(init_data.direction, init_data.route_dir))
     {
         Journal::instance()->error("Failed signaling initialization at route " +
                                    init_data.route_dir);

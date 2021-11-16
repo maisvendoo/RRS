@@ -20,6 +20,10 @@ public:
 
     void setState(bool state);
 
+signals:
+
+    void changeState();
+
 protected:
 
     bool state;
