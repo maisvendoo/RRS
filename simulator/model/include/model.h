@@ -37,6 +37,8 @@
 
 #include    "sim-client.h"
 
+#include    "signaling.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -126,6 +128,9 @@ private:
     /// Клиент для связи с ВЖД
     SimTcpClient *sim_client;
 
+    /// Система СЦБ
+    Signaling *signaling;
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -165,6 +170,9 @@ private:
     void initControlPanel(QString cfg_path);
 
     void initSimClient(QString cfg_path);
+
+    /// Инициализация СЦБ
+    void initSignaling(const init_data_t &init_data);
 
     /// TCP feedback
     void tcpFeedBack();

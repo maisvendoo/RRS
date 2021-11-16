@@ -133,6 +133,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initSimClient("virtual-railway");
 
+    initSignaling(init_data);
+
     Journal::instance()->info("Train is initialized successfully");
 
     return true;
@@ -477,6 +479,20 @@ void Model::initSimClient(QString cfg_path)
     else
     {
         Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::initSignaling(const init_data_t &init_data)
+{
+    signaling = new Signaling;
+
+    if (!signaling->load_signals(init_data.direction, init_data.route_dir))
+    {
+        Journal::instance()->error("Failed signaling initialization at route " +
+                                   init_data.route_dir);
     }
 }
 

@@ -86,6 +86,7 @@ INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../../tcp-connection/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include
+INCLUDEPATH += ../signaling/include
 
 
 

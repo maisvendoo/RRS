@@ -96,5 +96,7 @@ INCLUDEPATH += ../sim-client/include
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../sound-manager/include
 
+INCLUDEPATH += ../signaling/include
+
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)
