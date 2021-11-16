@@ -7,6 +7,8 @@
 
 #include    "block-section.h"
 
+#include    "CfgReader.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -22,10 +24,18 @@ public:
 
     virtual void step(double t, double dt);
 
+    bool load_signals(int dir, const QString &route_dir);
+
 protected:
 
     /// Блок-участки на маршруте
     std::vector<BlockSection *> sections;
+
+    /// Парсинг конфига сигналов
+    void signals_parse(CfgReader &cfg);
+
+    /// Создание сигнала соотвествующего типа
+    Signal *createSignal(const QString &type, const QString &liter);
 };
 
 #endif // SIGNALING_H

@@ -3,6 +3,8 @@
 
 #include    <QObject>
 
+#include    "abstract-signal.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -22,6 +24,16 @@ public:
 
     double getLenght() const { return qAbs(x_end - x_begin); }
 
+    void setPrevSection(BlockSection *section) { prev_section = section; }
+
+    void setNextSection(BlockSection *section) { next_section = section; }
+
+    BlockSection *getNextSection() const { return next_section; }
+
+    BlockSection *getPrevSection() const { return prev_section; }
+
+    void setSignal(Signal *signal) { this->signal = signal; }
+
 protected:
 
     double  x_begin;
@@ -33,6 +45,8 @@ protected:
     BlockSection *prev_section;
 
     BlockSection *next_section;
+
+    Signal  *signal;
 };
 
 #endif // BLOCK_SECTION_H

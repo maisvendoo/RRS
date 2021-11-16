@@ -1,14 +1,9 @@
-#include    "block-section.h"
+#include    "abstract-signal.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BlockSection::BlockSection(QObject *parent) : QObject(parent)
-  , x_begin(0.0)
-  , x_end(0.0)
-  , is_busy(false)
-  , prev_section(Q_NULLPTR)
-  , next_section(Q_NULLPTR)
+Signal::Signal(QObject *parent) : QObject(parent)
 {
 
 }
@@ -16,7 +11,7 @@ BlockSection::BlockSection(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BlockSection::~BlockSection()
+Signal::~Signal()
 {
 
 }
