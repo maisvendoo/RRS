@@ -48,7 +48,11 @@ protected:
 
     double  x_end;
 
+    /// Признак занятости блок-участка
     bool    is_busy;
+
+    /// Код АЛСН (будем получать через слот от путевого трансмитера!!!)
+    int     alsn_code;
 
     BlockSection *prev_section;
 
