@@ -4,10 +4,14 @@
 
 #include    "line-signal.h"
 
+#include    "Journal.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Signaling::Signaling(QObject *parent) : QObject(parent)
+  , dir(1)
+  , is_ready(false)
 {
 
 }
@@ -25,7 +29,10 @@ Signaling::~Signaling()
 //------------------------------------------------------------------------------
 void Signaling::step(double t, double dt)
 {
-
+    for (BlockSection *section : sections)
+    {
+        section->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -36,9 +43,11 @@ bool Signaling::init(int dir, const QString &route_dir)
     QString file_name = "signals";
 
     if (dir > 0)
-        file_name += "1.conf";
+        file_name += "1.xml";
     else
-        file_name += "2.conf";
+        file_name += "2.xml";
+
+    this->dir = dir;
 
     QString path = QDir::toNativeSeparators(route_dir) +
             QDir::separator() +
@@ -53,7 +62,41 @@ bool Signaling::init(int dir, const QString &route_dir)
 
     init_signal_links();
 
-    return !sections.empty();
+    return is_ready = !sections.empty();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signaling::check_busy_sections(double x)
+{
+    size_t left_idx = 0;
+    size_t right_idx = sections.size() - 1;
+    size_t idx = (left_idx + right_idx) / 2;
+
+    while (left_idx != right_idx)
+    {
+        if (dir > 0)
+        {
+            if (x < sections[idx]->getBeginCoord())
+                right_idx = idx;
+            else
+                left_idx = idx;
+        }
+
+        if (dir < 0)
+        {
+            if (x > sections[idx]->getBeginCoord())
+                right_idx = idx;
+            else
+                left_idx = idx;
+        }
+
+        idx = (left_idx + right_idx) / 2;
+    }
+
+    sections[idx]->setBusy(true);
+    sections[idx]->getPrevSection()->setBusy(false);
 }
 
 //------------------------------------------------------------------------------
@@ -82,6 +125,11 @@ void Signaling::signals_parse(CfgReader &cfg)
         section->getNextSection()->setSignal(createSignal(signal_type, signal_liter));
 
         sections.push_back(section);
+
+        QString msg = QString("Loaded block section: L = %1")
+                .arg(section->getLenght());
+
+        Journal::instance()->info(msg);
 
         section = section->getNextSection();
 

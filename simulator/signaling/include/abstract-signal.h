@@ -21,6 +21,8 @@ using lens_state_t = std::array<bool, NUM_LENS>;
 //------------------------------------------------------------------------------
 class Signal : public Device
 {
+    Q_OBJECT
+
 public:
 
     Signal(QObject *parent = Q_NULLPTR);

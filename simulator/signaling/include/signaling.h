@@ -26,7 +26,16 @@ public:
 
     bool init(int dir, const QString &route_dir);
 
+    /// Проверка занятости блок-участков, в зависимости от координат ПС
+    void check_busy_sections(double x);
+
+    bool isReady() const { return is_ready; }
+
 protected:
+
+    int dir;
+
+    bool is_ready;
 
     /// Блок-участки на маршруте
     std::vector<BlockSection *> sections;

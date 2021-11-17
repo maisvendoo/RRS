@@ -8,6 +8,8 @@
 //------------------------------------------------------------------------------
 class DEVICE_EXPORT LogicRelay : public Device
 {
+    Q_OBJECT
+
 public:
 
     LogicRelay(size_t num_contacts = 1, QObject *parent = Q_NULLPTR);

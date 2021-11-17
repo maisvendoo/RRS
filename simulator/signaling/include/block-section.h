@@ -42,6 +42,8 @@ public:
 
     void setBusy(bool is_busy) { this->is_busy = is_busy; }
 
+    void step(double t, double dt);
+
 protected:
 
     double  x_begin;
