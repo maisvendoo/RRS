@@ -204,6 +204,10 @@ bool Model::step(double t, double &dt)
 
     signaling->step(t, dt);
 
+    double coord = train->getVehicles()->at(0)->getRailwayCoord();
+    alsn_info_t alsn_info = signaling->getALSN(coord);
+    train->getVehicles()->at(0)->setASLN(alsn_info);
+
     return true;
 }
 

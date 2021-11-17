@@ -9,6 +9,8 @@
 
 #include    "CfgReader.h"
 
+#include    "alsn-struct.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -27,6 +29,8 @@ public:
     bool init(int dir, const QString &route_dir);
 
     bool isReady() const { return is_ready; }
+
+    alsn_info_t getALSN(double coord);
 
 public slots:
 
@@ -51,6 +55,9 @@ protected:
 
     /// Инициализация связей между сигналами
     void init_signal_links();
+
+    /// Поиск блок-участка по координатам
+    BlockSection *findSection(double x) const;
 };
 
 #endif // SIGNALING_H

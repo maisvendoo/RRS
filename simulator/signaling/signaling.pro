@@ -37,6 +37,7 @@ INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../device/include
+INCLUDEPATH += ../vehicle/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

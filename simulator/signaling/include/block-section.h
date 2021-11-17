@@ -47,6 +47,8 @@ public:
 
     Transmiter *getTransmiter() const { return transmiter; }
 
+    int getAlsnCode() const { return alsn_code; }
+
 protected:
 
     double  x_begin;

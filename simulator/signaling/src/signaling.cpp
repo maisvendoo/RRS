@@ -68,39 +68,31 @@ bool Signaling::init(int dir, const QString &route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+alsn_info_t Signaling::getALSN(double coord)
+{
+    alsn_info_t alsn_info;
+
+    BlockSection *sec = findSection(coord);
+
+    alsn_info.code_alsn = static_cast<short>(sec->getAlsnCode());
+    alsn_info.signal_dist = qAbs(sec->getEndCoord() - coord);
+
+    return alsn_info;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Signaling::check_busy_sections(double x)
 {
     if (sections.empty())
         return;
 
-    size_t left_idx = 0;
-    size_t right_idx = sections.size() - 1;
-    size_t idx = (left_idx + right_idx) / 2;
+    BlockSection *section = findSection(x);
 
-    while (idx != left_idx)
-    {
-        if (dir > 0)
-        {
-            if (x <= sections[idx]->getBeginCoord())
-                right_idx = idx;
-            else
-                left_idx = idx;
-        }
+    section->setBusy(true);
 
-        if (dir < 0)
-        {
-            if (x >= sections[idx]->getBeginCoord())
-                right_idx = idx;
-            else
-                left_idx = idx;
-        }
-
-        idx = (left_idx + right_idx) / 2;
-    }
-
-    sections[idx]->setBusy(true);
-
-    BlockSection *prev_sec = sections[idx]->getPrevSection();
+    BlockSection *prev_sec = section->getPrevSection();
 
     if (prev_sec != Q_NULLPTR)
         prev_sec->setBusy(false);
@@ -182,4 +174,37 @@ void Signaling::init_signal_links()
         connect(sections[i]->getTransmiter(), &Transmiter::sendAlsnCode,
                 sections[i-1], &BlockSection::slotRecvAlsnCode);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+BlockSection *Signaling::findSection(double x) const
+{
+    size_t left_idx = 0;
+    size_t right_idx = sections.size() - 1;
+    size_t idx = (left_idx + right_idx) / 2;
+
+    while (idx != left_idx)
+    {
+        if (dir > 0)
+        {
+            if (x <= sections[idx]->getBeginCoord())
+                right_idx = idx;
+            else
+                left_idx = idx;
+        }
+
+        if (dir < 0)
+        {
+            if (x >= sections[idx]->getBeginCoord())
+                right_idx = idx;
+            else
+                left_idx = idx;
+        }
+
+        idx = (left_idx + right_idx) / 2;
+    }
+
+    return sections[idx];
 }
