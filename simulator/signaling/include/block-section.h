@@ -4,6 +4,7 @@
 #include    <QObject>
 
 #include    "abstract-signal.h"
+#include    "alsn-transmiter.h"
 
 //------------------------------------------------------------------------------
 //
@@ -44,6 +45,8 @@ public:
 
     void step(double t, double dt);
 
+    Transmiter *getTransmiter() const { return transmiter; }
+
 protected:
 
     double  x_begin;
@@ -61,6 +64,12 @@ protected:
     BlockSection *next_section;
 
     Signal  *signal;
+
+    Transmiter *transmiter;
+
+public slots:
+
+    void slotRecvAlsnCode(int alsn_code);
 };
 
 #endif // BLOCK_SECTION_H

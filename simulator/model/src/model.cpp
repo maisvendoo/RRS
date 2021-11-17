@@ -135,6 +135,12 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initSignaling(init_data);
 
+    for (Vehicle *vehicle : *(train->getVehicles()))
+    {
+        connect(vehicle, &Vehicle::sendCoord,
+                signaling, &Signaling::check_busy_sections);
+    }
+
     Journal::instance()->info("Train is initialized successfully");
 
     return true;
@@ -195,6 +201,8 @@ bool Model::step(double t, double &dt)
 {
     if (!train->step(t, dt))
         return false;
+
+    signaling->step(t, dt);
 
     return true;
 }

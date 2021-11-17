@@ -423,6 +423,8 @@ void Vehicle::integrationPostStep(state_vector_t &Y, double t)
         wheel_omega[i] = Y[idx + s + i + 1] * dir;
     }
 
+    emit sendCoord(railway_coord + dir * length / 2.0);
+
     postStep(t);
 }
 

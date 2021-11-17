@@ -46,6 +46,12 @@ public:
     /// Вернуть тип сигнала
     QString getType() const { return type; }
 
+    virtual bool getRedState() const = 0;
+
+    virtual bool getGreenState() const = 0;
+
+    virtual bool getYellowState() const = 0;
+
 signals:
 
     /// Отправка данных о закрытом состоянии сигнала

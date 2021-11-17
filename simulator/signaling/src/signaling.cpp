@@ -70,15 +70,18 @@ bool Signaling::init(int dir, const QString &route_dir)
 //------------------------------------------------------------------------------
 void Signaling::check_busy_sections(double x)
 {
+    if (sections.empty())
+        return;
+
     size_t left_idx = 0;
     size_t right_idx = sections.size() - 1;
     size_t idx = (left_idx + right_idx) / 2;
 
-    while (left_idx != right_idx)
+    while (idx != left_idx)
     {
         if (dir > 0)
         {
-            if (x < sections[idx]->getBeginCoord())
+            if (x <= sections[idx]->getBeginCoord())
                 right_idx = idx;
             else
                 left_idx = idx;
@@ -86,7 +89,7 @@ void Signaling::check_busy_sections(double x)
 
         if (dir < 0)
         {
-            if (x > sections[idx]->getBeginCoord())
+            if (x >= sections[idx]->getBeginCoord())
                 right_idx = idx;
             else
                 left_idx = idx;
@@ -96,7 +99,11 @@ void Signaling::check_busy_sections(double x)
     }
 
     sections[idx]->setBusy(true);
-    sections[idx]->getPrevSection()->setBusy(false);
+
+    BlockSection *prev_sec = sections[idx]->getPrevSection();
+
+    if (prev_sec != Q_NULLPTR)
+        prev_sec->setBusy(false);
 }
 
 //------------------------------------------------------------------------------
@@ -107,6 +114,7 @@ void Signaling::signals_parse(CfgReader &cfg)
     QDomNode secNode = cfg.getFirstSection("Signal");
 
     BlockSection *section = new BlockSection;
+    section->setSignal(createSignal("line", "0"));
 
     while (!secNode.isNull())
     {
@@ -165,5 +173,13 @@ void Signaling::init_signal_links()
     {
         connect(sections[i+1]->getSignal(), &Signal::sendClosedState,
                 sections[i]->getSignal(), &Signal::slotRecvPreviosState);
+
+        sections[i+1]->setPrevSection(sections[i]);
+    }
+
+    for (size_t i = 1; i < sections.size(); ++i)
+    {
+        connect(sections[i]->getTransmiter(), &Transmiter::sendAlsnCode,
+                sections[i-1], &BlockSection::slotRecvAlsnCode);
     }
 }

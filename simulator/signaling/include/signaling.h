@@ -26,10 +26,13 @@ public:
 
     bool init(int dir, const QString &route_dir);
 
+    bool isReady() const { return is_ready; }
+
+public slots:
+
     /// Проверка занятости блок-участков, в зависимости от координат ПС
     void check_busy_sections(double x);
 
-    bool isReady() const { return is_ready; }
 
 protected:
 

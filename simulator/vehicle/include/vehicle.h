@@ -199,6 +199,8 @@ signals:
 
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
+    void sendCoord(double x);
+
 protected:
 
     /// Current route directory

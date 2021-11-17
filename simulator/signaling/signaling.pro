@@ -3,6 +3,8 @@ TEMPLATE = lib
 QT -= gui
 QT += xml
 
+CONFIG += force_debug_info
+
 DEFINES += SIGNALING_LIB
 
 TARGET = signaling

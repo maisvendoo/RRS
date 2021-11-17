@@ -29,6 +29,21 @@ public:
 
     void step(double t, double dt) override;
 
+    bool getRedState() const override
+    {
+        return lens_state[LINE_RED];
+    }
+
+    bool getGreenState() const override
+    {
+        return lens_state[LINE_GREEN];
+    }
+
+    bool getYellowState() const override
+    {
+        return lens_state[LINE_YELLOW];
+    }
+
 private:
 
     /// Реле, питаемое от рельсовой цепи
