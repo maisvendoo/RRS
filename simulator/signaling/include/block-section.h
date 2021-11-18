@@ -55,6 +55,8 @@ public:
     /// Задать занятость блок-участка
     void setBusy(bool is_busy, double x_busy);
 
+    void setBusyCoord(double x_busy) { this->x_busy = x_busy; }
+
     /// Модулирование устройств СЦБ на блок-участке
     void step(double t, double dt);
 

@@ -74,7 +74,10 @@ alsn_info_t Signaling::getALSN(double coord)
     BlockSection *sec = findSection(coord);
 
     if (qAbs(coord - sec->getBusyCoord()) < 0.5)
+    {
         alsn_info.code_alsn = static_cast<short>(sec->getAlsnCode());
+        sec->setBusyCoord(coord);
+    }
     else
         alsn_info.code_alsn = 0;
 

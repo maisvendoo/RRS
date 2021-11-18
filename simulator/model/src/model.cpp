@@ -663,7 +663,8 @@ void Model::process()
 
         controlStep(control_time, control_delay);
 
-        signaling->set_busy_sections(3000.0);
+        double v = 50.0 / Physics::kmh;
+        signaling->set_busy_sections(5000.0 + v * t);
 
         is_step_correct = step(t, dt);
 
