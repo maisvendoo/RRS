@@ -32,11 +32,13 @@ void BlockSection::step(double t, double dt)
     {
         signal->close(is_busy);
         signal->step(t, dt);
+
+
+        transmiter->setState(signal->getRedState(),
+                             signal->getGreenState(),
+                             signal->getYellowState());
     }
 
-    transmiter->setState(signal->getRedState(),
-                         signal->getGreenState(),
-                         signal->getYellowState());
     transmiter->step(t, dt);
 }
 
