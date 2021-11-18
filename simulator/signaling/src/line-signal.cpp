@@ -40,6 +40,8 @@ void LineSignal::step(double t, double dt)
 {
     busy_relay->step(t, dt);
     yellow_relay->step(t, dt);
+
+    Signal::step(t, dt);
 }
 
 //------------------------------------------------------------------------------

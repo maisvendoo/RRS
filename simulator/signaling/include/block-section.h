@@ -47,7 +47,7 @@ public:
 
     Transmiter *getTransmiter() const { return transmiter; }
 
-    int getAlsnCode() const { return alsn_code; }
+    short getAlsnCode() const { return alsn_code; }
 
 protected:
 
@@ -59,7 +59,7 @@ protected:
     bool    is_busy;
 
     /// Код АЛСН (будем получать через слот от путевого трансмитера!!!)
-    int     alsn_code;
+    short    alsn_code;
 
     BlockSection *prev_section;
 

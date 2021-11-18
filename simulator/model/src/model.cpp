@@ -667,6 +667,8 @@ void Model::process()
 
         is_step_correct = step(t, dt);
 
+        //signaling->check_busy_sections(6000.0);
+
         tau += dt;
         t += dt;
 
