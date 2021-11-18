@@ -29,7 +29,7 @@ public:
     void setAlsnCode(int code_alsn)
     {
         old_code_alsn = this->code_alsn;
-        this->code_alsn = code_alsn - 1;
+        this->code_alsn = code_alsn;
     };
 
     /// Прием состояния РБ
@@ -87,6 +87,10 @@ private:
     void load_config(CfgReader &cfg);
 
     void alsn_process(int code_alsn);
+
+    void off_all_lamps();
+
+    void lamp_on(size_t lamp_idx);
 
 private slots:
 
