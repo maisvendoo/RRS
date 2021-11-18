@@ -204,7 +204,9 @@ bool Model::step(double t, double &dt)
 
     signaling->step(t, dt);
 
-    double coord = train->getVehicles()->at(0)->getRailwayCoord();
+    double coord = train->getVehicles()->at(0)->getRailwayCoord() +
+            train->getDirection() * train->getVehicles()->at(0)->getLength() / 2.0;
+
     alsn_info_t alsn_info = signaling->getALSN(coord);
     train->getVehicles()->at(0)->setASLN(alsn_info);
 
@@ -661,7 +663,9 @@ void Model::process()
 
         controlStep(control_time, control_delay);
 
-        is_step_correct = step(t, dt);        
+        signaling->set_busy_sections(3000.0);
+
+        is_step_correct = step(t, dt);
 
         tau += dt;
         t += dt;

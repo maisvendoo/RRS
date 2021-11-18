@@ -73,7 +73,11 @@ alsn_info_t Signaling::getALSN(double coord)
 
     BlockSection *sec = findSection(coord);
 
-    alsn_info.code_alsn = static_cast<short>(sec->getAlsnCode());
+    if (qAbs(coord - sec->getBusyCoord()) < 0.5)
+        alsn_info.code_alsn = static_cast<short>(sec->getAlsnCode());
+    else
+        alsn_info.code_alsn = 0;
+
     alsn_info.signal_dist = qAbs(sec->getEndCoord() - coord);
 
     return alsn_info;
@@ -89,12 +93,12 @@ void Signaling::set_busy_sections(double x)
 
     BlockSection *section = findSection(x);
 
-    section->setBusy(true);
+    section->setBusy(true, x);
 
     BlockSection *prev_sec = section->getPrevSection();
 
     if (prev_sec != Q_NULLPTR)
-        prev_sec->setBusy(false);
+        prev_sec->setBusy(false, 0);
 }
 
 //------------------------------------------------------------------------------

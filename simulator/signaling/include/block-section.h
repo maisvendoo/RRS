@@ -53,7 +53,7 @@ public:
     Signal *getSignal() const { return signal; }
 
     /// Задать занятость блок-участка
-    void setBusy(bool is_busy) { this->is_busy = is_busy; }
+    void setBusy(bool is_busy, double x_busy);
 
     /// Модулирование устройств СЦБ на блок-участке
     void step(double t, double dt);
@@ -63,6 +63,9 @@ public:
 
     /// Получить код АЛСН
     short getAlsnCode() const { return alsn_code; }
+
+    /// Получить координату, на которой замкнута рельсовая цепь
+    double getBusyCoord() const { return x_busy; }
 
 protected:
 
@@ -75,8 +78,14 @@ protected:
     /// Признак занятости блок-участка
     bool    is_busy;
 
+    /// Число поездов, занявших блок-участок
+    int     busy_count;
+
     /// Код АЛСН (будем получать через слот от путевого трансмитера!!!)
     short    alsn_code;
+
+    /// Координата, на которой произведено замыкание рельсовой цепи
+    double  x_busy;
 
     /// Указатель на предыдущий блок-участок
     BlockSection *prev_section;
