@@ -10,8 +10,7 @@
 //
 //------------------------------------------------------------------------------
 Signaling::Signaling(QObject *parent) : QObject(parent)
-  , dir(1)
-  , is_ready(false)
+  , dir(1)  
 {
 
 }
@@ -62,7 +61,7 @@ bool Signaling::init(int dir, const QString &route_dir)
 
     init_signal_links();
 
-    return is_ready = !sections.empty();
+    return !sections.empty();
 }
 
 //------------------------------------------------------------------------------
@@ -83,7 +82,7 @@ alsn_info_t Signaling::getALSN(double coord)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signaling::check_busy_sections(double x)
+void Signaling::set_busy_sections(double x)
 {
     if (sections.empty())
         return;

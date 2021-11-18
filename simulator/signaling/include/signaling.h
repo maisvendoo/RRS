@@ -24,25 +24,24 @@ public:
 
     ~Signaling();
 
+    /// Шаг моделирования устройств СЦБ
     virtual void step(double t, double dt);
 
-    bool init(int dir, const QString &route_dir);
+    /// Инициализация СЦБ
+    bool init(int dir, const QString &route_dir);    
 
-    bool isReady() const { return is_ready; }
-
+    /// Получить код АЛСН по координате ПС
     alsn_info_t getALSN(double coord);
 
 public slots:
 
     /// Проверка занятости блок-участков, в зависимости от координат ПС
-    void check_busy_sections(double x);
-
+    void set_busy_sections(double x);
 
 protected:
 
+    /// Направление движения на участке
     int dir;
-
-    bool is_ready;
 
     /// Блок-участки на маршруте
     std::vector<BlockSection *> sections;

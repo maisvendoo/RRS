@@ -138,7 +138,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     for (Vehicle *vehicle : *(train->getVehicles()))
     {
         connect(vehicle, &Vehicle::sendCoord,
-                signaling, &Signaling::check_busy_sections);
+                signaling, &Signaling::set_busy_sections);
     }
 
     Journal::instance()->info("Train is initialized successfully");
@@ -600,11 +600,7 @@ void Model::sharedMemoryFeedback()
         viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
 
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);        
-
-        /*std::copy((*it)->getDiscreteSignals().begin(),
-                  (*it)->getDiscreteSignals().end(),
-                  viewer_data.te[i].discreteSignal.begin());*/
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);                
 
         std::copy((*it)->getAnalogSignals().begin(),
                   (*it)->getAnalogSignals().end(),
@@ -665,9 +661,7 @@ void Model::process()
 
         controlStep(control_time, control_delay);
 
-        is_step_correct = step(t, dt);
-
-        //signaling->check_busy_sections(6000.0);
+        is_step_correct = step(t, dt);        
 
         tau += dt;
         t += dt;
