@@ -105,6 +105,14 @@ void FileSystem::setThemeDir(const std::string &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void FileSystem::setShadersDir(const std::string &path)
+{
+    shadersDir = getNativePath(path);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::string FileSystem::getRouteRootDir() const
 {
     return routeRootDir;
@@ -205,6 +213,11 @@ std::string FileSystem::getSoundsDir() const
 std::string FileSystem::getThemeDir() const
 {
     return themeDir;
+}
+
+std::string FileSystem::getShadersDir() const
+{
+    return shadersDir;
 }
 
 //------------------------------------------------------------------------------

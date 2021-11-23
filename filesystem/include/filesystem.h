@@ -41,6 +41,7 @@ public:
         instance.setFontsDir(tmp + "fonts");
         instance.setSoundsDir(instance.combinePath(instance.getDataDir(), "sounds"));
         instance.setThemeDir(tmp + "themes");
+        instance.setShadersDir(tmp + "shaders");
 
         return instance;
     }    
@@ -87,6 +88,8 @@ public:
 
     std::string getThemeDir() const;
 
+    std::string getShadersDir() const;
+
     std::string combinePath(const std::string &path1, const std::string &path2);
 
     std::string toNativeSeparators(const std::string &path);
@@ -118,6 +121,8 @@ private:
     std::string soundsDir;
 
     std::string themeDir;
+
+    std::string shadersDir;
 
     FileSystem() {}
     FileSystem(const FileSystem &) = delete;
@@ -160,6 +165,8 @@ private:
     void setSoundsDir(const std::string &path);
 
     void setThemeDir(const std::string &path);
+
+    void setShadersDir(const std::string &path);
 };
 
 #endif

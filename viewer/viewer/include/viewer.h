@@ -82,7 +82,9 @@ protected:
     bool initEngineSettings(osg::Group *root);
 
     /// Init display
-    bool initDisplay(osgViewer::Viewer *viewer, const settings_t &settings);    
+    bool initDisplay(osgViewer::Viewer *viewer, const settings_t &settings);
+
+    void initLightShaders(osg::StateSet *stateset, float psi, float theta);
 };
 
 #endif // VIEWER_H

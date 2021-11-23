@@ -19,6 +19,7 @@
 #include    <osg/GraphicsContext>
 #include    <osgDB/FileUtils>
 #include    <osgDB/FileNameUtils>
+#include    <osgDB/ReadFile>
 #include    <osgViewer/ViewerEventHandlers>
 #include    <osg/LightModel>
 #include    <osgViewer/View>
@@ -405,11 +406,13 @@ bool RouteViewer::initEngineSettings(osg::Group *root)
     stateset->setAttributeAndModes(cull.get(), osg::StateAttribute::ON);
 
     // Set lighting
-    initEnvironmentLight(root,
+    /*initEnvironmentLight(root,
                          osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
                          1.0f,
                          -20.0f,
-                         75.0f);
+                         75.0f);*/
+
+    initLightShaders(stateset, -20.0f, 75.0f);
 
     osg::LightModel *lightmodel = new osg::LightModel;
     float power = 0.4f;
@@ -441,6 +444,8 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
     traits->doubleBuffer = settings.double_buffer;
     traits->samples = settings.samples;
     traits->vsync = settings.vsync;
+    traits->glContextVersion = "3.0";
+    traits->readDISPLAY();
 
     osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
     osg::Camera *camera = viewer->getCamera();
@@ -461,4 +466,40 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
         viewer->setUpViewOnSingleScreen(settings.screen_number);
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::initLightShaders(osg::StateSet *stateset,
+                                   float psi,
+                                   float theta)
+{
+    FileSystem &fs = FileSystem::getInstance();
+
+    osg::Program *prog = new osg::Program;
+
+    std::string path = fs.getShadersDir() + fs.separator() + "light.vert";
+    prog->addShader(osgDB::readShaderFile(path));
+    path = fs.getShadersDir() + fs.separator() + "light.frag";
+    prog->addShader(osgDB::readShaderFile(path));
+
+    /*std::string vshader_path = fs.getShadersDir() + fs.separator() + "light.vert";
+    prog->addShader(osgDB::readShaderFile(vshader_path));
+    std::string fshader_path = fs.getShadersDir() + fs.separator() + "light.frag";
+    prog->addShader(osgDB::readShaderFile(fshader_path));*/
+
+    stateset->setAttribute(prog);
+
+    float dist = 1000.0f;
+
+    float rad = osg::PIf / 180.0f;
+    float x = dist * cosf(theta * rad) * sinf(psi * rad);
+    float y = dist * cosf(theta * rad) * cosf(psi * rad);
+    float z = dist * sinf(theta * rad);
+
+    osg::Vec3 pos = osg::Vec3(x, y, z);
+    pos.normalize();
+    stateset->addUniform(new osg::Uniform("tex", 0));
+    stateset->addUniform(new osg::Uniform("ecLightDir", pos));
 }
