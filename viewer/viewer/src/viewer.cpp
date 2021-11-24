@@ -412,7 +412,7 @@ bool RouteViewer::initEngineSettings(osg::Group *root)
                          -20.0f,
                          75.0f);*/
 
-    initLightShaders(stateset, -20.0f, 75.0f);
+    initLightShaders(stateset, -20.0f, 75.0f, 0.4f);
 
     osg::LightModel *lightmodel = new osg::LightModel;
     float power = 0.4f;
@@ -473,7 +473,8 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
 //------------------------------------------------------------------------------
 void RouteViewer::initLightShaders(osg::StateSet *stateset,
                                    float psi,
-                                   float theta)
+                                   float theta,
+                                   float ambient)
 {
     FileSystem &fs = FileSystem::getInstance();
 
@@ -502,4 +503,5 @@ void RouteViewer::initLightShaders(osg::StateSet *stateset,
     pos.normalize();
     stateset->addUniform(new osg::Uniform("tex", 0));
     stateset->addUniform(new osg::Uniform("ecLightDir", pos));
+    stateset->addUniform(new osg::Uniform("lightAmbient", ambient));
 }

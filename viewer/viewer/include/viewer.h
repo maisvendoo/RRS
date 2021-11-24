@@ -84,7 +84,7 @@ protected:
     /// Init display
     bool initDisplay(osgViewer::Viewer *viewer, const settings_t &settings);
 
-    void initLightShaders(osg::StateSet *stateset, float psi, float theta);
+    void initLightShaders(osg::StateSet *stateset, float psi, float theta, float ambient);
 };
 
 #endif // VIEWER_H
