@@ -69,6 +69,9 @@ bool Signaling::init(int dir, const QString &route_dir)
 //------------------------------------------------------------------------------
 alsn_info_t Signaling::getALSN(double coord)
 {
+    if (sections.empty())
+        return alsn_info_t();
+
     alsn_info_t alsn_info;
 
     BlockSection *sec = findSection(coord);
@@ -187,6 +190,9 @@ void Signaling::init_signal_links()
 //------------------------------------------------------------------------------
 BlockSection *Signaling::findSection(double x) const
 {
+    if (sections.size() == 0)
+        return nullptr;
+
     size_t left_idx = 0;
     size_t right_idx = sections.size() - 1;
     size_t idx = (left_idx + right_idx) / 2;
