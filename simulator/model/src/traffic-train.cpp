@@ -3,7 +3,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TrafficTrain::TrafficTrain(QString timetable_file, QObject *parent) : QObject(parent)
+TrafficTrain::TrafficTrain(QString timetable_file, QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+TrafficTrain::~TrafficTrain()
 {
 
 }

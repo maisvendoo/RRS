@@ -2,6 +2,7 @@
 #define     TRAFFIC_MACHINE_H
 
 #include    <QObject>
+#include    <QFile>
 
 #include    "traffic-train.h"
 
@@ -36,6 +37,8 @@ public:
 
     ~TrafficMachine();
 
+    void init(QString route_dir);
+
 private:
 
     /// Массив станций на участке
@@ -43,6 +46,9 @@ private:
 
     /// Поезда, движущиеся по участку
     std::vector<TrafficTrain *> trains;
+
+    /// Разбор файла с данными о станциях
+    void stations_parse(QFile &stations_file);
 };
 
 #endif // TRAFFIC_MACHINE_H

@@ -39,6 +39,8 @@
 
 #include    "signaling.h"
 
+#include    "traffic-machine.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -131,6 +133,9 @@ private:
     /// Система СЦБ
     Signaling *signaling;
 
+    /// Система трафика
+    TrafficMachine  *traffic_machine;
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -173,6 +178,9 @@ private:
 
     /// Инициализация СЦБ
     void initSignaling(const init_data_t &init_data);
+
+    /// Инициализация трафика
+    void initTraffic(const init_data_t &init_data);
 
     /// TCP feedback
     void tcpFeedBack();
