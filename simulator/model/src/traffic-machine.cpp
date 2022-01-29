@@ -94,6 +94,18 @@ void TrafficMachine::load_trains(QDir &timetables_dir)
 
     while (timetable_files.hasNext())
     {
+        QString fullPath = timetable_files.next();
 
+        TrafficTrain *train = new TrafficTrain();
+        train->setStationsList(&stations);
+        train->init(fullPath);
+
+        if (!train->isReady())
+        {
+            delete train;
+            continue;
+        }
+
+        trains.push_back(train);
     }
 }

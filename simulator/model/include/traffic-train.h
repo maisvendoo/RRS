@@ -3,25 +3,7 @@
 
 #include    <QObject>
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-struct waypoint_t
-{
-    int station_id;
-    double dep_time;
-    double arr_time;
-    double ordinate;
-
-    waypoint_t()
-        : station_id(0)
-        , dep_time(0)
-        , arr_time(0)
-        , ordinate(0)
-    {
-
-    }
-};
+#include    "traffic-common-types.h"
 
 //------------------------------------------------------------------------------
 //
@@ -30,13 +12,30 @@ class TrafficTrain : public QObject
 {
 public:
 
-    TrafficTrain(QString timetable_file, QObject *parent = Q_NULLPTR);
+    TrafficTrain(QObject *parent = Q_NULLPTR);
 
     ~TrafficTrain();
 
+    void setStationsList(stations_list_t *stations)
+    {
+        this->stations = stations;
+    }
+
+    void init(QString timetable_file);
+
+    bool isReady() const { return is_ready; }
+
 private:
 
+    stations_list_t *stations;
+
+    bool is_ready;
+
     std::vector<waypoint_t> waypoints;
+
+    void load_waypoints(QString timetable_file);
+
+    double convertTime(QString time);
 };
 
 #endif // TRAFFIC_TRAIN_H

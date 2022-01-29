@@ -6,26 +6,7 @@
 #include    <QFile>
 
 #include    "traffic-train.h"
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-struct station_t
-{
-    QString     name;
-    int         id;
-    double      begin_coord;
-    double      end_coord;
-
-    station_t()
-        : name("")
-        , id(0)
-        , begin_coord(0.0)
-        , end_coord(0.0)
-    {
-
-    }
-};
+#include    "traffic-common-types.h"
 
 //------------------------------------------------------------------------------
 //
@@ -43,7 +24,7 @@ public:
 private:
 
     /// Массив станций на участке
-    std::vector<station_t>   stations;
+    stations_list_t  stations;
 
     /// Поезда, движущиеся по участку
     std::vector<TrafficTrain *> trains;
