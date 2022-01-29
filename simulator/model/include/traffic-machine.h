@@ -2,6 +2,7 @@
 #define     TRAFFIC_MACHINE_H
 
 #include    <QObject>
+#include    <QDir>
 #include    <QFile>
 
 #include    "traffic-train.h"
@@ -37,7 +38,7 @@ public:
 
     ~TrafficMachine();
 
-    void init(QString route_dir);
+    bool init(QString route_dir);
 
 private:
 
@@ -49,6 +50,10 @@ private:
 
     /// Разбор файла с данными о станциях
     void stations_parse(QFile &stations_file);
+
+    /// Загрузка поездов, согласно графикам их движения
+    /// в каталоге timetables с маршрутом
+    void load_trains(QDir &timetables_dir);
 };
 
 #endif // TRAFFIC_MACHINE_H

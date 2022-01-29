@@ -518,7 +518,12 @@ void Model::initSignaling(const init_data_t &init_data)
 void Model::initTraffic(const init_data_t &init_data)
 {
     traffic_machine = new TrafficMachine();
-    traffic_machine->init(init_data.route_dir);
+
+    if (!traffic_machine->init(init_data.route_dir))
+    {
+        Journal::instance()->error("Failed traffic initialization in route" +
+                                   init_data.route_dir);
+    }
 }
 
 //------------------------------------------------------------------------------

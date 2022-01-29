@@ -1,6 +1,6 @@
 #include    "traffic-machine.h"
 
-#include    <QDir>
+#include    <QDirIterator>
 
 //------------------------------------------------------------------------------
 //
@@ -21,7 +21,7 @@ TrafficMachine::~TrafficMachine()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficMachine::init(QString route_dir)
+bool TrafficMachine::init(QString route_dir)
 {
     QString path = QDir::toNativeSeparators(route_dir) +
             QDir::separator() + "stations.conf";
@@ -30,10 +30,33 @@ void TrafficMachine::init(QString route_dir)
 
     if (!stations_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        return;
+        return false;
     }
 
     stations_parse(stations_file);
+
+    if (stations.empty())
+    {
+        return false;
+    }
+
+    QDir timetables_dir(QDir::toNativeSeparators(route_dir) +
+                        QDir::separator() +
+                        "timetables");
+
+    if (!timetables_dir.exists())
+    {
+        return false;
+    }
+
+    load_trains(timetables_dir);
+
+    if (trains.empty())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -57,5 +80,20 @@ void TrafficMachine::stations_parse(QFile &stations_file)
         station.id = stations.size() + 1;
 
         stations.push_back(station);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficMachine::load_trains(QDir &timetables_dir)
+{
+    QDirIterator timetable_files(timetables_dir.path(),
+                                 QStringList() << "*.xml",
+                                 QDir::NoDotAndDotDot | QDir::Files);
+
+    while (timetable_files.hasNext())
+    {
+
     }
 }
