@@ -110,6 +110,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     QIcon icon(":/images/images/RRS_logo.png");
     setWindowIcon(icon);
+
+    showFullScreen();
 }
 
 //------------------------------------------------------------------------------
@@ -722,4 +724,12 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
     CfgEditor editor;
 
     editor.editFile(settings_path, "Viewer", fd_list);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::closeEvent(QCloseEvent *)
+{
+    simulatorProc.kill();
 }

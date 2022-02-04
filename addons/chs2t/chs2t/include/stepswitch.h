@@ -63,6 +63,7 @@ private:
     double poz_d;
 
     int poz;
+    int poz_old;
 
     int fieldStep;
     int reverseState;

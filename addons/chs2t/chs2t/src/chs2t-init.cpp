@@ -376,6 +376,8 @@ void CHS2T::initSounds()
     connect(blindsSwitcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
 
     connect(bv, &CHS2TFastSwitch::soundPlay, this, &CHS2T::soundPlay);
+
+    connect(stepSwitch, &StepSwitch::soundPlay, this, &CHS2T::soundPlay);
 }
 
 

@@ -129,6 +129,8 @@ private:
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
 
+    void closeEvent(QCloseEvent *);
+
 private slots:
 
     void onRouteSelection();
