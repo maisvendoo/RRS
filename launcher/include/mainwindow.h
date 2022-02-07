@@ -88,6 +88,8 @@ private:
 
     QString settings_path;
 
+    bool btnStartState; // 0 - stoped, 1 - started
+
     /// Launcer initialization
     void init();
 
@@ -126,6 +128,8 @@ private:
 
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
+
+    void closeEvent(QCloseEvent *);
 
 private slots:
 

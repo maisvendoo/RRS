@@ -1,14 +1,55 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
+
     <DiscreteInput>
 	<Address>0</Address>
 	<Index>38</Index>
     </DiscreteInput>
 
+
     <HoldingRegister>
 	<Address>0</Address>
 	<Index>57</Index>
     </HoldingRegister>
+
+    <HoldingRegister>
+	<Address>1</Address>
+	<Index>58</Index>
+    </HoldingRegister>
+
+    <HoldingRegister>
+	<Address>2</Address>
+	<Index>59</Index>
+    </HoldingRegister>
+    
+    <Coil>
+	<Address>0</Address>
+	<Index>993</Index>
+    </Coil>
+    
+    <Coil>
+	<Address>1</Address>
+	<Index>992</Index>
+    </Coil>
+    
+    <Coil>
+	<Address>2</Address>
+	<Index>991</Index>
+    </Coil>
+    
+    <Coil>
+	<Address>3</Address>
+	<Index>990</Index>
+    </Coil>
+    
+    <Coil>
+	<!--<Address>16</Address>-->
+	<Address>4</Address>
+	<Index>60</Index>
+    </Coil>
+    
+    
+    
     
 </Config>

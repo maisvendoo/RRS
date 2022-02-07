@@ -40,6 +40,7 @@ Model::Model(QObject *parent) : QObject(parent)
   , profile(nullptr)
   , server(nullptr)
   , control_panel(nullptr)
+  , msgCount_(0)
 {
     shared_memory.setKey("sim");
 
@@ -81,6 +82,8 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Read solver configuration
     Journal::instance()->info("==== Solver configurating ====");
     configSolver(init_data.solver_config);
+
+    init_data_for_udp = init_data;
 
     start_time = init_data.solver_config.start_time;
     stop_time = init_data.solver_config.stop_time;
@@ -133,6 +136,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initSimClient("virtual-railway");
 
+    initUdpServer("../cfg/udp-connection.xml");
+
     Journal::instance()->info("Train is initialized successfully");
 
     return true;
@@ -176,6 +181,25 @@ void Model::outMessage(QString msg)
 void Model::controlProcess()
 {
     control_panel->process();
+}
+
+void Model::udpDataUpdate()
+{
+    udp_server_data_t udp_data;
+
+    udp_data.time = static_cast<float>(t);
+    ++msgCount_;
+    udp_data.msgCount = msgCount_;
+    udp_data.vehicleCount = 1;
+    udp_data.routeDir = init_data_for_udp.route_dir;
+
+    udp_data.vehicles[0].coord = static_cast<float>(train->getVehicles()->at(0)->getRailwayCoord());
+//    udp_data.vehicles[0].velocity = 100.f;
+    udp_data.vehicles[0].direction =init_data_for_udp.direction;
+//    udp_data.vehicle
+
+
+    udps->setServerData(udp_data);
 }
 
 //------------------------------------------------------------------------------
@@ -482,6 +506,16 @@ void Model::initSimClient(QString cfg_path)
     }
 }
 
+void Model::initUdpServer(QString cfg_path)
+{
+    udps = new UdpServer();
+    udps->init(cfg_path);
+
+    udpTimer.setInterval(100);
+    connect(&udpTimer, &QTimer::timeout, this, &Model::udpDataUpdate);
+    udpTimer.start();
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -522,6 +556,18 @@ void Model::tcpFeedBack()
 
     emit sendDataToTrain(server->getReceivedData());*/
 }
+
+//void Model::udpFeedBack()
+//{
+//    if (udp_server == Q_NULLPTR)
+//        return;
+
+//    if (!udp_server->isConnected())
+//        return;
+
+//    udp_server_data_t server_data;
+
+//}
 
 //------------------------------------------------------------------------------
 //

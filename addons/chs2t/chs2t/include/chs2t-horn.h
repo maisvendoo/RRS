@@ -12,11 +12,9 @@ public:
 
     ~CHS2tHorn();
 
-private:
+private:    
 
-    bool lock;
-
-    void preStep(state_vector_t &Y, double t);
+    void stepExternalControl(double t, double dt) override;
 };
 
 #endif // CHS2T_HORN_H

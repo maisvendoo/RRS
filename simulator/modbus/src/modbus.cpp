@@ -2,6 +2,8 @@
 
 #include    "slave-data.h"
 
+#include    <QDebug>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -126,7 +128,10 @@ void Modbus::feedbackSignalsProcess()
         }        
 
         if (is_changed)
+        {
+            qDebug() << feedback_signals.analogSignal[29].cur_value;
             master->writeHoldingRegisters(slave);
+        }
     }
 }
 

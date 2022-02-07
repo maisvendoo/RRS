@@ -62,14 +62,13 @@ void CHS2T::stepFastSwitch(double t, double dt)
 
     bv->setU_in(U_kr);
 
+    // Включаем БВ исключительно на 0 позиции ПБК
     bv->setState(fast_switch_trigger.getState());
     bv->step(t, dt);
 
     if (fastSwitchSw->getState() == 3)
     {
         fast_switch_trigger.set();
-        if (!bv_return)
-            emit soundPlay("BV-on");
         bv_return = true;
     }
 
@@ -107,6 +106,11 @@ void CHS2T::stepTractionControl(double t, double dt)
     stepSwitch->setCtrlState(km21KR2->getCtrlState());
     stepSwitch->setControl(keys);
     stepSwitch->setDropPositionsWithZ(handleEDT->getDropPositions());
+
+    bool ast = autoTrainStop->getState();
+
+    stepSwitch->setUpUnlock( (pTM >= 0.3) && ast);
+
     stepSwitch->step(t, dt);
 
     puskRez->setPoz(stepSwitch->getPoz());
@@ -176,6 +180,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepBrakesControl(double t, double dt)
 {
+
     brakeCrane->setChargePressure(charging_press);
     brakeCrane->setFeedLinePressure(mainReservoir->getPressure());
     brakeCrane->setBrakePipePressure(pTM);
@@ -275,6 +280,14 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
     autoTrainStop->setBrakepipePressure(pTM);
     autoTrainStop->setControl(keys);
+
+    if (static_cast<bool>(control_signals.analogSignal[999].cur_value))
+    {
+        autoTrainStop->keyOn(static_cast<bool>(control_signals.analogSignal[KEY_EPK].cur_value));
+    }
+
+    autoTrainStop->powerOn(alsn->getSafetyState() && kpd3->getSafetyRelayState());
+
     autoTrainStop->step(t, dt);
 
     auxRate = autoTrainStop->getEmergencyBrakeRate() + airDistr->getAuxRate();
@@ -352,7 +365,16 @@ bool CHS2T::getHoldingCoilState() const
 {
     bool no_overload = (!static_cast<bool>(overload_relay->getState()));
 
-    return no_overload;
+    bool bv_off_button = true;
+
+    if (control_signals.analogSignal[BV_OFF].is_active)
+    {
+        bv_off_button = static_cast<bool>(control_signals.analogSignal[BV_OFF].cur_value);
+    }
+
+    bool is_allow_on = !bv->getState() || stepSwitch->isZero();
+
+    return no_overload && bv_off_button && is_allow_on;
 }
 
 //------------------------------------------------------------------------------
@@ -366,4 +388,18 @@ void CHS2T::stepTapSound()
     {
         emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
     }
+}
+
+void CHS2T::stepOtherEquipment(double t, double dt)
+{
+    alsn->setAlsnCode(alsn_info.code_alsn);
+    alsn->setEPKstate(autoTrainStop->getState());
+    alsn->setControl(keys, control_signals);
+    alsn->step(t, dt);
+
+    kpd3->setWheelDiameter(wheel_diameter);
+    kpd3->setOmega(wheel_omega[0]);
+    kpd3->setCodeALSN(alsn_info.code_alsn);
+    kpd3->setControl(keys, control_signals);
+    kpd3->step(t, dt);
 }

@@ -3,12 +3,12 @@
 
     <HoldingRegister>
         <Address>0</Address>
-        <Index>0</Index>
+        <Index>994</Index>
     </HoldingRegister>
 
     <HoldingRegister>
         <Address>1</Address>
-        <Index>1</Index>
+        <Index>995</Index>
     </HoldingRegister>
 
     <!-- Манометр ТМ -->
@@ -40,5 +40,55 @@
         <Address>6</Address>
         <Index>4</Index>
     </HoldingRegister>
+
+
+
+    <!-- РБ -->
+    <DiscreteInput>
+	<Address>1</Address>
+	<Index>44</Index>
+    </DiscreteInput>
+
+    <!-- ЭПК -->    
+    <DiscreteInput>
+	<Address>4</Address>
+	<Index>45</Index>
+    </DiscreteInput>
+
+
+    <!-- Педали -->
+    <!-- Песок -->
+    <DiscreteInput>
+	<Address>5</Address>
+	<Index>43</Index>
+    </DiscreteInput>
+
+    <!-- Свисток -->
+    <DiscreteInput>
+	<Address>6</Address>
+	<Index>42</Index>
+    </DiscreteInput>
+
+    <!-- Тифон -->
+    <DiscreteInput>
+	<Address>7</Address>
+	<Index>41</Index>
+    </DiscreteInput>
+    
+    
+    
+    
+    <!-- Подсветка -->
+    <Coil>
+	<Address>3</Address>
+	<Index>61</Index>
+    </Coil>
+
+    <!-- Плафон -->
+    <Coil>
+	<Address>2</Address>
+	<Index>62</Index>
+    </Coil>
+
 
 </Config>

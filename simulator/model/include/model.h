@@ -37,6 +37,8 @@
 
 #include    "sim-client.h"
 
+#include    "udp-server.h"
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -76,6 +78,8 @@ signals:
 
     void getRecvData(sim_dispatcher_data_t &disp_data);
 
+//    void getUdpRecvData(udp_server_data_t &server_data);
+
 public slots:
 
     /// Messages output
@@ -83,6 +87,8 @@ public slots:
 
     ///
     void controlProcess();
+
+    void udpDataUpdate();
 
     /// Обмен данными с ВЖД
     void virtualRailwayFeedback();
@@ -126,6 +132,10 @@ private:
     /// Клиент для связи с ВЖД
     SimTcpClient *sim_client;
 
+    ///
+    UdpServer *udps;
+    int msgCount_;
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -139,9 +149,16 @@ private:
     QByteArray      data;
 
     QTimer          controlTimer;
+    QTimer          udpTimer;
     QTimer          networkTimer;
 
-    ElapsedTimer    simTimer;       
+    ElapsedTimer    simTimer;
+
+    udp_server_data_t server_data;
+
+    init_data_t init_data_for_udp;
+
+
 
     /// Actions, which prerare integration step
     void preStep(double t);
@@ -166,9 +183,13 @@ private:
 
     void initSimClient(QString cfg_path);
 
+    void initUdpServer(QString cfg_path);
+
     /// TCP feedback
     void tcpFeedBack();
 
+//    /// UDP feedback
+//    void udpFeedBack();
 
     /// Shered memory feedback
     void sharedMemoryFeedback();

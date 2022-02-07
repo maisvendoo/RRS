@@ -92,4 +92,15 @@
         <Index>26</Index>
     </Coil>
 
+
+    <DiscreteInput>
+	<Address>8</Address>
+	<Index>39</Index>
+    </DiscreteInput>
+    
+    <DiscreteInput>
+	<Address>9</Address>
+	<Index>40</Index>
+    </DiscreteInput>
+
 </Config>

@@ -1,0 +1,7 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<Config>
+    <DiscreteInput>
+	<Address>0</Address>
+	<Index>38</Index>
+    </DiscreteInput>
+</Config>

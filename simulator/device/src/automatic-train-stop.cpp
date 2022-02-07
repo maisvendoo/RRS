@@ -10,6 +10,7 @@ AutoTrainStop::AutoTrainStop(QObject *parent) : BrakeDevice(parent)
   , is_key_on(0.0)
   , pFL(0.0)
   , pTM(0.0)
+  , state(false)
 {
 
 }
@@ -60,6 +61,11 @@ void AutoTrainStop::setBrakepipePressure(double pTM)
 double AutoTrainStop::getEmergencyBrakeRate() const
 {
     return 0.0;
+}
+
+bool AutoTrainStop::getState()
+{
+    return state;
 }
 
 //------------------------------------------------------------------------------
