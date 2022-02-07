@@ -26,6 +26,8 @@ struct alsn_info_t
     char    current_time[9];
     char    signal_name[23];
     double  signal_dist;
+    int     power_type;
+    float   voltage;
 
 
     alsn_info_t()
@@ -35,6 +37,8 @@ struct alsn_info_t
         , current_time("00:00:00")
         , signal_name("")
         , signal_dist(0.0)
+        , power_type(0)
+        , voltage(0.0)
     {
 
     }
