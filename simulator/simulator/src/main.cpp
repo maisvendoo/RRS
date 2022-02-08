@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     init_journal();
     register_handlers();
 
+
     AppCore app(argc, argv);
 
     if (!app.init())

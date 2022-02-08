@@ -3,12 +3,12 @@
 
     <HoldingRegister>
         <Address>0</Address>
-        <Index>0</Index>
+        <Index>63</Index>
     </HoldingRegister>
 
     <HoldingRegister>
         <Address>1</Address>
-        <Index>1</Index>
+        <Index>64</Index>
     </HoldingRegister>
 
     <!-- Указатель позиций -->

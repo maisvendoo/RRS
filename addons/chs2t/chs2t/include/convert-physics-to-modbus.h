@@ -14,7 +14,7 @@ public:
 
     ~PhysToModbus();
 
-    double getModbus(double physValue) { return interpolate(physValue); }
+    double getModbus(double physValue);
 
     void load(const std::string &path);
 
@@ -41,7 +41,7 @@ private:
 
     double  interpolate(double physValue);
 
-    double calculateModbus(double physValue);
+//    double calculateModbus(double physValue);
 };
 
 #endif // CONVERTPHYSICSTOMODBUS_H

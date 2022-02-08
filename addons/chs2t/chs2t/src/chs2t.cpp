@@ -30,13 +30,15 @@ CHS2T::CHS2T() : Vehicle()
 
     tracForce_kN = 0;
     bv_return = false;
-    Uks = 4000;
+    Uks = 3000;
 
     U_kr = 0;
 
     EDT = false;    
 
     dropPosition = false;
+
+
 }
 
 //------------------------------------------------------------------------------
@@ -98,6 +100,15 @@ void CHS2T::initialization()
     for (size_t i = SWP2_POWER_1; i <= SWP2_POWER_10; ++i)
         feedback_signals.analogSignal[i].cur_value = 1;
 
+//    velocity = 0;
+
+//    feedback_signals.analogSignal[KPD3_RESET].cur_value = 1.0f;
+
+//    kpd3_reset = new Timer(0.5, false);
+//    connect(kpd3_reset, &Timer::process, this, &CHS2T::slotKpd3Reset);
+    feedback_signals.analogSignal[KPD3_RESET].cur_value = 1.0f;
+    //kpd3_reset->start();
+
     hardwareOutput();
 }
 
@@ -156,6 +167,8 @@ void CHS2T::step(double t, double dt)
 
     stepTapSound();
 
+    stepOtherEquipment(t, dt);
+
     //registrate(t, dt);
 
     //Journal::instance()->info("Step horn");
@@ -166,6 +179,21 @@ void CHS2T::step(double t, double dt)
     speed_meter->setOmega(wheel_omega[0]);
     speed_meter->setWheelDiameter(wheel_diameter);
     speed_meter->step(t, dt);
+
+    //kpd3_reset->step(t, dt);
+
+    /*if (static_cast<bool>(control_signals.analogSignal[KPD3_READY].cur_value))
+    {
+        //feedback_signals.analogSignal[KPD3_RESET].cur_value = 0.0f;
+        //kpd3_reset->stop();
+    }*/
+
+    feedback_signals.analogSignal[POS_RESET2].cur_value = 1.0f;
+}
+
+void CHS2T::slotKpd3Reset()
+{
+
 }
 
 
@@ -247,7 +275,34 @@ void CHS2T::hardwareOutput()
     feedback_signals.analogSignal[998].cur_value = 1.0f;
     feedback_signals.analogSignal[997].cur_value = 1.0f;
 
-    feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = KPD3_Velocity->getModbus(velocity * 3.6);
+
+    feedback_signals.analogSignal[KPD3_STRELKA].cur_value = KPD3_Velocity->getModbus(kpd3->getVelocityKmh());
+    feedback_signals.analogSignal[KPD3_VELOCITY].cur_value = static_cast<float>(kpd3->getVelocityKmh());
+    feedback_signals.analogSignal[KPD3_TARGET_DISTANCE].cur_value = alsn_info.signal_dist;
+
+    switch (static_cast<int>(control_signals.analogSignal[SWP2_CAB_LIGHT].cur_value))
+    {
+    case 1:
+    case 2:
+        {
+            feedback_signals.analogSignal[PODSVETKA].cur_value = 1.0f;
+            feedback_signals.analogSignal[PLAFON].cur_value = 0.0f;
+            break;
+        }
+    case 3:
+        {
+            feedback_signals.analogSignal[PODSVETKA].cur_value = 0.0f;
+            feedback_signals.analogSignal[PLAFON].cur_value = 0.0f;
+            break;
+        }
+
+    case 4:
+        {
+            feedback_signals.analogSignal[PODSVETKA].cur_value = 0.0f;
+            feedback_signals.analogSignal[PLAFON].cur_value = 1.0f;
+            break;
+        }
+    }
 }
 
 GET_VEHICLE(CHS2T)

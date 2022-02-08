@@ -7,9 +7,12 @@ StepSwitch::StepSwitch(QObject* parent) : Device(parent)
   , V(0.0)
   , poz_d(0.0)
   , poz(0)
+  , poz_old(poz)
 
   , fieldStep(0)
   , reverseState(0)
+
+  , up_unlock(false)
 
   , up(false)
   , up1(false)
@@ -87,8 +90,8 @@ void StepSwitch::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
 
-    up = (ctrlState.k21 && ctrlState.k23);
-    up1 = (!ctrlState.k21 && ctrlState.k23);
+    up = (ctrlState.k21 && ctrlState.k23) && up_unlock;
+    up1 = (!ctrlState.k21 && ctrlState.k23) && up_unlock;
     zero = (ctrlState.k22 && !ctrlState.k23);
     down1 = (!ctrlState.k21 && !ctrlState.k22);
     down = (ctrlState.k21 && !ctrlState.k22);
@@ -148,6 +151,12 @@ void StepSwitch::stepDiscrete(double t, double dt)
                     (1 * (ctrlState.k01 && !ctrlState.k02));
 
     poz = static_cast<int>(poz_d);
+
+    if (poz != poz_old)
+    {
+        emit soundPlay("PK");
+        poz_old = poz;
+    }
 }
 
 void StepSwitch::changeOnePosition(int dir)
@@ -156,6 +165,6 @@ void StepSwitch::changeOnePosition(int dir)
     {
         poz_d += dir;
         poz_d = cut(poz_d, 0.0, static_cast<double>(MPOS_P));
-        ableToChangeOnePosition = false;
+        ableToChangeOnePosition = false;        
     }
 }

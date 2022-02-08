@@ -53,7 +53,17 @@ enum ControllerSignals
 
     LOCO_CRANE = 37,
 
-    KPD3_READY = 38
+    KPD3_READY = 38,
+
+    RBP_BUTTON = 39,
+    BV_OFF = 40,
+
+    TIFON_PEDAL = 41,
+    SVISTOK_PEDAL = 42,
+    SAND_PEDAL = 43,
+
+    RB1 = 44,
+    KEY_EPK = 45
 };
 
 enum FeedbackSignals
@@ -126,7 +136,17 @@ enum FeedbackSignals
 
     IND_BV = 56,
 
-    KPD3_VELOCITY = 57
+    KPD3_STRELKA = 57,
+    KPD3_VELOCITY = 58,
+    KPD3_TARGET_DISTANCE = 59,
+    KPD3_RESET = 60,
+
+    PODSVETKA = 61,
+    PLAFON = 62,
+
+    POS_RESET1 = 63,
+    POS_RESET2 = 64
+
 };
 
 #endif // HARDWARESIGNALS_H

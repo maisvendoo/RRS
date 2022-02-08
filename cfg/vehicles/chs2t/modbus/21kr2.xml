@@ -1,7 +1,7 @@
 <?xml version = "1.0" encoding="UTF-8"?>
 <Config>
 
-	<!-- Контакт К01 -->
+	<!--Сигнал готовности -->
 	<DiscreteInput>
 		<Address>0</Address>
 		<Index>0</Index>		

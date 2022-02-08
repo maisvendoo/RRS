@@ -49,7 +49,7 @@ void CHS2T::initFastSwitch()
 {
     Journal::instance()->info("Init fast switch");
 
-    bv = new ProtectiveDevice();
+    bv = new CHS2TFastSwitch();
     bv->read_custom_config(config_dir + QDir::separator() + "bv");
 
     fastSwitchSw = new CHS2TSwitcher(Q_NULLPTR, KEY_P, 4);
@@ -197,6 +197,9 @@ void CHS2T::initOtherEquipment()
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
 
+    alsn = new ALSN();
+
+    kpd3 = new KPD3();
 }
 
 //------------------------------------------------------------------------------
@@ -371,6 +374,10 @@ void CHS2T::initSounds()
 
     blindsSwitcher->setSoundName("tumbler");
     connect(blindsSwitcher, &Switcher::soundPlay, this, &CHS2T::soundPlay);
+
+    connect(bv, &CHS2TFastSwitch::soundPlay, this, &CHS2T::soundPlay);
+
+    connect(stepSwitch, &StepSwitch::soundPlay, this, &CHS2T::soundPlay);
 }
 
 

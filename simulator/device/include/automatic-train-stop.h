@@ -24,6 +24,13 @@ public:
 
     virtual double getEmergencyBrakeRate() const;
 
+    bool getState();
+
+    bool getStateKey() const
+    {
+        return static_cast<bool>(is_key_on);
+    }
+
 protected:
 
     double is_powered;
@@ -33,6 +40,8 @@ protected:
     double pFL;
 
     double pTM;
+
+    bool state;
 };
 
 //------------------------------------------------------------------------------

@@ -16,6 +16,7 @@
 #include    "vehicle-api.h"
 #include    "pantograph.h"
 #include    "protective-device.h"
+#include    "chs2t-fast-switch.h"
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
@@ -41,6 +42,9 @@
 #include    "sl2m.h"
 #include    "energy-counter.h"
 #include    "chs2t-switcher.h"
+#include    "chs2t-autostop.h"
+#include    "alsn.h"
+#include    "kpd3.h"
 
 /*!
  * \class
@@ -77,7 +81,7 @@ private:
     std::array<Pantograph *, NUM_PANTOGRAPHS>    pantographs;
 
     /// Быстрый выключатель
-    ProtectiveDevice *bv;
+    CHS2TFastSwitch *bv;
 
     /// Пусковой резистор
     PuskRez *puskRez;
@@ -259,6 +263,15 @@ private:
     /// Счетчик энергии
     EnergyCounter *energy_counter;
 
+    /// АЛСН
+    ALSN    *alsn;
+
+    /// Скоростемер КПД3
+    KPD3    *kpd3;
+
+    /// Таймер сброса скоростемера
+    Timer   *kpd3_reset;
+
     /// Инициадизация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -366,6 +379,8 @@ private:
 
     void stepDecodeAlsn();
 
+    void stepOtherEquipment(double t, double dt);
+
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
 
@@ -378,6 +393,8 @@ private slots:
         EDT = allowEDT = true;
         EDT_timer.stop();
     }
+
+    void slotKpd3Reset();
 };
 
 #endif // CHS2TOO

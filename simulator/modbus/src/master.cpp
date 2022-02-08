@@ -257,7 +257,7 @@ void Master::writeCoils(Slave *slave)
     {
         if (!reply->isFinished())
         {
-            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited, Qt::QueuedConnection);
 
             connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
         }
@@ -289,7 +289,7 @@ void Master::writeCoil(Slave* slave, slave_data_t coil)
     {
         if (!reply->isFinished())
         {
-            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited, Qt::QueuedConnection);
 
             connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
         }
@@ -326,7 +326,7 @@ void Master::writeHoldingRegisters(Slave *slave)
     {
         if (!reply->isFinished())
         {
-            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited, Qt::QueuedConnection);
 
             connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
         }
@@ -356,7 +356,7 @@ void Master::writeHoldingRegister(Slave *slave, slave_data_t hreg)
     {
         if (!reply->isFinished())
         {
-            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited);
+            connect(reply, &QModbusReply::finished, slave, &Slave::slotWrited, Qt::QueuedConnection);
 
             connect(reply, &QModbusReply::errorOccurred, this, &Master::slotErrorModbus);
         }

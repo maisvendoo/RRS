@@ -48,10 +48,10 @@ void PressureRegulator::preStep(state_vector_t &Y, double t)
     if (p_cur > p_max)
         state = 0.0;
 
-    if ( (p_cur >= p_min) && (p_cur <= p_max) )
+    /*if ( (p_cur >= p_min) && (p_cur <= p_max) )
     {
         state = hs_p(dp);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------

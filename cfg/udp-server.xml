@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <UdpServer>
+        <HostAddr>127.0.0.1</HostAddr>
+        <Port>1994</Port>
+    </UdpServer>
+</Config>

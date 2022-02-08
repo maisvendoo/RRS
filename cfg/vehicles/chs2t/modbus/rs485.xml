@@ -3,7 +3,7 @@
     <SerialPort>
         <!-- <Name>/dev/rs485</Name> -->
         <Name>/dev/rs485</Name>
-        <Baudrate>115200</Baudrate>        
+        <Baudrate>250000</Baudrate>        
         <DataBits>8</DataBits>
         <StopBits>1</StopBits>
         <Parity>0</Parity>
