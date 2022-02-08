@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 void CHS2T::stepPantographs(double t, double dt)
 {
+    Uks = max(static_cast<float>(WIRE_VOLTAGE), alsn_info.voltage);
+
     // Управление разъединителями токоприемников
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
@@ -26,7 +28,7 @@ void CHS2T::stepPantographs(double t, double dt)
 
         // Подъем/опускание ТП
         pantographs[i]->setState(pant_switch[i].getState() && pantup_trigger[i].getState());
-
+        pantographs[i]->setUks(Uks);
         pantographs[i]->step(t, dt);
     }
 }

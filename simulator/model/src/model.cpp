@@ -589,12 +589,15 @@ void Model::virtualRailwayFeedback()
     alsn_info.response_code = disp_data.response_code;
     alsn_info.signal_dist = disp_data.signal_dist;
     strcpy(alsn_info.current_time, disp_data.current_time);
+    alsn_info.power_type = disp_data.power_type;
+    alsn_info.voltage = disp_data.voltage;
 
     train->getFirstVehicle()->setASLN(alsn_info);
 
     sim_train_data_t train_data;
     strcpy(train_data.train_id, train->getTrainID().toStdString().c_str());
     train_data.direction = train->getDirection();
+    train_data.trainLength = train->getLength();
     train_data.coord = train->getFirstVehicle()->getRailwayCoord();
     train_data.speed = train->getFirstVehicle()->getVelocity();
 
