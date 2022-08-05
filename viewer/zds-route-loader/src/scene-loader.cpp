@@ -159,6 +159,9 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
             continue;
 
         object.name = tokens[0];
+        // Обрезка имени объекта до 20 сомволов (привет Славе Усову!)
+        object.name = object.name.substr(0, 20);
+
         object.model_path = tokens[1];
         object.texture_path = tokens[2];
 
