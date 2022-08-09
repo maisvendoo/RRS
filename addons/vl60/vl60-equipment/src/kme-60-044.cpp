@@ -76,7 +76,7 @@ void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
 
     state.revers_ref_state = cut(revers_pos - 1, -1, 1);
 
-    state.field_loosen_pos = pf(revers_pos - 1);
+    state.field_loosen_pos = pf(revers_pos - 2);
 
     if (main_pos < POS_ZERO)
         main_handle_pos = static_cast<float>(main_pos - 2) / 2.0f;
@@ -87,6 +87,8 @@ void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
         revers_handle_pos = static_cast<float>(revers_pos - 2);
     else
         revers_handle_pos = static_cast<float>(revers_pos - 1) / 4.0f;
+//    DebugMsg = QString(" field-loosen-pos: %1")
+//            .arg(state.field_loosen_pos);
 }
 
 //------------------------------------------------------------------------------
