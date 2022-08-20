@@ -87,7 +87,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             moveCamera(viewer);
 
             break;
-        }    
+        }
 
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
@@ -251,6 +251,16 @@ void TrainExteriorHandler::load(const std::string &train_config)
             // Read vehicles number
             getValue(count_node->contents, count);
 
+            bool isForward = true;
+
+            osgDB::XmlNode *orient_node = cfg.findSection(child, "IsOrientationForward");
+
+            // Read vehicles orientation
+            if (count_node != nullptr)
+            {
+                getValue(orient_node->contents, isForward);
+            }
+
             std::string module_config_name = "";
 
             osgDB::XmlNode *module_config_node = cfg.findSection(child, "ModuleConfig");
@@ -262,7 +272,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
             }
 
             // Load vehicle body model
-            getValue(module_config_node->contents, module_config_name);            
+            getValue(module_config_node->contents, module_config_name);
 
             for (int i = 0; i < count; ++i)
             {
@@ -284,10 +294,14 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
                 vehicle_exterior_t vehicle_ext;
                 vehicle_ext.transform = new osg::MatrixTransform;
-                vehicle_ext.transform->addChild(vehicle_model.get());                
+                vehicle_ext.transform->addChild(vehicle_model.get());
                 vehicle_ext.length = length;
                 vehicle_ext.cabine = cabine;
                 vehicle_ext.driver_pos = driver_pos;
+                if (isForward)
+                    vehicle_ext.orientation = 1;
+                else
+                    vehicle_ext.orientation = -1;
 
                 vehicle_ext.anims = new animations_t();
                 vehicle_ext.displays = new displays_t();
@@ -316,7 +330,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
 void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 {
     if (nd.sd.size() < 2)
-        return;    
+        return;
 
     // Time to relative units conversion
     float Delta_t = static_cast<float>(settings.request_interval) / 1000.0f;
@@ -331,7 +345,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
 
-        if (settings.direction == -1)
+        if ((settings.direction * vehicles_ext[i].orientation) == -1)
             vehicles_ext[i].attitude.z() = osg::PIf + vehicles_ext[i].attitude.z();
 
         // Store current railway coordinate and wheels angle
@@ -352,15 +366,15 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         {
             ProcAnimation *animation = it.value();
             animation->setPosition(nd.sd.back().te[i].analogSignal[animation->getSignalID()]);
-        }        
-    }    
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::processSharedData(double &ref_time)
-{    
+{
     if (ref_time < static_cast<double>(settings.request_interval) / 1000.0)
         return;
 
@@ -477,7 +491,7 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
     AnimTransformVisitor atv(&animations, vehicle_name);
     atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
-    cabine->accept(atv);    
+    cabine->accept(atv);
 }
 
 //------------------------------------------------------------------------------

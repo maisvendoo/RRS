@@ -405,6 +405,19 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                 Journal::instance()->warning("Count of vehicles " + module_name + " is not found. Vehicle will't loaded");
             }
 
+            // Orientation of vehicles group
+            bool isForward = true;
+            if (!cfg.getBool(vehicle_node, "IsOrientationForward", isForward))
+            {
+                isForward = true;
+                Journal::instance()->warning("Orientations of vehicles " + module_name + " is not found.");
+            }
+            int orient;
+            if (isForward)
+                orient = 1;
+            else
+                orient = -1;
+
             // Payload coefficient of vehicles group
             double payload_coeff = 0;
             if (!cfg.getDouble(vehicle_node, "PayloadCoeff", payload_coeff))
@@ -436,6 +449,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                 vehicle->setRouteDir(init_data.route_dir);
                 vehicle->setPayloadCoeff(payload_coeff);
                 vehicle->setDirection(dir);
+                vehicle->setOrientation(orient);
                 vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
 
                 trainMass += vehicle->getMass();

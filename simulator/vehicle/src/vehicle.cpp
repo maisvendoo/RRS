@@ -130,6 +130,14 @@ void Vehicle::setDirection(int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::setOrientation(int orient)
+{
+    this->orient = orient;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::setForwardForce(double R1)
 {
     this->R1 = R1;
@@ -637,7 +645,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         rk = wheel_diameter / 2.0;
 
         int tmp = 0;
-        cfg.getInt(secName, "NumAxis", tmp);        
+        cfg.getInt(secName, "NumAxis", tmp);
 
         num_axis = static_cast<size_t>(tmp);
         wheel_rotation_angle.resize(num_axis);

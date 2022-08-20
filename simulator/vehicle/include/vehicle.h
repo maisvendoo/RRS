@@ -65,6 +65,9 @@ public:
     /// Set direction
     void setDirection(int dir);
 
+    /// Set orientation
+    void setOrientation(int orient);
+
     /// Set forward coupling force
     void setForwardForce(double R1);
 
@@ -157,7 +160,7 @@ public:
 
     void setUks(double value);
 
-    void setCurrentKind(int value);    
+    void setCurrentKind(int value);
 
     void setEPTControl(size_t i, double value);
 
@@ -178,7 +181,7 @@ public:
     void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
 
 public slots:
-    
+
     void receiveData(QByteArray data);
 
     void getControlSignals(control_signals_t control_signals);
@@ -260,6 +263,8 @@ protected:
 
     /// Railway motion direction
     int     dir;
+    /// Vehicle orientation
+    int     orient;
 
     /// Pressure in begin of brakepipe
     double p0;
@@ -295,7 +300,7 @@ protected:
 
     /// Keyboard state
     QMap<int, bool> keys;
-    QMutex          keys_mutex;    
+    QMutex          keys_mutex;
 
     /// Discrete signals for outpput
     std::array<bool, MAX_DISCRETE_SIGNALS>  discreteSignal;
