@@ -346,7 +346,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
 
         if ((settings.direction * vehicles_ext[i].orientation) == -1)
-            vehicles_ext[i].attitude.z() = osg::PIf + vehicles_ext[i].attitude.z();
+            vehicles_ext[i].attitude.z() += osg::PIf;
 
         // Store current railway coordinate and wheels angle
         vehicles_ext[i].coord = coord;
@@ -440,6 +440,10 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::recalcAttitude(size_t i)
 {
+    // Attitude.z from -PI to +PI
+    while (abs(vehicles_ext[i].attitude.z()) > osg::PIf)
+        vehicles_ext[i].attitude.z() -= 2.0f * osg::PIf * sign(vehicles_ext[i].attitude.z());
+
     // Don't recalculate from head vehicle
     if (i == 0)
         return;
@@ -453,7 +457,7 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     osg::Vec3 prev_att = prev.attitude;
     float pitch = prev_att.x();
     float yaw = prev_att.z();
-    yaw += osg::PIf * hs_n(prev.orientation);
+    yaw -= osg::PIf * hs_n(prev.orientation);
     osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
 
     // Calculate bacward coupling point of previos vehicle
@@ -466,14 +470,14 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
 
     // Calculate new attitude of current vehicle
     float y_new = arg(f_orth.y(), f_orth.x());
-    y_new += osg::PIf * hs_n(curr.orientation);
+    y_new -= osg::PIf * osg::sign(y_new) * hs_n(curr.orientation);
     float y_old = curr.attitude.z();
 
+    // Change y_old for correct work near -PI and +PI
     float dy = y_new - y_old;
-
-    if (fabs(dy) > osg::PIf / 2.0)
+    if (fabs(dy) > osg::PIf)
     {
-        y_new = (y_new - 2.0 * osg::PIf) * osg::sign(dy);
+        y_old += 2.0 * osg::PIf * osg::sign(dy);
     }
 
     // "Smoothing" of vehicle oscillations
