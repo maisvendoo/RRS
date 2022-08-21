@@ -256,7 +256,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
             osgDB::XmlNode *orient_node = cfg.findSection(child, "IsOrientationForward");
 
             // Read vehicles orientation
-            if (count_node != nullptr)
+            if (orient_node != nullptr)
             {
                 getValue(orient_node->contents, isForward);
             }
@@ -352,7 +352,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         vehicles_ext[i].coord = coord;
         //vehicles_ext[i].wheel_angle = angle;
 
-        recalcAttitude(i);
+        //recalcAttitude(i);
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
