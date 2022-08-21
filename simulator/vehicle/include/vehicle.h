@@ -69,10 +69,10 @@ public:
     void setOrientation(int orient);
 
     /// Set forward coupling force
-    void setForwardForce(double R1);
+    void setForwardForce(double R);
 
     /// Set backward coupling force
-    void setBackwardForce(double R2);
+    void setBackwardForce(double R);
 
     /// Set active common force
     void setActiveCommonForce(size_t idx, double value);
