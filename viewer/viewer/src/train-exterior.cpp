@@ -352,7 +352,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         vehicles_ext[i].coord = coord;
         //vehicles_ext[i].wheel_angle = angle;
 
-        //recalcAttitude(i);
+        recalcAttitude(i);
 
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
@@ -453,10 +453,11 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     osg::Vec3 prev_att = prev.attitude;
     float pitch = prev_att.x();
     float yaw = prev_att.z();
+    yaw += osg::PIf * hs_n(prev.orientation);
     osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
 
     // Calculate bacward coupling point of previos vehicle
-    osg::Vec3 tail_dir = tail_orth * (curr.length / 2.0f);
+    osg::Vec3 tail_dir = tail_orth * (prev.length / 2.0f);
 
     // Calculate forward coupling of current vehicle orth
     osg::Vec3 a = prev.position + tail_dir;
@@ -465,6 +466,7 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
 
     // Calculate new attitude of current vehicle
     float y_new = arg(f_orth.y(), f_orth.x());
+    y_new += osg::PIf * hs_n(curr.orientation);
     float y_old = curr.attitude.z();
 
     float dy = y_new - y_old;
