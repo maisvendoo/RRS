@@ -158,8 +158,14 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
             double R = dir * coup->getForce(ds, dv);
             ++coup_it;
 
-            vehicle->setBackwardForce(R);
-            vehicle1->setForwardForce(R);
+            if (vehicle->getOrientation() > 0)
+                vehicle->setBackwardForce(R);
+            else
+                vehicle->setForwardForce(R);
+            if (vehicle1->getOrientation() > 0)
+                vehicle1->setForwardForce(R);
+            else
+                vehicle1->setBackwardForce(R);
         }
 
         profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
@@ -474,8 +480,14 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                 if (vehicles.size() !=0)
                 {
                     Vehicle *prev =  *(vehicles.end() - 1);
-                    prev->setNextVehicle(vehicle);
-                    vehicle->setPrevVehicle(prev);
+                    if (prev->getOrientation() > 0)
+                        prev->setNextVehicle(vehicle);
+                    else
+                        prev->setPrevVehicle(vehicle);
+                    if (vehicle->getOrientation() > 0)
+                        vehicle->setPrevVehicle(prev);
+                    else
+                        vehicle->setNextVehicle(prev);
                 }
 
                 vehicles.push_back(vehicle);

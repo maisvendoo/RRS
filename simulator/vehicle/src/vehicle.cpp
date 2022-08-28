@@ -141,10 +141,7 @@ void Vehicle::setOrientation(int orient)
 //------------------------------------------------------------------------------
 void Vehicle::setForwardForce(double R)
 {
-    if (orient > 0)
-        this->R1 = R;
-    else
-        this->R2 = R;
+    this->R1 = R;
 }
 
 //------------------------------------------------------------------------------
@@ -152,10 +149,7 @@ void Vehicle::setForwardForce(double R)
 //------------------------------------------------------------------------------
 void Vehicle::setBackwardForce(double R)
 {
-    if (orient > 0)
-        this->R2 = R;
-    else
-        this->R1 = R;
+    this->R2 = R;
 }
 
 //------------------------------------------------------------------------------
@@ -249,6 +243,14 @@ void Vehicle::setConfigDir(QString config_dir)
 size_t Vehicle::getIndex() const
 {
     return idx;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int Vehicle::getOrientation() const
+{
+    return orient;
 }
 
 //------------------------------------------------------------------------------

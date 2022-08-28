@@ -98,6 +98,9 @@ public:
     /// Get vehicle index
     size_t getIndex() const;
 
+    /// Get orientation
+    int getOrientation() const;
+
     /// Get vehicle mass
     double getMass() const;
 
