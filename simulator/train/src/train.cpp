@@ -36,7 +36,7 @@ Train::~Train()
 //------------------------------------------------------------------------------
 bool Train::init(const init_data_t &init_data)
 {
-    solver_config = init_data.solver_config;    
+    solver_config = init_data.solver_config;
 
     dir = init_data.direction;
 
@@ -80,7 +80,7 @@ bool Train::init(const init_data_t &init_data)
     {
         Journal::instance()->error("Train is't loaded");
         return false;
-    }    
+    }
 
     // State vector initialization
     y.resize(ode_order);
@@ -190,7 +190,7 @@ bool Train::step(double t, double &dt)
     // Train dynamics simulation
     bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
-                                          solver_config.local_error);    
+                                          solver_config.local_error);
     // Brakepipe simulation
     brakepipe->step(t, dt);
 
@@ -369,7 +369,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
         if (!cfg.getString("Common", "TrainID", train_id))
         {
             train_id = "";
-        }        
+        }
 
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 
@@ -431,15 +431,12 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
                 QString relConfigPath = QString(fs.combinePath(module_cfg_name.toStdString(), module_cfg_name.toStdString()).c_str());
 
-
                 QString config_dir(fs.combinePath(fs.getVehiclesDir(), module_cfg_name.toStdString()).c_str());
                 vehicle->setConfigDir(config_dir);
                 vehicle->setRouteDir(init_data.route_dir);
-                vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");                
-
                 vehicle->setPayloadCoeff(payload_coeff);
-
                 vehicle->setDirection(dir);
+                vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
 
                 trainMass += vehicle->getMass();
                 trainLength += vehicle->getLength();
@@ -465,13 +462,13 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                     Vehicle *prev =  *(vehicles.end() - 1);
                     prev->setNextVehicle(vehicle);
                     vehicle->setPrevVehicle(prev);
-                }                
+                }
 
-                vehicles.push_back(vehicle);                
-            }            
+                vehicles.push_back(vehicle);
+            }
 
-            vehicle_node = cfg.getNextSection();            
-        }        
+            vehicle_node = cfg.getNextSection();
+        }
 
         for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
         {
@@ -566,7 +563,7 @@ void Train::setInitConditions(const init_data_t &init_data)
     }
 
     double x0 = init_data.init_coord * 1000.0 - dir * this->getFirstVehicle()->getLength() / 2.0;
-    y[0] = x0;    
+    y[0] = x0;
 
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
 
