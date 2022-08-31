@@ -495,7 +495,24 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
     if (cabine == nullptr)
         return;
 
-    AnimTransformVisitor atv(&animations, vehicle_name);
+    // Default name of animations configs directory is name of vehicle's config
+    std::string anim_config_dir = vehicle_name;
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = vehicle_name + fs.separator() + vehicle_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "AnimationsConfigDir", anim_config_dir);
+        OSG_FATAL << "Vehicle animations are loaded from " << anim_config_dir << std::endl;
+    }
+
+    AnimTransformVisitor atv(&animations, anim_config_dir);
     atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
     cabine->accept(atv);
@@ -508,10 +525,25 @@ void TrainExteriorHandler::loadModelAnimations(const std::string vehicle_name,
                                                osg::Node *model,
                                                animations_t &animations)
 {
+    // Default name of animations configs directory is name of vehicle's config
+    std::string anim_config_dir = vehicle_name;
+
     FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = vehicle_name + fs.separator() + vehicle_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "AnimationsConfigDir", anim_config_dir);
+        OSG_FATAL << "Vehicle animations are loaded from " << anim_config_dir << std::endl;
+    }
 
     std::string animations_dir = fs.combinePath(fs.getDataDir(), "animations");
-    animations_dir = fs.combinePath(animations_dir, vehicle_name);
+    animations_dir = fs.combinePath(animations_dir, anim_config_dir);
 
     QDir animDir(QString(animations_dir.c_str()));
 
