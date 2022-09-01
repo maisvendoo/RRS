@@ -18,6 +18,7 @@ struct vehicle_exterior_t
     float       wheel_angle;
     float       coord;
     float       length;
+    int         orientation;
     osg::Vec3   driver_pos;
 
     animations_t *anims;
