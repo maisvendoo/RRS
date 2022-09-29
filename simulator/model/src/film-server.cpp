@@ -44,6 +44,13 @@ void FilmServer::start()
 
 
 
+int FilmServer::getDataSendInterval()
+{
+    return tcp_conf_.data_send_interval;
+}
+
+
+
 void FilmServer::loadCfg_()
 {
     CfgReader cfg;

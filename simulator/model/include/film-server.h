@@ -72,6 +72,7 @@ public:
 
     void start();
 
+    int getDataSendInterval();
 
 public slots:
     // Отправка данных клиенту

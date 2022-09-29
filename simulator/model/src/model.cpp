@@ -502,12 +502,14 @@ void Model::filmServerStart_(QString routeDir)
     {
         data_client_t film_dc;
         film_dc.routeName = routeName_;
-        film_dc.trainCoordinate = train->getFirstVehicle()->getRailwayCoord();
+        film_dc.trainCoordinate = train->getFirstVehicle()->getRailwayCoord() +
+                train->getDirection() * train->getFirstVehicle()->getLength() / 2.0;
+
         film_dc.trainVelocity = train->getFirstVehicle()->getVelocity();
 
         filmServer_->slotSendDataClient(film_dc);
     });
-    filmDataSendTimer_.start(100);
+    filmDataSendTimer_.start(filmServer_->getDataSendInterval());
 }
 
 //------------------------------------------------------------------------------

@@ -13,6 +13,8 @@ public:
     char    current_time[9];
     char    signal_name[23];
     double  signal_dist;
+    int     power_type;
+    float   voltage;
 
     // Конструктор
     sim_dispatcher_data_t()
@@ -22,6 +24,8 @@ public:
         , current_time("00:00:00")
         , signal_name("")
         , signal_dist(0.0)
+        , power_type(0)
+        , voltage(0.0f)
     {
 
     }
@@ -36,12 +40,14 @@ public:
 
     double  coord;
     int     direction;
+    int     trainLength;
     double  speed;
     char    train_id[9];
 
     sim_train_data_t()
         : coord(0.0)
         , direction(0)
+        , trainLength(0)
         , speed(0)
         , train_id("")        
     {
