@@ -13,17 +13,11 @@ void VL60k::stepDecodeAlsn()
 
     switch (alsn_info.code_alsn)
     {
-    case ALSN_WHITE:
+    case ALSN_NOCODE:
 
         analogSignal[LS_W] = 1.0f;
 
-        break;
-
-    case ALSN_RED:
-
-        analogSignal[LS_R] = 1.0f;
-
-        break;
+        break;    
 
     case ALSN_RED_YELLOW:
 

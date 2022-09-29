@@ -40,30 +40,54 @@ void SafetyDevice::step(double t, double dt)
 //------------------------------------------------------------------------------
 void SafetyDevice::preStep(state_vector_t &Y, double t)
 {
-    // Очищаем состояние ламп
-    std::fill(lamps.begin(), lamps.end(), 0.0f);
-
     // Ничего не делаем при выключенном ЭПК
     if (!key_epk)
     {
+        off_all_lamps();
         is_red.reset();
         return;
     }
 
+    if (is_red.getState())
+        return;
+
     if (code_alsn < old_code_alsn)
         epk_state.reset();
 
-    /*if ( (old_code_alsn == 1) && (code_alsn == 3) )
-        is_red.set();
-
-    if (is_red.getState())
+    if (code_alsn == 0)
     {
-        epk_state.reset();
-        lamps[RED_LAMP] = 1.0f;
-        return;
-    }*/
+        if (old_code_alsn == 1)
+        {
+            is_red.set();
+            epk_state.reset();
+            lamp_on(RED_LAMP);
+            return;
+        }
+        else
+        {
+            lamp_on(WHITE_LAMP);
+        }
+    }
 
     alsn_process(code_alsn);
+
+    if (code_alsn == 0)
+    {
+        if (v_kmh > 40.0)
+        {
+            epk_state.reset();
+            return;
+        }
+
+        if ( (!safety_timer->isStarted()) && (v_kmh > 5) )
+        {
+            safety_timer->start();
+        }
+        else
+        {
+            safety_timer->stop();
+        }
+    }
 
     if (code_alsn == 1)
     {
@@ -129,33 +153,45 @@ void SafetyDevice::alsn_process(int code_alsn)
 {
     switch (code_alsn)
     {
-    case 0:
-        {
-            lamps[WHITE_LAMP] = 1.0f;
-
-            break;
-        }
     case 1:
         {
-            lamps[RED_YELLOW_LAMP] = 1.0f;
+            lamp_on(RED_YELLOW_LAMP);
 
             break;
         }
 
     case 2:
         {
-            lamps[YELLOW_LAMP] = 1.0f;
+            lamp_on(YELLOW_LAMP);
 
             break;
         }
 
     case 3:
         {
-            lamps[GREEN_LAMP] = 1.0f;
+            lamp_on(GREEN_LAMP);
 
             break;
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SafetyDevice::off_all_lamps()
+{
+    // Очищаем состояние ламп
+    std::fill(lamps.begin(), lamps.end(), 0.0f);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SafetyDevice::lamp_on(size_t lamp_idx)
+{
+    off_all_lamps();
+    lamps[lamp_idx] = 1.0f;
 }
 
 //------------------------------------------------------------------------------

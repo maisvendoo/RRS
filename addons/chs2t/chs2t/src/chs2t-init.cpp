@@ -168,7 +168,8 @@ void CHS2T::initBrakesEquipment(QString module_path)
 
     autoTrainStop = loadAutoTrainStop(module_path + QDir::separator() + "epk150");
     autoTrainStop->read_config("epk150");
-    connect(autoTrainStop, &AutoTrainStop::soundSetVolume, this, &CHS2T::soundSetVolume);
+    connect(autoTrainStop, &AutoTrainStop::soundPlay, this, &CHS2T::soundPlay);
+    connect(autoTrainStop, &AutoTrainStop::soundStop, this, &CHS2T::soundStop);
 
     zpk = new SwitchingValve();
     zpk->read_config("zpk");

@@ -40,6 +40,7 @@ protected:
 
     virtual ~RailsManipulator();
 
+
 private:
 
     settings_t  settings;

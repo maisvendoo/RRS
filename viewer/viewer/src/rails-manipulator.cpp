@@ -194,5 +194,19 @@ bool RailsManipulator::handleMousePush(const osgGA::GUIEventAdapter &ea,
         angle_H = angle_V = 0;*/
     }
 
+    if (ea.getButton() == osgGA::GUIEventAdapter::MIDDLE_MOUSE_BUTTON)
+    {
+        double fovy = 0;
+        double aspectRatio = 0;
+        double zNear = 0;
+        double zFar = 0;
+
+        osgViewer::Viewer *viewer = static_cast<osgViewer::Viewer *>(&aa);
+        viewer->getCamera()->getProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+
+        fovy = 20.0f;
+        viewer->getCamera()->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+    }
+
     return false;
 }

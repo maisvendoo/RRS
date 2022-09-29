@@ -1,0 +1,10 @@
+#ifndef     SIGNALING_EXPORT_H
+#define     SIGNALING_EXPORT_H
+
+#if defined(SIGNALING_LIB)
+    #define SIGNALING_EXPORT   Q_DECL_EXPORT
+#else
+    #define SIGNALING_EXPORT   Q_DECL_IMPORT
+#endif
+
+#endif // SIGNALING_EXPORT_H

@@ -158,4 +158,4 @@ windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
 windeployqt %RRS_DEV_ROOT%\bin\TcpConnection.dll
 
-copy %QTDIR%\bin\Qt5OpenGL.dll %RRS_DEV_ROOT%\bin
+rem copy %QTDIR%\bin\Qt5OpenGL.dll %RRS_DEV_ROOT%\bin

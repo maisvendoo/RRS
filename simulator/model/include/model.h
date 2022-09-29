@@ -38,7 +38,13 @@
 #include    "sim-client.h"
 
 
+
 class FilmServer;
+
+
+#include    "signaling.h"
+
+#include    "traffic-machine.h"
 
 
 #if defined(MODEL_LIB)
@@ -132,6 +138,12 @@ private:
     /// Клиент для связи с ВЖД
     SimTcpClient *sim_client;
 
+    /// Система СЦБ
+    Signaling *signaling;
+
+    /// Система трафика
+    TrafficMachine  *traffic_machine;
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -173,7 +185,15 @@ private:
 
     void initSimClient(QString cfg_path);
 
+
     void filmServerStart_(QString routeDir);
+
+    /// Инициализация СЦБ
+    void initSignaling(const init_data_t &init_data);
+
+    /// Инициализация трафика
+    void initTraffic(const init_data_t &init_data);
+
 
     /// TCP feedback
     void tcpFeedBack();

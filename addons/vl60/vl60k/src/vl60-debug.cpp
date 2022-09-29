@@ -11,4 +11,6 @@ void VL60k::debugPrint(double t)
             .arg(velocity * Physics::kmh, 6, 'f', 1)
             .arg(alsn_info.code_alsn, 2)
             .arg(alsn_info.signal_dist, 7, 'f', 1);
+//    DebugMsg += motor[0]->getDebugMsg();
+//    DebugMsg += controller->getDebugMsg();
 }

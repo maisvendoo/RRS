@@ -101,6 +101,7 @@ int RouteViewer::run()
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
                      rm, &RailsManipulator::getCameraPosition);
 
+
     // Free camera manipulator
     osg::ref_ptr<FreeManipulator> fm = new FreeManipulator(settings);
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,

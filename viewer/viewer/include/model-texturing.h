@@ -25,6 +25,10 @@ private:
 
     std::string texturesDir;
 
+    std::string previousPath;
+
+    osg::ref_ptr<osg::Image> newImage;
+
     void createTexture(const std::string &textureDir, osg::Texture2D *texture);
 
     void changeTexture(const std::string &textureDir, osg::Texture2D *texture);

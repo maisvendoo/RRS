@@ -87,7 +87,10 @@ private:
     osg::ref_ptr<osg::Group> trainExterior;
 
     /// Time between current and previous frame drawing
-    double ref_time;        
+    double ref_time;
+
+    ///
+    bool is_displays_locked;
 
     /// Info about train's vehicles exterior
     std::vector<vehicle_exterior_t> vehicles_ext;
@@ -126,6 +129,10 @@ private:
     void loadDisplays(ConfigReader &cfg, osgDB::XmlNode *vehicle_node, osg::Node *model, displays_t &displays);
 
     void timerEvent(QTimerEvent *);
+
+public slots:
+
+    void lock_display(bool lock);
 };
 
 #endif // TRAIN_EXTERIOR_H

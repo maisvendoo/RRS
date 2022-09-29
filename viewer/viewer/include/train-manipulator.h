@@ -29,7 +29,7 @@ public:
 
 protected:
 
-    virtual ~TrainManipulator();
+    virtual ~TrainManipulator();    
 
 private:
 

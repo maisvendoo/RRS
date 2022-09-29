@@ -27,7 +27,13 @@ protected:
     double  start_time;
     float   delta_time;
 
-    virtual ~AbstractManipulator();    
+    virtual ~AbstractManipulator();
+
+    virtual void process_displays_lock();
+
+signals:
+
+    void lock_displays(bool lock);
 
 public slots:
 

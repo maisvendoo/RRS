@@ -14,6 +14,7 @@ SUBDIRS += ./brakepipe
 SUBDIRS += ./profile
 SUBDIRS += ./train
 SUBDIRS += ./sim-client
+SUBDIRS += ./signaling
 SUBDIRS += ./model
 SUBDIRS += ./default-coupling
 SUBDIRS += ./ef-coupling

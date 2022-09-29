@@ -48,6 +48,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
+    , is_displays_locked(false)
 
 {
     load(train_config);
@@ -86,7 +87,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             moveCamera(viewer);
 
             break;
-        }    
+        }
 
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
@@ -169,6 +170,19 @@ void TrainExteriorHandler::keyboardHandler(int key)
         cur_vehicle = 0;
         long_shift = 0.0f;
         height_shift = 0.0f;
+        is_displays_locked = false;
+
+        break;
+
+    case osgGA::GUIEventAdapter::KEY_F3:
+
+    case osgGA::GUIEventAdapter::KEY_F4:
+
+    case osgGA::GUIEventAdapter::KEY_F5:
+
+    case osgGA::GUIEventAdapter::KEY_F6:
+
+        is_displays_locked = true;
 
         break;
 
@@ -237,6 +251,16 @@ void TrainExteriorHandler::load(const std::string &train_config)
             // Read vehicles number
             getValue(count_node->contents, count);
 
+            bool isForward = true;
+
+            osgDB::XmlNode *orient_node = cfg.findSection(child, "IsOrientationForward");
+
+            // Read vehicles orientation
+            if (orient_node != nullptr)
+            {
+                getValue(orient_node->contents, isForward);
+            }
+
             std::string module_config_name = "";
 
             osgDB::XmlNode *module_config_node = cfg.findSection(child, "ModuleConfig");
@@ -248,7 +272,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
             }
 
             // Load vehicle body model
-            getValue(module_config_node->contents, module_config_name);            
+            getValue(module_config_node->contents, module_config_name);
 
             for (int i = 0; i < count; ++i)
             {
@@ -270,10 +294,14 @@ void TrainExteriorHandler::load(const std::string &train_config)
 
                 vehicle_exterior_t vehicle_ext;
                 vehicle_ext.transform = new osg::MatrixTransform;
-                vehicle_ext.transform->addChild(vehicle_model.get());                
+                vehicle_ext.transform->addChild(vehicle_model.get());
                 vehicle_ext.length = length;
                 vehicle_ext.cabine = cabine;
                 vehicle_ext.driver_pos = driver_pos;
+                if (isForward)
+                    vehicle_ext.orientation = 1;
+                else
+                    vehicle_ext.orientation = -1;
 
                 vehicle_ext.anims = new animations_t();
                 vehicle_ext.displays = new displays_t();
@@ -302,7 +330,7 @@ void TrainExteriorHandler::load(const std::string &train_config)
 void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
 {
     if (nd.sd.size() < 2)
-        return;    
+        return;
 
     // Time to relative units conversion
     float Delta_t = static_cast<float>(settings.request_interval) / 1000.0f;
@@ -317,8 +345,8 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
 
-        if (settings.direction == -1)
-            vehicles_ext[i].attitude.z() = osg::PIf + vehicles_ext[i].attitude.z();
+        if ((settings.direction * vehicles_ext[i].orientation) == -1)
+            vehicles_ext[i].attitude.z() += osg::PIf;
 
         // Store current railway coordinate and wheels angle
         vehicles_ext[i].coord = coord;
@@ -338,15 +366,15 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         {
             ProcAnimation *animation = it.value();
             animation->setPosition(nd.sd.back().te[i].analogSignal[animation->getSignalID()]);
-        }        
-    }    
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::processSharedData(double &ref_time)
-{    
+{
     if (ref_time < static_cast<double>(settings.request_interval) / 1000.0)
         return;
 
@@ -394,6 +422,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     cp.position = vehicles_ext[static_cast<size_t>(cur_vehicle)].position;
     cp.attitude = vehicles_ext[static_cast<size_t>(cur_vehicle)].attitude;
     cp.driver_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
+    cp.is_orient_bwd = (vehicles_ext[static_cast<size_t>(cur_vehicle)].orientation < 0);
 
     cp.attitude.x() = - osg::PIf / 2.0f - cp.attitude.x() * settings.direction;
 
@@ -412,6 +441,10 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::recalcAttitude(size_t i)
 {
+    // Attitude.z from -PI to +PI
+    while (abs(vehicles_ext[i].attitude.z()) > osg::PIf)
+        vehicles_ext[i].attitude.z() -= 2.0f * osg::PIf * sign(vehicles_ext[i].attitude.z());
+
     // Don't recalculate from head vehicle
     if (i == 0)
         return;
@@ -425,10 +458,11 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     osg::Vec3 prev_att = prev.attitude;
     float pitch = prev_att.x();
     float yaw = prev_att.z();
+    yaw -= osg::PIf * hs_n(prev.orientation);
     osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
 
     // Calculate bacward coupling point of previos vehicle
-    osg::Vec3 tail_dir = tail_orth * (curr.length / 2.0f);
+    osg::Vec3 tail_dir = tail_orth * (prev.length / 2.0f);
 
     // Calculate forward coupling of current vehicle orth
     osg::Vec3 a = prev.position + tail_dir;
@@ -437,13 +471,14 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
 
     // Calculate new attitude of current vehicle
     float y_new = arg(f_orth.y(), f_orth.x());
+    y_new -= osg::PIf * osg::sign(y_new) * hs_n(curr.orientation);
     float y_old = curr.attitude.z();
 
+    // Change y_old for correct work near -PI and +PI
     float dy = y_new - y_old;
-
-    if (fabs(dy) > osg::PIf / 2.0)
+    if (fabs(dy) > osg::PIf)
     {
-        y_new = (y_new - 2.0 * osg::PIf) * osg::sign(dy);
+        y_old += 2.0 * osg::PIf * osg::sign(dy);
     }
 
     // "Smoothing" of vehicle oscillations
@@ -460,10 +495,27 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
     if (cabine == nullptr)
         return;
 
-    AnimTransformVisitor atv(&animations, vehicle_name);
+    // Default name of animations configs directory is name of vehicle's config
+    std::string anim_config_dir = vehicle_name;
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = vehicle_name + fs.separator() + vehicle_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "AnimationsConfigDir", anim_config_dir);
+        OSG_FATAL << "Vehicle animations are loaded from " << anim_config_dir << std::endl;
+    }
+
+    AnimTransformVisitor atv(&animations, anim_config_dir);
     atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
-    cabine->accept(atv);    
+    cabine->accept(atv);
 }
 
 //------------------------------------------------------------------------------
@@ -473,10 +525,25 @@ void TrainExteriorHandler::loadModelAnimations(const std::string vehicle_name,
                                                osg::Node *model,
                                                animations_t &animations)
 {
+    // Default name of animations configs directory is name of vehicle's config
+    std::string anim_config_dir = vehicle_name;
+
     FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = vehicle_name + fs.separator() + vehicle_name + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "AnimationsConfigDir", anim_config_dir);
+        OSG_FATAL << "Vehicle animations are loaded from " << anim_config_dir << std::endl;
+    }
 
     std::string animations_dir = fs.combinePath(fs.getDataDir(), "animations");
-    animations_dir = fs.combinePath(animations_dir, vehicle_name);
+    animations_dir = fs.combinePath(animations_dir, anim_config_dir);
 
     QDir animDir(QString(animations_dir.c_str()));
 
@@ -611,6 +678,9 @@ void TrainExteriorHandler::timerEvent(QTimerEvent *)
     if (nd.sd.size() == 0)
         return;
 
+    if (is_displays_locked)
+        return;
+
     for (size_t i = 0; i < vehicles_ext.size(); ++i)
     {
         for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
@@ -619,4 +689,9 @@ void TrainExteriorHandler::timerEvent(QTimerEvent *)
             dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
         }
     }
+}
+
+void TrainExteriorHandler::lock_display(bool lock)
+{
+    is_displays_locked = lock;
 }
