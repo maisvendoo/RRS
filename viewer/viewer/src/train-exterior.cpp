@@ -645,16 +645,22 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
             display_config.surface_name = QString(surface_name_node->contents.c_str());
 
             display_config.texcoord = new osg::Vec2Array;
-            for (size_t i = 0; i < 4; ++i)
-            {
-                QString corner_name = QString("Corner%1").arg(i+1);
-                osgDB::XmlNode *corner_node = displays_cfg.findSection(display_node, corner_name.toStdString());
+            size_t i = 0;
 
+            QString corner_name = QString("Corner%1").arg(i+1);
+            osgDB::XmlNode *corner_node = displays_cfg.findSection(display_node, corner_name.toStdString());
+
+            while (corner_node != nullptr)
+            {
                 std::stringstream ss(corner_node->contents);
                 float x, y;
                 ss >> x >> y;
                 osg::Vec2 texel(x, y);
                 display_config.texcoord->push_back(texel);
+
+                i++;
+                QString corner_name = QString("Corner%1").arg(i+1);
+                corner_node = displays_cfg.findSection(display_node, corner_name.toStdString());
             }
 
             display_container_t *dc = new display_container_t();
