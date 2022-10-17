@@ -16,6 +16,7 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , charging_pressure(0.0)
   , no_air(false)
   , init_main_res_pressure(0.0)
+  , kTM(0.01)
   , train_motion_solver(nullptr)
   , brakepipe(nullptr)
   , soundMan(nullptr)
@@ -197,9 +198,10 @@ bool Train::step(double t, double &dt)
     bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
                                           solver_config.local_error);
+/*
     // Brakepipe simulation
     brakepipe->step(t, dt);
-
+*/
     vehiclesStep(t, dt);
 
     return done;
@@ -210,21 +212,58 @@ bool Train::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Train::vehiclesStep(double t, double dt)
 {
+    size_t num_vehicles = vehicles.size();
     auto end = vehicles.end();
     auto begin = vehicles.begin();
-
+/*
     brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
     size_t j = 1;
-
+*/
     for (auto i = begin; i != end; ++i)
     {
         Vehicle *vehicle = *i;
 
+        // Если в поезде больше одной единицы ПС - считаем перетоки воздуха в ТМ
+        if ( (num_vehicles > 1) && ( i != end - 1) )
+        {
+            Vehicle *vehicle1 = *(i+1);
+
+            double pTM;
+            double pTM1;
+            double flow;
+
+            // Получаем давление в ТМ соседних единиц ПС с учётом их ориентации
+            if (vehicle->getOrientation() > 0)
+                pTM = vehicle->getBrakepipePressureBwd();
+            else
+                pTM = vehicle->getBrakepipePressureFwd();
+            if (vehicle1->getOrientation() > 0)
+                pTM1 = vehicle1->getBrakepipePressureFwd();
+            else
+                pTM1 = vehicle1->getBrakepipePressureBwd();
+
+            // Считаем переток воздуха из предыдущей единицы ПС к следующей
+            flow = kTM * (pTM - pTM1);
+
+            // Задаём поток в ТМ соседних единиц ПС с учётом их ориентации
+            if (vehicle->getOrientation() > 0)
+                vehicle->setBrakepipeFlowBwd(-flow);
+            else
+                vehicle->setBrakepipeFlowFwd(-flow);
+            if (vehicle1->getOrientation() > 0)
+                vehicle1->setBrakepipeFlowFwd(flow);
+            else
+                vehicle1->setBrakepipeFlowBwd(flow);
+
+        }
+/*
         brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
         vehicle->setBrakepipePressure(brakepipe->getPressure(j));
+*/
         vehicle->integrationStep(y, t, dt);
-
+/*
         ++j;
+*/
     }
 }
 

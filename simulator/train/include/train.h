@@ -101,7 +101,7 @@ signals:
     void logMessage(QString msg);
     void sendDataToVehicle(QByteArray data);
 
-private:    
+private:
 
     /// Train mass
     double          trainMass;
@@ -126,11 +126,14 @@ private:
     /// Initial main reservoir pressure
     double      init_main_res_pressure;
 
+    /// Коэффициент потока воздуха в тормозной магистрали между единицами ПС
+    double      kTM;
+
     /// Motion ODE's solver
     Solver      *train_motion_solver;
 
     /// Brakepipe model
-    BrakePipe   *brakepipe;    
+    BrakePipe   *brakepipe;
 
     /// Sound manager
     SoundManager *soundMan;
