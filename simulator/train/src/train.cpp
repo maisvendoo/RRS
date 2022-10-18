@@ -406,6 +406,11 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
             no_air = false;
         }
 
+        if (!cfg.getDouble("Common", "BrakepipeFlowCoeff", kTM))
+        {
+            kTM = 0.01;
+        }
+
         if (!cfg.getString("Common", "ClientName", client_name))
         {
             client_name = "";
