@@ -115,8 +115,6 @@ void DCMotor::preStep(state_vector_t &Y, double t)
 
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
     emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 300)));
-//    DebugMsg = QString(" dc-motor-beta: %1")
-//            .arg(beta);
 }
 
 //------------------------------------------------------------------------------

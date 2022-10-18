@@ -33,8 +33,8 @@ public:
     ~VL60pk();
 
     /// Инициализация тормозных приборов
-    void initBrakeDevices(double p0, double pTM, double pFL);    
-    
+    void initBrakeDevices(double p0, double pTM, double pFL);
+
 private:
 
     enum
@@ -130,6 +130,9 @@ private:
 
     /// Мотор-вентиляторы
     std::array<MotorFan *, NUM_MOTOR_FANS> motor_fans;
+
+    /// Резервуар в качестве трубы тормозной магистрали
+    Reservoir *brakepipe;
 
     /// Главный резервуар
     Reservoir   *main_reservoir;
@@ -323,7 +326,7 @@ private:
 
     void load_brakes_config(QString path);
 
-    void loadConfig(QString cfg_path);    
+    void loadConfig(QString cfg_path);
 
 private slots:
 

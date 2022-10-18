@@ -168,7 +168,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
     mainReservoir->step(t, dt);
 
     pressReg->setPressure(mainReservoir->getPressure());
-    pressReg->step(t, dt);    
+    pressReg->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ void CHS2T::stepBrakesControl(double t, double dt)
     brakeCrane->setBrakePipePressure(pTM);
     brakeCrane->setControl(keys);
     p0 = brakeCrane->getBrakePipeInitPressure();
-    brakeCrane->step(t, dt);    
+    brakeCrane->step(t, dt);
 
     handleEDT->setControl(keys, control_signals);
     handleEDT->step(t, dt);
@@ -192,6 +192,15 @@ void CHS2T::stepBrakesControl(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS2T::stepBrakesEquipment(double t, double dt)
 {
+    // Подключение потоков из оборудования и межвагонных соединений в ТМ
+    double Q_brake_crane = 0.1 * (brakeCrane->getBrakePipeInitPressure() - brakepipe->getPressure());
+    brakepipe->setAirFlow(QTMfwd + QTMbwd + Q_brake_crane
+                          - autoTrainStop->getEmergencyBrakeRate()
+                          - airDistr->getAuxRate());
+    brakepipe->step(t, dt);
+    pTMfwd = brakepipe->getPressure();
+    pTMbwd = brakepipe->getPressure();
+
     brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
     brakesMech[0]->step(t, dt);
 
@@ -245,11 +254,11 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
     airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
-    airDistr->setBrakepipePressure(pTM);
+    airDistr->setBrakepipePressure(brakepipe->getPressure());
     airDistr->step(t, dt);
 
     autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
-    autoTrainStop->setBrakepipePressure(pTM);
+    autoTrainStop->setBrakepipePressure(brakepipe->getPressure());
     autoTrainStop->setControl(keys);
     autoTrainStop->powerOn(safety_device->getEPKstate());
     autoTrainStop->step(t, dt);

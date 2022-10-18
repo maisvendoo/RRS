@@ -157,6 +157,10 @@ void CHS2T::initBrakesEquipment(QString module_path)
 {
     Journal::instance()->info("Init brakes equipment");
 
+    // Тормозная магистраль
+    double volumeTM = length * 0.035 * 0.035 * Physics::PI / 4.0;
+    brakepipe = new Reservoir(volumeTM);
+
     dako = new Dako();
     dako->read_custom_config(config_dir + QDir::separator() + "dako");
 
@@ -310,6 +314,9 @@ void CHS2T::initRegistrator()
 void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Journal::instance()->info("Init brake devices: callback form TrainEngine");
+
+    // Инициализация давления
+    brakepipe->setY(0, pTM);
 
     charging_press = p0;
 

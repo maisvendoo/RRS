@@ -254,12 +254,19 @@ void VL60k::stepTrolleysBrakeMech(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60k::stepAirDistributors(double t, double dt)
 {
+    // Подключение потоков из оборудования и межвагонных соединений в ТМ
+    double Q_brake_crane = 0.1 * (ubt->getLocoTMpressure() - brakepipe->getPressure());
+    brakepipe->setAirFlow(QTMfwd + QTMbwd + Q_brake_crane - air_disr->getAuxRate());
+    brakepipe->step(t, dt);
+    pTMfwd = brakepipe->getPressure();
+    pTMbwd = brakepipe->getPressure();
+
     supply_reservoir->setAirFlow(air_disr->getAirSupplyFlow());
     supply_reservoir->step(t, dt);
 
     air_disr->setBrakeCylinderPressure(airdist_splitter->getP_in());
     air_disr->setAirSupplyPressure(supply_reservoir->getPressure());
-    air_disr->setBrakepipePressure(pTM);
+    air_disr->setBrakepipePressure(brakepipe->getPressure());
     auxRate = air_disr->getAuxRate();
     air_disr->step(t, dt);
 }

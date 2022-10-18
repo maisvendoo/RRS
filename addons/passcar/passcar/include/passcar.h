@@ -24,11 +24,14 @@ public:
 
     PassCarrige();
 
-    ~PassCarrige();    
+    ~PassCarrige();
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
+
+    /// Резервуар в качестве трубы тормозной магистрали
+    Reservoir *brakepipe;
 
     BrakeMech   *brake_mech;
     Reservoir   *supply_reservoir;
@@ -39,7 +42,7 @@ private:
     AirDistributor *airdist;
 
     QString     airdist_module;
-    QString     airdist_config;   
+    QString     airdist_config;
 
     ElectroAirDistributor *electroAirDist;
 

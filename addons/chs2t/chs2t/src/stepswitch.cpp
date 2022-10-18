@@ -118,11 +118,6 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
-//    DebugMsg = QString(" step %1 k31 %2 k32 %3 k33 %4")
-//            .arg(fieldStep)
-//            .arg(ctrlState.k31)
-//            .arg(ctrlState.k32)
-//            .arg(ctrlState.k33);
 }
 
 //------------------------------------------------------------------------------

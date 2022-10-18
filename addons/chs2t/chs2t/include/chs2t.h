@@ -103,6 +103,9 @@ private:
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
+    /// Резервуар в качестве трубы тормозной магистрали
+    Reservoir *brakepipe;
+
     /// Главный резервуар (ГР)
     Reservoir *mainReservoir;
 
@@ -239,7 +242,7 @@ private:
     Blinds      *blinds;
 
     /// Скоростемер 3СЛ2М
-    SL2M        *speed_meter;   
+    SL2M        *speed_meter;
 
     /// Счетчик энергии
     EnergyCounter   *energy_counter;
