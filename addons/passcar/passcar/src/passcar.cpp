@@ -96,7 +96,8 @@ void PassCarrige::initialization()
 void PassCarrige::step(double t, double dt)
 {
     // Подключение потоков из оборудования и межвагонных соединений в ТМ
-    brakepipe->setAirFlow(QTMfwd + QTMbwd - airdist->getAuxRate());
+    double QTM = -1.0 * (airdist->getAuxRate());
+    brakepipe->setAirFlow(QTMfwd + QTMbwd + QTM);
     brakepipe->step(t, dt);
     pTMfwd = brakepipe->getPressure();
     pTMbwd = brakepipe->getPressure();

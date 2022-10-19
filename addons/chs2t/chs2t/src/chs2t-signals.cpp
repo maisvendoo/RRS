@@ -26,7 +26,7 @@ void CHS2T::stepSignals()
     analogSignal[STRELKA_TC] = static_cast<float>(brakesMech[0]->getBrakeCylinderPressure() / 1.0);
     analogSignal[STRELKA_EDT] = static_cast<float>(brakeRefRes->getPressure() / 1.0);
     analogSignal[STRELKA_UR] = static_cast<float>(brakeCrane->getEqReservoirPressure() / 1.0);
-    analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.0);
+    analogSignal[STRELKA_TM] = static_cast<float>(brakepipe->getPressure() / 1.0);
 
     analogSignal[STRELKA_UKS] = static_cast<float>(U_kr / 4000.0);
 

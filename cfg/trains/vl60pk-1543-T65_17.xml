@@ -10,6 +10,8 @@
 		<InitMainResPressure>0.9</InitMainResPressure>
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
+		<!-- Коэффициент перетока воздуха по тормозной магистрали между соседними единицами ПС -->
+		<BrakepipeFlowCoeff>1.0</BrakepipeFlowCoeff>
 
 		<Title>ВЛ60пк-1543_Поезд 65</Title>
 		<Description>Состав из 17 вагонов и вагона-бара</Description>

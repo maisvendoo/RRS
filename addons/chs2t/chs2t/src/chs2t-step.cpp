@@ -193,10 +193,10 @@ void CHS2T::stepBrakesControl(double t, double dt)
 void CHS2T::stepBrakesEquipment(double t, double dt)
 {
     // Подключение потоков из оборудования и межвагонных соединений в ТМ
-    double Q_brake_crane = 0.1 * (brakeCrane->getBrakePipeInitPressure() - brakepipe->getPressure());
-    brakepipe->setAirFlow(QTMfwd + QTMbwd + Q_brake_crane
-                          - autoTrainStop->getEmergencyBrakeRate()
-                          - airDistr->getAuxRate());
+    double QTM = -1.0 * (airDistr->getAuxRate());
+    QTM += -1.0 * (autoTrainStop->getEmergencyBrakeRate());
+    QTM += 1.0 * (brakeCrane->getBrakePipeInitPressure() - brakepipe->getPressure());
+    brakepipe->setAirFlow(QTMfwd + QTMbwd + QTM);
     brakepipe->step(t, dt);
     pTMfwd = brakepipe->getPressure();
     pTMbwd = brakepipe->getPressure();
