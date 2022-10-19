@@ -158,8 +158,17 @@ void CHS2T::initBrakesEquipment(QString module_path)
     Journal::instance()->info("Init brakes equipment");
 
     // Тормозная магистраль
-    double volumeTM = length * 0.035 * 0.035 * Physics::PI / 4.0;
-    brakepipe = new Reservoir(volumeTM);
+    double volume = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
+    brakepipe = new Reservoir(volume);
+    // Рукава тормозной магистрали
+    volume = 0.7 * 0.0343 * 0.0343 * Physics::PI / 4.0;
+    hose_tm_fwd = new Reservoir(volume);
+    hose_tm_bwd = new Reservoir(volume);
+    // Концевые краны
+    anglecock_tm_fwd = new PneumoAngleCock();
+    anglecock_tm_fwd->read_config("pneumo-anglecock");
+    anglecock_tm_bwd = new PneumoAngleCock();
+    anglecock_tm_bwd->read_config("pneumo-anglecock");
 
     dako = new Dako();
     dako->read_custom_config(config_dir + QDir::separator() + "dako");
@@ -317,6 +326,17 @@ void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
 
     // Инициализация давления
     brakepipe->setY(0, pTM);
+    hose_tm_fwd->setY(0, pTM);
+    hose_tm_bwd->setY(0, pTM);
+    // Состояние концевых кранов
+    if (prev_vehicle == nullptr)
+        anglecock_tm_fwd->setState(false);
+    else
+        anglecock_tm_fwd->setState(true);
+    if (next_vehicle == nullptr)
+        anglecock_tm_bwd->setState(false);
+    else
+        anglecock_tm_bwd->setState(true);
 
     charging_press = p0;
 

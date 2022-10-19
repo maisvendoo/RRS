@@ -106,6 +106,18 @@ private:
     /// Резервуар в качестве трубы тормозной магистрали
     Reservoir *brakepipe;
 
+    /// Резервуар в качестве переднего рукава тормозной магистрали
+    Reservoir *hose_tm_fwd;
+
+    /// Резервуар в качестве заднего рукава тормозной магистрали
+    Reservoir *hose_tm_bwd;
+
+    /// Концевой кран переднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_fwd;
+
+    /// Концевой кран заднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_bwd;
+
     /// Главный резервуар (ГР)
     Reservoir *mainReservoir;
 

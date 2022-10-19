@@ -9,6 +9,7 @@ PneumoAngleCock::PneumoAngleCock(QObject *parent) : BrakeDevice(parent)
   , Q_pipe(0.0)
   , Q_hose(0.0)
   , k(1.0)
+  , k_atm(0.2)
   , is_opened(true)
 {
 
@@ -44,6 +45,14 @@ void PneumoAngleCock::setP_hose(double p)
 void PneumoAngleCock::setState(bool opened)
 {
     this->is_opened = opened;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoAngleCock::changeState()
+{
+    this->is_opened = !(this->is_opened);
 }
 
 //------------------------------------------------------------------------------
@@ -92,6 +101,30 @@ void PneumoAngleCock::preStep(state_vector_t &Y, double t)
         // Магистраль перекрыта
         Q_pipe = 0.0;
         // Рукав соединён с атмосферой
-        Q_hose = k * p_hose;
+        Q_hose = k_atm * p_hose;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoAngleCock::ode_system(const state_vector_t &Y,
+                                state_vector_t &dYdt,
+                                double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoAngleCock::load_config(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    cfg.getDouble(secName, "k", k);
+    cfg.getDouble(secName, "kAtm", k_atm);
+    cfg.getBool(secName, "isStateOpened", is_opened);
 }
