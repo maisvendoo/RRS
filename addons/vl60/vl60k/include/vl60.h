@@ -132,6 +132,18 @@ private:
     /// Резервуар в качестве трубы тормозной магистрали
     Reservoir *brakepipe;
 
+    /// Резервуар в качестве переднего рукава тормозной магистрали
+    Reservoir *hose_tm_fwd;
+
+    /// Резервуар в качестве заднего рукава тормозной магистрали
+    Reservoir *hose_tm_bwd;
+
+    /// Концевой кран переднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_fwd;
+
+    /// Концевой кран заднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_bwd;
+
     /// Главный резервуар
     Reservoir   *main_reservoir;
 
@@ -244,6 +256,9 @@ private:
     /// Инициализация вспомогательных машин (ФР, МК, МВ1 - МВ6)
     void initSupplyMachines();
 
+    /// Инициализация тормозной магистрали
+    void initBrakepipe(QString module_path);
+
     /// Инициализация приборов управления тормозами
     void initBrakeControls(QString modules_dir);
 
@@ -277,6 +292,9 @@ private:
     void stepMotorFans(double t, double dt);
 
     void stepMotorCompressor(double t, double dt);
+
+    /// Моделирование тормозной магистрали
+    void stepBrakepipe(double t, double dt);
 
     void stepBrakeControl(double t, double dt);
 

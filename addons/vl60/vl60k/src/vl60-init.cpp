@@ -10,8 +10,10 @@
 //------------------------------------------------------------------------------
 void VL60k::initBrakeDevices(double p0, double pTM, double pFL)
 {
-    // Инициализация давления
+    // Инициализация давления в тормозной магистрали
     brakepipe->setY(0, pTM);
+    hose_tm_fwd->setY(0, pTM);
+    hose_tm_bwd->setY(0, pTM);
 
     main_reservoir->setY(0, pFL);
     charge_press = p0;
@@ -123,10 +125,6 @@ void VL60k::initBrakeMechanics()
 //------------------------------------------------------------------------------
 void VL60k::initBrakeEquipment(QString modules_dir)
 {
-    // Тормозная магистраль
-    double volumeTM = length * 0.035 * 0.035 * Physics::PI / 4.0;
-    brakepipe = new Reservoir(volumeTM);
-
     switch_valve = new SwitchingValve();
     switch_valve->read_config("zpk");
 
@@ -254,6 +252,8 @@ void VL60k::initialization()
     initHighVoltageScheme();
 
     initSupplyMachines();
+
+    initBrakepipe(modules_dir);
 
     initBrakeControls(modules_dir);
 
