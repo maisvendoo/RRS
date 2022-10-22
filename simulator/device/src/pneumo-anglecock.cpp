@@ -8,8 +8,8 @@ PneumoAngleCock::PneumoAngleCock(QObject *parent) : BrakeDevice(parent)
   , p_hose(0.0)
   , Q_pipe(0.0)
   , Q_hose(0.0)
-  , k(1.0)
-  , k_atm(0.2)
+  , k(0.1)
+  , k_atm(0.02)
   , is_opened(true)
 {
 
@@ -101,7 +101,7 @@ void PneumoAngleCock::preStep(state_vector_t &Y, double t)
         // Магистраль перекрыта
         Q_pipe = 0.0;
         // Рукав соединён с атмосферой
-        Q_hose = k_atm * p_hose;
+        Q_hose = -k_atm * p_hose;
     }
 }
 

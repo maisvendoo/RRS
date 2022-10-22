@@ -306,6 +306,9 @@ private:
     /// Инициализация схемы управления тягой
     void initTractionControl();
 
+    /// Инициализация тормозной магистрали
+    void initBrakepipe(QString module_path);
+
     /// Инициализация тормозного оборудования
     void initBrakesEquipment(QString module_path);
 
@@ -351,6 +354,9 @@ private:
     void stepAirSupplySubsystem(double t, double dt);
 
     void stepBrakesControl(double t, double dt);
+
+    /// Моделирование тормозной магистрали
+    void stepBrakepipe(double t, double dt);
 
     void stepBrakesEquipment(double t, double dt);
 

@@ -6,6 +6,11 @@
 //
 //------------------------------------------------------------------------------
 PassCarrige::PassCarrige() : Vehicle ()
+  , brakepipe(nullptr)
+  , hose_tm_fwd(nullptr)
+  , hose_tm_bwd(nullptr)
+  , anglecock_tm_fwd(nullptr)
+  , anglecock_tm_bwd(nullptr)
   , brake_mech(nullptr)
   , supply_reservoir(nullptr)
   , brake_mech_module("carbrakes-mech")
@@ -36,8 +41,19 @@ void PassCarrige::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Q_UNUSED(p0)
 
-    // Инициализация давления
+    // Инициализация давления в тормозной магистрали
     brakepipe->setY(0, pTM);
+    hose_tm_fwd->setY(0, pTM);
+    hose_tm_bwd->setY(0, pTM);
+    // Состояние концевых кранов
+    if (prev_vehicle == nullptr)
+        anglecock_tm_fwd->setState(false);
+    else
+        anglecock_tm_fwd->setState(true);
+    if (next_vehicle == nullptr)
+        anglecock_tm_bwd->setState(false);
+    else
+        anglecock_tm_bwd->setState(true);
 
     if (supply_reservoir != nullptr)
         supply_reservoir->setY(0, pTM);
@@ -54,9 +70,7 @@ void PassCarrige::initialization()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir(fs.getModulesDir().c_str());
 
-    // Тормозная магистраль
-    double volumeTM = length * 0.035 * 0.035 * Physics::PI / 4.0;
-    brakepipe = new Reservoir(volumeTM);
+    initBrakepipe(modules_dir);
 
     // Brake mechanics
     brake_mech = loadBrakeMech(modules_dir + fs.separator() + brake_mech_module);
@@ -95,12 +109,7 @@ void PassCarrige::initialization()
 //------------------------------------------------------------------------------
 void PassCarrige::step(double t, double dt)
 {
-    // Подключение потоков из оборудования и межвагонных соединений в ТМ
-    double QTM = -1.0 * (airdist->getAuxRate());
-    brakepipe->setAirFlow(QTMfwd + QTMbwd + QTM);
-    brakepipe->step(t, dt);
-    pTMfwd = brakepipe->getPressure();
-    pTMbwd = brakepipe->getPressure();
+    stepBrakepipe(t, dt);
 
     airdist->setBrakepipePressure(brakepipe->getPressure());
     airdist->setBrakeCylinderPressure(electroAirDist->getPbc_out());
@@ -147,6 +156,8 @@ void PassCarrige::step(double t, double dt)
     DebugMsg += QString("| Vbp: %1   ")
             .arg(length * 0.035 * 0.035 * Physics::PI / 4.0, 8, 'f', 5);
 
+    //DebugMsg = QString("|") + anglecock_tm_bwd->getDebugMsg() + QString("|");
+    //DebugMsg = msg + QString("f %1 | b %2 | ").arg(hose_tm_fwd->getPressure(), 9, 'f', 6).arg(hose_tm_bwd->getPressure(), 9, 'f', 6);
     soundStep();
 }
 
