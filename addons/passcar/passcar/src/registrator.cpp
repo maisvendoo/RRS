@@ -43,7 +43,7 @@ void Registrator::print_msg(QString msg, double t, double dt)
             tau = 0;
             QTextStream s(&file);
 
-            s << QString("%1 ").arg(t) << msg << "\n";
+            s /*<< QString("%1 ").arg(t) */<< msg;// << "\n";
 
             file.close();
         }
