@@ -15,6 +15,7 @@
 #include    "airdistributor.h"
 #include    "electro-airdistributor.h"
 #include    "pneumo-anglecock.h"
+#include    "registrator.h"
 
 //------------------------------------------------------------------------------
 //
@@ -30,7 +31,10 @@ public:
     void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
-QString msg;
+
+    /// Регистратор параметров в лог-файл
+    Registrator *reg;
+
     /// Резервуар в качестве трубы тормозной магистрали
     Reservoir *brakepipe;
 
@@ -72,6 +76,9 @@ QString msg;
     void initBrakepipe(QString module_path);
 
     void step(double t, double dt);
+
+    /// Запись параметров в лог-файл
+    void stepRegistrator(double t, double dt);
 
     /// Моделирование тормозной магистрали
     void stepBrakepipe(double t, double dt);

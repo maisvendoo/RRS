@@ -6,6 +6,7 @@
 //
 //------------------------------------------------------------------------------
 PassCarrige::PassCarrige() : Vehicle ()
+  , reg(nullptr)
   , brakepipe(nullptr)
   , hose_tm_fwd(nullptr)
   , hose_tm_bwd(nullptr)
@@ -102,6 +103,11 @@ void PassCarrige::initialization()
 
     initEPT();
     initSounds();
+
+    // Инициализация регистратора
+    QString log_name = QString("passcar.log");
+    reg = new Registrator(log_name, 0.02);
+
 }
 
 //------------------------------------------------------------------------------
@@ -156,8 +162,8 @@ void PassCarrige::step(double t, double dt)
     DebugMsg += QString("| Vbp: %1   ")
             .arg(length * 0.035 * 0.035 * Physics::PI / 4.0, 8, 'f', 5);
 
-    //DebugMsg = QString("|") + anglecock_tm_bwd->getDebugMsg() + QString("|");
-    //DebugMsg = msg + QString("f %1 | b %2 | ").arg(hose_tm_fwd->getPressure(), 9, 'f', 6).arg(hose_tm_bwd->getPressure(), 9, 'f', 6);
+    stepRegistrator(t, dt);
+
     soundStep();
 }
 
