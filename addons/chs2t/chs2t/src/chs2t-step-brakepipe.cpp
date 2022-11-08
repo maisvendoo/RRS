@@ -9,7 +9,7 @@ void CHS2T::stepBrakepipe(double t, double dt)
     hose_tm_fwd->setAirFlow(QTMfwd + anglecock_tm_fwd->getQ_hose());
     hose_tm_fwd->step(t, dt);
     pTMfwd = hose_tm_fwd->getPressure();
-    hose_tm_bwd->setAirFlow(QTMfwd + anglecock_tm_bwd->getQ_hose());
+    hose_tm_bwd->setAirFlow(QTMbwd + anglecock_tm_bwd->getQ_hose());
     hose_tm_bwd->step(t, dt);
     pTMbwd = hose_tm_bwd->getPressure();
 

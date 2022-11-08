@@ -213,24 +213,34 @@ bool Train::step(double t, double &dt)
 void Train::vehiclesStep(double t, double dt)
 {
     size_t num_vehicles = vehicles.size();
-    auto end = vehicles.end();
     auto begin = vehicles.begin();
-/*
-    brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
-    size_t j = 1;
-*/
+    auto end = vehicles.end();
+
+    // Передний рукав ТМ первой единицы ПС открыт в атмосферу
+    Vehicle *vehicle = *begin;
+    if (vehicle->getOrientation() > 0)
+        vehicle->setBrakepipeFlowFwd(-kTM * vehicle->getBrakepipePressureFwd());
+    else
+        vehicle->setBrakepipeFlowBwd(-kTM * vehicle->getBrakepipePressureBwd());
+
+    // Задний рукав ТМ последней единицы ПС открыт в атмосферу
+    vehicle = *(end - 1);
+    if (vehicle->getOrientation() > 0)
+        vehicle->setBrakepipeFlowBwd(-kTM * vehicle->getBrakepipePressureBwd());
+    else
+        vehicle->setBrakepipeFlowFwd(-kTM * vehicle->getBrakepipePressureFwd());
+
     for (auto i = begin; i != end; ++i)
     {
-        Vehicle *vehicle = *i;
+        vehicle = *i;
 
         // Если в поезде больше одной единицы ПС - считаем перетоки воздуха в ТМ
         if ( (num_vehicles > 1) && ( i != end - 1) )
         {
-            Vehicle *vehicle1 = *(i+1);
+            Vehicle *vehicle1= *(i+1);
 
             double pTM;
             double pTM1;
-            double flow;
 
             // Получаем давление в ТМ соседних единиц ПС с учётом их ориентации
             if (vehicle->getOrientation() > 0)
@@ -243,7 +253,7 @@ void Train::vehiclesStep(double t, double dt)
                 pTM1 = vehicle1->getBrakepipePressureBwd();
 
             // Считаем переток воздуха из предыдущей единицы ПС к следующей
-            flow = kTM * (pTM - pTM1);
+            double flow = kTM * (pTM - pTM1);
 
             // Задаём поток в ТМ соседних единиц ПС с учётом их ориентации
             if (vehicle->getOrientation() > 0)
@@ -254,16 +264,9 @@ void Train::vehiclesStep(double t, double dt)
                 vehicle1->setBrakepipeFlowFwd(flow);
             else
                 vehicle1->setBrakepipeFlowBwd(flow);
-
         }
-/*
-        brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
-        vehicle->setBrakepipePressure(brakepipe->getPressure(j));
-*/
+
         vehicle->integrationStep(y, t, dt);
-/*
-        ++j;
-*/
     }
 }
 
