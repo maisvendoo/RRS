@@ -20,11 +20,11 @@ public:
     /// Деструктор
     virtual ~PneumoAngleCock();
 
-    /// Задать давление в магистрали
+    /// Задать давление со стороны магистрали
     void setP_pipe(double p);
 
-    /// Задать давление в рукаве
-    void setP_hose(double p);
+    /// Задать поток из рукава
+    void setQ_hose(double q);
 
     /// Задать состояние концевого крана: true - открыть, false - закрыть
     void setState(bool opened);
@@ -35,8 +35,8 @@ public:
     /// Поток в магистраль
     double getQ_pipe() const;
 
-    /// Поток в рукав
-    double getQ_hose() const;
+    /// Давление в рукаве
+    double getP_hose() const;
 
     /// Cостояние концевого крана: true - открыт, false - закрыт
     bool getState() const;
@@ -46,20 +46,8 @@ protected:
     /// Давление в магистрали
     double p_pipe;
 
-    /// Давление в рукаве
-    double p_hose;
-
-    /// Поток в магистраль
-    double Q_pipe;
-
-    /// Поток в рукав
+    /// Поток из рукава
     double Q_hose;
-
-    /// Коэффициент потока между рукавом и магистралью
-    double k;
-
-    /// Коэффициент потока между рукавом и атмосферой
-    double k_atm;
 
     /// Состояние крана
     bool is_opened;

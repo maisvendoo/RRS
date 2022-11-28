@@ -12,8 +12,18 @@ void VL60pk::initBrakeDevices(double p0, double pTM, double pFL)
 {
     // Инициализация давления в тормозной магистрали
     brakepipe->setY(0, pTM);
-    hose_tm_fwd->setY(0, pTM);
-    hose_tm_bwd->setY(0, pTM);
+    anglecock_tm_fwd->setP_pipe(pTM);
+    anglecock_tm_bwd->setP_pipe(pTM);
+
+    // Состояние концевых кранов
+    if (prev_vehicle == nullptr)
+        anglecock_tm_fwd->setState(false);
+    else
+        anglecock_tm_fwd->setState(true);
+    if (next_vehicle == nullptr)
+        anglecock_tm_bwd->setState(false);
+    else
+        anglecock_tm_bwd->setState(true);
 
     main_reservoir->setY(0, pFL);
     charge_press = p0;

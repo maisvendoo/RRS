@@ -8,8 +8,6 @@
 PassCarrige::PassCarrige() : Vehicle ()
   , reg(nullptr)
   , brakepipe(nullptr)
-  , hose_tm_fwd(nullptr)
-  , hose_tm_bwd(nullptr)
   , anglecock_tm_fwd(nullptr)
   , anglecock_tm_bwd(nullptr)
   , brake_mech(nullptr)
@@ -44,8 +42,9 @@ void PassCarrige::initBrakeDevices(double p0, double pTM, double pFL)
 
     // Инициализация давления в тормозной магистрали
     brakepipe->setY(0, pTM);
-    hose_tm_fwd->setY(0, pTM);
-    hose_tm_bwd->setY(0, pTM);
+    anglecock_tm_fwd->setP_pipe(pTM);
+    anglecock_tm_bwd->setP_pipe(pTM);
+
     // Состояние концевых кранов
     if (prev_vehicle == nullptr)
         anglecock_tm_fwd->setState(false);

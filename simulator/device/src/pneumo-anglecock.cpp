@@ -5,11 +5,7 @@
 //------------------------------------------------------------------------------
 PneumoAngleCock::PneumoAngleCock(QObject *parent) : BrakeDevice(parent)
   , p_pipe(0.0)
-  , p_hose(0.0)
-  , Q_pipe(0.0)
   , Q_hose(0.0)
-  , k(0.1)
-  , k_atm(0.02)
   , is_opened(true)
 {
 
@@ -34,9 +30,9 @@ void PneumoAngleCock::setP_pipe(double p)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoAngleCock::setP_hose(double p)
+void PneumoAngleCock::setQ_hose(double q)
 {
-    this->p_hose = p;
+    this->Q_hose = q;
 }
 
 //------------------------------------------------------------------------------
@@ -60,15 +56,25 @@ void PneumoAngleCock::changeState()
 //------------------------------------------------------------------------------
 double PneumoAngleCock::getQ_pipe() const
 {
-    return Q_pipe;
+    if (is_opened)
+        // Поток через открытый концевой кран
+        return Q_hose;
+    else
+        // Поток через закрытый концевой кран
+        return 0.0;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoAngleCock::getQ_hose() const
+double PneumoAngleCock::getP_hose() const
 {
-    return Q_hose;
+    if (is_opened)
+        // Рукав соединён с магистралью
+        return p_pipe;
+    else
+        // Рукав соединён с атмосферой
+        return 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -86,23 +92,6 @@ void PneumoAngleCock::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
-
-    if (is_opened)
-    // Открытый концевой кран
-    {
-        // Рукав соединён с магистралью
-        double Q = k * (p_hose - p_pipe);
-        Q_pipe = Q;
-        Q_hose = -Q;
-    }
-    else
-    // Закрытый концевой кран
-    {
-        // Магистраль перекрыта
-        Q_pipe = 0.0;
-        // Рукав соединён с атмосферой
-        Q_hose = -k_atm * p_hose;
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -124,7 +113,5 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
-    cfg.getDouble(secName, "k", k);
-    cfg.getDouble(secName, "kAtm", k_atm);
     cfg.getBool(secName, "isStateOpened", is_opened);
 }
