@@ -361,7 +361,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
     double sin_beta = inc / 1000.0;
     double G = full_mass * Physics::g * sin_beta;
 
-    // Calculate main resistence force
+    // Calculate main resistance force
     double w = b0 + (b1 + b2 * V + b3 * V * V) / q0;
     double wk = 700.0 * curv;
     double W = full_mass * Physics::g * (w + wk) / 1000.0;
@@ -369,25 +369,34 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
     // Direction & orientation
     int d = dir * orient;
 
-    // Calculate equvivalent wheel forces
-    double sumEqWheelForce = 0;
-
-    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
-    {
-        double eqWheelForce = (Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i])) / rk;
-        sumEqWheelForce += eqWheelForce;
-    }
-
-    // Calculate equvivalent resistence force
+    // Calculate equvivalent resistance force
     double Fr = Physics::fricForce(W + Q_r[0], d * v);
 
-    // Vehicle body's acceleration
-    *a.begin() = d * (*Q_a.begin() - Fr + R1 - R2 + sumEqWheelForce - G) / ( full_mass + num_axis * J_axis / rk / rk);
-
     // Wheels angle accelerations
-    auto end = a.end();
-    for (auto accel_it = a.begin() + 1; accel_it != end; ++accel_it)
-        *accel_it = *a.begin() / rk;
+    size_t i = 1;
+    double sumWheelForce = 0.0;
+    for (auto accel_it = a.begin() + 1; accel_it != a.end(); ++accel_it)
+    {
+        // Calculate velocity of slip between wheel and rail
+        double slip = rk * Y[idx + s + i] - v;
+
+        // Calculate force from friction between wheel and rail
+        double fricWheelForce = d * Physics::fricForce(0.3 * full_mass, slip);
+
+        // Calculate common wheel torque from active, reactive and friction forces
+        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i]) - fricWheelForce * rk;
+
+        // Calculate wheel angle acceleration
+        *accel_it = d * eqWheelTorque / J_axis;
+
+        // Common force from wheel to vehicle body
+        sumWheelForce += fricWheelForce;
+
+        ++i;
+    }
+
+    // Vehicle body's acceleration
+    *a.begin() = d * (*Q_a.begin() - G - Fr + R1 - R2 + sumWheelForce) / full_mass;
 
     return a;
 }
