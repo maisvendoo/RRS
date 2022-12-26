@@ -381,7 +381,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         double slip = rk * Y[idx + s + i] - v;
 
         // Calculate force from friction between wheel and rail
-        double fricWheelForce = d * Physics::fricForce(0.3 * full_mass, slip);
+        double fricWheelForce = d * Physics::fricForce(0.3 * full_mass * Physics::g, slip);
 
         // Calculate common wheel torque from active, reactive and friction forces
         double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i]) - fricWheelForce * rk;
