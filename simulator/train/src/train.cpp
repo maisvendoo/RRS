@@ -168,11 +168,6 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
                 vehicle1->setBackwardForce(R);
         }
 
-        profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
-
-        vehicle->setInclination(pe.inclination);
-        vehicle->setCurvature(pe.curvature);
-
         state_vector_t a = vehicle->getAcceleration(Y, t);
 
         memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
@@ -222,7 +217,12 @@ void Train::vehiclesStep(double t, double dt)
 
         brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
         vehicle->setBrakepipePressure(brakepipe->getPressure(j));
+
         vehicle->integrationStep(y, t, dt);
+
+        profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
+        vehicle->setInclination(pe.inclination);
+        vehicle->setCurvature(pe.curvature);
 
         ++j;
     }
