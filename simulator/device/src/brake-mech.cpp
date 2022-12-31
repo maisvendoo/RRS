@@ -19,7 +19,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BrakeMech::BrakeMech(QObject *parent) : Device(parent)  
+BrakeMech::BrakeMech(QObject *parent) : Device(parent)
   , shoesAxis(4)
   , cylNum(1)
   , Q(0.0)
@@ -35,6 +35,8 @@ BrakeMech::BrakeMech(QObject *parent) : Device(parent)
   , shoeType("iron")
   , Kmax(3.0)
   , p_max(0.4)
+  , p_begin(0.02)
+  , p_end(0.04)
 {
 
 }
@@ -124,14 +126,22 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    // Вычисляем нажатие на одну колодку (кгс)
-    K = Kmax * Y[0] / p_max;
+    if (Y[0] > p_end)
+    {
+        // Вычисляем нажатие на одну колодку (кгс)
+        K = Kmax * (Y[0] - p_end) / p_max;
 
-    // Вычисляем тормозную силу, получаемую от одной колодки
-    double shoe_brake_force = K * phi(K, velocity) * Physics::g * 1000.0;
+        // Вычисляем тормозную силу, получаемую от одной колодки
+        double shoe_brake_force = K * phi(K, velocity) * Physics::g * 1000.0;
 
-    // Вычисляем момент на оси колесной пары
-    brakeTorque = shoesAxis * shoe_brake_force * effRadius;
+        // Вычисляем момент на оси колесной пары
+        brakeTorque = shoesAxis * shoe_brake_force * effRadius;
+    }
+    else
+    {
+        K = 0.0;
+        brakeTorque = 0.0;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -153,6 +163,8 @@ void BrakeMech::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "Kmax", Kmax);
     cfg.getDouble(secName, "p_max", p_max);
+    cfg.getDouble(secName, "p_begin", p_begin);
+    cfg.getDouble(secName, "p_end", p_end);
 
     double p_cyl_begin = 0.0;
     cfg.getDouble(secName, "InitPressure", p_cyl_begin);
