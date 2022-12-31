@@ -415,7 +415,17 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 {
-    (void) Y;
+    railway_coord = Y[idx];
+    velocity = Y[idx + s] * orient;
+
+    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    {
+        wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
+        wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
+    }
+
+    emit sendCoord(railway_coord + dir * length / 2.0);
+
     preStep(t);
 }
 
@@ -451,17 +461,7 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
-    railway_coord = Y[idx];
-    velocity = Y[idx + s] * orient;
-
-    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
-    {
-        wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
-        wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
-    }
-
-    emit sendCoord(railway_coord + dir * length / 2.0);
-
+    (void) Y;
     postStep(t);
 }
 

@@ -218,12 +218,12 @@ void Train::vehiclesStep(double t, double dt)
         brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
         vehicle->setBrakepipePressure(brakepipe->getPressure(j));
 
-        vehicle->integrationStep(y, t, dt);
-
-        profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
+        profile_element_t pe = profile->getElement(y[vehicle->getIndex()]);
         vehicle->setInclination(pe.inclination);
         vehicle->setCurvature(pe.curvature);
 //        vehicle->setFrictionCoeff(0.3);
+
+        vehicle->integrationStep(y, t, dt);
 
         ++j;
     }
