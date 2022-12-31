@@ -223,6 +223,7 @@ void Train::vehiclesStep(double t, double dt)
         profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
         vehicle->setInclination(pe.inclination);
         vehicle->setCurvature(pe.curvature);
+//        vehicle->setFrictionCoeff(0.3);
 
         ++j;
     }

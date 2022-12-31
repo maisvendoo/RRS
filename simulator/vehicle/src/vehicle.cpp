@@ -52,6 +52,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , q0(24.0)
   , inc(0.0)
   , curv(0.0)
+  , Psi(0.3)
   , dir(1)
   , orient(1)
   , p0(0.0)
@@ -118,6 +119,14 @@ void Vehicle::setInclination(double inc)
 void Vehicle::setCurvature(double curv)
 {
     this->curv = curv;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setFrictionCoeff(double coeff)
+{
+    this->Psi = coeff;
 }
 
 //------------------------------------------------------------------------------
@@ -381,7 +390,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         double slip = rk * Y[idx + s + i] - v;
 
         // Calculate force from friction between wheel and rail
-        double fricWheelForce = d * Physics::fricForce(0.3 * full_mass * Physics::g / num_axis, slip);
+        double fricWheelForce = d * Physics::fricForce(Psi * full_mass * Physics::g / num_axis, slip);
 
         // Calculate common wheel torque from active, reactive and friction forces
         double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i] / 2.0) - fricWheelForce * rk;

@@ -62,6 +62,9 @@ public:
     /// Set curvature
     void setCurvature(double curv);
 
+    /// Set friction coefficient between wheel and rail
+    void setFrictionCoeff(double coeff);
+
     /// Set direction
     void setDirection(int dir);
 
@@ -263,6 +266,8 @@ protected:
     double  inc;
     /// Railway curvature
     double  curv;
+    /// Friction coefficient between wheel and rail
+    double  Psi;
 
     /// Railway motion direction
     int     dir;
