@@ -384,7 +384,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         double fricWheelForce = d * Physics::fricForce(0.3 * full_mass * Physics::g / num_axis, slip);
 
         // Calculate common wheel torque from active, reactive and friction forces
-        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i]) - fricWheelForce * rk;
+        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i] / 2.0) - fricWheelForce * rk;
 
         // Calculate wheel angle acceleration
         *accel_it = d * eqWheelTorque / J_axis;
