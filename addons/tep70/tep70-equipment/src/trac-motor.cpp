@@ -57,8 +57,6 @@ void TractionMotor::preStep(state_vector_t &Y, double t)
     {
     case 1:
         {
-            E = cPhi(beta * Y[0] * revers_state) * omega;
-
             M = Y[0] * cPhi(beta * Y[0] * revers_state) * eff_coef.getValue(Y[0]);
 
             break;
@@ -66,8 +64,6 @@ void TractionMotor::preStep(state_vector_t &Y, double t)
 
     case 0:
         {
-            E = 0;
-
             M = 0;
 
             Y[0] = Y[1] = 0.0;
@@ -98,6 +94,8 @@ void TractionMotor::ode_system(const state_vector_t &Y,
     {
     case 1:
         {
+            E = cPhi(beta * Y[0] * revers_state) * omega;
+
             double R = Ra + beta * (Rf + Rd);
 
             dYdt[0] = (Ua - Y[0] * R - E) / Ta / Ra;
@@ -117,6 +115,8 @@ void TractionMotor::ode_system(const state_vector_t &Y,
 
     default:
         {
+            E = 0;
+
             dYdt[0] = 0.0;
             dYdt[1] = 0.0;
             break;
