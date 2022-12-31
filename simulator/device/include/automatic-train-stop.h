@@ -24,6 +24,8 @@ public:
 
     virtual double getEmergencyBrakeRate() const;
 
+    virtual bool getEmergencyBrakeContact() const;
+
     bool getStateKey() const { return is_key_on; }
 
 protected:
