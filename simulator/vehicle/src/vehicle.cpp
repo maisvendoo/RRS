@@ -377,7 +377,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
     int d = dir * orient;
 
     // Calculate equvivalent force from resistance
-    double sumForce = - Physics::fricForce(W + Q_r[0], d * v);
+    double sum_force = - Physics::fricForce(W + Q_r[0], d * v);
 
     // Wheels angle accelerations
     size_t i = 1;
@@ -386,26 +386,23 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         // Wheel's surface velocity from state vector
         double omega_rk = Y[idx + s + i] * rk;
 
-        // Calculate velocity of slip between wheel and rail
-        double slip = omega_rk - v;
-
         // Calculate force from friction between wheel and rail
-        double fricWheelForce = Physics::fricForce(Psi * full_mass * Physics::g / num_axis, slip);
+        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], omega_rk - v);
 
         // Calculate common wheel torque from active, reactive and friction forces
-        double eqWheelTorque = d * Q_a[i] - Physics::fricForce(Q_r[i], omega_rk) - fricWheelForce * rk;
+        double eqWheelTorque = d * Q_a[i] - Physics::fricForce(Q_r[i], omega_rk) - wheel_fric * rk;
 
         // Calculate wheel angle acceleration
         *accel_it = eqWheelTorque / J_axis;
 
         // Add force from wheel to vehicle's equvivalent force
-        sumForce += fricWheelForce;
+        sum_force += wheel_fric;
 
         ++i;
     }
 
     // Vehicle body's acceleration
-    *a.begin() = d * (*Q_a.begin() - G_force + R1 - R2 + sumForce) / full_mass;
+    *a.begin() = d * (*Q_a.begin() - G_force + R1 - R2 + sum_force) / full_mass;
 
     return a;
 }
@@ -422,6 +419,7 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
         wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
+        wheel_fric_max[i] = Psi * full_mass * Physics::g / num_axis;
     }
 
     // Calculate gravity force from profile inclination
@@ -683,6 +681,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         num_axis = static_cast<size_t>(tmp);
         wheel_rotation_angle.resize(num_axis);
         wheel_omega.resize(num_axis);
+        wheel_fric_max.resize(num_axis);
 
         Journal::instance()->info(QString("NumAxis: %1").arg(num_axis));
 

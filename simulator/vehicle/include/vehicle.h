@@ -247,6 +247,8 @@ protected:
     double  R2;
     /// Gravity force from profile inclination
     double  G_force;
+    /// Max wheel friction force
+    std::vector<double>  wheel_fric_max;
 
     /// Number of degrees of freedom
     size_t  s;
