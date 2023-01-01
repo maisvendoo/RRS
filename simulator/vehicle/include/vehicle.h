@@ -245,6 +245,8 @@ protected:
     double  R1;
     /// Backward coupling force
     double  R2;
+    /// Gravity force from profile inclination
+    double  G_force;
 
     /// Number of degrees of freedom
     size_t  s;
@@ -261,6 +263,10 @@ protected:
     double  b2;
     double  b3;
     double  q0;
+    double  W_coef;
+    double  W_coef_v;
+    double  W_coef_v2;
+    double  W_coef_curv;
 
     /// Vertical profile inclination
     double  inc;
