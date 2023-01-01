@@ -387,13 +387,13 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         double omega_rk = Y[idx + s + i] * rk;
 
         // Calculate force from friction between wheel and rail
-        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], omega_rk - v);
+        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], d * (omega_rk - v));
 
         // Calculate common wheel torque from active, reactive and friction forces
-        double eqWheelTorque = d * Q_a[i] - Physics::fricForce(Q_r[i], omega_rk) - wheel_fric * rk;
+        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * omega_rk) - wheel_fric * rk;
 
         // Calculate wheel angle acceleration
-        *accel_it = eqWheelTorque / J_axis;
+        *accel_it = d * eqWheelTorque / J_axis;
 
         // Add force from wheel to vehicle's equvivalent force
         sum_force += wheel_fric;
