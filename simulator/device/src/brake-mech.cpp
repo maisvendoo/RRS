@@ -126,10 +126,10 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    if (Y[0] > p_end)
+    if ((Y[0] - p_end) > Physics::ZERO)
     {
         // Вычисляем нажатие на одну колодку (кгс)
-        K = Kmax * (Y[0] - p_end) / p_max;
+        K = Kmax * (Y[0] - p_end) / (p_max - p_end);
 
         // Вычисляем тормозную силу, получаемую от одной колодки
         double shoe_brake_force = K * phi(K, velocity) * Physics::g * 1000.0;
