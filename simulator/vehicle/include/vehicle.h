@@ -249,6 +249,8 @@ protected:
     double  G_force;
     /// Max wheel friction force
     std::vector<double>  wheel_fric_max;
+    /// Max friction force
+    double fric_max;
 
     /// Number of degrees of freedom
     size_t  s;

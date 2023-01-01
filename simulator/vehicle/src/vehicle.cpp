@@ -389,11 +389,8 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         // Calculate force from friction between wheel and rail
         double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], d * (omega_rk - v));
 
-        // Calculate common wheel torque from active, reactive and friction forces
-        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * omega_rk) - wheel_fric * rk;
-
-        // Calculate wheel angle acceleration
-        *accel_it = d * eqWheelTorque / J_axis;
+        // Calculate wheel angle acceleration by active, reactive and friction forces
+        *accel_it = d * (Q_a[i] - Physics::fricForce(Q_r[i], d * omega_rk) - wheel_fric * rk) / J_axis;
 
         // Add force from wheel to vehicle's equvivalent force
         sum_force += wheel_fric;
@@ -401,8 +398,17 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         ++i;
     }
 
+    // Common body active force
+    double body_force = *Q_a.begin() - G_force + R1 - R2;
+    // Decrease active force by reactive at low velocities for better behaviour
+    if (sign(body_force) == sign(v))
+    {
+        double f = cut(fric_max, 0.0, abs(body_force));
+        body_force = body_force - sign(v) * f + Physics::fricForce(f, v);
+    }
+
     // Vehicle body's acceleration
-    *a.begin() = d * (*Q_a.begin() - G_force + R1 - R2 + sum_force) / full_mass;
+    *a.begin() = d * (body_force + sum_force) / full_mass;
 
     return a;
 }
@@ -419,12 +425,7 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
     {
         wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
         wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
-        wheel_fric_max[i] = Psi * full_mass * Physics::g / num_axis;
     }
-
-    // Calculate gravity force from profile inclination
-    double sin_beta = inc / 1000.0;
-    G_force = full_mass * Physics::g * sin_beta * orient;
 
     emit sendCoord(railway_coord + dir * length / 2.0);
 
@@ -464,6 +465,19 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
     (void) Y;
+
+    // Calculate gravity force from profile inclination
+    double sin_beta = inc / 1000.0;
+    G_force = full_mass * Physics::g * sin_beta * orient;
+
+    // Calculate max friction force
+    fric_max = Q_r[0];
+    for (size_t i = 0; i < wheel_fric_max.size(); i++)
+    {
+        wheel_fric_max[i] = Psi * full_mass * Physics::g / num_axis;
+        fric_max += (min(wheel_fric_max[i], Q_r[i+1]) - pf(Q_a[i+1] * sign(wheel_omega[i]))) * rk;
+    }
+
     postStep(t);
 }
 
