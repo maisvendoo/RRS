@@ -368,7 +368,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     // Calculate gravity force from profile inclination
     double sin_beta = inc / 1000.0;
-    double G = full_mass * Physics::g * sin_beta;
+    double G = full_mass * Physics::g * sin_beta * orient;
 
     // Calculate main resistance force
     double w = b0 + (b1 + b2 * V + b3 * V * V) / q0;
@@ -393,7 +393,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
         double fricWheelForce = d * Physics::fricForce(Psi * full_mass * Physics::g / num_axis, slip);
 
         // Calculate common wheel torque from active, reactive and friction forces
-        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i] / 2.0) - fricWheelForce * rk;
+        double eqWheelTorque = Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i] * rk) - fricWheelForce * rk;
 
         // Calculate wheel angle acceleration
         *accel_it = d * eqWheelTorque / J_axis;
