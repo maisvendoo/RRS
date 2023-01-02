@@ -366,31 +366,31 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 {
     (void) t;
 
+    // Direction & orientation
+    int d = dir * orient;
+
     // Body velocity from state vector
-    double v = Y[idx + s];
+    double v = d * Y[idx + s];
 
     // Calculate main resistance force
     double W = full_mass *
         (W_coef + W_coef_v * abs(v) + W_coef_v2 * v * v + W_coef_curv * curv);
 
-    // Direction & orientation
-    int d = dir * orient;
-
     // Calculate equvivalent force from resistance
-    double sum_force = - Physics::fricForce(W + Q_r[0], d * v);
+    double sum_force = - Physics::fricForce(W + Q_r[0], v);
 
     // Wheels angle accelerations
     size_t i = 1;
     for (auto accel_it = a.begin() + 1; accel_it != a.end(); ++accel_it)
     {
         // Wheel's surface velocity from state vector
-        double omega_rk = Y[idx + s + i] * rk;
+        double omega_rk = d * Y[idx + s + i] * rk;
 
         // Calculate force from friction between wheel and rail
-        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], d * (omega_rk - v));
+        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], omega_rk - v);
 
         // Calculate wheel angle acceleration by active, reactive and friction forces
-        *accel_it = d * (Q_a[i] - Physics::fricForce(Q_r[i], d * omega_rk) - wheel_fric * rk) / J_axis;
+        *accel_it = d * (Q_a[i] - Physics::fricForce(Q_r[i], omega_rk) - wheel_fric * rk) / J_axis;
 
         // Add force from wheel to vehicle's equvivalent force
         sum_force += wheel_fric;
