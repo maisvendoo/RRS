@@ -688,14 +688,9 @@ void Model::process()
         t += dt;
 
         postStep(t);
-        Journal::instance()->info(QString("t %1|dt %2|tau %3|interv %4|realtd %5|contrt %6|conrd %7")
+        Journal::instance()->info(QString("t %1|dt %2")
                                   .arg(t, 9, 'f', 5)
-                                  .arg(dt, 7, 'f', 5)
-                                  .arg(tau, 7, 'f', 5)
-                                  .arg(integration_time, 7, 'f', 5)
-                                  .arg(realtime_delay, 2)
-                                  .arg(control_time, 7, 'f', 5)
-                                  .arg(control_delay, 7, 'f', 5));
+                                  .arg(dt, 7, 'f', 5));
     }
 
     train->inputProcess();
