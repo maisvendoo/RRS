@@ -401,7 +401,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
     // Common body active force
     double body_force = *Q_a.begin() - G_force + R1 - R2;
     // Decrease active force by reactive at low velocities for better behaviour
-    if (sign(body_force) == sign(v))
+    if ((sign(body_force) == sign(v)) && (abs(v) < 0.25))
     {
         double f = cut(fric_max, 0.0, abs(body_force));
         body_force = body_force - sign(v) * f + Physics::fricForce(f, v);

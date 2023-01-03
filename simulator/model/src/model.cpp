@@ -355,36 +355,48 @@ void Model::configSolver(solver_config_t &solver_config)
         {
             solver_config.method = "rkf5";
         }
-
         Journal::instance()->info("Integration method: " + solver_config.method);
 
         if (!cfg.getDouble(secName, "StartTime", solver_config.start_time))
         {
             solver_config.start_time = 0;
         }
-
         Journal::instance()->info("Start time: " + QString("%1").arg(solver_config.start_time));
 
         if (!cfg.getDouble(secName, "StopTime", solver_config.stop_time))
         {
             solver_config.stop_time = 10.0;
         }
-
         Journal::instance()->info("Stop time: " + QString("%1").arg(solver_config.stop_time));
 
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
-            solver_config.step = 1e-4;
+            solver_config.step = 2e-3;
         }
-
         Journal::instance()->info("Initial integration step: " + QString("%1").arg(solver_config.step));
 
         if (!cfg.getDouble(secName, "MaxStep", solver_config.max_step))
         {
-            solver_config.max_step = 1e-2;
+            solver_config.max_step = 2e-3;
         }
-
         Journal::instance()->info("Maximal integration step: " + QString("%1").arg(solver_config.max_step));
+
+        int tmp = 4;
+        if (!cfg.getInt(secName, "SubStepNum", tmp))
+        {
+            solver_config.num_sub_step = 4;
+        }
+        else
+        {
+            solver_config.num_sub_step = static_cast<size_t>(tmp);
+        }
+        Journal::instance()->info("Number of substep: " + QString("%1").arg(solver_config.num_sub_step));
+
+        if (!cfg.getDouble(secName, "LocalError", solver_config.local_error))
+        {
+            solver_config.local_error = 1e-5;
+        }
+        Journal::instance()->info("Local error of solution: " + QString("%1").arg(solver_config.local_error));
     }
     else
     {
@@ -688,11 +700,11 @@ void Model::process()
         t += dt;
 
         postStep(t);
-        Journal::instance()->info(QString("t %1|dt %2")
-                                  .arg(t, 9, 'f', 5)
-                                  .arg(dt, 7, 'f', 5));
     }
 
+    Journal::instance()->info(QString("t %1|dt %2")
+                              .arg(t, 9, 'f', 5)
+                              .arg(dt, 7, 'f', 5));
     train->inputProcess();
 
     // Debug print, is allowed

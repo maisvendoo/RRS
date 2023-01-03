@@ -25,7 +25,7 @@ const double Physics::Mair = 0.029;
 const double Physics::c = 340.0;
 const double Physics::ZERO = 1e-10;
 
-const double Physics::FricApproxCoeff = 4.0;
+const double Physics::FricApproxCoeff = 15.0;
 
 //------------------------------------------------------------------------------
 //

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Solver>
-        <Method>rk4</Method>
+        <Method>euler</Method>
         <StartTime>0</StartTime>
         <StopTime>1e7</StopTime>
         <MaxStep>2e-3</MaxStep>
         <InitStep>2e-3</InitStep>
+        <SubStepNum>4</SubStepNum>
         <LocalError>1e-1</LocalError>
     </Solver>
 </Config>
