@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Vehicle>
+    <Vehicle>
 
-		<EmptyMass>135000</EmptyMass>
-		<PayloadMass>0</PayloadMass>
-		<Length>22.55</Length>
-		<WheelDiameter>1.25</WheelDiameter>
-		<MainResist>loco-resist</MainResist>
-		<NumAxis>6</NumAxis>		
-		<DegreesOfFreedom>7</DegreesOfFreedom>
-        <WheelInertia>2.0</WheelInertia>
+        <EmptyMass>135000</EmptyMass>
+        <PayloadMass>0</PayloadMass>
+        <Length>22.55</Length>
+        <WheelDiameter>1.25</WheelDiameter>
+        <MainResist>loco-resist</MainResist>
+        <NumAxis>6</NumAxis>
+        <DegreesOfFreedom>7</DegreesOfFreedom>
+        <WheelInertia>100.0</WheelInertia>
 
         <ExtModelName>ep20/EP20.osgt</ExtModelName>
-		<CabineModel>ep20/Cab.osgt</CabineModel>
-                
+        <CabineModel>ep20/Cab.osgt</CabineModel>
 
-                
-		<DriverPos>0.6 9.0 3.35</DriverPos>
-                
+        <DriverPos>0.6 9.0 3.35</DriverPos>
 
-	</Vehicle>
+    </Vehicle>
 </Config>

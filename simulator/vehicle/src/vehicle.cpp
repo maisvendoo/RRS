@@ -41,6 +41,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , rk(0.475)
   , R1(0.0)
   , R2(0.0)
+  , G_force(0.0)
   , s(5)
   , railway_coord0(0.0)
   , railway_coord(0.0)
@@ -50,8 +51,13 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , b2(0.0)
   , b3(0.0)
   , q0(24.0)
+  , W_coef((b0 + b1 / q0) * Physics::g / 1000.0)
+  , W_coef_v((b2 / q0) * Physics::g * Physics::kmh / 1000.0)
+  , W_coef_v2((b3 / q0) * Physics::g * Physics::kmh * Physics::kmh / 1000.0)
+  , W_coef_curv(700.0 * Physics::g / 1000.0)
   , inc(0.0)
   , curv(0.0)
+  , Psi(0.3)
   , dir(1)
   , orient(1)
   , p0(0.0)
@@ -118,6 +124,14 @@ void Vehicle::setInclination(double inc)
 void Vehicle::setCurvature(double curv)
 {
     this->curv = curv;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setFrictionCoeff(double coeff)
+{
+    this->Psi = coeff;
 }
 
 //------------------------------------------------------------------------------
@@ -352,42 +366,49 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 {
     (void) t;
 
-    // Get body velocity from state vector
-    double v = Y[idx + s];
-    // Convert velocity to kmh
-    double V = abs(v) * Physics::kmh;
-
-    // Calculate gravity force from profile inclination
-    double sin_beta = inc / 1000.0;
-    double G = full_mass * Physics::g * sin_beta;
-
-    // Calculate main resistence force
-    double w = b0 + (b1 + b2 * V + b3 * V * V) / q0;
-    double wk = 700.0 * curv;
-    double W = full_mass * Physics::g * (w + wk) / 1000.0;
-
     // Direction & orientation
     int d = dir * orient;
 
-    // Calculate equvivalent wheel forces
-    double sumEqWheelForce = 0;
+    // Body velocity from state vector
+    double v = d * Y[idx + s];
 
-    for (size_t i = 1; i <= static_cast<size_t>(num_axis); i++)
-    {
-        double eqWheelForce = (Q_a[i] - Physics::fricForce(Q_r[i], d * Y[idx + s + i])) / rk;
-        sumEqWheelForce += eqWheelForce;
-    }
+    // Calculate main resistance force
+    double W = full_mass *
+        (W_coef + W_coef_v * abs(v) + W_coef_v2 * v * v + W_coef_curv * curv);
 
-    // Calculate equvivalent resistence force
-    double Fr = Physics::fricForce(W + Q_r[0], d * v);
-
-    // Vehicle body's acceleration
-    *a.begin() = d * (*Q_a.begin() - Fr + R1 - R2 + sumEqWheelForce - G) / ( full_mass + num_axis * J_axis / rk / rk);
+    // Calculate equvivalent force from resistance
+    double sum_force = - Physics::fricForce(W + Q_r[0], v);
 
     // Wheels angle accelerations
-    auto end = a.end();
-    for (auto accel_it = a.begin() + 1; accel_it != end; ++accel_it)
-        *accel_it = *a.begin() / rk;
+    size_t i = 1;
+    for (auto accel_it = a.begin() + 1; accel_it != a.end(); ++accel_it)
+    {
+        // Wheel's surface velocity from state vector
+        double omega_rk = d * Y[idx + s + i] * rk;
+
+        // Calculate force from friction between wheel and rail
+        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], omega_rk - v);
+
+        // Calculate wheel angle acceleration by active, reactive and friction forces
+        *accel_it = d * (Q_a[i] - Physics::fricForce(Q_r[i], omega_rk) - wheel_fric * rk) / J_axis;
+
+        // Add force from wheel to vehicle's equvivalent force
+        sum_force += wheel_fric;
+
+        ++i;
+    }
+
+    // Common body active force
+    double body_force = *Q_a.begin() - G_force + R1 - R2;
+    // Decrease active force by reactive at low velocities for better behaviour
+    if ((sign(body_force) == sign(v)) && (abs(v) < 0.25))
+    {
+        double f = cut(fric_max, 0.0, abs(body_force));
+        body_force = body_force - sign(v) * f + Physics::fricForce(f, v);
+    }
+
+    // Vehicle body's acceleration
+    *a.begin() = d * (body_force + sum_force) / full_mass;
 
     return a;
 }
@@ -397,7 +418,17 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 {
-    (void) Y;
+    railway_coord = Y[idx];
+    velocity = Y[idx + s] * orient;
+
+    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    {
+        wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
+        wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
+    }
+
+    emit sendCoord(railway_coord + dir * length / 2.0);
+
     preStep(t);
 }
 
@@ -433,16 +464,19 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
-    railway_coord = Y[idx];
-    velocity = Y[idx + s] * orient;
+    (void) Y;
 
-    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    // Calculate gravity force from profile inclination
+    double sin_beta = inc / 1000.0;
+    G_force = full_mass * Physics::g * sin_beta * orient;
+
+    // Calculate max friction force
+    fric_max = Q_r[0];
+    for (size_t i = 0; i < wheel_fric_max.size(); i++)
     {
-        wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
-        wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
+        wheel_fric_max[i] = Psi * full_mass * Physics::g / num_axis;
+        fric_max += (min(wheel_fric_max[i], Q_r[i+1]) - pf(Q_a[i+1] * sign(wheel_omega[i]))) * rk;
     }
-
-    emit sendCoord(railway_coord + dir * length / 2.0);
 
     postStep(t);
 }
@@ -661,6 +695,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         num_axis = static_cast<size_t>(tmp);
         wheel_rotation_angle.resize(num_axis);
         wheel_omega.resize(num_axis);
+        wheel_fric_max.resize(num_axis);
 
         Journal::instance()->info(QString("NumAxis: %1").arg(num_axis));
 
@@ -717,6 +752,11 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
 
         Journal::instance()->info("Main resist formula: " + QString("w = %1 + (%2 + %3 * V + %4 * V^2) / %5")
                                   .arg(b0).arg(b1).arg(b2).arg(b3).arg(q0));
+
+    W_coef = (b0 + b1 / q0) * Physics::g / 1000.0;
+    W_coef_v = (b2 / q0) * Physics::g * Physics::kmh / 1000.0;
+    W_coef_v2 = (b3 / q0) * Physics::g * Physics::kmh * Physics::kmh / 1000.0;
+    W_coef_curv = 700.0 * Physics::g / 1000.0;
     }
     else
     {

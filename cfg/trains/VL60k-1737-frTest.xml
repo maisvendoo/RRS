@@ -17,14 +17,14 @@
 	<Vehicle>
 		<Module>vl60k</Module>
 		<ModuleConfig>VL60k-1737</ModuleConfig>
-		<Count>1</Count>
+		<Count>9</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
 		<Module>passcar</Module>
 		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
-		<Count>50</Count>
+		<Count>170</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 	

@@ -46,7 +46,7 @@ Model::Model(QObject *parent) : QObject(parent)
     if (!shared_memory.create(sizeof(server_data_t)))
     {
         shared_memory.attach();
-    }    
+    }
 
     sim_client = Q_NULLPTR;
 }
@@ -111,11 +111,11 @@ bool Model::init(const simulator_command_line_t &command_line)
     connect(train, &Train::logMessage, this, &Model::logMessage);
 
     if (!train->init(init_data))
-        return false;    
+        return false;
 
     connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
-    keys_data.setKey("keys");    
+    keys_data.setKey("keys");
 
     if (!keys_data.create(init_data.keys_buffer_size))
     {
@@ -329,7 +329,7 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     if (command_line.init_coord.is_present)
     {
-        init_data.init_coord = command_line.init_coord.value;        
+        init_data.init_coord = command_line.init_coord.value;
     }
 
     if (command_line.direction.is_present)
@@ -355,36 +355,48 @@ void Model::configSolver(solver_config_t &solver_config)
         {
             solver_config.method = "rkf5";
         }
-
         Journal::instance()->info("Integration method: " + solver_config.method);
 
         if (!cfg.getDouble(secName, "StartTime", solver_config.start_time))
         {
             solver_config.start_time = 0;
         }
-
         Journal::instance()->info("Start time: " + QString("%1").arg(solver_config.start_time));
 
         if (!cfg.getDouble(secName, "StopTime", solver_config.stop_time))
         {
             solver_config.stop_time = 10.0;
         }
-
         Journal::instance()->info("Stop time: " + QString("%1").arg(solver_config.stop_time));
 
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
-            solver_config.step = 1e-4;
+            solver_config.step = 2e-3;
         }
-
         Journal::instance()->info("Initial integration step: " + QString("%1").arg(solver_config.step));
 
         if (!cfg.getDouble(secName, "MaxStep", solver_config.max_step))
         {
-            solver_config.max_step = 1e-2;
+            solver_config.max_step = 2e-3;
         }
-
         Journal::instance()->info("Maximal integration step: " + QString("%1").arg(solver_config.max_step));
+
+        int tmp = 4;
+        if (!cfg.getInt(secName, "SubStepNum", tmp))
+        {
+            solver_config.num_sub_step = 4;
+        }
+        else
+        {
+            solver_config.num_sub_step = static_cast<size_t>(tmp);
+        }
+        Journal::instance()->info("Number of substep: " + QString("%1").arg(solver_config.num_sub_step));
+
+        if (!cfg.getDouble(secName, "LocalError", solver_config.local_error))
+        {
+            solver_config.local_error = 1e-5;
+        }
+        Journal::instance()->info("Local error of solution: " + QString("%1").arg(solver_config.local_error));
     }
     else
     {
@@ -618,7 +630,7 @@ void Model::sharedMemoryFeedback()
         viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
         viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
 
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);                
+        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
 
         std::copy((*it)->getAnalogSignals().begin(),
                   (*it)->getAnalogSignals().end(),
@@ -633,7 +645,7 @@ void Model::sharedMemoryFeedback()
         shared_memory.unlock();
     }
 
-    viewer_data.count++;    
+    viewer_data.count++;
 }
 
 //------------------------------------------------------------------------------
@@ -646,7 +658,7 @@ void Model::controlStep(double &control_time, const double control_delay)
         control_time = 0;
 
         if (keys_data.lock())
-        {            
+        {
             data.resize(keys_data.size());
             memcpy(data.data(), keys_data.data(), static_cast<size_t>(keys_data.size()));
 
@@ -666,7 +678,7 @@ void Model::controlStep(double &control_time, const double control_delay)
 void Model::process()
 {
     double tau = 0;
-    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;    
+    double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
 
     // Integrate all ODE in train motion model
     while ( (tau <= integration_time) &&
@@ -690,10 +702,13 @@ void Model::process()
         postStep(t);
     }
 
-    train->inputProcess();    
+    Journal::instance()->info(QString("t %1|dt %2")
+                              .arg(t, 9, 'f', 5)
+                              .arg(dt, 7, 'f', 5));
+    train->inputProcess();
 
     // Debug print, is allowed
     if (is_debug_print)
-        debugPrint();    
+        debugPrint();
 }
 

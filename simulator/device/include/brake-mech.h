@@ -73,10 +73,10 @@ protected:
     double  S;
 
     /// Brake cylinder diameter
-    double  cylDiam;    
+    double  cylDiam;
 
     ///
-    double  Lmax;    
+    double  Lmax;
 
     /// Brake press force
     double  K;
@@ -98,6 +98,12 @@ protected:
 
     /// Максимальное давление в ТЦ
     double  p_max;
+
+    /// Давление в ТЦ - начало движения поршня из отпускного положения
+    double  p_begin;
+
+    /// Давление в ТЦ - окончание движения поршня в тормозное положение
+    double  p_end;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

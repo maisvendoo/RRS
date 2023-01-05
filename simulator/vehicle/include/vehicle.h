@@ -62,6 +62,9 @@ public:
     /// Set curvature
     void setCurvature(double curv);
 
+    /// Set friction coefficient between wheel and rail
+    void setFrictionCoeff(double coeff);
+
     /// Set direction
     void setDirection(int dir);
 
@@ -242,6 +245,12 @@ protected:
     double  R1;
     /// Backward coupling force
     double  R2;
+    /// Gravity force from profile inclination
+    double  G_force;
+    /// Max wheel friction force
+    std::vector<double>  wheel_fric_max;
+    /// Max friction force
+    double fric_max;
 
     /// Number of degrees of freedom
     size_t  s;
@@ -258,11 +267,17 @@ protected:
     double  b2;
     double  b3;
     double  q0;
+    double  W_coef;
+    double  W_coef_v;
+    double  W_coef_v2;
+    double  W_coef_curv;
 
     /// Vertical profile inclination
     double  inc;
     /// Railway curvature
     double  curv;
+    /// Friction coefficient between wheel and rail
+    double  Psi;
 
     /// Railway motion direction
     int     dir;
