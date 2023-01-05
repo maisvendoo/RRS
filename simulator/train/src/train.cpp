@@ -13,6 +13,7 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , ode_order(0)
   , dir(1)
   , profile(profile)
+  , wheel_rail_fric_coeff(0.3)
   , charging_pressure(0.0)
   , no_air(false)
   , init_main_res_pressure(0.0)
@@ -39,6 +40,8 @@ bool Train::init(const init_data_t &init_data)
     solver_config = init_data.solver_config;
 
     dir = init_data.direction;
+
+    wheel_rail_fric_coeff = init_data.wheel_rail_fric_coeff;
 
     // Solver loading
     FileSystem &fs = FileSystem::getInstance();
@@ -232,7 +235,7 @@ void Train::vehiclesStep(double t, double dt)
         profile_element_t pe = profile->getElement(y[idx]);
         vehicle->setInclination(pe.inclination);
         vehicle->setCurvature(pe.curvature);
-//        vehicle->setFrictionCoeff(0.3);
+        vehicle->setFrictionCoeff(wheel_rail_fric_coeff);
 
         vehicle->integrationStep(y, t, dt);
 

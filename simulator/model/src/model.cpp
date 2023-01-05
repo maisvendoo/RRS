@@ -277,6 +277,11 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.prof_step = 100.0;
         }
 
+        if (!cfg.getDouble(secName, "WheelRailFrictionCoeff", init_data.wheel_rail_fric_coeff))
+        {
+            init_data.wheel_rail_fric_coeff = 0.3;
+        }
+
         if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
         {
             init_data.train_config = "default-train";
