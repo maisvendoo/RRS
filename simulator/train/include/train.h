@@ -101,7 +101,7 @@ signals:
     void logMessage(QString msg);
     void sendDataToVehicle(QByteArray data);
 
-private:    
+private:
 
     /// Train mass
     double          trainMass;
@@ -118,6 +118,9 @@ private:
     Profile     *profile;
 
     /// Charging pressure
+    double      wheel_rail_fric_coeff;
+
+    /// Charging pressure
     double      charging_pressure;
 
     /// No air flag (for empty air system on start)
@@ -130,7 +133,7 @@ private:
     Solver      *train_motion_solver;
 
     /// Brakepipe model
-    BrakePipe   *brakepipe;    
+    BrakePipe   *brakepipe;
 
     /// Sound manager
     SoundManager *soundMan;
