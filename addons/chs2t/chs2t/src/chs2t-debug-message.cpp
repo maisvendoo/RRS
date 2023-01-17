@@ -22,5 +22,7 @@ void CHS2T::stepDebugMsg(double t, double dt)
                        .arg(railway_coord / 1000.0, 5, 'f', 1)
                        .arg(alsn_info.current_time, 8)
                        .arg(alsn_info.signal_dist, 4, 'f', 0);
-
+//    DebugMsg += motor->getDebugMsg();
+//    DebugMsg += stepSwitch->getDebugMsg();
+//    DebugMsg += km21KR2->getDebugMsg();
 }

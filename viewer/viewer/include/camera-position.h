@@ -17,6 +17,7 @@ struct camera_position_t
     osg::Vec3   driver_pos;
     osg::Vec3   viewer_pos;
     osg::Vec3   cam_delta;
+    bool        is_orient_bwd;
     basis_t     view_basis;
 
     camera_position_t()

@@ -118,6 +118,11 @@ void StepSwitch::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
+//    DebugMsg = QString(" step %1 k31 %2 k32 %3 k33 %4")
+//            .arg(fieldStep)
+//            .arg(ctrlState.k31)
+//            .arg(ctrlState.k32)
+//            .arg(ctrlState.k33);
 }
 
 //------------------------------------------------------------------------------
@@ -155,11 +160,12 @@ void StepSwitch::stepDiscrete(double t, double dt)
     }
     else
     {
-        fieldStep = (1 * (ctrlState.k31 && !ctrlState.k32) +
-                    2 * (ctrlState.k32 && !ctrlState.k31) +
-                    3 * (ctrlState.k33 && !ctrlState.k31) +
-                    4 * (ctrlState.k31 && ctrlState.k32) +
-                    5 * (ctrlState.k31 && ctrlState.k33)) * hod;
+        fieldStep = (1 * ( ctrlState.k31 && !ctrlState.k32 && !ctrlState.k33) +
+                     2 * (!ctrlState.k31 &&  ctrlState.k32 && !ctrlState.k33) +
+                     3 * (!ctrlState.k31 && !ctrlState.k32 &&  ctrlState.k33) +
+                     4 * ( ctrlState.k31 &&  ctrlState.k32 && !ctrlState.k33) +
+                     5 * ( ctrlState.k31 && !ctrlState.k32 &&  ctrlState.k33))
+                     * hod;
     }
 
     if (zero)

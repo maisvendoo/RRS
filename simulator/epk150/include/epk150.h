@@ -32,6 +32,8 @@ public:
 
     double getEmergencyBrakeRate() const;
 
+    bool getEmergencyBrakeContact() const;
+
     void init(double pTM, double pFL);
 
 private:

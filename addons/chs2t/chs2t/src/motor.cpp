@@ -149,6 +149,9 @@ void Motor::preStep(state_vector_t& Y, double t)
 
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
     emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 100)));
+
+//    DebugMsg = QString(" motor-beta %1")
+//            .arg(beta);
 }
 
 //------------------------------------------------------------------------------

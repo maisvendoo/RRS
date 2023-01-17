@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-        <Vehicle>
-                <EmptyMass>130000</EmptyMass>
-                <PayloadMass>2000</PayloadMass>
-                <Length>21.0</Length>
-                <WheelDiameter>1.236</WheelDiameter>
-                <MainResist>loco-resist</MainResist>
-                <NumAxis>6</NumAxis>            
-                <DegreesOfFreedom>7</DegreesOfFreedom>
-                <WheelInertia>2.0</WheelInertia>
-				<SoundDir>vl60</SoundDir>
+    <Vehicle>
+        <EmptyMass>130000</EmptyMass>
+        <PayloadMass>2000</PayloadMass>
+        <Length>21.0</Length>
+        <WheelDiameter>1.236</WheelDiameter>
+        <MainResist>loco-resist</MainResist>
+        <NumAxis>6</NumAxis>
+        <DegreesOfFreedom>7</DegreesOfFreedom>
+        <WheelInertia>100.0</WheelInertia>
+        <SoundDir>vl60</SoundDir>
 
-                <ReguctorCoeff>2.73</ReguctorCoeff>
+        <ReguctorCoeff>2.73</ReguctorCoeff>
 
-                <ExtModelName>VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
-                <ModelShift>0.0 0.0 0.312</ModelShift>
-                
-        	<CabineModel>VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
-                <CabineShift>0.0 0.0 0.317</CabineShift>         
+        <ExtModelName>VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
+        <ModelShift>0.0 0.0 0.312</ModelShift>
 
-                <BrakeCraneModule>krm395</BrakeCraneModule>
-                <BrakeCraneConfig>krm395</BrakeCraneConfig>
+        <CabineModel>VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
+        <CabineShift>0.0 0.0 0.317</CabineShift>
 
-                <LocoCraneModule>kvt254</LocoCraneModule>
-                <LocoCraneConfig>kvt254</LocoCraneConfig>
+        <BrakeCraneModule>krm395</BrakeCraneModule>
+        <BrakeCraneConfig>krm395</BrakeCraneConfig>
 
-                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-                <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
+        <LocoCraneModule>kvt254</LocoCraneModule>
+        <LocoCraneConfig>kvt254</LocoCraneConfig>
 
-                <AirDistModule>vr242</AirDistModule>
-                <AirDistConfig>vr242</AirDistConfig>
+        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+        <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
 
-                <DriverPos>0.8 8.4 3.6</DriverPos>                
-	</Vehicle>
+        <AirDistModule>vr242</AirDistModule>
+        <AirDistConfig>vr242</AirDistConfig>
+
+        <DriverPos>0.8 8.4 3.6</DriverPos>
+    </Vehicle>
 </Config>

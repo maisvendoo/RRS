@@ -31,7 +31,6 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     , is_whistle(false)
 {
     std::fill(K.begin(), K.end(), 0.0);
-    std::fill(k.begin(), k.end(), 0.0);   
 }
 
 //------------------------------------------------------------------------------
@@ -48,6 +47,14 @@ AutoTrainStopEPK150::~AutoTrainStopEPK150()
 double AutoTrainStopEPK150::getEmergencyBrakeRate() const
 {
     return emergencyRate;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AutoTrainStopEPK150::getEmergencyBrakeContact() const
+{
+    return is_whistle;
 }
 
 //------------------------------------------------------------------------------

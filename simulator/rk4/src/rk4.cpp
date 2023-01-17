@@ -28,7 +28,7 @@ bool RK4Solver::step(OdeSystem *ode_sys,
         k1.resize(n);
         k2.resize(n);
         k3.resize(n);
-        k4.resize(n);
+        //k4.resize(n);
         Y1.resize(n);
 
         first_step = false;
@@ -62,8 +62,9 @@ bool RK4Solver::step(OdeSystem *ode_sys,
 
     for (size_t i = 0; i < Y.size(); ++i)
     {
-        k4[i] = dYdt[i];
-        Y[i] = Y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dt / 6.0;
+        //k4[i] = dYdt[i];
+        //Y[i] = Y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dt / 6.0;
+        Y[i] = Y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + dYdt[i]) * dt / 6.0;
     }
 
     return true;

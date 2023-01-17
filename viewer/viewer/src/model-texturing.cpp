@@ -19,13 +19,14 @@ ModelTexturing::ModelTexturing(const std::string &texturesDir)
 //------------------------------------------------------------------------------
 void ModelTexturing::apply(osg::Geode &geode)
 {
+    previousPath = "";
     for (unsigned int i = 0; i < geode.getNumDrawables(); ++i)
     {
         osg::Drawable  *drawable = geode.getDrawable(i);
         osg::StateSet *stateset = drawable->getOrCreateStateSet();
 
         osg::StateAttribute *stateattr =
-                stateset->getTextureAttribute(0, osg::StateAttribute::TEXTURE);        
+                stateset->getTextureAttribute(0, osg::StateAttribute::TEXTURE);
 
         osg::Texture2D *texture = static_cast<osg::Texture2D *>(stateattr);
 
@@ -64,7 +65,18 @@ void ModelTexturing::changeTexture(const std::string &textureDir,
     std::string newDir = fs.combinePath(fs.getVehicleModelsDir(), textureDir);
     std::string newPath = fs.combinePath(newDir, fileName);
 
-    osg::ref_ptr<osg::Image> newImage = osgDB::readImageFile(newPath);
+    // Проверяем, что новая текстура не используется в модели изначально
+    if (newPath == fullPath)
+    {
+        return;
+    }
+
+    // Проверяем, что новая текстура не использовалась в предыдущем цикле
+    if (newPath != previousPath)
+    {
+        newImage = osgDB::readImageFile(newPath);
+        previousPath = newPath;
+    }
 
     if (newImage.valid())
         texture->setImage(newImage.get());

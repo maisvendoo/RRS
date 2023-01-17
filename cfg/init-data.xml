@@ -4,8 +4,9 @@
         <InitCoord>1.0</InitCoord>
         <InitVelocity>0.0</InitVelocity>
         <Direction>1</Direction>
+        <WheelRailFrictionCoeff>0.3</WheelRailFrictionCoeff>
         <TrainConfig>default</TrainConfig>
-        <IntegrationTimeInterval>20</IntegrationTimeInterval>        
+        <IntegrationTimeInterval>20</IntegrationTimeInterval>
         <DebugPrint>true</DebugPrint>
 
         <!-- Интервал опроса кнопок, мс -->

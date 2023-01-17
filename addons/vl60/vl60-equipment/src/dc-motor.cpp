@@ -16,7 +16,7 @@ DCMotor::DCMotor(QObject *parent) : Device(parent)
     , U(0.0)
     , torque(0.0)
     , omega_nom(100.0)
-    , direction(1)    
+    , direction(1)
 {
 
 }
@@ -115,6 +115,8 @@ void DCMotor::preStep(state_vector_t &Y, double t)
 
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
     emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 300)));
+//    DebugMsg = QString(" dc-motor-beta: %1")
+//            .arg(beta);
 }
 
 //------------------------------------------------------------------------------
@@ -177,5 +179,3 @@ double DCMotor::calcCPhi(double I)
 {
     return cPhi.getValue(I);
 }
-
-

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Vehicle>
-		
-		<EmptyMass>125000</EmptyMass>
-		<PayloadMass>0</PayloadMass>
-		<Length>18.8</Length>
-		<WheelDiameter>1.25</WheelDiameter>
-		<MainResist>default</MainResist>
-		<NumAxis>6</NumAxis>				
-                <WheelInertia>2.0</WheelInertia>        
-		<SoundDir>chs2t</SoundDir>        
-                
-                <ExtModelName>chs2t/chs2t.osgt</ExtModelName>
-                <ModelShift>0.0 0.0 0.312</ModelShift>
+    <Vehicle>
 
-                <CabineModel>chs2t/chs2t-cabview.osgt</CabineModel>
-                <CabineShift>0.0 0.0 0.312</CabineShift>
-        
-                <DriverPos>0.492 7.776 3.98</DriverPos>
+    <EmptyMass>125000</EmptyMass>
+        <PayloadMass>0</PayloadMass>
+        <Length>18.8</Length>
+        <WheelDiameter>1.25</WheelDiameter>
+        <MainResist>default</MainResist>
+        <NumAxis>6</NumAxis>
+        <WheelInertia>100.0</WheelInertia>
+        <SoundDir>chs2t</SoundDir>
 
-	</Vehicle>
+        <ExtModelName>chs2t/chs2t.osgt</ExtModelName>
+        <ModelShift>0.0 0.0 0.312</ModelShift>
+
+        <CabineModel>chs2t/chs2t-cabview.osgt</CabineModel>
+        <CabineShift>0.0 0.0 0.312</CabineShift>
+
+        <DriverPos>0.492 7.776 3.98</DriverPos>
+
+    </Vehicle>
 </Config>

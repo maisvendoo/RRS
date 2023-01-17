@@ -65,6 +65,14 @@ double AutoTrainStop::getEmergencyBrakeRate() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool AutoTrainStop::getEmergencyBrakeContact() const
+{
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AutoTrainStop *loadAutoTrainStop(QString lib_path)
 {
     AutoTrainStop *autostop = nullptr;

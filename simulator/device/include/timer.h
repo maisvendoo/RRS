@@ -43,6 +43,12 @@ public:
     /// Set timeout
     void setTimeout(double timeout);
 
+    /// Get time
+    double getTime();
+
+    /// Get timeout
+    double getTimeout();
+
     void firstProcess(bool first_process);
 
 signals:

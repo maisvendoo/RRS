@@ -88,6 +88,8 @@ void Km21KR2::preStep(state_vector_t& Y, double t)
 
     if ((k01 != controlState.k01) || (k02 != controlState.k02))
         emit soundPlay("revers");
+//    DebugMsg = QString(" km-fWS %1")
+//            .arg(fieldWeakShaft);
 }
 
 //------------------------------------------------------------------------------

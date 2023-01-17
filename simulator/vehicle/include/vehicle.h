@@ -62,14 +62,20 @@ public:
     /// Set curvature
     void setCurvature(double curv);
 
+    /// Set friction coefficient between wheel and rail
+    void setFrictionCoeff(double coeff);
+
     /// Set direction
     void setDirection(int dir);
 
+    /// Set orientation
+    void setOrientation(int orient);
+
     /// Set forward coupling force
-    void setForwardForce(double R1);
+    void setForwardForce(double R);
 
     /// Set backward coupling force
-    void setBackwardForce(double R2);
+    void setBackwardForce(double R);
 
     /// Set active common force
     void setActiveCommonForce(size_t idx, double value);
@@ -94,6 +100,9 @@ public:
 
     /// Get vehicle index
     size_t getIndex() const;
+
+    /// Get orientation
+    int getOrientation() const;
 
     /// Get vehicle mass
     double getMass() const;
@@ -157,7 +166,7 @@ public:
 
     void setUks(double value);
 
-    void setCurrentKind(int value);    
+    void setCurrentKind(int value);
 
     void setEPTControl(size_t i, double value);
 
@@ -178,7 +187,7 @@ public:
     void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
 
 public slots:
-    
+
     void receiveData(QByteArray data);
 
     void getControlSignals(control_signals_t control_signals);
@@ -236,6 +245,12 @@ protected:
     double  R1;
     /// Backward coupling force
     double  R2;
+    /// Gravity force from profile inclination
+    double  G_force;
+    /// Max wheel friction force
+    std::vector<double>  wheel_fric_max;
+    /// Max friction force
+    double fric_max;
 
     /// Number of degrees of freedom
     size_t  s;
@@ -252,14 +267,22 @@ protected:
     double  b2;
     double  b3;
     double  q0;
+    double  W_coef;
+    double  W_coef_v;
+    double  W_coef_v2;
+    double  W_coef_curv;
 
     /// Vertical profile inclination
     double  inc;
     /// Railway curvature
     double  curv;
+    /// Friction coefficient between wheel and rail
+    double  Psi;
 
     /// Railway motion direction
     int     dir;
+    /// Vehicle orientation
+    int     orient;
 
     /// Pressure in begin of brakepipe
     double p0;
@@ -295,7 +318,7 @@ protected:
 
     /// Keyboard state
     QMap<int, bool> keys;
-    QMutex          keys_mutex;    
+    QMutex          keys_mutex;
 
     /// Discrete signals for outpput
     std::array<bool, MAX_DISCRETE_SIGNALS>  discreteSignal;

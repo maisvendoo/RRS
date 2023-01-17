@@ -1,17 +1,17 @@
-#ifndef     RK4_H
-#define     RK4_H
+#ifndef     EULER_H
+#define     EULER_H
 
 #include    "solver.h"
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-class  RK4Solver : public Solver
+class  EulerSolver : public Solver
 {
 public:
 
-    RK4Solver();
-    ~RK4Solver();
+    EulerSolver();
+    ~EulerSolver();
 
     /// Method step
     bool step(OdeSystem *ode_sys,
@@ -24,14 +24,7 @@ public:
 
 protected:
 
-    state_vector_t k1;
-    state_vector_t k2;
-    state_vector_t k3;
-//    state_vector_t k4;
-
-    state_vector_t Y1;
-
     bool first_step;
 };
 
-#endif
+#endif // EULER_H

@@ -37,6 +37,8 @@ struct solver_config_t
     double      step;
     /// Maximal step value
     double      max_step;
+    /// Number of substep
+    size_t      num_sub_step;
     /// Local error of solution
     double      local_error;
 
@@ -44,8 +46,9 @@ struct solver_config_t
         : method("rkf5")
         , start_time(0.0)
         , stop_time(10.0)
-        , step(1e-3)
-        , max_step(1e-2)
+        , step(2e-3)
+        , max_step(2e-3)
+        , num_sub_step(4)
         , local_error(1e-5)
     {
 

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Vehicle>
+    <Vehicle>
 
-		<EmptyMass>58300</EmptyMass>
-		<PayloadMass>4000</PayloadMass>
-		<Length>25.0</Length>
-		<WheelDiameter>0.95</WheelDiameter>
-		<MainResist>passcar</MainResist>
-		<NumAxis>4</NumAxis>		
-		<DegreesOfFreedom>5</DegreesOfFreedom>
-		<SoundDir>pass</SoundDir>
-                <WheelInertia>2.0</WheelInertia>
+        <EmptyMass>58300</EmptyMass>
+        <PayloadMass>4000</PayloadMass>
+        <Length>25.0</Length>
+        <WheelDiameter>0.95</WheelDiameter>
+        <MainResist>passcar</MainResist>
+        <NumAxis>4</NumAxis>
+        <DegreesOfFreedom>5</DegreesOfFreedom>
+        <SoundDir>pass</SoundDir>
+        <WheelInertia>100.0</WheelInertia>
 
-                <ExtModelName>IMR_pass_rzd/Pass_CupAmm7.osgt</ExtModelName>
+        <ExtModelName>IMR_pass_rzd/Pass_CupAmm7.osgt</ExtModelName>
 
-                <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-                <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
+        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
-                <AirDistModule>vr242</AirDistModule>
-                <AirDistConfig>vr242</AirDistConfig>
+        <AirDistModule>vr242</AirDistModule>
+        <AirDistConfig>vr242</AirDistConfig>
 
-	</Vehicle>
+    </Vehicle>
 </Config>

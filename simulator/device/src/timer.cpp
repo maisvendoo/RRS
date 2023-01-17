@@ -34,7 +34,7 @@ void Timer::step(double t, double dt)
         if ( first_process || (tau >= timeout) )
         {
             emit process();
-            tau = 0;            
+            tau = 0;
             first_process = false;
         }
 
@@ -86,6 +86,22 @@ bool Timer::isStarted() const
 void Timer::setTimeout(double timeout)
 {
     this->timeout = timeout;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Timer::getTime()
+{
+    return tau;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Timer::getTimeout()
+{
+    return timeout - tau;
 }
 
 //------------------------------------------------------------------------------
