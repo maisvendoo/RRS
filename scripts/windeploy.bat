@@ -112,8 +112,9 @@ rem Вагоны-хоперы
 xcopy /S ..\..\data\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
 xcopy /S ..\..\data\animations\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\data\animations\Fr_hopper_RZD-2851\
 
-rem Темы оформления лаунчера
+rem Шрифты вьювера и темы оформления лаунчера
 
+xcopy ..\..\fonts\*.* %RRS_DEV_ROOT%\fonts
 xcopy ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты
