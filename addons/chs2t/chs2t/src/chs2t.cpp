@@ -33,7 +33,7 @@ CHS2T::CHS2T() : Vehicle()
 
     U_kr = 0;
 
-    EDT = false;    
+    EDT = false;
 
     dropPosition = false;
 
@@ -161,7 +161,7 @@ void CHS2T::step(double t, double dt)
 
     //Journal::instance()->info("Step speed meter");
     speed_meter->setOmega(wheel_omega[0]);
-    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->step(t, dt);
 }
 

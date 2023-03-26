@@ -7,6 +7,7 @@
         <Length>22.55</Length>
         <WheelDiameter>1.25</WheelDiameter>
         <MainResist>loco-resist</MainResist>
+        <WheelRailFriction>loco-AC</WheelRailFriction>
         <NumAxis>6</NumAxis>
         <DegreesOfFreedom>7</DegreesOfFreedom>
         <WheelInertia>100.0</WheelInertia>

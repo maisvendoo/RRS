@@ -277,9 +277,9 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.prof_step = 100.0;
         }
 
-        if (!cfg.getDouble(secName, "WheelRailFrictionCoeff", init_data.wheel_rail_fric_coeff))
+        if (!cfg.getDouble(secName, "CoeffToWheelRailFriction", init_data.coeff_to_wheel_rail_friction))
         {
-            init_data.wheel_rail_fric_coeff = 0.3;
+            init_data.coeff_to_wheel_rail_friction = 1.0;
         }
 
         if (!cfg.getString(secName, "TrainConfig", init_data.train_config))

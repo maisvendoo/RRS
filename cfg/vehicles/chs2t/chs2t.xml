@@ -7,6 +7,7 @@
         <Length>18.8</Length>
         <WheelDiameter>1.25</WheelDiameter>
         <MainResist>default</MainResist>
+        <WheelRailFriction>loco-DC</WheelRailFriction>
         <NumAxis>6</NumAxis>
         <WheelInertia>100.0</WheelInertia>
         <SoundDir>chs2t</SoundDir>

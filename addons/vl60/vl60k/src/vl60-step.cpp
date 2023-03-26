@@ -370,16 +370,14 @@ double VL60k::getTractionForce()
 {
     double ip = 2.73;
 
-    double sumTorque = 0;
+    double sum_force = 0.0;
 
-    for (auto m : motor)
+    for (size_t i = 0; i < motor.size(); ++i)
     {
-        sumTorque += m->getTorque();
+        sum_force += motor[i]->getTorque() * ip * 2.0 / wheel_diameter[i];
     }
 
-    double force = sumTorque * ip * 2.0 / wheel_diameter;
-
-    return force;
+    return sum_force;
 }
 
 //------------------------------------------------------------------------------

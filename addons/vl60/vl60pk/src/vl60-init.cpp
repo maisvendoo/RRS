@@ -176,7 +176,7 @@ void VL60pk::initTractionControl()
 void VL60pk::initOtherEquipment()
 {
     speed_meter = new SL2M();
-    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
     connect(speed_meter, &SL2M::soundSetVolume, this, &VL60pk::soundSetVolume);
 

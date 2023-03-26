@@ -34,7 +34,7 @@ struct init_data_t
     int     direction;
     QString profile_path;
     double  prof_step;
-    double  wheel_rail_fric_coeff;
+    double  coeff_to_wheel_rail_friction;
     QString train_config;
     QString route_dir;
     int     integration_time_interval;
@@ -49,7 +49,7 @@ struct init_data_t
         , direction(1)
         , profile_path("")
         , prof_step(100.0)
-        , wheel_rail_fric_coeff(0.3)
+        , coeff_to_wheel_rail_friction(1.0)
         , train_config("")
         , route_dir("")
         , integration_time_interval(100)

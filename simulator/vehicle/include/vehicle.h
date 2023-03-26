@@ -53,17 +53,20 @@ public:
     /// Vehicle initialization
     void init(QString cfg_path);
 
+    /// Set current route directory
+    void setRouteDir(QString route_dir);
+
     /// Set vehicle index
     void setIndex(size_t idx);
 
     /// Set inclination
-    void setInclination(double inc);
+    void setInclination(double value);
 
     /// Set curvature
-    void setCurvature(double curv);
+    void setCurvature(double value);
 
     /// Set friction coefficient between wheel and rail
-    void setFrictionCoeff(double coeff);
+    void setFrictionCoeff(double value);
 
     /// Set direction
     void setDirection(int dir);
@@ -72,10 +75,10 @@ public:
     void setOrientation(int orient);
 
     /// Set forward coupling force
-    void setForwardForce(double R);
+    void setForwardForce(double value);
 
     /// Set backward coupling force
-    void setBackwardForce(double R);
+    void setBackwardForce(double value);
 
     /// Set active common force
     void setActiveCommonForce(size_t idx, double value);
@@ -113,8 +116,11 @@ public:
     /// Get degrees of freedom
     size_t getDegressOfFreedom() const;
 
+    /// Get number of axis
+    size_t getNumAxis() const;
+
     /// Get wheel diameter
-    double getWheelDiameter() const;
+    double getWheelDiameter(size_t i) const;
 
     double getRailwayCoord() const;
 
@@ -132,7 +138,7 @@ public:
     std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
 
     /// Common acceleration calculation
-    virtual state_vector_t getAcceleration(state_vector_t &Y, double t);
+    virtual state_vector_t getAcceleration(state_vector_t &Y, double t, double dt);
 
     ///
     void integrationPreStep(state_vector_t &Y, double t);
@@ -184,8 +190,6 @@ public:
 
     void setBwdInput(size_t index, float value);
 
-    void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
-
 public slots:
 
     void receiveData(QByteArray data);
@@ -214,6 +218,8 @@ protected:
 
     /// Current route directory
     QString route_dir;
+    /// Vehicle sounds directory
+    QString soundDirectory;
 
     /// Vehicle ODE system index
     size_t     idx;
@@ -226,31 +232,34 @@ protected:
     double  payload_coeff;
     /// Full vehicle mass
     double  full_mass;
-    /// Vehicle sounds directory
-    QString soundDirectory;
-
     /// Length between coupling's axis
     double  length;
 
     /// Numder of axis
-    size_t     num_axis;
-    /// Axis moment of inertia
-    double  J_axis;
+    size_t              num_axis;
+    /// Wheels rotation angles
+    std::vector<double> wheel_rotation_angle;
+    /// Wheels angular velocities
+    std::vector<double> wheel_omega;
     /// Wheel diameter
-    double  wheel_diameter;
+    std::vector<double> wheel_diameter;
     /// Wheel radius
-    double  rk;
+    std::vector<double> rk;
+    /// Axis moment of inertia
+    std::vector<double> J_axis;
+    /// Vertical axis load
+    std::vector<double> axis_load;
+    /// Friction coefficient between wheel and rail
+    std::vector<double> psi;
+    /// Friction coefficient changing
+    double              psi_coeff;
 
     /// Forward coupling force
-    double  R1;
+    double  F_fwd;
     /// Backward coupling force
-    double  R2;
+    double  F_bwd;
     /// Gravity force from profile inclination
-    double  G_force;
-    /// Max wheel friction force
-    std::vector<double>  wheel_fric_max;
-    /// Max friction force
-    double fric_max;
+    double  F_g;
 
     /// Number of degrees of freedom
     size_t  s;
@@ -262,6 +271,7 @@ protected:
     /// Body velocity
     double velocity;
 
+    // Main resistant's coefficients
     double  b0;
     double  b1;
     double  b2;
@@ -272,13 +282,17 @@ protected:
     double  W_coef_v2;
     double  W_coef_curv;
 
+    // Wheels model's coefficients
+    double  a;
+    double  b;
+    double  c;
+    double  d;
+    double  e;
+
     /// Vertical profile inclination
     double  inc;
     /// Railway curvature
     double  curv;
-    /// Friction coefficient between wheel and rail
-    double  Psi;
-
     /// Railway motion direction
     int     dir;
     /// Vehicle orientation
@@ -304,17 +318,12 @@ protected:
     /// Род тока в КС
     int         current_kind;
 
-    /// Wheels rotation angles
-    std::vector<double> wheel_rotation_angle;
-    /// Wheels angular velocities
-    std::vector<double> wheel_omega;
-
     /// Active common forces
     state_vector_t  Q_a;
     /// Reactive common forces
     state_vector_t  Q_r;
     /// Vehicle common acceleration
-    state_vector_t  a;
+    state_vector_t  acceleration;
 
     /// Keyboard state
     QMap<int, bool> keys;
@@ -365,6 +374,15 @@ protected:
 
     virtual void hardwareOutput();
 
+    /// Recalculate coefficients for default main resistant formula
+    virtual void mainResistCoeffs();
+
+    /// Calculate main resistant to motion
+    virtual double mainResist(double velocity);
+
+    /// Calculate wheel-rail friction coefficient
+    virtual double wheelrailFriction(double velocity);
+
     /* Modkeys extended functions */
 
     bool isShift() const;
@@ -382,6 +400,8 @@ private:
 
     /// Load main resistence coefficients
     void loadMainResist(QString cfg_path, QString main_resist_cfg);
+    /// Load wheel model coefficients
+    void loadWheelModel(QString cfg_path, QString wheel_model_cfg);
 };
 
 /*!

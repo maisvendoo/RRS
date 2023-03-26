@@ -41,7 +41,7 @@ void TEP70::stepElectroTransmission(double t, double dt)
 
         Q_a[i+1] = motor[i]->getTorque() * ip;
 
-        tracForce += Q_a[i+1] * 2 / wheel_diameter;
+        tracForce += Q_a[i+1] * 2 / wheel_diameter[i];
 
         I_gen += motor[i]->getAncorCurrent();
 
@@ -70,7 +70,7 @@ void TEP70::stepElectroTransmission(double t, double dt)
     field_gen->setFieldVoltage(Ucc * static_cast<double>(is_FGF_on));
     field_gen->setLoadCurrent(trac_gen->getFieldCurrent());
     field_gen->setOmega(disel->getStarterOmega());
-    field_gen->step(t, dt);    
+    field_gen->step(t, dt);
 
     // Состояние цепи возбуждения главного генератора
     bool is_TGF_on = kvg->getContactState(0);
@@ -88,7 +88,7 @@ void TEP70::stepElectroTransmission(double t, double dt)
     field_reg->setKMPosition(km->getPositionNumber());
     field_reg->step(t, dt);
 
-    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->setOmega(wheel_omega[0]);
     speed_meter->step(t, dt);
 

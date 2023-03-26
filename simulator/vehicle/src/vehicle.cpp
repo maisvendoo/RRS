@@ -29,20 +29,19 @@
 //------------------------------------------------------------------------------
 Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , route_dir("")
+  , soundDirectory("")
   , idx(0)
   , empty_mass(24000.0)
   , payload_mass(68000.0)
   , payload_coeff(0.0)
   , full_mass(empty_mass + payload_mass * payload_coeff)
   , length(14.7)
-  , num_axis(4)
-  , J_axis(2.0)
-  , wheel_diameter(0.95)
-  , rk(0.475)
-  , R1(0.0)
-  , R2(0.0)
-  , G_force(0.0)
-  , s(5)
+  , num_axis(0)
+  , psi_coeff(1.0)
+  , F_fwd(0.0)
+  , F_bwd(0.0)
+  , F_g(0.0)
+  , s(1)
   , railway_coord0(0.0)
   , railway_coord(0.0)
   , velocity(0.0)
@@ -55,9 +54,13 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , W_coef_v((b2 / q0) * Physics::g * Physics::kmh / 1000.0)
   , W_coef_v2((b3 / q0) * Physics::g * Physics::kmh * Physics::kmh / 1000.0)
   , W_coef_curv(700.0 * Physics::g / 1000.0)
+  , a(0.0)
+  , b(30.0)
+  , c(100.0)
+  , d(1.0)
+  , e(0.0)
   , inc(0.0)
   , curv(0.0)
-  , Psi(0.3)
   , dir(1)
   , orient(1)
   , p0(0.0)
@@ -105,6 +108,14 @@ void Vehicle::init(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::setRouteDir(QString route_dir)
+{
+    this->route_dir = route_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::setIndex(size_t idx)
 {
     this->idx = idx;
@@ -113,25 +124,25 @@ void Vehicle::setIndex(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setInclination(double inc)
+void Vehicle::setInclination(double value)
 {
-    this->inc = inc;
+    this->inc = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setCurvature(double curv)
+void Vehicle::setCurvature(double value)
 {
-    this->curv = curv;
+    this->curv = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setFrictionCoeff(double coeff)
+void Vehicle::setFrictionCoeff(double value)
 {
-    this->Psi = coeff;
+    this->psi_coeff = value;
 }
 
 //------------------------------------------------------------------------------
@@ -153,17 +164,17 @@ void Vehicle::setOrientation(int orient)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setForwardForce(double R)
+void Vehicle::setForwardForce(double value)
 {
-    this->R1 = R;
+    this->F_fwd = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setBackwardForce(double R)
+void Vehicle::setBackwardForce(double value)
 {
-    this->R2 = R;
+    this->F_bwd = value;
 }
 
 //------------------------------------------------------------------------------
@@ -294,9 +305,20 @@ size_t Vehicle::getDegressOfFreedom() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Vehicle::getWheelDiameter() const
+size_t Vehicle::getNumAxis() const
 {
-    return wheel_diameter;
+    return num_axis;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getWheelDiameter(size_t i) const
+{
+    if (i < wheel_diameter.size())
+        return wheel_diameter[i];
+    else
+        return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -362,7 +384,7 @@ float Vehicle::getAnalogSignal(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
+state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t, double dt)
 {
     (void) t;
 
@@ -371,46 +393,147 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 
     // Body velocity from state vector
     double v = d * Y[idx + s];
+    double abs_v = abs(v);
 
-    // Calculate main resistance force
-    double W = full_mass *
-        (W_coef + W_coef_v * abs(v) + W_coef_v2 * v * v + W_coef_curv * curv);
-
-    // Calculate equvivalent force from resistance
-    double sum_force = - Physics::fricForce(W + Q_r[0], v);
-
-    // Wheels angle accelerations
-    size_t i = 1;
-    for (auto accel_it = a.begin() + 1; accel_it != a.end(); ++accel_it)
+    // Forces from wheels to vehicle body
+    double F_wheels = 0.0;
+    double R_wheels_fwd = 0.0;
+    double R_wheels_bwd = 0.0;
+    if (num_axis > 0)
     {
-        // Wheel's surface velocity from state vector
-        double omega_rk = d * Y[idx + s + i] * rk;
+        auto a_it = acceleration.begin();
+        auto Qa_it = Q_a.begin();
+        auto Qr_it = Q_r.begin();
+        for (size_t i = 0; i < num_axis; ++i)
+        {
+            ++a_it;
+            ++Qa_it;
+            ++Qr_it;
+            // Wheel's angular velocity
+            double w = Y[idx + s + 1 + i];
+            double abs_w = abs(w);
+            // Wheel's slip velocity
+            double slip = w * rk[i] - v;
+            double abs_slip = abs(slip);
+            // Reduce friction coefficient between wheel and rail when it slips
+            double psi_slip = psi[i] / (1.0 + abs_slip);
 
-        // Calculate force from friction between wheel and rail
-        double wheel_fric = Physics::fricForce(wheel_fric_max[i - 1], omega_rk - v);
+            // Active torque
+            double wheel_a = *Qa_it;
 
-        // Calculate wheel angle acceleration by active, reactive and friction forces
-        *accel_it = d * (Q_a[i] - Physics::fricForce(Q_r[i], omega_rk) - wheel_fric * rk) / J_axis;
+            // Reactive torque
+            double potential_r = pf(*Qr_it);
+            double wheel_r = 0.0;
+            if (abs_w > Physics::ZERO)
+            {
+                // Calculate maximum possible velocity change
+                double dw_max = (potential_r / J_axis[i]) * dt;
+                if (abs_w >= dw_max)
+                {
+                    wheel_r = potential_r * sign(w);
+                    potential_r = 0.0;
+                }
+                else
+                {
+                    // If velocity will fall to zero, reduce reactive force
+                    double e = abs_w / dw_max;
+                    wheel_r = e * potential_r * sign(w);
+                    potential_r = (1 - e) * potential_r;
+                }
+            }
 
-        // Add force from wheel to vehicle's equvivalent force
-        sum_force += wheel_fric;
+            // Friction torque
+            double potential_f = psi_slip * axis_load[i] * rk[i];
+            double wheel_f = 0.0;
+            if (abs_slip > Physics::ZERO)
+            {
+                // Calculate maximum possible velocity change
+                double dslip_max = (potential_f / J_axis[i]) * dt;
+                if (abs_slip >= dslip_max)
+                {
+                    wheel_f = potential_f * sign(slip);
+                    potential_f = 0.0;
+                }
+                else
+                {
+                    // If slip will fall to zero, reduce friction force
+                    double e = abs_slip / dslip_max;
+                    wheel_f = e * potential_f * sign(slip);
+                    potential_f = (1 - e) * potential_f;
+                }
+            }
 
-        ++i;
+            // Apply potential reactive forces
+            double tmp_r = min(abs(wheel_a - wheel_f), potential_r) * sign(wheel_a - wheel_f);
+            wheel_r += tmp_r;
+
+            double tmp_f = min(abs(wheel_a - wheel_r), potential_f) * sign(wheel_a - wheel_r);
+            wheel_f += tmp_f;
+
+            // Apply wheel-rail forces to vehicle
+            F_wheels += wheel_f / rk[i];
+            R_wheels_fwd += min(potential_r - tmp_r, potential_f - tmp_f) / rk[i];
+            R_wheels_bwd += min(potential_r + tmp_r, potential_f + tmp_f) / rk[i];
+
+            // Calculate and apply wheel angle acceleration
+            *a_it = (wheel_a - wheel_r - wheel_f) / J_axis[i];
+        }
     }
 
+    // Calculate main resistance force
+    double W = mainResist(v);
+
     // Common body active force
-    double body_force = *Q_a.begin() - G_force + R1 - R2;
-    // Decrease active force by reactive at low velocities for better behaviour
-    if ((sign(body_force) == sign(v)) && (abs(v) < 0.25))
+    double force_a = *Q_a.begin() + F_wheels + F_fwd - F_bwd - F_g;
+
+    // Common body reactive force
+    double potential_fwd = W + pf(Q_r[0]) + R_wheels_fwd;
+    double potential_bwd = W + pf(Q_r[0]) + R_wheels_bwd;
+    double force_r = 0.0;
+    if (abs_v < Physics::ZERO)
     {
-        double f = cut(fric_max, 0.0, abs(body_force));
-        body_force = body_force - sign(v) * f + Physics::fricForce(f, v);
+        if (force_a > 0)
+        {
+            force_r = min(force_a, potential_fwd);
+        }
+        if (force_a < 0)
+        {
+            force_r = max(force_a, - potential_bwd);
+        }
+    }
+    else
+    {
+        if (v > 0)
+        {
+            force_r = potential_fwd;
+        }
+        else
+        {
+            force_r = - potential_bwd;
+        }
+
+        // Prediction of velocity
+        double dv = ((force_a - force_r) / full_mass) * dt;
+        // If velocity will fall to zero, reduce reactive force after it
+        if (sign(v) != sign(v + dv))
+        {
+            double e = abs(v / dv);
+            force_r = e * force_r;
+            if (force_a > 0.0)
+            {
+                force_r += (1 - e) * min(force_a, potential_fwd);
+            }
+            if (force_a < 0.0)
+            {
+                force_r += (1 - e) * max(force_a, - potential_bwd);
+            }
+        }
     }
 
     // Vehicle body's acceleration
-    *a.begin() = d * (body_force + sum_force) / full_mass;
+    *acceleration.begin() = d * (force_a - force_r) / full_mass;
 
-    return a;
+    return acceleration;
 }
 
 //------------------------------------------------------------------------------
@@ -419,12 +542,25 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t)
 void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 {
     railway_coord = Y[idx];
-    velocity = Y[idx + s] * orient;
+    velocity = dir * orient * Y[idx + s];
 
-    for (size_t i = 0; i < wheel_rotation_angle.size(); i++)
+    // Calculate gravity force from profile inclination
+    double weight = full_mass * Physics::g;
+    double sin_beta = inc / 1000.0;
+    F_g = weight * sin_beta * orient;
+
+    if (num_axis > 0)
     {
-        wheel_rotation_angle[i] = Y[idx + i + 1] * orient;
-        wheel_omega[i] = Y[idx + s + i + 1] * dir * orient;
+        // Wheel-rail friction coefficient
+        double psi_v = psi_coeff * wheelrailFriction(velocity);
+
+        for (size_t i = 0; i < num_axis; i++)
+        {
+            wheel_rotation_angle[i] = Y[idx + 1 + i];
+            wheel_omega[i] = Y[idx + s + 1 + i];
+            psi[i] = psi_v;
+            axis_load[i] = weight / static_cast<double>(num_axis);
+        }
     }
 
     emit sendCoord(railway_coord + dir * length / 2.0);
@@ -465,18 +601,6 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
     (void) Y;
-
-    // Calculate gravity force from profile inclination
-    double sin_beta = inc / 1000.0;
-    G_force = full_mass * Physics::g * sin_beta * orient;
-
-    // Calculate max friction force
-    fric_max = Q_r[0];
-    for (size_t i = 0; i < wheel_fric_max.size(); i++)
-    {
-        wheel_fric_max[i] = Psi * full_mass * Physics::g / num_axis;
-        fric_max += (min(wheel_fric_max[i], Q_r[i+1]) - pf(Q_a[i+1] * sign(wheel_omega[i]))) * rk;
-    }
 
     postStep(t);
 }
@@ -656,14 +780,6 @@ void Vehicle::initialization()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::loadConfig(QString cfg_path)
-{
-    (void) cfg_path;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Vehicle::loadConfiguration(QString cfg_path)
 {
     CfgReader cfg;
@@ -674,55 +790,93 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         QString secName = "Vehicle";
 
+        double diameter = 0.0;
+        double J = 0.0;
+        int axis = 0;
         cfg.getDouble(secName, "EmptyMass", empty_mass);
         cfg.getDouble(secName, "PayloadMass", payload_mass);
         cfg.getDouble(secName, "Length", length);
-        cfg.getDouble(secName, "WheelDiameter", wheel_diameter);
+        cfg.getInt(secName, "NumAxis", axis);
+        cfg.getDouble(secName, "WheelDiameter", diameter);
+        cfg.getDouble(secName, "WheelInertia", J);
         cfg.getString(secName, "SoundDir", soundDirectory);
-
 
         Journal::instance()->info(QString("EmptyMass: %1 kg").arg(empty_mass));
         Journal::instance()->info(QString("PayloadMass: %1 kg").arg(payload_mass));
         Journal::instance()->info(QString("Length: %1 m").arg(length));
-        Journal::instance()->info(QString("WheelDiameter: %1 m").arg(wheel_diameter));
+
+        full_mass = empty_mass + payload_mass * payload_coeff;
+
+        if (axis > 0)
+        {
+            num_axis = static_cast<size_t>(axis);
+
+            wheel_rotation_angle.resize(num_axis);
+            std::fill(wheel_rotation_angle.begin(), wheel_rotation_angle.end(), 0.0);
+
+            wheel_omega.resize(num_axis);
+            std::fill(wheel_omega.begin(), wheel_omega.end(), 0.0);
+
+            wheel_diameter.resize(num_axis);
+            std::fill(wheel_diameter.begin(), wheel_diameter.end(), diameter);
+
+            double tmp = diameter / 2.0;
+            rk.resize(num_axis);
+            std::fill(rk.begin(), rk.end(), tmp);
+
+            J_axis.resize(num_axis);
+            std::fill(J_axis.begin(), J_axis.end(), J);
+
+            tmp = full_mass * Physics::g / static_cast<double>(num_axis);
+            axis_load.resize(num_axis);
+            std::fill(axis_load.begin(), axis_load.end(), tmp);
+
+            psi.resize(num_axis);
+            std::fill(psi.begin(), psi.end(), 0.30);
+
+            Journal::instance()->info(QString("NumAxis: %1").arg(num_axis));
+            Journal::instance()->info(QString("WheelDiameter: %1 m").arg(diameter));
+            Journal::instance()->info(QString("WheelInertia: %1 kg*m^2").arg(J));
+        }
+        else
+        {
+            num_axis = 0;
+            Journal::instance()->warning(QString("NumAxis is zero. Wheel's model will't used"));
+        }
+
         Journal::instance()->info(QString("SoundsDirectory: " + soundDirectory));
-
-        rk = wheel_diameter / 2.0;
-
-        int tmp = 0;
-        cfg.getInt(secName, "NumAxis", tmp);
-
-        num_axis = static_cast<size_t>(tmp);
-        wheel_rotation_angle.resize(num_axis);
-        wheel_omega.resize(num_axis);
-        wheel_fric_max.resize(num_axis);
-
-        Journal::instance()->info(QString("NumAxis: %1").arg(num_axis));
-
-        s = num_axis + 1;
-
-        Q_a.resize(s);
-        Q_r.resize(s);
-        a.resize(s);
-
-        for (size_t i = 0; i < Q_a.size(); i++)
-            Q_a[i] = Q_r[i] = 0;
-
-        cfg.getDouble(secName, "WheelInertia", J_axis);
-
-        Journal::instance()->info(QString("WheelInertia: %1 kg*m^2").arg(J_axis));
 
         QString main_resist_cfg = "";
         cfg.getString(secName, "MainResist", main_resist_cfg);
-
         loadMainResist(cfg_path, main_resist_cfg);
+
+        QString wheel_cfg = "default";
+        cfg.getString(secName, "WheelRailFriction", wheel_cfg);
+        loadWheelModel(cfg_path, wheel_cfg);
+
+        s = 1 + num_axis;
+
+        loadConfig(cfg_path);
     }
     else
     {
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
-    loadConfig(cfg_path);
+    Q_a.resize(s);
+    Q_r.resize(s);
+    acceleration.resize(s);
+    std::fill(Q_a.begin(), Q_a.end(), 0.0);
+    std::fill(Q_r.begin(), Q_r.end(), 0.0);
+    std::fill(acceleration.begin(), acceleration.end(), 0.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::loadConfig(QString cfg_path)
+{
+    (void) cfg_path;
 }
 
 //------------------------------------------------------------------------------
@@ -750,18 +904,50 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
         cfg.getDouble(secName, "b3", b3);
         cfg.getDouble(secName, "q0", q0);
 
-        Journal::instance()->info("Main resist formula: " + QString("w = %1 + (%2 + %3 * V + %4 * V^2) / %5")
-                                  .arg(b0).arg(b1).arg(b2).arg(b3).arg(q0));
-
-    W_coef = (b0 + b1 / q0) * Physics::g / 1000.0;
-    W_coef_v = (b2 / q0) * Physics::g * Physics::kmh / 1000.0;
-    W_coef_v2 = (b3 / q0) * Physics::g * Physics::kmh * Physics::kmh / 1000.0;
-    W_coef_curv = 700.0 * Physics::g / 1000.0;
+        mainResistCoeffs();
     }
     else
     {
         Journal::instance()->error("File " + file_path + " is't found");
     }
+    Journal::instance()->info("Main resist formula: " + QString("w = %1 + (%2 + %3 * V + %4 * V^2) / %5")
+                              .arg(b0).arg(b1).arg(b2).arg(b3).arg(q0));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::loadWheelModel(QString cfg_path, QString wheel_cfg)
+{
+    QFileInfo info(cfg_path);
+    QDir dir(info.path());
+    dir.cdUp();
+    dir.cdUp();
+    QString file_path = dir.path() + QDir::separator() +
+            "wheel-rail-friction" + QDir::separator() +
+            wheel_cfg + ".xml";
+
+    CfgReader cfg;
+
+    if (cfg.load(file_path))
+    {
+        QString secName = "WheelModel";
+
+        cfg.getDouble(secName, "a", a);
+        cfg.getDouble(secName, "b", b);
+        cfg.getDouble(secName, "c", c);
+        cfg.getDouble(secName, "d", d);
+        cfg.getDouble(secName, "e", e);
+
+        Journal::instance()->info("Wheel model config: " + QString("%1")
+                                  .arg(file_path));
+    }
+    else
+    {
+        Journal::instance()->error("File " + file_path + " is't found");
+    }
+    Journal::instance()->info("Wheel friction coefficient formula: " + QString("psi = %1 + (%2 / (%3 + %4 * V)) + %5 * V")
+                              .arg(a).arg(b).arg(c).arg(d).arg(e));
 }
 
 //------------------------------------------------------------------------------
@@ -827,6 +1013,41 @@ void Vehicle::postStep(double t)
 void Vehicle::hardwareOutput()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::mainResistCoeffs()
+{
+    double q = 1.0;
+    if ((q0 > 1.0) && (num_axis > 0))
+        q = full_mass / (1000.0 * static_cast<double>(num_axis));
+
+    W_coef = (b0 + b1 / q) * Physics::g / 1000.0;
+    W_coef_v = (b2 / q) * Physics::g * Physics::kmh / 1000.0;
+    W_coef_v2 = (b3 / q) * Physics::g * Physics::kmh * Physics::kmh / 1000.0;
+    W_coef_curv = 700.0 * Physics::g / 1000.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::mainResist(double velocity)
+{
+    return full_mass * (  W_coef
+                        + W_coef_v * abs(velocity)
+                        + W_coef_v2 * velocity * velocity
+                        + W_coef_curv * curv  );
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::wheelrailFriction(double velocity)
+{
+    double abs_V = abs(velocity) * Physics::kmh;
+    return a + (b / (c + d * abs_V)) + e * abs_V;
 }
 
 //------------------------------------------------------------------------------
