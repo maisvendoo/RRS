@@ -189,7 +189,7 @@ void VL60k::initOtherEquipment()
     connect(horn, &TrainHorn::soundPlay, this, &VL60k::soundPlay);
     connect(horn, &TrainHorn::soundStop, this, &VL60k::soundStop);
 
-    //reg = new Registrator("brakes");
+    //reg = new Registrator("motor", 1e-3);
 }
 
 //------------------------------------------------------------------------------

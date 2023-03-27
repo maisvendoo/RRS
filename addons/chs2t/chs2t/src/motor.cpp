@@ -88,6 +88,9 @@ void Motor::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     double R;
     R = R_r / n + R_a + R_gp * beta + R_dp;
     dYdt[0] = (U / n - R * Y[0] - calcCPhi(Y[0] * beta * direction) * omega) / L_af;
+    //DebugMsg += QString("I: %1, dI: %2, ")
+    //        .arg(Y[0], 12, 'f', 5)
+    //        .arg(dYdt[0], 12, 'f', 5);
 }
 
 //------------------------------------------------------------------------------
@@ -150,8 +153,8 @@ void Motor::preStep(state_vector_t& Y, double t)
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
     emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 100)));
 
-//    DebugMsg = QString(" motor-beta %1")
-//            .arg(beta);
+    //DebugMsg = QString("t: %1")
+    //        .arg(t, 8, 'f', 3);
 }
 
 //------------------------------------------------------------------------------

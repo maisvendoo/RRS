@@ -185,7 +185,7 @@ void VL60pk::initOtherEquipment()
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60pk::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60pk::soundStop);
 
-    //reg = new Registrator("brakes");
+    //reg = new Registrator("motor", 1e-3);
 }
 
 //------------------------------------------------------------------------------

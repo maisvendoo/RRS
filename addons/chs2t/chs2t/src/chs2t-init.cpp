@@ -301,7 +301,7 @@ void CHS2T::initRegistrator()
     Journal::instance()->info("Init registraion subsystem");
 
     reg = nullptr;
-    reg = new Registrator("../charts/energy", 1.0, Q_NULLPTR);
+    //reg = new Registrator("motor", 1e-3, Q_NULLPTR);
 }
 
 //------------------------------------------------------------------------------
