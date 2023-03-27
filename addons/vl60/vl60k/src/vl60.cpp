@@ -26,6 +26,7 @@ VL60k::VL60k() : Vehicle ()
   , gv_return(false)
   , charge_press(0.0)
   , ip(3.83)
+  , reg(nullptr)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
     pants_tumbler.setOffSoundName("K_Tumbler_Off");

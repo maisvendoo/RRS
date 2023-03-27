@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<BrakesState>
-		
+
 		<!-- Давление в главных резервуарах, МПа -->
 		<MainReservoirPressure>0.9</MainReservoirPressure>
 
@@ -22,7 +22,7 @@
 		<BrakeLockDevice>1</BrakeLockDevice>
 
 		<!-- Положение комбинированного крана -->
-		<CombineCranePos>-1</CombineCranePos>		
-		
+		<CombineCranePos>0</CombineCranePos>
+
 	</BrakesState>
 </Config>
