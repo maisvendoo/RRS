@@ -2,6 +2,9 @@
 <Config>
     <Device>
         <Order>2</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
         <K1>1250</K1>
         <K2>2e-4</K2>
         <T>10.0</T>

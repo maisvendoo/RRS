@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>0</Order>
-		<TrigCurrent>800</TrigCurrent>
-	</Device>
+    <Device>
+        <Order>0</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <TrigCurrent>800</TrigCurrent>
+    </Device>
 </Config>

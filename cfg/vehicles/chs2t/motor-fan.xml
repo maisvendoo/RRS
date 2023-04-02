@@ -2,6 +2,9 @@
 <Config>
     <Device>
         <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
         <Unom>1500</Unom>
         <R>9.2</R>
         <omega_nom>188.5</omega_nom>

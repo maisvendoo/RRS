@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>2</Order>
-		<Omega>1.6</Omega>
-		<Beta>0.9</Beta>s
-		<Coeff>1.0</Coeff>
-	</Device>
+    <Device>
+        <Order>2</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <Omega>1.6</Omega>
+        <Beta>0.9</Beta>s
+        <Coeff>1.0</Coeff>
+    </Device>
 </Config>

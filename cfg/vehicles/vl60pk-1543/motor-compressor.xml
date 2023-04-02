@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Device>
-    	
         <Order>2</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
         <K1>0.001</K1>
 

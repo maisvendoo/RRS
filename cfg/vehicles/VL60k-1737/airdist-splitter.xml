@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		
-		<Order>1</Order>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
-		<V0>8e-3</V0>
-		
-		<K1>1e-2</K1>
+        <V0>8e-3</V0>
 
-		<K2>1e-2</K2>		
+        <K1>1e-2</K1>
 
-		<K3>1e-2</K3>		
+        <K2>1e-2</K2>
+
+        <K3>1e-2</K3>
 
         <K4>0</K4>
 
-	</Device>
+    </Device>
 </Config>

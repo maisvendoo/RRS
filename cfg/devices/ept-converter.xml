@@ -2,6 +2,8 @@
 <Config>
     <Device>
         <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
         <r>1.87</r>
         <ks>1.145</ks>

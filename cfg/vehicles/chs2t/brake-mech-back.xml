@@ -2,6 +2,9 @@
 <Config>
     <Device>
         <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
         <ShoeType>iron</ShoeType>
         <ShoesCyl>4</ShoesCyl>
         <ShoesAxis>4</ShoesAxis>

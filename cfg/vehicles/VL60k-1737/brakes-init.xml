@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<BrakesState>
+    <BrakesState>
 
-		<!-- Давление в главных резервуарах, МПа -->
-		<MainReservoirPressure>0.9</MainReservoirPressure>
+        <!-- Давление в главных резервуарах, МПа -->
+        <MainReservoirPressure>0.9</MainReservoirPressure>
 
-		<!-- Темп утечек из ГР -->
-		<MainReservoirFlow>1.1e-4</MainReservoirFlow>
+        <!-- Темп утечек из ГР -->
+        <MainReservoirFlow>1.1e-4</MainReservoirFlow>
 
-		<!-- Зарядное давление, МПа -->
-		<ChargingPressure>0.5</ChargingPressure>
+        <!-- Зарядное давление, МПа -->
+        <ChargingPressure>0.5</ChargingPressure>
 
-		<!-- Положение рукоятки крана машиниста -->
-		<TrainCranePos>2</TrainCranePos>
+        <!-- Положение рукоятки крана машиниста -->
+        <TrainCranePos>2</TrainCranePos>
 
-		<!-- Положение рукоятки КВТ -->
-		<LocoCranePos>1</LocoCranePos>
+        <!-- Положение рукоятки КВТ -->
+        <LocoCranePos>1</LocoCranePos>
 
-		<!-- Состояние устройства блокировки тормозов 
-		(1 - разблокирована, 0 - заблокирована) -->
-		<BrakeLockDevice>1</BrakeLockDevice>
+        <!-- Состояние устройства блокировки тормозов 
+        (1 - разблокирована, 0 - заблокирована) -->
+        <BrakeLockDevice>1</BrakeLockDevice>
 
-		<!-- Положение комбинированного крана -->
-		<CombineCranePos>0</CombineCranePos>
+        <!-- Положение комбинированного крана -->
+        <CombineCranePos>0</CombineCranePos>
 
-	</BrakesState>
+    </BrakesState>
 </Config>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
-		<Order>1</Order>
+        <!-- Время рабора позиций с 0 до 33 -->
+        <PosSwitchTime>22</PosSwitchTime>
 
-		<!-- Время рабора позиций с 0 до 33 -->
-		<PosSwitchTime>22</PosSwitchTime>
-
-	</Device>
+    </Device>
 </Config>

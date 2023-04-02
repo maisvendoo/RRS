@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>1</Order>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
-		<U_nom>110.0</U_nom>
-		<R>157.0</R>
-		<T>0.1</T>
-		<level_off>0.6</level_off>
-		<level_on>0.7</level_on>		
+        <U_nom>110.0</U_nom>
+        <R>157.0</R>
+        <T>0.1</T>
+        <level_off>0.6</level_off>
+        <level_on>0.7</level_on>
 
-	</Device>
+    </Device>
 </Config>

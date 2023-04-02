@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>1</Order>
-		<ShoeType>iron</ShoeType>
-		<ShoesCyl>2</ShoesCyl>
-		<ShoesAxis>4</ShoesAxis>
-		<CylNum>12</CylNum>
-		<DeadVolume>0.0</DeadVolume>
-		<CylinderDiameter>0.254</CylinderDiameter>
-		<MechCoeff>3.4</MechCoeff>
-		<StockOut>0.060</StockOut>
-		<SpringForce>1649.0</SpringForce>
-		<InitPressure>0.0</InitPressure>
-	</Device>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <ShoeType>iron</ShoeType>
+        <ShoesCyl>2</ShoesCyl>
+        <ShoesAxis>4</ShoesAxis>
+        <CylNum>12</CylNum>
+        <DeadVolume>0.0</DeadVolume>
+        <CylinderDiameter>0.254</CylinderDiameter>
+        <MechCoeff>3.4</MechCoeff>
+        <StockOut>0.060</StockOut>
+        <SpringForce>1649.0</SpringForce>
+        <InitPressure>0.0</InitPressure>
+    </Device>
 </Config>

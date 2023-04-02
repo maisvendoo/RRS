@@ -2,6 +2,8 @@
 <Config>
     <Device>
         <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
         <!-- Темп наполнения рабочей камеры из ЗР -->
         <K1>0.4e-3</K1>

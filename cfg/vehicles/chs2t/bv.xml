@@ -2,6 +2,9 @@
 <Config>
     <Device>
         <Order>2</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
         <Vn>3.33</Vn>
         <Vdk>1e-3</Vdk>
         <Fk>1.1</Fk>
