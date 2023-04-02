@@ -3,7 +3,7 @@
     <Device>
         <Order>6</Order>
         <SubStepNum>1</SubStepNum>
-        <Solver>euler</Solver>
+        <Solver>euler2</Solver>
 
         <EqReservoirVolume>0.02</EqReservoirVolume>
         <LocoBrakePipeVolume>1e-4</LocoBrakePipeVolume>
