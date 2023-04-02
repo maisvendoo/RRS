@@ -33,7 +33,7 @@
 
 /*!
  * \class
- * \brief Deivce base class
+ * \brief Device base class
  */
 //------------------------------------------------------------------------------
 //
@@ -51,7 +51,7 @@ public:
     virtual ~Device();
 
     /// Step of ODE system solving
-    virtual void step(double t, double dt);            
+    virtual void step(double t, double dt);
 
     /// Set state variable
     void setY(size_t i, double value);
@@ -95,12 +95,20 @@ protected:
     /// Derivative of state vector
     state_vector_t dydt;
 
+    size_t sub_step_num;
+    size_t solver_type;
+    enum {
+        RK4 = 4,
+        EULER2 = 2,
+        EULER = 1
+    };
+
     state_vector_t y1;
 
     state_vector_t k1;
     state_vector_t k2;
     state_vector_t k3;
-    state_vector_t k4;
+    //state_vector_t k4;
 
     /// Config directory
     std::string cfg_dir;
@@ -124,7 +132,7 @@ protected:
 
     virtual void preStep(state_vector_t &Y, double t);
 
-    virtual void postStep(state_vector_t &Y, double t);    
+    virtual void postStep(state_vector_t &Y, double t);
 
     virtual void stepKeysControl(double t, double dt);
 
@@ -141,6 +149,14 @@ protected:
     bool isAlt() const;
 
 private:
+
+    void load_configuration(CfgReader &cfg);
+
+    void step_rk4(double t, double dt);
+
+    void step_euler2(double t, double dt);
+
+    void step_euler(double t, double dt);
 
     void memory_alloc(int order);
 

@@ -21,6 +21,8 @@
 //
 //------------------------------------------------------------------------------
 Device::Device(QObject *parent) : QObject(parent)
+  , sub_step_num(1)
+  , solver_type(EULER)
 {
     FileSystem &fs = FileSystem::getInstance();
     cfg_dir = fs.getDevicesDir();
@@ -54,36 +56,34 @@ void Device::step(double t, double dt)
 
     stepDiscrete(t, dt);
 
-    ode_system(y, dydt, t);    
-
-    for (size_t i = 0; i < y.size(); ++i)
+    double _dt = dt / static_cast<double>(sub_step_num);
+    switch (solver_type)
     {
-        k1[i] = dydt[i];
-        y1[i] = y[i] + k1[i] * dt / 2.0;
+    case RK4:
+    {
+        for (size_t i = 0; i < sub_step_num; ++i)
+        {
+            step_rk4(t + static_cast<double>(i) * _dt, _dt);
+        }
+        break;
     }
-
-    ode_system(y1, dydt, t + dt / 2.0);
-
-    for (size_t i = 0; i < y.size(); ++i)
+    case EULER2:
     {
-        k2[i] = dydt[i];
-        y1[i] = y[i] + k2[i] * dt / 2.0;
+        for (size_t i = 0; i < sub_step_num; ++i)
+        {
+            step_euler2(t + static_cast<double>(i) * _dt, _dt);
+        }
+        break;
     }
-
-    ode_system(y1, dydt, t + dt / 2.0);
-
-    for (size_t i = 0; i < y.size(); ++i)
+    case EULER:
+    default:
     {
-        k3[i] = dydt[i];
-        y1[i] = y[i] + k3[i] * dt;
+        for (size_t i = 0; i < sub_step_num; ++i)
+        {
+            step_euler(t + static_cast<double>(i) * _dt, _dt);
+        }
+        break;
     }
-
-    ode_system(y1, dydt, t + dt);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        k4[i] = dydt[i];
-        y[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dt / 6.0;
     }
 
     postStep(y, t + dt);
@@ -120,17 +120,7 @@ void Device::read_config(const QString &path)
     if (cfg.load(cfg_path))
     {
         Journal::instance()->info("Loaded file: " + cfg_path);
-
-        int order = 0;
-        QString secName = "Device";
-
-        if (!cfg.getInt(secName, "Order", order))
-        {
-            order = 1;
-        }
-
-        memory_alloc(order);
-
+        load_configuration(cfg);
         load_config(cfg);
     }
     else
@@ -149,22 +139,62 @@ void Device::read_custom_config(const QString &path)
     if (cfg.load(path + ".xml"))
     {
         Journal::instance()->info("Loaded file: " + path);
-
-        int order = 0;
-        QString secName = "Device";
-
-        if (!cfg.getInt(secName, "Order", order))
-        {
-            order = 1;
-        }
-
-        memory_alloc(order);
-
+        load_configuration(cfg);
         load_config(cfg);
     }
     else
     {
         Journal::instance()->error("File " + path + " is't found");
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::load_configuration(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    int tmp = 0;
+    if (!cfg.getInt(secName, "Order", tmp))
+    {
+        tmp = 1;
+    }
+    memory_alloc(tmp);
+
+    sub_step_num = 1;
+    if (!cfg.getInt(secName, "SubStepNum", tmp))
+    {
+        sub_step_num = 1;
+    }
+    else
+    {
+        if (tmp > 0)
+        {
+            sub_step_num = tmp;
+        }
+    }
+
+    solver_type = EULER;
+    QString solver_name = "";
+    if (!cfg.getString(secName, "Solver", solver_name))
+    {
+        solver_type = EULER;
+    }
+    else
+    {
+        if (solver_name == "rk4")
+        {
+            solver_type = RK4;
+        }
+        if (solver_name == "euler2")
+        {
+            solver_type = EULER2;
+        }
+        if (solver_name == "euler")
+        {
+            solver_type = EULER;
+        }
     }
 }
 
@@ -238,7 +268,7 @@ void Device::memory_alloc(int order)
     k1.resize(static_cast<size_t>(order));
     k2.resize(static_cast<size_t>(order));
     k3.resize(static_cast<size_t>(order));
-    k4.resize(static_cast<size_t>(order));
+    //k4.resize(static_cast<size_t>(order));
 
     std::fill(y.begin(), y.end(), 0.0);
     std::fill(dydt.begin(), dydt.end(), 0.0);
@@ -318,4 +348,81 @@ void Device::stepControl(double t, double dt)
 {
     stepKeysControl(t, dt);
     stepExternalControl(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::step_rk4(double t, double dt)
+{
+    ode_system(y, dydt, t);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        k1[i] = dydt[i];
+        y1[i] = y[i] + k1[i] * dt / 2.0;
+    }
+
+    ode_system(y1, dydt, t + dt / 2.0);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        k2[i] = dydt[i];
+        y1[i] = y[i] + k2[i] * dt / 2.0;
+    }
+
+    ode_system(y1, dydt, t + dt / 2.0);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        k3[i] = dydt[i];
+        y1[i] = y[i] + k3[i] * dt;
+    }
+
+    ode_system(y1, dydt, t + dt);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        //k4[i] = dydt[i];
+        //y[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dt / 6.0;
+        y[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + dydt[i]) * dt / 6.0;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::step_euler2(double t, double dt)
+{
+    ode_system(y, dydt, t);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        k1[i] = dydt[i];
+        y1[i] = y[i] + k1[i] * dt;
+    }
+
+    ode_system(y1, dydt, t + dt);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        //k2[i] = dydt[i];
+        //y[i] = y[i] + (k1[i] + k2[i]) * dt / 2.0;
+        y[i] = y[i] + (k1[i] + dydt[i]) * dt / 2.0;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::step_euler(double t, double dt)
+{
+    ode_system(y, dydt, t);
+
+    for (size_t i = 0; i < y.size(); ++i)
+    {
+        //k1[i] = dydt[i];
+        //y[i] = y[i] + k1[i] * dt;
+        y[i] = y[i] + dydt[i] * dt;
+    }
 }
