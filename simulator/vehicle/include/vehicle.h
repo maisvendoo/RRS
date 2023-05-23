@@ -27,6 +27,7 @@
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
+#include    "device-list.h"
 
 #include    "alsn-struct.h"
 
@@ -136,6 +137,9 @@ public:
 
     std::array<bool, MAX_DISCRETE_SIGNALS> getDiscreteSignals();
     std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
+
+    device_list_t *getFwdConnectors();
+    device_list_t *getBwdConnectors();
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t, double dt);
@@ -334,6 +338,11 @@ protected:
     /// Analog signals for output
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
+    /// List of devices - forward connectors
+    device_list_t forward_connectors;
+    /// List of devices - backward connectors
+    device_list_t backward_connectors;
+
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
@@ -400,8 +409,8 @@ private:
 
     /// Load main resistence coefficients
     void loadMainResist(QString cfg_path, QString main_resist_cfg);
-    /// Load wheel model coefficients
-    void loadWheelModel(QString cfg_path, QString wheel_model_cfg);
+    /// Load wheel-rail friction coefficients
+    void loadWheelRailFriction(QString cfg_path, QString wheel_rail_friction_cfg);
 };
 
 /*!

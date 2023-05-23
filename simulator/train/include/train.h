@@ -21,6 +21,8 @@
 #include    "ode-system.h"
 #include    "vehicle.h"
 #include    "coupling.h"
+#include    "device-list.h"
+#include    "device-joint.h"
 #include    "solver.h"
 #include    "solver-config.h"
 #include    "brakepipe.h"
@@ -150,6 +152,9 @@ private:
     /// All train's couplings
     std::vector<Coupling *> couplings;
 
+    /// All joints between neighbor vehicles
+    std::vector<std::vector<Joint *>> joints_list;
+
     /// Solver's configuration
     solver_config_t solver_config;
 
@@ -157,6 +162,10 @@ private:
     bool loadTrain(QString cfg_path, const init_data_t &init_data);
     /// Couplings loading
     bool loadCouplings(QString cfg_path);
+    /// Joints loading
+    bool loadJoints();
+    /// Joint module loading
+    void loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint *> &joints);
 
     /// Set initial conditions
     void setInitConditions(const init_data_t &init_data);

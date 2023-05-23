@@ -53,6 +53,27 @@ public:
     /// Step of ODE system solving
     virtual void step(double t, double dt);
 
+    /// Set linked state
+    virtual void link();
+
+    /// Set unlinked state
+    virtual void unlink();
+
+    /// Get linked state
+    bool isLinked() const;
+
+    /// Set name
+    void setName(QString value);
+
+    /// Get name
+    QString getName() const;
+
+    /// Set signal
+    void setInputSignal(size_t idx, double value);
+
+    /// Get signal
+    double getOutputSignal(size_t idx) const;
+
     /// Set state variable
     void setY(size_t i, double value);
 
@@ -89,6 +110,16 @@ signals:
     void soundSetPitch(QString name, float pitch);
 
 protected:
+
+    /// Name of this device
+    QString name;
+    /// State of link with other device
+    bool is_linked;
+
+    /// Input signals
+    state_vector_t input_signals;
+    /// Output signals
+    state_vector_t output_signals;
 
     /// State vector
     state_vector_t y;

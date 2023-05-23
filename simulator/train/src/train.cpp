@@ -107,6 +107,13 @@ bool Train::init(const init_data_t &init_data)
         return false;
     }
 
+    // Loading of joints
+    if (!loadJoints())
+    {
+        Journal::instance()->error("Joints aren't loaded");
+        return false;
+    }
+
     // Set initial conditions
     Journal::instance()->info("Setting up of initial conditions");
     setInitConditions(init_data);
@@ -218,6 +225,8 @@ bool Train::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Train::vehiclesStep(double t, double dt)
 {
+    bool is_joints = (vehicles.size() > 1);
+    auto joints_it = joints_list.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
@@ -226,6 +235,20 @@ void Train::vehiclesStep(double t, double dt)
 
     for (auto it = begin; it != end; ++it)
     {
+        // Если в поезде больше одной единицы ПС - просчитываем связи между ПС
+        if ( is_joints && ( it != end - 1) )
+        {
+            std::vector<Joint *> joints = *joints_it;
+            if (!joints.empty())
+            {
+                for (auto joint : joints)
+                {
+                    joint->step(t, dt);
+                }
+            }
+            ++joints_it;
+        }
+
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
@@ -579,6 +602,160 @@ bool Train::loadCouplings(QString cfg_path)
     }
 
     return couplings.size() != 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::loadJoints()
+{
+    joints_list.clear();
+
+    size_t num_joints = vehicles.size() - 1;
+
+    if (num_joints == 0)
+        return true;
+
+    size_t i = 0;
+    auto begin = vehicles.begin();
+    auto end = vehicles.end();
+
+    for (auto it = begin; it != end - 1; ++it)
+    {
+        ++i;
+
+        // Get connectors list from ahead vehicle
+        Vehicle *veh_fwd = *it;
+        device_list_t *cons_fwd;
+        if (veh_fwd->getOrientation() > 0)
+            cons_fwd = veh_fwd->getBwdConnectors();
+        else
+            cons_fwd = veh_fwd->getFwdConnectors();
+
+        // Get connectors list from behind vehicle
+        Vehicle *veh_bwd = *(it+1);
+        device_list_t *cons_bwd;
+        if (veh_bwd->getOrientation() > 0)
+            cons_bwd = veh_bwd->getFwdConnectors();
+        else
+            cons_bwd = veh_bwd->getBwdConnectors();
+
+        // Create array with joints between these two vehicle
+        std::vector<Joint *> joints;
+
+        if ((cons_fwd->empty()) || (cons_bwd->empty()))
+        {
+            joints_list.push_back(joints);
+            Journal::instance()->warning(QString("#%1 and #%2 have no connectors. Created empty array of joints.")
+                                      .arg(i)
+                                      .arg(i + 1));
+            continue;
+        }
+
+        // First try link connectors with the same name
+        for (auto con_fwd_it = cons_fwd->begin(); con_fwd_it != cons_fwd->end(); ++con_fwd_it)
+        {
+            Device *con_fwd = *con_fwd_it;
+            QString name_fwd = con_fwd->getName();
+
+            for (auto con_bwd_it = cons_bwd->begin(); con_bwd_it != cons_bwd->end(); ++con_bwd_it)
+            {
+                Device *con_bwd = *con_bwd_it;
+                QString name_bwd = con_bwd->getName();
+
+                if (name_fwd == name_bwd)
+                {
+                    loadJointModule(con_fwd, con_bwd, joints);
+                    break;
+                }
+            }
+        }
+
+        // Try link any connectors
+        for (auto con_fwd_it = cons_fwd->begin(); con_fwd_it != cons_fwd->end(); ++con_fwd_it)
+        {
+            Device *con_fwd = *con_fwd_it;
+            if (con_fwd->isLinked())
+                continue;
+
+            for (auto con_bwd_it = cons_bwd->begin(); con_bwd_it != cons_bwd->end(); ++con_bwd_it)
+            {
+                Device *con_bwd = *con_bwd_it;
+                if (con_bwd->isLinked())
+                    continue;
+
+                loadJointModule(con_fwd, con_bwd, joints);
+                break;
+            }
+        }
+
+        if (joints.empty())
+        {
+            Journal::instance()->warning(QString("No joints beetween #%1 and #%2. Created empty array of joints.")
+                                         .arg(i)
+                                         .arg(i + 1));
+        }
+        else
+        {
+            Journal::instance()->info(QString("Created %1 joints beetween #%2 and #%3")
+                                      .arg(joints.size())
+                                      .arg(i)
+                                      .arg(i + 1));
+        }
+
+        // Add joints array to list of all joints
+        joints_list.push_back(joints);
+    }
+
+    // Check there are joints for each pair of neighbor vehicles
+    return joints_list.size() == num_joints;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint *> &joints)
+{
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+
+    QString name_fwd = con_fwd->getName();
+    QString name_bwd = con_bwd->getName();
+
+    QString joint_cfg_name = QString("joint-" + name_fwd + "-" + name_bwd);
+    QString joint_cfg_path = QString(fs.getDevicesDir().c_str()) +
+            fs.separator() + joint_cfg_name + ".xml";
+
+    if (!cfg.load(joint_cfg_path))
+        return;
+
+    QString secName = "Joint";
+
+    QString joint_module_dir;
+    if (cfg.getString(secName, "ModuleDir", joint_module_dir))
+    {
+        joint_module_dir = QString(fs.combinePath(fs.getModulesDir(), joint_module_dir.toStdString()).c_str());
+    }
+    else
+    {
+        joint_module_dir = QString(fs.getModulesDir().c_str());
+    }
+
+    QString joint_module_name = "";
+    cfg.getString(secName, "ModuleName", joint_module_name);
+
+    Joint *joint = loadJoint(QString(joint_module_dir +
+                             fs.separator() + joint_module_name));
+    if (joint == Q_NULLPTR)
+        return;
+
+    Journal::instance()->info("Loaded joint model from: " + joint_module_name + ".dll");
+
+    joint->setLink(con_fwd, 0);
+    joint->setLink(con_bwd, 1);
+    joint->read_config(joint_cfg_path);
+
+    joints.push_back(joint);
 }
 
 //------------------------------------------------------------------------------
