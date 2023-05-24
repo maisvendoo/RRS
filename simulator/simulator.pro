@@ -32,4 +32,4 @@ SUBDIRS += ./kvt254
 SUBDIRS += ./epk150
 SUBDIRS += ./evr305
 SUBDIRS += ./carbrakes-mech
-
+SUBDIRS += ./joint-pneumo-hose
