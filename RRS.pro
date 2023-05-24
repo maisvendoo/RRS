@@ -17,6 +17,8 @@ SUBDIRS += ./addons/vl60
 SUBDIRS += ./addons/tep70
 SUBDIRS += ./addons/chs2t
 SUBDIRS += ./addons/ep20
+SUBDIRS += ./addons/simple-loco
+SUBDIRS += ./addons/simple-car
 
 SUBDIRS += ./launcher
 #SUBDIRS += ./launcher2

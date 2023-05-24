@@ -86,8 +86,8 @@ double PneumoAngleCock::getFlowCoeff() const
 double PneumoAngleCock::getFlowToPipe() const
 {
     if (is_opened)
-        return 0.0;
-    return Q;
+        return Q;
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -96,8 +96,8 @@ double PneumoAngleCock::getFlowToPipe() const
 double PneumoAngleCock::getPressureToHose() const
 {
     if (is_opened)
-        return 0.0;
-    return p;
+        return p;
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
