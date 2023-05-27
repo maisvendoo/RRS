@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 enum
 {
+    P1_PRESSURE = 0, ///< Давление над переключательным поршнем
+    P3_PRESSURE = 1, ///< Давление в межпоршневом пространстве и камере 0.3 литра
+
     MAX_FLOW_COEFFS = 10,
     MAX_GIAN_COEFFS = 10,
     NUM_STEPS = 5
@@ -28,21 +31,18 @@ public:
 
     double getHandleShift() const;
 
-    double getAirDistribPressure() const;
-
-    void init(double pTM, double pFL);
+    void init(double pBP, double pFL);
 
 private:
 
+    /// Объём камеры над переключательным поршнем
     double V1;
 
-    double V2;
+    /// Объём межпоршневого пространства с камерой 0.3 литра
+    double V3;
 
-    double Vpz;
-
-    double delta_p;
-
-    double ps;
+    /// Разница давлений, от которой срабатывает переключательный поршень
+    double p_switch;
 
     double min_pos;
 
@@ -51,7 +51,6 @@ private:
     double pos_duration;
 
     int dir;
-
 
     std::array<double, NUM_STEPS> step_pressures;
 

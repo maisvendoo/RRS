@@ -6,15 +6,15 @@
 //
 //------------------------------------------------------------------------------
 BrakeCrane::BrakeCrane(QObject *parent) : BrakeDevice (parent)
-  , Ver(1.0)  
-  , Vbp(1.0)
-  , p0(5.0)
-  , pFL(0.0)
-  , pTM1(0.0)
   , is_hold(false)
   , is_brake(false)
+  , p0(0.5)
+  , Ver(1.0)
+  , pFL(0.0)
+  , pBP(0.0)
+  , QFL(0.0)
+  , QBP(0.0)
   , Qer(0.0)
-  , Qbp(0.0)
 {
 
 }
@@ -30,31 +30,63 @@ BrakeCrane::~BrakeCrane()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double BrakeCrane::getBrakePipeInitPressure() const
+bool BrakeCrane::isHold() const
 {
-    return getY(BP_PRESSURE);
+    return is_hold;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double BrakeCrane::getEqReservoirPressure() const
+bool BrakeCrane::isBrake() const
 {
-    return getY(ER_PRESSURE);
+    return is_brake;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setBrakePipeFlow(double Qbp)
+void BrakeCrane::setChargePressure(double value)
 {
-    this->Qbp = Qbp;
+    p0 = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setEqResrvoirFlow(double Qer)
+void BrakeCrane::setFLpressure(double value)
+{
+    pFL = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double BrakeCrane::getFLflow() const
+{
+    return QFL;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane::setBPpressure(double value)
+{
+    pBP = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double BrakeCrane::getBPflow() const
+{
+    return QBP;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane::setERflow(double Qer)
 {
     this->Qer = Qer;
 }
@@ -62,25 +94,9 @@ void BrakeCrane::setEqResrvoirFlow(double Qer)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setChargePressure(double p0)
+double BrakeCrane::getERpressure() const
 {
-    this->p0 = p0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void BrakeCrane::setFeedLinePressure(double pFL)
-{
-    this->pFL = pFL;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void BrakeCrane::setBrakePipePressure(double pTM1)
-{
-    this->pTM1 = pTM1;
+    return getY(ER_PRESSURE);
 }
 
 //------------------------------------------------------------------------------
@@ -93,7 +109,6 @@ void BrakeCrane::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    dYdt[BP_PRESSURE] = Qbp / Vbp;
     dYdt[ER_PRESSURE] = Qer / Ver;
 }
 

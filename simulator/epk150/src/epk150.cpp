@@ -26,7 +26,6 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     , ps2(0.15)
     , V1(1e-4)
     , V2(1e-3)
-    , emergencyRate(0.0)
     , is_whistle_on(0.0)
     , is_whistle(false)
 {
@@ -44,9 +43,11 @@ AutoTrainStopEPK150::~AutoTrainStopEPK150()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AutoTrainStopEPK150::getEmergencyBrakeRate() const
+void AutoTrainStopEPK150::init(double pBP, double pFL)
 {
-    return emergencyRate;
+    setY(0, 0.0);
+    setY(2, pBP);
+    setY(1, pFL);
 }
 
 //------------------------------------------------------------------------------
@@ -55,16 +56,6 @@ double AutoTrainStopEPK150::getEmergencyBrakeRate() const
 bool AutoTrainStopEPK150::getEmergencyBrakeContact() const
 {
     return is_whistle;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void AutoTrainStopEPK150::init(double pTM, double pFL)
-{
-    setY(0, 0.0);
-    setY(2, pTM);
-    setY(1, pFL);
 }
 
 //------------------------------------------------------------------------------
@@ -84,7 +75,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double u3 = cut(nf(k[2] * dp1), 0.0, 1.0);
 
-    double sum_p1 = Y[2] + ps1 - pTM;
+    double sum_p1 = Y[2] + ps1 - pBP;
 
     double u4 = cut(nf(k[3] * sum_p1), 0.0, 1.0);
 
@@ -92,17 +83,34 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double u5 = is_whistle_on = cut(nf(k[4] * sum_p2), 0.0, 1.0);
 
-    double Q2 = K[4] * (pFL - Y[1]) * hs_p(sum_p2) - K[5] * Y[1] * u5;
+    // Поток из питательной магистрали в камеру выдержки времени
+    double Q_fl_2 = K[4] * (pFL - Y[1]) * hs_p(sum_p2);
 
-    double Q1 = K[1] * (pTM - Y[2]) - K[2] * Y[2] * u3;
+    // Разрядка камеры выдержки времени в атмосферу
+    double Q_2_atm = K[5] * Y[1] * u5;
+
+    // Поток из тормозной магистрали в камеру над срывным клапаном
+    double Q_bp_1 = K[1] * (pBP - Y[2]);
+
+    // Разрядка камеры над срывным клапаном в атмосферу
+    double Q_1_atm = K[2] * Y[2] * u3;
+
+    // Экстренная разрядка тормозной магистрали в атмосферу
+    double Q_bp_emergency = K[3] * pBP * u4;
+
+    // Поток в питательную магистраль
+    QFL = - Q_fl_2;
+
+    // Поток в тормозную магистраль
+    QBP = - Q_bp_1 - Q_bp_emergency;
+
+    // Поток в камеру выдержки времени
+    dYdt[1] = (Q_fl_2 - Q_2_atm) / V2;
+
+    // Поток в камеру над срывным клапаном
+    dYdt[2] = (Q_bp_1 - Q_1_atm) / V1;
 
     dYdt[0] = ( pk * u1 * u2 - Y[0] ) / T1;
-
-    dYdt[1] = Q2 / V2;
-
-    dYdt[2] = Q1 / V1;
-
-    emergencyRate = K[3] * pTM * u4;
 }
 
 //------------------------------------------------------------------------------
@@ -168,10 +176,7 @@ void AutoTrainStopEPK150::stepKeysControl(double t, double dt)
 
     if (getKeyState(KEY_N))
     {
-        if ( getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R) )
-            keyOn(true);
-        else
-            keyOn(false);
+        keyOn(isShift());
     }
 
     /*if (getKeyState(KEY_K))

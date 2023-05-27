@@ -33,7 +33,10 @@ public:
     ~BrakeMech();
 
     /// Set air flow in/out brake cylinder
-    void setAirFlow(double Q);
+    void setBCflow(double value);
+
+    /// Get brake cylinder pressure
+    double getBCpressure() const;
 
     /// Set effective brake radius
     void setEffFricRadius(double radius);
@@ -46,9 +49,6 @@ public:
 
     /// Get brake torque by one axis
     double getBrakeTorque() const;
-
-    /// Get brake cylinder pressure
-    double getBrakeCylinderPressure() const;
 
     double getShoeForce() const;
 

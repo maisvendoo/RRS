@@ -14,39 +14,54 @@ public:
 
     virtual ~LocoCrane();
 
-    void setFeedlinePressure(double pFL);
+    /// Задать позицию крана
+    virtual void setHandlePosition(double position);
 
-    void setBrakeCylinderPressure(double pBC);
+    /// Задать отпуск тормозов на локомотиве
+    void release(bool is_release);
 
-    void setAirDistributorFlow(double Qvr);
-
-    virtual void setHandlePosition(double pos);
-
-    double getBrakeCylinderFlow() const;
-
+    /// Положение рукоятки (вращение)
     virtual double getHandlePosition() const = 0;
 
+    /// Положение рукоятки (подъём по вертикальной оси)
     virtual double getHandleShift() const = 0;
 
-    virtual double getAirDistribPressure() const;
+    /// Задать давление от питательной магистрали
+    void setFLpressure(double value);
 
+    /// Поток в питательную магистраль
+    double getFLflow() const;
+
+    /// Задать давление от магистрали тормозных цилиндров
+    void setBCpressure(double value);
+
+    /// Поток в магистраль тормозных цилиндров
+    double getBCflow() const;
+
+    /// Задать давление от импульсной магистрали (давление от воздухораспределителя)
+    void setILpressure(double value);
+
+    /// Поток в импульсную магистраль
+    double getILflow() const;
+
+    /// Моделирование звуков
     virtual void stepSound();
-
-    void release(bool is_release);
 
 protected:
 
-    double pFL;
-
-    double pBC;
-
-    double Qvr;
-
-    double Qbc;
-
+    /// Положение рукоятки
     double pos;
 
+    /// Признак отпуска тормозов на локомотиве
     double is_release;
+
+    double pFL;
+    double pBC;
+    double pIL;
+
+    double QFL;
+    double QBC;
+    double QIL;
 };
 
 //------------------------------------------------------------------------------

@@ -30,11 +30,9 @@ public:
 
     ~AutoTrainStopEPK150();
 
-    double getEmergencyBrakeRate() const;
-
     bool getEmergencyBrakeContact() const;
 
-    void init(double pTM, double pFL);
+    void init(double pBP, double pFL);
 
 private:
 
@@ -61,9 +59,6 @@ private:
 
     /// Объем камеры выдержки времени
     double V2;
-
-    /// Темп разрядки ТМ через срывной клапан
-    double emergencyRate;
 
     /// Флаг работы свистка
     double is_whistle_on;

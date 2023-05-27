@@ -6,15 +6,14 @@
 //
 //------------------------------------------------------------------------------
 ElectroAirDistributor::ElectroAirDistributor(QObject *parent) : BrakeDevice(parent)
-  , Qar_in(0.0)
-  , Qar_out(0.0)
-  , p_ar(0.0)
-  , Qbc_out(0.0)
-  , Q2(0.0)
-  , pbc_out(0.0)
-  , pbc_in(0.0)
-
-  , p1(0.0)
+  , pBC(0.0)
+  , p_airdistBC(0.0)
+  , pSR(0.0)
+  , p_airdistSR(0.0)
+  , Q_airdistBC(0.0)
+  , QBC(0.0)
+  , Q_airdistSR(0.0)
+  , QSR(0.0)
 {
     setControlLinesNumber(1);
     setValvesNumber(2);
@@ -56,12 +55,79 @@ void ElectroAirDistributor::setControlLine(double value, size_t idx)
         control_line[idx] = cut(value, -1.0, 1.0);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double ElectroAirDistributor::getValveState(size_t i)
 {
     if (i < valve_state.size())
         return valve_state[i];
     else
         return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ElectroAirDistributor::setBCpressure(double value)
+{
+    pBC = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double ElectroAirDistributor::getAirdistBCpressure() const
+{
+    return p_airdistBC;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ElectroAirDistributor::setAirdistBCflow(double value)
+{
+    Q_airdistBC = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double ElectroAirDistributor::getBCflow() const
+{
+    return QBC;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ElectroAirDistributor::setSRpressure(double value)
+{
+    pSR = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double ElectroAirDistributor::getAirdistSRpressure() const
+{
+    return p_airdistSR;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ElectroAirDistributor::setAirdistSRflow(double value)
+{
+    Q_airdistSR = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double ElectroAirDistributor::getSRflow() const
+{
+    return QSR;
 }
 
 //------------------------------------------------------------------------------

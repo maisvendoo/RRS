@@ -9,22 +9,9 @@
 enum
 {
     MAX_FLOW_COEFFS = 14,
-    NUM_POSITIONS = 7
-};
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-enum
-{
-    EC_PRESSURE = 2
-};
+    NUM_POSITIONS = 7,
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-enum
-{
     POS_I = 0,
     POS_II = 1,
     POS_III = 2,
@@ -47,68 +34,57 @@ public:
 
     ~BrakeCrane395();
 
-    void setPosition(int &position);
+    void init(double pBP, double pFL);
 
-    QString getPositionName();
+    void setHandlePosition(int &position);
 
-    float getHandlePosition();
+    QString getPositionName() const;
 
-    void init(double pTM, double pFL);
+    double getHandlePosition() const;
 
 private:
 
+    /// Коэффициент утечек из УР
     double k_leek;
 
+    /// Коэффициент зарядки УР из ГР в I и II положениях
+    double k_charge;
+
+    /// Коэффициент расхода из УР через стабилизатор в II положении
+    /// (ликвидация сверхзарядного давления)
     double k_stab;
 
-    double Vec;
+    /// Коэффициент разрядки УР в Va положении
+    double k_Va;
 
-    double A1;
+    /// Коэффициент разрядки УР в V положении
+    double k_V;
 
-    double k1;
+    /// Коэффициент разрядки УР в VI положении
+    double k_VI;
 
-    double k2;
+    /// Коэффициент к разнице давлений ТМ и УР (условный уравнительный поршень)
+    double A;
 
-    double k3;
+    /// Коэффициент зарядки ТМ из ГР в I положении
+    double K_charge;
 
-    double k4;
+    /// Коэффициент зарядки ТМ из ГР от уравнительного поршня
+    double K_feed;
 
-    double T1;
+    /// Коэффициент разрядки ТМ в атмосферу от уравнительного поршня
+    double K_atm;
 
-    double T2;
-
-    double K4_power;
-
-    double Qbp;
-
-    int old_input;
-
-    int old_output;
-
-    bool    pulse_II;
-
-    bool    pulse_I;
-
-    double  t_old;
-    double  dt;
+    /// Коэффициент разрядки ТМ в VI положении
+    double K_VI;
 
     int handle_pos;
-
-    double pos_angle;
 
     double pos_delay;
 
     int min_pos;
 
     int max_pos;
-
-    double pos_duration;
-
-    int dir;
-
-    bool pos_switch;
-
-    double tau;
 
     int volume_in;
 
@@ -118,29 +94,22 @@ private:
 
     double Kv_out;
 
-    int volume_1;
+//    int volume_1;
     int volume_2;
-    int volume_5;
+//    int volume_5;
 
-    double Kv_1;
+//    double Kv_1;
     double Kv_2;
-    double Kv_5;
+//    double Kv_5;
 
     Timer   *incTimer;
-    Timer   *decTimer;    
-
-    std::array<double, MAX_FLOW_COEFFS + 1> K;
+    Timer   *decTimer;
 
     std::array<double, NUM_POSITIONS> pos;
 
     QStringList positions_names;
 
-    std::vector<float> positions;
-
-
     void preStep(state_vector_t &Y, double t);
-
-    void postStep(state_vector_t &Y, double t);
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
@@ -148,11 +117,11 @@ private:
 
     void stepKeysControl(double t, double dt);
 
-private slots:    
+private slots:
 
     void inc();
 
     void dec();
 };
 
-#endif
+#endif // KRM_395_H

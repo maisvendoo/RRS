@@ -6,39 +6,53 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT PneumoReley : public BrakeDevice
+class DEVICE_EXPORT PneumoRelay : public BrakeDevice
 {
 public:
 
-    PneumoReley(double work_volume = 2e-3, QObject *parent = Q_NULLPTR);
+    PneumoRelay(double work_volume = 2e-3, QObject *parent = Q_NULLPTR);
 
-    virtual ~PneumoReley();
+    virtual ~PneumoRelay();
 
-    void setWorkAirFlow(double flow);
+    // Работа с давлением в управляющей камере напрямую
+    /// Задать управляющее давление в повторительном пневмореле
+    void setControlPressure(double value);
 
-    void setBrakeCylPressure(double pBC);
+    // Работа с управляющей камерой как с фиктивным объёмом
+    /// Задать управляющий поток в повторительное пневмореле
+    void setControlFlow(double value);
 
-    void setPipelinePressure(double pPM);
+    /// Давление в управляющей камере повторительного пневмореле
+    double getControlPressure() const;
 
-    double getWorkPressure() const;
+    /// Задать давление от питательной магистрали
+    void setFLpressure(double value);
 
-    double getBrakeCylAirFlow() const;
+    /// Поток в питательную магистраль
+    double getFLflow() const;
+
+    /// Задать давление от управляемой магистрали
+    void setPipePressure(double value);
+
+    /// Поток в управляемую магистраль
+    double getPipeFlow() const;
 
 protected:
 
-    double V_work;
+    /// Объём управляющей камеры
+    double V0;
+
+    double pCONTROL;
+    double pFL;
+    double pPIPE;
+
+    double QCONTROL;
+    double QFL;
+    double QPIPE;
 
     double K1;
 
     double K2;
-
-    double Q_work;
-
-    double pBC;
-
-    double pPM;
-
-    double Qbc;
 
     double k1;
 

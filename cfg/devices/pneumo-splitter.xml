@@ -5,6 +5,7 @@
         <SubStepNum>1</SubStepNum>
         <Solver>euler</Solver>
 
+        <!-- Объём рабочей камеры пневмосоединения -->
         <V0>8e-3</V0>
 
         <K1>1e-2</K1>

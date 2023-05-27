@@ -14,31 +14,33 @@ public:
 
     virtual ~AirDistributor();
 
-    void setBrakepipePressure(double pTM);
+    /// Задать давление от тормозной магистрали
+    void setBPpressure(double value);
 
-    void setBrakeCylinderPressure(double pBC);
+    /// Поток в тормозную магистраль
+    double getBPflow() const;
 
-    void setAirSupplyPressure(double pAS);
+    /// Задать давление от магистрали тормозных цилиндров (или импульсной магистрали)
+    void setBCpressure(double value);
 
-    virtual double getBrakeCylinderAirFlow() const;
+    /// Поток в магистраль тормозных цилиндров (или в импульсную магистраль)
+    double getBCflow() const;
 
-    virtual double getAirSupplyFlow() const;
+    /// Задать давление от запасного резервуара
+    void setSRpressure(double value);
 
-    double getAuxRate() const;
+    /// Поток в запасный резервуар
+    double getSRflow() const;
 
 protected:
 
-    double  pTM;
+    double pBP;
+    double pBC;
+    double pSR;
 
-    double  pBC;
-
-    double  pAS;
-
-    double  Qbc;
-
-    double  Qas;
-
-    double  auxRate;
+    double QBP;
+    double QBC;
+    double QSR;
 };
 
 //------------------------------------------------------------------------------

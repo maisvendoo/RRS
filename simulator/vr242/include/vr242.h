@@ -1,8 +1,17 @@
-#ifndef		VR242
-#define		VR242
+#ifndef		VR242_H
+#define		VR242_H
 
 #include	"airdistributor.h"
-#include    "constants.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+enum
+{
+    MAX_FLOW_COEFFS = 21,
+    MAX_GIAN_COEFFS = 10,
+    MAX_TIME_CONST = 10
+};
 
 //------------------------------------------------------------------------------
 //
@@ -15,7 +24,7 @@ public:
 
     ~AirDist242();
 
-    void init(double pTM, double pFL);
+    void init(double pBP, double pFL);
 
 private:
 
@@ -41,4 +50,4 @@ private:
     void preStep(state_vector_t &Y, double t);
 };
 
-#endif // VR242
+#endif // VR242_H

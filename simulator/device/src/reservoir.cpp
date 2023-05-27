@@ -22,9 +22,9 @@ Reservoir::~Reservoir()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Reservoir::setAirFlow(double Q)
+void Reservoir::setFlow(double value)
 {
-    this->Q = Q;
+    Q = value;
 }
 
 //------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ double Reservoir::getPressure() const
 //------------------------------------------------------------------------------
 void Reservoir::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-   Q_UNUSED(t)   
+   Q_UNUSED(t)
 
    dYdt[0] = (Q - k_flow * Y[0]) / V;
 }

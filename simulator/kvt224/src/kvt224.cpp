@@ -7,10 +7,8 @@
 //------------------------------------------------------------------------------
 LocoCrane224::LocoCrane224(QObject *parent) : LocoCrane(parent)
   , V1(1e-4)
-  , V2(1e-4)
-  , Vpz(3e-4)
-  , delta_p(0.05)
-  , ps(0.1)
+  , V3(3.5e-4)
+  , p_switch(0.1)
   , min_pos(-0.05)
   , max_pos(1.0)
   , pos_duration(1.0)
@@ -22,8 +20,8 @@ LocoCrane224::LocoCrane224(QObject *parent) : LocoCrane(parent)
 
     pos = cur_pos = 1.0;
 
-    /*DebugLog *log = new DebugLog("kvt254.txt");
-    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);*/
+    /*DebugLog *log = new DebugLog("kvt224.txt");
+    connect(this, &LocoCrane224::DebugPrint, log, &DebugLog::DebugPring);*/
 }
 
 //------------------------------------------------------------------------------
@@ -53,14 +51,6 @@ double LocoCrane224::getHandleShift() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double LocoCrane224::getAirDistribPressure() const
-{
-    return getY(0);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void LocoCrane224::init(double pTM, double pFL)
 {
     Q_UNUSED(pTM)
@@ -77,45 +67,49 @@ void LocoCrane224::ode_system(const state_vector_t &Y,
     Q_UNUSED(t)
 
     // Давление, задаваемое поворотом рукоятки
-    double p_handle = K[3] * pf(cur_pos);
-
-    double u1 = hs_p(p_handle - Y[2]);
-
-    double u2 = hs_n(p_handle - Y[2]);
+    double p_handle = K[3] * pf(pos);
 
     // Давление, задаваемое уравнительным органом крана
-    double pz = p_handle * u1 + Y[2] * u2;
+    double p_ur = max(p_handle, Y[P3_PRESSURE]);
 
-    double dp = pz - pBC;
+    double dp_ur = k[1] * (p_ur - pBC);
+    double u_fl = cut(pf(dp_ur), 0.0, 1.0);
+    double u_atm = cut(nf(dp_ur), 0.0, 1.0);
 
-    double u3 = cut(pf(k[1] * dp), 0.0, 1.0);
+    // Поток из питательной магистрали в магистраль тормозных цилиндров
+    double Q_fl_bc = K[1] * u_fl * (pFL - pBC);
 
-    double u4 = cut(nf(k[1] * dp), 0.0, 1.0);
-
-    // Поток воздуха в ТЦ
-    Qbc = K[1] * (pFL - pBC) * u3 - K[2] * pBC * u4;
+    // Разрядка магистрали тормозных цилиндров в атмосферу
+    double Q_bc_atm = K[2] * u_atm * pBC;
 
     // Работа повторительной схемы
+    double dp_1 = pIL - Y[P1_PRESSURE];
+    double u_switch = hs_n(dp_1 - p_switch);
+    double u_release = hs_n(pos) + is_release;
 
-    double dp12 =  Y[0] - Y[1];
+    // Наполнение камеры над переключательным поршнем из импульсной магистрали
+    double Q_il_1 = K[5] * dp_1 * u_switch;
 
-    double u5 = hs_n(dp12 - ps);
+    // Разрядка камеры над переключательным поршнем в атмосферу
+    double Q_1_atm = K[6] * Y[P1_PRESSURE] * u_release;
 
-    double u6 = hs_n(pos) + is_release;
+    // Поток из камеры над переключательным поршнем в межпоршневое пространство
+    double Q_1_3 = K[7] * (Y[P1_PRESSURE] - Y[P3_PRESSURE]);
 
-    double Qpz = K[7] * (Y[1] - Y[2]);
+    // Поток в питательную магистраль
+    QFL = - Q_fl_bc;
 
-    double Q12 = K[5] * dp12 * u5;
+    // Поток в магистраль тормозных цилиндров
+    QBC = Q_fl_bc - Q_bc_atm;
 
-    double Q1 = K[4] * Qvr;
+    // Поток в импульсную магистраль
+    QIL = - Q_il_1;
 
-    double Q2 = Q12 - Qpz - K[6] * Y[1] * u6;
+    // Поток в камеру над переключательным поршнем
+    dYdt[P1_PRESSURE] = (Q_il_1 - Q_1_3 - Q_1_atm) / V1;
 
-    dYdt[0] = Q1 / V1; // p1
-
-    dYdt[1] = Q2 / V2; // p2
-
-    dYdt[2] = Qpz / Vpz; // p_pz
+    // Поток в межпоршневое пространство и камеру 0.3 литра
+    dYdt[P3_PRESSURE] = Q_1_3 / V3;
 }
 
 //------------------------------------------------------------------------------
@@ -138,12 +132,12 @@ void LocoCrane224::load_config(CfgReader &cfg)
     }
 
     cfg.getDouble(secName, "V1", V1);
-    cfg.getDouble(secName, "V2", V2);
-    cfg.getDouble(secName, "Vpz", Vpz);
+//    cfg.getDouble(secName, "V2", V1);
+    cfg.getDouble(secName, "Vpz", V3);
 
-    cfg.getDouble(secName, "delta_p", delta_p);
+//    cfg.getDouble(secName, "delta_p", delta_p);
 
-    cfg.getDouble(secName, "ps", ps);
+    cfg.getDouble(secName, "ps", p_switch);
 
     QString tmp = "";
 

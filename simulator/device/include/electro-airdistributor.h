@@ -20,51 +20,50 @@ public:
 
     void setControlLine(double value, size_t idx = 0);
 
-    void setQbc_in(double qbc_in) { this->Q2 = qbc_in; }
-
-    void setPbc_in(double pbc_in) { this->pbc_in = pbc_in; }
-
-    void setSupplyReservoirPressure(double press) { p_ar = press; }
-
-    double getSupplyReservoirPressure() { return p_ar; }
-
-    void setInputSupplyReservoirFlow(double Qar_in) { this->Qar_in = Qar_in; }
-
-    double getOutputSupplyReservoirFlow() { return Qar_out; }
-
     double getValveState(size_t i);
 
-    double getQbc_out() { return Qbc_out; }
+    // Взаимодействие оборудования, подключаемого через данный электровоздухораспределитель
+    // Взаимодействие воздухораспределителя и магистрали тормозных цилиндров
+    /// Задать давление от магистрали тормозных цилиндров
+    void setBCpressure(double value);
 
-    double getPbc_out() { return pbc_out; }
+    /// Давление магистрали тормозных цилиндров к воздухораспределителю
+    double getAirdistBCpressure() const;
+
+    /// Задать поток из воздухораспределителя в магистраль тормозных цилиндров
+    void setAirdistBCflow(double value);
+
+    /// Поток в магистраль тормозных цилиндров
+    double getBCflow() const;
+
+    // Взаимодействие воздухораспределителя и запасного резервуара
+    /// Задать давление от запасного резервуара
+    void setSRpressure(double value);
+
+    /// Давление запасного резервуара к воздухораспределителю
+    double getAirdistSRpressure() const;
+
+    /// Задать поток из воздухораспределителя в запасный резервуар
+    void setAirdistSRflow(double value);
+
+    /// Поток в запасный резервуар
+    double getSRflow() const;
 
 protected:
-
-    /// Расход воздуха на пополнение ЗР от ВР
-    double Qar_in;
-    /// Расход воздуха в ЗР
-    double Qar_out;
-
-    /// Давление в ЗР
-    double p_ar;
-
-    /// Расход воздуха на наполнение ТЦ
-    double Qbc_out;
-    /// Расход воздуха от ВР на наполнение ТЦ
-    double Q2;
-
-    /// Давление в ТЦ
-    double pbc_out;
-    /// Давление в ТЦ, передаваемое в модель ВР
-    double pbc_in;
-
-
-    double p1;
-
 
     std::vector<double> control_line;
 
     std::vector<double> valve_state;
+
+    double pBC;
+    double p_airdistBC;
+    double pSR;
+    double p_airdistSR;
+
+    double Q_airdistBC;
+    double QBC;
+    double Q_airdistSR;
+    double QSR;
 };
 
 //------------------------------------------------------------------------------

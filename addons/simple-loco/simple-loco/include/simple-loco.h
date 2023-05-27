@@ -24,61 +24,56 @@ public:
 
 private:
 
-    // Старая пневносхема
-    /// Главный резервуар
-    Reservoir   *old_main_reservoir;
+    /// Номер Debug-строки
+    size_t debug_num;
 
-    /// Запасный резервуар
-    Reservoir   *old_supply_reservoir;
+    /// Подкачка главного резервуара (вместо полноценного компресора)
+    double is_compressor;
 
-    /// Тормозной цилиндр
-    Reservoir   *old_brake_cylinder;
-
-    /// Воздухораспределитель
-    AirDistributor  *old_air_dist;
-
-    /// Поездной кран машиниста (КрМ)
-    BrakeCrane  *old_brake_crane;
-
-    // Новая пневносхема
     /// Главный резервуар
     Reservoir   *main_reservoir;
 
-    /// Запасный резервуар
-    Reservoir   *supply_reservoir;
+    /// Блокировочное устройство
+    BrakeLock  *brake_lock;
 
-    /// Тормозной цилиндр
-    Reservoir   *brake_cylinder;
-
-    /// Воздухораспределитель
-    AirDistributor  *air_dist;
-
-    /// Поездной кран машиниста (КрМ)
+    /// Поездной кран машиниста
     BrakeCrane  *brake_crane;
+
+    /// Кран впомогательного тормоза
+    LocoCrane  *loco_crane;
 
     /// Тормозная магистраль
     Reservoir   *brakepipe;
 
-    /// Рукав тормозной магистрали спереди
-    PneumoHose  *hose_tm_fwd;
+    /// Воздухораспределитель
+    AirDistributor  *air_dist;
 
-    /// Рукав тормозной магистрали сзади
-    PneumoHose  *hose_tm_bwd;
+    /// Переключательный клапан магистрали тормозных цилиндров
+    SwitchingValve  *bc_switch_valve;
+
+    /// Тормозной цилиндр
+    Reservoir   *brake_cylinder;
+
+    /// Запасный резервуар
+    Reservoir   *supply_reservoir;
 
     /// Концевой кран тормозной магистрали спереди
-    PneumoAngleCock  *anglecock_tm_fwd;
+    PneumoAngleCock  *anglecock_bp_fwd;
 
     /// Концевой кран тормозной магистрали сзади
-    PneumoAngleCock  *anglecock_tm_bwd;
+    PneumoAngleCock  *anglecock_bp_bwd;
+
+    /// Рукав тормозной магистрали спереди
+    PneumoHose  *hose_bp_fwd;
+
+    /// Рукав тормозной магистрали сзади
+    PneumoHose  *hose_bp_bwd;
 
     /// Registrator
     Registrator *reg;
 
     /// Общая инициализация локомотива
     void initialization();
-
-    /// Инициализация старой пневмосхемы
-    void initPneumatics_old();
 
     /// Инициализация новой пневмосхемы
     void initPneumatics();
@@ -91,9 +86,6 @@ private:
 
     /// Шаг моделирования систем единицы ПС
     void step(double t, double dt);
-
-    /// Моделирование старой пневмосхемы
-    void stepPneumatics_old(double t, double dt);
 
     /// Моделирование новой пневмосхемы
     void stepPneumatics(double t, double dt);

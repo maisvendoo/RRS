@@ -14,17 +14,24 @@ public:
 
     ~Reservoir();
 
-    void setAirFlow(double Q);
+    /// Задать поток в резервуар
+    void setFlow(double value);
 
-    void setFlowCoeff(double coeff);
+    /// Задать коэффициент утечек из резервуара в атмосферу
+    void setFlowCoeff(double value);
 
-    double getPressure() const;    
+    /// Давление в резервуаре
+    double getPressure() const;
 
 private:
 
+    /// Объём резервуара
     double  V;
+
+    /// Поток в резервуар
     double  Q;
 
+    /// Коэффициент утечек из резервуара в атмосферу
     double  k_flow;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

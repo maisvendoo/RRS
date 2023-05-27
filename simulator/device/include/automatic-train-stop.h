@@ -18,15 +18,22 @@ public:
 
     void keyOn(bool on);
 
-    void setFeedlinePressure(double pFL);
+    bool getStateKey() const;
 
-    void setBrakepipePressure(double pTM);
+    /// Задать давление от питательной магистрали
+    void setFLpressure(double value);
 
-    virtual double getEmergencyBrakeRate() const;
+    /// Поток в питательную магистраль
+    double getFLflow() const;
 
+    /// Задать давление от тормозной магистрали
+    void setBPpressure(double value);
+
+    /// Поток в тормозную магистраль
+    double getBPflow() const;
+
+    /// Автостопное экстренное торможение
     virtual bool getEmergencyBrakeContact() const;
-
-    bool getStateKey() const { return is_key_on; }
 
 protected:
 
@@ -35,8 +42,10 @@ protected:
     double is_key_on;
 
     double pFL;
+    double pBP;
 
-    double pTM;
+    double QFL;
+    double QBP;
 };
 
 //------------------------------------------------------------------------------

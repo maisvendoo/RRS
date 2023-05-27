@@ -3,14 +3,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoReley::PneumoReley(double work_volume, QObject *parent) : BrakeDevice(parent)
-  , V_work(work_volume)
+PneumoRelay::PneumoRelay(double work_volume, QObject *parent) : BrakeDevice(parent)
+  , V0(work_volume)
+  , pCONTROL(0.0)
+  , pFL(0.0)
+  , pPIPE(0.0)
+  , QCONTROL(0.0)
+  , QFL(0.0)
+  , QPIPE(0.0)
   , K1(0.0)
   , K2(0.0)
-  , Q_work(0.0)
-  , pBC(0.0)
-  , pPM(0.0)
-  , Qbc(0.0)
   , k1(1.0)
 {
 
@@ -19,7 +21,7 @@ PneumoReley::PneumoReley(double work_volume, QObject *parent) : BrakeDevice(pare
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoReley::~PneumoReley()
+PneumoRelay::~PneumoRelay()
 {
 
 }
@@ -27,31 +29,23 @@ PneumoReley::~PneumoReley()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoReley::setWorkAirFlow(double flow)
+void PneumoRelay::setControlPressure(double value)
 {
-    Q_work = flow;
+    pCONTROL = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoReley::setBrakeCylPressure(double pBC)
+void PneumoRelay::setControlFlow(double value)
 {
-    this->pBC = pBC;
+    QCONTROL = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoReley::setPipelinePressure(double pPM)
-{
-    this->pPM = pPM;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoReley::getWorkPressure() const
+double PneumoRelay::getControlPressure() const
 {
     return getY(0);
 }
@@ -59,50 +53,91 @@ double PneumoReley::getWorkPressure() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoReley::getBrakeCylAirFlow() const
+void PneumoRelay::setFLpressure(double value)
 {
-    return Qbc;
+    pFL = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoReley::ode_system(const state_vector_t &Y,
+double PneumoRelay::getFLflow() const
+{
+    return QFL;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoRelay::setPipePressure(double value)
+{
+    pPIPE = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoRelay::getPipeFlow() const
+{
+    return QPIPE;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoRelay::ode_system(const state_vector_t &Y,
                              state_vector_t &dYdt,
                              double t)
 {
-    Q_UNUSED(t)
     Q_UNUSED(Y)
+    Q_UNUSED(t)
 
-    dYdt[0] = Q_work / V_work;
+    // Проверям, задавалось ли давление в камере напрямую
+    if (pCONTROL != 0.0)
+    {
+        setY(0, pCONTROL);
+        pCONTROL = 0.0;
+        QCONTROL = 0.0;
+    }
+
+    dYdt[0] = QCONTROL / V0;
 }
-
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoReley::preStep(state_vector_t &Y, double t)
+void PneumoRelay::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    double s1 = cut(k1 * (Y[0] - pBC), -1.0, 1.0);
+    double s1 = cut(k1 * (Y[0] - pPIPE), -1.0, 1.0);
 
-    double v1 = hs_p(s1);
+    // Поток из питательной магистрали в управляемую
+    double Q_fl_pipe = K1 * (pFL - pPIPE) * hs_p(s1);
 
-    double v2 = hs_n(s1);
+    // Разрядка управляемой магистрали в атмосферу
+    double Q_pipe_atm = K2 * pPIPE * hs_n(s1);
 
-    Qbc = K1 * (pPM - pBC) * v1 - K2 * pBC * v2;
+    // Поток в питательную магистраль
+    QFL = - Q_fl_pipe;
+
+    // Поток в управляемую магистраль
+    QPIPE = Q_fl_pipe - Q_pipe_atm;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoReley::load_config(CfgReader &cfg)
+void PneumoRelay::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
+    double tmp = 0.0;
+    cfg.getDouble(secName, "V0", tmp);
+    if (tmp > 1e-3)
+        V0 = tmp;
+
     cfg.getDouble(secName, "K1", K1);
     cfg.getDouble(secName, "K2", K2);
-    cfg.getDouble(secName, "WorkVolume", V_work);
     cfg.getDouble(secName, "k1", k1);
 }

@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------------
-//
-//
-//
-//------------------------------------------------------------------------------
 #ifndef     BRAKE_CRANE_H
 #define     BRAKE_CRANE_H
 
@@ -13,8 +8,7 @@
 //------------------------------------------------------------------------------
 enum
 {
-    BP_PRESSURE = 0,
-    ER_PRESSURE = 1
+    ER_PRESSURE = 0 ///< Давление в уравнительном резервуаре
 };
 
 //------------------------------------------------------------------------------
@@ -28,56 +22,69 @@ public:
 
     ~BrakeCrane();
 
-    double getBrakePipeInitPressure() const;
+    /// Задать позицию крана
+    virtual void setHandlePosition(int &position) = 0;
 
-    double getEqReservoirPressure() const;
+    /// Наименование текущей позиции крана
+    virtual QString getPositionName() const = 0;
 
-    void setBrakePipeFlow(double Qbp);
+    /// Положение рукоятки
+    virtual double getHandlePosition() const = 0;
 
-    void setEqResrvoirFlow(double Qer);
+    /// Признак положения перекрыши
+    bool isHold() const;
 
-    //
-    void setChargePressure(double p0);
+    /// Признак положения торможения
+    bool isBrake() const;
 
-    //
-    void setFeedLinePressure(double pFL);
+    /// Задать зарядное давление
+    void setChargePressure(double value);
 
-    //
-    void setBrakePipePressure(double pTM1);
+    /// Задать давление от питательной магистрали
+    void setFLpressure(double value);
 
-    virtual void setPosition(int &position) = 0;
+    /// Поток в питательную магистраль
+    double getFLflow() const;
 
-    virtual QString getPositionName() = 0;
+    /// Задать давление от тормозной магистрали
+    void setBPpressure(double value);
 
-    virtual float getHandlePosition() = 0;
+    /// Поток в тормозную магистраль
+    double getBPflow() const;
 
-    bool isHold() const { return is_hold; }
+    /// Задать поток в уравнительный резервуар
+    void setERflow(double value);
 
-    bool isBrake() const {return is_brake; }
+    /// Давление в уравнительном резервуаре
+    double getERpressure() const;
 
 protected:
 
-    double Ver;
+    /// Признак положения перекрыши
+    bool is_hold;
 
-    double Vbp;
+    /// Признак положения торможения
+    bool is_brake;
 
+    /// Зарядное давление
     double p0;
 
+    /// Объём уравнительного резервуара
+    double Ver;
+
     double pFL;
+    double pBP;
 
-    double pTM1;
-
-    bool is_hold;
-    bool is_brake;
+    double QFL;
+    double QBP;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t);
 private:
 
+    /// Поток в уравнительный резервуар
     double Qer;
-
-    double Qbp;
 };
 
 //------------------------------------------------------------------------------

@@ -1,18 +1,16 @@
-//------------------------------------------------------------------------------
-//
-//
-//
-//
-//------------------------------------------------------------------------------
-
 #ifndef     EVR305_H
 #define     EVR305_H
 
-const int MAX_COEFFS = 7;
-const int MAX_LCOEFFS = 3;
+enum
+{
+    WORK_PRESSURE = 0, ///< Давление в рабочей камере электровоздухораспределителя
+
+    MAX_COEFFS = 7,
+    MAX_LCOEFFS = 3
+};
 
 #include    "electro-airdistributor.h"
-#include    "switching-valve.h"
+#include    "pneumo-switching-valve.h"
 
 //------------------------------------------------------------------------------
 //

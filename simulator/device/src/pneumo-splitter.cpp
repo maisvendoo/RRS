@@ -3,13 +3,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoSplitter::PneumoSplitter(QObject *parent) : BrakeDevice(parent)
-  , V0(1e-3)
-  , Q_in(0.0)
-  , Q_out1(0.0)
-  , p_out1(0.0)
-  , Q_out2(0.0)
-  , p_out2(0.0)
+PneumoSplitter::PneumoSplitter(double work_volume, QObject *parent) : BrakeDevice(parent)
+  , V0(work_volume)
+  , pIN(0.0)
+  , p1(0.0)
+  , p2(0.0)
+  , QIN(0.0)
+  , Q1(0.0)
+  , Q2(0.0)
 {
     std::fill(K.begin(), K.end(), 0.0);
 }
@@ -25,49 +26,66 @@ PneumoSplitter::~PneumoSplitter()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoSplitter::setQ_in(double value)
+void PneumoSplitter::setInputPressure(double value)
 {
-    Q_in = value;
+    pIN = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoSplitter::setP_out1(double value)
+double PneumoSplitter::getSumFlow() const
 {
-    p_out1 = value;
+    double summ = - K[3] * (Q1 + Q2);
+    return summ;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoSplitter::setP_out2(double value)
+void PneumoSplitter::setInputFlow(double value)
 {
-    p_out2 = value;
+    QIN = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoSplitter::getQ_out1() const
-{
-    return Q_out1;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoSplitter::getQ_out2() const
-{
-    return Q_out2;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoSplitter::getP_in() const
+double PneumoSplitter::getInputPressure() const
 {
     return getY(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoSplitter::setPipePressure1(double value)
+{
+    p1 = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoSplitter::getPipeFlow1() const
+{
+    return Q1;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoSplitter::setPipePressure2(double value)
+{
+    p2 = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoSplitter::getPipeFlow2() const
+{
+    return Q2;
 }
 
 //------------------------------------------------------------------------------
@@ -77,8 +95,9 @@ void PneumoSplitter::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    Q_out1 = K[1] * (Y[0] - p_out1) + K[4] * (p_out2 - p_out1);
-    Q_out2 = K[2] * (Y[0] - p_out2) + K[4] * (p_out1 - p_out2);
+    double Q_1_2 = K[4] * (p1 - p2);
+    Q1 = K[1] * (Y[0] - p1) - Q_1_2;
+    Q2 = K[2] * (Y[0] - p2) + Q_1_2;
 }
 
 //------------------------------------------------------------------------------
@@ -91,7 +110,15 @@ void PneumoSplitter::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    dYdt[0] = ( Q_in - K[3] *(Q_out1 + Q_out2) ) / V0;
+    // Проверям, задавалось ли давление в камере напрямую
+    if (pIN != 0.0)
+    {
+        setY(0, pIN);
+        pIN = 0.0;
+        QIN = 0.0;
+    }
+
+    dYdt[0] = ( QIN - K[3] * (Q1 + Q2) ) / V0;
 }
 
 //------------------------------------------------------------------------------
@@ -107,5 +134,8 @@ void PneumoSplitter::load_config(CfgReader &cfg)
         cfg.getDouble(secName, coeff, K[i]);
     }
 
-    cfg.getDouble(secName, "V0", V0);
+    double tmp = 0.0;
+    cfg.getDouble(secName, "V0", tmp);
+    if (tmp > 1e-3)
+        V0 = tmp;
 }

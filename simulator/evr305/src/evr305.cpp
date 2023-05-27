@@ -1,9 +1,3 @@
-//------------------------------------------------------------------------------
-//
-//
-//
-//
-//------------------------------------------------------------------------------
 #include    "evr305.h"
 
 //------------------------------------------------------------------------------
@@ -44,13 +38,13 @@ void EVR305::ode_system(const state_vector_t &Y,
     double ut = pf(control_line[0]);
 
     // Поток воздуха из ЗР в РК
-    double Qar_pk = K[1] * (p_ar - Y[0]) * up * ut;
+    double Q_sr_work = K[1] * (pSR - Y[WORK_PRESSURE]) * up * ut;
 
     // Поток воздуха из РК а атмосферу
-    double Qpk_at = K[2] * Y[0] * (1.0 - up);
+    double Q_work_atm = K[2] * Y[WORK_PRESSURE] * (1.0 - up);
 
     // Перемещение диафрагмы реле давления
-    double s = A1 * (Y[0] - pbc_in);
+    double s = A1 * (Y[WORK_PRESSURE] - pBC);
 
     // Состояние клапана наполнения ТЦ
     double u1 = cut(pf(k[1] * s), 0.0, 1.0);
@@ -60,22 +54,25 @@ void EVR305::ode_system(const state_vector_t &Y,
 
     // Поток воздуха на заполнение ТЦ
     double p1 = zpk->getPressure1();
-    double Qar_bc = K[4] * (p_ar - p1) * u1;
+    double Q_sr_bc = K[4] * (pSR - p1) * u1;
 
     // Поток воздуха на опорожнение ТЦ
-    double Qbc_at = K[6] * p1 * u2;
+    double Q_bc_atm = K[6] * p1 * u2;
 
-    zpk->setInputFlow1(Qar_bc - Qbc_at);
+    // Работа с ТЦ через переключательный клапан
+    zpk->setInputFlow1(Q_sr_bc - Q_bc_atm);
+    zpk->setInputFlow2(Q_airdistBC);
+    p_airdistBC = zpk->getPressure2();
 
-    zpk->setInputFlow2(Q2);
-    pbc_out = zpk->getPressure2();
+    zpk->setOutputPressure(pBC);
+    QBC = zpk->getOutputFlow();
 
-    zpk->setOutputPressure(pbc_in);
-    Qbc_out = zpk->getOutputFlow();
+    QSR = Q_airdistSR - K[3] * Q_sr_work - K[5] * Q_sr_bc;
 
-    Qar_out = Qar_in - K[3] * Qar_pk - K[5] * Qar_bc;
+    p_airdistSR = pSR;
 
-    dYdt[0] = (Qar_pk - Qpk_at) / Vpk;
+    // Поток в рабочую камеру
+    dYdt[0] = (Q_sr_work - Q_work_atm) / Vpk;
 }
 
 //------------------------------------------------------------------------------

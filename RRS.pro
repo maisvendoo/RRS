@@ -12,11 +12,11 @@ SUBDIRS += ./simulator
 
 SUBDIRS += ./viewer
 
-SUBDIRS += ./addons/passcar
-SUBDIRS += ./addons/vl60
-SUBDIRS += ./addons/tep70
-SUBDIRS += ./addons/chs2t
-SUBDIRS += ./addons/ep20
+#SUBDIRS += ./addons/passcar
+#SUBDIRS += ./addons/vl60
+#SUBDIRS += ./addons/tep70
+#SUBDIRS += ./addons/chs2t
+#SUBDIRS += ./addons/ep20
 SUBDIRS += ./addons/simple-loco
 SUBDIRS += ./addons/simple-car
 

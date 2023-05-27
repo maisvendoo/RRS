@@ -6,49 +6,26 @@
 //
 //------------------------------------------------------------------------------
 BrakeCrane130::BrakeCrane130(QObject *parent) : BrakeCrane (parent)
-  , k_leek(0.0)
-  , k_stab(0.0)
-  , Vec(1.0)
-  , A1(1.0)
-  , k1(1.0)
-  , k2(1.0)
-  , k3(1.0)
-  , k4(1.0)
-  , T1(0.1)
-  , T2(0.1)
-  , K4_power(10.0)
-  , Qbp(0.0)
-  , old_input(0)
-  , old_output(0)
-  , pulse_II(true)
-  , pulse_I(true)
-  , t_old(0)
-  , dt(0)
+  , k_leek(1.0e-6)
+  , k_charge(1.0e-3)
+  , k_stab(4.0e-6)
+  , k_Va(1.0e-4)
+  , k_V(1.0e-3)
+  , k_VI(1.5e-3)
+  , A(1.0)
+  , K_charge(0.0)
+  , K_feed(1.0)
+  , K_atm(1.0)
+  , K_VI(1.0)
   , handle_pos(static_cast<int>(POS_II))
-  , pos_angle(static_cast<int>(POS_II))
   , pos_delay(0.3)
   , min_pos(POS_I)
   , max_pos(POS_VI)
-  , pos_duration(5.0)
-  , dir(0)
-  , pos_switch(true)
-  , tau(0.0)
-
 {
-    std::fill(K.begin(), K.end(), 0.0);
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[POS_II] = 1.0;
 
     positions_names << "I" << "II" << "III" << "IV" << "Va" << "V" << "VI";
-
-    float max_angle = 115.0f;
-    positions.push_back(0.0f);
-    positions.push_back(35.0f / max_angle);
-    positions.push_back(52.0f / max_angle);
-    positions.push_back(59.0f / max_angle);
-    positions.push_back(63.0f / max_angle);
-    positions.push_back(80.0f / max_angle);
-    positions.push_back(1.0f);
 
     incTimer = new Timer(pos_delay);
     decTimer = new Timer(pos_delay);
@@ -71,7 +48,17 @@ BrakeCrane130::~BrakeCrane130()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane130::setPosition(int &position)
+void BrakeCrane130::init(double pBP, double pFL)
+{
+    Q_UNUSED(pFL)
+
+    setY(ER_PRESSURE, pBP);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BrakeCrane130::setHandlePosition(int &position)
 {
     position = cut(position, static_cast<int>(POS_I), static_cast<int>(POS_VI));
 
@@ -82,7 +69,7 @@ void BrakeCrane130::setPosition(int &position)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString BrakeCrane130::getPositionName()
+QString BrakeCrane130::getPositionName() const
 {
     return positions_names[handle_pos];
 }
@@ -90,20 +77,9 @@ QString BrakeCrane130::getPositionName()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float BrakeCrane130::getHandlePosition()
+double BrakeCrane130::getHandlePosition() const
 {
-    return static_cast<float>(handle_pos) / 6.0f;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void BrakeCrane130::init(double pTM, double pFL)
-{
-    Q_UNUSED(pFL)
-
-    y[0] = pTM;
-    y[1] = pTM;
+    return static_cast<double>(handle_pos) / 6.0f;
 }
 
 //------------------------------------------------------------------------------
@@ -111,8 +87,9 @@ void BrakeCrane130::init(double pTM, double pFL)
 //------------------------------------------------------------------------------
 void BrakeCrane130::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
     Q_UNUSED(t)
-
+/*
     t_old = t;
 
     if ( (static_cast<int>(pos[POS_II]) == 1) && pulse_II )
@@ -124,8 +101,11 @@ void BrakeCrane130::preStep(state_vector_t &Y, double t)
     {
         pulse_II = true;
     }
+*/
+    is_hold = static_cast<bool>(pos[POS_III] + pos[POS_IV]);
+    is_brake = static_cast<bool>(pos[POS_Va] + pos[POS_V] + pos[POS_VI]);
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -135,7 +115,7 @@ void BrakeCrane130::postStep(state_vector_t &Y, double t)
 
     dt = t - t_old;
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -143,36 +123,49 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
                                state_vector_t &dYdt,
                                double t)
 {
-    double Q_charge = K[1] * (pFL - Y[1]) * pos[POS_I];
+    // Зарядка УР из ГР в I положении
+    double Q_leek_er = - k_leek * Y[ER_PRESSURE];
 
-    double u1 = hs_n(Y[1] - p0);
+    // Зарядка УР из ГР в I положении
+    double Q_charge_er = pos[POS_I] * k_charge * (pFL - Y[ER_PRESSURE]);
 
-    double Q_train = K[1] * (pFL - Y[1]) * u1 * pos[POS_II];
+    // Зарядка УР из ГР до зарядного давления в II положении
+    double Q_train_er = pos[POS_II] * cut(p0 - Y[ER_PRESSURE], 0.0, k_charge) * (pFL - Y[ER_PRESSURE]);
 
-    double Q_stab = - k_stab * cut(k1 * Y[1], 0.0, 1.0) * pos[POS_II];
+    // Разрядка УР через стабилизатор
+    double Q_stab_er = - pos[POS_II] * cut(Y[ER_PRESSURE], 0.0, k_stab);
 
-    double Q_brake = - K[5] * Y[1] * pos[POS_Va]
-                     - K[6] * Y[1] * pos[POS_V]
-                     - K[9] * Y[1] * pos[POS_VI];
+    // Разрядка УР в тормозных положениях
+    double Q_brake_er = - pos[POS_Va] * k_Va * Y[ER_PRESSURE]
+                        - pos[POS_V] * k_V * Y[ER_PRESSURE]
+                        - pos[POS_VI] * k_VI * Y[ER_PRESSURE];
 
-    double Qer = Q_charge + Q_train + Q_stab + Q_brake;
+    // Условное положение уравнительного поршня
+    double s1 = A * (Y[ER_PRESSURE] - pBP);
 
-    double s1 = A1 * (Y[0] - Y[1]);
+    // Зарядка ТМ из ГР в I положении
+    double Q_charge_bp = pos[POS_I] * K_charge * (pFL - pBP);
 
-    double K4 = 0;
+    // Управление ТМ от уравнительного поршня в II, IV, Va и V положениях
+    double is_245a5 = pos[POS_II] + pos[POS_IV] + pos[POS_Va] + pos[POS_V];
 
-    K4 = K[4] * (1.0 + k4 * pf(Y[0] - Y[1]));
+    // Подзарядка ТМ из ГР от уравнительного поршня
+    double Q_train_bp = is_245a5 * cut(s1, 0.0, K_feed) * (pFL - pBP);
 
-    double u2 = cut(k2 * nf(s1), 0.0, 1.0) * (1.0 - pos[POS_VI]);
-    double u3 = cut(k3 * pf(s1), 0.0, 1.0);
+    // Разрядка ТМ от уравнительного поршня
+    double Q_brake_bp = is_245a5 * cut(s1, - K_atm, 0.0) * pBP;
 
-    double Qbp =   K[2] * (pFL - Y[0]) * u2
-                 - K4 * Y[0] * u3
-                 - K[7] * Y[0] * pos[POS_VI]
-                 + K[8] * (pFL - Y[0]) * pos[POS_I];
+    // Экстренная разрядка ТМ в VI положении
+    double Q_emerg_bp = - K_VI * pBP * pos[POS_VI];
 
-    setBrakePipeFlow(Qbp);
-    setEqResrvoirFlow(Qer);
+    // Суммарный поток в питательную магистраль
+    QFL = - Q_charge_er - Q_train_er - Q_charge_bp - Q_train_bp;
+
+    // Суммарный поток в тормозную магистраль
+    QBP = Q_charge_bp + Q_train_bp + Q_brake_bp + Q_emerg_bp;
+
+    // Суммарный поток в уравнительный резервуар
+    setERflow(Q_leek_er + Q_charge_er + Q_train_er + Q_stab_er + Q_brake_er);
 
     BrakeCrane::ode_system(Y, dYdt, t);
 }
@@ -184,26 +177,24 @@ void BrakeCrane130::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
-    for (size_t i = 1; i <= MAX_FLOW_COEFFS; ++i)
-    {
-        QString param = QString("K%1").arg(i);
+    double tmp = 0.0;
+    cfg.getDouble(secName, "EqReservoirVolume", tmp);
+    if (tmp > 0.0)
+        Ver = tmp;
 
-        cfg.getDouble(secName, param, K[i]);
-    }
-
-    cfg.getDouble(secName, "EqReservoirVolume", Ver);
-    cfg.getDouble(secName, "LocoBrakePipeVolume", Vbp);
-    cfg.getDouble(secName, "EqCameraVolume", Vec);
     cfg.getDouble(secName, "k_leek", k_leek);
+    cfg.getDouble(secName, "k_charge", k_charge);
     cfg.getDouble(secName, "k_stab", k_stab);
-    cfg.getDouble(secName, "A1", A1);
-    cfg.getDouble(secName, "k1", k1);
-    cfg.getDouble(secName, "k2", k2);
-    cfg.getDouble(secName, "k3", k3);
-    cfg.getDouble(secName, "k4", k4);
-    cfg.getDouble(secName, "T1", T1);
-    cfg.getDouble(secName, "T2", T2);
-    cfg.getDouble(secName, "K4_power", K4_power);
+    cfg.getDouble(secName, "k_Va", k_Va);
+    cfg.getDouble(secName, "k_V", k_V);
+    cfg.getDouble(secName, "k_VI", k_VI);
+
+    cfg.getDouble(secName, "A", A);
+
+    cfg.getDouble(secName, "K_charge", K_charge);
+    cfg.getDouble(secName, "KF", K_feed);
+    cfg.getDouble(secName, "K_atm", K_atm);
+    cfg.getDouble(secName, "K_VI", K_VI);
 }
 
 //------------------------------------------------------------------------------
@@ -275,7 +266,7 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
         }
     }
 
-    setPosition(handle_pos);
+    setHandlePosition(handle_pos);
 
     incTimer->step(t, dt);
     decTimer->step(t, dt);

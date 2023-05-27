@@ -11,7 +11,7 @@ public:
 
     virtual ~BrakeDevice();
 
-    virtual void init(double pTM, double pFL);
+    virtual void init(double pBP, double pFL);
 
 protected:
 

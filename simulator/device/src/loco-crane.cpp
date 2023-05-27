@@ -6,12 +6,14 @@
 //
 //------------------------------------------------------------------------------
 LocoCrane::LocoCrane(QObject *parent) : BrakeDevice(parent)
-  , pFL(0.0)
-  , pBC(0.0)
-  , Qvr(0.0)
-  , Qbc(0.0)
   , pos(0.0)
   , is_release(0.0)
+  , pFL(0.0)
+  , pBC(0.0)
+  , pIL(0.0)
+  , QFL(0.0)
+  , QBC(0.0)
+  , QIL(0.0)
 {
 
 }
@@ -27,49 +29,57 @@ LocoCrane::~LocoCrane()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LocoCrane::setFeedlinePressure(double pFL)
+void LocoCrane::setHandlePosition(double position)
 {
-    this->pFL = pFL;
+    pos = position;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LocoCrane::setBrakeCylinderPressure(double pBC)
+void LocoCrane::setFLpressure(double value)
 {
-    this->pBC = pBC;
+    pFL = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LocoCrane::setAirDistributorFlow(double Qvr)
+double LocoCrane::getFLflow() const
 {
-    this->Qvr = Qvr;
+    return QFL;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LocoCrane::setHandlePosition(double pos)
+void LocoCrane::setBCpressure(double value)
 {
-    this->pos = pos;
+    pBC = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double LocoCrane::getBrakeCylinderFlow() const
+double LocoCrane::getBCflow() const
 {
-    return Qbc;
+    return QBC;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double LocoCrane::getAirDistribPressure() const
+void LocoCrane::setILpressure(double value)
 {
-    return 0.0;
+    pIL = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double LocoCrane::getILflow() const
+{
+    return QIL;
 }
 
 //------------------------------------------------------------------------------

@@ -6,12 +6,12 @@
 //
 //------------------------------------------------------------------------------
 AirDistributor::AirDistributor(QObject *parent) : BrakeDevice(parent)
-  , pTM(0.0)
+  , pBP(0.0)
   , pBC(0.0)
-  , pAS(0.0)
-  , Qbc(0.0)
-  , Qas(0.0)
-  , auxRate(0.0)
+  , pSR(0.0)
+  , QBP(0.0)
+  , QBC(0.0)
+  , QSR(0.0)
 {
 
 }
@@ -27,46 +27,49 @@ AirDistributor::~AirDistributor()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDistributor::setBrakepipePressure(double pTM)
+void AirDistributor::setBPpressure(double value)
 {
-    this->pTM = pTM;
+    pBP = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDistributor::setBrakeCylinderPressure(double pBC)
+double AirDistributor::getBPflow() const
 {
-    this->pBC = pBC;
+    return QBP;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDistributor::setAirSupplyPressure(double pAS)
+void AirDistributor::setBCpressure(double value)
 {
-    this->pAS = pAS;
+    pBC = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AirDistributor::getBrakeCylinderAirFlow() const
+double AirDistributor::getBCflow() const
 {
-    return Qbc;
+    return QBC;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AirDistributor::getAirSupplyFlow() const
+void AirDistributor::setSRpressure(double value)
 {
-    return Qas;
+    pSR = value;
 }
 
-double AirDistributor::getAuxRate() const
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double AirDistributor::getSRflow() const
 {
-    return auxRate;
+    return QSR;
 }
 
 //------------------------------------------------------------------------------

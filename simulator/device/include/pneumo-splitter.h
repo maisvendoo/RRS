@@ -10,35 +10,48 @@ class DEVICE_EXPORT PneumoSplitter : public BrakeDevice
 {
 public:
 
-    PneumoSplitter(QObject *parent = Q_NULLPTR);
+    PneumoSplitter(double work_volume = 2e-3, QObject *parent = Q_NULLPTR);
 
     ~PneumoSplitter();
 
-    void setQ_in(double value);
+    // Работа с давлением в рабочей камере пневмосоединения напрямую
+    /// Задать давление входящей магистрали
+    void setInputPressure(double value);
 
-    void setP_out1(double value);
+    /// Суммарный поток из исходящих магистралей во входящую
+    double getSumFlow() const;
 
-    void setP_out2(double value);
+    // Работа с камерой пневмосоединения как с отдельным объёмом
+    /// Задать поток из входящей магистрали
+    void setInputFlow(double value);
 
-    double getQ_out1() const;
+    /// Давление в рабочей камере пневмосоединения
+    double getInputPressure() const;
 
-    double getQ_out2() const;
+    /// Задать давление от первой исходящей магистрали
+    void setPipePressure1(double value);
 
-    double getP_in() const;
+    /// Поток в первую исходящую магистраль
+    double getPipeFlow1() const;
+
+    /// Задать давление от второй исходящей магистрали
+    void setPipePressure2(double value);
+
+    /// Поток во вторую исходящую магистраль
+    double getPipeFlow2() const;
 
 private:
 
+    /// Объём рабочей камеры пневмосоединения
     double V0;
 
-    double Q_in;
+    double pIN;
+    double p1;
+    double p2;
 
-    double Q_out1;
-
-    double p_out1;
-
-    double Q_out2;
-
-    double p_out2;
+    double QIN;
+    double Q1;
+    double Q2;
 
     enum
     {

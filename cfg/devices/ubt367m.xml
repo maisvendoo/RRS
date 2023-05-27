@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Device>
-        <Order>2</Order>
+        <Order>3</Order>
         <SubStepNum>1</SubStepNum>
         <Solver>euler</Solver>
 
+        <!-- Условный объём труб к кранам -->
         <V0>1e-3</V0>
 
-        <K1>1e-3</K1>
+        <!-- Давление в тормозной магистрали, блокирующее рукоятку устройства -->
+        <p_lock>0.1</p_lock>
 
-        <K2>2e-3</K2>
-
-        <K3>0.0</K3>
+        <!-- Коэффициент потока - разрядки ТМ при экстренном торможении -->
+        <K_emergency>5.0e-2</K_emergency>
 
     </Device>
 </Config>

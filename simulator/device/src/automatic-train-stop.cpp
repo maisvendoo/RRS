@@ -9,7 +9,9 @@ AutoTrainStop::AutoTrainStop(QObject *parent) : BrakeDevice(parent)
   , is_powered(0.0)
   , is_key_on(0.0)
   , pFL(0.0)
-  , pTM(0.0)
+  , pBP(0.0)
+  , QFL(0.0)
+  , QBP(0.0)
 {
 
 }
@@ -41,25 +43,41 @@ void AutoTrainStop::keyOn(bool on)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setFeedlinePressure(double pFL)
+bool AutoTrainStop::getStateKey() const
 {
-    this->pFL = pFL;
+    return static_cast<bool>(is_key_on);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setBrakepipePressure(double pTM)
+void AutoTrainStop::setFLpressure(double value)
 {
-    this->pTM = pTM;
+    pFL = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AutoTrainStop::getEmergencyBrakeRate() const
+double AutoTrainStop::getFLflow() const
 {
-    return 0.0;
+    return QFL;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutoTrainStop::setBPpressure(double value)
+{
+    pBP = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double AutoTrainStop::getBPflow() const
+{
+    return QBP;
 }
 
 //------------------------------------------------------------------------------

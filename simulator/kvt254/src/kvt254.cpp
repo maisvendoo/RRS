@@ -7,10 +7,8 @@
 //------------------------------------------------------------------------------
 LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , V1(1e-4)
-  , V2(1e-4)
-  , Vpz(3e-4)
-  , delta_p(0.05)
-  , ps(0.1)
+  , V3(3.5e-4)
+  , p_switch(0.1)
   , min_pos(-0.05)
   , max_pos(1.0)
   , pos_duration(1.0)
@@ -58,17 +56,9 @@ double LocoCrane254::getHandleShift() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double LocoCrane254::getAirDistribPressure() const
+void LocoCrane254::init(double pBP, double pFL)
 {
-    return getY(0);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void LocoCrane254::init(double pTM, double pFL)
-{
-    Q_UNUSED(pTM)
+    Q_UNUSED(pBP)
     Q_UNUSED(pFL)
 }
 
@@ -84,43 +74,47 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
     // Давление, задаваемое поворотом рукоятки
     double p_handle = K[3] * pf(pos);
 
-    double u1 = hs_p(p_handle - Y[2]);
-
-    double u2 = hs_n(p_handle - Y[2]);
-
     // Давление, задаваемое уравнительным органом крана
-    double pz = p_handle * u1 + Y[2] * u2;
+    double p_ur = max(p_handle, Y[P3_PRESSURE]);
 
-    double dp = pz - pBC;
+    double dp_ur = k[1] * (p_ur - pBC);
+    double u_fl = cut(pf(dp_ur), 0.0, 1.0);
+    double u_atm = cut(nf(dp_ur), 0.0, 1.0);
 
-    double u3 = cut(pf(k[1] * dp), 0.0, 1.0);
+    // Поток из питательной магистрали в магистраль тормозных цилиндров
+    double Q_fl_bc = K[1] * u_fl * (pFL - pBC);
 
-    double u4 = cut(nf(k[1] * dp), 0.0, 1.0);
-
-    // Поток воздуха в ТЦ
-    Qbc = K[1] * (pFL - pBC) * u3 - K[2] * pBC * u4;
+    // Разрядка магистрали тормозных цилиндров в атмосферу
+    double Q_bc_atm = K[2] * u_atm * pBC;
 
     // Работа повторительной схемы
+    double dp_1 = pIL - Y[P1_PRESSURE];
+    double u_switch = hs_n(dp_1 - p_switch);
+    double u_release = hs_n(pos) + is_release;
 
-    double dp12 =  Y[0] - Y[1];
+    // Наполнение камеры над переключательным поршнем из импульсной магистрали
+    double Q_il_1 = K[5] * dp_1 * u_switch;
 
-    double u5 = hs_n(dp12 - ps);
+    // Разрядка камеры над переключательным поршнем в атмосферу
+    double Q_1_atm = K[6] * Y[P1_PRESSURE] * u_release;
 
-    double u6 = hs_n(pos) + is_release;
+    // Поток из камеры над переключательным поршнем в межпоршневое пространство
+    double Q_1_3 = K[7] * (Y[P1_PRESSURE] - Y[P3_PRESSURE]);
 
-    double Qpz = K[7] * (Y[1] - Y[2]);
+    // Поток в питательную магистраль
+    QFL = - Q_fl_bc;
 
-    double Q12 = K[5] * dp12 * u5;
+    // Поток в магистраль тормозных цилиндров
+    QBC = Q_fl_bc - Q_bc_atm;
 
-    double Q1 = K[4] * Qvr;
+    // Поток в импульсную магистраль
+    QIL = - Q_il_1;
 
-    double Q2 = Q12 - Qpz - K[6] * Y[1] * u6;
+    // Поток в камеру над переключательным поршнем
+    dYdt[P1_PRESSURE] = (Q_il_1 - Q_1_3 - Q_1_atm) / V1;
 
-    dYdt[0] = Q1 / V1; // p1
-
-    dYdt[1] = Q2 / V2; // p2
-
-    dYdt[2] = Qpz / Vpz; // p_pz
+    // Поток в межпоршневое пространство и камеру 0.3 литра
+    dYdt[P3_PRESSURE] = Q_1_3 / V3;
 
     stepSound();
 }
@@ -134,11 +128,11 @@ void LocoCrane254::stepSound()
 
     // 250000 поправочный коэффициент для перевода 1кг/cм^3 в 1кг/м^3
     // Для звуков взято 400000 с малым запасом
-    volume = abs(Qbc) * 400000;
+    volume = abs(QBC) * 400000;
 
     if (volume > 30)
     {
-        if (Qbc > 0)
+        if (QBC > 0)
         {
             if (p_volume <= 30)
             {
@@ -148,7 +142,7 @@ void LocoCrane254::stepSound()
             emit soundSetVolume("254_vpusk", volume);
         }
 
-        if (Qbc < 0)
+        if (QBC < 0)
         {
             if (p_volume <= 30)
             {
@@ -190,12 +184,12 @@ void LocoCrane254::load_config(CfgReader &cfg)
     }
 
     cfg.getDouble(secName, "V1", V1);
-    cfg.getDouble(secName, "V2", V2);
-    cfg.getDouble(secName, "Vpz", Vpz);
+//    cfg.getDouble(secName, "V2", V1);
+    cfg.getDouble(secName, "Vpz", V3);
 
-    cfg.getDouble(secName, "delta_p", delta_p);
+//    cfg.getDouble(secName, "delta_p", delta_p);
 
-    cfg.getDouble(secName, "ps", ps);
+    cfg.getDouble(secName, "ps", p_switch);
 
     QString tmp = "";
 
@@ -228,13 +222,14 @@ void LocoCrane254::stepKeysControl(double t, double dt)
         dir = -1;
     else
     {
-        if (pos < 0.0)
-           pos = 0.0;
-
         if (getKeyState(KEY_Rightbracket))
             dir = 1;
         else
             dir = 0;
+
+        // Возврат из отпускного положения
+        if (pos < 0.0)
+           pos = 0.0;
     }
 
     int old_pos_n = pos_num;
