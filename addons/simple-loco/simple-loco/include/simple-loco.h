@@ -27,8 +27,12 @@ private:
     /// Номер Debug-строки
     size_t debug_num;
 
-    /// Подкачка главного резервуара (вместо полноценного компресора)
-    double is_compressor;
+    /// Регулятор давления в ГР
+    PressureRegulator *press_reg;
+
+    /// Мотор-компрессор
+    ACMotorCompressor *motor_compressor;
+//    DCMotorCompressor *motor_compressor;
 
     /// Главный резервуар
     Reservoir   *main_reservoir;

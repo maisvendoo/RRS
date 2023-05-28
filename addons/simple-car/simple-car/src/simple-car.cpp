@@ -146,7 +146,7 @@ void SimpleCar::stepPneumatics(double t, double dt)
     double BP_flow = 0.0;
     BP_flow += anglecock_bp_fwd->getFlowToPipe();
     BP_flow += anglecock_bp_bwd->getFlowToPipe();
-//    BP_flow += -0.02 * air_dist->getBPflow();
+    BP_flow += air_dist->getBPflow();
     brakepipe->setFlow(BP_flow);
     brakepipe->step(t, dt);
 
@@ -197,15 +197,16 @@ void SimpleCar::stepDebugMsg(double t, double dt)
     DebugMsg = QString("t %1|")
             .arg(t, 6, 'f', 2);
 
-    DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4 MPa|QF %5 aux %6 QB %7 |pBC %8 MPa|acB o%9|hoseB l%10 c%11              ")
+    DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4|QF %5 aux %6 QB %7 |pBC %8 pSR %9|acB o%10|hoseB l%11 c%12                ")
             .arg(hose_bp_fwd->isLinked())
             .arg(hose_bp_fwd->isConnected())
             .arg(anglecock_bp_fwd->isOpened())
             .arg(brakepipe->getPressure(), 8, 'f', 5)
-            .arg(10000*anglecock_bp_fwd->getFlowToPipe(), 8, 'f', 5)
-            .arg(10000*air_dist->getBPflow(), 8, 'f', 5)
-            .arg(10000*anglecock_bp_bwd->getFlowToPipe(), 8, 'f', 5)
+            .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 9, 'f', 7)
+            .arg(1000*air_dist->getBPflow(), 9, 'f', 7)
+            .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 9, 'f', 7)
             .arg(brake_cylinder->getPressure(), 8, 'f', 5)
+            .arg(supply_reservoir->getPressure(), 8, 'f', 5)
             .arg(anglecock_bp_bwd->isOpened())
             .arg(hose_bp_bwd->isLinked())
             .arg(hose_bp_bwd->isConnected());

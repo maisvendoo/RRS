@@ -85,6 +85,17 @@ void SimpleLoco::initPneumatics()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
 
+    press_reg = new PressureRegulator();
+    press_reg->read_config("pressure-regulator");
+
+    motor_compressor = new ACMotorCompressor();
+//    motor_compressor = new DCMotorCompressor();
+    motor_compressor->read_config("motor-compressor-ac");
+//    motor_compressor->read_config("motor-compressor-dc");
+    connect(motor_compressor, &ACMotorCompressor::soundPlay, this, &SimpleLoco::soundPlay);
+    connect(motor_compressor, &ACMotorCompressor::soundStop, this, &SimpleLoco::soundStop);
+    connect(motor_compressor, &ACMotorCompressor::soundSetPitch, this, &SimpleLoco::soundSetPitch);
+
     main_reservoir = new Reservoir(1.2);
     main_reservoir->setFlowCoeff(2e-5);
 
@@ -190,13 +201,17 @@ void SimpleLoco::step(double t, double dt)
 //------------------------------------------------------------------------
 void SimpleLoco::stepPneumatics(double t, double dt)
 {
-    if (main_reservoir->getPressure() < 0.75)
-        is_compressor = 1.0;
-    if (main_reservoir->getPressure() > 0.9)
-        is_compressor = 0.0;
+    press_reg->setFLpressure(main_reservoir->getPressure());
+    press_reg->step(t, dt);
+
+    double U = 380.0 * static_cast<double>(press_reg->getState());
+//    double U = 3000.0 * static_cast<double>(press_reg->getState());
+    motor_compressor->setFLpressure(main_reservoir->getPressure());
+    motor_compressor->setPowerVoltage(U);
+    motor_compressor->step(t, dt);
 
     double FL_flow = 0.0;
-    FL_flow += 0.001 * is_compressor;
+    FL_flow += motor_compressor->getFLflow();
     FL_flow += brake_lock->getFLflow();
     main_reservoir->setFlow(FL_flow);
     main_reservoir->step(t, dt);
@@ -224,7 +239,7 @@ void SimpleLoco::stepPneumatics(double t, double dt)
     double BP_flow = 0.0;
     BP_flow += anglecock_bp_fwd->getFlowToPipe();
     BP_flow += anglecock_bp_bwd->getFlowToPipe();
-//    BP_flow += -0.02 * air_dist->getBPflow();
+    BP_flow += air_dist->getBPflow();
     BP_flow += brake_lock->getBPflow();
     brakepipe->setFlow(BP_flow);
     brakepipe->step(t, dt);
@@ -314,21 +329,25 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(bc_switch_valve->getPressure2(), 7, 'f', 5)
                 .arg(brake_lock->getCraneBCpressure(), 7, 'f', 5)
                 .arg(brake_lock->getFLflow(), 7, 'f', 5)
-                .arg(10000*(brake_crane->getFLflow() + loco_crane->getFLflow()), 7, 'f', 5)
-                .arg(10000*brake_lock->getBPflow(), 7, 'f', 5)
-                .arg(10000*brake_crane->getBPflow(), 7, 'f', 5)
-                .arg(10000*brake_lock->getBCflow(), 7, 'f', 5)
-                .arg(10000*loco_crane->getBCflow(), 7, 'f', 5);
+                .arg(1000*(brake_crane->getFLflow() + loco_crane->getFLflow()), 9, 'f', 7)
+                .arg(1000*brake_lock->getBPflow(), 9, 'f', 7)
+                .arg(1000*brake_crane->getBPflow(), 9, 'f', 7)
+                .arg(1000*brake_lock->getBCflow(), 9, 'f', 7)
+                .arg(1000*loco_crane->getBCflow(), 9, 'f', 7);
         break;
     }
     case 2:
     {
-        DebugMsg += QString("pFL %1 (crane %2)|QFL %3 (395 %4 254 %5)                ")
+        DebugMsg += QString("pFL %1 (crane %2) |Reg %3 MC %4 (w %5)|QFL %6 %7 (395 %8 254 %9)                ")
                 .arg(main_reservoir->getPressure(), 7, 'f', 5)
                 .arg(brake_lock->getCraneFLpressure(), 7, 'f', 5)
-                .arg(10000*brake_lock->getFLflow(), 7, 'f', 5)
-                .arg(10000*brake_crane->getFLflow(), 7, 'f', 5)
-                .arg(10000*loco_crane->getFLflow(), 7, 'f', 5);
+                .arg(press_reg->getState())
+                .arg(motor_compressor->isPowered())
+                .arg(motor_compressor->getY(0), 9, 'f', 7)
+                .arg(1000*motor_compressor->getFLflow(), 9, 'f', 7)
+                .arg(1000*brake_lock->getFLflow(), 9, 'f', 7)
+                .arg(1000*brake_crane->getFLflow(), 9, 'f', 7)
+                .arg(1000*loco_crane->getFLflow(), 9, 'f', 7);
         break;
     }
     case 3:
@@ -337,11 +356,11 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(brake_crane->getERpressure(), 7, 'f', 5)
                 .arg(brakepipe->getPressure(), 7, 'f', 5)
                 .arg(brake_lock->getCraneBPpressure(), 7, 'f', 5)
-                .arg(10000*brake_lock->getBPflow(), 7, 'f', 5)
-                .arg(10000*brake_crane->getBPflow(), 7, 'f', 5)
-                .arg(10000*air_dist->getBPflow(), 7, 'f', 5)
-                .arg(10000*anglecock_bp_fwd->getFlowToPipe(), 7, 'f', 5)
-                .arg(10000*anglecock_bp_bwd->getFlowToPipe(), 7, 'f', 5);
+                .arg(1000*brake_lock->getBPflow(), 9, 'f', 7)
+                .arg(1000*brake_crane->getBPflow(), 9, 'f', 7)
+                .arg(1000*air_dist->getBPflow(), 9, 'f', 7)
+                .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 9, 'f', 7)
+                .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 9, 'f', 7);
         break;
     }
     case 4:
@@ -349,32 +368,34 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
         DebugMsg += QString("pBP %1 |pSR %2 (QSR %3)|pBC %4 (242 %5 254 %6)|QBC %7 (242 %8 254 %9)               ")
                 .arg(brakepipe->getPressure(), 7, 'f', 5)
                 .arg(supply_reservoir->getPressure(), 7, 'f', 5)
-                .arg(10000*air_dist->getSRflow(), 7, 'f', 5)
+                .arg(1000*air_dist->getSRflow(), 9, 'f', 7)
                 .arg(brake_cylinder->getPressure(), 7, 'f', 5)
                 .arg(bc_switch_valve->getPressure1(), 7, 'f', 5)
                 .arg(bc_switch_valve->getPressure2(), 7, 'f', 5)
-                .arg(10000*bc_switch_valve->getOutputFlow(), 7, 'f', 5)
-                .arg(10000*air_dist->getBCflow(), 7, 'f', 5)
-                .arg(10000*brake_lock->getBCflow(), 7, 'f', 5);
+                .arg(1000*bc_switch_valve->getOutputFlow(), 9, 'f', 7)
+                .arg(1000*air_dist->getBCflow(), 9, 'f', 7)
+                .arg(1000*brake_lock->getBCflow(), 9, 'f', 7);
         break;
     }
+    default:
     case 5:
     {
-        DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4 MPa|QF %5 aux %6 QB %7 |pBC %8 MPa|acB o%9|hoseB l%10 c%11              ")
+        DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4|QF %5 aux %6 QB %7 |pBC %8 pSR %9|acB o%10|hoseB l%11 c%12                ")
                 .arg(hose_bp_fwd->isLinked())
                 .arg(hose_bp_fwd->isConnected())
                 .arg(anglecock_bp_fwd->isOpened())
                 .arg(brakepipe->getPressure(), 8, 'f', 5)
-                .arg(10000*anglecock_bp_fwd->getFlowToPipe(), 8, 'f', 5)
-                .arg(10000*air_dist->getBPflow(), 8, 'f', 5)
-                .arg(10000*anglecock_bp_bwd->getFlowToPipe(), 8, 'f', 5)
+                .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 9, 'f', 7)
+                .arg(1000*air_dist->getBPflow(), 9, 'f', 7)
+                .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 9, 'f', 7)
                 .arg(brake_cylinder->getPressure(), 8, 'f', 5)
+                .arg(supply_reservoir->getPressure(), 8, 'f', 5)
                 .arg(anglecock_bp_bwd->isOpened())
                 .arg(hose_bp_bwd->isLinked())
                 .arg(hose_bp_bwd->isConnected());
         break;
     }
-    case 8:
+/*    case 8:
     {
         DebugMsg += air_dist->getDebugMsg();
         break;
@@ -383,7 +404,7 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
     {
         DebugMsg += brake_crane->getDebugMsg();
         break;
-    }
+    }*/
     }
 }
 

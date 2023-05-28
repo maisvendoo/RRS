@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <!-- Номинальное напряжение -->
+        <U_nom>380.0</U_nom>
+
+        <!-- Номинальная угловая скорость магнитного поля статора -->
+        <omega0>157.08</omega0>
+
+        <!-- Максимальный момент -->
+        <Mmax>455.8</Mmax>
+
+        <!-- Критическое скольжение -->
+        <s_kr>0.154</s_kr>
+
+        <!-- Момент инерции ротора -->
+        <J>2.0</J>
+
+        <!-- Момент сопротивления вращению ротора -->
+        <Mxx>50.0</Mxx>
+
+        <!-- Коэффициент перехода от скорости ротора к производимому давлению -->
+        <K_pressure>0.0077</K_pressure>
+
+        <!-- Коэффициент потока в питательную магистраль -->
+        <K_flow>0.005</K_flow>
+
+        <SoundName>Motor_Compressor</SoundName>
+        <RegulateSoundByOnOff>0</RegulateSoundByOnOff>
+        <RegulateSoundByPitch>1</RegulateSoundByPitch>
+
+    </Device>
+</Config>

@@ -27,6 +27,7 @@
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 #include    "key-symbols.h"
+#include    "hysteresis.h"
 #include    "timer.h"
 #include    "trigger.h"
 
