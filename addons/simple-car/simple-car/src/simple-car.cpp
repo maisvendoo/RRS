@@ -26,7 +26,6 @@ void SimpleCar::initBrakeDevices(double p0, double pBP, double pFL)
     Q_UNUSED(p0);
 
     supply_reservoir->setY(0, pBP);
-    //supply_reservoir->setY(0, 0.0);
 
     air_dist->init(pBP, pFL);
 
@@ -84,22 +83,25 @@ void SimpleCar::initPneumatics()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
 
-    supply_reservoir = new Reservoir(0.078);
-    brake_cylinder = new Reservoir(0.008);
+    // Тормозная магистраль
+    double volume_bp = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
+    brakepipe = new Reservoir(volume_bp);
+    brakepipe->setFlowCoeff(5e-6);
 
     air_dist = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
     air_dist->read_config("vr242");
 
-    // Тормозная магистраль
-    double volume = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
-    brakepipe = new Reservoir(volume);
-    brakepipe->setFlowCoeff(5e-6);
+    brake_cylinder = new Reservoir(0.016);
+
+    supply_reservoir = new Reservoir(0.078);
 
     // Концевые краны
     anglecock_bp_fwd = new PneumoAngleCock();
     anglecock_bp_fwd->read_config("pneumo-anglecock");
+    anglecock_bp_fwd->setPipeVolume(volume_bp);
     anglecock_bp_bwd = new PneumoAngleCock();
     anglecock_bp_bwd->read_config("pneumo-anglecock");
+    anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава
     hose_bp_fwd = new PneumoHose();
@@ -161,19 +163,19 @@ void SimpleCar::stepPneumatics(double t, double dt)
     supply_reservoir->setFlow(air_dist->getSRflow());
     supply_reservoir->step(t, dt);
 
-    hose_bp_fwd->setPressure(anglecock_bp_fwd->getPressureToHose());
-    hose_bp_fwd->setFlowCoeff(anglecock_bp_fwd->getFlowCoeff());
-    hose_bp_fwd->step(t, dt);
-    hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
-    hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
-    hose_bp_bwd->step(t, dt);
-
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());
     anglecock_bp_fwd->setHoseFlow(hose_bp_fwd->getFlow());
     anglecock_bp_fwd->step(t, dt);
     anglecock_bp_bwd->setPipePressure(brakepipe->getPressure());
     anglecock_bp_bwd->setHoseFlow(hose_bp_bwd->getFlow());
     anglecock_bp_bwd->step(t, dt);
+
+    hose_bp_fwd->setPressure(anglecock_bp_fwd->getPressureToHose());
+    hose_bp_fwd->setFlowCoeff(anglecock_bp_fwd->getFlowCoeff());
+    hose_bp_fwd->step(t, dt);
+    hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
+    hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
+    hose_bp_bwd->step(t, dt);
 }
 
 //------------------------------------------------------------------------

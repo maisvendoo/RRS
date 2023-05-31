@@ -8,8 +8,9 @@ PneumoAngleCock::PneumoAngleCock(QObject *parent) : Device(parent)
   , switch_time(0.5)
   , p(0.0)
   , Q(0.0)
-  , k(0.05)
-  , k_atm(0.01)
+  , k_max_by_pipe_volume(1.0e10)
+  , k_pipe(0.3)
+  , k_atm(0.1)
 {
 
 }
@@ -57,6 +58,14 @@ double PneumoAngleCock::getHandlePosition() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoAngleCock::setPipeVolume(double value)
+{
+    pipe_volume = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoAngleCock::setPipePressure(double value)
 {
     p = value;
@@ -76,7 +85,7 @@ void PneumoAngleCock::setHoseFlow(double value)
 double PneumoAngleCock::getFlowCoeff() const
 {
     if (is_opened)
-        return k * getY(0);
+        return k_pipe * getY(0);
     return k_atm;
 }
 
@@ -122,6 +131,19 @@ void PneumoAngleCock::ode_system(const state_vector_t& Y, state_vector_t& dYdt, 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoAngleCock::stepDiscrete(double t, double dt)
+{
+    Q_UNUSED(t)
+
+    k_max_by_pipe_volume = 0.15 * pipe_volume / dt;
+
+    if (k_pipe > k_max_by_pipe_volume)
+        k_pipe = k_max_by_pipe_volume;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoAngleCock::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
@@ -145,6 +167,9 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
     if (tmp > 0.1)
         switch_time = tmp;
 
-    cfg.getDouble(secName, "k", k);
+    cfg.getDouble(secName, "kPipe", k_pipe);
     cfg.getDouble(secName, "kAtm", k_atm);
+
+    if (k_pipe > k_max_by_pipe_volume)
+        k_pipe = k_max_by_pipe_volume;
 }

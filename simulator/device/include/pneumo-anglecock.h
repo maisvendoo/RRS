@@ -28,6 +28,10 @@ public:
     /// Положение рукоятки: от 0.0 (кран закрыт) до 1.0 (кран открыт)
     double getHandlePosition() const;
 
+    /// Задать объём трубы магистрали для вычисления максимального коэффициента перетока
+    /// (для устойчивого расчёта не более 0.15 * <объём трубы магистрали> / dt)
+    void setPipeVolume(double value);
+
     /// Задать давление со стороны магистрали
     void setPipePressure(double value);
 
@@ -60,13 +64,22 @@ protected:
     /// Поток из рукава в магистраль
     double Q;
 
+    /// Объём магистрали, к которой присоединён концевой кран
+    double pipe_volume;
+
+    /// Максимальное значение коэффициента перетока из рукава в магистраль
+    /// (для устойчивого расчёта не более 0.15 * <объём трубы магистрали> / dt)
+    double k_max_by_pipe_volume;
+
     /// Коэффициент перетока из рукава в магистраль при открытом кране
-    double k;
+    double k_pipe;
 
     /// Коэффициент перетока из рукава в атмосферу при закрытом кране
     double k_atm;
 
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+
+    virtual void stepDiscrete(double t, double dt);
 
     virtual void preStep(state_vector_t &Y, double t);
 
