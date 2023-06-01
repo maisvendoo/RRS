@@ -8,9 +8,8 @@
 //------------------------------------------------------------------------------
 enum
 {
-    MAX_FLOW_COEFFS = 21,
-    MAX_GIAN_COEFFS = 10,
-    MAX_TIME_CONST = 10
+    MAX_FLOW_COEFFS = 10,
+    MAX_GIAN_COEFFS = 3,
 };
 
 //------------------------------------------------------------------------------
@@ -28,20 +27,32 @@ public:
 
 private:
 
-    double A1;
-    double py2;
+    /// Признак длинносоставного режима
+    bool long_train_mode;
+
+    /// Признак включения ускорителя экстренного торможения
+    bool emergency_mode;
+
+    /// Объем ускорительной камеры
+    double Vuk;
+
+    /// Поток в ускорительную камеру
+    double Quk;
+
+    /// Давление срабатывания клапана в камере У2 (разобщение ТМ и ЗР)
+    double pu2;
+
+    /// Давление запирания тормозного клапана в длинносоставном режиме
+    double pbv;
+
+    /// Давление открытия срывного клапана ускорения экстренного торможения
+    double psv;
 
     double s1_min;
     double s1_max;
 
-    double p_bv;
-    double p_UP;
-    double long_train;
-    double K2;
-
     std::array<double, MAX_FLOW_COEFFS> K;
     std::array<double, MAX_GIAN_COEFFS> k;
-    std::array<double, MAX_TIME_CONST> T;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
