@@ -400,8 +400,8 @@ private:
 
     /// Load main resistence coefficients
     void loadMainResist(QString cfg_path, QString main_resist_cfg);
-    /// Load wheel model coefficients
-    void loadWheelModel(QString cfg_path, QString wheel_model_cfg);
+    /// Load wheel-rail friction coefficients
+    void loadWheelRailFriction(QString cfg_path, QString wheel_rail_friction_cfg);
 };
 
 /*!

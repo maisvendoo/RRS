@@ -852,7 +852,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         QString wheel_cfg = "default";
         cfg.getString(secName, "WheelRailFriction", wheel_cfg);
-        loadWheelModel(cfg_path, wheel_cfg);
+        loadWheelRailFriction(cfg_path, wheel_cfg);
 
         s = 1 + num_axis;
 
@@ -917,7 +917,7 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::loadWheelModel(QString cfg_path, QString wheel_cfg)
+void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
 {
     QFileInfo info(cfg_path);
     QDir dir(info.path());
