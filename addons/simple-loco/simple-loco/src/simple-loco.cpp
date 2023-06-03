@@ -6,6 +6,8 @@
 //
 //------------------------------------------------------------------------
 SimpleLoco::SimpleLoco(QObject *parent) : Vehicle (parent)
+  , pBP_prev(0.5)
+  , pBP_temp(0.0)
 {
 
 }
@@ -62,10 +64,11 @@ void SimpleLoco::initBrakeDevices(double p0, double pBP, double pFL)
     }
 
     reg = nullptr;
-    QString name = "simple-loco";
+/*    QString name = "simple-loco";
     reg = new Registrator(name, 1e-3);
-    QString line = QString(" t      ; pBP    ; pBC    ; pSR    ; Q_f    ; Q_b    ; Qad    ; Qcrane ");
-    reg->print(line, 0, 0);
+    QString line = QString(" t      ; temp    ;");
+    line += QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
+    reg->print(line, 0, 0);*/
 }
 
 //------------------------------------------------------------------------
@@ -124,9 +127,9 @@ void SimpleLoco::initPneumatics()
     bc_switch_valve = new SwitchingValve();
     bc_switch_valve->read_config("zpk");
 
-    brake_cylinder = new Reservoir(0.008);
+    brake_cylinder = new Reservoir(0.015);
 
-    supply_reservoir = new Reservoir(0.055);
+    supply_reservoir = new Reservoir(0.078);
 
     // Концевые краны
     anglecock_bp_fwd = new PneumoAngleCock();
@@ -188,6 +191,9 @@ void SimpleLoco::keyProcess()
 //------------------------------------------------------------------------
 void SimpleLoco::step(double t, double dt)
 {
+    pBP_temp = (brakepipe->getPressure() - pBP_prev) / dt;
+    pBP_prev = brakepipe->getPressure();
+
     stepPneumatics(t, dt);
 
     stepSignalsOutput();
@@ -382,14 +388,14 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
     default:
     case 5:
     {
-        DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4|QF %5 aux %6 QB %7 |pBC %8 pSR %9|acB o%10|hoseB l%11 c%12                ")
+        DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4|QF%5 aux%6 QB%7 |pBC %8 pSR %9|acB o%10|hoseB l%11 c%12                ")
                 .arg(hose_bp_fwd->isLinked())
                 .arg(hose_bp_fwd->isConnected())
                 .arg(anglecock_bp_fwd->isOpened())
                 .arg(brakepipe->getPressure(), 8, 'f', 5)
-                .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 9, 'f', 7)
-                .arg(1000*air_dist->getBPflow(), 9, 'f', 7)
-                .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 9, 'f', 7)
+                .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 10, 'f', 7)
+                .arg(1000*air_dist->getBPflow(), 10, 'f', 7)
+                .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 10, 'f', 7)
                 .arg(brake_cylinder->getPressure(), 8, 'f', 5)
                 .arg(supply_reservoir->getPressure(), 8, 'f', 5)
                 .arg(anglecock_bp_bwd->isOpened())
@@ -397,16 +403,6 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(hose_bp_bwd->isConnected());
         break;
     }
-/*    case 8:
-    {
-        DebugMsg += air_dist->getDebugMsg();
-        break;
-    }
-    case 9:
-    {
-        DebugMsg += brake_crane->getDebugMsg();
-        break;
-    }*/
     }
 }
 
@@ -418,15 +414,14 @@ void SimpleLoco::stepRegistrator(double t, double dt)
     Q_UNUSED(t);
     Q_UNUSED(dt);
 
-    QString line = QString("%1;%2;%3;%4;%5;%6;%7;%8")
-            .arg(t, 8, 'f', 3)
-            .arg(brakepipe->getPressure(), 8, 'f', 5)
-            .arg(brake_cylinder->getPressure(), 8, 'f', 5)
-            .arg(supply_reservoir->getPressure(), 8, 'f', 5)
-            .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 8, 'f', 5)
-            .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 8, 'f', 5)
-            .arg(1000*air_dist->getBPflow(), 8, 'f', 5)
-            .arg(1000*brake_lock->getBPflow(), 8, 'f', 5);
+    QString line = QString("%1;")
+            .arg(t, 8, 'f', 3);
+
+    line += QString("%1;")
+            .arg(pBP_temp, 9, 'f', 6);
+
+    line += air_dist->getDebugMsg();
+
     reg->print(line, t, dt);
 }
 

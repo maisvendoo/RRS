@@ -23,8 +23,8 @@ public:
 
 private:
 
-    /// Номер Debug-строки
-    size_t debug_num;
+    double pBP_prev;
+    double pBP_temp;
 
     /// Тормозная магистраль
     Reservoir   *brakepipe;

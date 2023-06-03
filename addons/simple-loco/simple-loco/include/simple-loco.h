@@ -24,6 +24,9 @@ public:
 
 private:
 
+    double pBP_prev;
+    double pBP_temp;
+
     /// Номер Debug-строки
     size_t debug_num;
 
