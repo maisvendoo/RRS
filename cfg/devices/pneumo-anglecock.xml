@@ -2,6 +2,8 @@
 <Config>
     <Device>
         <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
         <!-- Начальное состояние концевого крана: 0 - закрыт, 1 - открыт -->
         <IsOpened>1</IsOpened>

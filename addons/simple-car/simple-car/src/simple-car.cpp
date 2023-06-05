@@ -60,14 +60,16 @@ void SimpleCar::initBrakeDevices(double p0, double pBP, double pFL)
     }
 
     reg = nullptr;
-/*    if (((idx / 10) % 10) == 1)
+    if (((idx / 10) % 10) == 1)
     {
         QString name = QString("simple-car-%1").arg((idx / 10), 3, 10, QChar('0'));
         reg = new Registrator(name, 1e-3);
-        QString line = QString(" t      ; temp    ;");
-        line += QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
+//        QString line = QString(" t      ; temp    ;");
+//        line += QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
+        QString line = QString(" t      ; pBP   ;");
+        line += QString(" pWORK ; pBC   ; pSR   ; zpk1  ; zpk2  ; SRwork ; SRbc   ; WORKat ; BCatm  ; U     ; f     ; I     ;R;B; u1b ; u2r ");
         reg->print(line, 0, 0);
-    }*/
+    }
 }
 
 //------------------------------------------------------------------------
@@ -94,6 +96,9 @@ void SimpleCar::initPneumatics()
     air_dist = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
     air_dist->read_config("vr242");
 
+    electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
+    electro_air_dist->read_config("evr305");
+
     brake_cylinder = new Reservoir(0.016);
 
     supply_reservoir = new Reservoir(0.078);
@@ -107,8 +112,10 @@ void SimpleCar::initPneumatics()
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава
-    hose_bp_fwd = new PneumoHose();
-    hose_bp_bwd = new PneumoHose();
+    hose_bp_fwd = new PneumoHoseEPB();
+    hose_bp_fwd->read_config("pneumo-hose-BPepb2line");
+    hose_bp_bwd = new PneumoHoseEPB();
+    hose_bp_bwd->read_config("pneumo-hose-BPepb2line");
     forward_connectors.push_back(hose_bp_fwd);
     backward_connectors.push_back(hose_bp_bwd);
 }
@@ -138,6 +145,8 @@ void SimpleCar::step(double t, double dt)
 
     stepPneumatics(t, dt);
 
+    stepEPB(t, dt);
+
     stepSignalsOutput();
 
     stepDebugMsg(t, dt);
@@ -159,14 +168,20 @@ void SimpleCar::stepPneumatics(double t, double dt)
     brakepipe->step(t, dt);
 
     air_dist->setBPpressure(brakepipe->getPressure());
-    air_dist->setBCpressure(brake_cylinder->getPressure());
-    air_dist->setSRpressure(supply_reservoir->getPressure());
+    air_dist->setBCpressure(electro_air_dist->getAirdistBCpressure());
+    air_dist->setSRpressure(electro_air_dist->getAirdistSRpressure());
     air_dist->step(t, dt);
 
-    brake_cylinder->setFlow(air_dist->getBCflow());
+    electro_air_dist->setAirdistBCflow(air_dist->getBCflow());
+    electro_air_dist->setAirdistSRflow(air_dist->getSRflow());
+    electro_air_dist->setBCpressure(brake_cylinder->getPressure());
+    electro_air_dist->setSRpressure(supply_reservoir->getPressure());
+    electro_air_dist->step(t, dt);
+
+    brake_cylinder->setFlow(electro_air_dist->getBCflow());
     brake_cylinder->step(t, dt);
 
-    supply_reservoir->setFlow(air_dist->getSRflow());
+    supply_reservoir->setFlow(electro_air_dist->getSRflow());
     supply_reservoir->step(t, dt);
 
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());
@@ -182,6 +197,36 @@ void SimpleCar::stepPneumatics(double t, double dt)
     hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
     hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
     hose_bp_bwd->step(t, dt);
+}
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
+void SimpleCar::stepEPB(double t, double dt)
+{
+    Q_UNUSED(t);
+    Q_UNUSED(dt);
+
+    electro_air_dist->setVoltage(0,
+        hose_bp_fwd->getVoltage(0) + hose_bp_bwd->getVoltage(0) );
+    electro_air_dist->setFrequency(0,
+        hose_bp_fwd->getFrequency(0) + hose_bp_bwd->getFrequency(0) );
+
+    hose_bp_fwd->setVoltage  (0, hose_bp_bwd->getVoltage(0));
+    hose_bp_fwd->setFrequency(0, hose_bp_bwd->getFrequency(0));
+    hose_bp_fwd->setCurrent  (0,
+        hose_bp_bwd->getCurrent(0) + electro_air_dist->getCurrent(0) );
+    hose_bp_fwd->setVoltage  (1, hose_bp_bwd->getVoltage(1));
+    hose_bp_fwd->setFrequency(1, hose_bp_bwd->getFrequency(1));
+    hose_bp_fwd->setCurrent  (1, hose_bp_bwd->getCurrent(1));
+
+    hose_bp_bwd->setVoltage  (0, hose_bp_fwd->getVoltage(0));
+    hose_bp_bwd->setFrequency(0, hose_bp_fwd->getFrequency(0));
+    hose_bp_bwd->setCurrent  (0,
+        hose_bp_fwd->getCurrent(0) + electro_air_dist->getCurrent(0) );
+    hose_bp_bwd->setVoltage  (1, hose_bp_fwd->getVoltage(1));
+    hose_bp_bwd->setFrequency(1, hose_bp_fwd->getFrequency(1));
+    hose_bp_bwd->setCurrent  (1, hose_bp_fwd->getCurrent(1));
 }
 
 //------------------------------------------------------------------------
@@ -230,11 +275,14 @@ void SimpleCar::stepRegistrator(double t, double dt)
 
     QString line = QString("%1;")
             .arg(t, 8, 'f', 3);
-
+/*
     line += QString("%1;")
             .arg(pBP_temp, 9, 'f', 6);
-
     line += air_dist->getDebugMsg();
+*/
+    line += QString("%1;")
+            .arg(brakepipe->getPressure(), 7, 'f', 5);
+    line += electro_air_dist->getDebugMsg();
 
     reg->print(line, t, dt);
 }

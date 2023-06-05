@@ -6,6 +6,7 @@
 //
 //------------------------------------------------------------------------
 SimpleLoco::SimpleLoco(QObject *parent) : Vehicle (parent)
+  , U_bat(55.0)
   , pBP_prev(0.5)
   , pBP_temp(0.0)
 {
@@ -64,11 +65,13 @@ void SimpleLoco::initBrakeDevices(double p0, double pBP, double pFL)
     }
 
     reg = nullptr;
-/*    QString name = "simple-loco";
+    QString name = "simple-loco";
     reg = new Registrator(name, 1e-3);
-    QString line = QString(" t      ; temp    ;");
-    line += QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
-    reg->print(line, 0, 0);*/
+//    QString line = QString(" t      ; temp    ;");
+//    line += QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
+    QString line = QString(" t      ; pBP   ;");
+    line += QString(" pWORK ; pBC   ; pSR   ; zpk1  ; zpk2  ; SRwork ; SRbc   ; WORKat ; BCatm  ; U     ; f     ; I     ;R;B; u1b ; u2r ");
+    reg->print(line, 0, 0);
 }
 
 //------------------------------------------------------------------------
@@ -77,6 +80,8 @@ void SimpleLoco::initBrakeDevices(double p0, double pBP, double pFL)
 void SimpleLoco::initialization()
 {
     initPneumatics();
+
+    initEPB();
 }
 
 //------------------------------------------------------------------------
@@ -124,6 +129,9 @@ void SimpleLoco::initPneumatics()
     air_dist = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
     air_dist->read_config("vr242");
 
+    electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
+    electro_air_dist->read_config("evr305");
+
     bc_switch_valve = new SwitchingValve();
     bc_switch_valve->read_config("zpk");
 
@@ -140,10 +148,23 @@ void SimpleLoco::initPneumatics()
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава
-    hose_bp_fwd = new PneumoHose();
-    hose_bp_bwd = new PneumoHose();
+    hose_bp_fwd = new PneumoHoseEPB();
+    hose_bp_fwd->read_config("pneumo-hose-BPepb2line");
+    hose_bp_bwd = new PneumoHoseEPB();
+    hose_bp_bwd->read_config("pneumo-hose-BPepb2line");
     forward_connectors.push_back(hose_bp_fwd);
     backward_connectors.push_back(hose_bp_bwd);
+}
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
+void SimpleLoco::initEPB()
+{
+    epb_converter = new EPBConverter();
+    epb_converter->read_config("epb-converter");
+
+    epb_controller = new EPBControl();
 }
 
 //------------------------------------------------------------------------
@@ -195,6 +216,8 @@ void SimpleLoco::step(double t, double dt)
     pBP_prev = brakepipe->getPressure();
 
     stepPneumatics(t, dt);
+
+    stepEPB(t, dt);
 
     stepSignalsOutput();
 
@@ -253,11 +276,17 @@ void SimpleLoco::stepPneumatics(double t, double dt)
     brakepipe->step(t, dt);
 
     air_dist->setBPpressure(brakepipe->getPressure());
-    air_dist->setBCpressure(bc_switch_valve->getPressure1());
-    air_dist->setSRpressure(supply_reservoir->getPressure());
+    air_dist->setBCpressure(electro_air_dist->getAirdistBCpressure());
+    air_dist->setSRpressure(electro_air_dist->getAirdistSRpressure());
     air_dist->step(t, dt);
 
-    bc_switch_valve->setInputFlow1(air_dist->getBCflow());
+    electro_air_dist->setAirdistBCflow(air_dist->getBCflow());
+    electro_air_dist->setAirdistSRflow(air_dist->getSRflow());
+    electro_air_dist->setBCpressure(bc_switch_valve->getPressure1());
+    electro_air_dist->setSRpressure(supply_reservoir->getPressure());
+    electro_air_dist->step(t, dt);
+
+    bc_switch_valve->setInputFlow1(electro_air_dist->getBCflow());
     bc_switch_valve->setInputFlow2(brake_lock->getBCflow());
     bc_switch_valve->setOutputPressure(brake_cylinder->getPressure());
     bc_switch_valve->step(t, dt);
@@ -265,7 +294,7 @@ void SimpleLoco::stepPneumatics(double t, double dt)
     brake_cylinder->setFlow(bc_switch_valve->getOutputFlow());
     brake_cylinder->step(t, dt);
 
-    supply_reservoir->setFlow(air_dist->getSRflow());
+    supply_reservoir->setFlow(electro_air_dist->getSRflow());
     supply_reservoir->step(t, dt);
 
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());
@@ -281,6 +310,53 @@ void SimpleLoco::stepPneumatics(double t, double dt)
     hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
     hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
     hose_bp_bwd->step(t, dt);
+}
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
+void SimpleLoco::stepEPB(double t, double dt)
+{
+    double epb_work_curr = 0.0;
+    epb_work_curr += electro_air_dist->getCurrent(0);
+    epb_work_curr += hose_bp_fwd->getCurrent(0);
+    epb_work_curr += hose_bp_bwd->getCurrent(0);
+
+    epb_converter->setInputVoltage(U_bat);
+    epb_converter->setOutputCurrent(epb_work_curr);
+    epb_converter->step(t, dt);
+
+    epb_controller->setInputVoltage(epb_converter->getOutputVoltage());
+    epb_controller->setHoldState(brake_crane->isHold());
+    epb_controller->setBrakeState(brake_crane->isBrake());
+    epb_controller->setControlVoltage(  hose_bp_fwd->getVoltage(1)
+                                      + hose_bp_bwd->getVoltage(1) );
+    epb_controller->step(t, dt);
+
+    electro_air_dist->setVoltage  (0,  epb_controller->getWorkVoltage()
+        + hose_bp_fwd->getVoltage(0) + hose_bp_bwd->getVoltage(0) );
+    electro_air_dist->setFrequency(0,  epb_controller->getWorkFrequency()
+        + hose_bp_fwd->getFrequency(0) + hose_bp_bwd->getFrequency(0) );
+
+    hose_bp_fwd->setVoltage  (0,
+        hose_bp_bwd->getVoltage(0) + epb_controller->getWorkVoltage() );
+    hose_bp_fwd->setFrequency(0,
+        hose_bp_bwd->getFrequency(0) + epb_controller->getWorkFrequency() );
+    hose_bp_fwd->setCurrent  (0,
+        hose_bp_bwd->getCurrent(0) + electro_air_dist->getCurrent(0) );
+    hose_bp_fwd->setVoltage  (1, hose_bp_bwd->getVoltage(1));
+    hose_bp_fwd->setFrequency(1, hose_bp_bwd->getFrequency(1));
+    hose_bp_fwd->setCurrent  (1, hose_bp_bwd->getCurrent(1));
+
+    hose_bp_bwd->setVoltage  (0,
+        hose_bp_fwd->getVoltage(0) + epb_controller->getWorkVoltage() );
+    hose_bp_bwd->setFrequency(0,
+        hose_bp_fwd->getFrequency(0) + epb_controller->getWorkFrequency() );
+    hose_bp_bwd->setCurrent  (0,
+        hose_bp_fwd->getCurrent(0) + electro_air_dist->getCurrent(0) );
+    hose_bp_bwd->setVoltage  (1, hose_bp_fwd->getVoltage(1));
+    hose_bp_bwd->setFrequency(1, hose_bp_fwd->getFrequency(1));
+    hose_bp_bwd->setCurrent  (1, hose_bp_fwd->getCurrent(1));
 }
 
 //------------------------------------------------------------------------
@@ -403,6 +479,28 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(hose_bp_bwd->isConnected());
         break;
     }
+    case 6:
+    {
+        DebugMsg += QString("F: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |                ")
+                .arg(hose_bp_fwd->getConnectedLinesNumber())
+                .arg(hose_bp_fwd->getOutputSignal(5), 6, 'f', 3)
+                .arg(hose_bp_fwd->getOutputSignal(6), 6, 'f', 1)
+                .arg(hose_bp_fwd->getOutputSignal(7), 6, 'f', 1)
+                .arg(hose_bp_fwd->getOutputSignal(8), 6, 'f', 3)
+                .arg(hose_bp_fwd->getOutputSignal(9), 6, 'f', 1)
+                .arg(hose_bp_fwd->getOutputSignal(10), 6, 'f', 1)
+                .arg(hose_bp_fwd->getOutputSignal(11), 6, 'f', 3);
+        DebugMsg += QString("B: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |                ")
+                .arg(hose_bp_bwd->getConnectedLinesNumber())
+                .arg(hose_bp_fwd->getOutputSignal(5), 6, 'f', 3)
+                .arg(hose_bp_bwd->getOutputSignal(6), 6, 'f', 1)
+                .arg(hose_bp_bwd->getOutputSignal(7), 6, 'f', 1)
+                .arg(hose_bp_bwd->getOutputSignal(8), 6, 'f', 3)
+                .arg(hose_bp_bwd->getOutputSignal(9), 6, 'f', 1)
+                .arg(hose_bp_bwd->getOutputSignal(10), 6, 'f', 1)
+                .arg(hose_bp_bwd->getOutputSignal(11), 6, 'f', 3);
+        break;
+    }
     }
 }
 
@@ -416,11 +514,14 @@ void SimpleLoco::stepRegistrator(double t, double dt)
 
     QString line = QString("%1;")
             .arg(t, 8, 'f', 3);
-
+/*
     line += QString("%1;")
             .arg(pBP_temp, 9, 'f', 6);
-
     line += air_dist->getDebugMsg();
+*/
+    line += QString("%1;")
+            .arg(brakepipe->getPressure(), 7, 'f', 5);
+    line += electro_air_dist->getDebugMsg();
 
     reg->print(line, t, dt);
 }

@@ -3,7 +3,14 @@
 
 enum
 {
-    WORK_PRESSURE = 0, ///< Давление в рабочей камере электровоздухораспределителя
+    WORK_PRESSURE = 0,  ///< Давление в рабочей камере электровоздухораспределителя
+
+    LINES_NUM = 1,      ///< Количество линий управления ЭПТ
+    WORK_LINE = 0,   ///< Линия управления ЭПТ
+
+    VALVES_NUM = 2,     ///< Количество электромагнитных вентилей
+    RELEASE_VALVE = 0,  ///< Отпускной электромагнитный вентиль
+    BRAKE_VALVE = 1,    ///< Тормозной электромагнитный вентиль
 
     MAX_COEFFS = 7,
     MAX_LCOEFFS = 3
@@ -24,17 +31,21 @@ public:
     ~EVR305();
 
 private:
+
+    /// Объём рабочей камеры
+    double V0;
+
+    /// Сопротивление катушек вентилей
+    double R;
+    /// Индуктивность катушек вентилей
+    double L;
+    /// Ток включения вентилей
+    double I_on;
+
     std::array<double, MAX_COEFFS> K;
     std::array<double, MAX_LCOEFFS> k;
 
     SwitchingValve *zpk;
-
-    double A1;
-    double Vpk;
-    double Q1;
-
-    double Ip_max;
-    double It_max;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

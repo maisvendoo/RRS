@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Name>BPepb</Name>
+        <Order>0</Order>
+
+        <!-- Количество линий управления электропневматическими тормозами -->
+        <LinesNum>2</LinesNum>
+    </Device>
+</Config>

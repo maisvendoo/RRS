@@ -132,7 +132,7 @@ double Device::getOutputSignal(size_t idx) const
     if (idx < output_signals.size())
         return output_signals[idx];
     else
-        return 0.0f;
+        return 0.0;
 }
 
 //------------------------------------------------------------------------------

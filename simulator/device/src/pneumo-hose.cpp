@@ -1,3 +1,5 @@
+#include    <QLibrary>
+
 #include    "pneumo-hose.h"
 
 #include    "CfgReader.h"
@@ -5,10 +7,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHose::PneumoHose() : Device()
+PneumoHose::PneumoHose(QObject *parent) : Device(parent)
   , is_ref_state_command(false)
 {
-    name = QString("tm");
+    name = QString("BP");
 
     input_signals.resize(SIZE_OF_INPUTS);
     output_signals.resize(SIZE_OF_OUTPUTS);
@@ -30,7 +32,7 @@ PneumoHose::~PneumoHose()
 //------------------------------------------------------------------------------
 void PneumoHose::connect()
 {
-    output_signals[HOSE_REF_STATE] = 1.0;
+    output_signals[HOSE_OUTPUT_REF_STATE] = 1.0;
     is_ref_state_command = true;
 }
 
@@ -39,8 +41,8 @@ void PneumoHose::connect()
 //------------------------------------------------------------------------------
 void PneumoHose::disconnect()
 {
+    output_signals[HOSE_OUTPUT_REF_STATE] = -1.0;
     is_ref_state_command = true;
-    output_signals[HOSE_REF_STATE] = -1.0;
 }
 
 //------------------------------------------------------------------------------
@@ -48,7 +50,7 @@ void PneumoHose::disconnect()
 //------------------------------------------------------------------------------
 bool PneumoHose::isConnected() const
 {
-    return is_linked && (input_signals[HOSE_IS_CONNECTED] == 1.0);
+    return is_linked && (input_signals[HOSE_INPUT_IS_CONNECTED] == 1.0);
 }
 
 //------------------------------------------------------------------------------
@@ -56,7 +58,7 @@ bool PneumoHose::isConnected() const
 //------------------------------------------------------------------------------
 void PneumoHose::setPressure(double value)
 {
-    output_signals[HOSE_PIPE_PRESSURE] = value;
+    output_signals[HOSE_OUTPUT_PIPE_PRESSURE] = value;
 }
 
 //------------------------------------------------------------------------------
@@ -64,7 +66,7 @@ void PneumoHose::setPressure(double value)
 //------------------------------------------------------------------------------
 void PneumoHose::setFlowCoeff(double value)
 {
-    output_signals[HOSE_FLOW_COEFF] = value;
+    output_signals[HOSE_OUTPUT_FLOW_COEFF] = value;
 }
 
 //------------------------------------------------------------------------------
@@ -73,10 +75,31 @@ void PneumoHose::setFlowCoeff(double value)
 double PneumoHose::getFlow() const
 {
     if (is_linked)
-        return input_signals[HOSE_FLOW_TO_PIPE];
+        return input_signals[HOSE_INPUT_FLOW_TO_PIPE];
 
     // Если нет соседнего рукава, то рукав открыт в атмосферу
-    return -output_signals[HOSE_FLOW_COEFF] * output_signals[HOSE_PIPE_PRESSURE];
+    return -( output_signals[HOSE_OUTPUT_FLOW_COEFF]
+            * output_signals[HOSE_OUTPUT_PIPE_PRESSURE] );
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::step(double t, double dt)
+{
+    // Проверяем, вызывались ли методы управления рукавами на данном шаге
+    if (is_ref_state_command)
+    {
+        // Сбрасываем флаг, чтобы обнулить управляющий сигнал на следующем шаге
+        is_ref_state_command = false;
+    }
+    else
+    {
+        // Если не вызывались, обнуляем управляющий сигнал
+        output_signals[HOSE_OUTPUT_REF_STATE] = 0.0f;
+    }
+
+    Device::step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -94,27 +117,6 @@ void PneumoHose::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::preStep(state_vector_t &Y, double t)
-{
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
-
-    // Проверяем, вызывались ли методы управления рукавами на данном шаге
-    if (is_ref_state_command)
-    {
-        // Сбрасываем флаг, чтобы обнулить управляющий сигнал на следующем шаге
-        is_ref_state_command = false;
-    }
-    else
-    {
-        // Если не вызывались, обнуляем управляющий сигнал
-        output_signals[HOSE_REF_STATE] = 0.0f;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void PneumoHose::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
@@ -123,5 +125,27 @@ void PneumoHose::load_config(CfgReader &cfg)
 
     double tmp = 1.0;
     cfg.getDouble(secName, "FlowCoefficient", tmp);
-    output_signals[HOSE_PIPE_PRESSURE] = tmp;
+    output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+PneumoHose *loadPneumoHose(QString lib_path)
+{
+    PneumoHose *hose = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetPneumoHose getPneumoHose = reinterpret_cast<GetPneumoHose>(lib.resolve("getPneumoHose"));
+
+        if (getPneumoHose)
+        {
+            hose = getPneumoHose();
+        }
+    }
+
+    return hose;
 }

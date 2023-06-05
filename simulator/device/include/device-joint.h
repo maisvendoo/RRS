@@ -67,4 +67,4 @@ typedef Joint* (*GetJoint)();
 //------------------------------------------------------------------------------
 extern "C" Q_DECL_EXPORT Joint *loadJoint(QString lib_path);
 
-#endif // COUPLING_H
+#endif // JOINT_H

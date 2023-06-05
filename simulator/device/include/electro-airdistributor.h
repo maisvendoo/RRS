@@ -14,15 +14,32 @@ public:
 
     ~ElectroAirDistributor();
 
-    void setControlLinesNumber(size_t num);
-
+    // Электромагнитные вентили в электровоздухораспределителе
+    /// Задать количество электромагнитных вентилей
     void setValvesNumber(size_t num);
 
-    void setControlLine(double value, size_t idx = 0);
+    /// Количество электромагнитных вентилей
+    size_t getValvesNumber() const;
 
-    double getValveState(size_t i);
+    /// Состояние электромагнитных вентилей
+    bool getValveState(size_t idx);
 
-    // Взаимодействие оборудования, подключаемого через данный электровоздухораспределитель
+    // Взаимодействие электровоздухораспределителя с линиями управления ЭПТ
+    /// Задать число линий ЭПТ, подключенных к электровоздухораспределителю
+    void setControlLinesNumber(size_t num);
+
+    /// Число линий ЭПТ, подключенных к электровоздухораспределителю
+    size_t getControlLinesNumber() const;
+
+    /// Задать величину постоянного напряжения в линии idx
+    void setVoltage(size_t idx, double value);
+
+    /// Задать частоту переменного напряжения в линии idx
+    void setFrequency(size_t idx, double value);
+
+    /// Получить потребляемый ток из линии idx
+    double getCurrent(size_t idx) const;
+
     // Взаимодействие воздухораспределителя и магистрали тормозных цилиндров
     /// Задать давление от магистрали тормозных цилиндров
     void setBCpressure(double value);
@@ -51,9 +68,13 @@ public:
 
 protected:
 
-    std::vector<double> control_line;
+    size_t valves_num;
+    std::vector<bool> valve_state;
 
-    std::vector<double> valve_state;
+    size_t lines_num;
+    std::vector<double> U;
+    std::vector<double> f;
+    std::vector<double> I;
 
     double pBC;
     double p_airdistBC;

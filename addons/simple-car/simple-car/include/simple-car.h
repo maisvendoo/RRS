@@ -32,6 +32,9 @@ private:
     /// Воздухораспределитель
     AirDistributor  *air_dist;
 
+    /// Электровоздухораспределитель
+    ElectroAirDistributor  *electro_air_dist;
+
     /// Тормозной цилиндр
     Reservoir   *brake_cylinder;
 
@@ -39,10 +42,10 @@ private:
     Reservoir   *supply_reservoir;
 
     /// Рукав тормозной магистрали спереди
-    PneumoHose  *hose_bp_fwd;
+    PneumoHoseEPB  *hose_bp_fwd;
 
     /// Рукав тормозной магистрали сзади
-    PneumoHose  *hose_bp_bwd;
+    PneumoHoseEPB  *hose_bp_bwd;
 
     /// Концевой кран тормозной магистрали спереди
     PneumoAngleCock  *anglecock_bp_fwd;
@@ -67,6 +70,9 @@ private:
 
     /// Моделирование новой пневмосхемы
     void stepPneumatics(double t, double dt);
+
+    /// Моделирование ЭПТ
+    void stepEPB(double t, double dt);
 
     /// Сигналы для анимации
     void stepSignalsOutput();

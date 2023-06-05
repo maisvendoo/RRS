@@ -24,6 +24,8 @@ public:
 
 private:
 
+    double U_bat;
+
     double pBP_prev;
     double pBP_temp;
 
@@ -55,6 +57,9 @@ private:
     /// Воздухораспределитель
     AirDistributor  *air_dist;
 
+    /// Электровоздухораспределитель
+    ElectroAirDistributor  *electro_air_dist;
+
     /// Переключательный клапан магистрали тормозных цилиндров
     SwitchingValve  *bc_switch_valve;
 
@@ -71,10 +76,16 @@ private:
     PneumoAngleCock  *anglecock_bp_bwd;
 
     /// Рукав тормозной магистрали спереди
-    PneumoHose  *hose_bp_fwd;
+    PneumoHoseEPB  *hose_bp_fwd;
 
     /// Рукав тормозной магистрали сзади
-    PneumoHose  *hose_bp_bwd;
+    PneumoHoseEPB  *hose_bp_bwd;
+
+    /// Преобразователь напряжения для ЭПТ
+    EPBConverter *epb_converter;
+
+    /// Контроллер двухпроводного ЭПТ
+    EPBControl *epb_controller;
 
     /// Registrator
     Registrator *reg;
@@ -84,6 +95,9 @@ private:
 
     /// Инициализация новой пневмосхемы
     void initPneumatics();
+
+    /// Инициализация ЭПТ
+    void initEPB();
 
     /// Загрузка пользовательских параметров из конфига
     void loadConfig(QString cfg_path);
@@ -96,6 +110,9 @@ private:
 
     /// Моделирование новой пневмосхемы
     void stepPneumatics(double t, double dt);
+
+    /// Моделирование ЭПТ
+    void stepEPB(double t, double dt);
 
     /// Сигналы для анимации
     void stepSignalsOutput();
