@@ -10,7 +10,7 @@ EVR305::EVR305(QObject *parent)
     , L(0.5)
     , I_on(0.1)
 {
-    lines_num = LINES_NUM;
+    lines_num = EPB_LINES_NUM;
     setControlLinesNumber(lines_num);
 
     valves_num = VALVES_NUM;
@@ -78,7 +78,7 @@ void EVR305::ode_system(const state_vector_t &Y,
 
     // Поток в рабочую камеру
     dYdt[WORK_PRESSURE] = (Q_sr_work - Q_work_atm) / V0;
-
+/*
 //    QString(" pWORK ; pBC   ; pSR   ; zpk1  ; zpk2  ; SRwork ; SRbc   ; WORKat ; BCatm  ; U     ; f     ; I     ;R;B; u1b ; u2r ");
     DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16")
             .arg(Y[0], 7, 'f', 5)
@@ -90,14 +90,14 @@ void EVR305::ode_system(const state_vector_t &Y,
             .arg(1000*Q_sr_bc, 8, 'f', 5)
             .arg(1000*Q_work_atm, 8, 'f', 5)
             .arg(1000*Q_bc_atm, 8, 'f', 5)
-            .arg(U[WORK_LINE], 7, 'f', 3)
-            .arg(f[WORK_LINE], 7, 'f', 3)
-            .arg(I[WORK_LINE], 7, 'f', 3)
+            .arg(U[EPB_WORK_LINE], 7, 'f', 3)
+            .arg(f[EPB_WORK_LINE], 7, 'f', 3)
+            .arg(I[EPB_WORK_LINE], 7, 'f', 3)
             .arg(valve_state[RELEASE_VALVE])
             .arg(valve_state[BRAKE_VALVE])
             .arg(u1, 5, 'f', 3)
             .arg(u2, 5, 'f', 3);
-
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void EVR305::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Ток, потребляемый катушкой вентиля
-    double curr = U[WORK_LINE] / (R + (2.0 * Physics::PI * f[WORK_LINE] * L));
+    double curr = U[EPB_WORK_LINE] / (R + (2.0 * Physics::PI * f[EPB_WORK_LINE] * L));
 
     // Отпускной электромагнитный вентиль
     double I_release = curr;
@@ -120,7 +120,7 @@ void EVR305::preStep(state_vector_t &Y, double t)
     valve_state[BRAKE_VALVE] = (I_brake > I_on);
 
     // Ток, потребляемый электровоздухораспределителем
-    I[WORK_LINE] = I_release + I_brake;
+    I[EPB_WORK_LINE] = I_release + I_brake;
 }
 
 //------------------------------------------------------------------------------

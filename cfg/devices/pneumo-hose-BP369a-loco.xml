@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Name>BPepb</Name>
+        <Order>0</Order>
+
+        <!-- Признак использования рукава на локомотиве: 0 - вагон, 1 - локомотив -->
+        <!-- На локомотивах у рукавов, закреплённых на подвесе, линии ЭПТ размыкаются -->
+        <IsHoseAtLoco>1</IsHoseAtLoco>
+    </Device>
+</Config>

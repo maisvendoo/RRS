@@ -65,13 +65,13 @@ void SimpleLoco::initBrakeDevices(double p0, double pBP, double pFL)
     }
 
     reg = nullptr;
-    QString name = "simple-loco";
+/*    QString name = "simple-loco";
     reg = new Registrator(name, 1e-3);
 //    QString line = QString(" t      ; temp    ;");
 //    line += QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
     QString line = QString(" t      ; pBP   ;");
     line += QString(" pWORK ; pBC   ; pSR   ; zpk1  ; zpk2  ; SRwork ; SRbc   ; WORKat ; BCatm  ; U     ; f     ; I     ;R;B; u1b ; u2r ");
-    reg->print(line, 0, 0);
+    reg->print(line, 0, 0);*/
 }
 
 //------------------------------------------------------------------------
@@ -148,10 +148,10 @@ void SimpleLoco::initPneumatics()
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава
-    hose_bp_fwd = new PneumoHoseEPB();
-    hose_bp_fwd->read_config("pneumo-hose-BPepb2line");
-    hose_bp_bwd = new PneumoHoseEPB();
-    hose_bp_bwd->read_config("pneumo-hose-BPepb2line");
+    hose_bp_fwd = loadPneumoHoseEPB(modules_dir + QDir::separator() + "hose369a");
+    hose_bp_fwd->read_config("pneumo-hose-BP369a-loco");
+    hose_bp_bwd = loadPneumoHoseEPB(modules_dir + QDir::separator() + "hose369a");
+    hose_bp_bwd->read_config("pneumo-hose-BP369a-loco");
     forward_connectors.push_back(hose_bp_fwd);
     backward_connectors.push_back(hose_bp_bwd);
 }
@@ -388,6 +388,11 @@ void SimpleLoco::stepSignalsOutput()
     analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getERpressure() / 1.0);
     // Манометр давления в ТЦ
     analogSignal[STRELKA_M_TC] = static_cast<float>(brake_cylinder->getPressure() / 1.0);
+
+    // Лампы контроля ЭПТ
+    analogSignal[SIG_LIGHT_O] = epb_controller->stateReleaseLamp();
+    analogSignal[SIG_LIGHT_P] = epb_controller->stateHoldLamp();
+    analogSignal[SIG_LIGHT_T] = epb_controller->stateBrakeLamp();
 }
 
 //------------------------------------------------------------------------
@@ -481,24 +486,28 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
     }
     case 6:
     {
-        DebugMsg += QString("F: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |                ")
+        DebugMsg += QString("F: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |")
                 .arg(hose_bp_fwd->getConnectedLinesNumber())
-                .arg(hose_bp_fwd->getOutputSignal(5), 6, 'f', 3)
+                .arg(hose_bp_fwd->getOutputSignal(5), 1, 'f', 0)
                 .arg(hose_bp_fwd->getOutputSignal(6), 6, 'f', 1)
                 .arg(hose_bp_fwd->getOutputSignal(7), 6, 'f', 1)
                 .arg(hose_bp_fwd->getOutputSignal(8), 6, 'f', 3)
                 .arg(hose_bp_fwd->getOutputSignal(9), 6, 'f', 1)
                 .arg(hose_bp_fwd->getOutputSignal(10), 6, 'f', 1)
                 .arg(hose_bp_fwd->getOutputSignal(11), 6, 'f', 3);
-        DebugMsg += QString("B: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |                ")
+        DebugMsg += QString("B: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |")
                 .arg(hose_bp_bwd->getConnectedLinesNumber())
-                .arg(hose_bp_fwd->getOutputSignal(5), 6, 'f', 3)
+                .arg(hose_bp_fwd->getOutputSignal(5), 1, 'f', 0)
                 .arg(hose_bp_bwd->getOutputSignal(6), 6, 'f', 1)
                 .arg(hose_bp_bwd->getOutputSignal(7), 6, 'f', 1)
                 .arg(hose_bp_bwd->getOutputSignal(8), 6, 'f', 3)
                 .arg(hose_bp_bwd->getOutputSignal(9), 6, 'f', 1)
                 .arg(hose_bp_bwd->getOutputSignal(10), 6, 'f', 1)
                 .arg(hose_bp_bwd->getOutputSignal(11), 6, 'f', 3);
+        DebugMsg += QString("R%1 H%2 B%3                 ")
+                .arg(epb_controller->stateReleaseLamp())
+                .arg(epb_controller->stateHoldLamp())
+                .arg(epb_controller->stateBrakeLamp());
         break;
     }
     }
@@ -518,11 +527,11 @@ void SimpleLoco::stepRegistrator(double t, double dt)
     line += QString("%1;")
             .arg(pBP_temp, 9, 'f', 6);
     line += air_dist->getDebugMsg();
-*/
+
     line += QString("%1;")
             .arg(brakepipe->getPressure(), 7, 'f', 5);
     line += electro_air_dist->getDebugMsg();
-
+*/
     reg->print(line, t, dt);
 }
 

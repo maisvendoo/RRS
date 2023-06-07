@@ -60,7 +60,7 @@ void SimpleCar::initBrakeDevices(double p0, double pBP, double pFL)
     }
 
     reg = nullptr;
-    if (((idx / 10) % 10) == 1)
+/*    if (((idx / 10) % 10) == 1)
     {
         QString name = QString("simple-car-%1").arg((idx / 10), 3, 10, QChar('0'));
         reg = new Registrator(name, 1e-3);
@@ -69,7 +69,7 @@ void SimpleCar::initBrakeDevices(double p0, double pBP, double pFL)
         QString line = QString(" t      ; pBP   ;");
         line += QString(" pWORK ; pBC   ; pSR   ; zpk1  ; zpk2  ; SRwork ; SRbc   ; WORKat ; BCatm  ; U     ; f     ; I     ;R;B; u1b ; u2r ");
         reg->print(line, 0, 0);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------
@@ -112,10 +112,10 @@ void SimpleCar::initPneumatics()
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава
-    hose_bp_fwd = new PneumoHoseEPB();
-    hose_bp_fwd->read_config("pneumo-hose-BPepb2line");
-    hose_bp_bwd = new PneumoHoseEPB();
-    hose_bp_bwd->read_config("pneumo-hose-BPepb2line");
+    hose_bp_fwd = loadPneumoHoseEPB(modules_dir + QDir::separator() + "hose369a");
+    hose_bp_fwd->read_config("pneumo-hose-BP369a-passcar");
+    hose_bp_bwd = loadPneumoHoseEPB(modules_dir + QDir::separator() + "hose369a");
+    hose_bp_bwd->read_config("pneumo-hose-BP369a-passcar");
     forward_connectors.push_back(hose_bp_fwd);
     backward_connectors.push_back(hose_bp_bwd);
 }
@@ -249,7 +249,7 @@ void SimpleCar::stepDebugMsg(double t, double dt)
 
     DebugMsg = QString("t %1|")
             .arg(t, 6, 'f', 2);
-
+/*
     DebugMsg += QString("hoseF l%1 c%2|acF o%3|pTM %4|QF%5 aux%6 QB%7 |pBC %8 pSR %9|acB o%10|hoseB l%11 c%12                ")
             .arg(hose_bp_fwd->isLinked())
             .arg(hose_bp_fwd->isConnected())
@@ -263,6 +263,25 @@ void SimpleCar::stepDebugMsg(double t, double dt)
             .arg(anglecock_bp_bwd->isOpened())
             .arg(hose_bp_bwd->isLinked())
             .arg(hose_bp_bwd->isConnected());
+*/
+    DebugMsg += QString("F: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |")
+            .arg(hose_bp_fwd->getConnectedLinesNumber())
+            .arg(hose_bp_fwd->getOutputSignal(5), 1, 'f', 0)
+            .arg(hose_bp_fwd->getOutputSignal(6), 6, 'f', 1)
+            .arg(hose_bp_fwd->getOutputSignal(7), 6, 'f', 1)
+            .arg(hose_bp_fwd->getOutputSignal(8), 6, 'f', 3)
+            .arg(hose_bp_fwd->getOutputSignal(9), 6, 'f', 1)
+            .arg(hose_bp_fwd->getOutputSignal(10), 6, 'f', 1)
+            .arg(hose_bp_fwd->getOutputSignal(11), 6, 'f', 3);
+    DebugMsg += QString("B: %1/%2 | U0 %3 f0 %4 I0 %5 | U1 %6 f1 %7 I1 %8 |")
+            .arg(hose_bp_bwd->getConnectedLinesNumber())
+            .arg(hose_bp_fwd->getOutputSignal(5), 1, 'f', 0)
+            .arg(hose_bp_bwd->getOutputSignal(6), 6, 'f', 1)
+            .arg(hose_bp_bwd->getOutputSignal(7), 6, 'f', 1)
+            .arg(hose_bp_bwd->getOutputSignal(8), 6, 'f', 3)
+            .arg(hose_bp_bwd->getOutputSignal(9), 6, 'f', 1)
+            .arg(hose_bp_bwd->getOutputSignal(10), 6, 'f', 1)
+            .arg(hose_bp_bwd->getOutputSignal(11), 6, 'f', 3);
 }
 
 //------------------------------------------------------------------------
@@ -279,11 +298,11 @@ void SimpleCar::stepRegistrator(double t, double dt)
     line += QString("%1;")
             .arg(pBP_temp, 9, 'f', 6);
     line += air_dist->getDebugMsg();
-*/
+
     line += QString("%1;")
             .arg(brakepipe->getPressure(), 7, 'f', 5);
     line += electro_air_dist->getDebugMsg();
-
+*/
     reg->print(line, t, dt);
 }
 
