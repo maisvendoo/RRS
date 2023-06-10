@@ -9,7 +9,7 @@
         <EqReservoirVolume>0.02</EqReservoirVolume>
 
         <!-- Коэффициент утечек из УР -->
-        <k_leek>1.0e-6</k_leek>
+        <k_leak>1.0e-6</k_leak>
 
         <!-- Коэффициент зарядки УР из ГР в I и II положениях -->
         <k_charge>9.0e-4</k_charge>

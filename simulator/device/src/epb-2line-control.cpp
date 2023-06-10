@@ -124,7 +124,7 @@ void EPBControl::step(double t, double dt)
     Q_UNUSED(dt)
 
     // Наличие питания
-    bool is_powered = (U > 0.9 * 50.0);
+    bool is_powered = (U > 0.8 * 50.0);
 
     if (!is_powered)
     {
@@ -139,7 +139,7 @@ void EPBControl::step(double t, double dt)
     }
 
     // Лампы включаются от реле, запитанного от контрольной цепи
-    bool control_relay = (abs(control_U) > 0.9 * 50.0);
+    bool control_relay = (abs(control_U) > 0.8 * 50.0);
     lampRelease = control_relay;
     lampHold = is_hold && control_relay;
     lampBrake = is_brake && control_relay;

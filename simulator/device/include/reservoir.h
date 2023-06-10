@@ -18,7 +18,7 @@ public:
     void setFlow(double value);
 
     /// Задать коэффициент утечек из резервуара в атмосферу
-    void setFlowCoeff(double value);
+    void setLeakCoeff(double value);
 
     /// Давление в резервуаре
     double getPressure() const;
@@ -32,7 +32,7 @@ private:
     double  Q;
 
     /// Коэффициент утечек из резервуара в атмосферу
-    double  k_flow;
+    double  k_leak;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 };

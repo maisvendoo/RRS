@@ -28,82 +28,119 @@ class DEVICE_EXPORT BrakeMech : public Device
 {
 public:
 
-    BrakeMech(QObject *parent = Q_NULLPTR);
+    BrakeMech(size_t axis_num = 4, QObject *parent = Q_NULLPTR);
 
     ~BrakeMech();
 
-    /// Set air flow in/out brake cylinder
+    /// Задать поток воздуха в тормозные цилиндры
     void setBCflow(double value);
 
-    /// Get brake cylinder pressure
+    /// Задать коэффициент утечек из тормозных цилиндров в атмосферу
+    void setLeakCoeff(double value);
+
+    /// Давление в тормозных цилиндрах
     double getBCpressure() const;
 
-    /// Set effective brake radius
-    void setEffFricRadius(double radius);
+    /// Текущий относительный выход штока
+    /// (от 0.0 - отпускное положение до 1.0 - тормозное положение)
+    double getStockOutCoeff() const;
 
-    /// Set wheel diameter
-    void setWheelDiameter(double diameter);
+    /// Текущий выход штока, м
+    double getStockOut() const;
 
-    /// Set current vehicle velocity
-    void setVelocity(double v);
+    /// Текущая относительная сила нажатия на тормозную колодку
+    /// (от 0.0 - нет нажатия до 1.0 - нажатие при максимальном давлении в ТЦ)
+    double getShoeForceCoeff() const;
 
-    /// Get brake torque by one axis
-    double getBrakeTorque() const;
-
+    /// Текущая сила нажатия на тормозную колодку, кгс
     double getShoeForce() const;
+
+    /// Задать число осей в тормозной рычажной передаче
+    void setAxisNum(size_t num);
+
+    /// Задать радиус поверхности катания колёс
+    void setWheelRadius(double value);
+
+    /// Задать эффективный радиус тормозной поверхности
+    /// (радиус поверхности катания колёс или тормозных дисков)
+    void setEffFricRadius(double value);
+
+    /// Задать текущую угловую скорость колёсной пары № idx
+    void setAngularVelocity(size_t idx, double value);
+
+    /// Момент тормозных сил на оси № idx, Н * м
+    double getBrakeTorque(size_t idx) const;
 
 protected:
 
-    /// Number of shoes for one axis
-    int     shoesAxis;
+    /// Число осей в тормозной рычажной передаче
+    size_t  axis_num;
 
-    /// Number of brake cylinders
-    int     cylNum;
+    /// Число тормозных цилиндров в тормозной рычажной передаче
+    int  cyl_num;
 
-    /// Air flow into/from brake cylinders
-    double  Q;
+    /// Диаметр тормозного цилиндра, м
+    double  cyl_d;
 
-    /// Axis brake torque
-    double  brakeTorque;
-
-    /// Dead volume of brake cylinder
-    double  V0;
-
-    /// Area of forcer
+    /// Площадь поршня
     double  S;
 
-    /// Brake cylinder diameter
-    double  cylDiam;
+    /// Максимальный выход штока, м
+    double  stock_out_max;
 
-    ///
-    double  Lmax;
+    /// Текущий относительный выход штока
+    double  stock_out_coeff;
 
-    /// Brake press force
-    double  K;
+    /// Текущий выход штока, м
+    double  stock_out_cur;
 
-    /// Effective radius of friction
-    double  effRadius;
+    /// Мёртвый объём каждого тормозного цилиндра и подводящих к нему труб, м^3
+    double  V0;
 
-    /// Wheel diameter
-    double  wheelDiameter;
+    /// Текущий объём тормозных цилиндров и подводящих труб
+    double  V;
 
-    /// Current vehicle velocity
-    double  velocity;
+    /// Поток в тормозные цилиндры
+    double  Q;
 
-    /// Shoes type (iron/iron-ph/composite)
-    QString shoeType;
-
-    /// Максимальное действительное нажатие на колодку
-    double  Kmax;
-
-    /// Максимальное давление в ТЦ
-    double  p_max;
+    /// Коэффициент утечек из тормозных цилиндров
+    double  k_leak;
 
     /// Давление в ТЦ - начало движения поршня из отпускного положения
     double  p_begin;
 
     /// Давление в ТЦ - окончание движения поршня в тормозное положение
     double  p_end;
+
+    /// Максимальное давление в ТЦ
+    double  p_max;
+
+    /// Максимальное нажатие на колодку (при максимальном давлении), кгс
+    double  Kmax;
+
+    /// Текущая относительная сила нажатия на колодку
+    double  Kcoef;
+
+    /// Текущая сила нажатия на колодку, кгс
+    double  K;
+
+    /// Число колодок на каждой оси
+    int  shoes_per_axis;
+
+    /// Текущие угловые скорости каждой оси
+    std::vector<double>  axis_omega;
+
+    /// Радиус колёс
+    double wheel_r;
+
+    /// Эффективный радиус тормозной поверхности
+    double eff_r;
+
+    /// Тормозной момент на осях
+    std::vector<double>  brake_torque;
+
+    /// Материал колодок: iron/iron-ph/composite (чугун/фосфористый чугун/композит)
+    QString shoeType;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

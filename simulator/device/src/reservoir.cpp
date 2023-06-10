@@ -6,7 +6,7 @@
 Reservoir::Reservoir(double volume, QObject *parent) : BrakeDevice(parent)
     , V(volume)
     , Q(0.0)
-    , k_flow(0.0)
+    , k_leak(0.0)
 {
 
 }
@@ -30,9 +30,9 @@ void Reservoir::setFlow(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Reservoir::setFlowCoeff(double coeff)
+void Reservoir::setLeakCoeff(double coeff)
 {
-    k_flow = coeff;
+    k_leak = coeff;
 }
 
 //------------------------------------------------------------------------------
@@ -50,5 +50,5 @@ void Reservoir::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double
 {
    Q_UNUSED(t)
 
-   dYdt[0] = (Q - k_flow * Y[0]) / V;
+   dYdt[0] = (Q - k_leak * Y[0]) / V;
 }

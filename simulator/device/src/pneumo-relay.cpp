@@ -11,9 +11,9 @@ PneumoRelay::PneumoRelay(double work_volume, QObject *parent) : BrakeDevice(pare
   , QCONTROL(0.0)
   , QFL(0.0)
   , QPIPE(0.0)
-  , K1(0.0)
-  , K2(0.0)
-  , k1(1.0)
+  , K1(1.0e-2)
+  , K2(2.0e-2)
+  , k1(50.0)
 {
 
 }
@@ -110,13 +110,14 @@ void PneumoRelay::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    double s1 = cut(k1 * (Y[0] - pPIPE), -1.0, 1.0);
+    // Условное положение диафрагмы управляющей камеры
+    double s1 = k1 * (Y[0] - pPIPE);
 
     // Поток из питательной магистрали в управляемую
-    double Q_fl_pipe = K1 * (pFL - pPIPE) * hs_p(s1);
+    double Q_fl_pipe = cut(s1, 0.0, K1) * (pFL - pPIPE);
 
     // Разрядка управляемой магистрали в атмосферу
-    double Q_pipe_atm = K2 * pPIPE * hs_n(s1);
+    double Q_pipe_atm = cut(-s1, 0.0, K2) * pPIPE;
 
     // Поток в питательную магистраль
     QFL = - Q_fl_pipe;

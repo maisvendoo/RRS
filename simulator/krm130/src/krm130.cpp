@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------------------------------
 BrakeCrane130::BrakeCrane130(QObject *parent) : BrakeCrane (parent)
-  , k_leek(1.0e-6)
+  , k_leak(1.0e-6)
   , k_charge(1.0e-3)
   , k_stab(4.0e-6)
   , k_Va(1.0e-4)
@@ -124,7 +124,7 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
                                double t)
 {
     // Зарядка УР из ГР в I положении
-    double Q_leek_er = - k_leek * Y[ER_PRESSURE];
+    double Q_leak_er = - k_leak * Y[ER_PRESSURE];
 
     // Зарядка УР из ГР в I положении
     double Q_charge_er = pos[POS_I] * k_charge * (pFL - Y[ER_PRESSURE]);
@@ -165,7 +165,7 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
     QBP = Q_charge_bp + Q_train_bp + Q_brake_bp + Q_emerg_bp;
 
     // Суммарный поток в уравнительный резервуар
-    setERflow(Q_leek_er + Q_charge_er + Q_train_er + Q_stab_er + Q_brake_er);
+    setERflow(Q_leak_er + Q_charge_er + Q_train_er + Q_stab_er + Q_brake_er);
 
     BrakeCrane::ode_system(Y, dYdt, t);
 }
@@ -182,7 +182,7 @@ void BrakeCrane130::load_config(CfgReader &cfg)
     if (tmp > 0.0)
         Ver = tmp;
 
-    cfg.getDouble(secName, "k_leek", k_leek);
+    cfg.getDouble(secName, "k_leak", k_leak);
     cfg.getDouble(secName, "k_charge", k_charge);
     cfg.getDouble(secName, "k_stab", k_stab);
     cfg.getDouble(secName, "k_Va", k_Va);

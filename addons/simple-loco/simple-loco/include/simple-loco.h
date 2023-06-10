@@ -60,11 +60,20 @@ private:
     /// Электровоздухораспределитель
     ElectroAirDistributor  *electro_air_dist;
 
+    /// Резервуар импульсной магистрали (ложный тормозной цилиндр)
+    Reservoir   *impulse_line;
+
     /// Переключательный клапан магистрали тормозных цилиндров
     SwitchingValve  *bc_switch_valve;
 
-    /// Тормозной цилиндр
-    Reservoir   *brake_cylinder;
+    /// Повторительное реле давления
+    PneumoRelay   *pressure_relay;
+
+    /// Тормозная рычажная передача передней тележки
+    BrakeMech   *brake_mech_fwd;
+
+    /// Тормозная рычажная передача задней тележки
+    BrakeMech   *brake_mech_bwd;
 
     /// Запасный резервуар
     Reservoir   *supply_reservoir;

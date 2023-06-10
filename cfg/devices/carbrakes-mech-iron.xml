@@ -30,7 +30,7 @@
         <pMax>0.4</pMax>
 
         <!-- Максимальное нажатие на колодку (при максимальном давлении), кгс -->
-        <Kmax>1.03</Kmax>
+        <Kmax>2.35</Kmax>
 
         <!-- Число колодок на каждой оси -->
         <ShoesAxis>4</ShoesAxis>
@@ -39,7 +39,7 @@
         <!-- <EffRadius>0.475</EffRadius> -->
 
         <!-- Материал колодок: iron/iron-ph/composite (чугун/фосфористый чугун/композит) -->
-        <ShoeType>composite</ShoeType>
+        <ShoeType>iron</ShoeType>
 
         <!-- Начальное давление в тормозных цилиндрах -->
         <InitPressure>0.0</InitPressure>

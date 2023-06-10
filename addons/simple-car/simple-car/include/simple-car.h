@@ -35,8 +35,8 @@ private:
     /// Электровоздухораспределитель
     ElectroAirDistributor  *electro_air_dist;
 
-    /// Тормозной цилиндр
-    Reservoir   *brake_cylinder;
+    /// Тормозная рычажная передача
+    BrakeMech   *brake_mech;
 
     /// Запасный резервуар
     Reservoir   *supply_reservoir;

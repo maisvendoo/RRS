@@ -45,7 +45,7 @@ public:
 private:
 
     /// Коэффициент утечек из УР
-    double k_leek;
+    double k_leak;
 
     /// Коэффициент зарядки УР из ГР в I и II положениях
     double k_charge;

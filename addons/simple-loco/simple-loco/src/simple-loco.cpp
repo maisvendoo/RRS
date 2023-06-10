@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------------------------
 SimpleLoco::SimpleLoco(QObject *parent) : Vehicle (parent)
-  , U_bat(55.0)
+  , U_bat(0.0)
   , pBP_prev(0.5)
   , pBP_temp(0.0)
 {
@@ -104,7 +104,7 @@ void SimpleLoco::initPneumatics()
     connect(motor_compressor, &ACMotorCompressor::soundSetPitch, this, &SimpleLoco::soundSetPitch);
 
     main_reservoir = new Reservoir(1.2);
-    main_reservoir->setFlowCoeff(2e-5);
+    main_reservoir->setLeakCoeff(1e-6);
 
     brake_lock = new BrakeLock();
     brake_lock->read_config("ubt367m");
@@ -124,10 +124,12 @@ void SimpleLoco::initPneumatics()
     // Тормозная магистраль
     double volume_bp = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
     brakepipe = new Reservoir(volume_bp);
-    brakepipe->setFlowCoeff(5e-6);
+    brakepipe->setLeakCoeff(3e-6);
 
     air_dist = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
     air_dist->read_config("vr242");
+
+    impulse_line = new Reservoir(0.008);
 
     electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
     electro_air_dist->read_config("evr305");
@@ -135,9 +137,20 @@ void SimpleLoco::initPneumatics()
     bc_switch_valve = new SwitchingValve();
     bc_switch_valve->read_config("zpk");
 
-    brake_cylinder = new Reservoir(0.015);
+    pressure_relay = new PneumoRelay();
+    pressure_relay->read_config("rd304");
 
-    supply_reservoir = new Reservoir(0.078);
+    brake_mech_fwd = new BrakeMech(3);
+    brake_mech_fwd->read_custom_config(config_dir + QDir::separator() + "fwd-trolley-brake-mech");
+    brake_mech_fwd->setWheelRadius(rk[0]);
+    brake_mech_fwd->setEffFricRadius(rk[0]);
+    brake_mech_bwd = new BrakeMech(3);
+    brake_mech_bwd->read_custom_config(config_dir + QDir::separator() + "bwd-trolley-brake-mech");
+    brake_mech_bwd->setWheelRadius(rk[0]);
+    brake_mech_bwd->setEffFricRadius(rk[0]);
+
+    supply_reservoir = new Reservoir(0.055);
+    supply_reservoir->setLeakCoeff(1e-6);
 
     // Концевые краны
     anglecock_bp_fwd = new PneumoAngleCock();
@@ -187,6 +200,14 @@ void SimpleLoco::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------
 void SimpleLoco::keyProcess()
 {
+    if (getKeyState(KEY_V))
+    {
+        if (isShift())
+            U_bat = 55.0;
+        else
+            U_bat = 0.0;
+    }
+
     if (getKeyState(KEY_1))
         debug_num = 1;
     if (getKeyState(KEY_2))
@@ -214,6 +235,10 @@ void SimpleLoco::step(double t, double dt)
 {
     pBP_temp = (brakepipe->getPressure() - pBP_prev) / dt;
     pBP_prev = brakepipe->getPressure();
+
+    brake_mech_fwd->setAngularVelocity(0, 0.0);
+    brake_mech_fwd->setAngularVelocity(1, 1.0);
+    brake_mech_fwd->setAngularVelocity(2, 8.0);
 
     stepPneumatics(t, dt);
 
@@ -244,12 +269,14 @@ void SimpleLoco::stepPneumatics(double t, double dt)
     double FL_flow = 0.0;
     FL_flow += motor_compressor->getFLflow();
     FL_flow += brake_lock->getFLflow();
+    FL_flow += pressure_relay->getFLflow();
     main_reservoir->setFlow(FL_flow);
     main_reservoir->step(t, dt);
 
     brake_lock->setFLpressure(main_reservoir->getPressure());
     brake_lock->setBPpressure(brakepipe->getPressure());
-    brake_lock->setBCpressure(bc_switch_valve->getPressure2());
+//    brake_lock->setBCpressure(bc_switch_valve->getPressure2());
+    brake_lock->setBCpressure(brake_mech_fwd->getBCpressure());
     brake_lock->setCraneFLflow(brake_crane->getFLflow() + loco_crane->getFLflow());
     brake_lock->setCraneBPflow(brake_crane->getBPflow());
     brake_lock->setCraneBCflow(loco_crane->getBCflow());
@@ -263,7 +290,7 @@ void SimpleLoco::stepPneumatics(double t, double dt)
 
     loco_crane->setFLpressure(brake_lock->getCraneFLpressure());
     loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
-    loco_crane->setILpressure(0.0);
+    loco_crane->setILpressure(impulse_line->getPressure());
     loco_crane->setControl(keys);
     loco_crane->step(t, dt);
 
@@ -282,17 +309,28 @@ void SimpleLoco::stepPneumatics(double t, double dt)
 
     electro_air_dist->setAirdistBCflow(air_dist->getBCflow());
     electro_air_dist->setAirdistSRflow(air_dist->getSRflow());
-    electro_air_dist->setBCpressure(bc_switch_valve->getPressure1());
+    electro_air_dist->setBCpressure(impulse_line->getPressure());
     electro_air_dist->setSRpressure(supply_reservoir->getPressure());
     electro_air_dist->step(t, dt);
 
+    impulse_line->setFlow(electro_air_dist->getBCflow() + loco_crane->getILflow());
+    impulse_line->step(t, dt);
+/*
     bc_switch_valve->setInputFlow1(electro_air_dist->getBCflow());
     bc_switch_valve->setInputFlow2(brake_lock->getBCflow());
-    bc_switch_valve->setOutputPressure(brake_cylinder->getPressure());
+    bc_switch_valve->setOutputPressure(brake_cylinder->getBCpressure());
     bc_switch_valve->step(t, dt);
+*/
+    pressure_relay->setFLpressure(main_reservoir->getPressure());
+    pressure_relay->setControlPressure(brake_mech_fwd->getBCpressure());
+    pressure_relay->setPipePressure(brake_mech_bwd->getBCpressure());
+    pressure_relay->step(t, dt);
 
-    brake_cylinder->setFlow(bc_switch_valve->getOutputFlow());
-    brake_cylinder->step(t, dt);
+    brake_mech_fwd->setBCflow(brake_lock->getBCflow());
+    brake_mech_fwd->step(t, dt);
+
+    brake_mech_bwd->setBCflow(pressure_relay->getPipeFlow());
+    brake_mech_bwd->step(t, dt);
 
     supply_reservoir->setFlow(electro_air_dist->getSRflow());
     supply_reservoir->step(t, dt);
@@ -387,7 +425,7 @@ void SimpleLoco::stepSignalsOutput()
     // Манометр уравнительного резервуара
     analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getERpressure() / 1.0);
     // Манометр давления в ТЦ
-    analogSignal[STRELKA_M_TC] = static_cast<float>(brake_cylinder->getPressure() / 1.0);
+    analogSignal[STRELKA_M_TC] = static_cast<float>(brake_mech_fwd->getBCpressure() / 1.0);
 
     // Лампы контроля ЭПТ
     analogSignal[SIG_LIGHT_O] = epb_controller->stateReleaseLamp();
@@ -458,7 +496,7 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(brakepipe->getPressure(), 7, 'f', 5)
                 .arg(supply_reservoir->getPressure(), 7, 'f', 5)
                 .arg(1000*air_dist->getSRflow(), 9, 'f', 7)
-                .arg(brake_cylinder->getPressure(), 7, 'f', 5)
+                .arg(brake_mech_fwd->getBCpressure(), 7, 'f', 5)
                 .arg(bc_switch_valve->getPressure1(), 7, 'f', 5)
                 .arg(bc_switch_valve->getPressure2(), 7, 'f', 5)
                 .arg(1000*bc_switch_valve->getOutputFlow(), 9, 'f', 7)
@@ -477,7 +515,7 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(1000*anglecock_bp_fwd->getFlowToPipe(), 10, 'f', 7)
                 .arg(1000*air_dist->getBPflow(), 10, 'f', 7)
                 .arg(1000*anglecock_bp_bwd->getFlowToPipe(), 10, 'f', 7)
-                .arg(brake_cylinder->getPressure(), 8, 'f', 5)
+                .arg(brake_mech_fwd->getBCpressure(), 8, 'f', 5)
                 .arg(supply_reservoir->getPressure(), 8, 'f', 5)
                 .arg(anglecock_bp_bwd->isOpened())
                 .arg(hose_bp_bwd->isLinked())
@@ -508,6 +546,20 @@ void SimpleLoco::stepDebugMsg(double t, double dt)
                 .arg(epb_controller->stateReleaseLamp())
                 .arg(epb_controller->stateHoldLamp())
                 .arg(epb_controller->stateBrakeLamp());
+        break;
+    }
+    case 7:
+    {
+        DebugMsg += QString("BrakeMech: pIL %1 pBCf %2 pBCb %3 |F: StockOut %4 (%5) | ShoeForce %6 | w=0.0 Mr=%7 | w=1.0 Mr=%8 | w=8.0 Mr=%9")
+                .arg(impulse_line->getPressure(), 8, 'f', 5)
+                .arg(brake_mech_fwd->getBCpressure(), 8, 'f', 5)
+                .arg(brake_mech_bwd->getBCpressure(), 8, 'f', 5)
+                .arg(brake_mech_fwd->getStockOut(), 5, 'f', 3)
+                .arg(brake_mech_fwd->getStockOutCoeff(), 4, 'f', 2)
+                .arg(brake_mech_fwd->getShoeForce(), 12, 'f', 3)
+                .arg(brake_mech_fwd->getBrakeTorque(0), 12, 'f', 5)
+                .arg(brake_mech_fwd->getBrakeTorque(1), 12, 'f', 5)
+                .arg(brake_mech_fwd->getBrakeTorque(2), 12, 'f', 5);
         break;
     }
     }
