@@ -55,7 +55,7 @@ private:
 
     enum
     {
-        NUM_COEFFS = 5
+        NUM_COEFFS = 4
     };
 
     std::array<double, NUM_COEFFS> K;

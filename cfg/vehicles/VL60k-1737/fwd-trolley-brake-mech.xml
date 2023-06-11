@@ -5,15 +5,44 @@
         <SubStepNum>1</SubStepNum>
         <Solver>euler</Solver>
 
-        <ShoeType>iron</ShoeType>
-        <ShoesCyl>6</ShoesCyl>
+        <!-- Число тормозных цилиндров в тормозной рычажной передаче -->
+        <CylindersNum>2</CylindersNum>
+
+        <!-- Диаметр тормозного цилиндра, м -->
+        <CylindersDiameter>0.356</CylindersDiameter>
+
+        <!-- Максимальный выход штока, м -->
+        <StockOut>0.08</StockOut>
+
+        <!-- Мёртвый объём тормозных цилиндров и подводящих труб, м^3 -->
+        <DeadVolume>1.0e-3</DeadVolume>
+
+        <!-- Коэффициент утечек из тормозных цилиндров -->
+        <kLeak>1.0e-6</kLeak>
+
+        <!-- Давление в ТЦ - начало движения поршня из отпускного положения -->
+        <pBegin>0.02</pBegin>
+
+        <!-- Давление в ТЦ - окончание движения поршня в тормозное положение -->
+        <pEnd>0.04</pEnd>
+
+        <!-- Максимальное давление в ТЦ -->
+        <pMax>0.4</pMax>
+
+        <!-- Максимальное нажатие на колодку (при максимальном давлении), тс -->
+        <Kmax>3.0</Kmax>
+
+        <!-- Число колодок на каждой оси -->
         <ShoesAxis>4</ShoesAxis>
-        <CylNum>2</CylNum>
-        <DeadVolume>0.0</DeadVolume>
-        <CylinderDiameter>0.356</CylinderDiameter>
-        <MechCoeff>4.7</MechCoeff>
-        <StockOut>0.1</StockOut>
-        <SpringForce>1649.0</SpringForce>
+
+        <!-- Эффективный радиус тормозной поверхности (радиус поверхности катания колёс или тормозных дисков) -->
+        <!-- <EffRadius>0.618</EffRadius> -->
+
+        <!-- Материал колодок: iron/iron-ph/composite (чугун/фосфористый чугун/композит) -->
+        <ShoeType>iron</ShoeType>
+
+        <!-- Начальное давление в тормозных цилиндрах -->
         <InitPressure>0.0</InitPressure>
+
     </Device>
 </Config>

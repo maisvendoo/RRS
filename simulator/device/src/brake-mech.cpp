@@ -174,7 +174,7 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
     // Если шток вышел полностью - считаем тормозное нажатие
     if ((Y[0] - p_end) > Physics::ZERO)
     {
-        // Вычисляем нажатие на одну колодку (кгс)
+        // Вычисляем нажатие на одну колодку (тс)
         Kcoef = (Y[0] - p_end) / (p_max - p_end);
         K = Kcoef * Kmax;
 
@@ -219,7 +219,7 @@ void BrakeMech::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "DeadVolume", tmp);
     if (tmp > 1e-3)
         V0 = tmp;
-    V = (V0 + S * stock_out_max) * cyl_num;
+    V = V0 + S * stock_out_max * cyl_num;
 
     cfg.getDouble(secName, "kLeak", k_leak);
 

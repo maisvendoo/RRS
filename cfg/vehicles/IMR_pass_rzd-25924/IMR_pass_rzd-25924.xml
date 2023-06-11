@@ -14,11 +14,25 @@
 
         <ExtModelName>IMR_pass_rzd/Pass_TVZ_61-826-kvr.osgt</ExtModelName>
 
-        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+        <BrakepipeLeak>3e-6</BrakepipeLeak>
 
         <AirDistModule>vr242</AirDistModule>
         <AirDistConfig>vr242</AirDistConfig>
+
+        <ElectroAirDistModule>evr305</ElectroAirDistModule>
+        <ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+
+        <SupplyReservoirVolume>0.078</SupplyReservoirVolume>
+        <SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
+
+        <BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
+
+        <BrakepipeHoseModule>hose369a</BrakepipeHoseModule>
+        <BrakepipeHoseConfig>pneumo-hose-BP369a-passcar</BrakepipeHoseConfig>
+
+        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+
+        <GenReductorCoeff>2.96</GenReductorCoeff>
 
     </Vehicle>
 </Config>

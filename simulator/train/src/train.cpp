@@ -646,9 +646,9 @@ bool Train::loadJoints()
         if ((cons_fwd->empty()) || (cons_bwd->empty()))
         {
             joints_list.push_back(joints);
-            Journal::instance()->warning(QString("#%1 and #%2 have no connectors. Created empty array of joints.")
-                                      .arg(i)
-                                      .arg(i + 1));
+            Journal::instance()->warning(QString("#%1 or #%2 have no connectors. Created empty array of joints.")
+                                      .arg(i - 1)
+                                      .arg(i));
             continue;
         }
 
@@ -685,22 +685,24 @@ bool Train::loadJoints()
                     continue;
 
                 loadJointModule(con_fwd, con_bwd, joints);
-                break;
+
+                if (con_fwd->isLinked())
+                    break;
             }
         }
 
         if (joints.empty())
         {
             Journal::instance()->warning(QString("No joints beetween #%1 and #%2. Created empty array of joints.")
-                                         .arg(i)
-                                         .arg(i + 1));
+                                         .arg(i - 1)
+                                         .arg(i));
         }
         else
         {
             Journal::instance()->info(QString("Created %1 joints beetween #%2 and #%3")
                                       .arg(joints.size())
-                                      .arg(i)
-                                      .arg(i + 1));
+                                      .arg(i - 1)
+                                      .arg(i));
         }
 
         // Add joints array to list of all joints

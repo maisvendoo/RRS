@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-//		Passagire's carrige model for RRS
+//		Passenger's car model for RRS
 //		(c) maisvendoo, 16/02/2019
 //
 //------------------------------------------------------------------------------
@@ -9,42 +9,61 @@
 
 #include    <QMap>
 
-#include    "vehicle.h"
-#include    "brake-mech.h"
-#include    "reservoir.h"
-#include    "airdistributor.h"
-#include    "electro-airdistributor.h"
+#include    "vehicle-api.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class PassCarrige : public Vehicle
+class PassCar : public Vehicle
 {
 public:
 
-    PassCarrige();
+    PassCar();
 
-    ~PassCarrige();    
+    ~PassCar();
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
 
-    BrakeMech   *brake_mech;
-    Reservoir   *supply_reservoir;
+    /// Тормозная магистраль
+    Reservoir   *brakepipe;
+    double      bp_leak;
 
-    QString     brake_mech_module;
+    /// Воздухораспределитель
+    AirDistributor  *air_dist;
+    QString     air_dist_module;
+    QString     air_dist_config;
+
+    /// Электровоздухораспределитель
+    ElectroAirDistributor   *electro_air_dist;
+    QString     electro_air_dist_module;
+    QString     electro_air_dist_config;
+
+    /// Запасный резервуар
+    Reservoir   *supply_reservoir;
+    double      sr_volume;
+    double      sr_leak;
+
+    /// Концевой кран тормозной магистрали спереди
+    PneumoAngleCock *anglecock_bp_fwd;
+    /// Концевой кран тормозной магистрали сзади
+    PneumoAngleCock *anglecock_bp_bwd;
+    QString     anglecock_bp_config;
+
+    /// Рукав тормозной магистрали спереди
+    PneumoHoseEPB   *hose_bp_fwd;
+    /// Рукав тормозной магистрали сзади
+    PneumoHoseEPB   *hose_bp_bwd;
+    QString     hose_bp_module;
+    QString     hose_bp_config;
+
+    /// Тормозная рычажная передача
+    BrakeMech   *brake_mech;
     QString     brake_mech_config;
 
-    AirDistributor *airdist;
-
-    QString     airdist_module;
-    QString     airdist_config;   
-
-    ElectroAirDistributor *electroAirDist;
-
-    QString     electro_airdist_module;
-    QString     electro_airdist_config;
+    /// Передаточное число редуктора в подвагонном электрогенераторе
+    double ip;
 
     QString     soundDir;
 
@@ -52,15 +71,29 @@ private:
 
     void initialization();
 
+    /// Инициализация тормозного оборудования
+    void initBrakesEquipment(QString modules_dir);
+
+    /// Инициализация ЭПТ
+    void initEPB(QString modules_dir);
+
     void step(double t, double dt);
 
+    /// Моделирование тормозного оборудования
+    void stepBrakesEquipment(double t, double dt);
+
+    /// Моделирование ЭПТ
+    void stepEPB(double t, double dt);
+
+    /// Сигналы для анимации
     void stepSignalsOutput();
+
+    /// Отладочная строка
+    void stepDebugMsg(double t, double dt);
 
     void keyProcess();
 
     void loadConfig(QString cfg_path);
-
-    void initEPT();
 
     void initSounds();
 
@@ -69,8 +102,6 @@ private:
     void getSoundList();
 
     void playPasscarSound(QString sound_name);
-
-    void stepEPT(double t, double dt);
 };
 
 #endif // PASSCAR_H

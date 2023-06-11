@@ -50,6 +50,8 @@ void Rectifier::setI_out(double value)
 //------------------------------------------------------------------------------
 void Rectifier::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
     U_out = coeff * U_in - r * I_out;
 }
 
@@ -60,7 +62,9 @@ void Rectifier::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)
 {
-
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
 }
 
 void Rectifier::load_config(CfgReader &cfg)

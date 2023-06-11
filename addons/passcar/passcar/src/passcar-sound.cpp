@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 // Инициализация звуков, воспроизведение их на нулевой громкости
 //------------------------------------------------------------------------------
-void PassCarrige::initSounds()
+void PassCar::initSounds()
 {
     getSoundList();
 }
@@ -14,7 +14,7 @@ void PassCarrige::initSounds()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCarrige::soundStep()
+void PassCar::soundStep()
 {
     double speed = velocity * 3.6;
     QMap<int, QString>::const_iterator i = sounds.constBegin();
@@ -36,7 +36,7 @@ void PassCarrige::soundStep()
     playPasscarSound(soundPlay);
 }
 
-void PassCarrige::getSoundList()
+void PassCar::getSoundList()
 {
     sounds.insert(5, "passcar_5_10");
     sounds.insert(10, "passcar_10_15");
@@ -53,7 +53,7 @@ void PassCarrige::getSoundList()
     sounds.insert(120, "passcar_120_140");
 }
 
-void PassCarrige::playPasscarSound(QString sound_name)
+void PassCar::playPasscarSound(QString sound_name)
 {
     QMap<int, QString>::const_iterator i = sounds.constBegin();
     int volume;

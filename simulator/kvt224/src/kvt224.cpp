@@ -67,20 +67,17 @@ void LocoCrane224::ode_system(const state_vector_t &Y,
     Q_UNUSED(t)
 
     // Давление, задаваемое поворотом рукоятки
-    double p_handle = K[3] * pf(pos);
+    double p_handle = k[1] * pf(pos);
 
     // Давление, задаваемое уравнительным органом крана
     double p_ur = max(p_handle, Y[P3_PRESSURE]);
-
-    double dp_ur = k[1] * (p_ur - pBC);
-    double u_fl = cut(pf(dp_ur), 0.0, 1.0);
-    double u_atm = cut(nf(dp_ur), 0.0, 1.0);
+    double dp_ur = k[2] * (p_ur - pBC);
 
     // Поток из питательной магистрали в магистраль тормозных цилиндров
-    double Q_fl_bc = K[1] * u_fl * (pFL - pBC);
+    double Q_fl_bc = cut(dp_ur, 0.0, K[1]) * (pFL - pBC);
 
     // Разрядка магистрали тормозных цилиндров в атмосферу
-    double Q_bc_atm = K[2] * u_atm * pBC;
+    double Q_bc_atm = cut(-dp_ur, 0.0, K[2]) * pBC;
 
     // Работа повторительной схемы
     double dp_1 = pIL - Y[P1_PRESSURE];
@@ -88,13 +85,13 @@ void LocoCrane224::ode_system(const state_vector_t &Y,
     double u_release = hs_n(pos) + is_release;
 
     // Наполнение камеры над переключательным поршнем из импульсной магистрали
-    double Q_il_1 = K[5] * dp_1 * u_switch;
+    double Q_il_1 = K[3] * dp_1 * u_switch;
 
     // Разрядка камеры над переключательным поршнем в атмосферу
-    double Q_1_atm = K[6] * Y[P1_PRESSURE] * u_release;
+    double Q_1_atm = K[4] * Y[P1_PRESSURE] * u_release;
 
     // Поток из камеры над переключательным поршнем в межпоршневое пространство
-    double Q_1_3 = K[7] * (Y[P1_PRESSURE] - Y[P3_PRESSURE]);
+    double Q_1_3 = K[5] * (Y[P1_PRESSURE] - Y[P3_PRESSURE]);
 
     // Поток в питательную магистраль
     QFL = - Q_fl_bc;
@@ -132,10 +129,7 @@ void LocoCrane224::load_config(CfgReader &cfg)
     }
 
     cfg.getDouble(secName, "V1", V1);
-//    cfg.getDouble(secName, "V2", V1);
     cfg.getDouble(secName, "Vpz", V3);
-
-//    cfg.getDouble(secName, "delta_p", delta_p);
 
     cfg.getDouble(secName, "ps", p_switch);
 

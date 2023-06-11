@@ -16,7 +16,7 @@ EVR305::EVR305(QObject *parent)
     valves_num = VALVES_NUM;
     setValvesNumber(valves_num);
 
-    zpk = new SwitchingValve();
+    zpk = new SwitchingValve(2e-3, 2e-3);
 }
 
 //------------------------------------------------------------------------------

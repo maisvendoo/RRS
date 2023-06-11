@@ -14,11 +14,19 @@
 
         <ExtModelName>FrWag_hopper_1/Fr_hopper-1.osgt</ExtModelName>
 
-        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+        <BrakepipeLeak>3e-6</BrakepipeLeak>
 
         <AirDistModule>vr242</AirDistModule>
         <AirDistConfig>vr242</AirDistConfig>
+
+        <SupplyReservoirVolume>0.078</SupplyReservoirVolume>
+        <SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
+
+        <BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
+
+        <BrakepipeHoseConfig>pneumo-hose-BP</BrakepipeHoseConfig>
+
+        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
     </Vehicle>
 </Config>

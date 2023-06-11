@@ -11,8 +11,8 @@ enum
     P1_PRESSURE = 0, ///< Давление над переключательным поршнем
     P3_PRESSURE = 1, ///< Давление в межпоршневом пространстве и камере 0.3 литра
 
-    MAX_FLOW_COEFFS = 10,
-    MAX_GIAN_COEFFS = 10,
+    MAX_FLOW_COEFFS = 6,
+    MAX_GIAN_COEFFS = 3,
     NUM_STEPS = 5
 };
 

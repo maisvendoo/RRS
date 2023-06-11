@@ -170,7 +170,7 @@ void PneumoHoseEPB::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "FlowCoefficient", tmp);
     output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
 
-    int num = 1;
+    int num = 0;
     cfg.getInt(secName, "LinesNum", num);
     if (num > 0)
         setLinesNumber(static_cast<size_t>(num));

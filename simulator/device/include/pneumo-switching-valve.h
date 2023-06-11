@@ -7,7 +7,9 @@ class DEVICE_EXPORT SwitchingValve : public BrakeDevice
 {
 public:
 
-    SwitchingValve(double working_volume = 2e-3, QObject *parent = Q_NULLPTR);
+    SwitchingValve(double working_volume_1 = 1e-3,
+                   double working_volume_2 = 1e-3,
+                   QObject *parent = Q_NULLPTR);
 
     virtual ~SwitchingValve();
 
@@ -31,8 +33,10 @@ public:
 
 protected:
 
-    /// Объём рабочих камер
-    double V0;
+    /// Объём рабочей камеры 1
+    double V1;
+    /// Объём рабочей камеры 2
+    double V2;
 
     double pOUT;
 
@@ -42,11 +46,7 @@ protected:
 
     double K1;
 
-    double K2;
-
     double A1;
-
-    double k;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
