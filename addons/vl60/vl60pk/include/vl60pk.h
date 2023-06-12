@@ -63,6 +63,7 @@ private:
     /// Список звуков перестука
     QList<QString> tap_sounds;
 
+    /// Напряжение аккумуляторной батареи
     double  U_bat;
 
     float   pant1_pos;

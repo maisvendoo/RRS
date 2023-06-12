@@ -17,6 +17,7 @@ void EnergyCounter::ode_system(const state_vector_t &Y,
                                state_vector_t &dYdt,
                                double t)
 {
+    Q_UNUSED(Y)
     Q_UNUSED(t)
 
     dYdt[0] = P_ks / 3600.0 / 1000.0;

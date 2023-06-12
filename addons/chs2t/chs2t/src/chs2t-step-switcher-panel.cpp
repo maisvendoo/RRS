@@ -41,7 +41,7 @@ void setTriggerState(Trigger &trig, signal_t signal)
 void CHS2T::stepSwitcherPanel()
 {
     // Верхнаяя половина приборной панели
-    setTriggerState(eptSwitch, control_signals.analogSignal[SWP1_EPT]);
+    setTriggerState(epb_switch, control_signals.analogSignal[SWP1_EPT]);
     setSwitcherState(mk_switcher[0], control_signals.analogSignal[SWP1_MK1]);
     setSwitcherState(fastSwitchSw, control_signals.analogSignal[SWP1_BV]);
     setSwitcherState(pantoSwitcher[0], control_signals.analogSignal[SWP1_TP1]);

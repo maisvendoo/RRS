@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 void CHS2T::initPantographs()
 {
-    Journal::instance()->info("Init pantographs");
+    //Journal::instance()->info("Init pantographs");
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
@@ -32,25 +32,11 @@ void CHS2T::initPantographs()
 }
 
 //------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::initBrakesMech()
-{
-    Journal::instance()->info("Init brake mechanics");
-
-    brakesMech[0] = new CHS2tBrakeMech();
-    brakesMech[0]->read_custom_config(config_dir + QDir::separator() + "brake-mech-front");
-
-    brakesMech[1] = new CHS2tBrakeMech();
-    brakesMech[1]->read_custom_config(config_dir + QDir::separator() + "brake-mech-back");
-}
-
-//------------------------------------------------------------------------------
 // Инициализация быстродействующего выключателя
 //------------------------------------------------------------------------------
 void CHS2T::initFastSwitch()
 {
-    Journal::instance()->info("Init fast switch");
+    //Journal::instance()->info("Init fast switch");
 
     bv = new ProtectiveDevice();
     bv->read_custom_config(config_dir + QDir::separator() + "bv");
@@ -66,7 +52,7 @@ void CHS2T::initFastSwitch()
 //------------------------------------------------------------------------------
 void CHS2T::initProtection()
 {
-    Journal::instance()->info("Init protection devices");
+    //Journal::instance()->info("Init protection devices");
 
     overload_relay = new OverloadRelay();
     overload_relay->read_custom_config(config_dir + QDir::separator() + "1RPD6");
@@ -75,64 +61,9 @@ void CHS2T::initProtection()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS2T::initBrakesControl(QString module_path)
-{
-    Journal::instance()->info("Init brake control devices");
-
-    brakeCrane = loadBrakeCrane(module_path + QDir::separator() + "krm395");
-    brakeCrane->read_config("krm395");
-    connect(brakeCrane, &BrakeCrane::soundPlay, this, &CHS2T::soundPlay);
-    connect(brakeCrane, &BrakeCrane::soundSetVolume, this, &CHS2T::soundSetVolume);
-
-    locoCrane = loadLocoCrane(module_path + QDir::separator() + "kvt254");
-    locoCrane->read_config("kvt254");
-    connect(locoCrane, &LocoCrane::soundPlay, this, &CHS2T::soundPlay);
-    connect(locoCrane, &LocoCrane::soundSetVolume, this, &CHS2T::soundSetVolume);
-    connect(locoCrane, &LocoCrane::soundPlay, this, &CHS2T::soundPlay);
-
-    handleEDT = new HandleEDT();
-    handleEDT->read_custom_config(config_dir + QDir::separator() + "handle-edt");
-    handleEDT->setBrakeKey(KEY_Period);
-    handleEDT->setReleaseKey(KEY_Comma);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::initAirSupplySubsystem()
-{
-    Journal::instance()->info("Init air suplly subsystem");
-
-    mainReservoir = new Reservoir(1);
-    spareReservoir = new Reservoir(0.078);
-    brakeRefRes = new Reservoir(0.004);
-
-    for (size_t i = 0; i < motor_compressor.size(); ++i)
-    {
-        motor_compressor[i] = new DCMotorCompressor();
-        motor_compressor[i]->read_custom_config(config_dir + QDir::separator() + "motor-compressor");
-        connect(motor_compressor[i], &DCMotorCompressor::soundPlay, this, &CHS2T::soundPlay);
-        connect(motor_compressor[i], &DCMotorCompressor::soundStop, this, &CHS2T::soundStop);
-
-        motor_compressor[i]->setSoundName(QString("kompressor%1").arg(i+1));
-
-        mk_switcher[i] = new CHS2TSwitcher(Q_NULLPTR, 0, 4);
-        mk_switcher[i]->setSoundName("tumbler");
-        connect(mk_switcher[i], &Switcher::soundPlay, this, &CHS2T::soundPlay);
-    }
-
-    mk_switcher[0]->setKeyCode(KEY_7);
-    mk_switcher[1]->setKeyCode(KEY_8);
-
-    pressReg = new PressureRegulator();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void CHS2T::initTractionControl()
 {
-    Journal::instance()->info("Init traction control");
+    //Journal::instance()->info("Init traction control");
 
     km21KR2 = new Km21KR2();
     connect(km21KR2, &Km21KR2::soundPlay, this, &CHS2T::soundPlay);
@@ -153,43 +84,9 @@ void CHS2T::initTractionControl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS2T::initBrakesEquipment(QString module_path)
-{
-    Journal::instance()->info("Init brakes equipment");
-
-    dako = new Dako();
-    dako->read_custom_config(config_dir + QDir::separator() + "dako");
-
-    electroAirDistr = loadElectroAirDistributor(module_path + QDir::separator() + "evr305");
-    electroAirDistr->read_config("evr305");
-
-    airDistr = loadAirDistributor(module_path + QDir::separator() + "vr242");
-    airDistr->read_config("vr242");
-
-    autoTrainStop = loadAutoTrainStop(module_path + QDir::separator() + "epk150");
-    autoTrainStop->read_config("epk150");
-    connect(autoTrainStop, &AutoTrainStop::soundPlay, this, &CHS2T::soundPlay);
-    connect(autoTrainStop, &AutoTrainStop::soundStop, this, &CHS2T::soundStop);
-
-    zpk = new SwitchingValve();
-    zpk->read_config("zpk");
-
-    rd304 = new PneumoReley();
-    rd304->read_config("rd304");
-
-    pnSplit = new PneumoSplitter();
-    pnSplit->read_config("pneumo-splitter");
-
-    airSplit = new PneumoSplitter();
-    airSplit->read_config("pneumo-splitter");
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void CHS2T::initEDT()
 {
-    Journal::instance()->info("Init electrical brake system");
+    //Journal::instance()->info("Init electrical brake system");
 
     generator = new Generator();
     generator->setCustomConfigDir(config_dir);
@@ -212,11 +109,11 @@ void CHS2T::initEDT()
 //------------------------------------------------------------------------------
 void CHS2T::initOtherEquipment()
 {
-    Journal::instance()->info("Init whistle and typhoid");
+    //Journal::instance()->info("Init whistle and typhoid");
 
-    horn = new CHS2tHorn();
-    connect(horn, &CHS2tHorn::soundPlay, this, &CHS2T::soundPlay);
-    connect(horn, &CHS2tHorn::soundStop, this, &CHS2T::soundStop);
+    horn = new TrainHorn();
+    connect(horn, &TrainHorn::soundPlay, this, &CHS2T::soundPlay);
+    connect(horn, &TrainHorn::soundStop, this, &CHS2T::soundStop);
 
     speed_meter = new SL2M();
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
@@ -230,10 +127,7 @@ void CHS2T::initOtherEquipment()
 //------------------------------------------------------------------------------
 void CHS2T::initSupportEquipment()
 {
-    Journal::instance()->info("Init support equipment");
-
-    relValve = new ReleaseValve();
-    relValve->read_custom_config(config_dir + QDir::separator() + "release-valve");
+    //Journal::instance()->info("Init support equipment");
 
     motor_fan_ptr = new DCMotorFan();
     motor_fan_ptr->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan");
@@ -272,7 +166,7 @@ void CHS2T::initSupportEquipment()
 //------------------------------------------------------------------------------
 void CHS2T::initModbus()
 {
-    Journal::instance()->info("Init modbus");
+    //Journal::instance()->info("Init modbus");
 
     QString modbusCfgDir = config_dir + QDir::separator() + "modbus";
 
@@ -298,27 +192,10 @@ void CHS2T::initModbus()
 //------------------------------------------------------------------------------
 void CHS2T::initRegistrator()
 {
-    Journal::instance()->info("Init registraion subsystem");
+    //Journal::instance()->info("Init registraion subsystem");
 
     reg = nullptr;
     //reg = new Registrator("motor", 1e-3, Q_NULLPTR);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::initBrakeDevices(double p0, double pTM, double pFL)
-{
-    Journal::instance()->info("Init brake devices: callback form TrainEngine");
-
-    charging_press = p0;
-
-    mainReservoir->setY(0, pFL);
-    spareReservoir->setY(0, charging_press);
-    brakeCrane->init(pTM, pFL);
-    locoCrane->init(pTM, pFL);
-    airDistr->init(pTM, pFL);
-    autoTrainStop->init(pTM, pFL);
 }
 
 //------------------------------------------------------------------------------

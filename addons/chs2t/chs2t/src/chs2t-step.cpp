@@ -34,23 +34,6 @@ void CHS2T::stepPantographs(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS2T::stepBrakesMech(double t, double dt)
-{
-        brakesMech[0]->step(t, dt);
-        brakesMech[1]->step(t, dt);
-
-        Q_r[1] = brakesMech[0]->getBrakeTorque();
-        Q_r[2] = brakesMech[0]->getBrakeTorque();
-        Q_r[3] = brakesMech[0]->getBrakeTorque();
-
-        Q_r[4] = brakesMech[1]->getBrakeTorque();
-        Q_r[5] = brakesMech[1]->getBrakeTorque();
-        Q_r[6] = brakesMech[1]->getBrakeTorque();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void CHS2T::stepFastSwitch(double t, double dt)
 {
     bv->setHoldingCoilState(getHoldingCoilState());
@@ -114,7 +97,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     if (EDT)
         allowTrac.reset();
 
-    if ( (stepSwitch->getPoz() == 0) && (autoTrainStop->getStateKey()) )
+    if ( (stepSwitch->getPoz() == 0) && (epk->getStateKey()) )
         allowTrac.set();
 
     motor->setDirection(stepSwitch->getReverseState());
@@ -138,136 +121,10 @@ void CHS2T::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CHS2T::stepAirSupplySubsystem(double t, double dt)
-{
-
-    for (size_t i = 0; i < motor_compressor.size(); ++i)
-    {
-        double mk_on = 0.0;
-
-        if ((mk_switcher[i]->getState() == 2 && static_cast<bool>(pressReg->getState())) ||
-             mk_switcher[i]->getState() == 3)
-        {
-            mk_on = 1.0;
-        }
-        else
-        {
-            mk_on = 0.0;
-        }
-
-        motor_compressor[i]->setU(bv->getU_out() * mk_on);
-        motor_compressor[i]->setPressure(mainReservoir->getPressure());
-        motor_compressor[i]->step(t, dt);
-
-        mk_switcher[i]->setControl(keys);
-        mk_switcher[i]->step(t, dt);
-    }
-
-    mainReservoir->setAirFlow(motor_compressor[0]->getAirFlow() + motor_compressor[1]->getAirFlow());
-    mainReservoir->setFlowCoeff(1e-3);
-    mainReservoir->step(t, dt);
-
-    pressReg->setPressure(mainReservoir->getPressure());
-    pressReg->step(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::stepBrakesControl(double t, double dt)
-{
-    brakeCrane->setChargePressure(charging_press);
-    brakeCrane->setFeedLinePressure(mainReservoir->getPressure());
-    brakeCrane->setBrakePipePressure(pTM);
-    brakeCrane->setControl(keys);
-    p0 = brakeCrane->getBrakePipeInitPressure();
-    brakeCrane->step(t, dt);
-
-    handleEDT->setControl(keys, control_signals);
-    handleEDT->step(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void CHS2T::stepBrakesEquipment(double t, double dt)
-{
-    brakesMech[0]->setAirFlow(pnSplit->getQ_out1());
-    brakesMech[0]->step(t, dt);
-
-    brakesMech[1]->setAirFlow(rd304->getBrakeCylAirFlow());
-    brakesMech[1]->step(t, dt);
-
-    rd304->setPipelinePressure(mainReservoir->getPressure());
-    rd304->setWorkAirFlow(pnSplit->getQ_out2());
-    rd304->setBrakeCylPressure(brakesMech[1]->getBrakeCylinderPressure());
-    rd304->step(t, dt);
-
-    pnSplit->setQ_in(zpk->getOutputFlow());
-    pnSplit->setP_out1(brakesMech[0]->getBrakeCylinderPressure());
-    pnSplit->setP_out2(rd304->getWorkPressure());
-    pnSplit->step(t, dt);
-
-    zpk->setInputFlow1(dako->getQtc());
-    zpk->setInputFlow2(locoCrane->getBrakeCylinderFlow());
-    zpk->setOutputPressure(pnSplit->getP_in());
-    zpk->step(t, dt);
-
-    locoCrane->setFeedlinePressure(mainReservoir->getPressure());
-    locoCrane->setBrakeCylinderPressure(zpk->getPressure2());
-    locoCrane->setControl(keys);
-    locoCrane->step(t, dt);
-
-    dako->setPgr(mainReservoir->getPressure());
-    dako->setPkvt(zpk->getPressure2());
-    dako->setPtc(zpk->getPressure1());
-    dako->setQvr(airSplit->getQ_out1() * static_cast<double>(!allowEDT) + relValve->getQrv());
-    dako->setVelocity(velocity);
-    dako->step(t, dt);
-
-    airSplit->setP_out1(dako->getPy() * static_cast<double>(!allowEDT));
-    airSplit->setP_out2(brakeRefRes->getPressure());
-    airSplit->setQ_in(electroAirDistr->getQbc_out());
-    airSplit->step(t, dt);
-
-    brakeRefRes->setAirFlow(airSplit->getQ_out2());
-    brakeRefRes->step(t, dt);
-
-    electroAirDistr->setPbc_in(airSplit->getP_in());
-    electroAirDistr->setSupplyReservoirPressure(spareReservoir->getPressure());
-    electroAirDistr->setInputSupplyReservoirFlow(airDistr->getAirSupplyFlow());
-    electroAirDistr->setQbc_in(airDistr->getBrakeCylinderAirFlow());
-    electroAirDistr->setControlLine(handleEDT->getControlSignal() + ept_control[0]);
-    electroAirDistr->step(t, dt);
-
-    spareReservoir->setAirFlow(electroAirDistr->getOutputSupplyReservoirFlow());
-    spareReservoir->step(t, dt);
-
-    airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
-    airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
-    airDistr->setBrakepipePressure(pTM);
-    airDistr->step(t, dt);
-
-    autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
-    autoTrainStop->setBrakepipePressure(pTM);
-    autoTrainStop->setControl(keys);
-    autoTrainStop->powerOn(safety_device->getEPKstate());
-    autoTrainStop->step(t, dt);
-
-    auxRate = autoTrainStop->getEmergencyBrakeRate() + airDistr->getAuxRate();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void CHS2T::stepSupportEquipment(double t, double dt)
 {
     double R = 0.6;
     bool hod = stepSwitch->getHod();
-
-    // Отпускной вентиль
-    relValve->setPy(dako->getPy());
-    relValve->step(t, dt);
 
     // Мотор-вентилятор ПТР
     motor_fan_ptr->setU(R * (motor->getIa() * !hod + abs(generator->getIa())));
@@ -325,7 +182,7 @@ void CHS2T::stepSupportEquipment(double t, double dt)
     safety_device->setRBSstate(state_RBS);
     safety_device->setAlsnCode(alsn_info.code_alsn);
     safety_device->setVelocity(velocity);
-    safety_device->setKeyEPK(autoTrainStop->getStateKey());
+    safety_device->setKeyEPK(epk->getStateKey());
     safety_device->step(t, dt);
 }
 

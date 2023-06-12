@@ -21,9 +21,9 @@
 //------------------------------------------------------------------------------
 CHS2T::CHS2T() : Vehicle()
 {
-    eptSwitch.setOnSoundName("tumbler");
-    eptSwitch.setOffSoundName("tumbler");
-    connect(&eptSwitch, &Trigger::soundPlay, this, &CHS2T::soundPlay);
+    epb_switch.setOnSoundName("tumbler");
+    epb_switch.setOffSoundName("tumbler");
+    connect(&epb_switch, &Trigger::soundPlay, this, &CHS2T::soundPlay);
 
     U_bat = 55.0;
 
@@ -65,27 +65,25 @@ void CHS2T::initialization()
 
     initPantographs();
 
-    initBrakesMech();
-
     initFastSwitch();
 
     initProtection();
 
+    initPneumoSupply(modules_dir);
+
     initBrakesControl(modules_dir);
 
-    initAirSupplySubsystem();
+    initBrakesEquipment(modules_dir);
+
+    initEPB(modules_dir);
 
     initTractionControl();
-
-    initBrakesEquipment(modules_dir);
 
     initEDT();
 
     initSupportEquipment();
 
     initOtherEquipment();
-
-    initEPT();
 
     initModbus();
 
@@ -121,13 +119,13 @@ void CHS2T::step(double t, double dt)
     stepProtection(t, dt);
 
     //Journal::instance()->info("Step air supply");
-    stepAirSupplySubsystem(t, dt);
+    stepPneumoSupply(t, dt);
 
     //Journal::instance()->info("Step brakes control");
     stepBrakesControl(t, dt);
 
-    //Journal::instance()->info("Step brake mech");
-    stepBrakesMech(t , dt);
+    //Journal::instance()->info("Step electropneumatic brakes");
+    stepEPB(t, dt);
 
     //Journal::instance()->info("Step brake equipment");
     stepBrakesEquipment(t, dt);
@@ -138,8 +136,6 @@ void CHS2T::step(double t, double dt)
 
     //Journal::instance()->info("Step support equipment");
     stepSupportEquipment(t, dt);
-
-    stepEPT(t, dt);
 
     //Journal::instance()->info("Step debug");
     stepDebugMsg(t, dt);
@@ -187,10 +183,10 @@ void CHS2T::loadConfig(QString cfg_path)
 void CHS2T::hardwareOutput()
 {
     feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(pTM);
-    feedback_signals.analogSignal[1].cur_value = UR_manometer->getModbus(brakeCrane->getEqReservoirPressure());
-    feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brakeRefRes->getPressure());
-    feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(mainReservoir->getPressure());
-    feedback_signals.analogSignal[4].cur_value = TC_manometer->getModbus(brakesMech[0]->getBrakeCylinderPressure());
+    feedback_signals.analogSignal[1].cur_value = UR_manometer->getModbus(brake_crane->getERpressure());
+    feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brake_ref_res->getPressure());
+    feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(main_reservoir->getPressure());
+    feedback_signals.analogSignal[4].cur_value = TC_manometer->getModbus(brake_mech[0]->getBCpressure());
 }
 
 GET_VEHICLE(CHS2T)

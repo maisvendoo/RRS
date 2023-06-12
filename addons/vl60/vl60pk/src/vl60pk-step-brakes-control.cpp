@@ -21,7 +21,7 @@ void VL60pk::stepBrakesControl(double t, double dt)
     brake_crane->setControl(keys);
     brake_crane->step(t, dt);
 
-    // Кран впомогательного тормоза
+    // Кран вспомогательного тормоза
     loco_crane->setFLpressure(brake_lock->getCraneFLpressure());
     loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
     loco_crane->setILpressure(0.0);

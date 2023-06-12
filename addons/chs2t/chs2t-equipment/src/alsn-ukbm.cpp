@@ -40,6 +40,9 @@ void SafetyDevice::step(double t, double dt)
 //------------------------------------------------------------------------------
 void SafetyDevice::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     // Ничего не делаем при выключенном ЭПК
     if (!key_epk)
     {
@@ -143,7 +146,7 @@ void SafetyDevice::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void SafetyDevice::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 //------------------------------------------------------------------------------

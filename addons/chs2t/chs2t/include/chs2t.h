@@ -14,30 +14,22 @@
 #define     CHS2T_H
 
 #include    "vehicle-api.h"
-#include    "pantograph.h"
-#include    "protective-device.h"
+
 #include    "km-21kr2.h"
 #include    "stepswitch.h"
 #include    "pusk-rez.h"
 #include    "motor.h"
 #include    "registrator.h"
 #include    "overload-relay.h"
-#include    "dc-motor-compressor.h"
-#include    "pressure-regulator.h"
-#include    "chs2t-brake-mech.h"
 #include    "dako.h"
 #include    "generator.h"
 #include    "pulse-converter.h"
 #include    "brake-regulator.h"
 #include    "handle-edt.h"
 #include    "dc-motor-fan.h"
-#include    "release-valve.h"
 #include    "blinds.h"
 #include    "hardware-signals.h"
-#include    "ept-converter.h"
-#include    "ept-pass-control.h"
 #include    "convert-physics-to-modbus.h"
-#include    "chs2t-horn.h"
 #include    "sl2m.h"
 #include    "energy-counter.h"
 #include    "chs2t-switcher.h"
@@ -59,6 +51,9 @@ public:
 
     /// Деструктор
     ~CHS2T();
+
+    /// Инициализация тормозных приборов
+    void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
 
@@ -103,26 +98,11 @@ private:
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
-    /// Главный резервуар (ГР)
-    Reservoir *mainReservoir;
-
-    /// Запасный резервуар (ЗР)
-    Reservoir *spareReservoir;
-
-    /// Задатчик тормозного усилия ЭДТ (ЗТ)
-    Reservoir *brakeRefRes;
-
     PhysToModbus *TM_manometer;
     PhysToModbus *UR_manometer;
     PhysToModbus *ZT_manometer;
     PhysToModbus *GR_manometer;
     PhysToModbus *TC_manometer;
-
-    /// Регулятор давления ГР
-    PressureRegulator *pressReg;
-
-    /// Мотор-компрессоры (МК)
-    std::array<DCMotorCompressor *, 2> motor_compressor;
 
     /// Тумблер включенияМК
     Trigger     mk_tumbler;
@@ -130,36 +110,97 @@ private:
     /// Галетники управления МК
     std::array<CHS2TSwitcher *, 2> mk_switcher;
 
-    /// Поездной кран машиниста (КрМ)
-    BrakeCrane *brakeCrane;
+    /// Мотор-компрессоры (МК)
+    std::array<DCMotorCompressor *, 2> motor_compressor;
 
-    ElectroAirDistributor *electroAirDistr;
+    /// Регулятор давления ГР
+    PressureRegulator *press_reg;
 
-    /// Тормозная рычажная передача тележек
-    std::array<CHS2tBrakeMech *, 2>    brakesMech;
+    /// Главный резервуар
+    Reservoir   *main_reservoir;
+
+    /// Концевой кран питательной магистрали спереди
+    PneumoAngleCock *anglecock_fl_fwd;
+
+    /// Концевой кран питательной магистрали сзади
+    PneumoAngleCock *anglecock_fl_bwd;
+
+    /// Рукав питательной  магистрали спереди
+    PneumoHose      *hose_fl_fwd;
+
+    /// Рукав питательной  магистрали сзади
+    PneumoHose      *hose_fl_bwd;
+
+    /// Поездной кран машиниста усл.№395
+    BrakeCrane  *brake_crane;
+
+    /// Кран впомогательного тормоза усл.№254
+    LocoCrane   *loco_crane;
+
+    /// Рукоятка задатчика тормозного усилия
+    HandleEDT   *handleEDT;
+
+    /// Электропневматический клапан автостопа усл.№150
+    AutoTrainStop   *epk;
+
+    /// Управляющая камера воздухораспределителя (ложный ТЦ)
+    Reservoir   *brake_ref_res;
+
+    /// Тормозная магистраль
+    Reservoir   *brakepipe;
+
+    /// Воздухораспределитель
+    AirDistributor  *air_dist;
+
+    /// Электровоздухораспределитель
+    ElectroAirDistributor  *electro_air_dist;
+
+    /// Запасный резервуар
+    Reservoir   *supply_reservoir;
+
+    /// Разветвитель потока воздуха от локомотивного крана к тележкам
+    PneumoSplitter  *loco_crane_splitter;
 
     /// Скоростной клапан ДАКО
     Dako *dako;
 
-    /// Воздухораспределитель (ВР)
-    AirDistributor *airDistr;
+    /// Повторительное реле давления усл.№304
+    PneumoRelay     *bc_pressure_relay;
 
-    /// Кран вспомогательного тормоза (КВТ)
-    LocoCrane *locoCrane;
+    /// Концевой кран тормозной магистрали спереди
+    PneumoAngleCock *anglecock_bp_fwd;
 
-    /// Переключательный клапан (ЗПК)
-    SwitchingValve *zpk;
+    /// Концевой кран тормозной магистрали сзади
+    PneumoAngleCock *anglecock_bp_bwd;
 
-    /// Реле давления РД304 (РД)
-    PneumoReley *rd304;
+    /// Рукав тормозной магистрали спереди
+    PneumoHoseEPB   *hose_bp_fwd;
 
-    /// Разветвитель потока воздуха от ДАКО к тележке 1 и РД304
-    PneumoSplitter *pnSplit;
+    /// Рукав тормозной магистрали сзади
+    PneumoHoseEPB   *hose_bp_bwd;
 
-    /// Разветвитель от ВР к ДАКО и ЗТ
-    PneumoSplitter *airSplit;
+    enum
+    {
+        NUM_TROLLEYS = 2,
+        NUM_AXIS_PER_TROLLEY = 3,
+        TROLLEY_FWD = 0,
+        TROLLEY_BWD = 1
+    };
 
-    ReleaseValve *relValve;
+    /// Переключательные клапаны ЗПК потока в тормозные цилиндры
+    std::array<SwitchingValve *, NUM_TROLLEYS> bc_switch_valve;
+
+    /// Тормозные механизмы тележек
+    std::array<BrakeMech *, NUM_TROLLEYS> brake_mech;
+
+    /// Выключатель ЭПТ
+    Trigger     epb_switch;
+
+    /// Преобразователь питания ЭПТ
+    EPBConverter *epb_converter;
+
+    /// Блок управления ЭПТ
+    EPBControl *epb_control;
 
     DCMotorFan *motor_fan_ptr;
 
@@ -174,11 +215,6 @@ private:
 
     /// Регулятор тормозного усилия (САРТ)
     BrakeRegulator  *BrakeReg;
-
-    AutoTrainStop *autoTrainStop;
-
-    /// Рукоятка задатчика тормозного усилия
-    HandleEDT       *handleEDT;
 
     /// Галетники управления токоприемниками
     std::array<CHS2TSwitcher *, NUM_PANTOGRAPHS> pantoSwitcher;
@@ -213,15 +249,6 @@ private:
     /// Разрешение тяги
     Trigger     allowTrac;
 
-    /// Выключатель ЭПТ
-    Trigger     eptSwitch;
-
-    /// Преобразователь питания ЭПТ
-    EPTConverter *ept_converter;
-
-    /// Блок управления ЭПТ
-    EPTPassControl *ept_pass_control;
-
     bool dropPosition;
 
     Timer EDT_timer;
@@ -239,7 +266,7 @@ private:
     Blinds      *blinds;
 
     /// Скоростемер 3СЛ2М
-    SL2M        *speed_meter;   
+    SL2M        *speed_meter;
 
     /// Счетчик энергии
     EnergyCounter   *energy_counter;
@@ -251,9 +278,6 @@ private:
     bool state_RB;
 
     bool state_RBS;
-
-    /// Инициадизация тормозных приборов
-    void initBrakeDevices(double p0, double pTM, double pFL);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);
@@ -267,8 +291,11 @@ private:
     /// Сброс данных в регистратор
     void registrate(double t, double dt);
 
-    /// Состояние удерживающей катошки БВ
+    /// Состояние удерживающей катушки БВ
     bool getHoldingCoilState() const;
+
+    /// Общая инициализация локомотива
+    void initialization();
 
     /// Инициализация токоприемников
     void initPantographs();
@@ -279,20 +306,23 @@ private:
     /// Инициализация БВ
     void initFastSwitch();
 
-    /// Инициализация приборов управления тормозами
-    void initBrakesControl(QString module_path);
-
     /// Инициализация защит
     void initProtection();
 
-    /// Инициализация подсистемы снабжения электровоза сжатым воздухом
-    void initAirSupplySubsystem();
+    /// Инициализация питательной магистрали
+    void initPneumoSupply(QString modules_dir);
+
+    /// Инициализация приборов управления тормозами
+    void initBrakesControl(QString modules_dir);
+
+    /// Инициализация тормозного оборудования
+    void initBrakesEquipment(QString modules_dir);
+
+    /// Инициализация ЭПТ
+    void initEPB(QString modules_dir);
 
     /// Инициализация схемы управления тягой
     void initTractionControl();
-
-    /// Инициализация тормозного оборудования
-    void initBrakesEquipment(QString module_path);
 
     /// Инициализация ЭДТ
     void initEDT();
@@ -303,9 +333,6 @@ private:
     /// Инициализация прочего оборудования
     void initOtherEquipment();
 
-    /// Инициализация приборов ЭПТ
-    void initEPT();
-
     ///
     void initModbus();
 
@@ -315,37 +342,38 @@ private:
     /// Инициализация регистратора
     void initRegistrator();
 
-    /// Общая инициализация локомотива
-    void initialization();
-
     /// Подпрограмма изменения положения пакетника
     void setSwitcherState(Switcher *sw, signal_t signal);
 
+    /// Шаг моделирования всех систем локомотива в целом
+    void step(double t, double dt);
+
     /// Моделирование работы токоприемников
     void stepPantographs(double t, double dt);
-
-    /// Моделирование работы рычажки
-    void stepBrakesMech(double t, double dt);
 
     void stepFastSwitch(double t, double dt);
 
     void stepProtection(double t, double dt);
 
-    void stepTractionControl(double t, double dt);
+    /// Моделирование питательной магистрали
+    void stepPneumoSupply(double t, double dt);
 
-    void stepAirSupplySubsystem(double t, double dt);
-
+    /// Моделирование приборов управления тормозами
     void stepBrakesControl(double t, double dt);
 
+    /// Моделирование тормозного оборудования
     void stepBrakesEquipment(double t, double dt);
+
+    /// Моделирование ЭПТ
+    void stepEPB(double t, double dt);
+
+    void stepTractionControl(double t, double dt);
 
     void stepEDT(double t, double dt);
 
     void stepEDT2(double t, double dt);
 
     void stepSupportEquipment(double t, double dt);
-
-    void stepEPT(double t, double dt);
 
     void stepDebugMsg(double t, double dt);
 
@@ -356,9 +384,6 @@ private:
     void stepTapSound();
 
     void stepDecodeAlsn();
-
-    /// Шаг моделирования всех систем локомотива в целом
-    void step(double t, double dt);
 
     void disableEDT() { EDT = allowEDT = false; }
 
@@ -371,4 +396,4 @@ private slots:
     }
 };
 
-#endif // CHS2TOO
+#endif // CHS2T_H

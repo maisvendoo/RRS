@@ -27,8 +27,9 @@ CONFIG(debug, debug|release) {
 }
 
 INCLUDEPATH += ./include
-INCLUDEPATH += ../../../CfgReader/include
+INCLUDEPATH += ../chs2t-equipment/include
 
+INCLUDEPATH += ../../../CfgReader/include
 INCLUDEPATH += ../../../simulator/solver/include
 INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include
@@ -37,7 +38,9 @@ INCLUDEPATH += ../../../filesystem/include
 INCLUDEPATH += ../../../libJournal/include
 
 HEADERS += $$files(./include/*.h)
+HEADERS += $$files(../chs2t-equipment/include/*.h)
 SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(../chs2t-equipment/src/*.cpp)
 
 #CONFIG += force_debug_info
 #QMAKE_CXXFLAGS += -Werror -pedantic-errors -Wall -Wextra -Wpedantic -Wmaybe-uninitialized -Wreturn-type -Warray-bounds=1

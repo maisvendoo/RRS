@@ -6,10 +6,10 @@
         <Solver>euler</Solver>
 
         <!-- Число тормозных цилиндров в тормозной рычажной передаче -->
-        <CylindersNum>2</CylindersNum>
+        <CylindersNum>3</CylindersNum>
 
         <!-- Диаметр тормозного цилиндра, м -->
-        <CylindersDiameter>0.356</CylindersDiameter>
+        <CylindersDiameter>0.305</CylindersDiameter>
 
         <!-- Максимальный выход штока, м -->
         <StockOut>0.08</StockOut>

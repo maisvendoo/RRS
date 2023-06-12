@@ -18,7 +18,7 @@ void VL60pk::initBrakesControl(QString modules_dir)
     connect(brake_crane, &BrakeCrane::soundPlay, this, &VL60pk::soundPlay);
     connect(brake_crane, &BrakeCrane::soundSetVolume, this, &VL60pk::soundSetVolume);
 
-    // Кран впомогательного тормоза
+    // Кран вспомогательного тормоза
     loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
     loco_crane->read_config("kvt254");
     connect(loco_crane, &LocoCrane::soundPlay, this, &VL60pk::soundPlay);

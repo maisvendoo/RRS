@@ -16,9 +16,9 @@ void CHS2T::keyProcess()
     if (getKeyState(KEY_V))
     {
         if (isShift())
-            eptSwitch.set();
+            epb_switch.set();
         else
-            eptSwitch.reset();
+            epb_switch.reset();
     }
 
     state_RB = getKeyState(KEY_M);

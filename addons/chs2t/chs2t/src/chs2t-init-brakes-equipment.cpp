@@ -1,12 +1,16 @@
 #include    "filesystem.h"
 
-#include    "vl60pk.h"
+#include    "chs2t.h"
+
+#include    "Journal.h"
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::initBrakesEquipment(QString modules_dir)
+void CHS2T::initBrakesEquipment(QString modules_dir)
 {
+    //Journal::instance()->info("Init brakes equipment");
+
     // Тормозная магистраль
     double volume_bp = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
     brakepipe = new Reservoir(volume_bp);
@@ -21,7 +25,7 @@ void VL60pk::initBrakesEquipment(QString modules_dir)
     electro_air_dist->read_config("evr305");
 
     // Запасный резервуар
-    supply_reservoir = new Reservoir(0.055);
+    supply_reservoir = new Reservoir(0.057);
     supply_reservoir->setLeakCoeff(1e-6);
 
     // Тормозные рычажные передачи
