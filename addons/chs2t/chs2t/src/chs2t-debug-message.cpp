@@ -27,9 +27,5 @@ void CHS2T::stepDebugMsg(double t, double dt)
     DebugMsg += QString("ALSN:%1|D:%2|")
             .arg(alsn_info.code_alsn, 2)
             .arg(alsn_info.signal_dist, 8, 'f', 1);
-    DebugMsg += QString("          ");/*
-    DebugMsg += QString("KVT%1|DAKO%2|")
-            .arg(bc_switch_valve[0]->getPressure1(), 8, 'f', 5)
-            .arg(bc_switch_valve[0]->getPressure2(), 8, 'f', 5);
-    DebugMsg += dako->getDebugMsg();*/
+    DebugMsg += QString("          ");
 }

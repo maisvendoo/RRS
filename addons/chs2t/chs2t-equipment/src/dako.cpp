@@ -169,18 +169,6 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     dYdt[DACO_BOTTOM_CAMERA] = (Q0 - Q0_atm) / V0;
 
     dYdt[DACO_MIDDLE_CAMERA] = (Q1 - Q1_atm) / V1;
-
-    DebugMsg = QString("pKVT%1|pAD%2|pBC%3|p0%4|p1%5|s0%6|s1%7|sA%8|EDT%9|rel%10")
-            .arg(pKVT, 8, 'f', 5)
-            .arg(pAD, 8, 'f', 5)
-            .arg(pBC, 8, 'f', 5)
-            .arg(getY(0), 8, 'f', 5)
-            .arg(getY(1), 8, 'f', 5)
-            .arg(s0, 6, 'f', 3)
-            .arg(s1, 6, 'f', 3)
-            .arg(A1 * Y[DACO_BOTTOM_CAMERA] + A2 * Y[DACO_MIDDLE_CAMERA] - pBC, 6, 'f', 3)
-            .arg(EDT_state)
-            .arg(release_valve_state);
 }
 
 //------------------------------------------------------------------------------
