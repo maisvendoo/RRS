@@ -23,7 +23,7 @@ void CHS2T::stepDebugMsg(double t, double dt)
             .arg(stepSwitch->getReverseState(), 2)
             .arg(stepSwitch->getPoz(), 2)
             .arg(stepSwitch->getHod() ? "*" : " ")
-            .arg(motor->getI56(), 6, 'f', 1);
+            .arg(motor->getI56() - abs(generator->getIa()), 6, 'f', 1);
     DebugMsg += QString("ALSN:%1|D:%2|")
             .arg(alsn_info.code_alsn, 2)
             .arg(alsn_info.signal_dist, 8, 'f', 1);

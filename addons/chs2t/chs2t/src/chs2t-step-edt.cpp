@@ -39,13 +39,10 @@ void CHS2T::stepEDT2(double t, double dt)
 
         if (allowEDT)
         {
-            //relValve->setRelease(abs(generator->getIa()) >= 100.0);
-
             if (!dako->isEDTAllow() || (brake_ref_res->getPressure() < 0.07) )
             {
                 disableEDT();
                 dropPosition = false;
-                //relValve->setRelease(false);
                 BrakeReg->reset();
             }
         }

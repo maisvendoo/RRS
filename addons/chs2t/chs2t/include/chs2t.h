@@ -21,6 +21,7 @@
 #include    "motor.h"
 #include    "registrator.h"
 #include    "overload-relay.h"
+#include    "emergency-electropneumovalve.h"
 #include    "dako.h"
 #include    "generator.h"
 #include    "pulse-converter.h"
@@ -142,6 +143,9 @@ private:
 
     /// Электропневматический клапан автостопа усл.№150
     AutoTrainStop   *epk;
+
+    /// Электропневматический вентиль экстренного торможения (при ТМ < 0.3 МПа)
+    EmergencyElectroPneumoValve  *emergency_valve;
 
     /// Управляющая камера воздухораспределителя (ложный ТЦ)
     Reservoir   *brake_ref_res;

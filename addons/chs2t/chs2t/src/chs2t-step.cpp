@@ -94,17 +94,21 @@ void CHS2T::stepTractionControl(double t, double dt)
     puskRez->setPoz(stepSwitch->getPoz());
     puskRez->step(t, dt);
 
-    if (EDT)
+    if (EDT || (!epk->getStateKey()) || (!emergency_valve->isTractionAllow()))
+    {
         allowTrac.reset();
-
-    if ( (stepSwitch->getPoz() == 0) && (epk->getStateKey()) )
-        allowTrac.set();
+    }
+    else
+    {
+        if (stepSwitch->getPoz() == 0)
+            allowTrac.set();
+    }
 
     motor->setDirection(stepSwitch->getReverseState());
     motor->setBetaStep(stepSwitch->getFieldStep());
     motor->setPoz(stepSwitch->getPoz());
     motor->setR(puskRez->getR());
-    motor->setU(bv->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(!EDT) * allowTrac.getState());
+    motor->setU(bv->getU_out() * stepSwitch->getSchemeState() * static_cast<double>(allowTrac.getState()));
     motor->setOmega(wheel_omega[0] * ip);
     motor->setAmpermetersState(stepSwitch->getAmpermetersState());
     motor->step(t, dt);

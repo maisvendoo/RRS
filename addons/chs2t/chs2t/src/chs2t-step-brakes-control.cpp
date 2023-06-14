@@ -29,6 +29,11 @@ void CHS2T::stepBrakesControl(double t, double dt)
     epk->powerOn(safety_device->getEPKstate());
     epk->step(t, dt);
 
+    // Электропневматический вентиль экстренного торможения
+    emergency_valve->setFLpressure(main_reservoir->getPressure());
+    emergency_valve->setBPpressure(brakepipe->getPressure());
+    emergency_valve->step(t, dt);
+
     // Управляющая камера воздухораспределителя (ложный ТЦ)
     brake_ref_res->setFlow(electro_air_dist->getBCflow());
     brake_ref_res->step(t, dt);
@@ -45,7 +50,8 @@ void CHS2T::stepBrakesControl(double t, double dt)
     dako->setEDTcurrent(generator->getIa());
     dako->setFLpressure(main_reservoir->getPressure());
     dako->setBCpressure(bc_switch_valve[TROLLEY_BWD]->getPressure2());
-    dako->setLocoCranePressure(loco_crane_splitter->getInputPressure());
+    dako->setLocoCranePressure(  loco_crane_splitter->getInputPressure()
+                               + emergency_valve->getAdditionalPressure());
     dako->setAirDistPressure(brake_ref_res->getPressure());
     dako->step(t, dt);
 

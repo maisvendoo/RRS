@@ -36,8 +36,12 @@ void CHS2T::initBrakesControl(QString modules_dir)
     connect(epk, &AutoTrainStop::soundPlay, this, &CHS2T::soundPlay);
     connect(epk, &AutoTrainStop::soundStop, this, &CHS2T::soundStop);
 
+    // Электропневматический вентиль экстренного торможения
+    emergency_valve = new EmergencyElectroPneumoValve();
+    emergency_valve->read_custom_config(config_dir + QDir::separator() + "emergency-valve");
+
     // Управляющая камера воздухораспределителя (ложный ТЦ)
-    brake_ref_res = new Reservoir(0.004);
+    brake_ref_res = new Reservoir(0.01);
 
     // Разветвитель потока воздуха от локомотивного крана к тележкам
     loco_crane_splitter = new PneumoSplitter();

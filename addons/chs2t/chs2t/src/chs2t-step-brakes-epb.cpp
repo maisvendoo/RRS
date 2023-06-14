@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------
 void CHS2T::stepEPB(double t, double dt)
 {
-    // Потребляемый ток в рабочей линии ЭПТ
+    // Потребляемый ток электровоздухораспределителя
     double evr_current = electro_air_dist->getCurrent(0);
 
     // Потребляемый ток в рабочей линии ЭПТ
@@ -32,10 +32,10 @@ void CHS2T::stepEPB(double t, double dt)
 
     // Управление электровоздухораспределителем
     // Управление от задатчика ЭДТ ("карандаша")
-    double evr_U = U_bat * handleEDT->getControlSignal();
+    double evr_U = handleEDT->getControlSignal() * epb_converter->getOutputVoltage();
     double evr_f = 0.0;
     // Управление от линий ЭПТ
-    if (evr_U == 0.0)
+    if ((evr_U == 0.0) || (brake_ref_res->getPressure() > 0.22))
     {
         evr_U = epb_work_U + hose_bp_fwd->getVoltage(0) + hose_bp_bwd->getVoltage(0);
         evr_f = epb_work_f + hose_bp_fwd->getFrequency(0) + hose_bp_bwd->getFrequency(0);
