@@ -30,7 +30,7 @@ public:
     void RegulateSoundByOnOff(bool value);
     void RegulateSoundByPitch(bool value);
 
-private:
+protected:
 
     /// Внешнее противодавление
     double  pFL;

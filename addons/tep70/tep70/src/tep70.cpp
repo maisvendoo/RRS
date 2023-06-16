@@ -1,5 +1,7 @@
 #include    "tep70.h"
 
+#include    "filesystem.h"
+
 #include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
@@ -31,27 +33,37 @@ TEP70::TEP70() : Vehicle()
   , rv9(nullptr)
   , krn(nullptr)
   , voltage_regulator(nullptr)
-  , main_reservoir(nullptr)
   , motor_compressor(nullptr)
   , press_reg(nullptr)
+  , main_reservoir(nullptr)
+  , anglecock_fl_fwd(nullptr)
+  , anglecock_fl_bwd(nullptr)
+  , hose_fl_fwd(nullptr)
+  , hose_fl_bwd(nullptr)
   , ru18(nullptr)
   , ktk1(nullptr)
   , ktk2(nullptr)
   , rv6(nullptr)
-  , ubt367m(nullptr)
-  , krm(nullptr)
-  , kvt(nullptr)
-  , vr(nullptr)
-  , evr(nullptr)
-  , zpk(nullptr)
-  , rd304(nullptr)
-  , pneumo_splitter(nullptr)
-  , fwd_trolley(nullptr)
-  , bwd_trolley(nullptr)
-  , zr(nullptr)
+  , brake_lock(nullptr)
+  , brake_crane(nullptr)
+  , loco_crane(nullptr)
   , epk(nullptr)
-  , ept_converter(nullptr)
-  , ept_pass_control(nullptr)
+  , brakepipe(nullptr)
+  , air_dist(nullptr)
+  , electro_air_dist(nullptr)
+  , supply_reservoir(nullptr)
+  , anglecock_bp_fwd(nullptr)
+  , anglecock_bp_bwd(nullptr)
+  , hose_bp_fwd(nullptr)
+  , hose_bp_bwd(nullptr)
+  , bc_switch_valve(nullptr)
+  , bc_splitter(nullptr)
+  , anglecock_bc_fwd(nullptr)
+  , anglecock_bc_bwd(nullptr)
+  , hose_bc_fwd(nullptr)
+  , hose_bc_bwd(nullptr)
+  , epb_converter(nullptr)
+  , epb_control(nullptr)
   , field_gen(nullptr)
   , kvv(nullptr)
   , kvg(nullptr)
@@ -83,8 +95,8 @@ TEP70::TEP70() : Vehicle()
   , ksh2_delay(nullptr)
   , ksh1_delay(nullptr)
 {
-    railway_coord = railway_coord0 = 0;
-    velocity = 0;
+    std::fill(bc_pressure_relay.begin(), bc_pressure_relay.end(), nullptr);
+    std::fill(brake_mech.begin(), brake_mech.end(), nullptr);
 }
 
 //------------------------------------------------------------------------------
@@ -98,27 +110,11 @@ TEP70::~TEP70()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TEP70::initBrakeDevices(double p0, double pTM, double pFL)
-{
-    main_reservoir->setY(0, pFL);
-    charge_press = p0;
-
-    krm->setChargePressure(charge_press);
-    krm->init(pTM, pFL);
-    kvt->init(pTM, pFL);
-    vr->init(pTM, pFL);
-    zr->init(pTM, pFL);
-    zr->setY(0, pTM);
-
-    ubt367m->setState(1);
-    ubt367m->setCombineCranePos(0);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void TEP70::initialization()
 {
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir = QString(fs.getModulesDir().c_str());
+
     initCabineControls();
 
     initControlCircuit();
@@ -129,9 +125,13 @@ void TEP70::initialization()
 
     initOilSystem();
 
-    initPneumoBrakeSystem();
+    initPneumoSupply(modules_dir);
 
-    initEPT();
+    initBrakesControl(modules_dir);
+
+    initBrakesEquipment(modules_dir);
+
+    initEPB(modules_dir);
 
     initElectroTransmission();
 
@@ -139,7 +139,7 @@ void TEP70::initialization()
 
     initSounds();
 
-    reg = new Registrator("../charts/tep70-char", 1.0);
+    //reg = new Registrator("../charts/tep70-char", 1.0);
 }
 
 //------------------------------------------------------------------------------
@@ -160,9 +160,13 @@ void TEP70::step(double t, double dt)
 
     stepOilSystem(t, dt);
 
-    stepPneumoBrakeSystem(t, dt);
+    stepPneumoSupply(t, dt);
 
-    stepEPT(t, dt);
+    stepBrakesControl(t, dt);
+
+    stepEPB(t, dt);
+
+    stepBrakesEquipment(t, dt);
 
     stepElectroTransmission(t, dt);
 
@@ -171,6 +175,9 @@ void TEP70::step(double t, double dt)
     stepSignalsOutput(t, dt);
 
     debugOutput(t, dt);
+
+    if (reg == nullptr)
+        return;
 
     QString line = QString("%1 %2 %3")
             .arg(velocity * Physics::kmh, 6, 'f', 1)

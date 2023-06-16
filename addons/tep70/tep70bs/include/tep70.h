@@ -14,7 +14,6 @@
 #define     TEP70_H
 
 #include    "vehicle-api.h"
-#include    "tep70-headers.h"
 #include    "tep70-signals.h"
 
 #include    "battery.h"
@@ -26,18 +25,14 @@
 #include    "electric-oil-pump.h"
 #include    "starter-generator.h"
 #include    "voltage-regulator.h"
-#include    "dc-motor-compressor.h"
-#include    "pressure-regulator.h"
-#include    "ubt367m.h"
-#include    "ept-converter.h"
-#include    "ept-pass-control.h"
+#include    "tep70-motor-compressor.h"
 #include    "tep70-switcher.h"
 #include    "field-generator.h"
 #include    "trac-generator.h"
 #include    "field-regulator.h"
 #include    "trac-motor.h"
 #include    "sl2m.h"
-#include    "tep70-horn.h"
+#include    "km-2202.h"
 #include    "reversor.h"
 #include    "brake-switcher.h"
 #include    "hysteresis-relay.h"

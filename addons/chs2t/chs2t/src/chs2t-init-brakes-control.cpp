@@ -37,8 +37,12 @@ void CHS2T::initBrakesControl(QString modules_dir)
     connect(epk, &AutoTrainStop::soundStop, this, &CHS2T::soundStop);
 
     // Электропневматический вентиль экстренного торможения
-    emergency_valve = new EmergencyElectroPneumoValve();
-    emergency_valve->read_custom_config(config_dir + QDir::separator() + "emergency-valve");
+    emergency_valve = new ElectroPneumoValveEmergency();
+    emergency_valve->read_custom_config(config_dir + QDir::separator() + "valve-emergency");
+
+    // Электропневматический вентиль отпуска тормозов
+    release_valve = new ElectroPneumoValveRelease();
+    release_valve->read_custom_config(config_dir + QDir::separator() + "valve-release");
 
     // Управляющая камера воздухораспределителя (ложный ТЦ)
     brake_ref_res = new Reservoir(0.01);

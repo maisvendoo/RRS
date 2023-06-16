@@ -30,20 +30,20 @@ void TEP70::initSounds()
     connect(motor_compressor, &DCMotorCompressor::soundSetPitch, this, &TEP70::soundSetPitch);
     connect(motor_compressor, &DCMotorCompressor::soundSetVolume, this, &TEP70::soundSetVolume);
 
-    connect(ubt367m, &BrakeLock::soundPlay, this, &TEP70::soundPlay);
-    connect(ubt367m, &BrakeLock::soundStop, this, &TEP70::soundStop);
-    connect(ubt367m, &BrakeLock::soundSetPitch, this, &TEP70::soundSetPitch);
-    connect(ubt367m, &BrakeLock::soundSetVolume, this, &TEP70::soundSetVolume);
+    connect(brake_lock, &BrakeLock::soundPlay, this, &TEP70::soundPlay);
+    connect(brake_lock, &BrakeLock::soundStop, this, &TEP70::soundStop);
+    connect(brake_lock, &BrakeLock::soundSetPitch, this, &TEP70::soundSetPitch);
+    connect(brake_lock, &BrakeLock::soundSetVolume, this, &TEP70::soundSetVolume);
 
-    connect(krm, &BrakeCrane::soundPlay, this, &TEP70::soundPlay);
-    connect(krm, &BrakeCrane::soundStop, this, &TEP70::soundStop);
-    connect(krm, &BrakeCrane::soundSetPitch, this, &TEP70::soundSetPitch);
-    connect(krm, &BrakeCrane::soundSetVolume, this, &TEP70::soundSetVolume);
+    connect(brake_crane, &BrakeCrane::soundPlay, this, &TEP70::soundPlay);
+    connect(brake_crane, &BrakeCrane::soundStop, this, &TEP70::soundStop);
+    connect(brake_crane, &BrakeCrane::soundSetPitch, this, &TEP70::soundSetPitch);
+    connect(brake_crane, &BrakeCrane::soundSetVolume, this, &TEP70::soundSetVolume);
 
-    connect(kvt, &LocoCrane::soundPlay, this, &TEP70::soundPlay);
-    connect(kvt, &LocoCrane::soundStop, this, &TEP70::soundStop);
-    connect(kvt, &LocoCrane::soundSetPitch, this, &TEP70::soundSetPitch);
-    connect(kvt, &LocoCrane::soundSetVolume, this, &TEP70::soundSetVolume);
+    connect(loco_crane, &LocoCrane::soundPlay, this, &TEP70::soundPlay);
+    connect(loco_crane, &LocoCrane::soundStop, this, &TEP70::soundStop);
+    connect(loco_crane, &LocoCrane::soundSetPitch, this, &TEP70::soundSetPitch);
+    connect(loco_crane, &LocoCrane::soundSetVolume, this, &TEP70::soundSetVolume);
 
     azv_common_control.setOnSoundName("AZV_On");
     azv_common_control.setOffSoundName("AZV_Off");
@@ -165,8 +165,8 @@ void TEP70::initSounds()
     ru1->setSoundName("Relay");
     connect(ru1, &Relay::soundPlay, this, &TEP70::soundPlay);
 
-    //connect(horn, &TEP70Horn::soundPlay, this, &TEP70::soundPlay);
-    //connect(horn, &TEP70Horn::soundStop, this, &TEP70::soundStop);
+    connect(horn, &TrainHorn::soundPlay, this, &TEP70::soundPlay);
+    connect(horn, &TrainHorn::soundStop, this, &TEP70::soundStop);
 
     connect(km, &ControllerKM2202::soundPlay, this, &TEP70::soundPlay);
 

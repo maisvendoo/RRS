@@ -1,9 +1,9 @@
-#include    "emergency-electropneumovalve.h"
+#include    "electropneumovalve-emergency.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-EmergencyElectroPneumoValve::EmergencyElectroPneumoValve(double min_pressure,
+ElectroPneumoValveEmergency::ElectroPneumoValveEmergency(double min_pressure,
                                      double max_pressure,
                                      QObject *parent)
     : Device(parent)
@@ -18,7 +18,7 @@ EmergencyElectroPneumoValve::EmergencyElectroPneumoValve(double min_pressure,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-EmergencyElectroPneumoValve::~EmergencyElectroPneumoValve()
+ElectroPneumoValveEmergency::~ElectroPneumoValveEmergency()
 {
 
 }
@@ -26,7 +26,7 @@ EmergencyElectroPneumoValve::~EmergencyElectroPneumoValve()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EmergencyElectroPneumoValve::setPressureRange(double min_pressure, double max_pressure)
+void ElectroPneumoValveEmergency::setPressureRange(double min_pressure, double max_pressure)
 {
     no_emergency->setRange(min_pressure, max_pressure);
 }
@@ -34,7 +34,7 @@ void EmergencyElectroPneumoValve::setPressureRange(double min_pressure, double m
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EmergencyElectroPneumoValve::setFLpressure(double value)
+void ElectroPneumoValveEmergency::setFLpressure(double value)
 {
     pFL = value;
 }
@@ -42,7 +42,7 @@ void EmergencyElectroPneumoValve::setFLpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EmergencyElectroPneumoValve::setBPpressure(double value)
+void ElectroPneumoValveEmergency::setBPpressure(double value)
 {
     no_emergency->setValue(value);
 }
@@ -50,7 +50,7 @@ void EmergencyElectroPneumoValve::setBPpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double EmergencyElectroPneumoValve::getAdditionalPressure() const
+double ElectroPneumoValveEmergency::getAdditionalPressure() const
 {
     return p_add_current;
 }
@@ -58,7 +58,7 @@ double EmergencyElectroPneumoValve::getAdditionalPressure() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool EmergencyElectroPneumoValve::isTractionAllow() const
+bool ElectroPneumoValveEmergency::isTractionAllow() const
 {
     return no_emergency->getState();
 }
@@ -66,7 +66,7 @@ bool EmergencyElectroPneumoValve::isTractionAllow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool EmergencyElectroPneumoValve::isEmergency() const
+bool ElectroPneumoValveEmergency::isEmergency() const
 {
     return (!no_emergency->getState());
 }
@@ -74,7 +74,7 @@ bool EmergencyElectroPneumoValve::isEmergency() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EmergencyElectroPneumoValve::step(double t, double dt)
+void ElectroPneumoValveEmergency::step(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
@@ -88,7 +88,7 @@ void EmergencyElectroPneumoValve::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EmergencyElectroPneumoValve::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
+void ElectroPneumoValveEmergency::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(dYdt)
@@ -98,7 +98,7 @@ void EmergencyElectroPneumoValve::ode_system(const state_vector_t& Y, state_vect
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EmergencyElectroPneumoValve::load_config(CfgReader &cfg)
+void ElectroPneumoValveEmergency::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 

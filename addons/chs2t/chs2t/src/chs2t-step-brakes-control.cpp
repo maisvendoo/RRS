@@ -34,6 +34,10 @@ void CHS2T::stepBrakesControl(double t, double dt)
     emergency_valve->setBPpressure(brakepipe->getPressure());
     emergency_valve->step(t, dt);
 
+    // Электропневматический вентиль отпуска тормозов
+    release_valve->setEDTcurrent(generator->getIa());
+    release_valve->step(t, dt);
+
     // Управляющая камера воздухораспределителя (ложный ТЦ)
     brake_ref_res->setFlow(electro_air_dist->getBCflow());
     brake_ref_res->step(t, dt);
@@ -45,14 +49,14 @@ void CHS2T::stepBrakesControl(double t, double dt)
     loco_crane_splitter->step(t, dt);
 
     // Скоростной клапан ДАКО
+    double no_release = static_cast<double>(!release_valve->isPneumoBrakesRelease());
     dako->setAngularVelocity1(wheel_omega[0]);
     dako->setAngularVelocity6(wheel_omega[5]);
-    dako->setEDTcurrent(generator->getIa());
     dako->setFLpressure(main_reservoir->getPressure());
     dako->setBCpressure(bc_switch_valve[TROLLEY_BWD]->getPressure2());
-    dako->setLocoCranePressure(  loco_crane_splitter->getInputPressure()
-                               + emergency_valve->getAdditionalPressure());
-    dako->setAirDistPressure(brake_ref_res->getPressure());
+    dako->setLocoCranePressure(max(loco_crane_splitter->getInputPressure(),
+                                   emergency_valve->getAdditionalPressure()) );
+    dako->setAirDistPressure(no_release * brake_ref_res->getPressure());
     dako->step(t, dt);
 
     // Повторительное реле давления №304

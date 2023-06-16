@@ -39,9 +39,6 @@ public:
     /// Задать скорость вращения центробежного регулятора на шестой оси
     void setAngularVelocity6(double value);
 
-    /// Задать ток реостатного торможения
-    void setEDTcurrent(double value);
-
     /// Задать давление от питательной магистрали
     void setFLpressure(double value);
 
@@ -60,8 +57,7 @@ public:
     /// Задать давление от воздухораспределителя
     void setAirDistPressure(double value);
 
-    bool isPneumoBrakesRelease() const;
-
+    /// Разрешение реостатного тормоза от центробежного регулятора на первой оси
     bool isEDTAllow() const;
 
 private:
@@ -77,9 +73,6 @@ private:
     double w1_cur;
     double w6;
     double w6_cur;
-
-    double I;
-    double Ia;
 
     double pFL;
     double pBC;
@@ -97,14 +90,12 @@ private:
     double K3;
     double K4;
     double K5;
-    double K6;
 
     double k_1;
     double k_2;
     double k_3;
     double k_4;
 
-    bool release_valve_state;
     bool EDT_state;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);

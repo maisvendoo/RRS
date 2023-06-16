@@ -16,11 +16,11 @@ void TEP70::stepDisel(double t, double dt)
     disel->setFuelLevel(fuel_tank->getFuelLevel());
     disel->step(t, dt);
 
-    double I_gen = Icc + motor_compressor->getCurrent();
+    double I_gen_starter = Icc + motor_compressor->getPowerCurrent();
 
     starter_generator->setAncorVoltage( battery->getVoltage() *  static_cast<double>(kontaktor_starter->getContactState(0)));
     starter_generator->setFieldVoltage(voltage_regulator->getFieldVoltage() * static_cast<double>(krn->getContactState(0)));
-    starter_generator->setLoadCurrent(I_gen);
+    starter_generator->setLoadCurrent(I_gen_starter);
     starter_generator->setOmega(disel->getStarterOmega());
     starter_generator->setMotorMode(krn->getContactState(2));
     starter_generator->step(t, dt);

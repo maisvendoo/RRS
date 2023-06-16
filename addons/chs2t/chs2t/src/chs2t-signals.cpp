@@ -48,9 +48,9 @@ void CHS2T::stepSignals()
 
     analogSignal[SIGLIGHT_R] = static_cast<float>(EDT);
 
-    analogSignal[SIGLIGHT_O] = epb_control->stateReleaseLamp();
-    analogSignal[SIGLIGHT_PEREKRISHA] = epb_control->stateHoldLamp();
-    analogSignal[SIGLIGHT_T] = epb_control->stateBrakeLamp();
+    analogSignal[SIGLIGHT_O] = static_cast<float>(epb_control->stateReleaseLamp());
+    analogSignal[SIGLIGHT_PEREKRISHA] = static_cast<float>(epb_control->stateHoldLamp());
+    analogSignal[SIGLIGHT_T] = static_cast<float>(epb_control->stateBrakeLamp());
 
     analogSignal[SIGLIGHT_NO_BRAKES_RELEASE] = static_cast<float>(brake_mech[0]->getBCpressure() >= 0.1);
 

@@ -7,7 +7,7 @@ void TEP70::keyProcess()
 {
     button_disel_start = getKeyState(KEY_K);
 
-    button_brake_release = !getKeyState(KEY_R);
+    button_brake_release = getKeyState(KEY_R);
 
     button_svistok = getKeyState(KEY_Space);
 
@@ -123,49 +123,6 @@ void TEP70::keyProcess()
         else
         {
             azv_motor_compressor.reset();
-        }
-    }
-
-    if (getKeyState(KEY_N))
-    {
-        if (isShift())
-        {
-            epk_key.set();
-        }
-        else
-        {
-            epk_key.reset();
-        }
-    }
-
-    bool is_svistok_old = is_svistok;
-    is_svistok = getKeyState(KEY_Space);
-
-    if (is_svistok_old != is_svistok)
-
-    {
-        if (is_svistok)
-        {
-            emit soundPlay("Svistok");
-        }
-        else
-        {
-            emit soundStop("Svistok");
-        }
-    }
-
-    bool is_tifon_old = is_tifon;
-    is_tifon = getKeyState(KEY_B);
-
-    if (is_tifon_old != is_tifon)
-    {
-        if (is_tifon)
-        {
-            emit soundPlay("Tifon");
-        }
-        else
-        {
-            emit soundStop("Tifon");
         }
     }
 }

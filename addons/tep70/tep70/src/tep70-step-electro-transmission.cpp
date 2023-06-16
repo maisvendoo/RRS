@@ -136,7 +136,7 @@ void TEP70::stepElectroTransmission(double t, double dt)
     ksh2->step(t, dt);
 
 
-    // Цепь вентиля реврсора вперед
+    // Цепь вентиля реверсора вперед
     bool is_Revers_Forward = azv_upr_tepl.getState() && km->isForward();
 
     // Цепь вентиля реверсора назад

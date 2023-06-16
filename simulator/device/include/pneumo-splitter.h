@@ -10,7 +10,7 @@ class DEVICE_EXPORT PneumoSplitter : public BrakeDevice
 {
 public:
 
-    PneumoSplitter(double work_volume = 2e-3, QObject *parent = Q_NULLPTR);
+    PneumoSplitter(double work_volume = 1e-3, QObject *parent = Q_NULLPTR);
 
     ~PneumoSplitter();
 

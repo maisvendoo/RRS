@@ -45,5 +45,5 @@ void AperiodicFilter::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void AperiodicFilter::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }

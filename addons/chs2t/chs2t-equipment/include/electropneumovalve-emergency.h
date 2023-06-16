@@ -1,20 +1,20 @@
-#ifndef     EMERGENCY_ELECTROPNEUMOVALVE_H
-#define     EMERGENCY_ELECTROPNEUMOVALVE_H
+#ifndef     ELECTROPNEUMOVALVE_EMERGENCY_H
+#define     ELECTROPNEUMOVALVE_EMERGENCY_H
 
 #include    "device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class EmergencyElectroPneumoValve : public Device
+class ElectroPneumoValveEmergency : public Device
 {
 public:
 
-    EmergencyElectroPneumoValve(double min_pressure = 0.3,
-                      double max_pressure = 0.45,
-                      QObject *parent = Q_NULLPTR);
+    ElectroPneumoValveEmergency(double min_pressure = 0.3,
+                                double max_pressure = 0.45,
+                                QObject *parent = Q_NULLPTR);
 
-    ~EmergencyElectroPneumoValve();
+    ~ElectroPneumoValveEmergency();
 
     /// Задать давление экстреннего торможения и отмены экстреннего торможения
     void setPressureRange(double min_pressure, double max_pressure);
@@ -51,4 +51,4 @@ private:
     void load_config(CfgReader &cfg);
 };
 
-#endif // EMERGENCY_ELECTROPNEUMOVALVE_H
+#endif // ELECTROPNEUMOVALVE_EMERGENCY_H

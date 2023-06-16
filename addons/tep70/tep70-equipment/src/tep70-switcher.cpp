@@ -25,6 +25,9 @@ TEP70Switcher::~TEP70Switcher()
 //------------------------------------------------------------------------------
 void TEP70Switcher::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     if (old_state != state)
     {
         emit soundPlay(soundName);

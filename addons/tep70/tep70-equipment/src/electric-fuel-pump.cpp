@@ -59,7 +59,7 @@ void ElectricFuelPump::setFuelLevel(double fuel_level)
 //------------------------------------------------------------------------------
 void ElectricFuelPump::setVoltage(double U)
 {
-    this->U = U;    
+    this->U = U;
 }
 
 //------------------------------------------------------------------------------
@@ -108,5 +108,5 @@ void ElectricFuelPump::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void ElectricFuelPump::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }

@@ -13,25 +13,21 @@ Dako::Dako(QObject* parent) : Device(parent)
   , w1_cur(0.0)
   , w6(U6 / Physics::kmh / wheel_r)
   , w6_cur(0.0)
-  , I(100.0)
-  , Ia(0.0)
   , pFL(0.0)
   , pBC(0.0)
   , QFL(0.0)
   , QBC(0.0)
   , A1(0.71)
   , A2(1.0)
-  , K1(0.0)
-  , K2(0.0)
-  , K3(0.0)
-  , K4(0.0)
-  , K5(0.0)
-  , K6(0.0)
-  , k_1(0.0)
-  , k_2(0.0)
-  , k_3(0.0)
-  , k_4(0.0)
-  , release_valve_state(false)
+  , K1(1.0e-2)
+  , K2(1.5e-2)
+  , K3(3.0e-3)
+  , K4(4.0e-3)
+  , K5(4.0e-3)
+  , k_1(2.0)
+  , k_2(2.0)
+  , k_3(10.0)
+  , k_4(10.0)
   , EDT_state(false)
 {
 
@@ -69,14 +65,6 @@ void Dako::setAngularVelocity1(double value)
 void Dako::setAngularVelocity6(double value)
 {
     w6_cur = abs(value);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Dako::setEDTcurrent(double value)
-{
-    Ia = abs(value);
 }
 
 //------------------------------------------------------------------------------
@@ -130,14 +118,6 @@ void Dako::setAirDistPressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Dako::isPneumoBrakesRelease() const
-{
-    return release_valve_state;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 bool Dako::isEDTAllow() const
 {
     return EDT_state;
@@ -158,17 +138,12 @@ void Dako::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
     // Опорожнение нижней камеры
     double Q0_atm = cut(-k_4 * s0, 0.0, K4) * Y[DACO_BOTTOM_CAMERA];
 
-    // Управление средней камерой от отпускного клапана
-    double s1 = static_cast<double>(release_valve_state);
-
-    // Наполнение средней камеры вслед за давлением от воздухораспределителя
-    double Q1 = (1.0 - s1) * K5 * (pAD - Y[DACO_MIDDLE_CAMERA]);
-    // Опорожнение средней камеры
-    double Q1_atm = s1 * K6 * Y[DACO_MIDDLE_CAMERA];
+    // Наполнение и опорожнение средней камеры вслед за давлением от воздухораспределителя
+    double Q1 = K5 * (pAD - Y[DACO_MIDDLE_CAMERA]);
 
     dYdt[DACO_BOTTOM_CAMERA] = (Q0 - Q0_atm) / V0;
 
-    dYdt[DACO_MIDDLE_CAMERA] = (Q1 - Q1_atm) / V1;
+    dYdt[DACO_MIDDLE_CAMERA] = Q1 / V1;
 }
 
 //------------------------------------------------------------------------------
@@ -194,9 +169,6 @@ void Dako::preStep(state_vector_t& Y, double t)
 
     // Разрешение реостатного тормоза от центробежного регулятора на первой оси
     EDT_state = (w1_cur >= w1);
-
-    // Разрешение отпуска пневматического тормоза при токе реостата более 100 А
-    release_valve_state = (Ia >= I);
 }
 
 //------------------------------------------------------------------------------
@@ -214,8 +186,6 @@ void Dako::load_config(CfgReader& cfg)
     w1 = U1 / wheel_r / Physics::kmh;
     w6 = U6 / wheel_r / Physics::kmh;
 
-    cfg.getDouble(secName, "I", I);
-
     cfg.getDouble(secName, "A1", A1);
     cfg.getDouble(secName, "A2", A2);
 
@@ -224,7 +194,6 @@ void Dako::load_config(CfgReader& cfg)
     cfg.getDouble(secName, "K3", K3);
     cfg.getDouble(secName, "K4", K4);
     cfg.getDouble(secName, "K5", K5);
-    cfg.getDouble(secName, "K6", K6);
 
     cfg.getDouble(secName, "k1", k_1);
     cfg.getDouble(secName, "k2", k_2);

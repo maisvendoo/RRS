@@ -121,7 +121,7 @@ void FieldRegulator::preStep(state_vector_t &Y, double t)
     dI = I_max - I;
     dU = U_max - U;
     dP_prev = dP;
-    dP = P_max - P;    
+    dP = P_max - P;
 
     double s1 = K[0] * dI + Y[0];
 
@@ -141,6 +141,7 @@ void FieldRegulator::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void FieldRegulator::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
+    Q_UNUSED(Y)
     Q_UNUSED(t)
 
     dYdt[0] = K[1] * dI;

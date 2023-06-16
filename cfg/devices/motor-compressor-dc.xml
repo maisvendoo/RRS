@@ -26,7 +26,7 @@
         <!-- Коэффициент потока в питательную магистраль -->
         <K_flow>0.005</K_flow>
 
-        <SoundName>Motor_Compressor_2</SoundName>
+        <SoundName>Motor_Compressor</SoundName>
         <RegulateSoundByOnOff>0</RegulateSoundByOnOff>
         <RegulateSoundByPitch>1</RegulateSoundByPitch>
 

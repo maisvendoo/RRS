@@ -1,17 +1,13 @@
-#include    "trac-generator.h"
+#include    "electropneumovalve-release.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TracGenerator::TracGenerator(QObject *parent) : Device(parent)
-  , Uf(0.0)
-  , In(0.0)
-  , omega(0.0)
-  , Ra(0.0011)
-  , Rf(0.535)
-  , M(0.0)
-  , U(0.0)
-  , Tf(0.1)
+ElectroPneumoValveRelease::ElectroPneumoValveRelease(QObject *parent)
+    : Device(parent)
+    , I(100.0)
+    , Ia(0.0)
+    , release_valve_state(false)
 {
 
 }
@@ -19,7 +15,7 @@ TracGenerator::TracGenerator(QObject *parent) : Device(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TracGenerator::~TracGenerator()
+ElectroPneumoValveRelease::~ElectroPneumoValveRelease()
 {
 
 }
@@ -27,55 +23,47 @@ TracGenerator::~TracGenerator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TracGenerator::load_marnetic_char(QString file_name)
+void ElectroPneumoValveRelease::setEDTcurrent(double value)
 {
-    magnetic_char.load(file_name.toStdString());
+    Ia = abs(value);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TracGenerator::load_eff_coeff(QString file_name)
+bool ElectroPneumoValveRelease::isPneumoBrakesRelease() const
 {
-    eff_coef.load(file_name.toStdString());
+    return release_valve_state;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TracGenerator::preStep(state_vector_t &Y, double t)
+void ElectroPneumoValveRelease::step(double t, double dt)
 {
     Q_UNUSED(t)
+    Q_UNUSED(dt)
 
-    U = pf(cPhi(Y[0]) * omega - Ra * In);
-
-    M = cPhi(Y[0]) * In;
+    // Разрешение отпуска пневматического тормоза при токе реостата более 100 А
+    release_valve_state = (Ia >= I);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TracGenerator::ode_system(const state_vector_t &Y,
-                               state_vector_t &dYdt,
-                               double t)
+void ElectroPneumoValveRelease::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
     Q_UNUSED(t)
-
-    dYdt[0] = (Uf - Rf * Y[0]) / Rf / Tf;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TracGenerator::load_config(CfgReader &cfg)
+void ElectroPneumoValveRelease::load_config(CfgReader &cfg)
 {
-    Q_UNUSED(cfg)
-}
+    QString secName = "Device";
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double TracGenerator::cPhi(double If)
-{
-    return magnetic_char.getValue(If);
+    cfg.getDouble(secName, "I", I);
 }

@@ -56,5 +56,5 @@ void BrakeSwitcher::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void BrakeSwitcher::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }

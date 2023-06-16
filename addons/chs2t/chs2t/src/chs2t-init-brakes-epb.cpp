@@ -15,7 +15,7 @@ void CHS2T::initEPB(QString modules_dir)
 
     // Преобразователь напряжения для ЭПТ
     epb_converter = new EPBConverter();
-    epb_converter->read_config("epb-converter");
+    epb_converter->read_config("epb-converter-55V");
 
     // Контроллер двухпроводного ЭПТ
     epb_control = new EPBControl();

@@ -3,11 +3,21 @@
 
 void TEP70::stepSignalsOutput(double t, double dt)
 {
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    analogSignal[STRELKA_REOSTATE_CURRENT] = 0.0;
+
+    analogSignal[STRELKA_WATER_TEMP] = 0.0;
+
+    // Состояние локомотивного светофора
+    stepDecodeAlsn();
+
     analogSignal[KM_SHTURVAL] = km->getMainShaftPos();
     analogSignal[KM_REVERSOR] = km->getReversState();
 
     analogSignal[BUTTON_DISEL_START] = static_cast<float>(button_disel_start);
-    analogSignal[BUTTON_BRAKE_RELEASE] = static_cast<float>(!button_brake_release);
+    analogSignal[BUTTON_BRAKE_RELEASE] = static_cast<float>(button_brake_release);
     analogSignal[BUTTON_SVISTOK] = static_cast<float>(button_svistok);
     analogSignal[BUTTON_TIFON] = static_cast<float>(button_tifon);
 
@@ -17,18 +27,6 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[AZV_EDT_ON] = static_cast<float>(azv_edt_on.getState());
     analogSignal[AZV_EDT_POWER] = static_cast<float>(azv_edt_power.getState());
     analogSignal[AZV_EPT_ON] = static_cast<float>(azv_ept_on.getState());
-
-    analogSignal[STRELKA_UR] = 0.0;
-    analogSignal[STRELKA_TM] = 0.0;
-    analogSignal[STRELKA_TC1] = 0.0;
-
-    analogSignal[STRELKA_REOSTATE_CURRENT] = 0.0;
-    analogSignal[STRELKA_GEN_CURRENT] = 0.0;
-
-    analogSignal[STRELKA_WATER_TEMP] = 0.0;
-    analogSignal[STRELKA_OIL_PRESS] = 0.0;
-
-    analogSignal[LS_G] = 1.0f;
 
     analogSignal[TUMBLER_VOLTMETER] = static_cast<float>(tumbler_voltage.getState());
     analogSignal[TUMBLER_DISEL_STOP] = static_cast<float>(tumbler_disel_stop.getState());
@@ -44,7 +42,7 @@ void TEP70::stepSignalsOutput(double t, double dt)
 
     if (tumbler_voltage.getState())
     {
-        U_bat = ept_converter->getU_out();
+        U_bat = epb_converter->getOutputVoltage();
     }
     else
     {
@@ -61,26 +59,26 @@ void TEP70::stepSignalsOutput(double t, double dt)
 
     analogSignal[STRELKA_PM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
 
-    analogSignal[RUK_367] = static_cast<float>(ubt367m->getMainHandlePos());
-    analogSignal[COMB_KRAN] = static_cast<float>(ubt367m->getCombCranePos());
+    analogSignal[RUK_367] = static_cast<float>(brake_lock->getMainHandlePosition());
+    analogSignal[COMB_KRAN] = static_cast<float>(brake_lock->getCombCranePosition());
 
-    analogSignal[STRELKA_TM] = static_cast<float>(pTM / 1.6);
-    analogSignal[KRAN_395_RUK] = krm->getHandlePosition();
+    analogSignal[STRELKA_TM] = static_cast<float>(brakepipe->getPressure() / 1.6);
+    analogSignal[KRAN_395_RUK] = static_cast<float>(brake_crane->getHandlePosition());
 
-    analogSignal[STRELKA_TC1] = static_cast<float>(fwd_trolley->getBrakeCylinderPressure() / 1.0);
-    analogSignal[STRELKA_TC2] = static_cast<float>(bwd_trolley->getBrakeCylinderPressure() / 1.0);
+    analogSignal[STRELKA_TC1] = static_cast<float>(brake_mech[TROLLEY_FWD]->getBCpressure() / 1.0);
+    analogSignal[STRELKA_TC2] = static_cast<float>(brake_mech[TROLLEY_BWD]->getBCpressure() / 1.0);
 
-    analogSignal[STRELKA_UR] = static_cast<float>(krm->getEqReservoirPressure() / 1.0);
+    analogSignal[STRELKA_UR] = static_cast<float>(brake_crane->getERpressure() / 1.0);
 
-    analogSignal[KRAN_254_POD] = static_cast<float>(kvt->getHandleShift());
-    analogSignal[KRAN_254_RUK] = static_cast<float>(kvt->getHandlePosition());
+    analogSignal[KRAN_254_POD] = static_cast<float>(loco_crane->getHandleShift());
+    analogSignal[KRAN_254_RUK] = static_cast<float>(loco_crane->getHandlePosition());
 
-    analogSignal[KLUCH_EPK] = static_cast<float>(epk_key.getState());
+    analogSignal[KLUCH_EPK] = static_cast<float>(epk->getStateKey());
     analogSignal[RB1] = static_cast<float>(button_RB1);
 
-    analogSignal[SIGLIGHT_EPT_O] = ept_pass_control->stateReleaseLamp();
-    analogSignal[SIGLIGHT_EPT_P] = ept_pass_control->stateHoldLamp();
-    analogSignal[SIGLIGHT_EPT_T] = ept_pass_control->stateBrakeLamp();
+    analogSignal[SIGLIGHT_EPT_O] = static_cast<float>(epb_control->stateReleaseLamp());
+    analogSignal[SIGLIGHT_EPT_P] = static_cast<float>(epb_control->stateHoldLamp());
+    analogSignal[SIGLIGHT_EPT_T] = static_cast<float>(epb_control->stateBrakeLamp());
 
     analogSignal[STRELKA_GEN_CURRENT] = static_cast<float>(I_gen / 10000.0);
     analogSignal[STRELKA_GEN_VOLTAGE] = static_cast<float>(trac_gen->getVoltage() / 1000.0);

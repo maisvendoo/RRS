@@ -49,6 +49,8 @@ double ElectricOilPump::getCurrent() const
 //------------------------------------------------------------------------------
 void ElectricOilPump::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(t)
+
     Ia = (U - cF * Y[0] * Physics::sign(If)) / Ra;
 
     If = U / Rf;
@@ -78,6 +80,8 @@ void ElectricOilPump::ode_system(const state_vector_t &Y,
                                  state_vector_t &dYdt,
                                  double t)
 {
+    Q_UNUSED(t)
+
     dYdt[0] = (cF * Ia - kc * Y[0]) / J;
 }
 
@@ -86,5 +90,5 @@ void ElectricOilPump::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void ElectricOilPump::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
