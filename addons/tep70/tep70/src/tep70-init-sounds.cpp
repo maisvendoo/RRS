@@ -25,10 +25,10 @@ void TEP70::initSounds()
     connect(disel, &Disel::soundSetPitch, this, &TEP70::soundSetPitch);
     connect(disel, &Disel::soundSetVolume, this, &TEP70::soundSetVolume);
 
-    connect(motor_compressor, &DCMotorCompressor::soundPlay, this, &TEP70::soundPlay);
-    connect(motor_compressor, &DCMotorCompressor::soundStop, this, &TEP70::soundStop);
-    connect(motor_compressor, &DCMotorCompressor::soundSetPitch, this, &TEP70::soundSetPitch);
-    connect(motor_compressor, &DCMotorCompressor::soundSetVolume, this, &TEP70::soundSetVolume);
+    connect(motor_compressor, &TEP70MotorCompressor::soundPlay, this, &TEP70::soundPlay);
+    connect(motor_compressor, &TEP70MotorCompressor::soundStop, this, &TEP70::soundStop);
+    connect(motor_compressor, &TEP70MotorCompressor::soundSetPitch, this, &TEP70::soundSetPitch);
+    connect(motor_compressor, &TEP70MotorCompressor::soundSetVolume, this, &TEP70::soundSetVolume);
 
     connect(brake_lock, &BrakeLock::soundPlay, this, &TEP70::soundPlay);
     connect(brake_lock, &BrakeLock::soundStop, this, &TEP70::soundStop);

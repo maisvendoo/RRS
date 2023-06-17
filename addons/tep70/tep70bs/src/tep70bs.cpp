@@ -1,4 +1,4 @@
-#include    "tep70.h"
+#include    "tep70bs.h"
 
 #include    "filesystem.h"
 
@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TEP70::TEP70() : Vehicle()
+TEP70BS::TEP70BS() : Vehicle()
   , km(nullptr)
   , battery(nullptr)
   , kontaktor_fuel_pump(nullptr)
@@ -71,8 +71,6 @@ TEP70::TEP70() : Vehicle()
   , field_reg(nullptr)
   , I_gen(0.0)
   , reg(nullptr)
-  , speed_meter(nullptr)
-  , button_disel_start(false)
   , button_brake_release(false)
   , button_svistok(false)
   , button_tifon(false)
@@ -94,23 +92,27 @@ TEP70::TEP70() : Vehicle()
   , rp2(nullptr)
   , ksh2_delay(nullptr)
   , ksh1_delay(nullptr)
+  , msut(nullptr)
 {
-    std::fill(bc_pressure_relay.begin(), bc_pressure_relay.end(), nullptr);
-    std::fill(brake_mech.begin(), brake_mech.end(), nullptr);
+    railway_coord = railway_coord0 = 0;
+    velocity = 0;
+
+    start_count = 0;
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+TEP70BS::~TEP70BS()
+{
+
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TEP70::~TEP70()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TEP70::initialization()
+void TEP70BS::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
@@ -137,6 +139,10 @@ void TEP70::initialization()
 
     initOther();
 
+    initMSUT();
+
+    initAutostart();
+
     initSounds();
 
     //reg = new Registrator("../charts/tep70-char", 1.0);
@@ -145,7 +151,7 @@ void TEP70::initialization()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TEP70::step(double t, double dt)
+void TEP70BS::step(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
@@ -174,6 +180,12 @@ void TEP70::step(double t, double dt)
 
     stepSignalsOutput(t, dt);
 
+    stepMSUTsignals(t, dt);
+
+    stepMSUT(t, dt);
+
+    stepAutostart(t, dt);
+
     debugOutput(t, dt);
 
     if (reg == nullptr)
@@ -189,7 +201,7 @@ void TEP70::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TEP70::loadConfig(QString cfg_path)
+void TEP70BS::loadConfig(QString cfg_path)
 {
     CfgReader cfg;
 
@@ -211,4 +223,4 @@ void TEP70::loadConfig(QString cfg_path)
     }
 }
 
-GET_VEHICLE(TEP70)
+GET_VEHICLE(TEP70BS)

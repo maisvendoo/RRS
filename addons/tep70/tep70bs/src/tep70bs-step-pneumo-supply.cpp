@@ -1,9 +1,9 @@
-#include    "tep70.h"
+#include    "tep70bs.h"
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void TEP70::stepPneumoSupply(double t, double dt)
+void TEP70BS::stepPneumoSupply(double t, double dt)
 {
     press_reg->setFLpressure(main_reservoir->getPressure());
     press_reg->step(t, dt);

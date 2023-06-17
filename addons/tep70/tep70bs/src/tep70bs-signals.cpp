@@ -1,7 +1,7 @@
-#include    "tep70.h"
+#include    "tep70bs.h"
 
 
-void TEP70::stepSignalsOutput(double t, double dt)
+void TEP70BS::stepSignalsOutput(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
@@ -10,14 +10,13 @@ void TEP70::stepSignalsOutput(double t, double dt)
 
     analogSignal[STRELKA_WATER_TEMP] = 0.0;
 
-    // Состояние локомотивного светофора
-    stepDecodeAlsn();
+    analogSignal[LS_G] = 1.0f;
 
     analogSignal[KM_SHTURVAL] = km->getMainShaftPos();
-    analogSignal[KM_REVERSOR] = km->getReversState();
+    analogSignal[KM_REVERSOR] = tumbler_revers.getState() - 1;
 
-    analogSignal[BUTTON_DISEL_START] = static_cast<float>(button_disel_start);
-    analogSignal[BUTTON_BRAKE_RELEASE] = static_cast<float>(button_brake_release);
+    analogSignal[BUTTON_DISEL_START] = static_cast<float>(button_start_disel.getState());
+    analogSignal[BUTTON_BRAKE_RELEASE] = static_cast<float>(!button_brake_release);
     analogSignal[BUTTON_SVISTOK] = static_cast<float>(button_svistok);
     analogSignal[BUTTON_TIFON] = static_cast<float>(button_tifon);
 
@@ -77,9 +76,7 @@ void TEP70::stepSignalsOutput(double t, double dt)
     analogSignal[STRELKA_GEN_CURRENT] = static_cast<float>(I_gen / 10000.0);
     analogSignal[STRELKA_GEN_VOLTAGE] = static_cast<float>(trac_gen->getVoltage() / 1000.0);
 
-    analogSignal[STRELKA_SPEED] = static_cast<float>(speed_meter->getArrowPos());
-    analogSignal[VAL_PRSKOR1] = static_cast<float>(speed_meter->getShaftPos());
-    analogSignal[VAL_PRSKOR2] = static_cast<float>(speed_meter->getShaftPos());
+    analogSignal[KLUB_ALARM] = 0.0f;
 
     analogSignal[WHEEL_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
@@ -92,7 +89,7 @@ void TEP70::stepSignalsOutput(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float TEP70::getLampState(double signal)
+float TEP70BS::getLampState(double signal)
 {
     bool state = azv_common_control.getState() && static_cast<bool>(signal);
 

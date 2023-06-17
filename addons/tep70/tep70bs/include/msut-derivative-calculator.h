@@ -28,6 +28,8 @@ public:
 
     void step(double x, double t, double dt)
     {
+        (void)t;
+
         if ((is_first_value) || (tau >= delta_t) )
         {
             is_first_value = false;

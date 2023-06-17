@@ -1,6 +1,6 @@
 #include    "msut.h"
 
-#include    "tep70-signals.h"
+#include    "tep70bs-signals.h"
 
 
 
@@ -35,6 +35,9 @@ void MSUT::step(double t, double dt)
 //------------------------------------------------------------------------------
 void MSUT::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     msut_output.acceleration = accel_calc->getDerivative();
 
     if (msut_input.button_start_state)
@@ -67,7 +70,9 @@ void MSUT::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void MSUT::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -75,7 +80,7 @@ void MSUT::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 //------------------------------------------------------------------------------
 void MSUT::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 void MSUT::stepDiscrete(double t, double dt)

@@ -10,11 +10,11 @@
 //      Дата: 12/05/2019
 //
 //------------------------------------------------------------------------------
-#ifndef     TEP70_H
-#define     TEP70_H
+#ifndef     TEP70BS_H
+#define     TEP70BS_H
 
 #include    "vehicle-api.h"
-#include    "tep70-signals.h"
+#include    "tep70bs-signals.h"
 
 #include    "battery.h"
 #include    "relay.h"
@@ -37,6 +37,8 @@
 #include    "brake-switcher.h"
 #include    "hysteresis-relay.h"
 
+#include    "msut.h"
+
 #include    "registrator.h"
 
 /*!
@@ -46,15 +48,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TEP70 : public Vehicle
+class TEP70BS : public Vehicle
 {
 public:
 
     /// Конструктор
-    TEP70();
+    TEP70BS();
 
     /// Деструктор
-    ~TEP70();
+    ~TEP70BS();
 
     /// Инициализация тормозных приборов
     void initBrakeDevices(double p0, double pTM, double pFL);
@@ -265,12 +267,6 @@ private:
     /// Регистратор, для постоения графиков
     Registrator             *reg;
 
-    /// Скоростемер
-    SL2M                    *speed_meter;
-
-    /// Кнопка "Пуск дизеля"
-    bool    button_disel_start;
-
     /// Кнопка "Отпуск тормозов"
     bool    button_brake_release;
 
@@ -332,6 +328,9 @@ private:
     /// при выключении КШ2 (нет в схеме!)
     TimeRelay           *ksh1_delay;
 
+    /// Микропроцессорная система управления тепловозом
+    MSUT                *msut;
+
     enum
     {
         NUM_MOTORS = 6
@@ -343,6 +342,11 @@ private:
     /// Поездные контакторы
     std::array<Relay *, NUM_MOTORS + 1> kp;
 
+    // Состояние последовательной цепи размыкающих контактов КП1 - КП7
+    bool is_KP1_KP7_off;
+
+    // Состояние последовательной цепи замыкающих контактор КП1 - КП6
+    bool is_KP1_KP6_on;
 
     /// АЗВ "Управление общее"
     Trigger azv_common_control;
@@ -371,6 +375,9 @@ private:
     /// Тумблер "Аварийная остановка дизеля"
     Trigger tumbler_disel_stop;
 
+    /// Кнопка пуска дизеля
+    Trigger button_start_disel;
+
     /// Тумблер "Ослабление поля I ступени руч./авт."
     TEP70Switcher tumbler_field_weak1;
 
@@ -382,6 +389,18 @@ private:
 
     /// Тумблер "Управление жалюзи масла руч./авт."
     TEP70Switcher tumbler_oil_zaluzi;
+
+    TEP70Switcher tumbler_revers;
+
+    msut_input_t msut_input;
+
+    msut_output_t msut_output;
+
+    std::vector<Trigger *> triggers;
+
+    size_t start_count;
+
+    Timer autoStartTimer;
 
     /// Инициализация всех систем тепловоза
     void initialization();
@@ -419,8 +438,14 @@ private:
     /// Инициализация прочего оборудования
     void initOther();
 
+    /// Инициализация МСУТ
+    void initMSUT();
+
     /// Инициализация звуков
     void initSounds();
+
+    /// Инициализация процедуры автозапуска
+    void initAutostart();
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
@@ -458,11 +483,16 @@ private:
     /// Шаг моделирования прочего оборудования
     void stepOther(double t, double dt);
 
+    /// Шаг работы МСУТ
+    void stepMSUT(double t, double dt);
+
     /// Вывод сигналов для анимаций
     void stepSignalsOutput(double t, double dt);
 
-    /// Работа локомотивного светофора по сигналам АЛСН
-    void stepDecodeAlsn();
+    /// Вывод сигналов на дисплей МСУ-ТЭ
+    void stepMSUTsignals(double t, double dt);
+
+    void stepAutostart(double t, double dt);
 
     /// Вывод отладочной строки
     void debugOutput(double t, double dt);
@@ -475,6 +505,10 @@ private:
 
     /// Обработка клавиш
     void keyProcess();
+
+private slots:
+
+    void slotAutostart();
 };
 
 #endif // TEP70_H
