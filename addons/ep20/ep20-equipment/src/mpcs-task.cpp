@@ -31,5 +31,9 @@ void Task::step(state_vector_t &Y, double t, double dt,
                 const mpcs_input_t &mpcs_input,
                 mpcs_output_t &mpcs_output)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dt)
+    Q_UNUSED(t)
+    Q_UNUSED(mpcs_input)
+    Q_UNUSED(mpcs_output)
 }

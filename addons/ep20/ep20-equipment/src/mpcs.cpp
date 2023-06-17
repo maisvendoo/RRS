@@ -53,7 +53,7 @@ void MPCS::init()
     taskPant->setStoragePath(pathStorage);
     taskPant->init();
 
-    auxConv = new AuxiliaryConverter();  
+    auxConv = new AuxiliaryConverter();
 }
 
 //------------------------------------------------------------------------------
@@ -111,11 +111,11 @@ void MPCS::stepKeysControl(double t, double dt)
     {
         if (isShift())
         {
-           keyPosition = 1;           
+           keyPosition = 1;
         }
         else
         {
-           keyPosition = 0;           
+           keyPosition = 0;
         }
     }
 
@@ -161,7 +161,7 @@ void MPCS::stepKeysControl(double t, double dt)
 // Шаг
 //------------------------------------------------------------------------------
 void MPCS::stepDiscrete(double t, double dt)
-{   
+{
     mpcs_output.control_switch = static_cast<float>(controlSwitch);
 
     if ( (keyPosition == 0) || (controlSwitch == 0) )
@@ -183,6 +183,9 @@ void MPCS::stepDiscrete(double t, double dt)
 //------------------------------------------------------------------------------
 void MPCS::stepMainSwitchControl(double t, double dt)
 {
+    Q_UNUSED(dt)
+    Q_UNUSED(t)
+
     mpcs_output.turn_on_ms = ms_fs_on.getState();
     mpcs_output.turn_on_ms = mpcs_output.turn_on_ms && mpcs_input.isOff_fs;
     mpcs_output.turn_on_ms = mpcs_output.turn_on_ms && (mpcs_input.current_kind_switch_state == 0);
@@ -195,6 +198,9 @@ void MPCS::stepMainSwitchControl(double t, double dt)
 //------------------------------------------------------------------------------
 void MPCS::stepFastSwitchControl(double t, double dt)
 {
+    Q_UNUSED(dt)
+    Q_UNUSED(t)
+
     mpcs_output.turn_on_fs = ms_fs_on.getState();
     mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && mpcs_input.isOff_ms;
     mpcs_output.turn_on_fs = mpcs_output.turn_on_fs && (mpcs_input.current_kind_switch_state == 1);
@@ -252,11 +258,17 @@ void MPCS::PressureReg()
 //------------------------------------------------------------------------------
 void MPCS::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     PressureReg();
 }
 
 void MPCS::postStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
     p_prev = mpcs_input.PressMR;
 }
 
@@ -265,7 +277,9 @@ void MPCS::postStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void MPCS::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------

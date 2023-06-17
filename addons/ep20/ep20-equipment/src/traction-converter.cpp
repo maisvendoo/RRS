@@ -1,85 +1,84 @@
-#include    "auxiliary-converter.h"
-
+#include    "traction-converter.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-AuxiliaryConverter::AuxiliaryConverter(QObject *parent) : Device (parent)
-  ,U4(0)
-  ,Fref(1)
-  ,Uref(1)
-  ,Koef(0.1267)
-  ,U1(0)
-  ,F(0)
-  ,U2(0)
+TractionConverter::TractionConverter(QObject *parent) : Device (parent)
+  ,Udc_in(0)
+  ,K4QS(1.808)
 {
-
+    std::fill(Ut.begin(), Ut.end(), 0);
+    std::fill(U4QS.begin(), U4QS.end(), 0);
+    std::fill(Udc.begin(), Udc.end(), 0);
+    std::fill(U4.begin(), U4.end(), 0);
 }
 
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-AuxiliaryConverter::~AuxiliaryConverter()
+TractionConverter::~TractionConverter()
 {
 
 }
 
 //------------------------------------------------------------------------------
-// Установить значение от ПСН
+// Установить напряжение с тяговых обмоток
 //------------------------------------------------------------------------------
-void AuxiliaryConverter::setU4(double U4)
+void TractionConverter::setUt(double Ut, size_t i)
 {
-        this->U4 = U4;
+    if (i < this->Ut.size())
+        this->Ut[i] = Ut;
 }
 
 //------------------------------------------------------------------------------
-// Получить значение напряжения
+// Установить напряжение постоянного тока
 //------------------------------------------------------------------------------
-double AuxiliaryConverter::getU1()
+void TractionConverter::setUdcIn(double Udc_in)
 {
-    return  U1;
+    this->Udc_in = Udc_in;
 }
 
 //------------------------------------------------------------------------------
-// Получить значение частоты
+// Получить напряжение ПСН
 //------------------------------------------------------------------------------
-double AuxiliaryConverter::getF()
+double TractionConverter::getU4(size_t i)
 {
-    return  F;
+    if (i < U4.size())
+        return U4[i];
+    else
+        return 0;
 }
 
 //------------------------------------------------------------------------------
-// Получить значение напряжения 380
+// Предварительные шаги
 //------------------------------------------------------------------------------
-double AuxiliaryConverter::getU2()
+void TractionConverter::preStep(state_vector_t &Y, double t)
 {
-    return U2;
-}
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 
-//------------------------------------------------------------------------------
-// Пердварительные шаги
-//------------------------------------------------------------------------------
-void AuxiliaryConverter::preStep(state_vector_t &Y, double t)
-{
-    U1 = Uref;
-
-    F = Fref;
-
-    U2 = Koef * U4;
+    for (size_t i = 0; i < U4QS.size(); ++i)
+    {
+        U4QS[i] = K4QS * Ut[i];
+        Udc[i] = max(U4QS[i], Udc_in);
+        U4[i] = Udc[i];
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AuxiliaryConverter::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
+void TractionConverter::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
-// Загрузка конфига
+//
 //------------------------------------------------------------------------------
-void AuxiliaryConverter::load_config(CfgReader &cfg)
+void TractionConverter::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }

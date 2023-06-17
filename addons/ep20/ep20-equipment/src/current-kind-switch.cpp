@@ -50,12 +50,14 @@ void CurrentKindSwitch::preStep(state_vector_t &Y, double t)
 
 void CurrentKindSwitch::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 void CurrentKindSwitch::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }
 
 

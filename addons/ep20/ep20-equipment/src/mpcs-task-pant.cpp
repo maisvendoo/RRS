@@ -247,7 +247,7 @@ void TaskPant::pantUp(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output
 
             for (size_t i = 0; i < mpcs_input.pant_up.size(); ++i)
             {
-                if (i != prevPant)
+                if (i != static_cast<size_t>(prevPant) )
                 {
                     more_one_up = more_one_up || mpcs_input.pant_up[i];
 
@@ -401,6 +401,8 @@ void TaskPant::pantDown(const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_outp
 void TaskPant::step(state_vector_t &Y, double t, double dt,
                     const mpcs_input_t &mpcs_input, mpcs_output_t &mpcs_output)
 {
+    Q_UNUSED(Y)
+
     pantUp(mpcs_input, mpcs_output);
 
     pantDown(mpcs_input, mpcs_output);

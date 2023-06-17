@@ -5,21 +5,21 @@
 //------------------------------------------------------------------------------
 // Конструктор класса
 //------------------------------------------------------------------------------
-KMB2::KMB2(QObject *parent)
-    : reverse_dir(0),
-      traction_pos(0),
-      velocity_pos(0),
-      traction_level(0.0),
-      velocity_level(0.0),
-      reverse_state(0),
-      traction_rate(0.0),
-      velocity_rate(0.0),
-      T(0.5),
-      S1(0),
-      S2(0),
-      S3(0),
-      old_state_W(false),
-      old_state_S(false)
+KMB2::KMB2(QObject *parent) : Device(parent)
+  , reverse_dir(0)
+  , traction_pos(0)
+  , velocity_pos(0)
+  , traction_level(0.0)
+  , velocity_level(0.0)
+  , reverse_state(0)
+  , traction_rate(0.0)
+  , velocity_rate(0.0)
+  , T(0.5)
+  , S1(0)
+  , S2(0)
+  , S3(0)
+  , old_state_W(false)
+  , old_state_S(false)
 {
     tractionVelocityLevelTimer = new Timer(0.1, false, Q_NULLPTR);
     connect(tractionVelocityLevelTimer, &Timer::process, this, &KMB2::levelTimerHandler);
@@ -40,7 +40,7 @@ KMB2::~KMB2()
 }
 
 //------------------------------------------------------------------------------
-// Деструктор класса
+//
 //------------------------------------------------------------------------------
 float KMB2::getReverseDir()
 {
@@ -48,7 +48,7 @@ float KMB2::getReverseDir()
 }
 
 //------------------------------------------------------------------------------
-// Деструктор класса
+//
 //------------------------------------------------------------------------------
 float KMB2::getTractionPosition()
 {
@@ -56,7 +56,7 @@ float KMB2::getTractionPosition()
 }
 
 //------------------------------------------------------------------------------
-// Деструктор класса
+//
 //------------------------------------------------------------------------------
 float KMB2::getVelocityPosition()
 {
@@ -64,7 +64,7 @@ float KMB2::getVelocityPosition()
 }
 
 //------------------------------------------------------------------------------
-// Деструктор класса
+//
 //------------------------------------------------------------------------------
 double KMB2::getTractionLevel()
 {
@@ -72,7 +72,7 @@ double KMB2::getTractionLevel()
 }
 
 //------------------------------------------------------------------------------
-// Деструктор класса
+//
 //------------------------------------------------------------------------------
 double KMB2::getVelocityLevel()
 {
@@ -80,7 +80,7 @@ double KMB2::getVelocityLevel()
 }
 
 //------------------------------------------------------------------------------
-// Деструктор класса
+//
 //------------------------------------------------------------------------------
 float KMB2::getReverseState()
 {
@@ -99,6 +99,8 @@ double KMB2::getS3()
 
 void KMB2::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(t)
+
     S1 = Y[0] - 0.99;
     S2 = hs_p(S1);
     S3 = S2 + pf(reverse_state);
@@ -106,6 +108,8 @@ void KMB2::preStep(state_vector_t &Y, double t)
 
 void KMB2::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
+    Q_UNUSED(t)
+
     dYdt[0] = (nf(reverse_state) - Y[0])/T;
 }
 

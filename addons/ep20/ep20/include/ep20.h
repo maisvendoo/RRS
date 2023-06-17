@@ -22,9 +22,7 @@
 #include    "traction-transformer.h"
 #include    "traction-converter.h"
 #include    "auxiliary-converter.h"
-#include    "ac-motor-compressor.h"
 #include    "ep20-signals.h"
-#include    "ep20-brake-mech.h"
 #include    "kmb2.h"
 
 /*!
@@ -83,15 +81,6 @@ private:
     /// Преобразователь собственных нужд
     std::array<AuxiliaryConverter *, NUM_AUX_CONV> auxConv;
 
-    /// Резервуар
-    Reservoir   *main_reservoir;
-
-    /// Запасный резервуар (ЗР)
-    Reservoir   *spareReservoir;
-
-    /// Мотор компрессор   
-    std::array<ACMotorCompressor *, 2> motorCompAC;
-
     /// Входные значения
     mpcs_input_t mpcsInput;
 
@@ -101,35 +90,87 @@ private:
     /// Массив токоприемников
     std::array<Pantograph *, NUM_PANTOGRAPHS> pantograph;
 
+    /// Мотор-компрессор
+    std::array<ACMotorCompressor *, 2> motor_compressor;
+
+    /// Главный резервуар
+    Reservoir           *main_reservoir;
+
+    /// Концевой кран питательной магистрали спереди
+    PneumoAngleCock     *anglecock_fl_fwd;
+
+    /// Концевой кран питательной магистрали сзади
+    PneumoAngleCock     *anglecock_fl_bwd;
+
+    /// Рукав питательной  магистрали спереди
+    PneumoHose          *hose_fl_fwd;
+
+    /// Рукав питательной  магистрали сзади
+    PneumoHose          *hose_fl_bwd;
+
     /// Зарядное давление
     double charge_press;
 
-    /// Поездной кран машиниста (КрМ)
-    BrakeCrane *krm;
+    /// Поездной кран машиниста усл.№130
+    BrakeCrane          *brake_crane;
 
-    /// Кран вспомогательного тормоза (КВТ)
-    LocoCrane *kvt;
+    /// Кран впомогательного тормоза усл.№224
+    LocoCrane           *loco_crane;
 
-    /// Переключательный клапан (ЗПК)
-    SwitchingValve *zpk;
+    /// Тормозная магистраль
+    Reservoir           *brakepipe;
 
-    /// Воздухораспределитель (ВР)
-    AirDistributor  *airDistr;
+    /// Воздухораспределитель
+    AirDistributor      *air_dist;
 
-    /// Электро-воздухораспределитель (ЭВР)
-    ElectroAirDistributor   *electroAirDistr;
+    /// Электровоздухораспределитель
+    ElectroAirDistributor  *electro_air_dist;
+
+    /// Запасный резервуар
+    Reservoir           *supply_reservoir;
+
+    /// Концевой кран тормозной магистрали спереди
+    PneumoAngleCock     *anglecock_bp_fwd;
+
+    /// Концевой кран тормозной магистрали сзади
+    PneumoAngleCock     *anglecock_bp_bwd;
+
+    /// Рукав тормозной магистрали спереди
+    PneumoHoseEPB       *hose_bp_fwd;
+
+    /// Рукав тормозной магистрали сзади
+    PneumoHoseEPB       *hose_bp_bwd;
+
+    /// Переключательный клапан магистрали тормозных цилиндров ЗПК
+    SwitchingValve      *bc_switch_valve;
+
+    /// Тройники для распределения воздуха от переключательного клапана
+    /// к тележкам
+    std::array<PneumoSplitter *, 2> bc_splitter;
 
     enum
     {
         NUM_TROLLEYS = 3,
-        FWD_TROLLEY = 0,
-        MDL_TROLLEY = 1,
-        BWD_TROLLEY = 2
+        NUM_AXIS_PER_TROLLEY = 2,
+        TROLLEY_FWD = 0,
+        TROLLEY_MID = 1,
+        TROLLEY_BWD = 2
     };
 
-    std::array<EP20BrakeMech *, NUM_TROLLEYS> brake_mech;
-    std::array<PneumoReley *, NUM_TROLLEYS> rd304;
-    std::array<PneumoSplitter *, 2> pSplit;
+    /// Повторительное реле давления усл.№304
+    std::array<PneumoRelay *, NUM_TROLLEYS> bc_pressure_relay;
+
+    /// Тормозные механизмы тележек
+    std::array<BrakeMech *, NUM_TROLLEYS> brake_mech;
+
+    /// Напряжение аккумуляторной батареи
+    double U_bat;
+
+    /// Источник питания ЭПТ
+    EPBConverter        *epb_converter;
+
+    /// Блок управления двухпроводного ЭПТ
+    EPBControl          *epb_control;
 
     /// Бесконтактный контроллер машиниста
     KMB2    *kmb2;
@@ -140,8 +181,17 @@ private:
     /// Инициализация высоковольтной схемы
     void initHighVoltageScheme();
 
-    /// Инициализация тормозного крана
-    void initBrakeControls(QString modules_dir);
+    /// Инициализация питательной магистрали
+    void initPneumoSupply(QString modules_dir);
+
+    /// Инициализация приборов управления тормозами
+    void initBrakesControl(QString modules_dir);
+
+    /// Инициализация тормозного оборудования
+    void initBrakesEquipment(QString modules_dir);
+
+    /// Инициализация ЭПТ
+    void initEPB(QString modules_dir);
 
     /// Инициализация МПСУ
     void initMPCS();
@@ -158,11 +208,23 @@ private:
     /// Шаг моделирования высоковольтной схемы
     void stepHighVoltageScheme(double t, double dt);
 
-    /// Шаг моделирования тормозного крана
-    void stepBrakeControls(double t, double dt);
+    /// Шаг моделирования питательной магистрали
+    void stepPneumoSupply(double t, double dt);
+
+    /// Шаг моделирования приборов управления тормозами
+    void stepBrakesControl(double t, double dt);
+
+    /// Шаг моделирования тормозного оборудования
+    void stepBrakesEquipment(double t, double dt);
+
+    /// Шаг моделирования ЭПТ
+    void stepEPB(double t, double dt);
 
     /// Шаг моделирования бесконтактного контроллера машиниста
     void stepKMB2(double t, double dt);
+
+    /// Вывод отладочной строки
+    void debugOutput(double t, double dt);
 
     /// Загрузка данных из конфигурационных файлов
     void loadConfig(QString cfg_path);

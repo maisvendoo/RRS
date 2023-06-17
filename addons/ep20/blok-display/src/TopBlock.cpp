@@ -47,7 +47,7 @@ TopBlock::TopBlock(QRect geo, QWidget *parent, QString config_dir) : QWidget(par
 
     QRect geoIP; // размер и положение элементов
     int fooH_ip = 70; // высота элементов
-    Qt::Alignment alignLeft = Qt::Alignment(Qt::AlignVCenter + Qt::AlignLeft);
+//    Qt::Alignment alignLeft = Qt::Alignment(Qt::AlignVCenter + Qt::AlignLeft);
     Qt::Alignment alignCenter = Qt::AlignCenter;
 
     // устанавливаем элементы информационного блока и заносим в map

@@ -40,7 +40,7 @@ void TEP70BS::stepBrakesEquipment(double t, double dt)
     brake_mech[TROLLEY_FWD]->setAngularVelocity(2, wheel_omega[2]);
     brake_mech[TROLLEY_FWD]->step(t, dt);
 
-    // Задняя тележка управляется от переключательного клапана магистрали ТЦ
+    // Задняя тележка управляется от реле давления 304
     brake_mech[TROLLEY_BWD]->setBCflow(bc_pressure_relay[TROLLEY_BWD]->getPipeFlow());
     brake_mech[TROLLEY_BWD]->setAngularVelocity(0, wheel_omega[3]);
     brake_mech[TROLLEY_BWD]->setAngularVelocity(1, wheel_omega[4]);

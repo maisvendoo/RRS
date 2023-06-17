@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>3</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <!-- Объём рабочих камер переключательного клапана -->
+        <V1>1.0e-2</V1>
+        <V2>1.0e-2</V2>
+
+        <K1>5e-2</K1>
+
+        <A1>100.0</A1>
+
+    </Device>
+</Config>

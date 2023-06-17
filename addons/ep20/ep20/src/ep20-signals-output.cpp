@@ -2,13 +2,13 @@
 
 void EP20::stepSignals()
 {
-    analogSignal[STRELKA_pTM] = static_cast<float>(pTM / 1.0);
+    analogSignal[STRELKA_pTM] = static_cast<float>(brakepipe->getPressure() / 1.0);
     analogSignal[STRELKA_pGR] = static_cast<float>(main_reservoir->getPressure() / 1.6);
-    analogSignal[STRELKA_pTC] = static_cast<float>(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure() / 1.6);
-    analogSignal[STRELKA_pUR] = static_cast<float>(krm->getEqReservoirPressure() / 1.0);
+    analogSignal[STRELKA_pTC] = static_cast<float>(brake_mech[TROLLEY_FWD]->getBCpressure() / 1.6);
+    analogSignal[STRELKA_pUR] = static_cast<float>(brake_crane->getERpressure() / 1.0);
 
-    analogSignal[RUK_KRM130] = krm->getHandlePosition();
-    analogSignal[RUK_KVT224] = static_cast<float>(kvt->getHandlePosition());
+    analogSignal[RUK_KRM130] = brake_crane->getHandlePosition();
+    analogSignal[RUK_KVT224] = static_cast<float>(loco_crane->getHandlePosition());
 
     analogSignal[KMB2_Real] = kmb2->getTractionPosition();
     analogSignal[KMB2_Fake] = kmb2->getVelocityPosition();
@@ -18,9 +18,9 @@ void EP20::stepSignals()
 
     analogSignal[Key] = mpcs->getKeyPosition();
 
-    analogSignal[BLOK_TC_PRESS] = static_cast<float>(brake_mech[FWD_TROLLEY]->getBrakeCylinderPressure());
-    analogSignal[BLOK_TM_PRESS] = static_cast<float>(pTM);
-    analogSignal[BLOK_UR_PRESS] = static_cast<float>(krm->getEqReservoirPressure());
+    analogSignal[BLOK_TC_PRESS] = static_cast<float>(brake_mech[TROLLEY_FWD]->getBCpressure());
+    analogSignal[BLOK_TM_PRESS] = static_cast<float>(brakepipe->getPressure());
+    analogSignal[BLOK_UR_PRESS] = static_cast<float>(brake_crane->getERpressure());
 
     analogSignal[BLOK_RAILWAY_COORD] = static_cast<float>(railway_coord / 1000.0);
     analogSignal[BLOK_VELOCITY] = static_cast<float>(velocity * Physics::kmh);

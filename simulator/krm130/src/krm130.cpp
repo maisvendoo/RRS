@@ -89,33 +89,11 @@ void BrakeCrane130::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
-/*
-    t_old = t;
 
-    if ( (static_cast<int>(pos[POS_II]) == 1) && pulse_II )
-    {
-        Y[0] = cut(pf(2 * p0  - Y[1]), 0.0, pFL);
-        pulse_II = false;
-    }
-    else
-    {
-        pulse_II = true;
-    }
-*/
     is_hold = static_cast<bool>(pos[POS_III] + pos[POS_IV]);
     is_brake = static_cast<bool>(pos[POS_Va] + pos[POS_V] + pos[POS_VI]);
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void BrakeCrane130::postStep(state_vector_t &Y, double t)
-{
-    Q_UNUSED(Y)
 
-    dt = t - t_old;
-}
-*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

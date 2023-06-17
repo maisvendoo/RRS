@@ -1,80 +1,86 @@
-#include    "traction-converter.h"
+#include    "traction-transformer.h"
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-TractionConverter::TractionConverter(QObject *parent) : Device (parent)
-  ,Udc_in(0)
-  ,K4QS(1.808)
+TractionTransformer::TractionTransformer(QObject *parent) : Device (parent)
+  ,U1(0)
+  ,traction_coefficient(15.07)
+  ,heating_coil_coefficient(8.33)
+  ,winding_coils_heating(0)
 {
-    std::fill(Ut.begin(), Ut.end(), 0);
-    std::fill(U4QS.begin(), U4QS.end(), 0);
-    std::fill(Udc.begin(), Udc.end(), 0);
-    std::fill(U4.begin(), U4.end(), 0);
+    std::fill(traction_winding_coils.begin(), traction_winding_coils.end(), 0);
 }
 
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-TractionConverter::~TractionConverter()
+TractionTransformer::~TractionTransformer()
 {
 
 }
 
 //------------------------------------------------------------------------------
-// Установить напряжение с тяговых обмоток
+// Установить напряжение с выхода ГВ
 //------------------------------------------------------------------------------
-void TractionConverter::setUt(double Ut, size_t i)
+void TractionTransformer::setU1(double U1)
 {
-    if (i < this->Ut.size())
-        this->Ut[i] = Ut;
+    this->U1 = U1;
 }
 
 //------------------------------------------------------------------------------
-// Установить напряжение постоянного тока
+// Получить напряжение тяговой обмотки
 //------------------------------------------------------------------------------
-void TractionConverter::setUdcIn(double Udc_in)
+double TractionTransformer::getTractionVoltage(size_t i)
 {
-    this->Udc_in = Udc_in;
-}
-
-//------------------------------------------------------------------------------
-// Получить напряжение ПСН
-//------------------------------------------------------------------------------
-double TractionConverter::getU4(size_t i)
-{
-    if (i < U4.size())
-        return U4[i];
+    if (i < traction_winding_coils.size())
+    {
+       return traction_winding_coils[i];
+    }
     else
+    {
         return 0;
+    }
+}
+
+//------------------------------------------------------------------------------
+// Получить напряжение обмотки отопления
+//------------------------------------------------------------------------------
+double TractionTransformer::getVoltageHeatingCoil()
+{
+    return winding_coils_heating;
 }
 
 //------------------------------------------------------------------------------
 // Предварительные шаги
 //------------------------------------------------------------------------------
-void TractionConverter::preStep(state_vector_t &Y, double t)
+void TractionTransformer::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 
-    for (size_t i = 0; i < U4QS.size(); ++i)
+    for (size_t i = 0; i < traction_winding_coils.size(); ++i)
     {
-        U4QS[i] = K4QS * Ut[i];
-        Udc[i] = max(U4QS[i], Udc_in);
-        U4[i] = Udc[i];
+        traction_winding_coils[i] = U1 / traction_coefficient;
     }
+
+    winding_coils_heating = U1 / heating_coil_coefficient;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TractionConverter::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
+void TractionTransformer::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TractionConverter::load_config(CfgReader &cfg)
+void TractionTransformer::load_config(CfgReader &cfg)
 {
-
+    Q_UNUSED(cfg)
 }

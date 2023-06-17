@@ -1,81 +1,90 @@
-#include    "traction-transformer.h"
+#include    "auxiliary-converter.h"
+
 
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-TractionTransformer::TractionTransformer(QObject *parent) : Device (parent)
+AuxiliaryConverter::AuxiliaryConverter(QObject *parent) : Device (parent)
+  ,U4(0)
+  ,Fref(1)
+  ,Uref(1)
+  ,Koef(0.1267)
   ,U1(0)
-  ,traction_coefficient(15.07)
-  ,heating_coil_coefficient(8.33)
-  ,winding_coils_heating(0)
+  ,F(0)
+  ,U2(0)
 {
-    std::fill(traction_winding_coils.begin(), traction_winding_coils.end(), 0);
+
 }
 
 //------------------------------------------------------------------------------
 // Деструктор
 //------------------------------------------------------------------------------
-TractionTransformer::~TractionTransformer()
+AuxiliaryConverter::~AuxiliaryConverter()
 {
 
 }
 
 //------------------------------------------------------------------------------
-// Установить напряжение с выхода ГВ
+// Установить значение от ПСН
 //------------------------------------------------------------------------------
-void TractionTransformer::setU1(double U1)
+void AuxiliaryConverter::setU4(double U4)
 {
-    this->U1 = U1;
+        this->U4 = U4;
 }
 
 //------------------------------------------------------------------------------
-// Получить напряжение тяговой обмотки
+// Получить значение напряжения
 //------------------------------------------------------------------------------
-double TractionTransformer::getTractionVoltage(size_t i)
+double AuxiliaryConverter::getU1()
 {
-    if (i < traction_winding_coils.size())
-    {
-       return traction_winding_coils[i];
-    }
-    else
-    {
-        return 0;
-    }
+    return  U1;
 }
 
 //------------------------------------------------------------------------------
-// Получить напряжение обмотки отопления
+// Получить значение частоты
 //------------------------------------------------------------------------------
-double TractionTransformer::getVoltageHeatingCoil()
+double AuxiliaryConverter::getF()
 {
-    return winding_coils_heating;
+    return  F;
 }
 
 //------------------------------------------------------------------------------
-// Предварительные шаги
+// Получить значение напряжения 380
 //------------------------------------------------------------------------------
-void TractionTransformer::preStep(state_vector_t &Y, double t)
+double AuxiliaryConverter::getU2()
 {
-    for (size_t i = 0; i < traction_winding_coils.size(); ++i)
-    {
-        traction_winding_coils[i] = U1 / traction_coefficient;
-    }
-
-    winding_coils_heating = U1 / heating_coil_coefficient;
+    return U2;
 }
 
 //------------------------------------------------------------------------------
-//
+// Пердварительные шаги
 //------------------------------------------------------------------------------
-void TractionTransformer::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
+void AuxiliaryConverter::preStep(state_vector_t &Y, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
 
+    U1 = Uref;
+
+    F = Fref;
+
+    U2 = Koef * U4;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TractionTransformer::load_config(CfgReader &cfg)
+void AuxiliaryConverter::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
+}
 
+//------------------------------------------------------------------------------
+// Загрузка конфига
+//------------------------------------------------------------------------------
+void AuxiliaryConverter::load_config(CfgReader &cfg)
+{
+    Q_UNUSED(cfg)
 }
