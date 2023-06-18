@@ -8,6 +8,8 @@ ScaleArrow2::ScaleArrow2(QSize _size, int otstupSverhu, QWidget *parent)
     : QLabel(parent)
     , maxVal_(4)
 {
+    Q_UNUSED(otstupSverhu)
+
     this->resize(_size);
     w_2_ = this->width()/2.0;
     h_2_ = this->width()/2.0 + 2;
@@ -51,7 +53,7 @@ void ScaleArrow2::draw_(double _val)
 
     int sgp_angleArcEnd = -40; // +++
     //int sgp_maxSpeedScale = 60; // maxVal_
-    int sgp_lenArcScale = 260; // +++
+    //int sgp_lenArcScale = 260; // +++
     double stepDeg_ = /*(360.0-90)*/260/maxVal_;
 
 

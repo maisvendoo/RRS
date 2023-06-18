@@ -3,7 +3,7 @@
 #include    <QLabel>
 
 
-#include    "tep70-signals.h"
+#include    "tep70bs-signals.h"
 
 
 

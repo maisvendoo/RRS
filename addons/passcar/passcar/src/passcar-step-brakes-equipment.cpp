@@ -53,7 +53,7 @@ void PassCar::stepBrakesEquipment(double t, double dt)
     for (size_t i = 0; i < num_axis; ++i)
     {
         brake_mech->setAngularVelocity(i, wheel_omega[i]);
-        Q_r[i] = brake_mech->getBrakeTorque(i);
+        Q_r[i + 1] = brake_mech->getBrakeTorque(i);
     }
 
     // Концевые краны тормозной магистрали

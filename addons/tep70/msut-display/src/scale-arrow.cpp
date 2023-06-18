@@ -52,7 +52,7 @@ void ScaleArrow::draw_(double _val)
 
     int sgp_angleArcEnd = 45; // +++
     //int sgp_maxSpeedScale = 60; // maxVal_
-    int sgp_lenArcScale = 90; // +++
+    //int sgp_lenArcScale = 90; // +++
     double stepDeg_ = (360.0-270)/maxVal_;
 
 

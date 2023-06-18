@@ -36,7 +36,7 @@
         <ShoesAxis>4</ShoesAxis>
 
         <!-- Эффективный радиус тормозной поверхности (радиус поверхности катания колёс или тормозных дисков) -->
-        <!-- <EffRadius>0.660</EffRadius> -->
+        <!-- <EffRadius>0.625</EffRadius> -->
 
         <!-- Материал колодок: iron/iron-ph/composite (чугун/фосфористый чугун/композит) -->
         <ShoeType>iron</ShoeType>

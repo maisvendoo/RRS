@@ -45,13 +45,13 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
     brake_mech[TROLLEY_BWD]->setAngularVelocity(2, wheel_omega[5]);
     brake_mech[TROLLEY_BWD]->step(t, dt);
 
-    Q_r[0] = brake_mech[TROLLEY_FWD]->getBrakeTorque(0);
-    Q_r[1] = brake_mech[TROLLEY_FWD]->getBrakeTorque(1);
-    Q_r[2] = brake_mech[TROLLEY_FWD]->getBrakeTorque(2);
+    Q_r[1] = brake_mech[TROLLEY_FWD]->getBrakeTorque(0);
+    Q_r[2] = brake_mech[TROLLEY_FWD]->getBrakeTorque(1);
+    Q_r[3] = brake_mech[TROLLEY_FWD]->getBrakeTorque(2);
 
-    Q_r[3] = brake_mech[TROLLEY_BWD]->getBrakeTorque(0);
-    Q_r[4] = brake_mech[TROLLEY_BWD]->getBrakeTorque(1);
-    Q_r[5] = brake_mech[TROLLEY_BWD]->getBrakeTorque(2);
+    Q_r[4] = brake_mech[TROLLEY_BWD]->getBrakeTorque(0);
+    Q_r[5] = brake_mech[TROLLEY_BWD]->getBrakeTorque(1);
+    Q_r[6] = brake_mech[TROLLEY_BWD]->getBrakeTorque(2);
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());

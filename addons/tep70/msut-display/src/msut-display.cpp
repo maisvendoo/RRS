@@ -1,6 +1,6 @@
 #include    "msut-display.h"
 
-#include    "tep70-signals.h"
+#include    "tep70bs-signals.h"
 
 #include    <QLayout>
 #include    <QLabel>
