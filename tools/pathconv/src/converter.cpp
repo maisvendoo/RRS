@@ -56,7 +56,7 @@ void Converter::process(const QString &routeDir)
     while (model_files.hasNext())
     {
         QFileInfo fileInfo(model_files.next());
-        QString key = fileInfo.baseName().toLower();        
+        QString key = fileInfo.fileName().toLower();
 
         model_names.insert(key, fileInfo.fileName());
     }
@@ -80,7 +80,7 @@ void Converter::process(const QString &routeDir)
         return;
     }
 
-    rewriteObjectsRef();
+    //rewriteObjectsRef();
 }
 
 //------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ bool Converter::rewriteObjectsRef()
 
                 if (token_it == tokens.begin() + 1)
                 {
-                    key = fileInfo.baseName().toLower();
+                    key = fileInfo.fileName().toLower();
 
                     if (key.isEmpty())
                         continue;
