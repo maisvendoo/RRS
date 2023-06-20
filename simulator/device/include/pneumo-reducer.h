@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class PneumoReducer : public BrakeDevice
+class DEVICE_EXPORT PneumoReducer : public BrakeDevice
 {
 public:
 

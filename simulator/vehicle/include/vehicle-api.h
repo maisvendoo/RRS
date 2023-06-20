@@ -20,6 +20,7 @@
 #include    "pneumo-anglecock.h"
 #include    "pneumo-hose-epb.h"
 #include    "pneumo-hose.h"
+#include    "pneumo-reducer.h"
 #include    "pneumo-relay.h"
 #include    "pneumo-splitter.h"
 #include    "pneumo-switching-valve.h"
