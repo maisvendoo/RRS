@@ -723,14 +723,32 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
 
     QString name_fwd = con_fwd->getName();
     QString name_bwd = con_bwd->getName();
-
     QString joint_cfg_name = QString("joint-" + name_fwd + "-" + name_bwd);
+
+    // Default directory of joint's configuration files
     QString joint_cfg_path = QString(fs.getDevicesDir().c_str()) +
             fs.separator() + joint_cfg_name + ".xml";
 
     if (!cfg.load(joint_cfg_path))
-        return;
+    {
+        // Forward connector's config directory
+        joint_cfg_path = con_fwd->getCustomConfigDir() +
+                fs.separator() + joint_cfg_name + ".xml";
 
+        if (!cfg.load(joint_cfg_path))
+        {
+            // Backward connector's config directory
+            joint_cfg_path = con_bwd->getCustomConfigDir() +
+                    fs.separator() + joint_cfg_name + ".xml";
+
+            if (!cfg.load(joint_cfg_path))
+            {
+                return;
+            }
+        }
+    }
+
+    Journal::instance()->info("Loaded file: " + joint_cfg_path);
     QString secName = "Joint";
 
     QString joint_module_dir;

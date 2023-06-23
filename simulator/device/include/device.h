@@ -97,6 +97,8 @@ public:
 
     void setCustomConfigDir(const QString &value);
 
+    QString getCustomConfigDir() const;
+
 signals:
 
     /// Print debug info into file
