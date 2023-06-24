@@ -15,7 +15,7 @@
         <StockOut>0.085</StockOut>
 
         <!-- Мёртвый объём тормозных цилиндров и подводящих труб, м^3 -->
-        <DeadVolume>1.0e-3</DeadVolume>
+        <DeadVolume>5.0e-3</DeadVolume>
 
         <!-- Коэффициент утечек из тормозных цилиндров -->
         <kLeak>1.0e-6</kLeak>

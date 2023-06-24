@@ -186,7 +186,7 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::hardwareOutput()
 {
-    feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(pTM);
+    feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(brakepipe->getPressure());
     feedback_signals.analogSignal[1].cur_value = UR_manometer->getModbus(brake_crane->getERpressure());
     feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brake_ref_res->getPressure());
     feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(main_reservoir->getPressure());

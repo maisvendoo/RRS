@@ -12,7 +12,6 @@ SUBDIRS += ./euler2
 SUBDIRS += ./euler
 SUBDIRS += ./vehicle
 SUBDIRS += ./coupling
-SUBDIRS += ./brakepipe
 SUBDIRS += ./profile
 SUBDIRS += ./train
 SUBDIRS += ./sim-client

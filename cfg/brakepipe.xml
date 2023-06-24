@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Config>
-	<BrakePipe>
-		<lambda>0.066</lambda>
-		<diameter>0.0343</diameter>
-		<muf>1.5e-8</muf>
-		<AirTemp>20.0</AirTemp>
-	</BrakePipe>
-</Config>

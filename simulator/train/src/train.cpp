@@ -18,7 +18,6 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , no_air(false)
   , init_main_res_pressure(0.0)
   , train_motion_solver(nullptr)
-  , brakepipe(nullptr)
   , soundMan(nullptr)
 {
 
@@ -118,20 +117,6 @@ bool Train::init(const init_data_t &init_data)
     Journal::instance()->info("Setting up of initial conditions");
     setInitConditions(init_data);
 
-    // Brakepipe initialization
-    brakepipe = new BrakePipe();
-
-    Journal::instance()->info(QString("Created brakepipe object at address: 0x%1")
-                              .arg(reinterpret_cast<quint64>(brakepipe), 0, 16));
-
-    brakepipe->setLength(trainLength);
-    brakepipe->setNodesNum(vehicles.size());
-
-    if (!no_air)
-        brakepipe->setBeginPressure(charging_pressure * Physics::MPa + Physics::pA);
-
-    brakepipe->init(QString(fs.getConfigDir().c_str()) + fs.separator() + "brakepipe.xml");
-
     initVehiclesBrakes();
 
     return true;
@@ -212,9 +197,6 @@ bool Train::step(double t, double &dt)
     }
     dt = tau;
 
-    // Brakepipe simulation
-    brakepipe->step(t, dt);
-
     vehiclesStep(t, dt);
 
     return done;
@@ -229,9 +211,6 @@ void Train::vehiclesStep(double t, double dt)
     auto joints_it = joints_list.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
-
-    brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
-    size_t j = 1;
 
     for (auto it = begin; it != end; ++it)
     {
@@ -252,17 +231,12 @@ void Train::vehiclesStep(double t, double dt)
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
-        vehicle->setBrakepipePressure(brakepipe->getPressure(j));
-
         profile_element_t pe = profile->getElement(y[idx]);
         vehicle->setInclination(pe.inclination);
         vehicle->setCurvature(pe.curvature);
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationStep(y, t, dt);
-
-        ++j;
     }
 }
 
@@ -826,7 +800,14 @@ void Train::initVehiclesBrakes()
 
     for (size_t i = 0; i < vehicles.size(); ++i)
     {
-        double pTM = brakepipe->getPressure(i);
-        vehicles[i]->initBrakeDevices(charging_pressure, pTM, init_main_res_pressure);
+        if (no_air)
+        {
+            vehicles[i]->initBrakeDevices(charging_pressure, 0.0, init_main_res_pressure);
+        }
+        else
+        {
+            double pBP = charging_pressure;
+            vehicles[i]->initBrakeDevices(charging_pressure, pBP, init_main_res_pressure);
+        }
     }
 }

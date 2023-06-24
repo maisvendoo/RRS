@@ -25,7 +25,6 @@
 #include    "device-joint.h"
 #include    "solver.h"
 #include    "solver-config.h"
-#include    "brakepipe.h"
 #include    "profile.h"
 #include    "sound-manager.h"
 
@@ -133,9 +132,6 @@ private:
 
     /// Motion ODE's solver
     Solver      *train_motion_solver;
-
-    /// Brakepipe model
-    BrakePipe   *brakepipe;
 
     /// Sound manager
     SoundManager *soundMan;

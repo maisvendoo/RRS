@@ -157,15 +157,6 @@ public:
     ///
     void integrationPostStep(state_vector_t &Y, double t);
 
-    ///
-    double getBrakepipeBeginPressure() const;
-
-    ///
-    double getBrakepipeAuxRate() const;
-
-    ///
-    void setBrakepipePressure(double pTM);
-
     QString getDebugMsg() const;
 
     /// vehicle get sounds directory
@@ -178,21 +169,7 @@ public:
 
     void setCurrentKind(int value);
 
-    void setEPTControl(size_t i, double value);
-
-    double getEPTCurrent(size_t i);
-
-    double getEPTControl(size_t i);
-
     void setASLN(alsn_info_t alsn_info);
-
-    float getFwdOutput(size_t index) const;
-
-    void setFwdInput(size_t index, float value);
-
-    float getBwdOutput(size_t index) const;
-
-    void setBwdInput(size_t index, float value);
 
 public slots:
 
@@ -302,13 +279,6 @@ protected:
     /// Vehicle orientation
     int     orient;
 
-    /// Pressure in begin of brakepipe
-    double p0;
-    /// Aux brakepipe pressure rate
-    double auxRate;
-    /// Brakepipe pressure
-    double pTM;
-
     QString DebugMsg;
 
     Vehicle *prev_vehicle;
@@ -347,24 +317,8 @@ protected:
 
     feedback_signals_t  feedback_signals;
 
-    /// Линии управления ЭПТ
-    std::vector<double> ept_control;
-
-    /// Ток в линии управления ЭПТ
-    std::vector<double> ept_current;
-
     /// Информация АЛСН
     alsn_info_t     alsn_info;
-
-    /// Входные сигналы СМЕ
-    std::array<float, INPUTS_NUMBER>    forward_inputs;
-    /// Выходные сигналы СМЕ
-    std::array<float, OUTPUTS_NUMBER>   forward_outputs;
-
-    /// Входные сигналы СМЕ
-    std::array<float, INPUTS_NUMBER>    backward_inputs;
-    /// Выходные сигналы СМЕ
-    std::array<float, OUTPUTS_NUMBER>   backward_outputs;
 
     /// User defined initialization
     virtual void initialization();
