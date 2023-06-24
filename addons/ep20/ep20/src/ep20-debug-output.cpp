@@ -21,7 +21,6 @@ void EP20::debugOutput(double t, double dt)
             .arg(10.0 * brake_crane->getERpressure(), 6, 'f', 2)
             .arg(brake_crane->getPositionName(), 3)
             .arg(loco_crane->getHandlePosition() * 100.0, 3, 'f', 0);
-/*    DebugMsg += QString("Rev%1|")
-            .arg(kmb2->getReverseDir(), 2);*/
+
     DebugMsg += QString("          ");
 }

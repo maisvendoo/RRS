@@ -11,9 +11,10 @@ PneumoRelay::PneumoRelay(double work_volume, QObject *parent) : BrakeDevice(pare
   , QCONTROL(0.0)
   , QFL(0.0)
   , QPIPE(0.0)
+  , eps(0.001)
+  , A1(5.0)
   , K1(1.0e-2)
   , K2(2.0e-2)
-  , k1(50.0)
 {
 
 }
@@ -32,6 +33,7 @@ PneumoRelay::~PneumoRelay()
 void PneumoRelay::setControlPressure(double value)
 {
     pCONTROL = value;
+    is_set_pressure = true;
 }
 
 //------------------------------------------------------------------------------
@@ -93,13 +95,13 @@ void PneumoRelay::ode_system(const state_vector_t &Y,
     Q_UNUSED(t)
 
     // Проверям, задавалось ли давление в камере напрямую
-    if (pCONTROL != 0.0)
+    if (is_set_pressure)
     {
         setY(0, pCONTROL);
-        pCONTROL = 0.0;
         QCONTROL = 0.0;
     }
 
+    is_set_pressure = false;
     dYdt[0] = QCONTROL / V0;
 }
 
@@ -111,7 +113,7 @@ void PneumoRelay::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Условное положение диафрагмы управляющей камеры
-    double s1 = k1 * (Y[0] - pPIPE);
+    double s1 = A1 * dead_zone(Y[0] - pPIPE, -eps, eps);
 
     // Поток из питательной магистрали в управляемую
     double Q_fl_pipe = cut(s1, 0.0, K1) * (pFL - pPIPE);
@@ -138,7 +140,8 @@ void PneumoRelay::load_config(CfgReader &cfg)
     if (tmp > 1e-3)
         V0 = tmp;
 
+    cfg.getDouble(secName, "eps", eps);
+    cfg.getDouble(secName, "A1", A1);
     cfg.getDouble(secName, "K1", K1);
     cfg.getDouble(secName, "K2", K2);
-    cfg.getDouble(secName, "k1", k1);
 }

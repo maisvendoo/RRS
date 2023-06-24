@@ -25,9 +25,6 @@ void TEP70BS::debugOutput(double t, double dt)
             .arg(km->getReversState(), 2)
             .arg(km->getPositionNumber(), 2)
             .arg(I_gen, 7, 'f', 1);
-    DebugMsg += QString("ALSN:%1|D:%2|")
-            .arg(alsn_info.code_alsn, 2)
-            .arg(alsn_info.signal_dist, 8, 'f', 1);
     DebugMsg += QString("          ");
 }
 

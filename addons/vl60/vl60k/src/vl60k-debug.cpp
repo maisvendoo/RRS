@@ -26,8 +26,5 @@ void VL60k::debugPrint(double t, double dt)
             .arg(main_controller->getPosition(), 2)
             .arg(main_controller->isLongMotionPos() ? "*" : " ")
             .arg(motor[TED1]->getIa(), 6, 'f', 1);
-    DebugMsg += QString("ALSN:%1|D:%2|")
-            .arg(alsn_info.code_alsn, 2)
-            .arg(alsn_info.signal_dist, 8, 'f', 1);
     DebugMsg += QString("          ");
 }

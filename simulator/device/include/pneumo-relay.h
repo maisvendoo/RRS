@@ -41,6 +41,8 @@ protected:
 
     /// Объём управляющей камеры
     double V0;
+    /// Признак установки давления в рабочей камере напрямую
+    bool is_set_pressure;
 
     double pCONTROL;
     double pFL;
@@ -50,11 +52,14 @@ protected:
     double QFL;
     double QPIPE;
 
+    /// Точность поддержания давления, МПа
+    double eps;
+    /// Коэффициент к положению диафрагмы управлющей камеры
+    double A1;
+    /// Коэффициент к наполнению управляемой магистрали из питательной
     double K1;
-
+    /// Коэффициент к разрядке управляемой магистрали в атмосферу
     double K2;
-
-    double k1;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

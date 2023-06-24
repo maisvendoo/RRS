@@ -29,6 +29,7 @@ PneumoSplitter::~PneumoSplitter()
 void PneumoSplitter::setInputPressure(double value)
 {
     pIN = value;
+    is_set_pressure = true;
 }
 
 //------------------------------------------------------------------------------
@@ -36,8 +37,7 @@ void PneumoSplitter::setInputPressure(double value)
 //------------------------------------------------------------------------------
 double PneumoSplitter::getSumFlow() const
 {
-    double summ = - K[3] * (Q1 + Q2);
-    return summ;
+    return - Q1 - Q2;
 }
 
 //------------------------------------------------------------------------------
@@ -111,13 +111,13 @@ void PneumoSplitter::ode_system(const state_vector_t &Y,
     Q_UNUSED(t)
 
     // Проверям, задавалось ли давление в камере напрямую
-    if (pIN != 0.0)
+    if (is_set_pressure)
     {
         setY(0, pIN);
-        pIN = 0.0;
         QIN = 0.0;
     }
 
+    is_set_pressure = false;
     dYdt[0] = (QIN - Q1 - Q2) / V0;
 }
 
