@@ -706,10 +706,10 @@ void Model::process()
 
         postStep(t);
     }
-
+/*
     Journal::instance()->info(QString("t %1|dt %2")
                               .arg(t, 9, 'f', 5)
-                              .arg(dt, 7, 'f', 5));
+                              .arg(dt, 7, 'f', 5));*/
     train->inputProcess();
 
     // Debug print, is allowed
