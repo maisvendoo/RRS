@@ -21,6 +21,7 @@ mkdir %RRS_DEV_ROOT%\sdk\include
 
 mkdir %RRS_DEV_ROOT%\logs
 mkdir %RRS_DEV_ROOT%\screenshots
+mkdir %RRS_DEV_ROOT%\themes
 
 rem Копируем бинарные файлы
 
@@ -84,7 +85,8 @@ xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_
 rem Копируем прочие необходимые DLL
 
 xcopy %OPENAL_BIN%\*.dll %RRS_DEV_ROOT%\bin\
-xcopy %FREETYPE_BIN%\*.dll %RRS_DEV_ROOT%\bin\
+xcopy %FREETYPE_LIBRARY% %RRS_DEV_ROOT%\bin\
+xcopy %ZLIB_LIBRARY% %RRS_DEV_ROOT%\bin\
 
 rem Копируем данные игры (модели, звуки, конфиги анимаций)
 
@@ -112,10 +114,10 @@ rem Вагоны-хоперы
 xcopy /S ..\..\data\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
 xcopy /S ..\..\data\animations\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\data\animations\Fr_hopper_RZD-2851\
 
-rem Шрифты и темы оформления лаунчера
+rem Шрифты вьювера и темы оформления лаунчера
 
 xcopy ..\..\fonts\*.* %RRS_DEV_ROOT%\fonts
-xcopy ..\..\themes\*.* %RRS_DEV_ROOT%\themes
+xcopy ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты
 
@@ -159,5 +161,3 @@ windeployqt %RRS_DEV_ROOT%\bin\profconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
 windeployqt %RRS_DEV_ROOT%\bin\TcpConnection.dll
-
-rem copy %QTDIR%\bin\Qt5OpenGL.dll %RRS_DEV_ROOT%\bin
