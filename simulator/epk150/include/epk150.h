@@ -60,9 +60,13 @@ private:
     /// Объем камеры выдержки времени
     double V2;
 
-    /// Флаг работы свистка
+    /// Признак экстренного торможения
+    bool is_emergency_brake;
+
+    /// Признак работы свистка
     double is_whistle_on;
 
+    /// Признак озвучки свистка
     bool is_whistle;
 
     std::array<double, MAX_FLOW_COEFFS> K;

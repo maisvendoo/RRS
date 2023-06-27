@@ -26,6 +26,7 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     , ps2(0.15)
     , V1(1e-4)
     , V2(1e-3)
+    , is_emergency_brake(false)
     , is_whistle_on(0.0)
     , is_whistle(false)
 {
@@ -55,7 +56,7 @@ void AutoTrainStopEPK150::init(double pBP, double pFL)
 //------------------------------------------------------------------------------
 bool AutoTrainStopEPK150::getEmergencyBrakeContact() const
 {
-    return is_whistle;
+    return is_emergency_brake;
 }
 
 //------------------------------------------------------------------------------
@@ -78,6 +79,8 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
     double sum_p1 = Y[2] + ps1 - pBP;
 
     double u4 = cut(nf(k[3] * sum_p1), 0.0, 1.0);
+
+    is_emergency_brake = (u4 >= 0.9);
 
     double sum_p2 = Y[0] + pk * (1.0 - is_key_on) - pd;
 
