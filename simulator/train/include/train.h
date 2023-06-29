@@ -57,7 +57,7 @@ public:
     bool init(const init_data_t &init_data);
 
     /// Calculation of right part motion ODE's
-    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t);
+    void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt);
 
     /// Action before time step
     void preStep(double t);
@@ -117,8 +117,8 @@ private:
     /// Profile manager
     Profile     *profile;
 
-    /// Charging pressure
-    double      wheel_rail_fric_coeff;
+    /// Coefficient to friction between wheel and rail
+    double      coeff_to_wheel_rail_friction;
 
     /// Charging pressure
     double      charging_pressure;

@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>3</Order>
+    <Device>
+        <Order>3</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
-		<V1>1e-4</V1>
-		<V2>1e-3</V2>
+        <V1>1e-4</V1>
+        <V2>1e-3</V2>
 
-		<T1>0.1</T1>
-		<pd>0.2</pd>
-		<pk>0.4</pk>
-		<p_key>10.0</p_key>
+        <T1>0.1</T1>
+        <pd>0.2</pd>
+        <pk>0.4</pk>
+        <p_key>10.0</p_key>
 
-		<k1>10.0</k1>
-		<k2>10.0</k2>
-		<k3>10.0</k3>
-		<k4>10.0</k4>
+        <k1>10.0</k1>
+        <k2>10.0</k2>
+        <k3>10.0</k3>
+        <k4>10.0</k4>
 
-		<K4>2.7e-4</K4>
-		<K5>2.3e-4</K5>
+        <K4>2.7e-4</K4>
+        <K5>2.3e-4</K5>
 
-		<K1>1e-3</K1>
-		<K2>5e-2</K2>
+        <K1>1e-3</K1>
+        <K2>5e-2</K2>
 
-		<K3>50.0</K3>
+        <K3>50.0</K3>
 
-		<ps1>0.05</ps1>
-		<ps2>0.15</ps2>
+        <ps1>0.05</ps1>
+        <ps2>0.15</ps2>
 
-	</Device>
+    </Device>
 </Config>

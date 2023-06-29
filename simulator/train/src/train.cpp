@@ -13,7 +13,7 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , ode_order(0)
   , dir(1)
   , profile(profile)
-  , wheel_rail_fric_coeff(0.3)
+  , coeff_to_wheel_rail_friction(1.0)
   , charging_pressure(0.0)
   , no_air(false)
   , init_main_res_pressure(0.0)
@@ -41,7 +41,7 @@ bool Train::init(const init_data_t &init_data)
 
     dir = init_data.direction;
 
-    wheel_rail_fric_coeff = init_data.wheel_rail_fric_coeff;
+    coeff_to_wheel_rail_friction = init_data.coeff_to_wheel_rail_friction;
 
     // Solver loading
     FileSystem &fs = FileSystem::getInstance();
@@ -133,15 +133,45 @@ bool Train::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
+void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
 {
-    for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
+    bool coups = (vehicles.size() > 1);
+    auto coup_it = couplings.begin();
+    auto begin = vehicles.begin();
+    auto end = vehicles.end();
+
+    for (auto it = begin; it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
         size_t s = vehicle->getDegressOfFreedom();
 
-        state_vector_t a = vehicle->getAcceleration(Y, t);
+        if (coups && (it != end - 1) )
+        {
+            Vehicle *vehicle1 = *(it+1);
+            size_t idx1 = vehicle1->getIndex();
+            size_t s1 = vehicle1->getDegressOfFreedom();
+
+            double ds = Y[idx] - Y[idx1] -
+                    dir * vehicle->getLength() / 2 -
+                    dir * vehicle1->getLength() / 2;
+
+            double dv = Y[idx + s] - Y[idx1 + s1];
+
+            Coupling *coup = *coup_it;
+            double R = dir * coup->getForce(ds, dv);
+            ++coup_it;
+
+            if (vehicle->getOrientation() > 0)
+                vehicle->setBackwardForce(R);
+            else
+                vehicle->setForwardForce(R);
+            if (vehicle1->getOrientation() > 0)
+                vehicle1->setForwardForce(R);
+            else
+                vehicle1->setBackwardForce(R);
+        }
+        state_vector_t a = vehicle->getAcceleration(Y, t, dt);
 
         memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
         memcpy(dYdt.data() + idx + s, a.data(), sizeof(double) * s);
@@ -188,8 +218,6 @@ bool Train::step(double t, double &dt)
 //------------------------------------------------------------------------------
 void Train::vehiclesStep(double t, double dt)
 {
-    size_t num_vehicles = vehicles.size();
-    auto coup_it = couplings.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
@@ -200,34 +228,6 @@ void Train::vehiclesStep(double t, double dt)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
-        size_t s = vehicle->getDegressOfFreedom();
-
-        if ( (num_vehicles > 1) && ( it != end - 1) )
-        {
-            Vehicle *vehicle1 = *(it+1);
-            size_t idx1 = vehicle1->getIndex();
-            size_t s1 = vehicle1->getDegressOfFreedom();
-
-            double ds = y[idx] - y[idx1] -
-                    dir * vehicle->getLength() / 2 -
-                    dir * vehicle1->getLength() / 2;
-
-            double dv = y[idx + s] - y[idx1 + s1];
-
-            Coupling *coup = *coup_it;
-            double R = dir * coup->getForce(ds, dv);
-            ++coup_it;
-
-            if (vehicle->getOrientation() > 0)
-                vehicle->setBackwardForce(R);
-            else
-                vehicle->setForwardForce(R);
-            if (vehicle1->getOrientation() > 0)
-                vehicle1->setForwardForce(R);
-            else
-                vehicle1->setBackwardForce(R);
-        }
-
 
         brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
         vehicle->setBrakepipePressure(brakepipe->getPressure(j));
@@ -235,7 +235,7 @@ void Train::vehiclesStep(double t, double dt)
         profile_element_t pe = profile->getElement(y[idx]);
         vehicle->setInclination(pe.inclination);
         vehicle->setCurvature(pe.curvature);
-        vehicle->setFrictionCoeff(wheel_rail_fric_coeff);
+        vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationStep(y, t, dt);
 
@@ -594,11 +594,9 @@ void Train::setInitConditions(const init_data_t &init_data)
         size_t idx = vehicle->getIndex();
 
         y[idx + s] = init_data.init_velocity / Physics::kmh;
-
-        double wheel_radius = vehicle->getWheelDiameter() / 2.0;
-
-        for (size_t j = 1; j < static_cast<size_t>(s); j++)
+        for (size_t j = 1; j < s; j++)
         {
+            double wheel_radius = vehicle->getWheelDiameter(j - 1) / 2.0;
             y[idx + s + j] = y[idx + s] / wheel_radius;
         }
     }

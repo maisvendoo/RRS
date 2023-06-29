@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<BrakesState>
-		
-		<!-- Давление в главных резервуарах, МПа -->
-		<MainReservoirPressure>0.9</MainReservoirPressure>
+    <BrakesState>
 
-		<!-- Темп утечек из ГР -->
-		<MainReservoirFlow>1.1e-4</MainReservoirFlow>
+        <!-- Давление в главных резервуарах, МПа -->
+        <MainReservoirPressure>0.9</MainReservoirPressure>
 
-		<!-- Зарядное давление, МПа -->
-		<ChargingPressure>0.5</ChargingPressure>
+        <!-- Темп утечек из ГР -->
+        <MainReservoirFlow>1.1e-4</MainReservoirFlow>
 
-		<!-- Положение рукоятки крана машиниста -->
-		<TrainCranePos>2</TrainCranePos>
+        <!-- Зарядное давление, МПа -->
+        <ChargingPressure>0.5</ChargingPressure>
 
-		<!-- Положение рукоятки КВТ -->
-		<LocoCranePos>0</LocoCranePos>
-		
-	</BrakesState>
+        <!-- Положение рукоятки крана машиниста -->
+        <TrainCranePos>2</TrainCranePos>
+
+        <!-- Положение рукоятки КВТ -->
+        <LocoCranePos>0</LocoCranePos>
+
+    </BrakesState>
 </Config>

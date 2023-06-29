@@ -2,6 +2,6 @@
 <Config>
     <Device>
         <MaxHeight>0.51</MaxHeight>
-        <MotionTime>3.0</MotionTime>                
+        <MotionTime>3.0</MotionTime>
     </Device>
 </Config>

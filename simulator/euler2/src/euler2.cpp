@@ -31,7 +31,7 @@ bool Euler2Solver::step(OdeSystem *ode_sys,
         first_step = false;
     }
 
-    ode_sys->calcDerivative(Y, dYdt, t);
+    ode_sys->calcDerivative(Y, dYdt, t, dt);
 
     for (size_t i = 0; i < Y.size(); ++i)
     {
@@ -39,7 +39,7 @@ bool Euler2Solver::step(OdeSystem *ode_sys,
         Y1[i] = Y[i] + k1[i] * dt;
     }
 
-    ode_sys->calcDerivative(Y1, dYdt, t + dt);
+    ode_sys->calcDerivative(Y1, dYdt, t + dt, dt);
 
     for (size_t i = 0; i < Y.size(); ++i)
     {

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>0</Order>
-		<Coeff>0.9</Coeff>
-	</Device>
+    <Device>
+        <Order>0</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <Coeff>0.9</Coeff>
+    </Device>
 </Config>

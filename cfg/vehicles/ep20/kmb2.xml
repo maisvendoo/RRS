@@ -1,11 +1,13 @@
 <Config>
-	<Device>
+    <Device>
 
-		<Order>1</Order>
-		
-		<traction_rate>0.05</traction_rate>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
-		<velocity_rate>0.05</velocity_rate>
+        <traction_rate>0.05</traction_rate>
 
-	</Device>
+        <velocity_rate>0.05</velocity_rate>
+
+    </Device>
 </Config>

@@ -4,7 +4,7 @@
         <InitCoord>1.0</InitCoord>
         <InitVelocity>0.0</InitVelocity>
         <Direction>1</Direction>
-        <WheelRailFrictionCoeff>0.3</WheelRailFrictionCoeff>
+        <CoeffToWheelRailFriction>1.0</CoeffToWheelRailFriction>
         <TrainConfig>default</TrainConfig>
         <IntegrationTimeInterval>20</IntegrationTimeInterval>
         <DebugPrint>true</DebugPrint>

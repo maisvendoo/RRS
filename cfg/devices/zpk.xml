@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Device>
-		<Order>3</Order>
+    <Device>
+        <Order>3</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
 
-		<WorkVolume>8e-3</WorkVolume>
-		
-		<K1>1e-1</K1>
-		<K2>1.0</K2>		
+        <WorkVolume>8e-3</WorkVolume>
 
-		<A1>100.0</A1>
+        <K1>1e-1</K1>
+        <K2>1.0</K2>
 
-		<k1>10.0</k1>		
+        <A1>100.0</A1>
 
-	</Device>
+        <k1>10.0</k1>
+
+    </Device>
 </Config>

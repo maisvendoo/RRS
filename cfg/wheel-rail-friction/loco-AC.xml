@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <WheelModel>
+        <!-- a, b, c, d - empiric coefficients for friction formula -->
+        <!-- psi = a + (b / (c + d * V)) + e * V, V - velocity (km/h) -->
+        <a>0.28</a>
+        <b>4.0</b>
+        <c>50.0</c>
+        <d>6.0</d>
+        <e>-0.0006</e>
+    </WheelModel>
+</Config>

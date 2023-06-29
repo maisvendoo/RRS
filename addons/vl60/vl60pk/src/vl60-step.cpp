@@ -12,6 +12,10 @@ void VL60pk::stepOtherEquipment(double t, double dt)
     horn->step(t, dt);
 
     debugPrint(t);
+
+    if (reg == nullptr)
+        return;
+    reg->print(motor[0]->getDebugMsg(), t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -382,18 +386,14 @@ float VL60pk::isLineContactorsOff()
 //------------------------------------------------------------------------------
 double VL60pk::getTractionForce()
 {
-    double ip = 2.73;
+    double sum_force = 0.0;
 
-    double sumTorque = 0;
-
-    for (auto m : motor)
+    for (size_t i = 0; i < motor.size(); ++i)
     {
-        sumTorque += m->getTorque();
+        sum_force += motor[i]->getTorque() * ip * 2.0 / wheel_diameter[i];
     }
 
-    double force = sumTorque * ip * 2.0 / wheel_diameter;
-
-    return force;
+    return sum_force;
 }
 
 //------------------------------------------------------------------------------

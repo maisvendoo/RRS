@@ -61,7 +61,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
         iter++;
 
         // Method step
-        ode_sys->calcDerivative(Y, dYdt, t);        
+        ode_sys->calcDerivative(Y, dYdt, t, dt);
 
         for (size_t i = 0; i < n; ++i)
         {
@@ -69,7 +69,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
             Y1[i] = Y[i] + b21 * k1[i];
         }
 
-        ode_sys->calcDerivative(Y1, dYdt, t + dt / 4.0);
+        ode_sys->calcDerivative(Y1, dYdt, t + dt / 4.0, dt);
 
         for (size_t i = 0; i < n; i++)
         {
@@ -77,7 +77,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
             Y1[i] = Y[i] + b31 * k1[i] + b32 * k2[i];
         }
 
-        ode_sys->calcDerivative(Y1, dYdt, t + 3.0 * dt / 8.0);
+        ode_sys->calcDerivative(Y1, dYdt, t + 3.0 * dt / 8.0, dt);
 
         for (size_t i = 0; i < n; i++)
         {
@@ -85,7 +85,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
             Y1[i] = Y[i] + b41 * k1[i] + b42 * k2[i] + b43 * k3[i];
         }
 
-        ode_sys->calcDerivative(Y1, dYdt, t + 12.0 * dt / 13.0);
+        ode_sys->calcDerivative(Y1, dYdt, t + 12.0 * dt / 13.0, dt);
 
         for (size_t i = 0; i < n; i++)
         {
@@ -94,7 +94,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
                 b54 * k4[i];
         }
 
-        ode_sys->calcDerivative(Y1, dYdt, t + dt);
+        ode_sys->calcDerivative(Y1, dYdt, t + dt, dt);
 
         for (size_t i = 0; i < n; i++)
         {
@@ -103,7 +103,7 @@ bool RKF5Solver::step(OdeSystem *ode_sys,
                 b64 * k4[i] + b65 * k5[i];
         }
 
-        ode_sys->calcDerivative(Y1, dYdt, t + dt / 2.0);
+        ode_sys->calcDerivative(Y1, dYdt, t + dt / 2.0, dt);
 
         // Local error calculation
         for (size_t i = 0; i < n; i++)

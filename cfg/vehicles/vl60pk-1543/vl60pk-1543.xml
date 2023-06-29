@@ -6,12 +6,13 @@
         <Length>21.0</Length>
         <WheelDiameter>1.236</WheelDiameter>
         <MainResist>loco-resist</MainResist>
+        <WheelRailFriction>loco-AC</WheelRailFriction>
         <NumAxis>6</NumAxis>
         <DegreesOfFreedom>7</DegreesOfFreedom>
         <WheelInertia>100.0</WheelInertia>
         <SoundDir>vl60</SoundDir>
 
-        <ReguctorCoeff>2.73</ReguctorCoeff>
+        <ReductorCoeff>2.73</ReductorCoeff>
 
         <ExtModelName>VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
         <ModelShift>0.0 0.0 0.312</ModelShift>

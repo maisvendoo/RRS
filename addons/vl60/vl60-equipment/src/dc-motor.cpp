@@ -115,8 +115,8 @@ void DCMotor::preStep(state_vector_t &Y, double t)
 
     emit soundSetPitch("TED", static_cast<float>(abs(omega) / omega_nom));
     emit soundSetVolume("TED", static_cast<int>(pf(abs(Y[0]) - 300)));
-//    DebugMsg = QString(" dc-motor-beta: %1")
-//            .arg(beta);
+    //DebugMsg = QString("t: %1")
+    //        .arg(t, 8, 'f', 3);
 }
 
 //------------------------------------------------------------------------------
@@ -132,6 +132,9 @@ void DCMotor::ode_system(const state_vector_t &Y,
     double E = omega * calcCPhi(Y[0] * beta * direction);
 
     dYdt[0] = (U - R * Y[0] - E) / L_af;
+    //DebugMsg += QString("I: %1, dI: %2, ")
+    //        .arg(Y[0], 12, 'f', 5)
+    //        .arg(dYdt[0], 12, 'f', 5);
 }
 
 //------------------------------------------------------------------------------

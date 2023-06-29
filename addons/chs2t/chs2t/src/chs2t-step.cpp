@@ -131,7 +131,7 @@ void CHS2T::stepTractionControl(double t, double dt)
     for (size_t i = 1; i < Q_a.size(); ++i)
     {
         Q_a[i] = (motor->getTorque() + generator->getTorque()) * ip;
-        tracForce_kN += 2.0 * Q_a[i] / wheel_diameter / 1000.0;
+        tracForce_kN += 2.0 * Q_a[i] / wheel_diameter[i - 1] / 1000.0;
     }
 }
 
@@ -168,7 +168,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
     mainReservoir->step(t, dt);
 
     pressReg->setPressure(mainReservoir->getPressure());
-    pressReg->step(t, dt);    
+    pressReg->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ void CHS2T::stepBrakesControl(double t, double dt)
     brakeCrane->setBrakePipePressure(pTM);
     brakeCrane->setControl(keys);
     p0 = brakeCrane->getBrakePipeInitPressure();
-    brakeCrane->step(t, dt);    
+    brakeCrane->step(t, dt);
 
     handleEDT->setControl(keys, control_signals);
     handleEDT->step(t, dt);

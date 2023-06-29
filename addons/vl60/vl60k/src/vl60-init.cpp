@@ -180,7 +180,7 @@ void VL60k::initTractionControl()
 void VL60k::initOtherEquipment()
 {
     speed_meter = new SL2M();
-    speed_meter->setWheelDiameter(wheel_diameter);
+    speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
     connect(speed_meter, &SL2M::soundSetVolume, this, &VL60k::soundSetVolume);
 
@@ -189,7 +189,7 @@ void VL60k::initOtherEquipment()
     connect(horn, &TrainHorn::soundPlay, this, &VL60k::soundPlay);
     connect(horn, &TrainHorn::soundStop, this, &VL60k::soundStop);
 
-    //reg = new Registrator("brakes");
+    //reg = new Registrator("motor", 1e-3);
 }
 
 //------------------------------------------------------------------------------

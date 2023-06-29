@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 
-	<!-- Дисплейный модуль БЛОК -->
-	<Display>
-		<Module>blok-display</Module>
-		<SurfaceName>BLOK_display</SurfaceName>
-		
-		<Corner1>1.0 1.0</Corner1>
-		<Corner2>0.0 1.0</Corner2>
-		<Corner3>0.0 0.0</Corner3>
-		<Corner4>1.0 0.0</Corner4>
-	</Display> 
+    <!-- Дисплейный модуль БЛОК -->
+    <Display>
+        <Module>blok-display</Module>
+        <SurfaceName>BLOK_display</SurfaceName>
 
+        <Corner1>1.0 1.0</Corner1>
+        <Corner2>0.0 1.0</Corner2>
+        <Corner3>0.0 0.0</Corner3>
+        <Corner4>1.0 0.0</Corner4>
+    </Display>
 
 </Config>

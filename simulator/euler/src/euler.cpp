@@ -27,7 +27,7 @@ bool EulerSolver::step(OdeSystem *ode_sys,
         first_step = false;
     }
 
-    ode_sys->calcDerivative(Y, dYdt, t);
+    ode_sys->calcDerivative(Y, dYdt, t, dt);
 
     for (size_t i = 0; i < Y.size(); ++i)
     {
