@@ -7,8 +7,9 @@ PneumoReducer::PneumoReducer(double ref_pressure, QObject *parent) : BrakeDevice
   , V0(1.0e-3)
   , pREF(ref_pressure)
   , pIN(0.0)
-  , QOUT(0.0)
   , QIN(0.0)
+  , pOUT(0.0)
+  , QOUT(0.0)
   , kv(1.0)
   , Kflow(1e-2)
 {
@@ -50,6 +51,23 @@ double PneumoReducer::getInputFlow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoReducer::setOutPressure(double value)
+{
+    pOUT = value;
+    is_set_pressure = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoReducer::getOutFlow() const
+{
+    return QOUT;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoReducer::setOutFlow(double value)
 {
     QOUT = value;
@@ -70,11 +88,11 @@ void PneumoReducer::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    // Клапан наполнения рабочей полости
+    // Клапан наполнения управляемой камеры
     double v = cut(kv * (pREF - Y[0]), 0.0, Kflow);
 
-    // Поток наполнения рабочей полости
-    QIN = v * (pIN - Y[0]);
+    // Поток из входящей магистрали в управляемую камеру
+    QIN = -v * (pIN - Y[0]);
 }
 
 //------------------------------------------------------------------------------
@@ -87,7 +105,18 @@ void PneumoReducer::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    dYdt[0] = (QIN + QOUT) / V0;
+    // Проверям, задавалось ли давление в камере напрямую
+    if (is_set_pressure)
+    {
+        setY(0, pOUT);
+        QOUT = -QIN;
+        dYdt[0] = 0.0;
+    }
+    else
+    {
+        dYdt[0] = (QOUT - QIN) / V0;
+    }
+    is_set_pressure = false;
 }
 
 //------------------------------------------------------------------------------
