@@ -156,6 +156,18 @@ public:
     ///
     void setBrakepipePressure(double pTM);
 
+    /// Задать поток воздуха в тормозную магистраль спереди
+    void setBrakepipeFlowFwd(double flow);
+
+    /// Задать поток воздуха в тормозную магистраль сзади
+    void setBrakepipeFlowBwd(double flow);
+
+    /// Давление воздуха в тормозной магистрали спереди
+    double getBrakepipePressureFwd() const;
+
+    /// Давление воздуха в тормозной магистрали сзади
+    double getBrakepipePressureBwd() const;
+
     QString getDebugMsg() const;
 
     /// vehicle get sounds directory
@@ -290,6 +302,15 @@ protected:
     double auxRate;
     /// Brakepipe pressure
     double pTM;
+
+    /// Поток воздуха в тормозную магистраль спереди
+    double QTMfwd;
+    /// Поток воздуха в тормозную магистраль сзади
+    double QTMbwd;
+    /// Давление воздуха в тормозной магистрали спереди
+    double pTMfwd;
+    /// Давление воздуха в тормозной магистрали сзади
+    double pTMbwd;
 
     QString DebugMsg;
 

@@ -44,6 +44,8 @@ void VL60pk::step(double t, double dt)
 
     stepMotorCompressor(t, dt);
 
+    stepBrakepipe(t, dt);
+
     stepBrakeControl(t, dt);
 
     stepTrolleysBrakeMech(t, dt);
@@ -202,7 +204,7 @@ void VL60pk::stepBrakeControl(double t, double dt)
 
     brake_crane->setFeedLinePressure(ubt->getCraneFLpressure());
     brake_crane->setChargePressure(charge_press);
-    brake_crane->setBrakePipePressure(pTM);
+    brake_crane->setBrakePipePressure(brakepipe->getPressure());
     brake_crane->setControl(keys);
     brake_crane->step(t, dt);
 
@@ -263,7 +265,7 @@ void VL60pk::stepAirDistributors(double t, double dt)
 
     air_disr->setBrakeCylinderPressure(electroAirDist->getPbc_out());
     air_disr->setAirSupplyPressure(electroAirDist->getSupplyReservoirPressure());
-    air_disr->setBrakepipePressure(pTM);
+    air_disr->setBrakepipePressure(brakepipe->getPressure());
     auxRate = air_disr->getAuxRate();
     air_disr->step(t, dt);
 

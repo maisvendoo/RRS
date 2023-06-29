@@ -70,7 +70,7 @@ void VL60pk::stepSignalsOutput()
     // Манометр питательной магистрали
     analogSignal[STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
     // Манометр тормозной магистрали
-    analogSignal[STRELKA_M_TM] = static_cast<float>(pTM / 1.0);
+    analogSignal[STRELKA_M_TM] = static_cast<float>(brakepipe->getPressure() / 1.0);
     // Манометр уравнительного резервуара
     analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getEqReservoirPressure() / 1.0);
     // Манометр давления в ТЦ

@@ -168,7 +168,7 @@ void CHS2T::stepAirSupplySubsystem(double t, double dt)
     mainReservoir->step(t, dt);
 
     pressReg->setPressure(mainReservoir->getPressure());
-    pressReg->step(t, dt);    
+    pressReg->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -178,10 +178,10 @@ void CHS2T::stepBrakesControl(double t, double dt)
 {
     brakeCrane->setChargePressure(charging_press);
     brakeCrane->setFeedLinePressure(mainReservoir->getPressure());
-    brakeCrane->setBrakePipePressure(pTM);
+    brakeCrane->setBrakePipePressure(brakepipe->getPressure());
     brakeCrane->setControl(keys);
     p0 = brakeCrane->getBrakePipeInitPressure();
-    brakeCrane->step(t, dt);    
+    brakeCrane->step(t, dt);
 
     handleEDT->setControl(keys, control_signals);
     handleEDT->step(t, dt);
@@ -245,11 +245,11 @@ void CHS2T::stepBrakesEquipment(double t, double dt)
 
     airDistr->setAirSupplyPressure(electroAirDistr->getSupplyReservoirPressure());
     airDistr->setBrakeCylinderPressure(electroAirDistr->getPbc_out());
-    airDistr->setBrakepipePressure(pTM);
+    airDistr->setBrakepipePressure(brakepipe->getPressure());
     airDistr->step(t, dt);
 
     autoTrainStop->setFeedlinePressure(mainReservoir->getPressure());
-    autoTrainStop->setBrakepipePressure(pTM);
+    autoTrainStop->setBrakepipePressure(brakepipe->getPressure());
     autoTrainStop->setControl(keys);
     autoTrainStop->powerOn(safety_device->getEPKstate());
     autoTrainStop->step(t, dt);

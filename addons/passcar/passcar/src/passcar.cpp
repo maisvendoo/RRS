@@ -6,6 +6,10 @@
 //
 //------------------------------------------------------------------------------
 PassCarrige::PassCarrige() : Vehicle ()
+  , reg(nullptr)
+  , brakepipe(nullptr)
+  , anglecock_tm_fwd(nullptr)
+  , anglecock_tm_bwd(nullptr)
   , brake_mech(nullptr)
   , supply_reservoir(nullptr)
   , brake_mech_module("carbrakes-mech")
@@ -36,6 +40,21 @@ void PassCarrige::initBrakeDevices(double p0, double pTM, double pFL)
 {
     Q_UNUSED(p0)
 
+    // Инициализация давления в тормозной магистрали
+    brakepipe->setY(0, pTM);
+    anglecock_tm_fwd->setP_pipe(pTM);
+    anglecock_tm_bwd->setP_pipe(pTM);
+
+    // Состояние концевых кранов
+    if (prev_vehicle == nullptr)
+        anglecock_tm_fwd->setState(false);
+    else
+        anglecock_tm_fwd->setState(true);
+    if (next_vehicle == nullptr)
+        anglecock_tm_bwd->setState(false);
+    else
+        anglecock_tm_bwd->setState(true);
+
     if (supply_reservoir != nullptr)
         supply_reservoir->setY(0, pTM);
 
@@ -50,6 +69,8 @@ void PassCarrige::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir(fs.getModulesDir().c_str());
+
+    initBrakepipe(modules_dir);
 
     // Brake mechanics
     brake_mech = loadBrakeMech(modules_dir + fs.separator() + brake_mech_module);
@@ -81,6 +102,11 @@ void PassCarrige::initialization()
 
     initEPT();
     initSounds();
+
+    // Инициализация регистратора
+    QString log_name = QString("passcar.log");
+    reg = new Registrator(log_name, 0.02);
+
 }
 
 //------------------------------------------------------------------------------
@@ -88,15 +114,15 @@ void PassCarrige::initialization()
 //------------------------------------------------------------------------------
 void PassCarrige::step(double t, double dt)
 {
-    airdist->setBrakepipePressure(pTM);
+    stepBrakepipe(t, dt);
+
+    airdist->setBrakepipePressure(brakepipe->getPressure());
     airdist->setBrakeCylinderPressure(electroAirDist->getPbc_out());
     airdist->setAirSupplyPressure(electroAirDist->getSupplyReservoirPressure());
 
     auxRate = airdist->getAuxRate();
 
     airdist->step(t, dt);
-
-
 
     brake_mech->setAirFlow(electroAirDist->getQbc_out());
     brake_mech->setVelocity(velocity);
@@ -120,17 +146,22 @@ void PassCarrige::step(double t, double dt)
 
     stepEPT(t, dt);
 
-    DebugMsg = QString("Время: %3 ТМ: %1 ЗР: %2 Kкол: %4 ТЦ: %5")
-            .arg(pTM, 4, 'f', 2)
-            .arg(supply_reservoir->getPressure(), 4, 'f', 2)
-            .arg(t, 10, 'f', 1)
-            .arg(brake_mech->getShoeForce() / 1000.0, 6, 'f', 2)
-            .arg(brake_mech->getBrakeCylinderPressure(), 5, 'f', 2);
+    DebugMsg = QString("t: %1 | %2 км | %3 км/ч ")
+            .arg(t, 6, 'f', 1)
+            .arg(railway_coord / 1000.0, 8, 'f', 3)
+            .arg(velocity * Physics::kmh, 6, 'f', 1);
+    DebugMsg += QString("| FwdQ:%1 | BwdQ:%2 ")
+            .arg(QTMfwd, 8, 'f', 5)
+            .arg(QTMbwd, 8, 'f', 5);
+    DebugMsg += QString("| ТМ:%1 МПа | ЗР:%2 МПа | ТЦ:%3 МПа | Доп.Р.:%4")
+            .arg(brakepipe->getPressure(), 5, 'f', 3)
+            .arg(supply_reservoir->getPressure(), 5, 'f', 3)
+            .arg(brake_mech->getBrakeCylinderPressure(), 5, 'f', 3)
+            .arg(auxRate, 8, 'f', 5);
+    DebugMsg += QString("| Vbp: %1   ")
+            .arg(length * 0.035 * 0.035 * Physics::PI / 4.0, 8, 'f', 5);
 
-    DebugMsg += airdist->getDebugMsg();
-
-    DebugMsg += QString(" Тепм. ДР.: %1")
-            .arg(auxRate, 9, 'f', 4);
+    stepRegistrator(t, dt);
 
     soundStep();
 }

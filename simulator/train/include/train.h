@@ -129,6 +129,9 @@ private:
     /// Initial main reservoir pressure
     double      init_main_res_pressure;
 
+    /// Коэффициент потока воздуха в тормозной магистрали между единицами ПС
+    double      kTM;
+
     /// Motion ODE's solver
     Solver      *train_motion_solver;
 

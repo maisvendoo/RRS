@@ -33,8 +33,8 @@ public:
     ~VL60pk();
 
     /// Инициализация тормозных приборов
-    void initBrakeDevices(double p0, double pTM, double pFL);    
-    
+    void initBrakeDevices(double p0, double pTM, double pFL);
+
 private:
 
     enum
@@ -130,6 +130,15 @@ private:
 
     /// Мотор-вентиляторы
     std::array<MotorFan *, NUM_MOTOR_FANS> motor_fans;
+
+    /// Резервуар в качестве трубы тормозной магистрали
+    Reservoir *brakepipe;
+
+    /// Концевой кран переднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_fwd;
+
+    /// Концевой кран заднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_bwd;
 
     /// Главный резервуар
     Reservoir   *main_reservoir;
@@ -252,6 +261,9 @@ private:
     /// Инициализация вспомогательных машин (ФР, МК, МВ1 - МВ6)
     void initSupplyMachines();
 
+    /// Инициализация тормозной магистрали
+    void initBrakepipe(QString module_path);
+
     /// Инициализация приборов управления тормозами
     void initBrakeControls(QString modules_dir);
 
@@ -288,6 +300,9 @@ private:
 
     void stepMotorCompressor(double t, double dt);
 
+    /// Моделирование тормозной магистрали
+    void stepBrakepipe(double t, double dt);
+
     void stepBrakeControl(double t, double dt);
 
     void stepTrolleysBrakeMech(double t, double dt);
@@ -323,7 +338,7 @@ private:
 
     void load_brakes_config(QString path);
 
-    void loadConfig(QString cfg_path);    
+    void loadConfig(QString cfg_path);
 
 private slots:
 

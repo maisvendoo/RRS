@@ -103,6 +103,15 @@ private:
     /// Реле перегрузки ТЭД
     OverloadRelay *overload_relay;
 
+    /// Резервуар в качестве трубы тормозной магистрали
+    Reservoir *brakepipe;
+
+    /// Концевой кран переднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_fwd;
+
+    /// Концевой кран заднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_bwd;
+
     /// Главный резервуар (ГР)
     Reservoir *mainReservoir;
 
@@ -239,7 +248,7 @@ private:
     Blinds      *blinds;
 
     /// Скоростемер 3СЛ2М
-    SL2M        *speed_meter;   
+    SL2M        *speed_meter;
 
     /// Счетчик энергии
     EnergyCounter   *energy_counter;
@@ -291,6 +300,9 @@ private:
     /// Инициализация схемы управления тягой
     void initTractionControl();
 
+    /// Инициализация тормозной магистрали
+    void initBrakepipe(QString module_path);
+
     /// Инициализация тормозного оборудования
     void initBrakesEquipment(QString module_path);
 
@@ -336,6 +348,9 @@ private:
     void stepAirSupplySubsystem(double t, double dt);
 
     void stepBrakesControl(double t, double dt);
+
+    /// Моделирование тормозной магистрали
+    void stepBrakepipe(double t, double dt);
 
     void stepBrakesEquipment(double t, double dt);
 

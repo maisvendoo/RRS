@@ -63,6 +63,10 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , p0(0.0)
   , auxRate(0.0)
   , pTM(0.0)
+  , QTMfwd(0.0)
+  , QTMbwd(0.0)
+  , pTMfwd(0.0)
+  , pTMbwd(0.0)
   , DebugMsg(" ")
   , prev_vehicle(nullptr)
   , next_vehicle(nullptr)
@@ -498,6 +502,41 @@ void Vehicle::setBrakepipePressure(double pTM)
     this->pTM = pTM;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setBrakepipeFlowFwd(double flow)
+{
+    this->QTMfwd = flow;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setBrakepipeFlowBwd(double flow)
+{
+    this->QTMbwd = flow;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getBrakepipePressureFwd() const
+{
+    return pTMfwd;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getBrakepipePressureBwd() const
+{
+    return pTMbwd;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString Vehicle::getDebugMsg() const
 {
     return DebugMsg;

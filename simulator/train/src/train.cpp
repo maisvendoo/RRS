@@ -13,10 +13,10 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , ode_order(0)
   , dir(1)
   , profile(profile)
-  , wheel_rail_fric_coeff(0.3)
   , charging_pressure(0.0)
   , no_air(false)
   , init_main_res_pressure(0.0)
+  , kTM(1.0)
   , train_motion_solver(nullptr)
   , brakepipe(nullptr)
   , soundMan(nullptr)
@@ -40,8 +40,6 @@ bool Train::init(const init_data_t &init_data)
     solver_config = init_data.solver_config;
 
     dir = init_data.direction;
-
-    wheel_rail_fric_coeff = init_data.wheel_rail_fric_coeff;
 
     // Solver loading
     FileSystem &fs = FileSystem::getInstance();
@@ -135,11 +133,46 @@ bool Train::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-    for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
+    size_t num_vehicles = vehicles.size();
+    auto end = vehicles.end();
+    auto coup_it = couplings.begin();
+
+    for (auto it = vehicles.begin(); it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
         size_t s = vehicle->getDegressOfFreedom();
+
+        if ( (num_vehicles > 1) && ( it != end - 1) )
+        {
+            Vehicle *vehicle1 = *(it+1);
+            size_t idx1 = vehicle1->getIndex();
+            size_t s1 = vehicle1->getDegressOfFreedom();
+
+            double ds = Y[idx] - Y[idx1] -
+                    dir * vehicle->getLength() / 2 -
+                    dir * vehicle1->getLength() / 2;
+
+            double dv = Y[idx + s] - Y[idx1 + s1];
+
+            Coupling *coup = *coup_it;
+            double R = dir * coup->getForce(ds, dv);
+            ++coup_it;
+
+            if (vehicle->getOrientation() > 0)
+                vehicle->setBackwardForce(R);
+            else
+                vehicle->setForwardForce(R);
+            if (vehicle1->getOrientation() > 0)
+                vehicle1->setForwardForce(R);
+            else
+                vehicle1->setBackwardForce(R);
+        }
+
+        profile_element_t pe = profile->getElement(vehicle->getRailwayCoord());
+
+        vehicle->setInclination(pe.inclination);
+        vehicle->setCurvature(pe.curvature);
 
         state_vector_t a = vehicle->getAcceleration(Y, t);
 
@@ -162,22 +195,13 @@ void Train::preStep(double t)
 bool Train::step(double t, double &dt)
 {
     // Train dynamics simulation
-    bool done = true;
-    double tau = 0.0;
-    double _dt = dt / static_cast<double>(solver_config.num_sub_step);
-    for (size_t i = 0; i < solver_config.num_sub_step; ++i)
-    {
-        done &= train_motion_solver->step(this, y, dydt, t, _dt,
+    bool done = train_motion_solver->step(this, y, dydt, t, dt,
                                           solver_config.max_step,
                                           solver_config.local_error);
-        t +=_dt;
-        tau +=_dt;
-    }
-    dt = tau;
-
+/*
     // Brakepipe simulation
     brakepipe->step(t, dt);
-
+*/
     vehiclesStep(t, dt);
 
     return done;
@@ -189,57 +213,60 @@ bool Train::step(double t, double &dt)
 void Train::vehiclesStep(double t, double dt)
 {
     size_t num_vehicles = vehicles.size();
-    auto coup_it = couplings.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
-    brakepipe->setBeginPressure((*begin)->getBrakepipeBeginPressure());
-    size_t j = 1;
+    // Передний рукав ТМ первой единицы ПС открыт в атмосферу
+    Vehicle *vehicle = *begin;
+    if (vehicle->getOrientation() > 0)
+        vehicle->setBrakepipeFlowFwd(-kTM * vehicle->getBrakepipePressureFwd());
+    else
+        vehicle->setBrakepipeFlowBwd(-kTM * vehicle->getBrakepipePressureBwd());
 
-    for (auto it = begin; it != end; ++it)
+    // Задний рукав ТМ последней единицы ПС открыт в атмосферу
+    vehicle = *(end - 1);
+    if (vehicle->getOrientation() > 0)
+        vehicle->setBrakepipeFlowBwd(-kTM * vehicle->getBrakepipePressureBwd());
+    else
+        vehicle->setBrakepipeFlowFwd(-kTM * vehicle->getBrakepipePressureFwd());
+
+    for (auto i = begin; i != end; ++i)
     {
-        Vehicle *vehicle = *it;
-        size_t idx = vehicle->getIndex();
-        size_t s = vehicle->getDegressOfFreedom();
+        vehicle = *i;
 
-        if ( (num_vehicles > 1) && ( it != end - 1) )
+        // Если в поезде больше одной единицы ПС - считаем перетоки воздуха в ТМ
+        if ( (num_vehicles > 1) && ( i != end - 1) )
         {
-            Vehicle *vehicle1 = *(it+1);
-            size_t idx1 = vehicle1->getIndex();
-            size_t s1 = vehicle1->getDegressOfFreedom();
+            Vehicle *vehicle1= *(i+1);
 
-            double ds = y[idx] - y[idx1] -
-                    dir * vehicle->getLength() / 2 -
-                    dir * vehicle1->getLength() / 2;
+            double pTM;
+            double pTM1;
 
-            double dv = y[idx + s] - y[idx1 + s1];
-
-            Coupling *coup = *coup_it;
-            double R = dir * coup->getForce(ds, dv);
-            ++coup_it;
-
+            // Получаем давление в ТМ соседних единиц ПС с учётом их ориентации
             if (vehicle->getOrientation() > 0)
-                vehicle->setBackwardForce(R);
+                pTM = vehicle->getBrakepipePressureBwd();
             else
-                vehicle->setForwardForce(R);
+                pTM = vehicle->getBrakepipePressureFwd();
             if (vehicle1->getOrientation() > 0)
-                vehicle1->setForwardForce(R);
+                pTM1 = vehicle1->getBrakepipePressureFwd();
             else
-                vehicle1->setBackwardForce(R);
+                pTM1 = vehicle1->getBrakepipePressureBwd();
+
+            // Считаем переток воздуха из предыдущей единицы ПС к следующей
+            double flow = kTM * (pTM - pTM1);
+
+            // Задаём поток в ТМ соседних единиц ПС с учётом их ориентации
+            if (vehicle->getOrientation() > 0)
+                vehicle->setBrakepipeFlowBwd(-flow);
+            else
+                vehicle->setBrakepipeFlowFwd(-flow);
+            if (vehicle1->getOrientation() > 0)
+                vehicle1->setBrakepipeFlowFwd(flow);
+            else
+                vehicle1->setBrakepipeFlowBwd(flow);
         }
 
-
-        brakepipe->setAuxRate(j, vehicle->getBrakepipeAuxRate());
-        vehicle->setBrakepipePressure(brakepipe->getPressure(j));
-
-        profile_element_t pe = profile->getElement(y[idx]);
-        vehicle->setInclination(pe.inclination);
-        vehicle->setCurvature(pe.curvature);
-        vehicle->setFrictionCoeff(wheel_rail_fric_coeff);
-
         vehicle->integrationStep(y, t, dt);
-
-        ++j;
     }
 }
 
@@ -380,6 +407,11 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
         if (!cfg.getBool("Common", "NoAir", no_air))
         {
             no_air = false;
+        }
+
+        if (!cfg.getDouble("Common", "BrakepipeFlowCoeff", kTM))
+        {
+            kTM = 0.01;
         }
 
         if (!cfg.getString("Common", "ClientName", client_name))

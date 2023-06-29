@@ -33,7 +33,7 @@ CHS2T::CHS2T() : Vehicle()
 
     U_kr = 0;
 
-    EDT = false;    
+    EDT = false;
 
     dropPosition = false;
 
@@ -76,6 +76,8 @@ void CHS2T::initialization()
     initAirSupplySubsystem();
 
     initTractionControl();
+
+    initBrakepipe(modules_dir);
 
     initBrakesEquipment(modules_dir);
 
@@ -128,6 +130,9 @@ void CHS2T::step(double t, double dt)
 
     //Journal::instance()->info("Step brake mech");
     stepBrakesMech(t , dt);
+
+    //Journal::instance()->info("Step brakepipe");
+    stepBrakepipe(t, dt);
 
     //Journal::instance()->info("Step brake equipment");
     stepBrakesEquipment(t, dt);
@@ -186,7 +191,7 @@ void CHS2T::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 void CHS2T::hardwareOutput()
 {
-    feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(pTM);
+    feedback_signals.analogSignal[0].cur_value = TM_manometer->getModbus(brakepipe->getPressure());
     feedback_signals.analogSignal[1].cur_value = UR_manometer->getModbus(brakeCrane->getEqReservoirPressure());
     feedback_signals.analogSignal[2].cur_value = ZT_manometer->getModbus(brakeRefRes->getPressure());
     feedback_signals.analogSignal[3].cur_value = GR_manometer->getModbus(mainReservoir->getPressure());

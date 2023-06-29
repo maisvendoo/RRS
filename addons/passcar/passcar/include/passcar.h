@@ -14,6 +14,8 @@
 #include    "reservoir.h"
 #include    "airdistributor.h"
 #include    "electro-airdistributor.h"
+#include    "pneumo-anglecock.h"
+#include    "registrator.h"
 
 //------------------------------------------------------------------------------
 //
@@ -24,11 +26,23 @@ public:
 
     PassCarrige();
 
-    ~PassCarrige();    
+    ~PassCarrige();
 
     void initBrakeDevices(double p0, double pTM, double pFL);
 
 private:
+
+    /// Регистратор параметров в лог-файл
+    Registrator *reg;
+
+    /// Резервуар в качестве трубы тормозной магистрали
+    Reservoir *brakepipe;
+
+    /// Концевой кран переднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_fwd;
+
+    /// Концевой кран заднего рукава тормозной магистрали
+    PneumoAngleCock *anglecock_tm_bwd;
 
     BrakeMech   *brake_mech;
     Reservoir   *supply_reservoir;
@@ -39,7 +53,7 @@ private:
     AirDistributor *airdist;
 
     QString     airdist_module;
-    QString     airdist_config;   
+    QString     airdist_config;
 
     ElectroAirDistributor *electroAirDist;
 
@@ -52,7 +66,16 @@ private:
 
     void initialization();
 
+    /// Инициализация тормозной магистрали
+    void initBrakepipe(QString module_path);
+
     void step(double t, double dt);
+
+    /// Запись параметров в лог-файл
+    void stepRegistrator(double t, double dt);
+
+    /// Моделирование тормозной магистрали
+    void stepBrakepipe(double t, double dt);
 
     void stepSignalsOutput();
 

@@ -6,8 +6,12 @@
 
 		<!-- Зарядное давление, МПа -->
 		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Начальное давление в ГР, МПа -->
+		<InitMainResPressure>0.9</InitMainResPressure>
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
 		<NoAir>0</NoAir>
+		<!-- Коэффициент перетока воздуха по тормозной магистрали между соседними единицами ПС -->
+		<BrakepipeFlowCoeff>1.0</BrakepipeFlowCoeff>
 
 		<Title>ЧС2т с поездом</Title>
 		<Description>Пассажирский электровоз постоянного тока ЧС2т с поездом из 20 вагонов</Description>

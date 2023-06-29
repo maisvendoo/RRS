@@ -87,8 +87,6 @@ void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
         revers_handle_pos = static_cast<float>(revers_pos - 2);
     else
         revers_handle_pos = static_cast<float>(revers_pos - 1) / 4.0f;
-//    DebugMsg = QString(" field-loosen-pos: %1")
-//            .arg(state.field_loosen_pos);
 }
 
 //------------------------------------------------------------------------------
