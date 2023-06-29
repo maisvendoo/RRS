@@ -22,7 +22,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lcoupling_d
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -ltrain_d
-    LIBS += -L../../../lib -lbrakepipe_d
     LIBS += -L../../../lib -lTcpConnection_d
     LIBS += -L../../../lib -lsim-client_d
     LIBS += -L../../../lib -lprofile_d
@@ -43,7 +42,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lcoupling
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -ltrain
-    LIBS += -L../../../lib -lbrakepipe    
     LIBS += -L../../../lib -lTcpConnection
     LIBS += -L../../../lib -lsim-client
     LIBS += -L../../../lib -lprofile
