@@ -104,6 +104,10 @@ private:
 
     double K_pulse_II;
 
+    double K_in_II;
+
+    double K_in_I;
+
     Timer   *incTimer;
     Timer   *decTimer;
 
