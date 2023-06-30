@@ -12,9 +12,10 @@ BrakeCrane130::BrakeCrane130(QObject *parent) : BrakeCrane (parent)
   , k_Va(1.0e-4)
   , k_V(1.0e-3)
   , k_VI(1.5e-3)
-  , A(0.1)
-  , K_charge(5.0e-2)
-  , K_feed(2.0e-2)
+  , A(0.8)
+  , K_charge(1.0e-1)
+  , p_pulse_II(0.45)
+  , K_feed(4.0e-2)
   , K_atm(1.5e-2)
   , K_VI(8.0e-2)
   , handle_pos(static_cast<int>(POS_II))
@@ -118,19 +119,20 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
                         - pos[POS_V] * k_V * Y[ER_PRESSURE]
                         - pos[POS_VI] * k_VI * Y[ER_PRESSURE];
 
-    // Условное положение уравнительного поршня
-    double s1 = A * (Y[ER_PRESSURE] - pBP);
+    // Условное положение уравнительного поршня в реле давления
+    // с учётом импульсной зарядки во втором положении
+    double s1 = A * (max(Y[ER_PRESSURE], p_pulse_II * pos[POS_II]) - pBP);
 
     // Зарядка ТМ из ГР в I положении
     double Q_charge_bp = pos[POS_I] * K_charge * (pFL - pBP);
 
-    // Управление ТМ от уравнительного поршня в II, IV, Va и V положениях
+    // Управление ТМ от реле давления в II, IV, Va и V положениях
     double is_245a5 = pos[POS_II] + pos[POS_IV] + pos[POS_Va] + pos[POS_V];
 
-    // Подзарядка ТМ из ГР от уравнительного поршня
+    // Подзарядка ТМ из ГР от реле давления
     double Q_train_bp = is_245a5 * cut(s1, 0.0, K_feed) * (pFL - pBP);
 
-    // Разрядка ТМ от уравнительного поршня
+    // Разрядка ТМ от реле давления
     double Q_brake_bp = is_245a5 * cut(s1, - K_atm, 0.0) * pBP;
 
     // Экстренная разрядка ТМ в VI положении

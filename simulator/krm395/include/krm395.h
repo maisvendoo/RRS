@@ -69,6 +69,9 @@ private:
     /// Коэффициент зарядки ТМ из ГР в I положении
     double K_charge;
 
+    /// Коэффициент к давлению импульсной сверхзарядки при отпуске вторым положением
+    double K_pulse_II;
+
     /// Коэффициент зарядки ТМ из ГР от уравнительного поршня
     double K_feed;
 
@@ -101,12 +104,6 @@ private:
 //    double Kv_1;
     double Kv_2;
 //    double Kv_5;
-
-    double K_pulse_II;
-
-    double K_in_II;
-
-    double K_in_I;
 
     Timer   *incTimer;
     Timer   *decTimer;
