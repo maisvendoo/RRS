@@ -18,5 +18,8 @@ void PassCar::stepDebugMsg(double t, double dt)
             .arg(10.0 * brakepipe->getPressure(), 6, 'f', 2)
             .arg(10.0 * brake_mech->getBCpressure(), 6, 'f', 2)
             .arg(10.0 * supply_reservoir->getPressure(), 6, 'f', 2);
+
+    DebugMsg += QString("|AK:%1|").arg(static_cast<int>(anglecock_bp_bwd->isOpened()), 1);
+
     DebugMsg += QString("          ");
 }
