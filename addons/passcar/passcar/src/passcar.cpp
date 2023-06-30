@@ -75,7 +75,16 @@ void PassCar::step(double t, double dt)
 //------------------------------------------------------------------------------
 void PassCar::keyProcess()
 {
-
+    if (!hose_bp_bwd->isConnected())
+    {
+        if (getKeyState(KEY_BackSpace))
+        {
+            if (isShift())
+                anglecock_bp_bwd->open();
+            else
+                anglecock_bp_bwd->close();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

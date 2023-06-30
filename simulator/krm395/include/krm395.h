@@ -102,6 +102,12 @@ private:
     double Kv_2;
 //    double Kv_5;
 
+    double K_pulse_II;
+
+    double K_in_II;
+
+    double K_in_I;
+
     Timer   *incTimer;
     Timer   *decTimer;
 
