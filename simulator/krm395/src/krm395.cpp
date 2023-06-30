@@ -200,7 +200,7 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "A", A);
 
     cfg.getDouble(secName, "K_charge", K_charge);
-    cfg.getDouble(secName, "KF", K_feed);
+    cfg.getDouble(secName, "K_feed", K_feed);
     cfg.getDouble(secName, "K_atm", K_atm);
     cfg.getDouble(secName, "K_VI", K_VI);
 
