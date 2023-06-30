@@ -27,6 +27,7 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , Kv_out(1e7)
   , volume_2(0)
   , Kv_2(2e7)
+  , K_pulse_II(2.0)
 {
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[POS_II] = 1.0;
@@ -137,8 +138,10 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
                         - pos[POS_V] * k_V * Y[ER_PRESSURE]
                         - pos[POS_VI] * k_VI * Y[ER_PRESSURE];
 
+    double add_pressure = hs_p(pFL - p0) * pos[POS_II] * (p0 - Y[ER_PRESSURE]) * K_pulse_II;
+
     // Условное положение уравнительного поршня
-    double s1 = A * (Y[ER_PRESSURE] - pBP);
+    double s1 = A * (Y[ER_PRESSURE] + add_pressure - pBP);
 
     // Зарядка ТМ из ГР в I положении
     double Q_charge_bp = pos[POS_I] * K_charge * (pFL - pBP);
@@ -164,7 +167,7 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
     // Суммарный поток в уравнительный резервуар
     setERflow(Q_leak_er + Q_charge_er + Q_train_er + Q_stab_er + Q_brake_er);
 
-    volume_in = static_cast<int>(Kv_in * pf(QBP));
+    volume_in = static_cast<int>(Kv_in * pf(QBP)) * pos[POS_I];
     volume_out = static_cast<int>(Kv_out * nf(QBP));
 //    volume_1 = static_cast<int>(Kv_1 * pf(Q_charge_er));
     volume_2 = static_cast<int>(Kv_2 * nf(Q_stab_er));
@@ -203,6 +206,7 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "Kv_out", Kv_out);
 //    cfg.getDouble(secName, "Kv_1", Kv_1);
     cfg.getDouble(secName, "Kv_2", Kv_2);
+    cfg.getDouble(secName, "K_pulse_II", K_pulse_II);
 //    cfg.getDouble(secName, "Kv_5", Kv_5);
 }
 

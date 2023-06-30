@@ -46,6 +46,8 @@
         <Kv_1>3e5</Kv_1>
         <Kv_2>1e7</Kv_2>
         <Kv_5>2e5</Kv_5>
+		
+		<K_pulse_II>2.0</K_pulse_II>
 
     </Device>
 </Config>
