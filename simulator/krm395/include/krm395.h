@@ -89,21 +89,19 @@ private:
 
     int max_pos;
 
+    // Громкость озвучки
     int volume_in;
-
     int volume_out;
-
-    double Kv_in;
-
-    double Kv_out;
-
 //    int volume_1;
     int volume_2;
-//    int volume_5;
+    int volume_5;
 
+    // Коэффициенты к громкости озвучки
+    double Kv_in;
+    double Kv_out;
 //    double Kv_1;
     double Kv_2;
-//    double Kv_5;
+    double Kv_5;
 
     Timer   *incTimer;
     Timer   *decTimer;

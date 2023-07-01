@@ -24,10 +24,14 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , max_pos(POS_VI)
   , volume_in(0)
   , volume_out(0)
-  , Kv_in(1e9)
-  , Kv_out(1e7)
+//  , volume_1(0)
   , volume_2(0)
-  , Kv_2(2e7)
+  , volume_5(0)
+  , Kv_in(3e2)
+  , Kv_out(3e2)
+//  , Kv_1(3e5)
+  , Kv_2(1e7)
+  , Kv_5(2e2)
 {
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[POS_II] = 1.0;
@@ -102,15 +106,17 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 
     emit soundSetVolume("KRM395_vpusk", cut(volume_in, 0, 100));
     emit soundSetVolume("KRM395_vipusk", cut(volume_out, 0, 100));
+//    emit soundSetVolume("KRM395_1", cut(volume_1, 0, 100));
     emit soundSetVolume("KRM395_2", cut(volume_2, 0, 100));
+    emit soundSetVolume("KRM395_5", cut(volume_5, 0, 100));
 /*
 //    DebugMsg = QString("out: %1 in: %2 1: %3 2: %4 5: %5")
-    DebugMsg = QString("out: %1 in: %2 2: %3")
+    DebugMsg = QString("out: %1 in: %2 2: %3 5: %4")
             .arg(volume_out, 10)
             .arg(volume_in, 10)
 //            .arg(volume_1, 10)
             .arg(volume_2, 10);
-//            .arg(volume_5, 10);
+            .arg(volume_5, 10);
 */
 }
 
@@ -168,11 +174,11 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
     // Суммарный поток в уравнительный резервуар
     setERflow(Q_leak_er + Q_charge_er + Q_train_er + Q_stab_er + Q_brake_er);
 
-    volume_in = static_cast<int>(Kv_in * pf(QBP)) * pos[POS_I];
-    volume_out = static_cast<int>(Kv_out * nf(QBP));
+    volume_in = static_cast<int>(Kv_in * cbrt(pf(QBP)));
+    volume_out = static_cast<int>(Kv_out * cbrt(nf(QBP)));
 //    volume_1 = static_cast<int>(Kv_1 * pf(Q_charge_er));
     volume_2 = static_cast<int>(Kv_2 * nf(Q_stab_er));
-//    volume_5 = static_cast<int>(Kv_5 * nf(Q_brake_er));
+    volume_5 = static_cast<int>(Kv_5 * cbrt(nf(Q_brake_er)));
 
     BrakeCrane::ode_system(Y, dYdt, t);
 }
@@ -199,6 +205,7 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "A", A);
 
     cfg.getDouble(secName, "K_charge", K_charge);
+    cfg.getDouble(secName, "K_pulse_II", K_pulse_II);
     cfg.getDouble(secName, "K_feed", K_feed);
     cfg.getDouble(secName, "K_atm", K_atm);
     cfg.getDouble(secName, "K_VI", K_VI);
@@ -207,8 +214,7 @@ void BrakeCrane395::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "Kv_out", Kv_out);
 //    cfg.getDouble(secName, "Kv_1", Kv_1);
     cfg.getDouble(secName, "Kv_2", Kv_2);
-    cfg.getDouble(secName, "K_pulse_II", K_pulse_II);
-//    cfg.getDouble(secName, "Kv_5", Kv_5);
+    cfg.getDouble(secName, "Kv_5", Kv_5);
 }
 
 //------------------------------------------------------------------------------

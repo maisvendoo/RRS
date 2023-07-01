@@ -30,7 +30,8 @@ void VL60k::initBrakesControl(QString modules_dir)
 
     // Тройник магистрали тормозных цилиндров
     bc_splitter = new PneumoSplitter();
-    bc_splitter->read_config("pneumo-splitter");
+    bc_splitter->read_custom_config(
+                config_dir + QDir::separator() + "bc-splitter");
 
     // Концевые краны магистрали тормозных цилиндров
     anglecock_bc_fwd = new PneumoAngleCock();

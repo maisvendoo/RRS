@@ -3,13 +3,13 @@
     <BrakesState>
 
         <!-- Давление в главных резервуарах, МПа -->
-        <MainReservoirPressure>0.9</MainReservoirPressure>
+        <!-- <MainReservoirPressure>0.9</MainReservoirPressure> -->
 
         <!-- Темп утечек из ГР -->
         <MainReservoirFlow>1.1e-4</MainReservoirFlow>
 
         <!-- Зарядное давление, МПа -->
-        <ChargingPressure>0.5</ChargingPressure>
+        <!-- <ChargingPressure>0.5</ChargingPressure> -->
 
         <!-- Положение рукоятки крана машиниста -->
         <TrainCranePos>2</TrainCranePos>
