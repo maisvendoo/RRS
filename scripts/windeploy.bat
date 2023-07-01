@@ -50,6 +50,8 @@ xcopy ..\cfg\main-resist\default.xml %RRS_DEV_ROOT%\cfg\main-resist\
 xcopy ..\cfg\main-resist\passcar.xml %RRS_DEV_ROOT%\cfg\main-resist\
 xcopy ..\cfg\main-resist\loco-resist.xml %RRS_DEV_ROOT%\cfg\main-resist\
 
+xcopy ..\cfg\wheel-rail-friction\*.xml %RRS_DEV_ROOT%\cfg\wheel-rail-friction\
+
 xcopy ..\cfg\vehicles\vl60pk-1543\*.* %RRS_DEV_ROOT%\cfg\vehicles\vl60pk-1543\
 xcopy ..\cfg\vehicles\VL60k-1737\*.* %RRS_DEV_ROOT%\cfg\vehicles\VL60k-1737\
 xcopy ..\cfg\vehicles\IMR_pass_rzd-11100\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-11100\
