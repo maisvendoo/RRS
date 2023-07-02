@@ -6,6 +6,7 @@
 
 #include    "airdistributor.h"
 #include    "automatic-train-stop.h"
+#include    "brake-auto-mode.h"
 #include    "brake-crane.h"
 #include    "brake-lock.h"
 #include    "brake-mech.h"
