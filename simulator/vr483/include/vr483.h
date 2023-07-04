@@ -52,7 +52,9 @@ private:
     std::array<double, NUM_PRESSURES> p;
 
     /// Коэффициент чувствительности к разности сил на уравнительном поршне
-    double A;
+    double A1;
+
+    double A2;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

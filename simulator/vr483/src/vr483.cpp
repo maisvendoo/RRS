@@ -6,7 +6,8 @@
 AirDist483::AirDist483() : AirDistributor ()
   , switchProfile(1)
   , switchPayload(1)
-  , A(1.0)
+  , A1(1.0)
+  , A2(1.0)
 {
     v[RK] = 0.006;
     v[ZK] = 0.0045;
@@ -57,7 +58,7 @@ void AirDist483::load_config(CfgReader &cfg)
     // Коэффициенты
     for (size_t i = 0; i < k.size(); ++i)
     {
-        QString coeff = QString("d%1").arg(i);
+        QString coeff = QString("k%1").arg(i);
         cfg.getDouble(secName, coeff, k[i]);
     }
     for (size_t i = 0; i < p.size(); ++i)
@@ -65,7 +66,8 @@ void AirDist483::load_config(CfgReader &cfg)
         QString coeff = QString("p%1").arg(i);
         cfg.getDouble(secName, coeff, p[i]);
     }
-    cfg.getDouble(secName, "A", A);
+    cfg.getDouble(secName, "A1", A1);
+    cfg.getDouble(secName, "A2", A2);
 }
 
 //------------------------------------------------------------------------------
@@ -122,13 +124,13 @@ void AirDist483::preStep(state_vector_t &Y, double t)
 
     // Взаимодействие с ТЦ
     // Разница давления в ТЦ и усилий от пружин уравнительного поршня
-    double d_pBC = A * (pUP + pUP_g - pBC);
+    double d_pBC = A1 * pUP - A2 * (pBC + pUP_g);
     // Расход воздуха из ЗР в ТЦ при быстром наполнении
-    double Qas_bc_fast = cut(d_pBC, 0.0, k[10]) * hs_p(poz_gp - p[11]) * hs_n(poz_gp - p[12]) * (pSR - pBC);
+    double Qas_bc_fast = k[10] * cut(d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[11]) * hs_n(poz_gp - p[12]) * (pSR - pBC);
     // Расход воздуха из ЗР в ТЦ при медленном наполнении
-    double Qas_bc_slow = cut(d_pBC, 0.0, k[11]) * hs_p(poz_gp - p[12]) * (pSR - pBC);
+    double Qas_bc_slow = k[11] * cut(d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[12]) * (pSR - pBC);
     // Расход воздуха из ТЦ в атмосферу
-    double Qbc_atm = max( cut(-d_pBC, 0.0, k[8]), hs_n(poz_gp - p[11]) ) * pBC;
+    double Qbc_atm = max( k[8] * cut(-d_pBC, 0.0, 1.0), hs_n(poz_gp - p[11]) ) * pBC;
 
     // Расход воздуха в РК
     Q[RK] = Qzk_rk_gp + Qzk_rk_dp;
@@ -143,10 +145,13 @@ void AirDist483::preStep(state_vector_t &Y, double t)
     // Расход воздуха из ТМ
     QBP = - Qbp_as - Qmk_zk_pl - Qmk_zk_km - Qmk_kdr_dop;
 
-    DebugMsg = QString("483:RK%1|ZK%2|KDR%3|")
+    DebugMsg = QString("483:RK%1|ZK%2|KDR%3|poz_d%4|poz_gp%5|poz_up:%6")
             .arg(10.0 * Y[RK], 6, 'f', 3)
             .arg(10.0 * Y[ZK], 6, 'f', 3)
-            .arg(10.0 * Y[KDR], 6, 'f', 3);
+            .arg(10.0 * Y[KDR], 6, 'f', 3)
+            .arg(poz_d, 6, 'f', 3)
+            .arg(poz_gp, 6, 'f', 3)
+            .arg(poz_up, 6, 'f', 3);
 }
 
 //------------------------------------------------------------------------------
