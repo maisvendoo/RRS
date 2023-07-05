@@ -1,6 +1,7 @@
 rem Определяем необходимые переменные окружения
 
 set OSG_PLUGINS_DIR=osgPlugins-3.6.5
+set DATA_PATH=..\data
 
 rem Создаем структуру каталогов игры
 
@@ -63,8 +64,8 @@ xcopy ..\cfg\vehicles\IMR_pass_rzd-21071\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pas
 xcopy ..\cfg\vehicles\IMR_pass_rzd-65361\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-65361\
 xcopy ..\cfg\vehicles\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\cfg\vehicles\Fr_hopper_RZD-2851\
 
+xcopy ..\cfg\trains\vl60pk-1543-T65_17.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\
-xcopy ..\cfg\trains\vl60pk-1543-pass-train.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy ..\cfg\trains\VL60k-1737.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy ..\cfg\trains\VL60k-1737-frTest.xml %RRS_DEV_ROOT%\cfg\trains\
 
@@ -90,35 +91,35 @@ xcopy %OPENAL_BIN%\*.dll %RRS_DEV_ROOT%\bin\
 xcopy %FREETYPE_LIBRARY% %RRS_DEV_ROOT%\bin\
 xcopy %ZLIB_LIBRARY% %RRS_DEV_ROOT%\bin\
 
-rem Копируем данные игры (модели, звуки, конфиги анимаций)
+rem Копируем данные игры (модели, звуки, конфиги анимаций, шрифты)
 
 rem ВЛ60пк
-xcopy /S ..\..\data\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
-xcopy /S ..\..\data\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
-xcopy /S ..\..\data\animations\vl60pk-1543\*.* %RRS_DEV_ROOT%\data\animations\vl60pk-1543\
+xcopy /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
+xcopy /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
+xcopy /S %DATA_PATH%\animations\vl60pk-1543\*.* %RRS_DEV_ROOT%\data\animations\vl60pk-1543\
 
 rem ВЛ60к
-xcopy /S ..\..\data\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
-xcopy /S ..\..\data\animations\VL60k-1737\*.* %RRS_DEV_ROOT%\data\animations\VL60k-1737\
+xcopy /S %DATA_PATH%\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
+xcopy /S %DATA_PATH%\animations\VL60k-1737\*.* %RRS_DEV_ROOT%\data\animations\VL60k-1737\
 
 rem Пассажирские вагоны
-xcopy /S ..\..\data\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-11100\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-11100\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-13819\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-13819\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-16733\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-16733\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-17669\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-17669\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-25924\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-25924\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-21071\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-21071\
-xcopy /S ..\..\data\animations\IMR_pass_rzd-15563\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-15563\
+xcopy /S %DATA_PATH%\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-11100\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-11100\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-13819\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-13819\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-16733\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-16733\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-17669\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-17669\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-25924\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-25924\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-21071\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-21071\
+xcopy /S %DATA_PATH%\animations\IMR_pass_rzd-15563\*.* %RRS_DEV_ROOT%\data\animations\IMR_pass_rzd-15563\
 
 
 rem Вагоны-хоперы
-xcopy /S ..\..\data\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
-xcopy /S ..\..\data\animations\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\data\animations\Fr_hopper_RZD-2851\
+xcopy /S %DATA_PATH%\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
+xcopy /S %DATA_PATH%\animations\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\data\animations\Fr_hopper_RZD-2851\
 
 rem Шрифты вьювера и темы оформления лаунчера
 
-xcopy ..\..\fonts\*.* %RRS_DEV_ROOT%\fonts
+xcopy ..\fonts\*.* %RRS_DEV_ROOT%\fonts
 xcopy ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты

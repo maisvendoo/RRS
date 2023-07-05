@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<AnalogRotation>
+		<SignalID>98</SignalID>
+		<MinAngle>0.0</MinAngle>
+		<MaxAngle>271</MaxAngle>
+		<InitAngle>0.0</InitAngle>
+		<Duration>4.0</Duration>
+		<Precision>0.01</Precision>
+		<Axis>0.0 0.1 0.0</Axis>
+	</AnalogRotation>
+
+	<KeyPoint>
+		<Param>0.0</Param>
+		<Value>-119.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>0.167</Param>
+		<Value>-108.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>0.333</Param>
+		<Value>-85.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>0.5</Param>
+		<Value>-48.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>0.667</Param>
+		<Value>0.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>0.833</Param>
+		<Value>62</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>1.0</Param>
+		<Value>117.0</Value>
+	</KeyPoint>
+
+
+</Config>
