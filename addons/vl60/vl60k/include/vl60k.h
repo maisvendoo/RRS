@@ -61,9 +61,6 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
-    /// Список звуков перестука
-    QList<QString>   tap_sounds;
-
     float   pant1_pos;
     float   pant2_pos;
     float   gv_pos;
@@ -74,6 +71,18 @@ private:
 
     /// Передаточное число редуктора
     double  ip;
+
+    /// Подключение рукавов магистрали тормозных цилиндров к импульсной магистрали
+    bool bc_hose_to_impulse_line;
+
+    /// Регистратор, для записи параметров
+    Registrator *reg;
+
+    /// Имя модуля воздухораспределителя
+    QString airdist_module_name;
+
+    /// Имя конфига воздухорапределителя
+    QString airdist_config_name;
 
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler;
@@ -107,6 +116,9 @@ private:
         RBP = 1,
         RBS = 2
     };
+
+    /// Список звуков перестука
+    QList<QString>   tap_sounds;
 
     /// Триггеры рукояток бдительности
     std::array<Trigger, NUM_RB>  rb;
@@ -184,10 +196,7 @@ private:
     Reservoir  *impulse_line;
 
     /// Тройник подключения тележек к магистрали тормозных цилиндров
-    PneumoSplitter  *bc_splitter;
-
-    /// Подключение рукавов магистрали тормозных цилиндров к импульсной магистрали
-    bool bc_hose_to_impulse_line;
+    PneumoSplitter  *bc_splitter;    
 
     enum
     {
@@ -256,9 +265,6 @@ private:
 
     /// Свисток и тифон
     TrainHorn   *horn;
-
-    /// Регистратор, для записи параметров
-    Registrator *reg;
 
     std::vector<Trigger *> triggers;
     Timer   *autoStartTimer;

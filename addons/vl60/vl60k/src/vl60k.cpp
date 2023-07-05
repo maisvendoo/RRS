@@ -28,6 +28,8 @@ VL60k::VL60k() : Vehicle ()
   , ip(2.73)
   , bc_hose_to_impulse_line(true)
   , reg(nullptr)
+  , airdist_module_name("vr483")
+  , airdist_config_name("vr483")
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
     pants_tumbler.setOffSoundName("K_Tumbler_Off");

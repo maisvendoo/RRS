@@ -13,8 +13,8 @@ void VL60k::initBrakesEquipment(QString modules_dir)
     brakepipe->setLeakCoeff(3e-6);
 
     // Воздухораспределитель
-    air_dist = loadAirDistributor(modules_dir + QDir::separator() + "vr483");
-    air_dist->read_config("vr483");
+    air_dist = loadAirDistributor(modules_dir + QDir::separator() + airdist_module_name);
+    air_dist->read_config(airdist_config_name);
 
     // Запасный резервуар
     supply_reservoir = new Reservoir(0.055);

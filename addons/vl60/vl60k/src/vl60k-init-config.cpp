@@ -75,5 +75,7 @@ void VL60k::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getDouble(secName, "ReductorCoeff", ip);
+        cfg.getString(secName, "AirDistModule", airdist_module_name);
+        cfg.getString(secName, "AirDistConfig", airdist_config_name);
     }
 }

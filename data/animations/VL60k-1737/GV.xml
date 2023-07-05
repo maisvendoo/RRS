@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<ModelAnimation>
+		<SignalID>42</SignalID>
+		<Time>0.1</Time>
+	</ModelAnimation>
+</Config>
