@@ -36,6 +36,7 @@ xcopy ..\..\modules\*.dll %RRS_DEV_ROOT%\modules
 xcopy ..\..\modules\vl60k\*.dll %RRS_DEV_ROOT%\modules\vl60k\
 xcopy ..\..\modules\vl60pk\*.dll %RRS_DEV_ROOT%\modules\vl60pk\
 xcopy ..\..\modules\passcar\*.dll %RRS_DEV_ROOT%\modules\passcar\
+xcopy ..\..\modules\freightcar\*.dll %RRS_DEV_ROOT%\modules\freightcar\
 
 xcopy ..\..\plugins\*.dll %RRS_DEV_ROOT%\plugins
 
@@ -66,7 +67,8 @@ xcopy ..\cfg\vehicles\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\cfg\vehicles\Fr_hopp
 xcopy ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy ..\cfg\trains\vl60pk-1543-pass-train.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy ..\cfg\trains\VL60k-1737.xml %RRS_DEV_ROOT%\cfg\trains\
-xcopy ..\cfg\trains\VL60k-1737-frTest.xml %RRS_DEV_ROOT%\cfg\trains\
+xcopy ..\cfg\trains\vl60k-1737-frEmpties.xml %RRS_DEV_ROOT%\cfg\trains\
+xcopy ..\cfg\trains\vl60k-1737-frLoads.xml %RRS_DEV_ROOT%\cfg\trains\
 
 rem Копируем движок OSG
 

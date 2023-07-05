@@ -26,6 +26,7 @@ move %RRS_DEV_ROOT%\bin\euler.dll %RRS_DEV_ROOT%\lib\euler.dll
 
 xcopy ..\..\modules\*.dll %RRS_DEV_ROOT%\modules
 xcopy ..\..\modules\chs2t\*.dll %RRS_DEV_ROOT%\modules\chs2t\
+xcopy ..\..\modules\freightcar\*.dll %RRS_DEV_ROOT%\modules\freightcar\
 xcopy ..\..\modules\passcar\*.dll %RRS_DEV_ROOT%\modules\passcar\
 xcopy ..\..\modules\tep70\*.dll %RRS_DEV_ROOT%\modules\tep70\
 xcopy ..\..\modules\vl60k\*.dll %RRS_DEV_ROOT%\modules\vl60k\

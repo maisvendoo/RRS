@@ -13,6 +13,7 @@ SUBDIRS += ./simulator
 SUBDIRS += ./viewer
 
 SUBDIRS += ./addons/passcar
+SUBDIRS += ./addons/freightcar
 SUBDIRS += ./addons/vl60
 SUBDIRS += ./addons/tep70
 SUBDIRS += ./addons/chs2t

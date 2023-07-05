@@ -3,5 +3,6 @@
     <Device>
         <Name>BP</Name>
         <Order>0</Order>
+        <LinesNum>0</LinesNum>
     </Device>
 </Config>

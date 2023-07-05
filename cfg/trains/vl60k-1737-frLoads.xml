@@ -12,18 +12,18 @@
 		<NoAir>0</NoAir>
 
 		<Title>ВЛ60к-1737 с грузовым поездом</Title>
-		<Description>Магистральный грузовой электровоз переменного тока производства НЭВЗ</Description>
+		<Description>Магистральный грузовой электровоз переменного тока производства НЭВЗ и 50 гружёных хопперов</Description>
 	</Common>
 
 	<Vehicle>
 		<Module>vl60k</Module>
-		<ModuleConfig>VL60k-1737</ModuleConfig>
+		<ModuleConfig>vl60k-1737</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
-		<Module>passcar</Module>
+		<Module>freightcar</Module>
 		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
 		<Count>50</Count>
 		<PayloadCoeff>1</PayloadCoeff>
