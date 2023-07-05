@@ -8,6 +8,7 @@ AirDist483::AirDist483() : AirDistributor ()
   , switchPayload(1)
   , A1(1.0)
   , A2(1.0)
+  , A3(1.0)
 {
     v[RK] = 0.006;
     v[ZK] = 0.0045;
@@ -68,6 +69,7 @@ void AirDist483::load_config(CfgReader &cfg)
     }
     cfg.getDouble(secName, "A1", A1);
     cfg.getDouble(secName, "A2", A2);
+    cfg.getDouble(secName, "A3", A3);
 }
 
 //------------------------------------------------------------------------------
@@ -84,7 +86,7 @@ void AirDist483::preStep(state_vector_t &Y, double t)
     // Условное положение диафрагмы - разница давлений в МК и ЗК
     double poz_d = pBP - Y[ZK];
     // Условное положение главного поршня - разница давлений в РК и ЗК
-    double poz_gp = Y[RK] - Y[ZK];
+    double poz_gp = Y[RK] - A3 * Y[ZK];
 
     // Расчёт перетоков воздуха между разными элементами воздухораспределителя
 
@@ -120,11 +122,11 @@ void AirDist483::preStep(state_vector_t &Y, double t)
     // Эквивалентное давление на уравнительный поршень от усилия основной пружины
     double pUP = p[14] + (p[15] - p[14]) * poz_up;
     // Эквивалентное давление на уравнительный поршень от усилия пружины гружёного режима
-    double pUP_g = pf(p[16] + (p[17] - p[16]) * (poz_up - static_cast<double>(switchPayload) / 2.0) );
+     double pUP_g = pf(p[16] + (p[17] - p[16]) * (poz_up - ((1 + p[16]) * (1 - static_cast<double>(switchPayload) / 2.0))) );
 
     // Взаимодействие с ТЦ
     // Разница давления в ТЦ и усилий от пружин уравнительного поршня
-    double d_pBC = A1 * pUP - A2 * (pBC + pUP_g);
+    double d_pBC = A1 * ( pUP + pUP_g - pBC );
     // Расход воздуха из ЗР в ТЦ при быстром наполнении
     double Qas_bc_fast = k[10] * cut(d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[11]) * hs_n(poz_gp - p[12]) * (pSR - pBC);
     // Расход воздуха из ЗР в ТЦ при медленном наполнении
