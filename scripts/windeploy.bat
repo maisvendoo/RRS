@@ -107,10 +107,10 @@ xcopy /S %DATA_PATH%\animations\VL60k-1737\*.* %RRS_DEV_ROOT%\data\animations\VL
 rem Пассажирские вагоны
 xcopy /S %DATA_PATH%\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
 xcopy /S %DATA_PATH%\animations\passcar\*.* %RRS_DEV_ROOT%\data\animations\passcar\
-xcopy /S %DATA_PATH%\animations\freight\*.* %RRS_DEV_ROOT%\data\animations\freight\
 
 rem Вагоны-хоперы
-xcopy /S %DATA_PATH%\animations\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\data\animations\Fr_hopper_RZD-2851\
+xcopy /S %DATA_PATH%\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
+xcopy /S %DATA_PATH%\animations\freight\*.* %RRS_DEV_ROOT%\data\animations\freight\
 
 rem Шрифты вьювера и темы оформления лаунчера
 
