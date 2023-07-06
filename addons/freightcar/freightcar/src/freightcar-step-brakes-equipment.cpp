@@ -61,6 +61,7 @@ void FreightCar::stepBrakesEquipment(double t, double dt)
     {
         automode->setAirDistBCflow(ad_bc_flow);
         automode->setBCpressure(brake_mech->getBCpressure());
+        automode->setPayloadCoeff(payload_coeff);
         automode->step(t, dt);
 
         ad_bc_flow = automode->getBCflow();
