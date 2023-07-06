@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Vehicle>
-        <EmptyMass>130000</EmptyMass>
+        <EmptyMass>134000</EmptyMass>
         <PayloadMass>2000</PayloadMass>
         <Length>21.0</Length>
         <WheelDiameter>1.236</WheelDiameter>
