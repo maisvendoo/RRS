@@ -5,7 +5,7 @@
 		<CabineInVehicle>0</CabineInVehicle>
 
 		<!-- Зарядное давление, МПа -->
-		<ChargingPressure>0.5</ChargingPressure>
+		<ChargingPressure>0.52</ChargingPressure>
 		<!-- Начальное давление в ГР, МПа -->
 		<InitMainResPressure>0.9</InitMainResPressure>
 		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
