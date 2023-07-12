@@ -10,6 +10,9 @@ EVR305::EVR305(QObject *parent)
     , L(0.5)
     , I_on(0.1)
 {
+    K.fill(0.0);
+    A.fill(0.0);
+
     lines_num = EPB_LINES_NUM;
     setControlLinesNumber(lines_num);
 
@@ -38,42 +41,35 @@ void EVR305::ode_system(const state_vector_t &Y,
 
     // Состояние отпускного вентиля
     double up = static_cast<double>(valve_state[RELEASE_VALVE]);
-
     // Состояние тормозного вентиля
     double ut = static_cast<double>(valve_state[BRAKE_VALVE]);
 
     // Поток воздуха из ЗР в РК (включены оба вентиля)
-    double Q_sr_work = K[1] * (pSR - Y[WORK_PRESSURE]) * up * ut;
+    double Q_sr_work = up * ut * cut(A[1] * (pSR - Y[WORK_PRESSURE]), 0.0, K[1]);
+    // Поток воздуха из РК в атмосферу (отпускной вентиль выключен)
+    double Q_work_atm = (1.0 - up) * cut(A[1] * (Y[WORK_PRESSURE]), 0.0, K[2]);
 
-    // Поток воздуха из РК а атмосферу (отпускной вентиль выключен)
-    double Q_work_atm = K[2] * Y[WORK_PRESSURE] * (1.0 - up);
+    // Давления на переключательном клапане
+    double p1 = zpk->getPressure1();
+    p_airdistBC = zpk->getPressure2();
 
     // Перемещение диафрагмы реле давления
-    double p1 = zpk->getPressure1();
-    double s = Y[WORK_PRESSURE] - p1;
-
-    // Состояние клапана наполнения ТЦ
-    double u1 = cut(k[1] * s, 0.0, 1.0);
-
-    // Состояние клапана опорожнения ТЦ
-    double u2 = cut(-k[2] * s, 0.0, 1.0);
+    double s = A[2] * (Y[WORK_PRESSURE] - p1);
 
     // Поток воздуха на заполнение ТЦ
-    double Q_sr_bc = K[3] * (pSR - p1) * u1;
-
+    double Q_sr_bc = cut(s, 0.0, K[3]) * (pSR - p1);
     // Поток воздуха на опорожнение ТЦ
-    double Q_bc_atm = K[4] * p1 * u2;
+    double Q_bc_atm = cut(-s, 0.0, K[4]) * p1;
 
     // Работа с ТЦ через переключательный клапан
     zpk->setInputFlow1(Q_sr_bc - Q_bc_atm);
     zpk->setInputFlow2(Q_airdistBC);
-    p_airdistBC = zpk->getPressure2();
 
     zpk->setOutputPressure(pBC);
     QBC = zpk->getOutputFlow();
 
+    // Поток в запасный резервуар
     QSR = Q_airdistSR - Q_sr_work - Q_sr_bc;
-
     p_airdistSR = pSR;
 
     // Поток в рабочую камеру
@@ -136,10 +132,10 @@ void EVR305::load_config(CfgReader &cfg)
         cfg.getDouble(secName, coeff, K[i]);
     }
 
-    for (size_t i = 1; i < k.size(); ++i)
+    for (size_t i = 1; i < A.size(); ++i)
     {
-        QString coeff = QString("k%1").arg(i);
-        cfg.getDouble(secName, coeff, k[i]);
+        QString coeff = QString("A%1").arg(i);
+        cfg.getDouble(secName, coeff, A[i]);
     }
 
     double tmp = 0.0;

@@ -12,7 +12,7 @@ enum
     RELEASE_VALVE = 0,  ///< Отпускной электромагнитный вентиль
     BRAKE_VALVE = 1,    ///< Тормозной электромагнитный вентиль
 
-    MAX_COEFFS = 7,
+    MAX_COEFFS = 5,
     MAX_LCOEFFS = 3
 };
 
@@ -43,7 +43,7 @@ private:
     double I_on;
 
     std::array<double, MAX_COEFFS> K;
-    std::array<double, MAX_LCOEFFS> k;
+    std::array<double, MAX_LCOEFFS> A;
 
     SwitchingValve *zpk;
 
