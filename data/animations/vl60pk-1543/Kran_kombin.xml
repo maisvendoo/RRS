@@ -4,7 +4,7 @@
 	<AnalogRotation>
 		<SignalID>1</SignalID>
 		<Duration>10.0</Duration>		
-		<Axis>0.879 0.4767 0.0</Axis>
+		<Axis>1.0 0.0 0.0</Axis>
 	</AnalogRotation>
 
 	<KeyPoint>
