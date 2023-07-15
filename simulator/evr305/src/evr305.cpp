@@ -105,7 +105,7 @@ void EVR305::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Ток, потребляемый катушкой вентиля
-    double curr = U[EPB_WORK_LINE] / (R + (2.0 * Physics::PI * f[EPB_WORK_LINE] * L));
+    double curr = U[EPB_WORK_LINE] / sqrt(R * R + pow(2.0 * Physics::PI * f[EPB_WORK_LINE] * L, 2.0));
 
     // Отпускной электромагнитный вентиль
     double I_release = curr;
