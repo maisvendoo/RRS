@@ -11,6 +11,8 @@
 
 #include    "vehicle-api.h"
 
+#include    "registrator.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -65,6 +67,12 @@ private:
     /// Передаточное число редуктора в подвагонном электрогенераторе
     double ip;
 
+    /// Признак включения регистрации
+    bool is_Registarator_on;
+
+    /// Регистратор параметров
+    Registrator *registrator;
+
     QString     soundDir;
 
     QMap<int, QString> sounds;
@@ -96,6 +104,10 @@ private:
     void loadConfig(QString cfg_path);
 
     void initSounds();
+
+    void initRegistrator();
+
+    void stepRegistrator(double t, double dt);
 
     void soundStep();
 

@@ -26,6 +26,7 @@ CONFIG(debug, debug|release) {
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../../CfgReader/include
+INCLUDEPATH += ../passcar-equipment/include/
 
 INCLUDEPATH += ../../../simulator/solver/include
 INCLUDEPATH += ../../../simulator/physics/include
@@ -34,4 +35,6 @@ INCLUDEPATH += ../../../simulator/device/include
 INCLUDEPATH += ../../../filesystem/include
 
 HEADERS += $$files(./include/*.h)
+HEADERS += $$files(../passcar-equipment/include/*.h)
 SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(../passcar-equipment/src/*.cpp)

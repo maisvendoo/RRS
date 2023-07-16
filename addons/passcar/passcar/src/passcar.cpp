@@ -27,6 +27,7 @@ PassCar::PassCar() : Vehicle ()
   , brake_mech(nullptr)
   , brake_mech_config("carbrakes-mech-composite")
   , ip(2.96)
+  , is_Registarator_on(false)
 {
 
 }
@@ -52,6 +53,9 @@ void PassCar::initialization()
     initEPB(modules_dir);
 
     initSounds();
+
+    if (is_Registarator_on)
+        initRegistrator();
 }
 
 //------------------------------------------------------------------------------
@@ -66,6 +70,9 @@ void PassCar::step(double t, double dt)
     stepSignalsOutput();
 
     stepDebugMsg(t, dt);
+
+    if (is_Registarator_on)
+        stepRegistrator(t, dt);
 
     soundStep();
 }
@@ -117,6 +124,8 @@ void PassCar::loadConfig(QString cfg_path)
         cfg.getString(secName, "BrakeMechConfig", brake_mech_config);
 
         cfg.getDouble(secName, "GenReductorCoeff", ip);
+
+        cfg.getBool(secName, "isRegistratorOn", is_Registarator_on);
     }
 }
 
