@@ -3,11 +3,10 @@
 
 #include    "device.h"
 
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Registrator : public Device
+class DEVICE_EXPORT Registrator : public Device
 {
     Q_OBJECT
 
@@ -17,9 +16,9 @@ public:
 
     ~Registrator();
 
-    void print(QString line, double t, double dt);    
+    virtual void print(QString line, double t, double dt);
 
-private:
+protected:
 
     bool    first_print;
     double  tau;
@@ -29,9 +28,9 @@ private:
 
     QFile   *file;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-    void load_config(CfgReader &cfg);
+    virtual void load_config(CfgReader &cfg);
 };
 
 

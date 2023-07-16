@@ -31,5 +31,6 @@
 #include    "switcher.h"
 #include    "traction-controller.h"
 #include    "train-horn.h"
+#include    "registrator.h"
 
 #endif // VEHICLE_API_H

@@ -37,8 +37,6 @@
 #include    "brake-switcher.h"
 #include    "hysteresis-relay.h"
 
-#include    "registrator.h"
-
 /*!
  * \class
  * \brief Основной класс, описывающий весь тепловоз
