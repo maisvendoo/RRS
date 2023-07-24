@@ -26,6 +26,7 @@ SUBDIRS += ./modbus
 SUBDIRS += ./krm395
 SUBDIRS += ./krm130
 SUBDIRS += ./vr242
+SUBDIRS += ./vr292
 SUBDIRS += ./vr483
 SUBDIRS += ./ar265
 SUBDIRS += ./kvt224
