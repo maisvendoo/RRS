@@ -7,15 +7,13 @@ AirDist292::AirDist292() : AirDistributor ()
   , long_train_mode(0)
   , Vkd(1.0e-3)
   , Qkd(0.0)
-/*  , pu2(0.037)
-  , pbv(0.15)
-  , psv(0.025)
-  , pwv(0.48)
-  , s1_min(-0.015)
-  , s1_max(0.015)*/
+  , disjunction_z_pos(0.0)
+  , main_z_pos(0.0)
+  , main_z_eps(0.015)
 {
+    p.fill(0.0);
     K.fill(0.0);
-    k.fill(0.0);
+    A.fill(0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -42,83 +40,40 @@ void AirDist292::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
     Q_UNUSED(t)
-/*
-    // Перемещение главного поршня
-    double s1 = dead_zone((pSR - pBP), s1_min, s1_max);
 
-    // Отжатие полого стержня от уплотнения на выпускном клапане (наполнение ТЦ)
-    double v11 = cut(k[1] * s1, 0.0, 1.0);
+    // Условное положение магистрального поршня и отсекательного золотника
+    disjunction_z_pos = pSR - pBP;
 
-    // Открытие клапана дополнительной разрядки тормозной магистрали
-    double v12 = cut(k[2] * s1, 0.0, 1.0);
-
-    // Открытие выпускного клапана
-    double v1 = hs_n(s1);
-
-    // Клапаны поршня в камере У2
-    double v2 = hs_n(pBC - pu2);
-
-    // Тормозной клапан с учётом режимов торможения/отпуска "К" и "Д"
-    double vb = static_cast<double>((!long_train_mode) || (pBC < pbv));
-
-    // Срывной клапан ускорения экстренного торможения
-    double vs = static_cast<double>(emergency_mode && ((Y[0] - pBP) > psv));
-
-    // Клапан широкого канала ускорительной камеры при сверхзарядном давлении
-    double vw = hs_p(pBP - pwv);
+    // Условное положение главного золотника
+    main_z_pos = cut(main_z_pos,
+                     disjunction_z_pos - main_z_eps,
+                     disjunction_z_pos);
 
     // Поток из тормозной магистрали в запасный резервуар
-    double Q_bp_sr = K[1] * v2 * (pBP - pSR);
-
-    // Поток из тормозной магистрали в ускорительную камеру
-    double Q_bp_uk = (K[2] + K[3] * vw) * (pBP - Y[0]);
-
-    // Поток из запасного резервуара в магистраль тормозных цилиндров
-    double Q_sr_bc = (K[4] + K[5] * vb) * v11 * (pSR - pBC);
-
-    // Разрядка магистрали тормозных цилиндров в атмосферу
-    double Q_bc_atm = ((K[6] + K[7] * vb) * v1 + K[6] * v2) * pBC;
-
-    // Дополнительная разрядка тормозной магистрали
-    // в магистраль тормозных цилиндров
-    double Q_bp_bc = (K[8] * v12 * v2) * (pBP - pBC);
-
-    // Дополнительная разрядка тормозной магистрали
-    // и экстренная разрядка тормозной магистрали в атмосферу
-    double Q_bp_atm = ((K[8] * v12 * v2) + (K[9] * vs)) * pBP;
+    double Q_bp_sr = 0.0;
+    // Проверяем связь запасного резезвуара и тормозной магистрали
+    // через три отверстия диаметром 1.25 мм
+    if (disjunction_z_pos < p[1])
+    {
+        // Коэффициент перетока через зазор между пояском поршня и втулкой
+        double K_2 = cut(A[1] * (disjunction_z_pos - p[2]), 0.0, K[2]);
+        // Поток из тормозной магистрали в запасный резервуар
+        Q_bp_sr = (K[1] + K_2) * (pBP - pSR);
+    }
+/*
+    TODO
 */
     // Поток в тормозную магистраль
-    QBP = 0.0;
+    QBP = -Q_bp_sr;
 
     // Поток в магистраль тормозных цилиндров
     QBC = 0.0;
 
     // Поток в запасный резервуар
-    QSR = 0.0;
+    QSR = Q_bp_sr;
 
     // Поток в камеру дополнительной разрядки ТМ
     Qkd = 0.0;
-/*
-//    QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
-    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17")
-            .arg(Y[0], 7, 'f', 5)
-            .arg(pBP, 7, 'f', 5)
-            .arg(pBC, 7, 'f', 5)
-            .arg(pSR, 7, 'f', 5)
-            .arg(1000*Q_bp_sr, 8, 'f', 5)
-            .arg(1000*Q_bp_uk, 8, 'f', 5)
-            .arg(1000*Q_sr_bc, 8, 'f', 5)
-            .arg(1000*Q_bc_atm, 8, 'f', 5)
-            .arg(1000*Q_bp_bc, 8, 'f', 5)
-            .arg(1000*Q_bp_atm, 8, 'f', 5)
-            .arg(v11, 7, 'f', 5)
-            .arg(v12, 7, 'f', 5)
-            .arg(v1, 4, 'f', 1)
-            .arg(v2, 4, 'f', 1)
-            .arg(vb, 4, 'f', 1)
-            .arg(vs, 4, 'f', 1)
-            .arg(vw, 4, 'f', 1);
-*/
 }
 
 //------------------------------------------------------------------------------
@@ -146,25 +101,25 @@ void AirDist292::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "Vkd", tmp);
     if (tmp > 1e-3)
         Vkd = tmp;
-/*
-    cfg.getDouble(secName, "pu2", pu2);
-    cfg.getDouble(secName, "pbv", pbv);
-    cfg.getDouble(secName, "psv", psv);
-    cfg.getDouble(secName, "pwv", pwv);
 
-    cfg.getDouble(secName, "s1_min", s1_min);
-    cfg.getDouble(secName, "s1_max", s1_max);
-*/
+    cfg.getDouble(secName, "main_z_eps", main_z_eps);
+
+    for (size_t i = 1; i < p.size(); ++i)
+    {
+        QString coeff = QString("p%1").arg(i);
+        cfg.getDouble(secName, coeff, p[i]);
+    }
+
     for (size_t i = 1; i < K.size(); ++i)
     {
         QString coeff = QString("K%1").arg(i);
         cfg.getDouble(secName, coeff, K[i]);
     }
 
-    for (size_t i = 1; i < k.size(); ++i)
+    for (size_t i = 1; i < A.size(); ++i)
     {
-        QString coeff = QString("k%1").arg(i);
-        cfg.getDouble(secName, coeff, k[i]);
+        QString coeff = QString("A%1").arg(i);
+        cfg.getDouble(secName, coeff, A[i]);
     }
 
 }

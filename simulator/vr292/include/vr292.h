@@ -8,8 +8,9 @@
 //------------------------------------------------------------------------------
 enum
 {
-    MAX_FLOW_COEFFS = 10,
-    MAX_GIAN_COEFFS = 3,
+    NUM_PRESSURES = 10,
+    NUM_FLOW_COEFFS = 10,
+    NUM_SENSITIVITY_COEFFS = 10
 };
 
 //------------------------------------------------------------------------------
@@ -34,27 +35,20 @@ private:
 
     /// Объем камеры дополнительной разрядки ТМ
     double Vkd;
-
     /// Поток в камеру дополнительной разрядки ТМ
     double Qkd;
-/*
-    /// Давление срабатывания клапана в камере У2 (разобщение ТМ и ЗР)
-    double pu2;
 
-    /// Давление запирания тормозного клапана в длинносоставном режиме
-    double pbv;
+    /// Условное положение магистрального поршня и отсекательного золотника
+    double disjunction_z_pos;
+    /// Условное положение главного золотника
+    double main_z_pos;
+    /// Условный зазор главного золотника
+    /// (холостой ход магистрального поршня без перемещения золотника)
+    double main_z_eps;
 
-    /// Давление открытия срывного клапана ускорения экстренного торможения
-    double psv;
-
-    /// Давление открытия широкого канала в ускорительную камеру (сверхзарядное)
-    double pwv;
-
-    double s1_min;
-    double s1_max;
-*/
-    std::array<double, MAX_FLOW_COEFFS> K;
-    std::array<double, MAX_GIAN_COEFFS> k;
+    std::array<double, NUM_PRESSURES> p;
+    std::array<double, NUM_FLOW_COEFFS> K;
+    std::array<double, NUM_SENSITIVITY_COEFFS> A;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
