@@ -42,12 +42,16 @@ void AirDist292::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Условное положение магистрального поршня и отсекательного золотника
-    disjunction_z_pos = pSR - pBP;
+    // с учётом трения
+    disjunction_z_pos = cut(disjunction_z_pos,
+                            pSR - pBP - (disjunction_z_eps / 2.0),
+                            pSR - pBP + (disjunction_z_eps / 2.0));
 
     // Условное положение главного золотника
+    // с учётом зазора
     main_z_pos = cut(main_z_pos,
-                     disjunction_z_pos - main_z_eps,
-                     disjunction_z_pos);
+                     disjunction_z_pos - (main_z_eps / 2.0),
+                     disjunction_z_pos + (main_z_eps / 2.0));
 
     // Поток из тормозной магистрали в запасный резервуар
     double Q_bp_sr = 0.0;
@@ -60,20 +64,65 @@ void AirDist292::preStep(state_vector_t &Y, double t)
         // Поток из тормозной магистрали в запасный резервуар
         Q_bp_sr = (K[1] + K_2) * (pBP - pSR);
     }
+
+    // Потоки камеры дополнительной разрядки ТМ
+    double Q_bp_kd = 0.0;
+    double Q_kd_atm = 0.0;
+    // Потоки магистрали тормозных цилиндров
+    double Q_sr_bc = 0.0;
+    double Q_bc_atm = 0.0;
+
+    // Проверяем, что главный золотник не в отпускном положении
+    // (управляющие КДР и ТЦ каналы золотника совпадают с зеркалом)
+    if (main_z_pos > p[3])
+    {
+        // Проверяем, что главный золотник не в экстренном положении
+        if (main_z_pos < p[4])
+        {
+            // Проверяем взаимное положение золотников
+            double z_diff = A[2] * (disjunction_z_pos - main_z_pos - p[5]);
+
+            // Поток из тормозной магистрали в камеру дополнительной разрядки ТМ
+            Q_bp_kd = cut(z_diff, 0.0, K[3]) * (pBP - Y[KDR]);
+            // Поток из камеры дополнительной разрядки ТМ в атмосферу
+            Q_kd_atm = cut(-z_diff, 0.0, K[4]) * Y[KDR];
+
+            // Поток из запасного резервуара в магистраль тормозных цилиндров
+            Q_sr_bc = cut(z_diff, 0.0, K[5] + K[6]) * (pSR - pBC);
+        }
+    }
+    else
+    {
+        // Разрядка магистрали тормозных цилиндров в атмосферу
+        Q_bc_atm = (K[7] + K[8]) * pBC;
+    }
+
 /*
-    TODO
+    TODO протестировать и настроить всё
+    TODO короткосоставный/длинносоставный режимы и ускоритель экстренного
 */
     // Поток в тормозную магистраль
-    QBP = -Q_bp_sr;
+    QBP = - Q_bp_sr - Q_bp_kd;
 
     // Поток в магистраль тормозных цилиндров
-    QBC = 0.0;
+    QBC = Q_sr_bc - Q_bc_atm;
 
     // Поток в запасный резервуар
-    QSR = Q_bp_sr;
+    QSR = Q_bp_sr - Q_sr_bc;
 
     // Поток в камеру дополнительной разрядки ТМ
-    Qkd = 0.0;
+    Qkd = Q_bp_kd - Q_kd_atm;
+
+    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9")
+            .arg(10*Y[0], 7, 'f', 5)
+            .arg(10*pBP, 7, 'f', 5)
+            .arg(10*pBC, 7, 'f', 5)
+            .arg(10*pSR, 7, 'f', 5)
+            .arg(10000*Q_bp_sr, 8, 'f', 5)
+            .arg(10000*Q_bp_kd, 8, 'f', 5)
+            .arg(10000*Q_kd_atm, 8, 'f', 5)
+            .arg(10000*Q_sr_bc, 8, 'f', 5)
+            .arg(10000*Q_bc_atm, 8, 'f', 5);
 }
 
 //------------------------------------------------------------------------------
@@ -85,7 +134,7 @@ void AirDist292::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
-    dYdt[0] = Qkd / Vkd;
+    dYdt[KDR] = Qkd / Vkd;
 }
 
 //------------------------------------------------------------------------------
