@@ -81,7 +81,6 @@ xcopy %OSG_BIN_PATH%\libosgGA.dll %RRS_DEV_ROOT%\bin\
 xcopy %OSG_BIN_PATH%\libosgText.dll %RRS_DEV_ROOT%\bin\
 xcopy %OSG_BIN_PATH%\libosgUtil.dll %RRS_DEV_ROOT%\bin\
 xcopy %OSG_BIN_PATH%\libosgViewer.dll %RRS_DEV_ROOT%\bin\
-xcopy %OSG_BIN_PATH%\libosgQt5.dll %RRS_DEV_ROOT%\bin\
 
 xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
 del /S %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\*d.dll
