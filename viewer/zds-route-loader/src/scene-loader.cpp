@@ -106,6 +106,7 @@ ReadResult SceneLoader::loadDataFile(const std::string &filepath)
 //------------------------------------------------------------------------------
 std::vector<std::string> parse_line(const std::string &line)
 {
+    // Разбираем строку на токены с разделителем в виде знака табуляции
     char delimiter = '\t';
     std::string tmp = line + delimiter;
     std::vector<std::string> tokens;
@@ -130,17 +131,21 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
 {
     std::string mode = "";
 
+    // Читаем файл построчно
     while ( !stream.eof() && !stream.fail() )
     {
         std::string line;
         std::getline(stream, line);
 
+        // Пропускаем разбор строки если она пустая, начинается с
+        // точки с запятой (комментарий)
         if (line.empty())
             continue;
 
         if (line.at(0) == ';')
             continue;
 
+        // Читаем модификатор обработки модели
         if (line.at(0) == '[')
         {
             std::string tmp = delete_symbol(line, '[');
@@ -149,12 +154,15 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
             continue;
         }
 
+        // Убираем лишний мусор с троке
         std::string tmp = delete_symbol(line, '\r');
 
+        // Разбираем строку описания объекта
         object_ref_t object;
 
         std::vector<std::string> tokens = parse_line(tmp);
 
+        // Если токенов меньше трех - строка ошибочная, пропускаем ее
         if (tokens.size() < 3)
             continue;
 
@@ -165,7 +173,7 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
         object.model_path = tokens[1];
         object.texture_path = tokens[2];
 
-
+        // Заполняем информацию о файле модели
         FileSystem &fs = FileSystem::getInstance();        
 
         object.model_path = routeDir + object.model_path;
@@ -185,7 +193,8 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
 
         model_info.view_distance = view_distance;
 
-        object.model_node = createLODNode(model_info);        
+        // Создаем ноду для модели (узел графа сцены)
+        object.model_node = createLODNode(model_info);
 
         objectRef.insert(std::pair<std::string, object_ref_t>(object.name, object));
     }

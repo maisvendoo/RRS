@@ -57,9 +57,7 @@ void createTexture(const std::string &texture_path, osg::Texture2D *texture)
 
     if ( (ext == "bmp") || (ext == "jpg") )
     {
-        //image->flipHorizontal();
         image->flipVertical();
-        //convertTexture(image.get());
     }
 
     // Apply image for texture
