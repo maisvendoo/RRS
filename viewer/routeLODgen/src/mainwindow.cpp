@@ -13,11 +13,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    std::string path = "../routes/experimental-polygon/models/sig_k2.dmd";
+    std::string path = "../routes/experimental-polygon/models/tracks/1track.dmd";
 
     osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(path);
 
-    osgDB::writeNodeFile(*model.get(), "sig_k2.dmd");
+    osgDB::writeNodeFile(*model.get(), "1track.dmd");
 }
 
 //------------------------------------------------------------------------------
