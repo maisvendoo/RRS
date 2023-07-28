@@ -3,6 +3,7 @@
 
 #include    <QMainWindow>
 #include    <QMap>
+#include    <QTimer>
 
 #include    "object-data.h"
 
@@ -31,11 +32,15 @@ private:
 
     QString routeDir;
 
+    size_t clean_count;
+
+    QTimer cleanTimer;
+
     QMap<QString, object_data_t> objects_ref;
 
     QMap<QString, QString> used_models;
 
-    QMap<QString, object_data_t> unused_models;
+    std::vector<object_data_t> unused_models;
 
     void objectRefReader();
 
@@ -49,6 +54,8 @@ private slots:
     void slotOnRouteOpen();
 
     void slotOnCleanRoute();
+
+    void slotOnCleanTimer();
 };
 
 #endif // MAINWINDOW_H

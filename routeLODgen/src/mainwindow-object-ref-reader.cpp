@@ -9,6 +9,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::slotOnRouteOpen()
+{
+    objectRefReader();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::objectRefReader()
 {
     routeDir = QFileDialog::getExistingDirectory(this, tr("Open route"),
@@ -115,7 +123,7 @@ void MainWindow::findUsedModels()
         }
         else
         {
-            unused_models.insert(model_ID, objects_ref[model_ID]);
+            unused_models.push_back(objects_ref[model_ID]);
         }
     }
 }

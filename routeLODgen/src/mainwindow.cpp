@@ -12,6 +12,9 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , routesRootDir("")
+    , routeDir("")
+    , clean_count(0)
 {
     ui->setupUi(this);
 
@@ -31,6 +34,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpenRoute, &QAction::triggered,
             this, &MainWindow::slotOnRouteOpen);
 
+    connect(ui->actionClean_route, &QAction::triggered,
+            this, &MainWindow::slotOnCleanRoute);
+
+    connect(&cleanTimer, &QTimer::timeout,
+            this, &MainWindow::slotOnCleanTimer);
+
     this->setWindowTitle(tr("RRS routes LOD generator"));
 }
 
@@ -49,20 +58,3 @@ void MainWindow::slotOnQuit()
 {
     QApplication::quit();
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotOnRouteOpen()
-{
-    objectRefReader();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotOnCleanRoute()
-{
-
-}
-
