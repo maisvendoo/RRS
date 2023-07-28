@@ -4,6 +4,8 @@
 #include    <osgDB/ReadFile>
 #include    <osgDB/WriteFile>
 
+#include    "filesystem.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -13,16 +15,23 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    std::string path = "../routes/experimental-polygon/models/tracks/1track.dmd";
-
-    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(path);
-
-    osgDB::writeNodeFile(*model.get(), "1track.dmd");
-
     connect(ui->actionQuit, &QAction::triggered,
             this, &MainWindow::slotOnQuit);
 
     ui->twFilesList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+
+    for (int i = 1; i < ui->twLODparams->columnCount(); ++i)
+    {
+        ui->twLODparams->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
+    }
+
+    FileSystem &fs = FileSystem::getInstance();
+    routesDir = QString(fs.getRouteRootDir().c_str());
+
+    connect(ui->actionOpenRoute, &QAction::triggered,
+            this, &MainWindow::slotOnRouteOpen);
+
+    this->setWindowTitle(tr("RRS routes LOD generator"));
 }
 
 //------------------------------------------------------------------------------
@@ -39,5 +48,13 @@ MainWindow::~MainWindow()
 void MainWindow::slotOnQuit()
 {
     QApplication::quit();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOnRouteOpen()
+{
+
 }
 

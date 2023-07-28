@@ -8,13 +8,15 @@ CONFIG += c++11
 
 TARGET = routeLODgen
 
-DESTDIR = ../../../bin
+DESTDIR = ../../bin
 
 win32 {
 
     CONFIG(debug, debug|release) {
 
         TARGET = $$join(TARGET,,,_d)
+
+        LIBS += -L../../lib -lfilesystem_d
 
         LIBS += -L$$(OSG_BIN_PATH) -losg
         LIBS += -L$$(OSG_BIN_PATH) -losgViewer
@@ -23,6 +25,8 @@ win32 {
         LIBS += -L$$(OSG_BIN_PATH) -losgUtil
 
     } else {
+
+        LIBS += -L../../lib -lfilesystem
 
         LIBS += -L$$(OSG_BIN_PATH) -losg
         LIBS += -L$$(OSG_BIN_PATH) -losgViewer
@@ -41,6 +45,8 @@ unix {
 
         TARGET = $$join(TARGET,,,_d)
 
+        LIBS += -L../../lib -lfilesystem_d
+
         LIBS += -losg
         LIBS += -losgViewer
         LIBS += -losgDB
@@ -48,6 +54,8 @@ unix {
         LIBS += -losgUtil
 
     } else {
+
+        LIBS += -L../../lib -lfilesystem
 
         LIBS +=  -losg
         LIBS +=  -losgViewer
@@ -58,6 +66,7 @@ unix {
 }
 
 INCLUDEPATH += ./include
+INCLUDEPATH += ../filesystem/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

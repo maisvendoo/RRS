@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1150</width>
-    <height>713</height>
+    <width>691</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -167,7 +167,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="tableWidget_2">
+       <widget class="QTableWidget" name="twLODparams">
         <column>
          <property name="text">
           <string>Level</string>
@@ -193,14 +193,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="pbAddLODLevel">
           <property name="text">
            <string>Add</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pbDeleteLODLevel">
           <property name="text">
            <string>Delete</string>
           </property>
@@ -237,7 +237,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1150</width>
+     <width>691</width>
      <height>21</height>
     </rect>
    </property>
@@ -245,8 +245,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
+    <addaction name="actionOpenFile"/>
+    <addaction name="actionOpenRoute"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -262,7 +262,7 @@
    <addaction name="menuTolls"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action">
+  <action name="actionOpenFile">
    <property name="text">
     <string>Open model</string>
    </property>
@@ -270,7 +270,7 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="actionOpenRoute">
    <property name="text">
     <string>Open route</string>
    </property>
