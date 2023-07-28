@@ -18,6 +18,11 @@ MainWindow::MainWindow(QWidget *parent)
     osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(path);
 
     osgDB::writeNodeFile(*model.get(), "1track.dmd");
+
+    connect(ui->actionQuit, &QAction::triggered,
+            this, &MainWindow::slotOnQuit);
+
+    ui->twFilesList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 }
 
 //------------------------------------------------------------------------------
@@ -26,5 +31,13 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOnQuit()
+{
+    QApplication::quit();
 }
 
