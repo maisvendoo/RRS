@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     FileSystem &fs = FileSystem::getInstance();
-    routesDir = QString(fs.getRouteRootDir().c_str());
+    routesRootDir = QString(fs.getRouteRootDir().c_str());
 
     connect(ui->actionOpenRoute, &QAction::triggered,
             this, &MainWindow::slotOnRouteOpen);
@@ -54,6 +54,14 @@ void MainWindow::slotOnQuit()
 //
 //------------------------------------------------------------------------------
 void MainWindow::slotOnRouteOpen()
+{
+    objectRefReader();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOnCleanRoute()
 {
 
 }

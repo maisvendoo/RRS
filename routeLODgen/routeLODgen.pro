@@ -57,10 +57,10 @@ unix {
 
         LIBS += -L../../lib -lfilesystem
 
-        LIBS +=  -losg
-        LIBS +=  -losgViewer
-        LIBS +=  -losgDB
-        LIBS +=  -lOpenThreads
+        LIBS += -losg
+        LIBS += -losgViewer
+        LIBS += -losgDB
+        LIBS += -lOpenThreads
         LIBS += -losgUtil
     }
 }

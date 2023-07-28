@@ -4,6 +4,8 @@
 #include    <QMainWindow>
 #include    <QMap>
 
+#include    "object-data.h"
+
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -25,9 +27,19 @@ private:
 
     Ui::MainWindow *ui;
 
-    QString routesDir;
+    QString routesRootDir;
 
-    QMap<QString, QString> objects_ref;
+    QString routeDir;
+
+    QMap<QString, object_data_t> objects_ref;
+
+    QMap<QString, QString> used_models;
+
+    QMap<QString, object_data_t> unused_models;
+
+    void objectRefReader();
+
+    void findUsedModels();
 
 private slots:
 
@@ -35,6 +47,8 @@ private slots:
     void slotOnQuit();
 
     void slotOnRouteOpen();
+
+    void slotOnCleanRoute();
 };
 
 #endif // MAINWINDOW_H
