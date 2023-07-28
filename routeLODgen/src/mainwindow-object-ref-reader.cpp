@@ -102,6 +102,8 @@ void MainWindow::findUsedModels()
 
     QString model_ID = "";
 
+    QMap<QString, object_data_t> tmp = objects_ref;
+
     foreach (QString line, lines)
     {
         if (line.isEmpty())
@@ -119,11 +121,13 @@ void MainWindow::findUsedModels()
 
         if (objects_ref.contains(model_ID))
         {
-            used_models.insert(model_ID, objects_ref[model_ID].model_path);
-        }
-        else
-        {
-            unused_models.push_back(objects_ref[model_ID]);
-        }
+            used_models.insert(model_ID, tmp[model_ID].model_path);
+            tmp.remove(model_ID);
+        }        
+    }
+
+    foreach (object_data_t obj, tmp)
+    {
+        unused_models.push_back(obj);
     }
 }

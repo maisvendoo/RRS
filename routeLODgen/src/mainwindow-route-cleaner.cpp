@@ -31,12 +31,14 @@ void MainWindow::slotOnCleanTimer()
     QDir dir;
 
     dir.remove(object_data.model_path);
+    ui->statusbar->showMessage(tr("Removed file") + object_data.model_path);
 
     for (auto it = object_data.texture_path.begin();
          it != object_data.texture_path.end();
          ++it)
     {
         dir.remove(*it);
+        ui->statusbar->showMessage(tr("Removed file") + *it);
     }
 
     clean_count++;
