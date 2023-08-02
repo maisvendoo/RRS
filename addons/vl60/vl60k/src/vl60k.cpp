@@ -27,9 +27,13 @@ VL60k::VL60k() : Vehicle ()
   , charge_press(0.0)
   , ip(2.73)
   , bc_hose_to_impulse_line(true)
-  , reg(nullptr)
+  , brake_crane_module_name("krm395")
+  , brake_crane_config_name("krm395")
+  , loco_crane_module_name("kvt254")
+  , loco_crane_config_name("kvt254")
   , airdist_module_name("vr483")
   , airdist_config_name("vr483")
+  , reg(nullptr)
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
     pants_tumbler.setOffSoundName("K_Tumbler_Off");

@@ -10,8 +10,8 @@
 //      Дата: 28/03/2019
 //
 //------------------------------------------------------------------------------
-#ifndef     VL60_H
-#define     VL60_H
+#ifndef     VL60K_H
+#define     VL60K_H
 
 #include    "vl60k-headers.h"
 
@@ -54,7 +54,6 @@ private:
         MV6 = 5
     };
 
-
     enum
     {
         /// Объем главного резервуара (ГР), литров
@@ -75,14 +74,21 @@ private:
     /// Подключение рукавов магистрали тормозных цилиндров к импульсной магистрали
     bool bc_hose_to_impulse_line;
 
-    /// Регистратор, для записи параметров
-    Registrator *reg;
-
+    /// Имя модуля поездного крана
+    QString brake_crane_module_name;
+    /// Имя конфига поездного крана
+    QString brake_crane_config_name;
+    /// Имя модуля локомотивного крана
+    QString loco_crane_module_name;
+    /// Имя конфига локомотивного крана
+    QString loco_crane_config_name;
     /// Имя модуля воздухораспределителя
     QString airdist_module_name;
-
     /// Имя конфига воздухорапределителя
     QString airdist_config_name;
+
+    /// Регистратор, для записи параметров
+    Registrator *reg;
 
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler;
@@ -196,7 +202,7 @@ private:
     Reservoir  *impulse_line;
 
     /// Тройник подключения тележек к магистрали тормозных цилиндров
-    PneumoSplitter  *bc_splitter;    
+    PneumoSplitter  *bc_splitter;
 
     enum
     {
@@ -358,5 +364,5 @@ private slots:
     void slotAutoStart();
 };
 
-#endif // VL60_H
+#endif // VL60K_H
 

@@ -26,11 +26,11 @@
         <LocoCraneModule>kvt254</LocoCraneModule>
         <LocoCraneConfig>kvt254</LocoCraneConfig>
 
-        <BrakeMechModule>carbrakes-mech</BrakeMechModule>
-        <BrakeMechConfig>tep70bs-mech</BrakeMechConfig>
-
         <AirDistModule>vr242</AirDistModule>
         <AirDistConfig>vr242</AirDistConfig>
+
+        <ElectroAirDistModule>evr305</ElectroAirDistModule>
+        <ElectroAirDistConfig>evr305</ElectroAirDistConfig>
 
         <DriverPos>0.8 8.4 3.6</DriverPos>
     </Vehicle>

@@ -10,8 +10,8 @@
 //      Дата: 28/03/2019
 //
 //------------------------------------------------------------------------------
-#ifndef     VL60_H
-#define     VL60_H
+#ifndef     VL60PK_H
+#define     VL60PK_H
 
 #include    "vl60pk-headers.h"
 
@@ -76,6 +76,26 @@ private:
 
     /// Передаточное число редуктора
     double  ip;
+
+    /// Имя модуля поездного крана
+    QString brake_crane_module_name;
+    /// Имя конфига поездного крана
+    QString brake_crane_config_name;
+    /// Имя модуля локомотивного крана
+    QString loco_crane_module_name;
+    /// Имя конфига локомотивного крана
+    QString loco_crane_config_name;
+    /// Имя модуля воздухораспределителя
+    QString airdist_module_name;
+    /// Имя конфига воздухорапределителя
+    QString airdist_config_name;
+    /// Имя модуля электровоздухораспределителя
+    QString electro_airdist_module_name;
+    /// Имя конфига электровоздухорапределителя
+    QString electro_airdist_config_name;
+
+    /// Регистратор, для записи параметров
+    Registrator *reg;
 
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler;
@@ -268,9 +288,6 @@ private:
     /// Свисток и тифон
     TrainHorn   *horn;
 
-    /// Регистратор, для записи параметров
-    Registrator *reg;
-
     std::vector<Trigger *> triggers;
     Timer   *autoStartTimer;
     size_t  start_count;
@@ -369,5 +386,5 @@ private slots:
     void slotAutoStart();
 };
 
-#endif // VL60_H
+#endif // VL60PK_H
 

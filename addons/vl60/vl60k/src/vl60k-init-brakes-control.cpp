@@ -13,14 +13,16 @@ void VL60k::initBrakesControl(QString modules_dir)
     connect(brake_lock, &BrakeLock::soundPlay, this, &VL60k::soundPlay);
 
     // Поездной кран машиниста
-    brake_crane = loadBrakeCrane(modules_dir + QDir::separator() + "krm395");
-    brake_crane->read_config("krm395");
+    brake_crane = loadBrakeCrane(
+                modules_dir + QDir::separator() + brake_crane_module_name);
+    brake_crane->read_config(brake_crane_config_name);
     connect(brake_crane, &BrakeCrane::soundPlay, this, &VL60k::soundPlay);
     connect(brake_crane, &BrakeCrane::soundSetVolume, this, &VL60k::soundSetVolume);
 
     // Кран вспомогательного тормоза
-    loco_crane = loadLocoCrane(modules_dir + QDir::separator() + "kvt254");
-    loco_crane->read_config("kvt254");
+    loco_crane = loadLocoCrane(
+                modules_dir + QDir::separator() + loco_crane_module_name);
+    loco_crane->read_config(loco_crane_config_name);
     connect(loco_crane, &LocoCrane::soundPlay, this, &VL60k::soundPlay);
     connect(loco_crane, &LocoCrane::soundStop, this, &VL60k::soundStop);
     connect(loco_crane, &LocoCrane::soundSetVolume, this, &VL60k::soundSetVolume);

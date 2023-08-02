@@ -75,6 +75,10 @@ void VL60k::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getDouble(secName, "ReductorCoeff", ip);
+        cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
+        cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
+        cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);
+        cfg.getString(secName, "LocoCraneConfig", loco_crane_config_name);
         cfg.getString(secName, "AirDistModule", airdist_module_name);
         cfg.getString(secName, "AirDistConfig", airdist_config_name);
     }
