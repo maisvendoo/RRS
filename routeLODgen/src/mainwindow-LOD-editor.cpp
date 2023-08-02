@@ -20,16 +20,20 @@ void MainWindow::slotOnAddLODButtonClick()
     ui->twLODparams->insertRow(idx);
 
     ui->twLODparams->setItem(idx, 0,
-                             new QTableWidgetItem(QString("L%1").arg(LOD_data.level)));
+                             new QTableWidgetItem(QString("L%1")
+                                                  .arg(LOD_data.level)));
 
     ui->twLODparams->setItem(idx, 1,
-                             new QTableWidgetItem(QString("%1").arg(LOD_data.reduction, 4, '2', 2)));
+                             new QTableWidgetItem(QString("%1")
+                                                  .arg(LOD_data.reduction, 4, '2', 2)));
 
     ui->twLODparams->setItem(idx, 2,
-                             new QTableWidgetItem(QString("%1").arg(LOD_data.min_dist, 10, '2', 0)));
+                             new QTableWidgetItem(QString("%1")
+                                                  .arg(LOD_data.min_dist, 10, '2', 0)));
 
     ui->twLODparams->setItem(idx, 3,
-                             new QTableWidgetItem(QString("%1").arg(LOD_data.max_dist, 10, '2', 0)));
+                             new QTableWidgetItem(QString("%1")
+                                                  .arg(LOD_data.max_dist, 10, '2', 0)));
 }
 
 //------------------------------------------------------------------------------

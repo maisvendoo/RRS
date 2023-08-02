@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , routesRootDir("")
     , routeDir("")
     , clean_count(0)
+    , LOD_count(0)
 {
     ui->setupUi(this);
 
@@ -48,6 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->twLODparams, &QTableWidget::cellChanged,
             this, &MainWindow::slotLODCellChanged);
+
+    connect(ui->actionGenerate_LOD, &QAction::triggered,
+            this, &MainWindow::slotOnLODGenerate);
+
+    connect(&LODGenTimer, &QTimer::timeout,
+            this, &MainWindow::slotOnLODGenTimer);
 
     this->setWindowTitle(tr("RRS routes LOD generator"));
 }

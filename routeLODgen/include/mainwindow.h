@@ -35,11 +35,17 @@ private:
 
     size_t clean_count;
 
+    int LOD_count;
+
     QTimer cleanTimer;
+
+    QTimer LODGenTimer;
 
     QMap<QString, object_data_t> objects_ref;
 
     QMap<QString, QString> used_models;
+
+    QMap<QString, QString>::iterator model_it;
 
     std::vector<object_data_t> unused_models;
 
@@ -65,6 +71,10 @@ private slots:
     void slotOnDeleteLODButtonClick();
 
     void slotLODCellChanged(int row, int column);
+
+    void slotOnLODGenerate();
+
+    void slotOnLODGenTimer();
 };
 
 #endif // MAINWINDOW_H
