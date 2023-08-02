@@ -119,7 +119,7 @@ void MainWindow::findUsedModels()
 
         model_ID = token[0];
 
-        if (objects_ref.contains(model_ID))
+        if (tmp.contains(model_ID))
         {
             used_models.insert(model_ID, tmp[model_ID].model_path);
             tmp.remove(model_ID);

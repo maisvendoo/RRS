@@ -6,6 +6,7 @@
 #include    <QTimer>
 
 #include    "object-data.h"
+#include    "LOD-data.h"
 
 QT_BEGIN_NAMESPACE
     namespace Ui { class MainWindow; }
@@ -42,6 +43,8 @@ private:
 
     std::vector<object_data_t> unused_models;
 
+    std::vector<LOD_data_t> LOD_list;
+
     void objectRefReader();
 
     void findUsedModels();
@@ -56,6 +59,10 @@ private slots:
     void slotOnCleanRoute();
 
     void slotOnCleanTimer();
+
+    void slotOnAddLODButtonClick();
+
+    void slotOnDeleteLODButtonClick();
 };
 
 #endif // MAINWINDOW_H
