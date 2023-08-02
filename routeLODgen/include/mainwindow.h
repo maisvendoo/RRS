@@ -63,6 +63,8 @@ private slots:
     void slotOnAddLODButtonClick();
 
     void slotOnDeleteLODButtonClick();
+
+    void slotLODCellChanged(int row, int column);
 };
 
 #endif // MAINWINDOW_H

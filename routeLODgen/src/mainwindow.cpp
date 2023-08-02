@@ -40,6 +40,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&cleanTimer, &QTimer::timeout,
             this, &MainWindow::slotOnCleanTimer);
 
+    connect(ui->pbAddLODLevel, &QPushButton::released,
+            this, &MainWindow::slotOnAddLODButtonClick);
+
+    connect(ui->pbDeleteLODLevel, &QPushButton::released,
+            this, &MainWindow::slotOnDeleteLODButtonClick);
+
+    connect(ui->twLODparams, &QTableWidget::cellChanged,
+            this, &MainWindow::slotLODCellChanged);
+
     this->setWindowTitle(tr("RRS routes LOD generator"));
 }
 
