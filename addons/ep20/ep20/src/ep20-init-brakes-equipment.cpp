@@ -13,12 +13,12 @@ void EP20::initBrakesEquipment(QString modules_dir)
     brakepipe->setLeakCoeff(3e-6);
 
     // Воздухораспределитель
-    air_dist = loadAirDistributor(modules_dir + QDir::separator() + "vr242");
-    air_dist->read_config("vr242");
+    air_dist = loadAirDistributor(modules_dir + QDir::separator() + airdist_module_name);
+    air_dist->read_config(airdist_config_name);
 
     // Электровоздухораспределитель
-    electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
-    electro_air_dist->read_config("evr305");
+    electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + electro_airdist_module_name);
+    electro_air_dist->read_config(electro_airdist_config_name);
 
     // Запасный резервуар
     supply_reservoir = new Reservoir(0.078);

@@ -20,6 +20,14 @@
 // Конструктор
 //------------------------------------------------------------------------------
 CHS2T::CHS2T() : Vehicle()
+  , brake_crane_module_name("krm395")
+  , brake_crane_config_name("krm395")
+  , loco_crane_module_name("kvt254")
+  , loco_crane_config_name("kvt254")
+  , airdist_module_name("vr292")
+  , airdist_config_name("vr292")
+  , electro_airdist_module_name("evr305")
+  , electro_airdist_config_name("evr305")
 {
     epb_switch.setOnSoundName("tumbler");
     epb_switch.setOffSoundName("tumbler");
@@ -175,7 +183,16 @@ void CHS2T::loadConfig(QString cfg_path)
 
     if (cfg.load(cfg_path))
     {
+        QString secName = "Vehicle";
 
+        cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
+        cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
+        cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);
+        cfg.getString(secName, "LocoCraneConfig", loco_crane_config_name);
+        cfg.getString(secName, "AirDistModule", airdist_module_name);
+        cfg.getString(secName, "AirDistConfig", airdist_config_name);
+        cfg.getString(secName, "ElectroAirDistModule", electro_airdist_module_name);
+        cfg.getString(secName, "ElectroAirDistConfig", electro_airdist_config_name);
     }
 }
 

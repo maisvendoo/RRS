@@ -8,7 +8,15 @@
 //------------------------------------------------------------------------------
 // Конструктор
 //------------------------------------------------------------------------------
-EP20::EP20()
+EP20::EP20() : Vehicle()
+  , brake_crane_module_name("krm130")
+  , brake_crane_config_name("krm130")
+  , loco_crane_module_name("kvt224")
+  , loco_crane_config_name("kvt224")
+  , airdist_module_name("vr292")
+  , airdist_config_name("vr292")
+  , electro_airdist_module_name("evr305")
+  , electro_airdist_config_name("evr305")
 {
     U_bat = 55.0;
     Uks = 25000.0;
@@ -240,7 +248,16 @@ void EP20::loadConfig(QString cfg_path)
 
     if (cfg.load(cfg_path))
     {
+        QString secName = "Vehicle";
 
+        cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
+        cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
+        cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);
+        cfg.getString(secName, "LocoCraneConfig", loco_crane_config_name);
+        cfg.getString(secName, "AirDistModule", airdist_module_name);
+        cfg.getString(secName, "AirDistConfig", airdist_config_name);
+        cfg.getString(secName, "ElectroAirDistModule", electro_airdist_module_name);
+        cfg.getString(secName, "ElectroAirDistConfig", electro_airdist_config_name);
     }
 }
 

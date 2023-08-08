@@ -17,8 +17,8 @@ void VL60pk::initBrakesEquipment(QString modules_dir)
     air_dist->read_config(airdist_config_name);
 
     // Электровоздухораспределитель
-    electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + "evr305");
-    electro_air_dist->read_config("evr305");
+    electro_air_dist = loadElectroAirDistributor(modules_dir + QDir::separator() + electro_airdist_module_name);
+    electro_air_dist->read_config(electro_airdist_config_name);
 
     // Запасный резервуар
     supply_reservoir = new Reservoir(0.055);

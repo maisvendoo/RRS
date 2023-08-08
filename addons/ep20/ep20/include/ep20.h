@@ -46,6 +46,23 @@ public:
 
 private:
 
+    /// Имя модуля поездного крана
+    QString brake_crane_module_name;
+    /// Имя конфига поездного крана
+    QString brake_crane_config_name;
+    /// Имя модуля локомотивного крана
+    QString loco_crane_module_name;
+    /// Имя конфига локомотивного крана
+    QString loco_crane_config_name;
+    /// Имя модуля воздухораспределителя
+    QString airdist_module_name;
+    /// Имя конфига воздухорапределителя
+    QString airdist_config_name;
+    /// Имя модуля электровоздухораспределителя
+    QString electro_airdist_module_name;
+    /// Имя конфига электровоздухорапределителя
+    QString electro_airdist_config_name;
+
 //    /// Выбор кабины
 //    int selectedCab;
 

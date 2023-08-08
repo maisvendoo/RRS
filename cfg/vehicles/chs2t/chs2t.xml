@@ -20,5 +20,17 @@
 
         <DriverPos>0.492 7.776 3.98</DriverPos>
 
+        <BrakeCraneModule>krm395</BrakeCraneModule>
+        <BrakeCraneConfig>krm395</BrakeCraneConfig>
+
+        <LocoCraneModule>kvt254</LocoCraneModule>
+        <LocoCraneConfig>kvt254</LocoCraneConfig>
+
+        <AirDistModule>vr242</AirDistModule>
+        <AirDistConfig>vr242</AirDistConfig>
+
+        <ElectroAirDistModule>evr305</ElectroAirDistModule>
+        <ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+
     </Vehicle>
 </Config>
