@@ -27,6 +27,7 @@
 #include    "solver-config.h"
 #include    "profile.h"
 #include    "sound-manager.h"
+#include    "long-forces-registrator.h"
 
 #include    <QByteArray>
 
@@ -97,6 +98,8 @@ public:
 
     std::vector<Vehicle *> *getVehicles();
 
+
+
 signals:
 
     void logMessage(QString msg);
@@ -134,7 +137,10 @@ private:
     Solver      *train_motion_solver;
 
     /// Sound manager
-    SoundManager *soundMan;
+    SoundManager *soundMan;    
+
+    /// Long forces registrator
+    LongForcesRegistrator *regLF;
 
     /// Имя сетевого клиента для ВЖД
     QString     client_name;
@@ -147,6 +153,10 @@ private:
 
     /// All train's couplings
     std::vector<Coupling *> couplings;
+
+    std::vector<double> longForces;
+
+    std::vector<double> coupDefs;
 
     /// All joints between neighbor vehicles
     std::vector<std::vector<Joint *>> joints_list;

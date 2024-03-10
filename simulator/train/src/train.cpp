@@ -18,7 +18,7 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , no_air(false)
   , init_main_res_pressure(0.0)
   , train_motion_solver(nullptr)
-  , soundMan(nullptr)
+  , soundMan(nullptr)  
 {
 
 }
@@ -119,6 +119,8 @@ bool Train::init(const init_data_t &init_data)
 
     initVehiclesBrakes();
 
+    regLF = new LongForcesRegistrator(0.01);
+
     return true;
 }
 
@@ -131,6 +133,8 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
     auto coup_it = couplings.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
+
+    size_t coup_idx = 0;
 
     for (auto it = begin; it != end; ++it)
     {
@@ -153,6 +157,10 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
             Coupling *coup = *coup_it;
             double R = dir * coup->getForce(ds, dv);
             ++coup_it;
+
+            longForces[coup_idx] = R / 1000.0;
+            coupDefs[coup_idx] = ds * 1000.0;
+            coup_idx++;
 
             if (vehicle->getOrientation() > 0)
                 vehicle->setBackwardForce(R);
@@ -198,6 +206,8 @@ bool Train::step(double t, double &dt)
     dt = tau;
 
     vehiclesStep(t, dt);
+
+    regLF->print(longForces, coupDefs, t, dt);
 
     return done;
 }
@@ -568,6 +578,8 @@ bool Train::loadCouplings(QString cfg_path)
             coupling->reset();
 
             couplings.push_back(coupling);
+            longForces.push_back(0.0);
+            coupDefs.push_back(0.0);
         }
     }
     else
