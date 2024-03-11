@@ -309,6 +309,16 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.keys_buffer_size = 1024;
         }
 
+        if (!cfg.getBool(secName, "IsLongForcesPrint", init_data.is_long_forces_print))
+        {
+            init_data.is_long_forces_print = false;
+
+            if (!cfg.getDouble(secName, "LongForcesTimeStep", init_data.long_forces_time_step))
+            {
+                init_data.long_forces_time_step = 0.01;
+            }
+        }
+
         Journal::instance()->info("Loaded settings from: " + cfg_path);
     }
     else

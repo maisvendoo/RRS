@@ -42,6 +42,8 @@ struct init_data_t
     int     keys_buffer_size;
     bool    debug_print;
     solver_config_t solver_config;
+    bool    is_long_forces_print;
+    double  long_forces_time_step;
 
     init_data_t()
         : init_coord(0)
@@ -56,6 +58,9 @@ struct init_data_t
         , control_time_interval(50)
         , keys_buffer_size(1024)
         , debug_print(false)
+        , solver_config(solver_config_t())
+        , is_long_forces_print(false)
+        , long_forces_time_step(0.01)
     {
 
     }

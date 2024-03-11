@@ -18,7 +18,8 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , no_air(false)
   , init_main_res_pressure(0.0)
   , train_motion_solver(nullptr)
-  , soundMan(nullptr)  
+  , soundMan(nullptr)
+  , regLF(nullptr)
 {
 
 }
@@ -119,7 +120,8 @@ bool Train::init(const init_data_t &init_data)
 
     initVehiclesBrakes();
 
-    regLF = new LongForcesRegistrator(0.01);
+    if (init_data.is_long_forces_print)
+        regLF = new LongForcesRegistrator(init_data.long_forces_time_step);
 
     return true;
 }
@@ -207,7 +209,8 @@ bool Train::step(double t, double &dt)
 
     vehiclesStep(t, dt);
 
-    regLF->print(longForces, coupDefs, t, dt);
+    if (regLF != nullptr)
+            regLF->print(longForces, coupDefs, t, dt);
 
     return done;
 }
