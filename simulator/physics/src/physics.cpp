@@ -46,12 +46,12 @@ double Physics::sign(double x)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Physics::fricForce(double Fmax, double v)
+double Physics::fricForce(double Fmax, double v, double beta)
 {
     if (abs(v) < ZERO)
         return 0;
 
-    return Fmax * tanh(FricApproxCoeff * v);
+    return Fmax * tanh(beta * v);
 }
 
 //------------------------------------------------------------------------------
@@ -59,18 +59,7 @@ double Physics::fricForce(double Fmax, double v)
 //------------------------------------------------------------------------------
 double Physics::gapForce(double x, double c, double lambda)
 {
-    /*if (abs(x) <= lambda)
-        return 0.0;
-    else
-    {
-        if (x > lambda)
-            return c * (x - lambda);
-
-        if (x < -lambda)
-            return c * (x + lambda);
-    }*/
-
-    return std::max(0.0, c * (x - lambda)) + std::min(0.0, c * (x + lambda));
+     return std::max(0.0, c * (x - lambda)) + std::min(0.0, c * (x + lambda));
 }
 
 //------------------------------------------------------------------------------
@@ -78,16 +67,5 @@ double Physics::gapForce(double x, double c, double lambda)
 //------------------------------------------------------------------------------
 double Physics::gapMotion(double x, double a)
 {
-    /*if (abs(x) <= a)
-        return 0.0;
-    else
-    {
-        if (x > a)
-            return x - a;
-
-        if (x < -a)
-            return x + a;
-    }*/
-
     return std::max(0.0, x - a) + std::min(0.0, x + a);
 }

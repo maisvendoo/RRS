@@ -82,7 +82,7 @@ public:
      * \param v - relative slip velocity
      * \return - friction force
      */
-    static double fricForce(double Fmax, double v);
+    static double fricForce(double Fmax, double v, double beta = Physics::FricApproxCoeff);
 
     static double gapForce(double x, double c, double lambda);
 

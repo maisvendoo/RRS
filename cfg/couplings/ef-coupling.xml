@@ -7,5 +7,6 @@
 		<c>2e7</c>
 		<f>0.6</f>
 		<T0>5e3</T0>
+		<beta>100.0</beta>
 	</Coupling>
 </Config>
