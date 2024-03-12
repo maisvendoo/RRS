@@ -51,7 +51,7 @@ double Physics::fricForce(double Fmax, double v, double beta)
     if (abs(v) < ZERO)
         return 0;
 
-    return Fmax * tanh(beta * v);
+    return Fmax * cut(beta * v, -1.0, 1.0);
 }
 
 //------------------------------------------------------------------------------

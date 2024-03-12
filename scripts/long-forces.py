@@ -7,7 +7,7 @@ data_folder = "../../graphs/"
 # Читаем данные из файла в виде таблицы
 df = pd.read_csv(data_folder + "long_forces.txt", sep="\s+", header=None)
 
-vehicle_idx = 1
+vehicle_idx = 33
 force_idx = 2*vehicle_idx
 motion_idx = 2*vehicle_idx - 1
 
@@ -35,7 +35,7 @@ f2.savefig(data_folder + "foce-motion.png", dpi=300)
 
 plt.show()
 
-sec_time = 365.5
+sec_time = 280.0
 
 row_idx = int(sec_time * 100)
 
