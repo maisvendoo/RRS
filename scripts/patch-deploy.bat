@@ -8,7 +8,6 @@ mkdir %RRS_DEV_ROOT%\plugins
 
 mkdir %RRS_DEV_ROOT%\cfg
 mkdir %RRS_DEV_ROOT%\data
-mkdir %RRS_DEV_ROOT%\routes
 mkdir %RRS_DEV_ROOT%\fonts
 mkdir %RRS_DEV_ROOT%\themes
 
