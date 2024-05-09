@@ -59,6 +59,12 @@ private:
     BrakeMech   *brake_mech;
     QString     brake_mech_config;
 
+    /// Признак включения регистрации
+    bool is_Registrator_on;
+
+    /// Регистратор параметров
+    Registrator *registrator;
+
     void initialization();
 
     /// Инициализация тормозного оборудования
@@ -84,6 +90,11 @@ private:
     void keyProcess();
 
     void loadConfig(QString cfg_path);
+
+    void initRegistrator();
+
+    void stepRegistrator(double t, double dt);
+
 };
 
 #endif // FREIGHTCAR_H

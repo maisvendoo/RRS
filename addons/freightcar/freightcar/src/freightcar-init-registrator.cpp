@@ -1,14 +1,14 @@
-#include    "passcar.h"
+#include    "freightcar.h"
 
 #include    <QDir>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::initRegistrator()
+void FreightCar::initRegistrator()
 {
     registrator = new Registrator();
-    registrator->setFileName(QString("passcar_%1_%2").arg(air_dist_module).arg(idx));
+    registrator->setFileName(QString("freightcar_%1_%2").arg(air_dist_module).arg(idx));
     registrator->read_custom_config(config_dir + QDir::separator() + "registrator");
     registrator->init();
 

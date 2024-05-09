@@ -1,9 +1,9 @@
-#include    "passcar.h"
+#include    "freightcar.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::stepRegistrator(double t, double dt)
+void FreightCar::stepRegistrator(double t, double dt)
 {
 /*
     QString line = QString("%1 %2 %3 %4")

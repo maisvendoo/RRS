@@ -23,7 +23,7 @@
 #include    "solver-types.h"
 #include    "physics.h"
 #include    "CfgReader.h"
-#include    "debug.h"
+#include    "registrator.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 #include    "key-symbols.h"

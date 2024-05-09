@@ -1,6 +1,5 @@
 #include    "passcar.h"
 #include    "filesystem.h"
-#include    "passcar-signals.h"
 
 //------------------------------------------------------------------------------
 //
@@ -27,7 +26,7 @@ PassCar::PassCar() : Vehicle ()
   , brake_mech(nullptr)
   , brake_mech_config("carbrakes-mech-composite")
   , ip(2.96)
-  , is_Registarator_on(false)
+  , is_Registrator_on(false)
 {
 
 }
@@ -54,7 +53,7 @@ void PassCar::initialization()
 
     initSounds();
 
-    if (is_Registarator_on)
+    if (is_Registrator_on)
         initRegistrator();
 }
 
@@ -71,10 +70,10 @@ void PassCar::step(double t, double dt)
 
     stepDebugMsg(t, dt);
 
-    if (is_Registarator_on)
-        stepRegistrator(t, dt);
-
     soundStep();
+
+    if (is_Registrator_on)
+        stepRegistrator(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -125,7 +124,7 @@ void PassCar::loadConfig(QString cfg_path)
 
         cfg.getDouble(secName, "GenReductorCoeff", ip);
 
-        cfg.getBool(secName, "isRegistratorOn", is_Registarator_on);
+        cfg.getBool(secName, "isRegistratorOn", is_Registrator_on);
     }
 }
 

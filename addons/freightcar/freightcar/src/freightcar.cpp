@@ -28,6 +28,7 @@ FreightCar::FreightCar() : Vehicle ()
   , automode_config("")
   , brake_mech(nullptr)
   , brake_mech_config("carbrakes-mech-composite")
+  , is_Registrator_on(false)
 {
 
 }
@@ -51,6 +52,9 @@ void FreightCar::initialization()
     initBrakesEquipment(modules_dir);
 
     initEPB(modules_dir);
+
+    if (is_Registrator_on)
+        initRegistrator();
 }
 
 //------------------------------------------------------------------------------
@@ -65,6 +69,10 @@ void FreightCar::step(double t, double dt)
     stepSignalsOutput();
 
     stepDebugMsg(t, dt);
+
+    if (is_Registrator_on)
+        stepRegistrator(t, dt);
+
 }
 
 //------------------------------------------------------------------------------
@@ -116,6 +124,8 @@ void FreightCar::loadConfig(QString cfg_path)
         cfg.getString(secName, "BrakeAutomodeConfig", automode_config);
 
         cfg.getString(secName, "BrakeMechConfig", brake_mech_config);
+
+        cfg.getBool(secName, "isRegistratorOn", is_Registrator_on);
     }
 }
 

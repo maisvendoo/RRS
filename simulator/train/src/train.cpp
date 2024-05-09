@@ -394,7 +394,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
         if (vehicle_node.isNull())
             Journal::instance()->error("There are not Vehicle sections in train config");
 
-        size_t index = 0;
+        ode_order = 0;
 
         while (!vehicle_node.isNull())
         {
@@ -464,21 +464,20 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
                 QString config_dir(fs.combinePath(fs.getVehiclesDir(), module_cfg_name.toStdString()).c_str());
                 vehicle->setConfigDir(config_dir);
+
+                vehicle->setIndex(ode_order);
                 vehicle->setRouteDir(init_data.route_dir);
                 vehicle->setPayloadCoeff(payload_coeff);
                 vehicle->setDirection(dir);
                 vehicle->setOrientation(orient);
+
                 vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
 
                 trainMass += vehicle->getMass();
                 trainLength += vehicle->getLength();
 
                 size_t s = vehicle->getDegressOfFreedom();
-
                 ode_order += 2 * s;
-
-                vehicle->setIndex(index);
-                index = ode_order;
 
                 // Loading sounds
                 soundMan->loadSounds(vehicle->getSoundsDir());

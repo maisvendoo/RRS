@@ -1,34 +1,40 @@
 #ifndef     REGISTRATOR_H
 #define     REGISTRATOR_H
 
-#include    "device.h"
+#include    <QObject>
+
+#include    "device-export.h"
+#include    "CfgReader.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT Registrator : public Device
+class DEVICE_EXPORT Registrator : public QObject
 {
-    Q_OBJECT
 
 public:
 
-    Registrator(double interval = 0.1, QObject *parent = Q_NULLPTR);
+    Registrator(double interval = 0.0, QObject *parent = Q_NULLPTR);
 
     ~Registrator();
 
-    virtual void print(QString line, double t, double dt);
+    virtual void read_custom_config(const QString &path);
+
+    void setFileName(QString name);
+    void setInterval(double interval);
+
+    virtual void init();
+
+    virtual void print(QString line, double t = 0.0, double dt = 0.0);
 
 protected:
 
-    bool    first_print;
     double  tau;
     double  interval;
     QString fileName;
     QString path;
 
     QFile   *file;
-
-    virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     virtual void load_config(CfgReader &cfg);
 };

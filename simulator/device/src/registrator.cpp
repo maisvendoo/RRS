@@ -8,13 +8,12 @@
 //
 //------------------------------------------------------------------------------
 Registrator::Registrator(double interval, QObject *parent)
-    : Device(parent)
-    , first_print(true)
-    , tau(0.0)
+    : QObject(parent)
+    , tau(interval)
     , interval(interval)
-    , fileName("data.txt")
+    , fileName("data")
     , path("")
-    , file(Q_NULLPTR)
+    , file(nullptr)
 {
 
 }
@@ -30,11 +29,54 @@ Registrator::~Registrator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Registrator::setFileName(QString name)
+{
+    fileName = name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Registrator::setInterval(double value)
+{
+    interval = value;
+    tau = interval;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Registrator::init()
+{
+    path = "../graphs/";
+    path += fileName + QDateTime::currentDateTime().toString("_dd-MM-yyyy_hh-mm-ss") + ".txt";
+
+    file = new QFile(path);
+    file->open(QIODevice::WriteOnly);
+    file->close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Registrator::read_custom_config(const QString &path)
+{
+    CfgReader cfg;
+
+    if (cfg.load(path + ".xml"))
+    {
+        load_config(cfg);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Registrator::print(QString line, double t, double dt)
 {
     Q_UNUSED(t)
 
-    if ( first_print || (tau > interval))
+    if ((tau >= interval) && (file))
     {
         file->open(QIODevice::Append);
 
@@ -43,21 +85,11 @@ void Registrator::print(QString line, double t, double dt)
         stream << line << "\n";
 
         file->close();
+
+        tau = 0.0;
     }
 
     tau += dt;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Registrator::ode_system(const state_vector_t &Y,
-                             state_vector_t &dYdt,
-                             double t)
-{
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
 }
 
 //------------------------------------------------------------------------------
@@ -68,12 +100,7 @@ void Registrator::load_config(CfgReader &cfg)
     QString secName = "Device";
 
     cfg.getDouble(secName, "Interval", interval);
+    tau = interval;
+
     cfg.getString(secName, "FileName", fileName);
-
-    path = "../graphs/";
-    path += fileName + QDateTime::currentDateTime().toString("_dd-MM-yyyy_hh-mm-ss") + ".txt";
-
-    file = new QFile(path);
-    file->open(QIODevice::WriteOnly);
-    file->close();
 }

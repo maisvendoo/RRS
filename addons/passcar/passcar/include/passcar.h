@@ -66,7 +66,7 @@ private:
     double ip;
 
     /// Признак включения регистрации
-    bool is_Registarator_on;
+    bool is_Registrator_on;
 
     /// Регистратор параметров
     Registrator *registrator;
