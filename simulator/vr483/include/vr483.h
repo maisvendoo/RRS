@@ -10,6 +10,7 @@ enum
 {
     NUM_VOLUMES = 3,
     NUM_COEFFS = 14,
+    NUM_SENSIVITY_COEFFS = 6,
     NUM_PRESSURES = 18,
 
     RK = 0, ///< Давление в рабочей камере
@@ -51,12 +52,8 @@ private:
     /// Давления открытия клапанов, начала перемещения поршней и т.д., МПа
     std::array<double, NUM_PRESSURES> p;
 
-    /// Коэффициент чувствительности к разности сил на уравнительном поршне
-    double A1;
-
-    double A2;
-
-    double A3;
+    /// Коэффициенты чувствительности для дросселирования клапанов
+    std::array<double, NUM_SENSIVITY_COEFFS> A;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

@@ -113,15 +113,17 @@ void AirDist292::preStep(state_vector_t &Y, double t)
     // Поток в камеру дополнительной разрядки ТМ
     Qkd = Q_bp_kd - Q_kd_atm;
 
-    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9")
-            .arg(10*Y[0], 7, 'f', 5)
+//    QString("  time  ; pBP   ; pBC   ; pSR   ; pKDR  ; BPsr   ; BPkdr  ; KDRatm ; SRbc   ; BCatm  ");
+    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10")
+            .arg(t, 8, 'f', 3)
             .arg(10*pBP, 7, 'f', 5)
-            .arg(10*pBC, 7, 'f', 5)
+            .arg(10*pBC, 7, 'f', 5)         //%3
             .arg(10*pSR, 7, 'f', 5)
-            .arg(10000*Q_bp_sr, 8, 'f', 5)
+            .arg(10*Y[KDR], 7, 'f', 5)
+            .arg(10000*Q_bp_sr, 8, 'f', 5)  //%6
             .arg(10000*Q_bp_kd, 8, 'f', 5)
             .arg(10000*Q_kd_atm, 8, 'f', 5)
-            .arg(10000*Q_sr_bc, 8, 'f', 5)
+            .arg(10000*Q_sr_bc, 8, 'f', 5)  //%9
             .arg(10000*Q_bc_atm, 8, 'f', 5);
 }
 
