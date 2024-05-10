@@ -15,7 +15,7 @@
         <TrainCranePos>2</TrainCranePos>
 
         <!-- Положение рукоятки КВТ -->
-        <LocoCranePos>1</LocoCranePos>
+        <LocoCranePos>1.0</LocoCranePos>
 
         <!-- Состояние устройства блокировки тормозов 
         (1 - разблокирована, 0 - заблокирована) -->

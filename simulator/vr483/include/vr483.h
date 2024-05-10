@@ -10,7 +10,7 @@ enum
 {
     NUM_VOLUMES = 3,
     NUM_COEFFS = 14,
-    NUM_SENSIVITY_COEFFS = 6,
+    NUM_SENSIVITY_COEFFS = 9,
     NUM_PRESSURES = 18,
 
     RK = 0, ///< Давление в рабочей камере

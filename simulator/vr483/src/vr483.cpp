@@ -92,29 +92,40 @@ void AirDist483::preStep(state_vector_t &Y, double t)
 
     // Зарядка/отпуск, взаимодействие камер
     // Расход воздуха из ТМ в ЗР через обратный клапан
-    double Q_bp_sr = k[0] * pf(pBP - pSR);
+    double Q_bp_sr = k[0] * cut((pBP - pSR), 0.0, A[0]);
     // Расход воздуха между МК и ЗК через плунжер
-    double Q_mk_zk_pl = k[1] * hs_p(poz_d - p[2]) * (pBP - Y[ZK]);
+    double Q_mk_zk_pl = k[1] * hs_p(poz_d - p[2]) * cut((pBP - Y[ZK]), -A[1], A[1]);
     // Расход воздуха между МК и ЗК через клапан мягкости
-    double Q_mk_zk_km = k[2] * cut(A[0] * (Y[ZK] - Y[KDR] - p[0]), 0.0, 1.0) * (pBP - Y[ZK]);
+    double Q_mk_zk_km = k[2] * hs_p(Y[ZK] - Y[KDR] - p[0]) * cut((pBP - Y[ZK]), -A[2], A[2]);
     // Расход воздуха между ЗК и РК через корпус главного поршня
-    double Q_zk_rk_gp = k[3] * hs_n(poz_gp - p[9]) * (Y[ZK] - Y[RK]);
+    double Q_zk_rk_gp = k[3] * hs_n(poz_gp - p[10]) * (Y[ZK] - Y[RK]);
     // Расход воздуха между ЗК и РК через плунжер и диафрагму режима профиля пути
     double Q_zk_rk_dp = k[4] * hs_p(poz_d - p[3]) * hs_p(Y[RK] - p[1]) * static_cast<double>(switchProfile) * (Y[ZK] - Y[RK]);
 
     // Торможение
     // Расход воздуха из ЗК в КДР при разрядке через плунжер
-    double Q_zk_kdr_pl = k[1] * cut(A[1] * (p[4] - poz_d), 0.0, 1.0) * (Y[ZK] - Y[KDR]);
+//    double Q_zk_kdr_pl = k[1] * cut(A[3] * (p[4] - poz_d), 0.0, 1.0) * (Y[ZK] - Y[KDR]);
+    // Временно игнорирую дополнительную мягкость ЗК.
+//    double Q_zk_kdr_pl = 0.0;
+    // Разрядка в камеру с давлением КДР слишком быстрая, расход ограничен
+    // каналами плунжера и должен быть с коэффициентом плунжера,
+    // но ЗК сразу выравнивается с МК, прекращая доп.разрядку ТМ
+    // В реальности разрядка через плунжер в промежуточную камеру
+    // с клапаном доп. разрядки МК, в ней давление, близкое к МК,
+    // и таким образом расход меньше.
+    // Не понятно, как смоделировать это простым способом.
+    // ТЕСТИРУЮ расчёт потока просто по разнице ЗК-МК:
+    double Q_zk_kdr_pl = k[1] * cut(A[3] * (p[4] - poz_d), 0.0, 1.0) * (Y[ZK] - pBP);
     // Расход воздуха из МК в КДР при дополнительной разрядке
-    double Q_mk_kdr_dop = k[5] * cut(A[2] * (p[5] - poz_d), 0.0, 1.0) * cut(A[0] * (pBP - Y[KDR] - p[8]), 0.0, 1.0) * (pBP - Y[KDR]);
+    double Q_mk_kdr_dop = k[5] * hs_p(p[5] - poz_d) * cut(A[4] * (pBP - Y[KDR] - p[8]), 0.0, 1.0) * (pBP - Y[KDR]);
     // Расход воздуха из ЗК в КДР при дополнительной разрядке
-    double Q_zk_kdr_dop = k[6] * cut(A[3] * (p[7] - poz_d), 0.0, 1.0) * (Y[ZK] - Y[KDR]);
+    double Q_zk_kdr_dop = k[6] * cut(A[5] * (p[7] - poz_d), 0.0, 1.0) * (Y[ZK] - Y[KDR]);
     // Расход воздуха из КДР в ТЦ
-    double Q_kdr_bc = k[7] * hs_p(p[10] - poz_gp) * (Y[KDR] - pBC);
+    double Q_kdr_bc = k[7] * hs_p(p[11] - poz_gp) * (Y[KDR] - pBC);
     // Расход воздуха из КДР в атмосферу через осевой канал уравнительного поршня
-    double Q_kdr_atm = k[8] * hs_p(p[10] - poz_gp) * Y[KDR];
+    double Q_kdr_atm = k[8] * hs_p(p[11] - poz_gp) * Y[KDR];
     // Расход воздуха из КДР в атмосферу дополнительно через атмосферный клапан
-    double Q_kdr_atm_dop = k[9] * cut(A[4] * (p[6] - poz_d), 0.0, 1.0) * Y[KDR];
+    double Q_kdr_atm_dop = k[9] * cut(A[6] * (pf(p[6] - poz_d) + pf(Y[KDR] - p[9])), 0.0, 1.0) * Y[KDR];
 
     // Уравнительный поршень
     // Относительное положение уравнительного поршня (равновесное главному поршню)
@@ -126,13 +137,13 @@ void AirDist483::preStep(state_vector_t &Y, double t)
 
     // Взаимодействие с ТЦ
     // Разница давления в ТЦ и усилий от пружин уравнительного поршня
-    double d_pBC = A[5] * ( pUP + pUP_g - pBC );
+    double d_pBC = pUP + pUP_g - pBC;
     // Расход воздуха из ЗР в ТЦ при быстром наполнении
-    double Q_sr_bc_fast = k[10] * cut(d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[11]) * hs_n(poz_gp - p[12]) * (pSR - pBC);
+    double Q_sr_bc_fast = k[10] * cut(A[7] * d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[11]) * hs_n(poz_gp - p[12]) * (pSR - pBC);
     // Расход воздуха из ЗР в ТЦ при медленном наполнении
-    double Q_sr_bc_slow = k[11] * cut(d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[12]) * (pSR - pBC);
+    double Q_sr_bc_slow = k[11] * cut(A[7] * d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[12]) * (pSR - pBC);
     // Расход воздуха из ТЦ в атмосферу
-    double Q_bc_atm = k[8] * max( cut(-d_pBC, 0.0, 1.0), hs_n(poz_gp - p[11]) ) * pBC;
+    double Q_bc_atm = k[8] * max( cut(-A[8] * d_pBC, 0.0, 1.0), hs_n(poz_gp - p[11]) ) * pBC;
 
     // Расход воздуха в РК
     Q[RK] = Q_zk_rk_gp + Q_zk_rk_dp;

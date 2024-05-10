@@ -19,6 +19,17 @@ void VL60k::stepBrakesControl(double t, double dt)
     brake_crane->setFLpressure(brake_lock->getCraneFLpressure());
     brake_crane->setBPpressure(brake_lock->getCraneBPpressure());
     brake_crane->setControl(keys);
+/*  QMap<int, bool> key_prog = keys;
+    key_prog[KEY_Alt_L] = true;
+    if (t < 30.0)
+        key_prog[KEY_2] = true;
+    else if (t < 32.75)
+        key_prog[KEY_6] = true;
+    else if (t < 90.0)
+        key_prog[KEY_4] = true;
+    else if (t < 96.0)
+        key_prog[KEY_1] = true;
+    brake_crane->setControl(key_prog);*/
     brake_crane->step(t, dt);
 
     // Кран вспомогательного тормоза
