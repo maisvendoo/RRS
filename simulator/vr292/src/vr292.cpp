@@ -66,6 +66,7 @@ void AirDist292::preStep(state_vector_t &Y, double t)
     }
 
     // Потоки камеры дополнительной разрядки ТМ
+    double Q_bp_atm = 0.0;
     double Q_bp_kd = 0.0;
     double Q_kd_atm = 0.0;
     // Потоки магистрали тормозных цилиндров
@@ -83,26 +84,64 @@ void AirDist292::preStep(state_vector_t &Y, double t)
             double z_diff = A[2] * (disjunction_z_pos - main_z_pos - p[5]);
 
             // Поток из тормозной магистрали в камеру дополнительной разрядки ТМ
-            Q_bp_kd = cut(z_diff, 0.0, K[3]) * (pBP - Y[KDR]);
+            Q_bp_kd = K[3] * cut(z_diff, 0.0, 1.0) * (pBP - Y[KDR]);
             // Поток из камеры дополнительной разрядки ТМ в атмосферу
-            Q_kd_atm = cut(-z_diff, 0.0, K[4]) * Y[KDR];
+            Q_kd_atm = K[4] * cut(-z_diff, 0.0, 1.0) * Y[KDR];
 
             // Поток из запасного резервуара в магистраль тормозных цилиндров
-            Q_sr_bc = cut(z_diff, 0.0, K[5] + K[6]) * (pSR - pBC);
+            Q_sr_bc = K[5] * cut(z_diff, 0.0, 1.0) * (pSR - pBC);
+        }
+        else
+        {
+            switch (long_train_mode) {
+            case 0:
+            {
+                // Открытие срывного клапана экстренного торможения
+                double v_emerg = cut(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
+                // Поток экстренной разрядки тормозной магистрали
+                Q_bp_atm = K[0] * v_emerg * pBP;
+
+                // Поток из запасного резервуара в магистраль тормозных цилиндров
+                Q_sr_bc = K[6] * (pSR - pBC);
+                break;
+            }
+            case 1:
+            {
+                // Открытие срывного клапана экстренного торможения
+                double v_emerg = cut(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
+                // Поток экстренной разрядки тормозной магистрали
+                Q_bp_atm = K[0] * v_emerg * pBP;
+
+                // Поток из запасного резервуара в магистраль тормозных цилиндров
+                Q_sr_bc = K[7] * (pSR - pBC);
+                break;
+            }
+            case 2:
+            default:
+            {
+                // Поток из запасного резервуара в магистраль тормозных цилиндров
+                Q_sr_bc = K[7] * (pSR - pBC);
+                break;
+            }
+            }
+
+            // Поток из камеры дополнительной разрядки ТМ в атмосферу
+            Q_kd_atm = K[4] * Y[KDR];
         }
     }
     else
     {
         // Разрядка магистрали тормозных цилиндров в атмосферу
-        Q_bc_atm = (K[7] + K[8]) * pBC;
+        Q_bc_atm = K[8] * pBC;
+        // Поток из камеры дополнительной разрядки ТМ в атмосферу
+        Q_kd_atm = K[4] * Y[KDR];
     }
 
 /*
     TODO протестировать и настроить всё
-    TODO короткосоставный/длинносоставный режимы и ускоритель экстренного
 */
     // Поток в тормозную магистраль
-    QBP = - Q_bp_sr - Q_bp_kd;
+    QBP = - Q_bp_sr - Q_bp_kd - Q_bp_atm;
 
     // Поток в магистраль тормозных цилиндров
     QBC = Q_sr_bc - Q_bc_atm;
@@ -155,19 +194,19 @@ void AirDist292::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "main_z_eps", main_z_eps);
 
-    for (size_t i = 1; i < p.size(); ++i)
+    for (size_t i = 0; i < p.size(); ++i)
     {
         QString coeff = QString("p%1").arg(i);
         cfg.getDouble(secName, coeff, p[i]);
     }
 
-    for (size_t i = 1; i < K.size(); ++i)
+    for (size_t i = 0; i < K.size(); ++i)
     {
         QString coeff = QString("K%1").arg(i);
         cfg.getDouble(secName, coeff, K[i]);
     }
 
-    for (size_t i = 1; i < A.size(); ++i)
+    for (size_t i = 0; i < A.size(); ++i)
     {
         QString coeff = QString("A%1").arg(i);
         cfg.getDouble(secName, coeff, A[i]);

@@ -50,8 +50,11 @@ void AirDist483::load_config(CfgReader &cfg)
     // Объёмы камер
     for (size_t i = 0; i < v.size(); ++i)
     {
+        double tmp = 0.0;
         QString coeff = QString("v%1").arg(i);
-        cfg.getDouble(secName, coeff, v[i]);
+        cfg.getDouble(secName, coeff, tmp);
+        if (tmp > 0.0)
+            v[i] = tmp;
     }
 
     // Коэффициенты
