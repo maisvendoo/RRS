@@ -8,7 +8,7 @@ AirDist242::AirDist242() : AirDistributor ()
   , emergency_mode(false)
   , Vuk(1.0e-3)
   , Quk(0.0)
-  , pu2(0.037)
+  , pu2(0.039)
   , pbv(0.15)
   , psv(0.025)
   , pwv(0.48)
@@ -16,7 +16,7 @@ AirDist242::AirDist242() : AirDistributor ()
   , s1_max(0.015)
 {
     K.fill(0.0);
-    k.fill(0.0);
+    A.fill(0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -49,16 +49,16 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     double s1 = dead_zone((pSR - pBP), s1_min, s1_max);
 
     // Отжатие полого стержня от уплотнения на выпускном клапане (наполнение ТЦ)
-    double v11 = cut(k[1] * s1, 0.0, 1.0);
+    double v11 = cut(A[1] * s1, 0.0, 1.0);
 
     // Открытие клапана дополнительной разрядки тормозной магистрали
-    double v12 = cut(k[2] * s1, 0.0, 1.0);
+    double v12 = cut(A[2] * s1, 0.0, 1.0);
 
     // Открытие выпускного клапана
-    double v1 = hs_n(s1);
+    double v1 = cut(-A[3] * s1, 0.0, 1.0);
 
     // Клапаны поршня в камере У2
-    double v2 = hs_n(pBC - pu2);
+    double v2 = cut(A[4] * (pu2 - pBC), 0.0, 1.0);
 
     // Тормозной клапан с учётом режимов торможения/отпуска "К" и "Д"
     double vb = static_cast<double>((!long_train_mode) || (pBC < pbv));
@@ -100,26 +100,36 @@ void AirDist242::preStep(state_vector_t &Y, double t)
 
     // Поток в ускорительную камеру
     Quk = Q_bp_uk;
+
 /*
-//    QString(" pUK   ; pBP   ; pBC   ; pSR   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPatm  ; BPemer ; v11   ; v12   ; v1 ; v2 ; vb ; vs ; vw ");
-    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17")
-            .arg(Y[0], 7, 'f', 5)
-            .arg(pBP, 7, 'f', 5)
-            .arg(pBC, 7, 'f', 5)
-            .arg(pSR, 7, 'f', 5)
-            .arg(1000*Q_bp_sr, 8, 'f', 5)
-            .arg(1000*Q_bp_uk, 8, 'f', 5)
-            .arg(1000*Q_sr_bc, 8, 'f', 5)
-            .arg(1000*Q_bc_atm, 8, 'f', 5)
-            .arg(1000*Q_bp_bc, 8, 'f', 5)
-            .arg(1000*Q_bp_atm, 8, 'f', 5)
-            .arg(v11, 7, 'f', 5)
-            .arg(v12, 7, 'f', 5)
-            .arg(v1, 4, 'f', 1)
-            .arg(v2, 4, 'f', 1)
+    DebugMsg = QString("242:UK%1|vBC+:%2|vTM-:%3|vBC-:%4|vY2:%5|")
+            .arg(10.0 * Y[0], 6, 'f', 3)
+            .arg(v11, 4, 'f', 2)
+            .arg(v12, 4, 'f', 2)
+            .arg(v1, 4, 'f', 2)
+            .arg(v2, 4, 'f', 2);
+*/
+/*
+//    QString("  time  ; pBP   ; pBC   ; pSR   ; pUK   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPbc   ; BPatm  ; v11; v12; v1 ; v2 ; vb ; vs ; vw ");
+    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17;%18")
+            .arg(t, 8, 'f', 3)
+            .arg(10*pBP, 7, 'f', 5)
+            .arg(10*pBC, 7, 'f', 5)         //%3
+            .arg(10*pSR, 7, 'f', 5)
+            .arg(10*Y[0], 7, 'f', 5)
+            .arg(10000*Q_bp_sr, 8, 'f', 5)  //%6
+            .arg(10000*Q_bp_uk, 8, 'f', 5)
+            .arg(10000*Q_sr_bc, 8, 'f', 5)
+            .arg(10000*Q_bc_atm, 8, 'f', 5) //%9
+            .arg(10000*Q_bp_bc, 8, 'f', 5)
+            .arg(10000*Q_bp_atm, 8, 'f', 5)
+            .arg(v11, 4, 'f', 2)            //%12
+            .arg(v12, 4, 'f', 2)
+            .arg(v1, 4, 'f', 2)
+            .arg(v2, 4, 'f', 2)             //%15
             .arg(vb, 4, 'f', 1)
             .arg(vs, 4, 'f', 1)
-            .arg(vw, 4, 'f', 1);
+            .arg(vw, 4, 'f', 1);            //%18
 */
 }
 
@@ -164,10 +174,10 @@ void AirDist242::load_config(CfgReader &cfg)
         cfg.getDouble(secName, coeff, K[i]);
     }
 
-    for (size_t i = 1; i < k.size(); ++i)
+    for (size_t i = 1; i < A.size(); ++i)
     {
-        QString coeff = QString("k%1").arg(i);
-        cfg.getDouble(secName, coeff, k[i]);
+        QString coeff = QString("A%1").arg(i);
+        cfg.getDouble(secName, coeff, A[i]);
     }
 
 }

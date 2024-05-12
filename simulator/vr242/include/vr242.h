@@ -9,7 +9,7 @@
 enum
 {
     MAX_FLOW_COEFFS = 10,
-    MAX_GIAN_COEFFS = 3,
+    MAX_SENS_COEFFS = 5,
 };
 
 //------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ private:
     double s1_max;
 
     std::array<double, MAX_FLOW_COEFFS> K;
-    std::array<double, MAX_GIAN_COEFFS> k;
+    std::array<double, MAX_SENS_COEFFS> A;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

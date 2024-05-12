@@ -14,6 +14,6 @@ void PassCar::stepRegistrator(double t, double dt)
 
     registrator->print(line, t, dt);
 */
-
-    registrator->print(air_dist->getDebugMsg().replace(QChar('.'),QChar(',')), t, dt);
+    if ((t > 30.0) && (t < 180.0))
+        registrator->print(air_dist->getDebugMsg().replace(QChar('.'),QChar(',')), t, dt);
 }

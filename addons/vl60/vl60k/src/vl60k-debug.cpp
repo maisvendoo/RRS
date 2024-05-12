@@ -21,13 +21,13 @@ void VL60k::debugPrint(double t, double dt)
             .arg(10.0 * brake_crane->getERpressure(), 6, 'f', 2)
             .arg(brake_crane->getPositionName(), 3)
             .arg(loco_crane->getHandlePosition() * 100.0, 3, 'f', 0);
-    /*DebugMsg += QString("Rev%1|Pos %2%3|I%4 A|")
+    DebugMsg += QString("Rev%1|Pos %2%3|I%4 A|")
             .arg(controller->getReversHandlePos() * 4.0, 2, 'f', 0)
             .arg(main_controller->getPosition(), 2)
             .arg(main_controller->isLongMotionPos() ? "*" : " ")
-            .arg(motor[TED1]->getIa(), 6, 'f', 1);*/
+            .arg(motor[TED1]->getIa(), 6, 'f', 1);
 
-    DebugMsg += air_dist->getDebugMsg();
+//    DebugMsg += air_dist->getDebugMsg();
 
     DebugMsg += QString("          ");
 }
