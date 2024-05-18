@@ -26,8 +26,5 @@ void VL60k::debugPrint(double t, double dt)
             .arg(main_controller->getPosition(), 2)
             .arg(main_controller->isLongMotionPos() ? "*" : " ")
             .arg(motor[TED1]->getIa(), 6, 'f', 1);
-
-//    DebugMsg += air_dist->getDebugMsg();
-
     DebugMsg += QString("          ");
 }
