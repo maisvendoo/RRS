@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 void PassCar::stepRegistrator(double t, double dt)
 {
+    Q_UNUSED(t);
+    Q_UNUSED(dt);
 /*
     QString line = QString("%1 %2 %3 %4")
             .arg(t, 10, 'f', 1)
@@ -14,6 +16,8 @@ void PassCar::stepRegistrator(double t, double dt)
 
     registrator->print(line, t, dt);
 */
+/*
     if ((t > 30.0) && (t < 180.0))
-        registrator->print(air_dist->getDebugMsg().replace(QChar('.'),QChar(',')), t, dt);
+        registrator->print(air_dist->getDebugMsg(), t, dt);
+*/
 }

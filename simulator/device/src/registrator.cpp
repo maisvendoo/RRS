@@ -14,6 +14,7 @@ Registrator::Registrator(double interval, QObject *parent)
     , fileName("data")
     , path("")
     , file(nullptr)
+    , is_replace_dot_by_comma(false)
 {
 
 }
@@ -82,7 +83,14 @@ void Registrator::print(QString line, double t, double dt)
 
         QTextStream stream(file);
 
-        stream << line << "\n";
+        if (is_replace_dot_by_comma)
+        {
+            stream << line.replace('.',',') << "\n";
+        }
+        else
+        {
+            stream << line << "\n";
+        }
 
         file->close();
 
@@ -103,4 +111,5 @@ void Registrator::load_config(CfgReader &cfg)
     tau = interval;
 
     cfg.getString(secName, "FileName", fileName);
+    cfg.getBool(secName, "ReplaceDotByComma", is_replace_dot_by_comma);
 }

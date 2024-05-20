@@ -8,7 +8,8 @@
 void FreightCar::initRegistrator()
 {
     registrator = new Registrator();
-    registrator->setFileName(QString("freightcar%1m_%2").arg(length,4,'f',1,'0').arg(idx));
+    registrator->setFileName(QString("freightcar_%1").arg(idx));
+    registrator->setReplaceDotByComma(true);
     registrator->read_custom_config(config_dir + QDir::separator() + "registrator");
     registrator->init();
 

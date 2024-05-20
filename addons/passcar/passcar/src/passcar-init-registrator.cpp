@@ -9,6 +9,7 @@ void PassCar::initRegistrator()
 {
     registrator = new Registrator();
     registrator->setFileName(QString("passcar_%1").arg(idx));
+    registrator->setReplaceDotByComma(true);
     registrator->read_custom_config(config_dir + QDir::separator() + "registrator");
     registrator->init();
 
