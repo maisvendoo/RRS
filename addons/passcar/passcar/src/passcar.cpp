@@ -80,17 +80,60 @@ void PassCar::step(double t, double dt)
 //
 //------------------------------------------------------------------------------
 void PassCar::keyProcess()
-{
-    if (!hose_bp_bwd->isConnected())
+{/*
+    // Сцепка/Отцепка спереди
+    if (getKeyState(KEY_X))
     {
-        if (getKeyState(KEY_BackSpace))
+        if (isShift())
         {
-            if (isShift())
-                anglecock_bp_bwd->open();
+            if (isControl())
+            {
+                anglecock_bp_fwd->close();
+            }
             else
-                anglecock_bp_bwd->close();
+            {
+                hose_bp_fwd->disconnect();
+
+                coupling_fwd->uncouple();
+            }
+        }
+        else
+        {
+            hose_bp_fwd->connect();
+
+            if ( (hose_bp_fwd->isLinked()) || (isControl()) )
+                anglecock_bp_fwd->open();
+
+            coupling_fwd->couple();
         }
     }
+
+    // Сцепка/Отцепка сзади
+    if (getKeyState(KEY_X))
+    {
+        if (isShift())
+        {
+            if (isControl())
+            {
+                anglecock_bp_bwd->close();
+            }
+            else
+            {
+                hose_bp_bwd->disconnect();
+
+                coupling_bwd->uncouple();
+            }
+        }
+        else
+        {
+            hose_bp_bwd->connect();
+
+            if ( (hose_bp_bwd->isLinked()) || (isControl()) )
+                anglecock_bp_bwd->open();
+
+            coupling_bwd->couple();
+        }
+    }*/
 }
 
 //------------------------------------------------------------------------------

@@ -65,7 +65,7 @@ T cut(T x, T min, T max)
 template <typename T>
 T pf(T x)
 {
-    return hs_p(x) * std::abs(x);
+    return hs_p(x) * x;
 }
 
 //------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ T pf(T x)
 template <typename T>
 T nf(T x)
 {
-    return hs_n(x) * std::abs(x);
+    return hs_n(x) * (-x);
 }
 
 //------------------------------------------------------------------------------
@@ -83,16 +83,13 @@ T nf(T x)
 template <typename T>
 T dead_zone(T x, T min, T max)
 {
-    if ( (x >= min) && (x <= max) )
-        return static_cast<T>(0);
-
     if (x > max)
         return x - max;
 
     if (x < min)
         return x - min;
 
-    return x;
+    return static_cast<T>(0);
 }
 
 #endif // MATH_FUNCS_H

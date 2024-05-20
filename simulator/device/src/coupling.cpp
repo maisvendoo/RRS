@@ -1,19 +1,19 @@
 #include    <QLibrary>
 
-#include    "pneumo-hose.h"
+#include    "coupling.h"
 
 #include    "CfgReader.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHose::PneumoHose(QObject *parent) : Device(parent)
+Coupling::Coupling(QObject *parent) : Device(parent)
   , is_ref_state_command(false)
 {
-    name = QString("BP");
+    name = QString("Coupling");
 
-    input_signals.resize(HOSE_SIZE_OF_INPUTS);
-    output_signals.resize(HOSE_SIZE_OF_OUTPUTS);
+    input_signals.resize(COUPL_SIZE_OF_INPUTS);
+    output_signals.resize(COUPL_SIZE_OF_OUTPUTS);
 
     std::fill(input_signals.begin(), input_signals.end(), 0.0);
     std::fill(output_signals.begin(), output_signals.end(), 0.0);
@@ -22,7 +22,7 @@ PneumoHose::PneumoHose(QObject *parent) : Device(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHose::~PneumoHose()
+Coupling::~Coupling()
 {
 
 }
@@ -30,64 +30,63 @@ PneumoHose::~PneumoHose()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::connect()
+void Coupling::couple()
 {
-    output_signals[HOSE_OUTPUT_REF_STATE] = 1.0;
+    output_signals[COUPL_OUTPUT_REF_STATE] = 1.0;
     is_ref_state_command = true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::disconnect()
+void Coupling::uncouple()
 {
-    output_signals[HOSE_OUTPUT_REF_STATE] = -1.0;
+    output_signals[COUPL_OUTPUT_REF_STATE] = -1.0;
     is_ref_state_command = true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool PneumoHose::isConnected() const
+bool Coupling::isCoupled() const
 {
-    return is_linked && (input_signals[HOSE_INPUT_IS_CONNECTED] == 1.0);
+    return is_linked && (input_signals[COUPL_INPUT_IS_CONNECTED] == 1.0);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setPressure(double value)
+void Coupling::setCoord(double value)
 {
-    output_signals[HOSE_OUTPUT_PIPE_PRESSURE] = value;
+    output_signals[COUPL_OUTPUT_COORD] = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setFlowCoeff(double value)
+void Coupling::setVelocity(double value)
 {
-    output_signals[HOSE_OUTPUT_FLOW_COEFF] = value;
+    output_signals[COUPL_OUTPUT_VELOCITY] = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoHose::getFlow() const
+double Coupling::getForce() const
 {
     if (is_linked)
-        return input_signals[HOSE_INPUT_FLOW_TO_PIPE];
+        return input_signals[COUPL_INPUT_FORCE];
 
-    // Если нет соседнего рукава, то рукав открыт в атмосферу
-    return -( output_signals[HOSE_OUTPUT_FLOW_COEFF]
-            * output_signals[HOSE_OUTPUT_PIPE_PRESSURE] );
+    // Если нет соседней сцепки, нет тягового усилия
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::step(double t, double dt)
+void Coupling::step(double t, double dt)
 {
-    // Проверяем, вызывались ли методы управления рукавами на данном шаге
+    // Проверяем, вызывались ли методы управления сцепкой на данном шаге
     if (is_ref_state_command)
     {
         // Сбрасываем флаг, чтобы обнулить управляющий сигнал на следующем шаге
@@ -96,7 +95,7 @@ void PneumoHose::step(double t, double dt)
     else
     {
         // Если не вызывались, обнуляем управляющий сигнал
-        output_signals[HOSE_OUTPUT_REF_STATE] = 0.0f;
+        output_signals[COUPL_OUTPUT_REF_STATE] = 0.0f;
     }
 
     Device::step(t, dt);
@@ -105,7 +104,7 @@ void PneumoHose::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::ode_system(const state_vector_t &Y,
+void Coupling::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)
 {
@@ -117,35 +116,31 @@ void PneumoHose::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::load_config(CfgReader &cfg)
+void Coupling::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
     cfg.getString(secName, "Name", name);
-
-    double tmp = 1.0;
-    cfg.getDouble(secName, "FlowCoefficient", tmp);
-    output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHose *loadPneumoHose(QString lib_path)
+Coupling *loadCoupling(QString lib_path)
 {
-    PneumoHose *hose = nullptr;
+    Coupling *coupling = nullptr;
 
     QLibrary lib(lib_path);
 
     if (lib.load())
     {
-        GetPneumoHose getPneumoHose = reinterpret_cast<GetPneumoHose>(lib.resolve("getPneumoHose"));
+        GetCoupling getCoupling = reinterpret_cast<GetCoupling>(lib.resolve("getCoupling"));
 
-        if (getPneumoHose)
+        if (getCoupling)
         {
-            hose = getPneumoHose();
+            coupling = getCoupling();
         }
     }
 
-    return hose;
+    return coupling;
 }

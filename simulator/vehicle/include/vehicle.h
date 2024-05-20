@@ -27,7 +27,9 @@
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
+
 #include    "device-list.h"
+#include    "coupling.h"
 
 #include    "alsn-struct.h"
 
@@ -312,6 +314,11 @@ protected:
     device_list_t forward_connectors;
     /// List of devices - backward connectors
     device_list_t backward_connectors;
+
+    /// Forward coupling
+    Coupling *coupling_fwd;
+    /// Backward coupling
+    Coupling *coupling_bwd;
 
     control_signals_t   control_signals;
 

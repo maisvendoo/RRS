@@ -69,6 +69,8 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , config_dir("")
   , Uks(0.0)
   , current_kind(0)
+  , coupling_fwd(nullptr)
+  , coupling_bwd(nullptr)
 {
     std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     std::fill(discreteSignal.begin(), discreteSignal.end(), false);
@@ -91,7 +93,7 @@ void Vehicle::init(QString cfg_path)
     loadConfiguration(cfg_path);
     Journal::instance()->info("Base class initialization finished");
 
-    Journal::instance()->info("Call of Vehicle::initialize() method...");
+    Journal::instance()->info("Call of Vehicle::initialization() method...");
     initialization();
     Journal::instance()->info("Custom initialization finished");
 }
@@ -551,6 +553,11 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
     railway_coord = Y[idx];
     velocity = dir * orient * Y[idx + s];
 
+    coupling_fwd->setCoord(railway_coord + dir * orient * length / 2.0);
+    coupling_fwd->setVelocity(velocity);
+    coupling_bwd->setCoord(railway_coord - dir * orient * length / 2.0);
+    coupling_bwd->setVelocity(velocity);
+
     // Calculate gravity force from profile inclination
     double weight = full_mass * Physics::g;
     double sin_beta = inc / 1000.0;
@@ -598,6 +605,12 @@ void Vehicle::hardwareProcess()
 void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 {
     integrationPreStep(Y, t);
+
+    coupling_fwd->step(t, dt);
+    F_fwd = coupling_fwd->getForce();
+    coupling_bwd->step(t, dt);
+    F_bwd = coupling_bwd->getForce();
+
     step(t, dt);
     integrationPostStep(Y, t);
 }
@@ -784,6 +797,14 @@ void Vehicle::loadConfiguration(QString cfg_path)
     std::fill(Q_a.begin(), Q_a.end(), 0.0);
     std::fill(Q_r.begin(), Q_r.end(), 0.0);
     std::fill(acceleration.begin(), acceleration.end(), 0.0);
+
+    // Couplings
+    coupling_fwd = new Coupling();
+    coupling_fwd->couple();
+    forward_connectors.push_back(coupling_fwd);
+    coupling_bwd = new Coupling();
+    coupling_bwd->couple();
+    backward_connectors.push_back(coupling_bwd);
 }
 
 //------------------------------------------------------------------------------

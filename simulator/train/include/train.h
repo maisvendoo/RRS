@@ -20,7 +20,7 @@
 #include    "init_data.h"
 #include    "ode-system.h"
 #include    "vehicle.h"
-#include    "coupling.h"
+//#include    "coupling.h"
 #include    "device-list.h"
 #include    "device-joint.h"
 #include    "solver.h"
@@ -144,10 +144,10 @@ private:
 
     /// All train's vehicles
     std::vector<Vehicle *> vehicles;
-
+/*
     /// All train's couplings
     std::vector<Coupling *> couplings;
-
+*/
     /// All joints between neighbor vehicles
     std::vector<std::vector<Joint *>> joints_list;
 
@@ -156,8 +156,8 @@ private:
 
     /// Train's loading
     bool loadTrain(QString cfg_path, const init_data_t &init_data);
-    /// Couplings loading
-    bool loadCouplings(QString cfg_path);
+/*    /// Couplings loading
+    bool loadCouplings(QString cfg_path);*/
     /// Joints loading
     bool loadJoints();
     /// Joint module loading

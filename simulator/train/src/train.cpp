@@ -98,14 +98,14 @@ bool Train::init(const init_data_t &init_data)
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
-
+/*
     // Loading of couplings
     if (!loadCouplings(full_config_path))
     {
         Journal::instance()->error("Coupling model is't loaded");
         return false;
     }
-
+*/
     // Loading of joints
     if (!loadJoints())
     {
@@ -127,8 +127,8 @@ bool Train::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
 {
-    bool coups = (vehicles.size() > 1);
-    auto coup_it = couplings.begin();
+//    bool coups = (vehicles.size() > 1);
+//    auto coup_it = couplings.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
@@ -137,7 +137,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
         size_t s = vehicle->getDegressOfFreedom();
-
+/*
         if (coups && (it != end - 1) )
         {
             Vehicle *vehicle1 = *(it+1);
@@ -162,7 +162,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
                 vehicle1->setForwardForce(R);
             else
                 vehicle1->setBackwardForce(R);
-        }
+        }*/
         state_vector_t a = vehicle->getAcceleration(Y, t, dt);
 
         memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
@@ -522,7 +522,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
     // Check train is't empty and return
     return vehicles.size() != 0;
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -576,7 +576,7 @@ bool Train::loadCouplings(QString cfg_path)
 
     return couplings.size() != 0;
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

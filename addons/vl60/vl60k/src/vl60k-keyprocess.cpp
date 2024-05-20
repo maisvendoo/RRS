@@ -158,4 +158,78 @@ void VL60k::keyProcess()
         if (isAlt() && !autoStartTimer->isStarted())
             autoStartTimer->start();
     }
+
+    // Сцепка/Отцепка спереди
+    if (getKeyState(KEY_X))
+    {
+        if (isShift())
+        {
+            if (isControl())
+            {
+                anglecock_bp_fwd->close();
+                anglecock_fl_fwd->close();
+                anglecock_bc_fwd->close();
+            }
+            else
+            {
+                hose_bp_fwd->disconnect();
+                hose_fl_fwd->disconnect();
+                hose_bc_fwd->disconnect();
+
+                coupling_fwd->uncouple();
+            }
+        }
+        else
+        {
+            hose_bp_fwd->connect();
+            hose_fl_fwd->connect();
+            hose_bc_fwd->connect();
+
+            if ( (hose_bp_fwd->isLinked()) || (isControl()) )
+                anglecock_bp_fwd->open();
+            if ( (hose_fl_fwd->isLinked()) || (isControl()) )
+                anglecock_fl_fwd->open();
+            if ( (hose_bc_fwd->isLinked()) || (isControl()) )
+                anglecock_bc_fwd->open();
+
+            coupling_fwd->couple();
+        }
+    }
+
+    // Сцепка/Отцепка сзади
+    if (getKeyState(KEY_X))
+    {
+        if (isShift())
+        {
+            if (isControl())
+            {
+                anglecock_bp_bwd->close();
+                anglecock_fl_bwd->close();
+                anglecock_bc_bwd->close();
+            }
+            else
+            {
+                hose_bp_bwd->disconnect();
+                hose_fl_bwd->disconnect();
+                hose_bc_bwd->disconnect();
+
+                coupling_bwd->uncouple();
+            }
+        }
+        else
+        {
+            hose_bp_bwd->connect();
+            hose_fl_bwd->connect();
+            hose_bc_bwd->connect();
+
+            if ( (hose_bp_bwd->isLinked()) || (isControl()) )
+                anglecock_bp_bwd->open();
+            if ( (hose_fl_bwd->isLinked()) || (isControl()) )
+                anglecock_fl_bwd->open();
+            if ( (hose_bc_bwd->isLinked()) || (isControl()) )
+                anglecock_bc_bwd->open();
+
+            coupling_bwd->couple();
+        }
+    }
 }
