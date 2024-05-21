@@ -53,9 +53,10 @@ private:
 
     /// Загрузка параметров из конфига
     virtual void load_config(CfgReader &cfg);
-
+/*
     QString msg;
     Registrator *reg;
+*/
 };
 
 #endif // JOINT_COUPLING_H

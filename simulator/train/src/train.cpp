@@ -613,14 +613,14 @@ bool Train::loadJoints()
 
         // Get connectors list from ahead vehicle
         device_list_t *cons_fwd;
-        if (veh_fwd->getOrientation() > 0)
+        if (dir * veh_fwd->getOrientation() > 0)
             cons_fwd = veh_fwd->getBwdConnectors();
         else
             cons_fwd = veh_fwd->getFwdConnectors();
 
         // Get connectors list from behind vehicle
         device_list_t *cons_bwd;
-        if (veh_bwd->getOrientation() > 0)
+        if (dir * veh_bwd->getOrientation() > 0)
             cons_bwd = veh_bwd->getFwdConnectors();
         else
             cons_bwd = veh_bwd->getBwdConnectors();
