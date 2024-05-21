@@ -28,24 +28,4 @@ private:
     std::string screenshotsDir;
 };
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-class ScreenCaptureHandler : public osgGA::GUIEventHandler
-{
-public:
-
-    ScreenCaptureHandler(osgViewer::ScreenCaptureHandler *sch);
-
-
-    virtual bool handle(const osgGA::GUIEventAdapter &ea,
-                        osgGA::GUIActionAdapter &aa);
-
-
-
-private:
-
-    osgViewer::ScreenCaptureHandler *sch;
-};
-
 #endif // SCREEN_CAPTURE_H

@@ -180,14 +180,19 @@ bool RouteViewer::init(int argc, char *argv[])
     /*if (!initMotionBlurEffect(&viewer, settings))
         return false;*/
 
+    // Запись скриншота в файл
     osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile =
             new WriteToFileOperation(fs.getScreenshotsDir());
 
     osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler =
             new osgViewer::ScreenCaptureHandler(writeFile.get());
 
+    // Одиночный скриншот по клавише F12
+    screenCaptureHandler->setKeyEventTakeScreenShot(osgGA::GUIEventAdapter::KEY_F12);
+    // Серия скриншотов отключена из-за просадки производительности
+    screenCaptureHandler->setKeyEventToggleContinuousCapture(-1);
+
     viewer.addEventHandler(screenCaptureHandler.get());
-    viewer.addEventHandler(new ScreenCaptureHandler(screenCaptureHandler.get()));
 
     HUD *hud = new HUD(settings.width, settings.height);
     root->addChild(hud->getCamera());
