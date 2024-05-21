@@ -17,7 +17,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lJournal_d
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -lvehicle_d
-#    LIBS += -L../../../lib -lcoupling_d
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
@@ -32,7 +31,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lJournal
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
-#    LIBS += -L../../../lib -lcoupling
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
@@ -61,7 +59,6 @@ INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../vehicle/include
-#INCLUDEPATH += ../coupling/include
 INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../CfgReader/include

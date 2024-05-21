@@ -98,14 +98,7 @@ bool Train::init(const init_data_t &init_data)
 
     for (size_t i = 0; i < y.size(); i++)
         y[i] = dydt[i] = 0;
-/*
-    // Loading of couplings
-    if (!loadCouplings(full_config_path))
-    {
-        Journal::instance()->error("Coupling model is't loaded");
-        return false;
-    }
-*/
+
     // Loading of joints
     if (!loadJoints())
     {
@@ -127,8 +120,6 @@ bool Train::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
 {
-//    bool coups = (vehicles.size() > 1);
-//    auto coup_it = couplings.begin();
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
@@ -137,32 +128,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
         size_t s = vehicle->getDegressOfFreedom();
-/*
-        if (coups && (it != end - 1) )
-        {
-            Vehicle *vehicle1 = *(it+1);
-            size_t idx1 = vehicle1->getIndex();
-            size_t s1 = vehicle1->getDegressOfFreedom();
 
-            double ds = Y[idx] - Y[idx1] -
-                    dir * vehicle->getLength() / 2 -
-                    dir * vehicle1->getLength() / 2;
-
-            double dv = Y[idx + s] - Y[idx1 + s1];
-
-            Coupling *coup = *coup_it;
-            double R = dir * coup->getForce(ds, dv);
-            ++coup_it;
-
-            if (vehicle->getOrientation() > 0)
-                vehicle->setBackwardForce(R);
-            else
-                vehicle->setForwardForce(R);
-            if (vehicle1->getOrientation() > 0)
-                vehicle1->setForwardForce(R);
-            else
-                vehicle1->setBackwardForce(R);
-        }*/
         state_vector_t a = vehicle->getAcceleration(Y, t, dt);
 
         memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
@@ -522,61 +488,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
     // Check train is't empty and return
     return vehicles.size() != 0;
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Train::loadCouplings(QString cfg_path)
-{
-    CfgReader cfg;
-    FileSystem &fs = FileSystem::getInstance();
 
-    if (cfg.load(cfg_path))
-    {
-        QString coupling_module = "";
-        if (!cfg.getString("Common", "CouplingModule", coupling_module))
-        {
-            coupling_module = "default-coupling";
-        }
-
-        int num_couplings = static_cast<int>(vehicles.size() - 1);
-
-        if (num_couplings == 0)
-            return true;
-
-        for (int i = 0; i < num_couplings; i++)
-        {
-            Coupling *coupling = loadCoupling(QString(fs.getModulesDir().c_str()) +
-                                              fs.separator() +
-                                              coupling_module);
-
-            if (coupling == Q_NULLPTR)
-            {
-                return false;
-            }
-
-            Journal::instance()->info(QString("Created Coupling object at address: 0x%1")
-                                      .arg(reinterpret_cast<quint64>(coupling), 0, 16));
-
-            Journal::instance()->info("Loaded coupling model from: " + coupling_module);
-
-            coupling->loadConfiguration(QString(fs.getCouplingsDir().c_str()) +
-                                        fs.separator() +
-                                        coupling_module + ".xml");
-
-            coupling->reset();
-
-            couplings.push_back(coupling);
-        }
-    }
-    else
-    {
-        Journal::instance()->error("File " + cfg_path + " is't found");
-    }
-
-    return couplings.size() != 0;
-}
-*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
