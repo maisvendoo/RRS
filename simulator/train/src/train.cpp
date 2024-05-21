@@ -597,8 +597,21 @@ bool Train::loadJoints()
     {
         ++i;
 
+        // Pair of neighbor vehicles, co-directional with dir
+        Vehicle *veh_fwd;
+        Vehicle *veh_bwd;
+        if (dir > 0)
+        {
+            veh_fwd = *it;
+            veh_bwd = *(it+1);
+        }
+        else
+        {
+            veh_fwd = *(it+1);
+            veh_bwd = *it;
+        }
+
         // Get connectors list from ahead vehicle
-        Vehicle *veh_fwd = *it;
         device_list_t *cons_fwd;
         if (veh_fwd->getOrientation() > 0)
             cons_fwd = veh_fwd->getBwdConnectors();
@@ -606,7 +619,6 @@ bool Train::loadJoints()
             cons_fwd = veh_fwd->getFwdConnectors();
 
         // Get connectors list from behind vehicle
-        Vehicle *veh_bwd = *(it+1);
         device_list_t *cons_bwd;
         if (veh_bwd->getOrientation() > 0)
             cons_bwd = veh_bwd->getFwdConnectors();

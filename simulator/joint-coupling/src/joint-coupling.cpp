@@ -15,6 +15,10 @@ JointCoupling::JointCoupling() : Joint()
   , ck(1.0e8)
 {
     devices.resize(NUM_CONNECTORS);
+    reg = new Registrator();
+    reg->setFileName(QString("JointCoupling%1").arg(reinterpret_cast<quint64>(this),0,16));
+    reg->init();
+    reg->print("   t   ;   ds     ;    dv    ;    x     ;    xc    ;    xck   ;    fc    ;   fck    ;  fc fck  ");
 }
 
 //------------------------------------------------------------------------------
@@ -32,19 +36,7 @@ void JointCoupling::step(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
-
-    // Управление сцепками
-    if (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0)
-        || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0) )
-    {
-        is_connected = true;
-    }
-
-    if (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == -1.0)
-        || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == -1.0) )
-    {
-        is_connected = false;
-    }
+    msg = QString("%1").arg(t,7,'f',3);
 
     // Расчёт взаимного расположения и скорости
     double x_fwd = devices[FWD]->getOutputSignal(COUPL_OUTPUT_COORD);
@@ -54,6 +46,20 @@ void JointCoupling::step(double t, double dt)
     double v_fwd = devices[FWD]->getOutputSignal(COUPL_OUTPUT_VELOCITY);
     double v_bwd = devices[BWD]->getOutputSignal(COUPL_OUTPUT_VELOCITY);
     double dv = v_fwd - v_bwd;
+
+    // Управление сцепками
+    if (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0)
+        || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0) )
+    {
+        if (ds < delta)
+            is_connected = true;
+    }
+
+    if (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == -1.0)
+        || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == -1.0) )
+    {
+        is_connected = false;
+    }
 
     if (is_connected)
     {
@@ -86,6 +92,8 @@ void JointCoupling::step(double t, double dt)
             devices[BWD]->setInputSignal(COUPL_INPUT_FORCE, 0.0);
         }
     }
+    if (abs(ds) > 0.005)
+        reg->print(msg);
 }
 
 //------------------------------------------------------------------------------
@@ -103,6 +111,16 @@ double JointCoupling::calc_force(double ds, double dv)
     double x_ck = dead_zone(x_c, -lambda, lambda);
     // Усилие от упругости конструкций
     double force_ck = ck * x_ck;
+
+    msg += QString("%1;%2;%3;%4;%5;%6;%7;%8")
+                   .arg(ds,10,'f',6)
+                   .arg(dv,10,'f',6)
+                   .arg(x,10,'f',6)
+                   .arg(x_c,10,'f',6)
+                   .arg(x_ck,10,'f',6)
+                   .arg(force_c,10,'f',3)
+                   .arg(force_ck,10,'f',3)
+                   .arg(force_c + force_ck,10,'f',3);
 
     return force_c + force_ck;
 }

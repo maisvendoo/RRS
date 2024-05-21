@@ -187,17 +187,25 @@ void VL60k::keyProcess()
 
             if ( (hose_bp_fwd->isLinked()) || (isControl()) )
                 anglecock_bp_fwd->open();
+            else
+                anglecock_bp_fwd->close();
+
             if ( (hose_fl_fwd->isLinked()) || (isControl()) )
                 anglecock_fl_fwd->open();
+            else
+                anglecock_fl_fwd->close();
+
             if ( (hose_bc_fwd->isLinked()) || (isControl()) )
                 anglecock_bc_fwd->open();
+            else
+                anglecock_bc_fwd->close();
 
             coupling_fwd->couple();
         }
     }
 
     // Сцепка/Отцепка сзади
-    if (getKeyState(KEY_X))
+    if (getKeyState(KEY_C))
     {
         if (isShift())
         {
@@ -224,10 +232,18 @@ void VL60k::keyProcess()
 
             if ( (hose_bp_bwd->isLinked()) || (isControl()) )
                 anglecock_bp_bwd->open();
+            else
+                anglecock_bp_bwd->close();
+
             if ( (hose_fl_bwd->isLinked()) || (isControl()) )
                 anglecock_fl_bwd->open();
+            else
+                anglecock_fl_bwd->close();
+
             if ( (hose_bc_bwd->isLinked()) || (isControl()) )
                 anglecock_bc_bwd->open();
+            else
+                anglecock_bc_bwd->close();
 
             coupling_bwd->couple();
         }

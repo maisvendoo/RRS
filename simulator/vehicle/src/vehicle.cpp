@@ -553,10 +553,10 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
     railway_coord = Y[idx];
     velocity = dir * orient * Y[idx + s];
 
-    coupling_fwd->setCoord(railway_coord + dir * orient * length / 2.0);
-    coupling_fwd->setVelocity(velocity);
-    coupling_bwd->setCoord(railway_coord - dir * orient * length / 2.0);
-    coupling_bwd->setVelocity(velocity);
+    coupling_fwd->setCoord(Y[idx] + dir * orient * length / 2.0);
+    coupling_fwd->setVelocity(Y[idx + s]);
+    coupling_bwd->setCoord(Y[idx] - dir * orient * length / 2.0);
+    coupling_bwd->setVelocity(Y[idx + s]);
 
     // Calculate gravity force from profile inclination
     double weight = full_mass * Physics::g;
