@@ -22,7 +22,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lJournal_d
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -lvehicle_d
-    LIBS += -L../../../lib -lcoupling_d
     LIBS += -L../../../lib -lsolver_d
     LIBS += -L../../../lib -ltrain_d
     LIBS += -L../../../lib -lmodel_d
@@ -43,7 +42,6 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lJournal
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -lvehicle
-    LIBS += -L../../../lib -lcoupling
     LIBS += -L../../../lib -lsolver
     LIBS += -L../../../lib -ltrain
     LIBS += -L../../../lib -lmodel
