@@ -20,6 +20,8 @@
 // Конструктор
 //------------------------------------------------------------------------------
 CHS2T::CHS2T() : Vehicle()
+  , coupling_module_name("sa3")
+  , coupling_config_name("sa3")
   , brake_crane_module_name("krm395")
   , brake_crane_config_name("krm395")
   , loco_crane_module_name("kvt254")
@@ -28,6 +30,10 @@ CHS2T::CHS2T() : Vehicle()
   , airdist_config_name("vr292")
   , electro_airdist_module_name("evr305")
   , electro_airdist_config_name("evr305")
+  , coupling_fwd(nullptr)
+  , coupling_bwd(nullptr)
+  , oper_rod_fwd(nullptr)
+  , oper_rod_bwd(nullptr)
 {
     epb_switch.setOnSoundName("tumbler");
     epb_switch.setOffSoundName("tumbler");
@@ -75,6 +81,8 @@ void CHS2T::initialization()
 
     Journal::instance()->info("Started DC electrical locomotive CS2t initialization...");
 
+    initCouplings(modules_dir);
+
     initPantographs();
 
     initFastSwitch();
@@ -118,41 +126,31 @@ void CHS2T::step(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    //Journal::instance()->info("Step pantographs");
+    stepCouplings(t, dt);
+
     stepPantographs(t, dt);
 
-    //Journal::instance()->info("Step fast switch");
     stepFastSwitch(t, dt);
 
-    //Journal::instance()->info("Step traction control");
     stepTractionControl(t, dt);
 
-    //Journal::instance()->info("Step protection");
     stepProtection(t, dt);
 
-    //Journal::instance()->info("Step air supply");
     stepPneumoSupply(t, dt);
 
-    //Journal::instance()->info("Step brakes control");
     stepBrakesControl(t, dt);
 
-    //Journal::instance()->info("Step electropneumatic brakes");
     stepEPB(t, dt);
 
-    //Journal::instance()->info("Step brake equipment");
     stepBrakesEquipment(t, dt);
 
-    //Journal::instance()->info("Step EDT");
     stepEDT(t, dt);
     stepEDT2(t, dt);
 
-    //Journal::instance()->info("Step support equipment");
     stepSupportEquipment(t, dt);
 
-    //Journal::instance()->info("Step debug");
     stepDebugMsg(t, dt);
 
-    //Journal::instance()->info("Step signals");
     stepSignals();
 
     stepSwitcherPanel();
@@ -163,11 +161,9 @@ void CHS2T::step(double t, double dt)
 
     registrate(t, dt);
 
-    //Journal::instance()->info("Step horn");
     horn->setControl(keys, control_signals);
     horn->step(t, dt);
 
-    //Journal::instance()->info("Step speed meter");
     speed_meter->setOmega(wheel_omega[0]);
     speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->step(t, dt);
@@ -185,6 +181,8 @@ void CHS2T::loadConfig(QString cfg_path)
     {
         QString secName = "Vehicle";
 
+        cfg.getString(secName, "CouplingModule", coupling_module_name);
+        cfg.getString(secName, "CouplingConfig", coupling_config_name);
         cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
         cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
         cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);

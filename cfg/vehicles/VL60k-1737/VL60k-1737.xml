@@ -8,7 +8,6 @@
 		<MainResist>loco-resist</MainResist>
 		<WheelRailFriction>loco-AC</WheelRailFriction>
 		<NumAxis>6</NumAxis>
-		<DegreesOfFreedom>7</DegreesOfFreedom>
 		<WheelInertia>100.0</WheelInertia>
 		<SoundDir>vl60</SoundDir>
 

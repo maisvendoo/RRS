@@ -46,6 +46,10 @@ public:
 
 private:
 
+    /// Имя модуля сцепного устройства
+    QString coupling_module_name;
+    /// Имя конфига сцепного устройства
+    QString coupling_config_name;
     /// Имя модуля поездного крана
     QString brake_crane_module_name;
     /// Имя конфига поездного крана
@@ -65,6 +69,16 @@ private:
 
 //    /// Выбор кабины
 //    int selectedCab;
+
+    /// Сцепка спереди
+    Coupling *coupling_fwd;
+    /// Сцепка сзади
+    Coupling *coupling_bwd;
+
+    /// Расцепной рычаг спереди
+    OperatingRod *oper_rod_fwd;
+    /// Расцепной рычаг сзади
+    OperatingRod *oper_rod_bwd;
 
     /// Микропроцессорная система управления электровозом
     MPCS    *mpcs;
@@ -195,6 +209,9 @@ private:
     /// Инициализация
     void initialization();
 
+    /// Инициализация сцепных устройств
+    void initCouplings(QString modules_dir);
+
     /// Инициализация высоковольтной схемы
     void initHighVoltageScheme();
 
@@ -218,6 +235,9 @@ private:
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    /// Моделирование сцепных устройств
+    void stepCouplings(double t, double dt);
 
     /// Шаг моделирования МПСУ
     void stepMPCS(double t, double dt);

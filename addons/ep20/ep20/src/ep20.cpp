@@ -9,6 +9,8 @@
 // Конструктор
 //------------------------------------------------------------------------------
 EP20::EP20() : Vehicle()
+  , coupling_module_name("sa3")
+  , coupling_config_name("sa3")
   , brake_crane_module_name("krm130")
   , brake_crane_config_name("krm130")
   , loco_crane_module_name("kvt224")
@@ -17,6 +19,10 @@ EP20::EP20() : Vehicle()
   , airdist_config_name("vr292")
   , electro_airdist_module_name("evr305")
   , electro_airdist_config_name("evr305")
+  , coupling_fwd(nullptr)
+  , coupling_bwd(nullptr)
+  , oper_rod_fwd(nullptr)
+  , oper_rod_bwd(nullptr)
 {
     U_bat = 55.0;
     Uks = 25000.0;
@@ -39,10 +45,10 @@ void EP20::initialization()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir(fs.getModulesDir().c_str());
 
-    // Вызваем метод
+    initCouplings(modules_dir);
+
     initMPCS();
 
-    // Вызываем метод
     initHighVoltageScheme();
 
     initPneumoSupply(modules_dir);
@@ -115,10 +121,10 @@ void EP20::initHighVoltageScheme()
 
 void EP20::step(double t, double dt)
 {
-    // Вызываем метод
+    stepCouplings(t, dt);
+
     stepMPCS(t, dt);
 
-    // Вызываем метод
     stepHighVoltageScheme(t, dt);
 
     stepPneumoSupply(t, dt);
@@ -250,6 +256,8 @@ void EP20::loadConfig(QString cfg_path)
     {
         QString secName = "Vehicle";
 
+        cfg.getString(secName, "CouplingModule", coupling_module_name);
+        cfg.getString(secName, "CouplingConfig", coupling_config_name);
         cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
         cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
         cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);

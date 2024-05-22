@@ -59,6 +59,10 @@ public:
 
 private:
 
+    /// Имя модуля сцепного устройства
+    QString coupling_module_name;
+    /// Имя конфига сцепного устройства
+    QString coupling_config_name;
     /// Имя модуля поездного крана
     QString brake_crane_module_name;
     /// Имя конфига поездного крана
@@ -75,6 +79,16 @@ private:
     QString electro_airdist_module_name;
     /// Имя конфига электровоздухорапределителя
     QString electro_airdist_config_name;
+
+    /// Сцепка спереди
+    Coupling *coupling_fwd;
+    /// Сцепка сзади
+    Coupling *coupling_bwd;
+
+    /// Расцепной рычаг спереди
+    OperatingRod *oper_rod_fwd;
+    /// Расцепной рычаг сзади
+    OperatingRod *oper_rod_bwd;
 
     enum
     {
@@ -322,6 +336,9 @@ private:
     /// Общая инициализация локомотива
     void initialization();
 
+    /// Инициализация сцепных устройств
+    void initCouplings(QString modules_dir);
+
     /// Инициализация токоприемников
     void initPantographs();
 
@@ -372,6 +389,9 @@ private:
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    /// Моделирование сцепных устройств
+    void stepCouplings(double t, double dt);
 
     /// Моделирование работы токоприемников
     void stepPantographs(double t, double dt);

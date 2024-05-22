@@ -8,6 +8,8 @@
 //
 //------------------------------------------------------------------------------
 TEP70::TEP70() : Vehicle()
+  , coupling_module_name("sa3")
+  , coupling_config_name("sa3")
   , brake_crane_module_name("krm395")
   , brake_crane_config_name("krm395")
   , loco_crane_module_name("kvt254")
@@ -16,6 +18,10 @@ TEP70::TEP70() : Vehicle()
   , airdist_config_name("vr292")
   , electro_airdist_module_name("evr305")
   , electro_airdist_config_name("evr305")
+  , coupling_fwd(nullptr)
+  , coupling_bwd(nullptr)
+  , oper_rod_fwd(nullptr)
+  , oper_rod_bwd(nullptr)
   , km(nullptr)
   , battery(nullptr)
   , kontaktor_fuel_pump(nullptr)
@@ -123,6 +129,8 @@ void TEP70::initialization()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
 
+    initCouplings(modules_dir);
+
     initCabineControls();
 
     initControlCircuit();
@@ -155,6 +163,8 @@ void TEP70::step(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
+
+    stepCouplings(t, dt);
 
     stepCabineControls(t, dt);
 
@@ -194,6 +204,8 @@ void TEP70::loadConfig(QString cfg_path)
     {
         QString secName = "Vehicle";
 
+        cfg.getString(secName, "CouplingModule", coupling_module_name);
+        cfg.getString(secName, "CouplingConfig", coupling_config_name);
         cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
         cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
         cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);

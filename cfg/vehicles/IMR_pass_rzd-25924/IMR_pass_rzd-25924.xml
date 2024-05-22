@@ -8,7 +8,6 @@
 		<WheelDiameter>0.95</WheelDiameter>
 		<MainResist>passcar</MainResist>
 		<NumAxis>4</NumAxis>
-		<DegreesOfFreedom>5</DegreesOfFreedom>
 		<SoundDir>pass</SoundDir>
 		<WheelInertia>100.0</WheelInertia>
 

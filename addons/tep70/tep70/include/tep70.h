@@ -59,6 +59,10 @@ public:
 
 private:
 
+    /// Имя модуля сцепного устройства
+    QString coupling_module_name;
+    /// Имя конфига сцепного устройства
+    QString coupling_config_name;
     /// Имя модуля поездного крана
     QString brake_crane_module_name;
     /// Имя конфига поездного крана
@@ -75,6 +79,16 @@ private:
     QString electro_airdist_module_name;
     /// Имя конфига электровоздухорапределителя
     QString electro_airdist_config_name;
+
+    /// Сцепка спереди
+    Coupling *coupling_fwd;
+    /// Сцепка сзади
+    Coupling *coupling_bwd;
+
+    /// Расцепной рычаг спереди
+    OperatingRod *oper_rod_fwd;
+    /// Расцепной рычаг сзади
+    OperatingRod *oper_rod_bwd;
 
     /// Контроллер машиниста
     ControllerKM2202    *km;
@@ -401,6 +415,9 @@ private:
     /// Инициализация всех систем тепловоза
     void initialization();
 
+    /// Инициализация сцепных устройств
+    void initCouplings(QString modules_dir);
+
     /// Инициализация органов управления в кабине
     void initCabineControls();
 
@@ -439,6 +456,9 @@ private:
 
     /// Шаг моделирования всех систем локомотива в целом
     void step(double t, double dt);
+
+    /// Шаг моделирования сцепных устройств
+    void stepCouplings(double t, double dt);
 
     /// Шаг моделирования органов управления в кабине
     void stepCabineControls(double t, double dt);

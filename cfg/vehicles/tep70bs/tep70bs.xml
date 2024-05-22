@@ -1,41 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Vehicle>
-        <EmptyMass>129000</EmptyMass>
-        <PayloadMass>0</PayloadMass>
-        <FuelCapacity>6000</FuelCapacity>
-        <FuelLevel>1.0</FuelLevel>
-        <Length>21.7</Length>
-        <WheelDiameter>1.22</WheelDiameter>
-        <MainResist>loco-resist</MainResist>
-        <WheelRailFriction>loco-diesel</WheelRailFriction>
-        <NumAxis>6</NumAxis>
-        <DegreesOfFreedom>7</DegreesOfFreedom>
-        <WheelInertia>100.0</WheelInertia>
-        <SoundDir>tep70</SoundDir>
+	<Vehicle>
+		<EmptyMass>129000</EmptyMass>
+		<PayloadMass>0</PayloadMass>
+		<FuelCapacity>6000</FuelCapacity>
+		<FuelLevel>1.0</FuelLevel>
+		<Length>21.7</Length>
+		<WheelDiameter>1.22</WheelDiameter>
+		<MainResist>loco-resist</MainResist>
+		<WheelRailFriction>loco-diesel</WheelRailFriction>
+		<NumAxis>6</NumAxis>
+		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>tep70</SoundDir>
 
-        <ReductorCoeff>3.12</ReductorCoeff>
+		<ReductorCoeff>3.12</ReductorCoeff>
 
-        <ExtTexturesDir>tep70bs/rzd</ExtTexturesDir>
+		<ExtTexturesDir>tep70bs/rzd</ExtTexturesDir>
 
-        <ExtModelName>tep70bs/tep70bs.osgt</ExtModelName>
-        <ModelShift>0.0 0.0 0.0</ModelShift>
+		<ExtModelName>tep70bs/tep70bs.osgt</ExtModelName>
+		<ModelShift>0.0 0.0 0.0</ModelShift>
 
-        <CabineModel>tep70bs/tep70bs_cabview.osgt</CabineModel>
-        <CabineShift>0.0 0.0 0.0</CabineShift>
+		<CabineModel>tep70bs/tep70bs_cabview.osgt</CabineModel>
+		<CabineShift>0.0 0.0 0.0</CabineShift>
 
-        <BrakeCraneModule>krm395</BrakeCraneModule>
-        <BrakeCraneConfig>krm395</BrakeCraneConfig>
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
 
-        <LocoCraneModule>kvt254</LocoCraneModule>
-        <LocoCraneConfig>kvt254</LocoCraneConfig>
+		<BrakeCraneModule>krm395</BrakeCraneModule>
+		<BrakeCraneConfig>krm395</BrakeCraneConfig>
 
-        <AirDistModule>vr242</AirDistModule>
-        <AirDistConfig>vr242</AirDistConfig>
+		<LocoCraneModule>kvt254</LocoCraneModule>
+		<LocoCraneConfig>kvt254</LocoCraneConfig>
 
-        <ElectroAirDistModule>evr305</ElectroAirDistModule>
-        <ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+		<AirDistModule>vr242</AirDistModule>
+		<AirDistConfig>vr242</AirDistConfig>
 
-        <DriverPos>0.782 9.005 3.696</DriverPos>
-    </Vehicle>
+		<ElectroAirDistModule>evr305</ElectroAirDistModule>
+		<ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+
+		<DriverPos>0.782 9.005 3.696</DriverPos>
+	</Vehicle>
 </Config>
