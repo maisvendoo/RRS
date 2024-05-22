@@ -54,7 +54,6 @@ void CouplingSA3::step(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
-
     if (is_lockkeeper_working)
     {
         // Проверяем разведение сцепок
@@ -64,10 +63,10 @@ void CouplingSA3::step(double t, double dt)
             output_signals[COUPL_OUTPUT_REF_STATE] = 0.0;
             is_lockkeeper_working = false;
         }
-    }
-    else
-    {
-        output_signals[COUPL_OUTPUT_REF_STATE] = -1.0;
+        else
+        {
+            output_signals[COUPL_OUTPUT_REF_STATE] = -1.0;
+        }
     }
 }
 

@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 void VL60pk::step(double t, double dt)
 {
+    stepCouplings(t, dt);
+
     stepPantographsControl(t, dt);
 
     stepMainSwitchControl(t, dt);

@@ -35,7 +35,6 @@ struct vehicle_data_t
     float           angle;
     float           omega;
     wchar_t         DebugMsg[DEBUG_STRING_SIZE];
-    std::array<bool, MAX_DISCRETE_SIGNALS>  discreteSignal;
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     vehicle_data_t()
@@ -45,11 +44,9 @@ struct vehicle_data_t
         , omega(0.0f)
         , DebugMsg(L"")
     {
-        std::fill(discreteSignal.begin(), discreteSignal.end(), false);
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
 };
-
 
 
 /*!

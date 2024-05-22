@@ -1,5 +1,5 @@
-#ifndef     VL60_SIGNALS_H
-#define     VL60_SIGNALS_H
+#ifndef     VL60K_SIGNALS_H
+#define     VL60K_SIGNALS_H
 
 enum
 {
@@ -93,4 +93,4 @@ enum
     WHEEL_6 = 199
 };
 
-#endif // VL60_SIGNALS_H
+#endif // VL60K_SIGNALS_H

@@ -26,5 +26,8 @@ void VL60k::debugPrint(double t, double dt)
             .arg(main_controller->getPosition(), 2)
             .arg(main_controller->isLongMotionPos() ? "*" : " ")
             .arg(motor[TED1]->getIa(), 6, 'f', 1);
+    DebugMsg += QString("F%1|B%2|")
+            .arg(oper_rod_fwd->getOperatingState(), 5, 'f', 2)
+            .arg(oper_rod_bwd->getOperatingState(), 5, 'f', 2);
     DebugMsg += QString("          ");
 }

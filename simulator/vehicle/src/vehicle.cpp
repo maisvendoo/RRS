@@ -69,11 +69,8 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , config_dir("")
   , Uks(0.0)
   , current_kind(0)
-  , coupling_fwd(nullptr)
-  , coupling_bwd(nullptr)
 {
     std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
-    std::fill(discreteSignal.begin(), discreteSignal.end(), false);
 }
 
 //------------------------------------------------------------------------------
@@ -355,23 +352,20 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Vehicle::getDiscreteSignal(size_t i)
-{
-    if (i < discreteSignal.size())
-        return discreteSignal[i];
-    else
-        return false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 float Vehicle::getAnalogSignal(size_t i)
 {
     if (i < analogSignal.size())
         return analogSignal[i];
     else
         return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::array<float, MAX_ANALOG_SIGNALS> Vehicle::getAnalogSignals()
+{
+    return analogSignal;
 }
 
 //------------------------------------------------------------------------------
@@ -553,15 +547,13 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
     railway_coord = Y[idx];
     velocity = dir * orient * Y[idx + s];
 
-    coupling_fwd->setCoord(Y[idx] + dir * orient * length / 2.0);
-    coupling_fwd->setVelocity(Y[idx + s]);
-    coupling_bwd->setCoord(Y[idx] - dir * orient * length / 2.0);
-    coupling_bwd->setVelocity(Y[idx + s]);
-
     // Calculate gravity force from profile inclination
     double weight = full_mass * Physics::g;
     double sin_beta = inc / 1000.0;
     F_g = weight * sin_beta * orient;
+
+    F_fwd = 0.0;
+    F_bwd = 0.0;
 
     if (num_axis > 0)
     {
@@ -605,11 +597,6 @@ void Vehicle::hardwareProcess()
 void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 {
     integrationPreStep(Y, t);
-
-    coupling_fwd->step(t, dt);
-    F_fwd = coupling_fwd->getCurrentForce();
-    coupling_bwd->step(t, dt);
-    F_bwd = coupling_bwd->getCurrentForce();
 
     step(t, dt);
     integrationPostStep(Y, t);
@@ -679,22 +666,6 @@ void Vehicle::setASLN(alsn_info_t alsn_info)
 void Vehicle::setUks(double value)
 {
     Uks = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-std::array<bool, MAX_DISCRETE_SIGNALS> Vehicle::getDiscreteSignals()
-{
-    return discreteSignal;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-std::array<float, MAX_ANALOG_SIGNALS> Vehicle::getAnalogSignals()
-{
-    return analogSignal;
 }
 
 //------------------------------------------------------------------------------
@@ -797,14 +768,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
     std::fill(Q_a.begin(), Q_a.end(), 0.0);
     std::fill(Q_r.begin(), Q_r.end(), 0.0);
     std::fill(acceleration.begin(), acceleration.end(), 0.0);
-
-    // Couplings
-    coupling_fwd = new Coupling();
-    coupling_fwd->couple();
-    forward_connectors.push_back(coupling_fwd);
-    coupling_bwd = new Coupling();
-    coupling_bwd->couple();
-    backward_connectors.push_back(coupling_bwd);
 }
 
 //------------------------------------------------------------------------------

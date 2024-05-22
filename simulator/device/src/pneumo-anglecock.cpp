@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 PneumoAngleCock::PneumoAngleCock(QObject *parent) : Device(parent)
   , ref_state(false)
-  , switch_time(0.5)
+  , switch_time(0.2)
   , p(0.0)
   , Q(0.0)
   , pipe_volume(1.0e8)

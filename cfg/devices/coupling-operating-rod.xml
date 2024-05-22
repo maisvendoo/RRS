@@ -8,7 +8,7 @@
 		<!-- Максимальное усилие в сцепке, при котором возможно управление сцепным устройством, Н -->
 		<MaxOperatingForce>1e-3</MaxOperatingForce>
 		<!-- Время движения расцепного рычага между положениями, с -->
-		<MotionTime>0.5</MotionTime>
+		<MotionTime>0.1</MotionTime>
 
 	</Device>
 </Config>

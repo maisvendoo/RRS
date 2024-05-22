@@ -18,6 +18,18 @@ public:
 
 private:
 
+    /// Сцепка спереди
+    Coupling *coupling_fwd;
+    /// Сцепка сзади
+    Coupling *coupling_bwd;
+    QString coupling_module_name;
+    QString coupling_config_name;
+
+    /// Расцепной рычаг спереди
+    OperatingRod *oper_rod_fwd;
+    /// Расцепной рычаг сзади
+    OperatingRod *oper_rod_bwd;
+
     /// Тормозная магистраль
     Reservoir   *brakepipe;
     double      bp_leak;
@@ -67,6 +79,9 @@ private:
 
     void initialization();
 
+    /// Инициализация сцепных устройств
+    void initCouplings(QString modules_dir);
+
     /// Инициализация тормозного оборудования
     void initBrakesEquipment(QString modules_dir);
 
@@ -74,6 +89,9 @@ private:
     void initEPB(QString modules_dir);
 
     void step(double t, double dt);
+
+    /// Моделирование сцепных устройств
+    void stepCouplings(double t, double dt);
 
     /// Моделирование тормозного оборудования
     void stepBrakesEquipment(double t, double dt);

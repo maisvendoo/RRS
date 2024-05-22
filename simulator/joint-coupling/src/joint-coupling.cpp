@@ -12,7 +12,8 @@ JointCoupling::JointCoupling() : Joint()
   , f(0.6)
   , c(2.0e7)
   , lambda(0.11)
-  , ck(1.0e9)
+  , fk(0.1)
+  , ck(5.0e8)
 {
     devices.resize(NUM_CONNECTORS);
 /*
@@ -118,7 +119,7 @@ void JointCoupling::step(double t, double dt)
     devices[FWD]->setInputSignal(COUPL_INPUT_SHIFT, ds_shift / 2.0);
     devices[BWD]->setInputSignal(COUPL_INPUT_SHIFT, ds_shift / 2.0);
 
-    /*
+/*
     if (abs(ds) > 0.005)
         reg->print(msg);
 */
@@ -132,15 +133,17 @@ double JointCoupling::calc_force(double ds, double dv)
     // Вычитание зазора в сцепке
     double x = dead_zone(ds, -delta / 2.0, delta / 2.0);
     // Сжатие поглощающих аппаратов
-    double x_c = cut(x, -lambda, lambda);
+    double x_c = cut(x, -lambda * 2.0, lambda * 2.0);
     // Усилие упругих элементов в поглощающих аппаратах
     double force_c = x_c * c;
     // Сила трения фрикционных элементов в поглощающих аппаратах
     double force_f = Physics::fricForce(abs(x_c) * c * f, dv);
     // Сжатие конструкций за вычетом сжатия поглощающих аппаратов
-    double x_ck = dead_zone(x_c, -lambda, lambda);
+    double x_ck = dead_zone(x_c, -lambda * 2.0, lambda * 2.0);
     // Усилие от упругости конструкций
     double force_ck = ck * x_ck;
+    // Потери на пластические деформации конструкций
+    double force_fk = Physics::fricForce(abs(x) * ck * fk, dv);
 /*
     msg += QString("%1;%2;%3;%4;%5;%6;%7;%8")
                    .arg(ds,10,'f',6)
@@ -152,7 +155,7 @@ double JointCoupling::calc_force(double ds, double dv)
                    .arg(force_ck,10,'f',3)
                    .arg(force_c + force_ck,10,'f',3);
 */
-    return force_c + force_f + force_ck;
+    return force_c + force_f + force_ck + force_fk;
 }
 
 //------------------------------------------------------------------------------
@@ -166,6 +169,7 @@ void JointCoupling::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "delta", delta);
     cfg.getDouble(secName, "c", c);
     cfg.getDouble(secName, "lambda", lambda);
+    cfg.getDouble(secName, "fk", fk);
     cfg.getDouble(secName, "ck", ck);
 }
 

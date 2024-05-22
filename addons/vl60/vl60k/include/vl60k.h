@@ -74,6 +74,10 @@ private:
     /// Подключение рукавов магистрали тормозных цилиндров к импульсной магистрали
     bool bc_hose_to_impulse_line;
 
+    /// Имя модуля сцепного устройства
+    QString coupling_module_name;
+    /// Имя конфига сцепного устройства
+    QString coupling_config_name;
     /// Имя модуля поездного крана
     QString brake_crane_module_name;
     /// Имя конфига поездного крана
@@ -89,6 +93,16 @@ private:
 
     /// Регистратор, для записи параметров
     Registrator *reg;
+
+    /// Сцепка спереди
+    Coupling *coupling_fwd;
+    /// Сцепка сзади
+    Coupling *coupling_bwd;
+
+    /// Расцепной рычаг спереди
+    OperatingRod *oper_rod_fwd;
+    /// Расцепной рычаг сзади
+    OperatingRod *oper_rod_bwd;
 
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler;
@@ -280,6 +294,9 @@ private:
     /// Общая инициализация локомотива
     void initialization();
 
+    /// Инициализация сцепных устройств
+    void initCouplings(QString modules_dir);
+
     /// Инициализация токоприемников
     void initPantographs();
 
@@ -307,9 +324,11 @@ private:
 
     void initTapSounds();
 
-
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
+
+    /// Моделирование сцепных устройств
+    void stepCouplings(double t, double dt);
 
     void stepPantographsControl(double t, double dt);
 

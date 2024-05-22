@@ -15,6 +15,8 @@ void VL60k::initialization()
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
 
+    initCouplings(modules_dir);
+
     initPantographs();
 
     initHighVoltageScheme();

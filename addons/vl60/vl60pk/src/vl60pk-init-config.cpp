@@ -75,6 +75,8 @@ void VL60pk::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getDouble(secName, "ReductorCoeff", ip);
+        cfg.getString(secName, "CouplingModule", coupling_module_name);
+        cfg.getString(secName, "CouplingConfig", coupling_config_name);
         cfg.getString(secName, "BrakeCraneModule", brake_crane_module_name);
         cfg.getString(secName, "BrakeCraneConfig", brake_crane_config_name);
         cfg.getString(secName, "LocoCraneModule", loco_crane_module_name);

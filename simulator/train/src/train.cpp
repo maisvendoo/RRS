@@ -65,6 +65,7 @@ bool Train::init(const init_data_t &init_data)
 
     Journal::instance()->info("Train config from file: " + full_config_path);
 
+    Journal::instance()->info("==== Sound Manager ====");
     try
     {
         soundMan = new SoundManager();
@@ -83,6 +84,8 @@ bool Train::init(const init_data_t &init_data)
         Journal::instance()->error("Train is't loaded");
         return false;
     }
+
+    Journal::instance()->info("==== State vector ====");
 
     // State vector initialization
     y.resize(ode_order);
@@ -107,7 +110,7 @@ bool Train::init(const init_data_t &init_data)
     }
 
     // Set initial conditions
-    Journal::instance()->info("Setting up of initial conditions");
+    Journal::instance()->info("==== Initial conditions ====");
     setInitConditions(init_data);
 
     initVehiclesBrakes();
@@ -325,7 +328,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
     CfgReader cfg;
     FileSystem &fs = FileSystem::getInstance();
 
-    Journal::instance()->info("Train loading is started...");
+    Journal::instance()->info("==== Train loading ====");
 
     if (cfg.load(cfg_path))
     {
@@ -364,6 +367,8 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
         while (!vehicle_node.isNull())
         {
+            Journal::instance()->info("==== Vehicle's group loading ====");
+
             QString module_name = "";
             if (!cfg.getString(vehicle_node, "Module", module_name))
             {
@@ -411,6 +416,8 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
             for (int i = 0; i < n_vehicles; i++)
             {
+                Journal::instance()->info("==== Vehicle loading ====");
+
                 Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
                                                fs.separator() +
                                                relModulePath);
@@ -494,6 +501,8 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 //------------------------------------------------------------------------------
 bool Train::loadJoints()
 {
+    Journal::instance()->info("==== Joints loading ====");
+
     joints_list.clear();
 
     size_t num_joints = vehicles.size() - 1;
@@ -621,6 +630,7 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
     QString name_fwd = con_fwd->getName();
     QString name_bwd = con_bwd->getName();
     QString joint_cfg_name = QString("joint-" + name_fwd + "-" + name_bwd);
+//    Journal::instance()->info(QString("Try to load config: " + joint_cfg_name));
 
     // Default directory of joint's configuration files
     QString joint_cfg_path = QString(fs.getDevicesDir().c_str()) +

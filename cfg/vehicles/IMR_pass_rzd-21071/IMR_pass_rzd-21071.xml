@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Vehicle>
+	<Vehicle>
 
-        <EmptyMass>51000</EmptyMass>
-        <PayloadMass>4500</PayloadMass>
-        <Length>25.0</Length>
-        <WheelDiameter>0.95</WheelDiameter>
-        <MainResist>passcar</MainResist>
-        <NumAxis>4</NumAxis>
-        <DegreesOfFreedom>5</DegreesOfFreedom>
-        <SoundDir>pass</SoundDir>
-        <WheelInertia>100.0</WheelInertia>
+		<EmptyMass>51000</EmptyMass>
+		<PayloadMass>4500</PayloadMass>
+		<Length>25.0</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>passcar</MainResist>
+		<NumAxis>4</NumAxis>
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+		<SoundDir>pass</SoundDir>
+		<WheelInertia>100.0</WheelInertia>
 
-        <ExtModelName>IMR_pass_rzd/Pass_TVZ_62-425_1.osgt</ExtModelName>
-        <AnimationsConfigDir>passcar</AnimationsConfigDir>
+		<ExtModelName>IMR_pass_rzd/Pass_TVZ_62-425_1.osgt</ExtModelName>
+		<AnimationsConfigDir>passcar</AnimationsConfigDir>
 
-        <BrakepipeLeak>3e-6</BrakepipeLeak>
+		<BrakepipeLeak>3e-6</BrakepipeLeak>
 
-        <AirDistModule>vr242</AirDistModule>
-        <AirDistConfig>vr242</AirDistConfig>
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
 
-        <ElectroAirDistModule>evr305</ElectroAirDistModule>
-        <ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+		<AirDistModule>vr242</AirDistModule>
+		<AirDistConfig>vr242</AirDistConfig>
 
-        <SupplyReservoirVolume>0.078</SupplyReservoirVolume>
-        <SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
+		<ElectroAirDistModule>evr305</ElectroAirDistModule>
+		<ElectroAirDistConfig>evr305</ElectroAirDistConfig>
 
-        <BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
+		<SupplyReservoirVolume>0.078</SupplyReservoirVolume>
+		<SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
 
-        <BrakepipeHoseModule>hose369a</BrakepipeHoseModule>
-        <BrakepipeHoseConfig>pneumo-hose-BP369a-passcar</BrakepipeHoseConfig>
+		<BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
 
-        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+		<BrakepipeHoseModule>hose369a</BrakepipeHoseModule>
+		<BrakepipeHoseConfig>pneumo-hose-BP369a-passcar</BrakepipeHoseConfig>
 
-        <GenReductorCoeff>2.96</GenReductorCoeff>
+		<BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
-    </Vehicle>
+		<GenReductorCoeff>2.96</GenReductorCoeff>
+
+	</Vehicle>
 </Config>

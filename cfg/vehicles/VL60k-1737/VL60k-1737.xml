@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Vehicle>
-        <EmptyMass>136000</EmptyMass>
-        <PayloadMass>2000</PayloadMass>
-        <Length>21.0</Length>
-        <WheelDiameter>1.236</WheelDiameter>
-        <MainResist>loco-resist</MainResist>
-        <WheelRailFriction>loco-AC</WheelRailFriction>
-        <NumAxis>6</NumAxis>
-        <DegreesOfFreedom>7</DegreesOfFreedom>
-        <WheelInertia>100.0</WheelInertia>
-        <SoundDir>vl60</SoundDir>
+	<Vehicle>
+		<EmptyMass>136000</EmptyMass>
+		<PayloadMass>2000</PayloadMass>
+		<Length>21.0</Length>
+		<WheelDiameter>1.236</WheelDiameter>
+		<MainResist>loco-resist</MainResist>
+		<WheelRailFriction>loco-AC</WheelRailFriction>
+		<NumAxis>6</NumAxis>
+		<DegreesOfFreedom>7</DegreesOfFreedom>
+		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>vl60</SoundDir>
 
-        <ReductorCoeff>3.83</ReductorCoeff>
+		<ReductorCoeff>3.83</ReductorCoeff>
 
-        <ExtModelName>VL60k-1737/VL60k-1737.osgt</ExtModelName>
-        <ModelShift>0.0 0.0 0.312</ModelShift>
+		<ExtModelName>VL60k-1737/VL60k-1737.osgt</ExtModelName>
+		<ModelShift>0.0 0.0 0.312</ModelShift>
 
-        <CabineModel>VL60k-1737/VL60k-cabview.osgt</CabineModel>
-        <CabineShift>0.0 0.0 0.317</CabineShift>
+		<CabineModel>VL60k-1737/VL60k-cabview.osgt</CabineModel>
+		<CabineShift>0.0 0.0 0.317</CabineShift>
 
-        <BrakeCraneModule>krm395</BrakeCraneModule>
-        <BrakeCraneConfig>krm395</BrakeCraneConfig>
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
 
-        <LocoCraneModule>kvt254</LocoCraneModule>
-        <LocoCraneConfig>kvt254</LocoCraneConfig>
+		<BrakeCraneModule>krm395</BrakeCraneModule>
+		<BrakeCraneConfig>krm395</BrakeCraneConfig>
 
-        <AirDistModule>vr483</AirDistModule>
-        <AirDistConfig>vr483</AirDistConfig>
+		<LocoCraneModule>kvt254</LocoCraneModule>
+		<LocoCraneConfig>kvt254</LocoCraneConfig>
 
-        <DriverPos>0.8 8.4 3.6</DriverPos>
-    </Vehicle>
+		<AirDistModule>vr483</AirDistModule>
+		<AirDistConfig>vr483</AirDistConfig>
+
+		<DriverPos>0.8 8.4 3.6</DriverPos>
+	</Vehicle>
 </Config>

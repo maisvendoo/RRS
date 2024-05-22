@@ -29,7 +29,6 @@
 #include    "feedback-signals.h"
 
 #include    "device-list.h"
-#include    "coupling.h"
 
 #include    "alsn-struct.h"
 
@@ -133,11 +132,7 @@ public:
 
     double getWheelOmega(size_t i);
 
-    bool getDiscreteSignal(size_t i);
-
     float getAnalogSignal(size_t i);
-
-    std::array<bool, MAX_DISCRETE_SIGNALS> getDiscreteSignals();
     std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
 
     device_list_t *getFwdConnectors();
@@ -305,8 +300,6 @@ protected:
     QMap<int, bool> keys;
     QMutex          keys_mutex;
 
-    /// Discrete signals for outpput
-    std::array<bool, MAX_DISCRETE_SIGNALS>  discreteSignal;
     /// Analog signals for output
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
@@ -314,11 +307,6 @@ protected:
     device_list_t forward_connectors;
     /// List of devices - backward connectors
     device_list_t backward_connectors;
-
-    /// Forward coupling
-    Coupling *coupling_fwd;
-    /// Backward coupling
-    Coupling *coupling_bwd;
 
     control_signals_t   control_signals;
 

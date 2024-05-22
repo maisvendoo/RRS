@@ -5,11 +5,11 @@
 //------------------------------------------------------------------------------
 OperatingRod::OperatingRod(int key_code, QObject *parent) : Device(parent)
   , keyCode(key_code)
-  , ref_operating_state(0)
+  , ref_operating_state(1.0)
   , is_fixed_uncoupling(false)
   , coupling_force(0.0)
   , max_operating_force(Physics::ZERO)
-  , motion_time(0.5)
+  , motion_time(0.1)
 {
 
 }
@@ -91,8 +91,8 @@ void OperatingRod::stepKeysControl(double t, double dt)
             // Расцепляющее положение
             ref_operating_state = -1.0;
         else
-            // Положение натянутой цепочки, расцепление невозможно
-            ref_operating_state = 0.0;
+            // Положение натянутой цепочки, но расцепление невозможно
+            ref_operating_state = min(0.0, getY(0));
     else
         // Нормальное положение
         ref_operating_state = 1.0;

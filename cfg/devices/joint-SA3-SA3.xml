@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Joint>
-		<ModuleName>joint-coupling</ModuleName>
+		<ModuleName>joint-coupling-sa3</ModuleName>
 
 		<!-- Начальное состояние сцепки: 0 - расцеплены, 1 - сцеплены -->
 		<initConnectionState>1</initConnectionState>
@@ -15,7 +15,9 @@
 		<!-- Максимальное сжатие поглощающих аппаратов -->
 		<lambda>0.090</lambda>
 		<!-- Упругость конструкций после сжатия поглощающих аппаратов -->
-		<ck>1e9</ck>
+		<ck>2e8</ck>
+		<!-- Коэффициент потерь энергии на пластические деформации конструкций -->
+		<fk>0.6</fk>
 		<!-- Усилие до начала сжатия поглощающего аппарата -->
 		<T0>5e3</T0>
 	</Joint>

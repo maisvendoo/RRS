@@ -10,6 +10,8 @@
 #include    "brake-crane.h"
 #include    "brake-lock.h"
 #include    "brake-mech.h"
+#include    "coupling.h"
+#include    "coupling-operating-rod.h"
 #include    "electro-airdistributor.h"
 #include    "epb-converter.h"
 #include    "epb-2line-control.h"

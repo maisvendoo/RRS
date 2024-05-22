@@ -23,10 +23,5 @@ void FreightCar::stepDebugMsg(double t, double dt)
                 .arg(10.0 * automode->getAirDistBCpressure(), 6, 'f', 2)
                 .arg(100.0 * payload_coeff, 3, 'f', 0);
     }
-
-    DebugMsg += air_dist->getDebugMsg();
-
-    DebugMsg += QString("|AK:%1|").arg(static_cast<int>(anglecock_bp_bwd->isOpened()), 1);
-
     DebugMsg += QString("          ");
 }

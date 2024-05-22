@@ -12,14 +12,15 @@ JointCouplingSA3::JointCouplingSA3() : Joint()
   , f(0.6)
   , c(2.0e7)
   , lambda(0.11)
-  , ck(1.0e9)
+  , fk(0.1)
+  , ck(5.0e8)
   , T0(5000.0)
   , dx_t0(T0/ck)
 {
     devices.resize(NUM_CONNECTORS);
 /*
     reg = new Registrator();
-    reg->setFileName(QString("JointCoupling%1").arg(reinterpret_cast<quint64>(this),0,16));
+    reg->setFileName(QString("JointSA3%1").arg(reinterpret_cast<quint64>(this),0,16));
     reg->init();
     reg->print("   t   ;    ds    ;    dv    ;   xt0    ;   ft0    ;    xc    ;    fc    ;    ff    ;   xck    ;   fck    ;  summ f ");
 */
@@ -115,7 +116,6 @@ void JointCouplingSA3::step(double t, double dt)
     // Смещение сцепок и поглощающих аппаратов в данный момент
     devices[FWD]->setInputSignal(COUPL_INPUT_SHIFT, ds_shift / 2.0);
     devices[BWD]->setInputSignal(COUPL_INPUT_SHIFT, ds_shift / 2.0);
-
 /*
     if ( (ds < -0.011) || (ds > 0.0) )
         reg->print(msg);
@@ -138,16 +138,18 @@ double JointCouplingSA3::calc_force(double ds, double dv)
     x = dead_zone(x, -dx_t0, dx_t0);
 
     // Сжатие поглощающих аппаратов
-    double x_c = cut(x, -lambda, lambda);
+    double x_c = cut(x, -lambda * 2.0, lambda * 2.0);
     // Усилие упругих элементов в поглощающих аппаратах
     double force_c = x_c * c;
     // Сила трения фрикционных элементов в поглощающих аппаратах
     double force_f = Physics::fricForce(abs(x_c) * c * f, dv);
     // Вычитание сжатия поглощающих аппаратов
-    x = dead_zone(x, -lambda, lambda);
+    x = dead_zone(x, -lambda * 2.0, lambda * 2.0);
 
     // Усилие от упругости конструкций
     double force_ck = x * ck;
+    // Потери на пластические деформации конструкций
+    double force_fk = Physics::fricForce(abs(x) * ck * fk, dv);
 /*
     msg += QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10")
                    .arg(ds,10,'f',6)
@@ -161,7 +163,7 @@ double JointCouplingSA3::calc_force(double ds, double dv)
                    .arg(force_ck,10,'f',3)
                    .arg(force_t0 + force_c + force_f + force_ck,10,'f',3);
 */
-    return force_t0 + force_c + force_f + force_ck;
+    return force_t0 + force_c + force_f + force_ck + force_fk;
 }
 
 //------------------------------------------------------------------------------
@@ -175,6 +177,7 @@ void JointCouplingSA3::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "delta", delta);
     cfg.getDouble(secName, "c", c);
     cfg.getDouble(secName, "lambda", lambda);
+    cfg.getDouble(secName, "fk", fk);
     cfg.getDouble(secName, "ck", ck);
     cfg.getDouble(secName, "T0", T0);
     if (ck > Physics::ZERO)

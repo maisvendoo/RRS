@@ -5,6 +5,12 @@
 //
 //------------------------------------------------------------------------------
 FreightCar::FreightCar() : Vehicle ()
+  , coupling_fwd(nullptr)
+  , coupling_bwd(nullptr)
+  , coupling_module_name("sa3")
+  , coupling_config_name("sa3")
+  , oper_rod_fwd(nullptr)
+  , oper_rod_bwd(nullptr)
   , brakepipe(nullptr)
   , bp_leak(0.0)
   , air_dist(nullptr)
@@ -49,6 +55,8 @@ void FreightCar::initialization()
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir(fs.getModulesDir().c_str());
 
+    initCouplings( modules_dir);
+
     initBrakesEquipment(modules_dir);
 
     initEPB(modules_dir);
@@ -62,6 +70,8 @@ void FreightCar::initialization()
 //------------------------------------------------------------------------------
 void FreightCar::step(double t, double dt)
 {
+    stepCouplings(t, dt);
+
     stepBrakesEquipment(t, dt);
 
     stepEPB(t, dt);
@@ -79,60 +89,8 @@ void FreightCar::step(double t, double dt)
 //
 //------------------------------------------------------------------------------
 void FreightCar::keyProcess()
-{/*
-    // Сцепка/Отцепка спереди
-    if (getKeyState(KEY_X))
-    {
-        if (isShift())
-        {
-            if (isControl())
-            {
-                anglecock_bp_fwd->close();
-            }
-            else
-            {
-                hose_bp_fwd->disconnect();
+{
 
-                coupling_fwd->uncouple();
-            }
-        }
-        else
-        {
-            hose_bp_fwd->connect();
-
-            if ( (hose_bp_fwd->isLinked()) || (isControl()) )
-                anglecock_bp_fwd->open();
-
-            coupling_fwd->couple();
-        }
-    }
-
-    // Сцепка/Отцепка сзади
-    if (getKeyState(KEY_X))
-    {
-        if (isShift())
-        {
-            if (isControl())
-            {
-                anglecock_bp_bwd->close();
-            }
-            else
-            {
-                hose_bp_bwd->disconnect();
-
-                coupling_bwd->uncouple();
-            }
-        }
-        else
-        {
-            hose_bp_bwd->connect();
-
-            if ( (hose_bp_bwd->isLinked()) || (isControl()) )
-                anglecock_bp_bwd->open();
-
-            coupling_bwd->couple();
-        }
-    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -147,6 +105,9 @@ void FreightCar::loadConfig(QString cfg_path)
         QString secName = "Vehicle";
 
         cfg.getDouble(secName, "BrakepipeLeak", bp_leak);
+
+        cfg.getString(secName, "CouplingModule", coupling_module_name);
+        cfg.getString(secName, "CouplingConfig", coupling_config_name);
 
         cfg.getString(secName, "AirDistModule", air_dist_module);
         cfg.getString(secName, "AirDistConfig", air_dist_config);

@@ -1,5 +1,5 @@
-#ifndef     VL60_HEADERS_H
-#define     VL60_HEADERS_H
+#ifndef     VL60PK_HEADERS_H
+#define     VL60PK_HEADERS_H
 
 #include    "vehicle-api.h"
 
@@ -13,6 +13,5 @@
 #include    "dc-motor.h"
 #include    "overload-relay.h"
 #include    "sl2m.h"
-#include    "registrator.h"
 
-#endif // VL60_HEADERS_H
+#endif // VL60PK_HEADERS_H

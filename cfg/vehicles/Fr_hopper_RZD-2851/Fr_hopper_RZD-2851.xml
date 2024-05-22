@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Vehicle>
+	<Vehicle>
 
-        <EmptyMass>21300</EmptyMass>
-        <PayloadMass>70000</PayloadMass>
-        <Length>14.5</Length>
-        <WheelDiameter>0.95</WheelDiameter>
-        <MainResist>default</MainResist>
-        <NumAxis>4</NumAxis>
-        <DegreesOfFreedom>5</DegreesOfFreedom>
-        <!-- <SoundDir>freight</SoundDir> -->
-        <WheelInertia>100.0</WheelInertia>
+		<EmptyMass>21300</EmptyMass>
+		<PayloadMass>70000</PayloadMass>
+		<Length>14.5</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>4</NumAxis>
+		<DegreesOfFreedom>5</DegreesOfFreedom>
+		<!-- <SoundDir>freight</SoundDir> -->
+		<WheelInertia>100.0</WheelInertia>
 
-        <ExtModelName>FrWag_hopper_1/Fr_hopper-1.osgt</ExtModelName>
-        <AnimationsConfigDir>freight</AnimationsConfigDir>
+		<ExtModelName>FrWag_hopper_1/Fr_hopper-1.osgt</ExtModelName>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
 
-        <BrakepipeLeak>3e-6</BrakepipeLeak>
+		<BrakepipeLeak>3e-6</BrakepipeLeak>
 
-        <AirDistModule>vr483</AirDistModule>
-        <AirDistConfig>vr483</AirDistConfig>
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
 
-        <!-- <ElectroAirDistModule></ElectroAirDistModule> -->
-        <!-- <ElectroAirDistConfig></ElectroAirDistConfig> -->
+		<AirDistModule>vr483</AirDistModule>
+		<AirDistConfig>vr483</AirDistConfig>
 
-        <SupplyReservoirVolume>0.078</SupplyReservoirVolume>
-        <SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
+		<!-- <ElectroAirDistModule></ElectroAirDistModule> -->
+		<!-- <ElectroAirDistConfig></ElectroAirDistConfig> -->
 
-        <BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
+		<SupplyReservoirVolume>0.078</SupplyReservoirVolume>
+		<SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
 
-        <!-- <BrakepipeHoseModule></BrakepipeHoseModule> -->
-        <BrakepipeHoseConfig>pneumo-hose-BP</BrakepipeHoseConfig>
+		<BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
 
-        <BrakeAutomodeModule>ar265</BrakeAutomodeModule>
-        <BrakeAutomodeConfig>ar265</BrakeAutomodeConfig>
+		<!-- <BrakepipeHoseModule></BrakepipeHoseModule> -->
+		<BrakepipeHoseConfig>pneumo-hose-BP</BrakepipeHoseConfig>
 
-        <BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+		<BrakeAutomodeModule>ar265</BrakeAutomodeModule>
+		<BrakeAutomodeConfig>ar265</BrakeAutomodeConfig>
 
-    </Vehicle>
+		<BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+
+	</Vehicle>
 </Config>
