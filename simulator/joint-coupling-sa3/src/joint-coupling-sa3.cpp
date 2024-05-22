@@ -56,8 +56,9 @@ void JointCouplingSA3::step(double t, double dt)
         is_connected = true;
 
     // Управление расцеплением
-    if (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == -1.0)
-        || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == -1.0) )
+    if ( (- nf(devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE))
+          - nf(devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE))
+          + 1.0 ) <= Physics::ZERO )
     {
         is_connected = false;
     }
