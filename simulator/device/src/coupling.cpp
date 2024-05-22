@@ -48,6 +48,17 @@ void Coupling::uncouple()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Coupling::setCouplingOperatingState(double state)
+{
+    if (state < -Physics::ZERO)
+        uncouple();
+    if (state > Physics::ZERO)
+        couple();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Coupling::isCoupled() const
 {
     return is_linked && (input_signals[COUPL_INPUT_IS_CONNECTED] == 1.0);
@@ -72,12 +83,36 @@ void Coupling::setVelocity(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Coupling::getForce() const
+double Coupling::getCurrentForce() const
 {
     if (is_linked)
         return input_signals[COUPL_INPUT_FORCE];
 
     // Если нет соседней сцепки, нет тягового усилия
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Coupling::getCurrentDelta() const
+{
+    if (is_linked)
+        return input_signals[COUPL_INPUT_DELTA];
+
+    // Если нет соседней сцепки, зазор не важен
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Coupling::getCurrentShift() const
+{
+    if (is_linked)
+        return input_signals[COUPL_INPUT_SHIFT];
+
+    // Если нет соседней сцепки, нет смещения
     return 0.0;
 }
 

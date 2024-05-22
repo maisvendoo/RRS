@@ -607,9 +607,9 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
     integrationPreStep(Y, t);
 
     coupling_fwd->step(t, dt);
-    F_fwd = coupling_fwd->getForce();
+    F_fwd = coupling_fwd->getCurrentForce();
     coupling_bwd->step(t, dt);
-    F_bwd = coupling_bwd->getForce();
+    F_bwd = coupling_bwd->getCurrentForce();
 
     step(t, dt);
     integrationPostStep(Y, t);

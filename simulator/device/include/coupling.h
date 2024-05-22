@@ -24,17 +24,26 @@ public:
     /// Разъединить сцепки
     virtual void uncouple();
 
+    /// Управление сцепкой, по умолчанию: > 0 - сцепить, < 0 - расцепить
+    virtual void setCouplingOperatingState(double state);
+
     /// Состояние сцепки
     bool isCoupled() const;
 
-    /// Задать координату положения сцепки на треке пути
+    /// Задать координату положения сцепки на треке пути, м
     void setCoord(double value);
 
-    /// Задать скорость движения сцепки на треке пути
+    /// Задать скорость движения сцепки на треке пути, м/с
     void setVelocity(double value);
 
-    /// Получить тяговое усилие на сцепке
-    virtual double getForce() const;
+    /// Получить тяговое усилие на сцепке в данный момент, Н
+    virtual double getCurrentForce() const;
+
+    /// Получить зазор в сцепках в данный момент, м
+    virtual double getCurrentDelta() const;
+
+    /// Получить смещение сцепки и поглощающего аппарата в данный момент, м
+    virtual double getCurrentShift() const;
 
     virtual void step(double t, double dt);
 
@@ -54,7 +63,7 @@ private:
 
 /*!
  * \typedef
- * \brief getPneumoHose() signature
+ * \brief getCoupling() signature
  */
 //------------------------------------------------------------------------------
 //
@@ -69,7 +78,7 @@ typedef Coupling* (*GetCoupling)();
 //
 //------------------------------------------------------------------------------
 #define GET_COUPLING(ClassName) \
-    extern "C" Q_DECL_EXPORT PneumoHose *getCoupling() \
+    extern "C" Q_DECL_EXPORT Coupling *getCoupling() \
     {\
         return new (ClassName)(); \
     }
