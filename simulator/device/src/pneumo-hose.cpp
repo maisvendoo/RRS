@@ -72,6 +72,30 @@ void PneumoHose::setFlowCoeff(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoHose::setLength(double value)
+{
+    output_signals[HOSE_OUTPUT_LENGTH] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setShiftSide(double value)
+{
+    output_signals[HOSE_OUTPUT_SIDE] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setCoord(double value)
+{
+    output_signals[HOSE_OUTPUT_COORD] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double PneumoHose::getFlow() const
 {
     if (is_linked)
@@ -80,6 +104,28 @@ double PneumoHose::getFlow() const
     // Если нет соседнего рукава, то рукав открыт в атмосферу
     return -( output_signals[HOSE_OUTPUT_FLOW_COEFF]
             * output_signals[HOSE_OUTPUT_PIPE_PRESSURE] );
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoHose::getSideAngle() const
+{
+    if (isConnected())
+        return input_signals[HOSE_INPUT_SIDE_ANGLE];
+
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoHose::getDownAngle() const
+{
+    if (isConnected())
+        return input_signals[HOSE_INPUT_DOWN_ANGLE];
+
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -126,6 +172,10 @@ void PneumoHose::load_config(CfgReader &cfg)
     double tmp = 1.0;
     cfg.getDouble(secName, "FlowCoefficient", tmp);
     output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
+
+    tmp = 0.71;
+    cfg.getDouble(secName, "Length", tmp);
+    output_signals[HOSE_OUTPUT_LENGTH] = tmp;
 }
 
 //------------------------------------------------------------------------------

@@ -22,7 +22,8 @@ CouplingSA3::~CouplingSA3()
 //------------------------------------------------------------------------------
 void CouplingSA3::setCouplingOperatingState(double state)
 {
-    output_signals[COUPL_OUTPUT_REF_STATE] = state;
+    // У са-3 только отрицательный сигнал, на расцепление
+    output_signals[COUPL_OUTPUT_REF_STATE] = min(0.0, state);
     if (state == -1.0)
         // Срабатывание замкодержателя на удержание расцепленного состояния
         is_lockkeeper_working = true;

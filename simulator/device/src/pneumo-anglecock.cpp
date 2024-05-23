@@ -83,6 +83,22 @@ void PneumoAngleCock::setHoseFlow(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoAngleCock::setShiftSide(double value)
+{
+    shift_side = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoAngleCock::setShiftCoord(double value)
+{
+    shift_coord = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double PneumoAngleCock::getFlowCoeff() const
 {
     if (is_opened)
@@ -108,6 +124,22 @@ double PneumoAngleCock::getPressureToHose() const
     if (is_opened)
         return p;
     return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoAngleCock::getShiftSide() const
+{
+    return shift_side;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoAngleCock::getShiftCoord() const
+{
+    return shift_coord;
 }
 
 //------------------------------------------------------------------------------
@@ -173,4 +205,8 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
 
     if (k_pipe > k_max_by_pipe_volume)
         k_pipe = k_max_by_pipe_volume;
+
+    cfg.getDouble(secName, "ShiftSide", shift_side);
+    cfg.getDouble(secName, "ShiftCoord", shift_coord);
+
 }

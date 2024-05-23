@@ -33,8 +33,23 @@ public:
     /// Задать коэффициент перетока через рукав
     void setFlowCoeff(double value);
 
+    /// Задать длину рукава, м
+    void setLength(double value);
+
+    /// Задать смещение точки крепления рукава в сторону, м
+    void setShiftSide(double value);
+
+    /// Задать координату точки крепления руква на треке пути, м
+    void setCoord(double value);
+
     /// Получить поток через рукав
     double getFlow() const;
+
+    /// Получить угол отклонения рукава в сторону соседнего, радиан
+    double getSideAngle() const;
+
+    /// Получить угол свешивания рукава вниз с учётом натяжения от соседнего, радиан
+    double getDownAngle() const;
 
     virtual void step(double t, double dt);
 

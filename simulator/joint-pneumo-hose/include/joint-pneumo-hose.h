@@ -33,6 +33,12 @@ private:
     /// Состояние соединения рукавов
     bool is_connected;
 
+    /// Расчёт соединения рукавов
+    void stepConnectionCheck();
+
+    /// Расчёт потоков через рукава
+    void stepFlowCalc();
+
     /// Загрузка параметров из конфига
     virtual void load_config(CfgReader &cfg);
 };

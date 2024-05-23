@@ -38,14 +38,26 @@ public:
     /// Задать поток из рукава
     void setHoseFlow(double value);
 
-    /// Коэффициент перетока через кран
+    /// Задать смещение точки крепления рукава от продольной оси (<0 - влево, >0 - вправо)
+    void setShiftSide(double value);
+
+    /// Задать смещение точки крепления рукава по продольной оси от оси автосцепки
+    void setShiftCoord(double value);
+
+    /// Получить коэффициент перетока через кран
     double getFlowCoeff() const;
 
-    /// Поток в магистраль
+    /// Получить поток в магистраль
     double getFlowToPipe() const;
 
-    /// Давление в рукаве
+    /// Получить давление в рукаве
     double getPressureToHose() const;
+
+    /// Получить смещение точки крепления рукава от продольной оси (<0 - влево, >0 - вправо)
+    double getShiftSide() const;
+
+    /// Получить смещение точки крепления рукава по продольной оси от оси автосцепки
+    double getShiftCoord() const;
 
 protected:
 
@@ -76,6 +88,12 @@ protected:
 
     /// Коэффициент перетока из рукава в атмосферу при закрытом кране
     double k_atm;
+
+    /// Смещение точки крепления рукава от продольной оси (<0 - влево, >0 - вправо)
+    double shift_side;
+
+    /// Смещение точки крепления рукава по продольной оси от оси автосцепки
+    double shift_coord;
 
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

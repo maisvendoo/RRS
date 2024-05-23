@@ -36,6 +36,12 @@ private:
     /// Количество соединений линий ЭПТ
     size_t epb_connected_num;
 
+    /// Расчёт соединения рукавов
+    void stepConnectionCheck();
+
+    /// Расчёт потоков через рукава и соединений сигналов ЭПТ
+    void stepFlowEPBCalc();
+
     /// Загрузка параметров из конфига
     virtual void load_config(CfgReader &cfg);
 };

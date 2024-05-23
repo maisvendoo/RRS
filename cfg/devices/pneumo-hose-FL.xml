@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Device>
-        <Name>FL</Name>
-        <Order>0</Order>
-    </Device>
+	<Device>
+		<Name>FL</Name>
+		<Order>0</Order>
+
+		<!-- Длина рукава -->
+		<Length>0.71</Length>
+	</Device>
 </Config>

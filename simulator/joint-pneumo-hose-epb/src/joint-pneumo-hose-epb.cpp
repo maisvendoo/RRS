@@ -28,6 +28,15 @@ void JointPneumoHoseEPB::step(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
+    stepConnectionCheck();
+    stepFlowEPBCalc();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void JointPneumoHoseEPB::stepConnectionCheck()
+{
     // Управление соединением рукавов
     if (   (devices[FWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE) == 1.0)
         || (devices[BWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE) == 1.0) )
@@ -42,6 +51,50 @@ void JointPneumoHoseEPB::step(double t, double dt)
         is_connected = false;
     }
 
+    // Расчёт геометрии рукавов
+    double length_fwd = devices[FWD]->getOutputSignal(HOSE_OUTPUT_LENGTH);
+    double length_bwd = devices[BWD]->getOutputSignal(HOSE_OUTPUT_LENGTH);
+
+    // Точками крепления рукавов и расстояния в треугольние между ними
+    double coord_fwd = devices[FWD]->getOutputSignal(HOSE_OUTPUT_COORD);
+    double coord_bwd = devices[BWD]->getOutputSignal(HOSE_OUTPUT_COORD);
+    double coord_delta = max(0.001, coord_fwd - coord_bwd);
+    double side_shift_fwd = devices[FWD]->getOutputSignal(HOSE_OUTPUT_SIDE);
+    double side_shift_bwd = devices[BWD]->getOutputSignal(HOSE_OUTPUT_SIDE);
+    double side_shift = side_shift_fwd + side_shift_bwd;
+
+    // Расстояние между точками крепления рукавов по теореме Пифагора
+    double length_quad = coord_delta * coord_delta + side_shift * side_shift;
+    double length = sqrt(length_quad);
+
+    // Неравенство треугольника
+    if ( (length_fwd + length_bwd - length) < Physics::ZERO )
+    {
+        // САМОРАСЦЕПЛЕНИЕ ОТКЛЮЧЕНО ПОКА НЕ НАСТРОЕН ВВОД СИГНАЛОВ
+        //is_connected = false;
+        return;
+    }
+
+    // Угол отклонения рукава в сторону соседнего
+    double angle = acos( (length_quad + coord_delta * coord_delta - side_shift * side_shift)
+                        / (2.0 * length * coord_delta) );
+    devices[FWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, sign(side_shift) * angle);
+    devices[BWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, sign(side_shift) * angle);
+
+    // Угол свешивания рукава вниз
+    angle = acos( (length_quad + length_fwd * length_fwd - length_bwd * length_bwd)
+                 / (2.0 * length * length_fwd) );
+    devices[FWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, angle);
+    angle = acos( (length_quad + length_bwd * length_bwd - length_fwd * length_fwd)
+                 / (2.0 * length * length_bwd) );
+    devices[BWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, angle);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void JointPneumoHoseEPB::stepFlowEPBCalc()
+{
     // Расчёт потоков через рукава
     double p_fwd = devices[FWD]->getOutputSignal(HOSE_OUTPUT_PIPE_PRESSURE);
     double p_bwd = devices[BWD]->getOutputSignal(HOSE_OUTPUT_PIPE_PRESSURE);

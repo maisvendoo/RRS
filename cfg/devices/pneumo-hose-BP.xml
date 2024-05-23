@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Device>
-        <Name>BP</Name>
-        <Order>0</Order>
-        <LinesNum>0</LinesNum>
-    </Device>
+	<Device>
+		<Name>BP</Name>
+		<Order>0</Order>
+		<LinesNum>0</LinesNum>
+
+		<!-- Длина рукава -->
+		<Length>0.71</Length>
+	</Device>
 </Config>
