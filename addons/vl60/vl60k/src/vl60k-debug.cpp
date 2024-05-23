@@ -29,5 +29,9 @@ void VL60k::debugPrint(double t, double dt)
     DebugMsg += QString("F%1|B%2|")
             .arg(oper_rod_fwd->getOperatingState(), 5, 'f', 2)
             .arg(oper_rod_bwd->getOperatingState(), 5, 'f', 2);
+    DebugMsg += QString("hoseB %1|angle:down%2°,side%3°")
+                    .arg(hose_bp_bwd->isConnected())
+                    .arg(hose_bp_bwd->getDownAngle()*180.0/Physics::PI, 7, 'f', 2)
+                    .arg(hose_bp_bwd->getSideAngle()*180.0/Physics::PI, 7, 'f', 2);
     DebugMsg += QString("          ");
 }

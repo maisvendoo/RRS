@@ -67,8 +67,12 @@ void PassCar::stepBrakesEquipment(double t, double dt)
     // Рукава тормозной магистрали
     hose_bp_fwd->setPressure(anglecock_bp_fwd->getPressureToHose());
     hose_bp_fwd->setFlowCoeff(anglecock_bp_fwd->getFlowCoeff());
+    hose_bp_fwd->setCoord(railway_coord + dir * orient * (length / 2.0 - anglecock_bp_fwd->getShiftCoord()));
+    hose_bp_fwd->setShiftSide(anglecock_bp_fwd->getShiftSide());
     hose_bp_fwd->step(t, dt);
     hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
     hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
+    hose_bp_bwd->setCoord(railway_coord - dir * orient * (length / 2.0 - anglecock_bp_bwd->getShiftCoord()));
+    hose_bp_bwd->setShiftSide(anglecock_bp_bwd->getShiftSide());
     hose_bp_bwd->step(t, dt);
 }

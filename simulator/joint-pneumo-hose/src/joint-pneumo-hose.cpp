@@ -51,6 +51,15 @@ void JointPneumoHose::stepConnectionCheck()
         is_connected = false;
     }
 
+    if (!is_connected)
+    {
+        devices[FWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[FWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
+        return;
+    }
+
     // Расчёт геометрии рукавов
     double length_fwd = devices[FWD]->getOutputSignal(HOSE_OUTPUT_LENGTH);
     double length_bwd = devices[BWD]->getOutputSignal(HOSE_OUTPUT_LENGTH);
@@ -70,20 +79,23 @@ void JointPneumoHose::stepConnectionCheck()
     // Неравенство треугольника
     if ( (length_fwd + length_bwd - length) < Physics::ZERO )
     {
-        // САМОРАСЦЕПЛЕНИЕ ОТКЛЮЧЕНО ПОКА НЕ НАСТРОЕН ВВОД СИГНАЛОВ
-        //is_connected = false;
+        is_connected = false;
+        devices[FWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[FWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
         return;
     }
 
     // Угол отклонения рукава в сторону соседнего
     double angle = acos( (length_quad + coord_delta * coord_delta - side_shift * side_shift)
-                         / (2.0 * length * coord_delta) );
+                        / (2.0 * length * coord_delta) );
     devices[FWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, sign(side_shift) * angle);
     devices[BWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, sign(side_shift) * angle);
 
     // Угол свешивания рукава вниз
     angle = acos( (length_quad + length_fwd * length_fwd - length_bwd * length_bwd)
-                        / (2.0 * length * length_fwd) );
+                 / (2.0 * length * length_fwd) );
     devices[FWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, angle);
     angle = acos( (length_quad + length_bwd * length_bwd - length_fwd * length_fwd)
                  / (2.0 * length * length_bwd) );

@@ -175,7 +175,8 @@ void PneumoHose::load_config(CfgReader &cfg)
 
     tmp = 0.71;
     cfg.getDouble(secName, "Length", tmp);
-    output_signals[HOSE_OUTPUT_LENGTH] = tmp;
+    if (tmp > Physics::ZERO)
+        output_signals[HOSE_OUTPUT_LENGTH] = tmp;
 }
 
 //------------------------------------------------------------------------------

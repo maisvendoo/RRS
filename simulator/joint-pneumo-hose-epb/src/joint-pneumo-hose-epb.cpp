@@ -51,6 +51,15 @@ void JointPneumoHoseEPB::stepConnectionCheck()
         is_connected = false;
     }
 
+    if (!is_connected)
+    {
+        devices[FWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[FWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
+        return;
+    }
+
     // Расчёт геометрии рукавов
     double length_fwd = devices[FWD]->getOutputSignal(HOSE_OUTPUT_LENGTH);
     double length_bwd = devices[BWD]->getOutputSignal(HOSE_OUTPUT_LENGTH);
@@ -70,8 +79,11 @@ void JointPneumoHoseEPB::stepConnectionCheck()
     // Неравенство треугольника
     if ( (length_fwd + length_bwd - length) < Physics::ZERO )
     {
-        // САМОРАСЦЕПЛЕНИЕ ОТКЛЮЧЕНО ПОКА НЕ НАСТРОЕН ВВОД СИГНАЛОВ
-        //is_connected = false;
+        is_connected = false;
+        devices[FWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[FWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_SIDE_ANGLE, 0.0);
+        devices[BWD]->setInputSignal(HOSE_INPUT_DOWN_ANGLE, 0.0);
         return;
     }
 

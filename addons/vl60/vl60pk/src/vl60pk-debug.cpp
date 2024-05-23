@@ -27,7 +27,11 @@ void VL60pk::debugPrint(double t, double dt)
             .arg(main_controller->isLongMotionPos() ? "*" : " ")
             .arg(motor[TED1]->getIa(), 6, 'f', 1);
     DebugMsg += QString("F%1|B%2|")
-            .arg(oper_rod_fwd->getOperatingState(), 5, 'f', 2)
-            .arg(oper_rod_bwd->getOperatingState(), 5, 'f', 2);
+                    .arg(oper_rod_fwd->getOperatingState(), 5, 'f', 2)
+                    .arg(oper_rod_bwd->getOperatingState(), 5, 'f', 2);
+    DebugMsg += QString("hoseB %1|angle:down%2°,side%3°")
+                    .arg(hose_bp_bwd->isConnected())
+                    .arg(hose_bp_bwd->getDownAngle()*180.0/Physics::PI, 7, 'f', 2)
+                    .arg(hose_bp_bwd->getSideAngle()*180.0/Physics::PI, 7, 'f', 2);
     DebugMsg += QString("          ");
 }
