@@ -72,11 +72,12 @@ void FreeJoy::process()
 {
     freejoy.update();
 
-    pos_axisX = freejoy.getAxisPosition(joy_id, sf::Joystick::X);
-    pos_axisY = freejoy.getAxisPosition(joy_id, sf::Joystick::Y);
+    pos_axisX = static_cast<int>(freejoy.getAxisPosition(joy_id, sf::Joystick::X));
+    pos_axisY = static_cast<int>(freejoy.getAxisPosition(joy_id, sf::Joystick::Y));
     button_pressed = freejoy.isButtonPressed(joy_id, 18);
 
     control_signals.analogSignal[FB_RBS].setValue(static_cast<float>(button_pressed));
+    control_signals.analogSignal[FB_LOCO_CRANE].setValue((77.0 - pos_axisX ) / 164.0);
 
     emit sendControlSignals(control_signals);
 

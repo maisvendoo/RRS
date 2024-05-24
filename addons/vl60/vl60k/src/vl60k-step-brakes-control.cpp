@@ -25,7 +25,16 @@ void VL60k::stepBrakesControl(double t, double dt)
     loco_crane->setFLpressure(brake_lock->getCraneFLpressure());
     loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
     loco_crane->setILpressure(impulse_line->getPressure());
-    loco_crane->setControl(keys);
+
+    if (static_cast<bool>(control_signals.analogSignal[FB_LOCO_CRANE].cur_value))
+    {
+        loco_crane->setHandlePosition(control_signals.analogSignal[FB_LOCO_CRANE].cur_value);
+    }
+    else
+    {
+        loco_crane->setControl(keys);
+    }
+
     loco_crane->step(t, dt);
 
     // Импульсная магистраль
