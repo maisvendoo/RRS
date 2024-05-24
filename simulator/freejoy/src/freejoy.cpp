@@ -52,6 +52,16 @@ bool FreeJoy::init(QString cfg_path)
 
     // Тут будем читать конфиг
 
+
+    // Устанавливаем бит готовности к приему сигналов с пульта
+    control_signals.analogSignal[FB_READY].setValue(1.0f);
+
+    control_signals.analogSignal[FB_READY].is_active = true;
+    control_signals.analogSignal[FB_RBS].is_active = true;
+    control_signals.analogSignal[FB_READY].is_active = true;
+    control_signals.analogSignal[FB_BRAKE_CRANE].is_active = true;
+    control_signals.analogSignal[FB_LOCO_CRANE].is_active = true;
+
     return true;
 }
 
@@ -65,6 +75,10 @@ void FreeJoy::process()
     pos_axisX = freejoy.getAxisPosition(joy_id, sf::Joystick::X);
     pos_axisY = freejoy.getAxisPosition(joy_id, sf::Joystick::Y);
     button_pressed = freejoy.isButtonPressed(joy_id, 18);
+
+    control_signals.analogSignal[FB_RBS].setValue(static_cast<float>(button_pressed));
+
+    emit sendControlSignals(control_signals);
 
     int a = 0;
 }

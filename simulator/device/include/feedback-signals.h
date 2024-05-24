@@ -28,6 +28,17 @@ struct feedback_signals_t
     }
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+enum
+{
+    FB_READY = 0,
+    FB_RBS = 1,
+    FB_BRAKE_CRANE = 2,
+    FB_LOCO_CRANE = 3
+};
+
 Q_DECLARE_METATYPE(feedback_signals_t)
 
 #endif // FEEDBACK_SIGNALS_H
