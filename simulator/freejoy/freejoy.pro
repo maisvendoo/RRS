@@ -15,6 +15,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lphysics_d
     LIBS += -L../../../lib -ldevice_d
     LIBS += -L../../../lib -lfilesystem_d
+    LIBS += -L../../../lib -lJournal_d
 
 } else {
 
@@ -22,6 +23,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lphysics
     LIBS += -L../../../lib -ldevice
     LIBS += -L../../../lib -lfilesystem
+    LIBS += -L../../../lib -lJournal
 }
 
 LIBS += -L$$(SFML_ROOT)/lib -lsfml-window-s
@@ -38,6 +40,7 @@ INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += $$(SFML_ROOT)/include/
 
 HEADERS += $$files(./include/*.h)
