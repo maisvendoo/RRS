@@ -11,9 +11,11 @@ FreeJoy::FreeJoy(QObject *parent) : VirtualInterfaceDevice(parent)
   , joy_id(-1)
   , pos_axisX(0.0)
   , pos_axisY(0.0)
-  , button_pressed(false)
+  , RBS_button_pressed(false)
   , axis_x_min(0)
   , axis_x_max(1)
+  , RBS_button_id(18)
+  , Release_button_id(16)
 {
 
 }
@@ -78,9 +80,10 @@ void FreeJoy::process()
 
     pos_axisX = static_cast<int>(freejoy.getAxisPosition(joy_id, sf::Joystick::X));
     pos_axisY = static_cast<int>(freejoy.getAxisPosition(joy_id, sf::Joystick::Y));
-    button_pressed = freejoy.isButtonPressed(joy_id, 18);
+    RBS_button_pressed = freejoy.isButtonPressed(joy_id, RBS_button_id);
+    release_button_pressed = freejoy.isButtonPressed(joy_id, Release_button_id);
 
-    control_signals.analogSignal[FB_RBS].setValue(static_cast<float>(button_pressed));
+    control_signals.analogSignal[FB_RBS].setValue(static_cast<float>(RBS_button_pressed));
     control_signals.analogSignal[FB_LOCO_CRANE].setValue( (pos_axisX - axis_x_min) / (axis_x_max - axis_x_min));
 
     for (size_t i = 0; i < brake_crane_pos.size(); ++i)
@@ -92,6 +95,8 @@ void FreeJoy::process()
             break;
         }
     }
+
+    control_signals.analogSignal[FB_RELEASE_VALVE].setValue(static_cast<float>(release_button_pressed));
 
     emit sendControlSignals(control_signals);    
 }

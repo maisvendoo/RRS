@@ -42,7 +42,7 @@ LocoCrane254::~LocoCrane254()
 //------------------------------------------------------------------------------
 double LocoCrane254::getHandlePosition() const
 {
-    return pos;
+    return cut(pos, min_pos, max_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ double LocoCrane254::getHandlePosition() const
 //------------------------------------------------------------------------------
 double LocoCrane254::getHandleShift() const
 {
-    return pos;
+    return cut(pos, 0.0, max_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -222,7 +222,7 @@ void LocoCrane254::stepKeysControl(double t, double dt)
             dir = 0;
 
         // Возврат из отпускного положения
-        if (pos < 0.0)
+        if ( (pos < 0.0) && (!static_cast<bool>(is_release)) )
            pos = 0.0;
     }
 

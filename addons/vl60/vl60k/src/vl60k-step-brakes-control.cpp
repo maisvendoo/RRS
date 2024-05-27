@@ -40,7 +40,20 @@ void VL60k::stepBrakesControl(double t, double dt)
 
     if (static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value))
     {
-        loco_crane->setHandlePosition(control_signals.analogSignal[FB_LOCO_CRANE].cur_value);
+        double pos = 0.0;
+
+        if (static_cast<bool>(control_signals.analogSignal[FB_RELEASE_VALVE].cur_value))
+        {
+            loco_crane->release(true);
+            pos = -1.0;
+        }
+        else
+        {
+            loco_crane->release(false);
+            pos = control_signals.analogSignal[FB_LOCO_CRANE].cur_value;
+        }
+
+        loco_crane->setHandlePosition(pos);
     }
     else
     {

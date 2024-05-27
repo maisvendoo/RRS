@@ -36,7 +36,8 @@ enum
     FB_READY = 0,
     FB_RBS = 1,
     FB_BRAKE_CRANE = 2,
-    FB_LOCO_CRANE = 3
+    FB_LOCO_CRANE = 3,
+    FB_RELEASE_VALVE = 4
 };
 
 Q_DECLARE_METATYPE(feedback_signals_t)

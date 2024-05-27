@@ -31,11 +31,17 @@ private:
 
     double pos_axisY;
 
-    bool button_pressed;
+    bool RBS_button_pressed;
+
+    bool release_button_pressed;
 
     double axis_x_min;
 
     double axis_x_max;
+
+    int RBS_button_id;
+
+    int Release_button_id;
 
     enum
     {
