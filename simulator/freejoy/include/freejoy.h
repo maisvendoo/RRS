@@ -4,6 +4,7 @@
 #define     SFML_STATIC
 
 #include    "virtual-interface-device.h"
+#include    "brake-crane-pos.h"
 
 #include    <SFML/Window/Joystick.hpp>
 
@@ -32,7 +33,20 @@ private:
 
     bool button_pressed;
 
+    double axis_x_min;
+
+    double axis_x_max;
+
+    enum
+    {
+        BRAKE_CRANE_POS_NUM = 7
+    };
+
+    std::array<brake_crane_pos_t, BRAKE_CRANE_POS_NUM> brake_crane_pos;
+
     sf::Joystick freejoy;
+
+    bool load_config(QString path);
 };
 
 #endif

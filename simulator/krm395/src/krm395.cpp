@@ -73,6 +73,8 @@ void BrakeCrane395::setHandlePosition(int &position)
 {
     position = cut(position, min_pos, max_pos);
 
+    handle_pos = position;
+
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[static_cast<size_t>(position)] = 1.0;
 }

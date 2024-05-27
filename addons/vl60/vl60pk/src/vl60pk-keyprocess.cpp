@@ -143,10 +143,24 @@ void VL60pk::keyProcess()
         rb[RB_1].reset();
 
     // Нажатие РБС
-    if (getKeyState(KEY_M))
-        rb[RBS].set();
+    bool is_cp_ready = static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value);
+
+    bool is_cp_RBS = static_cast<bool>(control_signals.analogSignal[FB_RBS].cur_value);
+
+    if (!is_cp_ready)
+    {
+        if (getKeyState(KEY_M))
+            rb[RBS].set();
+        else
+            rb[RBS].reset();
+    }
     else
-        rb[RBS].reset();
+    {
+        if (is_cp_RBS)
+            rb[RBS].set();
+        else
+            rb[RBS].reset();
+    }
 
     // Нажатие РБП
     if (getKeyState(KEY_Q))

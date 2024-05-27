@@ -1,5 +1,8 @@
 #include    <freejoy.h>
 #include    <Journal.h>
+#include    <CfgReader.h>
+
+#include    <QDir>
 
 //------------------------------------------------------------------------------
 //
@@ -8,6 +11,9 @@ FreeJoy::FreeJoy(QObject *parent) : VirtualInterfaceDevice(parent)
   , joy_id(-1)
   , pos_axisX(0.0)
   , pos_axisY(0.0)
+  , button_pressed(false)
+  , axis_x_min(0)
+  , axis_x_max(1)
 {
 
 }
@@ -51,16 +57,14 @@ bool FreeJoy::init(QString cfg_path)
     }
 
     // Тут будем читать конфиг
-
+    if (!load_config(cfg_path + QDir::separator() + "freejoy.xml"))
+    {
+        Journal::instance()->error("FreeJoy config not found");
+        return false;
+    }
 
     // Устанавливаем бит готовности к приему сигналов с пульта
-    control_signals.analogSignal[FB_READY].setValue(1.0f);
-
-    control_signals.analogSignal[FB_READY].is_active = true;
-    control_signals.analogSignal[FB_RBS].is_active = true;
-    control_signals.analogSignal[FB_READY].is_active = true;
-    control_signals.analogSignal[FB_BRAKE_CRANE].is_active = true;
-    control_signals.analogSignal[FB_LOCO_CRANE].is_active = true;
+    control_signals.analogSignal[FB_READY].setValue(1.0f);    
 
     return true;
 }
@@ -77,11 +81,54 @@ void FreeJoy::process()
     button_pressed = freejoy.isButtonPressed(joy_id, 18);
 
     control_signals.analogSignal[FB_RBS].setValue(static_cast<float>(button_pressed));
-    control_signals.analogSignal[FB_LOCO_CRANE].setValue((77.0 - pos_axisX ) / 164.0);
+    control_signals.analogSignal[FB_LOCO_CRANE].setValue( (pos_axisX - axis_x_min) / (axis_x_max - axis_x_min));
 
-    emit sendControlSignals(control_signals);
+    for (size_t i = 0; i < brake_crane_pos.size(); ++i)
+    {
+        if ( (pos_axisY >= brake_crane_pos[i].axis_y_min) &&
+             (pos_axisY < brake_crane_pos[i].axis_y_max) )
+        {
+            control_signals.analogSignal[FB_BRAKE_CRANE].setValue(i);
+            break;
+        }
+    }
 
-    int a = 0;
+    emit sendControlSignals(control_signals);    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool FreeJoy::load_config(QString path)
+{
+    CfgReader cfg;
+
+    if (!cfg.load(path))
+    {
+        return false;
+    }
+
+    QString locoCraneSec = "LocoCrane";
+
+    cfg.getDouble(locoCraneSec, "AxisXmin", axis_x_min);
+    cfg.getDouble(locoCraneSec, "AxisXmax", axis_x_max);
+
+    QDomNode brakeCranePosSec = cfg.getFirstSection("BrakeCranePos");
+
+    while (!brakeCranePosSec.isNull())
+    {
+        brake_crane_pos_t brake_pos;
+
+        cfg.getInt(brakeCranePosSec, "Pos", brake_pos.pos_num);
+        cfg.getDouble(brakeCranePosSec, "AxisYmin", brake_pos.axis_y_min);
+        cfg.getDouble(brakeCranePosSec, "AxisYmax", brake_pos.axis_y_max);
+
+        brake_crane_pos[brake_pos.pos_num] = brake_pos;
+
+        brakeCranePosSec = cfg.getNextSection();
+    }
+
+    return true;
 }
 
 //------------------------------------------------------------------------------
