@@ -46,9 +46,7 @@ void VL60pk::stepBrakesControl(double t, double dt)
         loco_crane->setControl(keys);
     }
 
-    loco_crane->step(t, dt);
-
-    loco_crane->step(t, dt);
+    loco_crane->step(t, dt);    
 
     // Переключательный клапан ЗПК
     // Первый вход клапана моделирует магистраль тормозных цилиндров

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 
+	<Common>
+		<RBS_Button_ID>18</RBS_Button_ID>
+		<Release_Button_ID>16</Release_Button_ID>
+	</Common>
+
 	<LocoCrane>
 		<AxisXmin>77</AxisXmin>
 		<AxisXmax>-87</AxisXmax>

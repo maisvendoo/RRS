@@ -113,6 +113,9 @@ bool FreeJoy::load_config(QString path)
         return false;
     }
 
+    cfg.getInt("Common", "RBS_Button_ID", RBS_button_id);
+    cfg.getInt("Common", "Release_Button_ID", Release_button_id);
+
     QString locoCraneSec = "LocoCrane";
 
     cfg.getDouble(locoCraneSec, "AxisXmin", axis_x_min);
