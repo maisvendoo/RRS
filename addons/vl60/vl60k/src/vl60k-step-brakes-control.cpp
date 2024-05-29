@@ -30,7 +30,6 @@ void VL60k::stepBrakesControl(double t, double dt)
         brake_crane->setControl(keys);
     }
 
-
     brake_crane->step(t, dt);
 
     // Кран вспомогательного тормоза

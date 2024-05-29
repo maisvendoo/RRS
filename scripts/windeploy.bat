@@ -44,9 +44,9 @@ xcopy ..\..\plugins\*.dll %RRS_DEV_ROOT%\plugins
 rem Копируем конфиги
 
 xcopy ..\cfg\*.xml %RRS_DEV_ROOT%\cfg\
-del %RRS_DEV_ROOT%\cfg\control-panel.xml
 xcopy ..\cfg\couplings\*.xml %RRS_DEV_ROOT%\cfg\couplings\
 xcopy ..\cfg\devices\*.xml %RRS_DEV_ROOT%\cfg\devices\
+xcopy ..\cfg\devices\freejoy\*.xml %RRS_DEV_ROOT%\cfg\devices\freejoy\
 
 xcopy ..\cfg\main-resist\default.xml %RRS_DEV_ROOT%\cfg\main-resist\
 xcopy ..\cfg\main-resist\passcar.xml %RRS_DEV_ROOT%\cfg\main-resist\

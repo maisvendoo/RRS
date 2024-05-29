@@ -143,20 +143,20 @@ void VL60pk::keyProcess()
         rb[RB_1].reset();
 
     // Нажатие РБС
-    bool is_cp_ready = static_cast<bool>(control_signals.analogSignal[CS_READY].cur_value);
 
-    bool is_cp_RBS = static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value);
-
-    if (!is_cp_ready)
+    // Если активна РБС на внешнем пульте
+    if (control_signals.analogSignal[CS_RBS].is_active)
     {
-        if (getKeyState(KEY_M))
+        // реагируем на состояние РБС на внешнем пульте
+        if (static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value))
             rb[RBS].set();
         else
             rb[RBS].reset();
     }
-    else
+    else // иначе
     {
-        if (is_cp_RBS)
+        // обрабатываем клавиши
+        if (getKeyState(KEY_M))
             rb[RBS].set();
         else
             rb[RBS].reset();
