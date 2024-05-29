@@ -19,9 +19,9 @@ void VL60pk::stepBrakesControl(double t, double dt)
     brake_crane->setFLpressure(brake_lock->getCraneFLpressure());
     brake_crane->setBPpressure(brake_lock->getCraneBPpressure());
 
-    if (static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value))
+    if (static_cast<bool>(control_signals.analogSignal[CS_READY].cur_value))
     {
-        int brake_crane_pos = static_cast<int>(control_signals.analogSignal[FB_BRAKE_CRANE].cur_value);
+        int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
 
         brake_crane->setHandlePosition(brake_crane_pos);
     }
@@ -37,9 +37,9 @@ void VL60pk::stepBrakesControl(double t, double dt)
     loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
     loco_crane->setILpressure(0.0);
 
-    if (static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value))
+    if (static_cast<bool>(control_signals.analogSignal[CS_READY].cur_value))
     {
-        loco_crane->setHandlePosition(control_signals.analogSignal[FB_LOCO_CRANE].cur_value);
+        loco_crane->setHandlePosition(control_signals.analogSignal[CS_LOCO_CRANE].cur_value);
     }
     else
     {

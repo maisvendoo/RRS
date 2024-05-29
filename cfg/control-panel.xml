@@ -3,7 +3,7 @@
 	<ControlPanel>
 	<Plugin>freejoy</Plugin>
 	<ConfigDir>devices/freejoy</ConfigDir>
-	<RequestInterval>100</RequestInterval>
+	<RequestInterval>10</RequestInterval>
 	<Vehicle>0</Vehicle>
     </ControlPanel>
 </Config>

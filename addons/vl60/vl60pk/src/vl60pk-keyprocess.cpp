@@ -143,9 +143,9 @@ void VL60pk::keyProcess()
         rb[RB_1].reset();
 
     // Нажатие РБС
-    bool is_cp_ready = static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value);
+    bool is_cp_ready = static_cast<bool>(control_signals.analogSignal[CS_READY].cur_value);
 
-    bool is_cp_RBS = static_cast<bool>(control_signals.analogSignal[FB_RBS].cur_value);
+    bool is_cp_RBS = static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value);
 
     if (!is_cp_ready)
     {

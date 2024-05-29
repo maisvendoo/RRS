@@ -19,10 +19,10 @@ void VL60k::stepBrakesControl(double t, double dt)
     brake_crane->setFLpressure(brake_lock->getCraneFLpressure());
     brake_crane->setBPpressure(brake_lock->getCraneBPpressure());
 
-    if (static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value))
+    // Управляем краном, учитывая возможное наличие внешнего пульта
+    if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
     {
-        int brake_crane_pos = static_cast<int>(control_signals.analogSignal[FB_BRAKE_CRANE].cur_value);
-
+        int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
         brake_crane->setHandlePosition(brake_crane_pos);
     }
     else
@@ -38,11 +38,12 @@ void VL60k::stepBrakesControl(double t, double dt)
     loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
     loco_crane->setILpressure(impulse_line->getPressure());
 
-    if (static_cast<bool>(control_signals.analogSignal[FB_READY].cur_value))
+    // Управляем, с учетом возможного наличия пульта
+    if (control_signals.analogSignal[CS_LOCO_CRANE].is_active)
     {
         double pos = 0.0;
 
-        if (static_cast<bool>(control_signals.analogSignal[FB_RELEASE_VALVE].cur_value))
+        if (static_cast<bool>(control_signals.analogSignal[CS_RELEASE_VALVE].cur_value))
         {
             loco_crane->release(true);
             pos = -1.0;
@@ -50,7 +51,7 @@ void VL60k::stepBrakesControl(double t, double dt)
         else
         {
             loco_crane->release(false);
-            pos = control_signals.analogSignal[FB_LOCO_CRANE].cur_value;
+            pos = control_signals.analogSignal[CS_LOCO_CRANE].cur_value;
         }
 
         loco_crane->setHandlePosition(pos);
