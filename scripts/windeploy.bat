@@ -131,6 +131,7 @@ xcopy /Q ..\simulator\physics\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\vehicle\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\device\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\viewer\display\include\*.h %RRS_DEV_ROOT%\sdk\include\
+xcopy /Q ..\libJournal\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /S ..\..\sdk\examples\*.* %RRS_DEV_ROOT%\sdk\examples\
 
 rem Копируем иконку
