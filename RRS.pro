@@ -15,7 +15,6 @@ SUBDIRS += ./viewer
 SUBDIRS += ./addons/passcar
 SUBDIRS += ./addons/freightcar
 SUBDIRS += ./addons/vl60
-SUBDIRS += ./addons/ep20
 
 SUBDIRS += ./launcher
 #SUBDIRS += ./launcher2
