@@ -7,40 +7,6 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::initialization()
-{
-    FileSystem &fs = FileSystem::getInstance();
-    QString modules_dir = QString(fs.getModulesDir().c_str());
-
-    Uks = WIRE_VOLTAGE;
-    current_kind = 1;
-
-    initCouplings(modules_dir);
-
-    initPantographs();
-
-    initHighVoltageScheme();
-
-    initSupplyMachines();
-
-    initPneumoSupply(modules_dir);
-
-    initBrakesControl(modules_dir);
-
-    initBrakesEquipment(modules_dir);
-
-    initTractionControl();
-
-    initOtherEquipment();
-
-    initTriggers();
-
-    initTapSounds();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void VL60k::initPantographs()
 {
     QString pant_cfg_path = config_dir + QDir::separator() + "pantograph";

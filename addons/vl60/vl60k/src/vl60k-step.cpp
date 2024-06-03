@@ -3,42 +3,6 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::step(double t, double dt)
-{
-    stepCouplings(t, dt);
-
-    stepPantographsControl(t, dt);
-
-    stepMainSwitchControl(t, dt);
-
-    stepTracTransformer(t, dt);
-
-    stepPhaseSplitter(t, dt);
-
-    stepMotorFans(t, dt);
-
-    stepPneumoSupply(t, dt);
-
-    stepBrakesControl(t, dt);
-
-    stepBrakesEquipment(t, dt);
-
-    stepSignalsOutput();
-
-    stepTractionControl(t, dt);
-
-    stepLineContactors(t, dt);
-
-    stepOtherEquipment(t, dt);
-
-    stepTapSound();
-
-    autoStartTimer->step(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void VL60k::slotAutoStart()
 {
     if (start_count < triggers.size())

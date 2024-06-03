@@ -596,10 +596,8 @@ void Vehicle::hardwareProcess()
 //------------------------------------------------------------------------------
 void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 {
-    integrationPreStep(Y, t);
-
+    (void) Y;
     step(t, dt);
-    integrationPostStep(Y, t);
 }
 
 //------------------------------------------------------------------------------
@@ -608,7 +606,6 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 void Vehicle::integrationPostStep(state_vector_t &Y, double t)
 {
     (void) Y;
-
     postStep(t);
 }
 

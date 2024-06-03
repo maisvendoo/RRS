@@ -344,6 +344,12 @@ private:
 
     void initTapSounds();
 
+    /// Предварительные расчёты перед симуляцией
+    void preStep(double t);
+
+    /// Предварительный расчёт координат сцепных устройств
+    void preStepCouplings(double t);
+
     /// Шаг симуляции всех систем электровоза
     void step(double t, double dt);
 

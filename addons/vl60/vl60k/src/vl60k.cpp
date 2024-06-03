@@ -97,6 +97,84 @@ VL60k::~VL60k()
 }
 
 //------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60k::initialization()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir = QString(fs.getModulesDir().c_str());
+
+    Uks = WIRE_VOLTAGE;
+    current_kind = 1;
+
+    initCouplings(modules_dir);
+
+    initPantographs();
+
+    initHighVoltageScheme();
+
+    initSupplyMachines();
+
+    initPneumoSupply(modules_dir);
+
+    initBrakesControl(modules_dir);
+
+    initBrakesEquipment(modules_dir);
+
+    initTractionControl();
+
+    initOtherEquipment();
+
+    initTriggers();
+
+    initTapSounds();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60k::preStep(double t)
+{
+    preStepCouplings(t);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60k::step(double t, double dt)
+{
+    stepCouplings(t, dt);
+
+    stepPantographsControl(t, dt);
+
+    stepMainSwitchControl(t, dt);
+
+    stepTracTransformer(t, dt);
+
+    stepPhaseSplitter(t, dt);
+
+    stepMotorFans(t, dt);
+
+    stepPneumoSupply(t, dt);
+
+    stepBrakesControl(t, dt);
+
+    stepBrakesEquipment(t, dt);
+
+    stepSignalsOutput();
+
+    stepTractionControl(t, dt);
+
+    stepLineContactors(t, dt);
+
+    stepOtherEquipment(t, dt);
+
+    stepTapSound();
+
+    autoStartTimer->step(t, dt);
+}
+
+//------------------------------------------------------------------------------
 //  Макрос генерации функции loadVehicle() для симулятора
 //------------------------------------------------------------------------------
 GET_VEHICLE(VL60k)

@@ -98,6 +98,13 @@ private:
     /// Инициализация ЭПТ
     void initEPB(QString modules_dir);
 
+    /// Предварительные расчёты перед симуляцией
+    void preStep(double t);
+
+    /// Предварительный расчёт координат сцепных устройств
+    void preStepCouplings(double t);
+
+    /// Шаг моделирования
     void step(double t, double dt);
 
     /// Моделирование сцепных устройств

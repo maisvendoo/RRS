@@ -144,7 +144,22 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 //------------------------------------------------------------------------------
 void Train::preStep(double t)
 {
-    (void) t;
+    //(void) t;
+    auto begin = vehicles.begin();
+    auto end = vehicles.end();
+
+    for (auto it = begin; it != end; ++it)
+    {
+        Vehicle *vehicle = *it;
+        size_t idx = vehicle->getIndex();
+
+        profile_element_t pe = profile->getElement(y[idx]);
+        vehicle->setInclination(pe.inclination);
+        vehicle->setCurvature(pe.curvature);
+        vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
+
+        vehicle->integrationPreStep(y, t);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -152,6 +167,8 @@ void Train::preStep(double t)
 //------------------------------------------------------------------------------
 bool Train::step(double t, double &dt)
 {
+    vehiclesStep(t, dt);
+
     // Train dynamics simulation
     bool done = true;
     double tau = 0.0;
@@ -165,8 +182,6 @@ bool Train::step(double t, double &dt)
         tau +=_dt;
     }
     dt = tau;
-
-    vehiclesStep(t, dt);
 
     return done;
 }
@@ -198,13 +213,6 @@ void Train::vehiclesStep(double t, double dt)
         }
 
         Vehicle *vehicle = *it;
-        size_t idx = vehicle->getIndex();
-
-        profile_element_t pe = profile->getElement(y[idx]);
-        vehicle->setInclination(pe.inclination);
-        vehicle->setCurvature(pe.curvature);
-        vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
-
         vehicle->integrationStep(y, t, dt);
     }
 }
@@ -230,7 +238,15 @@ void Train::inputProcess()
 //------------------------------------------------------------------------------
 void Train::postStep(double t)
 {
-    (void) t;
+    //(void) t;
+    auto begin = vehicles.begin();
+    auto end = vehicles.end();
+
+    for (auto it = begin; it != end; ++it)
+    {
+        Vehicle *vehicle = *it;
+        vehicle->integrationPostStep(y, t);
+    }
 }
 
 //------------------------------------------------------------------------------
