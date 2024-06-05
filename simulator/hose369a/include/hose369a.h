@@ -17,7 +17,7 @@ class Hose369A : public PneumoHoseEPB
 {
 public:
 
-    Hose369A(QObject *parent = Q_NULLPTR);
+    Hose369A(int key_code = 0, QObject *parent = Q_NULLPTR);
 
     ~Hose369A();
 

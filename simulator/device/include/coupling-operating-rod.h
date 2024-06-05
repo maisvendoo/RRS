@@ -49,13 +49,14 @@ protected:
     /// Время движения расцепного рычага между положениями, с
     double motion_time;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
-
-    void load_config(CfgReader &cfg);
-
     void preStep(state_vector_t &Y, double t);
 
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+
     virtual void stepKeysControl(double t, double dt);
+
+    /// Загрузка параметров из конфигурационного файла
+    void load_config(CfgReader &cfg);
 };
 
 #endif // COUPLING_OPERATING_ROD_H

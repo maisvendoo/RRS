@@ -11,10 +11,13 @@ class DEVICE_EXPORT PneumoAngleCock : public Device
 public:
 
     /// Конструктор
-    PneumoAngleCock(QObject *parent = Q_NULLPTR);
+    PneumoAngleCock(int key_code = 0, QObject *parent = Q_NULLPTR);
 
     /// Деструктор
     virtual ~PneumoAngleCock();
+
+    /// Задать управляющую клавишу
+    void setKeyCode(int key_code);
 
     /// Закрыть концевой кран
     void close();
@@ -61,6 +64,9 @@ public:
 
 protected:
 
+    /// Код управляющей клавиши
+    int keyCode;
+
     /// Заданное состояние крана: 0 - закрыт, 1 - открыт
     bool ref_state;
 
@@ -101,6 +107,9 @@ protected:
 
     virtual void preStep(state_vector_t &Y, double t);
 
+    virtual void stepKeysControl(double t, double dt);
+
+    /// Загрузка параметров из конфигурационного файла
     virtual void load_config(CfgReader &cfg);
 };
 

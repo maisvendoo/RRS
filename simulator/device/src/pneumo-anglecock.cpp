@@ -3,13 +3,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoAngleCock::PneumoAngleCock(QObject *parent) : Device(parent)
+PneumoAngleCock::PneumoAngleCock(int key_code, QObject *parent) : Device(parent)
+  , keyCode(key_code)
   , ref_state(false)
   , switch_time(0.2)
   , p(0.0)
   , Q(0.0)
   , pipe_volume(1.0e8)
-  , k_max_by_pipe_volume(1.0e10)
+  , k_max_by_pipe_volume(0.75)
   , k_pipe(0.75)
   , k_atm(0.1)
 {
@@ -22,6 +23,14 @@ PneumoAngleCock::PneumoAngleCock(QObject *parent) : Device(parent)
 PneumoAngleCock::~PneumoAngleCock()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoAngleCock::setKeyCode(int key_code)
+{
+    keyCode = key_code;
 }
 
 //------------------------------------------------------------------------------
@@ -102,7 +111,7 @@ void PneumoAngleCock::setShiftCoord(double value)
 double PneumoAngleCock::getFlowCoeff() const
 {
     if (is_opened)
-        return k_pipe * getY(0);
+        return k_max_by_pipe_volume * getY(0);
     return k_atm;
 }
 
@@ -168,10 +177,8 @@ void PneumoAngleCock::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
 
-    k_max_by_pipe_volume = 0.15 * pipe_volume / dt;
-
-    if (k_pipe > k_max_by_pipe_volume)
-        k_pipe = k_max_by_pipe_volume;
+    // Ограничение коэффициента перетока для устойчивого расчёта с данным шагом
+    k_max_by_pipe_volume = min(k_pipe, (0.15 * pipe_volume / dt) );
 }
 
 //------------------------------------------------------------------------------
@@ -184,6 +191,26 @@ void PneumoAngleCock::preStep(state_vector_t &Y, double t)
         is_opened = false;
     else
         is_opened = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoAngleCock::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    // Проверяем управляющий сигнал
+    if (getKeyState(keyCode))
+    {
+        if (isShift())
+            // Открываем концевой кран
+            open();
+        else
+            // Закрываем концевой кран
+            close();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -203,10 +230,8 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "kPipe", k_pipe);
     cfg.getDouble(secName, "kAtm", k_atm);
 
-    if (k_pipe > k_max_by_pipe_volume)
-        k_pipe = k_max_by_pipe_volume;
+    k_max_by_pipe_volume = k_pipe;
 
     cfg.getDouble(secName, "ShiftSide", shift_side);
     cfg.getDouble(secName, "ShiftCoord", shift_coord);
-
 }

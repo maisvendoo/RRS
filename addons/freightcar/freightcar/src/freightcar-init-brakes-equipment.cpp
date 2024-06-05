@@ -41,10 +41,12 @@ void FreightCar::initBrakesEquipment(QString modules_dir)
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd = new PneumoAngleCock();
+    //anglecock_bp_fwd->setKeyCode(KEY_9);
     anglecock_bp_fwd->read_config(anglecock_bp_config);
     anglecock_bp_fwd->setPipeVolume(volume_bp);
 
     anglecock_bp_bwd = new PneumoAngleCock();
+    //anglecock_bp_bwd->setKeyCode(KEY_0);
     anglecock_bp_bwd->read_config(anglecock_bp_config);
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
@@ -53,6 +55,7 @@ void FreightCar::initBrakesEquipment(QString modules_dir)
                 modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_fwd == nullptr)
         hose_bp_fwd = new PneumoHoseEPB();
+    //hose_bp_fwd->setKeyCode(0);
     hose_bp_fwd->read_config(hose_bp_config);
     forward_connectors.push_back(hose_bp_fwd);
 
@@ -60,6 +63,7 @@ void FreightCar::initBrakesEquipment(QString modules_dir)
                 modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_bwd == nullptr)
         hose_bp_bwd = new PneumoHoseEPB();
+    //hose_bp_bwd->setKeyCode(0);
     hose_bp_bwd->read_config(hose_bp_config);
     backward_connectors.push_back(hose_bp_bwd);
 }

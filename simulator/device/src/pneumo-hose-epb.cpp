@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHoseEPB::PneumoHoseEPB(QObject *parent) : PneumoHose(parent)
+PneumoHoseEPB::PneumoHoseEPB(int key_code, QObject *parent) : PneumoHose(key_code, parent)
   , lines_num(1)
 {
     name = QString("BPepb");

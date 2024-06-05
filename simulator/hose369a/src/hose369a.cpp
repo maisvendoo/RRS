@@ -3,8 +3,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Hose369A::Hose369A(QObject *parent)
-    : PneumoHoseEPB(parent)
+Hose369A::Hose369A(int key_code, QObject *parent)
+    : PneumoHoseEPB(key_code, parent)
     , is_hose_at_loco(false)
 {
     name = QString("BPepb");

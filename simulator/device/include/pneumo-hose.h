@@ -13,10 +13,13 @@ class DEVICE_EXPORT PneumoHose : public Device
 public:
 
     /// Конструктор
-    PneumoHose(QObject *parent = Q_NULLPTR);
+    PneumoHose(int key_code = 0, QObject *parent = Q_NULLPTR);
 
     /// Деструктор
     ~PneumoHose();
+
+    /// Задать управляющую клавишу
+    void setKeyCode(int key_code);
 
     /// Соединить рукава
     void connect();
@@ -55,6 +58,9 @@ public:
 
 private:
 
+    /// Код управляющей клавиши
+    int keyCode;
+
     /// Флаг вызова команд управления соединением рукавов
     bool is_ref_state_command;
 
@@ -62,9 +68,10 @@ private:
                             state_vector_t &dYdt,
                             double t);
 
+    virtual void stepKeysControl(double t, double dt);
+
     /// Загрузка параметров из конфигурационного файла
     virtual void load_config(CfgReader &cfg);
-
 };
 
 /*!

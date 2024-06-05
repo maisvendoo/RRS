@@ -169,79 +169,55 @@ void VL60pk::keyProcess()
             epb_switch.reset();
     }
 
-    // Сцепка/Отцепка спереди
-    if (getKeyState(KEY_X) && (!isShift()))
+    // Рукава напорной магистрали и магистрали ТЦ при отцепке-прицепке спереди
+    if ( getKeyState(KEY_X) && isShift() && (!coupling_fwd->isCoupled()) )
     {
-        if (isControl())
-        {
-            anglecock_bp_fwd->close();
-            anglecock_fl_fwd->close();
-            anglecock_bc_fwd->close();
-            hose_bp_fwd->disconnect();
-            hose_fl_fwd->disconnect();
-            hose_bc_fwd->disconnect();
-        }
+        // Отцепка - закрытие кранов, рассоединение рукавов
+        anglecock_fl_fwd->close();
+        anglecock_bc_fwd->close();
+        hose_fl_fwd->disconnect();
+        hose_bc_fwd->disconnect();
+    }
+    if ( getKeyState(KEY_X) && (!isShift()) && coupling_fwd->isCoupled() )
+    {
+        // Прицепка - соединение рукавов, открытие кранов
+        hose_fl_fwd->connect();
+        hose_bc_fwd->connect();
+
+        if (hose_fl_fwd->isConnected())
+            anglecock_fl_fwd->open();
         else
-        {
-            if (coupling_fwd->isCoupled())
-            {
-                hose_bp_fwd->connect();
-                hose_fl_fwd->connect();
-                hose_bc_fwd->connect();
+            anglecock_fl_fwd->close();
 
-                if (hose_bp_fwd->isLinked())
-                    anglecock_bp_fwd->open();
-                else
-                    anglecock_bp_fwd->close();
-
-                if (hose_fl_fwd->isLinked())
-                    anglecock_fl_fwd->open();
-                else
-                    anglecock_fl_fwd->close();
-
-                if (hose_bc_fwd->isLinked())
-                    anglecock_bc_fwd->open();
-                else
-                    anglecock_bc_fwd->close();
-            }
-        }
+        if (hose_bc_fwd->isConnected())
+            anglecock_bc_fwd->open();
+        else
+            anglecock_bc_fwd->close();
     }
 
-    // Сцепка/Отцепка сзади
-    if (getKeyState(KEY_C)&& (!isShift()))
+    // Рукава напорной магистрали и магистрали ТЦ при отцепке-прицепке сзади
+    if ( getKeyState(KEY_C) && isShift() && (!coupling_bwd->isCoupled()) )
     {
-        if (isControl())
-        {
-            anglecock_bp_bwd->close();
-            anglecock_fl_bwd->close();
-            anglecock_bc_bwd->close();
-            hose_bp_bwd->disconnect();
-            hose_fl_bwd->disconnect();
-            hose_bc_bwd->disconnect();
-        }
+        // Отцепка - закрытие кранов, рассоединение рукавов
+        anglecock_fl_bwd->close();
+        anglecock_bc_bwd->close();
+        hose_fl_bwd->disconnect();
+        hose_bc_bwd->disconnect();
+    }
+    if ( getKeyState(KEY_C) && (!isShift()) && coupling_bwd->isCoupled() )
+    {
+        // Прицепка - соединение рукавов, открытие кранов
+        hose_fl_bwd->connect();
+        hose_bc_bwd->connect();
+
+        if (hose_fl_bwd->isConnected())
+            anglecock_fl_bwd->open();
         else
-        {
-            if (coupling_bwd->isCoupled())
-            {
-                hose_bp_bwd->connect();
-                hose_fl_bwd->connect();
-                hose_bc_bwd->connect();
+            anglecock_fl_bwd->close();
 
-                if (hose_bp_bwd->isLinked())
-                    anglecock_bp_bwd->open();
-                else
-                    anglecock_bp_bwd->close();
-
-                if (hose_fl_bwd->isLinked())
-                    anglecock_fl_bwd->open();
-                else
-                    anglecock_fl_bwd->close();
-
-                if (hose_bc_bwd->isLinked())
-                    anglecock_bc_bwd->open();
-                else
-                    anglecock_bc_bwd->close();
-            }
-        }
+        if (hose_bc_bwd->isConnected())
+            anglecock_bc_bwd->open();
+        else
+            anglecock_bc_bwd->close();
     }
 }

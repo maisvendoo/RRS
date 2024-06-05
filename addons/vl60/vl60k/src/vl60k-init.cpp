@@ -105,8 +105,12 @@ void VL60k::initOtherEquipment()
     connect(horn, &TrainHorn::soundPlay, this, &VL60k::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60k::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60k::soundStop);
-
-    //reg = new Registrator("motor", 1e-3);
+/*
+    reg = new Registrator();
+    reg->setFileName("vl60k-coupling-forces");
+    reg->init();
+    reg->print("  time  ;  fwd_force  ;  bwd_force  ");
+*/
 }
 
 //------------------------------------------------------------------------------

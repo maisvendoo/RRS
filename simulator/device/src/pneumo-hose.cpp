@@ -7,7 +7,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHose::PneumoHose(QObject *parent) : Device(parent)
+PneumoHose::PneumoHose(int key_code, QObject *parent) : Device(parent)
+  , keyCode(key_code)
   , is_ref_state_command(false)
 {
     name = QString("BP");
@@ -25,6 +26,14 @@ PneumoHose::PneumoHose(QObject *parent) : Device(parent)
 PneumoHose::~PneumoHose()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setKeyCode(int key_code)
+{
+    keyCode = key_code;
 }
 
 //------------------------------------------------------------------------------
@@ -158,6 +167,26 @@ void PneumoHose::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(dYdt)
     Q_UNUSED(t)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    // Проверяем управляющий сигнал
+    if (getKeyState(keyCode))
+    {
+        if (isShift())
+            // Соединяем рукава
+            connect();
+        else
+            // Разъединяем рукава
+            disconnect();
+    }
 }
 
 //------------------------------------------------------------------------------

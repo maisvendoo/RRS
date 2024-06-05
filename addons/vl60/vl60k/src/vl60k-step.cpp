@@ -220,7 +220,10 @@ void VL60k::stepOtherEquipment(double t, double dt)
 
     if (reg == nullptr)
         return;
-    reg->print(motor[0]->getDebugMsg(), t, dt);
+    reg->print(QString("%1;%2;%3")
+                   .arg(t,8,'f',3)
+                   .arg(coupling_fwd->getCurrentForce(),13,'f',3)
+                   .arg(coupling_bwd->getCurrentForce(),13,'f',3));
 }
 
 //------------------------------------------------------------------------------

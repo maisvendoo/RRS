@@ -35,19 +35,23 @@ void VL60k::initBrakesEquipment(QString modules_dir)
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd = new PneumoAngleCock();
+    anglecock_bp_fwd->setKeyCode(KEY_9);
     anglecock_bp_fwd->read_config("pneumo-anglecock-BP");
     anglecock_bp_fwd->setPipeVolume(volume_bp);
 
     anglecock_bp_bwd = new PneumoAngleCock();
+    anglecock_bp_bwd->setKeyCode(KEY_0);
     anglecock_bp_bwd->read_config("pneumo-anglecock-BP");
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава тормозной магистрали
     hose_bp_fwd = new PneumoHose();
+    //hose_bp_fwd->setKeyCode(0);
     hose_bp_fwd->read_config("pneumo-hose-BP");
     forward_connectors.push_back(hose_bp_fwd);
 
     hose_bp_bwd = new PneumoHose();
+    //hose_bp_bwd->setKeyCode(0);
     hose_bp_bwd->read_config("pneumo-hose-BP");
     backward_connectors.push_back(hose_bp_bwd);
 }
