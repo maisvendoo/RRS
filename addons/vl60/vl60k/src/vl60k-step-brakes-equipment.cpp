@@ -9,8 +9,13 @@ void VL60k::stepBrakesEquipment(double t, double dt)
     double BP_flow = 0.0;
     BP_flow += air_dist->getBPflow();
     BP_flow += brake_lock->getBPflow();
+
+    anglecock_bp_fwd->setHoseFlow(hose_bp_fwd->getFlow());
     BP_flow += anglecock_bp_fwd->getFlowToPipe();
+
+    anglecock_bp_bwd->setHoseFlow(hose_bp_bwd->getFlow());
     BP_flow += anglecock_bp_bwd->getFlowToPipe();
+
     brakepipe->setFlow(BP_flow);
     brakepipe->step(t, dt);
 
@@ -47,10 +52,8 @@ void VL60k::stepBrakesEquipment(double t, double dt)
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());
-    anglecock_bp_fwd->setHoseFlow(hose_bp_fwd->getFlow());
     anglecock_bp_fwd->step(t, dt);
     anglecock_bp_bwd->setPipePressure(brakepipe->getPressure());
-    anglecock_bp_bwd->setHoseFlow(hose_bp_bwd->getFlow());
     anglecock_bp_bwd->step(t, dt);
 
     // Рукава тормозной магистрали

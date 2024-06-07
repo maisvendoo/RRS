@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Device>
-        <Order>1</Order>
-        <SubStepNum>1</SubStepNum>
-        <Solver>euler</Solver>
+	<Device>
+		<Order>1</Order>
+		<SubStepNum>1</SubStepNum>
+		<Solver>euler</Solver>
 
-        <!-- Номинальная угловая скорость -->
-        <omega0>192.0</omega0>
+		<!-- Номинальная угловая скорость -->
+		<omega0>192.0</omega0>
 
-        <!-- Сопротивление двигателя -->
-        <R>56.9</R>
+		<!-- Сопротивление двигателя -->
+		<R>56.9</R>
 
-        <!-- Харакстеристика магнитного поля двигателя -->
-        <cPhi>14.2</cPhi>
+		<!-- Харакстеристика магнитного поля двигателя -->
+		<cPhi>14.2</cPhi>
 
-        <!-- Момент инерции ротора -->
-        <J>2.0</J>
+		<!-- Момент инерции ротора -->
+		<J>2.0</J>
 
-        <!-- Момент сопротивления вращению ротора -->
-        <Mxx>50.0</Mxx>
+		<!-- Момент сопротивления вращению ротора -->
+		<Mxx>50.0</Mxx>
 
-        <!-- Коэффициент перехода от скорости ротора к производимому давлению -->
-        <K_pressure>0.0061</K_pressure>
+		<!-- Коэффициент перехода от скорости ротора к производимому давлению -->
+		<K_pressure>0.0061</K_pressure>
 
-        <!-- Коэффициент потока в питательную магистраль -->
-        <K_flow>0.01</K_flow>
+		<!-- Коэффициент потока в питательную магистраль -->
+		<K_flow>0.02</K_flow>
 
-        <SoundName>Motor_Compressor</SoundName>
-        <RegulateSoundByOnOff>0</RegulateSoundByOnOff>
-        <RegulateSoundByPitch>1</RegulateSoundByPitch>
+		<SoundName>Motor_Compressor</SoundName>
+		<RegulateSoundByOnOff>0</RegulateSoundByOnOff>
+		<RegulateSoundByPitch>1</RegulateSoundByPitch>
 
-    </Device>
+	</Device>
 </Config>

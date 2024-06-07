@@ -34,7 +34,10 @@ void VL60k::stepBrakesControl(double t, double dt)
     il_flow += loco_crane->getILflow();
     if (bc_hose_to_impulse_line)
     {
+        anglecock_bc_fwd->setHoseFlow(hose_bc_fwd->getFlow());
         il_flow += anglecock_bc_fwd->getFlowToPipe();
+
+        anglecock_bc_bwd->setHoseFlow(hose_bc_bwd->getFlow());
         il_flow += anglecock_bc_bwd->getFlowToPipe();
     }
     impulse_line->setFlow(il_flow);
@@ -45,7 +48,10 @@ void VL60k::stepBrakesControl(double t, double dt)
     bc_flow += brake_lock->getBCflow();
     if (!bc_hose_to_impulse_line)
     {
+        anglecock_bc_fwd->setHoseFlow(hose_bc_fwd->getFlow());
         bc_flow += anglecock_bc_fwd->getFlowToPipe();
+
+        anglecock_bc_bwd->setHoseFlow(hose_bc_bwd->getFlow());
         bc_flow += anglecock_bc_bwd->getFlowToPipe();
     }
     bc_splitter->setInputFlow(bc_flow);
@@ -64,19 +70,19 @@ void VL60k::stepBrakesControl(double t, double dt)
         anglecock_bc_fwd->setPipePressure(bc_splitter->getInputPressure());
         anglecock_bc_bwd->setPipePressure(bc_splitter->getInputPressure());
     }
-
-    anglecock_bc_fwd->setHoseFlow(hose_bc_fwd->getFlow());
+    //anglecock_bc_fwd->setControl(keys);
     anglecock_bc_fwd->step(t, dt);
-
-    anglecock_bc_bwd->setHoseFlow(hose_bc_bwd->getFlow());
+    //anglecock_bc_bwd->setControl(keys);
     anglecock_bc_bwd->step(t, dt);
 
     // Рукава магистрали тормозных цилиндров
     hose_bc_fwd->setPressure(anglecock_bc_fwd->getPressureToHose());
     hose_bc_fwd->setFlowCoeff(anglecock_bc_fwd->getFlowCoeff());
+    //hose_bc_fwd->setControl(keys);
     hose_bc_fwd->step(t, dt);
 
     hose_bc_bwd->setPressure(anglecock_bc_bwd->getPressureToHose());
     hose_bc_bwd->setFlowCoeff(anglecock_bc_bwd->getFlowCoeff());
+    //hose_bc_bwd->setControl(keys);
     hose_bc_bwd->step(t, dt);
 }
