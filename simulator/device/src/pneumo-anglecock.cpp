@@ -10,8 +10,8 @@ PneumoAngleCock::PneumoAngleCock(int key_code, QObject *parent) : Device(parent)
   , p(0.0)
   , Q(0.0)
   , pipe_volume(1.0e8)
-  , k_max_by_pipe_volume(0.75)
-  , k_pipe(0.75)
+  , k_max_by_pipe_volume(0.8)
+  , k_pipe(0.8)
   , k_atm(0.1)
 {
 
@@ -160,13 +160,13 @@ void PneumoAngleCock::ode_system(const state_vector_t& Y, state_vector_t& dYdt, 
 
     double ref_pos = static_cast<double>(ref_state);
     double delta = ref_pos - Y[0];
-    if (abs(delta) > 0.1)
+    if (abs(delta) > 0.05)
     {
         dYdt[0] = sign(delta) / switch_time;
     }
     else
     {
-        dYdt[0] = 10.0 * delta / switch_time;
+        dYdt[0] = 20.0 * delta / switch_time;
     }
 }
 
@@ -178,7 +178,7 @@ void PneumoAngleCock::stepDiscrete(double t, double dt)
     Q_UNUSED(t)
 
     // Ограничение коэффициента перетока для устойчивого расчёта с данным шагом
-    k_max_by_pipe_volume = min(k_pipe, (0.15 * pipe_volume / dt) );
+    k_max_by_pipe_volume = min(k_pipe, (0.5 * pipe_volume / dt) );
 }
 
 //------------------------------------------------------------------------------
