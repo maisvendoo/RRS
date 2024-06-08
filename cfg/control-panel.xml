@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<ControlPanel>
+	<Plugin>freejoy</Plugin>
+	<ConfigDir>devices/freejoy</ConfigDir>
+	<RequestInterval>10</RequestInterval>
+	<Vehicle>0</Vehicle>
+    </ControlPanel>
+</Config>

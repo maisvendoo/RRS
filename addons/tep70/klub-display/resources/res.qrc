@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/klub">
-        <file alias="img-background">img/klub-bil-v3-2048.png</file>
-        <file alias="alarm_off">img/alarm_off.png</file>
-        <file alias="alarm_on">img/alarm_on.png</file>
-    </qresource>
-</RCC>

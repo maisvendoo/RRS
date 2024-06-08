@@ -19,6 +19,7 @@ SUBDIRS += ./model
 SUBDIRS += ./simulator
 
 SUBDIRS += ./modbus
+SUBDIRS += ./freejoy
 
 SUBDIRS += ./krm395
 SUBDIRS += ./krm130

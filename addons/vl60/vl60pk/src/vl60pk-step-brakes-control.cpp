@@ -18,15 +18,49 @@ void VL60pk::stepBrakesControl(double t, double dt)
     // Поездной кран машиниста
     brake_crane->setFLpressure(brake_lock->getCraneFLpressure());
     brake_crane->setBPpressure(brake_lock->getCraneBPpressure());
-    brake_crane->setControl(keys);
+
+    // Управляем краном, учитывая возможное наличие внешнего пульта
+    if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
+    {
+        int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
+        brake_crane->setHandlePosition(brake_crane_pos);
+    }
+    else
+    {
+        brake_crane->setControl(keys);
+    }
+
     brake_crane->step(t, dt);
 
     // Кран вспомогательного тормоза
     loco_crane->setFLpressure(brake_lock->getCraneFLpressure());
     loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
     loco_crane->setILpressure(0.0);
-    loco_crane->setControl(keys);
-    loco_crane->step(t, dt);
+
+    // Управляем, с учетом возможного наличия пульта
+    if (control_signals.analogSignal[CS_LOCO_CRANE].is_active)
+    {
+        double pos = 0.0;
+
+        if (static_cast<bool>(control_signals.analogSignal[CS_RELEASE_VALVE].cur_value))
+        {
+            loco_crane->release(true);
+            pos = -1.0;
+        }
+        else
+        {
+            loco_crane->release(false);
+            pos = control_signals.analogSignal[CS_LOCO_CRANE].cur_value;
+        }
+
+        loco_crane->setHandlePosition(pos);
+    }
+    else
+    {
+        loco_crane->setControl(keys);
+    }
+
+    loco_crane->step(t, dt);    
 
     // Переключательный клапан ЗПК
     // Первый вход клапана моделирует магистраль тормозных цилиндров
