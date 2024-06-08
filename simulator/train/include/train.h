@@ -98,7 +98,6 @@ public:
 
 signals:
 
-    void logMessage(QString msg);
     void sendDataToVehicle(QByteArray data);
 
 private:

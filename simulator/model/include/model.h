@@ -72,8 +72,6 @@ public:
 
 signals:
 
-    void logMessage(QString msg);
-
     void sendDataToServer(QByteArray data);
 
     void sendDataToTrain(QByteArray data);

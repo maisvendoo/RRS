@@ -447,8 +447,6 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                 Journal::instance()->info(QString("Created Vehicle object at address: 0x%1")
                                           .arg(reinterpret_cast<quint64>(vehicle), 0, 16));
 
-                connect(vehicle, &Vehicle::logMessage, this, &Train::logMessage);
-
                 QString relConfigPath = QString(fs.combinePath(module_cfg_name.toStdString(), module_cfg_name.toStdString()).c_str());
 
                 QString config_dir(fs.combinePath(fs.getVehiclesDir(), module_cfg_name.toStdString()).c_str());

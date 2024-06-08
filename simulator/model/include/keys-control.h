@@ -21,8 +21,6 @@ public:
 
 signals:
 
-    void logMessage(QString msg);
-
     void sendDataToTrain(QByteArray data);
 
 private:

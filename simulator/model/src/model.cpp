@@ -108,8 +108,6 @@ bool Model::init(const simulator_command_line_t &command_line)
     Journal::instance()->info(QString("Created Train object at address: 0x%1")
                               .arg(reinterpret_cast<quint64>(train), 0, 16));
 
-    connect(train, &Train::logMessage, this, &Model::logMessage);
-
     if (!train->init(init_data))
         return false;
 
