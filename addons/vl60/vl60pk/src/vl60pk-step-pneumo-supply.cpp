@@ -47,7 +47,7 @@ void VL60pk::stepPneumoSupply(double t, double dt)
     hose_fl_fwd->step(t, dt);
     hose_fl_bwd->setPressure(anglecock_fl_bwd->getPressureToHose());
     hose_fl_bwd->setFlowCoeff(anglecock_fl_bwd->getFlowCoeff());
-    hose_fl_bwd->setCoord(railway_coord + dir * orient * (length / 2.0 - anglecock_fl_bwd->getShiftCoord()));
+    hose_fl_bwd->setCoord(railway_coord - dir * orient * (length / 2.0 - anglecock_fl_bwd->getShiftCoord()));
     hose_fl_bwd->setShiftSide(anglecock_fl_bwd->getShiftSide());
     //hose_fl_bwd->setControl(keys);
     hose_fl_bwd->step(t, dt);
