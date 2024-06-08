@@ -77,10 +77,10 @@ public:
     void setOrientation(int orient);
 
     /// Set forward coupling force
-    void setForwardForce(double value);
+    void addForwardForce(double value);
 
     /// Set backward coupling force
-    void setBackwardForce(double value);
+    void addBackwardForce(double value);
 
     /// Set active common force
     void setActiveCommonForce(size_t idx, double value);
@@ -175,8 +175,6 @@ public slots:
     void getControlSignals(control_signals_t control_signals);
 
 signals:
-
-    void logMessage(QString msg);
 
     void soundPlay(QString name);
 

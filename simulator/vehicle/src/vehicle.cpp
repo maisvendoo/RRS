@@ -154,17 +154,17 @@ void Vehicle::setOrientation(int orient)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setForwardForce(double value)
+void Vehicle::addForwardForce(double value)
 {
-    this->F_fwd = value;
+    this->F_fwd += value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setBackwardForce(double value)
+void Vehicle::addBackwardForce(double value)
 {
-    this->F_bwd = value;
+    this->F_bwd += value;
 }
 
 //------------------------------------------------------------------------------
