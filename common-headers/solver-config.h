@@ -43,12 +43,12 @@ struct solver_config_t
     double      local_error;
 
     solver_config_t()
-        : method("rkf5")
+        : method("euler")
         , start_time(0.0)
         , stop_time(10.0)
-        , step(2e-3)
-        , max_step(2e-3)
-        , num_sub_step(4)
+        , step(3e-3)
+        , max_step(3e-3)
+        , num_sub_step(1)
         , local_error(1e-5)
     {
 

@@ -95,6 +95,8 @@ private:
     double      t;
     /// Current simulation time step
     double      dt;
+    /// Current simulation time in current integration interval
+    double      tau;
     /// Simulation start time
     double      start_time;
     /// Simulation stop time

@@ -135,8 +135,8 @@ void VL60k::stepTractionControl(double t, double dt)
         motor[i]->setDirection(km_state.revers_ref_state);
         motor[i]->setOmega(ip * wheel_omega[i]);
         motor[i]->setBetaStep(km_state.field_loosen_pos);
-        Q_a[i+1] = motor[i]->getTorque() * ip;
         motor[i]->step(t, dt);
+        Q_a[i+1] = motor[i]->getTorque() * ip;
 
         I_vu += motor[i]->getIa();
 

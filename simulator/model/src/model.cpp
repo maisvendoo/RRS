@@ -27,6 +27,7 @@
 Model::Model(QObject *parent) : QObject(parent)
   , t(0.0)
   , dt(0.001)
+  , tau(0.0)
   , start_time(0.0)
   , stop_time(1000.0)
   , is_step_correct(true)
@@ -356,7 +357,7 @@ void Model::configSolver(solver_config_t &solver_config)
 
         if (!cfg.getString(secName, "Method", solver_config.method))
         {
-            solver_config.method = "rkf5";
+            solver_config.method = "euler";
         }
         Journal::instance()->info("Integration method: " + solver_config.method);
 
@@ -374,20 +375,20 @@ void Model::configSolver(solver_config_t &solver_config)
 
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
-            solver_config.step = 2e-3;
+            solver_config.step = 3e-3;
         }
         Journal::instance()->info("Initial integration step: " + QString("%1").arg(solver_config.step));
 
         if (!cfg.getDouble(secName, "MaxStep", solver_config.max_step))
         {
-            solver_config.max_step = 2e-3;
+            solver_config.max_step = 3e-3;
         }
         Journal::instance()->info("Maximal integration step: " + QString("%1").arg(solver_config.max_step));
 
-        int tmp = 4;
+        int tmp = 1;
         if (!cfg.getInt(secName, "SubStepNum", tmp))
         {
-            solver_config.num_sub_step = 4;
+            solver_config.num_sub_step = 1;
         }
         else
         {
@@ -680,17 +681,13 @@ void Model::controlStep(double &control_time, const double control_delay)
 //------------------------------------------------------------------------------
 void Model::process()
 {
-    double tau = 0;
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
+    tau = tau - integration_time;
 
     // Integrate all ODE in train motion model
-    while ( (tau <= integration_time) &&
-            is_step_correct)
+    do
     {
         preStep(t);
-
-        // Feedback to viewer
-        sharedMemoryFeedback();
 
         controlStep(control_time, control_delay);
 
@@ -704,10 +701,11 @@ void Model::process()
 
         postStep(t);
     }
-/*
-    Journal::instance()->info(QString("t %1|dt %2")
-                              .arg(t, 9, 'f', 5)
-                              .arg(dt, 7, 'f', 5));*/
+    while ( (tau < 0.0) && is_step_correct );
+
+    // Feedback to viewer
+    sharedMemoryFeedback();
+
     train->inputProcess();
 
     // Debug print, is allowed
