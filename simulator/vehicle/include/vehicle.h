@@ -55,6 +55,14 @@ public:
     /// Vehicle initialization
     void init(QString cfg_path);
 
+    /// Set vehicle module directory
+    void setModuleDir(QString module_dir);
+    /// Set Vehicle module name
+    void setModuleName(QString module_name);
+    /// Set vehicle configuration file directory
+    void setConfigDir(QString config_dir);
+    /// Set Vehicle configuration file name
+    void setConfigName(QString config_name);
     /// Set current route directory
     void setRouteDir(QString route_dir);
 
@@ -101,7 +109,16 @@ public:
     void setPrevVehicle(Vehicle *vehicle);
     void setNextVehicle(Vehicle *vehicle);
 
-    void setConfigDir(QString config_dir);
+    /// Get vehicle module directory
+    QString getModuleDir() const;
+    /// Get Vehicle module name
+    QString getModuleName() const;
+    /// Get vehicle configuration file directory
+    QString getConfigDir() const;
+    /// Get Vehicle configuration file name
+    QString getConfigName() const;
+    /// Get vehicle sounds directory
+    QString getSoundsDir() const;
 
     /// Get vehicle index
     size_t getIndex() const;
@@ -156,9 +173,6 @@ public:
 
     QString getDebugMsg() const;
 
-    /// vehicle get sounds directory
-    QString getSoundsDir() const;
-
     /// Init vehicle brake devices
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
@@ -192,6 +206,14 @@ signals:
 
 protected:
 
+    /// Vehicle configuration file directory
+    QString module_dir;
+    /// Vehicle configuration file name
+    QString module_name;
+    /// Vehicle configuration file directory
+    QString config_dir;
+    /// Vehicle configuration file name
+    QString config_name;
     /// Current route directory
     QString route_dir;
     /// Vehicle sounds directory
@@ -278,8 +300,6 @@ protected:
 
     Vehicle *prev_vehicle;
     Vehicle *next_vehicle;
-
-    QString config_dir;
 
     /// Напряжение в КС
     double      Uks;

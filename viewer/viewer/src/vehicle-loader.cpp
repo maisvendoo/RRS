@@ -99,14 +99,14 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Group *loadVehicle(const std::string &configPath)
+osg::Group *loadVehicle(const std::string &configDir, const std::string &configName)
 {
     // Group node for vehicle model loading
     osg::ref_ptr<osg::Group> group = new osg::Group;
 
     // Open vehicle config file
     FileSystem &fs = FileSystem::getInstance();
-    std::string relative_config_path = configPath + fs.separator() + configPath + ".xml";
+    std::string relative_config_path = configDir + fs.separator() + configName + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
     ConfigReader cfg(cfg_path);
 
@@ -147,12 +147,12 @@ osg::Group *loadVehicle(const std::string &configPath)
 //
 //------------------------------------------------------------------------------
 void loadCabine(osg::Group *vehicle,
-                const std::string &config_name,
+                const std::string &configDir, const std::string &configName,
                 osg::ref_ptr<osg::Node> &cabine_model)
 {
     // Calculate vehicle config path
     FileSystem &fs = FileSystem::getInstance();
-    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string relative_cfg_path = configDir + fs.separator() + configName + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
 
     // Load config file
@@ -198,13 +198,13 @@ void loadCabine(osg::Group *vehicle,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float getLength(const std::string &config_name)
+float getLength(const std::string &configDir, const std::string &configName)
 {
     float length = 16.0f;
 
     // Calculate vehicle config path
     FileSystem &fs = FileSystem::getInstance();
-    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string relative_cfg_path = configDir + fs.separator() + configName + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
 
     // Load config file
@@ -226,13 +226,13 @@ float getLength(const std::string &config_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Vec3 getDirverPosition(const std::string &config_name)
+osg::Vec3 getDirverPosition(const std::string &configDir, const std::string &configName)
 {
     osg::Vec3 position(0.9255f, 9.0172f, 3.75f);
 
     // Calculate vehicle config path
     FileSystem &fs = FileSystem::getInstance();
-    std::string relative_cfg_path = config_name + fs.separator() + config_name + ".xml";
+    std::string relative_cfg_path = configDir + fs.separator() + configName + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
 
     // Load config file

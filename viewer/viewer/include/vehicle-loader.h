@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Group *loadVehicle(const std::string &configPath);
+osg::Group *loadVehicle(const std::string &configDir, const std::string &configName);
 
 
 /*!
@@ -38,7 +38,7 @@ osg::Group *loadVehicle(const std::string &configPath);
 //
 //------------------------------------------------------------------------------
 void loadCabine(osg::Group *vehicle,
-                const std::string &config_name,
+                const std::string &configDir, const std::string &configName,
                 osg::ref_ptr<osg::Node> &cabine_model);
 
 /*!
@@ -48,8 +48,8 @@ void loadCabine(osg::Group *vehicle,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float getLength(const std::string &config_name);
+float getLength(const std::string &configDir, const std::string &configName);
 
-osg::Vec3 getDirverPosition(const std::string &config_name);
+osg::Vec3 getDirverPosition(const std::string &configDir, const std::string &configName);
 
 #endif // VEHICLE_LOADER_H

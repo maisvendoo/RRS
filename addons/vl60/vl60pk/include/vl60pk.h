@@ -312,33 +312,33 @@ private:
     void initialization();
 
     /// Инициализация сцепных устройств
-    void initCouplings(QString modules_dir);
+    void initCouplings(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация токоприемников
-    void initPantographs();
+    void initPantographs(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Иницаализация высоковольтной части схемы (ГВ, тяговый трансформатор)
-    void initHighVoltageScheme();
+    void initHighVoltageScheme(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация вспомогательных машин (ФР, МК, МВ1 - МВ6)
-    void initSupplyMachines();
+    void initSupplyMachines(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация питательной магистрали
-    void initPneumoSupply(QString modules_dir);
+    void initPneumoSupply(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация приборов управления тормозами
-    void initBrakesControl(QString modules_dir);
+    void initBrakesControl(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация тормозного оборудования
-    void initBrakesEquipment(QString modules_dir);
+    void initBrakesEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация ЭПТ
-    void initEPB(QString modules_dir);
+    void initEPB(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация схемы управления тягой
-    void initTractionControl();
+    void initTractionControl(const QString &modules_dir, const QString &custom_cfg_dir);
 
-    void initOtherEquipment();
+    void initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
 
     void initTriggers();
 

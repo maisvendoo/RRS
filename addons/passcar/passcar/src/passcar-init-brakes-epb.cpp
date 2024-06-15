@@ -1,11 +1,10 @@
-#include    "filesystem.h"
-
 #include    "passcar.h"
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void PassCar::initEPB(QString modules_dir)
+void PassCar::initEPB(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    Q_UNUSED(modules_dir)
+    (void) modules_dir;
+    (void) custom_cfg_dir;
 }

@@ -1,20 +1,16 @@
 #include    "vl60pk.h"
 
-#include    "filesystem.h"
-
-#include    <QDir>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initPantographs()
+void VL60pk::initPantographs(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    QString pant_cfg_path = config_dir + QDir::separator() + "pantograph";
+    (void) modules_dir;
 
     for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
     {
         pantographs[i] = new Pantograph();
-        pantographs[i]->read_custom_config(pant_cfg_path);
+        pantographs[i]->read_config("pantograph", custom_cfg_dir);
         connect(pantographs[i], &Pantograph::soundPlay, this, &VL60pk::soundPlay);
     }
 }
@@ -22,29 +18,31 @@ void VL60pk::initPantographs()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initHighVoltageScheme()
+void VL60pk::initHighVoltageScheme(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    QString gv_cfg_path = config_dir + QDir::separator() + "main-switch";
+    (void) modules_dir;
 
     main_switch = new ProtectiveDevice();
-    main_switch->read_custom_config(gv_cfg_path);
+    main_switch->read_config("main-switch", custom_cfg_dir);
     connect(main_switch, &ProtectiveDevice::soundPlay, this, &VL60pk::soundPlay);
 
     gauge_KV_ks = new Oscillator();
     gauge_KV_ks->read_config("oscillator");
 
     trac_trans = new TracTransformer();
-    trac_trans->read_custom_config(config_dir + QDir::separator() + "trac-transformer");
+    trac_trans->read_config("trac-transformer", custom_cfg_dir);
     connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60pk::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initSupplyMachines()
+void VL60pk::initSupplyMachines(const QString &modules_dir, const QString &custom_cfg_dir)
 {
+    (void) modules_dir;
+
     phase_spliter = new PhaseSplitter();
-    phase_spliter->read_custom_config(config_dir + QDir::separator() + "phase-splitter");
+    phase_spliter->read_config("phase-splitter", custom_cfg_dir);
     connect(phase_spliter, &PhaseSplitter::soundPlay, this, &VL60pk::soundPlay);
     connect(phase_spliter, &PhaseSplitter::soundStop, this, &VL60pk::soundStop);
 
@@ -60,57 +58,59 @@ void VL60pk::initSupplyMachines()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initTractionControl()
+void VL60pk::initTractionControl(const QString &modules_dir, const QString &custom_cfg_dir)
 {
+    (void) modules_dir;
+
     controller = new ControllerKME_60_044();
     connect(controller, &ControllerKME_60_044::soundPlay, this, &VL60pk::soundPlay);
 
     main_controller = new EKG_8G();
-    main_controller->read_custom_config(config_dir + QDir::separator() + "ekg-8g");
+    main_controller->read_config("ekg-8g", custom_cfg_dir);
     connect(main_controller, &EKG_8G::soundPlay, this, &VL60pk::soundPlay);
 
     for (size_t i = 0; i < vu.size(); ++i)
     {
         vu[i] = new Rectifier();
-        vu[i]->read_custom_config(config_dir + QDir::separator() + "VU");
+        vu[i]->read_config("VU", custom_cfg_dir);
     }
 
     gauge_KV_motors = new Oscillator();
-    gauge_KV_motors->read_custom_config(config_dir + QDir::separator() + "KV1-osc");
+    gauge_KV_motors->read_config("KV1-osc", custom_cfg_dir);
 
     for (size_t i = 0; i < motor.size(); ++i)
     {
         motor[i] = new DCMotor();
-        motor[i]->setCustomConfigDir(config_dir);
-        motor[i]->read_custom_config(config_dir + QDir::separator() + "HB-412K");
+        motor[i]->setCustomConfigDir(custom_cfg_dir);
+        motor[i]->read_config("HB-412K", custom_cfg_dir);
         connect(motor[i], &DCMotor::soundSetPitch, this, &VL60pk::soundSetPitch);
         connect(motor[i], &DCMotor::soundSetVolume, this, &VL60pk::soundSetVolume);
 
         overload_relay[i] = new OverloadRelay();
-        overload_relay[i]->read_custom_config(config_dir + QDir::separator() + "PT-140A");
+        overload_relay[i]->read_config("PT-140A", custom_cfg_dir);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initOtherEquipment()
+void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir)
 {
+    (void) modules_dir;
+
     speed_meter = new SL2M();
     speed_meter->setWheelDiameter(wheel_diameter[0]);
-    speed_meter->read_custom_config(config_dir + QDir::separator() + "3SL-2M");
+    speed_meter->read_config("3SL-2M", custom_cfg_dir);
     connect(speed_meter, &SL2M::soundSetVolume, this, &VL60pk::soundSetVolume);
 
     horn = new TrainHorn();
     connect(horn, &TrainHorn::soundPlay, this, &VL60pk::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60pk::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60pk::soundStop);
-/*
+
     reg = new Registrator();
-    reg->setFileName("vl60pk-coupling-forces");
+    reg->setFileName("vl60pk-step");
     reg->init();
-    reg->print("  time  ;  fwd_force  ;  bwd_force  ");
-*/
 }
 
 //------------------------------------------------------------------------------

@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------
 void FreightCar::stepEPB(double t, double dt)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
+    (void) t;
+    (void) dt;
 
     if (electro_air_dist != nullptr)
     {

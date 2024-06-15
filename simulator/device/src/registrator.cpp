@@ -1,6 +1,7 @@
 #include    "registrator.h"
+#include    "filesystem.h"
+#include    "Journal.h"
 
-#include    <QDir>
 #include    <QDateTime>
 #include    <QTextStream>
 
@@ -16,7 +17,7 @@ Registrator::Registrator(double interval, QObject *parent)
     , file(nullptr)
     , is_replace_dot_by_comma(false)
 {
-
+    custom_cfg_dir = "";
 }
 
 //------------------------------------------------------------------------------
@@ -25,6 +26,75 @@ Registrator::Registrator(double interval, QObject *parent)
 Registrator::~Registrator()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Registrator::setCustomConfigDir(const QString &path)
+{
+    custom_cfg_dir = path;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Registrator::read_config(const QString &filename, const QString &dir_path)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    CfgReader cfg;
+
+    // Custom config from path
+    if (dir_path != "")
+    {
+        QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_configuration(cfg);
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + dir_path);
+        }
+    }
+
+    // Custom config from vehicle's subdirectory
+    if (custom_cfg_dir != "")
+    {
+        QString cfg_path = custom_cfg_dir + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_configuration(cfg);
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + custom_cfg_dir);
+        }
+    }
+
+    // Config from default directory
+    QString cfg_dir = fs.getDevicesDir().c_str();
+    QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
+
+    if (cfg.load(cfg_path))
+    {
+        Journal::instance()->info("Loaded file: " + cfg_path);
+
+        load_configuration(cfg);
+        load_config(cfg);
+        return;
+    }
+    Journal::instance()->error("File " + filename + ".xml is't found at default path " + cfg_dir);
 }
 
 //------------------------------------------------------------------------------
@@ -68,19 +138,6 @@ void Registrator::init()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Registrator::read_custom_config(const QString &path)
-{
-    CfgReader cfg;
-
-    if (cfg.load(path + ".xml"))
-    {
-        load_config(cfg);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Registrator::print(QString line, double t, double dt)
 {
     Q_UNUSED(t)
@@ -111,7 +168,7 @@ void Registrator::print(QString line, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Registrator::load_config(CfgReader &cfg)
+void Registrator::load_configuration(CfgReader &cfg)
 {
     QString secName = "Device";
 
@@ -120,4 +177,11 @@ void Registrator::load_config(CfgReader &cfg)
 
     cfg.getString(secName, "FileName", fileName);
     cfg.getBool(secName, "ReplaceDotByComma", is_replace_dot_by_comma);
+}
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Registrator::load_config(CfgReader &cfg)
+{
+    Q_UNUSED(cfg)
 }

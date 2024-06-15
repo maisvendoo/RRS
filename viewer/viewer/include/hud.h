@@ -30,7 +30,7 @@ public:
 
 public slots:
 
-    void setStatusBar(QString msg);
+    void setStatusBar(const std::wstring &msg);
 
 private:
 

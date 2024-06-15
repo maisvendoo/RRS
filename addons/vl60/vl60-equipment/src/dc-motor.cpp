@@ -155,7 +155,7 @@ void DCMotor::load_config(CfgReader &cfg)
 
     cfg.getString(secName, "cPhi", cPhiFileName);
 
-    cPhi.load((custom_config_dir + QDir::separator() + cPhiFileName).toStdString());
+    cPhi.load((custom_cfg_dir + QDir::separator() + cPhiFileName).toStdString());
 
     QDomNode secNode;
 

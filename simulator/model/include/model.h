@@ -27,6 +27,9 @@
 #include    "train.h"
 #include    "elapsed-timer.h"
 
+#include    "simulator-info-struct.h"
+#include    "simulator-update-struct.h"
+
 #include    "server.h"
 
 #include    "profile.h"
@@ -115,6 +118,9 @@ private:
     double      control_time;
     double      control_delay;
 
+    int current_vehicle;
+    int controlled_vehicle;
+
     /// Train model
     Train       *train;    
 
@@ -140,11 +146,18 @@ private:
     QThread     model_thread;
 
     KeysControl keys_control;
-
+/*
     /// Server data to clinet transmission
-    server_data_t   viewer_data;
+    server_data_t   viewer_data;*/
+/*
+    /// Server info to clinet transmission
+    simulator_info_t   info_data;*/
+    /// Server update data to clinet transmission
+    simulator_update_t   update_data;
 
-    QSharedMemory   shared_memory;
+    QSharedMemory   memory_sim_info;
+    QSharedMemory   memory_sim_update;
+//    QSharedMemory   shared_memory;
     QSharedMemory   keys_data;
     QByteArray      data;
 
@@ -153,7 +166,7 @@ private:
 
     ElapsedTimer    simTimer;       
 
-    /// Actions, which prerare integration step
+    /// Actions, which prerare integration step and also update shared data
     void preStep(double t);
     /// Simulation step
     bool step(double t, double &dt);

@@ -1,13 +1,12 @@
-#include    "filesystem.h"
-
 #include    "vl60pk.h"
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::initEPB(QString modules_dir)
+void VL60pk::initEPB(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    Q_UNUSED(modules_dir)
+    (void) modules_dir;
+    (void) custom_cfg_dir;
 
     // Преобразователь напряжения для ЭПТ
     epb_converter = new EPBConverter();

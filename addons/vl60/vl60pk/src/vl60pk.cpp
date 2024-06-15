@@ -109,29 +109,31 @@ void VL60pk::initialization()
 {
     FileSystem &fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
+    QString custom_cfg_dir(fs.getVehiclesDir().c_str());
+    custom_cfg_dir += fs.separator() + config_dir;
 
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
 
-    initCouplings(modules_dir);
+    initCouplings(modules_dir, custom_cfg_dir);
 
-    initPantographs();
+    initPantographs(modules_dir, custom_cfg_dir);
 
-    initHighVoltageScheme();
+    initHighVoltageScheme(modules_dir, custom_cfg_dir);
 
-    initSupplyMachines();
+    initSupplyMachines(modules_dir, custom_cfg_dir);
 
-    initPneumoSupply(modules_dir);
+    initPneumoSupply(modules_dir, custom_cfg_dir);
 
-    initBrakesControl(modules_dir);
+    initBrakesControl(modules_dir, custom_cfg_dir);
 
-    initBrakesEquipment(modules_dir);
+    initBrakesEquipment(modules_dir, custom_cfg_dir);
 
-    initEPB(modules_dir);
+    initEPB(modules_dir, custom_cfg_dir);
 
-    initTractionControl();
+    initTractionControl(modules_dir, custom_cfg_dir);
 
-    initOtherEquipment();
+    initOtherEquipment(modules_dir, custom_cfg_dir);
 
     initTriggers();
 

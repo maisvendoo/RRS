@@ -5,12 +5,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::initRegistrator()
+void PassCar::initRegistrator(const QString &modules_dir, const QString &custom_cfg_dir)
 {
+    (void) modules_dir;
+
     registrator = new Registrator();
     registrator->setFileName(QString("passcar_%1").arg(idx));
     registrator->setReplaceDotByComma(true);
-    registrator->read_custom_config(config_dir + QDir::separator() + "registrator");
+    registrator->read_config("registrator", custom_cfg_dir);
     registrator->init();
 
     if (air_dist_module == "vr292")

@@ -26,12 +26,9 @@ Device::Device(QObject *parent) : QObject(parent)
   , sub_step_num(1)
   , solver_type(EULER)
 {
-    FileSystem &fs = FileSystem::getInstance();
-    cfg_dir = fs.getDevicesDir();
-    modules_dir = fs.getModulesDir();
-
     qRegisterMetaType<state_vector_t>();
 
+    custom_cfg_dir = "";
     DebugMsg = "";
 
     memory_alloc(1);
@@ -174,40 +171,62 @@ double Device::getY(size_t i) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Device::read_config(const QString &path)
+void Device::read_config(const QString &filename, const QString &dir_path)
 {
+    FileSystem &fs = FileSystem::getInstance();
     CfgReader cfg;
-    QString cfg_path = QString(cfg_dir.c_str()) + QDir::separator() + path + ".xml";
+
+    // Custom config from path
+    if (dir_path != "")
+    {
+        QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_configuration(cfg);
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + dir_path);
+        }
+    }
+
+    // Custom config from vehicle's subdirectory
+    if (custom_cfg_dir != "")
+    {
+        QString cfg_path = custom_cfg_dir + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_configuration(cfg);
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + custom_cfg_dir);
+        }
+    }
+
+    // Config from default directory
+    QString cfg_dir = fs.getDevicesDir().c_str();
+    QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
 
     if (cfg.load(cfg_path))
     {
         Journal::instance()->info("Loaded file: " + cfg_path);
+
         load_configuration(cfg);
         load_config(cfg);
+        return;
     }
-    else
-    {
-        Journal::instance()->error("File " + cfg_path + " is't found");
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Device::read_custom_config(const QString &path)
-{
-    CfgReader cfg;
-
-    if (cfg.load(path + ".xml"))
-    {
-        Journal::instance()->info("Loaded file: " + path);
-        load_configuration(cfg);
-        load_config(cfg);
-    }
-    else
-    {
-        Journal::instance()->error("File " + path + " is't found");
-    }
+    Journal::instance()->error("File " + filename + ".xml is't found at default path " + cfg_dir);
 }
 
 //------------------------------------------------------------------------------
@@ -291,9 +310,9 @@ feedback_signals_t Device::getFeedback() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Device::setCustomConfigDir(const QString &value)
+void Device::setCustomConfigDir(const QString &path)
 {
-    custom_config_dir = value;
+    custom_cfg_dir = path;
 }
 
 //------------------------------------------------------------------------------
@@ -301,7 +320,7 @@ void Device::setCustomConfigDir(const QString &value)
 //------------------------------------------------------------------------------
 QString Device::getCustomConfigDir() const
 {
-    return custom_config_dir;
+    return custom_cfg_dir;
 }
 
 //------------------------------------------------------------------------------

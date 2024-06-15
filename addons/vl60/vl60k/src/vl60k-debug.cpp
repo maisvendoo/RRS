@@ -5,7 +5,8 @@
 //------------------------------------------------------------------------------
 void VL60k::debugPrint(double t, double dt)
 {
-    Q_UNUSED(dt)
+    (void) t;
+    (void) dt;
 
     DebugMsg = QString("t%1 s|")
             .arg(t, 7, 'f', 1);

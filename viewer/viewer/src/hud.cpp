@@ -54,12 +54,15 @@ osgViewer::View *HUD::getView()
     return view.get();
 }
 
-void HUD::setStatusBar(QString msg)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HUD::setStatusBar(const std::wstring &msg)
 {
     //std::cout << qPrintable(msg) << std::endl;
 
     if (statusBar.valid())
-        statusBar->setText(msg.toStdWString().c_str());
+        statusBar->setText(msg.c_str());
 }
 
 //------------------------------------------------------------------------------
@@ -80,7 +83,7 @@ osg::Camera *HUD::createCamera(int width, int height)
     osg::StateSet* stateset = geode->getOrCreateStateSet();
     stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
-    statusBar = createText(osg::Vec3(10, 10, 0), L"", 14.0f);
+    statusBar = createText(osg::Vec3(5, 66, 0), L"", 15.0f);
 
     geode->addDrawable(statusBar.get());
 

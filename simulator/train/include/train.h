@@ -18,6 +18,7 @@
 
 #include    "filesystem.h"
 #include    "init_data.h"
+#include    "simulator-update-struct.h"
 #include    "ode-system.h"
 #include    "vehicle.h"
 #include    "device-list.h"
@@ -60,7 +61,7 @@ public:
     void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt);
 
     /// Action before time step
-    void preStep(double t);
+    void preStep(double t, simulator_update_t &update_data);
 
     /// Integration step
     bool step(double t, double &dt);
@@ -112,6 +113,12 @@ private:
 
     /// Direction of motion on railway
     int             dir;
+
+    /// Vehicle which selected by user for view
+    int             current_vehicle;
+
+    /// Vehicle which selected by user for control
+    int             controlled_vehicle;
 
     /// Profile manager
     Profile     *profile;

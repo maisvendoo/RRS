@@ -1,12 +1,14 @@
-#include    "filesystem.h"
-
 #include    "passcar.h"
+
+#include    <QDir>
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void PassCar::initBrakesEquipment(QString modules_dir)
+void PassCar::initBrakesEquipment(const QString &modules_dir, const QString &custom_cfg_dir)
 {
+    (void) custom_cfg_dir;
+
     // Тормозная магистраль
     double volume_bp = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
     brakepipe = new Reservoir(volume_bp);

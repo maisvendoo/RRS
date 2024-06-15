@@ -1,11 +1,11 @@
-#include    "filesystem.h"
-
 #include    "vl60pk.h"
+
+#include    <QDir>
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::initBrakesControl(QString modules_dir)
+void VL60pk::initBrakesControl(const QString &modules_dir, const QString &custom_cfg_dir)
 {
     // Блокировочное устройство
     brake_lock = new BrakeLock();
@@ -29,7 +29,7 @@ void VL60pk::initBrakesControl(QString modules_dir)
 
     // Переключательный клапан магистрали тормозных цилиндров
     bc_switch_valve = new SwitchingValve();
-    bc_switch_valve->read_custom_config(config_dir + QDir::separator() + "zpk");
+    bc_switch_valve->read_config("zpk", custom_cfg_dir);
 
     // Повторительное реле давления
     bc_pressure_relay = new PneumoRelay();

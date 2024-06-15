@@ -38,28 +38,37 @@
 //------------------------------------------------------------------------------
 TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
                                            MotionPath *routePath,
-                                           const std::string &train_config)
+                                           const simulator_info_t &info_data)
     : QObject(Q_NULLPTR)
     , osgGA::GUIEventHandler ()
     , settings(settings)
     , cur_vehicle(0)
+    , controlled_vehicle(0)
     , long_shift(0.0f)
     , height_shift(0.0f)
     , routePath(routePath)
     , trainExterior(new osg::Group)
     , ref_time(0.0)
     , is_displays_locked(false)
-
+    , new_data(-1)
+    , old_data(-1)
 {
-    load(train_config);
+    load(info_data);
 
+    memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
+
+    if (!memory_sim_update.attach(QSharedMemory::ReadOnly))
+    {
+        OSG_FATAL << "Can't connect to shared memory" << std::endl;
+    }
+/*
     shared_memory.setKey("sim");
 
     if (!shared_memory.attach(QSharedMemory::ReadOnly))
     {
         OSG_FATAL << "Can't connect to shared memory" << std::endl;
     }
-
+*/
     //startTimer(settings.request_interval);
 }
 
@@ -82,7 +91,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             processSharedData(ref_time);
 
-            moveTrain(ref_time, nd);
+            moveTrain(ref_time, update_data);
 
             moveCamera(viewer);
 
@@ -195,165 +204,111 @@ void TrainExteriorHandler::keyboardHandler(int key)
 
         height_shift += 0.05f;
         break;
+
+    case osgGA::GUIEventAdapter::KEY_KP_Enter:
+    case osgGA::GUIEventAdapter::KEY_Return:
+
+        controlled_vehicle = cur_vehicle;
+        break;
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::load(const std::string &train_config)
+void TrainExteriorHandler::load(const simulator_info_t &info_data)
 {
-    // Check train config name
-    if (train_config.empty())
+    int count = info_data.num_vehicles;
+
+    for (int i = 0; i < count; ++i)
     {
-        OSG_FATAL << "Train config is't referenced" << std::endl;
-        return;
-    }
+        QString cfg_dir_tmp = QString::fromStdWString(info_data.vehicles_info[i].vehicle_config_dir);
+        cfg_dir_tmp.resize(info_data.vehicles_info[i].vehicle_config_dir_length);
+        std::string cfg_dir = cfg_dir_tmp.toStdString();
 
-    // Loading train config XML-file
-    FileSystem &fs = FileSystem::getInstance();
-    std::string path = fs.combinePath(fs.getTrainsDir(), train_config + ".xml");
+        QString cfg_file_tmp = QString::fromStdWString(info_data.vehicles_info[i].vehicle_config_file);
+        cfg_file_tmp.resize(info_data.vehicles_info[i].vehicle_config_file_length);
+        std::string cfg_file = cfg_file_tmp.toStdString();
 
-    ConfigReader cfg(path);
+        osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(cfg_dir, cfg_file);
 
-    if (!cfg.isOpenned())
-    {
-        OSG_FATAL << "Train's config file " << path << " is't opened" << std::endl;
-        return;
-    }
-
-    osgDB::XmlNode *config_node = cfg.getConfigNode();
-
-    if (config_node == nullptr)
-    {
-        OSG_FATAL << "There is no Config node in file " << path << std::endl;
-        return;
-    }
-
-    // Parsing of train config file
-    for (auto it = config_node->children.begin(); it != config_node->children.end(); ++it)
-    {
-        osgDB::XmlNode *child = *it;
-
-        // Check that node is Vehicle node
-        if (child->name == "Vehicle")
+        if (!vehicle_model.valid())
         {
-            int count = 0;
-
-            osgDB::XmlNode *count_node = cfg.findSection(child, "Count");
-
-            if (count_node == nullptr)
-            {
-                OSG_FATAL << "Number of vehicles is't referenced" << std::endl;
-                continue;
-            }
-
-            // Read vehicles number
-            getValue(count_node->contents, count);
-
-            bool isForward = true;
-
-            osgDB::XmlNode *orient_node = cfg.findSection(child, "IsOrientationForward");
-
-            // Read vehicles orientation
-            if (orient_node != nullptr)
-            {
-                getValue(orient_node->contents, isForward);
-            }
-
-            std::string module_config_name = "";
-
-            osgDB::XmlNode *module_config_node = cfg.findSection(child, "ModuleConfig");
-
-            if (module_config_node == nullptr)
-            {
-                OSG_FATAL << "Vehicle module config is't referenced" << std::endl;
-                continue;
-            }
-
-            // Load vehicle body model
-            getValue(module_config_node->contents, module_config_name);
-
-            for (int i = 0; i < count; ++i)
-            {
-                osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(module_config_name);
-
-                if (!vehicle_model.valid())
-                {
-                    OSG_FATAL << "Vehicle model " << module_config_name << " is't loaded" << std::endl;
-                    continue;
-                }
-
-                // Load cabine model
-                osg::ref_ptr<osg::Node> cabine;
-                loadCabine(vehicle_model.get(), module_config_name, cabine);
-
-                float length = getLength(module_config_name);
-
-                osg::Vec3 driver_pos = getDirverPosition(module_config_name);
-
-                vehicle_exterior_t vehicle_ext;
-                vehicle_ext.transform = new osg::MatrixTransform;
-                vehicle_ext.transform->addChild(vehicle_model.get());
-                vehicle_ext.length = length;
-                vehicle_ext.cabine = cabine;
-                vehicle_ext.driver_pos = driver_pos;
-                if (isForward)
-                    vehicle_ext.orientation = 1;
-                else
-                    vehicle_ext.orientation = -1;
-
-                vehicle_ext.anims = new animations_t();
-                vehicle_ext.displays = new displays_t();
-
-                loadModelAnimations(module_config_name, vehicle_model.get(), *vehicle_ext.anims);
-                loadAnimations(module_config_name, vehicle_model.get(), *vehicle_ext.anims);
-                loadAnimations(module_config_name, cabine.get(), *vehicle_ext.anims);
-
-                anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
-
-                loadDisplays(cfg, child, cabine.get(), *vehicle_ext.displays);
-
-                vehicles_ext.push_back(vehicle_ext);
-                trainExterior->addChild(vehicle_ext.transform.get());
-            }
+            OSG_FATAL << "Vehicle model " << cfg_dir << "/" << cfg_file << " is't loaded. Added empty model." << std::endl;
+            vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
+            vehicles_ext.push_back(vehicle_ext);
+            continue;
         }
+
+        // Load cabine model
+        osg::ref_ptr<osg::Node> cabine;
+        loadCabine(vehicle_model.get(), cfg_dir, cfg_file, cabine);
+
+        osg::Vec3 driver_pos = getDirverPosition(cfg_dir, cfg_file);
+
+        vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
+        vehicle_ext.transform->addChild(vehicle_model.get());
+        vehicle_ext.cabine = cabine;
+        vehicle_ext.driver_pos = driver_pos;
+
+        loadModelAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
+        loadAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
+        loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
+
+        anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
+
+        loadDisplays(cfg_dir, cabine.get(), *vehicle_ext.displays);
+
+        vehicles_ext.push_back(vehicle_ext);
+        trainExterior->addChild(vehicle_ext.transform.get());
     }
 
-    //animation_manager = new AnimationManager(&animations);
     this->startTimer(100);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
+void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator_update_t, 2> sim_data)
 {
-    if (nd.sd.size() < 2)
+    if ((old_data == -1) || (new_data == -1))
         return;
 
     // Time to relative units conversion
     float Delta_t = static_cast<float>(settings.request_interval) / 1000.0f;
 
+    // Interframe coordinate
     float t = static_cast<float>(ref_time) / Delta_t;
+    float k = (1.0f - t);
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
-        // Interframe railway coordinate and wheels angle linear interpolation
-        float coord = (1.0f - t) * nd.sd.front().te[i].coord + nd.sd.back().te[i].coord * t;
-
         // Vehicle cartesian position and attitude calculation
-        vehicles_ext[i].position = routePath->getPosition(coord, vehicles_ext[i].attitude);
+        vehicles_ext[i].position = osg::Vec3(
+            k * sim_data[old_data].vehicles[i].position_x + t * sim_data[new_data].vehicles[i].position_x,
+            k * sim_data[old_data].vehicles[i].position_y + t * sim_data[new_data].vehicles[i].position_y,
+            k * sim_data[old_data].vehicles[i].position_z + t * sim_data[new_data].vehicles[i].position_z);
 
-        if ((settings.direction * vehicles_ext[i].orientation) == -1)
-            vehicles_ext[i].attitude.z() += osg::PIf;
+        vehicles_ext[i].orth = osg::Vec3(
+            k * sim_data[old_data].vehicles[i].orth_x + t * sim_data[new_data].vehicles[i].orth_x,
+            k * sim_data[old_data].vehicles[i].orth_y + t * sim_data[new_data].vehicles[i].orth_y,
+            k * sim_data[old_data].vehicles[i].orth_z + t * sim_data[new_data].vehicles[i].orth_z);
 
+        vehicles_ext[i].up = osg::Vec3(
+            k * sim_data[old_data].vehicles[i].up_x + t * sim_data[new_data].vehicles[i].up_x,
+            k * sim_data[old_data].vehicles[i].up_y + t * sim_data[new_data].vehicles[i].up_y,
+            k * sim_data[old_data].vehicles[i].up_z + t * sim_data[new_data].vehicles[i].up_z);
+
+        vehicles_ext[i].attitude = osg::Vec3(
+            asinf(vehicles_ext[i].orth.z()),
+            0.0f,
+            (vehicles_ext[i].orth.x() > 0.0) ? acos(vehicles_ext[i].orth.y()) : - acos(vehicles_ext[i].orth.y()) );
+
+        vehicles_ext[i].orientation = update_data[new_data].vehicles[i].orientation;
+/*
         // Store current railway coordinate and wheels angle
-        vehicles_ext[i].coord = coord;
-        //vehicles_ext[i].wheel_angle = angle;
-
         recalcAttitude(i);
-
+*/
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
         matrix *= osg::Matrixf::rotate(settings.direction * vehicles_ext[i].orientation * vehicles_ext[i].attitude.x(), osg::Vec3(1.0f, 0.0f, 0.0f));
@@ -365,7 +320,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const network_data_t &nd)
         for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
         {
             ProcAnimation *animation = it.value();
-            animation->setPosition(nd.sd.back().te[i].analogSignal[animation->getSignalID()]);
+            animation->setPosition(update_data[new_data].vehicles[i].analogSignal[animation->getSignalID()]);
         }
     }
 }
@@ -380,6 +335,64 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 
     ref_time = 0;
 
+    if (memory_sim_update.lock())
+    {
+        simulator_update_t *sd = static_cast<simulator_update_t *>(memory_sim_update.data());
+
+        if (sd == nullptr)
+        {
+            memory_sim_update.unlock();
+            return;
+        }
+
+        if (old_data == -1)
+        {
+            if (new_data == -1)
+            {
+                memcpy(update_data.data(), sd, sizeof (simulator_update_t));
+                new_data = 0;
+            }
+            else
+            {
+                memcpy(update_data.data() + 1, sd, sizeof (simulator_update_t));
+                old_data = 0;
+                new_data = 1;
+            }
+        }
+        else
+        {
+            if (new_data == 1)
+            {
+                memcpy(update_data.data(), sd, sizeof (simulator_update_t));
+                old_data = 1;
+                new_data = 0;
+            }
+            else
+            {
+                memcpy(update_data.data() + 1, sd, sizeof (simulator_update_t));
+                old_data = 0;
+                new_data = 1;
+            }
+        }
+        memory_sim_update.unlock();
+        //OSG_FATAL << new_data << " | " << update_data[new_data].time << " | " << old_data << " | " << update_data[old_data].time << std::endl;
+
+        QString hud_text = QString("Время от начала симуляции: %1 сек\n")
+                        .arg(update_data[new_data].time, 8, 'f', 1);
+        hud_text += QString("Выбранная ПЕ %1 \n")
+                        .arg(update_data[new_data].current_vehicle);
+
+        hud_text += QString::fromStdWString(update_data[new_data].currentDebugMsg) + QString("\n");
+
+        hud_text += QString("Управляемая ПЕ %1 \n")
+                        .arg(update_data[new_data].controlled_vehicle);
+
+        hud_text += QString::fromStdWString(update_data[new_data].controlledDebugMsg);
+
+        std::wstring text = hud_text.toStdWString();
+        emit setStatusBar(text);
+    }
+/*
     if (shared_memory.lock())
     {
         server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
@@ -409,6 +422,7 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
 
         shared_memory.unlock();
     }
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -425,17 +439,21 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     cp.is_orient_bwd = (vehicles_ext[static_cast<size_t>(cur_vehicle)].orientation < 0);
 
     cp.attitude.x() = - osg::PIf / 2.0f - cp.attitude.x() * settings.direction;
-
+/*
     float viewer_coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord +
             settings.direction * settings.stat_cam_shift;
 
     cp.viewer_pos = routePath->getPosition(viewer_coord, cp.view_basis);
+*/
+    cp.viewer_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].position
+        + vehicles_ext[static_cast<size_t>(cur_vehicle)].orth * settings.direction * settings.stat_cam_shift;
 
-    cp.view_basis.right = cp.view_basis.right * settings.direction;
+    cp.view_basis.front = vehicles_ext[static_cast<size_t>(cur_vehicle)].orth;
+    cp.view_basis.right = cp.view_basis.front ^ osg::Vec3(osg::Z_AXIS);
 
     emit sendCameraPosition(cp);
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -458,14 +476,15 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     osg::Vec3 prev_att = prev.attitude;
     float pitch = prev_att.x();
     float yaw = prev_att.z();
-    yaw -= osg::PIf * hs_n(prev.orientation);
+//    yaw -= osg::PIf * hs_n(prev.orientation);
     osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
 
     // Calculate bacward coupling point of previos vehicle
-    osg::Vec3 tail_dir = tail_orth * (prev.length / 2.0f);
+//    osg::Vec3 tail_dir = tail_orth * (prev.length / 2.0f);
 
     // Calculate forward coupling of current vehicle orth
-    osg::Vec3 a = prev.position + tail_dir;
+//    osg::Vec3 a = prev.position + tail_dir;
+    osg::Vec3 a = prev.position;
     osg::Vec3 forward = a - curr.position;
     osg::Vec3 f_orth = forward * (1 / forward.length());
 
@@ -484,11 +503,12 @@ void TrainExteriorHandler::recalcAttitude(size_t i)
     // "Smoothing" of vehicle oscillations
     vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0;
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
+void TrainExteriorHandler::loadAnimations(const std::string &configDir,
+                                          const std::string &configName,
                                           osg::Node *cabine,
                                           animations_t &animations)
 {
@@ -496,10 +516,10 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
         return;
 
     // Default name of animations configs directory is name of vehicle's config
-    std::string anim_config_dir = vehicle_name;
+    std::string anim_config_dir = configName;
 
     FileSystem &fs = FileSystem::getInstance();
-    std::string relative_cfg_path = vehicle_name + fs.separator() + vehicle_name + ".xml";
+    std::string relative_cfg_path = configDir + fs.separator() + configName + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
 
     // Load config file
@@ -521,15 +541,16 @@ void TrainExteriorHandler::loadAnimations(const std::string vehicle_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::loadModelAnimations(const std::string vehicle_name,
+void TrainExteriorHandler::loadModelAnimations(const std::string &configDir,
+                                               const std::string &configName,
                                                osg::Node *model,
                                                animations_t &animations)
 {
     // Default name of animations configs directory is name of vehicle's config
-    std::string anim_config_dir = vehicle_name;
+    std::string anim_config_dir = configName;
 
     FileSystem &fs = FileSystem::getInstance();
-    std::string relative_cfg_path = vehicle_name + fs.separator() + vehicle_name + ".xml";
+    std::string relative_cfg_path = configDir + fs.separator() + configName + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
 
     // Load config file
@@ -584,46 +605,21 @@ void TrainExteriorHandler::loadModelAnimations(const std::string vehicle_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
-                                        osgDB::XmlNode *vehicle_node,
+void TrainExteriorHandler::loadDisplays(const std::string &configDir,
                                         osg::Node *model,
                                         displays_t &displays)
 {
-    // Определяем имя модуля для формирования пути к библиотекам дисплеев
-    osgDB::XmlNode *module_node = cfg.findSection(vehicle_node, "Module");
-
-    if (module_node == nullptr)
-    {
-        OSG_FATAL << "Vehicle's module is't represented";
-        return;
-    }
-
-    std::string module_name;
-    getValue(module_node->contents, module_name);
-    FileSystem &fs = FileSystem::getInstance();
-    std::string modules_dir = fs.combinePath(fs.getModulesDir(), module_name);
-    QString md(modules_dir.c_str());
-
     // Определяем имя конфига для формирования пути к файлу displays.xml,
     // где хранится список дисплеев
-    osgDB::XmlNode *module_config_node = cfg.findSection(vehicle_node, "ModuleConfig");
+    FileSystem &fs = FileSystem::getInstance();
+    std::string vehicle_config_dir = fs.combinePath(fs.getVehiclesDir(), configDir); ;
+    std::string cfg_path = vehicle_config_dir + fs.separator() + "displays.xml";
 
-    if (module_config_node == nullptr)
-    {
-        OSG_FATAL << "Vehicle's module config is't represented";
-        return;
-    }
-
-    std::string module_config_name;
-    getValue(module_config_node->contents, module_config_name);
-    std::string vehicles_config_dir = fs.combinePath(fs.getConfigDir(), fs.combinePath("vehicles", module_config_name));
-    std::string displays_config = fs.combinePath(vehicles_config_dir, "displays.xml");
-
-    ConfigReader displays_cfg(displays_config);
+    ConfigReader displays_cfg(cfg_path);
 
     if (!displays_cfg.isOpenned())
     {
-        OSG_FATAL << "File " << displays_config << " is't found";
+        OSG_FATAL << "File " << cfg_path << " is't found";
         return;
     }
 
@@ -637,8 +633,11 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
         {
             display_config_t display_config;
 
+            osgDB::XmlNode *module_dir_node = displays_cfg.findSection(display_node, "ModuleDir");
+            std::string module_dir = fs.combinePath(fs.getModulesDir(), module_dir_node->contents);
+
             osgDB::XmlNode *module_node = displays_cfg.findSection(display_node, "Module");
-            std::string module_path = fs.combinePath(modules_dir, module_node->contents);
+            std::string module_path = fs.combinePath(module_dir, module_node->contents);
             display_config.module_name = QString(module_path.c_str());
 
             osgDB::XmlNode *surface_name_node = displays_cfg.findSection(display_node, "SurfaceName");
@@ -670,7 +669,7 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
             if (dc->display == nullptr)
                 continue;
 
-            dc->display->setConfigDir(QString(vehicles_config_dir.c_str()));
+            dc->display->setConfigDir(QString(vehicle_config_dir.c_str()));
             dc->display->setRouteDir(QString(settings.route_dir.c_str()));
             dc->display->init();
 
@@ -679,9 +678,12 @@ void TrainExteriorHandler::loadDisplays(ConfigReader &cfg,
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrainExteriorHandler::timerEvent(QTimerEvent *)
 {
-    if (nd.sd.size() == 0)
+    if ((old_data == -1) || (new_data == -1))
         return;
 
     if (is_displays_locked)
@@ -692,11 +694,14 @@ void TrainExteriorHandler::timerEvent(QTimerEvent *)
         for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
         {
             display_container_t *dc = *it;
-            dc->display->setInputSignals(nd.sd.back().te[i].analogSignal);
+            dc->display->setInputSignals(update_data[new_data].vehicles[i].analogSignal);
         }
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrainExteriorHandler::lock_display(bool lock)
 {
     is_displays_locked = lock;

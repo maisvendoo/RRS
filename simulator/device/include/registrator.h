@@ -18,7 +18,10 @@ public:
 
     ~Registrator();
 
-    virtual void read_custom_config(const QString &path);
+    void setCustomConfigDir(const QString &path);
+
+    /// Read device config file
+    virtual void read_config(const QString &filename, const QString &dir_path);
 
     void setFileName(QString name);
     void setInterval(double interval);
@@ -41,7 +44,14 @@ protected:
 
     bool is_replace_dot_by_comma;
 
+    /// Path to directory with custom configs
+    QString custom_cfg_dir;
+
     virtual void load_config(CfgReader &cfg);
+
+private:
+
+    void load_configuration(CfgReader &cfg);
 };
 
 #endif // REGISTRATOR_H

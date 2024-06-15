@@ -50,6 +50,13 @@ RouteViewer::RouteViewer(int argc, char *argv[])
   : is_ready(false)
   , keyboard(nullptr)
 {
+    memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
+
+    if (!memory_sim_info.attach(QSharedMemory::ReadOnly))
+    {
+        OSG_FATAL << "Can't connect to shared memory with simulator info" << std::endl;
+    }
+
     is_ready = init(argc, argv);
 }
 
@@ -140,11 +147,6 @@ bool RouteViewer::init(int argc, char *argv[])
     // Read settings from config file
     settings = loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
 
-    // Parse command line
-    CommandLineParser parser(argc, argv);
-    cmd_line_t cmd_line = parser.getCommadLine();
-    overrideSettingsByCommandLine(cmd_line, settings);
-
     // Notify settings
     osg::NotifySeverity level = osg::INFO;
 
@@ -161,10 +163,20 @@ bool RouteViewer::init(int argc, char *argv[])
     std::string logs_path = fs.getLogsDir();
     osg::setNotifyHandler(new LogFileHandler(logs_path + fs.separator() + "viewer.log"));
 
+    OSG_FATAL << "Override settings from command line" << std::endl;
+    // Parse command line
+    CommandLineParser parser(argc, argv);
+    cmd_line_t cmd_line = parser.getCommadLine();
+    overrideSettingsByCommandLine(cmd_line, settings);
+
+    OSG_FATAL << "Override settings from simulator shared memory" << std::endl;
+    // Parse info from shared memory
+    overrideSettingsBySharedMemory(settings);
+
     // Load selected route
-    if (!loadRoute(cmd_line.route_dir.value))
+    if (!loadRoute(settings.route_dir))
     {
-        OSG_FATAL << "Route from " << cmd_line.route_dir.value << " is't loaded" << std::endl;
+        OSG_FATAL << "Route from " << settings.route_dir << " is't loaded" << std::endl;
         return false;
     }
 
@@ -305,8 +317,8 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
     if (cmd_line.localmode.is_present)
         settings.localmode = cmd_line.localmode.value;
 
-    if (cmd_line.train_config.is_present)
-        settings.train_config = cmd_line.train_config.value;
+    //if (cmd_line.train_config.is_present)
+    //    settings.train_config = cmd_line.train_config.value;
 
     if (cmd_line.notify_level.is_present)
         settings.notify_level = cmd_line.notify_level.value;
@@ -316,6 +328,65 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 
     if (cmd_line.route_dir.is_present)
         settings.route_dir = cmd_line.route_dir.value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::overrideSettingsBySharedMemory(settings_t &settings)
+{
+    if (memory_sim_info.lock())
+    {
+        simulator_info_t *tmp = static_cast<simulator_info_t *>(memory_sim_info.data());
+        if (tmp == nullptr)
+        {
+            memory_sim_info.unlock();
+            OSG_FATAL << "ERROR: shared memory is null" << std::endl;
+            return;
+        }
+        if (tmp->num_updates <= 0)
+        {
+            memory_sim_info.unlock();
+            OSG_FATAL << "ERROR: shared memory isn't updated with sim info." << std::endl;
+            OSG_FATAL << "Try to wait for 10 seconds." << std::endl;
+            for (int i = 0; i < 10; ++i)
+            {
+                Sleep(1000);
+                if (memory_sim_info.lock())
+                {
+                    if (tmp->num_updates <= 0)
+                    {
+                        OSG_FATAL << "ERROR: shared memory isn't updated with sim info (after " << i + 1 << "seconds)." << std::endl;
+                        memory_sim_info.unlock();
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        if (tmp->num_updates <= 0)
+        {
+            OSG_FATAL << "ERROR: shared memory isn't updated with sim info." << std::endl;
+            memory_sim_info.unlock();
+            return;
+        }
+
+        memcpy(&info_data, tmp, sizeof (simulator_info_t));
+        memory_sim_info.unlock();
+        OSG_FATAL << "Got simulator info from shared memory" << std::endl;
+
+        QString route_dir_tmp = QString::fromStdWString(info_data.route_info.route_dir_name);
+        route_dir_tmp.resize(info_data.route_info.route_dir_name_length);
+        settings.route_dir = route_dir_tmp.toStdString();
+        OSG_FATAL << "Route dir from shared memory: " << route_dir_tmp.toStdString() << std::endl;
+    }
+    else
+    {
+        OSG_FATAL << "ERROR: Can't lock shared memory" << std::endl;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -370,9 +441,8 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
 
     MotionPath *motionPath = loader->getMotionPath(settings.direction);
 
-    train_ext_handler = new TrainExteriorHandler(settings, motionPath, settings.train_config);
+    train_ext_handler = new TrainExteriorHandler(settings, motionPath, info_data);
     viewer.addEventHandler(train_ext_handler);
-
 
     //viewer.addEventHandler(train_ext_handler->getAnimationManager());
     std::vector<AnimationManager *> anims_manager = train_ext_handler->getAnimManagers();

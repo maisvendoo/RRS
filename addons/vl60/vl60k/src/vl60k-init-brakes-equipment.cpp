@@ -1,11 +1,11 @@
-#include    "filesystem.h"
-
 #include    "vl60k.h"
+
+#include    <QDir>
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60k::initBrakesEquipment(QString modules_dir)
+void VL60k::initBrakesEquipment(const QString &modules_dir, const QString &custom_cfg_dir)
 {
     // Тормозная магистраль
     double volume_bp = length * 0.0343 * 0.0343 * Physics::PI / 4.0;
@@ -22,14 +22,12 @@ void VL60k::initBrakesEquipment(QString modules_dir)
 
     // Тормозные рычажные передачи
     brake_mech[TROLLEY_FWD] = new BrakeMech(NUM_AXIS_PER_TROLLEY);
-    brake_mech[TROLLEY_FWD]->read_custom_config(
-                config_dir + QDir::separator() + "brake-mech-fwd");
+    brake_mech[TROLLEY_FWD]->read_config("brake-mech-fwd", custom_cfg_dir);
     brake_mech[TROLLEY_FWD]->setWheelRadius(rk[0]);
     brake_mech[TROLLEY_FWD]->setEffFricRadius(rk[0]);
 
     brake_mech[TROLLEY_BWD] = new BrakeMech(NUM_AXIS_PER_TROLLEY);
-    brake_mech[TROLLEY_BWD]->read_custom_config(
-                config_dir + QDir::separator() + "brake-mech-bwd");
+    brake_mech[TROLLEY_BWD]->read_config("brake-mech-bwd", custom_cfg_dir);
     brake_mech[TROLLEY_BWD]->setWheelRadius(rk[NUM_AXIS_PER_TROLLEY]);
     brake_mech[TROLLEY_BWD]->setEffFricRadius(rk[NUM_AXIS_PER_TROLLEY]);
 

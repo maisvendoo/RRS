@@ -42,13 +42,50 @@ Model::Model(QObject *parent) : QObject(parent)
   , server(nullptr)
   , control_panel(nullptr)
 {
+    simulator_info_t tmp = simulator_info_t();
+    memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
+    if (memory_sim_info.create(sizeof(simulator_info_t)))
+    {
+        Journal::instance()->info("Created shared memory for simulator info");
+        memcpy(memory_sim_info.data(), &tmp, sizeof (simulator_info_t));
+    }
+    else
+    {
+        if (memory_sim_info.attach())
+        {
+            Journal::instance()->info("Attach to shared memory for simulator info");
+            memcpy(memory_sim_info.data(), &tmp, sizeof (simulator_info_t));
+        }
+        else
+        {
+            Journal::instance()->error("No shared memory for simulator info");
+        }
+    }
+
+    memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
+    if (memory_sim_update.create(sizeof(simulator_update_t)))
+    {
+        Journal::instance()->info("Created shared memory for simulator update data");
+    }
+    else
+    {
+        if (memory_sim_update.attach())
+        {
+            Journal::instance()->info("Attach to shared memory for simulator update data");
+        }
+        else
+        {
+            Journal::instance()->error("No shared memory for simulator update data");
+        }
+    }
+/*
     shared_memory.setKey("sim");
 
     if (!shared_memory.create(sizeof(server_data_t)))
     {
         shared_memory.attach();
     }
-
+*/
     sim_client = Q_NULLPTR;
 }
 
@@ -57,7 +94,9 @@ Model::Model(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 Model::~Model()
 {
-    shared_memory.detach();
+//    shared_memory.detach();
+    memory_sim_info.detach();
+    memory_sim_update.detach();
     keys_data.detach();
 }
 
@@ -111,6 +150,42 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     if (!train->init(init_data))
         return false;
+
+    Journal::instance()->info("==== Info to shared memory ====");
+    simulator_info_t   info_data;
+    info_data.num_updates = 1;
+    info_data.route_info.route_dir_name_length = init_data.route_dir.size();
+    init_data.route_dir.toWCharArray(info_data.route_info.route_dir_name);
+    Journal::instance()->info("Ready route info for shared memory");
+
+    std::vector<Vehicle *> *vehicles = train->getVehicles();
+    info_data.num_vehicles = vehicles->size();
+    size_t i = 0;
+    for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
+    {
+        QString dir = (*it)->getConfigDir();
+        info_data.vehicles_info[i].vehicle_config_dir_length = dir.size();
+        dir.toWCharArray(info_data.vehicles_info[i].vehicle_config_dir);
+
+        QString file = (*it)->getConfigName();
+        info_data.vehicles_info[i].vehicle_config_file_length = file.size();
+        file.toWCharArray(info_data.vehicles_info[i].vehicle_config_file);
+
+        ++i;
+    }
+    Journal::instance()->info("Ready vehicles info for shared memory");
+
+    if (memory_sim_info.lock())
+    {
+        Journal::instance()->info("Shared memory locked");
+        memcpy(memory_sim_info.data(), &info_data, sizeof (simulator_info_t));
+        memory_sim_info.unlock();
+        Journal::instance()->info("Set info to shared memory");
+    }
+    else
+    {
+        Journal::instance()->error("Can't lock shared memory");
+    }
 
     connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
@@ -192,7 +267,7 @@ void Model::controlProcess()
 //------------------------------------------------------------------------------
 void Model::preStep(double t)
 {
-    train->preStep(t);
+    train->preStep(t, update_data);
 }
 
 //------------------------------------------------------------------------------
@@ -619,7 +694,7 @@ void Model::virtualRailwayFeedback()
 //
 //------------------------------------------------------------------------------
 void Model::sharedMemoryFeedback()
-{
+{/*
     std::vector<Vehicle *> *vehicles = train->getVehicles();
 
     viewer_data.time = static_cast<float>(t);
@@ -648,8 +723,14 @@ void Model::sharedMemoryFeedback()
         memcpy(shared_memory.data(), &viewer_data, sizeof (server_data_t));
         shared_memory.unlock();
     }
+*/
+    if (memory_sim_update.lock())
+    {
+        memcpy(memory_sim_update.data(), &update_data, sizeof (simulator_update_t));
+        memory_sim_update.unlock();
+    }
 
-    viewer_data.count++;
+//    viewer_data.count++;
 }
 
 //------------------------------------------------------------------------------
@@ -712,4 +793,3 @@ void Model::process()
     if (is_debug_print)
         debugPrint();
 }
-

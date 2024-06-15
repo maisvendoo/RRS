@@ -1,13 +1,12 @@
-#include    "filesystem.h"
-
 #include    "vl60pk.h"
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::initPneumoSupply(QString modules_dir)
+void VL60pk::initPneumoSupply(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    Q_UNUSED(modules_dir)
+    (void) modules_dir;
+    (void) custom_cfg_dir;
 
     // Регулятор давления в ГР
     press_reg = new PressureRegulator();

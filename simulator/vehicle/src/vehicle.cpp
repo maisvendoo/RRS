@@ -28,6 +28,10 @@
 //
 //------------------------------------------------------------------------------
 Vehicle::Vehicle(QObject *parent) : QObject(parent)
+  , module_dir("")
+  , module_name("")
+  , config_dir("")
+  , config_name("")
   , route_dir("")
   , soundDirectory("")
   , idx(0)
@@ -66,7 +70,6 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , DebugMsg(" ")
   , prev_vehicle(nullptr)
   , next_vehicle(nullptr)
-  , config_dir("")
   , Uks(0.0)
   , current_kind(0)
 {
@@ -93,6 +96,38 @@ void Vehicle::init(QString cfg_path)
     Journal::instance()->info("Call of Vehicle::initialization() method...");
     initialization();
     Journal::instance()->info("Custom initialization finished");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setModuleDir(QString module_dir)
+{
+    this->module_dir = module_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setModuleName(QString module_name)
+{
+    this->module_name = module_name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setConfigDir(QString config_dir)
+{
+    this->config_dir = config_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setConfigName(QString config_name)
+{
+    this->config_name = config_name;
 }
 
 //------------------------------------------------------------------------------
@@ -247,9 +282,41 @@ void Vehicle::setNextVehicle(Vehicle *vehicle)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setConfigDir(QString config_dir)
+QString Vehicle::getConfigDir() const
 {
-    this->config_dir = config_dir;
+    return config_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Vehicle::getConfigName() const
+{
+    return config_name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Vehicle::getModuleDir() const
+{
+    return module_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Vehicle::getModuleName() const
+{
+    return module_name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Vehicle::getSoundsDir() const
+{
+    return soundDirectory;
 }
 
 //------------------------------------------------------------------------------
@@ -550,7 +617,7 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
     // Calculate gravity force from profile inclination
     double weight = full_mass * Physics::g;
     double sin_beta = inc / 1000.0;
-    F_g = weight * sin_beta * orient;
+    F_g = weight * sin_beta;
 
     F_fwd = 0.0;
     F_bwd = 0.0;
@@ -991,12 +1058,4 @@ void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
     Q_UNUSED(p0)
     Q_UNUSED(pTM)
     Q_UNUSED(pFL)
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString Vehicle::getSoundsDir() const
-{
-    return soundDirectory;
 }

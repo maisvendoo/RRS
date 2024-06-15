@@ -19,8 +19,15 @@
 #define     APPLICATION_NAME    QString("simulator")
 #define     APPLICATION_VERSION QString("0.1.0")
 
+#define     SHARED_MEMORY_SIM_INFO      QString("siminfo")
+#define     SHARED_MEMORY_SIM_UPDATE    QString("simupdate")
+
 #define     MAX_NUM_VEHICLES      180
 
 #define     DEBUG_STRING_SIZE      2048
+
+#define     ROUTE_DIR_NAME_SIZE             256
+#define     VEHICLE_CONFIG_DIR_NAME_SIZE    256
+#define     VEHICLE_CONFIG_FILENAME_SIZE    256
 
 #endif // GLOBAL_CONST_H

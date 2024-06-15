@@ -1,12 +1,14 @@
-#include    "filesystem.h"
-
 #include    "vl60k.h"
+
+#include    <QDir>
 
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60k::initBrakesControl(QString modules_dir)
+void VL60k::initBrakesControl(const QString &modules_dir, const QString &custom_cfg_dir)
 {
+    (void) modules_dir;
+
     // Блокировочное устройство
     brake_lock = new BrakeLock();
     brake_lock->read_config("ubt367m");
@@ -32,8 +34,7 @@ void VL60k::initBrakesControl(QString modules_dir)
 
     // Тройник магистрали тормозных цилиндров
     bc_splitter = new PneumoSplitter();
-    bc_splitter->read_custom_config(
-                config_dir + QDir::separator() + "bc-splitter");
+    bc_splitter->read_config("bc-splitter", custom_cfg_dir);
 
     // Концевые краны магистрали тормозных цилиндров
     anglecock_bc_fwd = new PneumoAngleCock();

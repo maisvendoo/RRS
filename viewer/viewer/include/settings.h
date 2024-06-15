@@ -30,8 +30,6 @@ struct settings_t
 {
     /// Route directory
     std::string     route_dir;
-    /// Train config file name
-    std::string     train_config;
     /// Server ip-address
     std::string     host_addr;
     /// Server port
@@ -129,7 +127,6 @@ struct settings_t
 
     settings_t()
         : route_dir("")
-        , train_config("")
         , host_addr("127.0.0.1")
         , port(1992)
         , x(50)

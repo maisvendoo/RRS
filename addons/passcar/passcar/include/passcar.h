@@ -90,13 +90,16 @@ private:
     void initialization();
 
     /// Инициализация сцепных устройств
-    void initCouplings(QString modules_dir);
+    void initCouplings(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация тормозного оборудования
-    void initBrakesEquipment(QString modules_dir);
+    void initBrakesEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация ЭПТ
-    void initEPB(QString modules_dir);
+    void initEPB(const QString &modules_dir, const QString &custom_cfg_dir);
+
+    /// Инициализация регистратора параметров в лог-файл
+    void initRegistrator(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Предварительные расчёты перед симуляцией
     void preStep(double t);
@@ -116,6 +119,9 @@ private:
     /// Моделирование ЭПТ
     void stepEPB(double t, double dt);
 
+    /// Вывод параметров в лог-файл
+    void stepRegistrator(double t, double dt);
+
     /// Сигналы для анимации
     void stepSignalsOutput();
 
@@ -127,10 +133,6 @@ private:
     void loadConfig(QString cfg_path);
 
     void initSounds();
-
-    void initRegistrator();
-
-    void stepRegistrator(double t, double dt);
 
     void soundStep();
 

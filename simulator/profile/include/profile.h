@@ -12,6 +12,7 @@
 #include    <vector>
 
 #include    "profile-element.h"
+#include    "zds-track.h"
 
 //------------------------------------------------------------------------------
 //
@@ -22,7 +23,6 @@ public:
 
     Profile()
         : is_ready(false)
-        , dir(1)
     {
 
     }
@@ -33,15 +33,13 @@ public:
 
     bool isReady() const;
 
-    profile_element_t getElement(double railway_coord);
+    profile_element_t getElement(double railway_coord, int dir);
 
 private:
 
     bool    is_ready;
 
-    int     dir;
-
-    std::vector<profile_element_t> profile_data;
+    std::vector<zds_track_t> profile_data;
 
     bool load(const std::string &path);
 

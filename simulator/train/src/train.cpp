@@ -12,6 +12,8 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , trainLength(0.0)
   , ode_order(0)
   , dir(1)
+  , current_vehicle(0)
+  , controlled_vehicle(0)
   , profile(profile)
   , coeff_to_wheel_rail_friction(1.0)
   , charging_pressure(0.0)
@@ -142,18 +144,62 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::preStep(double t)
+void Train::preStep(double t, simulator_update_t &update_data)
 {
     //(void) t;
+    update_data.time = t;
+
     auto begin = vehicles.begin();
     auto end = vehicles.end();
+    int i = 0;
 
     for (auto it = begin; it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        profile_element_t pe = profile->getElement(y[idx]);
+        profile_element_t pe = profile->getElement(y[idx], dir * vehicle->getOrientation());
+
+        if (i < MAX_NUM_VEHICLES)
+        {
+            update_data.vehicles[i].position_x = pe.position.x;
+            update_data.vehicles[i].position_y = pe.position.y;
+            update_data.vehicles[i].position_z = pe.position.z;
+            update_data.vehicles[i].orth_x = pe.orth.x;
+            update_data.vehicles[i].orth_y = pe.orth.y;
+            update_data.vehicles[i].orth_z = pe.orth.z;
+            update_data.vehicles[i].up_x = pe.up.x;
+            update_data.vehicles[i].up_y = pe.up.y;
+            update_data.vehicles[i].up_z = pe.up.z;
+            update_data.vehicles[i].orientation = vehicle->getOrientation();
+
+            if (it == begin)
+                update_data.vehicles[i].prev_vehicle = -1;
+            else
+                update_data.vehicles[i].prev_vehicle = i - 1;
+
+            if (it == end - 1)
+                update_data.vehicles[i].next_vehicle = -1;
+            else
+                update_data.vehicles[i].prev_vehicle = i + 1;
+
+            std::copy(vehicle->getAnalogSignals().begin(),
+                      vehicle->getAnalogSignals().end(),
+                      update_data.vehicles[i].analogSignal.begin());
+
+            if (i == controlled_vehicle)
+            {
+                update_data.controlled_vehicle = controlled_vehicle;
+                vehicle->getDebugMsg().toWCharArray(update_data.controlledDebugMsg);
+            }
+            if (i == current_vehicle)
+            {
+                update_data.current_vehicle = current_vehicle;
+                vehicle->getDebugMsg().toWCharArray(update_data.currentDebugMsg);
+            }
+        }
+        ++i;
+
         vehicle->setInclination(pe.inclination);
         vehicle->setCurvature(pe.curvature);
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
@@ -385,29 +431,46 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
         {
             Journal::instance()->info("==== Vehicle's group loading ====");
 
-            QString module_name = "";
-            if (!cfg.getString(vehicle_node, "Module", module_name))
+            QString module_lib_name = "";
+            if (!cfg.getString(vehicle_node, "Module", module_lib_name))
             {
-                Journal::instance()->error("Module section is not found");
+                Journal::instance()->error("Section with Module library name is not found");
                 break;
             }
+
+            QString module_lib_dir = module_lib_name;
+            if (!cfg.getString(vehicle_node, "ModuleDir", module_lib_dir))
+            {
+                Journal::instance()->error("Section with Module directory is not found, using directory with the same name as Module library");
+                module_lib_dir = module_lib_name;
+            }
+
+            // Calculate module library path
+            QString relModulePath = QString(fs.combinePath(module_lib_dir.toStdString(), module_lib_name.toStdString()).c_str());
 
             QString module_cfg_name = "";
             if (!cfg.getString(vehicle_node, "ModuleConfig", module_cfg_name))
             {
-                Journal::instance()->error("Module config file name is not found");
+                Journal::instance()->error("Section with Config file name is not found");
                 break;
             }
 
-            // Calculate module library path
-            QString relModulePath = QString(fs.combinePath(module_name.toStdString(), module_name.toStdString()).c_str());
+            QString module_cfg_dir = module_cfg_name;
+            if (!cfg.getString(vehicle_node, "ModuleConfigDir", module_cfg_dir))
+            {
+                Journal::instance()->error("Section with Config directory is not found, using directory with the same name as Config file");
+                module_cfg_dir = module_cfg_name;
+            }
+
+            // Calculate config file path
+            QString relConfigPath = QString(fs.combinePath(module_cfg_dir.toStdString(), module_cfg_name.toStdString()).c_str());
 
             // Vehicles count
             int n_vehicles = 0;
             if (!cfg.getInt(vehicle_node, "Count", n_vehicles))
             {
                 n_vehicles = 0;
-                Journal::instance()->warning("Count of vehicles " + module_name + " is not found. Vehicle will't loaded");
+                Journal::instance()->warning("Count of vehicles " + module_lib_name + " is not found. Vehicle willn't loaded");
             }
 
             // Orientation of vehicles group
@@ -415,7 +478,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
             if (!cfg.getBool(vehicle_node, "IsOrientationForward", isForward))
             {
                 isForward = true;
-                Journal::instance()->warning("Orientations of vehicles " + module_name + " is not found.");
+                Journal::instance()->warning("Orientations of vehicles " + module_lib_name + " is not found.");
             }
             int orient;
             if (isForward)
@@ -440,20 +503,20 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
                 if (vehicle == Q_NULLPTR)
                 {
-                    Journal::instance()->error("Vehicle " + module_name + " is't loaded");
+                    Journal::instance()->error("Vehicle " + module_lib_name + " is't loaded");
                     break;
                 }
 
                 Journal::instance()->info(QString("Created Vehicle object at address: 0x%1")
                                           .arg(reinterpret_cast<quint64>(vehicle), 0, 16));
 
-                QString relConfigPath = QString(fs.combinePath(module_cfg_name.toStdString(), module_cfg_name.toStdString()).c_str());
-
-                QString config_dir(fs.combinePath(fs.getVehiclesDir(), module_cfg_name.toStdString()).c_str());
-                vehicle->setConfigDir(config_dir);
+                vehicle->setModuleDir(module_lib_dir);
+                vehicle->setModuleName(module_lib_name);
+                vehicle->setConfigDir(module_cfg_dir);
+                vehicle->setConfigName(module_cfg_name);
+                vehicle->setRouteDir(init_data.route_dir);
 
                 vehicle->setIndex(ode_order);
-                vehicle->setRouteDir(init_data.route_dir);
                 vehicle->setPayloadCoeff(payload_coeff);
                 vehicle->setDirection(dir);
                 vehicle->setOrientation(orient);
@@ -522,7 +585,10 @@ bool Train::loadJoints()
     size_t num_joints = vehicles.size() - 1;
 
     if (num_joints == 0)
+    {
+        Journal::instance()->info("There is only one vehicle! No joints needed");
         return true;
+    }
 
     size_t i = 0;
     auto begin = vehicles.begin();
@@ -532,7 +598,7 @@ bool Train::loadJoints()
     {
         ++i;
 
-        // Pair of neighbor vehicles, co-directional with dir
+        // Pair of neighbor vehicles, co-directional with route
         Vehicle *veh_fwd;
         Vehicle *veh_bwd;
         if (dir > 0)

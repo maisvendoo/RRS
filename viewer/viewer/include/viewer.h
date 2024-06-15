@@ -15,7 +15,10 @@
 #ifndef     VIEWER_H
 #define     VIEWER_H
 
+#include    <QSharedMemory>
 #include    <osgViewer/Viewer>
+
+#include    "simulator-info-struct.h"
 
 #include    "settings.h"
 #include    "command-line-parser.h"
@@ -46,6 +49,9 @@ public:
 
 protected:
 
+    QSharedMemory   memory_sim_info;
+    simulator_info_t info_data;
+
     /// Viewer ready flag
     bool                        is_ready;
 
@@ -74,6 +80,9 @@ protected:
     /// Override settings from command line
     void overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
                                        settings_t &settings);
+
+    /// Override settings from shared memory with simulator info
+    void overrideSettingsBySharedMemory(settings_t &settings);
 
     /// Load route form directory
     bool loadRoute(const std::string &routeDir);

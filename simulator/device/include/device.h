@@ -82,9 +82,7 @@ public:
     double getY(size_t i) const;
 
     /// Read device config file
-    virtual void read_config(const QString &path);
-
-    virtual void read_custom_config(const QString &path);
+    virtual void read_config(const QString &filename, const QString &dir_path = "");
 
     QString getDebugMsg() const;
 
@@ -95,7 +93,7 @@ public:
     ///
     feedback_signals_t getFeedback() const;
 
-    void setCustomConfigDir(const QString &value);
+    void setCustomConfigDir(const QString &path);
 
     QString getCustomConfigDir() const;
 
@@ -144,10 +142,8 @@ protected:
     state_vector_t k3;
     //state_vector_t k4;
 
-    /// Config directory
-    std::string cfg_dir;
-
-    std::string modules_dir;
+    /// Path to directory with custom configs
+    QString custom_cfg_dir;
 
     QString     DebugMsg;
 
@@ -155,8 +151,6 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback;
-
-    QString custom_config_dir;
 
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;

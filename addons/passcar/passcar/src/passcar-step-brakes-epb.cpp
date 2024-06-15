@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------
 void PassCar::stepEPB(double t, double dt)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
+    (void) t;
+    (void) dt;
 
     // Управление электровоздухораспределителем
     double evr_current = 0.0;
