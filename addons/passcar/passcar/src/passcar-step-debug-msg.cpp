@@ -8,8 +8,7 @@ void PassCar::stepDebugMsg(double t, double dt)
     (void) t;
     (void) dt;
 
-    DebugMsg = QString("t%1 s|")
-            .arg(t, 7, 'f', 1);
+    DebugMsg = "";
     DebugMsg += QString("x%1 km|V%2 km/h|")
             .arg(railway_coord / 1000.0, 8, 'f', 3)
             .arg(velocity * Physics::kmh, 6, 'f', 1);

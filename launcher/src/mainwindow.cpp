@@ -23,6 +23,7 @@
 #include    <QSpinBox>
 #include    <QDoubleSpinBox>
 #include    <QTextStream>
+#include <synchapi.h>
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
@@ -395,7 +396,9 @@ void MainWindow::onStartPressed()
 //------------------------------------------------------------------------------
 void MainWindow::onSimulatorStarted()
 {
-    ui->btnStart->setEnabled(false);    
+    ui->btnStart->setEnabled(false);
+
+    Sleep(500);
 
     startViewer();
 }

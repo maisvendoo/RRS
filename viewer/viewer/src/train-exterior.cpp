@@ -222,6 +222,7 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
     for (int i = 0; i < count; ++i)
     {
+        OSG_FATAL << "Vehicle " << i << " / " << count << " load" << std::endl;
         QString cfg_dir_tmp = QString::fromStdWString(info_data.vehicles_info[i].vehicle_config_dir);
         cfg_dir_tmp.resize(info_data.vehicles_info[i].vehicle_config_dir_length);
         std::string cfg_dir = cfg_dir_tmp.toStdString();
@@ -261,8 +262,9 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
         vehicles_ext.push_back(vehicle_ext);
         trainExterior->addChild(vehicle_ext.transform.get());
+        OSG_FATAL << "Vehicle " << i << " loaded" << std::endl;
     }
-
+            OSG_FATAL << "Vehicles loaded" << std::endl;
     this->startTimer(100);
 }
 
@@ -375,17 +377,39 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
             }
         }
         memory_sim_update.unlock();
-        //OSG_FATAL << new_data << " | " << update_data[new_data].time << " | " << old_data << " | " << update_data[old_data].time << std::endl;
+        OSG_FATAL << new_data << " | " << update_data[new_data].time << " | " << old_data << " | " << update_data[old_data].time << std::endl;
 
-        QString hud_text = QString("Время от начала симуляции: %1 сек\n")
-                        .arg(update_data[new_data].time, 8, 'f', 1);
-        hud_text += QString("Выбранная ПЕ %1 \n")
-                        .arg(update_data[new_data].current_vehicle);
+        int seconds = static_cast<int>(std::floor(update_data[new_data].time));
+        int hours = seconds / 3600;
+        int minutes = seconds / 60 % 60;
+        seconds = seconds % 60;
+        QString hud_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
+                               .arg(update_data[new_data].time, 8, 'f', 1)
+                               .arg(hours, 2)
+                               .arg(minutes, 2)
+                               .arg(seconds, 2);
+
+        int curr = update_data[new_data].current_vehicle;
+        hud_text += QString("Выбранная ПЕ: %1 | pos{%2,%3,%4} | dir{%5,%6,%7}\n")
+                        .arg(curr, 3)
+                        .arg(update_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
+                        .arg(update_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
+                        .arg(update_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
+                        .arg(update_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
+                        .arg(update_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
+                        .arg(update_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
 
         hud_text += QString::fromStdWString(update_data[new_data].currentDebugMsg) + QString("\n");
 
-        hud_text += QString("Управляемая ПЕ %1 \n")
-                        .arg(update_data[new_data].controlled_vehicle);
+        int control = update_data[new_data].controlled_vehicle;
+        hud_text += QString("Управляемая ПЕ: %1 | pos{%2,%3,%4} | dir{%5,%6,%7}\n")
+                        .arg(control, 3)
+                        .arg(update_data[new_data].vehicles[control].position_x, 8, 'f', 1)
+                        .arg(update_data[new_data].vehicles[control].position_y, 8, 'f', 1)
+                        .arg(update_data[new_data].vehicles[control].position_z, 8, 'f', 1)
+                        .arg(update_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
+                        .arg(update_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
+                        .arg(update_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
 
         hud_text += QString::fromStdWString(update_data[new_data].controlledDebugMsg);
 
@@ -619,7 +643,7 @@ void TrainExteriorHandler::loadDisplays(const std::string &configDir,
 
     if (!displays_cfg.isOpenned())
     {
-        OSG_FATAL << "File " << cfg_path << " is't found";
+        OSG_FATAL << "File " << cfg_path << " is't found" << std::endl;
         return;
     }
 

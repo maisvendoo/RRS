@@ -107,10 +107,11 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     connect(horn, &TrainHorn::soundPlay, this, &VL60pk::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60pk::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60pk::soundStop);
-
+/*
     reg = new Registrator();
     reg->setFileName("vl60pk-step");
     reg->init();
+*/
 }
 
 //------------------------------------------------------------------------------
