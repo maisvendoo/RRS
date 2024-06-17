@@ -49,11 +49,11 @@ public:
 
 protected:
 
-    QSharedMemory   memory_sim_info;
-    simulator_info_t info_data;
-
     /// Viewer ready flag
     bool                        is_ready;
+
+    QSharedMemory   memory_sim_info;
+    simulator_info_t info_data;
 
     KeyboardHandler             *keyboard;
 

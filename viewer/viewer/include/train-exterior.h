@@ -33,6 +33,7 @@
 #include    "server-data-struct.h"
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
+#include    "controlled-struct.h"
 #include    "config-reader.h"
 #include    "display.h"
 
@@ -107,6 +108,7 @@ private:
 
 //    QSharedMemory   memory_sim_info;
     QSharedMemory   memory_sim_update;
+    QSharedMemory   memory_controlled;
 //    QSharedMemory   shared_memory;
 
     /// Animations list
@@ -123,6 +125,9 @@ private:
 
     /// Processing data from server
     void processSharedData(double &ref_time);
+
+    /// Processing data from server
+    void sendControlledVehicle(const controlled_t &data);
 
     /// Move camera along track
     void moveCamera(osgViewer::Viewer *viewer);

@@ -37,24 +37,32 @@ Model::Model(QObject *parent) : QObject(parent)
   , is_debug_print(false)
   , control_time(0)
   , control_delay(0.05)
+  , current_vehicle(-1)
+//  , prev_current_vehicle(-1)
+  , controlled_vehicle(-1)
+  , prev_controlled_vehicle(-1)
   , train(nullptr)
   , profile(nullptr)
   , server(nullptr)
   , control_panel(nullptr)
+  , memory_sim_info(nullptr)
+  , memory_sim_update(nullptr)
+  , memory_controlled(nullptr)
+  , keys_data(nullptr)
 {
-    simulator_info_t tmp = simulator_info_t();
+    simulator_info_t tmp_si = simulator_info_t();
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
     if (memory_sim_info.create(sizeof(simulator_info_t)))
     {
         Journal::instance()->info("Created shared memory for simulator info");
-        memcpy(memory_sim_info.data(), &tmp, sizeof (simulator_info_t));
+        memcpy(memory_sim_info.data(), &tmp_si, sizeof (simulator_info_t));
     }
     else
     {
         if (memory_sim_info.attach())
         {
             Journal::instance()->info("Attach to shared memory for simulator info");
-            memcpy(memory_sim_info.data(), &tmp, sizeof (simulator_info_t));
+            memcpy(memory_sim_info.data(), &tmp_si, sizeof (simulator_info_t));
         }
         else
         {
@@ -78,6 +86,43 @@ Model::Model(QObject *parent) : QObject(parent)
             Journal::instance()->error("No shared memory for simulator update data");
         }
     }
+
+    controlled_t tmp_c = controlled_t();
+    memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
+    if (memory_controlled.create(sizeof(controlled_t)))
+    {
+        Journal::instance()->info("Created shared memory for info about controlled vehicle");
+        memcpy(memory_controlled.data(), &tmp_c, sizeof (controlled_t));
+    }
+    else
+    {
+        if (memory_controlled.attach())
+        {
+            Journal::instance()->info("Attach to shared memory for info about controlled vehicle");
+            memcpy(memory_controlled.data(), &tmp_c, sizeof (controlled_t));
+        }
+        else
+        {
+            Journal::instance()->error("No shared memory for info about controlled vehicle");
+        }
+    }
+
+    keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
+    if (keys_data.create(sizeof(KEYS_DATA_BYTEARRAY_SIZE)))
+    {
+        Journal::instance()->info("Created shared memory for keysboard processing");
+    }
+    else
+    {
+        if (keys_data.attach())
+        {
+            Journal::instance()->info("Attach to shared memory for keysboard processing");
+        }
+        else
+        {
+            Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
+        }
+    }
 /*
     shared_memory.setKey("sim");
 
@@ -94,9 +139,10 @@ Model::Model(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 Model::~Model()
 {
-//    shared_memory.detach();
     memory_sim_info.detach();
     memory_sim_update.detach();
+    memory_controlled.detach();
+    //shared_memory.detach();
     keys_data.detach();
 }
 
@@ -186,7 +232,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     {
         Journal::instance()->error("Can't lock shared memory");
     }
-
+/*
     connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
     keys_data.setKey("keys");
@@ -202,7 +248,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     {
         Journal::instance()->info("Created shared memory for keysboard processing");
     }
-
+*/
     initControlPanel("control-panel");
 
     initSimClient("virtual-railway");
@@ -724,6 +770,40 @@ void Model::sharedMemoryFeedback()
         shared_memory.unlock();
     }
 */
+    update_data.current_vehicle = current_vehicle;
+    update_data.controlled_vehicle = controlled_vehicle;
+
+    std::vector<Vehicle *> *vehicles = train->getVehicles();
+
+    if (current_vehicle >= 0)
+    {
+        Vehicle *vehicle = vehicles->at(current_vehicle);
+        QString msg = vehicle->getDebugMsg();
+        msg.resize(DEBUG_STRING_SIZE, QChar(' '));
+        msg.toWCharArray(update_data.currentDebugMsg);
+    }
+
+    if (controlled_vehicle >= 0)
+    {
+        Vehicle *vehicle = vehicles->at(controlled_vehicle);
+        if (data.size() != 0)
+            vehicle->setKeysData(data);
+
+        QString msg = vehicle->getDebugMsg();
+        msg.resize(DEBUG_STRING_SIZE, QChar(' '));
+        msg.toWCharArray(update_data.controlledDebugMsg);
+
+        if (prev_controlled_vehicle != controlled_vehicle)
+        {
+            if (prev_controlled_vehicle >= 0)
+            {
+                vehicles->at(prev_controlled_vehicle)->resetKeysData();
+            }
+
+            prev_controlled_vehicle = controlled_vehicle;
+        }
+    }
+
     if (memory_sim_update.lock())
     {
         memcpy(memory_sim_update.data(), &update_data, sizeof (simulator_update_t));
@@ -742,13 +822,26 @@ void Model::controlStep(double &control_time, const double control_delay)
     {
         control_time = 0;
 
+        if (memory_controlled.lock())
+        {
+            controlled_t *c = static_cast<controlled_t *>(memory_controlled.data());
+
+            if (c == nullptr)
+            {
+                memory_controlled.unlock();
+                return;
+            }
+
+            current_vehicle = c->current_vehicle;
+            controlled_vehicle = c->controlled_vehicle;
+
+            memory_controlled.unlock();
+        }
+
         if (keys_data.lock())
         {
             data.resize(keys_data.size());
             memcpy(data.data(), keys_data.data(), static_cast<size_t>(keys_data.size()));
-
-            if (keys_data.size() != 0)
-                emit sendDataToTrain(data);
 
             keys_data.unlock();
         }

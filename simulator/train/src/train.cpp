@@ -186,17 +186,6 @@ void Train::preStep(double t, simulator_update_t &update_data)
             std::copy(vehicle->getAnalogSignals().begin(),
                       vehicle->getAnalogSignals().end(),
                       update_data.vehicles[i].analogSignal.begin());
-
-            if (i == controlled_vehicle)
-            {
-                update_data.controlled_vehicle = controlled_vehicle;
-                vehicle->getDebugMsg().toWCharArray(update_data.controlledDebugMsg);
-            }
-            if (i == current_vehicle)
-            {
-                update_data.current_vehicle = current_vehicle;
-                vehicle->getDebugMsg().toWCharArray(update_data.currentDebugMsg);
-            }
         }
         ++i;
 
@@ -556,13 +545,13 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
             vehicle_node = cfg.getNextSection();
         }
-
+/*
         for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
         {
             Vehicle *vehicle = *it;
             connect(this, &Train::sendDataToVehicle,
                     vehicle, &Vehicle::receiveData, Qt::DirectConnection);
-        }
+        }*/
     }
     else
     {

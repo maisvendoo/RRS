@@ -96,11 +96,11 @@ public:
     int getDirection() const;
 
     std::vector<Vehicle *> *getVehicles();
-
+/*
 signals:
 
     void sendDataToVehicle(QByteArray data);
-
+*/
 private:
 
     /// Train mass

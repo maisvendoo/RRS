@@ -43,7 +43,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , osgGA::GUIEventHandler ()
     , settings(settings)
     , cur_vehicle(0)
-    , controlled_vehicle(0)
+    , controlled_vehicle(-1)
     , long_shift(0.0f)
     , height_shift(0.0f)
     , routePath(routePath)
@@ -52,14 +52,33 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , is_displays_locked(false)
     , new_data(-1)
     , old_data(-1)
+    , memory_sim_update(nullptr)
+    , memory_controlled(nullptr)
 {
     load(info_data);
 
     memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
-
-    if (!memory_sim_update.attach(QSharedMemory::ReadOnly))
+    if (memory_sim_update.attach(QSharedMemory::ReadOnly))
     {
-        OSG_FATAL << "Can't connect to shared memory" << std::endl;
+        OSG_FATAL << "Connected to shared memory with simulator update data" << std::endl;
+    }
+    else
+    {
+        OSG_FATAL << "Can't connect to shared memory with simulator update data" << std::endl;
+    }
+
+    memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
+    if (memory_controlled.attach())
+    {
+        OSG_FATAL << "Connected to shared memory for info about controlled vehicle" << std::endl;
+        controlled_t tmp;
+        tmp.current_vehicle = cur_vehicle;
+        tmp.controlled_vehicle = controlled_vehicle;
+        sendControlledVehicle(tmp);
+    }
+    else
+    {
+        OSG_FATAL << "Can't connect to shared memory for info about controlled vehicle" << std::endl;
     }
 /*
     shared_memory.setKey("sim");
@@ -138,6 +157,8 @@ std::vector<AnimationManager *> TrainExteriorHandler::getAnimManagers()
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::keyboardHandler(int key)
 {
+    controlled_t tmp;
+
     switch (key)
     {
     case osgGA::GUIEventAdapter::KEY_Page_Down:
@@ -149,6 +170,9 @@ void TrainExteriorHandler::keyboardHandler(int key)
 
         long_shift = 0.0f;
 
+        tmp.current_vehicle = cur_vehicle;
+        tmp.controlled_vehicle = controlled_vehicle;
+        sendControlledVehicle(tmp);
         break;
 
     case osgGA::GUIEventAdapter::KEY_Page_Up:
@@ -160,6 +184,9 @@ void TrainExteriorHandler::keyboardHandler(int key)
 
         long_shift = 0.0f;
 
+        tmp.current_vehicle = cur_vehicle;
+        tmp.controlled_vehicle = controlled_vehicle;
+        sendControlledVehicle(tmp);
         break;
 
     case osgGA::GUIEventAdapter::KEY_Home:
@@ -209,6 +236,10 @@ void TrainExteriorHandler::keyboardHandler(int key)
     case osgGA::GUIEventAdapter::KEY_Return:
 
         controlled_vehicle = cur_vehicle;
+
+        tmp.current_vehicle = cur_vehicle;
+        tmp.controlled_vehicle = controlled_vehicle;
+        sendControlledVehicle(tmp);
         break;
     }
 }
@@ -222,7 +253,7 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
     for (int i = 0; i < count; ++i)
     {
-        OSG_FATAL << "Vehicle " << i << " / " << count << " load" << std::endl;
+        OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " load" << std::endl;
         QString cfg_dir_tmp = QString::fromStdWString(info_data.vehicles_info[i].vehicle_config_dir);
         cfg_dir_tmp.resize(info_data.vehicles_info[i].vehicle_config_dir_length);
         std::string cfg_dir = cfg_dir_tmp.toStdString();
@@ -235,11 +266,13 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
         if (!vehicle_model.valid())
         {
-            OSG_FATAL << "Vehicle model " << cfg_dir << "/" << cfg_file << " is't loaded. Added empty model." << std::endl;
+            OSG_FATAL << "Vehicle model from" << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
             vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
             vehicles_ext.push_back(vehicle_ext);
+            OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
             continue;
         }
+        OSG_FATAL << "Loaded vehicle model from" << cfg_dir << "/" << cfg_file << std::endl;
 
         // Load cabine model
         osg::ref_ptr<osg::Node> cabine;
@@ -262,9 +295,8 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
         vehicles_ext.push_back(vehicle_ext);
         trainExterior->addChild(vehicle_ext.transform.get());
-        OSG_FATAL << "Vehicle " << i << " loaded" << std::endl;
+        OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;
     }
-            OSG_FATAL << "Vehicles loaded" << std::endl;
     this->startTimer(100);
 }
 
@@ -377,7 +409,6 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
             }
         }
         memory_sim_update.unlock();
-        OSG_FATAL << new_data << " | " << update_data[new_data].time << " | " << old_data << " | " << update_data[old_data].time << std::endl;
 
         int seconds = static_cast<int>(std::floor(update_data[new_data].time));
         int hours = seconds / 3600;
@@ -390,28 +421,42 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
                                .arg(seconds, 2);
 
         int curr = update_data[new_data].current_vehicle;
-        hud_text += QString("Выбранная ПЕ: %1 | pos{%2,%3,%4} | dir{%5,%6,%7}\n")
-                        .arg(curr, 3)
-                        .arg(update_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
-                        .arg(update_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
-                        .arg(update_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
-                        .arg(update_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
-                        .arg(update_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
-                        .arg(update_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
+        if (curr >= 0)
+        {
+            hud_text += QString("Данная ПЕ: %1 | pos{%2,%3,%4} | dir{%5,%6,%7}\n")
+                            .arg(curr, 3)
+                            .arg(update_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
+                            .arg(update_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
+                            .arg(update_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
+                            .arg(update_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
+                            .arg(update_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
+                            .arg(update_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
 
-        hud_text += QString::fromStdWString(update_data[new_data].currentDebugMsg) + QString("\n");
+            hud_text += QString::fromStdWString(update_data[new_data].currentDebugMsg) + QString("\n");
+        }
+        else
+        {
+            hud_text += QString("\n\n");
+        }
 
         int control = update_data[new_data].controlled_vehicle;
-        hud_text += QString("Управляемая ПЕ: %1 | pos{%2,%3,%4} | dir{%5,%6,%7}\n")
-                        .arg(control, 3)
-                        .arg(update_data[new_data].vehicles[control].position_x, 8, 'f', 1)
-                        .arg(update_data[new_data].vehicles[control].position_y, 8, 'f', 1)
-                        .arg(update_data[new_data].vehicles[control].position_z, 8, 'f', 1)
-                        .arg(update_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
-                        .arg(update_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
-                        .arg(update_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
+        if (control >= 0)
+        {
+            hud_text += QString("Управляемая ПЕ: %1 | pos{%2,%3,%4} | dir{%5,%6,%7}\n")
+                            .arg(control, 3)
+                            .arg(update_data[new_data].vehicles[control].position_x, 8, 'f', 1)
+                            .arg(update_data[new_data].vehicles[control].position_y, 8, 'f', 1)
+                            .arg(update_data[new_data].vehicles[control].position_z, 8, 'f', 1)
+                            .arg(update_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
+                            .arg(update_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
+                            .arg(update_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
 
-        hud_text += QString::fromStdWString(update_data[new_data].controlledDebugMsg);
+            hud_text += QString::fromStdWString(update_data[new_data].controlledDebugMsg);
+        }
+        else
+        {
+            hud_text += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
+        }
 
         std::wstring text = hud_text.toStdWString();
         emit setStatusBar(text);
@@ -447,6 +492,27 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         shared_memory.unlock();
     }
 */
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::sendControlledVehicle(const controlled_t &data)
+{
+    if (memory_controlled.lock())
+    {
+        controlled_t *c = static_cast<controlled_t *>(memory_controlled.data());
+
+        if (c == nullptr)
+        {
+            memory_controlled.unlock();
+            return;
+        }
+
+        memcpy(memory_controlled.data(), &data, sizeof(controlled_t));
+
+        memory_controlled.unlock();
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -687,7 +687,7 @@ QString Vehicle::getDebugMsg() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::receiveData(QByteArray data)
+void Vehicle::setKeysData(QByteArray data)
 {
     if (data.size() == 0)
         return;
@@ -696,6 +696,21 @@ void Vehicle::receiveData(QByteArray data)
 
     QDataStream stream(&data, QIODevice::ReadOnly);
     stream >> keys;
+
+    keys_mutex.unlock();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::resetKeysData()
+{
+    keys_mutex.lock();
+
+    for (QMap<int, bool>::iterator it = keys.begin(); it != keys.end(); ++it)
+    {
+        it.value() = false;
+    }
 
     keys_mutex.unlock();
 }

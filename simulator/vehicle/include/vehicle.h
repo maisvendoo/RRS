@@ -182,9 +182,11 @@ public:
 
     void setASLN(alsn_info_t alsn_info);
 
-public slots:
+    void setKeysData(QByteArray data);
 
-    void receiveData(QByteArray data);
+    void resetKeysData();
+
+public slots:
 
     void getControlSignals(control_signals_t control_signals);
 

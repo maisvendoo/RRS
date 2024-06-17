@@ -13,6 +13,7 @@
  */
 
 #include    "keyboard.h"
+#include    "global-const.h"
 
 #include    <QDataStream>
 
@@ -27,8 +28,15 @@ KeyboardHandler::KeyboardHandler(QObject *parent)
 {
     init();
 
-    keys_data.setKey("keys");
-    keys_data.attach();
+    keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
+    if (keys_data.attach())
+    {
+        OSG_FATAL << "Connected to shared memory for keysboard processing" << std::endl;
+    }
+    else
+    {
+        OSG_FATAL << "Can't connect to shared memory for keysboard processing" << std::endl;
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -29,6 +29,7 @@
 
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
+#include    "controlled-struct.h"
 
 #include    "server.h"
 
@@ -77,7 +78,7 @@ signals:
 
     void sendDataToServer(QByteArray data);
 
-    void sendDataToTrain(QByteArray data);
+//    void sendDataToTrain(QByteArray data);
 
     void getRecvData(sim_dispatcher_data_t &disp_data);
 
@@ -118,8 +119,13 @@ private:
     double      control_time;
     double      control_delay;
 
-    int current_vehicle;
-    int controlled_vehicle;
+    /// Vehicle which selected by user for view
+    int             current_vehicle;
+//    int             prev_current_vehicle;
+
+    /// Vehicle which selected by user for control
+    int             controlled_vehicle;
+    int             prev_controlled_vehicle;
 
     /// Train model
     Train       *train;    
@@ -157,6 +163,7 @@ private:
 
     QSharedMemory   memory_sim_info;
     QSharedMemory   memory_sim_update;
+    QSharedMemory   memory_controlled;
 //    QSharedMemory   shared_memory;
     QSharedMemory   keys_data;
     QByteArray      data;

@@ -48,13 +48,18 @@
 //------------------------------------------------------------------------------
 RouteViewer::RouteViewer(int argc, char *argv[])
   : is_ready(false)
+  , memory_sim_info(nullptr)
   , keyboard(nullptr)
 {
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
 
-    if (!memory_sim_info.attach(QSharedMemory::ReadOnly))
+    if (memory_sim_info.attach(QSharedMemory::ReadOnly))
     {
-        OSG_FATAL << "Can't connect to shared memory with simulator info" << std::endl;
+        //OSG_FATAL << "Connected to shared memory with simulator info" << std::endl;
+    }
+    else
+    {
+        //OSG_FATAL << "Can't connect to shared memory with simulator info" << std::endl;
     }
 
     is_ready = init(argc, argv);
