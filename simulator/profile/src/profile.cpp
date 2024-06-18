@@ -111,33 +111,33 @@ profile_element_t Profile::getElement(double railway_coord, int dir)
     profile_element.inclination = track.inclination * static_cast<double>(dir);
     profile_element.curvature = track.curvature;
     profile_element.position = track.begin_point + track.orth * motion;
-    profile_element.orth = track.orth;
-    profile_element.right = track.right;
-    profile_element.up = track.up;
     if ((relative_motion < 0.5) && (idx > 0))
     {
         zds_track_t prev_track = profile_data.at(idx - 1);
-        profile_element.orth = track.orth * (0.5 + relative_motion);
-        profile_element.orth += prev_track.orth * (0.5 - relative_motion);
-        profile_element.right = track.right * (0.5 + relative_motion);
-        profile_element.right += prev_track.right * (0.5 - relative_motion);
+        profile_element.orth = track.orth * (0.5 + relative_motion) * static_cast<double>(dir);
+        profile_element.orth += prev_track.orth * (0.5 - relative_motion) * static_cast<double>(dir);
+        profile_element.right = track.right * (0.5 + relative_motion) * static_cast<double>(dir);
+        profile_element.right += prev_track.right * (0.5 - relative_motion) * static_cast<double>(dir);
         profile_element.up = track.up * (0.5 + relative_motion);
         profile_element.up += prev_track.up * (0.5 - relative_motion);
+        return profile_element;
     }
 
     if ((relative_motion > 0.5) && (idx < profile_data.size() - 1))
     {
         zds_track_t next_track = profile_data.at(idx + 1);
-        profile_element.orth = track.orth * (1.5 - relative_motion);
-        profile_element.orth += next_track.orth * (relative_motion - 0.5);
-        profile_element.right = track.right * (1.5 - relative_motion);
-        profile_element.right += next_track.right * (relative_motion - 0.5);
+        profile_element.orth = track.orth * (1.5 - relative_motion) * static_cast<double>(dir);
+        profile_element.orth += next_track.orth * (relative_motion - 0.5) * static_cast<double>(dir);
+        profile_element.right = track.right * (1.5 - relative_motion) * static_cast<double>(dir);
+        profile_element.right += next_track.right * (relative_motion - 0.5) * static_cast<double>(dir);
         profile_element.up = track.up * (1.5 - relative_motion);
         profile_element.up += next_track.up * (relative_motion - 0.5);
+        return profile_element;
     }
 
+    profile_element.orth = track.orth * static_cast<double>(dir);
+    profile_element.right = track.right * static_cast<double>(dir);
     profile_element.up = track.up;
-
     return profile_element;
 }
 
