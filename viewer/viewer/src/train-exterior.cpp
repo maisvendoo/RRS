@@ -203,11 +203,14 @@ void TrainExteriorHandler::keyboardHandler(int key)
 
     case osgGA::GUIEventAdapter::KEY_F2:
 
-        cur_vehicle = 0;
+        cur_vehicle = controlled_vehicle;
         long_shift = 0.0f;
         height_shift = 0.0f;
         is_displays_locked = false;
 
+        tmp.current_vehicle = cur_vehicle;
+        tmp.controlled_vehicle = controlled_vehicle;
+        sendControlledVehicle(tmp);
         break;
 
     case osgGA::GUIEventAdapter::KEY_F3:
