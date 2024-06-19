@@ -84,6 +84,9 @@ public:
     /// Read device config file
     virtual void read_config(const QString &filename, const QString &dir_path = "");
 
+    /// Временно вернул, для обратной совместимости
+    virtual void read_custom_config(const QString &path);
+
     QString getDebugMsg() const;
 
     ///
