@@ -43,7 +43,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , osgGA::GUIEventHandler ()
     , settings(settings)
     , cur_vehicle(0)
-    , controlled_vehicle(-1)
+    , controlled_vehicle(0)
     , long_shift(0.0f)
     , height_shift(0.0f)
     , routePath(routePath)
@@ -203,7 +203,8 @@ void TrainExteriorHandler::keyboardHandler(int key)
 
     case osgGA::GUIEventAdapter::KEY_F2:
 
-        cur_vehicle = controlled_vehicle;
+        if (controlled_vehicle >= 0)
+            cur_vehicle = controlled_vehicle;
         long_shift = 0.0f;
         height_shift = 0.0f;
         is_displays_locked = false;
