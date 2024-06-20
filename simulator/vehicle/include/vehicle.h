@@ -28,6 +28,7 @@
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
+#include    "profile-point.h"
 #include    "device-list.h"
 
 #include    "alsn-struct.h"
@@ -70,11 +71,14 @@ public:
     void setIndex(size_t idx);
 
     /// Set inclination
+    void setProfilePoint(profile_point_t point_data);
+/*
+    /// Set inclination
     void setInclination(double value);
 
     /// Set curvature
     void setCurvature(double value);
-
+*/
     /// Set friction coefficient between wheel and rail
     void setFrictionCoeff(double value);
 
@@ -122,6 +126,8 @@ public:
 
     /// Get vehicle index
     size_t getIndex() const;
+
+    profile_point_t *getProfilePoint();
 
     /// Get orientation
     int getOrientation() const;
@@ -289,10 +295,14 @@ protected:
     double  d;
     double  e;
 
+
+    profile_point_t profile_point_data;
+    /*
     /// Vertical profile inclination
     double  inc;
     /// Railway curvature
     double  curv;
+    */
     /// Railway motion direction
     int     dir;
     /// Vehicle orientation

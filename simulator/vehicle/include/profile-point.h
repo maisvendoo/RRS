@@ -3,7 +3,7 @@
 
 #include    "vec3.h"
 
-struct profile_element_t
+struct profile_point_t
 {
     double  ordinate;
     double  inclination;
@@ -13,7 +13,7 @@ struct profile_element_t
     dvec3   right;
     dvec3   up;
 
-    profile_element_t()
+    profile_point_t()
         : ordinate(0.0)
         , inclination(0.0)
         , curvature(0.0)

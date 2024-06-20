@@ -151,46 +151,13 @@ void Train::preStep(double t, simulator_update_t &update_data)
 
     auto begin = vehicles.begin();
     auto end = vehicles.end();
-    int i = 0;
 
     for (auto it = begin; it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        profile_element_t pe = profile->getElement(y[idx], dir * vehicle->getOrientation());
-
-        if (i < MAX_NUM_VEHICLES)
-        {
-            update_data.vehicles[i].position_x = pe.position.x;
-            update_data.vehicles[i].position_y = pe.position.y;
-            update_data.vehicles[i].position_z = pe.position.z;
-            update_data.vehicles[i].orth_x = pe.orth.x;
-            update_data.vehicles[i].orth_y = pe.orth.y;
-            update_data.vehicles[i].orth_z = pe.orth.z;
-            update_data.vehicles[i].up_x = pe.up.x;
-            update_data.vehicles[i].up_y = pe.up.y;
-            update_data.vehicles[i].up_z = pe.up.z;
-            update_data.vehicles[i].orientation = vehicle->getOrientation();
-
-            if (it == begin)
-                update_data.vehicles[i].prev_vehicle = -1;
-            else
-                update_data.vehicles[i].prev_vehicle = i - 1;
-
-            if (it == end - 1)
-                update_data.vehicles[i].next_vehicle = -1;
-            else
-                update_data.vehicles[i].prev_vehicle = i + 1;
-
-            std::copy(vehicle->getAnalogSignals().begin(),
-                      vehicle->getAnalogSignals().end(),
-                      update_data.vehicles[i].analogSignal.begin());
-        }
-        ++i;
-
-        vehicle->setInclination(pe.inclination);
-        vehicle->setCurvature(pe.curvature);
+        *vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationPreStep(y, t);

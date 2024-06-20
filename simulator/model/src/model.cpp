@@ -773,35 +773,54 @@ void Model::sharedMemoryFeedback()
     update_data.current_vehicle = current_vehicle;
     update_data.controlled_vehicle = controlled_vehicle;
 
+    int i = 0;
     std::vector<Vehicle *> *vehicles = train->getVehicles();
 
-    if (current_vehicle >= 0)
+    for (auto vehicle : *vehicles)
     {
-        Vehicle *vehicle = vehicles->at(current_vehicle);
-        QString msg = vehicle->getDebugMsg();
-        msg.resize(DEBUG_STRING_SIZE, QChar(' '));
-        msg.toWCharArray(update_data.currentDebugMsg);
-    }
+        profile_point_t *pp = vehicle->getProfilePoint();
 
-    if (controlled_vehicle >= 0)
-    {
-        Vehicle *vehicle = vehicles->at(controlled_vehicle);
-        if (data.size() != 0)
-            vehicle->setKeysData(data);
+        update_data.vehicles[i].position_x = pp->position.x;
+        update_data.vehicles[i].position_y = pp->position.y;
+        update_data.vehicles[i].position_z = pp->position.z;
+        update_data.vehicles[i].orth_x = pp->orth.x;
+        update_data.vehicles[i].orth_y = pp->orth.y;
+        update_data.vehicles[i].orth_z = pp->orth.z;
+        update_data.vehicles[i].up_x = pp->up.x;
+        update_data.vehicles[i].up_y = pp->up.y;
+        update_data.vehicles[i].up_z = pp->up.z;
 
-        QString msg = vehicle->getDebugMsg();
-        msg.resize(DEBUG_STRING_SIZE, QChar(' '));
-        msg.toWCharArray(update_data.controlledDebugMsg);
+        update_data.vehicles[i].orientation = vehicle->getOrientation();
 
-        if (prev_controlled_vehicle != controlled_vehicle)
+        std::copy(vehicle->getAnalogSignals().begin(),
+                  vehicle->getAnalogSignals().end(),
+                  update_data.vehicles[i].analogSignal.begin());
+
+        if (current_vehicle == i)
         {
-            if (prev_controlled_vehicle >= 0)
-            {
-                vehicles->at(prev_controlled_vehicle)->resetKeysData();
-            }
-
-            prev_controlled_vehicle = controlled_vehicle;
+            QString msg = vehicle->getDebugMsg();
+            msg.resize(DEBUG_STRING_SIZE, QChar(' '));
+            msg.toWCharArray(update_data.currentDebugMsg);
         }
+
+        if (controlled_vehicle == i)
+        {
+            if (data.size() != 0)
+                vehicle->setKeysData(data);
+
+            QString msg = vehicle->getDebugMsg();
+            msg.resize(DEBUG_STRING_SIZE, QChar(' '));
+            msg.toWCharArray(update_data.controlledDebugMsg);
+        }
+        else
+        {
+            if (prev_controlled_vehicle == i)
+            {
+                vehicle->resetKeysData();
+                prev_controlled_vehicle = controlled_vehicle;
+            }
+        }
+        ++i;
     }
 
     if (memory_sim_update.lock())
