@@ -668,21 +668,28 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
     QString joint_cfg_name = QString("joint-" + name_fwd + "-" + name_bwd);
 //    Journal::instance()->info(QString("Try to load config: " + joint_cfg_name));
 
-    // Default directory of joint's configuration files
-    QString joint_cfg_path = QString(fs.getDevicesDir().c_str()) +
-            fs.separator() + joint_cfg_name + ".xml";
+    // Check forward connector's custom config directory
+    QString cfg_dir = QString(fs.getVehiclesDir().c_str());
+    QString fwd_cfg_subdir = con_fwd->getCustomConfigDir();
+
+    QString joint_cfg_path = cfg_dir;
+    joint_cfg_path += fs.separator() + fwd_cfg_subdir;
+    joint_cfg_path += fs.separator() + joint_cfg_name + ".xml";
 
     if (!cfg.load(joint_cfg_path))
     {
-        // Forward connector's config directory
-        joint_cfg_path = con_fwd->getCustomConfigDir() +
-                fs.separator() + joint_cfg_name + ".xml";
+        // Check backward connector's custom config directory
+        QString bwd_cfg_subdir = con_bwd->getCustomConfigDir();
+
+        joint_cfg_path = cfg_dir;
+        joint_cfg_path += fs.separator() + bwd_cfg_subdir;
+        joint_cfg_path += fs.separator() + joint_cfg_name + ".xml";
 
         if (!cfg.load(joint_cfg_path))
         {
-            // Backward connector's config directory
-            joint_cfg_path = con_bwd->getCustomConfigDir() +
-                    fs.separator() + joint_cfg_name + ".xml";
+            // Check default directory of devices configuration files
+            joint_cfg_path = QString(fs.getDevicesDir().c_str());
+            joint_cfg_path += fs.separator() + joint_cfg_name + ".xml";
 
             if (!cfg.load(joint_cfg_path))
             {

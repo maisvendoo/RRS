@@ -142,10 +142,10 @@ protected:
     state_vector_t k3;
     //state_vector_t k4;
 
-    /// Path to directory with custom configs
+    /// Name of directory with vehicle's custom configs
     QString custom_cfg_dir;
 
-    QString     DebugMsg;
+    QString DebugMsg;
 
     QMap<int, bool>     keys;
     control_signals_t   control_signals;

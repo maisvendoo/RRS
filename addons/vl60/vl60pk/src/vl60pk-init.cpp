@@ -81,7 +81,7 @@ void VL60pk::initTractionControl(const QString &modules_dir, const QString &cust
     for (size_t i = 0; i < motor.size(); ++i)
     {
         motor[i] = new DCMotor();
-        motor[i]->setCustomConfigDir(custom_cfg_dir);
+        motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_config("HB-412K", custom_cfg_dir);
         connect(motor[i], &DCMotor::soundSetPitch, this, &VL60pk::soundSetPitch);
         connect(motor[i], &DCMotor::soundSetVolume, this, &VL60pk::soundSetVolume);

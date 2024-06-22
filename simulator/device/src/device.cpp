@@ -198,7 +198,9 @@ void Device::read_config(const QString &filename, const QString &dir_path)
     // Custom config from vehicle's subdirectory
     if (custom_cfg_dir != "")
     {
-        QString cfg_path = custom_cfg_dir + QDir::separator() + filename + ".xml";
+        QString cfg_dir = fs.getVehiclesDir().c_str();
+        cfg_dir += fs.separator() + custom_cfg_dir;
+        QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
 
         if (cfg.load(cfg_path))
         {
@@ -210,7 +212,7 @@ void Device::read_config(const QString &filename, const QString &dir_path)
         }
         else
         {
-            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + custom_cfg_dir);
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + cfg_dir);
         }
     }
 
