@@ -83,10 +83,10 @@ void FreightCar::stepBrakesEquipment(double t, double dt)
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());
-    //anglecock_bp_fwd->setControl(keys);
+    anglecock_bp_fwd->setControl(keys);
     anglecock_bp_fwd->step(t, dt);
     anglecock_bp_bwd->setPipePressure(brakepipe->getPressure());
-    //anglecock_bp_bwd->setControl(keys);
+    anglecock_bp_bwd->setControl(keys);
     anglecock_bp_bwd->step(t, dt);
 
     // Рукава тормозной магистрали

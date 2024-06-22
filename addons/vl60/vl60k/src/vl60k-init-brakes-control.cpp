@@ -38,17 +38,21 @@ void VL60k::initBrakesControl(const QString &modules_dir, const QString &custom_
 
     // Концевые краны магистрали тормозных цилиндров
     anglecock_bc_fwd = new PneumoAngleCock();
+    //anglecock_bc_fwd->setKeyCode(0);
     anglecock_bc_fwd->read_config("pneumo-anglecock-BC");
 
     anglecock_bc_bwd = new PneumoAngleCock();
+    //anglecock_bc_bwd->setKeyCode(0);
     anglecock_bc_bwd->read_config("pneumo-anglecock-BC");
 
     // Рукава магистрали тормозных цилиндров
     hose_bc_fwd = new PneumoHose();
+    //hose_bc_fwd->setKeyCode(0);
     hose_bc_fwd->read_config("pneumo-hose-BC");
     forward_connectors.push_back(hose_bc_fwd);
 
     hose_bc_bwd = new PneumoHose();
+    //hose_bc_bwd->setKeyCode(0);
     hose_bc_bwd->read_config("pneumo-hose-BC");
     backward_connectors.push_back(hose_bc_bwd);
 }
