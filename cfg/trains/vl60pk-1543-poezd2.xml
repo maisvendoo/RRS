@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Common>
-		<CouplingModule>ef-coupling</CouplingModule>
-		<CabineInVehicle>0</CabineInVehicle>
 		<Title>–ü–æ–µ–∑–¥ ‚Ññ2</Title>
 		<Description>–°–µ—Ç–µ–≤–∞—è –∫–æ–Ω—Ñ–∏–≥—É—Ä–∞—Ü–∏—è –¥–ª—è –í–ñ–î –†–ì–£–ü–°</Description>
 		<ClientName>vl60pk</ClientName>
@@ -10,89 +8,124 @@
 	</Common>
 
 	<Vehicle>
+		<ModuleDir>vl60pk</ModuleDir>
 		<Module>vl60pk</Module>
+		<ModuleConfigDir>vl60pk</ModuleConfigDir>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
-	
+
 	<!--  ÛÔÂÈÌ˚Â ( ) -->
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
-	</Vehicle>	
+	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
-	</Vehicle>	
+	</Vehicle>
 
 	<!-- ¬‡„ÓÌ-·ÛÙÂÚ -->
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-17669</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-16733</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<!-- œÎ‡ˆÍ‡ÚÌ˚Â (œÀ) -->
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>5</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<!--  ÛÔÂÈÌ˚Â -->
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>

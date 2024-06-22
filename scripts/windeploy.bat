@@ -54,16 +54,10 @@ xcopy ..\cfg\main-resist\loco-resist.xml %RRS_DEV_ROOT%\cfg\main-resist\
 
 xcopy ..\cfg\wheel-rail-friction\*.xml %RRS_DEV_ROOT%\cfg\wheel-rail-friction\
 
-xcopy ..\cfg\vehicles\vl60pk-1543\*.* %RRS_DEV_ROOT%\cfg\vehicles\vl60pk-1543\
-xcopy ..\cfg\vehicles\VL60k-1737\*.* %RRS_DEV_ROOT%\cfg\vehicles\VL60k-1737\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-11100\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-11100\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-13819\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-13819\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-16733\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-16733\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-17669\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-17669\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-25924\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-25924\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-21071\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-21071\
-xcopy ..\cfg\vehicles\IMR_pass_rzd-65361\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd-65361\
-xcopy ..\cfg\vehicles\Fr_hopper_RZD-2851\*.* %RRS_DEV_ROOT%\cfg\vehicles\Fr_hopper_RZD-2851\
+xcopy ..\cfg\vehicles\vl60pk\*.* %RRS_DEV_ROOT%\cfg\vehicles\vl60pk\
+xcopy ..\cfg\vehicles\vl60k\*.* %RRS_DEV_ROOT%\cfg\vehicles\vl60k\
+xcopy ..\cfg\vehicles\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd\
+xcopy ..\cfg\vehicles\Fr_hopper_RZD\*.* %RRS_DEV_ROOT%\cfg\vehicles\Fr_hopper_RZD\
 
 xcopy ..\cfg\trains\vl60pk-1543-T65_17.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\

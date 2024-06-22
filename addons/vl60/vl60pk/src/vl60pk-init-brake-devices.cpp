@@ -1,6 +1,6 @@
 #include    "vl60pk.h"
 
-#include    <QDir>
+#include    "filesystem.h"
 
 //------------------------------------------------------------------------
 //
@@ -37,7 +37,10 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
     supply_reservoir->setY(0, pBP);
 
     // Загрузка состояния тормозного оборудования из собственного конфига
-    load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
+    FileSystem &fs = FileSystem::getInstance();
+    QString custom_cfg_dir(fs.getVehiclesDir().c_str());
+    custom_cfg_dir += QDir::separator() + config_dir;
+    load_brakes_config(custom_cfg_dir + QDir::separator() + "brakes-init.xml");
 
     // Состояние рукавов и концевых кранов магистрали тормозных цилиндров
     if (hose_bc_fwd->isLinked())

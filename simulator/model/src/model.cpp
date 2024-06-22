@@ -223,7 +223,6 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     if (memory_sim_info.lock())
     {
-        Journal::instance()->info("Shared memory locked");
         memcpy(memory_sim_info.data(), &info_data, sizeof (simulator_info_t));
         memory_sim_info.unlock();
         Journal::instance()->info("Set info to shared memory");
