@@ -10,6 +10,7 @@
 		<NumAxis>6</NumAxis>
 		<WheelInertia>100.0</WheelInertia>
 		<SoundDir>vl60</SoundDir>
+		<AnimationsConfigDir>vl60pk</AnimationsConfigDir>
 
 		<ReductorCoeff>2.73</ReductorCoeff>
 

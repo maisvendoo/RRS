@@ -8,6 +8,7 @@
 		<WheelDiameter>0.95</WheelDiameter>
 		<MainResist>passcar</MainResist>
 		<NumAxis>4</NumAxis>
+		<SoundDir>pass</SoundDir>
 		<WheelInertia>100.0</WheelInertia>
 
 		<ExtModelName>IMR_pass_rzd/Pass_RestAmm2.osgt</ExtModelName>

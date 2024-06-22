@@ -91,11 +91,11 @@ rem Копируем данные игры (модели, звуки, конфи
 rem ВЛ60пк
 xcopy /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
 xcopy /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
-xcopy /S %DATA_PATH%\animations\vl60pk-1543\*.* %RRS_DEV_ROOT%\data\animations\vl60pk-1543\
+xcopy /S %DATA_PATH%\animations\vl60pk\*.* %RRS_DEV_ROOT%\data\animations\vl60pk\
 
 rem ВЛ60к
 xcopy /S %DATA_PATH%\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
-xcopy /S %DATA_PATH%\animations\VL60k-1737\*.* %RRS_DEV_ROOT%\data\animations\VL60k-1737\
+xcopy /S %DATA_PATH%\animations\vl60k\*.* %RRS_DEV_ROOT%\data\animations\vl60k\
 
 rem Пассажирские вагоны
 xcopy /S %DATA_PATH%\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
