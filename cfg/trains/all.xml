@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Начальное давление в ГР, МПа -->
+		<InitMainResPressure>0.9</InitMainResPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>0</NoAir>
+
+		<Title>Все модули подвижного состава</Title>
+		<Description></Description>
+	</Common>
+
+	<Vehicle>
+		<ModuleDir>vl60pk</ModuleDir>
+		<Module>vl60pk</Module>
+		<ModuleConfigDir>vl60pk</ModuleConfigDir>
+		<ModuleConfig>vl60pk-1543</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>vl60k</ModuleDir>
+		<Module>vl60k</Module>
+		<ModuleConfigDir>vl60k</ModuleConfigDir>
+		<ModuleConfig>vl60k-1737</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>freightcar</ModuleDir>
+		<Module>freightcar</Module>
+		<ModuleConfigDir>Fr_hopper_RZD</ModuleConfigDir>
+		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>0</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>chs2t</ModuleDir>
+		<Module>chs2t</Module>
+		<ModuleConfigDir>chs2t</ModuleConfigDir>
+		<ModuleConfig>chs2t-977</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>tep70</ModuleDir>
+		<Module>tep70</Module>
+		<ModuleConfigDir>tep70</ModuleConfigDir>
+		<ModuleConfig>tep70-0132</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>ra3-middle</ModuleDir>
+		<Module>ra3-middle</Module>
+		<ModuleConfigDir>ra3-middle</ModuleConfigDir>
+		<ModuleConfig>ra3-06003</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>ra3-head</ModuleDir>
+		<Module>ra3-head</Module>
+		<ModuleConfigDir>ra3-head</ModuleConfigDir>
+		<ModuleConfig>ra3-06001</ModuleConfig>
+		<IsOrientationForward>0</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>ep1m</ModuleDir>
+		<Module>ep1m</Module>
+		<ModuleConfigDir>ep1m</ModuleConfigDir>
+		<ModuleConfig>ep1m-384</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>ep20</ModuleDir>
+		<Module>ep20</Module>
+		<ModuleConfigDir>ep20</ModuleConfigDir>
+		<ModuleConfig>ep20-017</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>tep70bs</ModuleDir>
+		<Module>tep70bs</Module>
+		<ModuleConfigDir>tep70bs</ModuleConfigDir>
+		<ModuleConfig>tep70bs-214</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+</Config>
