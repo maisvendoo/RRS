@@ -28,8 +28,10 @@
 //------------------------------------------------------------------------------
 struct settings_t
 {
+    /// Route directory name
+    std::string     route_dir_name;
     /// Route directory
-    std::string     route_dir;
+    std::string     route_dir_full_path; // Temporary for displays with route map
     /// Server ip-address
     std::string     host_addr;
     /// Server port
@@ -126,13 +128,14 @@ struct settings_t
     unsigned int    interval;
 
     settings_t()
-        : route_dir("")
+        : route_dir_name("")
+        , route_dir_full_path("")
         , host_addr("127.0.0.1")
         , port(1992)
         , x(50)
         , y(50)
-        , width(1366)
-        , height(768)
+        , width(1280)
+        , height(720)
         , fullscreen(false)
         , vsync(true)
         , localmode(false)

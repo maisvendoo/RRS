@@ -54,6 +54,7 @@ public:
 
     /// Constructor
     TrainExteriorHandler(settings_t settings, MotionPath *routePath, const simulator_info_t &info_data);
+    ~TrainExteriorHandler();
 
     /// Handle method
     virtual bool handle(const osgGA::GUIEventAdapter &ea,

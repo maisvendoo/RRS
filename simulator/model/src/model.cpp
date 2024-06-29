@@ -175,13 +175,17 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     // Load profile
     Journal::instance()->info("==== Profile data loading ====");
-    profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+    profile = new Profile(init_data.direction, route_dir_path);
 
     Journal::instance()->info(QString("State Profile object at address: 0x%1")
                               .arg(reinterpret_cast<quint64>(profile), 0, 16));
 
     if (profile->isReady())
+    {
         Journal::instance()->info("Profile loaded successfully");
+    }
     else
     {
         Journal::instance()->warning("Profile is't loaded. Using flat profile");
@@ -200,8 +204,8 @@ bool Model::init(const simulator_command_line_t &command_line)
     Journal::instance()->info("==== Info to shared memory ====");
     simulator_info_t   info_data;
     info_data.num_updates = 1;
-    info_data.route_info.route_dir_name_length = init_data.route_dir.size();
-    init_data.route_dir.toWCharArray(info_data.route_info.route_dir_name);
+    info_data.route_info.route_dir_name_length = init_data.route_dir_name.size();
+    init_data.route_dir_name.toWCharArray(info_data.route_info.route_dir_name);
     Journal::instance()->info("Ready route info for shared memory");
 
     std::vector<Vehicle *> *vehicles = train->getVehicles();
@@ -231,23 +235,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     {
         Journal::instance()->error("Can't lock shared memory");
     }
-/*
-    connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
-    keys_data.setKey("keys");
-
-    if (!keys_data.create(init_data.keys_buffer_size))
-    {
-        if (!keys_data.attach())
-        {
-            Journal::instance()->error("Can't attach to shread memory. Unable process keyboard");
-        }
-    }
-    else
-    {
-        Journal::instance()->info("Created shared memory for keysboard processing");
-    }
-*/
     initControlPanel("control-panel");
 
     initSimClient("virtual-railway");
@@ -386,14 +374,19 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.init_velocity = 0.0;
         }
 
-        if (!cfg.getString(secName, "Profile", init_data.profile_path))
+        if (!cfg.getInt(secName, "Direction", init_data.direction))
         {
-            init_data.profile_path = "default";
+            init_data.direction = 1;
         }
 
-        if (!cfg.getDouble(secName, "ProfileStep", init_data.prof_step))
+        if (!cfg.getString(secName, "Profile", init_data.route_dir_name))
         {
-            init_data.prof_step = 100.0;
+            init_data.route_dir_name = "experimental-polygon";
+        }
+
+        if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
+        {
+            init_data.train_config = "vl60pk-1543";
         }
 
         if (!cfg.getDouble(secName, "CoeffToWheelRailFriction", init_data.coeff_to_wheel_rail_friction))
@@ -401,19 +394,14 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.coeff_to_wheel_rail_friction = 1.0;
         }
 
-        if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
-        {
-            init_data.train_config = "default-train";
-        }
-
         if (!cfg.getInt(secName, "IntegrationTimeInterval", init_data.integration_time_interval))
         {
-            init_data.integration_time_interval = 100;
+            init_data.integration_time_interval = 15;
         }
 
         if (!cfg.getInt(secName, "ControlTimeInterval", init_data.control_time_interval))
         {
-            init_data.control_time_interval = 50;
+            init_data.control_time_interval = 15;
         }
 
         control_delay = static_cast<double>(init_data.control_time_interval) / 1000.0;
@@ -421,11 +409,6 @@ void Model::loadInitData(init_data_t &init_data)
         if (!cfg.getBool(secName, "DebugPrint", init_data.debug_print))
         {
             init_data.debug_print = false;
-        }
-
-        if (!cfg.getInt(secName, "KeysBufferSize", init_data.keys_buffer_size))
-        {
-            init_data.keys_buffer_size = 1024;
         }
 
         Journal::instance()->info("Loaded settings from: " + cfg_path);
@@ -443,13 +426,19 @@ void Model::overrideByCommandLine(init_data_t &init_data,
                                   const simulator_command_line_t &command_line)
 {
     if (command_line.train_config.is_present)
+    {
         init_data.train_config = command_line.train_config.value;
+    }
 
     if (command_line.route_dir.is_present)
-        init_data.route_dir = command_line.route_dir.value;
+    {
+        init_data.route_dir_name = command_line.route_dir.value;
+    }
 
     if (command_line.debug_print.is_present)
+    {
         init_data.debug_print = command_line.debug_print.value;
+    }
 
     if (command_line.init_coord.is_present)
     {
@@ -457,7 +446,9 @@ void Model::overrideByCommandLine(init_data_t &init_data,
     }
 
     if (command_line.direction.is_present)
+    {
         init_data.direction = command_line.direction.value;
+    }
 
     Journal::instance()->info("Apply command line settinds");
 }
@@ -641,10 +632,13 @@ void Model::initSignaling(const init_data_t &init_data)
 {
     signaling = new Signaling;
 
-    if (!signaling->init(init_data.direction, init_data.route_dir))
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+
+    if (!signaling->init(init_data.direction, route_dir_path.c_str()))
     {
         Journal::instance()->error("Failed signaling initialization at route " +
-                                   init_data.route_dir);
+                                   QString(route_dir_path.c_str()));
     }
 }
 
@@ -655,10 +649,13 @@ void Model::initTraffic(const init_data_t &init_data)
 {
     traffic_machine = new TrafficMachine();
 
-    if (!traffic_machine->init(init_data.route_dir))
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+
+    if (!traffic_machine->init(route_dir_path.c_str()))
     {
         Journal::instance()->error("Failed traffic initialization in route" +
-                                   init_data.route_dir);
+                                   QString(route_dir_path.c_str()));
     }
 }
 

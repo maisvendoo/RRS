@@ -70,7 +70,7 @@ RouteViewer::RouteViewer(int argc, char *argv[])
 //------------------------------------------------------------------------------
 RouteViewer::~RouteViewer()
 {
-
+    memory_sim_info.detach();
 }
 
 //------------------------------------------------------------------------------
@@ -179,9 +179,9 @@ bool RouteViewer::init(int argc, char *argv[])
     overrideSettingsBySharedMemory(settings);
 
     // Load selected route
-    if (!loadRoute(settings.route_dir))
+    if (!loadRoute())
     {
-        OSG_FATAL << "Route from " << settings.route_dir << " is't loaded" << std::endl;
+        OSG_FATAL << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
         return false;
     }
 
@@ -332,7 +332,7 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
         settings.direction = cmd_line.direction.value;
 
     if (cmd_line.route_dir.is_present)
-        settings.route_dir = cmd_line.route_dir.value;
+        settings.route_dir_name = cmd_line.route_dir.value;
 }
 
 //------------------------------------------------------------------------------
@@ -385,8 +385,8 @@ void RouteViewer::overrideSettingsBySharedMemory(settings_t &settings)
 
         QString route_dir_tmp = QString::fromStdWString(info_data.route_info.route_dir_name);
         route_dir_tmp.resize(info_data.route_info.route_dir_name_length);
-        settings.route_dir = route_dir_tmp.toStdString();
-        OSG_FATAL << "Route dir from shared memory: " << route_dir_tmp.toStdString() << std::endl;
+        settings.route_dir_name = route_dir_tmp.toStdString();
+        OSG_FATAL << "Route directory name from shared memory: " << route_dir_tmp.toStdString() << std::endl;
     }
     else
     {
@@ -397,17 +397,18 @@ void RouteViewer::overrideSettingsBySharedMemory(settings_t &settings)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool RouteViewer::loadRoute(const std::string &routeDir)
+bool RouteViewer::loadRoute()
 {
-    if (routeDir.empty())
+    if (settings.route_dir_name.empty())
     {
-        OSG_FATAL << "ERROR: Route path is empty" << std::endl;
-        OSG_FATAL << "Route path: " << routeDir << std::endl;
+        OSG_FATAL << "ERROR: Route directory name is empty" << std::endl;
         return false;
     }
 
     FileSystem &fs = FileSystem::getInstance();
-    std::string routeType = osgDB::findDataFile(routeDir + fs.separator() + "route-type");
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
+    settings.route_dir_full_path = route_dir_path;
+    std::string routeType = osgDB::findDataFile(route_dir_path + fs.separator() + "route-type");
 
     if (routeType.empty())
     {
@@ -442,7 +443,7 @@ bool RouteViewer::loadRoute(const std::string &routeDir)
         return false;
     }
 
-    loader->load(routeDir, settings.view_distance);
+    loader->load(route_dir_path, settings.view_distance);
 
     MotionPath *motionPath = loader->getMotionPath(settings.direction);
 

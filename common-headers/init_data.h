@@ -32,32 +32,26 @@ struct init_data_t
     double  init_coord;
     double  init_velocity;
     int     direction;
-    QString profile_path;
-    double  prof_step;
-    double  coeff_to_wheel_rail_friction;
+    QString route_dir_name;
     QString train_config;
-    QString route_dir;
+    double  coeff_to_wheel_rail_friction;
     int     integration_time_interval;
     int     control_time_interval;
-    int     keys_buffer_size;
     bool    debug_print;
     solver_config_t solver_config;
 
     init_data_t()
-        : init_coord(0)
-        , init_velocity(0)
+        : init_coord(0.0)
+        , init_velocity(0.0)
         , direction(1)
-        , profile_path("")
-        , prof_step(100.0)
-        , coeff_to_wheel_rail_friction(1.0)
+        , route_dir_name("")
         , train_config("")
-        , route_dir("")
-        , integration_time_interval(100)
-        , control_time_interval(50)
-        , keys_buffer_size(1024)
+        , coeff_to_wheel_rail_friction(1.0)
+        , integration_time_interval(15)
+        , control_time_interval(15)
         , debug_print(false)
     {
-
+        solver_config = solver_config_t();
     }
 };
 

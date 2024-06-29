@@ -42,6 +42,14 @@ KeyboardHandler::KeyboardHandler(QObject *parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+KeyboardHandler::~KeyboardHandler()
+{
+    keys_data.detach();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
                              osgGA::GUIActionAdapter &aa)
 {

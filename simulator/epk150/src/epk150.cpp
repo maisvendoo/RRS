@@ -130,7 +130,6 @@ void AutoTrainStopEPK150::preStep(state_vector_t &Y, double t)
         {
             is_whistle = true;
             emit soundPlay("EPK");
-
         }
     }
     else

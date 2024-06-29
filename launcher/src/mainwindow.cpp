@@ -140,11 +140,12 @@ void MainWindow::loadRoutesList(const std::string &routesDir)
     while (route_dirs.hasNext())
     {
         route_info_t route_info;
-        route_info.route_dir = route_dirs.next();
+        route_info.route_dir_full_path = route_dirs.next();
+        route_info.route_dir_name = route_dirs.fileName();
 
         CfgReader cfg;
 
-        if (cfg.load(route_info.route_dir + QDir::separator() + "description.xml"))
+        if (cfg.load(route_info.route_dir_full_path + QDir::separator() + "description.xml"))
         {
             QString secName = "Route";
 
@@ -220,7 +221,7 @@ void MainWindow::startSimulator()
 
     QStringList args;
     args << "--train-config=" + selectedTrain;
-    args << "--route=" + selectedRoutePath;
+    args << "--route=" + selectedRouteDirName;
 
     if (isBackward())
     {
@@ -250,7 +251,7 @@ void MainWindow::startViewer()
     QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     QStringList args;
-    args << "--route" << selectedRoutePath;
+    args << "--route" << selectedRouteDirName;
     args << "--train" << selectedTrain;
     args << "--direction";
 
@@ -349,14 +350,14 @@ void MainWindow::onRouteSelection()
     size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
 
     ui->ptRouteDescription->clear();
-    selectedRoutePath = routes_info[item_idx].route_dir;
+    selectedRouteDirName = routes_info[item_idx].route_dir_name;
     ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
 
-    loadStations(selectedRoutePath);
+    loadStations(routes_info[item_idx].route_dir_full_path);
 
     onStationSelected(ui->cbStations->currentIndex());
 
-    setRouteScreenShot(selectedRoutePath + QDir::separator() + "shotcut.png");
+    setRouteScreenShot(routes_info[item_idx].route_dir_full_path + QDir::separator() + "shotcut.png");
 }
 
 //------------------------------------------------------------------------------
@@ -383,7 +384,7 @@ void MainWindow::onStartPressed()
     }
 
     // Check is route selected
-    if (selectedRoutePath.isEmpty())
+    if (selectedRouteDirName.isEmpty())
     {
         return;
     }

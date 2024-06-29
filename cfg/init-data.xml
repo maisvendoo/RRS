@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <InitData>
-        <InitCoord>1.0</InitCoord>
-        <InitVelocity>0.0</InitVelocity>
-        <Direction>1</Direction>
-        <CoeffToWheelRailFriction>1.0</CoeffToWheelRailFriction>
-        <TrainConfig>default</TrainConfig>
-        <IntegrationTimeInterval>20</IntegrationTimeInterval>
-        <DebugPrint>true</DebugPrint>
+	<InitData>
+		<!-- Координата положения головы поезда при запуске симуляции -->
+		<InitCoord>1.0</InitCoord>
+		<!-- Скорость поезда при запуске симуляции -->
+		<InitVelocity>0.0</InitVelocity>
+		<!-- Направление движения по маршруту: 1 - туда, -1 - обратно -->
+		<Direction>1</Direction>
+		<!-- Имя папки с маршрутом в /routes -->
+		<RouteDirectory>experimental-polygon</RouteDirectory>
+		<!-- Имя конфиг-файла поезда в /cfg/trains -->
+		<TrainConfig>vl60pk-1543</TrainConfig>
+		<!-- Коэффициент к трению колесо-рельс: меньше 1.0 - уменьшить, больше 1.0 - увеличить -->
+		<CoeffToWheelRailFriction>1.0</CoeffToWheelRailFriction>
+		<!-- Шаг синхронизации симуляции, мс -->
+		<IntegrationTimeInterval>15</IntegrationTimeInterval>
+		<!-- Интервал опроса клавиш клавиатуры, мс -->
+		<ControlTimeInterval>15</ControlTimeInterval>
 
-        <!-- Интервал опроса кнопок, мс -->
-        <ControlTimeInterval>20</ControlTimeInterval>
+		<DebugPrint>0</DebugPrint>
 
-        <!-- Объем буфера клавиатуры, байт -->
-        <KeysBufferSize>10240</KeysBufferSize>
-
-    </InitData>
+	</InitData>
 </Config>

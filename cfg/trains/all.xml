@@ -73,21 +73,21 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>ra3-middle</ModuleDir>
-		<Module>ra3-middle</Module>
-		<ModuleConfigDir>ra3-middle</ModuleConfigDir>
-		<ModuleConfig>ra3-06003</ModuleConfig>
+		<ModuleDir>ra3-head</ModuleDir>
+		<Module>ra3-head</Module>
+		<ModuleConfigDir>ra3-head</ModuleConfigDir>
+		<ModuleConfig>ra3-06002</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>ra3-head</ModuleDir>
-		<Module>ra3-head</Module>
-		<ModuleConfigDir>ra3-head</ModuleConfigDir>
-		<ModuleConfig>ra3-06001</ModuleConfig>
-		<IsOrientationForward>0</IsOrientationForward>
+		<ModuleDir>ra3-middle</ModuleDir>
+		<Module>ra3-middle</Module>
+		<ModuleConfigDir>ra3-middle</ModuleConfigDir>
+		<ModuleConfig>ra3-06003</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>

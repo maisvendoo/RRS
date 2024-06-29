@@ -50,10 +50,10 @@ public:
     /// Destructor
     ~MainWindow();
 
-private:    
+private:
 
-    /// Selected route path
-    QString         selectedRoutePath;
+    /// Selected route directory name
+    QString         selectedRouteDirName;
     /// SElected train config
     QString         selectedTrain;
 

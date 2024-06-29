@@ -22,15 +22,18 @@
 //------------------------------------------------------------------------------
 struct route_info_t
 {
-    /// Route directory
-    QString route_dir;
+    /// Route directory path
+    QString route_dir_full_path;
+    /// Route directory name
+    QString route_dir_name;
     /// Route name
     QString route_title;
     /// Route description
     QString route_description;
 
     route_info_t()
-        : route_dir("")
+        : route_dir_full_path("")
+        , route_dir_name("")
         , route_title("")
         , route_description("")
     {

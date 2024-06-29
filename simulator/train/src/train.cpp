@@ -470,7 +470,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                 vehicle->setModuleName(module_lib_name);
                 vehicle->setConfigDir(module_cfg_dir);
                 vehicle->setConfigName(module_cfg_name);
-                vehicle->setRouteDir(init_data.route_dir);
+                vehicle->setRouteDir(init_data.route_dir_name);
 
                 vehicle->setIndex(ode_order);
                 vehicle->setPayloadCoeff(payload_coeff);

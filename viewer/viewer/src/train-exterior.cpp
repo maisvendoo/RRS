@@ -94,6 +94,15 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+TrainExteriorHandler::~TrainExteriorHandler()
+{
+    memory_sim_update.detach();
+    memory_controlled.detach();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                                   osgGA::GUIActionAdapter &aa)
 {
@@ -764,7 +773,7 @@ void TrainExteriorHandler::loadDisplays(const std::string &configDir,
                 continue;
 
             dc->display->setConfigDir(QString(vehicle_config_dir.c_str()));
-            dc->display->setRouteDir(QString(settings.route_dir.c_str()));
+            dc->display->setRouteDir(QString(settings.route_dir_full_path.c_str()));
             dc->display->init();
 
             displays.push_back(dc);
