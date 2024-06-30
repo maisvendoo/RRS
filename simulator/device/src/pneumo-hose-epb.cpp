@@ -164,21 +164,12 @@ void PneumoHoseEPB::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
-    cfg.getString(secName, "Name", name);
-
-    double tmp = 1.0;
-    cfg.getDouble(secName, "FlowCoefficient", tmp);
-    output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
-
-    tmp = 0.71;
-    cfg.getDouble(secName, "Length", tmp);
-    if (tmp > Physics::ZERO)
-        output_signals[HOSE_OUTPUT_LENGTH] = tmp;
-
     int num = 0;
     cfg.getInt(secName, "LinesNum", num);
     if (num > 0)
         setLinesNumber(static_cast<size_t>(num));
+
+    PneumoHose::load_config(cfg);
 }
 
 //------------------------------------------------------------------------------

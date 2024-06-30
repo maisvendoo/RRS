@@ -2,7 +2,6 @@
 #define     DC_MOTOR_H
 
 #include    "device.h"
-#include    "motor-magnetic-char.h"
 
 //------------------------------------------------------------------------------
 //
@@ -63,9 +62,9 @@ private:
 
     double  omega_nom;
 
-    int     direction;    
+    int     direction;
 
-    MotorMagneticChar cPhi;
+    LinearInterpolation cPhi;
 
     QMap<int, double> fieldStep;
 

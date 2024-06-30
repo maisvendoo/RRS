@@ -6,6 +6,7 @@
 
 #include    "airdistributor.h"
 #include    "automatic-train-stop.h"
+#include    "battery.h"
 #include    "brake-auto-mode.h"
 #include    "brake-crane.h"
 #include    "brake-lock.h"
@@ -29,8 +30,10 @@
 #include    "pneumo-switching-valve.h"
 #include    "pressure-regulator.h"
 #include    "protective-device.h"
+#include    "relay.h"
 #include    "reservoir.h"
 #include    "switcher.h"
+#include    "time-relay.h"
 #include    "traction-controller.h"
 #include    "train-horn.h"
 #include    "registrator.h"

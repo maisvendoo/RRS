@@ -1,4 +1,4 @@
-#include    "motor-magnetic-char.h"
+#include    "linear-interpolation.h"
 
 #include    <fstream>
 #include    <sstream>
@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MotorMagneticChar::MotorMagneticChar()
+LinearInterpolation::LinearInterpolation()
 {
 
 }
@@ -14,7 +14,7 @@ MotorMagneticChar::MotorMagneticChar()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MotorMagneticChar::~MotorMagneticChar()
+LinearInterpolation::~LinearInterpolation()
 {
 
 }
@@ -22,7 +22,7 @@ MotorMagneticChar::~MotorMagneticChar()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MotorMagneticChar::load(const std::string &path)
+void LinearInterpolation::load(const std::string &path)
 {
     std::ifstream stream(path.c_str(), std::ios::in);
 
@@ -37,28 +37,28 @@ void MotorMagneticChar::load(const std::string &path)
 
             point_t p;
 
-            ss >> p.current >> p.value;
+            ss >> p.parameter >> p.value;
 
             points.push_back(p);
-        }
+        }        
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double MotorMagneticChar::getValue(double I)
+double LinearInterpolation::getValue(double parameter)
 {
-    if (I >= 0)
-        return interpolate(I);
+    if (parameter >= 0)
+        return interpolate(parameter);
     else
-        return -interpolate(-I);
+        return -interpolate(-parameter);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MotorMagneticChar::point_t MotorMagneticChar::findPoint(double I, point_t &next_point)
+LinearInterpolation::point_t LinearInterpolation::findPoint(double parameter, point_t &next_point)
 {
     point_t point;
 
@@ -70,7 +70,7 @@ MotorMagneticChar::point_t MotorMagneticChar::findPoint(double I, point_t &next_
     {
         point_t p = points[idx];
 
-        if (I <= p.current)
+        if (parameter <= p.parameter)
             right_idx = idx;
         else
             left_idx = idx;
@@ -87,10 +87,13 @@ MotorMagneticChar::point_t MotorMagneticChar::findPoint(double I, point_t &next_
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double MotorMagneticChar::interpolate(double I)
+double LinearInterpolation::interpolate(double parameter)
 {
-    point_t p1;
-    point_t p0 = findPoint(I, p1);
+    if (points.empty())
+        return 0;
 
-    return p0.value + (p1.value - p0.value) * (I - p0.current) / (p1.current - p0.current);
+    point_t p1;
+    point_t p0 = findPoint(parameter, p1);
+
+    return p0.value + (p1.value - p0.value) * (parameter - p0.parameter) / (p1.parameter - p0.parameter);
 }

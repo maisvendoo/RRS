@@ -28,6 +28,8 @@
 #include    "feedback-signals.h"
 #include    "key-symbols.h"
 #include    "hysteresis.h"
+#include    "hysteresis-relay.h"
+#include    "linear-interpolation.h"
 #include    "timer.h"
 #include    "trigger.h"
 

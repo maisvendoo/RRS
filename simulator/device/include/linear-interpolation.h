@@ -1,30 +1,39 @@
-#ifndef     MOTOR_MAGNETIC_CHAR_H
-#define     MOTOR_MAGNETIC_CHAR_H
+#ifndef     LINEAR_INTERPOLATION_H
+#define     LINEAR_INTERPOLATION_H
 
-#include    <QString>
+#include    <QObject>
 #include    <vector>
+
+#include    "device-export.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class MotorMagneticChar
+class DEVICE_EXPORT LinearInterpolation
 {
 public:
 
-    MotorMagneticChar();
+    LinearInterpolation();
 
-    ~MotorMagneticChar();
+    ~LinearInterpolation();
 
     void load(const std::string &path);
 
-    double getValue(double I);
+    double getValue(double parameter);
 
 private:
 
     struct point_t
     {
-        double  current;
+        double  parameter;
         double  value;
+
+        point_t()
+            : parameter(0.0)
+            , value(0.0)
+        {
+
+        }
     };
 
     std::vector<point_t> points;
@@ -34,4 +43,4 @@ private:
     double  interpolate(double I);
 };
 
-#endif // MOTOR_MAGNETIC_CHAR_H
+#endif // LINEAR_INTERPOLATION_H
