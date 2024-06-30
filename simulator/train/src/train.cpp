@@ -144,10 +144,9 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::preStep(double t, simulator_update_t &update_data)
+void Train::preStep(double t)
 {
-    //(void) t;
-    update_data.time = t;
+    (void) t;
 
     auto begin = vehicles.begin();
     auto end = vehicles.end();

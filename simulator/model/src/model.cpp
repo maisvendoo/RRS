@@ -123,14 +123,7 @@ Model::Model(QObject *parent) : QObject(parent)
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
     }
-/*
-    shared_memory.setKey("sim");
 
-    if (!shared_memory.create(sizeof(server_data_t)))
-    {
-        shared_memory.attach();
-    }
-*/
     sim_client = Q_NULLPTR;
 }
 
@@ -142,7 +135,6 @@ Model::~Model()
     memory_sim_info.detach();
     memory_sim_update.detach();
     memory_controlled.detach();
-    //shared_memory.detach();
     keys_data.detach();
 }
 
@@ -300,7 +292,7 @@ void Model::controlProcess()
 //------------------------------------------------------------------------------
 void Model::preStep(double t)
 {
-    train->preStep(t, update_data);
+    train->preStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -736,36 +728,8 @@ void Model::virtualRailwayFeedback()
 //
 //------------------------------------------------------------------------------
 void Model::sharedMemoryFeedback()
-{/*
-    std::vector<Vehicle *> *vehicles = train->getVehicles();
-
-    viewer_data.time = static_cast<float>(t);
-
-    size_t i = 0;
-
-    for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
-    {
-        viewer_data.te[i].coord = static_cast<float>((*it)->getRailwayCoord());
-        viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
-
-        viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
-        viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
-
-        std::copy((*it)->getAnalogSignals().begin(),
-                  (*it)->getAnalogSignals().end(),
-                  viewer_data.te[i].analogSignal.begin());
-
-        ++i;
-    }
-
-    if (shared_memory.lock())
-    {
-        memcpy(shared_memory.data(), &viewer_data, sizeof (server_data_t));
-        shared_memory.unlock();
-    }
-*/
+{
+    update_data.time = t;
     update_data.current_vehicle = current_vehicle;
     update_data.controlled_vehicle = controlled_vehicle;
 
@@ -824,8 +788,6 @@ void Model::sharedMemoryFeedback()
         memcpy(memory_sim_update.data(), &update_data, sizeof (simulator_update_t));
         memory_sim_update.unlock();
     }
-
-//    viewer_data.count++;
 }
 
 //------------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 
 #define     SHARED_MEMORY_SIM_INFO      QString("siminfo")
 #define     SHARED_MEMORY_SIM_UPDATE    QString("simupdate")
-#define     SHARED_MEMORY_KEYS_DATA     QString("keys")
+#define     SHARED_MEMORY_KEYS_DATA     QString("keysdata")
 #define     SHARED_MEMORY_CONTROLLED    QString("controlled")
 
 #define     MAX_NUM_VEHICLES      180

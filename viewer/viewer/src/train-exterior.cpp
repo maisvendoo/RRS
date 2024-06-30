@@ -80,15 +80,6 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     {
         OSG_FATAL << "Can't connect to shared memory for info about controlled vehicle" << std::endl;
     }
-/*
-    shared_memory.setKey("sim");
-
-    if (!shared_memory.attach(QSharedMemory::ReadOnly))
-    {
-        OSG_FATAL << "Can't connect to shared memory" << std::endl;
-    }
-*/
-    //startTimer(settings.request_interval);
 }
 
 //------------------------------------------------------------------------------
@@ -352,10 +343,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             (vehicles_ext[i].orth.x() > 0.0) ? acos(vehicles_ext[i].orth.y()) : - acos(vehicles_ext[i].orth.y()) );
 
         vehicles_ext[i].orientation = update_data[new_data].vehicles[i].orientation;
-/*
-        // Store current railway coordinate and wheels angle
-        recalcAttitude(i);
-*/
+
         // Apply vehicle body matrix transform
         osg::Matrix  matrix;
         matrix *= osg::Matrixf::rotate(settings.direction * vehicles_ext[i].orientation * vehicles_ext[i].attitude.x(), osg::Vec3(1.0f, 0.0f, 0.0f));
@@ -396,11 +384,13 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         {
             if (new_data == -1)
             {
+                // Первое получение данных
                 memcpy(update_data.data(), sd, sizeof (simulator_update_t));
                 new_data = 0;
             }
             else
             {
+                // Второе получение данных
                 memcpy(update_data.data() + 1, sd, sizeof (simulator_update_t));
                 old_data = 0;
                 new_data = 1;
@@ -408,6 +398,7 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         }
         else
         {
+            // Обновление данных по очереди
             if (new_data == 1)
             {
                 memcpy(update_data.data(), sd, sizeof (simulator_update_t));
@@ -474,37 +465,6 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         std::wstring text = hud_text.toStdWString();
         emit setStatusBar(text);
     }
-/*
-    if (shared_memory.lock())
-    {
-        server_data_t *sd = static_cast<server_data_t *>(shared_memory.data());
-
-        if (sd == nullptr)
-        {
-            shared_memory.unlock();
-            return;
-        }
-
-        server_data_t server_data;
-
-        memcpy(&server_data, sd, sizeof (server_data_t));
-
-        nd.sd.push_back(server_data);
-
-        if (nd.sd.size() > 2)
-        {
-            nd.sd.pop_front();
-            nd.delta_time = nd.sd.back().time - nd.sd.front().time;
-        }
-
-        QString msg = QString("ПЕ #%1: ")
-                .arg(cur_vehicle);
-
-        emit setStatusBar(msg + QString::fromStdWString(server_data.te[static_cast<size_t>(cur_vehicle)].DebugMsg));
-
-        shared_memory.unlock();
-    }
-*/
 }
 
 //------------------------------------------------------------------------------
@@ -542,12 +502,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     cp.is_orient_bwd = (vehicles_ext[static_cast<size_t>(cur_vehicle)].orientation < 0);
 
     cp.attitude.x() = - osg::PIf / 2.0f - cp.attitude.x() * settings.direction;
-/*
-    float viewer_coord = vehicles_ext[static_cast<size_t>(cur_vehicle)].coord +
-            settings.direction * settings.stat_cam_shift;
 
-    cp.viewer_pos = routePath->getPosition(viewer_coord, cp.view_basis);
-*/
     cp.viewer_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].position
         + vehicles_ext[static_cast<size_t>(cur_vehicle)].orth * settings.direction * settings.stat_cam_shift;
 
@@ -556,57 +511,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 
     emit sendCameraPosition(cp);
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrainExteriorHandler::recalcAttitude(size_t i)
-{
-    // Attitude.z from -PI to +PI
-    while (abs(vehicles_ext[i].attitude.z()) > osg::PIf)
-        vehicles_ext[i].attitude.z() -= 2.0f * osg::PIf * sign(vehicles_ext[i].attitude.z());
 
-    // Don't recalculate from head vehicle
-    if (i == 0)
-        return;
-
-    // Get prevuos vehicle
-    vehicle_exterior_t prev = vehicles_ext[i-1];
-    // Get current vehicles
-    vehicle_exterior_t curr = vehicles_ext[i];
-
-    // Calculate vehicle tail orth
-    osg::Vec3 prev_att = prev.attitude;
-    float pitch = prev_att.x();
-    float yaw = prev_att.z();
-//    yaw -= osg::PIf * hs_n(prev.orientation);
-    osg::Vec3 tail_orth = osg::Vec3(-cosf(pitch) * sinf(yaw), -cosf(pitch) * cosf(yaw), -sinf(pitch));
-
-    // Calculate bacward coupling point of previos vehicle
-//    osg::Vec3 tail_dir = tail_orth * (prev.length / 2.0f);
-
-    // Calculate forward coupling of current vehicle orth
-//    osg::Vec3 a = prev.position + tail_dir;
-    osg::Vec3 a = prev.position;
-    osg::Vec3 forward = a - curr.position;
-    osg::Vec3 f_orth = forward * (1 / forward.length());
-
-    // Calculate new attitude of current vehicle
-    float y_new = arg(f_orth.y(), f_orth.x());
-    y_new -= osg::PIf * osg::sign(y_new) * hs_n(curr.orientation);
-    float y_old = curr.attitude.z();
-
-    // Change y_old for correct work near -PI and +PI
-    float dy = y_new - y_old;
-    if (fabs(dy) > osg::PIf)
-    {
-        y_old += 2.0 * osg::PIf * osg::sign(dy);
-    }
-
-    // "Smoothing" of vehicle oscillations
-    vehicles_ext[i].attitude.z() = (y_new + y_old) / 2.0;
-}
-*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

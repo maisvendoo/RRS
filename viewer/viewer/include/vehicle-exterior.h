@@ -16,8 +16,6 @@ struct vehicle_exterior_t
     osg::Vec3   orth;
     osg::Vec3   up;
     osg::Vec3   attitude;
-//    float       coord;
-//    float       length;
     int         orientation;
     osg::Vec3   driver_pos;
 

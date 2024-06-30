@@ -12,8 +12,8 @@
  * \date 24/12/2018
  */
 
-#ifndef     TRAINE_XTERIOR_H
-#define     TRAINE_XTERIOR_H
+#ifndef     TRAIN_EXTERIOR_H
+#define     TRAIN_EXTERIOR_H
 
 #include    <QObject>
 #include    <QSharedMemory>
@@ -22,7 +22,6 @@
 #include    <osg/MatrixTransform>
 
 #include    "abstract-path.h"
-#include    "trajectory-element.h"
 
 #include    <osgViewer/Viewer>
 
@@ -30,7 +29,6 @@
 #include    "animation-manager.h"
 #include    "camera-position.h"
 #include    "settings.h"
-#include    "server-data-struct.h"
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
 #include    "controlled-struct.h"
