@@ -6,6 +6,11 @@
 TrainHorn::TrainHorn(QObject *parent) : Device(parent)
   , is_svistok(false)
   , is_tifon(false)
+  , pFL(0.0)
+  , QFL(0.0)
+  , p_nom(0.9)
+  , k_svistok(5.0e-4)
+  , k_tifon(8.0e-4)
 {
 
 }
@@ -18,14 +23,104 @@ TrainHorn::~TrainHorn()
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainHorn::step(double t, double dt)
+{
+    // Переопределяем шаг, поскольку выполнение решателя не нужно
+    // Нужна только обработка клавиатурного ввода
+    stepKeysControl(t, dt);
+    stepExternalControl(t, dt);
+
+    // Расчёт коэффициента расхода воздуха в атмосферу при работе звуковых сигналов
+    double k = 0.0;
+    // Расчёт громкости звуковых сигналов
+    int volume_level = static_cast<int>(floor(100.0 * cut(pFL / p_nom, 0.0, 1.0)));
+
+    if (is_svistok)
+    {
+        k += k_svistok;
+        emit soundSetVolume("Svistok", volume_level);
+    }
+    if (is_tifon)
+    {
+        k += k_tifon;
+        emit soundSetVolume("Tifon", volume_level);
+    }
+
+    // Расход воздуха питательной магистрали
+    QFL = -k * pFL;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainHorn::setSvistokOn(bool state)
+{
+    if (is_svistok != state)
+    {
+        if (state)
+        {
+            emit soundPlay("Svistok");
+        }
+        else
+        {
+            emit soundStop("Svistok");
+        }
+        is_svistok = state;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TrainHorn::isSvistok() const
 {
     return is_svistok;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainHorn::setTifonOn(bool state)
+{
+    if (is_tifon != state)
+    {
+        if (state)
+        {
+            emit soundPlay("Tifon");
+        }
+        else
+        {
+            emit soundStop("Tifon");
+        }
+        is_tifon = state;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TrainHorn::isTifon() const
 {
     return is_tifon;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainHorn::setFLpressure(double value)
+{
+    pFL = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double TrainHorn::getFLflow() const
+{
+    return QFL;
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +140,10 @@ void TrainHorn::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void TrainHorn::load_config(CfgReader &cfg)
 {
-    Q_UNUSED(cfg)
+    QString secName = "Device";
+    cfg.getDouble(secName, "p_nom", p_nom);
+    cfg.getDouble(secName, "k_svistok", k_svistok);
+    cfg.getDouble(secName, "k_tifon", k_tifon);
 }
 
 //------------------------------------------------------------------------------
@@ -56,34 +154,6 @@ void TrainHorn::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    bool is_svistok_old = is_svistok;
-    is_svistok = getKeyState(KEY_Space);
-
-    if (is_svistok_old != is_svistok)
-
-    {
-        if (is_svistok)
-        {
-            emit soundPlay("Svistok");
-        }
-        else
-        {
-            emit soundStop("Svistok");
-        }
-    }
-
-    bool is_tifon_old = is_tifon;
-    is_tifon = getKeyState(KEY_B);
-
-    if (is_tifon_old != is_tifon)
-    {
-        if (is_tifon)
-        {
-            emit soundPlay("Tifon");
-        }
-        else
-        {
-            emit soundStop("Tifon");
-        }
-    }
+    setSvistokOn(getKeyState(KEY_Space));
+    setTifonOn(getKeyState(KEY_B));
 }

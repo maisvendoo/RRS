@@ -14,11 +14,20 @@ public:
 
     virtual ~AutoTrainStop();
 
-    void powerOn(bool on);
+    /// Задать состояние ключа включения-выключения
+    void setKeyOn(bool state);
 
-    void keyOn(bool on);
+    /// Состояние ключа включения-выключения
+    bool isKeyOn() const;
 
-    bool getStateKey() const;
+    /// Задать подачу электропитания
+    void setPowered(bool state);
+
+    /// Наличие электропитания
+    bool isPowered() const;
+
+    /// Автостопное экстренное торможение
+    virtual bool getEmergencyBrakeContact() const;
 
     /// Задать давление от питательной магистрали
     void setFLpressure(double value);
@@ -32,19 +41,22 @@ public:
     /// Поток в тормозную магистраль
     double getBPflow() const;
 
-    /// Автостопное экстренное торможение
-    virtual bool getEmergencyBrakeContact() const;
-
 protected:
 
+    /// Наличие электропитания
     double is_powered;
 
+    /// Состояние ключа включения-выключения
     double is_key_on;
 
+    /// Давление питательной магистрали
     double pFL;
+    /// Давление тормозной магистрали
     double pBP;
 
+    /// Поток в питательную магистраль
     double QFL;
+    /// Поток в тормозную магистраль
     double QBP;
 };
 

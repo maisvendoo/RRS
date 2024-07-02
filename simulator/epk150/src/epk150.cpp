@@ -178,7 +178,7 @@ void AutoTrainStopEPK150::stepKeysControl(double t, double dt)
 
     if (getKeyState(KEY_N))
     {
-        keyOn(isShift());
+        setKeyOn(isShift());
     }
 
     /*if (getKeyState(KEY_K))

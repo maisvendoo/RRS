@@ -104,6 +104,7 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     connect(speed_meter, &SL2M::soundSetVolume, this, &VL60pk::soundSetVolume);
 
     horn = new TrainHorn();
+    horn->read_config("train-horn");
     connect(horn, &TrainHorn::soundPlay, this, &VL60pk::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60pk::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60pk::soundStop);
