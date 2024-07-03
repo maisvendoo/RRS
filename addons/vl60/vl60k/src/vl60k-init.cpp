@@ -108,6 +108,11 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
     connect(horn, &TrainHorn::soundPlay, this, &VL60k::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60k::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60k::soundStop);
+
+    // Система подачи песка
+    sand_system = new SandingSystem();
+    sand_system->read_config("sanding-system");
+    sand_system->setSandLevel(payload_coeff);
 /*
     reg = new Registrator();
     reg->setFileName("vl60k-coupling-forces");

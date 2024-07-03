@@ -199,6 +199,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Alt_L);
     addKey(osgGA::GUIEventAdapter::KEY_Alt_R);
 
+    addKey(osgGA::GUIEventAdapter::KEY_Backquote);
     addKey(osgGA::GUIEventAdapter::KEY_1);
     addKey(osgGA::GUIEventAdapter::KEY_2);
     addKey(osgGA::GUIEventAdapter::KEY_3);

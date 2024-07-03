@@ -32,6 +32,7 @@
 #include    "protective-device.h"
 #include    "relay.h"
 #include    "reservoir.h"
+#include    "sanding-system.h"
 #include    "switcher.h"
 #include    "time-relay.h"
 #include    "traction-controller.h"

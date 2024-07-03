@@ -108,6 +108,10 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     connect(horn, &TrainHorn::soundPlay, this, &VL60pk::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60pk::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60pk::soundStop);
+
+    // Система подачи песка
+    sand_system = new SandingSystem();
+    sand_system->read_config("sanding-system");
 /*
     reg = new Registrator();
     reg->setFileName("vl60pk-step");

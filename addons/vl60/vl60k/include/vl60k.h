@@ -286,6 +286,9 @@ private:
     /// Свисток и тифон
     TrainHorn   *horn;
 
+    /// Система подачи песка
+    SandingSystem   *sand_system;
+
     std::vector<Trigger *> triggers;
     Timer   *autoStartTimer;
     size_t  start_count;
