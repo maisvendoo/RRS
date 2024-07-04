@@ -141,7 +141,12 @@ void TrainHorn::ode_system(const state_vector_t &Y,
 void TrainHorn::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
-    cfg.getDouble(secName, "p_nom", p_nom);
+
+    double tmp = 0.0;
+    cfg.getDouble(secName, "p_nom", tmp);
+    if (tmp > Physics::ZERO)
+        p_nom = tmp;
+
     cfg.getDouble(secName, "k_svistok", k_svistok);
     cfg.getDouble(secName, "k_tifon", k_tifon);
 }

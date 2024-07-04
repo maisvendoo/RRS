@@ -26,6 +26,9 @@ public:
     /// Пересчёт коэффициента трения колесо-рельс
     double getWheelRailFrictionCoeff(double current_coeff) const;
 
+    /// Задать вместимость бункера для песка, кг
+    void setSandMassMax(double value);
+
     /// Задать количество песка в бункере, кг
     void setSandMass(double value);
 
@@ -49,9 +52,6 @@ protected:
     /// Состояние подачи песка
     bool is_sand;
 
-    /// Коэффициент изменения трения колесо-рельс
-    double k_friction;
-
     /// Максимальная вместимость бункера для песка, кг
     double sand_mass_max;
 
@@ -72,6 +72,9 @@ protected:
 
     /// Коэффициент потока - расхода воздуха для подачи песка
     double k_air;
+
+    /// Коэффициент изменения трения колесо-рельс
+    double k_friction;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

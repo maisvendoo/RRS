@@ -112,6 +112,8 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     // Система подачи песка
     sand_system = new SandingSystem();
     sand_system->read_config("sanding-system");
+    sand_system->setSandMassMax(payload_mass);
+    sand_system->setSandLevel(payload_coeff);
 /*
     reg = new Registrator();
     reg->setFileName("vl60pk-step");

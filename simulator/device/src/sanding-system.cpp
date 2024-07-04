@@ -5,14 +5,14 @@
 //------------------------------------------------------------------------------
 SandingSystem::SandingSystem(QObject *parent) : Device(parent)
   , is_sand(false)
-  , k_friction(1.3)
-  , sand_mass_max(200.0)
+  , sand_mass_max(2000.0)
   , sand_flow_nom(2.0)
   , sand_flow(0.0)
   , pFL(0.0)
   , QFL(0.0)
   , p_nom(0.9)
   , k_air(5.0e-4)
+  , k_friction(1.3)
 {
 
 }
@@ -65,7 +65,15 @@ double SandingSystem::getSandFlow() const
 //------------------------------------------------------------------------------
 double SandingSystem::getWheelRailFrictionCoeff(double current_coeff) const
 {
-    return (1.0 + sand_flow / sand_flow_nom) * k_friction * current_coeff;
+    return (1.0 + (k_friction - 1.0) * (sand_flow / sand_flow_nom)) * current_coeff;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SandingSystem::setSandMassMax(double value)
+{
+    sand_mass_max = value;
 }
 
 //------------------------------------------------------------------------------
@@ -151,11 +159,24 @@ void SandingSystem::ode_system(const state_vector_t &Y,
 void SandingSystem::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
-    cfg.getDouble(secName, "k_friction", k_friction);
-    cfg.getDouble(secName, "sand_mass_max", sand_mass_max);
-    cfg.getDouble(secName, "sand_flow_nom", sand_flow_nom);
-    cfg.getDouble(secName, "p_nom", p_nom);
+
+    double tmp = 0.0;
+    cfg.getDouble(secName, "sand_mass_max", tmp);
+    if (tmp > Physics::ZERO)
+        sand_mass_max = tmp;
+
+    tmp = 0.0;
+    cfg.getDouble(secName, "sand_flow_nom", tmp);
+    if (tmp > Physics::ZERO)
+        sand_flow_nom = tmp;
+
+    tmp = 0.0;
+    cfg.getDouble(secName, "p_nom", tmp);
+    if (tmp > Physics::ZERO)
+        p_nom = tmp;
+
     cfg.getDouble(secName, "k_air", k_air);
+    cfg.getDouble(secName, "k_friction", k_friction);
 }
 
 //------------------------------------------------------------------------------
