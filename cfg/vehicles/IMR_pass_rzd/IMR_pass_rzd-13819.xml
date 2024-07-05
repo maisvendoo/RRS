@@ -12,7 +12,7 @@
 		<WheelInertia>100.0</WheelInertia>
 
 		<ExtModelName>IMR_pass_rzd/Pass_CupAmm1.osgt</ExtModelName>
-		<AnimationsConfigDir>passcar</AnimationsConfigDir>
+		<AnimationsConfigDir>passcar-oy</AnimationsConfigDir>
 
 		<BrakepipeLeak>3e-6</BrakepipeLeak>
 
