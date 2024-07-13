@@ -3,6 +3,7 @@
 
 #include    "vehicle.h"
 #include    "physics.h"
+#include    "sound-signal.h"
 
 #include    "airdistributor.h"
 #include    "automatic-train-stop.h"

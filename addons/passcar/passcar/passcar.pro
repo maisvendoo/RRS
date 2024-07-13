@@ -27,6 +27,7 @@ CONFIG(debug, debug|release) {
 INCLUDEPATH += ./include
 INCLUDEPATH += ../../../CfgReader/include
 
+INCLUDEPATH += ../../../common-headers
 INCLUDEPATH += ../../../simulator/solver/include
 INCLUDEPATH += ../../../simulator/physics/include
 INCLUDEPATH += ../../../simulator/vehicle/include

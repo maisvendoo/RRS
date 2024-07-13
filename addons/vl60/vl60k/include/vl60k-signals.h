@@ -90,7 +90,10 @@ enum
     WHEEL_3 = 196,
     WHEEL_4 = 197,
     WHEEL_5 = 198,
-    WHEEL_6 = 199
+    WHEEL_6 = 199,
+
+    SOUND_SVISTOK = 201,
+    SOUND_TIFON = 202
 };
 
 #endif // VL60K_SIGNALS_H

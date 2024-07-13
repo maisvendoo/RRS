@@ -26,6 +26,7 @@ CONFIG(debug, debug|release) {
 }
 
 INCLUDEPATH += ./include
+INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../device/include

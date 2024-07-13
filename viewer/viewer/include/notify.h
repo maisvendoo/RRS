@@ -12,8 +12,8 @@
  * \date 12/12/2018
  */
 
-#ifndef     NOTIFY_H
-#define     NOTIFY_H
+#ifndef     NOTIFY_OSG_VIEWER_H
+#define     NOTIFY_OSG_VIEWER_H
 
 #include    <osg/Notify>
 #include    <fstream>
@@ -25,15 +25,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class LogFileHandler : public osg::NotifyHandler
+class ViewerLogFileHandler : public osg::NotifyHandler
 {
 public:
 
     /// Constructor
-    LogFileHandler(const std::string &file);
+    ViewerLogFileHandler(const std::string &file);
 
     /// Destructor
-    virtual ~LogFileHandler();
+    virtual ~ViewerLogFileHandler();
 
     /// Log message handler
     virtual void notify(osg::NotifySeverity severity, const char *msg);
@@ -44,4 +44,4 @@ protected:
     std::ofstream log;
 };
 
-#endif // NOTIFY_H
+#endif // NOTIFY_OSG_VIEWER_H

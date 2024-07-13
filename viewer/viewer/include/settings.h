@@ -147,7 +147,7 @@ struct settings_t
         , window_decoration(true)
         , double_buffer(true)
         , samples(4)
-        , request_interval(200)
+        , request_interval(33)
         , reconnect_interval(1000)
         , persistence(0.05)
         , eye_height(3.0)

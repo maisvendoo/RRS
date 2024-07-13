@@ -230,8 +230,6 @@ void VL60pk::stepOtherEquipment(double t, double dt)
     payload_coeff = sand_system->getSandLevel();
     setPayloadCoeff(payload_coeff);
 
-    debugPrint(t, dt);
-
     if (reg == nullptr)
         return;
     reg->print(QString("%1;%2;%3")

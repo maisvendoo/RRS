@@ -37,7 +37,7 @@
 //
 //------------------------------------------------------------------------------
 TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
-                                           MotionPath *routePath,
+                                           SoundManager *sm,
                                            const simulator_info_t &info_data)
     : QObject(Q_NULLPTR)
     , osgGA::GUIEventHandler ()
@@ -46,14 +46,15 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , controlled_vehicle(0)
     , long_shift(0.0f)
     , height_shift(0.0f)
-    , routePath(routePath)
     , trainExterior(new osg::Group)
+    , prev_time(0.0)
     , ref_time(0.0)
     , is_displays_locked(false)
     , new_data(-1)
     , old_data(-1)
     , memory_sim_update(nullptr)
     , memory_controlled(nullptr)
+    , sound_manager(sm)
 {
     load(info_data);
 
@@ -106,7 +107,9 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             if (!viewer)
                 break;
 
-            ref_time += viewer->getFrameStamp()->getReferenceTime();
+            double curr_time = viewer->getFrameStamp()->getReferenceTime();
+            ref_time += curr_time - prev_time;
+            prev_time = curr_time;
 
             processSharedData(ref_time);
 
@@ -270,13 +273,13 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
         if (!vehicle_model.valid())
         {
-            OSG_FATAL << "Vehicle model from" << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
+            OSG_FATAL << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
             vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
             vehicles_ext.push_back(vehicle_ext);
             OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
             continue;
         }
-        OSG_FATAL << "Loaded vehicle model from" << cfg_dir << "/" << cfg_file << std::endl;
+        OSG_FATAL << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
 
         // Load cabine model
         osg::ref_ptr<osg::Node> cabine;
@@ -291,7 +294,8 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 
         loadModelAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
         loadAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
-        loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
+        //loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
+        loadSounds(cfg_dir, cfg_file, vehicle_ext.sounds_id);
 
         anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
 
@@ -337,6 +341,9 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             k * sim_data[old_data].vehicles[i].up_y + t * sim_data[new_data].vehicles[i].up_y,
             k * sim_data[old_data].vehicles[i].up_z + t * sim_data[new_data].vehicles[i].up_z);
 
+        vehicles_ext[i].right = vehicles_ext[i].orth ^ osg::Vec3(osg::Z_AXIS);
+        //vehicles_ext[i].right.normalize();
+
         vehicles_ext[i].attitude = osg::Vec3(
             asinf(vehicles_ext[i].orth.z()),
             0.0f,
@@ -352,10 +359,30 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
 
         vehicles_ext[i].transform->setMatrix(matrix);
 
+        // Model animations update
         for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
         {
             ProcAnimation *animation = it.value();
             animation->setPosition(update_data[new_data].vehicles[i].analogSignal[animation->getSignalID()]);
+        }
+
+        // Sounds update
+        float dt = sim_data[new_data].time - sim_data[old_data].time;
+        osg::Vec3 velocity = osg::Vec3( (sim_data[new_data].vehicles[i].position_x - sim_data[old_data].vehicles[i].position_x) / dt,
+                                        (sim_data[new_data].vehicles[i].position_y - sim_data[old_data].vehicles[i].position_y) / dt,
+                                        (sim_data[new_data].vehicles[i].position_z - sim_data[old_data].vehicles[i].position_z) / dt  );
+
+        for (auto sound_id : vehicles_ext[i].sounds_id)
+        {
+            osg::Vec3 pos = vehicles_ext[i].position +
+                            vehicles_ext[i].right * sound_manager->getLocalPositionX(sound_id) +
+                            vehicles_ext[i].orth * sound_manager->getLocalPositionY(sound_id) +
+                            vehicles_ext[i].up * sound_manager->getLocalPositionZ(sound_id);
+            sound_manager->setPosition(sound_id, pos.x(), pos.y(), pos.z());
+            sound_manager->setVelocity(sound_id, velocity.x(), velocity.y(), velocity.z());
+
+            sound_state_t ss;
+            sound_manager->setSoundState(sound_id, ss.soundFromSignal(update_data[new_data].vehicles[i].analogSignal[sound_manager->getSignalID(sound_id)]));
         }
     }
 }
@@ -368,13 +395,15 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
     if (ref_time < static_cast<double>(settings.request_interval) / 1000.0)
         return;
 
-    ref_time = 0;
+    double prev_time = 0.0;
+    if (new_data != -1)
+        prev_time = update_data[new_data].time;
 
     if (memory_sim_update.lock())
     {
         simulator_update_t *sd = static_cast<simulator_update_t *>(memory_sim_update.data());
 
-        if (sd == nullptr)
+        if ( (sd == nullptr) || (sd->time <= prev_time) )
         {
             memory_sim_update.unlock();
             return;
@@ -414,6 +443,9 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         }
         memory_sim_update.unlock();
 
+        ref_time = 0;
+
+        // Update debug string
         int seconds = static_cast<int>(std::floor(update_data[new_data].time));
         int hours = seconds / 3600;
         int minutes = seconds / 60 % 60;
@@ -493,8 +525,6 @@ void TrainExteriorHandler::sendControlledVehicle(const controlled_t &data)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
 {
-    Q_UNUSED(viewer)
-
     camera_position_t cp;
     cp.position = vehicles_ext[static_cast<size_t>(cur_vehicle)].position;
     cp.attitude = vehicles_ext[static_cast<size_t>(cur_vehicle)].attitude;
@@ -507,9 +537,48 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
         + vehicles_ext[static_cast<size_t>(cur_vehicle)].orth * settings.direction * settings.stat_cam_shift;
 
     cp.view_basis.front = vehicles_ext[static_cast<size_t>(cur_vehicle)].orth;
-    cp.view_basis.right = cp.view_basis.front ^ osg::Vec3(osg::Z_AXIS);
+    cp.view_basis.right = vehicles_ext[static_cast<size_t>(cur_vehicle)].right;
 
     emit sendCameraPosition(cp);
+
+    // Move sound Listener
+    osg::Vec3f tmp_eye, tmp_center, tmp_up;
+    viewer->getCamera()->getViewMatrixAsLookAt(tmp_eye, tmp_center, tmp_up);
+    osg::Vec3f pos = tmp_eye;
+    osg::Vec3f front = tmp_center - tmp_eye;
+    front.normalize();
+    osg::Vec3f up = tmp_up;
+
+    sound_manager->setListenerPosition(pos.x(), pos.y(), pos.z());
+    sound_manager->setListenerVelocity(0.0f, 0.0f, 0.0f);
+    sound_manager->setListenerOrientation(front.x(), front.y(), front.z(), up.x(), up.y(), up.z());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::loadSounds(const std::string &configDir,
+                                          const std::string &configName,
+                                          std::vector<size_t> &sounds_id)
+{
+    // Default name of animations configs directory is name of vehicle's config
+    std::string sounds_config_dir = configName;
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string relative_cfg_path = configDir + fs.separator() + configName + ".xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_cfg_path);
+
+    // Load config file
+    ConfigReader cfg(cfg_path);
+
+    if (cfg.isOpenned())
+    {
+        std::string secName = "Vehicle";
+        cfg.getValue(secName, "SoundDir", sounds_config_dir);
+        OSG_FATAL << "Vehicle sounds are loaded from " << sounds_config_dir << std::endl;
+    }
+
+    sounds_id = sound_manager->loadSounds(QString(sounds_config_dir.c_str()));
 }
 
 //------------------------------------------------------------------------------
@@ -568,7 +637,7 @@ void TrainExteriorHandler::loadModelAnimations(const std::string &configDir,
     {
         std::string secName = "Vehicle";
         cfg.getValue(secName, "AnimationsConfigDir", anim_config_dir);
-        OSG_FATAL << "Vehicle animations are loaded from " << anim_config_dir << std::endl;
+        OSG_FATAL << "Vehicle model animations are loaded from " << anim_config_dir << std::endl;
     }
 
     std::string animations_dir = fs.combinePath(fs.getDataDir(), "animations");

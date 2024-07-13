@@ -28,6 +28,8 @@ CONFIG(debug, debug|release) {
 
 INCLUDEPATH += ./include
 INCLUDEPATH += ../vl60-equipment/include
+
+INCLUDEPATH += ../../../common-headers
 INCLUDEPATH += ../../../CfgReader/include
 INCLUDEPATH += ../../../filesystem/include
 

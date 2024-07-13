@@ -2,7 +2,6 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-SUBDIRS += ./sound-manager
 SUBDIRS += ./physics
 SUBDIRS += ./device
 SUBDIRS += ./solver

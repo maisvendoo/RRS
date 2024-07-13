@@ -17,7 +17,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LogFileHandler::LogFileHandler(const std::string &file)
+ViewerLogFileHandler::ViewerLogFileHandler(const std::string &file)
 {
     log.open(file.c_str());
 }
@@ -25,7 +25,7 @@ LogFileHandler::LogFileHandler(const std::string &file)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LogFileHandler::~LogFileHandler()
+ViewerLogFileHandler::~ViewerLogFileHandler()
 {
     log.close();
 }
@@ -33,7 +33,7 @@ LogFileHandler::~LogFileHandler()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LogFileHandler::notify(osg::NotifySeverity severity, const char *msg)
+void ViewerLogFileHandler::notify(osg::NotifySeverity severity, const char *msg)
 {
     (void) severity;
 

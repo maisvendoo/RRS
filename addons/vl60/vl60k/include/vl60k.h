@@ -285,6 +285,8 @@ private:
 
     /// Свисток и тифон
     TrainHorn   *horn;
+    sound_state_t ss_svistok;
+    sound_state_t ss_tifon;
 
     /// Система подачи песка
     SandingSystem   *sand_system;
@@ -364,6 +366,8 @@ private:
 
     void stepOtherEquipment(double t, double dt);
 
+    void stepSoundSignalsOutput(double t, double dt);
+
     void stepTapSound();
 
     void lineContactorsControl(bool state);
@@ -390,6 +394,10 @@ private:
 private slots:
 
     void slotAutoStart();
+
+    void horn_play(QString name);
+    void horn_stop(QString name);
+    void horn_volume(QString name, int volume);
 };
 
 #endif // VL60K_H

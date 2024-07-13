@@ -42,6 +42,8 @@ VL60pk::VL60pk() : Vehicle ()
   , coupling_bwd(nullptr)
   , oper_rod_fwd(nullptr)
   , oper_rod_bwd(nullptr)
+  , ss_svistok(sound_state_t())
+  , ss_tifon(sound_state_t())
 {
     pants_tumbler.setOnSoundName("K_Tumbler_On");
     pants_tumbler.setOffSoundName("K_Tumbler_Off");
@@ -173,8 +175,6 @@ void VL60pk::step(double t, double dt)
 
     stepEPB(t, dt);
 
-    stepSignalsOutput();
-
     stepTractionControl(t, dt);
 
     stepLineContactors(t, dt);
@@ -182,6 +182,12 @@ void VL60pk::step(double t, double dt)
     stepOtherEquipment(t, dt);
 
     stepTapSound();
+
+    stepSoundSignalsOutput(t, dt);
+
+    stepSignalsOutput();
+
+    debugPrint(t, dt);
 
     autoStartTimer->step(t, dt);
 }
