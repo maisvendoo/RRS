@@ -86,6 +86,9 @@ private:
     /// Train exterior scene group
     osg::ref_ptr<osg::Group> trainExterior;
 
+    /// Camera position at previous frame
+    osg::Vec3f prev_camera_pos;
+
     /// Time stamp of previous frame
     double prev_time;
 
@@ -128,7 +131,7 @@ private:
     void sendControlledVehicle(const controlled_t &data);
 
     /// Move camera
-    void moveCamera(osgViewer::Viewer *viewer);
+    void moveCamera(osgViewer::Viewer *viewer, float delta_time);
 
     /// Load vehicle sounds
     void loadSounds(const std::string &configDir, const std::string &configName,

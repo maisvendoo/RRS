@@ -183,8 +183,7 @@ void SoundManager::setListenerOrientation(float at_x, float at_y, float at_z, fl
 //------------------------------------------------------------------------------
 void SoundManager::setSoundState(size_t idx, sound_state_t ss)
 {
-    emit notify(QString("State for sound [%1]: play %2 | volume %3 | pitch %4").arg(idx).arg(ss.play).arg(ss.volume, 5, 'f', 3).arg(ss.pitch, 5, 'f', 3).toStdString());
-
+    //emit notify(QString("State for sound [%1]: play %2 | volume %3 | pitch %4").arg(idx).arg(ss.play).arg(ss.volume, 5, 'f', 3).arg(ss.pitch, 5, 'f', 3).toStdString());
     if (idx >= sounds.size())
         return;
 

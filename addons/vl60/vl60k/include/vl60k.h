@@ -39,23 +39,6 @@ private:
 
     enum
     {
-        NUM_PANTOGRAPHS = 2,
-        WIRE_VOLTAGE = 25000
-    };
-
-    enum
-    {
-        NUM_MOTOR_FANS = 6,
-        MV1 = 0,
-        MV2 = 1,
-        MV3 = 2,
-        MV4 = 3,
-        MV5 = 4,
-        MV6 = 5
-    };
-
-    enum
-    {
         /// Объем главного резервуара (ГР), литров
         MAIN_RESERVOIR_VOLUME = 1200
     };
@@ -104,30 +87,46 @@ private:
     /// Расцепной рычаг сзади
     OperatingRod *oper_rod_bwd;
 
-    /// Тригер тумблера "Токоприемники"
-    Trigger pants_tumbler;
-    /// Триггер тумблера "Токоприемник передний"
-    Trigger pant1_tumbler;
+    // Дальний ряд тумблеров приборной панели машиниста
+//    /// Тригер тумблера "Прожектор яркий"
+//    Trigger proj2_tumbler;
+//    /// Тригер тумблера "Прожектор тусклый"
+//    Trigger proj1_tumbler;
+//    /// Тригер тумблера "Радиостанция"
+//    Trigger radio_tumbler;
+    /// Триггер тумблера "Цепи управления"
+    Trigger cu_tumbler;
     /// Триггер тумблера "Токоприемник задний"
     Trigger pant2_tumbler;
-
+    /// Триггер тумблера "Токоприемник передний"
+    Trigger pant1_tumbler;
+    /// Тригер тумблера "Токоприемники"
+    Trigger pants_tumbler;
+    /// Тригер тумблена "ГВ вкл. Возврат защиты"
+    Trigger gv_return_tumbler;
     /// Триггер тумблера "ГВ вкл/выкл"
     Trigger gv_tumbler;
 
-    /// Тригер тумблена "ГВ вкл. Возврат защиты"
-    Trigger gv_return_tumbler;
+    // Ближний ряд тумблеров приборной панели машиниста
+    enum
+    {
+        NUM_MOTOR_FANS = 6,
+        MV1 = 0,
+        MV2 = 1,
+        MV3 = 2,
+        MV4 = 3,
+        MV5 = 4,
+        MV6 = 5
+    };
 
+//    /// Тригер тумблера "Автоматическая подача песка"
+//    Trigger autosand_tumbler;
+    /// Триггеры тумблеров "Вентилятор 1-6"
+    std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
+    /// Тригер тумблера "Компрессор"
+    Trigger mk_tumbler;
     /// Тригер тумблера "Фазорасщепитель"
     Trigger fr_tumbler;
-
-    /// Триггеры тумблеров управления мотор-вентиляторами
-    std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
-
-    /// Тригер тумблера управления мотор-компрессором
-    Trigger mk_tumbler;
-
-    /// Триггер тумблера "Цепи управления"
-    Trigger cu_tumbler;
 
     enum
     {
@@ -142,6 +141,12 @@ private:
 
     /// Триггеры рукояток бдительности
     std::array<Trigger, NUM_RB>  rb;
+
+    enum
+    {
+        NUM_PANTOGRAPHS = 2,
+        WIRE_VOLTAGE = 25000
+    };
 
     /// Токоприемники
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
@@ -285,8 +290,6 @@ private:
 
     /// Свисток и тифон
     TrainHorn   *horn;
-    sound_state_t ss_svistok;
-    sound_state_t ss_tifon;
 
     /// Система подачи песка
     SandingSystem   *sand_system;
@@ -394,10 +397,6 @@ private:
 private slots:
 
     void slotAutoStart();
-
-    void horn_play(QString name);
-    void horn_stop(QString name);
-    void horn_volume(QString name, int volume);
 };
 
 #endif // VL60K_H

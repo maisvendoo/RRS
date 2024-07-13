@@ -1,48 +1,99 @@
-    #include    "trigger.h"
+#include    "trigger.h"
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Trigger::Trigger(QObject *parent) : QObject(parent)
     , state(false)
-    , old_state(false)
-    , onSoundName("on")
-    , offSoundName("off")
+    , sound_on(sound_state_t())
+    , sound_off(sound_state_t())
+    , sound_on_reset(new Timer(0.2, false))
+    , sound_off_reset(new Timer(0.2, false))
 {
-
+    connect(sound_on_reset, &Timer::process, this, &Trigger::slotSoundOnReset);
+    connect(sound_off_reset, &Timer::process, this, &Trigger::slotSoundOffReset);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Trigger::~Trigger()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trigger::step(double t, double dt)
+{
+    sound_on_reset->step(t, dt);
+    sound_off_reset->step(t, dt);
+}
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trigger::set()
+{
+    if (state)
+        return;
+
+    state = true;
+    sound_on.play = true;
+    sound_on_reset->start();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trigger::reset()
+{
+    if (!state)
+        return;
+
+    state = false;
+    sound_off.play = true;
+    sound_off_reset->start();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Trigger::getState() const
 {
     return state;
 }
 
-void Trigger::set()
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Trigger::getSoundOn() const
 {
-    old_state = state;
-    state = true;
-
-    if (state != old_state)
-        emit soundPlay(onSoundName);
+    return sound_on;
 }
 
-void Trigger::reset()
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Trigger::getSoundOff() const
 {
-    old_state = state;
-    state = false;
-
-    if (state != old_state)
-        emit soundPlay(offSoundName);
+    return sound_off;
 }
 
-void Trigger::setOnSoundName(QString soundName)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trigger::slotSoundOnReset()
 {
-    onSoundName = soundName;
+    sound_on_reset->stop();
+    sound_on.play = false;
 }
 
-void Trigger::setOffSoundName(QString soundName)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trigger::slotSoundOffReset()
 {
-    offSoundName = soundName;
+    sound_off_reset->stop();
+    sound_off.play = false;
 }

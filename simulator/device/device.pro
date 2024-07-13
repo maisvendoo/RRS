@@ -33,7 +33,7 @@ INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
-INCLUDEPATH += ../../common-headers/include
+INCLUDEPATH += ../../common-headers
 
 
 HEADERS += $$files(./include/*.h)

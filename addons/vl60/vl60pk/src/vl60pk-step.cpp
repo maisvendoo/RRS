@@ -41,6 +41,10 @@ void VL60pk::stepPantographsControl(double t, double dt)
         // Моделируем работу токоприемников
         pant->step(t, dt);
     }
+
+    pants_tumbler.step(t, dt);
+    pant1_tumbler.step(t, dt);
+    pant2_tumbler.step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -65,6 +69,9 @@ void VL60pk::stepMainSwitchControl(double t, double dt)
     main_switch->step(t, dt);
 
     gauge_KV_ks->step(t, dt);
+
+    gv_tumbler.step(t, dt);
+    gv_return_tumbler.step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -88,6 +95,8 @@ void VL60pk::stepPhaseSplitter(double t, double dt)
     phase_spliter->setU_power(U_power);
 
     phase_spliter->step(t, dt);
+
+    fr_tumbler.step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -100,6 +109,8 @@ void VL60pk::stepMotorFans(double t, double dt)
         MotorFan *mf = motor_fans[i];
         mf->setU_power(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[i].getState()));
         mf->step(t, dt);
+
+        mv_tumblers[i].step(t, dt);
     }
 }
 
@@ -150,6 +161,8 @@ void VL60pk::stepTractionControl(double t, double dt)
         v->setU_in(trac_trans->getTracVoltage());
         v->step(t, dt);
     }
+
+    cu_tumbler.step(t, dt);
 }
 
 //------------------------------------------------------------------------------

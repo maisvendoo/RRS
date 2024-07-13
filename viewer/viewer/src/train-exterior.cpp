@@ -115,7 +115,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             moveTrain(ref_time, update_data);
 
-            moveCamera(viewer);
+            moveCamera(viewer, curr_time - prev_time);
 
             break;
         }
@@ -523,7 +523,7 @@ void TrainExteriorHandler::sendControlledVehicle(const controlled_t &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
+void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer, float delta_time)
 {
     camera_position_t cp;
     cp.position = vehicles_ext[static_cast<size_t>(cur_vehicle)].position;
@@ -544,14 +544,17 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer)
     // Move sound Listener
     osg::Vec3f tmp_eye, tmp_center, tmp_up;
     viewer->getCamera()->getViewMatrixAsLookAt(tmp_eye, tmp_center, tmp_up);
+
     osg::Vec3f pos = tmp_eye;
+    osg::Vec3f velocity = (pos - prev_camera_pos) / delta_time;
     osg::Vec3f front = tmp_center - tmp_eye;
     front.normalize();
     osg::Vec3f up = tmp_up;
 
     sound_manager->setListenerPosition(pos.x(), pos.y(), pos.z());
-    sound_manager->setListenerVelocity(0.0f, 0.0f, 0.0f);
+    sound_manager->setListenerVelocity(velocity.x(), velocity.y(), velocity.z());
     sound_manager->setListenerOrientation(front.x(), front.y(), front.z(), up.x(), up.y(), up.z());
+    prev_camera_pos = pos;
 }
 
 //------------------------------------------------------------------------------

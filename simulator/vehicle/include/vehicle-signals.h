@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 enum
 {
-    MAX_ANALOG_SIGNALS = 256,
+    MAX_ANALOG_SIGNALS = 300,
 };
 
 #endif // VENICLE_SIGNALS_H

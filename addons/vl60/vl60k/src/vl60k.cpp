@@ -40,54 +40,8 @@ VL60k::VL60k() : Vehicle ()
   , coupling_bwd(nullptr)
   , oper_rod_fwd(nullptr)
   , oper_rod_bwd(nullptr)
-  , ss_svistok(sound_state_t())
-  , ss_tifon(sound_state_t())
 {
-    pants_tumbler.setOnSoundName("K_Tumbler_On");
-    pants_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&pants_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
 
-    pant1_tumbler.setOnSoundName("K_Tumbler_On");
-    pant1_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&pant1_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    pant2_tumbler.setOnSoundName("K_Tumbler_On");
-    pant2_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&pant2_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    gv_tumbler.setOnSoundName("K_Tumbler_On");
-    gv_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&gv_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    gv_return_tumbler.setOnSoundName("K_Tumbler_Nofixed_On");
-    gv_return_tumbler.setOffSoundName("K_Tumbler_Nofixed_Off");
-    connect(&gv_return_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    fr_tumbler.setOnSoundName("K_Tumbler_On");
-    fr_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&fr_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    for (size_t i = 0; i < mv_tumblers.size(); ++i)
-    {
-        mv_tumblers[i].setOnSoundName("K_Tumbler_On");
-        mv_tumblers[i].setOffSoundName("K_Tumbler_Off");
-        connect(&mv_tumblers[i], &Trigger::soundPlay, this, &VL60k::soundPlay);
-    }
-
-    mk_tumbler.setOnSoundName("K_Tumbler_On");
-    mk_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&mk_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    cu_tumbler.setOnSoundName("K_Tumbler_On");
-    cu_tumbler.setOffSoundName("K_Tumbler_Off");
-    connect(&cu_tumbler, &Trigger::soundPlay, this, &VL60k::soundPlay);
-
-    for (size_t i = 0; i < rb.size(); ++i)
-    {
-        rb[i].setOnSoundName("RB_Down");
-        rb[i].setOffSoundName("RB_Up");
-        connect(&rb[i], &Trigger::soundPlay, this, &VL60k::soundPlay);
-    }
 }
 
 //------------------------------------------------------------------------------

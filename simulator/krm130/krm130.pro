@@ -30,6 +30,7 @@ INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
+INCLUDEPATH += ../../common-headers
 
 
 HEADERS += $$files(./include/*.h)

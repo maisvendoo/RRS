@@ -4,6 +4,8 @@
 #include    <QObject>
 
 #include    "device-export.h"
+#include    "sound-signal.h"
+#include    "timer.h"
 
 class DEVICE_EXPORT  Trigger : public QObject
 {
@@ -15,35 +17,38 @@ public:
 
     ~Trigger();
 
-    bool getState() const;
+    /// Step (excecuted in integraion step)
+    void step(double t, double dt);
 
     void set();
 
     void reset();
 
-    void setOnSoundName(QString soundName);
+    bool getState() const;
 
-    void setOffSoundName(QString soundName);
+    /// Состояние звука включения триггера
+    sound_state_t getSoundOn() const;
 
-signals:
-
-    void soundPlay(QString name);
-
-    void soundStop(QString name);
-
-    void soundSetVolume(QString name, int volume);
-
-    void soundSetPitch(QString name, float pitch);
+    /// Состояние звука выключения триггера
+    sound_state_t getSoundOff() const;
 
 private:
 
     bool state;
 
-    bool old_state;
+    /// Состояние звука включения
+    sound_state_t sound_on;
 
-    QString onSoundName;
+    /// Состояние звука отключения
+    sound_state_t sound_off;
 
-    QString offSoundName;
+    Timer *sound_on_reset;
+    Timer *sound_off_reset;
+
+private slots:
+
+    void slotSoundOnReset();
+    void slotSoundOffReset();
 };
 
 #endif // TRIGGER_H
