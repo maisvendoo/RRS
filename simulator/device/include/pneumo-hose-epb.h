@@ -45,7 +45,7 @@ public:
 
     virtual void step(double t, double dt);
 
-private:
+protected:
 
     /// Число линий управления ЭПТ
     size_t lines_num;

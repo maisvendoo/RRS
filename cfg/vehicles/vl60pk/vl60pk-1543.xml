@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		<EmptyMass>134000</EmptyMass>
+		<PayloadMass>2000</PayloadMass>
+		<Length>21.0</Length>
+		<WheelDiameter>1.236</WheelDiameter>
+		<MainResist>loco-resist</MainResist>
+		<WheelRailFriction>loco-AC</WheelRailFriction>
+		<NumAxis>6</NumAxis>
+		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>vl60</SoundDir>
+		<AnimationsConfigDir>vl60pk</AnimationsConfigDir>
+
+		<ReductorCoeff>2.73</ReductorCoeff>
+
+		<ExtModelName>VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
+		<ModelShift>0.0 0.0 0.312</ModelShift>
+
+		<CabineModel>VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
+		<CabineShift>0.0 0.0 0.317</CabineShift>
+
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
+
+		<BrakeCraneModule>krm395</BrakeCraneModule>
+		<BrakeCraneConfig>krm395</BrakeCraneConfig>
+
+		<LocoCraneModule>kvt254</LocoCraneModule>
+		<LocoCraneConfig>kvt254</LocoCraneConfig>
+
+		<AirDistModule>vr242</AirDistModule>
+		<AirDistConfig>vr242</AirDistConfig>
+
+		<ElectroAirDistModule>evr305</ElectroAirDistModule>
+		<ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+
+		<DriverPos>0.8 8.4 3.6</DriverPos>
+	</Vehicle>
+</Config>

@@ -16,8 +16,7 @@
 #define     CLIENT_H
 
 #include    "tcp-client.h"
-#include    "server-data-struct.h"
-#include    "trajectory-element.h"
+#include    "simulator-update-struct.h"
 #include    "settings.h"
 
 #include    <QTimer>
@@ -57,7 +56,7 @@ private:
     QTimer      timerRequester;
 
     /// Data structure, reseived from server
-    server_data_t   server_data;
+    simulator_update_t   server_data;
 
 
     /// Buffer for store keyboard state

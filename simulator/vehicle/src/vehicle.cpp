@@ -63,8 +63,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , c(100.0)
   , d(1.0)
   , e(0.0)
-  , inc(0.0)
-  , curv(0.0)
+  , profile_point_data(profile_point_t())
   , dir(1)
   , orient(1)
   , DebugMsg(" ")
@@ -149,17 +148,9 @@ void Vehicle::setIndex(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setInclination(double value)
+void Vehicle::setProfilePoint(profile_point_t point_data)
 {
-    this->inc = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::setCurvature(double value)
-{
-    this->curv = value;
+    this->profile_point_data = point_data;
 }
 
 //------------------------------------------------------------------------------
@@ -325,6 +316,14 @@ QString Vehicle::getSoundsDir() const
 size_t Vehicle::getIndex() const
 {
     return idx;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+profile_point_t *Vehicle::getProfilePoint()
+{
+    return &profile_point_data;
 }
 
 //------------------------------------------------------------------------------
@@ -616,7 +615,7 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 
     // Calculate gravity force from profile inclination
     double weight = full_mass * Physics::g;
-    double sin_beta = inc / 1000.0;
+    double sin_beta = profile_point_data.inclination / 1000.0;
     F_g = weight * sin_beta;
 
     F_fwd = 0.0;
@@ -1016,7 +1015,7 @@ double Vehicle::mainResist(double velocity)
     return full_mass * (  W_coef
                         + W_coef_v * abs(velocity)
                         + W_coef_v2 * velocity * velocity
-                        + W_coef_curv * curv  );
+                        + W_coef_curv * abs(profile_point_data.curvature)  );
 }
 
 //------------------------------------------------------------------------------

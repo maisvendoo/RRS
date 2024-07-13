@@ -23,7 +23,7 @@ public:
 
     void setValue(double value);
 
-    bool getState() const;
+    virtual bool getState() const;
 
 private:
 

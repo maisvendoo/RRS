@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Common>
-		<CouplingModule>ef-coupling</CouplingModule>
-		<CabineInVehicle>0</CabineInVehicle>
-
 		<!-- Зарядное давление, МПа -->
 		<ChargingPressure>0.52</ChargingPressure>
 		<!-- Начальное давление в ГР, МПа -->
@@ -16,15 +13,21 @@
 	</Common>
 
 	<Vehicle>
+		<ModuleDir>vl60k</ModuleDir>
 		<Module>vl60k</Module>
+		<ModuleConfigDir>vl60k</ModuleConfigDir>
 		<ModuleConfig>vl60k-1737</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>
+		<ModuleDir>freightcar</ModuleDir>
 		<Module>freightcar</Module>
+		<ModuleConfigDir>Fr_hopper_RZD</ModuleConfigDir>
 		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
 		<Count>50</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>

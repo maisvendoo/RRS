@@ -3,7 +3,6 @@
 
 #include    <osg/Referenced>
 #include    <osg/Geometry>
-#include    "trajectory-element.h"
 #include    "abstract-path.h"
 
 #include    "import-export.h"
@@ -22,9 +21,6 @@ class ROUTE_LOADER_EXPORT Trajectory : public osg::Referenced
 public:
 
     Trajectory();
-
-    virtual void update(const network_data_t &traj_elem,
-                        const float &delta_time) = 0;
 
     virtual osg::Vec3 getPosition() const = 0;
 

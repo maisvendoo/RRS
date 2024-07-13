@@ -81,7 +81,7 @@ void VL60pk::initTractionControl(const QString &modules_dir, const QString &cust
     for (size_t i = 0; i < motor.size(); ++i)
     {
         motor[i] = new DCMotor();
-        motor[i]->setCustomConfigDir(custom_cfg_dir);
+        motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_config("HB-412K", custom_cfg_dir);
         connect(motor[i], &DCMotor::soundSetPitch, this, &VL60pk::soundSetPitch);
         connect(motor[i], &DCMotor::soundSetVolume, this, &VL60pk::soundSetVolume);
@@ -104,9 +104,16 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     connect(speed_meter, &SL2M::soundSetVolume, this, &VL60pk::soundSetVolume);
 
     horn = new TrainHorn();
+    horn->read_config("train-horn");
     connect(horn, &TrainHorn::soundPlay, this, &VL60pk::soundPlay);
     connect(horn, &TrainHorn::soundSetVolume, this, &VL60pk::soundSetVolume);
     connect(horn, &TrainHorn::soundStop, this, &VL60pk::soundStop);
+
+    // Система подачи песка
+    sand_system = new SandingSystem();
+    sand_system->read_config("sanding-system");
+    sand_system->setSandMassMax(payload_mass);
+    sand_system->setSandLevel(payload_coeff);
 /*
     reg = new Registrator();
     reg->setFileName("vl60pk-step");

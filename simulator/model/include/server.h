@@ -18,7 +18,6 @@
 #include    <QTcpServer>
 
 #include    "a-tcp-namespace.h"
-#include    "server-data-struct.h"
 
 class TcpServer;
 class QTimer;

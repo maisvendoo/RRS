@@ -11,7 +11,7 @@
 #include    <fstream>
 #include    <vector>
 
-#include    "profile-element.h"
+#include    "profile-point.h"
 #include    "zds-track.h"
 
 //------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ public:
 
     bool isReady() const;
 
-    profile_element_t getElement(double railway_coord, int dir);
+    profile_point_t getElement(double railway_coord, int dir);
 
 private:
 

@@ -13,7 +13,6 @@
  */
 
 #include    "client.h"
-#include    "trajectory-element.h"
 
 //------------------------------------------------------------------------------
 //
@@ -59,7 +58,7 @@ void NetworkClient::init(const settings_t settings, osgViewer::Viewer *viewer)
     tcp_config.reconnect_interval = settings.reconnect_interval;
 
 
-    tcp_client->setRecvDataSize(static_cast<qint64>(sizeof (server_data_t)));
+    tcp_client->setRecvDataSize(static_cast<qint64>(sizeof (simulator_update_t)));
     tcp_client->init(tcp_config);
     tcp_client->start();
 }
@@ -93,12 +92,12 @@ void NetworkClient::onTimerRequest()
     if (tcp_client->isConnected())
     {
         size_t in_size = static_cast<size_t>(tcp_client->getBufferSize());
-        size_t size = sizeof (server_data_t);
+        size_t size = sizeof (simulator_update_t);
 
         if (in_size == size)
         {
             QByteArray array = tcp_client->getBuffer();
-            memcpy(static_cast<void *>(&server_data), array.data(), sizeof (server_data_t));
+            memcpy(static_cast<void *>(&server_data), array.data(), sizeof (simulator_update_t));
 
             if (viewer != nullptr)
             {

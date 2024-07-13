@@ -123,14 +123,7 @@ Model::Model(QObject *parent) : QObject(parent)
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
     }
-/*
-    shared_memory.setKey("sim");
 
-    if (!shared_memory.create(sizeof(server_data_t)))
-    {
-        shared_memory.attach();
-    }
-*/
     sim_client = Q_NULLPTR;
 }
 
@@ -142,7 +135,6 @@ Model::~Model()
     memory_sim_info.detach();
     memory_sim_update.detach();
     memory_controlled.detach();
-    //shared_memory.detach();
     keys_data.detach();
 }
 
@@ -175,13 +167,17 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     // Load profile
     Journal::instance()->info("==== Profile data loading ====");
-    profile = new Profile(init_data.direction, init_data.route_dir.toStdString());
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+    profile = new Profile(init_data.direction, route_dir_path);
 
     Journal::instance()->info(QString("State Profile object at address: 0x%1")
                               .arg(reinterpret_cast<quint64>(profile), 0, 16));
 
     if (profile->isReady())
+    {
         Journal::instance()->info("Profile loaded successfully");
+    }
     else
     {
         Journal::instance()->warning("Profile is't loaded. Using flat profile");
@@ -200,8 +196,8 @@ bool Model::init(const simulator_command_line_t &command_line)
     Journal::instance()->info("==== Info to shared memory ====");
     simulator_info_t   info_data;
     info_data.num_updates = 1;
-    info_data.route_info.route_dir_name_length = init_data.route_dir.size();
-    init_data.route_dir.toWCharArray(info_data.route_info.route_dir_name);
+    info_data.route_info.route_dir_name_length = init_data.route_dir_name.size();
+    init_data.route_dir_name.toWCharArray(info_data.route_info.route_dir_name);
     Journal::instance()->info("Ready route info for shared memory");
 
     std::vector<Vehicle *> *vehicles = train->getVehicles();
@@ -223,7 +219,6 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     if (memory_sim_info.lock())
     {
-        Journal::instance()->info("Shared memory locked");
         memcpy(memory_sim_info.data(), &info_data, sizeof (simulator_info_t));
         memory_sim_info.unlock();
         Journal::instance()->info("Set info to shared memory");
@@ -232,23 +227,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     {
         Journal::instance()->error("Can't lock shared memory");
     }
-/*
-    connect(this, &Model::sendDataToTrain, train, &Train::sendDataToVehicle);
 
-    keys_data.setKey("keys");
-
-    if (!keys_data.create(init_data.keys_buffer_size))
-    {
-        if (!keys_data.attach())
-        {
-            Journal::instance()->error("Can't attach to shread memory. Unable process keyboard");
-        }
-    }
-    else
-    {
-        Journal::instance()->info("Created shared memory for keysboard processing");
-    }
-*/
     initControlPanel("control-panel");
 
     initSimClient("virtual-railway");
@@ -313,7 +292,7 @@ void Model::controlProcess()
 //------------------------------------------------------------------------------
 void Model::preStep(double t)
 {
-    train->preStep(t, update_data);
+    train->preStep(t);
 }
 
 //------------------------------------------------------------------------------
@@ -387,14 +366,19 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.init_velocity = 0.0;
         }
 
-        if (!cfg.getString(secName, "Profile", init_data.profile_path))
+        if (!cfg.getInt(secName, "Direction", init_data.direction))
         {
-            init_data.profile_path = "default";
+            init_data.direction = 1;
         }
 
-        if (!cfg.getDouble(secName, "ProfileStep", init_data.prof_step))
+        if (!cfg.getString(secName, "Profile", init_data.route_dir_name))
         {
-            init_data.prof_step = 100.0;
+            init_data.route_dir_name = "experimental-polygon";
+        }
+
+        if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
+        {
+            init_data.train_config = "vl60pk-1543";
         }
 
         if (!cfg.getDouble(secName, "CoeffToWheelRailFriction", init_data.coeff_to_wheel_rail_friction))
@@ -402,19 +386,14 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.coeff_to_wheel_rail_friction = 1.0;
         }
 
-        if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
-        {
-            init_data.train_config = "default-train";
-        }
-
         if (!cfg.getInt(secName, "IntegrationTimeInterval", init_data.integration_time_interval))
         {
-            init_data.integration_time_interval = 100;
+            init_data.integration_time_interval = 15;
         }
 
         if (!cfg.getInt(secName, "ControlTimeInterval", init_data.control_time_interval))
         {
-            init_data.control_time_interval = 50;
+            init_data.control_time_interval = 15;
         }
 
         control_delay = static_cast<double>(init_data.control_time_interval) / 1000.0;
@@ -422,11 +401,6 @@ void Model::loadInitData(init_data_t &init_data)
         if (!cfg.getBool(secName, "DebugPrint", init_data.debug_print))
         {
             init_data.debug_print = false;
-        }
-
-        if (!cfg.getInt(secName, "KeysBufferSize", init_data.keys_buffer_size))
-        {
-            init_data.keys_buffer_size = 1024;
         }
 
         Journal::instance()->info("Loaded settings from: " + cfg_path);
@@ -444,13 +418,19 @@ void Model::overrideByCommandLine(init_data_t &init_data,
                                   const simulator_command_line_t &command_line)
 {
     if (command_line.train_config.is_present)
+    {
         init_data.train_config = command_line.train_config.value;
+    }
 
     if (command_line.route_dir.is_present)
-        init_data.route_dir = command_line.route_dir.value;
+    {
+        init_data.route_dir_name = command_line.route_dir.value;
+    }
 
     if (command_line.debug_print.is_present)
+    {
         init_data.debug_print = command_line.debug_print.value;
+    }
 
     if (command_line.init_coord.is_present)
     {
@@ -458,7 +438,9 @@ void Model::overrideByCommandLine(init_data_t &init_data,
     }
 
     if (command_line.direction.is_present)
+    {
         init_data.direction = command_line.direction.value;
+    }
 
     Journal::instance()->info("Apply command line settinds");
 }
@@ -642,10 +624,13 @@ void Model::initSignaling(const init_data_t &init_data)
 {
     signaling = new Signaling;
 
-    if (!signaling->init(init_data.direction, init_data.route_dir))
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+
+    if (!signaling->init(init_data.direction, route_dir_path.c_str()))
     {
         Journal::instance()->error("Failed signaling initialization at route " +
-                                   init_data.route_dir);
+                                   QString(route_dir_path.c_str()));
     }
 }
 
@@ -656,10 +641,13 @@ void Model::initTraffic(const init_data_t &init_data)
 {
     traffic_machine = new TrafficMachine();
 
-    if (!traffic_machine->init(init_data.route_dir))
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+
+    if (!traffic_machine->init(route_dir_path.c_str()))
     {
         Journal::instance()->error("Failed traffic initialization in route" +
-                                   init_data.route_dir);
+                                   QString(route_dir_path.c_str()));
     }
 }
 
@@ -740,68 +728,59 @@ void Model::virtualRailwayFeedback()
 //
 //------------------------------------------------------------------------------
 void Model::sharedMemoryFeedback()
-{/*
-    std::vector<Vehicle *> *vehicles = train->getVehicles();
-
-    viewer_data.time = static_cast<float>(t);
-
-    size_t i = 0;
-
-    for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
-    {
-        viewer_data.te[i].coord = static_cast<float>((*it)->getRailwayCoord());
-        viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
-
-        viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
-        viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
-
-        std::copy((*it)->getAnalogSignals().begin(),
-                  (*it)->getAnalogSignals().end(),
-                  viewer_data.te[i].analogSignal.begin());
-
-        ++i;
-    }
-
-    if (shared_memory.lock())
-    {
-        memcpy(shared_memory.data(), &viewer_data, sizeof (server_data_t));
-        shared_memory.unlock();
-    }
-*/
+{
+    update_data.time = t;
     update_data.current_vehicle = current_vehicle;
     update_data.controlled_vehicle = controlled_vehicle;
 
+    int i = 0;
     std::vector<Vehicle *> *vehicles = train->getVehicles();
 
-    if (current_vehicle >= 0)
+    for (auto vehicle : *vehicles)
     {
-        Vehicle *vehicle = vehicles->at(current_vehicle);
-        QString msg = vehicle->getDebugMsg();
-        msg.resize(DEBUG_STRING_SIZE, QChar(' '));
-        msg.toWCharArray(update_data.currentDebugMsg);
-    }
+        profile_point_t *pp = vehicle->getProfilePoint();
 
-    if (controlled_vehicle >= 0)
-    {
-        Vehicle *vehicle = vehicles->at(controlled_vehicle);
-        if (data.size() != 0)
-            vehicle->setKeysData(data);
+        update_data.vehicles[i].position_x = pp->position.x;
+        update_data.vehicles[i].position_y = pp->position.y;
+        update_data.vehicles[i].position_z = pp->position.z;
+        update_data.vehicles[i].orth_x = pp->orth.x;
+        update_data.vehicles[i].orth_y = pp->orth.y;
+        update_data.vehicles[i].orth_z = pp->orth.z;
+        update_data.vehicles[i].up_x = pp->up.x;
+        update_data.vehicles[i].up_y = pp->up.y;
+        update_data.vehicles[i].up_z = pp->up.z;
 
-        QString msg = vehicle->getDebugMsg();
-        msg.resize(DEBUG_STRING_SIZE, QChar(' '));
-        msg.toWCharArray(update_data.controlledDebugMsg);
+        update_data.vehicles[i].orientation = vehicle->getOrientation();
 
-        if (prev_controlled_vehicle != controlled_vehicle)
+        std::copy(vehicle->getAnalogSignals().begin(),
+                  vehicle->getAnalogSignals().end(),
+                  update_data.vehicles[i].analogSignal.begin());
+
+        if (current_vehicle == i)
         {
-            if (prev_controlled_vehicle >= 0)
-            {
-                vehicles->at(prev_controlled_vehicle)->resetKeysData();
-            }
-
-            prev_controlled_vehicle = controlled_vehicle;
+            QString msg = vehicle->getDebugMsg();
+            msg.resize(DEBUG_STRING_SIZE, QChar(' '));
+            msg.toWCharArray(update_data.currentDebugMsg);
         }
+
+        if (controlled_vehicle == i)
+        {
+            if (data.size() != 0)
+                vehicle->setKeysData(data);
+
+            QString msg = vehicle->getDebugMsg();
+            msg.resize(DEBUG_STRING_SIZE, QChar(' '));
+            msg.toWCharArray(update_data.controlledDebugMsg);
+        }
+        else
+        {
+            if (prev_controlled_vehicle == i)
+            {
+                vehicle->resetKeysData();
+                prev_controlled_vehicle = controlled_vehicle;
+            }
+        }
+        ++i;
     }
 
     if (memory_sim_update.lock())
@@ -809,8 +788,6 @@ void Model::sharedMemoryFeedback()
         memcpy(memory_sim_update.data(), &update_data, sizeof (simulator_update_t));
         memory_sim_update.unlock();
     }
-
-//    viewer_data.count++;
 }
 
 //------------------------------------------------------------------------------

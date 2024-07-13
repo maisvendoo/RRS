@@ -36,6 +36,7 @@ void Timer::step(double t, double dt)
             emit process();
             tau = 0;
             first_process = false;
+            return;
         }
 
         tau += dt;

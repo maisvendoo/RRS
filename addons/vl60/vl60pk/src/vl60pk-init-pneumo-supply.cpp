@@ -26,17 +26,21 @@ void VL60pk::initPneumoSupply(const QString &modules_dir, const QString &custom_
 
     // Концевые краны питательной магистрали
     anglecock_fl_fwd = new PneumoAngleCock();
+    //anglecock_fl_fwd->setKeyCode(0);
     anglecock_fl_fwd->read_config("pneumo-anglecock-FL");
 
     anglecock_fl_bwd = new PneumoAngleCock();
+    //anglecock_fl_bwd->setKeyCode(0);
     anglecock_fl_bwd->read_config("pneumo-anglecock-FL");
 
     // Рукава питательной магистрали
     hose_fl_fwd = new PneumoHose();
+    //hose_fl_fwd->setKeyCode(0);
     hose_fl_fwd->read_config("pneumo-hose-FL");
     forward_connectors.push_back(hose_fl_fwd);
 
     hose_fl_bwd = new PneumoHose();
+    //hose_fl_bwd->setKeyCode(0);
     hose_fl_bwd->read_config("pneumo-hose-FL");
     backward_connectors.push_back(hose_fl_bwd);
 }

@@ -18,6 +18,8 @@ void VL60k::stepPneumoSupply(double t, double dt)
     // Питательная магистраль
     double FL_flow = 0.0;
     FL_flow += motor_compressor->getFLflow();
+    FL_flow += horn->getFLflow();
+    FL_flow += sand_system->getFLflow();
     FL_flow += brake_lock->getFLflow();
 
     anglecock_fl_fwd->setHoseFlow(hose_fl_fwd->getFlow());

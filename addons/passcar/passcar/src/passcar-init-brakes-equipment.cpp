@@ -37,12 +37,12 @@ void PassCar::initBrakesEquipment(const QString &modules_dir, const QString &cus
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd = new PneumoAngleCock();
-    //anglecock_bp_fwd->setKeyCode(KEY_9);
+    anglecock_bp_fwd->setKeyCode(KEY_9);
     anglecock_bp_fwd->read_config(anglecock_bp_config);
     anglecock_bp_fwd->setPipeVolume(volume_bp);
 
     anglecock_bp_bwd = new PneumoAngleCock();
-    //anglecock_bp_bwd->setKeyCode(KEY_0);
+    anglecock_bp_bwd->setKeyCode(KEY_0);
     anglecock_bp_bwd->read_config(anglecock_bp_config);
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 

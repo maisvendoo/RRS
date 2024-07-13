@@ -144,53 +144,19 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::preStep(double t, simulator_update_t &update_data)
+void Train::preStep(double t)
 {
-    //(void) t;
-    update_data.time = t;
+    (void) t;
 
     auto begin = vehicles.begin();
     auto end = vehicles.end();
-    int i = 0;
 
     for (auto it = begin; it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        profile_element_t pe = profile->getElement(y[idx], dir * vehicle->getOrientation());
-
-        if (i < MAX_NUM_VEHICLES)
-        {
-            update_data.vehicles[i].position_x = pe.position.x;
-            update_data.vehicles[i].position_y = pe.position.y;
-            update_data.vehicles[i].position_z = pe.position.z;
-            update_data.vehicles[i].orth_x = pe.orth.x;
-            update_data.vehicles[i].orth_y = pe.orth.y;
-            update_data.vehicles[i].orth_z = pe.orth.z;
-            update_data.vehicles[i].up_x = pe.up.x;
-            update_data.vehicles[i].up_y = pe.up.y;
-            update_data.vehicles[i].up_z = pe.up.z;
-            update_data.vehicles[i].orientation = vehicle->getOrientation();
-
-            if (it == begin)
-                update_data.vehicles[i].prev_vehicle = -1;
-            else
-                update_data.vehicles[i].prev_vehicle = i - 1;
-
-            if (it == end - 1)
-                update_data.vehicles[i].next_vehicle = -1;
-            else
-                update_data.vehicles[i].prev_vehicle = i + 1;
-
-            std::copy(vehicle->getAnalogSignals().begin(),
-                      vehicle->getAnalogSignals().end(),
-                      update_data.vehicles[i].analogSignal.begin());
-        }
-        ++i;
-
-        vehicle->setInclination(pe.inclination);
-        vehicle->setCurvature(pe.curvature);
+        *vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationPreStep(y, t);
@@ -503,7 +469,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                 vehicle->setModuleName(module_lib_name);
                 vehicle->setConfigDir(module_cfg_dir);
                 vehicle->setConfigName(module_cfg_name);
-                vehicle->setRouteDir(init_data.route_dir);
+                vehicle->setRouteDir(init_data.route_dir_name);
 
                 vehicle->setIndex(ode_order);
                 vehicle->setPayloadCoeff(payload_coeff);
@@ -701,21 +667,28 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
     QString joint_cfg_name = QString("joint-" + name_fwd + "-" + name_bwd);
 //    Journal::instance()->info(QString("Try to load config: " + joint_cfg_name));
 
-    // Default directory of joint's configuration files
-    QString joint_cfg_path = QString(fs.getDevicesDir().c_str()) +
-            fs.separator() + joint_cfg_name + ".xml";
+    // Check forward connector's custom config directory
+    QString cfg_dir = QString(fs.getVehiclesDir().c_str());
+    QString fwd_cfg_subdir = con_fwd->getCustomConfigDir();
+
+    QString joint_cfg_path = cfg_dir;
+    joint_cfg_path += fs.separator() + fwd_cfg_subdir;
+    joint_cfg_path += fs.separator() + joint_cfg_name + ".xml";
 
     if (!cfg.load(joint_cfg_path))
     {
-        // Forward connector's config directory
-        joint_cfg_path = con_fwd->getCustomConfigDir() +
-                fs.separator() + joint_cfg_name + ".xml";
+        // Check backward connector's custom config directory
+        QString bwd_cfg_subdir = con_bwd->getCustomConfigDir();
+
+        joint_cfg_path = cfg_dir;
+        joint_cfg_path += fs.separator() + bwd_cfg_subdir;
+        joint_cfg_path += fs.separator() + joint_cfg_name + ".xml";
 
         if (!cfg.load(joint_cfg_path))
         {
-            // Backward connector's config directory
-            joint_cfg_path = con_bwd->getCustomConfigDir() +
-                    fs.separator() + joint_cfg_name + ".xml";
+            // Check default directory of devices configuration files
+            joint_cfg_path = QString(fs.getDevicesDir().c_str());
+            joint_cfg_path += fs.separator() + joint_cfg_name + ".xml";
 
             if (!cfg.load(joint_cfg_path))
             {

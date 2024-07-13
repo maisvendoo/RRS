@@ -3,13 +3,13 @@
 
 enum
 {
-    GEN_AXIS = 191,
-    GEN_KARDAN = 192,
-    GEN_MUFTA1 = 193,
-    WHEEL_1 = 194,
-    WHEEL_2 = 195,
-    WHEEL_3 = 196,
-    WHEEL_4 = 197
+    WHEEL_1 = 1,
+    WHEEL_2 = 2,
+    WHEEL_3 = 3,
+    WHEEL_4 = 4,
+    GEN_AXIS = 11,
+    GEN_KARDAN = 12,
+    GEN_MUFTA1 = 13,
 };
 
 #endif // PASSCARSIGNALS_H

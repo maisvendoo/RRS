@@ -85,7 +85,7 @@ protected:
     void overrideSettingsBySharedMemory(settings_t &settings);
 
     /// Load route form directory
-    bool loadRoute(const std::string &routeDir);
+    bool loadRoute();
 
     /// Init common graphical engine settings
     bool initEngineSettings(osg::Group *root);

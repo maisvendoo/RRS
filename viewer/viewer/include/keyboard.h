@@ -35,6 +35,7 @@ public:
 
     /// Constructor
     KeyboardHandler(QObject *parent = Q_NULLPTR);
+    ~KeyboardHandler();
 
     /// Keyboard handler
     virtual bool handle(const osgGA::GUIEventAdapter &ea,

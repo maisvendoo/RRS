@@ -56,7 +56,7 @@ public:
 
     virtual void step(double t, double dt);
 
-private:
+protected:
 
     /// Код управляющей клавиши
     int keyCode;
