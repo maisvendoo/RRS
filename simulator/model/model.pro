@@ -71,8 +71,6 @@ INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../train/include
 INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../vehicle/include
-INCLUDEPATH += ../coupling/include
-INCLUDEPATH += ../brakepipe/include
 INCLUDEPATH += ../profile/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../sim-client/include
@@ -80,11 +78,7 @@ INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include
 INCLUDEPATH += ../../libJournal/include
 INCLUDEPATH += ../../tcp-connection/include
-INCLUDEPATH += ../../asound/include
-INCLUDEPATH += ../sound-manager/include
 INCLUDEPATH += ../signaling/include
-
-
 
 HEADERS += $$files(./include/*.h)
 HEADERS += $$files(../../common-headers/*.h)

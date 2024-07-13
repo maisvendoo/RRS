@@ -21,6 +21,7 @@
 #include    <QMap>
 
 #include    "solver-types.h"
+#include    "sound-signal.h"
 #include    "physics.h"
 #include    "CfgReader.h"
 #include    "registrator.h"

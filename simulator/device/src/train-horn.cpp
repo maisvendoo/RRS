@@ -4,13 +4,13 @@
 //
 //------------------------------------------------------------------------------
 TrainHorn::TrainHorn(QObject *parent) : Device(parent)
-  , is_svistok(false)
-  , is_tifon(false)
-  , pFL(0.0)
-  , QFL(0.0)
-  , p_nom(0.9)
-  , k_svistok(5.0e-4)
-  , k_tifon(8.0e-4)
+    , svistok_state(sound_state_t())
+    , tifon_state(sound_state_t())
+    , pFL(0.0)
+    , QFL(0.0)
+    , p_nom(0.9)
+    , k_svistok(5.0e-4)
+    , k_tifon(8.0e-4)
 {
 
 }
@@ -36,17 +36,17 @@ void TrainHorn::step(double t, double dt)
     // Расчёт коэффициента расхода воздуха в атмосферу при работе звуковых сигналов
     double k = 0.0;
     // Расчёт громкости звуковых сигналов
-    int volume_level = static_cast<int>(floor(100.0 * cut(pFL / p_nom, 0.0, 1.0)));
+    float volume_level = cut(static_cast<float>(pFL / p_nom), 0.0f, 1.0f);
+    svistok_state.volume = volume_level;
+    tifon_state.volume = volume_level;
 
-    if (is_svistok)
+    if (svistok_state.play)
     {
         k += k_svistok;
-        emit soundSetVolume("Svistok", volume_level);
     }
-    if (is_tifon)
+    if (tifon_state.play)
     {
         k += k_tifon;
-        emit soundSetVolume("Tifon", volume_level);
     }
 
     // Расход воздуха питательной магистрали
@@ -58,18 +58,7 @@ void TrainHorn::step(double t, double dt)
 //------------------------------------------------------------------------------
 void TrainHorn::setSvistokOn(bool state)
 {
-    if (is_svistok != state)
-    {
-        if (state)
-        {
-            emit soundPlay("Svistok");
-        }
-        else
-        {
-            emit soundStop("Svistok");
-        }
-        is_svistok = state;
-    }
+    svistok_state.play = state;
 }
 
 //------------------------------------------------------------------------------
@@ -77,7 +66,15 @@ void TrainHorn::setSvistokOn(bool state)
 //------------------------------------------------------------------------------
 bool TrainHorn::isSvistok() const
 {
-    return is_svistok;
+    return svistok_state.play;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t TrainHorn::getSvistokSound() const
+{
+    return svistok_state;
 }
 
 //------------------------------------------------------------------------------
@@ -85,18 +82,7 @@ bool TrainHorn::isSvistok() const
 //------------------------------------------------------------------------------
 void TrainHorn::setTifonOn(bool state)
 {
-    if (is_tifon != state)
-    {
-        if (state)
-        {
-            emit soundPlay("Tifon");
-        }
-        else
-        {
-            emit soundStop("Tifon");
-        }
-        is_tifon = state;
-    }
+    tifon_state.play = state;
 }
 
 //------------------------------------------------------------------------------
@@ -104,7 +90,15 @@ void TrainHorn::setTifonOn(bool state)
 //------------------------------------------------------------------------------
 bool TrainHorn::isTifon() const
 {
-    return is_tifon;
+    return tifon_state.play;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t TrainHorn::getTifonSound() const
+{
+    return tifon_state;
 }
 
 //------------------------------------------------------------------------------

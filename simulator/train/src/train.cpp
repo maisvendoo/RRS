@@ -20,7 +20,6 @@ Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
   , no_air(false)
   , init_main_res_pressure(0.0)
   , train_motion_solver(nullptr)
-  , soundMan(nullptr)
 {
 
 }
@@ -66,19 +65,6 @@ bool Train::init(const init_data_t &init_data)
             init_data.train_config + ".xml";
 
     Journal::instance()->info("Train config from file: " + full_config_path);
-
-    Journal::instance()->info("==== Sound Manager ====");
-    try
-    {
-        soundMan = new SoundManager();
-
-        Journal::instance()->info(QString("Created SoundManager at address: 0x%1")
-                                      .arg(reinterpret_cast<quint64>(soundMan), 0, 16));
-
-    } catch (const std::bad_alloc &)
-    {
-        Journal::instance()->error("Sound mamager is;t created");
-    }
 
     // Loading of train
     if (!loadTrain(full_config_path, init_data))
@@ -483,15 +469,6 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
                 size_t s = vehicle->getDegressOfFreedom();
                 ode_order += 2 * s;
-
-                // Loading sounds
-                soundMan->loadSounds(vehicle->getSoundsDir());
-
-                connect(vehicle, &Vehicle::soundPlay, soundMan, &SoundManager::play, Qt::DirectConnection);
-                connect(vehicle, &Vehicle::soundStop, soundMan, &SoundManager::stop, Qt::DirectConnection);
-                connect(vehicle, &Vehicle::soundSetVolume, soundMan, &SoundManager::setVolume, Qt::DirectConnection);
-                connect(vehicle, &Vehicle::soundSetPitch, soundMan, &SoundManager::setPitch, Qt::DirectConnection);
-                connect(vehicle, &Vehicle::volumeCurveStep, soundMan, &SoundManager::volumeCurveStep, Qt::DirectConnection);
 
                 if (vehicles.size() !=0)
                 {

@@ -50,6 +50,7 @@ RouteViewer::RouteViewer(int argc, char *argv[])
   : is_ready(false)
   , memory_sim_info(nullptr)
   , keyboard(nullptr)
+  , sound_manager(nullptr)
 {
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
 
@@ -166,7 +167,7 @@ bool RouteViewer::init(int argc, char *argv[])
 
     osg::setNotifyLevel(level);
     std::string logs_path = fs.getLogsDir();
-    osg::setNotifyHandler(new LogFileHandler(logs_path + fs.separator() + "viewer.log"));
+    osg::setNotifyHandler(new ViewerLogFileHandler(logs_path + fs.separator() + "viewer.log"));
 
     OSG_FATAL << "Override settings from command line" << std::endl;
     // Parse command line
@@ -177,6 +178,16 @@ bool RouteViewer::init(int argc, char *argv[])
     OSG_FATAL << "Override settings from simulator shared memory" << std::endl;
     // Parse info from shared memory
     overrideSettingsBySharedMemory(settings);
+
+    try
+    {
+        sound_manager = new SoundManager();
+        OSG_FATAL << "Created SoundManager" << std::endl;
+    }
+    catch (const std::bad_alloc &)
+    {
+        OSG_FATAL << "SoundManager is not created";
+    }
 
     // Load selected route
     if (!loadRoute())
@@ -445,9 +456,9 @@ bool RouteViewer::loadRoute()
 
     loader->load(route_dir_path, settings.view_distance);
 
-    MotionPath *motionPath = loader->getMotionPath(settings.direction);
+    //MotionPath *motionPath = loader->getMotionPath(settings.direction);
 
-    train_ext_handler = new TrainExteriorHandler(settings, motionPath, info_data);
+    train_ext_handler = new TrainExteriorHandler(settings, sound_manager, info_data);
     viewer.addEventHandler(train_ext_handler);
 
     //viewer.addEventHandler(train_ext_handler->getAnimationManager());

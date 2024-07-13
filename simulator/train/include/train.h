@@ -25,7 +25,6 @@
 #include    "solver.h"
 #include    "solver-config.h"
 #include    "profile.h"
-#include    "sound-manager.h"
 
 #include    <QByteArray>
 
@@ -95,11 +94,7 @@ public:
     int getDirection() const;
 
     std::vector<Vehicle *> *getVehicles();
-/*
-signals:
 
-    void sendDataToVehicle(QByteArray data);
-*/
 private:
 
     /// Train mass
@@ -136,9 +131,6 @@ private:
 
     /// Motion ODE's solver
     Solver      *train_motion_solver;
-
-    /// Sound manager
-    SoundManager *soundMan;
 
     /// Имя сетевого клиента для ВЖД
     QString     client_name;

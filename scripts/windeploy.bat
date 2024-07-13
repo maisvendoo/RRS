@@ -120,6 +120,7 @@ rem Копируем SDK
 
 xcopy /Q ..\CfgReader\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\filesystem\include\*.h %RRS_DEV_ROOT%\sdk\include\
+xcopy /Q ..\common-headers\sound-signal.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\solver\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\physics\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Q ..\simulator\vehicle\include\*.h %RRS_DEV_ROOT%\sdk\include\

@@ -38,6 +38,7 @@ INCLUDEPATH += ../solver/include
 INCLUDEPATH += ../physics/include
 INCLUDEPATH += ../device/include
 INCLUDEPATH += ../vehicle/include
+INCLUDEPATH += ../../common-headers
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

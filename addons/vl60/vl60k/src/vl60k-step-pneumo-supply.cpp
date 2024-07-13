@@ -15,6 +15,8 @@ void VL60k::stepPneumoSupply(double t, double dt)
     motor_compressor->setPowerVoltage(U_power);
     motor_compressor->step(t, dt);
 
+    mk_tumbler.step(t, dt);
+
     // Питательная магистраль
     double FL_flow = 0.0;
     FL_flow += motor_compressor->getFLflow();

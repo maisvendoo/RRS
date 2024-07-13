@@ -43,6 +43,7 @@ unix{
 }
 
 INCLUDEPATH += ./include
+INCLUDEPATH += ../../common-headers
 INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../../CfgReader/include
 INCLUDEPATH += ../../filesystem/include

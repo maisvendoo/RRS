@@ -22,11 +22,17 @@ public:
     /// Состояние свистка
     bool isSvistok() const;
 
+    /// Состояние звука свистка
+    sound_state_t getSvistokSound() const;
+
     /// Задать состояние тифона
     void setTifonOn(bool state);
 
     /// Состояние тифона
     bool isTifon() const;
+
+    /// Состояние звука тифона
+    sound_state_t getTifonSound() const;
 
     /// Задать давление от питательной магистрали, МПа
     void setFLpressure(double value);
@@ -37,10 +43,10 @@ public:
 protected:
 
     /// Состояние свистка
-    bool is_svistok;
+    sound_state_t svistok_state;
 
     /// Состояние тифона
-    bool is_tifon;
+    sound_state_t tifon_state;
 
     /// Давление питательной магистрали, МПа
     double pFL;

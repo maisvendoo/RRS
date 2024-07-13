@@ -27,6 +27,7 @@
 #include    "keyboard.h"
 
 #include    "train-exterior.h"
+#include    "sound-manager.h"
 
 //------------------------------------------------------------------------------
 //
@@ -70,6 +71,9 @@ protected:
 
 
     TrainExteriorHandler *train_ext_handler;
+
+    /// Sound manager
+    SoundManager *sound_manager;
 
     /// Initialization
     bool init(int argc, char *argv[]);   

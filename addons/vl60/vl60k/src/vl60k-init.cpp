@@ -105,9 +105,6 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
 
     horn = new TrainHorn();
     horn->read_config("train-horn");
-    connect(horn, &TrainHorn::soundPlay, this, &VL60k::soundPlay);
-    connect(horn, &TrainHorn::soundSetVolume, this, &VL60k::soundSetVolume);
-    connect(horn, &TrainHorn::soundStop, this, &VL60k::soundStop);
 
     // Система подачи песка
     sand_system = new SandingSystem();

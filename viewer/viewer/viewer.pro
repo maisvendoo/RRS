@@ -17,6 +17,8 @@ win32 {
     OSG_LIB_DIRECTORY = $$(OSG_BIN_PATH)
     OSG_INCLUDE_DIRECTORY = $(OSG_INCLUDE_PATH)
 
+    OPENAL_LIB_DIR = $$(OPENAL_BIN)
+    OPENAL_INCLUDE_BIN = $$(OPENAL_INCLUDE)
 
     CONFIG(debug, debug|release) {
 
@@ -36,6 +38,9 @@ win32 {
         LIBS += -L../../../lib -lTcpConnection_d
         LIBS += -L../../../lib -ldisplay_d
 
+        LIBS += -L../../../lib -lasound_d
+        LIBS += -L../../../lib -lsound-manager_d
+
     } else {
 
         LIBS += -L$$OSG_LIB_DIRECTORY -losg
@@ -51,11 +56,17 @@ win32 {
         LIBS += -L../../../lib -lfilesystem
         LIBS += -L../../../lib -lTcpConnection
         LIBS += -L../../../lib -ldisplay
+
+        LIBS += -L../../../lib -lasound
+        LIBS += -L../../../lib -lsound-manager
     }
 
     #LIBS += -lopengl32 -lglu32
 
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
+
+    LIBS += -L$$OPENAL_LIB_DIR -lOpenAL32
+    INCLUDEPATH += $$OPENAL_INCLUDE_BIN
 }
 
 unix {
@@ -78,6 +89,9 @@ unix {
         LIBS += -L../../lib -lTcpConnection_d
         LIBS += -L../../lib -ldisplay_d
 
+        LIBS += -L../../../lib -lasound
+        LIBS += -L../../../lib -lsound-manager
+
     } else {
 
         LIBS +=  -losg
@@ -93,7 +107,13 @@ unix {
         LIBS += -L../../../lib -lfilesystem
         LIBS += -L../../lib -lTcpConnection
         LIBS += -L../../lib -ldisplay
+
+        LIBS += -L../../../lib -lasound
+        LIBS += -L../../../lib -lsound-manager
     }
+
+    LIBS += -lopenal
+    INCLUDEPATH += /usr/include/AL
 
     #LIBS += -lGL
 }
@@ -116,6 +136,9 @@ INCLUDEPATH += ../route-loader/include
 INCLUDEPATH += ../library/include
 INCLUDEPATH += ../display/include
 INCLUDEPATH += ./include
+
+INCLUDEPATH += ../sound-manager/include
+INCLUDEPATH += ../../asound/include
 
 HEADERS += $$files(./include/*.h)
 SOURCES += $$files(./src/*.cpp)

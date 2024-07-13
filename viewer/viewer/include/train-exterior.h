@@ -21,8 +21,6 @@
 #include    <osgGA/GUIEventHandler>
 #include    <osg/MatrixTransform>
 
-#include    "abstract-path.h"
-
 #include    <osgViewer/Viewer>
 
 #include    "vehicle-exterior.h"
@@ -35,7 +33,7 @@
 #include    "config-reader.h"
 #include    "display.h"
 
-#include    <queue>
+#include    "sound-manager.h"
 
 /*!
  * \class
@@ -51,7 +49,7 @@ class TrainExteriorHandler : public QObject, public osgGA::GUIEventHandler
 public:
 
     /// Constructor
-    TrainExteriorHandler(settings_t settings, MotionPath *routePath, const simulator_info_t &info_data);
+    TrainExteriorHandler(settings_t settings, SoundManager *sm, const simulator_info_t &info_data);
     ~TrainExteriorHandler();
 
     /// Handle method
@@ -85,11 +83,14 @@ private:
     /// Shift camera up/down
     float height_shift;
 
-    /// Route path (trajectory) contener
-    osg::ref_ptr<MotionPath> routePath;
-
     /// Train exterior scene group
     osg::ref_ptr<osg::Group> trainExterior;
+
+    /// Camera position at previous frame
+    osg::Vec3f prev_camera_pos;
+
+    /// Time stamp of previous frame
+    double prev_time;
 
     /// Time between current and previous frame drawing
     double ref_time;
@@ -105,13 +106,14 @@ private:
     short new_data;
     short old_data;
 
-//    QSharedMemory   memory_sim_info;
     QSharedMemory   memory_sim_update;
     QSharedMemory   memory_controlled;
-//    QSharedMemory   shared_memory;
 
     /// Animations list
     std::vector<AnimationManager *> anim_managers;
+
+    /// Sound manager
+    SoundManager *sound_manager;
 
     /// Keyboard handler (camera control)
     void keyboardHandler(int key);
@@ -128,12 +130,13 @@ private:
     /// Processing data from server
     void sendControlledVehicle(const controlled_t &data);
 
-    /// Move camera along track
-    void moveCamera(osgViewer::Viewer *viewer);
-/*
-    /// Calculate vehicles attiture
-    void recalcAttitude(size_t i);
-*/
+    /// Move camera
+    void moveCamera(osgViewer::Viewer *viewer, float delta_time);
+
+    /// Load vehicle sounds
+    void loadSounds(const std::string &configDir, const std::string &configName,
+                    std::vector<size_t> &sounds_id);
+
     /// Load vehicle animations
     void loadAnimations(const std::string &configDir, const std::string &configName,
                         osg::Node *cabine, animations_t &animations);

@@ -15,12 +15,14 @@ struct vehicle_exterior_t
     osg::Vec3   position;
     osg::Vec3   orth;
     osg::Vec3   up;
+    osg::Vec3   right;
     osg::Vec3   attitude;
     int         orientation;
     osg::Vec3   driver_pos;
 
     animations_t *anims;
     displays_t   *displays;
+    std::vector<size_t> sounds_id;
 
     vehicle_exterior_t()
         : transform(new osg::MatrixTransform())
@@ -34,9 +36,8 @@ struct vehicle_exterior_t
         , anims(new animations_t())
         , displays(new displays_t())
     {
-
+        sounds_id.clear();
     }
-
 };
 
 #endif // VEHICLE_EXTERIOR_H
