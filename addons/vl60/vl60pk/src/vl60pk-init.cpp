@@ -56,11 +56,9 @@ void VL60pk::initTractionControl(const QString &modules_dir, const QString &cust
     (void) modules_dir;
 
     controller = new ControllerKME_60_044();
-    connect(controller, &ControllerKME_60_044::soundPlay, this, &VL60pk::soundPlay);
 
     main_controller = new EKG_8G();
     main_controller->read_config("ekg-8g", custom_cfg_dir);
-    connect(main_controller, &EKG_8G::soundPlay, this, &VL60pk::soundPlay);
 
     for (size_t i = 0; i < vu.size(); ++i)
     {

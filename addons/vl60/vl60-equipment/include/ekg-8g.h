@@ -30,6 +30,19 @@ public:
 
     bool isLKallow() const;
 
+    enum {
+        NUM_SOUNDS = 4,
+        CHANGE_POS_ONE_1 = 0,
+        CHANGE_POS_ONE_2 = 1,
+        CHANGE_POS_AUTO_1 = 2,
+        CHANGE_POS_AUTO_2 = 3,
+
+        NO_SOUND = 0,
+        SOUND_ONE = 1,
+        SOUND_AUTO = 2
+    };
+    sound_state_t getSound(size_t idx);
+
 private:
 
     enum
@@ -65,9 +78,6 @@ private:
 
     bool    is_auto;
 
-    /// Имя звука ЭКГ-8Ж
-    QString sound_name;
-
     /// Таймер управления переключением позиций
     Timer   pos_switcher;
 
@@ -95,6 +105,12 @@ private:
         LM_POS7 = 33,
         LM_POS8 = 37
     };
+
+    /// Очерёдность и состояние звуков
+    std::array <sound_state_t, 4> sounds;
+    char is_sound_one_or_auto;
+    bool is_change_one_1_or_2;
+    bool is_change_auto_1_or_2;
 
     void preStep(state_vector_t &Y, double t);
 
