@@ -21,7 +21,7 @@
 		<RequestInterval>33</RequestInterval>
 		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
-		<NotifyLevel>WARN</NotifyLevel>
+		<NotifyLevel>INFO</NotifyLevel>
 		<ViewDistance>1000</ViewDistance>
 		<FrameDiv>1000</FrameDiv>
 	</Viewer>

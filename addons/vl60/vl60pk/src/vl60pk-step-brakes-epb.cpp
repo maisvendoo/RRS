@@ -54,6 +54,4 @@ void VL60pk::stepEPB(double t, double dt)
     hose_bp_bwd->setVoltage  (1, hose_bp_fwd->getVoltage(1));
     hose_bp_bwd->setFrequency(1, hose_bp_fwd->getFrequency(1));
     hose_bp_bwd->setCurrent  (1, hose_bp_fwd->getCurrent(1));
-
-    epb_switch.step(t, dt);
 }

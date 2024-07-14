@@ -9,19 +9,19 @@
 //------------------------------------------------------------------------------
 struct sound_config_t
 {
-    ASound  *sound;
-    bool    prev_play;
-    size_t  signal_id;
-    float   local_pos_x;
-    float   local_pos_y;
-    float   local_pos_z;
-    float   init_volume;
-    float   max_volume;
-    float   init_pitch;
-    bool    loop;
-    bool    play_on_start;
-    QString sounddir;
-    QString filename;
+    ASound  *sound;         ///< OpenAl-источник звука
+    bool    prev_play;      ///< Состояние звука на предыдущем шаге
+    size_t  signal_id;      ///< Индекс сигнала состояния звука
+    float   local_pos_x;    ///< Локальная координата звука по оси X
+    float   local_pos_y;    ///< Локальная координата звука по оси Y
+    float   local_pos_z;    ///< Локальная координата звука по оси Z
+    float   init_volume;    ///< Громкость по умолчанию, 0.0 - 1.0
+    float   max_volume;     ///< Множитель к максимальной  громкости, 0.0 - 1.0
+    float   init_pitch;     ///< Скорость воспроизведения, 0.0 - 1.0
+    bool    loop;           ///< Признак зацикливания звука
+    bool    play_on_start;  ///< Признак включения звука
+    QString sounddir;       ///< Подпапка в data/sounds с файлом звука
+    QString filename;       ///< Файл звука
 
     sound_config_t()
         : sound(Q_NULLPTR)
