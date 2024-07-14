@@ -26,8 +26,8 @@ mkdir %RRS_DEV_ROOT%\themes
 
 rem Копируем бинарные файлы
 
-xcopy  ..\..\bin\*.exe %RRS_DEV_ROOT%\bin\
-xcopy ..\..\lib\*.dll %RRS_DEV_ROOT%\bin\
+xcopy /F  ..\..\bin\*.exe %RRS_DEV_ROOT%\bin\
+xcopy /F ..\..\lib\*.dll %RRS_DEV_ROOT%\bin\
 move %RRS_DEV_ROOT%\bin\rkf5.dll %RRS_DEV_ROOT%\lib\rkf5.dll
 move %RRS_DEV_ROOT%\bin\rk4.dll %RRS_DEV_ROOT%\lib\rk4.dll
 move %RRS_DEV_ROOT%\bin\euler2.dll %RRS_DEV_ROOT%\lib\euler2.dll

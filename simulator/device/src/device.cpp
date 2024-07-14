@@ -234,6 +234,28 @@ void Device::read_config(const QString &filename, const QString &dir_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Device::read_custom_config(const QString &path)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    CfgReader cfg;
+
+    QString cfg_path = QString(fs.getVehiclesDir().c_str()) + QDir::separator() + path + ".xml";
+
+    if (cfg.load(cfg_path))
+    {
+        Journal::instance()->info("Loaded file: " + cfg_path);
+        load_configuration(cfg);
+        load_config(cfg);
+    }
+    else
+    {
+        Journal::instance()->error("File " + cfg_path + " is't found");
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Device::load_configuration(CfgReader &cfg)
 {
     QString secName = "Device";

@@ -30,8 +30,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lprofile_d
     LIBS += -L../../../lib -ldevice_d
 
-    LIBS += -L../../../lib -lasound_d
-    LIBS += -L../../../lib -lsound-manager_d
+    #LIBS += -L../../../lib -lasound_d
+    #LIBS += -L../../../lib -lsound-manager_d
 
     LIBS += -L../../../lib -lsignaling_d
 
@@ -50,8 +50,8 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../../lib -lprofile
     LIBS += -L../../../lib -ldevice
 
-    LIBS += -L../../../lib -lasound
-    LIBS += -L../../../lib -lsound-manager
+    #LIBS += -L../../../lib -lasound
+    #LIBS += -L../../../lib -lsound-manager
 
     LIBS += -L../../../lib -lsignaling
 }
