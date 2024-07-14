@@ -43,17 +43,31 @@ void HysteresisRelay::setLocked(bool is_locked)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool HysteresisRelay::getState() const
+void HysteresisRelay::setValue(double value)
 {
     if (!is_active)
     {
-        return false;
+        state.reset();
+        return;
     }
 
     if (is_locked)
     {
-        return true;
+        state.set();
+        return;
     }
 
+    if (value <= min)
+        state.reset();
+
+    if (value >= max)
+        state.set();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool HysteresisRelay::getState() const
+{
     return Hysteresis::getState();
 }

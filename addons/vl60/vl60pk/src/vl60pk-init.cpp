@@ -29,7 +29,6 @@ void VL60pk::initHighVoltageScheme(const QString &modules_dir, const QString &cu
 
     trac_trans = new TracTransformer();
     trac_trans->read_config("trac-transformer", custom_cfg_dir);
-    connect(trac_trans, &TracTransformer::soundSetVolume, this, &VL60pk::soundSetVolume);
 }
 
 //------------------------------------------------------------------------------

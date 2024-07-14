@@ -10,9 +10,11 @@ Hysteresis::Hysteresis(double min_value,
     : QObject(parent)
     , min(min_value)
     , max(max_value)
-    , state(init_state)
 {
-
+    if (init_state)
+        state.set();
+    else
+        state.reset();
 }
 
 //------------------------------------------------------------------------------
@@ -38,10 +40,10 @@ void Hysteresis::setRange(double min_value, double max_value)
 void Hysteresis::setValue(double value)
 {
     if (value <= min)
-        state = false;
+        state.reset();
 
     if (value >= max)
-        state = true;
+        state.set();
 }
 
 //------------------------------------------------------------------------------
@@ -49,5 +51,21 @@ void Hysteresis::setValue(double value)
 //------------------------------------------------------------------------------
 bool Hysteresis::getState() const
 {
-    return state;
+    return state.getState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Hysteresis::getSoundOn() const
+{
+    return state.getSoundOn();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Hysteresis::getSoundOff() const
+{
+    return state.getSoundOff();
 }
