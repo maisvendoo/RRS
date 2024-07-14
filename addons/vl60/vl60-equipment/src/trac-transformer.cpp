@@ -7,6 +7,7 @@ TracTransformer::TracTransformer(QObject *parent) : Device(parent)
     , U1(0.0)
     , K_sn(62.7)
     , ekg_pos(0)
+    , sound_state(sound_state_t(true, 0.0f))
 {
 
 }
@@ -22,9 +23,9 @@ TracTransformer::~TracTransformer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double TracTransformer::getU_sn() const
+void TracTransformer::setPosition(int position)
 {
-    return U1 / K_sn;
+    ekg_pos = position;
 }
 
 //------------------------------------------------------------------------------
@@ -38,11 +39,22 @@ void TracTransformer::setU1(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+double TracTransformer::getU_sn() const
+{
+    return U1 / K_sn;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double TracTransformer::getTracVoltage() const
 {
     return cur_pos.Unom * U1 / 25000.0;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString TracTransformer::getPosName() const
 {
     return cur_pos.name;
@@ -51,9 +63,9 @@ QString TracTransformer::getPosName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TracTransformer::setPosition(int position)
+sound_state_t TracTransformer::getSoundState() const
 {
-    ekg_pos = position;
+    return sound_state;
 }
 
 //------------------------------------------------------------------------------
@@ -69,7 +81,7 @@ void TracTransformer::preStep(state_vector_t &Y, double t)
         cur_pos = position[ekg_pos];
     }
 
-    emit soundSetVolume("Trac_Transformer", static_cast<int>(100.0 * U1 / 25000.0));
+    sound_state.volume = U1 / 25000.0;
 }
 
 //------------------------------------------------------------------------------

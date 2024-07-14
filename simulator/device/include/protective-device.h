@@ -30,6 +30,12 @@ public:
 
     bool getState() const;
 
+    /// Состояние звука включения
+    sound_state_t getSoundOn() const;
+
+    /// Состояние звука отключения
+    sound_state_t getSoundOff() const;
+
 private:
 
     /// Напряжение на входе ГВ
@@ -73,8 +79,8 @@ private:
 
     float lamp_state;
 
-    int state;
-    int old_state;
+    /// Состояние главного выключателя
+    Trigger state;
 
     void preStep(state_vector_t &Y, double t);
 

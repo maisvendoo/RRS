@@ -168,7 +168,7 @@ private:
     PhaseSplitter   *phase_spliter;
 
     /// Мотор-вентиляторы
-    std::array<MotorFan *, NUM_MOTOR_FANS> motor_fans;
+    std::array<ACMotorFan *, NUM_MOTOR_FANS> motor_fans;
 
     /// Мотор-компрессор
     ACMotorCompressor *motor_compressor;

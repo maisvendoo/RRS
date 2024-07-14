@@ -1,43 +1,34 @@
-#ifndef     AC_MOTOR_COMPRESSOR_H
-#define     AC_MOTOR_COMPRESSOR_H
+#ifndef     AC_MOTOR_FAN_H
+#define     AC_MOTOR_FAN_H
 
 #include    "device.h"
 
 //------------------------------------------------------------------------------
-// Мотор-компрессор переменного тока
+// Мотор-вентилятор переменного тока
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT ACMotorCompressor : public Device
+class DEVICE_EXPORT ACMotorFan : public Device
 {
 public:
 
-    ACMotorCompressor(QObject *parent = Q_NULLPTR);
+    ACMotorFan(QObject *parent = Q_NULLPTR);
 
-    ~ACMotorCompressor();
-
-    /// Задать давление от питательной магистрали
-    void setFLpressure(double value);
-
-    /// Поток в питательную магистраль
-    double getFLflow() const;
+    ~ACMotorFan();
 
     /// Задать питающее напряжение
     void setPowerVoltage(double value);
 
-    /// Текущее состояние
+    /// Текущее состояние питания
     bool isPowered() const;
 
-    /// Состояние звука компрессора
+    /// Текущее обеспечение потока воздуха
+    bool isReady() const;
+
+    /// Состояние звука вентилятора
     sound_state_t getSoundState() const;
     void RegulateSoundByOnOff(bool value);
     void RegulateSoundByPitch(bool value);
 
 protected:
-
-    /// Внешнее противодавление
-    double  pFL;
-
-    /// Расход воздуха
-    double  QFL;
 
     /// Питающее напряжение
     double  U_power;
@@ -57,19 +48,16 @@ protected:
     /// Момент инерции ротора
     double  J;
 
-    /// Момент сопротивления вращению ротора
-    double  Mxx;
-
-    /// Коэффициент перехода от скорости ротора к производимому давлению
-    double  K_pressure;
-
-    /// Коэффициент потока в питательную магистраль
-    double  K_flow;
+    /// Коэффициент аэродинамического сопротивления вращению ротора
+    double  kf;
 
     /// Признак включения
     bool    is_powered;
 
-    /// Состояние звука компрессора
+    /// Признак обеспечения потока воздуха
+    bool    is_ready;
+
+    /// Состояние звука вентилятора
     sound_state_t sound_state;
     bool    reg_sound_by_on_off;
     bool    reg_sound_by_pitch;
@@ -81,4 +69,4 @@ protected:
     virtual void load_config(CfgReader &cfg);
 };
 
-#endif // MOTOR_COMPRESSOR_H
+#endif // AC_MOTOR_FAN_H

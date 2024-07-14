@@ -20,6 +20,9 @@ public:
 
     double getU_out() const;
 
+    /// Состояние звука фазорасщепителя
+    sound_state_t getSoundState() const;
+
 private:
 
     /// Максимальный крутящий момент
@@ -52,6 +55,9 @@ private:
     double  k_eds;
 
     double  U_out;
+
+    /// Состояние звука фазорасщепителя
+    sound_state_t sound_state;
 
     void preStep(state_vector_t &Y, double t);
 

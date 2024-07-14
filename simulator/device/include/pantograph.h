@@ -40,6 +40,12 @@ public:
 
     bool isDown() const;
 
+    /// Состояние звука подъёма
+    sound_state_t getSoundUp() const;
+
+    /// Состояние звука опускания
+    sound_state_t getSoundDown() const;
+
 private:
 
     /// Напряжение в контактной сети
@@ -47,11 +53,10 @@ private:
 
     /// Напряжение на выходе токоприемника
     double Uout;
-
+/*
     /// Состояние токоприемника (true - подъем, false - опускание)
-    bool state;
-    bool old_state;
-
+    bool ref_state;
+*/
     /// Максимальная высота подъема (в относительном выражении)
     double  max_height;
 
@@ -70,6 +75,15 @@ private:
     /// Токоприемник опущен
     bool is_down;
 
+    /// Состояние токоприемника (true - подъем, false - опускание)
+    Trigger ref_state;
+/*
+    /// Состояние звука подъёма
+    sound_state_t sound_up;
+
+    /// Состояние звука опускания
+    sound_state_t sound_down;
+*/
     /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);
 

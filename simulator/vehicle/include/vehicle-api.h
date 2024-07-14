@@ -20,6 +20,8 @@
 #include    "loco-crane.h"
 #include    "motor-compressor-ac.h"
 #include    "motor-compressor-dc.h"
+#include    "motor-fan-ac.h"
+#include    "motor-fan-dc.h"
 #include    "oscillator.h"
 #include    "pantograph.h"
 #include    "pneumo-anglecock.h"

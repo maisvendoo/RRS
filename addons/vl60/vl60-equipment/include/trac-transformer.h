@@ -32,22 +32,24 @@ public:
 
     ~TracTransformer();
 
-    /// Получить напряжение с обмотки собственных нужд (СН)
-    double getU_sn() const;
+    /// Задать текущую позицию ЭКГ
+    void setPosition(int position);
 
     /// Задать напряжение первичной обмотки
     void setU1(double value);
+
+    /// Получить напряжение с обмотки собственных нужд (СН)
+    double getU_sn() const;
 
     /// Вернуть текущее напряжение на тяговой обмотке
     double getTracVoltage() const;
 
     QString getPosName() const;
 
-    /// Задать текущую позицию ЭКГ
-    void setPosition(int position);
+    /// Состояние звука трансформатора
+    sound_state_t getSoundState() const;
 
 private:
-
 
     /// Напряжение на первичной обмотке
     double  U1;    
@@ -60,6 +62,9 @@ private:
 
     /// Описатель текущей позиции ЭКГ
     position_t cur_pos;
+
+    /// Состояние звука трансформатора
+    sound_state_t sound_state;
 
     /// Данные о эквивалентных напряжениях тяговой обмотки на каждой позиции ЭКГ
     QMap<int, position_t>   position;

@@ -4,17 +4,18 @@
 //
 //------------------------------------------------------------------------------
 PhaseSplitter::PhaseSplitter(QObject *parent) : Device(parent)
-  , Mmax(48.96)
-  , s_kr(0.022)
-  , Un(380.0)
-  , omega0(157.08)
-  , Mxx(1.5)
-  , J(0.02)
-  , U_power(0.0)
-  , omega_r(141.4)
-  , is_not_ready(1.0f)
-  , k_eds(2.389)
-  , U_out(0.0)
+    , Mmax(48.96)
+    , s_kr(0.022)
+    , Un(380.0)
+    , omega0(157.08)
+    , Mxx(1.5)
+    , J(0.02)
+    , U_power(0.0)
+    , omega_r(141.4)
+    , is_not_ready(1.0f)
+    , k_eds(2.389)
+    , U_out(0.0)
+    , sound_state(sound_state_t())
 {
 
 }
@@ -32,12 +33,6 @@ PhaseSplitter::~PhaseSplitter()
 //------------------------------------------------------------------------------
 void PhaseSplitter::setU_power(double value)
 {
-    if (floor(value) > 0 && floor(U_power) == 0)
-        emit soundPlay("Phase_Splitter");
-
-    if (floor(value) == 0 && floor(U_power) > 0)
-        emit soundStop("Phase_Splitter");
-
     U_power = value;
 }
 
@@ -49,9 +44,20 @@ float PhaseSplitter::isNotReady() const
     return is_not_ready;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double PhaseSplitter::getU_out() const
 {
     return U_out;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t PhaseSplitter::getSoundState() const
+{
+    return sound_state;
 }
 
 //------------------------------------------------------------------------------
@@ -66,7 +72,7 @@ void PhaseSplitter::preStep(state_vector_t &Y, double t)
 
     U_out = k_eds * Y[0];
 
-    //emit soundSetPitch("Phase_Splitter", static_cast<float>(Y[0] / omega0));
+    sound_state.play = (U_power > Physics::ZERO);
 }
 
 //------------------------------------------------------------------------------

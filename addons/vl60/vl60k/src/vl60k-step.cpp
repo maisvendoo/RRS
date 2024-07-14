@@ -13,7 +13,7 @@ void VL60k::slotAutoStart()
                 (triggers[start_count] == &gv_tumbler))
             return;
 
-        if (!static_cast<bool>(main_switch->getLampState()))
+        if (main_switch->getState())
             gv_return_tumbler.reset();
 
         start_count++;
@@ -97,8 +97,8 @@ void VL60k::stepMotorFans(double t, double dt)
 {
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
     {
-        MotorFan *mf = motor_fans[i];
-        mf->setU_power(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[i].getState()));
+        ACMotorFan *mf = motor_fans[i];
+        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[i].getState()));
         mf->step(t, dt);
     }
 }
@@ -164,9 +164,9 @@ void VL60k::stepLineContactors(double t, double dt)
 
     bool motor_fans_state = true;
 
-    for (auto mv: motor_fans)
+    for (auto mf: motor_fans)
     {
-        motor_fans_state = motor_fans_state && !static_cast<bool>(mv->isNoReady());
+        motor_fans_state &= mf->isReady();
     }
 
     bool lk_state = !km_state.pos_state[POS_BV] &&
