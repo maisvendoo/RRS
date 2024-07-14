@@ -11,7 +11,6 @@ Relay::Relay(size_t num_contacts, QObject *parent) : Device(parent)
   , T(0.1)
   , level_off(0.6)
   , level_on(0.7)
-  , soundName("Relay")
   , hysteresis(new Hysteresis(level_off * U_nom / R, level_on * U_nom / R, false))
 {
     contact.resize(num_contacts);
@@ -57,6 +56,22 @@ bool Relay::getContactState(size_t number) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t Relay::getSoundOn() const
+{
+    return hysteresis->getSoundOn();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Relay::getSoundOff() const
+{
+    return hysteresis->getSoundOff();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double Relay::getCurrent() const
 {
     return getY(0);
@@ -72,7 +87,8 @@ void Relay::preStep(state_vector_t &Y, double t)
     hysteresis->setValue(Y[0]);
 
     if (ancor_state_prev != hysteresis->getState())
-        change_contacts_state();
+        for (auto c_it : contact)
+            c_it = !c_it;
 
     ancor_state_prev = hysteresis->getState();
 }
@@ -110,17 +126,4 @@ void Relay::load_config(CfgReader &cfg)
     double I_on = U_nom * level_on / R;
 
     hysteresis->setRange(I_off, I_on);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Relay::change_contacts_state()
-{
-    for (size_t i = 0; i < contact.size(); ++i)
-    {
-        contact[i] = !contact[i];
-    }
-
-    emit soundPlay(soundName);
 }

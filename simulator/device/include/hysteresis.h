@@ -4,6 +4,7 @@
 #include    <QObject>
 
 #include    "device-export.h"
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //
@@ -21,17 +22,21 @@ public:
 
     void setRange(double min_value, double max_value);
 
-    void setValue(double value);
+    virtual void setValue(double value);
 
     virtual bool getState() const;
 
-private:
+    sound_state_t getSoundOn() const;
+
+    sound_state_t getSoundOff() const;
+
+protected:
 
     double min;
 
     double max;
 
-    bool state;
+    Trigger state;
 };
 
 #endif // HYSTERESIS_H

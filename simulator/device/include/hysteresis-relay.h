@@ -23,6 +23,8 @@ public:
 
     void setLocked(bool is_locked);
 
+    virtual void setValue(double value);
+
     virtual bool getState() const;
 
 protected:
