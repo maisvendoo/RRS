@@ -47,9 +47,9 @@ void VL60k::stepSignalsOutput()
     analogSignal[SIG_LIGHT_GU] = phase_spliter->isNotReady();
     analogSignal[SIG_LIGHT_FR] = phase_spliter->isNotReady();
     analogSignal[SIG_LIGHT_0HP] = static_cast<float>(main_controller->isLongMotionPos());
-    analogSignal[SIG_LIGHT_TR] = cut (motor_fans[MV3]->isNoReady() + motor_fans[MV4]->isNoReady(), 0.0f, 1.0f);
-    analogSignal[SIG_LIGHT_VU1] = cut (motor_fans[MV1]->isNoReady() + motor_fans[MV2]->isNoReady(), 0.0f, 1.0f);
-    analogSignal[SIG_LIGHT_VU2] = cut (motor_fans[MV5]->isNoReady() + motor_fans[MV6]->isNoReady(), 0.0f, 1.0f);
+    analogSignal[SIG_LIGHT_TR] = static_cast<float>(!motor_fans[MV3]->isReady() || !motor_fans[MV4]->isReady());
+    analogSignal[SIG_LIGHT_VU1] = static_cast<float>(!motor_fans[MV1]->isReady() || !motor_fans[MV2]->isReady());
+    analogSignal[SIG_LIGHT_VU2] = static_cast<float>(!motor_fans[MV5]->isReady() || !motor_fans[MV6]->isReady());
     analogSignal[SIG_LIGHT_TD] = isLineContactorsOff();
 
     analogSignal[KONTROLLER] = controller->getMainHandlePos();

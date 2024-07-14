@@ -24,6 +24,210 @@
 		<LocalPosition>0.8 8.6 4.6</LocalPosition>
 	</Sound>
 
+	<!-- Подъём заднего токоприёмника -->
+	<Sound>
+		<SignalID>234</SignalID>
+		<Filename>TPUp.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -7.0 5.5</LocalPosition>
+	</Sound>
+
+	<!-- Опускание заднего токоприёмника -->
+	<Sound>
+		<SignalID>235</SignalID>
+		<Filename>TPDown.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -7.0 5.5</LocalPosition>
+	</Sound>
+
+	<!-- Подъём переднего токоприёмника -->
+	<Sound>
+		<SignalID>236</SignalID>
+		<Filename>TPUp.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 7.0 5.5</LocalPosition>
+	</Sound>
+
+	<!-- Опускание переднего токоприёмника -->
+	<Sound>
+		<SignalID>237</SignalID>
+		<Filename>TPDown.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 7.0 5.5</LocalPosition>
+	</Sound>
+
+	<!-- Включение ГВ -->
+	<Sound>
+		<SignalID>238</SignalID>
+		<Filename>gvon.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.02 0.7 4.7</LocalPosition>
+	</Sound>
+
+	<!-- Отключение ГВ -->
+	<Sound>
+		<SignalID>239</SignalID>
+		<Filename>gvoff.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.02 0.7 4.7</LocalPosition>
+	</Sound>
+
+	<!-- Трансформатор -->
+	<Sound>
+		<SignalID>240</SignalID>
+		<Filename>trans.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-вентилятор 6 -->
+	<Sound>
+		<SignalID>242</SignalID>
+		<Filename>mw-1.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.0 -7.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-вентилятор 5 -->
+	<Sound>
+		<SignalID>243</SignalID>
+		<Filename>mw-4.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.0 -7.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-вентилятор 4 -->
+	<Sound>
+		<SignalID>244</SignalID>
+		<Filename>mw-2.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.0 -3.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-вентилятор 3 -->
+	<Sound>
+		<SignalID>245</SignalID>
+		<Filename>mw-3.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.0 3.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-вентилятор 2 -->
+	<Sound>
+		<SignalID>246</SignalID>
+		<Filename>mw-4.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.0 7.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-вентилятор 1 -->
+	<Sound>
+		<SignalID>247</SignalID>
+		<Filename>mw-1.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.0 7.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-компрессор 1 -->
+	<Sound>
+		<SignalID>248</SignalID>
+		<Filename>compr.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 6.5 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-компрессор 2 (в коде реализован вместе с МК1, поэтому управление тем же сигналом) -->
+	<Sound>
+		<SignalID>248</SignalID>
+		<Filename>compr.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -7.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Фазорасщепитель 1 -->
+	<Sound>
+		<SignalID>249</SignalID>
+		<Filename>Fazan.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 3.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Фазорасщепитель 2 (в коде реализован вместе с ФР1, поэтому управление тем же сигналом) -->
+	<Sound>
+		<SignalID>249</SignalID>
+		<Filename>Fazan.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -3.0 2.0</LocalPosition>
+	</Sound>
+
 	<!-- Дальний ряд тумблеров приборной панели машиниста -->
 	<!-- Прожектор яркий - включение -->
 	<Sound>

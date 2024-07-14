@@ -6,7 +6,6 @@
 #include    "vl60pk-signals.h"
 #include    "trac-transformer.h"
 #include    "phase-splitter.h"
-#include    "motor-fan.h"
 #include    "kme-60-044.h"
 #include    "ekg-8g.h"
 #include    "rectifier.h"

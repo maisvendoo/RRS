@@ -4,21 +4,22 @@
 //
 //------------------------------------------------------------------------------
 DCMotorCompressor::DCMotorCompressor(QObject *parent) : Device(parent)
-  , pFL(0.0)
-  , QFL(0.0)
-  , U_power(0.0)
-  , I(0.0)
-  , omega0(157.08)
-  , R(56.9)
-  , cPhi(14.2)
-  , J(2.0)
-  , Mxx(50.0)
-  , K_pressure(0.0061)
-  , K_flow(0.02)
-  , is_powered(false)
-  , soundName("Motor_Compressor")
-  , reg_sound_by_on_off(false)
-  , reg_sound_by_pitch(false)
+    , pFL(0.0)
+    , QFL(0.0)
+    , U_power(0.0)
+    , U_nom(3000.0)
+    , I(0.0)
+    , omega0(157.08)
+    , R(56.9)
+    , cPhi(14.2)
+    , J(2.0)
+    , Mxx(50.0)
+    , K_pressure(0.0061)
+    , K_flow(0.02)
+    , is_powered(false)
+    , sound_state(sound_state_t())
+    , reg_sound_by_on_off(false)
+    , reg_sound_by_pitch(false)
 {
 
 }
@@ -74,9 +75,9 @@ bool DCMotorCompressor::isPowered() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void DCMotorCompressor::setSoundName(const QString &value)
+sound_state_t DCMotorCompressor::getSoundState() const
 {
-    soundName = value;
+    return sound_state;
 }
 
 //------------------------------------------------------------------------------
@@ -104,20 +105,19 @@ void DCMotorCompressor::preStep(state_vector_t &Y, double t)
 
     QFL = K_flow * pf(K_pressure * Y[0] - pFL);
 
-    bool powered_prev = is_powered;
     is_powered = (U_power > Physics::ZERO);
 
     if (reg_sound_by_on_off)
     {
-        if (is_powered && !powered_prev)
-            emit soundPlay(soundName);
-
-        if (!is_powered && powered_prev)
-            emit soundStop(soundName);
+        sound_state.play = is_powered;
+    }
+    else
+    {
+        sound_state.play = ( (2.0 * Y[0]) >= omega0 ); // (Y[0] / omega0) >= 0.5
     }
 
     if (reg_sound_by_pitch)
-        emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega0));
+        sound_state.pitch = static_cast<float>(Y[0] / omega0);
 }
 
 //------------------------------------------------------------------------------
@@ -129,9 +129,11 @@ void DCMotorCompressor::ode_system(const state_vector_t &Y,
 {
     Q_UNUSED(t)
 
-    I = (U_power - cPhi * Y[0]) / R;
+    double c_phi = cPhi * sqrt(U_power / U_nom);
 
-    double Ma = cPhi * I;
+    I = (U_power - c_phi * Y[0]) / R;
+
+    double Ma = c_phi * I;
 
     double Mr = Physics::fricForce(Mxx, 0.1 * Y[0]);
 
@@ -145,6 +147,7 @@ void DCMotorCompressor::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
+    cfg.getDouble(secName, "Unom", U_nom);
     cfg.getDouble(secName, "omega0", omega0);
     cfg.getDouble(secName, "R", R);
     cfg.getDouble(secName, "cPhi", cPhi);
@@ -154,7 +157,6 @@ void DCMotorCompressor::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "K_pressure", K_pressure);
     cfg.getDouble(secName, "K_flow", K_flow);
 
-    cfg.getString(secName, "SoundName", soundName);
     cfg.getBool(secName, "RegulateSoundByOnOff", reg_sound_by_on_off);
     cfg.getBool(secName, "RegulateSoundByPitch", reg_sound_by_pitch);
 }

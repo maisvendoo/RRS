@@ -1,21 +1,18 @@
-#include    "motor-compressor-ac.h"
+#include    "motor-fan-ac.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ACMotorCompressor::ACMotorCompressor(QObject *parent) : Device(parent)
-    , pFL(0.0)
-    , QFL(0.0)
+ACMotorFan::ACMotorFan(QObject *parent) : Device(parent)
     , U_power(0.0)
-    , U_nom(380.0)
-    , omega0(157.08)
-    , Mmax(455.8)
-    , s_kr(0.154)
-    , J(2.0)
-    , Mxx(50.0)
-    , K_pressure(0.0077)
-    , K_flow(0.02)
+    , U_nom(380.0)//
+    , omega0(157.08)//
+    , Mmax(611.5)//
+    , s_kr(0.08)//
+    , J(2.0)//
+    , kf(0.0154)//
     , is_powered(false)
+    , is_ready(false)
     , sound_state(sound_state_t())
     , reg_sound_by_on_off(false)
     , reg_sound_by_pitch(false)
@@ -26,7 +23,7 @@ ACMotorCompressor::ACMotorCompressor(QObject *parent) : Device(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ACMotorCompressor::~ACMotorCompressor()
+ACMotorFan::~ACMotorFan()
 {
 
 }
@@ -34,23 +31,7 @@ ACMotorCompressor::~ACMotorCompressor()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ACMotorCompressor::setFLpressure(double value)
-{
-    pFL = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double ACMotorCompressor::getFLflow() const
-{
-    return QFL;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ACMotorCompressor::setPowerVoltage(double value)
+void ACMotorFan::setPowerVoltage(double value)
 {
     U_power = value;
 }
@@ -58,7 +39,7 @@ void ACMotorCompressor::setPowerVoltage(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ACMotorCompressor::isPowered() const
+bool ACMotorFan::isPowered() const
 {
     return is_powered;
 }
@@ -66,7 +47,15 @@ bool ACMotorCompressor::isPowered() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t ACMotorCompressor::getSoundState() const
+bool ACMotorFan::isReady() const
+{
+    return is_ready;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t ACMotorFan::getSoundState() const
 {
     return sound_state;
 }
@@ -74,7 +63,7 @@ sound_state_t ACMotorCompressor::getSoundState() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ACMotorCompressor::RegulateSoundByOnOff(bool value)
+void ACMotorFan::RegulateSoundByOnOff(bool value)
 {
     reg_sound_by_on_off = value;
 }
@@ -82,7 +71,7 @@ void ACMotorCompressor::RegulateSoundByOnOff(bool value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ACMotorCompressor::RegulateSoundByPitch(bool value)
+void ACMotorFan::RegulateSoundByPitch(bool value)
 {
     reg_sound_by_pitch = value;
 }
@@ -90,13 +79,12 @@ void ACMotorCompressor::RegulateSoundByPitch(bool value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ACMotorCompressor::preStep(state_vector_t &Y, double t)
+void ACMotorFan::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    QFL = K_flow * pf(K_pressure * Y[0] - pFL);
-
     is_powered = (U_power > 0.9 * U_nom);
+    is_ready = (Y[0] > 0.9 * omega0);
 
     if (reg_sound_by_on_off)
     {
@@ -114,7 +102,7 @@ void ACMotorCompressor::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ACMotorCompressor::ode_system(const state_vector_t &Y,
+void ACMotorFan::ode_system(const state_vector_t &Y,
                                  state_vector_t &dYdt,
                                  double t)
 {
@@ -129,7 +117,8 @@ void ACMotorCompressor::ode_system(const state_vector_t &Y,
     // Расчитываем электромагнитный момент (формула Клосса)
     double Ma = 2 * M_maximal / ( s / s_kr + s_kr / s );
 
-    double Mr = Physics::fricForce(Mxx, 0.1 * Y[0]);
+    // Рассчитываем аэродинамический момент сопротивления
+    double Mr = kf * Y[0] * Y[0] * Physics::sign(Y[0]);
 
     dYdt[0] = (Ma - Mr) / J;
 }
@@ -137,7 +126,7 @@ void ACMotorCompressor::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ACMotorCompressor::load_config(CfgReader &cfg)
+void ACMotorFan::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
@@ -146,10 +135,7 @@ void ACMotorCompressor::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "Mmax", Mmax);
     cfg.getDouble(secName, "s_kr", s_kr);
     cfg.getDouble(secName, "J", J);
-    cfg.getDouble(secName, "Mxx", Mxx);
-
-    cfg.getDouble(secName, "K_pressure", K_pressure);
-    cfg.getDouble(secName, "K_flow", K_flow);
+    cfg.getDouble(secName, "kf", kf);
 
     cfg.getBool(secName, "RegulateSoundByOnOff", reg_sound_by_on_off);
     cfg.getBool(secName, "RegulateSoundByPitch", reg_sound_by_pitch);

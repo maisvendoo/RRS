@@ -10,6 +10,29 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_SVISTOK] = horn->getSvistokSound().createSoundSignal();
     analogSignal[SOUND_TIFON] = horn->getTifonSound().createSoundSignal();
 
+    // Токоприёмники
+    analogSignal[SOUND_PANT_BWD_UP] = pantographs[1]->getSoundUp().createSoundSignal();
+    analogSignal[SOUND_PANT_BWD_DOWN] = pantographs[1]->getSoundDown().createSoundSignal();
+    analogSignal[SOUND_PANT_FWD_UP] = pantographs[0]->getSoundUp().createSoundSignal();
+    analogSignal[SOUND_PANT_FWD_DOWN] = pantographs[0]->getSoundDown().createSoundSignal();
+    // Главный выключатель
+    analogSignal[SOUND_GV_ON] = main_switch->getSoundOn().createSoundSignal();
+    analogSignal[SOUND_GV_OFF] = main_switch->getSoundOff().createSoundSignal();
+    // Трансформатор
+    analogSignal[SOUND_TRANSFORMER] = trac_trans->getSoundState().createSoundSignal();
+
+    // Мотор-вентиляторы
+    analogSignal[SOUND_FAN6] = motor_fans[MV6]->getSoundState().createSoundSignal();
+    analogSignal[SOUND_FAN5] = motor_fans[MV5]->getSoundState().createSoundSignal();
+    analogSignal[SOUND_FAN4] = motor_fans[MV4]->getSoundState().createSoundSignal();
+    analogSignal[SOUND_FAN3] = motor_fans[MV3]->getSoundState().createSoundSignal();
+    analogSignal[SOUND_FAN2] = motor_fans[MV2]->getSoundState().createSoundSignal();
+    analogSignal[SOUND_FAN1] = motor_fans[MV1]->getSoundState().createSoundSignal();
+    // Мотор-компрессор
+    analogSignal[SOUND_COMPR] = motor_compressor->getSoundState().createSoundSignal();
+    // Фазорасщепитель
+    analogSignal[SOUND_PHASESPLITTER] = phase_spliter->getSoundState().createSoundSignal();
+
     // Дальний ряд тумблеров приборной панели машиниста
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_ON] = proj2_tumbler.getSoundOn().createSoundSignal();
 //    analogSignal[SOUND_TUMBLER_PROJECTOR1_ON] = proj1_tumbler.getSoundOn().createSoundSignal();

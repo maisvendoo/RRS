@@ -4,19 +4,16 @@
 // Конструктор класса
 //------------------------------------------------------------------------------
 Pantograph::Pantograph(QObject *parent) : Device(parent)
-  , Uks(0.0)
-  , Uout(0.0)
-  , state(false)
-  , old_state(false)
-  , max_height(1.0)
-  , motion_time(4.0)
-  , current_kind_in(0)
-  , current_kind_out(0)
-  , is_up(false)
-  , is_down(true)
-
+    , Uks(0.0)
+    , Uout(0.0)
+    , max_height(1.0)
+    , motion_time(4.0)
+    , current_kind_in(0)
+    , current_kind_out(0)
+    , is_up(false)
+    , is_down(true)
 {
-
+    ref_state.reset();
 }
 
 //------------------------------------------------------------------------------
@@ -32,8 +29,14 @@ Pantograph::~Pantograph()
 //------------------------------------------------------------------------------
 void Pantograph::setState(bool state)
 {
-    old_state = this->state;
-    this->state = state;
+    if (state)
+    {
+        ref_state.set();
+    }
+    else
+    {
+        ref_state.reset();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -92,6 +95,22 @@ bool Pantograph::isDown() const
     return is_down;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Pantograph::getSoundUp() const
+{
+    return ref_state.getSoundOn();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Pantograph::getSoundDown() const
+{
+    return ref_state.getSoundOff();
+}
+
 //----------------------------------------------------------------------------
 // Предварительный шаг
 //----------------------------------------------------------------------------
@@ -99,14 +118,6 @@ void Pantograph::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
     Q_UNUSED(Y)
-
-    if (state != old_state)
-    {
-        if (state)
-            emit soundPlay("Pantograph_Up");
-        else
-            emit soundPlay("Pantograph_Down");
-    }
 
     double level = 0.999;
 
@@ -126,7 +137,7 @@ void Pantograph::ode_system(const state_vector_t &Y, state_vector_t &dYdt, doubl
 {
     Q_UNUSED(t)
 
-    double ref_height = static_cast<double>(state) * max_height;
+    double ref_height = static_cast<double>(ref_state.getState()) * max_height;
 
     dYdt[0] = 3.0 * (ref_height - Y[0]) / motion_time;
 }

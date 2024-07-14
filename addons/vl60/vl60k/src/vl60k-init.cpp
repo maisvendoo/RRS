@@ -11,7 +11,6 @@ void VL60k::initPantographs(const QString &modules_dir, const QString &custom_cf
     {
         pantographs[i] = new Pantograph();
         pantographs[i]->read_config("pantograph", custom_cfg_dir);
-        connect(pantographs[i], &Pantograph::soundPlay, this, &VL60k::soundPlay);
     }
 }
 
@@ -24,7 +23,6 @@ void VL60k::initHighVoltageScheme(const QString &modules_dir, const QString &cus
 
     main_switch = new ProtectiveDevice();
     main_switch->read_config("main-switch", custom_cfg_dir);
-    connect(main_switch, &ProtectiveDevice::soundPlay, this, &VL60k::soundPlay);
 
     gauge_KV_ks = new Oscillator();
     gauge_KV_ks->read_config("oscillator");
@@ -43,15 +41,11 @@ void VL60k::initSupplyMachines(const QString &modules_dir, const QString &custom
 
     phase_spliter = new PhaseSplitter();
     phase_spliter->read_config("phase-splitter", custom_cfg_dir);
-    connect(phase_spliter, &PhaseSplitter::soundPlay, this, &VL60k::soundPlay);
-    connect(phase_spliter, &PhaseSplitter::soundStop, this, &VL60k::soundStop);
 
     for (size_t i = 0; i < motor_fans.size(); ++i)
     {
-        motor_fans[i] = new MotorFan(i + 1);
-        //connect(motor_fans[i], &MotorFan::soundSetPitch, this, &VL60pk::soundSetPitch);
-        connect(motor_fans[i], &MotorFan::soundPlay, this, &VL60k::soundPlay);
-        connect(motor_fans[i], &MotorFan::soundStop, this, &VL60k::soundStop);
+        motor_fans[i] = new ACMotorFan();
+        motor_fans[i]->read_config("motor-fan-ac");
     }
 }
 

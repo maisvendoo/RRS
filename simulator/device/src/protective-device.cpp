@@ -18,11 +18,8 @@ ProtectiveDevice::ProtectiveDevice(QObject *parent) : Device(parent)
   , p0(0.5)
   , p1(0.3)
   , lamp_state(1.0f)
-  , state(0)
-  , old_state(0)
-
 {
-
+    state.reset();
 }
 
 //------------------------------------------------------------------------------
@@ -81,9 +78,28 @@ float ProtectiveDevice::getLampState() const
     return lamp_state;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ProtectiveDevice::getState() const
 {
-    return static_cast<bool>(lamp_state);
+    return state.getState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t ProtectiveDevice::getSoundOn() const
+{
+    return state.getSoundOn();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t ProtectiveDevice::getSoundOff() const
+{
+    return state.getSoundOff();
 }
 
 //------------------------------------------------------------------------------
@@ -94,18 +110,15 @@ void ProtectiveDevice::preStep(state_vector_t &Y, double t)
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    old_state = state;
-    state = static_cast<int>(hs_p(Y[0] - 1.0));
-
-    lamp_state = 1 - state;
-
-    if (state != old_state)
+    if (Y[0] >= 1.0)
     {
-        if (state == 1)
-            emit soundPlay("GV_On");
-
-        if (state == 0)
-            emit soundPlay("GV_Off");
+        state.set();
+        lamp_state = 0.0f;
+    }
+    else
+    {
+        state.reset();
+        lamp_state = 1.0f;
     }
 }
 

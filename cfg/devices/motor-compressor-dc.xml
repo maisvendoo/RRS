@@ -5,6 +5,9 @@
 		<SubStepNum>1</SubStepNum>
 		<Solver>euler</Solver>
 
+		<!-- Номинальное напряжение -->
+		<U_nom>3000.0</U_nom>
+
 		<!-- Номинальная угловая скорость -->
 		<omega0>192.0</omega0>
 
@@ -26,7 +29,6 @@
 		<!-- Коэффициент потока в питательную магистраль -->
 		<K_flow>0.02</K_flow>
 
-		<SoundName>Motor_Compressor</SoundName>
 		<RegulateSoundByOnOff>0</RegulateSoundByOnOff>
 		<RegulateSoundByPitch>1</RegulateSoundByPitch>
 

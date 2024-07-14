@@ -15,9 +15,6 @@ void VL60k::initPneumoSupply(const QString &modules_dir, const QString &custom_c
     // Мотор-компрессор
     motor_compressor = new ACMotorCompressor();
     motor_compressor->read_config("motor-compressor-ac");
-    connect(motor_compressor, &ACMotorCompressor::soundPlay, this, &VL60k::soundPlay);
-    connect(motor_compressor, &ACMotorCompressor::soundStop, this, &VL60k::soundStop);
-    connect(motor_compressor, &ACMotorCompressor::soundSetPitch, this, &VL60k::soundSetPitch);
 
     // Главный резервуар
     double volume_main = static_cast<double>(MAIN_RESERVOIR_VOLUME) / 1000.0;

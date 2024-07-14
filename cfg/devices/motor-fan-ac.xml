@@ -12,25 +12,19 @@
 		<omega0>157.08</omega0>
 
 		<!-- Максимальный момент -->
-		<Mmax>455.8</Mmax>
+		<Mmax>611.5</Mmax>
 
 		<!-- Критическое скольжение -->
-		<s_kr>0.154</s_kr>
+		<s_kr>0.08</s_kr>
 
 		<!-- Момент инерции ротора -->
 		<J>2.0</J>
 
-		<!-- Момент сопротивления вращению ротора -->
-		<Mxx>50.0</Mxx>
+		<!-- Коэффициент аэродинамического сопротивления вращению ротора -->
+		<kf>0.0154</kf>
 
-		<!-- Коэффициент перехода от скорости ротора к производимому давлению -->
-		<K_pressure>0.0077</K_pressure>
-
-		<!-- Коэффициент потока в питательную магистраль -->
-		<K_flow>0.02</K_flow>
-
-		<RegulateSoundByOnOff>0</RegulateSoundByOnOff>
-		<RegulateSoundByPitch>1</RegulateSoundByPitch>
+		<RegulateSoundByOnOff>1</RegulateSoundByOnOff>
+		<RegulateSoundByPitch>0</RegulateSoundByPitch>
 
 	</Device>
 </Config>

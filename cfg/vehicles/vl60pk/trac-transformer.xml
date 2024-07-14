@@ -1,248 +1,248 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Device>
-        <Order>0</Order>
-        <SubStepNum>1</SubStepNum>
-        <Solver>euler</Solver>
-    </Device>
+	<Device>
+		<Order>0</Order>
+		<SubStepNum>1</SubStepNum>
+		<Solver>euler</Solver>
+	</Device>
 
 
-    <Position>
-        <Number>0</Number>
-        <Name>0</Name>
-        <Voltage>0</Voltage>
-    </Position>
+	<Position>
+		<Number>0</Number>
+		<Name>0</Name>
+		<Voltage>0</Voltage>
+	</Position>
 
-    <!-- 1-5 -->
-    <Position>
-        <Number>1</Number>
-        <Name>1</Name>
-        <Voltage>42.0</Voltage>
-    </Position>
+	<!-- 1-5 -->
+	<Position>
+		<Number>1</Number>
+		<Name>1</Name>
+		<Voltage>42.0</Voltage>
+	</Position>
 
-    <Position>
-        <Number>2</Number>
-        <Name>2</Name>
-        <Voltage>105</Voltage>
-    </Position>
+	<Position>
+		<Number>2</Number>
+		<Name>2</Name>
+		<Voltage>105</Voltage>
+	</Position>
 
-    <Position>
-        <Number>3</Number>
-        <Name>3</Name>
-        <Voltage>168</Voltage>
-    </Position>
+	<Position>
+		<Number>3</Number>
+		<Name>3</Name>
+		<Voltage>168</Voltage>
+	</Position>
 
-    <Position>
-        <Number>4</Number>
-        <Name>4</Name>
-        <Voltage>231</Voltage>
-    </Position>
+	<Position>
+		<Number>4</Number>
+		<Name>4</Name>
+		<Voltage>231</Voltage>
+	</Position>
 
-    <Position>
-        <Number>5</Number>
-        <Name>5</Name>
-        <Voltage>294.0</Voltage>
-    </Position>
+	<Position>
+		<Number>5</Number>
+		<Name>5</Name>
+		<Voltage>294.0</Voltage>
+	</Position>
 
-    <!-- 6-9 -->
-    <Position>
-        <Number>6</Number>
-        <Name>6</Name>
-        <Voltage>357.25</Voltage>
-    </Position>
+	<!-- 6-9 -->
+	<Position>
+		<Number>6</Number>
+		<Name>6</Name>
+		<Voltage>357.25</Voltage>
+	</Position>
 
-    <Position>
-        <Number>7</Number>
-        <Name>7</Name>
-        <Voltage>420.5</Voltage>
-    </Position>
+	<Position>
+		<Number>7</Number>
+		<Name>7</Name>
+		<Voltage>420.5</Voltage>
+	</Position>
 
-    <Position>
-        <Number>8</Number>
-        <Name>8</Name>
-        <Voltage>483.75</Voltage>
-    </Position>
+	<Position>
+		<Number>8</Number>
+		<Name>8</Name>
+		<Voltage>483.75</Voltage>
+	</Position>
 
-    <Position>
-        <Number>9</Number>
-        <Name>9</Name>
-        <Voltage>547</Voltage>
-    </Position>
+	<Position>
+		<Number>9</Number>
+		<Name>9</Name>
+		<Voltage>547</Voltage>
+	</Position>
 
-    <!-- 10-13 -->
-    <Position>
-        <Number>10</Number>
-        <Name>10</Name>
-        <Voltage>610</Voltage>
-    </Position>
+	<!-- 10-13 -->
+	<Position>
+		<Number>10</Number>
+		<Name>10</Name>
+		<Voltage>610</Voltage>
+	</Position>
 
-    <Position>
-        <Number>11</Number>
-        <Name>11</Name>
-        <Voltage>673</Voltage>
-    </Position>
+	<Position>
+		<Number>11</Number>
+		<Name>11</Name>
+		<Voltage>673</Voltage>
+	</Position>
 
-    <Position>
-        <Number>12</Number>
-        <Name>12</Name>
-        <Voltage>736</Voltage>
-    </Position>
+	<Position>
+		<Number>12</Number>
+		<Name>12</Name>
+		<Voltage>736</Voltage>
+	</Position>
 
-    <Position>
-        <Number>13</Number>
-        <Name>13</Name>
-        <Voltage>799</Voltage>
-    </Position>
+	<Position>
+		<Number>13</Number>
+		<Name>13</Name>
+		<Voltage>799</Voltage>
+	</Position>
 
-    <!-- 14-17 -->
-    <Position>
-        <Number>14</Number>
-        <Name>14</Name>
-        <Voltage>862</Voltage>
-    </Position>
+	<!-- 14-17 -->
+	<Position>
+		<Number>14</Number>
+		<Name>14</Name>
+		<Voltage>862</Voltage>
+	</Position>
 
-    <Position>
-        <Number>15</Number>
-        <Name>15</Name>
-        <Voltage>925</Voltage>
-    </Position>
+	<Position>
+		<Number>15</Number>
+		<Name>15</Name>
+		<Voltage>925</Voltage>
+	</Position>
 
-    <Position>
-        <Number>16</Number>
-        <Name>16</Name>
-        <Voltage>995</Voltage>
-    </Position>
+	<Position>
+		<Number>16</Number>
+		<Name>16</Name>
+		<Voltage>995</Voltage>
+	</Position>
 
-    <Position>
-        <Number>17</Number>
-        <Name>17</Name>
-        <Voltage>1051</Voltage>
-    </Position>
+	<Position>
+		<Number>17</Number>
+		<Name>17</Name>
+		<Voltage>1051</Voltage>
+	</Position>
 
-    <!-- 18-21 -->
-    <Position>
-        <Number>18</Number>
-        <Name>П1</Name>
-        <Voltage>1051</Voltage>
-    </Position>
+	<!-- 18-21 -->
+	<Position>
+		<Number>18</Number>
+		<Name>П1</Name>
+		<Voltage>1051</Voltage>
+	</Position>
 
-    <Position>
-        <Number>19</Number>
-        <Name>П2</Name>
-        <Voltage>1051</Voltage>
-    </Position>
+	<Position>
+		<Number>19</Number>
+		<Name>П2</Name>
+		<Voltage>1051</Voltage>
+	</Position>
 
-    <Position>
-        <Number>20</Number>
-        <Name>П3</Name>
-        <Voltage>1051</Voltage>
-    </Position>
+	<Position>
+		<Number>20</Number>
+		<Name>П3</Name>
+		<Voltage>1051</Voltage>
+	</Position>
 
-    <Position>
-        <Number>21</Number>
-        <Name>П4</Name>
-        <Voltage>1051</Voltage>
-    </Position>
+	<Position>
+		<Number>21</Number>
+		<Name>П4</Name>
+		<Voltage>1051</Voltage>
+	</Position>
 
-    <!-- 22-25 -->
-    <Position>
-        <Number>22</Number>
-        <Name>18</Name>
-        <Voltage>1114</Voltage>
-    </Position>
+	<!-- 22-25 -->
+	<Position>
+		<Number>22</Number>
+		<Name>18</Name>
+		<Voltage>1114</Voltage>
+	</Position>
 
-    <Position>
-        <Number>23</Number>
-        <Name>19</Name>
-        <Voltage>1177</Voltage>
-    </Position>
+	<Position>
+		<Number>23</Number>
+		<Name>19</Name>
+		<Voltage>1177</Voltage>
+	</Position>
 
-    <Position>
-        <Number>24</Number>
-        <Name>20</Name>
-        <Voltage>1240</Voltage>
-    </Position>
+	<Position>
+		<Number>24</Number>
+		<Name>20</Name>
+		<Voltage>1240</Voltage>
+	</Position>
 
-    <Position>
-        <Number>25</Number>
-        <Name>21</Name>
-        <Voltage>1303</Voltage>
-    </Position>
+	<Position>
+		<Number>25</Number>
+		<Name>21</Name>
+		<Voltage>1303</Voltage>
+	</Position>
 
-    <!-- 26-29 -->
-    <Position>
-        <Number>26</Number>
-        <Name>22</Name>
-        <Voltage>1366.25</Voltage>
-    </Position>
+	<!-- 26-29 -->
+	<Position>
+		<Number>26</Number>
+		<Name>22</Name>
+		<Voltage>1366.25</Voltage>
+	</Position>
 
-    <Position>
-        <Number>27</Number>
-        <Name>23</Name>
-        <Voltage>1429.5</Voltage>
-    </Position>
+	<Position>
+		<Number>27</Number>
+		<Name>23</Name>
+		<Voltage>1429.5</Voltage>
+	</Position>
 
-    <Position>
-        <Number>28</Number>
-        <Name>24</Name>
-        <Voltage>1492.75</Voltage>
-    </Position>
+	<Position>
+		<Number>28</Number>
+		<Name>24</Name>
+		<Voltage>1492.75</Voltage>
+	</Position>
 
-    <Position>
-        <Number>29</Number>
-        <Name>25</Name>
-        <Voltage>1556</Voltage>
-    </Position>
+	<Position>
+		<Number>29</Number>
+		<Name>25</Name>
+		<Voltage>1556</Voltage>
+	</Position>
 
 
-    <!-- 30-33 -->
-    <Position>
-        <Number>30</Number>
-        <Name>26</Name>
-        <Voltage>1619</Voltage>
-    </Position>
+	<!-- 30-33 -->
+	<Position>
+		<Number>30</Number>
+		<Name>26</Name>
+		<Voltage>1619</Voltage>
+	</Position>
 
-    <Position>
-        <Number>31</Number>
-        <Name>27</Name>
-        <Voltage>1682</Voltage>
-    </Position>
+	<Position>
+		<Number>31</Number>
+		<Name>27</Name>
+		<Voltage>1682</Voltage>
+	</Position>
 
-    <Position>
-        <Number>32</Number>
-        <Name>28</Name>
-        <Voltage>1745</Voltage>
-    </Position>
+	<Position>
+		<Number>32</Number>
+		<Name>28</Name>
+		<Voltage>1745</Voltage>
+	</Position>
 
-    <Position>
-        <Number>33</Number>
-        <Name>29</Name>
-        <Voltage>1808</Voltage>
-    </Position>
+	<Position>
+		<Number>33</Number>
+		<Name>29</Name>
+		<Voltage>1808</Voltage>
+	</Position>
 
-    <!-- 34-37 -->
-    <Position>
-        <Number>34</Number>
-        <Name>30</Name>
-        <Voltage>1871</Voltage>
-    </Position>
+	<!-- 34-37 -->
+	<Position>
+		<Number>34</Number>
+		<Name>30</Name>
+		<Voltage>1871</Voltage>
+	</Position>
 
-    <Position>
-        <Number>35</Number>
-        <Name>31</Name>
-        <Voltage>1934</Voltage>
-    </Position>
+	<Position>
+		<Number>35</Number>
+		<Name>31</Name>
+		<Voltage>1934</Voltage>
+	</Position>
 
-    <Position>
-        <Number>36</Number>
-        <Name>32</Name>
-        <Voltage>1977</Voltage>
-    </Position>
+	<Position>
+		<Number>36</Number>
+		<Name>32</Name>
+		<Voltage>1977</Voltage>
+	</Position>
 
-    <Position>
-        <Number>37</Number>
-        <Name>33</Name>
-        <Voltage>2060</Voltage>
-    </Position>
+	<Position>
+		<Number>37</Number>
+		<Name>33</Name>
+		<Voltage>2060</Voltage>
+	</Position>
 
 </Config>
