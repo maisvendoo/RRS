@@ -7,11 +7,8 @@ Trigger::Trigger(QObject *parent) : QObject(parent)
     , state(false)
     , sound_on(sound_state_t())
     , sound_off(sound_state_t())
-    , sound_on_reset(new Timer(0.2, false))
-    , sound_off_reset(new Timer(0.2, false))
 {
-    connect(sound_on_reset, &Timer::process, this, &Trigger::slotSoundOnReset);
-    connect(sound_off_reset, &Timer::process, this, &Trigger::slotSoundOffReset);
+
 }
 
 //------------------------------------------------------------------------------
@@ -25,14 +22,6 @@ Trigger::~Trigger()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trigger::step(double t, double dt)
-{
-    sound_on_reset->step(t, dt);
-    sound_off_reset->step(t, dt);
-}
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Trigger::set()
 {
     if (state)
@@ -40,7 +29,7 @@ void Trigger::set()
 
     state = true;
     sound_on.play = true;
-    sound_on_reset->start();
+    sound_off.play = false;
 }
 
 //------------------------------------------------------------------------------
@@ -53,7 +42,7 @@ void Trigger::reset()
 
     state = false;
     sound_off.play = true;
-    sound_off_reset->start();
+    sound_on.play = false;
 }
 
 //------------------------------------------------------------------------------
@@ -78,22 +67,4 @@ sound_state_t Trigger::getSoundOn() const
 sound_state_t Trigger::getSoundOff() const
 {
     return sound_off;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Trigger::slotSoundOnReset()
-{
-    sound_on_reset->stop();
-    sound_on.play = false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Trigger::slotSoundOffReset()
-{
-    sound_off_reset->stop();
-    sound_off.play = false;
 }

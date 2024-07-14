@@ -5,7 +5,6 @@
 
 #include    "device-export.h"
 #include    "sound-signal.h"
-#include    "timer.h"
 
 class DEVICE_EXPORT  Trigger : public QObject
 {
@@ -16,9 +15,6 @@ public:
     Trigger(QObject *parent = Q_NULLPTR);
 
     ~Trigger();
-
-    /// Step (excecuted in integraion step)
-    void step(double t, double dt);
 
     void set();
 
@@ -41,14 +37,6 @@ private:
 
     /// Состояние звука отключения
     sound_state_t sound_off;
-
-    Timer *sound_on_reset;
-    Timer *sound_off_reset;
-
-private slots:
-
-    void slotSoundOnReset();
-    void slotSoundOffReset();
 };
 
 #endif // TRIGGER_H
