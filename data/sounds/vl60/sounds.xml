@@ -24,6 +24,54 @@
 		<LocalPosition>0.8 8.6 4.6</LocalPosition>
 	</Sound>
 
+	<!-- Реверсор -->
+	<Sound>
+		<SignalID>203</SignalID>
+		<Filename>revers.wav</Filename>
+		<InitVolume>100</InitVolume>
+		<MaxVolume>100</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.3 9.0 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Реверсор (второй звук, для работы по очереди с первым) -->
+	<Sound>
+		<SignalID>204</SignalID>
+		<Filename>revers.wav</Filename>
+		<InitVolume>100</InitVolume>
+		<MaxVolume>100</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.3 9.0 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Контроллер машиниста -->
+	<Sound>
+		<SignalID>205</SignalID>
+		<Filename>kme-60-044.wav</Filename>
+		<InitVolume>100</InitVolume>
+		<MaxVolume>100</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.3 8.9 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Контроллер машиниста (второй звук, для работы по очереди с первым) -->
+	<Sound>
+		<SignalID>206</SignalID>
+		<Filename>kme-60-044.wav</Filename>
+		<InitVolume>100</InitVolume>
+		<MaxVolume>100</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.3 8.9 2.6</LocalPosition>
+	</Sound>
+
 	<!-- Подъём заднего токоприёмника -->
 	<Sound>
 		<SignalID>234</SignalID>

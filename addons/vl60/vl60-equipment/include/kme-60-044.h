@@ -24,6 +24,15 @@ public:
 
     void setReversPos(int pos);
 
+    enum {
+        NUM_SOUNDS = 4,
+        REVERS_CHANGE_POS_1 = 0,
+        REVERS_CHANGE_POS_2 = 1,
+        MAIN_CHANGE_POS_1 = 2,
+        MAIN_CHANGE_POS_2 = 3,
+    };
+    sound_state_t getSound(size_t idx);
+
 private:
 
     /// Состояние главного вала
@@ -39,6 +48,11 @@ private:
 
     /// Состояние контроллера
     km_state_t  state;
+
+    /// Очерёдность и состояние звуков
+    std::array <sound_state_t, 4> sounds;
+    bool is_main_1_or_2;
+    bool is_revers_1_or_2;
 
     enum
     {
@@ -58,6 +72,9 @@ private:
     void load_config(CfgReader &cfg);
 
     void stepKeysControl(double t, double dt);
+
+    void soundMainChangePos();
+    void soundReversChangePos();
 
 private slots:
 

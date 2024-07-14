@@ -9,7 +9,11 @@ ControllerKME_60_044::ControllerKME_60_044(QObject *parent)
     , revers_pos(REVERS_ZERO)
     , main_handle_pos(0.0f)
     , revers_handle_pos(0.0f)
+    , is_main_1_or_2(false)
+    , is_revers_1_or_2(false)
 {
+    std::fill(sounds.begin(), sounds.end(), sound_state_t());
+
     incMainPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
     connect(incMainPos, &Timer::process, this, &ControllerKME_60_044::incMain);
 
@@ -66,6 +70,16 @@ void ControllerKME_60_044::setReversPos(int pos)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t ControllerKME_60_044::getSound(size_t idx)
+{
+    if (idx < sounds.size())
+        return sounds[idx];
+    return sound_state_t();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(Y)
@@ -87,8 +101,6 @@ void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
         revers_handle_pos = static_cast<float>(revers_pos - 2);
     else
         revers_handle_pos = static_cast<float>(revers_pos - 1) / 4.0f;
-//    DebugMsg = QString(" field-loosen-pos: %1")
-//            .arg(state.field_loosen_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -134,7 +146,13 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     if (getKeyState(KEY_D))
     {
         if (getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R))
-            main_pos = POS_ZERO;
+        {
+            if (main_pos != POS_ZERO)
+            {
+                main_pos = POS_ZERO;
+                soundMainChangePos();
+            }
+        }
         else
         {
             if (!decMainPos->isStarted())
@@ -180,6 +198,46 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ControllerKME_60_044::soundMainChangePos()
+{
+    // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
+    if (is_main_1_or_2)
+    {
+        sounds[MAIN_CHANGE_POS_1].play = true;
+        sounds[MAIN_CHANGE_POS_2].play = false;
+        is_main_1_or_2 = false;
+    }
+    else
+    {
+        sounds[MAIN_CHANGE_POS_2].play = true;
+        sounds[MAIN_CHANGE_POS_1].play = false;
+        is_main_1_or_2 = true;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ControllerKME_60_044::soundReversChangePos()
+{
+    // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
+    if (is_revers_1_or_2)
+    {
+        sounds[MAIN_CHANGE_POS_1].play = true;
+        sounds[MAIN_CHANGE_POS_2].play = false;
+        is_revers_1_or_2 = false;
+    }
+    else
+    {
+        sounds[MAIN_CHANGE_POS_2].play = true;
+        sounds[MAIN_CHANGE_POS_1].play = false;
+        is_revers_1_or_2 = true;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ControllerKME_60_044::incMain()
 {
     if (revers_pos == REVERS_ZERO)
@@ -192,7 +250,7 @@ void ControllerKME_60_044::incMain()
     main_pos = cut(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
 
     if (main_pos_old != main_pos)
-        emit soundPlay("kme_60_044");
+        soundMainChangePos();
 }
 
 //------------------------------------------------------------------------------
@@ -210,7 +268,7 @@ void ControllerKME_60_044::decMain()
     main_pos = cut(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
 
     if (main_pos_old != main_pos)
-        emit soundPlay("kme_60_044");
+        soundMainChangePos();
 }
 
 //------------------------------------------------------------------------------
@@ -228,7 +286,7 @@ void ControllerKME_60_044::incRevers()
     revers_pos = cut(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
 
     if (revers_pos_old != revers_pos)
-        emit soundPlay("revers");
+        soundReversChangePos();
 }
 
 //------------------------------------------------------------------------------
@@ -246,5 +304,5 @@ void ControllerKME_60_044::decRevers()
     revers_pos = cut(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
 
     if (revers_pos_old != revers_pos)
-        emit soundPlay("revers");
+        soundReversChangePos();
 }

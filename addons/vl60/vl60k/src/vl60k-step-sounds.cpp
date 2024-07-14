@@ -11,6 +11,12 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_SVISTOK] = horn->getSvistokSound().createSoundSignal();
     analogSignal[SOUND_TIFON] = horn->getTifonSound().createSoundSignal();
 
+    // Реверсор и контроллер, 2 звука по очереди
+    analogSignal[SOUND_REVERSOR_1] = controller->getSound(ControllerKME_60_044::REVERS_CHANGE_POS_1).createSoundSignal();
+    analogSignal[SOUND_REVERSOR_1] = controller->getSound(ControllerKME_60_044::REVERS_CHANGE_POS_2).createSoundSignal();
+    analogSignal[SOUND_CONTROLLER_1] = controller->getSound(ControllerKME_60_044::MAIN_CHANGE_POS_1).createSoundSignal();
+    analogSignal[SOUND_CONTROLLER_2] = controller->getSound(ControllerKME_60_044::MAIN_CHANGE_POS_2).createSoundSignal();
+
     // Токоприёмники
     analogSignal[SOUND_PANT_BWD_UP] = pantographs[1]->getSoundUp().createSoundSignal();
     analogSignal[SOUND_PANT_BWD_DOWN] = pantographs[1]->getSoundDown().createSoundSignal();
