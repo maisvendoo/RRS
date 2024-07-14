@@ -4,21 +4,24 @@
 //
 //------------------------------------------------------------------------------
 EKG_8G::EKG_8G(QObject *parent) : Device(parent)
-  , position(0)
-  , ref_position(0)
-  , switch_time(1.0)
-  , is_enabled(false)
-  , is_ready(false)
-  , is_LK_allow(false)
-  , is_fix_start(false)
-  , is_fix_off(false)
-  , dir(0)
-  , is_auto(false)
-  , sound_name("")
+    , position(0)
+    , ref_position(0)
+    , switch_time(1.0)
+    , is_enabled(false)
+    , is_ready(false)
+    , is_LK_allow(false)
+    , is_fix_start(false)
+    , is_fix_off(false)
+    , dir(0)
+    , is_auto(false)
+    , is_sound_one_or_auto(NO_SOUND)
+    , is_change_one_1_or_2(false)
+    , is_change_auto_1_or_2(false)
 {
     connect(&pos_switcher, &Timer::process, this, &EKG_8G::slotPosSwitch);
 
     std::fill(is_long_motion.begin(), is_long_motion.end(), false);
+    std::fill(sounds.begin(), sounds.end(), sound_state_t());
 
     is_long_motion[LM_POS0] = true;
     is_long_motion[LM_POS1] = true;
@@ -100,7 +103,7 @@ void EKG_8G::process()
     // Нулевая позиция
     if (km_state.pos_state[POS_ZERO] && (position != 0) && !is_auto)
     {
-        sound_name = "EKG_serv_auto";
+        is_sound_one_or_auto = SOUND_AUTO;
         pos_switcher.start();
         dir = -1;
     }
@@ -108,7 +111,7 @@ void EKG_8G::process()
     // Фиксация пуска
     if (km_state.pos_state[POS_FP])
     {
-        sound_name = "";
+        is_sound_one_or_auto = NO_SOUND;
         is_fix_start = true;
         dir = 1;
     }
@@ -116,7 +119,7 @@ void EKG_8G::process()
     // Ручной пуск
     if (km_state.pos_state[POS_RP] && is_fix_start)
     {
-        sound_name = "EKG_serv_rp";
+        is_sound_one_or_auto = SOUND_ONE;
         is_fix_start = false;
         pos_switcher.start();
     }
@@ -124,7 +127,7 @@ void EKG_8G::process()
     // Фиксация выключения
     if (km_state.pos_state[POS_FV])
     {
-        sound_name = "";
+        is_sound_one_or_auto = NO_SOUND;
         is_fix_off = true;
         dir = -1;
     }
@@ -132,7 +135,7 @@ void EKG_8G::process()
     // Ручное выключение
     if (km_state.pos_state[POS_RV] && is_fix_off)
     {
-        sound_name = "EKG_serv_rp";
+        is_sound_one_or_auto = SOUND_ONE;
         is_fix_off = false;
         pos_switcher.start();
     }
@@ -140,20 +143,30 @@ void EKG_8G::process()
     // Автоматический пуск
     if (km_state.pos_state[POS_AP] && !is_auto)
     {
-        sound_name = "EKG_serv_auto";
+        is_sound_one_or_auto = SOUND_AUTO;
         pos_switcher.start();
         dir = 1;
     }
 
-    // Автоматический пуск
+    // Автоматическое выключение
     if (km_state.pos_state[POS_AV] && !is_auto)
     {
-        sound_name = "EKG_serv_auto";
+        is_sound_one_or_auto = SOUND_AUTO;
         pos_switcher.start();
         dir = -1;
     }
 
     is_auto = km_state.pos_state[POS_AV] || km_state.pos_state[POS_AP] || km_state.pos_state[POS_ZERO];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t EKG_8G::getSound(size_t idx)
+{
+    if (idx < sounds.size())
+        return sounds[idx];
+    return sound_state_t();
 }
 
 //------------------------------------------------------------------------------
@@ -229,10 +242,46 @@ void EKG_8G::slotPosSwitch()
 
     position = cut(position, 0, static_cast<int>(NUM_POSITIONS - 1));
 
+    // Озвучка
     if ( (position != 0) && (position != NUM_POSITIONS - 1) )
-            emit soundPlay(sound_name);
+    {
+        // Звук ручного переключения
+        if (is_sound_one_or_auto == SOUND_ONE)
+        {
+            // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
+            if (is_change_one_1_or_2)
+            {
+                sounds[CHANGE_POS_ONE_1].play = true;
+                sounds[CHANGE_POS_ONE_2].play = false;
+                is_change_one_1_or_2 = false;
+            }
+            else
+            {
+                sounds[CHANGE_POS_ONE_2].play = true;
+                sounds[CHANGE_POS_ONE_1].play = false;
+                is_change_one_1_or_2 = true;
+            }
+        }
+        // Звук автоматического переключения
+        if (is_sound_one_or_auto == SOUND_AUTO)
+        {
+            // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
+            if (is_change_auto_1_or_2)
+            {
+                sounds[CHANGE_POS_AUTO_1].play = true;
+                sounds[CHANGE_POS_AUTO_2].play = false;
+                is_change_auto_1_or_2 = false;
+            }
+            else
+            {
+                sounds[CHANGE_POS_AUTO_2].play = true;
+                sounds[CHANGE_POS_AUTO_1].play = false;
+                is_change_auto_1_or_2 = true;
+            }
+        }
+    }
 
-    // Останавливаемся, если не находимся на переходных позициях
+        // Останавливаемся, если не находимся на переходных позициях
     if ( ( (position < PP_MIN) || (position > PP_MAX) ) && !is_auto )
         pos_switcher.stop();
 }

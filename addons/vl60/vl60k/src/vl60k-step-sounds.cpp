@@ -17,6 +17,12 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_CONTROLLER_1] = controller->getSound(ControllerKME_60_044::MAIN_CHANGE_POS_1).createSoundSignal();
     analogSignal[SOUND_CONTROLLER_2] = controller->getSound(ControllerKME_60_044::MAIN_CHANGE_POS_2).createSoundSignal();
 
+    // Серводвигатель ЭКГ, ручное и автоматическое движение, 2 звука по очереди
+    analogSignal[SOUND_EKG_ONE_1] = main_controller->getSound(EKG_8G::CHANGE_POS_ONE_1).createSoundSignal();
+    analogSignal[SOUND_EKG_ONE_2] = main_controller->getSound(EKG_8G::CHANGE_POS_ONE_2).createSoundSignal();
+    analogSignal[SOUND_EKG_AUTO_1] = main_controller->getSound(EKG_8G::CHANGE_POS_AUTO_1).createSoundSignal();
+    analogSignal[SOUND_EKG_AUTO_2] = main_controller->getSound(EKG_8G::CHANGE_POS_AUTO_2).createSoundSignal();
+
     // Токоприёмники
     analogSignal[SOUND_PANT_BWD_UP] = pantographs[1]->getSoundUp().createSoundSignal();
     analogSignal[SOUND_PANT_BWD_DOWN] = pantographs[1]->getSoundDown().createSoundSignal();

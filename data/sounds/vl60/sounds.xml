@@ -72,6 +72,50 @@
 		<LocalPosition>0.3 8.9 2.6</LocalPosition>
 	</Sound>
 
+	<!-- Серводвигатель ЭКГ авто набор -->
+	<Sound>
+		<SignalID>207</SignalID>
+		<Filename>ekg-8g_auto.wav</Filename>
+		<InitVolume>30</InitVolume>
+		<MaxVolume>30</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Серводвигатель ЭКГ авто набор (второй звук, для работы по очереди с первым) -->
+	<Sound>
+		<SignalID>208</SignalID>
+		<Filename>ekg-8g_auto.wav</Filename>
+		<InitVolume>30</InitVolume>
+		<MaxVolume>30</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Серводвигатель ЭКГ ручной пуск (РП) -->
+	<Sound>
+		<SignalID>209</SignalID>
+		<Filename>ekg-8g_rp.wav</Filename>
+		<InitVolume>30</InitVolume>
+		<MaxVolume>30</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Серводвигатель ЭКГ ручной пуск (РП) (второй звук, для работы по очереди с первым) -->
+	<Sound>
+		<SignalID>210</SignalID>
+		<Filename>ekg-8g_rp.wav</Filename>
+		<InitVolume>30</InitVolume>
+		<MaxVolume>30</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
 	<!-- Подъём заднего токоприёмника -->
 	<Sound>
 		<SignalID>234</SignalID>
