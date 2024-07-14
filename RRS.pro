@@ -22,4 +22,4 @@ SUBDIRS += ./launcher
 SUBDIRS += ./tools/profconv
 SUBDIRS += ./tools/pathconv
 SUBDIRS += ./tools/routeconv
-SUBDIRS += ./routeLODgen
+#SUBDIRS += ./routeLODgen
