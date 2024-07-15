@@ -56,17 +56,17 @@ bool Relay::getContactState(size_t number) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Relay::getSoundOn() const
+sound_state_t Relay::getSoundState(size_t idx) const
 {
-    return hysteresis->getSoundOn();
+    return hysteresis->getSoundState(idx);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Relay::getSoundOff() const
+float Relay::getSoundSignal(size_t idx) const
 {
-    return hysteresis->getSoundOff();
+    return hysteresis->getSoundSignal(idx);
 }
 
 //------------------------------------------------------------------------------

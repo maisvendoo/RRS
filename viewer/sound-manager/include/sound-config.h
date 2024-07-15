@@ -10,7 +10,7 @@
 struct sound_config_t
 {
     ASound  *sound;         ///< OpenAl-источник звука
-    bool    prev_play;      ///< Состояние звука на предыдущем шаге
+    char    prev_state;     ///< Состояние счётчика включений звука на предыдущем шаге
     size_t  signal_id;      ///< Индекс сигнала состояния звука
     float   local_pos_x;    ///< Локальная координата звука по оси X
     float   local_pos_y;    ///< Локальная координата звука по оси Y
@@ -25,7 +25,7 @@ struct sound_config_t
 
     sound_config_t()
         : sound(Q_NULLPTR)
-        , prev_play(false)
+        , prev_state(0)
         , signal_id(0)
         , local_pos_x(0.0f)
         , local_pos_y(0.0f)

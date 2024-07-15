@@ -19,7 +19,7 @@ ProtectiveDevice::ProtectiveDevice(QObject *parent) : Device(parent)
   , p1(0.3)
   , lamp_state(1.0f)
 {
-    state.reset();
+
 }
 
 //------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ bool ProtectiveDevice::getState() const
 //------------------------------------------------------------------------------
 sound_state_t ProtectiveDevice::getSoundOn() const
 {
-    return state.getSoundOn();
+    return state.getSoundState(Trigger::ON_SOUND);
 }
 
 //------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ sound_state_t ProtectiveDevice::getSoundOn() const
 //------------------------------------------------------------------------------
 sound_state_t ProtectiveDevice::getSoundOff() const
 {
-    return state.getSoundOff();
+    return state.getSoundState(Trigger::OFF_SOUND);
 }
 
 //------------------------------------------------------------------------------

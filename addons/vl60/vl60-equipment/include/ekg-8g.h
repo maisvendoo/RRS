@@ -31,17 +31,15 @@ public:
     bool isLKallow() const;
 
     enum {
-        NUM_SOUNDS = 4,
-        CHANGE_POS_ONE_1 = 0,
-        CHANGE_POS_ONE_2 = 1,
-        CHANGE_POS_AUTO_1 = 2,
-        CHANGE_POS_AUTO_2 = 3,
-
-        NO_SOUND = 0,
-        SOUND_ONE = 1,
-        SOUND_AUTO = 2
+        NUM_SOUNDS = 2,
+        CHANGE_POS_ONE_SOUND = 0,   ///< Звук сервомотора при ручном наборе
+        CHANGE_POS_AUTO_SOUND = 1   ///< Звук сервомотора при автоматическом наборе
     };
-    sound_state_t getSound(size_t idx);
+    /// Состояние звука
+    sound_state_t getSoundState(size_t idx = CHANGE_POS_ONE_SOUND) const;
+
+    /// Сигнал состояния звука
+    float getSoundSignal(size_t idx = CHANGE_POS_ONE_SOUND) const;
 
 private:
 
@@ -106,11 +104,15 @@ private:
         LM_POS8 = 37
     };
 
-    /// Очерёдность и состояние звуков
-    std::array <sound_state_t, 4> sounds;
+    enum
+    {
+        NO_SOUND = 0,
+        SOUND_ONE = 1,
+        SOUND_AUTO = 2
+    };
+    /// Состояние звуков
+    std::array <sound_state_t, NUM_SOUNDS> sounds;
     char is_sound_one_or_auto;
-    bool is_change_one_1_or_2;
-    bool is_change_auto_1_or_2;
 
     void preStep(state_vector_t &Y, double t);
 

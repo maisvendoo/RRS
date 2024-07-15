@@ -312,6 +312,24 @@ feedback_signals_t Device::getFeedback() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t Device::getSoundState(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float Device::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t::createSoundSignal(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Device::setCustomConfigDir(const QString &path)
 {
     custom_cfg_dir = path;

@@ -96,6 +96,12 @@ public:
     ///
     feedback_signals_t getFeedback() const;
 
+    /// Device's sound state
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Device's sound state (as a single float value, see common-headers/sound-signal.h)
+    virtual float getSoundSignal(size_t idx = 0) const;
+
     void setCustomConfigDir(const QString &path);
 
     QString getCustomConfigDir() const;

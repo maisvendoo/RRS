@@ -26,9 +26,11 @@ public:
 
     virtual bool getState() const;
 
-    sound_state_t getSoundOn() const;
+    /// Sound state
+    virtual sound_state_t getSoundState(size_t idx = Trigger::CHANGE_SOUND) const;
 
-    sound_state_t getSoundOff() const;
+    /// Sound state (as a single float value, see common-headers/sound-signal.h)
+    virtual float getSoundSignal(size_t idx = Trigger::CHANGE_SOUND) const;
 
 protected:
 

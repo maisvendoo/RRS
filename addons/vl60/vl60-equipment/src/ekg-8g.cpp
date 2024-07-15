@@ -15,8 +15,6 @@ EKG_8G::EKG_8G(QObject *parent) : Device(parent)
     , dir(0)
     , is_auto(false)
     , is_sound_one_or_auto(NO_SOUND)
-    , is_change_one_1_or_2(false)
-    , is_change_auto_1_or_2(false)
 {
     connect(&pos_switcher, &Timer::process, this, &EKG_8G::slotPosSwitch);
 
@@ -162,11 +160,21 @@ void EKG_8G::process()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t EKG_8G::getSound(size_t idx)
+sound_state_t EKG_8G::getSoundState(size_t idx) const
 {
     if (idx < sounds.size())
         return sounds[idx];
-    return sound_state_t();
+    return Device::getSoundState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float EKG_8G::getSoundSignal(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx].createSoundSignal();
+    return Device::getSoundSignal();
 }
 
 //------------------------------------------------------------------------------
@@ -248,36 +256,12 @@ void EKG_8G::slotPosSwitch()
         // Звук ручного переключения
         if (is_sound_one_or_auto == SOUND_ONE)
         {
-            // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
-            if (is_change_one_1_or_2)
-            {
-                sounds[CHANGE_POS_ONE_1].play = true;
-                sounds[CHANGE_POS_ONE_2].play = false;
-                is_change_one_1_or_2 = false;
-            }
-            else
-            {
-                sounds[CHANGE_POS_ONE_2].play = true;
-                sounds[CHANGE_POS_ONE_1].play = false;
-                is_change_one_1_or_2 = true;
-            }
+            sounds[CHANGE_POS_ONE_SOUND].play();
         }
         // Звук автоматического переключения
         if (is_sound_one_or_auto == SOUND_AUTO)
         {
-            // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
-            if (is_change_auto_1_or_2)
-            {
-                sounds[CHANGE_POS_AUTO_1].play = true;
-                sounds[CHANGE_POS_AUTO_2].play = false;
-                is_change_auto_1_or_2 = false;
-            }
-            else
-            {
-                sounds[CHANGE_POS_AUTO_2].play = true;
-                sounds[CHANGE_POS_AUTO_1].play = false;
-                is_change_auto_1_or_2 = true;
-            }
+            sounds[CHANGE_POS_AUTO_SOUND].play();
         }
     }
 

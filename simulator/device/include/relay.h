@@ -26,11 +26,17 @@ public:
     /// Ток, потребляемый реле, А
     virtual double getCurrent() const;
 
-    /// Состояние звука включения реле
-    sound_state_t getSoundOn() const;
+    enum {
+        NUM_SOUNDS = 3,
+        CHANGE_SOUND = 0,   ///< Звук переключения
+        ON_SOUND = 1,       ///< Звук включения
+        OFF_SOUND = 2       ///< Звук выключения
+    };
+    /// Состояние звука
+    virtual sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const;
 
-    /// Состояние звука выключения реле
-    sound_state_t getSoundOff() const;
+    /// Сигнал состояния звука
+    virtual float getSoundSignal(size_t idx = CHANGE_SOUND) const;
 
 protected:
 
