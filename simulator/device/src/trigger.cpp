@@ -5,8 +5,8 @@
 //------------------------------------------------------------------------------
 Trigger::Trigger(QObject *parent) : QObject(parent)
     , state(false)
-    , sound_on(sound_state_t())
-    , sound_off(sound_state_t())
+    , was_first_reset(false)
+    , sound_change_state(sound_state_t())
 {
 
 }
@@ -28,8 +28,7 @@ void Trigger::set()
         return;
 
     state = true;
-    sound_on.play = true;
-    sound_off.play = false;
+    sound_change_state.play(); // Изменяем счётчик включений звука
 }
 
 //------------------------------------------------------------------------------
@@ -41,8 +40,8 @@ void Trigger::reset()
         return;
 
     state = false;
-    sound_off.play = true;
-    sound_on.play = false;
+    was_first_reset = true; // Разрешаем звук выключения
+    sound_change_state.play(); // Изменяем счётчик включений звука
 }
 
 //------------------------------------------------------------------------------
@@ -56,15 +55,27 @@ bool Trigger::getState() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Trigger::getSoundOn() const
+sound_state_t Trigger::getSoundState(size_t idx) const
 {
-    return sound_on;
+    if (idx == CHANGE_SOUND)
+        return sound_change_state;
+    if (idx == ON_SOUND)
+        return sound_state_t(state);
+    if (idx == OFF_SOUND)
+        return sound_state_t((!state) && was_first_reset);
+    return sound_state_t();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Trigger::getSoundOff() const
+float Trigger::getSoundSignal(size_t idx) const
 {
-    return sound_off;
+    if (idx == CHANGE_SOUND)
+        return sound_change_state.createSoundSignal();
+    if (idx == ON_SOUND)
+        return sound_state_t::createSoundSignal(state);
+    if (idx == OFF_SOUND)
+        return sound_state_t::createSoundSignal((!state) && was_first_reset);
+    return sound_state_t::createSoundSignal(false);
 }

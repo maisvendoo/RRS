@@ -13,7 +13,7 @@ Pantograph::Pantograph(QObject *parent) : Device(parent)
     , is_up(false)
     , is_down(true)
 {
-    ref_state.reset();
+
 }
 
 //------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ bool Pantograph::isDown() const
 //------------------------------------------------------------------------------
 sound_state_t Pantograph::getSoundUp() const
 {
-    return ref_state.getSoundOn();
+    return ref_state.getSoundState(Trigger::ON_SOUND);
 }
 
 //------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ sound_state_t Pantograph::getSoundUp() const
 //------------------------------------------------------------------------------
 sound_state_t Pantograph::getSoundDown() const
 {
-    return ref_state.getSoundOff();
+    return ref_state.getSoundState(Trigger::OFF_SOUND);
 }
 
 //----------------------------------------------------------------------------

@@ -47,7 +47,7 @@ std::vector<size_t> SoundManager::loadSounds(const QString &sounddir)
         while (!secNode.isNull())
         {
             sound_config_t sound_config;
-            sound_config.prev_play = false;
+            sound_config.prev_state = false;
 
             int id = -1;
             cfg.getInt(secNode, "SignalID", id);
@@ -183,16 +183,16 @@ void SoundManager::setListenerOrientation(float at_x, float at_y, float at_z, fl
 //------------------------------------------------------------------------------
 void SoundManager::setSoundState(size_t idx, sound_state_t ss)
 {
-    //emit notify(QString("State for sound [%1]: play %2 | volume %3 | pitch %4").arg(idx).arg(ss.play).arg(ss.volume, 5, 'f', 3).arg(ss.pitch, 5, 'f', 3).toStdString());
+    //emit notify(QString("State for sound [%1]: play %2 | volume %3 | pitch %4").arg(idx).arg(ss.state).arg(ss.volume, 5, 'f', 3).arg(ss.pitch, 5, 'f', 3).toStdString());
     if (idx >= sounds.size())
         return;
 
     if (ss.volume == 0.0f)
     {
-        if (sounds[idx].prev_play)
+        if (sounds[idx].prev_state > 0)
         {
             sounds[idx].sound->stop();
-            sounds[idx].prev_play = false;
+            sounds[idx].prev_state = 0;
         }
         sounds[idx].sound->setVolume(0);
         return;
@@ -202,32 +202,31 @@ void SoundManager::setSoundState(size_t idx, sound_state_t ss)
 
     if (ss.pitch < 0.5f)
     {
-        if (sounds[idx].prev_play)
+        if (sounds[idx].prev_state > 0)
         {
             sounds[idx].sound->stop();
-            sounds[idx].prev_play = false;
+            sounds[idx].prev_state = 0;
         }
         sounds[idx].sound->setPitch(0.5f);
         return;
     }
     sounds[idx].sound->setPitch(ss.pitch);
 
-    if (ss.play)
+    if (ss.state == 0)
     {
-        if (!sounds[idx].prev_play)
+        if (sounds[idx].prev_state > 0)
         {
-            sounds[idx].sound->play();
-            sounds[idx].prev_play = true;
+            sounds[idx].sound->stop();
+            sounds[idx].prev_state = 0;
         }
     }
     else
     {
-        if (sounds[idx].prev_play)
+        if (sounds[idx].prev_state != ss.state)
         {
-            sounds[idx].sound->stop();
-            sounds[idx].prev_play = false;
+            sounds[idx].sound->play();
+            sounds[idx].prev_state = ss.state;
         }
-        return;
     }
 }
 
@@ -239,10 +238,10 @@ void SoundManager::play(size_t idx)
     if (idx >= sounds.size())
         return;
 
-    if (!sounds[idx].prev_play)
+    if (sounds[idx].prev_state == 0)
     {
         sounds[idx].sound->play();
-        sounds[idx].prev_play = true;
+        sounds[idx].prev_state = 1;
     }
 }
 
@@ -254,10 +253,10 @@ void SoundManager::stop(size_t idx)
     if (idx >= sounds.size())
         return;
 
-    if (sounds[idx].prev_play)
+    if (sounds[idx].prev_state > 0)
     {
         sounds[idx].sound->stop();
-        sounds[idx].prev_play = false;
+        sounds[idx].prev_state = 0;
     }
 }
 
@@ -273,10 +272,10 @@ void SoundManager::setVolume(size_t idx, float volume)
     {
         sounds[idx].sound->setVolume(0);
 
-        if (sounds[idx].prev_play)
+        if (sounds[idx].prev_state > 0)
         {
             sounds[idx].sound->stop();
-            sounds[idx].prev_play = false;
+            sounds[idx].prev_state = 0;
         }
         return;
     }
@@ -292,10 +291,10 @@ void SoundManager::setVolume(size_t idx, float volume)
         sounds[idx].sound->setVolume(tmp);
     }
 
-    if (!sounds[idx].prev_play)
+    if (sounds[idx].prev_state == 0)
     {
         sounds[idx].sound->play();
-        sounds[idx].prev_play = true;
+        sounds[idx].prev_state = 1;
     }
 }
 
@@ -309,20 +308,20 @@ void SoundManager::setPitch(size_t idx, float pitch)
 
     if (pitch < 0.5f)
     {
-        if (sounds[idx].prev_play)
+        if (sounds[idx].prev_state > 0)
         {
             sounds[idx].sound->stop();
-            sounds[idx].prev_play = false;
+            sounds[idx].prev_state = 0;
         }
         return;
     }
 
     sounds[idx].sound->setPitch(pitch);
 
-    if (!sounds[idx].prev_play)
+    if (sounds[idx].prev_state == 0)
     {
         sounds[idx].sound->play();
-        sounds[idx].prev_play = true;
+        sounds[idx].prev_state = 1;
     }
 }
 

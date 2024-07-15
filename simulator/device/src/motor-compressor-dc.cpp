@@ -109,11 +109,11 @@ void DCMotorCompressor::preStep(state_vector_t &Y, double t)
 
     if (reg_sound_by_on_off)
     {
-        sound_state.play = is_powered;
+        sound_state.state = is_powered;
     }
     else
     {
-        sound_state.play = ( (2.0 * Y[0]) >= omega0 ); // (Y[0] / omega0) >= 0.5
+        sound_state.state = ( (2.0 * Y[0]) >= omega0 ); // (Y[0] / omega0) >= 0.5
     }
 
     if (reg_sound_by_pitch)

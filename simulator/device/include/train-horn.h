@@ -22,17 +22,11 @@ public:
     /// Состояние свистка
     bool isSvistok() const;
 
-    /// Состояние звука свистка
-    sound_state_t getSvistokSound() const;
-
     /// Задать состояние тифона
     void setTifonOn(bool state);
 
     /// Состояние тифона
     bool isTifon() const;
-
-    /// Состояние звука тифона
-    sound_state_t getTifonSound() const;
 
     /// Задать давление от питательной магистрали, МПа
     void setFLpressure(double value);
@@ -40,13 +34,21 @@ public:
     /// Поток в питательную магистраль
     double getFLflow() const;
 
+    enum {
+        NUM_SOUNDS = 2,
+        SVISTOK_SOUND = 0,
+        TIFON_SOUND = 1
+    };
+    /// Состояние звука
+    sound_state_t getSoundState(size_t idx = SVISTOK_SOUND) const;
+
+    /// Сигнал состояния звука
+    float getSoundSignal(size_t idx = SVISTOK_SOUND) const;
+
 protected:
 
-    /// Состояние свистка
-    sound_state_t svistok_state;
-
-    /// Состояние тифона
-    sound_state_t tifon_state;
+    /// Состояние звуков
+    std::array<sound_state_t, NUM_SOUNDS> sounds;
 
     /// Давление питательной магистрали, МПа
     double pFL;

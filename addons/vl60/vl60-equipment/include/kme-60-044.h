@@ -26,12 +26,14 @@ public:
 
     enum {
         NUM_SOUNDS = 4,
-        REVERS_CHANGE_POS_1 = 0,
-        REVERS_CHANGE_POS_2 = 1,
-        MAIN_CHANGE_POS_1 = 2,
-        MAIN_CHANGE_POS_2 = 3,
+        REVERS_CHANGE_POS_SOUND = 0,    ///< Звук переключения реверсора
+        MAIN_CHANGE_POS_SOUND = 1       ///< Звук переключения контроллера
     };
-    sound_state_t getSound(size_t idx);
+    /// Состояние звука
+    sound_state_t getSoundState(size_t idx = REVERS_CHANGE_POS_SOUND) const;
+
+    /// Сигнал состояния звука
+    float getSoundSignal(size_t idx = REVERS_CHANGE_POS_SOUND) const;
 
 private:
 
@@ -50,9 +52,7 @@ private:
     km_state_t  state;
 
     /// Очерёдность и состояние звуков
-    std::array <sound_state_t, 4> sounds;
-    bool is_main_1_or_2;
-    bool is_revers_1_or_2;
+    std::array <sound_state_t, NUM_SOUNDS> sounds;
 
     enum
     {

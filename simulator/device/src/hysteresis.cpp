@@ -13,8 +13,6 @@ Hysteresis::Hysteresis(double min_value,
 {
     if (init_state)
         state.set();
-    else
-        state.reset();
 }
 
 //------------------------------------------------------------------------------
@@ -57,15 +55,15 @@ bool Hysteresis::getState() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Hysteresis::getSoundOn() const
+sound_state_t Hysteresis::getSoundState(size_t idx) const
 {
-    return state.getSoundOn();
+    return state.getSoundState(idx);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Hysteresis::getSoundOff() const
+float Hysteresis::getSoundSignal(size_t idx) const
 {
-    return state.getSoundOff();
+    return state.getSoundSignal(idx);
 }

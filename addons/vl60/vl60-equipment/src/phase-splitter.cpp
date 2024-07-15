@@ -72,7 +72,7 @@ void PhaseSplitter::preStep(state_vector_t &Y, double t)
 
     U_out = k_eds * Y[0];
 
-    sound_state.play = (U_power > Physics::ZERO);
+    sound_state.state = (U_power > Physics::ZERO);
 }
 
 //------------------------------------------------------------------------------

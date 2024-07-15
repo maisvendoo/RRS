@@ -87,9 +87,6 @@ public:
     /// Read device config file
     virtual void read_config(const QString &filename, const QString &dir_path = "");
 
-    /// Временно вернул, для обратной совместимости
-    virtual void read_custom_config(const QString &path);
-
     QString getDebugMsg() const;
 
     ///
@@ -98,6 +95,12 @@ public:
 
     ///
     feedback_signals_t getFeedback() const;
+
+    /// Device's sound state
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Device's sound state (as a single float value, see common-headers/sound-signal.h)
+    virtual float getSoundSignal(size_t idx = 0) const;
 
     void setCustomConfigDir(const QString &path);
 

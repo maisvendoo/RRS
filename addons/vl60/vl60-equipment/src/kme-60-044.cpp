@@ -9,8 +9,6 @@ ControllerKME_60_044::ControllerKME_60_044(QObject *parent)
     , revers_pos(REVERS_ZERO)
     , main_handle_pos(0.0f)
     , revers_handle_pos(0.0f)
-    , is_main_1_or_2(false)
-    , is_revers_1_or_2(false)
 {
     std::fill(sounds.begin(), sounds.end(), sound_state_t());
 
@@ -64,17 +62,31 @@ float ControllerKME_60_044::getReversHandlePos() const
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::setReversPos(int pos)
 {
+    if (revers_pos == pos)
+        return;
+
     revers_pos = pos;
+    soundReversChangePos();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t ControllerKME_60_044::getSound(size_t idx)
+sound_state_t ControllerKME_60_044::getSoundState(size_t idx) const
 {
     if (idx < sounds.size())
         return sounds[idx];
-    return sound_state_t();
+    return Device::getSoundState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float ControllerKME_60_044::getSoundSignal(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx].createSoundSignal();
+    return Device::getSoundSignal();
 }
 
 //------------------------------------------------------------------------------
@@ -145,6 +157,7 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     // Тянем рукоятку от себя
     if (getKeyState(KEY_D))
     {
+        // Ctrl+D возвращает в нулевую позицию
         if (getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R))
         {
             if (main_pos != POS_ZERO)
@@ -200,19 +213,7 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::soundMainChangePos()
 {
-    // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
-    if (is_main_1_or_2)
-    {
-        sounds[MAIN_CHANGE_POS_1].play = true;
-        sounds[MAIN_CHANGE_POS_2].play = false;
-        is_main_1_or_2 = false;
-    }
-    else
-    {
-        sounds[MAIN_CHANGE_POS_2].play = true;
-        sounds[MAIN_CHANGE_POS_1].play = false;
-        is_main_1_or_2 = true;
-    }
+    sounds[MAIN_CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------
@@ -220,19 +221,7 @@ void ControllerKME_60_044::soundMainChangePos()
 //------------------------------------------------------------------------------
 void ControllerKME_60_044::soundReversChangePos()
 {
-    // Два звука по очереди, чтобы спокойно сбросить сигнал каждому
-    if (is_revers_1_or_2)
-    {
-        sounds[MAIN_CHANGE_POS_1].play = true;
-        sounds[MAIN_CHANGE_POS_2].play = false;
-        is_revers_1_or_2 = false;
-    }
-    else
-    {
-        sounds[MAIN_CHANGE_POS_2].play = true;
-        sounds[MAIN_CHANGE_POS_1].play = false;
-        is_revers_1_or_2 = true;
-    }
+    sounds[REVERS_CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------

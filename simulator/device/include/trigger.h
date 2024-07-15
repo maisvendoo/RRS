@@ -22,21 +22,28 @@ public:
 
     bool getState() const;
 
-    /// Состояние звука включения триггера
-    sound_state_t getSoundOn() const;
+    enum {
+        NUM_SOUNDS = 3,
+        CHANGE_SOUND = 0,   ///< Звук переключения
+        ON_SOUND = 1,       ///< Звук включения
+        OFF_SOUND = 2       ///< Звук выключения
+    };
+    /// Sound state
+    virtual sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const;
 
-    /// Состояние звука выключения триггера
-    sound_state_t getSoundOff() const;
+    /// Sound state (as a single float value, see common-headers/sound-signal.h)
+    virtual float getSoundSignal(size_t idx = CHANGE_SOUND) const;
 
 private:
 
+    /// Состояние триггера
     bool state;
 
-    /// Состояние звука включения
-    sound_state_t sound_on;
+    /// Не создаём звук выключения при инициализации
+    bool was_first_reset;
 
-    /// Состояние звука отключения
-    sound_state_t sound_off;
+    /// Звук переключения (со счётчиком включений звука)
+    sound_state_t sound_change_state;
 };
 
 #endif // TRIGGER_H

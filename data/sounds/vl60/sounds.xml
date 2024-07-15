@@ -36,33 +36,9 @@
 		<LocalPosition>0.3 9.0 2.6</LocalPosition>
 	</Sound>
 
-	<!-- Реверсор (второй звук, для работы по очереди с первым) -->
-	<Sound>
-		<SignalID>204</SignalID>
-		<Filename>revers.wav</Filename>
-		<InitVolume>100</InitVolume>
-		<MaxVolume>100</MaxVolume>
-		<InitPitch>1.0</InitPitch>
-		<Loop>0</Loop>
-		<PlayOnStart>0</PlayOnStart>
-		<LocalPosition>0.3 9.0 2.6</LocalPosition>
-	</Sound>
-
 	<!-- Контроллер машиниста -->
 	<Sound>
-		<SignalID>205</SignalID>
-		<Filename>kme-60-044.wav</Filename>
-		<InitVolume>100</InitVolume>
-		<MaxVolume>100</MaxVolume>
-		<InitPitch>1.0</InitPitch>
-		<Loop>0</Loop>
-		<PlayOnStart>0</PlayOnStart>
-		<LocalPosition>0.3 8.9 2.6</LocalPosition>
-	</Sound>
-
-	<!-- Контроллер машиниста (второй звук, для работы по очереди с первым) -->
-	<Sound>
-		<SignalID>206</SignalID>
+		<SignalID>204</SignalID>
 		<Filename>kme-60-044.wav</Filename>
 		<InitVolume>100</InitVolume>
 		<MaxVolume>100</MaxVolume>
@@ -74,18 +50,7 @@
 
 	<!-- Серводвигатель ЭКГ авто набор -->
 	<Sound>
-		<SignalID>207</SignalID>
-		<Filename>ekg-8g_auto.wav</Filename>
-		<InitVolume>30</InitVolume>
-		<MaxVolume>30</MaxVolume>
-		<InitPitch>1.0</InitPitch>
-		<Loop>0</Loop>
-		<PlayOnStart>0</PlayOnStart>
-	</Sound>
-
-	<!-- Серводвигатель ЭКГ авто набор (второй звук, для работы по очереди с первым) -->
-	<Sound>
-		<SignalID>208</SignalID>
+		<SignalID>205</SignalID>
 		<Filename>ekg-8g_auto.wav</Filename>
 		<InitVolume>30</InitVolume>
 		<MaxVolume>30</MaxVolume>
@@ -96,18 +61,7 @@
 
 	<!-- Серводвигатель ЭКГ ручной пуск (РП) -->
 	<Sound>
-		<SignalID>209</SignalID>
-		<Filename>ekg-8g_rp.wav</Filename>
-		<InitVolume>30</InitVolume>
-		<MaxVolume>30</MaxVolume>
-		<InitPitch>1.0</InitPitch>
-		<Loop>0</Loop>
-		<PlayOnStart>0</PlayOnStart>
-	</Sound>
-
-	<!-- Серводвигатель ЭКГ ручной пуск (РП) (второй звук, для работы по очереди с первым) -->
-	<Sound>
-		<SignalID>210</SignalID>
+		<SignalID>206</SignalID>
 		<Filename>ekg-8g_rp.wav</Filename>
 		<InitVolume>30</InitVolume>
 		<MaxVolume>30</MaxVolume>
