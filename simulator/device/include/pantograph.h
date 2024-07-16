@@ -40,11 +40,17 @@ public:
 
     bool isDown() const;
 
-    /// Состояние звука подъёма
-    sound_state_t getSoundUp() const;
+    enum {
+        NUM_SOUNDS = 3,
+        CHANGE_SOUND = 0,
+        UP_SOUND = 1,
+        DOWN_SOUND = 2
+    };
+    /// Состояние звука
+    sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const;
 
-    /// Состояние звука опускания
-    sound_state_t getSoundDown() const;
+    /// Сигнал состояния звука
+    float getSoundSignal(size_t idx = CHANGE_SOUND) const;
 
 private:
 
@@ -53,10 +59,7 @@ private:
 
     /// Напряжение на выходе токоприемника
     double Uout;
-/*
-    /// Состояние токоприемника (true - подъем, false - опускание)
-    bool ref_state;
-*/
+
     /// Максимальная высота подъема (в относительном выражении)
     double  max_height;
 
@@ -77,13 +80,10 @@ private:
 
     /// Состояние токоприемника (true - подъем, false - опускание)
     Trigger ref_state;
-/*
-    /// Состояние звука подъёма
-    sound_state_t sound_up;
 
-    /// Состояние звука опускания
-    sound_state_t sound_down;
-*/
+    /// Состояние звуков
+    std::array<sound_state_t, NUM_SOUNDS> sounds;
+
     /// Предварительный шаг
     void preStep(state_vector_t &Y, double t);
 

@@ -18,29 +18,29 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     // Серводвигатель ЭКГ, ручное и автоматическое движение
     analogSignal[SOUND_EKG_ONE] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_ONE_SOUND);
     analogSignal[SOUND_EKG_AUTO] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_AUTO_SOUND);
-// TODO переделать интерфейс звука на Device::getSoundSignal
+
     // Токоприёмники
-    analogSignal[SOUND_PANT_BWD_UP] = pantographs[1]->getSoundUp().createSoundSignal();
-    analogSignal[SOUND_PANT_BWD_DOWN] = pantographs[1]->getSoundDown().createSoundSignal();
-    analogSignal[SOUND_PANT_FWD_UP] = pantographs[0]->getSoundUp().createSoundSignal();
-    analogSignal[SOUND_PANT_FWD_DOWN] = pantographs[0]->getSoundDown().createSoundSignal();
+    analogSignal[SOUND_PANT_BWD_UP] = pantographs[1]->getSoundSignal(Pantograph::UP_SOUND);
+    analogSignal[SOUND_PANT_BWD_DOWN] = pantographs[1]->getSoundSignal(Pantograph::DOWN_SOUND);
+    analogSignal[SOUND_PANT_FWD_UP] = pantographs[0]->getSoundSignal(Pantograph::UP_SOUND);
+    analogSignal[SOUND_PANT_FWD_DOWN] = pantographs[0]->getSoundSignal(Pantograph::DOWN_SOUND);
     // Главный выключатель
-    analogSignal[SOUND_GV_ON] = main_switch->getSoundOn().createSoundSignal();
-    analogSignal[SOUND_GV_OFF] = main_switch->getSoundOff().createSoundSignal();
-    // Трансформатор
-    analogSignal[SOUND_TRANSFORMER] = trac_trans->getSoundState().createSoundSignal();
-// TODO переделать интерфейс звука на Device::getSoundSignal
+    analogSignal[SOUND_GV_ON] = main_switch->getSoundSignal(ProtectiveDevice::ON_SOUND);
+    analogSignal[SOUND_GV_OFF] = main_switch->getSoundSignal(ProtectiveDevice::OFF_SOUND);
+
     // Мотор-вентиляторы
-    analogSignal[SOUND_FAN6] = motor_fans[MV6]->getSoundState().createSoundSignal();
-    analogSignal[SOUND_FAN5] = motor_fans[MV5]->getSoundState().createSoundSignal();
-    analogSignal[SOUND_FAN4] = motor_fans[MV4]->getSoundState().createSoundSignal();
-    analogSignal[SOUND_FAN3] = motor_fans[MV3]->getSoundState().createSoundSignal();
-    analogSignal[SOUND_FAN2] = motor_fans[MV2]->getSoundState().createSoundSignal();
-    analogSignal[SOUND_FAN1] = motor_fans[MV1]->getSoundState().createSoundSignal();
+    analogSignal[SOUND_FAN6] = motor_fans[MV6]->getSoundSignal();
+    analogSignal[SOUND_FAN5] = motor_fans[MV5]->getSoundSignal();
+    analogSignal[SOUND_FAN4] = motor_fans[MV4]->getSoundSignal();
+    analogSignal[SOUND_FAN3] = motor_fans[MV3]->getSoundSignal();
+    analogSignal[SOUND_FAN2] = motor_fans[MV2]->getSoundSignal();
+    analogSignal[SOUND_FAN1] = motor_fans[MV1]->getSoundSignal();
     // Мотор-компрессор
-    analogSignal[SOUND_COMPR] = motor_compressor->getSoundState().createSoundSignal();
+    analogSignal[SOUND_COMPR] = motor_compressor->getSoundSignal();
     // Фазорасщепитель
-    analogSignal[SOUND_PHASESPLITTER] = phase_spliter->getSoundState().createSoundSignal();
+    analogSignal[SOUND_PHASESPLITTER] = phase_spliter->getSoundSignal();
+    // Трансформатор
+    analogSignal[SOUND_TRANSFORMER] = trac_trans->getSoundSignal();
 
     // Дальний ряд тумблеров приборной панели машиниста
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_ON] = proj2_tumbler.getSoundSignal(Trigger::ON_SOUND);

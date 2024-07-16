@@ -16,7 +16,7 @@ BrakeCrane::BrakeCrane(QObject *parent) : BrakeDevice (parent)
   , QBP(0.0)
   , Qer(0.0)
 {
-
+    sounds.resize(NUM_SOUNDS, sound_state_t());
 }
 
 //------------------------------------------------------------------------------
@@ -97,6 +97,26 @@ void BrakeCrane::setERflow(double Qer)
 double BrakeCrane::getERpressure() const
 {
     return getY(ER_PRESSURE);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t BrakeCrane::getSoundState(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx];
+    return Device::getSoundState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float BrakeCrane::getSoundSignal(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx].createSoundSignal();
+    return Device::getSoundSignal();
 }
 
 //------------------------------------------------------------------------------

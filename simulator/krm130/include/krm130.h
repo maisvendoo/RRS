@@ -36,7 +36,7 @@ public:
 
     void init(double pBP, double pFL);
 
-    void setHandlePosition(int &position);
+    void setHandlePosition(int position);
 
     QString getPositionName() const;
 

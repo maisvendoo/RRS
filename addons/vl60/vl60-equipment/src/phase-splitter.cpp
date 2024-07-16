@@ -55,9 +55,19 @@ double PhaseSplitter::getU_out() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t PhaseSplitter::getSoundState() const
+sound_state_t PhaseSplitter::getSoundState(size_t idx) const
 {
+    (void) idx;
     return sound_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float PhaseSplitter::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state.createSoundSignal();
 }
 
 //------------------------------------------------------------------------------

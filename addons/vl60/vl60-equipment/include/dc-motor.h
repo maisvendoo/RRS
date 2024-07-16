@@ -32,6 +32,12 @@ public:
 
     void setDirection(int revers_state);
 
+    /// Состояние звука работы
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука работы
+    virtual float getSoundSignal(size_t idx = 0) const;
+
 private:
 
     /// Степень ослабления возбуждения
@@ -63,6 +69,9 @@ private:
     double  omega_nom;
 
     int     direction;
+
+    /// Состояние звука работы
+    sound_state_t sound_state;
 
     LinearInterpolation cPhi;
 

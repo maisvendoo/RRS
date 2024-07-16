@@ -20,8 +20,11 @@ public:
 
     double getU_out() const;
 
-    /// Состояние звука фазорасщепителя
-    sound_state_t getSoundState() const;
+    /// Состояние звука работы
+    sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука работы
+    float getSoundSignal(size_t idx = 0) const;
 
 private:
 

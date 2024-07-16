@@ -89,17 +89,17 @@ bool ProtectiveDevice::getState() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t ProtectiveDevice::getSoundOn() const
+sound_state_t ProtectiveDevice::getSoundState(size_t idx) const
 {
-    return state.getSoundState(Trigger::ON_SOUND);
+    return state.getSoundState(idx);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t ProtectiveDevice::getSoundOff() const
+float ProtectiveDevice::getSoundSignal(size_t idx) const
 {
-    return state.getSoundState(Trigger::OFF_SOUND);
+    return state.getSoundSignal(idx);
 }
 
 //------------------------------------------------------------------------------

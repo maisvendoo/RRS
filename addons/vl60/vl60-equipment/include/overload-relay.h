@@ -1,12 +1,13 @@
 #ifndef     OVERLOADRELAY_H
 #define     OVERLOADRELAY_H
 
-#include    "device.h"
+#include    <QString>
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class OverloadRelay : public Device
+class OverloadRelay : public Trigger
 {
 public:
 
@@ -16,7 +17,7 @@ public:
 
     void setCurrent(double value);
 
-    double getState() const;
+    void read_config(const QString &filename, const QString &dir_path = "");
 
 private:
 
@@ -25,15 +26,6 @@ private:
 
     /// Уставка срабатывания реле
     double trig_current;
-
-    /// Состояние реле
-    double state;
-
-    void preStep(state_vector_t &Y, double t);
-
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
-
-    void load_config(CfgReader &cfg);
 };
 
 #endif // OVERLOADRELAY_H

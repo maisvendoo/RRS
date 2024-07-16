@@ -27,12 +27,11 @@ public:
 
     ~LocoCrane254();
 
+    void setHandlePosition(double position);
+
     double getHandlePosition() const;
 
     double getHandleShift() const;
-
-    /// Получение номера позиции
-    int getPositionNumber() const;
 
     void init(double pBP, double pFL);
 
@@ -53,15 +52,7 @@ private:
 
     double pos_duration;
 
-    double volume;
-
-    double p_volume;
-
-    int dir;
-
     int pos_num;
-
-    bool isStop;
 
     std::array<double, NUM_STEPS> positions;
 
@@ -77,6 +68,9 @@ private:
     void load_config(CfgReader &cfg);
 
     void stepKeysControl(double t, double dt);
+
+    /// Получение номера позиции
+    int getPositionNumber() const;
 
     void stepSound();
 };

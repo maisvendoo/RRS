@@ -28,8 +28,8 @@
 	<Sound>
 		<SignalID>203</SignalID>
 		<Filename>revers.wav</Filename>
-		<InitVolume>100</InitVolume>
-		<MaxVolume>100</MaxVolume>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
@@ -40,33 +40,267 @@
 	<Sound>
 		<SignalID>204</SignalID>
 		<Filename>kme-60-044.wav</Filename>
-		<InitVolume>100</InitVolume>
-		<MaxVolume>100</MaxVolume>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.3 8.9 2.6</LocalPosition>
 	</Sound>
 
-	<!-- Серводвигатель ЭКГ авто набор -->
+	<!-- Серводвигатель ЭКГ ручной пуск (РП) -->
 	<Sound>
 		<SignalID>205</SignalID>
+		<Filename>ekg-8g_rp.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Серводвигатель ЭКГ авто набор -->
+	<Sound>
+		<SignalID>206</SignalID>
 		<Filename>ekg-8g_auto.wav</Filename>
-		<InitVolume>30</InitVolume>
-		<MaxVolume>30</MaxVolume>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.0</LocalPosition>
+	</Sound>
+
+	<!-- Скоростемер -->
+	<Sound>
+		<SignalID>207</SignalID>
+		<Path>skorostemer.wav</Path>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Щелчок блокировки тормозных приборов -->
+	<Sound>
+		<SignalID>208</SignalID>
+		<Path>ubt-367-ruk.wav</Path>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
 	</Sound>
 
-	<!-- Серводвигатель ЭКГ ручной пуск (РП) -->
+	<!-- Щелчок комбинированного крана -->
 	<Sound>
-		<SignalID>206</SignalID>
-		<Filename>ekg-8g_rp.wav</Filename>
-		<InitVolume>30</InitVolume>
-		<MaxVolume>30</MaxVolume>
+		<SignalID>209</SignalID>
+		<Path>komb-kran.wav</Path>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Опорожнение тормозной магистрали от комбинированного крана -->
+	<Sound>
+		<SignalID>210</SignalID>
+		<Path>395_vypusk.wav</Path>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Щелчок рукоятки крана 395 -->
+	<Sound>
+		<SignalID>211</SignalID>
+		<Path>395-chelk.wav</Path>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+
+	<!-- Стабилизатор крана 395 -->
+	<Sound>
+		<Name>KRM395_2</Name>
+		<Path>395_2.wav</Path>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>1</PlayOnStart>
+	</Sound>
+
+	<!-- Наполнение уравнительного резервуара крана 395 -->
+	<Sound>
+		<Name>KRM395_1</Name>
+		<Path>395_1.wav</Path>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>1</PlayOnStart>
+	</Sound>
+
+	<!-- Опорожнение уравнительного резервуара крана 395 -->
+	<Sound>
+		<Name>KRM395_5</Name>
+		<Path>395_5.wav</Path>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>1</PlayOnStart>
+	</Sound>
+
+	<!-- Наполнение тормозной магистрали от крана 395 -->
+	<Sound>
+		<Name>KRM395_vpusk</Name>
+		<Path>395_vpusk.wav</Path>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>1</PlayOnStart>
+	</Sound>
+
+	<!-- Опорожнение тормозной магистрали от крана 395 -->
+	<Sound>
+		<Name>KRM395_vipusk</Name>
+		<Path>395_vypusk.wav</Path>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>1</PlayOnStart>
+	</Sound>
+
+	<!-- Звуки в движении -->
+	<!-- 5 - 10 км/ч -->
+	<Sound>
+		<SignalID>221</SignalID>
+		<Filename>5-10.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 10 - 20 км/ч -->
+	<Sound>
+		<SignalID>222</SignalID>
+		<Filename>10-20.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 20 - 30 км/ч -->
+	<Sound>
+		<SignalID>223</SignalID>
+		<Filename>20-30.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 30 - 40 км/ч -->
+	<Sound>
+		<SignalID>224</SignalID>
+		<Filename>30-40.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 40 - 50 км/ч -->
+	<Sound>
+		<SignalID>225</SignalID>
+		<Filename>40-50.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 50 - 60 км/ч -->
+	<Sound>
+		<SignalID>226</SignalID>
+		<Filename>50-60.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 60 - 70 км/ч -->
+	<Sound>
+		<SignalID>227</SignalID>
+		<Filename>60-70.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 70 - 80 км/ч -->
+	<Sound>
+		<SignalID>228</SignalID>
+		<Filename>70-80.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 80 - 90 км/ч -->
+	<Sound>
+		<SignalID>229</SignalID>
+		<Filename>80-90.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 90 - 100 км/ч -->
+	<Sound>
+		<SignalID>230</SignalID>
+		<Filename>90-100.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 100 - 110 км/ч -->
+	<Sound>
+		<SignalID>231</SignalID>
+		<Filename>100-110.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+	</Sound>
+	<!-- 110 и более км/ч -->
+	<Sound>
+		<SignalID>232</SignalID>
+		<Filename>110-~.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 	</Sound>
 

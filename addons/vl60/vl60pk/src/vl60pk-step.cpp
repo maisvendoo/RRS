@@ -141,7 +141,6 @@ void VL60pk::stepTractionControl(double t, double dt)
         I_vu += motor[i]->getIa();
 
         overload_relay[i]->setCurrent(motor[i]->getIa());
-        overload_relay[i]->step(t, dt);
     }
 
     for (auto v : vu)
@@ -273,14 +272,14 @@ bool VL60pk::getHoldingCoilState() const
 {
     km_state_t km_state = controller->getState();
 
-    bool no_overload = true;
+    bool overload = false;
 
     for (auto ov_relay : overload_relay)
     {
-        no_overload = no_overload && (!static_cast<bool>(ov_relay->getState()));
+        overload |= ov_relay->getState();
     }
 
-    bool state = !km_state.pos_state[POS_BV] && no_overload;
+    bool state = !km_state.pos_state[POS_BV] && (!overload);
 
     return state;
 }

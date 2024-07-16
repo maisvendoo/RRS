@@ -46,8 +46,11 @@ public:
 
     QString getPosName() const;
 
-    /// Состояние звука трансформатора
-    sound_state_t getSoundState() const;
+    /// Состояние звука работы
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука работы
+    virtual float getSoundSignal(size_t idx = 0) const;
 
 private:
 

@@ -15,7 +15,7 @@ LocoCrane::LocoCrane(QObject *parent) : BrakeDevice(parent)
   , QBC(0.0)
   , QIL(0.0)
 {
-
+    sounds.resize(NUM_SOUNDS, sound_state_t());
 }
 
 //------------------------------------------------------------------------------
@@ -93,9 +93,21 @@ void LocoCrane::release(bool is_release)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LocoCrane::stepSound()
+sound_state_t LocoCrane::getSoundState(size_t idx) const
 {
-    return;
+    if (idx < sounds.size())
+        return sounds[idx];
+    return Device::getSoundState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float LocoCrane::getSoundSignal(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx].createSoundSignal();
+    return Device::getSoundSignal();
 }
 
 //------------------------------------------------------------------------------

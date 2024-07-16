@@ -23,7 +23,7 @@ public:
     ~BrakeCrane();
 
     /// Задать позицию крана
-    virtual void setHandlePosition(int &position) = 0;
+    virtual void setHandlePosition(int position) = 0;
 
     /// Наименование текущей позиции крана
     virtual QString getPositionName() const = 0;
@@ -58,6 +58,21 @@ public:
     /// Давление в уравнительном резервуаре
     double getERpressure() const;
 
+    enum {
+        NUM_SOUNDS = 6,
+        CHANGE_POS_SOUND = 0,   ///< Звук переключения
+        ER_STAB_SOUND = 1,      ///< Звук стабилизатора уравнительного резервуара
+        ER_FILL_FLOW_SOUND = 2, ///< Звук наполнения уравнительного резервуара
+        ER_DRAIN_FLOW_SOUND = 3,///< Звук опорожнения уравнительного резервуара
+        BP_FILL_FLOW_SOUND = 4, ///< Звук наполнения тормозной магистрали
+        BP_DRAIN_FLOW_SOUND = 5 ///< Звук опорожнения тормозной магистрали
+    };
+    /// Состояние звука
+    virtual sound_state_t getSoundState(size_t idx = CHANGE_POS_SOUND) const;
+
+    /// Сигнал состояния звука
+    virtual float getSoundSignal(size_t idx = CHANGE_POS_SOUND) const;
+
 protected:
 
     /// Признак положения перекрыши
@@ -77,6 +92,9 @@ protected:
 
     double QFL;
     double QBP;
+
+    /// Состояние звуков
+    std::vector<sound_state_t> sounds;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

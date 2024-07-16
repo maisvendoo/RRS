@@ -66,9 +66,19 @@ bool ACMotorCompressor::isPowered() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t ACMotorCompressor::getSoundState() const
+sound_state_t ACMotorCompressor::getSoundState(size_t idx) const
 {
+    (void) idx;
     return sound_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float ACMotorCompressor::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state.createSoundSignal();
 }
 
 //------------------------------------------------------------------------------

@@ -9,19 +9,15 @@ LocoCrane224::LocoCrane224(QObject *parent) : LocoCrane(parent)
   , V1(1e-4)
   , V3(3.5e-4)
   , p_switch(0.1)
-  , min_pos(-0.05)
+  , min_pos(0.0)
   , max_pos(1.0)
   , pos_duration(1.0)
-  , dir(0)
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
 
-    pos = cur_pos = 1.0;
-
-    /*DebugLog *log = new DebugLog("kvt224.txt");
-    connect(this, &LocoCrane224::DebugPrint, log, &DebugLog::DebugPring);*/
+    pos = cur_pos = max_pos;
 }
 
 //------------------------------------------------------------------------------
@@ -30,6 +26,16 @@ LocoCrane224::LocoCrane224(QObject *parent) : LocoCrane(parent)
 LocoCrane224::~LocoCrane224()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane224::setHandlePosition(double position)
+{
+    pos = position;
+    if (isPositionNumberChanged())
+        sounds[CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------
@@ -164,57 +170,67 @@ void LocoCrane224::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
 
-    // Непрерывное движение ручки
+    double new_pos = 0.0;
+
+    // Непрерывное движение ручки в сторону отпуска
     if (getKeyState(KEY_Leftbracket))
-        dir = -1;
+        new_pos = pos - pos_duration * dt;
     else
     {
+        // Непрерывное движение ручки в сторону торможения
         if (getKeyState(KEY_Rightbracket))
-            dir = 1;
-        else
-            dir = 0;
+            new_pos = pos + pos_duration * dt;
     }
 
-    pos += dir * pos_duration * dt;
-
-    pos = cut(pos, min_pos, max_pos);
-
-    for (size_t i = 0; i < fixed_pos.size() - 1; ++i)
-    {
-        if ( (pos >= fixed_pos[i]) && (pos < fixed_pos[i+1]) )
-            cur_pos = fixed_pos[i];
-    }
-
-    if (pos > 0.99 * *(fixed_pos.end() - 1))
-        cur_pos = *(fixed_pos.end() - 1);
-
+    // Дискретное движение от кнопок
     if (isAlt())
     {
         if (getKeyState(KEY_8))
         {
-            cur_pos = fixed_pos[0];
+            new_pos = fixed_pos[0];
         }
 
         if (getKeyState(KEY_9))
         {
-            cur_pos = fixed_pos[1];
+            new_pos = fixed_pos[1];
         }
 
         if (getKeyState(KEY_0))
         {
-            cur_pos = fixed_pos[2];
+            new_pos = fixed_pos[2];
         }
 
         if (getKeyState(KEY_Minus))
         {
-            cur_pos = fixed_pos[3];
+            new_pos = fixed_pos[3];
         }
 
         if (getKeyState(KEY_Equals))
         {
-            cur_pos = fixed_pos[4];
+            new_pos = fixed_pos[4];
         }
     }
+
+    setHandlePosition(new_pos);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool LocoCrane224::isPositionNumberChanged()
+{
+    size_t prev_pos = cur_pos;
+
+    for (size_t i = 0; i < (fixed_pos.size() - 1); ++i)
+    {
+        if ( (pos >= fixed_pos[i]) && (pos < fixed_pos[i+1]) )
+            cur_pos = i;
+    }
+
+    if (pos > 0.99 * *(fixed_pos.end() - 1))
+        cur_pos = fixed_pos.size() - 1;
+
+    return cur_pos != prev_pos;
 }
 
 GET_LOCO_CRANE(LocoCrane224)

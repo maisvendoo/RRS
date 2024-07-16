@@ -12,21 +12,18 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
   , min_pos(-0.05)
   , max_pos(1.0)
   , pos_duration(1.0)
-  , volume(0)
-  , p_volume(0)
-  , dir(0)
   , pos_num(0)
-  , isStop(false)
   , positions({0.0, 0.325, 0.5, 0.752, 1.0})
   , step_pressures({0.0, 0.13, 0.20, 0.30, 0.40})
 {
     std::fill(K.begin(), K.end(), 0.0);
     std::fill(k.begin(), k.end(), 0.0);
 
-    pos = 1.0;
+    pos = max_pos;
 
-    /*DebugLog *log = new DebugLog("kvt254.txt");
-    connect(this, &LocoCrane254::DebugPrint, log, &DebugLog::DebugPring);*/
+    sounds[CHANGE_POS_SOUND] = sound_state_t();
+    sounds[BC_FILL_FLOW_SOUND] = sound_state_t(true, 0.0f, 1.0f);
+    sounds[BC_DRAIN_FLOW_SOUND] = sound_state_t(true, 0.0f, 1.0f);
 }
 
 //------------------------------------------------------------------------------
@@ -35,6 +32,19 @@ LocoCrane254::LocoCrane254(QObject *parent) : LocoCrane(parent)
 LocoCrane254::~LocoCrane254()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LocoCrane254::setHandlePosition(double position)
+{
+    pos = position;
+    int new_pos_num = getPositionNumber();
+    if (pos_num == new_pos_num)
+        return;
+    pos_num = new_pos_num;
+    sounds[CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------
@@ -112,8 +122,6 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
 
     // Поток в межпоршневое пространство и камеру 0.3 литра
     dYdt[P3_PRESSURE] = Q_1_3 / V3;
-
-    stepSound();
 }
 
 //------------------------------------------------------------------------------
@@ -121,44 +129,8 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void LocoCrane254::stepSound()
 {
-    p_volume = volume;
-
-    // 250000 поправочный коэффициент для перевода 1кг/cм^3 в 1кг/м^3
-    // Для звуков взято 400000 с малым запасом
-    volume = abs(QBC) * 400000;
-
-    if (volume > 30)
-    {
-        if (QBC > 0)
-        {
-            if (p_volume <= 30)
-            {
-                emit soundPlay("254_vpusk");
-            }
-            emit soundSetVolume("254_vypusk", 0);
-            emit soundSetVolume("254_vpusk", volume);
-        }
-
-        if (QBC < 0)
-        {
-            if (p_volume <= 30)
-            {
-                emit soundPlay("254_vypusk");
-            }
-            emit soundSetVolume("254_vpusk", 0);
-            emit soundSetVolume("254_vypusk", volume);
-        }
-        isStop = false;
-    }
-    else
-    {
-        if (!isStop)
-        {
-            emit soundStop("254_vpusk");
-            emit soundStop("254_vypusk");
-            isStop = true;
-        }
-    }
+    sounds[BC_FILL_FLOW_SOUND].volume = pf(QBC) * 4000.0f;
+    sounds[BC_DRAIN_FLOW_SOUND].volume = nf(QBC) * 4000.0f;
 }
 
 //------------------------------------------------------------------------------
@@ -211,26 +183,23 @@ void LocoCrane254::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
 
-    // Непрерывное движение ручки
+    double new_pos = 0.0;
+
+    // Непрерывное движение ручки в сторону отпуска
     if (getKeyState(KEY_Leftbracket))
-        dir = -1;
+        new_pos = pos - pos_duration * dt;
     else
     {
-        if (getKeyState(KEY_Rightbracket))
-            dir = 1;
-        else
-            dir = 0;
-
         // Возврат из отпускного положения
         if ( (pos < 0.0) && (!static_cast<bool>(is_release)) )
-           pos = 0.0;
+            new_pos = 0.0;
+        else
+        {
+            // Непрерывное движение ручки в сторону торможения
+            if (getKeyState(KEY_Rightbracket))
+                new_pos = pos + pos_duration * dt;
+        }
     }
-
-    int old_pos_n = pos_num;
-
-    pos += dir * pos_duration * dt;
-
-    pos = cut(pos, min_pos, max_pos);
 
     // Дискретное движение от кнопок
     double max_step = *(step_pressures.end() - 1);
@@ -239,34 +208,33 @@ void LocoCrane254::stepKeysControl(double t, double dt)
     {
         if (getKeyState(KEY_8))
         {
-            pos = step_pressures[0] / max_step;
+            new_pos = step_pressures[0] / max_step;
         }
 
         if (getKeyState(KEY_9))
         {
-            pos = step_pressures[1] / max_step;
+            new_pos = step_pressures[1] / max_step;
         }
 
         if (getKeyState(KEY_0))
         {
-            pos = step_pressures[2] / max_step;
+            new_pos = step_pressures[2] / max_step;
         }
 
         if (getKeyState(KEY_Minus))
         {
-            pos = step_pressures[3] / max_step;
+            new_pos = step_pressures[3] / max_step;
         }
 
         if (getKeyState(KEY_Equals))
         {
-            pos = step_pressures[4] / max_step;
+            new_pos = step_pressures[4] / max_step;
         }
     }
 
-    pos_num = getPositionNumber();
+    setHandlePosition(new_pos);
 
-    if (pos_num != old_pos_n && pos_num != -1)
-        emit soundPlay("254-chelk");
+    stepSound();
 }
 
 //------------------------------------------------------------------------------
@@ -276,15 +244,15 @@ int LocoCrane254::getPositionNumber() const
 {
     int pos_n = -1;
 
-    if (pos == 0.0)
+    if (pos <= 0.0)
         return 0;
 
     if (pos == 1.0)
         return 4;
 
-    for (uint i = 0; i < positions.size() - (dir == -1 ? 2 : 1); ++i)
+    for (uint i = 0; i < (positions.size() - 1); ++i)
     {
-        if (pos >= positions[i] && pos <= positions[i+1])
+        if (pos >= positions[i] && pos < positions[i+1])
             pos_n = static_cast<int>(i);
     }
 

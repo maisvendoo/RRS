@@ -1,7 +1,5 @@
 #include    "krm130.h"
 
-#include    <iostream>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -24,7 +22,7 @@ BrakeCrane130::BrakeCrane130(QObject *parent) : BrakeCrane (parent)
   , max_pos(POS_VI)
 {
     std::fill(pos.begin(), pos.end(), 0.0);
-    pos[POS_II] = 1.0;
+    pos[handle_pos] = 1.0;
 
     positions_names << "I" << "II" << "III" << "IV" << "Va" << "V" << "VI";
 
@@ -36,6 +34,8 @@ BrakeCrane130::BrakeCrane130(QObject *parent) : BrakeCrane (parent)
 
     connect(incTimer, SIGNAL(process()), this, SLOT(inc()), Qt::DirectConnection);
     connect(decTimer, SIGNAL(process()), this, SLOT(dec()), Qt::DirectConnection);
+
+    std::fill(sounds.begin(), sounds.end(), sound_state_t());
 }
 
 //------------------------------------------------------------------------------
@@ -59,12 +59,15 @@ void BrakeCrane130::init(double pBP, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane130::setHandlePosition(int &position)
+void BrakeCrane130::setHandlePosition(int position)
 {
-    position = cut(position, static_cast<int>(POS_I), static_cast<int>(POS_VI));
+    if ((handle_pos == position) || (position < min_pos) || (position > max_pos))
+        return;
 
-    std::fill(pos.begin(), pos.end(), 0.0);
+    pos[static_cast<size_t>(handle_pos)] = 0.0;
     pos[static_cast<size_t>(position)] = 1.0;
+    handle_pos = position;
+    sounds[BrakeCrane::CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------
@@ -193,9 +196,9 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
     {
         decTimer->stop();
 
-        // Воазврат ручки из сверхзарядки в поездное
-        if (handle_pos == POS_I)
-            handle_pos = POS_II;
+        // Возврат ручки из сверхзарядки в поездное
+        if ( (handle_pos == POS_I) && !(isAlt() && getKeyState(KEY_1)) )
+            setHandlePosition(POS_II);
     }
 
     if (getKeyState(KEY_Quote))
@@ -208,48 +211,46 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
         incTimer->stop();
     }
 
+    incTimer->step(t, dt);
+    decTimer->step(t, dt);
+
     if (isAlt())
     {
         if (getKeyState(KEY_1))
         {
-            handle_pos = POS_I;
+            setHandlePosition(POS_I);
         }
 
         if (getKeyState(KEY_2))
         {
-            handle_pos = POS_II;
+            setHandlePosition(POS_II);
         }
 
         if (getKeyState(KEY_3))
         {
-            handle_pos = POS_III;
+            setHandlePosition(POS_III);
         }
 
         if (getKeyState(KEY_4))
         {
-            handle_pos = POS_IV;
+            setHandlePosition(POS_IV);
         }
 
         if (getKeyState(KEY_5))
         {
-            handle_pos = POS_Va;
+            setHandlePosition(POS_Va);
         }
 
         if (getKeyState(KEY_6))
         {
-            handle_pos = POS_V;
+            setHandlePosition(POS_V);
         }
 
         if (getKeyState(KEY_7))
         {
-            handle_pos = POS_VI;
+            setHandlePosition(POS_VI);
         }
     }
-
-    setHandlePosition(handle_pos);
-
-    incTimer->step(t, dt);
-    decTimer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -257,14 +258,8 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void BrakeCrane130::inc()
 {
-   int old_pos = handle_pos;
-
-   handle_pos++;
-
-   handle_pos = cut(handle_pos, min_pos, max_pos);
-
-   if (handle_pos != old_pos)
-       emit soundPlay("Kran_395_ruk");
+    int new_pos = handle_pos + 1;
+    setHandlePosition(new_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -272,14 +267,8 @@ void BrakeCrane130::inc()
 //------------------------------------------------------------------------------
 void BrakeCrane130::dec()
 {
-    int old_pos = handle_pos;
-
-    handle_pos--;
-
-    handle_pos = cut(handle_pos, min_pos, max_pos);
-
-    if (handle_pos != old_pos)
-        emit soundPlay("Kran_395_ruk");
+    int new_pos = handle_pos - 1;
+    setHandlePosition(new_pos);
 }
 
 GET_BRAKE_CRANE(BrakeCrane130)
