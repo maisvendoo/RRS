@@ -74,8 +74,6 @@ void VL60k::initTractionControl(const QString &modules_dir, const QString &custo
         motor[i] = new DCMotor();
         motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_config("HB-412K", custom_cfg_dir);
-        connect(motor[i], &DCMotor::soundSetPitch, this, &VL60k::soundSetPitch);
-        connect(motor[i], &DCMotor::soundSetVolume, this, &VL60k::soundSetVolume);
 
         overload_relay[i] = new OverloadRelay();
         overload_relay[i]->read_config("PT-140A", custom_cfg_dir);
@@ -92,7 +90,6 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
     speed_meter = new SL2M();
     speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->read_config("3SL-2M", custom_cfg_dir);
-    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60k::soundSetVolume);
 
     horn = new TrainHorn();
     horn->read_config("train-horn");

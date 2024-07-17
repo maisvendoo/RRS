@@ -75,111 +75,157 @@
 	<!-- Скоростемер -->
 	<Sound>
 		<SignalID>207</SignalID>
-		<Path>skorostemer.wav</Path>
+		<Filename>skorostemer.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.2 3.3</LocalPosition>
 	</Sound>
 
 	<!-- Щелчок блокировки тормозных приборов -->
 	<Sound>
 		<SignalID>208</SignalID>
-		<Path>ubt-367-ruk.wav</Path>
+		<Filename>ubt-367-ruk.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 8.9 2.4</LocalPosition>
 	</Sound>
 
 	<!-- Щелчок комбинированного крана -->
 	<Sound>
 		<SignalID>209</SignalID>
-		<Path>komb-kran.wav</Path>
+		<Filename>komb-kran.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.1 8.8 2.3</LocalPosition>
 	</Sound>
 
 	<!-- Опорожнение тормозной магистрали от комбинированного крана -->
 	<Sound>
 		<SignalID>210</SignalID>
-		<Path>395_vypusk.wav</Path>
+		<Filename>395_vypusk.wav</Filename>
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.1 8.8 2.2</LocalPosition>
 	</Sound>
 
 	<!-- Щелчок рукоятки крана 395 -->
 	<Sound>
 		<SignalID>211</SignalID>
-		<Path>395-chelk.wav</Path>
+		<Filename>395-chelk.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>0</Loop>
 		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 8.9 2.9</LocalPosition>
 	</Sound>
 
 	<!-- Стабилизатор крана 395 -->
 	<Sound>
-		<Name>KRM395_2</Name>
-		<Path>395_2.wav</Path>
+		<SignalID>212</SignalID>
+		<Filename>395_2.wav</Filename>
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>1</Loop>
-		<PlayOnStart>1</PlayOnStart>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.25 8.8 2.8</LocalPosition>
 	</Sound>
 
 	<!-- Наполнение уравнительного резервуара крана 395 -->
 	<Sound>
-		<Name>KRM395_1</Name>
-		<Path>395_1.wav</Path>
+		<SignalID>213</SignalID>
+		<Filename>395_1.wav</Filename>
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>1</Loop>
-		<PlayOnStart>1</PlayOnStart>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 8.9 2.9</LocalPosition>
 	</Sound>
 
 	<!-- Опорожнение уравнительного резервуара крана 395 -->
 	<Sound>
-		<Name>KRM395_5</Name>
-		<Path>395_5.wav</Path>
+		<SignalID>214</SignalID>
+		<Filename>395_5.wav</Filename>
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>1</Loop>
-		<PlayOnStart>1</PlayOnStart>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 8.9 2.9</LocalPosition>
 	</Sound>
 
 	<!-- Наполнение тормозной магистрали от крана 395 -->
 	<Sound>
-		<Name>KRM395_vpusk</Name>
-		<Path>395_vpusk.wav</Path>
+		<SignalID>215</SignalID>
+		<Filename>395_vpusk.wav</Filename>
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>1</Loop>
-		<PlayOnStart>1</PlayOnStart>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 8.9 2.9</LocalPosition>
 	</Sound>
 
 	<!-- Опорожнение тормозной магистрали от крана 395 -->
 	<Sound>
-		<Name>KRM395_vipusk</Name>
-		<Path>395_vypusk.wav</Path>
+		<SignalID>216</SignalID>
+		<Filename>395_vypusk.wav</Filename>
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
 		<Loop>1</Loop>
-		<PlayOnStart>1</PlayOnStart>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 8.9 2.9</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок рукоятки крана 254 -->
+	<Sound>
+		<SignalID>217</SignalID>
+		<Filename>254-chelk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 9.3 3.0</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение магистрали тормозных цилиндров от крана 254 -->
+	<Sound>
+		<SignalID>218</SignalID>
+		<Filename>254_vpusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 9.3 3.0</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение магистрали тормозных цилиндров от крана 254 -->
+	<Sound>
+		<SignalID>219</SignalID>
+		<Filename>254_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 9.3 3.0</LocalPosition>
 	</Sound>
 
 	<!-- Звуки в движении -->
@@ -924,6 +970,78 @@
 		<LocalPosition>1.05 9.05 2.65</LocalPosition>
 	</Sound>
 
+	<!-- Тяговый двигатель 1 -->
+	<Sound>
+		<SignalID>291</SignalID>
+		<Filename>ted_60-62.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>0.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 7.5 0.625</LocalPosition>
+	</Sound>
+
+	<!-- Тяговый двигатель 2 -->
+	<Sound>
+		<SignalID>295</SignalID>
+		<Filename>ted_60-62.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>0.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 5.2 0.625</LocalPosition>
+	</Sound>
+
+	<!-- Тяговый двигатель 3 -->
+	<Sound>
+		<SignalID>293</SignalID>
+		<Filename>ted_60-62.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>0.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 2.9 0.625</LocalPosition>
+	</Sound>
+
+	<!-- Тяговый двигатель 4 -->
+	<Sound>
+		<SignalID>294</SignalID>
+		<Filename>ted_60-62.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>0.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -2.9 0.625</LocalPosition>
+	</Sound>
+
+	<!-- Тяговый двигатель 5 -->
+	<Sound>
+		<SignalID>295</SignalID>
+		<Filename>ted_60-62.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>0.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -5.2 0.625</LocalPosition>
+	</Sound>
+
+	<!-- Тяговый двигатель 6 -->
+	<Sound>
+		<SignalID>296</SignalID>
+		<Filename>ted_60-62.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>0.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -7.5 0.625</LocalPosition>
+	</Sound>
+
 	<!-- Тумблер электропневматического тормоза (на ВЛ60пк) - включение -->
 	<Sound>
 		<SignalID>260</SignalID>
@@ -935,7 +1053,7 @@
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.60 9.20 2.75</LocalPosition>
 	</Sound>
-	<!-- Тумблер электропневматического тормоза (на ВЛ60пк) - включение -->
+	<!-- Тумблер электропневматического тормоза (на ВЛ60пк) - выключение -->
 	<Sound>
 		<SignalID>270</SignalID>
 		<Filename>k-tumbler-off.wav</Filename>

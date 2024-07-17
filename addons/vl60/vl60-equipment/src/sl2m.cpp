@@ -4,16 +4,17 @@
 //
 //------------------------------------------------------------------------------
 SL2M::SL2M(QObject *parent) : Device(parent)
-  , omega(0.0)
-  , ip(3.0 * Physics::PI / 50.0)
-  , omega_s(0.0)
-  , wear_gap(1.0)
-  , max_speed(150.0)
-  , arrow_pos(0.0f)
-  , Dk(1.25)
-  , sound_speed(2.0)
-  , shaft_pos(0.0)
-  , freq_coeff(1.0)
+    , omega(0.0)
+    , ip(3.0 * Physics::PI / 50.0)
+    , omega_s(0.0)
+    , wear_gap(1.0)
+    , max_speed(150.0)
+    , arrow_pos(0.0f)
+    , Dk(1.25)
+    , speed_begin_sound(2.0)
+    , omega_begin_sound(speed_begin_sound * 2.0 / Dk / Physics::kmh)
+    , shaft_pos(0.0)
+    , freq_coeff(1.0)
 {
 
 }
@@ -40,6 +41,7 @@ void SL2M::setOmega(double value)
 void SL2M::setWheelDiameter(double diam)
 {
     Dk = diam;
+    omega_begin_sound = speed_begin_sound * 2.0 / Dk / Physics::kmh;
 }
 
 //------------------------------------------------------------------------------
@@ -50,9 +52,30 @@ float SL2M::getArrowPos() const
     return arrow_pos;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 float SL2M::getShaftPos() const
 {
     return shaft_pos;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t SL2M::getSoundState(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t(abs(omega) >= omega_begin_sound);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float SL2M::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t::createSoundSignal(abs(omega) >= omega_begin_sound);
 }
 
 //------------------------------------------------------------------------------
@@ -65,15 +88,13 @@ void SL2M::preStep(state_vector_t &Y, double t)
 
     omega_s = ip * omega;
 
-    double velocity = omega * Dk / 2.0 + cut(1000.0 * omega, -wear_gap, wear_gap) * sin(Y[1]);
+    double velocity = abs(omega) * Dk / 2.0 + min(1000.0 * omega, wear_gap) * sin(Y[1]);
 
-    arrow_pos = cut(static_cast<float>(abs(velocity) * Physics::kmh / max_speed), 0.0f, 1.0f);
+    arrow_pos = static_cast<float>(min(velocity * Physics::kmh / max_speed, 1.0));
 
     double shaft_angle = Y[0];
 
-    shaft_pos = static_cast<float>(abs(shaft_angle) / 2.0 / Physics::PI);
-
-    emit soundSetVolume("Skorostemer", static_cast<int>(100 * hs_p(abs(omega) * Dk / 2.0 - sound_speed)));
+    shaft_pos = static_cast<float>(shaft_angle / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------
@@ -100,9 +121,7 @@ void SL2M::load_config(CfgReader &cfg)
 
     wear_gap = wear_gap / Physics::kmh;
 
-    cfg.getDouble(secName, "SoundSpeed", sound_speed);
-
-    sound_speed = sound_speed / Physics::kmh;
+    cfg.getDouble(secName, "SoundSpeed", speed_begin_sound);
 
     cfg.getDouble(secName, "FreqCoeff", freq_coeff);
 }

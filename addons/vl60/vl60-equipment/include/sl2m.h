@@ -22,6 +22,12 @@ public:
 
     float getShaftPos() const;
 
+    /// Состояние звука работы
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука работы
+    virtual float getSoundSignal(size_t idx = 0) const;
+
 private:
 
     /// Угловая скорость вращения колесной пары
@@ -33,7 +39,7 @@ private:
     /// Угловая скорость вращения вала
     double omega_s;
 
-    /// Показатель износта - величина разбега стрелки, км/ч
+    /// Показатель износа - величина разбега стрелки, км/ч
     double wear_gap;
 
     /// Максимальна скорость на шкале
@@ -45,7 +51,9 @@ private:
     /// Диаметр бандажа
     double Dk;
 
-    double sound_speed;
+    /// Скорость начала работы звука скоростемера
+    double speed_begin_sound;
+    double omega_begin_sound;
 
     /// Сигнал положения вала
     float shaft_pos;

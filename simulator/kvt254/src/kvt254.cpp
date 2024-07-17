@@ -89,7 +89,7 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
     double dp_ur = k[2] * (p_ur - pBC);
 
     // Поток из питательной магистрали в магистраль тормозных цилиндров
-    double Q_fl_bc = cut(dp_ur, 0.0, K[1]) * (pFL - pBC);
+    double Q_fl_bc = cut(dp_ur, 0.0, K[1]) * pf(pFL - pBC);
 
     // Разрядка магистрали тормозных цилиндров в атмосферу
     double Q_bc_atm = cut(-dp_ur, 0.0, K[2]) * pBC;
@@ -129,8 +129,8 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void LocoCrane254::stepSound()
 {
-    sounds[BC_FILL_FLOW_SOUND].volume = pf(QBC) * 4000.0f;
-    sounds[BC_DRAIN_FLOW_SOUND].volume = nf(QBC) * 4000.0f;
+    sounds[BC_FILL_FLOW_SOUND].volume = pf(QBC) * 500.0f;
+    sounds[BC_DRAIN_FLOW_SOUND].volume = nf(QBC) * 500.0f;
 }
 
 //------------------------------------------------------------------------------
@@ -183,11 +183,11 @@ void LocoCrane254::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
 
-    double new_pos = 0.0;
+    double new_pos = pos;
 
     // Непрерывное движение ручки в сторону отпуска
     if (getKeyState(KEY_Leftbracket))
-        new_pos = pos - pos_duration * dt;
+        new_pos = max(min_pos, pos - pos_duration * dt);
     else
     {
         // Возврат из отпускного положения
@@ -197,7 +197,7 @@ void LocoCrane254::stepKeysControl(double t, double dt)
         {
             // Непрерывное движение ручки в сторону торможения
             if (getKeyState(KEY_Rightbracket))
-                new_pos = pos + pos_duration * dt;
+                new_pos = min(max_pos, pos + pos_duration * dt);
         }
     }
 
@@ -252,7 +252,7 @@ int LocoCrane254::getPositionNumber() const
 
     for (uint i = 0; i < (positions.size() - 1); ++i)
     {
-        if (pos >= positions[i] && pos < positions[i+1])
+        if (pos > positions[i] && pos <= positions[i+1])
             pos_n = static_cast<int>(i);
     }
 

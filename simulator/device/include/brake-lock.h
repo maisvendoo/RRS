@@ -19,7 +19,7 @@ public:
     // Блокировочное устройство
     /// Задать состояние блокировочного устройства:
     /// false - заблокировать, true - разблокировать;
-    /// возвращает false, если вращение ручки заблокировано
+    /// возвращает false, если вращение ручки заблокировано стопором
     bool setState(bool state);
 
     /// Состояние блокировочного устройства:
@@ -36,7 +36,7 @@ public:
 
     // Комбинированный кран
     /// Задать позицию комбинированного крана:
-    /// -1 - положение двойной тяги, 0.0 - поездное положение, 1.0 - экстренное торможение
+    /// -1 - положение двойной тяги, 0 - поездное положение, 1 - экстренное торможение
     void setCombineCranePosition(int pos);
 
     /// Положение рукоятки комбинированного крана:
@@ -83,6 +83,18 @@ public:
     /// Поток в магистраль тормозных цилиндров
     double getBCflow() const;
 
+    enum {
+        NUM_SOUNDS = 3,
+        CHANGE_LOCK_POS_SOUND = 0,  ///< Звук переключения блокировки
+        CHANGE_COMB_POS_SOUND = 1,  ///< Звук переключения комбинированного крана
+        BP_DRAIN_FLOW_SOUND = 2,    ///< Звук опорожнения тормозной магистрали
+    };
+    /// Состояние звука
+    virtual sound_state_t getSoundState(size_t idx = CHANGE_LOCK_POS_SOUND) const;
+
+    /// Сигнал состояния звука
+    virtual float getSoundSignal(size_t idx = CHANGE_LOCK_POS_SOUND) const;
+
 private:
 
     /// Состояние блокировочного устройства:
@@ -113,8 +125,14 @@ private:
     /// Коэффициент потока - разрядки ТМ при экстренном торможении
     double K_emergency;
 
+    /// Коэффициент громкости озвучки к потоку разрядки ТМ комбинированным краном
+    double K_sound;
+
     Timer   *incCombCrane;
     Timer   *decCombCrane;
+
+    /// Состояние звуков
+    std::array<sound_state_t, NUM_SOUNDS> sounds;
 
     void preStep(state_vector_t &Y, double t);
 

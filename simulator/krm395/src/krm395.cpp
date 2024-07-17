@@ -20,11 +20,11 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , pos_delay(0.3)
   , min_pos(POS_I)
   , max_pos(POS_VI)
-  , Kv_in(3e2)
-  , Kv_out(3e2)
-//  , Kv_1(3e5)
-  , Kv_2(1e7)
-  , Kv_5(2e2)
+  , Kv_in(3.0)
+  , Kv_out(3.0)
+//  , Kv_1(3.0e3)
+  , Kv_2(3.0e5)
+  , Kv_5(2.0)
 {
     std::fill(pos.begin(), pos.end(), 0.0);
     pos[handle_pos] = 1.0;

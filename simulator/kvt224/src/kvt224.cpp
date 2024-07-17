@@ -80,7 +80,7 @@ void LocoCrane224::ode_system(const state_vector_t &Y,
     double dp_ur = k[2] * (p_ur - pBC);
 
     // Поток из питательной магистрали в магистраль тормозных цилиндров
-    double Q_fl_bc = cut(dp_ur, 0.0, K[1]) * (pFL - pBC);
+    double Q_fl_bc = cut(dp_ur, 0.0, K[1]) * pf(pFL - pBC);
 
     // Разрядка магистрали тормозных цилиндров в атмосферу
     double Q_bc_atm = cut(-dp_ur, 0.0, K[2]) * pBC;
@@ -170,7 +170,7 @@ void LocoCrane224::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
 
-    double new_pos = 0.0;
+    double new_pos = pos;
 
     // Непрерывное движение ручки в сторону отпуска
     if (getKeyState(KEY_Leftbracket))
