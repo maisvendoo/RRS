@@ -34,16 +34,16 @@ void VL60pk::load_brakes_config(QString path)
             supply_reservoir->setY(0, charge_press);
         }
 
-        int train_crane_pos = 6;
+        int train_crane_pos = 7;
 
         if (cfg.getInt(secName, "TrainCranePos", train_crane_pos))
         {
-            brake_crane->setHandlePosition(train_crane_pos);
+            brake_crane->setHandlePosition(train_crane_pos - 1);
         }
 
-        int loco_crane_pos = 0;
+        double loco_crane_pos = 0.0;
 
-        if (cfg.getInt(secName, "LocoCranePos", loco_crane_pos))
+        if (cfg.getDouble(secName, "LocoCranePos", loco_crane_pos))
         {
             loco_crane->setHandlePosition(loco_crane_pos);
         }

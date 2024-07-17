@@ -136,9 +136,6 @@ private:
         RBS = 2
     };
 
-    /// Список звуков перестука
-    QList<QString>   tap_sounds;
-
     /// Триггеры рукояток бдительности
     std::array<Trigger, NUM_RB>  rb;
 
@@ -330,8 +327,6 @@ private:
 
     void initTriggers();
 
-    void initTapSounds();
-
     /// Предварительные расчёты перед симуляцией
     void preStep(double t);
 
@@ -370,8 +365,6 @@ private:
     void stepOtherEquipment(double t, double dt);
 
     void stepSoundSignalsOutput(double t, double dt);
-
-    void stepTapSound();
 
     void lineContactorsControl(bool state);
 

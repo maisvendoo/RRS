@@ -84,8 +84,6 @@ void VL60k::initialization()
     initOtherEquipment(modules_dir, custom_cfg_dir);
 
     initTriggers();
-
-    initTapSounds();
 }
 
 //------------------------------------------------------------------------------
@@ -124,8 +122,6 @@ void VL60k::step(double t, double dt)
     stepLineContactors(t, dt);
 
     stepOtherEquipment(t, dt);
-
-    stepTapSound();
 
     stepSoundSignalsOutput(t, dt);
 

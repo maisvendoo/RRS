@@ -240,19 +240,6 @@ void VL60pk::stepOtherEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepTapSound()
-{
-    double speed = abs(this->velocity) * 3.6;
-
-    for (int i = 0; i < tap_sounds.count(); ++i)
-    {
-        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 double VL60pk::getTractionForce()
 {
     double sum_force = 0.0;
