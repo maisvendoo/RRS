@@ -38,7 +38,6 @@ win32 {
         LIBS += -L../../../lib -lTcpConnection_d
         LIBS += -L../../../lib -ldisplay_d
 
-        LIBS += -L../../../lib -lasound_d
         LIBS += -L../../../lib -lsound-manager_d
 
     } else {
@@ -57,7 +56,6 @@ win32 {
         LIBS += -L../../../lib -lTcpConnection
         LIBS += -L../../../lib -ldisplay
 
-        LIBS += -L../../../lib -lasound
         LIBS += -L../../../lib -lsound-manager
     }
 
@@ -89,7 +87,6 @@ unix {
         LIBS += -L../../lib -lTcpConnection_d
         LIBS += -L../../lib -ldisplay_d
 
-        LIBS += -L../../../lib -lasound
         LIBS += -L../../../lib -lsound-manager
 
     } else {
@@ -108,7 +105,6 @@ unix {
         LIBS += -L../../lib -lTcpConnection
         LIBS += -L../../lib -ldisplay
 
-        LIBS += -L../../../lib -lasound
         LIBS += -L../../../lib -lsound-manager
     }
 
