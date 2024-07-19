@@ -7,7 +7,6 @@ SUBDIRS += ./CfgEditor
 SUBDIRS += ./filesystem
 SUBDIRS += ./libJournal
 SUBDIRS += ./tcp-connection
-#SUBDIRS += ./asound
 SUBDIRS += ./simulator
 
 SUBDIRS += ./viewer
@@ -22,4 +21,3 @@ SUBDIRS += ./launcher
 SUBDIRS += ./tools/profconv
 SUBDIRS += ./tools/pathconv
 SUBDIRS += ./tools/routeconv
-#SUBDIRS += ./routeLODgen
