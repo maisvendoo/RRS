@@ -27,6 +27,8 @@ public:
 
     ~LocoCrane224();
 
+    void setHandlePosition(double position);
+
     double getHandlePosition() const;
 
     double getHandleShift() const;
@@ -50,7 +52,8 @@ private:
 
     double pos_duration;
 
-    int dir;
+    /// Текущая фиксированная позиция
+    size_t cur_pos;
 
     std::array<double, NUM_STEPS> step_pressures;
 
@@ -60,14 +63,14 @@ private:
 
     std::array<double, MAX_GIAN_COEFFS> k;
 
-    /// Текущая фиксированная позиция
-    double cur_pos;
-
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
     void load_config(CfgReader &cfg);
 
     void stepKeysControl(double t, double dt);
+
+    /// Изменение номера позиции
+    bool isPositionNumberChanged();
 };
 
 #endif // KVT224_H

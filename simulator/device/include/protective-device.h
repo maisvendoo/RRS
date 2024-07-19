@@ -30,11 +30,17 @@ public:
 
     bool getState() const;
 
-    /// Состояние звука включения
-    sound_state_t getSoundOn() const;
+    enum {
+        NUM_SOUNDS = 3,
+        CHANGE_SOUND = 0,   ///< Звук переключения
+        ON_SOUND = 1,       ///< Звук включения
+        OFF_SOUND = 2       ///< Звук выключения
+    };
+    /// Состояние звука включения-выключения
+    sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const;
 
-    /// Состояние звука отключения
-    sound_state_t getSoundOff() const;
+    /// Сигнал состояния звука включения-выключения
+    float getSoundSignal(size_t idx = CHANGE_SOUND) const;
 
 private:
 

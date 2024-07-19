@@ -1,12 +1,13 @@
 #include    "overload-relay.h"
+#include    "filesystem.h"
+#include    "CfgReader.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-OverloadRelay::OverloadRelay(QObject *parent) : Device(parent)
+OverloadRelay::OverloadRelay(QObject *parent) : Trigger(parent)
   , current(0.0)
   , trig_current(800.0)
-  , state(0.0)
 {
 
 }
@@ -25,40 +26,33 @@ OverloadRelay::~OverloadRelay()
 void OverloadRelay::setCurrent(double value)
 {
     current = value;
-}
-
-double OverloadRelay::getState() const
-{
-    return state;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void OverloadRelay::preStep(state_vector_t &Y, double t)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(Y)
-
-    state = hs_p(qAbs(current) - trig_current);
+    if (current > trig_current)
+        set();
+    else
+        reset();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void OverloadRelay::ode_system(const state_vector_t &Y,
-                               state_vector_t &dYdt,
-                               double t)
+void OverloadRelay::read_config(const QString &filename, const QString &dir_path)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
-}
+    FileSystem &fs = FileSystem::getInstance();
+    CfgReader cfg;
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void OverloadRelay::load_config(CfgReader &cfg)
-{
-    cfg.getDouble("Device", "TrigCurren", trig_current);
+    // Custom config from path
+    QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
+    if (cfg.load(cfg_path))
+    {
+        cfg.getDouble("Device", "TrigCurren", trig_current);
+        return;
+    }
+
+    QString cfg_dir = fs.getDevicesDir().c_str();
+    cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
+
+    if (cfg.load(cfg_path))
+    {
+        cfg.getDouble("Device", "TrigCurren", trig_current);
+    }
 }

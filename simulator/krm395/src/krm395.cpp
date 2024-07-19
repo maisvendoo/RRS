@@ -1,7 +1,5 @@
 #include    "krm395.h"
 
-#include    <iostream>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -22,19 +20,14 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
   , pos_delay(0.3)
   , min_pos(POS_I)
   , max_pos(POS_VI)
-  , volume_in(0)
-  , volume_out(0)
-//  , volume_1(0)
-  , volume_2(0)
-  , volume_5(0)
-  , Kv_in(3e2)
-  , Kv_out(3e2)
-//  , Kv_1(3e5)
-  , Kv_2(1e7)
-  , Kv_5(2e2)
+  , Kv_in(3.0)
+  , Kv_out(3.0)
+//  , Kv_1(3.0e3)
+  , Kv_2(3.0e5)
+  , Kv_5(2.0)
 {
     std::fill(pos.begin(), pos.end(), 0.0);
-    pos[POS_II] = 1.0;
+    pos[handle_pos] = 1.0;
 
     positions_names << "I" << "II" << "III" << "IV" << "Va" << "V" << "VI";
 
@@ -46,6 +39,14 @@ BrakeCrane395::BrakeCrane395(QObject *parent) : BrakeCrane (parent)
 
     connect(incTimer, SIGNAL(process()), this, SLOT(inc()), Qt::DirectConnection);
     connect(decTimer, SIGNAL(process()), this, SLOT(dec()), Qt::DirectConnection);
+
+    sounds[CHANGE_POS_SOUND] = sound_state_t();
+    sounds[ER_STAB_SOUND] = sound_state_t(true, 0.0f, 1.0f);
+    //sounds[ER_FILL_FLOW_SOUND] = sound_state_t(true, 0.0f, 1.0f);
+    sounds[ER_FILL_FLOW_SOUND] = sound_state_t();
+    sounds[ER_DRAIN_FLOW_SOUND] = sound_state_t(true, 0.0f, 1.0f);
+    sounds[BP_FILL_FLOW_SOUND] = sound_state_t(true, 0.0f, 1.0f);
+    sounds[BP_DRAIN_FLOW_SOUND] = sound_state_t(true, 0.0f, 1.0f);
 }
 
 //------------------------------------------------------------------------------
@@ -69,14 +70,15 @@ void BrakeCrane395::init(double pBP, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane395::setHandlePosition(int &position)
+void BrakeCrane395::setHandlePosition(int position)
 {
-    position = cut(position, min_pos, max_pos);
+    if ((handle_pos == position) || (position < min_pos) || (position > max_pos))
+        return;
 
-    handle_pos = position;
-
-    std::fill(pos.begin(), pos.end(), 0.0);
+    pos[static_cast<size_t>(handle_pos)] = 0.0;
     pos[static_cast<size_t>(position)] = 1.0;
+    handle_pos = position;
+    sounds[BrakeCrane::CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------
@@ -105,21 +107,6 @@ void BrakeCrane395::preStep(state_vector_t &Y, double t)
 
     is_hold = static_cast<bool>(pos[POS_III] + pos[POS_IV]);
     is_brake = static_cast<bool>(pos[POS_Va] + pos[POS_V] + pos[POS_VI]);
-
-    emit soundSetVolume("KRM395_vpusk", cut(volume_in, 0, 100));
-    emit soundSetVolume("KRM395_vipusk", cut(volume_out, 0, 100));
-//    emit soundSetVolume("KRM395_1", cut(volume_1, 0, 100));
-    emit soundSetVolume("KRM395_2", cut(volume_2, 0, 100));
-    emit soundSetVolume("KRM395_5", cut(volume_5, 0, 100));
-/*
-//    DebugMsg = QString("out: %1 in: %2 1: %3 2: %4 5: %5")
-    DebugMsg = QString("out: %1 in: %2 2: %3 5: %4")
-            .arg(volume_out, 10)
-            .arg(volume_in, 10)
-//            .arg(volume_1, 10)
-            .arg(volume_2, 10);
-            .arg(volume_5, 10);
-*/
 }
 
 //------------------------------------------------------------------------------
@@ -176,11 +163,11 @@ void BrakeCrane395::ode_system(const state_vector_t &Y,
     // Суммарный поток в уравнительный резервуар
     setERflow(Q_leak_er + Q_charge_er + Q_train_er + Q_stab_er + Q_brake_er);
 
-    volume_in = static_cast<int>(Kv_in * cbrt(pf(QBP)));
-    volume_out = static_cast<int>(Kv_out * cbrt(nf(QBP)));
-//    volume_1 = static_cast<int>(Kv_1 * pf(Q_charge_er));
-    volume_2 = static_cast<int>(Kv_2 * nf(Q_stab_er));
-    volume_5 = static_cast<int>(Kv_5 * cbrt(nf(Q_brake_er)));
+    sounds[ER_STAB_SOUND].volume = Kv_2 * nf(Q_stab_er);
+    //sounds[ER_FILL_FLOW_SOUND].volume = Kv_1 * pf(Q_charge_er);
+    sounds[ER_DRAIN_FLOW_SOUND].volume = Kv_5 * cbrt(nf(Q_brake_er));
+    sounds[BP_FILL_FLOW_SOUND].volume = Kv_in * cbrt(pf(QBP));
+    sounds[BP_DRAIN_FLOW_SOUND].volume = Kv_out * cbrt(nf(QBP));
 
     BrakeCrane::ode_system(Y, dYdt, t);
 }
@@ -246,48 +233,46 @@ void BrakeCrane395::stepKeysControl(double t, double dt)
         incTimer->stop();
     }
 
+    incTimer->step(t, dt);
+    decTimer->step(t, dt);
+
     if (isAlt())
     {
         if (getKeyState(KEY_1))
         {
-            handle_pos = POS_I;
+            setHandlePosition(POS_I);
         }
 
         if (getKeyState(KEY_2))
         {
-            handle_pos = POS_II;
+            setHandlePosition(POS_II);
         }
 
         if (getKeyState(KEY_3))
         {
-            handle_pos = POS_III;
+            setHandlePosition(POS_III);
         }
 
         if (getKeyState(KEY_4))
         {
-            handle_pos = POS_IV;
+            setHandlePosition(POS_IV);
         }
 
         if (getKeyState(KEY_5))
         {
-            handle_pos = POS_Va;
+            setHandlePosition(POS_Va);
         }
 
         if (getKeyState(KEY_6))
         {
-            handle_pos = POS_V;
+            setHandlePosition(POS_V);
         }
 
         if (getKeyState(KEY_7))
         {
-            handle_pos = POS_VI;
+            setHandlePosition(POS_VI);
         }
     }
-
-    setHandlePosition(handle_pos);
-
-    incTimer->step(t, dt);
-    decTimer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -295,14 +280,8 @@ void BrakeCrane395::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void BrakeCrane395::inc()
 {
-   int old_pos = handle_pos;
-
-   handle_pos++;
-
-   handle_pos = cut(handle_pos, min_pos, max_pos);
-
-   if (handle_pos != old_pos)
-       emit soundPlay("Kran_395_ruk");
+    int new_pos = handle_pos + 1;
+    setHandlePosition(new_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -310,14 +289,8 @@ void BrakeCrane395::inc()
 //------------------------------------------------------------------------------
 void BrakeCrane395::dec()
 {
-    int old_pos = handle_pos;
-
-    handle_pos--;
-
-    handle_pos = cut(handle_pos, min_pos, max_pos);
-
-    if (handle_pos != old_pos)
-        emit soundPlay("Kran_395_ruk");
+    int new_pos = handle_pos - 1;
+    setHandlePosition(new_pos);
 }
 
 GET_BRAKE_CRANE(BrakeCrane395)

@@ -43,9 +43,6 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
-    /// Список звуков перестука
-    QList<QString> tap_sounds;
-
     /// Напряжение аккумуляторной батареи
     double  U_bat;
 
@@ -349,8 +346,6 @@ private:
 
     void initTriggers();
 
-    void initTapSounds();
-
     /// Предварительные расчёты перед симуляцией
     void preStep(double t);
 
@@ -392,8 +387,6 @@ private:
     void stepOtherEquipment(double t, double dt);
 
     void stepSoundSignalsOutput(double t, double dt);
-
-    void stepTapSound();
 
     void lineContactorsControl(bool state);
 

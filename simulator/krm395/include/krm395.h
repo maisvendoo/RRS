@@ -36,7 +36,7 @@ public:
 
     void init(double pBP, double pFL);
 
-    void setHandlePosition(int &position);
+    void setHandlePosition(int position);
 
     QString getPositionName() const;
 
@@ -88,13 +88,6 @@ private:
     int min_pos;
 
     int max_pos;
-
-    // Громкость озвучки
-    int volume_in;
-    int volume_out;
-//    int volume_1;
-    int volume_2;
-    int volume_5;
 
     // Коэффициенты к громкости озвучки
     double Kv_in;

@@ -74,8 +74,6 @@ void VL60k::initTractionControl(const QString &modules_dir, const QString &custo
         motor[i] = new DCMotor();
         motor[i]->setCustomConfigDir(config_dir);
         motor[i]->read_config("HB-412K", custom_cfg_dir);
-        connect(motor[i], &DCMotor::soundSetPitch, this, &VL60k::soundSetPitch);
-        connect(motor[i], &DCMotor::soundSetVolume, this, &VL60k::soundSetVolume);
 
         overload_relay[i] = new OverloadRelay();
         overload_relay[i]->read_config("PT-140A", custom_cfg_dir);
@@ -92,7 +90,6 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
     speed_meter = new SL2M();
     speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->read_config("3SL-2M", custom_cfg_dir);
-    connect(speed_meter, &SL2M::soundSetVolume, this, &VL60k::soundSetVolume);
 
     horn = new TrainHorn();
     horn->read_config("train-horn");
@@ -130,24 +127,4 @@ void VL60k::initTriggers()
     autoStartTimer = new Timer(0.5);
     connect(autoStartTimer, &Timer::process, this, &VL60k::slotAutoStart);
     start_count = 0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60k::initTapSounds() {
-    QString f_p = "tap_";
-
-    tap_sounds << (f_p + "5-10");
-    tap_sounds << (f_p + "10-20");
-    tap_sounds << (f_p + "20-30");
-    tap_sounds << (f_p + "30-40");
-    tap_sounds << (f_p + "40-50");
-    tap_sounds << (f_p + "50-60");
-    tap_sounds << (f_p + "60-70");
-    tap_sounds << (f_p + "70-80");
-    tap_sounds << (f_p + "80-90");
-    tap_sounds << (f_p + "90-100");
-    tap_sounds << (f_p + "100-110");
-    tap_sounds << (f_p + "110-~");
 }

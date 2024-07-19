@@ -55,9 +55,19 @@ bool ACMotorFan::isReady() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t ACMotorFan::getSoundState() const
+sound_state_t ACMotorFan::getSoundState(size_t idx) const
 {
+    (void) idx;
     return sound_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float ACMotorFan::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state.createSoundSignal();
 }
 
 //------------------------------------------------------------------------------

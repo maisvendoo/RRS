@@ -141,7 +141,6 @@ void VL60pk::stepTractionControl(double t, double dt)
         I_vu += motor[i]->getIa();
 
         overload_relay[i]->setCurrent(motor[i]->getIa());
-        overload_relay[i]->step(t, dt);
     }
 
     for (auto v : vu)
@@ -241,19 +240,6 @@ void VL60pk::stepOtherEquipment(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepTapSound()
-{
-    double speed = abs(this->velocity) * 3.6;
-
-    for (int i = 0; i < tap_sounds.count(); ++i)
-    {
-        emit volumeCurveStep(tap_sounds[i], static_cast<float>(speed));
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 double VL60pk::getTractionForce()
 {
     double sum_force = 0.0;
@@ -273,14 +259,14 @@ bool VL60pk::getHoldingCoilState() const
 {
     km_state_t km_state = controller->getState();
 
-    bool no_overload = true;
+    bool overload = false;
 
     for (auto ov_relay : overload_relay)
     {
-        no_overload = no_overload && (!static_cast<bool>(ov_relay->getState()));
+        overload |= ov_relay->getState();
     }
 
-    bool state = !km_state.pos_state[POS_BV] && no_overload;
+    bool state = !km_state.pos_state[POS_BV] && (!overload);
 
     return state;
 }

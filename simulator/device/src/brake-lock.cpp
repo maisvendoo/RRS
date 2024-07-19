@@ -15,13 +15,15 @@ BrakeLock::BrakeLock(QObject *parent) : BrakeDevice(parent)
   , QBP(0.0)
   , QBC(0.0)
   , V0(1e-3)
-  , K_emergency(1e-3)
+  , K_emergency(0.1)
 {
     incCombCrane = new Timer(0.3);
     decCombCrane = new Timer(0.3);
 
     connect(incCombCrane, &Timer::process, this, &BrakeLock::combCraneInc);
     connect(decCombCrane, &Timer::process, this, &BrakeLock::combCraneDec);
+
+    std::fill(sounds.begin(), sounds.end(), sound_state_t());
 }
 
 //------------------------------------------------------------------------------
@@ -53,12 +55,11 @@ bool BrakeLock::setState(bool state)
     if (is_handle_locked)
         return false;
 
-    bool prev_state = this->state;
+    if (state == this->state)
+        return true;
+
     this->state = state;
-
-    if (prev_state != state)
-        emit soundPlay("UBT_367_ruk");
-
+    sounds[CHANGE_LOCK_POS_SOUND].play();
     return true;
 }
 
@@ -91,7 +92,12 @@ double BrakeLock::getMainHandlePosition() const
 //------------------------------------------------------------------------------
 void BrakeLock::setCombineCranePosition(int pos)
 {
+    if ( (pos == comb_crane_pos) || (pos < -1) || (pos > 1) )
+        return;
+
     comb_crane_pos = pos;
+    sounds[CHANGE_COMB_POS_SOUND].play();
+    sounds[BP_DRAIN_FLOW_SOUND].state = (comb_crane_pos == 1);
 }
 
 //------------------------------------------------------------------------------
@@ -209,6 +215,26 @@ double BrakeLock::getBCflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t BrakeLock::getSoundState(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx];
+    return Device::getSoundState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float BrakeLock::getSoundSignal(size_t idx) const
+{
+    if (idx < sounds.size())
+        return sounds[idx].createSoundSignal();
+    return Device::getSoundSignal();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void BrakeLock::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
@@ -224,6 +250,8 @@ void BrakeLock::preStep(state_vector_t &Y, double t)
 
         Y[2] = pBC;
     }
+
+    sounds[BP_DRAIN_FLOW_SOUND].volume = K_sound * cbrt(K_emergency * pBP);
 }
 
 //------------------------------------------------------------------------------
@@ -270,6 +298,8 @@ void BrakeLock::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "p_lock", p_lock);
 
     cfg.getDouble(secName, "K_emergency", K_emergency);
+
+    cfg.getDouble(secName, "K_sound", K_sound);
 }
 
 //------------------------------------------------------------------------------
@@ -316,14 +346,7 @@ void BrakeLock::stepKeysControl(double t, double dt)
 //------------------------------------------------------------------------------
 void BrakeLock::combCraneInc()
 {
-    int old_pos = comb_crane_pos;
-
-    comb_crane_pos++;
-
-    comb_crane_pos = cut(comb_crane_pos, -1, 1);
-
-    if (old_pos != comb_crane_pos)
-        emit soundPlay("Komb_kran");
+    setCombineCranePosition(comb_crane_pos + 1);
 }
 
 //------------------------------------------------------------------------------
@@ -331,12 +354,5 @@ void BrakeLock::combCraneInc()
 //------------------------------------------------------------------------------
 void BrakeLock::combCraneDec()
 {
-    int old_pos = comb_crane_pos;
-
-    comb_crane_pos--;
-
-    comb_crane_pos = cut(comb_crane_pos, -1, 1);
-
-    if (old_pos != comb_crane_pos)
-        emit soundPlay("Komb_kran");
+    setCombineCranePosition(comb_crane_pos - 1);
 }

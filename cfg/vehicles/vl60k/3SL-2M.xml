@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Device>
-        <Order>2</Order>
-        <SubStepNum>1</SubStepNum>
-        <Solver>euler</Solver>
+	<Device>
+		<Order>2</Order>
+		<SubStepNum>1</SubStepNum>
+		<Solver>euler</Solver>
 
-        <MaxSpeed>150</MaxSpeed>
-        <WearGap>0.0</WearGap>
-        <SoundSpeed>2.0</SoundSpeed>
-        <FreqCoeff>2.0</FreqCoeff>
+		<MaxSpeed>150</MaxSpeed>
+		<WearGap>0.0</WearGap>
+		<SoundSpeed>2.0</SoundSpeed>
+		<FreqCoeff>2.0</FreqCoeff>
 
-    </Device>
+	</Device>
 </Config>

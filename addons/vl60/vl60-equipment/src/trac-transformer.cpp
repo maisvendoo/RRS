@@ -63,9 +63,19 @@ QString TracTransformer::getPosName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t TracTransformer::getSoundState() const
+sound_state_t TracTransformer::getSoundState(size_t idx) const
 {
+    (void) idx;
     return sound_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float TracTransformer::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state.createSoundSignal();
 }
 
 //------------------------------------------------------------------------------

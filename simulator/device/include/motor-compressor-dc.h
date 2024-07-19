@@ -29,8 +29,12 @@ public:
     /// Текущее состояние
     bool isPowered() const;
 
-    /// Состояние звука компрессора
-    sound_state_t getSoundState() const;
+    /// Состояние звука работы
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука работы
+    virtual float getSoundSignal(size_t idx = 0) const;
+
     void RegulateSoundByOnOff(bool value);
     void RegulateSoundByPitch(bool value);
 

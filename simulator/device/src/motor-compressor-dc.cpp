@@ -75,9 +75,19 @@ bool DCMotorCompressor::isPowered() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t DCMotorCompressor::getSoundState() const
+sound_state_t DCMotorCompressor::getSoundState(size_t idx) const
 {
+    (void) idx;
     return sound_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float DCMotorCompressor::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state.createSoundSignal();
 }
 
 //------------------------------------------------------------------------------

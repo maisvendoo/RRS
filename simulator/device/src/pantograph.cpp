@@ -98,17 +98,17 @@ bool Pantograph::isDown() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Pantograph::getSoundUp() const
+sound_state_t Pantograph::getSoundState(size_t idx) const
 {
-    return ref_state.getSoundState(Trigger::ON_SOUND);
+    return ref_state.getSoundState(idx);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t Pantograph::getSoundDown() const
+float Pantograph::getSoundSignal(size_t idx) const
 {
-    return ref_state.getSoundState(Trigger::OFF_SOUND);
+    return ref_state.getSoundSignal(idx);
 }
 
 //----------------------------------------------------------------------------

@@ -44,8 +44,17 @@ public:
     /// Поток в импульсную магистраль
     double getILflow() const;
 
-    /// Моделирование звуков
-    virtual void stepSound();
+    enum {
+        NUM_SOUNDS = 3,
+        CHANGE_POS_SOUND = 0,   ///< Звук переключения
+        BC_FILL_FLOW_SOUND = 1, ///< Звук наполнения магистрали тормозных цилиндров
+        BC_DRAIN_FLOW_SOUND = 2 ///< Звук опорожнения магистрали тормозных цилиндров
+    };
+    /// Состояние звука
+    virtual sound_state_t getSoundState(size_t idx = CHANGE_POS_SOUND) const;
+
+    /// Сигнал состояния звука
+    virtual float getSoundSignal(size_t idx = CHANGE_POS_SOUND) const;
 
 protected:
 
@@ -62,6 +71,9 @@ protected:
     double QFL;
     double QBC;
     double QIL;
+
+    /// Состояние звуков
+    std::vector<sound_state_t> sounds;
 };
 
 //------------------------------------------------------------------------------
