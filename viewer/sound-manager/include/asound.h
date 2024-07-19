@@ -208,11 +208,11 @@ struct wave_list_head_t
 const float DEF_SRC_PITCH = 1.0f;
 
 /// Минимальная громкость источника
-const int MIN_SRC_VOLUME  = 0;
+const int MIN_SRC_VOLUME  = 0.0f;
 /// Громкость источника по умолчанию
-const int DEF_SRC_VOLUME  = 100;
+const int DEF_SRC_VOLUME  = 1.0f;
 /// Максимальная громкость источника
-const int MAX_SRC_VOLUME  = 100;
+const int MAX_SRC_VOLUME  = 1.0f;
 
 /// Положение источника по умолчанию
 const float DEF_SRC_POS[3] = {0.0f, 0.0f, 1.0f};
@@ -239,7 +239,7 @@ public:
     ~ASound();
 
     /// Вернуть громкость
-    int getVolume();
+    float getVolume();
 
     /// Вернуть скорость воспроизведения
     float getPitch();
@@ -277,7 +277,7 @@ public:
 
 public slots:
     /// Установить громкость
-    void setVolume(int volume = 100);
+    void setVolume(float volume = 1.0f);
 
     /// Установить скорости воспроизведения
     void setPitch(float pitch);
@@ -375,7 +375,7 @@ private:
     ALenum  format_; ///< Формат аудио (mono8/16 - stereo8/16) OpenAL
 
     // Громкость
-    int sourceVolume_; ///< Громкость
+    ALfloat sourceVolume_; ///< Громкость
 
     // Скорости воспроизведения
     ALfloat sourcePitch_; ///< Скорость воспроизведения

@@ -194,11 +194,10 @@ void SoundManager::setSoundState(size_t idx, sound_state_t ss)
             sounds[idx].sound->stop();
             sounds[idx].prev_state = 0;
         }
-        sounds[idx].sound->setVolume(0);
+        sounds[idx].sound->setVolume(0.0f);
         return;
     }
-    int tmp = static_cast<int>(100.0f * ss.volume * sounds[idx].max_volume);
-    sounds[idx].sound->setVolume(tmp);
+    sounds[idx].sound->setVolume(ss.volume * sounds[idx].max_volume);
 
     if (ss.pitch < 0.5f)
     {
@@ -270,7 +269,7 @@ void SoundManager::setVolume(size_t idx, float volume)
 
     if (volume <= 0.0f)
     {
-        sounds[idx].sound->setVolume(0);
+        sounds[idx].sound->setVolume(0.0f);
 
         if (sounds[idx].prev_state > 0)
         {
@@ -282,13 +281,11 @@ void SoundManager::setVolume(size_t idx, float volume)
 
     if (volume >= 1.0f)
     {
-        int tmp = static_cast<int>(100.0f * sounds[idx].max_volume);
-        sounds[idx].sound->setVolume(tmp);
+        sounds[idx].sound->setVolume(sounds[idx].max_volume);
     }
     else
     {
-        int tmp = static_cast<int>(100.0f * volume * sounds[idx].max_volume);
-        sounds[idx].sound->setVolume(tmp);
+        sounds[idx].sound->setVolume(volume * sounds[idx].max_volume);
     }
 
     if (sounds[idx].prev_state == 0)

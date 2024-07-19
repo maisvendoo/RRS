@@ -586,7 +586,7 @@ void ASound::configureSource_()
         }
 
         // Устанавливаем громкость
-        alSourcef(source_, AL_GAIN, 0.01f * sourceVolume_);
+        alSourcef(source_, AL_GAIN, sourceVolume_);
 
         if (alGetError() != AL_NO_ERROR)
         {
@@ -659,7 +659,7 @@ int ASound::getDuration()
 //-----------------------------------------------------------------------------
 // (слот) Установить громкость
 //-----------------------------------------------------------------------------
-void ASound::setVolume(int volume)
+void ASound::setVolume(float volume)
 {
     if (canPlay_)
     {
@@ -671,7 +671,7 @@ void ASound::setVolume(int volume)
         if (sourceVolume_ < MIN_SRC_VOLUME)
             sourceVolume_ = MIN_SRC_VOLUME;
 
-        alSourcef(source_, AL_GAIN, 0.01f * sourceVolume_);
+        alSourcef(source_, AL_GAIN, sourceVolume_);
     }
 }
 
@@ -680,7 +680,7 @@ void ASound::setVolume(int volume)
 //-----------------------------------------------------------------------------
 // Вернуть громкость
 //-----------------------------------------------------------------------------
-int ASound::getVolume()
+float ASound::getVolume()
 {
     return sourceVolume_;
 }
