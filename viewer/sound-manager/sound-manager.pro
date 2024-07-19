@@ -14,14 +14,12 @@ CONFIG(debug, debug|release) {
 
     TARGET = $$join(TARGET,,,_d)
 
-    LIBS += -L../../../lib -lasound_d
     LIBS += -L../../../lib -lCfgReader_d
     LIBS += -L../../../lib -lfilesystem_d
     LIBS += -L../../../lib -lJournal_d
 
 } else {
 
-    LIBS += -L../../../lib -lasound
     LIBS += -L../../../lib -lCfgReader
     LIBS += -L../../../lib -lfilesystem
     LIBS += -L../../../lib -lJournal
