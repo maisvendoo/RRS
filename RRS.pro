@@ -7,7 +7,7 @@ SUBDIRS += ./CfgEditor
 SUBDIRS += ./filesystem
 SUBDIRS += ./libJournal
 SUBDIRS += ./tcp-connection
-SUBDIRS += ./asound
+#SUBDIRS += ./asound
 SUBDIRS += ./simulator
 
 SUBDIRS += ./viewer
