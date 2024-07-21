@@ -25,7 +25,7 @@ public:
     void setReversPos(int pos);
 
     enum {
-        NUM_SOUNDS = 4,
+        NUM_SOUNDS = 2,
         REVERS_CHANGE_POS_SOUND = 0,    ///< Звук переключения реверсора
         MAIN_CHANGE_POS_SOUND = 1       ///< Звук переключения контроллера
     };
@@ -51,7 +51,7 @@ private:
     /// Состояние контроллера
     km_state_t  state;
 
-    /// Очерёдность и состояние звуков
+    /// Счётчик и состояние звуков
     std::array <sound_state_t, NUM_SOUNDS> sounds;
 
     enum

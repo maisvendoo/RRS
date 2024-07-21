@@ -30,9 +30,15 @@ public:
 
     ~AutoTrainStopEPK150();
 
+    void init(double pBP, double pFL);
+
     bool getEmergencyBrakeContact() const;
 
-    void init(double pBP, double pFL);
+    /// Состояние звука свистка ЭПК
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука свистка ЭПК
+    virtual float getSoundSignal(size_t idx = 0) const;
 
 private:
 
@@ -66,16 +72,11 @@ private:
     /// Признак работы свистка
     double is_whistle_on;
 
-    /// Признак озвучки свистка
-    bool is_whistle;
-
     std::array<double, MAX_FLOW_COEFFS> K;
 
     std::array<double, MAX_GIAN_COEFFS> k;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
-
-    void preStep(state_vector_t &Y, double t);
 
     void load_config(CfgReader &cfg);
 
