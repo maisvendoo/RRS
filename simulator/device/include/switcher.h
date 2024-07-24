@@ -1,10 +1,10 @@
 #ifndef SWITCHER_H
 #define SWITCHER_H
 
-#include "device.h"
+#include    "device.h"
 
 //------------------------------------------------------------------------------
-//
+// Многопозиционный переключатель
 //------------------------------------------------------------------------------
 class DEVICE_EXPORT Switcher : public Device
 {
@@ -14,39 +14,67 @@ public:
 
     ~Switcher();
 
-    void setKeyCode(int value) { keyCode = value; }
+    /// Задать управляющую клавишу
+    void setKeyCode(int key_code);
 
-    void setKolStates(int value) { kolStates = value; is_switched.resize(static_cast<size_t>(kolStates)); }
+    /// Задать количество позиций
+    void setNumPositions(int value);
 
-    void setState(int value) { state = value; }
+    /// Задать подпружиненный автовозврат из первой позиции в следующую
+    void setSpringFirst(bool is_spring = true);
 
-    int getState() const { return state; }
+    /// Задать подпружиненный автовозврат из последней позиции в предыдущую
+    void setSpringLast(bool is_spring = true);
 
-    int getKolStates() const { return kolStates; }
+    /// Задать позицию
+    void setState(int value);
 
-    float getHandlePos() const { return static_cast<float>(state) / static_cast<float>(kolStates - 1) ; }
+    /// Количество позиций
+    int getNumPositions() const;
 
-    bool isSwitched(int pos) const
-    {
-        if (pos < static_cast<int>(is_switched.size()))
-            return is_switched[static_cast<size_t>(state)];
-        else
-            return false;
-    }
+    /// Текущая позиция
+    int getPosition() const;
+
+    /// Текущее относительное положение переключателя, 0.0 - 1.0
+    float getHandlePosition() const;
+
+    /// Состояние позиции
+    bool isSwitched(int pos) const;
+
+    /// Звук переключения позиции
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал звука переключения позиции
+    virtual float getSoundSignal(size_t idx = 0) const;
+
+    virtual void step(double t, double dt);
 
 protected:
 
-    int keyCode;
+    /// Управляющая клавиша
+    int keyCode = 0;
 
-    int state;
+    /// Текущая позиция
+    int state = 0;
 
-    int kolStates;
+    /// Количество позиций переключателя
+    int num_states = 1;
 
-    bool ableToPress;
+    /// Признак подпружиненного автовозврата из первой позиции в следующую
+    bool is_spring_first = false;
 
-    std::vector<bool> is_switched;
+    /// Признак подпружиненного автовозврата из последней позиции в предыдущую
+    bool is_spring_last = false;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    /// Признак возможности однократного переключения по следующему нажатию клавиши
+    bool ableToPress = false;
+
+    /// Звук переключения позиции
+    sound_state_t switch_sound = sound_state_t();
+
+    void ode_system(const state_vector_t &Y,
+                    state_vector_t &dYdt,
+                    double t);
 
     void stepKeysControl(double t, double dt);
 };
