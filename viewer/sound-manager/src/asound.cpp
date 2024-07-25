@@ -8,8 +8,9 @@
 
 
 #include "asound.h"
+#include "CfgReader.h"
 #include "asound-log.h"
-#include <QFile>
+#include "filesystem.h"
 #include <QTimer>
 
 // ****************************************************************************
@@ -20,10 +21,28 @@
 //-----------------------------------------------------------------------------
 AListener::AListener()
 {
+    // Загрузка конфиг-файла
+    double tmp_volume = 1.0;
+    int tmp_max_sources = 65535;
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString cfg_path = QString(fs.getConfigDir().c_str()) + fs.separator() + "sound-settings.xml";
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Settings";
+
+        cfg.getDouble(secName, "Volume", tmp_volume);
+        cfg.getInt(secName, "MaxSources", tmp_max_sources);
+    }
+    ALfloat volume = static_cast<ALfloat>( std::max( 0.0, std::min(1.0, tmp_volume) ) );
+    ALCint max_sources = static_cast<ALCint>( std::max( 1, std::min(65535, tmp_max_sources) ) );
+
     // Открываем устройство
     device_ = alcOpenDevice(nullptr);
     // Создаём контекст
-    ALCint context_atrribute_list[2] = {ALC_MONO_SOURCES, 1024};
+    ALCint context_atrribute_list[2] = {ALC_MONO_SOURCES, max_sources};
     context_ = alcCreateContext(device_, context_atrribute_list);
     // Устанавливаем текущий контекст
     alcMakeContextCurrent(context_);
@@ -41,9 +60,12 @@ AListener::AListener()
     alListenerfv(AL_VELOCITY,    listenerVelocity_);
     // Устанавливаем направление слушателя
     alListenerfv(AL_ORIENTATION, listenerOrientation_);
+    // Устанавливаем общий уровень громкости
+    alListenerf(AL_GAIN, volume);
 
     log_ = new LogFileHandler("asound.log");
-
+    log_->notify(QString("Volume: %1").arg(volume, 5, 'f', 3).toStdString());
+    log_->notify(QString("Sources: %1").arg(max_sources).toStdString());
 }
 
 

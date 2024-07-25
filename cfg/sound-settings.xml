@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Config>
+	<Settings>
+		<!-- Общий уровень громкости: 0.0 - 1.0 -->
+		<Volume>1.0</Volume>
+
+		<!-- Максимальное число источников звука -->
+		<MaxSources>65535</MaxSources>
+	</Settings>
+</Config>
