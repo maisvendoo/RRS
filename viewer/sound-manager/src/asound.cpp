@@ -23,7 +23,8 @@ AListener::AListener()
     // Открываем устройство
     device_ = alcOpenDevice(nullptr);
     // Создаём контекст
-    context_ = alcCreateContext(device_, nullptr);
+    ALCint context_atrribute_list[2] = {ALC_MONO_SOURCES, 1024};
+    context_ = alcCreateContext(device_, context_atrribute_list);
     // Устанавливаем текущий контекст
     alcMakeContextCurrent(context_);
 
