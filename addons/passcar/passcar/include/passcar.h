@@ -125,6 +125,9 @@ private:
     /// Сигналы для анимации
     void stepSignalsOutput();
 
+    /// Сигналы для звуков
+    void stepSoundsSignals(double t, double dt);
+
     /// Отладочная строка
     void stepDebugMsg(double t, double dt);
 

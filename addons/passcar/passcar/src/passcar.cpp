@@ -88,6 +88,8 @@ void PassCar::step(double t, double dt)
 
     stepSignalsOutput();
 
+    stepSoundsSignals(t, dt);
+
     stepDebugMsg(t, dt);
 
     soundStep();
