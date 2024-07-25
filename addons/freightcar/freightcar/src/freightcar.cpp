@@ -88,6 +88,8 @@ void FreightCar::step(double t, double dt)
 
     stepSignalsOutput();
 
+    stepSoundsSignals(t, dt);
+
     stepDebugMsg(t, dt);
 
     if (is_Registrator_on)

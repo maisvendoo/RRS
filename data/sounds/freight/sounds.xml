@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<!-- Перестуки -->
+	<Sound>
+		<SignalID>10</SignalID>
+		<Filename>4-10.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>11</SignalID>
+		<Filename>10-20.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>12</SignalID>
+		<Filename>20-30.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>13</SignalID>
+		<Filename>30-40.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>14</SignalID>
+		<Filename>40-50.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>15</SignalID>
+		<Filename>50-60.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>16</SignalID>
+		<Filename>60-70.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>17</SignalID>
+		<Filename>70-80.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>	
+
+</Config>

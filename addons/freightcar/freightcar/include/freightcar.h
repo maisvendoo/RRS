@@ -113,7 +113,10 @@ private:
     void stepRegistrator(double t, double dt);
 
     /// Сигналы для анимации
-    void stepSignalsOutput();
+    virtual void stepSignalsOutput();
+
+    /// Сигналы для озвучки
+    virtual void stepSoundsSignals(double t, double dt);
 
     /// Отладочная строка
     void stepDebugMsg(double t, double dt);

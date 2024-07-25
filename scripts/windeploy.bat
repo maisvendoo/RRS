@@ -106,6 +106,7 @@ xcopy /S %DATA_PATH%\sounds\pass\*.* %RRS_DEV_ROOT%\data\sounds\pass\
 rem Вагоны-хоперы
 xcopy /S %DATA_PATH%\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
 xcopy /S %DATA_PATH%\animations\freight\*.* %RRS_DEV_ROOT%\data\animations\freight\
+xcopy /S %DATA_PATH%\sounds\freight\*.* %RRS_DEV_ROOT%\data\sounds\freight\
 
 rem Шрифты вьювера и темы оформления лаунчера
 
