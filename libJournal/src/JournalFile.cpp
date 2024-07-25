@@ -36,6 +36,6 @@ void JournalFile::write(const QDateTime& time, JournalLevel::Level level, const 
             .arg(time.toString("yyyy-MM-dd hh:mm:ss"))
             .arg(record);
 
-    out << fileLine << endl;
+    out << fileLine << Qt::endl;
     out.flush();
 }

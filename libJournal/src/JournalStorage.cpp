@@ -37,6 +37,6 @@ void JournalStorage::write(const QDateTime& time, JournalLevel::Level level, con
                 .arg( record )
                 .arg( JournalLevel::endColor() );
 
-    out << outLine << endl;
+    out << outLine << Qt::endl;
 
 }

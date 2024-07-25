@@ -101,6 +101,7 @@ rem Пассажирские вагоны
 xcopy /S %DATA_PATH%\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
 xcopy /S %DATA_PATH%\animations\passcar-ox\*.* %RRS_DEV_ROOT%\data\animations\passcar-ox\
 xcopy /S %DATA_PATH%\animations\passcar-oy\*.* %RRS_DEV_ROOT%\data\animations\passcar-oy\
+xcopy /S %DATA_PATH%\sounds\pass\*.* %RRS_DEV_ROOT%\data\sounds\pass\
 
 rem Вагоны-хоперы
 xcopy /S %DATA_PATH%\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
