@@ -9,10 +9,10 @@ void PassCar::stepSoundsSignals(double t, double dt)
     (void) t;
     (void) dt;
 
-    double Vkmh = abs(velocity) * Physics::kmh;
+    double Vkmh = qAbs(velocity) * Physics::kmh;
     analogSignal[SOUND_5_10] = sound_state_t::createSoundSignal((Vkmh > 1.0) && (Vkmh <= 10.0));
     analogSignal[SOUND_10_15] = sound_state_t::createSoundSignal((Vkmh > 10.0) && (Vkmh <= 15.0));
-    analogSignal[SOUND_15_20] = sound_state_t::createSoundSignal((Vkmh > 10.0) && (Vkmh <= 15.0));
+    analogSignal[SOUND_15_20] = sound_state_t::createSoundSignal((Vkmh > 15.0) && (Vkmh <= 20.0));
     analogSignal[SOUND_20_30] = sound_state_t::createSoundSignal((Vkmh > 20.0) && (Vkmh <= 30.0));
     analogSignal[SOUND_30_40] = sound_state_t::createSoundSignal((Vkmh > 30.0) && (Vkmh <= 40.0));
     analogSignal[SOUND_40_50] = sound_state_t::createSoundSignal((Vkmh > 40.0) && (Vkmh <= 50.0));
