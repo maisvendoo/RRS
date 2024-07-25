@@ -86,7 +86,8 @@ std::vector<size_t> SoundManager::loadSounds(const QString &sounddir)
             sound_config.sound = new ASound(QString((soundsDir + fs.separator()).c_str())
                                             + sound_config.filename);
 
-            if (sound_config.sound->getLastError().isEmpty())
+            QString tmp_error = sound_config.sound->getLastError();
+            if (tmp_error.isEmpty())
             {
                 sound_config.sound->setVolume(sound_config.init_volume * sound_config.max_volume);
                 sound_config.sound->setPitch(sound_config.init_pitch);
@@ -100,7 +101,7 @@ std::vector<size_t> SoundManager::loadSounds(const QString &sounddir)
             }
             else
             {
-                emit notify(QString("Sound Manager: can't load sound #%1(total #%2): ").arg(sounds_id.size()).arg(sounds.size()).toStdString() + sound_config.sound->getLastError().toStdString());
+                emit notify(QString("Sound Manager: can't load sound #%1(total #%2): ").arg(sounds_id.size()).arg(sounds.size()).toStdString() + tmp_error.toStdString());
             }
 
             secNode = cfg.getNextSection();
