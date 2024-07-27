@@ -30,7 +30,24 @@ void Switcher::setKeyCode(int key_code)
 //------------------------------------------------------------------------------
 void Switcher::setNumPositions(int value)
 {
-    num_states = value;
+    if (value > 0)
+        num_states = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switcher::setSpringFirst(bool is_spring)
+{
+    is_spring_first = is_spring;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switcher::setSpringLast(bool is_spring)
+{
+    is_spring_last = is_spring;
 }
 
 //------------------------------------------------------------------------------
@@ -38,7 +55,10 @@ void Switcher::setNumPositions(int value)
 //------------------------------------------------------------------------------
 void Switcher::setState(int value)
 {
+    int old_pos = state;
     state = cut(value, 0, num_states - 1);
+    if (state != old_pos)
+        switch_sound.play();
 }
 
 //------------------------------------------------------------------------------
@@ -124,39 +144,29 @@ void Switcher::stepKeysControl(double t, double dt)
 
     if (getKeyState(keyCode))
     {
-        if (ableToPress)
+        if(isShift())
         {
-            if(isShift())
+            if (ableToPress)
             {
-                if (state < (num_states - 1))
-                {
-                    // Переключение вперёд
-                    state++;
-                    switch_sound.play();
-                }
-                else
-                {
-                    // Запрет автовозврата назад
-                    allow_spring_last = false;
-                }
+                // Переключение вперёд
+                setState(state + 1);
+                // Запрещаем переключать дальше до отпускания клавиши
+                ableToPress = false;
             }
-            else
+            // Запрет автовозврата назад
+            allow_spring_last = false;
+        }
+        else
+        {
+            if (ableToPress)
             {
-                if (state > 0)
-                {
-                    // Переключение назад
-                    state--;
-                    switch_sound.play();
-                }
-                else
-                {
-                    // Запрет автовозврата вперёд
-                    allow_spring_first = false;
-                }
+                // Переключение назад
+                setState(state - 1);
+                // Запрещаем переключать дальше до отпускания клавиши
+                ableToPress = false;
             }
-
-            // Запрещаем переключение до отпускания клавиши
-            ableToPress = false;
+            // Запрет автовозврата вперёд
+            allow_spring_first = false;
         }
     }
     else
@@ -166,15 +176,10 @@ void Switcher::stepKeysControl(double t, double dt)
     }
 
     // Автовозврат вперёд
-    if (allow_spring_first && (num_states > 1) && (state == 0))
-    {
-        state++;
-        switch_sound.play();
-    }
+    if (allow_spring_first && (state == 0))
+        setState(state + 1);
+
     // Автовозврат назад
-    if (allow_spring_last && (num_states > 1) && (state == (num_states - 1)))
-    {
-        state--;
-        switch_sound.play();
-    }
+    if (allow_spring_last && (state == (num_states - 1)))
+        setState(state - 1);
 }
