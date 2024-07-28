@@ -62,6 +62,8 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_GV_ON] = main_switch->getSoundSignal(ProtectiveDevice::ON_SOUND);
     analogSignal[SOUND_GV_OFF] = main_switch->getSoundSignal(ProtectiveDevice::OFF_SOUND);
 
+    // Песочница
+    analogSignal[SOUND_SAND_DELIVERY] = sand_system->getSoundSignal();
     // Мотор-вентиляторы
     analogSignal[SOUND_FAN6] = motor_fans[MV6]->getSoundSignal();
     analogSignal[SOUND_FAN5] = motor_fans[MV5]->getSoundSignal();

@@ -127,6 +127,23 @@ double SandingSystem::getFLflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t SandingSystem::getSoundState(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t(is_sand);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float SandingSystem::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t::createSoundSignal(is_sand);
+}
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SandingSystem::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)

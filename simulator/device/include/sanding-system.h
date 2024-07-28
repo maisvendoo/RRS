@@ -47,6 +47,12 @@ public:
     /// Поток в питательную магистраль
     double getFLflow() const;
 
+    /// Состояние звука работы песочницы
+    virtual sound_state_t getSoundState(size_t idx = 0) const;
+
+    /// Сигнал состояния звука работы песочницы
+    virtual float getSoundSignal(size_t idx = 0) const;
+
 protected:
 
     /// Состояние подачи песка
