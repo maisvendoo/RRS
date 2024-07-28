@@ -121,9 +121,11 @@ ASound::ASound(QString soundname, QObject *parent): QObject(parent),
     for (int i = 0; i < BUFFER_BLOCKS; ++i)
     {
         wavData_[i] = nullptr;
-        buffer_[i] = 0;
         blockSize_[i] = 0;
+        blockDuration_[i] = 0;
+        buffer_[i] = 0;
     }
+    num_cycle_blocks_ = 0;
 
     connect(this, &ASound::notify, AListener::getInstance().log_, &LogFileHandler::notify);
     connect(this, &ASound::lastErrorChanged_, AListener::getInstance().log_, &LogFileHandler::notify);
@@ -133,7 +135,7 @@ ASound::ASound(QString soundname, QObject *parent): QObject(parent),
     // Загружаем звук
     loadSound_(soundname);
 
-    timerStartKiller_ = Q_NULLPTR;
+    timerControl_ = Q_NULLPTR;
 }
 
 
@@ -311,7 +313,9 @@ void ASound::readWaveInfo_()
             // Переносим данные в массив
             memcpy(wavData_[i], blockData.data(),
                    blockSize_[i]);
-            ++i;
+
+            calcDuration_();
+
             emit notify("| - File size: " + QString::number(file_->size()).toStdString());
             emit notify("| - File data size: " + QString::number(wave_info_file_data_.subchunk2Size).toStdString());
             emit notify("| - Byterate: " + QString::number(wave_info_.byteRate).toStdString());
@@ -325,6 +329,12 @@ void ASound::readWaveInfo_()
             {
                 emit notify("| - Block #" + QString::number(i).toStdString() +
                             " size: " + QString::number(blockSize_[i]).toStdString());
+            }
+
+            for (int i = 0; i < BUFFER_BLOCKS; ++i)
+            {
+                emit notify("| - Block #" + QString::number(i).toStdString() +
+                            " duration: " + QString::number(blockDuration_[i]).toStdString());
             }
 
             // Закрываем файл
@@ -547,6 +557,24 @@ void ASound::defineFormat_()
 
 
 //-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void ASound::calcDuration_()
+{
+    if (canDo_)
+    {
+        for (int i = 0; i < BUFFER_BLOCKS; ++i)
+        {
+            double size = static_cast<double>(blockSize_[i]);
+            double byteRate = static_cast<double>(wave_info_.byteRate);
+            blockDuration_[i] = static_cast<uint64_t>(1000.0 * size / byteRate);
+        }
+    }
+}
+
+
+
+//-----------------------------------------------------------------------------
 // Генерация буфера и источника
 //-----------------------------------------------------------------------------
 void ASound::generateStuff_()
@@ -598,8 +626,32 @@ void ASound::configureSource_()
 {
     if (canDo_)
     {
-        // Передаём источнику буфер
-        alSourceQueueBuffers(source_, BUFFER_BLOCKS, buffer_);
+        if (canLABL_ && (blockDuration_[1] > 1))
+        {
+            // Если в файле предусмотрены метки цикла,
+            // передаём источнику в очередь буфер начала,
+            // несколько буферов зацикленной части (чтобы проигрывалась секунду)
+            // и буфер конца
+            ALuint buf[1];
+            buf[0] = {buffer_[0]};
+            alSourceQueueBuffers(source_, 1, buf);
+
+            buf[0] = buffer_[1];
+            num_cycle_blocks_ = 2 + 1000 / blockDuration_[1];
+            for (uint64_t i = 0; i < num_cycle_blocks_; ++i)
+                alSourceQueueBuffers(source_, 1, buf);
+
+            buf[0] = buffer_[2];
+            alSourceQueueBuffers(source_, 1, buf);
+
+            emit notify(QString("| - Num cycle blocks: %1 (%2) ms").arg(num_cycle_blocks_).arg(num_cycle_blocks_ * blockDuration_[1]).toStdString());
+        }
+        else
+        {
+            // Передаём источнику первый буфер
+            ALuint buf[1] = {buffer_[0]};
+            alSourceQueueBuffers(source_, 1, buf);
+        }
 
         if (alGetError() != AL_NO_ERROR)
         {
@@ -665,14 +717,22 @@ void ASound::configureSource_()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int ASound::getDuration()
+int ASound::getDuration(int idx)
 {
     if (canDo_)
     {
-        double subchunk2Size = wave_info_file_data_.subchunk2Size;
-        double byteRate = wave_info_.byteRate;
-        int duration = static_cast<int>(subchunk2Size/byteRate)*100;
-        return 10*duration;
+        if (idx < 0)
+        {
+            int duration = 0;
+            for (int i = 0; i < BUFFER_BLOCKS; ++i)
+            {
+                duration += blockDuration_[i];
+            }
+            return duration;
+        }
+        if (idx < BUFFER_BLOCKS)
+            return blockDuration_[idx];
+        return 0;
     }
     return 0;
 }
@@ -741,7 +801,15 @@ void ASound::setLoop(bool loop)
 {
     if (canPlay_)
     {
-        sourceLoop_ = loop;
+        if (canLABL_)
+        {
+            // Звук с метками зациклен другим механизмом
+            sourceLoop_ = false;
+        }
+        else
+        {
+            sourceLoop_ = loop;
+        }
         alSourcei(source_, AL_LOOPING, static_cast<char>(sourceLoop_));
     }
 }
@@ -825,11 +893,19 @@ void ASound::play()
         {
             if (canLABL_)
             {
-                timerStartKiller_ = new QTimer(this);
-                connect(timerStartKiller_, SIGNAL(timeout()),
-                        this, SLOT(onTimerStartKiller()));
-                timerStartKiller_->setInterval(15);
-                timerStartKiller_->start();
+                // Таймер управления циклом
+                if (timerControl_ == Q_NULLPTR)
+                {
+                    timerControl_ = new QTimer(this);
+                    connect(timerControl_, SIGNAL(timeout()),
+                            this, SLOT(onTimerLoopControl()));
+
+                    // Таймер продолжительностью в половину зацикленной части
+                    timerControl_->setInterval(blockDuration_[1] / 2);
+                    timerControl_->setTimerType(Qt::PreciseTimer);
+                }
+                timerControl_->start();
+//                emit notify(QString("START:duration:%1 ms").arg(blockDuration_[1] / 2, 6).toStdString());
             }
 
             alSourcePlay(source_);
@@ -837,6 +913,7 @@ void ASound::play()
     }
     else
     {
+        // Играем заново
         alSourcePlay(source_);
     }
 }
@@ -866,14 +943,15 @@ void ASound::stop()
         // Если у файла есть метки
         if (canLABL_)
         {
-            setLoop(false);
-            // Задаём смещение на блок звука остановки по метке
+            // Задаём смещение на последний блок звука - завершающая часть
             alSourcei(source_, AL_BYTE_OFFSET,
-                      static_cast<ALint>(blockSize_[0] + blockSize_[1]));
+                      static_cast<ALint>(blockSize_[0] + num_cycle_blocks_ * blockSize_[1]));
 
-            if (timerStartKiller_ != Q_NULLPTR)
-                if (timerStartKiller_->isActive())
-                    timerStartKiller_->stop();
+            // Таймер контроля цикла больше не нужен
+            if (timerControl_ != Q_NULLPTR)
+                if (timerControl_->isActive())
+                    timerControl_->stop();
+//            emit notify(QString("STOP:offset:%1").arg(blockSize_[0] + blockSize_[1] + blockSize_[1], 8).toStdString());
         }
         else
         {
@@ -885,7 +963,7 @@ void ASound::stop()
 
 
 //-----------------------------------------------------------------------------
-// Вернуть последюю ошибку
+// Вернуть последнюю ошибку
 //-----------------------------------------------------------------------------
 QString ASound::getLastError()
 {
@@ -955,21 +1033,38 @@ void ASound::checkValue(std::string baseStr, const char targStr[], QString err)
 
 
 //-----------------------------------------------------------------------------
-// Уничтожение блока старта
+// Работа с циклом
 //-----------------------------------------------------------------------------
-void ASound::onTimerStartKiller()
+void ASound::onTimerLoopControl()
 {
-    ALint buffer, curPosByte;
-
-    alGetSourcei(source_, AL_BUFFER, &buffer);
+    // Текущий момент проигрываемого звука
+    ALint curPosByte;
     alGetSourcei(source_, AL_BYTE_OFFSET, &curPosByte);
-
-
-    //if (static_cast<ALuint>(buffer) == buffer_[1])
-    if (curPosByte >= static_cast<ALint>(blockSize_[0] + blockSize_[1]))
+/*
+    emit notify(QString("cur:%1|[0]%2|[0+1]%3|[0+num]%4|")
+                    .arg(curPosByte, 8)
+                    .arg(blockSize_[0], 8)
+                    .arg(blockSize_[0] + blockSize_[1], 8)
+                    .arg(blockSize_[0] + num_cycle_blocks_ * blockSize_[1], 8)
+                    .toStdString());
+*/
+    ALint newPosByte = curPosByte;
+    while (newPosByte >= static_cast<ALint>(blockSize_[0] + blockSize_[1]))
     {
-        alSourcei(source_, AL_BYTE_OFFSET, static_cast<ALint>(blockSize_[0]));
+        // Если находимся дальше второго буфера (в копиях зацикленной части),
+        // смещаемся на тот же момент второго буфера (первой копии зацикленной части)
+        newPosByte = newPosByte - static_cast<ALint>(blockSize_[1]);
     }
+    if (newPosByte == curPosByte)
+        return;
+
+    alSourcei(source_, AL_BYTE_OFFSET, newPosByte);
+/*
+    emit notify(QString("offset: from%1|to%2|")
+                    .arg(curPosByte, 8)
+                    .arg(newPosByte, 8)
+                    .toStdString());
+*/
 }
 
 

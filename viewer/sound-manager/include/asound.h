@@ -265,8 +265,8 @@ public:
     /// Приостановлен ли звук
     bool isPaused();
 
-    /// Длительность звука в секундах
-    int getDuration();
+    /// Длительность звука (или i-го блока) в мс
+    int getDuration(int idx = -1);
 
     void setLastError(const std::string& value)
     {
@@ -308,9 +308,9 @@ signals:
 
 
 private slots:
-    /// Слот обработки таймера уничтожения у звука блока старта
-    void onTimerStartKiller();
 
+    /// Слот обработки таймера для работы с циклом
+    void onTimerLoopControl();
 
 private:
 
@@ -362,11 +362,17 @@ private:
     // Хранилище для data секции (самой музыки) файла .wav
     unsigned char* wavData_[BUFFER_BLOCKS]; ///< Контейнер секций блока данных файла wav
 
-    // Размер каждого из 3-х блоков данных фай
+    // Размер каждого из 3-х блоков данных файла .wav
     uint64_t blockSize_[BUFFER_BLOCKS]; ///< Размер блоков данных файла wav
+
+    // Продолжительность каждого из 3-х блоков данных файла .wav в мс
+    uint64_t blockDuration_[BUFFER_BLOCKS]; ///< Продолжительность блоков данных файла wav
 
     // Буфер OpenAL
     ALuint  buffer_[BUFFER_BLOCKS]; ///< Буфер OpenAL 3 секции (старт, цикл, остановка)
+
+    // Необходимое число блоков зацикленной части звука, чтобы играть хотя бы секунду
+    uint64_t num_cycle_blocks_; ///< Число блоков зацикленной части звука
 
     // Источник OpenAL
     ALuint  source_; ///< Источник OpenAL
@@ -389,8 +395,8 @@ private:
     // "Скорость передвижения" источника
     ALfloat sourceVelocity_[3]; ///< "Скорость передвижения" источника
 
-    /// Таймер для стирания в звуке блока старта
-    QTimer* timerStartKiller_;
+    /// Таймер для управления зацикленным звуком
+    QTimer* timerControl_;
 
     /// Last error in asound
     QString LastError_;
@@ -421,6 +427,9 @@ private:
 
     /// Получение списка меток (Labels)
     void getLabels_(QByteArray &baseStr);
+
+    /// Вычисление продолжительности звука
+    void calcDuration_();
 
     /// Генерация буфера и источника
     void generateStuff_();
