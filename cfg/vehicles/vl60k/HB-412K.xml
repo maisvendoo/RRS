@@ -11,7 +11,10 @@
 		<R_r>0.0</R_r>
 		<L_af>0.01</L_af>
 		<cPhi>nb-412k.txt</cPhi>
-		<OmegaNom>93.7</OmegaNom>
+
+		<!-- Параметры для озвучки -->
+		<TorqueMax>10000.0</TorqueMax>
+		<OmegaNom>80.0</OmegaNom>
 	</Device>
 
 	<FieldPos>

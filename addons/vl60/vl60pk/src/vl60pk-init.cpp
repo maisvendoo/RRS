@@ -101,7 +101,7 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     sand_system->setSandLevel(payload_coeff);
 /*
     reg = new Registrator();
-    reg->setFileName("vl60pk-step");
+    reg->setFileName("vl60pk-motor");
     reg->init();
 */
 }

@@ -231,10 +231,12 @@ void VL60k::stepOtherEquipment(double t, double dt)
 
     if (reg == nullptr)
         return;
-    reg->print(QString("%1;%2;%3")
-                   .arg(t,8,'f',3)
-                   .arg(coupling_fwd->getCurrentForce(),13,'f',3)
-                   .arg(coupling_bwd->getCurrentForce(),13,'f',3));
+
+    QString msg = "";
+    msg += QString("v%1 kmh|").arg(velocity * 3.6, 10, 'f', 5);
+    msg += QString("omega%1|").arg(wheel_omega[0], 10, 'f', 5);
+    msg += QString("motor%1|").arg(motor[0]->getTorque(), 12, 'f', 5);
+    reg->print(msg, t, dt);
 }
 
 //------------------------------------------------------------------------------

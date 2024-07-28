@@ -101,9 +101,8 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
     sand_system->setSandLevel(payload_coeff);
 /*
     reg = new Registrator();
-    reg->setFileName("vl60k-coupling-forces");
+    reg->setFileName("vl60k-motor");
     reg->init();
-    reg->print("  time  ;  fwd_force  ;  bwd_force  ");
 */
 }
 

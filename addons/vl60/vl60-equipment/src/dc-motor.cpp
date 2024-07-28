@@ -15,9 +15,9 @@ DCMotor::DCMotor(QObject *parent) : Device(parent)
     , omega(0.0)
     , U(0.0)
     , torque(0.0)
-    , omega_nom(100.0)
     , direction(1)
-    , sound_state(true, 0.0f, 0.0f)
+    , torque_max(10000.0)
+    , omega_nom(62.0)
 {
 
 }
@@ -135,8 +135,19 @@ void DCMotor::preStep(state_vector_t &Y, double t)
 
     torque = Y[0] * calcCPhi(Y[0] * beta * direction);
 
-    sound_state.volume = static_cast<float>(pf(abs(Y[0]) - 100.0)) / 100.0f;
-    sound_state.pitch = static_cast<float>(abs(omega) / omega_nom);
+    // Озвучка
+    // Относительная громкость пропорциональна крутящему моменту
+    double relative_volume = abs(torque) / torque_max;
+    // Плавное включение на низкой скорости
+    relative_volume = relative_volume * max(abs(omega) / 2.0, 1.0);
+    sound_state.volume = static_cast<float>(relative_volume);
+
+    // Относительная частота вращения от номинальной, для которой записан звук
+    double relative_pitch = abs(omega) / omega_nom;
+    // Костыль - нелинейное преобразование частоты (0.5 x^2 + 0.5),
+    // чтобы охватить низкие скорости с частотой хотя бы 0.5
+    relative_pitch = 0.5 * relative_pitch * relative_pitch + 0.5;
+    sound_state.pitch = static_cast<float>(relative_pitch);
 }
 
 //------------------------------------------------------------------------------
@@ -166,6 +177,7 @@ void DCMotor::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "R_dp", R_dp);
     cfg.getDouble(secName, "R_r", R_r);
     cfg.getDouble(secName, "L_af", L_af);
+    cfg.getDouble(secName, "TorqueMax", torque_max);
     cfg.getDouble(secName, "OmegaNom", omega_nom);
 
     QString cPhiFileName = "";

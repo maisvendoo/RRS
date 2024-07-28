@@ -977,7 +977,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>0.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.0 7.5 0.625</LocalPosition>
 	</Sound>
@@ -989,7 +989,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>0.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.0 5.2 0.625</LocalPosition>
 	</Sound>
@@ -1001,7 +1001,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>0.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.0 2.9 0.625</LocalPosition>
 	</Sound>
@@ -1013,7 +1013,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>0.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.0 -2.9 0.625</LocalPosition>
 	</Sound>
@@ -1025,7 +1025,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>0.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.0 -5.2 0.625</LocalPosition>
 	</Sound>
@@ -1037,7 +1037,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>0.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>0.0 -7.5 0.625</LocalPosition>
 	</Sound>
