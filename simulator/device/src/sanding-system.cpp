@@ -204,6 +204,6 @@ void SandingSystem::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    // Пока по умолчанию песок на клавише ё (тильда)
-    setSandDeliveryOn(getKeyState(KEY_Backquote));
+    // Активация песочницы прикручена к клавише Del
+    setSandDeliveryOn(getKeyState(KEY_Delete));
 }
