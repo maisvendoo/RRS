@@ -341,7 +341,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             k * sim_data[old_data].vehicles[i].up_y + t * sim_data[new_data].vehicles[i].up_y,
             k * sim_data[old_data].vehicles[i].up_z + t * sim_data[new_data].vehicles[i].up_z);
 
-        vehicles_ext[i].right = vehicles_ext[i].orth ^ osg::Vec3(osg::Z_AXIS);
+        vehicles_ext[i].right = vehicles_ext[i].orth ^ vehicles_ext[i].up;
         //vehicles_ext[i].right.normalize();
 
         vehicles_ext[i].attitude = osg::Vec3(
@@ -381,8 +381,7 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             sound_manager->setPosition(sound_id, pos.x(), pos.y(), pos.z());
             sound_manager->setVelocity(sound_id, velocity.x(), velocity.y(), velocity.z());
 
-            sound_state_t ss;
-            sound_manager->setSoundState(sound_id, ss.soundFromSignal(update_data[new_data].vehicles[i].analogSignal[sound_manager->getSignalID(sound_id)]));
+            sound_manager->setSoundSignal(sound_id, update_data[new_data].vehicles[i].analogSignal[sound_manager->getSignalID(sound_id)]);
         }
     }
 }
@@ -581,7 +580,7 @@ void TrainExteriorHandler::loadSounds(const std::string &configDir,
         OSG_FATAL << "Vehicle sounds are loaded from " << sounds_config_dir << std::endl;
     }
 
-    sounds_id = sound_manager->loadSounds(QString(sounds_config_dir.c_str()));
+    sounds_id = sound_manager->loadVehicleSounds(QString(sounds_config_dir.c_str()));
 }
 
 //------------------------------------------------------------------------------

@@ -27,56 +27,6 @@ class QFile;
 class QTimer;
 
 #define BUFFER_BLOCKS 3
-
-
-//-----------------------------------------------------------------------------
-// Класс AListener
-//-----------------------------------------------------------------------------
-/// Положение слушателя по умолчанию
-const float DEF_LSN_POS[3] = {0.0f, 0.0f, 0.0f};
-/// "Скорость передвижения" слушателя по умолчанию
-const float DEF_LSN_VEL[3] = {0.0f, 0.0f, 0.0f};
-/// Направление слушателя по умолчанию
-const float DEF_LSN_ORI[6] = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f};
-
-/*!
- * \class AListener
- * \brief Класс, реализующий создание единственного слушателя
- */
-class AListener
-{   
-public:
-    /// Статический метод запрещающий повторное создание экземпляра класса
-    static AListener &getInstance();
-
-    ///
-    void closeDevices();
-
-    LogFileHandler *log_;
-
-private:
-    /// Конструктор (priate!)
-    AListener();
-
-    /// Аудиоустройство
-    ALCdevice* device_;
-
-    /// Контекст OpenAL
-    ALCcontext* context_;
-
-    /// Положение слушателя
-    ALfloat listenerPosition_[3];
-
-    /// "Скорость передвижения" слушателя
-    ALfloat listenerVelocity_[3];
-
-    /// Направление слушателя
-    ALfloat listenerOrientation_[6];
-
-};
-
-
-
 //-----------------------------------------------------------------------------
 // Класс ASound
 //-----------------------------------------------------------------------------
@@ -234,7 +184,7 @@ public:
      * \brief Конструктор
      * \param soundname - имя аудиофайла
      */
-    ASound(QString soundname, QObject* parent = Q_NULLPTR);
+    ASound(QString soundname, LogFileHandler *log, QObject* parent = Q_NULLPTR);
     /// Деструктор
     ~ASound();
 

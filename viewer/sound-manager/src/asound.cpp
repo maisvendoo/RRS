@@ -8,91 +8,9 @@
 
 
 #include "asound.h"
-#include "CfgReader.h"
 #include "asound-log.h"
-#include "filesystem.h"
+#include <QFile>
 #include <QTimer>
-
-// ****************************************************************************
-// *                         Класс AListener                                  *
-// ****************************************************************************
-//-----------------------------------------------------------------------------
-// КОНСТРУКТОР
-//-----------------------------------------------------------------------------
-AListener::AListener()
-{
-    // Загрузка конфиг-файла
-    double tmp_volume = 1.0;
-    int tmp_max_sources = 65535;
-
-    FileSystem &fs = FileSystem::getInstance();
-    QString cfg_path = QString(fs.getConfigDir().c_str()) + fs.separator() + "sound-settings.xml";
-    CfgReader cfg;
-
-    if (cfg.load(cfg_path))
-    {
-        QString secName = "Settings";
-
-        cfg.getDouble(secName, "Volume", tmp_volume);
-        cfg.getInt(secName, "MaxSources", tmp_max_sources);
-    }
-    ALfloat volume = static_cast<ALfloat>( std::max( 0.0, std::min(1.0, tmp_volume) ) );
-    ALCint max_sources = static_cast<ALCint>( std::max( 1, std::min(65535, tmp_max_sources) ) );
-
-    // Открываем устройство
-    device_ = alcOpenDevice(nullptr);
-    // Создаём контекст
-    ALCint context_atrribute_list[2] = {ALC_MONO_SOURCES, max_sources};
-    context_ = alcCreateContext(device_, context_atrribute_list);
-    // Устанавливаем текущий контекст
-    alcMakeContextCurrent(context_);
-
-    // Инициализируем положение слушателя
-    memcpy(listenerPosition_,    DEF_LSN_POS, 3 * sizeof(float));
-    // Инициализируем вектор "скорости передвижения" слушателя
-    memcpy(listenerVelocity_,    DEF_LSN_VEL, 3 * sizeof(float));
-    // Инициализируем векторы направления слушателя
-    memcpy(listenerOrientation_, DEF_LSN_ORI, 6 * sizeof(float));
-
-    // Устанавливаем положение слушателя
-    alListenerfv(AL_POSITION,    listenerPosition_);
-    // Устанавливаем скорость слушателя
-    alListenerfv(AL_VELOCITY,    listenerVelocity_);
-    // Устанавливаем направление слушателя
-    alListenerfv(AL_ORIENTATION, listenerOrientation_);
-    // Устанавливаем общий уровень громкости
-    alListenerf(AL_GAIN, volume);
-
-    log_ = new LogFileHandler("asound.log");
-    log_->notify(QString("Volume: %1").arg(volume, 5, 'f', 3).toStdString());
-    log_->notify(QString("Sources: %1").arg(max_sources).toStdString());
-}
-
-
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-AListener& AListener::getInstance()
-{
-    // Создаем статичный экземпляр класса
-    static AListener instance;
-    // Возвращаем его при каждом вызове метода
-    return instance;
-}
-
-
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-void AListener::closeDevices()
-{
-    alcDestroyContext(context_);
-    alcCloseDevice(device_);
-}
-
-
 
 // ****************************************************************************
 // *                            Класс ASound                                  *
@@ -100,7 +18,7 @@ void AListener::closeDevices()
 //-----------------------------------------------------------------------------
 // КОНСТРУКТОР
 //-----------------------------------------------------------------------------
-ASound::ASound(QString soundname, QObject *parent): QObject(parent),
+ASound::ASound(QString soundname, LogFileHandler *log, QObject *parent): QObject(parent),
     canDo_(false),              // Сбрасываем флаг
     canPlay_(false),            // Сбрасываем флаг
     soundName_(soundname),      // Сохраняем название звука
@@ -109,7 +27,10 @@ ASound::ASound(QString soundname, QObject *parent): QObject(parent),
     sourceVolume_(DEF_SRC_VOLUME),  // Громкость по умолч.
     sourcePitch_(DEF_SRC_PITCH),    // Скорость воспроизведения по умолч.
     sourceLoop_(false)         // Зацикливание по-умолч.
-{ 
+{
+    connect(this, &ASound::notify, log, &LogFileHandler::notify);
+    connect(this, &ASound::lastErrorChanged_, log, &LogFileHandler::notify);
+
     // Инициализируем позицию источника
     memcpy(sourcePosition_, DEF_SRC_POS, 3 * sizeof(float));
     // Инициализируем вектор "скорости передвижения" источника
@@ -126,11 +47,6 @@ ASound::ASound(QString soundname, QObject *parent): QObject(parent),
         buffer_[i] = 0;
     }
     num_cycle_blocks_ = 0;
-
-    connect(this, &ASound::notify, AListener::getInstance().log_, &LogFileHandler::notify);
-    connect(this, &ASound::lastErrorChanged_, AListener::getInstance().log_, &LogFileHandler::notify);
-
-    emit notify("T Load sound: " + soundname.toStdString());
 
     // Загружаем звук
     loadSound_(soundname);
@@ -175,6 +91,8 @@ void ASound::deleteWAVEDataContainers()
 //-----------------------------------------------------------------------------
 void ASound::loadSound_(QString soundname)
 {
+    emit notify("T Load sound: " + soundname.toStdString());
+
     // Сбрасываем флаги
     canDo_ = false;
     canPlay_ = false;
@@ -316,6 +234,7 @@ void ASound::readWaveInfo_()
 
             calcDuration_();
 
+            ++i;
             emit notify("| - File size: " + QString::number(file_->size()).toStdString());
             emit notify("| - File data size: " + QString::number(wave_info_file_data_.subchunk2Size).toStdString());
             emit notify("| - Byterate: " + QString::number(wave_info_.byteRate).toStdString());
@@ -325,16 +244,11 @@ void ASound::readWaveInfo_()
             emit notify("| - Bytes per sample: " + QString::number(wave_info_.bytesPerSample).toStdString());
             emit notify("| - Buffer blocks: " + QString::number(i).toStdString());
 
-            for (int i = 0; i < BUFFER_BLOCKS; ++i)
+            for (int j = 0; j < std::min(BUFFER_BLOCKS, i); ++j)
             {
-                emit notify("| - Block #" + QString::number(i).toStdString() +
-                            " size: " + QString::number(blockSize_[i]).toStdString());
-            }
-
-            for (int i = 0; i < BUFFER_BLOCKS; ++i)
-            {
-                emit notify("| - Block #" + QString::number(i).toStdString() +
-                            " duration: " + QString::number(blockDuration_[i]).toStdString());
+                emit notify("| - Block #" + QString::number(j).toStdString() +
+                            " size: " + QString::number(blockSize_[j]).toStdString() +
+                            " (" + QString::number(blockDuration_[j]).toStdString() + " ms)");
             }
 
             // Закрываем файл
@@ -644,7 +558,7 @@ void ASound::configureSource_()
             buf[0] = buffer_[2];
             alSourceQueueBuffers(source_, 1, buf);
 
-            emit notify(QString("| - Num cycle blocks: %1 (%2) ms").arg(num_cycle_blocks_).arg(num_cycle_blocks_ * blockDuration_[1]).toStdString());
+            emit notify(QString("| - Num cycle blocks: %1 (%2 ms)").arg(num_cycle_blocks_).arg(num_cycle_blocks_ * blockDuration_[1]).toStdString());
         }
         else
         {
