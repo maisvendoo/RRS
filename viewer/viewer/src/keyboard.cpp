@@ -189,6 +189,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Comma);
     addKey(osgGA::GUIEventAdapter::KEY_Period);
     addKey(osgGA::GUIEventAdapter::KEY_Slash);
+    addKey(osgGA::GUIEventAdapter::KEY_Backslash);
 
     addKey(osgGA::GUIEventAdapter::KEY_Menu);
 
@@ -215,6 +216,11 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_BackSpace);
 
     addKey(osgGA::GUIEventAdapter::KEY_Space);
+
+    addKey(osgGA::GUIEventAdapter::KEY_Delete);
+    addKey(osgGA::GUIEventAdapter::KEY_Insert);
+    addKey(osgGA::GUIEventAdapter::KEY_Home);
+    addKey(osgGA::GUIEventAdapter::KEY_End);
 }
 
 //------------------------------------------------------------------------------
