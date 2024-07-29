@@ -61,6 +61,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     // Главный выключатель
     analogSignal[SOUND_GV_ON] = main_switch->getSoundSignal(ProtectiveDevice::ON_SOUND);
     analogSignal[SOUND_GV_OFF] = main_switch->getSoundSignal(ProtectiveDevice::OFF_SOUND);
+    // Трансформатор
+    analogSignal[SOUND_TRANSFORMER] = trac_trans->getSoundSignal();
 
     // Песочница
     analogSignal[SOUND_SAND_DELIVERY] = sand_system->getSoundSignal();
@@ -75,8 +77,6 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_COMPR] = motor_compressor->getSoundSignal();
     // Фазорасщепитель
     analogSignal[SOUND_PHASESPLITTER] = phase_spliter->getSoundSignal();
-    // Трансформатор
-    analogSignal[SOUND_TRANSFORMER] = trac_trans->getSoundSignal();
 
     // Дальний ряд тумблеров приборной панели машиниста
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_ON] = proj2_tumbler.getSoundSignal(Trigger::ON_SOUND);
