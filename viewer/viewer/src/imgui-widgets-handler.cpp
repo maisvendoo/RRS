@@ -20,7 +20,7 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 
     ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
 
-    ImGui::Begin("A you realy want ot quit?");
+    ImGui::Begin("A you realy want to quit?");
 
     int bw = w / 4;
     int bh = h / 4;
