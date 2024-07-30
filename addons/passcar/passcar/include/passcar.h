@@ -134,14 +134,6 @@ private:
     void keyProcess();
 
     void loadConfig(QString cfg_path);
-
-    void initSounds();
-
-    void soundStep();
-
-    void getSoundList();
-
-    void playPasscarSound(QString sound_name);
 };
 
 #endif // PASSCAR_H

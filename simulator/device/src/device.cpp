@@ -47,8 +47,6 @@ Device::~Device()
 //------------------------------------------------------------------------------
 void Device::step(double t, double dt)
 {
-    emit DebugPrint(t, y);
-
     preStep(y, t);
 
     stepControl(t, dt);
