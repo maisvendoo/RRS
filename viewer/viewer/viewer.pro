@@ -143,4 +143,3 @@ HEADERS += $$files(./include/*.hpp)
 HEADERS += $$files(../imgui/include/*.h)
 SOURCES += $$files(./src/*.cpp)
 SOURCES += $$files(../imgui/src/*.cpp)
-

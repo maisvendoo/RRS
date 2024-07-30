@@ -43,6 +43,8 @@
 
 #include    <QObject>
 
+#include    <imgui-widgets-handler.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -140,9 +142,8 @@ int RouteViewer::run()
 
     viewer.setCameraManipulator(cs.get());
 
-    //viewer.apply(new osgViewer::SingleWindow(100, 100, 640, 480));
-    /*viewer.setRealizeOperation(new ImGuiInitOperation);
-    viewer.addEventHandler(new ImGuiDemo);*/
+    viewer.setRealizeOperation(new ImGuiInitOperation);
+    viewer.addEventHandler(new ImGuiWidgetsHandler);
 
     return viewer.run();
 }
