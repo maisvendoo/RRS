@@ -115,7 +115,7 @@
 		<InitVolume>0.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
-		<Loop>0</Loop>
+		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>1.1 8.8 2.2</LocalPosition>
 	</Sound>
