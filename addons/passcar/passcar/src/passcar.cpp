@@ -61,8 +61,6 @@ void PassCar::initialization()
 
     initEPB(modules_dir, custom_cfg_dir);
 
-    initSounds();
-
     if (is_Registrator_on)
         initRegistrator(modules_dir, custom_cfg_dir);
 }
@@ -91,8 +89,6 @@ void PassCar::step(double t, double dt)
     stepSoundsSignals(t, dt);
 
     stepDebugMsg(t, dt);
-
-    soundStep();
 
     if (is_Registrator_on)
         stepRegistrator(t, dt);

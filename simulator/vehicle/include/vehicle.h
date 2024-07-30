@@ -72,13 +72,7 @@ public:
 
     /// Set inclination
     void setProfilePoint(profile_point_t point_data);
-/*
-    /// Set inclination
-    void setInclination(double value);
 
-    /// Set curvature
-    void setCurvature(double value);
-*/
     /// Set friction coefficient between wheel and rail
     void setFrictionCoeff(double value);
 
@@ -198,16 +192,6 @@ public slots:
 
 signals:
 
-    void soundPlay(QString name);
-
-    void soundStop(QString name);
-
-    void soundSetVolume(QString name, int volume);
-
-    void soundSetPitch(QString name, float pitch);
-
-    void volumeCurveStep(QString name, float param);
-
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
 
     void sendCoord(double x);
@@ -289,20 +273,15 @@ protected:
     double  W_coef_curv;
 
     // Wheels model's coefficients
-    double  a;
-    double  b;
-    double  c;
-    double  d;
-    double  e;
+    double  psi_a;
+    double  psi_b;
+    double  psi_c;
+    double  psi_d;
+    double  psi_e;
 
 
     profile_point_t profile_point_data;
-    /*
-    /// Vertical profile inclination
-    double  inc;
-    /// Railway curvature
-    double  curv;
-    */
+
     /// Railway motion direction
     int     dir;
     /// Vehicle orientation

@@ -58,11 +58,11 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , W_coef_v((b2 / q0) * Physics::g * Physics::kmh / 1000.0)
   , W_coef_v2((b3 / q0) * Physics::g * Physics::kmh * Physics::kmh / 1000.0)
   , W_coef_curv(700.0 * Physics::g / 1000.0)
-  , a(0.0)
-  , b(30.0)
-  , c(100.0)
-  , d(1.0)
-  , e(0.0)
+  , psi_a(0.0)
+  , psi_b(30.0)
+  , psi_c(100.0)
+  , psi_d(1.0)
+  , psi_e(0.0)
   , profile_point_data(profile_point_t())
   , dir(1)
   , orient(1)
@@ -910,11 +910,11 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
     {
         QString secName = "WheelModel";
 
-        cfg.getDouble(secName, "a", a);
-        cfg.getDouble(secName, "b", b);
-        cfg.getDouble(secName, "c", c);
-        cfg.getDouble(secName, "d", d);
-        cfg.getDouble(secName, "e", e);
+        cfg.getDouble(secName, "a", psi_a);
+        cfg.getDouble(secName, "b", psi_b);
+        cfg.getDouble(secName, "c", psi_c);
+        cfg.getDouble(secName, "d", psi_d);
+        cfg.getDouble(secName, "e", psi_e);
 
         Journal::instance()->info("Wheel model config: " + QString("%1")
                                   .arg(file_path));
@@ -924,7 +924,7 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
         Journal::instance()->error("File " + file_path + " is't found");
     }
     Journal::instance()->info("Wheel friction coefficient formula: " + QString("psi = %1 + (%2 / (%3 + %4 * V)) + %5 * V")
-                              .arg(a).arg(b).arg(c).arg(d).arg(e));
+                              .arg(psi_a).arg(psi_b).arg(psi_c).arg(psi_d).arg(psi_e));
 }
 
 //------------------------------------------------------------------------------
@@ -1024,7 +1024,7 @@ double Vehicle::mainResist(double velocity)
 double Vehicle::wheelrailFriction(double velocity)
 {
     double abs_V = abs(velocity) * Physics::kmh;
-    return a + (b / (c + d * abs_V)) + e * abs_V;
+    return psi_a + (psi_b / (psi_c + psi_d * abs_V)) + psi_e * abs_V;
 }
 
 //------------------------------------------------------------------------------

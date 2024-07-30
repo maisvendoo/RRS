@@ -106,19 +106,6 @@ public:
 
     QString getCustomConfigDir() const;
 
-signals:
-
-    /// Print debug info into file
-    void DebugPrint(double t, const state_vector_t &Y);
-
-    void soundPlay(QString name);
-
-    void soundStop(QString name);
-
-    void soundSetVolume(QString name, int volume);
-
-    void soundSetPitch(QString name, float pitch);
-
 protected:
 
     /// Name of this device
