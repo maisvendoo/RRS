@@ -8,6 +8,11 @@ class ImGuiWidgetsHandler : public OSGImGuiHandler
 protected:
 
     void drawUI() override;
+private:
+
+    bool is_quit = false;
+
+    void showQuitDialog();
 };
 
 #endif

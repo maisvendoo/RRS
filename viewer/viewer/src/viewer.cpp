@@ -142,6 +142,7 @@ int RouteViewer::run()
 
     viewer.setCameraManipulator(cs.get());
 
+    viewer.setKeyEventSetsDone(0);
     viewer.setRealizeOperation(new ImGuiInitOperation);
     viewer.addEventHandler(new ImGuiWidgetsHandler);
 

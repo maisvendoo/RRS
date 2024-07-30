@@ -1,10 +1,7 @@
 #include    <imgui-widgets-handler.h>
 #include    <QString>
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ImGuiWidgetsHandler::drawUI()
+void ImGuiWidgetsHandler::showQuitDialog()
 {
     int w = 300;
     int h = 150;
@@ -20,4 +17,20 @@ void ImGuiWidgetsHandler::drawUI()
     ImGui::Button("YES");
     ImGui::Button("NO");
     ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::drawUI()
+{
+    ImGuiIO &io = ImGui::GetIO();
+
+    if (io.KeysDown[ImGuiKey_Escape])
+    {
+        is_quit = true;
+    }
+
+    if (is_quit)
+        showQuitDialog();
 }
