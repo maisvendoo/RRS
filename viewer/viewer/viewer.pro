@@ -64,7 +64,7 @@ win32 {
     INCLUDEPATH += $$OSG_INCLUDE_DIRECTORY
 
     LIBS += -L$$OPENAL_LIB_DIR -lOpenAL32
-    INCLUDEPATH += $$OPENAL_INCLUDE_BIN
+    INCLUDEPATH += $$OPENAL_INCLUDE_BIN    
 }
 
 unix {
@@ -136,5 +136,10 @@ INCLUDEPATH += ./include
 INCLUDEPATH += ../sound-manager/include
 INCLUDEPATH += ../../asound/include
 
+INCLUDEPATH += ../imgui/include
+
 HEADERS += $$files(./include/*.h)
+HEADERS += $$files(../imgui/include/*.h)
 SOURCES += $$files(./src/*.cpp)
+SOURCES += $$files(../imgui/src/*.cpp)
+
