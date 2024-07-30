@@ -5,14 +5,20 @@
 
 class ImGuiWidgetsHandler : public OSGImGuiHandler
 {
+
+public:
+
+    bool handle(const osgGA::GUIEventAdapter &ea,
+                osgGA::GUIActionAdapter &aa) override;
+
 protected:
 
     void drawUI() override;
 private:
 
-    bool is_quit = false;
+    bool is_show_quit_dialog = false;
 
-    void showQuitDialog();
+    void showQuitDialog(bool &is_show);
 };
 
 #endif

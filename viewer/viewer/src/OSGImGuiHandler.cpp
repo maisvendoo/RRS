@@ -133,6 +133,15 @@ bool OSGImGuiHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             return wantCaptureKeyboard;
         }
+        case (osgGA::GUIEventAdapter::RELEASE):
+        case (osgGA::GUIEventAdapter::PUSH):
+        {
+            io.MousePos = ImVec2(ea.getX(), io.DisplaySize.y - ea.getY());
+            mousePressed[0] = ea.getButtonMask() & osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON;
+            mousePressed[1] = ea.getButtonMask() & osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON;
+            mousePressed[2] = ea.getButtonMask() & osgGA::GUIEventAdapter::MIDDLE_MOUSE_BUTTON;
+            return wantCaptureMouse;
+        }
         default:
         {
             return false;
