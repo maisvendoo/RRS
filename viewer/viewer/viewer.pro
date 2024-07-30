@@ -139,6 +139,7 @@ INCLUDEPATH += ../../asound/include
 INCLUDEPATH += ../imgui/include
 
 HEADERS += $$files(./include/*.h)
+HEADERS += $$files(./include/*.hpp)
 HEADERS += $$files(../imgui/include/*.h)
 SOURCES += $$files(./src/*.cpp)
 SOURCES += $$files(../imgui/src/*.cpp)
