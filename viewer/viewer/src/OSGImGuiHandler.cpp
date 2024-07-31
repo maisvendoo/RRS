@@ -93,6 +93,40 @@ static int ConvertFromOSGKey(int key)
         return ImGuiKey_Escape;
     case KEY::KEY_F1:
         return ImGuiKey_F1;
+    case KEY::KEY_F2:
+        return ImGuiKey_F2;
+    case KEY::KEY_F3:
+        return ImGuiKey_F3;
+    case KEY::KEY_F4:
+        return ImGuiKey_F4;
+    case KEY::KEY_F5:
+        return ImGuiKey_F5;
+    case KEY::KEY_F6:
+        return ImGuiKey_F6;
+    case KEY::KEY_F7:
+        return ImGuiKey_F7;
+    case KEY::KEY_F8:
+        return ImGuiKey_F8;
+    case KEY::KEY_F9:
+        return ImGuiKey_F9;
+    case KEY::KEY_F10:
+        return ImGuiKey_F10;
+    case KEY::KEY_F11:
+        return ImGuiKey_F11;
+    case KEY::KEY_F12:
+        return ImGuiKey_F12;
+    case KEY::KEY_Shift_L:
+        return ImGuiKey_LeftShift;
+    case KEY::KEY_Shift_R:
+        return ImGuiKey_RightShift;
+    case KEY::KEY_Control_L:
+        return ImGuiKey_LeftCtrl;
+    case KEY::KEY_Control_R:
+        return ImGuiKey_RightCtrl;
+    case KEY::KEY_Alt_L:
+        return ImGuiKey_LeftAlt;
+    case KEY::KEY_Alt_R:
+        return ImGuiKey_RightAlt;
     default: // Not found
         return -1;
     }
