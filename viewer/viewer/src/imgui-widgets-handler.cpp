@@ -102,7 +102,7 @@ void ImGuiWidgetsHandler::showUncontrolledState()
 
     bool open_ptr = true;
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
     ImGui::Begin(u8"Сосотояние управления", &open_ptr, window_flags);
     ImGui::PopStyleColor();
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
