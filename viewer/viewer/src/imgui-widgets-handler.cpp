@@ -46,7 +46,7 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
     {
         ImGui::SetCursorPos(ImVec2(cx, cy));
         is_show = false;
-    }
+    }    
 
     ImGui::End();
 
@@ -65,7 +65,14 @@ void ImGuiWidgetsHandler::showDebugLog()
     ImGui::SetNextWindowSize(ImVec2(content_size.x, h));
     ImGui::SetNextWindowPos(ImVec2(0, content_size.y - h));
 
-    ImGui::Begin(u8"Консоль отладки");
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Консоль отладки", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
     ImGui::Text(u8"%s", debugMsg.toStdString().c_str());
     ImGui::End();
 }
@@ -93,10 +100,12 @@ void ImGuiWidgetsHandler::drawUI()
 {
     ImGuiIO &io = ImGui::GetIO();
 
-    if (io.KeysDown[ImGuiKey_Escape])
+    if (io.KeysDown[ImGuiKey_Escape] && !is_Esc)
     {
-        is_show_quit_dialog = true;
+        is_show_quit_dialog = !is_show_quit_dialog;
     }
+
+    is_Esc = io.KeysDown[ImGuiKey_Escape];
 
     if (is_show_quit_dialog)
         showQuitDialog(is_show_quit_dialog);
