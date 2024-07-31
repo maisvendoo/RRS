@@ -1,9 +1,9 @@
-#include    "camera-switcher.h"
+#include    "viewer-stats-switcher.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CameraSwitcher::CameraSwitcher() : osgGA::KeySwitchMatrixManipulator()
+ViewerStatsHandler::ViewerStatsHandler() : osgViewer::StatsHandler()
 {
 
 }
@@ -11,15 +11,7 @@ CameraSwitcher::CameraSwitcher() : osgGA::KeySwitchMatrixManipulator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CameraSwitcher::~CameraSwitcher()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool CameraSwitcher::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+bool ViewerStatsHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
     switch (ea.getEventType())
     {
@@ -82,5 +74,5 @@ bool CameraSwitcher::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     if (is_Shift_L || is_Shift_R || is_Ctrl_L || is_Ctrl_R || is_Alt_L || is_Alt_R)
         return false;
 
-    return osgGA::KeySwitchMatrixManipulator::handle(ea, aa);
+    return osgViewer::StatsHandler::handle(ea, aa);
 }

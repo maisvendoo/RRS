@@ -35,6 +35,8 @@ private:
 
     bool is_F1 = false;
 
+    bool is_modified_key = false;
+
     QString debugMsg = "";
 
     void showQuitDialog(bool &is_show);

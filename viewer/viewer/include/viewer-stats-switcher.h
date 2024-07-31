@@ -1,22 +1,20 @@
-#ifndef     CAMERA_SWITCHER_H
-#define     CAMERA_SWITCHER_H
+#ifndef     VIEWER_STATS_SWITCHER_H
+#define     VIEWER_STATS_SWITCHER_H
 
-#include    <osgGA/KeySwitchMatrixManipulator>
+#include    <osgViewer/ViewerEventHandlers>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class CameraSwitcher : public osgGA::KeySwitchMatrixManipulator
+class ViewerStatsHandler : public osgViewer::StatsHandler
 {
 public:
 
-    CameraSwitcher();
+    ViewerStatsHandler();
 
     bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa);
 
 protected:
-
-    virtual ~CameraSwitcher();
 
     bool is_Shift_L = false;
     bool is_Shift_R = false;
@@ -26,4 +24,4 @@ protected:
     bool is_Alt_R = false;
 };
 
-#endif // CAMERASWITCHER_H
+#endif // VIEWER_STATS_SWITCHER_H

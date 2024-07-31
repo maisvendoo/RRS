@@ -113,6 +113,10 @@ void ImGuiWidgetsHandler::drawUI()
 {
     ImGuiIO &io = ImGui::GetIO();
 
+    is_modified_key = io.KeysDown[ImGuiKey_LeftShift] || io.KeysDown[ImGuiKey_RightShift]
+                   || io.KeysDown[ImGuiKey_LeftCtrl] || io.KeysDown[ImGuiKey_RightCtrl]
+                   || io.KeysDown[ImGuiKey_LeftAlt] || io.KeysDown[ImGuiKey_RightAlt];
+
     if (io.KeysDown[ImGuiKey_Escape] && !is_Esc)
     {
         is_show_quit_dialog = !is_show_quit_dialog;
@@ -123,7 +127,7 @@ void ImGuiWidgetsHandler::drawUI()
     if (is_show_quit_dialog)
         showQuitDialog(is_show_quit_dialog);
 
-    if (io.KeysDown[ImGuiKey_F1] && !is_F1)
+    if (io.KeysDown[ImGuiKey_F1] && !is_F1 && !is_modified_key)
     {
         is_show_debug_log = !is_show_debug_log;
     }

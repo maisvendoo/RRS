@@ -34,6 +34,7 @@
 #include    "lighting.h"
 #include    "qt-events.h"
 #include    "screen-capture.h"
+#include    "viewer-stats-switcher.h"
 #include    "hud.h"
 #include    "rails-manipulator.h"
 #include    "free-manipulator.h"
@@ -100,7 +101,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
 
-    osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new osgViewer::StatsHandler;
+    osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new ViewerStatsHandler();
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
 
     viewer.addEventHandler(statsHandler.get());
@@ -141,6 +142,7 @@ int RouteViewer::run()
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F6, "static_view", sm_left.get());
 
     viewer.setCameraManipulator(cs.get());
+    viewer.addEventHandler(cs.get());
 
     viewer.setKeyEventSetsDone(0);
     viewer.setRealizeOperation(new ImGuiInitOperation);
@@ -225,7 +227,7 @@ bool RouteViewer::init(int argc, char *argv[])
             new WriteToFileOperation(fs.getScreenshotsDir());
 
     osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler =
-            new osgViewer::ScreenCaptureHandler(writeFile.get());
+            new ScreenCapture(writeFile.get());
 
     // Одиночный скриншот по клавише F12
     screenCaptureHandler->setKeyEventTakeScreenShot(osgGA::GUIEventAdapter::KEY_F12);
