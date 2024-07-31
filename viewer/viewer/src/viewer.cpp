@@ -226,7 +226,7 @@ bool RouteViewer::init(int argc, char *argv[])
             new WriteToFileOperation(fs.getScreenshotsDir());
 
     osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler =
-            new osgViewer::ScreenCaptureHandler(writeFile.get());
+            new ScreenCapture(writeFile.get());
 
     // Одиночный скриншот по клавише F12
     screenCaptureHandler->setKeyEventTakeScreenShot(osgGA::GUIEventAdapter::KEY_F12);

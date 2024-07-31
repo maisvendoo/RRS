@@ -23,7 +23,6 @@ bool CameraSwitcher::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     case osgGA::GUIEventAdapter::KEYDOWN:
     {
         int key = ea.getUnmodifiedKey();
-//        OSG_FATAL << "CAMERA SWITCHER KEYDOWN: " << key << std::endl;
         switch (key)
         {
         case osgGA::GUIEventAdapter::KEY_Shift_L:
@@ -51,7 +50,6 @@ bool CameraSwitcher::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     case osgGA::GUIEventAdapter::KEYUP:
     {
         int key = ea.getUnmodifiedKey();
-//        OSG_FATAL << "CAMERA SWITCHER KEYUP: " << key << std::endl;
         switch (key)
         {
         case osgGA::GUIEventAdapter::KEY_Shift_L:
@@ -77,8 +75,6 @@ bool CameraSwitcher::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     }
     default: break;
     }
-
-//    OSG_FATAL << "CAMERA SWITCHER: "<< is_Shift_L << is_Shift_R << is_Ctrl_L << is_Ctrl_R << is_Alt_L << is_Alt_R << std::endl;
 
     if (is_Shift_L || is_Shift_R || is_Ctrl_L || is_Ctrl_R || is_Alt_L || is_Alt_R)
         return false;

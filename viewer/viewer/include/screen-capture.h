@@ -13,6 +13,27 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+class ScreenCapture : public osgViewer::ScreenCaptureHandler
+{
+public:
+
+    ScreenCapture(osgViewer::ScreenCaptureHandler::CaptureOperation* write_op);
+
+    virtual bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+
+private:
+
+    bool is_Shift_L = false;
+    bool is_Shift_R = false;
+    bool is_Ctrl_L = false;
+    bool is_Ctrl_R = false;
+    bool is_Alt_L = false;
+    bool is_Alt_R = false;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class WriteToFileOperation : public osgViewer::ScreenCaptureHandler::CaptureOperation
 {
 public:
