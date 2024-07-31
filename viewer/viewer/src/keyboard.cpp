@@ -221,6 +221,21 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_Insert);
     addKey(osgGA::GUIEventAdapter::KEY_Home);
     addKey(osgGA::GUIEventAdapter::KEY_End);
+//    addKey(osgGA::GUIEventAdapter::KEY_Page_Down); // Используем для переключения между ПЕ
+//    addKey(osgGA::GUIEventAdapter::KEY_Page_Up);   // Используем для переключения между ПЕ
+
+    addKey(osgGA::GUIEventAdapter::KEY_F1);
+    addKey(osgGA::GUIEventAdapter::KEY_F2);
+    addKey(osgGA::GUIEventAdapter::KEY_F3);
+    addKey(osgGA::GUIEventAdapter::KEY_F4);
+    addKey(osgGA::GUIEventAdapter::KEY_F5);
+    addKey(osgGA::GUIEventAdapter::KEY_F6);
+    addKey(osgGA::GUIEventAdapter::KEY_F7);
+    addKey(osgGA::GUIEventAdapter::KEY_F8);
+    addKey(osgGA::GUIEventAdapter::KEY_F9);
+    addKey(osgGA::GUIEventAdapter::KEY_F10);
+    addKey(osgGA::GUIEventAdapter::KEY_F11);
+    addKey(osgGA::GUIEventAdapter::KEY_F12);
 }
 
 //------------------------------------------------------------------------------
