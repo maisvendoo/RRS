@@ -494,7 +494,7 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         }
 
         std::wstring text = hud_text.toStdWString();
-        emit setStatusBar(text);
+        emit setStatusBar(hud_text);
     }
 }
 

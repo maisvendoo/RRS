@@ -63,7 +63,8 @@ public:
 
 signals:
 
-    void setStatusBar(std::wstring &msg);
+    //void setStatusBar(std::wstring &msg);
+    void setStatusBar(QString &msg);
 
     void sendCameraPosition(camera_position_t cp);
 

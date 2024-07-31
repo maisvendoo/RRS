@@ -4,9 +4,18 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+ImGuiWidgetsHandler::ImGuiWidgetsHandler()
+{
+    ImGuiIO &io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("../fonts/arial.ttf", 20, NULL, io.Fonts->GetGlyphRangesCyrillic());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 {
-    int w = 300;
+    int w = 400;
     int h = 150;
 
     int cx = w / 2;
@@ -20,20 +29,20 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 
     ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
 
-    ImGui::Begin("A you realy want to quit?");
+    ImGui::Begin(u8"Вы действительно хотите выйти?");
 
     int bw = w / 4;
     int bh = h / 4;
 
     ImGui::SetCursorPos(ImVec2(cx - 3 * bw / 2, cy - bh / 2));
-    if (ImGui::Button("YES", ImVec2(bw, bh)))
+    if (ImGui::Button(u8"Да", ImVec2(bw, bh)))
     {
         ImGui::SetCursorPos(ImVec2(cx, cy));
         exit(0);
     }
 
     ImGui::SetCursorPos(ImVec2(cx + bw / 2, cy - bh / 2));
-    if (ImGui::Button("NO", ImVec2(bw, bh)))
+    if (ImGui::Button(u8"Нет", ImVec2(bw, bh)))
     {
         ImGui::SetCursorPos(ImVec2(cx, cy));
         is_show = false;
@@ -46,6 +55,31 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::showDebugLog()
+{
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 content_size = io.DisplaySize;
+
+    int h = 200;
+
+    ImGui::SetNextWindowSize(ImVec2(content_size.x, h));
+    ImGui::SetNextWindowPos(ImVec2(0, content_size.y - h));
+
+    ImGui::Begin(u8"Консоль отладки");
+    ImGui::Text(u8"%s", debugMsg.toStdString().c_str());
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::setStatusBar(const QString &msg)
+{
+    debugMsg = msg;
+}
+
+
+
 bool ImGuiWidgetsHandler::handle(const osgGA::GUIEventAdapter &ea,
                                  osgGA::GUIActionAdapter &aa)
 {
@@ -66,4 +100,6 @@ void ImGuiWidgetsHandler::drawUI()
 
     if (is_show_quit_dialog)
         showQuitDialog(is_show_quit_dialog);
+
+    showDebugLog();
 }

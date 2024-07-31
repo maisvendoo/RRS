@@ -144,7 +144,13 @@ int RouteViewer::run()
 
     viewer.setKeyEventSetsDone(0);
     viewer.setRealizeOperation(new ImGuiInitOperation);
-    viewer.addEventHandler(new ImGuiWidgetsHandler);
+
+    osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = new ImGuiWidgetsHandler;
+
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
+                         imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::setStatusBar);
+
+    viewer.addEventHandler(imguiWidgetsHandler.get());
 
     return viewer.run();
 }
@@ -233,8 +239,8 @@ bool RouteViewer::init(int argc, char *argv[])
 
     viewer.addEventHandler(new KeyboardHUDHandler(hud->getScene()));
 
-    QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
-                     hud, &HUD::setStatusBar);
+    /*QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
+                     hud, &HUD::setStatusBar);*/
 
     osgDB::DatabasePager *dp = viewer.getDatabasePager();
     dp->setDoPreCompile(true);
