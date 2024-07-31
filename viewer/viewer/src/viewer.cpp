@@ -34,6 +34,7 @@
 #include    "lighting.h"
 #include    "qt-events.h"
 #include    "screen-capture.h"
+#include    "viewer-stats-switcher.h"
 #include    "hud.h"
 #include    "rails-manipulator.h"
 #include    "free-manipulator.h"
@@ -100,7 +101,7 @@ int RouteViewer::run()
                      &client, &NetworkClient::receiveKeysState);
 
 
-    osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new osgViewer::StatsHandler;
+    osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new ViewerStatsHandler();
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
 
     viewer.addEventHandler(statsHandler.get());
