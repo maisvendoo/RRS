@@ -104,9 +104,9 @@ void VL60k::stepBrakesControl(double t, double dt)
         anglecock_bc_fwd->setPipePressure(bc_splitter->getInputPressure());
         anglecock_bc_bwd->setPipePressure(bc_splitter->getInputPressure());
     }
-    //anglecock_bc_fwd->setControl(keys);
+    anglecock_bc_fwd->setControl(keys);
     anglecock_bc_fwd->step(t, dt);
-    //anglecock_bc_bwd->setControl(keys);
+    anglecock_bc_bwd->setControl(keys);
     anglecock_bc_bwd->step(t, dt);
 
     // Рукава магистрали тормозных цилиндров
@@ -114,13 +114,13 @@ void VL60k::stepBrakesControl(double t, double dt)
     hose_bc_fwd->setFlowCoeff(anglecock_bc_fwd->getFlowCoeff());
     hose_bc_fwd->setCoord(railway_coord + dir * orient * (length / 2.0 - anglecock_bc_fwd->getShiftCoord()));
     hose_bc_fwd->setShiftSide(anglecock_bc_fwd->getShiftSide());
-    //hose_bc_fwd->setControl(keys);
+    hose_bc_fwd->setControl(keys);
     hose_bc_fwd->step(t, dt);
 
     hose_bc_bwd->setPressure(anglecock_bc_bwd->getPressureToHose());
     hose_bc_bwd->setFlowCoeff(anglecock_bc_bwd->getFlowCoeff());
     hose_bc_bwd->setCoord(railway_coord - dir * orient * (length / 2.0 - anglecock_bc_bwd->getShiftCoord()));
     hose_bc_bwd->setShiftSide(anglecock_bc_bwd->getShiftSide());
-    //hose_bc_bwd->setControl(keys);
+    hose_bc_bwd->setControl(keys);
     hose_bc_bwd->step(t, dt);
 }

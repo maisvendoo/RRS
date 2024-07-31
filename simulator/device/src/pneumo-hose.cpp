@@ -140,6 +140,34 @@ double PneumoHose::getDownAngle() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t PneumoHose::getSoundState(size_t idx) const
+{
+    if (idx == PIPE_DRAIN_FLOW_SOUND)
+        return atm_flow_sound;
+    if (idx == CONNECT_SOUND)
+        return sound_state_t(isConnected());
+    if (idx == DISCONNECT_SOUND)
+        return sound_state_t(!isConnected());
+    return sound_state_t();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float PneumoHose::getSoundSignal(size_t idx) const
+{
+    if (idx == PIPE_DRAIN_FLOW_SOUND)
+        return atm_flow_sound.createSoundSignal();
+    if (idx == CONNECT_SOUND)
+        return sound_state_t::createSoundSignal(isConnected());
+    if (idx == DISCONNECT_SOUND)
+        return sound_state_t::createSoundSignal(!isConnected());
+    return sound_state_t::createSoundSignal(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoHose::step(double t, double dt)
 {
     // Проверяем, вызывались ли методы управления рукавами на данном шаге
@@ -153,6 +181,9 @@ void PneumoHose::step(double t, double dt)
         // Если не вызывались, обнуляем управляющий сигнал
         output_signals[HOSE_OUTPUT_REF_STATE] = 0.0f;
     }
+
+    atm_flow_sound.state = !isConnected();
+    atm_flow_sound.volume = K_sound * cbrt(getFlow());
 
     Device::step(t, dt);
 }
@@ -180,12 +211,17 @@ void PneumoHose::stepKeysControl(double t, double dt)
     // Проверяем управляющий сигнал
     if (getKeyState(keyCode))
     {
-        if (isShift())
+        if (isShift() && (!isControl()))
+        {
             // Соединяем рукава
             connect();
+        }
         else
-            // Разъединяем рукава
-            disconnect();
+        {
+            if (isControl())
+                // Разъединяем рукава
+                disconnect();
+        }
     }
 }
 
@@ -201,6 +237,8 @@ void PneumoHose::load_config(CfgReader &cfg)
     double tmp = 1.0;
     cfg.getDouble(secName, "FlowCoefficient", tmp);
     output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
+
+    cfg.getDouble(secName, "K_sound", K_sound);
 
     tmp = 0.71;
     cfg.getDouble(secName, "Length", tmp);

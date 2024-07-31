@@ -5,14 +5,6 @@
 //------------------------------------------------------------------------------
 PneumoAngleCock::PneumoAngleCock(int key_code, QObject *parent) : Device(parent)
   , keyCode(key_code)
-  , ref_state(false)
-  , switch_time(0.2)
-  , p(0.0)
-  , Q(0.0)
-  , pipe_volume(1.0e8)
-  , k_max_by_pipe_volume(0.8)
-  , k_pipe(0.8)
-  , k_atm(0.1)
 {
 
 }
@@ -38,7 +30,7 @@ void PneumoAngleCock::setKeyCode(int key_code)
 //------------------------------------------------------------------------------
 void PneumoAngleCock::close()
 {
-    ref_state = false;
+    ref_state.reset();
 }
 
 //------------------------------------------------------------------------------
@@ -46,7 +38,7 @@ void PneumoAngleCock::close()
 //------------------------------------------------------------------------------
 void PneumoAngleCock::open()
 {
-    ref_state = true;
+    ref_state.set();
 }
 
 //------------------------------------------------------------------------------
@@ -154,11 +146,31 @@ double PneumoAngleCock::getShiftCoord() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+sound_state_t PneumoAngleCock::getSoundState(size_t idx) const
+{
+    if (idx == PIPE_DRAIN_FLOW_SOUND)
+        return atm_flow_sound;
+    return ref_state.getSoundState(idx);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float PneumoAngleCock::getSoundSignal(size_t idx) const
+{
+    if (idx == PIPE_DRAIN_FLOW_SOUND)
+        return atm_flow_sound.createSoundSignal();
+    return ref_state.getSoundSignal(idx);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoAngleCock::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
     Q_UNUSED(t)
 
-    double ref_pos = static_cast<double>(ref_state);
+    double ref_pos = static_cast<double>(ref_state.getState());
     double delta = ref_pos - Y[0];
     if (abs(delta) > 0.05)
     {
@@ -173,24 +185,21 @@ void PneumoAngleCock::ode_system(const state_vector_t& Y, state_vector_t& dYdt, 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoAngleCock::stepDiscrete(double t, double dt)
-{
-    Q_UNUSED(t)
-
-    // Ограничение коэффициента перетока для устойчивого расчёта с данным шагом
-    k_max_by_pipe_volume = min(k_pipe, (0.5 * pipe_volume / dt) );
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void PneumoAngleCock::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
     if (Y[0] < 0.05)
+    {
         is_opened = false;
+        atm_flow_sound.state = 1;
+        atm_flow_sound.volume = K_sound * cbrt(Q);
+    }
     else
+    {
         is_opened = true;
+        atm_flow_sound.state = 0;
+        atm_flow_sound.volume = 0.0f;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -199,17 +208,24 @@ void PneumoAngleCock::preStep(state_vector_t &Y, double t)
 void PneumoAngleCock::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
-    Q_UNUSED(dt)
+
+    // Ограничение коэффициента перетока для устойчивого расчёта с данным шагом
+    k_max_by_pipe_volume = min(k_pipe, (0.5 * pipe_volume / dt) );
 
     // Проверяем управляющий сигнал
     if (getKeyState(keyCode))
     {
-        if (isShift())
+        if (isShift() && (!isControl()))
+        {
             // Открываем концевой кран
             open();
+        }
         else
-            // Закрываем концевой кран
-            close();
+        {
+            if (isControl())
+                // Закрываем концевой кран
+                close();
+        }
     }
 }
 
@@ -220,7 +236,9 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
-    cfg.getBool(secName, "IsOpened", ref_state);
+    bool state = false;
+    cfg.getBool(secName, "IsOpened", state);
+    state ? ref_state.set() : ref_state.reset();
 
     double tmp = 0.0;
     cfg.getDouble(secName, "SwitchTime", tmp);
@@ -229,6 +247,7 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "kPipe", k_pipe);
     cfg.getDouble(secName, "kAtm", k_atm);
+    cfg.getDouble(secName, "K_sound", K_sound);
 
     k_max_by_pipe_volume = k_pipe;
 
