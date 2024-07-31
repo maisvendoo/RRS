@@ -141,6 +141,7 @@ int RouteViewer::run()
     cs->addMatrixManipulator(osgGA::GUIEventAdapter::KEY_F6, "static_view", sm_left.get());
 
     viewer.setCameraManipulator(cs.get());
+    viewer.addEventHandler(cs.get());
 
     viewer.setKeyEventSetsDone(0);
     viewer.setRealizeOperation(new ImGuiInitOperation);
