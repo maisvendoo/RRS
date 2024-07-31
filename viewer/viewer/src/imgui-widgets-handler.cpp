@@ -93,13 +93,43 @@ void ImGuiWidgetsHandler::showDebugLog()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::showUncontrolledState()
+{
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Begin(u8"Сосотояние управления", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::Text(u8"%s", "Нажмите Enter для управления данной ПЕ");
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::setStatusBar(const QString &msg)
 {
     debugMsg = msg;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::receiveControlledState(bool state)
+{
+    is_controlled = state;
+}
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ImGuiWidgetsHandler::handle(const osgGA::GUIEventAdapter &ea,
                                  osgGA::GUIActionAdapter &aa)
 {
@@ -136,4 +166,7 @@ void ImGuiWidgetsHandler::drawUI()
 
     if (is_show_debug_log)
         showDebugLog();
+
+    if (!is_controlled)
+        showUncontrolledState();
 }

@@ -37,15 +37,21 @@ private:
 
     bool is_modified_key = false;
 
+    bool is_controlled = false;
+
     QString debugMsg = "";
 
     void showQuitDialog(bool &is_show);
 
     void showDebugLog();
 
+    void showUncontrolledState();
+
 public slots:
 
     void setStatusBar(const QString &msg);
+
+    void receiveControlledState(bool state);
 };
 
 #endif
