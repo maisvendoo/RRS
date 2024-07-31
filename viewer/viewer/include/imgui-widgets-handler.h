@@ -25,6 +25,8 @@ protected:
 
 private:
 
+    int font_size = 20;
+
     bool is_show_quit_dialog = false;
 
     bool is_Esc = false;

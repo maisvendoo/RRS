@@ -1,5 +1,5 @@
 #include    <imgui-widgets-handler.h>
-#include    <QApplication>
+#include    <QStringList>
 
 //------------------------------------------------------------------------------
 //
@@ -7,7 +7,10 @@
 ImGuiWidgetsHandler::ImGuiWidgetsHandler()
 {
     ImGuiIO &io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("../fonts/arial.ttf", 20, NULL, io.Fonts->GetGlyphRangesCyrillic());
+    io.Fonts->AddFontFromFileTTF("../fonts/arial.ttf",
+                                 font_size,
+                                 NULL,
+                                 io.Fonts->GetGlyphRangesCyrillic());
 }
 
 //------------------------------------------------------------------------------
@@ -55,12 +58,22 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int getLinesCount(const QString &str)
+{
+    QStringList lines = str.split('\n');
+
+    return lines.count();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::showDebugLog()
 {
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 content_size = io.DisplaySize;
 
-    int h = 200;
+    float h = 1.2 * font_size * getLinesCount(debugMsg);
 
     ImGui::SetNextWindowSize(ImVec2(content_size.x, h));
     ImGui::SetNextWindowPos(ImVec2(0, content_size.y - h));
