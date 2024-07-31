@@ -27,6 +27,10 @@ private:
 
     bool is_show_quit_dialog = false;
 
+    bool is_show_debug_log = false;
+
+    bool is_F1 = false;
+
     QString debugMsg = "";
 
     void showQuitDialog(bool &is_show);

@@ -91,6 +91,8 @@ static int ConvertFromOSGKey(int key)
         return ImGuiKey_Enter;
     case KEY::KEY_Escape:
         return ImGuiKey_Escape;
+    case KEY::KEY_F1:
+        return ImGuiKey_F1;
     default: // Not found
         return -1;
     }

@@ -493,7 +493,6 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
             hud_text += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
         }
 
-        std::wstring text = hud_text.toStdWString();
         emit setStatusBar(hud_text);
     }
 }

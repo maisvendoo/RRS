@@ -101,5 +101,13 @@ void ImGuiWidgetsHandler::drawUI()
     if (is_show_quit_dialog)
         showQuitDialog(is_show_quit_dialog);
 
-    showDebugLog();
+    if (io.KeysDown[ImGuiKey_F1] && !is_F1)
+    {
+        is_show_debug_log = !is_show_debug_log;
+    }
+
+    is_F1 = io.KeysDown[ImGuiKey_F1];
+
+    if (is_show_debug_log)
+        showDebugLog();
 }

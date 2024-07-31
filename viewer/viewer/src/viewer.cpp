@@ -232,15 +232,7 @@ bool RouteViewer::init(int argc, char *argv[])
     // Серия скриншотов отключена из-за просадки производительности
     screenCaptureHandler->setKeyEventToggleContinuousCapture(-1);
 
-    viewer.addEventHandler(screenCaptureHandler.get());
-
-    HUD *hud = new HUD(settings.width, settings.height);
-    root->addChild(hud->getCamera());
-
-    viewer.addEventHandler(new KeyboardHUDHandler(hud->getScene()));
-
-    /*QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
-                     hud, &HUD::setStatusBar);*/
+    viewer.addEventHandler(screenCaptureHandler.get());        
 
     osgDB::DatabasePager *dp = viewer.getDatabasePager();
     dp->setDoPreCompile(true);
