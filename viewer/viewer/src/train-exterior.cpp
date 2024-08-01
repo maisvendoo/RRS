@@ -122,11 +122,119 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
-            keyboardHandler(ea.getKey());
+            int key = ea.getUnmodifiedKey();
+            controlled_t tmp;
+            switch (key)
+            {
+            case osgGA::GUIEventAdapter::KEY_Page_Down:
 
+                cur_vehicle++;
 
+                if (cur_vehicle > static_cast<int>(vehicles_ext.size() - 1))
+                    cur_vehicle = 0;
+
+                tmp.current_vehicle = cur_vehicle;
+                tmp.controlled_vehicle = controlled_vehicle;
+                sendControlledVehicle(tmp);
+
+                break;
+
+            case osgGA::GUIEventAdapter::KEY_Page_Up:
+
+                cur_vehicle--;
+
+                if (cur_vehicle < 0)
+                    cur_vehicle = static_cast<int>(vehicles_ext.size() - 1);
+
+                tmp.current_vehicle = cur_vehicle;
+                tmp.controlled_vehicle = controlled_vehicle;
+                sendControlledVehicle(tmp);
+
+                break;
+
+            case osgGA::GUIEventAdapter::KEY_KP_Enter:
+            case osgGA::GUIEventAdapter::KEY_Return:
+
+                controlled_vehicle = cur_vehicle;
+
+                tmp.current_vehicle = cur_vehicle;
+                tmp.controlled_vehicle = controlled_vehicle;
+                sendControlledVehicle(tmp);
+                break;
+
+            case osgGA::GUIEventAdapter::KEY_Shift_L:
+                is_Shift_L = true;
+                return false;
+            case osgGA::GUIEventAdapter::KEY_Shift_R:
+                is_Shift_R = true;
+                return false;
+            case osgGA::GUIEventAdapter::KEY_Control_L:
+                is_Ctrl_L = true;
+                return false;
+            case osgGA::GUIEventAdapter::KEY_Control_R:
+                is_Ctrl_R = true;
+                return false;
+            case osgGA::GUIEventAdapter::KEY_Alt_L:
+                is_Alt_L = true;
+                return false;
+            case osgGA::GUIEventAdapter::KEY_Alt_R:
+                is_Alt_R = true;
+                return false;
+
+            case osgGA::GUIEventAdapter::KEY_F2:
+
+                if (is_Shift_L || is_Shift_R || is_Ctrl_L || is_Ctrl_R || is_Alt_L || is_Alt_R)
+                    return false;
+                if (controlled_vehicle >= 0)
+                    cur_vehicle = controlled_vehicle;
+                is_displays_locked = false;
+
+                tmp.current_vehicle = cur_vehicle;
+                tmp.controlled_vehicle = controlled_vehicle;
+                sendControlledVehicle(tmp);
+                break;
+
+            case osgGA::GUIEventAdapter::KEY_F3:
+            case osgGA::GUIEventAdapter::KEY_F4:
+            case osgGA::GUIEventAdapter::KEY_F5:
+            case osgGA::GUIEventAdapter::KEY_F6:
+
+                if (is_Shift_L || is_Shift_R || is_Ctrl_L || is_Ctrl_R || is_Alt_L || is_Alt_R)
+                    return false;
+                is_displays_locked = true;
+                break;
+
+            default: break;
+            }
             break;
         }
+
+    case osgGA::GUIEventAdapter::KEYUP:
+    {
+        int key = ea.getUnmodifiedKey();
+        switch (key)
+        {
+        case osgGA::GUIEventAdapter::KEY_Shift_L:
+            is_Shift_L = false;
+            break;
+        case osgGA::GUIEventAdapter::KEY_Shift_R:
+            is_Shift_R = false;
+            break;
+        case osgGA::GUIEventAdapter::KEY_Control_L:
+            is_Ctrl_L = false;
+            break;
+        case osgGA::GUIEventAdapter::KEY_Control_R:
+            is_Ctrl_R = false;
+            break;
+        case osgGA::GUIEventAdapter::KEY_Alt_L:
+            is_Alt_L = false;
+            break;
+        case osgGA::GUIEventAdapter::KEY_Alt_R:
+            is_Alt_R = false;
+            break;
+        default: break;
+        }
+    }
 
     default:
 
@@ -153,104 +261,6 @@ osg::Group *TrainExteriorHandler::getExterior()
 std::vector<AnimationManager *> TrainExteriorHandler::getAnimManagers()
 {
     return anim_managers;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrainExteriorHandler::keyboardHandler(int key)
-{
-    controlled_t tmp;
-
-    switch (key)
-    {
-    case osgGA::GUIEventAdapter::KEY_Page_Down:
-
-        cur_vehicle++;
-
-        if (cur_vehicle > static_cast<int>(vehicles_ext.size() - 1))
-            cur_vehicle = 0;
-
-        long_shift = 0.0f;
-
-        tmp.current_vehicle = cur_vehicle;
-        tmp.controlled_vehicle = controlled_vehicle;
-        sendControlledVehicle(tmp);
-
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_Page_Up:
-
-        cur_vehicle--;
-
-        if (cur_vehicle < 0)
-            cur_vehicle = static_cast<int>(vehicles_ext.size() - 1);
-
-        long_shift = 0.0f;
-
-        tmp.current_vehicle = cur_vehicle;
-        tmp.controlled_vehicle = controlled_vehicle;
-        sendControlledVehicle(tmp);
-
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_Home:
-
-        long_shift += 0.5f;
-
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_End:
-
-        long_shift -= 0.5f;
-
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_F2:
-
-        if (controlled_vehicle >= 0)
-            cur_vehicle = controlled_vehicle;
-        long_shift = 0.0f;
-        height_shift = 0.0f;
-        is_displays_locked = false;
-
-        tmp.current_vehicle = cur_vehicle;
-        tmp.controlled_vehicle = controlled_vehicle;
-        sendControlledVehicle(tmp);
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_F3:
-
-    case osgGA::GUIEventAdapter::KEY_F4:
-
-    case osgGA::GUIEventAdapter::KEY_F5:
-
-    case osgGA::GUIEventAdapter::KEY_F6:
-
-        is_displays_locked = true;
-
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_Delete:
-
-        height_shift -= 0.05f;
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_Insert:
-
-        height_shift += 0.05f;
-        break;
-
-    case osgGA::GUIEventAdapter::KEY_KP_Enter:
-    case osgGA::GUIEventAdapter::KEY_Return:
-
-        controlled_vehicle = cur_vehicle;
-
-        tmp.current_vehicle = cur_vehicle;
-        tmp.controlled_vehicle = controlled_vehicle;
-        sendControlledVehicle(tmp);
-        break;
-    }
 }
 
 //------------------------------------------------------------------------------
