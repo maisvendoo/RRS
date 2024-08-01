@@ -91,7 +91,7 @@ void VL60k::keyProcess()
     }
 
     // МВ4
-    if (getKeyState(KEY_5))
+    if (getKeyState(KEY_5) && !isAlt())
     {
         if (isShift())
             mv_tumblers[MV4].set();
@@ -100,7 +100,7 @@ void VL60k::keyProcess()
     }
 
     // МВ5
-    if (getKeyState(KEY_6))
+    if (getKeyState(KEY_6) && !isAlt())
     {
         if (isShift())
             mv_tumblers[MV5].set();
@@ -109,7 +109,7 @@ void VL60k::keyProcess()
     }
 
     // МВ6
-    if (getKeyState(KEY_7))
+    if (getKeyState(KEY_7) && !isAlt())
     {
         if (isShift())
             mv_tumblers[MV6].set();

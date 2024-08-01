@@ -142,7 +142,7 @@ void Switcher::stepKeysControl(double t, double dt)
     bool allow_spring_first = is_spring_first;
     bool allow_spring_last = is_spring_last;
 
-    if (getKeyState(keyCode))
+    if (getKeyState(keyCode) && !isAlt())
     {
         if(isShift())
         {
