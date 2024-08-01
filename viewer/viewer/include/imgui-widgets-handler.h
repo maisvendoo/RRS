@@ -25,6 +25,8 @@ protected:
 
 private:
 
+    int font_size = 20;
+
     bool is_show_quit_dialog = false;
 
     bool is_Esc = false;
@@ -35,15 +37,21 @@ private:
 
     bool is_modified_key = false;
 
+    bool is_controlled = false;
+
     QString debugMsg = "";
 
     void showQuitDialog(bool &is_show);
 
     void showDebugLog();
 
+    void showUncontrolledState();
+
 public slots:
 
     void setStatusBar(const QString &msg);
+
+    void receiveControlledState(bool state);
 };
 
 #endif

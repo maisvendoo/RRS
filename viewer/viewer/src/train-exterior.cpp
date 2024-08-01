@@ -176,6 +176,7 @@ void TrainExteriorHandler::keyboardHandler(int key)
         tmp.current_vehicle = cur_vehicle;
         tmp.controlled_vehicle = controlled_vehicle;
         sendControlledVehicle(tmp);
+
         break;
 
     case osgGA::GUIEventAdapter::KEY_Page_Up:
@@ -190,6 +191,7 @@ void TrainExteriorHandler::keyboardHandler(int key)
         tmp.current_vehicle = cur_vehicle;
         tmp.controlled_vehicle = controlled_vehicle;
         sendControlledVehicle(tmp);
+
         break;
 
     case osgGA::GUIEventAdapter::KEY_Home:
@@ -494,6 +496,8 @@ void TrainExteriorHandler::processSharedData(double &ref_time)
         }
 
         emit setStatusBar(hud_text);
+
+        emit sendControlledState(controlled_vehicle == cur_vehicle);
     }
 }
 

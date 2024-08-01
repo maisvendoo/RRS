@@ -152,6 +152,9 @@ int RouteViewer::run()
     QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
                          imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::setStatusBar);
 
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendControlledState,
+                     imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
+
     viewer.addEventHandler(imguiWidgetsHandler.get());
 
     return viewer.run();

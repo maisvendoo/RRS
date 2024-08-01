@@ -68,6 +68,8 @@ signals:
 
     void sendCameraPosition(camera_position_t cp);
 
+    void sendControlledState(bool state);
+
 private:
 
     settings_t  settings;

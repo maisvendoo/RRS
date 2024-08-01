@@ -1,5 +1,5 @@
 #include    <imgui-widgets-handler.h>
-#include    <QApplication>
+#include    <QStringList>
 
 //------------------------------------------------------------------------------
 //
@@ -7,7 +7,10 @@
 ImGuiWidgetsHandler::ImGuiWidgetsHandler()
 {
     ImGuiIO &io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("../fonts/arial.ttf", 20, NULL, io.Fonts->GetGlyphRangesCyrillic());
+    io.Fonts->AddFontFromFileTTF("../fonts/arial.ttf",
+                                 font_size,
+                                 NULL,
+                                 io.Fonts->GetGlyphRangesCyrillic());
 }
 
 //------------------------------------------------------------------------------
@@ -55,12 +58,22 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int getLinesCount(const QString &str)
+{
+    QStringList lines = str.split('\n');
+
+    return lines.count();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::showDebugLog()
 {
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 content_size = io.DisplaySize;
 
-    int h = 200;
+    float h = 1.2 * font_size * getLinesCount(debugMsg);
 
     ImGui::SetNextWindowSize(ImVec2(content_size.x, h));
     ImGui::SetNextWindowPos(ImVec2(0, content_size.y - h));
@@ -80,13 +93,43 @@ void ImGuiWidgetsHandler::showDebugLog()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::showUncontrolledState()
+{
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Сосотояние управления", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::Text(u8"%s", "Нажмите Enter для управления данной ПЕ");
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::setStatusBar(const QString &msg)
 {
     debugMsg = msg;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::receiveControlledState(bool state)
+{
+    is_controlled = state;
+}
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ImGuiWidgetsHandler::handle(const osgGA::GUIEventAdapter &ea,
                                  osgGA::GUIActionAdapter &aa)
 {
@@ -123,4 +166,7 @@ void ImGuiWidgetsHandler::drawUI()
 
     if (is_show_debug_log)
         showDebugLog();
+
+    if (!is_controlled)
+        showUncontrolledState();
 }
