@@ -101,6 +101,13 @@ private:
     ///
     bool is_displays_locked;
 
+    bool is_Shift_L = false;
+    bool is_Shift_R = false;
+    bool is_Ctrl_L = false;
+    bool is_Ctrl_R = false;
+    bool is_Alt_L = false;
+    bool is_Alt_R = false;
+
     /// Info about train's vehicles exterior
     std::vector<vehicle_exterior_t> vehicles_ext;
 
@@ -117,9 +124,6 @@ private:
 
     /// Sound manager
     SoundManager *sound_manager;
-
-    /// Keyboard handler (camera control)
-    void keyboardHandler(int key);
 
     /// Load train exterior from
     void load(const simulator_info_t &info_data);
