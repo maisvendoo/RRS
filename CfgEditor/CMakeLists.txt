@@ -31,7 +31,7 @@ file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
 # Компиляция библиотеке
-add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
+add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)

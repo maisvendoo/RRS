@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.7)
 
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET CfgReader)
+set (TARGET physics)
 
 # Задаем имя проекта
 project (${TARGET})
@@ -15,16 +15,16 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
-set (LIBRARY_OUTPUT_PATH "../../lib")
+set (LIBRARY_OUTPUT_PATH "../../../lib")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_MODULE_PREFIX "")
 
 # Опеределяем дефайн CFG_READER_LIB для корректного
 # экспорта и импорта слассов из DLL
-add_definitions(-DCFG_READER_LIB)
+add_definitions(-DPHYSICS_LIB)
 
 # Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Xml REQUIRED)
+find_package(Qt5 COMPONENTS Core REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -37,4 +37,4 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 
 # Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Xml)
+target_link_libraries (${TARGET} Qt5::Core)

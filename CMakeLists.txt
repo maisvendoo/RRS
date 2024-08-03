@@ -9,4 +9,7 @@ add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)
 add_subdirectory (libJournal)
+add_subdirectory (tcp-connection)
+
+add_subdirectory (simulator)
 

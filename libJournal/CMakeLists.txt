@@ -28,7 +28,7 @@ file (GLOB CPP_SOURCES "./src/*.cpp")
 file (GLOB C_SOURCES "./src/*.c")
 
 # Компиляция библиотеке
-add_library (${TARGET} MODULE ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
+add_library (${TARGET} SHARED ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
