@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.7)
 
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET physics)
+set (TARGET solver)
 
 # Задаем имя проекта
 project (${TARGET})
@@ -21,7 +21,7 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 # Опеределяем дефайн CFG_READER_LIB для корректного
 # экспорта и импорта слассов из DLL
-add_definitions(-DPHYSICS_LIB)
+add_definitions(-DSOLVER_LIB)
 
 # Ищем зависимости Qt5
 find_package(Qt5 COMPONENTS Core REQUIRED)

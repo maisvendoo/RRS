@@ -17,7 +17,7 @@ set(CMAKE_AUTOUIC ON)
 # Путь, куда надо сложить собранное
 set (LIBRARY_OUTPUT_PATH "../../lib")
 # Указываем не добавлять к имени бинарника никаких префиксов
-set (CMAKE_SHARED_MODULE_PREFIX "")
+set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 # Ищем зависимости Qt5
 find_package(Qt5 COMPONENTS Core REQUIRED)
