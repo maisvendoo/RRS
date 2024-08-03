@@ -543,13 +543,16 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer, float delta_tim
     cp.driver_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
     cp.is_orient_bwd = (vehicles_ext[static_cast<size_t>(cur_vehicle)].orientation < 0);
 
-    cp.attitude.x() = - osg::PIf / 2.0f - cp.attitude.x() * settings.direction;
+    cp.attitude.x() = - osg::PIf / 2.0f - cp.attitude.x();
 
-    cp.viewer_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].position
-        + vehicles_ext[static_cast<size_t>(cur_vehicle)].orth * settings.direction * settings.stat_cam_shift;
+    // Положение для камер сопровождения сбоку привязываем только к первой ПЕ
+    // при этом игнорируем оринтацию ПЕ - переворачиваем её вектор обратно
+    cp.viewer_pos = vehicles_ext[0].position
+                    + vehicles_ext[0].orth * vehicles_ext[0].orientation * settings.stat_cam_shift;
 
-    cp.view_basis.front = vehicles_ext[static_cast<size_t>(cur_vehicle)].orth;
-    cp.view_basis.right = vehicles_ext[static_cast<size_t>(cur_vehicle)].right;
+    cp.front = vehicles_ext[static_cast<size_t>(cur_vehicle)].orth;
+    cp.right = vehicles_ext[static_cast<size_t>(cur_vehicle)].right;
+    cp.up = vehicles_ext[static_cast<size_t>(cur_vehicle)].up;
 
     emit sendCameraPosition(cp);
 

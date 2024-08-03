@@ -171,9 +171,9 @@ struct settings_t
         , cabine_cam_rot_coeff(1.0f)
         , cabine_cam_fovy_step(1.0f)
         , cabine_cam_speed(2.0)
-        , stat_cam_dist(10.0f)
+        , stat_cam_dist(8.0f)
         , stat_cam_height(1.75)
-        , stat_cam_shift(200.0f)
+        , stat_cam_shift(150.0f)
         , interval(10)
 
     {
