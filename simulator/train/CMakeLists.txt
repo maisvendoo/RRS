@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.7)
 
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET vehicle)
+set (TARGET train)
 
 # Задаем имя проекта
 project (${TARGET})
@@ -21,7 +21,7 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 # Опеределяем дефайн CFG_READER_LIB для корректного
 # экспорта и импорта слассов из DLL
-add_definitions(-DVEHICLE_LIB)
+add_definitions(-DTRAIN_LIB)
 
 # Ищем зависимости Qt5
 find_package(Qt5 COMPONENTS Xml REQUIRED)
@@ -37,6 +37,8 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../physics/include)
 target_include_directories (${TARGET} PRIVATE ../solver/include)
+target_include_directories (${TARGET} PRIVATE ../vehicle/include)
+target_include_directories (${TARGET} PRIVATE ../profile/include)
 target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
@@ -47,6 +49,10 @@ target_include_directories (${TARGET} PRIVATE ../device/include)
 target_link_libraries (${TARGET} Qt5::Xml)
 # и со своими не забываем
 target_link_libraries (${TARGET} CfgReader)
+target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} device)
 target_link_libraries (${TARGET} Journal)
 target_link_libraries (${TARGET} physics)
+target_link_libraries (${TARGET} profile)
+target_link_libraries (${TARGET} vehicle)
+target_link_libraries (${TARGET} solver)
