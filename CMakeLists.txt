@@ -19,3 +19,5 @@ add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
 
+add_subdirectory (launcher)
+
