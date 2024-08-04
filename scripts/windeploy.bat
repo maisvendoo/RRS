@@ -78,7 +78,8 @@ xcopy %OSG_BIN_PATH%\libosgViewer.dll %RRS_DEV_ROOT%\bin\
 
 xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
 del /S %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\*d.dll
-xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
+rem xcopy %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
+xcopy ..\..\plugins\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
 
 rem Копируем прочие необходимые DLL
 
@@ -156,4 +157,4 @@ windeployqt %RRS_DEV_ROOT%\bin\pathconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\profconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
-windeployqt %RRS_DEV_ROOT%\bin\TcpConnection.dll
+windeployqt %RRS_DEV_ROOT%\bin\tcp-connection.dll
