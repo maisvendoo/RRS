@@ -1,3 +1,5 @@
 *.pro.user
 *.pro.user.*
+*.txt.user
+*.txt.user.*
 
