@@ -16,3 +16,6 @@ add_subdirectory (sim-client)
 add_subdirectory (signaling)
 add_subdirectory (model)
 add_subdirectory (simulator)
+
+add_subdirectory (modbus)
+add_subdirectory (freejoy)
