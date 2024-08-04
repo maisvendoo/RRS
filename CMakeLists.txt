@@ -13,3 +13,5 @@ add_subdirectory (tcp-connection)
 
 add_subdirectory (simulator)
 
+add_subdirectory (viewer)
+

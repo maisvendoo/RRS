@@ -1,0 +1,133 @@
+#include    "reader-writer.h"
+#include    "dmd-parser.h"
+#include    "dmd-writer-visitor.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ReaderWriterDMD::ReaderWriterDMD()
+{
+    supportsExtension("dmd", "DGLEngine model file");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osgDB::ReaderWriter::ReadResult ReaderWriterDMD::readNode(const std::string &filepath,
+                                                    const osgDB::Options *options) const
+{
+    std::string ext = osgDB::getLowerCaseFileExtension(filepath);
+
+    if (!acceptsExtension(ext))
+        return ReadResult::FILE_NOT_HANDLED;
+
+    std::string fileName = osgDB::findDataFile(filepath, options);
+
+    if (fileName.empty())
+        return ReadResult::FILE_NOT_FOUND;
+
+    std::ifstream stream(fileName.c_str(), std::ios::in);
+
+    if (!stream)
+        return ReadResult::ERROR_IN_READING_FILE;
+
+    return readNode(stream, options);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osgDB::ReaderWriter::ReadResult ReaderWriterDMD::readNode(std::ifstream &stream,
+                                                    const osgDB::Options *options) const
+{
+    (void) options;
+
+    dmd_multimesh_t multimesh = load_dmd(stream);
+
+    if (multimesh.meshes.size() == 0)
+    {
+        return ReadResult::ERROR_IN_READING_FILE;
+    }
+
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    //osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+    osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
+
+    dmd_mesh_t mesh = multimesh.meshes[0];
+
+    //osg::ref_ptr<osg::Vec3Array> normals = mesh.vertex_normals;
+
+    for (unsigned int i = 0; i < mesh.faces_count; ++i)
+    {
+        face_t face = mesh.faces[i];
+
+        vertices->push_back(mesh.vertices->at(face[0]));
+        vertices->push_back(mesh.vertices->at(face[1]));
+        vertices->push_back(mesh.vertices->at(face[2]));        
+    }
+
+    osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
+    geom->setVertexArray(vertices.get());
+    geom->setNormalArray(mesh.vertex_normals.get());
+    geom->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+    geom->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLES, 0, mesh.faces_count * 3));
+
+    //osgUtil::SmoothingVisitor::smooth(*geom);
+
+    if (multimesh.is_texture_present)
+    {
+        for (unsigned int i = 0; i < multimesh.tex_f_count; ++i)
+        {
+            face_t texface = multimesh.texfaces[i];
+
+            texcoords->push_back(multimesh.texvrtices->at(texface[0]));
+            texcoords->push_back(multimesh.texvrtices->at(texface[1]));
+            texcoords->push_back(multimesh.texvrtices->at(texface[2]));
+        }
+
+        geom->setTexCoordArray(0, texcoords.get());
+    }
+
+    geode->addDrawable(geom.get());
+
+    return geode.release();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osgDB::ReaderWriter::WriteResult ReaderWriterDMD::writeNode(const osg::Node &node,
+                                                            const std::string &filepath,
+                                                            const osgDB::Options *options) const
+{
+    std::string ext = osgDB::getLowerCaseFileExtension(filepath);
+
+    if (!acceptsExtension(ext))
+        return WriteResult::FILE_NOT_HANDLED;
+
+    std::ofstream stream(filepath.c_str(), std::ios::out);
+
+    if (!stream)
+        return WriteResult::ERROR_IN_WRITING_FILE;
+
+    return writeNode(node, stream, options);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+osgDB::ReaderWriter::WriteResult ReaderWriterDMD::writeNode(const osg::Node &node,
+                                                            std::ostream &stream,
+                                                            const osgDB::Options *options) const
+{
+    DMDWriterVisitor dmd_nv(stream);
+
+    (const_cast<osg::Node *>(&node))->accept(dmd_nv);
+
+    return WriteResult::FILE_SAVED;
+}
+
+
+REGISTER_OSGPLUGIN( dmd, ReaderWriterDMD )

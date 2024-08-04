@@ -15,7 +15,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
-set (LIBRARY_OUTPUT_PATH "../../lib")
+set (LIBRARY_OUTPUT_PATH "../../../lib")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
