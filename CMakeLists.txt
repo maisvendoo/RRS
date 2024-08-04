@@ -21,3 +21,7 @@ add_subdirectory (addons/vl60)
 
 add_subdirectory (launcher)
 
+add_subdirectory (tools/profconv)
+add_subdirectory (tools/pathconv)
+add_subdirectory (tools/routeconv)
+

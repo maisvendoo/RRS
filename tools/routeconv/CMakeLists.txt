@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.7)
 
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET launcher)
+set (TARGET routeconv)
 
 # Задаем имя проекта
 project (${TARGET})
@@ -17,7 +17,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC OFF)
 
 # Путь, куда надо сложить собранное
-set (EXECUTABLE_OUTPUT_PATH "../../bin")
+set (EXECUTABLE_OUTPUT_PATH "../../../bin")
 
 # Ищем зависимости Qt5
 find_package(Qt5 COMPONENTS Xml REQUIRED)
@@ -41,10 +41,9 @@ add_executable (${TARGET} ${SOURCES} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RES
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../common-headers)
-target_include_directories (${TARGET} PRIVATE ../CfgReader/include)
-target_include_directories (${TARGET} PRIVATE ../CfgEditor/include)
-target_include_directories (${TARGET} PRIVATE ../filesystem/include)
+target_include_directories (${TARGET} PRIVATE ../../common-headers)
+target_include_directories (${TARGET} PRIVATE ../../CfgEditor/include)
+target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 
 # Компонуемся с библиотеками Qt5
 target_link_libraries (${TARGET} Qt5::Xml)
@@ -52,6 +51,5 @@ target_link_libraries (${TARGET} Qt5::Gui)
 target_link_libraries (${TARGET} Qt5::Widgets)
 
 # и со своими не забываем
-target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)
