@@ -14,7 +14,7 @@ set (LIBRARY_OUTPUT_PATH "../../../plugins")
 set (CMAKE_SHARED_MODULE_PREFIX "mingw_")
 
 # Ищем зависимости
-find_package(OpenSceneGraph 3.6.5 REQUIRED osg osgViewer osgDB OpenThreads osgUtil)
+find_package(OpenSceneGraph REQUIRED osg osgViewer osgDB OpenThreads osgUtil)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
