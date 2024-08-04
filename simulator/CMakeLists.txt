@@ -19,3 +19,5 @@ add_subdirectory (simulator)
 
 add_subdirectory (modbus)
 add_subdirectory (freejoy)
+
+add_subdirectory (krm395)
