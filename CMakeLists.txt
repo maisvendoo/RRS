@@ -15,3 +15,7 @@ add_subdirectory (simulator)
 
 add_subdirectory (viewer)
 
+add_subdirectory (addons/passcar)
+add_subdirectory (addons/freightcar)
+add_subdirectory (addons/vl60)
+
