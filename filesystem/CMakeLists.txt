@@ -56,7 +56,6 @@ write_basic_package_version_file(
 
 install(EXPORT ${TARGET}Targets
 FILE ${TARGET}Targets.cmake
-NAMESPACE RRS::
 DESTINATION sdk/lib/cmake/${TARGET})
 
 install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
