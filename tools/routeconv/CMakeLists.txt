@@ -37,7 +37,11 @@ qt_wrap_ui(UI_HEADERS ${FORMS})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Компиляция приложения
-add_executable (${TARGET} ${SOURCES} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
+if (WIN32)
+    add_executable (${TARGET} WIN32 ${SOURCES} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
+else()
+    add_executable (${TARGET} ${SOURCES} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
+endif()
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
