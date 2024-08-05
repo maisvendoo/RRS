@@ -51,26 +51,32 @@ target_link_libraries (${TARGET} device)
 target_link_libraries (${TARGET} Journal)
 target_link_libraries (${TARGET} physics)
 
-install(TARGETS ${TARGET}
-EXPORT ${TARGET}Targets
-FILE_SET HEADERS
-LIBRARY DESTINATION sdk/lib
-ARCHIVE DESTINATION sdk/lib
-RUNTIME DESTINATION bin
-INCLUDES DESTINATION sdk/include)
+if (WIN32)
 
-include(CMakePackageConfigHelpers)
+    install(TARGETS ${TARGET}
+    EXPORT ${TARGET}Targets
+    FILE_SET HEADERS
+    LIBRARY DESTINATION sdk/lib
+    ARCHIVE DESTINATION sdk/lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION sdk/include)
 
-write_basic_package_version_file(
-    "${TARGET}ConfigVersion.cmake"
-    VERSION 1.3.0
-    COMPATIBILITY AnyNewerVersion)
+    include(CMakePackageConfigHelpers)
 
-install(EXPORT ${TARGET}Targets
-FILE ${TARGET}Targets.cmake
-DESTINATION sdk/lib/cmake/${TARGET})
+    write_basic_package_version_file(
+        "${TARGET}ConfigVersion.cmake"
+        VERSION ${CMAKE_PROJECT_VERSION}
+        COMPATIBILITY AnyNewerVersion)
 
-install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
+    install(EXPORT ${TARGET}Targets
+    FILE ${TARGET}Targets.cmake
     DESTINATION sdk/lib/cmake/${TARGET})
 
-install(FILES ${INCLUDES} DESTINATION sdk/include)
+    install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
+        DESTINATION sdk/lib/cmake/${TARGET})
+
+    install(FILES ${INCLUDES} DESTINATION sdk/include)
+
+else()
+
+endif()
