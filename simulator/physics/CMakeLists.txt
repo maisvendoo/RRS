@@ -38,3 +38,28 @@ target_include_directories (${TARGET} PRIVATE ./include/)
 
 # Компонуемся с библиотеками Qt5
 target_link_libraries (${TARGET} Qt5::Core)
+
+install(TARGETS ${TARGET}
+EXPORT ${TARGET}Targets
+FILE_SET HEADERS
+LIBRARY DESTINATION sdk/lib
+ARCHIVE DESTINATION sdk/lib
+RUNTIME DESTINATION bin
+INCLUDES DESTINATION sdk/include)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    "${TARGET}ConfigVersion.cmake"
+    VERSION 1.3.0
+    COMPATIBILITY AnyNewerVersion)
+
+install(EXPORT ${TARGET}Targets
+FILE ${TARGET}Targets.cmake
+NAMESPACE RRS::
+DESTINATION sdk/lib/cmake/${TARGET})
+
+install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
+    DESTINATION sdk/lib/cmake/${TARGET})
+
+install(FILES ${INCLUDES} DESTINATION sdk/include)
