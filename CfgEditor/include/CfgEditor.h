@@ -23,10 +23,10 @@
 #include <QList>
 
 
-#if defined(CFGEDITOR_LIB)
+#if defined(CFG_EDITOR_LIB)
 # define CFGEDITOR_EXPORT Q_DECL_EXPORT
 #else
-# define CFGEDITOR_EXPORT Q_DECL_IMPORT
+# define CFG_EDITOR_EXPORT Q_DECL_IMPORT
 #endif
 
 

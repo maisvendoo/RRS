@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET model)
@@ -23,9 +20,9 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 # экспорта и импорта слассов из DLL
 add_definitions(-DMODEL_LIB)
 
-# Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Xml REQUIRED)
-find_package(Qt5 COMPONENTS Network REQUIRED)
+# Ищем зависимости Qt6
+find_package(Qt6 COMPONENTS Xml REQUIRED)
+find_package(Qt6 COMPONENTS Network REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -50,8 +47,8 @@ target_include_directories (${TARGET} PRIVATE ../../tcp-connection/include)
 target_include_directories (${TARGET} PRIVATE ../signaling/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Xml)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Xml)
 # и со своими не забываем
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} filesystem)

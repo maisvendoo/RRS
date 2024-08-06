@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET CfgReader)
@@ -24,7 +21,7 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 add_definitions(-DCFG_READER_LIB)
 
 # Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Xml REQUIRED)
+find_package(Qt6 COMPONENTS Xml REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -37,11 +34,11 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 
 # Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Xml)
+target_link_libraries (${TARGET} Qt6::Xml)
 
 if (WIN32)
 
-    install(TARGETS ${TARGET}
+    install(TARGETS ${TARGET}        
     EXPORT ${TARGET}Targets
     FILE_SET HEADERS
     LIBRARY DESTINATION sdk/lib

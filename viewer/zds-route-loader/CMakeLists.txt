@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET zds-route-loader)
@@ -14,7 +11,7 @@ set (LIBRARY_OUTPUT_PATH "../../../plugins")
 set (CMAKE_SHARED_MODULE_PREFIX "")
 
 # Ищем зависимости
-find_package(Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt6 COMPONENTS Core REQUIRED)
 find_package(OpenSceneGraph REQUIRED osg osgViewer osgDB OpenThreads osgUtil)
 
 # Пути к заголовкам и сорцам
@@ -32,7 +29,7 @@ target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../route-loader/include)
 
-target_link_libraries (${TARGET} Qt5::Core)
+target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} route-loader)

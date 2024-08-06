@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET rk4)
@@ -19,8 +16,8 @@ set (LIBRARY_OUTPUT_PATH "../../../lib")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_MODULE_PREFIX "")
 
-# Ищем зависимости Qt5
-#find_package(Qt5 COMPONENTS Core REQUIRED)
+# Ищем зависимости Qt6
+#find_package(Qt6 COMPONENTS Core REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -33,6 +30,6 @@ add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../solver/include)
 
-# Компонуемся с библиотеками Qt5
-#target_link_libraries (${TARGET} Qt5::Core)
+# Компонуемся с библиотеками Qt6
+#target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} solver)

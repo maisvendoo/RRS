@@ -1,8 +1,6 @@
 #ifndef     FREEJOY_H
 #define     FREEJOY_H
 
-#define     SFML_STATIC
-
 #include    "virtual-interface-device.h"
 #include    "brake-crane-pos.h"
 

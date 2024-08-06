@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET route-loader)
@@ -24,7 +21,7 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 add_definitions(-DROUTE_LOADER_LIB)
 
 # Ищем зависимости
-find_package(Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt6 COMPONENTS Core REQUIRED)
 find_package(OpenSceneGraph REQUIRED osg osgViewer osgDB OpenThreads osgUtil)
 
 # Пути к заголовкам и сорцам
@@ -42,8 +39,8 @@ target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../library/include)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Core)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
 target_link_libraries (${TARGET} library)
 target_link_libraries (${TARGET} filesystem)

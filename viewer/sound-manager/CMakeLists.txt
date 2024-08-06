@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET sound-manager)
@@ -23,8 +20,8 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 # экспорта и импорта слассов из DLL
 add_definitions(-DSOUND_MANAGER_LIB)
 
-# Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Xml REQUIRED)
+# Ищем зависимости Qt6
+find_package(Qt6 COMPONENTS Xml REQUIRED)
 find_package(OpenAL REQUIRED CONFIG)
 
 # Пути к заголовкам и сорцам
@@ -41,8 +38,8 @@ target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Xml)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Xml)
 target_link_libraries (${TARGET} OpenAL::OpenAL)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} filesystem)

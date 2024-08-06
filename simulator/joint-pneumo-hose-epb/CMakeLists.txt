@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET joint-pneumo-hose-epb)
@@ -19,8 +16,8 @@ set (LIBRARY_OUTPUT_PATH "../../../modules")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_MODULE_PREFIX "")
 
-# Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Xml REQUIRED)
+# Ищем зависимости Qt6
+find_package(Qt6 COMPONENTS Xml REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -38,8 +35,8 @@ target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Xml)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Xml)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} physics)
 target_link_libraries (${TARGET} device)

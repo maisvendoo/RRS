@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET physics)
@@ -23,8 +20,8 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 # экспорта и импорта слассов из DLL
 add_definitions(-DPHYSICS_LIB)
 
-# Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Core REQUIRED)
+# Ищем зависимости Qt6
+find_package(Qt6 COMPONENTS Core REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -36,8 +33,8 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Core)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Core)
 
 if (WIN32)
 
