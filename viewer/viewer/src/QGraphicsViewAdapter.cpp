@@ -12,9 +12,9 @@
 */
 
 #include "QGraphicsViewAdapter.h"
-#include "QWidgetImage.h"
+#include <QWidgetImage.h>
 
-#include <QtOpenGL/QGLWidget>
+//#include <QtOpenGL/QGLWidget>
 
 #include <osg/Version>
 #include <osgGA/GUIEventAdapter>
@@ -361,7 +361,7 @@ bool QGraphicsViewAdapter::handlePointerEvent(int x, int y, int buttonMask)
 
     Qt::MouseButtons qtMouseButtons =
         (leftButtonPressed ? Qt::LeftButton : Qt::NoButton) |
-        (middleButtonPressed ? Qt::MidButton : Qt::NoButton) |
+        (middleButtonPressed ? Qt::MiddleButton : Qt::NoButton) |
         (rightButtonPressed ? Qt::RightButton : Qt::NoButton);
 
     const QPoint globalPos(x, y);
@@ -378,7 +378,7 @@ bool QGraphicsViewAdapter::handlePointerEvent(int x, int y, int buttonMask)
         }
         else if (middleButtonPressed != prev_middleButtonPressed)
         {
-            qtButton = Qt::MidButton;
+            qtButton = Qt::MiddleButton;
             eventType = middleButtonPressed ? QEvent::MouseButtonPress : QEvent::MouseButtonRelease ;
         }
         else if (rightButtonPressed != prev_rightButtonPressed)
@@ -402,14 +402,15 @@ bool QGraphicsViewAdapter::handlePointerEvent(int x, int y, int buttonMask)
             if (targetWidget) targetWidget->setFocus(Qt::MouseFocusReason);
         }
 
-        QMouseEvent event(eventType, globalPos, qtButton, qtMouseButtons, 0);
+        //QMouseEvent event(eventType, globalPos, qtButton, qtMouseButtons, 0);
+        QMouseEvent event(QEvent::MouseMove, globalPos, qtButton, qtMouseButtons, Qt::NoModifier);
         QCoreApplication::sendEvent(_graphicsView->viewport(), &event);
 
         _previousButtonMask = buttonMask;
     }
     else if (x != _previousMouseX || y != _previousMouseY)
     {
-        QMouseEvent event(QEvent::MouseMove, globalPos, Qt::NoButton, qtMouseButtons, 0);
+        QMouseEvent event(QEvent::MouseMove, globalPos, Qt::NoButton, qtMouseButtons, Qt::NoModifier);
         QCoreApplication::sendEvent(_graphicsView->viewport(), &event);
 
         _previousMouseX = x;
@@ -508,7 +509,9 @@ void QGraphicsViewAdapter::clearWriteBuffer()
 {
     QImage& image = _qimages[_currentWrite];
     image.fill(_backgroundColor.rgba ());
-    image = QGLWidget::convertToGLFormat(image);
+    //image = QGLWidget::convertToGLFormat(image);
+    image.rgbSwap();
+    image.mirror();
 
     // swap the write buffers in a thread safe way
     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_qimagesMutex);
@@ -574,7 +577,9 @@ void QGraphicsViewAdapter::render()
 #endif
 
     // convert into OpenGL format - flipping around the Y axis and swizzling the pixels
-    image = QGLWidget::convertToGLFormat(image);
+    //image = QGLWidget::convertToGLFormat(image);
+    image.rgbSwap();
+    image.mirror();
 
     // swap the write buffers in a thread safe way
     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_qimagesMutex);

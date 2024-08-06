@@ -255,7 +255,7 @@ void KeyboardHandler::init()
 QByteArray KeyboardHandler::serialize()
 {
     QByteArray data;
-    QDataStream stream(&data, QIODevice::WriteOnly);
+    QDataStream stream(&data, QDataStream::WriteOnly);
 
     stream << keys;
 

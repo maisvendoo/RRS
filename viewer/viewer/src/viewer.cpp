@@ -35,7 +35,6 @@
 #include    "qt-events.h"
 #include    "screen-capture.h"
 #include    "viewer-stats-switcher.h"
-#include    "hud.h"
 #include    "rails-manipulator.h"
 #include    "free-manipulator.h"
 #include    "stat-manipulator.h"
@@ -45,6 +44,8 @@
 #include    <QObject>
 
 #include    <imgui-widgets-handler.h>
+
+#include    <QThread>
 
 //------------------------------------------------------------------------------
 //
@@ -376,7 +377,7 @@ void RouteViewer::overrideSettingsBySharedMemory(settings_t &settings)
             OSG_FATAL << "Try to wait for 10 seconds." << std::endl;
             for (int i = 0; i < 10; ++i)
             {
-                Sleep(1000);
+                QThread::sleep(1000);
                 if (memory_sim_info.lock())
                 {
                     if (tmp->num_updates <= 0)

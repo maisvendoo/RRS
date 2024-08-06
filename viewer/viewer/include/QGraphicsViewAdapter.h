@@ -14,11 +14,11 @@
 #ifndef QGRAPHICSVIEWADAPTER
 #define QGRAPHICSVIEWADAPTER
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 
 #include <osg/Image>
 #include <osg/observer_ptr>
-#include "Export.h"
+#include <Export.h>
 
 #include <QPointer>
 #include <QGraphicsScene>
