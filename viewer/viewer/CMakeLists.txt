@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET viewer)
@@ -17,10 +14,10 @@ set(CMAKE_AUTOUIC ON)
 set (EXECUTABLE_OUTPUT_PATH "../../../bin")
 
 # Ищем зависимости
-find_package(Qt5 COMPONENTS Gui REQUIRED)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5 COMPONENTS Network REQUIRED)
-find_package(Qt5 COMPONENTS OpenGL REQUIRED)
+find_package(Qt6 COMPONENTS Gui REQUIRED)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Network REQUIRED)
+find_package(Qt6 COMPONENTS OpenGL REQUIRED)
 find_package(OpenSceneGraph REQUIRED osg osgViewer osgDB OpenThreads osgGA osgUtil osgText)
 
 # Пути к заголовкам и сорцам
@@ -48,11 +45,11 @@ target_include_directories (${TARGET} PRIVATE ../../asound/include)
 
 target_include_directories (${TARGET} PRIVATE ../imgui/include)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Gui)
-target_link_libraries (${TARGET} Qt5::Widgets)
-target_link_libraries (${TARGET} Qt5::Network)
-target_link_libraries (${TARGET} Qt5::OpenGL)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Gui)
+target_link_libraries (${TARGET} Qt6::Widgets)
+target_link_libraries (${TARGET} Qt6::Network)
+target_link_libraries (${TARGET} Qt6::OpenGL)
 target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
 target_link_libraries (${TARGET} route-loader)
 target_link_libraries (${TARGET} library)
