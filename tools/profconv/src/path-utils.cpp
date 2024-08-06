@@ -44,3 +44,27 @@ std::string compinePath(const std::string &path1, const std::string &path2)
 
     return tmp;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string delete_symbol(const std::string &str, char symbol)
+{
+    std::string tmp = str;
+    tmp.erase(std::remove(tmp.begin(), tmp.end(), symbol), tmp.end());
+    return tmp;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string getLine(std::istream &stream)
+{
+    std::string line = "";
+    std::getline(stream, line);
+    std::string tmp = delete_symbol(line, '\r');
+    tmp = delete_symbol(tmp, ';');
+    std::replace(tmp.begin(), tmp.end(), ',', ' ');
+
+    return tmp;
+}

@@ -1,5 +1,5 @@
-#ifndef     PROFILE_H
-#define     PROFILE_H
+#ifndef     ZDS_PROFILE_H
+#define     ZDS_PROFILE_H
 
 #include    <string>
 
@@ -41,4 +41,4 @@ struct zds_profile_element_t
     short int   RightFieldAngle;
 };
 
-#endif // PROFILE_H
+#endif // ZDS_PROFILE_H

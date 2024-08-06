@@ -20,7 +20,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    ProfConverter profconv;
+    ZDSimConverter conv;
 
-    return profconv.run(argc, argv);
+    return conv.run(argc, argv);
 }
