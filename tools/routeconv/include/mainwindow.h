@@ -52,9 +52,9 @@ private slots:
 
     void slotConvert();
 
-    void slotIsPathconvFinished(int error_code);
+    void slotIsPathconvFinished(int error_code, QProcess::ExitStatus exitstatus);
 
-    void slotIsProfconvFinished(int error_code);
+    void slotIsProfconvFinished(int error_code, QProcess::ExitStatus exitstatus);
 };
 
 #endif // MAINWINDOW_H

@@ -2,84 +2,83 @@
 
 #include    <QDir>
 #include    <QDirIterator>
-#include    <QTextCodec>
-#include    <QTextDecoder>
+#include    <QStringConverter>
 #include    <QTextStream>
 
 #include    <QDebug>
 
-#include    "path-funcs.h"
+#include    <path-funcs.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Translator::Translator(const QString &routeDir)
 {
-    alphabet.insert(0x410, "A");
-    alphabet.insert(0x411, "B");
-    alphabet.insert(0x412, "V");
-    alphabet.insert(0x413, "G");
-    alphabet.insert(0x414, "D");
-    alphabet.insert(0x415, "E");
-    alphabet.insert(0x416, "Zh");
-    alphabet.insert(0x417, "Z");
-    alphabet.insert(0x418, "I");
-    alphabet.insert(0x419, "J");
-    alphabet.insert(0x41A, "K");
-    alphabet.insert(0x41B, "L");
-    alphabet.insert(0x41C, "M");
-    alphabet.insert(0x41D, "N");
-    alphabet.insert(0x41E, "O");
-    alphabet.insert(0x41F, "P");
-    alphabet.insert(0x420, "R");
-    alphabet.insert(0x421, "S");
-    alphabet.insert(0x422, "T");
-    alphabet.insert(0x423, "U");
-    alphabet.insert(0x424, "F");
-    alphabet.insert(0x425, "H");
-    alphabet.insert(0x426, "C");
-    alphabet.insert(0x427, "Ch");
-    alphabet.insert(0x428, "Sh");
-    alphabet.insert(0x429, "Shj");
-    alphabet.insert(0x42A, "");
-    alphabet.insert(0x42B, "Y");
-    alphabet.insert(0x42C, "");
-    alphabet.insert(0x42D, "E");
-    alphabet.insert(0x42E, "Yu");
-    alphabet.insert(0x42F, "Ya");
+    alphabet.insert(QChar(0x410), "A");
+    alphabet.insert(QChar(0x411), "B");
+    alphabet.insert(QChar(0x412), "V");
+    alphabet.insert(QChar(0x413), "G");
+    alphabet.insert(QChar(0x414), "D");
+    alphabet.insert(QChar(0x415), "E");
+    alphabet.insert(QChar(0x416), "Zh");
+    alphabet.insert(QChar(0x417), "Z");
+    alphabet.insert(QChar(0x418), "I");
+    alphabet.insert(QChar(0x419), "J");
+    alphabet.insert(QChar(0x41A), "K");
+    alphabet.insert(QChar(0x41B), "L");
+    alphabet.insert(QChar(0x41C), "M");
+    alphabet.insert(QChar(0x41D), "N");
+    alphabet.insert(QChar(0x41E), "O");
+    alphabet.insert(QChar(0x41F), "P");
+    alphabet.insert(QChar(0x420), "R");
+    alphabet.insert(QChar(0x421), "S");
+    alphabet.insert(QChar(0x422), "T");
+    alphabet.insert(QChar(0x423), "U");
+    alphabet.insert(QChar(0x424), "F");
+    alphabet.insert(QChar(0x425), "H");
+    alphabet.insert(QChar(0x426), "C");
+    alphabet.insert(QChar(0x427), "Ch");
+    alphabet.insert(QChar(0x428), "Sh");
+    alphabet.insert(QChar(0x429), "Shj");
+    alphabet.insert(QChar(0x42A), "");
+    alphabet.insert(QChar(0x42B), "Y");
+    alphabet.insert(QChar(0x42C), "");
+    alphabet.insert(QChar(0x42D), "E");
+    alphabet.insert(QChar(0x42E), "Yu");
+    alphabet.insert(QChar(0x42F), "Ya");
 
-    alphabet.insert(0x430, "a");
-    alphabet.insert(0x431, "b");
-    alphabet.insert(0x432, "v");
-    alphabet.insert(0x433, "g");
-    alphabet.insert(0x434, "d");
-    alphabet.insert(0x435, "e");
-    alphabet.insert(0x436, "zh");
-    alphabet.insert(0x437, "z");
-    alphabet.insert(0x438, "i");
-    alphabet.insert(0x439, "j");
-    alphabet.insert(0x43A, "k");
-    alphabet.insert(0x43B, "l");
-    alphabet.insert(0x43C, "m");
-    alphabet.insert(0x43D, "n");
-    alphabet.insert(0x43E, "o");
-    alphabet.insert(0x43F, "p");
-    alphabet.insert(0x440, "r");
-    alphabet.insert(0x441, "s");
-    alphabet.insert(0x442, "t");
-    alphabet.insert(0x443, "u");
-    alphabet.insert(0x444, "f");
-    alphabet.insert(0x445, "x");
-    alphabet.insert(0x446, "c");
-    alphabet.insert(0x447, "ch");
-    alphabet.insert(0x448, "sh");
-    alphabet.insert(0x449, "shj");
-    alphabet.insert(0x44A, "");
-    alphabet.insert(0x44B, "y");
-    alphabet.insert(0x44C, "");
-    alphabet.insert(0x44D, "e");
-    alphabet.insert(0x44E, "yu");
-    alphabet.insert(0x44F, "ya");
+    alphabet.insert(QChar(0x430), "a");
+    alphabet.insert(QChar(0x431), "b");
+    alphabet.insert(QChar(0x432), "v");
+    alphabet.insert(QChar(0x433), "g");
+    alphabet.insert(QChar(0x434), "d");
+    alphabet.insert(QChar(0x435), "e");
+    alphabet.insert(QChar(0x436), "zh");
+    alphabet.insert(QChar(0x437), "z");
+    alphabet.insert(QChar(0x438), "i");
+    alphabet.insert(QChar(0x439), "j");
+    alphabet.insert(QChar(0x43A), "k");
+    alphabet.insert(QChar(0x43B), "l");
+    alphabet.insert(QChar(0x43C), "m");
+    alphabet.insert(QChar(0x43D), "n");
+    alphabet.insert(QChar(0x43E), "o");
+    alphabet.insert(QChar(0x43F), "p");
+    alphabet.insert(QChar(0x440), "r");
+    alphabet.insert(QChar(0x441), "s");
+    alphabet.insert(QChar(0x442), "t");
+    alphabet.insert(QChar(0x443), "u");
+    alphabet.insert(QChar(0x444), "f");
+    alphabet.insert(QChar(0x445), "x");
+    alphabet.insert(QChar(0x446), "c");
+    alphabet.insert(QChar(0x447), "ch");
+    alphabet.insert(QChar(0x448), "sh");
+    alphabet.insert(QChar(0x449), "shj");
+    alphabet.insert(QChar(0x44A), "");
+    alphabet.insert(QChar(0x44B), "y");
+    alphabet.insert(QChar(0x44C), "");
+    alphabet.insert(QChar(0x44D), "e");
+    alphabet.insert(QChar(0x44E), "yu");
+    alphabet.insert(QChar(0x44F), "ya");
 
     process(routeDir);
 }
@@ -124,8 +123,8 @@ bool Translator::translateObjectsRef(const QString &path)
     if (file.open(QIODevice::ReadOnly))
     {
         QByteArray data = file.readAll();
-        QTextCodec *codec_1251 = QTextCodec::codecForName("Windows-1251");
-        QString tmp = codec_1251->toUnicode(data);
+        auto toUtf8 = QStringDecoder(QStringConverter::Utf8);
+        QString tmp = toUtf8(data);
 
         new_data = latin(tmp);
 

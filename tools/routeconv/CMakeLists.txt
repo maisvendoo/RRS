@@ -1,6 +1,3 @@
-# Минимальная требуемая версия CMake
-cmake_minimum_required (VERSION 3.7)
-
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET routeconv)
@@ -19,10 +16,10 @@ set(CMAKE_AUTOUIC OFF)
 # Путь, куда надо сложить собранное
 set (EXECUTABLE_OUTPUT_PATH "../../../bin")
 
-# Ищем зависимости Qt5
-find_package(Qt5 COMPONENTS Xml REQUIRED)
-find_package(Qt5 COMPONENTS Gui REQUIRED)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+# Ищем зависимости Qt6
+find_package(Qt6 COMPONENTS Xml REQUIRED)
+find_package(Qt6 COMPONENTS Gui REQUIRED)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -49,10 +46,10 @@ target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../../CfgEditor/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 
-# Компонуемся с библиотеками Qt5
-target_link_libraries (${TARGET} Qt5::Xml)
-target_link_libraries (${TARGET} Qt5::Gui)
-target_link_libraries (${TARGET} Qt5::Widgets)
+# Компонуемся с библиотеками Qt6
+target_link_libraries (${TARGET} Qt6::Xml)
+target_link_libraries (${TARGET} Qt6::Gui)
+target_link_libraries (${TARGET} Qt6::Widgets)
 
 # и со своими не забываем
 target_link_libraries (${TARGET} CfgEditor)

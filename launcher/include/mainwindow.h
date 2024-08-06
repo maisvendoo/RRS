@@ -137,9 +137,9 @@ private slots:
 
     void onSimulatorStarted();
 
-    void onSimulatorFinished(int exitCode);
+    void onSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
-    void onViewerFinished(int exitCode);
+    void onViewerFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     void onStationSelected(int index);
 

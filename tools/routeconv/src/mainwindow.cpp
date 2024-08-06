@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbOpenRoute, &QPushButton::released, this, &MainWindow::slotOpenRoute);
     connect(ui->pbConvert, &QPushButton::released, this, &MainWindow::slotConvert);
-    connect(&pathconvProc, QOverload<int>::of(&QProcess::finished), this, &MainWindow::slotIsPathconvFinished);
-    connect(&profconvProc, QOverload<int>::of(&QProcess::finished), this, &MainWindow::slotIsProfconvFinished);
+    connect(&pathconvProc, &QProcess::finished, this, &MainWindow::slotIsPathconvFinished);
+    connect(&profconvProc, &QProcess::finished, this, &MainWindow::slotIsProfconvFinished);
 }
 
 //------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void MainWindow::slotConvert()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotIsPathconvFinished(int error_code)
+void MainWindow::slotIsPathconvFinished(int error_code, QProcess::ExitStatus exitstatus)
 {
     Q_UNUSED(error_code)
 
@@ -178,7 +178,7 @@ void MainWindow::slotIsPathconvFinished(int error_code)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotIsProfconvFinished(int error_code)
+void MainWindow::slotIsProfconvFinished(int error_code, QProcess::ExitStatus exitstatus)
 {
     Q_UNUSED(error_code)
 

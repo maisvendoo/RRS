@@ -11,8 +11,7 @@
 #include    "profile.h"
 
 #include    <QFile>
-#include    <QTextCodec>
-#include    <QTextDecoder>
+#include    <QStringConverter>
 #include    <QTextStream>
 
 //------------------------------------------------------------------------------
@@ -306,7 +305,7 @@ void ProfConverter::writeWaypoints(const std::string &filename,
         return;
 
     QTextStream stream(&file);
-    stream.setCodec("UTF-8");
+    stream.setEncoding(QStringConverter::Utf8);
 
     for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
     {
@@ -383,8 +382,8 @@ void ProfConverter::fileToUtf8(const std::string &path)
         return;
 
     QByteArray data = file.readAll();
-    QTextCodec *codec_1251 = QTextCodec::codecForName("Windows-1251");
-    new_data = codec_1251->toUnicode(data);
+    auto toUtf8 = QStringDecoder(QStringConverter::Utf8);
+    new_data = toUtf8(data);
 
     file.close();
 

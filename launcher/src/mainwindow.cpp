@@ -53,10 +53,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(&simulatorProc, &QProcess::started,
             this, &MainWindow::onSimulatorStarted);
 
-    connect(&simulatorProc, QOverload<int>::of(&QProcess::finished),
+    connect(&simulatorProc, &QProcess::finished,
             this, &MainWindow::onSimulatorFinished);
 
-    connect(&viewerProc, QOverload<int>::of(&QProcess::finished),
+    connect(&viewerProc, &QProcess::finished,
             this, &MainWindow::onViewerFinished);
 
     connect(ui->cbStations, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -407,7 +407,7 @@ void MainWindow::onSimulatorStarted()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onSimulatorFinished(int exitCode)
+void MainWindow::onSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
 
@@ -417,7 +417,7 @@ void MainWindow::onSimulatorFinished(int exitCode)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onViewerFinished(int exitCode)
+void MainWindow::onViewerFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
 
