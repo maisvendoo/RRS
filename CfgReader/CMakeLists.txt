@@ -20,7 +20,7 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 # экспорта и импорта слассов из DLL
 add_definitions(-DCFG_READER_LIB)
 
-# Ищем зависимости Qt5
+# Ищем зависимости Qt6
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 
 # Пути к заголовкам и сорцам
@@ -33,7 +33,7 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 
-# Компонуемся с библиотеками Qt5
+# Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
 
 if (WIN32)
