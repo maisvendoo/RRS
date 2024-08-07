@@ -43,6 +43,7 @@ endif()
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
+target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../CfgEditor/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 
@@ -52,5 +53,6 @@ target_link_libraries (${TARGET} Qt6::Gui)
 target_link_libraries (${TARGET} Qt6::Widgets)
 
 # и со своими не забываем
+target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)

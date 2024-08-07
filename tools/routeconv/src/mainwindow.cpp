@@ -3,6 +3,7 @@
 
 #include    "filesystem.h"
 #include    "CfgEditor.h"
+#include    "CfgReader.h"
 #include    "platform.h"
 
 #include    <QFileDialog>
@@ -125,6 +126,22 @@ void MainWindow::slotOpenRoute()
 
     ui->lCurrentRouteDir->setText(relPath);
     ui->lStatus->setText(tr("Route opened succesfully"));
+
+    CfgReader cfg;
+    if (cfg.load(routeDir + QDir::separator() + "description.xml"))
+    {
+        QString secName = "Route";
+        QString fieldName = "";
+        QString fieldValue = "";
+
+        fieldName = "Title";
+        cfg.getString(secName, fieldName, fieldValue);
+        ui->leRouteTitle->setText(fieldValue);
+
+        fieldName = "Description";
+        cfg.getString(secName, fieldName, fieldValue);
+        ui->teRouteDescription->setText(fieldValue);
+    }
 }
 
 //------------------------------------------------------------------------------
