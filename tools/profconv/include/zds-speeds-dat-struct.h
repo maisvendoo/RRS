@@ -14,6 +14,11 @@ struct zds_speeds_t
 
     double  begin_trajectory_coord = 0.0;
     double  end_trajectory_coord = 0.0;
+
+    static bool compare_by_track_id(const zds_speeds_t left, const zds_speeds_t right)
+    {
+        return left.begin_track_id < right.begin_track_id;
+    };
 };
 
 //------------------------------------------------------------------------------

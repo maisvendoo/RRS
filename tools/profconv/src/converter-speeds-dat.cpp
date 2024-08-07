@@ -13,6 +13,8 @@ bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &s
     if (path.empty())
         return false;
 
+    fileToUtf8(path);
+
     std::string file_path = path;
 
     QFile file(QString(file_path.c_str()));
@@ -40,7 +42,7 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         if (line.isEmpty())
             continue;
 
-        QStringList tokens = line.split(' ');
+        QStringList tokens = line.split('\t');
 
         zds_speeds_t speed_point;
         speed_point.begin_track_id = static_cast<size_t>(tokens[0].toInt());
@@ -48,10 +50,15 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         speed_point.limit = tokens[2].toDouble();
 
         speed_point.begin_trajectory_coord = tracks_data1[speed_point.begin_track_id].trajectory_coord;
-        speed_point.end_trajectory_coord = tracks_data1[speed_point.end_track_id].trajectory_coord;
+        speed_point.end_trajectory_coord = tracks_data1[speed_point.end_track_id].trajectory_coord +
+                                           tracks_data1[speed_point.end_track_id].length;
 
         speeds_data.push_back(speed_point);
     }
+
+    std::sort(speeds_data.begin(),
+              speeds_data.end(),
+              zds_speeds_t::compare_by_track_id);
 
     return true;
 }

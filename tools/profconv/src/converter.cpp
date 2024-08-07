@@ -132,9 +132,10 @@ CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::fileToUtf8(const std::string &path)
+std::string ZDSimConverter::fileToUtf8(const std::string &path)
 {
-    QFile file(QString(path.c_str()));
+    QString file_path = QString(path.c_str());
+    QFile file(file_path);
     QString new_data = "";
 
     if (!file.open(QIODevice::ReadOnly))
@@ -145,19 +146,18 @@ void ZDSimConverter::fileToUtf8(const std::string &path)
     new_data = toUtf8(data);
     file.close();
 
-    QFile::rename(QString(compinePath(routeDir, "start_kilometers.dat").c_str()),
-                  compinePath(routeDir, "start_kilometers.dat.bak").c_str());
+    QFile::rename(file_path, file_path + QString(".bak"));
 
-    QFile startKmDat(compinePath(routeDir, "start_kilometers.dat").c_str());
+    QFile new_file(file_path);
 
-    if (!startKmDat.open(QIODevice::WriteOnly))
+    if (!new_file.open(QIODevice::WriteOnly))
         return;
 
-    QTextStream stream(&startKmDat);
+    QTextStream stream(&new_file);
 
     stream << new_data;
 
-    startKmDat.close();
+    new_file.close();
 }
 
 //------------------------------------------------------------------------------

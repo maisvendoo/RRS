@@ -43,7 +43,7 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
         if (line.isEmpty())
             continue;
 
-        QStringList tokens = line.split(' ');
+        QStringList tokens = line.split('\t');
 
         bool is_valid_value = false;
         int id_value = tokens[0].toInt(&is_valid_value);
@@ -62,6 +62,10 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
 
         signals_data.push_back(signal);
     }
+
+    std::sort(signals_data.begin(),
+              signals_data.end(),
+              zds_signals_t::compare_by_track_id);
 
     return true;
 }

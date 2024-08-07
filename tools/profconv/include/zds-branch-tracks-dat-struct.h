@@ -16,6 +16,12 @@ struct zds_branch_point_t
     int     main_track_id = 0;
     double  bias = 0.0;
     std::string signal_liter = "";
+    std::string signal_special = "";
+
+    static bool compare_by_track_id(const zds_branch_point_t left, const zds_branch_point_t right)
+    {
+        return left.main_track_id < right.main_track_id;
+    };
 };
 
 //------------------------------------------------------------------------------
