@@ -132,32 +132,23 @@ CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string ZDSimConverter::fileToUtf8(const std::string &path)
+QString ZDSimConverter::fileToQString(const std::string &path)
 {
     QString file_path = QString(path.c_str());
     QFile file(file_path);
-    QString new_data = "";
 
     if (!file.open(QIODevice::ReadOnly))
-        return;
+    {
+        return "";
+    }
 
     QByteArray data = file.readAll();
-    auto toUtf8 = QStringDecoder(QStringConverter::Utf8);
-    new_data = toUtf8(data);
+    auto toUtf8 = QStringDecoder(QStringConverter::System);
+    QString new_data = toUtf8(data);
+//    QString new_data(data);
     file.close();
 
-    QFile::rename(file_path, file_path + QString(".bak"));
-
-    QFile new_file(file_path);
-
-    if (!new_file.open(QIODevice::WriteOnly))
-        return;
-
-    QTextStream stream(&new_file);
-
-    stream << new_data;
-
-    new_file.close();
+    return new_data;
 }
 
 //------------------------------------------------------------------------------

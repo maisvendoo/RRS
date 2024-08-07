@@ -73,7 +73,7 @@ private:
 
     CmdLineParseResult parseCommandLine(int argc, char *argv[]);
 
-    void fileToUtf8(const std::string &path);
+    QString fileToQString(const std::string &path);
 
     bool conversion(const std::string &routeDir);
 

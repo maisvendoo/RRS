@@ -13,20 +13,14 @@ bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &s
     if (path.empty())
         return false;
 
-    fileToUtf8(path);
-
-    std::string file_path = path;
-
-    QFile file(QString(file_path.c_str()));
-
-    if (!file.open(QIODevice::ReadOnly))
+    QString data = fileToQString(path);
+    if (data.isEmpty())
     {
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
 
-    QTextStream stream(&file);
-
+    QTextStream stream(&data);
     return readSpeedsDAT(stream, speeds_data);
 }
 
@@ -72,7 +66,7 @@ void ZDSimConverter::writeSpeeds(const std::string &filename, const zds_speeds_d
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename((filename + ".bak").c_str());
+        file_old.rename( QString((path + ".bak").c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))

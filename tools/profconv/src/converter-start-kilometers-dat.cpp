@@ -14,21 +14,14 @@ bool ZDSimConverter::readStartKilometersDAT(const std::string &path,
     if (path.empty())
         return false;
 
-    fileToUtf8(path);
-
-    std::string file_path = path;
-
-    QFile file(QString(file_path.c_str()));
-
-    if (!file.open(QIODevice::ReadOnly))
+    QString data = fileToQString(path);
+    if (data.isEmpty())
     {
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
 
-    QTextStream stream(&file);
-    //stream.setCodec("UTF-8");
-
+    QTextStream stream(&data);
     return readStartKilometersDAT(stream, waypoints);
 }
 
@@ -74,7 +67,7 @@ void ZDSimConverter::writeWaypoints(const std::string &filename,
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename((filename + ".bak").c_str());
+        file_old.rename( QString((path + ".bak").c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -103,7 +96,7 @@ void ZDSimConverter::writeStations(const std::string &filename, const zds_start_
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename((filename + ".bak").c_str());
+        file_old.rename( QString((path + ".bak").c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))

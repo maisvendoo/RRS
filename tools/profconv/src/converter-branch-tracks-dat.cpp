@@ -2,7 +2,6 @@
 
 #include    <iostream>
 #include    <QFile>
-#include    <algorithm>
 
 //------------------------------------------------------------------------------
 //
@@ -12,20 +11,14 @@ bool ZDSimConverter::readBranchTracksDAT(const std::string &path, zds_branch_tra
     if (path.empty())
         return false;
 
-    fileToUtf8(path);
-
-    std::string file_path = path;
-
-    QFile file(QString(file_path.c_str()));
-
-    if (!file.open(QIODevice::ReadOnly))
+    QString data = fileToQString(path);
+    if (data.isEmpty())
     {
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
 
-    QTextStream stream(&file);
-
+    QTextStream stream(&data);
     return readBranchTracksDAT(stream, branch_data);
 }
 
@@ -76,9 +69,6 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         if (abs(bias_value) < 0.01)
         {
             zds_branch_track_t tmp_branch_track = branch_track;
-            std::sort(tmp_branch_track.branch_track.begin(),
-                      tmp_branch_track.branch_track.end(),
-                      zds_branch_point_t::compare_by_track_id);
             branch_data.push_back(tmp_branch_track);
 
             branch_track.branch_track.clear();

@@ -13,21 +13,14 @@ bool ZDSimConverter::readSvetoforDAT(const std::string &path, zds_signals_data_t
     if (path.empty())
         return false;
 
-    fileToUtf8(path);
-
-    std::string file_path = path;
-
-    QFile file(QString(file_path.c_str()));
-
-    if (!file.open(QIODevice::ReadOnly))
+    QString data = fileToQString(path);
+    if (data.isEmpty())
     {
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
 
-    QTextStream stream(&file);
-    //stream.setCodec("UTF-8");
-
+    QTextStream stream(&data);
     return readSvetoforDAT(stream, signals_data);
 }
 
