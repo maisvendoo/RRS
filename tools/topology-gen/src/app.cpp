@@ -3,6 +3,7 @@
 #include    <QDir>
 #include    <QDirIterator>
 #include    <QStringList>
+#include    <QFileInfo>
 
 #include    <fstream>
 
@@ -192,6 +193,47 @@ void Application::generate_topology(const QString &route_dir)
         if (zds_tracks.empty())
         {
             continue;
+        }
+
+        QFileInfo info(full_path);
+        QString base_name = info.baseName();
+
+
+        QString traj_path = QDir::toNativeSeparators(route_dir) +
+                            QDir::separator() +
+                            this->traj_path + QDir::separator() +
+                            base_name + ".traj";
+
+        std::ofstream out_stream(traj_path.toStdString(), std::ios::out);
+
+        if (!out_stream.is_open())
+        {
+            continue;
+        }
+
+        for (auto it = zds_tracks.begin(); it != zds_tracks.end(); ++it)
+        {
+            zds_track_t cur_track = *it;
+
+            if (cur_track.next_uid != -2)
+            {
+                out_stream << cur_track.begin_point.x << " "
+                           << cur_track.begin_point.y << " "
+                           << cur_track.begin_point.z
+                           << std::endl;
+            }
+            else
+            {
+                out_stream << cur_track.begin_point.x << " "
+                           << cur_track.begin_point.y << " "
+                           << cur_track.begin_point.z
+                           << std::endl
+                           << cur_track.end_point.x << " "
+                           << cur_track.end_point.y << " "
+                           << cur_track.end_point.z
+                           << std::endl;
+                break;
+            }
         }
     }
 }
