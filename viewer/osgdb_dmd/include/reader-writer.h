@@ -4,8 +4,8 @@
 //
 //
 //------------------------------------------------------------------------------
-#ifndef     READER-WRITER_H
-#define     READER-WRITER_H
+#ifndef     READER_WRITER_H
+#define     READER_WRITER_H
 
 #include    <osg/Geometry>
 #include    <osg/Geode>
@@ -40,4 +40,4 @@ private:
 
 };
 
-#endif // READER-WRITER_H
+#endif // READER_WRITER_H
