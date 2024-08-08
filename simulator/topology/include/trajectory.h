@@ -4,7 +4,8 @@
 #include    <QObject>
 
 #include    <track.h>
-#include    <connector.h>
+
+class Connector;
 
 //------------------------------------------------------------------------------
 //
@@ -18,6 +19,8 @@ public:
     Trajectory(QObject *parent = Q_NULLPTR);
 
     ~Trajectory();
+
+    bool load(const QString &route_dir, const QString &traj_name);
 
 private:
 
