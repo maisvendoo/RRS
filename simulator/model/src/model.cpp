@@ -242,6 +242,8 @@ bool Model::init(const simulator_command_line_t &command_line)
                 signaling, &Signaling::set_busy_sections);
     }*/
 
+    initTopology(init_data);
+
     Journal::instance()->info("Train is initialized successfully");
 
     return true;
@@ -649,6 +651,14 @@ void Model::initTraffic(const init_data_t &init_data)
         Journal::instance()->error("Failed traffic initialization in route" +
                                    QString(route_dir_path.c_str()));
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::initTopology(const init_data_t &init_data)
+{
+    topology->init(init_data.route_dir_name);
 }
 
 //------------------------------------------------------------------------------
