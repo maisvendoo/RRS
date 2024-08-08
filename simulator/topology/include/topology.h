@@ -14,6 +14,8 @@
 //------------------------------------------------------------------------------
 class TOPOLOGY_EXPORT Topology : public QObject
 {
+    Q_OBJECT
+
 public:
 
     Topology(QObject *parent = Q_NULLPTR);
