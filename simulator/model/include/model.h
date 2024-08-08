@@ -45,6 +45,8 @@
 
 #include    "traffic-machine.h"
 
+#include    <topology.h>
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -148,6 +150,9 @@ private:
     /// Система трафика
     TrafficMachine  *traffic_machine;
 
+    /// Топология
+    Topology *topology = new Topology();
+
     /// Simulation thread
     QThread     model_thread;
 
@@ -201,6 +206,9 @@ private:
 
     /// Инициализация трафика
     void initTraffic(const init_data_t &init_data);
+
+    /// Инициализация топологии
+    void initTopology(const init_data_t &init_data);
 
     /// TCP feedback
     void tcpFeedBack();

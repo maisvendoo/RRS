@@ -14,8 +14,6 @@
 #include "QGraphicsViewAdapter.h"
 #include <QWidgetImage.h>
 
-//#include <QtOpenGL/QGLWidget>
-
 #include <osg/Version>
 #include <osgGA/GUIEventAdapter>
 

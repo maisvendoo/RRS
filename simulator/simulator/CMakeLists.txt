@@ -42,6 +42,7 @@ target_include_directories (${TARGET} PRIVATE ../../tcp-connection/include)
 target_include_directories (${TARGET} PRIVATE ../signaling/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../model/include)
+target_include_directories (${TARGET} PRIVATE ../topology/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Core)
@@ -60,4 +61,5 @@ target_link_libraries (${TARGET} train)
 target_link_libraries (${TARGET} tcp-connection)
 target_link_libraries (${TARGET} sim-client)
 target_link_libraries (${TARGET} signaling)
+target_link_libraries (${TARGET} topology)
 target_link_libraries (${TARGET} model)

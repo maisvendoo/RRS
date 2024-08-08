@@ -14,8 +14,6 @@
 #ifndef QGRAPHICSVIEWADAPTER
 #define QGRAPHICSVIEWADAPTER
 
-#include <QOpenGLWidget>
-
 #include <osg/Image>
 #include <osg/observer_ptr>
 #include <Export.h>
