@@ -1,6 +1,6 @@
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET CfgEditor)
+set (TARGET tcp-connection)
 
 # Задаем имя проекта
 project (${TARGET})
@@ -18,10 +18,10 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 # Опеределяем дефайн CFG_READER_LIB для корректного
 # экспорта и импорта слассов из DLL
-add_definitions(-DCFG_EDITOR_LIB)
+add_definitions(-DTCPCONNECTION_LIB)
 
 # Ищем зависимости Qt6
-find_package(Qt6 COMPONENTS Xml REQUIRED)
+find_package(Qt6 COMPONENTS Network REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -34,4 +34,4 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 
 # Компонуемся с библиотеками Qt6
-target_link_libraries (${TARGET} Qt6::Xml)
+target_link_libraries (${TARGET} Qt6::Network)
