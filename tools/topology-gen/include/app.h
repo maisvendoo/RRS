@@ -4,6 +4,8 @@
 #include    <QCoreApplication>
 #include    <QCommandLineParser>
 
+#include    <zds-track.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -29,8 +31,15 @@ private:
 
     QCommandLineParser parser;
 
+    QString traj_path = "";
+
     CommandLineResult parseCommandLine(QString &route_dir,
                                        QString &errorMessage);
+
+    void generate_topology(const QString &route_dir);
+
+    void create_directories(const QString &route_dir);
+    void read_zds_tracks(std::vector<zds_track_t> &zds_tracks, QString full_path);
 };
 
 #endif
