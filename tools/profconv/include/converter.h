@@ -86,6 +86,8 @@ private:
     void writeProfileData(const zds_trajectory_data_t &tracks_data,
                           const std::string &file_name);
 
+    void writeMainTrajectory(const std::string &filename, const zds_trajectory_data_t &tracks_data);
+
     void createPowerLine(const std::vector<zds_track_t> &tracks_data,
                          std::vector<power_line_element_t> &power_line);
 
@@ -110,6 +112,12 @@ private:
     bool readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data);
 
     bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data);
+
+    bool calcBranchTrack1(zds_branch_track_t *branch_track);
+
+    bool calcBranchTrack2(zds_branch_track_t *branch_track);
+
+    void writeBranchTrajectory(const std::string &filename, const zds_branch_track_t *branch_track);
 
     bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
 

@@ -25,9 +25,9 @@ struct zds_track_t
     double      railway_coord_end = 0.0;
     double      inclination = 0.0;
     double      curvature = 0.0;
-    dvec3       orth = dvec3(0.0, 0.0, 0.0);
-    dvec3       right = dvec3(0.0, 0.0, 0.0);
-    dvec3       up = dvec3(0.0, 0.0, 0.0);
+    dvec3       orth = dvec3(0.0, 1.0, 0.0);
+    dvec3       right = dvec3(1.0, 0.0, 0.0);
+    dvec3       up = dvec3(0.0, 0.0, 1.0);
 };
 
 //------------------------------------------------------------------------------

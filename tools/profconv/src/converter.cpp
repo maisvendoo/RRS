@@ -167,6 +167,12 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     std::string branch1_path = compinePath(routeDir, "branch_tracks1.dat");
     std::string branch2_path = compinePath(routeDir, "branch_tracks2.dat");
 
+    std::string traj_file1 = "route1.trj";
+    std::string traj_file2 = "route2.trj";
+    std::string branch_traj_prefix1 = "route1_branch_";
+    std::string branch_traj_prefix2 = "route2_branch_";
+    std::string branch_traj_ext = ".trj";
+
     std::string waypoints_file = "waypoints.conf";
     std::string stations_file = "stations.conf";
     std::string speeds1_file = "speeds1.conf";
@@ -183,6 +189,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals1_path, signals_data1);
         readBranchTracksDAT(branch1_path, branch_track_data1);
 
+        writeMainTrajectory(traj_file1, tracks_data1);
         writeSpeeds(speeds1_file, speeds_data1);
     }
 
@@ -195,6 +202,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals2_path, signals_data2);
         readBranchTracksDAT(branch2_path, branch_track_data2);
 
+        writeMainTrajectory(traj_file2, tracks_data1);
         writeSpeeds(speeds2_file, speeds_data2);
     }
 
@@ -202,6 +210,30 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         writeWaypoints(waypoints_file, start_km_data);
         writeStations(stations_file, start_km_data);
+    }
+
+    if (!branch_track_data1.empty())
+    {
+        size_t i = 0;
+        for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
+        {
+            ++i;
+            zds_branch_track_t *branch_track = *it;
+            calcBranchTrack1(branch_track);
+            writeBranchTrajectory(branch_traj_prefix1 + QString("%1").arg(i,3,QChar('0')).toStdString() + branch_traj_ext.c_str(), branch_track);
+        }
+    }
+
+    if (!branch_track_data2.empty())
+    {
+        size_t i = 0;
+        for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
+        {
+            ++i;
+            zds_branch_track_t *branch_track = *it;
+            calcBranchTrack2(branch_track);
+            writeBranchTrajectory(branch_traj_prefix2 + QString("%1").arg(i,3,QChar('0')).toStdString() + branch_traj_ext.c_str(), branch_track);
+        }
     }
 
     return true;
@@ -231,7 +263,7 @@ zds_track_t ZDSimConverter::getNearestTrack(dvec3 point, const zds_trajectory_da
         coord = track.trajectory_coord + tau;
 
         break;
-    }    
+    }
 
     return result;
 }

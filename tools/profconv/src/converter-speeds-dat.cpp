@@ -38,10 +38,28 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 
         QStringList tokens = line.split('\t');
 
+        if (tokens.size() < 3)
+            continue;
+
+        bool is_valid_value = false;
+        int begin_id_value = tokens[0].toInt(&is_valid_value);
+        if ((!is_valid_value) || (begin_id_value < 0) || (static_cast<size_t>(begin_id_value) > tracks_data1.size()))
+            continue;
+
+        is_valid_value = false;
+        int end_id_value = tokens[1].toInt(&is_valid_value);
+        if ((!is_valid_value) || (end_id_value < 0) || (static_cast<size_t>(end_id_value) > tracks_data1.size()))
+            continue;
+
+        is_valid_value = false;
+        double limit_value = tokens[2].toDouble(&is_valid_value);
+        if ((!is_valid_value) || (limit_value < 0.0))
+            continue;
+
         zds_speeds_t speed_point;
-        speed_point.begin_track_id = static_cast<size_t>(tokens[0].toInt());
-        speed_point.end_track_id = static_cast<size_t>(tokens[1].toInt());
-        speed_point.limit = tokens[2].toDouble();
+        speed_point.begin_track_id = std::min(begin_id_value, end_id_value);
+        speed_point.end_track_id = std::max(begin_id_value, end_id_value);
+        speed_point.limit = limit_value;
 
         speed_point.begin_trajectory_coord = tracks_data1[speed_point.begin_track_id].trajectory_coord;
         speed_point.end_trajectory_coord = tracks_data1[speed_point.end_track_id].trajectory_coord +

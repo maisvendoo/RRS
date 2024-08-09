@@ -2,6 +2,7 @@
 
 #include    <iostream>
 #include    <sstream>
+#include    <QFile>
 
 #include    "path-utils.h"
 
@@ -56,7 +57,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
         tmp_data.push_back(track);
     }
 
-    track_data.push_back(*tmp_data.begin());
+//    track_data.push_back(*tmp_data.begin());
 
     auto it = tmp_data.begin();
     double trajectory_length = 0.0;
@@ -122,7 +123,8 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
         }
         else
         {
-            cur_track.railway_coord_end = cur_track.ordinate + cur_track.length * coord_increase_direction;
+            cur_track.railway_coord = railway_coord_recalc_begin + trajectory_recalc_length;
+            cur_track.railway_coord_end = cur_track.railway_coord + cur_track.length * coord_increase_direction;
         }
 
         cur_track.inclination = cur_track.orth.z * 1000.0;
@@ -153,6 +155,47 @@ void ZDSimConverter::writeProfileData(const zds_trajectory_data_t &tracks_data,
     }
 
     stream.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::writeMainTrajectory(const std::string &filename, const zds_trajectory_data_t &tracks_data)
+{
+    std::string path = compinePath(toNativeSeparators(routeDir), filename);
+
+    QFile file_old(QString(path.c_str()));
+    if (file_old.exists())
+        file_old.rename( QString((path + ".bak").c_str()) );
+
+    QFile file(QString(path.c_str()));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+
+    size_t i = 0;
+    for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
+    {
+        ++i;
+        stream << i << ";"
+               << (*it).begin_point.x << ";"
+               << (*it).begin_point.y << ";"
+               << (*it).begin_point.z << ";"
+               << (*it).ordinate << ";"
+               << (*it).railway_coord << ";"
+               << (*it).trajectory_coord << "\n";
+    }
+    stream << i << ";"
+           << tracks_data.back().end_point.x << ";"
+           << tracks_data.back().end_point.y << ";"
+           << tracks_data.back().end_point.z << ";"
+           << tracks_data.back().ordinate << ";"
+           << tracks_data.back().railway_coord_end << ";"
+           << tracks_data.back().trajectory_coord + tracks_data.back().length << "\n";
+
+    file.close();
 }
 
 //------------------------------------------------------------------------------
