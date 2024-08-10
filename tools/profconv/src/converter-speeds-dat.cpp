@@ -43,12 +43,12 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 
         bool is_valid_value = false;
         int begin_id_value = tokens[0].toInt(&is_valid_value);
-        if ((!is_valid_value) || (begin_id_value < 0) || (static_cast<size_t>(begin_id_value) > tracks_data1.size()))
+        if ((!is_valid_value) || (begin_id_value < 1) || (static_cast<size_t>(begin_id_value) > tracks_data1.size()))
             continue;
 
         is_valid_value = false;
         int end_id_value = tokens[1].toInt(&is_valid_value);
-        if ((!is_valid_value) || (end_id_value < 0) || (static_cast<size_t>(end_id_value) > tracks_data1.size()))
+        if ((!is_valid_value) || (end_id_value < 1) || (static_cast<size_t>(end_id_value) > tracks_data1.size()))
             continue;
 
         is_valid_value = false;
@@ -57,8 +57,8 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
             continue;
 
         zds_speeds_t speed_point;
-        speed_point.begin_track_id = std::min(begin_id_value, end_id_value);
-        speed_point.end_track_id = std::max(begin_id_value, end_id_value);
+        speed_point.begin_track_id = std::min(begin_id_value, end_id_value) - 1;
+        speed_point.end_track_id = std::max(begin_id_value, end_id_value) - 1;
         speed_point.limit = limit_value;
 
         speed_point.begin_trajectory_coord = tracks_data1[speed_point.begin_track_id].trajectory_coord;

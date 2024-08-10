@@ -44,7 +44,7 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
             continue;
 
         zds_signals_t signal;
-        signal.track_id = id_value;
+        signal.track_id = id_value - 1;
         signal.type = tokens[1].toStdString();
         if (tokens.size() > 2)
             signal.liter = tokens[2].toStdString();

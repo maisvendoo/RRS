@@ -55,7 +55,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
             continue;
 
         zds_branch_point_t branch_point;
-        branch_point.main_track_id = id_value;
+        branch_point.main_track_id = id_value - 1;
         branch_point.bias = (abs(bias_value) < 0.01) ? 0.0 : bias_value;
         if (tokens.size() > 2)
             branch_point.signal_liter = tokens[2].toStdString();
