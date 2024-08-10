@@ -183,8 +183,8 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         // Расчёт точек траектории, параллельной главному пути, со смещением
         for (id = id_end; id <= (it+1)->main_track_id; ++id)
         {
-            dvec3 mean_right = tracks_data1[id].right * 0.5 +
-                               tracks_data1[id - 1].right * 0.5;
+            dvec3 mean_right = normalize(tracks_data1[id].right +
+                                         tracks_data1[id - 1].right);
             calculated_branch_point_t point;
             point.point = tracks_data1[id].begin_point +
                           mean_right * bias_curr;
@@ -216,27 +216,19 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         return false;
     // === TODO ===
 
-    // === TODO ===
-    // Боковые путей "обратно" прописаны задом наперёд
-    // Всё сложно
-    return false;
-    // === TODO ===
-
-// Образец кода из направления "туда"
-/*
     // Первая точка
-    size_t id_begin = branch_track->branch_points.begin()->main_track_id;
+    size_t id_begin = branch_track->branch_points.begin()->main_track_id + 1;
     double bias_prev = 0.0;
     double bias_curr = branch_track->branch_points.begin()->bias;
-    double coord_begin = tracks_data1[id_begin].trajectory_coord;
+    double coord_begin = tracks_data2[id_begin].trajectory_coord;
     calculated_branch_point_t point_begin;
-    point_begin.point = tracks_data1[id_begin].begin_point;
+    point_begin.point = tracks_data2[id_begin].begin_point;
     point_begin.trajectory_coord = 0.0;
-    point_begin.railway_coord = tracks_data1[id_begin].railway_coord;
+    point_begin.railway_coord = tracks_data2[id_begin].railway_coord;
     // Добавляем первую точку
     branch_track->branch_trajectory.push_back(point_begin);
 
-    for (auto it = branch_track->branch_points.begin() + 1; it != branch_track->branch_points.end(); ++it)
+    for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
     {
         // Траектория отклонения
         // Отклонение в ZDS длится 100 метров
@@ -246,34 +238,34 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         double main_traj_l = 0.0;
         do
         {
-            ++id;
-            main_traj_l = tracks_data1[id].trajectory_coord - coord_begin;
+            --id;
+            main_traj_l = coord_begin - tracks_data2[id].trajectory_coord;
         }
         while (main_traj_l < 95.0);
         size_t id_end = id;
-        double railway_coord_length = tracks_data1[id_end].railway_coord - point_begin.railway_coord;
+        double railway_coord_length = tracks_data2[id_end].railway_coord - point_begin.railway_coord;
 
         // Расчёт промежуточных точек по траектории сплайна отклонения
         id = id_begin;
         for (size_t i = 0; i < NUM_BIAS_POINTS; ++i)
         {
             double coord_add = COORD_COEFF[i] * main_traj_l;
-            double coord_ref = coord_begin + coord_add;
-            // Находим нужный подтрек - у следующего координата больше
-            while (coord_ref < tracks_data1[id+1].trajectory_coord)
+            double coord_ref = coord_begin - coord_add;
+            // Находим нужный подтрек - у него координата меньше
+            while (coord_ref < tracks_data2[id].trajectory_coord)
             {
-                ++id;
+                --id;
             }
 
-            dvec3 main_track_point = tracks_data1[id].begin_point +
-                                     tracks_data1[id].orth * (coord_ref - tracks_data1[id].trajectory_coord);
+            dvec3 main_track_point = tracks_data2[id].begin_point +
+                                     tracks_data2[id].orth * (coord_ref - tracks_data2[id].trajectory_coord);
 
             // Промежуточная точка отклонения
             calculated_branch_point_t point;
             double bias_coeff = bias_prev * (1.0 - BIAS_COEFF[i]) +
                                 bias_curr * BIAS_COEFF[i];
-            point.point = main_track_point +
-                          tracks_data1[id].right * bias_coeff;
+            point.point = main_track_point -
+                          tracks_data2[id].right * bias_coeff;
             double l = length(point.point - branch_track->branch_trajectory.back().point);
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
             point.railway_coord = point_begin.railway_coord +
@@ -284,36 +276,45 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
 
         // Если смещение нулевое - траектория завершена
         if (bias_curr == 0.0)
+        {
+            // Дописываем последнюю точку
+            calculated_branch_point_t point;
+            point.point = tracks_data2[id_end].begin_point;
+            double l = length(point.point - branch_track->branch_trajectory.back().point);
+            point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
+            point.railway_coord = tracks_data2[id_end].railway_coord;
+            // Добавляем точку траектории
+            branch_track->branch_trajectory.push_back(point);
             return true;
+        }
 
         // === TODO ===
         // Разделение траектории по светофору
         // === TODO ===
 
         // Расчёт точек траектории, параллельной главному пути, со смещением
-        for (id = id_end; id <= it->main_track_id; ++id)
+        for (id = id_end; id > (it+1)->main_track_id; --id)
         {
-            dvec3 mean_right = tracks_data1[id].right * 0.5 +
-                               tracks_data1[id - 1].right * 0.5;
+            dvec3 mean_right = normalize(tracks_data2[id].right +
+                                         tracks_data2[id - 1].right);
             calculated_branch_point_t point;
-            point.point = tracks_data1[id].begin_point +
+            point.point = tracks_data2[id].begin_point -
                           mean_right * bias_curr;
             double l = length(point.point - branch_track->branch_trajectory.back().point);
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
-            point.railway_coord = tracks_data1[id].railway_coord;
+            point.railway_coord = tracks_data2[id].railway_coord;
             // Добавляем точку траектории
             branch_track->branch_trajectory.push_back(point);
         }
 
         // Подготавливаемся к следующей итерации
-        id_begin = it->main_track_id;
+        id_begin = (it+1)->main_track_id + 1;
         bias_prev = bias_curr;
-        bias_curr = it->bias;
-        coord_begin = tracks_data1[id_begin].trajectory_coord;
+        bias_curr = (it+1)->bias;
+        coord_begin = tracks_data2[id_begin].trajectory_coord;
     }
 
     return true;
-*/
 }
 
 //------------------------------------------------------------------------------

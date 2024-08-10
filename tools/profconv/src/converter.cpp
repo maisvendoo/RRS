@@ -220,19 +220,23 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             ++i;
             zds_branch_track_t *branch_track = *it;
             calcBranchTrack1(branch_track);
-            writeBranchTrajectory(branch_traj_prefix1 + QString("%1").arg(static_cast<int>(i),3,10,QChar('0')).toStdString() + branch_traj_ext.c_str(), branch_track);
+            writeBranchTrajectory(branch_traj_prefix1 +
+                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
+                                  branch_traj_ext.c_str(), branch_track);
         }
     }
 
     if (!branch_track_data2.empty())
     {
         size_t i = 0;
-        for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
+        for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
         {
             ++i;
             zds_branch_track_t *branch_track = *it;
             calcBranchTrack2(branch_track);
-            writeBranchTrajectory(branch_traj_prefix2 + QString("%1").arg(i,3,QChar('0')).toStdString() + branch_traj_ext.c_str(), branch_track);
+            writeBranchTrajectory(branch_traj_prefix2 +
+                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
+                                  branch_traj_ext.c_str(), branch_track);
         }
     }
 
