@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data)
+bool ZDSimConverter::readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data, const int &dir)
 {
     if (path.empty())
         return false;
@@ -21,13 +21,13 @@ bool ZDSimConverter::readBranchTracksDAT(const std::string &path, zds_branch_tra
     }
 
     QTextStream stream(&data);
-    return readBranchTracksDAT(stream, branch_data);
+    return readBranchTracksDAT(stream, branch_data, dir);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data)
+bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir)
 {
     zds_branch_track_t branch_track;
     bool is_next_from_other_main = false;
@@ -46,14 +46,13 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
 
         bool is_valid_value = false;
         int id_value = tokens[0].toInt(&is_valid_value);
-        if ((!is_valid_value) || (id_value < 0) || (static_cast<size_t>(id_value) > tracks_data1.size()) || (tokens.size() < 2))
+        if ((!is_valid_value) || (id_value < 1) || (static_cast<size_t>(id_value) > tracks_data1.size()) || (tokens.size() < 2))
             continue;
 
         is_valid_value = false;
         double bias_value = tokens[1].toDouble(&is_valid_value);
         if ((!is_valid_value) || (abs(bias_value) > 100.0))
             continue;
-
 
         zds_branch_point_t branch_point;
         branch_point.main_track_id = id_value;
@@ -63,21 +62,36 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         if (tokens.size() > 3)
             branch_point.signal_special = tokens[3].toStdString();
 
+        // Если какая-то из предыдущих точек была съездом на соседний главный,
+        // ищем только обратный съезд (с нулевым смещением), остальные случаи игнорируем
+        if (is_next_from_other_main)
+        {
+            if ((abs(bias_value) >= 0.01))
+                continue;
+        }
+
         branch_track.branch_points.push_back(branch_point);
 
-        if (abs(bias_value - ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK) < 0.01)
+        // Если смещение отрицательно - оно в сторону соседнего главного,
+        // проверяем, что это может быть съезд между главными
+        if (bias_value <= -0.01)
         {
-            branch_track.to_other_main_track = true;
-            zds_branch_track_t *tmp_branch_track = new zds_branch_track_t(branch_track);
-            branch_data.push_back(tmp_branch_track);
+            if (checkIsToOtherMain(&branch_track, dir))
+            {
+                is_next_from_other_main = true;
 
-            branch_track.branch_points.clear();
-            branch_track.to_other_main_track = false;
-            is_next_from_other_main = true;
-        }
-        else
-        {
-            is_next_from_other_main = false;
+                branch_track.to_other_main_track = true;
+                zds_branch_track_t *tmp_branch_track = new zds_branch_track_t(branch_track);
+                branch_data.push_back(tmp_branch_track);
+
+                // Очистка
+                branch_track.branch_points.clear();
+                branch_track.to_other_main_track = false;
+            }
+            else
+            {
+                is_next_from_other_main = false;
+            }
         }
 
         if ((abs(bias_value) < 0.01) && (is_next_from_other_main || (branch_track.branch_points.size() > 1)) )
@@ -86,11 +100,74 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
             zds_branch_track_t *tmp_branch_track = new zds_branch_track_t(branch_track);
             branch_data.push_back(tmp_branch_track);
 
+            // Очистка
             branch_track.branch_points.clear();
             branch_track.from_other_main_track = false;
+            is_next_from_other_main = false;
         }
     }
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ZDSimConverter::checkIsToOtherMain(zds_branch_track_t *branch_track, const int &dir)
+{
+    double bias = branch_track->branch_points.back().bias;
+    if (abs(bias - ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK) < 0.01)
+        return true;
+
+    dvec3 point_after_bias;
+    dvec3 point_at_other_track;
+    if (dir > 0)
+    {
+        if (tracks_data2.empty())
+            return false;
+
+        size_t id_begin = branch_track->branch_points.back().main_track_id;
+        double coord_begin = tracks_data1[id_begin].trajectory_coord;
+
+        size_t id_end = id_begin;
+        double main_traj_l = 0.0;
+        do
+        {
+            ++id_end;
+            main_traj_l = tracks_data1[id_end].trajectory_coord - coord_begin;
+        }
+        while (main_traj_l < 95.0);
+
+        point_after_bias = tracks_data1[id_end].begin_point +
+                           tracks_data1[id_begin].right * bias;
+        float coord;
+        zds_track_t track = getNearestTrack(point_after_bias, tracks_data2, coord);
+        bool near_end = (coord > (track.trajectory_coord + 0.5 * track.length));
+        point_at_other_track = near_end ? track.end_point : track.begin_point;
+    }
+    else
+    {
+        size_t id_begin = branch_track->branch_points.back().main_track_id + 1;
+        double coord_begin = tracks_data2[id_begin].trajectory_coord;
+
+        size_t id_end = id_begin;
+        double main_traj_l = 0.0;
+        do
+        {
+            --id_end;
+            main_traj_l = coord_begin - tracks_data2[id_end].trajectory_coord;
+        }
+        while (main_traj_l < 95.0);
+
+        point_after_bias = tracks_data2[id_end].begin_point -
+                           tracks_data2[id_begin].right * bias;
+        float coord;
+        zds_track_t track = getNearestTrack(point_after_bias, tracks_data1, coord);
+        bool near_end = (coord > (track.trajectory_coord + 0.5 * track.length));
+        point_at_other_track = near_end ? track.end_point : track.begin_point;
+    }
+
+    double distance = length(point_after_bias - point_at_other_track);
+    return (distance < 1.0);
 }
 
 //------------------------------------------------------------------------------
@@ -104,11 +181,12 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         return false;
     // === TODO ===
 
-    // Первая точка
+    // Параметры следующего смещения
     size_t id_begin = branch_track->branch_points.begin()->main_track_id;
     double bias_prev = 0.0;
     double bias_curr = branch_track->branch_points.begin()->bias;
     double coord_begin = tracks_data1[id_begin].trajectory_coord;
+    // Первая точка
     calculated_branch_point_t point_begin;
     point_begin.point = tracks_data1[id_begin].begin_point;
     point_begin.trajectory_coord = 0.0;
@@ -131,7 +209,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         }
         while (main_traj_l < 95.0);
         size_t id_end = id;
-        double railway_coord_length = tracks_data1[id_end].railway_coord - point_begin.railway_coord;
+        double railway_coord_length = tracks_data1[id_end].railway_coord - tracks_data1[id_begin].railway_coord;
 
         // Расчёт промежуточных точек по траектории сплайна отклонения
         id = id_begin;
@@ -156,7 +234,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
                           tracks_data1[id].right * bias_coeff;
             double l = length(point.point - branch_track->branch_trajectory.back().point);
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
-            point.railway_coord = point_begin.railway_coord +
+            point.railway_coord = tracks_data1[id_begin].railway_coord +
                                   COORD_COEFF[i] * railway_coord_length;
             // Добавляем промежуточную точку отклонения
             branch_track->branch_trajectory.push_back(point);
@@ -216,11 +294,12 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         return false;
     // === TODO ===
 
-    // Первая точка
+    // Параметры следующего смещения
     size_t id_begin = branch_track->branch_points.begin()->main_track_id + 1;
     double bias_prev = 0.0;
     double bias_curr = branch_track->branch_points.begin()->bias;
     double coord_begin = tracks_data2[id_begin].trajectory_coord;
+    // Первая точка
     calculated_branch_point_t point_begin;
     point_begin.point = tracks_data2[id_begin].begin_point;
     point_begin.trajectory_coord = 0.0;
@@ -243,7 +322,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         }
         while (main_traj_l < 95.0);
         size_t id_end = id;
-        double railway_coord_length = tracks_data2[id_end].railway_coord - point_begin.railway_coord;
+        double railway_coord_length = tracks_data2[id_end].railway_coord - tracks_data2[id_begin].railway_coord;
 
         // Расчёт промежуточных точек по траектории сплайна отклонения
         id = id_begin;
@@ -268,7 +347,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
                           tracks_data2[id].right * bias_coeff;
             double l = length(point.point - branch_track->branch_trajectory.back().point);
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
-            point.railway_coord = point_begin.railway_coord +
+            point.railway_coord = tracks_data2[id_begin].railway_coord +
                                   COORD_COEFF[i] * railway_coord_length;
             // Добавляем промежуточную точку отклонения
             branch_track->branch_trajectory.push_back(point);
@@ -322,6 +401,12 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
 //------------------------------------------------------------------------------
 void ZDSimConverter::writeBranchTrajectory(const std::string &filename, const zds_branch_track_t *branch_track)
 {
+    // === TODO ===
+    // Съезды между главными путями пока никак не обрабатываем
+    if (branch_track->to_other_main_track || branch_track->from_other_main_track)
+        return;
+    // === TODO ===
+
     std::string path = compinePath(toNativeSeparators(routeDir), filename);
 
     QFile file_old(QString(path.c_str()));

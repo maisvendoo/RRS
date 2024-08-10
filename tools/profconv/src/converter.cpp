@@ -178,29 +178,34 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     std::string speeds1_file = "speeds1.conf";
     std::string speeds2_file = "speeds2.conf";
 
-    if (readRouteTRK(trk1_path, tracks_data1))
+    bool is_1 = readRouteTRK(trk1_path, tracks_data1);
+    bool is_2 = readRouteTRK(trk2_path, tracks_data2);
+
+    if (is_1)
     {
+        int dir = 1;
         // Создание profile.conf отключено, симулятор сам читает route1.trk
         //writeProfileData(tracks_data1, "profile1.conf");
-        createPowerLine(tracks_data1, power_line1);
-        readRouteMAP(map_path, neutral_insertions);
+        //createPowerLine(tracks_data1, power_line1);
+        //readRouteMAP(map_path, neutral_insertions);
 
         readSpeedsDAT(speeds1_path, speeds_data1);
         readSvetoforDAT(signals1_path, signals_data1);
-        readBranchTracksDAT(branch1_path, branch_track_data1);
+        readBranchTracksDAT(branch1_path, branch_track_data1, dir);
 
         writeMainTrajectory(traj_file1, tracks_data1);
         writeSpeeds(speeds1_file, speeds_data1);
     }
 
-    if (readRouteTRK(trk2_path, tracks_data2))
+    if (is_1 && is_2)
     {
+        int dir = -1;
         // Создание profile.conf отключено, симулятор сам читает route2.trk
         //writeProfileData(tracks_data2, "profile2.conf");
 
         readSpeedsDAT(speeds2_path, speeds_data2);
         readSvetoforDAT(signals2_path, signals_data2);
-        readBranchTracksDAT(branch2_path, branch_track_data2);
+        readBranchTracksDAT(branch2_path, branch_track_data2, dir);
 
         writeMainTrajectory(traj_file2, tracks_data2);
         writeSpeeds(speeds2_file, speeds_data2);
@@ -248,26 +253,45 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 //------------------------------------------------------------------------------
 zds_track_t ZDSimConverter::getNearestTrack(dvec3 point, const zds_trajectory_data_t &tracks_data, float &coord)
 {
-    zds_track_t result;
+    int id_with_min_distance = 0;
+    double min_distance = 1e10;
 
+    size_t id = 0;
     for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
     {
         zds_track_t track = *it;
 
-        dvec3 rho = point - track.begin_point;
-        double tau = dot(rho, track.orth);
-
-        if ( tau < 0.0 )
-            continue;
-
-        if ( tau > track.length )
-            continue;
-
-        result = track;
-        coord = track.trajectory_coord + tau;
-
-        break;
+        double distance = length(point - track.begin_point);
+        if (distance < min_distance)
+        {
+            min_distance = distance;
+            id_with_min_distance = id;
+        }
+        ++id;
     }
 
+    zds_track_t result = tracks_data[id_with_min_distance];
+    dvec3 rho = point - result.begin_point;
+    double tau = dot(rho, result.orth);
+    if (tau >= 0.0)
+    {
+        coord = result.trajectory_coord + tau;
+        return result;
+    }
+
+    if (id_with_min_distance > 0)
+    {
+        result = tracks_data[id_with_min_distance - 1];
+        rho = point - result.begin_point;
+        tau = dot(rho, result.orth);
+        if (tau <= result.length)
+        {
+            coord = result.trajectory_coord + tau;
+            return result;
+        }
+    }
+
+    result = tracks_data[id_with_min_distance];
+    coord = result.trajectory_coord;
     return result;
 }

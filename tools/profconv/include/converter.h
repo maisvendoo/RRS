@@ -114,9 +114,11 @@ private:
 
     bool readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data);
 
-    bool readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data);
+    bool readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data, const int &dir);
 
-    bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data);
+    bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir);
+
+    bool checkIsToOtherMain(zds_branch_track_t *branch_track, const int &dir);
 
     bool calcBranchTrack1(zds_branch_track_t *branch_track);
 
