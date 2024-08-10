@@ -174,25 +174,22 @@ void ZDSimConverter::writeMainTrajectory(const std::string &filename, const zds_
 
     QTextStream stream(&file);
     stream.setEncoding(QStringConverter::Utf8);
+    stream.setRealNumberNotation(QTextStream::FixedNotation);
 
     size_t i = 0;
     for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
     {
         ++i;
-        stream << i << ";"
-               << (*it).begin_point.x << ";"
+        stream << (*it).begin_point.x << ";"
                << (*it).begin_point.y << ";"
                << (*it).begin_point.z << ";"
-               << (*it).ordinate << ";"
-               << (*it).railway_coord << ";"
+               << static_cast<int>(round((*it).railway_coord)) << ";"
                << (*it).trajectory_coord << "\n";
     }
-    stream << i << ";"
-           << tracks_data.back().end_point.x << ";"
+    stream << tracks_data.back().end_point.x << ";"
            << tracks_data.back().end_point.y << ";"
            << tracks_data.back().end_point.z << ";"
-           << tracks_data.back().ordinate << ";"
-           << tracks_data.back().railway_coord_end << ";"
+           << static_cast<int>(round(tracks_data.back().railway_coord_end)) << ";"
            << tracks_data.back().trajectory_coord + tracks_data.back().length << "\n";
 
     file.close();

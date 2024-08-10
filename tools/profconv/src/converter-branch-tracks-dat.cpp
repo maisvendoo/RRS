@@ -140,7 +140,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
             double coord_add = COORD_COEFF[i] * main_traj_l;
             double coord_ref = coord_begin + coord_add;
             // Находим нужный подтрек - у следующего координата больше
-            while (coord_ref < tracks_data1[id+1].trajectory_coord)
+            while (tracks_data1[id + 1].trajectory_coord < coord_ref)
             {
                 ++id;
             }
@@ -323,16 +323,15 @@ void ZDSimConverter::writeBranchTrajectory(const std::string &filename, const zd
 
     QTextStream stream(&file);
     stream.setEncoding(QStringConverter::Utf8);
+    stream.setRealNumberNotation(QTextStream::FixedNotation);
 
     for (auto it = branch_track->branch_trajectory.begin(); it != branch_track->branch_trajectory.end(); ++it)
     {
-        stream << ";"
-               << "working" << "\n";
-/*        stream << (*it).point.x << ";"
+        stream << (*it).point.x << ";"
                << (*it).point.y << ";"
                << (*it).point.z << ";"
-               << (*it).railway_coord << ";"
-               << (*it).trajectory_coord << "\n";*/
+               << static_cast<int>(round((*it).railway_coord)) << ";"
+               << (*it).trajectory_coord << "\n";
     }
 
     file.close();
