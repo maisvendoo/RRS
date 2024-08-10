@@ -88,6 +88,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
         cur_track.orth = dir_vector / cur_track.length;
         cur_track.right = normalize(cross(cur_track.orth, dvec3(0.0, 0.0, 1.0)));
         cur_track.up = normalize(cross(cur_track.right, cur_track.orth));
+        cur_track.trav = normalize(dvec3(cur_track.orth.x, cur_track.orth.y, 0.0));
 
         cur_track.trajectory_coord = trajectory_length;
         trajectory_length += cur_track.length;

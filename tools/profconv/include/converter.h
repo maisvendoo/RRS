@@ -23,6 +23,7 @@
 #include    "zds-speeds-dat-struct.h"
 #include    "zds-svetofor-dat-struct.h"
 #include    "zds-branch-tracks-dat-struct.h"
+#include    "trajectory_struct.h"
 #include    "power_line_element.h"
 #include    "neutral_insertion.h"
 #include    "cmd-line.h"
@@ -64,6 +65,10 @@ private:
     zds_branch_track_data_t branch_track_data1;
 
     zds_branch_track_data_t branch_track_data2;
+
+    route_trajectories_t trajectories;
+
+    route_connectors_t connectors;
 
     std::vector<power_line_element_t> power_line1;
 
