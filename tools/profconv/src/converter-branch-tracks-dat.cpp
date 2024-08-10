@@ -164,7 +164,17 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
 
         // Если смещение нулевое - траектория завершена
         if (bias_curr == 0.0)
+        {
+            // Дописываем последнюю точку
+            calculated_branch_point_t point;
+            point.point = tracks_data1[id_end].begin_point;
+            double l = length(point.point - branch_track->branch_trajectory.back().point);
+            point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
+            point.railway_coord = tracks_data1[id_end].railway_coord;
+            // Добавляем точку траектории
+            branch_track->branch_trajectory.push_back(point);
             return true;
+        }
 
         // === TODO ===
         // Разделение траектории по светофору

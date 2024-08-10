@@ -202,7 +202,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals2_path, signals_data2);
         readBranchTracksDAT(branch2_path, branch_track_data2);
 
-        writeMainTrajectory(traj_file2, tracks_data1);
+        writeMainTrajectory(traj_file2, tracks_data2);
         writeSpeeds(speeds2_file, speeds_data2);
     }
 
