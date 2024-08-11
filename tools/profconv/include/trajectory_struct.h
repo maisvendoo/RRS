@@ -51,12 +51,13 @@ struct split_zds_trajectory_t
         // Съезды между главными путями
         SPLIT_2PLUS2 = 1,
         SPLIT_2MINUS2 = 2,
-/*
+/* Съезды в однопутный участок проще искать через совпадение точек
         SPLIT_1PLUS2 = 3,
         SPLIT_1MINUS2 = 4,
         SPLIT_2PLUS1 = 5,
         SPLIT_2MINUS1 = 6,
 */
+        // Съезды на однопутный участок
         SPLIT_1_2 = 3,
         SPLIT_2_1 = 4,
 

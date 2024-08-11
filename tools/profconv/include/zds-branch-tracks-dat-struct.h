@@ -31,7 +31,7 @@ struct zds_branch_point_t
     std::string signal_liter = "";
     std::string signal_special = "";
 
-    int     branch_track_id = 0;
+    int dir = 1;
 };
 
 //------------------------------------------------------------------------------
@@ -50,8 +50,6 @@ struct calculated_branch_point_t
 struct zds_branch_track_t
 {
     std::vector<zds_branch_point_t> branch_points = {};
-    bool    to_other_main_track = false;
-    bool    from_other_main_track = false;
 
     std::vector<calculated_branch_point_t> branch_trajectory = {};
 };
@@ -60,5 +58,23 @@ struct zds_branch_track_t
 //
 //------------------------------------------------------------------------------
 typedef std::vector<zds_branch_track_t *> zds_branch_track_data_t;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct zds_branch_2_2_t
+{
+    zds_branch_point_t  branch_point = zds_branch_point_t();
+    std::vector<calculated_branch_point_t> branch_trajectory = {};
+    int id1 = -1;
+    int id2 = -1;
+    bool is_added_split = false;
+    int id_reverse_branch = -1;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef std::vector<zds_branch_2_2_t *> zds_branch_2_2_data_t;
 
 #endif // ZDS_BRANCH_TRACK_H

@@ -171,7 +171,9 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     std::string traj_file2 = "route2.trj";
     std::string branch_traj_prefix1 = "branch1_";
     std::string branch_traj_prefix2 = "branch2_";
-    std::string branch_traj_ext = ".trj";
+    std::string branch_2minus2_prefix = "branch2m2_";
+    std::string branch_2plus2_prefix = "branch2p2_";
+    std::string traj_ext = ".trj";
 
     std::string waypoints_file = "waypoints.conf";
     std::string stations_file = "stations.conf";
@@ -194,9 +196,6 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals1_path, signals_data1);
         readBranchTracksDAT(branch1_path, branch_track_data1, dir);
 
-        splitMainTrajectory(dir);
-
-        writeMainTrajectory(traj_file1, tracks_data1);
         writeSpeeds(speeds1_file, speeds_data1);
     }
 
@@ -210,10 +209,23 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals2_path, signals_data2);
         readBranchTracksDAT(branch2_path, branch_track_data2, dir);
 
+        writeSpeeds(speeds2_file, speeds_data2);
+    }
+
+    if (is_1)
+    {
+        int dir = 1;
+        splitMainTrajectory(dir);
+
+        writeMainTrajectory(traj_file1, tracks_data1);
+    }
+
+    if (is_1 && is_2)
+    {
+        int dir = -1;
         splitMainTrajectory(dir);
 
         writeMainTrajectory(traj_file2, tracks_data2);
-        writeSpeeds(speeds2_file, speeds_data2);
     }
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
@@ -232,7 +244,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             calcBranchTrack1(branch_track);
             writeBranchTrajectory(branch_traj_prefix1 +
                                   QString("%1").arg(i,3,10,QChar('0')).toStdString() +
-                                  branch_traj_ext.c_str(), branch_track);
+                                      traj_ext.c_str(), &branch_track->branch_trajectory);
         }
     }
 
@@ -246,7 +258,35 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             calcBranchTrack2(branch_track);
             writeBranchTrajectory(branch_traj_prefix2 +
                                   QString("%1").arg(i,3,10,QChar('0')).toStdString() +
-                                  branch_traj_ext.c_str(), branch_track);
+                                  traj_ext.c_str(), &branch_track->branch_trajectory);
+        }
+    }
+
+    if (!branch_2minus2_data.empty())
+    {
+        size_t i = 0;
+        for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
+        {
+            ++i;
+            zds_branch_2_2_t *branch_track = *it;
+            calcBranch22(branch_track);
+            writeBranchTrajectory(branch_2minus2_prefix +
+                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
+                                  traj_ext.c_str(), &branch_track->branch_trajectory);
+        }
+    }
+
+    if (!branch_2plus2_data.empty())
+    {
+        size_t i = 0;
+        for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
+        {
+            ++i;
+            zds_branch_2_2_t *branch_track = *it;
+            calcBranch22(branch_track);
+            writeBranchTrajectory(branch_2plus2_prefix +
+                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
+                                  traj_ext.c_str(), &branch_track->branch_trajectory);
         }
     }
 

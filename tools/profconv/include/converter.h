@@ -66,9 +66,9 @@ private:
 
     zds_branch_track_data_t branch_track_data2;
 
-    zds_branch_track_data_t branch_2plus2_data2;
+    zds_branch_2_2_data_t branch_2minus2_data;
 
-    zds_branch_track_data_t branch_2minus2_data2;
+    zds_branch_2_2_data_t branch_2plus2_data;
 
     route_trajectories_t trajectories;
 
@@ -128,13 +128,17 @@ private:
 
     bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir);
 
-    bool checkIsToOtherMain(zds_branch_track_t *branch_track, const int &dir);
+    bool checkIsToOtherMain(zds_branch_point_t *branch_point, const int &dir);
+
+    void findFromOtherMain(zds_branch_point_t *branch_point, const int &dir);
 
     bool calcBranchTrack1(zds_branch_track_t *branch_track);
 
     bool calcBranchTrack2(zds_branch_track_t *branch_track);
 
-    void writeBranchTrajectory(const std::string &filename, const zds_branch_track_t *branch_track);
+    bool calcBranch22(zds_branch_2_2_t *branch22);
+
+    void writeBranchTrajectory(const std::string &filename, const std::vector<calculated_branch_point_t>* branch_trajectory);
 
     bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
 

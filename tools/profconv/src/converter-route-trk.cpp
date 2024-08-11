@@ -53,11 +53,41 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
             >> track.arrows
             >> track.voltage
             >> track.ordinate;
+        // Если команда в поле arrows пустая, в неё распарситься
+        // следующая переменная, проверяем это
+        if (((track.arrows == "0") || (track.arrows == "3") || (track.arrows == "25")) &&
+            (track.voltage != 0) && (track.voltage != 3) && (track.voltage != 25) &&
+            (track.ordinate == 0))
+        {
+            track.ordinate = track.voltage;
+            if (track.arrows == "0")
+                track.voltage = 0;
+            if (track.arrows == "3")
+                track.voltage = 3;
+            if (track.arrows == "25")
+                track.voltage = 25;
+        }
+        // У команд n:x.x или m:x.x дробная чать может распарситься
+        // как следующая переменная, проверяем это
+        if ((track.arrows.front() == 'n' || (track.arrows.front() == 'm')) &&
+            (track.voltage != 0) &&
+            (track.ordinate == 0 || track.ordinate == 3 || track.ordinate == 25))
+        {
+            track.voltage = track.ordinate;
+            ss >> track.ordinate;
+        }
+        // Иногда встречается пикетаж со знаком минус
+        if (track.ordinate < 0)
+        {
+            int tmp = abs(track.ordinate);
+            if (!tmp_data.empty() && (abs(tmp_data.back().ordinate - tmp) <= 200))
+            {
+                track.ordinate = tmp;
+            }
+        }
 
         tmp_data.push_back(track);
     }
-
-//    track_data.push_back(*tmp_data.begin());
 
     auto it = tmp_data.begin();
     double trajectory_length = 0.0;
@@ -148,10 +178,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
     {
         split_zds_trajectory_t split = split_zds_trajectory_t();
         split_zds_trajectory_t split_next = split_zds_trajectory_t();
-        split_zds_trajectory_t split2 = split_zds_trajectory_t();
-        split_zds_trajectory_t split2_next = split_zds_trajectory_t();
         bool is_add_split_next = false;
-        bool is_add_split2_next = false;
 
         size_t id = 0;
         for (auto it = tracks_data1.begin(); it != tracks_data1.end(); ++it)
@@ -163,14 +190,6 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             split_next = split_zds_trajectory_t();
             is_add_split_next = false;
 
-            if (is_add_split2_next)
-                split2 = split2_next;
-            else
-                split2 = split_zds_trajectory_t();
-            split2_next = split_zds_trajectory_t();
-            is_add_split2_next = false;
-            split2.track_id = id;
-
             zds_track_t track = *it;
 
             // Съезды между главными путями
@@ -178,15 +197,30 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             {
                 split.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
                 // Добавляем разделение и в соседний главный путь
-                split2_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
-                is_add_split2_next = true;
+                float coord;
+                zds_track_t track2 = getNearestTrack(track.end_point, tracks_data2, coord);
+                bool near_end = (coord > (track2.trajectory_coord + 0.5 * track2.length));
+                size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
+
+                split_zds_trajectory_t split2 = split_zds_trajectory_t();
+                split2.track_id = id2;
+                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                split_data2.push_back(new split_zds_trajectory_t(split2));
             }
             if (track.arrows == "2-2")
             {
                 split_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
                 is_add_split_next = true;
                 // Добавляем разделение и в соседний главный путь
+                float coord;
+                zds_track_t track2 = getNearestTrack(track.begin_point, tracks_data2, coord);
+                bool near_end = (coord > (track2.trajectory_coord + 0.5 * track2.length));
+                size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
+
+                split_zds_trajectory_t split2 = split_zds_trajectory_t();
+                split2.track_id = id2;
                 split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
+                split_data2.push_back(new split_zds_trajectory_t(split2));
             }
 /* Съезды в однопутный участок проще искать через совпадение точек
             if (track.arrows == "1+2")
@@ -231,11 +265,6 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                 split.point = track.begin_point;
                 split.railway_coord = track.railway_coord;
                 split_data1.push_back(new split_zds_trajectory_t(split));
-            }
-            if (!split2.split_type.empty())
-            {
-                split2.track_id = id;
-                split_data2.push_back(new split_zds_trajectory_t(split2));
             }
 
             ++id;
