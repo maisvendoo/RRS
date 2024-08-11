@@ -31,10 +31,7 @@ struct zds_branch_point_t
     std::string signal_liter = "";
     std::string signal_special = "";
 
-    static bool compare_by_track_id(const zds_branch_point_t left, const zds_branch_point_t right)
-    {
-        return left.main_track_id < right.main_track_id;
-    };
+    int     branch_track_id = 0;
 };
 
 //------------------------------------------------------------------------------

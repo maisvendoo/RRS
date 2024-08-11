@@ -169,8 +169,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     std::string traj_file1 = "route1.trj";
     std::string traj_file2 = "route2.trj";
-    std::string branch_traj_prefix1 = "route1_branch_";
-    std::string branch_traj_prefix2 = "route2_branch_";
+    std::string branch_traj_prefix1 = "branch1_";
+    std::string branch_traj_prefix2 = "branch2_";
     std::string branch_traj_ext = ".trj";
 
     std::string waypoints_file = "waypoints.conf";
@@ -186,12 +186,15 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         int dir = 1;
         // Создание profile.conf отключено, симулятор сам читает route1.trk
         //writeProfileData(tracks_data1, "profile1.conf");
+
         //createPowerLine(tracks_data1, power_line1);
         //readRouteMAP(map_path, neutral_insertions);
 
         readSpeedsDAT(speeds1_path, speeds_data1);
         readSvetoforDAT(signals1_path, signals_data1);
         readBranchTracksDAT(branch1_path, branch_track_data1, dir);
+
+        splitMainTrajectory(dir);
 
         writeMainTrajectory(traj_file1, tracks_data1);
         writeSpeeds(speeds1_file, speeds_data1);
@@ -206,6 +209,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSpeedsDAT(speeds2_path, speeds_data2);
         readSvetoforDAT(signals2_path, signals_data2);
         readBranchTracksDAT(branch2_path, branch_track_data2, dir);
+
+        splitMainTrajectory(dir);
 
         writeMainTrajectory(traj_file2, tracks_data2);
         writeSpeeds(speeds2_file, speeds_data2);

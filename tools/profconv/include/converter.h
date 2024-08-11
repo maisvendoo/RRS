@@ -66,7 +66,15 @@ private:
 
     zds_branch_track_data_t branch_track_data2;
 
+    zds_branch_track_data_t branch_2plus2_data2;
+
+    zds_branch_track_data_t branch_2minus2_data2;
+
     route_trajectories_t trajectories;
+
+    route_connectors_t split_data1;
+
+    route_connectors_t split_data2;
 
     route_connectors_t connectors;
 
@@ -87,6 +95,8 @@ private:
     bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data);
 
     bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data);
+
+    void splitMainTrajectory(const int &dir);
 
     void writeProfileData(const zds_trajectory_data_t &tracks_data,
                           const std::string &file_name);
@@ -129,6 +139,10 @@ private:
     bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
 
     bool findNeutralInsertions(std::ifstream &stream, std::vector<neutral_insertion_t> ni);
+
+    void writeTopologyTrajectories(const route_trajectories_t &trajectories);
+
+    void writeTopologyConnectors(const std::string &filename, const route_connectors_t &connectors);
 };
 
 #endif // CONVERTER_H

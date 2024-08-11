@@ -48,22 +48,27 @@ struct split_zds_trajectory_t
 {
     enum
     {
-        // Светофор
-        SPLIT_SIGNAL = 0,
-
         // Съезды между главными путями
         SPLIT_2PLUS2 = 1,
         SPLIT_2MINUS2 = 2,
+/*
         SPLIT_1PLUS2 = 3,
         SPLIT_1MINUS2 = 4,
         SPLIT_2PLUS1 = 5,
         SPLIT_2MINUS1 = 6,
+*/
+        SPLIT_1_2 = 3,
+        SPLIT_2_1 = 4,
 
         // Стрелки на боковые пути
         SPLIT_PLUS2 = 7,
         SPLIT_MINUS2 = 8,
         SPLIT_2PLUS = 9,
         SPLIT_2MINUS = 10,
+
+        // Светофор
+        SPLIT_SIGNAL_FWD = 11,
+        SPLIT_SIGNAL_BWD = 12,
     };
 
     size_t track_id = 0;
