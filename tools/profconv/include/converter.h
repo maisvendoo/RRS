@@ -48,6 +48,8 @@ private:
 
     std::string         routeDir;
 
+    std::string         topologyDir;
+
     zds_trajectory_data_t    tracks_data1;
 
     zds_trajectory_data_t    tracks_data2;
@@ -98,6 +100,8 @@ private:
 
     void splitMainTrajectory(const int &dir);
 
+    void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
+
     void writeProfileData(const zds_trajectory_data_t &tracks_data,
                           const std::string &file_name);
 
@@ -128,9 +132,9 @@ private:
 
     bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir);
 
-    bool checkIsToOtherMain(zds_branch_point_t *branch_point, const int &dir);
+    bool checkIsToOtherMain(zds_branch_point_t *branch_point);
 
-    void findFromOtherMain(zds_branch_point_t *branch_point, const int &dir);
+    void findFromOtherMain(zds_branch_point_t *branch_point);
 
     bool calcBranchTrack1(zds_branch_track_t *branch_track);
 

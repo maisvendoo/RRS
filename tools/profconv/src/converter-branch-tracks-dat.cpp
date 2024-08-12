@@ -74,7 +74,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
             is_next_from_other_main = false;
 
             // Ищем точку начала обратного съезда, считаем это съездом "2+2"
-            findFromOtherMain(&branch_point, dir);
+            findFromOtherMain(&branch_point);
             continue;
         }
 
@@ -82,7 +82,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         // проверяем, что это может быть съезд "2-2" между главными
         if ((bias_value <= -0.01) && (branch_track.branch_points.empty()))
         {
-            if (checkIsToOtherMain(&branch_point, dir))
+            if (checkIsToOtherMain(&branch_point))
             {
                 is_next_from_other_main = true;
 
@@ -114,10 +114,11 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point, const int &dir)
+bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point)
 {
     double bias = branch_point->bias;
     size_t id_begin = branch_point->main_track_id;
+    int dir = branch_point->dir;
     dvec3 point_after_bias;
     zds_track_t track;
     float coord;
@@ -179,30 +180,47 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point, const 
             return false;
     }
 
-    zds_branch_2_2_t branch_2minus2;
-    branch_2minus2.branch_point = *branch_point;
+    zds_branch_2_2_t branch_2minus2 = zds_branch_2_2_t();
     if (dir > 0)
     {
-        branch_2minus2.id1 = id_begin;
-        branch_2minus2.id2 =
-            near_end ? track.prev_uid + 1 : track.prev_uid;
+        int id1 = id_begin;
+        int id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        branch_2minus2.branch_point_fwd = *branch_point;
+        branch_2minus2.is_fwd = true;
+        branch_2minus2.id1 = id1;
+        branch_2minus2.id2 = id2;
+        branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
     else
     {
-        branch_2minus2.id1 =
-            near_end ? track.prev_uid + 1 : track.prev_uid;
-        branch_2minus2.id2 = id_begin + 1;
+        int id1 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        int id2 = id_begin + 1;
+        for (auto exist_branch : branch_2minus2_data)
+        {
+            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            {
+                exist_branch->branch_point_bwd = *branch_point;
+                exist_branch->is_bwd = true;
+                return true;
+            }
+        }
+
+        branch_2minus2.branch_point_bwd = *branch_point;
+        branch_2minus2.is_bwd = true;
+        branch_2minus2.id1 = id1;
+        branch_2minus2.id2 = id2;
+        branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
-    branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::findFromOtherMain(zds_branch_point_t *branch_point, const int &dir)
+void ZDSimConverter::findFromOtherMain(zds_branch_point_t *branch_point)
 {
     size_t id_end = branch_point->main_track_id;
+    int dir = branch_point->dir;
     dvec3 point_after_bias;
     zds_track_t track;
     float coord;
@@ -226,21 +244,37 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t *branch_point, const i
 
     near_end = (coord > (track.trajectory_coord + 0.5 * track.length));
 
-    zds_branch_2_2_t branch_2plus2;
-    branch_2plus2.branch_point = *branch_point;
+    zds_branch_2_2_t branch_2plus2 = zds_branch_2_2_t();
     if (dir > 0)
     {
-        branch_2plus2.id1 = id_end + 1;
-        branch_2plus2.id2 =
-            near_end ? track.prev_uid + 1 : track.prev_uid;
+        int id1 = id_end + 1;
+        int id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        branch_2plus2.branch_point_fwd = *branch_point;
+        branch_2plus2.is_fwd = true;
+        branch_2plus2.id1 = id1;
+        branch_2plus2.id2 = id2;
+        branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
     else
     {
-        branch_2plus2.id1 =
-            near_end ? track.prev_uid + 1 : track.prev_uid;
-        branch_2plus2.id2 = id_end;
+        int id1 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        int id2 = id_end;
+        for (auto exist_branch : branch_2plus2_data)
+        {
+            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            {
+                exist_branch->branch_point_bwd = *branch_point;
+                exist_branch->is_bwd = true;
+                return;
+            }
+        }
+
+        branch_2plus2.branch_point_bwd = *branch_point;
+        branch_2plus2.is_bwd = true;
+        branch_2plus2.id1 = id1;
+        branch_2plus2.id2 = id2;
+        branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
-    branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
 }
 
 //------------------------------------------------------------------------------
@@ -536,7 +570,7 @@ bool ZDSimConverter::calcBranch22(zds_branch_2_2_t *branch22)
 //------------------------------------------------------------------------------
 void ZDSimConverter::writeBranchTrajectory(const std::string &filename, const std::vector<calculated_branch_point_t> *branch_trajectory)
 {
-    std::string path = compinePath(toNativeSeparators(routeDir), filename);
+    std::string path = compinePath(toNativeSeparators(topologyDir), filename);
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())

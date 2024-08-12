@@ -5,6 +5,7 @@
 #include    "path-utils.h"
 
 #include    <QFile>
+#include    <QDir>
 #include    <QStringConverter>
 
 //------------------------------------------------------------------------------
@@ -125,6 +126,15 @@ CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
 
     if (routeDir.empty())
         return RESULT_ERROR;
+
+    std::string topology_subdir_name = "topology";
+    topologyDir = compinePath(routeDir, topology_subdir_name);
+
+    QDir route(routeDir.c_str());
+    if (!route.exists(topology_subdir_name.c_str()))
+    {
+        route.mkpath(topologyDir.c_str());
+    }
 
     return RESULT_OK;
 }

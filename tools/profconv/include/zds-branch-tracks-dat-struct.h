@@ -64,12 +64,13 @@ typedef std::vector<zds_branch_track_t *> zds_branch_track_data_t;
 //------------------------------------------------------------------------------
 struct zds_branch_2_2_t
 {
-    zds_branch_point_t  branch_point = zds_branch_point_t();
-    std::vector<calculated_branch_point_t> branch_trajectory = {};
     int id1 = -1;
     int id2 = -1;
-    bool is_added_split = false;
-    int id_reverse_branch = -1;
+    bool is_fwd = false;
+    zds_branch_point_t  branch_point_fwd = zds_branch_point_t();
+    bool is_bwd = false;
+    zds_branch_point_t  branch_point_bwd = zds_branch_point_t();
+    std::vector<calculated_branch_point_t> branch_trajectory = {};
 };
 
 //------------------------------------------------------------------------------
