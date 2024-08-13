@@ -50,6 +50,8 @@ struct calculated_branch_point_t
 struct zds_branch_track_t
 {
     std::vector<zds_branch_point_t> branch_points = {};
+    int id_begin = -1;
+    int id_end = -1;
 
     std::vector<calculated_branch_point_t> branch_trajectory = {};
 };

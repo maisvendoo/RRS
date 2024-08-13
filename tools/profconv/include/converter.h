@@ -72,13 +72,15 @@ private:
 
     zds_branch_2_2_data_t branch_2plus2_data;
 
-    route_trajectories_t trajectories;
+    route_trajectories_t trajectories1;
+
+    route_trajectories_t trajectories2;
 
     route_connectors_t split_data1;
 
     route_connectors_t split_data2;
 
-    route_connectors_t connectors;
+    route_connectors_t branch_connectors;
 
     std::vector<power_line_element_t> power_line1;
 
@@ -97,10 +99,6 @@ private:
     bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data);
 
     bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data);
-
-    void splitMainTrajectory(const int &dir);
-
-    void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
 
     void writeProfileData(const zds_trajectory_data_t &tracks_data,
                           const std::string &file_name);
@@ -141,6 +139,14 @@ private:
     bool calcBranchTrack2(zds_branch_track_t *branch_track);
 
     bool calcBranch22(zds_branch_2_2_t *branch22);
+
+    void findSplitsMainTrajectories(const int &dir);
+
+    void writeSplits(const int &dir);
+
+    void splitMainTrajectory(const int &dir);
+
+    void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
 
     void writeBranchTrajectory(const std::string &filename, const std::vector<calculated_branch_point_t>* branch_trajectory);
 

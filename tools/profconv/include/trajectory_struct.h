@@ -49,27 +49,20 @@ struct split_zds_trajectory_t
     enum
     {
         // Съезды между главными путями
-        SPLIT_2PLUS2 = 1,
-        SPLIT_2MINUS2 = 2,
-/* Съезды в однопутный участок проще искать через совпадение точек
-        SPLIT_1PLUS2 = 3,
-        SPLIT_1MINUS2 = 4,
-        SPLIT_2PLUS1 = 5,
-        SPLIT_2MINUS1 = 6,
-*/
-        // Съезды на однопутный участок
-        SPLIT_1_2 = 3,
-        SPLIT_2_1 = 4,
+        SPLIT_2MINUS2 = 1,
+        SPLIT_2PLUS2 = 2,
+
+        // Съезды в начале/конце однопутного участка
+        SPLIT_2_1 = 3,
+        SPLIT_1_2 = 4,
 
         // Стрелки на боковые пути
-        SPLIT_PLUS2 = 7,
-        SPLIT_MINUS2 = 8,
-        SPLIT_2PLUS = 9,
-        SPLIT_2MINUS = 10,
+        SPLIT_TO_SIDE = 5,
+        SPLIT_FROM_SIDE = 6,
 
         // Светофор
-        SPLIT_SIGNAL_FWD = 11,
-        SPLIT_SIGNAL_BWD = 12,
+        SPLIT_SIGNAL_FWD = 7,
+        SPLIT_SIGNAL_BWD = 8,
     };
 
     size_t track_id = 0;
@@ -100,6 +93,11 @@ struct split_zds_trajectory_t
     {
 
     }
+
+    static bool compare_by_track_id(const split_zds_trajectory_t* left, const split_zds_trajectory_t* right)
+    {
+        return (*left).track_id < (*right).track_id;
+    };
 };
 
 //------------------------------------------------------------------------------

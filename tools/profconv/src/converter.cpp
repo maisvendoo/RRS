@@ -225,17 +225,29 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     if (is_1)
     {
         int dir = 1;
+        findSplitsMainTrajectories(dir);
         splitMainTrajectory(dir);
-
         writeMainTrajectory(traj_file1, tracks_data1);
     }
 
     if (is_1 && is_2)
     {
         int dir = -1;
+        findSplitsMainTrajectories(dir);
         splitMainTrajectory(dir);
-
         writeMainTrajectory(traj_file2, tracks_data2);
+    }
+
+    // Отладка разделения главных путей на подтраектории
+    if (is_1)
+    {
+        int dir = 1;
+        writeSplits(dir);
+    }
+    if (is_1 && is_2)
+    {
+        int dir = -1;
+        writeSplits(dir);
     }
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
@@ -251,10 +263,14 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         {
             ++i;
             zds_branch_track_t *branch_track = *it;
-            calcBranchTrack1(branch_track);
             writeBranchTrajectory(branch_traj_prefix1 +
-                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
-                                      traj_ext.c_str(), &branch_track->branch_trajectory);
+                                    QString("%1_%2_%3")
+                                        .arg(i,3,10,QChar('0'))
+                                        .arg(branch_track->id_begin)
+                                        .arg(branch_track->id_end)
+                                        .toStdString() +
+                                    traj_ext.c_str(),
+                                  &branch_track->branch_trajectory);
         }
     }
 
@@ -265,10 +281,14 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         {
             ++i;
             zds_branch_track_t *branch_track = *it;
-            calcBranchTrack2(branch_track);
             writeBranchTrajectory(branch_traj_prefix2 +
-                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
-                                  traj_ext.c_str(), &branch_track->branch_trajectory);
+                                    QString("%1_%2_%3")
+                                        .arg(i,3,10,QChar('0'))
+                                        .arg(branch_track->id_begin)
+                                        .arg(branch_track->id_end)
+                                        .toStdString() +
+                                    traj_ext.c_str(),
+                                  &branch_track->branch_trajectory);
         }
     }
 
@@ -281,8 +301,13 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             zds_branch_2_2_t *branch_track = *it;
             calcBranch22(branch_track);
             writeBranchTrajectory(branch_2minus2_prefix +
-                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
-                                  traj_ext.c_str(), &branch_track->branch_trajectory);
+                                    QString("%1_%2_%3")
+                                        .arg(i,3,10,QChar('0'))
+                                        .arg(branch_track->id1)
+                                        .arg(branch_track->id2)
+                                        .toStdString() +
+                                    traj_ext.c_str(),
+                                  &branch_track->branch_trajectory);
         }
     }
 
@@ -295,8 +320,13 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             zds_branch_2_2_t *branch_track = *it;
             calcBranch22(branch_track);
             writeBranchTrajectory(branch_2plus2_prefix +
-                                  QString("%1").arg(i,3,10,QChar('0')).toStdString() +
-                                  traj_ext.c_str(), &branch_track->branch_trajectory);
+                                    QString("%1_%2_%3")
+                                        .arg(i,3,10,QChar('0'))
+                                        .arg(branch_track->id1)
+                                        .arg(branch_track->id2)
+                                        .toStdString() +
+                                    traj_ext.c_str(),
+                                  &branch_track->branch_trajectory);
         }
     }
 

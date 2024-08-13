@@ -99,8 +99,16 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         {
             if (branch_track.branch_points.size() > 1)
             {
-                zds_branch_track_t *tmp_branch_track = new zds_branch_track_t(branch_track);
-                branch_data.push_back(tmp_branch_track);
+                zds_branch_track_t* tmp_branch = new zds_branch_track_t(branch_track);
+                if (dir > 0)
+                {
+                    calcBranchTrack1(tmp_branch);
+                }
+                else
+                {
+                    calcBranchTrack2(tmp_branch);
+                }
+                branch_data.push_back(tmp_branch);
             }
 
             // Очистка
@@ -293,6 +301,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
     point_begin.trajectory_coord = 0.0;
     point_begin.railway_coord = tracks_data1[id_begin].railway_coord;
     // Добавляем первую точку
+    branch_track->id_begin = id_begin;
     branch_track->branch_trajectory.push_back(point_begin);
 
     for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
@@ -362,6 +371,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
             point.railway_coord = tracks_data1[id_end].railway_coord;
             // Добавляем точку траектории
+            branch_track->id_end = id_end;
             branch_track->branch_trajectory.push_back(point);
             return true;
         }
@@ -411,6 +421,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
     point_begin.trajectory_coord = 0.0;
     point_begin.railway_coord = tracks_data2[id_begin].railway_coord;
     // Добавляем первую точку
+    branch_track->id_begin = id_begin;
     branch_track->branch_trajectory.push_back(point_begin);
 
     for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
@@ -481,6 +492,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
             point.railway_coord = tracks_data2[id_end].railway_coord;
             // Добавляем точку траектории
+            branch_track->id_end = id_end;
             branch_track->branch_trajectory.push_back(point);
             return true;
         }
