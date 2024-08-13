@@ -4,12 +4,13 @@
 #include    <QObject>
 
 #include    <topology-types.h>
+#include    <topology-export.h>
 #include    <profile-point.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class VehicleController : public QObject
+class TOPOLOGY_EXPORT VehicleController : public QObject
 {
     Q_OBJECT
 
@@ -35,7 +36,7 @@ public:
     void setDirection(int dir) { this->dir = dir; }
 
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
-    profile_point_t getPosition() const;
+    profile_point_t getPosition();
 
     /// Вернуть указатель на текущую траекторию
     Trajectory *getCurrentTraj() const { return current_traj; }

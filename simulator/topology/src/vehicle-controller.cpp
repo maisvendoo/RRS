@@ -127,7 +127,7 @@ void VehicleController::setInitCurrentTraj(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t VehicleController::getPosition() const
+profile_point_t VehicleController::getPosition()
 {
     return current_traj->getPosition(traj_coord, dir);
 }

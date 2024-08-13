@@ -33,7 +33,7 @@ public:
     bool init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles);
 
     /// Вернуть контроллер конкретной ПЕ
-    VehicleController *getVehicleController(size_t idx) const;
+    VehicleController *getVehicleController(size_t idx);
 
 
 

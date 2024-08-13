@@ -767,6 +767,23 @@ void Model::sharedMemoryFeedback()
         update_data.vehicles[i].up_y = pp->up.y;
         update_data.vehicles[i].up_z = pp->up.z;
 
+        /*topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
+
+        // Получаем точку профиля из топологии
+        profile_point_t pp = topology->getVehicleController(i)->getPosition();
+        // Передаем её вайклу
+        vehicle->setProfilePoint(pp);
+
+        update_data.vehicles[i].position_x = pp.position.x;
+        update_data.vehicles[i].position_y = pp.position.y;
+        update_data.vehicles[i].position_z = pp.position.z;
+        update_data.vehicles[i].orth_x = pp.orth.x;
+        update_data.vehicles[i].orth_y = pp.orth.y;
+        update_data.vehicles[i].orth_z = pp.orth.z;
+        update_data.vehicles[i].up_x = pp.up.x;
+        update_data.vehicles[i].up_y = pp.up.y;
+        update_data.vehicles[i].up_z = pp.up.z;*/
+
         update_data.vehicles[i].orientation = vehicle->getOrientation();
 
         std::copy(vehicle->getAnalogSignals().begin(),

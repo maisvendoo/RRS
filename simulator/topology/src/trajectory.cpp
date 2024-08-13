@@ -93,9 +93,9 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 {
     profile_point_t pp;
 
-    track_t cur_track;
-    track_t prev_track;
-    track_t next_track;
+    track_t cur_track = track_t();
+    track_t prev_track = track_t();
+    track_t next_track = track_t();
 
     findTracks(traj_coord, cur_track, prev_track, next_track);
 
@@ -107,7 +107,7 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
     pp.inclination = cur_track.inclination * dir;
 
     // Относительное перемещение вдоль текущего трека
-    double rel_motion = traj_coord / cur_track.len;
+    double rel_motion = traj_coord / len;
 
     if (rel_motion < 0.5)
     {
@@ -244,7 +244,7 @@ void Trajectory::findTracks(double traj_coord,
         idx = (left_idx + right_idx) / 2;
     }
 
-    track = tracks[idx];
+    cur_track = tracks[idx];
     prev_track = tracks[idx - 1];
     next_track = tracks[idx + 1];    
 }

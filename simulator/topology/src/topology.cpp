@@ -132,7 +132,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VehicleController *Topology::getVehicleController(size_t idx) const
+VehicleController *Topology::getVehicleController(size_t idx)
 {
     return vehicle_control[idx];
 }
