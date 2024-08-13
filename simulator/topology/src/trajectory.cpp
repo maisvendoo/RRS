@@ -1,4 +1,5 @@
 #include    <trajectory.h>
+#include    <connector.h>
 
 #include    <QDir>
 
@@ -70,6 +71,9 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
         // Конструируем трек
         track_t track(p0, p1);
 
+        // Обновляем траекторную координату начала трека
+        track.traj_coord = len;
+
         // Обновляем длину траектории
         len += track.len;
 
@@ -80,4 +84,64 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
     name = traj_name;
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+track_t Trajectory::findTracks(double traj_coord, track_t &next_track)
+{
+    if (tracks.size() == 0)
+        return track_t();
+
+    // Исходим из того, что случай traj_coord < 0 у нас недопускается.
+    // В этом случае, текущий трек это трек на данной траектории, и если
+    // он последний, то следующий трек - это первый трек сделующей траектории
+
+    // Обрабатываем случай, коогда мы оказываемся на последнем треке
+    if (traj_coord > (*(tracks.end() - 1)).traj_coord)
+    {
+        track_t track = this->getLastTrack();
+
+        if (fwd_connector == Q_NULLPTR)
+        {
+            return track;
+        }
+
+        // Смотрим, какая траектория впереди
+        Trajectory *next_traj = fwd_connector->getFwdTraj();
+
+        if (next_traj == Q_NULLPTR)
+        {
+            return track;
+        }
+
+        next_track = next_traj->getFirstTrack();
+        return track;
+    }
+
+    // Если мы не на последнем треке, ищем на каком мы треке
+    // бинарным поиском
+    track_t track;
+
+    size_t left_idx = 0;
+    size_t right_idx = tracks.size() - 1;
+    size_t idx = (left_idx + right_idx) / 2;
+
+    while (idx != left_idx)
+    {
+        track = tracks[idx];
+
+        if (traj_coord <= track.traj_coord)
+            right_idx = idx;
+        else
+            left_idx = idx;
+
+        idx = (left_idx + right_idx) / 2;
+    }
+
+    track = tracks[idx];
+    next_track = tracks[idx + 1];
+
+    return track_t();
 }

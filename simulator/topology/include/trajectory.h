@@ -62,6 +62,18 @@ public:
         return is_busy;
     }
 
+    /// Вернуть первый трек траектории
+    track_t getFirstTrack() const
+    {
+        return *tracks.begin();
+    }
+
+    /// Вернуть последний трек траектории
+    track_t getLastTrack() const
+    {
+        return *(tracks.end() - 1);
+    }
+
 private:
 
     QString name = "";
@@ -75,6 +87,9 @@ private:
     Connector *bwd_connector = Q_NULLPTR;
 
     std::vector<track_t>    tracks;
+
+    /// Поиск текущего и следующего трека
+    track_t findTracks(double traj_coord, track_t &next_track);
 };
 
 #endif
