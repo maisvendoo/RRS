@@ -476,6 +476,63 @@ void ZDSimConverter::addOrCreateSplit(route_connectors_t &split_data, const spli
 //------------------------------------------------------------------------------
 void ZDSimConverter::splitMainTrajectory(const int &dir)
 {
+    double trajectory_length = 0.0;
+    trajectory_t trajectory = trajectory_t();;
+    size_t num_traj = 0;
+    std::string name_prefix;
+    route_trajectories_t* trajectories;
+    zds_trajectory_data_t* tracks_data;
+    route_connectors_t* split_data;
+    if (dir > 0)
+    {
+        name_prefix = "route1_";
+        split_data = &split_data1;
+        tracks_data = &tracks_data1;
+        trajectories = &trajectories1;
+    }
+    else
+    {
+        name_prefix = "route2_";
+        split_data = &split_data2;
+        tracks_data = &tracks_data2;
+        trajectories = &trajectories2;
+    }
+    for (auto it = tracks_data->begin(); it != tracks_data->end(); ++it)
+    {
+        if ((dir < 0) && (it->id_at_track1 != -1))
+            continue;
 
+        point_t point;
+        point.point = it->begin_point;
+        point.railway_coord = it->railway_coord;
+        point.trajectory_coord = trajectory_length;
+        trajectory.points.push_back(point);
+
+        size_t id = it->prev_uid;
+        bool is_split_next = false;
+        for (auto split = split_data->begin(); split != split_data->end(); ++split)
+        {
+            if ((*split)->track_id == id + 1)
+                is_split_next = true;
+        }
+        if (is_split_next)
+        {
+            ++num_traj;
+            point_t end_point;
+            end_point.point = it->end_point;
+            end_point.railway_coord = it->railway_coord_end;
+            end_point.trajectory_coord = trajectory_length + it->length;
+            trajectory.points.push_back(end_point);
+            trajectory.name = name_prefix +
+                              QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+            trajectories->push_back(new trajectory_t(trajectory));
+
+            trajectory.points.clear();
+            trajectory_length = 0.0;
+        }
+        else
+        {
+            trajectory_length += it->length;
+        }
+    }
 }
-

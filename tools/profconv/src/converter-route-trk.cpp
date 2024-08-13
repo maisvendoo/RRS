@@ -222,7 +222,7 @@ void ZDSimConverter::writeMainTrajectory(const std::string &filename, const zds_
                << (*it).begin_point.z << ";"
                << static_cast<int>(round((*it).railway_coord)) << ";"
                << (*it).trajectory_coord << ";"
-               << ((*it).id_at_track1 == -1 ? "ONE" : "TWO") << "\n";
+               << ((*it).id_at_track1 == -1 ? "TWO" : "ONE") << "\n";
     }
     stream << tracks_data.back().end_point.x << ";"
            << tracks_data.back().end_point.y << ";"

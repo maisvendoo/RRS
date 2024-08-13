@@ -241,11 +241,17 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     // Отладка разделения главных путей на подтраектории
     if (is_1)
     {
+        writeTopologyTrajectories(trajectories1);
+
+        // Отладка разделения главных путей на подтраектории
         int dir = 1;
         writeSplits(dir);
     }
     if (is_1 && is_2)
     {
+        writeTopologyTrajectories(trajectories2);
+
+        // Отладка разделения главных путей на подтраектории
         int dir = -1;
         writeSplits(dir);
     }
