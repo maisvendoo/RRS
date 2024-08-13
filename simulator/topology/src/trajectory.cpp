@@ -89,40 +89,101 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::getPosition(double traj_coord, dvec3 &position, dvec3 &attitude)
+profile_point_t Trajectory::getPosition(double traj_coord, int dir)
 {
-    track_t next_track;
-    track_t current_track = findTracks(traj_coord, next_track);
+    profile_point_t profile_point;
 
-    position = current_track.begin_point + current_track.orth * (traj_coord - current_track.traj_coord);
+    track_t cur_track;
+    track_t prev_track;
+    track_t next_track;
+
+    findTracks(traj_coord, cur_track, prev_track, next_track);
+
+    profile_point.position = cur_track.begin_point +
+                             cur_track.orth * (traj_coord - cur_track.traj_coord);
+
+    profile_point.inclination = cur_track.inclination * static_cast<double>(dir);
+
+    // Относительное перемещение вдоль текущего трека
+    double rel_motion = traj_coord / cur_track.len;
+
+    if (rel_motion < 0.5)
+    {
+
+    }
+
+    if (rel_motion >= 0.5)
+    {
+
+    }
+
+    return profile_point;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::findTracks(double traj_coord, track_t &next_track)
+void Trajectory::findTracks(double traj_coord,
+                            track_t &cur_track,
+                            track_t &prev_track,
+                            track_t &next_track)
 {
     if (tracks.size() == 0)
-        return track_t();
+        return;
 
     // Исходим из того, что случай traj_coord < 0 у нас недопускается.
     // В этом случае, текущий трек это трек на данной траектории, и если
     // он последний, то следующий трек - это первый трек сделующей траектории
 
+    // Обрабатываем случай, когда мы на первом треке
+    if (traj_coord < (*tracks.begin()).len)
+    {
+        cur_track = *(tracks.begin());
+        next_track = *(tracks.begin() + 1);
+
+        // Если нет коннектора сзади
+        if (bwd_connector == Q_NULLPTR)
+        {
+            prev_track = cur_track;
+            prev_track.begin_point -= cur_track.orth * cur_track.len;
+            prev_track.end_point -= cur_track.orth * cur_track.len;
+            prev_track.traj_coord -= cur_track.len;
+            return;
+        }
+
+        // Смотрим, какая траектория сзади
+        Trajectory *prev_traj = bwd_connector->getBwdTraj();
+
+        // Если сзади нет траектории
+        if (prev_traj == Q_NULLPTR)
+        {
+            prev_track = cur_track;
+            prev_track.begin_point -= cur_track.orth * cur_track.len;
+            prev_track.end_point -= cur_track.orth * cur_track.len;
+            prev_track.traj_coord -= cur_track.len;
+            return;
+        }
+
+        prev_track = prev_traj->getLastTrack();
+        return;
+    }
+
+
     // Обрабатываем случай, коогда мы оказываемся на последнем треке
     if (traj_coord > (*(tracks.end() - 1)).traj_coord)
     {
-        track_t track = this->getLastTrack();
+        prev_track = *(tracks.end() - 2);
+        cur_track = this->getLastTrack();
 
         // Если нет соннектора впереди
         if (fwd_connector == Q_NULLPTR)
         {
             // Следующий трек сонаправлен текущему
-            next_track = track;
-            next_track.begin_point += track.orth * track.len;
-            next_track.end_point += track.orth * track.len;
-            next_track.traj_coord += track.len;
-            return track;
+            next_track = cur_track;
+            next_track.begin_point += cur_track.orth * cur_track.len;
+            next_track.end_point += cur_track.orth * cur_track.len;
+            next_track.traj_coord += cur_track.len;
+            return;
         }
 
         // Смотрим, какая траектория впереди
@@ -132,18 +193,18 @@ track_t Trajectory::findTracks(double traj_coord, track_t &next_track)
         if (next_traj == Q_NULLPTR)
         {
             // Следующий трек сонаправлен текущему
-            next_track = track;
-            next_track.begin_point += track.orth * track.len;
-            next_track.end_point += track.orth * track.len;
-            next_track.traj_coord += track.len;
-            return track;
+            next_track = cur_track;
+            next_track.begin_point += cur_track.orth * cur_track.len;
+            next_track.end_point += cur_track.orth * cur_track.len;
+            next_track.traj_coord += cur_track.len;
+            return;
         }
 
         next_track = next_traj->getFirstTrack();
-        return track;
+        return;
     }
 
-    // Если мы не на последнем треке, ищем на каком мы треке
+    // Если мы не на первом или последнем треке, ищем на каком мы треке
     // бинарным поиском
     track_t track;
 
@@ -164,7 +225,6 @@ track_t Trajectory::findTracks(double traj_coord, track_t &next_track)
     }
 
     track = tracks[idx];
-    next_track = tracks[idx + 1];
-
-    return track_t();
+    prev_track = tracks[idx - 1];
+    next_track = tracks[idx + 1];    
 }

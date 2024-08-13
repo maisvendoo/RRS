@@ -4,6 +4,7 @@
 #include    <QObject>
 
 #include    <track.h>
+#include    <profile-point.h>
 
 class Connector;
 
@@ -75,7 +76,7 @@ public:
     }
 
     /// Получить положение ПЕ на траектории
-    void getPosition(double traj_coord, dvec3 &position, dvec3 &attitude);
+    profile_point_t getPosition(double traj_coord, int dir);
 
 private:
 
@@ -92,7 +93,10 @@ private:
     std::vector<track_t>    tracks;
 
     /// Поиск текущего и следующего трека
-    track_t findTracks(double traj_coord, track_t &next_track);
+    void findTracks(double traj_coord,
+                    track_t &cur_track,
+                    track_t &prev_track,
+                    track_t &next_track);
 };
 
 #endif
