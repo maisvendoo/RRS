@@ -89,9 +89,9 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t Trajectory::getPosition(double traj_coord, int dir)
+profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 {
-    profile_point_t profile_point;
+    profile_point_t pp;
 
     track_t cur_track;
     track_t prev_track;
@@ -99,25 +99,45 @@ profile_point_t Trajectory::getPosition(double traj_coord, int dir)
 
     findTracks(traj_coord, cur_track, prev_track, next_track);
 
-    profile_point.position = cur_track.begin_point +
-                             cur_track.orth * (traj_coord - cur_track.traj_coord);
+    pp.position = cur_track.begin_point +
+                  cur_track.orth * (traj_coord - cur_track.traj_coord);
 
-    profile_point.inclination = cur_track.inclination * static_cast<double>(dir);
+    double dir = static_cast<double>(direction);
+
+    pp.inclination = cur_track.inclination * dir;
 
     // Относительное перемещение вдоль текущего трека
     double rel_motion = traj_coord / cur_track.len;
 
     if (rel_motion < 0.5)
     {
+        pp.orth = cur_track.orth * (0.5 + rel_motion) * dir;
+        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;
 
+        pp.right = cur_track.trav * (0.5 + rel_motion) * dir;
+        pp.right += prev_track.trav * (0.5 - rel_motion) * dir;
+
+        pp.up = cur_track.up * (0.5 + rel_motion);
+        pp.up += prev_track.up * (0.5 - rel_motion);
+
+        return pp;
     }
 
     if (rel_motion >= 0.5)
     {
+        pp.orth = cur_track.orth * (1.5 - rel_motion) * dir;
+        pp.orth += next_track.orth * (rel_motion - 0.5) * dir;
 
+        pp.right = cur_track.trav * (1.5 - rel_motion) * dir;
+        pp.right += next_track.trav * (rel_motion - 0.5) * dir;
+
+        pp.up = cur_track.up * (1.5 - rel_motion);
+        pp.up += next_track.up * (rel_motion - 0.5);
+
+        return pp;
     }
 
-    return profile_point;
+    return pp;
 }
 
 //------------------------------------------------------------------------------
