@@ -21,7 +21,7 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 add_definitions(-DTOPOLOGY_LIB)
 
 # Ищем зависимости Qt6
-#find_package(Qt6 COMPONENTS Xml REQUIRED)
+find_package(Qt6 COMPONENTS Xml REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -36,11 +36,17 @@ target_include_directories (${TARGET} PRIVATE ../physics/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
+target_include_directories (${TARGET} PRIVATE ../vehicle/include)
+target_include_directories (${TARGET} PRIVATE ../solver/include)
+target_include_directories (${TARGET} PRIVATE ../device/include)
+target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
 # Компонуемся с библиотеками Qt6
-#target_link_libraries (${TARGET} Qt6::Xml)
+target_link_libraries (${TARGET} Qt6::Xml)
 # и со своими не забываем
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} Journal)
 target_link_libraries (${TARGET} physics)
 target_link_libraries (${TARGET} CfgReader)
+target_link_libraries (${TARGET} device)
+target_link_libraries (${TARGET} vehicle)

@@ -43,6 +43,10 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
     {
         std::string line = "";
         std::getline(stream, line);
+
+        if (line.empty())
+            continue;
+
         lines.push_back(line);
     }
 
@@ -61,8 +65,12 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
         track_t track(p0, p1);
 
+        len += track.len;
+
         tracks.push_back(track);
     }
+
+    name = traj_name;
 
     return true;
 }

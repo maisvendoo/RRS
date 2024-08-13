@@ -658,7 +658,14 @@ void Model::initTraffic(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Model::initTopology(const init_data_t &init_data)
 {
-    topology->init(init_data.route_dir_name);
+    topology->load(init_data.route_dir_name);
+
+    topology_pos_t tp;
+    tp.traj_name = "route1";
+    tp.traj_coord = 1300.0;
+    tp.dir = 1;
+
+    topology->init(tp, train->getVehicles());
 }
 
 //------------------------------------------------------------------------------
