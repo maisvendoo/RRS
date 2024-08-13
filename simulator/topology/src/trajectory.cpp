@@ -89,6 +89,17 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Trajectory::getPosition(double traj_coord, dvec3 &position, dvec3 &attitude)
+{
+    track_t next_track;
+    track_t current_track = findTracks(traj_coord, next_track);
+
+    position = current_track.begin_point + current_track.orth * (traj_coord - current_track.traj_coord);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 track_t Trajectory::findTracks(double traj_coord, track_t &next_track)
 {
     if (tracks.size() == 0)

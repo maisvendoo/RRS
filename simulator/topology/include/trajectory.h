@@ -74,6 +74,9 @@ public:
         return *(tracks.end() - 1);
     }
 
+    /// Получить положение ПЕ на траектории
+    void getPosition(double traj_coord, dvec3 &position, dvec3 &attitude);
+
 private:
 
     QString name = "";
