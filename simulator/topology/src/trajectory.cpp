@@ -103,16 +103,28 @@ track_t Trajectory::findTracks(double traj_coord, track_t &next_track)
     {
         track_t track = this->getLastTrack();
 
+        // Если нет соннектора впереди
         if (fwd_connector == Q_NULLPTR)
         {
+            // Следующий трек сонаправлен текущему
+            next_track = track;
+            next_track.begin_point += track.orth * track.len;
+            next_track.end_point += track.orth * track.len;
+            next_track.traj_coord += track.len;
             return track;
         }
 
         // Смотрим, какая траектория впереди
         Trajectory *next_traj = fwd_connector->getFwdTraj();
 
+        // Если впереди нет траектории
         if (next_traj == Q_NULLPTR)
         {
+            // Следующий трек сонаправлен текущему
+            next_track = track;
+            next_track.begin_point += track.orth * track.len;
+            next_track.end_point += track.orth * track.len;
+            next_track.traj_coord += track.len;
             return track;
         }
 
