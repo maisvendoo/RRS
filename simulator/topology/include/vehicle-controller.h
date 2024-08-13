@@ -18,20 +18,27 @@ public:
 
     virtual ~VehicleController();
 
+    /// Устанавливаем текущую дуговую координату ПЕ
     void setRailwayCoord(double x);
 
+    /// Задание начальной дуговой координаты ПЕ
     void setInitRailwayCoord(double x);
 
+    /// Задание начальной траектории на которой находится ПЕ
     void setInitCurrentTraj(Trajectory *traj);
 
+    /// Задаем координату ПЕ вдоль траектории
     void setTrajCoord(double traj_coord) { this->traj_coord = traj_coord; }
 
+    /// Устанавливаем направление движения по траектории
     void setDirection(int dir) { this->dir = dir; }
 
     //vec3d getPosition(vec3d &attitude) const;
 
+    /// Вернуть указатель на текущую траекторию
     Trajectory *getCurrentTraj() const { return current_traj; }
 
+    /// Вернтуть текущую координату вдоль траектории
     double getTrajCoord() const { return traj_coord; }
 
 protected:
@@ -48,8 +55,10 @@ protected:
     /// Координата, в пределах текущей траектории
     double traj_coord = 0.0;
 
+    /// Текущая траектория ПЕ
     Trajectory *current_traj = Q_NULLPTR;
 
+    /// Предыдущая траектория ПЕ (за коннектором сзади по ходу движения)
     Trajectory *prev_traj = Q_NULLPTR;
 };
 

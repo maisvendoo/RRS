@@ -39,6 +39,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
     std::vector<std::string> lines;
 
+    // Читаем непустые линии из файла точек траектории
     while (!stream.eof())
     {
         std::string line = "";
@@ -52,9 +53,12 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
     for (size_t i = 0; i < lines.size() - 1; ++i)
     {
+        // Линия, описывающая начальную точку трека
         std::istringstream ss_begin(lines[i]);
+        // следующая линия описывает конечную точку трека
         std::istringstream ss_end(lines[i+1]);
 
+        // Читаем начальную и конечную точки
         dvec3 p0;
 
         ss_begin >> p0.x >> p0.y >> p0.z;
@@ -63,13 +67,16 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
         ss_end >> p1.x >> p1.y >> p1.z;
 
+        // Конструируем трек
         track_t track(p0, p1);
 
+        // Обновляем длину траектории
         len += track.len;
 
         tracks.push_back(track);
     }
 
+    // Заполняем имя траектории (по имени файла, где она хранится)
     name = traj_name;
 
     return true;
