@@ -127,9 +127,7 @@ void VehicleController::setInitCurrentTraj(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-/*vec3d VehicleController::getPosition(vec3d &attitude) const
+profile_point_t VehicleController::getPosition() const
 {
-    vec3d pos = current_traj->getPosition(traj_coord, attitude);
-
-    return pos;
-}*/
+    return current_traj->getPosition(traj_coord, dir);
+}

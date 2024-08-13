@@ -4,6 +4,7 @@
 #include    <QObject>
 
 #include    <topology-types.h>
+#include    <profile-point.h>
 
 //------------------------------------------------------------------------------
 //
@@ -33,7 +34,8 @@ public:
     /// Устанавливаем направление движения по траектории
     void setDirection(int dir) { this->dir = dir; }
 
-    //vec3d getPosition(vec3d &attitude) const;
+    /// Вернуть структуру, определяющую положение ПЕ в пространстве
+    profile_point_t getPosition() const;
 
     /// Вернуть указатель на текущую траекторию
     Trajectory *getCurrentTraj() const { return current_traj; }
