@@ -17,38 +17,14 @@
 
 #include    <QTime>
 
-#include    "CfgReader.h"
-#include    "Journal.h"
-#include    "JournalFile.h"
+#include    <CfgReader.h>
+#include    <Journal.h>
+#include    <JournalFile.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Model::Model(QObject *parent) : QObject(parent)
-  , t(0.0)
-  , dt(0.001)
-  , tau(0.0)
-  , start_time(0.0)
-  , stop_time(1000.0)
-  , is_step_correct(true)
-  , is_simulation_started(false)
-  , realtime_delay(0)
-  , integration_time_interval(100)
-  , is_debug_print(false)
-  , control_time(0)
-  , control_delay(0.05)
-  , current_vehicle(-1)
-//  , prev_current_vehicle(-1)
-  , controlled_vehicle(-1)
-  , prev_controlled_vehicle(-1)
-  , train(nullptr)
-  , profile(nullptr)
-  , server(nullptr)
-  , control_panel(nullptr)
-  , memory_sim_info(nullptr)
-  , memory_sim_update(nullptr)
-  , memory_controlled(nullptr)
-  , keys_data(nullptr)
+Model::Model(QObject *parent) : QObject(parent)  
 {
     simulator_info_t tmp_si = simulator_info_t();
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
@@ -186,6 +162,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Train creation and initialization
     Journal::instance()->info("==== Train initialization ====");
     train = new Train(profile);
+    train->setTopology(topology);
 
     Journal::instance()->info(QString("Created Train object at address: 0x%1")
                               .arg(reinterpret_cast<quint64>(train), 0, 16));
@@ -658,7 +635,14 @@ void Model::initTraffic(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Model::initTopology(const init_data_t &init_data)
 {
-    topology->init(init_data.route_dir_name);
+    topology->load(init_data.route_dir_name);
+
+    topology_pos_t tp;
+    tp.traj_name = "s01-chp";
+    tp.traj_coord = 10.0;
+    tp.dir = 1;
+
+    topology->init(tp, train->getVehicles());
 }
 
 //------------------------------------------------------------------------------
@@ -748,6 +732,7 @@ void Model::sharedMemoryFeedback()
 
     for (auto vehicle : *vehicles)
     {
+        topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
         profile_point_t *pp = vehicle->getProfilePoint();
 
         update_data.vehicles[i].position_x = pp->position.x;

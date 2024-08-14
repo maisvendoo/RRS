@@ -8,20 +8,8 @@
 //
 //------------------------------------------------------------------------------
 Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
-  , trainMass(0.0)
-  , trainLength(0.0)
-  , ode_order(0)
-  , dir(1)
-  , current_vehicle(0)
-  , controlled_vehicle(0)
-  , profile(profile)
-  , coeff_to_wheel_rail_friction(1.0)
-  , charging_pressure(0.0)
-  , no_air(false)
-  , init_main_res_pressure(0.0)
-  , train_motion_solver(nullptr)
 {
-
+    this->profile = profile;
 }
 
 //------------------------------------------------------------------------------
@@ -137,15 +125,18 @@ void Train::preStep(double t)
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
+    int i = 0;
     for (auto it = begin; it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        *vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
+        //*vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
+        *vehicle->getProfilePoint() = topology->getVehicleController(i)->getPosition(dir * vehicle->getOrientation());
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationPreStep(y, t);
+        ++i;
     }
 }
 
@@ -727,6 +718,8 @@ void Train::setInitConditions(const init_data_t &init_data)
     double x0 = init_data.init_coord * 1000.0 - dir * this->getFirstVehicle()->getLength() / 2.0;
     y[0] = x0;
 
+    vehicles[0]->setRailwayCoord(x0);
+
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
 
     for (size_t i = 1; i < vehicles.size(); i++)
@@ -738,6 +731,8 @@ void Train::setInitConditions(const init_data_t &init_data)
         size_t idxi = vehicles[i]->getIndex();
 
         y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
+
+        vehicles[i]->setRailwayCoord(y[idxi]);
 
         Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[idxi]).arg(i, 3));
     }

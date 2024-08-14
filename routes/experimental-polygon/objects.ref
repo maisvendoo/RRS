@@ -1,0 +1,90 @@
+;
+;			�����
+;
+[mipmap]
+1track	/models/tracks/1track.dmd	/textures/TrackSections.tga
+1track500l	/models/tracks/1track500l.dmd	/textures/TrackSections.tga
+1track500r	/models/tracks/1track500r.dmd	/textures/TrackSections.tga
+1track1000l	/models/tracks/1track1000l.dmd	/textures/TrackSections.tga
+1track1000r	/models/tracks/1track1000r.dmd	/textures/TrackSections.tga
+1track2000l	/models/tracks/1track2000l.dmd	/textures/TrackSections.tga
+1track2000r	/models/tracks/1track2000r.dmd	/textures/TrackSections.tga
+1track1-2	/models/tracks/1track1-2.dmd	/textures/TrackSections.tga
+1track1+2	/models/tracks/1track1+2.dmd	/textures/TrackSections.tga
+1track2-1	/models/tracks/1track2-1.dmd	/textures/TrackSections.tga
+1track2+1	/models/tracks/1track2+1.dmd	/textures/TrackSections.tga
+2track2+2	/models/tracks/2track2+2.dmd	/textures/TrackSections.tga
+2track2-2	/models/tracks/2track2-2.dmd	/textures/TrackSections.tga
+[not_mipmap]
+;
+;����� �� � ��
+;
+[smooth]
+op0l	/models/ks/op0l.dmd	/textures/KontSet.tga
+op0r	/models/ks/op0r.dmd	/textures/KontSet.tga
+op1l	/models/ks/op1l.dmd	/textures/KontSet.tga
+op1r	/models/ks/op1r.dmd	/textures/KontSet.tga
+op2l	/models/ks/op2l.dmd	/textures/KontSet.tga
+op2r	/models/ks/op2r.dmd	/textures/KontSet.tga
+op3l	/models/ks/op3l.dmd	/textures/KontSet.tga
+op3r	/models/ks/op3r.dmd	/textures/KontSet.tga
+op4l	/models/ks/op4l.dmd	/textures/KontSet.tga
+op4r	/models/ks/op4r.dmd	/textures/KontSet.tga
+op5l	/models/ks/op5l.dmd	/textures/KontSet.tga
+op5r	/models/ks/op5r.dmd	/textures/KontSet.tga
+opkl	/models/ks/opkl.dmd	/textures/KontSet.tga
+opkr	/models/ks/opkr.dmd	/textures/KontSet.tga
+opk-500l	/models/ks/opk-500l.dmd	/textures/KontSet.tga
+opk-500r	/models/ks/opk-500r.dmd	/textures/KontSet.tga
+opk500l	/models/ks/opk500l.dmd	/textures/KontSet.tga
+opk500r	/models/ks/opk500r.dmd	/textures/KontSet.tga
+opk-1000l	/models/ks/opk-1000l.dmd	/textures/KontSet.tga
+opk-1000r	/models/ks/opk-1000r.dmd	/textures/KontSet.tga
+opk1000l	/models/ks/opk1000l.dmd	/textures/KontSet.tga
+opk1000r	/models/ks/opk1000r.dmd	/textures/KontSet.tga
+opk-2000l	/models/ks/opk-2000l.dmd	/textures/KontSet.tga
+opk-2000r	/models/ks/opk-2000r.dmd	/textures/KontSet.tga
+opk2000l	/models/ks/opk2000l.dmd	/textures/KontSet.tga
+opk2000r	/models/ks/opk2000r.dmd	/textures/KontSet.tga
+;
+wirer	/models/ks/wire.dmd	/textures/KontSet.tga
+wirel	/models/ks/wire.dmd	/textures/KontSet.tga
+wire-500l	/models/ks/wire-500l.dmd	/textures/KontSet.tga
+wire500l	/models/ks/wire500l.dmd	/textures/KontSet.tga
+wire-500r	/models/ks/wire-500r.dmd	/textures/KontSet.tga
+wire500r	/models/ks/wire500r.dmd	/textures/KontSet.tga
+wire-1000l	/models/ks/wire-1000l.dmd	/textures/KontSet.tga
+wire1000l	/models/ks/wire1000l.dmd	/textures/KontSet.tga
+wire-1000r	/models/ks/wire-1000r.dmd	/textures/KontSet.tga
+wire1000r	/models/ks/wire1000r.dmd	/textures/KontSet.tga
+wire-2000l	/models/ks/wire-2000l.dmd	/textures/KontSet.tga
+wire2000l	/models/ks/wire2000l.dmd	/textures/KontSet.tga
+wire-2000r	/models/ks/wire-2000r.dmd	/textures/KontSet.tga
+wire2000r	/models/ks/wire2000r.dmd	/textures/KontSet.tga
+wire_switch	/models/ks/wire_switch.dmd	/textures/KontSet.tga
+;
+; �����
+;
+FloorR	/models/FloorR.dmd	/textures/trava.bmp
+FloorL	/models/FloorL.dmd	/textures/trava.bmp
+SteepR	/models/SteepR.dmd	/textures/trava.bmp
+SteepL	/models/SteepL.dmd	/textures/trava.bmp
+field0L	/models/poleL.dmd	/textures/pole0.bmp
+field0R	/models/poleR.dmd	/textures/pole0.bmp
+;
+; �������
+;
+signal_line	/models/signal_line.dmd	/textures/ab_signals.bmp
+signal_pred	/models/signal_pred.dmd	/textures/ab_signals.bmp
+signal_enter	/models/signal_enter.dmd	/textures/ab_signals.bmp
+signal_exit	/models/signal_exit.dmd	/textures/ab_signals.bmp
+sig_povt	/models/sig_povt.dmd	/textures/ab_signals.bmp
+sig_povt_k	/models/sig_povt_k.dmd	/textures/ab_signals.bmp
+signal_zag	/models/signal_zag.dmd	/textures/ab_signals.bmp
+sig_m2m	/models/sig_m2.dmd	/textures/ab_signals.bmp
+sig_k2m	/models/sig_k2.dmd	/textures/ab_signals.bmp
+sig_k5p	/models/sig_k5.dmd	/textures/ab_signals.bmp
+sig_k4p	/models/sig_k4.dmd	/textures/ab_signals.bmp
+sig_k3p	/models/sig_k3.dmd	/textures/ab_signals.bmp
+[not_smooth]
+plate	/models/plate.dmd	/textures/ab_signals.bmp

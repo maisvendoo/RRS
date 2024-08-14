@@ -58,7 +58,7 @@ int Application::exec()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CommandLineResult Application::parseCommandLine(QString &routeDir, QString &errorMessage)
+CommandLineResult Application::parseCommandLine(QString &route_dir, QString &errorMessage)
 {
     QCommandLineOption optHelp = parser.addHelpOption();
     QCommandLineOption optVersion = parser.addVersionOption();
@@ -83,7 +83,7 @@ CommandLineResult Application::parseCommandLine(QString &routeDir, QString &erro
 
     if (parser.isSet(optRouteDir))
     {
-        routeDir = parser.value(optRouteDir);
+        route_dir = parser.value(optRouteDir);
     }
 
     return CommandLineOK;

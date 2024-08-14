@@ -23,5 +23,6 @@ add_subdirectory (launcher)
 
 add_subdirectory (tools/profconv)
 add_subdirectory (tools/pathconv)
+add_subdirectory (tools/topology-gen)
 add_subdirectory (tools/routeconv)
 
