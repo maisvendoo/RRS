@@ -747,7 +747,6 @@ void Model::sharedMemoryFeedback()
 
     for (auto vehicle : *vehicles)
     {
-        topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
         profile_point_t *pp = vehicle->getProfilePoint();
 
         update_data.vehicles[i].position_x = pp->position.x;
