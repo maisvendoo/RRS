@@ -8,20 +8,8 @@
 //
 //------------------------------------------------------------------------------
 Train::Train(Profile *profile, QObject *parent) : OdeSystem(parent)
-  , trainMass(0.0)
-  , trainLength(0.0)
-  , ode_order(0)
-  , dir(1)
-  , current_vehicle(0)
-  , controlled_vehicle(0)
-  , profile(profile)
-  , coeff_to_wheel_rail_friction(1.0)
-  , charging_pressure(0.0)
-  , no_air(false)
-  , init_main_res_pressure(0.0)
-  , train_motion_solver(nullptr)
 {
-
+    this->profile = profile;
 }
 
 //------------------------------------------------------------------------------

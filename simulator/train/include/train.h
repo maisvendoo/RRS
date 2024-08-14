@@ -105,39 +105,39 @@ public:
 private:
 
     /// Train mass
-    double          trainMass;
+    double          trainMass = 0.0;
     /// Train length
-    double          trainLength;
+    double          trainLength = 0.0;
 
     /// Order of system ODE motion
-    size_t          ode_order;
+    size_t          ode_order = 0;
 
     /// Direction of motion on railway
-    int             dir;
+    int             dir = 1;
 
     /// Vehicle which selected by user for view
-    int             current_vehicle;
+    int             current_vehicle = 0;
 
     /// Vehicle which selected by user for control
-    int             controlled_vehicle;
+    int             controlled_vehicle = 0;
 
     /// Profile manager
-    Profile     *profile;
+    Profile     *profile = nullptr;
 
     /// Coefficient to friction between wheel and rail
-    double      coeff_to_wheel_rail_friction;
+    double      coeff_to_wheel_rail_friction = 1.0;
 
     /// Charging pressure
-    double      charging_pressure;
+    double      charging_pressure = 0.0;
 
     /// No air flag (for empty air system on start)
-    bool        no_air;
+    bool        no_air = false;
 
     /// Initial main reservoir pressure
-    double      init_main_res_pressure;
+    double      init_main_res_pressure = 0.0;
 
     /// Motion ODE's solver
-    Solver      *train_motion_solver;
+    Solver      *train_motion_solver = nullptr;
 
     /// Имя сетевого клиента для ВЖД
     QString     client_name;
