@@ -36,7 +36,7 @@ public:
     void setDirection(int dir) { this->dir = dir; }
 
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
-    profile_point_t getPosition();
+    profile_point_t getPosition(int dir);
 
     /// Вернуть указатель на текущую траекторию
     Trajectory *getCurrentTraj() const { return current_traj; }

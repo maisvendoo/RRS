@@ -186,6 +186,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Train creation and initialization
     Journal::instance()->info("==== Train initialization ====");
     train = new Train(profile);
+    train->setTopology(topology);
 
     Journal::instance()->info(QString("Created Train object at address: 0x%1")
                               .arg(reinterpret_cast<quint64>(train), 0, 16));
@@ -661,8 +662,8 @@ void Model::initTopology(const init_data_t &init_data)
     topology->load(init_data.route_dir_name);
 
     topology_pos_t tp;
-    tp.traj_name = "route1";
-    tp.traj_coord = 1300.0;
+    tp.traj_name = "s01-chp";
+    tp.traj_coord = 10.0;
     tp.dir = 1;
 
     topology->init(tp, train->getVehicles());
@@ -755,6 +756,7 @@ void Model::sharedMemoryFeedback()
 
     for (auto vehicle : *vehicles)
     {
+        topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
         profile_point_t *pp = vehicle->getProfilePoint();
 
         update_data.vehicles[i].position_x = pp->position.x;
@@ -766,23 +768,6 @@ void Model::sharedMemoryFeedback()
         update_data.vehicles[i].up_x = pp->up.x;
         update_data.vehicles[i].up_y = pp->up.y;
         update_data.vehicles[i].up_z = pp->up.z;
-
-        /*topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
-
-        // Получаем точку профиля из топологии
-        profile_point_t pp = topology->getVehicleController(i)->getPosition();
-        // Передаем её вайклу
-        vehicle->setProfilePoint(pp);
-
-        update_data.vehicles[i].position_x = pp.position.x;
-        update_data.vehicles[i].position_y = pp.position.y;
-        update_data.vehicles[i].position_z = pp.position.z;
-        update_data.vehicles[i].orth_x = pp.orth.x;
-        update_data.vehicles[i].orth_y = pp.orth.y;
-        update_data.vehicles[i].orth_z = pp.orth.z;
-        update_data.vehicles[i].up_x = pp.up.x;
-        update_data.vehicles[i].up_y = pp.up.y;
-        update_data.vehicles[i].up_z = pp.up.z;*/
 
         update_data.vehicles[i].orientation = vehicle->getOrientation();
 

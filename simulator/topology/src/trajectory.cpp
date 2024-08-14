@@ -112,13 +112,17 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
     if (rel_motion < 0.5)
     {
         pp.orth = cur_track.orth * (0.5 + rel_motion) * dir;
-        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;
+        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;        
 
         pp.right = cur_track.trav * (0.5 + rel_motion) * dir;
         pp.right += prev_track.trav * (0.5 - rel_motion) * dir;
 
         pp.up = cur_track.up * (0.5 + rel_motion);
         pp.up += prev_track.up * (0.5 - rel_motion);
+
+        pp.orth = normalize(pp.orth);
+        pp.right = normalize(pp.right);
+        pp.up = normalize(pp.up);
 
         return pp;
     }
@@ -133,6 +137,10 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 
         pp.up = cur_track.up * (1.5 - rel_motion);
         pp.up += next_track.up * (rel_motion - 0.5);
+
+        pp.orth = normalize(pp.orth);
+        pp.right = normalize(pp.right);
+        pp.up = normalize(pp.up);
 
         return pp;
     }

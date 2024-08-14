@@ -137,15 +137,18 @@ void Train::preStep(double t)
     auto begin = vehicles.begin();
     auto end = vehicles.end();
 
+    int i = 0;
     for (auto it = begin; it != end; ++it)
     {
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        *vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
+        //*vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
+        *vehicle->getProfilePoint() = topology->getVehicleController(i)->getPosition(dir * vehicle->getOrientation());
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationPreStep(y, t);
+        ++i;
     }
 }
 

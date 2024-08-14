@@ -26,6 +26,8 @@
 #include    "solver-config.h"
 #include    "profile.h"
 
+#include    <topology.h>
+
 #include    <QByteArray>
 
 #if defined(TRAIN_LIB)
@@ -95,6 +97,11 @@ public:
 
     std::vector<Vehicle *> *getVehicles();
 
+    void setTopology(Topology *topology)
+    {
+        this->topology = topology;
+    }
+
 private:
 
     /// Train mass
@@ -146,6 +153,8 @@ private:
 
     /// Solver's configuration
     solver_config_t solver_config;
+
+    Topology *topology = Q_NULLPTR;
 
     /// Train's loading
     bool loadTrain(QString cfg_path, const init_data_t &init_data);
