@@ -82,7 +82,18 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
     vehicle_control[0]->setInitRailwayCoord((*vehicles)[0]->getRailwayCoord());
 
     double traj_coord = tp.traj_coord;
-    Trajectory *cur_traj = traj_list[tp.traj_name];
+
+    Trajectory *cur_traj = traj_list.value(tp.traj_name, Q_NULLPTR);
+
+    if (cur_traj == Q_NULLPTR)
+    {
+        Journal::instance()->critical("INVALID INITIAL TRAJECTORY!!!");
+        return false;
+    }
+
+    Journal::instance()->info(QString("Vehcile #%1").arg(0) +
+                              " at traj: " + cur_traj->getName() +
+                              QString(" %1 m from start").arg(traj_coord));
 
     cur_traj->setBusy(true);
 
@@ -100,6 +111,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (conn == Q_NULLPTR)
             {
+                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
                 return false;
             }
 
@@ -107,6 +119,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (cur_traj == Q_NULLPTR)
             {
+                Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
                 return false;
             }
 
@@ -121,6 +134,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (conn == Q_NULLPTR)
             {
+                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't forward connector");
                 return false;
             }
 
@@ -128,6 +142,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (cur_traj == Q_NULLPTR)
             {
+                Journal::instance()->error("Connector " + conn->getName() + " has't forward trajectory");
                 return false;
             }
         }
@@ -136,6 +151,10 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
         vehicle_control[i]->setInitCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
         vehicle_control[i]->setInitRailwayCoord((*vehicles)[i]->getRailwayCoord());
+
+        Journal::instance()->info(QString("Vehcile #%1").arg(i) +
+                                  " at traj: " + cur_traj->getName() +
+                                  QString(" %1 m from start").arg(traj_coord));
 
         cur_traj->setBusy(true);
     }

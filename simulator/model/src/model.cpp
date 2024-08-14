@@ -649,7 +649,15 @@ void Model::initTopology(const init_data_t &init_data)
     tp.traj_coord = 10.0;
     tp.dir = 1;
 
-    topology->init(tp, train->getVehicles());
+    if (topology->init(tp, train->getVehicles()))
+    {
+        Journal::instance()->info("Topology initialized successfully");
+    }
+    else
+    {
+        Journal::instance()->critical("CAN'T INITIALIZE TOPOLOGY");
+        exit(0);
+    }
 }
 
 //------------------------------------------------------------------------------
