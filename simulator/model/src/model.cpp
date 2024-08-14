@@ -635,14 +635,29 @@ void Model::initTraffic(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Model::initTopology(const init_data_t &init_data)
 {
-    topology->load(init_data.route_dir_name);
+    if (topology->load(init_data.route_dir_name))
+    {
+        Journal::instance()->info("Loaded topology for route " + init_data.route_dir_name);
+    }
+    else
+    {
+        Journal::instance()->error("FAILED TOPOLOGY LOAD!!!");
+    }
 
     topology_pos_t tp;
     tp.traj_name = "s01-chp";
     tp.traj_coord = 10.0;
     tp.dir = 1;
 
-    topology->init(tp, train->getVehicles());
+    if (topology->init(tp, train->getVehicles()))
+    {
+        Journal::instance()->info("Topology initialized successfully");
+    }
+    else
+    {
+        Journal::instance()->critical("CAN'T INITIALIZE TOPOLOGY");
+        exit(0);
+    }
 }
 
 //------------------------------------------------------------------------------

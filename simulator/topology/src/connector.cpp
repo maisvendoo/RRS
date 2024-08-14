@@ -1,4 +1,5 @@
 #include    <connector.h>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -27,4 +28,6 @@ void Connector::configure(CfgReader &cfg,
 
     cfg.getString(secNode, "Name", name);
     cfg.getInt(secNode, "state", state);
+
+    Journal::instance()->info("Connector " + name + " will be initialized...");
 }

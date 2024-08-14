@@ -7,6 +7,9 @@
 #include    <switch.h>
 #include    <isolated-joint.h>
 
+#include    <Journal.h>
+#include    <filesystem.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -28,23 +31,42 @@ Topology::~Topology()
 //------------------------------------------------------------------------------
 bool Topology::load(QString route_dir)
 {
-    QStringList names = getTrajNamesList(route_dir);
+    FileSystem &fs = FileSystem::getInstance();
+
+    QString route_path = QString(fs.getRouteRootDir().c_str()) +
+                         QDir::separator() + route_dir;
+
+    QStringList names = getTrajNamesList(route_path);
 
     if (names.isEmpty())
+    {
+        Journal::instance()->error("TRAJECTORIES NOT FOUND!!!");
         return false;
+    }
 
     for (QString name : names)
     {
         Trajectory *traj = new Trajectory();
-        traj->load(route_dir, name);
+
+        if (traj->load(route_path, name))
+        {
+            Journal::instance()->info("Loaded trajectory: " + name);
+        }
+        else
+        {
+            Journal::instance()->error("Can't load trajectory: " + name);
+        }
 
         traj_list.insert(name, traj);
     }
 
     if (traj_list.size() == 0)
+    {
+        Journal::instance()->error("Empty list of trajectories");
         return false;
+    }
 
-    load_topology(route_dir);
+    load_topology(route_path);
 
     return true;
 }
@@ -56,6 +78,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 {
     if (vehicles->empty())
     {
+        Journal::instance()->error("Vehicles list is empty!!!");
         return false;
     }
 
@@ -68,7 +91,18 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
     vehicle_control[0]->setInitRailwayCoord((*vehicles)[0]->getRailwayCoord());
 
     double traj_coord = tp.traj_coord;
-    Trajectory *cur_traj = traj_list[tp.traj_name];
+
+    Trajectory *cur_traj = traj_list.value(tp.traj_name, Q_NULLPTR);
+
+    if (cur_traj == Q_NULLPTR)
+    {
+        Journal::instance()->critical("INVALID INITIAL TRAJECTORY!!!");
+        return false;
+    }
+
+    Journal::instance()->info(QString("Vehcile #%1").arg(0) +
+                              " at traj: " + cur_traj->getName() +
+                              QString(" %1 m from start").arg(traj_coord));
 
     cur_traj->setBusy(true);
 
@@ -86,6 +120,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (conn == Q_NULLPTR)
             {
+                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
                 return false;
             }
 
@@ -93,6 +128,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (cur_traj == Q_NULLPTR)
             {
+                Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
                 return false;
             }
 
@@ -107,6 +143,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (conn == Q_NULLPTR)
             {
+                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't forward connector");
                 return false;
             }
 
@@ -114,6 +151,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
             if (cur_traj == Q_NULLPTR)
             {
+                Journal::instance()->error("Connector " + conn->getName() + " has't forward trajectory");
                 return false;
             }
         }
@@ -122,6 +160,10 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
         vehicle_control[i]->setInitCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
         vehicle_control[i]->setInitRailwayCoord((*vehicles)[i]->getRailwayCoord());
+
+        Journal::instance()->info(QString("Vehcile #%1").arg(i) +
+                                  " at traj: " + cur_traj->getName() +
+                                  QString(" %1 m from start").arg(traj_coord));
 
         cur_traj->setBusy(true);
     }
@@ -142,9 +184,13 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 QStringList Topology::getTrajNamesList(QString route_dir)
 {
-    QDir traj_dir(route_dir + QDir::separator() +
-                  "topology" + QDir::separator() +
-                  + "trajectories");
+    QString path = route_dir + QDir::separator() +
+                   "topology" + QDir::separator() +
+                   + "trajectories";
+
+    QDir traj_dir(path);
+
+    Journal::instance()->info("Check trajectories at directory " + path);
 
     QDirIterator traj_files(traj_dir.path(),
                             QStringList() << "*.traj",
@@ -155,6 +201,9 @@ QStringList Topology::getTrajNamesList(QString route_dir)
     while (traj_files.hasNext())
     {
         QString fullpath = traj_files.next();
+
+        Journal::instance()->info("Found trajectory " + fullpath);
+
         QFileInfo file_info(fullpath);
 
         names_list << file_info.baseName();
@@ -175,7 +224,10 @@ bool Topology::load_topology(QString route_dir)
     CfgReader cfg;
 
     if (!cfg.load(path))
+    {
+        Journal::instance()->error("File " + path + " not found");
         return false;
+    }
 
     QDomNode secNode = cfg.getFirstSection("Switch");
 

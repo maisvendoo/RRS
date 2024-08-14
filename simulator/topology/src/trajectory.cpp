@@ -4,6 +4,7 @@
 #include    <QDir>
 
 #include    <fstream>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -35,6 +36,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
     if (!stream.is_open())
     {
+        Journal::instance()->error("File " + path + " not found");
         return false;
     }
 
