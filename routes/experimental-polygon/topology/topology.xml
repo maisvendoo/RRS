@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	
+	<Joint>
+
+		<Name>s01-ch</Name>
+
+		<SignalLetter>Ч</SignalLetter>
+		<SignalModel></SignalModel>
+		<SignalModule></SignalModule>
+
+		<bwdTraj>s01-chp1</bwdTraj>
+		<fwdTraj>s01-chp</fwdTraj>
+
+	</Joint>
+
+	<Switch>
+
+		<Name>s01-sw2</Name>				
+
+		<bwdMinusTraj>s01-chp</bwdMinusTraj>		
+		<fwdMinusTraj>s01-2sp</fwdMinusTraj>
+		<state>-1</state>
+
+	</Switch>
+
+	<Switch>				
+
+		<Name>s01-sw8</Name>
+
+		<bwdMinusTraj>s01-2sp</bwdMinusTraj>		
+		<fwdMinusTraj>s01-8_12sp</fwdMinusTraj>
+		<state>-1</state>
+
+	</Switch>
+
+	<Switch>
+
+		<Name>s01-sw12</Name>				
+
+		<bwdMinusTraj>s01-8_12sp</bwdMinusTraj>		
+		<fwdMinusTraj>s01-2p</fwdMinusTraj>
+
+		<bwdPlusTraj>s01-8_12sp</bwdPlusTraj>
+		<fwdPlusTraj>s01-4p</fwdPlusTraj>	
+
+		<state>1</state>
+
+	</Switch>
+
+	<Joint>
+
+		<Name>s01-ch2</Name>
+
+		<SignalLetter>Ч2</SignalLetter>
+		<SignalModel></SignalModel>
+		<SignalModule></SignalModule>
+
+		<bwdTraj>s01-2p</bwdTraj>
+		<fwdTraj>s01-7_11sp</fwdTraj>
+
+	</Joint>
+
+	<Switch>
+
+		<Name>s01-sw11</Name>				
+
+		<bwdMinusTraj>s01-7_11sp</bwdMinusTraj>		
+		<fwdMinusTraj>s01-1sp</fwdMinusTraj>
+
+		<bwdPlusTraj>s01-4p</bwdPlusTraj>
+		<fwdPlusTraj>s01-1sp</fwdPlusTraj>
+
+		<state>1</state>
+
+	</Switch>
+
+	<Switch>
+
+		<Name>s01-sw7</Name>				
+
+		<bwdMinusTraj>s01-1sp</bwdMinusTraj>		
+		<fwdMinusTraj>s01-ndp</fwdMinusTraj>
+		<state>-1</state>
+
+	</Switch>
+
+	<Switch>
+
+		<Name>s01-sw1</Name>				
+
+		<bwdMinusTraj>s01-ndp</bwdMinusTraj>		
+		<fwdMinusTraj>s01-nu1</fwdMinusTraj>
+		<state>-1</state>
+
+	</Switch>
+
+</Config>
