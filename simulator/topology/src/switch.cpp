@@ -1,4 +1,5 @@
 #include    <switch.h>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -51,6 +52,8 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 {
     Connector::configure(cfg, secNode, traj_list);
 
+    Journal::instance()->info("Connector type: switch");
+
     QString fwd_minus_name;
     cfg.getString(secNode, "fwdMinusTraj", fwd_minus_name);
     fwdMinusTraj = traj_list.value(fwd_minus_name, Q_NULLPTR);
@@ -70,20 +73,40 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     if (bwdMinusTraj != Q_NULLPTR)
     {
         bwdMinusTraj->setFwdConnector(this);
+        Journal::instance()->info("Backward minus traj: " + bwdMinusTraj->getName());
+    }
+    else
+    {
+        Journal::instance()->info("Backward minus traj: NONE");
     }
 
     if (bwdPlusTraj != Q_NULLPTR)
     {
         bwdPlusTraj->setFwdConnector(this);
+         Journal::instance()->info("Backward plus traj: " + bwdPlusTraj->getName());
+    }
+    else
+    {
+        Journal::instance()->info("Backward plus traj: NONE");
     }
 
     if (fwdMinusTraj != Q_NULLPTR)
     {
         fwdMinusTraj->setBwdConnector(this);
+        Journal::instance()->info("Forward minus traj: " + fwdMinusTraj->getName());
+    }
+    else
+    {
+        Journal::instance()->info("Forward minus traj: NONE");
     }
 
     if (fwdPlusTraj != Q_NULLPTR)
     {
         fwdPlusTraj->setBwdConnector(this);
+        Journal::instance()->info("Forward plus traj: " + fwdPlusTraj->getName());
+    }
+    else
+    {
+        Journal::instance()->info("Forward plus traj: NONE");
     }
 }

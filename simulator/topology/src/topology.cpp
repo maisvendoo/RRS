@@ -7,6 +7,8 @@
 #include    <switch.h>
 #include    <isolated-joint.h>
 
+#include    <Journal.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -36,13 +38,24 @@ bool Topology::load(QString route_dir)
     for (QString name : names)
     {
         Trajectory *traj = new Trajectory();
-        traj->load(route_dir, name);
+
+        if (traj->load(route_dir, name))
+        {
+            Journal::instance()->info("Loaded trajectory: " + name);
+        }
+        else
+        {
+            Journal::instance()->error("Can't load trajectory: " + name);
+        }
 
         traj_list.insert(name, traj);
     }
 
     if (traj_list.size() == 0)
+    {
+        Journal::instance()->error("Empty list of trajectories");
         return false;
+    }
 
     load_topology(route_dir);
 
@@ -175,7 +188,10 @@ bool Topology::load_topology(QString route_dir)
     CfgReader cfg;
 
     if (!cfg.load(path))
+    {
+        Journal::instance()->error("File " + path + " not found");
         return false;
+    }
 
     QDomNode secNode = cfg.getFirstSection("Switch");
 
