@@ -107,7 +107,7 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
     pp.inclination = cur_track.inclination * dir;
 
     // Относительное перемещение вдоль текущего трека
-    double rel_motion = traj_coord / len;
+    double rel_motion = (traj_coord - cur_track.traj_coord) / cur_track.len;
 
     if (rel_motion < 0.5)
     {
