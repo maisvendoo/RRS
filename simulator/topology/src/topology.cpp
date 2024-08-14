@@ -69,6 +69,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 {
     if (vehicles->empty())
     {
+        Journal::instance()->error("Vehicles list is empty!!!");
         return false;
     }
 

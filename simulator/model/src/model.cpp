@@ -635,7 +635,14 @@ void Model::initTraffic(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 void Model::initTopology(const init_data_t &init_data)
 {
-    topology->load(init_data.route_dir_name);
+    if (topology->load(init_data.route_dir_name))
+    {
+        Journal::instance()->info("Loaded topology for route " + init_data.route_dir_name);
+    }
+    else
+    {
+        Journal::instance()->error("Failed topology load!!!");
+    }
 
     topology_pos_t tp;
     tp.traj_name = "s01-chp";
