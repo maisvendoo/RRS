@@ -641,7 +641,7 @@ void Model::initTopology(const init_data_t &init_data)
     }
     else
     {
-        Journal::instance()->error("Failed topology load!!!");
+        Journal::instance()->error("FAILED TOPOLOGY LOAD!!!");
     }
 
     topology_pos_t tp;

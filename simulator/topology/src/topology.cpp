@@ -8,6 +8,7 @@
 #include    <isolated-joint.h>
 
 #include    <Journal.h>
+#include    <filesystem.h>
 
 //------------------------------------------------------------------------------
 //
@@ -30,16 +31,24 @@ Topology::~Topology()
 //------------------------------------------------------------------------------
 bool Topology::load(QString route_dir)
 {
-    QStringList names = getTrajNamesList(route_dir);
+    FileSystem &fs = FileSystem::getInstance();
+
+    QString route_path = QString(fs.getRouteRootDir().c_str()) +
+                         QDir::separator() + route_dir;
+
+    QStringList names = getTrajNamesList(route_path);
 
     if (names.isEmpty())
+    {
+        Journal::instance()->error("TRAJECTORIES NOT FOUND!!!");
         return false;
+    }
 
     for (QString name : names)
     {
         Trajectory *traj = new Trajectory();
 
-        if (traj->load(route_dir, name))
+        if (traj->load(route_path, name))
         {
             Journal::instance()->info("Loaded trajectory: " + name);
         }
@@ -57,7 +66,7 @@ bool Topology::load(QString route_dir)
         return false;
     }
 
-    load_topology(route_dir);
+    load_topology(route_path);
 
     return true;
 }
@@ -175,9 +184,13 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 QStringList Topology::getTrajNamesList(QString route_dir)
 {
-    QDir traj_dir(route_dir + QDir::separator() +
-                  "topology" + QDir::separator() +
-                  + "trajectories");
+    QString path = route_dir + QDir::separator() +
+                   "topology" + QDir::separator() +
+                   + "trajectories";
+
+    QDir traj_dir(path);
+
+    Journal::instance()->info("Check trajectories at directory " + path);
 
     QDirIterator traj_files(traj_dir.path(),
                             QStringList() << "*.traj",
@@ -188,6 +201,9 @@ QStringList Topology::getTrajNamesList(QString route_dir)
     while (traj_files.hasNext())
     {
         QString fullpath = traj_files.next();
+
+        Journal::instance()->info("Found trajectory " + fullpath);
+
         QFileInfo file_info(fullpath);
 
         names_list << file_info.baseName();
