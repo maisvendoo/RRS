@@ -98,57 +98,57 @@ public slots:
 private:
 
     /// Current simulation time
-    double      t;
+    double      t = 0.0;
     /// Current simulation time step
-    double      dt;
+    double      dt = 1e-3;
     /// Current simulation time in current integration interval
-    double      tau;
+    double      tau = 0.0;
     /// Simulation start time
-    double      start_time;
+    double      start_time = 0.0;
     /// Simulation stop time
-    double      stop_time;
+    double      stop_time = 1000.0;
     /// Flag of integration step is correct
-    bool        is_step_correct;
+    bool        is_step_correct = true;
     /// Flag is simulation thread started
-    bool        is_simulation_started;
+    bool        is_simulation_started = false;
     /// Delay for realtime simulation
-    int         realtime_delay;
+    int         realtime_delay = 0;
     /// Minimal intergation interval
-    int         integration_time_interval;
+    int         integration_time_interval = 100;
     /// Flag, which allow debug print
-    bool        is_debug_print;    
+    bool        is_debug_print = false;
 
-    double      control_time;
-    double      control_delay;
+    double      control_time = 0.0;
+    double      control_delay = 0.05;
 
     /// Vehicle which selected by user for view
-    int             current_vehicle;
+    int             current_vehicle = -1;
 //    int             prev_current_vehicle;
 
     /// Vehicle which selected by user for control
-    int             controlled_vehicle;
-    int             prev_controlled_vehicle;
+    int             controlled_vehicle = -1;
+    int             prev_controlled_vehicle = -1;
 
     /// Train model
-    Train       *train;    
+    Train       *train = nullptr;
 
     /// Profile
-    Profile     *profile;
+    Profile     *profile = nullptr;
 
     /// TCP-server
-    Server      *server;
+    Server      *server = nullptr;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
-    VirtualInterfaceDevice  *control_panel;
+    VirtualInterfaceDevice  *control_panel = nullptr;
 
     /// Клиент для связи с ВЖД
-    SimTcpClient *sim_client;
+    SimTcpClient *sim_client = nullptr;
 
     /// Система СЦБ
-    Signaling *signaling;
+    Signaling *signaling = nullptr;
 
     /// Система трафика
-    TrafficMachine  *traffic_machine;
+    TrafficMachine  *traffic_machine = nullptr;
 
     /// Топология
     Topology *topology = new Topology();

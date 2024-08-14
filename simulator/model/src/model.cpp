@@ -17,38 +17,14 @@
 
 #include    <QTime>
 
-#include    "CfgReader.h"
-#include    "Journal.h"
-#include    "JournalFile.h"
+#include    <CfgReader.h>
+#include    <Journal.h>
+#include    <JournalFile.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Model::Model(QObject *parent) : QObject(parent)
-  , t(0.0)
-  , dt(0.001)
-  , tau(0.0)
-  , start_time(0.0)
-  , stop_time(1000.0)
-  , is_step_correct(true)
-  , is_simulation_started(false)
-  , realtime_delay(0)
-  , integration_time_interval(100)
-  , is_debug_print(false)
-  , control_time(0)
-  , control_delay(0.05)
-  , current_vehicle(-1)
-//  , prev_current_vehicle(-1)
-  , controlled_vehicle(-1)
-  , prev_controlled_vehicle(-1)
-  , train(nullptr)
-  , profile(nullptr)
-  , server(nullptr)
-  , control_panel(nullptr)
-  , memory_sim_info(nullptr)
-  , memory_sim_update(nullptr)
-  , memory_controlled(nullptr)
-  , keys_data(nullptr)
+Model::Model(QObject *parent) : QObject(parent)  
 {
     simulator_info_t tmp_si = simulator_info_t();
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
