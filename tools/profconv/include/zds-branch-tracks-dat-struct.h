@@ -59,6 +59,16 @@ struct zds_branch_track_t
     std::vector<calculated_branch_point_t> branch_trajectory = {};
 
     route_trajectories_t trajectories = {};
+
+    static bool compare_by_track_id_begin(const zds_branch_track_t* left, const zds_branch_track_t* right)
+    {
+        return left->id_begin < right->id_begin;
+    };
+
+    static bool compare_by_track_id_end(const zds_branch_track_t* left, const zds_branch_track_t* right)
+    {
+        return left->id_end < right->id_end;
+    };
 };
 
 //------------------------------------------------------------------------------
@@ -78,6 +88,16 @@ struct zds_branch_2_2_t
     bool is_bwd = false;
     zds_branch_point_t  branch_point_bwd = zds_branch_point_t();
     trajectory_t trajectory = {};
+
+    static bool compare_by_track_id1(const zds_branch_2_2_t* left, const zds_branch_2_2_t* right)
+    {
+        return left->id1 < right->id1;
+    };
+
+    static bool compare_by_track_id2(const zds_branch_2_2_t* left, const zds_branch_2_2_t* right)
+    {
+        return left->id2 < right->id2;
+    };
 };
 
 //------------------------------------------------------------------------------

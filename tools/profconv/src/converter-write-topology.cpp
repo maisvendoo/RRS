@@ -25,11 +25,12 @@ void ZDSimConverter::writeTopologyTrajectory(const trajectory_t* trajectory)
 
     for (auto point = trajectory->points.begin(); point != trajectory->points.end(); ++point)
     {
-        stream << point->point.x << DELIMITER_SYMBOL
-               << point->point.y << DELIMITER_SYMBOL
-               << point->point.z << DELIMITER_SYMBOL
-               << static_cast<int>(round(point->railway_coord)) << DELIMITER_SYMBOL
-               << point->trajectory_coord << "\n";
+        stream                  << point->point.x
+            << DELIMITER_SYMBOL << point->point.y
+            << DELIMITER_SYMBOL << point->point.z
+            << DELIMITER_SYMBOL << static_cast<int>(round(point->railway_coord))
+            << DELIMITER_SYMBOL << point->trajectory_coord
+            << "\n";
     }
 }
 

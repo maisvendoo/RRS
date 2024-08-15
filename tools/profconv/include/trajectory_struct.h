@@ -60,9 +60,13 @@ struct split_zds_trajectory_t
         SPLIT_TO_SIDE = 5,
         SPLIT_FROM_SIDE = 6,
 
+        // Стрелки на бок, прописанные в .trk, но без прописанных боковых путей
+        SPLIT_TO_SIDE_NO_BRANCH = 7,
+        SPLIT_FROM_SIDE_NO_BRANCH = 8,
+
         // Светофор
-        SPLIT_SIGNAL_FWD = 7,
-        SPLIT_SIGNAL_BWD = 8,
+        SPLIT_SIGNAL_FWD = 9,
+        SPLIT_SIGNAL_BWD = 10,
     };
 
     size_t track_id = 0;

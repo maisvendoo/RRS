@@ -156,11 +156,11 @@ private:
 
     void nameBranch22(zds_branch_2_2_t *branch_track, const int &dir, size_t num_trajectories);
 
-    void writeSplits(const int &dir);
-
     bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
 
     bool findNeutralInsertions(std::ifstream &stream, std::vector<neutral_insertion_t> ni);
+
+    void writeSplits(const route_connectors_t &connectors, const int &dir);
 
     void writeTopologyTrajectory(const trajectory_t* trajectory);
 

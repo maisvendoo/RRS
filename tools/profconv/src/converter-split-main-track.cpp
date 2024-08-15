@@ -70,14 +70,14 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                     is_branch = true;
 
                     // Разделение в начале данного трека
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
 
                     // Добавляем разделение и в соседний главный путь
                     split_zds_trajectory_t split2 = split_zds_trajectory_t();
                     split2.track_id = branch22->id2;
                     split2.point = tracks_data2[branch22->id2].begin_point;
                     split2.railway_coord = tracks_data2[branch22->id2].railway_coord;
-                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
                     addOrCreateSplit(split_data2, split2);
 
                     break;
@@ -87,7 +87,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             if ((track.arrows == "2-2") && (!is_branch))
             {
                 // Разделение в начале данного трека
-                split.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
 
                 // Добавляем разделение и в соседний главный путь
                 float coord;
@@ -194,7 +194,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             // Добавляем стрелки "+2" или "-2", записанные в route.trk
             if ( ((track.arrows == "+2") || (track.arrows == "-2")) && (!is_branch) )
             {
-                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
             }
             // Добавляем съезды с боковых путей, найденных в branch_tracks
             is_branch = false;
@@ -221,7 +221,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 split_at_next.track_id = id + 1;
                 split_at_next.point = track.end_point;
                 split_at_next.railway_coord = track.railway_coord_end;
-                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
                 addOrCreateSplit(split_data1, split_at_next);
             }
 
@@ -269,7 +269,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             // Добавляем стрелки "+2" или "-2", записанные в route.trk
             if ( ((track.arrows == "+2") || (track.arrows == "-2")) && (!is_branch) )
             {
-                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
             }
             // Добавляем съезды с боковых путей, найденных в branch_tracks
             is_branch = false;
@@ -304,7 +304,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 split_at_next.track_id = id + 1;
                 split_at_next.point = track.end_point;
                 split_at_next.railway_coord = track.railway_coord_end;
-                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
                 if (track.id_at_track1 == -1)
                 {
                     addOrCreateSplit(split_data2, split_at_next);
@@ -345,96 +345,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
 
             ++id;
         }
-        std::sort(split_data1.begin(), split_data1.end(), split_zds_trajectory_t::compare_by_track_id);
-        std::sort(split_data2.begin(), split_data2.end(), split_zds_trajectory_t::compare_by_track_id);
     }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ZDSimConverter::writeSplits(const int &dir)
-{
-    // Вывод в файл, для отладки
-    std::string path;
-    route_connectors_t* data;
-    if (dir > 0)
-    {
-        path = compinePath(toNativeSeparators(topologyDir), "split1.conf");
-        data = &split_data1;
-    }
-    else
-    {
-        path = compinePath(toNativeSeparators(topologyDir), "split2.conf");
-        data = &split_data2;
-    }
-
-    QFile file_old(QString(path.c_str()));
-    if (file_old.exists())
-        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
-
-    QFile file(QString(path.c_str()));
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    QTextStream stream(&file);
-    stream.setEncoding(QStringConverter::Utf8);
-    stream.setRealNumberNotation(QTextStream::FixedNotation);
-
-    for (auto it = data->begin(); it != data->end(); ++it)
-    {
-        stream << (*it)->point.x << ";"
-               << (*it)->point.y << ";"
-               << (*it)->point.z << ";"
-               << (*it)->track_id << ";"
-               << static_cast<int>(round((*it)->railway_coord)) << ";";
-        for (auto type_it : (*it)->split_type)
-        {
-            switch (type_it)
-            {
-            case split_zds_trajectory_t::SPLIT_2MINUS2:
-            {
-                stream << "splitby2minus2;";
-                break;
-            }
-            case split_zds_trajectory_t::SPLIT_2PLUS2:
-            {
-                stream << "splitby2plus2;";
-                break;
-            }
-            case split_zds_trajectory_t::SPLIT_2_1:
-            {
-                stream << "splitby1begin;";
-                break;
-            }
-            case split_zds_trajectory_t::SPLIT_1_2:
-            {
-                stream << "splitby2begin;";
-                break;
-            }
-            case split_zds_trajectory_t::SPLIT_TO_SIDE:
-            case split_zds_trajectory_t::SPLIT_FROM_SIDE:
-            {
-                stream << "splitbyside_" << type_it << ";";
-                break;
-            }
-            case split_zds_trajectory_t::SPLIT_SIGNAL_FWD:
-            {
-                stream << "splitsignF_" << (*it)->signal_fwd_liter.c_str() << ";";
-                break;
-            }
-            case split_zds_trajectory_t::SPLIT_SIGNAL_BWD:
-            {
-                stream << "splitsignB_" << (*it)->signal_bwd_liter.c_str() << ";";
-                break;
-            }
-            default: stream << "WARN_" << type_it << ";";
-            }
-        }
-        stream << "\n";
-    }
-
-    file.close();
 }
 
 //------------------------------------------------------------------------------
@@ -502,10 +413,59 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
         trajectories = &trajectories2;
     }
 
+    bool was_1_track = false;
     for (auto it = tracks_data->begin(); it != tracks_data->end(); ++it)
     {
         if ((dir < 0) && (it->id_at_track1 != -1))
+        {
+            if ((!was_1_track) && (it->id_at_track1 != 0))
+            {
+                // Начало однопутного участка
+                for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
+                {
+                    if ((*split)->track_id == it->id_at_track1)
+                    {
+                    name_cur = name_prefix +
+                               QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                    ++num_traj;
+                    name_next = name_prefix +
+                                QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+
+                    // Добавляем последюю точку в траекторию
+                    point_t end_point;
+                    end_point.point = it->begin_point;
+                    end_point.railway_coord = it->railway_coord;
+                    end_point.trajectory_coord = trajectory_length + it->length;
+                    trajectory.points.push_back(end_point);
+                    trajectory.name = name_cur;
+                    trajectories->push_back(new trajectory_t(trajectory));
+
+                    // Делаем траекторию главного пути "туда" сзади боковой
+                    (*split)->bwd_side_traj = (*split)->bwd_main_traj;
+                    // Делаем траекторию данного пути ("обратно") сзади основной
+                    (*split)->bwd_main_traj = name_cur;
+
+                    trajectory.points.clear();
+                    trajectory_length = 0.0;
+                    }
+                }
+            }
+            if ((it + 1)->id_at_track1 != -1)
+            {
+                // Однопутный участок
+                was_1_track = true;
+            }
+            else
+            {
+                // Конец однопутного участка/*
+                for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
+                {
+                    // ========= TODO ==============
+                }
+            }
+
             continue;
+        }
 
         point_t point;
         point.point = it->begin_point;
@@ -547,4 +507,126 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             trajectory_length += it->length;
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::writeSplits(const route_connectors_t &connectors, const int &dir)
+{
+    // Вывод в файл, для отладки
+    std::string path;
+    if (dir == 0)
+    {
+        path = compinePath(toNativeSeparators(topologyDir), "branch_split.conf");
+    }
+    if (dir == 1)
+    {
+        path = compinePath(toNativeSeparators(topologyDir), "split1.conf");
+    }
+    if (dir == -1)
+    {
+        path = compinePath(toNativeSeparators(topologyDir), "split2.conf");
+    }
+
+    QFile file_old(QString(path.c_str()));
+    if (file_old.exists())
+        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
+
+    QFile file(QString(path.c_str()));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream.setRealNumberNotation(QTextStream::FixedNotation);
+
+    for (auto it = connectors.begin(); it != connectors.end(); ++it)
+    {
+        stream                  << (*it)->point.x
+            << DELIMITER_SYMBOL << (*it)->point.y
+            << DELIMITER_SYMBOL << (*it)->point.z
+            << DELIMITER_SYMBOL << (*it)->track_id
+            << DELIMITER_SYMBOL << static_cast<int>(round((*it)->railway_coord))
+            << DELIMITER_SYMBOL << (*it)->bwd_main_traj.c_str()
+            << DELIMITER_SYMBOL << (*it)->fwd_main_traj.c_str();
+        for (auto type_it : (*it)->split_type)
+        {
+            switch (type_it)
+            {
+            case split_zds_trajectory_t::SPLIT_2MINUS2:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitby2minus2_";
+                if (dir == 1)
+                    stream << (*it)->fwd_side_traj.c_str();
+                if (dir == -1)
+                    stream << (*it)->bwd_side_traj.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_2PLUS2:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitby2plus2_";
+                if (dir == 1)
+                    stream << (*it)->bwd_side_traj.c_str();
+                if (dir == -1)
+                    stream << (*it)->fwd_side_traj.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_2_1:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitby1begin__!!!__!!!__!!!__!!!__";
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_1_2:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitby2begin__!!!__!!!__!!!__!!!__";
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_TO_SIDE:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitbyside2_" << (*it)->fwd_side_traj.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_FROM_SIDE:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitbyside1_" << (*it)->bwd_side_traj.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitbyside2__!!!__NO_BRANCH__!!!__" << (*it)->fwd_side_traj.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitbyside1__!!!__NO_BRANCH__!!!__" << (*it)->bwd_side_traj.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_SIGNAL_FWD:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitsignF_________________" << (*it)->signal_fwd_liter.c_str();
+                break;
+            }
+            case split_zds_trajectory_t::SPLIT_SIGNAL_BWD:
+            {
+                stream << DELIMITER_SYMBOL
+                       << "splitsignB_________________" << (*it)->signal_bwd_liter.c_str();
+                break;
+            }
+            default: stream << DELIMITER_SYMBOL << "WARN_" << type_it;
+            }
+        }
+        stream << "\n";
+    }
+
+    file.close();
 }

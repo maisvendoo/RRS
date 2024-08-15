@@ -235,7 +235,6 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         int dir = 1;
         findSplitsMainTrajectories(dir);
-        splitMainTrajectory(dir);
         writeMainTrajectory(traj_file1, tracks_data1);
     }
 
@@ -243,32 +242,29 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         int dir = -1;
         findSplitsMainTrajectories(dir);
-        splitMainTrajectory(dir);
         writeMainTrajectory(traj_file2, tracks_data2);
     }
 
-    // Отладка разделения главных путей на подтраектории
+    // Разделение главных путей на подтраектории
     if (is_1)
     {
+        int dir = 1;
+        std::sort(split_data1.begin(), split_data1.end(), split_zds_trajectory_t::compare_by_track_id);
+        splitMainTrajectory(dir);
         for (auto it = trajectories1.begin(); it != trajectories1.end(); ++it)
         {
             writeTopologyTrajectory(*it);
         }
-
-        // Отладка разделения главных путей на подтраектории
-        int dir = 1;
-        writeSplits(dir);
     }
     if (is_1 && is_2)
     {
+        int dir = -1;
+        std::sort(split_data2.begin(), split_data2.end(), split_zds_trajectory_t::compare_by_track_id);
+        splitMainTrajectory(dir);
         for (auto it = trajectories2.begin(); it != trajectories2.end(); ++it)
         {
             writeTopologyTrajectory(*it);
         }
-
-        // Отладка разделения главных путей на подтраектории
-        int dir = -1;
-        writeSplits(dir);
     }
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
@@ -279,6 +275,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (!branch_track_data1.empty())
     {
+        std::sort(branch_track_data1.begin(), branch_track_data1.end(), zds_branch_track_t::compare_by_track_id_begin);
+
         int dir = 1;
         size_t num_trajectories = 0;
         for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
@@ -295,6 +293,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (!branch_track_data2.empty())
     {
+        std::sort(branch_track_data2.begin(), branch_track_data2.end(), zds_branch_track_t::compare_by_track_id_end);
+
         int dir = -1;
         size_t num_trajectories = 0;
         for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
@@ -311,6 +311,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (!branch_2minus2_data.empty())
     {
+        std::sort(branch_2minus2_data.begin(), branch_2minus2_data.end(), zds_branch_2_2_t::compare_by_track_id1);
+
         int dir = 1;
         size_t num_trajectories = 0;
         for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
@@ -324,6 +326,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (!branch_2plus2_data.empty())
     {
+        std::sort(branch_2plus2_data.begin(), branch_2plus2_data.end(), zds_branch_2_2_t::compare_by_track_id2);
+
         int dir = -1;
         size_t num_trajectories = 0;
         for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
@@ -334,6 +338,14 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             writeTopologyTrajectory(&branch_track->trajectory);
         }
     }
+
+    // Отладка разделения путей на подтраектории
+    int dir = 0;
+    writeSplits(branch_connectors, dir);
+    dir = 1;
+    writeSplits(split_data1, dir);
+    dir = -1;
+    writeSplits(split_data2, dir);
 
     return true;
 }

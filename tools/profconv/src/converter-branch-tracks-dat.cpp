@@ -598,26 +598,46 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t *branch_track, const 
     double trajectory_length = 0.0;
     trajectory_t trajectory = trajectory_t();
     size_t num_sub_traj = 1;
-    size_t begin_id;
-    size_t end_id;
+    size_t begin_point_id;
+    size_t end_point_id;
     std::string name_prefix;
     std::string name_cur;
     std::string name_next;
+    route_connectors_t* split_data;
     if (dir > 0)
     {
-        begin_id = 0;
-        end_id = branch_track->branch_trajectory.size() - 1;
+        begin_point_id = 0;
+        end_point_id = branch_track->branch_trajectory.size() - 1;
         name_prefix = "branch1_";
+        split_data = &split_data1;
     }
     else
     {
-        begin_id = branch_track->branch_trajectory.size() - 1;
-        end_id = 0;
+        begin_point_id = branch_track->branch_trajectory.size() - 1;
+        end_point_id = 0;
         name_prefix = "branch2_";
+        split_data = &split_data2;
     }
     name_next = name_prefix +
         QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString();
-    for (size_t i = begin_id; i != end_id; i += dir)
+    for (auto split = split_data->begin(); split != split_data->end(); ++split)
+    {
+        if (dir > 0)
+        {
+            if ((*split)->track_id == branch_track->id_begin)
+            {
+                (*split)->fwd_side_traj = name_next;
+            }
+        }
+        else
+        {
+            if ((*split)->track_id == branch_track->id_end)
+            {
+                (*split)->fwd_side_traj = name_next;
+            }
+        }
+    }
+    for (size_t i = begin_point_id; i != end_point_id; i += dir)
     {
         point_t point;
         point.point = branch_track->branch_trajectory[i].point;
@@ -637,6 +657,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t *branch_track, const 
                     QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString();
 
                 split_zds_trajectory_t split;
+                split.point = branch_track->branch_trajectory[i + dir].point;
+                split.railway_coord = branch_track->branch_trajectory[i + dir].railway_coord;
                 split.bwd_main_traj = name_cur;
                 split.fwd_main_traj = name_next;
                 if (dir > 0)
@@ -654,14 +676,38 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t *branch_track, const 
             }
         }
 
-        if (is_split_next || (i + dir == end_id))
+        if (is_split_next || (i + dir == end_point_id))
         {
             point_t end_point;
             end_point.point = branch_track->branch_trajectory[i + dir].point;
             end_point.railway_coord = branch_track->branch_trajectory[i + dir].railway_coord;
             end_point.trajectory_coord = trajectory_length + length(end_point.point - trajectory.points.back().point);
             trajectory.points.push_back(end_point);
-            trajectory.name = (i + dir == end_id) ? name_next : name_cur;
+            if (i + dir == end_point_id)
+            {
+                trajectory.name = name_next;
+                for (auto split = split_data->begin(); split != split_data->end(); ++split)
+                {
+                    if (dir > 0)
+                    {
+                        if ((*split)->track_id == branch_track->id_end)
+                        {
+                            (*split)->bwd_side_traj = name_next;
+                        }
+                    }
+                    else
+                    {
+                        if ((*split)->track_id == branch_track->id_begin)
+                        {
+                            (*split)->bwd_side_traj = name_next;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                trajectory.name = name_cur;
+            }
             branch_track->trajectories.push_back(new trajectory_t(trajectory));
 
             trajectory.points.clear();
@@ -687,9 +733,9 @@ void ZDSimConverter::nameBranch22(zds_branch_2_2_t *branch_track, const int &dir
     else
     {
         name_prefix = "branch2p2_";
+
         double trajectory_length = 0.0;
         trajectory_t new_forward_trajectory = trajectory_t();
-
         for (size_t i = branch_track->trajectory.points.size(); i > 0; --i)
         {
             point_t point = branch_track->trajectory.points[i - 1];
@@ -703,4 +749,33 @@ void ZDSimConverter::nameBranch22(zds_branch_2_2_t *branch_track, const int &dir
     }
     branch_track->trajectory.name = name_prefix +
         QString("%1").arg(num_trajectories, 4, 10, QChar('0')).toStdString();
+
+    for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
+    {
+        if ((*split)->track_id == branch_track->id1)
+        {
+            if (dir > 0)
+            {
+                (*split)->fwd_side_traj = branch_track->trajectory.name;
+            }
+            else
+            {
+                (*split)->bwd_side_traj = branch_track->trajectory.name;
+            }
+        }
+    }
+    for (auto split = split_data2.begin(); split != split_data2.end(); ++split)
+    {
+        if ((*split)->track_id == branch_track->id2)
+        {
+            if (dir > 0)
+            {
+                (*split)->bwd_side_traj = branch_track->trajectory.name;
+            }
+            else
+            {
+                (*split)->fwd_side_traj = branch_track->trajectory.name;
+            }
+        }
+    }
 }
