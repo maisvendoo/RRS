@@ -29,31 +29,17 @@
 //------------------------------------------------------------------------------
 struct init_data_t
 {
-    double  init_coord;
-    double  init_velocity;
-    int     direction;
-    QString route_dir_name;
-    QString train_config;
-    double  coeff_to_wheel_rail_friction;
-    int     integration_time_interval;
-    int     control_time_interval;
-    bool    debug_print;
-    solver_config_t solver_config;
-
-    init_data_t()
-        : init_coord(0.0)
-        , init_velocity(0.0)
-        , direction(1)
-        , route_dir_name("")
-        , train_config("")
-        , coeff_to_wheel_rail_friction(1.0)
-        , integration_time_interval(15)
-        , control_time_interval(15)
-        , debug_print(false)
-    {
-        solver_config = solver_config_t();
-    }
+    QString route_dir_name = "experimental-polygon";
+    QString train_config = "vl60pk-1543";
+    QString trajectory_name = "route1_0001";
+    int     direction = 1;
+    double  init_coord = 0.0;
+    double  init_velocity = 0.0;
+    double  coeff_to_wheel_rail_friction = 1.0;
+    int     integration_time_interval = 15;
+    int     control_time_interval = 15;
+    bool    debug_print = false;
+    solver_config_t solver_config = solver_config_t();
 };
 
 #endif // INIT_DATA_H
-

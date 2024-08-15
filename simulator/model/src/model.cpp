@@ -335,22 +335,7 @@ void Model::loadInitData(init_data_t &init_data)
     {
         QString secName = "InitData";
 
-        if (!cfg.getDouble(secName, "InitCoord", init_data.init_coord))
-        {
-            init_data.init_coord = 1.0;
-        }
-
-        if (!cfg.getDouble(secName, "InitVelocity", init_data.init_velocity))
-        {
-            init_data.init_velocity = 0.0;
-        }
-
-        if (!cfg.getInt(secName, "Direction", init_data.direction))
-        {
-            init_data.direction = 1;
-        }
-
-        if (!cfg.getString(secName, "Profile", init_data.route_dir_name))
+        if (!cfg.getString(secName, "RouteDirectory", init_data.route_dir_name))
         {
             init_data.route_dir_name = "experimental-polygon";
         }
@@ -358,6 +343,26 @@ void Model::loadInitData(init_data_t &init_data)
         if (!cfg.getString(secName, "TrainConfig", init_data.train_config))
         {
             init_data.train_config = "vl60pk-1543";
+        }
+
+        if (!cfg.getString(secName, "RouteDirectory", init_data.route_dir_name))
+        {
+            init_data.route_dir_name = "experimental-polygon";
+        }
+
+        if (!cfg.getInt(secName, "Direction", init_data.direction))
+        {
+            init_data.direction = 1;
+        }
+
+        if (!cfg.getDouble(secName, "InitCoord", init_data.init_coord))
+        {
+            init_data.init_coord = 0.0;
+        }
+
+        if (!cfg.getDouble(secName, "InitVelocity", init_data.init_velocity))
+        {
+            init_data.init_velocity = 0.0;
         }
 
         if (!cfg.getDouble(secName, "CoeffToWheelRailFriction", init_data.coeff_to_wheel_rail_friction))
@@ -645,9 +650,9 @@ void Model::initTopology(const init_data_t &init_data)
     }
 
     topology_pos_t tp;
-    tp.traj_name = "s01-chp";
-    tp.traj_coord = 10.0;
-    tp.dir = 1;
+    tp.traj_name = init_data.trajectory_name;
+    tp.traj_coord = init_data.init_coord;
+    tp.dir = init_data.direction;
 
     if (topology->init(tp, train->getVehicles()))
     {

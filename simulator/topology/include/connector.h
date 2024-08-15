@@ -38,7 +38,7 @@ protected:
 
     Trajectory *bwdTraj = Q_NULLPTR;
 
-    int state = 0;
+    int state = 1;
 
     QString name = "";
 };

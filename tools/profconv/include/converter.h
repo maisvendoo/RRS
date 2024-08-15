@@ -33,7 +33,7 @@
 
 #define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     DELIMITER_SYMBOL char('\t')
-#define     FILE_EXTENTION   std::string(".trj")
+#define     FILE_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
 
 //------------------------------------------------------------------------------

@@ -45,22 +45,22 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
     FieldsDataList flist;
     flist.append(QPair<QString, QString>("Name", QString("%1").arg(i, 5, 10, QChar('0'))));
     // Основной путь, сзади и спереди
-    flist.append(QPair<QString, QString>("bwdMinusTraj", QString(connector->bwd_main_traj.c_str())));
-    flist.append(QPair<QString, QString>("fwdMinusTraj", QString(connector->fwd_main_traj.c_str())));
+    flist.append(QPair<QString, QString>("bwdPlusTraj", QString(connector->bwd_main_traj.c_str())));
+    flist.append(QPair<QString, QString>("fwdPlusTraj", QString(connector->fwd_main_traj.c_str())));
 
     // Стрелка на бок сзади
     QString bwd_side = QString(connector->bwd_side_traj.c_str());
     if (!bwd_side.isEmpty())
     {
-        flist.append(QPair<QString, QString>("bwdPlusTraj", bwd_side));
-        flist.append(QPair<QString, QString>("state", QString("-1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
+        flist.append(QPair<QString, QString>("bwdMinusTraj", bwd_side));
+        flist.append(QPair<QString, QString>("state", QString("1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
     }
     // Стрелка на бок спереди
     QString fwd_side = QString(connector->fwd_side_traj.c_str());
     if (!fwd_side.isEmpty())
     {
-        flist.append(QPair<QString, QString>("fwdPlusTraj", fwd_side));
-        flist.append(QPair<QString, QString>("state", QString("-1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
+        flist.append(QPair<QString, QString>("fwdMinusTraj", fwd_side));
+        flist.append(QPair<QString, QString>("state", QString("1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
     }
 
     // Светофор назад
@@ -81,7 +81,8 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
         if (!fwd_type.isEmpty())
             flist.append(QPair<QString, QString>("SignalModel", fwd_type));
     }
-    editor.writeFile("Joint", flist);
+    //editor.writeFile("Joint", flist);
+    editor.writeFile("Switch", flist);
 }
 
 //------------------------------------------------------------------------------
