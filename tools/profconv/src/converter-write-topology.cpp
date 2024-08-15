@@ -36,6 +36,54 @@ void ZDSimConverter::writeTopologyTrajectory(const trajectory_t* trajectory)
     }
 }
 
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_t i)
+{
+    FieldsDataList flist;
+    flist.append(QPair<QString, QString>("Name", QString("%1").arg(i, 5, 10, QChar('0'))));
+    // Основной путь, сзади и спереди
+    flist.append(QPair<QString, QString>("bwdMinusTraj", QString(connector->bwd_main_traj.c_str())));
+    flist.append(QPair<QString, QString>("fwdMinusTraj", QString(connector->fwd_main_traj.c_str())));
+
+    // Стрелка на бок сзади
+    QString bwd_side = QString(connector->bwd_side_traj.c_str());
+    if (!bwd_side.isEmpty())
+    {
+        flist.append(QPair<QString, QString>("bwdPlusTraj", bwd_side));
+        flist.append(QPair<QString, QString>("state", QString("-1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
+    }
+    // Стрелка на бок спереди
+    QString fwd_side = QString(connector->fwd_side_traj.c_str());
+    if (!fwd_side.isEmpty())
+    {
+        flist.append(QPair<QString, QString>("fwdPlusTraj", fwd_side));
+        flist.append(QPair<QString, QString>("state", QString("-1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
+    }
+
+    // Светофор назад
+    QString bwd_liter = QString(connector->signal_bwd_liter.c_str());
+    if (!bwd_liter.isEmpty())
+    {
+        flist.append(QPair<QString, QString>("SignalLetter", bwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
+        QString bwd_type = QString(connector->signal_bwd_type.c_str());
+        if (!bwd_type.isEmpty())
+            flist.append(QPair<QString, QString>("SignalModel", bwd_type));
+    }
+    // Светофор вперёд
+    QString fwd_liter = QString(connector->signal_fwd_liter.c_str());
+    if (!fwd_liter.isEmpty())
+    {
+        flist.append(QPair<QString, QString>("SignalLetter", fwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
+        QString fwd_type = QString(connector->signal_fwd_type.c_str());
+        if (!fwd_type.isEmpty())
+            flist.append(QPair<QString, QString>("SignalModel", fwd_type));
+    }
+    editor.writeFile("Joint", flist);
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -55,46 +103,19 @@ void ZDSimConverter::writeTopologyConnectors()
     for (auto connector : split_data1)
     {
         ++i;
-        FieldsDataList flist;
-        flist.append(QPair<QString, QString>("Name", QString("%1").arg(i, 5, 10, QChar('0'))));
-        // Основной путь, сзади и спереди
-        flist.append(QPair<QString, QString>("bwdMinusTraj", QString(connector->bwd_main_traj.c_str())));
-        flist.append(QPair<QString, QString>("fwdMinusTraj", QString(connector->fwd_main_traj.c_str())));
-
-        // Стрелка на бок сзади
-        QString bwd_side = QString(connector->bwd_side_traj.c_str());
-        if (!bwd_side.isEmpty())
-        {
-            flist.append(QPair<QString, QString>("bwdPlusTraj", bwd_side));
-            flist.append(QPair<QString, QString>("state", QString("-1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
-        }
-        // Стрелка на бок спереди
-        QString fwd_side = QString(connector->bwd_side_traj.c_str());
-        if (!fwd_side.isEmpty())
-        {
-            flist.append(QPair<QString, QString>("fwdPlusTraj", fwd_side));
-            flist.append(QPair<QString, QString>("state", QString("-1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
-        }
-
-        // Светофор назад
-        QString bwd_liter = QString(connector->signal_bwd_liter.c_str());
-        if (!bwd_liter.isEmpty())
-        {
-            flist.append(QPair<QString, QString>("SignalLetter", bwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
-            QString bwd_type = QString(connector->signal_bwd_type.c_str());
-            if (!bwd_type.isEmpty())
-                flist.append(QPair<QString, QString>("SignalModel", bwd_type));
-        }
-        // Светофор вперёд
-        QString fwd_liter = QString(connector->signal_fwd_liter.c_str());
-        if (!fwd_liter.isEmpty())
-        {
-            flist.append(QPair<QString, QString>("SignalLetter", fwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
-            QString fwd_type = QString(connector->signal_fwd_type.c_str());
-            if (!fwd_type.isEmpty())
-                flist.append(QPair<QString, QString>("SignalModel", fwd_type));
-        }
-        editor.writeFile("Joint", flist);
+        addTopologyNode(editor, connector, i);
+    }
+    // Соединения главного пути "обратно" и однопутных участков
+    for (auto connector : split_data2)
+    {
+        ++i;
+        addTopologyNode(editor, connector, i);
+    }
+    // Соединения боковых путей по светофорам
+    for (auto connector : branch_connectors)
+    {
+        ++i;
+        addTopologyNode(editor, connector, i);
     }
 
     editor.closeFileAfterWrite();
