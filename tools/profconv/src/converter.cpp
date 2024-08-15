@@ -235,14 +235,16 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         int dir = 1;
         findSplitsMainTrajectories(dir);
-        writeMainTrajectory(traj_file1, tracks_data1);
+        // Отладка
+        //writeMainTrajectory(traj_file1, tracks_data1);
     }
 
     if (is_1 && is_2)
     {
         int dir = -1;
         findSplitsMainTrajectories(dir);
-        writeMainTrajectory(traj_file2, tracks_data2);
+        // Отладка
+        //writeMainTrajectory(traj_file2, tracks_data2);
     }
 
     // Разделение главных путей на подтраектории
@@ -338,7 +340,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             writeTopologyTrajectory(&branch_track->trajectory);
         }
     }
-
+/*
     // Отладка разделения путей на подтраектории
     int dir = 0;
     writeSplits(branch_connectors, dir);
@@ -346,7 +348,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     writeSplits(split_data1, dir);
     dir = -1;
     writeSplits(split_data2, dir);
-
+*/
     writeTopologyConnectors();
 
     return true;

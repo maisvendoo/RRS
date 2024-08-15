@@ -48,8 +48,8 @@ bool ZDSimConverter::readStartKilometersDAT(QTextStream &stream,
         waypoint.forward_railway_coord = tracks_data1[waypoint.forward_track_id].railway_coord;
 
         waypoint.backward_track_id = static_cast<size_t>(tokens[2].toInt());
-        waypoint.backward_trajectory_coord = tracks_data2[waypoint.forward_track_id].trajectory_coord;
-        waypoint.backward_railway_coord = tracks_data2[waypoint.forward_track_id].railway_coord;
+        waypoint.backward_trajectory_coord = tracks_data2[waypoint.backward_track_id].trajectory_coord;
+        waypoint.backward_railway_coord = tracks_data2[waypoint.backward_track_id].railway_coord;
 
         waypoints.push_back(waypoint);
     }
