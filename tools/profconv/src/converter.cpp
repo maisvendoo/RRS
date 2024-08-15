@@ -347,6 +347,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     dir = -1;
     writeSplits(split_data2, dir);
 
+    writeTopologyConnectors();
+
     return true;
 }
 

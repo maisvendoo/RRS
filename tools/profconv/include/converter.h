@@ -31,6 +31,7 @@
 #include    <fstream>
 #include    <QTextStream>
 
+#define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     DELIMITER_SYMBOL char('\t')
 #define     FILE_EXTENTION   std::string(".trj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
@@ -164,7 +165,7 @@ private:
 
     void writeTopologyTrajectory(const trajectory_t* trajectory);
 
-    void writeTopologyConnectors(const std::string &filename, const route_connectors_t &connectors);
+    void writeTopologyConnectors();
 };
 
 #endif // CONVERTER_H
