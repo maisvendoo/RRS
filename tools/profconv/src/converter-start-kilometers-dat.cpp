@@ -67,7 +67,7 @@ void ZDSimConverter::writeWaypoints(const std::string &filename,
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + ".bak").c_str()) );
+        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -96,7 +96,7 @@ void ZDSimConverter::writeStations(const std::string &filename, const zds_start_
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + ".bak").c_str()) );
+        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))

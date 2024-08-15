@@ -106,6 +106,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 zds_branch_2_2_t branch2minus2 = zds_branch_2_2_t();
                 branch2minus2.id1 = id;
                 branch2minus2.id2 = id2;
+                calcBranch22(&branch2minus2);
                 branch_2minus2_data.push_back(new zds_branch_2_2_t(branch2minus2));
             }
             // Добавляем съезды "2+2", найденные в branch_tracks
@@ -175,6 +176,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 zds_branch_2_2_t branch2plus2 = zds_branch_2_2_t();
                 branch2plus2.id1 = id + 1;
                 branch2plus2.id2 = id2;
+                calcBranch22(&branch2plus2);
                 branch_2plus2_data.push_back(new zds_branch_2_2_t(branch2plus2));
             }
 
@@ -369,7 +371,7 @@ void ZDSimConverter::writeSplits(const int &dir)
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + ".bak").c_str()) );
+        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -446,7 +448,7 @@ void ZDSimConverter::addOrCreateSplit(route_connectors_t &split_data, const spli
     auto exist_it = split_data.begin();
     while (exist_it != split_data.end())
     {
-        if (((*exist_it)->track_id == split_point.track_id))
+        if ((*exist_it)->track_id == split_point.track_id)
         {
             for (auto type_it : split_point.split_type)
             {
@@ -477,9 +479,11 @@ void ZDSimConverter::addOrCreateSplit(route_connectors_t &split_data, const spli
 void ZDSimConverter::splitMainTrajectory(const int &dir)
 {
     double trajectory_length = 0.0;
-    trajectory_t trajectory = trajectory_t();;
-    size_t num_traj = 0;
+    trajectory_t trajectory = trajectory_t();
+    size_t num_traj = 1;
     std::string name_prefix;
+    std::string name_cur;
+    std::string name_next;
     route_trajectories_t* trajectories;
     zds_trajectory_data_t* tracks_data;
     route_connectors_t* split_data;
@@ -497,6 +501,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
         tracks_data = &tracks_data2;
         trajectories = &trajectories2;
     }
+
     for (auto it = tracks_data->begin(); it != tracks_data->end(); ++it)
     {
         if ((dir < 0) && (it->id_at_track1 != -1))
@@ -513,18 +518,25 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
         for (auto split = split_data->begin(); split != split_data->end(); ++split)
         {
             if ((*split)->track_id == id + 1)
+            {
                 is_split_next = true;
+                name_cur = name_prefix +
+                    QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                ++num_traj;
+                name_next = name_prefix +
+                    QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                (*split)->bwd_main_traj = name_cur;
+                (*split)->fwd_main_traj = name_next;
+            }
         }
-        if (is_split_next)
+        if (is_split_next || ((it+1) == tracks_data->end()))
         {
-            ++num_traj;
             point_t end_point;
             end_point.point = it->end_point;
             end_point.railway_coord = it->railway_coord_end;
             end_point.trajectory_coord = trajectory_length + it->length;
             trajectory.points.push_back(end_point);
-            trajectory.name = name_prefix +
-                              QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+            trajectory.name = ((it+1) == tracks_data->end()) ? name_next : name_cur;
             trajectories->push_back(new trajectory_t(trajectory));
 
             trajectory.points.clear();

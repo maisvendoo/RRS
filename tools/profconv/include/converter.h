@@ -31,6 +31,10 @@
 #include    <fstream>
 #include    <QTextStream>
 
+#define     DELIMITER_SYMBOL char('\t')
+#define     FILE_EXTENTION   std::string(".trj")
+#define     FILE_BACKUP_EXTENTION std::string(".bak")
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -49,6 +53,8 @@ private:
     std::string         routeDir;
 
     std::string         topologyDir;
+
+    std::string         trajectoriesDir;
 
     zds_trajectory_data_t    tracks_data1;
 
@@ -138,23 +144,25 @@ private:
 
     bool calcBranchTrack2(zds_branch_track_t *branch_track);
 
-    bool calcBranch22(zds_branch_2_2_t *branch22);
+    void calcBranch22(zds_branch_2_2_t *branch22);
 
     void findSplitsMainTrajectories(const int &dir);
 
-    void writeSplits(const int &dir);
+    void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
 
     void splitMainTrajectory(const int &dir);
 
-    void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
+    void splitAndNameBranch(zds_branch_track_t *branch_track, const int &dir, size_t num_trajectories);
 
-    void writeBranchTrajectory(const std::string &filename, const std::vector<calculated_branch_point_t>* branch_trajectory);
+    void nameBranch22(zds_branch_2_2_t *branch_track, const int &dir, size_t num_trajectories);
+
+    void writeSplits(const int &dir);
 
     bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
 
     bool findNeutralInsertions(std::ifstream &stream, std::vector<neutral_insertion_t> ni);
 
-    void writeTopologyTrajectories(const route_trajectories_t &trajectories);
+    void writeTopologyTrajectory(const trajectory_t* trajectory);
 
     void writeTopologyConnectors(const std::string &filename, const route_connectors_t &connectors);
 };

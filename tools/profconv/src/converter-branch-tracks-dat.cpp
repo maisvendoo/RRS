@@ -57,10 +57,18 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         zds_branch_point_t branch_point;
         branch_point.main_track_id = id_value - 1;
         branch_point.bias = (abs(bias_value) < 0.01) ? 0.0 : bias_value;
-        if (tokens.size() > 2)
+        if ((tokens.size() > 2) && (!tokens[2].isEmpty()))
+        {
+            // Светофор
             branch_point.signal_liter = tokens[2].toStdString();
-        if (tokens.size() > 3)
+            // Отмечаем необходимость разделить траекторию светофором
+            // Пока не знаем id элемента трека, просто меняем на 1
+            branch_point.id_split_point = 1;
+        }
+        if ((tokens.size() > 3) && (!tokens[3].isEmpty()))
+        {
             branch_point.signal_special = tokens[3].toStdString();
+        }
         branch_point.dir = dir;
 
         // Если какая-то из предыдущих точек была съездом на соседний главный,
@@ -197,6 +205,7 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point)
         branch_2minus2.is_fwd = true;
         branch_2minus2.id1 = id1;
         branch_2minus2.id2 = id2;
+        calcBranch22(&branch_2minus2);
         branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
     else
@@ -217,6 +226,7 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point)
         branch_2minus2.is_bwd = true;
         branch_2minus2.id1 = id1;
         branch_2minus2.id2 = id2;
+        calcBranch22(&branch_2minus2);
         branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
     return true;
@@ -261,6 +271,7 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t *branch_point)
         branch_2plus2.is_fwd = true;
         branch_2plus2.id1 = id1;
         branch_2plus2.id2 = id2;
+        calcBranch22(&branch_2plus2);
         branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
     else
@@ -281,6 +292,7 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t *branch_point)
         branch_2plus2.is_bwd = true;
         branch_2plus2.id1 = id1;
         branch_2plus2.id2 = id2;
+        calcBranch22(&branch_2plus2);
         branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
 }
@@ -311,6 +323,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         {
             if ((it+1)->main_track_id == id_begin)
             {
+                it->id_split_point = -1;
                 ++it;
                 bias_curr = (it)->bias;
                 continue;
@@ -376,10 +389,6 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
             return true;
         }
 
-        // === TODO ===
-        // Разделение траектории по светофору
-        // === TODO ===
-
         // Расчёт точек траектории, параллельной главному пути, со смещением
         for (id = id_end; id <= (it+1)->main_track_id; ++id)
         {
@@ -400,6 +409,10 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         bias_prev = bias_curr;
         bias_curr = (it+1)->bias;
         coord_begin = tracks_data1[id_begin].trajectory_coord;
+
+        // Отмечаем разделение траектории светофором, если необходимо
+        if ((it+1)->id_split_point != -1)
+            (it+1)->id_split_point = branch_track->branch_trajectory.size() - 1;
     }
 
     return true;
@@ -431,6 +444,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         {
             if ((it+1)->main_track_id + 1 == id_begin)
             {
+                it->id_split_point = -1;
                 ++it;
                 bias_curr = (it)->bias;
                 continue;
@@ -497,10 +511,6 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
             return true;
         }
 
-        // === TODO ===
-        // Разделение траектории по светофору
-        // === TODO ===
-
         // Расчёт точек траектории, параллельной главному пути, со смещением
         for (id = id_end; id > (it+1)->main_track_id; --id)
         {
@@ -521,6 +531,10 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         bias_prev = bias_curr;
         bias_curr = (it+1)->bias;
         coord_begin = tracks_data2[id_begin].trajectory_coord;
+
+        // Отмечаем разделение траектории светофором, если необходимо
+        if ((it+1)->id_split_point != -1)
+            (it+1)->id_split_point = branch_track->branch_trajectory.size() - 1;
     }
 
     return true;
@@ -529,18 +543,18 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::calcBranch22(zds_branch_2_2_t *branch22)
+void ZDSimConverter::calcBranch22(zds_branch_2_2_t *branch22)
 {
     // Первая точка
-    calculated_branch_point_t point_begin;
+    point_t point_begin;
     point_begin.point = tracks_data1[branch22->id1].begin_point;
     point_begin.railway_coord = tracks_data1[branch22->id1].railway_coord;
     // Добавляем первую точку
     point_begin.trajectory_coord = 0.0;
-    branch22->branch_trajectory.push_back(point_begin);
+    branch22->trajectory.points.push_back(point_begin);
 
     // Последняя точка
-    calculated_branch_point_t point_end;
+    point_t point_end;
     point_end.point = tracks_data2[branch22->id2].begin_point;
     point_end.railway_coord = tracks_data2[branch22->id2].railway_coord;
 
@@ -557,53 +571,136 @@ bool ZDSimConverter::calcBranch22(zds_branch_2_2_t *branch22)
     for (size_t i = 0; i < NUM_BIAS_POINTS; ++i)
     {
         // Промежуточная точка отклонения
-        calculated_branch_point_t point;
+        point_t point;
         point.point = point_begin.point +
                       mean_orth * COORD_COEFF[i] * coord_length +
                       mean_right * BIAS_COEFF[i] * bias;
-        double l = length(point.point - branch22->branch_trajectory.back().point);
-        point.trajectory_coord = branch22->branch_trajectory.back().trajectory_coord + l;
+        double l = length(point.point - branch22->trajectory.points.back().point);
+        point.trajectory_coord = branch22->trajectory.points.back().trajectory_coord + l;
         point.railway_coord = point_begin.railway_coord +
                               COORD_COEFF[i] * railway_coord_length;
         // Добавляем промежуточную точку отклонения
-        branch22->branch_trajectory.push_back(point);
+        branch22->trajectory.points.push_back(point);
     }
 
     // Дописываем последнюю точку
-    double l = length(point_end.point - branch22->branch_trajectory.back().point);
-    point_end.trajectory_coord = branch22->branch_trajectory.back().trajectory_coord + l;
+    double l = length(point_end.point - branch22->trajectory.points.back().point);
+    point_end.trajectory_coord = branch22->trajectory.points.back().trajectory_coord + l;
     // Добавляем точку траектории
-    branch22->branch_trajectory.push_back(point_end);
-    return true;
+    branch22->trajectory.points.push_back(point_end);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::writeBranchTrajectory(const std::string &filename, const std::vector<calculated_branch_point_t> *branch_trajectory)
+void ZDSimConverter::splitAndNameBranch(zds_branch_track_t *branch_track, const int &dir, size_t num_trajectories)
 {
-    std::string path = compinePath(toNativeSeparators(topologyDir), filename);
-
-    QFile file_old(QString(path.c_str()));
-    if (file_old.exists())
-        file_old.rename( QString((path + ".bak").c_str()) );
-
-    QFile file(QString(path.c_str()));
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    QTextStream stream(&file);
-    stream.setEncoding(QStringConverter::Utf8);
-    stream.setRealNumberNotation(QTextStream::FixedNotation);
-
-    for (auto it = branch_trajectory->begin(); it != branch_trajectory->end(); ++it)
+    double trajectory_length = 0.0;
+    trajectory_t trajectory = trajectory_t();
+    size_t num_sub_traj = 1;
+    size_t begin_id;
+    size_t end_id;
+    std::string name_prefix;
+    std::string name_cur;
+    std::string name_next;
+    if (dir > 0)
     {
-        stream << (*it).point.x << ";"
-               << (*it).point.y << ";"
-               << (*it).point.z << ";"
-               << static_cast<int>(round((*it).railway_coord)) << ";"
-               << (*it).trajectory_coord << "\n";
+        begin_id = 0;
+        end_id = branch_track->branch_trajectory.size() - 1;
+        name_prefix = "branch1_";
     }
+    else
+    {
+        begin_id = branch_track->branch_trajectory.size() - 1;
+        end_id = 0;
+        name_prefix = "branch2_";
+    }
+    name_next = name_prefix +
+        QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString();
+    for (size_t i = begin_id; i != end_id; i += dir)
+    {
+        point_t point;
+        point.point = branch_track->branch_trajectory[i].point;
+        point.railway_coord = branch_track->branch_trajectory[i].railway_coord;
+        point.trajectory_coord = trajectory_length;
+        trajectory.points.push_back(point);
 
-    file.close();
+        bool is_split_next = false;
+        for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
+        {
+            if ((it->id_split_point != -1) && (it->id_split_point == i + dir))
+            {
+                is_split_next = true;
+                name_cur = name_next;
+                ++num_sub_traj;
+                name_next = name_prefix +
+                    QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString();
+
+                split_zds_trajectory_t split;
+                split.bwd_main_traj = name_cur;
+                split.fwd_main_traj = name_next;
+                if (dir > 0)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                    split.signal_fwd_liter = it->signal_liter;
+                }
+                else
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                    split.signal_bwd_liter = it->signal_liter;
+                }
+                branch_connectors.push_back(new split_zds_trajectory_t(split));
+                break;
+            }
+        }
+
+        if (is_split_next || (i + dir == end_id))
+        {
+            point_t end_point;
+            end_point.point = branch_track->branch_trajectory[i + dir].point;
+            end_point.railway_coord = branch_track->branch_trajectory[i + dir].railway_coord;
+            end_point.trajectory_coord = trajectory_length + length(end_point.point - trajectory.points.back().point);
+            trajectory.points.push_back(end_point);
+            trajectory.name = (i + dir == end_id) ? name_next : name_cur;
+            branch_track->trajectories.push_back(new trajectory_t(trajectory));
+
+            trajectory.points.clear();
+            trajectory_length = 0.0;
+        }
+        else
+        {
+            trajectory_length += length(branch_track->branch_trajectory[i + dir].point - trajectory.points.back().point);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::nameBranch22(zds_branch_2_2_t *branch_track, const int &dir, size_t num_trajectories)
+{
+    std::string name_prefix;
+    if (dir > 0)
+    {
+        name_prefix = "branch2m2_";
+    }
+    else
+    {
+        name_prefix = "branch2p2_";
+        double trajectory_length = 0.0;
+        trajectory_t new_forward_trajectory = trajectory_t();
+
+        for (size_t i = branch_track->trajectory.points.size(); i > 0; --i)
+        {
+            point_t point = branch_track->trajectory.points[i - 1];
+            point.trajectory_coord = trajectory_length;
+            new_forward_trajectory.points.push_back(point);
+
+            if (i > 1)
+                trajectory_length += length(branch_track->trajectory.points[i - 2].point - new_forward_trajectory.points.back().point);
+        }
+        branch_track->trajectory = new_forward_trajectory;
+    }
+    branch_track->trajectory.name = name_prefix +
+        QString("%1").arg(num_trajectories, 4, 10, QChar('0')).toStdString();
 }

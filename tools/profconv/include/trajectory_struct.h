@@ -73,13 +73,13 @@ struct split_zds_trajectory_t
 
     double railway_coord = 0.0;
 
-    trajectory_t *fwd_main_traj = nullptr;
+    std::string fwd_main_traj = "";
 
-    trajectory_t *bwd_main_traj = nullptr;
+    std::string bwd_main_traj = "";
 
-    trajectory_t *fwd_side_traj = nullptr;
+    std::string fwd_side_traj = "";
 
-    trajectory_t *bwd_side_traj = nullptr;
+    std::string bwd_side_traj = "";
 
     std::string signal_fwd_type = "";
 

@@ -136,6 +136,15 @@ CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
         route.mkpath(topologyDir.c_str());
     }
 
+    std::string trajectories_subdir_name = "trajectories";
+    trajectoriesDir = compinePath(topologyDir, trajectories_subdir_name);
+
+    QDir topology(topologyDir.c_str());
+    if (!topology.exists(trajectories_subdir_name.c_str()))
+    {
+        topology.mkpath(trajectoriesDir.c_str());
+    }
+
     return RESULT_OK;
 }
 
@@ -241,7 +250,10 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     // Отладка разделения главных путей на подтраектории
     if (is_1)
     {
-        writeTopologyTrajectories(trajectories1);
+        for (auto it = trajectories1.begin(); it != trajectories1.end(); ++it)
+        {
+            writeTopologyTrajectory(*it);
+        }
 
         // Отладка разделения главных путей на подтраектории
         int dir = 1;
@@ -249,7 +261,10 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     }
     if (is_1 && is_2)
     {
-        writeTopologyTrajectories(trajectories2);
+        for (auto it = trajectories2.begin(); it != trajectories2.end(); ++it)
+        {
+            writeTopologyTrajectory(*it);
+        }
 
         // Отладка разделения главных путей на подтраектории
         int dir = -1;
@@ -264,75 +279,59 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (!branch_track_data1.empty())
     {
-        size_t i = 0;
+        int dir = 1;
+        size_t num_trajectories = 0;
         for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
         {
-            ++i;
+            ++num_trajectories;
             zds_branch_track_t *branch_track = *it;
-            writeBranchTrajectory(branch_traj_prefix1 +
-                                    QString("%1_%2_%3")
-                                        .arg(i,3,10,QChar('0'))
-                                        .arg(branch_track->id_begin)
-                                        .arg(branch_track->id_end)
-                                        .toStdString() +
-                                    traj_ext.c_str(),
-                                  &branch_track->branch_trajectory);
+            splitAndNameBranch(branch_track, dir, num_trajectories);
+            for (auto it = branch_track->trajectories.begin(); it != branch_track->trajectories.end(); ++it)
+            {
+                writeTopologyTrajectory(*it);
+            }
         }
     }
 
     if (!branch_track_data2.empty())
     {
-        size_t i = 0;
+        int dir = -1;
+        size_t num_trajectories = 0;
         for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
         {
-            ++i;
+            ++num_trajectories;
             zds_branch_track_t *branch_track = *it;
-            writeBranchTrajectory(branch_traj_prefix2 +
-                                    QString("%1_%2_%3")
-                                        .arg(i,3,10,QChar('0'))
-                                        .arg(branch_track->id_begin)
-                                        .arg(branch_track->id_end)
-                                        .toStdString() +
-                                    traj_ext.c_str(),
-                                  &branch_track->branch_trajectory);
+            splitAndNameBranch(branch_track, dir, num_trajectories);
+            for (auto it = branch_track->trajectories.begin(); it != branch_track->trajectories.end(); ++it)
+            {
+                writeTopologyTrajectory(*it);
+            }
         }
     }
 
     if (!branch_2minus2_data.empty())
     {
-        size_t i = 0;
+        int dir = 1;
+        size_t num_trajectories = 0;
         for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
         {
-            ++i;
+            ++num_trajectories;
             zds_branch_2_2_t *branch_track = *it;
-            calcBranch22(branch_track);
-            writeBranchTrajectory(branch_2minus2_prefix +
-                                    QString("%1_%2_%3")
-                                        .arg(i,3,10,QChar('0'))
-                                        .arg(branch_track->id1)
-                                        .arg(branch_track->id2)
-                                        .toStdString() +
-                                    traj_ext.c_str(),
-                                  &branch_track->branch_trajectory);
+            nameBranch22(branch_track, dir, num_trajectories);
+            writeTopologyTrajectory(&branch_track->trajectory);
         }
     }
 
     if (!branch_2plus2_data.empty())
     {
-        size_t i = 0;
+        int dir = -1;
+        size_t num_trajectories = 0;
         for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
         {
-            ++i;
+            ++num_trajectories;
             zds_branch_2_2_t *branch_track = *it;
-            calcBranch22(branch_track);
-            writeBranchTrajectory(branch_2plus2_prefix +
-                                    QString("%1_%2_%3")
-                                        .arg(i,3,10,QChar('0'))
-                                        .arg(branch_track->id1)
-                                        .arg(branch_track->id2)
-                                        .toStdString() +
-                                    traj_ext.c_str(),
-                                  &branch_track->branch_trajectory);
+            nameBranch22(branch_track, dir, num_trajectories);
+            writeTopologyTrajectory(&branch_track->trajectory);
         }
     }
 

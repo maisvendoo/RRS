@@ -5,6 +5,7 @@
 #include    <vector>
 
 #include    "vec3.h"
+#include    "trajectory_struct.h"
 
 /// Отклонение на соседний главный путь в ZDS задаётся смещением -7.47
 const double ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK = -7.47;
@@ -32,6 +33,7 @@ struct zds_branch_point_t
     std::string signal_special = "";
 
     int dir = 1;
+    int id_split_point = -1;
 };
 
 //------------------------------------------------------------------------------
@@ -50,10 +52,13 @@ struct calculated_branch_point_t
 struct zds_branch_track_t
 {
     std::vector<zds_branch_point_t> branch_points = {};
+
     int id_begin = -1;
     int id_end = -1;
 
     std::vector<calculated_branch_point_t> branch_trajectory = {};
+
+    route_trajectories_t trajectories = {};
 };
 
 //------------------------------------------------------------------------------
@@ -72,7 +77,7 @@ struct zds_branch_2_2_t
     zds_branch_point_t  branch_point_fwd = zds_branch_point_t();
     bool is_bwd = false;
     zds_branch_point_t  branch_point_bwd = zds_branch_point_t();
-    std::vector<calculated_branch_point_t> branch_trajectory = {};
+    trajectory_t trajectory = {};
 };
 
 //------------------------------------------------------------------------------

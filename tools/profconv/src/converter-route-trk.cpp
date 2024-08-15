@@ -203,7 +203,7 @@ void ZDSimConverter::writeMainTrajectory(const std::string &filename, const zds_
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + ".bak").c_str()) );
+        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
