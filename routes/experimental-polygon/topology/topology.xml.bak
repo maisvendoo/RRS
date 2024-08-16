@@ -12,16 +12,16 @@
         <bwdPlusTraj>route1_0002</bwdPlusTraj>
         <fwdPlusTraj>route1_0003</fwdPlusTraj>
         <fwdMinusTraj>branch2m2_0001</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00003</Name>
         <bwdPlusTraj>route1_0003</bwdPlusTraj>
         <fwdPlusTraj>route1_0004</fwdPlusTraj>
         <bwdMinusTraj>branch2p2_0001</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch1_0001_1</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00004</Name>
@@ -35,16 +35,16 @@
         <bwdPlusTraj>route1_0005</bwdPlusTraj>
         <fwdPlusTraj>route1_0006</fwdPlusTraj>
         <bwdMinusTraj>branch1_0001_2</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00006</Name>
         <bwdPlusTraj>route1_0006</bwdPlusTraj>
         <fwdPlusTraj>route1_0007</fwdPlusTraj>
         <bwdMinusTraj>branch2p2_0002</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2m2_0002</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00007</Name>
@@ -100,16 +100,16 @@
         <bwdPlusTraj>route1_0014</bwdPlusTraj>
         <fwdPlusTraj>route1_0015</fwdPlusTraj>
         <bwdMinusTraj>branch2p2_0003</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2m2_0003</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00015</Name>
         <bwdPlusTraj>route1_0015</bwdPlusTraj>
         <fwdPlusTraj>route1_0016</fwdPlusTraj>
         <fwdMinusTraj>branch1_0002_1</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00016</Name>
@@ -123,16 +123,16 @@
         <bwdPlusTraj>route1_0017</bwdPlusTraj>
         <fwdPlusTraj>route1_0018</fwdPlusTraj>
         <bwdMinusTraj>branch1_0002_2</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2m2_0004</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00018</Name>
         <bwdPlusTraj>route1_0018</bwdPlusTraj>
         <fwdPlusTraj>route1_0019</fwdPlusTraj>
         <bwdMinusTraj>branch2p2_0004</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00019</Name>
@@ -188,16 +188,16 @@
         <bwdPlusTraj>route1_0026</bwdPlusTraj>
         <fwdPlusTraj>route1_0027</fwdPlusTraj>
         <bwdMinusTraj>branch2p2_0005</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2m2_0005</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00027</Name>
         <bwdPlusTraj>route1_0027</bwdPlusTraj>
         <fwdPlusTraj>route1_0028</fwdPlusTraj>
         <fwdMinusTraj>branch1_0003_1</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00028</Name>
@@ -211,32 +211,32 @@
         <bwdPlusTraj>route1_0029</bwdPlusTraj>
         <fwdPlusTraj>route1_0030</fwdPlusTraj>
         <bwdMinusTraj>branch1_0003_2</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2m2_0006</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00030</Name>
         <bwdPlusTraj>route1_0030</bwdPlusTraj>
         <fwdPlusTraj>route1_0031</fwdPlusTraj>
         <bwdMinusTraj>branch2p2_0006</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00031</Name>
         <bwdPlusTraj>route2_0001</bwdPlusTraj>
         <fwdPlusTraj>route2_0002</fwdPlusTraj>
         <bwdMinusTraj>branch2m2_0001</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2p2_0001</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00032</Name>
         <bwdPlusTraj>route2_0002</bwdPlusTraj>
         <fwdPlusTraj>route2_0003</fwdPlusTraj>
         <fwdMinusTraj>branch2_0001_1</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00033</Name>
@@ -250,16 +250,16 @@
         <bwdPlusTraj>route2_0004</bwdPlusTraj>
         <fwdPlusTraj>route2_0005</fwdPlusTraj>
         <bwdMinusTraj>branch2_0001_2</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2p2_0002</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00035</Name>
         <bwdPlusTraj>route2_0005</bwdPlusTraj>
         <fwdPlusTraj>route2_0006</fwdPlusTraj>
         <bwdMinusTraj>branch2m2_0002</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00036</Name>
@@ -315,16 +315,16 @@
         <bwdPlusTraj>route2_0013</bwdPlusTraj>
         <fwdPlusTraj>route2_0014</fwdPlusTraj>
         <fwdMinusTraj>branch2p2_0003</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00044</Name>
         <bwdPlusTraj>route2_0014</bwdPlusTraj>
         <fwdPlusTraj>route2_0015</fwdPlusTraj>
         <bwdMinusTraj>branch2m2_0003</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2_0002_1</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00045</Name>
@@ -338,16 +338,16 @@
         <bwdPlusTraj>route2_0016</bwdPlusTraj>
         <fwdPlusTraj>route2_0017</fwdPlusTraj>
         <bwdMinusTraj>branch2_0002_2</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00047</Name>
         <bwdPlusTraj>route2_0017</bwdPlusTraj>
         <fwdPlusTraj>route2_0018</fwdPlusTraj>
         <bwdMinusTraj>branch2m2_0004</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2p2_0004</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00048</Name>
@@ -403,16 +403,16 @@
         <bwdPlusTraj>route2_0025</bwdPlusTraj>
         <fwdPlusTraj>route2_0026</fwdPlusTraj>
         <fwdMinusTraj>branch2p2_0005</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00056</Name>
         <bwdPlusTraj>route2_0026</bwdPlusTraj>
         <fwdPlusTraj>route2_0027</fwdPlusTraj>
         <bwdMinusTraj>branch2m2_0005</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2_0003_1</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00057</Name>
@@ -426,16 +426,16 @@
         <bwdPlusTraj>route2_0028</bwdPlusTraj>
         <fwdPlusTraj>route2_0029</fwdPlusTraj>
         <bwdMinusTraj>branch2_0003_2</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00059</Name>
         <bwdPlusTraj>route2_0029</bwdPlusTraj>
         <fwdPlusTraj>route2_0030</fwdPlusTraj>
         <bwdMinusTraj>branch2m2_0006</bwdMinusTraj>
-        <state_bwd>1</state_bwd>
+        <state>-1</state>
         <fwdMinusTraj>branch2p2_0006</fwdMinusTraj>
-        <state_fwd>1</state_fwd>
+        <state>-1</state>
     </Switch>
     <Switch>
         <Name>00060</Name>
