@@ -153,6 +153,29 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+track_t addFakeTrack(track_t &cur_track, bool plus = true)
+{
+    track_t fake_track = cur_track;
+
+    if (plus)
+    {
+        fake_track.begin_point += cur_track.orth * cur_track.len;
+        fake_track.end_point += cur_track.orth * cur_track.len;
+        fake_track.traj_coord += cur_track.len;
+    }
+    else
+    {
+        fake_track.begin_point -= cur_track.orth * cur_track.len;
+        fake_track.end_point -= cur_track.orth * cur_track.len;
+        fake_track.traj_coord -= cur_track.len;
+    }
+
+    return fake_track;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Trajectory::findTracks(double traj_coord,
                             track_t &cur_track,
                             track_t &prev_track,
@@ -165,19 +188,15 @@ void Trajectory::findTracks(double traj_coord,
     // В этом случае, текущий трек это трек на данной траектории, и если
     // он последний, то следующий трек - это первый трек сделующей траектории
 
-    // Обрабатываем случай, когда мы на первом треке
-    if (traj_coord < (*tracks.begin()).len)
+    // Если у нас единственный трек, он де первый и он же последний
+    if (tracks.size() == 1)
     {
         cur_track = *(tracks.begin());
-        next_track = *(tracks.begin() + 1);
 
         // Если нет коннектора сзади
         if (bwd_connector == Q_NULLPTR)
         {
-            prev_track = cur_track;
-            prev_track.begin_point -= cur_track.orth * cur_track.len;
-            prev_track.end_point -= cur_track.orth * cur_track.len;
-            prev_track.traj_coord -= cur_track.len;
+            prev_track = addFakeTrack(cur_track, false);
             return;
         }
 
@@ -187,17 +206,62 @@ void Trajectory::findTracks(double traj_coord,
         // Если сзади нет траектории
         if (prev_traj == Q_NULLPTR)
         {
-            prev_track = cur_track;
-            prev_track.begin_point -= cur_track.orth * cur_track.len;
-            prev_track.end_point -= cur_track.orth * cur_track.len;
-            prev_track.traj_coord -= cur_track.len;
+            prev_track = addFakeTrack(cur_track, false);
+            return;
+        }
+
+        prev_track = prev_traj->getLastTrack();
+
+        // Если нет соннектора впереди
+        if (fwd_connector == Q_NULLPTR)
+        {
+            // Следующий трек сонаправлен текущему
+            next_track = addFakeTrack(cur_track, true);
+            return;
+        }
+
+        // Смотрим, какая траектория впереди
+        Trajectory *next_traj = fwd_connector->getFwdTraj();
+
+        // Если впереди нет траектории
+        if (next_traj == Q_NULLPTR)
+        {
+            // Следующий трек сонаправлен текущему
+            next_track = addFakeTrack(cur_track, true);
+            return;
+        }
+
+        next_track = next_traj->getFirstTrack();
+        return;
+    }
+
+
+    // Обрабатываем случай, когда мы на первом треке
+    if (traj_coord < (*tracks.begin()).len)
+    {
+        cur_track = *(tracks.begin());
+        next_track = *(tracks.begin() + 1);
+
+        // Если нет коннектора сзади
+        if (bwd_connector == Q_NULLPTR)
+        {
+            prev_track = addFakeTrack(cur_track, false);
+            return;
+        }
+
+        // Смотрим, какая траектория сзади
+        Trajectory *prev_traj = bwd_connector->getBwdTraj();
+
+        // Если сзади нет траектории
+        if (prev_traj == Q_NULLPTR)
+        {
+            prev_track = addFakeTrack(cur_track, false);
             return;
         }
 
         prev_track = prev_traj->getLastTrack();
         return;
     }
-
 
     // Обрабатываем случай, коогда мы оказываемся на последнем треке
     if (traj_coord > (*(tracks.end() - 1)).traj_coord)
@@ -209,10 +273,7 @@ void Trajectory::findTracks(double traj_coord,
         if (fwd_connector == Q_NULLPTR)
         {
             // Следующий трек сонаправлен текущему
-            next_track = cur_track;
-            next_track.begin_point += cur_track.orth * cur_track.len;
-            next_track.end_point += cur_track.orth * cur_track.len;
-            next_track.traj_coord += cur_track.len;
+            next_track = addFakeTrack(cur_track, true);
             return;
         }
 
@@ -223,10 +284,7 @@ void Trajectory::findTracks(double traj_coord,
         if (next_traj == Q_NULLPTR)
         {
             // Следующий трек сонаправлен текущему
-            next_track = cur_track;
-            next_track.begin_point += cur_track.orth * cur_track.len;
-            next_track.end_point += cur_track.orth * cur_track.len;
-            next_track.traj_coord += cur_track.len;
+            next_track = addFakeTrack(cur_track, true);
             return;
         }
 

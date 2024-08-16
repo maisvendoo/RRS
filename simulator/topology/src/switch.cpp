@@ -23,10 +23,25 @@ Switch::~Switch()
 Trajectory *Switch::getFwdTraj() const
 {
     if (state == 1)
-        return fwdPlusTraj;
+    {
+        if (fwdPlusTraj != Q_NULLPTR)
+            return fwdPlusTraj;
+        else
+        {
+            if (fwdMinusTraj != Q_NULLPTR)
+                return fwdMinusTraj;
+        }
+    }
 
     if (state == -1)
-        return fwdMinusTraj;
+    {
+        if (fwdMinusTraj != Q_NULLPTR)
+            return fwdMinusTraj;
+        {
+            if (fwdPlusTraj != Q_NULLPTR)
+                return fwdPlusTraj;
+        }
+    }
 
     return Q_NULLPTR;
 }
@@ -37,10 +52,25 @@ Trajectory *Switch::getFwdTraj() const
 Trajectory *Switch::getBwdTraj() const
 {
     if (state == 1)
-        return bwdPlusTraj;
+    {
+        if (bwdPlusTraj != Q_NULLPTR)
+            return bwdPlusTraj;
+        else
+        {
+            if (bwdMinusTraj != Q_NULLPTR)
+                return bwdMinusTraj;
+        }
+    }
 
     if (state == -1)
-        return bwdMinusTraj;
+    {
+        if (bwdMinusTraj != Q_NULLPTR)
+            return bwdMinusTraj;
+        {
+            if (bwdPlusTraj != Q_NULLPTR)
+                return bwdPlusTraj;
+        }
+    }
 
     return Q_NULLPTR;
 }
