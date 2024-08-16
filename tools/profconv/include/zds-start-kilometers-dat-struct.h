@@ -1,8 +1,9 @@
 #ifndef     ZDS_START_KM_H
 #define     ZDS_START_KM_H
 
-#include    <string>
 #include    <vector>
+#include    <string>
+#include    <vec3.h>
 
 //------------------------------------------------------------------------------
 //
@@ -13,10 +14,11 @@ struct zds_start_km_t
     size_t      forward_track_id = 0;
     size_t      backward_track_id = 0;
 
-    double  forward_trajectory_coord = 0.0;
-    double  forward_railway_coord = 0.0;
-    double  backward_trajectory_coord = 0.0;
-    double  backward_railway_coord = 0.0;
+    double  forward_route_coord = 0.0;
+    double  backward_route_coord = 0.0;
+
+    dvec3 mean_point = {0.0, 0.0, 0.0};
+    double station_id = 0;
 };
 
 //------------------------------------------------------------------------------

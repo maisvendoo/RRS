@@ -93,6 +93,8 @@ struct split_zds_trajectory_t
 
     std::string signal_bwd_liter = "";
 
+    double length_bwd_traj = 0.0;
+
     split_zds_trajectory_t()
     {
 
@@ -108,5 +110,32 @@ struct split_zds_trajectory_t
 //
 //------------------------------------------------------------------------------
 typedef std::vector<split_zds_trajectory_t *> route_connectors_t;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct start_point_t
+{
+    std::string name = "";
+    std::string trajectory_name = "";
+    int         direction = 1;
+    double      trajectory_coord = 0.0;
+    double      railway_coord = 0.0;
+
+    double station_id = 0;
+    static bool compare_by_direction(const start_point_t* left, const start_point_t* right)
+    {
+        return (*left).direction < (*right).direction;
+    };
+    static bool compare_by_station_id(const start_point_t* left, const start_point_t* right)
+    {
+        return (*left).station_id < (*right).station_id;
+    };
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef std::vector<start_point_t*>   start_point_data_t;
 
 #endif // TRAJECTORY_STRUCT_H

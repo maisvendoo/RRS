@@ -78,7 +78,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 // Добавляем разделение и в соседний главный путь
                 float coord;
                 zds_track_t track2 = getNearestTrack(track.end_point, tracks_data2, coord);
-                bool near_end = (coord > (track2.trajectory_coord + 0.5 * track2.length));
+                bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
                 size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
 
                 split_zds_trajectory_t split2 = split_zds_trajectory_t();
@@ -148,7 +148,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 // Добавляем разделение и в соседний главный путь
                 float coord;
                 zds_track_t track2 = getNearestTrack(track.begin_point, tracks_data2, coord);
-                bool near_end = (coord > (track2.trajectory_coord + 0.5 * track2.length));
+                bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
                 size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
 
                 split_zds_trajectory_t split2 = split_zds_trajectory_t();
@@ -399,6 +399,9 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
         trajectories = &trajectories2;
     }
 
+    name_next = name_prefix +
+                QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+
     bool was_1_track = false;
     for (auto it = tracks_data->begin(); it != tracks_data->end(); ++it)
     {
@@ -411,8 +414,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                 {
                     if ((*split)->track_id == it->id_at_track1)
                     {
-                        name_cur = name_prefix +
-                                   QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                        name_cur = name_next;
                         ++num_traj;
                         name_next = name_prefix +
                                     QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
@@ -430,9 +432,11 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                         (*split)->bwd_side_traj = (*split)->bwd_main_traj;
                         // Делаем траекторию данного пути "обратно" сзади основной
                         (*split)->bwd_main_traj = name_cur;
+                        (*split)->length_bwd_traj = trajectory_length;
 
                         trajectory.points.clear();
                         trajectory_length = 0.0;
+
                     }
                 }
             }
@@ -443,6 +447,8 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             {
                 // Однопутный участок
                 was_1_track = true;
+                it->trajectory_name = tracks_data1[it->id_at_track1].trajectory_name;
+                it->trajectory_coord = tracks_data1[it->id_at_track1].trajectory_coord;
             }
             else
             {
@@ -468,6 +474,8 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
         point.railway_coord = it->railway_coord;
         point.trajectory_coord = trajectory_length;
         trajectory.points.push_back(point);
+        it->trajectory_name = name_next;
+        it->trajectory_coord = trajectory_length;
 
         size_t id = it->prev_uid;
         bool is_split_next = false;
@@ -476,13 +484,13 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             if ((*split)->track_id == id + 1)
             {
                 is_split_next = true;
-                name_cur = name_prefix +
-                    QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                name_cur = name_next;
                 ++num_traj;
                 name_next = name_prefix +
                     QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
                 (*split)->bwd_main_traj = name_cur;
                 (*split)->fwd_main_traj = name_next;
+                (*split)->length_bwd_traj = trajectory_length + it->length;
             }
         }
         if (is_split_next || ((it+1) == tracks_data->end()))

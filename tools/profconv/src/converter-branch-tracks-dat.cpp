@@ -162,7 +162,7 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point)
             track = getNearestTrack(point_after_bias, tracks_data1, coord);
         }
 
-        near_end = (coord > (track.trajectory_coord + 0.5 * track.length));
+        near_end = (coord > (track.route_coord + 0.5 * track.length));
     }
     else
     {
@@ -188,7 +188,7 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t *branch_point)
             track = getNearestTrack(point_after_bias, tracks_data1, coord);
         }
 
-        near_end = (coord > (track.trajectory_coord + 0.5 * track.length));
+        near_end = (coord > (track.route_coord + 0.5 * track.length));
 
         dvec3 point_at_other_track = near_end ? track.end_point : track.begin_point;
         double distance = length(point_after_bias - point_at_other_track);
@@ -260,7 +260,7 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t *branch_point)
         track = getNearestTrack(point_after_bias, tracks_data1, coord);
     }
 
-    near_end = (coord > (track.trajectory_coord + 0.5 * track.length));
+    near_end = (coord > (track.route_coord + 0.5 * track.length));
 
     zds_branch_2_2_t branch_2plus2 = zds_branch_2_2_t();
     if (dir > 0)
@@ -306,7 +306,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
     size_t id_begin = branch_track->branch_points.begin()->main_track_id;
     double bias_prev = 0.0;
     double bias_curr = branch_track->branch_points.begin()->bias;
-    double coord_begin = tracks_data1[id_begin].trajectory_coord;
+    double coord_begin = tracks_data1[id_begin].route_coord;
     // Первая точка
     calculated_branch_point_t point_begin;
     point_begin.point = tracks_data1[id_begin].begin_point;
@@ -339,7 +339,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         do
         {
             ++id;
-            main_traj_l = tracks_data1[id].trajectory_coord - coord_begin;
+            main_traj_l = tracks_data1[id].route_coord - coord_begin;
         }
         while (main_traj_l < 95.0);
         size_t id_end = id;
@@ -352,13 +352,13 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
             double coord_add = COORD_COEFF[i] * main_traj_l;
             double coord_ref = coord_begin + coord_add;
             // Находим нужный подтрек - у следующего координата больше
-            while (tracks_data1[id + 1].trajectory_coord < coord_ref)
+            while (tracks_data1[id + 1].route_coord < coord_ref)
             {
                 ++id;
             }
 
             dvec3 main_track_point = tracks_data1[id].begin_point +
-                                     tracks_data1[id].orth * (coord_ref - tracks_data1[id].trajectory_coord);
+                                     tracks_data1[id].orth * (coord_ref - tracks_data1[id].route_coord);
 
             // Промежуточная точка отклонения
             calculated_branch_point_t point;
@@ -408,7 +408,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t *branch_track)
         id_begin = (it+1)->main_track_id;
         bias_prev = bias_curr;
         bias_curr = (it+1)->bias;
-        coord_begin = tracks_data1[id_begin].trajectory_coord;
+        coord_begin = tracks_data1[id_begin].route_coord;
 
         // Отмечаем разделение траектории светофором, если необходимо
         if ((it+1)->id_split_point != -1)
@@ -427,7 +427,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
     size_t id_begin = branch_track->branch_points.begin()->main_track_id + 1;
     double bias_prev = 0.0;
     double bias_curr = branch_track->branch_points.begin()->bias;
-    double coord_begin = tracks_data2[id_begin].trajectory_coord;
+    double coord_begin = tracks_data2[id_begin].route_coord;
     // Первая точка
     calculated_branch_point_t point_begin;
     point_begin.point = tracks_data2[id_begin].begin_point;
@@ -460,7 +460,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         do
         {
             --id;
-            main_traj_l = coord_begin - tracks_data2[id].trajectory_coord;
+            main_traj_l = coord_begin - tracks_data2[id].route_coord;
         }
         while (main_traj_l < 95.0);
         size_t id_end = id;
@@ -473,13 +473,13 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
             double coord_add = COORD_COEFF[i] * main_traj_l;
             double coord_ref = coord_begin - coord_add;
             // Находим нужный подтрек - у него координата меньше
-            while (coord_ref < tracks_data2[id].trajectory_coord)
+            while (coord_ref < tracks_data2[id].route_coord)
             {
                 --id;
             }
 
             dvec3 main_track_point = tracks_data2[id].begin_point +
-                                     tracks_data2[id].orth * (coord_ref - tracks_data2[id].trajectory_coord);
+                                     tracks_data2[id].orth * (coord_ref - tracks_data2[id].route_coord);
 
             // Промежуточная точка отклонения
             calculated_branch_point_t point;
@@ -530,7 +530,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t *branch_track)
         id_begin = (it+1)->main_track_id + 1;
         bias_prev = bias_curr;
         bias_curr = (it+1)->bias;
-        coord_begin = tracks_data2[id_begin].trajectory_coord;
+        coord_begin = tracks_data2[id_begin].route_coord;
 
         // Отмечаем разделение траектории светофором, если необходимо
         if ((it+1)->id_split_point != -1)
@@ -671,6 +671,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t *branch_track, const 
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
                     split.signal_bwd_liter = it->signal_liter;
                 }
+                split.length_bwd_traj = trajectory_length +
+                    length(branch_track->branch_trajectory[i + dir].point - trajectory.points.back().point);
                 branch_connectors.push_back(new split_zds_trajectory_t(split));
                 break;
             }

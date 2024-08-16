@@ -32,6 +32,7 @@
 #include    <QTextStream>
 
 #define     FILE_TOPOLOGY    std::string("topology.xml")
+#define     FILE_START_POINT std::string("waypoints.conf")
 #define     DELIMITER_SYMBOL char('\t')
 #define     FILE_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
@@ -89,6 +90,8 @@ private:
 
     route_connectors_t branch_connectors;
 
+    start_point_data_t start_points;
+
     std::vector<power_line_element_t> power_line1;
 
     std::vector<power_line_element_t> power_line2;
@@ -118,8 +121,6 @@ private:
     bool readStartKilometersDAT(const std::string &path, zds_start_km_data_t &waypoints);
 
     bool readStartKilometersDAT(QTextStream &stream, zds_start_km_data_t &waypoints);
-
-    void writeWaypoints(const std::string &filename, const zds_start_km_data_t &waypoints);
 
     void writeStations(const std::string &filename, const zds_start_km_data_t &waypoints);
 
@@ -157,6 +158,8 @@ private:
 
     void nameBranch22(zds_branch_2_2_t *branch_track, const int &dir, size_t num_trajectories);
 
+    void findStartPointsBySignals(const route_connectors_t &connectors);
+
     bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
 
     bool findNeutralInsertions(std::ifstream &stream, std::vector<neutral_insertion_t> ni);
@@ -166,6 +169,8 @@ private:
     void writeTopologyTrajectory(const trajectory_t* trajectory);
 
     void writeTopologyConnectors();
+
+    void writeStartPoints(const start_point_data_t &start_points);
 };
 
 #endif // CONVERTER_H
