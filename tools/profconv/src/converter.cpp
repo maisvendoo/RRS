@@ -271,7 +271,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
     {
-        writeWaypoints(waypoints_file, start_km_data);
+        writeStartPoints(start_km_data);
         writeStations(stations_file, start_km_data);
     }
 

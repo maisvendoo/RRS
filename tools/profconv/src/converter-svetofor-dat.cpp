@@ -51,7 +51,7 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
         if (tokens.size() > 3)
             signal.special = tokens[3].toStdString();
 
-        signal.trajectory_coord = tracks_data1[signal.track_id].trajectory_coord;
+        signal.trajectory_coord = tracks_data1[signal.track_id].route_coord;
 
         signals_data.push_back(signal);
     }

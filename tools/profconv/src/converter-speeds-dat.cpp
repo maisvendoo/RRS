@@ -61,8 +61,8 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         speed_point.end_track_id = std::max(begin_id_value, end_id_value) - 1;
         speed_point.limit = limit_value;
 
-        speed_point.begin_trajectory_coord = tracks_data1[speed_point.begin_track_id].trajectory_coord;
-        speed_point.end_trajectory_coord = tracks_data1[speed_point.end_track_id].trajectory_coord +
+        speed_point.begin_trajectory_coord = tracks_data1[speed_point.begin_track_id].route_coord;
+        speed_point.end_trajectory_coord = tracks_data1[speed_point.end_track_id].route_coord +
                                            tracks_data1[speed_point.end_track_id].length;
 
         speeds_data.push_back(speed_point);

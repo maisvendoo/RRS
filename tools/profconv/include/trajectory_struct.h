@@ -109,4 +109,21 @@ struct split_zds_trajectory_t
 //------------------------------------------------------------------------------
 typedef std::vector<split_zds_trajectory_t *> route_connectors_t;
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct start_point_t
+{
+    std::string name = "";
+    std::string trajectory_name = "";
+    int         direction = 1;
+    double      trajectory_coord = 0.0;
+    double      railway_coord = 0.0;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef std::vector<start_point_t>   start_point_data_t;
+
 #endif // TRAJECTORY_STRUCT_H

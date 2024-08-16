@@ -36,7 +36,6 @@ void ZDSimConverter::writeTopologyTrajectory(const trajectory_t* trajectory)
     }
 }
 
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -120,4 +119,45 @@ void ZDSimConverter::writeTopologyConnectors()
     }
 
     editor.closeFileAfterWrite();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::writeStartPoints(const zds_start_km_data_t &waypoints)
+{
+    std::string path = compinePath(toNativeSeparators(topologyDir), "debug-waypoints.conf");
+
+    QFile file_old(QString(path.c_str()));
+    if (file_old.exists())
+        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
+
+    QFile file(QString(path.c_str()));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+
+    stream << "#Станция"
+           << DELIMITER_SYMBOL << "#Траектория"
+           << DELIMITER_SYMBOL << "#Напр."
+           << DELIMITER_SYMBOL << "#Коорд."
+           << DELIMITER_SYMBOL << "#Жд-пикетаж"
+           << "\n";
+    for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
+    {
+        for (auto sp = it->start_points.begin(); sp != it->start_points.end(); ++sp)
+        {
+            start_point_t start_point = (*sp);
+            stream << start_point.name.c_str()
+                << DELIMITER_SYMBOL << start_point.trajectory_name.c_str()
+                << DELIMITER_SYMBOL << start_point.direction
+                << DELIMITER_SYMBOL << start_point.trajectory_coord
+                << DELIMITER_SYMBOL << static_cast<int>(round(start_point.railway_coord))
+                << "\n";
+        }
+    }
+
+    file.close();
 }

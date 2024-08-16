@@ -20,7 +20,7 @@ struct zds_track_t
     int         ordinate = 0;
 
     double      length = 0.0;
-    double      trajectory_coord = 0.0;
+    double      route_coord = 0.0;
     double      railway_coord = 0.0;
     double      railway_coord_end = 0.0;
     double      inclination = 0.0;
@@ -30,6 +30,9 @@ struct zds_track_t
     dvec3       up = dvec3(0.0, 0.0, 1.0);
     dvec3       trav = dvec3(0.0, 1.0, 0.0);
     int         id_at_track1 = -1;
+
+    std::string trajectory_name = "";
+    double      trajectory_coord = 0.0;
 };
 
 //------------------------------------------------------------------------------

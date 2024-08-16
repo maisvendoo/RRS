@@ -125,7 +125,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
         cur_track.up = normalize(cross(cur_track.right, cur_track.orth));
         cur_track.trav = normalize(dvec3(cur_track.orth.x, cur_track.orth.y, 0.0));
 
-        cur_track.trajectory_coord = trajectory_length;
+        cur_track.route_coord = trajectory_length;
         trajectory_length += cur_track.length;
 
         if (not_end)
@@ -186,7 +186,7 @@ void ZDSimConverter::writeProfileData(const zds_trajectory_data_t &tracks_data,
     {
         zds_track_t track = *it;
 
-        stream << track.trajectory_coord / 1000.0f << " "
+        stream << track.route_coord / 1000.0f << " "
                << track.orth.z * 1000.0f << " "
                << track.curvature << std::endl;
     }
@@ -221,14 +221,14 @@ void ZDSimConverter::writeMainTrajectory(const std::string &filename, const zds_
                << (*it).begin_point.y << ";"
                << (*it).begin_point.z << ";"
                << static_cast<int>(round((*it).railway_coord)) << ";"
-               << (*it).trajectory_coord << ";"
+               << (*it).route_coord << ";"
                << ((*it).id_at_track1 == -1 ? "TWO" : "ONE") << "\n";
     }
     stream << tracks_data.back().end_point.x << ";"
            << tracks_data.back().end_point.y << ";"
            << tracks_data.back().end_point.z << ";"
            << static_cast<int>(round(tracks_data.back().railway_coord_end)) << ";"
-           << tracks_data.back().trajectory_coord + tracks_data.back().length << "\n";
+           << tracks_data.back().route_coord + tracks_data.back().length << "\n";
 
     file.close();
 }
@@ -245,7 +245,7 @@ void ZDSimConverter::createPowerLine(const zds_trajectory_data_t &tracks_data,
 
         power_line_element_t p_line_emem;
 
-        p_line_emem.railway_coord = track.trajectory_coord;
+        p_line_emem.railway_coord = track.route_coord;
         p_line_emem.voltage = static_cast<float>(track.voltage);
 
         switch (track.voltage)

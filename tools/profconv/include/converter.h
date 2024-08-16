@@ -32,6 +32,7 @@
 #include    <QTextStream>
 
 #define     FILE_TOPOLOGY    std::string("topology.xml")
+#define     FILE_START_POINT std::string("waypoint.xml")
 #define     DELIMITER_SYMBOL char('\t')
 #define     FILE_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
@@ -119,8 +120,6 @@ private:
 
     bool readStartKilometersDAT(QTextStream &stream, zds_start_km_data_t &waypoints);
 
-    void writeWaypoints(const std::string &filename, const zds_start_km_data_t &waypoints);
-
     void writeStations(const std::string &filename, const zds_start_km_data_t &waypoints);
 
     bool readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data);
@@ -166,6 +165,8 @@ private:
     void writeTopologyTrajectory(const trajectory_t* trajectory);
 
     void writeTopologyConnectors();
+
+    void writeStartPoints(const zds_start_km_data_t &waypoints);
 };
 
 #endif // CONVERTER_H
