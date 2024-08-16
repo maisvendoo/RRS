@@ -176,9 +176,15 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
     QCommandLineOption direction(QStringList() << "d" << "direction",
                                  QCoreApplication::translate("main", "Motion's direction"),
-                                 QCoreApplication::translate("main", "direction"));
+                                 QCoreApplication::translate("main", "direction"));    
 
     parser.addOption(direction);
+
+    QCommandLineOption trajectory_name(QStringList() << "p" << "traj-name",
+                                       QCoreApplication::translate("main", "Initial trajectory name"),
+                                       QCoreApplication::translate("main", "traj-name"));
+
+    parser.addOption(trajectory_name);
 
     // Parse command line arguments
     if (!parser.parse(this->arguments()))
@@ -231,6 +237,12 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
         command_line.direction.is_present = true;
         QString tmp = parser.value(direction);
         command_line.direction.value = tmp.toInt();
+    }
+
+    if (parser.isSet(trajectory_name))
+    {
+        command_line.trajectory_name.is_present = true;
+        command_line.trajectory_name.value = parser.value(trajectory_name);
     }
 
     return CommandLineOk;

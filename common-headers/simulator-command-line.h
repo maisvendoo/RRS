@@ -20,6 +20,8 @@ struct simulator_command_line_t
     option_t<double>    init_coord;
     /// Initial direction
     option_t<int>       direction;
+    /// Initial trajectory
+    option_t<QString>   trajectory_name;
 };
 
 #endif // SIMULATOR_COMMAND_LINE

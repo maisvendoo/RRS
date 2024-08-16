@@ -426,6 +426,11 @@ void Model::overrideByCommandLine(init_data_t &init_data,
         init_data.direction = command_line.direction.value;
     }
 
+    if (command_line.trajectory_name.is_present)
+    {
+        init_data.trajectory_name = command_line.trajectory_name.value;
+    }
+
     Journal::instance()->info("Apply command line settinds");
 }
 
