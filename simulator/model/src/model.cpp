@@ -345,9 +345,9 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.train_config = "vl60pk-1543";
         }
 
-        if (!cfg.getString(secName, "RouteDirectory", init_data.route_dir_name))
+        if (!cfg.getString(secName, "TrajectoryName", init_data.trajectory_name))
         {
-            init_data.route_dir_name = "experimental-polygon";
+            init_data.trajectory_name = "route1_0001";
         }
 
         if (!cfg.getInt(secName, "Direction", init_data.direction))
