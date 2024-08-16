@@ -124,9 +124,9 @@ void ZDSimConverter::writeTopologyConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::writeStartPoints(const zds_start_km_data_t &waypoints)
+void ZDSimConverter::writeStartPoints(const start_point_data_t &start_points)
 {
-    std::string path = compinePath(toNativeSeparators(topologyDir), "debug-waypoints.conf");
+    std::string path = compinePath(toNativeSeparators(topologyDir), FILE_START_POINT);
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
@@ -138,25 +138,22 @@ void ZDSimConverter::writeStartPoints(const zds_start_km_data_t &waypoints)
 
     QTextStream stream(&file);
     stream.setEncoding(QStringConverter::Utf8);
-
+/*
     stream << "#Станция"
            << DELIMITER_SYMBOL << "#Траектория"
            << DELIMITER_SYMBOL << "#Напр."
            << DELIMITER_SYMBOL << "#Коорд."
            << DELIMITER_SYMBOL << "#Жд-пикетаж"
            << "\n";
-    for (auto it = waypoints.begin(); it != waypoints.end(); ++it)
+*/
+    for (auto start_point : start_points)
     {
-        for (auto sp = it->start_points.begin(); sp != it->start_points.end(); ++sp)
-        {
-            start_point_t start_point = (*sp);
-            stream << start_point.name.c_str()
-                << DELIMITER_SYMBOL << start_point.trajectory_name.c_str()
-                << DELIMITER_SYMBOL << start_point.direction
-                << DELIMITER_SYMBOL << start_point.trajectory_coord
-                << DELIMITER_SYMBOL << static_cast<int>(round(start_point.railway_coord))
-                << "\n";
-        }
+        stream << start_point->name.c_str()
+               << DELIMITER_SYMBOL << start_point->trajectory_name.c_str()
+               << DELIMITER_SYMBOL << start_point->direction
+               << DELIMITER_SYMBOL << start_point->trajectory_coord
+               << DELIMITER_SYMBOL << static_cast<int>(round(start_point->railway_coord))
+               << "\n";
     }
 
     file.close();

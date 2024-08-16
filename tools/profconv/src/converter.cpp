@@ -269,12 +269,6 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         }
     }
 
-    if (readStartKilometersDAT(start_km_path, start_km_data))
-    {
-        writeStartPoints(start_km_data);
-        writeStations(stations_file, start_km_data);
-    }
-
     if (!branch_track_data1.empty())
     {
         std::sort(branch_track_data1.begin(), branch_track_data1.end(), zds_branch_track_t::compare_by_track_id_begin);
@@ -350,6 +344,18 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     writeSplits(split_data2, dir);
 */
     writeTopologyConnectors();
+
+    if (readStartKilometersDAT(start_km_path, start_km_data))
+    {
+        writeStations(stations_file, start_km_data);
+    }
+
+    findStartPointsBySignals(split_data1);
+    findStartPointsBySignals(split_data2);
+    findStartPointsBySignals(branch_connectors);
+    std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_direction);
+    std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_station_id);
+    writeStartPoints(start_points);
 
     return true;
 }

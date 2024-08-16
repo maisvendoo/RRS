@@ -1,7 +1,9 @@
 #ifndef     ZDS_START_KM_H
 #define     ZDS_START_KM_H
 
-#include    "trajectory_struct.h"
+#include    <vector>
+#include    <string>
+#include    <vec3.h>
 
 //------------------------------------------------------------------------------
 //
@@ -15,7 +17,8 @@ struct zds_start_km_t
     double  forward_route_coord = 0.0;
     double  backward_route_coord = 0.0;
 
-    start_point_data_t start_points = {};
+    dvec3 mean_point = {0.0, 0.0, 0.0};
+    double station_id = 0;
 };
 
 //------------------------------------------------------------------------------

@@ -432,6 +432,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                         (*split)->bwd_side_traj = (*split)->bwd_main_traj;
                         // Делаем траекторию данного пути "обратно" сзади основной
                         (*split)->bwd_main_traj = name_cur;
+                        (*split)->length_bwd_traj = trajectory_length;
 
                         trajectory.points.clear();
                         trajectory_length = 0.0;
@@ -489,6 +490,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                     QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
                 (*split)->bwd_main_traj = name_cur;
                 (*split)->fwd_main_traj = name_next;
+                (*split)->length_bwd_traj = trajectory_length + it->length;
             }
         }
         if (is_split_next || ((it+1) == tracks_data->end()))

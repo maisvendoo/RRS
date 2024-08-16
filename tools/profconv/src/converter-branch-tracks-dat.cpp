@@ -671,6 +671,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t *branch_track, const 
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
                     split.signal_bwd_liter = it->signal_liter;
                 }
+                split.length_bwd_traj = trajectory_length +
+                    length(branch_track->branch_trajectory[i + dir].point - trajectory.points.back().point);
                 branch_connectors.push_back(new split_zds_trajectory_t(split));
                 break;
             }
