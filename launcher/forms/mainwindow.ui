@@ -92,6 +92,9 @@
              </widget>
             </item>
             <item>
+             <widget class="QComboBox" name="cbTrajectories"/>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3,0">
               <item>
                <widget class="QLabel" name="label_3">

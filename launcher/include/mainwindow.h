@@ -109,6 +109,9 @@ private:
     /// Loading of stations list for selected route
     void loadStations(QString &routeDir);
 
+    /// Loading of trajectories for selected route
+    void loadTrajectories(QString &routeDir);
+
     /// Check backward direction
     bool isBackward();
 

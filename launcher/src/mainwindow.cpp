@@ -301,6 +301,32 @@ void MainWindow::loadStations(QString &routeDir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::loadTrajectories(QString &routeDir)
+{
+    QString path = routeDir + QDir::separator() +
+                   "topology" + QDir::separator() +
+                   + "trajectories";
+
+    QDir traj_dir(path);
+
+    QDirIterator traj_files(traj_dir.path(),
+                            QStringList() << "*.traj",
+                            QDir::NoDotAndDotDot | QDir::Files);
+
+
+    while (traj_files.hasNext())
+    {
+        QString fullpath = traj_files.next();
+
+        QFileInfo file_info(fullpath);
+
+        ui->cbTrajectories->addItem(file_info.baseName());
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool MainWindow::isBackward()
 {
     switch (ui->cbDirection->currentIndex())
@@ -354,6 +380,8 @@ void MainWindow::onRouteSelection()
     ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
 
     loadStations(routes_info[item_idx].route_dir_full_path);
+
+    loadTrajectories(routes_info[item_idx].route_dir_full_path);
 
     onStationSelected(ui->cbStations->currentIndex());
 
