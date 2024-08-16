@@ -31,6 +31,12 @@ private:
     Trajectory *bwdMinusTraj = Q_NULLPTR;
 
     Trajectory *bwdPlusTraj = Q_NULLPTR;
+
+    /// Состояние стрелки впереди
+    int state_fwd = 1;
+
+    /// Состояние стрелки сзади
+    int state_bwd = 1;
 };
 
 #endif // SWITCH_H

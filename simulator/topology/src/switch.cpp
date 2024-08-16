@@ -22,7 +22,7 @@ Switch::~Switch()
 //------------------------------------------------------------------------------
 Trajectory *Switch::getFwdTraj() const
 {
-    if (state == 1)
+    if (state_fwd == 1)
     {
         if (fwdPlusTraj != Q_NULLPTR)
             return fwdPlusTraj;
@@ -33,7 +33,7 @@ Trajectory *Switch::getFwdTraj() const
         }
     }
 
-    if (state == -1)
+    if (state_fwd == -1)
     {
         if (fwdMinusTraj != Q_NULLPTR)
             return fwdMinusTraj;
@@ -51,7 +51,7 @@ Trajectory *Switch::getFwdTraj() const
 //------------------------------------------------------------------------------
 Trajectory *Switch::getBwdTraj() const
 {
-    if (state == 1)
+    if (state_bwd == 1)
     {
         if (bwdPlusTraj != Q_NULLPTR)
             return bwdPlusTraj;
@@ -62,7 +62,7 @@ Trajectory *Switch::getBwdTraj() const
         }
     }
 
-    if (state == -1)
+    if (state_bwd == -1)
     {
         if (bwdMinusTraj != Q_NULLPTR)
             return bwdMinusTraj;
@@ -81,6 +81,9 @@ Trajectory *Switch::getBwdTraj() const
 void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 {
     Connector::configure(cfg, secNode, traj_list);
+
+    cfg.getInt(secNode, "state_fwd", state_fwd);
+    cfg.getInt(secNode, "state_bwd", state_bwd);
 
     Journal::instance()->info("Connector type: switch");
 

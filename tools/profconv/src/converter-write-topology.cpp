@@ -53,14 +53,14 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
     if (!bwd_side.isEmpty())
     {
         flist.append(QPair<QString, QString>("bwdMinusTraj", bwd_side));
-        flist.append(QPair<QString, QString>("state", QString("1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
+        flist.append(QPair<QString, QString>("state_bwd", QString("1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
     }
     // Стрелка на бок спереди
     QString fwd_side = QString(connector->fwd_side_traj.c_str());
     if (!fwd_side.isEmpty())
     {
         flist.append(QPair<QString, QString>("fwdMinusTraj", fwd_side));
-        flist.append(QPair<QString, QString>("state", QString("1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
+        flist.append(QPair<QString, QString>("state_fwd", QString("1"))); // РАЗДЕЛИТЬ "state" ДЛЯ СТРЕЛОК СПЕРЕДИ И СЗАДИ
     }
 
     // Светофор назад
