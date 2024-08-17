@@ -97,6 +97,8 @@ private:
                     track_t &cur_track,
                     track_t &prev_track,
                     track_t &next_track);
+
+    double calc_curvature(track_t &cur_track, track_t &next_track);
 };
 
 #endif

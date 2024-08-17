@@ -31,4 +31,15 @@ void VL60pk::debugPrint(double t, double dt)
                     .arg(anglecock_bp_bwd->isOpened())
                     .arg(hose_bp_fwd->isConnected())
                     .arg(hose_bp_bwd->isConnected());
+
+    DebugMsg += QString("| Curvature: %1").arg(profile_point_data.curvature);
+
+    if (profile_point_data.curvature > Physics::ZERO)
+    {
+        DebugMsg += QString("| Radius: %1").arg(1 / profile_point_data.curvature);
+    }
+    else
+    {
+        DebugMsg += QString("| Radius: inf");
+    }
 }
