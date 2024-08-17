@@ -391,18 +391,17 @@ void MainWindow::onRouteSelection()
 void MainWindow::onTrajectorySelection(int index)
 {
     QString point_name = ui->cbTrajectories->itemText(index);
-    selected_train_position = train_positions.value(point_name, train_position_t());
 
-    ui->dsbOrdinate->setValue(selected_train_position.traj_coord);
-
-    if (selected_train_position.direction == 1)
+    if (isBackward())
     {
-        ui->cbDirection->setCurrentIndex(0);
+        selected_train_position = bwd_train_positions.value(point_name, train_position_t());
     }
     else
     {
-        ui->cbDirection->setCurrentIndex(1);
+        selected_train_position = fwd_train_positions.value(point_name, train_position_t());
     }
+
+    ui->dsbOrdinate->setValue(selected_train_position.traj_coord);
 }
 
 //------------------------------------------------------------------------------
@@ -484,6 +483,23 @@ void MainWindow::onStationSelected(int index)
 void MainWindow::onDirectionSelected(int index)
 {
     Q_UNUSED(index)
+
+    ui->cbTrajectories->clear();
+
+    if (index == 0)
+    {
+        for (auto tp : fwd_train_positions)
+        {
+            ui->cbTrajectories->addItem(tp.name);
+        }
+    }
+    else
+    {
+        for (auto tp : bwd_train_positions)
+        {
+            ui->cbTrajectories->addItem(tp.name);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -739,7 +755,8 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
 void MainWindow::loadTrainPositions(const QString &routeDir)
 {
     ui->cbTrajectories->clear();
-    train_positions.clear();
+    fwd_train_positions.clear();
+    bwd_train_positions.clear();
 
     QString path = routeDir + QDir::separator() +
                    "topology" + QDir::separator() +
@@ -766,8 +783,16 @@ void MainWindow::loadTrainPositions(const QString &routeDir)
         tp.traj_coord = tokens[3].toDouble();
         tp.railway_coord = tokens[4].toDouble();
 
-        train_positions.insert(tp.name, tp);
+        //train_positions.insert(tp.name, tp);
 
-        ui->cbTrajectories->addItem(tp.name);
+        if (tp.direction > 0)
+        {
+            fwd_train_positions.insert(tp.name, tp);
+            ui->cbTrajectories->addItem(tp.name);
+        }
+        else
+        {
+            bwd_train_positions.insert(tp.name, tp);
+        }
     }
 }
