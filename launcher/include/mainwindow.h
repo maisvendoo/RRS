@@ -88,9 +88,9 @@ private:
 
     QString settings_path;
 
-    QMap<QString, train_position_t> fwd_train_positions;
+    std::vector<train_position_t> fwd_train_positions;
 
-    QMap<QString, train_position_t> bwd_train_positions;
+    std::vector<train_position_t> bwd_train_positions;
 
     train_position_t selected_train_position;
 

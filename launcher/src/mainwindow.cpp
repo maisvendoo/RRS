@@ -394,11 +394,11 @@ void MainWindow::onTrajectorySelection(int index)
 
     if (isBackward())
     {
-        selected_train_position = bwd_train_positions.value(point_name, train_position_t());
+        selected_train_position = bwd_train_positions[index];
     }
     else
     {
-        selected_train_position = fwd_train_positions.value(point_name, train_position_t());
+        selected_train_position = fwd_train_positions[index];
     }
 
     ui->dsbOrdinate->setValue(selected_train_position.traj_coord);
@@ -488,16 +488,16 @@ void MainWindow::onDirectionSelected(int index)
 
     if (index == 0)
     {
-        for (auto tp : fwd_train_positions)
+        for (auto tp = fwd_train_positions.begin(); tp != fwd_train_positions.end(); ++tp)
         {
-            ui->cbTrajectories->addItem(tp.name);
+            ui->cbTrajectories->addItem((*tp).name);
         }
     }
     else
     {
-        for (auto tp : bwd_train_positions)
+        for (auto tp = bwd_train_positions.begin(); tp != bwd_train_positions.end(); ++tp)
         {
-            ui->cbTrajectories->addItem(tp.name);
+            ui->cbTrajectories->addItem((*tp).name);
         }
     }
 }
@@ -787,12 +787,12 @@ void MainWindow::loadTrainPositions(const QString &routeDir)
 
         if (tp.direction > 0)
         {
-            fwd_train_positions.insert(tp.name, tp);
+            fwd_train_positions.push_back(tp);
             ui->cbTrajectories->addItem(tp.name);
         }
         else
         {
-            bwd_train_positions.insert(tp.name, tp);
+            bwd_train_positions.push_back(tp);
         }
     }
 }
