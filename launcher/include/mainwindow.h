@@ -88,6 +88,10 @@ private:
 
     QString settings_path;
 
+    QMap<QString, train_position_t> train_positions;
+
+    train_position_t selected_train_position;
+
     /// Launcer initialization
     void init();
 
@@ -130,9 +134,13 @@ private:
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
 
+    void loadTrainPositions(const QString &routeDir);
+
 private slots:
 
     void onRouteSelection();
+
+    void onTrajectorySelection(int index);
 
     void onTrainSelection();
 

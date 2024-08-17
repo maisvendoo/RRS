@@ -44,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->lwRoutes, &QListWidget::itemSelectionChanged,
             this, &MainWindow::onRouteSelection);
 
+    connect(ui->cbTrajectories, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onTrajectorySelection);
+
     connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
             this, &MainWindow::onTrainSelection);
 
@@ -222,19 +225,13 @@ void MainWindow::startSimulator()
     QStringList args;
     args << "--train-config=" + selectedTrain;
     args << "--route=" + selectedRouteDirName;
+    args << "--direction=" + QString("%1").arg(selected_train_position.direction);
+    args << "--traj-name=" + selected_train_position.trajectory_name;
 
-    if (isBackward())
-    {
-        args << "--direction=-1";
-    }
-    else
-    {
-        args << "--direction=1";
-    }
 
     if (ui->cbStations->count() != 0)
     {        
-        double init_coord = ui->dsbOrdinate->value() / 1000.0;
+        double init_coord = selected_train_position.traj_coord;
         args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
 
@@ -381,11 +378,22 @@ void MainWindow::onRouteSelection()
 
     loadStations(routes_info[item_idx].route_dir_full_path);
 
-    loadTrajectories(routes_info[item_idx].route_dir_full_path);
+    loadTrainPositions(routes_info[item_idx].route_dir_full_path);
 
     onStationSelected(ui->cbStations->currentIndex());
 
     setRouteScreenShot(routes_info[item_idx].route_dir_full_path + QDir::separator() + "shotcut.png");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onTrajectorySelection(int index)
+{
+    QString point_name = ui->cbTrajectories->itemText(index);
+    selected_train_position = train_positions.value(point_name, train_position_t());
+
+    ui->dsbOrdinate->setValue(selected_train_position.railway_coord);
 }
 
 //------------------------------------------------------------------------------
@@ -459,14 +467,6 @@ void MainWindow::onViewerFinished(int exitCode, QProcess::ExitStatus exitStatus)
 void MainWindow::onStationSelected(int index)
 {
     size_t idx = static_cast<size_t>(index);
-
-    if (idx < waypoints.size())
-    {
-        if (isBackward())
-            ui->dsbOrdinate->setValue(waypoints[idx].backward_coord);
-        else
-            ui->dsbOrdinate->setValue(waypoints[idx].forward_coord);
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -726,4 +726,40 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
     CfgEditor editor;
 
     editor.editFile(settings_path, "Viewer", fd_list);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadTrainPositions(const QString &routeDir)
+{
+    QString path = routeDir + QDir::separator() +
+                   "topology" + QDir::separator() +
+                   "waypoints.conf";
+
+    QFile waypoints_file(path);
+
+    if (!waypoints_file.open(QIODevice::ReadOnly))
+    {
+        return;
+    }
+
+    QTextStream stream(&waypoints_file);
+
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine();
+        QStringList tokens = line.split('\t');
+
+        train_position_t tp;
+        tp.name = tokens[0];
+        tp.trajectory_name = tokens[1];
+        tp.direction = tokens[2].toInt();
+        tp.traj_coord = tokens[3].toDouble();
+        tp.railway_coord = tokens[4].toDouble();
+
+        train_positions.insert(tp.name, tp);
+
+        ui->cbTrajectories->addItem(tp.name);
+    }
 }
