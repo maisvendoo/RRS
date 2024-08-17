@@ -393,7 +393,7 @@ void MainWindow::onTrajectorySelection(int index)
     QString point_name = ui->cbTrajectories->itemText(index);
     selected_train_position = train_positions.value(point_name, train_position_t());
 
-    ui->dsbOrdinate->setValue(selected_train_position.railway_coord);
+    ui->dsbOrdinate->setValue(selected_train_position.traj_coord);
 }
 
 //------------------------------------------------------------------------------
