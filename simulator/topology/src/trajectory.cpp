@@ -102,12 +102,13 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 
     findTracks(traj_coord, cur_track, prev_track, next_track);
 
+    double dir = static_cast<double>(direction);
+
     pp.curvature = calc_curvature(cur_track, next_track);
 
     pp.position = cur_track.begin_point +
                   cur_track.orth * (traj_coord - cur_track.traj_coord);
 
-    double dir = static_cast<double>(direction);
 
     pp.inclination = cur_track.inclination * dir;
 

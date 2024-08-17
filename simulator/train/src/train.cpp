@@ -133,6 +133,7 @@ void Train::preStep(double t)
 
         //*vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
 
+        topology->getVehicleController(i)->setDirection(dir);
         topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
         *vehicle->getProfilePoint() = topology->getVehicleController(i)->getPosition(dir * vehicle->getOrientation());
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);

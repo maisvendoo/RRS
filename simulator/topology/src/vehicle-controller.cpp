@@ -33,7 +33,7 @@ void VehicleController::setRailwayCoord(double x)
 
     // Обновляем траекторную координату, в соответствии с относительным
     // перемещением ПЕ
-    traj_coord += dir * (x_cur - x_prev);
+    traj_coord += x_cur - x_prev;
 
     // Инициализируем предыдущую траекторию как текущую
     prev_traj = current_traj;
