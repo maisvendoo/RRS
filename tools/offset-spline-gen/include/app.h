@@ -38,6 +38,7 @@ private:
     QString filename = "";
     QString trkfile = "";
     int track = 0;
+    double len = 100.0;
     double begin_bias = 0.0;
     double end_bias = 0.0;
 

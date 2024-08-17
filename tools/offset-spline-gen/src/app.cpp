@@ -86,20 +86,26 @@ Application::CommandLineResult Application::parseCommandLine(QString &errorMessa
                                      QCoreApplication::translate("main", "Number of track"),
                                      QCoreApplication::translate("main", "track"));
 
+    QCommandLineOption optLength(QStringList() << "l" << "length",
+                                    QCoreApplication::translate("main", "Length of spline, the nearest track after length will be used for end point, default: 100"),
+                                    QCoreApplication::translate("main", "spline, 20 - 500"),
+                                    QString("100.0"));
+
     QCommandLineOption optBiasBegin(QStringList() << "d" << "distance",
                                QCoreApplication::translate("main", "Offset distance: >0 to right, <0 to left, default: 0.0"),
-                               QCoreApplication::translate("main", "distance begin"),
+                               QCoreApplication::translate("main", "distance at begin"),
                                QString("0.0"));
 
     QCommandLineOption optBiasEnd(QStringList() << "e" << "end",
                                   QCoreApplication::translate("main", "Offset distance: >0 to right, <0 to left, default: 7.5"),
-                                  QCoreApplication::translate("main", "distance end"),
+                                  QCoreApplication::translate("main", "distance at end"),
                                   QString("7.5"));
 
     parser.addOption(optRouteDir);
     parser.addOption(optFile);
     parser.addOption(optRouteTrkNum);
     parser.addOption(optTrack);
+    parser.addOption(optLength);
     parser.addOption(optBiasBegin);
     parser.addOption(optBiasEnd);
 
@@ -145,6 +151,13 @@ Application::CommandLineResult Application::parseCommandLine(QString &errorMessa
         track = tmp.toInt();
         std::cout << "track: " << track << std::endl;
         --track;
+    }
+
+    if (parser.isSet(optLength))
+    {
+        QString tmp = parser.value(optLength);
+        len = tmp.toDouble();
+        std::cout << "spline length: " << len << std::endl;
     }
 
     if (parser.isSet(optBiasBegin))
@@ -378,6 +391,7 @@ void Application::generate_topology(const QString &route_dir)
     }
 
     track = cut(track, 0, static_cast<int>(zds_tracks.size()) - 1);
+    len = cut(len, 20.0, 500.0);
 
     QString traj_path = trajDir + QDir::separator() +
                         filename + FILE_EXTENTION.c_str();
@@ -412,9 +426,8 @@ void Application::generate_topology(const QString &route_dir)
         << "\n";
 
     // Траектория отклонения
-    // Отклонение в ZDS длится 100 метров
-    // На всякий случай проверяем разбиение стометрового трека на подтреки
-    // Ищем трек, который через 100 м - как трек, который хотя бы через 95 м
+    // Ищем ближайший трек, который через заданную длину - как трек,
+    // который хотя бы через 0.97 от этой длины
     size_t id_end = track;
     double coord_begin = zds_tracks[track].route_coord;
     double railway_coord_begin = zds_tracks[track].railway_coord;
@@ -431,7 +444,7 @@ void Application::generate_topology(const QString &route_dir)
             break;
         }
     }
-    while (main_traj_l < 95.0);
+    while (main_traj_l < 0.97 * len);
     double railway_coord_length = zds_tracks[id_end].railway_coord - railway_coord_begin;
 
     // Расчёт промежуточных точек по траектории сплайна отклонения
