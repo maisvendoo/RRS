@@ -76,22 +76,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="cbStations">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>10000</width>
-                <height>16777215</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QComboBox" name="cbTrajectories"/>
             </item>
             <item>
@@ -111,7 +95,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Ordinate, m</string>
+                 <string>Distance, m</string>
                 </property>
                </widget>
               </item>
