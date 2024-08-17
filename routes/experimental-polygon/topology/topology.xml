@@ -466,18 +466,18 @@
         <Name>00064</Name>
         <bwdPlusTraj>branch2_0001_1</bwdPlusTraj>
         <fwdPlusTraj>branch2_0001_2</fwdPlusTraj>
-        <SignalLetter>Ч4</SignalLetter>
+        <SignalLetter>Н4</SignalLetter>
     </Switch>
     <Switch>
         <Name>00065</Name>
         <bwdPlusTraj>branch2_0002_1</bwdPlusTraj>
         <fwdPlusTraj>branch2_0002_2</fwdPlusTraj>
-        <SignalLetter>Ч4</SignalLetter>
+        <SignalLetter>Н4</SignalLetter>
     </Switch>
     <Switch>
         <Name>00066</Name>
         <bwdPlusTraj>branch2_0003_1</bwdPlusTraj>
         <fwdPlusTraj>branch2_0003_2</fwdPlusTraj>
-        <SignalLetter>Ч4</SignalLetter>
+        <SignalLetter>Н4</SignalLetter>
     </Switch>
 </Config>
