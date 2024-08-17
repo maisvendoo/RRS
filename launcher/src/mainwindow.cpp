@@ -62,9 +62,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(&viewerProc, &QProcess::finished,
             this, &MainWindow::onViewerFinished);
 
-    connect(ui->cbStations, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onStationSelected);
-
     connect(ui->cbDirection, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onDirectionSelected);
 
@@ -225,13 +222,20 @@ void MainWindow::startSimulator()
     QStringList args;
     args << "--train-config=" + selectedTrain;
     args << "--route=" + selectedRouteDirName;
-    args << "--direction=" + QString("%1").arg(selected_train_position.direction);
     args << "--traj-name=" + selected_train_position.trajectory_name;
 
+    if (isBackward())
+    {
+        args << "--direction=-1";
+    }
+    else
+    {
+        args << "--direction=1";
+    }
 
-    if (ui->cbStations->count() != 0)
-    {        
-        double init_coord = selected_train_position.traj_coord;
+    if (ui->cbTrajectories->count() != 0)
+    {
+        double init_coord = ui->dsbOrdinate->value();
         args << "--init-coord=" + QString("%1").arg(init_coord, 0, 'f', 2);
     }
 
@@ -270,7 +274,6 @@ void MainWindow::startViewer()
 //------------------------------------------------------------------------------
 void MainWindow::loadStations(QString &routeDir)
 {
-    ui->cbStations->clear();
     waypoints.clear();
 
     QFile file(routeDir + QDir::separator() + "waypoints.conf");
@@ -288,11 +291,8 @@ void MainWindow::loadStations(QString &routeDir)
 
         ss >> waypoint.name >> waypoint.forward_coord >> waypoint.backward_coord;
 
-        ui->cbStations->addItem(waypoint.name);
         waypoints.push_back(waypoint);
-    }
-
-    ui->cbStations->setCurrentIndex(0);
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -380,7 +380,7 @@ void MainWindow::onRouteSelection()
 
     loadTrainPositions(routes_info[item_idx].route_dir_full_path);
 
-    onStationSelected(ui->cbStations->currentIndex());
+    onTrajectorySelection(0);
 
     setRouteScreenShot(routes_info[item_idx].route_dir_full_path + QDir::separator() + "shotcut.png");
 }
@@ -394,6 +394,15 @@ void MainWindow::onTrajectorySelection(int index)
     selected_train_position = train_positions.value(point_name, train_position_t());
 
     ui->dsbOrdinate->setValue(selected_train_position.traj_coord);
+
+    if (selected_train_position.direction == 1)
+    {
+        ui->cbDirection->setCurrentIndex(0);
+    }
+    else
+    {
+        ui->cbDirection->setCurrentIndex(1);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -475,10 +484,6 @@ void MainWindow::onStationSelected(int index)
 void MainWindow::onDirectionSelected(int index)
 {
     Q_UNUSED(index)
-
-    int station_idx = ui->cbStations->currentIndex();
-
-    onStationSelected(station_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -733,6 +738,9 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
 //------------------------------------------------------------------------------
 void MainWindow::loadTrainPositions(const QString &routeDir)
 {
+    ui->cbTrajectories->clear();
+    train_positions.clear();
+
     QString path = routeDir + QDir::separator() +
                    "topology" + QDir::separator() +
                    "waypoints.conf";
