@@ -34,6 +34,8 @@ void ZDSimConverter::writeTopologyTrajectory(const trajectory_t* trajectory)
             << DELIMITER_SYMBOL << point->trajectory_coord
             << "\n";
     }
+
+    file.close();
 }
 
 //------------------------------------------------------------------------------

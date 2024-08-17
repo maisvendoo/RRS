@@ -5,6 +5,9 @@
 #include    <QCommandLineParser>
 
 #include    <zds-track.h>
+#define     DELIMITER_SYMBOL char('\t')
+#define     FILE_EXTENTION   std::string(".traj")
+#define     FILE_BACKUP_EXTENTION std::string(".bak")
 
 //------------------------------------------------------------------------------
 //
@@ -31,10 +34,16 @@ private:
 
     QCommandLineParser parser;
 
-    QString traj_path = "";
+    QString routeDir = "";
+    QString filename = "";
+    QString trkfile = "";
+    int begin_track = 0;
+    int end_track = 1;
+    double bias = 7.5;
 
-    CommandLineResult parseCommandLine(QString &route_dir,
-                                       QString &errorMessage);
+    QString trajDir = "";
+
+    CommandLineResult parseCommandLine(QString &errorMessage);
 
     void generate_topology(const QString &route_dir);
 

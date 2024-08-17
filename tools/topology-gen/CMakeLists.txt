@@ -26,6 +26,9 @@ add_executable (${TARGET} ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
+target_include_directories (${TARGET} PRIVATE ../../simulator/physics/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Core)
+# и со своими не забываем
+target_link_libraries (${TARGET} physics)
