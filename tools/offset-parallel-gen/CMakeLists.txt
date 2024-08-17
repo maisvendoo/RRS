@@ -1,6 +1,6 @@
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET topology-gen)
+set (TARGET offset-parallel-gen)
 
 # Задаем имя проекта
 project (${TARGET})
