@@ -15,7 +15,7 @@
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="52"/>
-        <location filename="../src/mainwindow.cpp" line="118"/>
+        <location filename="../src/mainwindow.cpp" line="119"/>
         <source>Open route</source>
         <translation>Открыть</translation>
     </message>
@@ -40,47 +40,46 @@
         <translation>Конвертировать</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="127"/>
+        <location filename="../src/mainwindow.cpp" line="128"/>
         <source>Route opened succesfully</source>
         <translation>Маршрут выбран</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="137"/>
+        <location filename="../src/mainwindow.cpp" line="211"/>
+        <location filename="../src/mainwindow.cpp" line="249"/>
+        <location filename="../src/mainwindow.cpp" line="269"/>
         <source>Error: route is&apos;t loaded. Please choose route</source>
         <translation>Ошибка: маршрут не выбран. Пожалуйста, выберете маршрут</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="143"/>
+        <location filename="../src/mainwindow.cpp" line="211"/>
+        <location filename="../src/mainwindow.cpp" line="255"/>
+        <location filename="../src/mainwindow.cpp" line="275"/>
+        <source>Error: filename is empty. Please fill it</source>
+        <translation>Ошибка: задано пустое имя файла. Заполните поле &quot;Output filename&quot;</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="217"/>
         <source>Error: route title is empty. Please fill it</source>
         <translation>Ошибка: отсутсвует название маршрута. Заполните поле &quot;Название маршрута&quot;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="149"/>
+        <location filename="../src/mainwindow.cpp" line="223"/>
         <source>Error: route description is empty. Please fill it</source>
         <translation>Ошибка: заполните описание маршрута</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="155"/>
+        <location filename="../src/mainwindow.cpp" line="229"/>
         <source>Error: route-type file is&apos;t created</source>
         <translation>Ошибка: файл route-type не создан</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="161"/>
+        <location filename="../src/mainwindow.cpp" line="235"/>
         <source>Error: description file is&apos;t created</source>
         <translation>Ошибка: невозможно создать файл описания</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="175"/>
-        <source>Error: path converter failed</source>
-        <translation>Ошибка: сбой конвертации путей</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cpp" line="189"/>
-        <source>Error: profile converter failed</source>
-        <translation>Ошибка: сбой конвертации профиля</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cpp" line="193"/>
+        <location filename="../src/mainwindow.cpp" line="299"/>
         <source>OK: conversion complete</source>
         <translation>Конвертация успешно завершена</translation>
     </message>

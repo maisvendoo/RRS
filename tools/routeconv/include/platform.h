@@ -3,13 +3,10 @@
 
 #include    <QString>
 
-#ifdef QT_DEBUG
-    const QString PATHCONV = "pathconv_d";
-    const QString PROFCONV = "profconv_d";
-#else
-    const QString PATHCONV = "pathconv";
-    const QString PROFCONV = "profconv";
-#endif
+const QString PATHCONV = "pathconv";
+const QString PROFCONV = "profconv";
+const QString PARALLELGEN = "offset-parallel-gen";
+const QString SPLINEGEN = "offset-spline-gen";
 
 #ifdef __WIN32__
     const QString EXE_EXP = ".exe";

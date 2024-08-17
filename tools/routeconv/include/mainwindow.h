@@ -37,6 +37,8 @@ private:
 
     QProcess    pathconvProc;
     QProcess    profconvProc;
+    QProcess    parallelGenProc;
+    QProcess    splineGenProc;
 
     bool createRouteTypeFile();
 
@@ -45,6 +47,10 @@ private:
     void startPathConverter(QString routeDir);
 
     void startProfConverter(QString routeDir);
+
+    void startParallelGenerator(QString routeDir);
+
+    void startSplineGenerator(QString routeDir);
 
 private slots:
 
@@ -55,6 +61,10 @@ private slots:
     void slotIsPathconvFinished(int error_code, QProcess::ExitStatus exitstatus);
 
     void slotIsProfconvFinished(int error_code, QProcess::ExitStatus exitstatus);
+
+    void slotGenerateParallel();
+
+    void slotGenerateSpline();
 };
 
 #endif // MAINWINDOW_H
