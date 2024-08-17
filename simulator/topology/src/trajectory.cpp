@@ -5,6 +5,7 @@
 
 #include    <fstream>
 #include    <Journal.h>
+#include    <physics.h>
 
 //------------------------------------------------------------------------------
 //
@@ -101,10 +102,13 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 
     findTracks(traj_coord, cur_track, prev_track, next_track);
 
+    double dir = static_cast<double>(direction);
+
+    pp.curvature = calc_curvature(cur_track, next_track);
+
     pp.position = cur_track.begin_point +
                   cur_track.orth * (traj_coord - cur_track.traj_coord);
 
-    double dir = static_cast<double>(direction);
 
     pp.inclination = cur_track.inclination * dir;
 
@@ -315,4 +319,44 @@ void Trajectory::findTracks(double traj_coord,
     cur_track = tracks[idx];
     prev_track = tracks[idx - 1];
     next_track = tracks[idx + 1];    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Trajectory::calc_curvature(track_t &cur_track, track_t &next_track)
+{
+    double curvature = 0.0;
+
+    double A0 = cur_track.orth.x;
+    double B0 = cur_track.orth.y;
+
+    // Центр текущего трека
+    dvec3 S0 = (cur_track.begin_point + cur_track.end_point) * 0.5;
+
+    double D0 = A0 * S0.x + B0 * S0.y;
+
+    double A1 = next_track.orth.x;
+    double B1 = next_track.orth.y;
+
+    // Центр следующего трека
+    dvec3 S1 = (next_track.begin_point + next_track.end_point) * 0.5;
+
+    double D1 = A1 * S1.x + B1 * S1.y;
+
+    double det = A0*B1 - A1*B0;
+
+    if ( qAbs(det) <= Physics::ZERO )
+    {
+        return 0.0;
+    }
+
+    double xC = (B0*D1 - B1*D0) / det;
+    double yC = (A0*D1 - A1*D0) / det;
+
+    double rho = std::sqrt( std::pow(S0.x - xC, 2.0) + std::pow(S0.y - yC, 2.0) );
+
+    curvature = 1 / rho;
+
+    return curvature;
 }
