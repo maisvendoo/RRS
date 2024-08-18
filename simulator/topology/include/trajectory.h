@@ -78,6 +78,8 @@ public:
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction);
 
+    QByteArray serialize();
+
 private:
 
     QString name = "";

@@ -2,6 +2,9 @@
 #define     TRACK_H
 
 #include    <vec3.h>
+#include    <QByteArray>
+#include    <QBuffer>
+#include    <QDataStream>
 
 //------------------------------------------------------------------------------
 //
@@ -60,6 +63,42 @@ struct track_t
 
         up = cross(trav, t);
         up = normalize(up);
+    }
+
+    /// Сериализация (прeобразование в последовательность байт)
+    QByteArray serialize()
+    {
+        QBuffer data;
+        data.open(QIODevice::WriteOnly);
+        QDataStream stream(&data);
+
+        stream << begin_point.x << begin_point.y << begin_point.z
+               <<end_point.x << end_point.y << end_point.z
+               << orth.x << orth.y << orth.z
+               << trav.x << trav.y << trav.z
+               << up.x << up.y << up.z
+               << len
+               << inclination
+               << curvature
+               << traj_coord;
+
+        return data.data();
+    }
+
+    /// Десериализация
+    void deserialize(const QByteArray &data)
+    {
+        QDataStream stream(data);
+
+        stream >> begin_point.x >> begin_point.y >> begin_point.z
+               >> end_point.x >> end_point.y >> end_point.z
+               >> orth.x >> orth.y >> orth.z
+               >> trav.x >> trav.y >> trav.z
+               >> up.x >> up.y >> up.z
+               >> len
+               >> inclination
+               >> curvature
+               >> traj_coord;
     }
 };
 

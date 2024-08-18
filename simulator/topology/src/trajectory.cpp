@@ -157,6 +157,58 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QByteArray Trajectory::serialize()
+{
+    QBuffer data;
+    data.open(QIODevice::WriteOnly);
+    QDataStream stream(&data);
+
+    char traj_name[256];
+    strncpy(traj_name, name.toStdString().c_str(), name.length());
+
+    stream << traj_name << len << is_busy;
+
+    char fwd_conn_name[256];
+    if (fwd_connector != Q_NULLPTR)
+    {
+        strncpy(fwd_conn_name,
+                fwd_connector->getName().toStdString().c_str(),
+                fwd_connector->getName().length());
+
+    }
+    else
+    {
+        strcpy(fwd_conn_name, "NONE_FWD_CONNECTOR");
+    }
+
+    stream << fwd_conn_name;
+
+    char bwd_conn_name[256];
+    if (bwd_connector != Q_NULLPTR)
+    {
+        strncpy(bwd_conn_name,
+                bwd_connector->getName().toStdString().c_str(),
+                bwd_connector->getName().length());
+
+    }
+    else
+    {
+        strcpy(bwd_conn_name, "NONE_BWD_CONNECTOR");
+    }
+
+    stream << bwd_conn_name;
+
+    for (auto track = tracks.begin(); track != tracks.end(); ++track)
+    {
+        stream << track->serialize();
+    }
+
+    return data.data();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 track_t addFakeTrack(track_t &cur_track, bool plus = true)
 {
     track_t fake_track = cur_track;

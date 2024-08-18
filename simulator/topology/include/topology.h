@@ -35,7 +35,7 @@ public:
     /// Вернуть контроллер конкретной ПЕ
     VehicleController *getVehicleController(size_t idx);
 
-
+    QByteArray serialize();
 
 private:
 

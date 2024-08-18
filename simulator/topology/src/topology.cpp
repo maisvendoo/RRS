@@ -182,6 +182,21 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QByteArray Topology::serialize()
+{
+    QByteArray data;
+
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        data.append(traj.value()->serialize());
+    }
+
+    return data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QStringList Topology::getTrajNamesList(QString route_dir)
 {
     QString path = route_dir + QDir::separator() +
