@@ -36,6 +36,7 @@
 #define     DELIMITER_SYMBOL char('\t')
 #define     FILE_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
+#define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
 
 //------------------------------------------------------------------------------
 //
@@ -134,9 +135,9 @@ private:
 
     bool readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data);
 
-    bool readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data, const int &dir);
+    bool readBranchTracksDAT(const std::string &path, const int &dir);
 
-    bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir);
+    bool readBranchTracksDAT(QTextStream &stream, const int &dir);
 
     bool checkIsToOtherMain(zds_branch_point_t* branch_point, bool is_add_2minus2);
 

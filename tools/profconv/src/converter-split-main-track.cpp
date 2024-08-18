@@ -401,6 +401,8 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
 
     name_next = name_prefix +
                 QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+    if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+        name_next += "_1";
 
     bool was_1_track = false;
     for (auto it = tracks_data->begin(); it != tracks_data->end(); ++it)
@@ -418,6 +420,10 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                         ++num_traj;
                         name_next = name_prefix +
                                     QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                        if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+                        {
+                            name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
+                        }
 
                         // Добавляем последюю точку в траекторию
                         point_t end_point;
@@ -488,6 +494,10 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                 ++num_traj;
                 name_next = name_prefix +
                     QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+                {
+                    name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
+                }
                 (*split)->bwd_main_traj = name_cur;
                 (*split)->fwd_main_traj = name_next;
                 (*split)->length_bwd_traj = trajectory_length + it->length;

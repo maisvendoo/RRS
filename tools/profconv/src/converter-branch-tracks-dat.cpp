@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data, const int &dir)
+bool ZDSimConverter::readBranchTracksDAT(const std::string &path, const int &dir)
 {
     if (path.empty())
         return false;
@@ -19,16 +19,15 @@ bool ZDSimConverter::readBranchTracksDAT(const std::string &path, zds_branch_tra
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
-    // Добавляем в конец строку
 
     QTextStream stream(&data);
-    return readBranchTracksDAT(stream, branch_data, dir);
+    return readBranchTracksDAT(stream, dir);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir)
+bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
 {
     std::vector<zds_branch_point_t*> tmp_data;
 
@@ -74,7 +73,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         // Проверяем, если id этой точки дублирует предыдущую,
         // а предыдущая не завершала траекторию нулевым смещением,
         // перезаписываем предыдущую
-        if ((!tmp_data.empty()) && (tmp_data.back()->bias != 0.0) && (tmp_data.back()->main_track_id) == (id_value - 1))
+        if ( (!tmp_data.empty()) && (tmp_data.back()->bias != 0.0) && ((tmp_data.back()->main_track_id) == (id_value - 1)) )
         {
             tmp_data.back()->bias = branch_point->bias;
             if (branch_point->id_split_point_by_signal == 1)
@@ -134,6 +133,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
             if (checkIsToOtherMain(branch_point, true))
             {
                 is_next_from_other_main = true;
+                branch_track = zds_branch_track_t();
                 continue;
             }
 
@@ -142,7 +142,8 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
         }
         else
         {
-            if (checkIsToOtherMain(branch_point, false))
+            // Если мы на траектории с точками, проверяем попадание в соседний главный путь
+            if (checkIsToOtherMain(branch_point, false) && (branch_point->bias != 0.0))
             {
                 is_next_from_other_main = true;
 
@@ -154,7 +155,6 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
                     calcBranchTrack1(tmp_branch);
                 else
                     calcBranchTrack2(tmp_branch);
-//                branch_data.push_back(tmp_branch);
 
                 // Очистка
                 branch_track.branch_points.clear();
@@ -180,7 +180,6 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, zds_branch_track_d
                     calcBranchTrack1(tmp_branch);
                 else
                     calcBranchTrack2(tmp_branch);
-//                branch_data.push_back(tmp_branch);
             }
 
             // Очистка
@@ -388,7 +387,6 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
     if (branch_track->begin_at_other)
     {
         dvec3 point_after_bias = tracks_data1[id_begin].begin_point +
-                                 tracks_data1[id_begin].orth * 100.0 +
                                  tracks_data1[id_begin].right * bias_curr;
         float coord;
         zds_track_t track = getNearestTrack(point_after_bias, tracks_data2, coord);
@@ -456,13 +454,12 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
             calculated_branch_point_t point;
             if (branch_track->end_at_other)
             {
-                dvec3 point_before_bias = tracks_data1[id_end].end_point -
-                                          tracks_data1[id_end].orth * 100.0 +
+                dvec3 point_before_bias = tracks_data1[id_end].end_point +
                                           tracks_data1[id_end].right * ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK;
                 float coord;
                 zds_track_t track = getNearestTrack(point_before_bias, tracks_data2, coord);
                 bool near_end = (coord > (track.route_coord + 0.5 * track.length));
-                branch_track->id_begin_at_other = near_end ? track.prev_uid + 1 : track.prev_uid;
+                branch_track->id_end_at_other = near_end ? track.prev_uid + 1 : track.prev_uid;
 
                 point.point = near_end ? track.end_point : track.begin_point;
                 point.railway_coord = near_end ? track.railway_coord_end : track.railway_coord;
@@ -533,7 +530,6 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
     if (branch_track->begin_at_other)
     {
         dvec3 point_after_bias = tracks_data2[id_begin].end_point -
-                                 tracks_data2[id_begin].orth * 100.0 -
                                  tracks_data2[id_begin].right * bias_curr;
         float coord;
         zds_track_t track = getNearestTrack(point_after_bias, tracks_data1, coord);
@@ -602,13 +598,12 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
 
             if (branch_track->end_at_other)
             {
-                dvec3 point_before_bias = tracks_data2[id_end].begin_point +
-                                          tracks_data2[id_end].orth * 100.0 -
+                dvec3 point_before_bias = tracks_data2[id_end].begin_point -
                                           tracks_data2[id_end].right * ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK;
                 float coord;
                 zds_track_t track = getNearestTrack(point_before_bias, tracks_data1, coord);
                 bool near_end = (coord > (track.route_coord + 0.5 * track.length));
-                branch_track->id_begin_at_other = near_end ? track.prev_uid + 1 : track.prev_uid;
+                branch_track->id_end_at_other = near_end ? track.prev_uid + 1 : track.prev_uid;
 
                 point.point = near_end ? track.end_point : track.begin_point;
                 point.railway_coord = near_end ? track.railway_coord_end : track.railway_coord;
@@ -784,8 +779,20 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
         name_prefix = "branch2_";
         split_data = &split_data2;
     }
+    std::string name_suffix = "";
+    if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+    {
+        name_suffix += QString("_%1").arg(branch_track->id_begin + 1).toStdString();
+        if (branch_track->begin_at_other)
+            name_suffix += QString("x%1").arg(branch_track->id_begin_at_other + 1).toStdString();
+
+        name_suffix += QString("_%1").arg(branch_track->id_end + 1).toStdString();
+        if (branch_track->end_at_other)
+            name_suffix += QString("x%1").arg(branch_track->id_end_at_other + 1).toStdString();
+    }
     name_next = name_prefix +
-        QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString();
+        QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString() +
+        name_suffix;
     for (auto split = split_data->begin(); split != split_data->end(); ++split)
     {
         if (dir > 0)
@@ -820,7 +827,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                 name_cur = name_next;
                 ++num_sub_traj;
                 name_next = name_prefix +
-                    QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString();
+                    QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString() +
+                    name_suffix;
 
                 split_zds_trajectory_t split;
                 split.point = branch_track->branch_trajectory[i + dir].point;
@@ -854,6 +862,7 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
             if (i + dir == end_point_id)
             {
                 trajectory.name = name_next;
+
                 for (auto split = split_data->begin(); split != split_data->end(); ++split)
                 {
                     if (dir > 0)
@@ -917,6 +926,16 @@ void ZDSimConverter::nameBranch22(zds_branch_2_2_t* branch_track, const int &dir
     }
     branch_track->trajectory.name = name_prefix +
         QString("%1").arg(num_trajectories, 4, 10, QChar('0')).toStdString();
+
+    if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+    {
+        if (dir > 0)
+            branch_track->trajectory.name +=
+                QString("_%1_%2").arg(branch_track->id1 + 1).arg(branch_track->id2).toStdString();
+        else
+            branch_track->trajectory.name +=
+                QString("_%1_%2").arg(branch_track->id1).arg(branch_track->id2 + 1).toStdString();
+    }
 
     for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
     {

@@ -213,7 +213,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
         readSpeedsDAT(speeds1_path, speeds_data1);
         readSvetoforDAT(signals1_path, signals_data1);
-        readBranchTracksDAT(branch1_path, branch_track_data1, dir);
+        readBranchTracksDAT(branch1_path, dir);
 
         writeSpeeds(speeds1_file, speeds_data1);
     }
@@ -226,7 +226,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
         readSpeedsDAT(speeds2_path, speeds_data2);
         readSvetoforDAT(signals2_path, signals_data2);
-        readBranchTracksDAT(branch2_path, branch_track_data2, dir);
+        readBranchTracksDAT(branch2_path, dir);
 
         writeSpeeds(speeds2_file, speeds_data2);
     }
@@ -387,7 +387,7 @@ zds_track_t ZDSimConverter::getNearestTrack(dvec3 point, const zds_trajectory_da
     double tau = dot(rho, result.orth);
     if (tau >= 0.0)
     {
-        coord = result.trajectory_coord + tau;
+        coord = result.route_coord + tau;
         return result;
     }
 
@@ -398,12 +398,12 @@ zds_track_t ZDSimConverter::getNearestTrack(dvec3 point, const zds_trajectory_da
         tau = dot(rho, result.orth);
         if (tau <= result.length)
         {
-            coord = result.trajectory_coord + tau;
+            coord = result.route_coord + tau;
             return result;
         }
     }
 
     result = tracks_data[id_with_min_distance];
-    coord = result.trajectory_coord;
+    coord = result.route_coord;
     return result;
 }
