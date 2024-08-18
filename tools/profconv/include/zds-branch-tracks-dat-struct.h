@@ -33,7 +33,7 @@ struct zds_branch_point_t
     std::string signal_special = "";
 
     int dir = 1;
-    int id_split_point = -1;
+    int id_split_point_by_signal = -1;
 };
 
 //------------------------------------------------------------------------------
@@ -51,10 +51,14 @@ struct calculated_branch_point_t
 //------------------------------------------------------------------------------
 struct zds_branch_track_t
 {
-    std::vector<zds_branch_point_t> branch_points = {};
+    std::vector<zds_branch_point_t *> branch_points = {};
 
     int id_begin = -1;
     int id_end = -1;
+    bool begin_at_other = false;
+    bool end_at_other = false;
+    int id_begin_at_other = -1;
+    int id_end_at_other = -1;
 
     std::vector<calculated_branch_point_t> branch_trajectory = {};
 

@@ -36,6 +36,7 @@
 #define     DELIMITER_SYMBOL char('\t')
 #define     FILE_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
+#define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
 
 //------------------------------------------------------------------------------
 //
@@ -134,19 +135,19 @@ private:
 
     bool readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data);
 
-    bool readBranchTracksDAT(const std::string &path, zds_branch_track_data_t &branch_data, const int &dir);
+    bool readBranchTracksDAT(const std::string &path, const int &dir);
 
-    bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir);
+    bool readBranchTracksDAT(QTextStream &stream, const int &dir);
 
-    bool checkIsToOtherMain(zds_branch_point_t *branch_point);
+    bool checkIsToOtherMain(zds_branch_point_t* branch_point, bool is_add_2minus2);
 
-    void findFromOtherMain(zds_branch_point_t *branch_point);
+    void findFromOtherMain(zds_branch_point_t* branch_point);
 
-    bool calcBranchTrack1(zds_branch_track_t *branch_track);
+    bool calcBranchTrack1(zds_branch_track_t* branch_track);
 
-    bool calcBranchTrack2(zds_branch_track_t *branch_track);
+    bool calcBranchTrack2(zds_branch_track_t* branch_track);
 
-    void calcBranch22(zds_branch_2_2_t *branch22);
+    void calcBranch22(zds_branch_2_2_t* branch22);
 
     void findSplitsMainTrajectories(const int &dir);
 
@@ -154,9 +155,9 @@ private:
 
     void splitMainTrajectory(const int &dir);
 
-    void splitAndNameBranch(zds_branch_track_t *branch_track, const int &dir, size_t num_trajectories);
+    void splitAndNameBranch(zds_branch_track_t* branch_track, const int &dir, size_t num_trajectories);
 
-    void nameBranch22(zds_branch_2_2_t *branch_track, const int &dir, size_t num_trajectories);
+    void nameBranch22(zds_branch_2_2_t* branch_track, const int &dir, size_t num_trajectories);
 
     void findStartPointsBySignals(const route_connectors_t &connectors);
 

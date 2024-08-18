@@ -140,7 +140,7 @@ void ZDSimConverter::findStartPointsBySignals(const route_connectors_t &connecto
                 {
                     start_point_t start_point;
                     start_point.name = nearest_station->name + " (" + bwd_liter + ")";
-                    start_point.trajectory_name = connector->bwd_main_traj;
+                    start_point.trajectory_name = connector->fwd_main_traj;
                     start_point.direction = -1;
                     start_point.trajectory_coord = add_distance_before_signal;
                     start_point.railway_coord = connector->railway_coord + add_distance_before_signal;
