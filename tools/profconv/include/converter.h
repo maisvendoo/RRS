@@ -138,15 +138,15 @@ private:
 
     bool readBranchTracksDAT(QTextStream &stream, zds_branch_track_data_t &branch_data, const int &dir);
 
-    bool checkIsToOtherMain(zds_branch_point_t *branch_point);
+    bool checkIsToOtherMain(zds_branch_point_t* branch_point, bool is_add_2minus2);
 
-    void findFromOtherMain(zds_branch_point_t *branch_point);
+    void findFromOtherMain(zds_branch_point_t* branch_point);
 
-    bool calcBranchTrack1(zds_branch_track_t *branch_track);
+    bool calcBranchTrack1(zds_branch_track_t* branch_track);
 
-    bool calcBranchTrack2(zds_branch_track_t *branch_track);
+    bool calcBranchTrack2(zds_branch_track_t* branch_track);
 
-    void calcBranch22(zds_branch_2_2_t *branch22);
+    void calcBranch22(zds_branch_2_2_t* branch22);
 
     void findSplitsMainTrajectories(const int &dir);
 
@@ -154,9 +154,9 @@ private:
 
     void splitMainTrajectory(const int &dir);
 
-    void splitAndNameBranch(zds_branch_track_t *branch_track, const int &dir, size_t num_trajectories);
+    void splitAndNameBranch(zds_branch_track_t* branch_track, const int &dir, size_t num_trajectories);
 
-    void nameBranch22(zds_branch_2_2_t *branch_track, const int &dir, size_t num_trajectories);
+    void nameBranch22(zds_branch_2_2_t* branch_track, const int &dir, size_t num_trajectories);
 
     void findStartPointsBySignals(const route_connectors_t &connectors);
 
