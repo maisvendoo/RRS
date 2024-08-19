@@ -207,10 +207,10 @@ void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
     stream >> name;
 
     // Восстанавливаем связанные с этим коннектором траектории
-    deserialize_connected_trajectory(stream, fwdMinusTraj, traj_list);
-    deserialize_connected_trajectory(stream, fwdPlusTraj, traj_list);
-    deserialize_connected_trajectory(stream, bwdMinusTraj, traj_list);
-    deserialize_connected_trajectory(stream, bwdPlusTraj, traj_list);
+    fwdMinusTraj = deserialize_connected_trajectory(stream, traj_list);
+    fwdPlusTraj = deserialize_connected_trajectory(stream, traj_list);
+    bwdMinusTraj = deserialize_connected_trajectory(stream, traj_list);
+    bwdPlusTraj = deserialize_connected_trajectory(stream, traj_list);
 
     // Восстанавливаем статусы стрелки
     stream >> state_fwd;
@@ -229,7 +229,7 @@ void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *tra
     if (bool has_traj = traj != Q_NULLPTR)
     {
         stream << has_traj;
-        stream << traj->serialize();
+        stream << traj->getName();
     }
     else
     {
@@ -241,13 +241,14 @@ void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *tra
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::deserialize_connected_trajectory(QDataStream &stream,
-                                              Trajectory *traj,
+Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
                                               traj_list_t &traj_list)
 {
     // Извлекаем признак наличия траектории
     bool has_traj = false;
     stream >> has_traj;
+
+    Trajectory *traj = Q_NULLPTR;
 
     //и если она есть
     if (has_traj)
@@ -256,10 +257,11 @@ void Switch::deserialize_connected_trajectory(QDataStream &stream,
         traj = new Trajectory;
 
         // И восстанавливаем её данные
-        QByteArray traj_data;
-        stream >> traj_data;
-        traj->deserialize(traj_data);
+        QString traj_name;
+        stream >> traj_name;
 
-        traj_list.insert(traj->getName(), traj);
+        traj_list.insert(traj_name, traj);
     }
+
+    return traj;
 }

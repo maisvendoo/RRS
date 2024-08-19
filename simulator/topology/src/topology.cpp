@@ -199,6 +199,15 @@ QByteArray Topology::serialize()
         stream << sw.value()->serialize();
     }
 
+    stream << traj_list.size();
+
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        stream << traj.value()->serialize();
+        serialize_connector_name(stream, traj.value()->getFwdConnector());
+        serialize_connector_name(stream, traj.value()->getBwdConnector());
+    }
+
     return data.data();
 }
 
@@ -229,7 +238,18 @@ void Topology::deserialize(QByteArray &data)
         switches.insert(sw->getName(), sw);
     }
 
-    int a = 0;
+
+    qsizetype traj_count = 0;
+    stream >> traj_count;
+
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        QByteArray traj_data;
+        stream >> traj_data;
+        traj.value()->deserialize(traj_data);
+        traj.value()->setFwdConnector(deserialize_traj_connectors(stream, switches));
+        traj.value()->setBwdConnector(deserialize_traj_connectors(stream, switches));
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -307,4 +327,39 @@ bool Topology::load_topology(QString route_dir)
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::serialize_connector_name(QDataStream &stream, Connector *conn)
+{
+    if (bool has_conn = conn != Q_NULLPTR)
+    {
+        stream << has_conn;
+        stream << conn->getName();
+    }
+    else
+    {
+        stream << has_conn;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const
+{
+    bool has_conn = false;
+    stream >> has_conn;
+
+    if (has_conn)
+    {
+        QString conn_name = "";
+        stream >> conn_name;
+
+        return conn_list.value(conn_name, Q_NULLPTR);
+    }
+
+    return Q_NULLPTR;
 }

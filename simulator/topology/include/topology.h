@@ -58,6 +58,10 @@ private:
 
     /// Загрузка топологии
     bool load_topology(QString route_dir);
+
+    void serialize_connector_name(QDataStream &stream, Connector *conn);
+
+    Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 };
 
 #endif

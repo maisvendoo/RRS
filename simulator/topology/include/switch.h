@@ -44,8 +44,7 @@ private:
 
     void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj);
 
-    void deserialize_connected_trajectory(QDataStream &stream,
-                                          Trajectory *traj,
+    Trajectory *deserialize_connected_trajectory(QDataStream &stream,
                                           traj_list_t &traj_list);
 };
 
