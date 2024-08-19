@@ -171,7 +171,15 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             is_branch = false;
             for (auto branch : branch_track_data1)
             {
-                if (branch->id_begin == id)
+                if ((branch->id_begin == id) && (!branch->begin_at_other))
+                {
+                    is_branch = true;
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+                }
+            }
+            for (auto branch : branch_track_data2)
+            {
+                if (branch->id_begin_at_other == id)
                 {
                     is_branch = true;
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
@@ -186,7 +194,22 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             is_branch = false;
             for (auto branch : branch_track_data1)
             {
-                if (branch->id_end == id + 1)
+                if ((branch->id_end == id + 1) && (!branch->end_at_other))
+                {
+                    is_branch = true;
+
+                    // Разделение в конце данного трека - в начале следующего
+                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                    split_at_next.track_id = id + 1;
+                    split_at_next.point = track.end_point;
+                    split_at_next.railway_coord = track.railway_coord_end;
+                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
+                    addOrCreateSplit(split_data1, split_at_next);
+                }
+            }
+            for (auto branch : branch_track_data2)
+            {
+                if (branch->id_end_at_other == id + 1)
                 {
                     is_branch = true;
 
@@ -246,7 +269,15 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             bool is_branch = false;
             for (auto branch : branch_track_data2)
             {
-                if (branch->id_end == id)
+                if ((branch->id_end == id) && (!branch->end_at_other))
+                {
+                    is_branch = true;
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+                }
+            }
+            for (auto branch : branch_track_data1)
+            {
+                if (branch->id_end_at_other == id)
                 {
                     is_branch = true;
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
@@ -261,7 +292,30 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             is_branch = false;
             for (auto branch : branch_track_data2)
             {
-                if (branch->id_begin == id + 1)
+                if ((branch->id_begin == id + 1) && (!branch->begin_at_other))
+                {
+                    is_branch = true;
+
+                    // Разделение в конце данного трека - в начале следующего
+                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                    split_at_next.track_id = id + 1;
+                    split_at_next.point = track.end_point;
+                    split_at_next.railway_coord = track.railway_coord_end;
+                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
+                    if (track.id_at_track1 == -1)
+                    {
+                        addOrCreateSplit(split_data2, split_at_next);
+                    }
+                    else
+                    {
+                        split_at_next.track_id = track.id_at_track1;
+                        addOrCreateSplit(split_data1, split_at_next);
+                    }
+                }
+            }
+            for (auto branch : branch_track_data1)
+            {
+                if (branch->id_begin_at_other == id + 1)
                 {
                     is_branch = true;
 

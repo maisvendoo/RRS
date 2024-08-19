@@ -454,7 +454,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
             calculated_branch_point_t point;
             if (branch_track->end_at_other)
             {
-                dvec3 point_before_bias = tracks_data1[id_end].end_point +
+                dvec3 point_before_bias = tracks_data1[id_end].begin_point +
                                           tracks_data1[id_end].right * ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK;
                 float coord;
                 zds_track_t track = getNearestTrack(point_before_bias, tracks_data2, coord);
@@ -782,13 +782,15 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
     std::string name_suffix = "";
     if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
     {
-        name_suffix += QString("_%1").arg(branch_track->id_begin + 1).toStdString();
         if (branch_track->begin_at_other)
-            name_suffix += QString("x%1").arg(branch_track->id_begin_at_other + 1).toStdString();
+            name_suffix += QString("_x%1").arg(branch_track->id_begin_at_other + 1).toStdString();
+        else
+            name_suffix += QString("_%1").arg(branch_track->id_begin + 1).toStdString();
 
-        name_suffix += QString("_%1").arg(branch_track->id_end + 1).toStdString();
         if (branch_track->end_at_other)
-            name_suffix += QString("x%1").arg(branch_track->id_end_at_other + 1).toStdString();
+            name_suffix += QString("_x%1").arg(branch_track->id_end_at_other + 1).toStdString();
+        else
+            name_suffix += QString("_%1").arg(branch_track->id_end + 1).toStdString();
     }
     name_next = name_prefix +
         QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString() +
