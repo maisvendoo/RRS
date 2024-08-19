@@ -22,6 +22,8 @@ public:
 
     void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list);
 
+    QByteArray serialize() override;
+
 private:
 
     Trajectory *fwdMinusTraj = Q_NULLPTR;

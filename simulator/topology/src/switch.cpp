@@ -169,3 +169,59 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     }
 
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QByteArray Switch::serialize()
+{
+    QBuffer data;
+    data.open(QIODevice::WriteOnly);
+    QDataStream stream(&data);
+
+    stream << Connector::serialize();
+
+    if (fwdMinusTraj != Q_NULLPTR)
+    {
+        stream << fwdMinusTraj->getName().size() << fwdMinusTraj->getName();
+    }
+    else
+    {
+        QString tmp = "NONE_FWD_MINUS_TRAJ";
+        stream << tmp.size() << tmp;
+    }
+
+    if (fwdPlusTraj != Q_NULLPTR)
+    {
+        stream << fwdPlusTraj->getName().size() << fwdPlusTraj->getName();
+    }
+    else
+    {
+        QString tmp = "NONE_FWD_PLUS_TRAJ";
+        stream << tmp.size() << tmp;
+    }
+
+    if (bwdMinusTraj != Q_NULLPTR)
+    {
+        stream << bwdMinusTraj->getName().size() << bwdMinusTraj->getName();
+    }
+    else
+    {
+        QString tmp = "NONE_BWD_MINUS_TRAJ";
+        stream << tmp.size() << tmp;
+    }
+
+    if (bwdPlusTraj != Q_NULLPTR)
+    {
+        stream << bwdPlusTraj->getName().size() << bwdPlusTraj->getName();
+    }
+    else
+    {
+        QString tmp = "NONE_BWD_PLUS_TRAJ";
+        stream << tmp.size() << tmp;
+    }
+
+    stream << state_fwd << state_bwd;
+
+    return data.data();
+}

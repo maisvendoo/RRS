@@ -32,6 +32,8 @@ public:
 
     QString getName() const { return this->name; }
 
+    virtual QByteArray serialize();
+
 protected:
 
     Trajectory *fwdTraj = Q_NULLPTR;

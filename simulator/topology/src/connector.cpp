@@ -31,3 +31,17 @@ void Connector::configure(CfgReader &cfg,
 
     Journal::instance()->info("Connector " + name + " will be initialized...");
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QByteArray Connector::serialize()
+{
+    QBuffer data;
+    data.open(QIODevice::WriteOnly);
+    QDataStream stream(&data);
+
+    stream << name.length() << name;
+
+    return data.data();
+}

@@ -80,6 +80,8 @@ public:
 
     QByteArray serialize();
 
+    void deserialize(const QByteArray &data);
+
 private:
 
     QString name = "";

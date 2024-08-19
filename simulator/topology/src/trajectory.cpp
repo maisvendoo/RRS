@@ -163,27 +163,27 @@ QByteArray Trajectory::serialize()
     data.open(QIODevice::WriteOnly);
     QDataStream stream(&data);
 
-    stream << name.length() << name << len << is_busy;
+    stream << name.size() << name << len << is_busy;
 
 
     if (fwd_connector != Q_NULLPTR)
     {
-        stream << fwd_connector->getName().length() << fwd_connector->getName();
+        stream << fwd_connector->serialize();
     }
     else
     {
         QString tmp = "NONE_FWD_CONNECTOR";
-        stream << tmp.length() << tmp;
+        stream << tmp.size() << tmp;
     }
 
     if (bwd_connector != Q_NULLPTR)
     {
-        stream << bwd_connector->getName().length() << bwd_connector->getName();
+        stream << bwd_connector->serialize();
     }
     else
     {
         QString tmp = "NONE_BWD_CONNECTOR";
-        stream << tmp.length() << tmp;
+        stream << tmp.size() << tmp;
     }
 
     for (auto track = tracks.begin(); track != tracks.end(); ++track)
@@ -192,6 +192,19 @@ QByteArray Trajectory::serialize()
     }
 
     return data.data();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::deserialize(const QByteArray &data)
+{
+    QBuffer buff(&data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    qsizetype name_size = 0;
+    stream >> name_size;
 }
 
 //------------------------------------------------------------------------------
