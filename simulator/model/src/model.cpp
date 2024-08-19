@@ -98,9 +98,7 @@ Model::Model(QObject *parent) : QObject(parent)
         {
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
-    }
-
-    sim_client = Q_NULLPTR;
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -564,7 +562,7 @@ void Model::initControlPanel(QString cfg_path)
 //------------------------------------------------------------------------------
 void Model::initSimClient(QString cfg_path)
 {
-    if (train->getTrainID().isEmpty())
+    /*if (train->getTrainID().isEmpty())
         return;
 
     if (train->getClientName().isEmpty())
@@ -603,7 +601,7 @@ void Model::initSimClient(QString cfg_path)
     else
     {
         Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -723,7 +721,7 @@ void Model::tcpFeedBack()
 //------------------------------------------------------------------------------
 void Model::virtualRailwayFeedback()
 {
-    if (sim_client == Q_NULLPTR)
+    /*if (sim_client == Q_NULLPTR)
         return;
 
     if (!sim_client->isConnected())
@@ -747,7 +745,7 @@ void Model::virtualRailwayFeedback()
     train_data.coord = train->getFirstVehicle()->getRailwayCoord();
     train_data.speed = train->getFirstVehicle()->getVelocity();
 
-    sim_client->sendTrainData(train_data);
+    sim_client->sendTrainData(train_data);*/
 }
 
 //------------------------------------------------------------------------------

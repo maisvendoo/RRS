@@ -98,10 +98,6 @@ int RouteViewer::run()
     keyboard = new KeyboardHandler();
     viewer.addEventHandler(keyboard);
 
-    QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
-                     &client, &NetworkClient::receiveKeysState);
-
-
     osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new ViewerStatsHandler();
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
 

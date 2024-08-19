@@ -22,28 +22,24 @@
 #include    <QSharedMemory>
 #include    <QTimer>
 
-#include    "simulator-command-line.h"
-#include    "filesystem.h"
-#include    "train.h"
-#include    "elapsed-timer.h"
+#include    <simulator-command-line.h>
+#include    <filesystem.h>
+#include    <train.h>
+#include    <elapsed-timer.h>
 
-#include    "simulator-info-struct.h"
-#include    "simulator-update-struct.h"
-#include    "controlled-struct.h"
+#include    <simulator-info-struct.h>
+#include    <simulator-update-struct.h>
+#include    <controlled-struct.h>
 
-#include    "server.h"
+#include    <profile.h>
 
-#include    "profile.h"
+#include    <keys-control.h>
 
-#include    "keys-control.h"
+#include    <virtual-interface-device.h>
 
-#include    "virtual-interface-device.h"
+#include    <signaling.h>
 
-#include    "sim-client.h"
-
-#include    "signaling.h"
-
-#include    "traffic-machine.h"
+#include    <traffic-machine.h>
 
 #include    <topology.h>
 
@@ -82,7 +78,7 @@ signals:
 
 //    void sendDataToTrain(QByteArray data);
 
-    void getRecvData(sim_dispatcher_data_t &disp_data);
+    //void getRecvData(sim_dispatcher_data_t &disp_data);
 
 public slots:
 
@@ -136,13 +132,13 @@ private:
     Profile     *profile = nullptr;
 
     /// TCP-server
-    Server      *server = nullptr;
+    //Server      *server = nullptr;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
     /// Клиент для связи с ВЖД
-    SimTcpClient *sim_client = nullptr;
+    //SimTcpClient *sim_client = nullptr;
 
     /// Система СЦБ
     Signaling *signaling = nullptr;
