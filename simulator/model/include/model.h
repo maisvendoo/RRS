@@ -43,6 +43,8 @@
 
 #include    <topology.h>
 
+#include    <tcp-server.h>
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -172,7 +174,9 @@ private:
     QTimer          controlTimer;
     QTimer          networkTimer;
 
-    ElapsedTimer    simTimer;       
+    ElapsedTimer    simTimer;
+
+    TcpServer   *tpc_server = new TcpServer;
 
     /// Actions, which prerare integration step and also update shared data
     void preStep(double t);
@@ -205,6 +209,9 @@ private:
 
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);
+
+    /// Инициализация TCP-сервера
+    void initTcpServer();
 
     /// TCP feedback
     void tcpFeedBack();

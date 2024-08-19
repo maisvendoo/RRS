@@ -219,6 +219,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     initTopology(init_data);
 
+    initTcpServer();
+
     Journal::instance()->info("Train is initialized successfully");
 
     return true;
@@ -666,6 +668,17 @@ void Model::initTopology(const init_data_t &init_data)
         Journal::instance()->critical("CAN'T INITIALIZE TOPOLOGY");
         exit(0);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::initTcpServer()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_path = fs.getConfigDir() + fs.separator() + "tcp-server.xml";
+
+    tpc_server->init(QString(cfg_path.c_str()));
 }
 
 //------------------------------------------------------------------------------
