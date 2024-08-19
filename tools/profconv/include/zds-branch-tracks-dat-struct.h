@@ -11,15 +11,23 @@
 const double ZDS_CONST_BIAS_FOR_OTHER_MAIN_TRACK = -7.47;
 
 /// Моделируем траекторию отклонения пятью отрезками
-/// с четырями промежуточными точками по кубическому сплайну (x*x*(3-2*x))
+/// с четырями промежуточными точками по полиномиальному сплайну
+/// пятой степени 6*x^5 - 15*x^4 + 10*x^3
+/* с четырями промежуточными точками по кубическому сплайну -2*x^3 + 3*x^2 */
 const size_t NUM_BIAS_POINTS = 4;
 const double COORD_COEFF[NUM_BIAS_POINTS] = {0.2, 0.4, 0.6, 0.8};
 const double BIAS_COEFF[NUM_BIAS_POINTS] =
 {
+    COORD_COEFF[0] * COORD_COEFF[0] * COORD_COEFF[0] * (6.0 * COORD_COEFF[0] * COORD_COEFF[0] - 15.0 * COORD_COEFF[0] + 10.0),
+    COORD_COEFF[1] * COORD_COEFF[1] * COORD_COEFF[1] * (6.0 * COORD_COEFF[1] * COORD_COEFF[1] - 15.0 * COORD_COEFF[1] + 10.0),
+    COORD_COEFF[2] * COORD_COEFF[2] * COORD_COEFF[2] * (6.0 * COORD_COEFF[2] * COORD_COEFF[2] - 15.0 * COORD_COEFF[2] + 10.0),
+    COORD_COEFF[3] * COORD_COEFF[3] * COORD_COEFF[3] * (6.0 * COORD_COEFF[3] * COORD_COEFF[3] - 15.0 * COORD_COEFF[3] + 10.0)
+/*
     COORD_COEFF[0] * COORD_COEFF[0] * (3.0 - 2.0 * COORD_COEFF[0]),
     COORD_COEFF[1] * COORD_COEFF[1] * (3.0 - 2.0 * COORD_COEFF[1]),
     COORD_COEFF[2] * COORD_COEFF[2] * (3.0 - 2.0 * COORD_COEFF[2]),
     COORD_COEFF[3] * COORD_COEFF[3] * (3.0 - 2.0 * COORD_COEFF[3])
+*/
 };
 
 //------------------------------------------------------------------------------
