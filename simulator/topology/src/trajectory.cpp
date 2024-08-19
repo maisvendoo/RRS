@@ -163,40 +163,28 @@ QByteArray Trajectory::serialize()
     data.open(QIODevice::WriteOnly);
     QDataStream stream(&data);
 
-    char traj_name[256];
-    strncpy(traj_name, name.toStdString().c_str(), name.length());
+    stream << name.length() << name << len << is_busy;
 
-    stream << traj_name << len << is_busy;
 
-    char fwd_conn_name[256];
     if (fwd_connector != Q_NULLPTR)
     {
-        strncpy(fwd_conn_name,
-                fwd_connector->getName().toStdString().c_str(),
-                fwd_connector->getName().length());
-
+        stream << fwd_connector->getName().length() << fwd_connector->getName();
     }
     else
     {
-        strcpy(fwd_conn_name, "NONE_FWD_CONNECTOR");
+        QString tmp = "NONE_FWD_CONNECTOR";
+        stream << tmp.length() << tmp;
     }
 
-    stream << fwd_conn_name;
-
-    char bwd_conn_name[256];
     if (bwd_connector != Q_NULLPTR)
     {
-        strncpy(bwd_conn_name,
-                bwd_connector->getName().toStdString().c_str(),
-                bwd_connector->getName().length());
-
+        stream << bwd_connector->getName().length() << bwd_connector->getName();
     }
     else
     {
-        strcpy(bwd_conn_name, "NONE_BWD_CONNECTOR");
+        QString tmp = "NONE_BWD_CONNECTOR";
+        stream << tmp.length() << tmp;
     }
-
-    stream << bwd_conn_name;
 
     for (auto track = tracks.begin(); track != tracks.end(); ++track)
     {
