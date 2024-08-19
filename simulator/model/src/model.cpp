@@ -672,6 +672,9 @@ void Model::initTopology(const init_data_t &init_data)
     QByteArray data = topology->serialize();
 
     int size = data.size();
+
+    Topology *copy_topology = new Topology;
+    copy_topology->deserialize(data);
 }
 
 //------------------------------------------------------------------------------

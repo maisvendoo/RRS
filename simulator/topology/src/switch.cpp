@@ -179,49 +179,114 @@ QByteArray Switch::serialize()
     data.open(QIODevice::WriteOnly);
     QDataStream stream(&data);
 
-    stream << Connector::serialize();
+    stream << name;
 
-    if (fwdMinusTraj != Q_NULLPTR)
+    if (bool has_fwd_minus_traj = fwdMinusTraj != Q_NULLPTR)
     {
-        stream << fwdMinusTraj->getName().size() << fwdMinusTraj->getName();
+        stream << has_fwd_minus_traj;
+        stream << fwdMinusTraj->serialize();
     }
     else
     {
-        QString tmp = "NONE_FWD_MINUS_TRAJ";
-        stream << tmp.size() << tmp;
+        stream << has_fwd_minus_traj;
     }
 
-    if (fwdPlusTraj != Q_NULLPTR)
+    if (bool has_fwd_plus_traj = fwdPlusTraj != Q_NULLPTR)
     {
-        stream << fwdPlusTraj->getName().size() << fwdPlusTraj->getName();
+        stream << has_fwd_plus_traj;
+        stream << fwdPlusTraj->serialize();
     }
     else
     {
-        QString tmp = "NONE_FWD_PLUS_TRAJ";
-        stream << tmp.size() << tmp;
+        stream << has_fwd_plus_traj;
     }
 
-    if (bwdMinusTraj != Q_NULLPTR)
+    if (bool has_bwd_minus_traj = bwdMinusTraj != Q_NULLPTR)
     {
-        stream << bwdMinusTraj->getName().size() << bwdMinusTraj->getName();
+        stream << has_bwd_minus_traj;
+        stream << bwdMinusTraj->serialize();
     }
     else
     {
-        QString tmp = "NONE_BWD_MINUS_TRAJ";
-        stream << tmp.size() << tmp;
+        stream << has_bwd_minus_traj;
     }
 
-    if (bwdPlusTraj != Q_NULLPTR)
+    if (bool has_bwd_plus_traj = bwdPlusTraj != Q_NULLPTR)
     {
-        stream << bwdPlusTraj->getName().size() << bwdPlusTraj->getName();
+        stream << has_bwd_plus_traj;
+        stream << bwdPlusTraj->serialize();
     }
     else
     {
-        QString tmp = "NONE_BWD_PLUS_TRAJ";
-        stream << tmp.size() << tmp;
+        stream << has_bwd_plus_traj;
     }
 
     stream << state_fwd << state_bwd;
 
     return data.data();
+}
+
+
+void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
+{
+    QBuffer buff(&data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    stream >> name;
+
+    bool has_fwd_minus_traj = false;
+    stream >> has_fwd_minus_traj;
+
+    if (has_fwd_minus_traj)
+    {
+        fwdMinusTraj = new Trajectory;
+        QByteArray traj_data;
+        stream >> traj_data;
+        fwdMinusTraj->deserialize(traj_data);
+
+        traj_list.insert(fwdMinusTraj->getName(), fwdMinusTraj);
+    }
+
+    bool has_fwd_plus_traj = false;
+    stream >> has_fwd_plus_traj;
+
+    if (has_fwd_plus_traj)
+    {
+        fwdPlusTraj = new Trajectory;
+        QByteArray traj_data;
+        stream >> traj_data;
+        fwdPlusTraj->deserialize(traj_data);
+
+        traj_list.insert(fwdPlusTraj->getName(), fwdPlusTraj);
+    }
+
+    bool has_bwd_minus_traj = false;
+    stream >> has_bwd_minus_traj;
+
+    if (has_bwd_minus_traj)
+    {
+        bwdMinusTraj = new Trajectory;
+        QByteArray traj_data;
+        stream >> traj_data;
+        bwdMinusTraj->deserialize(traj_data);
+
+        traj_list.insert(bwdMinusTraj->getName(), bwdMinusTraj);
+    }
+
+    bool has_bwd_plus_traj = false;
+    stream >> has_bwd_plus_traj;
+
+    if (has_bwd_plus_traj)
+    {
+        bwdPlusTraj = new Trajectory;
+        QByteArray traj_data;
+        stream >> traj_data;
+        bwdPlusTraj->deserialize(traj_data);
+
+        traj_list.insert(bwdPlusTraj->getName(), bwdPlusTraj);
+    }
+
+    stream >> state_fwd;
+    stream >> state_bwd;
 }

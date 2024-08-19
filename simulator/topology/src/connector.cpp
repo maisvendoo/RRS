@@ -38,10 +38,14 @@ void Connector::configure(CfgReader &cfg,
 QByteArray Connector::serialize()
 {
     QBuffer data;
-    data.open(QIODevice::WriteOnly);
-    QDataStream stream(&data);
-
-    stream << name.length() << name;
 
     return data.data();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Connector::deserialize(QByteArray &data, traj_list_t &traj_list)
+{
+
 }

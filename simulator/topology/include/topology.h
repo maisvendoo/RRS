@@ -37,6 +37,8 @@ public:
 
     QByteArray serialize();
 
+    void deserialize(QByteArray &data);
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне

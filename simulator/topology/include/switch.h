@@ -24,6 +24,8 @@ public:
 
     QByteArray serialize() override;
 
+    void deserialize(QByteArray &data, traj_list_t &traj_list);
+
 private:
 
     Trajectory *fwdMinusTraj = Q_NULLPTR;

@@ -80,7 +80,7 @@ public:
 
     QByteArray serialize();
 
-    void deserialize(const QByteArray &data);
+    void deserialize(QByteArray &data);
 
 private:
 

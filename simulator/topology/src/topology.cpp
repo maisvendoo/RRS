@@ -184,14 +184,48 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 QByteArray Topology::serialize()
 {
-    QByteArray data;
+    QBuffer data;
+    data.open(QIODevice::WriteOnly);
+    QDataStream stream(&data);
 
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    stream << switches.size();
+
+    for (auto sw = switches.begin(); sw != switches.end(); ++sw)
     {
-        data.append(traj.value()->serialize());
+        stream << sw.value()->serialize();
     }
 
-    return data;
+    return data.data();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::deserialize(QByteArray &data)
+{
+    QBuffer buff(&data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    traj_list.clear();
+    switches.clear();
+
+    qsizetype conn_count = 0;
+    stream >> conn_count;
+
+    for (qsizetype i = 0; i < conn_count; ++i)
+    {
+        Switch *sw = new Switch;
+
+        QByteArray conn_data;
+        stream >> conn_data;
+
+        sw->deserialize(conn_data, traj_list);
+
+        switches.insert(sw->getName(), sw);
+    }
+
+    int a = 0;
 }
 
 //------------------------------------------------------------------------------

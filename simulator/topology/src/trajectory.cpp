@@ -6,6 +6,7 @@
 #include    <fstream>
 #include    <Journal.h>
 #include    <physics.h>
+#include    <switch.h>
 
 //------------------------------------------------------------------------------
 //
@@ -163,28 +164,9 @@ QByteArray Trajectory::serialize()
     data.open(QIODevice::WriteOnly);
     QDataStream stream(&data);
 
-    stream << name.size() << name << len << is_busy;
+    stream << name << len << is_busy;
 
-
-    if (fwd_connector != Q_NULLPTR)
-    {
-        stream << fwd_connector->serialize();
-    }
-    else
-    {
-        QString tmp = "NONE_FWD_CONNECTOR";
-        stream << tmp.size() << tmp;
-    }
-
-    if (bwd_connector != Q_NULLPTR)
-    {
-        stream << bwd_connector->serialize();
-    }
-    else
-    {
-        QString tmp = "NONE_BWD_CONNECTOR";
-        stream << tmp.size() << tmp;
-    }
+    stream << tracks.size();
 
     for (auto track = tracks.begin(); track != tracks.end(); ++track)
     {
@@ -197,14 +179,29 @@ QByteArray Trajectory::serialize()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::deserialize(const QByteArray &data)
+void Trajectory::deserialize(QByteArray &data)
 {
     QBuffer buff(&data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
-    qsizetype name_size = 0;
-    stream >> name_size;
+    stream >> name;
+    stream >> len;
+    stream >> is_busy;
+
+    qsizetype tracks_count;
+    stream >> tracks_count;
+
+    for (qsizetype i = 0; i < tracks_count; ++i)
+    {
+        QByteArray track_data;
+        stream >> track_data;
+
+        track_t track;
+        track.deserialize(track_data);
+
+        tracks.push_back(track);
+    }
 }
 
 //------------------------------------------------------------------------------

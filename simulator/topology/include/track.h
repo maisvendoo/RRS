@@ -86,9 +86,11 @@ struct track_t
     }
 
     /// Десериализация
-    void deserialize(const QByteArray &data)
+    void deserialize(QByteArray &data)
     {
-        QDataStream stream(data);
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
 
         stream >> begin_point.x >> begin_point.y >> begin_point.z
                >> end_point.x >> end_point.y >> end_point.z
