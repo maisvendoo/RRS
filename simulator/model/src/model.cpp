@@ -666,13 +666,6 @@ void Model::initTopology(const init_data_t &init_data)
         Journal::instance()->critical("CAN'T INITIALIZE TOPOLOGY");
         exit(0);
     }
-
-    QByteArray data = topology->serialize();
-
-    int size = data.size();
-
-    Topology *copy_topology = new Topology;
-    copy_topology->deserialize(data);
 }
 
 //------------------------------------------------------------------------------
