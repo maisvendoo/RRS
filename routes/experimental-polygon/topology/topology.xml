@@ -2,482 +2,482 @@
 <Config>
     <Switch>
         <Name>00001</Name>
-        <bwdPlusTraj>route1_0001</bwdPlusTraj>
-        <fwdPlusTraj>route1_0002</fwdPlusTraj>
+        <bwdPlusTraj>route1_0001_1</bwdPlusTraj>
+        <fwdPlusTraj>route1_0002_9</fwdPlusTraj>
         <SignalLetter>Ч</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
     </Switch>
     <Switch>
         <Name>00002</Name>
-        <bwdPlusTraj>route1_0002</bwdPlusTraj>
-        <fwdPlusTraj>route1_0003</fwdPlusTraj>
-        <fwdMinusTraj>branch2m2_0001</fwdMinusTraj>
+        <bwdPlusTraj>route1_0002_9</bwdPlusTraj>
+        <fwdPlusTraj>route1_0003_10</fwdPlusTraj>
+        <fwdMinusTraj>branch2m2_0001_10_10</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00003</Name>
-        <bwdPlusTraj>route1_0003</bwdPlusTraj>
-        <fwdPlusTraj>route1_0004</fwdPlusTraj>
-        <bwdMinusTraj>branch2p2_0001</bwdMinusTraj>
+        <bwdPlusTraj>route1_0003_10</bwdPlusTraj>
+        <fwdPlusTraj>route1_0004_12</fwdPlusTraj>
+        <bwdMinusTraj>branch2p2_0001_11_11</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch1_0001_1</fwdMinusTraj>
+        <fwdMinusTraj>branch1_0001_1_12_22</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00004</Name>
-        <bwdPlusTraj>route1_0004</bwdPlusTraj>
-        <fwdPlusTraj>route1_0005</fwdPlusTraj>
+        <bwdPlusTraj>route1_0004_12</bwdPlusTraj>
+        <fwdPlusTraj>route1_0005_21</fwdPlusTraj>
         <SignalLetter>Ч1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00005</Name>
-        <bwdPlusTraj>route1_0005</bwdPlusTraj>
-        <fwdPlusTraj>route1_0006</fwdPlusTraj>
-        <bwdMinusTraj>branch1_0001_2</bwdMinusTraj>
+        <bwdPlusTraj>route1_0005_21</bwdPlusTraj>
+        <fwdPlusTraj>route1_0006_22</fwdPlusTraj>
+        <bwdMinusTraj>branch1_0001_2_12_22</bwdMinusTraj>
         <state_bwd>1</state_bwd>
     </Switch>
     <Switch>
         <Name>00006</Name>
-        <bwdPlusTraj>route1_0006</bwdPlusTraj>
-        <fwdPlusTraj>route1_0007</fwdPlusTraj>
-        <bwdMinusTraj>branch2p2_0002</bwdMinusTraj>
+        <bwdPlusTraj>route1_0006_22</bwdPlusTraj>
+        <fwdPlusTraj>route1_0007_23</fwdPlusTraj>
+        <bwdMinusTraj>branch2p2_0002_22_22</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2m2_0002</fwdMinusTraj>
+        <fwdMinusTraj>branch2m2_0002_23_23</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00007</Name>
-        <bwdPlusTraj>route1_0007</bwdPlusTraj>
-        <fwdPlusTraj>route1_0008</fwdPlusTraj>
+        <bwdPlusTraj>route1_0007_23</bwdPlusTraj>
+        <fwdPlusTraj>route1_0008_60</fwdPlusTraj>
         <SignalLetter>12</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00008</Name>
-        <bwdPlusTraj>route1_0008</bwdPlusTraj>
-        <fwdPlusTraj>route1_0009</fwdPlusTraj>
+        <bwdPlusTraj>route1_0008_60</bwdPlusTraj>
+        <fwdPlusTraj>route1_0009_82</fwdPlusTraj>
         <SignalLetter>10</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00009</Name>
-        <bwdPlusTraj>route1_0009</bwdPlusTraj>
-        <fwdPlusTraj>route1_0010</fwdPlusTraj>
+        <bwdPlusTraj>route1_0009_82</bwdPlusTraj>
+        <fwdPlusTraj>route1_0010_131</fwdPlusTraj>
         <SignalLetter>8</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00010</Name>
-        <bwdPlusTraj>route1_0010</bwdPlusTraj>
-        <fwdPlusTraj>route1_0011</fwdPlusTraj>
+        <bwdPlusTraj>route1_0010_131</bwdPlusTraj>
+        <fwdPlusTraj>route1_0011_160</fwdPlusTraj>
         <SignalLetter>6</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00011</Name>
-        <bwdPlusTraj>route1_0011</bwdPlusTraj>
-        <fwdPlusTraj>route1_0012</fwdPlusTraj>
+        <bwdPlusTraj>route1_0011_160</bwdPlusTraj>
+        <fwdPlusTraj>route1_0012_202</fwdPlusTraj>
         <SignalLetter>4</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00012</Name>
-        <bwdPlusTraj>route1_0012</bwdPlusTraj>
-        <fwdPlusTraj>route1_0013</fwdPlusTraj>
+        <bwdPlusTraj>route1_0012_202</bwdPlusTraj>
+        <fwdPlusTraj>route1_0013_222</fwdPlusTraj>
         <SignalLetter>2</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00013</Name>
-        <bwdPlusTraj>route1_0013</bwdPlusTraj>
-        <fwdPlusTraj>route1_0014</fwdPlusTraj>
+        <bwdPlusTraj>route1_0013_222</bwdPlusTraj>
+        <fwdPlusTraj>route1_0014_242</fwdPlusTraj>
         <SignalLetter>Ч</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00014</Name>
-        <bwdPlusTraj>route1_0014</bwdPlusTraj>
-        <fwdPlusTraj>route1_0015</fwdPlusTraj>
-        <bwdMinusTraj>branch2p2_0003</bwdMinusTraj>
+        <bwdPlusTraj>route1_0014_242</bwdPlusTraj>
+        <fwdPlusTraj>route1_0015_245</fwdPlusTraj>
+        <bwdMinusTraj>branch2p2_0003_244_244</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2m2_0003</fwdMinusTraj>
+        <fwdMinusTraj>branch2m2_0003_245_245</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00015</Name>
-        <bwdPlusTraj>route1_0015</bwdPlusTraj>
-        <fwdPlusTraj>route1_0016</fwdPlusTraj>
-        <fwdMinusTraj>branch1_0002_1</fwdMinusTraj>
+        <bwdPlusTraj>route1_0015_245</bwdPlusTraj>
+        <fwdPlusTraj>route1_0016_246</fwdPlusTraj>
+        <fwdMinusTraj>branch1_0002_1_246_259</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00016</Name>
-        <bwdPlusTraj>route1_0016</bwdPlusTraj>
-        <fwdPlusTraj>route1_0017</fwdPlusTraj>
+        <bwdPlusTraj>route1_0016_246</bwdPlusTraj>
+        <fwdPlusTraj>route1_0017_258</fwdPlusTraj>
         <SignalLetter>Ч1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00017</Name>
-        <bwdPlusTraj>route1_0017</bwdPlusTraj>
-        <fwdPlusTraj>route1_0018</fwdPlusTraj>
-        <bwdMinusTraj>branch1_0002_2</bwdMinusTraj>
+        <bwdPlusTraj>route1_0017_258</bwdPlusTraj>
+        <fwdPlusTraj>route1_0018_259</fwdPlusTraj>
+        <bwdMinusTraj>branch1_0002_2_246_259</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2m2_0004</fwdMinusTraj>
+        <fwdMinusTraj>branch2m2_0004_259_259</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00018</Name>
-        <bwdPlusTraj>route1_0018</bwdPlusTraj>
-        <fwdPlusTraj>route1_0019</fwdPlusTraj>
-        <bwdMinusTraj>branch2p2_0004</bwdMinusTraj>
+        <bwdPlusTraj>route1_0018_259</bwdPlusTraj>
+        <fwdPlusTraj>route1_0019_261</fwdPlusTraj>
+        <bwdMinusTraj>branch2p2_0004_260_260</bwdMinusTraj>
         <state_bwd>1</state_bwd>
     </Switch>
     <Switch>
         <Name>00019</Name>
-        <bwdPlusTraj>route1_0019</bwdPlusTraj>
-        <fwdPlusTraj>route1_0020</fwdPlusTraj>
+        <bwdPlusTraj>route1_0019_261</bwdPlusTraj>
+        <fwdPlusTraj>route1_0020_292</fwdPlusTraj>
         <SignalLetter>12</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00020</Name>
-        <bwdPlusTraj>route1_0020</bwdPlusTraj>
-        <fwdPlusTraj>route1_0021</fwdPlusTraj>
+        <bwdPlusTraj>route1_0020_292</bwdPlusTraj>
+        <fwdPlusTraj>route1_0021_321</fwdPlusTraj>
         <SignalLetter>10</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00021</Name>
-        <bwdPlusTraj>route1_0021</bwdPlusTraj>
-        <fwdPlusTraj>route1_0022</fwdPlusTraj>
+        <bwdPlusTraj>route1_0021_321</bwdPlusTraj>
+        <fwdPlusTraj>route1_0022_352</fwdPlusTraj>
         <SignalLetter>8</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00022</Name>
-        <bwdPlusTraj>route1_0022</bwdPlusTraj>
-        <fwdPlusTraj>route1_0023</fwdPlusTraj>
+        <bwdPlusTraj>route1_0022_352</bwdPlusTraj>
+        <fwdPlusTraj>route1_0023_379</fwdPlusTraj>
         <SignalLetter>6</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00023</Name>
-        <bwdPlusTraj>route1_0023</bwdPlusTraj>
-        <fwdPlusTraj>route1_0024</fwdPlusTraj>
+        <bwdPlusTraj>route1_0023_379</bwdPlusTraj>
+        <fwdPlusTraj>route1_0024_411</fwdPlusTraj>
         <SignalLetter>4</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00024</Name>
-        <bwdPlusTraj>route1_0024</bwdPlusTraj>
-        <fwdPlusTraj>route1_0025</fwdPlusTraj>
+        <bwdPlusTraj>route1_0024_411</bwdPlusTraj>
+        <fwdPlusTraj>route1_0025_442</fwdPlusTraj>
         <SignalLetter>2</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00025</Name>
-        <bwdPlusTraj>route1_0025</bwdPlusTraj>
-        <fwdPlusTraj>route1_0026</fwdPlusTraj>
+        <bwdPlusTraj>route1_0025_442</bwdPlusTraj>
+        <fwdPlusTraj>route1_0026_477</fwdPlusTraj>
         <SignalLetter>Ч</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
     </Switch>
     <Switch>
         <Name>00026</Name>
-        <bwdPlusTraj>route1_0026</bwdPlusTraj>
-        <fwdPlusTraj>route1_0027</fwdPlusTraj>
-        <bwdMinusTraj>branch2p2_0005</bwdMinusTraj>
+        <bwdPlusTraj>route1_0026_477</bwdPlusTraj>
+        <fwdPlusTraj>route1_0027_480</fwdPlusTraj>
+        <bwdMinusTraj>branch2p2_0005_479_479</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2m2_0005</fwdMinusTraj>
+        <fwdMinusTraj>branch2m2_0005_480_480</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00027</Name>
-        <bwdPlusTraj>route1_0027</bwdPlusTraj>
-        <fwdPlusTraj>route1_0028</fwdPlusTraj>
-        <fwdMinusTraj>branch1_0003_1</fwdMinusTraj>
+        <bwdPlusTraj>route1_0027_480</bwdPlusTraj>
+        <fwdPlusTraj>route1_0028_481</fwdPlusTraj>
+        <fwdMinusTraj>branch1_0003_1_481_493</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00028</Name>
-        <bwdPlusTraj>route1_0028</bwdPlusTraj>
-        <fwdPlusTraj>route1_0029</fwdPlusTraj>
+        <bwdPlusTraj>route1_0028_481</bwdPlusTraj>
+        <fwdPlusTraj>route1_0029_492</fwdPlusTraj>
         <SignalLetter>Ч1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00029</Name>
-        <bwdPlusTraj>route1_0029</bwdPlusTraj>
-        <fwdPlusTraj>route1_0030</fwdPlusTraj>
-        <bwdMinusTraj>branch1_0003_2</bwdMinusTraj>
+        <bwdPlusTraj>route1_0029_492</bwdPlusTraj>
+        <fwdPlusTraj>route1_0030_493</fwdPlusTraj>
+        <bwdMinusTraj>branch1_0003_2_481_493</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2m2_0006</fwdMinusTraj>
+        <fwdMinusTraj>branch2m2_0006_493_493</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00030</Name>
-        <bwdPlusTraj>route1_0030</bwdPlusTraj>
-        <fwdPlusTraj>route1_0031</fwdPlusTraj>
-        <bwdMinusTraj>branch2p2_0006</bwdMinusTraj>
+        <bwdPlusTraj>route1_0030_493</bwdPlusTraj>
+        <fwdPlusTraj>route1_0031_495</fwdPlusTraj>
+        <bwdMinusTraj>branch2p2_0006_494_494</bwdMinusTraj>
         <state_bwd>1</state_bwd>
     </Switch>
     <Switch>
         <Name>00031</Name>
-        <bwdPlusTraj>route2_0001</bwdPlusTraj>
-        <fwdPlusTraj>route2_0002</fwdPlusTraj>
-        <bwdMinusTraj>branch2m2_0001</bwdMinusTraj>
+        <bwdPlusTraj>route2_0001_1</bwdPlusTraj>
+        <fwdPlusTraj>route2_0002_11</fwdPlusTraj>
+        <bwdMinusTraj>branch2m2_0001_10_10</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2p2_0001</fwdMinusTraj>
+        <fwdMinusTraj>branch2p2_0001_11_11</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00032</Name>
-        <bwdPlusTraj>route2_0002</bwdPlusTraj>
-        <fwdPlusTraj>route2_0003</fwdPlusTraj>
-        <fwdMinusTraj>branch2_0001_1</fwdMinusTraj>
+        <bwdPlusTraj>route2_0002_11</bwdPlusTraj>
+        <fwdPlusTraj>route2_0003_12</fwdPlusTraj>
+        <fwdMinusTraj>branch2_0001_1_22_12</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00033</Name>
-        <bwdPlusTraj>route2_0003</bwdPlusTraj>
-        <fwdPlusTraj>route2_0004</fwdPlusTraj>
+        <bwdPlusTraj>route2_0003_12</bwdPlusTraj>
+        <fwdPlusTraj>route2_0004_13</fwdPlusTraj>
         <SignalLetter>Н1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00034</Name>
-        <bwdPlusTraj>route2_0004</bwdPlusTraj>
-        <fwdPlusTraj>route2_0005</fwdPlusTraj>
-        <bwdMinusTraj>branch2_0001_2</bwdMinusTraj>
+        <bwdPlusTraj>route2_0004_13</bwdPlusTraj>
+        <fwdPlusTraj>route2_0005_22</fwdPlusTraj>
+        <bwdMinusTraj>branch2_0001_2_22_12</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2p2_0002</fwdMinusTraj>
+        <fwdMinusTraj>branch2p2_0002_22_22</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00035</Name>
-        <bwdPlusTraj>route2_0005</bwdPlusTraj>
-        <fwdPlusTraj>route2_0006</fwdPlusTraj>
-        <bwdMinusTraj>branch2m2_0002</bwdMinusTraj>
+        <bwdPlusTraj>route2_0005_22</bwdPlusTraj>
+        <fwdPlusTraj>route2_0006_24</fwdPlusTraj>
+        <bwdMinusTraj>branch2m2_0002_23_23</bwdMinusTraj>
         <state_bwd>1</state_bwd>
     </Switch>
     <Switch>
         <Name>00036</Name>
-        <bwdPlusTraj>route2_0006</bwdPlusTraj>
-        <fwdPlusTraj>route2_0007</fwdPlusTraj>
+        <bwdPlusTraj>route2_0006_24</bwdPlusTraj>
+        <fwdPlusTraj>route2_0007_26</fwdPlusTraj>
         <SignalLetter>Н</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
     </Switch>
     <Switch>
         <Name>00037</Name>
-        <bwdPlusTraj>route2_0007</bwdPlusTraj>
-        <fwdPlusTraj>route2_0008</fwdPlusTraj>
+        <bwdPlusTraj>route2_0007_26</bwdPlusTraj>
+        <fwdPlusTraj>route2_0008_60</fwdPlusTraj>
         <SignalLetter>1</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00038</Name>
-        <bwdPlusTraj>route2_0008</bwdPlusTraj>
-        <fwdPlusTraj>route2_0009</fwdPlusTraj>
+        <bwdPlusTraj>route2_0008_60</bwdPlusTraj>
+        <fwdPlusTraj>route2_0009_82</fwdPlusTraj>
         <SignalLetter>3</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00039</Name>
-        <bwdPlusTraj>route2_0009</bwdPlusTraj>
-        <fwdPlusTraj>route2_0010</fwdPlusTraj>
+        <bwdPlusTraj>route2_0009_82</bwdPlusTraj>
+        <fwdPlusTraj>route2_0010_131</fwdPlusTraj>
         <SignalLetter>5</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00040</Name>
-        <bwdPlusTraj>route2_0010</bwdPlusTraj>
-        <fwdPlusTraj>route2_0011</fwdPlusTraj>
+        <bwdPlusTraj>route2_0010_131</bwdPlusTraj>
+        <fwdPlusTraj>route2_0011_160</fwdPlusTraj>
         <SignalLetter>7</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00041</Name>
-        <bwdPlusTraj>route2_0011</bwdPlusTraj>
-        <fwdPlusTraj>route2_0012</fwdPlusTraj>
+        <bwdPlusTraj>route2_0011_160</bwdPlusTraj>
+        <fwdPlusTraj>route2_0012_202</fwdPlusTraj>
         <SignalLetter>9</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00042</Name>
-        <bwdPlusTraj>route2_0012</bwdPlusTraj>
-        <fwdPlusTraj>route2_0013</fwdPlusTraj>
+        <bwdPlusTraj>route2_0012_202</bwdPlusTraj>
+        <fwdPlusTraj>route2_0013_222</fwdPlusTraj>
         <SignalLetter>11</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00043</Name>
-        <bwdPlusTraj>route2_0013</bwdPlusTraj>
-        <fwdPlusTraj>route2_0014</fwdPlusTraj>
-        <fwdMinusTraj>branch2p2_0003</fwdMinusTraj>
+        <bwdPlusTraj>route2_0013_222</bwdPlusTraj>
+        <fwdPlusTraj>route2_0014_244</fwdPlusTraj>
+        <fwdMinusTraj>branch2p2_0003_244_244</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00044</Name>
-        <bwdPlusTraj>route2_0014</bwdPlusTraj>
-        <fwdPlusTraj>route2_0015</fwdPlusTraj>
-        <bwdMinusTraj>branch2m2_0003</bwdMinusTraj>
+        <bwdPlusTraj>route2_0014_244</bwdPlusTraj>
+        <fwdPlusTraj>route2_0015_246</fwdPlusTraj>
+        <bwdMinusTraj>branch2m2_0003_245_245</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2_0002_1</fwdMinusTraj>
+        <fwdMinusTraj>branch2_0002_1_259_246</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00045</Name>
-        <bwdPlusTraj>route2_0015</bwdPlusTraj>
-        <fwdPlusTraj>route2_0016</fwdPlusTraj>
+        <bwdPlusTraj>route2_0015_246</bwdPlusTraj>
+        <fwdPlusTraj>route2_0016_247</fwdPlusTraj>
         <SignalLetter>Н1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00046</Name>
-        <bwdPlusTraj>route2_0016</bwdPlusTraj>
-        <fwdPlusTraj>route2_0017</fwdPlusTraj>
-        <bwdMinusTraj>branch2_0002_2</bwdMinusTraj>
+        <bwdPlusTraj>route2_0016_247</bwdPlusTraj>
+        <fwdPlusTraj>route2_0017_259</fwdPlusTraj>
+        <bwdMinusTraj>branch2_0002_2_259_246</bwdMinusTraj>
         <state_bwd>1</state_bwd>
     </Switch>
     <Switch>
         <Name>00047</Name>
-        <bwdPlusTraj>route2_0017</bwdPlusTraj>
-        <fwdPlusTraj>route2_0018</fwdPlusTraj>
-        <bwdMinusTraj>branch2m2_0004</bwdMinusTraj>
+        <bwdPlusTraj>route2_0017_259</bwdPlusTraj>
+        <fwdPlusTraj>route2_0018_260</fwdPlusTraj>
+        <bwdMinusTraj>branch2m2_0004_259_259</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2p2_0004</fwdMinusTraj>
+        <fwdMinusTraj>branch2p2_0004_260_260</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00048</Name>
-        <bwdPlusTraj>route2_0018</bwdPlusTraj>
-        <fwdPlusTraj>route2_0019</fwdPlusTraj>
+        <bwdPlusTraj>route2_0018_260</bwdPlusTraj>
+        <fwdPlusTraj>route2_0019_263</fwdPlusTraj>
         <SignalLetter>Н</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
     </Switch>
     <Switch>
         <Name>00049</Name>
-        <bwdPlusTraj>route2_0019</bwdPlusTraj>
-        <fwdPlusTraj>route2_0020</fwdPlusTraj>
+        <bwdPlusTraj>route2_0019_263</bwdPlusTraj>
+        <fwdPlusTraj>route2_0020_292</fwdPlusTraj>
         <SignalLetter>1</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00050</Name>
-        <bwdPlusTraj>route2_0020</bwdPlusTraj>
-        <fwdPlusTraj>route2_0021</fwdPlusTraj>
+        <bwdPlusTraj>route2_0020_292</bwdPlusTraj>
+        <fwdPlusTraj>route2_0021_321</fwdPlusTraj>
         <SignalLetter>3</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00051</Name>
-        <bwdPlusTraj>route2_0021</bwdPlusTraj>
-        <fwdPlusTraj>route2_0022</fwdPlusTraj>
+        <bwdPlusTraj>route2_0021_321</bwdPlusTraj>
+        <fwdPlusTraj>route2_0022_352</fwdPlusTraj>
         <SignalLetter>5</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00052</Name>
-        <bwdPlusTraj>route2_0022</bwdPlusTraj>
-        <fwdPlusTraj>route2_0023</fwdPlusTraj>
+        <bwdPlusTraj>route2_0022_352</bwdPlusTraj>
+        <fwdPlusTraj>route2_0023_379</fwdPlusTraj>
         <SignalLetter>7</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00053</Name>
-        <bwdPlusTraj>route2_0023</bwdPlusTraj>
-        <fwdPlusTraj>route2_0024</fwdPlusTraj>
+        <bwdPlusTraj>route2_0023_379</bwdPlusTraj>
+        <fwdPlusTraj>route2_0024_411</fwdPlusTraj>
         <SignalLetter>9</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00054</Name>
-        <bwdPlusTraj>route2_0024</bwdPlusTraj>
-        <fwdPlusTraj>route2_0025</fwdPlusTraj>
+        <bwdPlusTraj>route2_0024_411</bwdPlusTraj>
+        <fwdPlusTraj>route2_0025_442</fwdPlusTraj>
         <SignalLetter>11</SignalLetter>
         <SignalModel>ab_line</SignalModel>
     </Switch>
     <Switch>
         <Name>00055</Name>
-        <bwdPlusTraj>route2_0025</bwdPlusTraj>
-        <fwdPlusTraj>route2_0026</fwdPlusTraj>
-        <fwdMinusTraj>branch2p2_0005</fwdMinusTraj>
+        <bwdPlusTraj>route2_0025_442</bwdPlusTraj>
+        <fwdPlusTraj>route2_0026_479</fwdPlusTraj>
+        <fwdMinusTraj>branch2p2_0005_479_479</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00056</Name>
-        <bwdPlusTraj>route2_0026</bwdPlusTraj>
-        <fwdPlusTraj>route2_0027</fwdPlusTraj>
-        <bwdMinusTraj>branch2m2_0005</bwdMinusTraj>
+        <bwdPlusTraj>route2_0026_479</bwdPlusTraj>
+        <fwdPlusTraj>route2_0027_481</fwdPlusTraj>
+        <bwdMinusTraj>branch2m2_0005_480_480</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2_0003_1</fwdMinusTraj>
+        <fwdMinusTraj>branch2_0003_1_493_481</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00057</Name>
-        <bwdPlusTraj>route2_0027</bwdPlusTraj>
-        <fwdPlusTraj>route2_0028</fwdPlusTraj>
+        <bwdPlusTraj>route2_0027_481</bwdPlusTraj>
+        <fwdPlusTraj>route2_0028_482</fwdPlusTraj>
         <SignalLetter>Н1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
     </Switch>
     <Switch>
         <Name>00058</Name>
-        <bwdPlusTraj>route2_0028</bwdPlusTraj>
-        <fwdPlusTraj>route2_0029</fwdPlusTraj>
-        <bwdMinusTraj>branch2_0003_2</bwdMinusTraj>
+        <bwdPlusTraj>route2_0028_482</bwdPlusTraj>
+        <fwdPlusTraj>route2_0029_493</fwdPlusTraj>
+        <bwdMinusTraj>branch2_0003_2_493_481</bwdMinusTraj>
         <state_bwd>1</state_bwd>
     </Switch>
     <Switch>
         <Name>00059</Name>
-        <bwdPlusTraj>route2_0029</bwdPlusTraj>
-        <fwdPlusTraj>route2_0030</fwdPlusTraj>
-        <bwdMinusTraj>branch2m2_0006</bwdMinusTraj>
+        <bwdPlusTraj>route2_0029_493</bwdPlusTraj>
+        <fwdPlusTraj>route2_0030_494</fwdPlusTraj>
+        <bwdMinusTraj>branch2m2_0006_493_493</bwdMinusTraj>
         <state_bwd>1</state_bwd>
-        <fwdMinusTraj>branch2p2_0006</fwdMinusTraj>
+        <fwdMinusTraj>branch2p2_0006_494_494</fwdMinusTraj>
         <state_fwd>1</state_fwd>
     </Switch>
     <Switch>
         <Name>00060</Name>
-        <bwdPlusTraj>route2_0030</bwdPlusTraj>
-        <fwdPlusTraj>route2_0031</fwdPlusTraj>
+        <bwdPlusTraj>route2_0030_494</bwdPlusTraj>
+        <fwdPlusTraj>route2_0031_497</fwdPlusTraj>
         <SignalLetter>Н</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
     </Switch>
     <Switch>
         <Name>00061</Name>
-        <bwdPlusTraj>branch1_0001_1</bwdPlusTraj>
-        <fwdPlusTraj>branch1_0001_2</fwdPlusTraj>
+        <bwdPlusTraj>branch1_0001_1_12_22</bwdPlusTraj>
+        <fwdPlusTraj>branch1_0001_2_12_22</fwdPlusTraj>
         <SignalLetter>Ч3</SignalLetter>
     </Switch>
     <Switch>
         <Name>00062</Name>
-        <bwdPlusTraj>branch1_0002_1</bwdPlusTraj>
-        <fwdPlusTraj>branch1_0002_2</fwdPlusTraj>
+        <bwdPlusTraj>branch1_0002_1_246_259</bwdPlusTraj>
+        <fwdPlusTraj>branch1_0002_2_246_259</fwdPlusTraj>
         <SignalLetter>Ч3</SignalLetter>
     </Switch>
     <Switch>
         <Name>00063</Name>
-        <bwdPlusTraj>branch1_0003_1</bwdPlusTraj>
-        <fwdPlusTraj>branch1_0003_2</fwdPlusTraj>
+        <bwdPlusTraj>branch1_0003_1_481_493</bwdPlusTraj>
+        <fwdPlusTraj>branch1_0003_2_481_493</fwdPlusTraj>
         <SignalLetter>Ч3</SignalLetter>
     </Switch>
     <Switch>
         <Name>00064</Name>
-        <bwdPlusTraj>branch2_0001_1</bwdPlusTraj>
-        <fwdPlusTraj>branch2_0001_2</fwdPlusTraj>
+        <bwdPlusTraj>branch2_0001_1_22_12</bwdPlusTraj>
+        <fwdPlusTraj>branch2_0001_2_22_12</fwdPlusTraj>
         <SignalLetter>Н4</SignalLetter>
     </Switch>
     <Switch>
         <Name>00065</Name>
-        <bwdPlusTraj>branch2_0002_1</bwdPlusTraj>
-        <fwdPlusTraj>branch2_0002_2</fwdPlusTraj>
+        <bwdPlusTraj>branch2_0002_1_259_246</bwdPlusTraj>
+        <fwdPlusTraj>branch2_0002_2_259_246</fwdPlusTraj>
         <SignalLetter>Н4</SignalLetter>
     </Switch>
     <Switch>
         <Name>00066</Name>
-        <bwdPlusTraj>branch2_0003_1</bwdPlusTraj>
-        <fwdPlusTraj>branch2_0003_2</fwdPlusTraj>
+        <bwdPlusTraj>branch2_0003_1_493_481</bwdPlusTraj>
+        <fwdPlusTraj>branch2_0003_2_493_481</fwdPlusTraj>
         <SignalLetter>Н4</SignalLetter>
     </Switch>
 </Config>
