@@ -179,114 +179,87 @@ QByteArray Switch::serialize()
     data.open(QIODevice::WriteOnly);
     QDataStream stream(&data);
 
+    // Имя коннектора в буфер данных
     stream << name;
 
-    if (bool has_fwd_minus_traj = fwdMinusTraj != Q_NULLPTR)
-    {
-        stream << has_fwd_minus_traj;
-        stream << fwdMinusTraj->serialize();
-    }
-    else
-    {
-        stream << has_fwd_minus_traj;
-    }
+    // Сериализуем связанные с этим коннектором траектории
+    serialize_connected_trajectory(stream, fwdMinusTraj);
+    serialize_connected_trajectory(stream, fwdPlusTraj);
+    serialize_connected_trajectory(stream, bwdMinusTraj);
+    serialize_connected_trajectory(stream, bwdPlusTraj);
 
-    if (bool has_fwd_plus_traj = fwdPlusTraj != Q_NULLPTR)
-    {
-        stream << has_fwd_plus_traj;
-        stream << fwdPlusTraj->serialize();
-    }
-    else
-    {
-        stream << has_fwd_plus_traj;
-    }
-
-    if (bool has_bwd_minus_traj = bwdMinusTraj != Q_NULLPTR)
-    {
-        stream << has_bwd_minus_traj;
-        stream << bwdMinusTraj->serialize();
-    }
-    else
-    {
-        stream << has_bwd_minus_traj;
-    }
-
-    if (bool has_bwd_plus_traj = bwdPlusTraj != Q_NULLPTR)
-    {
-        stream << has_bwd_plus_traj;
-        stream << bwdPlusTraj->serialize();
-    }
-    else
-    {
-        stream << has_bwd_plus_traj;
-    }
-
+    // Помещаем в бувер состояние стрелки
     stream << state_fwd << state_bwd;
 
     return data.data();
 }
 
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
 {
     QBuffer buff(&data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
+    // Извлекаем имя коннектора из буфера
     stream >> name;
 
-    bool has_fwd_minus_traj = false;
-    stream >> has_fwd_minus_traj;
+    // Восстанавливаем связанные с этим коннектором траектории
+    deserialize_connected_trajectory(stream, fwdMinusTraj, traj_list);
+    deserialize_connected_trajectory(stream, fwdPlusTraj, traj_list);
+    deserialize_connected_trajectory(stream, bwdMinusTraj, traj_list);
+    deserialize_connected_trajectory(stream, bwdPlusTraj, traj_list);
 
-    if (has_fwd_minus_traj)
-    {
-        fwdMinusTraj = new Trajectory;
-        QByteArray traj_data;
-        stream >> traj_data;
-        fwdMinusTraj->deserialize(traj_data);
-
-        traj_list.insert(fwdMinusTraj->getName(), fwdMinusTraj);
-    }
-
-    bool has_fwd_plus_traj = false;
-    stream >> has_fwd_plus_traj;
-
-    if (has_fwd_plus_traj)
-    {
-        fwdPlusTraj = new Trajectory;
-        QByteArray traj_data;
-        stream >> traj_data;
-        fwdPlusTraj->deserialize(traj_data);
-
-        traj_list.insert(fwdPlusTraj->getName(), fwdPlusTraj);
-    }
-
-    bool has_bwd_minus_traj = false;
-    stream >> has_bwd_minus_traj;
-
-    if (has_bwd_minus_traj)
-    {
-        bwdMinusTraj = new Trajectory;
-        QByteArray traj_data;
-        stream >> traj_data;
-        bwdMinusTraj->deserialize(traj_data);
-
-        traj_list.insert(bwdMinusTraj->getName(), bwdMinusTraj);
-    }
-
-    bool has_bwd_plus_traj = false;
-    stream >> has_bwd_plus_traj;
-
-    if (has_bwd_plus_traj)
-    {
-        bwdPlusTraj = new Trajectory;
-        QByteArray traj_data;
-        stream >> traj_data;
-        bwdPlusTraj->deserialize(traj_data);
-
-        traj_list.insert(bwdPlusTraj->getName(), bwdPlusTraj);
-    }
-
+    // Восстанавливаем статусы стрелки
     stream >> state_fwd;
     stream >> state_bwd;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *traj)
+{
+    // Анализирум наличие на каждом из ответвлений траектории,
+    // и если она присутствуем, пишем признак присутствия,
+    // а далее помещаем сериализованные данные этой траекторри
+    // в буфер
+    if (bool has_traj = traj != Q_NULLPTR)
+    {
+        stream << has_traj;
+        stream << traj->serialize();
+    }
+    else
+    {
+        // Если ответвление свободно - момещаем просто признак
+        stream << has_traj;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::deserialize_connected_trajectory(QDataStream &stream,
+                                              Trajectory *traj,
+                                              traj_list_t &traj_list)
+{
+    // Извлекаем признак наличия траектории
+    bool has_traj = false;
+    stream >> has_traj;
+
+    //и если она есть
+    if (has_traj)
+    {
+        // Содаем траекторию
+        traj = new Trajectory;
+
+        // И восстанавливаем её данные
+        QByteArray traj_data;
+        stream >> traj_data;
+        traj->deserialize(traj_data);
+
+        traj_list.insert(traj->getName(), traj);
+    }
 }

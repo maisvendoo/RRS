@@ -14,17 +14,17 @@ public:
 
     Switch(QObject *parent = Q_NULLPTR);
 
-    ~Switch();    
+    ~Switch();
 
-    Trajectory *getFwdTraj() const;
+    Trajectory *getFwdTraj() const override;
 
-    Trajectory *getBwdTraj() const;
+    Trajectory *getBwdTraj() const override;
 
-    void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list);
+    void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list) override;
 
     QByteArray serialize() override;
 
-    void deserialize(QByteArray &data, traj_list_t &traj_list);
+    void deserialize(QByteArray &data, traj_list_t &traj_list) override;
 
 private:
 
@@ -41,6 +41,12 @@ private:
 
     /// Состояние стрелки сзади
     int state_bwd = 1;
+
+    void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj);
+
+    void deserialize_connected_trajectory(QDataStream &stream,
+                                          Trajectory *traj,
+                                          traj_list_t &traj_list);
 };
 
 #endif // SWITCH_H

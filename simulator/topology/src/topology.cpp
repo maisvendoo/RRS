@@ -184,12 +184,16 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 QByteArray Topology::serialize()
 {
+    // Задаем буфер для данных и открываем его на запись
     QBuffer data;
     data.open(QIODevice::WriteOnly);
+    // Связываем с буфером поток данных
     QDataStream stream(&data);
 
+    // Указываем число коннекторов
     stream << switches.size();
 
+    // Складываем в буффер сериализованную информацию о коннекторах
     for (auto sw = switches.begin(); sw != switches.end(); ++sw)
     {
         stream << sw.value()->serialize();
