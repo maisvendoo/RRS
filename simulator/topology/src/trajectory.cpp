@@ -164,10 +164,13 @@ QByteArray Trajectory::serialize()
     data.open(QIODevice::WriteOnly);
     QDataStream stream(&data);
 
+    // Кладем в буфер имя, длину и признак занятости
     stream << name << len << is_busy;
 
+    // кладем туда же число треков
     stream << tracks.size();
 
+    // Последовательно сериализум треки
     for (auto track = tracks.begin(); track != tracks.end(); ++track)
     {
         stream << track->serialize();
@@ -185,13 +188,16 @@ void Trajectory::deserialize(QByteArray &data)
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
+    // Восстанавливаем имя длину и признак занятости
     stream >> name;
     stream >> len;
     stream >> is_busy;
 
+    // Восстанавливаем число треков
     qsizetype tracks_count;
     stream >> tracks_count;
 
+    // Восстанавливаем треки
     for (qsizetype i = 0; i < tracks_count; ++i)
     {
         QByteArray track_data;
