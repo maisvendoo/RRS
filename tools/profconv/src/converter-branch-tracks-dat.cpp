@@ -765,12 +765,14 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
     std::string name_cur;
     std::string name_next;
     route_connectors_t* split_data;
+    route_connectors_t* split_data_other;
     if (dir > 0)
     {
         begin_point_id = 0;
         end_point_id = branch_track->branch_trajectory.size() - 1;
         name_prefix = "branch1_";
         split_data = &split_data1;
+        split_data_other = &split_data2;
     }
     else
     {
@@ -778,6 +780,7 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
         end_point_id = 0;
         name_prefix = "branch2_";
         split_data = &split_data2;
+        split_data_other = &split_data1;
     }
     std::string name_suffix = "";
     if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
@@ -795,20 +798,46 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
     name_next = name_prefix +
         QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString() +
         name_suffix;
-    for (auto split = split_data->begin(); split != split_data->end(); ++split)
+
+    // Добавляем название траектории в коннектор на главном пути
+    // Если траектория началась с соседнего главного - добавляем в соседний главный
+    if (branch_track->begin_at_other)
     {
-        if (dir > 0)
+        for (auto split = split_data_other->begin(); split != split_data_other->end(); ++split)
         {
-            if ((*split)->track_id == branch_track->id_begin)
+            if (dir > 0)
             {
-                (*split)->fwd_side_traj = name_next;
+                if ((*split)->track_id == branch_track->id_begin_at_other)
+                {
+                    (*split)->fwd_side_traj = name_next;
+                }
+            }
+            else
+            {
+                if ((*split)->track_id == branch_track->id_end_at_other)
+                {
+                    (*split)->fwd_side_traj = name_next;
+                }
             }
         }
-        else
+    }
+    else
+    {
+        for (auto split = split_data->begin(); split != split_data->end(); ++split)
         {
-            if ((*split)->track_id == branch_track->id_end)
+            if (dir > 0)
             {
-                (*split)->fwd_side_traj = name_next;
+                if ((*split)->track_id == branch_track->id_begin)
+                {
+                    (*split)->fwd_side_traj = name_next;
+                }
+            }
+            else
+            {
+                if ((*split)->track_id == branch_track->id_end)
+                {
+                    (*split)->fwd_side_traj = name_next;
+                }
             }
         }
     }
@@ -865,20 +894,45 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
             {
                 trajectory.name = name_next;
 
-                for (auto split = split_data->begin(); split != split_data->end(); ++split)
+                // Добавляем название траектории в коннектор на главном пути
+                // Если траектория закончилась на соседнем главном - добавляем в соседний главный
+                if (branch_track->end_at_other)
                 {
-                    if (dir > 0)
+                    for (auto split = split_data_other->begin(); split != split_data_other->end(); ++split)
                     {
-                        if ((*split)->track_id == branch_track->id_end)
+                        if (dir > 0)
                         {
-                            (*split)->bwd_side_traj = name_next;
+                            if ((*split)->track_id == branch_track->id_end_at_other)
+                            {
+                                (*split)->bwd_side_traj = name_next;
+                            }
+                        }
+                        else
+                        {
+                            if ((*split)->track_id == branch_track->id_begin_at_other)
+                            {
+                                (*split)->bwd_side_traj = name_next;
+                            }
                         }
                     }
-                    else
+                }
+                else
+                {
+                    for (auto split = split_data->begin(); split != split_data->end(); ++split)
                     {
-                        if ((*split)->track_id == branch_track->id_begin)
+                        if (dir > 0)
                         {
-                            (*split)->bwd_side_traj = name_next;
+                            if ((*split)->track_id == branch_track->id_end)
+                            {
+                                (*split)->bwd_side_traj = name_next;
+                            }
+                        }
+                        else
+                        {
+                            if ((*split)->track_id == branch_track->id_begin)
+                            {
+                                (*split)->bwd_side_traj = name_next;
+                            }
                         }
                     }
                 }
