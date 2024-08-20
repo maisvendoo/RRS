@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TcpServer::TcpServer(QObject *parent) : QTcpServer(parent)
+TcpServer::TcpServer(QObject *parent) : QObject(parent)
 {
 
 }
@@ -23,7 +23,7 @@ TcpServer::~TcpServer()
 //------------------------------------------------------------------------------
 bool TcpServer::init(QString cfg_path)
 {
-    Journal::instance()->info("Strating init TCP-server...");
+    Journal::instance()->info("Starting init TCP-server...");
 
     CfgReader cfg;
 
@@ -40,9 +40,13 @@ bool TcpServer::init(QString cfg_path)
         port = static_cast<quint16>(tmp);
     }
 
-    if (!isListening())
+    server = new QTcpServer(this);
+
+    connect(server, &QTcpServer::newConnection, this, &TcpServer::slotNewConnection);
+
+    if (!server->isListening())
     {
-        if (listen(QHostAddress::Any, port))
+        if (server->listen(QHostAddress::Any, port))
         {
             Journal::instance()->info(QString("TCP-server listen at port %1").arg(port));
         }
@@ -53,4 +57,53 @@ bool TcpServer::init(QString cfg_path)
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int TcpServer::getClientDataBySocket(QTcpSocket *socket)
+{
+    for (size_t i = 0; i < clients_data.size(); ++i)
+    {
+        if (clients_data[i].socket == socket)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotNewConnection()
+{
+    client_data_t client_data;
+
+    client_data.socket = server->nextPendingConnection();
+
+    clients_data.push_back(client_data);
+
+    connect(client_data.socket, &QTcpSocket::disconnected, this, &TcpServer::slotClientDisconnected);
+
+    Journal::instance()->info(QString("Connected client with id %1").arg(clients_data.size()));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotClientDisconnected()
+{
+    QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
+
+    int client_idx = getClientDataBySocket(socket);
+
+    if (client_idx < 0)
+        return;
+
+    clients_data[client_idx].socket->close();
+
+    clients_data.erase(clients_data.begin() + client_idx);
 }

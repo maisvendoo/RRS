@@ -4,6 +4,7 @@
 #include    <QByteArray>
 #include    <QBuffer>
 #include    <QDataStream>
+#include    <QTcpSocket>
 
 //------------------------------------------------------------------------------
 //
@@ -52,6 +53,15 @@ struct network_data_t
         stream >> data_size;
         stream >> data;
     }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct client_data_t
+{
+    QTcpSocket  *socket = Q_NULLPTR;
+    network_data_t  received_data;
 };
 
 #endif
