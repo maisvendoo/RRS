@@ -209,7 +209,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         //writeProfileData(tracks_data1, "profile1.conf");
 
         //createPowerLine(tracks_data1, power_line1);
-        //readRouteMAP(map_path, neutral_insertions);
+        readRouteMAP(map_path, route_map_data);
+        findNeutralInsertions(neutral_insertions);
 
         readSpeedsDAT(speeds1_path, speeds_data1);
         readSvetoforDAT(signals1_path, signals_data1);

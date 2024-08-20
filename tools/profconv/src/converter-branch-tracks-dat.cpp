@@ -54,21 +54,40 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             continue;
 
         zds_branch_point_t* branch_point = new zds_branch_point_t();
+        branch_point->dir = dir;
         branch_point->main_track_id = id_value - 1;
         branch_point->bias = (abs(bias_value) < 0.01) ? 0.0 : bias_value;
         if ((tokens.size() > 2) && (!tokens[2].isEmpty()))
         {
             // Светофор
-            branch_point->signal_liter = tokens[2].toStdString();
-            // Отмечаем необходимость разделить траекторию светофором
-            // Пока не знаем id элемента трека, просто меняем на 1
-            branch_point->id_split_point_by_signal = 1;
+            std::string signal_liter = tokens[2].toStdString();
+
+            // Находим в route1.map ближайший светофор с такой же литерой
+            dvec3 signal_pos_by_branch = (dir > 0) ?
+                tracks_data1[id_value - 1].begin_point :
+                tracks_data2[id_value].begin_point;
+            double min_distance = 1e10;
+            for (auto zds_object : route_map_data)
+            {
+                double distance = length(zds_object->position - signal_pos_by_branch);
+                if ((distance < min_distance) &&
+                    (zds_object->obj_info == signal_liter))
+                {
+                    min_distance = distance;
+                    // Сохраняем найденный светофор
+                    branch_point->signal_liter = signal_liter;
+                    branch_point->nearest_signal_pos = zds_object->position;
+                    // Отмечаем необходимость разделить траекторию светофором
+                    // Пока не знаем id элемента трека, просто меняем на 1
+                    branch_point->id_split_point_by_signal = 1;
+
+                    if ((tokens.size() > 3) && (!tokens[3].isEmpty()))
+                    {
+                        branch_point->signal_special = tokens[3].toStdString();
+                    }
+                }
+            }
         }
-        if ((tokens.size() > 3) && (!tokens[3].isEmpty()))
-        {
-            branch_point->signal_special = tokens[3].toStdString();
-        }
-        branch_point->dir = dir;
 
         // Проверяем, если id этой точки дублирует предыдущую,
         // а предыдущая не завершала траекторию нулевым смещением,

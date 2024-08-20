@@ -42,6 +42,7 @@ struct zds_branch_point_t
 
     int dir = 1;
     int id_split_point_by_signal = -1;
+    dvec3 nearest_signal_pos = dvec3(0.0, 0.0, 0.0);
 };
 
 //------------------------------------------------------------------------------

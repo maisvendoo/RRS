@@ -18,6 +18,7 @@
 #include    <vector>
 
 //#include    "zds-profile-dat-struct.h"
+#include    "zds-route-map-struct.h"
 #include    "zds-route-trk-struct.h"
 #include    "zds-start-kilometers-dat-struct.h"
 #include    "zds-speeds-dat-struct.h"
@@ -59,9 +60,11 @@ private:
 
     std::string         trajectoriesDir;
 
-    zds_trajectory_data_t    tracks_data1;
+    zds_route_map_data_t    route_map_data;
 
-    zds_trajectory_data_t    tracks_data2;
+    zds_trajectory_data_t   tracks_data1;
+
+    zds_trajectory_data_t   tracks_data2;
 
     zds_start_km_data_t start_km_data;
 
@@ -107,6 +110,10 @@ private:
 
     zds_track_t getNearestTrack(dvec3 point, const zds_trajectory_data_t &tracks_data, float &coord);
 
+    bool readRouteMAP(const std::string &path, zds_route_map_data_t &map_data);
+
+    bool readRouteMAP(QTextStream &stream, zds_route_map_data_t &map_data);
+
     bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data);
 
     bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data);
@@ -118,6 +125,8 @@ private:
 
     void createPowerLine(const std::vector<zds_track_t> &tracks_data,
                          std::vector<power_line_element_t> &power_line);
+
+    bool findNeutralInsertions(std::vector<neutral_insertion_t> ni);
 
     bool readStartKilometersDAT(const std::string &path, zds_start_km_data_t &waypoints);
 
@@ -160,10 +169,6 @@ private:
     void nameBranch22(zds_branch_2_2_t* branch_track, const int &dir, size_t num_trajectories);
 
     void findStartPointsBySignals(const route_connectors_t &connectors);
-
-    bool readRouteMAP(const std::string &path, std::vector<neutral_insertion_t> ni);
-
-    bool findNeutralInsertions(std::ifstream &stream, std::vector<neutral_insertion_t> ni);
 
     void writeSplits(const route_connectors_t &connectors, const int &dir);
 

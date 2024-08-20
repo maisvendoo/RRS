@@ -28,73 +28,99 @@ void add_element(float x, std::vector<float> &array)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readRouteMAP(const std::string &path,
-                                  std::vector<neutral_insertion_t> ni)
+bool ZDSimConverter::readRouteMAP(const std::string &path, zds_route_map_data_t &map_data)
 {
     if (path.empty())
         return false;
 
-    std::ifstream stream(path.c_str(), std::ios::in);
-
-    if (!stream.is_open())
+    QString data = fileToQString(path);
+    if (data.isEmpty())
     {
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
 
-    return findNeutralInsertions(stream, ni);
+    QTextStream stream(&data);
+    return readRouteMAP(stream, map_data);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::findNeutralInsertions(std::ifstream &stream,
-                                           std::vector<neutral_insertion_t> ni)
+bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map_data)
+{
+    bool may_add_info_to_last = false;
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine();
+
+        if (line.isEmpty())
+            continue;
+
+        // Пустое название объекта
+        if (*(line.begin()) == ',')
+            continue;
+
+        // Строка с объектом заканчивается точкой с запятой, а если нет,
+        // это может быть строка с информацией об объекте из предыдущей строки
+        if (*(line.end() - 1) != ';')
+        {
+            if (may_add_info_to_last)
+            {
+                map_data.back()->obj_info = line.toStdString();
+                may_add_info_to_last = false;
+            }
+            continue;
+        }
+
+        // Удаляем завершающую точку с запятой и разделяем строку на данные
+        QStringList tokens = line.removeLast().split(',');
+        if (tokens.size() < 7)
+            continue;
+
+        // Читаем информацию об объекте
+        zds_object_position_t zds_object = zds_object_position_t();
+        zds_object.obj_name = tokens[0].toStdString();
+        zds_object.position.x = tokens[1].toDouble();
+        zds_object.position.y = tokens[2].toDouble();
+        zds_object.position.z = tokens[3].toDouble();
+        zds_object.attitude.x = tokens[4].toDouble();
+        zds_object.attitude.y = tokens[5].toDouble();
+        zds_object.attitude.z = tokens[6].toDouble();
+
+        map_data.push_back(new zds_object_position_t(zds_object));
+        may_add_info_to_last = true;
+    }
+
+    return (!map_data.empty());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ZDSimConverter::findNeutralInsertions(std::vector<neutral_insertion_t> ni)
 {
     std::vector<float> begins;
     std::vector<float> ends;
 
-    while (!stream.eof())
+    for (auto zds_object : route_map_data)
     {
-        std::string line;
-        std::getline(stream, line);
-
-        line = delete_symbol(line, '\r');
-        std::replace(line.begin(), line.end(), ',', ' ');
-
-        if (line.empty())
-            continue;
-
-        if (*(line.end() - 1) != ';')
-            continue;
-
-        if (line.at(0) == ',')
-            continue;
-
-        std::string obj_name = "";
-
-        std::istringstream ss(line);
-
-        dvec3 pos;
-
-        ss >> obj_name >> pos.x >> pos.y >> pos.z;
-
-        if (obj_name == "nvne")
+        if (zds_object->obj_name == "nvne")
         {
             neutral_insertion_t n_insertion;
 
             float begin_coord = 0;
-            zds_track_t track = getNearestTrack(pos, tracks_data1, begin_coord);
+            zds_track_t track = getNearestTrack(zds_object->position, tracks_data1, begin_coord);
 
             add_element(begin_coord, begins);
         }
 
-        if (obj_name == "nvke")
+        if (zds_object->obj_name == "nvke")
         {
             neutral_insertion_t n_insertion;
 
             float end_coord = 0;
-            zds_track_t track = getNearestTrack(pos, tracks_data1, end_coord);
+            zds_track_t track = getNearestTrack(zds_object->position, tracks_data1, end_coord);
 
             add_element(end_coord, ends);
         }
