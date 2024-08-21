@@ -74,12 +74,19 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
                     (zds_object->obj_info == signal_liter))
                 {
                     min_distance = distance;
+                    // Трек главного пути напротив светофора
+                    float coord;
+                    zds_track_t nearest_track = getNearestTrack(
+                        zds_object->position, (dir > 0) ? tracks_data1 : tracks_data2, coord);
+                    bool near_end =  (coord > (nearest_track.route_coord + 0.5 * nearest_track.length));
                     // Сохраняем найденный светофор
                     branch_point->signal_liter = signal_liter;
                     branch_point->nearest_signal_pos = zds_object->position;
+                    branch_point->nearest_signal_main_track_id =
+                        near_end ? nearest_track.prev_uid + 1 : nearest_track.prev_uid;
+
                     // Отмечаем необходимость разделить траекторию светофором
-                    // Пока не знаем id элемента трека, просто меняем на 1
-                    branch_point->id_split_point_by_signal = 1;
+                    branch_point->is_signal = true;
 
                     if ((tokens.size() > 3) && (!tokens[3].isEmpty()))
                     {
@@ -95,9 +102,11 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
         if ( (!tmp_data.empty()) && (tmp_data.back()->bias != 0.0) && ((tmp_data.back()->main_track_id) == (id_value - 1)) )
         {
             tmp_data.back()->bias = branch_point->bias;
-            if (branch_point->id_split_point_by_signal == 1)
+            if (branch_point->is_signal)
             {
-                tmp_data.back()->id_split_point_by_signal = branch_point->id_split_point_by_signal;
+                tmp_data.back()->is_signal = true;
+                tmp_data.back()->nearest_signal_main_track_id = branch_point->nearest_signal_main_track_id;
+                tmp_data.back()->nearest_signal_pos = branch_point->nearest_signal_pos;
                 tmp_data.back()->signal_liter = branch_point->signal_liter;
                 tmp_data.back()->signal_special = branch_point->signal_special;
             }
@@ -110,6 +119,8 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
 
     zds_branch_track_t branch_track = zds_branch_track_t();
     bool is_next_from_other_main = false;
+    bool was_branch_before_other_main = false;
+    zds_branch_point_t* last_branch_point = nullptr;
     for (auto it = tmp_data.begin(); it != tmp_data.end(); ++it)
     {
         zds_branch_point_t* branch_point = *it;
@@ -120,6 +131,30 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             // проверяем обратный съезд (с нулевым смещением)
             if (branch_point->bias == 0.0)
             {
+                // Если в конце траектории указан светофор, проверяем, возможно
+                // он относится к траектории до пересечения соседнего главного
+                if (/*branch_point->is_signal &&*/
+                    was_branch_before_other_main &&
+                    (last_branch_point != nullptr))
+                {
+                    was_branch_before_other_main = false;
+
+                    int distance_this_to_signal =
+                        abs(branch_point->main_track_id - branch_point->nearest_signal_main_track_id);
+                    int distance_last_to_signal =
+                        abs(last_branch_point->main_track_id - branch_point->nearest_signal_main_track_id);
+
+                    if ((distance_last_to_signal < distance_this_to_signal) &&
+                        (!(last_branch_point->is_signal)))
+                    {
+                        last_branch_point->is_signal = true;
+                        last_branch_point->nearest_signal_main_track_id = branch_point->nearest_signal_main_track_id;
+                        last_branch_point->nearest_signal_pos = branch_point->nearest_signal_pos;
+                        last_branch_point->signal_liter = branch_point->signal_liter;
+                        last_branch_point->signal_special = branch_point->signal_special;
+                    }
+                }
+
                 // Ищем точку начала обратного съезда, считаем это съездом "2+2"
                 findFromOtherMain(branch_point);
 
@@ -165,6 +200,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             if (checkIsToOtherMain(branch_point, false) && (branch_point->bias != 0.0))
             {
                 is_next_from_other_main = true;
+                was_branch_before_other_main = true;
 
                 // Заканчиваем траекторию, попавшую в соседний главный путь
                 branch_track.end_at_other = true;
@@ -183,6 +219,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
 
             // Если нет, то это не съезд на соседний главный
             is_next_from_other_main = false;
+            was_branch_before_other_main = false;
         }
 
         // Добавляем точку в траекторию бокового пути
@@ -205,6 +242,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             branch_track.branch_points.clear();
             branch_track = zds_branch_track_t();
             is_next_from_other_main = false;
+            was_branch_before_other_main = false;
         }
     }
     return true;
@@ -518,10 +556,7 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
         bias_prev = bias_curr;
         bias_curr = (*(it+1))->bias;
         coord_begin = tracks_data1[id_begin].route_coord;
-
-        // Отмечаем разделение траектории светофором, если необходимо
-        if ((*(it+1))->id_split_point_by_signal != -1)
-            (*(it+1))->id_split_point_by_signal = branch_track->branch_trajectory.size() - 1;
+        (*(it+1))->trajectory_point_id = branch_track->branch_trajectory.size() - 1;
     }
 
     return true;
@@ -656,10 +691,10 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
                     (exist_branch->id_begin_at_other == branch_track->id_end) ||
                     (exist_branch->id_end_at_other == branch_track->id_begin))
                 {
-                    // Переносим светофоры из данной траектории в существующую
+                    // Переносим точки бранча из данной траектории в существующую
                     for (auto this_branch_point : branch_track->branch_points)
                     {
-                        int point_id = this_branch_point->id_split_point_by_signal;
+                        int point_id = this_branch_point->trajectory_point_id;
                         if (point_id == -1)
                             continue;
                         // Проверяем, что в существующей траектории тоже есть такая точка
@@ -670,15 +705,8 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
                             double d = length(exist_point->point - point_with_signal);
                             if (d < 0.1)
                             {
-                                zds_branch_point_t* new_point_for_exist = new zds_branch_point_t();
-                                new_point_for_exist->main_track_id = this_branch_point->main_track_id;
-                                new_point_for_exist->bias = this_branch_point->bias;
-                                new_point_for_exist->signal_liter = this_branch_point->signal_liter;
-                                new_point_for_exist->signal_special = this_branch_point->signal_special;
-                                new_point_for_exist->dir = this_branch_point->dir;
-                                new_point_for_exist->id_split_point_by_signal = exist_id;
-                                exist_branch->branch_points.push_back(new_point_for_exist);
-                                return false;
+                                this_branch_point->trajectory_point_id = exist_id;
+                                exist_branch->branch_points.push_back(this_branch_point);
                             }
                             ++exist_id;
                         }
@@ -711,10 +739,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
         bias_prev = bias_curr;
         bias_curr = (*(it+1))->bias;
         coord_begin = tracks_data2[id_begin + 1].route_coord;
-
-        // Отмечаем разделение траектории светофором, если необходимо
-        if ((*(it+1))->id_split_point_by_signal != -1)
-            (*(it+1))->id_split_point_by_signal = branch_track->branch_trajectory.size() - 1;
+        (*(it+1))->trajectory_point_id = branch_track->branch_trajectory.size() - 1;
     }
 
     return true;
@@ -860,6 +885,26 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
             }
         }
     }
+
+    for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
+    {
+        if ((*it)->is_signal)
+        {
+            double min_distance = 1e10;
+            size_t id = 0;
+            for (auto point = branch_track->branch_trajectory.begin(); point != branch_track->branch_trajectory.end(); ++point)
+            {
+                double distance = length((*it)->nearest_signal_pos - point->point);
+                if (distance < min_distance)
+                {
+                    min_distance = distance;
+                    (*it)->trajectory_point_id_with_signal = id;
+                }
+                ++id;
+            }
+        }
+    }
+
     for (size_t i = begin_point_id; i != end_point_id; i += dir)
     {
         point_t point;
@@ -871,7 +916,7 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
         bool is_split_next = false;
         for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
         {
-            if (((*it)->id_split_point_by_signal != -1) && ((*it)->id_split_point_by_signal == i + dir))
+            if (((*it)->is_signal) && (*it)->trajectory_point_id_with_signal == i + dir)
             {
                 is_split_next = true;
                 name_cur = name_next;

@@ -40,9 +40,12 @@ struct zds_branch_point_t
     std::string signal_liter = "";
     std::string signal_special = "";
 
-    int dir = 1;
-    int id_split_point_by_signal = -1;
-    dvec3 nearest_signal_pos = dvec3(0.0, 0.0, 0.0);
+    int     dir = 1;
+    int     trajectory_point_id = -1;
+    bool    is_signal = false;
+    dvec3   nearest_signal_pos = dvec3(0.0, 0.0, 0.0);
+    int     nearest_signal_main_track_id = -1;
+    int     trajectory_point_id_with_signal = -1;
 };
 
 //------------------------------------------------------------------------------
