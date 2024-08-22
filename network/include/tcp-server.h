@@ -28,6 +28,8 @@ private:
 
     std::vector<client_data_t> clients_data;
 
+    QByteArray received_data;
+
     int getClientDataBySocket(QTcpSocket *socket);
 
 public slots:
@@ -35,6 +37,8 @@ public slots:
     void slotNewConnection();
 
     void slotClientDisconnected();
+
+    void slotReceive();
 };
 
 #endif

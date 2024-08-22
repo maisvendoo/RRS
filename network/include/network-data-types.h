@@ -37,7 +37,7 @@ struct network_data_t
         QDataStream stream(&buff);
 
         stream << stype;
-        stream << data.size() + sizeof(stype) + sizeof(data_size);
+        stream << data.size();
         stream << data;
 
         return buff.data();

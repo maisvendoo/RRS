@@ -84,11 +84,20 @@ void TcpServer::slotNewConnection()
 
     client_data.socket = server->nextPendingConnection();
 
+
     clients_data.push_back(client_data);
 
-    connect(client_data.socket, &QTcpSocket::disconnected, this, &TcpServer::slotClientDisconnected);
+    connect(client_data.socket, &QTcpSocket::disconnected,
+            this, &TcpServer::slotClientDisconnected);
 
-    Journal::instance()->info(QString("Connected client with id %1").arg(clients_data.size()));
+    connect(client_data.socket, &QTcpSocket::readyRead,
+            this, &TcpServer::slotReceive);
+
+    Journal::instance()->info(QString("Connected client with id %1")
+                                  .arg(clients_data.size()));
+
+    Journal::instance()->info(QString("Server receive buffer size: %1")
+                                  .arg(client_data.socket->readBufferSize()));
 }
 
 //------------------------------------------------------------------------------
@@ -106,4 +115,27 @@ void TcpServer::slotClientDisconnected()
     clients_data[client_idx].socket->close();
 
     clients_data.erase(clients_data.begin() + client_idx);
+
+    Journal::instance()->info(QString("Disconnected client with id %1")
+                                  .arg(clients_data.size()));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotReceive()
+{
+    QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
+
+    int client_idx = getClientDataBySocket(socket);
+
+    if (client_idx < 0)
+        return;
+
+    while (socket->bytesAvailable())
+    {
+        received_data.append(socket->readAll());
+    }
+
+    clients_data[client_idx].received_data.deserialize(received_data);
 }
