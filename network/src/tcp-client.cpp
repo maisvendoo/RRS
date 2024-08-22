@@ -167,7 +167,7 @@ void TcpClient::slotReceive()
         }
     }
 
-    if (recvBuff.size() > wait_data_size)
+    if (recvBuff.size() >= wait_data_size)
     {
         received_data.deserialize(recvBuff);
         process_received_data(received_data);

@@ -37,7 +37,7 @@ struct network_data_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << data.size();
+        stream << data.size() + sizeof(data_size) + sizeof(stype);
         stream << stype;
         stream << data;
 

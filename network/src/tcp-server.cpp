@@ -179,14 +179,29 @@ void TcpServer::slotReceive()
     if (client_idx < 0)
         return;
 
-    QByteArray received_data;
-
     while (socket->bytesAvailable())
     {
-        received_data.append(socket->readAll());
+        if (recvBuff.size() == 0)
+        {
+            recvBuff.append(socket->readAll());
+
+            QBuffer b(&recvBuff);
+            b.open(QIODevice::ReadOnly);
+            QDataStream stream(&b);
+
+            stream >> wait_data_size;
+        }
+        else
+        {
+            recvBuff.append(socket->readAll());
+        }
     }
 
-    clients_data[client_idx].received_data.deserialize(received_data);
+    if (recvBuff.size() >= wait_data_size)
+    {
+        clients_data[client_idx].received_data.deserialize(recvBuff);
+        process_client_request(clients_data[client_idx]);
 
-    process_client_request(clients_data[client_idx]);
+        recvBuff.clear();
+    }
 }
