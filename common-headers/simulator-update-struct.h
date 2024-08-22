@@ -7,6 +7,10 @@
 
 #include    <array>
 
+#include    <QString>
+#include    <QByteArray>
+#include    <QBuffer>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -36,6 +40,59 @@ struct simulator_vehicle_update_t
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << position_x;
+        stream << position_y;
+        stream << position_z;
+        stream << orth_x;
+        stream << orth_y;
+        stream << orth_z;
+        stream << up_x;
+        stream << up_y;
+        stream << up_z;
+        stream << orientation;
+        stream << prev_vehicle;
+        stream << next_vehicle;
+
+        for (auto signal : analogSignal)
+        {
+            stream << signal;
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> position_x;
+        stream >> position_y;
+        stream >> position_z;
+        stream >> orth_x;
+        stream >> orth_y;
+        stream >> orth_z;
+        stream >> up_x;
+        stream >> up_y;
+        stream >> up_z;
+        stream >> orientation;
+        stream >> prev_vehicle;
+        stream >> next_vehicle;
+
+        for (size_t i = 0; i < analogSignal.size(); ++i)
+        {
+            stream >> analogSignal[i];
+        }
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -59,6 +116,19 @@ struct simulator_update_t
     {
 
     }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct tcp_simulator_update_t
+{
+    double time = 0;
+    int current_vehicle = 0;
+    QString currengDebugMsg = "";
+    int controlled_vehicle = 0;
+    QString controlledDebugMeg = "";
+    std::vector<simulator_vehicle_update_t> vehicles;
 };
 
 #endif // SIMULATOR_UPDATE_STRUCT_H
