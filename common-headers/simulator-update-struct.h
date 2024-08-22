@@ -125,10 +125,61 @@ struct tcp_simulator_update_t
 {
     double time = 0;
     int current_vehicle = 0;
-    QString currengDebugMsg = "";
+    QString currentDebugMsg = "";
     int controlled_vehicle = 0;
     QString controlledDebugMeg = "";
     std::vector<simulator_vehicle_update_t> vehicles;
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << time;
+        stream << current_vehicle;
+        stream << currentDebugMsg;
+        stream << controlled_vehicle;
+        stream << controlledDebugMeg;
+
+        stream << vehicles.size();
+
+        for (auto vehicle : vehicles)
+        {
+            stream << vehicle.serialize();
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> time;
+        stream >> current_vehicle;
+        stream >> currentDebugMsg;
+        stream >> controlled_vehicle;
+        stream >> controlledDebugMeg;
+
+        size_t num_vehicles;
+
+        stream >> num_vehicles;
+
+        vehicles.clear();
+        vehicles.resize(num_vehicles);
+
+        for (size_t i = 0; i < vehicles.size(); ++i)
+        {
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+
+            vehicles[i].deserialize(vehicle_data);
+        }
+    }
 };
 
 #endif // SIMULATOR_UPDATE_STRUCT_H
