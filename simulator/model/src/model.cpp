@@ -679,6 +679,8 @@ void Model::initTcpServer()
     std::string cfg_path = fs.getConfigDir() + fs.separator() + "tcp-server.xml";
 
     tpc_server->init(QString(cfg_path.c_str()));
+
+    tpc_server->setTopologyData(topology->serialize());
 }
 
 //------------------------------------------------------------------------------
