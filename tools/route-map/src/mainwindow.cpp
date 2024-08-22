@@ -75,4 +75,6 @@ void MainWindow::slotOnUpdateTrainData()
 void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
+
+    ui->label->setText(QString("%1").arg(train_data.time));
 }

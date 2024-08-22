@@ -699,7 +699,7 @@ void Model::tcpFeedBack()
     tcp_simulator_update.current_vehicle = current_vehicle;
     tcp_simulator_update.controlled_vehicle = controlled_vehicle;
 
-    size_t i = 0;
+    int i = 0;
     std::vector<Vehicle *> *vehicles = train->getVehicles();
 
     for (auto vehicle : *vehicles)
@@ -718,9 +718,11 @@ void Model::tcpFeedBack()
 
         tcp_simulator_update.vehicles[i].orientation = vehicle->getOrientation();
 
-        std::copy(vehicle->getAnalogSignals().begin(),
+        /*std::copy(vehicle->getAnalogSignals().begin(),
                   vehicle->getAnalogSignals().end(),
-                  tcp_simulator_update.vehicles[i].analogSignal.begin());
+                  tcp_simulator_update.vehicles[i].analogSignal.begin());*/
+
+        tcp_simulator_update.vehicles[i].analogSignal = vehicle->getAnalogSignals();
 
         if (current_vehicle == i)
         {

@@ -116,7 +116,7 @@ xcopy ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты
 
-xcopy /S ..\..\routes\experimental-polygon\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
+xcopy /S ..\routes\experimental-polygon\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
 rmdir /S /Q %RRS_DEV_ROOT%\routes\experimental-polygon\map_editor
 del /S %RRS_DEV_ROOT%\routes\experimental-polygon\~*.*
 
