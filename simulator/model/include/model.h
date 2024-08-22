@@ -178,6 +178,8 @@ private:
 
     TcpServer   *tpc_server = new TcpServer;
 
+    tcp_simulator_update_t tcp_simulator_update;
+
     /// Actions, which prerare integration step and also update shared data
     void preStep(double t);
     /// Simulation step

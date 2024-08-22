@@ -83,6 +83,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     switch (client_data.received_data.stype)
     {
     case STYPE_EMPTY_DATA:
+
         break;
 
     case STYPE_TOPOLOGY_DATA:
@@ -90,6 +91,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
 
     case STYPE_TRAIN_POSITION:
+        send_simulator_data(client_data);
         break;
 
     case STYPE_CONNECTOR_STATE:
@@ -105,6 +107,19 @@ void TcpServer::send_topology_data(client_data_t &client_data)
     network_data_t net_data;
     net_data.stype = STYPE_TOPOLOGY_DATA;
     net_data.data = topology_data;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::send_simulator_data(client_data_t &client_data)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_TRAIN_POSITION;
+    net_data.data = simulator_data;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();

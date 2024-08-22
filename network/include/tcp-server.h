@@ -20,6 +20,11 @@ public:
 
     bool init(QString cfg_path);
 
+    void setSimulatorData(QByteArray simulator_data)
+    {
+        this->simulator_data = simulator_data;
+    }
+
 signals:
 
     void setTopologyData(QByteArray &topology_data);
@@ -38,11 +43,15 @@ private:
 
     qsizetype wait_data_size = 0;
 
+    QByteArray simulator_data;
+
     int getClientDataBySocket(QTcpSocket *socket);
 
     void process_client_request(client_data_t &client_data);
 
     void send_topology_data(client_data_t &client_data);
+
+    void send_simulator_data(client_data_t &client_data);
 
 public slots:
 
