@@ -139,7 +139,7 @@ void TcpServer::slotNewConnection()
 
     if (topology_data.size())
     {
-        Journal::instance()->info("Updated topology data");
+        Journal::instance()->info(QString("Updated topology data size: %1").arg(topology_data.size()));
     }
     else
     {

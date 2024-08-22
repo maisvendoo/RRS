@@ -32,7 +32,8 @@ struct network_data_t
     /// Сериализуем, подготоваливая кадр, передаваемый по сети
     QByteArray serialize()
     {
-        QBuffer buff(&data);
+        QByteArray tmp_data;
+        QBuffer buff(&tmp_data);
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
