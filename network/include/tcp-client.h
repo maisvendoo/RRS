@@ -23,6 +23,16 @@ public:
 
     void sendRequest(StructureType stype);
 
+    bool isConnected() const;
+
+signals:
+
+    void connected();
+
+    void disconnected();
+
+    void setTopologyData(QByteArray &topology_data);
+
 private:
 
     QTcpSocket *socket = Q_NULLPTR;
@@ -38,7 +48,15 @@ private:
 
     tcp_config_t tcp_config;
 
+    network_data_t received_data;
+
+    QByteArray recvBuff;
+
+    qsizetype wait_data_size = 0;
+
     void connectToServer(const tcp_config_t &tcp_config);
+
+    void process_received_data(network_data_t &net_data);
 
 public slots:
 

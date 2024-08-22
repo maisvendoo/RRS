@@ -26,4 +26,5 @@ add_subdirectory (tools/pathconv)
 add_subdirectory (tools/offset-parallel-gen)
 add_subdirectory (tools/offset-spline-gen)
 add_subdirectory (tools/routeconv)
+add_subdirectory (tools/route-map)
 
