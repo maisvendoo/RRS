@@ -20,10 +20,9 @@ public:
 
     bool init(QString cfg_path);
 
-    void setTopologyData(const QByteArray &topology_data)
-    {
-        this->topology_data = topology_data;
-    }
+signals:
+
+    void setTopologyData(QByteArray &topology_data);
 
 private:
 

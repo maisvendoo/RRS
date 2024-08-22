@@ -133,6 +133,18 @@ void TcpServer::slotNewConnection()
 
     Journal::instance()->info(QString("Server receive buffer size: %1")
                                   .arg(client_data.socket->readBufferSize()));
+
+    topology_data.clear();
+    emit setTopologyData(topology_data);
+
+    if (topology_data.size())
+    {
+        Journal::instance()->info("Updated topology data");
+    }
+    else
+    {
+        Journal::instance()->error("Failed to update topology data");
+    }
 }
 
 //------------------------------------------------------------------------------

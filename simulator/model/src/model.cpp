@@ -680,7 +680,7 @@ void Model::initTcpServer()
 
     tpc_server->init(QString(cfg_path.c_str()));
 
-    tpc_server->setTopologyData(topology->serialize());
+    connect(tpc_server, &TcpServer::setTopologyData, this, &Model::slotGetTopologyData);
 }
 
 //------------------------------------------------------------------------------
@@ -894,4 +894,12 @@ void Model::process()
     // Debug print, is allowed
     if (is_debug_print)
         debugPrint();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetTopologyData(QByteArray &topology_data)
+{
+    topology_data = topology->serialize();
 }
