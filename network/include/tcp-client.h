@@ -33,6 +33,8 @@ signals:
 
     void setTopologyData(QByteArray &topology_data);
 
+    void setSimulatorData(QByteArray &simulator_data);
+
 private:
 
     QTcpSocket *socket = Q_NULLPTR;

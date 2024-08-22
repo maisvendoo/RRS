@@ -10,6 +10,7 @@
 #include    <QString>
 #include    <QByteArray>
 #include    <QBuffer>
+#include    <QDataStream>
 
 //------------------------------------------------------------------------------
 //

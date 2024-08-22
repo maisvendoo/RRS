@@ -682,7 +682,7 @@ void Model::initTcpServer()
 
     connect(tpc_server, &TcpServer::setTopologyData, this, &Model::slotGetTopologyData);
 
-    tcp_simulator_update.vehicles.reserve(train->getVehiclesNumber());
+    tcp_simulator_update.vehicles.resize(train->getVehiclesNumber());
 }
 
 //------------------------------------------------------------------------------

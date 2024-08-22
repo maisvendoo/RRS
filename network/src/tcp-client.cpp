@@ -107,6 +107,9 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setTopologyData(net_data.data);
         break;
     }
+    case STYPE_TRAIN_POSITION:
+        emit setSimulatorData(net_data.data);
+        break;
 
     default:
 

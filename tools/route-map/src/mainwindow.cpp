@@ -19,6 +19,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(tcp_client, &TcpClient::setTopologyData,
             this, &MainWindow::slotGetTopologyData);
+
+    connect(trainUpdateTimer, &QTimer::timeout,
+            this, &MainWindow::slotOnUpdateTrainData);
+
+    connect(tcp_client, &TcpClient::setSimulatorData,
+            this, &MainWindow::slotGetSimulatorData);
 }
 
 //------------------------------------------------------------------------------
@@ -51,4 +57,22 @@ void MainWindow::slotDisconnectedFromSimulator()
 void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 {
     topology->deserialize(topology_data);
+
+    trainUpdateTimer->start(100);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOnUpdateTrainData()
+{
+    tcp_client->sendRequest(STYPE_TRAIN_POSITION);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
+{
+    train_data.deserialize(sim_data);
 }
