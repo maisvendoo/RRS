@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(tcp_client, &TcpClient::setSimulatorData,
             this, &MainWindow::slotGetSimulatorData);
+
+    map = new MapWidget(ui->Map);
 }
 
 //------------------------------------------------------------------------------
@@ -69,22 +71,6 @@ void MainWindow::load_config(const QString &cfg_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QPoint MainWindow::coord_transform(dvec3 traj_point)
-{
-    QPoint p;
-
-    shift_x = 0;
-    shift_y = ui->Map->height() / 2;
-
-    p.setX(shift_x + scale * traj_point.y);
-    p.setY(shift_y + scale * traj_point.x);
-
-    return p;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     if (traj_list == Q_NULLPTR)
@@ -92,29 +78,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
         return;
     }
 
-    for (auto traj : *traj_list)
-    {
-        drawTrajectory(traj);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::drawTrajectory(Trajectory *traj)
-{
-    QPainter painter;
-    painter.begin(this);
-
-    for (auto track : traj->getTracks())
-    {
-        QPoint p0 = coord_transform(track.begin_point);
-        QPoint p1 = coord_transform(track.end_point);
-
-        painter.drawLine(p0, p1);
-    }
-
-    painter.end();
+    map->resize(ui->Map->width(), ui->Map->height());
 }
 
 //------------------------------------------------------------------------------
@@ -171,7 +135,8 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     ui->ptLog->appendPlainText(trajectories);
     ui->ptLog->appendPlainText(connestors);
 
-    scale = static_cast<double>(ui->Map->width()) / 1000.0;
+    map->traj_list = traj_list;
+    map->conn_list = conn_list;
 
     trainUpdateTimer->start(tcp_config.request_interval);
 }

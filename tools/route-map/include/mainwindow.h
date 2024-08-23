@@ -7,6 +7,7 @@
 #include    <tcp-client.h>
 #include    <topology.h>
 #include    <simulator-update-struct.h>
+#include    <map-widget.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -46,14 +47,7 @@ private:
 
     conn_list_t *conn_list = Q_NULLPTR;
 
-    /// Масштаб отображения карты
-    double scale = 1.0;
-
-    /// Смещение координат по горизонтали
-    double shift_x = 0;
-
-    /// Смещение координат по вретикали
-    double shift_y = 0;
+    MapWidget *map;
 
     void load_config(const QString &cfg_name);
 
@@ -61,8 +55,6 @@ private:
     QPoint coord_transform(dvec3 traj_point);
 
     void paintEvent(QPaintEvent *event);
-
-    void drawTrajectory(Trajectory *traj);
 
 private slots:
 
