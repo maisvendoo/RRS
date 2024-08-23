@@ -82,6 +82,11 @@ public:
 
     void deserialize(QByteArray &data);
 
+    std::vector<track_t> getTracks()
+    {
+        return tracks;
+    }
+
 private:
 
     QString name = "";

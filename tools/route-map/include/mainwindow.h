@@ -42,7 +42,27 @@ private:
 
     tcp_simulator_update_t train_data;
 
-    void load_config(const QString &cfg_path);
+    traj_list_t *traj_list = Q_NULLPTR;
+
+    conn_list_t *conn_list = Q_NULLPTR;
+
+    /// Масштаб отображения карты
+    double scale = 1.0;
+
+    /// Смещение координат по горизонтали
+    double shift_x = 0;
+
+    /// Смещение координат по вретикали
+    double shift_y = 0;
+
+    void load_config(const QString &cfg_name);
+
+    /// Преобразование координат точки траекторри в координаты виджета
+    QPoint coord_transform(dvec3 traj_point);
+
+    void paintEvent(QPaintEvent *event);
+
+    void drawTrajectory(Trajectory *traj);
 
 private slots:
 

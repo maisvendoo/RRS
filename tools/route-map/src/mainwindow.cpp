@@ -2,6 +2,7 @@
 #include    <ui_mainwindow.h>
 
 #include    <CfgReader.h>
+#include    <QPainter>
 
 //------------------------------------------------------------------------------
 //
@@ -68,9 +69,62 @@ void MainWindow::load_config(const QString &cfg_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QPoint MainWindow::coord_transform(dvec3 traj_point)
+{
+    QPoint p;
+
+    shift_x = 0;
+    shift_y = ui->Map->height() / 2;
+
+    p.setX(shift_x + scale * traj_point.y);
+    p.setY(shift_y + scale * traj_point.x);
+
+    return p;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    if (traj_list == Q_NULLPTR)
+    {
+        return;
+    }
+
+    for (auto traj : *traj_list)
+    {
+        drawTrajectory(traj);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::drawTrajectory(Trajectory *traj)
+{
+    QPainter painter;
+    painter.begin(this);
+
+    for (auto track : traj->getTracks())
+    {
+        QPoint p0 = coord_transform(track.begin_point);
+        QPoint p1 = coord_transform(track.end_point);
+
+        painter.drawLine(p0, p1);
+    }
+
+    painter.end();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
     tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
+
+    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
 }
 
 //------------------------------------------------------------------------------
@@ -88,6 +142,37 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 {
     topology->deserialize(topology_data);
 
+    traj_list = topology->getTrajectoriesList();
+    conn_list = topology->getConnectorsList();
+
+    if ( (traj_list == Q_NULLPTR) || (conn_list == Q_NULLPTR) )
+    {
+        ui->ptLog->appendPlainText(tr("Toplology loading FAILED!!!"));
+        return;
+    }
+
+    if (traj_list->size() == 0)
+    {
+        ui->ptLog->appendPlainText(tr("Trajectories list is empty"));
+        return;
+    }
+
+    if (conn_list->size() == 0)
+    {
+        ui->ptLog->appendPlainText(tr("Connectors list is empty"));
+        return;
+    }
+
+    ui->ptLog->appendPlainText(tr("Topology loaded successfully!"));
+
+    QString trajectories = QString(tr("Trajectories: %1")).arg(traj_list->size());
+    QString connestors = QString(tr("Connectors: %1")).arg(conn_list->size());
+
+    ui->ptLog->appendPlainText(trajectories);
+    ui->ptLog->appendPlainText(connestors);
+
+    scale = static_cast<double>(ui->Map->width()) / 1000.0;
+
     trainUpdateTimer->start(tcp_config.request_interval);
 }
 
@@ -97,6 +182,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 void MainWindow::slotOnUpdateTrainData()
 {
     tcp_client->sendRequest(STYPE_TRAIN_POSITION);
+    this->update();
 }
 
 //------------------------------------------------------------------------------
@@ -105,8 +191,4 @@ void MainWindow::slotOnUpdateTrainData()
 void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
-
-    ui->label->setText(QString("%1").arg(train_data.time));
-    ui->label_2->setText(QString("%1").arg(train_data.vehicles[2].position_x));
-
 }

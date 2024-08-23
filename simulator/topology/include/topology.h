@@ -25,7 +25,6 @@ public:
 
     ~Topology();
 
-
     /// Загрузка топологии ж/д полигона
     bool load(QString route_dir);
 
@@ -38,6 +37,16 @@ public:
     QByteArray serialize();
 
     void deserialize(QByteArray &data);
+
+    traj_list_t *getTrajectoriesList()
+    {
+        return &traj_list;
+    }
+
+    conn_list_t *getConnectorsList()
+    {
+        return &switches;
+    }
 
 private:
 
