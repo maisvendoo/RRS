@@ -125,6 +125,14 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
     {
         zds_branch_point_t* branch_point = *it;
 
+        if (branch_point->main_track_id == 3602)
+        {
+            int tmp;
+            tmp = 0;
+            ++tmp;
+            --tmp;
+        }
+
         // Если предыдущая точка была на соседнем главном пути
         if (is_next_from_other_main)
         {
@@ -133,7 +141,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             {
                 // Если в конце траектории указан светофор, проверяем, возможно
                 // он относится к траектории до пересечения соседнего главного
-                if (/*branch_point->is_signal &&*/
+                if (branch_point->is_signal &&
                     was_branch_before_other_main &&
                     (last_branch_point != nullptr))
                 {
@@ -145,13 +153,18 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
                         abs(last_branch_point->main_track_id - branch_point->nearest_signal_main_track_id);
 
                     if ((distance_last_to_signal < distance_this_to_signal) &&
-                        (!(last_branch_point->is_signal)))
+                        (!last_branch_point->is_signal))
                     {
                         last_branch_point->is_signal = true;
                         last_branch_point->nearest_signal_main_track_id = branch_point->nearest_signal_main_track_id;
                         last_branch_point->nearest_signal_pos = branch_point->nearest_signal_pos;
                         last_branch_point->signal_liter = branch_point->signal_liter;
                         last_branch_point->signal_special = branch_point->signal_special;
+                        branch_point->is_signal = false;
+                        branch_point->nearest_signal_main_track_id = -1;
+                        branch_point->nearest_signal_pos = dvec3(0.0, 0.0, 0.0);
+                        branch_point->signal_liter = "";
+                        branch_point->signal_special = "";
                     }
                 }
 
@@ -201,6 +214,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             {
                 is_next_from_other_main = true;
                 was_branch_before_other_main = true;
+                last_branch_point = branch_point;
 
                 // Заканчиваем траекторию, попавшую в соседний главный путь
                 branch_track.end_at_other = true;
@@ -220,6 +234,7 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             // Если нет, то это не съезд на соседний главный
             is_next_from_other_main = false;
             was_branch_before_other_main = false;
+            last_branch_point = nullptr;
         }
 
         // Добавляем точку в траекторию бокового пути
@@ -326,6 +341,13 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t* branch_point, bool i
     {
         int id1 = id_begin;
         int id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        for (auto exist_branch : branch_2minus2_data)
+        {
+            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            {
+                return true;
+            }
+        }
         branch_2minus2.branch_point_fwd = *branch_point;
         branch_2minus2.is_fwd = true;
         branch_2minus2.id1 = id1;
@@ -392,6 +414,13 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
     {
         int id1 = id_end + 1;
         int id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        for (auto exist_branch : branch_2plus2_data)
+        {
+            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            {
+                return;
+            }
+        }
         branch_2plus2.branch_point_fwd = *branch_point;
         branch_2plus2.is_fwd = true;
         branch_2plus2.id1 = id1;
@@ -407,8 +436,11 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
         {
             if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
             {
-                exist_branch->branch_point_bwd = *branch_point;
-                exist_branch->is_bwd = true;
+                if (branch_point->is_signal)
+                {
+                    exist_branch->branch_point_bwd = *branch_point;
+                    exist_branch->is_bwd = true;
+                }
                 return;
             }
         }
