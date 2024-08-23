@@ -4,5 +4,6 @@
 		<HostAddr>127.0.0.1</HostAddr>
 		<port>1992</port>
 		<ReconnectInterval>100</ReconnectInterval>
+		<RequestInterval>100</RequestInterval>
 	</Client>
 </Config>

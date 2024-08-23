@@ -32,6 +32,8 @@ private:
 
     Ui::MainWindow *ui;
 
+    tcp_config_t tcp_config;
+
     TcpClient *tcp_client = new TcpClient(this);
 
     Topology *topology = new Topology;
@@ -39,6 +41,8 @@ private:
     QTimer *trainUpdateTimer = new QTimer(this);
 
     tcp_simulator_update_t train_data;
+
+    void load_config(const QString &cfg_path);
 
 private slots:
 

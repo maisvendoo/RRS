@@ -9,6 +9,17 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct tcp_config_t
+{
+    QString host_addr ="127.0.0.1";
+    quint16 port = 1992;
+    int reconnect_interval = 100;
+    int request_interval = 100;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class NETWORK_EXPORT TcpClient : public QObject
 {
     Q_OBJECT
@@ -19,7 +30,7 @@ public:
 
     ~TcpClient();
 
-    bool init(QString cfg_name);
+    bool init(const tcp_config_t &tcp_config);
 
     void sendRequest(StructureType stype);
 
@@ -39,14 +50,7 @@ private:
 
     QTcpSocket *socket = Q_NULLPTR;
 
-    QTimer *connectionTimer = Q_NULLPTR;
-
-    struct tcp_config_t
-    {
-        QString host_addr ="127.0.0.1";
-        quint16 port = 1992;
-        int reconnect_interval = 100;
-    };
+    QTimer *connectionTimer = Q_NULLPTR;    
 
     tcp_config_t tcp_config;
 

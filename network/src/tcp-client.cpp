@@ -20,27 +20,8 @@ TcpClient::~TcpClient()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool TcpClient::init(QString cfg_name)
+bool TcpClient::init(const tcp_config_t &tcp_config)
 {
-    CfgReader cfg;
-
-    if (!cfg.load(cfg_name))
-    {
-        return false;
-    }
-
-    QString secName = "Client";
-    cfg.getString(secName, "HostAddr", tcp_config.host_addr);
-
-    int tmp = 0;
-
-    if (cfg.getInt(secName, "port", tmp))
-    {
-        tcp_config.port = static_cast<quint16>(tmp);
-    }
-
-    cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
-
     connectionTimer = new QTimer(this);
     connectionTimer->setInterval(tcp_config.reconnect_interval);
     connect(connectionTimer, &QTimer::timeout, this, &TcpClient::slotOnConnectionTimeout);

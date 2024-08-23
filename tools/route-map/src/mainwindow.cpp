@@ -1,5 +1,7 @@
-#include    "mainwindow.h"
-#include    "./ui_mainwindow.h"
+#include    <mainwindow.h>
+#include    <ui_mainwindow.h>
+
+#include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
 //
@@ -9,7 +11,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     ui->setupUi(this);
 
-    tcp_client->init("../cfg/route-map-tcp.xml");
+    load_config("../cfg/route-map-tcp.xml");
+
+    tcp_client->init(tcp_config);
 
     connect(tcp_client, &TcpClient::connected,
             this, &MainWindow::slotConnectedToSimulator);
@@ -38,6 +42,32 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::load_config(const QString &cfg_name)
+{
+    CfgReader cfg;
+
+    if (!cfg.load(cfg_name))
+    {
+        return;
+    }
+
+    QString secName = "Client";
+    cfg.getString(secName, "HostAddr", tcp_config.host_addr);
+
+    int tmp = 0;
+
+    if (cfg.getInt(secName, "port", tmp))
+    {
+        tcp_config.port = static_cast<quint16>(tmp);
+    }
+
+    cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
+    cfg.getInt(secName, "RequestInterval", tcp_config.request_interval);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
     tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
@@ -58,7 +88,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 {
     topology->deserialize(topology_data);
 
-    trainUpdateTimer->start(100);
+    trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------
