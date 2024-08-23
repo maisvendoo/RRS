@@ -2,6 +2,7 @@
 #define     MAP_WIDGET_H
 
 #include    <QWidget>
+#include    <QMouseEvent>
 #include    <topology-types.h>
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
@@ -32,6 +33,11 @@ public:
         return scale;
     }
 
+    QPoint getMousePos() const
+    {
+        return mouse_pos;
+    }
+
 private:
 
     /// Масштаб отображения карты
@@ -49,13 +55,25 @@ private:
 
     QPoint map_shift;
 
+    QPoint mouse_pos;
+
     void paintEvent(QPaintEvent *event);
 
     void drawTrajectory(Trajectory *traj);
 
+    void drawTrain(tcp_simulator_update_t *train_data);
+
+    void drawVehicle(simulator_vehicle_update_t &vehicle, QColor color);
+
+    void drawConnectors(conn_list_t *conn_list);
+
+    void drawConnector(Connector *conn);
+
     QPoint coord_transform(dvec3 traj_point);
 
     void wheelEvent(QWheelEvent *event);
+
+    void mouseMoveEvent(QMouseEvent *event);
 };
 
 #endif

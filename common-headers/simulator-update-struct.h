@@ -29,6 +29,7 @@ struct simulator_vehicle_update_t
     int     orientation;
     int     prev_vehicle;
     int     next_vehicle;
+    double  length;
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
 
     simulator_vehicle_update_t()
@@ -38,6 +39,7 @@ struct simulator_vehicle_update_t
         , orientation(1)
         , prev_vehicle(-1)
         , next_vehicle(-1)
+        , length(0.0)
     {
         std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
     }
@@ -61,6 +63,7 @@ struct simulator_vehicle_update_t
         stream << orientation;
         stream << prev_vehicle;
         stream << next_vehicle;
+        stream << length;
 
         for (auto signal : analogSignal)
         {
@@ -88,6 +91,7 @@ struct simulator_vehicle_update_t
         stream >> orientation;
         stream >> prev_vehicle;
         stream >> next_vehicle;
+        stream >> length;
 
         for (size_t i = 0; i < analogSignal.size(); ++i)
         {

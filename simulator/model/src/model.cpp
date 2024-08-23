@@ -717,6 +717,7 @@ void Model::tcpFeedBack()
         tcp_simulator_update.vehicles[i].up_z = pp->up.z;
 
         tcp_simulator_update.vehicles[i].orientation = vehicle->getOrientation();
+        tcp_simulator_update.vehicles[i].length = vehicle->getLength();
 
         /*std::copy(vehicle->getAnalogSignals().begin(),
                   vehicle->getAnalogSignals().end(),
