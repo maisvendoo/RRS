@@ -79,6 +79,8 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 
     map->resize(ui->Map->width(), ui->Map->height());
+    ui->label->setText(QString("Scale: %1").arg(map->getScale()));
+    map->update();
 }
 
 //------------------------------------------------------------------------------

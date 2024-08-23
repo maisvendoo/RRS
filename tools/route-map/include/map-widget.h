@@ -27,10 +27,19 @@ public:
 
     void resize(int width, int height);
 
+    double getScale() const
+    {
+        return scale;
+    }
+
 private:
 
     /// Масштаб отображения карты
     double scale = 1.0;
+
+    double old_scale = 1.0;
+
+    bool is_stored_old_scale = false;
 
     /// Смещение координат по горизонтали
     double shift_x = 0;
@@ -38,11 +47,15 @@ private:
     /// Смещение координат по вретикали
     double shift_y = 0;
 
+    QPoint map_shift;
+
     void paintEvent(QPaintEvent *event);
 
     void drawTrajectory(Trajectory *traj);
 
     QPoint coord_transform(dvec3 traj_point);
+
+    void wheelEvent(QWheelEvent *event);
 };
 
 #endif
