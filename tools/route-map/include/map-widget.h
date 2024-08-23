@@ -4,6 +4,7 @@
 #include    <QWidget>
 #include    <topology-types.h>
 #include    <trajectory.h>
+#include    <simulator-update-struct.h>
 
 //------------------------------------------------------------------------------
 //
@@ -21,6 +22,8 @@ public:
     traj_list_t *traj_list = Q_NULLPTR;
 
     conn_list_t *conn_list = Q_NULLPTR;
+
+    tcp_simulator_update_t *train_data = Q_NULLPTR;
 
     void resize(int width, int height);
 

@@ -156,4 +156,6 @@ void MainWindow::slotOnUpdateTrainData()
 void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
+
+    map->train_data = &train_data;
 }

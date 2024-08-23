@@ -24,7 +24,7 @@ void MapWidget::resize(int width, int height)
 {
     QWidget::resize(width, height);
 
-    scale = static_cast<double>(this->width()) / 1000.0;
+    scale = static_cast<double>(this->width()) / 2000.0;
 }
 
 //------------------------------------------------------------------------------
@@ -33,6 +33,11 @@ void MapWidget::resize(int width, int height)
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     if (traj_list == Q_NULLPTR)
+    {
+        return;
+    }
+
+    if (train_data == Q_NULLPTR)
     {
         return;
     }
@@ -69,8 +74,8 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
 {
     QPoint p;
 
-    shift_x = 0;
-    shift_y = this->height() / 2;
+    shift_x = -train_data->vehicles[0].position_y * scale;
+    shift_y = -train_data->vehicles[0].position_x * scale;;
 
     p.setX(shift_x + scale * traj_point.y);
     p.setY(shift_y + scale * traj_point.x);
