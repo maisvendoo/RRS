@@ -65,7 +65,7 @@ private:
 
     void drawVehicle(simulator_vehicle_update_t &vehicle, QColor color);
 
-    void drawConnectors(conn_list_t *conn_list);
+    void drawConnectors(traj_list_t *traj_list);
 
     void drawConnector(Connector *conn);
 

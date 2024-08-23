@@ -1,6 +1,7 @@
 #include    <map-widget.h>
 #include    <QPainter>
 #include    <QWheelEvent>
+#include    <connector.h>
 
 //------------------------------------------------------------------------------
 //
@@ -42,6 +43,11 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
+    if (conn_list == Q_NULLPTR)
+    {
+        return;
+    }
+
     if (train_data == Q_NULLPTR)
     {
         return;
@@ -52,7 +58,10 @@ void MapWidget::paintEvent(QPaintEvent *event)
         drawTrajectory(traj);
     }
 
+
     drawTrain(train_data);
+
+    drawConnectors(traj_list);
 }
 
 //------------------------------------------------------------------------------
@@ -125,14 +134,66 @@ void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
     p.end();
 }
 
-void MapWidget::drawConnectors(conn_list_t *conn_list)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::drawConnectors(traj_list_t *traj_list)
 {
-
+    for (auto traj : *traj_list)
+    {
+        Connector *conn = traj->getBwdConnector();
+        drawConnector(conn);
+    }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MapWidget::drawConnector(Connector *conn)
 {
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
 
+    Trajectory *fwd_traj = conn->getFwdTraj();
+    Trajectory *bwd_traj = conn->getBwdTraj();
+
+    if ( (fwd_traj == Q_NULLPTR) || (bwd_traj == Q_NULLPTR) )
+    {
+        return;
+    }
+
+    if ( (fwd_traj->getTracks().size() == 0) || (fwd_traj->getTracks().size() == 0) )
+    {
+        return;
+    }
+
+    double conn_length = 5.0;
+
+    track_t fwd_track = fwd_traj->getFirstTrack();
+    dvec3 center = fwd_track.begin_point;
+    dvec3 fwd = center + fwd_track.orth * conn_length;
+
+    track_t bwd_track = bwd_traj->getLastTrack();
+    dvec3 bwd = center - bwd_track.orth * conn_length;
+
+    QPen pen;
+    pen.setWidth(4);
+    pen.setColor(QColor(0, 0, 128));
+
+    QPainter painter;
+    painter.begin(this);
+    painter.setPen(pen);
+
+    QPoint center_point = coord_transform(center);
+    QPoint fwd_point = coord_transform(fwd);
+    QPoint bwd_point = coord_transform(bwd);
+
+    painter.drawLine(center_point, fwd_point);
+    painter.drawLine(center_point, bwd_point);
+
+    painter.end();
 }
 
 //------------------------------------------------------------------------------

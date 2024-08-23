@@ -242,13 +242,13 @@ void Topology::deserialize(QByteArray &data)
     qsizetype traj_count = 0;
     stream >> traj_count;
 
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    for (auto traj : traj_list)
     {
         QByteArray traj_data;
         stream >> traj_data;
-        traj.value()->deserialize(traj_data);
-        traj.value()->setFwdConnector(deserialize_traj_connectors(stream, switches));
-        traj.value()->setBwdConnector(deserialize_traj_connectors(stream, switches));
+        traj->deserialize(traj_data);
+        traj->setFwdConnector(deserialize_traj_connectors(stream, switches));
+        traj->setBwdConnector(deserialize_traj_connectors(stream, switches));
     }
 }
 

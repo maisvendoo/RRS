@@ -215,6 +215,9 @@ void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
     // Восстанавливаем статусы стрелки
     stream >> state_fwd;
     stream >> state_bwd;
+
+    fwdTraj = this->getFwdTraj();
+    bwdTraj = this->getBwdTraj();
 }
 
 //------------------------------------------------------------------------------
