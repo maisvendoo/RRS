@@ -58,10 +58,16 @@ void MapWidget::paintEvent(QPaintEvent *event)
         drawTrajectory(traj);
     }
 
+    drawConnectors(conn_list);
 
     drawTrain(train_data);
 
-    drawConnectors(traj_list);
+    if (stations == Q_NULLPTR)
+    {
+        return;
+    }
+
+    drawStations(stations);
 }
 
 //------------------------------------------------------------------------------
@@ -137,11 +143,10 @@ void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawConnectors(traj_list_t *traj_list)
+void MapWidget::drawConnectors(conn_list_t *conn_list)
 {
-    for (auto traj : *traj_list)
+    for (auto conn : *conn_list)
     {
-        Connector *conn = traj->getBwdConnector();
         drawConnector(conn);
     }
 }
@@ -169,7 +174,7 @@ void MapWidget::drawConnector(Connector *conn)
         return;
     }
 
-    double conn_length = 5.0;
+    double conn_length = 15.0;
 
     track_t fwd_track = fwd_traj->getFirstTrack();
     dvec3 center = fwd_track.begin_point;
@@ -194,6 +199,27 @@ void MapWidget::drawConnector(Connector *conn)
     painter.drawLine(center_point, bwd_point);
 
     painter.end();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::drawStations(topology_stations_list_t *stations)
+{
+    for (auto station : *stations)
+    {
+        QPainter painter;
+        painter.begin(this);
+        QFont font("Arial", 14);
+        painter.setFont(font);
+
+        dvec3 station_place{station.pos_x, station.pos_y, station.pos_z};
+        QPoint place = coord_transform(station_place);
+
+        painter.drawText(place, station.name);
+
+        painter.end();
+    }
 }
 
 //------------------------------------------------------------------------------

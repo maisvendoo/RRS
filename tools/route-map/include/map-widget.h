@@ -6,6 +6,7 @@
 #include    <topology-types.h>
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
+#include    <switch-label.h>
 
 //------------------------------------------------------------------------------
 //
@@ -25,6 +26,8 @@ public:
     conn_list_t *conn_list = Q_NULLPTR;
 
     tcp_simulator_update_t *train_data = Q_NULLPTR;
+
+    topology_stations_list_t *stations = Q_NULLPTR;
 
     void resize(int width, int height);
 
@@ -65,9 +68,11 @@ private:
 
     void drawVehicle(simulator_vehicle_update_t &vehicle, QColor color);
 
-    void drawConnectors(traj_list_t *traj_list);
+    void drawConnectors(conn_list_t *conn_list);
 
     void drawConnector(Connector *conn);
+
+    void drawStations(topology_stations_list_t *stations);
 
     QPoint coord_transform(dvec3 traj_point);
 

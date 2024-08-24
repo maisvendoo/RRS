@@ -2,6 +2,7 @@
 
 #include    <QDir>
 #include    <QDirIterator>
+#include    <QFile>
 
 #include    <CfgReader.h>
 #include    <switch.h>
@@ -67,6 +68,11 @@ bool Topology::load(QString route_dir)
     }
 
     load_topology(route_path);
+
+    if (!load_stations(route_path))
+    {
+        Journal::instance()->error("Can't to load staions list");
+    }
 
     return true;
 }
@@ -190,6 +196,14 @@ QByteArray Topology::serialize()
     // Связываем с буфером поток данных
     QDataStream stream(&data);
 
+    stream << stations.size();
+
+    for (auto station : stations)
+    {
+        QByteArray sdata = station.serialize();
+        stream << sdata;
+    }
+
     // Указываем число коннекторов
     stream << switches.size();
 
@@ -220,6 +234,20 @@ void Topology::deserialize(QByteArray &data)
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
+    qsizetype stations_count = 0;
+    stream >> stations_count;
+
+    stations.clear();
+
+    for (qsizetype i = 0; i < stations_count; ++i)
+    {
+        QByteArray station_data;
+        stream >> station_data;
+        topology_station_t station;
+        station.deserialize(station_data);
+        stations.push_back(station);
+    }
+
     traj_list.clear();
     switches.clear();
 
@@ -238,7 +266,6 @@ void Topology::deserialize(QByteArray &data)
         switches.insert(sw->getName(), sw);
     }
 
-
     qsizetype traj_count = 0;
     stream >> traj_count;
 
@@ -249,7 +276,7 @@ void Topology::deserialize(QByteArray &data)
         traj->deserialize(traj_data);
         traj->setFwdConnector(deserialize_traj_connectors(stream, switches));
         traj->setBwdConnector(deserialize_traj_connectors(stream, switches));
-    }
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -324,6 +351,47 @@ bool Topology::load_topology(QString route_dir)
         joints.insert(joint->getName(), joint);
 
         secNode = cfg.getNextSection();
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Topology::load_stations(QString route_dir)
+{
+    QString path = route_dir + QDir::separator() +
+                   "topology" + QDir::separator() +
+                   "stations.conf";
+
+    QFile stations_file(path);
+
+    if (!stations_file.open(QIODevice::ReadOnly))
+    {
+        return false;
+    }
+
+    QTextStream stream(&stations_file);
+
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine();
+        QStringList tokens = line.split('\t');
+
+        topology_station_t station;
+        station.name = tokens[0];
+        station.pos_x = tokens[1].toDouble();
+        station.pos_y = tokens[2].toDouble();
+        station.pos_z = tokens[3].toDouble();
+
+        stations.push_back(station);
+
+        Journal::instance()->info(QString("Loaded station %1 at {%2,%3,%4}")
+                                      .arg(station.name)
+                                      .arg(station.pos_x)
+                                      .arg(station.pos_y)
+                                      .arg(station.pos_z));
     }
 
     return true;
