@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
-    scale = static_cast<double>(this->width()) / 1000.0;
+//    scale = static_cast<double>(this->width()) / 1000.0;
 }
 
 //------------------------------------------------------------------------------
@@ -26,11 +26,11 @@ void MapWidget::resize(int width, int height)
 {
     QWidget::resize(width, height);
 
-    if (!is_stored_old_scale)
+/*    if (!is_stored_old_scale)
     {
         old_scale = scale = static_cast<double>(this->width()) / 2000.0;
         is_stored_old_scale = true;
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -243,10 +243,11 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
 //------------------------------------------------------------------------------
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
-    scale += event->angleDelta().y() * 0.005;
+    if ((event->angleDelta().y() > 0) && (scale < 16.0))
+        scale *= scale_inc_step_coeff;
 
-    if (scale < 0.6)
-        scale = 0.6;
+    if ((event->angleDelta().y() < 0) && (scale > 0.25))
+        scale *= scale_dec_step_coeff;
 
     event->accept();
 }
