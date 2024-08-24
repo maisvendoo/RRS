@@ -229,7 +229,9 @@ void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *tra
     // и если она присутствуем, пишем признак присутствия,
     // а далее помещаем сериализованные данные этой траекторри
     // в буфер
-    if (bool has_traj = traj != Q_NULLPTR)
+    bool has_traj = traj != Q_NULLPTR;
+
+    if (has_traj)
     {
         stream << has_traj;
         stream << traj->getName();
@@ -256,14 +258,23 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
     //и если она есть
     if (has_traj)
     {
-        // Содаем траекторию
-        traj = new Trajectory;
-
         // И восстанавливаем её данные
         QString traj_name;
         stream >> traj_name;
 
-        traj_list.insert(traj_name, traj);
+        // Если в списке еще нет траектории с таким именем
+        if (!traj_list.contains(traj_name))
+        {
+            // Содаем траекторию
+            traj = new Trajectory;
+            traj_list.insert(traj_name, traj);
+            return traj;
+        }
+        else
+        {
+            traj = traj_list[traj_name];
+            return traj;
+        }
     }
 
     return traj;

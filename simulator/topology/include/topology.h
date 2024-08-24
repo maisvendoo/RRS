@@ -62,11 +62,17 @@ private:
     /// Контейнер контроллеров ПЕ
     std::vector<VehicleController *> vehicle_control;
 
+    /// Сипсок станций
+    std::vector<topology_station_t> stations;
+
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);
 
     /// Загрузка топологии
     bool load_topology(QString route_dir);
+
+    /// Загрузка списка станций
+    bool load_stations(QString route_dir);
 
     void serialize_connector_name(QDataStream &stream, Connector *conn);
 

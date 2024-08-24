@@ -61,7 +61,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     drawTrain(train_data);
 
-    drawConnectors(traj_list);
+    drawConnectors(conn_list);
 }
 
 //------------------------------------------------------------------------------
@@ -137,11 +137,10 @@ void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawConnectors(traj_list_t *traj_list)
+void MapWidget::drawConnectors(conn_list_t *conn_list)
 {
-    for (auto traj : *traj_list)
+    for (auto conn : *conn_list)
     {
-        Connector *conn = traj->getBwdConnector();
         drawConnector(conn);
     }
 }
