@@ -96,16 +96,20 @@ void MapWidget::drawTrain(tcp_simulator_update_t *train_data)
 {
     for (size_t i = 0; i < train_data->vehicles.size(); ++i)
     {
-        if (i == 0)
+        if (i == train_data->controlled_vehicle)
         {
-            QColor color(128, 0, 0);
+            QColor color(192, 64, 64);
             drawVehicle(train_data->vehicles[i],color);
+            continue;
         }
-        else
+        if (i == train_data->current_vehicle)
         {
-            QColor color(0, 128, 0);
+            QColor color(192, 192, 0);
             drawVehicle(train_data->vehicles[i],color);
+            continue;
         }
+        QColor color(64, 128, 0);
+        drawVehicle(train_data->vehicles[i],color);
     }
 }
 
@@ -115,21 +119,22 @@ void MapWidget::drawTrain(tcp_simulator_update_t *train_data)
 void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
 {
     QPen pen;
-    pen.setWidth(6);
+    pen.setWidth(5 + std::floor(scale));
     pen.setColor(color);
+    pen.setCapStyle(Qt::FlatCap);
 
     QPainter p;
     p.begin(this);
     p.setPen(pen);
 
     dvec3 fwd;
-    fwd.x = vehicle.position_x + vehicle.orth_x * vehicle.length / 2;
-    fwd.y = vehicle.position_y + vehicle.orth_y * vehicle.length / 2;
+    fwd.x = vehicle.position_x + vehicle.orth_x * (vehicle.length / 2.0 - 0.45);
+    fwd.y = vehicle.position_y + vehicle.orth_y * (vehicle.length / 2.0 - 0.45);
     fwd.z = 0;
 
     dvec3 bwd;
-    bwd.x = vehicle.position_x - vehicle.orth_x * vehicle.length / 2;
-    bwd.y = vehicle.position_y - vehicle.orth_y * vehicle.length / 2;
+    bwd.x = vehicle.position_x - vehicle.orth_x * (vehicle.length / 2.0 - 0.45);
+    bwd.y = vehicle.position_y - vehicle.orth_y * (vehicle.length / 2.0 - 0.45);
     bwd.z = 0;
 
     QPoint fwd_point = coord_transform(fwd);
@@ -184,7 +189,7 @@ void MapWidget::drawConnector(Connector *conn)
     dvec3 bwd = center - bwd_track.orth * conn_length;
 
     QPen pen;
-    pen.setWidth(4);
+    pen.setWidth(2 + std::floor(sqrt(scale)));
     pen.setColor(QColor(0, 0, 128));
 
     QPainter painter;
@@ -229,8 +234,9 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
 {
     QPoint p;
 
-    shift_x = this->width() / 2 - train_data->vehicles[0].position_y * scale + map_shift.x();
-    shift_y = this->height() / 2 - train_data->vehicles[0].position_x * scale + map_shift.y();
+    int curr = train_data->current_vehicle;
+    shift_x = this->width() / 2 - train_data->vehicles[curr].position_y * scale + map_shift.x();
+    shift_y = this->height() / 2 - train_data->vehicles[curr].position_x * scale + map_shift.y();
 
     p.setX(shift_x + scale * traj_point.y);
     p.setY(shift_y + scale * traj_point.x);
