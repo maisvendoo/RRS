@@ -58,10 +58,9 @@ void MapWidget::paintEvent(QPaintEvent *event)
         drawTrajectory(traj);
     }
 
+    drawConnectors(conn_list);
 
     drawTrain(train_data);
-
-    drawConnectors(conn_list);
 
     if (stations == Q_NULLPTR)
     {
@@ -175,7 +174,7 @@ void MapWidget::drawConnector(Connector *conn)
         return;
     }
 
-    double conn_length = 5.0;
+    double conn_length = 15.0;
 
     track_t fwd_track = fwd_traj->getFirstTrack();
     dvec3 center = fwd_track.begin_point;
