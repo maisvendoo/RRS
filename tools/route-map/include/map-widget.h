@@ -26,6 +26,8 @@ public:
 
     tcp_simulator_update_t *train_data = Q_NULLPTR;
 
+    topology_stations_list_t *stations = Q_NULLPTR;
+
     void resize(int width, int height);
 
     double getScale() const
@@ -68,6 +70,8 @@ private:
     void drawConnectors(conn_list_t *conn_list);
 
     void drawConnector(Connector *conn);
+
+    void drawStations(topology_stations_list_t *stations);
 
     QPoint coord_transform(dvec3 traj_point);
 

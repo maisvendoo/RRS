@@ -48,6 +48,11 @@ public:
         return &switches;
     }
 
+    topology_stations_list_t *getStationsList()
+    {
+        return &stations;
+    }
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне
@@ -63,7 +68,7 @@ private:
     std::vector<VehicleController *> vehicle_control;
 
     /// Сипсок станций
-    QVector<topology_station_t> stations;
+    topology_stations_list_t stations;
 
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);

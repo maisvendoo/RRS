@@ -144,6 +144,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 
     map->traj_list = traj_list;
     map->conn_list = conn_list;
+    map->stations = topology->getStationsList();
 
     trainUpdateTimer->start(tcp_config.request_interval);
 }
