@@ -63,7 +63,7 @@ private:
     std::vector<VehicleController *> vehicle_control;
 
     /// Сипсок станций
-    std::vector<topology_station_t> stations;
+    QVector<topology_station_t> stations;
 
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);

@@ -196,6 +196,14 @@ QByteArray Topology::serialize()
     // Связываем с буфером поток данных
     QDataStream stream(&data);
 
+    stream << stations.size();
+
+    for (auto station : stations)
+    {
+        QByteArray sdata = station.serialize();
+        stream << sdata;
+    }
+
     // Указываем число коннекторов
     stream << switches.size();
 
@@ -214,14 +222,6 @@ QByteArray Topology::serialize()
         serialize_connector_name(stream, traj.value()->getBwdConnector());
     }
 
-    /*qsizetype stations_size = static_cast<qsizetype>(stations.size());
-    stream << stations_size;
-
-    for (auto station : stations)
-    {
-        stream << station.serialize();
-    }*/
-
     return data.data();
 }
 
@@ -233,6 +233,20 @@ void Topology::deserialize(QByteArray &data)
     QBuffer buff(&data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
+
+    qsizetype stations_count = 0;
+    stream >> stations_count;
+
+    stations.clear();
+
+    for (qsizetype i = 0; i < stations_count; ++i)
+    {
+        QByteArray station_data;
+        stream >> station_data;
+        topology_station_t station;
+        station.deserialize(station_data);
+        stations.push_back(station);
+    }
 
     traj_list.clear();
     switches.clear();
@@ -252,7 +266,6 @@ void Topology::deserialize(QByteArray &data)
         switches.insert(sw->getName(), sw);
     }
 
-
     qsizetype traj_count = 0;
     stream >> traj_count;
 
@@ -263,21 +276,7 @@ void Topology::deserialize(QByteArray &data)
         traj->deserialize(traj_data);
         traj->setFwdConnector(deserialize_traj_connectors(stream, switches));
         traj->setBwdConnector(deserialize_traj_connectors(stream, switches));
-    }
-
-    /*qsizetype stations_count = 0;
-    stream >> stations_count;
-
-    stations.clear();   
-
-    for (qsizetype i = 0; i < stations_count; ++i)
-    {
-        QByteArray station_data;
-        stream >> station_data;
-        topology_station_t station;
-        station.deserialize(station_data);
-        stations.push_back(station);
-    }*/
+    }    
 }
 
 //------------------------------------------------------------------------------

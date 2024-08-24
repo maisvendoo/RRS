@@ -48,7 +48,8 @@ struct topology_station_t
 
     QByteArray serialize()
     {
-        QBuffer buff;
+        QByteArray data;
+        QBuffer buff(&data);
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
@@ -57,7 +58,7 @@ struct topology_station_t
         stream << pos_y;
         stream << pos_z;
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray &data)
