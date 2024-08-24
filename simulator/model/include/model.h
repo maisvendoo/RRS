@@ -22,30 +22,28 @@
 #include    <QSharedMemory>
 #include    <QTimer>
 
-#include    "simulator-command-line.h"
-#include    "filesystem.h"
-#include    "train.h"
-#include    "elapsed-timer.h"
+#include    <simulator-command-line.h>
+#include    <filesystem.h>
+#include    <train.h>
+#include    <elapsed-timer.h>
 
-#include    "simulator-info-struct.h"
-#include    "simulator-update-struct.h"
-#include    "controlled-struct.h"
+#include    <simulator-info-struct.h>
+#include    <simulator-update-struct.h>
+#include    <controlled-struct.h>
 
-#include    "server.h"
+#include    <profile.h>
 
-#include    "profile.h"
+#include    <keys-control.h>
 
-#include    "keys-control.h"
+#include    <virtual-interface-device.h>
 
-#include    "virtual-interface-device.h"
+#include    <signaling.h>
 
-#include    "sim-client.h"
-
-#include    "signaling.h"
-
-#include    "traffic-machine.h"
+#include    <traffic-machine.h>
 
 #include    <topology.h>
+
+#include    <tcp-server.h>
 
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
@@ -82,7 +80,7 @@ signals:
 
 //    void sendDataToTrain(QByteArray data);
 
-    void getRecvData(sim_dispatcher_data_t &disp_data);
+    //void getRecvData(sim_dispatcher_data_t &disp_data);
 
 public slots:
 
@@ -136,13 +134,13 @@ private:
     Profile     *profile = nullptr;
 
     /// TCP-server
-    Server      *server = nullptr;
+    //Server      *server = nullptr;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
     /// Клиент для связи с ВЖД
-    SimTcpClient *sim_client = nullptr;
+    //SimTcpClient *sim_client = nullptr;
 
     /// Система СЦБ
     Signaling *signaling = nullptr;
@@ -176,7 +174,11 @@ private:
     QTimer          controlTimer;
     QTimer          networkTimer;
 
-    ElapsedTimer    simTimer;       
+    ElapsedTimer    simTimer;
+
+    TcpServer   *tpc_server = new TcpServer;
+
+    tcp_simulator_update_t tcp_simulator_update;
 
     /// Actions, which prerare integration step and also update shared data
     void preStep(double t);
@@ -210,6 +212,9 @@ private:
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);
 
+    /// Инициализация TCP-сервера
+    void initTcpServer();
+
     /// TCP feedback
     void tcpFeedBack();
 
@@ -222,6 +227,8 @@ private:
 private slots:
 
     void process();
+
+    void slotGetTopologyData(QByteArray &topology_data);
 };
 
 #endif // MODEL_H

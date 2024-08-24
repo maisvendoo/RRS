@@ -98,9 +98,7 @@ Model::Model(QObject *parent) : QObject(parent)
         {
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
-    }
-
-    sim_client = Q_NULLPTR;
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -220,6 +218,8 @@ bool Model::init(const simulator_command_line_t &command_line)
     }*/
 
     initTopology(init_data);
+
+    initTcpServer();
 
     Journal::instance()->info("Train is initialized successfully");
 
@@ -564,7 +564,7 @@ void Model::initControlPanel(QString cfg_path)
 //------------------------------------------------------------------------------
 void Model::initSimClient(QString cfg_path)
 {
-    if (train->getTrainID().isEmpty())
+    /*if (train->getTrainID().isEmpty())
         return;
 
     if (train->getClientName().isEmpty())
@@ -603,7 +603,7 @@ void Model::initSimClient(QString cfg_path)
     else
     {
         Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -673,42 +673,72 @@ void Model::initTopology(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::initTcpServer()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_path = fs.getConfigDir() + fs.separator() + "tcp-server.xml";
+
+    tpc_server->init(QString(cfg_path.c_str()));
+
+    connect(tpc_server, &TcpServer::setTopologyData, this, &Model::slotGetTopologyData);
+
+    tcp_simulator_update.vehicles.resize(train->getVehiclesNumber());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
-    /*std::vector<Vehicle *> *vehicles = train->getVehicles();
-
-    viewer_data.time = static_cast<float>(integration_time_interval) / 1000.0f;
-
-    size_t i = 0;
-    for (auto it = vehicles->begin(); it != vehicles->end(); ++it)
+    if (tcp_simulator_update.vehicles.empty())
     {
-        viewer_data.te[i].coord = static_cast<float>((*it)->getRailwayCoord());
-        viewer_data.te[i].velocity = static_cast<float>((*it)->getVelocity());
-        viewer_data.te[i].coord_end = viewer_data.te[i].coord + viewer_data.te[i].velocity * viewer_data.time;
+        return;
+    }
 
-        viewer_data.te[i].angle = static_cast<float>((*it)->getWheelAngle(0));
-        viewer_data.te[i].omega = static_cast<float>((*it)->getWheelOmega(0));
-        viewer_data.te[i].angle_end = viewer_data.te[i].angle + viewer_data.te[i].omega * viewer_data.time;
+    tcp_simulator_update.time = t;
+    tcp_simulator_update.current_vehicle = current_vehicle;
+    tcp_simulator_update.controlled_vehicle = controlled_vehicle;
 
-        (*it)->getDebugMsg().toWCharArray(viewer_data.te[i].DebugMsg);
+    int i = 0;
+    std::vector<Vehicle *> *vehicles = train->getVehicles();
 
-        memcpy(viewer_data.te[i].discreteSignal,
-               (*it)->getDiscreteSignals(),
-               sizeof (viewer_data.te[i].discreteSignal));
+    for (auto vehicle : *vehicles)
+    {
+        profile_point_t *pp = vehicle->getProfilePoint();
 
-        memcpy(viewer_data.te[i].analogSignal,
-               (*it)->getAnalogSignals(),
-               sizeof (viewer_data.te[i].analogSignal));
+        tcp_simulator_update.vehicles[i].position_x = pp->position.x;
+        tcp_simulator_update.vehicles[i].position_y = pp->position.y;
+        tcp_simulator_update.vehicles[i].position_z = pp->position.z;
+        tcp_simulator_update.vehicles[i].orth_x = pp->orth.x;
+        tcp_simulator_update.vehicles[i].orth_y = pp->orth.y;
+        tcp_simulator_update.vehicles[i].orth_z = pp->orth.z;
+        tcp_simulator_update.vehicles[i].up_x = pp->up.x;
+        tcp_simulator_update.vehicles[i].up_y = pp->up.y;
+        tcp_simulator_update.vehicles[i].up_z = pp->up.z;
+
+        tcp_simulator_update.vehicles[i].orientation = vehicle->getOrientation();
+        tcp_simulator_update.vehicles[i].length = vehicle->getLength();
+
+        /*std::copy(vehicle->getAnalogSignals().begin(),
+                  vehicle->getAnalogSignals().end(),
+                  tcp_simulator_update.vehicles[i].analogSignal.begin());*/
+
+        tcp_simulator_update.vehicles[i].analogSignal = vehicle->getAnalogSignals();
+
+        if (current_vehicle == i)
+        {
+            tcp_simulator_update.currentDebugMsg = vehicle->getDebugMsg();
+        }
+
+        if (controlled_vehicle == i)
+        {
+            tcp_simulator_update.controlledDebugMeg = vehicle->getDebugMsg();
+        }
+
         ++i;
     }
 
-    QByteArray array(sizeof(server_data_t), Qt::Uninitialized);
-    memcpy(array.data(), &viewer_data, sizeof(server_data_t));
-    emit sendDataToServer(array);
-
-    viewer_data.count++;
-
-    emit sendDataToTrain(server->getReceivedData());*/
+    tpc_server->setSimulatorData(tcp_simulator_update.serialize());
 }
 
 //------------------------------------------------------------------------------
@@ -716,7 +746,7 @@ void Model::tcpFeedBack()
 //------------------------------------------------------------------------------
 void Model::virtualRailwayFeedback()
 {
-    if (sim_client == Q_NULLPTR)
+    /*if (sim_client == Q_NULLPTR)
         return;
 
     if (!sim_client->isConnected())
@@ -740,7 +770,7 @@ void Model::virtualRailwayFeedback()
     train_data.coord = train->getFirstVehicle()->getRailwayCoord();
     train_data.speed = train->getFirstVehicle()->getVelocity();
 
-    sim_client->sendTrainData(train_data);
+    sim_client->sendTrainData(train_data);*/
 }
 
 //------------------------------------------------------------------------------
@@ -876,9 +906,19 @@ void Model::process()
     // Feedback to viewer
     sharedMemoryFeedback();
 
+    tcpFeedBack();
+
     train->inputProcess();
 
     // Debug print, is allowed
     if (is_debug_print)
         debugPrint();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetTopologyData(QByteArray &topology_data)
+{
+    topology_data = topology->serialize();
 }

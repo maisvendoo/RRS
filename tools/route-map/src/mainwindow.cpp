@@ -1,0 +1,168 @@
+#include    <mainwindow.h>
+#include    <ui_mainwindow.h>
+
+#include    <CfgReader.h>
+#include    <QPainter>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    load_config("../cfg/route-map-tcp.xml");
+
+    tcp_client->init(tcp_config);
+
+    connect(tcp_client, &TcpClient::connected,
+            this, &MainWindow::slotConnectedToSimulator);
+
+    connect(tcp_client, &TcpClient::disconnected,
+            this, &::MainWindow::slotDisconnectedFromSimulator);
+
+    connect(tcp_client, &TcpClient::setTopologyData,
+            this, &MainWindow::slotGetTopologyData);
+
+    connect(trainUpdateTimer, &QTimer::timeout,
+            this, &MainWindow::slotOnUpdateTrainData);
+
+    connect(tcp_client, &TcpClient::setSimulatorData,
+            this, &MainWindow::slotGetSimulatorData);
+
+    map = new MapWidget(ui->Map);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::load_config(const QString &cfg_name)
+{
+    CfgReader cfg;
+
+    if (!cfg.load(cfg_name))
+    {
+        return;
+    }
+
+    QString secName = "Client";
+    cfg.getString(secName, "HostAddr", tcp_config.host_addr);
+
+    int tmp = 0;
+
+    if (cfg.getInt(secName, "port", tmp))
+    {
+        tcp_config.port = static_cast<quint16>(tmp);
+    }
+
+    cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
+    cfg.getInt(secName, "RequestInterval", tcp_config.request_interval);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    if (traj_list == Q_NULLPTR)
+    {
+        return;
+    }
+
+    map->resize(ui->Map->width(), ui->Map->height());
+    ui->label->setText(QString("Scale: %1").arg(map->getScale()));
+
+    ui->label_2->setText(QString("x: %1 y: %2")
+                             .arg(map->getMousePos().x())
+                             .arg(map->getMousePos().y()));
+
+    map->update();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotConnectedToSimulator()
+{
+    tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
+
+    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotDisconnectedFromSimulator()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTopologyData(QByteArray &topology_data)
+{
+    topology->deserialize(topology_data);
+
+    traj_list = topology->getTrajectoriesList();
+    conn_list = topology->getConnectorsList();
+
+    if ( (traj_list == Q_NULLPTR) || (conn_list == Q_NULLPTR) )
+    {
+        ui->ptLog->appendPlainText(tr("Toplology loading FAILED!!!"));
+        return;
+    }
+
+    if (traj_list->size() == 0)
+    {
+        ui->ptLog->appendPlainText(tr("Trajectories list is empty"));
+        return;
+    }
+
+    if (conn_list->size() == 0)
+    {
+        ui->ptLog->appendPlainText(tr("Connectors list is empty"));
+        return;
+    }
+
+    ui->ptLog->appendPlainText(tr("Topology loaded successfully!"));
+
+    QString trajectories = QString(tr("Trajectories: %1")).arg(traj_list->size());
+    QString connestors = QString(tr("Connectors: %1")).arg(conn_list->size());
+
+    ui->ptLog->appendPlainText(trajectories);
+    ui->ptLog->appendPlainText(connestors);
+
+    map->traj_list = traj_list;
+    map->conn_list = conn_list;
+
+    trainUpdateTimer->start(tcp_config.request_interval);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOnUpdateTrainData()
+{
+    tcp_client->sendRequest(STYPE_TRAIN_POSITION);
+    this->update();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
+{
+    train_data.deserialize(sim_data);
+
+    map->train_data = &train_data;
+}

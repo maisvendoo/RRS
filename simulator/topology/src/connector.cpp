@@ -31,3 +31,21 @@ void Connector::configure(CfgReader &cfg,
 
     Journal::instance()->info("Connector " + name + " will be initialized...");
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QByteArray Connector::serialize()
+{
+    QBuffer data;
+
+    return data.data();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Connector::deserialize(QByteArray &data, traj_list_t &traj_list)
+{
+
+}

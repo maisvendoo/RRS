@@ -25,7 +25,6 @@ public:
 
     ~Topology();
 
-
     /// Загрузка топологии ж/д полигона
     bool load(QString route_dir);
 
@@ -35,7 +34,19 @@ public:
     /// Вернуть контроллер конкретной ПЕ
     VehicleController *getVehicleController(size_t idx);
 
+    QByteArray serialize();
 
+    void deserialize(QByteArray &data);
+
+    traj_list_t *getTrajectoriesList()
+    {
+        return &traj_list;
+    }
+
+    conn_list_t *getConnectorsList()
+    {
+        return &switches;
+    }
 
 private:
 
@@ -56,6 +67,10 @@ private:
 
     /// Загрузка топологии
     bool load_topology(QString route_dir);
+
+    void serialize_connector_name(QDataStream &stream, Connector *conn);
+
+    Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 };
 
 #endif

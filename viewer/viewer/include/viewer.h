@@ -18,16 +18,15 @@
 #include    <QSharedMemory>
 #include    <osgViewer/Viewer>
 
-#include    "simulator-info-struct.h"
+#include    <simulator-info-struct.h>
 
-#include    "settings.h"
-#include    "command-line-parser.h"
-#include    "client.h"
+#include    <settings.h>
+#include    <command-line-parser.h>
 
-#include    "keyboard.h"
+#include    <keyboard.h>
 
-#include    "train-exterior.h"
-#include    "sound-manager.h"
+#include    <train-exterior.h>
+#include    <sound-manager.h>
 
 //------------------------------------------------------------------------------
 //
@@ -66,9 +65,6 @@ protected:
 
     /// OSG scene root node
     osg::ref_ptr<osg::Group>    root;
-
-    NetworkClient               client;
-
 
     TrainExteriorHandler *train_ext_handler;
 

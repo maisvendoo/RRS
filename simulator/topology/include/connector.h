@@ -32,6 +32,10 @@ public:
 
     QString getName() const { return this->name; }
 
+    virtual QByteArray serialize();
+
+    virtual void deserialize(QByteArray &data, traj_list_t &traj_list);
+
 protected:
 
     Trajectory *fwdTraj = Q_NULLPTR;

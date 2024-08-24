@@ -182,6 +182,79 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QByteArray Topology::serialize()
+{
+    // Задаем буфер для данных и открываем его на запись
+    QBuffer data;
+    data.open(QIODevice::WriteOnly);
+    // Связываем с буфером поток данных
+    QDataStream stream(&data);
+
+    // Указываем число коннекторов
+    stream << switches.size();
+
+    // Складываем в буффер сериализованную информацию о коннекторах
+    for (auto sw = switches.begin(); sw != switches.end(); ++sw)
+    {
+        stream << sw.value()->serialize();
+    }
+
+    stream << traj_list.size();
+
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        stream << traj.value()->serialize();
+        serialize_connector_name(stream, traj.value()->getFwdConnector());
+        serialize_connector_name(stream, traj.value()->getBwdConnector());
+    }
+
+    return data.data();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::deserialize(QByteArray &data)
+{
+    QBuffer buff(&data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    traj_list.clear();
+    switches.clear();
+
+    qsizetype conn_count = 0;
+    stream >> conn_count;
+
+    for (qsizetype i = 0; i < conn_count; ++i)
+    {
+        Switch *sw = new Switch;
+
+        QByteArray conn_data;
+        stream >> conn_data;
+
+        sw->deserialize(conn_data, traj_list);
+
+        switches.insert(sw->getName(), sw);
+    }
+
+
+    qsizetype traj_count = 0;
+    stream >> traj_count;
+
+    for (auto traj : traj_list)
+    {
+        QByteArray traj_data;
+        stream >> traj_data;
+        traj->deserialize(traj_data);
+        traj->setFwdConnector(deserialize_traj_connectors(stream, switches));
+        traj->setBwdConnector(deserialize_traj_connectors(stream, switches));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QStringList Topology::getTrajNamesList(QString route_dir)
 {
     QString path = route_dir + QDir::separator() +
@@ -254,4 +327,39 @@ bool Topology::load_topology(QString route_dir)
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::serialize_connector_name(QDataStream &stream, Connector *conn)
+{
+    if (bool has_conn = conn != Q_NULLPTR)
+    {
+        stream << has_conn;
+        stream << conn->getName();
+    }
+    else
+    {
+        stream << has_conn;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const
+{
+    bool has_conn = false;
+    stream >> has_conn;
+
+    if (has_conn)
+    {
+        QString conn_name = "";
+        stream >> conn_name;
+
+        return conn_list.value(conn_name, Q_NULLPTR);
+    }
+
+    return Q_NULLPTR;
 }
