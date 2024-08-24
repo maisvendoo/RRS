@@ -348,15 +348,17 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
     {
-        writeStations(stations_file, start_km_data);
+        writeStationsOld(stations_file, start_km_data);
     }
 
     findStartPointsBySignals(split_data1);
     findStartPointsBySignals(split_data2);
     findStartPointsBySignals(branch_connectors);
-    std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_direction);
+    //std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_direction);
     std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_station_id);
     writeStartPoints(start_points);
+
+    writeStations(start_km_data);
 
     return true;
 }

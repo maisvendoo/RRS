@@ -918,10 +918,23 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
         }
     }
 
+    // Корректировка светофора по позиции ближайшего в route1.map
     for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
     {
         if ((*it)->is_signal)
         {
+            int min = std::min(branch_track->id_begin, branch_track->id_end);
+            int max = std::max(branch_track->id_begin, branch_track->id_end);
+            if (((*it)->nearest_signal_main_track_id < min) ||
+                ((*it)->nearest_signal_main_track_id > max))
+            {
+                // Если найденный скорректированный светофор за пределами
+                // траектории, ставим его в некорректированную позицию
+                int point_id = (*it)->trajectory_point_id;
+                if (point_id == -1)
+                    continue;
+                (*it)->nearest_signal_pos = branch_track->branch_trajectory[point_id].point;
+            }
             double min_distance = 1e10;
             size_t id = 0;
             for (auto point = branch_track->branch_trajectory.begin(); point != branch_track->branch_trajectory.end(); ++point)

@@ -34,9 +34,10 @@
 
 #define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     FILE_START_POINT std::string("waypoints.conf")
-#define     DELIMITER_SYMBOL char('\t')
+#define     FILE_STATIONS    std::string("stations.conf")
 #define     FILE_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
+#define     DELIMITER_SYMBOL char('\t')
 #define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
 
 //------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ private:
 
     bool readStartKilometersDAT(QTextStream &stream, zds_start_km_data_t &waypoints);
 
-    void writeStations(const std::string &filename, const zds_start_km_data_t &waypoints);
+    void writeStationsOld(const std::string &filename, const zds_start_km_data_t &waypoints);
 
     bool readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data);
 
@@ -177,6 +178,8 @@ private:
     void writeTopologyConnectors();
 
     void writeStartPoints(const start_point_data_t &start_points);
+
+    void writeStations(const zds_start_km_data_t &waypoints);
 };
 
 #endif // CONVERTER_H

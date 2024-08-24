@@ -199,7 +199,7 @@ void ZDSimConverter::findStartPointsBySignals(const route_connectors_t &connecto
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::writeStations(const std::string &filename, const zds_start_km_data_t &waypoints)
+void ZDSimConverter::writeStationsOld(const std::string &filename, const zds_start_km_data_t &waypoints)
 {
     std::string path = compinePath(toNativeSeparators(routeDir), filename);
 
