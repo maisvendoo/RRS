@@ -6,6 +6,7 @@
 #include    <topology-types.h>
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
+#include    <switch-label.h>
 
 //------------------------------------------------------------------------------
 //
