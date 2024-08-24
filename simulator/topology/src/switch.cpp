@@ -262,17 +262,18 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
         QString traj_name;
         stream >> traj_name;
 
-        // Если в списке еще нет траектории с таким именем
-        if (!traj_list.contains(traj_name))
+        // Если в списке есть траектории с таким именем
+        if (traj_list.contains(traj_name))
+        {
+            // Просто возвращаем указатель на нее
+            traj = traj_list[traj_name];
+            return traj;
+        }
+        else // в противном случае
         {
             // Содаем траекторию
             traj = new Trajectory;
             traj_list.insert(traj_name, traj);
-            return traj;
-        }
-        else
-        {
-            traj = traj_list[traj_name];
             return traj;
         }
     }
