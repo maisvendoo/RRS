@@ -62,6 +62,17 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
             // Светофор
             std::string signal_liter = tokens[2].toStdString();
 
+            // Отмечаем необходимость разделить траекторию светофором
+            branch_point->is_signal = true;
+            branch_point->nearest_signal_main_track_id =
+                (dir > 0) ? id_value - 1 : id_value;
+
+            branch_point->signal_liter = signal_liter;
+            if ((tokens.size() > 3) && (!tokens[3].isEmpty()))
+            {
+                branch_point->signal_special = tokens[3].toStdString();
+            }
+
             // Находим в route1.map ближайший светофор с такой же литерой
             dvec3 signal_pos_by_branch = (dir > 0) ?
                 tracks_data1[id_value - 1].begin_point :
@@ -80,18 +91,10 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
                         zds_object->position, (dir > 0) ? tracks_data1 : tracks_data2, coord);
                     bool near_end =  (coord > (nearest_track.route_coord + 0.5 * nearest_track.length));
                     // Сохраняем найденный светофор
-                    branch_point->signal_liter = signal_liter;
+                    branch_point->is_corrected = true;
                     branch_point->nearest_signal_pos = zds_object->position;
                     branch_point->nearest_signal_main_track_id =
                         near_end ? nearest_track.prev_uid + 1 : nearest_track.prev_uid;
-
-                    // Отмечаем необходимость разделить траекторию светофором
-                    branch_point->is_signal = true;
-
-                    if ((tokens.size() > 3) && (!tokens[3].isEmpty()))
-                    {
-                        branch_point->signal_special = tokens[3].toStdString();
-                    }
                 }
             }
         }
@@ -714,14 +717,20 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
                 // со съездами через соседний главный путь;
                 // если что-то совпало - игнорируем данную траекторию,
                 // чтобы не конфликтовать с существующей
-                if ((length(tracks_data1[exist_branch->id_begin].begin_point -
-                            tracks_data2[branch_track->id_end].begin_point) < 0.1) ||
-                    (length(tracks_data1[exist_branch->id_end].begin_point -
-                            tracks_data2[branch_track->id_begin].begin_point) < 0.1) ||
-                    (exist_branch->id_begin == branch_track->id_end_at_other) ||
-                    (exist_branch->id_end == branch_track->id_begin_at_other) ||
-                    (exist_branch->id_begin_at_other == branch_track->id_end) ||
-                    (exist_branch->id_end_at_other == branch_track->id_begin))
+                bool one_track = (length(tracks_data1[exist_branch->id_begin].begin_point -
+                                    tracks_data2[branch_track->id_end].begin_point) < 0.1) ||
+                                 (length(tracks_data1[exist_branch->id_end].begin_point -
+                                    tracks_data2[branch_track->id_begin].begin_point) < 0.1);
+                int exist_begin = exist_branch->begin_at_other ? -2 : exist_branch->id_begin;
+                int exist_end = exist_branch->end_at_other ? -2 : exist_branch->id_end;
+                int this_begin = branch_track->begin_at_other ? -2 : branch_track->id_begin;
+                int this_end = branch_track->end_at_other ? -2 : branch_track->id_end;
+
+                if ( one_track ||
+                    (exist_begin == branch_track->id_end_at_other) ||
+                    (exist_end == branch_track->id_begin_at_other) ||
+                    (exist_branch->id_begin_at_other == this_end) ||
+                    (exist_branch->id_end_at_other == this_begin) )
                 {
                     // Переносим точки бранча из данной траектории в существующую
                     for (auto this_branch_point : branch_track->branch_points)
@@ -926,7 +935,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
             int min = std::min(branch_track->id_begin, branch_track->id_end);
             int max = std::max(branch_track->id_begin, branch_track->id_end);
             if (((*it)->nearest_signal_main_track_id < min) ||
-                ((*it)->nearest_signal_main_track_id > max))
+                ((*it)->nearest_signal_main_track_id > max) ||
+                (!(*it)->is_corrected) )
             {
                 // Если найденный скорректированный светофор за пределами
                 // траектории, ставим его в некорректированную позицию
