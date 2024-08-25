@@ -3,6 +3,7 @@
 
 #include    <QWidget>
 #include    <QMouseEvent>
+#include    <QMap>
 #include    <topology-types.h>
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
@@ -28,6 +29,8 @@ public:
     tcp_simulator_update_t *train_data = Q_NULLPTR;
 
     topology_stations_list_t *stations = Q_NULLPTR;
+
+    QMap<QString , SwitchLabel *> switch_labels;
 
     void resize(int width, int height);
 
@@ -59,6 +62,7 @@ private:
     QPoint map_shift;
 
     QPoint mouse_pos;
+
 
     void paintEvent(QPaintEvent *event);
 

@@ -8,6 +8,7 @@
 #include    <topology.h>
 #include    <simulator-update-struct.h>
 #include    <map-widget.h>
+#include    <switch-label.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui

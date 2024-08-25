@@ -3,6 +3,7 @@
 
 #include    <CfgReader.h>
 #include    <QPainter>
+#include    <connector.h>
 
 //------------------------------------------------------------------------------
 //
@@ -132,6 +133,13 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     {
         ui->ptLog->appendPlainText(tr("Connectors list is empty"));
         return;
+    }
+
+    for (auto conn : *conn_list)
+    {
+        SwitchLabel *sw_label = new SwitchLabel(map);
+        sw_label->setText(conn->getName());
+        map->switch_labels.insert(conn->getName(), sw_label);
     }
 
     ui->ptLog->appendPlainText(tr("Topology loaded successfully!"));
