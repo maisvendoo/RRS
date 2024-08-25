@@ -1,5 +1,7 @@
 #include    "topology-connector-device.h"
 
+#include    <QLibrary>
+
 #include    "filesystem.h"
 #include    "Journal.h"
 
@@ -56,7 +58,8 @@ TrajectoryDevice *ConnectorDevice::getBwdTrajectoryDevice() const
 //------------------------------------------------------------------------------
 void ConnectorDevice::step(double t, double dt)
 {
-
+    (void) t;
+    (void) dt;
 }
 
 //------------------------------------------------------------------------------
@@ -160,3 +163,25 @@ float ConnectorDevice::getSoundSignal(size_t idx) const
     return sound_state_t::createSoundSignal(false);
 }
 */
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ConnectorDevice *loadConnectorDevice(QString lib_path)
+{
+    ConnectorDevice *conn_device = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetConnectorDevice getConnectorDevice = reinterpret_cast<GetConnectorDevice>(lib.resolve("getConnectorDevice"));
+
+        if (getConnectorDevice)
+        {
+            conn_device = getConnectorDevice();
+        }
+    }
+
+    return conn_device;
+}

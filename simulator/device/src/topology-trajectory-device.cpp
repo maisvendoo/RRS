@@ -1,5 +1,7 @@
 #include    "topology-trajectory-device.h"
 
+#include    <QLibrary>
+
 #include    "filesystem.h"
 #include    "Journal.h"
 
@@ -82,7 +84,8 @@ void TrajectoryDevice::setLink(Device *device, size_t idx)
 //------------------------------------------------------------------------------
 void TrajectoryDevice::step(double t, double dt)
 {
-
+    (void) t;
+    (void) dt;
 }
 
 //------------------------------------------------------------------------------
@@ -206,3 +209,25 @@ float TrajectoryDevice::getSoundSignal(size_t idx) const
     return sound_state_t::createSoundSignal(false);
 }
 */
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+TrajectoryDevice *loadTrajectoryDevice(QString lib_path)
+{
+    TrajectoryDevice *conn_device = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetTrajectoryDevice getTrajectoryDevice = reinterpret_cast<GetTrajectoryDevice>(lib.resolve("getTrajectoryDevice"));
+
+        if (getTrajectoryDevice)
+        {
+            conn_device = getTrajectoryDevice();
+        }
+    }
+
+    return conn_device;
+}

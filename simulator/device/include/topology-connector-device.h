@@ -69,4 +69,24 @@ protected:
     virtual void load_config(CfgReader &cfg);
 };
 
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef ConnectorDevice* (*GetConnectorDevice)();
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+#define GET_CONNECTOR_DEVICE(ClassName) \
+extern "C" Q_DECL_EXPORT ConnectorDevice *getConnectorDevice() \
+{ \
+        return new (ClassName) (); \
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+extern "C" Q_DECL_EXPORT ConnectorDevice *loadConnectorDevice(QString lib_path);
+
 #endif // CONNECTORDEVICE_H
