@@ -36,6 +36,8 @@ public:
 
     virtual void deserialize(QByteArray &data, traj_list_t &traj_list);
 
+
+
 protected:
 
     Trajectory *fwdTraj = Q_NULLPTR;

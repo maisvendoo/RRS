@@ -68,6 +68,8 @@ private slots:
     void slotOnUpdateTrainData();
 
     void slotGetSimulatorData(QByteArray &sim_data);
+
+    void slotSwitchConnectorMenu();
 };
 
 #endif // MAINWINDOW_H
