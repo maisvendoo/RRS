@@ -21,19 +21,24 @@ VehicleController::~VehicleController()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VehicleController::setIndex(size_t idx)
+{
+    index = idx;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehicleController::setRailwayCoord(double x)
 {
-    // Запоминаем предыдущее значение дуговой координаты
-    x_prev = x_cur;
-    // Обновляем значение дуговой координаты
-    x_cur = x;
-
     // Запоминаем предыдущее значение траекторной координаты
     double prev_coord = traj_coord;
 
-    // Обновляем траекторную координату, в соответствии с относительным
-    // перемещением ПЕ
-    traj_coord += x_cur - x_prev;
+    // Обновляем траекторную координату,
+    // в соответствии с относительным перемещением ПЕ
+    traj_coord += x - x_cur;
+    // Обновляем значение дуговой координаты
+    x_cur = x;
 
     // Инициализируем предыдущую траекторию как текущую
     prev_traj = current_traj;
@@ -61,7 +66,7 @@ void VehicleController::setRailwayCoord(double x)
         current_traj = conn->getFwdTraj();
 
         // если за коннектором нет траектории, возвращаемся к исходной
-        // траектоиии
+        // траектории
         if (current_traj == Q_NULLPTR)
         {
             current_traj = prev_traj;
@@ -104,8 +109,37 @@ void VehicleController::setRailwayCoord(double x)
     if (current_traj != prev_traj)
     {
         prev_traj->setBusy(false);
+        for (auto traj_device : current_traj->getTrajectoryDevices())
+        {
+            traj_device->setLink(nullptr, index);
+        }
+
         current_traj->setBusy(true);
+        for (auto veh_device : *devices)
+        {
+            for (auto traj_device : current_traj->getTrajectoryDevices())
+            {
+                if (veh_device->getName() == traj_device->getName())
+                    traj_device->setLink(veh_device, index);
+            }
+        }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleController::setVehicleRailwayConnectors(device_list_t *devices)
+{
+    this->devices = devices;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+device_list_t *VehicleController::getVehicleRailwayConnectors()
+{
+    return devices;
 }
 
 //------------------------------------------------------------------------------
@@ -113,7 +147,7 @@ void VehicleController::setRailwayCoord(double x)
 //------------------------------------------------------------------------------
 void VehicleController::setInitRailwayCoord(double x)
 {
-    x_prev = x_cur = x;
+    x_cur = x;
 }
 
 //------------------------------------------------------------------------------
@@ -122,6 +156,14 @@ void VehicleController::setInitRailwayCoord(double x)
 void VehicleController::setInitCurrentTraj(Trajectory *traj)
 {
     current_traj = prev_traj = traj;
+    for (auto veh_device : *devices)
+    {
+        for (auto traj_device : current_traj->getTrajectoryDevices())
+        {
+            if (veh_device->getName() == traj_device->getName())
+                traj_device->setLink(veh_device, index);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

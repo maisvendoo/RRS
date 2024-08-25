@@ -93,6 +93,14 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+std::vector<TrajectoryDevice *> Trajectory::getTrajectoryDevices()
+{
+    return devices;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 {
     profile_point_t pp;
@@ -153,6 +161,17 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
     }
 
     return pp;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::step(double t, double dt)
+{
+    for (auto traj_device : devices)
+    {
+        traj_device->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------

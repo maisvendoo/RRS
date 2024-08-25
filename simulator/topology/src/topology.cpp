@@ -91,6 +91,8 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
     vehicle_control.resize(vehicles->size());
 
     vehicle_control[0] = new VehicleController;
+    vehicle_control[0]->setIndex(0);
+    vehicle_control[0]->setVehicleRailwayConnectors((*vehicles)[0]->getRailwayConnectors());
     vehicle_control[0]->setTrajCoord(tp.traj_coord);
     vehicle_control[0]->setInitCurrentTraj(traj_list[tp.traj_name]);
     vehicle_control[0]->setDirection(tp.dir);
@@ -162,6 +164,8 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
             }
         }
 
+        vehicle_control[i]->setIndex(i);
+        vehicle_control[i]->setVehicleRailwayConnectors((*vehicles)[i]->getRailwayConnectors());
         vehicle_control[i]->setTrajCoord(traj_coord);
         vehicle_control[i]->setInitCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
@@ -183,6 +187,27 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 VehicleController *Topology::getVehicleController(size_t idx)
 {
     return vehicle_control[idx];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::step(double t, double dt)
+{
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        (*traj)->step(t, dt);
+    }
+
+    for (auto conn = joints.begin(); conn != joints.end(); ++conn)
+    {
+        (*conn)->step(t, dt);
+    }
+
+    for (auto conn = switches.begin(); conn != switches.end(); ++conn)
+    {
+        (*conn)->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------

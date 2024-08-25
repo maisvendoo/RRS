@@ -34,6 +34,9 @@ public:
     /// Вернуть контроллер конкретной ПЕ
     VehicleController *getVehicleController(size_t idx);
 
+    /// Шаг симуляции
+    virtual void step(double t, double dt);
+
     QByteArray serialize();
 
     void deserialize(QByteArray &data);

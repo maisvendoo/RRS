@@ -5,6 +5,8 @@
 
 #include    <track.h>
 #include    <profile-point.h>
+#include    <device-list.h>
+#include    <topology-trajectory-device.h>
 
 class Connector;
 
@@ -75,8 +77,14 @@ public:
         return *(tracks.end() - 1);
     }
 
+    /// Получить оборудование путевой инфраструктуры на этой траектории
+    std::vector<TrajectoryDevice *> getTrajectoryDevices();
+
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction);
+
+    /// Шаг симуляции
+    virtual void step(double t, double dt);
 
     QByteArray serialize();
 
@@ -100,6 +108,9 @@ private:
     Connector *bwd_connector = Q_NULLPTR;
 
     std::vector<track_t>    tracks;
+
+    /// Оборудование путевой инфраструктуры на этой траектории
+    std::vector<TrajectoryDevice *> devices;
 
     /// Поиск текущего и следующего трека
     void findTracks(double traj_coord,

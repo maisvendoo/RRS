@@ -6,6 +6,7 @@
 #include    <trajectory.h>
 #include    <topology-types.h>
 #include    <CfgReader.h>
+#include    <topology-connector-device.h>
 
 //------------------------------------------------------------------------------
 //
@@ -29,8 +30,10 @@ public:
     virtual void configure(CfgReader &cfg,
                            QDomNode secNode,
                            traj_list_t &traj_list);
-
     QString getName() const { return this->name; }
+
+    /// Шаг симуляции
+    virtual void step(double t, double dt);
 
     virtual QByteArray serialize();
 
@@ -45,6 +48,10 @@ protected:
     int state = 1;
 
     QString name = "";
+
+    /// Связи путевой инфраструктуры
+    std::vector<ConnectorDevice *> devices;
+
 };
 
 #endif

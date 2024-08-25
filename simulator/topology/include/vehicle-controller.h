@@ -6,6 +6,8 @@
 #include    <topology-types.h>
 #include    <topology-export.h>
 #include    <profile-point.h>
+#include    <device-list.h>
+#include    <device-joint.h>
 
 //------------------------------------------------------------------------------
 //
@@ -19,6 +21,9 @@ public:
     VehicleController(QObject *parent = Q_NULLPTR);
 
     virtual ~VehicleController();
+
+    /// Устанавливаем текущую дуговую координату ПЕ
+    void setIndex(size_t idx);
 
     /// Устанавливаем текущую дуговую координату ПЕ
     void setRailwayCoord(double x);
@@ -35,6 +40,12 @@ public:
     /// Устанавливаем направление движения по траектории
     void setDirection(int dir) { this->dir = dir; }
 
+    /// Задать оборудование ПЕ, взаимодействующее с путевой инфраструктурой
+    void setVehicleRailwayConnectors(device_list_t *devices);
+
+    /// Указатели на оборудование ПЕ, взаимодействующее с путевой инфраструктурой
+    device_list_t *getVehicleRailwayConnectors();
+
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
     profile_point_t getPosition(int dir);
 
@@ -46,8 +57,8 @@ public:
 
 protected:
 
-    /// Предыдущее значение дуговой координаты ПЕ
-    double  x_prev = 0.0;
+    /// Индекс данной ПЕ в симуляции
+    size_t index;
 
     /// Текущее значение дуговой координаты ПЕ
     double  x_cur = 0.0;
@@ -57,6 +68,9 @@ protected:
 
     /// Координата, в пределах текущей траектории
     double traj_coord = 0.0;
+
+    /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой
+    device_list_t *devices;
 
     /// Текущая траектория ПЕ
     Trajectory *current_traj = Q_NULLPTR;

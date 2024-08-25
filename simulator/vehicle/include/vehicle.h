@@ -154,6 +154,7 @@ public:
 
     device_list_t *getFwdConnectors();
     device_list_t *getBwdConnectors();
+    device_list_t *getRailwayConnectors();
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t, double dt);
@@ -316,6 +317,8 @@ protected:
     device_list_t forward_connectors;
     /// List of devices - backward connectors
     device_list_t backward_connectors;
+    /// List of devices - railway connectors
+    device_list_t railway_connectors;
 
     control_signals_t   control_signals;
 

@@ -884,6 +884,8 @@ void Model::process()
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
     tau = tau - integration_time;
 
+    topology->step(t, integration_time);
+
     // Integrate all ODE in train motion model
     do
     {

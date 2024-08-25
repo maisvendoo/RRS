@@ -115,12 +115,6 @@ private:
     /// Direction of motion on railway
     int             dir = 1;
 
-    /// Vehicle which selected by user for view
-    int             current_vehicle = 0;
-
-    /// Vehicle which selected by user for control
-    int             controlled_vehicle = 0;
-
     /// Profile manager
     Profile     *profile = nullptr;
 
