@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::setSimulatorData,
             this, &MainWindow::slotGetSimulatorData);
 
+    connect(tcp_client, &TcpClient::setSwitchState,
+            this, &MainWindow::slotGetSwitchState);
+
     map = new MapWidget(ui->Map);
 }
 
@@ -213,4 +216,23 @@ void MainWindow::slotSwitchConnectorMenu()
     });
 
     menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSwitchState(QByteArray &sw_state)
+{
+    switch_state_t switch_state;
+    switch_state.deserialize(sw_state);
+
+    Switch *sw = dynamic_cast<Switch *>(conn_list->value(switch_state.name, Q_NULLPTR));
+
+    if (sw == Q_NULLPTR)
+    {
+        return;
+    }
+
+    sw->setStateFwd(switch_state.state_fwd);
+    sw->setStateBwd(switch_state.state_bwd);
 }

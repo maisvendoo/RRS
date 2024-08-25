@@ -431,3 +431,29 @@ Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_
 
     return Q_NULLPTR;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::getSwitchState(QByteArray &switch_data)
+{
+    switch_state_t sw_state;
+    sw_state.deserialize(switch_data);
+
+    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, Q_NULLPTR));
+
+    if (sw == Q_NULLPTR)
+    {
+        return;
+    }
+
+    sw->setStateFwd(sw_state.state_fwd);
+    sw->setStateBwd(sw_state.state_bwd);
+
+    switch_state_t new_state;
+    new_state.name = sw->getName();
+    new_state.state_fwd = sw->getStateFwd();
+    new_state.state_bwd = sw->getStateBwd();
+
+    emit sendSwitchState(new_state.serialize());
+}

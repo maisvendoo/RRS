@@ -48,6 +48,8 @@ signals:
 
     void setSimulatorData(QByteArray &simulator_data);
 
+    void setSwitchState(QByteArray &sw_state);
+
 private:
 
     QTcpSocket *socket = Q_NULLPTR;

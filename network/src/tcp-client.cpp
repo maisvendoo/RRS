@@ -99,15 +99,18 @@ void TcpClient::process_received_data(network_data_t &net_data)
     switch (net_data.stype)
     {
     case STYPE_TOPOLOGY_DATA:
-    {
+        {
+            qsizetype size = net_data.data.size();
 
-        qsizetype size = net_data.data.size();
-
-        emit setTopologyData(net_data.data);
-        break;
-    }
+            emit setTopologyData(net_data.data);
+            break;
+        }
     case STYPE_TRAIN_POSITION:
         emit setSimulatorData(net_data.data);
+        break;
+
+    case STYPE_CONNECTOR_STATE:
+        emit setSwitchState(net_data.data);
         break;
 
     default:

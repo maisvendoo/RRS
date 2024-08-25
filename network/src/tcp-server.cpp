@@ -95,7 +95,11 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
 
     case STYPE_CONNECTOR_STATE:
-        break;
+        {
+            map_client = client_data;
+            emit setSwitchState(client_data.received_data.data);
+            break;
+        }
     }
 }
 
@@ -219,4 +223,17 @@ void TcpServer::slotReceive()
 
         recvBuff.clear();
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotSendSwitchState(QByteArray sw_state)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_CONNECTOR_STATE;
+    net_data.data = sw_state;
+
+    map_client.socket->write(net_data.serialize());
+    map_client.socket->flush();
 }

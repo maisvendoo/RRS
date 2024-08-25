@@ -683,6 +683,9 @@ void Model::initTcpServer()
     connect(tpc_server, &TcpServer::setTopologyData, this, &Model::slotGetTopologyData);
 
     tcp_simulator_update.vehicles.resize(train->getVehiclesNumber());
+
+    connect(tpc_server, &TcpServer::setSwitchState, topology, &Topology::getSwitchState);
+    connect(topology, &Topology::sendSwitchState, tpc_server, &TcpServer::slotSendSwitchState);
 }
 
 //------------------------------------------------------------------------------
