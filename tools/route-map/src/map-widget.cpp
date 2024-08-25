@@ -271,7 +271,7 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    map_shift = event->pos() - mouse_pos;
+    delta_pos = event->pos() - mouse_pos;
 }
 
 //------------------------------------------------------------------------------
@@ -292,6 +292,6 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::MiddleButton)
     {
-        mouse_pos = event->pos();
+        map_shift += delta_pos;
     }
 }

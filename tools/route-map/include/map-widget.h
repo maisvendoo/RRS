@@ -66,6 +66,8 @@ private:
 
     QPoint mouse_pos;
 
+    QPoint delta_pos;
+
 
     void paintEvent(QPaintEvent *event);
 
