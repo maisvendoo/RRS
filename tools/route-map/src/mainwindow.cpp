@@ -3,6 +3,9 @@
 
 #include    <CfgReader.h>
 #include    <QPainter>
+#include    <connector.h>
+#include    <QMenu>
+#include    <switch.h>
 
 //------------------------------------------------------------------------------
 //
@@ -30,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(tcp_client, &TcpClient::setSimulatorData,
             this, &MainWindow::slotGetSimulatorData);
+
+    connect(tcp_client, &TcpClient::setSwitchState,
+            this, &MainWindow::slotGetSwitchState);
 
     map = new MapWidget(ui->Map);
 }
@@ -79,12 +85,6 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 
     map->resize(ui->Map->width(), ui->Map->height());
-    ui->label->setText(QString("Scale: %1").arg(map->getScale()));
-
-    ui->label_2->setText(QString("x: %1 y: %2")
-                             .arg(map->getMousePos().x())
-                             .arg(map->getMousePos().y()));
-
     map->update();
 }
 
@@ -134,6 +134,17 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
         return;
     }
 
+    for (auto conn : *conn_list)
+    {
+        SwitchLabel *sw_label = new SwitchLabel(map);
+        sw_label->setText(conn->getName());
+        sw_label->conn = conn;
+
+        connect(sw_label, &SwitchLabel::popUpMenu, this, &MainWindow::slotSwitchConnectorMenu);
+
+        map->switch_labels.insert(conn->getName(), sw_label);
+    }
+
     ui->ptLog->appendPlainText(tr("Topology loaded successfully!"));
 
     QString trajectories = QString(tr("Trajectories: %1")).arg(traj_list->size());
@@ -166,4 +177,56 @@ void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
     train_data.deserialize(sim_data);
 
     map->train_data = &train_data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSwitchConnectorMenu()
+{
+    SwitchLabel *sw_label = dynamic_cast<SwitchLabel *>(sender());
+    QString conn_name = sw_label->conn->getName();
+
+    Switch *sw = dynamic_cast<Switch *>(sw_label->conn);
+    int state_fwd = sw->getStateFwd();
+    int state_bwd = sw->getStateBwd();
+
+    TcpClient *tc = tcp_client;
+
+    QMenu *menu = new QMenu(this);
+
+    QAction *action_switch_fwd = new QAction(tr("Switch forward"), this);
+    menu->addAction(action_switch_fwd);
+
+    connect(action_switch_fwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
+        tc->sendSwitchState(conn_name, -state_fwd, state_bwd);
+    });
+
+    QAction *action_switch_bwd = new QAction(tr("Switch backward"), this);
+    menu->addAction(action_switch_bwd);
+
+    connect(action_switch_bwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
+        tc->sendSwitchState(conn_name, state_fwd, -state_bwd);
+    });
+
+    menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSwitchState(QByteArray &sw_state)
+{
+    switch_state_t switch_state;
+    switch_state.deserialize(sw_state);
+
+    Switch *sw = dynamic_cast<Switch *>(conn_list->value(switch_state.name, Q_NULLPTR));
+
+    if (sw == Q_NULLPTR)
+    {
+        return;
+    }
+
+    sw->setStateFwd(switch_state.state_fwd);
+    sw->setStateBwd(switch_state.state_bwd);
 }

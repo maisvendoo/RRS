@@ -34,6 +34,8 @@ public:
 
     void sendRequest(StructureType stype);
 
+    void sendSwitchState(QString conn_name, int state_fwd, int state_bwd);
+
     bool isConnected() const;
 
 signals:
@@ -45,6 +47,8 @@ signals:
     void setTopologyData(QByteArray &topology_data);
 
     void setSimulatorData(QByteArray &simulator_data);
+
+    void setSwitchState(QByteArray &sw_state);
 
 private:
 

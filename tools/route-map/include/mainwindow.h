@@ -8,6 +8,7 @@
 #include    <topology.h>
 #include    <simulator-update-struct.h>
 #include    <map-widget.h>
+#include    <switch-label.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -67,6 +68,10 @@ private slots:
     void slotOnUpdateTrainData();
 
     void slotGetSimulatorData(QByteArray &sim_data);
+
+    void slotSwitchConnectorMenu();
+
+    void slotGetSwitchState(QByteArray &sw_state);
 };
 
 #endif // MAINWINDOW_H

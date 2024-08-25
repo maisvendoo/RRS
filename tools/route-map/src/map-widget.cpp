@@ -203,6 +203,14 @@ void MapWidget::drawConnector(Connector *conn)
     painter.drawLine(center_point, fwd_point);
     painter.drawLine(center_point, bwd_point);
 
+    SwitchLabel * sw_label = switch_labels.value(conn->getName(), Q_NULLPTR);
+
+    if (sw_label != Q_NULLPTR)
+    {
+        sw_label->move(center_point);
+        sw_label->show();
+    }
+
     painter.end();
 }
 
@@ -263,8 +271,27 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton)
+    delta_pos = event->pos() - mouse_pos;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton)
     {
         mouse_pos = event->pos();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::MiddleButton)
+    {
+        map_shift += delta_pos;
     }
 }

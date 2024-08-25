@@ -79,4 +79,39 @@ struct topology_station_t
 //------------------------------------------------------------------------------
 using topology_stations_list_t = QVector<topology_station_t>;
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct switch_state_t
+{
+    QString name = "";
+    int state_fwd = 1;
+    int state_bwd = 1;
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << name;
+        stream << state_fwd;
+        stream << state_bwd;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> name;
+        stream >> state_fwd;
+        stream >> state_bwd;
+    }
+};
+
 #endif

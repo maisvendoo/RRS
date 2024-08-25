@@ -29,6 +29,8 @@ signals:
 
     void setTopologyData(QByteArray &topology_data);
 
+    void setSwitchState(QByteArray &switch_data);
+
 private:
 
     quint16 port = 1992;
@@ -45,6 +47,8 @@ private:
 
     QByteArray simulator_data;
 
+    client_data_t map_client;
+
     int getClientDataBySocket(QTcpSocket *socket);
 
     void process_client_request(client_data_t &client_data);
@@ -60,6 +64,8 @@ public slots:
     void slotClientDisconnected();
 
     void slotReceive();
+
+    void slotSendSwitchState(QByteArray sw_state);
 };
 
 #endif

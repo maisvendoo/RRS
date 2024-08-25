@@ -56,6 +56,10 @@ public:
         return &stations;
     }
 
+signals:
+
+    void sendSwitchState(QByteArray sw_data);
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне
@@ -85,6 +89,10 @@ private:
     void serialize_connector_name(QDataStream &stream, Connector *conn);
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
+
+public slots:
+
+    void getSwitchState(QByteArray &switch_data);
 };
 
 #endif
