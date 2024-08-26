@@ -216,7 +216,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals1_path, signals_data1);
         readBranchTracksDAT(branch1_path, dir);
 
-        writeSpeeds(speeds1_file, speeds_data1);
+        // Создание старого формата ЭК скоростей speeds1.conf отключено
+        //writeSpeeds(speeds1_file, speeds_data1);
     }
 
     if (is_1 && is_2)
@@ -229,7 +230,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readSvetoforDAT(signals2_path, signals_data2);
         readBranchTracksDAT(branch2_path, dir);
 
-        writeSpeeds(speeds2_file, speeds_data2);
+        // Создание старого формата ЭК скоростей speeds2.conf отключено
+        //writeSpeeds(speeds2_file, speeds_data2);
     }
 
     if (is_1)
@@ -348,17 +350,20 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
     {
-        writeStationsOld(stations_file, start_km_data);
+        // Точки старта у станционных светофоров
+        findStartPointsBySignals(split_data1);
+        findStartPointsBySignals(split_data2);
+        findStartPointsBySignals(branch_connectors);
+        //std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_direction);
+        std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_station_id);
+        writeStartPoints(start_points);
+
+        // Создание старого формата ЭК станций stations.conf отключено
+        //writeStationsOld(stations_file, start_km_data);
+
+        // Координаты центральных точек станций
+        writeStations(start_km_data);
     }
-
-    findStartPointsBySignals(split_data1);
-    findStartPointsBySignals(split_data2);
-    findStartPointsBySignals(branch_connectors);
-    //std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_direction);
-    std::sort(start_points.begin(), start_points.end(), start_point_t::compare_by_station_id);
-    writeStartPoints(start_points);
-
-    writeStations(start_km_data);
 
     return true;
 }
