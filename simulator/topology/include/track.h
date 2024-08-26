@@ -55,9 +55,10 @@ struct track_t
 
         inclination = orth.z * 1000.0;
 
-        trav.z = 0.0;
+        //trav = cross(orth, {0.0, 0.0, 1.0});
         trav.x = t.y;
-        trav.y = t.x;
+        trav.y = -t.x;
+        trav.z = 0.0;
 
         trav = normalize(trav);
 

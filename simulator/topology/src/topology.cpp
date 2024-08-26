@@ -110,7 +110,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
                               " at traj: " + cur_traj->getName() +
                               QString(" %1 m from start").arg(traj_coord));
 
-    cur_traj->setBusy(true);
+    cur_traj->setBusy(0, traj_coord);
 
     for (size_t i = 1; i < vehicles->size(); ++i)
     {
@@ -171,7 +171,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
                                   " at traj: " + cur_traj->getName() +
                                   QString(" %1 m from start").arg(traj_coord));
 
-        cur_traj->setBusy(true);
+        cur_traj->setBusy(i, traj_coord);
     }
 
     return true;

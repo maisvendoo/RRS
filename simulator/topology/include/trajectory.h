@@ -2,6 +2,7 @@
 #define     TRAJECTORY_H
 
 #include    <QObject>
+#include    <QMap>
 
 #include    <track.h>
 #include    <profile-point.h>
@@ -53,15 +54,11 @@ public:
         return bwd_connector;
     }
 
-    void setBusy(bool is_busy)
-    {
-        this->is_busy = is_busy;
-    }
+    void setBusy(size_t idx, double coord);
 
-    bool isBusy() const
-    {
-        return is_busy;
-    }
+    bool isBusy() const;
+
+    bool isBusy(double coord_begin, double coord_end) const;
 
     /// Вернуть первый трек траектории
     track_t getFirstTrack() const
@@ -94,6 +91,8 @@ private:
     double len = 0.0;
 
     bool is_busy = false;
+
+    QMap<size_t, double> vehicles_coords;
 
     Connector *fwd_connector = Q_NULLPTR;
 

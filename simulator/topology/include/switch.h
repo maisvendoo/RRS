@@ -36,15 +36,9 @@ public:
         return state_bwd;
     }
 
-    void setStateFwd(int state_fwd)
-    {
-        this->state_fwd = state_fwd;
-    }
+    void setStateFwd(int state);
 
-    void setStateBwd(int state_bwd)
-    {
-        this->state_bwd = state_bwd;
-    }
+    void setStateBwd(int state);
 
 private:
 
@@ -61,6 +55,10 @@ private:
 
     /// Состояние стрелки сзади
     int state_bwd = 1;
+
+    /// Стрелка будет заблокирована в сторону траектории,
+    /// которая занята ПЕ ближе чем в 40 метрах
+    const double lock_by_busy_distance = 40.0;
 
     void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj);
 
