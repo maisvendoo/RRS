@@ -5,12 +5,13 @@
 
 #include    <trajectory.h>
 #include    <topology-types.h>
+#include    <topology-export.h>
 #include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Connector : public QObject
+class TOPOLOGY_EXPORT Connector : public QObject
 {
     Q_OBJECT
 

@@ -91,6 +91,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
     vehicle_control.resize(vehicles->size());
 
     vehicle_control[0] = new VehicleController;
+    vehicle_control[0]->setIndex(0);
     vehicle_control[0]->setTrajCoord(tp.traj_coord);
     vehicle_control[0]->setInitCurrentTraj(traj_list[tp.traj_name]);
     vehicle_control[0]->setDirection(tp.dir);
@@ -162,6 +163,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
             }
         }
 
+        vehicle_control[i]->setIndex(i);
         vehicle_control[i]->setTrajCoord(traj_coord);
         vehicle_control[i]->setInitCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
