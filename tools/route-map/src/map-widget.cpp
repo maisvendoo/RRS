@@ -243,8 +243,17 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
     QPoint p;
 
     int curr = train_data->current_vehicle;
-    shift_x = this->width() / 2 - train_data->vehicles[curr].position_y * scale + map_shift.x();
-    shift_y = this->height() / 2 - train_data->vehicles[curr].position_x * scale + map_shift.y();
+
+    if (folow_vehicle)
+    {
+        shift_x = this->width() / 2 - train_data->vehicles[curr].position_y * scale;
+        shift_y = this->height() / 2 - train_data->vehicles[curr].position_x * scale;
+    }
+    else
+    {
+        shift_x = this->width() / 2 - train_x + map_shift.x() * 0.005;
+        shift_y = this->height() / 2 - train_y + map_shift.y() * 0.005;
+    }
 
     p.setX(shift_x + scale * traj_point.y);
     p.setY(shift_y + scale * traj_point.x);
@@ -272,6 +281,8 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
     delta_pos = event->pos() - mouse_pos;
+
+    map_shift += delta_pos;
 }
 
 //------------------------------------------------------------------------------
@@ -279,8 +290,14 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MiddleButton)
+    if (event->button() == Qt::LeftButton)
     {
+        folow_vehicle = false;
+
+        int curr = train_data->current_vehicle;
+        train_x = train_data->vehicles[curr].position_y * scale;
+        train_y = train_data->vehicles[curr].position_x * scale;
+
         mouse_pos = event->pos();
     }
 }
@@ -292,6 +309,6 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::MiddleButton)
     {
-        map_shift += delta_pos;
+
     }
 }

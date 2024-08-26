@@ -68,6 +68,12 @@ private:
 
     QPoint delta_pos;
 
+    bool folow_vehicle = true;
+
+    double train_x = 0.0;
+
+    double train_y = 0.0;
+
 
     void paintEvent(QPaintEvent *event);
 
