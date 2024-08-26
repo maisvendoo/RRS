@@ -91,6 +91,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
     vehicle_control.resize(vehicles->size());
 
     vehicle_control[0] = new VehicleController;
+    vehicle_control[0]->setIndex(0);
     vehicle_control[0]->setTrajCoord(tp.traj_coord);
     vehicle_control[0]->setInitCurrentTraj(traj_list[tp.traj_name]);
     vehicle_control[0]->setDirection(tp.dir);
@@ -110,7 +111,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
                               " at traj: " + cur_traj->getName() +
                               QString(" %1 m from start").arg(traj_coord));
 
-    cur_traj->setBusy(true);
+    cur_traj->setBusy(0, traj_coord);
 
     for (size_t i = 1; i < vehicles->size(); ++i)
     {
@@ -162,6 +163,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
             }
         }
 
+        vehicle_control[i]->setIndex(i);
         vehicle_control[i]->setTrajCoord(traj_coord);
         vehicle_control[i]->setInitCurrentTraj(cur_traj);
         vehicle_control[i]->setDirection(tp.dir);
@@ -171,7 +173,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
                                   " at traj: " + cur_traj->getName() +
                                   QString(" %1 m from start").arg(traj_coord));
 
-        cur_traj->setBusy(true);
+        cur_traj->setBusy(i, traj_coord);
     }
 
     return true;

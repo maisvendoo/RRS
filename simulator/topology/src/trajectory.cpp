@@ -93,6 +93,43 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Trajectory::setBusy(size_t idx, double coord)
+{
+    if ((coord >= 0.0) && (coord <= len))
+        vehicles_coords.insert(idx, coord);
+    else
+        vehicles_coords.remove(idx);
+
+    is_busy = !vehicles_coords.empty();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Trajectory::isBusy() const
+{
+    return is_busy;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Trajectory::isBusy(double coord_begin, double coord_end) const
+{
+    if (is_busy)
+    {
+        for (auto vehicle_coord : vehicles_coords)
+        {
+            if ((vehicle_coord >= coord_begin) && (vehicle_coord <= coord_end))
+                return true;
+        }
+    }
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 {
     profile_point_t pp;

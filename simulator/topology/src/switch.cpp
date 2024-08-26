@@ -280,3 +280,71 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
 
     return traj;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::setStateFwd(int state)
+{
+    // Если траектория вперёд единственная - делать дальше нечего
+    if (fwdMinusTraj == Q_NULLPTR)
+    {
+        state_fwd = 1;
+        return;
+    }
+    if (fwdPlusTraj == Q_NULLPTR)
+    {
+        state_fwd = -1;
+        return;
+    }
+
+    // Если какая-то траектория занята ПЕ ближе, чем заданная дистанция,
+    // ставим стрелку в это направление
+    if (fwdPlusTraj->isBusy(0.0, lock_by_busy_distance))
+    {
+        state_fwd = 1;
+        return;
+    }
+    if (fwdMinusTraj->isBusy(0.0, lock_by_busy_distance))
+    {
+        state_fwd = -1;
+        return;
+    }
+
+    // Переводим стрелку в заданное направление
+    state_fwd = state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::setStateBwd(int state)
+{
+    // Если траектория вперёд единственная - делать дальше нечего
+    if (bwdMinusTraj == Q_NULLPTR)
+    {
+        state_bwd = 1;
+        return;
+    }
+    if (bwdPlusTraj == Q_NULLPTR)
+    {
+        state_bwd = -1;
+        return;
+    }
+
+    // Если какая-то траектория занята ПЕ ближе, чем заданная дистанция,
+    // ставим стрелку в это направление
+    if (bwdPlusTraj->isBusy(bwdPlusTraj->getLength() - lock_by_busy_distance, bwdPlusTraj->getLength()))
+    {
+        state_bwd = 1;
+        return;
+    }
+    if (bwdMinusTraj->isBusy(bwdMinusTraj->getLength() - lock_by_busy_distance, bwdMinusTraj->getLength()))
+    {
+        state_bwd = -1;
+        return;
+    }
+
+    // Переводим стрелку в заданное направление
+    state_bwd = state;
+}
