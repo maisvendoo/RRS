@@ -49,6 +49,8 @@ private:
     /// Масштаб отображения карты
     double scale = 1.0;
 
+    double old_scale = 1.0;
+
     double scale_inc_step_coeff = sqrt(2.0);
     double scale_dec_step_coeff = 1.0 / sqrt(2.0);
 /*

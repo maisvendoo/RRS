@@ -253,8 +253,8 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
     }
     else
     {
-        shift_x = this->width() / 2 - train_x + map_shift.x();
-        shift_y = this->height() / 2 - train_y + map_shift.y();
+        shift_x = this->width() / 2 - train_x * old_scale / scale + map_shift.x();
+        shift_y = this->height() / 2 - train_y * old_scale / scale + map_shift.y();
     }
 
     p.setX(shift_x + scale * traj_point.y);
@@ -273,6 +273,8 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 
     if ((event->angleDelta().y() < 0) && (scale > 0.25))
         scale *= scale_dec_step_coeff;
+
+    old_scale = scale;
 
     event->accept();
 }
