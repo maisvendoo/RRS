@@ -246,13 +246,15 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
 
     if (folow_vehicle)
     {
-        shift_x = this->width() / 2 - train_data->vehicles[curr].position_y * scale;
-        shift_y = this->height() / 2 - train_data->vehicles[curr].position_x * scale;
+        train_x = train_data->vehicles[curr].position_y * scale;
+        train_y = train_data->vehicles[curr].position_x * scale;
+        shift_x = this->width() / 2 - train_x;
+        shift_y = this->height() / 2 - train_y;
     }
     else
     {
-        shift_x = this->width() / 2 - train_x + map_shift.x() * 0.005;
-        shift_y = this->height() / 2 - train_y + map_shift.y() * 0.005;
+        shift_x = this->width() / 2 - train_x + map_shift.x();
+        shift_y = this->height() / 2 - train_y + map_shift.y();
     }
 
     p.setX(shift_x + scale * traj_point.y);
@@ -280,9 +282,10 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    delta_pos = event->pos() - mouse_pos;
-
-    map_shift += delta_pos;
+    if (event->buttons() & Qt::LeftButton)
+    {
+        map_shift = prev_map_shift + event->pos() - mouse_pos;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -293,12 +296,13 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         folow_vehicle = false;
-
-        int curr = train_data->current_vehicle;
-        train_x = train_data->vehicles[curr].position_y * scale;
-        train_y = train_data->vehicles[curr].position_x * scale;
-
         mouse_pos = event->pos();
+    }
+
+    if (event->button() == Qt::MiddleButton)
+    {
+        folow_vehicle = true;
+        map_shift = QPoint(0, 0);
     }
 }
 
@@ -307,8 +311,8 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MiddleButton)
+    if (event->button() == Qt::LeftButton)
     {
-
+        prev_map_shift = map_shift;
     }
 }

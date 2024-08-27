@@ -66,7 +66,7 @@ private:
 
     QPoint mouse_pos;
 
-    QPoint delta_pos;
+    QPoint prev_map_shift;
 
     bool folow_vehicle = true;
 
