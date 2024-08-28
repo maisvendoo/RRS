@@ -22,6 +22,9 @@ public:
 
     virtual ~VehicleController();
 
+    /// Устанавливаем индекс данной ПЕ в симуляции
+    void setIndex(size_t idx);
+
     /// Устанавливаем текущую дуговую координату ПЕ
     void setIndex(size_t idx);
 
@@ -58,7 +61,7 @@ public:
 protected:
 
     /// Индекс данной ПЕ в симуляции
-    size_t index;
+    size_t index = 0;
 
     /// Текущее значение дуговой координаты ПЕ
     double  x_cur = 0.0;

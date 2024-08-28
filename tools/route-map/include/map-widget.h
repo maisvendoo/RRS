@@ -49,25 +49,22 @@ private:
     /// Масштаб отображения карты
     double scale = 1.0;
 
+    /// Шаг увеличения масштаба
     double scale_inc_step_coeff = sqrt(2.0);
+    /// Шаг уменьшения масштаба
     double scale_dec_step_coeff = 1.0 / sqrt(2.0);
-/*
-    double old_scale = 1.0;
 
-    bool is_stored_old_scale = false;
-*/
-    /// Смещение координат по горизонтали
-    double shift_x = 0;
-
-    /// Смещение координат по вретикали
-    double shift_y = 0;
-
+    /// Текущее смещение координат
     QPoint map_shift;
 
+    /// Положение курсора в момент последнего нажатия ЛКМ
     QPoint mouse_pos;
 
-    QPoint delta_pos;
+    /// Смещение координат до движения курсора с зажатой ЛКМ
+    QPoint prev_map_shift;
 
+    /// Перемещение вслед за ПЕ
+    bool folow_vehicle = true;
 
     void paintEvent(QPaintEvent *event);
 

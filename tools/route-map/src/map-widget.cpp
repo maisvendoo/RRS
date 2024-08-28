@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
-//    scale = static_cast<double>(this->width()) / 1000.0;
+
 }
 
 //------------------------------------------------------------------------------
@@ -25,12 +25,6 @@ MapWidget::~MapWidget()
 void MapWidget::resize(int width, int height)
 {
     QWidget::resize(width, height);
-
-/*    if (!is_stored_old_scale)
-    {
-        old_scale = scale = static_cast<double>(this->width()) / 2000.0;
-        is_stored_old_scale = true;
-    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -238,16 +232,20 @@ void MapWidget::drawStations(topology_stations_list_t *stations)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QPoint MapWidget::coord_transform(dvec3 traj_point)
+QPoint MapWidget::coord_transform(dvec3 point)
 {
     QPoint p;
 
-    int curr = train_data->current_vehicle;
-    shift_x = this->width() / 2 - train_data->vehicles[curr].position_y * scale + map_shift.x();
-    shift_y = this->height() / 2 - train_data->vehicles[curr].position_x * scale + map_shift.y();
+    if (folow_vehicle)
+    {
+        int curr = train_data->current_vehicle;
 
-    p.setX(shift_x + scale * traj_point.y);
-    p.setY(shift_y + scale * traj_point.x);
+        map_shift.setX(- train_data->vehicles[curr].position_y * scale);
+        map_shift.setY(- train_data->vehicles[curr].position_x * scale);
+    }
+
+    p.setX(this->width() / 2 + map_shift.x() + scale * point.y);
+    p.setY(this->height() / 2 + map_shift.y() + scale * point.x);
 
     return p;
 }
@@ -258,10 +256,18 @@ QPoint MapWidget::coord_transform(dvec3 traj_point)
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
     if ((event->angleDelta().y() > 0) && (scale < 16.0))
+    {
         scale *= scale_inc_step_coeff;
+        map_shift = map_shift * scale_inc_step_coeff;
+        prev_map_shift = prev_map_shift * scale_inc_step_coeff;
+    }
 
     if ((event->angleDelta().y() < 0) && (scale > 0.25))
+    {
         scale *= scale_dec_step_coeff;
+        map_shift = map_shift * scale_dec_step_coeff;
+        prev_map_shift = prev_map_shift * scale_dec_step_coeff;
+    }
 
     event->accept();
 }
@@ -271,7 +277,10 @@ void MapWidget::wheelEvent(QWheelEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    delta_pos = event->pos() - mouse_pos;
+    if (event->buttons() & Qt::LeftButton)
+    {
+        map_shift = prev_map_shift + event->pos() - mouse_pos;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -279,9 +288,19 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
+    if (event->button() == Qt::LeftButton)
+    {
+        if (folow_vehicle)
+        {
+            folow_vehicle = false;
+            prev_map_shift = map_shift;
+        }
+        mouse_pos = event->pos();
+    }
+
     if (event->button() == Qt::MiddleButton)
     {
-        mouse_pos = event->pos();
+        folow_vehicle = true;
     }
 }
 
@@ -290,8 +309,8 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::MiddleButton)
+    if (event->button() == Qt::LeftButton)
     {
-        map_shift += delta_pos;
+        prev_map_shift = map_shift;
     }
 }
