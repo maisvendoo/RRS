@@ -112,6 +112,7 @@ void MainWindow::slotDisconnectedFromSimulator()
 void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 {
     topology->deserialize(topology_data);
+    this->setWindowTitle(topology->getRouteName());
 
     traj_list = topology->getTrajectoriesList();
     conn_list = topology->getConnectorsList();

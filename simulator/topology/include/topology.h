@@ -53,6 +53,11 @@ public:
         return &stations;
     }
 
+    QString getRouteName() const
+    {
+        return route_name;
+    }
+
 signals:
 
     void sendSwitchState(QByteArray sw_data);
@@ -74,6 +79,9 @@ private:
     /// Сипсок станций
     topology_stations_list_t stations;
 
+    /// Название маршрута
+    QString route_name = "";
+
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);
 
@@ -82,6 +90,9 @@ private:
 
     /// Загрузка списка станций
     bool load_stations(QString route_dir);
+
+    /// Получение название маршрута из конфига описания
+    void get_route_name(QString route_dir);
 
     void serialize_connector_name(QDataStream &stream, Connector *conn);
 

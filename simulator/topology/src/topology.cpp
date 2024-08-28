@@ -74,6 +74,8 @@ bool Topology::load(QString route_dir)
         Journal::instance()->error("Can't to load staions list");
     }
 
+    get_route_name(route_path);
+
     return true;
 }
 
@@ -198,6 +200,8 @@ QByteArray Topology::serialize()
     // Связываем с буфером поток данных
     QDataStream stream(&data);
 
+    stream << route_name;
+
     stream << stations.size();
 
     for (auto station : stations)
@@ -235,6 +239,8 @@ void Topology::deserialize(QByteArray &data)
     QBuffer buff(&data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
+
+    stream >> route_name;
 
     qsizetype stations_count = 0;
     stream >> stations_count;
@@ -397,6 +403,25 @@ bool Topology::load_stations(QString route_dir)
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::get_route_name(QString route_dir)
+{
+    QString path = route_dir + QDir::separator() +
+                   "description.xml";
+
+    CfgReader cfg;
+
+    if (!cfg.load(path))
+    {
+        return;
+    }
+
+    QString secName = "Route";
+    cfg.getString(secName, "Title", route_name);
 }
 
 //------------------------------------------------------------------------------
