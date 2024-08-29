@@ -2,6 +2,7 @@
 #include    <QPainter>
 #include    <QWheelEvent>
 #include    <connector.h>
+#include    <switch.h>
 
 //------------------------------------------------------------------------------
 //
@@ -168,34 +169,98 @@ void MapWidget::drawConnector(Connector *conn)
         return;
     }
 
-    if ( (fwd_traj->getTracks().size() == 0) || (fwd_traj->getTracks().size() == 0) )
+    if ( (fwd_traj->getTracks().size() == 0) || (bwd_traj->getTracks().size() == 0) )
     {
         return;
     }
 
-    double conn_length = 15.0;
-
     track_t fwd_track = fwd_traj->getFirstTrack();
-    dvec3 center = fwd_track.begin_point;
-    dvec3 fwd = center + fwd_track.orth * conn_length;
-
     track_t bwd_track = bwd_traj->getLastTrack();
-    dvec3 bwd = center - bwd_track.orth * conn_length;
+    dvec3 center = fwd_track.begin_point;
+    QPoint center_point = coord_transform(center);
 
-    QPen pen;
-    pen.setWidth(2 + std::floor(sqrt(scale)));
-    pen.setColor(QColor(0, 0, 128));
+    QColor color = QColor(96, 96, 96);
+    int r = 4 + std::floor(sqrt(scale));
 
     QPainter painter;
     painter.begin(this);
-    painter.setPen(pen);
+    painter.setBrush(color);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(center_point, r, r);
+    painter.end();
 
-    QPoint center_point = coord_transform(center);
-    QPoint fwd_point = coord_transform(fwd);
-    QPoint bwd_point = coord_transform(bwd);
+    Switch *sw = dynamic_cast<Switch *>(conn);
+    if (sw != Q_NULLPTR)
+    {
+        if (sw->getStateFwd() != 0)
+        {
+            QColor color = QColor(0, 0, 128);
+            if ((sw->getStateFwd() == 2) || (sw->getStateFwd() == -2))
+                color = QColor(96, 96, 96);
 
-    painter.drawLine(center_point, fwd_point);
-    painter.drawLine(center_point, bwd_point);
+            QPen pen;
+            pen.setColor(color);
+            pen.setWidth(2 + std::floor(sqrt(scale)));
+            painter.begin(this);
+            painter.setPen(pen);
+
+            double conn_length_fwd = std::min(25.0, fwd_traj->getLength());
+            if ((fwd_track.len > conn_length_fwd) || (fwd_traj->getTracks().size() == 1))
+            {
+                dvec3 fwd = center + fwd_track.orth * conn_length_fwd;
+                QPoint fwd_point = coord_transform(fwd);
+                painter.drawLine(center_point, fwd_point);
+            }
+            else
+            {
+                dvec3 first_fwd = fwd_track.end_point;
+                QPoint first_fwd_point = coord_transform(first_fwd);
+                painter.drawLine(center_point, first_fwd_point);
+
+                double second_length = conn_length_fwd - fwd_track.len;
+                track_t second_fwd_track = *(fwd_traj->getTracks().begin() + 1);
+                dvec3 second_fwd = first_fwd + second_fwd_track.orth * second_length;
+                QPoint second_fwd_point = coord_transform(second_fwd);
+                painter.drawLine(first_fwd_point, second_fwd_point);
+            }
+            painter.end();
+        }
+
+        if (sw->getStateBwd() != 0)
+        {
+            QColor color = QColor(0, 0, 128);
+            if ((sw->getStateBwd() == 2) || (sw->getStateBwd() == -2))
+                color = QColor(96, 96, 96);
+
+            QPen pen;
+            pen.setColor(color);
+            pen.setWidth(2 + std::floor(sqrt(scale)));
+
+            painter.begin(this);
+            painter.setPen(pen);
+
+            double conn_length_bwd = std::min(25.0, bwd_traj->getLength());
+            if ((bwd_track.len > conn_length_bwd) || (bwd_traj->getTracks().size() == 1))
+            {
+                dvec3 bwd = center - bwd_track.orth * conn_length_bwd;
+                QPoint bwd_point = coord_transform(bwd);
+                painter.drawLine(center_point, bwd_point);
+            }
+            else
+            {
+                dvec3 first_bwd = bwd_track.begin_point;
+                QPoint first_bwd_point = coord_transform(first_bwd);
+                painter.drawLine(center_point, first_bwd_point);
+
+                double second_length = conn_length_bwd - bwd_track.len;
+                track_t second_bwd_track = *(bwd_traj->getTracks().end() - 2);
+                dvec3 second_bwd = first_bwd - second_bwd_track.orth * second_length;
+                QPoint second_bwd_point = coord_transform(second_bwd);
+                painter.drawLine(first_bwd_point, second_bwd_point);
+            }
+            painter.end();
+        }
+    }
 
     SwitchLabel * sw_label = switch_labels.value(conn->getName(), Q_NULLPTR);
 

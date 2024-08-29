@@ -75,6 +75,9 @@ public:
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction);
 
+    /// Шаг симуляции
+    virtual void step(double t, double dt);
+
     QByteArray serialize();
 
     void deserialize(QByteArray &data);

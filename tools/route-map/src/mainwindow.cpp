@@ -192,23 +192,34 @@ void MainWindow::slotSwitchConnectorMenu()
     int state_fwd = sw->getStateFwd();
     int state_bwd = sw->getStateBwd();
 
+    if ((state_fwd == 0) && (state_bwd == 0))
+        return;
+
     TcpClient *tc = tcp_client;
 
     QMenu *menu = new QMenu(this);
 
-    QAction *action_switch_fwd = new QAction(tr("Switch forward"), this);
-    menu->addAction(action_switch_fwd);
+    if (state_fwd != 0)
+    {
+        QAction *action_switch_fwd = new QAction(tr("Switch forward"), this);
+        action_switch_fwd->setEnabled((sw->getStateFwd() != 2) && (sw->getStateFwd() != -2));
+        menu->addAction(action_switch_fwd);
 
-    connect(action_switch_fwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
-        tc->sendSwitchState(conn_name, -state_fwd, state_bwd);
-    });
+        connect(action_switch_fwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
+            tc->sendSwitchState(conn_name, -sign(state_fwd), state_bwd);
+        });
+    }
 
-    QAction *action_switch_bwd = new QAction(tr("Switch backward"), this);
-    menu->addAction(action_switch_bwd);
+    if (state_bwd != 0)
+    {
+        QAction *action_switch_bwd = new QAction(tr("Switch backward"), this);
+        action_switch_bwd->setEnabled((sw->getStateBwd() != 2) && (sw->getStateBwd() != -2));
+        menu->addAction(action_switch_bwd);
 
-    connect(action_switch_bwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
-        tc->sendSwitchState(conn_name, state_fwd, -state_bwd);
-    });
+        connect(action_switch_bwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
+            tc->sendSwitchState(conn_name, state_fwd, -sign(state_bwd));
+        });
+    }
 
     menu->exec(QCursor::pos());
 }
