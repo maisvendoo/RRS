@@ -72,6 +72,8 @@ private slots:
     void slotSwitchConnectorMenu();
 
     void slotGetSwitchState(QByteArray &sw_state);
+
+    void slotGetTrajBusyState(QByteArray &busy_state);
 };
 
 #endif // MAINWINDOW_H

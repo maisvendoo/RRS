@@ -237,3 +237,16 @@ void TcpServer::slotSendSwitchState(QByteArray sw_state)
     map_client.socket->write(net_data.serialize());
     map_client.socket->flush();
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_TRAJ_BUSY_STATE;
+    net_data.data = busy_state;
+
+    map_client.socket->write(net_data.serialize());
+    map_client.socket->flush();
+}

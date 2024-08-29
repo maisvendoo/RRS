@@ -114,4 +114,36 @@ struct switch_state_t
     }
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct traj_busy_state_t
+{
+    QString name = "";
+    bool is_busy = false;
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << name;
+        stream << is_busy;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> name;
+        stream >> is_busy;
+    }
+};
+
 #endif

@@ -70,8 +70,13 @@ void MapWidget::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::drawTrajectory(Trajectory *traj)
 {
+    QPen pen;
+    if (traj->isBusy())
+        pen.setColor(QColor(255, 0, 0));
+
     QPainter painter;
     painter.begin(this);
+    painter.setPen(pen);
 
     for (auto track : traj->getTracks())
     {

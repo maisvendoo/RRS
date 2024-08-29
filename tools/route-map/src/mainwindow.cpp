@@ -37,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::setSwitchState,
             this, &MainWindow::slotGetSwitchState);
 
+    connect(tcp_client, &TcpClient::setTrajBusyState,
+            this, &MainWindow::slotGetTrajBusyState);
+
     map = new MapWidget(ui->Map);
 }
 
@@ -241,4 +244,22 @@ void MainWindow::slotGetSwitchState(QByteArray &sw_state)
 
     sw->setStateFwd(switch_state.state_fwd);
     sw->setStateBwd(switch_state.state_bwd);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
+{
+    traj_busy_state_t busy_state;
+    busy_state.deserialize(busy_data);
+
+    Trajectory *traj = (traj_list->value(busy_state.name, Q_NULLPTR));
+
+    if (traj == Q_NULLPTR)
+    {
+        return;
+    }
+
+    traj->setBusyState(busy_state.is_busy);
 }

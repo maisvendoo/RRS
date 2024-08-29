@@ -4,6 +4,7 @@
 #include    <QObject>
 #include    <QMap>
 
+#include    <topology-export.h>
 #include    <track.h>
 #include    <profile-point.h>
 
@@ -12,7 +13,7 @@ class Connector;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Trajectory : public QObject
+class TOPOLOGY_EXPORT Trajectory : public QObject
 {
     Q_OBJECT
 
@@ -56,6 +57,8 @@ public:
 
     void setBusy(size_t idx, double coord);
 
+    void setBusyState(bool busy_state);
+
     bool isBusy() const;
 
     bool isBusy(double coord_begin, double coord_end) const;
@@ -86,6 +89,10 @@ public:
     {
         return tracks;
     }
+
+signals:
+
+    void sendTrajBusyState(QByteArray busy_data);
 
 private:
 

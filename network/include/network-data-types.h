@@ -14,7 +14,8 @@ enum StructureType
     STYPE_EMPTY_DATA,
     STYPE_TOPOLOGY_DATA,
     STYPE_TRAIN_POSITION,
-    STYPE_CONNECTOR_STATE
+    STYPE_CONNECTOR_STATE,
+    STYPE_TRAJ_BUSY_STATE
 };
 
 //------------------------------------------------------------------------------
