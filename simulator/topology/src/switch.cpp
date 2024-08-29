@@ -22,25 +22,30 @@ Switch::~Switch()
 //------------------------------------------------------------------------------
 Trajectory *Switch::getFwdTraj() const
 {
-    if (state_fwd == 1)
+    // Если траектория вперёд единственная - делать дальше нечего
+    if (fwdMinusTraj == Q_NULLPTR)
     {
-        if (fwdPlusTraj != Q_NULLPTR)
-            return fwdPlusTraj;
-        else
+        if (fwdPlusTraj == Q_NULLPTR)
         {
-            if (fwdMinusTraj != Q_NULLPTR)
-                return fwdMinusTraj;
+            return Q_NULLPTR;
         }
+        return fwdPlusTraj;
+    }
+    if (fwdPlusTraj == Q_NULLPTR)
+    {
+        return fwdMinusTraj;
     }
 
-    if (state_fwd == -1)
+    // Стрелка в плюсовом положении
+    if (state_fwd > 0)
     {
-        if (fwdMinusTraj != Q_NULLPTR)
-            return fwdMinusTraj;
-        {
-            if (fwdPlusTraj != Q_NULLPTR)
-                return fwdPlusTraj;
-        }
+        return fwdPlusTraj;
+    }
+
+    // Стрелка в минусовом положении
+    if (state_fwd < 0)
+    {
+        return fwdMinusTraj;
     }
 
     return Q_NULLPTR;
@@ -51,25 +56,30 @@ Trajectory *Switch::getFwdTraj() const
 //------------------------------------------------------------------------------
 Trajectory *Switch::getBwdTraj() const
 {
-    if (state_bwd == 1)
+    // Если траектория вперёд единственная - делать дальше нечего
+    if (bwdMinusTraj == Q_NULLPTR)
     {
-        if (bwdPlusTraj != Q_NULLPTR)
-            return bwdPlusTraj;
-        else
+        if (bwdPlusTraj == Q_NULLPTR)
         {
-            if (bwdMinusTraj != Q_NULLPTR)
-                return bwdMinusTraj;
+            return Q_NULLPTR;
         }
+        return bwdPlusTraj;
+    }
+    if (bwdPlusTraj == Q_NULLPTR)
+    {
+        return bwdMinusTraj;
     }
 
-    if (state_bwd == -1)
+    // Стрелка в плюсовом положении
+    if (state_bwd > 0)
     {
-        if (bwdMinusTraj != Q_NULLPTR)
-            return bwdMinusTraj;
-        {
-            if (bwdPlusTraj != Q_NULLPTR)
-                return bwdPlusTraj;
-        }
+        return bwdPlusTraj;
+    }
+
+    // Стрелка в минусовом положении
+    if (state_bwd < 0)
+    {
+        return bwdMinusTraj;
     }
 
     return Q_NULLPTR;
@@ -157,6 +167,8 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     else
     {
         Journal::instance()->info("Incommnig trajectories: " + QString("%1").arg(inputs_count));
+        if (inputs_count == 2)
+            state_bwd = 1;
     }
 
     if (outputs_count == 0)
@@ -166,8 +178,93 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     else
     {
         Journal::instance()->info("Outgoing trajectories: " + QString("%1").arg(outputs_count));
+        if (outputs_count == 2)
+            state_fwd = 1;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::step(double t, double dt)
+{
+    (void) t;
+    (void) dt;
+
+    int prev_state_fwd = state_fwd;
+    int prev_state_bwd = state_bwd;
+
+    // Если траектория вперёд единственная - делать дальше нечего
+    if ((fwdMinusTraj == Q_NULLPTR) || (fwdPlusTraj == Q_NULLPTR))
+    {
+        state_fwd = 0;
+    }
+    else
+    {
+        // Если какая-то траектория спереди занята ПЕ ближе,
+        // чем заданная дистанция, ставим стрелку в это направление
+        if (fwdPlusTraj->isBusy(0.0, lock_by_busy_distance))
+        {
+            state_fwd = 2;
+        }
+        else
+        {
+            if (fwdMinusTraj->isBusy(0.0, lock_by_busy_distance))
+            {
+                state_fwd = -2;
+            }
+            else
+            {
+                // Переключаем стрелку в требуемое положение
+                state_fwd = ref_state_fwd;
+            }
+        }
     }
 
+
+    // Если траектория назад единственная - делать дальше нечего
+    if ((bwdMinusTraj == Q_NULLPTR) || (bwdPlusTraj == Q_NULLPTR))
+    {
+        state_bwd = 0;
+    }
+    else
+    {
+        // Если какая-то траектория сзади занята ПЕ ближе,
+        // чем заданная дистанция, ставим стрелку в это направление
+        if (bwdPlusTraj->isBusy(bwdPlusTraj->getLength() - lock_by_busy_distance, bwdPlusTraj->getLength()))
+        {
+            state_bwd = 2;
+        }
+        else
+        {
+            if (bwdMinusTraj->isBusy(bwdMinusTraj->getLength() - lock_by_busy_distance, bwdMinusTraj->getLength()))
+            {
+                state_bwd = -2;
+            }
+            else
+            {
+                // Переключаем стрелку в требуемое положение
+                state_bwd = ref_state_bwd;
+            }
+        }
+    }
+
+    if ((prev_state_fwd != state_fwd) || (prev_state_bwd != state_bwd))
+    {
+        Journal::instance()->info(QString("Switch %1 step: t =%2; dt =%3; fwd %4 -> %5; bwd %6 -> %7;")
+                                      .arg(name)
+                                      .arg(t, 10, 'f', 3)
+                                      .arg(dt, 6, 'f', 3)
+                                      .arg(prev_state_fwd, 2)
+                                      .arg(state_fwd, 2)
+                                      .arg(prev_state_bwd, 2)
+                                      .arg(state_bwd, 2));
+        switch_state_t new_state;
+        new_state.name = name;
+        new_state.state_fwd = state_fwd;
+        new_state.state_bwd = state_bwd;
+        emit sendSwitchState(new_state.serialize());
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -286,32 +383,7 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
 //------------------------------------------------------------------------------
 void Switch::setStateFwd(int state)
 {
-    // Если траектория вперёд единственная - делать дальше нечего
-    if (fwdMinusTraj == Q_NULLPTR)
-    {
-        state_fwd = 1;
-        return;
-    }
-    if (fwdPlusTraj == Q_NULLPTR)
-    {
-        state_fwd = -1;
-        return;
-    }
-
-    // Если какая-то траектория занята ПЕ ближе, чем заданная дистанция,
-    // ставим стрелку в это направление
-    if (fwdPlusTraj->isBusy(0.0, lock_by_busy_distance))
-    {
-        state_fwd = 1;
-        return;
-    }
-    if (fwdMinusTraj->isBusy(0.0, lock_by_busy_distance))
-    {
-        state_fwd = -1;
-        return;
-    }
-
-    // Переводим стрелку в заданное направление
+    // Задаём стрелке состояние
     state_fwd = state;
 }
 
@@ -320,31 +392,24 @@ void Switch::setStateFwd(int state)
 //------------------------------------------------------------------------------
 void Switch::setStateBwd(int state)
 {
-    // Если траектория вперёд единственная - делать дальше нечего
-    if (bwdMinusTraj == Q_NULLPTR)
-    {
-        state_bwd = 1;
-        return;
-    }
-    if (bwdPlusTraj == Q_NULLPTR)
-    {
-        state_bwd = -1;
-        return;
-    }
-
-    // Если какая-то траектория занята ПЕ ближе, чем заданная дистанция,
-    // ставим стрелку в это направление
-    if (bwdPlusTraj->isBusy(bwdPlusTraj->getLength() - lock_by_busy_distance, bwdPlusTraj->getLength()))
-    {
-        state_bwd = 1;
-        return;
-    }
-    if (bwdMinusTraj->isBusy(bwdMinusTraj->getLength() - lock_by_busy_distance, bwdMinusTraj->getLength()))
-    {
-        state_bwd = -1;
-        return;
-    }
-
-    // Переводим стрелку в заданное направление
+    // Задаём стрелке состояние
     state_bwd = state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::setRefStateFwd(int state)
+{
+    // Задаём стрелке требуемое направление
+    ref_state_fwd = state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Switch::setRefStateBwd(int state)
+{
+    // Задаём стрелке требуемое направление
+    ref_state_bwd = state;
 }

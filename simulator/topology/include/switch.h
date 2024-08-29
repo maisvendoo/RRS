@@ -22,6 +22,9 @@ public:
 
     void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list) override;
 
+    /// Шаг симуляции
+    virtual void step(double t, double dt) override;
+
     QByteArray serialize() override;
 
     void deserialize(QByteArray &data, traj_list_t &traj_list) override;
@@ -40,6 +43,14 @@ public:
 
     void setStateBwd(int state);
 
+    void setRefStateFwd(int state);
+
+    void setRefStateBwd(int state);
+
+signals:
+
+    void sendSwitchState(QByteArray sw_data);
+
 private:
 
     Trajectory *fwdMinusTraj = Q_NULLPTR;
@@ -50,11 +61,23 @@ private:
 
     Trajectory *bwdPlusTraj = Q_NULLPTR;
 
-    /// Состояние стрелки впереди
-    int state_fwd = 1;
+    /// Состояние стрелки впереди: 0 - вперёд единственная траектория,
+    /// >0 - в плюсовом положении, <0 - в минусовом положении,
+    /// 1 - свободна, 2 - занята ПЕ
+    int state_fwd = 0;
 
-    /// Состояние стрелки сзади
-    int state_bwd = 1;
+    /// Состояние стрелки сзади: 0 - назад единственная траектория,
+    /// >0 - в плюсовом положении, <0 - в минусовом положении,
+    /// 1 - свободна, 2 - занята ПЕ
+    int state_bwd = 0;
+
+    /// Требуемое состояние стрелки впереди:
+    /// 1 - в плюсовом положении, -1 - в минусовом положении
+    int ref_state_fwd = 1;
+
+    /// Требуемое состояние стрелки сзади:
+    /// 1 - в плюсовом положении, -1 - в минусовом положении
+    int ref_state_bwd = 1;
 
     /// Стрелка будет заблокирована в сторону траектории,
     /// которая занята ПЕ ближе чем в 40 метрах
