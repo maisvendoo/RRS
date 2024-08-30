@@ -93,6 +93,11 @@ void TcpServer::process_client_request(client_data_t &client_data)
         send_simulator_data(client_data);
         break;
     }
+    case STYPE_CONNECTOR_STATE:
+    {
+        emit setSwitchState(client_data.received_data.data);
+        break;
+    }
     case STYPE_EMPTY_DATA:
     default:
 
