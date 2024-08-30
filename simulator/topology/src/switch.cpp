@@ -251,14 +251,6 @@ void Switch::step(double t, double dt)
 
     if ((prev_state_fwd != state_fwd) || (prev_state_bwd != state_bwd))
     {
-        Journal::instance()->info(QString("Switch %1 step: t =%2; dt =%3; fwd %4 -> %5; bwd %6 -> %7;")
-                                      .arg(name)
-                                      .arg(t, 10, 'f', 3)
-                                      .arg(dt, 6, 'f', 3)
-                                      .arg(prev_state_fwd, 2)
-                                      .arg(state_fwd, 2)
-                                      .arg(prev_state_bwd, 2)
-                                      .arg(state_bwd, 2));
         switch_state_t new_state;
         new_state.name = name;
         new_state.state_fwd = state_fwd;

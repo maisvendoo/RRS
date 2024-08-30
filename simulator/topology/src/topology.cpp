@@ -59,6 +59,7 @@ bool Topology::load(QString route_dir)
         }
 
         traj_list.insert(name, traj);
+        connect(traj, &Trajectory::sendTrajBusyState, this, &Topology::sendTrajBusyState);
     }
 
     if (traj_list.size() == 0)
@@ -194,10 +195,6 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 void Topology::step(double t, double dt)
 {
-    Journal::instance()->info(QString("Topology step: t =%1; dt =%2;")
-                                  .arg(t, 10, 'f', 3)
-                                  .arg(dt, 6, 'f', 3));
-
     for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
     {
         (*traj)->step(t, dt);

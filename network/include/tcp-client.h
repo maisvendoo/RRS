@@ -50,6 +50,8 @@ signals:
 
     void setSwitchState(QByteArray &sw_state);
 
+    void setTrajBusyState(QByteArray &busy_state);
+
 private:
 
     QTcpSocket *socket = Q_NULLPTR;

@@ -31,6 +31,8 @@ signals:
 
     void setSwitchState(QByteArray &switch_data);
 
+    void setTrajBusyState(QByteArray &busy_data);
+
 private:
 
     quint16 port = 1992;
@@ -66,6 +68,8 @@ public slots:
     void slotReceive();
 
     void slotSendSwitchState(QByteArray sw_state);
+
+    void slotSendTrajBusyState(QByteArray busy_state);
 };
 
 #endif
