@@ -65,6 +65,8 @@ signals:
 
     void sendSwitchState(QByteArray sw_data);
 
+    void sendTrajBusyState(QByteArray busy_data);
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне

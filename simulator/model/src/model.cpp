@@ -686,6 +686,8 @@ void Model::initTcpServer()
 
     connect(tpc_server, &TcpServer::setSwitchState, topology, &Topology::getSwitchState);
     connect(topology, &Topology::sendSwitchState, tpc_server, &TcpServer::slotSendSwitchState);
+
+    connect(topology, &Topology::sendTrajBusyState, tpc_server, &TcpServer::slotSendTrajBusyState);
 }
 
 //------------------------------------------------------------------------------

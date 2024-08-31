@@ -59,6 +59,7 @@ bool Topology::load(QString route_dir)
         }
 
         traj_list.insert(name, traj);
+        connect(traj, &Trajectory::sendTrajBusyState, this, &Topology::sendTrajBusyState);
     }
 
     if (traj_list.size() == 0)
@@ -368,6 +369,7 @@ bool Topology::load_topology(QString route_dir)
         sw->configure(cfg, secNode, traj_list);
 
         switches.insert(sw->getName(), sw);
+        connect(sw, &Switch::sendSwitchState, this, &Topology::sendSwitchState);
 
         secNode = cfg.getNextSection();
     }
@@ -497,13 +499,6 @@ void Topology::getSwitchState(QByteArray &switch_data)
         return;
     }
 
-    sw->setStateFwd(sw_state.state_fwd);
-    sw->setStateBwd(sw_state.state_bwd);
-
-    switch_state_t new_state;
-    new_state.name = sw->getName();
-    new_state.state_fwd = sw->getStateFwd();
-    new_state.state_bwd = sw->getStateBwd();
-
-    emit sendSwitchState(new_state.serialize());
+    sw->setRefStateFwd(sw_state.state_fwd);
+    sw->setRefStateBwd(sw_state.state_bwd);
 }

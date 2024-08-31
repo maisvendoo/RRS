@@ -108,7 +108,25 @@ void Trajectory::setBusy(size_t idx, double coord)
     else
         vehicles_coords.remove(idx);
 
-    is_busy = !vehicles_coords.empty();
+    if (is_busy == vehicles_coords.empty())
+    {
+        is_busy = !vehicles_coords.empty();
+        //Journal::instance()->info(QString("Busy update: %1 %2 -> %3").arg(name).arg(!is_busy).arg(is_busy));
+
+        traj_busy_state_t new_state;
+        new_state.name = name;
+        new_state.is_busy = is_busy;
+        emit sendTrajBusyState(new_state.serialize());
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::setBusyState(bool busy_state)
+{
+    vehicles_coords.clear();
+    is_busy = busy_state;
 }
 
 //------------------------------------------------------------------------------

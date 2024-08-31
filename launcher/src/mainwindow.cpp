@@ -390,7 +390,10 @@ void MainWindow::onRouteSelection()
 //------------------------------------------------------------------------------
 void MainWindow::onTrajectorySelection(int index)
 {
-    QString point_name = ui->cbTrajectories->itemText(index);
+    if (index < 0)
+    {
+        return;
+    }
 
     if (isBackward())
     {
@@ -789,6 +792,7 @@ void MainWindow::loadTrainPositions(const QString &routeDir)
         {
             fwd_train_positions.push_back(tp);
             ui->cbTrajectories->addItem(tp.name);
+            ui->cbTrajectories->setCurrentIndex(0);
         }
         else
         {
