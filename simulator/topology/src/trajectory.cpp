@@ -222,7 +222,6 @@ void Trajectory::step(double t, double dt)
     if (is_busy == vehicles_coords.empty())
     {
         is_busy = !vehicles_coords.empty();
-        //Journal::instance()->info(QString("Busy update: %1 %2 -> %3").arg(name).arg(!is_busy).arg(is_busy));
 
         traj_busy_state_t new_state;
         new_state.name = name;

@@ -211,6 +211,11 @@ void Topology::step(double t, double dt)
         (*vc)->step(t, dt);
     }
 
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        (*traj)->step(t, dt);
+    }
+
     for (auto conn = joints.begin(); conn != joints.end(); ++conn)
     {
         (*conn)->step(t, dt);
@@ -221,10 +226,6 @@ void Topology::step(double t, double dt)
         (*conn)->step(t, dt);
     }
 
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
-    {
-        (*traj)->step(t, dt);
-    }
 }
 
 //------------------------------------------------------------------------------
