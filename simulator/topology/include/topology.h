@@ -35,7 +35,7 @@ public:
     VehicleController *getVehicleController(size_t idx);
 
     /// Шаг симуляции
-    virtual void step(double t, double dt);
+    void step(double t, double dt);
 
     QByteArray serialize();
 

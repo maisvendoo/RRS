@@ -93,81 +93,87 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
 
     vehicle_control.resize(vehicles->size());
 
-    vehicle_control[0] = new VehicleController;
-    vehicle_control[0]->setIndex(0);
-    vehicle_control[0]->setVehicleRailwayConnectors((*vehicles)[0]->getRailwayConnectors());
-    vehicle_control[0]->setTrajCoord(tp.traj_coord);
-    vehicle_control[0]->setInitCurrentTraj(traj_list[tp.traj_name]);
-    vehicle_control[0]->setDirection(tp.dir);
-    vehicle_control[0]->setInitRailwayCoord((*vehicles)[0]->getRailwayCoord());
-
-    double traj_coord = tp.traj_coord;
-
+    // Находим уазатель на стартовую траекторию
     Trajectory *cur_traj = traj_list.value(tp.traj_name, Q_NULLPTR);
-
     if (cur_traj == Q_NULLPTR)
     {
         Journal::instance()->critical("INVALID INITIAL TRAJECTORY!!!");
         return false;
     }
 
-    Journal::instance()->info(QString("Vehcile #%1").arg(0) +
-                              " at traj: " + cur_traj->getName() +
-                              QString(" %1 m from start").arg(traj_coord));
+    double traj_coord = cut(tp.traj_coord, 0.0, cur_traj->getLength());
 
-    cur_traj->setBusy(0, traj_coord);
-
-    for (size_t i = 1; i < vehicles->size(); ++i)
+    for (size_t i = 0; i < vehicles->size(); ++i)
     {
         vehicle_control[i] = new VehicleController;
 
-        double L = ((*vehicles)[i-1]->getLength() + (*vehicles)[i]->getLength()) / 2.0;
+        // Смещаем координату центра данной ПЕ
+        // на половину её длины и половину длины предыдущей ПЕ
+        double L = (*vehicles)[i]->getLength();
+        traj_coord = traj_coord - tp.dir * L / 2.0;
+        if (i != 0)
+            traj_coord = traj_coord - tp.dir * (*vehicles)[i-1]->getLength() / 2.0;
 
-        traj_coord = traj_coord - tp.dir * L;
-
-        while (traj_coord < 0)
-        {
-            Connector *conn = cur_traj->getBwdConnector();
-
-            if (conn == Q_NULLPTR)
-            {
-                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
-                return false;
-            }
-
-            cur_traj = conn->getBwdTraj();
-
-            if (cur_traj == Q_NULLPTR)
-            {
-                Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
-                return false;
-            }
-
-            traj_coord = cur_traj->getLength() + traj_coord;
-        }
-
+        // Если траекторная координата превысила длину траектории
+        // (заехали за стык или стрелку спереди), пока она её превышает...
         while (traj_coord > cur_traj->getLength())
         {
-            traj_coord = traj_coord - cur_traj->getLength();
-
+            // Получаем указатель на коннектор спереди
             Connector *conn = cur_traj->getFwdConnector();
-
             if (conn == Q_NULLPTR)
             {
                 Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't forward connector");
                 return false;
             }
 
-            cur_traj = conn->getFwdTraj();
-
-            if (cur_traj == Q_NULLPTR)
+            // Получаем указатель на следующую траекторию спереди
+            Trajectory *next_traj = conn->getFwdTraj();
+            if (next_traj == Q_NULLPTR)
             {
                 Journal::instance()->error("Connector " + conn->getName() + " has't forward trajectory");
                 return false;
             }
+
+            // Вычитаем из траекторной координаты длину предыдущей траектории,
+            // чтобы получить координату на новой траектории впереди
+            traj_coord = traj_coord - cur_traj->getLength();
+
+            // Обновляем текущую траекторию на ту,
+            // с которой нас соединяет коннектор спереди
+            cur_traj = next_traj;
+        }
+
+        // Если траекторная координата меньше нуля
+        // (заехали за стык или стрелку сзади), пока она меньше нуля...
+        while (traj_coord < 0.0)
+        {
+            // Получаем указатель на коннектор сзади
+            Connector *conn = cur_traj->getBwdConnector();
+            if (conn == Q_NULLPTR)
+            {
+                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
+                return false;
+            }
+
+            // Получаем указатель на следующую траекторию сзади
+            Trajectory *next_traj = conn->getBwdTraj();
+            if (next_traj == Q_NULLPTR)
+            {
+                Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
+                return false;
+            }
+
+            // Добавляем к траекторной координате длину новой траектории,
+            // чтобы получить координату на новой траектории сзади
+            traj_coord = traj_coord + next_traj->getLength();
+
+            // Обновляем текущую траекторию на ту,
+            // с которой нас соединяет коннектор сзади
+            cur_traj = next_traj;
         }
 
         vehicle_control[i]->setIndex(i);
+        vehicle_control[i]->setLength(L);
         vehicle_control[i]->setVehicleRailwayConnectors((*vehicles)[i]->getRailwayConnectors());
         vehicle_control[i]->setTrajCoord(traj_coord);
         vehicle_control[i]->setInitCurrentTraj(cur_traj);
@@ -177,8 +183,6 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
         Journal::instance()->info(QString("Vehcile #%1").arg(i) +
                                   " at traj: " + cur_traj->getName() +
                                   QString(" %1 m from start").arg(traj_coord));
-
-        cur_traj->setBusy(i, traj_coord);
     }
 
     return true;
@@ -199,7 +203,12 @@ void Topology::step(double t, double dt)
 {
     for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
     {
-        (*traj)->step(t, dt);
+        (*traj)->clearBusy();
+    }
+
+    for (auto vc = vehicle_control.begin(); vc != vehicle_control.end(); ++vc)
+    {
+        (*vc)->step(t, dt);
     }
 
     for (auto conn = joints.begin(); conn != joints.end(); ++conn)
@@ -210,6 +219,11 @@ void Topology::step(double t, double dt)
     for (auto conn = switches.begin(); conn != switches.end(); ++conn)
     {
         (*conn)->step(t, dt);
+    }
+
+    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    {
+        (*traj)->step(t, dt);
     }
 }
 

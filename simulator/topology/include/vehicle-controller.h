@@ -25,8 +25,8 @@ public:
     /// Устанавливаем индекс данной ПЕ в симуляции
     void setIndex(size_t idx);
 
-    /// Устанавливаем текущую дуговую координату ПЕ
-    void setIndex(size_t idx);
+    /// Устанавливаем длину данной ПЕ
+    void setLength(double len);
 
     /// Устанавливаем текущую дуговую координату ПЕ
     void setRailwayCoord(double x);
@@ -37,7 +37,7 @@ public:
     /// Задание начальной траектории на которой находится ПЕ
     void setInitCurrentTraj(Trajectory *traj);
 
-    /// Задаем координату ПЕ вдоль траектории
+    /// Задаем координаты ПЕ на первой и последних начальных траекториях
     void setTrajCoord(double traj_coord) { this->traj_coord = traj_coord; }
 
     /// Устанавливаем направление движения по траектории
@@ -52,16 +52,22 @@ public:
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
     profile_point_t getPosition(int dir);
 
-    /// Вернуть указатель на текущую траекторию
+    /// Вернуть массив указателей на траектории, занятые ПЕ
     Trajectory *getCurrentTraj() const { return current_traj; }
 
-    /// Вернтуть текущую координату вдоль траектории
+    /// Вернуть текущую координату вдоль траектории
     double getTrajCoord() const { return traj_coord; }
+
+    /// Шаг симуляции
+    void step(double t, double dt);
 
 protected:
 
     /// Индекс данной ПЕ в симуляции
     size_t index = 0;
+
+    /// Половина длины данной ПЕ
+    double length_half = 10.0;
 
     /// Текущее значение дуговой координаты ПЕ
     double  x_cur = 0.0;
@@ -72,14 +78,14 @@ protected:
     /// Координата, в пределах текущей траектории
     double traj_coord = 0.0;
 
-    /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой
-    device_list_t *devices;
-
     /// Текущая траектория ПЕ
     Trajectory *current_traj = Q_NULLPTR;
 
     /// Предыдущая траектория ПЕ (за коннектором сзади по ходу движения)
     Trajectory *prev_traj = Q_NULLPTR;
+
+    /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой
+    device_list_t *devices = {};
 };
 
 #endif // VEHICLE_CONTROLLER_H

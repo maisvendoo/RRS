@@ -57,7 +57,9 @@ public:
         return bwd_connector;
     }
 
-    void setBusy(size_t idx, double coord);
+    void setBusy(size_t idx, double coord_begin, double coord_end);
+
+    void clearBusy();
 
     void setBusyState(bool busy_state);
 
@@ -107,7 +109,7 @@ private:
 
     bool is_busy = false;
 
-    QMap<size_t, double> vehicles_coords;
+    QMap<size_t, std::array<double, 2>> vehicles_coords;
 
     Connector *fwd_connector = Q_NULLPTR;
 

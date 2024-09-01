@@ -101,23 +101,20 @@ std::vector<TrajectoryDevice *> Trajectory::getTrajectoryDevices()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::setBusy(size_t idx, double coord)
+void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 {
-    if ((coord >= 0.0) && (coord <= len))
-        vehicles_coords.insert(idx, coord);
+    if ((coord_begin >= 0.0) && (coord_end <= len))
+        vehicles_coords.insert(idx, {coord_begin, coord_end});
     else
         vehicles_coords.remove(idx);
+}
 
-    if (is_busy == vehicles_coords.empty())
-    {
-        is_busy = !vehicles_coords.empty();
-        //Journal::instance()->info(QString("Busy update: %1 %2 -> %3").arg(name).arg(!is_busy).arg(is_busy));
-
-        traj_busy_state_t new_state;
-        new_state.name = name;
-        new_state.is_busy = is_busy;
-        emit sendTrajBusyState(new_state.serialize());
-    }
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::clearBusy()
+{
+    vehicles_coords.clear();
 }
 
 //------------------------------------------------------------------------------
@@ -125,7 +122,6 @@ void Trajectory::setBusy(size_t idx, double coord)
 //------------------------------------------------------------------------------
 void Trajectory::setBusyState(bool busy_state)
 {
-    vehicles_coords.clear();
     is_busy = busy_state;
 }
 
@@ -146,7 +142,7 @@ bool Trajectory::isBusy(double coord_begin, double coord_end) const
     {
         for (auto vehicle_coord : vehicles_coords)
         {
-            if ((vehicle_coord >= coord_begin) && (vehicle_coord <= coord_end))
+            if ((vehicle_coord[1] >= coord_begin) && (vehicle_coord[0] <= coord_end))
                 return true;
         }
     }
@@ -223,6 +219,17 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 //------------------------------------------------------------------------------
 void Trajectory::step(double t, double dt)
 {
+    if (is_busy == vehicles_coords.empty())
+    {
+        is_busy = !vehicles_coords.empty();
+        //Journal::instance()->info(QString("Busy update: %1 %2 -> %3").arg(name).arg(!is_busy).arg(is_busy));
+
+        traj_busy_state_t new_state;
+        new_state.name = name;
+        new_state.is_busy = is_busy;
+        emit sendTrajBusyState(new_state.serialize());
+    }
+
     for (auto traj_device : devices)
     {
         traj_device->step(t, dt);
