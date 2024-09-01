@@ -239,7 +239,7 @@ void VehicleController::step(double t, double dt)
 
         // Добавляем к траекторной координате длину новой траектории,
         // чтобы получить координату на новой траектории сзади
-        vehicle_end = vehicle_end + current_traj->getLength();
+        vehicle_end = vehicle_end + next_traj->getLength();
 
         next_traj->setBusy(index, max(0.0, vehicle_end), next_traj->getLength());
     }
