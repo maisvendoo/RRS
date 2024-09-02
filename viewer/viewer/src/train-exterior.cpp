@@ -329,11 +329,11 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
         return;
 
     // Time to relative units conversion
-    float Delta_t = static_cast<float>(settings.request_interval) / 1000.0f;
+    double Delta_t = static_cast<float>(settings.request_interval) / 1000.0;
 
     // Interframe coordinate
-    float t = static_cast<float>(ref_time) / Delta_t;
-    float k = (1.0f - t);
+    double t = static_cast<float>(ref_time) / Delta_t;
+    double k = (1.0 - t);
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
@@ -354,7 +354,6 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             k * sim_data[old_data].vehicles[i].up_z + t * sim_data[new_data].vehicles[i].up_z);
 
         vehicles_ext[i].right = vehicles_ext[i].orth ^ vehicles_ext[i].up;
-        //vehicles_ext[i].right.normalize();
 
         vehicles_ext[i].attitude = osg::Vec3(
             asinf(vehicles_ext[i].orth.z()),
