@@ -202,7 +202,7 @@ void TcpServer::slotReceive()
 
     while (socket->bytesAvailable())
     {
-        if (recvBuff.size() == 0)
+        if (is_first_data)
         {
             recvBuff.append(socket->readAll());
 
@@ -211,6 +211,8 @@ void TcpServer::slotReceive()
             QDataStream stream(&b);
 
             stream >> wait_data_size;
+
+            is_first_data = false;
         }
         else
         {
@@ -218,12 +220,12 @@ void TcpServer::slotReceive()
         }
     }
 
-    if (recvBuff.size() >= wait_data_size)
+    if (recvBuff.size() > wait_data_size)
     {
         clients_data[client_idx].received_data.deserialize(recvBuff);
         process_client_request(clients_data[client_idx]);
 
-        recvBuff.clear();
+        is_first_data = true;
     }
 }
 

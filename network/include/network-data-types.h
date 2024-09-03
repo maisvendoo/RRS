@@ -54,6 +54,11 @@ struct network_data_t
         stream >> data_size;
         stream >> stype;
         stream >> this->data;
+
+        // Контрольная сериализация полученных данных
+        QByteArray tmp = this->serialize();
+        // Удаляем из полученного блока фактически сериализованное
+        data = data.mid(tmp.size());
     }
 };
 
