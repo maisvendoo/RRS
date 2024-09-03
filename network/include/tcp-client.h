@@ -66,6 +66,8 @@ private:
 
     qsizetype wait_data_size = 0;
 
+    bool is_first_data = true;
+
     void connectToServer(const tcp_config_t &tcp_config);
 
     void process_received_data(network_data_t &net_data);

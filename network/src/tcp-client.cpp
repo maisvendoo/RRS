@@ -160,7 +160,7 @@ void TcpClient::slotReceive()
 {
     while (socket->bytesAvailable())
     {
-        if (recvBuff.size() == 0)
+        if (is_first_data)
         {
             recvBuff.append(socket->readAll());
 
@@ -169,6 +169,8 @@ void TcpClient::slotReceive()
             QDataStream stream(&b);
 
             stream >> wait_data_size;
+
+            is_first_data = false;
         }
         else
         {
@@ -178,9 +180,15 @@ void TcpClient::slotReceive()
 
     if (recvBuff.size() >= wait_data_size)
     {
+        // Десириализуем принятые данные в структуру сетевого пакета
         received_data.deserialize(recvBuff);
-        process_received_data(received_data);
+        // Удаляем из буфера данные, подвергнутые десериализаии,
+        // но не чистим буффер в ноль!
+        recvBuff = recvBuff.mid(recvBuff.size());
 
-        recvBuff.clear();
+        // Обработка принятого сетевого пакета
+        process_received_data(received_data);        
+
+        is_first_data = true;
     }
 }
