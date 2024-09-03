@@ -178,13 +178,10 @@ void TcpClient::slotReceive()
         }
     }
 
-    if (recvBuff.size() >= wait_data_size)
+    if (recvBuff.size() > wait_data_size)
     {
         // Десириализуем принятые данные в структуру сетевого пакета
         received_data.deserialize(recvBuff);
-        // Удаляем из буфера данные, подвергнутые десериализаии,
-        // но не чистим буффер в ноль!
-        recvBuff = recvBuff.mid(recvBuff.size());
 
         // Обработка принятого сетевого пакета
         process_received_data(received_data);        
