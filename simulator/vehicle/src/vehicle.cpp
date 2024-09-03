@@ -453,7 +453,7 @@ device_list_t *Vehicle::getBwdConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-device_list_t *Vehicle::getRailwayConnectors()
+device_coord_list_t *Vehicle::getRailwayConnectors()
 {
     return &railway_connectors;
 }
@@ -867,6 +867,33 @@ void Vehicle::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::addFwdConnector(Device *device)
+{
+    forward_connectors.push_back(device);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::addBwdConnector(Device *device)
+{
+    backward_connectors.push_back(device);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::addRailwayConnector(Device *device, double distance_from_center)
+{
+    device_coord_t dc;
+    dc.device = device;
+    dc.coord = cut(distance_from_center, -length / 2.0, length / 2.0);
+    railway_connectors.push_back(dc);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
 {
     QFileInfo info(cfg_path);
@@ -933,36 +960,6 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
     }
     Journal::instance()->info("Wheel friction coefficient formula: " + QString("psi = %1 + (%2 / (%3 + %4 * V)) + %5 * V")
                               .arg(psi_a).arg(psi_b).arg(psi_c).arg(psi_d).arg(psi_e));
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Vehicle *loadVehicle(QString lib_path)
-{
-    Vehicle *vehicle = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetVehicle getVehicle = reinterpret_cast<GetVehicle>(lib.resolve("getVehicle"));
-
-        if (getVehicle)
-        {
-            vehicle = getVehicle();
-        }
-        else
-        {
-            Journal::instance()->error(lib.errorString());
-        }
-    }
-    else
-    {
-        Journal::instance()->error(lib.errorString());
-    }
-
-    return vehicle;
 }
 
 //------------------------------------------------------------------------------
@@ -1080,4 +1077,34 @@ void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
     Q_UNUSED(p0)
     Q_UNUSED(pTM)
     Q_UNUSED(pFL)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Vehicle *loadVehicle(QString lib_path)
+{
+    Vehicle *vehicle = nullptr;
+
+    QLibrary lib(lib_path);
+
+    if (lib.load())
+    {
+        GetVehicle getVehicle = reinterpret_cast<GetVehicle>(lib.resolve("getVehicle"));
+
+        if (getVehicle)
+        {
+            vehicle = getVehicle();
+        }
+        else
+        {
+            Journal::instance()->error(lib.errorString());
+        }
+    }
+    else
+    {
+        Journal::instance()->error(lib.errorString());
+    }
+
+    return vehicle;
 }

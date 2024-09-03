@@ -128,8 +128,8 @@ void VehicleController::setRailwayCoord(double x)
         {
             for (auto traj_device : current_traj->getTrajectoryDevices())
             {
-                if (veh_device->getName() == traj_device->getName())
-                    traj_device->setLink(veh_device, index);
+                if (veh_device.device->getName() == traj_device->getName())
+                    traj_device->setLink(veh_device.device, index);
             }
         }
     }
@@ -153,8 +153,8 @@ void VehicleController::setInitCurrentTraj(Trajectory *traj)
     {
         for (auto traj_device : current_traj->getTrajectoryDevices())
         {
-            if (veh_device->getName() == traj_device->getName())
-                traj_device->setLink(veh_device, index);
+            if (veh_device.device->getName() == traj_device->getName())
+                traj_device->setLink(veh_device.device, index);
         }
     }
 }
@@ -162,7 +162,7 @@ void VehicleController::setInitCurrentTraj(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleController::setVehicleRailwayConnectors(device_list_t *devices)
+void VehicleController::setVehicleRailwayConnectors(device_coord_list_t *devices)
 {
     this->devices = devices;
 }
@@ -170,7 +170,7 @@ void VehicleController::setVehicleRailwayConnectors(device_list_t *devices)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-device_list_t *VehicleController::getVehicleRailwayConnectors()
+device_coord_list_t *VehicleController::getVehicleRailwayConnectors()
 {
     return devices;
 }

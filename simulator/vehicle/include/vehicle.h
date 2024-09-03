@@ -154,7 +154,7 @@ public:
 
     device_list_t *getFwdConnectors();
     device_list_t *getBwdConnectors();
-    device_list_t *getRailwayConnectors();
+    device_coord_list_t *getRailwayConnectors();
 
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t &Y, double t, double dt);
@@ -318,7 +318,7 @@ protected:
     /// List of devices - backward connectors
     device_list_t backward_connectors;
     /// List of devices - railway connectors
-    device_list_t railway_connectors;
+    device_coord_list_t railway_connectors;
 
     control_signals_t   control_signals;
 
@@ -332,6 +332,13 @@ protected:
 
     /// User defined configuration load
     virtual void loadConfig(QString cfg_path);
+
+    /// Add device to forward connectors
+    void addFwdConnector(Device *device);
+    /// Add device to backward connectors
+    void addBwdConnector(Device *device);
+    /// Add device to railway connectors
+    void addRailwayConnector(Device *device, double distance_from_center = 0.0);
 
     /// User defined step prepare
     virtual void preStep(double t);

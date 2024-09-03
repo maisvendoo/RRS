@@ -44,10 +44,10 @@ public:
     void setDirection(int dir) { this->dir = dir; }
 
     /// Задать оборудование ПЕ, взаимодействующее с путевой инфраструктурой
-    void setVehicleRailwayConnectors(device_list_t *devices);
+    void setVehicleRailwayConnectors(device_coord_list_t *devices);
 
     /// Указатели на оборудование ПЕ, взаимодействующее с путевой инфраструктурой
-    device_list_t *getVehicleRailwayConnectors();
+    device_coord_list_t *getVehicleRailwayConnectors();
 
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
     profile_point_t getPosition(int dir);
@@ -85,7 +85,7 @@ protected:
     Trajectory *prev_traj = Q_NULLPTR;
 
     /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой
-    device_list_t *devices = {};
+    device_coord_list_t *devices = {};
 };
 
 #endif // VEHICLE_CONTROLLER_H
