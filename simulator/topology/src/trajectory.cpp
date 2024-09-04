@@ -115,6 +115,10 @@ void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 void Trajectory::clearBusy()
 {
     vehicles_coords.clear();
+    for (auto traj_device : devices)
+    {
+        traj_device->clearLinks();
+    }
 }
 
 //------------------------------------------------------------------------------

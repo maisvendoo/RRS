@@ -175,8 +175,7 @@ bool Topology::init(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles)
         vehicle_control[i]->setIndex(i);
         vehicle_control[i]->setLength(L);
         vehicle_control[i]->setVehicleRailwayConnectors((*vehicles)[i]->getRailwayConnectors());
-        vehicle_control[i]->setTrajCoord(traj_coord);
-        vehicle_control[i]->setInitCurrentTraj(cur_traj);
+        vehicle_control[i]->setInitCurrentTraj(cur_traj, traj_coord);
         vehicle_control[i]->setDirection(tp.dir);
         vehicle_control[i]->setInitRailwayCoord((*vehicles)[i]->getRailwayCoord());
 

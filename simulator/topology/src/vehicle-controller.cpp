@@ -115,24 +115,6 @@ void VehicleController::setRailwayCoord(double x)
         // чтобы получить координату на новой траектории сзади
         traj_coord = current_traj->getLength() + traj_coord;
     }
-
-    // Если перешли на новую траекторию, перебрасываем и модули тоже
-    if (current_traj != prev_traj)
-    {
-        for (auto traj_device : prev_traj->getTrajectoryDevices())
-        {
-            traj_device->setLink(nullptr, index);
-        }
-
-        for (auto veh_device : *devices)
-        {
-            for (auto traj_device : current_traj->getTrajectoryDevices())
-            {
-                if (veh_device.device->getName() == traj_device->getName())
-                    traj_device->setLink(veh_device.device, index);
-            }
-        }
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -146,17 +128,12 @@ void VehicleController::setInitRailwayCoord(double x)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleController::setInitCurrentTraj(Trajectory *traj)
+void VehicleController::setInitCurrentTraj(Trajectory *traj, double traj_coord)
 {
-    current_traj = traj;
-    for (auto veh_device : *devices)
-    {
-        for (auto traj_device : current_traj->getTrajectoryDevices())
-        {
-            if (veh_device.device->getName() == traj_device->getName())
-                traj_device->setLink(veh_device.device, index);
-        }
-    }
+    this->current_traj = traj;
+    this->traj_coord = traj_coord;
+
+    updateTrajectories();
 }
 
 //------------------------------------------------------------------------------
@@ -165,6 +142,14 @@ void VehicleController::setInitCurrentTraj(Trajectory *traj)
 void VehicleController::setVehicleRailwayConnectors(device_coord_list_t *devices)
 {
     this->devices = devices;
+
+    // Сохраняем смещения вперёд-назад в отдельном массиве,
+    // чтобы в структуре device_coord_t хранить траекторные координаты
+    for (auto veh_device : *devices)
+    {
+        devices_coords.push_back(veh_device.coord);
+        veh_device.coord = 0.0;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -190,11 +175,21 @@ void VehicleController::step(double t, double dt)
 {
     (void) t;
     (void) dt;
+    updateTrajectories();
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleController::updateTrajectories()
+{
     double vehicle_begin = traj_coord + length_half;
     double vehicle_end = traj_coord - length_half;
     Trajectory *next_traj = current_traj;
+
+    // Занятость пути
     next_traj->setBusy(index, max(0.0, vehicle_end), min(vehicle_begin, next_traj->getLength()));
+
 
     // Если траекторная координата превысила длину траектории
     // (заехали за стык или стрелку спереди), пока она её превышает...
@@ -233,14 +228,63 @@ void VehicleController::step(double t, double dt)
         // с которой нас соединяет коннектор сзади
         next_traj = conn->getBwdTraj();
         if (next_traj == Q_NULLPTR)
-        {
             break;
-        }
 
         // Добавляем к траекторной координате длину новой траектории,
         // чтобы получить координату на новой траектории сзади
         vehicle_end = vehicle_end + next_traj->getLength();
 
+        // Занятость пути
         next_traj->setBusy(index, max(0.0, vehicle_end), next_traj->getLength());
+    }
+
+    // Связи оборудования ПЕ с путевой инфраструктурой
+    size_t i = 0;
+    for (auto veh_device : *devices)
+    {
+        // Обновляем траекторную координату оборудования ПЕ
+        veh_device.coord = traj_coord + devices_coords[i];
+        ++i;
+
+        // Текущая траектория и траекторная координата данного оборуования
+        next_traj = current_traj;
+        while (veh_device.coord > next_traj->getLength())
+        {
+            Connector *conn = next_traj->getFwdConnector();
+            if (conn == Q_NULLPTR)
+                break;
+
+            veh_device.coord = veh_device.coord - next_traj->getLength();
+
+            next_traj = conn->getFwdTraj();
+            if (next_traj == Q_NULLPTR)
+                break;
+        }
+
+        while (vehicle_end < 0.0)
+        {
+            Connector *conn = next_traj->getBwdConnector();
+            if (conn == Q_NULLPTR)
+                break;
+
+            next_traj = conn->getBwdTraj();
+            if (next_traj == Q_NULLPTR)
+                break;
+
+            veh_device.coord = veh_device.coord + next_traj->getLength();
+        }
+
+        if (next_traj == Q_NULLPTR)
+            continue;
+
+        for (auto traj_device : next_traj->getTrajectoryDevices())
+        {
+            // Связываем оборудование ПЕ и путевое оборудование
+            if (veh_device.device->getName() == traj_device->getName())
+            {
+                traj_device->setLink(veh_device);
+                break;
+            }
+        }
     }
 }

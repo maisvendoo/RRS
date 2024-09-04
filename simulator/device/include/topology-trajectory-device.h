@@ -4,6 +4,7 @@
 #include    <QObject>
 #include    <QMap>
 #include    <device.h>
+#include    <device-list.h>
 
 class ConnectorDevice;
 
@@ -28,8 +29,11 @@ public:
     ConnectorDevice *getFwdConnectorDevice() const;
     ConnectorDevice *getBwdConnectorDevice() const;
 
-    /// Set Device from Vehicle #idx
-    void setLink(Device *device, size_t idx = 0);
+    /// Set Device for next step
+    void clearLinks();
+
+    /// Set Device for next step
+    void setLink(device_coord_t device);
 
     /// Шаг симуляции
     virtual void step(double t, double dt);
@@ -69,7 +73,7 @@ protected:
 
     ConnectorDevice *bwd_conn_device = nullptr;
 
-    QMap<size_t, Device *> vehicles_devices = {};
+    device_coord_list_t vehicles_devices = {};
 
     /// Name of this device
     QString name = "";

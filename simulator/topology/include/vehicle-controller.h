@@ -34,11 +34,8 @@ public:
     /// Задание начальной дуговой координаты ПЕ
     void setInitRailwayCoord(double x);
 
-    /// Задание начальной траектории на которой находится ПЕ
-    void setInitCurrentTraj(Trajectory *traj);
-
-    /// Задаем координаты ПЕ на первой и последних начальных траекториях
-    void setTrajCoord(double traj_coord) { this->traj_coord = traj_coord; }
+    /// Задание начальной траекториии и положения ПЕ на ней
+    void setInitCurrentTraj(Trajectory *traj, double traj_coord);
 
     /// Устанавливаем направление движения по траектории
     void setDirection(int dir) { this->dir = dir; }
@@ -84,8 +81,16 @@ protected:
     /// Предыдущая траектория ПЕ (за коннектором сзади по ходу движения)
     Trajectory *prev_traj = Q_NULLPTR;
 
-    /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой
+    /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой,
+    /// и его текущие траекторные координаты
     device_coord_list_t *devices = {};
+
+    /// Смещения вперёд-назад оборудования ПЕ
+    std::vector<double> devices_coords;
+
+    /// Расчёт занятости траекторий по всей длине ПЕ
+    /// и связей оборудования ПЕ с путевой инфраструктурой
+    void updateTrajectories();
 };
 
 #endif // VEHICLE_CONTROLLER_H

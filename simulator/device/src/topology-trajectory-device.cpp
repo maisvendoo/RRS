@@ -18,13 +18,7 @@ TrajectoryDevice::TrajectoryDevice(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 TrajectoryDevice::~TrajectoryDevice()
 {
-    for (auto device_it = vehicles_devices.begin(); device_it != vehicles_devices.end(); ++device_it)
-    {
-        if ((*device_it) != nullptr)
-        {
-            (*device_it)->unlink();
-        }
-    }
+    clearLinks();
 }
 
 //------------------------------------------------------------------------------
@@ -62,20 +56,27 @@ ConnectorDevice *TrajectoryDevice::getBwdConnectorDevice() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryDevice::setLink(Device *device, size_t idx)
+void TrajectoryDevice::clearLinks()
 {
-    if (vehicles_devices.contains(idx))
+    for (auto device : vehicles_devices)
     {
-        if (vehicles_devices[idx] != nullptr)
-            vehicles_devices[idx]->unlink();
-
-        vehicles_devices.remove(idx);
+        if (device.device != nullptr)
+        {
+            device.device->unlink();
+        }
     }
+    vehicles_devices.clear();
+}
 
-    if (device != nullptr)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrajectoryDevice::setLink(device_coord_t device)
+{
+    if (device.device != nullptr)
     {
-        device->link();
-        vehicles_devices.insert(idx, device);
+        device.device->link();
+        vehicles_devices.push_back(device);
     }
 }
 
