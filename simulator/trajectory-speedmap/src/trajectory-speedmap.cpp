@@ -32,14 +32,4 @@ void TrajectorySpeedMap::step(double t, double dt)
     }
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrajectorySpeedMap::load_config(CfgReader &cfg)
-{
-    QString secName = "Device";
-
-    cfg.getString(secName, "Name", name);
-}
-
 GET_TRAJECTORY_DEVICE(TrajectorySpeedMap)

@@ -97,7 +97,7 @@ public:
     /// Set payload level
     void setPayloadCoeff(double payload_coeff);
 
-    void setRailwayCoord(double value);
+    void setTrainCoord(double value);
 
     void setVelocity(double value);
 
@@ -141,7 +141,7 @@ public:
     /// Get wheel diameter
     double getWheelDiameter(size_t i) const;
 
-    double getRailwayCoord() const;
+    double getTrainCoord() const;
 
     double getVelocity() const;
 
@@ -194,8 +194,6 @@ public slots:
 signals:
 
     void sendFeedBackSignals(feedback_signals_t feedback_signals);
-
-    void sendCoord(double x);
 
 protected:
 
@@ -255,10 +253,8 @@ protected:
     /// Number of degrees of freedom
     size_t  s;
 
-    /// Init railway coordinate
-    double railway_coord0;
-    /// Railway coordinate
-    double railway_coord;
+    /// Train coordinate
+    double train_coord;
     /// Body velocity
     double velocity;
 

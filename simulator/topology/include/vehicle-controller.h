@@ -29,10 +29,10 @@ public:
     void setLength(double len);
 
     /// Устанавливаем текущую дуговую координату ПЕ
-    void setRailwayCoord(double x);
+    void setCoord(double x);
 
     /// Задание начальной дуговой координаты ПЕ
-    void setInitRailwayCoord(double x);
+    void setInitCoord(double x);
 
     /// Задание начальной траекториии и положения ПЕ на ней
     void setInitCurrentTraj(Trajectory *traj, double traj_coord);

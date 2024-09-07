@@ -316,7 +316,7 @@ void Model::debugPrint()
             .arg(static_cast<int>(train->getFirstVehicle()->getAnalogSignal(3)))
             .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(2)))
             .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(4)))
-            .arg(train->getFirstVehicle()->getRailwayCoord())
+            .arg(train->getFirstVehicle()->getTrainCoord())
             .arg(static_cast<double>(train->getFirstVehicle()->getAnalogSignal(20)));
 
     fputs(qPrintable(debug_info), stdout);

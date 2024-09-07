@@ -5,7 +5,7 @@
 
 struct profile_point_t
 {
-    double  ordinate;
+    double  railway_coord;
     double  inclination;
     double  curvature;
     dvec3   position;
@@ -14,7 +14,7 @@ struct profile_point_t
     dvec3   up;
 
     profile_point_t()
-        : ordinate(0.0)
+        : railway_coord(0.0)
         , inclination(0.0)
         , curvature(0.0)
         , position(dvec3(0.0, 0.0, 0.0))

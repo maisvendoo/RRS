@@ -131,10 +131,8 @@ void Train::preStep(double t)
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        //*vehicle->getProfilePoint() = profile->getElement(y[idx], dir * vehicle->getOrientation());
-
         topology->getVehicleController(i)->setDirection(dir);
-        topology->getVehicleController(i)->setRailwayCoord(vehicle->getRailwayCoord());
+        topology->getVehicleController(i)->setCoord(y[idx]);
         *vehicle->getProfilePoint() = topology->getVehicleController(i)->getPosition(dir * vehicle->getOrientation());
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
@@ -718,10 +716,10 @@ void Train::setInitConditions(const init_data_t &init_data)
         }
     }
 
-    double x0 = init_data.init_coord * 1000.0 - dir * this->getFirstVehicle()->getLength() / 2.0;
+    double x0 = 0.0 - dir * this->getFirstVehicle()->getLength() / 2.0;
     y[0] = x0;
 
-    vehicles[0]->setRailwayCoord(x0);
+    vehicles[0]->setTrainCoord(x0);
 
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
 
@@ -735,7 +733,7 @@ void Train::setInitConditions(const init_data_t &init_data)
 
         y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
 
-        vehicles[i]->setRailwayCoord(y[idxi]);
+        vehicles[i]->setTrainCoord(y[idxi]);
 
         Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[idxi]).arg(i, 3));
     }

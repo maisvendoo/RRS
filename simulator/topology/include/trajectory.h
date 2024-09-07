@@ -126,7 +126,7 @@ private:
                     track_t &prev_track,
                     track_t &next_track);
 
-    double calc_curvature(track_t &cur_track, track_t &next_track);
+    double calc_curvature(track_t &track0, track_t &track1);
 };
 
 #endif

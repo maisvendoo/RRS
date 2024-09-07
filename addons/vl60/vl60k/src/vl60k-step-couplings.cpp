@@ -8,11 +8,11 @@ void VL60k::preStepCouplings(double t)
     (void) t;
 
     // Координата и скорость переднего сцепного устройства (по оси сцепления)
-    coupling_fwd->setCoord(railway_coord + dir * orient * length / 2.0);
+    coupling_fwd->setCoord(train_coord + dir * orient * length / 2.0);
     coupling_fwd->setVelocity(dir * orient * velocity);
 
     // Координата и скорость заднего сцепного устройства (по оси сцепления)
-    coupling_bwd->setCoord(railway_coord - dir * orient * length / 2.0);
+    coupling_bwd->setCoord(train_coord - dir * orient * length / 2.0);
     coupling_bwd->setVelocity(dir * orient * velocity);
 }
 

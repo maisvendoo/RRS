@@ -65,15 +65,21 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
         // Читаем начальную и конечную точки
         dvec3 p0;
+        double railway_coord0;
 
-        ss_begin >> p0.x >> p0.y >> p0.z;
+        ss_begin >> p0.x >> p0.y >> p0.z >> railway_coord0;
 
         dvec3 p1;
+        double railway_coord1;
 
-        ss_end >> p1.x >> p1.y >> p1.z;
+        ss_end >> p1.x >> p1.y >> p1.z >> railway_coord1;
 
         // Конструируем трек
         track_t track(p0, p1);
+
+        // Железнодорожный пикетаж
+        track.railway_coord0 = railway_coord0;
+        track.railway_coord1 = railway_coord1;
 
         // Обновляем траекторную координату начала трека
         track.traj_coord = len;
@@ -176,16 +182,63 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 
     double dir = static_cast<double>(direction);
 
-    pp.curvature = calc_curvature(cur_track, next_track);
-
     pp.position = cur_track.begin_point +
                   cur_track.orth * (traj_coord - cur_track.traj_coord);
 
-
     pp.inclination = cur_track.inclination * dir;
 
-    // Относительное перемещение вдоль текущего трека
+    // Относительное перемещение вдоль текущего трека от 0.0 до 1.0
     double rel_motion = (traj_coord - cur_track.traj_coord) / cur_track.len;
+    // Железнодорожный пикетаж
+    pp.railway_coord = cur_track.railway_coord0 +
+        rel_motion * (cur_track.railway_coord1 - cur_track.railway_coord0);
+
+    // Поворачиваем ориентацию к соседнему треку
+    if (cur_track.len < 30.0)
+    {
+        // На треках короче 30 метров поворачиваем неперерывно
+        // Плавное изменение кривизны от угла с предыдущем треком к углу со следующим
+        pp.curvature = (1.0 - rel_motion) * calc_curvature(prev_track, cur_track) +
+                       rel_motion * calc_curvature(cur_track, next_track);
+    }
+    else
+    {
+        // Треки длиннее 30 метров считаем прямыми в середине
+        // Поворачиваем на первых и последних 15 метрах
+        double track_coord = traj_coord - cur_track.traj_coord;
+        if (track_coord < 15.0)
+        {
+            // Поворачиваем на первых 15 метрах
+            // rel_motion от 0.0 до 0.5
+            rel_motion = track_coord / 30.0;
+            // Плавное изменение кривизны от угла с предыдущем треком к нулю
+            double curv = (1.0 - track_coord / 15.0) *
+                          calc_curvature(prev_track, cur_track);
+            pp.curvature = (curv > 1e-5) ? curv : 0.0;
+        }
+        else
+        {
+            if (track_coord > (cur_track.len - 15.0))
+            {
+                // Поворачиваем на последних 15 метрах
+                // rel_motion от 0.5 до 1.0
+                rel_motion = 1.0 - (cur_track.len - track_coord) / 30.0;
+                // Плавное изменение кривизны от нуля к углу со следующим треком
+                double curv = ((15.0 + track_coord - cur_track.len) / 15.0) *
+                              calc_curvature(cur_track, next_track);
+                pp.curvature = (curv > 1e-5) ? curv : 0.0;
+            }
+            else
+            {
+                // В середине длинного трека движемся вдоль него
+                pp.curvature = 0.0;
+                pp.orth = cur_track.orth * dir;
+                pp.right = cur_track.trav * dir;
+                pp.up = cur_track.up;
+                return pp;
+            }
+        }
+    }
 
     if (rel_motion < 0.5)
     {
@@ -204,8 +257,7 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 
         return pp;
     }
-
-    if (rel_motion >= 0.5)
+    else
     {
         pp.orth = cur_track.orth * (1.5 - rel_motion) * dir;
         pp.orth += next_track.orth * (rel_motion - 0.5) * dir;
@@ -222,8 +274,6 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 
         return pp;
     }
-
-    return pp;
 }
 
 //------------------------------------------------------------------------------
@@ -472,39 +522,42 @@ void Trajectory::findTracks(double traj_coord,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Trajectory::calc_curvature(track_t &cur_track, track_t &next_track)
+double Trajectory::calc_curvature(track_t &track0, track_t &track1)
 {
     double curvature = 0.0;
 
-    double A0 = cur_track.orth.x;
-    double B0 = cur_track.orth.y;
+    // Направление первого трека
+    double A0 = track0.orth.x;
+    double B0 = track0.orth.y;
 
-    // Центр текущего трека
-    dvec3 S0 = (cur_track.begin_point + cur_track.end_point) * 0.5;
-
-    double D0 = A0 * S0.x + B0 * S0.y;
-
-    double A1 = next_track.orth.x;
-    double B1 = next_track.orth.y;
-
-    // Центр следующего трека
-    dvec3 S1 = (next_track.begin_point + next_track.end_point) * 0.5;
-
-    double D1 = A1 * S1.x + B1 * S1.y;
+    // Направление второго трека
+    double A1 = track1.orth.x;
+    double B1 = track1.orth.y;
 
     double det = A0*B1 - A1*B0;
 
-    if ( qAbs(det) <= Physics::ZERO )
+    // Если треки параллельны - кривизна нулевая
+    if ( qAbs(det) < 1e-5 )
     {
+        //Journal::instance()->info(QString("det=%1 | curv=0.0").arg(det, 15, 'f', 12));
         return 0.0;
     }
+
+    // Центр первого трека
+    dvec3 S0 = - track0.orth * 0.5 * track0.len;
+    double D0 = A0 * S0.x + B0 * S0.y;
+
+    // Центр второго трека
+    dvec3 S1 = track1.orth * 0.5 * track1.len;
+    double D1 = A1 * S1.x + B1 * S1.y;
 
     double xC = (B0*D1 - B1*D0) / det;
     double yC = (A0*D1 - A1*D0) / det;
 
-    double rho = std::sqrt( std::pow(S0.x - xC, 2.0) + std::pow(S0.y - yC, 2.0) );
+    double rho = std::sqrt(xC * xC + yC * yC);
 
     curvature = 1 / rho;
 
+    //Journal::instance()->info(QString("det=%1 | curv=%2 | r=%3").arg(det, 15, 'f', 12).arg(curvature, 15, 'f', 12).arg(rho, 15, 'f', 1));
     return curvature;
 }

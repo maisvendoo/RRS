@@ -38,7 +38,7 @@ void VehicleController::setLength(double len)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleController::setRailwayCoord(double x)
+void VehicleController::setCoord(double x)
 {
     // Запоминаем предыдущее значение траекторной координаты
     double prev_coord = traj_coord;
@@ -120,7 +120,7 @@ void VehicleController::setRailwayCoord(double x)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleController::setInitRailwayCoord(double x)
+void VehicleController::setInitCoord(double x)
 {
     x_cur = x;
 }

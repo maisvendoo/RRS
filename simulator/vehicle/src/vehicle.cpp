@@ -46,8 +46,7 @@ Vehicle::Vehicle(QObject *parent) : QObject(parent)
   , F_bwd(0.0)
   , F_g(0.0)
   , s(1)
-  , railway_coord0(0.0)
-  , railway_coord(0.0)
+  , train_coord(0.0)
   , velocity(0.0)
   , b0(0.0)
   , b1(0.0)
@@ -223,9 +222,9 @@ void Vehicle::setPayloadCoeff(double payload_coeff)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setRailwayCoord(double value)
+void Vehicle::setTrainCoord(double value)
 {
-    railway_coord0 = railway_coord = value;
+    train_coord = value;
 }
 
 //------------------------------------------------------------------------------
@@ -380,9 +379,9 @@ double Vehicle::getWheelDiameter(size_t i) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Vehicle::getRailwayCoord() const
+double Vehicle::getTrainCoord() const
 {
-    return railway_coord;
+    return train_coord;
 }
 
 //------------------------------------------------------------------------------
@@ -618,7 +617,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 void Vehicle::integrationPreStep(state_vector_t &Y, double t)
 {
-    railway_coord = Y[idx];
+    train_coord = Y[idx];
     velocity = dir * orient * Y[idx + s];
 
     // Calculate gravity force from profile inclination
@@ -642,8 +641,6 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
             axis_load[i] = weight / static_cast<double>(num_axis);
         }
     }
-
-    emit sendCoord(railway_coord + dir * length / 2.0);
 
     preStep(t);
 }

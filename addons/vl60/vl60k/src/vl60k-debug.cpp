@@ -10,7 +10,7 @@ void VL60k::debugPrint(double t, double dt)
 
     DebugMsg = "";
     DebugMsg += QString("x%1 km|V%2 km/h|")
-                    .arg(railway_coord / 1000.0, 8, 'f', 3)
+                    .arg(profile_point_data.railway_coord / 1000.0, 10, 'f', 3)
                     .arg(velocity * Physics::kmh, 6, 'f', 1);
     DebugMsg += QString("pBP%1|pBC%2|pSR%3|")
                     .arg(10.0 * brakepipe->getPressure(), 6, 'f', 2)
@@ -35,11 +35,11 @@ void VL60k::debugPrint(double t, double dt)
                     .arg(hose_bp_fwd->isConnected())
                     .arg(hose_bp_bwd->isConnected());
 
-    DebugMsg += QString("| Curvature: %1").arg(profile_point_data.curvature);
+    DebugMsg += QString("| Curvature: %1").arg(profile_point_data.curvature, 8, 'f', 6);
 
     if (profile_point_data.curvature > Physics::ZERO)
     {
-        DebugMsg += QString("| Radius: %1").arg(1 / profile_point_data.curvature);
+        DebugMsg += QString("| Radius: %1").arg(1.0 / profile_point_data.curvature, 8, 'f', 1);
     }
     else
     {
@@ -47,7 +47,11 @@ void VL60k::debugPrint(double t, double dt)
     }
 
     DebugMsg += QString("\n");
-    DebugMsg += QString("Traj coord at +10.0m:%1").arg(speedmap_fwd->getCurrentLimit(), 8, 'f', 1);
+    DebugMsg += QString("Traj coord at +%1m:%2")
+                    .arg(length / 2.0, 4, 'f', 1)
+                    .arg(speedmap_fwd->getCurrentLimit(), 8, 'f', 1);
     DebugMsg += QString(" | ");
-    DebugMsg += QString("Traj coord at -10.0m:%1").arg(speedmap_bwd->getCurrentLimit(), 8, 'f', 1);
+    DebugMsg += QString("Traj coord at -%1m:%2")
+                    .arg(length / 2.0, 4, 'f', 1)
+                    .arg(speedmap_bwd->getCurrentLimit(), 8, 'f', 1);
 }

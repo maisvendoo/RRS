@@ -62,7 +62,7 @@ profile_point_t Profile::getElement(double railway_coord, int dir)
         double motion = railway_coord - track.railway_coord;
         dvec3 horizontal_orth = normalize(dvec3(track.orth.x, track.orth.y, 0.0));
 
-        profile_point.ordinate = track.ordinate + motion;
+        profile_point.railway_coord = track.ordinate + motion;
         profile_point.position = track.begin_point + horizontal_orth * motion;
         profile_point.orth = horizontal_orth * static_cast<double>(dir);
         profile_point.right = track.right;
@@ -77,7 +77,7 @@ profile_point_t Profile::getElement(double railway_coord, int dir)
         double motion = railway_coord - track.railway_coord;
         dvec3 horizontal_orth = normalize(dvec3(track.orth.x, track.orth.y, 0.0));
 
-        profile_point.ordinate = track.ordinate + motion;
+        profile_point.railway_coord = track.ordinate + motion;
         profile_point.position = track.begin_point + horizontal_orth * motion;
         profile_point.orth = horizontal_orth * static_cast<double>(dir);
         profile_point.right = track.right;
@@ -107,7 +107,7 @@ profile_point_t Profile::getElement(double railway_coord, int dir)
     double motion = railway_coord - track.railway_coord;
     double relative_motion = motion / track.length;
 
-    profile_point.ordinate = track.ordinate + motion;
+    profile_point.railway_coord = track.ordinate + motion;
     profile_point.inclination = track.inclination * static_cast<double>(dir);
     profile_point.curvature = track.curvature;
     profile_point.position = track.begin_point + track.orth * motion;

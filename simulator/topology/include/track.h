@@ -38,6 +38,12 @@ struct track_t
     /// Координата на траектории, соответствующая началу данного трека
     double traj_coord = 0.0;
 
+    /// Железнодорожный пикетаж в точке начала данного трека
+    double railway_coord0 = 0.0;
+
+    /// Железнодорожный пикетаж в точке конца данного трека
+    double railway_coord1 = 0.0;
+
     track_t()
     {
 
@@ -74,7 +80,7 @@ struct track_t
         QDataStream stream(&data);
 
         stream << begin_point.x << begin_point.y << begin_point.z
-               <<end_point.x << end_point.y << end_point.z
+               << end_point.x << end_point.y << end_point.z
                << orth.x << orth.y << orth.z
                << trav.x << trav.y << trav.z
                << up.x << up.y << up.z

@@ -10,7 +10,7 @@ void PassCar::stepDebugMsg(double t, double dt)
 
     DebugMsg = "";
     DebugMsg += QString("x%1 km|V%2 km/h|")
-                    .arg(railway_coord / 1000.0, 8, 'f', 3)
+                    .arg(profile_point_data.railway_coord / 1000.0, 10, 'f', 3)
                     .arg(velocity * Physics::kmh, 6, 'f', 1);
     DebugMsg += QString("pBP%1|pBC%2|pSR%3|")
                     .arg(10.0 * brakepipe->getPressure(), 6, 'f', 2)
