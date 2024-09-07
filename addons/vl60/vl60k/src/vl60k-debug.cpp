@@ -34,4 +34,20 @@ void VL60k::debugPrint(double t, double dt)
                     .arg(anglecock_bp_bwd->isOpened())
                     .arg(hose_bp_fwd->isConnected())
                     .arg(hose_bp_bwd->isConnected());
+
+    DebugMsg += QString("| Curvature: %1").arg(profile_point_data.curvature);
+
+    if (profile_point_data.curvature > Physics::ZERO)
+    {
+        DebugMsg += QString("| Radius: %1").arg(1 / profile_point_data.curvature);
+    }
+    else
+    {
+        DebugMsg += QString("| Radius: inf");
+    }
+
+    DebugMsg += QString("\n");
+    DebugMsg += QString("Traj coord at +10.0m:%1").arg(speedmap_fwd->getCurrentLimit(), 8, 'f', 1);
+    DebugMsg += QString(" | ");
+    DebugMsg += QString("Traj coord at -10.0m:%1").arg(speedmap_bwd->getCurrentLimit(), 8, 'f', 1);
 }

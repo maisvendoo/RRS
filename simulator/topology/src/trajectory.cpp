@@ -1,7 +1,7 @@
 #include    <trajectory.h>
 #include    <connector.h>
 
-#include    <QDir>
+#include    <filesystem.h>
 
 #include    <fstream>
 #include    <Journal.h>
@@ -86,6 +86,14 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
 
     // Заполняем имя траектории (по имени файла, где она хранится)
     name = traj_name;
+
+    // Пока для теста грузим модуль путевой инфраструктуры с картой скоростей напрямую
+    FileSystem &fs = FileSystem::getInstance();
+    QString traj_speedmap_path = QString(fs.getModulesDir().c_str()) +
+                                    QDir::separator() +
+                                    "trajectory-speedmap";
+    TrajectoryDevice *traj_speedmap = loadTrajectoryDevice(traj_speedmap_path);
+    devices.push_back(traj_speedmap);
 
     return true;
 }

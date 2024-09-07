@@ -81,6 +81,8 @@ void VL60k::initialization()
 
     initTractionControl(modules_dir, custom_cfg_dir);
 
+    initSafetyDevices(modules_dir, custom_cfg_dir);
+
     initOtherEquipment(modules_dir, custom_cfg_dir);
 
     initTriggers();
@@ -125,7 +127,7 @@ void VL60k::step(double t, double dt)
 
     stepSoundSignalsOutput(t, dt);
 
-    stepSignalsOutput();
+    stepSignalsOutput(t, dt);
 
     debugPrint(t, dt);
 

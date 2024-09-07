@@ -298,6 +298,11 @@ private:
     /// Линейные контакторы ТЭД
     std::array<Trigger, NUM_MOTORS> line_contactor;
 
+    /// Ограничения скорости на путевой инфраструктуре для кабины А
+    SpeedMap    *speedmap_fwd;
+    /// Ограничения скорости на путевой инфраструктуре для кабины Б
+    SpeedMap    *speedmap_bwd;
+
     /// Локомотивный скоростемер
     SL2M    *speed_meter;
 
@@ -341,6 +346,9 @@ private:
 
     /// Инициализация схемы управления тягой
     void initTractionControl(const QString &modules_dir, const QString &custom_cfg_dir);
+
+    /// Инициализация приборов безопасности
+    void initSafetyDevices(const QString &modules_dir, const QString &custom_cfg_dir);
 
     void initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
 
@@ -392,9 +400,10 @@ private:
 
     float isLineContactorsOff();
 
-    void stepSignalsOutput();
+    void stepSignalsOutput(double t, double dt);
 
-    void stepDecodeAlsn();
+    /// Моделирование приборов безопасности
+    void stepSafetyDevices(double t, double dt);
 
     double getTractionForce();
 

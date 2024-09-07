@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepSignalsOutput()
+void VL60pk::stepSignalsOutput(double t, double dt)
 {
     // Состояние токоприемников
     analogSignal[PANT1_POS] = static_cast<float>(pantographs[0]->getHeight());
@@ -40,7 +40,7 @@ void VL60pk::stepSignalsOutput()
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
 
     // Состояние локомотивного светофора
-    stepDecodeAlsn();
+    stepSafetyDevices(t, dt);
 
     // Состояние контрольных ламп
     analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();

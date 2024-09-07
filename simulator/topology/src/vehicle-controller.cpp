@@ -261,7 +261,7 @@ void VehicleController::updateTrajectories()
                 break;
         }
 
-        while (vehicle_end < 0.0)
+        while (veh_device.coord < 0.0)
         {
             Connector *conn = next_traj->getBwdConnector();
             if (conn == Q_NULLPTR)

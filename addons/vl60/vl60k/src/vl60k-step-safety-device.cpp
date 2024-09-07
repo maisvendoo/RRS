@@ -1,10 +1,13 @@
-#include    "vl60pk.h"
+#include    "vl60k.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepDecodeAlsn()
+void VL60k::stepSafetyDevices(double t, double dt)
 {
+    (void) t;
+    (void) dt;
+
     analogSignal[LS_W] = 0.0f;
     analogSignal[LS_YK] = 0.0f;
     analogSignal[LS_R] = 0.0f;

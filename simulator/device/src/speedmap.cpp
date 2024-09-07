@@ -12,9 +12,9 @@ SpeedMap::SpeedMap(QObject *parent) : Device(parent)
     input_signals.resize(SIZE_OF_OUTPUTS);
     output_signals.resize(SIZE_OF_INPUTS);
 
-    output_signals[OUTPUT_TRAJECTORY_COORD] = 0.0;
     output_signals[OUTPUT_SEARCH_DIRECTION] = 1.0;
-    output_signals[OUTPUT_SEARCH_DISTANCE] = 3000.0;
+    output_signals[OUTPUT_CUR_SEARCH_DISTANCE] = 50.0;
+    output_signals[OUTPUT_NEXT_SEARCH_DISTANCE] = 3000.0;
     input_signals[INPUT_CURRENT_LIMIT] = 300.0;
     input_signals[INPUT_NEXT_LIMIT] = 300.0;
     input_signals[INPUT_NEXT_DISTANCE] = 3000.0;
@@ -31,14 +31,6 @@ SpeedMap::~SpeedMap()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SpeedMap::setCoord(double coord)
-{
-    output_signals[OUTPUT_TRAJECTORY_COORD] = coord;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void SpeedMap::setDirection(int direction)
 {
     if (direction == 1)
@@ -50,9 +42,17 @@ void SpeedMap::setDirection(int direction)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void SpeedMap::setCurrentSearchDistance(double distance)
+{
+    output_signals[OUTPUT_CUR_SEARCH_DISTANCE] = distance;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SpeedMap::setNextSearchDistance(double distance)
 {
-    output_signals[OUTPUT_SEARCH_DISTANCE] = distance;
+    output_signals[OUTPUT_NEXT_SEARCH_DISTANCE] = distance;
 }
 
 //------------------------------------------------------------------------------
@@ -123,5 +123,5 @@ void SpeedMap::load_config(CfgReader &cfg)
 
     double tmp = 3000.0;
     cfg.getDouble(secName, "SearchDistance", tmp);
-    output_signals[OUTPUT_SEARCH_DISTANCE] = tmp;
+    output_signals[OUTPUT_NEXT_SEARCH_DISTANCE] = tmp;
 }

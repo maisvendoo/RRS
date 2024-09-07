@@ -87,10 +87,6 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
 {
     (void) modules_dir;
 
-    speed_meter = new SL2M();
-    speed_meter->setWheelDiameter(wheel_diameter[0]);
-    speed_meter->read_config("3SL-2M", custom_cfg_dir);
-
     horn = new TrainHorn();
     horn->read_config("train-horn");
 

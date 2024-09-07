@@ -36,6 +36,7 @@
 #include    "relay.h"
 #include    "reservoir.h"
 #include    "sanding-system.h"
+#include    "speedmap.h"
 #include    "switcher.h"
 #include    "time-relay.h"
 #include    "traction-controller.h"

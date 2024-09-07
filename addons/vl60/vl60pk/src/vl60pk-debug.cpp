@@ -42,4 +42,9 @@ void VL60pk::debugPrint(double t, double dt)
     {
         DebugMsg += QString("| Radius: inf");
     }
+
+    DebugMsg += QString("\n");
+    DebugMsg += QString("Traj coord at +10.0m:%1").arg(speedmap_fwd->getCurrentLimit(), 8, 'f', 1);
+    DebugMsg += QString(" | ");
+    DebugMsg += QString("Traj coord at -10.0m:%1").arg(speedmap_bwd->getCurrentLimit(), 8, 'f', 1);
 }

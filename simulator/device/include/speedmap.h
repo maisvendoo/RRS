@@ -16,12 +16,12 @@ public:
     /// Деструктор
     ~SpeedMap();
 
-    /// Задать текущую координату на траектории в топологии
-    void setCoord(double coord);
-
     /// Задать направление поиска следующего ограничения:
     /// 1 - вперёд по траектории, -1 - назад  по траектории
     void setDirection(int direction);
+
+    /// Задать дистанцию для поиска минимального текущего ограничения (длину поезда), м
+    void setCurrentSearchDistance(double distance);
 
     /// Задать дистанцию поиска следующего ограничения, м
     void setNextSearchDistance(double distance);
@@ -41,9 +41,9 @@ public:
     {
         SIZE_OF_OUTPUTS = 3,        ///< Размер массива исходящих сигналов
 
-        OUTPUT_TRAJECTORY_COORD = 0,///< Текущая координата на траектории в топологии
-        OUTPUT_SEARCH_DIRECTION = 1,///< Направление поиска следующего ограничения
-        OUTPUT_SEARCH_DISTANCE = 2, ///< Дистанция поиска следующего ограничения, м
+        OUTPUT_SEARCH_DIRECTION = 0,    ///< Направление поиска следующего ограничения
+        OUTPUT_CUR_SEARCH_DISTANCE = 1, ///< Дистанция поиска следующего ограничения, м
+        OUTPUT_NEXT_SEARCH_DISTANCE = 2,///< Дистанция поиска следующего ограничения, м
 
         SIZE_OF_INPUTS = 3,         ///< Размер массива входящих сигналов
 
