@@ -35,7 +35,8 @@
 #define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     FILE_START_POINT std::string("waypoints.conf")
 #define     FILE_STATIONS    std::string("stations.conf")
-#define     FILE_EXTENTION   std::string(".traj")
+#define     FILE_SPEEDMAP    std::string("speedmap.xml")
+#define     FILE_TRAJ_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
 #define     DELIMITER_SYMBOL char('\t')
 #define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
@@ -97,6 +98,8 @@ private:
 
     start_point_data_t start_points;
 
+    speedmap_data_t   speedmap_data;
+
     std::vector<power_line_element_t> power_line1;
 
     std::vector<power_line_element_t> power_line2;
@@ -135,15 +138,15 @@ private:
 
     void writeStationsOld(const std::string &filename, const zds_start_km_data_t &waypoints);
 
-    bool readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data);
+    bool readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data, const int &dir);
 
-    bool readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speeds_data);
+    bool readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speeds_data, const int &dir);
 
-    void writeSpeeds(const std::string &filename, const zds_speeds_data_t &speeds_data);
+    void writeOldSpeeds(const std::string &filename, const zds_speeds_data_t &speeds_data);
 
-    bool readSvetoforDAT(const std::string &path, zds_signals_data_t &signals_data);
+    bool readSvetoforDAT(const std::string &path, zds_signals_data_t &signals_data, const int &dir);
 
-    bool readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data);
+    bool readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data, const int &dir);
 
     bool readBranchTracksDAT(const std::string &path, const int &dir);
 
@@ -171,6 +174,8 @@ private:
 
     void findStartPointsBySignals(const route_connectors_t &connectors);
 
+    bool createSpeedMap();
+
     void writeSplits(const route_connectors_t &connectors, const int &dir);
 
     void writeTopologyTrajectory(const trajectory_t* trajectory);
@@ -180,6 +185,8 @@ private:
     void writeStartPoints(const start_point_data_t &start_points);
 
     void writeStations(const zds_start_km_data_t &waypoints);
+
+    void writeSpeedmap();
 };
 
 #endif // CONVERTER_H

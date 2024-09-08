@@ -123,6 +123,12 @@ struct start_point_t
     double      railway_coord = 0.0;
 
     double station_id = 0;
+
+    start_point_t()
+    {
+
+    }
+
     static bool compare_by_direction(const start_point_t* left, const start_point_t* right)
     {
         return (*left).direction < (*right).direction;
@@ -136,6 +142,40 @@ struct start_point_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef std::vector<start_point_t*>   start_point_data_t;
+typedef std::vector<start_point_t *>   start_point_data_t;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct speed_element_t
+{
+    int         limit = 0;
+    double      railway_coord_begin = 0.0;
+    double      railway_coord_end = 0.0;
+
+    speed_element_t()
+    {
+
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct speedmap_t
+{
+    std::vector<std::string> trajectories_names = {};
+    std::vector<speed_element_t> speedmap_elements = {};
+
+    speedmap_t()
+    {
+
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+typedef std::vector<speedmap_t *>   speedmap_data_t;
 
 #endif // TRAJECTORY_STRUCT_H

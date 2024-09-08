@@ -14,7 +14,7 @@ struct zds_signals_t
     std::string liter = "";
     std::string special = "";
 
-    double  trajectory_coord = 0.0;
+    double  route_coord = 0.0;
 
     static bool compare_by_track_id(const zds_signals_t left, const zds_signals_t right)
     {

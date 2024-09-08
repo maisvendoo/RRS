@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readSvetoforDAT(const std::string &path, zds_signals_data_t &signals_data)
+bool ZDSimConverter::readSvetoforDAT(const std::string &path, zds_signals_data_t &signals_data, const int &dir)
 {
     if (path.empty())
         return false;
@@ -21,14 +21,15 @@ bool ZDSimConverter::readSvetoforDAT(const std::string &path, zds_signals_data_t
     }
 
     QTextStream stream(&data);
-    return readSvetoforDAT(stream, signals_data);
+    return readSvetoforDAT(stream, signals_data, dir);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data)
+bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data, const int &dir)
 {
+    zds_trajectory_data_t* td = dir > 0 ? &tracks_data1 : &tracks_data2;
     while (!stream.atEnd())
     {
         QString line = stream.readLine();
@@ -40,7 +41,7 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
 
         bool is_valid_value = false;
         int id_value = tokens[0].toInt(&is_valid_value);
-        if ((!is_valid_value) || (id_value < 0) || (static_cast<size_t>(id_value) > tracks_data1.size()) || (tokens.size() < 2))
+        if ((!is_valid_value) || (id_value < 1) || (static_cast<size_t>(id_value) > (*td).size()) || (tokens.size() < 2))
             continue;
 
         zds_signals_t signal;
@@ -51,7 +52,7 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
         if (tokens.size() > 3)
             signal.special = tokens[3].toStdString();
 
-        signal.trajectory_coord = tracks_data1[signal.track_id].route_coord;
+        signal.route_coord = (*td)[signal.track_id].route_coord;
 
         signals_data.push_back(signal);
     }

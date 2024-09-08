@@ -12,8 +12,11 @@ struct zds_speeds_t
     size_t  end_track_id = 0;
     double  limit = 120.0;
 
-    double  begin_trajectory_coord = 0.0;
-    double  end_trajectory_coord = 0.0;
+    double  begin_route_coord = 0.0;
+    double  end_route_coord = 0.0;
+
+    double  begin_railway_coord = 0.0;
+    double  end_railway_coord = 0.0;
 
     static bool compare_by_track_id(const zds_speeds_t left, const zds_speeds_t right)
     {

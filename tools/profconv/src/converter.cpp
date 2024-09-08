@@ -188,11 +188,6 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     std::string traj_file1 = "route1.trj";
     std::string traj_file2 = "route2.trj";
-    std::string branch_traj_prefix1 = "branch1_";
-    std::string branch_traj_prefix2 = "branch2_";
-    std::string branch_2minus2_prefix = "branch2m2_";
-    std::string branch_2plus2_prefix = "branch2p2_";
-    std::string traj_ext = ".trj";
 
     std::string waypoints_file = "waypoints.conf";
     std::string stations_file = "stations.conf";
@@ -212,12 +207,12 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         readRouteMAP(map_path, route_map_data);
         findNeutralInsertions(neutral_insertions);
 
-        readSpeedsDAT(speeds1_path, speeds_data1);
-        readSvetoforDAT(signals1_path, signals_data1);
+        readSpeedsDAT(speeds1_path, speeds_data1, dir);
+        readSvetoforDAT(signals1_path, signals_data1, dir);
         readBranchTracksDAT(branch1_path, dir);
 
         // Создание старого формата ЭК скоростей speeds1.conf отключено
-        //writeSpeeds(speeds1_file, speeds_data1);
+        //writeOldSpeeds(speeds1_file, speeds_data1);
     }
 
     if (is_1 && is_2)
@@ -226,12 +221,12 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         // Создание profile.conf отключено, симулятор сам читает route2.trk
         //writeProfileData(tracks_data2, "profile2.conf");
 
-        readSpeedsDAT(speeds2_path, speeds_data2);
-        readSvetoforDAT(signals2_path, signals_data2);
+        readSpeedsDAT(speeds2_path, speeds_data2, dir);
+        readSvetoforDAT(signals2_path, signals_data2, dir);
         readBranchTracksDAT(branch2_path, dir);
 
         // Создание старого формата ЭК скоростей speeds2.conf отключено
-        //writeSpeeds(speeds2_file, speeds_data2);
+        //writeOldSpeeds(speeds2_file, speeds_data2);
     }
 
     if (is_1)
@@ -363,6 +358,11 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
         // Координаты центральных точек станций
         writeStations(start_km_data);
+    }
+
+    if (createSpeedMap())
+    {
+        writeSpeedmap();
     }
 
     return true;

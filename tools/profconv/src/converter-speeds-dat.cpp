@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data)
+bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data, const int &dir)
 {
     if (path.empty())
         return false;
@@ -21,14 +21,15 @@ bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &s
     }
 
     QTextStream stream(&data);
-    return readSpeedsDAT(stream, speeds_data);
+    return readSpeedsDAT(stream, speeds_data, dir);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speeds_data)
+bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speeds_data, const int &dir)
 {
+    zds_trajectory_data_t* td = dir > 0 ? &tracks_data1 : &tracks_data2;
     while (!stream.atEnd())
     {
         QString line = stream.readLine();
@@ -43,12 +44,12 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 
         bool is_valid_value = false;
         int begin_id_value = tokens[0].toInt(&is_valid_value);
-        if ((!is_valid_value) || (begin_id_value < 1) || (static_cast<size_t>(begin_id_value) > tracks_data1.size()))
+        if ((!is_valid_value) || (begin_id_value < 1) || (static_cast<size_t>(begin_id_value) > (*td).size()))
             continue;
 
         is_valid_value = false;
         int end_id_value = tokens[1].toInt(&is_valid_value);
-        if ((!is_valid_value) || (end_id_value < 1) || (static_cast<size_t>(end_id_value) > tracks_data1.size()))
+        if ((!is_valid_value) || (end_id_value < 1) || (static_cast<size_t>(end_id_value) > (*td).size()))
             continue;
 
         is_valid_value = false;
@@ -61,9 +62,12 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         speed_point.end_track_id = std::max(begin_id_value, end_id_value) - 1;
         speed_point.limit = limit_value;
 
-        speed_point.begin_trajectory_coord = tracks_data1[speed_point.begin_track_id].route_coord;
-        speed_point.end_trajectory_coord = tracks_data1[speed_point.end_track_id].route_coord +
-                                           tracks_data1[speed_point.end_track_id].length;
+        speed_point.begin_route_coord = (*td)[speed_point.begin_track_id].route_coord;
+        speed_point.end_route_coord = (*td)[speed_point.end_track_id].route_coord +
+                                           (*td)[speed_point.end_track_id].length;
+
+        speed_point.begin_railway_coord = (*td)[speed_point.begin_track_id].railway_coord;
+        speed_point.end_railway_coord = (*td)[speed_point.end_track_id].railway_coord_end;
 
         speeds_data.push_back(speed_point);
     }
@@ -78,7 +82,16 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::writeSpeeds(const std::string &filename, const zds_speeds_data_t &speeds_data)
+bool ZDSimConverter::createSpeedMap()
+{
+    // TODO
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::writeOldSpeeds(const std::string &filename, const zds_speeds_data_t &speeds_data)
 {
     std::string path = compinePath(toNativeSeparators(routeDir), filename);
 
@@ -95,7 +108,7 @@ void ZDSimConverter::writeSpeeds(const std::string &filename, const zds_speeds_d
 
     for (auto it = speeds_data.begin(); it != speeds_data.end(); ++it)
     {
-        stream << (*it).begin_trajectory_coord << ";"
+        stream << (*it).begin_route_coord << ";"
                << (*it).limit << "\n";
     }
 
