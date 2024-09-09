@@ -44,13 +44,17 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 
         bool is_valid_value = false;
         int begin_id_value = tokens[0].toInt(&is_valid_value);
-        if ((!is_valid_value) || (begin_id_value < 1) || (static_cast<size_t>(begin_id_value) > (*td).size()))
+        if ((!is_valid_value) || (begin_id_value < 0) || (static_cast<size_t>(begin_id_value) > (*td).size()))
             continue;
+        if (begin_id_value == 0)
+            begin_id_value = 1;
 
         is_valid_value = false;
         int end_id_value = tokens[1].toInt(&is_valid_value);
-        if ((!is_valid_value) || (end_id_value < 1) || (static_cast<size_t>(end_id_value) > (*td).size()))
+        if ((!is_valid_value) || (end_id_value < 0) || (static_cast<size_t>(end_id_value) > (*td).size()))
             continue;
+        if (end_id_value == 0)
+            end_id_value = 1;
 
         is_valid_value = false;
         double limit_value = tokens[2].toDouble(&is_valid_value);
@@ -84,7 +88,95 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 //------------------------------------------------------------------------------
 bool ZDSimConverter::createSpeedMap()
 {
-    // TODO
+    // Карта скоростей для пути "туда"
+    if (speeds_data1.empty())
+        return false;
+
+    speedmap_t *speedmap1 = new speedmap_t();
+    // Пока просто запишем список траекторий по главному пути
+    for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
+    {
+        speedmap1->trajectories_names.push_back((*traj)->name);
+    }
+    // И список ограничений на интервалах жд-пикетажа
+    // !!!! Потом надо придумать обработку ситуаций,
+    // !!!! если жд-пикетаж меняется после узловых станций маршрута
+    for (auto zds_speed : speeds_data1)
+    {
+        speed_element_t speed_el = speed_element_t();
+        speed_el.limit = zds_speed.limit;
+        speed_el.railway_coord_begin = static_cast<int>(round(zds_speed.begin_railway_coord));
+        speed_el.railway_coord_end = static_cast<int>(round(zds_speed.end_railway_coord));
+        speedmap1->speedmap_elements.push_back(speed_el);
+    }
+    speedmap_data.push_back(speedmap1);
+
+    // Карта скоростей для пути "обратно"
+    if ((tracks_data2.empty()) || (speeds_data2.empty()))
+        return false;
+
+    speedmap_t *speedmap2 = new speedmap_t();
+    // Пока просто запишем список траекторий по главному пути
+    for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
+    {
+        speedmap2->trajectories_names.push_back((*traj)->name);
+    }
+    // И список ограничений на интервалах жд-пикетажа
+    // !!!! А ещё надо обработать однопутные участки
+    for (auto zds_speed : speeds_data2)
+    {
+        speed_element_t speed_el = speed_element_t();
+        speed_el.limit = zds_speed.limit;
+        speed_el.railway_coord_begin = static_cast<int>(round(zds_speed.begin_railway_coord));
+        speed_el.railway_coord_end = static_cast<int>(round(zds_speed.end_railway_coord));
+        speedmap2->speedmap_elements.push_back(speed_el);
+    }
+    speedmap_data.push_back(speedmap2);
+
+    // По всем боковым путям 40 км/ч
+    speedmap_t *branch_speedmap = new speedmap_t();
+    if (!branch_track_data1.empty())
+    {
+        for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
+        {
+            for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
+            {
+                branch_speedmap->trajectories_names.push_back((*traj)->name);
+            }
+        }
+    }
+    if (!branch_track_data2.empty())
+    {
+        for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
+        {
+            for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
+            {
+                branch_speedmap->trajectories_names.push_back((*traj)->name);
+            }
+        }
+    }
+    if (!branch_2minus2_data.empty())
+    {
+        for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
+        {
+            branch_speedmap->trajectories_names.push_back((*it)->trajectory.name);
+        }
+    }
+    if (!branch_2plus2_data.empty())
+    {
+        for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
+        {
+            branch_speedmap->trajectories_names.push_back((*it)->trajectory.name);
+        }
+    }
+    if (!branch_speedmap->trajectories_names.empty())
+    {
+        speed_element_t speed_el = speed_element_t();
+        speed_el.limit = 40;
+        branch_speedmap->speedmap_elements.push_back(speed_el);
+        speedmap_data.push_back(branch_speedmap);
+    }
+
     return true;
 }
 

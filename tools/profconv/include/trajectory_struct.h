@@ -149,9 +149,9 @@ typedef std::vector<start_point_t *>   start_point_data_t;
 //------------------------------------------------------------------------------
 struct speed_element_t
 {
-    int         limit = 0;
-    double      railway_coord_begin = 0.0;
-    double      railway_coord_end = 0.0;
+    int     limit = 0;
+    int     railway_coord_begin = -1;
+    int     railway_coord_end = 1000000000;
 
     speed_element_t()
     {

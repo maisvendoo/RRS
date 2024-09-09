@@ -251,9 +251,9 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         int dir = 1;
         std::sort(split_data1.begin(), split_data1.end(), split_zds_trajectory_t::compare_by_track_id);
         splitMainTrajectory(dir);
-        for (auto it = trajectories1.begin(); it != trajectories1.end(); ++it)
+        for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
         {
-            writeTopologyTrajectory(*it);
+            writeTopologyTrajectory(*traj);
         }
     }
     if (is_1 && is_2)
@@ -261,9 +261,9 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         int dir = -1;
         std::sort(split_data2.begin(), split_data2.end(), split_zds_trajectory_t::compare_by_track_id);
         splitMainTrajectory(dir);
-        for (auto it = trajectories2.begin(); it != trajectories2.end(); ++it)
+        for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
         {
-            writeTopologyTrajectory(*it);
+            writeTopologyTrajectory(*traj);
         }
     }
 
@@ -276,11 +276,10 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
         {
             ++num_trajectories;
-            zds_branch_track_t *branch_track = *it;
-            splitAndNameBranch(branch_track, dir, num_trajectories);
-            for (auto it = branch_track->trajectories.begin(); it != branch_track->trajectories.end(); ++it)
+            splitAndNameBranch(*it, dir, num_trajectories);
+            for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
             {
-                writeTopologyTrajectory(*it);
+                writeTopologyTrajectory(*traj);
             }
         }
     }
@@ -294,11 +293,10 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
         {
             ++num_trajectories;
-            zds_branch_track_t *branch_track = *it;
-            splitAndNameBranch(branch_track, dir, num_trajectories);
-            for (auto it = branch_track->trajectories.begin(); it != branch_track->trajectories.end(); ++it)
+            splitAndNameBranch(*it, dir, num_trajectories);
+            for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
             {
-                writeTopologyTrajectory(*it);
+                writeTopologyTrajectory(*traj);
             }
         }
     }
@@ -312,9 +310,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
         {
             ++num_trajectories;
-            zds_branch_2_2_t *branch_track = *it;
-            nameBranch22(branch_track, dir, num_trajectories);
-            writeTopologyTrajectory(&branch_track->trajectory);
+            nameBranch22(*it, dir, num_trajectories);
+            writeTopologyTrajectory(&((*it)->trajectory));
         }
     }
 
@@ -327,9 +324,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
         {
             ++num_trajectories;
-            zds_branch_2_2_t *branch_track = *it;
-            nameBranch22(branch_track, dir, num_trajectories);
-            writeTopologyTrajectory(&branch_track->trajectory);
+            nameBranch22(*it, dir, num_trajectories);
+            writeTopologyTrajectory(&((*it)->trajectory));
         }
     }
 /*

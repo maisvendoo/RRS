@@ -32,6 +32,9 @@
 #include    <fstream>
 #include    <QTextStream>
 
+#define     DIR_TOPOLOGY     std::string("topology")
+#define     DIR_TRAJECTORIES std::string("trajectories")
+#define     DIR_SPEEDMAP     std::string("trajectory-speedmap")
 #define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     FILE_START_POINT std::string("waypoints.conf")
 #define     FILE_STATIONS    std::string("stations.conf")
