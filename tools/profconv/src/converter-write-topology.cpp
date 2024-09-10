@@ -99,6 +99,7 @@ void ZDSimConverter::writeTopologyConnectors()
 
     CfgEditor editor;
     editor.openFileForWrite(QString(path.c_str()));
+    editor.setIndentationFormat(-1);
 
     size_t i = 0;
     // Соединения главного пути "туда" и однопутных участков

@@ -22,6 +22,7 @@ void ZDSimConverter::writeSpeedmap()
 
     CfgEditor editor;
     editor.openFileForWrite(QString(path.c_str()));
+    editor.setIndentationFormat(-1);
 
     for (auto speedmap_element : speedmap_data)
     {

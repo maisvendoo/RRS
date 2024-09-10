@@ -50,6 +50,9 @@ public:
     /// Закрыть файл по завершении записи
     void closeFileAfterWrite();
 
+    /// Задать формат отступа: число больше нуля - количество пробелов
+    /// или меньше нуля - количество табуляций
+    void setIndentationFormat(int numSpacesOrTabs);
 
     /// Редактировать файл
     void editFile(QString fileName,

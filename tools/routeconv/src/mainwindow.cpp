@@ -72,6 +72,7 @@ bool MainWindow::createDescriptionFile(QString title, QString description)
     CfgEditor editor;
 
     editor.openFileForWrite(routeDir + QDir::separator() + "description.xml");
+    editor.setIndentationFormat(-1);
 
     FieldsDataList flist;
     flist.append(QPair<QString, QString>("Title", title));
