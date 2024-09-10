@@ -67,6 +67,9 @@ struct split_zds_trajectory_t
         // Светофор
         SPLIT_SIGNAL_FWD = 9,
         SPLIT_SIGNAL_BWD = 10,
+
+        // Начало нового пикетажа
+        SPLIT_NEW_RAILWAY_COORD = 11
     };
 
     size_t track_id = 0;

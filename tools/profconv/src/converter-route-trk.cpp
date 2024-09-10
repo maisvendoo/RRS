@@ -108,7 +108,8 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
         zds_track_t cur_track = *it;
         if (cur_track.next_uid != -2)
         {
-            zds_track_t next_track = tmp_data.at(static_cast<size_t>(cur_track.next_uid - 1));
+            size_t next_id = static_cast<size_t>(cur_track.next_uid - 1);
+            zds_track_t next_track = tmp_data.at(next_id);
             cur_track.end_point = next_track.begin_point;
             cur_track.railway_coord_end = static_cast<double>(next_track.ordinate);
             *it = next_track;
@@ -148,13 +149,39 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
             }
             else
             {
+                // Проверяем случай перехода на участок с новым пикетажем:
+                // сравниваем увеличение пикетажа на длину данного трека и
+                // сохранённую в railway_coord_end пикет следующего трека
+                double coord_end = railway_coord_recalc_begin +
+                                   trajectory_recalc_length +
+                                   cur_track.length * coord_increase_direction;
+                if (abs(coord_end - cur_track.railway_coord_end) > 250.0)
+                {
+                    // Если разница велика, считаем,
+                    // что со следующего трека начался новый пикетаж
+                    size_t next_id = static_cast<size_t>(cur_track.next_uid - 1);
+                    tmp_data.at(next_id).is_new_railway_coord = true;
+
+                    // Определяем направление увеличения координаты
+                    // на новом пикетаже: если начался с нуля - будет возрастать
+                    ((cur_track.railway_coord_end) < 1111.0) ?
+                        coord_increase_direction = 1.0 :
+                        coord_increase_direction = -1.0;
+
+                    // Пикетаж текущего трека заканчиваем
+                    // уже посчитанным добавлением длины трека
+                    cur_track.railway_coord_end = coord_end;
+                }
+                else
+                {
+                    // Определяем направление увеличения координаты
+                    ((cur_track.railway_coord_end - railway_coord_recalc_begin) > 0) ?
+                        coord_increase_direction = 1.0 :
+                        coord_increase_direction = -1.0;
+                }
                 // Вне дробных подтреков сбрасываем счётчик
                 railway_coord_recalc_count = 0;
                 trajectory_recalc_length = 0.0;
-                // И определяем направление увеличения координаты
-                ((cur_track.railway_coord_end - railway_coord_recalc_begin) > 0) ?
-                    coord_increase_direction = 1.0 :
-                    coord_increase_direction = -1.0;
             }
         }
         else

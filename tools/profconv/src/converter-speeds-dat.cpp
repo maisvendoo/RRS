@@ -58,7 +58,7 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 
         is_valid_value = false;
         double limit_value = tokens[2].toDouble(&is_valid_value);
-        if ((!is_valid_value) || (limit_value < 0.0))
+        if ((!is_valid_value) || (limit_value < 1.0))
             continue;
         // В некоторых маршрутах встречается ограничение скорости
         // меньше на 1-3 км/ч для обхода механик ZDS,

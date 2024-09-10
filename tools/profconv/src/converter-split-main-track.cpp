@@ -179,7 +179,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             }
             for (auto branch : branch_track_data2)
             {
-                if (branch->id_begin_at_other == id)
+                if (branch->id_end_at_other == id)
                 {
                     is_branch = true;
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
@@ -209,7 +209,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             }
             for (auto branch : branch_track_data2)
             {
-                if (branch->id_end_at_other == id + 1)
+                if (branch->id_begin_at_other == id + 1)
                 {
                     is_branch = true;
 
@@ -234,6 +234,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 addOrCreateSplit(split_data1, split_at_next);
             }
 
+            // Разделяем возле светофоров для выделения блок-участков
             for (auto s_it = signals_data1.begin(); s_it != signals_data1.end(); ++s_it)
             {
                 if ((*s_it).track_id == id)
@@ -243,6 +244,12 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                     split.signal_fwd_liter = (*s_it).liter;
                     break;
                 }
+            }
+
+            // Разделяем, где начинается новый пикетаж
+            if (track.is_new_railway_coord)
+            {
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
             }
 
             if (!split.split_type.empty())
@@ -277,7 +284,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             }
             for (auto branch : branch_track_data1)
             {
-                if (branch->id_end_at_other == id)
+                if (branch->id_begin_at_other == id)
                 {
                     is_branch = true;
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
@@ -315,7 +322,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             }
             for (auto branch : branch_track_data1)
             {
-                if (branch->id_begin_at_other == id + 1)
+                if (branch->id_end_at_other == id + 1)
                 {
                     is_branch = true;
 
@@ -356,6 +363,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 }
             }
 
+            // Разделяем возле светофоров для выделения блок-участков
             for (auto s_it = signals_data2.begin(); s_it != signals_data2.end(); ++s_it)
             {
                 if ((*s_it).track_id + 1 == id)
@@ -365,6 +373,12 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                     split.signal_bwd_liter = (*s_it).liter;
                     break;
                 }
+            }
+
+            // Разделяем, где начинается новый пикетаж
+            if ((track.is_new_railway_coord) && (track.id_at_track1 == -1))
+            {
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
             }
 
             if (!split.split_type.empty())
