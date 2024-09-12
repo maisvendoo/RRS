@@ -11,7 +11,7 @@ add_subdirectory (vehicle)
 add_subdirectory (profile)
 add_subdirectory (train)
 add_subdirectory (topology)
-add_subdirectory (signaling)
+#add_subdirectory (signaling)
 add_subdirectory (model)
 add_subdirectory (simulator)
 
