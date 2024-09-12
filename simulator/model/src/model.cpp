@@ -611,7 +611,7 @@ void Model::initSimClient(QString cfg_path)
 //------------------------------------------------------------------------------
 void Model::initSignaling(const init_data_t &init_data)
 {
-    signaling = new Signaling;
+    /*signaling = new Signaling;
 
     FileSystem &fs = FileSystem::getInstance();
     std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
@@ -620,7 +620,7 @@ void Model::initSignaling(const init_data_t &init_data)
     {
         Journal::instance()->error("Failed signaling initialization at route " +
                                    QString(route_dir_path.c_str()));
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------

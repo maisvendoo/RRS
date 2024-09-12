@@ -37,8 +37,6 @@
 
 #include    <virtual-interface-device.h>
 
-#include    <signaling.h>
-
 #include    <traffic-machine.h>
 
 #include    <topology.h>
@@ -143,7 +141,7 @@ private:
     //SimTcpClient *sim_client = nullptr;
 
     /// Система СЦБ
-    Signaling *signaling = nullptr;
+    ///Signaling *signaling = nullptr;
 
     /// Система трафика
     TrafficMachine  *traffic_machine = nullptr;

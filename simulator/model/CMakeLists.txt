@@ -44,7 +44,6 @@ target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../device/include)
 target_include_directories (${TARGET} PRIVATE ../topology/include)
 target_include_directories (${TARGET} PRIVATE ../../network/include)
-target_include_directories (${TARGET} PRIVATE ../signaling/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 
 # Компонуемся с библиотеками Qt6
@@ -61,4 +60,4 @@ target_link_libraries (${TARGET} solver)
 target_link_libraries (${TARGET} train)
 target_link_libraries (${TARGET} network)
 target_link_libraries (${TARGET} topology)
-target_link_libraries (${TARGET} signaling)
+
