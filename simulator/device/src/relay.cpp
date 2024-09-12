@@ -100,7 +100,7 @@ void Relay::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
     Q_UNUSED(t)
 
-    dYdt[0] = (U / R - Y[0]) / T;
+    dYdt[0] = (qAbs(U) / R - Y[0]) / T;
 }
 
 //------------------------------------------------------------------------------
