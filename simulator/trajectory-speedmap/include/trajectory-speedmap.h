@@ -14,7 +14,20 @@ public:
 
     ~TrajectorySpeedMap();
 
-    virtual void step(double t, double dt);
+    /// Шаг симуляции
+    void step(double t, double dt);
+
+protected:
+
+    /// Ограничения скорости на траектории
+    std::vector<double> limits = {};
+
+    /// Траекторные координаты интервалов ограничения скорости
+    std::vector<double> limit_begins = {};
+    std::vector<double> limit_ends = {};
+
+    /// Инициализация и чтение конфигурационного файла
+    void load_config(CfgReader &cfg);
 };
 
 #endif // TRAJECTORY_SPEEDMAP_H

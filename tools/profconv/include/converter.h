@@ -34,11 +34,10 @@
 
 #define     DIR_TOPOLOGY     std::string("topology")
 #define     DIR_TRAJECTORIES std::string("trajectories")
-#define     DIR_SPEEDMAP     std::string("trajectory-speedmap")
 #define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     FILE_START_POINT std::string("waypoints.conf")
 #define     FILE_STATIONS    std::string("stations.conf")
-#define     FILE_SPEEDMAP    std::string("speedmap.xml")
+#define     FILE_SPEEDMAP    std::string("trajectory-speedmap.xml")
 #define     FILE_TRAJ_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
 #define     DELIMITER_SYMBOL char('\t')

@@ -99,7 +99,21 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
                                     QDir::separator() +
                                     "trajectory-speedmap";
     TrajectoryDevice *traj_speedmap = loadTrajectoryDevice(traj_speedmap_path);
-    devices.push_back(traj_speedmap);
+
+    if (traj_speedmap == nullptr)
+    {
+        Journal::instance()->error("Speedmap module for " + traj_name + " not found");
+    }
+    else
+    {
+        traj_speedmap->setTrajectory(this);
+
+        QString cfg_topology_dir = QDir::toNativeSeparators(route_dir) +
+                       QDir::separator() + "topology";
+        traj_speedmap->read_config("trajectory-speedmap", cfg_topology_dir);
+
+        devices.push_back(traj_speedmap);
+    }
 
     return true;
 }

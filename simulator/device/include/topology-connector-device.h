@@ -5,6 +5,8 @@
 #include    "device.h"
 #include    "topology-trajectory-device.h"
 
+class Connector;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -19,6 +21,8 @@ public:
 
     /// Destructor
     virtual ~ConnectorDevice();
+
+    void setConnector(Connector *conn);
 
     void setFwdTrajectoryDevice(TrajectoryDevice *traj_device);
     void setBwdTrajectoryDevice(TrajectoryDevice *traj_device);
@@ -53,6 +57,8 @@ public:
     virtual float getSoundSignal(size_t idx = 0) const;
 */
 protected:
+
+    Connector *connector = nullptr;
 
     TrajectoryDevice *fwd_traj_device = nullptr;
 

@@ -24,6 +24,14 @@ ConnectorDevice::~ConnectorDevice()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ConnectorDevice::setConnector(Connector *conn)
+{
+    connector = conn;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ConnectorDevice::setFwdTrajectoryDevice(TrajectoryDevice *traj_device)
 {
     fwd_traj_device = traj_device;

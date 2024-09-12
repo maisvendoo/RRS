@@ -6,6 +6,7 @@
 #include    <device.h>
 #include    <device-list.h>
 
+class Trajectory;
 class ConnectorDevice;
 
 //------------------------------------------------------------------------------
@@ -22,6 +23,8 @@ public:
 
     /// Destructor
     virtual ~TrajectoryDevice();
+
+    void setTrajectory(Trajectory *traj);
 
     void setFwdConnectorDevice(ConnectorDevice *conn_device);
     void setBwdConnectorDevice(ConnectorDevice *conn_device);
@@ -68,6 +71,8 @@ public:
     virtual float getSoundSignal(size_t idx = 0) const;
 */
 protected:
+
+    Trajectory *trajectory = nullptr;
 
     ConnectorDevice *fwd_conn_device = nullptr;
 
