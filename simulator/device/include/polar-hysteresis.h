@@ -20,6 +20,13 @@ public:
 
     void setRange(double min_value, double max_value);
 
+    void setValue(double value);
+
+    int getState() const
+    {
+        return state;
+    }
+
 protected:
 
     double min = 0.1;

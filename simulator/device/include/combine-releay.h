@@ -2,6 +2,7 @@
 #define     COMBINE_RELAY_H
 
 #include    <relay.h>
+#include    <polar-hysteresis.h>
 
 //------------------------------------------------------------------------------
 //
@@ -24,6 +25,14 @@ private:
 
     /// Контакты, активируемые при отрицательной полярности
     std::vector<bool> minus_contact;
+
+    /// Двухсторонний гистерези с центральной симметрией
+    PolarHysteresis *polar_hysteresis;
+
+    /// Пердыдущее состояние поляризованного якоря
+    int polar_ancor_state_prev = 0;
+
+    void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
 };

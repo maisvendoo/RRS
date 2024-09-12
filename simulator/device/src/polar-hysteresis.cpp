@@ -30,3 +30,24 @@ void PolarHysteresis::setRange(double min_value, double max_value)
     min = min_value;
     max = max_value;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PolarHysteresis::setValue(double value)
+{
+    if ( (value > -min) && (value < min) )
+    {
+        state = 0;
+    }
+
+    if (value <= -max )
+    {
+        state = -1;
+    }
+
+    if (value >= max)
+    {
+        state = 1;
+    }
+}
