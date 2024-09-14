@@ -17,6 +17,11 @@ public:
     /// Шаг симуляции
     void step(double t, double dt);
 
+    std::vector<double> *getLimits();
+    std::vector<double> *getLimitBegins();
+    std::vector<double> *getLimitEnds();
+    double getTrajLength();
+
 protected:
 
     /// Ограничения скорости на траектории

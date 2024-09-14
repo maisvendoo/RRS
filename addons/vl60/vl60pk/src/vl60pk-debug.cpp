@@ -44,11 +44,13 @@ void VL60pk::debugPrint(double t, double dt)
     }
 
     DebugMsg += QString("\n");
-    DebugMsg += QString("Traj coord at +%1m:%2")
-                    .arg(length / 2.0, 4, 'f', 1)
-                    .arg(speedmap_fwd->getCurrentLimit(), 8, 'f', 1);
+    DebugMsg += QString("Speed limit %1 km/h | Next %2 km/h (%3 m)")
+                    .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0)
+                    .arg(speedmap_fwd->getNextLimit(), 3, 'f', 0)
+                    .arg(speedmap_fwd->getNextLimitDistance(), 6, 'f', 1);
     DebugMsg += QString(" | ");
-    DebugMsg += QString("Traj coord at -%1m:%2")
-                    .arg(length / 2.0, 4, 'f', 1)
-                    .arg(speedmap_bwd->getCurrentLimit(), 8, 'f', 1);
+    DebugMsg += QString("Speed limit %1 km/h | Next %2 km/h (%3 m)")
+                    .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0)
+                    .arg(speedmap_bwd->getNextLimit(), 3, 'f', 0)
+                    .arg(speedmap_bwd->getNextLimitDistance(), 6, 'f', 1);
 }
