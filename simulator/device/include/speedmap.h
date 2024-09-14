@@ -39,11 +39,12 @@ public:
 
     enum
     {
-        SIZE_OF_OUTPUTS = 3,        ///< Размер массива исходящих сигналов
+        SIZE_OF_OUTPUTS = 4,        ///< Размер массива исходящих сигналов
 
         OUTPUT_SEARCH_DIRECTION = 0,    ///< Направление поиска следующего ограничения
-        OUTPUT_CUR_SEARCH_DISTANCE = 1, ///< Дистанция поиска следующего ограничения, м
+        OUTPUT_CUR_SEARCH_DISTANCE = 1, ///< Дистанция поиска текущего ограничения, м
         OUTPUT_NEXT_SEARCH_DISTANCE = 2,///< Дистанция поиска следующего ограничения, м
+        OUTPUT_BRAKE_ACCELERATION = 3,  ///< Ускорение торможения, м/с^2
 
         SIZE_OF_INPUTS = 3,         ///< Размер массива входящих сигналов
 

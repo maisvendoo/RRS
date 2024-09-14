@@ -14,10 +14,10 @@ SpeedMap::SpeedMap(QObject *parent) : Device(parent)
 
     output_signals[OUTPUT_SEARCH_DIRECTION] = 1.0;
     output_signals[OUTPUT_CUR_SEARCH_DISTANCE] = 50.0;
-    output_signals[OUTPUT_NEXT_SEARCH_DISTANCE] = 3000.0;
+    output_signals[OUTPUT_NEXT_SEARCH_DISTANCE] = 5000.0;
     input_signals[INPUT_CURRENT_LIMIT] = 300.0;
     input_signals[INPUT_NEXT_LIMIT] = 300.0;
-    input_signals[INPUT_NEXT_DISTANCE] = 3000.0;
+    input_signals[INPUT_NEXT_DISTANCE] = 5000.0;
 }
 
 //------------------------------------------------------------------------------
@@ -87,8 +87,8 @@ double SpeedMap::getNextLimitDistance() const
     if (is_linked)
         return input_signals[INPUT_NEXT_DISTANCE];
 
-    // Если нет карты скоростей, возвращаем 3000
-    return 3000.0;
+    // Если нет карты скоростей, возвращаем 5000
+    return 5000.0;
 }
 
 //------------------------------------------------------------------------------

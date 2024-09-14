@@ -1,4 +1,6 @@
 #include    <switch.h>
+
+#include    <filesystem.h>
 #include    <Journal.h>
 
 //------------------------------------------------------------------------------
@@ -181,6 +183,91 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         if (outputs_count == 2)
             state_fwd = 1;
     }
+
+    // Загружаем модули
+    // Находим названия модулей, которые есть и в траекториях спереди, и в траекториях сзади
+    QStringList devices_names;
+    for (auto traj_bwd : {bwdPlusTraj, bwdMinusTraj})
+    {
+        if (traj_bwd == nullptr)
+            continue;
+
+        QStringList devices_names_bwd;
+        for (auto device_bwd : traj_bwd->getTrajectoryDevices())
+        {
+            QString name = device_bwd->getName();
+            if (!devices_names_bwd.contains(name))
+                devices_names_bwd.push_back(name);
+        }
+
+        for (auto traj_fwd : {fwdPlusTraj, fwdMinusTraj})
+        {
+            if (traj_fwd == nullptr)
+                continue;
+
+            for (auto device_fwd : traj_bwd->getTrajectoryDevices())
+            {
+                QString name = device_fwd->getName();
+                if (devices_names_bwd.contains(name) && (!devices_names.contains(name)))
+                    devices_names.push_back(name);
+            }
+        }
+    }
+
+    if (devices_names.isEmpty())
+        return;
+
+    FileSystem &fs = FileSystem::getInstance();
+    for (auto device_name : devices_names)
+    {
+        QString conn_module = "connector-" + device_name;
+        QString conn_path = QString(fs.getModulesDir().c_str()) +
+                                     QDir::separator() +
+                                     conn_module;
+        ConnectorDevice *module = loadConnectorDevice(conn_path);
+
+        if (module == nullptr)
+        {
+            Journal::instance()->error("Module " + conn_module + " for " + name + " not found");
+        }
+        else
+        {
+            module->setConnector(this);
+
+            for (auto device_bwd : ( (bwdPlusTraj != nullptr) ?
+                                      bwdPlusTraj->getTrajectoryDevices() :
+                                      bwdMinusTraj->getTrajectoryDevices() ))
+            {
+                QString bwd_name = device_bwd->getName();
+                if (device_name == bwd_name)
+                {
+                    module->setBwdTrajectoryDevice(device_bwd);
+                    break;
+                }
+            }
+
+            for (auto device_fwd : ( (fwdPlusTraj != nullptr) ?
+                                      fwdPlusTraj->getTrajectoryDevices() :
+                                      fwdMinusTraj->getTrajectoryDevices() ))
+            {
+                QString fwd_name = device_fwd->getName();
+                if (device_name == fwd_name)
+                {
+                    module->setFwdTrajectoryDevice(device_fwd);
+                    break;
+                }
+            }
+
+            // TODO конфигурирование?
+            /*
+            QString cfg_topology_dir = QDir::toNativeSeparators(route_dir) +
+                                       QDir::separator() + "topology";
+            module->read_config(conn_module, cfg_topology_dir);
+            */
+
+            devices.push_back(module);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -256,6 +343,73 @@ void Switch::step(double t, double dt)
         new_state.state_fwd = state_fwd;
         new_state.state_bwd = state_bwd;
         emit sendSwitchState(new_state.serialize());
+    }
+
+    int change_fwd = (sign(prev_state_fwd) != sign(state_fwd)) * sign(state_fwd);
+    int change_bwd = (sign(prev_state_bwd) != sign(state_bwd)) * sign(state_bwd);
+    for (auto device : devices)
+    {
+        if (change_fwd > 0)
+        {
+            bool no_change = true;
+            for (auto device_fwd : fwdPlusTraj->getTrajectoryDevices())
+            {
+                if (device->getName() == device_fwd->getName())
+                {
+                    device->setFwdTrajectoryDevice(device_fwd);
+                    no_change = false;
+                    break;
+                }
+            }
+            if (no_change)
+                device->setFwdTrajectoryDevice(nullptr);
+        }
+        if (change_fwd < 0)
+        {
+            bool no_change = true;
+            for (auto device_fwd : fwdMinusTraj->getTrajectoryDevices())
+            {
+                if (device->getName() == device_fwd->getName())
+                {
+                    device->setFwdTrajectoryDevice(device_fwd);
+                    no_change = false;
+                    break;
+                }
+            }
+            if (no_change)
+                device->setFwdTrajectoryDevice(nullptr);
+        }
+
+        if (change_bwd > 0)
+        {
+            bool no_change = true;
+            for (auto device_bwd : bwdPlusTraj->getTrajectoryDevices())
+            {
+                if (device->getName() == device_bwd->getName())
+                {
+                    device->setBwdTrajectoryDevice(device_bwd);
+                    no_change = false;
+                    break;
+                }
+            }
+            if (no_change)
+                device->setBwdTrajectoryDevice(nullptr);
+        }
+        if (change_bwd < 0)
+        {
+            bool no_change = true;
+            for (auto device_bwd : bwdMinusTraj->getTrajectoryDevices())
+            {
+                if (device->getName() == device_bwd->getName())
+                {
+                    device->setBwdTrajectoryDevice(device_bwd);
+                    no_change = false;
+                    break;
+                }
+            }
+            if (no_change)
+                device->setBwdTrajectoryDevice(nullptr);
+        }
     }
 }
 

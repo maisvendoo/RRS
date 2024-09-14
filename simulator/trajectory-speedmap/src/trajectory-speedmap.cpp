@@ -31,16 +31,33 @@ void TrajectorySpeedMap::step(double t, double dt)
         if (limits.empty())
         {
             device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, 300.0);
+            device.device->setInputSignal(SpeedMap::INPUT_NEXT_LIMIT, 300.0);
+            device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, 5000.0);
         }
         else
         {
-            for (size_t i = 0; i < limits.size(); ++i)
+            double cur_coord = device.coord;
+            double dir = device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION);
+            double cur_distance = cur_coord -
+                dir * device.device->getOutputSignal(SpeedMap::OUTPUT_CUR_SEARCH_DISTANCE);
+            double next_distance = cur_coord +
+                dir * device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
+
+            double cur_limit = 0.0;
+            double next_limit = 0.0;
+            size_t cur_idx = 0;
+            while (cur_idx < limits.size())
             {
-                if ((device.coord >= limit_begins[i]) && (device.coord <= limit_ends[i]))
+                if ((cur_coord >= limit_begins[cur_idx]) && (cur_coord <= limit_ends[cur_idx]))
                 {
-                    device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, limits[i]);
+                    cur_limit = limits[cur_idx];
+                    break;
                 }
             }
+
+            device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, cur_limit);
+            device.device->setInputSignal(SpeedMap::INPUT_NEXT_LIMIT, next_limit);
+            device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, 5000.0);
         }
     }
 }

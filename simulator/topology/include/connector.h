@@ -33,6 +33,9 @@ public:
                            traj_list_t &traj_list);
     QString getName() const { return this->name; }
 
+    /// Получить оборудование путевой инфраструктуры на этом коннекторе
+    std::vector<ConnectorDevice *> getConnectorDevices();
+
     /// Шаг симуляции
     virtual void step(double t, double dt);
 
