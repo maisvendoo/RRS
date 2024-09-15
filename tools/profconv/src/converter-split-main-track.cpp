@@ -11,6 +11,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
 {
     if (dir > 0)
     {
+        int prev_railway_coord_section = 0;
         bool was_1_track = false;
         size_t id = 0;
         for (auto it = tracks_data1.begin(); it != tracks_data1.end(); ++it)
@@ -247,8 +248,9 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             }
 
             // Разделяем, где начинается новый пикетаж
-            if (track.is_new_railway_coord)
+            if (track.railway_coord_section != prev_railway_coord_section)
             {
+                prev_railway_coord_section = track.railway_coord_section;
                 split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
             }
 
@@ -265,6 +267,7 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
     }
     else
     {
+        int prev_railway_coord_section = 0;
         size_t id = 0;
         for (auto it = tracks_data2.begin(); it != tracks_data2.end(); ++it)
         {
@@ -376,8 +379,9 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
             }
 
             // Разделяем, где начинается новый пикетаж
-            if ((track.is_new_railway_coord) && (track.id_at_track1 == -1))
+            if (track.railway_coord_section != prev_railway_coord_section)
             {
+                prev_railway_coord_section = track.railway_coord_section;
                 split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
             }
 
@@ -496,7 +500,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                         // Добавляем последюю точку в траекторию
                         point_t end_point;
                         end_point.point = it->begin_point;
-                        end_point.railway_coord = it->railway_coord;
+                        end_point.railway_coord = (it-1)->railway_coord_end;
                         end_point.trajectory_coord = trajectory_length;
                         trajectory.points.push_back(end_point);
                         trajectory.name = name_cur;
@@ -579,6 +583,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             end_point.trajectory_coord = trajectory_length + it->length;
             trajectory.points.push_back(end_point);
             trajectory.name = ((it+1) == tracks_data->end()) ? name_next : name_cur;
+            trajectory.railway_coord_section = it->railway_coord_section;
             trajectories->push_back(new trajectory_t(trajectory));
 
             trajectory.points.clear();

@@ -97,6 +97,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
     auto it = tmp_data.begin();
     double trajectory_length = 0.0;
 
+    int railway_coord_section = 0;
     double coord_increase_direction = 1.0;
     double trajectory_recalc_length = 0.0;
     double railway_coord_recalc_begin = 0.0;
@@ -129,6 +130,8 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
         cur_track.route_coord = trajectory_length;
         trajectory_length += cur_track.length;
 
+        cur_track.railway_coord_section = railway_coord_section;
+
         if (not_end)
         {
             // Сохраняем координату в начале трека, если не дробные
@@ -159,8 +162,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                 {
                     // Если разница велика, считаем,
                     // что со следующего трека начался новый пикетаж
-                    size_t next_id = static_cast<size_t>(cur_track.next_uid - 1);
-                    tmp_data.at(next_id).is_new_railway_coord = true;
+                    ++railway_coord_section;
 
                     // Определяем направление увеличения координаты
                     // на новом пикетаже: если начался с нуля - будет возрастать

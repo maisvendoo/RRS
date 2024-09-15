@@ -30,7 +30,7 @@ struct zds_track_t
     dvec3       up = dvec3(0.0, 0.0, 1.0);
     dvec3       trav = dvec3(0.0, 1.0, 0.0);
     int         id_at_track1 = -1;
-    bool        is_new_railway_coord = false;
+    int         railway_coord_section = 0;
 
     std::string trajectory_name = "";
     double      trajectory_coord = 0.0;

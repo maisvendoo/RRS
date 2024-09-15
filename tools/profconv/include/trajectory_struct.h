@@ -30,6 +30,8 @@ struct trajectory_t
     std::string name = "";
     std::vector<point_t> points = {};
 
+    int railway_coord_section = 0;
+
     trajectory_t()
     {
 

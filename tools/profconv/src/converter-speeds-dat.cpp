@@ -96,48 +96,108 @@ bool ZDSimConverter::createSpeedMap()
     if (speeds_data1.empty())
         return false;
 
-    speedmap_t *speedmap1 = new speedmap_t();
-    // Пока просто запишем список траекторий по главному пути
+    // Пишем список траекторий по главному пути
+    int railway_coord_section = 0;
+    speedmap_t *speedmap = new speedmap_t();
     for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
     {
-        speedmap1->trajectories_names.push_back((*traj)->name);
+        // Если начался новый участок жд-пикетажа,
+        // заканчиваем список траекторий и начинаем новый
+        if ((*traj)->railway_coord_section != railway_coord_section)
+        {
+            railway_coord_section = (*traj)->railway_coord_section;
+            speedmap_data.push_back(speedmap);
+            speedmap = new speedmap_t();
+        }
+        speedmap->trajectories_names.push_back((*traj)->name);
     }
-    // И список ограничений на интервалах жд-пикетажа
-    // !!!! Потом надо придумать обработку ситуаций,
-    // !!!! если жд-пикетаж меняется после узловых станций маршрута
+    speedmap_data.push_back(speedmap);
+
+    // Пишем список ограничений скорости
     for (auto zds_speed : speeds_data1)
     {
+        // Ограничение на интервале пикетажа
         speed_element_t speed_el = speed_element_t();
         speed_el.limit = zds_speed.limit;
         speed_el.railway_coord_begin = static_cast<int>(round(zds_speed.begin_railway_coord));
         speed_el.railway_coord_end = static_cast<int>(round(zds_speed.end_railway_coord));
-        speedmap1->speedmap_elements.push_back(speed_el);
+
+        size_t id_begin = zds_speed.begin_track_id;
+        size_t id_end = zds_speed.end_track_id;
+        railway_coord_section = tracks_data1[id_begin].railway_coord_section;
+        for (size_t id = id_begin + 1; id <= id_end; ++id)
+        {
+            // Если начался новый участок жд-пикетажа,
+            // завершаем интервал с ограничением скорости и начинаем новый
+            if (tracks_data1[id].railway_coord_section != railway_coord_section)
+            {
+                speed_element_t speed_el_end_here = speed_el;
+                speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data1[id - 1].railway_coord_end));
+                speedmap_data[railway_coord_section]->speedmap_elements.push_back(speed_el_end_here);
+
+                speed_el.railway_coord_begin = static_cast<int>(round(tracks_data1[id].railway_coord));
+
+                railway_coord_section = tracks_data1[id].railway_coord_section;
+            }
+        }
+        speedmap_data[railway_coord_section]->speedmap_elements.push_back(speed_el);
     }
-    speedmap_data.push_back(speedmap1);
 
     // Карта скоростей для пути "обратно"
     if ((tracks_data2.empty()) || (speeds_data2.empty()))
         return false;
 
-    speedmap_t *speedmap2 = new speedmap_t();
-    // Пока просто запишем список траекторий по главному пути
+    // Пишем список траекторий по главному пути
+    speedmap = new speedmap_t();
+    railway_coord_section = 0;
+    int data1_size = speedmap_data.size();
     for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
     {
-        speedmap2->trajectories_names.push_back((*traj)->name);
+        if ((*traj)->railway_coord_section != railway_coord_section)
+        {
+            // Если начался новый участок жд-пикетажа,
+            // заканчиваем список траекторий и начинаем новый
+            railway_coord_section = (*traj)->railway_coord_section;
+            speedmap_data.push_back(speedmap);
+            speedmap = new speedmap_t();
+        }
+        speedmap->trajectories_names.push_back((*traj)->name);
     }
-    // И список ограничений на интервалах жд-пикетажа
-    // !!!! А ещё надо обработать однопутные участки
+    speedmap_data.push_back(speedmap);
+
+    // Пишем список ограничений скорости
+    // !!!! Пишем в том числе интервалы по однопутным участкам,
+    // !!!! они не нужны, но сложно их исключить из записи
     for (auto zds_speed : speeds_data2)
     {
+        // Ограничение на интервале пикетажа
         speed_element_t speed_el = speed_element_t();
         speed_el.limit = zds_speed.limit;
         speed_el.railway_coord_begin = static_cast<int>(round(zds_speed.begin_railway_coord));
         speed_el.railway_coord_end = static_cast<int>(round(zds_speed.end_railway_coord));
-        speedmap2->speedmap_elements.push_back(speed_el);
-    }
-    speedmap_data.push_back(speedmap2);
 
-    // По всем боковым путям 40 км/ч
+        size_t id_begin = zds_speed.begin_track_id;
+        size_t id_end = zds_speed.end_track_id;
+        railway_coord_section = tracks_data2[id_begin].railway_coord_section;
+        for (size_t id = id_begin + 1; id <= id_end; ++id)
+        {
+            // Если начался новый участок жд-пикетажа,
+            // завершаем интервал с ограничением скорости и начинаем новый
+            if (tracks_data2[id].railway_coord_section != railway_coord_section)
+            {
+                speed_element_t speed_el_end_here = speed_el;
+                speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data2[id - 1].railway_coord_end));
+                speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el_end_here);
+
+                speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
+
+                railway_coord_section = tracks_data2[id].railway_coord_section;
+            }
+        }
+        speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el);
+    }
+
+    // Пишем список всех траекторий боковых путей и съездов
     speedmap_t *branch_speedmap = new speedmap_t();
     if (!branch_track_data1.empty())
     {
@@ -173,6 +233,7 @@ bool ZDSimConverter::createSpeedMap()
             branch_speedmap->trajectories_names.push_back((*it)->trajectory.name);
         }
     }
+    // Ограничение 40 км/ч на любом интервале пикетажа для всех боковых путей
     if (!branch_speedmap->trajectories_names.empty())
     {
         speed_element_t speed_el = speed_element_t();
