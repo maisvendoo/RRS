@@ -34,180 +34,188 @@ void TrajectorySpeedMap::step(double t, double dt)
             device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, 300.0);
             device.device->setInputSignal(SpeedMap::INPUT_NEXT_LIMIT, 300.0);
             device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, 5000.0);
+            continue;
         }
-        else
+
+        double cur_coord = device.coord;
+        size_t cur_idx = 0;
+        while (cur_idx < limits.size())
         {
-            double cur_coord = device.coord;
-            double dir = device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION);
-            double cur_distance_coord = cur_coord -
-                dir * device.device->getOutputSignal(SpeedMap::OUTPUT_CUR_SEARCH_DISTANCE);
-            double next_distance_coord = cur_coord +
-                dir * device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
-
-            double cur_limit = 0.0;
-            double next_limit = 300.0;
-            size_t cur_idx = 0;
-            while (cur_idx < limits.size())
+            if ((cur_coord >= limit_begins[cur_idx]) && (cur_coord <= limit_ends[cur_idx]))
             {
-                if ((cur_coord >= limit_begins[cur_idx]) && (cur_coord <= limit_ends[cur_idx]))
-                {
-                    cur_limit = limits[cur_idx];
-                    break;
-                }
+                break;
             }
-
-            // Ищем текущее ограничение - минимальное на длину поезда назад
-            TrajectorySpeedMap *cur_traj_device = this;
-            cur_coord = dir > 0 ? limit_begins[cur_idx] : limit_ends[cur_idx];
-            while (dir * (cur_coord - cur_distance_coord) > 0)
-            {
-                if (dir > 0)
-                {
-                    if (cur_idx == 0)
-                    {
-                        // Переход к карте скоростей предыдущей траектории
-                        auto conn_device = cur_traj_device->getBwdConnectorDevice();
-                        if (conn_device == nullptr)
-                            break;
-
-                        cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
-                            conn_device->getBwdTrajectoryDevice());
-                        if (cur_traj_device == nullptr)
-                            break;
-
-                        cur_idx += cur_traj_device->getLimits()->size();
-                        cur_distance_coord += cur_traj_device->getTrajLength();
-                    }
-                    else
-                    {
-                        --cur_idx;
-                    }
-
-                    if (cur_limit > cur_traj_device->getLimits()->at(cur_idx))
-                    {
-                        cur_limit = cur_traj_device->getLimits()->at(cur_idx);
-                    }
-
-                    cur_coord = cur_traj_device->getLimitBegins()->at(cur_idx);
-                }
-                else
-                {
-                    if (cur_idx == cur_traj_device->getLimits()->size() - 1)
-                    {
-                        cur_distance_coord -= cur_traj_device->getTrajLength();
-
-                        // Переход к карте скоростей следующей траектории
-                        auto conn_device = cur_traj_device->getFwdConnectorDevice();
-                        if (conn_device == nullptr)
-                            break;
-
-                        cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
-                            conn_device->getFwdTrajectoryDevice());
-                        if (cur_traj_device == nullptr)
-                            break;
-
-                        cur_idx = 0;
-                    }
-                    else
-                    {
-                        ++cur_idx;
-                    }
-
-                    if (cur_limit > cur_traj_device->getLimits()->at(cur_idx))
-                    {
-                        cur_limit = cur_traj_device->getLimits()->at(cur_idx);
-                    }
-
-                    cur_coord = cur_traj_device->getLimitEnds()->at(cur_idx);
-                }
-            }
-
-            // Ищем следущее ограничение - минимальное на заданную дистанцию вперёд
-            cur_traj_device = this;
-            cur_coord = dir > 0 ? limit_ends[cur_idx] : limit_begins[cur_idx];
-            double distance_to_next = dir > 0 ?
-                                    limit_ends[cur_idx] - device.coord :
-                                    device.coord - limit_begins[cur_idx];
-            double distance_to_min_next = device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
-            while (dir * (cur_coord - next_distance_coord) < 0)
-            {
-                if (dir > 0)
-                {
-                    if (cur_idx == cur_traj_device->getLimits()->size() - 1)
-                    {
-                        next_distance_coord -= cur_traj_device->getTrajLength();
-
-                        // Переход к карте скоростей следующей траектории
-                        auto conn_device = cur_traj_device->getFwdConnectorDevice();
-                        if (conn_device == nullptr)
-                            break;
-
-                        cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
-                            conn_device->getFwdTrajectoryDevice());
-                        if (cur_traj_device == nullptr)
-                            break;
-
-                        cur_idx = 0;
-                    }
-                    else
-                    {
-                        ++cur_idx;
-                    }
-
-                    if (next_limit > cur_traj_device->getLimits()->at(cur_idx))
-                    {
-                        next_limit = cur_traj_device->getLimits()->at(cur_idx);
-                        distance_to_min_next = distance_to_next;
-                    }
-
-                    cur_coord = cur_traj_device->getLimitEnds()->at(cur_idx);
-                    distance_to_next += (cur_coord - next_distance_coord) < 0 ?
-                        (cur_traj_device->getLimitEnds()->at(cur_idx) -
-                         cur_traj_device->getLimitBegins()->at(cur_idx)) :
-                        (next_distance_coord - cur_traj_device->getLimitBegins()->at(cur_idx));
-
-                }
-                else
-                {
-                    if (cur_idx == 0)
-                    {
-                        // Переход к карте скоростей предыдущей траектории
-                        auto conn_device = cur_traj_device->getBwdConnectorDevice();
-                        if (conn_device == nullptr)
-                            break;
-
-                        cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
-                            conn_device->getBwdTrajectoryDevice());
-                        if (cur_traj_device == nullptr)
-                            break;
-
-                        cur_idx += cur_traj_device->getLimits()->size();
-                        next_distance_coord += cur_traj_device->getTrajLength();
-                    }
-                    else
-                    {
-
-                        --cur_idx;
-                    }
-
-                    if (next_limit > cur_traj_device->getLimits()->at(cur_idx))
-                    {
-                        next_limit = cur_traj_device->getLimits()->at(cur_idx);
-                        distance_to_min_next = distance_to_next;
-                    }
-
-                    cur_coord = cur_traj_device->getLimitBegins()->at(cur_idx);
-                    distance_to_next += (cur_coord - next_distance_coord) > 0 ?
-                                            (cur_traj_device->getLimitEnds()->at(cur_idx) -
-                                             cur_traj_device->getLimitBegins()->at(cur_idx)) :
-                                            (next_distance_coord - cur_traj_device->getLimitBegins()->at(cur_idx));
-                }
-            }
-
-            device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, cur_limit);
-            device.device->setInputSignal(SpeedMap::INPUT_NEXT_LIMIT, next_limit);
-            device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, distance_to_min_next);
+            ++cur_idx;
         }
+        if (cur_idx == limits.size())
+        {
+            device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, 300.0);
+            device.device->setInputSignal(SpeedMap::INPUT_NEXT_LIMIT, 300.0);
+            device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, 5000.0);
+            continue;
+        }
+
+        double dir = device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION);
+        double cur_distance_coord = cur_coord -
+                                    dir * device.device->getOutputSignal(SpeedMap::OUTPUT_CUR_SEARCH_DISTANCE);
+        double next_distance_coord = cur_coord +
+                                     dir * device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
+
+        size_t next_idx = cur_idx;
+        double cur_limit  = limits[cur_idx];
+        double next_limit = 300.0;
+
+        // Ищем текущее ограничение - минимальное на длину поезда назад
+        TrajectorySpeedMap *cur_traj_device = this;
+        cur_coord = dir > 0 ? limit_begins[cur_idx] : limit_ends[cur_idx];
+        while (dir * (cur_coord - cur_distance_coord) > 0)
+        {
+            if (dir > 0)
+            {
+                if (cur_idx == 0)
+                {
+                    // Переход к карте скоростей предыдущей траектории
+                    auto conn_device = cur_traj_device->getBwdConnectorDevice();
+                    if (conn_device == nullptr)
+                        break;
+
+                    cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
+                        conn_device->getBwdTrajectoryDevice());
+                    if (cur_traj_device == nullptr)
+                        break;
+
+                    cur_idx = cur_traj_device->getLimits()->size() - 1;
+                    cur_distance_coord += cur_traj_device->getTrajLength();
+                }
+                else
+                {
+                    --cur_idx;
+                }
+
+                if (cur_limit > cur_traj_device->getLimits()->at(cur_idx))
+                {
+                    cur_limit = cur_traj_device->getLimits()->at(cur_idx);
+                }
+
+                cur_coord = cur_traj_device->getLimitBegins()->at(cur_idx);
+            }
+            else
+            {
+                if (cur_idx == cur_traj_device->getLimits()->size() - 1)
+                {
+                    cur_distance_coord -= cur_traj_device->getTrajLength();
+
+                    // Переход к карте скоростей следующей траектории
+                    auto conn_device = cur_traj_device->getFwdConnectorDevice();
+                    if (conn_device == nullptr)
+                        break;
+
+                    cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
+                        conn_device->getFwdTrajectoryDevice());
+                    if (cur_traj_device == nullptr)
+                        break;
+
+                    cur_idx = 0;
+                }
+                else
+                {
+                    ++cur_idx;
+                }
+
+                if (cur_limit > cur_traj_device->getLimits()->at(cur_idx))
+                {
+                    cur_limit = cur_traj_device->getLimits()->at(cur_idx);
+                }
+
+                cur_coord = cur_traj_device->getLimitEnds()->at(cur_idx);
+            }
+        }
+
+        // Ищем следущее ограничение - минимальное на заданную дистанцию вперёд
+        cur_traj_device = this;
+        cur_coord = dir > 0 ? limit_ends[next_idx] : limit_begins[next_idx];
+        double distance_to_next = dir > 0 ?
+                                      limit_ends[next_idx] - device.coord :
+                                      device.coord - limit_begins[next_idx];
+        double distance_to_min_next = device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
+        while (dir * (cur_coord - next_distance_coord) < 0)
+        {
+            if (dir > 0)
+            {
+                if (next_idx == cur_traj_device->getLimits()->size() - 1)
+                {
+                    next_distance_coord -= cur_traj_device->getTrajLength();
+
+                    // Переход к карте скоростей следующей траектории
+                    auto conn_device = cur_traj_device->getFwdConnectorDevice();
+                    if (conn_device == nullptr)
+                        break;
+
+                    cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
+                        conn_device->getFwdTrajectoryDevice());
+                    if (cur_traj_device == nullptr)
+                        break;
+
+                    next_idx = 0;
+                }
+                else
+                {
+                    ++next_idx;
+                }
+
+                if (next_limit > cur_traj_device->getLimits()->at(next_idx))
+                {
+                    next_limit = cur_traj_device->getLimits()->at(next_idx);
+                    distance_to_min_next = distance_to_next;
+                }
+
+                cur_coord = cur_traj_device->getLimitEnds()->at(next_idx);
+                distance_to_next += (cur_coord - next_distance_coord) < 0 ?
+                                        (cur_traj_device->getLimitEnds()->at(next_idx) -
+                                         cur_traj_device->getLimitBegins()->at(next_idx)) :
+                                        (next_distance_coord - cur_traj_device->getLimitBegins()->at(next_idx));
+
+            }
+            else
+            {
+                if (next_idx == 0)
+                {
+                    // Переход к карте скоростей предыдущей траектории
+                    auto conn_device = cur_traj_device->getBwdConnectorDevice();
+                    if (conn_device == nullptr)
+                        break;
+
+                    cur_traj_device = dynamic_cast<TrajectorySpeedMap *>(
+                        conn_device->getBwdTrajectoryDevice());
+                    if (cur_traj_device == nullptr)
+                        break;
+
+                    next_idx = cur_traj_device->getLimits()->size() - 1;
+                    next_distance_coord += cur_traj_device->getTrajLength();
+                }
+                else
+                {
+
+                    --next_idx;
+                }
+
+                if (next_limit > cur_traj_device->getLimits()->at(next_idx))
+                {
+                    next_limit = cur_traj_device->getLimits()->at(next_idx);
+                    distance_to_min_next = distance_to_next;
+                }
+
+                cur_coord = cur_traj_device->getLimitBegins()->at(next_idx);
+                distance_to_next += (cur_coord - next_distance_coord) > 0 ?
+                                        (cur_traj_device->getLimitEnds()->at(next_idx) -
+                                         cur_traj_device->getLimitBegins()->at(next_idx)) :
+                                        (next_distance_coord - cur_traj_device->getLimitBegins()->at(next_idx));
+            }
+        }
+
+        device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, cur_limit);
+        device.device->setInputSignal(SpeedMap::INPUT_NEXT_LIMIT, next_limit);
+        device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, distance_to_min_next);
     }
 }
 
