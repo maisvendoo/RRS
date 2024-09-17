@@ -406,6 +406,32 @@ bool Topology::load_topology(QString route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::load_signals(CfgReader &cfg, QDomNode secNode)
+{
+    QString signal_model = "";
+    cfg.getString(secNode, "SignalModel", signal_model);
+
+    if (!signal_model.isEmpty())
+    {
+        QString signal_letter = "";
+        cfg.getString(secNode, "SignalLetter", signal_letter);
+        int signal_dir = 0;
+        cfg.getInt(secNode, "SignalDirection", signal_dir);
+
+        if (signal_model == "ab_line")
+        {
+            LineSignal *line_signal = new LineSignal;
+            line_signal->setLetter(signal_letter);
+            line_signal->setDirection(signal_dir);
+
+            line_signals.push_back(line_signal);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Topology::load_stations(QString route_dir)
 {
     QString path = route_dir + QDir::separator() +

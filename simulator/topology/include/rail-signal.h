@@ -35,6 +35,11 @@ public:
 
     void step(double t, double dt) override;
 
+    void setLetter(const QString &letter)
+    {
+        this->letter = letter;
+    }
+
     QString getLetter() const
     {
         return letter;
@@ -43,6 +48,16 @@ public:
     lens_state_t getAllLensState() const
     {
         return lens_state;
+    }
+
+    void setDirection(int signal_dir)
+    {
+        this->signal_dir = signal_dir;
+    }
+
+    int getDirection() const
+    {
+        return signal_dir;
     }
 
     /// Установить занятость блок-участка, предшествующего данному сигналу
@@ -65,6 +80,8 @@ protected:
     double U_line = 0.0;
 
     bool is_busy = false;
+
+    int signal_dir = 0;
 
     void load_config(CfgReader &cfg) override;
 

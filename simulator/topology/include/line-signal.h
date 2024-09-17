@@ -11,7 +11,7 @@ class TOPOLOGY_EXPORT LineSignal : public Signal
 {
 public:
 
-    LineSignal(QObject *parent);
+    LineSignal(QObject *parent = Q_NULLPTR);
 
     ~LineSignal();
 
@@ -55,6 +55,8 @@ private:
     double U_line_prev = 0.0;
 
     void preStep(state_vector_t &Y, double t) override;
+
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
 };
 
 #endif

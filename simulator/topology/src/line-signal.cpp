@@ -5,8 +5,10 @@
 //------------------------------------------------------------------------------
 LineSignal::LineSignal(QObject *parent) : Signal(parent)
 {
+    way_relay->read_config("combine-relay");
     way_relay->setInitContactState(WR_NEUTRAL_WAY_BUSY, false);
 
+    line_relay->read_config("combine-relay");
     line_relay->setInitContactState(LR_NEUTRAL_LINE_PLUS, false);
     line_relay->setInitContactState(LR_NEUTRAL_LINE_MINIS, true);
     line_relay->setInitContactState(LR_NEUTRAL_ALLOW, false);
@@ -81,4 +83,12 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     // линейного реле
     lens_state[YELLOW_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
                               line_relay->getMinusContactState(LR_MINUS_YELLOW);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LineSignal::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
+{
+
 }
