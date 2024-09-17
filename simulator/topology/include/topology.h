@@ -97,7 +97,11 @@ private:
     /// Загрузка топологии
     bool load_topology(QString route_dir);
 
-    void load_signals(CfgReader &cfg, QDomNode secNode);
+    /// Загрузка сигналов (пока ограничиваюсь проходными)
+    void load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn);
+
+    /// Связывание сигналов
+    void line_signals_connect(std::vector<Signal *> &line_signals);
 
     /// Загрузка списка станций
     bool load_stations(QString route_dir);

@@ -7,6 +7,7 @@
 #include    <CfgReader.h>
 #include    <switch.h>
 #include    <isolated-joint.h>
+#include    <line-signal.h>
 
 #include    <Journal.h>
 #include    <filesystem.h>
@@ -69,6 +70,8 @@ bool Topology::load(QString route_dir)
     }
 
     load_topology(route_path);
+
+    line_signals_connect(line_signals);
 
     if (!load_stations(route_path))
     {
@@ -385,6 +388,8 @@ bool Topology::load_topology(QString route_dir)
         switches.insert(sw->getName(), sw);
         connect(sw, &Switch::sendSwitchState, this, &Topology::sendSwitchState);
 
+        load_signals(cfg, secNode, sw);
+
         secNode = cfg.getNextSection();
     }
 
@@ -406,7 +411,7 @@ bool Topology::load_topology(QString route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::load_signals(CfgReader &cfg, QDomNode secNode)
+void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 {
     QString signal_model = "";
     cfg.getString(secNode, "SignalModel", signal_model);
@@ -423,8 +428,87 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode)
             LineSignal *line_signal = new LineSignal;
             line_signal->setLetter(signal_letter);
             line_signal->setDirection(signal_dir);
+            line_signal->setConnector(conn);
+
+            conn->setSignal(line_signal);
 
             line_signals.push_back(line_signal);
+
+            Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
+{
+    for (auto line_signal : line_signals)
+    {
+        Connector *conn = line_signal->getConnector();
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        if (line_signal->getDirection() == 1)
+        {
+            Trajectory *traj = conn->getBwdTraj();
+            if (traj == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            Connector *conn = traj->getBwdConnector();
+
+            if (conn == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            Signal *line_signal_prev = conn->getSignal();
+
+            if (line_signal_prev == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            connect(line_signal, &Signal::sendLineVoltage,
+                    line_signal_prev, &Signal::slotRecvLineVoltage);
+
+            Journal::instance()->info("Connected line signal " + line_signal->getLetter() +
+                                      " with line signal " + line_signal_prev->getLetter());
+        }
+
+        if (line_signal->getDirection() == -1)
+        {
+            Trajectory *traj = conn->getFwdTraj();
+            if (traj == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            Connector *conn = traj->getFwdConnector();
+
+            if (conn == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            Signal *line_signal_prev = conn->getSignal();
+
+            if (line_signal_prev == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            connect(line_signal, &Signal::sendLineVoltage,
+                    line_signal_prev, &Signal::slotRecvLineVoltage);
+
+            Journal::instance()->info("Connected line signal " + line_signal->getLetter() +
+                                      " with line signal " + line_signal_prev->getLetter());
         }
     }
 }

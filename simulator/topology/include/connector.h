@@ -9,6 +9,8 @@
 #include    <CfgReader.h>
 #include    <topology-connector-device.h>
 
+class Signal;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -40,6 +42,16 @@ public:
 
     virtual void deserialize(QByteArray &data, traj_list_t &traj_list);
 
+    void setSignal(Signal *signal)
+    {
+        this->signal = signal;
+    }
+
+    Signal *getSignal() const
+    {
+        return signal;
+    }
+
 protected:
 
     Trajectory *fwdTraj = Q_NULLPTR;
@@ -53,6 +65,7 @@ protected:
     /// Связи путевой инфраструктуры
     std::vector<ConnectorDevice *> devices;
 
+    Signal *signal = Q_NULLPTR;
 };
 
 #endif

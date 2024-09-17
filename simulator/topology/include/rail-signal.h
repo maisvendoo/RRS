@@ -3,6 +3,7 @@
 
 #include    <device.h>
 #include    <topology-export.h>
+#include    <connector.h>
 
 //------------------------------------------------------------------------------
 //
@@ -60,6 +61,16 @@ public:
         return signal_dir;
     }
 
+    void setConnector(Connector *conn)
+    {
+        this->conn = conn;
+    }
+
+    Connector *getConnector() const
+    {
+        return conn;
+    }
+
     /// Установить занятость блок-участка, предшествующего данному сигналу
     void setBusy(bool is_busy);
 
@@ -82,6 +93,9 @@ protected:
     bool is_busy = false;
 
     int signal_dir = 0;
+
+    /// Коннектор, с которым связан сигнал
+    Connector *conn = Q_NULLPTR;
 
     void load_config(CfgReader &cfg) override;
 
