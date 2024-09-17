@@ -72,7 +72,10 @@ public:
     }
 
     /// Установить занятость блок-участка, предшествующего данному сигналу
-    void setBusy(bool is_busy);
+    void setBusy(bool is_busy)
+    {
+        this->is_busy = is_busy;
+    }
 
 signals:
 

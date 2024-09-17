@@ -228,6 +228,51 @@ void Topology::step(double t, double dt)
         (*conn)->step(t, dt);
     }
 
+    for (auto line_signal : line_signals)
+    {
+        bool is_busy = false;
+
+        if (line_signal->getDirection() == 1)
+        {
+            Connector *conn = line_signal->getConnector();
+
+            if (conn == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            Trajectory *traj = conn->getBwdTraj();
+
+            if (traj == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            is_busy = traj->isBusy();
+        }
+
+        if (line_signal->getDirection() == -1)
+        {
+            Connector *conn = line_signal->getConnector();
+
+            if (conn == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            Trajectory *traj = conn->getFwdTraj();
+
+            if (traj == Q_NULLPTR)
+            {
+                continue;
+            }
+
+            is_busy = traj->isBusy();
+        }
+
+        line_signal->setBusy(is_busy);
+        line_signal->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
