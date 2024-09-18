@@ -71,7 +71,7 @@ bool Topology::load(QString route_dir)
 
     load_topology(route_path);
 
-    line_signals_connect(line_signals);
+    line_signals_connect(signals_data.line_signals);
 
     if (!load_stations(route_path))
     {
@@ -228,7 +228,7 @@ void Topology::step(double t, double dt)
         (*conn)->step(t, dt);
     }
 
-    for (auto line_signal : line_signals)
+    for (auto line_signal : signals_data.line_signals)
     {
         bool is_busy = false;
 
@@ -478,7 +478,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 
             conn->setSignal(line_signal);
 
-            line_signals.push_back(line_signal);
+            signals_data.line_signals.push_back(line_signal);
 
             Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
         }

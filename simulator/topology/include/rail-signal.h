@@ -77,6 +77,10 @@ public:
         this->is_busy = is_busy;
     }
 
+    QByteArray serialize();
+
+    void deserialize(QByteArray &data);
+
 signals:
 
     /// Послать предыдущему световору напряжение линии
@@ -99,6 +103,9 @@ protected:
 
     /// Коннектор, с которым связан сигнал
     Connector *conn = Q_NULLPTR;
+
+    /// Имя коннектора, с которым связан сигнал (для десериализации)
+    QString conn_name = "";
 
     void load_config(CfgReader &cfg) override;
 

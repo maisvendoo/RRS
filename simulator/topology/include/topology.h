@@ -7,7 +7,7 @@
 #include    <topology-types.h>
 #include    <vehicle-controller.h>
 #include    <vehicle.h>
-#include    <line-signal.h>
+#include    <signals-data-types.h>
 
 /*!
  * \class
@@ -85,8 +85,8 @@ private:
     /// Сипсок станций
     topology_stations_list_t stations;
 
-    /// Контейнер проходных сигналов
-    std::vector<Signal *> line_signals;
+    /// Контейнер сигналов
+    signals_data_t  signals_data;
 
     /// Название маршрута
     QString route_name = "";
