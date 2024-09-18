@@ -8,6 +8,7 @@
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
 #include    <switch-label.h>
+#include    <signals-data-types.h>
 
 //------------------------------------------------------------------------------
 //
@@ -31,6 +32,8 @@ public:
     topology_stations_list_t *stations = Q_NULLPTR;
 
     QMap<QString , SwitchLabel *> switch_labels;
+
+    signals_data_t *signals_data = Q_NULLPTR;
 
     void resize(int width, int height);
 
@@ -79,6 +82,10 @@ private:
     void drawConnector(Connector *conn);
 
     void drawStations(topology_stations_list_t *stations);
+
+    void drawLineSignal(Signal *signal);
+
+    void drawSignals(signals_data_t *signals_data);
 
     QPoint coord_transform(dvec3 traj_point);
 

@@ -31,6 +31,50 @@ CombineRelay::~CombineRelay()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void CombineRelay::setInitPlusContactState(size_t idx, bool state)
+{
+    if (idx >= plus_contact.size())
+        return;
+
+    plus_contact[idx] = state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CombineRelay::setInitMinusContactState(size_t idx, bool state)
+{
+    if (idx >= minus_contact.size())
+        return;
+
+    minus_contact[idx] = state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool CombineRelay::getPlusContactState(size_t idx) const
+{
+    if (idx >= plus_contact.size())
+        return false;
+
+    return plus_contact[idx];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool CombineRelay::getMinusContactState(size_t idx) const
+{
+    if (idx >= minus_contact.size())
+        return false;
+
+    return minus_contact[idx];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CombineRelay::preStep(state_vector_t &Y, double t)
 {
     // Обрабатываем нейтральный якорь

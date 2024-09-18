@@ -40,6 +40,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::setTrajBusyState,
             this, &MainWindow::slotGetTrajBusyState);
 
+    connect(tcp_client, &TcpClient::setSignalsData,
+            this, &MainWindow::slotGetSignalsData);
+
+    connect(tcp_client, &TcpClient::updateSignal,
+            this, &MainWindow::slotUpdateSignal);
+
     map = new MapWidget(ui->Map);
 }
 
@@ -96,9 +102,10 @@ void MainWindow::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
+    // Запрос серверу на загрузку топологии
     tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
 
-    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
+    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));    
 }
 
 //------------------------------------------------------------------------------
@@ -161,7 +168,10 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     map->conn_list = conn_list;
     map->stations = topology->getStationsList();
 
-    trainUpdateTimer->start(tcp_config.request_interval);
+    // Запрос серверу на загрузку сигналов
+    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
+    //trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------
@@ -262,4 +272,71 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
     }
 
     traj->setBusyState(busy_state.is_busy);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSignalsData(QByteArray &sig_data)
+{
+    signals_data->deserialize(sig_data);
+
+    if (signals_data->line_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 line signals")).arg(signals_data->line_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Failed to load signals data")));
+        return;
+    }
+
+    for (auto line_signal : signals_data->line_signals)
+    {
+        Connector *conn = conn_list->value(line_signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        line_signal->setConnector(conn);
+        conn->setSignal(line_signal);
+    }
+
+    map->signals_data = signals_data;
+
+    // Запуск таймера запроса положения поезда
+    trainUpdateTimer->start(tcp_config.request_interval);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotUpdateSignal(QByteArray signal_data)
+{
+    QBuffer buff(&signal_data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    QString conn_name = "";
+
+    stream >> conn_name;
+
+    if (conn_name.isEmpty())
+    {
+        return;
+    }
+
+    Connector *conn = conn_list->value(conn_name, Q_NULLPTR);
+
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    if (conn->getSignal() != Q_NULLPTR)
+    {
+        conn->getSignal()->deserialize(signal_data);
+    }
 }

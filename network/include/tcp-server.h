@@ -33,6 +33,8 @@ signals:
 
     void setTrajBusyState(QByteArray &busy_data);
 
+    void setSignalsData(QByteArray &signals_data);
+
 private:
 
     quint16 port = 1992;
@@ -53,6 +55,8 @@ private:
 
     client_data_t map_client;
 
+    QByteArray signals_data;
+
     int getClientDataBySocket(QTcpSocket *socket);
 
     void process_client_request(client_data_t &client_data);
@@ -60,6 +64,8 @@ private:
     void send_topology_data(client_data_t &client_data);
 
     void send_simulator_data(client_data_t &client_data);
+
+    void send_signals_list(client_data_t &client_data);
 
 public slots:
 
@@ -72,6 +78,8 @@ public slots:
     void slotSendSwitchState(QByteArray sw_state);
 
     void slotSendTrajBusyState(QByteArray busy_state);
+
+    void slotUpdateSignal(QByteArray signal_data);
 };
 
 #endif

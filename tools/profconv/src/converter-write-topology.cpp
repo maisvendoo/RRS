@@ -70,8 +70,12 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
     {
         flist.append(QPair<QString, QString>("SignalLetter", bwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
         QString bwd_type = QString(connector->signal_bwd_type.c_str());
+
         if (!bwd_type.isEmpty())
+        {
             flist.append(QPair<QString, QString>("SignalModel", bwd_type));
+            flist.append(QPair<QString, QString>("SignalDirection", QString("-1")));
+        }
     }
     // Светофор вперёд
     QString fwd_liter = QString(connector->signal_fwd_liter.c_str());
@@ -80,7 +84,10 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
         flist.append(QPair<QString, QString>("SignalLetter", fwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
         QString fwd_type = QString(connector->signal_fwd_type.c_str());
         if (!fwd_type.isEmpty())
+        {
             flist.append(QPair<QString, QString>("SignalModel", fwd_type));
+            flist.append(QPair<QString, QString>("SignalDirection", QString("1")));
+        }
     }
     //editor.writeFile("Joint", flist);
     editor.writeFile("Switch", flist);

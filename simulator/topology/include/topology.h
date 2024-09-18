@@ -7,6 +7,7 @@
 #include    <topology-types.h>
 #include    <vehicle-controller.h>
 #include    <vehicle.h>
+#include    <signals-data-types.h>
 
 /*!
  * \class
@@ -56,6 +57,11 @@ public:
         return &stations;
     }
 
+    signals_data_t *getSignalsData()
+    {
+        return &signals_data;
+    }
+
     QString getRouteName() const
     {
         return route_name;
@@ -84,6 +90,9 @@ private:
     /// Сипсок станций
     topology_stations_list_t stations;
 
+    /// Контейнер сигналов
+    signals_data_t  signals_data;
+
     /// Название маршрута
     QString route_name = "";
 
@@ -92,6 +101,12 @@ private:
 
     /// Загрузка топологии
     bool load_topology(QString route_dir);
+
+    /// Загрузка сигналов (пока ограничиваюсь проходными)
+    void load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn);
+
+    /// Связывание сигналов
+    void line_signals_connect(std::vector<Signal *> &line_signals);
 
     /// Загрузка списка станций
     bool load_stations(QString route_dir);

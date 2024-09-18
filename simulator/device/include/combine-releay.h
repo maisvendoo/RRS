@@ -18,6 +18,14 @@ public:
 
     ~CombineRelay();
 
+    void setInitPlusContactState(size_t idx, bool state);
+
+    void setInitMinusContactState(size_t idx, bool state);
+
+    bool getPlusContactState(size_t idx) const;
+
+    bool getMinusContactState(size_t idx) const;
+
 private:
 
     /// Контакты, активируемые при положительной полярности
