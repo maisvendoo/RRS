@@ -102,6 +102,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
+    // Запрос серверу на загрузку топологии
     tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
 
     ui->ptLog->appendPlainText(tr("Send request for topology loading..."));    
@@ -167,8 +168,10 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     map->conn_list = conn_list;
     map->stations = topology->getStationsList();
 
+    // Запрос серверу на загрузку сигналов
     tcp_client->sendRequest(STYPE_SIGNALS_LIST);
     ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
+    //trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------
@@ -303,6 +306,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     map->signals_data = signals_data;
 
+    // Запуск таймера запроса положения поезда
     trainUpdateTimer->start(tcp_config.request_interval);
 }
 
@@ -311,10 +315,20 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 //------------------------------------------------------------------------------
 void MainWindow::slotUpdateSignal(QByteArray signal_data)
 {
-    LineSignal signal;
-    signal.deserialize(signal_data);
+    QBuffer buff(&signal_data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
 
-    Connector *conn = conn_list->value(signal.getConnectorName(), Q_NULLPTR);
+    QString conn_name = "";
+
+    stream >> conn_name;
+
+    if (conn_name.isEmpty())
+    {
+        return;
+    }
+
+    Connector *conn = conn_list->value(conn_name, Q_NULLPTR);
 
     if (conn == Q_NULLPTR)
     {

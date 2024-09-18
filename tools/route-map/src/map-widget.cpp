@@ -306,6 +306,11 @@ void MapWidget::drawStations(topology_stations_list_t *stations)
 //------------------------------------------------------------------------------
 void MapWidget::drawSignals(signals_data_t *signals_data)
 {
+    if (signals_data == Q_NULLPTR)
+    {
+        return;
+    }
+
     for (auto line_signal : signals_data->line_signals)
     {
         drawLineSignal(line_signal);
@@ -317,6 +322,11 @@ void MapWidget::drawSignals(signals_data_t *signals_data)
 //------------------------------------------------------------------------------
 void MapWidget::drawLineSignal(Signal *signal)
 {
+    if (signal == Q_NULLPTR)
+    {
+        return;
+    }
+
     Connector *conn = signal->getConnector();
 
     if (conn == Q_NULLPTR)
