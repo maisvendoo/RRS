@@ -239,6 +239,7 @@ void Topology::step(double t, double dt)
             if (conn == Q_NULLPTR)
             {
                 continue;
+
             }
 
             Trajectory *traj = conn->getBwdTraj();
