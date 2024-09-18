@@ -50,6 +50,8 @@ private:
 
     MapWidget *map;
 
+    signals_data_t *signals_data = new signals_data_t();
+
     void load_config(const QString &cfg_name);
 
     /// Преобразование координат точки траекторри в координаты виджета
@@ -74,6 +76,8 @@ private slots:
     void slotGetSwitchState(QByteArray &sw_state);
 
     void slotGetTrajBusyState(QByteArray &busy_state);
+
+    void slotGetSignalsData(QByteArray &sig_data);
 };
 
 #endif // MAINWINDOW_H

@@ -15,7 +15,9 @@ enum StructureType
     STYPE_TOPOLOGY_DATA,
     STYPE_TRAIN_POSITION,
     STYPE_CONNECTOR_STATE,
-    STYPE_TRAJ_BUSY_STATE
+    STYPE_TRAJ_BUSY_STATE,
+    STYPE_SIGNALS_LIST,
+    STYPE_SIGNAL_STATE
 };
 
 //------------------------------------------------------------------------------

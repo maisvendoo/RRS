@@ -57,6 +57,11 @@ public:
         return &stations;
     }
 
+    signals_data_t *getSignalsData()
+    {
+        return &signals_data;
+    }
+
     QString getRouteName() const
     {
         return route_name;

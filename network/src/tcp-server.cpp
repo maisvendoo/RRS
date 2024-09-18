@@ -98,6 +98,11 @@ void TcpServer::process_client_request(client_data_t &client_data)
         emit setSwitchState(client_data.received_data.data);
         break;
     }
+    case STYPE_SIGNALS_LIST:
+    {
+        send_signals_list(client_data);
+        break;
+    }
     case STYPE_EMPTY_DATA:
     default:
 
@@ -134,6 +139,19 @@ void TcpServer::send_simulator_data(client_data_t &client_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpServer::send_signals_list(client_data_t &client_data)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_SIGNALS_LIST;
+    net_data.data = signals_data;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpServer::slotNewConnection()
 {
     client_data_t client_data;
@@ -158,13 +176,25 @@ void TcpServer::slotNewConnection()
     topology_data.clear();
     emit setTopologyData(topology_data);
 
-    if (topology_data.size())
+    if (topology_data.size() != 0)
     {
         Journal::instance()->info(QString("Updated topology data size: %1").arg(topology_data.size()));
     }
     else
     {
         Journal::instance()->error("Failed to update topology data");
+    }
+
+    signals_data.clear();
+    emit setSignalsData(signals_data);
+
+    if (signals_data.size() != 0)
+    {
+        Journal::instance()->info(QString("Updated signals data size %1").arg(signals_data.size()));
+    }
+    else
+    {
+        Journal::instance()->error("Failed to update signals data");
     }
 }
 

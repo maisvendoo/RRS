@@ -117,6 +117,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setTrajBusyState(net_data.data);
         break;
 
+    case STYPE_SIGNALS_LIST:
+        emit setSignalsData(net_data.data);
+        break;
+
     default:
 
         break;

@@ -52,6 +52,8 @@ signals:
 
     void setTrajBusyState(QByteArray &busy_state);
 
+    void setSignalsData(QByteArray &signals_data);
+
 private:
 
     QTcpSocket *socket = Q_NULLPTR;

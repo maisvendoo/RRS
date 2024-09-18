@@ -227,6 +227,8 @@ private slots:
     void process();
 
     void slotGetTopologyData(QByteArray &topology_data);
+
+    void slotGetSignalsData(QByteArray &signals_data);
 };
 
 #endif // MODEL_H

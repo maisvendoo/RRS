@@ -40,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::setTrajBusyState,
             this, &MainWindow::slotGetTrajBusyState);
 
+    connect(tcp_client, &TcpClient::setSignalsData,
+            this, &MainWindow::slotGetSignalsData);
+
     map = new MapWidget(ui->Map);
 }
 
@@ -99,6 +102,9 @@ void MainWindow::slotConnectedToSimulator()
     tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
 
     ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
+
+    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
 }
 
 //------------------------------------------------------------------------------
@@ -262,4 +268,21 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
     }
 
     traj->setBusyState(busy_state.is_busy);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSignalsData(QByteArray &sig_data)
+{
+    signals_data->deserialize(sig_data);
+
+    if (signals_data->line_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 line signals")).arg(signals_data->line_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Failed to load signals data")));
+    }
 }

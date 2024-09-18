@@ -688,6 +688,8 @@ void Model::initTcpServer()
     connect(topology, &Topology::sendSwitchState, tpc_server, &TcpServer::slotSendSwitchState);
 
     connect(topology, &Topology::sendTrajBusyState, tpc_server, &TcpServer::slotSendTrajBusyState);
+
+    connect(tpc_server, &TcpServer::setSignalsData, this, &Model::slotGetSignalsData);
 }
 
 //------------------------------------------------------------------------------
@@ -928,4 +930,12 @@ void Model::process()
 void Model::slotGetTopologyData(QByteArray &topology_data)
 {
     topology_data = topology->serialize();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetSignalsData(QByteArray &signals_data)
+{
+    signals_data = topology->getSignalsData()->serialize();
 }
