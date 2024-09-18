@@ -78,6 +78,8 @@ private slots:
     void slotGetTrajBusyState(QByteArray &busy_state);
 
     void slotGetSignalsData(QByteArray &sig_data);
+
+    void slotUpdateSignal(QByteArray signal_data);
 };
 
 #endif // MAINWINDOW_H

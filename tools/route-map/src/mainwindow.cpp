@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::setSignalsData,
             this, &MainWindow::slotGetSignalsData);
 
+    connect(tcp_client, &TcpClient::updateSignal,
+            this, &MainWindow::slotUpdateSignal);
+
     map = new MapWidget(ui->Map);
 }
 
@@ -297,7 +300,29 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         line_signal->setConnector(conn);
+        conn->setSignal(line_signal);
     }
 
     map->signals_data = signals_data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotUpdateSignal(QByteArray signal_data)
+{
+    LineSignal signal;
+    signal.deserialize(signal_data);
+
+    Connector *conn = conn_list->value(signal.getConnectorName(), Q_NULLPTR);
+
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    if (conn->getSignal() != Q_NULLPTR)
+    {
+        conn->getSignal()->deserialize(signal_data);
+    }
 }

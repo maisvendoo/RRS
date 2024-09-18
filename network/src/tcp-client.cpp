@@ -121,6 +121,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setSignalsData(net_data.data);
         break;
 
+    case STYPE_SIGNAL_STATE:
+        emit updateSignal(net_data.data);
+        break;
+
     default:
 
         break;

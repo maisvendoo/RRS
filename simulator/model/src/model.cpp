@@ -690,6 +690,11 @@ void Model::initTcpServer()
     connect(topology, &Topology::sendTrajBusyState, tpc_server, &TcpServer::slotSendTrajBusyState);
 
     connect(tpc_server, &TcpServer::setSignalsData, this, &Model::slotGetSignalsData);
+
+    for (auto line_signal : topology->getSignalsData()->line_signals)
+    {
+        connect(line_signal, &Signal::sendDataUpdate, tpc_server, &TcpServer::slotUpdateSignal);
+    }
 }
 
 //------------------------------------------------------------------------------
