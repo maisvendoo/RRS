@@ -104,10 +104,7 @@ void MainWindow::slotConnectedToSimulator()
 {
     tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
 
-    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
-
-    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
-    ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
+    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));    
 }
 
 //------------------------------------------------------------------------------
@@ -170,7 +167,8 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     map->conn_list = conn_list;
     map->stations = topology->getStationsList();
 
-    trainUpdateTimer->start(tcp_config.request_interval);
+    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
 }
 
 //------------------------------------------------------------------------------
@@ -304,6 +302,8 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     }
 
     map->signals_data = signals_data;
+
+    trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------

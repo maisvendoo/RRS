@@ -469,7 +469,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         int signal_dir = 0;
         cfg.getInt(secNode, "SignalDirection", signal_dir);
 
-        if (signal_model == "ab_line")
+        if (signal_model.right(4) == "line")
         {
             LineSignal *line_signal = new LineSignal;
             line_signal->setLetter(signal_letter);
