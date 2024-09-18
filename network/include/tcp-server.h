@@ -78,6 +78,8 @@ public slots:
     void slotSendSwitchState(QByteArray sw_state);
 
     void slotSendTrajBusyState(QByteArray busy_state);
+
+    void slotUpdateSignal(QByteArray signal_data);
 };
 
 #endif

@@ -290,3 +290,19 @@ void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
         client_data.socket->flush();
     }
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotUpdateSignal(QByteArray signal_data)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_SIGNAL_STATE;
+    net_data.data = signal_data;
+
+    for (auto client_data : clients_data)
+    {
+        client_data.socket->write(net_data.serialize());
+        client_data.socket->flush();
+    }
+}

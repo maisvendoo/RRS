@@ -91,10 +91,16 @@ signals:
     /// Послать предыдущему световору напряжение линии
     void sendLineVoltage(double U_line);
 
+    /// Послать серверу запрос на обновление данных
+    void sendDataUpdate(QByteArray signal_data);
+
 protected:    
 
     /// Состояние всех возможных линз
     lens_state_t lens_state;
+
+    /// Предыдущее состояние ламп
+    lens_state_t old_lens_state;
 
     /// Литер
     QString letter = "";

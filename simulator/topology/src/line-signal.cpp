@@ -43,6 +43,31 @@ void LineSignal::step(double t, double dt)
 //------------------------------------------------------------------------------
 void LineSignal::preStep(state_vector_t &Y, double t)
 {
+    // Запоминаем старое состояние ламп
+    old_lens_state = lens_state;
+
+    // Управляем состоянием ламп через контакты линейного реле
+
+    // Красный сигнал при отпадании нейтрального якоря
+    lens_state[RED_LENS] = line_relay->getContactState(LR_NEUTRAL_PROHIBITING);
+
+    // Зеленый, при притянутом нейтральном якоре и положительном питании
+    // линейного реле
+    lens_state[GREEN_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
+                             line_relay->getPlusContactState(LR_PLUS_GREEN);
+
+    // Желтый, при притянутом нейтральном якоре и отрицательном питании
+    // линейного реле
+    lens_state[YELLOW_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
+                              line_relay->getMinusContactState(LR_MINUS_YELLOW);
+
+    // При изменение соостояния ламп обновляем его
+    if (old_lens_state != lens_state)
+    {
+        old_lens_state = lens_state;
+        emit sendDataUpdate(this->serialize());
+    }
+
     // Признак  замыкания цепи путевой батареи
     double is_closed = static_cast<double>(is_busy);
 
@@ -68,23 +93,8 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     if (qAbs(U_line_prev - U_line_prev_old) >= 1.0)
     {
         // Устанавливаем новое значение на линии предыдущего светофора
-        emit sendLineVoltage(U_line_prev);
-    }
-
-    // Управляем состоянием ламп через контакты линейного реле
-
-    // Красный сигнал при отпадании нейтрального якоря
-    lens_state[RED_LENS] = line_relay->getContactState(LR_NEUTRAL_PROHIBITING);
-
-    // Зеленый, при притянутом нейтральном якоре и положительном питании
-    // линейного реле
-    lens_state[GREEN_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
-                             line_relay->getPlusContactState(LR_PLUS_GREEN);
-
-    // Желтый, при притянутом нейтральном якоре и отрицательном питании
-    // линейного реле
-    lens_state[YELLOW_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
-                              line_relay->getMinusContactState(LR_MINUS_YELLOW);
+        emit sendLineVoltage(U_line_prev);        
+    }    
 }
 
 //------------------------------------------------------------------------------
