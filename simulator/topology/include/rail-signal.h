@@ -81,6 +81,11 @@ public:
 
     void deserialize(QByteArray &data);
 
+    QString getConnectorName() const
+    {
+        return conn_name;
+    }
+
 signals:
 
     /// Послать предыдущему световору напряжение линии

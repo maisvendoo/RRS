@@ -284,5 +284,20 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     else
     {
         ui->ptLog->appendPlainText(QString(tr("Failed to load signals data")));
+        return;
     }
+
+    for (auto line_signal : signals_data->line_signals)
+    {
+        Connector *conn = conn_list->value(line_signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        line_signal->setConnector(conn);
+    }
+
+    map->signals_data = signals_data;
 }
