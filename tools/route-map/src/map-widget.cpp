@@ -373,7 +373,7 @@ void MapWidget::drawLineSignal(Signal *signal)
     QColor y_color(0, 0, 0);
     if (lens_state[YELLOW_LENS])
     {
-        g_color = QColor(255, 255, 0);
+        y_color = QColor(255, 255, 0);
     }
     painter.setBrush(y_color);
     painter.drawEllipse(yellow_p, radius * scale, radius * scale);
