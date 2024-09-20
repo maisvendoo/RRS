@@ -1,4 +1,5 @@
 #include    <enter-signal.h>
+#include    <switch.h>
 
 //------------------------------------------------------------------------------
 //
@@ -235,9 +236,79 @@ bool EnterSignal::is_route_free(Connector *conn)
 //------------------------------------------------------------------------------
 bool EnterSignal::is_switch_minus(Connector *conn)
 {
+    if (conn == Q_NULLPTR)
+    {
+        return false;
+    }
+
     bool is_minus = false;
 
-    return false;
+    Switch *cur_sw = dynamic_cast<Switch *>(conn);
+
+    while (true)
+    {
+        if (cur_sw == Q_NULLPTR)
+        {
+            return is_minus;
+        }
+
+        // проверка, стоят ли стрелки на бок
+        is_minus = is_minus ||
+                   (cur_sw->getStateFwd() == -1) ||
+                   (cur_sw->getStateBwd() == -1);
+
+        // Если одна на бок - выходим, дальнейшие проверки не имеют смысла
+        if (is_minus)
+        {
+            return is_minus;
+        }
+
+        // проверяем, есть ли траектория дальше
+        Trajectory *traj = Q_NULLPTR;
+
+        if (this->getDirection() == 1)
+        {
+            traj = cur_sw->getFwdTraj();
+        }
+        else
+        {
+            traj = cur_sw->getBwdTraj();
+        }
+
+        if (traj == Q_NULLPTR)
+        {
+            break;
+        }
+
+        // получаем следующий коннектор
+        if (this->getDirection() == 1)
+        {
+            cur_sw = dynamic_cast<Switch *>(traj->getFwdConnector());
+        }
+        else
+        {
+            cur_sw = dynamic_cast<Switch *>(traj->getBwdConnector());
+        }
+
+        if (cur_sw == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        Signal *signal = cur_sw->getSignal();
+
+        if (signal == Q_NULLPTR)
+        {
+            break;
+        }
+
+        if (signal->getSignalType() == "exit")
+        {
+            break;
+        }
+    }
+
+    return is_minus;
 }
 
 //------------------------------------------------------------------------------
