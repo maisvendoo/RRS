@@ -48,7 +48,19 @@ private:
         SSR_BOTTOM_YELLOW = 2,
 
         DSR_TOP_YELLOW = 0,
-        DSR_GREEN = 1
+        DSR_GREEN = 1,
+
+        RCR_SR_CTRL = 0,
+        RCR_MSR_SSR_CTRL = 1,
+        RCR_DSR_CTRL = 2,
+
+        SR_SELF_LOCK = 0,
+        SR_MSR_SSR_CTRL = 1,
+        SR_ALR_CTRL = 2,
+
+        ALR_MSR_SSR_CTRL = 0,
+
+        ESR_DSR_CTRL = 0
     };
 
     /// Главное сигнальное реле
@@ -123,6 +135,15 @@ private:
 
     /// Контроль занятости примыкающих участков
     void busy_control();
+
+    /// Управление цепями питания реле
+    void relay_control();
+
+    /// Проверка занятости маршрута по текущим стрелкам
+    bool is_route_free(Connector *conn);
+
+    /// Проверка состояния стрелок по маршруту
+    bool is_switch_minus(Connector *conn);
 
 private slots:
 

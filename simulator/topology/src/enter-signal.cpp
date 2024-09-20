@@ -110,11 +110,84 @@ void EnterSignal::busy_control()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void EnterSignal::relay_control()
+{
+    // Собираем цепь контрольного маршрутного реле
+    double is_RCR_ON = static_cast<double>(is_route_free(conn));
+    route_control_relay->setVoltage(U_bat * is_RCR_ON);
+
+    // Собираем цепь сигнального реле
+
+    // Состояние провода кнопочного блока "Открыть/Закрыть"
+    bool is_button_wire_ON = is_open_button_pressed ||
+                             (is_close_button_nopressed && signal_relay->getContactState(SR_SELF_LOCK));
+
+    bool is_SR_ON = is_button_wire_ON && bwd_way_relay->getContactState(BWD_BUSY_CLOSE);
+
+    signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
+
+    // Цепь реле замыкания маршрута приема
+    bool is_ALR_ON = signal_relay->getContactState(SR_ALR_CTRL);
+
+    arrival_lock_relay->setVoltage(U_bat * static_cast<double>(is_ALR_ON));
+
+    // Цепи главного и бокового сигнальных реле
+
+    // Состояние общего провода питания этих реле
+    bool is_common_wire_ON = arrival_lock_relay->getContactState(ALR_MSR_SSR_CTRL) &&
+                             signal_relay->getContactState(SR_MSR_SSR_CTRL);
+
+    // Проверяем, стоят ли стрелки на бок
+    bool is_minus = is_switch_minus(conn);
+
+    bool is_MSR_ON = (!is_minus) && is_common_wire_ON;
+
+    bool is_SSR_ON = (is_minus) && is_common_wire_ON;
+
+    main_signal_relay->setVoltage(U_bat * static_cast<double>(is_MSR_ON));
+
+    side_signal_relay->setVoltage(U_bat * static_cast<double>(is_SSR_ON));
+
+    // Питание указательного реле выходного сигнала
+    exit_signal_relay->setVoltage(U_line);
+
+    // Цепь сигнального реле сквозного пропуска
+    bool is_DSR_ON = exit_signal_relay->getContactState(ESR_DSR_CTRL) &&
+                     route_control_relay->getContactState(RCR_DSR_CTRL);
+
+    direct_signal_relay->setVoltage(U_bat * static_cast<double>(is_DSR_ON));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool EnterSignal::is_route_free(Connector *conn)
+{
+    bool is_free = true;
+
+    return is_free;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool EnterSignal::is_switch_minus(Connector *conn)
+{
+    bool is_minus = false;
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void EnterSignal::preStep(state_vector_t &Y, double t)
 {
     lens_control();
 
     busy_control();
+
+    relay_control();
 }
 
 //------------------------------------------------------------------------------
