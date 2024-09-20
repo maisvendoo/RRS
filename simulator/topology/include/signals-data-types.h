@@ -2,6 +2,8 @@
 #define     SIGNALS_DATA_TYPES_H
 
 #include    <line-signal.h>
+#include    <enter-signal.h>
+#include    <exit-signal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -9,6 +11,9 @@
 struct signals_data_t
 {
     std::vector<Signal *> line_signals;
+
+    std::vector<Signal *> enter_signals;
+
 
     QByteArray serialize()
     {
@@ -22,6 +27,13 @@ struct signals_data_t
         for (auto line_signal : line_signals)
         {
             stream << line_signal->serialize();
+        }
+
+        stream << enter_signals.size();
+
+        for (auto enter_signal: enter_signals)
+        {
+            stream << enter_signal->serialize();
         }
 
         return buff.data();
@@ -47,6 +59,22 @@ struct signals_data_t
             line_signal->deserialize(tmp_data);
 
             line_signals.push_back(line_signal);
+        }
+
+        size_t enter_signals_size = 0;
+        stream >> enter_signals_size;
+
+        enter_signals.clear();
+
+        for (size_t i = 0; i < enter_signals_size; ++i)
+        {
+            QByteArray tmp_data;
+            stream >> tmp_data;
+
+            EnterSignal *enter_signal = new EnterSignal;
+            enter_signal->deserialize(tmp_data);
+
+            enter_signals.push_back(enter_signal);
         }
     }
 };
