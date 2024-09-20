@@ -31,7 +31,7 @@ LineSignal::~LineSignal()
 //------------------------------------------------------------------------------
 void LineSignal::step(double t, double dt)
 {
-    Device::step(t, dt);
+    Signal::step(t, dt);
 
     way_relay->step(t, dt);
 

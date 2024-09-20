@@ -13,7 +13,9 @@ enum
     NUM_LENS = 5,
     RED_LENS = 0,
     YELLOW_LENS = 1,
-    GREEN_LENS = 2
+    GREEN_LENS = 2,
+    BOTTOM_YELLOW_LENS = 3,
+    CALL_LENS = 4
 };
 
 //------------------------------------------------------------------------------
