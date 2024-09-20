@@ -885,8 +885,11 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
         name_suffix;
 
     // Добавляем название траектории в коннектор на главном пути
-    // Если траектория началась с соседнего главного - добавляем в соседний главный
-    if (branch_track->begin_at_other)
+    // Если траектория началась с соседнего главного
+    // или траектория обратно началась на однопутке,
+    // добавляем в соседний главный
+    bool is_1_track = (dir < 0) && (tracks_data2[branch_track->id_end].id_at_track1 != -1);
+    if (branch_track->begin_at_other || is_1_track)
     {
         for (auto split = split_data_other->begin(); split != split_data_other->end(); ++split)
         {
@@ -899,7 +902,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
             }
             else
             {
-                if ((*split)->track_id == branch_track->id_end_at_other)
+                if (((*split)->track_id == branch_track->id_end_at_other) ||
+                    ((*split)->track_id == tracks_data2[branch_track->id_end].id_at_track1))
                 {
                     (*split)->fwd_side_traj = name_next;
                 }
@@ -1014,8 +1018,11 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                 trajectory.name = name_next;
 
                 // Добавляем название траектории в коннектор на главном пути
-                // Если траектория закончилась на соседнем главном - добавляем в соседний главный
-                if (branch_track->end_at_other)
+                // Если траектория закончилась на соседнем главном
+                // или траектория обратно закончилась на однопутке,
+                // добавляем в соседний главный
+                is_1_track = (dir < 0) && (tracks_data2[branch_track->id_begin].id_at_track1 != -1);
+                if (branch_track->end_at_other || is_1_track)
                 {
                     for (auto split = split_data_other->begin(); split != split_data_other->end(); ++split)
                     {
@@ -1028,7 +1035,8 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                         }
                         else
                         {
-                            if ((*split)->track_id == branch_track->id_begin_at_other)
+                            if (((*split)->track_id == branch_track->id_begin_at_other) ||
+                                ((*split)->track_id == tracks_data2[branch_track->id_begin].id_at_track1))
                             {
                                 (*split)->bwd_side_traj = name_next;
                             }
