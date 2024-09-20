@@ -163,7 +163,69 @@ void EnterSignal::relay_control()
 //------------------------------------------------------------------------------
 bool EnterSignal::is_route_free(Connector *conn)
 {
+    if (conn == Q_NULLPTR)
+    {
+        return false;
+    }
+
     bool is_free = true;
+
+    Connector *cur_conn = conn;
+
+    while (true)
+    {
+        // Смотрим траекторию за текущим коннектором
+        Trajectory *traj = Q_NULLPTR;
+
+        if (this->getDirection() == 1)
+        {
+            traj = cur_conn->getFwdTraj();
+        }
+        else
+        {
+            traj = cur_conn->getBwdTraj();
+        }
+
+        // Выходим, если за конектором нет валидной траектории - ехать некуда
+        if (traj == Q_NULLPTR)
+        {
+            return false;
+        }
+
+        // Проверяем занятость следующей траектории
+        is_free = is_free && (!traj->isBusy());
+
+        // Ищем следующий коннектор
+        if (this->getDirection() == 1)
+        {
+            cur_conn = traj->getFwdConnector();
+        }
+        else
+        {
+            cur_conn = traj->getBwdConnector();
+        }
+
+        // Если его нет, выходим стекущим результатом
+        if (cur_conn == Q_NULLPTR)
+        {
+            break;
+        }
+
+        // Смотрим сигнал на следующем коннекторе
+        Signal *signal = cur_conn->getSignal();
+
+        // Продолжаем цикл, возможно попалась стрелка
+        if (signal == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        // Если сигнал выходной - выходим с текущим результатом
+        if (signal->getSignalType() == "exit")
+        {
+            break;
+        }
+    }
 
     return is_free;
 }

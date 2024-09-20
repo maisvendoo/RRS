@@ -79,6 +79,18 @@ public:
         this->is_busy = is_busy;
     }
 
+    /// Задать имя модели сигнала
+    void setSignalModel(const QString &signal_model)
+    {
+        this->signal_model = signal_model;
+    }
+
+    /// Вернуть тип сигнала (проходной/входной/выходной/маршрутный)
+    QString getSignalType() const
+    {
+        return signal_model.right(4);
+    }
+
     QByteArray serialize();
 
     void deserialize(QByteArray &data);
@@ -106,6 +118,9 @@ protected:
 
     /// Литер
     QString letter = "";
+
+    /// Имя модели сигнала
+    QString signal_model = "";
 
     /// Напряжение питания линейного реле
     double U_line = 0.0;
