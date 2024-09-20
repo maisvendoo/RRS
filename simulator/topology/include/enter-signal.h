@@ -2,7 +2,7 @@
 #define     ENTER_SIGNAL_H
 
 #include    <rail-signal.h>
-#include    <relay.h>
+#include    <combine-releay.h>
 #include    <timer.h>
 
 //------------------------------------------------------------------------------
@@ -17,6 +17,16 @@ public:
     ~EnterSignal();
 
     void step(double t, double dt) override;
+
+    void setFwdBusy(bool is_fwd_busy)
+    {
+        this->is_fwd_busy = is_fwd_busy;
+    }
+
+    void setBwdBusy(bool is_bwd_busy)
+    {
+        this->is_bwd_busy = is_bwd_busy;
+    }
 
 private:
 
@@ -62,11 +72,39 @@ private:
     /// Указательное реле выходного светофора
     Relay *exit_signal_relay = new Relay(NUM_ESR_CONTACTS);
 
+    enum
+    {
+        NUM_FWD_BUSY = 3,
+        FWD_BUSY_RED = 0,
+
+        NUM_BWD_BUSY = 3,
+        BWD_BUSY_PLUS = 0,
+        BWD_BUSY_MINUS = 1,
+        BWD_BUSY_CLOSE = 2
+    };
+
+    /// Путевое реле на учатке приближения
+    Relay *fwd_way_relay = new Relay(NUM_FWD_BUSY);
+
+    /// Путевое реле на стрелочном участке
+    Relay *bwd_way_relay = new Relay(NUM_BWD_BUSY);
+
+    /// Признак занятия учатка приближения
+    bool is_fwd_busy = false;
+
+    /// Признак занятия стрелочного участка
+    bool is_bwd_busy = false;
+
     /// Признак нажатия кнопки открытия
     bool is_open_button_pressed = false;
 
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_nopressed = true;
+
+    double U_bat = 12.0;
+
+    /// Напряжение, передаваемое на линию предыдущего светофора
+    double U_line_prev = 0.0;
 
     /// Таймер выдержкм времени удержания кнопки открыть
     Timer *open_timer = new Timer(1.0);
@@ -79,6 +117,12 @@ private:
     void ode_system(const state_vector_t &Y,
                     state_vector_t &dYdt,
                     double t) override;
+
+    /// Управление состоянием линз
+    void lens_control();
+
+    /// Контроль занятости примыкающих участков
+    void busy_control();
 
 private slots:
 
