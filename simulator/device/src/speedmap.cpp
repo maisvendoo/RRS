@@ -9,8 +9,8 @@ SpeedMap::SpeedMap(QObject *parent) : Device(parent)
 {
     name = QString("speedmap");
 
-    input_signals.resize(SIZE_OF_OUTPUTS);
-    output_signals.resize(SIZE_OF_INPUTS);
+    input_signals.resize(SIZE_OF_INPUTS);
+    output_signals.resize(SIZE_OF_OUTPUTS);
 
     output_signals[OUTPUT_SEARCH_DIRECTION] = 1.0;
     output_signals[OUTPUT_CUR_SEARCH_DISTANCE] = 50.0;

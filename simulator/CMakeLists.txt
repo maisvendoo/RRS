@@ -37,5 +37,7 @@ add_subdirectory (joint-pneumo-hose-epb)
 
 add_subdirectory (connector-speedmap)
 add_subdirectory (trajectory-speedmap)
+add_subdirectory (connector-ALSN)
+add_subdirectory (trajectory-ALSN)
 
 install(FILES ../common-headers/sound-signal.h DESTINATION sdk/include)

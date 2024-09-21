@@ -1,6 +1,6 @@
 #include    "trajectory-speedmap.h"
 #include    "speedmap.h"
-#include "topology-connector-device.h"
+#include    "topology-connector-device.h"
 #include    "trajectory.h"
 
 //------------------------------------------------------------------------------

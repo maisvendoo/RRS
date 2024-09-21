@@ -320,9 +320,6 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 //------------------------------------------------------------------------------
 void Switch::step(double t, double dt)
 {
-    (void) t;
-    (void) dt;
-
     int prev_state_fwd = state_fwd;
     int prev_state_bwd = state_bwd;
 
@@ -455,6 +452,11 @@ void Switch::step(double t, double dt)
             if (no_change)
                 device->setBwdTrajectoryDevice(nullptr);
         }
+    }
+
+    for (auto conn_device : devices)
+    {
+        conn_device->step(t, dt);
     }
 }
 

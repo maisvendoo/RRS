@@ -93,8 +93,9 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
     // Заполняем имя траектории (по имени файла, где она хранится)
     name = traj_name;
 
-    // Пока для теста грузим модуль путевой инфраструктуры с картой скоростей напрямую
     FileSystem &fs = FileSystem::getInstance();
+
+    // Пока для теста грузим модуль путевой инфраструктуры с картой скоростей напрямую
     QString traj_speedmap_path = QString(fs.getModulesDir().c_str()) +
                                     QDir::separator() +
                                     "trajectory-speedmap";
@@ -113,6 +114,27 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name)
         traj_speedmap->read_config("trajectory-speedmap", cfg_topology_dir);
 
         devices.push_back(traj_speedmap);
+    }
+
+    // Пока для теста грузим модуль путевой инфраструктуры с рельсовыми цепями АЛСН напрямую
+    QString traj_ALSN_path = QString(fs.getModulesDir().c_str()) +
+                                 QDir::separator() +
+                                 "trajectory-ALSN";
+    TrajectoryDevice *traj_ALSN = loadTrajectoryDevice(traj_ALSN_path);
+
+    if (traj_ALSN == nullptr)
+    {
+        Journal::instance()->error("Speedmap module for " + traj_name + " not found");
+    }
+    else
+    {
+        traj_ALSN->setTrajectory(this);
+
+        QString cfg_topology_dir = QDir::toNativeSeparators(route_dir) +
+                                   QDir::separator() + "topology";
+        traj_ALSN->read_config("trajectory-ALSN", cfg_topology_dir);
+
+        devices.push_back(traj_ALSN);
     }
 
     return true;
@@ -179,6 +201,26 @@ bool Trajectory::isBusy(double coord_begin, double coord_end) const
         }
     }
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord)
+{
+    busy_begin_coord = 0.0;
+    busy_end_coord = len;
+    if (is_busy)
+    {
+        for (auto vehicle_coord : vehicles_coords)
+        {
+            if (busy_begin_coord < vehicle_coord[0])
+                busy_begin_coord = vehicle_coord[0];
+
+            if (busy_end_coord > vehicle_coord[1])
+                busy_end_coord = vehicle_coord[1];
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

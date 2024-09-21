@@ -56,4 +56,17 @@ void VL60k::debugPrint(double t, double dt)
                     .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0)
                     .arg(speedmap_bwd->getNextLimit(), 3, 'f', 0)
                     .arg(speedmap_bwd->getNextLimitDistance(), 6, 'f', 1);
+
+    DebugMsg += QString("\n");
+    DebugMsg += QString("FWD Signal code %1 (%2 Hz) | Next %3 (%4 m)")
+                    .arg(coil_ALSN_fwd->getCode(), 1)
+                    .arg(coil_ALSN_fwd->getFrequency(), 3, 'f', 0)
+                    .arg(coil_ALSN_fwd->getNextSignalLiter())
+                    .arg(coil_ALSN_fwd->getNextSignalDistance(), 6, 'f', 1);
+    DebugMsg += QString(" | ");
+    DebugMsg += QString("BWD Signal code %1 (%2 Hz) | Next %3 (%4 m)")
+                    .arg(coil_ALSN_bwd->getCode(), 1)
+                    .arg(coil_ALSN_bwd->getFrequency(), 3, 'f', 0)
+                    .arg(coil_ALSN_bwd->getNextSignalLiter())
+                    .arg(coil_ALSN_bwd->getNextSignalDistance(), 6, 'f', 1);
 }

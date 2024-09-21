@@ -24,11 +24,11 @@ public:
 
     void setConnector(Connector *conn);
 
-    void setFwdTrajectoryDevice(TrajectoryDevice *traj_device);
-    void setBwdTrajectoryDevice(TrajectoryDevice *traj_device);
+    virtual void setFwdTrajectoryDevice(TrajectoryDevice *traj_device);
+    virtual void setBwdTrajectoryDevice(TrajectoryDevice *traj_device);
 
-    TrajectoryDevice *getFwdTrajectoryDevice() const;
-    TrajectoryDevice *getBwdTrajectoryDevice() const;
+    virtual TrajectoryDevice *getFwdTrajectoryDevice() const;
+    virtual TrajectoryDevice *getBwdTrajectoryDevice() const;
 
     /// Шаг симуляции
     virtual void step(double t, double dt);

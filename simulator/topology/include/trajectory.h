@@ -67,6 +67,8 @@ public:
 
     bool isBusy(double coord_begin, double coord_end) const;
 
+    void getBusyCoords(double &busy_begin_coord, double &busy_end_coord);
+
     /// Вернуть первый трек траектории
     track_t getFirstTrack() const
     {

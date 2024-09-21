@@ -6,6 +6,7 @@
 #include    "sound-signal.h"
 
 #include    "airdistributor.h"
+#include    "ALSN-coil.h"
 #include    "automatic-train-stop.h"
 #include    "battery.h"
 #include    "brake-auto-mode.h"
