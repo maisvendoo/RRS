@@ -28,6 +28,12 @@ public:
         this->is_bwd_busy = is_bwd_busy;
     }
 
+public slots:
+
+    void slotPressOpen();
+
+    void slotPressClose();
+
 private:
 
     enum
@@ -151,11 +157,7 @@ private slots:
 
     void slotOpenTimer();
 
-    void slotCloseTimer();
-
-    void slotPressOpen();
-
-    void slotPressClose();
+    void slotCloseTimer();    
 };
 
 #endif

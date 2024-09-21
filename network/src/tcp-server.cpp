@@ -103,6 +103,17 @@ void TcpServer::process_client_request(client_data_t &client_data)
         send_signals_list(client_data);
         break;
     }
+    case STYPE_OPEN_SIGNAL:
+    {
+        emit openSignal(client_data.received_data.data);
+        break;
+    }
+    case STYPE_CLOSE_SIGNAL:
+    {
+        emit closeSignal(client_data.received_data.data);
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 

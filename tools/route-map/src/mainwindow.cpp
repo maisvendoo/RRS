@@ -240,6 +240,14 @@ void MainWindow::slotSwitchConnectorMenu()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::slotSignalControlMenu()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotGetSwitchState(QByteArray &sw_state)
 {
     switch_state_t switch_state;
@@ -325,6 +333,14 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
         signal->setConnector(conn);
         conn->setSignal(signal);
+
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
+        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+
+        map->signal_labels.insert(conn->getName(), signal_label);
     }
 
 

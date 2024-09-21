@@ -36,6 +36,8 @@ public:
 
     void sendSwitchState(QString conn_name, int state_fwd, int state_bwd);
 
+    void sendSignalState(QString conn_name, bool open);
+
     bool isConnected() const;
 
 signals:
@@ -54,7 +56,7 @@ signals:
 
     void setSignalsData(QByteArray &signals_data);
 
-    void updateSignal(QByteArray signal_data);
+    void updateSignal(QByteArray signal_data);    
 
 private:
 
@@ -84,7 +86,7 @@ public slots:
 
     void slotOnConnectionTimeout();
 
-    void slotReceive();
+    void slotReceive();    
 };
 
 #endif

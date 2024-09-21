@@ -691,10 +691,19 @@ void Model::initTcpServer()
 
     connect(tpc_server, &TcpServer::setSignalsData, this, &Model::slotGetSignalsData);
 
-    for (auto line_signal : topology->getSignalsData()->line_signals)
+    for (auto signal : topology->getSignalsData()->line_signals)
     {
-        connect(line_signal, &Signal::sendDataUpdate, tpc_server, &TcpServer::slotUpdateSignal);
+        connect(signal, &Signal::sendDataUpdate, tpc_server, &TcpServer::slotUpdateSignal);
     }
+
+    for (auto signal : topology->getSignalsData()->enter_signals)
+    {
+        connect(signal, &Signal::sendDataUpdate, tpc_server, &TcpServer::slotUpdateSignal);
+    }
+
+    connect(tpc_server, &TcpServer::openSignal, topology, &Topology::slotOpenSignal);
+
+    connect(tpc_server, &TcpServer::closeSignal, topology, &Topology::slotCloseSignal);
 }
 
 //------------------------------------------------------------------------------

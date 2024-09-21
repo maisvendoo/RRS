@@ -35,6 +35,10 @@ signals:
 
     void setSignalsData(QByteArray &signals_data);
 
+    void openSignal(QByteArray signal_data);
+
+    void closeSignal(QByteArray signal_data);
+
 private:
 
     quint16 port = 1992;

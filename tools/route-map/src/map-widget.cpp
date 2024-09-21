@@ -422,6 +422,14 @@ void MapWidget::drawEnterSignal(Signal *signal)
     painter.setBrush(w_color);
     painter.drawEllipse(white_p, r, r);
 
+    SignalLabel *signal_label = signal_labels.value(conn->getName(), Q_NULLPTR);
+
+    if (signal_label != Q_NULLPTR)
+    {
+        signal_label->move(red_p);
+        signal_label->show();
+    }
+
     painter.end();
 }
 
