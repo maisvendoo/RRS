@@ -287,22 +287,46 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     }
     else
     {
-        ui->ptLog->appendPlainText(QString(tr("Failed to load signals data")));
+        ui->ptLog->appendPlainText(QString(tr("Failed to load line signals data")));
         return;
     }
 
-    for (auto line_signal : signals_data->line_signals)
+    if (signals_data->enter_signals.size() != 0)
     {
-        Connector *conn = conn_list->value(line_signal->getConnectorName(), Q_NULLPTR);
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 enter signals")).arg(signals_data->enter_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Failed to load enter signals data")));
+        return;
+    }
+
+    for (auto signal : signals_data->line_signals)
+    {
+        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
 
         if (conn == Q_NULLPTR)
         {
             continue;
         }
 
-        line_signal->setConnector(conn);
-        conn->setSignal(line_signal);
+        signal->setConnector(conn);
+        conn->setSignal(signal);
     }
+
+    for (auto signal : signals_data->enter_signals)
+    {
+        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->setConnector(conn);
+        conn->setSignal(signal);
+    }
+
 
     map->signals_data = signals_data;
 
