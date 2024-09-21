@@ -98,6 +98,7 @@ void EnterSignal::busy_control()
     double is_line_plus = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_PLUS));
     double is_line_minus = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_MINUS));
 
+
     U_line_prev = U_bat * (is_line_plus - is_line_minus) * is_line_ON;
 
     // Если напряжение питание изменилось

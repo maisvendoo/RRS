@@ -108,6 +108,9 @@ private:
     /// Связывание сигналов
     void line_signals_connect(std::vector<Signal *> &line_signals);
 
+    /// Сзязывание входных сигналов с проходными на перегонах
+    void enter_signal_connect(std::vector<Signal *> &enter_signals);
+
     /// Загрузка списка станций
     bool load_stations(QString route_dir);
 
@@ -117,6 +120,10 @@ private:
     void serialize_connector_name(QDataStream &stream, Connector *conn);
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
+
+    void line_signals_step(double t, double dt);
+
+    void enter_signals_step(double t, double dt);
 
 public slots:
 

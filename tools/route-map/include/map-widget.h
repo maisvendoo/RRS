@@ -87,6 +87,8 @@ private:
 
     void drawSignals(signals_data_t *signals_data);
 
+    void drawEnterSignal(Signal *signal);
+
     QPoint coord_transform(dvec3 traj_point);
 
     void wheelEvent(QWheelEvent *event);

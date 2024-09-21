@@ -315,6 +315,93 @@ void MapWidget::drawSignals(signals_data_t *signals_data)
     {
         drawLineSignal(line_signal);
     }
+
+    for (auto enter_signal : signals_data->enter_signals)
+    {
+        drawEnterSignal(enter_signal);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::drawEnterSignal(Signal *signal)
+{
+    if (signal == Q_NULLPTR)
+    {
+        return;
+    }
+
+    Connector *conn = signal->getConnector();
+
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    dvec3 g_signal_pos;
+    track_t track;
+    Trajectory *traj = conn->getFwdTraj();
+
+    if (traj == Q_NULLPTR)
+    {
+        traj = conn->getBwdTraj();
+
+        if (traj == Q_NULLPTR)
+        {
+            return;
+        }
+
+        track = traj->getLastTrack();
+        g_signal_pos = track.end_point;
+    }
+    else
+    {
+        track = traj->getFirstTrack();
+        g_signal_pos = track.begin_point;
+    }
+
+    double radius = 7.0;
+    double right_shift = 30.0;
+    g_signal_pos += track.trav * (right_shift * signal->getDirection());
+    dvec3 y_signal_pos = g_signal_pos + track.orth * (2 *radius * signal->getDirection());
+    dvec3 r_signal_pos = g_signal_pos - track.orth * (2 *radius * signal->getDirection());
+
+    QPainter painter;
+    painter.begin(this);
+
+    QPoint green_p = coord_transform(g_signal_pos);
+    QPoint yellow_p = coord_transform(y_signal_pos);
+    QPoint red_p = coord_transform(r_signal_pos);
+
+    lens_state_t lens_state = signal->getAllLensState();
+
+
+    QColor g_color(0, 0, 0);
+    if (lens_state[GREEN_LENS])
+    {
+        g_color = QColor(0, 255, 0);
+    }
+    painter.setBrush(g_color);
+    painter.drawEllipse(green_p, radius * scale, radius * scale);
+
+    QColor y_color(0, 0, 0);
+    if (lens_state[YELLOW_LENS])
+    {
+        y_color = QColor(255, 255, 0);
+    }
+    painter.setBrush(y_color);
+    painter.drawEllipse(yellow_p, radius * scale, radius * scale);
+
+    QColor r_color(0, 0, 0);
+    if (lens_state[RED_LENS])
+    {
+        r_color = QColor(255, 0, 0);
+    }
+    painter.setBrush(r_color);
+    painter.drawEllipse(red_p, radius * scale, radius * scale);
+
+    painter.end();
 }
 
 //------------------------------------------------------------------------------
