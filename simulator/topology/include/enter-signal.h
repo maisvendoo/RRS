@@ -89,12 +89,12 @@ private:
     enum
     {
         NUM_FWD_BUSY = 3,
-        FWD_BUSY_RED = 0,
+        BWD_BUSY_RED = 0,
 
         NUM_BWD_BUSY = 3,
-        BWD_BUSY_PLUS = 0,
-        BWD_BUSY_MINUS = 1,
-        BWD_BUSY_CLOSE = 2
+        FWD_BUSY_PLUS = 0,
+        FWD_BUSY_MINUS = 1,
+        FWD_BUSY_CLOSE = 2
     };
 
     /// Путевое реле на учатке приближения
