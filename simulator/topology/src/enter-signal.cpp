@@ -26,6 +26,12 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     bwd_way_relay->setInitContactState(BWD_BUSY_PLUS, false);
     bwd_way_relay->setInitContactState(BWD_BUSY_MINUS, true);
     bwd_way_relay->setInitContactState(BWD_BUSY_CLOSE, false);
+
+    signal_relay->setInitContactState(SR_SELF_LOCK, false);
+    signal_relay->setInitContactState(SR_MSR_SSR_CTRL, false);
+    signal_relay->setInitContactState(SR_ALR_CTRL, false);
+    signal_relay->setInitContactState(SR_PLUS, false);
+    signal_relay->setInitContactState(SR_MINUS, true);
 }
 
 //------------------------------------------------------------------------------
@@ -95,8 +101,8 @@ void EnterSignal::busy_control()
     double U_line_prev_old = U_line_prev;
 
     double is_line_ON = static_cast<double>(fwd_way_relay->getContactState(FWD_BUSY_RED));
-    double is_line_plus = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_PLUS));
-    double is_line_minus = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_MINUS));
+    double is_line_plus = static_cast<double>(signal_relay->getContactState(SR_PLUS));
+    double is_line_minus = static_cast<double>(signal_relay->getContactState(SR_MINUS));
 
 
     U_line_prev = U_bat * (is_line_plus - is_line_minus) * is_line_ON;

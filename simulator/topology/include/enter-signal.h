@@ -36,7 +36,7 @@ private:
         NUM_SSR_CONTACTS = 3,
         NUM_DSR_CONTACTS = 2,
         NUM_RCR_CONTACTS = 3,
-        NUM_SR_CONTACTS = 4,
+        NUM_SR_CONTACTS = 5,
         NUM_ALR_CONTACTS = 1,
         NUM_ESR_CONTACTS = 1,
 
@@ -57,7 +57,8 @@ private:
         SR_SELF_LOCK = 0,
         SR_MSR_SSR_CTRL = 1,
         SR_ALR_CTRL = 2,
-        SR_CLOSE = 3,
+        SR_PLUS = 3,
+        SR_MINUS = 4,
 
         ALR_MSR_SSR_CTRL = 0,
 
