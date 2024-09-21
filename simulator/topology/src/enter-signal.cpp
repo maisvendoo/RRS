@@ -12,7 +12,7 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
 
     side_signal_relay->read_config("combine-relay");
     side_signal_relay->setInitContactState(SSR_RED, true);
-    side_signal_relay->setInitContactState(SSR_TOP_YELLOW, true);
+    side_signal_relay->setInitContactState(SSR_TOP_YELLOW, false);
     side_signal_relay->setInitContactState(SSR_BOTTOM_YELLOW, false);
 
     direct_signal_relay->read_config("combine-reley");
