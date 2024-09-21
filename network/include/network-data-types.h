@@ -17,7 +17,9 @@ enum StructureType
     STYPE_CONNECTOR_STATE,
     STYPE_TRAJ_BUSY_STATE,
     STYPE_SIGNALS_LIST,
-    STYPE_SIGNAL_STATE
+    STYPE_SIGNAL_STATE,
+    STYPE_OPEN_SIGNAL,
+    STYPE_CLOSE_SIGNAL
 };
 
 //------------------------------------------------------------------------------

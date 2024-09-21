@@ -73,6 +73,8 @@ private slots:
 
     void slotSwitchConnectorMenu();
 
+    void slotSignalControlMenu();
+
     void slotGetSwitchState(QByteArray &sw_state);
 
     void slotGetTrajBusyState(QByteArray &busy_state);

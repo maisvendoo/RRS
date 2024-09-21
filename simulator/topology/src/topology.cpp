@@ -836,3 +836,95 @@ void Topology::getSwitchState(QByteArray &switch_data)
     sw->setRefStateFwd(sw_state.state_fwd);
     sw->setRefStateBwd(sw_state.state_bwd);
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotOpenSignal(QByteArray signal_data)
+{
+    Journal::instance()->info("Try to open signal...");
+
+    QBuffer buff(&signal_data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    QString conn_name = "";
+    stream >> conn_name;
+
+    if (conn_name.isEmpty())
+    {
+        return;
+    }
+
+    Connector *conn = switches.value(conn_name, Q_NULLPTR);
+
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    Signal *signal = conn->getSignal();
+
+    if (signal == Q_NULLPTR)
+    {
+        return;
+    }
+
+    if (signal->getSignalType() == "entr")
+    {
+        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
+
+        if (es == Q_NULLPTR)
+        {
+            return;
+        }
+
+        es->slotPressOpen();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotCloseSignal(QByteArray signal_data)
+{
+    Journal::instance()->info("Try to close signal...");
+
+    QBuffer buff(&signal_data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    QString conn_name = "";
+    stream >> conn_name;
+
+    if (conn_name.isEmpty())
+    {
+        return;
+    }
+
+    Connector *conn = switches.value(conn_name, Q_NULLPTR);
+
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    Signal *signal = conn->getSignal();
+
+    if (signal == Q_NULLPTR)
+    {
+        return;
+    }
+
+    if (signal->getSignalType() == "entr")
+    {
+        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
+
+        if (es == Q_NULLPTR)
+        {
+            return;
+        }
+
+        es->slotPressClose();
+    }
+}

@@ -1,5 +1,6 @@
 #include    <enter-signal.h>
 #include    <switch.h>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -27,11 +28,15 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     fwd_way_relay->setInitContactState(FWD_BUSY_MINUS, true);
     fwd_way_relay->setInitContactState(FWD_BUSY_CLOSE, false);
 
+    signal_relay->read_config("combine-relay");
     signal_relay->setInitContactState(SR_SELF_LOCK, false);
     signal_relay->setInitContactState(SR_MSR_SSR_CTRL, false);
     signal_relay->setInitContactState(SR_ALR_CTRL, false);
     signal_relay->setInitContactState(SR_PLUS, false);
     signal_relay->setInitContactState(SR_MINUS, true);
+
+    arrival_lock_relay->read_config("combine-relay");
+    arrival_lock_relay->setInitContactState(ALR_MSR_SSR_CTRL, false);
 }
 
 //------------------------------------------------------------------------------
@@ -75,8 +80,9 @@ void EnterSignal::lens_control()
     lens_state[GREEN_LENS] = direct_signal_relay->getContactState(DSR_GREEN) &&
                              main_signal_relay->getContactState(MSR_YELLOW);
 
-    lens_state[YELLOW_LENS] = side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
-                              main_signal_relay->getContactState(MSR_RED);
+    lens_state[YELLOW_LENS] = (side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
+                               main_signal_relay->getContactState(MSR_RED)) ||
+                              (main_signal_relay->getContactState(MSR_YELLOW) && direct_signal_relay->getContactState(DSR_TOP_YELLOW));
 
     lens_state[RED_LENS] = side_signal_relay->getContactState(SSR_RED) &&
                            main_signal_relay->getContactState(MSR_RED);
@@ -86,6 +92,7 @@ void EnterSignal::lens_control()
     if (lens_state != old_lens_state)
     {
         emit sendDataUpdate(this->serialize());
+        Journal::instance()->info("Signal " + letter + ": Updated lens status");
     }
 }
 
@@ -121,8 +128,20 @@ void EnterSignal::busy_control()
 void EnterSignal::relay_control()
 {
     // Собираем цепь контрольного маршрутного реле
-    double is_RCR_ON = static_cast<double>(is_route_free(conn));
-    route_control_relay->setVoltage(U_bat * is_RCR_ON);
+
+    bool is_RCR_ON_old = is_RCR_ON;
+
+    is_RCR_ON = is_route_free(conn);
+
+    if (is_RCR_ON != is_RCR_ON_old)
+    {
+        if (is_RCR_ON)
+            Journal::instance()->info("Route control relay is ON");
+        else
+            Journal::instance()->info("Route control relay is OFF");
+    }
+
+    route_control_relay->setVoltage(U_bat * static_cast<double>(is_RCR_ON));
 
     // Собираем цепь сигнального реле
 
@@ -130,12 +149,32 @@ void EnterSignal::relay_control()
     bool is_button_wire_ON = is_open_button_pressed ||
                              (is_close_button_nopressed && signal_relay->getContactState(SR_SELF_LOCK));
 
-    bool is_SR_ON = is_button_wire_ON && fwd_way_relay->getContactState(FWD_BUSY_CLOSE);
+    bool is_SR_ON_old = is_SR_ON;
+
+    is_SR_ON = is_button_wire_ON && fwd_way_relay->getContactState(FWD_BUSY_CLOSE);
+
+    if (is_SR_ON != is_SR_ON_old)
+    {
+        if (is_SR_ON)
+            Journal::instance()->info("Signal relay is ON");
+        else
+            Journal::instance()->info("Signal relay is OFF");
+    }
 
     signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
 
     // Цепь реле замыкания маршрута приема
-    bool is_ALR_ON = signal_relay->getContactState(SR_ALR_CTRL);
+    bool is_ALR_ON_old = is_ALR_ON;
+
+    is_ALR_ON = signal_relay->getContactState(SR_ALR_CTRL);
+
+    if (is_ALR_ON != is_ALR_ON_old)
+    {
+        if (is_ALR_ON)
+            Journal::instance()->info("Arrival lock relay is ON");
+        else
+            Journal::instance()->info("Arrival lock relay is OFF");
+    }
 
     arrival_lock_relay->setVoltage(U_bat * static_cast<double>(is_ALR_ON));
 
@@ -148,9 +187,29 @@ void EnterSignal::relay_control()
     // Проверяем, стоят ли стрелки на бок
     bool is_minus = is_switch_minus(conn);
 
-    bool is_MSR_ON = (!is_minus) && is_common_wire_ON;
+    bool is_MSR_ON_old = is_MSR_ON;
 
-    bool is_SSR_ON = (is_minus) && is_common_wire_ON;
+    is_MSR_ON = (!is_minus) && is_common_wire_ON;
+
+    if (is_MSR_ON != is_MSR_ON_old)
+    {
+        if (is_MSR_ON)
+            Journal::instance()->info("Main signal relay is ON");
+        else
+            Journal::instance()->info("Main signal relay is OFF");
+    }
+
+    bool is_SSR_ON_old = is_SSR_ON;
+
+    is_SSR_ON = (is_minus) && is_common_wire_ON;
+
+    if (is_SSR_ON != is_SSR_ON_old)
+    {
+        if (is_SSR_ON)
+            Journal::instance()->info("Side signal relay is ON");
+        else
+            Journal::instance()->info("Side signal relay is OFF");
+    }
 
     main_signal_relay->setVoltage(U_bat * static_cast<double>(is_MSR_ON));
 
@@ -171,6 +230,8 @@ void EnterSignal::relay_control()
 //------------------------------------------------------------------------------
 bool EnterSignal::is_route_free(Connector *conn)
 {
+    return true;
+
     if (conn == Q_NULLPTR)
     {
         return false;
@@ -228,11 +289,12 @@ bool EnterSignal::is_route_free(Connector *conn)
             continue;
         }
 
-        // Если сигнал выходной - выходим с текущим результатом
-        if (signal->getSignalType() == "exit")
+        if (signal->getDirection() != this->getDirection())
         {
-            break;
+            continue;
         }
+
+        break;
     }
 
     return is_free;
@@ -309,10 +371,12 @@ bool EnterSignal::is_switch_minus(Connector *conn)
             break;
         }
 
-        if (signal->getSignalType() == "exit")
+        if (signal->getDirection() != this->getDirection())
         {
-            break;
+            continue;
         }
+
+        break;
     }
 
     return is_minus;
@@ -365,6 +429,8 @@ void EnterSignal::slotPressOpen()
 {
     is_open_button_pressed = true;
     open_timer->start();
+
+    Journal::instance()->info("Pressed open button");
 }
 
 //------------------------------------------------------------------------------
@@ -374,4 +440,6 @@ void EnterSignal::slotPressClose()
 {
     is_close_button_nopressed = false;
     close_timer->start();
+
+    Journal::instance()->info("Pressed close button");
 }

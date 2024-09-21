@@ -70,6 +70,32 @@ void TcpClient::sendSwitchState(QString conn_name, int state_fwd, int state_bwd)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendSignalState(QString conn_name, bool open)
+{
+    network_data_t request;
+
+    if (open)
+    {
+        request.stype = STYPE_OPEN_SIGNAL;
+    }
+    else
+    {
+        request.stype = STYPE_CLOSE_SIGNAL;
+    }
+
+    QBuffer buff(&request.data);
+    buff.open(QIODevice::WriteOnly);
+    QDataStream stream(&buff);
+
+    stream << conn_name;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TcpClient::isConnected() const
 {
     if (socket == Q_NULLPTR)

@@ -363,11 +363,14 @@ void MapWidget::drawEnterSignal(Signal *signal)
 
     double radius = 7.0;
     double right_shift = 30.0;
+    double label_shift = 8.0;
     g_signal_pos += track.trav * (right_shift * signal->getDirection());
     dvec3 y_signal_pos = g_signal_pos + track.orth * (2 *radius * signal->getDirection());
     dvec3 r_signal_pos = g_signal_pos - track.orth * (2 *radius * signal->getDirection());
     dvec3 by_signal_pos = g_signal_pos - track.orth * (4 *radius * signal->getDirection());
     dvec3 w_signal_pos = g_signal_pos - track.orth * (6 *radius * signal->getDirection());
+
+    dvec3 label_pos = r_signal_pos + track.trav * (label_shift * signal->getDirection());
 
     QPainter painter;
     painter.begin(this);
@@ -377,6 +380,8 @@ void MapWidget::drawEnterSignal(Signal *signal)
     QPoint red_p = coord_transform(r_signal_pos);
     QPoint byllow_p = coord_transform(by_signal_pos);
     QPoint white_p = coord_transform(w_signal_pos);
+
+    QPoint label_p = coord_transform(label_pos);
 
     lens_state_t lens_state = signal->getAllLensState();
 
@@ -421,6 +426,14 @@ void MapWidget::drawEnterSignal(Signal *signal)
     }
     painter.setBrush(w_color);
     painter.drawEllipse(white_p, r, r);
+
+    SignalLabel *signal_label = signal_labels.value(conn->getName(), Q_NULLPTR);
+
+    if (signal_label != Q_NULLPTR)
+    {
+        signal_label->move(label_p);
+        signal_label->show();
+    }
 
     painter.end();
 }

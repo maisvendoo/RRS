@@ -9,6 +9,7 @@
 #include    <simulator-update-struct.h>
 #include    <switch-label.h>
 #include    <signals-data-types.h>
+#include    <signal-label.h>
 
 //------------------------------------------------------------------------------
 //
@@ -34,6 +35,8 @@ public:
     QMap<QString , SwitchLabel *> switch_labels;
 
     signals_data_t *signals_data = Q_NULLPTR;
+
+    QMap<QString, SignalLabel *> signal_labels;
 
     void resize(int width, int height);
 
