@@ -127,10 +127,10 @@ private:
     double U_line_prev = 0.0;
 
     /// Таймер выдержкм времени удержания кнопки открыть
-    Timer *open_timer = new Timer(1.0);
+    Timer *open_timer = new Timer(1.0, false);
 
     /// Таймер выдержки времени удержания кнопки закрыть
-    Timer *close_timer = new Timer(1.0);
+    Timer *close_timer = new Timer(1.0, false);
 
     bool is_SR_ON = false;
 

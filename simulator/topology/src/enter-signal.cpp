@@ -37,6 +37,14 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
 
     arrival_lock_relay->read_config("combine-relay");
     arrival_lock_relay->setInitContactState(ALR_MSR_SSR_CTRL, false);
+
+    route_control_relay->read_config("combine-relay");
+    route_control_relay->setInitContactState(RCR_SR_CTRL, false);
+    route_control_relay->setInitContactState(RCR_MSR_SSR_CTRL, false);
+    route_control_relay->setInitContactState(RCR_DSR_CTRL, false);
+
+    connect(open_timer, &Timer::process, this, &EnterSignal::slotOpenTimer);
+    connect(close_timer, &Timer::process, this, &EnterSignal::slotCloseTimer);
 }
 
 //------------------------------------------------------------------------------
@@ -151,7 +159,8 @@ void EnterSignal::relay_control()
 
     bool is_SR_ON_old = is_SR_ON;
 
-    is_SR_ON = is_button_wire_ON && fwd_way_relay->getContactState(FWD_BUSY_CLOSE);
+    is_SR_ON = is_button_wire_ON && fwd_way_relay->getContactState(FWD_BUSY_CLOSE) &&
+               route_control_relay->getContactState(RCR_SR_CTRL);
 
     if (is_SR_ON != is_SR_ON_old)
     {
@@ -182,7 +191,8 @@ void EnterSignal::relay_control()
 
     // Состояние общего провода питания этих реле
     bool is_common_wire_ON = arrival_lock_relay->getContactState(ALR_MSR_SSR_CTRL) &&
-                             signal_relay->getContactState(SR_MSR_SSR_CTRL);
+                             signal_relay->getContactState(SR_MSR_SSR_CTRL) &&
+                             route_control_relay->getContactState(RCR_MSR_SSR_CTRL);
 
     // Проверяем, стоят ли стрелки на бок
     bool is_minus = is_switch_minus(conn);
@@ -230,8 +240,6 @@ void EnterSignal::relay_control()
 //------------------------------------------------------------------------------
 bool EnterSignal::is_route_free(Connector *conn)
 {
-    return true;
-
     if (conn == Q_NULLPTR)
     {
         return false;
@@ -368,7 +376,7 @@ bool EnterSignal::is_switch_minus(Connector *conn)
 
         if (signal == Q_NULLPTR)
         {
-            break;
+            continue;
         }
 
         if (signal->getDirection() != this->getDirection())
@@ -411,6 +419,8 @@ void EnterSignal::slotOpenTimer()
 {
     is_open_button_pressed = false;
     open_timer->stop();
+
+    Journal::instance()->info("Released open button");
 }
 
 //------------------------------------------------------------------------------
@@ -420,6 +430,8 @@ void EnterSignal::slotCloseTimer()
 {
     is_close_button_nopressed = true;
     close_timer->stop();
+
+    Journal::instance()->info("Released close button");
 }
 
 //------------------------------------------------------------------------------
