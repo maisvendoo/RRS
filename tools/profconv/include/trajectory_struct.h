@@ -31,6 +31,7 @@ struct trajectory_t
     std::vector<point_t> points = {};
 
     int railway_coord_section = 0;
+    int ALSN_frequency = -1;
 
     trajectory_t()
     {

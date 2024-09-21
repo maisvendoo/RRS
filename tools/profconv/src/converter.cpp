@@ -361,6 +361,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         writeSpeedmap();
     }
 
+    writeALSN();
+
     return true;
 }
 

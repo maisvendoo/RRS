@@ -505,9 +505,14 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
     if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
         name_next += "_1";
 
+    bool is_25kv = false;
     bool was_1_track = false;
     for (auto it = tracks_data->begin(); it != tracks_data->end(); ++it)
     {
+        // Если на маршруте есть переменный ток 25 кВ,
+        // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+        is_25kv |= (it->voltage == 25);
+
         if ((dir < 0) && (it->id_at_track1 != -1))
         {
             if ((!was_1_track) && (it->id_at_track1 != 0))
@@ -526,13 +531,20 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                             name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
                         }
 
-                        // Добавляем последюю точку в траекторию
+                        // Добавляем последнюю точку в траекторию
                         point_t end_point;
                         end_point.point = it->begin_point;
                         end_point.railway_coord = (it-1)->railway_coord_end;
                         end_point.trajectory_coord = trajectory_length;
                         trajectory.points.push_back(end_point);
                         trajectory.name = name_cur;
+
+                        // Всегда кодируем АЛСН по главным путям
+                        if (is_25kv)
+                            trajectory.ALSN_frequency = 25;
+                        else
+                            trajectory.ALSN_frequency = 50;
+
                         trajectories->push_back(new trajectory_t(trajectory));
 
                         // Делаем траекторию главного пути "туда" сзади боковой
@@ -543,7 +555,8 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
 
                         trajectory.points.clear();
                         trajectory_length = 0.0;
-
+                        if (!(*split)->signal_bwd_liter.empty() || !(*split)->signal_fwd_liter.empty())
+                            is_25kv = false;
                     }
                 }
             }
@@ -602,6 +615,15 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                 (*split)->bwd_main_traj = name_cur;
                 (*split)->fwd_main_traj = name_next;
                 (*split)->length_bwd_traj = trajectory_length + it->length;
+
+                // Всегда кодируем АЛСН по главным путям
+                if (is_25kv)
+                    trajectory.ALSN_frequency = 25;
+                else
+                    trajectory.ALSN_frequency = 50;
+
+                if (!(*split)->signal_bwd_liter.empty() || !(*split)->signal_fwd_liter.empty())
+                    is_25kv = false;
             }
         }
         if (is_split_next || ((it+1) == tracks_data->end()))

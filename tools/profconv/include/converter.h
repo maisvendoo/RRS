@@ -38,6 +38,7 @@
 #define     FILE_START_POINT std::string("waypoints.conf")
 #define     FILE_STATIONS    std::string("stations.conf")
 #define     FILE_SPEEDMAP    std::string("trajectory-speedmap.xml")
+#define     FILE_ALSN        std::string("trajectory-ALSN.xml")
 #define     FILE_TRAJ_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
 #define     DELIMITER_SYMBOL char('\t')
@@ -189,6 +190,8 @@ private:
     void writeStations(const zds_start_km_data_t &waypoints);
 
     void writeSpeedmap();
+
+    void writeALSN();
 };
 
 #endif // CONVERTER_H

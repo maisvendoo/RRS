@@ -492,6 +492,11 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
     // Добавляем первую точку
     branch_track->branch_trajectory.push_back(point_begin);
 
+    // Если на маршруте есть переменный ток 25 кВ,
+    // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+    branch_track->is_25kv |= (tracks_data1[id_begin].voltage == 25);
+
+    bool first_bias = true;
     for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
     {
         // Траектория отклонения
@@ -536,6 +541,13 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
                                   COORD_COEFF[i] * railway_coord_length;
             // Добавляем промежуточную точку отклонения
             branch_track->branch_trajectory.push_back(point);
+
+        }
+        // Запоминаем id точки после первого отклонения
+        if (first_bias)
+        {
+            first_bias = false;
+            branch_track->id_first_bias_end = branch_track->branch_trajectory.size();
         }
 
         // Завершение траектории
@@ -566,6 +578,11 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
             point.trajectory_coord = branch_track->branch_trajectory.back().trajectory_coord + l;
             // Добавляем точку траектории
             branch_track->branch_trajectory.push_back(point);
+
+            // Если на маршруте есть переменный ток 25 кВ,
+            // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+            branch_track->is_25kv |= (tracks_data1[id_end].voltage == 25);
+
             // Добавляем траекторию
             branch_track_data1.push_back(branch_track);
             return true;
@@ -584,7 +601,14 @@ bool ZDSimConverter::calcBranchTrack1(zds_branch_track_t* branch_track)
             point.railway_coord = tracks_data1[id].railway_coord;
             // Добавляем точку траектории
             branch_track->branch_trajectory.push_back(point);
+
+            // Если на маршруте есть переменный ток 25 кВ,
+            // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+            branch_track->is_25kv |= (tracks_data1[id].voltage == 25);
         }
+
+        // Запоминаем id точки перед следующим отклонением
+        branch_track->id_last_bias_begin = branch_track->branch_trajectory.size() - 1;
 
         // Подготавливаемся к следующей итерации
         id_begin = (*(it+1))->main_track_id;
@@ -632,6 +656,11 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
     // Добавляем первую точку
     branch_track->branch_trajectory.push_back(point_begin);
 
+    // Если на маршруте есть переменный ток 25 кВ,
+    // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+    branch_track->is_25kv |= (tracks_data2[id_begin].voltage == 25);
+
+    bool first_bias = true;
     for (auto it = branch_track->branch_points.begin(); it != branch_track->branch_points.end(); ++it)
     {
         // Траектория отклонения
@@ -676,6 +705,12 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
                                   COORD_COEFF[i] * railway_coord_length;
             // Добавляем промежуточную точку отклонения
             branch_track->branch_trajectory.push_back(point);
+        }
+        // Запоминаем id точки после первого отклонения
+        if (first_bias)
+        {
+            first_bias = false;
+            branch_track->id_first_bias_end = branch_track->branch_trajectory.size();
         }
 
         // Завершение траектории
@@ -755,6 +790,11 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
                     return false;
                 }
             }
+
+            // Если на маршруте есть переменный ток 25 кВ,
+            // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+            branch_track->is_25kv |= (tracks_data2[id_end].voltage == 25);
+
             // Добавляем траекторию
             branch_track_data2.push_back(branch_track);
             return true;
@@ -773,7 +813,14 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
             point.railway_coord = tracks_data2[id].railway_coord;
             // Добавляем точку траектории
             branch_track->branch_trajectory.push_back(point);
+
+            // Если на маршруте есть переменный ток 25 кВ,
+            // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
+            branch_track->is_25kv |= (tracks_data2[id].voltage == 25);
         }
+
+        // Запоминаем id точки перед следующим отклонением
+        branch_track->id_last_bias_begin = branch_track->branch_trajectory.size() - 1;
 
         // Подготавливаемся к следующей итерации
         id_begin = (*(it+1))->main_track_id;
@@ -961,9 +1008,25 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                 }
                 ++id;
             }
+/*
+            if (dir > 0)
+            {*/
+                if (branch_track->id_first_bias_end > (*it)->trajectory_point_id_with_signal)
+                    branch_track->id_first_bias_end = (*it)->trajectory_point_id_with_signal;
+                if (branch_track->id_last_bias_begin < (*it)->trajectory_point_id_with_signal)
+                    branch_track->id_last_bias_begin = (*it)->trajectory_point_id_with_signal;
+/*            }
+            else
+            {
+                if (branch_track->id_first_bias_end < (*it)->trajectory_point_id_with_signal)
+                    branch_track->id_first_bias_end = (*it)->trajectory_point_id_with_signal;
+                if (branch_track->id_last_bias_begin > (*it)->trajectory_point_id_with_signal)
+                    branch_track->id_last_bias_begin = (*it)->trajectory_point_id_with_signal;
+            }*/
         }
     }
 
+    bool no_first_traj = false;
     for (size_t i = begin_point_id; i != end_point_id; i += dir)
     {
         point_t point;
@@ -1004,6 +1067,29 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                 branch_connectors.push_back(new split_zds_trajectory_t(split));
                 break;
             }
+        }
+
+        // Всегда отделяем первую и последнюю траекторию с отклонением
+        // чтобы затем исключить на них АЛСН-код
+        if ( (!is_split_next) &&
+             (((i + dir) == branch_track->id_first_bias_end) ||
+              ((i + dir) == branch_track->id_last_bias_begin)) )
+        {
+            is_split_next = true;
+            name_cur = name_next;
+            ++num_sub_traj;
+            name_next = name_prefix +
+                        QString("%1_%2").arg(num_trajectories, 4, 10, QChar('0')).arg(num_sub_traj).toStdString() +
+                        name_suffix;
+
+            split_zds_trajectory_t split;
+            split.point = branch_track->branch_trajectory[i + dir].point;
+            split.railway_coord = branch_track->branch_trajectory[i + dir].railway_coord;
+            split.bwd_main_traj = name_cur;
+            split.fwd_main_traj = name_next;
+            split.length_bwd_traj = trajectory_length +
+                                    length(branch_track->branch_trajectory[i + dir].point - trajectory.points.back().point);
+            branch_connectors.push_back(new split_zds_trajectory_t(split));
         }
 
         if (is_split_next || (i + dir == end_point_id))
@@ -1066,11 +1152,23 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
             }
             else
             {
+                // Если траектория не последняя, проверяем, что она не первая
+                // и добавляем несущую частоту АЛСН
+                if (no_first_traj)
+                {
+                    if (branch_track->is_25kv)
+                        trajectory.ALSN_frequency = 25;
+                    else
+                        trajectory.ALSN_frequency = 50;
+                }
+                no_first_traj = true;
+
                 trajectory.name = name_cur;
             }
             branch_track->trajectories.push_back(new trajectory_t(trajectory));
 
             trajectory.points.clear();
+            trajectory.ALSN_frequency = -1;
             trajectory_length = 0.0;
         }
         else

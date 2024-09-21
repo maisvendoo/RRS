@@ -72,6 +72,11 @@ struct zds_branch_track_t
     int id_begin_at_other = -1;
     int id_end_at_other = -1;
 
+    size_t id_first_bias_end = -1;
+    size_t id_last_bias_begin = -1;
+
+    bool is_25kv = false;
+
     std::vector<calculated_branch_point_t> branch_trajectory = {};
 
     route_trajectories_t trajectories = {};
