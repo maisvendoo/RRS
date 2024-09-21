@@ -141,7 +141,7 @@
 		<bwdPlusTraj>route1_0018_226</bwdPlusTraj>
 		<fwdPlusTraj>route1_0019_242</fwdPlusTraj>
 		<SignalLetter>Ч</SignalLetter>
-		<SignalModel>ab_exit</SignalModel>
+		<SignalModel>ab_entr</SignalModel>
 		<SignalDirection>1</SignalDirection>
 	</Switch>
 	<Switch>
