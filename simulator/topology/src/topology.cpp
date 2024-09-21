@@ -842,6 +842,8 @@ void Topology::getSwitchState(QByteArray &switch_data)
 //------------------------------------------------------------------------------
 void Topology::slotOpenSignal(QByteArray signal_data)
 {
+    Journal::instance()->info("Try to open signal...");
+
     QBuffer buff(&signal_data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
@@ -886,6 +888,8 @@ void Topology::slotOpenSignal(QByteArray signal_data)
 //------------------------------------------------------------------------------
 void Topology::slotCloseSignal(QByteArray signal_data)
 {
+    Journal::instance()->info("Try to close signal...");
+
     QBuffer buff(&signal_data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);

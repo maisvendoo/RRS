@@ -105,11 +105,13 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_OPEN_SIGNAL:
     {
+        Journal::instance()->info("Received open signal request");
         emit openSignal(client_data.received_data.data);
         break;
     }
     case STYPE_CLOSE_SIGNAL:
     {
+        Journal::instance()->info("Received close signal request");
         emit closeSignal(client_data.received_data.data);
         break;
     }

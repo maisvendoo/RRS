@@ -132,6 +132,16 @@ private:
     /// Таймер выдержки времени удержания кнопки закрыть
     Timer *close_timer = new Timer(1.0);
 
+    bool is_SR_ON = false;
+
+    bool is_RCR_ON = false;
+
+    bool is_MSR_ON = false;
+
+    bool is_SSR_ON = false;
+
+    bool is_ALR_ON = false;
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
