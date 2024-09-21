@@ -19,13 +19,13 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     direct_signal_relay->setInitContactState(DSR_TOP_YELLOW, true);
     direct_signal_relay->setInitContactState(DSR_GREEN, false);
 
-    fwd_way_relay->read_config("combine-relay");
-    fwd_way_relay->setInitContactState(FWD_BUSY_RED, false);
-
     bwd_way_relay->read_config("combine-relay");
-    bwd_way_relay->setInitContactState(BWD_BUSY_PLUS, false);
-    bwd_way_relay->setInitContactState(BWD_BUSY_MINUS, true);
-    bwd_way_relay->setInitContactState(BWD_BUSY_CLOSE, false);
+    bwd_way_relay->setInitContactState(BWD_BUSY_RED, false);
+
+    fwd_way_relay->read_config("combine-relay");
+    fwd_way_relay->setInitContactState(FWD_BUSY_PLUS, false);
+    fwd_way_relay->setInitContactState(FWD_BUSY_MINUS, true);
+    fwd_way_relay->setInitContactState(FWD_BUSY_CLOSE, false);
 
     signal_relay->setInitContactState(SR_SELF_LOCK, false);
     signal_relay->setInitContactState(SR_MSR_SSR_CTRL, false);
@@ -100,7 +100,7 @@ void EnterSignal::busy_control()
 
     double U_line_prev_old = U_line_prev;
 
-    double is_line_ON = static_cast<double>(fwd_way_relay->getContactState(FWD_BUSY_RED));
+    double is_line_ON = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_RED));
     double is_line_plus = static_cast<double>(signal_relay->getContactState(SR_PLUS));
     double is_line_minus = static_cast<double>(signal_relay->getContactState(SR_MINUS));
 
@@ -130,7 +130,7 @@ void EnterSignal::relay_control()
     bool is_button_wire_ON = is_open_button_pressed ||
                              (is_close_button_nopressed && signal_relay->getContactState(SR_SELF_LOCK));
 
-    bool is_SR_ON = is_button_wire_ON && bwd_way_relay->getContactState(BWD_BUSY_CLOSE);
+    bool is_SR_ON = is_button_wire_ON && fwd_way_relay->getContactState(FWD_BUSY_CLOSE);
 
     signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
 
