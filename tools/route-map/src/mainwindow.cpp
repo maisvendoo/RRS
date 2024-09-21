@@ -242,7 +242,28 @@ void MainWindow::slotSwitchConnectorMenu()
 //------------------------------------------------------------------------------
 void MainWindow::slotSignalControlMenu()
 {
+    SignalLabel *signal_label = dynamic_cast<SignalLabel *>(sender());
+    Signal *signal = signal_label->signal;
 
+    TcpClient *tc = tcp_client;
+
+    QMenu *menu = new QMenu(this);
+
+    QAction *open = new QAction(tr("Open"), this);
+    menu->addAction(open);
+
+    connect(open, &QAction::triggered, this, [tc, signal]{
+        tc->sendSignalState(signal->getConnector()->getName(), true);
+    });
+
+    QAction *close = new QAction(tr("Close"), this);
+    menu->addAction(close);
+
+    connect(close, &QAction::triggered, this, [tc, signal]{
+        tc->sendSignalState(signal->getConnector()->getName(), false);
+    });
+
+    menu->exec(QCursor::pos());
 }
 
 //------------------------------------------------------------------------------
