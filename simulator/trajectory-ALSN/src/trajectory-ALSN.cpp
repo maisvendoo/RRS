@@ -160,6 +160,11 @@ void TrajectoryALSN::step(double t, double dt)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
 {
+    if (frequency == 0.0)
+    {
+        return;
+    }
+
     code_from_fwd = code;
     distance_fwd = distance;
     next_liter_fwd = liter;
@@ -182,6 +187,11 @@ void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
 {
+    if (frequency == 0.0)
+    {
+        return;
+    }
+
     code_from_bwd = code;
     distance_bwd = distance;
     next_liter_bwd = liter;
@@ -204,8 +214,37 @@ void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::load_config(CfgReader &cfg)
 {
-    (void) cfg;
-    frequency = 25.0;
+    // Проверяем все группы частот АЛСН в конфиге,
+    // пока не найдём ту, в которой есть имя данной траектории
+    QDomNode ALSN_node = cfg.getFirstSection("ALSN");
+    while (!ALSN_node.isNull())
+    {
+        QDomNodeList nodes = ALSN_node.childNodes();
+        // Проверяем все имена траекторий в карте скоростей,
+        // пока не найдём имя данной траектории
+        bool is_ALSN = false;
+        for (size_t i = 0; i < nodes.size(); ++i)
+        {
+            QString node_name = nodes.at(i).nodeName();
+            if (node_name == "Trajectory")
+            {
+                QString traj_name = nodes.at(i).toElement().text();
+                if (traj_name == trajectory->getName())
+                {
+                    is_ALSN = true;
+                    break;
+                }
+            }
+        }
+
+        if (is_ALSN)
+        {
+            cfg.getDouble(ALSN_node, "Frequency", frequency);
+        }
+
+        // Переходим к следующей группы частот АЛСН
+        ALSN_node = cfg.getNextSection();
+    }
 }
 
 GET_TRAJECTORY_DEVICE(TrajectoryALSN)

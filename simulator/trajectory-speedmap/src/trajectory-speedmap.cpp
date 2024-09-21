@@ -84,7 +84,12 @@ void TrajectorySpeedMap::step(double t, double dt)
                     if (cur_traj_device == nullptr)
                         break;
 
-                    cur_idx = cur_traj_device->getLimits()->size() - 1;
+                    cur_idx = cur_traj_device->getLimits()->size();
+                    if (cur_idx == 0)
+                        break;
+                    else
+                        --cur_idx;
+
                     cur_distance_coord += cur_traj_device->getTrajLength();
                 }
                 else
@@ -115,7 +120,11 @@ void TrajectorySpeedMap::step(double t, double dt)
                     if (cur_traj_device == nullptr)
                         break;
 
-                    cur_idx = 0;
+                    cur_idx = cur_traj_device->getLimits()->size();
+                    if (cur_idx == 0)
+                        break;
+                    else
+                        cur_idx = 0;
                 }
                 else
                 {
@@ -157,7 +166,11 @@ void TrajectorySpeedMap::step(double t, double dt)
                     if (cur_traj_device == nullptr)
                         break;
 
-                    next_idx = 0;
+                    next_idx = cur_traj_device->getLimits()->size();
+                    if (next_idx == 0)
+                        break;
+                    else
+                        next_idx = 0;
                 }
                 else
                 {
@@ -193,7 +206,11 @@ void TrajectorySpeedMap::step(double t, double dt)
                     if (cur_traj_device == nullptr)
                         break;
 
-                    next_idx = cur_traj_device->getLimits()->size() - 1;
+                    next_idx = cur_traj_device->getLimits()->size();
+                    if (next_idx == 0)
+                        break;
+                    else
+                        --next_idx;
                     next_distance_coord += cur_traj_device->getTrajLength();
                 }
                 else

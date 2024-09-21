@@ -1008,21 +1008,10 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                 }
                 ++id;
             }
-/*
-            if (dir > 0)
-            {*/
-                if (branch_track->id_first_bias_end > (*it)->trajectory_point_id_with_signal)
-                    branch_track->id_first_bias_end = (*it)->trajectory_point_id_with_signal;
-                if (branch_track->id_last_bias_begin < (*it)->trajectory_point_id_with_signal)
-                    branch_track->id_last_bias_begin = (*it)->trajectory_point_id_with_signal;
-/*            }
-            else
-            {
-                if (branch_track->id_first_bias_end < (*it)->trajectory_point_id_with_signal)
-                    branch_track->id_first_bias_end = (*it)->trajectory_point_id_with_signal;
-                if (branch_track->id_last_bias_begin > (*it)->trajectory_point_id_with_signal)
-                    branch_track->id_last_bias_begin = (*it)->trajectory_point_id_with_signal;
-            }*/
+            if (branch_track->id_first_bias_end > (*it)->trajectory_point_id_with_signal)
+                branch_track->id_first_bias_end = (*it)->trajectory_point_id_with_signal;
+            if (branch_track->id_last_bias_begin < (*it)->trajectory_point_id_with_signal)
+                branch_track->id_last_bias_begin = (*it)->trajectory_point_id_with_signal;
         }
     }
 
