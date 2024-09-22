@@ -46,6 +46,7 @@
 #define     FILE_TRAJ_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
 #define     FILE_BACKUP_PREFIX    std::string("~")
+#define     CONFIGNODE_TRAJECTORY std::string("Trajectory")
 #define     DELIMITER_SYMBOL char('\t')
 #define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
 

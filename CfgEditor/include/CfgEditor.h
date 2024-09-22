@@ -45,7 +45,9 @@ public:
 
     /// Открыть файл для записи
     void openFileForWrite(QString fileName);
-    /// Записать файл
+    /// Записать в файл список тегов
+    void writeFile(FieldsDataList fields_data);
+    /// Записать в файл в ноду <sectionName> список тегов
     void writeFile(QString sectionName, FieldsDataList fields_data);
     /// Закрыть файл по завершении записи
     void closeFileAfterWrite();

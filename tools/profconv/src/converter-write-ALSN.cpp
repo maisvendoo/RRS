@@ -14,28 +14,29 @@ void ZDSimConverter::writeALSN()
     FieldsDataList flist_25hz;
     FieldsDataList flist_50hz;
 
+    QString node = CONFIGNODE_TRAJECTORY.c_str();
     for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
     {
         if ((*traj)->ALSN_frequency == 25)
-            flist_25hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+            flist_25hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
         if ((*traj)->ALSN_frequency == 50)
-            flist_50hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+            flist_50hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
     }
     for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
     {
         if ((*traj)->ALSN_frequency == 25)
-            flist_25hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+            flist_25hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
         if ((*traj)->ALSN_frequency == 50)
-            flist_50hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+            flist_50hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
     }
     for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
     {
         for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
         {
             if ((*traj)->ALSN_frequency == 25)
-                flist_25hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+                flist_25hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
             if ((*traj)->ALSN_frequency == 50)
-                flist_50hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+                flist_50hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
         }
     }
     for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
@@ -43,31 +44,37 @@ void ZDSimConverter::writeALSN()
         for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
         {
             if ((*traj)->ALSN_frequency == 25)
-                flist_25hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+                flist_25hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
             if ((*traj)->ALSN_frequency == 50)
-                flist_50hz.append(QPair<QString, QString>("Trajectory", QString((*traj)->name.c_str())));
+                flist_50hz.append(QPair<QString, QString>(node, QString((*traj)->name.c_str())));
         }
     }
     if (!flist_25hz.empty())
     {
-        flist_25hz.append(QPair<QString, QString>("Frequency", QString("25")));
-
         std::string path_25hz = compinePath(ALSN_Dir, FILE_ALSN_25HZ);
         CfgEditor editor_25hz;
         editor_25hz.openFileForWrite(QString(path_25hz.c_str()));
         editor_25hz.setIndentationFormat(-1);
-        editor_25hz.writeFile("ALSN", flist_25hz);
+
+        // Список траекторий
+        editor_25hz.writeFile(flist_25hz);
+        // Конфиг несущей частоты сигнала АЛСН
+        editor_25hz.writeFile("ALSN", FieldsDataList{ QPair<QString, QString>("Frequency", QString("25")) });
+
         editor_25hz.closeFileAfterWrite();
     }
     if (!flist_50hz.empty())
     {
-        flist_50hz.append(QPair<QString, QString>("Frequency", QString("50")));
-
         std::string path_50hz = compinePath(ALSN_Dir, FILE_ALSN_50HZ);
         CfgEditor editor_50hz;
         editor_50hz.openFileForWrite(QString(path_50hz.c_str()));
         editor_50hz.setIndentationFormat(-1);
-        editor_50hz.writeFile("ALSN", flist_50hz);
+
+        // Список траекторий
+        editor_50hz.writeFile(flist_50hz);
+        // Конфиг несущей частоты сигнала АЛСН
+        editor_50hz.writeFile("ALSN", FieldsDataList{ QPair<QString, QString>("Frequency", QString("50")) });
+
         editor_50hz.closeFileAfterWrite();
     }
 }

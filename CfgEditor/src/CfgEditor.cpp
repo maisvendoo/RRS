@@ -44,18 +44,26 @@ void CfgEditor::openFileForWrite(QString fileName)
 }
 
 //-----------------------------------------------------------------------------
-//  Записать файл
+//  Записать в файл список тегов
 //-----------------------------------------------------------------------------
-void CfgEditor::writeFile(QString sectionName, FieldsDataList fields_data)
+void CfgEditor::writeFile(FieldsDataList fields_data)
 {
-    xmlWriter_.writeStartElement(sectionName);
-
     for (int i = 0, n = fields_data.size(); i < n; ++i)
     {
         xmlWriter_.writeStartElement(fields_data[i].first);
         xmlWriter_.writeCharacters(fields_data[i].second.toString());
         xmlWriter_.writeEndElement();
     }
+}
+
+//-----------------------------------------------------------------------------
+//  Записать в файл в ноду <sectionName> список тегов
+//-----------------------------------------------------------------------------
+void CfgEditor::writeFile(QString sectionName, FieldsDataList fields_data)
+{
+    xmlWriter_.writeStartElement(sectionName);
+
+    writeFile(fields_data);
 
     xmlWriter_.writeEndElement();
 }

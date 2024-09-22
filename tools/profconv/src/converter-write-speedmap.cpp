@@ -14,6 +14,7 @@ void ZDSimConverter::writeSpeedmap()
     if (speedmap_data.empty())
         return;
 
+    QString node = CONFIGNODE_TRAJECTORY.c_str();
     for (auto speedmap_element : speedmap_data)
     {
         int coord_begin = speedmap_element->speedmap_elements.front().railway_coord_begin;
@@ -31,17 +32,21 @@ void ZDSimConverter::writeSpeedmap()
         FieldsDataList flist;
         for (auto tn : speedmap_element->trajectories_names)
         {
-            flist.append(QPair<QString, QString>("Trajectory", QString(tn.c_str())));
+            flist.append(QPair<QString, QString>(node, QString(tn.c_str())));
         }
+        // Список траекторий
+        editor.writeFile(flist);
+
+        FieldsDataList flist_speed;
         for (auto se : speedmap_element->speedmap_elements)
         {
             QString field_value = QString("%1 %2 %3")
                                       .arg(se.limit)
                                       .arg(se.railway_coord_begin)
                                       .arg(se.railway_coord_end);
-            flist.append(QPair<QString, QString>("SpeedLimit", field_value));
+            flist_speed.append(QPair<QString, QString>("SpeedLimit", field_value));
         }
-        editor.writeFile("SpeedMap", flist);
+        editor.writeFile("SpeedMap", flist_speed);
         editor.closeFileAfterWrite();
     }
 }
