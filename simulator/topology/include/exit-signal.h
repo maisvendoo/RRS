@@ -45,6 +45,82 @@ private:
 
     Timer *close_timer = new Timer(1.0, false);
 
+    enum
+    {
+        NUM_DLR_CONTACTS = 1,
+        DRL_LOCK = 0
+    };
+
+    /// Реле замыкания маршрута отправления
+    Relay *departure_lock_relay = new Relay(NUM_DLR_CONTACTS);
+
+    enum
+    {
+        NUM_SRS_NEUTRAL_CONTACTS = 2,
+        NUM_SRS_PLUS_CONTACTS = 1,
+        NUM_SRS_MINUS_CONTACTS = 1,
+
+        SRS_N_RED = 0,
+        SRS_N_YELLOW = 1,
+
+        SRS_PLUS_YELLOW = 0,
+
+        SRS_MINUS_GREEN = 0
+    };
+
+    /// Сигнальное реле светофора
+    CombineRelay *semaphore_signal_relay = new CombineRelay(NUM_SRS_NEUTRAL_CONTACTS,
+                                                            NUM_SRS_PLUS_CONTACTS,
+                                                            NUM_SRS_MINUS_CONTACTS);
+
+    enum
+    {
+        NUM_RCR_CONTACTS = 2,
+        RCR_SR_CTRL = 0,
+        RCR_SRS_CTRL = 1
+    };
+
+    /// Контрольное маршрутное реле
+    Relay *route_control_relay = new Relay(NUM_RCR_CONTACTS);
+
+    enum
+    {
+        NUM_YR_CONTACTS = 2,
+        YR_SR_CTRL = 0,
+        YR_SRS_PLUS = 1
+    };
+
+    /// Реле контроля первого участка удаления
+    Relay *yellow_relay = new Relay(NUM_YR_CONTACTS);
+
+    enum
+    {
+        NUM_GR_CONTACTS = 2,
+        GR_SRS_MINUS = 0,
+        GER_SRS_PLUS = 1
+    };
+
+    /// Реле контроля второго участка удаления
+    Relay *green_relay = new Relay(NUM_GR_CONTACTS);
+
+    enum
+    {
+        NUM_FWD_WR_CONTACTS = 1,
+        FWD_BUSY = 0
+    };
+
+    /// Путевое реле стрелочного участка за светофором
+    Relay *fwd_way_relay = new Relay(NUM_FWD_WR_CONTACTS);
+
+    enum
+    {
+        NUM_AR_CONTACTS = 1,
+        AR_OPEN = 0
+    };
+
+    /// Указательное реле, для связи с предыдущим входным светофором
+    Relay *allow_relay = new Relay(NUM_AR_CONTACTS);
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,

@@ -12,6 +12,33 @@ ExitSignal::ExitSignal(QObject *parent) : Signal(parent)
 
     connect(open_timer, &Timer::process, this, &ExitSignal::slotOpenTimer);
     connect(close_timer, &Timer::process, this, &ExitSignal::slotCloseTimer);
+
+    departure_lock_relay->read_config("combine-relay");
+    departure_lock_relay->setInitContactState(DRL_LOCK, true);
+
+    semaphore_signal_relay->read_config("combine-relay");
+    semaphore_signal_relay->setInitContactState(SRS_N_RED, true);
+    semaphore_signal_relay->setInitContactState(SRS_N_YELLOW, false);
+    semaphore_signal_relay->setInitPlusContactState(SRS_PLUS_YELLOW, false);
+    semaphore_signal_relay->setInitMinusContactState(SRS_MINUS_GREEN, false);
+
+    route_control_relay->read_config("combine-relay");
+    route_control_relay->setInitContactState(RCR_SR_CTRL, false);
+    route_control_relay->setInitContactState(RCR_SRS_CTRL, false);
+
+    yellow_relay->read_config("combine-relay");
+    yellow_relay->setInitContactState(YR_SR_CTRL, false);
+    yellow_relay->setInitContactState(YR_SRS_PLUS, false);
+
+    green_relay->read_config("combine-relay");
+    green_relay->setInitContactState(GR_SRS_MINUS, false);
+    green_relay->setInitContactState(GER_SRS_PLUS, true);
+
+    fwd_way_relay->read_config("combine-relay");
+    fwd_way_relay->setInitContactState(FWD_BUSY, false);
+
+    allow_relay->read_config("combine-relay");
+    allow_relay->setInitContactState(AR_OPEN, false);
 }
 
 //------------------------------------------------------------------------------
@@ -33,6 +60,20 @@ void ExitSignal::step(double t, double dt)
 
     open_timer->step(t, dt);
     close_timer->step(t, dt);
+
+    departure_lock_relay->step(t, dt);
+
+    semaphore_signal_relay->step(t, dt);
+
+    route_control_relay->step(t, dt);
+
+    yellow_relay->step(t, dt);
+
+    green_relay->step(t, dt);
+
+    fwd_way_relay->step(t, dt);
+
+    allow_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
