@@ -32,7 +32,7 @@ ExitSignal::ExitSignal(QObject *parent) : Signal(parent)
 
     green_relay->read_config("combine-relay");
     green_relay->setInitContactState(GR_SRS_MINUS, false);
-    green_relay->setInitContactState(GER_SRS_PLUS, true);
+    green_relay->setInitContactState(GR_SRS_PLUS, true);
 
     fwd_way_relay->read_config("combine-relay");
     fwd_way_relay->setInitContactState(FWD_BUSY, false);
@@ -123,6 +123,8 @@ void ExitSignal::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void ExitSignal::lens_control()
 {
+    old_lens_state = lens_state;
+
     lens_state[RED_LENS] = semaphore_signal_relay->getContactState(SRS_N_RED);
 
     lens_state[YELLOW_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
@@ -130,6 +132,11 @@ void ExitSignal::lens_control()
 
     lens_state[GREEN_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
                              semaphore_signal_relay->getMinusContactState(SRS_MINUS_GREEN);
+
+    if (lens_state != old_lens_state)
+    {
+        emit sendDataUpdate(this->serialize());
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -369,6 +376,56 @@ void ExitSignal::route_control()
     }
 
     route_control_relay->setVoltage(U_bat * static_cast<double>(is_free && is_switches_correct));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::relay_control()
+{
+    // Цепь сигнального реле
+
+    // Провод блока кнопок
+    bool is_buttons_wire_ON = is_open_button_pressed ||
+                              (signal_relay->getContactState(SR_SELF) && is_close_button_unpressed);
+
+    bool is_SR_ON = yellow_relay->getContactState(YR_SR_CTRL) &&
+                    fwd_way_relay->getContactState(FWD_BUSY) &&
+                    route_control_relay->getContactState(RCR_SR_CTRL) && is_buttons_wire_ON;
+
+    signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
+
+    // Цепь реле замыкания маршрута
+    bool is_DRL_ON = signal_relay->getContactState(SR_DLR_CTRL);
+
+    departure_lock_relay->setVoltage(U_bat * static_cast<double>(is_DRL_ON));
+
+    double is_minus = static_cast<double>(green_relay->getContactState(GR_SRS_MINUS));
+    double is_plus = static_cast<double>(yellow_relay->getContactState(YR_SRS_PLUS) && green_relay->getContactState(GR_SRS_PLUS));
+
+    // Напряжение питания сигнального реле светофора
+    double U_srs = U_bat * (is_plus - is_minus);
+
+    bool is_SRS_ON = departure_lock_relay->getContactState(DRL_LOCK) &&
+                     signal_relay->getContactState(SR_SRS_CTRL) &&
+                     route_control_relay->getContactState(RCR_SRS_CTRL);
+
+    semaphore_signal_relay->setVoltage(U_srs * static_cast<double>(is_SRS_ON));
+
+    // Цепь указательного реле
+    bool is_AR_ON = semaphore_signal_relay->getContactState(SRS_N_YELLOW);
+
+    allow_relay->setVoltage(U_bat * static_cast<double>(is_AR_ON));
+
+    // Напряжение, даваемое в линию входному
+    double U_line_old = U_line_prev;
+
+    U_line_prev = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
+
+    if (qAbs(U_line_prev - U_line_old))
+    {
+        emit sendLineVoltage(U_line_prev);
+    }
 }
 
 //------------------------------------------------------------------------------

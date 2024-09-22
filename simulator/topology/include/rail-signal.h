@@ -100,6 +100,11 @@ public:
         return conn_name;
     }
 
+    double getLineVoltage() const
+    {
+        return U_line_prev;
+    }
+
 signals:
 
     /// Послать предыдущему световору напряжение линии
@@ -127,6 +132,8 @@ protected:
 
     /// Напряжение питания линейного реле
     double U_line = 0.0;
+
+    double U_line_prev = 0.0;
 
     /// Напряжение питания бокового сигнального реле
     double U_side = 0.0;

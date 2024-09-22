@@ -97,7 +97,7 @@ private:
     {
         NUM_GR_CONTACTS = 2,
         GR_SRS_MINUS = 0,
-        GER_SRS_PLUS = 1
+        GR_SRS_PLUS = 1
     };
 
     /// Реле контроля второго участка удаления
@@ -136,6 +136,8 @@ private:
     void removal_area_control();
 
     void route_control();
+
+    void relay_control();
 
 private slots:
 
