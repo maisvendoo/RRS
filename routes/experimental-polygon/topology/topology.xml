@@ -6,6 +6,7 @@
         <fwdPlusTraj>route1_0002_9</fwdPlusTraj>
         <SignalLetter>Ч</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00002</Name>
@@ -29,6 +30,7 @@
         <fwdPlusTraj>route1_0005_21</fwdPlusTraj>
         <SignalLetter>Ч1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00005</Name>
@@ -52,6 +54,7 @@
         <fwdPlusTraj>route1_0008_60</fwdPlusTraj>
         <SignalLetter>12</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00008</Name>
@@ -59,6 +62,7 @@
         <fwdPlusTraj>route1_0009_82</fwdPlusTraj>
         <SignalLetter>10</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00009</Name>
@@ -66,6 +70,7 @@
         <fwdPlusTraj>route1_0010_131</fwdPlusTraj>
         <SignalLetter>8</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00010</Name>
@@ -73,6 +78,7 @@
         <fwdPlusTraj>route1_0011_160</fwdPlusTraj>
         <SignalLetter>6</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00011</Name>
@@ -80,6 +86,7 @@
         <fwdPlusTraj>route1_0012_202</fwdPlusTraj>
         <SignalLetter>4</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00012</Name>
@@ -87,13 +94,15 @@
         <fwdPlusTraj>route1_0013_222</fwdPlusTraj>
         <SignalLetter>2</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00013</Name>
         <bwdPlusTraj>route1_0013_222</bwdPlusTraj>
         <fwdPlusTraj>route1_0014_242</fwdPlusTraj>
         <SignalLetter>Ч</SignalLetter>
-        <SignalModel>ab_exit</SignalModel>
+        <SignalModel>ab_entr</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00014</Name>
@@ -117,6 +126,7 @@
         <fwdPlusTraj>route1_0017_258</fwdPlusTraj>
         <SignalLetter>Ч1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00017</Name>
@@ -140,6 +150,7 @@
         <fwdPlusTraj>route1_0020_292</fwdPlusTraj>
         <SignalLetter>12</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00020</Name>
@@ -147,6 +158,7 @@
         <fwdPlusTraj>route1_0021_321</fwdPlusTraj>
         <SignalLetter>10</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00021</Name>
@@ -154,6 +166,7 @@
         <fwdPlusTraj>route1_0022_352</fwdPlusTraj>
         <SignalLetter>8</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00022</Name>
@@ -161,6 +174,7 @@
         <fwdPlusTraj>route1_0023_379</fwdPlusTraj>
         <SignalLetter>6</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00023</Name>
@@ -168,6 +182,7 @@
         <fwdPlusTraj>route1_0024_411</fwdPlusTraj>
         <SignalLetter>4</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00024</Name>
@@ -175,6 +190,7 @@
         <fwdPlusTraj>route1_0025_442</fwdPlusTraj>
         <SignalLetter>2</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00025</Name>
@@ -182,6 +198,7 @@
         <fwdPlusTraj>route1_0026_477</fwdPlusTraj>
         <SignalLetter>Ч</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00026</Name>
@@ -205,6 +222,7 @@
         <fwdPlusTraj>route1_0029_492</fwdPlusTraj>
         <SignalLetter>Ч1</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00029</Name>
@@ -244,6 +262,7 @@
         <fwdPlusTraj>route2_0004_13</fwdPlusTraj>
         <SignalLetter>Н2</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00034</Name>
@@ -267,6 +286,7 @@
         <fwdPlusTraj>route2_0007_26</fwdPlusTraj>
         <SignalLetter>Н</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00037</Name>
@@ -274,6 +294,7 @@
         <fwdPlusTraj>route2_0008_60</fwdPlusTraj>
         <SignalLetter>1</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00038</Name>
@@ -281,6 +302,7 @@
         <fwdPlusTraj>route2_0009_82</fwdPlusTraj>
         <SignalLetter>3</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00039</Name>
@@ -288,6 +310,7 @@
         <fwdPlusTraj>route2_0010_131</fwdPlusTraj>
         <SignalLetter>5</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00040</Name>
@@ -295,6 +318,7 @@
         <fwdPlusTraj>route2_0011_160</fwdPlusTraj>
         <SignalLetter>7</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00041</Name>
@@ -302,6 +326,7 @@
         <fwdPlusTraj>route2_0012_202</fwdPlusTraj>
         <SignalLetter>9</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00042</Name>
@@ -309,6 +334,7 @@
         <fwdPlusTraj>route2_0013_222</fwdPlusTraj>
         <SignalLetter>11</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00043</Name>
@@ -332,6 +358,7 @@
         <fwdPlusTraj>route2_0016_247</fwdPlusTraj>
         <SignalLetter>Н2</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00046</Name>
@@ -355,6 +382,7 @@
         <fwdPlusTraj>route2_0019_263</fwdPlusTraj>
         <SignalLetter>Н</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00049</Name>
@@ -362,6 +390,7 @@
         <fwdPlusTraj>route2_0020_292</fwdPlusTraj>
         <SignalLetter>1</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00050</Name>
@@ -369,6 +398,7 @@
         <fwdPlusTraj>route2_0021_321</fwdPlusTraj>
         <SignalLetter>3</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00051</Name>
@@ -376,6 +406,7 @@
         <fwdPlusTraj>route2_0022_352</fwdPlusTraj>
         <SignalLetter>5</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00052</Name>
@@ -383,6 +414,7 @@
         <fwdPlusTraj>route2_0023_379</fwdPlusTraj>
         <SignalLetter>7</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00053</Name>
@@ -390,6 +422,7 @@
         <fwdPlusTraj>route2_0024_411</fwdPlusTraj>
         <SignalLetter>9</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00054</Name>
@@ -397,6 +430,7 @@
         <fwdPlusTraj>route2_0025_442</fwdPlusTraj>
         <SignalLetter>11</SignalLetter>
         <SignalModel>ab_line</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00055</Name>
@@ -420,6 +454,7 @@
         <fwdPlusTraj>route2_0028_482</fwdPlusTraj>
         <SignalLetter>Н2</SignalLetter>
         <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00058</Name>
@@ -443,18 +478,23 @@
         <fwdPlusTraj>route2_0031_497</fwdPlusTraj>
         <SignalLetter>Н</SignalLetter>
         <SignalModel>ab_entr</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00061</Name>
         <bwdPlusTraj>branch1_0001_1_x12_x22</bwdPlusTraj>
         <fwdPlusTraj>branch1_0001_2_x12_x22</fwdPlusTraj>
         <SignalLetter>Н4</SignalLetter>
+        <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>-1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00062</Name>
         <bwdPlusTraj>branch1_0001_2_x12_x22</bwdPlusTraj>
         <fwdPlusTraj>branch1_0001_3_x12_x22</fwdPlusTraj>
         <SignalLetter>Ч4</SignalLetter>
+        <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00063</Name>
@@ -467,6 +507,8 @@
         <bwdPlusTraj>branch1_0002_2_12_22</bwdPlusTraj>
         <fwdPlusTraj>branch1_0002_3_12_22</fwdPlusTraj>
         <SignalLetter>Ч3</SignalLetter>
+        <SignalModel>ab_exit</SignalModel>
+        <SignalDirection>1</SignalDirection>
     </Switch>
     <Switch>
         <Name>00065</Name>
