@@ -104,6 +104,8 @@ void ExitSignal::preStep(state_vector_t &Y, double t)
     fwd_way_busy_control();
 
     removal_area_control();
+
+    route_control();
 }
 
 //------------------------------------------------------------------------------
@@ -223,58 +225,140 @@ void ExitSignal::removal_area_control()
             continue;
         }
 
-        if (signal->getSignalType() == "line")
+        if (signal->getDirection() == this->getDirection())
         {
-            if (signal->getDirection() == this->getDirection())
+            Connector *sig_conn = signal->getConnector();
+
+            if (sig_conn == Q_NULLPTR)
             {
-                Connector *sig_conn = signal->getConnector();
-
-                if (sig_conn == Q_NULLPTR)
-                {
-                    break;
-                }
-
-                Trajectory *traj = Q_NULLPTR;
-
-                if (this->getDirection() == 1)
-                {
-                    traj = sig_conn->getBwdTraj();
-                }
-                else
-                {
-                    traj = sig_conn->getFwdTraj();
-                }
-
-                // Если дошли сюда, траектория точно не пустая
-
-                // Определяем занятость первого участка удаления
-                is_YR_ON = !traj->isBusy();
-
-                // Пытаемся найти второй участок удаления
-                if (this->getDirection() == 1)
-                {
-                    traj = sig_conn->getFwdTraj();
-                }
-                else
-                {
-                    traj = sig_conn->getBwdTraj();
-                }
-
-                if (traj == Q_NULLPTR)
-                {
-                    break;
-                }
-
-                is_GR_ON = !traj->isBusy();
-
                 break;
+            }
+
+            Trajectory *traj = Q_NULLPTR;
+
+            if (this->getDirection() == 1)
+            {
+                traj = sig_conn->getBwdTraj();
             }
             else
             {
+                traj = sig_conn->getFwdTraj();
+            }
+
+            // Если дошли сюда, траектория точно не пустая
+
+            // Определяем занятость первого участка удаления
+            is_YR_ON = !traj->isBusy();
+
+            // Пытаемся найти второй участок удаления
+            if (this->getDirection() == 1)
+            {
+                traj = sig_conn->getFwdTraj();
+            }
+            else
+            {
+                traj = sig_conn->getBwdTraj();
+            }
+
+            if (traj == Q_NULLPTR)
+            {
                 break;
             }
+
+            is_GR_ON = !traj->isBusy();
+
+            break;
+        }
+        else
+        {
+            break;
         }
     }
+
+    yellow_relay->setVoltage(U_bat * static_cast<double>(is_YR_ON));
+    green_relay->setVoltage(U_bat * static_cast<double>(is_GR_ON));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::route_control()
+{
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    Connector *cur_conn = conn;
+
+    bool is_free = true;
+    bool is_switches_correct = true;
+
+    // Идем по маршруту до любого ближайшего светофора
+    while (true)
+    {
+        Trajectory *traj = Q_NULLPTR;
+
+        if (this->getDirection() == 1)
+        {
+            traj = cur_conn->getFwdTraj();
+        }
+        else
+        {
+            traj = cur_conn->getBwdTraj();
+        }
+
+        if (traj == Q_NULLPTR)
+        {
+            return;
+        }
+
+        is_free = is_free && (!traj->isBusy());
+
+        if (this->getDirection() == 1)
+        {
+            cur_conn = traj->getFwdConnector();
+        }
+        else
+        {
+            cur_conn = traj->getBwdConnector();
+        }
+
+        if (cur_conn == Q_NULLPTR)
+        {
+            return;
+        }
+
+        // Контроль вреза стрелки
+        Trajectory *prev_traj = Q_NULLPTR;
+
+        if (this->getDirection() == 1)
+        {
+            prev_traj = conn->getBwdTraj();
+        }
+        else
+        {
+            prev_traj = conn->getFwdTraj();
+        }
+
+        if (prev_traj == Q_NULLPTR)
+        {
+            return;
+        }
+
+        is_switches_correct = is_switches_correct && (traj == prev_traj);
+
+        Signal *signal = cur_conn->getSignal();
+
+        if (signal == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        break;
+    }
+
+    route_control_relay->setVoltage(U_bat * static_cast<double>(is_free && is_switches_correct));
 }
 
 //------------------------------------------------------------------------------

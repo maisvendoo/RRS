@@ -135,6 +135,8 @@ private:
 
     void removal_area_control();
 
+    void route_control();
+
 private slots:
 
     void slotOpenTimer();
