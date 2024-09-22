@@ -127,6 +127,8 @@ private:
                     state_vector_t &dYdt,
                     double t) override;
 
+    void lens_control();
+
 private slots:
 
     void slotOpenTimer();

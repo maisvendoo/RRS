@@ -99,7 +99,7 @@ void ExitSignal::slotPressClose()
 //------------------------------------------------------------------------------
 void ExitSignal::preStep(state_vector_t &Y, double t)
 {
-
+    lens_control();
 }
 
 //------------------------------------------------------------------------------
@@ -110,6 +110,20 @@ void ExitSignal::ode_system(const state_vector_t &Y,
                             double t)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::lens_control()
+{
+    lens_state[RED_LENS] = semaphore_signal_relay->getContactState(SRS_N_RED);
+
+    lens_state[YELLOW_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
+                              semaphore_signal_relay->getPlusContactState(SRS_PLUS_YELLOW);
+
+    lens_state[GREEN_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
+                             semaphore_signal_relay->getMinusContactState(SRS_MINUS_GREEN);
 }
 
 //------------------------------------------------------------------------------
