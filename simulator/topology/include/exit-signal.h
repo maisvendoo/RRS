@@ -133,6 +133,8 @@ private:
 
     void fwd_way_busy_control();
 
+    void removal_area_control();
+
 private slots:
 
     void slotOpenTimer();

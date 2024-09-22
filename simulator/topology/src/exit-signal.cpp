@@ -102,6 +102,8 @@ void ExitSignal::preStep(state_vector_t &Y, double t)
     lens_control();
 
     fwd_way_busy_control();
+
+    removal_area_control();
 }
 
 //------------------------------------------------------------------------------
@@ -163,6 +165,116 @@ void ExitSignal::fwd_way_busy_control()
     }
 
     fwd_way_relay->setVoltage(U_bat * static_cast<double>(!is_busy));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::removal_area_control()
+{
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    Connector *cur_conn = conn;
+
+    bool is_GR_ON = false;
+    bool is_YR_ON = false;
+
+    // Ищем первый попутный проходной светофор за горловиной
+    while (true)
+    {
+        Trajectory *traj = Q_NULLPTR;
+
+        if (this->getDirection() == 1)
+        {
+            traj = cur_conn->getFwdTraj();
+
+        }
+        else
+        {
+            traj = cur_conn->getBwdTraj();
+        }
+
+        if (traj == Q_NULLPTR)
+        {
+            return;
+        }
+
+        if (this->getDirection() == 1)
+        {
+            cur_conn = traj->getFwdConnector();
+        }
+        else
+        {
+            cur_conn = traj->getBwdConnector();
+        }
+
+        if (cur_conn == Q_NULLPTR)
+        {
+            return;
+        }
+
+        Signal *signal = cur_conn->getSignal();
+
+        if (signal == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        if (signal->getSignalType() == "line")
+        {
+            if (signal->getDirection() == this->getDirection())
+            {
+                Connector *sig_conn = signal->getConnector();
+
+                if (sig_conn == Q_NULLPTR)
+                {
+                    break;
+                }
+
+                Trajectory *traj = Q_NULLPTR;
+
+                if (this->getDirection() == 1)
+                {
+                    traj = sig_conn->getBwdTraj();
+                }
+                else
+                {
+                    traj = sig_conn->getFwdTraj();
+                }
+
+                // Если дошли сюда, траектория точно не пустая
+
+                // Определяем занятость первого участка удаления
+                is_YR_ON = !traj->isBusy();
+
+                // Пытаемся найти второй участок удаления
+                if (this->getDirection() == 1)
+                {
+                    traj = sig_conn->getFwdTraj();
+                }
+                else
+                {
+                    traj = sig_conn->getBwdTraj();
+                }
+
+                if (traj == Q_NULLPTR)
+                {
+                    break;
+                }
+
+                is_GR_ON = !traj->isBusy();
+
+                break;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
