@@ -100,6 +100,8 @@ void ExitSignal::slotPressClose()
 void ExitSignal::preStep(state_vector_t &Y, double t)
 {
     lens_control();
+
+    fwd_way_busy_control();
 }
 
 //------------------------------------------------------------------------------
@@ -124,6 +126,43 @@ void ExitSignal::lens_control()
 
     lens_state[GREEN_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
                              semaphore_signal_relay->getMinusContactState(SRS_MINUS_GREEN);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::fwd_way_busy_control()
+{
+    if (conn == Q_NULLPTR)
+    {
+        return;
+    }
+
+    if (this->getDirection() == 1)
+    {
+        Trajectory *traj = conn->getFwdTraj();
+
+        if (traj == Q_NULLPTR)
+        {
+            return;
+        }
+
+        is_busy = traj->isBusy();
+    }
+
+    if (this->getDirection() == -1)
+    {
+        Trajectory *traj = conn->getBwdTraj();
+
+        if (traj == Q_NULLPTR)
+        {
+            return;
+        }
+
+        is_busy = traj->isBusy();
+    }
+
+    fwd_way_relay->setVoltage(U_bat * static_cast<double>(!is_busy));
 }
 
 //------------------------------------------------------------------------------

@@ -121,6 +121,8 @@ private:
     /// Указательное реле, для связи с предыдущим входным светофором
     Relay *allow_relay = new Relay(NUM_AR_CONTACTS);
 
+    double U_bat = 12.0;
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
@@ -128,6 +130,8 @@ private:
                     double t) override;
 
     void lens_control();
+
+    void fwd_way_busy_control();
 
 private slots:
 
