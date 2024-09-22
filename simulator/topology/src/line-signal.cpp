@@ -16,6 +16,12 @@ LineSignal::LineSignal(QObject *parent) : Signal(parent)
 
     line_relay->setInitPlusContactState(LR_PLUS_GREEN, false);
     line_relay->setInitMinusContactState(LR_MINUS_YELLOW, false);
+
+    side_signal_relay->read_config("combine-relay");
+    side_signal_relay->setInitContactState(SSR_GREEN, true);
+    side_signal_relay->setInitContactState(SSR_YELLOW, false);
+
+    connect(blink_timer, &Timer::process, this, &LineSignal::slotBlinkTimer);
 }
 
 //------------------------------------------------------------------------------
@@ -36,6 +42,10 @@ void LineSignal::step(double t, double dt)
     way_relay->step(t, dt);
 
     line_relay->step(t, dt);
+
+    side_signal_relay->step(t, dt);
+
+    blink_timer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -54,12 +64,14 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     // Зеленый, при притянутом нейтральном якоре и положительном питании
     // линейного реле
     lens_state[GREEN_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
-                             line_relay->getPlusContactState(LR_PLUS_GREEN);
+                             line_relay->getPlusContactState(LR_PLUS_GREEN) &&
+                             side_signal_relay->getContactState(SSR_GREEN);
 
     // Желтый, при притянутом нейтральном якоре и отрицательном питании
     // линейного реле
-    lens_state[YELLOW_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
-                              line_relay->getMinusContactState(LR_MINUS_YELLOW);
+    lens_state[YELLOW_LENS] = (line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
+                               line_relay->getMinusContactState(LR_MINUS_YELLOW)) ||
+                              (blink_contact && side_signal_relay->getContactState(SSR_YELLOW));
 
     // При изменение соостояния ламп обновляем его
     if (old_lens_state != lens_state)
@@ -94,7 +106,18 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     {
         // Устанавливаем новое значение на линии предыдущего светофора
         emit sendLineVoltage(U_line_prev);        
-    }    
+    }
+
+    side_signal_relay->setVoltage(U_side);
+
+    if (side_signal_relay->getContactState(SSR_YELLOW))
+    {
+        blink_timer->start();
+    }
+    else
+    {
+        blink_timer->stop();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -103,4 +126,12 @@ void LineSignal::preStep(state_vector_t &Y, double t)
 void LineSignal::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LineSignal::slotBlinkTimer()
+{
+    blink_contact = !blink_contact;
 }

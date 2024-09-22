@@ -688,6 +688,9 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
             connect(enter_signal, &Signal::sendLineVoltage,
                     line_signal_prev, &Signal::slotRecvLineVoltage);
 
+            connect(enter_signal, &Signal::sendSideVoltage,
+                    line_signal_prev, &Signal::slotRecvSideVoltage);
+
             Journal::instance()->info("Connected line signal " + enter_signal->getLetter() +
                                       " with line signal " + line_signal_prev->getLetter());
         }
@@ -716,6 +719,9 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
 
             connect(enter_signal, &Signal::sendLineVoltage,
                     line_signal_prev, &Signal::slotRecvLineVoltage);
+
+            connect(enter_signal, &Signal::sendSideVoltage,
+                    line_signal_prev, &Signal::slotRecvSideVoltage);
 
             Journal::instance()->info("Connected line signal " + enter_signal->getLetter() +
                                       " with line signal " + line_signal_prev->getLetter());

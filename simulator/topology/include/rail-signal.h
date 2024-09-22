@@ -108,6 +108,9 @@ signals:
     /// Послать серверу запрос на обновление данных
     void sendDataUpdate(QByteArray signal_data);
 
+    /// Послать напряжение для бокового сигнального реле
+    void sendSideVoltage(double U_side);
+
 protected:    
 
     /// Состояние всех возможных линз
@@ -125,6 +128,9 @@ protected:
     /// Напряжение питания линейного реле
     double U_line = 0.0;
 
+    /// Напряжение питания бокового сигнального реле
+    double U_side = 0.0;
+
     bool is_busy = false;
 
     int signal_dir = 0;
@@ -141,6 +147,9 @@ public slots:
 
     /// Принять от следующего светофора напряжение на линии
     void slotRecvLineVoltage(double U_line);
+
+    /// Принять от следующего светофора напряжение для БСР
+    void slotRecvSideVoltage(double U_side);
 };
 
 #endif // SIGNAL_H

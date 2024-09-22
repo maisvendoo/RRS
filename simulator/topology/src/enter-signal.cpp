@@ -15,6 +15,7 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     side_signal_relay->setInitContactState(SSR_RED, true);
     side_signal_relay->setInitContactState(SSR_TOP_YELLOW, false);
     side_signal_relay->setInitContactState(SSR_BOTTOM_YELLOW, false);
+    side_signal_relay->setInitContactState(SSR_SIDE, false);
 
     direct_signal_relay->read_config("combine-reley");
     direct_signal_relay->setInitContactState(DSR_TOP_YELLOW, true);
@@ -233,6 +234,15 @@ void EnterSignal::relay_control()
                      route_control_relay->getContactState(RCR_DSR_CTRL);
 
     direct_signal_relay->setVoltage(U_bat * static_cast<double>(is_DSR_ON));
+
+    double U_side_old = U_side;
+
+    U_side = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
+
+    if (qAbs(U_side - U_side_old) > 1.0)
+    {
+        emit sendSideVoltage(U_side);
+    }
 }
 
 //------------------------------------------------------------------------------

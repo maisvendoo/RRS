@@ -39,7 +39,7 @@ private:
     enum
     {
         NUM_MSR_CONTACTS = 2,
-        NUM_SSR_CONTACTS = 3,
+        NUM_SSR_CONTACTS = 4,
         NUM_DSR_CONTACTS = 2,
         NUM_RCR_CONTACTS = 3,
         NUM_SR_CONTACTS = 5,
@@ -52,6 +52,7 @@ private:
         SSR_RED = 0,
         SSR_TOP_YELLOW = 1,
         SSR_BOTTOM_YELLOW = 2,
+        SSR_SIDE = 3,
 
         DSR_TOP_YELLOW = 0,
         DSR_GREEN = 1,
@@ -141,6 +142,8 @@ private:
     bool is_SSR_ON = false;
 
     bool is_ALR_ON = false;
+
+    double U_side = 0.0;
 
     void preStep(state_vector_t &Y, double t) override;
 

@@ -85,3 +85,11 @@ void Signal::slotRecvLineVoltage(double U_line)
 {
     this->U_line = U_line;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::slotRecvSideVoltage(double U_side)
+{
+    this->U_side = U_side;
+}
