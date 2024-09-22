@@ -10,13 +10,18 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     main_signal_relay->read_config("combine-relay");
     main_signal_relay->setInitContactState(MSR_RED, true);
     main_signal_relay->setInitContactState(MSR_YELLOW, false);
+    main_signal_relay->setInitContactState(MSR_PLUS, false);
+    main_signal_relay->setInitContactState(MSR_MINUS, true);
 
     side_signal_relay->read_config("combine-relay");
     side_signal_relay->setInitContactState(SSR_RED, true);
     side_signal_relay->setInitContactState(SSR_TOP_YELLOW, false);
     side_signal_relay->setInitContactState(SSR_BOTTOM_YELLOW, false);
+    side_signal_relay->setInitContactState(SSR_SIDE, false);
+    side_signal_relay->setInitContactState(SSR_PLUS, false);
+    side_signal_relay->setInitContactState(SSR_MINUS, true);
 
-    direct_signal_relay->read_config("combine-reley");
+    direct_signal_relay->read_config("combine-relay");
     direct_signal_relay->setInitContactState(DSR_TOP_YELLOW, true);
     direct_signal_relay->setInitContactState(DSR_GREEN, false);
 
@@ -43,8 +48,15 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     route_control_relay->setInitContactState(RCR_MSR_SSR_CTRL, false);
     route_control_relay->setInitContactState(RCR_DSR_CTRL, false);
 
+    line_relay->read_config("combine-relay");
+    line_relay->setInitContactState(LR_PLUS, true);
+    line_relay->setInitContactState(LR_MINUS, false);
+
     connect(open_timer, &Timer::process, this, &EnterSignal::slotOpenTimer);
     connect(close_timer, &Timer::process, this, &EnterSignal::slotCloseTimer);
+
+    exit_signal_relay->read_config("combine-relay");
+    exit_signal_relay->setInitContactState(ESR_DSR_CTRL, false);
 }
 
 //------------------------------------------------------------------------------
@@ -76,6 +88,8 @@ void EnterSignal::step(double t, double dt)
 
     fwd_way_relay->step(t, dt);
     bwd_way_relay->step(t, dt);
+
+    line_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -113,11 +127,13 @@ void EnterSignal::busy_control()
 
     fwd_way_relay->setVoltage(U_bat * static_cast<double>(!is_fwd_busy));
 
+    line_relay->setVoltage(U_bat * static_cast<double>(lens_state[RED_LENS]));
+
     double U_line_prev_old = U_line_prev;
 
     double is_line_ON = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_RED));
-    double is_line_plus = static_cast<double>(signal_relay->getContactState(SR_PLUS));
-    double is_line_minus = static_cast<double>(signal_relay->getContactState(SR_MINUS));
+    double is_line_plus = static_cast<double>(line_relay->getContactState(LR_PLUS));
+    double is_line_minus = static_cast<double>(line_relay->getContactState(LR_MINUS));
 
 
     U_line_prev = U_bat * (is_line_plus - is_line_minus) * is_line_ON;
@@ -139,7 +155,9 @@ void EnterSignal::relay_control()
 
     bool is_RCR_ON_old = is_RCR_ON;
 
-    is_RCR_ON = is_route_free(conn);
+    Signal *next_signal = Q_NULLPTR;
+
+    is_RCR_ON = is_route_free(conn, &next_signal);
 
     if (is_RCR_ON != is_RCR_ON_old)
     {
@@ -226,19 +244,32 @@ void EnterSignal::relay_control()
     side_signal_relay->setVoltage(U_bat * static_cast<double>(is_SSR_ON));
 
     // Питание указательного реле выходного сигнала
-    exit_signal_relay->setVoltage(U_line);
+
+    if (next_signal != Q_NULLPTR)
+        exit_signal_relay->setVoltage(next_signal->getLineVoltage());
+    else
+        exit_signal_relay->setVoltage(0.0);
 
     // Цепь сигнального реле сквозного пропуска
     bool is_DSR_ON = exit_signal_relay->getContactState(ESR_DSR_CTRL) &&
                      route_control_relay->getContactState(RCR_DSR_CTRL);
 
     direct_signal_relay->setVoltage(U_bat * static_cast<double>(is_DSR_ON));
+
+    double U_side_old = U_side;
+
+    U_side = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
+
+    if (qAbs(U_side - U_side_old) > 1.0)
+    {
+        emit sendSideVoltage(U_side);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool EnterSignal::is_route_free(Connector *conn)
+bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
 {
     if (conn == Q_NULLPTR)
     {
@@ -289,15 +320,15 @@ bool EnterSignal::is_route_free(Connector *conn)
         }
 
         // Смотрим сигнал на следующем коннекторе
-        Signal *signal = cur_conn->getSignal();
+        *signal = cur_conn->getSignal();
 
         // Продолжаем цикл, возможно попалась стрелка
-        if (signal == Q_NULLPTR)
+        if (*signal == Q_NULLPTR)
         {
             continue;
         }
 
-        if (signal->getDirection() != this->getDirection())
+        if ((*signal)->getDirection() != this->getDirection())
         {
             continue;
         }

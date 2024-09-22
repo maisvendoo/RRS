@@ -14,6 +14,8 @@ struct signals_data_t
 
     std::vector<Signal *> enter_signals;
 
+    std::vector<Signal *> exit_signals;
+
 
     QByteArray serialize()
     {
@@ -34,6 +36,13 @@ struct signals_data_t
         for (auto enter_signal: enter_signals)
         {
             stream << enter_signal->serialize();
+        }
+
+        stream << exit_signals.size();
+
+        for (auto signal : exit_signals)
+        {
+            stream << signal->serialize();
         }
 
         return buff.data();
@@ -75,6 +84,22 @@ struct signals_data_t
             enter_signal->deserialize(tmp_data);
 
             enter_signals.push_back(enter_signal);
+        }
+
+        size_t exit_signals_size = 0;
+        stream >> exit_signals_size;
+
+        exit_signals.clear();
+
+        for (size_t i = 0; i < exit_signals_size; ++i)
+        {
+            QByteArray tmp_data;
+            stream >> tmp_data;
+
+            ExitSignal *signal = new ExitSignal();
+            signal->deserialize(tmp_data);
+
+            exit_signals.push_back(signal);
         }
     }
 };

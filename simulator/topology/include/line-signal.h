@@ -3,6 +3,7 @@
 
 #include    <rail-signal.h>
 #include    <combine-releay.h>
+#include    <timer.h>
 
 //------------------------------------------------------------------------------
 //
@@ -48,6 +49,22 @@ private:
                                                 LR_PLUS_NUM,
                                                 LR_MINUS_NUM);
 
+    enum
+    {
+        NUM_SSR_CONTACTS = 2,
+        SSR_GREEN = 0,
+        SSR_YELLOW = 1
+    };
+
+    /// Боковое сигнальное реле (желтый мигающий для предвходного)
+    Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+
+    /// Таймер мигания желтого
+    Timer *blink_timer = new Timer(0.75, false);
+
+    /// Контакт мигания
+    bool blink_contact = true;
+
     /// Напряжение путевой батареи
     double U_bat = 12.0;
 
@@ -57,6 +74,10 @@ private:
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
+
+private slots:
+
+    void slotBlinkTimer();
 };
 
 #endif

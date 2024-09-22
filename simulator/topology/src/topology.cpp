@@ -318,6 +318,22 @@ void Topology::enter_signals_step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::exit_signals_step(double t, double dt)
+{
+    for (auto signal : signals_data.exit_signals)
+    {
+        if (signal == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->step(t, dt);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::step(double t, double dt)
 {
     for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
@@ -348,6 +364,8 @@ void Topology::step(double t, double dt)
     line_signals_step(t, dt);
 
     enter_signals_step(t, dt);
+
+    exit_signals_step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -572,6 +590,21 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 
             Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
         }
+
+        if (signal_model.right(4) == "exit")
+        {
+            ExitSignal *signal = new ExitSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir);
+            signal->setSignalModel(signal_model);
+            signal->setConnector(conn);
+
+            conn->setSignal(signal);
+
+            signals_data.exit_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
     }
 }
 
@@ -688,6 +721,9 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
             connect(enter_signal, &Signal::sendLineVoltage,
                     line_signal_prev, &Signal::slotRecvLineVoltage);
 
+            connect(enter_signal, &Signal::sendSideVoltage,
+                    line_signal_prev, &Signal::slotRecvSideVoltage);
+
             Journal::instance()->info("Connected line signal " + enter_signal->getLetter() +
                                       " with line signal " + line_signal_prev->getLetter());
         }
@@ -716,6 +752,9 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
 
             connect(enter_signal, &Signal::sendLineVoltage,
                     line_signal_prev, &Signal::slotRecvLineVoltage);
+
+            connect(enter_signal, &Signal::sendSideVoltage,
+                    line_signal_prev, &Signal::slotRecvSideVoltage);
 
             Journal::instance()->info("Connected line signal " + enter_signal->getLetter() +
                                       " with line signal " + line_signal_prev->getLetter());
@@ -881,6 +920,18 @@ void Topology::slotOpenSignal(QByteArray signal_data)
 
         es->slotPressOpen();
     }
+
+    if (signal->getSignalType() == "exit")
+    {
+        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
+
+        if (es == Q_NULLPTR)
+        {
+            return;
+        }
+
+        es->slotPressOpen();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -919,6 +970,18 @@ void Topology::slotCloseSignal(QByteArray signal_data)
     if (signal->getSignalType() == "entr")
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
+
+        if (es == Q_NULLPTR)
+        {
+            return;
+        }
+
+        es->slotPressClose();
+    }
+
+    if (signal->getSignalType() == "exit")
+    {
+        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
 
         if (es == Q_NULLPTR)
         {

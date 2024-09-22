@@ -704,6 +704,11 @@ void Model::initTcpServer()
     connect(tpc_server, &TcpServer::openSignal, topology, &Topology::slotOpenSignal);
 
     connect(tpc_server, &TcpServer::closeSignal, topology, &Topology::slotCloseSignal);
+
+    for (auto signal : topology->getSignalsData()->exit_signals)
+    {
+        connect(signal, &Signal::sendDataUpdate, tpc_server, &TcpServer::slotUpdateSignal);
+    }
 }
 
 //------------------------------------------------------------------------------
