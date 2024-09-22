@@ -12,7 +12,10 @@ void ZDSimConverter::writeStations(const zds_start_km_data_t &waypoints)
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
+    {
+        std::string backup = FILE_BACKUP_PREFIX + FILE_STATIONS + FILE_BACKUP_EXTENTION;
+        file_old.rename( QString(compinePath(topologyDir, backup).c_str()) );
+    }
 
     if (waypoints.empty())
         return;

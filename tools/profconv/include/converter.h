@@ -34,13 +34,18 @@
 
 #define     DIR_TOPOLOGY     std::string("topology")
 #define     DIR_TRAJECTORIES std::string("trajectories")
+#define     DIR_ALSN_MAP     std::string("trajectory-ALSN")
+#define     DIR_SPEEDMAP     std::string("trajectory-speedmap")
 #define     FILE_TOPOLOGY    std::string("topology.xml")
 #define     FILE_START_POINT std::string("waypoints.conf")
 #define     FILE_STATIONS    std::string("stations.conf")
 #define     FILE_SPEEDMAP    std::string("trajectory-speedmap.xml")
 #define     FILE_ALSN        std::string("trajectory-ALSN.xml")
+#define     FILE_ALSN_25HZ   std::string("ALSN_25Hz.xml")
+#define     FILE_ALSN_50HZ   std::string("ALSN_50Hz.xml")
 #define     FILE_TRAJ_EXTENTION   std::string(".traj")
 #define     FILE_BACKUP_EXTENTION std::string(".bak")
+#define     FILE_BACKUP_PREFIX    std::string("~")
 #define     DELIMITER_SYMBOL char('\t')
 #define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
 
@@ -64,6 +69,10 @@ private:
     std::string         topologyDir;
 
     std::string         trajectoriesDir;
+
+    std::string         ALSN_Dir;
+
+    std::string         speedmapDir;
 
     zds_route_map_data_t    route_map_data;
 
@@ -188,6 +197,10 @@ private:
     void writeStartPoints(const start_point_data_t &start_points);
 
     void writeStations(const zds_start_km_data_t &waypoints);
+
+    void writeSpeedmap_OLD();
+
+    void writeALSN_OLD();
 
     void writeSpeedmap();
 

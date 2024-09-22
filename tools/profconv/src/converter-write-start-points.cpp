@@ -8,11 +8,14 @@
 //------------------------------------------------------------------------------
 void ZDSimConverter::writeStartPoints(const start_point_data_t &start_points)
 {
-    std::string path = compinePath(toNativeSeparators(topologyDir), FILE_START_POINT);
+    std::string path = compinePath(topologyDir, FILE_START_POINT);
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
+    {
+        std::string backup = FILE_BACKUP_PREFIX + FILE_START_POINT + FILE_BACKUP_EXTENTION;
+        file_old.rename( QString(compinePath(topologyDir, backup).c_str()) );
+    }
 
     if (start_points.empty())
         return;

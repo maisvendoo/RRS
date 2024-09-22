@@ -99,6 +99,7 @@ bool ZDSimConverter::createSpeedMap()
     // Пишем список траекторий по главному пути
     int railway_coord_section = 0;
     speedmap_t *speedmap = new speedmap_t();
+    speedmap->name_prefix = "route1";
     for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
     {
         // Если начался новый участок жд-пикетажа,
@@ -108,6 +109,7 @@ bool ZDSimConverter::createSpeedMap()
             railway_coord_section = (*traj)->railway_coord_section;
             speedmap_data.push_back(speedmap);
             speedmap = new speedmap_t();
+            speedmap->name_prefix = "route1";
         }
         speedmap->trajectories_names.push_back((*traj)->name);
     }
@@ -149,6 +151,7 @@ bool ZDSimConverter::createSpeedMap()
 
     // Пишем список траекторий по главному пути
     speedmap = new speedmap_t();
+    speedmap->name_prefix = "route2";
     railway_coord_section = 0;
     int data1_size = speedmap_data.size();
     for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
@@ -160,6 +163,7 @@ bool ZDSimConverter::createSpeedMap()
             railway_coord_section = (*traj)->railway_coord_section;
             speedmap_data.push_back(speedmap);
             speedmap = new speedmap_t();
+            speedmap->name_prefix = "route2";
         }
         speedmap->trajectories_names.push_back((*traj)->name);
     }
@@ -199,6 +203,7 @@ bool ZDSimConverter::createSpeedMap()
 
     // Пишем список всех траекторий боковых путей и съездов
     speedmap_t *branch_speedmap = new speedmap_t();
+    branch_speedmap->name_prefix = "all_branch_tracks";
     if (!branch_track_data1.empty())
     {
         for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)

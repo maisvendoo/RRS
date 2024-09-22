@@ -172,6 +172,7 @@ struct speedmap_t
 {
     std::vector<std::string> trajectories_names = {};
     std::vector<speed_element_t> speedmap_elements = {};
+    std::string name_prefix = "";
 
     speedmap_t()
     {

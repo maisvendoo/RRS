@@ -11,11 +11,7 @@
 //------------------------------------------------------------------------------
 void ZDSimConverter::writeTopologyTrajectory(const trajectory_t* trajectory)
 {
-    std::string path = compinePath(toNativeSeparators(trajectoriesDir), trajectory->name + FILE_TRAJ_EXTENTION);
-
-    QFile file_old(QString(path.c_str()));
-    if (file_old.exists())
-        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
+    std::string path = compinePath(trajectoriesDir, trajectory->name + FILE_TRAJ_EXTENTION);
 
     QFile file(QString(path.c_str()));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -98,11 +94,14 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
 //------------------------------------------------------------------------------
 void ZDSimConverter::writeTopologyConnectors()
 {
-    std::string path = compinePath(toNativeSeparators(topologyDir), FILE_TOPOLOGY);
+    std::string path = compinePath(topologyDir, FILE_TOPOLOGY);
 
     QFile file_old(QString(path.c_str()));
     if (file_old.exists())
-        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
+    {
+        std::string backup = FILE_BACKUP_PREFIX + FILE_TOPOLOGY + FILE_BACKUP_EXTENTION;
+        file_old.rename( QString(compinePath(topologyDir, backup).c_str()) );
+    }
 
     CfgEditor editor;
     editor.openFileForWrite(QString(path.c_str()));

@@ -127,23 +127,56 @@ CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
     if (routeDir.empty())
         return RESULT_ERROR;
 
-    std::string topology_subdir_name = "topology";
-    topologyDir = compinePath(routeDir, topology_subdir_name);
-
     QDir route(routeDir.c_str());
-    if (!route.exists(topology_subdir_name.c_str()))
+
+    topologyDir = toNativeSeparators(compinePath(routeDir, DIR_TOPOLOGY));
+    if (!route.exists(DIR_TOPOLOGY.c_str()))
     {
         route.mkpath(topologyDir.c_str());
     }
-
-    std::string trajectories_subdir_name = "trajectories";
-    trajectoriesDir = compinePath(topologyDir, trajectories_subdir_name);
-
     QDir topology(topologyDir.c_str());
-    if (!topology.exists(trajectories_subdir_name.c_str()))
+
+    // Бэкап траекторий
+    if (topology.exists(DIR_TRAJECTORIES.c_str()))
     {
-        topology.mkpath(trajectoriesDir.c_str());
+        std::string backup = FILE_BACKUP_PREFIX + DIR_TRAJECTORIES + FILE_BACKUP_EXTENTION;
+        if (topology.exists(backup.c_str()))
+        {
+            std::string old_backup_path = compinePath(topologyDir, backup);
+            QDir(old_backup_path.c_str()).removeRecursively();
+        }
+        topology.rename(DIR_TRAJECTORIES.c_str(), backup.c_str());
     }
+    trajectoriesDir = toNativeSeparators(compinePath(topologyDir, DIR_TRAJECTORIES));
+    topology.mkpath(trajectoriesDir.c_str());
+
+    // Бэкап карты АЛСН
+    if (topology.exists(DIR_ALSN_MAP.c_str()))
+    {
+        std::string backup = FILE_BACKUP_PREFIX + DIR_ALSN_MAP + FILE_BACKUP_EXTENTION;
+        if (topology.exists(backup.c_str()))
+        {
+            std::string old_backup_path = compinePath(topologyDir, backup);
+            QDir(old_backup_path.c_str()).removeRecursively();
+        }
+        topology.rename(DIR_ALSN_MAP.c_str(), backup.c_str());
+    }
+    ALSN_Dir = toNativeSeparators(compinePath(topologyDir, DIR_ALSN_MAP));
+    topology.mkpath(ALSN_Dir.c_str());
+
+    // Бэкап карты скоростей
+    if (topology.exists(DIR_SPEEDMAP.c_str()))
+    {
+        std::string backup = FILE_BACKUP_PREFIX + DIR_SPEEDMAP + FILE_BACKUP_EXTENTION;
+        if (topology.exists(backup.c_str()))
+        {
+            std::string old_backup_path = compinePath(topologyDir, backup);
+            QDir(old_backup_path.c_str()).removeRecursively();
+        }
+        topology.rename(DIR_SPEEDMAP.c_str(), backup.c_str());
+    }
+    speedmapDir = toNativeSeparators(compinePath(topologyDir, DIR_SPEEDMAP));
+    topology.mkpath(speedmapDir.c_str());
 
     return RESULT_OK;
 }
@@ -356,12 +389,14 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         writeStations(start_km_data);
     }
 
+    writeALSN_OLD();
+    writeALSN();
+
     if (createSpeedMap())
     {
+        writeSpeedmap_OLD();
         writeSpeedmap();
     }
-
-    writeALSN();
 
     return true;
 }

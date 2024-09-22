@@ -1,6 +1,6 @@
 #include    "converter.h"
 
-#include    <QFile>
+#include    <QDir>
 #include    <QVariant>
 
 #include    "path-utils.h"
@@ -10,6 +10,46 @@
 //
 //------------------------------------------------------------------------------
 void ZDSimConverter::writeSpeedmap()
+{
+    if (speedmap_data.empty())
+        return;
+
+    for (auto speedmap_element : speedmap_data)
+    {
+        int coord_begin = speedmap_element->speedmap_elements.front().railway_coord_begin;
+        int coord_end = speedmap_element->speedmap_elements.back().railway_coord_end;
+        QString filename = speedmap_element->name_prefix.c_str();
+        if (coord_begin >= 0)
+            filename += QString("_%1_%2").arg(coord_begin).arg(coord_end);
+        filename += ".xml";
+        std::string path = compinePath(speedmapDir, filename.toStdString());
+
+        CfgEditor editor;
+        editor.openFileForWrite(QString(path.c_str()));
+        editor.setIndentationFormat(-1);
+
+        FieldsDataList flist;
+        for (auto tn : speedmap_element->trajectories_names)
+        {
+            flist.append(QPair<QString, QString>("Trajectory", QString(tn.c_str())));
+        }
+        for (auto se : speedmap_element->speedmap_elements)
+        {
+            QString field_value = QString("%1 %2 %3")
+                                      .arg(se.limit)
+                                      .arg(se.railway_coord_begin)
+                                      .arg(se.railway_coord_end);
+            flist.append(QPair<QString, QString>("SpeedLimit", field_value));
+        }
+        editor.writeFile("SpeedMap", flist);
+        editor.closeFileAfterWrite();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::writeSpeedmap_OLD()
 {
     std::string path = compinePath(toNativeSeparators(topologyDir), FILE_SPEEDMAP);
 
