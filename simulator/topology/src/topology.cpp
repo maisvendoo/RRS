@@ -920,6 +920,18 @@ void Topology::slotOpenSignal(QByteArray signal_data)
 
         es->slotPressOpen();
     }
+
+    if (signal->getSignalType() == "exit")
+    {
+        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
+
+        if (es == Q_NULLPTR)
+        {
+            return;
+        }
+
+        es->slotPressOpen();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -958,6 +970,18 @@ void Topology::slotCloseSignal(QByteArray signal_data)
     if (signal->getSignalType() == "entr")
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
+
+        if (es == Q_NULLPTR)
+        {
+            return;
+        }
+
+        es->slotPressClose();
+    }
+
+    if (signal->getSignalType() == "exit")
+    {
+        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
 
         if (es == Q_NULLPTR)
         {

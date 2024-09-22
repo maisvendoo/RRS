@@ -123,6 +123,14 @@ private:
 
     double U_bat = 12.0;
 
+    bool is_SR_ON = false;
+
+    bool is_DRL_ON = false;
+
+    bool is_SRS_ON = false;
+
+    bool is_AR_ON = false;
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
@@ -137,7 +145,7 @@ private:
 
     void route_control();
 
-    void relay_control();
+    void relay_control();    
 
 private slots:
 

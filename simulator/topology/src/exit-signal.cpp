@@ -1,4 +1,5 @@
 #include    <exit-signal.h>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -7,7 +8,7 @@ ExitSignal::ExitSignal(QObject *parent) : Signal(parent)
 {
     signal_relay->read_config("combine-relay");
     signal_relay->setInitContactState(SR_SELF, false);
-    signal_relay->setInitContactState(SR_DLR_CTRL, false);
+    signal_relay->setInitContactState(SR_DLR_CTRL, true);
     signal_relay->setInitContactState(SR_SRS_CTRL, false);
 
     connect(open_timer, &Timer::process, this, &ExitSignal::slotOpenTimer);
@@ -83,6 +84,8 @@ void ExitSignal::slotPressOpen()
 {
     is_open_button_pressed = true;
     open_timer->start();
+
+    Journal::instance()->info("Pressed open button for signal " + this->getLetter());
 }
 
 //------------------------------------------------------------------------------
@@ -92,6 +95,8 @@ void ExitSignal::slotPressClose()
 {
     is_close_button_unpressed = false;
     close_timer->start();
+
+    Journal::instance()->info("Pressed close button for signal " + this->getLetter());
 }
 
 //------------------------------------------------------------------------------
@@ -106,6 +111,8 @@ void ExitSignal::preStep(state_vector_t &Y, double t)
     removal_area_control();
 
     route_control();
+
+    relay_control();
 }
 
 //------------------------------------------------------------------------------
@@ -346,11 +353,11 @@ void ExitSignal::route_control()
 
         if (this->getDirection() == 1)
         {
-            prev_traj = conn->getBwdTraj();
+            prev_traj = cur_conn->getBwdTraj();
         }
         else
         {
-            prev_traj = conn->getFwdTraj();
+            prev_traj = cur_conn->getFwdTraj();
         }
 
         if (prev_traj == Q_NULLPTR)
@@ -389,14 +396,34 @@ void ExitSignal::relay_control()
     bool is_buttons_wire_ON = is_open_button_pressed ||
                               (signal_relay->getContactState(SR_SELF) && is_close_button_unpressed);
 
-    bool is_SR_ON = yellow_relay->getContactState(YR_SR_CTRL) &&
+    bool is_SR_ON_old = is_SR_ON;
+
+    is_SR_ON = yellow_relay->getContactState(YR_SR_CTRL) &&
                     fwd_way_relay->getContactState(FWD_BUSY) &&
                     route_control_relay->getContactState(RCR_SR_CTRL) && is_buttons_wire_ON;
+
+    if (is_SR_ON != is_SR_ON_old)
+    {
+        if (is_SR_ON)
+            Journal::instance()->info("Signal relay ON");
+        else
+            Journal::instance()->info("Signal relay OFF");
+    }
 
     signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
 
     // Цепь реле замыкания маршрута
-    bool is_DRL_ON = signal_relay->getContactState(SR_DLR_CTRL);
+    bool is_DRL_ON_old = is_DRL_ON;
+
+    is_DRL_ON = signal_relay->getContactState(SR_DLR_CTRL);
+
+    if (is_DRL_ON != is_DRL_ON_old)
+    {
+        if (is_DRL_ON)
+            Journal::instance()->info("Departure lock relay ON");
+        else
+            Journal::instance()->info("Departure lock relay OFF");
+    }
 
     departure_lock_relay->setVoltage(U_bat * static_cast<double>(is_DRL_ON));
 
@@ -406,14 +433,34 @@ void ExitSignal::relay_control()
     // Напряжение питания сигнального реле светофора
     double U_srs = U_bat * (is_plus - is_minus);
 
-    bool is_SRS_ON = departure_lock_relay->getContactState(DRL_LOCK) &&
+    bool is_SRS_ON_old = is_SRS_ON;
+
+    is_SRS_ON = departure_lock_relay->getContactState(DRL_LOCK) &&
                      signal_relay->getContactState(SR_SRS_CTRL) &&
                      route_control_relay->getContactState(RCR_SRS_CTRL);
+
+    if (is_SRS_ON != is_SRS_ON_old)
+    {
+        if (is_SRS_ON)
+            Journal::instance()->info("Semaphor signal relay ON");
+        else
+            Journal::instance()->info("Semaphor signal relay OFF");
+    }
 
     semaphore_signal_relay->setVoltage(U_srs * static_cast<double>(is_SRS_ON));
 
     // Цепь указательного реле
-    bool is_AR_ON = semaphore_signal_relay->getContactState(SRS_N_YELLOW);
+    bool is_AR_ON_old = is_AR_ON;
+
+    is_AR_ON = semaphore_signal_relay->getContactState(SRS_N_YELLOW);
+
+    if (is_AR_ON != is_AR_ON_old)
+    {
+        if (is_AR_ON)
+            Journal::instance()->info("Allow relay ON");
+        else
+            Journal::instance()->info("Allow relay OFF");
+    }
 
     allow_relay->setVoltage(U_bat * static_cast<double>(is_AR_ON));
 
@@ -435,6 +482,8 @@ void ExitSignal::slotOpenTimer()
 {
     is_open_button_pressed = false;
     open_timer->stop();
+
+    Journal::instance()->info("Released open button for signal " + this->getLetter());
 }
 
 //------------------------------------------------------------------------------
@@ -444,4 +493,6 @@ void ExitSignal::slotCloseTimer()
 {
     is_close_button_unpressed = true;
     close_timer->stop();
+
+    Journal::instance()->info("Released close button for signal " + this->getLetter());
 }
