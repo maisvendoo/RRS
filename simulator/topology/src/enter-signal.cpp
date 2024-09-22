@@ -10,12 +10,16 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     main_signal_relay->read_config("combine-relay");
     main_signal_relay->setInitContactState(MSR_RED, true);
     main_signal_relay->setInitContactState(MSR_YELLOW, false);
+    main_signal_relay->setInitContactState(MSR_PLUS, false);
+    main_signal_relay->setInitContactState(MSR_MINUS, true);
 
     side_signal_relay->read_config("combine-relay");
     side_signal_relay->setInitContactState(SSR_RED, true);
     side_signal_relay->setInitContactState(SSR_TOP_YELLOW, false);
     side_signal_relay->setInitContactState(SSR_BOTTOM_YELLOW, false);
     side_signal_relay->setInitContactState(SSR_SIDE, false);
+    side_signal_relay->setInitContactState(SSR_PLUS, false);
+    side_signal_relay->setInitContactState(SSR_MINUS, true);
 
     direct_signal_relay->read_config("combine-reley");
     direct_signal_relay->setInitContactState(DSR_TOP_YELLOW, true);
@@ -43,6 +47,10 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     route_control_relay->setInitContactState(RCR_SR_CTRL, false);
     route_control_relay->setInitContactState(RCR_MSR_SSR_CTRL, false);
     route_control_relay->setInitContactState(RCR_DSR_CTRL, false);
+
+    line_relay->read_config("combine-relay");
+    line_relay->setInitContactState(LR_PLUS, true);
+    line_relay->setInitContactState(LR_MINUS, false);
 
     connect(open_timer, &Timer::process, this, &EnterSignal::slotOpenTimer);
     connect(close_timer, &Timer::process, this, &EnterSignal::slotCloseTimer);
@@ -77,6 +85,8 @@ void EnterSignal::step(double t, double dt)
 
     fwd_way_relay->step(t, dt);
     bwd_way_relay->step(t, dt);
+
+    line_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -114,11 +124,13 @@ void EnterSignal::busy_control()
 
     fwd_way_relay->setVoltage(U_bat * static_cast<double>(!is_fwd_busy));
 
+    line_relay->setVoltage(U_bat * static_cast<double>(lens_state[RED_LENS]));
+
     double U_line_prev_old = U_line_prev;
 
     double is_line_ON = static_cast<double>(bwd_way_relay->getContactState(BWD_BUSY_RED));
-    double is_line_plus = static_cast<double>(signal_relay->getContactState(SR_PLUS));
-    double is_line_minus = static_cast<double>(signal_relay->getContactState(SR_MINUS));
+    double is_line_plus = static_cast<double>(line_relay->getContactState(LR_PLUS));
+    double is_line_minus = static_cast<double>(line_relay->getContactState(LR_MINUS));
 
 
     U_line_prev = U_bat * (is_line_plus - is_line_minus) * is_line_ON;

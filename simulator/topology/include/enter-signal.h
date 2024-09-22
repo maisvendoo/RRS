@@ -38,21 +38,26 @@ private:
 
     enum
     {
-        NUM_MSR_CONTACTS = 2,
-        NUM_SSR_CONTACTS = 4,
+        NUM_MSR_CONTACTS = 4,
+        NUM_SSR_CONTACTS = 6,
         NUM_DSR_CONTACTS = 2,
         NUM_RCR_CONTACTS = 3,
         NUM_SR_CONTACTS = 5,
         NUM_ALR_CONTACTS = 1,
         NUM_ESR_CONTACTS = 1,
+        NUM_LR_CONTACTS = 2,
 
         MSR_RED = 0,
         MSR_YELLOW = 1,
+        MSR_PLUS = 2,
+        MSR_MINUS = 3,
 
         SSR_RED = 0,
         SSR_TOP_YELLOW = 1,
         SSR_BOTTOM_YELLOW = 2,
         SSR_SIDE = 3,
+        SSR_PLUS = 4,
+        SSR_MINUS = 5,
 
         DSR_TOP_YELLOW = 0,
         DSR_GREEN = 1,
@@ -69,7 +74,10 @@ private:
 
         ALR_MSR_SSR_CTRL = 0,
 
-        ESR_DSR_CTRL = 0
+        ESR_DSR_CTRL = 0,
+
+        LR_PLUS = 0,
+        LR_MINUS = 1
     };
 
     /// Главное сигнальное реле
@@ -92,6 +100,9 @@ private:
 
     /// Указательное реле выходного светофора
     Relay *exit_signal_relay = new Relay(NUM_ESR_CONTACTS);
+
+    /// Линейное реле связи с предвходным
+    Relay *line_relay = new Relay(NUM_LR_CONTACTS);
 
     enum
     {
