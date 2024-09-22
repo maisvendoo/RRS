@@ -524,12 +524,6 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                     {
                         name_cur = name_next;
                         ++num_traj;
-                        name_next = name_prefix +
-                                    QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
-                        if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
-                        {
-                            name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
-                        }
 
                         // Добавляем последнюю точку в траекторию
                         point_t end_point;
@@ -538,6 +532,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                         end_point.trajectory_coord = trajectory_length;
                         trajectory.points.push_back(end_point);
                         trajectory.name = name_cur;
+                        trajectory.railway_coord_section = it->railway_coord_section;
 
                         // Всегда кодируем АЛСН по главным путям
                         if (is_25kv)
@@ -578,6 +573,13 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                     was_1_track = false;
                     for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
                     {
+                        name_next = name_prefix +
+                                    QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                        if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+                        {
+                            name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
+                        }
+
                         if ((*split)->track_id == ((it)->id_at_track1 + 1))
                         {
                             // Делаем траекторию данного пути "обратно" спереди боковой
@@ -626,6 +628,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
                     is_25kv = false;
             }
         }
+
         if (is_split_next || ((it+1) == tracks_data->end()))
         {
             point_t end_point;
@@ -635,6 +638,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             trajectory.points.push_back(end_point);
             trajectory.name = ((it+1) == tracks_data->end()) ? name_next : name_cur;
             trajectory.railway_coord_section = it->railway_coord_section;
+
             trajectories->push_back(new trajectory_t(trajectory));
 
             trajectory.points.clear();
