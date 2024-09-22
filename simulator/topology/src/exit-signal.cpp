@@ -198,11 +198,12 @@ void ExitSignal::removal_area_control()
     bool is_GR_ON = false;
     bool is_YR_ON = false;
 
-    // Ищем первый попутный проходной светофор за горловиной
+    // Ищем первый попутный светофор за горловиной
     while (true)
     {
         Trajectory *traj = Q_NULLPTR;
 
+        // Берем следующую траекторию
         if (this->getDirection() == 1)
         {
             traj = cur_conn->getFwdTraj();
@@ -213,11 +214,13 @@ void ExitSignal::removal_area_control()
             traj = cur_conn->getBwdTraj();
         }
 
+        // Если её нет - ехать некуда
         if (traj == Q_NULLPTR)
         {
             return;
         }
 
+        // Берем следующий коннектор
         if (this->getDirection() == 1)
         {
             cur_conn = traj->getFwdConnector();
@@ -227,27 +230,34 @@ void ExitSignal::removal_area_control()
             cur_conn = traj->getBwdConnector();
         }
 
+        // Если его нет - не будет никаких сигналов дальше, выходим
         if (cur_conn == Q_NULLPTR)
         {
             return;
         }
 
+        // Проверяем, есть ли у коннектора сигнал
         Signal *signal = cur_conn->getSignal();
 
+        // если нет - это стык или стрелка, продолжаем поиск
         if (signal == Q_NULLPTR)
         {
             continue;
         }
 
+        // Если сигнал попутный - мы у цели
         if (signal->getDirection() == this->getDirection())
         {
+            // Берем коннектор сигнала
             Connector *sig_conn = signal->getConnector();
 
+            // Страхуемся от бяки
             if (sig_conn == Q_NULLPTR)
             {
                 break;
             }
 
+            // Берем траекторию перед сигналом
             Trajectory *traj = Q_NULLPTR;
 
             if (this->getDirection() == 1)
@@ -264,7 +274,8 @@ void ExitSignal::removal_area_control()
             // Определяем занятость первого участка удаления
             is_YR_ON = !traj->isBusy();
 
-            // Пытаемся найти второй участок удаления
+            // Пытаемся найти второй участок удаления, беря траекторию
+            // спереди от коннектора
             if (this->getDirection() == 1)
             {
                 traj = sig_conn->getFwdTraj();
@@ -274,11 +285,13 @@ void ExitSignal::removal_area_control()
                 traj = sig_conn->getBwdTraj();
             }
 
+            // Нет такой траектории, нет второго участка удаления
             if (traj == Q_NULLPTR)
             {
                 break;
             }
 
+            // Если же есть, проверяем её занятость
             is_GR_ON = !traj->isBusy();
 
             break;
@@ -289,6 +302,7 @@ void ExitSignal::removal_area_control()
         }
     }
 
+    // Отпитываем реле контроля участков приближения
     yellow_relay->setVoltage(U_bat * static_cast<double>(is_YR_ON));
     green_relay->setVoltage(U_bat * static_cast<double>(is_GR_ON));
 }
@@ -305,12 +319,15 @@ void ExitSignal::route_control()
 
     Connector *cur_conn = conn;
 
+    // признак свободности участков по маршруту
     bool is_free = true;
+    // признак установки стрелок по маршруту
     bool is_switches_correct = true;
 
     // Идем по маршруту до любого ближайшего светофора
     while (true)
     {
+        // Смотрим следующую за сигналом траекторию
         Trajectory *traj = Q_NULLPTR;
 
         if (this->getDirection() == 1)
@@ -322,18 +339,23 @@ void ExitSignal::route_control()
             traj = cur_conn->getBwdTraj();
         }
 
+        // её нет - делать больше нечего
         if (traj == Q_NULLPTR)
         {
-            return;
+            is_free = false;
+            break;
         }
 
+        // Есть, проверяем, занята ли
         is_free = is_free && (!traj->isBusy());
 
+        // Если занята - выходим, все уже понятно
         if (!is_free)
         {
             break;
         }
 
+        // Берем следующий коннектор
         if (this->getDirection() == 1)
         {
             cur_conn = traj->getFwdConnector();
@@ -343,14 +365,18 @@ void ExitSignal::route_control()
             cur_conn = traj->getBwdConnector();
         }
 
+        // Нет коннектора - ехать некуда, нет стрелки,
+        // значит она - явно не по маршруту
         if (cur_conn == Q_NULLPTR)
         {
-            return;
+            is_switches_correct = false;
+            break;
         }
 
         // Контроль вреза стрелки
         Trajectory *prev_traj = Q_NULLPTR;
 
+        // Берем "заднюю" траекторию следующего коннектора
         if (this->getDirection() == 1)
         {
             prev_traj = cur_conn->getBwdTraj();
@@ -360,28 +386,37 @@ void ExitSignal::route_control()
             prev_traj = cur_conn->getFwdTraj();
         }
 
+        // Данная проверка не бессмыслена - стрелка может стоять
+        // не по маршруту и вдруг там нет траектории!
         if (prev_traj == Q_NULLPTR)
         {
             return;
         }
 
+        // Срелка стоит по маршруту, если текущая траектория совпадает с
+        // предыдущей для следующего коннектора
         is_switches_correct = is_switches_correct && (traj == prev_traj);
 
+        // Стрелка не по маршруту? Ловить нечего - выходим из поиска
         if (!is_switches_correct)
         {
             break;
         }
 
+        // Проверяем, дошли ли до сигнала
         Signal *signal = cur_conn->getSignal();
 
+        // Нет сигнала - продолжаем шагать
         if (signal == Q_NULLPTR)
         {
             continue;
         }
 
+        // Дошли - выходим подбивать бабки
         break;
     }
 
+    // Отпитываем контрольное маршрутное реле в соответсвии с проверками
     route_control_relay->setVoltage(U_bat * static_cast<double>(is_free && is_switches_correct));
 }
 
