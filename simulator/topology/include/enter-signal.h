@@ -172,7 +172,7 @@ private:
     void relay_control();
 
     /// Проверка занятости маршрута по текущим стрелкам
-    bool is_route_free(Connector *conn);
+    bool is_route_free(Connector *conn, Signal **signal);
 
     /// Проверка состояния стрелок по маршруту
     bool is_switch_minus(Connector *conn);
