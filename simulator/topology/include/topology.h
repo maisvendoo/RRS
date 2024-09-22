@@ -125,6 +125,8 @@ private:
 
     void enter_signals_step(double t, double dt);
 
+    void exit_signals_step(double t, double dt);
+
 public slots:
 
     void getSwitchState(QByteArray &switch_data);

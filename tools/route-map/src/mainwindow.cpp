@@ -330,6 +330,16 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         return;
     }
 
+    if (signals_data->exit_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 exit signals")).arg(signals_data->exit_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Failed to load exit signals data")));
+        return;
+    }
+
     for (auto signal : signals_data->line_signals)
     {
         Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
@@ -344,6 +354,27 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     }
 
     for (auto signal : signals_data->enter_signals)
+    {
+        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->setConnector(conn);
+        conn->setSignal(signal);
+
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
+        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+
+        map->signal_labels.insert(conn->getName(), signal_label);
+    }
+
+    for (auto signal : signals_data->exit_signals)
     {
         Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
 

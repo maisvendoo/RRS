@@ -318,6 +318,22 @@ void Topology::enter_signals_step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::exit_signals_step(double t, double dt)
+{
+    for (auto signal : signals_data.exit_signals)
+    {
+        if (signal == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->step(t, dt);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::step(double t, double dt)
 {
     for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
@@ -348,6 +364,8 @@ void Topology::step(double t, double dt)
     line_signals_step(t, dt);
 
     enter_signals_step(t, dt);
+
+    exit_signals_step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -571,6 +589,21 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.enter_signals.push_back(enter_signal);
 
             Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
+        }
+
+        if (signal_model.right(4) == "exit")
+        {
+            ExitSignal *signal = new ExitSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir);
+            signal->setSignalModel(signal_model);
+            signal->setConnector(conn);
+
+            conn->setSignal(signal);
+
+            signals_data.exit_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded exit signal " + signal->getLetter());
         }
     }
 }
