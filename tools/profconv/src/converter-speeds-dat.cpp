@@ -145,62 +145,6 @@ bool ZDSimConverter::createSpeedMap()
         speedmap_data[railway_coord_section]->speedmap_elements.push_back(speed_el);
     }
 
-    // Карта скоростей для пути "обратно"
-    if ((tracks_data2.empty()) || (speeds_data2.empty()))
-        return false;
-
-    // Пишем список траекторий по главному пути
-    speedmap = new speedmap_t();
-    speedmap->name_prefix = "route2";
-    railway_coord_section = 0;
-    int data1_size = speedmap_data.size();
-    for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
-    {
-        if ((*traj)->railway_coord_section != railway_coord_section)
-        {
-            // Если начался новый участок жд-пикетажа,
-            // заканчиваем список траекторий и начинаем новый
-            railway_coord_section = (*traj)->railway_coord_section;
-            speedmap_data.push_back(speedmap);
-            speedmap = new speedmap_t();
-            speedmap->name_prefix = "route2";
-        }
-        speedmap->trajectories_names.push_back((*traj)->name);
-    }
-    speedmap_data.push_back(speedmap);
-
-    // Пишем список ограничений скорости
-    // !!!! Пишем в том числе интервалы по однопутным участкам,
-    // !!!! они не нужны, но сложно их исключить из записи
-    for (auto zds_speed : speeds_data2)
-    {
-        // Ограничение на интервале пикетажа
-        speed_element_t speed_el = speed_element_t();
-        speed_el.limit = zds_speed.limit;
-        speed_el.railway_coord_begin = static_cast<int>(round(zds_speed.begin_railway_coord));
-        speed_el.railway_coord_end = static_cast<int>(round(zds_speed.end_railway_coord));
-
-        size_t id_begin = zds_speed.begin_track_id;
-        size_t id_end = zds_speed.end_track_id;
-        railway_coord_section = tracks_data2[id_begin].railway_coord_section;
-        for (size_t id = id_begin + 1; id <= id_end; ++id)
-        {
-            // Если начался новый участок жд-пикетажа,
-            // завершаем интервал с ограничением скорости и начинаем новый
-            if (tracks_data2[id].railway_coord_section != railway_coord_section)
-            {
-                speed_element_t speed_el_end_here = speed_el;
-                speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data2[id - 1].railway_coord_end));
-                speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el_end_here);
-
-                speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
-
-                railway_coord_section = tracks_data2[id].railway_coord_section;
-            }
-        }
-        speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el);
-    }
-
     // Пишем список всех траекторий боковых путей и съездов
     speedmap_t *branch_speedmap = new speedmap_t();
     branch_speedmap->name_prefix = "all_branch_tracks";
@@ -245,6 +189,89 @@ bool ZDSimConverter::createSpeedMap()
         speed_el.limit = 40;
         branch_speedmap->speedmap_elements.push_back(speed_el);
         speedmap_data.push_back(branch_speedmap);
+    }
+
+    // Карта скоростей для пути "обратно"
+    if (trajectories2.empty() || speeds_data2.empty())
+        return false;
+
+    // Пишем список траекторий по главному пути
+    speedmap = new speedmap_t();
+    speedmap->name_prefix = "route2";
+    std::vector<int> railway_coord_sections = {0};
+    int data1_size = speedmap_data.size();
+    for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
+    {
+        if ((*traj)->railway_coord_section != railway_coord_sections.back())
+        {
+            // Если начался новый участок жд-пикетажа,
+            // заканчиваем список траекторий и начинаем новый
+            railway_coord_sections.push_back((*traj)->railway_coord_section);
+            speedmap_data.push_back(speedmap);
+            speedmap = new speedmap_t();
+            speedmap->name_prefix = "route2";
+        }
+        speedmap->trajectories_names.push_back((*traj)->name);
+    }
+    speedmap_data.push_back(speedmap);
+
+    // Пишем список ограничений скорости
+    for (auto zds_speed : speeds_data2)
+    {
+        // Ограничение на интервале пикетажа
+        speed_element_t speed_el = speed_element_t();
+        speed_el.limit = zds_speed.limit;
+        speed_el.railway_coord_begin = static_cast<int>(round(zds_speed.begin_railway_coord));
+        speed_el.railway_coord_end = static_cast<int>(round(zds_speed.end_railway_coord));
+
+        size_t id_begin = zds_speed.begin_track_id;
+        size_t id_end = zds_speed.end_track_id;
+        railway_coord_section = tracks_data2[id_begin].railway_coord_section;
+        bool was_1_track = (tracks_data2[id_begin].id_at_track1 != -1);
+        for (size_t id = id_begin + 1; id <= id_end; ++id)
+        {
+            if (tracks_data2[id].id_at_track1 != -1)
+            {
+                if ((!was_1_track) && (tracks_data2[id].id_at_track1 != 0))
+                {
+                    // Начало однопутного участка
+                    // Завершаем интервал с ограничением скорости
+                    speed_element_t speed_el_end_here = speed_el;
+                    speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data2[id - 1].railway_coord_end));
+                    speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el_end_here);
+
+                }
+                if ((id + 1 == id_end) || (tracks_data2[id + 1].id_at_track1 != -1))
+                {
+                    // Однопутный участок
+                    was_1_track = true;
+                }
+                else
+                {
+                    // Конец однопутного участка
+                    // начинаем новый интервал с ограничением скорости
+                    if (was_1_track)
+                    {
+                        was_1_track = false;
+                        speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
+                    }
+                }
+            }
+
+            // Если начался новый участок жд-пикетажа,
+            // завершаем интервал с ограничением скорости и начинаем новый
+            if (tracks_data2[id].railway_coord_section != railway_coord_section)
+            {
+                speed_element_t speed_el_end_here = speed_el;
+                speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data2[id - 1].railway_coord_end));
+                speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el_end_here);
+
+                speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
+
+                railway_coord_section = tracks_data2[id].railway_coord_section;
+            }
+        }
+        speedmap_data[data1_size + railway_coord_section]->speedmap_elements.push_back(speed_el);
     }
 
     return true;
