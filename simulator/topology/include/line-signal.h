@@ -60,7 +60,7 @@ private:
     Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
 
     /// Таймер мигания желтого
-    Timer *blink_timer = new Timer(1.0, false);
+    Timer *blink_timer = new Timer(0.75, false);
 
     /// Контакт мигания
     bool blink_contact = true;
