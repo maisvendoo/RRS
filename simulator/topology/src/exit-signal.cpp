@@ -315,6 +315,11 @@ void ExitSignal::route_control()
 
         is_free = is_free && (!traj->isBusy());
 
+        if (!is_free)
+        {
+            break;
+        }
+
         if (this->getDirection() == 1)
         {
             cur_conn = traj->getFwdConnector();
@@ -347,6 +352,11 @@ void ExitSignal::route_control()
         }
 
         is_switches_correct = is_switches_correct && (traj == prev_traj);
+
+        if (!is_switches_correct)
+        {
+            break;
+        }
 
         Signal *signal = cur_conn->getSignal();
 
