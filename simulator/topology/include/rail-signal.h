@@ -105,6 +105,11 @@ public:
         return U_line_prev;
     }
 
+    double getVoltageDSR() const
+    {
+        return U_dsr;
+    }
+
 signals:
 
     /// Послать предыдущему световору напряжение линии
@@ -137,6 +142,8 @@ protected:
 
     /// Напряжение питания бокового сигнального реле
     double U_side = 0.0;
+
+    double U_dsr = 0.0;
 
     bool is_busy = false;
 

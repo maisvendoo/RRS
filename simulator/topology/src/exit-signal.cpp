@@ -514,7 +514,7 @@ void ExitSignal::relay_control()
     // Напряжение, даваемое в линию входному
     double U_line_old = U_line_prev;
 
-    U_line_prev = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
+    U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
 
     if (qAbs(U_line_prev - U_line_old))
     {

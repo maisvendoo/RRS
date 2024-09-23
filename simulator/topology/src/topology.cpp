@@ -576,7 +576,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
         }
 
-        if (signal_model.right(4) == "entr")
+        if ( (signal_model.right(4) == "entr") || (signal_model.right(4) == "rout") )
         {
             EnterSignal *enter_signal = new EnterSignal;
             enter_signal->setLetter(signal_letter);
@@ -909,7 +909,7 @@ void Topology::slotOpenSignal(QByteArray signal_data)
         return;
     }
 
-    if (signal->getSignalType() == "entr")
+    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 
@@ -967,7 +967,7 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         return;
     }
 
-    if (signal->getSignalType() == "entr")
+    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 
