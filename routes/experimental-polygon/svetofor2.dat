@@ -1,4 +1,5 @@
 496	ab_entr	Í
+491	ab_exit	×2
 481	ab_exit	Í2
 441	ab_line	11
 410	ab_line	9
@@ -7,6 +8,7 @@
 320	ab_line	3
 291	ab_line	1
 262	ab_entr	Í
+257	ab_exit	×2
 246	ab_exit	Í2
 221	ab_line	11
 201	ab_line	9
@@ -15,4 +17,5 @@
 81	ab_line	3
 59	ab_line	1
 25	ab_entr	Í
+20	ab_exit	×2
 12	ab_exit	Í2
