@@ -371,7 +371,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         }
 
         // Смотрим сигнал на следующем коннекторе
-        *signal = cur_conn->getSignal();
+        *signal = cur_conn->getSignalFwd();
 
         // Продолжаем цикл, возможно попалась стрелка
         if (*signal == Q_NULLPTR)
@@ -454,7 +454,7 @@ bool EnterSignal::is_switch_minus(Connector *conn)
             continue;
         }
 
-        Signal *signal = cur_sw->getSignal();
+        Signal *signal = cur_sw->getSignalFwd();
 
         if (signal == Q_NULLPTR)
         {

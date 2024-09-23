@@ -249,7 +249,7 @@ void ExitSignal::removal_area_control()
         }
 
         // Проверяем, есть ли у коннектора сигнал
-        Signal *signal = cur_conn->getSignal();
+        Signal *signal = cur_conn->getSignalFwd();
 
         // если нет - это стык или стрелка, продолжаем поиск
         if (signal == Q_NULLPTR)
@@ -416,7 +416,7 @@ void ExitSignal::route_control()
         }
 
         // Проверяем, дошли ли до сигнала
-        Signal *signal = cur_conn->getSignal();
+        Signal *signal = cur_conn->getSignalFwd();
 
         // Нет сигнала - продолжаем шагать
         if (signal == Q_NULLPTR)

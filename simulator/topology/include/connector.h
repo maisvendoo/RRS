@@ -42,14 +42,24 @@ public:
 
     virtual void deserialize(QByteArray &data, traj_list_t &traj_list);
 
-    void setSignal(Signal *signal)
+    void setSignalFwd(Signal *signal)
     {
-        this->signal = signal;
+        this->signal_fwd = signal;
     }
 
-    Signal *getSignal() const
+    Signal *getSignalFwd() const
     {
-        return signal;
+        return signal_fwd;
+    }
+
+    void setSignalBwd(Signal *signal)
+    {
+        this->signal_bwd = signal;
+    }
+
+    Signal *getSignalBwd() const
+    {
+        return signal_bwd;
     }
 
 protected:
@@ -65,7 +75,9 @@ protected:
     /// Связи путевой инфраструктуры
     std::vector<ConnectorDevice *> devices;
 
-    Signal *signal = Q_NULLPTR;
+    Signal *signal_fwd = Q_NULLPTR;
+
+    Signal *signal_bwd = Q_NULLPTR;
 };
 
 #endif

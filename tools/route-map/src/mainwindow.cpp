@@ -350,7 +350,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         signal->setConnector(conn);
-        conn->setSignal(signal);
+        conn->setSignalFwd(signal);
     }
 
     for (auto signal : signals_data->enter_signals)
@@ -363,7 +363,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         signal->setConnector(conn);
-        conn->setSignal(signal);
+        conn->setSignalFwd(signal);
 
         SignalLabel *signal_label = new SignalLabel(map);
         signal_label->signal = signal;
@@ -384,7 +384,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         signal->setConnector(conn);
-        conn->setSignal(signal);
+        conn->setSignalFwd(signal);
 
         SignalLabel *signal_label = new SignalLabel(map);
         signal_label->signal = signal;
@@ -427,8 +427,8 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
         return;
     }
 
-    if (conn->getSignal() != Q_NULLPTR)
+    if (conn->getSignalFwd() != Q_NULLPTR)
     {
-        conn->getSignal()->deserialize(signal_data);
+        conn->getSignalFwd()->deserialize(signal_data);
     }
 }

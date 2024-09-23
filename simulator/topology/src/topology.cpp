@@ -569,7 +569,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             line_signal->setSignalModel(signal_model);
             line_signal->setConnector(conn);
 
-            conn->setSignal(line_signal);
+            conn->setSignalFwd(line_signal);
 
             signals_data.line_signals.push_back(line_signal);
 
@@ -584,7 +584,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             enter_signal->setSignalModel(signal_model);
             enter_signal->setConnector(conn);
 
-            conn->setSignal(enter_signal);
+            conn->setSignalFwd(enter_signal);
 
             signals_data.enter_signals.push_back(enter_signal);
 
@@ -599,7 +599,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signal->setSignalModel(signal_model);
             signal->setConnector(conn);
 
-            conn->setSignal(signal);
+            conn->setSignalFwd(signal);
 
             signals_data.exit_signals.push_back(signal);
 
@@ -637,7 +637,7 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignal();
+            Signal *line_signal_prev = conn->getSignalFwd();
 
             if (line_signal_prev == Q_NULLPTR)
             {
@@ -666,7 +666,7 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignal();
+            Signal *line_signal_prev = conn->getSignalFwd();
 
             if (line_signal_prev == Q_NULLPTR)
             {
@@ -711,7 +711,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignal();
+            Signal *line_signal_prev = conn->getSignalFwd();
 
             if (line_signal_prev == Q_NULLPTR)
             {
@@ -743,7 +743,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignal();
+            Signal *line_signal_prev = conn->getSignalFwd();
 
             if (line_signal_prev == Q_NULLPTR)
             {
@@ -902,7 +902,7 @@ void Topology::slotOpenSignal(QByteArray signal_data)
         return;
     }
 
-    Signal *signal = conn->getSignal();
+    Signal *signal = conn->getSignalFwd();
 
     if (signal == Q_NULLPTR)
     {
@@ -960,7 +960,7 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         return;
     }
 
-    Signal *signal = conn->getSignal();
+    Signal *signal = conn->getSignalFwd();
 
     if (signal == Q_NULLPTR)
     {
