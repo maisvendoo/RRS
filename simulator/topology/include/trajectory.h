@@ -15,6 +15,16 @@ class Connector;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct module_cfg_t
+{
+    CfgReader cfg;
+    QString module_name = "";
+    QStringList traj_names = {};
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class TOPOLOGY_EXPORT Trajectory : public QObject
 {
     Q_OBJECT
@@ -25,7 +35,7 @@ public:
 
     ~Trajectory();
 
-    bool load(const QString &route_dir, const QString &traj_name);
+    bool load(const QString &route_dir, const QString &traj_name, std::vector<module_cfg_t> modules);
 
     QString getName() const
     {

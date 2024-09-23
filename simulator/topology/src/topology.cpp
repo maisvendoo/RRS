@@ -46,11 +46,71 @@ bool Topology::load(QString route_dir)
         return false;
     }
 
-    for (QString name : names)
+    // Загрузка модулей для траекторий
+    // Если в /<route>/topology есть папки с названием вида trajectory-*
+    // то будут загружены модули с таким же названием (/modules/trajectory-*.dll)
+    QString topology_path = route_path + QDir::separator() + "topology";
+    QDir topology_dir = QDir(topology_path);
+    QStringList traj_modules_dirs = topology_dir.entryList({"trajectory-*"}, QDir::Dirs);
+
+    // Из папок trajectory-* загружаем все конфиги *.xml
+    std::vector<std::vector<module_cfg_t>> all_modules;
+    for (auto name = traj_modules_dirs.begin(); name != traj_modules_dirs.end(); ++name)
     {
+        QString traj_module_path = topology_path + QDir::separator() + (*name);
+        QDir traj_module_dir = QDir(traj_module_path);
+        QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
+
+        std::vector<module_cfg_t> all_cfgs;
+        for (auto cfg_name = cfg_files.begin(); name != cfg_files.end(); ++cfg_name)
+        {
+            module_cfg_t mc;
+
+            QString cfg_path = traj_module_path + QDir::separator() + (*cfg_name);
+            if (!mc.cfg.load(cfg_path))
+                continue;
+
+            mc.module_name = (*name);
+
+            // Список траекторий в этом конфиге:
+            // модуль будет подгружен к траекториям,
+            // имя которой указано хотя бы в одном конфиге,
+            // после чего настроен этим же конфигом
+            QDomNode secNode = mc.cfg.getFirstSection("Trajectory");
+            while (!secNode.isNull())
+            {
+                QString traj_name = secNode.nodeValue();
+                mc.traj_names.push_back(traj_name);
+                secNode = mc.cfg.getNextSection();
+            }
+
+            all_cfgs.push_back(mc);
+        }
+
+        all_modules.push_back(all_cfgs);
+    }
+
+
+    for (auto it = names.begin(); it != names.end(); ++it)
+    {
+        QString name = *it;
         Trajectory *traj = new Trajectory();
 
-        if (traj->load(route_path, name))
+        std::vector<module_cfg_t> modules;
+        for (auto all_cfgs = all_modules.begin(); all_cfgs != all_modules.end(); ++all_cfgs)
+        {
+            for (auto it = all_cfgs->begin(); it != all_cfgs->end(); ++it)
+            {
+                module_cfg_t mc = *it;
+                if (mc.traj_names.contains(name))
+                {
+                    modules.push_back(mc);
+                    break;
+                }
+            }
+        }
+
+        if (traj->load(route_path, name, modules))
         {
             Journal::instance()->info("Loaded trajectory: " + name);
         }
