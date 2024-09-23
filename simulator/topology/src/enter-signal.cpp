@@ -277,6 +277,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
     }
 
     bool is_free = true;
+    bool is_switches_correct = true;
 
     Connector *cur_conn = conn;
 
@@ -319,6 +320,36 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
             break;
         }
 
+        // Контроль вреза стрелки
+        Trajectory *prev_traj = Q_NULLPTR;
+
+        // Берем "заднюю" траекторию следующего коннектора
+        if (this->getDirection() == 1)
+        {
+            prev_traj = cur_conn->getBwdTraj();
+        }
+        else
+        {
+            prev_traj = cur_conn->getFwdTraj();
+        }
+
+        // Данная проверка не бессмыслена - стрелка может стоять
+        // не по маршруту и вдруг там нет траектории!
+        if (prev_traj == Q_NULLPTR)
+        {
+            return false;
+        }
+
+        // Срелка стоит по маршруту, если текущая траектория совпадает с
+        // предыдущей для следующего коннектора
+        is_switches_correct = is_switches_correct && (traj == prev_traj);
+
+        // Стрелка не по маршруту? Ловить нечего - выходим из поиска
+        if (!is_switches_correct)
+        {
+            return false;
+        }
+
         // Смотрим сигнал на следующем коннекторе
         *signal = cur_conn->getSignal();
 
@@ -336,7 +367,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         break;
     }
 
-    return is_free;
+    return is_free && is_switches_correct;
 }
 
 //------------------------------------------------------------------------------
