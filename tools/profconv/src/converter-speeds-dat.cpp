@@ -30,6 +30,7 @@ bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &s
 bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speeds_data, const int &dir)
 {
     zds_trajectory_data_t* td = dir > 0 ? &tracks_data1 : &tracks_data2;
+    int last_id = -1;
     while (!stream.atEnd())
     {
         QString line = stream.readLine();
@@ -56,6 +57,7 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         if (end_id_value == 0)
             end_id_value = 1;
 
+
         is_valid_value = false;
         double limit_value = tokens[2].toDouble(&is_valid_value);
         if ((!is_valid_value) || (limit_value < 1.0))
@@ -69,6 +71,42 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         speed_point.begin_track_id = std::min(begin_id_value, end_id_value) - 1;
         speed_point.end_track_id = std::max(begin_id_value, end_id_value) - 1;
         speed_point.limit = limit_value;
+
+        // Проверяем что ZDS треки перечислены по возрастанию/убыванию
+        if (last_id == -1)
+        {
+            if (dir > 0)
+                last_id = speed_point.end_track_id;
+            else
+                last_id = speed_point.begin_track_id;
+        }
+        else
+        {
+            if (dir > 0)
+            {
+                if (speed_point.end_track_id <= last_id + 1)
+                {
+                    continue;
+                }
+                if (speed_point.begin_track_id <= last_id)
+                {
+                    speed_point.begin_track_id = last_id + 1;
+                }
+                last_id = speed_point.end_track_id;
+            }
+            else
+            {
+                if (speed_point.begin_track_id >= last_id - 1)
+                {
+                    continue;
+                }
+                if (speed_point.end_track_id >= last_id)
+                {
+                    speed_point.end_track_id = last_id - 1;
+                }
+                last_id = speed_point.begin_track_id;
+            }
+        }
 
         speed_point.begin_route_coord = (*td)[speed_point.begin_track_id].route_coord;
         speed_point.end_route_coord = (*td)[speed_point.end_track_id].route_coord +
@@ -231,7 +269,7 @@ bool ZDSimConverter::createSpeedMap()
 
         bool was_1_track = (tracks_data2[id_begin].id_at_track1 > -1);
 
-        bool empty_section = was_1_track;
+        bool empty_section = false;
         int speedmap2_data_id = 0;
         while (railway_coord_section != railway_coord_sections_2[speedmap2_data_id])
         {
@@ -248,15 +286,17 @@ bool ZDSimConverter::createSpeedMap()
             {
                 if (!was_1_track)
                 {
-                    // Начало однопутного участка
-                    // Завершаем интервал с ограничением скорости
+                    // Начало однопутного участка,
+                    // завершаем интервал с ограничением скорости
                     if (!empty_section)
                     {
                         speed_element_t speed_el_end_here = speed_el;
                         speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data2[id - 1].railway_coord_end));
 
                         if (speed_el_end_here.railway_coord_begin != speed_el_end_here.railway_coord_end)
+                        {
                             speedmap_data[data1_size + speedmap2_data_id]->speedmap_elements.push_back(speed_el_end_here);
+                        }
                     }
                 }
 
@@ -267,7 +307,7 @@ bool ZDSimConverter::createSpeedMap()
             {
                 if (was_1_track)
                 {
-                    // Конец однопутного участка
+                    // Конец однопутного участка,
                     // начинаем новый интервал ограничения скорости
                     speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
                 }
@@ -280,17 +320,20 @@ bool ZDSimConverter::createSpeedMap()
             // завершаем интервал с ограничением скорости и начинаем новый
             if (tracks_data2[id].railway_coord_section != railway_coord_section)
             {
-                if ((!empty_section) && (!was_1_track))
+                if (!(empty_section || was_1_track))
                 {
                     speed_element_t speed_el_end_here = speed_el;
                     speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data2[id - 1].railway_coord_end));
 
                     if (speed_el_end_here.railway_coord_begin != speed_el_end_here.railway_coord_end)
+                    {
                         speedmap_data[data1_size + speedmap2_data_id]->speedmap_elements.push_back(speed_el_end_here);
+                    }
                 }
 
-                railway_coord_section = tracks_data2[id].railway_coord_section;
+                speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
 
+                railway_coord_section = tracks_data2[id].railway_coord_section;
                 empty_section = false;
                 speedmap2_data_id = 0;
                 while (railway_coord_section != railway_coord_sections_2[speedmap2_data_id])
@@ -302,12 +345,10 @@ bool ZDSimConverter::createSpeedMap()
                         break;
                     }
                 }
-
-                speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
             }
         }
 
-        if ((!empty_section) && (speed_el.railway_coord_begin != speed_el.railway_coord_end))
+        if ((!(empty_section || was_1_track)) && (speed_el.railway_coord_begin != speed_el.railway_coord_end))
             speedmap_data[data1_size + speedmap2_data_id]->speedmap_elements.push_back(speed_el);
     }
 
