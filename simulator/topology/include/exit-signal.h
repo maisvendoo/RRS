@@ -131,6 +131,22 @@ private:
 
     bool is_AR_ON = false;
 
+    enum
+    {
+        NUM_SSR_CONTACTS = 2,
+        SSR_GREEN = 0,
+        SSR_YELLOW = 1
+    };
+
+    /// Боковое сигнальное реле (желтый мигающий для предвходного)
+    Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+
+    /// Таймер мигания желтого
+    Timer *blink_timer = new Timer(0.75, false);
+
+    /// Контакт мигания
+    bool blink_contact = true;
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
@@ -152,6 +168,8 @@ private slots:
     void slotOpenTimer();
 
     void slotCloseTimer();
+
+    void slotBlinkTimer();
 };
 
 #endif
