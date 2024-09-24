@@ -57,6 +57,9 @@ bool Topology::load(QString route_dir)
     std::vector<std::vector<module_cfg_t>> all_modules;
     for (auto name = traj_modules_dirs.begin(); name != traj_modules_dirs.end(); ++name)
     {
+        if ((name == nullptr) || (*name).isEmpty())
+            continue;
+
         QString traj_module_path = topology_path + QDir::separator() + (*name);
         QDir traj_module_dir = QDir(traj_module_path);
         QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
@@ -64,6 +67,9 @@ bool Topology::load(QString route_dir)
         std::vector<module_cfg_t> all_cfgs;
         for (auto cfg_name = cfg_files.begin(); name != cfg_files.end(); ++cfg_name)
         {
+            if ((cfg_name == nullptr) || (*cfg_name).isEmpty())
+                continue;
+
             module_cfg_t mc;
 
             QString cfg_path = traj_module_path + QDir::separator() + (*cfg_name);
@@ -89,7 +95,6 @@ bool Topology::load(QString route_dir)
 
         all_modules.push_back(all_cfgs);
     }
-
 
     for (auto it = names.begin(); it != names.end(); ++it)
     {
