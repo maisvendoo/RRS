@@ -53,8 +53,8 @@ public:
     /// Get signal
     double getOutputSignal(size_t idx) const;
 
-    /// Read device config file
-    virtual void read_config(const QString &filename, const QString &dir_path = "");
+    /// Device configuration
+    virtual void load_config(CfgReader &cfg);
 /*
     ///
     void setControl(control_signals_t control_signals = control_signals_t());
@@ -92,8 +92,6 @@ protected:
 
     feedback_signals_t  feedback;
 */
-    /// Device configuration loading
-    virtual void load_config(CfgReader &cfg);
 };
 
 

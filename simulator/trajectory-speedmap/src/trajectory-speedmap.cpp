@@ -278,82 +278,63 @@ double TrajectorySpeedMap::getTrajLength()
 //------------------------------------------------------------------------------
 void TrajectorySpeedMap::load_config(CfgReader &cfg)
 {
-    // Проверяем все карты скоростей в конфиге,
-    // пока не найдём ту, в которой есть имя данной траектории
+    // Треки данной траектории
+    std::vector<track_t> tracks = trajectory->getTracks();
+
+    // Интервалы пикетажа данной траектории
+    double railway_coord_begin = min(tracks.front().railway_coord0,
+                                     tracks.back().railway_coord1);
+    double railway_coord_end = max(tracks.front().railway_coord0,
+                                   tracks.back().railway_coord1);
+
     QDomNode speedmap_node = cfg.getFirstSection("SpeedMap");
     while (!speedmap_node.isNull())
     {
         QDomNodeList nodes = speedmap_node.childNodes();
-        // Проверяем все имена траекторий в карте скоростей,
-        // пока не найдём имя данной траектории
-        bool is_speedmap = false;
+        // Проверяем все ограничения скорости в карте по интервалам пикетажа
         for (size_t i = 0; i < nodes.size(); ++i)
         {
             QString node_name = nodes.at(i).nodeName();
-            if (node_name == "Trajectory")
+            if (node_name == "SpeedLimit")
             {
-                QString traj_name = nodes.at(i).toElement().text();
-                if (traj_name == trajectory->getName())
+                QString value = nodes.at(i).toElement().text();
+                QStringList tokens = value.split(' ');
+                double limit = tokens[0].toDouble();
+                double limit_coord_1 = tokens.size() > 1 ? tokens[1].toDouble() : -1.0;
+                double limit_coord_2 = tokens.size() > 2 ? tokens[2].toDouble() : 1000000000.0;
+                double limit_begin = min(limit_coord_1, limit_coord_2);
+                double limit_end = max(limit_coord_1, limit_coord_2);
+
+                // Если интервал пикетажа пересекается с пикетажем траектории,
+                // добавляем ограничение в модуль
+                if ((limit_end > railway_coord_begin) && (limit_begin < railway_coord_end))
                 {
-                    is_speedmap = true;
-                    break;
-                }
-            }
-        }
-
-        if (is_speedmap)
-        {
-            // Треки данной траектории
-            std::vector<track_t> tracks = trajectory->getTracks();
-
-            // Интервалы пикетажа данной траектории
-            double railway_coord_begin = min(tracks.front().railway_coord0,
-                                             tracks.back().railway_coord1);
-            double railway_coord_end = max(tracks.front().railway_coord0,
-                                           tracks.back().railway_coord1);
-
-            // Проверяем все ограничения скорости в карте по интервалам пикетажа
-            for (size_t i = 0; i < nodes.size(); ++i)
-            {
-                QString node_name = nodes.at(i).nodeName();
-                if (node_name == "SpeedLimit")
-                {
-                    QString value = nodes.at(i).toElement().text();
-                    QStringList tokens = value.split(' ');
-                    double limit = tokens[0].toDouble();
-                    double limit_begin = tokens.size() > 1 ? tokens[1].toDouble() : -1.0;
-                    double limit_end = tokens.size() > 2 ? tokens[2].toDouble() : 1000000000.0;
-
-                    // Если интервалы пикетажа пересекаются - добавляем ограничение в модуль
-                    if ((limit_end > railway_coord_begin) && (limit_begin < railway_coord_end))
+                    limits.push_back(limit);
+                    double traj_limit_begin = 0.0;
+                    double traj_limit_end = trajectory->getLength();
+                    for (auto track : tracks)
                     {
-                        limits.push_back(limit);
-                        double traj_limit_begin = 0.0;
-                        double traj_limit_end = trajectory->getLength();
-                        for (auto track : tracks)
+                        double track_begin = min(track.railway_coord0,
+                                                 track.railway_coord1);
+                        double track_end = max(track.railway_coord0,
+                                               track.railway_coord1);
+
+                        if ((limit_begin >= track_begin) &&
+                            (limit_begin < track_end))
                         {
-                            double track_begin = min(track.railway_coord0,
-                                                     track.railway_coord1);
-                            double track_end = max(track.railway_coord0,
-                                                   track.railway_coord1);
-
-                            if ((limit_begin >= track_begin) &&
-                                (limit_begin < track_end))
-                            {
-                                double relative_coord = (limit_begin - track_begin) / (track_end - track_begin);
-                                traj_limit_begin = track.traj_coord + relative_coord * track.len;
-                            }
-
-                            if ((limit_end >= track_begin) &&
-                                (limit_end < track_end))
-                            {
-                                double relative_coord = (limit_end - track_begin) / (track_end - track_begin);
-                                traj_limit_end = track.traj_coord + relative_coord * track.len;
-                            }
+                            double relative_coord = (limit_begin - track_begin) / (track_end - track_begin);
+                            traj_limit_begin = track.traj_coord + relative_coord * track.len;
                         }
-                        limit_begins.push_back(traj_limit_begin);
-                        limit_ends.push_back(traj_limit_end);
+
+                        if ((limit_end >= track_begin) &&
+                            (limit_end < track_end))
+                        {
+                            double relative_coord = (limit_end - track_begin) / (track_end - track_begin);
+                            traj_limit_end = track.traj_coord + relative_coord * track.len;
+                        }
                     }
+                    limit_begins.push_back(traj_limit_begin);
+                    limit_ends.push_back(traj_limit_end);
                 }
             }
         }

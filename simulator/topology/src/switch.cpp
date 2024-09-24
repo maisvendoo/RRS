@@ -217,6 +217,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     if (devices_names.isEmpty())
         return;
 
+    // Загружаем к коннектору модули с названием connector-<имя>
     FileSystem &fs = FileSystem::getInstance();
     for (auto device_name : devices_names)
     {
@@ -232,8 +233,11 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         }
         else
         {
+            // Указываем модулю, что он относится к этому коннектору
             module->setConnector(this);
 
+            // Настраиваем связи модулей траекторий и коннектора,
+            // параллельно топологии
             bool no_plus;
             if (bwdPlusTraj != nullptr)
             {
@@ -304,11 +308,6 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
             }
 
             // TODO конфигурирование?
-            /*
-            QString cfg_topology_dir = QDir::toNativeSeparators(route_dir) +
-                                       QDir::separator() + "topology";
-            module->read_config(conn_module, cfg_topology_dir);
-            */
 
             devices.push_back(module);
         }
@@ -387,6 +386,7 @@ void Switch::step(double t, double dt)
         emit sendSwitchState(new_state.serialize());
     }
 
+    // Переключаем связи модулей паралельно переключениям топологии
     int change_fwd = (sign(prev_state_fwd) != sign(state_fwd)) * sign(state_fwd);
     int change_bwd = (sign(prev_state_bwd) != sign(state_bwd)) * sign(state_bwd);
     for (auto device : devices)

@@ -169,17 +169,30 @@ void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
     distance_fwd = distance;
     next_liter_fwd = liter;
 
+    ALSN code_to_next = code;
+
     // Переход к рельсовым цепям предыдущей траектории
+    // Модуль коннектора к предыдущей траектории
     auto conn_device = getBwdConnectorDevice();
     if (conn_device == nullptr)
         return;
 
-    TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(
+    // Проверяем что коннектор не установлен на взрез стрелки
+    TrajectoryDevice *traj_device = conn_device->getFwdTrajectoryDevice();
+    if (traj_device != this)
+    {
+        // Если взрез, сбрасываем код
+        ALSN code_to_next = ALSN::NO_CODE;
+    }
+
+    // Предыдущая траектория
+    TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
         conn_device->getBwdTrajectoryDevice());
-    if (traj_device == nullptr)
+    if (traj_ALSN == nullptr)
         return;
 
-    traj_device->setSignalInfoFwd(code, distance + trajectory->getLength(), liter);
+    // Передаём информацию дальше
+    traj_ALSN->setSignalInfoFwd(code_to_next, distance + trajectory->getLength(), liter);
 }
 
 //------------------------------------------------------------------------------
@@ -196,17 +209,30 @@ void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
     distance_bwd = distance;
     next_liter_bwd = liter;
 
+    ALSN code_to_next = code;
+
     // Переход к рельсовым цепям следующей траектории
+    // Модуль коннектора к следующей траектории
     auto conn_device = getFwdConnectorDevice();
     if (conn_device == nullptr)
         return;
 
-    TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(
+    // Проверяем что коннектор не установлен на взрез стрелки
+    TrajectoryDevice *traj_device = conn_device->getBwdTrajectoryDevice();
+    if (traj_device != this)
+    {
+        // Если взрез, сбрасываем код
+        ALSN code_to_next = ALSN::NO_CODE;
+    }
+
+    // Следующая траектория
+    TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
         conn_device->getFwdTrajectoryDevice());
-    if (traj_device == nullptr)
+    if (traj_ALSN == nullptr)
         return;
 
-    traj_device->setSignalInfoBwd(code, distance + trajectory->getLength(), liter);
+    // Передаём информацию дальше
+    traj_ALSN->setSignalInfoBwd(code_to_next, distance + trajectory->getLength(), liter);
 }
 
 //------------------------------------------------------------------------------
@@ -214,35 +240,12 @@ void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::load_config(CfgReader &cfg)
 {
-    // Проверяем все группы частот АЛСН в конфиге,
-    // пока не найдём ту, в которой есть имя данной траектории
     QDomNode ALSN_node = cfg.getFirstSection("ALSN");
     while (!ALSN_node.isNull())
     {
-        QDomNodeList nodes = ALSN_node.childNodes();
-        // Проверяем все имена траекторий в карте скоростей,
-        // пока не найдём имя данной траектории
-        bool is_ALSN = false;
-        for (size_t i = 0; i < nodes.size(); ++i)
-        {
-            QString node_name = nodes.at(i).nodeName();
-            if (node_name == "Trajectory")
-            {
-                QString traj_name = nodes.at(i).toElement().text();
-                if (traj_name == trajectory->getName())
-                {
-                    is_ALSN = true;
-                    break;
-                }
-            }
-        }
+        if (cfg.getDouble(ALSN_node, "Frequency", frequency))
+            break;
 
-        if (is_ALSN)
-        {
-            cfg.getDouble(ALSN_node, "Frequency", frequency);
-        }
-
-        // Переходим к следующей группы частот АЛСН
         ALSN_node = cfg.getNextSection();
     }
 }

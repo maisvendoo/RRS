@@ -93,48 +93,40 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name, std::v
     // Заполняем имя траектории (по имени файла, где она хранится)
     name = traj_name;
 
+    // Загрузка модулей к траектории
+    if (modules.empty())
+    {
+        Journal::instance()->warning("No modules for trajectory " + traj_name);
+        return true;
+    }
+
     FileSystem &fs = FileSystem::getInstance();
-
-    // Пока для теста грузим модуль путевой инфраструктуры с картой скоростей напрямую
-    QString traj_speedmap_path = QString(fs.getModulesDir().c_str()) +
-                                    QDir::separator() +
-                                    "trajectory-speedmap";
-    TrajectoryDevice *traj_speedmap = loadTrajectoryDevice(traj_speedmap_path);
-
-    if (traj_speedmap == nullptr)
+    for (auto mc = modules.begin(); mc != modules.end(); ++mc)
     {
-        Journal::instance()->error("Speedmap module for " + traj_name + " not found");
-    }
-    else
-    {
-        traj_speedmap->setTrajectory(this);
+        // Загружаем dll модуль путевой инфраструктуры
+        QString module_path = QString(fs.getModulesDir().c_str()) +
+                                      QDir::separator() +
+                                      mc->module_name;
+        TrajectoryDevice *module = loadTrajectoryDevice(module_path);
 
-        QString cfg_topology_dir = QDir::toNativeSeparators(route_dir) +
-                       QDir::separator() + "topology";
-        traj_speedmap->read_config("trajectory-speedmap", cfg_topology_dir);
+        if (module  == nullptr)
+        {
+            Journal::instance()->error(
+                "Fail to load module " + mc->module_name + ".dll for trajectory " + traj_name);
+            continue;
+        }
 
-        devices.push_back(traj_speedmap);
-    }
+        Journal::instance()->info(
+            "Loaded module " + mc->module_name + ".dll for trajectory " + traj_name);
 
-    // Пока для теста грузим модуль путевой инфраструктуры с рельсовыми цепями АЛСН напрямую
-    QString traj_ALSN_path = QString(fs.getModulesDir().c_str()) +
-                                 QDir::separator() +
-                                 "trajectory-ALSN";
-    TrajectoryDevice *traj_ALSN = loadTrajectoryDevice(traj_ALSN_path);
+        // Указываем модулю, что он относится к этой траектории
+        module->setTrajectory(this);
 
-    if (traj_ALSN == nullptr)
-    {
-        Journal::instance()->error("Speedmap module for " + traj_name + " not found");
-    }
-    else
-    {
-        traj_ALSN->setTrajectory(this);
+        // Конфигурируем модуль
+        module->load_config(mc->cfg);
 
-        QString cfg_topology_dir = QDir::toNativeSeparators(route_dir) +
-                                   QDir::separator() + "topology";
-        traj_ALSN->read_config("trajectory-ALSN", cfg_topology_dir);
-
-        devices.push_back(traj_ALSN);
+        // Добавляем модуль в список оборудования путевой инфраструктуры
+        devices.push_back(module);
     }
 
     return true;

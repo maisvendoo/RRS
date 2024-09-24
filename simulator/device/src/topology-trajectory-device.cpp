@@ -136,46 +136,6 @@ QString TrajectoryDevice::getName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryDevice::read_config(const QString &filename, const QString &dir_path)
-{
-    FileSystem &fs = FileSystem::getInstance();
-    CfgReader cfg;
-
-    // Custom config from path
-    if (dir_path != "")
-    {
-        QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
-
-        if (cfg.load(cfg_path))
-        {
-            Journal::instance()->info("Loaded file: " + cfg_path);
-
-            load_config(cfg);
-            return;
-        }
-        else
-        {
-            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + dir_path);
-        }
-    }
-
-    // Config from default directory
-    QString cfg_dir = fs.getDevicesDir().c_str();
-    QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
-
-    if (cfg.load(cfg_path))
-    {
-        Journal::instance()->info("Loaded file: " + cfg_path);
-
-        load_config(cfg);
-        return;
-    }
-    Journal::instance()->error("File " + filename + ".xml is't found at default path " + cfg_dir);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void TrajectoryDevice::load_config(CfgReader &cfg)
 {
     (void) cfg;

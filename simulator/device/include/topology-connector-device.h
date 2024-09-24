@@ -39,8 +39,8 @@ public:
     /// Get name
     QString getName() const;
 
-    /// Read device config file
-    virtual void read_config(const QString &filename, const QString &dir_path = "");
+    /// Device configuration loading
+    virtual void load_config(CfgReader &cfg);
 /*
     ///
     void setControl(QMap<int, bool> keys,
@@ -71,8 +71,6 @@ protected:
 
     feedback_signals_t  feedback;
 */
-    /// Device configuration loading
-    virtual void load_config(CfgReader &cfg);
 };
 
 
