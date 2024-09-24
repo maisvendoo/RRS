@@ -275,6 +275,22 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 }
             }
 
+            // Разделяем возле добавленных светофоров в неправильном направлении
+            // На всякий случай проигнорируем однопутные участки
+            if (!was_1_track)
+            {
+                for (auto s_it = signals_reverse_data1.begin(); s_it != signals_reverse_data1.end(); ++s_it)
+                {
+                    if ((*s_it).track_id + 1 == id)
+                    {
+                        split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                        split.signal_bwd_type = (*s_it).type;
+                        split.signal_bwd_liter = (*s_it).liter;
+                        break;
+                    }
+                }
+            }
+
             // Разделяем, где начинается новый пикетаж
             if (track.railway_coord_section != prev_railway_coord_section)
             {
@@ -404,6 +420,22 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                     split.signal_bwd_type = (*s_it).type;
                     split.signal_bwd_liter = (*s_it).liter;
                     break;
+                }
+            }
+
+            // Разделяем возле добавленных светофоров в неправильном направлении
+            // На всякий случай проигнорируем однопутные участки
+            if ((track.id_at_track1 == -1) && ((it+1) != tracks_data2.end()) && ((it+1)->id_at_track1 == -1))
+            {
+                for (auto s_it = signals_reverse_data2.begin(); s_it != signals_reverse_data2.end(); ++s_it)
+                {
+                    if ((*s_it).track_id == id)
+                    {
+                        split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                        split.signal_fwd_type = (*s_it).type;
+                        split.signal_fwd_liter = (*s_it).liter;
+                        break;
+                    }
                 }
             }
 

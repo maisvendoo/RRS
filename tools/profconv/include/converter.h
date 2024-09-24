@@ -95,6 +95,10 @@ private:
 
     zds_signals_data_t  signals_data2;
 
+    zds_signals_data_t  signals_reverse_data1;
+
+    zds_signals_data_t  signals_reverse_data2;
+
     zds_branch_track_data_t branch_track_data1;
 
     zds_branch_track_data_t branch_track_data2;

@@ -227,6 +227,11 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     std::string speeds1_file = "speeds1.conf";
     std::string speeds2_file = "speeds2.conf";
 
+    // Создаваемые специально для конвертации файлы
+    // со светофорами по главным путям в неправильном направлении
+    std::string signals1_reverse_path = compinePath(routeDir, "svetofor1_reverse.dat");
+    std::string signals2_reverse_path = compinePath(routeDir, "svetofor2_reverse.dat");
+
     int dir = 1;
     bool is_1 = readRouteTRK(trk1_path, tracks_data1, dir);
     dir = -1;
@@ -244,6 +249,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
         readSpeedsDAT(speeds1_path, speeds_data1, dir);
         readSvetoforDAT(signals1_path, signals_data1, dir);
+        readSvetoforDAT(signals1_reverse_path, signals_reverse_data1, dir);
         readBranchTracksDAT(branch1_path, dir);
 
         // Создание старого формата ЭК скоростей speeds1.conf отключено
@@ -258,6 +264,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
         readSpeedsDAT(speeds2_path, speeds_data2, dir);
         readSvetoforDAT(signals2_path, signals_data2, dir);
+        readSvetoforDAT(signals2_reverse_path, signals_reverse_data2, dir);
         readBranchTracksDAT(branch2_path, dir);
 
         // Создание старого формата ЭК скоростей speeds2.conf отключено
@@ -268,16 +275,12 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         int dir = 1;
         findSplitsMainTrajectories(dir);
-        // Отладка
-        //writeMainTrajectory(traj_file1, tracks_data1);
     }
 
     if (is_1 && is_2)
     {
         dir = -1;
         findSplitsMainTrajectories(dir);
-        // Отладка
-        //writeMainTrajectory(traj_file2, tracks_data2);
     }
 
     // Разделение главных путей на подтраектории
@@ -365,6 +368,9 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     }
 /*
     // Отладка разделения путей на подтраектории
+    writeMainTrajectory(traj_file1, tracks_data1);
+    writeMainTrajectory(traj_file2, tracks_data2);
+
     dir = 0;
     writeSplits(branch_connectors, dir);
     dir = 1;
@@ -391,12 +397,12 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         writeStations(start_km_data);
     }
 
-    writeALSN_OLD();
+    //writeALSN_OLD();
     writeALSN();
 
     if (createSpeedMap())
     {
-        writeSpeedmap_OLD();
+        //writeSpeedmap_OLD();
         writeSpeedmap();
     }
 
