@@ -73,8 +73,8 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
 
         if (!bwd_type.isEmpty())
         {
-            flist.append(QPair<QString, QString>("SignalModel", bwd_type));
-            flist.append(QPair<QString, QString>("SignalDirection", QString("-1")));
+            flist.append(QPair<QString, QString>("SignalModelBwd", bwd_type));
+            //flist.append(QPair<QString, QString>("SignalDirection", QString("-1")));
         }
     }
     // Светофор вперёд
@@ -85,8 +85,8 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
         QString fwd_type = QString(connector->signal_fwd_type.c_str());
         if (!fwd_type.isEmpty())
         {
-            flist.append(QPair<QString, QString>("SignalModel", fwd_type));
-            flist.append(QPair<QString, QString>("SignalDirection", QString("1")));
+            flist.append(QPair<QString, QString>("SignalModelFwd", fwd_type));
+            //flist.append(QPair<QString, QString>("SignalDirection", QString("1")));
         }
     }
     //editor.writeFile("Joint", flist);

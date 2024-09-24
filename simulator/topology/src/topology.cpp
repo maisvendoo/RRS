@@ -552,14 +552,22 @@ bool Topology::load_topology(QString route_dir)
 void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 {
     QString signal_model = "";
-    cfg.getString(secNode, "SignalModel", signal_model);
+    int signal_dir = 0;
+
+    if (!cfg.getString(secNode, "SignalModelFwd", signal_model))
+    {
+        cfg.getString(secNode, "SignalModelBwd", signal_model);
+        signal_dir = -1;
+    }
+    else
+    {
+        signal_dir = 1;
+    }
 
     if (!signal_model.isEmpty())
     {
         QString signal_letter = "";
         cfg.getString(secNode, "SignalLetter", signal_letter);
-        int signal_dir = 0;
-        cfg.getInt(secNode, "SignalDirection", signal_dir);
 
         if (signal_model.right(4) == "line")
         {
