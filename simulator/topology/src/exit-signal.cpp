@@ -237,7 +237,17 @@ void ExitSignal::removal_area_control()
         }
 
         // Проверяем, есть ли у коннектора сигнал
-        Signal *signal = cur_conn->getSignal();
+        Signal *signal = Q_NULLPTR;
+
+        if (this->getDirection() == 1)
+        {
+            signal = cur_conn->getSignalFwd();
+        }
+
+        if (this->getDirection() == -1)
+        {
+            signal = cur_conn->getSignalBwd();
+        }
 
         // если нет - это стык или стрелка, продолжаем поиск
         if (signal == Q_NULLPTR)
@@ -404,9 +414,19 @@ void ExitSignal::route_control()
         }
 
         // Проверяем, дошли ли до сигнала
-        Signal *signal = cur_conn->getSignal();
+        Signal *signal = Q_NULLPTR;
 
-        // Нет сигнала - продолжаем шагать
+        if (this->getDirection() == 1)
+        {
+            signal = cur_conn->getSignalFwd();
+        }
+
+        if (this->getDirection() == -1)
+        {
+            signal = cur_conn->getSignalBwd();
+        }
+
+        // если нет - это стык или стрелка, продолжаем поиск
         if (signal == Q_NULLPTR)
         {
             continue;
@@ -502,7 +522,7 @@ void ExitSignal::relay_control()
     // Напряжение, даваемое в линию входному
     double U_line_old = U_line_prev;
 
-    U_line_prev = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
+    U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
 
     if (qAbs(U_line_prev - U_line_old))
     {

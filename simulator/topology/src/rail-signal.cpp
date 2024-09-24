@@ -36,10 +36,10 @@ QByteArray Signal::serialize()
     QDataStream stream(&buff);
 
     stream << conn->getName();
+    stream << signal_dir;
     stream << is_busy;
     stream << letter;
     stream << signal_model;
-    stream << signal_dir;
 
     for (auto lens : lens_state)
     {
@@ -59,10 +59,10 @@ void Signal::deserialize(QByteArray &data)
     QDataStream stream(&buff);
 
     stream >> conn_name;
+    stream >> signal_dir;
     stream >> is_busy;
     stream >> letter;
     stream >> signal_model;
-    stream >> signal_dir;
 
     for (size_t i = 0; i < lens_state.size(); ++i)
     {

@@ -627,55 +627,117 @@ bool Topology::load_topology(QString route_dir)
 //------------------------------------------------------------------------------
 void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 {
-    QString signal_model = "";
-    cfg.getString(secNode, "SignalModel", signal_model);
+    QString signal_model_fwd = "";
+    int signal_dir_fwd = 0;
 
-    if (!signal_model.isEmpty())
+    QString signal_model_bwd = "";
+    int signal_dir_bwd = 0;
+
+    if (cfg.getString(secNode, "SignalModelFwd", signal_model_fwd))
+    {
+        signal_dir_fwd = 1;
+    }
+
+    if (cfg.getString(secNode, "SignalModelBwd", signal_model_bwd))
+    {
+        signal_dir_bwd = -1;
+    }
+
+    if (signal_dir_fwd == 1)
     {
         QString signal_letter = "";
         cfg.getString(secNode, "SignalLetter", signal_letter);
-        int signal_dir = 0;
-        cfg.getInt(secNode, "SignalDirection", signal_dir);
 
-        if (signal_model.right(4) == "line")
+        if (signal_model_fwd.right(4) == "line")
         {
             LineSignal *line_signal = new LineSignal;
             line_signal->setLetter(signal_letter);
-            line_signal->setDirection(signal_dir);
-            line_signal->setSignalModel(signal_model);
+            line_signal->setDirection(signal_dir_fwd);
+            line_signal->setSignalModel(signal_model_fwd);
             line_signal->setConnector(conn);
 
-            conn->setSignal(line_signal);
+            conn->setSignalFwd(line_signal);
 
             signals_data.line_signals.push_back(line_signal);
 
             Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
         }
 
-        if (signal_model.right(4) == "entr")
+        if ( (signal_model_fwd.right(4) == "entr") || (signal_model_fwd.right(4) == "rout") )
         {
             EnterSignal *enter_signal = new EnterSignal;
             enter_signal->setLetter(signal_letter);
-            enter_signal->setDirection(signal_dir);
-            enter_signal->setSignalModel(signal_model);
+            enter_signal->setDirection(signal_dir_fwd);
+            enter_signal->setSignalModel(signal_model_fwd);
             enter_signal->setConnector(conn);
 
-            conn->setSignal(enter_signal);
+            conn->setSignalFwd(enter_signal);
 
             signals_data.enter_signals.push_back(enter_signal);
 
             Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
         }
 
-        if (signal_model.right(4) == "exit")
+        if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
             signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir);
-            signal->setSignalModel(signal_model);
+            signal->setDirection(signal_dir_fwd);
+            signal->setSignalModel(signal_model_fwd);
             signal->setConnector(conn);
 
-            conn->setSignal(signal);
+            conn->setSignalFwd(signal);
+
+            signals_data.exit_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
+    }
+
+    if (signal_dir_bwd == -1)
+    {
+        QString signal_letter = "";
+        cfg.getString(secNode, "SignalLetter", signal_letter);
+
+        if (signal_model_bwd.right(4) == "line")
+        {
+            LineSignal *line_signal = new LineSignal;
+            line_signal->setLetter(signal_letter);
+            line_signal->setDirection(signal_dir_bwd);
+            line_signal->setSignalModel(signal_model_bwd);
+            line_signal->setConnector(conn);
+
+            conn->setSignalBwd(line_signal);
+
+            signals_data.line_signals.push_back(line_signal);
+
+            Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
+        }
+
+        if ( (signal_model_bwd.right(4) == "entr") || (signal_model_bwd.right(4) == "rout") )
+        {
+            EnterSignal *enter_signal = new EnterSignal;
+            enter_signal->setLetter(signal_letter);
+            enter_signal->setDirection(signal_dir_bwd);
+            enter_signal->setSignalModel(signal_model_bwd);
+            enter_signal->setConnector(conn);
+
+            conn->setSignalBwd(enter_signal);
+
+            signals_data.enter_signals.push_back(enter_signal);
+
+            Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
+        }
+
+        if (signal_model_bwd.right(4) == "exit")
+        {
+            ExitSignal *signal = new ExitSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir_bwd);
+            signal->setSignalModel(signal_model_bwd);
+            signal->setConnector(conn);
+
+            conn->setSignalBwd(signal);
 
             signals_data.exit_signals.push_back(signal);
 
@@ -689,71 +751,73 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 //------------------------------------------------------------------------------
 void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
 {
-    for (auto line_signal : line_signals)
+    for (auto signal : line_signals)
     {
-        Connector *conn = line_signal->getConnector();
+        Connector *conn = signal->getConnector();
 
         if (conn == Q_NULLPTR)
         {
+            Journal::instance()->error("Failed connector for signal " + signal->getLetter());
             continue;
         }
 
-        if (line_signal->getDirection() == 1)
+        bool is_not_found = true;
+
+        while (is_not_found)
         {
-            Trajectory *traj = conn->getBwdTraj();
+            Trajectory *traj = Q_NULLPTR;
+
+            if (signal->getDirection() == 1)
+            {
+                traj = conn->getBwdTraj();
+            }
+
+            if (signal->getDirection() == -1)
+            {
+                traj = conn->getFwdTraj();
+            }
+
             if (traj == Q_NULLPTR)
             {
+                is_not_found = false;
                 continue;
             }
 
-            Connector *conn = traj->getBwdConnector();
+            if (signal->getDirection() == 1)
+            {
+                conn = traj->getBwdConnector();
+            }
+
+            if (signal->getDirection() == -1)
+            {
+                conn = traj->getFwdConnector();
+            }
 
             if (conn == Q_NULLPTR)
             {
+                is_not_found = false;
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignal();
+            Signal *prev_signal = Q_NULLPTR;
 
-            if (line_signal_prev == Q_NULLPTR)
+            if (signal->getDirection() == 1)
             {
-                continue;
+                prev_signal = conn->getSignalFwd();
             }
 
-            connect(line_signal, &Signal::sendLineVoltage,
-                    line_signal_prev, &Signal::slotRecvLineVoltage);
-
-            Journal::instance()->info("Connected line signal " + line_signal->getLetter() +
-                                      " with line signal " + line_signal_prev->getLetter());
-        }
-
-        if (line_signal->getDirection() == -1)
-        {
-            Trajectory *traj = conn->getFwdTraj();
-            if (traj == Q_NULLPTR)
+            if (signal->getDirection() == -1)
             {
-                continue;
+                prev_signal = conn->getSignalBwd();
             }
 
-            Connector *conn = traj->getFwdConnector();
-
-            if (conn == Q_NULLPTR)
+            if (prev_signal != Q_NULLPTR)
             {
-                continue;
+                connect(signal, &Signal::sendLineVoltage,
+                        prev_signal, &Signal::slotRecvLineVoltage);
+
+                is_not_found = false;
             }
-
-            Signal *line_signal_prev = conn->getSignal();
-
-            if (line_signal_prev == Q_NULLPTR)
-            {
-                continue;
-            }
-
-            connect(line_signal, &Signal::sendLineVoltage,
-                    line_signal_prev, &Signal::slotRecvLineVoltage);
-
-            Journal::instance()->info("Connected line signal " + line_signal->getLetter() +
-                                      " with line signal " + line_signal_prev->getLetter());
         }
     }
 }
@@ -763,77 +827,76 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
 //------------------------------------------------------------------------------
 void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
 {
-    for (auto enter_signal : enter_signals)
+    for (auto signal : enter_signals)
     {
-        Connector *conn = enter_signal->getConnector();
+        Connector *conn = signal->getConnector();
 
         if (conn == Q_NULLPTR)
         {
+            Journal::instance()->error("Failed connector for signal " + signal->getLetter());
             continue;
         }
 
-        if (enter_signal->getDirection() == 1)
+        bool is_not_found = true;
+
+        while (is_not_found)
         {
-            Trajectory *traj = conn->getBwdTraj();
+            Trajectory *traj = Q_NULLPTR;
+
+            if (signal->getDirection() == 1)
+            {
+                traj = conn->getBwdTraj();
+            }
+
+            if (signal->getDirection() == -1)
+            {
+                traj = conn->getFwdTraj();
+            }
+
             if (traj == Q_NULLPTR)
             {
+                is_not_found = false;
                 continue;
             }
 
-            Connector *conn = traj->getBwdConnector();
+            if (signal->getDirection() == 1)
+            {
+                conn = traj->getBwdConnector();
+            }
+
+            if (signal->getDirection() == -1)
+            {
+                conn = traj->getFwdConnector();
+            }
 
             if (conn == Q_NULLPTR)
             {
+                is_not_found = false;
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignal();
+            Signal *prev_signal = Q_NULLPTR;
 
-            if (line_signal_prev == Q_NULLPTR)
+            if (signal->getDirection() == 1)
             {
-                continue;
+                prev_signal = conn->getSignalFwd();
             }
 
-            connect(enter_signal, &Signal::sendLineVoltage,
-                    line_signal_prev, &Signal::slotRecvLineVoltage);
-
-            connect(enter_signal, &Signal::sendSideVoltage,
-                    line_signal_prev, &Signal::slotRecvSideVoltage);
-
-            Journal::instance()->info("Connected line signal " + enter_signal->getLetter() +
-                                      " with line signal " + line_signal_prev->getLetter());
-        }
-
-        if (enter_signal->getDirection() == -1)
-        {
-            Trajectory *traj = conn->getFwdTraj();
-            if (traj == Q_NULLPTR)
+            if (signal->getDirection() == -1)
             {
-                continue;
+                prev_signal = conn->getSignalBwd();
             }
 
-            Connector *conn = traj->getFwdConnector();
-
-            if (conn == Q_NULLPTR)
+            if (prev_signal != Q_NULLPTR)
             {
-                continue;
+                connect(signal, &Signal::sendLineVoltage,
+                        prev_signal, &Signal::slotRecvLineVoltage);
+
+                connect(signal, &Signal::sendSideVoltage,
+                        prev_signal, &Signal::slotRecvSideVoltage);
+
+                is_not_found = false;
             }
-
-            Signal *line_signal_prev = conn->getSignal();
-
-            if (line_signal_prev == Q_NULLPTR)
-            {
-                continue;
-            }
-
-            connect(enter_signal, &Signal::sendLineVoltage,
-                    line_signal_prev, &Signal::slotRecvLineVoltage);
-
-            connect(enter_signal, &Signal::sendSideVoltage,
-                    line_signal_prev, &Signal::slotRecvSideVoltage);
-
-            Journal::instance()->info("Connected line signal " + enter_signal->getLetter() +
-                                      " with line signal " + line_signal_prev->getLetter());
         }
     }
 }
@@ -964,10 +1027,19 @@ void Topology::slotOpenSignal(QByteArray signal_data)
     QDataStream stream(&buff);
 
     QString conn_name = "";
+    int sig_dir = 0;
     stream >> conn_name;
+    stream >> sig_dir;
 
     if (conn_name.isEmpty())
     {
+        Journal::instance()->error("Connector name is empty");
+        return;
+    }
+
+    if (sig_dir == 0)
+    {
+        Journal::instance()->error("Signal direction is zero");
         return;
     }
 
@@ -978,14 +1050,24 @@ void Topology::slotOpenSignal(QByteArray signal_data)
         return;
     }
 
-    Signal *signal = conn->getSignal();
+    Signal *signal = Q_NULLPTR;
+
+    if (sig_dir == 1)
+    {
+        signal = conn->getSignalFwd();
+    }
+
+    if (sig_dir == -1)
+    {
+        signal = conn->getSignalBwd();
+    }
 
     if (signal == Q_NULLPTR)
     {
         return;
     }
 
-    if (signal->getSignalType() == "entr")
+    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 
@@ -1022,10 +1104,19 @@ void Topology::slotCloseSignal(QByteArray signal_data)
     QDataStream stream(&buff);
 
     QString conn_name = "";
+    int sig_dir = 0;
     stream >> conn_name;
+    stream >> sig_dir;
 
     if (conn_name.isEmpty())
     {
+        Journal::instance()->error("Connector name is empty");
+        return;
+    }
+
+    if (sig_dir == 0)
+    {
+        Journal::instance()->error("Signal direction is zero");
         return;
     }
 
@@ -1036,14 +1127,24 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         return;
     }
 
-    Signal *signal = conn->getSignal();
+    Signal *signal = Q_NULLPTR;
+
+    if (sig_dir == 1)
+    {
+        signal = conn->getSignalFwd();
+    }
+
+    if (sig_dir == -1)
+    {
+        signal = conn->getSignalBwd();
+    }
 
     if (signal == Q_NULLPTR)
     {
         return;
     }
 
-    if (signal->getSignalType() == "entr")
+    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 

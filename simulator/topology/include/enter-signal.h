@@ -34,7 +34,7 @@ public slots:
 
     void slotPressClose();
 
-private:
+protected:
 
     enum
     {
@@ -133,10 +133,7 @@ private:
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_nopressed = true;
 
-    double U_bat = 12.0;
-
-    /// Напряжение, передаваемое на линию предыдущего светофора
-    double U_line_prev = 0.0;
+    double U_bat = 12.0;    
 
     /// Таймер выдержкм времени удержания кнопки открыть
     Timer *open_timer = new Timer(1.0, false);
@@ -155,6 +152,15 @@ private:
     bool is_ALR_ON = false;
 
     double U_side = 0.0;
+
+    enum
+    {
+        NUM_AR_CONTACTS = 1,
+        AR_OPEN = 0
+    };
+
+    /// Указательное реле, для связи с предыдущим входным светофором
+    Relay *allow_relay = new Relay(NUM_AR_CONTACTS);
 
     void preStep(state_vector_t &Y, double t) override;
 

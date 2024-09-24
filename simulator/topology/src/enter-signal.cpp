@@ -57,6 +57,9 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
 
     exit_signal_relay->read_config("combine-relay");
     exit_signal_relay->setInitContactState(ESR_DSR_CTRL, false);
+
+    allow_relay->read_config("combine-relay");
+    allow_relay->setInitContactState(AR_OPEN, true);
 }
 
 //------------------------------------------------------------------------------
@@ -90,6 +93,8 @@ void EnterSignal::step(double t, double dt)
     bwd_way_relay->step(t, dt);
 
     line_relay->step(t, dt);
+
+    allow_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -143,6 +148,13 @@ void EnterSignal::busy_control()
     {
         // Устанавливаем новое значение на линии предыдущего светофора
         emit sendLineVoltage(U_line_prev);
+
+        QString msg = QString("Line voltage in %1 on connector %2 is: %3 V")
+                          .arg(this->getLetter())
+                          .arg(this->conn->getName())
+                          .arg(U_line_prev, 4, 'f', 1);
+
+        Journal::instance()->info(msg);
     }
 }
 
@@ -245,8 +257,10 @@ void EnterSignal::relay_control()
 
     // Питание указательного реле выходного сигнала
 
+    double U_dsr_old = U_dsr;
+
     if (next_signal != Q_NULLPTR)
-        exit_signal_relay->setVoltage(next_signal->getLineVoltage());
+        exit_signal_relay->setVoltage(next_signal->getVoltageDSR());
     else
         exit_signal_relay->setVoltage(0.0);
 
@@ -264,6 +278,12 @@ void EnterSignal::relay_control()
     {
         emit sendSideVoltage(U_side);
     }
+
+    bool is_AR_ON = lens_state[RED_LENS];
+
+    allow_relay->setVoltage(U_bat * static_cast<double>(is_AR_ON));
+
+    U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
 }
 
 //------------------------------------------------------------------------------
@@ -320,9 +340,14 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         }
 
         // Смотрим сигнал на следующем коннекторе
-        *signal = cur_conn->getSignal();
+        *signal = cur_conn->getSignalFwd();
 
         // Продолжаем цикл, возможно попалась стрелка
+        if (*signal == Q_NULLPTR)
+        {
+            *signal = cur_conn->getSignalBwd();
+        }
+
         if (*signal == Q_NULLPTR)
         {
             continue;
@@ -403,7 +428,12 @@ bool EnterSignal::is_switch_minus(Connector *conn)
             continue;
         }
 
-        Signal *signal = cur_sw->getSignal();
+        Signal *signal = cur_sw->getSignalFwd();
+
+        if (signal == Q_NULLPTR)
+        {
+            signal = cur_sw->getSignalBwd();
+        }
 
         if (signal == Q_NULLPTR)
         {

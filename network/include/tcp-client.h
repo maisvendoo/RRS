@@ -36,7 +36,7 @@ public:
 
     void sendSwitchState(QString conn_name, int state_fwd, int state_bwd);
 
-    void sendSignalState(QString conn_name, bool open);
+    void sendSignalState(QString conn_name, int sig_dir, bool open);
 
     bool isConnected() const;
 
