@@ -10,7 +10,8 @@
 //
 //------------------------------------------------------------------------------
 bool ZDSimConverter::readRouteTRK(const std::string &path,
-                                  zds_trajectory_data_t &track_data)
+                                  zds_trajectory_data_t &track_data,
+                                  const int &dir)
 {
     if (path.empty())
         return false;
@@ -23,14 +24,15 @@ bool ZDSimConverter::readRouteTRK(const std::string &path,
         return false;
     }
 
-    return readRouteTRK(stream, track_data);
+    return readRouteTRK(stream, track_data, dir);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
-                                  zds_trajectory_data_t &track_data)
+                                  zds_trajectory_data_t &track_data,
+                                  const int &dir)
 {
     std::vector<zds_track_t> tmp_data;
 
@@ -228,6 +230,11 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
 
         track_data.push_back(cur_track);
     }
+
+    if (dir > 0)
+        railway_coord_sections1 = railway_coord_section + 1;
+    else
+        railway_coord_sections2 = railway_coord_section + 1;
 
     return true;
 }

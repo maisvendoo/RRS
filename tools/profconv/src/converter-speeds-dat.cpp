@@ -134,24 +134,24 @@ bool ZDSimConverter::createSpeedMap()
     if (speeds_data1.empty())
         return false;
 
+    // Готовим массив данных под карты туда и обратно по участкам пикетажа
+    // и карту на все съезды и боковые пути
+    size_t size = railway_coord_sections1 + railway_coord_sections2 + 1;
+    speedmap_data.clear();
+    for (size_t i = 0; i < size; ++i)
+    {
+        speedmap_data.push_back(new speedmap_t());
+    }
+
     // Пишем список траекторий по главному пути
-    int railway_coord_section = 0;
-    speedmap_t *speedmap = new speedmap_t();
-    speedmap->name_prefix = "route1";
     for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
     {
-        // Если начался новый участок жд-пикетажа,
-        // заканчиваем список траекторий и начинаем новый
-        if ((*traj)->railway_coord_section != railway_coord_section)
-        {
-            railway_coord_section = (*traj)->railway_coord_section;
-            speedmap_data.push_back(speedmap);
-            speedmap = new speedmap_t();
-            speedmap->name_prefix = "route1";
-        }
-        speedmap->trajectories_names.push_back((*traj)->name);
+        int railway_coord_section = (*traj)->railway_coord_section;
+        int speedmap_id = railway_coord_section;
+
+        speedmap_data[speedmap_id]->name_prefix = "route1";
+        speedmap_data[speedmap_id]->trajectories_names.push_back((*traj)->name);
     }
-    speedmap_data.push_back(speedmap);
 
     // Пишем список ограничений скорости
     for (auto zds_speed : speeds_data1)
@@ -164,7 +164,8 @@ bool ZDSimConverter::createSpeedMap()
 
         size_t id_begin = zds_speed.begin_track_id;
         size_t id_end = zds_speed.end_track_id;
-        railway_coord_section = tracks_data1[id_begin].railway_coord_section;
+        int railway_coord_section = tracks_data1[id_begin].railway_coord_section;
+        int speedmap_id = railway_coord_section;
         for (size_t id = id_begin + 1; id <= id_end; ++id)
         {
             // Если начался новый участок жд-пикетажа,
@@ -173,26 +174,29 @@ bool ZDSimConverter::createSpeedMap()
             {
                 speed_element_t speed_el_end_here = speed_el;
                 speed_el_end_here.railway_coord_end = static_cast<int>(round(tracks_data1[id - 1].railway_coord_end));
-                speedmap_data[railway_coord_section]->speedmap_elements.push_back(speed_el_end_here);
+
+                speedmap_t *speedmap = speedmap_data[speedmap_id];
+                speedmap->speedmap_elements.push_back(speed_el_end_here);
 
                 speed_el.railway_coord_begin = static_cast<int>(round(tracks_data1[id].railway_coord));
 
                 railway_coord_section = tracks_data1[id].railway_coord_section;
+                speedmap_id = railway_coord_section;
             }
         }
-        speedmap_data[railway_coord_section]->speedmap_elements.push_back(speed_el);
+        speedmap_data[speedmap_id]->speedmap_elements.push_back(speed_el);
     }
 
     // Пишем список всех траекторий боковых путей и съездов
-    speedmap_t *branch_speedmap = new speedmap_t();
-    branch_speedmap->name_prefix = "all_branch_tracks";
+    int speedmap_id = railway_coord_sections1;
+    speedmap_data[speedmap_id]->name_prefix = "all_branch_tracks";
     if (!branch_track_data1.empty())
     {
         for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
         {
             for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
             {
-                branch_speedmap->trajectories_names.push_back((*traj)->name);
+                speedmap_data[speedmap_id]->trajectories_names.push_back((*traj)->name);
             }
         }
     }
@@ -202,7 +206,7 @@ bool ZDSimConverter::createSpeedMap()
         {
             for (auto traj = (*it)->trajectories.begin(); traj != (*it)->trajectories.end(); ++traj)
             {
-                branch_speedmap->trajectories_names.push_back((*traj)->name);
+                speedmap_data[speedmap_id]->trajectories_names.push_back((*traj)->name);
             }
         }
     }
@@ -210,49 +214,37 @@ bool ZDSimConverter::createSpeedMap()
     {
         for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
         {
-            branch_speedmap->trajectories_names.push_back((*it)->trajectory.name);
+            speedmap_data[speedmap_id]->trajectories_names.push_back((*it)->trajectory.name);
         }
     }
     if (!branch_2plus2_data.empty())
     {
         for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
         {
-            branch_speedmap->trajectories_names.push_back((*it)->trajectory.name);
+            speedmap_data[speedmap_id]->trajectories_names.push_back((*it)->trajectory.name);
         }
     }
     // Ограничение 40 км/ч на любом интервале пикетажа для всех боковых путей
-    if (!branch_speedmap->trajectories_names.empty())
+    if (!speedmap_data[speedmap_id]->trajectories_names.empty())
     {
         speed_element_t speed_el = speed_element_t();
         speed_el.limit = 40;
-        branch_speedmap->speedmap_elements.push_back(speed_el);
-        speedmap_data.push_back(branch_speedmap);
+        speedmap_data[speedmap_id]->speedmap_elements.push_back(speed_el);
     }
 
     // Карта скоростей для пути "обратно"
     if (trajectories2.empty() || speeds_data2.empty())
-        return false;
+        return true;
 
     // Пишем список траекторий по главному пути
-    speedmap = new speedmap_t();
-    speedmap->name_prefix = "route2";
-    std::vector<int> railway_coord_sections_2 = {0};
-    int data1_size = speedmap_data.size();
     for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
     {
-        if ((*traj)->railway_coord_section != railway_coord_sections_2.back())
-        {
-            // Если начался новый участок жд-пикетажа,
-            // заканчиваем список траекторий и начинаем новый
-            speedmap_data.push_back(speedmap);
-            speedmap = new speedmap_t();
-            speedmap->name_prefix = "route2";
+        int railway_coord_section = (*traj)->railway_coord_section;
+        int speedmap_id = railway_coord_sections1 + 1 + railway_coord_section;
 
-            railway_coord_sections_2.push_back((*traj)->railway_coord_section);
-        }
-        speedmap->trajectories_names.push_back((*traj)->name);
+        speedmap_data[speedmap_id]->name_prefix = "route2";
+        speedmap_data[speedmap_id]->trajectories_names.push_back((*traj)->name);
     }
-    speedmap_data.push_back(speedmap);
 
     // Пишем список ограничений скорости
     for (auto zds_speed : speeds_data2)
@@ -265,21 +257,13 @@ bool ZDSimConverter::createSpeedMap()
 
         size_t id_begin = zds_speed.begin_track_id;
         size_t id_end = zds_speed.end_track_id;
-        railway_coord_section = tracks_data2[id_begin].railway_coord_section;
+
+        int railway_coord_section = tracks_data2[id_begin].railway_coord_section;
+        int speedmap_id = railway_coord_sections1 + 1 + railway_coord_section;
+        bool empty_section = speedmap_data[speedmap_id]->trajectories_names.empty();
 
         bool was_1_track = (tracks_data2[id_begin].id_at_track1 > -1);
 
-        bool empty_section = false;
-        int speedmap2_data_id = 0;
-        while (railway_coord_section != railway_coord_sections_2[speedmap2_data_id])
-        {
-            ++speedmap2_data_id;
-            if (speedmap2_data_id == railway_coord_sections_2.size())
-            {
-                empty_section = true;
-                break;
-            }
-        }
         for (size_t id = id_begin + 1; id <= id_end; ++id)
         {
             if (tracks_data2[id].id_at_track1 > -1)
@@ -295,7 +279,7 @@ bool ZDSimConverter::createSpeedMap()
 
                         if (speed_el_end_here.railway_coord_begin != speed_el_end_here.railway_coord_end)
                         {
-                            speedmap_data[data1_size + speedmap2_data_id]->speedmap_elements.push_back(speed_el_end_here);
+                            speedmap_data[speedmap_id]->speedmap_elements.push_back(speed_el_end_here);
                         }
                     }
                 }
@@ -327,29 +311,20 @@ bool ZDSimConverter::createSpeedMap()
 
                     if (speed_el_end_here.railway_coord_begin != speed_el_end_here.railway_coord_end)
                     {
-                        speedmap_data[data1_size + speedmap2_data_id]->speedmap_elements.push_back(speed_el_end_here);
+                        speedmap_data[speedmap_id]->speedmap_elements.push_back(speed_el_end_here);
                     }
                 }
 
                 speed_el.railway_coord_begin = static_cast<int>(round(tracks_data2[id].railway_coord));
 
                 railway_coord_section = tracks_data2[id].railway_coord_section;
-                empty_section = false;
-                speedmap2_data_id = 0;
-                while (railway_coord_section != railway_coord_sections_2[speedmap2_data_id])
-                {
-                    ++speedmap2_data_id;
-                    if (speedmap2_data_id == railway_coord_sections_2.size())
-                    {
-                        empty_section = true;
-                        break;
-                    }
-                }
+                speedmap_id = railway_coord_sections1 + 1 + railway_coord_section;
+                empty_section = speedmap_data[speedmap_id]->trajectories_names.empty();
             }
         }
 
         if ((!(empty_section || was_1_track)) && (speed_el.railway_coord_begin != speed_el.railway_coord_end))
-            speedmap_data[data1_size + speedmap2_data_id]->speedmap_elements.push_back(speed_el);
+            speedmap_data[speedmap_id]->speedmap_elements.push_back(speed_el);
     }
 
     return true;

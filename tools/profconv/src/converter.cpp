@@ -227,12 +227,14 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     std::string speeds1_file = "speeds1.conf";
     std::string speeds2_file = "speeds2.conf";
 
-    bool is_1 = readRouteTRK(trk1_path, tracks_data1);
-    bool is_2 = readRouteTRK(trk2_path, tracks_data2);
+    int dir = 1;
+    bool is_1 = readRouteTRK(trk1_path, tracks_data1, dir);
+    dir = -1;
+    bool is_2 = readRouteTRK(trk2_path, tracks_data2, dir);
 
     if (is_1)
     {
-        int dir = 1;
+        dir = 1;
         // Создание profile.conf отключено, симулятор сам читает route1.trk
         //writeProfileData(tracks_data1, "profile1.conf");
 
@@ -250,7 +252,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (is_1 && is_2)
     {
-        int dir = -1;
+        dir = -1;
         // Создание profile.conf отключено, симулятор сам читает route2.trk
         //writeProfileData(tracks_data2, "profile2.conf");
 
@@ -272,7 +274,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
 
     if (is_1 && is_2)
     {
-        int dir = -1;
+        dir = -1;
         findSplitsMainTrajectories(dir);
         // Отладка
         //writeMainTrajectory(traj_file2, tracks_data2);
@@ -281,7 +283,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     // Разделение главных путей на подтраектории
     if (is_1)
     {
-        int dir = 1;
+        dir = 1;
         std::sort(split_data1.begin(), split_data1.end(), split_zds_trajectory_t::compare_by_track_id);
         splitMainTrajectory(dir);
         for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
@@ -291,7 +293,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     }
     if (is_1 && is_2)
     {
-        int dir = -1;
+        dir = -1;
         std::sort(split_data2.begin(), split_data2.end(), split_zds_trajectory_t::compare_by_track_id);
         splitMainTrajectory(dir);
         for (auto traj = trajectories2.begin(); traj != trajectories2.end(); ++traj)
@@ -304,7 +306,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         std::sort(branch_track_data1.begin(), branch_track_data1.end(), zds_branch_track_t::compare_by_track_id_begin);
 
-        int dir = 1;
+        dir = 1;
         size_t num_trajectories = 0;
         for (auto it = branch_track_data1.begin(); it != branch_track_data1.end(); ++it)
         {
@@ -321,7 +323,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         std::sort(branch_track_data2.begin(), branch_track_data2.end(), zds_branch_track_t::compare_by_track_id_end);
 
-        int dir = -1;
+        dir = -1;
         size_t num_trajectories = 0;
         for (auto it = branch_track_data2.begin(); it != branch_track_data2.end(); ++it)
         {
@@ -338,7 +340,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         std::sort(branch_2minus2_data.begin(), branch_2minus2_data.end(), zds_branch_2_2_t::compare_by_track_id1);
 
-        int dir = 1;
+        dir = 1;
         size_t num_trajectories = 0;
         for (auto it = branch_2minus2_data.begin(); it != branch_2minus2_data.end(); ++it)
         {
@@ -352,7 +354,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     {
         std::sort(branch_2plus2_data.begin(), branch_2plus2_data.end(), zds_branch_2_2_t::compare_by_track_id2);
 
-        int dir = -1;
+        dir = -1;
         size_t num_trajectories = 0;
         for (auto it = branch_2plus2_data.begin(); it != branch_2plus2_data.end(); ++it)
         {
@@ -363,7 +365,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     }
 /*
     // Отладка разделения путей на подтраектории
-    int dir = 0;
+    dir = 0;
     writeSplits(branch_connectors, dir);
     dir = 1;
     writeSplits(split_data1, dir);

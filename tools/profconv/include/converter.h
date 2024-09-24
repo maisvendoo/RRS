@@ -65,6 +65,10 @@ public:
 
 private:
 
+    size_t railway_coord_sections1 = 0;
+
+    size_t railway_coord_sections2 = 0;
+
     std::string         routeDir;
 
     std::string         topologyDir;
@@ -131,9 +135,9 @@ private:
 
     bool readRouteMAP(QTextStream &stream, zds_route_map_data_t &map_data);
 
-    bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data);
+    bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data, const int &dir);
 
-    bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data);
+    bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data, const int &dir);
 
     void writeProfileData(const zds_trajectory_data_t &tracks_data,
                           const std::string &file_name);

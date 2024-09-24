@@ -17,6 +17,9 @@ void ZDSimConverter::writeSpeedmap()
     QString node = CONFIGNODE_TRAJECTORY.c_str();
     for (auto speedmap_element : speedmap_data)
     {
+        if (speedmap_element->trajectories_names.empty() || speedmap_element->speedmap_elements.empty())
+            continue;
+
         int coord_begin = speedmap_element->speedmap_elements.front().railway_coord_begin;
         int coord_end = speedmap_element->speedmap_elements.back().railway_coord_end;
         QString filename = speedmap_element->name_prefix.c_str();
