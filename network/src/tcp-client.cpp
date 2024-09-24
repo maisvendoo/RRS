@@ -70,7 +70,7 @@ void TcpClient::sendSwitchState(QString conn_name, int state_fwd, int state_bwd)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpClient::sendSignalState(QString conn_name, bool open)
+void TcpClient::sendSignalState(QString conn_name, int sig_dir, bool open)
 {
     network_data_t request;
 
@@ -88,6 +88,7 @@ void TcpClient::sendSignalState(QString conn_name, bool open)
     QDataStream stream(&buff);
 
     stream << conn_name;
+    stream << sig_dir;
 
     socket->write(request.serialize());
     socket->flush();

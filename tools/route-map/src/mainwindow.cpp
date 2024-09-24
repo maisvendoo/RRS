@@ -253,14 +253,14 @@ void MainWindow::slotSignalControlMenu()
     menu->addAction(open);
 
     connect(open, &QAction::triggered, this, [tc, signal]{
-        tc->sendSignalState(signal->getConnector()->getName(), true);
+        tc->sendSignalState(signal->getConnector()->getName(), signal->getDirection(), true);
     });
 
     QAction *close = new QAction(tr("Close"), this);
     menu->addAction(close);
 
     connect(close, &QAction::triggered, this, [tc, signal]{
-        tc->sendSignalState(signal->getConnector()->getName(), false);
+        tc->sendSignalState(signal->getConnector()->getName(), signal->getDirection(), false);
     });
 
     menu->exec(QCursor::pos());

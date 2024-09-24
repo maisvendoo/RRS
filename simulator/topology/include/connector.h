@@ -47,7 +47,7 @@ public:
         this->signal_fwd = signal;
     }
 
-    Signal *getSignalFwd() const
+    Signal *getSignalFwd()
     {
         return signal_fwd;
     }
@@ -57,7 +57,7 @@ public:
         this->signal_bwd = signal;
     }
 
-    Signal *getSignalBwd() const
+    Signal *getSignalBwd()
     {
         return signal_bwd;
     }
