@@ -14,7 +14,7 @@ void ZDSimConverter::writeALSN()
     FieldsDataList flist_25hz;
     FieldsDataList flist_50hz;
 
-    QString node = CONFIGNODE_TRAJECTORY.c_str();
+    QString node = CONFIGNODE_TRAJ_3LVL.c_str();
     for (auto traj = trajectories1.begin(); traj != trajectories1.end(); ++traj)
     {
         if ((*traj)->ALSN_frequency == 25)
@@ -57,9 +57,12 @@ void ZDSimConverter::writeALSN()
         editor_25hz.setIndentationFormat(-1);
 
         // Список траекторий
-        editor_25hz.writeFile(flist_25hz);
+        QString node2 = CONFIGNODE_TRAJ_2LVL.c_str();
+        editor_25hz.writeFile(node2, flist_25hz);
+
         // Конфиг несущей частоты сигнала АЛСН
-        editor_25hz.writeFile("ALSN", FieldsDataList{ QPair<QString, QString>("Frequency", QString("25")) });
+        node2 = "ALSN";
+        editor_25hz.writeFile(node2, FieldsDataList{ QPair<QString, QString>("Frequency", QString("25")) });
 
         editor_25hz.closeFileAfterWrite();
     }
@@ -71,9 +74,12 @@ void ZDSimConverter::writeALSN()
         editor_50hz.setIndentationFormat(-1);
 
         // Список траекторий
-        editor_50hz.writeFile(flist_50hz);
+        QString node2 = CONFIGNODE_TRAJ_2LVL.c_str();
+        editor_50hz.writeFile(node2, flist_50hz);
+
         // Конфиг несущей частоты сигнала АЛСН
-        editor_50hz.writeFile("ALSN", FieldsDataList{ QPair<QString, QString>("Frequency", QString("50")) });
+        node2 = "ALSN";
+        editor_50hz.writeFile(node2, FieldsDataList{ QPair<QString, QString>("Frequency", QString("50")) });
 
         editor_50hz.closeFileAfterWrite();
     }

@@ -55,38 +55,49 @@ bool Topology::load(QString route_dir)
 
     // Из папок trajectory-* загружаем все конфиги *.xml
     std::vector<std::vector<module_cfg_t>> all_modules;
-    for (auto name = traj_modules_dirs.begin(); name != traj_modules_dirs.end(); ++name)
+    for (auto name : traj_modules_dirs)
     {
-        if ((name == nullptr) || (*name).isEmpty())
+        if (name.isEmpty())
             continue;
 
-        QString traj_module_path = topology_path + QDir::separator() + (*name);
+        QString traj_module_path = topology_path + QDir::separator() + name;
         QDir traj_module_dir = QDir(traj_module_path);
         QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
 
         std::vector<module_cfg_t> all_cfgs;
-        for (auto cfg_name = cfg_files.begin(); name != cfg_files.end(); ++cfg_name)
+        for (auto cfg_name : cfg_files)
         {
-            if ((cfg_name == nullptr) || (*cfg_name).isEmpty())
+            if (cfg_name.isEmpty())
                 continue;
 
             module_cfg_t mc;
 
-            QString cfg_path = traj_module_path + QDir::separator() + (*cfg_name);
+            QString cfg_path = traj_module_path + QDir::separator() + cfg_name;
             if (!mc.cfg.load(cfg_path))
                 continue;
 
-            mc.module_name = (*name);
+            mc.module_name = name;
 
             // Список траекторий в этом конфиге:
             // модуль будет подгружен к траекториям,
             // имя которой указано хотя бы в одном конфиге,
             // после чего настроен этим же конфигом
-            QDomNode secNode = mc.cfg.getFirstSection("Trajectory");
+            QDomNode secNode = mc.cfg.getFirstSection("Trajectories");
             while (!secNode.isNull())
             {
-                QString traj_name = secNode.nodeValue();
-                mc.traj_names.push_back(traj_name);
+                QDomNodeList nodes = secNode.childNodes();
+                for (size_t i = 0; i < nodes.size(); ++i)
+                {
+                    QString node_name = nodes.at(i).nodeName();
+                    if (node_name == "Name")
+                    {
+                        QString traj_name = nodes.at(i).toElement().text();
+                        if (!traj_name.isEmpty())
+                            mc.traj_names.push_back(traj_name);
+                        else
+                            Journal::instance()->error("Empty trajectory name at " + cfg_path);
+                    }
+                }
                 secNode = mc.cfg.getNextSection();
             }
 
