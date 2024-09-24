@@ -376,6 +376,11 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         // Продолжаем цикл, возможно попалась стрелка
         if (*signal == Q_NULLPTR)
         {
+            *signal = cur_conn->getSignalBwd();
+        }
+
+        if (*signal == Q_NULLPTR)
+        {
             continue;
         }
 
@@ -455,6 +460,11 @@ bool EnterSignal::is_switch_minus(Connector *conn)
         }
 
         Signal *signal = cur_sw->getSignalFwd();
+
+        if (signal == Q_NULLPTR)
+        {
+            signal = cur_sw->getSignalBwd();
+        }
 
         if (signal == Q_NULLPTR)
         {

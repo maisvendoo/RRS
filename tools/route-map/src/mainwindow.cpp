@@ -350,7 +350,16 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         signal->setConnector(conn);
-        conn->setSignalFwd(signal);
+
+        if (signal->getDirection() == 1)
+        {
+            conn->setSignalFwd(signal);
+        }
+
+        if (signal->getDirection() == -1)
+        {
+            conn->setSignalBwd(signal);
+        }
     }
 
     for (auto signal : signals_data->enter_signals)
@@ -363,7 +372,16 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         signal->setConnector(conn);
-        conn->setSignalFwd(signal);
+
+        if (signal->getDirection() == 1)
+        {
+            conn->setSignalFwd(signal);
+        }
+
+        if (signal->getDirection() == -1)
+        {
+            conn->setSignalBwd(signal);
+        }
 
         SignalLabel *signal_label = new SignalLabel(map);
         signal_label->signal = signal;
@@ -384,7 +402,16 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         }
 
         signal->setConnector(conn);
-        conn->setSignalFwd(signal);
+
+        if (signal->getDirection() == 1)
+        {
+            conn->setSignalFwd(signal);
+        }
+
+        if (signal->getDirection() == -1)
+        {
+            conn->setSignalBwd(signal);
+        }
 
         SignalLabel *signal_label = new SignalLabel(map);
         signal_label->signal = signal;
@@ -412,8 +439,10 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
     QDataStream stream(&buff);
 
     QString conn_name = "";
+    int signal_dir = 0;
 
     stream >> conn_name;
+    stream >> signal_dir;
 
     if (conn_name.isEmpty())
     {
@@ -427,8 +456,13 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
         return;
     }
 
-    if (conn->getSignalFwd() != Q_NULLPTR)
+    if (signal_dir == 1)
     {
         conn->getSignalFwd()->deserialize(signal_data);
+    }
+
+    if (signal_dir == -1)
+    {
+        conn->getSignalBwd()->deserialize(signal_data);
     }
 }

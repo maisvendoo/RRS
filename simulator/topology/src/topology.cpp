@@ -706,8 +706,11 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 continue;
             }
 
-            connect(line_signal, &Signal::sendLineVoltage,
-                    line_signal_prev, &Signal::slotRecvLineVoltage);
+            if (line_signal->getDirection() == line_signal_prev->getDirection())
+            {
+                connect(line_signal, &Signal::sendLineVoltage,
+                        line_signal_prev, &Signal::slotRecvLineVoltage);
+            }
 
             Journal::instance()->info("Connected line signal " + line_signal->getLetter() +
                                       " with line signal " + line_signal_prev->getLetter());
@@ -728,15 +731,18 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignalFwd();
+            Signal *line_signal_prev = conn->getSignalBwd();
 
             if (line_signal_prev == Q_NULLPTR)
             {
                 continue;
             }
 
-            connect(line_signal, &Signal::sendLineVoltage,
-                    line_signal_prev, &Signal::slotRecvLineVoltage);
+            if (line_signal->getDirection() == line_signal_prev->getDirection())
+            {
+                connect(line_signal, &Signal::sendLineVoltage,
+                        line_signal_prev, &Signal::slotRecvLineVoltage);
+            }
 
             Journal::instance()->info("Connected line signal " + line_signal->getLetter() +
                                       " with line signal " + line_signal_prev->getLetter());
@@ -805,7 +811,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
                 continue;
             }
 
-            Signal *line_signal_prev = conn->getSignalFwd();
+            Signal *line_signal_prev = conn->getSignalBwd();
 
             if (line_signal_prev == Q_NULLPTR)
             {

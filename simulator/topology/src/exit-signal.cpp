@@ -254,6 +254,11 @@ void ExitSignal::removal_area_control()
         // если нет - это стык или стрелка, продолжаем поиск
         if (signal == Q_NULLPTR)
         {
+            signal = cur_conn->getSignalBwd();
+        }
+
+        if (signal == Q_NULLPTR)
+        {
             continue;
         }
 
@@ -417,6 +422,11 @@ void ExitSignal::route_control()
 
         // Проверяем, дошли ли до сигнала
         Signal *signal = cur_conn->getSignalFwd();
+
+        if (signal == Q_NULLPTR)
+        {
+            signal = cur_conn->getSignalBwd();
+        }
 
         // Нет сигнала - продолжаем шагать
         if (signal == Q_NULLPTR)
