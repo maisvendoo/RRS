@@ -47,24 +47,25 @@ void ConnectorALSN::step(double t, double dt)
     (void) t;
     (void) dt;
 
-    Signal *signal = connector->getSignal();
-    if (signal == nullptr)
-    {
+    Signal *signal_fwd = connector->getSignalFwd();
+    if (signal_fwd == nullptr)
         is_signal_fwd = false;
-        is_signal_bwd = false;
-        return;
-    }
-
-    if (signal->getDirection() == 1)
-    {
+    else
         is_signal_fwd = true;
-        is_signal_bwd = false;
 
+    Signal *signal_bwd = connector->getSignalBwd();
+    if (signal_bwd == nullptr)
+        is_signal_bwd = false;
+    else
+        is_signal_bwd = true;
+
+    if (is_signal_fwd)
+    {
         TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(bwd_traj_device);
         if (traj_device != nullptr)
         {
             ALSN code = ALSN::NO_CODE;
-            lens_state_t state = signal->getAllLensState();
+            lens_state_t state = signal_fwd->getAllLensState();
             if (!state[CALL_LENS])
             {
                 if (state[RED_LENS])
@@ -86,20 +87,17 @@ void ConnectorALSN::step(double t, double dt)
                     }
                 }
             }
-            traj_device->setSignalInfoFwd(code, 0.0, signal->getLetter());
+            traj_device->setSignalInfoFwd(code, 0.0, signal_fwd->getLetter());
         }
     }
 
-    if (signal->getDirection() == -1)
+    if (is_signal_bwd)
     {
-        is_signal_fwd = false;
-        is_signal_bwd = true;
-
         TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(fwd_traj_device);
         if (traj_device != nullptr)
         {
             ALSN code = ALSN::NO_CODE;
-            lens_state_t state = signal->getAllLensState();
+            lens_state_t state = signal_bwd->getAllLensState();
             if (!state[CALL_LENS])
             {
                 if (state[RED_LENS])
@@ -121,7 +119,7 @@ void ConnectorALSN::step(double t, double dt)
                     }
                 }
             }
-            traj_device->setSignalInfoBwd(code, 0.0, signal->getLetter());
+            traj_device->setSignalInfoBwd(code, 0.0, signal_bwd->getLetter());
         }
     }
 }
