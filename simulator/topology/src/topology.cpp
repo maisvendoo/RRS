@@ -65,14 +65,16 @@ bool Topology::load(QString route_dir)
         QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
 
         std::vector<module_cfg_t> all_cfgs;
-        for (auto cfg_name = cfg_files.begin(); name != cfg_files.end(); ++cfg_name)
+        for (QString cfg_name : cfg_files)
         {
-            if ((cfg_name == nullptr) || (*cfg_name).isEmpty())
+            if (cfg_name.isEmpty())
                 continue;
 
             module_cfg_t mc;
 
-            QString cfg_path = traj_module_path + QDir::separator() + (*cfg_name);
+            QString tmp = cfg_name;
+
+            QString cfg_path = traj_module_path + QDir::separator() + cfg_name;
             if (!mc.cfg.load(cfg_path))
                 continue;
 
