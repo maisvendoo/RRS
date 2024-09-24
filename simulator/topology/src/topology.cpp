@@ -551,30 +551,33 @@ bool Topology::load_topology(QString route_dir)
 //------------------------------------------------------------------------------
 void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 {
-    QString signal_model = "";
-    int signal_dir = 0;
+    QString signal_model_fwd = "";
+    int signal_dir_fwd = 0;
 
-    if (!cfg.getString(secNode, "SignalModelFwd", signal_model))
+    QString signal_model_bwd = "";
+    int signal_dir_bwd = 0;
+
+    if (cfg.getString(secNode, "SignalModelFwd", signal_model_fwd))
     {
-        cfg.getString(secNode, "SignalModelBwd", signal_model);
-        signal_dir = -1;
-    }
-    else
-    {
-        signal_dir = 1;
+        signal_dir_fwd = 1;
     }
 
-    if (!signal_model.isEmpty())
+    if (cfg.getString(secNode, "SignalModelBwd", signal_model_bwd))
+    {
+        signal_dir_bwd = -1;
+    }
+
+    if (signal_dir_fwd != 0)
     {
         QString signal_letter = "";
         cfg.getString(secNode, "SignalLetter", signal_letter);
 
-        if (signal_model.right(4) == "line")
+        if (signal_model_fwd.right(4) == "line")
         {
             LineSignal *line_signal = new LineSignal;
             line_signal->setLetter(signal_letter);
-            line_signal->setDirection(signal_dir);
-            line_signal->setSignalModel(signal_model);
+            line_signal->setDirection(signal_dir_fwd);
+            line_signal->setSignalModel(signal_model_fwd);
             line_signal->setConnector(conn);
 
             conn->setSignalFwd(line_signal);
@@ -584,12 +587,12 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
         }
 
-        if ( (signal_model.right(4) == "entr") || (signal_model.right(4) == "rout") )
+        if ( (signal_model_fwd.right(4) == "entr") || (signal_model_fwd.right(4) == "rout") )
         {
             EnterSignal *enter_signal = new EnterSignal;
             enter_signal->setLetter(signal_letter);
-            enter_signal->setDirection(signal_dir);
-            enter_signal->setSignalModel(signal_model);
+            enter_signal->setDirection(signal_dir_fwd);
+            enter_signal->setSignalModel(signal_model_fwd);
             enter_signal->setConnector(conn);
 
             conn->setSignalFwd(enter_signal);
@@ -599,15 +602,66 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
         }
 
-        if (signal_model.right(4) == "exit")
+        if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
             signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir);
-            signal->setSignalModel(signal_model);
+            signal->setDirection(signal_dir_fwd);
+            signal->setSignalModel(signal_model_fwd);
             signal->setConnector(conn);
 
             conn->setSignalFwd(signal);
+
+            signals_data.exit_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
+    }
+
+    if (signal_dir_bwd != 0)
+    {
+        QString signal_letter = "";
+        cfg.getString(secNode, "SignalLetter", signal_letter);
+
+        if (signal_model_bwd.right(4) == "line")
+        {
+            LineSignal *line_signal = new LineSignal;
+            line_signal->setLetter(signal_letter);
+            line_signal->setDirection(signal_dir_bwd);
+            line_signal->setSignalModel(signal_model_bwd);
+            line_signal->setConnector(conn);
+
+            conn->setSignalBwd(line_signal);
+
+            signals_data.line_signals.push_back(line_signal);
+
+            Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
+        }
+
+        if ( (signal_model_bwd.right(4) == "entr") || (signal_model_bwd.right(4) == "rout") )
+        {
+            EnterSignal *enter_signal = new EnterSignal;
+            enter_signal->setLetter(signal_letter);
+            enter_signal->setDirection(signal_dir_bwd);
+            enter_signal->setSignalModel(signal_model_bwd);
+            enter_signal->setConnector(conn);
+
+            conn->setSignalBwd(enter_signal);
+
+            signals_data.enter_signals.push_back(enter_signal);
+
+            Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
+        }
+
+        if (signal_model_bwd.right(4) == "exit")
+        {
+            ExitSignal *signal = new ExitSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir_bwd);
+            signal->setSignalModel(signal_model_bwd);
+            signal->setConnector(conn);
+
+            conn->setSignalBwd(signal);
 
             signals_data.exit_signals.push_back(signal);
 
