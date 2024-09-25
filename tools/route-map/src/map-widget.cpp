@@ -346,17 +346,24 @@ void MapWidget::drawEnterSignal(Signal *signal)
 
     dvec3 g_signal_pos;
     track_t track;
-    Trajectory *traj = conn->getFwdTraj();
+    Trajectory *traj = Q_NULLPTR;
+
+    if (signal->getDirection() == 1)
+    {
+        traj = conn->getBwdTraj();
+    }
+    else
+    {
+        traj = conn->getFwdTraj();
+    }
 
     if (traj == Q_NULLPTR)
     {
-        traj = conn->getBwdTraj();
+        return;
+    }
 
-        if (traj == Q_NULLPTR)
-        {
-            return;
-        }
-
+    if (signal->getDirection() == 1)
+    {
         track = traj->getLastTrack();
         g_signal_pos = track.end_point;
     }
@@ -366,9 +373,9 @@ void MapWidget::drawEnterSignal(Signal *signal)
         g_signal_pos = track.begin_point;
     }
 
-    double radius = 7.0;
-    double right_shift = 30.0;
-    double label_shift = 8.0;
+    double radius = 1.5;
+    double right_shift = 4.0;
+    double label_shift = 4.0;
     g_signal_pos += track.trav * (right_shift * signal->getDirection());
     dvec3 y_signal_pos = g_signal_pos + track.orth * (2 *radius * signal->getDirection());
     dvec3 r_signal_pos = g_signal_pos - track.orth * (2 *radius * signal->getDirection());
@@ -462,17 +469,24 @@ void MapWidget::drawExitSignal(Signal *signal)
 
     dvec3 g_signal_pos;
     track_t track;
-    Trajectory *traj = conn->getFwdTraj();
+    Trajectory *traj = Q_NULLPTR;
+
+    if (signal->getDirection() == 1)
+    {
+        traj = conn->getBwdTraj();
+    }
+    else
+    {
+        traj = conn->getFwdTraj();
+    }
 
     if (traj == Q_NULLPTR)
     {
-        traj = conn->getBwdTraj();
+        return;
+    }
 
-        if (traj == Q_NULLPTR)
-        {
-            return;
-        }
-
+    if (signal->getDirection() == 1)
+    {
         track = traj->getLastTrack();
         g_signal_pos = track.end_point;
     }
@@ -482,9 +496,9 @@ void MapWidget::drawExitSignal(Signal *signal)
         g_signal_pos = track.begin_point;
     }
 
-    double radius = 7.0;
-    double right_shift = 30.0;
-    double label_shift = 8.0;
+    double radius = 1.5;
+    double right_shift = 4.0;
+    double label_shift = 4.0;
     g_signal_pos += track.trav * (right_shift * signal->getDirection());
     dvec3 y_signal_pos = g_signal_pos + track.orth * (2 *radius * signal->getDirection());
     dvec3 r_signal_pos = g_signal_pos - track.orth * (2 *radius * signal->getDirection());
@@ -578,8 +592,8 @@ void MapWidget::drawLineSignal(Signal *signal)
         g_signal_pos = track.begin_point;
     }
 
-    double radius = 7.0;
-    double right_shift = 30.0;
+    double radius = 1.5;
+    double right_shift = 4.0;
     g_signal_pos += track.trav * (right_shift * signal->getDirection());
     dvec3 y_signal_pos = g_signal_pos + track.orth * (2 *radius * signal->getDirection());
     dvec3 r_signal_pos = g_signal_pos - track.orth * (2 *radius * signal->getDirection());
@@ -621,6 +635,7 @@ void MapWidget::drawLineSignal(Signal *signal)
 
     painter.end();
 }
+
 
 //------------------------------------------------------------------------------
 //
