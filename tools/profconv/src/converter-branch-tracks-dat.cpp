@@ -1045,11 +1045,15 @@ void ZDSimConverter::splitAndNameBranch(zds_branch_track_t* branch_track, const 
                 {
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
                     split.signal_fwd_liter = (*it)->signal_liter;
+                    // Всегда присваиваем сигналам на боковых тип "выходной"
+                    split.signal_fwd_type = "ab_exit";
                 }
                 else
                 {
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
                     split.signal_bwd_liter = (*it)->signal_liter;
+                    // Всегда присваиваем сигналам на боковых тип "выходной"
+                    split.signal_bwd_type = "ab_exit";
                 }
                 split.length_bwd_traj = trajectory_length +
                     length(branch_track->branch_trajectory[i + dir].point - trajectory.points.back().point);
