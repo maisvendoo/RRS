@@ -46,66 +46,7 @@ bool Topology::load(QString route_dir)
         return false;
     }
 
-    // Загрузка модулей для траекторий
-    // Если в /<route>/topology есть папки с названием вида trajectory-*
-    // то будут загружены модули с таким же названием (/modules/trajectory-*.dll)
-    QString topology_path = route_path + QDir::separator() + "topology";
-    QDir topology_dir = QDir(topology_path);
-    QStringList traj_modules_dirs = topology_dir.entryList({"trajectory-*"}, QDir::Dirs);
-
-    // Из папок trajectory-* загружаем все конфиги *.xml
-    std::vector<std::vector<module_cfg_t>> all_modules;
-    for (auto name : traj_modules_dirs)
-    {
-        if (name.isEmpty())
-            continue;
-
-        QString traj_module_path = topology_path + QDir::separator() + name;
-        QDir traj_module_dir = QDir(traj_module_path);
-        QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
-
-        std::vector<module_cfg_t> all_cfgs;
-        for (auto cfg_name : cfg_files)
-        {
-            if (cfg_name.isEmpty())
-                continue;
-
-            module_cfg_t mc;
-
-            QString cfg_path = traj_module_path + QDir::separator() + cfg_name;
-            if (!mc.cfg.load(cfg_path))
-                continue;
-
-            mc.module_name = name;
-
-            // Список траекторий в этом конфиге:
-            // модуль будет подгружен к траекториям,
-            // имя которой указано хотя бы в одном конфиге,
-            // после чего настроен этим же конфигом
-            QDomNode secNode = mc.cfg.getFirstSection("Trajectories");
-            while (!secNode.isNull())
-            {
-                QDomNodeList nodes = secNode.childNodes();
-                for (size_t i = 0; i < nodes.size(); ++i)
-                {
-                    QString node_name = nodes.at(i).nodeName();
-                    if (node_name == "Name")
-                    {
-                        QString traj_name = nodes.at(i).toElement().text();
-                        if (!traj_name.isEmpty())
-                            mc.traj_names.push_back(traj_name);
-                        else
-                            Journal::instance()->error("Empty trajectory name at " + cfg_path);
-                    }
-                }
-                secNode = mc.cfg.getNextSection();
-            }
-
-            all_cfgs.push_back(mc);
-        }
-
-        all_modules.push_back(all_cfgs);
-    }
+    std::vector<std::vector<module_cfg_t>> all_modules = load_topology_configs(route_path);
 
     for (auto it = names.begin(); it != names.end(); ++it)
     {
@@ -573,6 +514,76 @@ QStringList Topology::getTrajNamesList(QString route_dir)
     }
 
     return names_list;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString route_path)
+{
+    // Загрузка модулей для траекторий
+    // Если в /<route>/topology есть папки с названием вида trajectory-*
+    // то будут загружены модули с таким же названием (/modules/trajectory-*.dll)
+    QString topology_path = route_path + QDir::separator() + "topology";
+    QDir topology_dir = QDir(topology_path);
+    QStringList traj_modules_dirs = topology_dir.entryList({"trajectory-*"}, QDir::Dirs);
+
+    // Из папок trajectory-* загружаем все конфиги *.xml
+    std::vector<std::vector<module_cfg_t>> all_modules;
+    for (auto name : traj_modules_dirs)
+    {
+        if (name.isEmpty())
+            continue;
+
+        QString traj_module_path = topology_path + QDir::separator() + name;
+        QDir traj_module_dir = QDir(traj_module_path);
+        QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
+
+        std::vector<module_cfg_t> all_cfgs;
+        for (auto cfg_name : cfg_files)
+        {
+            if (cfg_name.isEmpty())
+                continue;
+
+            module_cfg_t mc;
+
+            QString cfg_path = traj_module_path + QDir::separator() + cfg_name;
+            if (!mc.cfg.load(cfg_path))
+                continue;
+
+            mc.module_name = name;
+
+            // Список траекторий в этом конфиге:
+            // модуль будет подгружен к траекториям,
+            // имя которой указано хотя бы в одном конфиге,
+            // после чего настроен этим же конфигом
+            QDomNode trajNode = mc.cfg.getFirstSection("Trajectory");
+            while (!trajNode.isNull())
+            {
+                QString traj_name;
+                mc.cfg.getString(trajNode, "Name", traj_name);
+
+                if (traj_name.isEmpty())
+                    Journal::instance()->warning("Empty trajectory name at " + cfg_path);
+                else
+                    mc.traj_names.push_back(traj_name);
+
+                trajNode = mc.cfg.getNextSection();
+            }
+
+            if (mc.traj_names.empty())
+                Journal::instance()->warning("No trajectories found in " + cfg_path);
+            else
+                all_cfgs.push_back(mc);
+        }
+
+        if (all_cfgs.empty())
+            Journal::instance()->warning("No trajectories found in files at " + traj_module_path);
+        else
+            all_modules.push_back(all_cfgs);
+    }
+
+    return all_modules;
 }
 
 //------------------------------------------------------------------------------

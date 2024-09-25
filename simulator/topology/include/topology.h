@@ -99,6 +99,9 @@ private:
     /// Получить список имен всех имеющихся траекторий
     QStringList getTrajNamesList(QString route_dir);
 
+    /// Загрузка конфиг-файлов модулей путевой инфраструктуры
+    std::vector<std::vector<module_cfg_t>> load_topology_configs(QString route_path);
+
     /// Загрузка топологии
     bool load_topology(QString route_dir);
 

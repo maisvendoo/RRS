@@ -240,14 +240,7 @@ void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::load_config(CfgReader &cfg)
 {
-    QDomNode ALSN_node = cfg.getFirstSection("ALSN");
-    while (!ALSN_node.isNull())
-    {
-        if (cfg.getDouble(ALSN_node, "Frequency", frequency))
-            break;
-
-        ALSN_node = cfg.getNextSection();
-    }
+    cfg.getDouble("ALSN", "Frequency", frequency);
 }
 
 GET_TRAJECTORY_DEVICE(TrajectoryALSN)
