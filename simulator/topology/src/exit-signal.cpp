@@ -40,6 +40,12 @@ ExitSignal::ExitSignal(QObject *parent) : Signal(parent)
 
     allow_relay->read_config("combine-relay");
     allow_relay->setInitContactState(AR_OPEN, false);
+
+    side_signal_relay->read_config("combine-relay");
+    side_signal_relay->setInitContactState(SSR_GREEN, true);
+    side_signal_relay->setInitContactState(SSR_YELLOW, false);
+
+    connect(blink_timer, &Timer::process, this, &ExitSignal::slotBlinkTimer);
 }
 
 //------------------------------------------------------------------------------
@@ -75,6 +81,10 @@ void ExitSignal::step(double t, double dt)
     fwd_way_relay->step(t, dt);
 
     allow_relay->step(t, dt);
+
+    side_signal_relay->step(t, dt);
+
+    blink_timer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -135,10 +145,12 @@ void ExitSignal::lens_control()
     lens_state[RED_LENS] = semaphore_signal_relay->getContactState(SRS_N_RED);
 
     lens_state[YELLOW_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
-                              semaphore_signal_relay->getPlusContactState(SRS_PLUS_YELLOW);
+                              (semaphore_signal_relay->getPlusContactState(SRS_PLUS_YELLOW) ||
+                              (blink_contact && side_signal_relay->getContactState(SSR_YELLOW)));
 
     lens_state[GREEN_LENS] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
-                             semaphore_signal_relay->getMinusContactState(SRS_MINUS_GREEN);
+                             semaphore_signal_relay->getMinusContactState(SRS_MINUS_GREEN)&&
+                             side_signal_relay->getContactState(SSR_GREEN);
 
     if (lens_state != old_lens_state)
     {
@@ -528,6 +540,16 @@ void ExitSignal::relay_control()
     {
         emit sendLineVoltage(U_line_prev);
     }
+
+    side_signal_relay->setVoltage(U_side);
+    if (side_signal_relay->getContactState(SSR_YELLOW))
+    {
+        blink_timer->start();
+    }
+    else
+    {
+        blink_timer->stop();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -550,4 +572,12 @@ void ExitSignal::slotCloseTimer()
     close_timer->stop();
 
     Journal::instance()->info("Released close button for signal " + this->getLetter());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::slotBlinkTimer()
+{
+    blink_contact = !blink_contact;
 }
