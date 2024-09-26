@@ -28,6 +28,11 @@ public:
     /// Сигнал состояния звука работы
     virtual float getSoundSignal(size_t idx = 0) const;
 
+    double getVelocityKmh() const
+    {
+        return velocity * Physics::kmh;
+    }
+
 private:
 
     /// Угловая скорость вращения колесной пары
@@ -59,6 +64,8 @@ private:
     float shaft_pos;
 
     double freq_coeff;
+
+    double velocity = 0.0;
 
     void preStep(state_vector_t &Y, double t);
 

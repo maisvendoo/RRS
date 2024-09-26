@@ -1,4 +1,5 @@
 #include    "vl60pk.h"
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -138,9 +139,15 @@ void VL60pk::keyProcess()
 
     // Нажатие РБ-1
     if (getKeyState(KEY_Z))
+    {
         rb[RB_1].set();
+        Journal::instance()->info("RB-1 pressed");
+    }
     else
+    {
         rb[RB_1].reset();
+        //Journal::instance()->info("RB-1 released");
+    }
 
     // Нажатие РБС
 
@@ -181,5 +188,14 @@ void VL60pk::keyProcess()
             epb_switch.set();
         else
             epb_switch.reset();
+    }
+
+    // Включение/выключение ЭПK
+    if (getKeyState(KEY_N))
+    {
+        if (isShift())
+            key_epk.set();
+        else
+            key_epk.reset();
     }
 }

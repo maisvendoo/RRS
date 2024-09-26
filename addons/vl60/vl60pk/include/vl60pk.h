@@ -321,6 +321,10 @@ private:
     Timer   *autoStartTimer;
     size_t  start_count;
 
+    AutoTrainStop *epk = Q_NULLPTR;
+    SafetyDevice *safety_device = Q_NULLPTR;
+
+    Trigger key_epk;
 
     /// Общая инициализация локомотива
     void initialization();

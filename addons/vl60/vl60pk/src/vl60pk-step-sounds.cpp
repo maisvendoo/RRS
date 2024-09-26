@@ -131,4 +131,9 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     // Тумблер электропневматического тормоза
     analogSignal[SOUND_TUMBLER_EPB_ON] = epb_switch.getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_EPB_OFF] = epb_switch.getSoundSignal(Trigger::OFF_SOUND);
+
+    // ЭПК
+    analogSignal[SOUND_EPK_ON] = key_epk.getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_EPK_OFF] = key_epk.getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_EPK] = epk->getSoundSignal();
 }
