@@ -1,5 +1,4 @@
 #include    <alsn-ukbm.h>
-#include    <ALSN-struct.h>
 
 //------------------------------------------------------------------------------
 //
@@ -51,6 +50,9 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
         is_red.reset();
         return;
     }
+
+    if (code_alsn < old_code_alsn)
+        epk_state.reset();
 
     // Включаем ламбы на ЛС в соответствии с кодом АЛСН
     alsn_process(code_alsn);
@@ -152,7 +154,8 @@ void SafetyDevice::alsn_process(int code_alsn)
             }
             else
             {
-                lamp_on(WHITE_LAMP);
+                if (!is_red.getState())
+                    lamp_on(WHITE_LAMP);
             }
 
             break;

@@ -2,6 +2,7 @@
 #define     ALSN_UKBM_H
 
 #include    <device.h>
+#include    <ALSN-struct.h>
 
 enum
 {
