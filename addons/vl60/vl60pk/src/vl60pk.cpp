@@ -19,29 +19,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VL60pk::VL60pk() : Vehicle ()
-  , U_bat(55.0)
-  , pant1_pos(0.0)
-  , pant2_pos(0.0)
-  , gv_pos(0.0)
-  , gv_return(false)
-  , charge_press(0.0)
-  , ip(2.73)
-  , coupling_module_name("sa3")
-  , coupling_config_name("sa3")
-  , brake_crane_module_name("krm395")
-  , brake_crane_config_name("krm395")
-  , loco_crane_module_name("kvt254")
-  , loco_crane_config_name("kvt254")
-  , airdist_module_name("vr292")
-  , airdist_config_name("vr292")
-  , electro_airdist_module_name("evr305")
-  , electro_airdist_config_name("evr305")
-  , reg(nullptr)
-  , coupling_fwd(nullptr)
-  , coupling_bwd(nullptr)
-  , oper_rod_fwd(nullptr)
-  , oper_rod_bwd(nullptr)
+VL60pk::VL60pk() : Vehicle ()  
 {
 
 }
