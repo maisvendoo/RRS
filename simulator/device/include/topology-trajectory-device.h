@@ -25,12 +25,13 @@ public:
     virtual ~TrajectoryDevice();
 
     void setTrajectory(Trajectory *traj);
+    Trajectory *getTrajectory() const;
 
-    void setFwdConnectorDevice(ConnectorDevice *conn_device);
-    void setBwdConnectorDevice(ConnectorDevice *conn_device);
+    virtual void setFwdConnectorDevice(ConnectorDevice *conn_device);
+    virtual void setBwdConnectorDevice(ConnectorDevice *conn_device);
 
-    ConnectorDevice *getFwdConnectorDevice() const;
-    ConnectorDevice *getBwdConnectorDevice() const;
+    virtual ConnectorDevice *getFwdConnectorDevice() const;
+    virtual ConnectorDevice *getBwdConnectorDevice() const;
 
     /// Set Device for next step
     void clearLinks();

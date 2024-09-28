@@ -32,6 +32,14 @@ void TrajectoryDevice::setTrajectory(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+Trajectory *TrajectoryDevice::getTrajectory() const
+{
+    return trajectory;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrajectoryDevice::setFwdConnectorDevice(ConnectorDevice *conn_device)
 {
     fwd_conn_device = conn_device;

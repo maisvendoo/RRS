@@ -23,6 +23,7 @@ public:
     virtual ~ConnectorDevice();
 
     void setConnector(Connector *conn);
+    Connector *getConnector() const;
 
     virtual void setFwdTrajectoryDevice(TrajectoryDevice *traj_device);
     virtual void setBwdTrajectoryDevice(TrajectoryDevice *traj_device);
