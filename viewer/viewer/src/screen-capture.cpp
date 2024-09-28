@@ -17,6 +17,24 @@ bool ScreenCapture::handle(const osgGA::GUIEventAdapter &ea,
 {
     switch (ea.getEventType())
     {
+/* Вроде не нужно, после отключения дефолтного поведения
+ * непрерывная запись больше не включалась
+    case osgGA::GUIEventAdapter::FRAME:
+    {
+        // Отключаем непрерывное создание скриншотов, если оно вдруг включилось
+        if (getFramesToCapture() < 0)
+        {
+            setFramesToCapture(0);
+
+            osgViewer::View* view = dynamic_cast<osgViewer::View*>(&aa);
+            if (!view) return false;
+            osgViewer::ViewerBase* viewer = view->getViewerBase();
+            if (!viewer) return false;
+
+            removeCallbackFromViewer(*viewer);
+        }
+    }
+*/
     case osgGA::GUIEventAdapter::KEYDOWN:
     {
         int key = ea.getUnmodifiedKey();
@@ -69,14 +87,27 @@ bool ScreenCapture::handle(const osgGA::GUIEventAdapter &ea,
             break;
         default: break;
         }
+
+        if (is_Shift_L || is_Shift_R || is_Ctrl_L || is_Ctrl_R || is_Alt_L || is_Alt_R)
+            return false;
+
+        if (ea.getKey() == _keyEventTakeScreenShot)
+        {
+            osgViewer::View* view = dynamic_cast<osgViewer::View*>(&aa);
+            if (!view) return false;
+            osgViewer::ViewerBase* viewer = view->getViewerBase();
+            if (!viewer) return false;
+
+            setFramesToCapture(1);
+            addCallbackToViewer(*viewer);
+            return true;
+        }
     }
     default: break;
     }
 
-    if (is_Shift_L || is_Shift_R || is_Ctrl_L || is_Ctrl_R || is_Alt_L || is_Alt_R)
-        return false;
-
-    return osgViewer::ScreenCaptureHandler::handle(ea, aa);
+    //return osgViewer::ScreenCaptureHandler::handle(ea, aa);
+    return false;
 }
 
 //------------------------------------------------------------------------------
