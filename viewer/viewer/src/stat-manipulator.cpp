@@ -45,10 +45,10 @@ osg::Matrixd StaticManipulator::getInverseMatrix() const
 
     is_right ? dir = 1 : dir = -1;
 
-    osg::Vec3 shift = init_pos.right * dist * dir;
-    shift += osg::Vec3(0.0, 0.0, settings.stat_cam_height);
+    osg::Vec3d shift = init_pos.right * dist * dir;
+    shift += osg::Vec3d(0.0, 0.0, settings.stat_cam_height);
 
-    osg::Matrix invMatrix = osg::Matrix::lookAt(init_pos.viewer_pos + shift, cp.position, osg::Z_AXIS);
+    osg::Matrix invMatrix = osg::Matrix::lookAt(init_pos.viewer_pos + shift, cp.position, osg::Vec3d(osg::Z_AXIS));
 
     return invMatrix;
 }
