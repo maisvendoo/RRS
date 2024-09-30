@@ -16,6 +16,8 @@ void VL60k::stepBrakesEquipment(double t, double dt)
     anglecock_bp_bwd->setHoseFlow(hose_bp_bwd->getFlow());
     BP_flow += anglecock_bp_bwd->getFlowToPipe();
 
+    BP_flow += epk->getBPflow();
+
     brakepipe->setFlow(BP_flow);
     brakepipe->step(t, dt);
 

@@ -118,13 +118,13 @@ void VL60k::stepTractionControl(double t, double dt)
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
     gauge_KV_motors->step(t, dt);
 
-    motor[TED1]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED1].getState()));
-    motor[TED2]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED2].getState()));
-    motor[TED3]->setU(vu[VU1]->getU_out() * static_cast<double>(line_contactor[TED3].getState()));
+    motor[TED1]->setU(vu[VU1]->getU_out() * static_cast<double>(linear_contactor[TED1]->getContactState(LC_TED)));
+    motor[TED2]->setU(vu[VU1]->getU_out() * static_cast<double>(linear_contactor[TED2]->getContactState(LC_TED)));
+    motor[TED3]->setU(vu[VU1]->getU_out() * static_cast<double>(linear_contactor[TED3]->getContactState(LC_TED)));
 
-    motor[TED4]->setU(vu[VU2]->getU_out() * static_cast<double>(line_contactor[TED4].getState()));
-    motor[TED5]->setU(vu[VU2]->getU_out() * static_cast<double>(line_contactor[TED5].getState()));
-    motor[TED6]->setU(vu[VU2]->getU_out() * static_cast<double>(line_contactor[TED6].getState()));
+    motor[TED4]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED4]->getContactState(LC_TED)));
+    motor[TED5]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED5]->getContactState(LC_TED)));
+    motor[TED6]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED6]->getContactState(LC_TED)));
 
     km_state_t km_state = controller->getState();
 
@@ -168,11 +168,24 @@ void VL60k::stepLineContactors(double t, double dt)
         motor_fans_state &= mf->isReady();
     }
 
-    bool lk_state = !km_state.pos_state[POS_BV] &&
-                    !km_state.pos_state[POS_ZERO] &&
-                    motor_fans_state && main_controller->isReady();
+    // Подготовка цепей линейных контакторов
 
-    lineContactorsControl(lk_state);
+    // Состояние провода Н6
+    bool is_BP_released = brakepipe->getPressure() > 0.3;
+
+    bool is_H6_ON = cu_tumbler.getState() && key_epk.getState() &&
+               is_BP_released &&
+               (km_state.revers_ref_state != 0) &&
+               (!km_state.pos_state[POS_ZERO]) && motor_fans_state;
+
+    for (auto lc : linear_contactor)
+    {
+        bool is_LC_ON = is_H6_ON &&
+                   (main_controller->isZeroPosition() || lc->getContactState(LC_SELF));
+
+        lc->setVoltage(U_bat * static_cast<double>(is_LC_ON));
+        lc->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -196,12 +209,12 @@ float VL60k::isLineContactorsOff()
 {
     bool state = true;
 
-    for (size_t i = 0; i < line_contactor.size(); ++i)
+    for (size_t i = 0; i < linear_contactor.size(); ++i)
     {
-        state = state && line_contactor[i].getState();
+        state = state && linear_contactor[i]->getContactState(LC_TED_LAMP);
     }
 
-    return 1.0f - static_cast<float>(state);
+    return static_cast<float>(state);
 }
 
 //------------------------------------------------------------------------------

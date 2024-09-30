@@ -1091,7 +1091,7 @@
 
 	<!-- Ключ ЭПК вкл. -->
 	<Sound>
-		<SignalID>271</SignalID>
+		<SignalID>297</SignalID>
 		<Filename>epk_vkl.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -1103,7 +1103,7 @@
 
 	<!-- Ключ ЭПК выкл. -->
 	<Sound>
-		<SignalID>272</SignalID>
+		<SignalID>298</SignalID>
 		<Filename>epk_vkl.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -1114,7 +1114,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>273</SignalID>
+		<SignalID>299</SignalID>
 		<Filename>epk.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>

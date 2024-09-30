@@ -8,36 +8,23 @@ void VL60k::stepSafetyDevices(double t, double dt)
     coil_ALSN_fwd->step(t, dt);
     coil_ALSN_bwd->step(t, dt);
 
-    analogSignal[LS_W] = 0.0f;
-    analogSignal[LS_YK] = 0.0f;
-    analogSignal[LS_R] = 0.0f;
-    analogSignal[LS_Y] = 0.0f;
-    analogSignal[LS_G] = 0.0f;
+    analogSignal[LS_W] = safety_device->getWhiteLamp();
+    analogSignal[LS_YK] = safety_device->getRedYellowLamp();
+    analogSignal[LS_R] = safety_device->getRedLamp();
+    analogSignal[LS_Y] = safety_device->getYellowLamp();
+    analogSignal[LS_G] = safety_device->getGreenLamp();
 
-    switch (coil_ALSN_fwd->getCode())
-    {
-    case ALSN::NO_CODE:
 
-        analogSignal[LS_W] = 1.0f;
+    epk->setFLpressure(main_reservoir->getPressure());
+    epk->setBPpressure(brakepipe->getPressure());
+    epk->setPowered(safety_device->getEPKstate());
+    epk->setKeyOn(key_epk.getState());
+    epk->step(t, dt);
 
-        break;
-
-    case ALSN::RED_YELLOW:
-
-        analogSignal[LS_YK] = 1.0f;
-
-        break;
-
-    case ALSN::YELLOW:
-
-        analogSignal[LS_Y] = 1.0f;
-
-        break;
-
-    case ALSN::GREEN:
-
-        analogSignal[LS_G] = 1.0f;
-
-        break;
-    }
+    safety_device->setAlsnCode(coil_ALSN_fwd->getCode());
+    safety_device->setRBstate(rb[RB_1].getState());
+    safety_device->setRBSstate(rb[RBS].getState());
+    safety_device->setKeyEPK(epk->isKeyOn());
+    safety_device->setVelocity(speed_meter->getVelocity());
+    safety_device->step(t, dt);
 }

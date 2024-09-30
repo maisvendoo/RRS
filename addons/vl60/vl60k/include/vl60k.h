@@ -43,49 +43,49 @@ private:
         MAIN_RESERVOIR_VOLUME = 1200
     };
 
-    float   pant1_pos;
-    float   pant2_pos;
-    float   gv_pos;
-    bool    gv_return;
+    float   pant1_pos = 0.0;
+    float   pant2_pos = 0.0;
+    float   gv_pos = 0.0;
+    bool    gv_return = false;
 
     /// Зарядное давление
-    double  charge_press;
+    double  charge_press = 0.0;
 
     /// Передаточное число редуктора
-    double  ip;
+    double  ip = 2.73;
 
     /// Подключение рукавов магистрали тормозных цилиндров к импульсной магистрали
-    bool bc_hose_to_impulse_line;
+    bool bc_hose_to_impulse_line = true;
 
     /// Имя модуля сцепного устройства
-    QString coupling_module_name;
+    QString coupling_module_name = "sa3";
     /// Имя конфига сцепного устройства
-    QString coupling_config_name;
+    QString coupling_config_name = "sa3";
     /// Имя модуля поездного крана
-    QString brake_crane_module_name;
+    QString brake_crane_module_name = "krm395";
     /// Имя конфига поездного крана
-    QString brake_crane_config_name;
+    QString brake_crane_config_name = "krm395";
     /// Имя модуля локомотивного крана
-    QString loco_crane_module_name;
+    QString loco_crane_module_name = "kvt254";
     /// Имя конфига локомотивного крана
-    QString loco_crane_config_name;
+    QString loco_crane_config_name = "kvt254";
     /// Имя модуля воздухораспределителя
-    QString airdist_module_name;
+    QString airdist_module_name = "vr483";
     /// Имя конфига воздухорапределителя
-    QString airdist_config_name;
+    QString airdist_config_name = "vr483";
 
     /// Регистратор, для записи параметров
-    Registrator *reg;
+    Registrator *reg = nullptr;
 
     /// Сцепка спереди
-    Coupling *coupling_fwd;
+    Coupling *coupling_fwd = Q_NULLPTR;
     /// Сцепка сзади
-    Coupling *coupling_bwd;
+    Coupling *coupling_bwd = Q_NULLPTR;
 
     /// Расцепной рычаг спереди
-    OperatingRod *oper_rod_fwd;
+    OperatingRod *oper_rod_fwd = Q_NULLPTR;
     /// Расцепной рычаг сзади
-    OperatingRod *oper_rod_bwd;
+    OperatingRod *oper_rod_bwd = Q_NULLPTR;
 
     // Дальний ряд тумблеров приборной панели машиниста
 //    /// Тригер тумблера "Прожектор яркий"
@@ -149,76 +149,76 @@ private:
     std::array<Pantograph *, NUM_PANTOGRAPHS>   pantographs;
 
     /// Главный выключатель (ГВ)
-    ProtectiveDevice    *main_switch;
+    ProtectiveDevice    *main_switch = Q_NULLPTR;
 
     /// Механизм киловольтметра КС
-    Oscillator      *gauge_KV_ks;
+    Oscillator      *gauge_KV_ks = Q_NULLPTR;
 
     /// Тяговый трансформатор
-    TracTransformer *trac_trans;
+    TracTransformer *trac_trans = Q_NULLPTR;
 
     /// Асинхронный расщепитель фаз
-    PhaseSplitter   *phase_spliter;
+    PhaseSplitter   *phase_spliter = Q_NULLPTR;
 
     /// Мотор-вентиляторы
     std::array<ACMotorFan *, NUM_MOTOR_FANS> motor_fans;
 
     /// Мотор-компрессор
-    ACMotorCompressor *motor_compressor;
+    ACMotorCompressor *motor_compressor = Q_NULLPTR;
 
     /// Регулятор давления в ГР
-    PressureRegulator *press_reg;
+    PressureRegulator *press_reg = Q_NULLPTR;
 
     /// Главный резервуар
-    Reservoir   *main_reservoir;
+    Reservoir   *main_reservoir = Q_NULLPTR;
 
     /// Концевой кран питательной магистрали спереди
-    PneumoAngleCock *anglecock_fl_fwd;
+    PneumoAngleCock *anglecock_fl_fwd = Q_NULLPTR;
 
     /// Концевой кран питательной магистрали сзади
-    PneumoAngleCock *anglecock_fl_bwd;
+    PneumoAngleCock *anglecock_fl_bwd = Q_NULLPTR;
 
     /// Рукав питательной  магистрали спереди
-    PneumoHose      *hose_fl_fwd;
+    PneumoHose      *hose_fl_fwd = Q_NULLPTR;
 
     /// Рукав питательной  магистрали сзади
-    PneumoHose      *hose_fl_bwd;
+    PneumoHose      *hose_fl_bwd = Q_NULLPTR;
 
     /// Блокировочное устройство УБТ усл.№367м
-    BrakeLock   *brake_lock;
+    BrakeLock   *brake_lock = Q_NULLPTR;
 
     /// Поездной кран машиниста усл.№395
-    BrakeCrane  *brake_crane;
+    BrakeCrane  *brake_crane = Q_NULLPTR;
 
     /// Кран впомогательного тормоза усл.№254
-    LocoCrane   *loco_crane;
+    LocoCrane   *loco_crane = Q_NULLPTR;
 
     /// Тормозная магистраль
-    Reservoir   *brakepipe;
+    Reservoir   *brakepipe = Q_NULLPTR;
 
     /// Воздухораспределитель
-    AirDistributor  *air_dist;
+    AirDistributor  *air_dist = Q_NULLPTR;
 
     /// Запасный резервуар
-    Reservoir   *supply_reservoir;
+    Reservoir   *supply_reservoir = Q_NULLPTR;
 
     /// Концевой кран тормозной магистрали спереди
-    PneumoAngleCock *anglecock_bp_fwd;
+    PneumoAngleCock *anglecock_bp_fwd = Q_NULLPTR;
 
     /// Концевой кран тормозной магистрали сзади
-    PneumoAngleCock *anglecock_bp_bwd;
+    PneumoAngleCock *anglecock_bp_bwd = Q_NULLPTR;
 
     /// Рукав тормозной магистрали спереди
-    PneumoHose  *hose_bp_fwd;
+    PneumoHose  *hose_bp_fwd = Q_NULLPTR;
 
     /// Рукав тормозной магистрали сзади
-    PneumoHose  *hose_bp_bwd;
+    PneumoHose  *hose_bp_bwd = Q_NULLPTR;
 
     /// Импульсная магистраль с ложным тормозным цилиндром
-    Reservoir  *impulse_line;
+    Reservoir  *impulse_line = Q_NULLPTR;
 
     /// Тройник подключения тележек к магистрали тормозных цилиндров
-    PneumoSplitter  *bc_splitter;
+    PneumoSplitter  *bc_splitter = Q_NULLPTR;
 
     enum
     {
@@ -232,22 +232,22 @@ private:
     std::array<BrakeMech *, NUM_TROLLEYS> brake_mech;
 
     /// Концевой кран магистрали тормозных цилиндров спереди
-    PneumoAngleCock  *anglecock_bc_fwd;
+    PneumoAngleCock  *anglecock_bc_fwd = Q_NULLPTR;
 
     /// Концевой кран магистрали тормозных цилиндров сзади
-    PneumoAngleCock  *anglecock_bc_bwd;
+    PneumoAngleCock  *anglecock_bc_bwd = Q_NULLPTR;
 
     /// Рукав магистрали тормозных цилиндров спереди
-    PneumoHose  *hose_bc_fwd;
+    PneumoHose  *hose_bc_fwd = Q_NULLPTR;
 
     /// Рукав магистрали тормозных цилиндров сзади
-    PneumoHose  *hose_bc_bwd;
+    PneumoHose  *hose_bc_bwd = Q_NULLPTR;
 
     /// Контроллер машиниста
-    ControllerKME_60_044    *controller;
+    ControllerKME_60_044    *controller = Q_NULLPTR;
 
     /// Главный контроллер (переключение обмоток тягового трансформатора)
-    EKG_8G                  *main_controller;
+    EKG_8G                  *main_controller = Q_NULLPTR;
 
     enum
     {
@@ -260,7 +260,7 @@ private:
     std::array<Rectifier *, NUM_VU> vu;
 
     /// Механизм киловольтметра ТЭД
-    Oscillator  *gauge_KV_motors;
+    Oscillator  *gauge_KV_motors = Q_NULLPTR;
 
     enum
     {
@@ -283,28 +283,49 @@ private:
     std::array<Trigger, NUM_MOTORS> line_contactor;
 
     /// Ограничения скорости на путевой инфраструктуре для кабины А
-    SpeedMap    *speedmap_fwd;
+    SpeedMap    *speedmap_fwd = Q_NULLPTR;
     /// Ограничения скорости на путевой инфраструктуре для кабины Б
-    SpeedMap    *speedmap_bwd;
+    SpeedMap    *speedmap_bwd = Q_NULLPTR;
 
     /// Приёмная катушка АЛСН для кабины А
-    CoilALSN    *coil_ALSN_fwd;
+    CoilALSN    *coil_ALSN_fwd = Q_NULLPTR;
     /// Приёмная катушка АЛСН для кабины Б
-    CoilALSN    *coil_ALSN_bwd;
+    CoilALSN    *coil_ALSN_bwd = Q_NULLPTR;
 
     /// Локомотивный скоростемер
-    SL2M    *speed_meter;
+    SL2M    *speed_meter = Q_NULLPTR;
 
     /// Свисток и тифон
-    TrainHorn   *horn;
+    TrainHorn   *horn = Q_NULLPTR;
 
     /// Система подачи песка
-    SandingSystem   *sand_system;
+    SandingSystem   *sand_system = Q_NULLPTR;
 
     std::vector<Trigger *> triggers;
-    Timer   *autoStartTimer;
-    size_t  start_count;
+    Timer   *autoStartTimer = Q_NULLPTR;
+    size_t  start_count = 0;
 
+    /// Устройство безопасности УКБМ
+    SafetyDevice *safety_device = new SafetyDevice;
+
+    /// Электропневматический клапан автостопа
+    AutoTrainStop *epk = Q_NULLPTR;
+
+    /// Ключ ЭПК
+    Trigger key_epk;
+
+    enum
+    {
+        NUM_LC_CONTACTS = 3,
+        LC_SELF = 0,
+        LC_TED = 1,
+        LC_TED_LAMP = 2
+    };
+
+    /// Линейные контакторы ТЭД
+    std::array<Relay *, NUM_MOTORS> linear_contactor;
+
+    double U_bat = 55.0;
 
     /// Общая инициализация локомотива
     void initialization();
