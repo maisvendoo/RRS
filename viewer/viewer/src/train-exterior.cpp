@@ -108,14 +108,16 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 break;
 
             double curr_time = viewer->getFrameStamp()->getReferenceTime();
-            ref_time += curr_time - prev_time;
+            double delta_time = curr_time - prev_time;
             prev_time = curr_time;
+
+            ref_time += delta_time;
 
             processSharedData(ref_time);
 
             moveTrain(ref_time, update_data);
 
-            moveCamera(viewer, curr_time - prev_time);
+            moveCamera(viewer, delta_time);
 
             break;
         }
@@ -338,35 +340,35 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
     for (size_t i = 0; i < vehicles_ext.size(); i++)
     {
         // Vehicle cartesian position and attitude calculation
-        vehicles_ext[i].position = osg::Vec3(
+        vehicles_ext[i].position = osg::Vec3d(
             k * sim_data[old_data].vehicles[i].position_x + t * sim_data[new_data].vehicles[i].position_x,
             k * sim_data[old_data].vehicles[i].position_y + t * sim_data[new_data].vehicles[i].position_y,
             k * sim_data[old_data].vehicles[i].position_z + t * sim_data[new_data].vehicles[i].position_z);
 
-        vehicles_ext[i].orth = osg::Vec3(
+        vehicles_ext[i].orth = osg::Vec3d(
             k * sim_data[old_data].vehicles[i].orth_x + t * sim_data[new_data].vehicles[i].orth_x,
             k * sim_data[old_data].vehicles[i].orth_y + t * sim_data[new_data].vehicles[i].orth_y,
             k * sim_data[old_data].vehicles[i].orth_z + t * sim_data[new_data].vehicles[i].orth_z);
 
-        vehicles_ext[i].up = osg::Vec3(
+        vehicles_ext[i].up = osg::Vec3d(
             k * sim_data[old_data].vehicles[i].up_x + t * sim_data[new_data].vehicles[i].up_x,
             k * sim_data[old_data].vehicles[i].up_y + t * sim_data[new_data].vehicles[i].up_y,
             k * sim_data[old_data].vehicles[i].up_z + t * sim_data[new_data].vehicles[i].up_z);
 
         vehicles_ext[i].right = vehicles_ext[i].orth ^ vehicles_ext[i].up;
 
-        vehicles_ext[i].attitude = osg::Vec3(
-            asinf(vehicles_ext[i].orth.z()),
-            0.0f,
+        vehicles_ext[i].attitude = osg::Vec3d(
+            asin(vehicles_ext[i].orth.z()),
+            0.0,
             (vehicles_ext[i].orth.x() > 0.0) ? acos(vehicles_ext[i].orth.y()) : - acos(vehicles_ext[i].orth.y()) );
 
         vehicles_ext[i].orientation = update_data[new_data].vehicles[i].orientation;
 
         // Apply vehicle body matrix transform
-        osg::Matrix  matrix;
-        matrix *= osg::Matrixf::rotate(vehicles_ext[i].attitude.x(), osg::Vec3(1.0f, 0.0f, 0.0f));
-        matrix *= osg::Matrixf::rotate(-vehicles_ext[i].attitude.z(), osg::Vec3(0.0f, 0.0f, 1.0f));
-        matrix *= osg::Matrixf::translate(vehicles_ext[i].position);
+        osg::Matrixd  matrix;
+        matrix *= osg::Matrixd::rotate(vehicles_ext[i].attitude.x(), osg::Vec3d(1.0, 0.0, 0.0));
+        matrix *= osg::Matrixd::rotate(-vehicles_ext[i].attitude.z(), osg::Vec3d(0.0, 0.0, 1.0));
+        matrix *= osg::Matrixd::translate(vehicles_ext[i].position);
 
         vehicles_ext[i].transform->setMatrix(matrix);
 
@@ -385,10 +387,10 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
 
         for (auto sound_id : vehicles_ext[i].sounds_id)
         {
-            osg::Vec3 pos = vehicles_ext[i].position +
-                            vehicles_ext[i].right * sound_manager->getLocalPositionX(sound_id) +
-                            vehicles_ext[i].orth * sound_manager->getLocalPositionY(sound_id) +
-                            vehicles_ext[i].up * sound_manager->getLocalPositionZ(sound_id);
+            osg::Vec3d pos = vehicles_ext[i].position +
+                             vehicles_ext[i].right * sound_manager->getLocalPositionX(sound_id) +
+                             vehicles_ext[i].orth * sound_manager->getLocalPositionY(sound_id) +
+                             vehicles_ext[i].up * sound_manager->getLocalPositionZ(sound_id);
             sound_manager->setPosition(sound_id, pos.x(), pos.y(), pos.z());
             sound_manager->setVelocity(sound_id, velocity.x(), velocity.y(), velocity.z());
 
@@ -542,7 +544,7 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer, float delta_tim
     cp.driver_pos = vehicles_ext[static_cast<size_t>(cur_vehicle)].driver_pos;
     cp.is_orient_bwd = (vehicles_ext[static_cast<size_t>(cur_vehicle)].orientation < 0);
 
-    cp.attitude.x() = - osg::PIf / 2.0f - cp.attitude.x();
+    cp.attitude.x() = - osg::PI_2 - cp.attitude.x();
 
     // Положение для камер сопровождения сбоку привязываем только к первой ПЕ
     // при этом игнорируем оринтацию ПЕ - переворачиваем её вектор обратно

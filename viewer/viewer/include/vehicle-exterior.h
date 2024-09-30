@@ -12,13 +12,13 @@ struct vehicle_exterior_t
 {
     osg::ref_ptr<osg::MatrixTransform> transform;
     osg::ref_ptr<osg::Node> cabine;
-    osg::Vec3   position;
-    osg::Vec3   orth;
-    osg::Vec3   up;
-    osg::Vec3   right;
-    osg::Vec3   attitude;
+    osg::Vec3d  position;
+    osg::Vec3d  orth;
+    osg::Vec3d  up;
+    osg::Vec3d  right;
+    osg::Vec3d  attitude;
     int         orientation;
-    osg::Vec3   driver_pos;
+    osg::Vec3d  driver_pos;
 
     animations_t *anims;
     displays_t   *displays;
@@ -27,12 +27,12 @@ struct vehicle_exterior_t
     vehicle_exterior_t()
         : transform(new osg::MatrixTransform())
         , cabine(nullptr)
-        , position(osg::Vec3(0.0, 0.0, 0.0))
-        , orth(osg::Vec3(0.0, 0.0, 0.0))
-        , up(osg::Vec3(0.0, 0.0, 1.0))
-        , attitude(osg::Vec3(0.0, 0.0, 0.0))
+        , position(osg::Vec3d(0.0, 0.0, 0.0))
+        , orth(osg::Vec3d(0.0f, 0.0f, 0.0f))
+        , up(osg::Vec3d(0.0f, 0.0f, 1.0f))
+        , attitude(osg::Vec3d(0.0f, 0.0f, 0.0f))
         , orientation(1)
-        , driver_pos(osg::Vec3(0.0, 0.0, 0.0))
+        , driver_pos(osg::Vec3d(0.0f, 0.0f, 0.0f))
         , anims(new animations_t())
         , displays(new displays_t())
     {

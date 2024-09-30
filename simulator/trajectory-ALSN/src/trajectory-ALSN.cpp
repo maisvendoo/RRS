@@ -2,6 +2,7 @@
 #include    "ALSN-coil.h"
 #include    "topology-connector-device.h"
 #include    "trajectory.h"
+#include    "connector.h"
 
 //------------------------------------------------------------------------------
 //
@@ -171,19 +172,20 @@ void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
 
     ALSN code_to_next = code;
 
+    // Если траектория занята, дальше код не проходит
+    if (trajectory->isBusy())
+        code_to_next = ALSN::NO_CODE;
+
     // Переход к рельсовым цепям предыдущей траектории
     // Модуль коннектора к предыдущей траектории
     auto conn_device = getBwdConnectorDevice();
     if (conn_device == nullptr)
         return;
 
-    // Проверяем что коннектор не установлен на взрез стрелки
-    TrajectoryDevice *traj_device = conn_device->getFwdTrajectoryDevice();
-    if (traj_device != this)
-    {
-        // Если взрез, сбрасываем код
-        ALSN code_to_next = ALSN::NO_CODE;
-    }
+    // Проверяем стрелку на взрез
+    Connector *conn = conn_device->getConnector();
+    if (conn->getFwdTraj() != trajectory)
+        return;
 
     // Предыдущая траектория
     TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
@@ -211,19 +213,20 @@ void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
 
     ALSN code_to_next = code;
 
+    // Если траектория занята, дальше код не проходит
+    if (trajectory->isBusy())
+        code_to_next = ALSN::NO_CODE;
+
     // Переход к рельсовым цепям следующей траектории
     // Модуль коннектора к следующей траектории
     auto conn_device = getFwdConnectorDevice();
     if (conn_device == nullptr)
         return;
 
-    // Проверяем что коннектор не установлен на взрез стрелки
-    TrajectoryDevice *traj_device = conn_device->getBwdTrajectoryDevice();
-    if (traj_device != this)
-    {
-        // Если взрез, сбрасываем код
-        ALSN code_to_next = ALSN::NO_CODE;
-    }
+    // Проверяем стрелку на взрез
+    Connector *conn = conn_device->getConnector();
+    if (conn->getBwdTraj() != trajectory)
+        return;
 
     // Следующая траектория
     TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(

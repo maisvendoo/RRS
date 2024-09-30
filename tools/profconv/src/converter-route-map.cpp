@@ -98,6 +98,91 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ZDSimConverter::findSignalsAtMap()
+{
+    for (auto zds_obj : route_map_data)
+    {
+        // Проходной
+        if (zds_obj->obj_name == "signal_line")
+            signals_line_data.push_back(zds_obj);
+
+        // Проходной предвходной
+        if (zds_obj->obj_name == "signal_pred")
+            signals_pred_data.push_back(zds_obj);
+
+        // Входной
+        if (zds_obj->obj_name == "signal_enter")
+            signals_enter_data.push_back(zds_obj);
+
+        // Маршрутный или выходной
+        if (zds_obj->obj_name == "signal_exit")
+            signals_exit_data.push_back(zds_obj);
+
+        // Карликовый, 5 линз
+        if (zds_obj->obj_name == "sig_k5p")
+            signals_sig_k5p_data.push_back(zds_obj);
+
+        // Карликовый 3 линзы
+        if (zds_obj->obj_name == "sig_k3p")
+            signals_sig_k3p_data.push_back(zds_obj);
+
+        // Повторительный
+        if (zds_obj->obj_name == "sig_povt")
+            signals_povt_data.push_back(zds_obj);
+
+        // Карликовый повторительный
+        if (zds_obj->obj_name == "sig_povt_k")
+            signals_povt_k_data.push_back(zds_obj);
+
+        // Маневровый мачтовый
+        if (zds_obj->obj_name == "sig_m2m")
+            signals_sig_m2m_data.push_back(zds_obj);
+
+        // Маневровый карликовый
+        if (zds_obj->obj_name == "sig_k2m")
+            signals_sig_k2m_data.push_back(zds_obj);
+    }
+
+    std::string path = compinePath(topologyDir, "signals_at_map.conf");
+
+    QFile file(QString(path.c_str()));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+
+    for (auto map : {signals_line_data,
+                     signals_pred_data,
+                     signals_enter_data,
+                     signals_exit_data,
+                     signals_sig_k5p_data,
+                     signals_sig_k3p_data,
+                     signals_povt_data,
+                     signals_povt_k_data,
+                     signals_sig_m2m_data,
+                     signals_sig_k2m_data})
+    {
+        for (auto zds_obj : map)
+        {
+            stream << zds_obj->obj_name.c_str()
+                   << DELIMITER_SYMBOL << zds_obj->obj_info.c_str()
+                   << DELIMITER_SYMBOL << zds_obj->position.x
+                   << DELIMITER_SYMBOL << zds_obj->position.y
+                   << DELIMITER_SYMBOL << zds_obj->position.z
+                   << DELIMITER_SYMBOL << zds_obj->attitude.x
+                   << DELIMITER_SYMBOL << zds_obj->attitude.y
+                   << DELIMITER_SYMBOL << zds_obj->attitude.z
+                   << "\n";
+        }
+    }
+
+    file.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ZDSimConverter::findNeutralInsertions(std::vector<neutral_insertion_t> ni)
 {
     std::vector<float> begins;

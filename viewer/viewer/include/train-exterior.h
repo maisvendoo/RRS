@@ -95,7 +95,7 @@ private:
     /// Time stamp of previous frame
     double prev_time;
 
-    /// Time between current and previous frame drawing
+    /// Time between current frame and previous data receiving
     double ref_time;
 
     ///

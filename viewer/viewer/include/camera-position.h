@@ -4,6 +4,7 @@
 #include    <QMetaType>
 
 #include    <osg/Vec3>
+#include    <osg/Vec3d>
 
 #include    "basis.h"
 
@@ -12,20 +13,20 @@
 //------------------------------------------------------------------------------
 struct camera_position_t
 {
-    osg::Vec3   position;
-    osg::Vec3   attitude;
-    osg::Vec3   driver_pos;
-    osg::Vec3   viewer_pos;
-    osg::Vec3   front;
-    osg::Vec3   right;
-    osg::Vec3   up;
+    osg::Vec3d   position;
+    osg::Vec3d   attitude;
+    osg::Vec3d   driver_pos;
+    osg::Vec3d   viewer_pos;
+    osg::Vec3d   front;
+    osg::Vec3d   right;
+    osg::Vec3d   up;
     bool        is_orient_bwd;
 
     camera_position_t()
-        : position(osg::Vec3())
-        , attitude(osg::Vec3())
-        , driver_pos(osg::Vec3())
-        , viewer_pos(osg::Vec3())
+        : position(osg::Vec3d())
+        , attitude(osg::Vec3d())
+        , driver_pos(osg::Vec3d())
+        , viewer_pos(osg::Vec3d())
         , front(osg::Y_AXIS)
         , right(osg::X_AXIS)
         , up(osg::Z_AXIS)
