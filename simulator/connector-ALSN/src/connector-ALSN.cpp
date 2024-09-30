@@ -65,28 +65,28 @@ void ConnectorALSN::step(double t, double dt)
         if (traj_device != nullptr)
         {
             ALSN code = ALSN::NO_CODE;
-            lens_state_t state = signal_fwd->getAllLensState();
-            if (!state[CALL_LENS])
-            {
-                if (state[RED_LENS])
+            alsn_state_t state = signal_fwd->getALSNstate();
+            //if (!state[CALL_LENS])
+            //{
+                if (state[ALSN_RY_LINE])
                 {
                     code = ALSN::RED_YELLOW;
                 }
                 else
                 {
-                    if ((state[YELLOW_LENS]) || (state[BOTTOM_YELLOW_LENS]))
+                    if (state[ALSN_Y_LINE])
                     {
                         code = ALSN::YELLOW;
                     }
                     else
                     {
-                        if (state[GREEN_LENS])
+                        if (state[ALSN_G_LINE])
                         {
                             code = ALSN::GREEN;
                         }
                     }
                 }
-            }
+            //}
             traj_device->setSignalInfoFwd(code, 0.0, signal_fwd->getLetter());
         }
     }
@@ -97,28 +97,28 @@ void ConnectorALSN::step(double t, double dt)
         if (traj_device != nullptr)
         {
             ALSN code = ALSN::NO_CODE;
-            lens_state_t state = signal_bwd->getAllLensState();
-            if (!state[CALL_LENS])
-            {
-                if (state[RED_LENS])
+            alsn_state_t state = signal_bwd->getALSNstate();
+            //if (!state[CALL_LENS])
+            //{
+                if (state[ALSN_RY_LINE])
                 {
                     code = ALSN::RED_YELLOW;
                 }
                 else
                 {
-                    if ((state[YELLOW_LENS]) || (state[BOTTOM_YELLOW_LENS]))
+                    if (state[ALSN_Y_LINE])
                     {
                         code = ALSN::YELLOW;
                     }
                     else
                     {
-                        if (state[GREEN_LENS])
+                        if (state[ALSN_G_LINE])
                         {
                             code = ALSN::GREEN;
                         }
                     }
                 }
-            }
+            //}
             traj_device->setSignalInfoBwd(code, 0.0, signal_bwd->getLetter());
         }
     }

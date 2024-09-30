@@ -26,6 +26,22 @@ using lens_state_t = std::array<bool, NUM_LENS>;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+enum
+{
+    NUM_ALSN_CTRL_LINES = 3,
+    ALSN_RY_LINE = 0,
+    ALSN_Y_LINE = 1,
+    ALSN_G_LINE = 2
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+using alsn_state_t = std::array<bool, NUM_ALSN_CTRL_LINES>;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class TOPOLOGY_EXPORT Signal : public Device
 {
     Q_OBJECT
@@ -51,6 +67,11 @@ public:
     lens_state_t getAllLensState() const
     {
         return lens_state;
+    }
+
+    alsn_state_t getALSNstate() const
+    {
+        return alsn_state;
     }
 
     void setDirection(int signal_dir)
@@ -128,6 +149,9 @@ protected:
 
     /// Предыдущее состояние ламп
     lens_state_t old_lens_state;
+
+    /// Состояние линий управления трнасмитером АСЛН
+    alsn_state_t alsn_state;
 
     /// Литер
     QString letter = "";

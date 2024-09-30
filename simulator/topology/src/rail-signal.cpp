@@ -7,6 +7,8 @@ Signal::Signal(QObject *parent) : Device(parent)
 {
     std::fill(lens_state.begin(), lens_state.end(), false);
     old_lens_state = lens_state;
+
+    std::fill(alsn_state.begin(), alsn_state.end(), false);
 }
 
 //------------------------------------------------------------------------------

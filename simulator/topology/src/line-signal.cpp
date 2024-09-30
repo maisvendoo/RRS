@@ -118,6 +118,15 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     {
         blink_timer->stop();
     }
+
+    // Задаем состояние сигнальных линий АЛСН
+    alsn_state[ALSN_RY_LINE] = lens_state[RED_LENS];
+
+    alsn_state[ALSN_G_LINE] = lens_state[GREEN_LENS];
+
+    alsn_state[ALSN_Y_LINE] = (line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
+                               line_relay->getMinusContactState(LR_MINUS_YELLOW)) ||
+                              (side_signal_relay->getContactState(SSR_YELLOW));
 }
 
 //------------------------------------------------------------------------------

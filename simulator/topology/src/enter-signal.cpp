@@ -121,6 +121,10 @@ void EnterSignal::lens_control()
         emit sendDataUpdate(this->serialize());
         Journal::instance()->info("Signal " + letter + ": Updated lens status");
     }
+
+    alsn_state[ALSN_G_LINE] = lens_state[GREEN_LENS];
+    alsn_state[ALSN_Y_LINE] = lens_state[YELLOW_LENS];
+    alsn_state[ALSN_RY_LINE] = lens_state[RED_LENS];
 }
 
 //------------------------------------------------------------------------------

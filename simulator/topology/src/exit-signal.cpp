@@ -156,6 +156,14 @@ void ExitSignal::lens_control()
     {
         emit sendDataUpdate(this->serialize());
     }
+
+    alsn_state[ALSN_G_LINE] = lens_state[GREEN_LENS];
+
+    alsn_state[ALSN_Y_LINE] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
+                              (semaphore_signal_relay->getPlusContactState(SRS_PLUS_YELLOW) ||
+                              (side_signal_relay->getContactState(SSR_YELLOW)));
+
+    alsn_state[ALSN_RY_LINE] = lens_state[RED_LENS];
 }
 
 //------------------------------------------------------------------------------
