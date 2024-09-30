@@ -31,13 +31,13 @@ public:
     {
         old_code_alsn = this->code_alsn;
         this->code_alsn = code_alsn;
-    };
+    }
 
     /// Прием состояния РБ
-    void setRBstate(bool state) { state_RB = state; };
+    void setRBstate(bool state) { state_RB = state; }
 
     /// Прием состояния РБС
-    void setRBSstate(bool state) { state_RBS = state; };
+    void setRBSstate(bool state) { state_RBS = state; }
 
     /// Прием скорости от скоростемера
     void setVelocity(double v) { v_kmh = v * Physics::kmh; }
@@ -45,7 +45,7 @@ public:
     void setKeyEPK(bool key_epk) { this->key_epk = key_epk; }
 
     /// Выдача состояния цепи удерживающей катушки ЭПК
-    bool getEPKstate() { return epk_state.getState(); };
+    bool getEPKstate() { return epk_state.getState(); }
 
     float getGreenLamp() const { return static_cast<float>(lamps[GREEN_LAMP]); }
 
@@ -59,19 +59,19 @@ public:
 
 private:
 
-    int code_alsn;
+    int code_alsn = 0;
 
-    int old_code_alsn;
+    int old_code_alsn = 0;
 
-    bool state_RB;
+    bool state_RB = false;
 
-    bool state_RBS;
+    bool state_RBS = false;
 
-    bool state_EPK;
+    bool state_EPK = false;
 
-    double v_kmh;
+    double v_kmh = 0.0;
 
-    bool key_epk;
+    bool key_epk = false;
 
     Trigger is_red;
 
@@ -79,7 +79,7 @@ private:
 
     Trigger epk_state;
 
-    Timer *safety_timer;
+    Timer *safety_timer = new Timer(45.0, false);
 
     void preStep(state_vector_t &Y, double t) override;
 
@@ -93,9 +93,7 @@ private:
 
     void lamp_on(size_t lamp_idx);
 
-    bool is_lamp_on(size_t lamp_idx);
-
-    void code_to_log();
+    bool is_lamp_on(size_t lamp_idx);    
 
 private slots:
 

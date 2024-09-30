@@ -5,7 +5,8 @@
 //
 //------------------------------------------------------------------------------
 
-#include    "epk150.h"
+#include    <epk150.h>
+#include    <Journal.h>
 
 /*
  *  Y[0] - усилие от катушки ЭПК
@@ -97,7 +98,17 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double u4 = cut(nf(k[3] * sum_p1), 0.0, 1.0);
 
-    is_emergency_brake = (u4 >= 0.9);
+    bool old_emergency_brake = is_emergency_brake;
+
+    is_emergency_brake = (u4 >= 0.5);
+
+    if (is_emergency_brake != old_emergency_brake)
+    {
+        if (is_emergency_brake)
+            Journal::instance()->info("EPK emergency brake!!!");
+        else
+            Journal::instance()->info("EPK is released...");
+    }
 
     double sum_p2 = Y[0] + pk * (1.0 - is_key_on) - pd;
 

@@ -1,21 +1,11 @@
 #include    <alsn-ukbm.h>
-#include    <../../libJournal/include/Journal.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 SafetyDevice::SafetyDevice(QObject *parent) : Device(parent)
-  , code_alsn(0)
-  , old_code_alsn(0)
-  , state_RB(false)
-  , state_RBS(false)
-  , state_EPK(false)
-  , v_kmh(0.0)
-  , key_epk(false)
 {
-    epk_state.reset();
-
-    safety_timer = new Timer(45.0, false);
+    epk_state.reset();    
     connect(safety_timer, &Timer::process, this, &SafetyDevice::onSafetyTimer);
 }
 
@@ -54,7 +44,6 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
 
     if (code_alsn < old_code_alsn)
     {
-        Journal::instance()->info("Change signal to less allow");
         epk_state.reset();
     }
 
@@ -65,7 +54,7 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     {
         is_red.set();
         epk_state.reset();
-        Journal::instance()->info("RED locomotive signal. Autostop is RESET");
+
         return;
     }
 
@@ -73,15 +62,13 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     {
         if (v_kmh > 40.0)
         {
-            epk_state.reset();
-            Journal::instance()->info("WHITE locomotive signal. Velocity limit");
+            epk_state.reset();            
             return;
         }
 
         if (!safety_timer->isStarted())
         {
             safety_timer->start();
-            Journal::instance()->info("WHITE locomotive signal. Safety timer ON");
         }
     }
 
@@ -211,38 +198,6 @@ void SafetyDevice::lamp_on(size_t lamp_idx)
 bool SafetyDevice::is_lamp_on(size_t lamp_idx)
 {
     return lamps[lamp_idx];
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void SafetyDevice::code_to_log()
-{
-    size_t lamp_idx = 0;
-
-    for (size_t i = 0; i < lamps.size(); i++)
-    {
-        if (is_lamp_on(i))
-        {
-            lamp_idx = i;
-
-            switch (i)
-            {
-            case RED_LAMP:
-                break;
-            case RED_YELLOW_LAMP:
-                break;
-            case YELLOW_LAMP:
-                break;
-            case GREEN_LAMP:
-                break;
-            case WHITE_LAMP:
-                break;
-            }
-
-            break;
-        }
-    }
 }
 
 //------------------------------------------------------------------------------

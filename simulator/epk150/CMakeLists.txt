@@ -34,6 +34,7 @@ target_include_directories (${TARGET} PRIVATE ../device/include)
 target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
+target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
@@ -41,3 +42,4 @@ target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} physics)
 target_link_libraries (${TARGET} device)
 target_link_libraries (${TARGET} filesystem)
+target_link_libraries (${TARGET} Journal)
