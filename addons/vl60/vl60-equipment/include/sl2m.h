@@ -28,9 +28,9 @@ public:
     /// Сигнал состояния звука работы
     virtual float getSoundSignal(size_t idx = 0) const;
 
-    double getVelocityKmh() const
+    double getVelocity() const
     {
-        return velocity * Physics::kmh;
+        return velocity;
     }
 
 private:

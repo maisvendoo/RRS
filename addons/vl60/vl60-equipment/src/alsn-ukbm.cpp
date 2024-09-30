@@ -1,4 +1,5 @@
 #include    <alsn-ukbm.h>
+#include    <../../libJournal/include/Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -52,7 +53,10 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     }
 
     if (code_alsn < old_code_alsn)
+    {
+        Journal::instance()->info("Change signal to less allow");
         epk_state.reset();
+    }
 
     // Включаем ламбы на ЛС в соответствии с кодом АЛСН
     alsn_process(code_alsn);
@@ -61,6 +65,7 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     {
         is_red.set();
         epk_state.reset();
+        Journal::instance()->info("RED locomotive signal. Autostop is RESET");
         return;
     }
 
@@ -69,16 +74,14 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
         if (v_kmh > 40.0)
         {
             epk_state.reset();
+            Journal::instance()->info("WHITE locomotive signal. Velocity limit");
             return;
         }
 
-        if ( (!safety_timer->isStarted()) && (v_kmh > 5) )
+        if (!safety_timer->isStarted())
         {
             safety_timer->start();
-        }
-        else
-        {
-            safety_timer->stop();
+            Journal::instance()->info("WHITE locomotive signal. Safety timer ON");
         }
     }
 
@@ -90,14 +93,10 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
             return;
         }
 
-        if ( (!safety_timer->isStarted()) && (v_kmh > 5) )
+        if (!safety_timer->isStarted())
         {
             safety_timer->start();
-        }
-        else
-        {
-            safety_timer->stop();
-        }
+        }        
     }
 
     if (is_lamp_on(YELLOW_LAMP))
@@ -107,16 +106,21 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
             if (!safety_timer->isStarted())
                 safety_timer->start();
         }
-        else
-        {
-            safety_timer->stop();
-        }
+    }
+
+    if (is_lamp_on(GREEN_LAMP))
+    {
+        safety_timer->stop();
+    }
+
+    if (v_kmh <= 5.0)
+    {
+        safety_timer->stop();
     }
 
     if (state_RB || state_RBS)
     {
-        epk_state.set();
-        safety_timer->stop();
+        epk_state.set();        
     }
 }
 

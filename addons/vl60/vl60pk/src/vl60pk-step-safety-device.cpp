@@ -25,6 +25,6 @@ void VL60pk::stepSafetyDevices(double t, double dt)
     safety_device->setRBstate(rb[RB_1].getState());
     safety_device->setRBSstate(rb[RBS].getState());
     safety_device->setKeyEPK(epk->isKeyOn());
-    safety_device->setVelocity(speed_meter->getVelocityKmh());
+    safety_device->setVelocity(speed_meter->getVelocity());
     safety_device->step(t, dt);
 }
