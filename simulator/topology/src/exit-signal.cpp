@@ -46,6 +46,10 @@ ExitSignal::ExitSignal(QObject *parent) : Signal(parent)
     side_signal_relay->setInitContactState(SSR_YELLOW, false);
 
     connect(blink_timer, &Timer::process, this, &ExitSignal::slotBlinkTimer);
+
+    line_relay->read_config("combine-relay");
+    line_relay->setInitContactState(LINE_N_YELLOW, false);
+    line_relay->setInitPlusContactState(LINE_PLUS_GREEN, false);
 }
 
 //------------------------------------------------------------------------------
@@ -85,6 +89,8 @@ void ExitSignal::step(double t, double dt)
     side_signal_relay->step(t, dt);
 
     blink_timer->step(t, dt);
+
+    line_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -333,8 +339,8 @@ void ExitSignal::removal_area_control()
     }
 
     // Отпитываем реле контроля участков приближения
-    yellow_relay->setVoltage(U_bat * static_cast<double>(is_YR_ON));
-    green_relay->setVoltage(U_bat * static_cast<double>(is_GR_ON));
+    yellow_relay->setVoltage(U_bat * static_cast<double>(is_YR_ON && line_relay->getContactState(LINE_N_YELLOW)));
+    green_relay->setVoltage(U_bat * static_cast<double>(is_GR_ON && line_relay->getPlusContactState(LINE_PLUS_GREEN)));
 }
 
 //------------------------------------------------------------------------------
@@ -558,6 +564,8 @@ void ExitSignal::relay_control()
     {
         blink_timer->stop();
     }
+
+    line_relay->setVoltage(U_line);
 }
 
 //------------------------------------------------------------------------------

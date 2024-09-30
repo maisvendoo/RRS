@@ -147,6 +147,21 @@ private:
     /// Контакт мигания
     bool blink_contact = true;
 
+    /// Линейное реле, для связи со следующим светофором
+    enum
+    {
+        NUM_LINE_NEUTRAL_CONTACTS = 1,
+        NUM_LINE_PLUS_CONTACTS = 1,
+        NUM_LINE_MINUS_CONTACTS = 0,
+
+        LINE_N_YELLOW = 0,
+        LINE_PLUS_GREEN = 0
+    };
+
+    CombineRelay *line_relay = new CombineRelay(NUM_LINE_NEUTRAL_CONTACTS,
+                                                NUM_LINE_PLUS_CONTACTS,
+                                                NUM_LINE_MINUS_CONTACTS);
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
