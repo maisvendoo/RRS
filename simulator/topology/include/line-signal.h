@@ -75,6 +75,18 @@ private:
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
 
+    /// Управление состоянием линз
+    void lens_state_control();
+
+    /// Управление путевым и и линейным реле
+    void relay_control();
+
+    /// Управление миганием желтого (на предвходном)
+    void yellow_blink_control();
+
+    /// Управление состоянием линий АЛСН
+    void alsn_control();
+
 private slots:
 
     void slotBlinkTimer();

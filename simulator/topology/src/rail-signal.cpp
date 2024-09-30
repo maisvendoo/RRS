@@ -9,6 +9,15 @@ Signal::Signal(QObject *parent) : Device(parent)
     old_lens_state = lens_state;
 
     std::fill(alsn_state.begin(), alsn_state.end(), false);
+
+    alsn_RY_relay->read_config("combine-relay");
+    alsn_RY_relay->setInitContactState(ALSN_RY, false);
+
+    alsn_Y_relay->read_config("combine-relay");
+    alsn_Y_relay->setInitContactState(ALSN_Y, false);
+
+    alsn_G_relay->read_config("combine-relay");
+    alsn_G_relay->setInitContactState(ALSN_G, false);
 }
 
 //------------------------------------------------------------------------------
@@ -25,6 +34,10 @@ Signal::~Signal()
 void Signal::step(double t, double dt)
 {
     Device::step(t, dt);
+
+    alsn_RY_relay->step(t, dt);
+    alsn_Y_relay->step(t, dt);
+    alsn_G_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

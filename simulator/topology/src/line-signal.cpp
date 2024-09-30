@@ -51,7 +51,7 @@ void LineSignal::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LineSignal::preStep(state_vector_t &Y, double t)
+void LineSignal::lens_state_control()
 {
     // Запоминаем старое состояние ламп
     old_lens_state = lens_state;
@@ -79,7 +79,13 @@ void LineSignal::preStep(state_vector_t &Y, double t)
         old_lens_state = lens_state;
         emit sendDataUpdate(this->serialize());
     }
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LineSignal::relay_control()
+{
     // Признак  замыкания цепи путевой батареи
     double is_closed = static_cast<double>(is_busy);
 
@@ -105,9 +111,15 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     if (qAbs(U_line_prev - U_line_prev_old) >= 1.0)
     {
         // Устанавливаем новое значение на линии предыдущего светофора
-        emit sendLineVoltage(U_line_prev);        
+        emit sendLineVoltage(U_line_prev);
     }
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LineSignal::yellow_blink_control()
+{
     side_signal_relay->setVoltage(U_side);
 
     if (side_signal_relay->getContactState(SSR_YELLOW))
@@ -118,15 +130,46 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     {
         blink_timer->stop();
     }
+}
 
-    // Задаем состояние сигнальных линий АЛСН
-    alsn_state[ALSN_RY_LINE] = lens_state[RED_LENS];
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LineSignal::alsn_control()
+{
+    bool is_ALSN_RY_ON = line_relay->getContactState(LR_NEUTRAL_PROHIBITING);
 
-    alsn_state[ALSN_G_LINE] = lens_state[GREEN_LENS];
+    alsn_RY_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_RY_ON));
 
-    alsn_state[ALSN_Y_LINE] = (line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
-                               line_relay->getMinusContactState(LR_MINUS_YELLOW)) ||
-                              (side_signal_relay->getContactState(SSR_YELLOW));
+    alsn_state[ALSN_RY_LINE] = alsn_RY_relay->getContactState(ALSN_RY);
+
+    bool is_ALSN_Y_ON = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
+                        line_relay->getMinusContactState(LR_MINUS_YELLOW);
+
+    alsn_Y_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_Y_ON));
+
+    alsn_state[ALSN_Y_LINE] = alsn_Y_relay->getContactState(ALSN_Y);
+
+    bool is_ALSN_G_ON = lens_state[GREEN_LENS] ||
+                        side_signal_relay->getContactState(SSR_YELLOW);
+
+    alsn_G_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_G_ON));
+
+    alsn_state[ALSN_G_LINE] = alsn_G_relay->getContactState(ALSN_G);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LineSignal::preStep(state_vector_t &Y, double t)
+{
+    lens_state_control();
+
+    relay_control();
+
+    yellow_blink_control();
+
+    alsn_control();
 }
 
 //------------------------------------------------------------------------------

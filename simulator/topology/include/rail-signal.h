@@ -4,6 +4,7 @@
 #include    <device.h>
 #include    <topology-export.h>
 #include    <connector.h>
+#include    <relay.h>
 
 //------------------------------------------------------------------------------
 //
@@ -178,6 +179,31 @@ protected:
 
     /// Имя коннектора, с которым связан сигнал (для десериализации)
     QString conn_name = "";
+
+    /// Реле управления линиями АЛСН
+    enum
+    {
+        NUM_ALSN_RY_CONTACTS = 1,
+        ALSN_RY = 0
+    };
+
+    Relay *alsn_RY_relay = new Relay(NUM_ALSN_RY_CONTACTS);
+
+    enum
+    {
+        NUM_ALSN_Y_CONTACTS = 1,
+        ALSN_Y = 0
+    };
+
+    Relay *alsn_Y_relay = new Relay(NUM_ALSN_Y_CONTACTS);
+
+    enum
+    {
+        NUM_ALSN_G_CONTACTS = 1,
+        ALSN_G = 0
+    };
+
+    Relay *alsn_G_relay = new Relay(NUM_ALSN_G_CONTACTS);
 
     void load_config(CfgReader &cfg) override;
 
