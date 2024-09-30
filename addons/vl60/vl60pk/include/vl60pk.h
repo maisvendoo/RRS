@@ -326,8 +326,20 @@ private:
 
     Trigger key_epk;
 
+    enum
+    {
+        NUM_LC_CONTACTS = 3,
+        LC_SELF = 0,
+        LC_TED = 1,
+        LC_TED_LAMP = 2
+    };
+
     /// Линейные контакторы тяговых двигателей
     std::array<Relay *, NUM_MOTORS> linear_contactor;
+
+    bool is_LC_ON = false;
+
+    bool is_H6_ON = false;
 
     /// Общая инициализация локомотива
     void initialization();

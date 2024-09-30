@@ -26,6 +26,11 @@ public:
 
     int getPosition() const;
 
+    bool isZeroPosition() const
+    {
+        return position == 0;
+    }
+
     bool isReady() const;
 
     bool isLKallow() const;

@@ -77,6 +77,12 @@ void VL60pk::initTractionControl(const QString &modules_dir, const QString &cust
 
         overload_relay[i] = new OverloadRelay();
         overload_relay[i]->read_config("PT-140A", custom_cfg_dir);
+
+        linear_contactor[i] = new Relay(NUM_LC_CONTACTS);
+        linear_contactor[i]->read_config("bv-8", custom_cfg_dir);
+        linear_contactor[i]->setInitContactState(LC_SELF, false);
+        linear_contactor[i]->setInitContactState(LC_TED, false);
+        linear_contactor[i]->setInitContactState(LC_TED_LAMP, true);
     }
 }
 
