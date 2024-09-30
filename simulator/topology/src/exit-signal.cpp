@@ -129,6 +129,8 @@ void ExitSignal::preStep(state_vector_t &Y, double t)
     route_control();
 
     relay_control();
+
+    alsn_control();
 }
 
 //------------------------------------------------------------------------------
@@ -161,15 +163,7 @@ void ExitSignal::lens_control()
     if (lens_state != old_lens_state)
     {
         emit sendDataUpdate(this->serialize());
-    }
-
-    alsn_state[ALSN_G_LINE] = lens_state[GREEN_LENS];
-
-    alsn_state[ALSN_Y_LINE] = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
-                              (semaphore_signal_relay->getPlusContactState(SRS_PLUS_YELLOW) ||
-                              (side_signal_relay->getContactState(SSR_YELLOW)));
-
-    alsn_state[ALSN_RY_LINE] = lens_state[RED_LENS];
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -566,6 +560,32 @@ void ExitSignal::relay_control()
     }
 
     line_relay->setVoltage(U_line);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ExitSignal::alsn_control()
+{
+    bool is_ALSN_RY_ON = semaphore_signal_relay->getContactState(SRS_N_RED);
+
+    alsn_RY_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_RY_ON));
+
+    alsn_state[ALSN_RY_LINE] = alsn_RY_relay->getContactState(ALSN_RY);
+
+    bool is_ALSN_Y_ON = semaphore_signal_relay->getContactState(SRS_N_YELLOW) &&
+                        semaphore_signal_relay->getPlusContactState(SRS_PLUS_YELLOW);
+
+    alsn_Y_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_Y_ON));
+
+    alsn_state[ALSN_Y_LINE] = alsn_Y_relay->getContactState(ALSN_Y);
+
+    bool is_ALSN_G_ON = lens_state[GREEN_LENS] ||
+                        side_signal_relay->getContactState(SSR_YELLOW);
+
+    alsn_G_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_G_ON));
+
+    alsn_state[ALSN_G_LINE] = alsn_G_relay->getContactState(ALSN_G);
 }
 
 //------------------------------------------------------------------------------

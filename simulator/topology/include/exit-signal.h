@@ -176,7 +176,9 @@ private:
 
     void route_control();
 
-    void relay_control();    
+    void relay_control();
+
+    void alsn_control();
 
 private slots:
 
