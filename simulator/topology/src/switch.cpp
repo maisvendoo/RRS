@@ -185,32 +185,18 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     }
 
     // Загружаем модули
-    // Находим названия модулей, которые есть и в траекториях спереди, и в траекториях сзади
+    // Находим названия модулей, которые есть в траекториях спереди или сзади
     QStringList devices_names;
-    for (auto traj_bwd : {bwdPlusTraj, bwdMinusTraj})
+    for (auto traj : {bwdPlusTraj, bwdMinusTraj, fwdPlusTraj, fwdMinusTraj})
     {
-        if (traj_bwd == nullptr)
+        if (traj == nullptr)
             continue;
 
-        QStringList devices_names_bwd;
-        for (auto device_bwd : traj_bwd->getTrajectoryDevices())
+        for (auto device : traj->getTrajectoryDevices())
         {
-            QString name = device_bwd->getName();
-            if (!devices_names_bwd.contains(name))
-                devices_names_bwd.push_back(name);
-        }
-
-        for (auto traj_fwd : {fwdPlusTraj, fwdMinusTraj})
-        {
-            if (traj_fwd == nullptr)
-                continue;
-
-            for (auto device_fwd : traj_bwd->getTrajectoryDevices())
-            {
-                QString name = device_fwd->getName();
-                if (devices_names_bwd.contains(name) && (!devices_names.contains(name)))
-                    devices_names.push_back(name);
-            }
+            QString name = device->getName();
+            if (!devices_names.contains(name))
+                devices_names.push_back(name);
         }
     }
 
