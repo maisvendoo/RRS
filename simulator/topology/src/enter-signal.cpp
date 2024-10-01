@@ -12,6 +12,7 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     main_signal_relay->setInitContactState(MSR_YELLOW, false);
     main_signal_relay->setInitContactState(MSR_PLUS, false);
     main_signal_relay->setInitContactState(MSR_MINUS, true);
+    main_signal_relay->setInitContactState(MSR_BLINK, false);
 
     side_signal_relay->read_config("combine-relay");
     side_signal_relay->setInitContactState(SSR_RED, true);
@@ -20,10 +21,12 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     side_signal_relay->setInitContactState(SSR_SIDE, false);
     side_signal_relay->setInitContactState(SSR_PLUS, false);
     side_signal_relay->setInitContactState(SSR_MINUS, true);
+    side_signal_relay->setInitContactState(SSR_BLINK, false);
 
     direct_signal_relay->read_config("combine-relay");
     direct_signal_relay->setInitContactState(DSR_TOP_YELLOW, true);
     direct_signal_relay->setInitContactState(DSR_GREEN, false);
+    direct_signal_relay->setInitContactState(DSR_BLINK, true);
 
     bwd_way_relay->read_config("combine-relay");
     bwd_way_relay->setInitContactState(BWD_BUSY_RED, false);
@@ -114,15 +117,18 @@ void EnterSignal::lens_control()
     old_lens_state = lens_state;
 
     lens_state[GREEN_LENS] = direct_signal_relay->getContactState(DSR_GREEN) &&
-                             main_signal_relay->getContactState(MSR_YELLOW) &&
-                             blink_relay->getContactState(BLINK_GREEN);
+                             main_signal_relay->getContactState(MSR_YELLOW);
 
     is_yellow_wire_ON = (side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
                             main_signal_relay->getContactState(MSR_RED)) ||
-                           (main_signal_relay->getContactState(MSR_YELLOW) && direct_signal_relay->getContactState(DSR_TOP_YELLOW));
+                           (main_signal_relay->getContactState(MSR_YELLOW) &&
+                             direct_signal_relay->getContactState(DSR_TOP_YELLOW));
 
     lens_state[YELLOW_LENS] = (is_yellow_wire_ON && blink_contact) ||
-                              (blink_contact && blink_relay->getContactState(BLINK_YELLOW));
+                              (blink_contact && direct_signal_relay->getContactState(DSR_BLINK) &&
+                               blink_relay->getContactState(BLINK_YELLOW) &&
+                              (main_signal_relay->getContactState(MSR_BLINK) ||
+                               side_signal_relay->getContactState(SSR_BLINK)));
 
     lens_state[RED_LENS] = side_signal_relay->getContactState(SSR_RED) &&
                            main_signal_relay->getContactState(MSR_RED);
@@ -333,7 +339,7 @@ void EnterSignal::blink_control(Signal *next_signal)
 {
     // Питание реле мигания от бокового реле предыдущего сигнала
     if (next_signal != Q_NULLPTR)
-        blink_relay->setVoltage(next_signal->getVoltageSSR());
+        blink_relay->setVoltage(next_signal->getVoltageDSR());
     else
         blink_relay->setVoltage(0.0);
 
