@@ -175,6 +175,8 @@ protected:
 
     Relay *blink_relay = new Relay(NUM_BLINK_CONTACTS);
 
+    bool is_yellow_wire_ON = false;
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
@@ -211,6 +213,7 @@ private:
     void exit_signal_control(Signal *next_signal);
     void allow_signal_control();
     void blink_control(Signal *next_signal);
+    void alsn_control();
 };
 
 #endif

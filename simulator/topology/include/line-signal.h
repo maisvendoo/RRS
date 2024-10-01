@@ -66,10 +66,7 @@ private:
     bool blink_contact = true;
 
     /// Напряжение путевой батареи
-    double U_bat = 12.0;
-
-    /// Напряжение, передаваемое на линию предыдущего светофора
-    double U_line_prev = 0.0;
+    double U_bat = 12.0;    
 
     void preStep(state_vector_t &Y, double t) override;
 

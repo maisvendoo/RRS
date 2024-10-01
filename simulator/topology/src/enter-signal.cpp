@@ -117,11 +117,11 @@ void EnterSignal::lens_control()
                              main_signal_relay->getContactState(MSR_YELLOW) &&
                              blink_relay->getContactState(BLINK_GREEN);
 
-    bool is_main_wire_ON = (side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
+    is_yellow_wire_ON = (side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
                             main_signal_relay->getContactState(MSR_RED)) ||
                            (main_signal_relay->getContactState(MSR_YELLOW) && direct_signal_relay->getContactState(DSR_TOP_YELLOW));
 
-    lens_state[YELLOW_LENS] = (is_main_wire_ON && blink_contact) ||
+    lens_state[YELLOW_LENS] = (is_yellow_wire_ON && blink_contact) ||
                               (blink_contact && blink_relay->getContactState(BLINK_YELLOW));
 
     lens_state[RED_LENS] = side_signal_relay->getContactState(SSR_RED) &&
@@ -133,11 +133,7 @@ void EnterSignal::lens_control()
     {
         emit sendDataUpdate(this->serialize());
         Journal::instance()->info("Signal " + letter + ": Updated lens status");
-    }
-
-    alsn_state[ALSN_G_LINE] = lens_state[GREEN_LENS];
-    alsn_state[ALSN_Y_LINE] = lens_state[YELLOW_LENS];
-    alsn_state[ALSN_RY_LINE] = lens_state[RED_LENS];
+    }    
 }
 
 //------------------------------------------------------------------------------
@@ -356,6 +352,32 @@ void EnterSignal::blink_control(Signal *next_signal)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void EnterSignal::alsn_control()
+{
+    bool is_ALSN_RY_ON = lens_state[RED_LENS];
+
+    alsn_RY_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_RY_ON));
+
+    alsn_state[ALSN_RY_LINE] = alsn_RY_relay->getContactState(ALSN_RY);
+
+    bool is_ALSN_G_ON = lens_state[GREEN_LENS] ||
+                        (blink_relay->getContactState(BLINK_YELLOW) &&
+                         !side_signal_relay->getContactState(SSR_BOTTOM_YELLOW));
+
+    alsn_G_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_G_ON));
+
+    alsn_state[ALSN_G_LINE] = alsn_G_relay->getContactState(ALSN_G);
+
+    bool is_ALSN_Y_ON = is_yellow_wire_ON;
+
+    alsn_Y_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_Y_ON));
+
+    alsn_state[ALSN_Y_LINE] = alsn_Y_relay->getContactState(ALSN_Y);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void EnterSignal::relay_control()
 {
     // Контроль занятости маршрута и положения стрелок
@@ -380,6 +402,8 @@ void EnterSignal::relay_control()
 
     // Контроль мигания
     blink_control(next_signal);
+
+    alsn_control();
 }
 
 //------------------------------------------------------------------------------
