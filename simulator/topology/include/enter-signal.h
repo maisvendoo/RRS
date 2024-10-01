@@ -203,6 +203,14 @@ private slots:
     void slotCloseTimer();
 
     void slotOnBlinkTimer();
+private:
+    Signal * route_control();
+    void signal_control();
+    void arrival_lock();
+    void signal_relays_control();
+    void exit_signal_control(Signal *next_signal);
+    void allow_signal_control();
+    void blink_control(Signal *next_signal);
 };
 
 #endif

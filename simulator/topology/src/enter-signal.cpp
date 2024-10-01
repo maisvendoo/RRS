@@ -178,10 +178,9 @@ void EnterSignal::busy_control()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EnterSignal::relay_control()
+Signal * EnterSignal::route_control()
 {
     // Собираем цепь контрольного маршрутного реле
-
     bool is_RCR_ON_old = is_RCR_ON;
 
     Signal *next_signal = Q_NULLPTR;
@@ -198,8 +197,15 @@ void EnterSignal::relay_control()
 
     route_control_relay->setVoltage(U_bat * static_cast<double>(is_RCR_ON));
 
-    // Собираем цепь сигнального реле
+    return next_signal;
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::signal_control()
+{
+    // Собираем цепь сигнального реле
     // Состояние провода кнопочного блока "Открыть/Закрыть"
     bool is_button_wire_ON = is_open_button_pressed ||
                              (is_close_button_nopressed && signal_relay->getContactState(SR_SELF_LOCK));
@@ -218,7 +224,13 @@ void EnterSignal::relay_control()
     }
 
     signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::arrival_lock()
+{
     // Цепь реле замыкания маршрута приема
     bool is_ALR_ON_old = is_ALR_ON;
 
@@ -233,7 +245,13 @@ void EnterSignal::relay_control()
     }
 
     arrival_lock_relay->setVoltage(U_bat * static_cast<double>(is_ALR_ON));
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::signal_relays_control()
+{
     // Цепи главного и бокового сигнальных реле
 
     // Состояние общего провода питания этих реле
@@ -272,6 +290,21 @@ void EnterSignal::relay_control()
 
     side_signal_relay->setVoltage(U_bat * static_cast<double>(is_SSR_ON));
 
+    double U_side_prev_old = U_side_prev;
+
+    U_side_prev = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
+
+    if (qAbs(U_side_prev - U_side_prev_old) > 1.0)
+    {
+        emit sendSideVoltage(U_side_prev);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::exit_signal_control(Signal *next_signal)
+{
     // Питание указательного реле выходного сигнала
     if (next_signal != Q_NULLPTR)
         exit_signal_relay->setVoltage(next_signal->getVoltageDSR());
@@ -283,22 +316,25 @@ void EnterSignal::relay_control()
                      route_control_relay->getContactState(RCR_DSR_CTRL);
 
     direct_signal_relay->setVoltage(U_bat * static_cast<double>(is_DSR_ON));
+}
 
-    double U_side_prev_old = U_side_prev;
-
-    U_side_prev = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
-
-    if (qAbs(U_side_prev - U_side_prev_old) > 1.0)
-    {
-        emit sendSideVoltage(U_side_prev);
-    }
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::allow_signal_control()
+{
     bool is_AR_ON = lens_state[RED_LENS];
 
     allow_relay->setVoltage(U_bat * static_cast<double>(is_AR_ON));
 
     U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::blink_control(Signal *next_signal)
+{
     // Питание реле мигания от бокового реле предыдущего сигнала
     if (next_signal != Q_NULLPTR)
         blink_relay->setVoltage(next_signal->getVoltageSSR());
@@ -315,6 +351,35 @@ void EnterSignal::relay_control()
         blink_timer->stop();
         blink_contact = true;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::relay_control()
+{
+    // Контроль занятости маршрута и положения стрелок
+    // с определением указателя на следующий попутный сигнал
+    Signal *next_signal = route_control();
+
+    // Управление сигнальным реле
+    signal_control();
+
+    // Контроль замыкания маршрута приема
+    arrival_lock();
+
+    // Управление реле, коммутирующими цепи линз
+    signal_relays_control();
+
+    // Контроль состояния выходного сигнала
+    exit_signal_control(next_signal);
+
+    // Контроль своих разрешающих показаний, с передачей на
+    // предыдущий сигнал (для маршрутных светофоров)
+    allow_signal_control();
+
+    // Контроль мигания
+    blink_control(next_signal);
 }
 
 //------------------------------------------------------------------------------
