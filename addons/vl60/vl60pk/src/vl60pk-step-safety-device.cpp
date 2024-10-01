@@ -21,7 +21,10 @@ void VL60pk::stepSafetyDevices(double t, double dt)
     epk->setKeyOn(key_epk.getState());
     epk->step(t, dt);
 
-    safety_device->setAlsnCode(coil_ALSN_fwd->getCode());
+    alsn_decoder->setCoilSignal(coil_ALSN_fwd->getCode());
+    alsn_decoder->step(t, dt);
+
+    safety_device->setAlsnCode(alsn_decoder->getCode());
     safety_device->setRBstate(rb[RB_1].getState());
     safety_device->setRBSstate(rb[RBS].getState());
     safety_device->setKeyEPK(epk->isKeyOn());

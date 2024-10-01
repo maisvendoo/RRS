@@ -37,4 +37,6 @@ void VL60pk::initSafetyDevices(const QString &modules_dir, const QString &custom
 
     // УКБМ
     safety_device = new SafetyDevice;
+
+    alsn_decoder->read_config("ALSN-decoder");
 }

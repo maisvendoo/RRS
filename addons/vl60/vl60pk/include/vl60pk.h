@@ -13,7 +13,7 @@
 #ifndef     VL60PK_H
 #define     VL60PK_H
 
-#include    "vl60pk-headers.h"
+#include    <vl60pk-headers.h>
 
 /*!
  * \class
@@ -340,6 +340,8 @@ private:
     bool is_LC_ON = false;
 
     bool is_H6_ON = false;
+
+    DecoderALSN *alsn_decoder = new DecoderALSN;
 
     /// Общая инициализация локомотива
     void initialization();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Device>
-        
+        <UpdateInterval>3.0</UpdateInterval>
     </Device>
 </Config>
