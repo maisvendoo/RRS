@@ -38,9 +38,9 @@ protected:
 
     enum
     {
-        NUM_MSR_CONTACTS = 4,
-        NUM_SSR_CONTACTS = 6,
-        NUM_DSR_CONTACTS = 2,
+        NUM_MSR_CONTACTS = 5,
+        NUM_SSR_CONTACTS = 7,
+        NUM_DSR_CONTACTS = 3,
         NUM_RCR_CONTACTS = 3,
         NUM_SR_CONTACTS = 5,
         NUM_ALR_CONTACTS = 1,
@@ -51,6 +51,7 @@ protected:
         MSR_YELLOW = 1,
         MSR_PLUS = 2,
         MSR_MINUS = 3,
+        MSR_BLINK = 4,
 
         SSR_RED = 0,
         SSR_TOP_YELLOW = 1,
@@ -58,9 +59,11 @@ protected:
         SSR_SIDE = 3,
         SSR_PLUS = 4,
         SSR_MINUS = 5,
+        SSR_BLINK = 6,
 
         DSR_TOP_YELLOW = 0,
         DSR_GREEN = 1,
+        DSR_BLINK = 2,
 
         RCR_SR_CTRL = 0,
         RCR_MSR_SSR_CTRL = 1,
