@@ -162,6 +162,8 @@ private:
                                                 NUM_LINE_PLUS_CONTACTS,
                                                 NUM_LINE_MINUS_CONTACTS);
 
+    Signal *next_signal = Q_NULLPTR;
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,
@@ -174,7 +176,7 @@ private:
 
     void removal_area_control();
 
-    void route_control();
+    void route_control(Signal **next_signal);
 
     void relay_control();
 

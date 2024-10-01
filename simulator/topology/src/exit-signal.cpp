@@ -126,7 +126,7 @@ void ExitSignal::preStep(state_vector_t &Y, double t)
 
     removal_area_control();
 
-    route_control();
+    route_control(&next_signal);
 
     relay_control();
 
@@ -340,7 +340,7 @@ void ExitSignal::removal_area_control()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ExitSignal::route_control()
+void ExitSignal::route_control(Signal **next_signal)
 {
     if (conn == Q_NULLPTR)
     {
@@ -453,6 +453,8 @@ void ExitSignal::route_control()
         }
 
         // Дошли - выходим подбивать бабки
+        *next_signal = signal;
+
         break;
     }
 
@@ -559,7 +561,12 @@ void ExitSignal::relay_control()
         blink_timer->stop();
     }
 
-    line_relay->setVoltage(U_line);
+    // Динамическая передача линейного напряжения, так как заранее не ясно
+    // какой сигнал будет следующим
+    if (next_signal != Q_NULLPTR)
+        line_relay->setVoltage(next_signal->getLineVoltage());
+    else
+        line_relay->setVoltage(0.0);
 }
 
 //------------------------------------------------------------------------------

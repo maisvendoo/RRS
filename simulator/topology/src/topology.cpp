@@ -92,6 +92,8 @@ bool Topology::load(QString route_dir)
 
     enter_signal_connect(signals_data.enter_signals);
 
+    //line_signals_connect(signals_data.exit_signals);
+
     if (!load_stations(route_path))
     {
         Journal::instance()->error("Can't to load staions list");
