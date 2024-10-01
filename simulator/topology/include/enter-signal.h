@@ -151,7 +151,7 @@ protected:
 
     bool is_ALR_ON = false;
 
-    double U_side = 0.0;
+    double U_side_prev = 0.0;
 
     enum
     {
@@ -161,6 +161,21 @@ protected:
 
     /// Указательное реле, для связи с предыдущим входным светофором
     Relay *allow_relay = new Relay(NUM_AR_CONTACTS);
+
+    /// Таймер мигания верхнего желтого сигнала
+    Timer *blink_timer = new Timer(0.75, false);
+
+    bool blink_contact = false;
+
+    /// Реле мигания верхнего желтого
+    enum
+    {
+        NUM_BLINK_CONTACTS = 2,
+        BLINK_GREEN = 0,
+        BLINK_YELLOW = 1
+    };
+
+    Relay *blink_relay = new Relay(NUM_BLINK_CONTACTS);
 
     void preStep(state_vector_t &Y, double t) override;
 
@@ -187,7 +202,9 @@ private slots:
 
     void slotOpenTimer();
 
-    void slotCloseTimer();    
+    void slotCloseTimer();
+
+    void slotOnBlinkTimer();
 };
 
 #endif

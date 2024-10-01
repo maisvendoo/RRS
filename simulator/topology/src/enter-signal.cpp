@@ -60,6 +60,12 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
 
     allow_relay->read_config("combine-relay");
     allow_relay->setInitContactState(AR_OPEN, true);
+
+    connect(blink_timer, &Timer::process, this, &EnterSignal::slotOnBlinkTimer);
+
+    blink_relay->read_config("combine-relay");
+    blink_relay->setInitContactState(BLINK_GREEN, true);
+    blink_relay->setInitContactState(BLINK_YELLOW, false);
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +101,9 @@ void EnterSignal::step(double t, double dt)
     line_relay->step(t, dt);
 
     allow_relay->step(t, dt);
+
+    blink_timer->step(t, dt);
+    blink_relay->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -105,11 +114,15 @@ void EnterSignal::lens_control()
     old_lens_state = lens_state;
 
     lens_state[GREEN_LENS] = direct_signal_relay->getContactState(DSR_GREEN) &&
-                             main_signal_relay->getContactState(MSR_YELLOW);
+                             main_signal_relay->getContactState(MSR_YELLOW) &&
+                             blink_relay->getContactState(BLINK_GREEN);
 
-    lens_state[YELLOW_LENS] = (side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
-                               main_signal_relay->getContactState(MSR_RED)) ||
-                              (main_signal_relay->getContactState(MSR_YELLOW) && direct_signal_relay->getContactState(DSR_TOP_YELLOW));
+    bool is_main_wire_ON = (side_signal_relay->getContactState(SSR_TOP_YELLOW) &&
+                            main_signal_relay->getContactState(MSR_RED)) ||
+                           (main_signal_relay->getContactState(MSR_YELLOW) && direct_signal_relay->getContactState(DSR_TOP_YELLOW));
+
+    lens_state[YELLOW_LENS] = (is_main_wire_ON && blink_contact) ||
+                              (blink_contact && blink_relay->getContactState(BLINK_YELLOW));
 
     lens_state[RED_LENS] = side_signal_relay->getContactState(SSR_RED) &&
                            main_signal_relay->getContactState(MSR_RED);
@@ -260,9 +273,6 @@ void EnterSignal::relay_control()
     side_signal_relay->setVoltage(U_bat * static_cast<double>(is_SSR_ON));
 
     // Питание указательного реле выходного сигнала
-
-    double U_dsr_old = U_dsr;
-
     if (next_signal != Q_NULLPTR)
         exit_signal_relay->setVoltage(next_signal->getVoltageDSR());
     else
@@ -274,13 +284,13 @@ void EnterSignal::relay_control()
 
     direct_signal_relay->setVoltage(U_bat * static_cast<double>(is_DSR_ON));
 
-    double U_side_old = U_side;
+    double U_side_prev_old = U_side_prev;
 
-    U_side = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
+    U_side_prev = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
 
-    if (qAbs(U_side - U_side_old) > 1.0)
+    if (qAbs(U_side_prev - U_side_prev_old) > 1.0)
     {
-        emit sendSideVoltage(U_side);
+        emit sendSideVoltage(U_side_prev);
     }
 
     bool is_AR_ON = lens_state[RED_LENS];
@@ -288,6 +298,23 @@ void EnterSignal::relay_control()
     allow_relay->setVoltage(U_bat * static_cast<double>(is_AR_ON));
 
     U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
+
+    // Питание реле мигания от бокового реле предыдущего сигнала
+    if (next_signal != Q_NULLPTR)
+        blink_relay->setVoltage(next_signal->getVoltageSSR());
+    else
+        blink_relay->setVoltage(0.0);
+
+    // Управление таймером мигания
+    if (blink_relay->getContactState(BLINK_YELLOW))
+    {
+        blink_timer->start();
+    }
+    else
+    {
+        blink_timer->stop();
+        blink_contact = true;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -528,6 +555,14 @@ void EnterSignal::slotCloseTimer()
     close_timer->stop();
 
     Journal::instance()->info("Released close button");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void EnterSignal::slotOnBlinkTimer()
+{
+    blink_contact = !blink_contact;
 }
 
 //------------------------------------------------------------------------------

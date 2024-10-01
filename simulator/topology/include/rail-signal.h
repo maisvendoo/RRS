@@ -132,6 +132,11 @@ public:
         return U_dsr;
     }
 
+    double getVoltageSSR() const
+    {
+        return U_side;
+    }
+
 signals:
 
     /// Послать предыдущему световору напряжение линии
