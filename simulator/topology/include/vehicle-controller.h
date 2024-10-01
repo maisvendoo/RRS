@@ -47,7 +47,7 @@ public:
     device_coord_list_t *getVehicleRailwayConnectors();
 
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
-    profile_point_t getPosition(int dir);
+    profile_point_t getPosition();
 
     /// Вернуть массив указателей на траектории, занятые ПЕ
     Trajectory *getCurrentTraj() const { return current_traj; }

@@ -163,7 +163,7 @@ device_coord_list_t *VehicleController::getVehicleRailwayConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t VehicleController::getPosition(int dir)
+profile_point_t VehicleController::getPosition()
 {
     return current_traj->getPosition(traj_coord, dir);
 }
@@ -243,7 +243,7 @@ void VehicleController::updateTrajectories()
     for (auto veh_device : *devices)
     {
         // Обновляем траекторную координату оборудования ПЕ
-        veh_device.coord = traj_coord + devices_coords[i];
+        veh_device.coord = traj_coord + devices_coords[i] * dir;
         ++i;
 
         // Текущая траектория и траекторная координата данного оборуования

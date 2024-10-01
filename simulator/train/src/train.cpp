@@ -131,9 +131,9 @@ void Train::preStep(double t)
         Vehicle *vehicle = *it;
         size_t idx = vehicle->getIndex();
 
-        topology->getVehicleController(i)->setDirection(dir);
+        topology->getVehicleController(i)->setDirection(dir * vehicle->getOrientation());
         topology->getVehicleController(i)->setCoord(y[idx]);
-        *vehicle->getProfilePoint() = topology->getVehicleController(i)->getPosition(dir * vehicle->getOrientation());
+        *vehicle->getProfilePoint() = topology->getVehicleController(i)->getPosition();
         vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
         vehicle->integrationPreStep(y, t);
