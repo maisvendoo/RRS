@@ -149,9 +149,7 @@ protected:
 
     bool is_SSR_ON = false;
 
-    bool is_ALR_ON = false;
-
-    double U_side_prev = 0.0;
+    bool is_ALR_ON = false;    
 
     enum
     {
@@ -165,7 +163,7 @@ protected:
     /// Таймер мигания верхнего желтого сигнала
     Timer *blink_timer = new Timer(0.75, false);
 
-    bool blink_contact = false;
+    bool blink_contact = true;
 
     /// Реле мигания верхнего желтого
     enum

@@ -134,7 +134,7 @@ public:
 
     double getVoltageSSR() const
     {
-        return U_side;
+        return U_side_prev;
     }
 
 signals:
@@ -172,6 +172,8 @@ protected:
 
     /// Напряжение питания бокового сигнального реле
     double U_side = 0.0;
+
+    double U_side_prev = 0.0;
 
     double U_dsr = 0.0;
 
