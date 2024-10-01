@@ -49,6 +49,11 @@ protected:
 
     /// Инициализация и чтение конфигурационного файла
     void load_config(CfgReader &cfg);
+
+private:
+
+    /// Очистка
+    void clear_code();
 };
 
 #endif // TRAJECTORY_ALSN_H

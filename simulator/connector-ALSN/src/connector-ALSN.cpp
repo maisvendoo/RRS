@@ -24,8 +24,11 @@ ConnectorALSN::~ConnectorALSN()
 //------------------------------------------------------------------------------
 TrajectoryDevice *ConnectorALSN::getFwdTrajectoryDevice() const
 {
+    // Если есть светофор назад, не пропускаем поиск по топологии
+    // от предыдущих светофоров вперёд
     if (is_signal_bwd)
         return nullptr;
+
     return fwd_traj_device;
 }
 
@@ -34,8 +37,11 @@ TrajectoryDevice *ConnectorALSN::getFwdTrajectoryDevice() const
 //------------------------------------------------------------------------------
 TrajectoryDevice *ConnectorALSN::getBwdTrajectoryDevice() const
 {
+    // Если есть светофор вперёд, не пропускаем поиск по топологии
+    // от следующих светофоров назад
     if (is_signal_fwd)
         return nullptr;
+
     return bwd_traj_device;
 }
 
@@ -59,6 +65,7 @@ void ConnectorALSN::step(double t, double dt)
     else
         is_signal_bwd = true;
 
+    // Код АЛСН из светофора вперёд для частотного сигнала у траектории сзади
     if (is_signal_fwd)
     {
         TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(bwd_traj_device);
@@ -66,31 +73,29 @@ void ConnectorALSN::step(double t, double dt)
         {
             ALSN code = ALSN::NO_CODE;
             alsn_state_t state = signal_fwd->getALSNstate();
-            //if (!state[CALL_LENS])
-            //{
-                if (state[ALSN_RY_LINE])
+            if (state[ALSN_RY_LINE])
+            {
+                code = ALSN::RED_YELLOW;
+            }
+            else
+            {
+                if (state[ALSN_Y_LINE])
                 {
-                    code = ALSN::RED_YELLOW;
+                    code = ALSN::YELLOW;
                 }
                 else
                 {
-                    if (state[ALSN_Y_LINE])
+                    if (state[ALSN_G_LINE])
                     {
-                        code = ALSN::YELLOW;
-                    }
-                    else
-                    {
-                        if (state[ALSN_G_LINE])
-                        {
-                            code = ALSN::GREEN;
-                        }
+                        code = ALSN::GREEN;
                     }
                 }
-            //}
+            }
             traj_device->setSignalInfoFwd(code, 0.0, signal_fwd->getLetter());
         }
     }
 
+    // Код АЛСН из светофора назад для частотного сигнала у траектории спереди
     if (is_signal_bwd)
     {
         TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(fwd_traj_device);
@@ -98,27 +103,24 @@ void ConnectorALSN::step(double t, double dt)
         {
             ALSN code = ALSN::NO_CODE;
             alsn_state_t state = signal_bwd->getALSNstate();
-            //if (!state[CALL_LENS])
-            //{
-                if (state[ALSN_RY_LINE])
+            if (state[ALSN_RY_LINE])
+            {
+                code = ALSN::RED_YELLOW;
+            }
+            else
+            {
+                if (state[ALSN_Y_LINE])
                 {
-                    code = ALSN::RED_YELLOW;
+                    code = ALSN::YELLOW;
                 }
                 else
                 {
-                    if (state[ALSN_Y_LINE])
+                    if (state[ALSN_G_LINE])
                     {
-                        code = ALSN::YELLOW;
-                    }
-                    else
-                    {
-                        if (state[ALSN_G_LINE])
-                        {
-                            code = ALSN::GREEN;
-                        }
+                        code = ALSN::GREEN;
                     }
                 }
-            //}
+            }
             traj_device->setSignalInfoBwd(code, 0.0, signal_bwd->getLetter());
         }
     }
