@@ -7,6 +7,7 @@ SafetyDevice::SafetyDevice(QObject *parent) : Device(parent)
 {
     epk_state.reset();    
     connect(safety_timer, &Timer::process, this, &SafetyDevice::onSafetyTimer);
+    connect(pss_timer, &Timer::process, this, &SafetyDevice::onPSSTimer);
 }
 
 //------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ SafetyDevice::~SafetyDevice()
 void SafetyDevice::step(double t, double dt)
 {
     safety_timer->step(t, dt);
+    pss_timer->step(t, dt);
     Device::step(t, dt);
 }
 
@@ -44,15 +46,16 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
 
     if (code_alsn < old_code_alsn)
     {
-        epk_state.reset();
+        setPSS();
     }
 
-    // Включаем ламбы на ЛС в соответствии с кодом АЛСН
+    // Включаем лампы на ЛС в соответствии с кодом АЛСН
     alsn_process(code_alsn);
 
     if (is_lamp_on(RED_LAMP))
     {
         is_red.set();
+        setPSS();
         epk_state.reset();
 
         return;
@@ -62,7 +65,8 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     {
         if (v_kmh > 40.0)
         {
-            epk_state.reset();            
+            setPSS();
+            epk_state.reset();
             return;
         }
 
@@ -76,6 +80,7 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     {
         if (v_kmh > 60.0)
         {
+            setPSS();
             epk_state.reset();
             return;
         }
@@ -107,7 +112,13 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
 
     if (state_RB || state_RBS)
     {
-        epk_state.set();        
+        resetPSS();
+    }
+
+    if (state_RBS)
+    {
+        epk_state.set();
+        resetPSS();
     }
 }
 
@@ -203,7 +214,37 @@ bool SafetyDevice::is_lamp_on(size_t lamp_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void SafetyDevice::setPSS()
+{
+    pss_lamp = 1.0f;
+
+    if (!pss_timer->isStarted())
+    {
+        pss_timer->start();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SafetyDevice::resetPSS()
+{
+    pss_lamp = 0.0f;
+    pss_timer->stop();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SafetyDevice::onSafetyTimer()
+{
+    setPSS();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SafetyDevice::onPSSTimer()
 {
     epk_state.reset();
 }

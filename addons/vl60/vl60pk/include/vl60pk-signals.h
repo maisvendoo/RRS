@@ -35,7 +35,7 @@ enum
     TUMBLER_GV_ON_OFF = 36,
 
     SIG_LIGHT_PSS_L = 50,
-    SIG_LIGHT_PSS_PROPUSK = 51,
+    SIG_LIGHT_PSS_R = 51,
     SIG_LIGHT_RB = 52,
     SIG_LIGHT_RP = 53,
     SIG_LIGHT_RPO = 54,
@@ -200,7 +200,9 @@ enum
 
     SOUND_EPK_ON = 297,
     SOUND_EPK_OFF = 298,
-    SOUND_EPK = 299
+    SOUND_EPK = 299,
+
+    SIG_LIGHT_PSS_PROPUSK = 300
 };
 
 #endif // VL60PK_SIGNALS_H

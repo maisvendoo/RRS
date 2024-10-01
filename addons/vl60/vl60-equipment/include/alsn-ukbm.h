@@ -57,6 +57,11 @@ public:
 
     float getWhiteLamp() const { return static_cast<float>(lamps[WHITE_LAMP]); }
 
+    float getStatePSS() const
+    {
+        return pss_lamp;
+    }
+
 private:
 
     int code_alsn = 0;
@@ -81,6 +86,12 @@ private:
 
     Timer *safety_timer = new Timer(45.0, false);
 
+    /// состяоние ламп ПСС
+    float pss_lamp = 0.0f;
+
+    /// таймер ПСС
+    Timer *pss_timer = new Timer(8.0, false);
+
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
@@ -93,11 +104,17 @@ private:
 
     void lamp_on(size_t lamp_idx);
 
-    bool is_lamp_on(size_t lamp_idx);    
+    bool is_lamp_on(size_t lamp_idx);
+
+    void setPSS();
+
+    void resetPSS();
 
 private slots:
 
     void onSafetyTimer();
+
+    void onPSSTimer();
 };
 
 #endif // ALSN_UKBM_H

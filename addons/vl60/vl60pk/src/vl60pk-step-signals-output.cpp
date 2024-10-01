@@ -100,4 +100,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[WHEEL_4] = static_cast<float>(wheel_rotation_angle[3] / 2.0 / Physics::PI);
     analogSignal[WHEEL_5] = static_cast<float>(wheel_rotation_angle[4] / 2.0 / Physics::PI);
     analogSignal[WHEEL_6] = static_cast<float>(wheel_rotation_angle[5] / 2.0 / Physics::PI);
+
+    analogSignal[SIG_LIGHT_PSS_L] = safety_device->getStatePSS();
+    analogSignal[SIG_LIGHT_PSS_R] = safety_device->getStatePSS();
 }
