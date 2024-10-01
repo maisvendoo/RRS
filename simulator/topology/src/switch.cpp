@@ -205,7 +205,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
             if (traj_fwd == nullptr)
                 continue;
 
-            for (auto device_fwd : traj_bwd->getTrajectoryDevices())
+            for (auto device_fwd : traj_fwd->getTrajectoryDevices())
             {
                 QString name = device_fwd->getName();
                 if (devices_names_bwd.contains(name) && (!devices_names.contains(name)))
