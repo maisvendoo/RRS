@@ -153,6 +153,7 @@ void SafetyDevice::alsn_process(int code_alsn)
             if (is_lamp_on(RED_YELLOW_LAMP))
             {
                 lamp_on(RED_LAMP);
+                is_red.set();
             }
             else
             {
@@ -164,6 +165,11 @@ void SafetyDevice::alsn_process(int code_alsn)
         }
     case ALSN_RED_YELLOW:
         {
+            if (!is_lamp_on(RED_YELLOW_LAMP))
+            {
+                setPSS();
+            }
+
             lamp_on(RED_YELLOW_LAMP);
 
             break;
