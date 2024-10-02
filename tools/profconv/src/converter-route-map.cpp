@@ -196,10 +196,30 @@ void ZDSimConverter::findSignalsAtMap()
             dvec3 nearest_point = nearest_track.begin_point + nearest_track.orth * track_coord;
             dvec3 rho_right = sig->position - nearest_point;
             sig->distance_from_main = dot(rho_right, nearest_track.right);
+
+            sig->nearest_point = nearest_point;
+            sig->rho_right = rho_right;
+            sig->track_right = nearest_track.right;
+
+            // Направление светофора
+            double signal_attitude_z = sig->attitude.z;
+            while (abs(signal_attitude_z) > 180.0)
+            {
+                signal_attitude_z += 360.0 * ((signal_attitude_z < 0) ? 1 : -1);
+            }
+            double track_attitude_z = (nearest_track.orth.x > 0.0) ? acos(nearest_track.orth.y) : - acos(nearest_track.orth.y);
+            track_attitude_z = track_attitude_z * 180.0 / 3.1415926535898;
+            sig->attitude_z_angle = track_attitude_z - signal_attitude_z;
+            if (abs(sig->attitude_z_angle) < 45.0)
+                sig->direction = 1;
+            if (abs(sig->attitude_z_angle) > 135.0)
+                sig->direction = -1;
+
             if (abs(sig->distance_from_main) < 6.0)
             {
                 sig->route_num = 1;
                 sig->track_id = track_id1;
+                sig->track_coord = near_end ? track_coord - nearest_track.length : track_coord;
             }
         }
     }
@@ -236,6 +256,10 @@ void ZDSimConverter::findSignalsAtMap()
                 stream << "\n"
                        << "NO_AT_MAIN"
                        << DELIMITER_SYMBOL
+                       << DELIMITER_SYMBOL << "sig{" << sig->position.x << "," << sig->position.y << "}"
+                       << DELIMITER_SYMBOL << "track{" << sig->nearest_point.x << "," << sig->nearest_point.y << "}"
+                       << DELIMITER_SYMBOL << "right{" << sig->track_right.x << "," << sig->track_right.y << "}"
+                       << DELIMITER_SYMBOL << "rho{" << sig->rho_right.x << "," << sig->rho_right.y << "}"
                        << DELIMITER_SYMBOL << "dist  " << sig->distance_from_main
                        << "\n";
             }
@@ -249,7 +273,13 @@ void ZDSimConverter::findSignalsAtMap()
                     stream << "route2";
 
                 stream << DELIMITER_SYMBOL
+                       << DELIMITER_SYMBOL
+                       << DELIMITER_SYMBOL << "sig{" << sig->position.x << "," << sig->position.y << "}"
+                       << DELIMITER_SYMBOL << "track{" << sig->nearest_point.x << "," << sig->nearest_point.y << "}"
+                       << DELIMITER_SYMBOL << "right{" << sig->track_right.x << "," << sig->track_right.y << "}"
+                       << DELIMITER_SYMBOL << "rho{" << sig->rho_right.x << "," << sig->rho_right.y << "}"
                        << DELIMITER_SYMBOL << "dist  " << sig->distance_from_main
+                       << DELIMITER_SYMBOL << "coord " << sig->track_coord
                        << DELIMITER_SYMBOL << "dir" << sig->direction
                        << DELIMITER_SYMBOL << "track" << sig->track_id
                        << "\n";
