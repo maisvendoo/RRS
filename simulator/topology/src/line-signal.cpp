@@ -69,9 +69,9 @@ void LineSignal::lens_state_control()
 
     // Желтый, при притянутом нейтральном якоре и отрицательном питании
     // линейного реле
-    lens_state[YELLOW_LENS] = (line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
-                               line_relay->getMinusContactState(LR_MINUS_YELLOW)) ||
-                              (blink_contact && side_signal_relay->getContactState(SSR_YELLOW));
+    lens_state[YELLOW_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
+                               (line_relay->getMinusContactState(LR_MINUS_YELLOW) ||
+                               (blink_contact && side_signal_relay->getContactState(SSR_YELLOW)));
 
     // При изменение соостояния ламп обновляем его
     if (old_lens_state != lens_state)
