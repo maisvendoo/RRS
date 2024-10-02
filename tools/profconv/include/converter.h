@@ -20,6 +20,7 @@
 //#include    "zds-profile-dat-struct.h"
 #include    "zds-route-map-struct.h"
 #include    "zds-route-trk-struct.h"
+#include    "zds-signals-at-route-map-struct.h"
 #include    "zds-start-kilometers-dat-struct.h"
 #include    "zds-speeds-dat-struct.h"
 #include    "zds-svetofor-dat-struct.h"
@@ -82,25 +83,15 @@ private:
 
     zds_route_map_data_t    route_map_data;
 
-    zds_route_map_data_t    signals_line_data;
+    zds_signals_at_map_data_t   signals_line_data;
 
-    zds_route_map_data_t    signals_pred_data;
+    zds_signals_at_map_data_t   signals_enter_data;
 
-    zds_route_map_data_t    signals_enter_data;
+    zds_signals_at_map_data_t   signals_exit_data;
 
-    zds_route_map_data_t    signals_exit_data;
+    zds_signals_at_map_data_t   signals_povt_data;
 
-    zds_route_map_data_t    signals_sig_k5p_data;
-
-    zds_route_map_data_t    signals_sig_k3p_data;
-
-    zds_route_map_data_t    signals_povt_data;
-
-    zds_route_map_data_t    signals_povt_k_data;
-
-    zds_route_map_data_t    signals_sig_m2m_data;
-
-    zds_route_map_data_t    signals_sig_k2m_data;
+    zds_signals_at_map_data_t   signals_maneurous_data;
 
     zds_trajectory_data_t   tracks_data1;
 

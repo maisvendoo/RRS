@@ -246,7 +246,6 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         //createPowerLine(tracks_data1, power_line1);
         readRouteMAP(map_path, route_map_data);
         findNeutralInsertions(neutral_insertions);
-        findSignalsAtMap();
 
         readSpeedsDAT(speeds1_path, speeds_data1, dir);
         readSvetoforDAT(signals1_path, signals_data1, dir);
@@ -271,6 +270,8 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         // Создание старого формата ЭК скоростей speeds2.conf отключено
         //writeOldSpeeds(speeds2_file, speeds_data2);
     }
+
+    findSignalsAtMap();
 
     if (is_1)
     {

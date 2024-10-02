@@ -102,47 +102,109 @@ void ZDSimConverter::findSignalsAtMap()
 {
     for (auto zds_obj : route_map_data)
     {
-        // Проходной
-        if (zds_obj->obj_name == "signal_line")
-            signals_line_data.push_back(zds_obj);
+        // Игнорируем модели с пустой дополнительной информацией
+        // поскольку нас интересуют светофоры с литерой
+        if (zds_obj->obj_info.empty())
+            continue;
 
-        // Проходной предвходной
-        if (zds_obj->obj_name == "signal_pred")
-            signals_pred_data.push_back(zds_obj);
+        // Проходной, предвходной
+        if ((zds_obj->obj_name == "signal_line") ||
+            (zds_obj->obj_name == "signal_pred"))
+        {
+            zds_signal_position_t *signal = new zds_signal_position_t();
+            signal->obj_name = zds_obj->obj_name;
+            signal->position = zds_obj->position;
+            signal->attitude = zds_obj->attitude;
+
+            signal->type = "ab3line";
+            signal->liter = zds_obj->obj_info;
+            signals_line_data.push_back(signal);
+        }
 
         // Входной
         if (zds_obj->obj_name == "signal_enter")
-            signals_enter_data.push_back(zds_obj);
+        {
+            zds_signal_position_t *signal = new zds_signal_position_t();
+            signal->obj_name = zds_obj->obj_name;
+            signal->position = zds_obj->position;
+            signal->attitude = zds_obj->attitude;
 
-        // Маршрутный или выходной
-        if (zds_obj->obj_name == "signal_exit")
-            signals_exit_data.push_back(zds_obj);
+            signal->type = "ab3entr";
+            signal->liter = zds_obj->obj_info;
+            signals_enter_data.push_back(signal);
+        }
 
-        // Карликовый, 5 линз
-        if (zds_obj->obj_name == "sig_k5p")
-            signals_sig_k5p_data.push_back(zds_obj);
+        // Маршрутный/выходной, карликовый 5 линз, карликовый 3 линзы
+        if ((zds_obj->obj_name == "signal_exit") ||
+            (zds_obj->obj_name == "sig_k5p") ||
+            (zds_obj->obj_name == "sig_k3p"))
+        {
+            zds_signal_position_t *signal = new zds_signal_position_t();
+            signal->obj_name = zds_obj->obj_name;
+            signal->position = zds_obj->position;
+            signal->attitude = zds_obj->attitude;
 
-        // Карликовый 3 линзы
-        if (zds_obj->obj_name == "sig_k3p")
-            signals_sig_k3p_data.push_back(zds_obj);
+            signal->type = "ab3exit";
+            signal->liter = zds_obj->obj_info;
+            signals_exit_data.push_back(signal);
+        }
 
-        // Повторительный
-        if (zds_obj->obj_name == "sig_povt")
-            signals_povt_data.push_back(zds_obj);
+        // Повторительный, карликовый повторительный
+        if ((zds_obj->obj_name == "sig_povt") ||
+            (zds_obj->obj_name == "sig_povt_k"))
+        {
+            zds_signal_position_t *signal = new zds_signal_position_t();
+            signal->obj_name = zds_obj->obj_name;
+            signal->position = zds_obj->position;
+            signal->attitude = zds_obj->attitude;
 
-        // Карликовый повторительный
-        if (zds_obj->obj_name == "sig_povt_k")
-            signals_povt_k_data.push_back(zds_obj);
+            signal->liter = zds_obj->obj_info;
+            signals_povt_data.push_back(signal);
+        }
 
-        // Маневровый мачтовый
-        if (zds_obj->obj_name == "sig_m2m")
-            signals_sig_m2m_data.push_back(zds_obj);
+        // Маневровый мачтовый, маневровый карликовый
+        if ((zds_obj->obj_name == "sig_m2m") ||
+            (zds_obj->obj_name == "sig_k2m"))
+        {
+            zds_signal_position_t *signal = new zds_signal_position_t();
+            signal->obj_name = zds_obj->obj_name;
+            signal->position = zds_obj->position;
+            signal->attitude = zds_obj->attitude;
 
-        // Маневровый карликовый
-        if (zds_obj->obj_name == "sig_k2m")
-            signals_sig_k2m_data.push_back(zds_obj);
+            signal->liter = zds_obj->obj_info;
+            signals_maneurous_data.push_back(signal);
+        }
     }
 
+    // Привязка к главным путям
+    for (auto map : {signals_line_data,
+                     signals_enter_data,
+                     signals_exit_data,
+                     signals_povt_data,
+                     signals_maneurous_data})
+    {
+        for (auto sig : map)
+        {
+            // Трек главного пути напротив светофора
+            float coord;
+            zds_track_t nearest_track = getNearestTrack(sig->position, tracks_data1, coord);
+            bool near_end = (coord > (nearest_track.route_coord + 0.5 * nearest_track.length));
+            int track_id1 = near_end ? nearest_track.prev_uid + 1 : nearest_track.prev_uid;
+
+            // Точка главного пути напротив светофора
+            double track_coord = coord - nearest_track.route_coord;
+            dvec3 nearest_point = nearest_track.begin_point + nearest_track.orth * track_coord;
+            dvec3 rho_right = sig->position - nearest_point;
+            sig->distance_from_main = dot(rho_right, nearest_track.right);
+            if (abs(sig->distance_from_main) < 6.0)
+            {
+                sig->route_num = 1;
+                sig->track_id = track_id1;
+            }
+        }
+    }
+
+    // Вывод для отладки
     std::string path = compinePath(topologyDir, "signals_at_map.conf");
 
     QFile file(QString(path.c_str()));
@@ -151,29 +213,47 @@ void ZDSimConverter::findSignalsAtMap()
 
     QTextStream stream(&file);
     stream.setEncoding(QStringConverter::Utf8);
+    stream.setRealNumberNotation(QTextStream::FixedNotation);
 
     for (auto map : {signals_line_data,
-                     signals_pred_data,
                      signals_enter_data,
                      signals_exit_data,
-                     signals_sig_k5p_data,
-                     signals_sig_k3p_data,
                      signals_povt_data,
-                     signals_povt_k_data,
-                     signals_sig_m2m_data,
-                     signals_sig_k2m_data})
+                     signals_maneurous_data})
     {
-        for (auto zds_obj : map)
+        for (auto sig : map)
         {
-            stream << zds_obj->obj_name.c_str()
-                   << DELIMITER_SYMBOL << zds_obj->obj_info.c_str()
-                   << DELIMITER_SYMBOL << zds_obj->position.x
-                   << DELIMITER_SYMBOL << zds_obj->position.y
-                   << DELIMITER_SYMBOL << zds_obj->position.z
-                   << DELIMITER_SYMBOL << zds_obj->attitude.x
-                   << DELIMITER_SYMBOL << zds_obj->attitude.y
-                   << DELIMITER_SYMBOL << zds_obj->attitude.z
-                   << "\n";
+            stream << sig->obj_name.c_str()
+                   << DELIMITER_SYMBOL << sig->liter.c_str()
+                   << DELIMITER_SYMBOL << sig->position.x
+                   << DELIMITER_SYMBOL << sig->position.y
+                   << DELIMITER_SYMBOL << sig->position.z
+                   << DELIMITER_SYMBOL << sig->attitude.x
+                   << DELIMITER_SYMBOL << sig->attitude.y
+                   << DELIMITER_SYMBOL << sig->attitude.z;
+            if (sig->route_num == -1)
+            {
+                stream << "\n"
+                       << "NO_AT_MAIN"
+                       << DELIMITER_SYMBOL
+                       << DELIMITER_SYMBOL << "dist  " << sig->distance_from_main
+                       << "\n";
+            }
+            else
+            {
+                stream << "\n"
+                       << "MAIN:";
+                if (sig->route_num == 1)
+                    stream << "route1";
+                if (sig->route_num == 2)
+                    stream << "route2";
+
+                stream << DELIMITER_SYMBOL
+                       << DELIMITER_SYMBOL << "dist  " << sig->distance_from_main
+                       << DELIMITER_SYMBOL << "dir" << sig->direction
+                       << DELIMITER_SYMBOL << "track" << sig->track_id
+                       << "\n";
+            }
         }
     }
 
