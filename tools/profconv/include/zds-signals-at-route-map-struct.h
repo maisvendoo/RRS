@@ -28,6 +28,8 @@ struct zds_signal_position_t
     dvec3       nearest_point = dvec3(0.0, 0.0, 0.0);
     dvec3       rho_right = dvec3(0.0, 0.0, 0.0);
     dvec3       track_right = dvec3(0.0, 0.0, 0.0);
+
+    bool        is_left = false;
 };
 
 //------------------------------------------------------------------------------

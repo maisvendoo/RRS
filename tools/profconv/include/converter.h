@@ -153,6 +153,8 @@ private:
 
     void findSignalsAtMap();
 
+    bool findTrackNearToSignal(zds_signal_position_t *signal, int dir);
+
     bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data, const int &dir);
 
     bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data, const int &dir);
