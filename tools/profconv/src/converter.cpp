@@ -271,18 +271,15 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         //writeOldSpeeds(speeds2_file, speeds_data2);
     }
 
-    findSignalsAtMap();
 
     if (is_1)
     {
-        int dir = 1;
-        findSplitsMainTrajectories(dir);
-    }
+        findSignalsAtMap();
 
-    if (is_1 && is_2)
-    {
-        dir = -1;
-        findSplitsMainTrajectories(dir);
+        findSplitsMainTrajectory1();
+
+        if (is_2)
+            findSplitsMainTrajectory2();
     }
 
     // Разделение главных путей на подтраектории

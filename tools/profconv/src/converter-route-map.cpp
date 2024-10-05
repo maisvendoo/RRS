@@ -117,7 +117,7 @@ void ZDSimConverter::findSignalsAtMap()
             signal->position = zds_obj->position;
             signal->attitude = zds_obj->attitude;
 
-            signal->type = "ab3line";
+            signal->type = "ab_line";
             signal->liter = zds_obj->obj_info;
             signals_line_data.push_back(signal);
         }
@@ -130,7 +130,7 @@ void ZDSimConverter::findSignalsAtMap()
             signal->position = zds_obj->position;
             signal->attitude = zds_obj->attitude;
 
-            signal->type = "ab3entr";
+            signal->type = "ab_entr";
             signal->liter = zds_obj->obj_info;
             signals_enter_data.push_back(signal);
         }
@@ -146,7 +146,7 @@ void ZDSimConverter::findSignalsAtMap()
             signal->position = zds_obj->position;
             signal->attitude = zds_obj->attitude;
 
-            signal->type = "ab3exit";
+            signal->type = "ab_exit";
             signal->liter = zds_obj->obj_info;
             signals_exit_data.push_back(signal);
         }
@@ -204,12 +204,12 @@ void ZDSimConverter::findSignalsAtMap()
     QFile file_t(QString(path_train.c_str()));
     if (!file_t.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
-    QFile file_p(QString(path_povt.c_str()));
+/*    QFile file_p(QString(path_povt.c_str()));
     if (!file_p.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
     QFile file_m(QString(path_maneurous.c_str()));
     if (!file_m.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
+        return;*/
     QFile file_n(QString(path_not_at_main.c_str()));
     if (!file_n.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
@@ -217,12 +217,12 @@ void ZDSimConverter::findSignalsAtMap()
     QTextStream stream_t(&file_t);
     stream_t.setEncoding(QStringConverter::Utf8);
     stream_t.setRealNumberNotation(QTextStream::FixedNotation);
-    QTextStream stream_p(&file_p);
+/*    QTextStream stream_p(&file_p);
     stream_p.setEncoding(QStringConverter::Utf8);
     stream_p.setRealNumberNotation(QTextStream::FixedNotation);
     QTextStream stream_m(&file_m);
     stream_m.setEncoding(QStringConverter::Utf8);
-    stream_m.setRealNumberNotation(QTextStream::FixedNotation);
+    stream_m.setRealNumberNotation(QTextStream::FixedNotation);*/
     QTextStream stream_n(&file_n);
     stream_n.setEncoding(QStringConverter::Utf8);
     stream_n.setRealNumberNotation(QTextStream::FixedNotation);
@@ -287,7 +287,7 @@ void ZDSimConverter::findSignalsAtMap()
             }
         }
     }
-
+/*
     for (auto sig : signals_povt_data)
     {
         stream_p << sig->obj_name.c_str()
@@ -377,10 +377,10 @@ void ZDSimConverter::findSignalsAtMap()
                      << "\n";
         }
     }
-
+*/
     file_t.close();
-    file_p.close();
-    file_m.close();
+/*    file_p.close();
+    file_m.close();*/
 }
 
 //------------------------------------------------------------------------------

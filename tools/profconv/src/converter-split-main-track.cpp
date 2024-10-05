@@ -7,254 +7,150 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
+void ZDSimConverter::findSplitsMainTrajectory1()
 {
-    if (dir > 0)
+    int prev_railway_coord_section = 0;
+    bool was_1_track = false;
+    size_t id = 0;
+    for (auto it = tracks_data1.begin(); it != tracks_data1.end(); ++it)
     {
-        int prev_railway_coord_section = 0;
-        bool was_1_track = false;
-        size_t id = 0;
-        for (auto it = tracks_data1.begin(); it != tracks_data1.end(); ++it)
+        zds_track_t track = *it;
+        split_zds_trajectory_t split = split_zds_trajectory_t();
+
+        // Проверяем однопутный участок
+        for (auto it2 = tracks_data2.begin(); it2 != tracks_data2.end(); ++it2)
         {
-            zds_track_t track = *it;
-            split_zds_trajectory_t split = split_zds_trajectory_t();
-
-            // Проверяем однопутный участок
-            for (auto it2 = tracks_data2.begin(); it2 != tracks_data2.end(); ++it2)
+            zds_track_t track2 = *it2;
+            if (length(track.begin_point - track2.begin_point) < 0.1)
             {
-                zds_track_t track2 = *it2;
-                if (length(track.begin_point - track2.begin_point) < 0.1)
+                if ((!was_1_track) && (id != 0))
                 {
-                    if ((!was_1_track) && (id != 0))
-                    {
-                        // Начало однопутного участка
-                        split.split_type.push_back(split_zds_trajectory_t::SPLIT_2_1);
-                    }
-
-                    if (length(track.end_point - track2.end_point) < 0.1)
-                    {
-                        // Однопутный участок
-                        it2->id_at_track1 = id;
-                        was_1_track = true;
-                    }
-                    else
-                    {
-                        // Конец однопутного участка
-                        split.split_type.push_back(split_zds_trajectory_t::SPLIT_1_2);
-                        was_1_track = false;
-                    }
-                    break;
+                    // Начало однопутного участка
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_2_1);
                 }
-            }
 
-            // Съезды между главными путями
-            // Добавляем съезды "2-2", найденные в branch_tracks
-            bool is_branch = false;
-            for (auto branch22 : branch_2minus2_data)
-            {
-                if (branch22->id1 == id)
+                if (length(track.end_point - track2.end_point) < 0.1)
                 {
-                    is_branch = true;
-
-                    // Разделение в начале данного трека
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
-
-                    // Добавляем разделение и в соседний главный путь
-                    split_zds_trajectory_t split2 = split_zds_trajectory_t();
-                    split2.track_id = branch22->id2;
-                    split2.point = tracks_data2[branch22->id2].begin_point;
-                    split2.railway_coord = tracks_data2[branch22->id2].railway_coord;
-                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
-                    addOrCreateSplit(split_data2, split2);
-
-                    break;
-                }
-            }
-            // Проверяем съезды "2-2", записанные в route.trk, игнорируем однопутные участки
-            if ((track.arrows == "2-2") && (!is_branch))
-            {
-                if (was_1_track)
-                {
-                    // На однопутном участке это просто модель стрелки
-                    // Добавляем разделение в начале данного трека
-                    // для возможности позднее создать съезд вручную
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
+                    // Однопутный участок
+                    it2->id_at_track1 = id;
+                    was_1_track = true;
                 }
                 else
                 {
-                    // Разделение в начале данного трека
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
-
-                    // Добавляем разделение и в соседний главный путь
-                    float coord;
-                    zds_track_t track2 = getNearestTrack(track.end_point, tracks_data2, coord);
-                    bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
-                    size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
-
-                    split_zds_trajectory_t split2 = split_zds_trajectory_t();
-                    split2.track_id = id2;
-                    split2.point = tracks_data2[id2].begin_point;
-                    split2.railway_coord = tracks_data2[id2].railway_coord;
-                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
-                    addOrCreateSplit(split_data2, split2);
-
-                    // Добавляем съезд в массив траекторий съездов
-                    zds_branch_2_2_t branch2minus2 = zds_branch_2_2_t();
-                    branch2minus2.id1 = id;
-                    branch2minus2.id2 = id2;
-                    calcBranch22(&branch2minus2);
-                    branch_2minus2_data.push_back(new zds_branch_2_2_t(branch2minus2));
+                    // Конец однопутного участка
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_1_2);
+                    was_1_track = false;
                 }
+                break;
             }
-            // Добавляем съезды "2+2", найденные в branch_tracks
-            is_branch = false;
-            for (auto branch22 : branch_2plus2_data)
+        }
+
+        // Съезды между главными путями
+        // Добавляем съезды "2-2", найденные в branch_tracks
+        bool is_branch = false;
+        for (auto branch22 : branch_2minus2_data)
+        {
+            if (branch22->id1 == id)
             {
-                if (branch22->id1 == id + 1)
-                {
-                    is_branch = true;
+                is_branch = true;
 
-                    // Разделение в конце данного трека - в начале следующего
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
-                    // Проверяем светофор на возвращении с branch_track
-                    if ((branch22->is_bwd) && (!branch22->branch_point_bwd.signal_liter.empty()))
-                    {
-                        split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
-                        split_at_next.signal_bwd_liter = branch22->branch_point_bwd.signal_liter;
-                    }
-                    addOrCreateSplit(split_data1, split_at_next);
+                // Разделение в начале данного трека
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
 
-                    // Добавляем разделение и в соседний главный путь
-                    split_zds_trajectory_t split2 = split_zds_trajectory_t();
-                    split2.track_id = branch22->id2;
-                    split2.point = tracks_data2[branch22->id2].begin_point;
-                    split2.railway_coord = tracks_data2[branch22->id2].railway_coord;
-                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
-                    // Проверяем светофор на возвращении с branch_track
-                    if ((branch22->is_fwd) && (!branch22->branch_point_fwd.signal_liter.empty()))
-                    {
-                        split2.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
-                        split2.signal_fwd_liter = branch22->branch_point_fwd.signal_liter;
-                    }
-                    addOrCreateSplit(split_data2, split2);
+                // Добавляем разделение и в соседний главный путь
+                split_zds_trajectory_t split2 = split_zds_trajectory_t();
+                split2.track_id = branch22->id2;
+                split2.point = tracks_data2[branch22->id2].begin_point;
+                split2.railway_coord = tracks_data2[branch22->id2].railway_coord;
+                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
+                addOrCreateSplit(split_data2, split2);
 
-                    break;
-                }
+                break;
             }
-            // Проверяем съезды "2+2", записанные в route.trk, игнорируем однопутные участки
-            if ((track.arrows == "2+2") && (!is_branch))
+        }
+        // Проверяем съезды "2-2", записанные в route.trk, игнорируем однопутные участки
+        if ((track.arrows == "2-2") && (!is_branch))
+        {
+            if (was_1_track)
             {
-                if (was_1_track)
-                {
-                    // На однопутном участке это просто модель стрелки
-                    // Добавляем разделение в конце данного трека - в начале следующего
-                    // для возможности позднее создать съезд вручную
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
-                    addOrCreateSplit(split_data1, split_at_next);
-                }
-                else
-                {
-                    // Разделение в конце данного трека - в начале следующего
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
-                    addOrCreateSplit(split_data1, split_at_next);
-
-                    // Добавляем разделение и в соседний главный путь
-                    float coord;
-                    zds_track_t track2 = getNearestTrack(track.begin_point, tracks_data2, coord);
-                    bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
-                    size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
-
-                    split_zds_trajectory_t split2 = split_zds_trajectory_t();
-                    split2.track_id = id2;
-                    split2.point = tracks_data2[id2].begin_point;
-                    split2.railway_coord = tracks_data2[id2].railway_coord;
-                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
-                    addOrCreateSplit(split_data2, split2);
-
-                    // Добавляем съезд в массив траекторий съездов
-                    zds_branch_2_2_t branch2plus2 = zds_branch_2_2_t();
-                    branch2plus2.id1 = id + 1;
-                    branch2plus2.id2 = id2;
-                    calcBranch22(&branch2plus2);
-                    branch_2plus2_data.push_back(new zds_branch_2_2_t(branch2plus2));
-                }
-            }
-
-            // Стрелки на боковые пути
-            // Добавляем съезды на боковые пути, найденные в branch_tracks
-            is_branch = false;
-            for (auto branch : branch_track_data1)
-            {
-                if ((branch->id_begin == id) && (!branch->begin_at_other))
-                {
-                    is_branch = true;
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
-                }
-            }
-            for (auto branch : branch_track_data2)
-            {
-                if (branch->id_end_at_other == id)
-                {
-                    is_branch = true;
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
-                }
-            }
-            // Добавляем стрелки "+2" или "-2", записанные в route.trk
-            // для возможности позднее создать съезд вручную
-            if ( ((track.arrows == "+2") || (track.arrows == "-2")) && (!is_branch) )
-            {
+                // На однопутном участке это просто модель стрелки
+                // Добавляем разделение в начале данного трека
+                // для возможности позднее создать съезд вручную
                 split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
             }
-
-            // Добавляем съезды с боковых путей, найденных в branch_tracks
-            is_branch = false;
-            for (auto branch : branch_track_data1)
+            else
             {
-                if ((branch->id_end == id + 1) && (!branch->end_at_other))
-                {
-                    is_branch = true;
+                // Разделение в начале данного трека
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
 
-                    // Разделение в конце данного трека - в начале следующего
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
-                    addOrCreateSplit(split_data1, split_at_next);
-                }
+                // Добавляем разделение и в соседний главный путь
+                float coord;
+                zds_track_t track2 = getNearestTrack(track.end_point, tracks_data2, coord);
+                bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
+                size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
+
+                split_zds_trajectory_t split2 = split_zds_trajectory_t();
+                split2.track_id = id2;
+                split2.point = tracks_data2[id2].begin_point;
+                split2.railway_coord = tracks_data2[id2].railway_coord;
+                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
+                addOrCreateSplit(split_data2, split2);
+
+                // Добавляем съезд в массив траекторий съездов
+                zds_branch_2_2_t branch2minus2 = zds_branch_2_2_t();
+                branch2minus2.id1 = id;
+                branch2minus2.id2 = id2;
+                calcBranch22(&branch2minus2);
+                branch_2minus2_data.push_back(new zds_branch_2_2_t(branch2minus2));
             }
-            for (auto branch : branch_track_data2)
+        }
+        // Добавляем съезды "2+2", найденные в branch_tracks
+        is_branch = false;
+        for (auto branch22 : branch_2plus2_data)
+        {
+            if (branch22->id1 == id + 1)
             {
-                if (branch->id_begin_at_other == id + 1)
-                {
-                    is_branch = true;
+                is_branch = true;
 
-                    // Разделение в конце данного трека - в начале следующего
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
-                    addOrCreateSplit(split_data1, split_at_next);
-                }
-            }
-            // Добавляем стрелки "2+" или "2-", записанные в route.trk
-            // для возможности позднее создать съезд вручную
-            if ( ((track.arrows == "2+") || (track.arrows == "2-")) && (!is_branch) )
-            {
                 // Разделение в конце данного трека - в начале следующего
+                split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                split_at_next.track_id = id + 1;
+                split_at_next.point = track.end_point;
+                split_at_next.railway_coord = track.railway_coord_end;
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                // Проверяем светофор на возвращении с branch_track
+                if ((branch22->is_bwd) && (!branch22->branch_point_bwd.signal_liter.empty()))
+                {
+                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                    split_at_next.signal_bwd_liter = branch22->branch_point_bwd.signal_liter;
+                }
+                addOrCreateSplit(split_data1, split_at_next);
+
+                // Добавляем разделение и в соседний главный путь
+                split_zds_trajectory_t split2 = split_zds_trajectory_t();
+                split2.track_id = branch22->id2;
+                split2.point = tracks_data2[branch22->id2].begin_point;
+                split2.railway_coord = tracks_data2[branch22->id2].railway_coord;
+                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                // Проверяем светофор на возвращении с branch_track
+                if ((branch22->is_fwd) && (!branch22->branch_point_fwd.signal_liter.empty()))
+                {
+                    split2.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                    split2.signal_fwd_liter = branch22->branch_point_fwd.signal_liter;
+                }
+                addOrCreateSplit(split_data2, split2);
+
+                break;
+            }
+        }
+        // Проверяем съезды "2+2", записанные в route.trk, игнорируем однопутные участки
+        if ((track.arrows == "2+2") && (!is_branch))
+        {
+            if (was_1_track)
+            {
+                // На однопутном участке это просто модель стрелки
+                // Добавляем разделение в конце данного трека - в начале следующего
+                // для возможности позднее создать съезд вручную
                 split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
                 split_at_next.track_id = id + 1;
                 split_at_next.point = track.end_point;
@@ -262,144 +158,236 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                 split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
                 addOrCreateSplit(split_data1, split_at_next);
             }
-
-            // Разделяем возле светофоров для выделения блок-участков
-            for (auto s_it = signals_data1.begin(); s_it != signals_data1.end(); ++s_it)
-            {
-                if ((*s_it).track_id == id)
-                {
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
-                    split.signal_fwd_type = (*s_it).type;
-                    split.signal_fwd_liter = (*s_it).liter;
-                    break;
-                }
-            }
-
-            // Разделяем возле добавленных светофоров в неправильном направлении
-            // На всякий случай проигнорируем однопутные участки
-            if (!was_1_track)
-            {
-                for (auto s_it = signals_reverse_data1.begin(); s_it != signals_reverse_data1.end(); ++s_it)
-                {
-                    if ((*s_it).track_id + 1 == id)
-                    {
-                        split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
-                        split.signal_bwd_type = (*s_it).type;
-                        split.signal_bwd_liter = (*s_it).liter;
-                        break;
-                    }
-                }
-            }
-
-            // Разделяем, где начинается новый пикетаж
-            if (track.railway_coord_section != prev_railway_coord_section)
-            {
-                prev_railway_coord_section = track.railway_coord_section;
-                split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
-            }
-
-            if (!split.split_type.empty())
-            {
-                split.track_id = id;
-                split.point = track.begin_point;
-                split.railway_coord = track.railway_coord;
-                addOrCreateSplit(split_data1, split);
-            }
-
-            ++id;
-        }
-    }
-    else
-    {
-        int prev_railway_coord_section = 0;
-        size_t id = 0;
-        for (auto it = tracks_data2.begin(); it != tracks_data2.end(); ++it)
-        {
-            zds_track_t track = *it;
-            split_zds_trajectory_t split = split_zds_trajectory_t();
-
-            // Стрелки на боковые пути
-            // Добавляем съезды на боковые пути, найденные в branch_tracks
-            bool is_branch = false;
-            for (auto branch : branch_track_data2)
-            {
-                if ((branch->id_end == id) && (!branch->end_at_other))
-                {
-                    is_branch = true;
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
-                }
-            }
-            for (auto branch : branch_track_data1)
-            {
-                if (branch->id_begin_at_other == id)
-                {
-                    is_branch = true;
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
-                }
-            }
-            // Добавляем стрелки "+2" или "-2", записанные в route.trk
-            if ( ((track.arrows == "+2") || (track.arrows == "-2")) && (!is_branch) )
-            {
-                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
-            }
-
-            // Добавляем съезды с боковых путей, найденных в branch_tracks
-            is_branch = false;
-            for (auto branch : branch_track_data2)
-            {
-                if ((branch->id_begin == id + 1) && (!branch->begin_at_other))
-                {
-                    is_branch = true;
-
-                    // Разделение в конце данного трека - в начале следующего
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
-                    if (track.id_at_track1 == -1)
-                    {
-                        addOrCreateSplit(split_data2, split_at_next);
-                    }
-                    else
-                    {
-                        split_at_next.track_id = track.id_at_track1 + 1;
-                        addOrCreateSplit(split_data1, split_at_next);
-                    }
-                }
-            }
-            for (auto branch : branch_track_data1)
-            {
-                if (branch->id_end_at_other == id + 1)
-                {
-                    is_branch = true;
-
-                    // Разделение в конце данного трека - в начале следующего
-                    split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
-                    split_at_next.track_id = id + 1;
-                    split_at_next.point = track.end_point;
-                    split_at_next.railway_coord = track.railway_coord_end;
-                    split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
-                    if (track.id_at_track1 == -1)
-                    {
-                        addOrCreateSplit(split_data2, split_at_next);
-                    }
-                    else
-                    {
-                        split_at_next.track_id = track.id_at_track1 + 1;
-                        addOrCreateSplit(split_data1, split_at_next);
-                    }
-                }
-            }
-            // Добавляем стрелки "2+" или "2-", записанные в route.trk
-            if ( ((track.arrows == "2+") || (track.arrows == "2-")) && (!is_branch))
+            else
             {
                 // Разделение в конце данного трека - в начале следующего
                 split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
                 split_at_next.track_id = id + 1;
                 split_at_next.point = track.end_point;
                 split_at_next.railway_coord = track.railway_coord_end;
-                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                addOrCreateSplit(split_data1, split_at_next);
+
+                // Добавляем разделение и в соседний главный путь
+                float coord;
+                zds_track_t track2 = getNearestTrack(track.begin_point, tracks_data2, coord);
+                bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
+                size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
+
+                split_zds_trajectory_t split2 = split_zds_trajectory_t();
+                split2.track_id = id2;
+                split2.point = tracks_data2[id2].begin_point;
+                split2.railway_coord = tracks_data2[id2].railway_coord;
+                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                addOrCreateSplit(split_data2, split2);
+
+                // Добавляем съезд в массив траекторий съездов
+                zds_branch_2_2_t branch2plus2 = zds_branch_2_2_t();
+                branch2plus2.id1 = id + 1;
+                branch2plus2.id2 = id2;
+                calcBranch22(&branch2plus2);
+                branch_2plus2_data.push_back(new zds_branch_2_2_t(branch2plus2));
+            }
+        }
+
+        // Стрелки на боковые пути
+        // Добавляем съезды на боковые пути, найденные в branch_tracks
+        is_branch = false;
+        for (auto branch : branch_track_data1)
+        {
+            if ((branch->id_begin == id) && (!branch->begin_at_other))
+            {
+                is_branch = true;
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+            }
+        }
+        for (auto branch : branch_track_data2)
+        {
+            if (branch->id_end_at_other == id)
+            {
+                is_branch = true;
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+            }
+        }
+        // Добавляем стрелки "+2" или "-2", записанные в route.trk
+        // для возможности позднее создать съезд вручную
+        if ( ((track.arrows == "+2") || (track.arrows == "-2")) && (!is_branch) )
+        {
+            split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
+        }
+
+        // Добавляем съезды с боковых путей, найденных в branch_tracks
+        is_branch = false;
+        for (auto branch : branch_track_data1)
+        {
+            if ((branch->id_end == id + 1) && (!branch->end_at_other))
+            {
+                is_branch = true;
+
+                // Разделение в конце данного трека - в начале следующего
+                split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                split_at_next.track_id = id + 1;
+                split_at_next.point = track.end_point;
+                split_at_next.railway_coord = track.railway_coord_end;
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
+                addOrCreateSplit(split_data1, split_at_next);
+            }
+        }
+        for (auto branch : branch_track_data2)
+        {
+            if (branch->id_begin_at_other == id + 1)
+            {
+                is_branch = true;
+
+                // Разделение в конце данного трека - в начале следующего
+                split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                split_at_next.track_id = id + 1;
+                split_at_next.point = track.end_point;
+                split_at_next.railway_coord = track.railway_coord_end;
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
+                addOrCreateSplit(split_data1, split_at_next);
+            }
+        }
+        // Добавляем стрелки "2+" или "2-", записанные в route.trk
+        // для возможности позднее создать съезд вручную
+        if ( ((track.arrows == "2+") || (track.arrows == "2-")) && (!is_branch) )
+        {
+            // Разделение в конце данного трека - в начале следующего
+            split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+            split_at_next.track_id = id + 1;
+            split_at_next.point = track.end_point;
+            split_at_next.railway_coord = track.railway_coord_end;
+            split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
+            addOrCreateSplit(split_data1, split_at_next);
+        }
+
+        // Разделяем возле светофоров из svetofor1.dat для выделения блок-участков
+        for (auto s_it = signals_data1.begin(); s_it != signals_data1.end(); ++s_it)
+        {
+            if ((*s_it).track_id == id)
+            {
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                split.signal_fwd_type = (*s_it).type;
+                split.signal_fwd_liter = (*s_it).liter;
+                break;
+            }
+        }
+
+        // Разделяем возле прочих светофоров
+        // На всякий случай проигнорируем однопутные участки
+        if (!was_1_track)
+        {
+            // Разделяем возле светофоров, добавленных через svetofor1_reverse.dat
+            for (auto s_it = signals_reverse_data1.begin(); s_it != signals_reverse_data1.end(); ++s_it)
+            {
+                if ((*s_it).track_id + 1 == id)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                    split.signal_bwd_type = (*s_it).type;
+                    split.signal_bwd_liter = (*s_it).liter;
+                    break;
+                }
+            }
+        }
+
+        // Разделяем возле светофоров, раставленных на карте
+        for (auto map : {signals_line_data,
+                         signals_enter_data,
+                         signals_exit_data/*,
+                         signals_povt_data,
+                         signals_maneurous_data*/})
+        {
+            for (auto sig : map)
+            {
+                if ((sig->route_num != 1) || (sig->track_id != id))
+                {
+                    continue;
+                }
+                if (sig->direction == 1)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                    split.signal_fwd_type = sig->type;
+                    split.signal_fwd_liter = sig->liter;
+                }
+                if (sig->direction == -1)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                    split.signal_bwd_type = sig->type;
+                    split.signal_bwd_liter = sig->liter;
+                }
+            }
+        }
+
+        // Разделяем, где начинается новый пикетаж
+        if (track.railway_coord_section != prev_railway_coord_section)
+        {
+            prev_railway_coord_section = track.railway_coord_section;
+            split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
+        }
+
+        if (!split.split_type.empty())
+        {
+            split.track_id = id;
+            split.point = track.begin_point;
+            split.railway_coord = track.railway_coord;
+            addOrCreateSplit(split_data1, split);
+        }
+
+        ++id;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::findSplitsMainTrajectory2()
+{
+    int prev_railway_coord_section = 0;
+    size_t id = 0;
+    for (auto it = tracks_data2.begin(); it != tracks_data2.end(); ++it)
+    {
+        zds_track_t track = *it;
+        split_zds_trajectory_t split = split_zds_trajectory_t();
+
+        // Стрелки на боковые пути
+        // Добавляем съезды на боковые пути, найденные в branch_tracks
+        bool is_branch = false;
+        for (auto branch : branch_track_data2)
+        {
+            if ((branch->id_end == id) && (!branch->end_at_other))
+            {
+                is_branch = true;
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+            }
+        }
+        for (auto branch : branch_track_data1)
+        {
+            if (branch->id_begin_at_other == id)
+            {
+                is_branch = true;
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE);
+            }
+        }
+        // Добавляем стрелки "+2" или "-2", записанные в route.trk
+        if ( ((track.arrows == "+2") || (track.arrows == "-2")) && (!is_branch) )
+        {
+            split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
+        }
+
+        // Добавляем съезды с боковых путей, найденных в branch_tracks
+        is_branch = false;
+        for (auto branch : branch_track_data2)
+        {
+            if ((branch->id_begin == id + 1) && (!branch->begin_at_other))
+            {
+                is_branch = true;
+
+                // Разделение в конце данного трека - в начале следующего
+                split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                split_at_next.track_id = id + 1;
+                split_at_next.point = track.end_point;
+                split_at_next.railway_coord = track.railway_coord_end;
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
                 if (track.id_at_track1 == -1)
                 {
                     addOrCreateSplit(split_data2, split_at_next);
@@ -410,60 +398,131 @@ void ZDSimConverter::findSplitsMainTrajectories(const int &dir)
                     addOrCreateSplit(split_data1, split_at_next);
                 }
             }
-
-            // Разделяем возле светофоров для выделения блок-участков
-            for (auto s_it = signals_data2.begin(); s_it != signals_data2.end(); ++s_it)
+        }
+        for (auto branch : branch_track_data1)
+        {
+            if (branch->id_end_at_other == id + 1)
             {
-                if ((*s_it).track_id + 1 == id)
-                {
-                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
-                    split.signal_bwd_type = (*s_it).type;
-                    split.signal_bwd_liter = (*s_it).liter;
-                    break;
-                }
-            }
+                is_branch = true;
 
-            // Разделяем возле добавленных светофоров в неправильном направлении
-            // На всякий случай проигнорируем однопутные участки
-            if ((track.id_at_track1 == -1) && ((it+1) != tracks_data2.end()) && ((it+1)->id_at_track1 == -1))
-            {
-                for (auto s_it = signals_reverse_data2.begin(); s_it != signals_reverse_data2.end(); ++s_it)
-                {
-                    if ((*s_it).track_id == id)
-                    {
-                        split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
-                        split.signal_fwd_type = (*s_it).type;
-                        split.signal_fwd_liter = (*s_it).liter;
-                        break;
-                    }
-                }
-            }
-
-            // Разделяем, где начинается новый пикетаж
-            if (track.railway_coord_section != prev_railway_coord_section)
-            {
-                prev_railway_coord_section = track.railway_coord_section;
-                split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
-            }
-
-            if (!split.split_type.empty())
-            {
-                split.track_id = id;
-                split.point = track.begin_point;
-                split.railway_coord = track.railway_coord;
+                // Разделение в конце данного трека - в начале следующего
+                split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+                split_at_next.track_id = id + 1;
+                split_at_next.point = track.end_point;
+                split_at_next.railway_coord = track.railway_coord_end;
+                split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE);
                 if (track.id_at_track1 == -1)
                 {
-                    addOrCreateSplit(split_data2, split);
+                    addOrCreateSplit(split_data2, split_at_next);
                 }
                 else
                 {
-                    split.track_id = track.id_at_track1;
-                    addOrCreateSplit(split_data1, split);
+                    split_at_next.track_id = track.id_at_track1 + 1;
+                    addOrCreateSplit(split_data1, split_at_next);
                 }
             }
-
-            ++id;
         }
+        // Добавляем стрелки "2+" или "2-", записанные в route.trk
+        if ( ((track.arrows == "2+") || (track.arrows == "2-")) && (!is_branch))
+        {
+            // Разделение в конце данного трека - в начале следующего
+            split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
+            split_at_next.track_id = id + 1;
+            split_at_next.point = track.end_point;
+            split_at_next.railway_coord = track.railway_coord_end;
+            split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH);
+            if (track.id_at_track1 == -1)
+            {
+                addOrCreateSplit(split_data2, split_at_next);
+            }
+            else
+            {
+                split_at_next.track_id = track.id_at_track1 + 1;
+                addOrCreateSplit(split_data1, split_at_next);
+            }
+        }
+
+        // Разделяем возле светофоров из svetofor2.dat для выделения блок-участков
+        for (auto s_it = signals_data2.begin(); s_it != signals_data2.end(); ++s_it)
+        {
+            if ((*s_it).track_id + 1 == id)
+            {
+                split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                split.signal_bwd_type = (*s_it).type;
+                split.signal_bwd_liter = (*s_it).liter;
+                break;
+            }
+        }
+
+        // Разделяем возле прочих светофоров
+        // На всякий случай проигнорируем однопутные участки
+        if ((track.id_at_track1 == -1) && ((it+1) != tracks_data2.end()) && ((it+1)->id_at_track1 == -1))
+        {
+            // Разделяем возле светофоров, добавленных через svetofor2_reverse.dat
+            for (auto s_it = signals_reverse_data2.begin(); s_it != signals_reverse_data2.end(); ++s_it)
+            {
+                if ((*s_it).track_id == id)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                    split.signal_fwd_type = (*s_it).type;
+                    split.signal_fwd_liter = (*s_it).liter;
+                    break;
+                }
+            }
+        }
+
+        // Разделяем возле светофоров, раставленных на карте
+        for (auto map : {signals_line_data,
+                         signals_enter_data,
+                         signals_exit_data/*,
+                         signals_povt_data,
+                         signals_maneurous_data*/})
+        {
+            for (auto sig : map)
+            {
+                if ((sig->route_num != 2) || (sig->track_id != id))
+                {
+                    continue;
+                }
+                if (sig->direction == 1)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
+                    split.signal_fwd_type = sig->type;
+                    split.signal_fwd_liter = sig->liter;
+                }
+                if (sig->direction == -1)
+                {
+                    split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
+                    split.signal_bwd_type = sig->type;
+                    split.signal_bwd_liter = sig->liter;
+                }
+            }
+        }
+
+        // Разделяем, где начинается новый пикетаж
+        if (track.railway_coord_section != prev_railway_coord_section)
+        {
+            prev_railway_coord_section = track.railway_coord_section;
+            split.split_type.push_back(split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD);
+        }
+
+        if (!split.split_type.empty())
+        {
+            split.track_id = id;
+            split.point = track.begin_point;
+            split.railway_coord = track.railway_coord;
+            if (track.id_at_track1 == -1)
+            {
+                addOrCreateSplit(split_data2, split);
+            }
+            else
+            {
+                split.track_id = track.id_at_track1;
+                addOrCreateSplit(split_data1, split);
+            }
+        }
+
+        ++id;
     }
 }
 

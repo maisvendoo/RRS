@@ -199,7 +199,9 @@ private:
 
     void calcBranch22(zds_branch_2_2_t* branch22);
 
-    void findSplitsMainTrajectories(const int &dir);
+    void findSplitsMainTrajectory1();
+
+    void findSplitsMainTrajectory2();
 
     void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
 
