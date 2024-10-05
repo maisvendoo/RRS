@@ -107,9 +107,10 @@ void ZDSimConverter::findSignalsAtMap()
         if (zds_obj->obj_info.empty())
             continue;
 
+        QString obj_info = QString(zds_obj->obj_name.c_str());
         // Проходной, предвходной
-        if ((zds_obj->obj_name == "signal_line") ||
-            (zds_obj->obj_name == "signal_pred"))
+        if (obj_info.contains("signal_line") ||
+            obj_info.contains("signal_pred"))
         {
             zds_signal_position_t *signal = new zds_signal_position_t();
             signal->obj_name = zds_obj->obj_name;
@@ -122,7 +123,7 @@ void ZDSimConverter::findSignalsAtMap()
         }
 
         // Входной
-        if (zds_obj->obj_name == "signal_enter")
+        if (obj_info.contains("signal_enter"))
         {
             zds_signal_position_t *signal = new zds_signal_position_t();
             signal->obj_name = zds_obj->obj_name;
@@ -134,10 +135,11 @@ void ZDSimConverter::findSignalsAtMap()
             signals_enter_data.push_back(signal);
         }
 
-        // Маршрутный/выходной, карликовый 5 линз, карликовый 3 линзы
-        if ((zds_obj->obj_name == "signal_exit") ||
-            (zds_obj->obj_name == "sig_k5p") ||
-            (zds_obj->obj_name == "sig_k3p"))
+        // Маршрутный/выходной, карликовый 5 линз, карликовый 4 линзы, карликовый 3 линзы
+        if (obj_info.contains("signal_exit") ||
+            obj_info.contains("sig_k5p") ||
+            obj_info.contains("sig_k4p") ||
+            obj_info.contains("sig_k3p"))
         {
             zds_signal_position_t *signal = new zds_signal_position_t();
             signal->obj_name = zds_obj->obj_name;
@@ -150,8 +152,8 @@ void ZDSimConverter::findSignalsAtMap()
         }
 
         // Повторительный, карликовый повторительный
-        if ((zds_obj->obj_name == "sig_povt") ||
-            (zds_obj->obj_name == "sig_povt_k"))
+        if (obj_info.contains("sig_povt") ||
+            obj_info.contains("sig_povt_k"))
         {
             zds_signal_position_t *signal = new zds_signal_position_t();
             signal->obj_name = zds_obj->obj_name;
@@ -163,8 +165,8 @@ void ZDSimConverter::findSignalsAtMap()
         }
 
         // Маневровый мачтовый, маневровый карликовый
-        if ((zds_obj->obj_name == "sig_m2m") ||
-            (zds_obj->obj_name == "sig_k2m"))
+        if (obj_info.contains("sig_m2m") ||
+            obj_info.contains("sig_k2m"))
         {
             zds_signal_position_t *signal = new zds_signal_position_t();
             signal->obj_name = zds_obj->obj_name;
@@ -270,8 +272,7 @@ void ZDSimConverter::findSignalsAtMap()
                 if (sig->route_num == 2)
                     stream_t << "route2";
 
-                stream_t << DELIMITER_SYMBOL
-                        << DELIMITER_SYMBOL
+                stream_t << DELIMITER_SYMBOL << sig->type.c_str()
                         << DELIMITER_SYMBOL << "sig{" << sig->position.x << "," << sig->position.y << "}"
                         << DELIMITER_SYMBOL << "track{" << sig->nearest_point.x << "," << sig->nearest_point.y << "}"
                         << DELIMITER_SYMBOL << "right{" << sig->track_right.x << "," << sig->track_right.y << "}"
@@ -279,8 +280,10 @@ void ZDSimConverter::findSignalsAtMap()
                         << DELIMITER_SYMBOL << "dist  " << sig->distance_from_main
                         << DELIMITER_SYMBOL << "coord " << sig->track_coord
                         << DELIMITER_SYMBOL << "dir" << sig->direction
-                        << DELIMITER_SYMBOL << "track" << sig->track_id
-                        << "\n";
+                        << DELIMITER_SYMBOL << "track" << sig->track_id;
+                if (sig->is_left)
+                    stream_t << DELIMITER_SYMBOL << "LEFT";
+                stream_t << "\n";
             }
         }
     }
@@ -437,9 +440,15 @@ bool ZDSimConverter::findTrackNearToSignal(zds_signal_position_t *signal, int di
         {
             // Светофор слева
             // Считаем, что относится к этому пути, если не далее 3 метров
-            if (distance_right > -3.1)
+            // Допускаем слева только входной светофор, или в качестве входного
+            // дополнительного любую модель светофора с "Д", но без "М" в литере
+            if ((distance_right > -3.1) &&
+                ( (signal->type == "ab3entr") ||
+                   ( QString(signal->liter.c_str()).contains("Д") &&
+                    (!QString(signal->liter.c_str()).contains("М")) ) ))
             {
                 signal->is_left = true;
+                signal->type = "ab3entr";
 
                 signal->route_num = (dir > 0) ? 1 : 2;
                 signal->track_id = near_end ? nearest_track.prev_uid + 1 : nearest_track.prev_uid;
@@ -482,9 +491,15 @@ bool ZDSimConverter::findTrackNearToSignal(zds_signal_position_t *signal, int di
         {
             // Светофор справа, но обратно - это светофор слева
             // Считаем, что относится к этому пути, если не далее 3 метров
-            if (distance_right < 3.1)
+            // Допускаем слева только входной светофор, или в качестве входного
+            // дополнительного любую модель светофора с "Д", но без "М" в литере
+            if ((distance_right < 3.1) &&
+                ( (signal->type == "ab3entr") ||
+                 ( QString(signal->liter.c_str()).contains("Д") &&
+                  (!QString(signal->liter.c_str()).contains("М")) ) ))
             {
                 signal->is_left = true;
+                signal->type = "ab3entr";
 
                 signal->route_num = (dir > 0) ? 1 : 2;
                 signal->track_id = near_end ? nearest_track.prev_uid + 1 : nearest_track.prev_uid;
