@@ -351,14 +351,22 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
         signal->setConnector(conn);
 
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
         if (signal->getDirection() == 1)
         {
             conn->setSignalFwd(signal);
+
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
         }
 
         if (signal->getDirection() == -1)
         {
             conn->setSignalBwd(signal);
+
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
         }
     }
 
@@ -373,23 +381,25 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
         signal->setConnector(conn);
 
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
         if (signal->getDirection() == 1)
         {
             conn->setSignalFwd(signal);
+
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
         }
 
         if (signal->getDirection() == -1)
         {
             conn->setSignalBwd(signal);
+
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
         }
 
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
         connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
-
-        map->signal_labels.insert(conn->getName(), signal_label);
     }
 
     for (auto signal : signals_data->exit_signals)
@@ -403,23 +413,25 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
         signal->setConnector(conn);
 
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
         if (signal->getDirection() == 1)
         {
             conn->setSignalFwd(signal);
+
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
         }
 
         if (signal->getDirection() == -1)
         {
             conn->setSignalBwd(signal);
+
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
         }
 
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
         connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
-
-        map->signal_labels.insert(conn->getName(), signal_label);
     }
 
 

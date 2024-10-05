@@ -36,7 +36,9 @@ public:
 
     signals_data_t *signals_data = Q_NULLPTR;
 
-    QMap<QString, SignalLabel *> signal_labels;
+    QMap<QString, SignalLabel *> signal_labels_fwd;
+
+    QMap<QString, SignalLabel *> signal_labels_bwd;
 
     void resize(int width, int height);
 
