@@ -191,6 +191,17 @@ void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
     train_data.deserialize(sim_data);
 
     map->train_data = &train_data;
+
+    int seconds = static_cast<int>(std::floor(train_data.time));
+    int hours = seconds / 3600;
+    int minutes = seconds / 60 % 60;
+    seconds = seconds % 60;
+    QString time_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)")
+                           .arg(train_data.time, 8, 'f', 1)
+                           .arg(hours, 2)
+                           .arg(minutes, 2)
+                           .arg(seconds, 2);
+    ui->statusbar->showMessage(time_text);
 }
 
 //------------------------------------------------------------------------------
