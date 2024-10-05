@@ -64,7 +64,7 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
     QString bwd_liter = QString(connector->signal_bwd_liter.c_str());
     if (!bwd_liter.isEmpty())
     {
-        flist.append(QPair<QString, QString>("SignalLetter", bwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
+        flist.append(QPair<QString, QString>("SignalLiterBwd", bwd_liter));
         QString bwd_type = QString(connector->signal_bwd_type.c_str());
 
         if (!bwd_type.isEmpty())
@@ -77,7 +77,7 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
     QString fwd_liter = QString(connector->signal_fwd_liter.c_str());
     if (!fwd_liter.isEmpty())
     {
-        flist.append(QPair<QString, QString>("SignalLetter", fwd_liter)); // РАЗДЕЛИТЬ ДЛЯ СВЕТОФОРОВ ВПЕРЁД И НАЗАД
+        flist.append(QPair<QString, QString>("SignalLiterFwd", fwd_liter));
         QString fwd_type = QString(connector->signal_fwd_type.c_str());
         if (!fwd_type.isEmpty())
         {

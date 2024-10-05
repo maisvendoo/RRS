@@ -659,7 +659,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
     if (signal_dir_fwd == 1)
     {
         QString signal_letter = "";
-        cfg.getString(secNode, "SignalLetter", signal_letter);
+        cfg.getString(secNode, "SignalLiterFwd", signal_letter);
 
         if (signal_model_fwd.right(4) == "line")
         {
@@ -710,7 +710,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
     if (signal_dir_bwd == -1)
     {
         QString signal_letter = "";
-        cfg.getString(secNode, "SignalLetter", signal_letter);
+        cfg.getString(secNode, "SignalLiterBwd", signal_letter);
 
         if (signal_model_bwd.right(4) == "line")
         {
