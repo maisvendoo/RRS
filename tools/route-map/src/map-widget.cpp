@@ -196,6 +196,14 @@ void MapWidget::drawConnector(Connector *conn)
     painter.drawEllipse(center_point, r, r);
     painter.end();
 
+    SwitchLabel *sw_label = switch_labels.value(conn->getName(), Q_NULLPTR);
+
+    if (sw_label != Q_NULLPTR)
+    {
+        sw_label->move(center_point);
+        sw_label->show();
+    }
+
     Switch *sw = dynamic_cast<Switch *>(conn);
     if (sw != Q_NULLPTR)
     {
@@ -203,7 +211,28 @@ void MapWidget::drawConnector(Connector *conn)
         {
             QColor color = QColor(0, 0, 128);
             if ((sw->getStateFwd() == 2) || (sw->getStateFwd() == -2))
+            {
                 color = QColor(96, 96, 96);
+
+                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
+                    (sw_label->action_switch_fwd != Q_NULLPTR))
+                {
+                    sw_label->action_switch_fwd->setEnabled(false);
+                }
+            }
+            else
+            {
+                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
+                    (sw_label->action_switch_fwd != Q_NULLPTR))
+                {
+                    sw_label->action_switch_fwd->setEnabled(true);
+
+                    if (sw_label->action_switch_fwd == sw_label->menu->activeAction())
+                    {
+                        color = QColor(0, 128, 255);
+                    }
+                }
+            }
 
             QPen pen;
             pen.setColor(color);
@@ -211,25 +240,23 @@ void MapWidget::drawConnector(Connector *conn)
             painter.begin(this);
             painter.setPen(pen);
 
-            double conn_length_fwd = std::min(25.0, fwd_traj->getLength());
-            if ((fwd_track.len > conn_length_fwd) || (fwd_traj->getTracks().size() == 1))
+            double conn_length_fwd = std::min(35.0, fwd_traj->getLength());
+            dvec3 fwd = center;
+            QPoint fwd_point = center_point;
+            track_t track_next = fwd_track;
+            size_t i = 1;
+            while (conn_length_fwd > 0.0)
             {
-                dvec3 fwd = center + fwd_track.orth * conn_length_fwd;
-                QPoint fwd_point = coord_transform(fwd);
-                painter.drawLine(center_point, fwd_point);
-            }
-            else
-            {
-                dvec3 first_fwd = fwd_track.end_point;
-                QPoint first_fwd_point = coord_transform(first_fwd);
-                painter.drawLine(center_point, first_fwd_point);
+                fwd += track_next.orth * std::min(conn_length_fwd, track_next.len);
+                QPoint fwd_point_next = coord_transform(fwd);
+                painter.drawLine(fwd_point, fwd_point_next);
 
-                double second_length = conn_length_fwd - fwd_track.len;
-                track_t second_fwd_track = *(fwd_traj->getTracks().begin() + 1);
-                dvec3 second_fwd = first_fwd + second_fwd_track.orth * second_length;
-                QPoint second_fwd_point = coord_transform(second_fwd);
-                painter.drawLine(first_fwd_point, second_fwd_point);
+                fwd_point = fwd_point_next;
+                conn_length_fwd = conn_length_fwd - fwd_track.len;
+                track_next = *(fwd_traj->getTracks().begin() + i);
+                ++i;
             }
+
             painter.end();
         }
 
@@ -237,7 +264,28 @@ void MapWidget::drawConnector(Connector *conn)
         {
             QColor color = QColor(0, 0, 128);
             if ((sw->getStateBwd() == 2) || (sw->getStateBwd() == -2))
+            {
                 color = QColor(96, 96, 96);
+
+                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
+                    (sw_label->action_switch_bwd != Q_NULLPTR))
+                {
+                    sw_label->action_switch_bwd->setEnabled(false);
+                }
+            }
+            else
+            {
+                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
+                    (sw_label->action_switch_bwd != Q_NULLPTR))
+                {
+                    sw_label->action_switch_bwd->setEnabled(true);
+
+                    if (sw_label->action_switch_bwd == sw_label->menu->activeAction())
+                    {
+                        color = QColor(0, 128, 255);
+                    }
+                }
+            }
 
             QPen pen;
             pen.setColor(color);
@@ -246,35 +294,25 @@ void MapWidget::drawConnector(Connector *conn)
             painter.begin(this);
             painter.setPen(pen);
 
-            double conn_length_bwd = std::min(25.0, bwd_traj->getLength());
-            if ((bwd_track.len > conn_length_bwd) || (bwd_traj->getTracks().size() == 1))
+            double conn_length_bwd = std::min(35.0, bwd_traj->getLength());
+            dvec3 bwd = center;
+            QPoint bwd_point = center_point;
+            track_t track_next = bwd_track;
+            size_t i = 1;
+            while (conn_length_bwd > 0.0)
             {
-                dvec3 bwd = center - bwd_track.orth * conn_length_bwd;
-                QPoint bwd_point = coord_transform(bwd);
-                painter.drawLine(center_point, bwd_point);
-            }
-            else
-            {
-                dvec3 first_bwd = bwd_track.begin_point;
-                QPoint first_bwd_point = coord_transform(first_bwd);
-                painter.drawLine(center_point, first_bwd_point);
+                bwd -= track_next.orth * std::min(conn_length_bwd, track_next.len);
+                QPoint bwd_point_next = coord_transform(bwd);
+                painter.drawLine(bwd_point, bwd_point_next);
 
-                double second_length = conn_length_bwd - bwd_track.len;
-                track_t second_bwd_track = *(bwd_traj->getTracks().end() - 2);
-                dvec3 second_bwd = first_bwd - second_bwd_track.orth * second_length;
-                QPoint second_bwd_point = coord_transform(second_bwd);
-                painter.drawLine(first_bwd_point, second_bwd_point);
+                bwd_point = bwd_point_next;
+                conn_length_bwd = conn_length_bwd - bwd_track.len;
+                ++i;
+                track_next = *(bwd_traj->getTracks().end() - i);
             }
+
             painter.end();
         }
-    }
-
-    SwitchLabel * sw_label = switch_labels.value(conn->getName(), Q_NULLPTR);
-
-    if (sw_label != Q_NULLPTR)
-    {
-        sw_label->move(center_point);
-        sw_label->show();
     }
 
     painter.end();

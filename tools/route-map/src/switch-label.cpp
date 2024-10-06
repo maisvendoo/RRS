@@ -20,6 +20,16 @@ SwitchLabel::~SwitchLabel()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void SwitchLabel::resetMenu()
+{
+    menu = Q_NULLPTR;
+    action_switch_fwd = Q_NULLPTR;
+    action_switch_bwd = Q_NULLPTR;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SwitchLabel::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::RightButton)

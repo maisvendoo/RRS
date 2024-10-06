@@ -1,7 +1,7 @@
 #ifndef     MAP_WIDGET_H
 #define     MAP_WIDGET_H
 
-#include    <QWidget>
+#include    <QMenu>
 #include    <QMouseEvent>
 #include    <QMap>
 #include    <topology-types.h>

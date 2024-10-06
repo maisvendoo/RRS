@@ -118,12 +118,14 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 split_at_next.point = track.end_point;
                 split_at_next.railway_coord = track.railway_coord_end;
                 split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                /*
                 // Проверяем светофор на возвращении с branch_track
                 if ((branch22->is_bwd) && (!branch22->branch_point_bwd.signal_liter.empty()))
                 {
                     split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
                     split_at_next.signal_bwd_liter = branch22->branch_point_bwd.signal_liter;
                 }
+                */
                 addOrCreateSplit(split_data1, split_at_next);
 
                 // Добавляем разделение и в соседний главный путь
@@ -132,12 +134,14 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 split2.point = tracks_data2[branch22->id2].begin_point;
                 split2.railway_coord = tracks_data2[branch22->id2].railway_coord;
                 split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                /*
                 // Проверяем светофор на возвращении с branch_track
                 if ((branch22->is_fwd) && (!branch22->branch_point_fwd.signal_liter.empty()))
                 {
                     split2.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
                     split2.signal_fwd_liter = branch22->branch_point_fwd.signal_liter;
                 }
+                */
                 addOrCreateSplit(split_data2, split2);
 
                 break;

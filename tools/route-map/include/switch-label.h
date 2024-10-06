@@ -19,14 +19,23 @@ public:
 
     Connector *conn;
 
+    QMenu *menu = Q_NULLPTR;
+
+    QAction *action_switch_fwd = Q_NULLPTR;
+
+    QAction *action_switch_bwd = Q_NULLPTR;
+
 signals:
 
     void popUpMenu();
 
+public slots:
+
+    void resetMenu();
+
 private:
 
     void mousePressEvent(QMouseEvent *event);
-
 };
 
 #endif

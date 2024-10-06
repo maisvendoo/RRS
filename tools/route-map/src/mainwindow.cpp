@@ -223,11 +223,16 @@ void MainWindow::slotSwitchConnectorMenu()
 
     QMenu *menu = new QMenu(this);
 
+    sw_label->menu = menu;
+
     if (state_fwd != 0)
     {
         QAction *action_switch_fwd = new QAction(tr("Switch forward"), this);
         action_switch_fwd->setEnabled((sw->getStateFwd() != 2) && (sw->getStateFwd() != -2));
         menu->addAction(action_switch_fwd);
+
+        sw_label->action_switch_fwd = action_switch_fwd;
+        connect(action_switch_fwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
 
         connect(action_switch_fwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
             tc->sendSwitchState(conn_name, -sign(state_fwd), state_bwd);
@@ -239,6 +244,9 @@ void MainWindow::slotSwitchConnectorMenu()
         QAction *action_switch_bwd = new QAction(tr("Switch backward"), this);
         action_switch_bwd->setEnabled((sw->getStateBwd() != 2) && (sw->getStateBwd() != -2));
         menu->addAction(action_switch_bwd);
+
+        sw_label->action_switch_bwd = action_switch_bwd;
+        connect(action_switch_bwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
 
         connect(action_switch_bwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
             tc->sendSwitchState(conn_name, state_fwd, -sign(state_bwd));
