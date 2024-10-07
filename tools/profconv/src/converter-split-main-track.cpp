@@ -749,7 +749,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::writeSplits(const route_connectors_t &connectors, const int &dir)
+void ZDSimConverter::writeSplitsForDebug(const route_connectors_t &connectors, const int &dir)
 {
     // Вывод в файл, для отладки
     std::string path;

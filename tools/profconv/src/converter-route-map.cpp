@@ -194,8 +194,13 @@ void ZDSimConverter::findSignalsAtMap()
                 continue;
         }
     }
+}
 
-    // Вывод для отладки
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::writeSignalsForDebug()
+{
     std::string path_train = compinePath(topologyDir, "signals_at_map_main_track.conf");
     std::string path_povt = compinePath(topologyDir, "signals_at_map_main_track_povt.conf");
     std::string path_maneurous = compinePath(topologyDir, "signals_at_map_main_track_maneurous.conf");
@@ -204,12 +209,12 @@ void ZDSimConverter::findSignalsAtMap()
     QFile file_t(QString(path_train.c_str()));
     if (!file_t.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
-/*    QFile file_p(QString(path_povt.c_str()));
+    QFile file_p(QString(path_povt.c_str()));
     if (!file_p.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
     QFile file_m(QString(path_maneurous.c_str()));
     if (!file_m.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;*/
+        return;
     QFile file_n(QString(path_not_at_main.c_str()));
     if (!file_n.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
@@ -217,12 +222,12 @@ void ZDSimConverter::findSignalsAtMap()
     QTextStream stream_t(&file_t);
     stream_t.setEncoding(QStringConverter::Utf8);
     stream_t.setRealNumberNotation(QTextStream::FixedNotation);
-/*    QTextStream stream_p(&file_p);
+    QTextStream stream_p(&file_p);
     stream_p.setEncoding(QStringConverter::Utf8);
     stream_p.setRealNumberNotation(QTextStream::FixedNotation);
     QTextStream stream_m(&file_m);
     stream_m.setEncoding(QStringConverter::Utf8);
-    stream_m.setRealNumberNotation(QTextStream::FixedNotation);*/
+    stream_m.setRealNumberNotation(QTextStream::FixedNotation);
     QTextStream stream_n(&file_n);
     stream_n.setEncoding(QStringConverter::Utf8);
     stream_n.setRealNumberNotation(QTextStream::FixedNotation);
@@ -287,7 +292,7 @@ void ZDSimConverter::findSignalsAtMap()
             }
         }
     }
-/*
+
     for (auto sig : signals_povt_data)
     {
         stream_p << sig->obj_name.c_str()
@@ -377,10 +382,10 @@ void ZDSimConverter::findSignalsAtMap()
                      << "\n";
         }
     }
-*/
+
     file_t.close();
-/*    file_p.close();
-    file_m.close();*/
+    file_p.close();
+    file_m.close();
 }
 
 //------------------------------------------------------------------------------

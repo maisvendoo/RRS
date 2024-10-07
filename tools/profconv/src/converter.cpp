@@ -366,16 +366,16 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         }
     }
 /*
-    // Отладка разделения путей на подтраектории
-    writeMainTrajectory(traj_file1, tracks_data1);
-    writeMainTrajectory(traj_file2, tracks_data2);
+    // Отладка поиска светофоров, расставленных на карте
+    writeSignalsForDebug();
 
+    // Отладка разделения путей на подтраектории
     dir = 0;
-    writeSplits(branch_connectors, dir);
+    writeSplitsForDebug(branch_connectors, dir);
     dir = 1;
-    writeSplits(split_data1, dir);
+    writeSplitsForDebug(split_data1, dir);
     dir = -1;
-    writeSplits(split_data2, dir);
+    writeSplitsForDebug(split_data2, dir);
 */
     writeTopologyConnectors();
 
@@ -396,12 +396,10 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         writeStations(start_km_data);
     }
 
-    //writeALSN_OLD();
     writeALSN();
 
     if (createSpeedMap())
     {
-        //writeSpeedmap_OLD();
         writeSpeedmap();
     }
 

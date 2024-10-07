@@ -162,8 +162,6 @@ private:
     void writeProfileData(const zds_trajectory_data_t &tracks_data,
                           const std::string &file_name);
 
-    void writeMainTrajectory(const std::string &filename, const zds_trajectory_data_t &tracks_data);
-
     void createPowerLine(const std::vector<zds_track_t> &tracks_data,
                          std::vector<power_line_element_t> &power_line);
 
@@ -215,7 +213,9 @@ private:
 
     bool createSpeedMap();
 
-    void writeSplits(const route_connectors_t &connectors, const int &dir);
+    void writeSignalsForDebug();
+
+    void writeSplitsForDebug(const route_connectors_t &connectors, const int &dir);
 
     void writeTopologyTrajectory(const trajectory_t* trajectory);
 
@@ -224,10 +224,6 @@ private:
     void writeStartPoints(const start_point_data_t &start_points);
 
     void writeStations(const zds_start_km_data_t &waypoints);
-
-    void writeSpeedmap_OLD();
-
-    void writeALSN_OLD();
 
     void writeSpeedmap();
 
