@@ -12,7 +12,7 @@
  * \date
  */
 
-#include    "viewer.h"
+#include    <viewer.h>
 
 #include    <osg/BlendFunc>
 #include    <osg/CullFace>
@@ -23,23 +23,23 @@
 #include    <osg/LightModel>
 #include    <osgViewer/View>
 
-#include    "filesystem.h"
-#include    "config-reader.h"
+#include    <filesystem.h>
+#include    <config-reader.h>
 
 #include    <sstream>
 #include    <fstream>
 
-#include    "notify.h"
-#include    "abstract-loader.h"
-#include    "lighting.h"
-#include    "qt-events.h"
-#include    "screen-capture.h"
-#include    "viewer-stats-switcher.h"
-#include    "rails-manipulator.h"
-#include    "free-manipulator.h"
-#include    "stat-manipulator.h"
-#include    "train-manipulator.h"
-#include    "camera-switcher.h"
+#include    <notify.h>
+#include    <abstract-loader.h>
+#include    <lighting.h>
+#include    <qt-events.h>
+#include    <screen-capture.h>
+#include    <viewer-stats-switcher.h>
+#include    <rails-manipulator.h>
+#include    <free-manipulator.h>
+#include    <stat-manipulator.h>
+#include    <train-manipulator.h>
+#include    <camera-switcher.h>
 
 #include    <QObject>
 
@@ -50,11 +50,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-RouteViewer::RouteViewer(int argc, char *argv[])
-  : is_ready(false)
-  , memory_sim_info(nullptr)
-  , keyboard(nullptr)
-  , sound_manager(nullptr)
+RouteViewer::RouteViewer(int argc, char *argv[], QObject *parent) : QObject(parent)
 {
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
 
@@ -144,6 +140,7 @@ int RouteViewer::run()
     viewer.setKeyEventSetsDone(0);
     viewer.setRealizeOperation(new ImGuiInitOperation);
 
+    // Обработка интерфейса ImGUI
     osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = new ImGuiWidgetsHandler;
 
     QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
@@ -152,7 +149,14 @@ int RouteViewer::run()
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendControlledState,
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
 
+
     viewer.addEventHandler(imguiWidgetsHandler.get());
+
+    // Добляем обработчик событий сигналов
+    viewer.addEventHandler(traffic_lights_handler.get());
+
+    // Инициализация TCP-клиента
+    initTCPclient(settings);
 
     return viewer.run();
 }
@@ -238,7 +242,7 @@ bool RouteViewer::init(int argc, char *argv[])
 
     osgDB::DatabasePager *dp = viewer.getDatabasePager();
     dp->setDoPreCompile(true);
-    dp->setTargetMaximumNumberOfPageLOD(1000);
+    dp->setTargetMaximumNumberOfPageLOD(1000);    
 
     return true;
 }
@@ -559,4 +563,42 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
         viewer->setUpViewOnSingleScreen(settings.screen_number);
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::initTCPclient(const settings_t &settings)
+{
+    tcp_config_t tcp_config;
+    tcp_config.host_addr = QString(settings.host_addr.c_str());
+    tcp_config.port = settings.port;
+    tcp_config.reconnect_interval = settings.reconnect_interval;
+    tcp_config.request_interval = settings.request_interval;
+
+    connect(tcp_client, &TcpClient::connected,
+            this, &RouteViewer::slotConnectedToSimulator);
+
+    connect(tcp_client, &TcpClient::setSignalsData,
+            this, &RouteViewer::slotGetSignalsData);
+
+    tcp_client->init(tcp_config);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotConnectedToSimulator()
+{
+    std::cout << "Viewer is connected to simulator..." << std::endl;
+
+    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
+{
+    traffic_lights_handler->deserialize(sig_data);
 }
