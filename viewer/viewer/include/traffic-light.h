@@ -25,6 +25,16 @@ public:
         return conn_name;
     }
 
+    QString getLetter() const
+    {
+        return letter;
+    }
+
+    osg::Vec3d getPosition() const
+    {
+        return pos;
+    }
+
 private:
 
     lens_state_t lens_state;

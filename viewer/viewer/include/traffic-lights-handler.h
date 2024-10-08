@@ -29,6 +29,8 @@ public:
 private:
 
     QMap<QString, TrafficLight *> traffic_lights;
+
+    void printSignalInfo(TrafficLight *tl);
 };
 
 #endif

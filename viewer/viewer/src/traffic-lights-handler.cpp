@@ -61,6 +61,8 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
             continue;
         }
 
+        printSignalInfo(tl);
+
         traffic_lights.insert(tl->getConnectorName(), tl);
     }
 
@@ -80,6 +82,8 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
         {
             continue;
         }
+
+        printSignalInfo(tl);
 
         traffic_lights.insert(tl->getConnectorName(), tl);
     }
@@ -101,6 +105,23 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
             continue;
         }
 
+        printSignalInfo(tl);
+
         traffic_lights.insert(tl->getConnectorName(), tl);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLightsHandler::printSignalInfo(TrafficLight *tl)
+{
+    QString msg = QString("Signal in connector %1 is initialized. Letter: %2 | position: {%3, %4, %5}")
+                      .arg(tl->getConnectorName())
+                      .arg(tl->getLetter())
+                      .arg(tl->getPosition().x())
+                      .arg(tl->getPosition().y())
+                      .arg(tl->getPosition().z());
+
+    std::cout << msg.toStdString() << std::endl;
 }
