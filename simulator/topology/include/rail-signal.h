@@ -104,6 +104,19 @@ public:
         return U_side_prev;
     }
 
+    void setRelPosition(dvec3 rel_pos)
+    {
+        this->rel_pos = rel_pos;
+    }
+
+    void setRelRotation(dvec3 rel_rot)
+    {
+        this->rel_rot = rel_rot;
+    }
+
+    bool calcPosition(dvec3 &pos);
+
+
 signals:
 
     /// Послать предыдущему световору напряжение линии
@@ -148,6 +161,24 @@ protected:
 
     int signal_dir = 0;
 
+    /// Вектор смещения относительно коннектора и трека
+    dvec3 rel_pos;
+
+    /// Вектор поворота относительно конектора и трека
+    dvec3 rel_rot;
+
+    /// Орт вдоль оси X собственной системы координат светофора
+    dvec3 right;
+
+    /// Орт вдоль оси Y собственной системы координат светофора
+    dvec3 orth;
+
+    /// Орт вдоль оси Z собственной системы координат светофора
+    dvec3 up;
+
+    /// Абсолютное положение сигнала
+    dvec3 pos;
+
     /// Коннектор, с которым связан сигнал
     Connector *conn = Q_NULLPTR;
 
@@ -180,6 +211,9 @@ protected:
     Relay *alsn_G_relay = new Relay(NUM_ALSN_G_CONTACTS);
 
     void load_config(CfgReader &cfg) override;
+
+    /// Получить координаты коннектора и трек, лежащий за светофором
+    bool getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track);
 
 public slots:
 

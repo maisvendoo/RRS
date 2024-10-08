@@ -61,6 +61,13 @@ QByteArray Signal::serialize()
         stream << lens;
     }
 
+    this->calcPosition(pos);
+
+    stream << pos.x << pos.y << pos.z;
+    stream << orth.x << orth.y << orth.z;
+    stream << right.x << right.y << right.z;
+    stream << up.x << up.y << up.z;
+
     return buff.data();
 }
 
@@ -83,6 +90,35 @@ void Signal::deserialize(QByteArray &data)
     {
         stream >> lens_state[i];
     }
+
+    stream >> pos.x >> pos.y >> pos.z;
+    stream >> orth.x >> orth.y >> orth.z;
+    stream >> right.x >> right.y >> right.z;
+    stream >> up.x >> up.y >> up.z;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Signal::calcPosition(dvec3 &pos)
+{
+    dvec3 conn_pos;
+    track_t track;
+
+    if (!getConnectorPos(conn, conn_pos, track))
+    {
+        return false;
+    }
+
+    pos = conn_pos + track.trav * (rel_pos.x * signal_dir) +
+          track.orth * (rel_pos.y * signal_dir) +
+           track.up * rel_pos.z;
+
+    right = track.trav;
+    orth = track.orth;
+    up = track.up;
+
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -91,6 +127,52 @@ void Signal::deserialize(QByteArray &data)
 void Signal::load_config(CfgReader &cfg)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
+{
+    if (conn == Q_NULLPTR)
+    {
+        return false;
+    }
+
+    Trajectory *traj = Q_NULLPTR;
+    dvec3 pos;
+
+    if (signal_dir == 1)
+    {
+        traj = conn->getFwdTraj();
+
+        if (traj == Q_NULLPTR)
+        {
+            return false;
+        }
+
+        track = traj->getFirstTrack();
+        conn_pos = track.begin_point;
+
+        return true;
+    }
+
+    if (signal_dir == -1)
+    {
+        traj = conn->getBwdTraj();
+
+        if (traj == Q_NULLPTR)
+        {
+            return false;
+        }
+
+        track = traj->getLastTrack();
+        conn_pos = track.end_point;
+
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
