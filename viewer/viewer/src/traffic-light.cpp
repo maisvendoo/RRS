@@ -36,5 +36,10 @@ void TrafficLight::deserialize(QByteArray &data)
     {
         stream >> lens_state[i];
     }
+
+    stream >> pos.x() >> pos.y() >> pos.z();
+    stream >> orth.x() >> orth.y() >> orth.z();
+    stream >> right.x() >> right.y() >> right.z();
+    stream >> up.x() >> up.y() >> up.z();
 }
 
