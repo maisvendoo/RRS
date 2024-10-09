@@ -1,5 +1,6 @@
 #include    <tcp-client.h>
 #include    <CfgReader.h>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -185,6 +186,7 @@ void TcpClient::slotOnConnectionTimeout()
     if (!isConnected())
     {
         this->connectToServer(tcp_config);
+        Journal::instance()->info("Try connect to server...");
     }
 }
 

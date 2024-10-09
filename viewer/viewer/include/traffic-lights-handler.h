@@ -40,6 +40,8 @@ public:
         return nullptr;
     }
 
+    void create_pagedLODs(const settings_t &settings);
+
 private:
 
     QMap<QString, TrafficLight *> traffic_lights;
@@ -49,7 +51,6 @@ private:
     QMap<QString, osg::ref_ptr<osg::PagedLOD>> signal_nodes;
 
     void printSignalInfo(TrafficLight *tl);
-    void create_pagedLODs(const settings_t &settings);
 };
 
 #endif

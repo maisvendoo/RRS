@@ -55,6 +55,11 @@ public:
         return up;
     }
 
+    int getSignalDirection() const
+    {
+        return signal_dir;
+    }
+
 private:
 
     lens_state_t lens_state;

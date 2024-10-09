@@ -150,10 +150,13 @@ int RouteViewer::run()
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
 
 
-    viewer.addEventHandler(imguiWidgetsHandler.get());    
+    viewer.addEventHandler(imguiWidgetsHandler.get());
+
+    // Добляем обработчик событий сигналов
+    viewer.addEventHandler(traffic_lights_handler.get());
 
     // Инициализация TCP-клиента
-    initTCPclient(settings);    
+    initTCPclient(settings);
 
     return viewer.run();
 }
@@ -480,6 +483,10 @@ bool RouteViewer::loadRoute()
     root->addChild(train_ext_handler->getExterior());
     root->addChild(loader->getRoot());
 
+    // Грузим модельки сигналов
+    traffic_lights_handler->create_pagedLODs(settings);
+    root->addChild(traffic_lights_handler->getSignalsGroup());
+
     return true;
 }
 
@@ -580,6 +587,8 @@ void RouteViewer::initTCPclient(const settings_t &settings)
             this, &RouteViewer::slotGetSignalsData);
 
     tcp_client->init(tcp_config);
+
+    OSG_FATAL << "Client is initilized...OK\n";
 }
 
 //------------------------------------------------------------------------------
@@ -587,9 +596,9 @@ void RouteViewer::initTCPclient(const settings_t &settings)
 //------------------------------------------------------------------------------
 void RouteViewer::slotConnectedToSimulator()
 {
-    std::cout << "Viewer is connected to simulator..." << std::endl;
+    OSG_FATAL << "Connected to server...OK\n";
 
-    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    tcp_client->sendRequest(STYPE_SIGNALS_LIST);    
 }
 
 //------------------------------------------------------------------------------
@@ -599,10 +608,5 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
     traffic_lights_handler->deserialize(sig_data);
 
-    traffic_lights_handler->load_signal_models(settings);
-
-    // Добляем обработчик событий сигналов
-    viewer.addEventHandler(traffic_lights_handler.get());
-
-    root->addChild(traffic_lights_handler->getSignalsGroup());
+    traffic_lights_handler->load_signal_models(settings);    
 }

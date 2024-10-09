@@ -252,18 +252,6 @@ void MainWindow::startViewer()
     QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     QStringList args;
-    args << "--route" << selectedRouteDirName;
-    args << "--train" << selectedTrain;
-    args << "--direction";
-
-    if (isBackward())
-    {
-        args << "-1";
-    }
-    else
-    {
-        args << "1";
-    }
 
     viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     viewerProc.start(viewerPath, args);

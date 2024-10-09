@@ -126,7 +126,7 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
 {
     FileSystem &fs = FileSystem::getInstance();
 
-    std::string path = fs.combinePath(settings.route_dir_name, "topology");
+    std::string path = fs.combinePath(settings.route_dir_full_path, "topology");
     path = fs.combinePath(path, "models-config.xml");
 
     ConfigReader cfg_reader;
@@ -165,7 +165,6 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
 //------------------------------------------------------------------------------
 void TrafficLightsHandler::load_signal_models(const settings_t &settings)
 {
-    create_pagedLODs(settings);
 
     for (auto tl = traffic_lights.begin(); tl != traffic_lights.end(); ++tl)
     {
@@ -179,8 +178,10 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
             osg::Vec3d r = tl.value()->getRight();
             osg::Vec3d u = tl.value()->getUp();
 
-            osg::Matrixd m2(r.x(), o.x(), u.y(), 0,
-                            r.y(), o.y(), u.y(), 0,
+            int sd = tl.value()->getSignalDirection();
+
+            osg::Matrixd m2(sd * r.x(), sd * o.x(), sd * u.y(), 0,
+                            sd * r.y(), sd * o.y(), sd * u.y(), 0,
                             r.z(), o.z(), u.z(), 0,
                             0, 0, 0, 1);
 
