@@ -37,12 +37,23 @@ bool MaterialAnimation::load_config(ConfigReader &cfg)
     cfg.getValue(secName, "Duration", duration);
     is_fixed_signal = cfg.getValue(secName, "FixedSignal", fixed_signal);
 
-    std::string tmp;
-    cfg.getValue(secName, "EmissionColor", tmp);
+    std::string emission_tmp = "";
+    cfg.getValue(secName, "EmissionColor", emission_tmp);
 
-    std::istringstream ss(tmp);
+    std::istringstream ss(emission_tmp);
 
     ss >> emission_color.r() >>  emission_color.g() >> emission_color.b();
+
+    std::string color_tmp = "";
+
+    if (!cfg.getValue(secName, "Color", color_tmp))
+    {
+        return true;
+    }
+
+    std::istringstream ss2(color_tmp);
+
+    ss2 >> color.r() >>  color.g() >> color.b();
 
     return true;
 }

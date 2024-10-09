@@ -36,6 +36,20 @@ TrafficLightsHandler::~TrafficLightsHandler()
 bool TrafficLightsHandler::handle(const osgGA::GUIEventAdapter &ea,
                                   osgGA::GUIActionAdapter &aa)
 {
+    switch (ea.getEventType())
+    {
+    case osgGA::GUIEventAdapter::FRAME:
+        {
+            for (auto tl = traffic_lights.begin(); tl != traffic_lights.end(); ++tl)
+            {
+                tl.value()->update();
+            }
+
+            break;
+        }
+    default: break;
+    }
+
     return false;
 }
 
@@ -150,13 +164,16 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
 
         QString model_base_name = fileInfo.baseName();
 
-        osg::ref_ptr<osg::PagedLOD> pagedLOD = new osg::PagedLOD;
+        /*osg::ref_ptr<osg::PagedLOD> pagedLOD = new osg::PagedLOD;
         pagedLOD->addDescription(model_base_name.toStdString());
         pagedLOD->setFileName(0, fullPath.toStdString());
         pagedLOD->setRange(0, 0.0f, settings.view_distance);
         pagedLOD->setRangeMode(osg::LOD::RangeMode::DISTANCE_FROM_EYE_POINT);
 
-        signal_nodes.insert(model_base_name, pagedLOD);
+        signal_nodes.insert(model_base_name, pagedLOD);*/
+
+        osg::ref_ptr<osg::Node> node = osgDB::readNodeFile(fullPath.toStdString());
+        signal_nodes.insert(model_base_name, node);
     }
 }
 
@@ -190,6 +207,8 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
             traffic_light->setNode(signal_node);
             traffic_light->load_animations(animations_dir);
             traffic_light->update();
+
+            animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
             transform->setMatrix(m2 * m1);
             transform->addChild(signal_nodes.value(tl.value()->getModelName(), nullptr).get());

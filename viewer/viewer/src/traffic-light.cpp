@@ -52,7 +52,7 @@ void TrafficLight::update()
 {
     if (lens_state != old_lens_state)
     {
-        for (size_t i = 0; i < lens_state.size(); ++i)
+        for (size_t i = 0; i < lens_state.size(); i++)
         {
             auto animation = animations.value(i, nullptr);
 
@@ -72,6 +72,7 @@ void TrafficLight::update()
 void TrafficLight::load_animations(const std::string &animations_dir)
 {
     AnimTransformVisitor atv(&animations, animations_dir);
+    atv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
     node->accept(atv);
 }
 

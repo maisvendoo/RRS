@@ -71,6 +71,11 @@ public:
 
     void load_animations(const std::string &animations_dir);
 
+    animations_t *getAnimationsListPtr()
+    {
+        return &animations;
+    }
+
 private:
 
     lens_state_t lens_state;

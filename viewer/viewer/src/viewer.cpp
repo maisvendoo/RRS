@@ -485,7 +485,7 @@ bool RouteViewer::loadRoute()
 
     // Грузим модельки сигналов
     traffic_lights_handler->create_pagedLODs(settings);
-    root->addChild(traffic_lights_handler->getSignalsGroup());
+    root->addChild(traffic_lights_handler->getSignalsGroup());    
 
     return true;
 }
@@ -608,5 +608,10 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
     traffic_lights_handler->deserialize(sig_data);
 
-    traffic_lights_handler->load_signal_models(settings);    
+    traffic_lights_handler->load_signal_models(settings);
+
+    for (auto am : traffic_lights_handler->animation_mangers)
+    {
+        viewer.addEventHandler(am);
+    }
 }
