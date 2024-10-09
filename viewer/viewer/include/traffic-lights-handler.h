@@ -9,6 +9,7 @@
 
 #include    <traffic-light.h>
 #include    <settings.h>
+#include    <animation-manager.h>
 
 //------------------------------------------------------------------------------
 //
@@ -42,13 +43,19 @@ public:
 
     void create_pagedLODs(const settings_t &settings);
 
+    std::vector<AnimationManager *> animation_mangers;
+
 private:
 
     QMap<QString, TrafficLight *> traffic_lights;
 
     osg::ref_ptr<osg::Group> signals_group = new osg::Group;
 
-    QMap<QString, osg::ref_ptr<osg::PagedLOD>> signal_nodes;
+    QMap<QString, osg::ref_ptr<osg::Node>> signal_nodes;
+
+    std::string models_dir;
+
+    std::string animations_dir;
 
     void printSignalInfo(TrafficLight *tl);
 };
