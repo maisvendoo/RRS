@@ -55,6 +55,7 @@ void AnimationManager::step(float t, float dt)
 {
     for (auto it = animations->begin(); it != animations->end(); ++it)
     {
-        it.value()->step(t, dt);
+        ProcAnimation *anim = it.value();
+        anim->step(t, dt);
     }
 }

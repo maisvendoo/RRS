@@ -247,14 +247,15 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
 
             osg::Matrixd m1 = osg::Matrixd::translate(tl.value()->getPosition());
 
-            osg::Vec3d o = tl.value()->getOrth();
-            osg::Vec3d r = tl.value()->getRight();
-            osg::Vec3d u = tl.value()->getUp();
-
             int sd = tl.value()->getSignalDirection();
 
-            osg::Matrixd m2(sd * r.x(), sd * o.x(), sd * u.y(), 0,
-                            sd * r.y(), sd * o.y(), sd * u.y(), 0,
+            osg::Vec3d o = tl.value()->getOrth() * sd;
+            osg::Vec3d r = tl.value()->getRight() * sd;
+            osg::Vec3d u = tl.value()->getUp();
+
+
+            osg::Matrixd m2(r.x(), o.x(), u.y(), 0,
+                            r.y(), o.y(), u.y(), 0,
                             r.z(), o.z(), u.z(), 0,
                             0, 0, 0, 1);
 
@@ -262,7 +263,7 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
             TrafficLight *traffic_light = tl.value();
             traffic_light->setNode(signal_node);
             traffic_light->load_animations(animations_dir);
-            traffic_light->update();
+            //traffic_light->update();
 
             animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
