@@ -59,7 +59,7 @@ private:
 
     void paintEvent(QPaintEvent *event);
 
-private slots:
+private slots:    
 
     void slotConnectedToSimulator();
 

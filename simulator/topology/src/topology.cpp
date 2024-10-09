@@ -638,6 +638,25 @@ bool Topology::load_topology(QString route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool strignToVector(const QString &str, dvec3 &vector)
+{
+    QStringList tokens = str.split(' ');
+
+    if (tokens.size() < 3)
+    {
+        return false;
+    }
+
+    vector.x = tokens[0].toDouble();
+    vector.y = tokens[1].toDouble();
+    vector.z = tokens[2].toDouble();
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 {
     QString signal_model_fwd = "";
@@ -656,6 +675,28 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         signal_dir_bwd = -1;
     }
 
+    QString tmp = "";
+    cfg.getString(secNode, "RelPosVector", tmp);
+
+    if (tmp.isEmpty())
+    {
+        return;
+    }
+
+    dvec3 rel_pos;
+    strignToVector(tmp, rel_pos);
+
+    cfg.getString(secNode, "RelRotVector", tmp);
+
+    if (tmp.isEmpty())
+    {
+        return;
+    }
+
+    dvec3 rel_rot;
+    strignToVector(tmp, rel_rot);
+
+
     if (signal_dir_fwd == 1)
     {
         QString signal_letter = "";
@@ -663,32 +704,38 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 
         if (signal_model_fwd.right(4) == "line")
         {
-            LineSignal *line_signal = new LineSignal;
-            line_signal->setLetter(signal_letter);
-            line_signal->setDirection(signal_dir_fwd);
-            line_signal->setSignalModel(signal_model_fwd);
-            line_signal->setConnector(conn);
+            LineSignal *signal = new LineSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir_fwd);
+            signal->setSignalModel(signal_model_fwd);
+            signal->setConnector(conn);
 
-            conn->setSignalFwd(line_signal);
+            conn->setSignalFwd(signal);
 
-            signals_data.line_signals.push_back(line_signal);
+            signal->setRelPosition(rel_pos);
+            signal->setRelRotation(rel_rot);
 
-            Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
+            signals_data.line_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
 
         if ( (signal_model_fwd.right(4) == "entr") || (signal_model_fwd.right(4) == "rout") )
         {
-            EnterSignal *enter_signal = new EnterSignal;
-            enter_signal->setLetter(signal_letter);
-            enter_signal->setDirection(signal_dir_fwd);
-            enter_signal->setSignalModel(signal_model_fwd);
-            enter_signal->setConnector(conn);
+            EnterSignal *signal = new EnterSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir_fwd);
+            signal->setSignalModel(signal_model_fwd);
+            signal->setConnector(conn);
 
-            conn->setSignalFwd(enter_signal);
+            conn->setSignalFwd(signal);
 
-            signals_data.enter_signals.push_back(enter_signal);
+            signal->setRelPosition(rel_pos);
+            signal->setRelRotation(rel_rot);
 
-            Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
+            signals_data.enter_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded enter signal " + signal->getLetter());
         }
 
         if (signal_model_fwd.right(4) == "exit")
@@ -700,6 +747,9 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signal->setConnector(conn);
 
             conn->setSignalFwd(signal);
+
+            signal->setRelPosition(rel_pos);
+            signal->setRelRotation(rel_rot);
 
             signals_data.exit_signals.push_back(signal);
 
@@ -714,32 +764,38 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
 
         if (signal_model_bwd.right(4) == "line")
         {
-            LineSignal *line_signal = new LineSignal;
-            line_signal->setLetter(signal_letter);
-            line_signal->setDirection(signal_dir_bwd);
-            line_signal->setSignalModel(signal_model_bwd);
-            line_signal->setConnector(conn);
+            LineSignal *signal = new LineSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir_bwd);
+            signal->setSignalModel(signal_model_bwd);
+            signal->setConnector(conn);
 
-            conn->setSignalBwd(line_signal);
+            conn->setSignalBwd(signal);
 
-            signals_data.line_signals.push_back(line_signal);
+            signal->setRelPosition(rel_pos);
+            signal->setRelRotation(rel_rot);
 
-            Journal::instance()->info("Loaded line signal " + line_signal->getLetter());
+            signals_data.line_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
 
         if ( (signal_model_bwd.right(4) == "entr") || (signal_model_bwd.right(4) == "rout") )
         {
-            EnterSignal *enter_signal = new EnterSignal;
-            enter_signal->setLetter(signal_letter);
-            enter_signal->setDirection(signal_dir_bwd);
-            enter_signal->setSignalModel(signal_model_bwd);
-            enter_signal->setConnector(conn);
+            EnterSignal *signal = new EnterSignal;
+            signal->setLetter(signal_letter);
+            signal->setDirection(signal_dir_bwd);
+            signal->setSignalModel(signal_model_bwd);
+            signal->setConnector(conn);
 
-            conn->setSignalBwd(enter_signal);
+            conn->setSignalBwd(signal);
 
-            signals_data.enter_signals.push_back(enter_signal);
+            signal->setRelPosition(rel_pos);
+            signal->setRelRotation(rel_rot);
 
-            Journal::instance()->info("Loaded enter signal " + enter_signal->getLetter());
+            signals_data.enter_signals.push_back(signal);
+
+            Journal::instance()->info("Loaded enter signal " + signal->getLetter());
         }
 
         if (signal_model_bwd.right(4) == "exit")
@@ -751,6 +807,9 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signal->setConnector(conn);
 
             conn->setSignalBwd(signal);
+
+            signal->setRelPosition(rel_pos);
+            signal->setRelRotation(rel_rot);
 
             signals_data.exit_signals.push_back(signal);
 

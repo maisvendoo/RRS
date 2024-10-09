@@ -45,6 +45,8 @@ target_include_directories (${TARGET} PRIVATE ../../asound/include)
 
 target_include_directories (${TARGET} PRIVATE ../imgui/include)
 
+target_include_directories (${TARGET} PRIVATE ../../simulator/topology/include)
+
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Gui)
 target_link_libraries (${TARGET} Qt6::Widgets)
@@ -57,3 +59,4 @@ target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} network)
 target_link_libraries (${TARGET} display)
 target_link_libraries (${TARGET} sound-manager)
+

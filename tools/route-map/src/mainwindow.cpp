@@ -13,11 +13,7 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-
-    load_config("../cfg/route-map-tcp.xml");
-
-    tcp_client->init(tcp_config);
+    ui->setupUi(this);       
 
     connect(tcp_client, &TcpClient::connected,
             this, &MainWindow::slotConnectedToSimulator);
@@ -47,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
             this, &MainWindow::slotUpdateSignal);
 
     map = new MapWidget(ui->Map);
+
+    load_config("../cfg/route-map-tcp.xml");
+
+    tcp_client->init(tcp_config);
 }
 
 //------------------------------------------------------------------------------
