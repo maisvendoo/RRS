@@ -150,13 +150,15 @@ int RouteViewer::run()
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
 
 
-    viewer.addEventHandler(imguiWidgetsHandler.get());
-
-    // Добляем обработчик событий сигналов
-    viewer.addEventHandler(traffic_lights_handler.get());
+    viewer.addEventHandler(imguiWidgetsHandler.get());    
 
     // Инициализация TCP-клиента
     initTCPclient(settings);
+
+    traffic_lights_handler->load_signal_models(settings);
+
+    // Добляем обработчик событий сигналов
+    viewer.addEventHandler(traffic_lights_handler.get());
 
     return viewer.run();
 }
