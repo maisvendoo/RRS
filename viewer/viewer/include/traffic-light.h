@@ -35,6 +35,26 @@ public:
         return pos;
     }
 
+    QString getModelName() const
+    {
+        return signal_model;
+    }
+
+    osg::Vec3d getOrth() const
+    {
+        return orth;
+    }
+
+    osg::Vec3d getRight() const
+    {
+        return right;
+    }
+
+    osg::Vec3d getUp() const
+    {
+        return up;
+    }
+
 private:
 
     lens_state_t lens_state;

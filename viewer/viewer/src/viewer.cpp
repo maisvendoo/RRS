@@ -153,12 +153,7 @@ int RouteViewer::run()
     viewer.addEventHandler(imguiWidgetsHandler.get());    
 
     // Инициализация TCP-клиента
-    initTCPclient(settings);
-
-    traffic_lights_handler->load_signal_models(settings);
-
-    // Добляем обработчик событий сигналов
-    viewer.addEventHandler(traffic_lights_handler.get());
+    initTCPclient(settings);    
 
     return viewer.run();
 }
@@ -603,4 +598,11 @@ void RouteViewer::slotConnectedToSimulator()
 void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
     traffic_lights_handler->deserialize(sig_data);
+
+    traffic_lights_handler->load_signal_models(settings);
+
+    // Добляем обработчик событий сигналов
+    viewer.addEventHandler(traffic_lights_handler.get());
+
+    root->addChild(traffic_lights_handler->getSignalsGroup());
 }

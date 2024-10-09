@@ -9,6 +9,7 @@
 #include    <filesystem.h>
 #include    <config-reader.h>
 #include    <osgDB/ReadFile>
+#include    <osg/MatrixTransform>
 
 
 //------------------------------------------------------------------------------
@@ -121,7 +122,7 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLightsHandler::load_signal_models(const settings_t &settings)
+void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
 {
     FileSystem &fs = FileSystem::getInstance();
 
@@ -156,6 +157,37 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
         pagedLOD->setRangeMode(osg::LOD::RangeMode::DISTANCE_FROM_EYE_POINT);
 
         signal_nodes.insert(model_base_name, pagedLOD);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLightsHandler::load_signal_models(const settings_t &settings)
+{
+    create_pagedLODs(settings);
+
+    for (auto tl = traffic_lights.begin(); tl != traffic_lights.end(); ++tl)
+    {
+        if (signal_nodes.value(tl.value()->getModelName(), nullptr).valid())
+        {
+            osg::ref_ptr<osg::MatrixTransform> transform = new osg::MatrixTransform;
+
+            osg::Matrixd m1 = osg::Matrixd::translate(tl.value()->getPosition());
+
+            osg::Vec3d o = tl.value()->getOrth();
+            osg::Vec3d r = tl.value()->getRight();
+            osg::Vec3d u = tl.value()->getUp();
+
+            osg::Matrixd m2(r.x(), o.x(), u.y(), 0,
+                            r.y(), o.y(), u.y(), 0,
+                            r.z(), o.z(), u.z(), 0,
+                            0, 0, 0, 1);
+
+            transform->setMatrix(m2 * m1);
+            transform->addChild(signal_nodes.value(tl.value()->getModelName(), nullptr).get());
+            signals_group->addChild(transform);
+        }
     }
 }
 
