@@ -1,12 +1,14 @@
 #include	<traffic-light.h>
 #include    <QBuffer>
+#include    <anim-transform-visitor.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 TrafficLight::TrafficLight(QObject *parent) : QObject(parent)
 {
-
+    std::fill(lens_state.begin(), lens_state.end(), false);
+    old_lens_state = lens_state;
 }
 
 //------------------------------------------------------------------------------
@@ -40,6 +42,36 @@ void TrafficLight::deserialize(QByteArray &data)
     stream >> pos.x() >> pos.y() >> pos.z();
     stream >> orth.x() >> orth.y() >> orth.z();
     stream >> right.x() >> right.y() >> right.z();
-    stream >> up.x() >> up.y() >> up.z();
+    stream >> up.x() >> up.y() >> up.z();    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLight::update()
+{
+    if (lens_state != old_lens_state)
+    {
+        for (size_t i = 0; i < lens_state.size(); ++i)
+        {
+            auto animation = animations.value(i, nullptr);
+
+            if (animation != nullptr)
+            {
+                animation->setPosition(static_cast<float>(lens_state[i]));
+            }
+        }
+
+        old_lens_state = lens_state;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLight::load_animations(const std::string &animations_dir)
+{
+    AnimTransformVisitor atv(&animations, animations_dir);
+    node->accept(atv);
 }
 

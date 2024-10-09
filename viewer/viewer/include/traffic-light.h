@@ -5,6 +5,8 @@
 #include    <signal-types.h>
 #include    <osg/Group>
 
+#include    <animations-list.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -60,9 +62,20 @@ public:
         return signal_dir;
     }
 
+    void setNode(osg::Node *node)
+    {
+        this->node = node;
+    }
+
+    void update();
+
+    void load_animations(const std::string &animations_dir);
+
 private:
 
     lens_state_t lens_state;
+
+    lens_state_t old_lens_state;
 
     QString letter = "";
 
@@ -85,6 +98,10 @@ private:
 
     /// Абсолютное положение сигнала
     osg::Vec3d pos;
+
+    osg::ref_ptr<osg::Node> node;
+
+    animations_t animations;
 };
 
 #endif

@@ -50,6 +50,10 @@ private:
 
     QMap<QString, osg::ref_ptr<osg::PagedLOD>> signal_nodes;
 
+    std::string models_dir;
+
+    std::string animations_dir;
+
     void printSignalInfo(TrafficLight *tl);
 };
 

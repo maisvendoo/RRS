@@ -129,11 +129,11 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
     std::string path = fs.combinePath(settings.route_dir_full_path, "topology");
     path = fs.combinePath(path, "models-config.xml");
 
-    ConfigReader cfg_reader;
-    std::string models_dir;
+    ConfigReader cfg_reader;    
     if (cfg_reader.load(path))
     {
         cfg_reader.getValue("Models", "SignalModelsDir", models_dir);
+        cfg_reader.getValue("Models", "SignalAnimationsDir", animations_dir);
     }
 
     std::string models_path = fs.getDataDir();
@@ -184,6 +184,12 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
                             sd * r.y(), sd * o.y(), sd * u.y(), 0,
                             r.z(), o.z(), u.z(), 0,
                             0, 0, 0, 1);
+
+            osg::Node *signal_node = signal_nodes.value(tl.value()->getModelName(), nullptr);
+            TrafficLight *traffic_light = tl.value();
+            traffic_light->setNode(signal_node);
+            traffic_light->load_animations(animations_dir);
+            traffic_light->update();
 
             transform->setMatrix(m2 * m1);
             transform->addChild(signal_nodes.value(tl.value()->getModelName(), nullptr).get());
