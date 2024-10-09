@@ -68,6 +68,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                 track.voltage = 3;
             if (track.arrows == "25")
                 track.voltage = 25;
+            track.arrows = "";
         }
         // У команд n:x.x или m:x.x дробная чать может распарситься
         // как следующая переменная, проверяем это
@@ -75,6 +76,9 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
             (track.voltage != 0) &&
             (track.ordinate == 0 || track.ordinate == 3 || track.ordinate == 25))
         {
+            std::stringstream s;
+            s << track.voltage;
+            track.arrows = track.arrows + "." + s.str();
             track.voltage = track.ordinate;
             ss >> track.ordinate;
         }
@@ -201,10 +205,21 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                     // Также сбрасываем запись в поле arrows,
                     // поскольку она просто дублирует первый подтрек,
                     // оставляем только если это число (радиус кривой)
-                    bool not_digit = false;
-                    for (auto c : cur_track.arrows)
+                    bool is_digit = false;
+                    if (cur_track.arrows.size() > 2)
                     {
-                        not_digit |= (std::isdigit(c) || (c == '-'));
+                        is_digit = true;
+                        bool first_symbol = true;
+                        for (auto c : cur_track.arrows)
+                        {
+                            bool c_is_digit = std::isdigit(c);
+                            if (first_symbol)
+                            {
+                                first_symbol = false;
+                                c_is_digit |= (c == '-');
+                            }
+                            is_digit &= c_is_digit;
+                        }
                     }
 
                     int last_track_id = track_data.size();
@@ -216,7 +231,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                         {
                             cur_track.railway_coord = new_coord;
 
-                            if (not_digit)
+                            if (!is_digit)
                             {
                                 cur_track.arrows = "";
                             }
@@ -225,7 +240,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                         {
                             track_data[id + 1].railway_coord = new_coord;
 
-                            if (not_digit)
+                            if (!is_digit)
                             {
                                 track_data[id + 1].arrows = "";
                             }
@@ -261,6 +276,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
 
     return true;
 }
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
