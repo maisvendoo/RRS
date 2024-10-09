@@ -144,21 +144,6 @@ bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
 
     if (signal_dir == 1)
     {
-        traj = conn->getFwdTraj();
-
-        if (traj == Q_NULLPTR)
-        {
-            return false;
-        }
-
-        track = traj->getFirstTrack();
-        conn_pos = track.begin_point;
-
-        return true;
-    }
-
-    if (signal_dir == -1)
-    {
         traj = conn->getBwdTraj();
 
         if (traj == Q_NULLPTR)
@@ -168,6 +153,21 @@ bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
 
         track = traj->getLastTrack();
         conn_pos = track.end_point;
+
+        return true;
+    }
+
+    if (signal_dir == -1)
+    {
+        traj = conn->getFwdTraj();
+
+        if (traj == Q_NULLPTR)
+        {
+            return false;
+        }
+
+        track = traj->getFirstTrack();
+        conn_pos = track.begin_point;
 
         return true;
     }
