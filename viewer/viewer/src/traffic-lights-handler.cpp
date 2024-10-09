@@ -179,6 +179,7 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
         osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(fullPath.toStdString());
 
         osg::StateSet *ss = model->getOrCreateStateSet();
+        model->setDataVariance(osg::Object::DYNAMIC);
 
         // Set blend function for model
         osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
@@ -259,7 +260,7 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
                             r.z(), o.z(), u.z(), 0,
                             0, 0, 0, 1);
 
-            osg::Node *signal_node = signal_nodes.value(tl.value()->getModelName(), nullptr);
+            osg::Node *signal_node = signal_nodes.value(tl.value()->getModelName(), nullptr).get();
             TrafficLight *traffic_light = tl.value();
             traffic_light->setNode(signal_node);
             traffic_light->load_animations(animations_dir);
