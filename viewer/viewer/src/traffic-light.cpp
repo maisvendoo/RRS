@@ -2,6 +2,7 @@
 #include    <QBuffer>
 #include    <anim-transform-visitor.h>
 
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -52,14 +53,10 @@ void TrafficLight::update()
 {
     if (lens_state != old_lens_state)
     {
-        for (size_t i = 0; i < lens_state.size(); i++)
+        for (auto animation = animations.begin(); animation != animations.end(); ++animation)
         {
-            auto animation = animations.value(i, nullptr);
-
-            if (animation != nullptr)
-            {
-                animation->setPosition(static_cast<float>(lens_state[i]));
-            }
+            ProcAnimation *anim = animation.value();
+            anim->setPosition(lens_state[animation.value()->getSignalID()]);
         }
 
         old_lens_state = lens_state;
