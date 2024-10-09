@@ -586,6 +586,9 @@ void RouteViewer::initTCPclient(const settings_t &settings)
     connect(tcp_client, &TcpClient::setSignalsData,
             this, &RouteViewer::slotGetSignalsData);
 
+    connect(tcp_client, &TcpClient::updateSignal,
+            traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal);
+
     tcp_client->init(tcp_config);
 
     OSG_FATAL << "Client is initilized...OK\n";

@@ -45,6 +45,10 @@ public:
 
     std::vector<AnimationManager *> animation_mangers;
 
+public slots:
+
+    void slotUpdateSignal(QByteArray data);
+
 private:
 
     QMap<QString, TrafficLight *> traffic_lights;
@@ -58,6 +62,8 @@ private:
     std::string animations_dir;
 
     void printSignalInfo(TrafficLight *tl);
+
+
 };
 
 #endif

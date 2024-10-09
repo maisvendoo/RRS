@@ -10,7 +10,10 @@
 #include    <config-reader.h>
 #include    <osgDB/ReadFile>
 #include    <osg/MatrixTransform>
-
+#include    <osg/BlendFunc>
+#include    <osg/AlphaFunc>
+#include    <osg/PolygonMode>
+#include    <osg/Depth>
 
 //------------------------------------------------------------------------------
 //
@@ -42,7 +45,8 @@ bool TrafficLightsHandler::handle(const osgGA::GUIEventAdapter &ea,
         {
             for (auto tl = traffic_lights.begin(); tl != traffic_lights.end(); ++tl)
             {
-                tl.value()->update();
+                TrafficLight *traffic_light = tl.value();
+                traffic_light->update();
             }
 
             break;
@@ -172,9 +176,61 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
 
         signal_nodes.insert(model_base_name, pagedLOD);*/
 
-        osg::ref_ptr<osg::Node> node = osgDB::readNodeFile(fullPath.toStdString());
-        signal_nodes.insert(model_base_name, node);
+        osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(fullPath.toStdString());
+
+        osg::StateSet *ss = model->getOrCreateStateSet();
+
+        // Set blend function for model
+        osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
+                                                                    osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+        ss->setAttributeAndModes(blendFunc.get());
+        ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+        ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+        // Set alpha function for model
+        osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
+        ss->setAttributeAndModes(alphaFunc.get());
+        ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
+
+        ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0));
+
+        osg::ref_ptr<osg::PolygonMode> pm = new osg::PolygonMode;
+        pm->setMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
+        ss->setAttribute(pm.get());
+
+        signal_nodes.insert(model_base_name, model);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
+{
+    QBuffer buff(&data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    QString conn_name = "";
+    int signal_dir = 0;
+
+    stream >> conn_name;
+    stream >> signal_dir;
+
+    if (conn_name.isEmpty())
+    {
+        return;
+    }
+
+    TrafficLight *tl = traffic_lights.value(conn_name, nullptr);
+
+    if (tl == nullptr)
+    {
+        return;
+    }
+
+    tl->deserialize(data);
+    tl->update();
 }
 
 //------------------------------------------------------------------------------
