@@ -222,6 +222,12 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                         }
                     }
 
+                    // Стрелки, которые завершаются в конце трека,
+                    // сохраняем у последнего подтрека (текущего)
+                    bool is_last = ((cur_track.arrows  == "2+2") ||
+                                    (cur_track.arrows == "2+") ||
+                                    (cur_track.arrows == "2-"));
+
                     int last_track_id = track_data.size();
                     for (int i = 1; i <= railway_coord_recalc_count; ++i)
                     {
@@ -231,7 +237,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                         {
                             cur_track.railway_coord = new_coord;
 
-                            if (!is_digit)
+                            if (!(is_last || is_digit))
                             {
                                 cur_track.arrows = "";
                             }
@@ -243,6 +249,10 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                             if (!is_digit)
                             {
                                 track_data[id + 1].arrows = "";
+                            }
+                            if (is_last)
+                            {
+                                track_data[id].arrows = "";
                             }
                         }
 

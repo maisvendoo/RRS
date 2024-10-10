@@ -73,12 +73,28 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 break;
             }
         }
-        // Проверяем съезды "2-2", записанные в route.trk, игнорируем однопутные участки
+        // Проверяем съезды "2-2", записанные в route.trk
         if ((track.arrows == "2-2") && (!is_branch))
         {
-            if (was_1_track)
+            // Расстояние до соседнего главного пути
+            double distance_right = 0.0;
+            dvec3 point1_100m = track.begin_point + track.orth * 100.0;
+            float coord2;
+            zds_track_t track2 = getNearestTrack(point1_100m, tracks_data2, coord2);
+
+            // Игнорируем однопутные участки
+            if (!was_1_track)
             {
-                // На однопутном участке это просто модель стрелки
+                double track_coord2 = coord2 - track2.route_coord;
+                dvec3 point2 = track2.begin_point + track2.orth * track_coord2;
+                dvec3 rho_right = point1_100m - point2;
+                distance_right = dot(rho_right, track.right);
+            }
+
+            if (abs(distance_right - 7.5) > 1.1)
+            {
+                // Если соседний путь не на расстоянии 7.5 метров справа,
+                // то это просто модель стрелки
                 // Добавляем разделение в начале данного трека
                 // для возможности позднее создать съезд вручную
                 split.split_type.push_back(split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH);
@@ -88,10 +104,8 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 // Разделение в начале данного трека
                 split.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
 
-                // Добавляем разделение и в соседний главный путь
-                float coord;
-                zds_track_t track2 = getNearestTrack(track.end_point, tracks_data2, coord);
-                bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
+                // Разделение соседнего главного пути
+                bool near_end = (coord2 > (track2.route_coord + 0.5 * track2.length));
                 size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
 
                 split_zds_trajectory_t split2 = split_zds_trajectory_t();
@@ -152,12 +166,28 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 break;
             }
         }
-        // Проверяем съезды "2+2", записанные в route.trk, игнорируем однопутные участки
+        // Проверяем съезды "2+2", записанные в route.trk
         if ((track.arrows == "2+2") && (!is_branch))
         {
-            if (was_1_track)
+            // Расстояние до соседнего главного пути
+            double distance_right = 0.0;
+            dvec3 point1_100m = track.end_point - track.orth * 100.0;
+            float coord2;
+            zds_track_t track2 = getNearestTrack(point1_100m, tracks_data2, coord2);
+
+            // Игнорируем однопутные участки
+            if (!was_1_track)
             {
-                // На однопутном участке это просто модель стрелки
+                double track_coord2 = coord2 - track2.route_coord;
+                dvec3 point2 = track2.begin_point + track2.orth * track_coord2;
+                dvec3 rho_right = point1_100m - point2;
+                distance_right = dot(rho_right, track.right);
+            }
+
+            if (abs(distance_right - 7.5) > 1.1)
+            {
+                // Если соседний путь не на расстоянии 7.5 метров справа,
+                // то это просто модель стрелки
                 // Добавляем разделение в конце данного трека - в начале следующего
                 // для возможности позднее создать съезд вручную
                 split_zds_trajectory_t split_at_next = split_zds_trajectory_t();
@@ -177,17 +207,15 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 split_at_next.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
                 addOrCreateSplit(split_data1, split_at_next);
 
-                // Добавляем разделение и в соседний главный путь
-                float coord;
-                zds_track_t track2 = getNearestTrack(track.begin_point, tracks_data2, coord);
-                bool near_end = (coord > (track2.route_coord + 0.5 * track2.length));
+                // Разделение соседнего главного пути
+                bool near_end = (coord2 > (track2.route_coord + 0.5 * track2.length));
                 size_t id2 = near_end ? track2.prev_uid + 1 : track2.prev_uid;
 
                 split_zds_trajectory_t split2 = split_zds_trajectory_t();
                 split2.track_id = id2;
                 split2.point = tracks_data2[id2].begin_point;
                 split2.railway_coord = tracks_data2[id2].railway_coord;
-                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2PLUS2);
+                split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
                 addOrCreateSplit(split_data2, split2);
 
                 // Добавляем съезд в массив траекторий съездов

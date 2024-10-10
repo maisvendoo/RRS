@@ -376,9 +376,9 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     writeSplitsForDebug(split_data1, dir);
     dir = -1;
     writeSplitsForDebug(split_data2, dir);
-*/
-    writeTopologyConnectors();
 
+    writeTopologyConnectors();
+*/
     if (readStartKilometersDAT(start_km_path, start_km_data))
     {
         // Точки старта у станционных светофоров
