@@ -176,30 +176,12 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
 
         signal_nodes.insert(model_base_name, pagedLOD);*/
 
-        osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(fullPath.toStdString());
+        /*osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(fullPath.toStdString());
 
         osg::StateSet *ss = model->getOrCreateStateSet();
-        model->setDataVariance(osg::Object::DYNAMIC);
+        model->setDataVariance(osg::Object::DYNAMIC);*/
 
-        // Set blend function for model
-        osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
-                                                                    osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
-        ss->setAttributeAndModes(blendFunc.get());
-        ss->setMode(GL_BLEND, osg::StateAttribute::ON);
-        ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-        // Set alpha function for model
-        osg::ref_ptr<osg::AlphaFunc> alphaFunc = new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.6f);
-        ss->setAttributeAndModes(alphaFunc.get());
-        ss->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
-
-        ss->setAttributeAndModes(new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0));
-
-        osg::ref_ptr<osg::PolygonMode> pm = new osg::PolygonMode;
-        pm->setMode(osg::PolygonMode::FRONT, osg::PolygonMode::FILL);
-        ss->setAttribute(pm.get());
-
-        signal_nodes.insert(model_base_name, model);
+        signal_nodes_paths.insert(model_base_name, fullPath);
     }
 }
 
@@ -238,10 +220,9 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
 //------------------------------------------------------------------------------
 void TrafficLightsHandler::load_signal_models(const settings_t &settings)
 {
-
     for (auto tl = traffic_lights.begin(); tl != traffic_lights.end(); ++tl)
     {
-        if (signal_nodes.value(tl.value()->getModelName(), nullptr).valid())
+        if (!signal_nodes_paths.value(tl.value()->getModelName(), "").isEmpty())
         {
             osg::ref_ptr<osg::MatrixTransform> transform = new osg::MatrixTransform;
 
@@ -259,15 +240,20 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
                             r.z(), o.z(), u.z(), 0,
                             0, 0, 0, 1);
 
-            osg::Node *signal_node = signal_nodes.value(tl.value()->getModelName(), nullptr).get();
+            QString node_path = signal_nodes_paths.value(tl.value()->getModelName(), "");
+
+            osg::ref_ptr<osg::Node> signal_node = osgDB::readNodeFile(node_path.toStdString());
+            osg::StateSet *ss = signal_node->getOrCreateStateSet();
+            signal_node->setDataVariance(osg::Object::DYNAMIC);
+
             TrafficLight *traffic_light = tl.value();
-            traffic_light->setNode(signal_node);
+            traffic_light->setNode(signal_node.get());
             traffic_light->load_animations(animations_dir);            
 
             animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
             transform->setMatrix(m2 * m1);
-            transform->addChild(signal_nodes.value(tl.value()->getModelName(), nullptr).get());
+            transform->addChild(signal_node.get());
             signals_group->addChild(transform);
         }
     }

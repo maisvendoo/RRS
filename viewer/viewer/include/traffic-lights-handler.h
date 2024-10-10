@@ -55,7 +55,7 @@ private:
 
     osg::ref_ptr<osg::Group> signals_group = new osg::Group;
 
-    QMap<QString, osg::ref_ptr<osg::Node>> signal_nodes;
+    QMap<QString, QString> signal_nodes_paths;
 
     std::string models_dir;
 
