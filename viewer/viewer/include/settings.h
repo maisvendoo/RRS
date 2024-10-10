@@ -52,6 +52,10 @@ struct settings_t
     bool            localmode;
     /// Vertical view angle
     double          fovy;
+    /// Vertical view angle min
+    double          fovy_min;
+    /// Vertical view angle max
+    double          fovy_max;
     ///
     double          zNear;
     ///
@@ -118,6 +122,11 @@ struct settings_t
     /// Cabine camera speed
     float           cabine_cam_speed;
 
+    /// Cabine camera relative vertical shift
+    float           cabine_cam_z_min;
+    /// Cabine camera relative vertical shift
+    float           cabine_cam_z_max;
+
     /// Static camera shift
     float           stat_cam_dist;
     /// Static camera height
@@ -140,6 +149,8 @@ struct settings_t
         , vsync(true)
         , localmode(false)
         , fovy(30.0)
+        , fovy_min(2.0)
+        , fovy_max(120.0)
         , zNear(1.0)
         , zFar(1000.0)
         , screen_number(0)
@@ -170,7 +181,9 @@ struct settings_t
         , free_cam_fovy_step(1.0f)
         , cabine_cam_rot_coeff(1.0f)
         , cabine_cam_fovy_step(1.0f)
-        , cabine_cam_speed(2.0)
+        , cabine_cam_speed(5.0)
+        , cabine_cam_z_min(-1.0f)
+        , cabine_cam_z_max(0.5f)
         , stat_cam_dist(8.0f)
         , stat_cam_height(1.75)
         , stat_cam_shift(150.0f)

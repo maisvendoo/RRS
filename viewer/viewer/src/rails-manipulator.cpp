@@ -89,7 +89,12 @@ bool RailsManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
     osgGA::GUIEventAdapter::ScrollingMotion sm = ea.getScrollingMotion();
 
     double step = static_cast<double>(settings.cabine_cam_fovy_step);
+    double fovy_min = static_cast<double>(settings.fovy_min);
+    double fovy_max = static_cast<double>(settings.fovy_max);
+
     float speed = settings.cabine_cam_speed;
+    float z_min = settings.cabine_cam_z_min;
+    float z_max = settings.cabine_cam_z_max;
 
     switch (sm)
     {
@@ -99,10 +104,14 @@ bool RailsManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
               (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_CTRL))
         {
             rel_pos.z() += speed * delta_time;
+            if (rel_pos.z() > z_max)
+                rel_pos.z() = z_max;
         }
         else
         {
             fovy -= step;
+            if (fovy < fovy_min)
+                fovy = fovy_min;
         }
 
         break;
@@ -113,10 +122,14 @@ bool RailsManipulator::handleMouseWheel(const osgGA::GUIEventAdapter &ea,
               (ea.getModKeyMask() == osgGA::GUIEventAdapter::MODKEY_RIGHT_CTRL))
         {
             rel_pos.z() -= speed * delta_time;
+            if (rel_pos.z() < z_min)
+                rel_pos.z() = z_min;
         }
         else
         {
             fovy += step;
+            if (fovy > fovy_max)
+                fovy = fovy_max;
         }
 
         break;
