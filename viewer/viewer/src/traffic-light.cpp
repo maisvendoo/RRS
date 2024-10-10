@@ -59,8 +59,10 @@ void TrafficLight::update()
             anim->setPosition(lens_state[animation.value()->getSignalID()]);
         }
 
-        old_lens_state = lens_state;
-    }
+         std::cout << "Updated signal " << this->getConnectorName().toStdString() << std::endl;
+
+         old_lens_state = lens_state;
+    }   
 }
 
 //------------------------------------------------------------------------------

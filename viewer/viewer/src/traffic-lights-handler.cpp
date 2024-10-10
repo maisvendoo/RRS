@@ -230,8 +230,7 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
         return;
     }
 
-    tl->deserialize(data);
-    tl->update();
+    tl->deserialize(data);    
 }
 
 //------------------------------------------------------------------------------
@@ -263,8 +262,7 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
             osg::Node *signal_node = signal_nodes.value(tl.value()->getModelName(), nullptr).get();
             TrafficLight *traffic_light = tl.value();
             traffic_light->setNode(signal_node);
-            traffic_light->load_animations(animations_dir);
-            //traffic_light->update();
+            traffic_light->load_animations(animations_dir);            
 
             animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
