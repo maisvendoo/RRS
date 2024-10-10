@@ -243,7 +243,6 @@ void TrafficLightsHandler::load_signal_models(const settings_t &settings)
             QString node_path = signal_nodes_paths.value(tl.value()->getModelName(), "");
 
             osg::ref_ptr<osg::Node> signal_node = osgDB::readNodeFile(node_path.toStdString());
-            osg::StateSet *ss = signal_node->getOrCreateStateSet();
             signal_node->setDataVariance(osg::Object::DYNAMIC);
 
             TrafficLight *traffic_light = tl.value();

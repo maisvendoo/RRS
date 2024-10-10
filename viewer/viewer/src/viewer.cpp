@@ -580,7 +580,7 @@ void RouteViewer::initTCPclient(const settings_t &settings)
             this, &RouteViewer::slotGetSignalsData);
 
     connect(tcp_client, &TcpClient::updateSignal,
-            traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal);
+            traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal, Qt::DirectConnection);
 
     tcp_client->init(tcp_config);
 

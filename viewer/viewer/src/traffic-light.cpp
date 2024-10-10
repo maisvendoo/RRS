@@ -51,6 +51,11 @@ void TrafficLight::deserialize(QByteArray &data)
 //------------------------------------------------------------------------------
 void TrafficLight::update()
 {
+    if (animations.isEmpty())
+    {
+        return;
+    }
+
     if (lens_state != old_lens_state)
     {
         for (auto animation = animations.begin(); animation != animations.end(); ++animation)
