@@ -87,7 +87,7 @@ void ZDSimConverter::findSplitsMainTrajectory1()
             {
                 double track_coord2 = coord2 - track2.route_coord;
                 dvec3 point2 = track2.begin_point + track2.orth * track_coord2;
-                dvec3 rho_right = point2 - point1_100m;
+                dvec3 rho_right = point1_100m - point2;
                 distance_right = dot(rho_right, track.right);
             }
 
@@ -180,7 +180,7 @@ void ZDSimConverter::findSplitsMainTrajectory1()
             {
                 double track_coord2 = coord2 - track2.route_coord;
                 dvec3 point2 = track2.begin_point + track2.orth * track_coord2;
-                dvec3 rho_right = point2 - point1_100m;
+                dvec3 rho_right = point1_100m - point2;
                 distance_right = dot(rho_right, track.right);
             }
 
