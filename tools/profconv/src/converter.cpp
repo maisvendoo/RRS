@@ -365,7 +365,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
             writeTopologyTrajectory(&((*it)->trajectory));
         }
     }
-/*
+
     // Отладка поиска светофоров, расставленных на карте
     writeSignalsForDebug();
 
@@ -376,7 +376,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     writeSplitsForDebug(split_data1, dir);
     dir = -1;
     writeSplitsForDebug(split_data2, dir);
-*/
+
     writeTopologyConnectors();
 
     if (readStartKilometersDAT(start_km_path, start_km_data))
