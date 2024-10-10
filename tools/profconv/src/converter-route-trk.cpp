@@ -68,6 +68,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                 track.voltage = 3;
             if (track.arrows == "25")
                 track.voltage = 25;
+            track.arrows = "";
         }
         // У команд n:x.x или m:x.x дробная чать может распарситься
         // как следующая переменная, проверяем это
@@ -75,6 +76,9 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
             (track.voltage != 0) &&
             (track.ordinate == 0 || track.ordinate == 3 || track.ordinate == 25))
         {
+            std::stringstream s;
+            s << track.voltage;
+            track.arrows = track.arrows + "." + s.str();
             track.voltage = track.ordinate;
             ss >> track.ordinate;
         }
@@ -198,15 +202,49 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                         (cur_track.railway_coord_end - railway_coord_recalc_begin) /
                         static_cast<double>(railway_coord_recalc_count + 1);
 
+                    // Также сбрасываем запись в поле arrows,
+                    // поскольку она просто дублирует первый подтрек,
+                    // оставляем только если это число (радиус кривой)
+                    bool is_digit = false;
+                    if (cur_track.arrows.size() > 2)
+                    {
+                        is_digit = true;
+                        bool first_symbol = true;
+                        for (auto c : cur_track.arrows)
+                        {
+                            bool c_is_digit = std::isdigit(c);
+                            if (first_symbol)
+                            {
+                                first_symbol = false;
+                                c_is_digit |= (c == '-');
+                            }
+                            is_digit &= c_is_digit;
+                        }
+                    }
+
                     int last_track_id = track_data.size();
                     for (int i = 1; i <= railway_coord_recalc_count; ++i)
                     {
                         int id = last_track_id - i;
                         double new_coord = cur_track.railway_coord_end - i * railway_coord_change;
                         if (i == 1)
+                        {
                             cur_track.railway_coord = new_coord;
+
+                            if (!is_digit)
+                            {
+                                cur_track.arrows = "";
+                            }
+                        }
                         else
+                        {
                             track_data[id + 1].railway_coord = new_coord;
+
+                            if (!is_digit)
+                            {
+                                track_data[id + 1].arrows = "";
+                            }
+                        }
 
                         track_data[id].railway_coord_end = new_coord;
                     }
@@ -238,6 +276,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
 
     return true;
 }
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -257,45 +296,6 @@ void ZDSimConverter::writeProfileData(const zds_trajectory_data_t &tracks_data,
     }
 
     stream.close();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ZDSimConverter::writeMainTrajectory(const std::string &filename, const zds_trajectory_data_t &tracks_data)
-{
-    std::string path = compinePath(toNativeSeparators(topologyDir), filename);
-
-    QFile file_old(QString(path.c_str()));
-    if (file_old.exists())
-        file_old.rename( QString((path + FILE_BACKUP_EXTENTION).c_str()) );
-
-    QFile file(QString(path.c_str()));
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    QTextStream stream(&file);
-    stream.setEncoding(QStringConverter::Utf8);
-    stream.setRealNumberNotation(QTextStream::FixedNotation);
-
-    size_t i = 0;
-    for (auto it = tracks_data.begin(); it != tracks_data.end(); ++it)
-    {
-        ++i;
-        stream << (*it).begin_point.x << ";"
-               << (*it).begin_point.y << ";"
-               << (*it).begin_point.z << ";"
-               << static_cast<int>(round((*it).railway_coord)) << ";"
-               << (*it).route_coord << ";"
-               << ((*it).id_at_track1 == -1 ? "TWO" : "ONE") << "\n";
-    }
-    stream << tracks_data.back().end_point.x << ";"
-           << tracks_data.back().end_point.y << ";"
-           << tracks_data.back().end_point.z << ";"
-           << static_cast<int>(round(tracks_data.back().railway_coord_end)) << ";"
-           << tracks_data.back().route_coord + tracks_data.back().length << "\n";
-
-    file.close();
 }
 
 //------------------------------------------------------------------------------

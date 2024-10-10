@@ -252,7 +252,7 @@ void MapWidget::drawConnector(Connector *conn)
                 painter.drawLine(fwd_point, fwd_point_next);
 
                 fwd_point = fwd_point_next;
-                conn_length_fwd = conn_length_fwd - fwd_track.len;
+                conn_length_fwd = conn_length_fwd - track_next.len;
                 track_next = *(fwd_traj->getTracks().begin() + i);
                 ++i;
             }
@@ -306,7 +306,7 @@ void MapWidget::drawConnector(Connector *conn)
                 painter.drawLine(bwd_point, bwd_point_next);
 
                 bwd_point = bwd_point_next;
-                conn_length_bwd = conn_length_bwd - bwd_track.len;
+                conn_length_bwd = conn_length_bwd - track_next.len;
                 ++i;
                 track_next = *(bwd_traj->getTracks().end() - i);
             }

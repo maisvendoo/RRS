@@ -23,6 +23,9 @@ void ZDSimConverter::findSplitsMainTrajectory1()
             zds_track_t track2 = *it2;
             if (length(track.begin_point - track2.begin_point) < 0.1)
             {
+                // Сохраняем в треке "обратно" id совпадающего трека "туда"
+                it2->begin_at_track1 = id;
+
                 if ((!was_1_track) && (id != 0))
                 {
                     // Начало однопутного участка
@@ -32,8 +35,10 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 if (length(track.end_point - track2.end_point) < 0.1)
                 {
                     // Однопутный участок
-                    it2->id_at_track1 = id;
                     was_1_track = true;
+
+                    // Сохраняем в треке "обратно" id совпадающего трека "туда"
+                    it2->id_at_track1 = id;
                 }
                 else
                 {
@@ -608,14 +613,14 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
         // указываем его, чтобы впоследствии кодировать АЛСН на частоте 25 Гц
         is_25kv |= (it->voltage == 25);
 
-        if ((dir < 0) && (it->id_at_track1 != -1))
+        if ((dir < 0) && (it->begin_at_track1 != -1))
         {
-            if ((!was_1_track) && (it->id_at_track1 != 0))
+            if ((!was_1_track) && (it->begin_at_track1 != 0))
             {
                 // Начало однопутного участка
                 for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
                 {
-                    if ((*split)->track_id == it->id_at_track1)
+                    if ((*split)->track_id == it->begin_at_track1)
                     {
                         name_cur = name_next;
                         ++num_traj;
@@ -653,37 +658,41 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
             if ((it + 1) == tracks_data->end())
                 return;
 
-            if ((it + 1)->id_at_track1 != -1)
+            if ((it)->id_at_track1 != -1)
             {
                 // Однопутный участок
                 was_1_track = true;
                 it->trajectory_name = tracks_data1[it->id_at_track1].trajectory_name;
                 it->trajectory_coord = tracks_data1[it->id_at_track1].trajectory_coord;
+                continue;
             }
             else
             {
                 // Конец однопутного участка
-                if (was_1_track)
+                if (was_1_track || (it->begin_at_track1 > 0))
                 {
                     was_1_track = false;
+                    name_next = name_prefix +
+                                QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
+                    if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
+                    {
+                        name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
+                    }
+
                     for (auto split = split_data1.begin(); split != split_data1.end(); ++split)
                     {
-                        name_next = name_prefix +
-                                    QString("%1").arg(num_traj, 4, 10, QChar('0')).toStdString();
-                        if (ADD_ZDS_TRACK_NUMBER_TO_FILENAME)
-                        {
-                            name_next += QString("_%1").arg(it->prev_uid + 2).toStdString();
-                        }
-
-                        if ((*split)->track_id == ((it)->id_at_track1 + 1))
+                        if ((*split)->track_id == ((it)->begin_at_track1))
                         {
                             // Делаем траекторию данного пути "обратно" спереди боковой
                             (*split)->fwd_side_traj = name_next;
                         }
                     }
                 }
+                else
+                {
+                    continue;
+                }
             }
-            continue;
         }
 
         point_t point;
@@ -749,7 +758,7 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::writeSplits(const route_connectors_t &connectors, const int &dir)
+void ZDSimConverter::writeSplitsForDebug(const route_connectors_t &connectors, const int &dir)
 {
     // Вывод в файл, для отладки
     std::string path;
