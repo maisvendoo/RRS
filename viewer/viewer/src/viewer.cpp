@@ -150,10 +150,7 @@ int RouteViewer::run()
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
 
 
-    viewer.addEventHandler(imguiWidgetsHandler.get());
-
-    // Добляем обработчик событий сигналов
-    viewer.addEventHandler(traffic_lights_handler.get());
+    viewer.addEventHandler(imguiWidgetsHandler.get());    
 
     // Инициализация TCP-клиента
     initTCPclient(settings);
@@ -481,11 +478,7 @@ bool RouteViewer::loadRoute()
 
     root = new osg::Group;
     root->addChild(train_ext_handler->getExterior());
-    root->addChild(loader->getRoot());
-
-    // Грузим модельки сигналов
-    traffic_lights_handler->create_pagedLODs(settings);
-    root->addChild(traffic_lights_handler->getSignalsGroup());    
+    root->addChild(loader->getRoot());       
 
     return true;
 }
@@ -611,10 +604,17 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
     traffic_lights_handler->deserialize(sig_data);
 
+    // Грузим модельки сигналов
+    traffic_lights_handler->create_pagedLODs(settings);
+    root->addChild(traffic_lights_handler->getSignalsGroup());
+
     traffic_lights_handler->load_signal_models(settings);
 
     for (auto am : traffic_lights_handler->animation_mangers)
     {
         viewer.addEventHandler(am);
     }
+
+    // Добляем обработчик событий сигналов
+    viewer.addEventHandler(traffic_lights_handler.get());
 }
