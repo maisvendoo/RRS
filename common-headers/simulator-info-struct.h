@@ -1,23 +1,42 @@
 #ifndef     SIMULATOR_INFO_STRUCT_H
 #define     SIMULATOR_INFO_STRUCT_H
 
-#include    "global-const.h"
-
-#include    <array>
+#include    <QString>
+#include    <QByteArray>
+#include    <QBuffer>
+#include    <QDataStream>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct simulator_route_info_t
 {
-    int  route_dir_name_length;
-    wchar_t route_dir_name[ROUTE_DIR_NAME_SIZE];
+    QString route_dir_name = "";
 
     simulator_route_info_t()
-        : route_dir_name_length(ROUTE_DIR_NAME_SIZE)
-        , route_dir_name(L"")
     {
 
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << route_dir_name;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> route_dir_name;
     }
 };
 
@@ -26,36 +45,89 @@ struct simulator_route_info_t
 //------------------------------------------------------------------------------
 struct simulator_vehicle_info_t
 {
-    int  vehicle_config_dir_length;
-    wchar_t vehicle_config_dir[VEHICLE_CONFIG_DIR_NAME_SIZE];
-    int  vehicle_config_file_length;
-    wchar_t vehicle_config_file[VEHICLE_CONFIG_FILENAME_SIZE];
+    double vehicle_length = 10.0;
+    QString vehicle_config_dir = "";
+    QString vehicle_config_file = "";
 
     simulator_vehicle_info_t()
-        : vehicle_config_dir_length(VEHICLE_CONFIG_DIR_NAME_SIZE)
-        , vehicle_config_dir(L"")
-        , vehicle_config_file_length(VEHICLE_CONFIG_FILENAME_SIZE)
-        , vehicle_config_file(L"")
     {
 
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << vehicle_length;
+        stream << vehicle_config_dir;
+        stream << vehicle_config_file;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> vehicle_length;
+        stream >> vehicle_config_dir;
+        stream >> vehicle_config_file;
     }
 };
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_info_t
+struct simulator_vehicles_info_t
 {
-    int num_updates;
-    simulator_route_info_t route_info;
-    int  num_vehicles;
-    std::array<simulator_vehicle_info_t, MAX_NUM_VEHICLES>  vehicles_info;
+    std::vector<simulator_vehicle_info_t> vehicles;
 
-    simulator_info_t()
-        : num_updates(-1)
-        , num_vehicles(0)
+    simulator_vehicles_info_t()
     {
 
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << vehicles.size();
+
+        for (auto veh : vehicles)
+        {
+            stream << veh.serialize();
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        size_t num;
+        stream >> num;
+
+        vehicles.clear();
+        vehicles.resize(num);
+
+        for (size_t i = 0; i < vehicles.size(); ++i)
+        {
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+
+            vehicles[i].deserialize(vehicle_data);
+        }
     }
 };
 

@@ -38,6 +38,8 @@ public:
 
     void sendSignalState(QString conn_name, int sig_dir, bool open);
 
+    void sendVehicleControl(int current_veh, int controlled_veh, QByteArray keyboard_data);
+
     bool isConnected() const;
 
 signals:
@@ -46,9 +48,11 @@ signals:
 
     void disconnected();
 
+    void setRouteInfo(QByteArray &route_info);
+
     void setTopologyData(QByteArray &topology_data);
 
-    void setSimulatorData(QByteArray &simulator_data);
+    //void setTopologyState(QByteArray &topology_state);
 
     void setSwitchState(QByteArray &sw_state);
 
@@ -56,7 +60,15 @@ signals:
 
     void setSignalsData(QByteArray &signals_data);
 
+    //void setSignalsState(QByteArray &signals_state);
+
     void updateSignal(QByteArray signal_data);
+
+    void setVehiclesInfo(QByteArray &vehicles_info);
+
+    void setVehiclesPositions(QByteArray &vehicles_pos);
+
+    void setVehiclesData(QByteArray &vehicles_data);
 
     void sendLogMessage(QString msg);
 

@@ -64,7 +64,7 @@ void TcpClient::sendRequest(StructureType stype)
 void TcpClient::sendSwitchState(QString conn_name, int state_fwd, int state_bwd)
 {
     network_data_t request;
-    request.stype = STYPE_CONNECTOR_STATE;
+    request.stype = STYPE_COMMAND_SWITCH_STATE;
 
     QBuffer buff(&request.data);
     buff.open(QIODevice::WriteOnly);
@@ -85,11 +85,11 @@ void TcpClient::sendSignalState(QString conn_name, int sig_dir, bool open)
 
     if (open)
     {
-        request.stype = STYPE_OPEN_SIGNAL;
+        request.stype = STYPE_COMMAND_OPEN_SIGNAL;
     }
     else
     {
-        request.stype = STYPE_CLOSE_SIGNAL;
+        request.stype = STYPE_COMMAND_CLOSE_SIGNAL;
     }
 
     QBuffer buff(&request.data);
@@ -98,6 +98,24 @@ void TcpClient::sendSignalState(QString conn_name, int sig_dir, bool open)
 
     stream << conn_name;
     stream << sig_dir;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::sendVehicleControl(int current_veh, int controlled_veh, QByteArray keyboard_data)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_VEHICLE_CONTROL;
+
+    QBuffer buff(&request.data);
+    buff.open(QIODevice::WriteOnly);
+    QDataStream stream(&buff);
+
+    stream << current_veh << controlled_veh << keyboard_data;
 
     socket->write(request.serialize());
     socket->flush();
@@ -139,31 +157,48 @@ void TcpClient::process_received_data(network_data_t &net_data)
 {
     switch (net_data.stype)
     {
-    case STYPE_TOPOLOGY_DATA:
-        {
-            qsizetype size = net_data.data.size();
-
-            emit setTopologyData(net_data.data);
-            break;
-        }
-    case STYPE_TRAIN_POSITION:
-        emit setSimulatorData(net_data.data);
+    case STYPE_ROUTE_INFO:
+        emit setRouteInfo(net_data.data);
         break;
 
-    case STYPE_CONNECTOR_STATE:
+    case STYPE_TOPOLOGY_DATA:
+        emit setTopologyData(net_data.data);
+        break;
+/*
+    case STYPE_TOPOLOGY_STATE:
+        emit setTopologyState(net_data.data);
+        break;
+*/
+    case STYPE_SWITCH_UPDATE:
         emit setSwitchState(net_data.data);
         break;
 
-    case STYPE_TRAJ_BUSY_STATE:
+    case STYPE_TRAJ_BUSY_UPDATE:
         emit setTrajBusyState(net_data.data);
         break;
 
-    case STYPE_SIGNALS_LIST:
+    case STYPE_SIGNALS_DATA:
         emit setSignalsData(net_data.data);
         break;
-
-    case STYPE_SIGNAL_STATE:
+/*
+    case STYPE_SIGNALS_STATE:
+        emit setSignalsState(net_data.data);
+        break;
+*/
+    case STYPE_SIGNAL_UPDATE:
         emit updateSignal(net_data.data);
+        break;
+
+    case STYPE_VEHICLES_INFO:
+        emit setVehiclesInfo(net_data.data);
+        break;
+
+    case STYPE_VEHICLES_POS_UPDATE:
+        emit setVehiclesPositions(net_data.data);
+        break;
+
+    case STYPE_VEHICLES_UPDATE:
+        emit setVehiclesData(net_data.data);
         break;
 
     default:
@@ -186,6 +221,8 @@ void TcpClient::slotConnect()
 //------------------------------------------------------------------------------
 void TcpClient::slotDisconnect()
 {
+    //Journal::instance()->info("Disconnected from the server...");
+    emit sendLogMessage("Disconnected from the server");
     socket->abort();
     connectionTimer->start();
     emit disconnect();
@@ -196,13 +233,10 @@ void TcpClient::slotDisconnect()
 //------------------------------------------------------------------------------
 void TcpClient::slotOnConnectionTimeout()
 {
-    //if (!isConnected())
-    //{
-        this->connectToServer(tcp_config);
-        //Journal::instance()->info("Try connect to server...");
+    this->connectToServer(tcp_config);
+    //Journal::instance()->info("Try connect to server...");
 
-        emit sendLogMessage("Try connect to server...");
-    //}
+    emit sendLogMessage("Try connect to server...");
 }
 
 //------------------------------------------------------------------------------
