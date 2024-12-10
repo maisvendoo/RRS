@@ -354,6 +354,10 @@ void TcpServer::slotSendSwitchState(QByteArray sw_state)
 
     for (auto client_socket : clients_for_topology_updates)
     {
+/*
+        if (clients_data.contains(client_socket))
+            Journal::instance()->info(QString("Updated switch state for %1").arg(clients_data[client_socket].id));
+*/
         client_socket->write(net_data.serialize());
         client_socket->flush();
     }
@@ -370,6 +374,10 @@ void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
 
     for (auto client_socket : clients_for_topology_updates)
     {
+/*
+        if (clients_data.contains(client_socket))
+            Journal::instance()->info(QString("Updated busy status for %1").arg(clients_data[client_socket].id));
+*/
         client_socket->write(net_data.serialize());
         client_socket->flush();
     }
@@ -386,6 +394,10 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 
     for (auto client_socket : clients_for_signals_updates)
     {
+/*
+        if (clients_data.contains(client_socket))
+            Journal::instance()->info(QString("Updated signals for %1").arg(clients_data[client_socket].id));
+*/
         client_socket->write(net_data.serialize());
         client_socket->flush();
     }
@@ -397,11 +409,15 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 void TcpServer::slotUpdateVehiclesPos(QByteArray vehicles_pos)
 {
     network_data_t net_data;
-    net_data.stype = STYPE_SIGNAL_UPDATE;
+    net_data.stype = STYPE_VEHICLES_POS_UPDATE;
     net_data.data = vehicles_pos;
 
     for (auto client_socket : clients_for_vehicles_pos_updates)
     {
+/*
+        if (clients_data.contains(client_socket))
+            Journal::instance()->info(QString("Updated vehicles positions for %1").arg(clients_data[client_socket].id));
+*/
         client_socket->write(net_data.serialize());
         client_socket->flush();
     }
@@ -413,11 +429,15 @@ void TcpServer::slotUpdateVehiclesPos(QByteArray vehicles_pos)
 void TcpServer::slotUpdateVehiclesState(QByteArray vehicles_state)
 {
     network_data_t net_data;
-    net_data.stype = STYPE_SIGNAL_UPDATE;
+    net_data.stype = STYPE_VEHICLES_UPDATE;
     net_data.data = vehicles_state;
 
     for (auto client_socket : clients_for_vehicles_updates)
     {
+/*
+        if (clients_data.contains(client_socket))
+            Journal::instance()->info(QString("Updated vehicles state for %1").arg(clients_data[client_socket].id));
+*/
         client_socket->write(net_data.serialize());
         client_socket->flush();
     }

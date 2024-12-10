@@ -27,6 +27,7 @@
 #include    <train.h>
 #include    <elapsed-timer.h>
 
+#include    <global-const.h>
 #include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
 #include    <controlled-struct.h>
@@ -84,9 +85,6 @@ public slots:
     ///
     void controlProcess();
 
-    /// Обмен данными с ВЖД
-    void virtualRailwayFeedback();
-
 private:
 
     /// Current simulation time
@@ -114,12 +112,12 @@ private:
     double      control_delay = 0.05;
 
     /// Vehicle which selected by user for view
-    int             current_vehicle = -1;
+    int         current_vehicle = -1;
 //    int             prev_current_vehicle;
 
     /// Vehicle which selected by user for control
-    int             controlled_vehicle = -1;
-    int             prev_controlled_vehicle = -1;
+    int         controlled_vehicle = -1;
+    int         prev_controlled_vehicle = -1;
 
     /// All vehicles
     std::vector<Vehicle *> vehicles;
@@ -127,17 +125,8 @@ private:
     /// Train model
     std::vector<Train *> trains;
 
-    /// TCP-server
-    //Server      *server = nullptr;
-
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
-
-    /// Клиент для связи с ВЖД
-    //SimTcpClient *sim_client = nullptr;
-
-    /// Система СЦБ
-    ///Signaling *signaling = nullptr;
 
     /// Система трафика
     TrafficMachine  *traffic_machine = nullptr;
@@ -149,11 +138,9 @@ private:
     QThread     model_thread;
 
     KeysControl keys_control;
-    /// Server update data to clinet transmission
-    simulator_update_t   update_data;
-
+/*
     QSharedMemory   memory_sim_info;
-    QSharedMemory   memory_sim_update;
+    QSharedMemory   memory_sim_update;*/
     QSharedMemory   memory_controlled;
     QSharedMemory   keys_data;
     QByteArray      data;
@@ -163,9 +150,8 @@ private:
 
     ElapsedTimer    simTimer;
 
+    /// TCP-server
     TcpServer   *tcp_server = new TcpServer;
-
-    tcp_simulator_update_t tcp_simulator_update;
 
     /// Вектор данных о нескольких поездах
     std::vector<init_data_t> init_datas;
@@ -196,8 +182,6 @@ private:
     void configSolver(solver_config_t &solver_config);
 
     void initControlPanel(QString cfg_path);
-
-    void initSimClient(QString cfg_path);
 
     /// Инициализация поезда
     Train *addTrain(const init_data_t &init_data);

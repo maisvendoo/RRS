@@ -220,7 +220,7 @@ struct simulator_update_t
     int current_vehicle = 0;
     QString currentDebugMsg = "";
     int controlled_vehicle = 0;
-    QString controlledDebugMeg = "";
+    QString controlledDebugMsg = "";
     std::vector<simulator_train_update_t> trains;
     std::vector<simulator_vehicle_update_t> vehicles;
 
@@ -239,7 +239,7 @@ struct simulator_update_t
         stream << current_vehicle;
         stream << currentDebugMsg;
         stream << controlled_vehicle;
-        stream << controlledDebugMeg;
+        stream << controlledDebugMsg;
 
         stream << trains.size();
 
@@ -267,7 +267,7 @@ struct simulator_update_t
         stream >> current_vehicle;
         stream >> currentDebugMsg;
         stream >> controlled_vehicle;
-        stream >> controlledDebugMeg;
+        stream >> controlledDebugMsg;
 
         size_t num;
         stream >> num;

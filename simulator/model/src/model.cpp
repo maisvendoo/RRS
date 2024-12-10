@@ -24,8 +24,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Model::Model(QObject *parent) : QObject(parent)  
-{
+Model::Model(QObject *parent) : QObject(parent)
+{/*
     simulator_info_t tmp_si = simulator_info_t();
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
     if (memory_sim_info.create(sizeof(simulator_info_t)))
@@ -61,7 +61,7 @@ Model::Model(QObject *parent) : QObject(parent)
         {
             Journal::instance()->error("No shared memory for simulator update data");
         }
-    }
+    }*/
 
     controlled_t tmp_c = controlled_t();
     memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
@@ -98,16 +98,16 @@ Model::Model(QObject *parent) : QObject(parent)
         {
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
-    }    
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Model::~Model()
-{
+{/*
     memory_sim_info.detach();
-    memory_sim_update.detach();
+    memory_sim_update.detach();*/
     memory_controlled.detach();
     keys_data.detach();
 }
@@ -140,58 +140,41 @@ bool Model::init(const simulator_command_line_t &command_line)
     for (size_t i = 0; i < init_datas.size(); ++i)
     {
         Train *train = addTrain(init_datas[i]);
-        trains.push_back(train);
+        if (train)
+            trains.push_back(train);
     }
 
-    Journal::instance()->info("==== Info to shared memory ====");
-    simulator_info_t   info_data;
-    info_data.num_updates = 1;
-    info_data.route_info.route_dir_name_length = init_data.route_dir_name.size();
-    init_data.route_dir_name.toWCharArray(info_data.route_info.route_dir_name);
-    Journal::instance()->info("Ready route info for shared memory");
-    Journal::instance()->info("Route dir name: " + QString::fromWCharArray(info_data.route_info.route_dir_name));
+    initControlPanel("control-panel");
 
-    info_data.num_vehicles = vehicles.size();
-    size_t i = 0;
-    for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
-    {
-        QString dir = (*it)->getConfigDir();
-        info_data.vehicles_info[i].vehicle_config_dir_length = dir.size();
-        dir.toWCharArray(info_data.vehicles_info[i].vehicle_config_dir);
-
-        QString file = (*it)->getConfigName();
-        info_data.vehicles_info[i].vehicle_config_file_length = file.size();
-        file.toWCharArray(info_data.vehicles_info[i].vehicle_config_file);
-
-        ++i;
-    }
-    Journal::instance()->info("Ready vehicles info for shared memory");
-
-    if (memory_sim_info.lock())
-    {
-        memcpy(memory_sim_info.data(), &info_data, sizeof (simulator_info_t));
-        memory_sim_info.unlock();
-        Journal::instance()->info("Set info to shared memory");
-    }
-    else
-    {
-        Journal::instance()->error("Can't lock shared memory");
-    }
+    //initTraffic(init_data);
 
     start_time = init_data.solver_config.start_time;
     stop_time = init_data.solver_config.stop_time;
     dt = init_data.solver_config.step;
     integration_time_interval = init_data.integration_time_interval;
 
-    initControlPanel("control-panel");
-
-    initSimClient("virtual-railway");
-
-    //initTraffic(init_data);
-
     initTcpServer();
 
-    Journal::instance()->info("Simulator model is initialized successfully");
+    Journal::instance()->info("==== Info to server ====");
+    simulator_route_info_t route_info;
+    route_info.route_dir_name = init_data.route_dir_name;
+    tcp_server->setRouteInfo(route_info.serialize());
+    Journal::instance()->info("Ready route info for server");
+
+    simulator_vehicles_info_t vehicles_info;
+    vehicles_info.vehicles.resize(vehicles.size());
+    size_t i = 0;
+    for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
+    {
+        vehicles_info.vehicles[i].vehicle_length = (*it)->getLength();
+        vehicles_info.vehicles[i].vehicle_config_dir = (*it)->getConfigDir();
+        vehicles_info.vehicles[i].vehicle_config_file = (*it)->getConfigName();
+        ++i;
+    }
+    tcp_server->setVehiclesInfo(vehicles_info.serialize());
+    Journal::instance()->info("Ready vehicles info for shared memory");
+
+    Journal::instance()->info("Simulator model and server are initialized successfully");
 
     return true;
 }
@@ -700,53 +683,6 @@ void Model::initControlPanel(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::initSimClient(QString cfg_path)
-{
-    /*if (trains[0]->getTrainID().isEmpty())
-        return;
-
-    if (trains[0]->getClientName().isEmpty())
-        return;
-
-    CfgReader cfg;
-    FileSystem &fs = FileSystem::getInstance();
-    QString full_path = QString(fs.getConfigDir().c_str()) + fs.separator() + cfg_path + ".xml";
-
-    if (cfg.load(full_path))
-    {
-        QString secName = "VRServer";
-        tcp_config_t tcp_config;
-
-        cfg.getString(secName, "HostAddr", tcp_config.host_addr);
-        int port = 0;
-
-        if (!cfg.getInt(secName, "Port", port))
-        {
-            port = 1993;
-        }
-
-        tcp_config.port = static_cast<quint16>(port);
-        tcp_config.name = trains[0]->getClientName();
-
-        sim_client = new SimTcpClient();
-        connect(this, &Model::getRecvData, sim_client, &SimTcpClient::getRecvData);
-        sim_client->init(tcp_config);
-        sim_client->start();
-
-        Journal::instance()->info("Started virtual railway TCP-client...");
-
-        connect(&networkTimer, &QTimer::timeout, this, &Model::virtualRailwayFeedback);
-        networkTimer.start(100);
-    }
-    else
-    {
-        Journal::instance()->error("There is no virtual railway configuration in file " + full_path);
-    }*/
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 Train *Model::addTrain(const init_data_t &init_data)
 {
     Journal::instance()->info("==== Train initialization ====");
@@ -837,16 +773,14 @@ void Model::initTcpServer()
 
     tcp_server->init(QString(cfg_path.c_str()));
 
-    connect(tcp_server, &TcpServer::setTopologyData, this, &Model::slotGetTopologyData);
-
-    tcp_simulator_update.vehicles.resize(vehicles.size());
+    connect(tcp_server, &TcpServer::requestTopologyData, this, &Model::slotGetTopologyData);
 
     connect(tcp_server, &TcpServer::setSwitchState, topology, &Topology::getSwitchState);
     connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
 
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
 
-    connect(tcp_server, &TcpServer::setSignalsData, this, &Model::slotGetSignalsData);
+    connect(tcp_server, &TcpServer::requestSignalsData, this, &Model::slotGetSignalsData);
 
     for (auto signal : topology->getSignalsData()->line_signals)
     {
@@ -875,130 +809,21 @@ void Model::initTcpServer()
 //------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
-    if (tcp_simulator_update.vehicles.empty())
-    {
-        return;
-    }
+    simulator_update_pos_t  update_pos_data;
+    simulator_update_t      update_data;
 
-    tcp_simulator_update.time = t;
-    tcp_simulator_update.current_vehicle = current_vehicle;
-    tcp_simulator_update.controlled_vehicle = controlled_vehicle;
+    update_pos_data.vehicles.resize(vehicles.size());
+    update_data.vehicles.resize(vehicles.size());
+    update_data.trains.resize(trains.size());
 
-    tcp_simulator_update.trains.resize(trains.size());
-    int i = 0;
-    for (auto train : trains)
-    {
-        tcp_simulator_update.trains[i].first_vehicle_id = train->getFirstVehicle()->getModelIndex();
-        tcp_simulator_update.trains[i].last_vehicle_id = train->getLastVehicle()->getModelIndex();
+    update_pos_data.time = t;
 
-        ++i;
-    }
+    update_pos_data.current_vehicle = current_vehicle;
+    update_pos_data.controlled_vehicle = controlled_vehicle;
 
-    i = 0;
-    for (auto vehicle : vehicles)
-    {
-        profile_point_t *pp = vehicle->getProfilePoint();
-
-        tcp_simulator_update.vehicles[i].position_x = pp->position.x;
-        tcp_simulator_update.vehicles[i].position_y = pp->position.y;
-        tcp_simulator_update.vehicles[i].position_z = pp->position.z;
-        tcp_simulator_update.vehicles[i].orth_x = pp->orth.x;
-        tcp_simulator_update.vehicles[i].orth_y = pp->orth.y;
-        tcp_simulator_update.vehicles[i].orth_z = pp->orth.z;
-        tcp_simulator_update.vehicles[i].up_x = pp->up.x;
-        tcp_simulator_update.vehicles[i].up_y = pp->up.y;
-        tcp_simulator_update.vehicles[i].up_z = pp->up.z;
-
-        tcp_simulator_update.vehicles[i].train_id = vehicle->getTrainIndex();
-        int orient = vehicle->getOrientation();
-        tcp_simulator_update.vehicles[i].orientation = orient;
-        if (orient == -1)
-        {
-            tcp_simulator_update.vehicles[i].next_vehicle =
-                (vehicle->getPrevVehicle() == nullptr) ?
-                    -1 :
-                    vehicle->getPrevVehicle()->getModelIndex();
-
-            tcp_simulator_update.vehicles[i].prev_vehicle =
-                (vehicle->getNextVehicle() == nullptr) ?
-                    -1 :
-                    vehicle->getNextVehicle()->getModelIndex();
-        }
-        else
-        {
-            tcp_simulator_update.vehicles[i].next_vehicle =
-                (vehicle->getNextVehicle() == nullptr) ?
-                    -1 :
-                    vehicle->getNextVehicle()->getModelIndex();
-
-            tcp_simulator_update.vehicles[i].prev_vehicle =
-                (vehicle->getPrevVehicle() == nullptr) ?
-                    -1 :
-                    vehicle->getPrevVehicle()->getModelIndex();
-        }
-
-        tcp_simulator_update.vehicles[i].length = vehicle->getLength();
-
-        tcp_simulator_update.vehicles[i].analogSignal = vehicle->getAnalogSignals();
-
-        if (current_vehicle == i)
-        {
-            tcp_simulator_update.currentDebugMsg = vehicle->getDebugMsg();
-        }
-
-        if (controlled_vehicle == i)
-        {
-            tcp_simulator_update.controlledDebugMeg = vehicle->getDebugMsg();
-        }
-
-        ++i;
-    }
-
-    tcp_server->setSimulatorData(tcp_simulator_update.serialize());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::virtualRailwayFeedback()
-{
-    /*if (sim_client == Q_NULLPTR)
-        return;
-
-    if (!sim_client->isConnected())
-        return;
-
-    sim_dispatcher_data_t disp_data;
-    emit getRecvData(disp_data);
-
-    alsn_info_t alsn_info;
-    alsn_info.code_alsn = disp_data.code_alsn;
-    alsn_info.num_free_block = disp_data.num_free_block;
-    alsn_info.response_code = disp_data.response_code;
-    alsn_info.signal_dist = disp_data.signal_dist;
-    strcpy(alsn_info.current_time, disp_data.current_time);
-
-    train->getFirstVehicle()->setASLN(alsn_info);
-
-    sim_train_data_t train_data;
-    strcpy(train_data.train_id, train->getTrainID().toStdString().c_str());
-    train_data.direction = train->getDirection();
-    train_data.coord = train->getFirstVehicle()->getRailwayCoord();
-    train_data.speed = train->getFirstVehicle()->getVelocity();
-
-    sim_client->sendTrainData(train_data);*/
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::sharedMemoryFeedback()
-{
-    update_data.time = t;
     update_data.current_vehicle = current_vehicle;
     update_data.controlled_vehicle = controlled_vehicle;
 
-    update_data.num_trains = trains.size();
     int i = 0;
     for (auto train : trains)
     {
@@ -1013,15 +838,15 @@ void Model::sharedMemoryFeedback()
     {
         profile_point_t *pp = vehicle->getProfilePoint();
 
-        update_data.vehicles[i].position_x = pp->position.x;
-        update_data.vehicles[i].position_y = pp->position.y;
-        update_data.vehicles[i].position_z = pp->position.z;
-        update_data.vehicles[i].orth_x = pp->orth.x;
-        update_data.vehicles[i].orth_y = pp->orth.y;
-        update_data.vehicles[i].orth_z = pp->orth.z;
-        update_data.vehicles[i].up_x = pp->up.x;
-        update_data.vehicles[i].up_y = pp->up.y;
-        update_data.vehicles[i].up_z = pp->up.z;
+        update_pos_data.vehicles[i].position_x = pp->position.x;
+        update_pos_data.vehicles[i].position_y = pp->position.y;
+        update_pos_data.vehicles[i].position_z = pp->position.z;
+        update_pos_data.vehicles[i].orth_x = pp->orth.x;
+        update_pos_data.vehicles[i].orth_y = pp->orth.y;
+        update_pos_data.vehicles[i].orth_z = pp->orth.z;
+        update_pos_data.vehicles[i].up_x = pp->up.x;
+        update_pos_data.vehicles[i].up_y = pp->up.y;
+        update_pos_data.vehicles[i].up_z = pp->up.z;
 
         update_data.vehicles[i].train_id = vehicle->getTrainIndex();
         int orient = vehicle->getOrientation();
@@ -1051,25 +876,40 @@ void Model::sharedMemoryFeedback()
                     vehicle->getPrevVehicle()->getModelIndex();
         }
 
-        std::copy(vehicle->getAnalogSignals().begin(),
-                  vehicle->getAnalogSignals().end(),
-                  update_data.vehicles[i].analogSignal.begin());
+        update_data.vehicles[i].analogSignal.insert(
+            update_data.vehicles[i].analogSignal.begin(),
+            vehicle->getAnalogSignals().begin(),
+            vehicle->getAnalogSignals().end());
 
         if (current_vehicle == i)
         {
-            QString msg = vehicle->getDebugMsg();
-            msg.resize(DEBUG_STRING_SIZE, QChar(' '));
-            msg.toWCharArray(update_data.currentDebugMsg);
+            update_data.currentDebugMsg = vehicle->getDebugMsg();
         }
 
         if (controlled_vehicle == i)
         {
+            update_data.controlledDebugMsg = vehicle->getDebugMsg();
+        }
+
+        ++i;
+    }
+
+    tcp_server->slotUpdateVehiclesPos(update_pos_data.serialize());
+    tcp_server->slotUpdateVehiclesState(update_data.serialize());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::sharedMemoryFeedback()
+{
+    int i = 0;
+    for (auto vehicle : vehicles)
+    {
+        if (controlled_vehicle == i)
+        {
             if (data.size() != 0)
                 vehicle->setKeysData(data);
-
-            QString msg = vehicle->getDebugMsg();
-            msg.resize(DEBUG_STRING_SIZE, QChar(' '));
-            msg.toWCharArray(update_data.controlledDebugMsg);
         }
         else
         {
@@ -1080,12 +920,6 @@ void Model::sharedMemoryFeedback()
             }
         }
         ++i;
-    }
-
-    if (memory_sim_update.lock())
-    {
-        memcpy(memory_sim_update.data(), &update_data, sizeof (simulator_update_t));
-        memory_sim_update.unlock();
     }
 }
 
@@ -1159,6 +993,7 @@ void Model::process()
     // Feedback to viewer
     sharedMemoryFeedback();
 
+    // Update server feedback
     tcpFeedBack();
 
     for (auto train : trains)

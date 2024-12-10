@@ -21,23 +21,23 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::disconnected,
             this, &::MainWindow::slotDisconnectedFromSimulator);
 
+    connect(tcp_client, &TcpClient::setVehiclesInfo,
+            this, &MainWindow::slotGetVehicleInfoData);
+
     connect(tcp_client, &TcpClient::setTopologyData,
             this, &MainWindow::slotGetTopologyData);
 
-    connect(trainUpdateTimer, &QTimer::timeout,
-            this, &MainWindow::slotOnUpdateTrainData);
+    connect(tcp_client, &TcpClient::setSignalsData,
+            this, &MainWindow::slotGetSignalsData);
 
-    connect(tcp_client, &TcpClient::setSimulatorData,
-            this, &MainWindow::slotGetSimulatorData);
+    connect(tcp_client, &TcpClient::setVehiclesPositions,
+            this, &MainWindow::slotGetVehiclePosData);
 
     connect(tcp_client, &TcpClient::setSwitchState,
             this, &MainWindow::slotGetSwitchState);
 
     connect(tcp_client, &TcpClient::setTrajBusyState,
             this, &MainWindow::slotGetTrajBusyState);
-
-    connect(tcp_client, &TcpClient::setSignalsData,
-            this, &MainWindow::slotGetSignalsData);
 
     connect(tcp_client, &TcpClient::updateSignal,
             this, &MainWindow::slotUpdateSignal);
@@ -121,10 +121,10 @@ void MainWindow::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
-    // Запрос серверу на загрузку топологии
-    tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
+    // Запрос серверу на информацию о длинах ПЕ
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 
-    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));    
+    ui->ptLog->appendPlainText(tr("Send request for vehicles info..."));
 }
 
 //------------------------------------------------------------------------------
@@ -133,6 +133,30 @@ void MainWindow::slotConnectedToSimulator()
 void MainWindow::slotDisconnectedFromSimulator()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetVehicleInfoData(QByteArray &data)
+{
+    simulator_vehicles_info_t info;
+    info.deserialize(data);
+
+    size_t num = info.vehicles.size();
+    ui->ptLog->appendPlainText(QString(tr("Loaded info about %1 vehicles")).arg(num));
+
+    vehicles_half_length.resize(num);
+    for (size_t i = 0; i < num; ++i)
+    {
+        vehicles_half_length[i] = info.vehicles[i].vehicle_length / 2.0;
+    }
+    map->vehicles_half_length = &vehicles_half_length;
+
+    // Запрос серверу на загрузку топологии
+    tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_DATA);
+
+    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
 }
 
 //------------------------------------------------------------------------------
@@ -188,157 +212,9 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     map->stations = topology->getStationsList();
 
     // Запрос серверу на загрузку сигналов
-    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
     ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
     //trainUpdateTimer->start(tcp_config.request_interval);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotOnUpdateTrainData()
-{
-    tcp_client->sendRequest(STYPE_TRAIN_POSITION);
-    this->update();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
-{
-    train_data.deserialize(sim_data);
-
-    map->train_data = &train_data;
-
-    int seconds = static_cast<int>(std::floor(train_data.time));
-    int hours = seconds / 3600;
-    int minutes = seconds / 60 % 60;
-    seconds = seconds % 60;
-    QString time_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)")
-                           .arg(train_data.time, 8, 'f', 1)
-                           .arg(hours, 2)
-                           .arg(minutes, 2)
-                           .arg(seconds, 2);
-    ui->statusbar->showMessage(time_text);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotSwitchConnectorMenu()
-{
-    SwitchLabel *sw_label = dynamic_cast<SwitchLabel *>(sender());
-    QString conn_name = sw_label->conn->getName();
-
-    Switch *sw = dynamic_cast<Switch *>(sw_label->conn);
-    int state_fwd = sw->getStateFwd();
-    int state_bwd = sw->getStateBwd();
-
-    if ((state_fwd == 0) && (state_bwd == 0))
-        return;
-
-    TcpClient *tc = tcp_client;
-
-    QMenu *menu = new QMenu(this);
-
-    sw_label->menu = menu;
-
-    if (state_fwd != 0)
-    {
-        QAction *action_switch_fwd = new QAction(tr("Switch forward"), this);
-        action_switch_fwd->setEnabled((sw->getStateFwd() != 2) && (sw->getStateFwd() != -2));
-        menu->addAction(action_switch_fwd);
-
-        sw_label->action_switch_fwd = action_switch_fwd;
-        connect(action_switch_fwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
-
-        connect(action_switch_fwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
-            tc->sendSwitchState(conn_name, -sign(state_fwd), state_bwd);
-        });
-    }
-
-    if (state_bwd != 0)
-    {
-        QAction *action_switch_bwd = new QAction(tr("Switch backward"), this);
-        action_switch_bwd->setEnabled((sw->getStateBwd() != 2) && (sw->getStateBwd() != -2));
-        menu->addAction(action_switch_bwd);
-
-        sw_label->action_switch_bwd = action_switch_bwd;
-        connect(action_switch_bwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
-
-        connect(action_switch_bwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
-            tc->sendSwitchState(conn_name, state_fwd, -sign(state_bwd));
-        });
-    }
-
-    menu->exec(QCursor::pos());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotSignalControlMenu()
-{
-    SignalLabel *signal_label = dynamic_cast<SignalLabel *>(sender());
-    Signal *signal = signal_label->signal;
-
-    TcpClient *tc = tcp_client;
-
-    QMenu *menu = new QMenu(this);
-
-    QAction *open = new QAction(tr("Open"), this);
-    menu->addAction(open);
-
-    connect(open, &QAction::triggered, this, [tc, signal]{
-        tc->sendSignalState(signal->getConnector()->getName(), signal->getDirection(), true);
-    });
-
-    QAction *close = new QAction(tr("Close"), this);
-    menu->addAction(close);
-
-    connect(close, &QAction::triggered, this, [tc, signal]{
-        tc->sendSignalState(signal->getConnector()->getName(), signal->getDirection(), false);
-    });
-
-    menu->exec(QCursor::pos());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotGetSwitchState(QByteArray &sw_state)
-{
-    switch_state_t switch_state;
-    switch_state.deserialize(sw_state);
-
-    Switch *sw = dynamic_cast<Switch *>(conn_list->value(switch_state.name, Q_NULLPTR));
-
-    if (sw == Q_NULLPTR)
-    {
-        return;
-    }
-
-    sw->setStateFwd(switch_state.state_fwd);
-    sw->setStateBwd(switch_state.state_bwd);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
-{
-    traj_busy_state_t busy_state;
-    busy_state.deserialize(busy_data);
-
-    Trajectory *traj = (traj_list->value(busy_state.name, Q_NULLPTR));
-
-    if (traj == Q_NULLPTR)
-    {
-        return;
-    }
-
-    traj->setBusyState(busy_state.is_busy);
 }
 
 //------------------------------------------------------------------------------
@@ -472,8 +348,148 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     map->signals_data = signals_data;
 
-    // Запуск таймера запроса положения поезда
-    trainUpdateTimer->start(tcp_config.request_interval);
+    // Запрос серверу на регулярное обновление положений ПЕ
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE);
+    ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
+{
+    train_data.deserialize(sim_data);
+
+    map->train_data = &train_data;
+
+    int seconds = static_cast<int>(std::floor(train_data.time));
+    int hours = seconds / 3600;
+    int minutes = seconds / 60 % 60;
+    seconds = seconds % 60;
+    QString time_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)")
+                           .arg(train_data.time, 8, 'f', 1)
+                           .arg(hours, 2)
+                           .arg(minutes, 2)
+                           .arg(seconds, 2);
+    ui->statusbar->showMessage(time_text);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSwitchConnectorMenu()
+{
+    SwitchLabel *sw_label = dynamic_cast<SwitchLabel *>(sender());
+    QString conn_name = sw_label->conn->getName();
+
+    Switch *sw = dynamic_cast<Switch *>(sw_label->conn);
+    int state_fwd = sw->getStateFwd();
+    int state_bwd = sw->getStateBwd();
+
+    if ((state_fwd == 0) && (state_bwd == 0))
+        return;
+
+    TcpClient *tc = tcp_client;
+
+    QMenu *menu = new QMenu(this);
+
+    sw_label->menu = menu;
+
+    if (state_fwd != 0)
+    {
+        QAction *action_switch_fwd = new QAction(tr("Switch forward"), this);
+        action_switch_fwd->setEnabled((sw->getStateFwd() != 2) && (sw->getStateFwd() != -2));
+        menu->addAction(action_switch_fwd);
+
+        sw_label->action_switch_fwd = action_switch_fwd;
+        connect(action_switch_fwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
+
+        connect(action_switch_fwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
+            tc->sendSwitchState(conn_name, -sign(state_fwd), state_bwd);
+        });
+    }
+
+    if (state_bwd != 0)
+    {
+        QAction *action_switch_bwd = new QAction(tr("Switch backward"), this);
+        action_switch_bwd->setEnabled((sw->getStateBwd() != 2) && (sw->getStateBwd() != -2));
+        menu->addAction(action_switch_bwd);
+
+        sw_label->action_switch_bwd = action_switch_bwd;
+        connect(action_switch_bwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
+
+        connect(action_switch_bwd, &QAction::triggered, this, [conn_name, state_fwd, state_bwd, tc]{
+            tc->sendSwitchState(conn_name, state_fwd, -sign(state_bwd));
+        });
+    }
+
+    menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSignalControlMenu()
+{
+    SignalLabel *signal_label = dynamic_cast<SignalLabel *>(sender());
+    Signal *signal = signal_label->signal;
+
+    TcpClient *tc = tcp_client;
+
+    QMenu *menu = new QMenu(this);
+
+    QAction *open = new QAction(tr("Open"), this);
+    menu->addAction(open);
+
+    connect(open, &QAction::triggered, this, [tc, signal]{
+        tc->sendSignalState(signal->getConnector()->getName(), signal->getDirection(), true);
+    });
+
+    QAction *close = new QAction(tr("Close"), this);
+    menu->addAction(close);
+
+    connect(close, &QAction::triggered, this, [tc, signal]{
+        tc->sendSignalState(signal->getConnector()->getName(), signal->getDirection(), false);
+    });
+
+    menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetSwitchState(QByteArray &sw_state)
+{
+    switch_state_t switch_state;
+    switch_state.deserialize(sw_state);
+
+    Switch *sw = dynamic_cast<Switch *>(conn_list->value(switch_state.name, Q_NULLPTR));
+
+    if (sw == Q_NULLPTR)
+    {
+        return;
+    }
+
+    sw->setStateFwd(switch_state.state_fwd);
+    sw->setStateBwd(switch_state.state_bwd);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
+{
+    traj_busy_state_t busy_state;
+    busy_state.deserialize(busy_data);
+
+    Trajectory *traj = (traj_list->value(busy_state.name, Q_NULLPTR));
+
+    if (traj == Q_NULLPTR)
+    {
+        return;
+    }
+
+    traj->setBusyState(busy_state.is_busy);
 }
 
 //------------------------------------------------------------------------------

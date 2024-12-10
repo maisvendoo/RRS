@@ -126,31 +126,31 @@ void MapWidget::drawTrajectory(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawTrain(tcp_simulator_update_t *train_data)
+void MapWidget::drawTrain(simulator_update_pos_t *train_data)
 {
     for (size_t i = 0; i < train_data->vehicles.size(); ++i)
     {
         if (i == train_data->controlled_vehicle)
         {
             QColor color(192, 64, 64);
-            drawVehicle(train_data->vehicles[i],color);
+            drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
             continue;
         }
         if (i == train_data->current_vehicle)
         {
             QColor color(192, 192, 0);
-            drawVehicle(train_data->vehicles[i],color);
+            drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
             continue;
         }
         QColor color(64, 128, 0);
-        drawVehicle(train_data->vehicles[i],color);
+        drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
+void MapWidget::drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color)
 {
     QPen pen;
     pen.setWidth(5 + std::floor(scale));
@@ -162,13 +162,13 @@ void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
     p.setPen(pen);
 
     dvec3 fwd;
-    fwd.x = vehicle.position_x + vehicle.orth_x * (vehicle.length / 2.0 - 0.51);
-    fwd.y = vehicle.position_y + vehicle.orth_y * (vehicle.length / 2.0 - 0.51);
+    fwd.x = vehicle.position_x + vehicle.orth_x * (vehicle_half_length - 0.51);
+    fwd.y = vehicle.position_y + vehicle.orth_y * (vehicle_half_length - 0.51);
     fwd.z = 0;
 
     dvec3 bwd;
-    bwd.x = vehicle.position_x - vehicle.orth_x * (vehicle.length / 2.0 - 0.51);
-    bwd.y = vehicle.position_y - vehicle.orth_y * (vehicle.length / 2.0 - 0.51);
+    bwd.x = vehicle.position_x - vehicle.orth_x * (vehicle_half_length - 0.51);
+    bwd.y = vehicle.position_y - vehicle.orth_y * (vehicle_half_length - 0.51);
     bwd.z = 0;
 
     QPoint fwd_point = coord_transform(fwd);
