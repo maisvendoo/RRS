@@ -29,12 +29,12 @@ bool TcpClient::init(const tcp_config_t &tcp_config)
     connectionTimer = new QTimer(this);
     connectionTimer->setInterval(tcp_config.reconnect_interval);
     connect(connectionTimer, &QTimer::timeout, this, &TcpClient::slotOnConnectionTimeout);
-    connect(socket, &QTcpSocket::errorOccurred, this, &TcpClient::slotAcceptError);
 
     socket = new QTcpSocket(this);
     in.setDevice(socket);
     in.setVersion(QDataStream::Qt_4_0);
 
+    connect(socket, &QTcpSocket::errorOccurred, this, &TcpClient::slotAcceptError);
     connect(socket, &QTcpSocket::connected, this, &TcpClient::slotConnect);
     connect(socket, &QTcpSocket::destroyed, this, &TcpClient::slotDisconnect);
     connect(socket, &QTcpSocket::readyRead, this, &TcpClient::slotReceive);
@@ -236,7 +236,9 @@ void TcpClient::slotOnConnectionTimeout()
     this->connectToServer(tcp_config);
     //Journal::instance()->info("Try connect to server...");
 
-    emit sendLogMessage("Try connect to server...");
+    emit sendLogMessage("Try connect to server " +
+                        tcp_config.host_addr + ":" +
+                        QString::number(tcp_config.port));
 }
 
 //------------------------------------------------------------------------------
@@ -246,10 +248,13 @@ void TcpClient::slotReceive()
 {
     while (socket->bytesAvailable())
     {
+        recvBuff.append(socket->readAll());
+    }
+
+    while (recvBuff.size() > 0)
+    {
         if (is_first_data)
         {
-            recvBuff.append(socket->readAll());
-
             QBuffer b(&recvBuff);
             b.open(QIODevice::ReadOnly);
             QDataStream stream(&b);
@@ -258,24 +263,21 @@ void TcpClient::slotReceive()
 
             is_first_data = false;
         }
-        else
-        {
-            recvBuff.append(socket->readAll());
-        }
-    }
 
-    if (recvBuff.size() > wait_data_size)
-    {
-        while (recvBuff.size() > 0)
+        if (recvBuff.size() > wait_data_size)
         {
-            // Десириализуем принятые данные в структуру сетевого пакета
+            // Десериализуем принятые данные в структуру сетевого пакета
             received_data.deserialize(recvBuff);
 
             // Обработка принятого сетевого пакета
             process_received_data(received_data);
-        }
 
-        is_first_data = true;
+            is_first_data = true;
+        }
+        else
+        {
+            break;
+        }
     }
 }
 

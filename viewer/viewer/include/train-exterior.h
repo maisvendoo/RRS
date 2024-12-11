@@ -27,6 +27,7 @@
 #include    "animation-manager.h"
 #include    "camera-position.h"
 #include    "settings.h"
+#include    "global-const.h"
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
 #include    "controlled-struct.h"
@@ -49,8 +50,11 @@ class TrainExteriorHandler : public QObject, public osgGA::GUIEventHandler
 public:
 
     /// Constructor
-    TrainExteriorHandler(settings_t settings, SoundManager *sm, const simulator_info_t &info_data);
+    TrainExteriorHandler(settings_t settings, SoundManager *sm);
     ~TrainExteriorHandler();
+
+    /// Loading vehicles
+    void load(const simulator_vehicles_info_t &info_data);
 
     /// Handle method
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
@@ -114,10 +118,17 @@ private:
     /// Info about train's vehicles exterior
     std::vector<vehicle_exterior_t> vehicles_ext;
 
-    /// Data, received from server
-    std::array<simulator_update_t, 2> update_data;
+    /// Data about vehicles positions, received from server
+    simulator_update_pos_t client_update_pos_data;
+    std::array<simulator_update_pos_t, 2> update_pos_data;
     short new_data;
     short old_data;
+
+    bool is_pos_updated = false;
+    bool is_state_updated = false;
+
+    /// Data about vehicles state, received from server
+    simulator_update_t update_data;
 
     QSharedMemory   memory_sim_update;
     QSharedMemory   memory_controlled;
@@ -128,14 +139,11 @@ private:
     /// Sound manager
     SoundManager *sound_manager;
 
-    /// Load train exterior from
-    void load(const simulator_info_t &info_data);
-
     /// Moving train along track
-    void moveTrain(double ref_time, const std::array<simulator_update_t, 2> update_data);
+    void moveTrain(double ref_time, const std::array<simulator_update_pos_t, 2> pos_data);
 
     /// Processing data from server
-    void processSharedData(double &ref_time);
+    void updatePosData(double &ref_time);
 
     /// Processing data from server
     void sendControlledVehicle(const controlled_t &data);
@@ -161,6 +169,10 @@ private:
 public slots:
 
     void lock_display(bool lock);
+
+    void slotGetVehiclePosData(QByteArray &data);
+
+    void slotGetVehicleStateData(QByteArray &data);
 };
 
 #endif // TRAIN_EXTERIOR_H

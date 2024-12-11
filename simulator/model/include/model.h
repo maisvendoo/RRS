@@ -110,6 +110,8 @@ private:
 
     double      control_time = 0.0;
     double      control_delay = 0.05;
+    double      feedback_time = 0.0;
+    double      feedback_delay = 0.05;
 
     /// Vehicle which selected by user for view
     int         current_vehicle = -1;
@@ -196,7 +198,7 @@ private:
     void initTcpServer();
 
     /// TCP feedback
-    void tcpFeedBack();
+    void tcpFeedBack(double delta_t);
 
     /// Shered memory feedback
     void sharedMemoryFeedback();

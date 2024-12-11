@@ -37,8 +37,7 @@
 //
 //------------------------------------------------------------------------------
 TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
-                                           SoundManager *sm,
-                                           const simulator_info_t &info_data)
+                                           SoundManager *sm)
     : QObject(Q_NULLPTR)
     , osgGA::GUIEventHandler ()
     , settings(settings)
@@ -56,8 +55,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , memory_controlled(nullptr)
     , sound_manager(sm)
 {
-    load(info_data);
-
+/*
     memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
     if (memory_sim_update.attach(QSharedMemory::ReadOnly))
     {
@@ -67,7 +65,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     {
         OSG_FATAL << "Can't connect to shared memory with simulator update data" << std::endl;
     }
-
+*/
     memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
     if (memory_controlled.attach())
     {
@@ -98,10 +96,14 @@ TrainExteriorHandler::~TrainExteriorHandler()
 bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                                   osgGA::GUIActionAdapter &aa)
 {
+    if (!is_pos_updated || !is_state_updated)
+        return false;
+
     switch (ea.getEventType())
     {
     case osgGA::GUIEventAdapter::FRAME:
         {
+
             osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
 
             if (!viewer)
@@ -113,9 +115,9 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             ref_time += delta_time;
 
-            processSharedData(ref_time);
+            updatePosData(ref_time);
 
-            moveTrain(ref_time, update_data);
+            moveTrain(ref_time, update_pos_data);
 
             moveCamera(viewer, delta_time);
 
@@ -134,14 +136,14 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             {
             case osgGA::GUIEventAdapter::KEY_Home:
                 // Переключаем на первый вагон следующего поезда
-                if (vehicles_ext[cur_vehicle].train_id >= (update_data[new_data].num_trains - 1))
+                if (vehicles_ext[cur_vehicle].train_id >= (update_data.trains.size() - 1))
                 {
-                    cur_vehicle = update_data[new_data].trains[0].first_vehicle_id;
+                    cur_vehicle = update_data.trains[0].first_vehicle_id;
                 }
                 else
                 {
                     int new_train_id = vehicles_ext[cur_vehicle].train_id + 1;
-                    cur_vehicle = update_data[new_data].trains[new_train_id].first_vehicle_id;
+                    cur_vehicle = update_data.trains[new_train_id].first_vehicle_id;
                 }
 
                 if (tmp.current_vehicle != cur_vehicle)
@@ -156,12 +158,12 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 // Переключаем на первый вагон предыдущего поезда
                 if (vehicles_ext[cur_vehicle].train_id <= 0)
                 {
-                    cur_vehicle = update_data[new_data].trains[update_data[new_data].num_trains - 1].first_vehicle_id;
+                    cur_vehicle = update_data.trains[update_data.trains.size() - 1].first_vehicle_id;
                 }
                 else
                 {
                     int new_train_id = vehicles_ext[cur_vehicle].train_id - 1;
-                    cur_vehicle = update_data[new_data].trains[new_train_id].first_vehicle_id;
+                    cur_vehicle = update_data.trains[new_train_id].first_vehicle_id;
                 }
 
                 if (tmp.current_vehicle != cur_vehicle)
@@ -182,7 +184,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 {
                     // С последнего вагона переключаемся на первый
                     int cur_train_id = vehicles_ext[cur_vehicle].train_id;
-                    cur_vehicle = update_data[new_data].trains[cur_train_id].first_vehicle_id;
+                    cur_vehicle = update_data.trains[cur_train_id].first_vehicle_id;
                 }
 
                 if (tmp.current_vehicle != cur_vehicle)
@@ -203,7 +205,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 {
                     // С первого вагона переключаемся на последний
                     int cur_train_id = vehicles_ext[cur_vehicle].train_id;
-                    cur_vehicle = update_data[new_data].trains[cur_train_id].last_vehicle_id;
+                    cur_vehicle = update_data.trains[cur_train_id].last_vehicle_id;
                 }
 
                 if (tmp.current_vehicle != cur_vehicle)
@@ -332,19 +334,17 @@ std::vector<AnimationManager *> TrainExteriorHandler::getAnimManagers()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::load(const simulator_info_t &info_data)
+void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
 {
-    int count = info_data.num_vehicles;
+    int count = info_data.vehicles.size();
 
     for (int i = 0; i < count; ++i)
     {
         OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " load" << std::endl;
-        QString cfg_dir_tmp = QString::fromStdWString(info_data.vehicles_info[i].vehicle_config_dir);
-        cfg_dir_tmp.resize(info_data.vehicles_info[i].vehicle_config_dir_length);
+        QString cfg_dir_tmp = info_data.vehicles[i].vehicle_config_dir;
         std::string cfg_dir = cfg_dir_tmp.toStdString();
 
-        QString cfg_file_tmp = QString::fromStdWString(info_data.vehicles_info[i].vehicle_config_file);
-        cfg_file_tmp.resize(info_data.vehicles_info[i].vehicle_config_file_length);
+        QString cfg_file_tmp = info_data.vehicles[i].vehicle_config_file;
         std::string cfg_file = cfg_file_tmp.toStdString();
 
         osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(cfg_dir, cfg_file);
@@ -388,13 +388,13 @@ void TrainExteriorHandler::load(const simulator_info_t &info_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator_update_t, 2> sim_data)
+void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator_update_pos_t, 2> pos_data)
 {
     if ((old_data == -1) || (new_data == -1))
         return;
 
     // Time to relative units conversion
-    double Delta_t = static_cast<float>(settings.request_interval) / 1000.0;
+    double Delta_t = static_cast<float>(settings.tcp_config.request_interval) / 1000.0;
 
     // Interframe coordinate
     double t = static_cast<float>(ref_time) / Delta_t;
@@ -404,19 +404,19 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
     {
         // Vehicle cartesian position and attitude calculation
         vehicles_ext[i].position = osg::Vec3d(
-            k * sim_data[old_data].vehicles[i].position_x + t * sim_data[new_data].vehicles[i].position_x,
-            k * sim_data[old_data].vehicles[i].position_y + t * sim_data[new_data].vehicles[i].position_y,
-            k * sim_data[old_data].vehicles[i].position_z + t * sim_data[new_data].vehicles[i].position_z);
+            k * pos_data[old_data].vehicles[i].position_x + t * pos_data[new_data].vehicles[i].position_x,
+            k * pos_data[old_data].vehicles[i].position_y + t * pos_data[new_data].vehicles[i].position_y,
+            k * pos_data[old_data].vehicles[i].position_z + t * pos_data[new_data].vehicles[i].position_z);
 
         vehicles_ext[i].orth = osg::Vec3d(
-            k * sim_data[old_data].vehicles[i].orth_x + t * sim_data[new_data].vehicles[i].orth_x,
-            k * sim_data[old_data].vehicles[i].orth_y + t * sim_data[new_data].vehicles[i].orth_y,
-            k * sim_data[old_data].vehicles[i].orth_z + t * sim_data[new_data].vehicles[i].orth_z);
+            k * pos_data[old_data].vehicles[i].orth_x + t * pos_data[new_data].vehicles[i].orth_x,
+            k * pos_data[old_data].vehicles[i].orth_y + t * pos_data[new_data].vehicles[i].orth_y,
+            k * pos_data[old_data].vehicles[i].orth_z + t * pos_data[new_data].vehicles[i].orth_z);
 
         vehicles_ext[i].up = osg::Vec3d(
-            k * sim_data[old_data].vehicles[i].up_x + t * sim_data[new_data].vehicles[i].up_x,
-            k * sim_data[old_data].vehicles[i].up_y + t * sim_data[new_data].vehicles[i].up_y,
-            k * sim_data[old_data].vehicles[i].up_z + t * sim_data[new_data].vehicles[i].up_z);
+            k * pos_data[old_data].vehicles[i].up_x + t * pos_data[new_data].vehicles[i].up_x,
+            k * pos_data[old_data].vehicles[i].up_y + t * pos_data[new_data].vehicles[i].up_y,
+            k * pos_data[old_data].vehicles[i].up_z + t * pos_data[new_data].vehicles[i].up_z);
 
         vehicles_ext[i].right = vehicles_ext[i].orth ^ vehicles_ext[i].up;
 
@@ -425,10 +425,10 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             0.0,
             (vehicles_ext[i].orth.x() > 0.0) ? acos(vehicles_ext[i].orth.y()) : - acos(vehicles_ext[i].orth.y()) );
 
-        vehicles_ext[i].train_id = update_data[new_data].vehicles[i].train_id;
-        vehicles_ext[i].orientation = update_data[new_data].vehicles[i].orientation;
-        vehicles_ext[i].prev_vehicle = update_data[new_data].vehicles[i].prev_vehicle;
-        vehicles_ext[i].next_vehicle = update_data[new_data].vehicles[i].next_vehicle;
+        vehicles_ext[i].train_id = update_data.vehicles[i].train_id;
+        vehicles_ext[i].orientation = update_data.vehicles[i].orientation;
+        vehicles_ext[i].prev_vehicle = update_data.vehicles[i].prev_vehicle;
+        vehicles_ext[i].next_vehicle = update_data.vehicles[i].next_vehicle;
 
         // Apply vehicle body matrix transform
         osg::Matrixd  matrix;
@@ -442,14 +442,18 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
         for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
         {
             ProcAnimation *animation = it.value();
-            animation->setPosition(update_data[new_data].vehicles[i].analogSignal[animation->getSignalID()]);
+            size_t signal_id = animation->getSignalID();
+            if (signal_id < update_data.vehicles[i].analogSignal.size())
+                animation->setPosition(update_data.vehicles[i].analogSignal[signal_id]);
+            else
+                animation->setPosition(0.0f);
         }
 
         // Sounds update
-        float dt = sim_data[new_data].time - sim_data[old_data].time;
-        osg::Vec3 velocity = osg::Vec3( (sim_data[new_data].vehicles[i].position_x - sim_data[old_data].vehicles[i].position_x) / dt,
-                                        (sim_data[new_data].vehicles[i].position_y - sim_data[old_data].vehicles[i].position_y) / dt,
-                                        (sim_data[new_data].vehicles[i].position_z - sim_data[old_data].vehicles[i].position_z) / dt  );
+        float dt = pos_data[new_data].time - pos_data[old_data].time;
+        osg::Vec3 velocity = osg::Vec3( (pos_data[new_data].vehicles[i].position_x - pos_data[old_data].vehicles[i].position_x) / dt,
+                                        (pos_data[new_data].vehicles[i].position_y - pos_data[old_data].vehicles[i].position_y) / dt,
+                                        (pos_data[new_data].vehicles[i].position_z - pos_data[old_data].vehicles[i].position_z) / dt  );
 
         for (auto sound_id : vehicles_ext[i].sounds_id)
         {
@@ -460,7 +464,11 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
             sound_manager->setPosition(sound_id, pos.x(), pos.y(), pos.z());
             sound_manager->setVelocity(sound_id, velocity.x(), velocity.y(), velocity.z());
 
-            sound_manager->setSoundSignal(sound_id, update_data[new_data].vehicles[i].analogSignal[sound_manager->getSignalID(sound_id)]);
+            size_t signal_id = sound_manager->getSignalID(sound_id);
+            if (signal_id < update_data.vehicles[i].analogSignal.size())
+                sound_manager->setSoundSignal(sound_id, update_data.vehicles[i].analogSignal[signal_id]);
+            else
+                sound_manager->setSoundSignal(sound_id, 0.0f);
         }
     }
 }
@@ -468,118 +476,111 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::processSharedData(double &ref_time)
+void TrainExteriorHandler::updatePosData(double &ref_time)
 {
-    if (ref_time < static_cast<double>(settings.request_interval) / 1000.0)
+    if (ref_time < static_cast<double>(settings.tcp_config.request_interval) / 1000.0)
         return;
 
     double prev_time = 0.0;
     if (new_data != -1)
-        prev_time = update_data[new_data].time;
+        prev_time = update_pos_data[new_data].time;
 
-    if (memory_sim_update.lock())
+    if (client_update_pos_data.time <= prev_time)
     {
-        simulator_update_t *sd = static_cast<simulator_update_t *>(memory_sim_update.data());
-
-        if ( (sd == nullptr) || (sd->time <= prev_time) )
-        {
-            memory_sim_update.unlock();
-            return;
-        }
-
-        if (old_data == -1)
-        {
-            if (new_data == -1)
-            {
-                // Первое получение данных
-                memcpy(update_data.data(), sd, sizeof (simulator_update_t));
-                new_data = 0;
-            }
-            else
-            {
-                // Второе получение данных
-                memcpy(update_data.data() + 1, sd, sizeof (simulator_update_t));
-                old_data = 0;
-                new_data = 1;
-            }
-        }
-        else
-        {
-            // Обновление данных по очереди
-            if (new_data == 1)
-            {
-                memcpy(update_data.data(), sd, sizeof (simulator_update_t));
-                old_data = 1;
-                new_data = 0;
-            }
-            else
-            {
-                memcpy(update_data.data() + 1, sd, sizeof (simulator_update_t));
-                old_data = 0;
-                new_data = 1;
-            }
-        }
-        memory_sim_update.unlock();
-
-        ref_time = 0;
-
-        // Update debug string
-        int seconds = static_cast<int>(std::floor(update_data[new_data].time));
-        int hours = seconds / 3600;
-        int minutes = seconds / 60 % 60;
-        seconds = seconds % 60;
-        QString hud_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
-                               .arg(update_data[new_data].time, 8, 'f', 1)
-                               .arg(hours, 2)
-                               .arg(minutes, 2)
-                               .arg(seconds, 2);
-
-        int curr = update_data[new_data].current_vehicle;
-        if (curr >= 0)
-        {
-            int curr_train = update_data[new_data].vehicles[curr].train_id;
-            hud_text += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
-                            .arg(curr, 3)
-                            .arg(curr_train, 3)
-                            .arg(update_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
-                            .arg(update_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
-                            .arg(update_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
-                            .arg(update_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
-                            .arg(update_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
-                            .arg(update_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
-
-            hud_text += QString::fromStdWString(update_data[new_data].currentDebugMsg) + QString("\n");
-        }
-        else
-        {
-            hud_text += QString("\n\n");
-        }
-
-        int control = update_data[new_data].controlled_vehicle;
-        if (control >= 0)
-        {
-            int control_train = update_data[new_data].vehicles[control].train_id;
-            hud_text += QString("Управляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
-                            .arg(control, 3)
-                            .arg(control_train, 3)
-                            .arg(update_data[new_data].vehicles[control].position_x, 8, 'f', 1)
-                            .arg(update_data[new_data].vehicles[control].position_y, 8, 'f', 1)
-                            .arg(update_data[new_data].vehicles[control].position_z, 8, 'f', 1)
-                            .arg(update_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
-                            .arg(update_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
-                            .arg(update_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
-
-            hud_text += QString::fromStdWString(update_data[new_data].controlledDebugMsg);
-        }
-        else
-        {
-            hud_text += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
-        }
-
-        emit setStatusBar(hud_text);
-
-        emit sendControlledState(controlled_vehicle == cur_vehicle);
+        return;
     }
+
+    if (old_data == -1)
+    {
+        if (new_data == -1)
+        {
+            // Первое получение данных
+            memcpy(update_pos_data.data(), &client_update_pos_data, sizeof (simulator_update_pos_t));
+            new_data = 0;
+        }
+        else
+        {
+            // Второе получение данных
+            memcpy(update_pos_data.data() + 1, &client_update_pos_data, sizeof (simulator_update_pos_t));
+            old_data = 0;
+            new_data = 1;
+        }
+    }
+    else
+    {
+        // Обновление данных по очереди
+        if (new_data == 1)
+        {
+            memcpy(update_pos_data.data(), &client_update_pos_data, sizeof (simulator_update_pos_t));
+            old_data = 1;
+            new_data = 0;
+        }
+        else
+        {
+            memcpy(update_pos_data.data() + 1, &client_update_pos_data, sizeof (simulator_update_pos_t));
+            old_data = 0;
+            new_data = 1;
+        }
+    }
+
+    ref_time = 0;
+
+    // Update debug string
+    int seconds = static_cast<int>(std::floor(update_pos_data[new_data].time));
+    int hours = seconds / 3600;
+    int minutes = seconds / 60 % 60;
+    seconds = seconds % 60;
+    QString hud_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
+                           .arg(update_pos_data[new_data].time, 8, 'f', 1)
+                           .arg(hours, 2)
+                           .arg(minutes, 2)
+                           .arg(seconds, 2);
+
+    int curr = update_data.current_vehicle;
+    if (curr >= 0)
+    {
+        int curr_train = update_data.vehicles[curr].train_id;
+        hud_text += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+                        .arg(curr, 3)
+                        .arg(curr_train, 3)
+                        .arg(update_pos_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
+
+        hud_text += update_data.currentDebugMsg + QString("\n");
+    }
+    else
+    {
+        hud_text += QString("\n\n");
+    }
+
+    int control = update_data.controlled_vehicle;
+    if (control >= 0)
+    {
+        int control_train = update_data.vehicles[control].train_id;
+        hud_text += QString("Управляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+                        .arg(control, 3)
+                        .arg(control_train, 3)
+                        .arg(update_pos_data[new_data].vehicles[control].position_x, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[control].position_y, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[control].position_z, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
+
+        hud_text += update_data.controlledDebugMsg;
+    }
+    else
+    {
+        hud_text += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
+    }
+
+    emit setStatusBar(hud_text);
+
+    emit sendControlledState(controlled_vehicle == cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
@@ -870,11 +871,11 @@ void TrainExteriorHandler::updateDisplays()
     if (is_displays_locked)
         return;
 */
-    double dt = update_data[new_data].time - prev_time_display_upd;
+    double dt = update_pos_data[new_data].time - prev_time_display_upd;
     if (dt < 0.1)
         return;
 
-    double t = update_data[new_data].time;
+    double t = update_pos_data[new_data].time;
     prev_time_display_upd = t;
 
     for (size_t i = 0; i < vehicles_ext.size(); ++i)
@@ -882,7 +883,12 @@ void TrainExteriorHandler::updateDisplays()
         for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
         {
             display_container_t *dc = *it;
-            dc->display->setInputSignals(update_data[new_data].vehicles[i].analogSignal);
+            std::array<float, MAX_ANALOG_SIGNALS> veh_signals;
+            std::fill(veh_signals.begin(), veh_signals.end(), 0.0f);
+            std::copy(update_data.vehicles[i].analogSignal.begin(),
+                      update_data.vehicles[i].analogSignal.end(),
+                      veh_signals.begin());
+            dc->display->setInputSignals(veh_signals);
             dc->display->update(t, dt);
         }
     }
@@ -894,4 +900,22 @@ void TrainExteriorHandler::updateDisplays()
 void TrainExteriorHandler::lock_display(bool lock)
 {
     is_displays_locked = lock;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::slotGetVehiclePosData(QByteArray &data)
+{
+    client_update_pos_data.deserialize(data);
+    is_pos_updated = (client_update_pos_data.vehicles.size() == vehicles_ext.size());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::slotGetVehicleStateData(QByteArray &data)
+{
+    update_data.deserialize(data);
+    is_state_updated = (update_data.vehicles.size() == vehicles_ext.size());
 }

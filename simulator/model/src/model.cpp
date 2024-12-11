@@ -807,8 +807,14 @@ void Model::initTcpServer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::tcpFeedBack()
+void Model::tcpFeedBack(double delta_t)
 {
+    feedback_time += delta_t;
+    if (feedback_time < feedback_delay)
+        return;
+
+    feedback_time = 0;
+
     simulator_update_pos_t  update_pos_data;
     simulator_update_t      update_data;
 
@@ -876,10 +882,14 @@ void Model::tcpFeedBack()
                     vehicle->getPrevVehicle()->getModelIndex();
         }
 
+        size_t end = MAX_ANALOG_SIGNALS - 1;
+        while (vehicle->getAnalogSignals()[end] == 0.0f)
+            --end;
+
         update_data.vehicles[i].analogSignal.insert(
             update_data.vehicles[i].analogSignal.begin(),
             vehicle->getAnalogSignals().begin(),
-            vehicle->getAnalogSignals().end());
+            vehicle->getAnalogSignals().begin() + end);
 
         if (current_vehicle == i)
         {
@@ -994,7 +1004,7 @@ void Model::process()
     sharedMemoryFeedback();
 
     // Update server feedback
-    tcpFeedBack();
+    tcpFeedBack(integration_time);
 
     for (auto train : trains)
         train->inputProcess();

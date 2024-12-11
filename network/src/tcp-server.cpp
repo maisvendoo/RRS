@@ -316,10 +316,13 @@ void TcpServer::slotReceive()
 
     while (socket->bytesAvailable())
     {
+        recvBuff.append(socket->readAll());
+    }
+
+    while (recvBuff.size() > 0)
+    {
         if (is_first_data)
         {
-            recvBuff.append(socket->readAll());
-
             QBuffer b(&recvBuff);
             b.open(QIODevice::ReadOnly);
             QDataStream stream(&b);
@@ -328,18 +331,21 @@ void TcpServer::slotReceive()
 
             is_first_data = false;
         }
+
+        if (recvBuff.size() > wait_data_size)
+        {
+            // Десериализуем принятые данные в структуру сетевого пакета
+            client_data->received_data.deserialize(recvBuff);
+
+            // Обработка принятого сетевого пакета
+            process_client_request(*client_data);
+
+            is_first_data = true;
+        }
         else
         {
-            recvBuff.append(socket->readAll());
+            break;
         }
-    }
-
-    if (recvBuff.size() > wait_data_size)
-    {
-        client_data->received_data.deserialize(recvBuff);
-        process_client_request(*client_data);
-
-        is_first_data = true;
     }
 }
 
