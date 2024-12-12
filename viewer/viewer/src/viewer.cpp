@@ -321,12 +321,13 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
         cfg.getValue(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
 
-        cfg.getValue(secName, "FreeCamInitPos", tmp);
-        std::istringstream ss(tmp);
-
-        ss >> settings.free_cam_init_pos.x()
-           >> settings.free_cam_init_pos.y()
-           >> settings.free_cam_init_pos.z();
+        if (cfg.getValue(secName, "FreeCamInitPos", tmp))
+        {
+            std::istringstream ss(tmp);
+            ss  >> settings.free_cam_init_pos.x()
+                >> settings.free_cam_init_pos.y()
+                >> settings.free_cam_init_pos.z();
+        }
 
         cfg.getValue(secName, "FreeCamRotCoeff", settings.free_cam_rot_coeff);
         cfg.getValue(secName, "FreeCamSpeed", settings.free_cam_speed);

@@ -119,7 +119,6 @@ private:
     std::vector<vehicle_exterior_t> vehicles_ext;
 
     /// Data about vehicles positions, received from server
-    simulator_update_pos_t client_update_pos_data;
     std::array<simulator_update_pos_t, 2> update_pos_data;
     short new_data;
     short old_data;
@@ -141,9 +140,11 @@ private:
 
     /// Moving train along track
     void moveTrain(double ref_time, const std::array<simulator_update_pos_t, 2> pos_data);
-
+/*
     /// Processing data from server
     void updatePosData(double &ref_time);
+*/
+    void updateDebugString();
 
     /// Processing data from server
     void sendControlledVehicle(const controlled_t &data);

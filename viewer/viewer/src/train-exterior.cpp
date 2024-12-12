@@ -115,8 +115,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
 
             ref_time += delta_time;
 
-            updatePosData(ref_time);
-
             moveTrain(ref_time, update_pos_data);
 
             moveCamera(viewer, delta_time);
@@ -390,14 +388,11 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator_update_pos_t, 2> pos_data)
 {
-    if ((old_data == -1) || (new_data == -1))
-        return;
-
     // Time to relative units conversion
-    double Delta_t = static_cast<float>(settings.tcp_config.request_interval) / 1000.0;
+    double dt = pos_data[new_data].time - pos_data[old_data].time;
 
     // Interframe coordinate
-    double t = static_cast<float>(ref_time) / Delta_t;
+    double t = ref_time / dt;
     double k = (1.0 - t);
 
     for (size_t i = 0; i < vehicles_ext.size(); i++)
@@ -431,12 +426,19 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
         vehicles_ext[i].next_vehicle = update_data.vehicles[i].next_vehicle;
 
         // Apply vehicle body matrix transform
+/*
         osg::Matrixd  matrix;
         matrix *= osg::Matrixd::rotate(vehicles_ext[i].attitude.x(), osg::Vec3d(1.0, 0.0, 0.0));
         matrix *= osg::Matrixd::rotate(-vehicles_ext[i].attitude.z(), osg::Vec3d(0.0, 0.0, 1.0));
         matrix *= osg::Matrixd::translate(vehicles_ext[i].position);
+*/
+        osg::Matrixd m1 = osg::Matrixd::translate(vehicles_ext[i].position);
+        osg::Matrixd m2(vehicles_ext[i].right.x(), -vehicles_ext[i].orth.x(), vehicles_ext[i].up.x(), 0.0,
+                        -vehicles_ext[i].right.y(), vehicles_ext[i].orth.y(), vehicles_ext[i].up.y(), 0.0,
+                        vehicles_ext[i].right.z(),  vehicles_ext[i].orth.z(), vehicles_ext[i].up.z(), 0.0,
+                        0.0, 0.0, 0.0, 1.0);
 
-        vehicles_ext[i].transform->setMatrix(matrix);
+        vehicles_ext[i].transform->setMatrix(m2 * m1);
 
         // Model animations update
         for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
@@ -450,10 +452,9 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
         }
 
         // Sounds update
-        float dt = pos_data[new_data].time - pos_data[old_data].time;
-        osg::Vec3 velocity = osg::Vec3( (pos_data[new_data].vehicles[i].position_x - pos_data[old_data].vehicles[i].position_x) / dt,
-                                        (pos_data[new_data].vehicles[i].position_y - pos_data[old_data].vehicles[i].position_y) / dt,
-                                        (pos_data[new_data].vehicles[i].position_z - pos_data[old_data].vehicles[i].position_z) / dt  );
+        osg::Vec3f velocity = osg::Vec3f( (pos_data[new_data].vehicles[i].position_x - pos_data[old_data].vehicles[i].position_x) / dt,
+                                          (pos_data[new_data].vehicles[i].position_y - pos_data[old_data].vehicles[i].position_y) / dt,
+                                          (pos_data[new_data].vehicles[i].position_z - pos_data[old_data].vehicles[i].position_z) / dt  );
 
         for (auto sound_id : vehicles_ext[i].sounds_id)
         {
@@ -476,55 +477,8 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::updatePosData(double &ref_time)
+void TrainExteriorHandler::updateDebugString()
 {
-    if (ref_time < static_cast<double>(settings.tcp_config.request_interval) / 1000.0)
-        return;
-
-    double prev_time = 0.0;
-    if (new_data != -1)
-        prev_time = update_pos_data[new_data].time;
-
-    if (client_update_pos_data.time <= prev_time)
-    {
-        return;
-    }
-
-    if (old_data == -1)
-    {
-        if (new_data == -1)
-        {
-            // Первое получение данных
-            memcpy(update_pos_data.data(), &client_update_pos_data, sizeof (simulator_update_pos_t));
-            new_data = 0;
-        }
-        else
-        {
-            // Второе получение данных
-            memcpy(update_pos_data.data() + 1, &client_update_pos_data, sizeof (simulator_update_pos_t));
-            old_data = 0;
-            new_data = 1;
-        }
-    }
-    else
-    {
-        // Обновление данных по очереди
-        if (new_data == 1)
-        {
-            memcpy(update_pos_data.data(), &client_update_pos_data, sizeof (simulator_update_pos_t));
-            old_data = 1;
-            new_data = 0;
-        }
-        else
-        {
-            memcpy(update_pos_data.data() + 1, &client_update_pos_data, sizeof (simulator_update_pos_t));
-            old_data = 0;
-            new_data = 1;
-        }
-    }
-
-    ref_time = 0;
-
     // Update debug string
     int seconds = static_cast<int>(std::floor(update_pos_data[new_data].time));
     int hours = seconds / 3600;
@@ -907,8 +861,40 @@ void TrainExteriorHandler::lock_display(bool lock)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::slotGetVehiclePosData(QByteArray &data)
 {
-    client_update_pos_data.deserialize(data);
-    is_pos_updated = (client_update_pos_data.vehicles.size() == vehicles_ext.size());
+    if (old_data == -1)
+    {
+        if (new_data == -1)
+        {
+            // Первое получение данных
+            update_pos_data[0].deserialize(data);
+            new_data = 0;
+        }
+        else
+        {
+            // Второе получение данных
+            update_pos_data[1].deserialize(data);
+            old_data = 0;
+            new_data = 1;
+        }
+    }
+    else
+    {
+        // Обновление данных по очереди
+        if (new_data == 1)
+        {
+            update_pos_data[0].deserialize(data);
+            old_data = 1;
+            new_data = 0;
+        }
+        else
+        {
+            update_pos_data[1].deserialize(data);
+            old_data = 0;
+            new_data = 1;
+        }
+        is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles_ext.size());
+        ref_time = 0.0;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -918,4 +904,6 @@ void TrainExteriorHandler::slotGetVehicleStateData(QByteArray &data)
 {
     update_data.deserialize(data);
     is_state_updated = (update_data.vehicles.size() == vehicles_ext.size());
+    if (is_pos_updated && is_state_updated)
+        updateDebugString();
 }
