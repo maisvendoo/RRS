@@ -102,6 +102,8 @@ int RouteViewer::run()
     // Keyboard events handler
     keyboard = new KeyboardHandler();
     viewer.addEventHandler(keyboard);
+    QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
+                     this, &RouteViewer::slotUpdateKeyboard);
 
     osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new ViewerStatsHandler();
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
@@ -286,7 +288,8 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         OSG_INFO << "Host for client from setings: " << tmp << ":" << port << std::endl;
         std::cout << "Host for client from setings: " << tmp << ":" << port << std::endl;
         cfg.getValue(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
-        cfg.getValue(secName, "RequestInterval", settings.tcp_config.request_interval);
+        cfg.getValue(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
+        cfg.getValue(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
 
         secName = "Viewer";
 
@@ -543,6 +546,8 @@ bool RouteViewer::loadVehicles(simulator_vehicles_info_t vehicles_info)
 
     train_ext_handler->load(vehicles_info);
     viewer.addEventHandler(train_ext_handler);
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendControlledVehicle,
+                     this, &RouteViewer::slotUpdateControlledVehicle);
 
     std::vector<AnimationManager *> anims_manager = train_ext_handler->getAnimManagers();
 
@@ -779,9 +784,67 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
         connect(tcp_client, &TcpClient::setVehiclesData,
                 train_ext_handler, &TrainExteriorHandler::slotGetVehicleStateData, Qt::DirectConnection);
 
+        vehicle_control_by_keyboard.controlled_vehicle = train_ext_handler->getControlledVehicle();
+        vehicle_control_by_keyboard.current_vehicle = train_ext_handler->getCurrentVehicle();
+        vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
+        OSG_FATAL << "Send keyboard control to vehicle " << vehicle_control_by_keyboard.controlled_vehicle << std::endl;
+        std::cout << "Send keyboard control to vehicle " << vehicle_control_by_keyboard.controlled_vehicle << std::endl;
+        tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+
         OSG_FATAL << "Send request for continuous vehicles update" << std::endl;
         std::cout << "Send request for continuous vehicles update" << std::endl;
-        tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE);
-        tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE);
+        tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
+                                static_cast<double>(settings.vehicles_pos_update_interval) / 1000.0);
+        tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+                                static_cast<double>(settings.vehicles_state_update_interval) / 1000.0);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotUpdateKeyboard()
+{
+    vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
+    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+/*
+    QString msg = "Send keyboard: controlled ";
+    msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
+    msg += " | current ";
+    msg += QString::number(vehicle_control_by_keyboard.current_vehicle);
+    msg += " | keys: ";
+    msg += QString::number(vehicle_control_by_keyboard.pressed_keys.size());
+    for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+    {
+        msg += " | ";
+        msg += QString::number(key_id);
+    }
+    OSG_FATAL << msg.toStdString() << std::endl;
+    std::cout << msg.toStdString() << std::endl;
+*/
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotUpdateControlledVehicle()
+{
+    vehicle_control_by_keyboard.controlled_vehicle = train_ext_handler->getControlledVehicle();
+    vehicle_control_by_keyboard.current_vehicle = train_ext_handler->getCurrentVehicle();
+    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+/*
+    QString msg = "Send keyboard: controlled ";
+    msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
+    msg += " | current ";
+    msg += QString::number(vehicle_control_by_keyboard.current_vehicle);
+    msg += " | keys: ";
+    msg += QString::number(vehicle_control_by_keyboard.pressed_keys.size());
+    for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+    {
+        msg += " | ";
+        msg += QString::number(key_id);
+    }
+    OSG_FATAL << msg.toStdString() << std::endl;
+    std::cout << msg.toStdString() << std::endl;
+*/
 }

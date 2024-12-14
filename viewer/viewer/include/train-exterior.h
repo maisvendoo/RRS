@@ -30,7 +30,6 @@
 #include    "global-const.h"
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
-#include    "controlled-struct.h"
 #include    "config-reader.h"
 #include    "display.h"
 
@@ -60,6 +59,9 @@ public:
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
                         osgGA::GUIActionAdapter &aa);
 
+    int getControlledVehicle();
+    int getCurrentVehicle();
+
     /// Get exterior scene group
     osg::Group *getExterior();
 
@@ -74,39 +76,40 @@ signals:
 
     void sendControlledState(bool state);
 
+    void sendControlledVehicle();
+
 private:
 
     settings_t  settings;
 
+    /// Sound manager
+    SoundManager *sound_manager;
+
     /// Vehicle number which is a referenced for camera
-    int cur_vehicle;
+    int cur_vehicle = 0;
+    int prev_cur_vehicle = -1;
 
     /// Vehicle number which is contorolled by user
-    int controlled_vehicle;
-
-    /// Shift camera along train
-    float long_shift;
-
-    /// Shift camera up/down
-    float height_shift;
+    int controlled_vehicle = 0;
+    int prev_controlled_vehicle = -1;
 
     /// Train exterior scene group
-    osg::ref_ptr<osg::Group> trainExterior;
+    osg::ref_ptr<osg::Group> trainExterior = new osg::Group;
 
     /// Camera position at previous frame
-    osg::Vec3f prev_camera_pos;
+    osg::Vec3f prev_camera_pos = {0.0f, 0.0f, 0.0f};
 
     /// Time stamp of previous frame
-    double prev_time;
+    double prev_time = 0.0;
 
     /// Time between current frame and previous data receiving
-    double ref_time;
+    double ref_time = 0.0;
 
     /// Time stamp of previous display update
-    double prev_time_display_upd;
+    double prev_time_display_upd = 0.0;
 
     ///
-    bool is_displays_locked;
+    bool is_displays_locked = false;
 
     bool is_Shift_L = false;
     bool is_Shift_R = false;
@@ -120,23 +123,20 @@ private:
 
     /// Data about vehicles positions, received from server
     std::array<simulator_update_pos_t, 2> update_pos_data;
-    short new_data;
-    short old_data;
+    short new_data = -1;
+    short old_data = -1;
 
     bool is_pos_updated = false;
     bool is_state_updated = false;
 
     /// Data about vehicles state, received from server
     simulator_update_t update_data;
-
+/*
     QSharedMemory   memory_sim_update;
     QSharedMemory   memory_controlled;
-
+*/
     /// Animations list
     std::vector<AnimationManager *> anim_managers;
-
-    /// Sound manager
-    SoundManager *sound_manager;
 
     /// Moving train along track
     void moveTrain(double ref_time, const std::array<simulator_update_pos_t, 2> pos_data);
@@ -145,9 +145,6 @@ private:
     void updatePosData(double &ref_time);
 */
     void updateDebugString();
-
-    /// Processing data from server
-    void sendControlledVehicle(const controlled_t &data);
 
     /// Move camera
     void moveCamera(osgViewer::Viewer *viewer, float delta_time);

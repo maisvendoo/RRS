@@ -49,10 +49,16 @@ bool TcpClient::init(const tcp_config_t &tcp_config)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpClient::sendRequest(StructureType stype)
+void TcpClient::sendRequest(StructureType stype, double update_interval)
 {
     network_data_t request;
     request.stype = stype;
+
+    QBuffer buff(&request.data);
+    buff.open(QIODevice::WriteOnly);
+    QDataStream stream(&buff);
+
+    stream << update_interval;
 
     socket->write(request.serialize());
     socket->flush();
@@ -106,16 +112,11 @@ void TcpClient::sendSignalState(QString conn_name, int sig_dir, bool open)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpClient::sendVehicleControl(int current_veh, int controlled_veh, QByteArray keyboard_data)
+void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 {
     network_data_t request;
     request.stype = STYPE_COMMAND_VEHICLE_CONTROL;
-
-    QBuffer buff(&request.data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
-
-    stream << current_veh << controlled_veh << keyboard_data;
+    request.data = vehicle_control_by_keyboard;
 
     socket->write(request.serialize());
     socket->flush();

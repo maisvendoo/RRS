@@ -19,6 +19,7 @@
 #include    <osgViewer/Viewer>
 
 #include    <simulator-info-struct.h>
+#include    <controlled-struct.h>
 
 #include    <settings.h>
 #include    <command-line-parser.h>
@@ -82,6 +83,8 @@ protected:
     /// TCP-client
     TcpClient *tcp_client = new TcpClient;
 
+    controlled_t vehicle_control_by_keyboard;
+
     /// Process traffic lights (signals) models
     osg::ref_ptr<TrafficLightsHandler> traffic_lights_handler = new TrafficLightsHandler;
 
@@ -124,6 +127,10 @@ protected slots:
     void slotGetSignalsData(QByteArray &sig_data);
 
     void slotGetVehicleInfoData(QByteArray &data);
+
+    void slotUpdateKeyboard();
+
+    void slotUpdateControlledVehicle();
 };
 
 #endif // VIEWER_H

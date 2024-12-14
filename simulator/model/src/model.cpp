@@ -62,7 +62,7 @@ Model::Model(QObject *parent) : QObject(parent)
             Journal::instance()->error("No shared memory for simulator update data");
         }
     }*/
-
+/*
     controlled_t tmp_c = controlled_t();
     memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
     if (memory_controlled.create(sizeof(controlled_t)))
@@ -98,7 +98,7 @@ Model::Model(QObject *parent) : QObject(parent)
         {
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -107,9 +107,9 @@ Model::Model(QObject *parent) : QObject(parent)
 Model::~Model()
 {/*
     memory_sim_info.detach();
-    memory_sim_update.detach();*/
+    memory_sim_update.detach();
     memory_controlled.detach();
-    keys_data.detach();
+    keys_data.detach();*/
 }
 
 //------------------------------------------------------------------------------
@@ -801,20 +801,16 @@ void Model::initTcpServer()
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
     }
 
+    connect(tcp_server, &TcpServer::setVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
+
     Journal::instance()->info("TCP server is initialized successfully");
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::tcpFeedBack(double delta_t)
+void Model::tcpFeedBack()
 {
-    feedback_time += delta_t;
-    if (feedback_time < feedback_delay)
-        return;
-
-    feedback_time = 0;
-
     simulator_update_pos_t  update_pos_data;
     simulator_update_t      update_data;
 
@@ -823,12 +819,6 @@ void Model::tcpFeedBack(double delta_t)
     update_data.trains.resize(trains.size());
 
     update_pos_data.time = t;
-
-    update_pos_data.current_vehicle = current_vehicle;
-    update_pos_data.controlled_vehicle = controlled_vehicle;
-
-    update_data.current_vehicle = current_vehicle;
-    update_data.controlled_vehicle = controlled_vehicle;
 
     int i = 0;
     for (auto train : trains)
@@ -891,23 +881,27 @@ void Model::tcpFeedBack(double delta_t)
             vehicle->getAnalogSignals().begin(),
             vehicle->getAnalogSignals().begin() + end);
 
-        if (current_vehicle == i)
+        if (vehicle_control_by_keyboard.current_vehicle == i)
         {
+            update_pos_data.current_vehicle = i;
+            update_data.current_vehicle = i;
             update_data.currentDebugMsg = vehicle->getDebugMsg();
         }
 
-        if (controlled_vehicle == i)
+        if (vehicle_control_by_keyboard.controlled_vehicle == i)
         {
+            update_pos_data.controlled_vehicle = i;
+            update_data.controlled_vehicle = i;
             update_data.controlledDebugMsg = vehicle->getDebugMsg();
         }
 
         ++i;
     }
 
-    tcp_server->slotUpdateVehiclesPos(update_pos_data.serialize());
-    tcp_server->slotUpdateVehiclesState(update_data.serialize());
+    tcp_server->updateVehiclesPos(update_pos_data.serialize(), t);
+    tcp_server->updateVehiclesState(update_data.serialize(), t);
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -916,23 +910,30 @@ void Model::sharedMemoryFeedback()
     int i = 0;
     for (auto vehicle : vehicles)
     {
-        if (controlled_vehicle == i)
+        if (vehicle_control_by_keyboard.controlled_vehicle == i)
         {
-            if (data.size() != 0)
-                vehicle->setKeysData(data);
+            QMap<int, bool> keys_data;
+            for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+                keys_data.insert(key_id, true);
+
+            QByteArray data;
+            QDataStream stream(&data, QDataStream::WriteOnly);
+
+            stream << keys_data;
+            vehicle->setKeysData(data);
         }
         else
         {
             if (prev_controlled_vehicle == i)
             {
                 vehicle->resetKeysData();
-                prev_controlled_vehicle = controlled_vehicle;
+                prev_controlled_vehicle = vehicle_control_by_keyboard.controlled_vehicle;
             }
         }
         ++i;
     }
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -942,31 +943,26 @@ void Model::controlStep(double &control_time, const double control_delay)
     {
         control_time = 0;
 
-        if (memory_controlled.lock())
+        if (vehicle_control_by_keyboard.controlled_vehicle < 0)
+            return;
+
+        QMap<int, bool> keys_data;
+        for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+            keys_data.insert(key_id, true);
+
+        QByteArray data;
+        QDataStream stream(&data, QDataStream::WriteOnly);
+
+        stream << keys_data;
+
+        vehicles[vehicle_control_by_keyboard.controlled_vehicle]->setKeysData(data);
+
+        if (prev_controlled_vehicle != vehicle_control_by_keyboard.controlled_vehicle)
         {
-            controlled_t *c = static_cast<controlled_t *>(memory_controlled.data());
-
-            if (c == nullptr)
-            {
-                memory_controlled.unlock();
-                return;
-            }
-
-            current_vehicle = c->current_vehicle;
-            controlled_vehicle = c->controlled_vehicle;
-
-            memory_controlled.unlock();
-        }
-
-        if (keys_data.lock())
-        {
-            data.resize(keys_data.size());
-            memcpy(data.data(), keys_data.data(), static_cast<size_t>(keys_data.size()));
-
-            keys_data.unlock();
+            vehicles[prev_controlled_vehicle]->resetKeysData();
+            prev_controlled_vehicle = vehicle_control_by_keyboard.controlled_vehicle;
         }
     }
-
     control_time += dt;
 }
 
@@ -999,12 +995,12 @@ void Model::process()
         postStep(t);
     }
     while ( (tau < 0.0) && is_step_correct );
-
+/*
     // Feedback to viewer
     sharedMemoryFeedback();
-
+*/
     // Update server feedback
-    tcpFeedBack(integration_time);
+    tcpFeedBack();
 
     for (auto train : trains)
         train->inputProcess();
@@ -1028,4 +1024,26 @@ void Model::slotGetTopologyData(QByteArray &topology_data)
 void Model::slotGetSignalsData(QByteArray &signals_data)
 {
     signals_data = topology->getSignalsData()->serialize();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data)
+{
+    vehicle_control_by_keyboard.deserialize(control_data);
+/*
+    QString msg = "Get keyboard: controlled ";
+    msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
+    msg += " | current ";
+    msg += QString::number(vehicle_control_by_keyboard.current_vehicle);
+    msg += " | keys: ";
+    msg += QString::number(vehicle_control_by_keyboard.pressed_keys.size());
+    for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+    {
+        msg += " | ";
+        msg += QString::number(key_id);
+    }
+    Journal::instance()->info(msg);
+*/
 }

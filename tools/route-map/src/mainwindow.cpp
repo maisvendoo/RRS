@@ -85,8 +85,7 @@ void MainWindow::load_config(const QString &cfg_name)
     }
 
     cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
-    cfg.getInt(secName, "RequestInterval", tcp_config.request_interval);
-
+    cfg.getInt(secName, "VehiclesPosUpdateInterval", vehicles_pos_update_interval);
 
     secName = "RouteMap";
     double tmp_value = 0;
@@ -349,7 +348,8 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     map->signals_data = signals_data;
 
     // Запрос серверу на регулярное обновление положений ПЕ
-    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
+                            static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 }
 

@@ -31,12 +31,19 @@ struct simulator_vehicle_pos_update_t
         stream << position_x;
         stream << position_y;
         stream << position_z;
-        stream << orth_x;
-        stream << orth_y;
-        stream << orth_z;
-        stream << up_x;
-        stream << up_y;
-        stream << up_z;
+        float tmp;
+        tmp = static_cast<float>(orth_x);
+        stream << tmp;
+        tmp = static_cast<float>(orth_y);
+        stream << tmp;
+        tmp = static_cast<float>(orth_z);
+        stream << tmp;
+        tmp = static_cast<float>(up_x);
+        stream << tmp;
+        tmp = static_cast<float>(up_y);
+        stream << tmp;
+        tmp = static_cast<float>(up_z);
+        stream << tmp;
 
         return buff.data();
     }
@@ -50,12 +57,19 @@ struct simulator_vehicle_pos_update_t
         stream >> position_x;
         stream >> position_y;
         stream >> position_z;
-        stream >> orth_x;
-        stream >> orth_y;
-        stream >> orth_z;
-        stream >> up_x;
-        stream >> up_y;
-        stream >> up_z;
+        float tmp;
+        stream >> tmp;
+        orth_x = static_cast<double>(tmp);
+        stream >> tmp;
+        orth_y = static_cast<double>(tmp);
+        stream >> tmp;
+        orth_z = static_cast<double>(tmp);
+        stream >> tmp;
+        up_x = static_cast<double>(tmp);
+        stream >> tmp;
+        up_y = static_cast<double>(tmp);
+        stream >> tmp;
+        up_z = static_cast<double>(tmp);
     }
 };
 

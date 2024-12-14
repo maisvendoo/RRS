@@ -41,18 +41,6 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     : QObject(Q_NULLPTR)
     , osgGA::GUIEventHandler ()
     , settings(settings)
-    , cur_vehicle(0)
-    , controlled_vehicle(0)
-    , long_shift(0.0f)
-    , height_shift(0.0f)
-    , trainExterior(new osg::Group)
-    , prev_time(0.0)
-    , ref_time(0.0)
-    , is_displays_locked(false)
-    , new_data(-1)
-    , old_data(-1)
-    , memory_sim_update(nullptr)
-    , memory_controlled(nullptr)
     , sound_manager(sm)
 {
 /*
@@ -65,7 +53,6 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     {
         OSG_FATAL << "Can't connect to shared memory with simulator update data" << std::endl;
     }
-*/
     memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
     if (memory_controlled.attach())
     {
@@ -73,12 +60,13 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
         controlled_t tmp;
         tmp.current_vehicle = cur_vehicle;
         tmp.controlled_vehicle = controlled_vehicle;
-        sendControlledVehicle(tmp);
+        emit sendControlledVehicle(tmp);
     }
     else
     {
         OSG_FATAL << "Can't connect to shared memory for info about controlled vehicle" << std::endl;
     }
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -86,8 +74,8 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
 //------------------------------------------------------------------------------
 TrainExteriorHandler::~TrainExteriorHandler()
 {
-    memory_sim_update.detach();
-    memory_controlled.detach();
+//    memory_sim_update.detach();
+//    memory_controlled.detach();
 }
 
 //------------------------------------------------------------------------------
@@ -109,6 +97,14 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
             if (!viewer)
                 break;
 
+            if ((prev_cur_vehicle != cur_vehicle) ||
+                (prev_controlled_vehicle != controlled_vehicle))
+            {
+                prev_cur_vehicle = cur_vehicle;
+                prev_controlled_vehicle = controlled_vehicle;
+                emit sendControlledVehicle();
+            }
+
             double curr_time = viewer->getFrameStamp()->getReferenceTime();
             double delta_time = curr_time - prev_time;
             prev_time = curr_time;
@@ -127,9 +123,7 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
     case osgGA::GUIEventAdapter::KEYDOWN:
         {
             int key = ea.getUnmodifiedKey();
-            controlled_t tmp;
-            tmp.current_vehicle = cur_vehicle;
-            tmp.controlled_vehicle = controlled_vehicle;
+
             switch (key)
             {
             case osgGA::GUIEventAdapter::KEY_Home:
@@ -143,13 +137,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                     int new_train_id = vehicles_ext[cur_vehicle].train_id + 1;
                     cur_vehicle = update_data.trains[new_train_id].first_vehicle_id;
                 }
-
-                if (tmp.current_vehicle != cur_vehicle)
-                {
-                    tmp.current_vehicle = cur_vehicle;
-                    sendControlledVehicle(tmp);
-                }
-
                 break;
 
             case osgGA::GUIEventAdapter::KEY_End:
@@ -162,12 +149,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 {
                     int new_train_id = vehicles_ext[cur_vehicle].train_id - 1;
                     cur_vehicle = update_data.trains[new_train_id].first_vehicle_id;
-                }
-
-                if (tmp.current_vehicle != cur_vehicle)
-                {
-                    tmp.current_vehicle = cur_vehicle;
-                    sendControlledVehicle(tmp);
                 }
 
                 break;
@@ -185,12 +166,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                     cur_vehicle = update_data.trains[cur_train_id].first_vehicle_id;
                 }
 
-                if (tmp.current_vehicle != cur_vehicle)
-                {
-                    tmp.current_vehicle = cur_vehicle;
-                    sendControlledVehicle(tmp);
-                }
-
                 break;
 
             case osgGA::GUIEventAdapter::KEY_Page_Up:
@@ -206,12 +181,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                     cur_vehicle = update_data.trains[cur_train_id].last_vehicle_id;
                 }
 
-                if (tmp.current_vehicle != cur_vehicle)
-                {
-                    tmp.current_vehicle = cur_vehicle;
-                    sendControlledVehicle(tmp);
-                }
-
                 break;
 
             case osgGA::GUIEventAdapter::KEY_KP_Enter:
@@ -219,11 +188,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 // Берём контроль над данным вагоном
                 controlled_vehicle = cur_vehicle;
 
-                if (tmp.controlled_vehicle != controlled_vehicle)
-                {
-                    tmp.controlled_vehicle = controlled_vehicle;
-                    sendControlledVehicle(tmp);
-                }
                 break;
 
             case osgGA::GUIEventAdapter::KEY_Shift_L:
@@ -252,12 +216,6 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
                 if (controlled_vehicle >= 0)
                     cur_vehicle = controlled_vehicle;
                 is_displays_locked = false;
-
-                if (tmp.current_vehicle != cur_vehicle)
-                {
-                    tmp.current_vehicle = cur_vehicle;
-                    sendControlledVehicle(tmp);
-                }
                 break;
 
             case osgGA::GUIEventAdapter::KEY_F3:
@@ -308,6 +266,22 @@ bool TrainExteriorHandler::handle(const osgGA::GUIEventAdapter &ea,
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int TrainExteriorHandler::getControlledVehicle()
+{
+    return controlled_vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int TrainExteriorHandler::getCurrentVehicle()
+{
+    return cur_vehicle;
 }
 
 //------------------------------------------------------------------------------
@@ -536,7 +510,7 @@ void TrainExteriorHandler::updateDebugString()
 
     emit sendControlledState(controlled_vehicle == cur_vehicle);
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -557,7 +531,7 @@ void TrainExteriorHandler::sendControlledVehicle(const controlled_t &data)
         memory_controlled.unlock();
     }
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

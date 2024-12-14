@@ -13,7 +13,6 @@
  */
 
 #include    "keyboard.h"
-#include    "global-const.h"
 
 #include    <QDataStream>
 
@@ -27,16 +26,6 @@ KeyboardHandler::KeyboardHandler(QObject *parent)
     , osgGA::GUIEventHandler ()
 {
     init();
-
-    keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
-    if (keys_data.attach())
-    {
-        OSG_FATAL << "Connected to shared memory for keysboard processing" << std::endl;
-    }
-    else
-    {
-        OSG_FATAL << "Can't connect to shared memory for keysboard processing" << std::endl;
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -44,7 +33,7 @@ KeyboardHandler::KeyboardHandler(QObject *parent)
 //------------------------------------------------------------------------------
 KeyboardHandler::~KeyboardHandler()
 {
-    keys_data.detach();
+//    keys_data.detach();
 }
 
 //------------------------------------------------------------------------------
@@ -55,7 +44,7 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
 {
     Q_UNUSED(aa)
 
-    modkeyProcess(ea);
+    bool is_changed = false;
 
     CyrilicTranslator ct;
 
@@ -65,10 +54,12 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
         {
             int key = ct.translate(ea.getUnmodifiedKey());
 
-            if (!getKey(key))
+            is_changed = modkeyProcess(ea);
+
+            if (available_keys.contains(key) && (!getKey(key)))
             {
                 setKey(key);
-                sendKeysData(serialize());
+                is_changed = true;
             }
 
             break;
@@ -78,10 +69,12 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
         {
             int key = ct.translate(ea.getUnmodifiedKey());
 
-            if (getKey(key))
+            is_changed = modkeyProcess(ea);
+
+            if (available_keys.contains(key) && (getKey(key)))
             {
                 resetKey(key);
-                sendKeysData(serialize());
+                is_changed = true;
             }
 
             break;
@@ -93,7 +86,23 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
         break;
     }
 
+    if (is_changed)
+        emit sendKeyBoardState();
+
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<int> KeyboardHandler::getPressedKeys()
+{
+    std::vector<int> pressed_keys;
+
+    for (auto key_id : keys)
+        pressed_keys.push_back(key_id);
+
+    return pressed_keys;
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +110,7 @@ bool KeyboardHandler::handle(const osgGA::GUIEventAdapter &ea,
 //------------------------------------------------------------------------------
 void KeyboardHandler::addKey(int key)
 {
-    keys.insert(key, false);
+    available_keys.insert(key);
 }
 
 //------------------------------------------------------------------------------
@@ -109,10 +118,7 @@ void KeyboardHandler::addKey(int key)
 //------------------------------------------------------------------------------
 void KeyboardHandler::setKey(int key)
 {
-    QMap<int, bool>::iterator it = keys.find(key);
-
-    if (it != keys.end())
-        keys[key] = true;
+    keys.insert(key);
 }
 
 //------------------------------------------------------------------------------
@@ -120,10 +126,8 @@ void KeyboardHandler::setKey(int key)
 //------------------------------------------------------------------------------
 bool KeyboardHandler::getKey(int key)
 {
-    QMap<int, bool>::iterator it = keys.find(key);
-
-    if (it != keys.end())
-        return keys[key];
+    if (keys.contains(key))
+        return true;
 
     return false;
 }
@@ -133,21 +137,29 @@ bool KeyboardHandler::getKey(int key)
 //------------------------------------------------------------------------------
 void KeyboardHandler::resetKey(int key)
 {
-    QMap<int, bool>::iterator it = keys.find(key);
-
-    if (it != keys.end())
-        keys[key] = false;
+    keys.remove(key);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void KeyboardHandler::setKeyState(int key, bool state)
+bool KeyboardHandler::setKeyState(int key, bool state)
 {
-    QMap<int, bool>::iterator it = keys.find(key);
+    if (state)
+    {
+        if (getKey(key))
+            return false;
 
-    if (it != keys.end())
-        keys[key] = state;
+        setKey(key);
+    }
+    else
+    {
+        if (!getKey(key))
+            return false;
+
+        resetKey(key);
+    }
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -219,10 +231,10 @@ void KeyboardHandler::init()
 
     addKey(osgGA::GUIEventAdapter::KEY_Delete);
     addKey(osgGA::GUIEventAdapter::KEY_Insert);
-    addKey(osgGA::GUIEventAdapter::KEY_Home);
-    addKey(osgGA::GUIEventAdapter::KEY_End);
-//    addKey(osgGA::GUIEventAdapter::KEY_Page_Down); // Используем для переключения между ПЕ
-//    addKey(osgGA::GUIEventAdapter::KEY_Page_Up);   // Используем для переключения между ПЕ
+//    addKey(osgGA::GUIEventAdapter::KEY_Home);     // Используем для переключения между поездами
+//    addKey(osgGA::GUIEventAdapter::KEY_End);      // Используем для переключения между поездами
+//    addKey(osgGA::GUIEventAdapter::KEY_Page_Down);// Используем для переключения между ПЕ
+//    addKey(osgGA::GUIEventAdapter::KEY_Page_Up);  // Используем для переключения между ПЕ
 
     addKey(osgGA::GUIEventAdapter::KEY_F1);
     addKey(osgGA::GUIEventAdapter::KEY_F2);
@@ -249,6 +261,7 @@ void KeyboardHandler::init()
     addKey(osgGA::GUIEventAdapter::KEY_KP_9);
 }
 
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -274,7 +287,7 @@ void KeyboardHandler::sendKeysData(const QByteArray &data)
         keys_data.unlock();
     }
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -286,16 +299,20 @@ bool getBit(int mask, int bit)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void KeyboardHandler::modkeyProcess(const osgGA::GUIEventAdapter &ea)
+bool KeyboardHandler::modkeyProcess(const osgGA::GUIEventAdapter &ea)
 {
     int modkey_mask = ea.getModKeyMask();
 
-    setKeyState(osgGA::GUIEventAdapter::KEY_Shift_L, getBit(modkey_mask, 0));
-    setKeyState(osgGA::GUIEventAdapter::KEY_Shift_R, getBit(modkey_mask, 1));
+    bool is_changed = false;
 
-    setKeyState(osgGA::GUIEventAdapter::KEY_Control_L, getBit(modkey_mask, 2));
-    setKeyState(osgGA::GUIEventAdapter::KEY_Control_R, getBit(modkey_mask, 3));
+    is_changed |= setKeyState(osgGA::GUIEventAdapter::KEY_Shift_L, getBit(modkey_mask, 0));
+    is_changed |= setKeyState(osgGA::GUIEventAdapter::KEY_Shift_R, getBit(modkey_mask, 1));
 
-    setKeyState(osgGA::GUIEventAdapter::KEY_Alt_L, getBit(modkey_mask, 4));
-    setKeyState(osgGA::GUIEventAdapter::KEY_Alt_R, getBit(modkey_mask, 5));
+    is_changed |= setKeyState(osgGA::GUIEventAdapter::KEY_Control_L, getBit(modkey_mask, 2));
+    is_changed |= setKeyState(osgGA::GUIEventAdapter::KEY_Control_R, getBit(modkey_mask, 3));
+
+    is_changed |= setKeyState(osgGA::GUIEventAdapter::KEY_Alt_L, getBit(modkey_mask, 4));
+    is_changed |= setKeyState(osgGA::GUIEventAdapter::KEY_Alt_R, getBit(modkey_mask, 5));
+
+    return is_changed;
 }

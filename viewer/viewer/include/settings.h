@@ -31,6 +31,10 @@ struct settings_t
 {
     /// TCP-Client settings
     tcp_config_t    tcp_config;
+    /// Interval for vehicles positions update, ms
+    int vehicles_pos_update_interval;
+    /// Interval for vehicles states update, ms
+    int vehicles_state_update_interval;
     /// Route directory name
     std::string     route_dir_name;
     /// Route directory
@@ -130,7 +134,9 @@ struct settings_t
     unsigned int    interval;
 
     settings_t()
-        : route_dir_name("")
+        : vehicles_pos_update_interval(70)
+        , vehicles_state_update_interval(100)
+        , route_dir_name("")
         , route_dir_full_path("")
         , x(50)
         , y(50)

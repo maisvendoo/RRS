@@ -37,6 +37,8 @@ private:
 
     tcp_config_t tcp_config;
 
+    int vehicles_pos_update_interval = 70;
+
     TcpClient *tcp_client = new TcpClient(this);
 
     Topology *topology = new Topology;

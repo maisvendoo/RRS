@@ -16,7 +16,8 @@
 #define     KEYBOARD_H
 
 #include    <QObject>
-#include    <QMap>
+//#include    <QMap>
+#include    <QSet>
 #include    <QSharedMemory>
 #include    <osgGA/GUIEventHandler>
 
@@ -41,17 +42,25 @@ public:
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
                         osgGA::GUIActionAdapter &aa);
 
+    std::vector<int> getPressedKeys();
+
 signals:
 
     /// Send keyboard state to server
-    void sendKeyBoardState(QByteArray data);
+    void sendKeyBoardState();
 
 protected:
-
+/*
     /// Map to store keys state (keymap)
     QMap<int, bool>     keys;
+*/
+    /// Set to store pressed keys (keymap)
+    QSet<int>     keys;
 
-    /// Add key to keymap
+    /// Set to store available keys
+    QSet<int>     available_keys;
+
+    /// Add key to available keys
     void addKey(int key);
 
     /// Set key in keymap as pressed
@@ -63,19 +72,19 @@ protected:
     /// Reset key in keymap (set as not pressed)
     void resetKey(int key);
 
-    void setKeyState(int key, bool state);
+    bool setKeyState(int key, bool state);
 
     /// Keymap initialization
     void init();
-
+/*
     /// Serialization of keymap to transmite thow TCP-socket
     QByteArray serialize();
 
     QSharedMemory   keys_data;
 
     void sendKeysData(const QByteArray &data);
-
-    void modkeyProcess(const osgGA::GUIEventAdapter &ea);
+*/
+    bool modkeyProcess(const osgGA::GUIEventAdapter &ea);
 };
 
 #endif // KEYBOARD_H

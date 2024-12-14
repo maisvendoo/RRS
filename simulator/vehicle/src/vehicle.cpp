@@ -709,10 +709,7 @@ void Vehicle::resetKeysData()
 {
     keys_mutex.lock();
 
-    for (QMap<int, bool>::iterator it = keys.begin(); it != keys.end(); ++it)
-    {
-        it.value() = false;
-    }
+    keys.clear();
 
     keys_mutex.unlock();
 }

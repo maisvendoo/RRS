@@ -30,6 +30,10 @@ public:
         this->vehicles_info = data;
     }
 
+    void updateVehiclesPos(QByteArray vehicles_pos, double t);
+
+    void updateVehiclesState(QByteArray vehicles_state, double t);
+
 signals:
 
     void requestTopologyData(QByteArray &topology_data);
@@ -101,10 +105,6 @@ public slots:
     void slotSendTrajBusyState(QByteArray busy_state);
 
     void slotUpdateSignal(QByteArray signal_data);
-
-    void slotUpdateVehiclesPos(QByteArray vehicles_pos);
-
-    void slotUpdateVehiclesState(QByteArray vehicles_state);
 };
 
 #endif

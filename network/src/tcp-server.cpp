@@ -69,12 +69,16 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
     case STYPE_REQUEST_ROUTE_INFO:
     {
+        client_data.received_data.data.clear();
+
         Journal::instance()->info(QString("Received route info request for %1").arg(client_data.id));
         send_route_info(client_data);
         break;
     }
     case STYPE_REQUEST_TOPOLOGY_DATA:
     {
+        client_data.received_data.data.clear();
+
         Journal::instance()->info(QString("Received topology data request for %1").arg(client_data.id));
         send_topology_data(client_data);
         // Пока не разделяем структуру топологии
@@ -85,6 +89,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
 /*    case STYPE_REQUEST_TOPOLOGY_UPDATE:
     {
+        client_data.received_data.data.clear();
+
         Journal::instance()->info(QString("Received topology update request for %1").arg(client_data.id));
         //send_topology_state(client_data);
         clients_for_topology_updates.insert(client_data.socket);
@@ -92,6 +98,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }*/
     case STYPE_REQUEST_SIGNALS_DATA:
     {
+        client_data.received_data.data.clear();
+
         Journal::instance()->info(QString("Received signals data request for %1").arg(client_data.id));
         send_signals_data(client_data);
         // Пока не разделяем положение сигналов
@@ -102,6 +110,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
 /*    case STYPE_REQUEST_SIGNALS_UPDATE:
     {
+        client_data.received_data.data.clear();
+
         Journal::instance()->info(QString("Received signals update request for %1").arg(client_data.id));
         //send_signals_state(client_data);
         clients_for_signals_updates.insert(client_data.socket);
@@ -109,43 +119,57 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }*/
     case STYPE_REQUEST_VEHICLES_INFO:
     {
+        client_data.received_data.data.clear();
+
         Journal::instance()->info(QString("Received vehicles info request for %1").arg(client_data.id));
         send_vehicles_info(client_data);
         break;
     }
     case STYPE_REQUEST_VEHICLES_POS_UPDATE:
     {
-        Journal::instance()->info(QString("Received vehicles pos update request for %1").arg(client_data.id));
+        QBuffer buff(&client_data.received_data.data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+        stream >> client_data.pos_update_interval;
+
+        Journal::instance()->info(QString("Received vehicles pos update request for %1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.pos_update_interval, 5, 'f', 3));
         clients_for_vehicles_pos_updates.insert(client_data.socket);
         break;
     }
     case STYPE_REQUEST_VEHICLES_STATE_UPDATE:
     {
-        Journal::instance()->info(QString("Received vehicles update request for %1").arg(client_data.id));
+        QBuffer buff(&client_data.received_data.data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+        stream >> client_data.state_update_interval;
+
+        Journal::instance()->info(QString("Received vehicles state update request for %1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.state_update_interval, 5, 'f', 3));
         clients_for_vehicles_updates.insert(client_data.socket);
         break;
     }
     case STYPE_COMMAND_SWITCH_STATE:
     {
-        Journal::instance()->info("Received change switch state request");
+        Journal::instance()->info("Received change switch state command");
         emit setSwitchState(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_OPEN_SIGNAL:
     {
-        Journal::instance()->info("Received open signal request");
+        Journal::instance()->info("Received open signal command");
         emit openSignal(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_CLOSE_SIGNAL:
     {
-        Journal::instance()->info("Received close signal request");
+        Journal::instance()->info("Received close signal command");
         emit closeSignal(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_VEHICLE_CONTROL:
     {
-        Journal::instance()->info("Received vehicle control request");
+        Journal::instance()->info("Received vehicle control command");
         emit setVehicleControl(client_data.received_data.data);
         break;
     }
@@ -381,8 +405,7 @@ void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
     for (auto client_socket : clients_for_topology_updates)
     {
 /*
-        if (clients_data.contains(client_socket))
-            Journal::instance()->info(QString("Updated busy status for %1").arg(clients_data[client_socket].id));
+        Journal::instance()->info(QString("Updated busy status for %1").arg(clients_data[client_socket].id));
 */
         client_socket->write(net_data.serialize());
         client_socket->flush();
@@ -401,8 +424,7 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
     for (auto client_socket : clients_for_signals_updates)
     {
 /*
-        if (clients_data.contains(client_socket))
-            Journal::instance()->info(QString("Updated signals for %1").arg(clients_data[client_socket].id));
+        Journal::instance()->info(QString("Updated signals for %1").arg(clients_data[client_socket].id));
 */
         client_socket->write(net_data.serialize());
         client_socket->flush();
@@ -412,7 +434,7 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpServer::slotUpdateVehiclesPos(QByteArray vehicles_pos)
+void TcpServer::updateVehiclesPos(QByteArray vehicles_pos, double t)
 {
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_POS_UPDATE;
@@ -420,19 +442,27 @@ void TcpServer::slotUpdateVehiclesPos(QByteArray vehicles_pos)
 
     for (auto client_socket : clients_for_vehicles_pos_updates)
     {
-/*
-        if (clients_data.contains(client_socket))
-            Journal::instance()->info(QString("Updated vehicles positions for %1").arg(clients_data[client_socket].id));
-*/
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
+        Journal::instance()->info(QString("Updated vehicles positions: data size = %1")
+                                      .arg(net_data.data.size()));
+
+        double prev_t = clients_data[client_socket].pos_update_prev_time;
+        if ((t - prev_t) > clients_data[client_socket].pos_update_interval)
+        {
+
+            Journal::instance()->info(QString("Updated vehicles positions for %1: t = %2 | dt = %3")
+                                          .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
+
+            clients_data[client_socket].pos_update_prev_time = t;
+            client_socket->write(net_data.serialize());
+            client_socket->flush();
+        }
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpServer::slotUpdateVehiclesState(QByteArray vehicles_state)
+void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
 {
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_UPDATE;
@@ -440,11 +470,19 @@ void TcpServer::slotUpdateVehiclesState(QByteArray vehicles_state)
 
     for (auto client_socket : clients_for_vehicles_updates)
     {
-/*
-        if (clients_data.contains(client_socket))
-            Journal::instance()->info(QString("Updated vehicles state for %1").arg(clients_data[client_socket].id));
-*/
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
+        Journal::instance()->info(QString("Updated vehicles states: data size = %1")
+                                      .arg(net_data.data.size()));
+
+        double prev_t = clients_data[client_socket].state_update_prev_time;
+        if ((t - prev_t) > clients_data[client_socket].state_update_interval)
+        {
+
+            Journal::instance()->info(QString("Updated vehicles state for %1: t = %2 | dt = %3")
+                                          .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
+
+            clients_data[client_socket].state_update_prev_time = t;
+            client_socket->write(net_data.serialize());
+            client_socket->flush();
+        }
     }
 }

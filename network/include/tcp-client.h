@@ -14,7 +14,6 @@ struct tcp_config_t
     QString host_addr ="127.0.0.1";
     quint16 port = 1992;
     int reconnect_interval = 100;
-    int request_interval = 100;
 };
 
 //------------------------------------------------------------------------------
@@ -32,13 +31,13 @@ public:
 
     bool init(const tcp_config_t &tcp_config);
 
-    void sendRequest(StructureType stype);
+    void sendRequest(StructureType stype, double update_interval = 0.0);
 
     void sendSwitchState(QString conn_name, int state_fwd, int state_bwd);
 
     void sendSignalState(QString conn_name, int sig_dir, bool open);
 
-    void sendVehicleControl(int current_veh, int controlled_veh, QByteArray keyboard_data);
+    void sendVehicleControl(QByteArray vehicle_control_by_keyboard);
 
     bool isConnected() const;
 

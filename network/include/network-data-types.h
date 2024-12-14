@@ -94,6 +94,10 @@ struct network_data_t
 struct client_data_t
 {
     int id = 0;
+    double pos_update_interval = 0.0;
+    double pos_update_prev_time = 0.0;
+    double state_update_interval = 0.0;
+    double state_update_prev_time = 0.0;
     QTcpSocket  *socket = Q_NULLPTR;
     network_data_t  received_data;
 };

@@ -32,7 +32,7 @@
 #include    <simulator-update-struct.h>
 #include    <controlled-struct.h>
 
-#include    <keys-control.h>
+//#include    <keys-control.h>
 
 #include    <virtual-interface-device.h>
 
@@ -109,17 +109,11 @@ private:
     bool        is_debug_print = false;
 
     double      control_time = 0.0;
-    double      control_delay = 0.05;
-    double      feedback_time = 0.0;
-    double      feedback_delay = 0.05;
+    double      control_delay = 0.01;
 
-    /// Vehicle which selected by user for view
-    int         current_vehicle = -1;
-//    int             prev_current_vehicle;
-
-    /// Vehicle which selected by user for control
-    int         controlled_vehicle = -1;
-    int         prev_controlled_vehicle = -1;
+    /// Vehicle control
+    controlled_t    vehicle_control_by_keyboard = controlled_t();
+    int             prev_controlled_vehicle = 0;
 
     /// All vehicles
     std::vector<Vehicle *> vehicles;
@@ -139,14 +133,14 @@ private:
     /// Simulation thread
     QThread     model_thread;
 
-    KeysControl keys_control;
+//    KeysControl keys_control;
 /*
     QSharedMemory   memory_sim_info;
-    QSharedMemory   memory_sim_update;*/
+    QSharedMemory   memory_sim_update;
     QSharedMemory   memory_controlled;
     QSharedMemory   keys_data;
     QByteArray      data;
-
+*/
     QTimer          controlTimer;
     QTimer          networkTimer;
 
@@ -198,11 +192,11 @@ private:
     void initTcpServer();
 
     /// TCP feedback
-    void tcpFeedBack(double delta_t);
-
+    void tcpFeedBack();
+/*
     /// Shered memory feedback
     void sharedMemoryFeedback();
-
+*/
     void controlStep(double &control_time, const double control_delay);    
 
 private slots:
@@ -212,6 +206,8 @@ private slots:
     void slotGetTopologyData(QByteArray &topology_data);
 
     void slotGetSignalsData(QByteArray &signals_data);
+
+    void slotGetVehicleControlByKeyboard(QByteArray &control_data);
 };
 
 #endif // MODEL_H
