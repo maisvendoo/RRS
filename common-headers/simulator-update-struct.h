@@ -79,8 +79,8 @@ struct simulator_vehicle_pos_update_t
 struct simulator_update_pos_t
 {
     double time = 0.0;
-    int current_vehicle = 0;
-    int controlled_vehicle = 0;
+    std::vector<int> current_vehicles;
+    std::vector<int> controlled_vehicles;
     std::vector<simulator_vehicle_pos_update_t> vehicles;
 
     simulator_update_pos_t()
@@ -97,8 +97,19 @@ struct simulator_update_pos_t
 
         stream << time;
 
-        stream << vehicles.size();
+        stream << current_vehicles.size();
+        for (auto veh : current_vehicles)
+        {
+            stream << veh;
+        }
 
+        stream << controlled_vehicles.size();
+        for (auto veh : controlled_vehicles)
+        {
+            stream << veh;
+        }
+
+        stream << vehicles.size();
         for (auto veh_pos : vehicles)
         {
             stream << veh_pos.serialize();
@@ -116,8 +127,24 @@ struct simulator_update_pos_t
         stream >> time;
 
         size_t num;
-        stream >> num;
 
+        stream >> num;
+        current_vehicles.clear();
+        current_vehicles.resize(num);
+        for (size_t i = 0; i < current_vehicles.size(); ++i)
+        {
+            stream >> current_vehicles[i];
+        }
+
+        stream >> num;
+        controlled_vehicles.clear();
+        controlled_vehicles.resize(num);
+        for (size_t i = 0; i < controlled_vehicles.size(); ++i)
+        {
+            stream >> controlled_vehicles[i];
+        }
+
+        stream >> num;
         vehicles.clear();
         vehicles.resize(num);
 

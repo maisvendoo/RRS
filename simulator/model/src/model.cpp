@@ -890,17 +890,13 @@ void Model::tcpFeedBack()
         simulator_vehicle_controlled_update_t vehicle_controlled;
 
         int id = controlled_clients[*с_id].vehicle_control_by_keyboard.current_vehicle;
-
-        // TODO // Переделать на список управляемых ПЕ
-        update_pos_data.current_vehicle = id;
+        update_pos_data.current_vehicles.push_back(id);
 
         vehicle_controlled.current_vehicle = id;
         vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
 
         id = controlled_clients[*с_id].vehicle_control_by_keyboard.controlled_vehicle;
-
-        // TODO // Переделать на список управляемых ПЕ
-        update_pos_data.controlled_vehicle = id;
+        update_pos_data.controlled_vehicles.push_back(id);
 
         vehicle_controlled.controlled_vehicle = id;
         vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();

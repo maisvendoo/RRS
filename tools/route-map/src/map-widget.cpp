@@ -79,7 +79,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     if (folow_vehicle)
     {
-        int curr = train_data->current_vehicle;
+        int curr = train_data->current_vehicles[0];
 
         map_shift.setX(- train_data->vehicles[curr].position_y * scale);
         map_shift.setY(- train_data->vehicles[curr].position_x * scale);
@@ -130,19 +130,21 @@ void MapWidget::drawTrain(simulator_update_pos_t *train_data)
 {
     for (size_t i = 0; i < train_data->vehicles.size(); ++i)
     {
-        if (i == train_data->controlled_vehicle)
-        {
-            QColor color(192, 64, 64);
-            drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
-            continue;
-        }
-        if (i == train_data->current_vehicle)
-        {
-            QColor color(192, 192, 0);
-            drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
-            continue;
-        }
         QColor color(64, 128, 0);
+        for (auto v_id : train_data->current_vehicles)
+        {
+            if (i == v_id)
+            {
+                color = QColor(192, 192, 0);
+            }
+        }
+        for (auto v_id : train_data->controlled_vehicles)
+        {
+            if (i == v_id)
+            {
+                color = QColor(192, 64, 64);
+            }
+        }
         drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
     }
 }
