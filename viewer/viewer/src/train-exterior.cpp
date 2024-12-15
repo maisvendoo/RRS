@@ -876,8 +876,52 @@ void TrainExteriorHandler::slotGetVehiclePosData(QByteArray &data)
 //------------------------------------------------------------------------------
 void TrainExteriorHandler::slotGetVehicleStateData(QByteArray &data)
 {
+//    bool prev = is_state_updated;
     update_data.deserialize(data);
     is_state_updated = (update_data.vehicles.size() == vehicles_ext.size());
     if (is_pos_updated && is_state_updated)
         updateDebugString();
+/*
+    if (!prev && is_state_updated)
+    {
+        QString msg = "Controlled(";
+        msg += QString::number(update_data.controlled_vehicle);
+        msg += "):";
+        msg += update_data.controlledDebugMsg;
+        msg += "\nCurrent(";
+        msg += QString::number(update_data.current_vehicle);
+        msg += "):";
+        msg += update_data.controlledDebugMsg;
+        msg += "\nTrains(";
+        msg += QString::number(update_data.trains.size());
+        msg += "):";
+        for (size_t i = 0; i < update_data.trains.size(); ++i)
+        {
+            msg += QString::number(update_data.trains[i].first_vehicle_id);
+            msg += ",";
+            msg += QString::number(update_data.trains[i].last_vehicle_id);
+            msg += "|";
+        }
+        msg += "\nVehicles(";
+        msg += QString::number(update_data.vehicles.size());
+        msg += "):";
+        for (size_t i = 0; i < update_data.vehicles.size(); ++i)
+        {
+            msg += "\n(";
+            msg += QString::number(update_data.vehicles[i].train_id);
+            msg += ")";
+            msg += QString::number(i);
+            msg += "(";
+            msg += QString::number(update_data.vehicles[i].analogSignal.size());
+            msg += "):";
+            for (auto s : update_data.vehicles[i].analogSignal)
+            {
+                msg += QString::number(s);
+                msg += "|";
+            }
+        }
+        OSG_FATAL << msg.toStdString() << std::endl;
+        std::cout << msg.toStdString() << std::endl;
+    }
+*/
 }

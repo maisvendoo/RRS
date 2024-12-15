@@ -873,13 +873,11 @@ void Model::tcpFeedBack()
         }
 
         size_t end = MAX_ANALOG_SIGNALS - 1;
-        while (vehicle->getAnalogSignals()[end] == 0.0f)
+        while ((vehicle->getAnalogSignals()[end] == 0.0f) && (end))
             --end;
 
-        update_data.vehicles[i].analogSignal.insert(
-            update_data.vehicles[i].analogSignal.begin(),
-            vehicle->getAnalogSignals().begin(),
-            vehicle->getAnalogSignals().begin() + end);
+        for (size_t j = 0; j <= end; ++j)
+            update_data.vehicles[i].analogSignal.push_back(vehicle->getAnalogSignals()[j]);
 
         if (vehicle_control_by_keyboard.current_vehicle == i)
         {
