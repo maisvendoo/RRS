@@ -34,6 +34,8 @@ public:
 
     void updateVehiclesState(QByteArray vehicles_state, double t);
 
+    void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
+
 signals:
 
     void requestTopologyData(QByteArray &topology_data);
@@ -67,6 +69,8 @@ private:
     QSet<QTcpSocket*> clients_for_vehicles_pos_updates;
 
     QSet<QTcpSocket*> clients_for_vehicles_updates;
+
+    QSet<QTcpSocket*> clients_for_vehicle_controlled_updates;
 
     QByteArray route_info;
 

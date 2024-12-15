@@ -231,10 +231,6 @@ struct simulator_train_update_t
 //------------------------------------------------------------------------------
 struct simulator_update_t
 {
-    int current_vehicle = 0;
-    QString currentDebugMsg = "";
-    int controlled_vehicle = 0;
-    QString controlledDebugMsg = "";
     std::vector<simulator_train_update_t> trains;
     std::vector<simulator_vehicle_update_t> vehicles;
 
@@ -249,11 +245,6 @@ struct simulator_update_t
         QBuffer buff(&data);
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
-
-        stream << current_vehicle;
-        stream << currentDebugMsg;
-        stream << controlled_vehicle;
-        stream << controlledDebugMsg;
 
         stream << trains.size();
 
@@ -277,11 +268,6 @@ struct simulator_update_t
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
-
-        stream >> current_vehicle;
-        stream >> currentDebugMsg;
-        stream >> controlled_vehicle;
-        stream >> controlledDebugMsg;
 
         size_t num;
         stream >> num;
@@ -309,6 +295,49 @@ struct simulator_update_t
 
             vehicles[i].deserialize(vehicle_data);
         }
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_vehicle_controlled_update_t
+{
+    int current_vehicle = 0;
+    QString currentDebugMsg = "";
+    int controlled_vehicle = 0;
+    QString controlledDebugMsg = "";
+
+    simulator_vehicle_controlled_update_t()
+    {
+
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << current_vehicle;
+        stream << currentDebugMsg;
+        stream << controlled_vehicle;
+        stream << controlledDebugMsg;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> current_vehicle;
+        stream >> currentDebugMsg;
+        stream >> controlled_vehicle;
+        stream >> controlledDebugMsg;
     }
 };
 

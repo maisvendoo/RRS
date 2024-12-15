@@ -35,6 +35,8 @@ struct settings_t
     int vehicles_pos_update_interval;
     /// Interval for vehicles states update, ms
     int vehicles_state_update_interval;
+    /// Interval for vehicle controlled debug strings update, ms
+    int vehicle_controled_update_interval;
     /// Route directory name
     std::string     route_dir_name;
     /// Route directory
@@ -136,6 +138,7 @@ struct settings_t
     settings_t()
         : vehicles_pos_update_interval(70)
         , vehicles_state_update_interval(100)
+        , vehicle_controled_update_interval(70)
         , route_dir_name("")
         , route_dir_full_path("")
         , x(50)

@@ -884,26 +884,28 @@ void Model::tcpFeedBack()
         ++i;
     }
 
-    // TODO // Придумать как раздать соответствующие debug_msg по клиентам
-    if (controlled_clients.empty())
+    // Раздаём соответствующие debug_msg по клиентам
+    for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {
-        update_pos_data.current_vehicle = -1;
-        update_data.current_vehicle = -1;
-        update_pos_data.controlled_vehicle = -1;
-        update_data.controlled_vehicle = -1;
-        update_data.currentDebugMsg = "";
-        update_data.controlledDebugMsg = "";
-    }
-    else
-    {
-        int id = controlled_clients.begin()->vehicle_control_by_keyboard.current_vehicle;
+        simulator_vehicle_controlled_update_t vehicle_controlled;
+
+        int id = controlled_clients[*с_id].vehicle_control_by_keyboard.current_vehicle;
+
+        // TODO // Переделать на список управляемых ПЕ
         update_pos_data.current_vehicle = id;
-        update_data.current_vehicle = id;
-        update_data.currentDebugMsg = vehicles[id]->getDebugMsg();
-        id = controlled_clients.begin()->vehicle_control_by_keyboard.controlled_vehicle;
+
+        vehicle_controlled.current_vehicle = id;
+        vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
+
+        id = controlled_clients[*с_id].vehicle_control_by_keyboard.controlled_vehicle;
+
+        // TODO // Переделать на список управляемых ПЕ
         update_pos_data.controlled_vehicle = id;
-        update_data.controlled_vehicle = id;
-        update_data.controlledDebugMsg = vehicles[id]->getDebugMsg();
+
+        vehicle_controlled.controlled_vehicle = id;
+        vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
+
+        tcp_server->updateVehicleControlled(vehicle_controlled.serialize(), (*с_id), t);
     }
 
     tcp_server->updateVehiclesPos(update_pos_data.serialize(), t);

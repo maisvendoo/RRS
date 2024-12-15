@@ -10,6 +10,9 @@
 
 		<!-- Интервал обновления состояний подвижного состава, мс -->
 		<VehiclesStateUpdateInterval>100</VehiclesStateUpdateInterval>
+
+		<!-- Интервал обновления отладочной строки, мс -->
+		<VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
 	</Client>
 	<Viewer>
 		<posX>50</posX>

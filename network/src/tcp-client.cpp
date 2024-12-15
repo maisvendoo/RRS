@@ -198,8 +198,12 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setVehiclesPositions(net_data.data);
         break;
 
-    case STYPE_VEHICLES_UPDATE:
+    case STYPE_VEHICLES_STATE_UPDATE:
         emit setVehiclesData(net_data.data);
+        break;
+
+    case STYPE_VEHICLE_CONTROLLED_UPDATE:
+        emit setVehicleControlled(net_data.data);
         break;
 
     default:

@@ -69,6 +69,8 @@ signals:
 
     void setVehiclesData(QByteArray &vehicles_data);
 
+    void setVehicleControlled(QByteArray &vehicle_controlled);
+
     void sendLogMessage(QString msg);
 
 private:

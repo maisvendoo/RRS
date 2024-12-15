@@ -126,6 +126,9 @@ private:
     short new_data = -1;
     short old_data = -1;
 
+    /// Debug strings for controlled and current vehicles
+    simulator_vehicle_controlled_update_t vehicle_controlled;
+
     bool is_pos_updated = false;
     bool is_state_updated = false;
 
@@ -168,9 +171,11 @@ public slots:
 
     void lock_display(bool lock);
 
-    void slotGetVehiclePosData(QByteArray &data);
+    void slotGetVehiclesPosData(QByteArray &data);
 
-    void slotGetVehicleStateData(QByteArray &data);
+    void slotGetVehiclesStateData(QByteArray &data);
+
+    void slotGetVehicleControlled(QByteArray &data);
 };
 
 #endif // TRAIN_EXTERIOR_H

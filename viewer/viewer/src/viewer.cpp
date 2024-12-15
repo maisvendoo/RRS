@@ -290,6 +290,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
         cfg.getValue(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
         cfg.getValue(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
+        cfg.getValue(secName, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
 
         secName = "Viewer";
 
@@ -779,10 +780,13 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     if (loadVehicles(vehicles_info))
     {
         connect(tcp_client, &TcpClient::setVehiclesPositions,
-                train_ext_handler, &TrainExteriorHandler::slotGetVehiclePosData, Qt::DirectConnection);
+                train_ext_handler, &TrainExteriorHandler::slotGetVehiclesPosData, Qt::DirectConnection);
 
         connect(tcp_client, &TcpClient::setVehiclesData,
-                train_ext_handler, &TrainExteriorHandler::slotGetVehicleStateData, Qt::DirectConnection);
+                train_ext_handler, &TrainExteriorHandler::slotGetVehiclesStateData, Qt::DirectConnection);
+
+        connect(tcp_client, &TcpClient::setVehicleControlled,
+                train_ext_handler, &TrainExteriorHandler::slotGetVehicleControlled, Qt::DirectConnection);
 
         vehicle_control_by_keyboard.controlled_vehicle = train_ext_handler->getControlledVehicle();
         vehicle_control_by_keyboard.current_vehicle = train_ext_handler->getCurrentVehicle();
@@ -797,6 +801,8 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
                                 static_cast<double>(settings.vehicles_pos_update_interval) / 1000.0);
         tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
                                 static_cast<double>(settings.vehicles_state_update_interval) / 1000.0);
+        tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
+                                static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
     }
 }
 

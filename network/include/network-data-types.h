@@ -23,6 +23,7 @@ enum StructureType
     STYPE_REQUEST_VEHICLES_INFO,
     STYPE_REQUEST_VEHICLES_POS_UPDATE,
     STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+    STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
 
     STYPE_COMMAND_SWITCH_STATE,
     STYPE_COMMAND_OPEN_SIGNAL,
@@ -41,7 +42,8 @@ enum StructureType
 
     STYPE_VEHICLES_INFO,
     STYPE_VEHICLES_POS_UPDATE,
-    STYPE_VEHICLES_UPDATE,
+    STYPE_VEHICLES_STATE_UPDATE,
+    STYPE_VEHICLE_CONTROLLED_UPDATE,
 };
 
 //------------------------------------------------------------------------------
@@ -98,6 +100,8 @@ struct client_data_t
     double pos_update_prev_time = 0.0;
     double state_update_interval = 0.0;
     double state_update_prev_time = 0.0;
+    double controlled_update_interval = 0.0;
+    double controlled_update_prev_time = 0.0;
     QTcpSocket  *socket = Q_NULLPTR;
     network_data_t  received_data;
 };

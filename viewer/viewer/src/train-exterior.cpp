@@ -464,7 +464,7 @@ void TrainExteriorHandler::updateDebugString()
                            .arg(minutes, 2)
                            .arg(seconds, 2);
 
-    int curr = update_data.current_vehicle;
+    int curr = vehicle_controlled.current_vehicle;
     if (curr >= 0)
     {
         int curr_train = update_data.vehicles[curr].train_id;
@@ -478,14 +478,14 @@ void TrainExteriorHandler::updateDebugString()
                         .arg(update_pos_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
                         .arg(update_pos_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
 
-        hud_text += update_data.currentDebugMsg + QString("\n");
+        hud_text += vehicle_controlled.currentDebugMsg + QString("\n");
     }
     else
     {
         hud_text += QString("\n\n");
     }
 
-    int control = update_data.controlled_vehicle;
+    int control = vehicle_controlled.controlled_vehicle;
     if (control >= 0)
     {
         int control_train = update_data.vehicles[control].train_id;
@@ -499,7 +499,7 @@ void TrainExteriorHandler::updateDebugString()
                         .arg(update_pos_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
                         .arg(update_pos_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
 
-        hud_text += update_data.controlledDebugMsg;
+        hud_text += vehicle_controlled.controlledDebugMsg;
     }
     else
     {
@@ -833,7 +833,7 @@ void TrainExteriorHandler::lock_display(bool lock)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::slotGetVehiclePosData(QByteArray &data)
+void TrainExteriorHandler::slotGetVehiclesPosData(QByteArray &data)
 {
     if (old_data == -1)
     {
@@ -874,25 +874,14 @@ void TrainExteriorHandler::slotGetVehiclePosData(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainExteriorHandler::slotGetVehicleStateData(QByteArray &data)
+void TrainExteriorHandler::slotGetVehiclesStateData(QByteArray &data)
 {
-//    bool prev = is_state_updated;
     update_data.deserialize(data);
     is_state_updated = (update_data.vehicles.size() == vehicles_ext.size());
-    if (is_pos_updated && is_state_updated)
-        updateDebugString();
 /*
-    if (!prev && is_state_updated)
+    if (is_state_updated)
     {
-        QString msg = "Controlled(";
-        msg += QString::number(update_data.controlled_vehicle);
-        msg += "):";
-        msg += update_data.controlledDebugMsg;
-        msg += "\nCurrent(";
-        msg += QString::number(update_data.current_vehicle);
-        msg += "):";
-        msg += update_data.controlledDebugMsg;
-        msg += "\nTrains(";
+        QString msg = "\nTrains(";
         msg += QString::number(update_data.trains.size());
         msg += "):";
         for (size_t i = 0; i < update_data.trains.size(); ++i)
@@ -924,4 +913,34 @@ void TrainExteriorHandler::slotGetVehicleStateData(QByteArray &data)
         std::cout << msg.toStdString() << std::endl;
     }
 */
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainExteriorHandler::slotGetVehicleControlled(QByteArray &data)
+{
+    if (!is_pos_updated || !is_state_updated)
+        return;
+
+    vehicle_controlled.deserialize(data);
+    if ((vehicle_controlled.controlled_vehicle >= 0) &&
+        (vehicle_controlled.controlled_vehicle < vehicles_ext.size()) &&
+        (vehicle_controlled.current_vehicle >= 0) &&
+        (vehicle_controlled.current_vehicle < vehicles_ext.size()))
+    {
+        updateDebugString();
+/*
+        QString msg = "Controlled(";
+        msg += QString::number(vehicle_controlled.controlled_vehicle);
+        msg += "):";
+        msg += vehicle_controlled.controlledDebugMsg;
+        msg += "\nCurrent(";
+        msg += QString::number(vehicle_controlled.current_vehicle);
+        msg += "):";
+        msg += vehicle_controlled.controlledDebugMsg;
+        OSG_FATAL << msg.toStdString() << std::endl;
+        std::cout << msg.toStdString() << std::endl;
+*/
+    }
 }
