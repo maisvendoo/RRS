@@ -46,7 +46,9 @@ signals:
 
     void closeSignal(QByteArray signal_data);
 
-    void setVehicleControl(QByteArray &control_data);
+    void setVehicleControl(QByteArray &control_data, int client_id);
+
+    void resetVehicleControl(int client_id);
 
 private:
 

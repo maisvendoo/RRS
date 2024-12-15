@@ -112,8 +112,12 @@ private:
     double      control_delay = 0.01;
 
     /// Vehicle control
-    controlled_t    vehicle_control_by_keyboard = controlled_t();
-    int             prev_controlled_vehicle = 0;
+    struct controlled_client_t
+    {
+        controlled_t vehicle_control_by_keyboard = controlled_t();
+        int prev_vehicle_controlled = -1;
+    };
+    QMap<int, controlled_client_t> controlled_clients;
 
     /// All vehicles
     std::vector<Vehicle *> vehicles;
@@ -207,7 +211,9 @@ private slots:
 
     void slotGetSignalsData(QByteArray &signals_data);
 
-    void slotGetVehicleControlByKeyboard(QByteArray &control_data);
+    void slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id);
+
+    void slotResetVehicleControlByKeyboard(int client_id);
 };
 
 #endif // MODEL_H

@@ -803,6 +803,8 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::setVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
 
+    connect(tcp_server, &TcpServer::resetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
+
     Journal::instance()->info("TCP server is initialized successfully");
 }
 
@@ -879,21 +881,29 @@ void Model::tcpFeedBack()
         for (size_t j = 0; j <= end; ++j)
             update_data.vehicles[i].analogSignal.push_back(vehicle->getAnalogSignals()[j]);
 
-        if (vehicle_control_by_keyboard.current_vehicle == i)
-        {
-            update_pos_data.current_vehicle = i;
-            update_data.current_vehicle = i;
-            update_data.currentDebugMsg = vehicle->getDebugMsg();
-        }
-
-        if (vehicle_control_by_keyboard.controlled_vehicle == i)
-        {
-            update_pos_data.controlled_vehicle = i;
-            update_data.controlled_vehicle = i;
-            update_data.controlledDebugMsg = vehicle->getDebugMsg();
-        }
-
         ++i;
+    }
+
+    // TODO // Придумать как раздать соответствующие debug_msg по клиентам
+    if (controlled_clients.empty())
+    {
+        update_pos_data.current_vehicle = -1;
+        update_data.current_vehicle = -1;
+        update_pos_data.controlled_vehicle = -1;
+        update_data.controlled_vehicle = -1;
+        update_data.currentDebugMsg = "";
+        update_data.controlledDebugMsg = "";
+    }
+    else
+    {
+        int id = controlled_clients.begin()->vehicle_control_by_keyboard.current_vehicle;
+        update_pos_data.current_vehicle = id;
+        update_data.current_vehicle = id;
+        update_data.currentDebugMsg = vehicles[id]->getDebugMsg();
+        id = controlled_clients.begin()->vehicle_control_by_keyboard.controlled_vehicle;
+        update_pos_data.controlled_vehicle = id;
+        update_data.controlled_vehicle = id;
+        update_data.controlledDebugMsg = vehicles[id]->getDebugMsg();
     }
 
     tcp_server->updateVehiclesPos(update_pos_data.serialize(), t);
@@ -937,31 +947,46 @@ void Model::sharedMemoryFeedback()
 //------------------------------------------------------------------------------
 void Model::controlStep(double &control_time, const double control_delay)
 {
-    if (control_time >= control_delay)
+    control_time += dt;
+    if (control_time < control_delay)
+        return;
+    control_time = 0;
+
+    for (auto c : controlled_clients)
     {
-        control_time = 0;
+        int id = c.prev_vehicle_controlled;
+        if ((id >= 0) && (id < vehicles.size()))
+        {
+            vehicles[id]->resetKeysData();
+        }
+    }
 
-        if (vehicle_control_by_keyboard.controlled_vehicle < 0)
-            return;
+    QMap<int, QMap<int, bool>> pressed_keys_by_vehicle;
+    for (auto c : controlled_clients)
+    {
+        int id = c.vehicle_control_by_keyboard.controlled_vehicle;
+        if ((id >= 0) && (id < vehicles.size()))
+        {
+            QMap<int, bool> keys_data;
+            if (pressed_keys_by_vehicle.contains(id))
+                keys_data = pressed_keys_by_vehicle[id];
 
-        QMap<int, bool> keys_data;
-        for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
-            keys_data.insert(key_id, true);
+            for (auto key_id : c.vehicle_control_by_keyboard.pressed_keys)
+                keys_data.insert(key_id, true);
 
+            pressed_keys_by_vehicle.insert(id, keys_data);
+        }
+    }
+
+    for (auto id = pressed_keys_by_vehicle.keyBegin(); id != pressed_keys_by_vehicle.keyEnd(); ++id)
+    {
         QByteArray data;
         QDataStream stream(&data, QDataStream::WriteOnly);
 
-        stream << keys_data;
+        stream << pressed_keys_by_vehicle[*id];
 
-        vehicles[vehicle_control_by_keyboard.controlled_vehicle]->setKeysData(data);
-
-        if (prev_controlled_vehicle != vehicle_control_by_keyboard.controlled_vehicle)
-        {
-            vehicles[prev_controlled_vehicle]->resetKeysData();
-            prev_controlled_vehicle = vehicle_control_by_keyboard.controlled_vehicle;
-        }
+        vehicles[*id]->setKeysData(data);
     }
-    control_time += dt;
 }
 
 //------------------------------------------------------------------------------
@@ -1027,9 +1052,15 @@ void Model::slotGetSignalsData(QByteArray &signals_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data)
+void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id)
 {
-    vehicle_control_by_keyboard.deserialize(control_data);
+    controlled_client_t c = controlled_client_t();
+    c.vehicle_control_by_keyboard.deserialize(control_data);
+    if (controlled_clients.contains(client_id))
+    {
+        c.prev_vehicle_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_vehicle;
+    }
+    controlled_clients.insert(client_id, c);
 /*
     QString msg = "Get keyboard: controlled ";
     msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
@@ -1044,4 +1075,17 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data)
     }
     Journal::instance()->info(msg);
 */
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotResetVehicleControlByKeyboard(int client_id)
+{
+    if (controlled_clients.contains(client_id))
+    {
+        int id = controlled_clients[client_id].prev_vehicle_controlled;
+        if ((id >= 0) && (id < vehicles.size()))
+            vehicles[id]->resetKeysData();
+    }
 }

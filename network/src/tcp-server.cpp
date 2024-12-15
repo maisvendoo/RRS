@@ -170,7 +170,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     case STYPE_COMMAND_VEHICLE_CONTROL:
     {
         Journal::instance()->info("Received vehicle control command");
-        emit setVehicleControl(client_data.received_data.data);
+        emit setVehicleControl(client_data.received_data.data, client_data.id);
         break;
     }
 
@@ -298,26 +298,23 @@ void TcpServer::slotClientDisconnected()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
 
-    client_data_t *client_data;
-
     if (clients_data.contains(socket))
     {
-        client_data = &clients_data[socket];
+        client_data_t *client_data = &clients_data[socket];
+
+        client_data->socket->close();
+
+        clients_data.remove(socket);
+        clients_for_topology_updates.remove(socket);
+        clients_for_signals_updates.remove(socket);
+        clients_for_vehicles_pos_updates.remove(socket);
+        clients_for_vehicles_updates.remove(socket);
+
+        emit resetVehicleControl(client_data->id);
+
         Journal::instance()->info(QString("Disconnected client with id %1")
                                       .arg(client_data->id));
     }
-    else
-    {
-        return;
-    }
-
-    client_data->socket->close();
-
-    clients_data.remove(socket);
-    clients_for_topology_updates.remove(socket);
-    clients_for_signals_updates.remove(socket);
-    clients_for_vehicles_pos_updates.remove(socket);
-    clients_for_vehicles_updates.remove(socket);
 }
 
 //------------------------------------------------------------------------------
@@ -442,16 +439,17 @@ void TcpServer::updateVehiclesPos(QByteArray vehicles_pos, double t)
 
     for (auto client_socket : clients_for_vehicles_pos_updates)
     {
+/*
         Journal::instance()->info(QString("Updated vehicles positions: data size = %1")
                                       .arg(net_data.data.size()));
-
+*/
         double prev_t = clients_data[client_socket].pos_update_prev_time;
         if ((t - prev_t) > clients_data[client_socket].pos_update_interval)
         {
-
+/*
             Journal::instance()->info(QString("Updated vehicles positions for %1: t = %2 | dt = %3")
                                           .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
-
+*/
             clients_data[client_socket].pos_update_prev_time = t;
             client_socket->write(net_data.serialize());
             client_socket->flush();
@@ -470,16 +468,17 @@ void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
 
     for (auto client_socket : clients_for_vehicles_updates)
     {
+/*
         Journal::instance()->info(QString("Updated vehicles states: data size = %1")
                                       .arg(net_data.data.size()));
-
+*/
         double prev_t = clients_data[client_socket].state_update_prev_time;
         if ((t - prev_t) > clients_data[client_socket].state_update_interval)
         {
-
+/*
             Journal::instance()->info(QString("Updated vehicles state for %1: t = %2 | dt = %3")
                                           .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
-
+*/
             clients_data[client_socket].state_update_prev_time = t;
             client_socket->write(net_data.serialize());
             client_socket->flush();
