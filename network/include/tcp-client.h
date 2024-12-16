@@ -63,6 +63,10 @@ signals:
 
     void updateSignal(QByteArray signal_data);
 
+    //void setPlayersInfo(QByteArray &players_info);
+
+    void setPlayersUpdate(QByteArray &players_update);
+
     void setVehiclesInfo(QByteArray &vehicles_info);
 
     void setVehiclesPositions(QByteArray &vehicles_pos);

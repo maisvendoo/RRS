@@ -9,6 +9,82 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct simulator_update_players_t
+{
+    std::vector<int> clients_id;
+    std::vector<int> current_vehicles;
+    std::vector<int> controlled_vehicles;
+
+    simulator_update_players_t()
+    {
+
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << clients_id.size();
+        for (auto id : clients_id)
+        {
+            stream << id;
+        }
+
+        stream << current_vehicles.size();
+        for (auto veh : current_vehicles)
+        {
+            stream << veh;
+        }
+
+        stream << controlled_vehicles.size();
+        for (auto veh : controlled_vehicles)
+        {
+            stream << veh;
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        size_t num;
+
+        stream >> num;
+        clients_id.clear();
+        clients_id.resize(num);
+        for (size_t i = 0; i < clients_id.size(); ++i)
+        {
+            stream >> clients_id[i];
+        }
+
+        stream >> num;
+        current_vehicles.clear();
+        current_vehicles.resize(num);
+        for (size_t i = 0; i < current_vehicles.size(); ++i)
+        {
+            stream >> current_vehicles[i];
+        }
+
+        stream >> num;
+        controlled_vehicles.clear();
+        controlled_vehicles.resize(num);
+        for (size_t i = 0; i < controlled_vehicles.size(); ++i)
+        {
+            stream >> controlled_vehicles[i];
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct simulator_vehicle_pos_update_t
 {
     double  position_x = 0.0;
@@ -79,8 +155,6 @@ struct simulator_vehicle_pos_update_t
 struct simulator_update_pos_t
 {
     double time = 0.0;
-    std::vector<int> current_vehicles;
-    std::vector<int> controlled_vehicles;
     std::vector<simulator_vehicle_pos_update_t> vehicles;
 
     simulator_update_pos_t()
@@ -96,18 +170,6 @@ struct simulator_update_pos_t
         QDataStream stream(&buff);
 
         stream << time;
-
-        stream << current_vehicles.size();
-        for (auto veh : current_vehicles)
-        {
-            stream << veh;
-        }
-
-        stream << controlled_vehicles.size();
-        for (auto veh : controlled_vehicles)
-        {
-            stream << veh;
-        }
 
         stream << vehicles.size();
         for (auto veh_pos : vehicles)
@@ -127,22 +189,6 @@ struct simulator_update_pos_t
         stream >> time;
 
         size_t num;
-
-        stream >> num;
-        current_vehicles.clear();
-        current_vehicles.resize(num);
-        for (size_t i = 0; i < current_vehicles.size(); ++i)
-        {
-            stream >> current_vehicles[i];
-        }
-
-        stream >> num;
-        controlled_vehicles.clear();
-        controlled_vehicles.resize(num);
-        for (size_t i = 0; i < controlled_vehicles.size(); ++i)
-        {
-            stream >> controlled_vehicles[i];
-        }
 
         stream >> num;
         vehicles.clear();

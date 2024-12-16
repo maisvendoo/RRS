@@ -13,6 +13,8 @@ enum StructureType
 {
     STYPE_EMPTY_DATA,
 
+    STYPE_REQUEST_PLAYERS_INFO,
+
     STYPE_REQUEST_ROUTE_INFO,
     STYPE_REQUEST_TOPOLOGY_DATA,
 //    STYPE_REQUEST_TOPOLOGY_UPDATE,
@@ -29,6 +31,9 @@ enum StructureType
     STYPE_COMMAND_OPEN_SIGNAL,
     STYPE_COMMAND_CLOSE_SIGNAL,
     STYPE_COMMAND_VEHICLE_CONTROL,
+
+//    STYPE_PLAYERS_INFO,
+    STYPE_PLAYERS_UPDATE,
 
     STYPE_ROUTE_INFO,
     STYPE_TOPOLOGY_DATA,
@@ -102,6 +107,8 @@ struct client_data_t
     double state_update_prev_time = 0.0;
     double controlled_update_interval = 0.0;
     double controlled_update_prev_time = 0.0;
+    double players_update_interval = 0.0;
+    double players_update_prev_time = 0.0;
     QTcpSocket  *socket = Q_NULLPTR;
     network_data_t  received_data;
 };

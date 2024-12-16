@@ -67,6 +67,18 @@ void TcpServer::process_client_request(client_data_t &client_data)
     switch (client_data.received_data.stype)
     {
 
+    case STYPE_REQUEST_PLAYERS_INFO:
+    {
+        QBuffer buff(&client_data.received_data.data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+        stream >> client_data.players_update_interval;
+
+        Journal::instance()->info(QString("Received players update request for %1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.players_update_interval, 5, 'f', 3));
+        clients_for_players_info_updates.insert(client_data.socket);
+        break;
+    }
     case STYPE_REQUEST_ROUTE_INFO:
     {
         client_data.received_data.data.clear();
@@ -317,6 +329,7 @@ void TcpServer::slotClientDisconnected()
         client_data->socket->close();
 
         clients_data.remove(socket);
+        clients_for_players_info_updates.remove(socket);
         clients_for_topology_updates.remove(socket);
         clients_for_signals_updates.remove(socket);
         clients_for_vehicles_pos_updates.remove(socket);
@@ -438,6 +451,35 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 */
         client_socket->write(net_data.serialize());
         client_socket->flush();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updatePlayers(QByteArray players_data, double t)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_PLAYERS_UPDATE;
+    net_data.data = players_data;
+
+    for (auto client_socket : clients_for_players_info_updates)
+    {
+/*
+        Journal::instance()->info(QString("Updated players at vehicles: data size = %1")
+            .arg(net_data.data.size()));
+*/
+        double prev_t = clients_data[client_socket].players_update_prev_time;
+        if ((t - prev_t) > clients_data[client_socket].players_update_interval)
+        {
+/*
+            Journal::instance()->info(QString("Updated players at vehicles for %1: t = %2 | dt = %3")
+                .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
+*/
+            clients_data[client_socket].players_update_prev_time = t;
+            client_socket->write(net_data.serialize());
+            client_socket->flush();
+        }
     }
 }
 

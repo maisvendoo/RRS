@@ -79,7 +79,12 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     if (folow_vehicle)
     {
-        int curr = train_data->current_vehicles[0];
+        int curr = 0;
+
+        // Пока отслеживаем текущую ПЕ у самого первого подключенного вьювера
+        // Следует придумать, как следить за ПЕ выбранного игрока, например себя
+        if (!players_data->current_vehicles.empty())
+            curr = players_data->current_vehicles[0];
 
         map_shift.setX(- train_data->vehicles[curr].position_y * scale);
         map_shift.setY(- train_data->vehicles[curr].position_x * scale);
@@ -131,14 +136,14 @@ void MapWidget::drawTrain(simulator_update_pos_t *train_data)
     for (size_t i = 0; i < train_data->vehicles.size(); ++i)
     {
         QColor color(64, 128, 0);
-        for (auto v_id : train_data->current_vehicles)
+        for (auto v_id : players_data->current_vehicles)
         {
             if (i == v_id)
             {
                 color = QColor(192, 192, 0);
             }
         }
-        for (auto v_id : train_data->controlled_vehicles)
+        for (auto v_id : players_data->controlled_vehicles)
         {
             if (i == v_id)
             {

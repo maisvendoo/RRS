@@ -30,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::setSignalsData,
             this, &MainWindow::slotGetSignalsData);
 
+    connect(tcp_client, &TcpClient::setPlayersUpdate,
+            this, &MainWindow::slotGetPlayersData);
+
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             this, &MainWindow::slotGetVehiclePosData);
 
@@ -48,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     map = new MapWidget(ui->Map);
 
     load_config("../cfg/route-map-tcp.xml");
-
-    load_config("../cfg/route-map.xml");
 
     tcp_client->init(tcp_config);
 }
@@ -86,6 +87,7 @@ void MainWindow::load_config(const QString &cfg_name)
 
     cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
     cfg.getInt(secName, "VehiclesPosUpdateInterval", vehicles_pos_update_interval);
+    cfg.getInt(secName, "PlayersUpdateInterval", players_update_interval);
 
     secName = "RouteMap";
     double tmp_value = 0;
@@ -145,6 +147,7 @@ void MainWindow::slotGetVehicleInfoData(QByteArray &data)
     size_t num = info.vehicles.size();
     ui->ptLog->appendPlainText(QString(tr("Loaded info about %1 vehicles")).arg(num));
 
+    // Сохраняем длины ПЕ для отрисовки
     vehicles_half_length.resize(num);
     for (size_t i = 0; i < num; ++i)
     {
@@ -213,7 +216,6 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     // Запрос серверу на загрузку сигналов
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
     ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
-    //trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------
@@ -344,13 +346,25 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
     }
 
-
     map->signals_data = signals_data;
 
+    // Запрос серверу на регулярное обновление игроков
+    tcp_client->sendRequest(STYPE_REQUEST_PLAYERS_INFO,
+                            static_cast<double>(players_update_interval) / 1000.0);
     // Запрос серверу на регулярное обновление положений ПЕ
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
                             static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetPlayersData(QByteArray &players_update)
+{
+    players_data.deserialize(players_update);
+
+    map->players_data = &players_data;
 }
 
 //------------------------------------------------------------------------------

@@ -193,6 +193,14 @@ void TcpClient::process_received_data(network_data_t &net_data)
     case STYPE_VEHICLES_INFO:
         emit setVehiclesInfo(net_data.data);
         break;
+/*
+    case STYPE_PLAYERS_INFO:
+        emit setPlayersInfo(net_data.data);
+        break;
+*/
+    case STYPE_PLAYERS_UPDATE:
+        emit setPlayersUpdate(net_data.data);
+        break;
 
     case STYPE_VEHICLES_POS_UPDATE:
         emit setVehiclesPositions(net_data.data);

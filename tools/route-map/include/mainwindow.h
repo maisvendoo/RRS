@@ -39,9 +39,13 @@ private:
 
     int vehicles_pos_update_interval = 70;
 
+    int players_update_interval = 70;
+
     TcpClient *tcp_client = new TcpClient(this);
 
     Topology *topology = new Topology;
+
+    simulator_update_players_t players_data;
 
     simulator_update_pos_t train_data;
 
@@ -73,6 +77,8 @@ private slots:
     void slotGetTopologyData(QByteArray &topology_data);
 
     void slotGetSignalsData(QByteArray &sig_data);
+
+    void slotGetPlayersData(QByteArray &players_update);
 
     void slotGetVehiclePosData(QByteArray &sim_data);
 

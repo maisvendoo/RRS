@@ -813,8 +813,9 @@ void Model::initTcpServer()
 //------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
-    simulator_update_pos_t  update_pos_data;
-    simulator_update_t      update_data;
+    simulator_update_players_t  update_players;
+    simulator_update_pos_t      update_pos_data;
+    simulator_update_t          update_data;
 
     update_pos_data.vehicles.resize(vehicles.size());
     update_data.vehicles.resize(vehicles.size());
@@ -887,16 +888,18 @@ void Model::tcpFeedBack()
     // Раздаём соответствующие debug_msg по клиентам
     for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {
+        update_players.clients_id.push_back(*с_id);
+
         simulator_vehicle_controlled_update_t vehicle_controlled;
 
         int id = controlled_clients[*с_id].vehicle_control_by_keyboard.current_vehicle;
-        update_pos_data.current_vehicles.push_back(id);
+        update_players.current_vehicles.push_back(id);
 
         vehicle_controlled.current_vehicle = id;
         vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
 
         id = controlled_clients[*с_id].vehicle_control_by_keyboard.controlled_vehicle;
-        update_pos_data.controlled_vehicles.push_back(id);
+        update_players.controlled_vehicles.push_back(id);
 
         vehicle_controlled.controlled_vehicle = id;
         vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
@@ -904,6 +907,7 @@ void Model::tcpFeedBack()
         tcp_server->updateVehicleControlled(vehicle_controlled.serialize(), (*с_id), t);
     }
 
+    tcp_server->updatePlayers(update_players.serialize(), t);
     tcp_server->updateVehiclesPos(update_pos_data.serialize(), t);
     tcp_server->updateVehiclesState(update_data.serialize(), t);
 }

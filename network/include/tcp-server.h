@@ -30,6 +30,8 @@ public:
         this->vehicles_info = data;
     }
 
+    void updatePlayers(QByteArray players_data, double t);
+
     void updateVehiclesPos(QByteArray vehicles_pos, double t);
 
     void updateVehiclesState(QByteArray vehicles_state, double t);
@@ -61,6 +63,8 @@ private:
     int clients_last_id = 0;
 
     QMap<QTcpSocket*, client_data_t> clients_data;
+
+    QSet<QTcpSocket*> clients_for_players_info_updates;
 
     QSet<QTcpSocket*> clients_for_topology_updates;
 
