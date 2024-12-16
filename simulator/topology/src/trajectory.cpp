@@ -393,7 +393,6 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
         pp.orth = normalize(pp.orth);
         pp.right = normalize(pp.right);
         pp.up = normalize(pp.up);
-
         return pp;
     }
     else
@@ -410,7 +409,6 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
         pp.orth = normalize(pp.orth);
         pp.right = normalize(pp.right);
         pp.up = normalize(pp.up);
-
         return pp;
     }
 }

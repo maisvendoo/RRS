@@ -400,19 +400,20 @@ void TrainExteriorHandler::moveTrain(double ref_time, const std::array<simulator
         vehicles_ext[i].next_vehicle = update_data.vehicles[i].next_vehicle;
 
         // Apply vehicle body matrix transform
-/*
         osg::Matrixd  matrix;
         matrix *= osg::Matrixd::rotate(vehicles_ext[i].attitude.x(), osg::Vec3d(1.0, 0.0, 0.0));
         matrix *= osg::Matrixd::rotate(-vehicles_ext[i].attitude.z(), osg::Vec3d(0.0, 0.0, 1.0));
         matrix *= osg::Matrixd::translate(vehicles_ext[i].position);
-*/
+        vehicles_ext[i].transform->setMatrix(matrix);
+
+/*      // не работает на уклонах
         osg::Matrixd m1 = osg::Matrixd::translate(vehicles_ext[i].position);
         osg::Matrixd m2(vehicles_ext[i].right.x(), -vehicles_ext[i].orth.x(), vehicles_ext[i].up.x(), 0.0,
                         -vehicles_ext[i].right.y(), vehicles_ext[i].orth.y(), vehicles_ext[i].up.y(), 0.0,
                         vehicles_ext[i].right.z(),  vehicles_ext[i].orth.z(), vehicles_ext[i].up.z(), 0.0,
                         0.0, 0.0, 0.0, 1.0);
-
         vehicles_ext[i].transform->setMatrix(m2 * m1);
+*/
 
         // Model animations update
         for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
@@ -547,8 +548,8 @@ void TrainExteriorHandler::moveCamera(osgViewer::Viewer *viewer, float delta_tim
 
     // Положение для камер сопровождения сбоку привязываем только к первой ПЕ
     // при этом игнорируем оринтацию ПЕ - переворачиваем её вектор обратно
-    cp.viewer_pos = vehicles_ext[0].position
-                    + vehicles_ext[0].orth * vehicles_ext[0].orientation * settings.stat_cam_shift;
+    cp.viewer_pos = vehicles_ext[cur_vehicle].position
+                    + vehicles_ext[cur_vehicle].orth * vehicles_ext[cur_vehicle].orientation * settings.stat_cam_shift;
 
     cp.front = vehicles_ext[static_cast<size_t>(cur_vehicle)].orth;
     cp.right = vehicles_ext[static_cast<size_t>(cur_vehicle)].right;
