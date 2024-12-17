@@ -99,10 +99,7 @@ private:
     /// Camera position at previous frame
     osg::Vec3f prev_camera_pos = {0.0f, 0.0f, 0.0f};
 
-    /// Time stamp of previous frame
-    double prev_time = 0.0;
-
-    /// Time between current frame and previous data receiving
+    /// Time stamp of current frame
     double ref_time = 0.0;
 
     /// Time stamp of previous display update
@@ -121,10 +118,15 @@ private:
     /// Info about train's vehicles exterior
     std::vector<vehicle_exterior_t> vehicles_ext;
 
+    enum {DATA_ARRAY_SIZE = 5};
     /// Data about vehicles positions, received from server
-    std::array<simulator_update_pos_t, 2> update_pos_data;
+    std::array<simulator_update_pos_t, DATA_ARRAY_SIZE> update_pos_data;
     short new_data = -1;
+    short delay_data = -1;
+    short cur_data = -1;
     short old_data = -1;
+    short unused_data = -1;
+    double time_difference = 0.0;
 
     /// Debug strings for controlled and current vehicles
     simulator_vehicle_controlled_update_t vehicle_controlled;
@@ -141,8 +143,8 @@ private:
     /// Animations list
     std::vector<AnimationManager *> anim_managers;
 
-    /// Moving train along track
-    void moveTrain(double ref_time, const std::array<simulator_update_pos_t, 2> pos_data);
+    /// Moving vehicles
+    void moveTrain();
 /*
     /// Processing data from server
     void updatePosData(double &ref_time);
