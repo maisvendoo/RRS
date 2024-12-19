@@ -127,6 +127,7 @@ private:
     short old_data = -1;
     short unused_data = -1;
     double time_difference = 0.0;
+    double settings_delay = 0.17;
 
     /// Debug strings for controlled and current vehicles
     simulator_vehicle_controlled_update_t vehicle_controlled;

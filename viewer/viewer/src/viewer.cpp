@@ -290,6 +290,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
         cfg.getValue(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
         cfg.getValue(secName, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
+        cfg.getValue(secName, "ClientDelay", settings.client_delay);
 
         secName = "Viewer";
 

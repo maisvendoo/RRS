@@ -37,6 +37,8 @@ struct settings_t
     int vehicles_state_update_interval;
     /// Interval for vehicle controlled debug strings update, ms
     int vehicle_controled_update_interval;
+    /// Client delay for smoothing network's delays
+    int client_delay;
     /// Route directory name
     std::string     route_dir_name;
     /// Route directory
@@ -139,6 +141,7 @@ struct settings_t
         : vehicles_pos_update_interval(70)
         , vehicles_state_update_interval(100)
         , vehicle_controled_update_interval(70)
+        , client_delay(100)
         , route_dir_name("")
         , route_dir_full_path("")
         , x(50)

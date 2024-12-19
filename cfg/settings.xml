@@ -13,6 +13,9 @@
 
 		<!-- Интервал обновления отладочной строки, мс -->
 		<VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
+
+		<!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов -->
+		<ClientDelay>100</ClientDelay>
 	</Client>
 	<Viewer>
 		<posX>50</posX>

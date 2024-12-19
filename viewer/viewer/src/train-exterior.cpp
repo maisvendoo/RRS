@@ -43,6 +43,7 @@ TrainExteriorHandler::TrainExteriorHandler(settings_t settings,
     , settings(settings)
     , sound_manager(sm)
 {
+    settings_delay = (settings.vehicle_controled_update_interval + settings.client_delay) / 1000.0;
 /*
     memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
     if (memory_sim_update.attach(QSharedMemory::ReadOnly))
@@ -373,18 +374,32 @@ void TrainExteriorHandler::moveTrain()
 
     while (is_update)
     {
-        if ((client_time < update_pos_data[cur_data].time) || (cur_data == new_data))
-            break;
+        // Check for use the latest data already
+        if (cur_data == delay_data)
+        {
+            delay_data = new_data;
+
+            if (cur_data == delay_data)
+            {
+                // No new data, the latest data is already used
+                break;
+            }
+        }
 
         // Update index
-        unused_data = old_data;
+        unused_data = (cur_data == 0) ? (DATA_ARRAY_SIZE - 1) : (cur_data - 1);
         old_data = cur_data;
         cur_data = delay_data;
         delay_data = new_data;
+
+        if (client_time < update_pos_data[cur_data].time)
+        {
+            break;
+        }
     }
-    double dt = update_pos_data[cur_data].time - update_pos_data[old_data].time;
 
     // Interframe coordinate
+    double dt = update_pos_data[cur_data].time - update_pos_data[old_data].time;
     double t = (client_time - update_pos_data[old_data].time) / dt;
     double k = (1.0 - t);
 /*
@@ -775,7 +790,7 @@ void TrainExteriorHandler::loadDisplays(const std::string &configDir,
 
     if (displays_cfg.isOpenned())
     {
-        OSG_INFO << "Loaded file " << cfg_path << std::endl;
+        OSG_FATAL << "Loaded file " << cfg_path << std::endl;
     }
     else
     {
@@ -836,7 +851,7 @@ void TrainExteriorHandler::loadDisplays(const std::string &configDir,
             }
             else
             {
-                OSG_INFO << "Loaded display module " << module_path << std::endl;
+                OSG_FATAL << "Loaded display module " << module_path << std::endl;
             }
 
             dc->display->setConfigDir(QString(vehicle_config_dir.c_str()));
@@ -898,15 +913,29 @@ void TrainExteriorHandler::slotGetVehiclesPosData(QByteArray &data)
 {
     if (unused_data < 0)
     {
+        is_pos_updated = false;
+
         if (new_data < 0)
         {
             // Первое получение данных
-            new_data = 0;
+            new_data = DATA_ARRAY_SIZE - 3;
             update_pos_data[new_data].deserialize(data);
-            is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles_ext.size());
-            if (is_pos_updated)
+            if (update_pos_data[new_data].vehicles.size() == vehicles_ext.size())
             {
                 time_difference = update_pos_data[new_data].time - ref_time;
+
+                QString msg = "FIRST UPDATE. Client:t=";
+                msg += QString::number(ref_time + time_difference, 'f', 4);
+                msg += "(";
+                msg += QString::number(ref_time, 'f', 4);
+                msg += "+";
+                msg += QString::number(time_difference, 'f', 4);
+                msg += ")data:n(";
+                msg += QString::number(new_data);
+                msg += ")t=";
+                msg += QString::number(update_pos_data[new_data].time, 'f', 4);
+                OSG_FATAL << msg.toStdString() << std::endl;
+                std::cout << msg.toStdString() << std::endl;
             }
             else
             {
@@ -919,13 +948,25 @@ void TrainExteriorHandler::slotGetVehiclesPosData(QByteArray &data)
         {
             // Второе получение данных
             delay_data = new_data;
-            ++new_data;
+            new_data = DATA_ARRAY_SIZE - 2;
             update_pos_data[new_data].deserialize(data);
-            is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles_ext.size());
-            if (is_pos_updated)
+            if (update_pos_data[new_data].vehicles.size() == vehicles_ext.size())
             {
                 time_difference = time_difference / 2.0 +
                     (update_pos_data[new_data].time - ref_time) / 2.0;
+
+                QString msg = "SECOND UPDATE. Client:t=";
+                msg += QString::number(ref_time + time_difference, 'f', 4);
+                msg += "(";
+                msg += QString::number(ref_time, 'f', 4);
+                msg += "+";
+                msg += QString::number(time_difference, 'f', 4);
+                msg += ")data:n(";
+                msg += QString::number(new_data);
+                msg += ")t=";
+                msg += QString::number(update_pos_data[new_data].time, 'f', 4);
+                OSG_FATAL << msg.toStdString() << std::endl;
+                std::cout << msg.toStdString() << std::endl;
             }
             else
             {
@@ -936,23 +977,33 @@ void TrainExteriorHandler::slotGetVehiclesPosData(QByteArray &data)
         }
 
         // Третье получение данных
-        short prev = new_data;
-        ++new_data;
+        new_data = DATA_ARRAY_SIZE - 1;
         update_pos_data[new_data].deserialize(data);
 
         is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles_ext.size());
         if (is_pos_updated)
         {
-            unused_data = delay_data;
-            old_data = delay_data;
-            cur_data = prev;
-            delay_data = prev;
+            unused_data = DATA_ARRAY_SIZE - 4;
+            old_data = DATA_ARRAY_SIZE - 3;
+            cur_data = DATA_ARRAY_SIZE - 2;
+            delay_data = DATA_ARRAY_SIZE - 1;
 
             time_difference = time_difference * 2.0 / 3.0 +
                 (update_pos_data[new_data].time - ref_time) / 3.0 -
-                settings.vehicles_pos_update_interval / 750.0;
+                settings_delay;
 
-            ref_time = 0.0;
+            QString msg = "THIRD UPDATE. Client:t=";
+            msg += QString::number(ref_time + time_difference, 'f', 4);
+            msg += "(";
+            msg += QString::number(ref_time, 'f', 4);
+            msg += "+";
+            msg += QString::number(time_difference, 'f', 4);
+            msg += ")data:n(";
+            msg += QString::number(new_data);
+            msg += ")t=";
+            msg += QString::number(update_pos_data[new_data].time, 'f', 4);
+            OSG_FATAL << msg.toStdString() << std::endl;
+            std::cout << msg.toStdString() << std::endl;
         }
         else
         {
@@ -969,6 +1020,12 @@ void TrainExteriorHandler::slotGetVehiclesPosData(QByteArray &data)
         new_data = 0;
     }
 
+    // Не даём обновлениям догнать цикл сзади
+    if (new_data == old_data)
+    {
+        new_data = unused_data;
+    }
+
     update_pos_data[new_data].deserialize(data);
 
     is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles_ext.size());
@@ -977,7 +1034,7 @@ void TrainExteriorHandler::slotGetVehiclesPosData(QByteArray &data)
     {
         time_difference = time_difference * 0.95 +
               ( update_pos_data[new_data].time - ref_time -
-                settings.vehicles_pos_update_interval / 750.0 ) * 0.05;
+                settings_delay ) * 0.05;
     }
 }
 
