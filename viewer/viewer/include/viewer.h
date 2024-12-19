@@ -33,6 +33,8 @@
 
 #include    <traffic-lights-handler.h>
 
+#include    <imgui-widgets-handler.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -87,6 +89,8 @@ protected:
 
     /// Process traffic lights (signals) models
     osg::ref_ptr<TrafficLightsHandler> traffic_lights_handler = new TrafficLightsHandler;
+
+    osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = nullptr;
 
     /// Initialization
     bool init(int argc, char *argv[]);   

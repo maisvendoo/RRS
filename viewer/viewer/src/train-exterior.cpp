@@ -318,7 +318,8 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
 
     for (int i = 0; i < count; ++i)
     {
-        OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " load" << std::endl;
+        OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " loading" << std::endl;
+        std::cout << "Vehicle " << i + 1 << " / " << count << " loading" << std::endl;
         QString cfg_dir_tmp = info_data.vehicles[i].vehicle_config_dir;
         std::string cfg_dir = cfg_dir_tmp.toStdString();
 
@@ -330,12 +331,15 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
         if (!vehicle_model.valid())
         {
             OSG_FATAL << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
+            std::cout << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
             vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
             vehicles_ext.push_back(vehicle_ext);
             OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
+            std::cout << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
             continue;
         }
         OSG_FATAL << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
+        std::cout << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
 
         // Load cabine model
         osg::ref_ptr<osg::Node> cabine;
@@ -360,6 +364,7 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
         vehicles_ext.push_back(vehicle_ext);
         trainExterior->addChild(vehicle_ext.transform.get());
         OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;
+        std::cout << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;
     }
 }
 

@@ -39,7 +39,11 @@ private:
 
     bool is_controlled = false;
 
+    bool is_show_loading_status = false;
+
     QString debugMsg = "";
+
+    QString loadingMsg = "";
 
     void showQuitDialog(bool &is_show);
 
@@ -47,9 +51,13 @@ private:
 
     void showUncontrolledState();
 
+    void showLoadingStatus();
+
 public slots:
 
     void setStatusBar(const QString &msg);
+
+    void setLoadingStatus(const QString &msg);
 
     void receiveControlledState(bool state);
 };

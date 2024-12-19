@@ -16,6 +16,53 @@ ImGuiWidgetsHandler::ImGuiWidgetsHandler()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool ImGuiWidgetsHandler::handle(const osgGA::GUIEventAdapter &ea,
+                                 osgGA::GUIActionAdapter &aa)
+{
+    return OSGImGuiHandler::handle(ea, aa);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::drawUI()
+{
+    ImGuiIO &io = ImGui::GetIO();
+
+    is_modified_key = io.KeysDown[ImGuiKey_LeftShift] || io.KeysDown[ImGuiKey_RightShift]
+                      || io.KeysDown[ImGuiKey_LeftCtrl] || io.KeysDown[ImGuiKey_RightCtrl]
+                      || io.KeysDown[ImGuiKey_LeftAlt] || io.KeysDown[ImGuiKey_RightAlt];
+
+    if (io.KeysDown[ImGuiKey_Escape] && !is_Esc)
+    {
+        is_show_quit_dialog = !is_show_quit_dialog;
+    }
+
+    is_Esc = io.KeysDown[ImGuiKey_Escape];
+
+    if (is_show_quit_dialog)
+        showQuitDialog(is_show_quit_dialog);
+
+    if (io.KeysDown[ImGuiKey_F1] && !is_F1 && !is_modified_key)
+    {
+        is_show_debug_log = !is_show_debug_log;
+    }
+
+    is_F1 = io.KeysDown[ImGuiKey_F1];
+
+    if (is_show_debug_log)
+        showDebugLog();
+
+    if (!is_controlled)
+        showUncontrolledState();
+
+    if (is_show_loading_status)
+        showLoadingStatus();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
 {
     int w = 400;
@@ -52,7 +99,6 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
     }    
 
     ImGui::End();
-
 }
 
 //------------------------------------------------------------------------------
@@ -118,6 +164,32 @@ void ImGuiWidgetsHandler::showUncontrolledState()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ImGuiWidgetsHandler::showLoadingStatus()
+{
+    int w = 400;
+    int h = 150;
+
+    int cx = w / 2;
+    int cy = h / 2;
+
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiIO &io = ImGui::GetIO();
+
+    ImVec2 content_size = io.DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Загрузка... Пожалуйста, подождите...");
+    ImGui::PopStyleColor();
+    ImGui::Text(u8"%s", loadingMsg.toStdString().c_str());
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ImGuiWidgetsHandler::setStatusBar(const QString &msg)
 {
     debugMsg = msg;
@@ -134,43 +206,8 @@ void ImGuiWidgetsHandler::receiveControlledState(bool state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ImGuiWidgetsHandler::handle(const osgGA::GUIEventAdapter &ea,
-                                 osgGA::GUIActionAdapter &aa)
+void ImGuiWidgetsHandler::setLoadingStatus(const QString &msg)
 {
-    return OSGImGuiHandler::handle(ea, aa);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ImGuiWidgetsHandler::drawUI()
-{
-    ImGuiIO &io = ImGui::GetIO();
-
-    is_modified_key = io.KeysDown[ImGuiKey_LeftShift] || io.KeysDown[ImGuiKey_RightShift]
-                   || io.KeysDown[ImGuiKey_LeftCtrl] || io.KeysDown[ImGuiKey_RightCtrl]
-                   || io.KeysDown[ImGuiKey_LeftAlt] || io.KeysDown[ImGuiKey_RightAlt];
-
-    if (io.KeysDown[ImGuiKey_Escape] && !is_Esc)
-    {
-        is_show_quit_dialog = !is_show_quit_dialog;
-    }
-
-    is_Esc = io.KeysDown[ImGuiKey_Escape];
-
-    if (is_show_quit_dialog)
-        showQuitDialog(is_show_quit_dialog);
-
-    if (io.KeysDown[ImGuiKey_F1] && !is_F1 && !is_modified_key)
-    {
-        is_show_debug_log = !is_show_debug_log;
-    }
-
-    is_F1 = io.KeysDown[ImGuiKey_F1];
-
-    if (is_show_debug_log)
-        showDebugLog();
-
-    if (!is_controlled)
-        showUncontrolledState();
+    loadingMsg = msg;
+    is_show_loading_status = (!loadingMsg.isEmpty());
 }

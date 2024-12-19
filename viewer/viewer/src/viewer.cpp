@@ -44,8 +44,6 @@
 
 #include    <QObject>
 
-#include    <imgui-widgets-handler.h>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -151,14 +149,13 @@ int RouteViewer::run()
     viewer.setRealizeOperation(new ImGuiInitOperation);
 
     // Обработка интерфейса ImGUI
-    osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = new ImGuiWidgetsHandler;
+    imguiWidgetsHandler = new ImGuiWidgetsHandler;
 
     QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::setStatusBar);
 
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendControlledState,
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
-
 
     viewer.addEventHandler(imguiWidgetsHandler.get());
 
@@ -678,6 +675,8 @@ void RouteViewer::slotRecvLogMessage(QString msg)
 {
     OSG_FATAL << msg.toStdString() << std::endl;
     std::cout << msg.toStdString() << std::endl;
+
+    imguiWidgetsHandler->setLoadingStatus(msg);
 }
 
 //------------------------------------------------------------------------------
@@ -704,6 +703,9 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
         return;
     }
     is_route = true;
+
+    QString msg = QString("Загрузка маршрута...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
@@ -735,6 +737,9 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
         return;
     }
     is_signals = true;
+
+    QString msg = QString("Загрузка светофоров...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
 
     traffic_lights_handler->deserialize(sig_data);
 
@@ -774,11 +779,18 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     simulator_vehicles_info_t vehicles_info;
     vehicles_info.deserialize(data);
-    OSG_FATAL << "Get info about " << vehicles_info.vehicles.size() << " vehicles" << std::endl;
-    std::cout << "Get info about " << vehicles_info.vehicles.size() << " vehicles" << std::endl;
+    int count = vehicles_info.vehicles.size();
+    OSG_FATAL << "Get info about " << count << " vehicles" << std::endl;
+    std::cout << "Get info about " << count << " vehicles" << std::endl;
+
+    QString msg = QString("Загрузка подвижного состава...").arg(count);
+    imguiWidgetsHandler->setLoadingStatus(msg);
 
     if (loadVehicles(vehicles_info))
     {
+        msg = QString("");
+        imguiWidgetsHandler->setLoadingStatus(msg);
+
         connect(tcp_client, &TcpClient::setVehiclesPositions,
                 train_ext_handler, &TrainExteriorHandler::slotGetVehiclesPosData, Qt::DirectConnection);
 
