@@ -69,12 +69,6 @@ EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
     blink_relay->read_config("combine-relay");
     blink_relay->setInitContactState(BLINK_GREEN, true);
     blink_relay->setInitContactState(BLINK_YELLOW, false);
-
-    reset_alsn.reset();
-    set_alsn.reset();
-    free_route.reset();
-
-    connect(allow_alsn_timer, &Timer::process, this, &EnterSignal::slotAllowAlsnTimer);
 }
 
 //------------------------------------------------------------------------------
@@ -113,8 +107,6 @@ void EnterSignal::step(double t, double dt)
 
     blink_timer->step(t, dt);
     blink_relay->step(t, dt);
-
-    allow_alsn_timer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -196,12 +188,6 @@ Signal * EnterSignal::route_control()
     Signal *next_signal = Q_NULLPTR;
 
     is_RCR_ON = is_route_free(conn, &next_signal);
-
-    // Взводим тригер запрета АЛСН, если занятость маршрута меняется со
-    // свободной на занятую (занимаем мы, либо предыдущий поезд осаживается)
-    reset_alsn.set(!is_RCR_ON);
-
-    free_route.set(is_RCR_ON);
 
     if (is_RCR_ON != is_RCR_ON_old)
     {
@@ -429,42 +415,10 @@ void EnterSignal::relay_control()
     // Контроль мигания
     blink_control(next_signal);
 
-    if (!lens_state[RED_LENS])
+    if (is_RCR_ON && (next_signal != Q_NULLPTR))
     {
-        set_alsn.set();
+        next_signal->allowTransmitALSN(!lens_state[RED_LENS]);
     }
-    else
-    {
-        if (!is_RCR_ON)
-        {
-            allow_alsn_timer->start();
-        }
-    }
-
-    // Если маршрут занят
-    if (!is_RCR_ON)
-    {
-        if (!reset_alsn.getState())
-        {
-            set_alsn.set();
-        }
-    }
-    else
-    {
-        reset_alsn.reset();
-
-        if (free_route.getState())
-        {
-            set_alsn.reset();
-            free_route.reset();
-        }
-    }
-
-    if (next_signal != Q_NULLPTR)
-    {
-        next_signal->allowTransmitALSN(set_alsn.getState());
-    }
-
 
     alsn_control();
 }
@@ -695,7 +649,7 @@ void EnterSignal::slotOpenTimer()
     is_open_button_pressed = false;
     open_timer->stop();
 
-    Journal::instance()->info("Released open button");
+    Journal::instance()->info("Released open button for signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -706,7 +660,7 @@ void EnterSignal::slotCloseTimer()
     is_close_button_nopressed = true;
     close_timer->stop();
 
-    Journal::instance()->info("Released close button");
+    Journal::instance()->info("Released close button for signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -720,21 +674,12 @@ void EnterSignal::slotOnBlinkTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EnterSignal::slotAllowAlsnTimer()
-{
-    set_alsn.set();
-    allow_alsn_timer->stop();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void EnterSignal::slotPressOpen()
 {
     is_open_button_pressed = true;
     open_timer->start();
 
-    Journal::instance()->info("Pressed open button");
+    Journal::instance()->info("Pressed open button for signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -745,5 +690,5 @@ void EnterSignal::slotPressClose()
     is_close_button_nopressed = false;
     close_timer->start();
 
-    Journal::instance()->info("Pressed close button");
+    Journal::instance()->info("Pressed close button for signal " + letter);
 }

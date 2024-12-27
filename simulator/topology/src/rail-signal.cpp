@@ -18,6 +18,8 @@ Signal::Signal(QObject *parent) : Device(parent)
 
     alsn_G_relay->read_config("combine-relay");
     alsn_G_relay->setInitContactState(ALSN_G, false);
+
+    connect(alsn_allow_timer, &Timer::process, this, &Signal::slotAllowTransmit);
 }
 
 //------------------------------------------------------------------------------
@@ -38,6 +40,18 @@ void Signal::step(double t, double dt)
     alsn_RY_relay->step(t, dt);
     alsn_Y_relay->step(t, dt);
     alsn_G_relay->step(t, dt);
+
+    // Если АЛСН не запрещена, с задержкой по 10-секундному таймеру включаем трансмиттер
+    if (is_alsn_allow && !is_asln_transmit)
+    {
+        if (!alsn_allow_timer->isStarted())
+            alsn_allow_timer->start();
+
+        alsn_allow_timer->step(t, dt);
+    }
+
+    // Сбрасываем запрет АЛСН
+    is_alsn_allow = true;
 }
 
 //------------------------------------------------------------------------------
@@ -126,6 +140,15 @@ bool Signal::calcPosition(dvec3 &pos)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Signal::allowTransmitALSN(bool is_allow)
+{
+    is_alsn_allow = is_allow;
+    is_asln_transmit = is_allow;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Signal::load_config(CfgReader &cfg)
 {
 
@@ -199,4 +222,13 @@ void Signal::slotRecvLineVoltage(double U_line)
 void Signal::slotRecvSideVoltage(double U_side)
 {
     this->U_side = U_side;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::slotAllowTransmit()
+{
+    alsn_allow_timer->stop();
+    is_asln_transmit = true;
 }
