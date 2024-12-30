@@ -97,13 +97,16 @@ private:
     osg::ref_ptr<osg::Group> trainExterior = new osg::Group;
 
     /// Camera position at previous frame
-    osg::Vec3f prev_camera_pos = {0.0f, 0.0f, 0.0f};
+    osg::Vec3d prev_camera_pos = {0.0, 0.0, 0.0};
 
     /// Time stamp of current frame
     double ref_time = 0.0;
 
     /// Time stamp of previous display update
     double prev_time_display_upd = 0.0;
+
+    /// Previous frame's draw time
+    double prew_delta_time = 1.0;
 
     ///
     bool is_displays_locked = false;
@@ -152,8 +155,11 @@ private:
 */
     void updateDebugString();
 
+    /// Move sound listener
+    void moveListener(osgViewer::Viewer *viewer, float delta_time);
+
     /// Move camera
-    void moveCamera(osgViewer::Viewer *viewer, float delta_time);
+    void moveCamera();
 
     /// Load vehicle sounds
     void loadSounds(const std::string &configDir, const std::string &configName,
