@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    a.setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
+
     QTranslator translator;
 
     const QStringList uiLanguages = QLocale::system().uiLanguages();
