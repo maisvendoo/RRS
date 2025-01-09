@@ -14,36 +14,10 @@
 //------------------------------------------------------------------------------
 class FILESYSTEM_EXPORT FileSystem
 {
-public:    
+public:
 
     /// Get instance byt filesystem singleton
-    static FileSystem &getInstance()
-    {
-        static FileSystem instance;
-
-        std::string workDir = QDir::currentPath().toStdString();
-        std::string tmp = instance.getLevelUpDirectory(workDir, 1);
-        instance.setBinaryDir(workDir);
-        instance.setRouteRootDir(tmp + "routes");
-        instance.setConfigDir(tmp + "cfg");
-        instance.setLogsDir(tmp + "logs");
-        instance.setLibraryDir(tmp + "lib");
-        instance.setTrainsDir(instance.getConfigDir() + instance.separator() + "trains");
-        instance.setModulesDir(tmp + "modules");
-        instance.setVehiclesDir(instance.getConfigDir() + instance.separator() + "vehicles");
-        instance.setCouplingsDir(instance.getConfigDir()+ instance.separator() + "couplings");
-        instance.setDevicesDir(instance.getConfigDir()+ instance.separator() + "devices");
-        instance.setDataDir(tmp + "data");
-        instance.setVehicleModelsDir(instance.combinePath(instance.getDataDir(), "models"));
-        instance.setVehicleTexturesDir(instance.combinePath(instance.getDataDir(), "textures"));
-        instance.setPluginsDir(tmp + "plugins");
-        instance.setScreenshotsDir(tmp + "screenshots");
-        instance.setFontsDir(tmp + "fonts");
-        instance.setSoundsDir(instance.combinePath(instance.getDataDir(), "sounds"));
-        instance.setThemeDir(tmp + "themes");
-
-        return instance;
-    }    
+    static FileSystem &getInstance();
 
     /// Get directory by num_levels levels up
     std::string getLevelUpDirectory(std::string path, int num_levels);
@@ -51,7 +25,7 @@ public:
     std::string getNativePath(const std::string &path);
 
     /// Get route directory path
-    std::string getRouteRootDir() const;    
+    std::string getRouteRootDir() const;
 
     std::string getConfigDir() const;
 
@@ -119,7 +93,7 @@ private:
 
     std::string themeDir;
 
-    FileSystem() {}
+    FileSystem();
     FileSystem(const FileSystem &) = delete;
     FileSystem &operator=(FileSystem &) = delete;
 
