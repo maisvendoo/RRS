@@ -176,14 +176,14 @@ struct tcp_simulator_update_t
         stream << controlled_vehicle;
         stream << controlledDebugMeg;
 
-        stream << trains.size();
+        stream << (quint32)trains.size();
 
         for (auto train : trains)
         {
             stream << train.serialize();
         }
 
-        stream << vehicles.size();
+        stream << (quint32)vehicles.size();
 
         for (auto vehicle : vehicles)
         {
@@ -205,7 +205,7 @@ struct tcp_simulator_update_t
         stream >> controlled_vehicle;
         stream >> controlledDebugMeg;
 
-        size_t num;
+        quint32 num;
         stream >> num;
 
         trains.clear();

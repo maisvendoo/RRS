@@ -85,7 +85,7 @@ typedef LocoCrane* (*GetLocoCrane)();
 //
 //------------------------------------------------------------------------------
 #define GET_LOCO_CRANE(ClassName) \
-    extern "C" Q_DECL_EXPORT LocoCrane *getLocoCrane() \
+    extern "C" DEVICE_EXPORT LocoCrane *getLocoCrane() \
     { \
         return new (ClassName) (); \
     }
@@ -93,6 +93,6 @@ typedef LocoCrane* (*GetLocoCrane)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT LocoCrane *loadLocoCrane(QString lib_path);
+extern "C" DEVICE_EXPORT LocoCrane *loadLocoCrane(QString lib_path);
 
 #endif // LOCO_CRANE_H

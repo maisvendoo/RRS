@@ -52,7 +52,7 @@ typedef AirDistributor* (*GetAirDistributor)();
 //
 //------------------------------------------------------------------------------
 #define GET_AIR_DISTRIBUTOR(ClassName) \
-    extern "C" Q_DECL_EXPORT AirDistributor *getAirDistributor() \
+    extern "C" DEVICE_EXPORT AirDistributor *getAirDistributor() \
     { \
         return new (ClassName) (); \
     }
@@ -60,6 +60,6 @@ typedef AirDistributor* (*GetAirDistributor)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT AirDistributor *loadAirDistributor(QString lib_path);
+extern "C" DEVICE_EXPORT AirDistributor *loadAirDistributor(QString lib_path);
 
 #endif // AIR_DISTRIBUTOR_H

@@ -56,7 +56,7 @@ typedef Joint* (*GetJoint)();
 //
 //------------------------------------------------------------------------------
 #define GET_JOINT(ClassName) \
-    extern "C" Q_DECL_EXPORT Joint *getJoint() \
+    extern "C" DEVICE_EXPORT Joint *getJoint() \
     {\
         return new (ClassName)(); \
     }
@@ -68,6 +68,6 @@ typedef Joint* (*GetJoint)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT Joint *loadJoint(QString lib_path);
+extern "C" DEVICE_EXPORT Joint *loadJoint(QString lib_path);
 
 #endif // JOINT_H

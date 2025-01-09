@@ -20,7 +20,7 @@ enum InterfaceDeviceMessageType
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT VirtualInterfaceDevice : public QObject
+class VirtualInterfaceDevice : public QObject
 {
     Q_OBJECT
 
@@ -63,7 +63,7 @@ protected:
 typedef VirtualInterfaceDevice* (*GetInterfaceDevice)();
 
 #define GET_INTERFACE_DEVICE(ClassName) \
-    extern "C" Q_DECL_EXPORT VirtualInterfaceDevice *getInterfaceDevice() \
+    extern "C" DEVICE_EXPORT VirtualInterfaceDevice *getInterfaceDevice() \
     { \
         return new (ClassName) (); \
     }
@@ -71,6 +71,6 @@ typedef VirtualInterfaceDevice* (*GetInterfaceDevice)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT VirtualInterfaceDevice *loadInterfaceDevice(QString lib_path);
+extern "C" DEVICE_EXPORT VirtualInterfaceDevice *loadInterfaceDevice(QString lib_path);
 
 #endif // VIRTUAL_INTERFACE_DEVICE_H

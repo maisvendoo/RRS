@@ -32,7 +32,7 @@ private:
     void controlSignalsProcess();
 
     /// Передача данных в Modbus
-    void feedbackSignalsProcess();    
+    void feedbackSignalsProcess();
 };
 
 #endif // MODBUS_H

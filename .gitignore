@@ -4,3 +4,4 @@
 *.txt.user.*
 *.bak
 
+build/

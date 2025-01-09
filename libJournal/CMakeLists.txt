@@ -22,7 +22,10 @@ find_package(Qt6 COMPONENTS Core REQUIRED)
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB CPP_SOURCES "./src/*.cpp")
-file (GLOB C_SOURCES "./src/*.c")
+
+if(WIN32)
+    file (GLOB C_SOURCES "./src/*.c")
+endif()
 
 # Компиляция библиотеке
 add_library (${TARGET} SHARED ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})

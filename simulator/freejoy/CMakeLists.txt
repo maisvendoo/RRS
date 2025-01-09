@@ -23,7 +23,12 @@ add_definitions(-DDEVICE_LIB)
 # Ищем зависимости Qt6
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 
-set(SFML_STATIC_LIBRARIES TRUE)
+if(WIN32)
+    set(SFML_STATIC_LIBRARIES TRUE)
+else()
+    set(SFML_STATIC_LIBRARIES FALSE)
+endif()
+
 find_package(SFML COMPONENTS system window REQUIRED)
 
 # Пути к заголовкам и сорцам

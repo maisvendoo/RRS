@@ -397,7 +397,7 @@ typedef Vehicle* (*GetVehicle)();
 //
 //------------------------------------------------------------------------------
 #define GET_VEHICLE(ClassName) \
-    extern "C" Q_DECL_EXPORT Vehicle *getVehicle() \
+    extern "C" VEHICLE_EXPORT Vehicle *getVehicle() \
     {\
         return new (ClassName)(); \
     }
@@ -409,6 +409,6 @@ typedef Vehicle* (*GetVehicle)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT Vehicle *loadVehicle(QString lib_path);
+extern "C" VEHICLE_EXPORT Vehicle *loadVehicle(QString lib_path);
 
 #endif // VEHICLE_H

@@ -23,7 +23,10 @@
 #include    <QSpinBox>
 #include    <QDoubleSpinBox>
 #include    <QTextStream>
-#include <synchapi.h>
+#include <thread>
+// #include <synchapi.h>
+
+
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
@@ -87,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
 
     connect(ui->spScreenNumber, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));   
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
 
     connect(ui->pbCancel, &QPushButton::released, this, &MainWindow::slotCancelGraphSettings);
     connect(ui->pbApply, &QPushButton::released, this, &MainWindow::slotApplyGraphSettings);
@@ -257,7 +260,7 @@ void MainWindow::startSimulator()
 void MainWindow::startViewer()
 {
     FileSystem &fs = FileSystem::getInstance();
-    QString viewerPath = VIEWER_NAME + EXE_EXP;    
+    QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     viewerProc.setStandardOutputFile("../logs/viewer-start.log");
@@ -289,7 +292,7 @@ void MainWindow::loadTheme()
         std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
         QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
 
-        this->setStyleSheet(style_sheet);        
+        this->setStyleSheet(style_sheet);
     }
 }
 
@@ -302,7 +305,7 @@ void MainWindow::onRouteSelection()
 
     ui->ptRouteDescription->clear();
     selectedRouteDirName = routes_info[item_idx].route_dir_name;
-    ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);    
+    ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
 
     loadTrainPositions(routes_info[item_idx].route_dir_full_path);
 
@@ -347,7 +350,7 @@ void MainWindow::onStartPressed()
         return;
     }
 
-    startSimulator();    
+    startSimulator();
 }
 
 //------------------------------------------------------------------------------
@@ -357,7 +360,9 @@ void MainWindow::onSimulatorStarted()
 {
     ui->btnStart->setEnabled(false);
 
-    Sleep(500);
+    // Sleep(500);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     startViewer();
 }
@@ -746,7 +751,7 @@ void MainWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui
     ui->dspNear->setValue(findSetting(ZNEAR, fd_list).second.toDouble());
     ui->dspFar->setValue(findSetting(ZFAR, fd_list).second.toDouble());
 
-    ui->spViewDist->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());    
+    ui->spViewDist->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());
 
     ui->pbApply->setEnabled(false);
 }
@@ -807,7 +812,7 @@ void MainWindow::applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
     fd_list[idx] = QPair<QString, QVariant>(ZFAR, ui->dspFar->value());
 
     findSetting(VIEW_DIST, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->spViewDist->value());   
+    fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->spViewDist->value());
 }
 
 //------------------------------------------------------------------------------
@@ -851,11 +856,11 @@ void MainWindow::loadTrainPositions(const QString &routeDir)
         tp.trajectory_name = tokens[1];
         tp.direction = tokens[2].toInt();
         tp.traj_coord = tokens[3].toDouble();
-        tp.railway_coord = tokens[4].toDouble();        
+        tp.railway_coord = tokens[4].toDouble();
 
         if (tp.direction > 0)
         {
-            fwd_train_positions.push_back(tp);            
+            fwd_train_positions.push_back(tp);
         }
         else
         {

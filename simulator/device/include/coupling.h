@@ -78,7 +78,7 @@ typedef Coupling* (*GetCoupling)();
 //
 //------------------------------------------------------------------------------
 #define GET_COUPLING(ClassName) \
-    extern "C" Q_DECL_EXPORT Coupling *getCoupling() \
+    extern "C" DEVICE_EXPORT Coupling *getCoupling() \
     {\
         return new (ClassName)(); \
     }
@@ -90,6 +90,6 @@ typedef Coupling* (*GetCoupling)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT Coupling *loadCoupling(QString lib_path);
+extern "C" DEVICE_EXPORT Coupling *loadCoupling(QString lib_path);
 
 #endif // COUPLING_H

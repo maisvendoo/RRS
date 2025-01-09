@@ -69,7 +69,7 @@ typedef AutoTrainStop* (*GetAutoTrainStop)();
 //
 //------------------------------------------------------------------------------
 #define GET_AUTO_TRAIN_STOP(ClassName) \
-    extern "C" Q_DECL_EXPORT AutoTrainStop *getAutoTrainStop() \
+    extern "C" DEVICE_EXPORT AutoTrainStop *getAutoTrainStop() \
     { \
         return new (ClassName) (); \
     }
@@ -77,6 +77,6 @@ typedef AutoTrainStop* (*GetAutoTrainStop)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT AutoTrainStop *loadAutoTrainStop(QString lib_path);
+extern "C" DEVICE_EXPORT AutoTrainStop *loadAutoTrainStop(QString lib_path);
 
 #endif // AUTOMATIC_TRAIN_STOP_H

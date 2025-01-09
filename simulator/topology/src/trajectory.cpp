@@ -382,7 +382,7 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
     if (rel_motion < 0.5)
     {
         pp.orth = cur_track.orth * (0.5 + rel_motion) * dir;
-        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;        
+        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;
 
         pp.right = cur_track.trav * (0.5 + rel_motion) * dir;
         pp.right += prev_track.trav * (0.5 - rel_motion) * dir;
@@ -449,7 +449,7 @@ QByteArray Trajectory::serialize()
     stream << name << len << is_busy;
 
     // кладем туда же число треков
-    stream << tracks.size();
+    stream << (quint32)tracks.size();
 
     // Последовательно сериализум треки
     for (auto track = tracks.begin(); track != tracks.end(); ++track)
@@ -655,7 +655,7 @@ void Trajectory::findTracks(double traj_coord,
 
     cur_track = tracks[idx];
     prev_track = tracks[idx - 1];
-    next_track = tracks[idx + 1];    
+    next_track = tracks[idx + 1];
 }
 
 //------------------------------------------------------------------------------

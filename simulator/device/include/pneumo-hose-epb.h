@@ -72,7 +72,7 @@ typedef PneumoHoseEPB* (*GetPneumoHoseEPB)();
 //
 //------------------------------------------------------------------------------
 #define GET_PNEUMO_HOSE_EPB(ClassName) \
-    extern "C" Q_DECL_EXPORT PneumoHoseEPB *getPneumoHoseEPB() \
+    extern "C" DEVICE_EXPORT PneumoHoseEPB *getPneumoHoseEPB() \
     {\
         return new (ClassName)(); \
     }
@@ -84,6 +84,6 @@ typedef PneumoHoseEPB* (*GetPneumoHoseEPB)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT PneumoHoseEPB *loadPneumoHoseEPB(QString lib_path);
+extern "C" DEVICE_EXPORT PneumoHoseEPB *loadPneumoHoseEPB(QString lib_path);
 
 #endif // PNEUMO_HOSE_EPB_H

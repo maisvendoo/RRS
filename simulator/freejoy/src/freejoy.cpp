@@ -41,11 +41,11 @@ bool FreeJoy::init(QString cfg_path)
     {
         ++joy_id;
 
-        if (freejoy.isConnected(joy_id))
+        if (sf::Joystick::isConnected(joy_id))
         {
             Journal::instance()->info(
               "Found control panel " +
-              QString(freejoy.getIdentification(joy_id).name.toAnsiString().c_str()));
+              QString(sf::Joystick::getIdentification(joy_id).name.toAnsiString().c_str()));
 
             break;
         }
@@ -66,7 +66,7 @@ bool FreeJoy::init(QString cfg_path)
     }
 
     // Устанавливаем бит готовности к приему сигналов с пульта
-    control_signals.analogSignal[CS_READY].setValue(1.0f);    
+    control_signals.analogSignal[CS_READY].setValue(1.0f);
 
     return true;
 }
@@ -76,12 +76,12 @@ bool FreeJoy::init(QString cfg_path)
 //------------------------------------------------------------------------------
 void FreeJoy::process()
 {
-    freejoy.update();
+    sf::Joystick::update();
 
-    pos_axisX = static_cast<int>(freejoy.getAxisPosition(joy_id, sf::Joystick::X));
-    pos_axisY = static_cast<int>(freejoy.getAxisPosition(joy_id, sf::Joystick::Y));
-    RBS_button_pressed = freejoy.isButtonPressed(joy_id, RBS_button_id);
-    release_button_pressed = freejoy.isButtonPressed(joy_id, Release_button_id);
+    pos_axisX = static_cast<int>(sf::Joystick::getAxisPosition(joy_id, sf::Joystick::Axis::X));
+    pos_axisY = static_cast<int>(sf::Joystick::getAxisPosition(joy_id, sf::Joystick::Axis::Y));
+    RBS_button_pressed = sf::Joystick::isButtonPressed(joy_id, RBS_button_id);
+    release_button_pressed = sf::Joystick::isButtonPressed(joy_id, Release_button_id);
 
     control_signals.analogSignal[CS_RBS].setValue(static_cast<float>(RBS_button_pressed));
     control_signals.analogSignal[CS_LOCO_CRANE].setValue( (pos_axisX - axis_x_min) / (axis_x_max - axis_x_min));
@@ -98,7 +98,7 @@ void FreeJoy::process()
 
     control_signals.analogSignal[CS_RELEASE_VALVE].setValue(static_cast<float>(release_button_pressed));
 
-    emit sendControlSignals(control_signals);    
+    emit sendControlSignals(control_signals);
 }
 
 //------------------------------------------------------------------------------

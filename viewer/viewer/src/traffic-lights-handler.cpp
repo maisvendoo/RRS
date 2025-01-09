@@ -72,7 +72,7 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
-    size_t data_size = 0;
+    quint32 data_size = 0;
     stream >> data_size;
 
     std::cout << "Line signals : " << data_size << std::endl;
@@ -160,7 +160,7 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t &settings)
     std::string path = fs.combinePath(settings.route_dir_full_path, "topology");
     path = fs.combinePath(path, "models-config.xml");
 
-    ConfigReader cfg_reader;    
+    ConfigReader cfg_reader;
     if (cfg_reader.load(path))
     {
         cfg_reader.getValue("Models", "SignalModelsDir", models_dir);
@@ -227,7 +227,7 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
         return;
     }
 
-    tl->deserialize(data);    
+    tl->deserialize(data);
 }
 
 //------------------------------------------------------------------------------

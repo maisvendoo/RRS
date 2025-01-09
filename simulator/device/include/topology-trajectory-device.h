@@ -105,7 +105,7 @@ typedef TrajectoryDevice* (*GetTrajectoryDevice)();
 //
 //------------------------------------------------------------------------------
 #define GET_TRAJECTORY_DEVICE(ClassName) \
-extern "C" Q_DECL_EXPORT TrajectoryDevice *getTrajectoryDevice() \
+extern "C" DEVICE_EXPORT TrajectoryDevice *getTrajectoryDevice() \
 { \
         return new (ClassName) (); \
 }
@@ -113,6 +113,6 @@ extern "C" Q_DECL_EXPORT TrajectoryDevice *getTrajectoryDevice() \
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT TrajectoryDevice *loadTrajectoryDevice(QString lib_path);
+extern "C" DEVICE_EXPORT TrajectoryDevice *loadTrajectoryDevice(QString lib_path);
 
 #endif // TRAJECTORYDEVICE_H

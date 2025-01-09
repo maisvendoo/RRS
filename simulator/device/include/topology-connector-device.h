@@ -84,7 +84,7 @@ typedef ConnectorDevice* (*GetConnectorDevice)();
 //
 //------------------------------------------------------------------------------
 #define GET_CONNECTOR_DEVICE(ClassName) \
-extern "C" Q_DECL_EXPORT ConnectorDevice *getConnectorDevice() \
+extern "C" DEVICE_EXPORT ConnectorDevice *getConnectorDevice() \
 { \
         return new (ClassName) (); \
 }
@@ -92,6 +92,6 @@ extern "C" Q_DECL_EXPORT ConnectorDevice *getConnectorDevice() \
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT ConnectorDevice *loadConnectorDevice(QString lib_path);
+extern "C" DEVICE_EXPORT ConnectorDevice *loadConnectorDevice(QString lib_path);
 
 #endif // CONNECTORDEVICE_H
