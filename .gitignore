@@ -4,4 +4,11 @@
 *.txt.user.*
 *.bak
 
+bin/
 build/
+build-debug/
+build-release/
+lib/
+logs/
+modules/
+plugins/

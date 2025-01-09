@@ -24,10 +24,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Model::Model(QObject *parent) : QObject(parent)  
+Model::Model(QObject *parent) : QObject(parent)
 {
     simulator_info_t tmp_si = simulator_info_t();
-    memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
+    memory_sim_info.setNativeKey(SHARED_MEMORY_SIM_INFO);
     if (memory_sim_info.create(sizeof(simulator_info_t)))
     {
         Journal::instance()->info("Created shared memory for simulator info");
@@ -35,6 +35,7 @@ Model::Model(QObject *parent) : QObject(parent)
     }
     else
     {
+        auto z = memory_sim_info.errorString();
         if (memory_sim_info.attach())
         {
             Journal::instance()->info("Attach to shared memory for simulator info");
@@ -42,6 +43,7 @@ Model::Model(QObject *parent) : QObject(parent)
         }
         else
         {
+            auto y = memory_sim_info.errorString();
             Journal::instance()->error("No shared memory for simulator info");
         }
     }
@@ -98,7 +100,7 @@ Model::Model(QObject *parent) : QObject(parent)
         {
             Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
         }
-    }    
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -131,7 +133,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     overrideByCommandLine(init_data, command_line);
 
     // Read solver configuration
-    configSolver(init_data.solver_config);    
+    configSolver(init_data.solver_config);
 
     // Load route topology
     initTopology(init_data);
@@ -537,7 +539,7 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     if (!command_line.train_config.is_present)
     {
-        Journal::instance()->info("Command line is empty. Apply init_data.xml config");        
+        Journal::instance()->info("Command line is empty. Apply init_data.xml config");
         return;
     }
 

@@ -37,7 +37,7 @@ bool FreeJoy::init(QString cfg_path)
     sf::Joystick::update();
 
     // Ищем подключенный джойстик (первый попавшийся, подразумевая FreeJoy)
-    while (joy_id < sf::Joystick::Count)
+    while (joy_id < (int)sf::Joystick::Count)
     {
         ++joy_id;
 
