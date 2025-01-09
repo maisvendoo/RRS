@@ -251,7 +251,7 @@ void MainWindow::startSimulator()
     args << "--init-coord=" + init_coords;
 
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    simulatorProc.start(simPath, args);
+    simulatorProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + simPath, args);
 }
 
 //------------------------------------------------------------------------------
@@ -263,8 +263,8 @@ void MainWindow::startViewer()
     QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    viewerProc.setStandardOutputFile("../logs/viewer-start.log");
-    viewerProc.start(viewerPath);
+    // viewerProc.setStandardOutputFile("../logs/viewer-start.log");
+    viewerProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + viewerPath);
 }
 
 //------------------------------------------------------------------------------
