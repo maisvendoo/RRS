@@ -31,6 +31,16 @@ Model::Model(QObject *parent) : QObject(parent)
     memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
     keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
 
+    // Обход ошибок с QSharedMemory в случае сбоя
+    memory_sim_info.attach();
+    memory_sim_info.detach();
+    memory_sim_update.attach();
+    memory_sim_update.detach();
+    memory_controlled.attach();
+    memory_controlled.detach();
+    keys_data.attach();
+    keys_data.detach();
+
     simulator_info_t tmp_si = simulator_info_t();
     if (memory_sim_info.create(sizeof(simulator_info_t)))
     {
@@ -39,7 +49,6 @@ Model::Model(QObject *parent) : QObject(parent)
     }
     else
     {
-        auto z = memory_sim_info.errorString();
         if (memory_sim_info.attach())
         {
             Journal::instance()->info("Attach to shared memory for simulator info");
@@ -47,7 +56,6 @@ Model::Model(QObject *parent) : QObject(parent)
         }
         else
         {
-            auto y = memory_sim_info.errorString();
             Journal::instance()->error("No shared memory for simulator info");
         }
     }
