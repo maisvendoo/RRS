@@ -1,5 +1,13 @@
 #include    "freightcar.h"
 
+#include "airdistributor.h"
+#include "brake-auto-mode.h"
+#include "brake-mech.h"
+#include "electro-airdistributor.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose-epb.h"
+#include "reservoir.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------

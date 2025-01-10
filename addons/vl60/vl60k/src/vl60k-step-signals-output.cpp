@@ -1,5 +1,23 @@
 #include    "vl60k.h"
 
+#include "vl60k-signals.h"
+
+#include "alsn-ukbm.h"
+#include "brake-crane.h"
+#include "brake-lock.h"
+#include "dc-motor.h"
+#include "ekg-8g.h"
+#include "kme-60-044.h"
+#include "loco-crane.h"
+#include "motor-fan-ac.h"
+#include "oscillator.h"
+#include "pantograph.h"
+#include "phase-splitter.h"
+#include "pneumo-splitter.h"
+#include "protective-device.h"
+#include "reservoir.h"
+#include "sl2m.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

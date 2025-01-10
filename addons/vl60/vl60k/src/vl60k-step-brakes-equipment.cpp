@@ -1,5 +1,14 @@
 #include    "vl60k.h"
 
+#include "airdistributor.h"
+#include "automatic-train-stop.h"
+#include "brake-lock.h"
+#include "brake-mech.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose.h"
+#include "pneumo-splitter.h"
+#include "reservoir.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------

@@ -7,9 +7,19 @@
 #ifndef     PASSCAR_H
 #define     PASSCAR_H
 
-#include    <QMap>
+#include "vehicle.h"
 
-#include    "vehicle-api.h"
+#include <QString>
+
+class AirDistributor;
+class BrakeMech;
+class Coupling;
+class ElectroAirDistributor;
+class OperatingRod;
+class PneumoAngleCock;
+class PneumoHoseEPB;
+class Registrator;
+class Reservoir;
 
 //------------------------------------------------------------------------------
 //

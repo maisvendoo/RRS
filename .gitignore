@@ -12,3 +12,6 @@ lib/
 logs/
 modules/
 plugins/
+
+*.cache*
+*.vs*

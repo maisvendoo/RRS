@@ -13,7 +13,46 @@
 #ifndef     VL60K_H
 #define     VL60K_H
 
-#include    "vl60k-headers.h"
+#include "ALSN-decoder.h"
+#include "trigger.h"
+#include "vehicle.h"
+
+#include <QString>
+
+#include <array>
+
+class ACMotorCompressor;
+class ACMotorFan;
+class AirDistributor;
+class AutoTrainStop;
+class BrakeCrane;
+class BrakeLock;
+class BrakeMech;
+class CoilALSN;
+class ControllerKME_60_044;
+class Coupling;
+class DCMotor;
+class EKG_8G;
+class LocoCrane;
+class OperatingRod;
+class Oscillator;
+class OverloadRelay;
+class Pantograph;
+class PhaseSplitter;
+class PneumoAngleCock;
+class PneumoHose;
+class PneumoSplitter;
+class PressureRegulator;
+class ProtectiveDevice;
+class Rectifier;
+class Relay;
+class Reservoir;
+class SafetyDevice;
+class SandingSystem;
+class SL2M;
+class SpeedMap;
+class TracTransformer;
+class TrainHorn;
 
 /*!
  * \class

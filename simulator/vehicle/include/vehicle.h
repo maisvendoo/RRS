@@ -21,9 +21,6 @@
 #include    <QMap>
 #include    <QMutex>
 
-#include    "solver-types.h"
-#include    "key-symbols.h"
-
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"

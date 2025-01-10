@@ -1,5 +1,15 @@
 #include    "vl60k.h"
 
+#include "brake-lock.h"
+#include "motor-compressor-ac.h"
+#include "phase-splitter.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose.h"
+#include "pressure-regulator.h"
+#include "reservoir.h"
+#include "sanding-system.h"
+#include "train-horn.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
