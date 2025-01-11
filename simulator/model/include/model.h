@@ -89,10 +89,6 @@ private:
 
     /// Current simulation time
     double      t = 0.0;
-    /// Current simulation time step
-    double      dt = 1e-3;
-    /// Current simulation time in current integration interval
-    double      tau = 0.0;
     /// Simulation start time
     double      start_time = 0.0;
     /// Simulation stop time
@@ -107,9 +103,6 @@ private:
     int         integration_time_interval = 100;
     /// Flag, which allow debug print
     bool        is_debug_print = false;
-
-    double      control_time = 0.0;
-    double      control_delay = 0.01;
 
     /// Vehicle control
     struct controlled_client_t
@@ -162,13 +155,6 @@ private:
     /// Find trains which have distances between its vehicles and uncouple them
     void findFarthestVehicles();
 
-    /// Actions, which prerare integration step and also update shared data
-    void preStep(double t);
-    /// Simulation step
-    bool step(double t, double &dt);
-    /// Actions after integration step
-    void postStep(double t);
-
     /// Debug print to stdout
     void debugPrint();
 
@@ -201,7 +187,7 @@ private:
     /// Shered memory feedback
     void sharedMemoryFeedback();
 */
-    void controlStep(double &control_time, const double control_delay);    
+    void controlStep();
 
 private slots:
 

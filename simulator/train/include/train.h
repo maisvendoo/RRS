@@ -74,19 +74,8 @@ public:
     /// Calculation of right part motion ODE's
     void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt);
 
-    /// Action before time step
-    void preStep(double t);
-
     /// Integration step
-    bool step(double t, double &dt);
-
-    /// Integration step for vehicles ODE's
-    void vehiclesStep(double t, double dt);
-
-    void inputProcess();
-
-    /// Action after integration step
-    void postStep(double t);
+    void step(double current_time, double integration_time);
 
     /// Get first vehicle
     Vehicle *getFirstVehicle() const;

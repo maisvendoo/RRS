@@ -150,7 +150,6 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     start_time = init_data.solver_config.start_time;
     stop_time = init_data.solver_config.stop_time;
-    dt = init_data.solver_config.step;
     integration_time_interval = init_data.integration_time_interval;
 
     initTcpServer();
@@ -359,41 +358,12 @@ void Model::findFarthestVehicles()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::preStep(double t)
-{
-    for (auto train : trains)
-        train->preStep(t);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Model::step(double t, double &dt)
-{
-    bool step_correct = true;
-    for (auto train : trains)
-        step_correct &= train->step(t, dt);
-    return step_correct;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::postStep(double t)
-{
-    for (auto train : trains)
-        train->postStep(t);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Model::debugPrint()
 {
     QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 x = %10 v[first] = %4 v[last] = %5 trac = %6 pos = %7 eq_press = %8 bp_press = %9 pos = %11\n")
             .arg(t)
             .arg(realtime_delay)
-            .arg(dt)
+            .arg(integration_time_interval)
             .arg(trains[0]->getFirstVehicle()->getVelocity() * 3.6)
             .arg(trains[0]->getLastVehicle()->getVelocity() * 3.6)
             .arg(static_cast<double>(trains[0]->getFirstVehicle()->getAnalogSignal(0)))
@@ -460,13 +430,6 @@ void Model::loadInitData(init_data_t &init_data)
         {
             init_data.integration_time_interval = 15;
         }
-
-        if (!cfg.getInt(secName, "ControlTimeInterval", init_data.control_time_interval))
-        {
-            init_data.control_time_interval = 15;
-        }
-
-        control_delay = static_cast<double>(init_data.control_time_interval) / 1000.0;
 
         if (!cfg.getBool(secName, "DebugPrint", init_data.debug_print))
         {
@@ -947,13 +910,8 @@ void Model::sharedMemoryFeedback()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::controlStep(double &control_time, const double control_delay)
+void Model::controlStep()
 {
-    control_time += dt;
-    if (control_time < control_delay)
-        return;
-    control_time = 0;
-
     for (auto c : controlled_clients)
     {
         int id = c.prev_vehicle_controlled;
@@ -996,8 +954,9 @@ void Model::controlStep(double &control_time, const double control_delay)
 //------------------------------------------------------------------------------
 void Model::process()
 {
+    size_t realtime_at_begin = QTime::currentTime().msecsSinceStartOfDay();
+
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
-    tau = tau - integration_time;
 
     topology->step(t, integration_time);
 
@@ -1005,21 +964,13 @@ void Model::process()
 
     findFarthestVehicles();
 
-    // Integrate all ODE in train motion model
-    do
-    {
-        preStep(t);
+    controlStep();
 
-        controlStep(control_time, control_delay);
+    for (auto train : trains)
+        train->step(t, integration_time);
 
-        is_step_correct = step(t, dt);
+    t += integration_time;
 
-        tau += dt;
-        t += dt;
-
-        postStep(t);
-    }
-    while ( (tau < 0.0) && is_step_correct );
 /*
     // Feedback to viewer
     sharedMemoryFeedback();
@@ -1027,12 +978,21 @@ void Model::process()
     // Update server feedback
     tcpFeedBack();
 
-    for (auto train : trains)
-        train->inputProcess();
-
     // Debug print, is allowed
     if (is_debug_print)
         debugPrint();
+
+    size_t realtime_at_end = QTime::currentTime().msecsSinceStartOfDay();
+    realtime_delay = realtime_at_end - realtime_at_begin - integration_time_interval;
+    if (realtime_delay > 0)
+    {
+        QString msg = QString("t = %1 | WARNING: realtime delay! simulation of %2ms take %3ms")
+                          .arg(t, 8, 'f', 3)
+                          .arg(integration_time_interval)
+                          .arg(realtime_delay + integration_time_interval);
+        fputs(qPrintable(msg + "\n"), stdout);
+        Journal::instance()->critical(msg);
+    }
 }
 
 //------------------------------------------------------------------------------
