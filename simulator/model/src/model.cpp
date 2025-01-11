@@ -141,7 +141,16 @@ bool Model::init(const simulator_command_line_t &command_line)
     {
         Train *train = addTrain(init_datas[i]);
         if (train)
+        {
             trains.push_back(train);
+
+            QThread *thread = new QThread();
+            train_threads.push_back(thread);
+            train->moveToThread(thread);
+
+            connect(this, &Model::step, train, &Train::slotStep);
+            thread->start();
+        }
     }
 
     initControlPanel("control-panel");
@@ -321,8 +330,15 @@ void Model::findNearestVehicles()
         if (min_idx < train_idx)
             min_idx = train_idx;
 
+        disconnect(this, &Model::step, trains[train_idx], &Train::slotStep);
+
         delete trains[train_idx];
         trains.erase(trains.begin() + train_idx);
+
+        train_threads[train_idx]->quit();
+        delete train_threads[train_idx];
+        train_threads.erase(train_threads.begin() + train_idx);
+
         Journal::instance()->info(QString("Delete train %1")
                                       .arg(train_idx, 3));
     }
@@ -351,6 +367,13 @@ void Model::findFarthestVehicles()
                                           .arg(trains.size(), 3));
             uncoupled_train->setTrainIndex(trains.size());
             trains.push_back(uncoupled_train);
+
+            QThread *thread = new QThread();
+            train_threads.push_back(thread);
+            uncoupled_train->moveToThread(thread);
+
+            connect(this, &Model::step, uncoupled_train, &Train::slotStep);
+            thread->start();
         }
     }
 }
@@ -677,6 +700,7 @@ Train *Model::addTrain(const init_data_t &init_data)
         else
         {
             Journal::instance()->critical("CAN'T INITIALIZE TRAIN AT TOPOLOGY");
+            delete train;
             return nullptr;
         }
 
@@ -966,11 +990,9 @@ void Model::process()
 
     controlStep();
 
-    for (auto train : trains)
-        train->step(t, integration_time);
+    emit step(t, integration_time);
 
     t += integration_time;
-
 /*
     // Feedback to viewer
     sharedMemoryFeedback();
@@ -986,13 +1008,22 @@ void Model::process()
     realtime_delay = realtime_at_end - realtime_at_begin - integration_time_interval;
     if (realtime_delay > 0)
     {
-        QString msg = QString("t = %1 | WARNING: realtime delay! simulation of %2ms take %3ms")
+        QString msg = QString("t = %1 | simulation of %2ms take %3ms | WARNING: realtime delay!")
                           .arg(t, 8, 'f', 3)
                           .arg(integration_time_interval)
                           .arg(realtime_delay + integration_time_interval);
         fputs(qPrintable(msg + "\n"), stdout);
         Journal::instance()->critical(msg);
-    }
+    }/*
+    else
+    {
+        QString msg = QString("t = %1 | simulation of %2ms take %3ms")
+                          .arg(t, 8, 'f', 3)
+                          .arg(integration_time_interval)
+                          .arg(realtime_delay + integration_time_interval);
+        fputs(qPrintable(msg + "\n"), stdout);
+        Journal::instance()->critical(msg);
+    }*/
 }
 
 //------------------------------------------------------------------------------

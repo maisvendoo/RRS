@@ -721,79 +721,6 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::step(double current_time, double integration_time)
-{
-    auto begin = vehicles.begin();
-    auto end = vehicles.end();
-
-    double t = current_time;
-    double num_sub_step = ceil(integration_time / solver_config.step);
-    double dt = integration_time / num_sub_step;
-    size_t num_step = static_cast<size_t>(num_sub_step);
-
-    for (size_t i = 0; i < num_step; ++i)
-    {
-        // prestep
-        for (auto it = begin; it != end; ++it)
-        {
-            Vehicle *vehicle = *it;
-            size_t model_idx = vehicle->getModelIndex();
-            size_t idx = vehicle->getStateIndex();
-
-            // input
-            if (i == 0)
-            {
-                vehicle->keyProcess();
-                vehicle->hardwareProcess();
-            }
-
-            topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
-            topology->getVehicleController(model_idx)->setCoord(y[idx]);
-            *vehicle->getProfilePoint() = topology->getVehicleController(model_idx)->getPosition();
-            vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
-
-            vehicle->integrationPreStep(y, t);
-        }
-
-        // step
-        auto joints_it = joints_list.begin();
-        for (auto it = begin; it != end; ++it)
-        {
-            if (joints_it != joints_list.end())
-            {
-                std::vector<Joint *> joints = *joints_it;
-                if (!joints.empty())
-                {
-                    for (auto joint : joints)
-                    {
-                        joint->step(t, dt);
-                    }
-                }
-                ++joints_it;
-            }
-
-            Vehicle *vehicle = *it;
-            vehicle->integrationStep(y, t, dt);
-        }
-
-        // solver step
-        train_motion_solver->step(this, y, dydt, t, dt,
-                                  solver_config.max_step,
-                                  solver_config.local_error);
-        t += dt;
-
-        // poststep
-        for (auto it = begin; it != end; ++it)
-        {
-            Vehicle *vehicle = *it;
-            vehicle->integrationPostStep(y, t);
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 Vehicle *Train::getFirstVehicle() const
 {
     return *vehicles.begin();
@@ -892,6 +819,87 @@ int Train::getDirection() const
 std::vector<Vehicle *> *Train::getVehicles()
 {
     return &vehicles;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::setTopology(Topology *topology)
+{
+    this->topology = topology;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::slotStep(double current_time, double integration_time)
+{
+    auto begin = vehicles.begin();
+    auto end = vehicles.end();
+
+    double t = current_time;
+    double num_sub_step = ceil(integration_time / solver_config.step);
+    double dt = integration_time / num_sub_step;
+    size_t num_step = static_cast<size_t>(num_sub_step);
+
+    for (size_t i = 0; i < num_step; ++i)
+    {
+        // prestep
+        for (auto it = begin; it != end; ++it)
+        {
+            Vehicle *vehicle = *it;
+            size_t model_idx = vehicle->getModelIndex();
+            size_t idx = vehicle->getStateIndex();
+
+            // input
+            if (i == 0)
+            {
+                vehicle->keyProcess();
+                vehicle->hardwareProcess();
+            }
+
+            topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
+            topology->getVehicleController(model_idx)->setCoord(y[idx]);
+            *vehicle->getProfilePoint() = topology->getVehicleController(model_idx)->getPosition();
+            vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
+
+            vehicle->integrationPreStep(y, t);
+        }
+
+        // step
+        auto joints_it = joints_list.begin();
+        for (auto it = begin; it != end; ++it)
+        {
+            if (joints_it != joints_list.end())
+            {
+                std::vector<Joint *> joints = *joints_it;
+                if (!joints.empty())
+                {
+                    for (auto joint : joints)
+                    {
+                        joint->step(t, dt);
+                    }
+                }
+                ++joints_it;
+            }
+
+            Vehicle *vehicle = *it;
+            vehicle->integrationStep(y, t, dt);
+        }
+
+        // solver step
+        train_motion_solver->step(this, y, dydt, t, dt,
+                                  solver_config.max_step,
+                                  solver_config.local_error);
+        t += dt;
+
+        // poststep
+        for (auto it = begin; it != end; ++it)
+        {
+            Vehicle *vehicle = *it;
+            vehicle->integrationPostStep(y, t);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

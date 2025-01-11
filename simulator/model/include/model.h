@@ -73,6 +73,8 @@ public:
 
 signals:
 
+    void step(double t, double dt);
+
     void sendDataToServer(QByteArray data);
 
     //void getRecvData(sim_dispatcher_data_t &disp_data);
@@ -117,6 +119,9 @@ private:
 
     /// Train model
     std::vector<Train *> trains;
+
+    /// Train threads
+    std::vector<QThread *> train_threads;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
