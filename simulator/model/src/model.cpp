@@ -332,11 +332,12 @@ void Model::findNearestVehicles()
 
         disconnect(this, &Model::step, trains[train_idx], &Train::slotStep);
 
-        delete trains[train_idx];
-        trains.erase(trains.begin() + train_idx);
-
         train_threads[train_idx]->quit();
-        delete train_threads[train_idx];
+        //delete train_threads[train_idx]; // Этого делать категорически нельзя
+
+        delete trains[train_idx]; // Это
+        trains.erase(trains.begin() + train_idx); // и это - не факт что будет стабильно
+
         train_threads.erase(train_threads.begin() + train_idx);
 
         Journal::instance()->info(QString("Delete train %1")
