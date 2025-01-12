@@ -537,7 +537,9 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
     train_motion_solver->setODEsize(ode_order);
     dydt.resize(ode_order);
 
-    Journal::instance()->info(QString("Trains coupled! New size of vehicles %1, joints %2, state_vector %3")
+    // Отладка
+    Journal::instance()->info(QString("Trains coupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
+                                  .arg(train_id, 3)
                                   .arg(vehicles.size(), 4)
                                   .arg(joints_list.size(), 4)
                                   .arg(y.size(), 4));

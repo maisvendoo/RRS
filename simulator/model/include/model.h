@@ -87,6 +87,8 @@ public slots:
     ///
     void controlProcess();
 
+    void deleteFinishedThread();
+
 private:
 
     /// Current simulation time
