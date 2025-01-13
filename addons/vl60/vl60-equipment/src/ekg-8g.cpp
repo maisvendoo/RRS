@@ -1,5 +1,7 @@
 #include    "ekg-8g.h"
 
+#include    "physics.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -193,7 +195,7 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
         else
         {
             // Устанавливаем готовность по состоянию рукоятки КМ положению вала ЭКГ
-            is_ready = km_state.pos_state[POS_ZERO] && (position == LM_POS0);            
+            is_ready = km_state.pos_state[POS_ZERO] && (position == LM_POS0);
         }
     }
     else

@@ -2,6 +2,16 @@
 
 #include    "filesystem.h"
 
+#include "airdistributor.h"
+#include "brake-crane.h"
+#include "brake-lock.h"
+#include "electro-airdistributor.h"
+#include "loco-crane.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose.h"
+#include "pneumo-hose-epb.h"
+#include "reservoir.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------

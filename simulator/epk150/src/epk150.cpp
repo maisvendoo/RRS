@@ -8,6 +8,8 @@
 #include    <epk150.h>
 #include    <Journal.h>
 
+#include    "physics.h"
+
 /*
  *  Y[0] - усилие от катушки ЭПК
  *  Y[1] - давление в камере выдержки времени

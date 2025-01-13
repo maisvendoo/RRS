@@ -1,5 +1,19 @@
 #include    "vl60pk.h"
 
+#include "ALSN-coil.h"
+#include "brake-crane.h"
+#include "brake-mech.h"
+#include "coupling.h"
+#include "coupling-operating-rod.h"
+#include "dc-motor.h"
+#include "ekg-8g.h"
+#include "kme-60-044.h"
+#include "loco-crane.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose-epb.h"
+#include "reservoir.h"
+#include "speedmap.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

@@ -4,6 +4,8 @@
 #include    <device.h>
 #include    <ALSN-struct.h>
 
+#include    "physics.h"
+
 enum
 {
     RED_LAMP = 0,

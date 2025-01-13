@@ -28,6 +28,8 @@
 #include    "profile-point.h"
 #include    "device-list.h"
 
+#include    "physics.h"
+
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
 #else
