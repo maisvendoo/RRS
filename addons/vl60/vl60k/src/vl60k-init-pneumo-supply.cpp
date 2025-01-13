@@ -5,6 +5,7 @@
 #include "pneumo-hose.h"
 #include "pressure-regulator.h"
 #include "reservoir.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------
 //

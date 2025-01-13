@@ -5,6 +5,8 @@
 #include    <ALSN-struct.h>
 
 #include    "physics.h"
+#include    "timer.h"
+#include    "trigger.h"
 
 enum
 {

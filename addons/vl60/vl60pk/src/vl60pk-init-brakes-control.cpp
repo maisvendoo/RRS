@@ -9,6 +9,7 @@
 #include "pneumo-hose.h"
 #include "pneumo-relay.h"
 #include "pneumo-switching-valve.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------
 //

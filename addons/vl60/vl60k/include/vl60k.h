@@ -45,6 +45,7 @@ class PneumoSplitter;
 class PressureRegulator;
 class ProtectiveDevice;
 class Rectifier;
+class Registrator;
 class Relay;
 class Reservoir;
 class SafetyDevice;

@@ -9,6 +9,7 @@
 #include    <Journal.h>
 
 #include    "physics.h"
+#include    "key-symbols.h"
 
 /*
  *  Y[0] - усилие от катушки ЭПК

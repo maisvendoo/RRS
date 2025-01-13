@@ -49,6 +49,7 @@ class PneumoRelay;
 class PressureRegulator;
 class ProtectiveDevice;
 class Rectifier;
+class Registrator;
 class Relay;
 class Reservoir;
 class SafetyDevice;
@@ -56,6 +57,7 @@ class SandingSystem;
 class SL2M;
 class SpeedMap;
 class SwitchingValve;
+class Timer;
 class TracTransformer;
 class TrainHorn;
 

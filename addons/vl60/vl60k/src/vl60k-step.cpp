@@ -11,6 +11,7 @@
 #include "phase-splitter.h"
 #include "protective-device.h"
 #include "rectifier.h"
+#include "registrator.h"
 #include "relay.h"
 #include "reservoir.h"
 #include "sanding-system.h"

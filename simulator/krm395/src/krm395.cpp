@@ -1,6 +1,8 @@
 #include    "krm395.h"
 
 #include    "physics.h"
+#include    "key-symbols.h"
+#include    "timer.h"
 
 //------------------------------------------------------------------------------
 //

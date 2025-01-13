@@ -3,6 +3,7 @@
 #include    <sstream>
 
 #include    "physics.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------------
 //

@@ -9,6 +9,7 @@
 #include "pneumo-hose.h"
 #include "pneumo-splitter.h"
 #include "reservoir.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------
 //

@@ -1,6 +1,7 @@
 #include    "sanding-system.h"
 
 #include    "physics.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------------
 //

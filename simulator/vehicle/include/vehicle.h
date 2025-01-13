@@ -29,6 +29,7 @@
 #include    "device-list.h"
 
 #include    "physics.h"
+#include "solver-types.h"
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT

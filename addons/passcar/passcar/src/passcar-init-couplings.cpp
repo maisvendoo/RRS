@@ -4,6 +4,7 @@
 
 #include "coupling.h"
 #include "coupling-operating-rod.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------
 //

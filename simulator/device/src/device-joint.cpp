@@ -5,6 +5,7 @@
 #include    "CfgReader.h"
 #include    "Journal.h"
 #include    "physics.h"
+#include    "device.h"
 
 //------------------------------------------------------------------------------
 //

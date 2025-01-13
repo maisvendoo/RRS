@@ -5,6 +5,7 @@
 #include    <rail-signal.h>
 #include    <combine-releay.h>
 #include    <timer.h>
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //

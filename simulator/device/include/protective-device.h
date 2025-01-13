@@ -2,6 +2,7 @@
 #define     MAIN_SWITCH_H
 
 #include    "device.h"
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //
@@ -92,7 +93,7 @@ private:
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-    void load_config(CfgReader &cfg);    
+    void load_config(CfgReader &cfg);
 };
 
 #endif // MAIN_SWITCH_H

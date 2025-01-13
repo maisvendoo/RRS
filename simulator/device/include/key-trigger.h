@@ -2,6 +2,9 @@
 #define     KEY_TRIGGER_H
 
 #include    "device.h"
+#include    "trigger.h"
+
+class Timer;
 
 class DEVICE_EXPORT KeyTrigger : public Device
 {
