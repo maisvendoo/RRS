@@ -16,8 +16,9 @@
 #define     SETTINGS_H
 
 #include    <string>
-
 #include    <osg/Vec3>
+
+#include    "tcp-client.h"
 
 /*!
  * \struct
@@ -28,14 +29,20 @@
 //------------------------------------------------------------------------------
 struct settings_t
 {
+    /// TCP-Client settings
+    tcp_config_t    tcp_config;
+    /// Interval for vehicles positions update, ms
+    int vehicles_pos_update_interval;
+    /// Interval for vehicles states update, ms
+    int vehicles_state_update_interval;
+    /// Interval for vehicle controlled debug strings update, ms
+    int vehicle_controled_update_interval;
+    /// Client delay for smoothing network's delays
+    int client_delay;
     /// Route directory name
     std::string     route_dir_name;
     /// Route directory
     std::string     route_dir_full_path; // Temporary for displays with route map
-    /// Server ip-address
-    std::string     host_addr;
-    /// Server port
-    int             port;
     /// Window horizontal position
     int             x;
     /// Window vertical position
@@ -48,8 +55,6 @@ struct settings_t
     bool            fullscreen;
     ///
     bool            vsync;
-    /// Work in localmode (reserved)
-    bool            localmode;
     /// Vertical view angle
     double          fovy;
     /// Vertical view angle min
@@ -70,10 +75,6 @@ struct settings_t
     bool            double_buffer;
     /// Set number of anialiasing samples
     bool            samples;
-    /// Set client's data request time interval
-    int             request_interval;
-    /// Set client reconnection interval
-    int             reconnect_interval;
     /// Motion blur persistence
     double          persistence;
     /// Cabine driver's eye height
@@ -137,17 +138,18 @@ struct settings_t
     unsigned int    interval;
 
     settings_t()
-        : route_dir_name("")
+        : vehicles_pos_update_interval(70)
+        , vehicles_state_update_interval(100)
+        , vehicle_controled_update_interval(70)
+        , client_delay(100)
+        , route_dir_name("")
         , route_dir_full_path("")
-        , host_addr("127.0.0.1")
-        , port(1992)
         , x(50)
         , y(50)
         , width(1280)
         , height(720)
         , fullscreen(false)
         , vsync(true)
-        , localmode(false)
         , fovy(30.0)
         , fovy_min(2.0)
         , fovy_max(120.0)
@@ -158,8 +160,6 @@ struct settings_t
         , window_decoration(true)
         , double_buffer(true)
         , samples(4)
-        , request_interval(33)
-        , reconnect_interval(1000)
         , persistence(0.05)
         , eye_height(3.0)
         , direction(1)

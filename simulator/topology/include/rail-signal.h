@@ -7,6 +7,8 @@
 #include    <relay.h>
 #include    <signal-types.h>
 
+#include "timer.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -116,10 +118,7 @@ public:
 
     bool calcPosition(dvec3 &pos);
 
-    void allowTransmitALSN(bool is_allow)
-    {
-        is_asln_transmit = is_allow;
-    }
+    void allowTransmitALSN(bool is_allow);
 
 signals:
 
@@ -132,7 +131,7 @@ signals:
     /// Послать напряжение для бокового сигнального реле
     void sendSideVoltage(double U_side);
 
-protected:    
+protected:
 
     /// Состояние всех возможных линз
     lens_state_t lens_state;
@@ -214,8 +213,15 @@ protected:
 
     Relay *alsn_G_relay = new Relay(NUM_ALSN_G_CONTACTS);
 
+    /// Признак разрешения работы путевого трансмитера
+    /// (АЛСН не разрешается, если предыдущий светофор - закрытый станционный)
+    bool is_alsn_allow = true;
+
     /// Признак работы путевого трансмитера
     bool is_asln_transmit = true;
+
+    /// Таймер включения путевого трансмитера, если нет запрета
+    Timer *alsn_allow_timer = new Timer(15.0, false);
 
     void load_config(CfgReader &cfg) override;
 
@@ -232,6 +238,9 @@ public slots:
 
     /// Принять от следующего светофора напряжение для БСР
     void slotRecvSideVoltage(double U_side);
+
+    /// Включить трансмиттер АЛСН по таймеру, если нет запрета
+    void slotAllowTransmit();
 };
 
 #endif // SIGNAL_H

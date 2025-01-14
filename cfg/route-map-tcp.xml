@@ -4,7 +4,9 @@
 		<HostAddr>127.0.0.1</HostAddr>
 		<port>1992</port>
 		<ReconnectInterval>100</ReconnectInterval>
-		<RequestInterval>100</RequestInterval>
+
+		<!-- Интервал обновления положений подвижного состава, мс -->
+		<VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>
 	</Client>
 	<RouteMap>
 		<!-- Длина отрисовки выбранной траектории стрелки, м -->

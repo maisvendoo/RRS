@@ -28,11 +28,15 @@ public:
 
     conn_list_t *conn_list = Q_NULLPTR;
 
-    tcp_simulator_update_t *train_data = Q_NULLPTR;
+    simulator_update_players_t *players_data = Q_NULLPTR;
+
+    simulator_update_pos_t *train_data = Q_NULLPTR;
+
+    std::vector<double> *vehicles_half_length;
 
     topology_stations_list_t *stations = Q_NULLPTR;
 
-    QMap<QString , SwitchLabel *> switch_labels;
+    QMap<QString, SwitchLabel *> switch_labels;
 
     signals_data_t *signals_data = Q_NULLPTR;
 
@@ -93,9 +97,9 @@ private:
 
     void drawTrajectory(Trajectory *traj);
 
-    void drawTrain(tcp_simulator_update_t *train_data);
+    void drawTrain(simulator_update_pos_t *train_data);
 
-    void drawVehicle(simulator_vehicle_update_t &vehicle, QColor color);
+    void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color);
 
     void drawConnectors(conn_list_t *conn_list);
 

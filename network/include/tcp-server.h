@@ -2,6 +2,7 @@
 #define     TCP_SERVER_H
 
 #include    <QTcpServer>
+#include    <QMap>
 #include    <network-export.h>
 #include    <network-data-types.h>
 
@@ -20,24 +21,38 @@ public:
 
     bool init(QString cfg_path);
 
-    void setSimulatorData(QByteArray simulator_data)
+    void setRouteInfo(QByteArray data)
     {
-        this->simulator_data = simulator_data;
+        this->route_info = data;
     }
+    void setVehiclesInfo(QByteArray data)
+    {
+        this->vehicles_info = data;
+    }
+
+    void updatePlayers(QByteArray players_data, double t);
+
+    void updateVehiclesPos(QByteArray vehicles_pos, double t);
+
+    void updateVehiclesState(QByteArray vehicles_state, double t);
+
+    void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
 
 signals:
 
-    void setTopologyData(QByteArray &topology_data);
+    void requestTopologyData(QByteArray &topology_data);
+
+    void requestSignalsData(QByteArray &signals_data);
 
     void setSwitchState(QByteArray &switch_data);
-
-    void setTrajBusyState(QByteArray &busy_data);
-
-    void setSignalsData(QByteArray &signals_data);
 
     void openSignal(QByteArray signal_data);
 
     void closeSignal(QByteArray signal_data);
+
+    void setVehicleControl(QByteArray &control_data, int client_id);
+
+    void resetVehicleControl(int client_id);
 
 private:
 
@@ -45,9 +60,25 @@ private:
 
     QTcpServer *server = Q_NULLPTR;
 
-    std::vector<client_data_t> clients_data;
+    int clients_last_id = 0;
 
-    QByteArray topology_data;
+    QMap<QTcpSocket*, client_data_t> clients_data;
+
+    QSet<QTcpSocket*> clients_for_players_info_updates;
+
+    QSet<QTcpSocket*> clients_for_topology_updates;
+
+    QSet<QTcpSocket*> clients_for_signals_updates;
+
+    QSet<QTcpSocket*> clients_for_vehicles_pos_updates;
+
+    QSet<QTcpSocket*> clients_for_vehicles_updates;
+
+    QSet<QTcpSocket*> clients_for_vehicle_controlled_updates;
+
+    QByteArray route_info;
+
+    QByteArray vehicles_info;
 
     QByteArray recvBuff;
 
@@ -55,21 +86,21 @@ private:
 
     bool is_first_data = true;
 
-    QByteArray simulator_data;
-
     client_data_t map_client;
-
-    QByteArray signals_data;
-
-    int getClientDataBySocket(QTcpSocket *socket);
 
     void process_client_request(client_data_t &client_data);
 
+    void send_route_info(client_data_t &client_data);
+
     void send_topology_data(client_data_t &client_data);
 
-    void send_simulator_data(client_data_t &client_data);
+    //void send_topology_state(client_data_t &client_data);
 
-    void send_signals_list(client_data_t &client_data);
+    void send_signals_data(client_data_t &client_data);
+
+    //void send_signals_state(client_data_t &client_data);
+
+    void send_vehicles_info(client_data_t &client_data);
 
 public slots:
 

@@ -19,6 +19,7 @@
 #include    <osgViewer/Viewer>
 
 #include    <simulator-info-struct.h>
+#include    <controlled-struct.h>
 
 #include    <settings.h>
 #include    <command-line-parser.h>
@@ -31,6 +32,8 @@
 #include    <tcp-client.h>
 
 #include    <traffic-lights-handler.h>
+
+#include    <imgui-widgets-handler.h>
 
 //------------------------------------------------------------------------------
 //
@@ -57,14 +60,16 @@ protected:
 
     /// Viewer ready flag
     bool                        is_ready = false;
+    bool                        is_route = false;
+    bool                        is_signals = false;
+    bool                        is_vehicles = false;
 
-    QSharedMemory   memory_sim_info;
-    simulator_info_t info_data;
+    //QSharedMemory   memory_sim_info;
 
     KeyboardHandler             *keyboard = nullptr;
 
     /// Viewer settings
-    settings_t                  settings;
+    settings_t      settings;
 
     /// OSG viewer object
     osgViewer::Viewer           viewer;
@@ -80,8 +85,12 @@ protected:
     /// TCP-client
     TcpClient *tcp_client = new TcpClient;
 
+    controlled_t vehicle_control_by_keyboard;
+
     /// Process traffic lights (signals) models
     osg::ref_ptr<TrafficLightsHandler> traffic_lights_handler = new TrafficLightsHandler;
+
+    osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = nullptr;
 
     /// Initialization
     bool init(int argc, char *argv[]);   
@@ -92,12 +101,15 @@ protected:
     /// Override settings from command line
     void overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
                                        settings_t &settings);
-
+/*
     /// Override settings from shared memory with simulator info
     void overrideSettingsBySharedMemory(settings_t &settings);
-
-    /// Load route form directory
+*/
+    /// Load route
     bool loadRoute();
+
+    /// Load vehicles
+    bool loadVehicles(simulator_vehicles_info_t vehicles_info);
 
     /// Init common graphical engine settings
     bool initEngineSettings(osg::Group *root);
@@ -110,9 +122,19 @@ protected:
 
 protected slots:
 
+    void slotRecvLogMessage(QString msg);
+
     void slotConnectedToSimulator();
 
+    void slotGetRouteInfoData(QByteArray &data);
+
     void slotGetSignalsData(QByteArray &sig_data);
+
+    void slotGetVehicleInfoData(QByteArray &data);
+
+    void slotUpdateKeyboard();
+
+    void slotUpdateControlledVehicle();
 };
 
 #endif // VIEWER_H

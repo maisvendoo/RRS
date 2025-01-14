@@ -6,6 +6,7 @@
 
 #include    <tcp-client.h>
 #include    <topology.h>
+#include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
 #include    <map-widget.h>
 #include    <switch-label.h>
@@ -36,13 +37,19 @@ private:
 
     tcp_config_t tcp_config;
 
+    int vehicles_pos_update_interval = 70;
+
+    int players_update_interval = 70;
+
     TcpClient *tcp_client = new TcpClient(this);
 
     Topology *topology = new Topology;
 
-    QTimer *trainUpdateTimer = new QTimer(this);
+    simulator_update_players_t players_data;
 
-    tcp_simulator_update_t train_data;
+    simulator_update_pos_t train_data;
+
+    std::vector<double> vehicles_half_length;
 
     traj_list_t *traj_list = Q_NULLPTR;
 
@@ -65,11 +72,15 @@ private slots:
 
     void slotDisconnectedFromSimulator();
 
+    void slotGetVehicleInfoData(QByteArray &data);
+
     void slotGetTopologyData(QByteArray &topology_data);
 
-    void slotOnUpdateTrainData();
+    void slotGetSignalsData(QByteArray &sig_data);
 
-    void slotGetSimulatorData(QByteArray &sim_data);
+    void slotGetPlayersData(QByteArray &players_update);
+
+    void slotGetVehiclePosData(QByteArray &sim_data);
 
     void slotSwitchConnectorMenu();
 
@@ -78,8 +89,6 @@ private slots:
     void slotGetSwitchState(QByteArray &sw_state);
 
     void slotGetTrajBusyState(QByteArray &busy_state);
-
-    void slotGetSignalsData(QByteArray &sig_data);
 
     void slotUpdateSignal(QByteArray signal_data);
 

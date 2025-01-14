@@ -79,7 +79,12 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     if (folow_vehicle)
     {
-        int curr = train_data->current_vehicle;
+        int curr = 0;
+
+        // Пока отслеживаем текущую ПЕ у самого первого подключенного вьювера
+        // Следует придумать, как следить за ПЕ выбранного игрока, например себя
+        if (!players_data->current_vehicles.empty())
+            curr = players_data->current_vehicles[0];
 
         map_shift.setX(- train_data->vehicles[curr].position_y * scale);
         map_shift.setY(- train_data->vehicles[curr].position_x * scale);
@@ -126,31 +131,33 @@ void MapWidget::drawTrajectory(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawTrain(tcp_simulator_update_t *train_data)
+void MapWidget::drawTrain(simulator_update_pos_t *train_data)
 {
     for (size_t i = 0; i < train_data->vehicles.size(); ++i)
     {
-        if (i == train_data->controlled_vehicle)
-        {
-            QColor color(192, 64, 64);
-            drawVehicle(train_data->vehicles[i],color);
-            continue;
-        }
-        if (i == train_data->current_vehicle)
-        {
-            QColor color(192, 192, 0);
-            drawVehicle(train_data->vehicles[i],color);
-            continue;
-        }
         QColor color(64, 128, 0);
-        drawVehicle(train_data->vehicles[i],color);
+        for (auto v_id : players_data->current_vehicles)
+        {
+            if (i == v_id)
+            {
+                color = QColor(192, 192, 0);
+            }
+        }
+        for (auto v_id : players_data->controlled_vehicles)
+        {
+            if (i == v_id)
+            {
+                color = QColor(192, 64, 64);
+            }
+        }
+        drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
+void MapWidget::drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color)
 {
     QPen pen;
     pen.setWidth(5 + std::floor(scale));
@@ -162,13 +169,13 @@ void MapWidget::drawVehicle(simulator_vehicle_update_t &vehicle, QColor color)
     p.setPen(pen);
 
     dvec3 fwd;
-    fwd.x = vehicle.position_x + vehicle.orth_x * (vehicle.length / 2.0 - 0.51);
-    fwd.y = vehicle.position_y + vehicle.orth_y * (vehicle.length / 2.0 - 0.51);
+    fwd.x = vehicle.position_x + vehicle.orth_x * (vehicle_half_length - 0.51);
+    fwd.y = vehicle.position_y + vehicle.orth_y * (vehicle_half_length - 0.51);
     fwd.z = 0;
 
     dvec3 bwd;
-    bwd.x = vehicle.position_x - vehicle.orth_x * (vehicle.length / 2.0 - 0.51);
-    bwd.y = vehicle.position_y - vehicle.orth_y * (vehicle.length / 2.0 - 0.51);
+    bwd.x = vehicle.position_x - vehicle.orth_x * (vehicle_half_length - 0.51);
+    bwd.y = vehicle.position_y - vehicle.orth_y * (vehicle_half_length - 0.51);
     bwd.z = 0;
 
     QPoint fwd_point = coord_transform(fwd);

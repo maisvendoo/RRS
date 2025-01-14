@@ -27,11 +27,12 @@
 #include    <train.h>
 #include    <elapsed-timer.h>
 
+#include    <global-const.h>
 #include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
 #include    <controlled-struct.h>
 
-#include    <keys-control.h>
+//#include    <keys-control.h>
 
 #include    <virtual-interface-device.h>
 
@@ -72,6 +73,8 @@ public:
 
 signals:
 
+    void step(double t, double dt);
+
     void sendDataToServer(QByteArray data);
 
     //void getRecvData(sim_dispatcher_data_t &disp_data);
@@ -84,17 +87,10 @@ public slots:
     ///
     void controlProcess();
 
-    /// Обмен данными с ВЖД
-    void virtualRailwayFeedback();
-
 private:
 
     /// Current simulation time
     double      t = 0.0;
-    /// Current simulation time step
-    double      dt = 1e-3;
-    /// Current simulation time in current integration interval
-    double      tau = 0.0;
     /// Simulation start time
     double      start_time = 0.0;
     /// Simulation stop time
@@ -110,16 +106,13 @@ private:
     /// Flag, which allow debug print
     bool        is_debug_print = false;
 
-    double      control_time = 0.0;
-    double      control_delay = 0.05;
-
-    /// Vehicle which selected by user for view
-    int             current_vehicle = -1;
-//    int             prev_current_vehicle;
-
-    /// Vehicle which selected by user for control
-    int             controlled_vehicle = -1;
-    int             prev_controlled_vehicle = -1;
+    /// Vehicle control
+    struct controlled_client_t
+    {
+        controlled_t vehicle_control_by_keyboard = controlled_t();
+        int prev_vehicle_controlled = -1;
+    };
+    QMap<int, controlled_client_t> controlled_clients;
 
     /// All vehicles
     std::vector<Vehicle *> vehicles;
@@ -127,17 +120,11 @@ private:
     /// Train model
     std::vector<Train *> trains;
 
-    /// TCP-server
-    //Server      *server = nullptr;
+    /// Train threads
+    std::vector<QThread *> train_threads;
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
-
-    /// Клиент для связи с ВЖД
-    //SimTcpClient *sim_client = nullptr;
-
-    /// Система СЦБ
-    ///Signaling *signaling = nullptr;
 
     /// Система трафика
     TrafficMachine  *traffic_machine = nullptr;
@@ -148,24 +135,21 @@ private:
     /// Simulation thread
     QThread     model_thread;
 
-    KeysControl keys_control;
-    /// Server update data to clinet transmission
-    simulator_update_t   update_data;
-
+//    KeysControl keys_control;
+/*
     QSharedMemory   memory_sim_info;
     QSharedMemory   memory_sim_update;
     QSharedMemory   memory_controlled;
     QSharedMemory   keys_data;
     QByteArray      data;
-
+*/
     QTimer          controlTimer;
     QTimer          networkTimer;
 
     ElapsedTimer    simTimer;
 
+    /// TCP-server
     TcpServer   *tcp_server = new TcpServer;
-
-    tcp_simulator_update_t tcp_simulator_update;
 
     /// Вектор данных о нескольких поездах
     std::vector<init_data_t> init_datas;
@@ -175,13 +159,6 @@ private:
 
     /// Find trains which have distances between its vehicles and uncouple them
     void findFarthestVehicles();
-
-    /// Actions, which prerare integration step and also update shared data
-    void preStep(double t);
-    /// Simulation step
-    bool step(double t, double &dt);
-    /// Actions after integration step
-    void postStep(double t);
 
     /// Debug print to stdout
     void debugPrint();
@@ -197,8 +174,6 @@ private:
 
     void initControlPanel(QString cfg_path);
 
-    void initSimClient(QString cfg_path);
-
     /// Инициализация поезда
     Train *addTrain(const init_data_t &init_data);
 
@@ -213,11 +188,11 @@ private:
 
     /// TCP feedback
     void tcpFeedBack();
-
+/*
     /// Shered memory feedback
     void sharedMemoryFeedback();
-
-    void controlStep(double &control_time, const double control_delay);    
+*/
+    void controlStep();
 
 private slots:
 
@@ -226,6 +201,10 @@ private slots:
     void slotGetTopologyData(QByteArray &topology_data);
 
     void slotGetSignalsData(QByteArray &signals_data);
+
+    void slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id);
+
+    void slotResetVehicleControlByKeyboard(int client_id);
 };
 
 #endif // MODEL_H

@@ -44,15 +44,11 @@
 
 #include    <QObject>
 
-#include    <imgui-widgets-handler.h>
-
-#include    <QThread>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 RouteViewer::RouteViewer(int argc, char *argv[], QObject *parent) : QObject(parent)
-{
+{/*
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
 
     if (memory_sim_info.attach(QSharedMemory::ReadOnly))
@@ -62,9 +58,19 @@ RouteViewer::RouteViewer(int argc, char *argv[], QObject *parent) : QObject(pare
     else
     {
         //OSG_FATAL << "Can't connect to shared memory with simulator info" << std::endl;
-    }
+    }*/
 
-    is_ready = init(argc, argv);
+    if (init(argc, argv))
+    {
+        OSG_INFO << "Viewer is initialized succesfully" << std::endl;
+        std::cout << "Viewer is initialized succesfully" << std::endl;
+        is_ready = true;
+    }
+    else
+    {
+        OSG_FATAL << "Fail to initialize viewer" << std::endl;
+        std::cout << "Fail to initialize viewer" << std::endl;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -72,7 +78,7 @@ RouteViewer::RouteViewer(int argc, char *argv[], QObject *parent) : QObject(pare
 //------------------------------------------------------------------------------
 RouteViewer::~RouteViewer()
 {
-    memory_sim_info.detach();
+    //memory_sim_info.detach();
 }
 
 //------------------------------------------------------------------------------
@@ -94,6 +100,8 @@ int RouteViewer::run()
     // Keyboard events handler
     keyboard = new KeyboardHandler();
     viewer.addEventHandler(keyboard);
+    QObject::connect(keyboard, &KeyboardHandler::sendKeyBoardState,
+                     this, &RouteViewer::slotUpdateKeyboard);
 
     osg::ref_ptr<osgViewer::StatsHandler> statsHandler = new ViewerStatsHandler();
     statsHandler->setKeyEventTogglesOnScreenStats(osgGA::GUIEventAdapter::KEY_F11);
@@ -106,7 +114,6 @@ int RouteViewer::run()
     osg::ref_ptr<RailsManipulator> rm = new RailsManipulator(settings);
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendCameraPosition,
                      rm, &RailsManipulator::getCameraPosition);
-
 
     // Free camera manipulator
     osg::ref_ptr<FreeManipulator> fm = new FreeManipulator(settings);
@@ -142,19 +149,16 @@ int RouteViewer::run()
     viewer.setRealizeOperation(new ImGuiInitOperation);
 
     // Обработка интерфейса ImGUI
-    osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = new ImGuiWidgetsHandler;
+    imguiWidgetsHandler = new ImGuiWidgetsHandler;
 
     QObject::connect(train_ext_handler, &TrainExteriorHandler::setStatusBar,
-                         imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::setStatusBar);
+                     imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::setStatusBar);
 
     QObject::connect(train_ext_handler, &TrainExteriorHandler::sendControlledState,
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
 
-
     viewer.addEventHandler(imguiWidgetsHandler.get());
 
-    // Инициализация TCP-клиента
-    initTCPclient(settings);
 
     return viewer.run();
 }
@@ -197,12 +201,6 @@ bool RouteViewer::init(int argc, char *argv[])
     cmd_line_t cmd_line = parser.getCommadLine();
     overrideSettingsByCommandLine(cmd_line, settings);
 
-    OSG_FATAL << "Override settings from simulator shared memory" << std::endl;
-    // Parse info from shared memory
-    std::cout << "Try override settings from shared memory" << std::endl;
-    overrideSettingsBySharedMemory(settings);
-    std::cout << "Overrided settings from shared memory" << std::endl;
-
     try
     {
         sound_manager = new SoundManager();
@@ -213,13 +211,10 @@ bool RouteViewer::init(int argc, char *argv[])
         OSG_FATAL << "SoundManager is not created";
     }
 
-    // Load selected route
-    if (!loadRoute())
-    {
-        OSG_FATAL << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
-        std::cout << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
-        return false;
-    }
+    train_ext_handler = new TrainExteriorHandler(settings, sound_manager);
+
+    // Корневой узел сцены
+    root = new osg::Group;
 
     // Init graphical engine settings
     if (!initEngineSettings(root.get()))
@@ -247,6 +242,23 @@ bool RouteViewer::init(int argc, char *argv[])
 
     viewer.addEventHandler(screenCaptureHandler.get());
 
+    // Инициализация TCP-клиента
+    initTCPclient(settings);
+/*
+    OSG_FATAL << "Override settings from simulator shared memory" << std::endl;
+    // Parse info from shared memory
+    std::cout << "Try override settings from shared memory" << std::endl;
+    //overrideSettingsBySharedMemory(settings);
+    std::cout << "Overrided settings from shared memory" << std::endl;
+*/
+/*    // Load selected route
+    if (!loadRoute())
+    {
+        OSG_FATAL << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
+        std::cout << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
+        return false;
+    }
+*/
     return true;
 }
 
@@ -261,15 +273,28 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
 
     if (cfg.isOpenned())
     {
-        std::string secName = "Viewer";
+        std::string secName = "Client";
 
-        cfg.getValue(secName, "HostAddress", settings.host_addr);
-        cfg.getValue(secName, "Port", settings.port);
+        std::string tmp = "";
+        if (cfg.getValue(secName, "HostAddr", tmp))
+            settings.tcp_config.host_addr = tmp.c_str();
+        int port = 0;
+        if (cfg.getValue(secName, "port", port))
+            settings.tcp_config.port = static_cast<quint16>(port);
+        OSG_INFO << "Host for client from setings: " << tmp << ":" << port << std::endl;
+        std::cout << "Host for client from setings: " << tmp << ":" << port << std::endl;
+        cfg.getValue(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
+        cfg.getValue(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
+        cfg.getValue(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
+        cfg.getValue(secName, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
+        cfg.getValue(secName, "ClientDelay", settings.client_delay);
+
+        secName = "Viewer";
+
         cfg.getValue(secName, "Width", settings.width);
         cfg.getValue(secName, "Height", settings.height);
         cfg.getValue(secName, "FullScreen", settings.fullscreen);
         cfg.getValue(secName, "VSync", settings.vsync);
-        cfg.getValue(secName, "LocalMode", settings.localmode);
         cfg.getValue(secName, "posX", settings.x);
         cfg.getValue(secName, "posY", settings.y);
         cfg.getValue(secName, "FovY", settings.fovy);
@@ -279,8 +304,6 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "WindowDecoration", settings.window_decoration);
         cfg.getValue(secName, "DoubleBuffer", settings.double_buffer);
         cfg.getValue(secName, "Samples", settings.samples);
-        cfg.getValue(secName, "RequestInterval", settings.request_interval);
-        cfg.getValue(secName, "ReconnectInterval", settings.reconnect_interval);
         cfg.getValue(secName, "MotionBlur", settings.persistence);
         cfg.getValue(secName, "NotifyLevel", settings.notify_level);
         cfg.getValue(secName, "ViewDistance", settings.view_distance);
@@ -299,13 +322,13 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         cfg.getValue(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
         cfg.getValue(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
 
-        std::string tmp = "";
-        cfg.getValue(secName, "FreeCamInitPos", tmp);
-        std::istringstream ss(tmp);
-
-        ss >> settings.free_cam_init_pos.x()
-           >> settings.free_cam_init_pos.y()
-           >> settings.free_cam_init_pos.z();
+        if (cfg.getValue(secName, "FreeCamInitPos", tmp))
+        {
+            std::istringstream ss(tmp);
+            ss  >> settings.free_cam_init_pos.x()
+                >> settings.free_cam_init_pos.y()
+                >> settings.free_cam_init_pos.z();
+        }
 
         cfg.getValue(secName, "FreeCamRotCoeff", settings.free_cam_rot_coeff);
         cfg.getValue(secName, "FreeCamSpeed", settings.free_cam_speed);
@@ -329,10 +352,10 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
                                                 settings_t &settings)
 {
     if (cmd_line.host_addr.is_present)
-        settings.host_addr = cmd_line.host_addr.value;
+        settings.tcp_config.host_addr = QString::fromStdString(cmd_line.host_addr.value);
 
     if (cmd_line.port.is_present)
-        settings.port = cmd_line.port.value;
+        settings.tcp_config.port = static_cast<quint16>(cmd_line.port.value);
 
     if (cmd_line.width.is_present)
         settings.width = cmd_line.width.value;
@@ -343,12 +366,6 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
     if (cmd_line.fullscreen.is_present)
         settings.fullscreen = cmd_line.fullscreen.value;
 
-    if (cmd_line.localmode.is_present)
-        settings.localmode = cmd_line.localmode.value;
-
-    //if (cmd_line.train_config.is_present)
-    //    settings.train_config = cmd_line.train_config.value;
-
     if (cmd_line.notify_level.is_present)
         settings.notify_level = cmd_line.notify_level.value;
 
@@ -358,7 +375,7 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
     if (cmd_line.route_dir.is_present)
         settings.route_dir_name = cmd_line.route_dir.value;
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -450,7 +467,7 @@ void RouteViewer::overrideSettingsBySharedMemory(settings_t &settings)
         std::cout << "ERROR: Can't lock shared memory" << std::endl;
     }
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -509,12 +526,27 @@ bool RouteViewer::loadRoute()
     loader->load(route_dir_path, settings.view_distance);
     std::cout << "Loaded route from " + route_dir_path << std::endl;
 
-    //MotionPath *motionPath = loader->getMotionPath(settings.direction);
+    root->addChild(loader->getRoot());
+    return true;
+}
 
-    train_ext_handler = new TrainExteriorHandler(settings, sound_manager, info_data);
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool RouteViewer::loadVehicles(simulator_vehicles_info_t vehicles_info)
+{
+    if (vehicles_info.vehicles.empty())
+    {
+        OSG_FATAL << "ERROR: Server has not any vehicles" << std::endl;
+        std::cout << "ERROR: Server has not any vehicles" << std::endl;
+        return false;
+    }
+
+    train_ext_handler->load(vehicles_info);
     viewer.addEventHandler(train_ext_handler);
+    QObject::connect(train_ext_handler, &TrainExteriorHandler::sendControlledVehicle,
+                     this, &RouteViewer::slotUpdateControlledVehicle);
 
-    //viewer.addEventHandler(train_ext_handler->getAnimationManager());
     std::vector<AnimationManager *> anims_manager = train_ext_handler->getAnimManagers();
 
     for (auto am : anims_manager)
@@ -522,10 +554,7 @@ bool RouteViewer::loadRoute()
         viewer.addEventHandler(am);
     }
 
-    root = new osg::Group;
     root->addChild(train_ext_handler->getExterior());
-    root->addChild(loader->getRoot());
-
     return true;
 }
 
@@ -613,28 +642,41 @@ bool RouteViewer::initDisplay(osgViewer::Viewer *viewer,
 //------------------------------------------------------------------------------
 void RouteViewer::initTCPclient(const settings_t &settings)
 {
-    tcp_config_t tcp_config;
-    tcp_config.host_addr = QString(settings.host_addr.c_str());
-    tcp_config.port = settings.port;
-    tcp_config.reconnect_interval = settings.reconnect_interval;
-    tcp_config.request_interval = settings.request_interval;
+    OSG_FATAL << "Starting init TCP-client" << std::endl;
 
     connect(tcp_client, &TcpClient::connected,
             this, &RouteViewer::slotConnectedToSimulator);
 
+    connect(tcp_client, &TcpClient::setRouteInfo,
+            this, &RouteViewer::slotGetRouteInfoData);
+
     connect(tcp_client, &TcpClient::setSignalsData,
             this, &RouteViewer::slotGetSignalsData);
 
-    connect(tcp_client, &TcpClient::updateSignal,
-            traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal, Qt::DirectConnection);
+    connect(tcp_client, &TcpClient::setVehiclesInfo,
+            this, &RouteViewer::slotGetVehicleInfoData);
 
+    connect(tcp_client, &TcpClient::sendLogMessage,
+            this, &RouteViewer::slotRecvLogMessage);
+/*
     connect(tcp_client, &TcpClient::setTrajBusyState,
             traffic_lights_handler,
             &TrafficLightsHandler::slotUpdateBusyData);
+*/
+    tcp_client->init(settings.tcp_config);
 
-    tcp_client->init(tcp_config);
+    OSG_FATAL << "TCP-lient is initilized...OK" << std::endl;
+}
 
-    OSG_FATAL << "Client is initilized...OK\n";
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotRecvLogMessage(QString msg)
+{
+    OSG_FATAL << msg.toStdString() << std::endl;
+    std::cout << msg.toStdString() << std::endl;
+
+    imguiWidgetsHandler->setLoadingStatus(msg);
 }
 
 //------------------------------------------------------------------------------
@@ -642,9 +684,46 @@ void RouteViewer::initTCPclient(const settings_t &settings)
 //------------------------------------------------------------------------------
 void RouteViewer::slotConnectedToSimulator()
 {
-    OSG_FATAL << "Connected to server...OK\n";
+    OSG_FATAL << "Connected to server...OK" << std::endl;
+    std::cout << "Connected to server...OK" << std::endl;
 
-    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    OSG_FATAL << "Send request for route info" << std::endl;
+    std::cout << "Send request for route info" << std::endl;
+    tcp_client->sendRequest(STYPE_REQUEST_ROUTE_INFO);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotGetRouteInfoData(QByteArray &data)
+{
+    if (is_route)
+    {
+        OSG_WARN << "WARNING: Get route info again" << std::endl;
+        return;
+    }
+    is_route = true;
+
+    QString msg = QString("Загрузка маршрута...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+
+    simulator_route_info_t route_info;
+    route_info.deserialize(data);
+    settings.route_dir_name = route_info.route_dir_name.toStdString();
+    OSG_FATAL << "Get route directory name: " << settings.route_dir_name << std::endl;
+    std::cout << "Get route directory name: " << settings.route_dir_name << std::endl;
+
+    // Load selected route
+    if (!loadRoute())
+    {
+        OSG_FATAL << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
+        std::cout << "Route from " << settings.route_dir_name << " is't loaded" << std::endl;
+        exit(0);
+    }
+
+    OSG_FATAL << "Send request for signals data" << std::endl;
+    std::cout << "Send request for signals data" << std::endl;
+    tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
 }
 
 //------------------------------------------------------------------------------
@@ -652,6 +731,16 @@ void RouteViewer::slotConnectedToSimulator()
 //------------------------------------------------------------------------------
 void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
+    if (is_signals)
+    {
+        OSG_WARN << "WARNING: Get signals data again" << std::endl;
+        return;
+    }
+    is_signals = true;
+
+    QString msg = QString("Загрузка светофоров...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+
     traffic_lights_handler->deserialize(sig_data);
 
     // Грузим модельки сигналов
@@ -667,4 +756,113 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     // Добляем обработчик событий сигналов
     viewer.addEventHandler(traffic_lights_handler.get());
+
+    connect(tcp_client, &TcpClient::updateSignal,
+            traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal, Qt::DirectConnection);
+
+    OSG_FATAL << "Send request for vehicles info" << std::endl;
+    std::cout << "Send request for vehicles info" << std::endl;
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
+{
+    if (is_vehicles)
+    {
+        OSG_WARN << "WARNING: Get vehicles info again" << std::endl;
+        return;
+    }
+    is_vehicles = true;
+
+    simulator_vehicles_info_t vehicles_info;
+    vehicles_info.deserialize(data);
+    int count = vehicles_info.vehicles.size();
+    OSG_FATAL << "Get info about " << count << " vehicles" << std::endl;
+    std::cout << "Get info about " << count << " vehicles" << std::endl;
+
+    QString msg = QString("Загрузка подвижного состава...").arg(count);
+    imguiWidgetsHandler->setLoadingStatus(msg);
+
+    if (loadVehicles(vehicles_info))
+    {
+        msg = QString("");
+        imguiWidgetsHandler->setLoadingStatus(msg);
+
+        connect(tcp_client, &TcpClient::setVehiclesPositions,
+                train_ext_handler, &TrainExteriorHandler::slotGetVehiclesPosData, Qt::DirectConnection);
+
+        connect(tcp_client, &TcpClient::setVehiclesData,
+                train_ext_handler, &TrainExteriorHandler::slotGetVehiclesStateData, Qt::DirectConnection);
+
+        connect(tcp_client, &TcpClient::setVehicleControlled,
+                train_ext_handler, &TrainExteriorHandler::slotGetVehicleControlled, Qt::DirectConnection);
+
+        vehicle_control_by_keyboard.controlled_vehicle = train_ext_handler->getControlledVehicle();
+        vehicle_control_by_keyboard.current_vehicle = train_ext_handler->getCurrentVehicle();
+        vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
+        OSG_FATAL << "Send keyboard control to vehicle " << vehicle_control_by_keyboard.controlled_vehicle << std::endl;
+        std::cout << "Send keyboard control to vehicle " << vehicle_control_by_keyboard.controlled_vehicle << std::endl;
+        tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+
+        OSG_FATAL << "Send request for continuous vehicles update" << std::endl;
+        std::cout << "Send request for continuous vehicles update" << std::endl;
+        tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
+                                static_cast<double>(settings.vehicles_pos_update_interval) / 1000.0);
+        tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+                                static_cast<double>(settings.vehicles_state_update_interval) / 1000.0);
+        tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
+                                static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotUpdateKeyboard()
+{
+    vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
+    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+/*
+    QString msg = "Send keyboard: controlled ";
+    msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
+    msg += " | current ";
+    msg += QString::number(vehicle_control_by_keyboard.current_vehicle);
+    msg += " | keys: ";
+    msg += QString::number(vehicle_control_by_keyboard.pressed_keys.size());
+    for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+    {
+        msg += " | ";
+        msg += QString::number(key_id);
+    }
+    OSG_FATAL << msg.toStdString() << std::endl;
+    std::cout << msg.toStdString() << std::endl;
+*/
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotUpdateControlledVehicle()
+{
+    vehicle_control_by_keyboard.controlled_vehicle = train_ext_handler->getControlledVehicle();
+    vehicle_control_by_keyboard.current_vehicle = train_ext_handler->getCurrentVehicle();
+    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+/*
+    QString msg = "Send keyboard: controlled ";
+    msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
+    msg += " | current ";
+    msg += QString::number(vehicle_control_by_keyboard.current_vehicle);
+    msg += " | keys: ";
+    msg += QString::number(vehicle_control_by_keyboard.pressed_keys.size());
+    for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+    {
+        msg += " | ";
+        msg += QString::number(key_id);
+    }
+    OSG_FATAL << msg.toStdString() << std::endl;
+    std::cout << msg.toStdString() << std::endl;
+*/
 }

@@ -27,9 +27,9 @@
 #include    "animation-manager.h"
 #include    "camera-position.h"
 #include    "settings.h"
+#include    "global-const.h"
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
-#include    "controlled-struct.h"
 #include    "config-reader.h"
 #include    "display.h"
 
@@ -49,12 +49,18 @@ class TrainExteriorHandler : public QObject, public osgGA::GUIEventHandler
 public:
 
     /// Constructor
-    TrainExteriorHandler(settings_t settings, SoundManager *sm, const simulator_info_t &info_data);
+    TrainExteriorHandler(settings_t settings, SoundManager *sm);
     ~TrainExteriorHandler();
+
+    /// Loading vehicles
+    void load(const simulator_vehicles_info_t &info_data);
 
     /// Handle method
     virtual bool handle(const osgGA::GUIEventAdapter &ea,
                         osgGA::GUIActionAdapter &aa);
+
+    int getControlledVehicle();
+    int getCurrentVehicle();
 
     /// Get exterior scene group
     osg::Group *getExterior();
@@ -70,39 +76,40 @@ signals:
 
     void sendControlledState(bool state);
 
+    void sendControlledVehicle();
+
 private:
 
     settings_t  settings;
 
+    /// Sound manager
+    SoundManager *sound_manager;
+
     /// Vehicle number which is a referenced for camera
-    int cur_vehicle;
+    int cur_vehicle = 0;
+    int prev_cur_vehicle = -1;
 
     /// Vehicle number which is contorolled by user
-    int controlled_vehicle;
-
-    /// Shift camera along train
-    float long_shift;
-
-    /// Shift camera up/down
-    float height_shift;
+    int controlled_vehicle = 0;
+    int prev_controlled_vehicle = -1;
 
     /// Train exterior scene group
-    osg::ref_ptr<osg::Group> trainExterior;
+    osg::ref_ptr<osg::Group> trainExterior = new osg::Group;
 
     /// Camera position at previous frame
-    osg::Vec3f prev_camera_pos;
+    osg::Vec3d prev_camera_pos = {0.0, 0.0, 0.0};
 
-    /// Time stamp of previous frame
-    double prev_time;
-
-    /// Time between current frame and previous data receiving
-    double ref_time;
+    /// Time stamp of current frame
+    double ref_time = 0.0;
 
     /// Time stamp of previous display update
-    double prev_time_display_upd;
+    double prev_time_display_upd = 0.0;
+
+    /// Previous frame's draw time
+    double prew_delta_time = 1.0;
 
     ///
-    bool is_displays_locked;
+    bool is_displays_locked = false;
 
     bool is_Shift_L = false;
     bool is_Shift_R = false;
@@ -114,34 +121,45 @@ private:
     /// Info about train's vehicles exterior
     std::vector<vehicle_exterior_t> vehicles_ext;
 
-    /// Data, received from server
-    std::array<simulator_update_t, 2> update_data;
-    short new_data;
-    short old_data;
+    enum {DATA_ARRAY_SIZE = 5};
+    /// Data about vehicles positions, received from server
+    std::array<simulator_update_pos_t, DATA_ARRAY_SIZE> update_pos_data;
+    short new_data = -1;
+    short delay_data = -1;
+    short cur_data = -1;
+    short old_data = -1;
+    short unused_data = -1;
+    double time_difference = 0.0;
+    double settings_delay = 0.17;
 
+    /// Debug strings for controlled and current vehicles
+    simulator_vehicle_controlled_update_t vehicle_controlled;
+
+    bool is_pos_updated = false;
+    bool is_state_updated = false;
+
+    /// Data about vehicles state, received from server
+    simulator_update_t update_data;
+/*
     QSharedMemory   memory_sim_update;
     QSharedMemory   memory_controlled;
-
+*/
     /// Animations list
     std::vector<AnimationManager *> anim_managers;
 
-    /// Sound manager
-    SoundManager *sound_manager;
-
-    /// Load train exterior from
-    void load(const simulator_info_t &info_data);
-
-    /// Moving train along track
-    void moveTrain(double ref_time, const std::array<simulator_update_t, 2> update_data);
-
+    /// Moving vehicles
+    void moveTrain();
+/*
     /// Processing data from server
-    void processSharedData(double &ref_time);
+    void updatePosData(double &ref_time);
+*/
+    void updateDebugString();
 
-    /// Processing data from server
-    void sendControlledVehicle(const controlled_t &data);
+    /// Move sound listener
+    void moveListener(osgViewer::Viewer *viewer, float delta_time);
 
     /// Move camera
-    void moveCamera(osgViewer::Viewer *viewer, float delta_time);
+    void moveCamera();
 
     /// Load vehicle sounds
     void loadSounds(const std::string &configDir, const std::string &configName,
@@ -161,6 +179,12 @@ private:
 public slots:
 
     void lock_display(bool lock);
+
+    void slotGetVehiclesPosData(QByteArray &data);
+
+    void slotGetVehiclesStateData(QByteArray &data);
+
+    void slotGetVehicleControlled(QByteArray &data);
 };
 
 #endif // TRAIN_EXTERIOR_H

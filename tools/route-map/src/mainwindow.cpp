@@ -21,23 +21,26 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::disconnected,
             this, &::MainWindow::slotDisconnectedFromSimulator);
 
+    connect(tcp_client, &TcpClient::setVehiclesInfo,
+            this, &MainWindow::slotGetVehicleInfoData);
+
     connect(tcp_client, &TcpClient::setTopologyData,
             this, &MainWindow::slotGetTopologyData);
 
-    connect(trainUpdateTimer, &QTimer::timeout,
-            this, &MainWindow::slotOnUpdateTrainData);
+    connect(tcp_client, &TcpClient::setSignalsData,
+            this, &MainWindow::slotGetSignalsData);
 
-    connect(tcp_client, &TcpClient::setSimulatorData,
-            this, &MainWindow::slotGetSimulatorData);
+    connect(tcp_client, &TcpClient::setPlayersUpdate,
+            this, &MainWindow::slotGetPlayersData);
+
+    connect(tcp_client, &TcpClient::setVehiclesPositions,
+            this, &MainWindow::slotGetVehiclePosData);
 
     connect(tcp_client, &TcpClient::setSwitchState,
             this, &MainWindow::slotGetSwitchState);
 
     connect(tcp_client, &TcpClient::setTrajBusyState,
             this, &MainWindow::slotGetTrajBusyState);
-
-    connect(tcp_client, &TcpClient::setSignalsData,
-            this, &MainWindow::slotGetSignalsData);
 
     connect(tcp_client, &TcpClient::updateSignal,
             this, &MainWindow::slotUpdateSignal);
@@ -48,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     map = new MapWidget(ui->Map);
 
     load_config("../cfg/route-map-tcp.xml");
-
-    load_config("../cfg/route-map.xml");
 
     tcp_client->init(tcp_config);
 }
@@ -85,8 +86,8 @@ void MainWindow::load_config(const QString &cfg_name)
     }
 
     cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
-    cfg.getInt(secName, "RequestInterval", tcp_config.request_interval);
-
+    cfg.getInt(secName, "VehiclesPosUpdateInterval", vehicles_pos_update_interval);
+    cfg.getInt(secName, "PlayersUpdateInterval", players_update_interval);
 
     secName = "RouteMap";
     double tmp_value = 0;
@@ -121,10 +122,10 @@ void MainWindow::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
-    // Запрос серверу на загрузку топологии
-    tcp_client->sendRequest(STYPE_TOPOLOGY_DATA);
+    // Запрос серверу на информацию о длинах ПЕ
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 
-    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));    
+    ui->ptLog->appendPlainText(tr("Send request for vehicles info..."));
 }
 
 //------------------------------------------------------------------------------
@@ -133,6 +134,31 @@ void MainWindow::slotConnectedToSimulator()
 void MainWindow::slotDisconnectedFromSimulator()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetVehicleInfoData(QByteArray &data)
+{
+    simulator_vehicles_info_t info;
+    info.deserialize(data);
+
+    size_t num = info.vehicles.size();
+    ui->ptLog->appendPlainText(QString(tr("Loaded info about %1 vehicles")).arg(num));
+
+    // Сохраняем длины ПЕ для отрисовки
+    vehicles_half_length.resize(num);
+    for (size_t i = 0; i < num; ++i)
+    {
+        vehicles_half_length[i] = info.vehicles[i].vehicle_length / 2.0;
+    }
+    map->vehicles_half_length = &vehicles_half_length;
+
+    // Запрос серверу на загрузку топологии
+    tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_DATA);
+
+    ui->ptLog->appendPlainText(tr("Send request for topology loading..."));
 }
 
 //------------------------------------------------------------------------------
@@ -188,24 +214,163 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     map->stations = topology->getStationsList();
 
     // Запрос серверу на загрузку сигналов
-    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
+    tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
     ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
-    //trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotOnUpdateTrainData()
+void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 {
-    tcp_client->sendRequest(STYPE_TRAIN_POSITION);
-    this->update();
+    signals_data->deserialize(sig_data);
+
+    if (signals_data->line_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 line signals")).arg(signals_data->line_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Warning: no line signals data")));
+    }
+
+    if (signals_data->enter_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 enter signals")).arg(signals_data->enter_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Warning: no enter signals data")));
+    }
+
+    if (signals_data->exit_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 exit signals")).arg(signals_data->exit_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Warning: no exit signals data")));
+    }
+
+    for (auto signal : signals_data->line_signals)
+    {
+        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->setConnector(conn);
+
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
+        if (signal->getDirection() == 1)
+        {
+            conn->setSignalFwd(signal);
+
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
+        }
+
+        if (signal->getDirection() == -1)
+        {
+            conn->setSignalBwd(signal);
+
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
+        }
+    }
+
+    for (auto signal : signals_data->enter_signals)
+    {
+        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->setConnector(conn);
+
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
+        if (signal->getDirection() == 1)
+        {
+            conn->setSignalFwd(signal);
+
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
+        }
+
+        if (signal->getDirection() == -1)
+        {
+            conn->setSignalBwd(signal);
+
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
+        }
+
+        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+    }
+
+    for (auto signal : signals_data->exit_signals)
+    {
+        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+
+        if (conn == Q_NULLPTR)
+        {
+            continue;
+        }
+
+        signal->setConnector(conn);
+
+        SignalLabel *signal_label = new SignalLabel(map);
+        signal_label->signal = signal;
+        signal_label->setText(signal->getLetter());
+
+        if (signal->getDirection() == 1)
+        {
+            conn->setSignalFwd(signal);
+
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
+        }
+
+        if (signal->getDirection() == -1)
+        {
+            conn->setSignalBwd(signal);
+
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
+        }
+
+        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+    }
+
+    map->signals_data = signals_data;
+
+    // Запрос серверу на регулярное обновление игроков
+    tcp_client->sendRequest(STYPE_REQUEST_PLAYERS_INFO,
+                            static_cast<double>(players_update_interval) / 1000.0);
+    // Запрос серверу на регулярное обновление положений ПЕ
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
+                            static_cast<double>(vehicles_pos_update_interval) / 1000.0);
+    ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotGetSimulatorData(QByteArray &sim_data)
+void MainWindow::slotGetPlayersData(QByteArray &players_update)
+{
+    players_data.deserialize(players_update);
+
+    map->players_data = &players_data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
 
@@ -339,141 +504,6 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
     }
 
     traj->setBusyState(busy_state.is_busy);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotGetSignalsData(QByteArray &sig_data)
-{
-    signals_data->deserialize(sig_data);
-
-    if (signals_data->line_signals.size() != 0)
-    {
-        ui->ptLog->appendPlainText(QString(tr("Loaded %1 line signals")).arg(signals_data->line_signals.size()));
-    }
-    else
-    {
-        ui->ptLog->appendPlainText(QString(tr("Warning: no line signals data")));
-    }
-
-    if (signals_data->enter_signals.size() != 0)
-    {
-        ui->ptLog->appendPlainText(QString(tr("Loaded %1 enter signals")).arg(signals_data->enter_signals.size()));
-    }
-    else
-    {
-        ui->ptLog->appendPlainText(QString(tr("Warning: no enter signals data")));
-    }
-
-    if (signals_data->exit_signals.size() != 0)
-    {
-        ui->ptLog->appendPlainText(QString(tr("Loaded %1 exit signals")).arg(signals_data->exit_signals.size()));
-    }
-    else
-    {
-        ui->ptLog->appendPlainText(QString(tr("Warning: no exit signals data")));
-    }
-
-    for (auto signal : signals_data->line_signals)
-    {
-        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
-
-        if (conn == Q_NULLPTR)
-        {
-            continue;
-        }
-
-        signal->setConnector(conn);
-
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
-        if (signal->getDirection() == 1)
-        {
-            conn->setSignalFwd(signal);
-
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
-        }
-
-        if (signal->getDirection() == -1)
-        {
-            conn->setSignalBwd(signal);
-
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
-        }
-    }
-
-    for (auto signal : signals_data->enter_signals)
-    {
-        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
-
-        if (conn == Q_NULLPTR)
-        {
-            continue;
-        }
-
-        signal->setConnector(conn);
-
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
-        if (signal->getDirection() == 1)
-        {
-            conn->setSignalFwd(signal);
-
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
-        }
-
-        if (signal->getDirection() == -1)
-        {
-            conn->setSignalBwd(signal);
-
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
-        }
-
-        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
-    }
-
-    for (auto signal : signals_data->exit_signals)
-    {
-        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
-
-        if (conn == Q_NULLPTR)
-        {
-            continue;
-        }
-
-        signal->setConnector(conn);
-
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
-        if (signal->getDirection() == 1)
-        {
-            conn->setSignalFwd(signal);
-
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
-        }
-
-        if (signal->getDirection() == -1)
-        {
-            conn->setSignalBwd(signal);
-
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
-        }
-
-        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
-    }
-
-
-    map->signals_data = signals_data;
-
-    // Запуск таймера запроса положения поезда
-    trainUpdateTimer->start(tcp_config.request_interval);
 }
 
 //------------------------------------------------------------------------------

@@ -167,12 +167,6 @@ private:
 
     Signal *next_signal = Q_NULLPTR;
 
-    /// Триггер включения трансмитера на следующем светофоре
-    Trigger set_alsn;
-
-    /// Счетный триггер сброса трансмитера по освобождению участка удаления
-    TriggerCounter reset_alsn;
-
     void preStep(state_vector_t &Y, double t) override;
 
     void ode_system(const state_vector_t &Y,

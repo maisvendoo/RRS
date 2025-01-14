@@ -12,14 +12,43 @@
 enum StructureType
 {
     STYPE_EMPTY_DATA,
+
+    STYPE_REQUEST_PLAYERS_INFO,
+
+    STYPE_REQUEST_ROUTE_INFO,
+    STYPE_REQUEST_TOPOLOGY_DATA,
+//    STYPE_REQUEST_TOPOLOGY_UPDATE,
+
+    STYPE_REQUEST_SIGNALS_DATA,
+//    STYPE_REQUEST_SIGNALS_UPDATE,
+
+    STYPE_REQUEST_VEHICLES_INFO,
+    STYPE_REQUEST_VEHICLES_POS_UPDATE,
+    STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+    STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
+
+    STYPE_COMMAND_SWITCH_STATE,
+    STYPE_COMMAND_OPEN_SIGNAL,
+    STYPE_COMMAND_CLOSE_SIGNAL,
+    STYPE_COMMAND_VEHICLE_CONTROL,
+
+//    STYPE_PLAYERS_INFO,
+    STYPE_PLAYERS_UPDATE,
+
+    STYPE_ROUTE_INFO,
     STYPE_TOPOLOGY_DATA,
-    STYPE_TRAIN_POSITION,
-    STYPE_CONNECTOR_STATE,
-    STYPE_TRAJ_BUSY_STATE,
-    STYPE_SIGNALS_LIST,
-    STYPE_SIGNAL_STATE,
-    STYPE_OPEN_SIGNAL,
-    STYPE_CLOSE_SIGNAL
+//    STYPE_TOPOLOGY_STATE,
+    STYPE_SWITCH_UPDATE,
+    STYPE_TRAJ_BUSY_UPDATE,
+
+    STYPE_SIGNALS_DATA,
+//    STYPE_SIGNALS_STATE,
+    STYPE_SIGNAL_UPDATE,
+
+    STYPE_VEHICLES_INFO,
+    STYPE_VEHICLES_POS_UPDATE,
+    STYPE_VEHICLES_STATE_UPDATE,
+    STYPE_VEHICLE_CONTROLLED_UPDATE,
 };
 
 //------------------------------------------------------------------------------
@@ -71,6 +100,15 @@ struct network_data_t
 //------------------------------------------------------------------------------
 struct client_data_t
 {
+    int id = 0;
+    double pos_update_interval = 0.0;
+    double pos_update_prev_time = 0.0;
+    double state_update_interval = 0.0;
+    double state_update_prev_time = 0.0;
+    double controlled_update_interval = 0.0;
+    double controlled_update_prev_time = 0.0;
+    double players_update_interval = 0.0;
+    double players_update_prev_time = 0.0;
     QTcpSocket  *socket = Q_NULLPTR;
     network_data_t  received_data;
 };

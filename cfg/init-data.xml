@@ -17,8 +17,6 @@
 		<CoeffToWheelRailFriction>1.0</CoeffToWheelRailFriction>
 		<!-- Шаг синхронизации симуляции, мс -->
 		<IntegrationTimeInterval>15</IntegrationTimeInterval>
-		<!-- Интервал опроса клавиш клавиатуры, мс -->
-		<ControlTimeInterval>15</ControlTimeInterval>
 
 		<DebugPrint>0</DebugPrint>
 

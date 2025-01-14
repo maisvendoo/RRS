@@ -1,5 +1,22 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <Config>
+	<Client>
+		<HostAddr>127.0.0.1</HostAddr>
+		<port>1992</port>
+		<ReconnectInterval>100</ReconnectInterval>
+
+		<!-- Интервал обновления положений подвижного состава, мс -->
+		<VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>
+
+		<!-- Интервал обновления состояний подвижного состава, мс -->
+		<VehiclesStateUpdateInterval>100</VehiclesStateUpdateInterval>
+
+		<!-- Интервал обновления отладочной строки, мс -->
+		<VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
+
+		<!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов -->
+		<ClientDelay>100</ClientDelay>
+	</Client>
 	<Viewer>
 		<posX>50</posX>
 		<posY>50</posY>
@@ -7,9 +24,6 @@
 		<Height>720</Height>
 		<FullScreen>0</FullScreen>
 		<VSync>1</VSync>
-		<HostAddress>127.0.0.1</HostAddress>
-		<Port>1992</Port>
-		<LocalMode>0</LocalMode>
 		<FovY>55</FovY>
 		<zNear>0.1</zNear>
 		<zFar>1000</zFar>
@@ -18,8 +32,6 @@
 		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
 		<Samples>16</Samples>
-		<RequestInterval>33</RequestInterval>
-		<ReconnectInterval>1000</ReconnectInterval>
 		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>
 		<ViewDistance>1000</ViewDistance>

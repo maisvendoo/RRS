@@ -1,12 +1,6 @@
 #ifndef     SIMULATOR_UPDATE_STRUCT_H
 #define     SIMULATOR_UPDATE_STRUCT_H
 
-#include    "global-const.h"
-
-#include    "vehicle-signals.h"
-
-#include    <array>
-
 #include    <QString>
 #include    <QByteArray>
 #include    <QBuffer>
@@ -15,7 +9,83 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_vehicle_update_t
+struct simulator_update_players_t
+{
+    std::vector<int> clients_id;
+    std::vector<int> current_vehicles;
+    std::vector<int> controlled_vehicles;
+
+    simulator_update_players_t()
+    {
+
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << (quint32)clients_id.size();
+        for (auto id : clients_id)
+        {
+            stream << id;
+        }
+
+        stream << (quint32)current_vehicles.size();
+        for (auto veh : current_vehicles)
+        {
+            stream << veh;
+        }
+
+        stream << (quint32)controlled_vehicles.size();
+        for (auto veh : controlled_vehicles)
+        {
+            stream << veh;
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        quint32 num;
+
+        stream >> num;
+        clients_id.clear();
+        clients_id.resize(num);
+        for (size_t i = 0; i < clients_id.size(); ++i)
+        {
+            stream >> clients_id[i];
+        }
+
+        stream >> num;
+        current_vehicles.clear();
+        current_vehicles.resize(num);
+        for (size_t i = 0; i < current_vehicles.size(); ++i)
+        {
+            stream >> current_vehicles[i];
+        }
+
+        stream >> num;
+        controlled_vehicles.clear();
+        controlled_vehicles.resize(num);
+        for (size_t i = 0; i < controlled_vehicles.size(); ++i)
+        {
+            stream >> controlled_vehicles[i];
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_vehicle_pos_update_t
 {
     double  position_x = 0.0;
     double  position_y = 0.0;
@@ -26,17 +96,6 @@ struct simulator_vehicle_update_t
     double  up_x = 0.0;
     double  up_y = 0.0;
     double  up_z = 1.0;
-    int     train_id = 0;
-    int     orientation = 1;
-    int     prev_vehicle = -1;
-    int     next_vehicle = -1;
-    double  length = 10.0;
-    std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
-
-    simulator_vehicle_update_t()
-    {
-        std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
-    }
 
     QByteArray serialize()
     {
@@ -48,17 +107,132 @@ struct simulator_vehicle_update_t
         stream << position_x;
         stream << position_y;
         stream << position_z;
-        stream << orth_x;
-        stream << orth_y;
-        stream << orth_z;
-        stream << up_x;
-        stream << up_y;
-        stream << up_z;
-        stream << train_id;
+        float tmp;
+        tmp = static_cast<float>(orth_x);
+        stream << tmp;
+        tmp = static_cast<float>(orth_y);
+        stream << tmp;
+        tmp = static_cast<float>(orth_z);
+        stream << tmp;
+        tmp = static_cast<float>(up_x);
+        stream << tmp;
+        tmp = static_cast<float>(up_y);
+        stream << tmp;
+        tmp = static_cast<float>(up_z);
+        stream << tmp;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> position_x;
+        stream >> position_y;
+        stream >> position_z;
+        float tmp;
+        stream >> tmp;
+        orth_x = static_cast<double>(tmp);
+        stream >> tmp;
+        orth_y = static_cast<double>(tmp);
+        stream >> tmp;
+        orth_z = static_cast<double>(tmp);
+        stream >> tmp;
+        up_x = static_cast<double>(tmp);
+        stream >> tmp;
+        up_y = static_cast<double>(tmp);
+        stream >> tmp;
+        up_z = static_cast<double>(tmp);
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_update_pos_t
+{
+    double time = 0.0;
+    std::vector<simulator_vehicle_pos_update_t> vehicles;
+
+    simulator_update_pos_t()
+    {
+
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << time;
+
+        stream << (quint32)vehicles.size();
+        for (auto veh_pos : vehicles)
+        {
+            stream << veh_pos.serialize();
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> time;
+
+        quint32 num;
+
+        stream >> num;
+        vehicles.clear();
+        vehicles.resize(num);
+
+        for (size_t i = 0; i < vehicles.size(); ++i)
+        {
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+
+            vehicles[i].deserialize(vehicle_data);
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_vehicle_update_t
+{
+    int orientation = 1;
+    int train_id = 0;
+    int prev_vehicle = -1;
+    int next_vehicle = -1;
+    std::vector<float>   analogSignal;
+
+    simulator_vehicle_update_t()
+    {
+
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
         stream << orientation;
+        stream << train_id;
         stream << prev_vehicle;
         stream << next_vehicle;
-        stream << length;
+
+        stream << (quint32)analogSignal.size();
 
         for (auto signal : analogSignal)
         {
@@ -74,20 +248,15 @@ struct simulator_vehicle_update_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        stream >> position_x;
-        stream >> position_y;
-        stream >> position_z;
-        stream >> orth_x;
-        stream >> orth_y;
-        stream >> orth_z;
-        stream >> up_x;
-        stream >> up_y;
-        stream >> up_z;
-        stream >> train_id;
         stream >> orientation;
+        stream >> train_id;
         stream >> prev_vehicle;
         stream >> next_vehicle;
-        stream >> length;
+
+        quint32 num;
+        stream >> num;
+        analogSignal.clear();
+        analogSignal.resize(num);
 
         for (size_t i = 0; i < analogSignal.size(); ++i)
         {
@@ -135,33 +304,13 @@ struct simulator_train_update_t
 //------------------------------------------------------------------------------
 struct simulator_update_t
 {
-    double  time = 0.0;
-    int     current_vehicle = 0;
-    wchar_t currentDebugMsg[DEBUG_STRING_SIZE] = L"";
-    int     controlled_vehicle = 0;
-    wchar_t controlledDebugMsg[DEBUG_STRING_SIZE] = L"";
-    int     num_trains = 0;
-    std::array<simulator_train_update_t, MAX_NUM_TRAINS>  trains;
-    std::array<simulator_vehicle_update_t, MAX_NUM_VEHICLES>  vehicles;
+    std::vector<simulator_train_update_t> trains;
+    std::vector<simulator_vehicle_update_t> vehicles;
 
     simulator_update_t()
     {
 
     }
-};
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-struct tcp_simulator_update_t
-{
-    double time = 0;
-    int current_vehicle = 0;
-    QString currentDebugMsg = "";
-    int controlled_vehicle = 0;
-    QString controlledDebugMeg = "";
-    std::vector<simulator_train_update_t> trains;
-    std::vector<simulator_vehicle_update_t> vehicles;
 
     QByteArray serialize()
     {
@@ -169,12 +318,6 @@ struct tcp_simulator_update_t
         QBuffer buff(&data);
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
-
-        stream << time;
-        stream << current_vehicle;
-        stream << currentDebugMsg;
-        stream << controlled_vehicle;
-        stream << controlledDebugMeg;
 
         stream << (quint32)trains.size();
 
@@ -198,12 +341,6 @@ struct tcp_simulator_update_t
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
-
-        stream >> time;
-        stream >> current_vehicle;
-        stream >> currentDebugMsg;
-        stream >> controlled_vehicle;
-        stream >> controlledDebugMeg;
 
         quint32 num;
         stream >> num;
@@ -231,6 +368,49 @@ struct tcp_simulator_update_t
 
             vehicles[i].deserialize(vehicle_data);
         }
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_vehicle_controlled_update_t
+{
+    int current_vehicle = 0;
+    QString currentDebugMsg = "";
+    int controlled_vehicle = 0;
+    QString controlledDebugMsg = "";
+
+    simulator_vehicle_controlled_update_t()
+    {
+
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << current_vehicle;
+        stream << currentDebugMsg;
+        stream << controlled_vehicle;
+        stream << controlledDebugMsg;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> current_vehicle;
+        stream >> currentDebugMsg;
+        stream >> controlled_vehicle;
+        stream >> controlledDebugMsg;
     }
 };
 

@@ -312,5 +312,6 @@ void TrafficLightsHandler::printSignalInfo(TrafficLight *tl)
                       .arg(tl->getOrth().y(), 6, 'f', 3)
                       .arg(tl->getOrth().z(), 6, 'f', 3);
 
+    OSG_INFO << msg.toStdString() << std::endl;
     std::cout << msg.toStdString() << std::endl;
 }
