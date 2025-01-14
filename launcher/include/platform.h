@@ -3,13 +3,13 @@
 
 #include    <QString>
 
-#ifdef QT_DEBUG
-    const QString SIMULATOR_NAME = "simulator_d";
-    const QString VIEWER_NAME = "viewer_d";
-#else
+// #ifdef QT_DEBUG
+    // const QString SIMULATOR_NAME = "simulator_d";
+    // const QString VIEWER_NAME = "viewer_d";
+// #else
     const QString SIMULATOR_NAME = "simulator";
     const QString VIEWER_NAME = "viewer";
-#endif
+// #endif
 
 #ifdef __WIN32__
     const QString EXE_EXP = ".exe";
