@@ -85,7 +85,7 @@ typedef LocoCrane* (*GetLocoCrane)();
 //
 //------------------------------------------------------------------------------
 #define GET_LOCO_CRANE(ClassName) \
-    extern "C" DEVICE_EXPORT LocoCrane *getLocoCrane() \
+    extern "C" LocoCrane *getLocoCrane() \
     { \
         return new (ClassName) (); \
     }

@@ -58,7 +58,7 @@ typedef Joint* (*GetJoint)();
 //
 //------------------------------------------------------------------------------
 #define GET_JOINT(ClassName) \
-    extern "C" DEVICE_EXPORT Joint *getJoint() \
+    extern "C" Joint *getJoint() \
     {\
         return new (ClassName)(); \
     }

@@ -75,7 +75,7 @@ typedef Solver* (*GetSolver)();
 //
 //------------------------------------------------------------------------------
 #define GET_SOLVER(ClassName) \
-    extern "C" SOLVER_EXPORT Solver *getSolver() \
+    extern "C" Q_DECL_EXPORT Solver *getSolver() \
     {\
         return new (ClassName)(); \
     }

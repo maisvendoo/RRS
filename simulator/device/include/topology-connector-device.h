@@ -84,7 +84,7 @@ typedef ConnectorDevice* (*GetConnectorDevice)();
 //
 //------------------------------------------------------------------------------
 #define GET_CONNECTOR_DEVICE(ClassName) \
-extern "C" DEVICE_EXPORT ConnectorDevice *getConnectorDevice() \
+extern "C" ConnectorDevice *getConnectorDevice() \
 { \
         return new (ClassName) (); \
 }

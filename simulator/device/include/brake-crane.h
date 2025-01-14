@@ -114,7 +114,7 @@ typedef BrakeCrane* (*GetBrakeCrane)();
 //
 //------------------------------------------------------------------------------
 #define GET_BRAKE_CRANE(ClassName) \
-    extern "C" DEVICE_EXPORT BrakeCrane *getBrakeCrane() \
+    extern "C" Q_DECL_EXPORT BrakeCrane *getBrakeCrane() \
     { \
         return new (ClassName) (); \
     }

@@ -96,7 +96,7 @@ typedef ElectroAirDistributor* (*GetElectroAirDistributor)();
 //
 //------------------------------------------------------------------------------
 #define GET_ELECTRO_AIRDISTRIBUTOR(ClassName) \
-    extern "C" DEVICE_EXPORT ElectroAirDistributor *getElectroAirDistributor() \
+    extern "C" ElectroAirDistributor *getElectroAirDistributor() \
     { \
         return new (ClassName) (); \
     }

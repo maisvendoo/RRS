@@ -78,7 +78,7 @@ typedef Coupling* (*GetCoupling)();
 //
 //------------------------------------------------------------------------------
 #define GET_COUPLING(ClassName) \
-    extern "C" DEVICE_EXPORT Coupling *getCoupling() \
+    extern "C" Coupling *getCoupling() \
     {\
         return new (ClassName)(); \
     }

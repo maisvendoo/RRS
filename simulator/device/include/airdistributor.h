@@ -52,7 +52,7 @@ typedef AirDistributor* (*GetAirDistributor)();
 //
 //------------------------------------------------------------------------------
 #define GET_AIR_DISTRIBUTOR(ClassName) \
-    extern "C" DEVICE_EXPORT AirDistributor *getAirDistributor() \
+    extern "C" AirDistributor *getAirDistributor() \
     { \
         return new (ClassName) (); \
     }

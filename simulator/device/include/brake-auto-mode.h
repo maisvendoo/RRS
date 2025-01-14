@@ -63,7 +63,7 @@ typedef BrakeAutoMode* (*GetBrakeAutoMode)();
 //
 //------------------------------------------------------------------------------
 #define GET_BRAKE_AUTOMODE(ClassName) \
-    extern "C" DEVICE_EXPORT BrakeAutoMode *getBrakeAutoMode() \
+    extern "C" BrakeAutoMode *getBrakeAutoMode() \
     { \
         return new (ClassName) (); \
     }

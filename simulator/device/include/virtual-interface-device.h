@@ -20,7 +20,7 @@ enum InterfaceDeviceMessageType
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class VirtualInterfaceDevice : public QObject
+class DEVICE_EXPORT VirtualInterfaceDevice : public QObject
 {
     Q_OBJECT
 

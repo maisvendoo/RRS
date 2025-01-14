@@ -72,7 +72,7 @@ typedef PneumoHoseEPB* (*GetPneumoHoseEPB)();
 //
 //------------------------------------------------------------------------------
 #define GET_PNEUMO_HOSE_EPB(ClassName) \
-    extern "C" DEVICE_EXPORT PneumoHoseEPB *getPneumoHoseEPB() \
+    extern "C" PneumoHoseEPB *getPneumoHoseEPB() \
     {\
         return new (ClassName)(); \
     }

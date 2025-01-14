@@ -105,7 +105,7 @@ typedef TrajectoryDevice* (*GetTrajectoryDevice)();
 //
 //------------------------------------------------------------------------------
 #define GET_TRAJECTORY_DEVICE(ClassName) \
-extern "C" DEVICE_EXPORT TrajectoryDevice *getTrajectoryDevice() \
+extern "C" TrajectoryDevice *getTrajectoryDevice() \
 { \
         return new (ClassName) (); \
 }

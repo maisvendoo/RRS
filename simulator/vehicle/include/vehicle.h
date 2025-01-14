@@ -397,7 +397,7 @@ typedef Vehicle* (*GetVehicle)();
 //
 //------------------------------------------------------------------------------
 #define GET_VEHICLE(ClassName) \
-    extern "C" VEHICLE_EXPORT Vehicle *getVehicle() \
+    extern "C" Vehicle *getVehicle() \
     {\
         return new (ClassName)(); \
     }

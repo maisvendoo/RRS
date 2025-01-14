@@ -69,7 +69,7 @@ typedef AutoTrainStop* (*GetAutoTrainStop)();
 //
 //------------------------------------------------------------------------------
 #define GET_AUTO_TRAIN_STOP(ClassName) \
-    extern "C" DEVICE_EXPORT AutoTrainStop *getAutoTrainStop() \
+    extern "C" AutoTrainStop *getAutoTrainStop() \
     { \
         return new (ClassName) (); \
     }
