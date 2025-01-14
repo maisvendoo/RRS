@@ -159,6 +159,8 @@ bool Model::init(const simulator_command_line_t &command_line)
             QThread *thread = new QThread();
             train_threads.push_back(thread);
             train->moveToThread(thread);
+            Journal::instance()->info(QString("Created new thread for train at address: 0x%1")
+                                          .arg(reinterpret_cast<quint64>(thread), 0, 16));
 
             connect(this, &Model::step, train, &Train::slotStep);
             thread->start();
@@ -172,8 +174,6 @@ bool Model::init(const simulator_command_line_t &command_line)
     start_time = init_data.solver_config.start_time;
     stop_time = init_data.solver_config.stop_time;
     integration_time_interval = init_data.integration_time_interval;
-
-    initTcpServer();
 
     Journal::instance()->info("==== Info to server ====");
     simulator_route_info_t route_info;
@@ -192,7 +192,9 @@ bool Model::init(const simulator_command_line_t &command_line)
         ++i;
     }
     tcp_server->setVehiclesInfo(vehicles_info.serialize());
-    Journal::instance()->info("Ready vehicles info for shared memory");
+    Journal::instance()->info("Ready vehicles info for server");
+
+    initTcpServer();
 
     Journal::instance()->info("Simulator model and server are initialized successfully");
 
@@ -237,6 +239,19 @@ void Model::outMessage(QString msg)
 void Model::controlProcess()
 {
     control_panel->process();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::deleteFinishedThread()
+{
+    QThread *thread = dynamic_cast<QThread *>(sender());
+    disconnect(thread, &QThread::finished, this, &Model::deleteFinishedThread);
+    delete thread;
+
+    Journal::instance()->info(QString("Delete finished thread at address: %1")
+                                  .arg(reinterpret_cast<quint64>(thread), 0, 16));
 }
 
 //------------------------------------------------------------------------------
@@ -313,7 +328,7 @@ void Model::findNearestVehicles()
                                               .arg((train_dir == dir_it) ? "head" : "tail"));
                 trains[fd.train_idx]->couple(current_distance, fd.from_head, (train_dir == dir_it), train);
 
-                // Поезд прицеплен и больше не нужен
+                // Поезд прицеплен и больше не нужен, запоминаем его чтобы удалить
                 trains_idx_to_delete.push_back(train_idx);
 
                 // Найденная пара ПЕ тоже не нужна
@@ -335,31 +350,31 @@ void Model::findNearestVehicles()
     if (trains_idx_to_delete.empty())
         return;
 
+    // Сортируем индексы поездов по убыванию
+    std::sort(trains_idx_to_delete.begin(), trains_idx_to_delete.end(), std::greater<size_t>());
+
     // Удаляем прицепленные поезда
-    size_t min_idx = trains.size();
     for (auto train_idx : trains_idx_to_delete)
     {
-        if (min_idx < train_idx)
-            min_idx = train_idx;
-
         disconnect(this, &Model::step, trains[train_idx], &Train::slotStep);
 
-        train_threads[train_idx]->quit();
-        //delete train_threads[train_idx]; // Этого делать категорически нельзя
+        trains[train_idx]->moveToThread(this->thread());
+        delete trains[train_idx];
+        trains.erase(trains.begin() + train_idx);
 
-        delete trains[train_idx]; // Это
-        trains.erase(trains.begin() + train_idx); // и это - не факт что будет стабильно
+        connect(train_threads[train_idx], &QThread::finished, this, &Model::deleteFinishedThread);
+        train_threads[train_idx]->quit();
+        Journal::instance()->info(QString("Delete train #%1 and quit its thread at address: %2")
+                                      .arg(train_idx, 3)
+                                      .arg(reinterpret_cast<quint64>(train_threads[train_idx]), 0, 16));
 
         train_threads.erase(train_threads.begin() + train_idx);
-
-        Journal::instance()->info(QString("Delete train %1")
-                                      .arg(train_idx, 3));
     }
 
     // Назначаем новые порядковые индексы поездам после уменьшения массива
-    for (size_t train_idx = min_idx; train_idx < trains.size(); ++train_idx)
+    for (size_t train_idx = trains_idx_to_delete.back(); train_idx < trains.size(); ++train_idx)
     {
-        Journal::instance()->info(QString("Train %1 now %2")
+        Journal::instance()->info(QString("Train #%1 now #%2")
                                       .arg(trains[train_idx]->getTrainIndex(), 3)
                                       .arg(train_idx, 3));
         trains[train_idx]->setTrainIndex(train_idx);
@@ -384,6 +399,8 @@ void Model::findFarthestVehicles()
             QThread *thread = new QThread();
             train_threads.push_back(thread);
             uncoupled_train->moveToThread(thread);
+            Journal::instance()->info(QString("Created new thread for train at address: 0x%1")
+                                          .arg(reinterpret_cast<quint64>(thread), 0, 16));
 
             connect(this, &Model::step, uncoupled_train, &Train::slotStep);
             thread->start();
@@ -396,18 +413,10 @@ void Model::findFarthestVehicles()
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 x = %10 v[first] = %4 v[last] = %5 trac = %6 pos = %7 eq_press = %8 bp_press = %9 pos = %11\n")
+    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3")
             .arg(t)
             .arg(realtime_delay)
-            .arg(integration_time_interval)
-            .arg(trains[0]->getFirstVehicle()->getVelocity() * 3.6)
-            .arg(trains[0]->getLastVehicle()->getVelocity() * 3.6)
-            .arg(static_cast<double>(trains[0]->getFirstVehicle()->getAnalogSignal(0)))
-            .arg(static_cast<int>(trains[0]->getFirstVehicle()->getAnalogSignal(3)))
-            .arg(static_cast<double>(trains[0]->getFirstVehicle()->getAnalogSignal(2)))
-            .arg(static_cast<double>(trains[0]->getFirstVehicle()->getAnalogSignal(4)))
-            .arg(trains[0]->getFirstVehicle()->getTrainCoord())
-            .arg(static_cast<double>(trains[0]->getFirstVehicle()->getAnalogSignal(20)));
+            .arg(integration_time_interval);
 
     fputs(qPrintable(debug_info), stdout);
 }
@@ -692,7 +701,7 @@ Train *Model::addTrain(const init_data_t &init_data)
 
     if (train->init(init_data))
     {
-        Journal::instance()->info(QString("Train initialized successfully"));
+        Journal::instance()->info(QString("Train #%1 initialized successfully").arg(trains.size()));
 
         train->setTrainIndex(trains.size());
         for (auto vehicle : *(train->getVehicles()))
