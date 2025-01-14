@@ -151,7 +151,7 @@ int RouteViewer::run()
                      imguiWidgetsHandler.get(), &ImGuiWidgetsHandler::receiveControlledState);
 
 
-    viewer.addEventHandler(imguiWidgetsHandler.get());    
+    viewer.addEventHandler(imguiWidgetsHandler.get());
 
     // Инициализация TCP-клиента
     initTCPclient(settings);
@@ -245,7 +245,7 @@ bool RouteViewer::init(int argc, char *argv[])
     // Серия скриншотов отключена из-за просадки производительности
     screenCaptureHandler->setKeyEventToggleContinuousCapture(-1);
 
-    viewer.addEventHandler(screenCaptureHandler.get());            
+    viewer.addEventHandler(screenCaptureHandler.get());
 
     return true;
 }
@@ -524,7 +524,7 @@ bool RouteViewer::loadRoute()
 
     root = new osg::Group;
     root->addChild(train_ext_handler->getExterior());
-    root->addChild(loader->getRoot());       
+    root->addChild(loader->getRoot());
 
     return true;
 }
@@ -644,7 +644,7 @@ void RouteViewer::slotConnectedToSimulator()
 {
     OSG_FATAL << "Connected to server...OK\n";
 
-    tcp_client->sendRequest(STYPE_SIGNALS_LIST);    
+    tcp_client->sendRequest(STYPE_SIGNALS_LIST);
 }
 
 //------------------------------------------------------------------------------
