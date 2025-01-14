@@ -17,14 +17,6 @@ VirtualInterfaceDevice::VirtualInterfaceDevice(QObject *parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VirtualInterfaceDevice::~VirtualInterfaceDevice()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 signal_t VirtualInterfaceDevice::getControlSignal(size_t id)
 {
     return control_signals.analogSignal[id];

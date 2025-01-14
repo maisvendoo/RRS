@@ -8,7 +8,12 @@ project (${TARGET})
 # Путь, куда надо сложить собранное
 set (LIBRARY_OUTPUT_PATH "../../../plugins")
 # Указываем не добавлять к имени бинарника никаких префиксов
-set (CMAKE_SHARED_MODULE_PREFIX "mingw_")
+
+if (WIN32)
+    set (CMAKE_SHARED_MODULE_PREFIX "mingw_")
+else()
+    set (CMAKE_SHARED_MODULE_PREFIX "")
+endif()
 
 # Ищем зависимости
 find_package(OpenSceneGraph REQUIRED osg osgViewer osgDB OpenThreads osgUtil)

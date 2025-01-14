@@ -15,7 +15,7 @@ public:
 
     FreeJoy(QObject *parent = Q_NULLPTR);
 
-    ~FreeJoy();
+    ~FreeJoy() = default;
 
     bool init(QString cfg_path);
 
