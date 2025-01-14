@@ -447,7 +447,7 @@ QByteArray Trajectory::serialize()
     stream << name << len << is_busy;
 
     // кладем туда же число треков
-    stream << (quint32)tracks.size();
+    stream << static_cast<uint32_t>(tracks.size());
 
     // Последовательно сериализум треки
     for (auto track = tracks.begin(); track != tracks.end(); ++track)
@@ -473,11 +473,11 @@ void Trajectory::deserialize(QByteArray &data)
     stream >> is_busy;
 
     // Восстанавливаем число треков
-    qsizetype tracks_count;
+    uint32_t tracks_count;
     stream >> tracks_count;
 
     // Восстанавливаем треки
-    for (qsizetype i = 0; i < tracks_count; ++i)
+    for (quint32 i = 0; i < tracks_count; ++i)
     {
         QByteArray track_data;
         stream >> track_data;
