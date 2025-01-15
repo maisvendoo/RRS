@@ -108,11 +108,18 @@ private:
     /// Flag, which allow debug print
     bool        is_debug_print = false;
 
-    /// Vehicle control
+    /// Feedback with vehicles positions
+    simulator_update_pos_t      update_pos_data = simulator_update_pos_t();
+    /// Feedback with vehicles state
+    simulator_update_t          update_data = simulator_update_t();
+    /// Feedback with player's current and controlled vehicles
+    simulator_update_players_t  update_players = simulator_update_players_t();
+    /// Vehicle control and feedback with debug message
     struct controlled_client_t
     {
-        controlled_t vehicle_control_by_keyboard = controlled_t();
         int prev_vehicle_controlled = -1;
+        controlled_t vehicle_control_by_keyboard = controlled_t();
+        simulator_vehicle_controlled_update_t vehicle_controlled = simulator_vehicle_controlled_update_t();
     };
     QMap<int, controlled_client_t> controlled_clients;
 
@@ -187,6 +194,9 @@ private:
 
     /// Инициализация TCP-сервера
     void initTcpServer();
+
+    /// Подготовка данных перед передачей серверу для рассылки клиентам
+    void prepareFeedBack();
 
     /// TCP feedback
     void tcpFeedBack();

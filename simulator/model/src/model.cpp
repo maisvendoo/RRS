@@ -820,12 +820,8 @@ void Model::initTcpServer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::tcpFeedBack()
+void Model::prepareFeedBack()
 {
-    simulator_update_players_t  update_players;
-    simulator_update_pos_t      update_pos_data;
-    simulator_update_t          update_data;
-
     update_pos_data.vehicles.resize(vehicles.size());
     update_data.vehicles.resize(vehicles.size());
     update_data.trains.resize(trains.size());
@@ -899,26 +895,37 @@ void Model::tcpFeedBack()
     {
         update_players.clients_id.push_back(*с_id);
 
-        simulator_vehicle_controlled_update_t vehicle_controlled;
-
         int id = controlled_clients[*с_id].vehicle_control_by_keyboard.current_vehicle;
         update_players.current_vehicles.push_back(id);
 
-        vehicle_controlled.current_vehicle = id;
-        vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
+        controlled_clients[*с_id].vehicle_controlled.current_vehicle = id;
+        controlled_clients[*с_id].vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
 
         id = controlled_clients[*с_id].vehicle_control_by_keyboard.controlled_vehicle;
         update_players.controlled_vehicles.push_back(id);
 
-        vehicle_controlled.controlled_vehicle = id;
-        vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
-
-        tcp_server->updateVehicleControlled(vehicle_controlled.serialize(), (*с_id), t);
+        controlled_clients[*с_id].vehicle_controlled.controlled_vehicle = id;
+        controlled_clients[*с_id].vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
     }
+}
 
-    tcp_server->updatePlayers(update_players.serialize(), t);
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::tcpFeedBack()
+{
     tcp_server->updateVehiclesPos(update_pos_data.serialize(), t);
+    update_pos_data = simulator_update_pos_t();
     tcp_server->updateVehiclesState(update_data.serialize(), t);
+    update_data = simulator_update_t();
+    tcp_server->updatePlayers(update_players.serialize(), t);
+    update_players = simulator_update_players_t();
+
+    for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
+    {
+        tcp_server->updateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(), (*с_id), t);
+        controlled_clients[*с_id].vehicle_controlled = simulator_vehicle_controlled_update_t();
+    }
 }
 /*
 //------------------------------------------------------------------------------
@@ -1010,17 +1017,19 @@ void Model::process()
 
     findFarthestVehicles();
 
+    prepareFeedBack();
+
     controlStep();
 
     emit step(t, integration_time);
-
-    t += integration_time;
 /*
     // Feedback to viewer
     sharedMemoryFeedback();
 */
     // Update server feedback
     tcpFeedBack();
+
+    t += integration_time;
 
     // Debug print, is allowed
     if (is_debug_print)
@@ -1046,6 +1055,7 @@ void Model::process()
         fputs(qPrintable(msg + "\n"), stdout);
         Journal::instance()->critical(msg);
     }*/
+
 }
 
 //------------------------------------------------------------------------------
@@ -1102,5 +1112,7 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
         int id = controlled_clients[client_id].prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
             vehicles[id]->resetKeysData();
+
+        controlled_clients.remove(client_id);
     }
 }
