@@ -14,11 +14,14 @@
 
 #include    "train-exterior.h"
 
+#include "animations-list.h"
 #include    "config-reader.h"
+#include "display-container.h"
 #include    "filesystem.h"
 
 #include    "vehicle-loader.h"
 
+#include <osg/MatrixTransform>
 #include    <osgViewer/Viewer>
 
 #include    <sstream>
@@ -316,6 +319,8 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
 {
     int count = info_data.vehicles.size();
 
+    std::map<std::pair<std::string, std::string>, vehicle_exterior_t> unique_exteriors;
+
     for (int i = 0; i < count; ++i)
     {
         OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " loading" << std::endl;
@@ -326,43 +331,70 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
         QString cfg_file_tmp = info_data.vehicles[i].vehicle_config_file;
         std::string cfg_file = cfg_file_tmp.toStdString();
 
-        osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(cfg_dir, cfg_file);
-
-        if (!vehicle_model.valid())
+        auto found_iterator = unique_exteriors.find(std::make_pair(cfg_dir, cfg_file));
+        if (found_iterator != unique_exteriors.end())
         {
-            OSG_FATAL << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
-            std::cout << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
-            vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
+            auto& vehicle_ext = found_iterator->second;
+
+            auto new_transform = new osg::MatrixTransform();
+            auto vehicle_model = vehicle_ext.transform->getChild(0);
+            new_transform->addChild(vehicle_model);
+            vehicle_ext.transform = new_transform;
+
+            vehicle_ext.anims = new animations_t;
+            vehicle_ext.displays = new displays_t;
+
+            loadModelAnimations(cfg_dir, cfg_file, vehicle_model, *vehicle_ext.anims);
+            loadAnimations(cfg_dir, cfg_file, vehicle_model, *vehicle_ext.anims);
+
+            anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
+
+            loadDisplays(cfg_dir, vehicle_model, *vehicle_ext.displays);
             vehicles_ext.push_back(vehicle_ext);
-            OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
-            std::cout << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
-            continue;
+            trainExterior->addChild(vehicle_ext.transform.get());
         }
-        OSG_FATAL << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
-        std::cout << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
+        else
+        {
+            osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(cfg_dir, cfg_file);
+            if (!vehicle_model.valid())
+            {
+                OSG_FATAL << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
+                std::cout << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
+                vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
+                vehicles_ext.push_back(vehicle_ext);
+                unique_exteriors.insert({std::make_pair(cfg_dir, cfg_file), vehicle_ext});
+                OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
+                std::cout << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
+                continue;
+            }
+            OSG_FATAL << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
+            std::cout << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
 
-        // Load cabine model
-        osg::ref_ptr<osg::Node> cabine;
-        loadCabine(vehicle_model.get(), cfg_dir, cfg_file, cabine);
+            // Load cabine model
+            osg::ref_ptr<osg::Node> cabine;
+            loadCabine(vehicle_model.get(), cfg_dir, cfg_file, cabine);
 
-        osg::Vec3 driver_pos = getDirverPosition(cfg_dir, cfg_file);
+            osg::Vec3 driver_pos = getDriverPosition(cfg_dir, cfg_file);
 
-        vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
-        vehicle_ext.transform->addChild(vehicle_model.get());
-        vehicle_ext.cabine = cabine;
-        vehicle_ext.driver_pos = driver_pos;
+            vehicle_exterior_t vehicle_ext;
+            vehicle_ext.transform->addChild(vehicle_model.get());
+            vehicle_ext.cabine = cabine;
+            vehicle_ext.driver_pos = driver_pos;
 
-        loadModelAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
-        loadAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
-        //loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
-        loadSounds(cfg_dir, cfg_file, vehicle_ext.sounds_id);
+            loadModelAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
+            loadAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
+            //loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
+            loadSounds(cfg_dir, cfg_file, vehicle_ext.sounds_id);
 
-        anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
+            anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
 
-        loadDisplays(cfg_dir, vehicle_model.get(), *vehicle_ext.displays);
+            loadDisplays(cfg_dir, vehicle_model.get(), *vehicle_ext.displays);
 
-        vehicles_ext.push_back(vehicle_ext);
-        trainExterior->addChild(vehicle_ext.transform.get());
+            vehicles_ext.push_back(vehicle_ext);
+            trainExterior->addChild(vehicle_ext.transform.get());
+            unique_exteriors.insert({std::make_pair(cfg_dir, cfg_file), vehicle_ext});
+        }
+
         OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;
         std::cout << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;
     }
