@@ -98,7 +98,7 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Group *loadVehicle(const std::string &configDir, const std::string &configName)
+osg::Node *loadVehicle(const std::string &configDir, const std::string &configName, osg::Vec3& vehicle_shift)
 {
     // Group node for vehicle model loading
     osg::ref_ptr<osg::Group> group = new osg::Group;
@@ -129,17 +129,18 @@ osg::Group *loadVehicle(const std::string &configDir, const std::string &configN
         }
     }
 
-    osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
+    vehicle_shift = shift;
+    // osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(shift));
     osg::ref_ptr<osg::Node> model = loadModel(modelName, textureName);
 
-    if (model.valid())
-    {
-        transShift->addChild(model.get());
-    }
+    // if (model.valid())
+    // {
+        // transShift->addChild(model.get());
+    // }
 
-    group->addChild(transShift.get());
+    // group->addChild(transShift.get());
 
-    return group.release();
+    return model.release();
 }
 
 //------------------------------------------------------------------------------

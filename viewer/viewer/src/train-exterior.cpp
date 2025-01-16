@@ -19,6 +19,9 @@
 #include "display-container.h"
 #include    "filesystem.h"
 
+#include "osg/CopyOp"
+#include "osg/Group"
+#include "osg/Vec3"
 #include    "vehicle-loader.h"
 
 #include <osg/MatrixTransform>
@@ -29,6 +32,7 @@
 #include    "anim-transform-visitor.h"
 #include    <QDir>
 #include    <QDirIterator>
+#include <utility>
 
 #include    "model-animation.h"
 
@@ -312,6 +316,19 @@ std::vector<AnimationManager *> TrainExteriorHandler::getAnimManagers()
     return anim_managers;
 }
 
+struct vehicle_data_t
+{
+    osg::Vec3 vehicle_shift;
+    osg::ref_ptr<osg::Node> model;
+    osg::Vec3 cabine_shift;
+    osg::ref_ptr<osg::Node> cabine;
+    osg::Vec3 driver_position;
+    std::vector<std::string> full_animation_paths;
+    std::vector<std::string> animation_names;
+    std::string anim_config_dir;
+    std::vector<size_t> sounds_id;
+};
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -319,7 +336,8 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
 {
     int count = info_data.vehicles.size();
 
-    std::map<std::pair<std::string, std::string>, vehicle_exterior_t> unique_exteriors;
+    // std::map<std::pair<std::string, std::string>, vehicle_exterior_t> unique_exteriors;
+    std::map<std::pair<std::string, std::string>, vehicle_data_t> unique_vehicles;
 
     for (int i = 0; i < count; ++i)
     {
@@ -331,69 +349,63 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
         QString cfg_file_tmp = info_data.vehicles[i].vehicle_config_file;
         std::string cfg_file = cfg_file_tmp.toStdString();
 
-        auto found_iterator = unique_exteriors.find(std::make_pair(cfg_dir, cfg_file));
-        if (found_iterator != unique_exteriors.end())
+        vehicle_data_t vehicle_data;
+        osg::ref_ptr<osg::Node> vehicle_node;
+
+        auto found_iterator = unique_vehicles.find(std::make_pair(cfg_dir, cfg_file));
+        if (found_iterator != unique_vehicles.end())
         {
-            auto& vehicle_ext = found_iterator->second;
-
-            auto new_transform = new osg::MatrixTransform();
-            auto vehicle_model = vehicle_ext.transform->getChild(0);
-            new_transform->addChild(vehicle_model);
-            vehicle_ext.transform = new_transform;
-
-            vehicle_ext.anims = new animations_t;
-            vehicle_ext.displays = new displays_t;
-
-            loadModelAnimations(cfg_dir, cfg_file, vehicle_model, *vehicle_ext.anims);
-            loadAnimations(cfg_dir, cfg_file, vehicle_model, *vehicle_ext.anims);
-
-            anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
-
-            loadDisplays(cfg_dir, vehicle_model, *vehicle_ext.displays);
-            vehicles_ext.push_back(vehicle_ext);
-            trainExterior->addChild(vehicle_ext.transform.get());
+            vehicle_data = found_iterator->second;
+            vehicle_node = vehicle_data.model;
         }
         else
         {
-            osg::ref_ptr<osg::Group> vehicle_model = loadVehicle(cfg_dir, cfg_file);
-            if (!vehicle_model.valid())
-            {
-                OSG_FATAL << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
-                std::cout << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
-                vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
-                vehicles_ext.push_back(vehicle_ext);
-                unique_exteriors.insert({std::make_pair(cfg_dir, cfg_file), vehicle_ext});
-                OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
-                std::cout << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
-                continue;
-            }
-            OSG_FATAL << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
-            std::cout << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
-
-            // Load cabine model
-            osg::ref_ptr<osg::Node> cabine;
-            loadCabine(vehicle_model.get(), cfg_dir, cfg_file, cabine);
-
-            osg::Vec3 driver_pos = getDriverPosition(cfg_dir, cfg_file);
-
-            vehicle_exterior_t vehicle_ext;
-            vehicle_ext.transform->addChild(vehicle_model.get());
-            vehicle_ext.cabine = cabine;
-            vehicle_ext.driver_pos = driver_pos;
-
-            loadModelAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
-            loadAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
-            //loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
-            loadSounds(cfg_dir, cfg_file, vehicle_ext.sounds_id);
-
-            anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
-
-            loadDisplays(cfg_dir, vehicle_model.get(), *vehicle_ext.displays);
-
-            vehicles_ext.push_back(vehicle_ext);
-            trainExterior->addChild(vehicle_ext.transform.get());
-            unique_exteriors.insert({std::make_pair(cfg_dir, cfg_file), vehicle_ext});
+            vehicle_node = loadVehicle(cfg_dir, cfg_file, vehicle_data.vehicle_shift);
         }
+
+        osg::ref_ptr<osg::MatrixTransform> transShift = new osg::MatrixTransform(osg::Matrix::translate(vehicle_data.vehicle_shift));
+        if (vehicle_node.valid())
+        {
+            transShift->addChild(vehicle_node);
+        }
+        osg::ref_ptr<osg::Group> vehicle_model = new osg::Group;
+        vehicle_model->addChild(transShift);
+
+        if (!vehicle_model.valid())
+        {
+            OSG_FATAL << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
+            std::cout << "Vehicle model from " << cfg_dir << "/" << cfg_file << " is't loaded" << std::endl;
+            vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
+            vehicles_ext.push_back(vehicle_ext);
+            OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
+            std::cout << "Vehicle " << i + 1 << " / " << count << " added with empty model" << std::endl;
+            continue;
+        }
+        OSG_FATAL << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
+        std::cout << "Loaded vehicle model from " << cfg_dir << "/" << cfg_file << std::endl;
+
+        // Load cabine model
+        osg::ref_ptr<osg::Node> cabine;
+        loadCabine(vehicle_model.get(), cfg_dir, cfg_file, cabine);
+
+        osg::Vec3 driver_pos = getDriverPosition(cfg_dir, cfg_file);
+
+        vehicle_exterior_t vehicle_ext;
+        vehicle_ext.transform->addChild(vehicle_model.get());
+        vehicle_ext.cabine = cabine;
+        vehicle_ext.driver_pos = driver_pos;
+
+        loadModelAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
+        loadAnimations(cfg_dir, cfg_file, vehicle_model.get(), *vehicle_ext.anims);
+        //loadAnimations(cfg_dir, cfg_file, cabine.get(), *vehicle_ext.anims);
+        loadSounds(cfg_dir, cfg_file, vehicle_ext.sounds_id);
+
+        anim_managers.push_back(new AnimationManager(vehicle_ext.anims));
+
+        loadDisplays(cfg_dir, vehicle_model.get(), *vehicle_ext.displays);
+
+        vehicles_ext.push_back(vehicle_ext);
+        trainExterior->addChild(vehicle_ext.transform.get());
 
         OSG_FATAL << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;
         std::cout << "Vehicle " << i + 1 << " / " << count << " loaded" << std::endl;

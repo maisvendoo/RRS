@@ -15,6 +15,7 @@
 #ifndef     VEHICLE_LOADER_H
 #define     VEHICLE_LOADER_H
 
+#include "osg/Vec3"
 #include    <osg/MatrixTransform>
 
 
@@ -25,7 +26,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Group *loadVehicle(const std::string &configDir, const std::string &configName);
+osg::Node *loadVehicle(const std::string &configDir, const std::string &configName, osg::Vec3& vehicle_shift);
 
 
 /*!
