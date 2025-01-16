@@ -1,7 +1,6 @@
 #include    "display-visitor.h"
 
 #include    <osg/MatrixTransform>
-#include    "QWidgetImage.h"
 #include    <osg/Texture2D>
 
 #include    "display-surface-visitor.h"

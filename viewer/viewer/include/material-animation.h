@@ -22,7 +22,7 @@ private:
 
     osg::Material   *mat;
     osg::Drawable   *drawable;
-    osg::ref_ptr<osg::StateSet>   stateset;    
+    osg::ref_ptr<osg::StateSet>   stateset;
 
     float           cur_pos;
 

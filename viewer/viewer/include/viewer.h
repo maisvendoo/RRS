@@ -93,7 +93,7 @@ protected:
     osg::ref_ptr<ImGuiWidgetsHandler> imguiWidgetsHandler = nullptr;
 
     /// Initialization
-    bool init(int argc, char *argv[]);   
+    bool init(int argc, char *argv[]);
 
     /// Load settings from config
     settings_t loadSettings(const std::string &cfg_path) const;

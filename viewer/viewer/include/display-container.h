@@ -7,7 +7,6 @@
 #include    <osg/Texture2D>
 
 #include    "display.h"
-#include    "display-config.h"
 
 //------------------------------------------------------------------------------
 //
@@ -29,6 +28,6 @@ struct  display_container_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef std::vector<display_container_t *> displays_t;
+using displays_t = std::vector<display_container_t *>;
 
 #endif // DISPLAY_CONTAINER_H

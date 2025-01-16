@@ -43,7 +43,7 @@ void TrafficLight::deserialize(QByteArray &data)
     stream >> pos.x() >> pos.y() >> pos.z();
     stream >> orth.x() >> orth.y() >> orth.z();
     stream >> right.x() >> right.y() >> right.z();
-    stream >> up.x() >> up.y() >> up.z();    
+    stream >> up.x() >> up.y() >> up.z();
 }
 
 //------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ void TrafficLight::update()
          std::cout << "Updated signal " << this->getConnectorName().toStdString() << std::endl;
 
          old_lens_state = lens_state;
-    }   
+    }
 }
 
 //------------------------------------------------------------------------------

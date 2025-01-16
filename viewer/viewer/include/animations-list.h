@@ -7,6 +7,6 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef QMap<size_t, ProcAnimation *>  animations_t;
+using animations_t = QMap<size_t, ProcAnimation *>;
 
 #endif // ANIMATIONS_LIST_H

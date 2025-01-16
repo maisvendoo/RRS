@@ -21,7 +21,7 @@ public:
 
     void setLastTime(double lastTime);
 
-private:    
+private:
 
     osg::MatrixTransform    *transform;
     osg::ref_ptr<osg::AnimationPath>      path;

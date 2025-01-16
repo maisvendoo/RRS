@@ -1,5 +1,7 @@
 #include    "analog-rotation.h"
 
+#include    "math-funcs.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ bool AnalogRotation::load_config(ConfigReader &cfg)
 {
     std::string secName = "AnalogRotation";
 
-    cfg.getValue(secName, "SignalID", signal_id);    
+    cfg.getValue(secName, "SignalID", signal_id);
     cfg.getValue(secName, "Duration", duration);
     is_fixed_signal = cfg.getValue(secName, "FixedSignal", fixed_signal);
 
@@ -58,7 +60,7 @@ bool AnalogRotation::load_config(ConfigReader &cfg)
 
     std::istringstream ss(tmp);
 
-    ss >> axis.x() >> axis.y() >> axis.z();    
+    ss >> axis.x() >> axis.y() >> axis.z();
 
     return true;
 }

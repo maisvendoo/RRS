@@ -44,7 +44,7 @@ private:
     float               angle_H;
     float               angle_V;
 
-    osg::Camera         *camera;    
+    osg::Camera         *camera;
 };
 
 #endif // FREE_MANIPULATOR_H

@@ -3,7 +3,6 @@
 #include    "config-reader.h"
 #include    "analog-rotation.h"
 #include    "analog-translation.h"
-#include    "material-animation.h"
 
 #include    "material-animation-visitor.h"
 #include    "material-rgb-animation-visitor.h"

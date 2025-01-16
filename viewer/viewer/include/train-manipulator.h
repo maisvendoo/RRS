@@ -15,7 +15,7 @@ public:
 
     virtual osg::Matrixd getMatrix() const;
 
-    virtual osg::Matrixd getInverseMatrix() const;    
+    virtual osg::Matrixd getInverseMatrix() const;
 
     bool performMovementRightMouseButton(const double eventTimeDelta,
                                          const double dx,
@@ -29,7 +29,7 @@ public:
 
 protected:
 
-    virtual ~TrainManipulator();    
+    virtual ~TrainManipulator();
 
 private:
 

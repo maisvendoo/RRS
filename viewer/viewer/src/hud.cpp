@@ -3,8 +3,6 @@
 
 #include    <osg/Geode>
 
-#include    <iostream>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -17,7 +15,7 @@ HUD::HUD(int width, int height, QObject *parent) : QObject (parent)
     FileSystem &fs = FileSystem::getInstance();
     fontPath = fs.getFontsDir() + fs.separator() + "dejavu-sans-mono.ttf";
 
-    camera = createCamera(width, height);    
+    camera = createCamera(width, height);
     camera->setViewport(0, 0, width, height);
     view->setCamera(camera.get());
 }
@@ -105,7 +103,7 @@ osgText::Text *HUD::createText(const osg::Vec3 &position,
     text->setFont(fontPath);
     text->setCharacterSize(size);
     text->setPosition(position);
-    text->setText(content.c_str());    
+    text->setText(content.c_str());
     text->setColor(color);
 
     return text.release();

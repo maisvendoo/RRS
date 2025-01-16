@@ -16,7 +16,7 @@ class AbstractManipulator : public QObject, public osgGA::TrackballManipulator
 
 public:
 
-    AbstractManipulator(QObject *parent = Q_NULLPTR);    
+    AbstractManipulator(QObject *parent = Q_NULLPTR);
 
     bool handleFrame(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
 

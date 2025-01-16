@@ -1,9 +1,6 @@
 #include    "free-manipulator.h"
-#include    "math-funcs.h"
 
 #include    <osgViewer/Viewer>
-
-#include    <iostream>
 
 //------------------------------------------------------------------------------
 //
@@ -61,7 +58,7 @@ void FreeManipulator::init(const osgGA::GUIEventAdapter &ea,
     init_pos = cp;
 
     osgViewer::Viewer *viewer = static_cast<osgViewer::Viewer *>(&aa);
-    camera = viewer->getCamera();    
+    camera = viewer->getCamera();
 }
 
 //------------------------------------------------------------------------------

@@ -4,6 +4,6 @@
 #include    <vector>
 #include    "model-part-animation.h"
 
-typedef std::vector<osg::ref_ptr<ModelPartAnimation>>  model_parts_list_t;
+using model_parts_list_t = std::vector<osg::ref_ptr<ModelPartAnimation>>;
 
 #endif // MODEL_PARTS_LIST_H

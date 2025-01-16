@@ -15,9 +15,7 @@
 #include    "train-exterior.h"
 
 #include    "config-reader.h"
-#include    "get-value.h"
 #include    "filesystem.h"
-#include    "math-funcs.h"
 
 #include    "vehicle-loader.h"
 
