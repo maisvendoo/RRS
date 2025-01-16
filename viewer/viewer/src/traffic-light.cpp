@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include "proc-animation.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -59,10 +61,9 @@ void TrafficLight::update()
 
     if (lens_state != old_lens_state)
     {
-        for (auto animation = animations.begin(); animation != animations.end(); ++animation)
+        for (auto* anim : animations)
         {
-            ProcAnimation *anim = animation.value();
-            anim->setPosition(lens_state[animation.value()->getSignalID()]);
+            anim->setPosition(lens_state[anim->getSignalID()]);
         }
 
          std::cout << "Updated signal " << this->getConnectorName().toStdString() << std::endl;

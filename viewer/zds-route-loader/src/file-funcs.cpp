@@ -12,7 +12,7 @@ std::string getFileName(const std::string &path)
     std::vector<std::string> pathElems;
     osgDB::getPathElements(path, pathElems);
 
-    return *(pathElems.end() - 1);
+    return pathElems.back();
 }
 
 //------------------------------------------------------------------------------

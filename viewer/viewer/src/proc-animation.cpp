@@ -137,9 +137,9 @@ bool ProcAnimation::loadKeyPoints(ConfigReader &cfg)
         return false;
     }
 
-    for (auto it = config_node->children.begin(); it != config_node->children.end(); ++it)
+    for (auto child_ref_ptr : config_node->children)
     {
-        osgDB::XmlNode *child = *it;
+        osgDB::XmlNode *child = child_ref_ptr.get();
 
         if (child->name == "KeyPoint")
         {

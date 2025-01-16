@@ -72,7 +72,7 @@ void AnalogTranslation::update()
     if (keypoints.size() == 0)
         return;
 
-    motion = cut(motion, (*keypoints.begin()).value, (*(keypoints.end() - 1)).value);
+    motion = cut(motion, keypoints.front().value, keypoints.back().value);
 
     osg::Matrix translate = osg::Matrixf::translate(axis * motion);
     transform->setMatrix(translate * matrix);

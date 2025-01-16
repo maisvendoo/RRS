@@ -189,7 +189,7 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
         object.texture_path = tokens[2];
 
         // Заполняем информацию о файле модели
-        FileSystem &fs = FileSystem::getInstance();        
+        FileSystem &fs = FileSystem::getInstance();
 
         object.model_path = routeDir + object.model_path;
         object.texture_path = routeDir + object.texture_path;
@@ -222,7 +222,7 @@ ReadResult SceneLoader::loadObjectRef(std::istream &stream)
 //------------------------------------------------------------------------------
 ReadResult SceneLoader::loadObjectMap(std::istream &stream)
 {
-    std::string prev_name = "";    
+    std::string prev_name = "";
 
     while ( !stream.eof() && !stream.fail() )
     {

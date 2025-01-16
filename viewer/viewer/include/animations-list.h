@@ -2,7 +2,8 @@
 #define     ANIMATIONS_LIST_H
 
 #include    <QMap>
-#include    "proc-animation.h"
+
+class ProcAnimation;
 
 //------------------------------------------------------------------------------
 //

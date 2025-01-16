@@ -74,11 +74,15 @@ bool AnalogRotation::load_config(ConfigReader &cfg)
 //------------------------------------------------------------------------------
 void AnalogRotation::update()
 {
-    if (keypoints.size() == 0)
+    if (keypoints.empty())
+    {
         return;
+    }
 
     if (!infinity)
-        angle = cut(angle, (*keypoints.begin()).value, (*(keypoints.end() - 1)).value);
+    {
+        angle = cut(angle, keypoints.front().value, keypoints.back().value);
+    }
 
     osg::Matrix rotate = osg::Matrixf::rotate(angle * osg::PIf / 180.0f, axis);
     transform->setMatrix(rotate * matrix);

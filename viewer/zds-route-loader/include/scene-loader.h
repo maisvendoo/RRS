@@ -18,7 +18,6 @@
 #include    <string>
 #include    <map>
 #include    <vector>
-#include    <fstream>
 
 #include    <osgDB/FileUtils>
 #include    <osgDB/FileNameUtils>

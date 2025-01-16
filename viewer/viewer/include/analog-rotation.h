@@ -3,8 +3,8 @@
 
 #include "proc-animation.h"
 
-#include <osg/Vec3>
 #include <osg/Matrix>
+#include <osg/Vec3>
 
 class AnalogRotation : public ProcAnimation
 {

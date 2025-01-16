@@ -4,6 +4,8 @@
 #include    <osg/NodeVisitor>
 #include    "animations-list.h"
 
+class ConfigReader;
+
 class MaterialAnimationVisitor : public osg::NodeVisitor
 {
 public:

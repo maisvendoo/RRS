@@ -75,7 +75,7 @@ void readNextMesh(std::ifstream &stream, dmd_multimesh_t &multimesh)
     line = getLine(stream);
 
     // Читаем массив вершин
-    mesh.vertices = new osg::Vec3Array;    
+    mesh.vertices = new osg::Vec3Array;
 
     for (unsigned int i = 0; i < mesh.vertex_count; ++i)
     {
@@ -97,7 +97,7 @@ void readNextMesh(std::ifstream &stream, dmd_multimesh_t &multimesh)
     for (unsigned int i = 0; i < mesh.faces_count; ++i)
     {
         line = getLine(stream);
-        line = delete_symbol(line, '\t');        
+        line = delete_symbol(line, '\t');
 
         std::istringstream ss(line);
 
@@ -157,7 +157,7 @@ void readTextureBlock(std::ifstream &stream, dmd_multimesh_t &multimesh)
         texel.y() = 1.0f - texel.y();
 
         multimesh.texvrtices->push_back(texel);
-    }    
+    }
 
     line = getLine(stream);
     line = getLine(stream);
@@ -165,20 +165,20 @@ void readTextureBlock(std::ifstream &stream, dmd_multimesh_t &multimesh)
     for (unsigned int i = 0; i < multimesh.tex_f_count; ++i)
     {
         line = delete_symbol(getLine(stream), '\t');
-        std::istringstream ss(line);        
+        std::istringstream ss(line);
 
 
         face_t texface;
 
         while (!ss.eof())
-        {            
+        {
             unsigned int idx = 0;
-            ss >> idx;            
+            ss >> idx;
 
             texface.push_back(idx-1);
         }
 
         multimesh.texfaces.push_back(texface);
-    }    
+    }
 }
 
