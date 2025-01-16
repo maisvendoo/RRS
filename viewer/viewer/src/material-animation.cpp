@@ -2,6 +2,10 @@
 
 #include    <sstream>
 
+#include <osg/Drawable>
+
+#include "config-reader.h"
+
 MaterialAnimation::MaterialAnimation(osg::Material *mat, osg::Drawable *drawable)
     : ProcAnimation()
     , mat(new osg::Material)

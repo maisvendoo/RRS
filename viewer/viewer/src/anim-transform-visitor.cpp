@@ -7,6 +7,8 @@
 #include    "material-animation-visitor.h"
 #include    "material-rgb-animation-visitor.h"
 
+#include <osg/MatrixTransform>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

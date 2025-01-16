@@ -4,7 +4,7 @@
 #include    <osg/Array>
 #include    <osg/Drawable>
 
-typedef  std::vector<unsigned int> face_t;
+using face_t = std::vector<unsigned int>;
 
 //------------------------------------------------------------------------------
 //

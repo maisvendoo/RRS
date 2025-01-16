@@ -4,7 +4,7 @@
 #include    <osg/NodeVisitor>
 #include    <osg/Geometry>
 
-typedef std::vector<std::string> dmd_content_t;
+using dmd_content_t = std::vector<std::string>;
 
 //------------------------------------------------------------------------------
 //

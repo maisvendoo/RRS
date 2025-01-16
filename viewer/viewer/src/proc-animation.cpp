@@ -1,10 +1,36 @@
 #include    "proc-animation.h"
 #include    "get-value.h"
 
+#include "config-reader.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation::ProcAnimation(osg::MatrixTransform *transform)
+ProcAnimation::ProcAnimation()
+    : pos(0.0f)
+    , duration(0.0f)
+    , signal_id(0)
+    , transform(nullptr)
+    , name("")
+{
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ProcAnimation::ProcAnimation(const std::string& name)
+    : pos(0.0f)
+    , duration(0.0f)
+    , signal_id(0)
+    , transform(nullptr)
+    , name(name)
+{
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ProcAnimation::ProcAnimation(osg::MatrixTransform* transform)
     : pos(0.0f)
     , duration(0.0f)
     , signal_id(0)
@@ -13,16 +39,12 @@ ProcAnimation::ProcAnimation(osg::MatrixTransform *transform)
     , is_fixed_signal(false)
     , fixed_signal(0.0f)
 {
-
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation::~ProcAnimation()
-{
-
-}
+ProcAnimation::~ProcAnimation() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -43,7 +65,7 @@ void ProcAnimation::setName(const std::string &name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string ProcAnimation::getName() const
+const std::string& ProcAnimation::getName() const
 {
     return name;
 }
@@ -91,6 +113,15 @@ void ProcAnimation::setPosition(float pos)
 size_t ProcAnimation::getSignalID() const
 {
     return signal_id;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ProcAnimation::key_point_t::key_point_t()
+    : param(0.0f)
+    , value(0.0f)
+{
 }
 
 //------------------------------------------------------------------------------

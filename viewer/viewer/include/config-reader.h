@@ -12,21 +12,20 @@ class ConfigReader
 public:
 
     ConfigReader();
-
-    ConfigReader(const std::string &path);
+    ConfigReader(const std::string& path);
 
     virtual ~ConfigReader();
 
-    bool load(const std::string &path);
+    bool load(const std::string& path);
 
     bool isOpenned() const;
 
-    osgDB::XmlNode *getConfigNode();
+    osgDB::XmlNode* getConfigNode();
 
-    osgDB::XmlNode *findSection(osgDB::XmlNode *node, const std::string &section);
+    osgDB::XmlNode* findSection(osgDB::XmlNode* node, const std::string& section);
 
     template<class T>
-    bool getValue(const std::string &section, const std::string &param, T &value)
+    bool getValue(const std::string& section, const std::string& param, T& value)
     {
         std::string contents = getStrValue(section, param);
 
@@ -48,7 +47,7 @@ public:
         return false;
     }
 
-    bool getValue(const std::string &section, const std::string &param, std::string &value)
+    bool getValue(const std::string& section, const std::string& param, std::string& value)
     {
         std::string contents = getStrValue(section, param);
 
@@ -63,11 +62,11 @@ public:
 
 protected:
 
-    bool    is_opened;
+    bool is_opened;
 
     osg::ref_ptr<osgDB::XmlNode> root;
 
-    std::string getStrValue(const std::string &section, const std::string &param);
+    std::string getStrValue(const std::string& section, const std::string& param);
 };
 
 #endif

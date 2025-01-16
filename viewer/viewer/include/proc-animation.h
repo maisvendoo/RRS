@@ -1,9 +1,15 @@
-#ifndef     PROC_ANIMATION_H
-#define     PROC_ANIMATION_H
+#ifndef PROC_ANIMATION_H
+#define PROC_ANIMATION_H
 
-#include    <osg/MatrixTransform>
+#include <string>
+#include <vector>
 
-#include    "config-reader.h"
+namespace osg
+{
+    class MatrixTransform;
+};
+
+class ConfigReader;
 
 //------------------------------------------------------------------------------
 //
@@ -12,39 +18,21 @@ class ProcAnimation
 {
 public:
 
-    ProcAnimation()
-        : pos(0.0)
-        , duration(0.0)
-        , signal_id(0)
-        , transform(nullptr)
-        , name("")
-    {
-
-    }
-
-    ProcAnimation(const std::string &name)
-        : pos(0.0)
-        , duration(0.0)
-        , signal_id(0)
-        , transform(nullptr)
-        , name(name)
-    {
-
-    }
-
-    ProcAnimation(osg::MatrixTransform *transform);
+    ProcAnimation();
+    ProcAnimation(const std::string& name);
+    ProcAnimation(osg::MatrixTransform* transform);
 
     virtual ~ProcAnimation();
 
     void step(float t, float dt);
 
-    void setName(const std::string &name);
+    void setName(const std::string& name);
 
-    std::string getName() const;
+    const std::string& getName() const;
 
-    bool load(const std::string &path);
+    bool load(const std::string& path);
 
-    bool load(ConfigReader &cfg);
+    bool load(ConfigReader& cfg);
 
     void setPosition(float pos);
 
@@ -54,41 +42,35 @@ protected:
 
     struct key_point_t
     {
+        key_point_t();
+
         float param;
         float value;
-
-        key_point_t()
-            : param(0.0f)
-            , value(0.0f)
-        {
-
-        }
     };
 
-    float                   pos;
-    float                   duration;
+    float pos;
+    float duration;
 
-    size_t                  signal_id;
+    size_t signal_id;
 
-    osg::MatrixTransform    *transform;
-    std::string             name;
+    osg::MatrixTransform* transform;
+    std::string name;
 
-    bool                    is_fixed_signal;
-    float                   fixed_signal;
+    bool is_fixed_signal;
+    float fixed_signal;
 
     std::vector<key_point_t> keypoints;
 
-    virtual bool load_config(ConfigReader &cfg) = 0;
+    virtual bool load_config(ConfigReader& cfg) = 0;
 
     virtual void anim_step(float t, float dt) = 0;
 
     float interpolate(float value);
 
 private:
+    bool loadKeyPoints(ConfigReader& cfg);
 
-    bool loadKeyPoints(ConfigReader &cfg);
-
-    key_point_t findBeginKeyPoint(float value, size_t &next_idx);
+    key_point_t findBeginKeyPoint(float value, size_t& next_idx);
 };
 
 #endif // PROC_ANIMATION_H

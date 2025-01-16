@@ -2,6 +2,7 @@
 #include    <QBuffer>
 #include    <anim-transform-visitor.h>
 
+#include <iostream>
 
 //------------------------------------------------------------------------------
 //
