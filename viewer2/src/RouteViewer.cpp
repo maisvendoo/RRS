@@ -3,13 +3,11 @@
 #include "ConfigReader.h"
 #include "filesystem.h"
 #include "settings.h"
+#include "Logger.h"
 
 #include <sstream>
-#include <vsg/io/Logger.h>
 
 #include <string>
-
-#include <cstdint>
 
 RouteViewer::RouteViewer(int argc, char* argv[])
     : is_ready(false)
@@ -17,12 +15,12 @@ RouteViewer::RouteViewer(int argc, char* argv[])
 {
     if (init(argc, argv))
     {
-        vsg::Logger::instance()->info("Viewer is initialized succesfully");
+        LOG_INFO("Viewer is initialized succesfully");
         is_ready = true;
     }
     else
     {
-        vsg::Logger::instance()->fatal("Fail to initialize viewer");
+        LOG_FATAL("Fail to initialize viewer");
     }
 }
 
@@ -40,11 +38,35 @@ bool RouteViewer::init(int argc, char* argv[])
 {
     FileSystem& fs = FileSystem::getInstance();
 
+    Logger::instance().openFile(fs.getLogsDir() + fs.separator() + "viewer.log");
+
     // osgDB::DatabasePager *dp = viewer.getDatabasePager();
     // dp->setDoPreCompile(true);
     // dp->setTargetMaximumNumberOfPageLOD(1000);
 
     loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
+    LOG_INFO("Loaded settings from settings.xml");
+
+    LogLevel level = LOG_LEVEL_INFO;
+
+    if (settings.notify_level == "INFO")
+    {
+        level = LOG_LEVEL_INFO;
+    }
+    else if (settings.notify_level == "WARN")
+    {
+        level = LOG_LEVEL_WARN;
+    }
+    else if (settings.notify_level == "FATAL")
+    {
+        level = LOG_LEVEL_FATAL;
+    }
+
+    // vsg::Logger::instance()->level = level;
+
+    auto tf = [&](std::ostream& out) {
+        out << "Hio";
+    };
 
     return true;
 }
@@ -63,12 +85,7 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
 
         cfg.getValue("port", settings.tcp_config.port);
 
-        vsg::Logger::instance()->info(
-            std::string("Host for client from settings: ")
-            + host_addr
-            + ':'
-            + std::to_string(settings.tcp_config.port)
-        );
+        LOG_INFO("Host for client from settings: %s:%u", host_addr.c_str(), settings.tcp_config.port);
 
         cfg.getValue("ReconnectInterval", settings.tcp_config.reconnect_interval);
         cfg.getValue("VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
@@ -114,7 +131,9 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
         if (!free_cam_init_pos.empty())
         {
             std::istringstream stream(free_cam_init_pos);
-            stream >> settings.free_cam_init_pos;
+            stream >> settings.free_cam_init_pos.x
+                >> settings.free_cam_init_pos.y
+                >> settings.free_cam_init_pos.z;
         }
 
         cfg.getValue("FreeCamRotCoeff", settings.free_cam_rot_coeff);

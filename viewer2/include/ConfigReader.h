@@ -1,7 +1,7 @@
 #ifndef VIEWER_CFG_READER_H
 #define VIEWER_CFG_READER_H
 
-#include <vsg/io/Logger.h>
+#include "Logger.h"
 
 #include <pugixml.hpp>
 
@@ -46,13 +46,11 @@ void ConfigReader::getValue(const std::string& param, T& value)
     }
     catch (...)
     {
-        vsg::Logger::instance()->error(
-            std::string("Invalid value of param ")
-            + param
-            + " in section "
-            + current_section.name()
-            + " in config file "
-            + path
+        LOG_ERROR(
+            "Invalid value of param %s in section %s in config file %s",
+            param.c_str(),
+            current_section.name(),
+            path.c_str()
         );
 
         throw 1;

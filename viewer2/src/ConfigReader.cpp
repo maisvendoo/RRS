@@ -1,6 +1,5 @@
 #include "ConfigReader.h"
-
-#include <vsg/io/Logger.h>
+#include "Logger.h"
 
 #include <pugixml.hpp>
 
@@ -14,7 +13,7 @@ ConfigReader::ConfigReader(const std::string& path)
     pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (!result)
     {
-        vsg::Logger::instance()->error(std::string("Failed to open config file ") + path);
+        LOG_ERROR("Failed to open config file %s", path.c_str());
         throw 1;
     }
 }
@@ -24,12 +23,7 @@ void ConfigReader::setSection(const std::string& section)
     current_section = doc.child("Config").child(section.c_str());
     if (!current_section)
     {
-        vsg::Logger::instance()->error(
-            std::string("Failed to find section ")
-            + section
-            + " in config file "
-            + path
-        );
+        LOG_ERROR("Failed to find section %s in config file %s", section.c_str(), path.c_str());
 
         throw 1;
     }
@@ -48,20 +42,18 @@ std::string ConfigReader::getStringValue(const std::string& param)
 {
     if (!current_section)
     {
-        vsg::Logger::instance()->error(std::string("Invalid current section in config file ") + path);
+        LOG_ERROR("Invalid current section in config file %s", path.c_str());
         throw 1;
     }
 
     std::string string_value = current_section.child_value(param.c_str());
     if (string_value.empty())
     {
-        vsg::Logger::instance()->warn(
-            std::string("No param ")
-            + param
-            + " in section "
-            + current_section.name()
-            + " in config file "
-            + path
+        LOG_WARN(
+            "No param \"%s\" in section \"%s\" in config file \"%s\"",
+            param.c_str(),
+            current_section.name(),
+            path.c_str()
         );
 
         // throw 1;
