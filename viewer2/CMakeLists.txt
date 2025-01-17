@@ -9,6 +9,12 @@ set (EXECUTABLE_OUTPUT_PATH "../../bin")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(OpenAL REQUIRED CONFIG)
+
+# Опеределяем дефайн CFG_READER_LIB для корректного
+# экспорта и импорта слассов из DLL
+add_definitions(-DSOUND_MANAGER_LIB)
+
 if(WIN32)
     set(DEPENDENCIES_DIR ${PROJECT_SOURCE_DIR}/dependencies/WIN32)
 else()
@@ -28,6 +34,7 @@ file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 add_executable(${TARGET} ${PUGIXML_SOURCES} ${TARGET_SOURCES})
 
 target_link_libraries(${TARGET} PRIVATE
+    OpenAL::OpenAL
     vsg::vsg
     vsgXchange::vsgXchange
     filesystem

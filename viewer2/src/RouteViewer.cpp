@@ -1,10 +1,14 @@
 #include "RouteViewer.h"
 
+#include "CLI11.hpp"
 #include "ConfigReader.h"
+#include "SoundManager.h"
+#include "cmd-line.h"
 #include "filesystem.h"
 #include "settings.h"
 #include "Logger.h"
 
+#include <memory>
 #include <sstream>
 
 #include <string>
@@ -12,6 +16,7 @@
 RouteViewer::RouteViewer(int argc, char* argv[])
     : is_ready(false)
     , settings()
+    , sound_manager()
 {
     if (init(argc, argv))
     {
@@ -62,11 +67,13 @@ bool RouteViewer::init(int argc, char* argv[])
         level = LOG_LEVEL_FATAL;
     }
 
-    // vsg::Logger::instance()->level = level;
+    Logger::instance().level = level;
 
-    auto tf = [&](std::ostream& out) {
-        out << "Hio";
-    };
+    LOG_INFO("Override settings from command line");
+    overrideSettingsByCommandLine(argc, argv);
+
+    sound_manager = std::make_unique<SoundManager>();
+    LOG_INFO("Created SoundManager");
 
     return true;
 }
@@ -150,4 +157,64 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
     catch (...)
     {
     }
+}
+
+int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
+{
+    cmd_line_t cmd_line;
+
+    CLI::App app("Viewer");
+    argv = app.ensure_utf8(argv);
+
+    app.add_option("--route", cmd_line.route_dir);
+    app.add_option("--train", cmd_line.train_config);
+    app.add_option("--host-addr", cmd_line.host_addr);
+    app.add_option("--port", cmd_line.port);
+    app.add_option("--width", cmd_line.width);
+    app.add_option("--height", cmd_line.height);
+    app.add_option("--direction", cmd_line.direction);
+    app.add_flag("--fullscreen", cmd_line.fullscreen);
+    app.add_flag("--localmode", cmd_line.localmode);
+    app.add_option("--notify-level", cmd_line.notify_level);
+
+    CLI11_PARSE(app, argc, argv);
+
+    if (cmd_line.host_addr)
+    {
+        settings.tcp_config.host_addr = cmd_line.host_addr->c_str();
+    }
+
+    if (cmd_line.port)
+    {
+        settings.tcp_config.port = static_cast<quint16>(cmd_line.port.value());
+    }
+
+    if (cmd_line.width)
+    {
+        settings.width = cmd_line.width.value();
+    }
+
+    if (cmd_line.height)
+    {
+        settings.height = cmd_line.height.value();
+    }
+
+    settings.fullscreen = cmd_line.fullscreen;
+
+    if (cmd_line.notify_level)
+    {
+        settings.notify_level = cmd_line.notify_level.value();
+    }
+
+    if (cmd_line.direction)
+    {
+        settings.direction = cmd_line.direction.value();
+    }
+
+    if (cmd_line.route_dir)
+    {
+        settings.route_dir_name = cmd_line.route_dir.value();
+    }
+
+    return 0;
 }
