@@ -51,5 +51,15 @@ void SoundManager::init()
     ALfloat pos[3] = {0.0f, 0.0f, 0.0f};
     alListenerfv(AL_POSITION, pos);
 
-    // ALfloat vel[3] = {0.0f, 0.0f}
+    ALfloat vel[3] = {0.0f, 0.0f, 0.0f};
+    alListenerfv(AL_VELOCITY, vel);
+
+    ALfloat ori[6] = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    alListenerfv(AL_ORIENTATION, ori);
+
+    alListenerf(AL_GAIN, volume);
+
+    LOG_INFO("Volume: %.3f", volume);
+    LOG_INFO("Sources: %d", max_sources);
+    LOG_INFO("=========================== Initialization successful ===========================");
 }
