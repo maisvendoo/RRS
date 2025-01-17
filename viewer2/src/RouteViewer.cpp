@@ -3,6 +3,7 @@
 #include "CLI11.hpp"
 #include "ConfigReader.h"
 #include "SoundManager.h"
+#include "TrainExteriorHandler.h"
 #include "cmd-line.h"
 #include "filesystem.h"
 #include "settings.h"
@@ -12,11 +13,11 @@
 #include <sstream>
 
 #include <string>
+#include <vsg/app/RecordTraversal.h>
+#include <vsg/nodes/Group.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[])
     : is_ready(false)
-    , settings()
-    , sound_manager()
 {
     if (init(argc, argv))
     {
@@ -74,6 +75,10 @@ bool RouteViewer::init(int argc, char* argv[])
 
     sound_manager = std::make_unique<SoundManager>();
     LOG_INFO("Created SoundManager");
+
+    train_ext_handler = std::make_unique<TrainExteriorHandler>(settings, sound_manager);
+
+    root = new vsg::Group;
 
     return true;
 }
@@ -217,4 +222,14 @@ int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
     }
 
     return 0;
+}
+
+bool RouteViewer::initEngineSettings()
+{
+    if (!root)
+    {
+        return false;
+    }
+
+    return true;
 }
