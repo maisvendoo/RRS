@@ -1,7 +1,14 @@
 #include "settings.h"
 
+#include "tcp-client.h"
+
+#include <vsg/maths/vec3.h>
+
+#include <string>
+
 settings_t::settings_t()
-    : vehicles_pos_update_interval(70)
+    : tcp_config()
+    , vehicles_pos_update_interval(70)
     , vehicles_state_update_interval(100)
     , vehicle_controled_update_interval(70)
     , client_delay(100)
@@ -37,7 +44,7 @@ settings_t::settings_t()
     , ext_cam_min_dist(5.0f)
     , ext_cam_init_angle_H(0.0f)
     , ext_cam_init_angle_V(0.0f)
-    , free_cam_init_pos(vsg::vec3(2.5f, 0.0f, 1.75f))
+    , free_cam_init_pos(2.5f, 0.0f, 1.75f)
     , free_cam_rot_coeff(1.0f)
     , free_cam_speed(5.0f)
     , free_cam_speed_coeff(10.0f)
