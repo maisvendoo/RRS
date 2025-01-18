@@ -21,15 +21,15 @@
 #include    <QMap>
 #include    <QMutex>
 
-#include    "solver-types.h"
-#include    "key-symbols.h"
-
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
 #include    "profile-point.h"
 #include    "device-list.h"
+
+#include    "physics.h"
+#include "solver-types.h"
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
@@ -397,7 +397,7 @@ typedef Vehicle* (*GetVehicle)();
 //
 //------------------------------------------------------------------------------
 #define GET_VEHICLE(ClassName) \
-    extern "C" Q_DECL_EXPORT Vehicle *getVehicle() \
+    extern "C" Vehicle *getVehicle() \
     {\
         return new (ClassName)(); \
     }
@@ -409,6 +409,6 @@ typedef Vehicle* (*GetVehicle)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT Vehicle *loadVehicle(QString lib_path);
+extern "C" VEHICLE_EXPORT Vehicle *loadVehicle(QString lib_path);
 
 #endif // VEHICLE_H

@@ -28,6 +28,21 @@ Model::Model(QObject *parent) : QObject(parent)
 {/*
     simulator_info_t tmp_si = simulator_info_t();
     memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
+    memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
+    memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
+    keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
+
+    // Обход ошибок с QSharedMemory в случае сбоя
+    memory_sim_info.attach();
+    memory_sim_info.detach();
+    memory_sim_update.attach();
+    memory_sim_update.detach();
+    memory_controlled.attach();
+    memory_controlled.detach();
+    keys_data.attach();
+    keys_data.detach();
+
+    simulator_info_t tmp_si = simulator_info_t();
     if (memory_sim_info.create(sizeof(simulator_info_t)))
     {
         Journal::instance()->info("Created shared memory for simulator info");
@@ -46,7 +61,6 @@ Model::Model(QObject *parent) : QObject(parent)
         }
     }
 
-    memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
     if (memory_sim_update.create(sizeof(simulator_update_t)))
     {
         Journal::instance()->info("Created shared memory for simulator update data");
@@ -64,7 +78,6 @@ Model::Model(QObject *parent) : QObject(parent)
     }*/
 /*
     controlled_t tmp_c = controlled_t();
-    memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
     if (memory_controlled.create(sizeof(controlled_t)))
     {
         Journal::instance()->info("Created shared memory for info about controlled vehicle");
@@ -83,7 +96,6 @@ Model::Model(QObject *parent) : QObject(parent)
         }
     }
 
-    keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
     if (keys_data.create(sizeof(KEYS_DATA_BYTEARRAY_SIZE)))
     {
         Journal::instance()->info("Created shared memory for keysboard processing");
@@ -131,7 +143,7 @@ bool Model::init(const simulator_command_line_t &command_line)
     overrideByCommandLine(init_data, command_line);
 
     // Read solver configuration
-    configSolver(init_data.solver_config);    
+    configSolver(init_data.solver_config);
 
     // Load route topology
     initTopology(init_data);
@@ -516,7 +528,7 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     if (!command_line.train_config.is_present)
     {
-        Journal::instance()->info("Command line is empty. Apply init_data.xml config");        
+        Journal::instance()->info("Command line is empty. Apply init_data.xml config");
         return;
     }
 

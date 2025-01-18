@@ -16,6 +16,7 @@
 
 #include    "filesystem.h"
 #include    "Journal.h"
+#include    "key-symbols.h"
 
 //------------------------------------------------------------------------------
 //

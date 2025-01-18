@@ -2,6 +2,13 @@
 
 #include    <QDir>
 
+#include "airdistributor.h"
+#include "brake-mech.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose.h"
+#include "reservoir.h"
+#include    "key-symbols.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------

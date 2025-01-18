@@ -1,5 +1,7 @@
 #include    "protective-device.h"
 
+#include    "physics.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -155,7 +157,7 @@ void ProtectiveDevice::ode_system(const state_vector_t &Y,
 
     double s1 = s2 - s3;
 
-    U_out = U_in * hs_p(dx);    
+    U_out = U_in * hs_p(dx);
 
     dYdt[0] = s1 * Vn;
 }

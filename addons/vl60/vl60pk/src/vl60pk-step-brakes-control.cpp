@@ -1,5 +1,16 @@
 #include    "vl60pk.h"
 
+#include "brake-crane.h"
+#include "brake-lock.h"
+#include "brake-mech.h"
+#include "electro-airdistributor.h"
+#include "loco-crane.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose.h"
+#include "pneumo-relay.h"
+#include "pneumo-switching-valve.h"
+#include "reservoir.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
@@ -60,7 +71,7 @@ void VL60pk::stepBrakesControl(double t, double dt)
         loco_crane->setControl(keys);
     }
 
-    loco_crane->step(t, dt);    
+    loco_crane->step(t, dt);
 
     // Переключательный клапан ЗПК
     // Первый вход клапана моделирует магистраль тормозных цилиндров

@@ -1,4 +1,10 @@
-#include    "freightcar.h"
+#include "freightcar.h"
+
+#include "airdistributor.h"
+#include "electro-airdistributor.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose-epb.h"
+#include "reservoir.h"
 
 //------------------------------------------------------------------------
 //

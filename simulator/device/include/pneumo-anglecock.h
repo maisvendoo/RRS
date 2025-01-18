@@ -2,6 +2,7 @@
 #define     PNEUMO_ANGLECOCK_H
 
 #include    "device.h"
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //

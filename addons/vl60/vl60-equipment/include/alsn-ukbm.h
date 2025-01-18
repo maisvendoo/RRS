@@ -4,6 +4,10 @@
 #include    <device.h>
 #include    <ALSN-struct.h>
 
+#include    "physics.h"
+#include    "timer.h"
+#include    "trigger.h"
+
 enum
 {
     RED_LAMP = 0,

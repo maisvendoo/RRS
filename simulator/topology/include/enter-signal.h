@@ -5,6 +5,7 @@
 #include    <rail-signal.h>
 #include    <combine-releay.h>
 #include    <timer.h>
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //
@@ -137,7 +138,7 @@ protected:
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_nopressed = true;
 
-    double U_bat = 12.0;    
+    double U_bat = 12.0;
 
     /// Таймер выдержкм времени удержания кнопки открыть
     Timer *open_timer = new Timer(1.0, false);
@@ -153,7 +154,7 @@ protected:
 
     bool is_SSR_ON = false;
 
-    bool is_ALR_ON = false;    
+    bool is_ALR_ON = false;
 
     enum
     {

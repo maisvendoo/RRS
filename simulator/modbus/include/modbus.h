@@ -14,7 +14,7 @@ public:
 
     Modbus(QObject *parent = Q_NULLPTR);
 
-    ~Modbus();
+    ~Modbus() = default;
 
     bool init(QString cfg_path);
 
@@ -32,7 +32,7 @@ private:
     void controlSignalsProcess();
 
     /// Передача данных в Modbus
-    void feedbackSignalsProcess();    
+    void feedbackSignalsProcess();
 };
 
 #endif // MODBUS_H

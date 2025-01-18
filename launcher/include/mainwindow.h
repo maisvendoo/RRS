@@ -63,7 +63,7 @@ private:
     /// Info about installed routes
     std::vector<route_info_t>   routes_info;
     /// Info about installed trains
-    std::vector<train_info_t>   trains_info;    
+    std::vector<train_info_t>   trains_info;
 
     /// Simulation process
     QProcess        simulatorProc;
@@ -102,13 +102,13 @@ private:
     void loadRoutesList(const std::string &routesDir);
 
     /// Loading of trains list
-    void loadTrainsList(const std::string &trainsDir);    
+    void loadTrainsList(const std::string &trainsDir);
 
     /// Start simulation
     void startSimulator();
 
     /// Start viewer
-    void startViewer();        
+    void startViewer();
 
     /// Load theme
     void loadTheme();
@@ -133,7 +133,7 @@ private:
 
 private slots:
 
-    void onRouteSelection();    
+    void onRouteSelection();
 
     void onTrainSelection();
 
@@ -145,7 +145,7 @@ private slots:
 
     void onViewerFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
-    void onStationSelected(int index);    
+    void onStationSelected(int index);
 
     void slotChangedGraphSetting(int);
 

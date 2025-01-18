@@ -22,17 +22,10 @@
 
 #include    "solver-types.h"
 #include    "sound-signal.h"
-#include    "physics.h"
 #include    "CfgReader.h"
-#include    "registrator.h"
+
 #include    "control-signals.h"
 #include    "feedback-signals.h"
-#include    "key-symbols.h"
-#include    "hysteresis.h"
-#include    "hysteresis-relay.h"
-#include    "linear-interpolation.h"
-#include    "timer.h"
-#include    "trigger.h"
 
 
 /*!

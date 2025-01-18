@@ -1,7 +1,20 @@
 #ifndef     FREIGHTCAR_H
 #define     FREIGHTCAR_H
 
-#include    "vehicle-api.h"
+#include "vehicle.h"
+
+#include <QString>
+
+class AirDistributor;
+class BrakeAutoMode;
+class BrakeMech;
+class Coupling;
+class ElectroAirDistributor;
+class OperatingRod;
+class PneumoAngleCock;
+class PneumoHoseEPB;
+class Registrator;
+class Reservoir;
 
 //------------------------------------------------------------------------------
 //

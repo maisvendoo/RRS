@@ -15,7 +15,7 @@ public:
 
     FreeJoy(QObject *parent = Q_NULLPTR);
 
-    ~FreeJoy();
+    ~FreeJoy() = default;
 
     bool init(QString cfg_path);
 
@@ -47,8 +47,6 @@ private:
     };
 
     std::array<brake_crane_pos_t, BRAKE_CRANE_POS_NUM> brake_crane_pos;
-
-    sf::Joystick freejoy;
 
     bool load_config(QString path);
 };

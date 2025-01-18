@@ -24,21 +24,21 @@ struct signals_data_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << line_signals.size();
+        stream << (quint32)line_signals.size();
 
         for (auto line_signal : line_signals)
         {
             stream << line_signal->serialize();
         }
 
-        stream << enter_signals.size();
+        stream << (quint32)enter_signals.size();
 
         for (auto enter_signal: enter_signals)
         {
             stream << enter_signal->serialize();
         }
 
-        stream << exit_signals.size();
+        stream << (quint32)exit_signals.size();
 
         for (auto signal : exit_signals)
         {
@@ -54,7 +54,7 @@ struct signals_data_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        size_t data_size = 0;
+        quint32 data_size = 0;
         stream >> data_size;
 
         line_signals.clear();
@@ -70,7 +70,7 @@ struct signals_data_t
             line_signals.push_back(line_signal);
         }
 
-        size_t enter_signals_size = 0;
+        quint32 enter_signals_size = 0;
         stream >> enter_signals_size;
 
         enter_signals.clear();
@@ -86,7 +86,7 @@ struct signals_data_t
             enter_signals.push_back(enter_signal);
         }
 
-        size_t exit_signals_size = 0;
+        quint32 exit_signals_size = 0;
         stream >> exit_signals_size;
 
         exit_signals.clear();

@@ -28,7 +28,7 @@ public:
 
     VirtualInterfaceDevice(QObject *parent = Q_NULLPTR);
 
-    virtual ~VirtualInterfaceDevice();
+    ~VirtualInterfaceDevice() = default;
 
     virtual bool init(QString cfg_path) = 0;
 
@@ -63,7 +63,7 @@ protected:
 typedef VirtualInterfaceDevice* (*GetInterfaceDevice)();
 
 #define GET_INTERFACE_DEVICE(ClassName) \
-    extern "C" Q_DECL_EXPORT VirtualInterfaceDevice *getInterfaceDevice() \
+    extern "C" VirtualInterfaceDevice *getInterfaceDevice() \
     { \
         return new (ClassName) (); \
     }
@@ -71,6 +71,6 @@ typedef VirtualInterfaceDevice* (*GetInterfaceDevice)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT VirtualInterfaceDevice *loadInterfaceDevice(QString lib_path);
+extern "C" DEVICE_EXPORT VirtualInterfaceDevice *loadInterfaceDevice(QString lib_path);
 
 #endif // VIRTUAL_INTERFACE_DEVICE_H

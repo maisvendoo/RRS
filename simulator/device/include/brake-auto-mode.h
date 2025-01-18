@@ -3,6 +3,8 @@
 
 #include    "brake-device.h"
 
+#include    "physics.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -61,7 +63,7 @@ typedef BrakeAutoMode* (*GetBrakeAutoMode)();
 //
 //------------------------------------------------------------------------------
 #define GET_BRAKE_AUTOMODE(ClassName) \
-    extern "C" Q_DECL_EXPORT BrakeAutoMode *getBrakeAutoMode() \
+    extern "C" BrakeAutoMode *getBrakeAutoMode() \
     { \
         return new (ClassName) (); \
     }
@@ -69,6 +71,6 @@ typedef BrakeAutoMode* (*GetBrakeAutoMode)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT BrakeAutoMode *loadBrakeAutoMode(QString lib_path);
+extern "C" DEVICE_EXPORT BrakeAutoMode *loadBrakeAutoMode(QString lib_path);
 
 #endif // BRAKE_AUTOMODE_H

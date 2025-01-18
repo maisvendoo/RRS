@@ -1,5 +1,12 @@
 #include    "vl60pk.h"
 
+#include "ALSN-coil.h"
+#include "ALSN-decoder.h"
+#include "alsn-ukbm.h"
+#include "automatic-train-stop.h"
+#include "reservoir.h"
+#include "sl2m.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

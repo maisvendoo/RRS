@@ -1,5 +1,11 @@
 #include    "vl60pk.h"
 
+#include "brake-crane.h"
+#include "electro-airdistributor.h"
+#include "epb-2line-control.h"
+#include "epb-converter.h"
+#include "pneumo-hose-epb.h"
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------

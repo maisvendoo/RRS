@@ -1,6 +1,13 @@
 #include    <vl60pk.h>
 #include    <QDir>
 
+#include "ALSN-coil.h"
+#include "ALSN-decoder.h"
+#include "alsn-ukbm.h"
+#include "automatic-train-stop.h"
+#include "sl2m.h"
+#include "speedmap.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

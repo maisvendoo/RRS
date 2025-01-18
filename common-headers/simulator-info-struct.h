@@ -99,7 +99,7 @@ struct simulator_vehicles_info_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << vehicles.size();
+        stream << (quint32)vehicles.size();
 
         for (auto veh : vehicles)
         {
@@ -115,7 +115,7 @@ struct simulator_vehicles_info_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        size_t num;
+        quint32 num;
         stream >> num;
 
         vehicles.clear();

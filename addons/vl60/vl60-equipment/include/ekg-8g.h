@@ -4,6 +4,7 @@
 #include    "device.h"
 #include    "timer.h"
 #include    "km-state.h"
+#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //

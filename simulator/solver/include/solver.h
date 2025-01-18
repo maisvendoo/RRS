@@ -87,6 +87,6 @@ typedef Solver* (*GetSolver)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT Solver *loadSolver(QString lib_path);
+extern "C" SOLVER_EXPORT Solver *loadSolver(QString lib_path);
 
 #endif // SOLVER_H

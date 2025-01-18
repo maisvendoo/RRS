@@ -27,19 +27,19 @@ struct simulator_update_players_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << clients_id.size();
+        stream << (quint32)clients_id.size();
         for (auto id : clients_id)
         {
             stream << id;
         }
 
-        stream << current_vehicles.size();
+        stream << (quint32)current_vehicles.size();
         for (auto veh : current_vehicles)
         {
             stream << veh;
         }
 
-        stream << controlled_vehicles.size();
+        stream << (quint32)controlled_vehicles.size();
         for (auto veh : controlled_vehicles)
         {
             stream << veh;
@@ -54,7 +54,7 @@ struct simulator_update_players_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        size_t num;
+        quint32 num;
 
         stream >> num;
         clients_id.clear();
@@ -171,7 +171,7 @@ struct simulator_update_pos_t
 
         stream << time;
 
-        stream << vehicles.size();
+        stream << (quint32)vehicles.size();
         for (auto veh_pos : vehicles)
         {
             stream << veh_pos.serialize();
@@ -188,7 +188,7 @@ struct simulator_update_pos_t
 
         stream >> time;
 
-        size_t num;
+        quint32 num;
 
         stream >> num;
         vehicles.clear();
@@ -232,7 +232,7 @@ struct simulator_vehicle_update_t
         stream << prev_vehicle;
         stream << next_vehicle;
 
-        stream << analogSignal.size();
+        stream << (quint32)analogSignal.size();
 
         for (auto signal : analogSignal)
         {
@@ -253,7 +253,7 @@ struct simulator_vehicle_update_t
         stream >> prev_vehicle;
         stream >> next_vehicle;
 
-        size_t num;
+        quint32 num;
         stream >> num;
         analogSignal.clear();
         analogSignal.resize(num);
@@ -319,14 +319,14 @@ struct simulator_update_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << trains.size();
+        stream << (quint32)trains.size();
 
         for (auto train : trains)
         {
             stream << train.serialize();
         }
 
-        stream << vehicles.size();
+        stream << (quint32)vehicles.size();
 
         for (auto vehicle : vehicles)
         {
@@ -342,7 +342,7 @@ struct simulator_update_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        size_t num;
+        quint32 num;
         stream >> num;
 
         trains.clear();

@@ -1,5 +1,12 @@
 #include    "passcar.h"
 
+#include "brake-mech.h"
+#include "coupling.h"
+#include "coupling-operating-rod.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose-epb.h"
+#include "reservoir.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

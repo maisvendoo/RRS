@@ -3,6 +3,42 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+FileSystem& FileSystem::getInstance()
+{
+    static FileSystem instance;
+    return instance;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+FileSystem::FileSystem()
+{
+    std::string workDir = QDir::currentPath().toStdString();
+    std::string tmp = getLevelUpDirectory(workDir, 1);
+    setBinaryDir(workDir);
+    setRouteRootDir(tmp + "routes");
+    setConfigDir(tmp + "cfg");
+    setLogsDir(tmp + "logs");
+    setLibraryDir(tmp + "lib");
+    setTrainsDir(getConfigDir() + separator() + "trains");
+    setModulesDir(tmp + "modules");
+    setVehiclesDir(getConfigDir() + separator() + "vehicles");
+    setCouplingsDir(getConfigDir()+ separator() + "couplings");
+    setDevicesDir(getConfigDir()+ separator() + "devices");
+    setDataDir(tmp + "data");
+    setVehicleModelsDir(combinePath(getDataDir(), "models"));
+    setVehicleTexturesDir(combinePath(getDataDir(), "textures"));
+    setPluginsDir(tmp + "plugins");
+    setScreenshotsDir(tmp + "screenshots");
+    setFontsDir(tmp + "fonts");
+    setSoundsDir(combinePath(getDataDir(), "sounds"));
+    setThemeDir(tmp + "themes");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void FileSystem::setRouteRootDir(const std::string &path)
 {
     routeRootDir = getNativePath(path);
