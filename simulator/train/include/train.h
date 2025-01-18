@@ -108,6 +108,11 @@ public slots:
     /// Integration step
     void slotStep(double current_time, double integration_time);
 
+signals:
+
+    /// Integration step done
+    void stepDone(int idx);
+
 private:
 
     /// Train index
