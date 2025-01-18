@@ -29,10 +29,10 @@ struct track_t
     /// Длина трека
     double len = 0.0;
 
-    /// Уклон профиля пути, в тясячных
+    /// Уклон профиля пути, в тысячных
     double inclination = 0.0;
 
-    /// Текущая кривизна траектории в плане
+    /// Текущая кривизна траектории в плане (НЕ ИСПОЛЬЗУЕТСЯ В ДАННЫЙ МОМЕНТ)
     double curvature = 0.0;
 
     /// Координата на траектории, соответствующая началу данного трека
@@ -53,7 +53,47 @@ struct track_t
     {
         begin_point = p0;
         end_point = p1;
+        calc_parameters();
+    }
 
+    /// Сериализация (прeобразование в последовательность байт)
+    QByteArray serialize()
+    {
+        QBuffer data;
+        data.open(QIODevice::WriteOnly);
+        QDataStream stream(&data);
+
+        stream << begin_point.x << begin_point.y << begin_point.z
+               << end_point.x << end_point.y << end_point.z
+               << curvature
+               << traj_coord
+               << railway_coord0
+               << railway_coord1;
+
+        return data.data();
+    }
+
+    /// Десериализация
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> begin_point.x >> begin_point.y >> begin_point.z
+               >> end_point.x >> end_point.y >> end_point.z
+               >> curvature
+               >> traj_coord
+               >> railway_coord0
+               >> railway_coord1;
+
+        calc_parameters();
+    }
+
+private:
+
+    void calc_parameters()
+    {
         dvec3 t = end_point - begin_point;
         len = length(t);
 
@@ -70,44 +110,6 @@ struct track_t
 
         up = cross(trav, t);
         up = normalize(up);
-    }
-
-    /// Сериализация (прeобразование в последовательность байт)
-    QByteArray serialize()
-    {
-        QBuffer data;
-        data.open(QIODevice::WriteOnly);
-        QDataStream stream(&data);
-
-        stream << begin_point.x << begin_point.y << begin_point.z
-               << end_point.x << end_point.y << end_point.z
-               << orth.x << orth.y << orth.z
-               << trav.x << trav.y << trav.z
-               << up.x << up.y << up.z
-               << len
-               << inclination
-               << curvature
-               << traj_coord;
-
-        return data.data();
-    }
-
-    /// Десериализация
-    void deserialize(QByteArray &data)
-    {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
-
-        stream >> begin_point.x >> begin_point.y >> begin_point.z
-               >> end_point.x >> end_point.y >> end_point.z
-               >> orth.x >> orth.y >> orth.z
-               >> trav.x >> trav.y >> trav.z
-               >> up.x >> up.y >> up.z
-               >> len
-               >> inclination
-               >> curvature
-               >> traj_coord;
     }
 };
 
