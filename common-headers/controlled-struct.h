@@ -28,7 +28,7 @@ struct controlled_t
 
         stream << controlled_vehicle;
         stream << current_vehicle;
-        stream << (quint32)pressed_keys.size();
+        stream << static_cast<uint32_t>(pressed_keys.size());
 
         for (auto key_id : pressed_keys)
         {
@@ -47,13 +47,13 @@ struct controlled_t
         stream >> controlled_vehicle;
         stream >> current_vehicle;
 
-        quint32 num;
+        uint32_t num;
         stream >> num;
 
         pressed_keys.clear();
         pressed_keys.resize(num);
 
-        for (size_t i = 0; i < pressed_keys.size(); ++i)
+        for (uint32_t i = 0; i < pressed_keys.size(); ++i)
         {
             stream >> pressed_keys[i];
         }

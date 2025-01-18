@@ -108,6 +108,9 @@ private:
     /// Flag, which allow debug print
     bool        is_debug_print = false;
 
+    int count_trains_done_its_step = -1;
+    int realtime_at_step_begin = 0;
+
     /// Feedback with vehicles positions
     simulator_update_pos_t      update_pos_data = simulator_update_pos_t();
     /// Feedback with vehicles state
@@ -209,6 +212,8 @@ private:
 private slots:
 
     void process();
+
+    void slotTrainStepDone(int idx);
 
     void slotGetTopologyData(QByteArray &topology_data);
 

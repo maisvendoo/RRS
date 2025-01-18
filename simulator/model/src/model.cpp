@@ -163,6 +163,7 @@ bool Model::init(const simulator_command_line_t &command_line)
                                           .arg(reinterpret_cast<quint64>(thread), 0, 16));
 
             connect(this, &Model::step, train, &Train::slotStep);
+            connect(train, &Train::stepDone, this, &Model::slotTrainStepDone);
             thread->start();
         }
     }
@@ -357,6 +358,7 @@ void Model::findNearestVehicles()
     for (auto train_idx : trains_idx_to_delete)
     {
         disconnect(this, &Model::step, trains[train_idx], &Train::slotStep);
+        disconnect(trains[train_idx], &Train::stepDone, this, &Model::slotTrainStepDone);
 
         trains[train_idx]->moveToThread(this->thread());
         delete trains[train_idx];
@@ -403,6 +405,7 @@ void Model::findFarthestVehicles()
                                           .arg(reinterpret_cast<quint64>(thread), 0, 16));
 
             connect(this, &Model::step, uncoupled_train, &Train::slotStep);
+            connect(train, &Train::stepDone, this, &Model::slotTrainStepDone);
             thread->start();
         }
     }
@@ -1007,7 +1010,17 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 void Model::process()
 {
-    size_t realtime_at_begin = QTime::currentTime().msecsSinceStartOfDay();
+    // Проверяем, если в счётчике ещё нет отрицательного значения,
+    // то предыдущий шаг симуляции не завершён, пропускаем новый шаг
+    if (count_trains_done_its_step >= 0)
+    {
+        Journal::instance()->critical("WARNING: skip step because previous not done yet");
+        return;
+    }
+    // Обнуляем счётчик
+    count_trains_done_its_step = 0;
+
+    realtime_at_step_begin = QTime::currentTime().msecsSinceStartOfDay();
 
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
 
@@ -1034,28 +1047,54 @@ void Model::process()
     // Debug print, is allowed
     if (is_debug_print)
         debugPrint();
+}
 
-    size_t realtime_at_end = QTime::currentTime().msecsSinceStartOfDay();
-    realtime_delay = realtime_at_end - realtime_at_begin - integration_time_interval;
-    if (realtime_delay > 0)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotTrainStepDone(int idx)
+{
+    // Считаем количество поездов, завершивших шаг симуляции
+    ++count_trains_done_its_step;
+
+    // Проверяем, что все поезда закончили шаг
+    if (count_trains_done_its_step >= trains.size())
     {
-        QString msg = QString("t = %1 | simulation of %2ms take %3ms | WARNING: realtime delay!")
-                          .arg(t, 8, 'f', 3)
-                          .arg(integration_time_interval)
-                          .arg(realtime_delay + integration_time_interval);
-        fputs(qPrintable(msg + "\n"), stdout);
-        Journal::instance()->critical(msg);
+        // Отрицательное значение счётчика как признак завершения шага
+        count_trains_done_its_step = -1;
+
+        // Расчитываем задержку симуляции от реалтайма
+        int realtime_at_step_end = QTime::currentTime().msecsSinceStartOfDay();
+        realtime_delay = realtime_at_step_end - realtime_at_step_begin - integration_time_interval;
+        if (realtime_delay > 0)
+        {
+            QString msg = QString("t = %1 | simulation of %2ms take %3ms | slowest train #%4 | WARNING: realtime delay!")
+                              .arg(t, 8, 'f', 3)
+                              .arg(integration_time_interval)
+                              .arg(realtime_delay + integration_time_interval)
+                              .arg(idx);
+            fputs(qPrintable(msg + "\n"), stdout);
+            Journal::instance()->critical(msg);
+        }/*
+        else
+        {
+            QString msg = QString("t = %1 | simulation of %2ms take %3ms | slowest train #%4 ")
+                              .arg(t, 8, 'f', 3)
+                              .arg(integration_time_interval)
+                              .arg(realtime_delay + integration_time_interval)
+                              .arg(idx);
+            fputs(qPrintable(msg + "\n"), stdout);
+            Journal::instance()->critical(msg);
+        }*/
     }/*
     else
     {
-        QString msg = QString("t = %1 | simulation of %2ms take %3ms")
-                          .arg(t, 8, 'f', 3)
-                          .arg(integration_time_interval)
-                          .arg(realtime_delay + integration_time_interval);
-        fputs(qPrintable(msg + "\n"), stdout);
-        Journal::instance()->critical(msg);
+        Journal::instance()->critical(QString("t = %1 | wait to step: %2/%3 trains done | last %4")
+                                          .arg(t, 8, 'f', 3)
+                                          .arg(count_trains_done_its_step)
+                                          .arg(trains.size())
+                                          .arg(idx));
     }*/
-
 }
 
 //------------------------------------------------------------------------------
