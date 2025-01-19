@@ -393,7 +393,7 @@ void Model::findFarthestVehicles()
         Train *uncoupled_train = train->uncouple(DISTANCE_TO_UNCOUPLE_TRAINS);
         if (uncoupled_train != nullptr)
         {
-            Journal::instance()->info(QString("Uncoupled new train %1 ")
+            Journal::instance()->info(QString("Uncoupled new train #%1 ")
                                           .arg(trains.size(), 3));
             uncoupled_train->setTrainIndex(trains.size());
             trains.push_back(uncoupled_train);
@@ -405,7 +405,7 @@ void Model::findFarthestVehicles()
                                           .arg(reinterpret_cast<quint64>(thread), 0, 16));
 
             connect(this, &Model::step, uncoupled_train, &Train::slotStep);
-            connect(train, &Train::stepDone, this, &Model::slotTrainStepDone);
+            connect(uncoupled_train, &Train::stepDone, this, &Model::slotTrainStepDone);
             thread->start();
         }
     }
@@ -1089,7 +1089,7 @@ void Model::slotTrainStepDone(int idx)
     }/*
     else
     {
-        Journal::instance()->critical(QString("t = %1 | wait to step: %2/%3 trains done | last %4")
+        Journal::instance()->critical(QString("t = %1 | wait to step: %2/%3 trains done | last #%4")
                                           .arg(t, 8, 'f', 3)
                                           .arg(count_trains_done_its_step)
                                           .arg(trains.size())
