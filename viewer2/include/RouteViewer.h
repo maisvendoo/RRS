@@ -7,14 +7,11 @@
 #include "tcp-client.h"
 
 #include <memory>
-#include <qobject.h>
-#include <qtcoreexports.h>
-#include <qtmetamacros.h>
+
+#include <QObject>
+
 #include <string>
-#include <vsg/app/RecordTraversal.h>
-#include <vsg/app/Viewer.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Group.h>
+#include <vsg/all.h>
 
 class RouteViewer : public QObject
 {

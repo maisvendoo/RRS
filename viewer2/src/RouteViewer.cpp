@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vsg/all.h>
+#include <vsg/core/Visitor.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
     : QObject(parent)
@@ -40,8 +41,11 @@ RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
 
 bool RouteViewer::isReady() const
 {
-    // viewer->addEventHandler(new QtEventsHandler)
+    return true;
+}
 
+int RouteViewer::run()
+{
     while (viewer->advanceToNextFrame())
     {
         viewer->handleEvents();
@@ -50,11 +54,6 @@ bool RouteViewer::isReady() const
         viewer->present();
     }
 
-    return true;
-}
-
-int RouteViewer::run()
-{
     return 0;
 }
 
