@@ -1,9 +1,11 @@
 #ifndef TRAIN_EXTERIOR_HANDLER_H
 #define TRAIN_EXTERIOR_HANDLER_H
 
-#include "SoundManager.h"
-#include "settings.h"
 #include <memory>
+
+class SoundManager;
+
+struct settings_t;
 
 class TrainExteriorHandler
 {

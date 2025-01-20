@@ -1,8 +1,15 @@
 #include    <tcp-client.h>
 #include    <CfgReader.h>
-#include    <iostream>
 #include    <QTcpSocket>
 #include    <QNetworkProxy>
+#include <QBuffer>
+
+tcp_config_t::tcp_config_t()
+    : host_addr("127.0.0.1")
+    , port(1992)
+    , reconnect_interval(100)
+{
+}
 
 //------------------------------------------------------------------------------
 //

@@ -1,10 +1,10 @@
-#ifndef     NETWORK_DATA_TYPES_H
-#define     NETWORK_DATA_TYPES_H
+#ifndef NETWORK_DATA_TYPES_H
+#define NETWORK_DATA_TYPES_H
 
-#include    <QByteArray>
-#include    <QBuffer>
-#include    <QDataStream>
-#include    <QTcpSocket>
+#include <QByteArray>
+#include <QtTypes>
+
+class QTcpSocket;
 
 //------------------------------------------------------------------------------
 //
@@ -56,43 +56,21 @@ enum StructureType
 //------------------------------------------------------------------------------
 struct network_data_t
 {
+    network_data_t();
+
     /// Тип передаваемой/принимаемой структуры
-    StructureType   stype = STYPE_EMPTY_DATA;
+    StructureType stype;
+
     /// Размер данных
-    qsizetype data_size = 0;
+    qsizetype data_size;
+
     /// Сериализованные данные
-    QByteArray      data;
+    QByteArray data;
 
     /// Сериализуем, подготоваливая кадр, передаваемый по сети
-    QByteArray serialize()
-    {
-        QByteArray tmp_data;
-        QBuffer buff(&tmp_data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+    QByteArray serialize();
 
-        stream << data.size() + sizeof(data_size) + sizeof(stype);
-        stream << stype;
-        stream << data;
-
-        return buff.data();
-    }
-
-    void deserialize(QByteArray &data)
-    {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
-
-        stream >> data_size;
-        stream >> stype;
-        stream >> this->data;
-
-        // Контрольная сериализация полученных данных
-        QByteArray tmp = this->serialize();
-        // Удаляем из полученного блока фактически сериализованное
-        data = data.mid(tmp.size());
-    }
+    void deserialize(QByteArray& data);
 };
 
 //------------------------------------------------------------------------------
@@ -100,17 +78,19 @@ struct network_data_t
 //------------------------------------------------------------------------------
 struct client_data_t
 {
-    int id = 0;
-    double pos_update_interval = 0.0;
-    double pos_update_prev_time = 0.0;
-    double state_update_interval = 0.0;
-    double state_update_prev_time = 0.0;
-    double controlled_update_interval = 0.0;
-    double controlled_update_prev_time = 0.0;
-    double players_update_interval = 0.0;
-    double players_update_prev_time = 0.0;
-    QTcpSocket  *socket = Q_NULLPTR;
-    network_data_t  received_data;
+    client_data_t();
+
+    int id;
+    double pos_update_interval;
+    double pos_update_prev_time;
+    double state_update_interval;
+    double state_update_prev_time;
+    double controlled_update_interval;
+    double controlled_update_prev_time;
+    double players_update_interval;
+    double players_update_prev_time;
+    QTcpSocket* socket;
+    network_data_t received_data;
 };
 
 #endif

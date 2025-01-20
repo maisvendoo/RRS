@@ -1,7 +1,9 @@
 #ifndef SOUND_MANAGER_H
 #define SOUND_MANAGER_H
 
-#include <alc.h>
+struct ALCdevice;
+struct ALCcontext;
+
 class SoundManager
 {
 public:

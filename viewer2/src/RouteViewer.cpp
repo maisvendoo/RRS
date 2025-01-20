@@ -19,23 +19,7 @@
 #include <sstream>
 
 #include <string>
-#include <vsg/app/CloseHandler.h>
-#include <vsg/app/CommandGraph.h>
-#include <vsg/app/RecordTraversal.h>
-#include <vsg/app/Trackball.h>
-#include <vsg/app/Viewer.h>
-#include <vsg/app/Window.h>
-#include <vsg/app/WindowTraits.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/lighting/AmbientLight.h>
-#include <vsg/lighting/DirectionalLight.h>
-#include <vsg/lighting/PointLight.h>
-#include <vsg/maths/common.h>
-#include <vsg/maths/vec3.h>
-#include <vsg/maths/vec4.h>
-#include <vsg/nodes/Group.h>
 #include <vsg/all.h>
-#include <vsg/utils/ComputeBounds.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
     : QObject(parent)

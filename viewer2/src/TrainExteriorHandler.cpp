@@ -1,5 +1,7 @@
 #include "TrainExteriorHandler.h"
 
+#include "settings.h"
+
 TrainExteriorHandler::TrainExteriorHandler(const settings_t& settings, const std::unique_ptr<SoundManager>& sm)
     : settings_delay()
 {

@@ -5,8 +5,6 @@
 
 #include <cstdio>
 
-
-
 #define LOG_DEBUG(format ...) \
     Logger::instance().log_message(LOG_LEVEL_DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
