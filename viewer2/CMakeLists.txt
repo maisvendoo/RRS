@@ -4,6 +4,10 @@ set (TARGET viewer2)
 
 project (${TARGET})
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 set (EXECUTABLE_OUTPUT_PATH "../../bin")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -25,9 +29,12 @@ file(GLOB PUGIXML_SOURCES ${DEPENDENCIES_DIR}/pugixml-1.15/src/*)
 
 set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
 set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
+set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
 
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
+
+find_package(vsgImGui REQUIRED)
 
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 
@@ -42,6 +49,7 @@ target_link_libraries(${TARGET} PRIVATE
 )
 
 target_include_directories(${TARGET} PRIVATE
+    ../common-headers
     ../filesystem/include
     ../network/include
     ./include

@@ -1,23 +1,47 @@
 #include "RouteViewer.h"
 
 #include "CLI11.hpp"
+#include "simulator-info-struct.h"
 #include "ConfigReader.h"
 #include "SoundManager.h"
 #include "TrainExteriorHandler.h"
 #include "cmd-line.h"
 #include "filesystem.h"
+#include "network-data-types.h"
 #include "settings.h"
 #include "Logger.h"
+#include "tcp-client.h"
 
+#include <cmath>
+#include <fstream>
 #include <memory>
+#include <qobject.h>
 #include <sstream>
 
 #include <string>
+#include <vsg/app/CloseHandler.h>
+#include <vsg/app/CommandGraph.h>
 #include <vsg/app/RecordTraversal.h>
+#include <vsg/app/Trackball.h>
+#include <vsg/app/Viewer.h>
+#include <vsg/app/Window.h>
+#include <vsg/app/WindowTraits.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/lighting/AmbientLight.h>
+#include <vsg/lighting/DirectionalLight.h>
+#include <vsg/lighting/PointLight.h>
+#include <vsg/maths/common.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/all.h>
+#include <vsg/utils/ComputeBounds.h>
 
-RouteViewer::RouteViewer(int argc, char* argv[])
-    : is_ready(false)
+RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
+    : QObject(parent)
+    , is_ready(false)
+    , is_route(false)
+    , tcp_client(new TcpClient(this))
 {
     if (init(argc, argv))
     {
@@ -32,6 +56,16 @@ RouteViewer::RouteViewer(int argc, char* argv[])
 
 bool RouteViewer::isReady() const
 {
+    // viewer->addEventHandler(new QtEventsHandler)
+
+    while (viewer->advanceToNextFrame())
+    {
+        viewer->handleEvents();
+        viewer->update();
+        viewer->recordAndSubmit();
+        viewer->present();
+    }
+
     return true;
 }
 
@@ -78,7 +112,37 @@ bool RouteViewer::init(int argc, char* argv[])
 
     train_ext_handler = std::make_unique<TrainExteriorHandler>(settings, sound_manager);
 
-    root = new vsg::Group;
+    root = vsg::Group::create();
+
+    if (!initEngineSettings())
+    {
+        return false;
+    }
+
+    if (!initDisplay())
+    {
+        return false;
+    }
+
+    initTCPclient();
+
+    /*
+
+    // Запись скриншота в файл
+    osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile =
+            new WriteToFileOperation(fs.getScreenshotsDir());
+
+    osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler =
+            new ScreenCapture(writeFile.get());
+
+    // Одиночный скриншот по клавише F12
+    screenCaptureHandler->setKeyEventTakeScreenShot(osgGA::GUIEventAdapter::KEY_F12);
+    // Серия скриншотов отключена из-за просадки производительности
+    screenCaptureHandler->setKeyEventToggleContinuousCapture(-1);
+
+    viewer.addEventHandler(screenCaptureHandler.get());
+
+    */
 
     return true;
 }
@@ -231,5 +295,236 @@ bool RouteViewer::initEngineSettings()
         return false;
     }
 
+    /*
+    // Common graphics settings
+    osg::StateSet *stateset = root->getOrCreateStateSet();
+
+    stateset->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+
+    stateset->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+    stateset->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+
+    osg::ref_ptr<osg::CullFace> cull = new osg::CullFace;
+    cull->setMode(osg::CullFace::BACK);
+    stateset->setAttributeAndModes(cull.get(), osg::StateAttribute::ON);
+
+    // Set lighting
+    initEnvironmentLight(root,
+                         osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+                         1.0f,
+                         -20.0f,
+                         75.0f);
+
+    osg::LightModel *lightmodel = new osg::LightModel;
+    float power = 0.4f;
+    lightmodel->setAmbientIntensity(osg::Vec4(power, power, power, 1.0));
+    lightmodel->setTwoSided(true);
+    stateset->setAttributeAndModes(lightmodel, osg::StateAttribute::ON);
+
+    return true;
+    */
+
+    initEnvironmentLight(vsg::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, -20.0f, 75.0f);
+
     return true;
 }
+
+void RouteViewer::initEnvironmentLight(vsg::vec4 color, float power, float psi, float theta)
+{
+    /*
+    osg::ref_ptr<osg::Light> sun = new osg::Light;
+    sun->setLightNum(0);
+    sun->setDiffuse(color *= power);
+    sun->setAmbient(color *= power * 0.0f);
+    sun->setSpecular(color *= power);
+
+
+    float dist = 1000.0f;
+
+    float rad = osg::PIf / 180.0f;
+    float x = dist * cosf(theta * rad) * sinf(psi * rad);
+    float y = dist * cosf(theta * rad) * cosf(psi * rad);
+    float z = dist * sinf(theta * rad);
+
+    osg::Vec3 pos = osg::Vec3(x, y, z);
+    sun->setPosition(osg::Vec4(pos, 0.0f));
+
+    osg::Vec3 sunDir = pos *= (- 1.0f / pos.length());
+    sun->setDirection(sunDir);
+
+    osg::ref_ptr<osg::LightSource> light0 = new osg::LightSource;
+    light0->setLight(sun);
+
+    root->getOrCreateStateSet()->setMode(GL_LIGHT0, osg::StateAttribute::ON);
+    root->addChild(light0.get());
+    */
+
+    auto sun = vsg::DirectionalLight::create();
+    sun->color = vsg::vec3(color.r, color.g, color.b);
+    sun->intensity = power;
+
+    float dist = 1000.0f;
+    float rad = vsg::PIf / 180.0f;
+    float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
+    float y = dist * std::cosf(theta * rad) * std::cosf(psi * rad);
+    float z = dist * std::sinf(theta * rad);
+
+    vsg::vec3 pos(x, y, z);
+    // sun->position.set(x, y, z);
+
+    float length = vsg::length(pos);
+    vsg::vec3 sunDir = pos;
+    sunDir *= (-1.0f / length);
+    sun->direction = sunDir;
+
+    root->addChild(sun);
+}
+
+bool RouteViewer::initDisplay()
+{
+    viewer = vsg::Viewer::create();
+
+    auto traits = vsg::WindowTraits::create();
+    traits->x = settings.x;
+    traits->y = settings.y;
+    traits->width = settings.width;
+    traits->height = settings.height;
+    traits->windowTitle = settings.name;
+    traits->decoration = settings.window_decoration;
+    traits->samples = settings.samples;
+
+    auto window = vsg::Window::create(traits);
+    viewer->addWindow(window);
+
+    vsg::ComputeBounds computeBounds;
+    root->accept(computeBounds);
+    vsg::dvec3 centre = (computeBounds.bounds.min + computeBounds.bounds.max) * 0.5;
+    double radius = vsg::length(computeBounds.bounds.max - computeBounds.bounds.min) * 0.6;
+    double nearFarRatio = 0.0005;
+
+    auto perspective = vsg::Perspective::create(
+        30.0,
+        static_cast<double>(window->extent2D().width)
+            / static_cast<double>(window->extent2D().height),
+        nearFarRatio * radius,
+        radius * 4.5
+    );
+
+    auto lookAt = vsg::LookAt::create(
+        centre + vsg::dvec3(0.0, -radius * 3.5, 0.0),
+        centre,
+        vsg::dvec3(0.0, 0.0, 1.0)
+    );
+
+    auto camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
+    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+    viewer->addEventHandler(vsg::Trackball::create(camera));
+
+    auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
+    viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
+    viewer->compile();
+
+    return true;
+}
+
+void RouteViewer::initTCPclient()
+{
+    LOG_INFO("Starting init TCP-client");
+
+    connect(tcp_client, &TcpClient::connected, this, &RouteViewer::slotConnectedToSimulator);
+    connect(tcp_client, &TcpClient::setRouteInfo, this, &RouteViewer::slotGetRouteInfoData);
+    connect(tcp_client, &TcpClient::setSignalsData, this, &RouteViewer::slotGetSignalsData);
+    connect(tcp_client, &TcpClient::setVehiclesInfo, this, &RouteViewer::slotGetVehicleInfoData);
+    connect(tcp_client, &TcpClient::sendLogMessage, this, &RouteViewer::slotRecvLogMessage);
+
+    tcp_client->init(settings.tcp_config);
+
+    LOG_INFO("TCP-client is initialized...OK");
+}
+
+bool RouteViewer::loadRoute()
+{
+    if (settings.route_dir_name.empty())
+    {
+        LOG_ERROR("Route directory name is empty");
+        return false;
+    }
+
+    FileSystem& fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
+    settings.route_dir_full_path = route_dir_path;
+
+    std::ifstream stream(route_dir_path + fs.separator() + "route-type");
+    if (!stream)
+    {
+        LOG_ERROR("Stream for route-type is not open");
+        return false;
+    }
+
+    std::string routeExt = "";
+    stream >> routeExt;
+
+    if (routeExt.empty())
+    {
+        LOG_ERROR("Unknown route type");
+        return false;
+    }
+
+    return true;
+}
+
+void RouteViewer::slotRecvLogMessage(QString msg)
+{
+    LOG_INFO("%s", msg.toStdString().c_str());
+    // imguiWidgetsHandler->setLoadingStatus(msg);
+}
+
+void RouteViewer::slotConnectedToSimulator()
+{
+    LOG_INFO("Connected to server...OK");
+    LOG_INFO("Send request for route info");
+    tcp_client->sendRequest(STYPE_REQUEST_ROUTE_INFO);
+}
+
+void RouteViewer::slotGetRouteInfoData(QByteArray &data)
+{
+    if (is_route)
+    {
+        LOG_WARN("Get route info again");
+        return;
+    }
+    is_route = true;
+
+    /*
+    QString msg = QString("Загрузка маршрута...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
+
+    simulator_route_info_t route_info;
+    route_info.deserialize(data);
+    settings.route_dir_name = route_info.route_dir_name.toStdString();
+    LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
+
+    loadRoute();
+}
+
+void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
+{
+
+}
+
+void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
+{
+
+}
+
+void RouteViewer::slotUpdateKeyboard()
+{
+
+}
+
+void RouteViewer::slotUpdateControlledVehicle()
+{
+
+}
+
