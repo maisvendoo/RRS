@@ -1,9 +1,11 @@
 #include "RouteViewer.h"
 
+#include <QtWidgets/qapplication.h>
 #include <memory>
 
 int main(int argc, char* argv[])
 {
+    QApplication application(argc, argv);
     auto viewer = std::make_unique<RouteViewer>(argc, argv);
 
     if (viewer->isReady())

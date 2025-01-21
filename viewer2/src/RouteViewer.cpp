@@ -15,12 +15,13 @@
 #include <cmath>
 #include <fstream>
 #include <memory>
-#include <qobject.h>
+#include <QApplication>
+#include <QObject>
 #include <sstream>
 
 #include <string>
 #include <vsg/all.h>
-#include <vsg/core/Visitor.h>
+#include <vsg/core/ref_ptr.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
     : QObject(parent)
@@ -48,6 +49,8 @@ int RouteViewer::run()
 {
     while (viewer->advanceToNextFrame())
     {
+        QApplication::processEvents();
+
         viewer->handleEvents();
         viewer->update();
         viewer->recordAndSubmit();
@@ -452,6 +455,10 @@ bool RouteViewer::loadRoute()
         LOG_ERROR("Unknown route type");
         return false;
     }
+
+    std::string route_loader_plugin = routeExt + "-route-loader";
+
+    // vsg::ref_ptr<>
 
     return true;
 }
