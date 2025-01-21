@@ -412,7 +412,7 @@ QByteArray Topology::serialize()
 
     stream << route_name;
 
-    stream << stations.size();
+    stream << static_cast<uint32_t>(stations.size());
 
     for (auto station : stations)
     {
@@ -421,7 +421,7 @@ QByteArray Topology::serialize()
     }
 
     // Указываем число траекторий
-    stream << traj_list.size();
+    stream << static_cast<uint32_t>(traj_list.size());
 
     // Складываем в буфер сериализованную информацию о траекториях
     for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
@@ -430,7 +430,7 @@ QByteArray Topology::serialize()
     }
 
     // Указываем число коннекторов
-    stream << switches.size();
+    stream << static_cast<uint32_t>(switches.size());
 
     // Складываем в буфер сериализованную информацию о коннекторах
     for (auto sw = switches.begin(); sw != switches.end(); ++sw)
@@ -452,12 +452,12 @@ void Topology::deserialize(QByteArray &data)
 
     stream >> route_name;
 
-    qsizetype stations_count = 0;
+    uint32_t stations_count = 0;
     stream >> stations_count;
 
     stations.clear();
 
-    for (qsizetype i = 0; i < stations_count; ++i)
+    for (uint32_t i = 0; i < stations_count; ++i)
     {
         QByteArray station_data;
         stream >> station_data;
@@ -470,11 +470,11 @@ void Topology::deserialize(QByteArray &data)
     switches.clear();
 
     // Число траекторий
-    qsizetype traj_count = 0;
+    uint32_t traj_count = 0;
     stream >> traj_count;
 
     // Создаём все траектории
-    for (qsizetype i = 0; i < traj_count; ++i)
+    for (uint32_t i = 0; i < traj_count; ++i)
     {
         Trajectory *traj = new Trajectory;;
 
@@ -486,11 +486,11 @@ void Topology::deserialize(QByteArray &data)
     }
 
     // Число коннекторов
-    qsizetype conn_count = 0;
+    uint32_t conn_count = 0;
     stream >> conn_count;
 
     // Создаём все коннекторы
-    for (qsizetype i = 0; i < conn_count; ++i)
+    for (uint32_t i = 0; i < conn_count; ++i)
     {
         Switch *sw = new Switch;
 

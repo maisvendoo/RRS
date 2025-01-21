@@ -24,21 +24,21 @@ struct signals_data_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << (quint32)line_signals.size();
+        stream << static_cast<uint32_t>(line_signals.size());
 
         for (auto line_signal : line_signals)
         {
             stream << line_signal->serialize();
         }
 
-        stream << (quint32)enter_signals.size();
+        stream << static_cast<uint32_t>(enter_signals.size());
 
         for (auto enter_signal: enter_signals)
         {
             stream << enter_signal->serialize();
         }
 
-        stream << (quint32)exit_signals.size();
+        stream << static_cast<uint32_t>(exit_signals.size());
 
         for (auto signal : exit_signals)
         {
@@ -54,12 +54,12 @@ struct signals_data_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        quint32 data_size = 0;
-        stream >> data_size;
+        uint32_t line_signals_size = 0;
+        stream >> line_signals_size;
 
         line_signals.clear();
 
-        for (size_t i = 0; i < data_size; ++i)
+        for (uint32_t i = 0; i < line_signals_size; ++i)
         {
             QByteArray tmp_data;
             stream >> tmp_data;
@@ -70,12 +70,12 @@ struct signals_data_t
             line_signals.push_back(line_signal);
         }
 
-        quint32 enter_signals_size = 0;
+        uint32_t enter_signals_size = 0;
         stream >> enter_signals_size;
 
         enter_signals.clear();
 
-        for (size_t i = 0; i < enter_signals_size; ++i)
+        for (uint32_t i = 0; i < enter_signals_size; ++i)
         {
             QByteArray tmp_data;
             stream >> tmp_data;
@@ -86,12 +86,12 @@ struct signals_data_t
             enter_signals.push_back(enter_signal);
         }
 
-        quint32 exit_signals_size = 0;
+        uint32_t exit_signals_size = 0;
         stream >> exit_signals_size;
 
         exit_signals.clear();
 
-        for (size_t i = 0; i < exit_signals_size; ++i)
+        for (uint32_t i = 0; i < exit_signals_size; ++i)
         {
             QByteArray tmp_data;
             stream >> tmp_data;

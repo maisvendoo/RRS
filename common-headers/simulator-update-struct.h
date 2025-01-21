@@ -27,19 +27,19 @@ struct simulator_update_players_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << (quint32)clients_id.size();
+        stream << static_cast<uint32_t>(clients_id.size());
         for (auto id : clients_id)
         {
             stream << id;
         }
 
-        stream << (quint32)current_vehicles.size();
+        stream << static_cast<uint32_t>(current_vehicles.size());
         for (auto veh : current_vehicles)
         {
             stream << veh;
         }
 
-        stream << (quint32)controlled_vehicles.size();
+        stream << static_cast<uint32_t>(controlled_vehicles.size());
         for (auto veh : controlled_vehicles)
         {
             stream << veh;
@@ -54,12 +54,12 @@ struct simulator_update_players_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        quint32 num;
+        uint32_t num;
 
         stream >> num;
         clients_id.clear();
         clients_id.resize(num);
-        for (size_t i = 0; i < clients_id.size(); ++i)
+        for (uint32_t i = 0; i < clients_id.size(); ++i)
         {
             stream >> clients_id[i];
         }
@@ -67,7 +67,7 @@ struct simulator_update_players_t
         stream >> num;
         current_vehicles.clear();
         current_vehicles.resize(num);
-        for (size_t i = 0; i < current_vehicles.size(); ++i)
+        for (uint32_t i = 0; i < current_vehicles.size(); ++i)
         {
             stream >> current_vehicles[i];
         }
@@ -75,7 +75,7 @@ struct simulator_update_players_t
         stream >> num;
         controlled_vehicles.clear();
         controlled_vehicles.resize(num);
-        for (size_t i = 0; i < controlled_vehicles.size(); ++i)
+        for (uint32_t i = 0; i < controlled_vehicles.size(); ++i)
         {
             stream >> controlled_vehicles[i];
         }
@@ -171,7 +171,7 @@ struct simulator_update_pos_t
 
         stream << time;
 
-        stream << (quint32)vehicles.size();
+        stream << static_cast<uint32_t>(vehicles.size());
         for (auto veh_pos : vehicles)
         {
             stream << veh_pos.serialize();
@@ -188,13 +188,13 @@ struct simulator_update_pos_t
 
         stream >> time;
 
-        quint32 num;
+        uint32_t num;
 
         stream >> num;
         vehicles.clear();
         vehicles.resize(num);
 
-        for (size_t i = 0; i < vehicles.size(); ++i)
+        for (uint32_t i = 0; i < vehicles.size(); ++i)
         {
             QByteArray vehicle_data;
             stream >> vehicle_data;
@@ -232,7 +232,7 @@ struct simulator_vehicle_update_t
         stream << prev_vehicle;
         stream << next_vehicle;
 
-        stream << (quint32)analogSignal.size();
+        stream << static_cast<uint32_t>(analogSignal.size());
 
         for (auto signal : analogSignal)
         {
@@ -253,12 +253,12 @@ struct simulator_vehicle_update_t
         stream >> prev_vehicle;
         stream >> next_vehicle;
 
-        quint32 num;
+        uint32_t num;
         stream >> num;
         analogSignal.clear();
         analogSignal.resize(num);
 
-        for (size_t i = 0; i < analogSignal.size(); ++i)
+        for (uint32_t i = 0; i < analogSignal.size(); ++i)
         {
             stream >> analogSignal[i];
         }
@@ -319,14 +319,14 @@ struct simulator_update_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << (quint32)trains.size();
+        stream << static_cast<uint32_t>(trains.size());
 
         for (auto train : trains)
         {
             stream << train.serialize();
         }
 
-        stream << (quint32)vehicles.size();
+        stream << static_cast<uint32_t>(vehicles.size());
 
         for (auto vehicle : vehicles)
         {
@@ -342,13 +342,13 @@ struct simulator_update_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        quint32 num;
+        uint32_t num;
         stream >> num;
 
         trains.clear();
         trains.resize(num);
 
-        for (size_t i = 0; i < trains.size(); ++i)
+        for (uint32_t i = 0; i < trains.size(); ++i)
         {
             QByteArray train_data;
             stream >> train_data;
@@ -361,7 +361,7 @@ struct simulator_update_t
         vehicles.clear();
         vehicles.resize(num);
 
-        for (size_t i = 0; i < vehicles.size(); ++i)
+        for (uint32_t i = 0; i < vehicles.size(); ++i)
         {
             QByteArray vehicle_data;
             stream >> vehicle_data;

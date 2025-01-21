@@ -539,7 +539,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
     // Отладка
     Journal::instance()->info(QString("Trains coupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
-                                  .arg(train_id, 3)
+                                  .arg(train_idx, 3)
                                   .arg(vehicles.size(), 4)
                                   .arg(joints_list.size(), 4)
                                   .arg(y.size(), 4));
@@ -650,7 +650,9 @@ Train *Train::uncouple(double uncoupling_distance)
         }
         joints_list.resize(i - 1);
 
-        Journal::instance()->info(QString("Train uncoupled! New size of vehicles %1, joints %2, state_vector %3")
+        // ОТЛАДКА
+        Journal::instance()->info(QString("Trains uncoupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
+                                      .arg(train_idx, 3)
                                       .arg(vehicles.size(), 4)
                                       .arg(joints_list.size(), 4)
                                       .arg(y.size(), 4));
@@ -902,6 +904,7 @@ void Train::slotStep(double current_time, double integration_time)
             vehicle->integrationPostStep(y, t);
         }
     }
+    emit stepDone(train_idx);
 }
 
 //------------------------------------------------------------------------------

@@ -4,16 +4,10 @@
 #include    "topology-trajectory-device.h"
 #include    "ALSN-struct.h"
 
-#if defined(TRAJECTORY_ALSN_LIB)
-    #define TRAJECTORY_ALSN_EXPORT   Q_DECL_EXPORT
-#else
-    #define TRAJECTORY_ALSN_EXPORT   Q_DECL_IMPORT
-#endif
-
 //------------------------------------------------------------------------------
 // Модуль путевой инфраструктуры с рельсовыми цепями АЛСН
 //------------------------------------------------------------------------------
-class TRAJECTORY_ALSN_EXPORT TrajectoryALSN : public TrajectoryDevice
+class TrajectoryALSN : public TrajectoryDevice
 {
 public:
 

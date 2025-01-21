@@ -70,16 +70,16 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
-    quint32 data_size = 0;
-    stream >> data_size;
+    uint32_t line_signals_size = 0;
+    stream >> line_signals_size;
 
-    std::cout << "Line signals : " << data_size << std::endl;
+    std::cout << "Line signals : " << line_signals_size << std::endl;
 
     // Очищаем список сигналов
     traffic_lights_fwd.clear();
     traffic_lights_bwd.clear();
 
-    for (size_t i = 0; i < data_size; ++i)
+    for (uint32_t i = 0; i < line_signals_size; ++i)
     {
         QByteArray tmp_data;
         stream >> tmp_data;
@@ -99,11 +99,12 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
             traffic_lights_fwd.insert(tl->getConnectorName(), tl);
     }
 
-    stream >> data_size;
+    uint32_t enter_signals_size = 0;
+    stream >> enter_signals_size;
 
-    std::cout << "Enter signals : " << data_size << std::endl;
+    std::cout << "Enter signals : " << enter_signals_size << std::endl;
 
-    for (size_t i = 0; i < data_size; ++i)
+    for (uint32_t i = 0; i < enter_signals_size; ++i)
     {
         QByteArray tmp_data;
         stream >> tmp_data;
@@ -123,11 +124,12 @@ void TrafficLightsHandler::deserialize(QByteArray &data)
             traffic_lights_fwd.insert(tl->getConnectorName(), tl);
     }
 
-    stream >> data_size;
+    uint32_t exit_signals_size = 0;
+    stream >> exit_signals_size;
 
-    std::cout << "Exit signals : " << data_size << std::endl;
+    std::cout << "Exit signals : " << exit_signals_size << std::endl;
 
-    for (size_t i = 0; i < data_size; ++i)
+    for (uint32_t i = 0; i < exit_signals_size; ++i)
     {
         QByteArray tmp_data;
         stream >> tmp_data;

@@ -251,88 +251,90 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
         if (module == nullptr)
         {
-            Journal::instance()->error("Module " + conn_module + " for " + name + " not found");
+            Journal::instance()->error("Fail to load module " + conn_module + " for connector " + name);
+            continue;
+        }
+
+        Journal::instance()->info(
+            "Loaded module " + conn_module + ".dll for connector " + name);
+
+        // Указываем модулю, что он относится к этому коннектору
+        module->setConnector(this);
+
+        // Настраиваем связи модулей траекторий и коннектора,
+        // параллельно топологии
+        bool no_plus;
+        if (bwdPlusTraj != nullptr)
+        {
+            no_plus = false;
+            for (auto device_bwd : bwdPlusTraj->getTrajectoryDevices())
+            {
+                QString bwd_name = device_bwd->getName();
+                if (device_name == bwd_name)
+                {
+                    module->setBwdTrajectoryDevice(device_bwd);
+                    device_bwd->setFwdConnectorDevice(module);
+                    break;
+                }
+            }
         }
         else
         {
-            // Указываем модулю, что он относится к этому коннектору
-            module->setConnector(this);
-
-            // Настраиваем связи модулей траекторий и коннектора,
-            // параллельно топологии
-            bool no_plus;
-            if (bwdPlusTraj != nullptr)
-            {
-                no_plus = false;
-                for (auto device_bwd : bwdPlusTraj->getTrajectoryDevices())
-                {
-                    QString bwd_name = device_bwd->getName();
-                    if (device_name == bwd_name)
-                    {
-                        module->setBwdTrajectoryDevice(device_bwd);
-                        device_bwd->setFwdConnectorDevice(module);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                no_plus = true;
-            }
-
-            if (bwdMinusTraj != nullptr)
-            {
-                for (auto device_bwd : bwdMinusTraj->getTrajectoryDevices())
-                {
-                    QString bwd_name = device_bwd->getName();
-                    if (device_name == bwd_name)
-                    {
-                        if (no_plus)
-                            module->setBwdTrajectoryDevice(device_bwd);
-                        device_bwd->setFwdConnectorDevice(module);
-                        break;
-                    }
-                }
-            }
-
-            if (fwdPlusTraj != nullptr)
-            {
-                no_plus = false;
-                for (auto device_fwd : fwdPlusTraj->getTrajectoryDevices())
-                {
-                    QString fwd_name = device_fwd->getName();
-                    if (device_name == fwd_name)
-                    {
-                        module->setFwdTrajectoryDevice(device_fwd);
-                        device_fwd->setBwdConnectorDevice(module);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                no_plus = true;
-            }
-
-            if (fwdMinusTraj != nullptr)
-            {
-                for (auto device_fwd : fwdMinusTraj->getTrajectoryDevices())
-                {
-                    QString fwd_name = device_fwd->getName();
-                    if (device_name == fwd_name)
-                    {
-                        if (no_plus)
-                            module->setFwdTrajectoryDevice(device_fwd);
-                        device_fwd->setBwdConnectorDevice(module);
-                        break;
-                    }
-                }
-            }
-
-            // TODO конфигурирование?
-
-            devices.push_back(module);
+            no_plus = true;
         }
+
+        if (bwdMinusTraj != nullptr)
+        {
+            for (auto device_bwd : bwdMinusTraj->getTrajectoryDevices())
+            {
+                QString bwd_name = device_bwd->getName();
+                if (device_name == bwd_name)
+                {
+                    if (no_plus)
+                        module->setBwdTrajectoryDevice(device_bwd);
+                    device_bwd->setFwdConnectorDevice(module);
+                    break;
+                }
+            }
+        }
+
+        if (fwdPlusTraj != nullptr)
+        {
+            no_plus = false;
+            for (auto device_fwd : fwdPlusTraj->getTrajectoryDevices())
+            {
+                QString fwd_name = device_fwd->getName();
+                if (device_name == fwd_name)
+                {
+                    module->setFwdTrajectoryDevice(device_fwd);
+                    device_fwd->setBwdConnectorDevice(module);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            no_plus = true;
+        }
+
+        if (fwdMinusTraj != nullptr)
+        {
+            for (auto device_fwd : fwdMinusTraj->getTrajectoryDevices())
+            {
+                QString fwd_name = device_fwd->getName();
+                if (device_name == fwd_name)
+                {
+                    if (no_plus)
+                        module->setFwdTrajectoryDevice(device_fwd);
+                    device_fwd->setBwdConnectorDevice(module);
+                    break;
+                }
+            }
+        }
+
+        // TODO конфигурирование?
+
+        devices.push_back(module);
     }
 }
 
