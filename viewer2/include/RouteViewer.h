@@ -1,17 +1,27 @@
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 
-#include "SoundManager.h"
-#include "TrainExteriorHandler.h"
 #include "settings.h"
-#include "tcp-client.h"
 
-#include <memory>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec4.h>
 
 #include <QObject>
 
+#include <memory>
 #include <string>
-#include <vsg/all.h>
+
+class QString;
+class QByteArray;
+class SoundManager;
+class TcpClient;
+class TrainExteriorHandler;
+
+namespace vsg
+{
+    class Group;
+    class Viewer;
+}
 
 class RouteViewer : public QObject
 {
@@ -19,7 +29,7 @@ class RouteViewer : public QObject
 
 public:
     RouteViewer(int argc, char* argv[], QObject* parent = Q_NULLPTR);
-    ~RouteViewer() = default;
+    ~RouteViewer();
 
     bool isReady() const;
 

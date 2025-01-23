@@ -23,6 +23,7 @@
 #include <string>
 #include <vsg/all.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/nodes/TileDatabase.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
     : QObject(parent)
@@ -40,6 +41,8 @@ RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
         LOG_FATAL("Fail to initialize viewer");
     }
 }
+
+RouteViewer::~RouteViewer() = default;
 
 bool RouteViewer::isReady() const
 {
