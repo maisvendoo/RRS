@@ -1,6 +1,7 @@
 #include "RouteLoader.h"
 #include "ConfigReader.h"
 #include "Logger.h"
+#include "Route.h"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -26,8 +27,6 @@ void RouteLoader::read_description()
     cfg.getValue("RouteMapPath", route_map_path);
     objects_ref_path = route_path + objects_ref_path;
     route_map_path = route_path + route_map_path;
-
-    int a = 10;
 }
 
 bool RouteLoader::parse_objects_ref(Route& route)
@@ -38,6 +37,8 @@ bool RouteLoader::parse_objects_ref(Route& route)
         LOG_ERROR("Failed to open %s", objects_ref_path.c_str());
         return false;
     }
+
+    route.type = route_type;
 
     if (route_type == "dmd")
     {
@@ -65,7 +66,7 @@ bool RouteLoader::parse_objects_ref(Route& route)
                 std::replace(texture_path.begin(), texture_path.end(), '\\', '/');
                 std::ofstream united_file(route_path + "/united/" + label + ".dmdu");
                 united_file << "/.." << model_path << "\n/.." << texture_path << '\n';
-
+                route.model_paths.emplace_back(route_path + "/united/" + label + ".dmdu");
             }
         }
     }
@@ -74,7 +75,16 @@ bool RouteLoader::parse_objects_ref(Route& route)
         std::string line;
         while (std::getline(objects_ref, line))
         {
-            LOG_INFO("%s", line.c_str());
+            std::istringstream line_stream(line);
+            std::string label;
+            std::string model_path;
+            line_stream >> label >> model_path;
+            if (!model_path.empty()
+                && is_slash(model_path.front()))
+            {
+                std::replace(model_path.begin(), model_path.end(), '\\', '/');
+                route.model_paths.emplace_back(route_path + model_path);
+            }
         }
     }
 
@@ -88,6 +98,17 @@ bool RouteLoader::parse_route_map(Route& route)
     {
         LOG_ERROR("Failed to open %s", route_map_path.c_str());
         return false;
+    }
+
+    std::string line;
+    while (std::getline(route_map, line))
+    {
+        std::replace(line.begin(), line.end(), ',', ' ');
+        std::istringstream line_stream(line);
+        std::string label;
+        float t_x, t_y, t_z;
+        float r_x, r_y, r_z;
+        // line_stream >> label
     }
 
     return true;
