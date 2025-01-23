@@ -3,7 +3,6 @@
 #include "CLI11.hpp"
 #include "Route.h"
 #include "RouteLoader.h"
-#include "RouteLoader2.h"
 #include "simulator-info-struct.h"
 #include "ConfigReader.h"
 #include "SoundManager.h"
@@ -16,7 +15,6 @@
 #include "tcp-client.h"
 
 #include <cmath>
-#include <fstream>
 #include <memory>
 #include <QApplication>
 #include <QObject>
@@ -445,7 +443,7 @@ bool RouteViewer::loadRoute()
 
     Route route;
 
-    RouteLoader2 loader(settings.route_dir_full_path);
+    RouteLoader loader(settings.route_dir_full_path);
     loader.read_description();\
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);

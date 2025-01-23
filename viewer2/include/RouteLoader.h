@@ -1,56 +1,24 @@
 #ifndef ROUTE_LOADER_H
 #define ROUTE_LOADER_H
 
-#include "MotionPath.h"
 #include <string>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Group.h>
 
-enum ReadResult
-{
-    FILE_READ_SUCCESS,
-    FILE_NOT_FOUND,
-    FILE_NOT_HANDLED
-};
+struct Route;
 
 class RouteLoader
 {
 public:
-    RouteLoader();
+    RouteLoader(const std::string& route_path);
 
-    virtual void load(const std::string& routeDir, float view_dist = 1000.0f) = 0;
+    void read_description();
+    bool parse_objects_ref(Route& route);
+    bool parse_route_map(Route& route);
 
-    virtual vsg::Group* getRoot();
-
-    virtual MotionPath* getMotionPath(int direction) = 0;
-
-protected:
-    std::string routeDir;
-    vsg::ref_ptr<vsg::Group> root;
-    virtual ~RouteLoader();
-    virtual ReadResult loadDataFile(const std::string& filepath) = 0;
+private:
+    std::string route_path;
+    std::string route_type;
+    std::string objects_ref_path;
+    std::string route_map_path;
 };
 
-using GetRouteLoader = RouteLoader* (*)();
-
-#define GET_ROUTE_LOADER(ClassName) \
-    extern "C" RouteLoader* getRouteLoader() \
-    { \
-        return new (ClassName)(); \
-    }
-
-extern "C" RouteLoader* loadRouteLoader(const std::string& path, const std::string& name);
-
 #endif // ROUTE_LOADER_H
-
-/* objects.ref 1
-    label path_to.dmd path_to.tga
-*/
-
-/* objects.ref 2
-    label path_to.gltf
-*/
-
-/* Route
-
-*/
