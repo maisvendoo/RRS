@@ -42,3 +42,15 @@ using GetRouteLoader = RouteLoader* (*)();
 extern "C" RouteLoader* loadRouteLoader(const std::string& path, const std::string& name);
 
 #endif // ROUTE_LOADER_H
+
+/* objects.ref 1
+    label path_to.dmd path_to.tga
+*/
+
+/* objects.ref 2
+    label path_to.gltf
+*/
+
+/* Route
+
+*/

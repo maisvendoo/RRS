@@ -1,6 +1,9 @@
 #include "RouteViewer.h"
 
 #include "CLI11.hpp"
+#include "Route.h"
+#include "RouteLoader.h"
+#include "RouteLoader2.h"
 #include "simulator-info-struct.h"
 #include "ConfigReader.h"
 #include "SoundManager.h"
@@ -440,25 +443,43 @@ bool RouteViewer::loadRoute()
     std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
     settings.route_dir_full_path = route_dir_path;
 
-    std::ifstream stream(route_dir_path + fs.separator() + "route-type");
-    if (!stream)
-    {
-        LOG_ERROR("Stream for route-type is not open");
-        return false;
-    }
+    Route route;
 
-    std::string routeExt = "";
-    stream >> routeExt;
+    RouteLoader2 loader(settings.route_dir_full_path);
+    loader.read_description();\
+    loader.parse_objects_ref(route);
+    loader.parse_route_map(route);
 
-    if (routeExt.empty())
-    {
-        LOG_ERROR("Unknown route type");
-        return false;
-    }
+    // std::ifstream stream(route_dir_path + fs.separator() + "route-type");
+    // if (!stream)
+    // {
+    //     LOG_ERROR("Stream for route-type is not open");
+    //     return false;
+    // }
 
-    std::string route_loader_plugin = routeExt + "-route-loader";
+    // std::string routeExt = "";
+    // stream >> routeExt;
 
-    // vsg::ref_ptr<>
+    // if (routeExt.empty())
+    // {
+    //     LOG_ERROR("Unknown route type");
+    //     return false;
+    // }
+
+    // std::string route_loader_plugin = routeExt + "-route-loader";
+
+    // RouteLoader* loader = loadRouteLoader(fs.getPluginsDir(), route_loader_plugin);
+    // if (!loader)
+    // {
+    //     LOG_ERROR("Not found route loader for this route");
+    //     return false;
+    // }
+
+    // LOG_INFO("Try loading route from %s", route_dir_path.c_str());
+    // loader->load(route_dir_path, settings.view_distance);
+    // LOG_INFO("Loaded route from %s", route_dir_path.c_str());
+    // root->addChild(vsg::ref_ptr<vsg::Node>(loader->getRoot()));
+    // // if (loader)
 
     return true;
 }
