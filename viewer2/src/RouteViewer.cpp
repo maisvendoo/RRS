@@ -16,6 +16,7 @@
 #include "tcp-client.h"
 
 #include <cmath>
+#include <iostream>
 #include <memory>
 #include <QApplication>
 #include <QObject>
@@ -388,9 +389,25 @@ bool RouteViewer::initDisplay()
     traits->windowTitle = settings.name;
     traits->decoration = settings.window_decoration;
     traits->samples = settings.samples;
+    traits->debugLayer = true;
+    traits->debugUtils = true;
 
     auto window = vsg::Window::create(traits);
     viewer->addWindow(window);
+
+    FileSystem& fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), "experimental-polygon");
+    settings.route_dir_full_path = route_dir_path;
+
+    Route route;
+
+    RouteLoader loader(settings.route_dir_full_path);
+    loader.read_description();
+    loader.parse_objects_ref(route);
+    loader.parse_route_map(route);
+
+    vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
+    root->addChild(a);
 
     vsg::ComputeBounds computeBounds;
     root->accept(computeBounds);
@@ -398,13 +415,10 @@ bool RouteViewer::initDisplay()
     double radius = vsg::length(computeBounds.bounds.max - computeBounds.bounds.min) * 0.6;
     double nearFarRatio = 0.0005;
 
-    auto perspective = vsg::Perspective::create(
-        30.0,
-        static_cast<double>(window->extent2D().width)
-            / static_cast<double>(window->extent2D().height),
-        nearFarRatio * radius,
-        radius * 4.5
-    );
+    double aspect_ratio = static_cast<double>(window->extent2D().width)
+        / static_cast<double>(window->extent2D().height);
+
+    auto perspective = vsg::Perspective::create(settings.fovy, aspect_ratio, nearFarRatio * radius, radius * 4.5);
 
     auto lookAt = vsg::LookAt::create(
         centre + vsg::dvec3(0.0, -radius * 3.5, 0.0),
@@ -453,11 +467,12 @@ bool RouteViewer::loadRoute()
     Route route;
 
     RouteLoader loader(settings.route_dir_full_path);
-    loader.read_description();\
+    loader.read_description();
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
-    vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
+    // vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
+    // root->addChild(a);
 
     // std::ifstream stream(route_dir_path + fs.separator() + "route-type");
     // if (!stream)
