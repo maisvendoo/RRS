@@ -65,7 +65,7 @@ bool RouteLoader::parse_objects_ref(Route& route)
                 std::replace(model_path.begin(), model_path.end(), '\\', '/');
                 std::replace(texture_path.begin(), texture_path.end(), '\\', '/');
                 std::ofstream united_file(route_path + "/united/" + label + ".dmdu");
-                united_file << "/.." << model_path << "\n/.." << texture_path << '\n';
+                united_file << route_path << model_path << '\n' << route_path << texture_path << '\n';
                 route.model_paths.emplace_back(route_path + "/united/" + label + ".dmdu");
             }
         }
@@ -108,7 +108,11 @@ bool RouteLoader::parse_route_map(Route& route)
         std::string label;
         float t_x, t_y, t_z;
         float r_x, r_y, r_z;
-        // line_stream >> label
+        line_stream >> label >> t_x >> t_y >> t_z >> r_x >> r_y >> r_z;
+        if (line_stream)
+        {
+            route.transforms.insert({label, RouteObjectTransform{t_x, t_y, t_z, r_x, r_y, r_z}});
+        }
     }
 
     return true;

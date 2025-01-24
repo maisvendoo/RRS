@@ -4,6 +4,7 @@
 #include "settings.h"
 
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
 #include <vsg/maths/vec4.h>
 
 #include <QObject>
@@ -76,6 +77,8 @@ private:
     std::unique_ptr<SoundManager> sound_manager;
 
     std::unique_ptr<TrainExteriorHandler> train_ext_handler;
+
+    vsg::ref_ptr<vsg::Options> options;
 
     vsg::ref_ptr<vsg::Group> root;
 

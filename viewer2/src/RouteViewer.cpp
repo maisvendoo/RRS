@@ -1,6 +1,7 @@
 #include "RouteViewer.h"
 
 #include "CLI11.hpp"
+#include "DmdReaderWriter.h"
 #include "Route.h"
 #include "RouteLoader.h"
 #include "simulator-info-struct.h"
@@ -23,7 +24,11 @@
 #include <string>
 #include <vsg/all.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/FileSystem.h>
+#include <vsg/io/Options.h>
+#include <vsg/io/read.h>
 #include <vsg/nodes/TileDatabase.h>
+#include <vsgXchange/all.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
     : QObject(parent)
@@ -372,6 +377,12 @@ void RouteViewer::initEnvironmentLight(vsg::vec4 color, float power, float psi, 
 
 bool RouteViewer::initDisplay()
 {
+    options = vsg::Options::create();
+    options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
+    options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    options->add(vsgXchange::all::create());
+    options->add(DmdReaderWriter::create());
+
     viewer = vsg::Viewer::create();
 
     auto traits = vsg::WindowTraits::create();
@@ -450,6 +461,8 @@ bool RouteViewer::loadRoute()
     loader.read_description();\
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
+
+    vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
 
     // std::ifstream stream(route_dir_path + fs.separator() + "route-type");
     // if (!stream)
