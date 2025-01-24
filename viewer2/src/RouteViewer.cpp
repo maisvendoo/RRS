@@ -23,11 +23,6 @@
 
 #include <string>
 #include <vsg/all.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/io/FileSystem.h>
-#include <vsg/io/Options.h>
-#include <vsg/io/read.h>
-#include <vsg/nodes/TileDatabase.h>
 #include <vsgXchange/all.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)

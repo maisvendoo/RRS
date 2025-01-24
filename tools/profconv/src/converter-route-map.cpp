@@ -2,7 +2,6 @@
 
 #include    <QFile>
 #include    <iostream>
-#include    <sstream>
 
 #include    "path-utils.h"
 

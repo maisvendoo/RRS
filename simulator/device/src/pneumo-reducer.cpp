@@ -1,6 +1,6 @@
 #include    "pneumo-reducer.h"
 
-#include    "physics.h"
+#include    "math-funcs.h"
 
 //------------------------------------------------------------------------------
 //

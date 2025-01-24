@@ -1,6 +1,6 @@
 #include    "protective-device.h"
 
-#include    "physics.h"
+#include    "math-funcs.h"
 
 //------------------------------------------------------------------------------
 //

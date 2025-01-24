@@ -3,7 +3,7 @@
 #include    <filesystem.h>
 #include    <Journal.h>
 
-#include    "physics.h"
+#include    "math-funcs.h"
 
 //------------------------------------------------------------------------------
 //

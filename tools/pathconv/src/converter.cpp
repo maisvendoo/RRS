@@ -6,9 +6,6 @@
 
 #include    <QDebug>
 
-#include    <algorithm>
-#include    <string>
-
 #include    <QCoreApplication>
 
 #include    "path-funcs.h"
@@ -43,7 +40,7 @@ void Converter::process(const QString &routeDir)
     }
 
     if (*(routeDir.end() - 1) != QDir::separator())
-        routeDirectory += QDir::separator();    
+        routeDirectory += QDir::separator();
 
     QString modelsDir = routeDirectory + "models";
     QString texturesDir = routeDirectory + "textures";
@@ -122,7 +119,7 @@ bool Converter::readObjectsRef(const QString &path)
         }
 
         ref_line.type = RefLine;
-        ref_lines.push_back(ref_line);        
+        ref_lines.push_back(ref_line);
     }
 
     return true;
