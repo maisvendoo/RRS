@@ -32,7 +32,7 @@ public:
 
     simulator_update_pos_t *train_data = Q_NULLPTR;
 
-    std::vector<double> *vehicles_half_length;
+    std::vector<double> *vehicles_half_length = Q_NULLPTR;
 
     topology_stations_list_t *stations = Q_NULLPTR;
 

@@ -13,7 +13,9 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);       
+    this->setWindowTitle(tr("route-map"));
+
+    ui->setupUi(this);
 
     connect(tcp_client, &TcpClient::connected,
             this, &MainWindow::slotConnectedToSimulator);
@@ -49,6 +51,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
             this, &MainWindow::slotRecvLogMessage);
 
     map = new MapWidget(ui->Map);
+    map->stations = topology->getStationsList();
+    map->traj_list = topology->getTrajectoriesList();
+    map->conn_list = topology->getConnectorsList();
+    map->signals_data = signals_data;
+    map->train_data = &train_data;
+    map->vehicles_half_length = &vehicles_half_length;
+    map->players_data = &players_data;
 
     load_config("../cfg/route-map-tcp.xml");
 
@@ -108,11 +117,6 @@ void MainWindow::load_config(const QString &cfg_name)
 //------------------------------------------------------------------------------
 void MainWindow::paintEvent(QPaintEvent *event)
 {
-    if (traj_list == Q_NULLPTR)
-    {
-        return;
-    }
-
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
 }
@@ -122,6 +126,10 @@ void MainWindow::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
+    players_data = simulator_update_players_t();
+    train_data = simulator_update_pos_t();
+    vehicles_half_length.clear();
+
     // Запрос серверу на информацию о длинах ПЕ
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 
@@ -153,7 +161,6 @@ void MainWindow::slotGetVehicleInfoData(QByteArray &data)
     {
         vehicles_half_length[i] = info.vehicles[i].vehicle_length / 2.0;
     }
-    map->vehicles_half_length = &vehicles_half_length;
 
     // Запрос серверу на загрузку топологии
     tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_DATA);
@@ -169,28 +176,31 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     topology->deserialize(topology_data);
     this->setWindowTitle(topology->getRouteName());
 
-    traj_list = topology->getTrajectoriesList();
-    conn_list = topology->getConnectorsList();
-
-    if ( (traj_list == Q_NULLPTR) || (conn_list == Q_NULLPTR) )
+    if ( (topology->getTrajectoriesList() == Q_NULLPTR) || (topology->getConnectorsList() == Q_NULLPTR) )
     {
         ui->ptLog->appendPlainText(tr("Toplology loading FAILED!!!"));
         return;
     }
 
-    if (traj_list->size() == 0)
+    if (topology->getTrajectoriesList()->size() == 0)
     {
         ui->ptLog->appendPlainText(tr("Trajectories list is empty"));
         return;
     }
 
-    if (conn_list->size() == 0)
+    if (topology->getConnectorsList()->size() == 0)
     {
         ui->ptLog->appendPlainText(tr("Connectors list is empty"));
         return;
     }
 
-    for (auto conn : *conn_list)
+    for (auto sl : map->switch_labels)
+    {
+        delete sl;
+    }
+    map->switch_labels.clear();
+
+    for (auto conn : *topology->getConnectorsList())
     {
         SwitchLabel *sw_label = new SwitchLabel(map);
         sw_label->setText(conn->getName());
@@ -203,15 +213,11 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 
     ui->ptLog->appendPlainText(tr("Topology loaded successfully!"));
 
-    QString trajectories = QString(tr("Trajectories: %1")).arg(traj_list->size());
-    QString connestors = QString(tr("Connectors: %1")).arg(conn_list->size());
+    QString trajectories = QString(tr("Trajectories: %1")).arg(topology->getTrajectoriesList()->size());
+    QString connestors = QString(tr("Connectors: %1")).arg(topology->getConnectorsList()->size());
 
     ui->ptLog->appendPlainText(trajectories);
     ui->ptLog->appendPlainText(connestors);
-
-    map->traj_list = traj_list;
-    map->conn_list = conn_list;
-    map->stations = topology->getStationsList();
 
     // Запрос серверу на загрузку сигналов
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
@@ -252,9 +258,20 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         ui->ptLog->appendPlainText(QString(tr("Warning: no exit signals data")));
     }
 
+    for (auto sl : map->signal_labels_fwd)
+    {
+        delete sl;
+    }
+    for (auto sl : map->signal_labels_bwd)
+    {
+        delete sl;
+    }
+    map->signal_labels_fwd.clear();
+    map->signal_labels_bwd.clear();
+
     for (auto signal : signals_data->line_signals)
     {
-        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), Q_NULLPTR);
 
         if (conn == Q_NULLPTR)
         {
@@ -284,7 +301,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     for (auto signal : signals_data->enter_signals)
     {
-        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), Q_NULLPTR);
 
         if (conn == Q_NULLPTR)
         {
@@ -316,7 +333,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     for (auto signal : signals_data->exit_signals)
     {
-        Connector *conn = conn_list->value(signal->getConnectorName(), Q_NULLPTR);
+        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), Q_NULLPTR);
 
         if (conn == Q_NULLPTR)
         {
@@ -346,8 +363,6 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
     }
 
-    map->signals_data = signals_data;
-
     // Запрос серверу на регулярное обновление игроков
     tcp_client->sendRequest(STYPE_REQUEST_PLAYERS_INFO,
                             static_cast<double>(players_update_interval) / 1000.0);
@@ -363,8 +378,6 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 void MainWindow::slotGetPlayersData(QByteArray &players_update)
 {
     players_data.deserialize(players_update);
-
-    map->players_data = &players_data;
 }
 
 //------------------------------------------------------------------------------
@@ -373,8 +386,6 @@ void MainWindow::slotGetPlayersData(QByteArray &players_update)
 void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
-
-    map->train_data = &train_data;
 
     int seconds = static_cast<int>(std::floor(train_data.time));
     int hours = seconds / 3600;
@@ -477,7 +488,7 @@ void MainWindow::slotGetSwitchState(QByteArray &sw_state)
     switch_state_t switch_state;
     switch_state.deserialize(sw_state);
 
-    Switch *sw = dynamic_cast<Switch *>(conn_list->value(switch_state.name, Q_NULLPTR));
+    Switch *sw = dynamic_cast<Switch *>(topology->getConnectorsList()->value(switch_state.name, Q_NULLPTR));
 
     if (sw == Q_NULLPTR)
     {
@@ -496,7 +507,7 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
     traj_busy_state_t busy_state;
     busy_state.deserialize(busy_data);
 
-    Trajectory *traj = (traj_list->value(busy_state.name, Q_NULLPTR));
+    Trajectory *traj = (topology->getTrajectoriesList()->value(busy_state.name, Q_NULLPTR));
 
     if (traj == Q_NULLPTR)
     {
@@ -526,7 +537,7 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
         return;
     }
 
-    Connector *conn = conn_list->value(conn_name, Q_NULLPTR);
+    Connector *conn = topology->getConnectorsList()->value(conn_name, Q_NULLPTR);
 
     if (conn == Q_NULLPTR)
     {

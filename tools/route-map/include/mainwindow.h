@@ -51,10 +51,6 @@ private:
 
     std::vector<double> vehicles_half_length;
 
-    traj_list_t *traj_list = Q_NULLPTR;
-
-    conn_list_t *conn_list = Q_NULLPTR;
-
     MapWidget *map;
 
     signals_data_t *signals_data = new signals_data_t();
