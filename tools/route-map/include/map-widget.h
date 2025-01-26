@@ -115,7 +115,7 @@ private:
 
     void drawExitSignal(Signal *signal);
 
-    QPoint coord_transform(dvec3 traj_point);
+    QPoint coord_transform(dvec3 point);
 
     void wheelEvent(QWheelEvent *event);
 

@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
+MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     this->setWindowTitle(tr("route-map"));
@@ -61,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     load_config("../cfg/route-map-tcp.xml");
 
+    overrideByCommandLine(cmd_line);
+
     tcp_client->init(tcp_config);
 }
 
@@ -110,6 +112,21 @@ void MainWindow::load_config(const QString &cfg_name)
     tmp_value = 0;
     cfg.getDouble(secName, "SignalOffset", tmp_value);
     map->SetSignalOffset(tmp_value);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::overrideByCommandLine(route_map_command_line_t &cmd_line)
+{
+    if (cmd_line.host_addr.is_present)
+    {
+        tcp_config.host_addr = cmd_line.host_addr.value;
+    }
+    if (cmd_line.port.is_present)
+    {
+        tcp_config.port = cmd_line.port.value;
+    }
 }
 
 //------------------------------------------------------------------------------

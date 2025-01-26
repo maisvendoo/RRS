@@ -28,12 +28,10 @@
 template <class T>
 struct option_t
 {
-    T value;
-    bool is_present;
+    T value = T();
+    bool is_present = false;
 
     option_t()
-        : value(T())
-        , is_present(false)
     {
 
     }

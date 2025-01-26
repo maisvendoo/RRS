@@ -365,15 +365,6 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 
     if (cmd_line.fullscreen.is_present)
         settings.fullscreen = cmd_line.fullscreen.value;
-
-    if (cmd_line.notify_level.is_present)
-        settings.notify_level = cmd_line.notify_level.value;
-
-    if (cmd_line.direction.is_present)
-        settings.direction = cmd_line.direction.value;
-
-    if (cmd_line.route_dir.is_present)
-        settings.route_dir_name = cmd_line.route_dir.value;
 }
 /*
 //------------------------------------------------------------------------------
