@@ -34,7 +34,7 @@
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
-      <string>Ride settings</string>
+      <string>Local server</string>
      </attribute>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
@@ -44,7 +44,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,3">
+             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,4">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout">
                 <item>
@@ -129,7 +129,7 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,3">
+             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,4">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
@@ -293,6 +293,65 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
+           <widget class="QPushButton" name="pbStartViewer">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Start viewer</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbAutostartViewer">
+            <property name="text">
+             <string>Start viewer automatically</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbStartMap">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Start route map</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbAutostartMap">
+            <property name="text">
+             <string>Start route map automatically</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -306,21 +365,15 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="btnStart">
+           <widget class="QPushButton" name="pbStartServer">
             <property name="minimumSize">
              <size>
-              <width>100</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
+              <width>120</width>
               <height>30</height>
              </size>
             </property>
             <property name="text">
-             <string>Start</string>
+             <string>Start server</string>
             </property>
            </widget>
           </item>
@@ -340,7 +393,7 @@
         <x>30</x>
         <y>20</y>
         <width>261</width>
-        <height>355</height>
+        <height>399</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">

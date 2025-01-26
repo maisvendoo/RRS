@@ -23,7 +23,7 @@
 #include    <QSpinBox>
 #include    <QDoubleSpinBox>
 #include    <QTextStream>
-#include <thread>
+// #include <thread>
 // #include <synchapi.h>
 
 
@@ -45,22 +45,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     init();
 
     connect(ui->lwRoutes, &QListWidget::itemSelectionChanged,
-            this, &MainWindow::onRouteSelection);
+            this, &MainWindow::slotRouteSelection);
 
     connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
-            this, &MainWindow::onTrainSelection);
+            this, &MainWindow::slotTrainSelection);
 
-    connect(ui->btnStart, &QPushButton::pressed,
-            this, &MainWindow::onStartPressed);
+    connect(ui->pbStartServer, &QPushButton::pressed,
+            this, &MainWindow::slotStartServerPressed);
+
+    connect(ui->pbStartViewer, &QPushButton::pressed,
+            this, &MainWindow::slotStartViewerPressed);
+
+    connect(ui->pbStartMap, &QPushButton::pressed,
+            this, &MainWindow::slotStartMapPressed);
 
     connect(&simulatorProc, &QProcess::started,
-            this, &MainWindow::onSimulatorStarted);
+            this, &MainWindow::slotSimulatorStarted);
+
+    connect(&viewerProc, &QProcess::started,
+            this, &MainWindow::slotViewerStarted);
+
+    connect(&mapProc, &QProcess::started,
+            this, &MainWindow::slotMapStarted);
 
     connect(&simulatorProc, &QProcess::finished,
-            this, &MainWindow::onSimulatorFinished);
+            this, &MainWindow::slotSimulatorFinished);
 
     connect(&viewerProc, &QProcess::finished,
-            this, &MainWindow::onViewerFinished);
+            this, &MainWindow::slotViewerFinished);
+
+    connect(&mapProc, &QProcess::finished,
+            this, &MainWindow::slotMapFinished);
 
     connect(ui->spWidth, QOverload<int>::of(&QSpinBox::valueChanged),
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
@@ -118,9 +133,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QIcon icon(":/images/images/RRS_logo.png");
     setWindowIcon(icon);
 
-    ui->btnStart->setEnabled(false);
     ui->pbAddTrain->setEnabled(false);
     ui->pbDeleteTrain->setEnabled(false);
+    ui->pbStartViewer->setEnabled(false);
+    ui->pbStartMap->setEnabled(false);
+    ui->pbStartServer->setEnabled(false);
+    is_start_button_to_stop_server = false;
 }
 
 //------------------------------------------------------------------------------
@@ -270,6 +288,18 @@ void MainWindow::startViewer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::startMap()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString mapPath = ROUTE_MAP_NAME + EXE_EXP;
+
+    mapProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    mapProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + mapPath);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadTheme()
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -299,7 +329,7 @@ void MainWindow::loadTheme()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onRouteSelection()
+void MainWindow::slotRouteSelection()
 {
     size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
 
@@ -322,7 +352,7 @@ void MainWindow::onRouteSelection()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onTrainSelection()
+void MainWindow::slotTrainSelection()
 {
     size_t item_idx = static_cast<size_t>(ui->lwTrains->currentRow());
 
@@ -336,8 +366,16 @@ void MainWindow::onTrainSelection()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onStartPressed()
+void MainWindow::slotStartServerPressed()
 {
+    // Check button is stop running server mode
+    if (is_start_button_to_stop_server)
+    {
+        //ui->pbStartServer->setEnabled(false);
+        simulatorProc.kill();
+        return;
+    }
+
     // Check is route selected
     if (selectedRouteDirName.isEmpty())
     {
@@ -350,50 +388,117 @@ void MainWindow::onStartPressed()
         return;
     }
 
+    //ui->pbStartServer->setEnabled(false);
     startSimulator();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onSimulatorStarted()
+void MainWindow::slotStartViewerPressed()
 {
-    ui->btnStart->setEnabled(false);
-
-    // Sleep(500);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
     startViewer();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void MainWindow::slotStartMapPressed()
 {
-    Q_UNUSED(exitCode)
-
-    ui->btnStart->setEnabled(true);
+    startMap();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onViewerFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void MainWindow::slotSimulatorStarted()
+{
+    is_start_button_to_stop_server = true;
+    ui->pbStartServer->setStyleSheet("background-color: red;");
+    ui->pbStartServer->setText(tr("Stop server"));
+    ui->pbStartServer->setEnabled(true);
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    if (ui->cbAutostartViewer->isChecked())
+        startViewer();
+    else
+        ui->pbStartViewer->setEnabled(true);
+
+    if (ui->cbAutostartMap->isChecked())
+        startMap();
+    else
+        ui->pbStartMap->setEnabled(true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotViewerStarted()
+{
+    ui->pbStartViewer->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotMapStarted()
+{
+    ui->pbStartMap->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
 
-    simulatorProc.kill();
+    is_start_button_to_stop_server = false;
+    ui->pbStartServer->setStyleSheet("background-color: ;");
+    ui->pbStartServer->setText(tr("Start server"));
+    if (active_trains.empty() || (ui->lwRoutes->currentRow() < 0))
+    {
+        ui->pbStartServer->setEnabled(false);
+    }
+    else
+    {
+        ui->pbStartServer->setEnabled(true);
+    }
+
+    ui->pbStartViewer->setEnabled(false);
+    ui->pbStartMap->setEnabled(false);
+
+    if (viewerProc.state() != QProcess::NotRunning)
+        viewerProc.kill();
+
+    if (mapProc.state() != QProcess::NotRunning)
+        mapProc.kill();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotViewerFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitCode)
+
+    if (simulatorProc.state() != QProcess::NotRunning)
+        ui->pbStartViewer->setEnabled(true);
+
+    //simulatorProc.kill();
     setFocusPolicy(Qt::StrongFocus);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::onStationSelected(int index)
+void MainWindow::slotMapFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    size_t idx = static_cast<size_t>(index);
+    Q_UNUSED(exitCode)
+
+    if (simulatorProc.state() != QProcess::NotRunning)
+        ui->pbStartMap->setEnabled(true);
 }
 
 //------------------------------------------------------------------------------
@@ -486,7 +591,9 @@ void MainWindow::slotAddActiveTrain()
 
     tt->selectRow(rowIdx);
 
-    ui->btnStart->setEnabled(true);
+    if (!is_start_button_to_stop_server)
+        ui->pbStartServer->setEnabled(true);
+
     ui->pbDeleteTrain->setEnabled(true);
 
     connect(dir, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -516,7 +623,9 @@ void MainWindow::slotDeleteActiveTrain()
 
     if (active_trains.empty())
     {
-        ui->btnStart->setEnabled(false);
+        if (!is_start_button_to_stop_server)
+            ui->pbStartServer->setEnabled(false);
+
         ui->pbDeleteTrain->setEnabled(false);
     }
 }

@@ -69,6 +69,10 @@ private:
     QProcess        simulatorProc;
     /// Visaulization process
     QProcess        viewerProc;
+    /// Visaulization process
+    QProcess        mapProc;
+
+    bool is_start_button_to_stop_server;
 
     /// Viewer settings
     FieldsDataList  fd_list;
@@ -110,6 +114,9 @@ private:
     /// Start viewer
     void startViewer();
 
+    /// Start dispatcher map
+    void startMap();
+
     /// Load theme
     void loadTheme();
 
@@ -133,19 +140,27 @@ private:
 
 private slots:
 
-    void onRouteSelection();
+    void slotRouteSelection();
 
-    void onTrainSelection();
+    void slotTrainSelection();
 
-    void onStartPressed();
+    void slotStartServerPressed();
 
-    void onSimulatorStarted();
+    void slotStartViewerPressed();
 
-    void onSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void slotStartMapPressed();
 
-    void onViewerFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void slotSimulatorStarted();
 
-    void onStationSelected(int index);
+    void slotViewerStarted();
+
+    void slotMapStarted();
+
+    void slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void slotViewerFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void slotMapFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     void slotChangedGraphSetting(int);
 
