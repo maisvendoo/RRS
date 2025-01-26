@@ -77,6 +77,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(&mapProc, &QProcess::finished,
             this, &MainWindow::slotMapFinished);
 
+    connect(ui->pbConnectViewer, &QPushButton::pressed,
+            this, &MainWindow::slotConnectViewerPressed);
+
+    connect(ui->pbConnectMap, &QPushButton::pressed,
+            this, &MainWindow::slotConnectMapPressed);
+
+    connect(ui->cbSavedServers, &QComboBox::currentIndexChanged,
+            this, &MainWindow::slotSelectSavedServer);
+
+    connect(ui->pbSaveServer, &QPushButton::pressed,
+            this, &MainWindow::slotSaveServer);
+
     connect(ui->spWidth, QOverload<int>::of(&QSpinBox::valueChanged),
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
 
@@ -158,6 +170,7 @@ void MainWindow::init()
 
     loadRoutesList(fs.getRouteRootDir());
     loadTrainsList(fs.getTrainsDir());
+    loadServersList(fs.getConfigDir());
 
     loadGraphicsSettings("settings");
 }
@@ -229,6 +242,53 @@ void MainWindow::loadTrainsList(const std::string &trainsDir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::loadServersList(const std::string &cfgDir)
+{
+    saved_servers.clear();
+
+    saved_servers_path = QString(cfgDir.c_str()) + QDir::separator() + QString(SAVED_SERVERS_FILE.c_str());
+    CfgReader cfg;
+    if (cfg.load(saved_servers_path))
+    {
+        QDomNode server_node = cfg.getFirstSection("Server");
+        while (!server_node.isNull())
+        {
+            server_info_t server = server_info_t();
+
+            QString tmp_host_address = "";
+            int tmp_port = 0;
+
+            cfg.getString(server_node, "Name", server.server_name);
+
+            if (cfg.getString(server_node, "HostAddr", tmp_host_address))
+                server.setHostAddress(tmp_host_address);
+
+            if (cfg.getInt(server_node, "port", tmp_port))
+                server.ipv4_port = static_cast<uint16_t>(tmp_port);
+
+            saved_servers.insert(server.server_name, server);
+
+            server_node = cfg.getNextSection();
+        }
+    }
+
+    if (saved_servers.empty())
+    {
+        server_info_t local_server = server_info_t();
+        saved_servers.insert(local_server.server_name, local_server);
+    }
+
+    for (auto ss : saved_servers)
+    {
+        ui->cbSavedServers->addItem(ss.server_name + " (" + ss.getHostAddressAndPort() + ")");
+    }
+
+    slotSelectSavedServer(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::startSimulator()
 {
     if (selectedRouteDirName.isEmpty() || active_trains.empty())
@@ -275,26 +335,81 @@ void MainWindow::startSimulator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::startViewer()
+void MainWindow::startViewer(bool local)
 {
     FileSystem &fs = FileSystem::getInstance();
     QString viewerPath = VIEWER_NAME + EXE_EXP;
 
-    viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    // viewerProc.setStandardOutputFile("../logs/viewer-start.log");
-    viewerProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + viewerPath);
+    server_info_t server;
+    if (local)
+    {
+        server = server_info_t();
+    }
+    else
+    {
+        server.ipv4_1 = ui->sbIPv4_1->value();
+        server.ipv4_2 = ui->sbIPv4_2->value();
+        server.ipv4_3 = ui->sbIPv4_3->value();
+        server.ipv4_4 = ui->sbIPv4_4->value();
+        server.ipv4_port = ui->sbIPv4_port->value();
+    }
+
+    QStringList args;
+    args << "--host-address=" + server.getHostAddress();
+    args << "--port=" + QString("%1").arg(server.ipv4_port);
+
+    if (local)
+    {
+        viewerProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+        viewerProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + viewerPath, args);
+    }
+    else
+    {
+        QProcess *proc = new QProcess;
+        connect(proc, &QProcess::finished, this, &MainWindow::slotAdditionalProcFinished);
+        proc->setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+        proc->start(QString::fromStdString(fs.getBinaryDir()) + '/' + viewerPath, args);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::startMap()
+void MainWindow::startMap(bool local)
 {
     FileSystem &fs = FileSystem::getInstance();
     QString mapPath = ROUTE_MAP_NAME + EXE_EXP;
 
-    mapProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    mapProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + mapPath);
+    server_info_t server;
+    if (local)
+    {
+        server = server_info_t();
+    }
+    else
+    {
+        server.ipv4_1 = ui->sbIPv4_1->value();
+        server.ipv4_2 = ui->sbIPv4_2->value();
+        server.ipv4_3 = ui->sbIPv4_3->value();
+        server.ipv4_4 = ui->sbIPv4_4->value();
+        server.ipv4_port = ui->sbIPv4_port->value();
+    }
+
+    QStringList args;
+    args << "--host-address=" + server.getHostAddress();
+    args << "--port=" + QString("%1").arg(server.ipv4_port);
+
+    if (local)
+    {
+        mapProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+        mapProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + mapPath, args);
+    }
+    else
+    {
+        QProcess *proc = new QProcess;
+        connect(proc, &QProcess::finished, this, &MainWindow::slotAdditionalProcFinished);
+        proc->setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+        proc->start(QString::fromStdString(fs.getBinaryDir()) + '/' + mapPath, args);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -450,6 +565,24 @@ void MainWindow::slotMapStarted()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::slotConnectViewerPressed()
+{
+    bool local = false;
+    startViewer(local);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotConnectMapPressed()
+{
+    bool local = false;
+    startMap(local);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
@@ -499,6 +632,81 @@ void MainWindow::slotMapFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     if (simulatorProc.state() != QProcess::NotRunning)
         ui->pbStartMap->setEnabled(true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotAdditionalProcFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    QProcess *proc = dynamic_cast<QProcess *>(sender());
+    disconnect(proc, &QProcess::finished, this, &MainWindow::slotAdditionalProcFinished);
+    delete proc;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSelectSavedServer(int idx)
+{
+    server_info_t server = server_info_t();
+    int i = 0;
+    for (auto ss : saved_servers)
+    {
+        if (i == idx)
+        {
+            server = ss;
+            break;
+        }
+        ++i;
+    }
+    ui->leServerName->setText(server.server_name);
+    ui->sbIPv4_1->setValue(server.ipv4_1);
+    ui->sbIPv4_2->setValue(server.ipv4_2);
+    ui->sbIPv4_3->setValue(server.ipv4_3);
+    ui->sbIPv4_4->setValue(server.ipv4_4);
+    ui->sbIPv4_port->setValue(server.ipv4_port);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSaveServer()
+{
+    server_info_t server = server_info_t();
+    server.server_name = ui->leServerName->text();
+    server.ipv4_1 = ui->sbIPv4_1->value();
+    server.ipv4_2 = ui->sbIPv4_2->value();
+    server.ipv4_3 = ui->sbIPv4_3->value();
+    server.ipv4_4 = ui->sbIPv4_4->value();
+    server.ipv4_port = ui->sbIPv4_port->value();
+
+    auto saved_it = saved_servers.insert(server.server_name, server);
+    int idx = ui->cbSavedServers->currentIndex();
+
+    CfgEditor editor;
+    editor.openFileForWrite(saved_servers_path);
+    editor.setIndentationFormat(-1);
+
+    ui->cbSavedServers->clear();
+    int i = 0;
+    for (auto it = saved_servers.begin(); it != saved_servers.end(); ++it)
+    {
+        if (it == saved_it)
+            idx = i;
+        ++i;
+
+        server_info_t server = it.value();
+        ui->cbSavedServers->addItem(server.server_name + " (" + server.getHostAddressAndPort() + ")");
+
+        FieldsDataList flist;
+        flist.append(QPair<QString, QString>("Name", server.server_name));
+        flist.append(QPair<QString, QString>("HostAddr", server.getHostAddress()));
+        flist.append(QPair<QString, QString>("port", QString::number(server.ipv4_port)));
+        editor.writeFile("Server", flist);
+    }
+
+    slotSelectSavedServer(idx);
 }
 
 //------------------------------------------------------------------------------

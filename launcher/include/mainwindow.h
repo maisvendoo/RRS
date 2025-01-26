@@ -22,6 +22,7 @@
 #include    <train-info.h>
 #include    <waypoint.h>
 #include    <active-train.h>
+#include    <server_info.h>
 #include    <CfgEditor.h>
 
 //------------------------------------------------------------------------------
@@ -69,7 +70,7 @@ private:
     QProcess        simulatorProc;
     /// Visaulization process
     QProcess        viewerProc;
-    /// Visaulization process
+    /// Dispatcher map process
     QProcess        mapProc;
 
     bool is_start_button_to_stop_server;
@@ -90,6 +91,7 @@ private:
     static const   QString VIEW_DIST;
 
     QString settings_path;
+    QString saved_servers_path;
 
     std::vector<train_position_t> fwd_train_positions;
 
@@ -98,6 +100,8 @@ private:
     train_position_t selected_train_position;
 
     std::vector<active_train_t> active_trains;
+
+    QMap<QString, server_info_t> saved_servers;
 
     /// Launcer initialization
     void init();
@@ -108,14 +112,20 @@ private:
     /// Loading of trains list
     void loadTrainsList(const std::string &trainsDir);
 
+    /// Loading of servers list
+    void loadServersList(const std::string &cfgDir);
+
+    /// Save servers list
+    void saveServersList();
+
     /// Start simulation
     void startSimulator();
 
     /// Start viewer
-    void startViewer();
+    void startViewer(bool local = true);
 
     /// Start dispatcher map
-    void startMap();
+    void startMap(bool local = true);
 
     /// Load theme
     void loadTheme();
@@ -156,11 +166,21 @@ private slots:
 
     void slotMapStarted();
 
+    void slotConnectViewerPressed();
+
+    void slotConnectMapPressed();
+
     void slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     void slotViewerFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     void slotMapFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void slotAdditionalProcFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void slotSelectSavedServer(int idx);
+
+    void slotSaveServer();
 
     void slotChangedGraphSetting(int);
 
