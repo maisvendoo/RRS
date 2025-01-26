@@ -392,7 +392,7 @@
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>361</width>
+        <width>372</width>
         <height>251</height>
        </rect>
       </property>
@@ -471,6 +471,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout_14">
          <item>
           <widget class="QSpinBox" name="sbIPv4_1">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="maximum">
             <number>255</number>
            </property>
@@ -486,7 +491,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>12</pointsize>
+             <pointsize>14</pointsize>
              <bold>true</bold>
             </font>
            </property>
@@ -497,6 +502,11 @@
          </item>
          <item>
           <widget class="QSpinBox" name="sbIPv4_2">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="maximum">
             <number>255</number>
            </property>
@@ -512,7 +522,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>12</pointsize>
+             <pointsize>14</pointsize>
              <bold>true</bold>
             </font>
            </property>
@@ -523,6 +533,11 @@
          </item>
          <item>
           <widget class="QSpinBox" name="sbIPv4_3">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="maximum">
             <number>255</number>
            </property>
@@ -538,7 +553,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>12</pointsize>
+             <pointsize>14</pointsize>
              <bold>true</bold>
             </font>
            </property>
@@ -549,6 +564,11 @@
          </item>
          <item>
           <widget class="QSpinBox" name="sbIPv4_4">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="maximum">
             <number>255</number>
            </property>
@@ -564,7 +584,7 @@
            </property>
            <property name="font">
             <font>
-             <pointsize>12</pointsize>
+             <pointsize>14</pointsize>
              <bold>true</bold>
             </font>
            </property>
@@ -575,6 +595,11 @@
          </item>
          <item>
           <widget class="QSpinBox" name="sbIPv4_port">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="maximum">
             <number>65535</number>
            </property>

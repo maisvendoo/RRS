@@ -86,6 +86,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->cbSavedServers, &QComboBox::currentIndexChanged,
             this, &MainWindow::slotSelectSavedServer);
 
+    connect(ui->leServerName, &QLineEdit::textChanged,
+            this, &MainWindow::slotChangedServerSettings);
+
+    connect(ui->sbIPv4_1, &QSpinBox::valueChanged,
+            this, &MainWindow::slotChangedServerSettings);
+
+    connect(ui->sbIPv4_2, &QSpinBox::valueChanged,
+            this, &MainWindow::slotChangedServerSettings);
+
+    connect(ui->sbIPv4_3, &QSpinBox::valueChanged,
+            this, &MainWindow::slotChangedServerSettings);
+
+    connect(ui->sbIPv4_4, &QSpinBox::valueChanged,
+            this, &MainWindow::slotChangedServerSettings);
+
+    connect(ui->sbIPv4_port, &QSpinBox::valueChanged,
+            this, &MainWindow::slotChangedServerSettings);
+
     connect(ui->pbSaveServer, &QPushButton::pressed,
             this, &MainWindow::slotSaveServer);
 
@@ -667,6 +685,45 @@ void MainWindow::slotSelectSavedServer(int idx)
     ui->sbIPv4_3->setValue(server.ipv4_3);
     ui->sbIPv4_4->setValue(server.ipv4_4);
     ui->sbIPv4_port->setValue(server.ipv4_port);
+    slotChangedServerSettings();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotChangedServerSettings()
+{
+    if (ui->leServerName->text().isEmpty())
+    {
+        ui->pbSaveServer->setText("Save Server");
+        ui->pbSaveServer->setEnabled(false);
+    }
+    else
+    {
+        if (saved_servers.contains(ui->leServerName->text()))
+        {
+            ui->pbSaveServer->setText("Rewrite Server");
+
+            server_info_t saved_server = saved_servers.value(ui->leServerName->text());
+            if ((saved_server.ipv4_1 == ui->sbIPv4_1->value()) &&
+                (saved_server.ipv4_2 == ui->sbIPv4_2->value()) &&
+                (saved_server.ipv4_3 == ui->sbIPv4_3->value()) &&
+                (saved_server.ipv4_4 == ui->sbIPv4_4->value()) &&
+                (saved_server.ipv4_port == ui->sbIPv4_port->value()))
+            {
+                ui->pbSaveServer->setEnabled(false);
+            }
+            else
+            {
+                ui->pbSaveServer->setEnabled(true);
+            }
+        }
+        else
+        {
+            ui->pbSaveServer->setEnabled(true);
+            ui->pbSaveServer->setText("Save Server");
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

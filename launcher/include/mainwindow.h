@@ -180,6 +180,8 @@ private slots:
 
     void slotSelectSavedServer(int idx);
 
+    void slotChangedServerSettings();
+
     void slotSaveServer();
 
     void slotChangedGraphSetting(int);
