@@ -281,8 +281,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         int port = 0;
         if (cfg.getValue(secName, "port", port))
             settings.tcp_config.port = static_cast<quint16>(port);
-        OSG_INFO << "Host for client from setings: " << tmp << ":" << port << std::endl;
-        std::cout << "Host for client from setings: " << tmp << ":" << port << std::endl;
+
         cfg.getValue(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
         cfg.getValue(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
         cfg.getValue(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);

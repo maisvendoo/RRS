@@ -355,8 +355,8 @@ void MainWindow::startViewer(bool local)
     }
 
     QStringList args;
-    args << "--host-address=" + server.getHostAddress();
-    args << "--port=" + QString("%1").arg(server.ipv4_port);
+    args << "--host-address" << server.getHostAddress();
+    args << "--port" << QString::number(server.ipv4_port);
 
     if (local)
     {
@@ -395,8 +395,8 @@ void MainWindow::startMap(bool local)
     }
 
     QStringList args;
-    args << "--host-address=" + server.getHostAddress();
-    args << "--port=" + QString("%1").arg(server.ipv4_port);
+    args << "--host-address" << server.getHostAddress();
+    args << "--port" << QString::number(server.ipv4_port);
 
     if (local)
     {
@@ -660,6 +660,7 @@ void MainWindow::slotSelectSavedServer(int idx)
         }
         ++i;
     }
+    ui->cbSavedServers->setCurrentIndex(idx);
     ui->leServerName->setText(server.server_name);
     ui->sbIPv4_1->setValue(server.ipv4_1);
     ui->sbIPv4_2->setValue(server.ipv4_2);
@@ -673,6 +674,9 @@ void MainWindow::slotSelectSavedServer(int idx)
 //------------------------------------------------------------------------------
 void MainWindow::slotSaveServer()
 {
+    if (ui->leServerName->text().isEmpty())
+        return;
+
     server_info_t server = server_info_t();
     server.server_name = ui->leServerName->text();
     server.ipv4_1 = ui->sbIPv4_1->value();
@@ -705,6 +709,8 @@ void MainWindow::slotSaveServer()
         flist.append(QPair<QString, QString>("port", QString::number(server.ipv4_port)));
         editor.writeFile("Server", flist);
     }
+
+    editor.closeFileAfterWrite();
 
     slotSelectSavedServer(idx);
 }
