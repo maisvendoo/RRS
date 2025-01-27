@@ -24,6 +24,8 @@
 
 #include <string>
 #include <vsg/all.h>
+#include <vsg/io/read.h>
+#include <vsg/utils/SharedObjects.h>
 #include <vsgXchange/all.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
@@ -376,8 +378,10 @@ bool RouteViewer::initDisplay()
     options = vsg::Options::create();
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    options->paths.push_back("/home/ksv/work-ANI/Projects/ANI/RRS/");
     options->add(vsgXchange::all::create());
     options->add(DmdReaderWriter::create());
+    options->sharedObjects = vsg::SharedObjects::create();
 
     viewer = vsg::Viewer::create();
 
@@ -406,11 +410,23 @@ bool RouteViewer::initDisplay()
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
-    vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
-    root->addChild(a);
+    // for (const auto& model_path : route.model_paths)
+    // {
+        // auto model = vsg::read_cast<vsg::Node>(model_path, options);
+    // }
+
+    auto model = vsg::read_cast<vsg::Node>(route.model_paths[0], options);
+    for (int i = 0; i < 3; ++i)
+    {
+        auto transform = vsg::MatrixTransform::create();
+        transform->matrix = vsg::translate(vsg::vec3(i * 2.0f, 0.0f, 0.0f));
+        transform->addChild(model);
+        root->addChild(transform);
+    }
 
     vsg::ComputeBounds computeBounds;
     root->accept(computeBounds);
+    auto z = computeBounds.bounds;
     vsg::dvec3 centre = (computeBounds.bounds.min + computeBounds.bounds.max) * 0.5;
     double radius = vsg::length(computeBounds.bounds.max - computeBounds.bounds.min) * 0.6;
     double nearFarRatio = 0.0005;
