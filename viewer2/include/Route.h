@@ -17,8 +17,7 @@ struct RouteObjectTransform
 
 struct Route
 {
-    std::string type;
-    std::vector<std::string> model_paths;
+    std::map<std::string, std::string> object_ref;
     std::multimap<std::string, RouteObjectTransform> transforms;
 };
 

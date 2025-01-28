@@ -1,17 +1,28 @@
+#include "Logger.h"
 #include "RouteViewer.h"
 
 #include <QtWidgets/qapplication.h>
 #include <memory>
+#include <vsg/core/Exception.h>
 
 int main(int argc, char* argv[])
 {
-    QApplication application(argc, argv);
-    auto viewer = std::make_unique<RouteViewer>(argc, argv);
-
-    if (viewer->isReady())
+    try
     {
-        return viewer->run();
+        QApplication application(argc, argv);
+        auto viewer = std::make_unique<RouteViewer>(argc, argv);
+
+        if (viewer->isReady())
+        {
+            return viewer->run();
+        }
     }
+    catch (const vsg::Exception& exception)
+    {
+        LOG_FATAL("%s", exception.message.c_str());
+        return 1;
+    }
+
 
     return 0;
 }

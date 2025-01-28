@@ -25,6 +25,8 @@
 #include <string>
 #include <vsg/all.h>
 #include <vsg/io/read.h>
+#include <vsg/nodes/PagedLOD.h>
+#include <vsg/utils/ComputeBounds.h>
 #include <vsg/utils/SharedObjects.h>
 #include <vsgXchange/all.h>
 
@@ -288,6 +290,10 @@ bool RouteViewer::initEngineSettings()
         return false;
     }
 
+    initEnvironmentLight(vsg::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, -20.0f, 75.0f);
+
+    return true;
+
     /*
     // Common graphics settings
     osg::StateSet *stateset = root->getOrCreateStateSet();
@@ -316,14 +322,30 @@ bool RouteViewer::initEngineSettings()
 
     return true;
     */
-
-    initEnvironmentLight(vsg::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, -20.0f, 75.0f);
-
-    return true;
 }
 
 void RouteViewer::initEnvironmentLight(vsg::vec4 color, float power, float psi, float theta)
 {
+    auto sun = vsg::DirectionalLight::create();
+    sun->color = vsg::vec3(color.r, color.g, color.b);
+    sun->intensity = power;
+
+    float dist = 1000.0f;
+    float rad = vsg::PIf / 180.0f;
+    float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
+    float y = dist * std::cosf(theta * rad) * std::cosf(psi * rad);
+    float z = dist * std::sinf(theta * rad);
+
+    vsg::vec3 pos(x, y, z);
+    // sun->position.set(x, y, z);
+
+    float length = vsg::length(pos);
+    vsg::vec3 sunDir = pos;
+    sunDir *= (-1.0f / length);
+    sun->direction = sunDir;
+
+    root->addChild(sun);
+
     /*
     osg::ref_ptr<osg::Light> sun = new osg::Light;
     sun->setLightNum(0);
@@ -351,26 +373,6 @@ void RouteViewer::initEnvironmentLight(vsg::vec4 color, float power, float psi, 
     root->getOrCreateStateSet()->setMode(GL_LIGHT0, osg::StateAttribute::ON);
     root->addChild(light0.get());
     */
-
-    auto sun = vsg::DirectionalLight::create();
-    sun->color = vsg::vec3(color.r, color.g, color.b);
-    sun->intensity = power;
-
-    float dist = 1000.0f;
-    float rad = vsg::PIf / 180.0f;
-    float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
-    float y = dist * std::cosf(theta * rad) * std::cosf(psi * rad);
-    float z = dist * std::sinf(theta * rad);
-
-    vsg::vec3 pos(x, y, z);
-    // sun->position.set(x, y, z);
-
-    float length = vsg::length(pos);
-    vsg::vec3 sunDir = pos;
-    sunDir *= (-1.0f / length);
-    sun->direction = sunDir;
-
-    root->addChild(sun);
 }
 
 bool RouteViewer::initDisplay()
@@ -396,11 +398,11 @@ bool RouteViewer::initDisplay()
     traits->debugLayer = true;
     traits->debugUtils = true;
 
-    auto window = vsg::Window::create(traits);
+    window = vsg::Window::create(traits);
     viewer->addWindow(window);
 
     FileSystem& fs = FileSystem::getInstance();
-    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), "experimental-polygon");
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), "volgodonskaya-salsk_v.3.2");
     settings.route_dir_full_path = route_dir_path;
 
     Route route;
@@ -410,23 +412,40 @@ bool RouteViewer::initDisplay()
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
-    // for (const auto& model_path : route.model_paths)
-    // {
-        // auto model = vsg::read_cast<vsg::Node>(model_path, options);
-    // }
-
-    auto model = vsg::read_cast<vsg::Node>(route.model_paths[0], options);
-    for (int i = 0; i < 3; ++i)
+    for (auto& [label, path] : route.object_ref)
     {
-        auto transform = vsg::MatrixTransform::create();
-        transform->matrix = vsg::translate(vsg::vec3(i * 2.0f, 0.0f, 0.0f));
-        transform->addChild(model);
-        root->addChild(transform);
+        auto model = vsg::read_cast<vsg::Node>(route_dir_path + path, options);
+
+        LOG_INFO("%s", (route_dir_path + path).c_str());
+        root->addChild(model);
+        break;
     }
 
+    // for (int i = 0; i < route.object_ref.size(); ++i)
+    // {
+        // auto model = vsg::read_cast<vsg::Node>(route_dir_path + , options);
+        // auto transform = vsg::MatrixTransform::create();
+        // transform->matrix = vsg::translate(vsg::vec3(i * 2.0f, 0.0f, 0.0f));
+        // transform->addChild(model);
+        // root->addChild(transform);
+    // }
+
+    initCamera();
+
+    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+    viewer->addEventHandler(vsg::Trackball::create(camera));
+
+    auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
+    viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
+    viewer->compile();
+
+    return true;
+}
+
+void RouteViewer::initCamera()
+{
     vsg::ComputeBounds computeBounds;
     root->accept(computeBounds);
-    auto z = computeBounds.bounds;
     vsg::dvec3 centre = (computeBounds.bounds.min + computeBounds.bounds.max) * 0.5;
     double radius = vsg::length(computeBounds.bounds.max - computeBounds.bounds.min) * 0.6;
     double nearFarRatio = 0.0005;
@@ -442,15 +461,7 @@ bool RouteViewer::initDisplay()
         vsg::dvec3(0.0, 0.0, 1.0)
     );
 
-    auto camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
-    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
-    viewer->addEventHandler(vsg::Trackball::create(camera));
-
-    auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
-    viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
-    viewer->compile();
-
-    return true;
+    camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
 }
 
 void RouteViewer::initTCPclient()
@@ -487,6 +498,8 @@ bool RouteViewer::loadRoute()
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
+    return true;
+
     // vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
     // root->addChild(a);
 
@@ -520,14 +533,11 @@ bool RouteViewer::loadRoute()
     // LOG_INFO("Loaded route from %s", route_dir_path.c_str());
     // root->addChild(vsg::ref_ptr<vsg::Node>(loader->getRoot()));
     // // if (loader)
-
-    return true;
 }
 
 void RouteViewer::slotRecvLogMessage(QString msg)
 {
     LOG_INFO("%s", msg.toStdString().c_str());
-    // imguiWidgetsHandler->setLoadingStatus(msg);
 }
 
 void RouteViewer::slotConnectedToSimulator()

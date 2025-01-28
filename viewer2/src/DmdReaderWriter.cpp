@@ -46,8 +46,6 @@ DmdReaderWriter::~DmdReaderWriter()
 
 vsg::ref_ptr<vsg::Object> DmdReaderWriter::read(const vsg::Path& filename, vsg::ref_ptr<const vsg::Options> options) const
 {
-    auto shared = options->sharedObjects;
-
     auto extension = filename.substr(filename.find_last_of('.'));
     if (extension != ".dmdu")
     {
@@ -88,18 +86,18 @@ vsg::ref_ptr<vsg::Object> DmdReaderWriter::read(const vsg::Path& filename, vsg::
 
     model_file >> buffer >> buffer;
 
-    std::uint32_t position_count {};
-    std::uint32_t position_face_count {};
+    std::uint32_t position_count;
+    std::uint32_t position_face_count;
     model_file >> position_count >> position_face_count;
 
-    std::uint32_t index_count { position_face_count * 3 };
+    std::uint32_t index_count = position_face_count * 3;
 
     model_file >> buffer >> buffer;
 
     std::vector<vsg::vec3> positions(position_count);
     for (auto& position : positions)
     {
-        for (int i { 0 }; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             model_file >> position[i];
             if (model_file.fail() || !std::isfinite(position[i]))
@@ -129,8 +127,8 @@ vsg::ref_ptr<vsg::Object> DmdReaderWriter::read(const vsg::Path& filename, vsg::
 
     model_file >> buffer >> buffer;
 
-    std::uint32_t tex_coord_count {};
-    std::uint32_t tex_coord_face_count {};
+    std::uint32_t tex_coord_count;
+    std::uint32_t tex_coord_face_count;
     model_file >> tex_coord_count >> tex_coord_face_count;
 
     if (position_face_count != tex_coord_face_count)
@@ -173,10 +171,10 @@ vsg::ref_ptr<vsg::Object> DmdReaderWriter::read(const vsg::Path& filename, vsg::
     indices.resize(index_count);
 
     std::map<std::pair<int, int>, int> unique_indices {};
-    for (int i { 0 }; i < index_count; ++i)
+    for (int i = 0; i < index_count; ++i)
     {
-        const std::uint32_t position_index { position_indices[i] };
-        const std::uint32_t tex_coord_index { tex_coord_indices[i] };
+        const std::uint32_t position_index = position_indices[i];
+        const std::uint32_t tex_coord_index = tex_coord_indices[i];
 
         const auto found_it { unique_indices.find(std::make_pair(position_index, tex_coord_index)) };
         if (found_it == unique_indices.end())
@@ -215,24 +213,93 @@ vsg::ref_ptr<vsg::Object> DmdReaderWriter::read(const vsg::Path& filename, vsg::
         return {};
     }
 
-    vsg::ref_ptr<vsg::ShaderStage> vertex_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", "viewer2/vert.spv", options);
-    if (!vertex_shader_stage)
-    {
-        LOG_ERROR("Failed to load vertex shader");
-        return {};
-    }
+    // vsg::ref_ptr<vsg::ShaderStage> vertex_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", "viewer2/vert.spv", options);
+    // if (!vertex_shader_stage)
+    // {
+    //     LOG_ERROR("Failed to load vertex shader");
+    //     return {};
+    // }
 
-    vsg::ref_ptr<vsg::ShaderStage> fragment_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", "viewer2/frag.spv", options);
-    if (!fragment_shader_stage)
-    {
-        LOG_ERROR("Failed to load fragment shader");
-        return {};
-    }
+    // vsg::ref_ptr<vsg::ShaderStage> fragment_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", "viewer2/frag.spv", options);
+    // if (!fragment_shader_stage)
+    // {
+    //     LOG_ERROR("Failed to load fragment shader");
+    //     return {};
+    // }
 
-    auto shader_stages = vsg::ShaderStages{vertex_shader_stage, fragment_shader_stage};
-    auto shader_set = vsg::ShaderSet::create(vsg::ShaderStages{vertex_shader_stage, fragment_shader_stage});
+    vsg::Paths searchPaths = vsg::getEnvPaths("VSG_FILE_PATH");
+    vsg::ref_ptr<vsg::ShaderStage> vertexShader = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", vsg::findFile("shaders/vert_PushConstants.spv", searchPaths));
+    vsg::ref_ptr<vsg::ShaderStage> fragmentShader = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", vsg::findFile("shaders/frag_PushConstants.spv", searchPaths));
 
     //------------------------------------------------------------------------------------------------------------------
+
+    // set up graphics pipeline
+    vsg::DescriptorSetLayoutBindings descriptorBindings{
+        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr} // { binding, descriptorType, descriptorCount, stageFlags, pImmutableSamplers}
+    };
+
+    auto descriptorSetLayout = vsg::DescriptorSetLayout::create(descriptorBindings);
+
+    vsg::PushConstantRanges pushConstantRanges{
+        {VK_SHADER_STAGE_VERTEX_BIT, 0, 128} // projection, view, and model matrices, actual push constant calls automatically provided by the VSG's RecordTraversal
+    };
+
+    auto colors = vsg::vec3Array::create(vsg_vertices->size());
+    for (int i = 0; i < colors->size(); ++i)
+    {
+        colors->at(i).set(1.0f, 1.0f, 1.0f);
+    }
+
+    vsg::VertexInputState::Bindings vertexBindingsDescriptions{
+        VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}, // vertex data
+        VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}, // colour data
+        VkVertexInputBindingDescription{2, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}  // tex coord data
+    };
+
+    vsg::VertexInputState::Attributes vertexAttributeDescriptions{
+        VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0}, // vertex data
+        VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT, 0}, // colour data
+        VkVertexInputAttributeDescription{2, 2, VK_FORMAT_R32G32_SFLOAT, 0}     // tex coord data
+    };
+
+    vsg::GraphicsPipelineStates pipelineStates{
+        vsg::VertexInputState::create(vertexBindingsDescriptions, vertexAttributeDescriptions),
+        vsg::InputAssemblyState::create(),
+        vsg::RasterizationState::create(),
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        vsg::DepthStencilState::create()};
+
+    auto pipelineLayout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptorSetLayout}, pushConstantRanges);
+    auto graphicsPipeline = vsg::GraphicsPipeline::create(pipelineLayout, vsg::ShaderStages{vertexShader, fragmentShader}, pipelineStates);
+    auto bindGraphicsPipeline = vsg::BindGraphicsPipeline::create(graphicsPipeline);
+
+    // create texture image and associated DescriptorSets and binding
+    auto texture = vsg::DescriptorImage::create(vsg::Sampler::create(), texture_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+
+    auto descriptorSet = vsg::DescriptorSet::create(descriptorSetLayout, vsg::Descriptors{texture});
+    auto bindDescriptorSet = vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, descriptorSet);
+
+    // create StateGroup as the root of the scene/command graph to hold the GraphicsPipeline, and binding of Descriptors to decorate the whole graph
+    auto scenegraph = vsg::StateGroup::create();
+    scenegraph->add(bindGraphicsPipeline);
+    scenegraph->add(bindDescriptorSet);
+
+    // set up model transformation node
+    auto transform = vsg::MatrixTransform::create(); // VK_SHADER_STAGE_VERTEX_BIT
+
+    // add transform to root of the scene graph
+    scenegraph->addChild(transform);
+
+    auto drawCommands = vsg::Commands::create();
+    drawCommands->addChild(vsg::BindVertexBuffers::create(0, vsg::DataList{vsg_vertices, colors, vsg_tex_coords}));
+    drawCommands->addChild(vsg::BindIndexBuffer::create(vsg_indices));
+    drawCommands->addChild(vsg::DrawIndexed::create(vsg_indices->size(), 1, 0, 0, 0));
+
+    // add drawCommands to transform
+    transform->addChild(drawCommands);
+
+    return scenegraph;
 
     // auto graphicsPipelineConfig = vsg::GraphicsPipelineConfigurator::create(shader_set);
     // graphicsPipelineConfig->assignTexture("texSampler", texture_data);
@@ -266,49 +333,49 @@ vsg::ref_ptr<vsg::Object> DmdReaderWriter::read(const vsg::Path& filename, vsg::
 
     // return transform;
 
-    auto descriptor_set_layout = vsg::DescriptorSetLayout::create(vsg::DescriptorSetLayoutBindings{
-        VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
-    });;
+    // auto descriptor_set_layout = vsg::DescriptorSetLayout::create(vsg::DescriptorSetLayoutBindings{
+    //     VkDescriptorSetLayoutBinding{0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+    // });;
 
-    auto pipeline_layout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, vsg::PushConstantRanges{});
+    // auto pipeline_layout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, vsg::PushConstantRanges{});
 
-    auto vertex_input_bindings = vsg::VertexInputState::Bindings{
-        VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
-        VkVertexInputBindingDescription{1, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}
-    };
+    // auto vertex_input_bindings = vsg::VertexInputState::Bindings{
+    //     VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
+    //     VkVertexInputBindingDescription{1, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}
+    // };
 
-    auto vertex_input_attributes = vsg::VertexInputState::Attributes{
-        VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
-        VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}
-    };
+    // auto vertex_input_attributes = vsg::VertexInputState::Attributes{
+    //     VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
+    //     VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}
+    // };
 
-    auto graphics_pipeline = vsg::GraphicsPipeline::create(
-        pipeline_layout,
-        shader_stages,
-        vsg::GraphicsPipelineStates{
-            vsg::InputAssemblyState::create(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST),
-            vsg::RasterizationState::create(),
-            vsg::MultisampleState::create(),
-            vsg::ColorBlendState::create(),
-            vsg::DepthStencilState::create(),
-            vsg::VertexInputState::create(vertex_input_bindings, vertex_input_attributes)
-        }
-    );
+    // auto graphics_pipeline = vsg::GraphicsPipeline::create(
+    //     pipeline_layout,
+    //     shader_stages,
+    //     vsg::GraphicsPipelineStates{
+    //         vsg::InputAssemblyState::create(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST),
+    //         vsg::RasterizationState::create(),
+    //         vsg::MultisampleState::create(),
+    //         vsg::ColorBlendState::create(),
+    //         vsg::DepthStencilState::create(),
+    //         vsg::VertexInputState::create(vertex_input_bindings, vertex_input_attributes)
+    //     }
+    // );
 
-    auto geometry = vsg::Geometry::create();
-    geometry->assignArrays(vsg::DataList{vsg_vertices, vsg_tex_coords});
-    geometry->assignIndices(vsg_indices);
-    geometry->commands.push_back(vsg::DrawIndexed::create(vsg_indices->size(), 1, 0, 0, 0));
+    // auto geometry = vsg::Geometry::create();
+    // geometry->assignArrays(vsg::DataList{vsg_vertices, vsg_tex_coords});
+    // geometry->assignIndices(vsg_indices);
+    // geometry->commands.push_back(vsg::DrawIndexed::create(vsg_indices->size(), 1, 0, 0, 0));
 
-    auto state_group = vsg::StateGroup::create();
-    state_group->add(vsg::BindGraphicsPipeline::create(graphics_pipeline));
+    // auto state_group = vsg::StateGroup::create();
+    // state_group->add(vsg::BindGraphicsPipeline::create(graphics_pipeline));
 
-    auto sampler = vsg::Sampler::create();
-    auto texture_descriptor = vsg::DescriptorImage::create(sampler, texture_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    auto descriptor_set = vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{texture_descriptor});
-    state_group->add(vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set));
-    state_group->addChild(geometry);
+    // auto sampler = vsg::Sampler::create();
+    // auto texture_descriptor = vsg::DescriptorImage::create(sampler, texture_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+    // auto descriptor_set = vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{texture_descriptor});
+    // state_group->add(vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set));
+    // state_group->addChild(geometry);
 
-    LOG_INFO("Model loaded");
-    return state_group;
+    // LOG_INFO("Model loaded");
+    // return state_group;
 }

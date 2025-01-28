@@ -31,60 +31,25 @@ void RouteLoader::read_description()
 
 bool RouteLoader::parse_objects_ref(Route& route)
 {
-    std::ifstream objects_ref(objects_ref_path);
+    std::ifstream objects_ref(route_path + "/objects.ref");
     if (!objects_ref)
     {
         LOG_ERROR("Failed to open %s", objects_ref_path.c_str());
         return false;
     }
 
-    route.type = route_type;
-
-    if (route_type == "dmd")
+    std::string line;
+    while (std::getline(objects_ref, line))
     {
-        if (!std::filesystem::create_directory(route_path + "/united")
-            && !std::filesystem::exists(route_path + "/united")
-        )
+        std::istringstream line_stream(line);
+        std::string label;
+        std::string model_path;
+        line_stream >> label >> model_path;
+        if (!model_path.empty()
+            && is_slash(model_path.front()))
         {
-            return false;
-        }
-
-        std::string line;
-        while (std::getline(objects_ref, line))
-        {
-            std::istringstream line_stream(line);
-            std::string label;
-            std::string model_path;
-            std::string texture_path;
-            line_stream >> label >> model_path >> texture_path;
-            if (!texture_path.empty()
-                && is_slash(model_path.front())
-                && is_slash(texture_path.front())
-            )
-            {
-                std::replace(model_path.begin(), model_path.end(), '\\', '/');
-                std::replace(texture_path.begin(), texture_path.end(), '\\', '/');
-                std::ofstream united_file(route_path + "/united/" + label + ".dmdu");
-                united_file << route_path << model_path << '\n' << route_path << texture_path << '\n';
-                route.model_paths.emplace_back(route_path + "/united/" + label + ".dmdu");
-            }
-        }
-    }
-    else
-    {
-        std::string line;
-        while (std::getline(objects_ref, line))
-        {
-            std::istringstream line_stream(line);
-            std::string label;
-            std::string model_path;
-            line_stream >> label >> model_path;
-            if (!model_path.empty()
-                && is_slash(model_path.front()))
-            {
-                std::replace(model_path.begin(), model_path.end(), '\\', '/');
-                route.model_paths.emplace_back(route_path + model_path);
-            }
+            std::replace(model_path.begin(), model_path.end(), '\\', '/');
+            route.object_ref.insert({label, model_path});
         }
     }
 
@@ -93,7 +58,7 @@ bool RouteLoader::parse_objects_ref(Route& route)
 
 bool RouteLoader::parse_route_map(Route& route)
 {
-    std::ifstream route_map(route_map_path);
+    std::ifstream route_map(route_path + "/route1.map");
     if (!route_map)
     {
         LOG_ERROR("Failed to open %s", route_map_path.c_str());

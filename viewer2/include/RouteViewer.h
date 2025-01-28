@@ -3,6 +3,7 @@
 
 #include "settings.h"
 
+#include <vsg/app/Window.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/maths/vec4.h>
@@ -49,6 +50,8 @@ private:
 
     bool initDisplay();
 
+    void initCamera();
+
     void initTCPclient();
 
     bool loadRoute();
@@ -75,14 +78,13 @@ private:
     settings_t settings;
 
     std::unique_ptr<SoundManager> sound_manager;
-
     std::unique_ptr<TrainExteriorHandler> train_ext_handler;
 
     vsg::ref_ptr<vsg::Options> options;
-
     vsg::ref_ptr<vsg::Group> root;
-
+    vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<vsg::Viewer> viewer;
+    vsg::ref_ptr<vsg::Camera> camera;
 
     TcpClient* tcp_client;
 };
