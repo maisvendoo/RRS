@@ -52,8 +52,10 @@ target_link_libraries(${TARGET} PRIVATE
 )
 
 target_include_directories(${TARGET} PRIVATE
+    ../simulator/topology/include
     ../common-headers
     ../filesystem/include
     ../network/include
     ./include
+
 )

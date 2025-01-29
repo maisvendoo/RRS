@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vsg/all.h>
+#include <vsg/app/Viewer.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/lighting/PercentageCloserSoftShadows.h>
@@ -540,10 +541,20 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
+
+    LOG_INFO("Send request for signals data");
+    tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
 }
 
 void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
+    if (is_signals)
+    {
+        LOG_WARN("Get signals data again");
+        return;
+    }
+    is_signals = true;
+
 
 }
 

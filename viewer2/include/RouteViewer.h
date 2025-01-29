@@ -88,6 +88,7 @@ private slots:
 private:
     bool is_ready;
     bool is_route;
+    bool is_signals;
 
     settings_t settings;
 
