@@ -3,6 +3,7 @@
 
 #include "settings.h"
 
+#include <vsg/app/ViewMatrix.h>
 #include <vsg/app/Window.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
@@ -84,6 +85,7 @@ private:
     vsg::ref_ptr<vsg::Group> root;
     vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<vsg::Viewer> viewer;
+    vsg::ref_ptr<vsg::LookAt> lookAt;
     vsg::ref_ptr<vsg::Camera> camera;
 
     TcpClient* tcp_client;

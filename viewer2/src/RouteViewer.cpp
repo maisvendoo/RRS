@@ -24,10 +24,6 @@
 
 #include <string>
 #include <vsg/all.h>
-#include <vsg/io/read.h>
-#include <vsg/nodes/PagedLOD.h>
-#include <vsg/utils/ComputeBounds.h>
-#include <vsg/utils/SharedObjects.h>
 #include <vsgXchange/all.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
@@ -64,6 +60,8 @@ int RouteViewer::run()
         viewer->update();
         viewer->recordAndSubmit();
         viewer->present();
+
+        LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
     }
 
     return 0;
@@ -401,35 +399,6 @@ bool RouteViewer::initDisplay()
     window = vsg::Window::create(traits);
     viewer->addWindow(window);
 
-    FileSystem& fs = FileSystem::getInstance();
-    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), "volgodonskaya-salsk_v.3.2");
-    settings.route_dir_full_path = route_dir_path;
-
-    Route route;
-
-    RouteLoader loader(settings.route_dir_full_path);
-    loader.read_description();
-    loader.parse_objects_ref(route);
-    loader.parse_route_map(route);
-
-    for (auto& [label, path] : route.object_ref)
-    {
-        auto model = vsg::read_cast<vsg::Node>(route_dir_path + path, options);
-
-        LOG_INFO("%s", (route_dir_path + path).c_str());
-        root->addChild(model);
-        break;
-    }
-
-    // for (int i = 0; i < route.object_ref.size(); ++i)
-    // {
-        // auto model = vsg::read_cast<vsg::Node>(route_dir_path + , options);
-        // auto transform = vsg::MatrixTransform::create();
-        // transform->matrix = vsg::translate(vsg::vec3(i * 2.0f, 0.0f, 0.0f));
-        // transform->addChild(model);
-        // root->addChild(transform);
-    // }
-
     initCamera();
 
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
@@ -446,8 +415,8 @@ void RouteViewer::initCamera()
 {
     vsg::ComputeBounds computeBounds;
     root->accept(computeBounds);
-    vsg::dvec3 centre = (computeBounds.bounds.min + computeBounds.bounds.max) * 0.5;
-    double radius = vsg::length(computeBounds.bounds.max - computeBounds.bounds.min) * 0.6;
+    vsg::dvec3 centre(0.0, 0.0, 0.0);
+    double radius = 100.0;
     double nearFarRatio = 0.0005;
 
     double aspect_ratio = static_cast<double>(window->extent2D().width)
@@ -455,8 +424,8 @@ void RouteViewer::initCamera()
 
     auto perspective = vsg::Perspective::create(settings.fovy, aspect_ratio, nearFarRatio * radius, radius * 4.5);
 
-    auto lookAt = vsg::LookAt::create(
-        centre + vsg::dvec3(0.0, -radius * 3.5, 0.0),
+    lookAt = vsg::LookAt::create(
+        centre + vsg::dvec3(0.0, -radius * 3.5, 20.0),
         centre,
         vsg::dvec3(0.0, 0.0, 1.0)
     );
@@ -498,41 +467,55 @@ bool RouteViewer::loadRoute()
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
+    for (auto& [label, transform] : route.transforms)
+    {
+        auto found_it = route.object_ref.find(label);
+        if (found_it == route.object_ref.end())
+        {
+            continue;
+        }
+
+        vsg::dvec3 center(transform.t_x, transform.t_y, 10.0);
+        double radius = 100.0;
+
+        auto pagedLOD = vsg::PagedLOD::create();
+        vsg::dsphere bound;
+        bound.center = center;
+        bound.radius = radius;
+        pagedLOD->bound = bound;
+        pagedLOD->filename = route_dir_path + found_it->second;
+        pagedLOD->options = options;
+
+        // auto node = vsg::Node::create();
+
+        // auto external = vsg::External::create();
+        // external->options = options;
+        // external->add(route_dir_path + found_it->second, node);
+
+        // auto pagedLOD = vsg::PagedLOD::create();
+        // pagedLOD->children[0].minimumScreenHeightRatio = 0.0;
+        // pagedLOD->children[0].node = node;
+
+        auto matrix = vsg::MatrixTransform::create();
+        transform.r_x = -vsg::radians(transform.r_x);
+        transform.r_y = -vsg::radians(transform.r_y);
+        transform.r_z = -vsg::radians(transform.r_z);
+
+        auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
+        auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
+        auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
+        auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
+        matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
+
+        matrix->addChild(pagedLOD);
+
+        root->addChild(matrix);
+    }
+
+    viewer->update();
+    viewer->compile();
+
     return true;
-
-    // vsg::ref_ptr<vsg::Node> a = vsg::read_cast<vsg::Node>(route.model_paths.front(), options);
-    // root->addChild(a);
-
-    // std::ifstream stream(route_dir_path + fs.separator() + "route-type");
-    // if (!stream)
-    // {
-    //     LOG_ERROR("Stream for route-type is not open");
-    //     return false;
-    // }
-
-    // std::string routeExt = "";
-    // stream >> routeExt;
-
-    // if (routeExt.empty())
-    // {
-    //     LOG_ERROR("Unknown route type");
-    //     return false;
-    // }
-
-    // std::string route_loader_plugin = routeExt + "-route-loader";
-
-    // RouteLoader* loader = loadRouteLoader(fs.getPluginsDir(), route_loader_plugin);
-    // if (!loader)
-    // {
-    //     LOG_ERROR("Not found route loader for this route");
-    //     return false;
-    // }
-
-    // LOG_INFO("Try loading route from %s", route_dir_path.c_str());
-    // loader->load(route_dir_path, settings.view_distance);
-    // LOG_INFO("Loaded route from %s", route_dir_path.c_str());
-    // root->addChild(vsg::ref_ptr<vsg::Node>(loader->getRoot()));
-    // // if (loader)
 }
 
 void RouteViewer::slotRecvLogMessage(QString msg)
