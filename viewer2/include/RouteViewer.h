@@ -3,16 +3,20 @@
 
 #include "settings.h"
 
+#include <vsg/app/CommandGraph.h>
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/app/Window.h>
+#include <vsg/app/WindowTraits.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
+#include <vsg/lighting/DirectionalLight.h>
 #include <vsg/maths/vec4.h>
 
 #include <QObject>
 
 #include <memory>
 #include <string>
+#include <vsg/nodes/RegionOfInterest.h>
 
 class QString;
 class QByteArray;
@@ -45,13 +49,22 @@ private:
 
     int overrideSettingsByCommandLine(int argc, char* argv[]);
 
-    bool initEngineSettings();
-
-    void initEnvironmentLight(vsg::vec4 color, float power, float psi, float theta);
-
-    bool initDisplay();
-
+    void initVsgOptions();
+    void initWindowTraits();
+    void initWindow();
     void initCamera();
+    void initScenegraph();
+    void initLights();
+    void initView();
+    void initCommandGraph();
+    void initViewer();
+
+    // bool initEngineSettings();
+
+    // void initEnvironmentLight(vsg::vec4 color, float power, float psi, float theta);
+
+    // bool initDisplay();
+
 
     void initTCPclient();
 
@@ -82,11 +95,16 @@ private:
     std::unique_ptr<TrainExteriorHandler> train_ext_handler;
 
     vsg::ref_ptr<vsg::Options> options;
-    vsg::ref_ptr<vsg::Group> root;
+    vsg::ref_ptr<vsg::WindowTraits> windowTraits;
     vsg::ref_ptr<vsg::Window> window;
-    vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::LookAt> lookAt;
     vsg::ref_ptr<vsg::Camera> camera;
+    vsg::ref_ptr<vsg::Group> root;
+    vsg::ref_ptr<vsg::DirectionalLight> sun;
+    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region;
+    vsg::ref_ptr<vsg::View> view;
+    vsg::ref_ptr<vsg::CommandGraph> commandGraph;
+    vsg::ref_ptr<vsg::Viewer> viewer;
 
     TcpClient* tcp_client;
 };

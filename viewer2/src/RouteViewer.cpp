@@ -1,7 +1,6 @@
 #include "RouteViewer.h"
 
 #include "CLI11.hpp"
-#include "DmdReaderWriter.h"
 #include "Route.h"
 #include "RouteLoader.h"
 #include "simulator-info-struct.h"
@@ -16,6 +15,7 @@
 #include "tcp-client.h"
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <QApplication>
@@ -24,6 +24,13 @@
 
 #include <string>
 #include <vsg/all.h>
+#include <vsg/lighting/AmbientLight.h>
+#include <vsg/lighting/HardShadows.h>
+#include <vsg/lighting/PercentageCloserSoftShadows.h>
+#include <vsg/maths/sphere.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/nodes/Group.h>
+#include <vsg/nodes/RegionOfInterest.h>
 #include <vsgXchange/all.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
@@ -56,12 +63,36 @@ int RouteViewer::run()
     {
         QApplication::processEvents();
 
+        constexpr double sideway_distance = 10.0;
+        constexpr double forward_distance = 150.0;
+        constexpr double min_z = -10.0;
+        constexpr double max_z = 100.0;
+        constexpr double angle = vsg::radians(90.0f);
+        auto dir = lookAt->center - lookAt->eye;
+        dir.z = 0.0;
+        dir = vsg::normalize(dir);
+        vsg::dvec3 left_sideway_dir;
+        left_sideway_dir.x = dir.x * std::cos(angle) - dir.y * std::sin(angle);
+        left_sideway_dir.y = dir.x * std::sin(angle) + dir.y * std::cos(angle);
+        left_sideway_dir.z = 0.0;
+        vsg::dvec3 right_sideway_dir = -left_sideway_dir;
+        auto eye = lookAt->eye;
+        eye.z = 0.0;
+        shadow_region->points[0] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        shadow_region->points[1] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        shadow_region->points[2] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        shadow_region->points[3] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        shadow_region->points[4] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        shadow_region->points[5] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        shadow_region->points[6] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        shadow_region->points[7] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+
         viewer->handleEvents();
         viewer->update();
         viewer->recordAndSubmit();
         viewer->present();
 
-        LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
+
     }
 
     return 0;
@@ -105,37 +136,19 @@ bool RouteViewer::init(int argc, char* argv[])
 
     train_ext_handler = std::make_unique<TrainExteriorHandler>(settings, sound_manager);
 
-    root = vsg::Group::create();
-
-    if (!initEngineSettings())
-    {
-        return false;
-    }
-
-    if (!initDisplay())
-    {
-        return false;
-    }
+    initVsgOptions();
+    initWindowTraits();
+    initWindow();
+    initCamera();
+    initScenegraph();
+    initLights();
+    initView();
+    initCommandGraph();
+    initViewer();
 
     initTCPclient();
 
-    /*
-
-    // Запись скриншота в файл
-    osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile =
-            new WriteToFileOperation(fs.getScreenshotsDir());
-
-    osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler =
-            new ScreenCapture(writeFile.get());
-
-    // Одиночный скриншот по клавише F12
-    screenCaptureHandler->setKeyEventTakeScreenShot(osgGA::GUIEventAdapter::KEY_F12);
-    // Серия скриншотов отключена из-за просадки производительности
-    screenCaptureHandler->setKeyEventToggleContinuousCapture(-1);
-
-    viewer.addEventHandler(screenCaptureHandler.get());
-
-    */
+    // TODO: Скриншоты
 
     return true;
 }
@@ -281,53 +294,97 @@ int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
     return 0;
 }
 
-bool RouteViewer::initEngineSettings()
+void RouteViewer::initVsgOptions()
 {
-    if (!root)
-    {
-        return false;
-    }
-
-    initEnvironmentLight(vsg::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, -20.0f, 75.0f);
-
-    return true;
-
-    /*
-    // Common graphics settings
-    osg::StateSet *stateset = root->getOrCreateStateSet();
-
-    stateset->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-
-    stateset->setMode(GL_LIGHTING, osg::StateAttribute::ON);
-    stateset->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-
-    osg::ref_ptr<osg::CullFace> cull = new osg::CullFace;
-    cull->setMode(osg::CullFace::BACK);
-    stateset->setAttributeAndModes(cull.get(), osg::StateAttribute::ON);
-
-    // Set lighting
-    initEnvironmentLight(root,
-                         osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
-                         1.0f,
-                         -20.0f,
-                         75.0f);
-
-    osg::LightModel *lightmodel = new osg::LightModel;
-    float power = 0.4f;
-    lightmodel->setAmbientIntensity(osg::Vec4(power, power, power, 1.0));
-    lightmodel->setTwoSided(true);
-    stateset->setAttributeAndModes(lightmodel, osg::StateAttribute::ON);
-
-    return true;
-    */
+    options = vsg::Options::create();
+    options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
+    options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    options->sharedObjects = vsg::SharedObjects::create();
+    options->add(vsgXchange::all::create());
 }
 
-void RouteViewer::initEnvironmentLight(vsg::vec4 color, float power, float psi, float theta)
+void RouteViewer::initWindowTraits()
 {
-    auto sun = vsg::DirectionalLight::create();
-    sun->color = vsg::vec3(color.r, color.g, color.b);
-    sun->intensity = power;
+    windowTraits = vsg::WindowTraits::create();
+    windowTraits->x = settings.x;
+    windowTraits->y = settings.y;
+    windowTraits->width = settings.width;
+    windowTraits->height = settings.height;
+    windowTraits->windowTitle = settings.name;
+    windowTraits->decoration = settings.window_decoration;
+    windowTraits->samples = settings.samples;
+    windowTraits->debugLayer = true;
+    windowTraits->debugUtils = true;
+}
 
+void RouteViewer::initWindow()
+{
+    window = vsg::Window::create(windowTraits);
+}
+
+void RouteViewer::initCamera()
+{
+    constexpr vsg::dvec3 center(0.0, 0.0, 0.0);
+    constexpr double radius = 100.0;
+    constexpr double nearFarRatio = 0.0005;
+
+    double windowWidth = static_cast<double>(window->extent2D().width);
+    double windowHeight = static_cast<double>(window->extent2D().height);
+    double aspectRatio = windowWidth / windowHeight;
+
+    auto perspective = vsg::Perspective::create(settings.fovy, aspectRatio, nearFarRatio * radius, radius * 4.5);
+
+    vsg::dvec3 eye = center + vsg::dvec3(0.0, -radius * 3.5, 20.0);
+    lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
+
+    camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
+}
+
+void RouteViewer::initScenegraph()
+{
+    root = vsg::Group::create();
+}
+
+void RouteViewer::initLights()
+{
+    // bool depthClamp = true;
+    // if (depthClamp)
+    // {
+    //     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
+    //     deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+    //     deviceFeatures->get().depthClamp = VK_TRUE;
+    // }
+    auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
+        deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+        deviceFeatures->get().depthClamp = VK_TRUE;
+
+    auto numShadowMapsPerLight = 8;
+    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
+
+    shadow_region = vsg::RegionOfInterest::create();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+    shadow_region->points.emplace_back();
+
+    root->addChild(shadow_region);
+
+    auto ambient = vsg::AmbientLight::create();
+    ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
+    ambient->intensity = 0.1f;
+
+    vsg::vec3 color(1.0f, 1.0f, 1.0f);
+    float power = 10000.0f;
+    float psi = 30.0f;
+    float theta = 75.0f;
+
+    sun = vsg::DirectionalLight::create();
+    sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
+    sun->intensity = 1000.0f;
     float dist = 1000.0f;
     float rad = vsg::PIf / 180.0f;
     float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
@@ -341,96 +398,45 @@ void RouteViewer::initEnvironmentLight(vsg::vec4 color, float power, float psi, 
     vsg::vec3 sunDir = pos;
     sunDir *= (-1.0f / length);
     sun->direction = sunDir;
+    sun->shadowSettings = shadowSettings;
 
+    root->addChild(ambient);
     root->addChild(sun);
-
-    /*
-    osg::ref_ptr<osg::Light> sun = new osg::Light;
-    sun->setLightNum(0);
-    sun->setDiffuse(color *= power);
-    sun->setAmbient(color *= power * 0.0f);
-    sun->setSpecular(color *= power);
-
-
-    float dist = 1000.0f;
-
-    float rad = osg::PIf / 180.0f;
-    float x = dist * cosf(theta * rad) * sinf(psi * rad);
-    float y = dist * cosf(theta * rad) * cosf(psi * rad);
-    float z = dist * sinf(theta * rad);
-
-    osg::Vec3 pos = osg::Vec3(x, y, z);
-    sun->setPosition(osg::Vec4(pos, 0.0f));
-
-    osg::Vec3 sunDir = pos *= (- 1.0f / pos.length());
-    sun->setDirection(sunDir);
-
-    osg::ref_ptr<osg::LightSource> light0 = new osg::LightSource;
-    light0->setLight(sun);
-
-    root->getOrCreateStateSet()->setMode(GL_LIGHT0, osg::StateAttribute::ON);
-    root->addChild(light0.get());
-    */
 }
 
-bool RouteViewer::initDisplay()
+void RouteViewer::initView()
 {
-    options = vsg::Options::create();
-    options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    options->paths.push_back("/home/ksv/work-ANI/Projects/ANI/RRS/");
-    options->add(vsgXchange::all::create());
-    options->add(DmdReaderWriter::create());
-    options->sharedObjects = vsg::SharedObjects::create();
+    constexpr double maxShadowDistance = 1e8;
+    constexpr double shadowMapBias = 0.005;
+    constexpr double lambda = 0.5;
 
+    view = vsg::View::create();
+    view->camera = camera;
+    view->viewDependentState->maxShadowDistance = maxShadowDistance;
+    view->viewDependentState->shadowMapBias = shadowMapBias;
+    view->viewDependentState->lambda = lambda;
+    // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
+    view->addChild(root);
+    auto renderGraph = vsg::RenderGraph::create(window, view);
+    commandGraph = vsg::CommandGraph::create(window, renderGraph);
+}
+
+void RouteViewer::initCommandGraph()
+{
+
+}
+
+void RouteViewer::initViewer()
+{
     viewer = vsg::Viewer::create();
-
-    auto traits = vsg::WindowTraits::create();
-    traits->x = settings.x;
-    traits->y = settings.y;
-    traits->width = settings.width;
-    traits->height = settings.height;
-    traits->windowTitle = settings.name;
-    traits->decoration = settings.window_decoration;
-    traits->samples = settings.samples;
-    traits->debugLayer = true;
-    traits->debugUtils = true;
-
-    window = vsg::Window::create(traits);
     viewer->addWindow(window);
-
-    initCamera();
 
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
     viewer->addEventHandler(vsg::Trackball::create(camera));
 
-    auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
+    // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
-
-    return true;
-}
-
-void RouteViewer::initCamera()
-{
-    vsg::ComputeBounds computeBounds;
-    root->accept(computeBounds);
-    vsg::dvec3 centre(0.0, 0.0, 0.0);
-    double radius = 100.0;
-    double nearFarRatio = 0.0005;
-
-    double aspect_ratio = static_cast<double>(window->extent2D().width)
-        / static_cast<double>(window->extent2D().height);
-
-    auto perspective = vsg::Perspective::create(settings.fovy, aspect_ratio, nearFarRatio * radius, radius * 4.5);
-
-    lookAt = vsg::LookAt::create(
-        centre + vsg::dvec3(0.0, -radius * 3.5, 20.0),
-        centre,
-        vsg::dvec3(0.0, 0.0, 1.0)
-    );
-
-    camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
 }
 
 void RouteViewer::initTCPclient()
@@ -475,26 +481,10 @@ bool RouteViewer::loadRoute()
             continue;
         }
 
-        vsg::dvec3 center(transform.t_x, transform.t_y, 10.0);
-        double radius = 100.0;
-
         auto pagedLOD = vsg::PagedLOD::create();
-        vsg::dsphere bound;
-        bound.center = center;
-        bound.radius = radius;
-        pagedLOD->bound = bound;
+        pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
         pagedLOD->filename = route_dir_path + found_it->second;
         pagedLOD->options = options;
-
-        // auto node = vsg::Node::create();
-
-        // auto external = vsg::External::create();
-        // external->options = options;
-        // external->add(route_dir_path + found_it->second, node);
-
-        // auto pagedLOD = vsg::PagedLOD::create();
-        // pagedLOD->children[0].minimumScreenHeightRatio = 0.0;
-        // pagedLOD->children[0].node = node;
 
         auto matrix = vsg::MatrixTransform::create();
         transform.r_x = -vsg::radians(transform.r_x);
