@@ -13,20 +13,15 @@
  */
 
 #include    "mainwindow.h"
+#include    "train-waypoint-widget.h"
 #include    "ui_mainwindow.h"
 
 #include    <QPushButton>
 #include    <QDir>
 #include    <QDirIterator>
 #include    <QStringList>
-#include    <QComboBox>
-#include    <QSpinBox>
-#include    <QDoubleSpinBox>
 #include    <QTextStream>
 // #include <thread>
-// #include <synchapi.h>
-
-
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
@@ -139,18 +134,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbCancel, &QPushButton::released, this, &MainWindow::slotCancelGraphSettings);
     connect(ui->pbApply, &QPushButton::released, this, &MainWindow::slotApplyGraphSettings);
-
+/*
     connect(ui->pbAddTrain, &QPushButton::released, this, &MainWindow::slotAddActiveTrain);
     connect(ui->pbDeleteTrain, &QPushButton::released, this, &MainWindow::slotDeleteActiveTrain);
 
     connect(ui->twActiveTrains, &QTableWidget::cellChanged, this, &MainWindow::slotActiveTrainCellChanged);
-
+*/
     setCentralWidget(ui->twMain);
 
     setFocusPolicy(Qt::ClickFocus);
 
     loadTheme();
-
+/*
     ui->twActiveTrains->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->twActiveTrains->horizontalHeader()->setSelectionMode(QAbstractItemView::NoSelection);
     ui->twActiveTrains->horizontalHeader()->setSectionsClickable(false);
@@ -159,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ui->twActiveTrains->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->twActiveTrains->setCornerButtonEnabled(false);
     ui->twActiveTrains->verticalHeader()->setVisible(false);
-
+*/
     QIcon icon(":/images/images/RRS_logo.png");
     setWindowIcon(icon);
 
@@ -302,6 +297,73 @@ void MainWindow::loadServersList(const std::string &cfgDir)
     }
 
     slotSelectSavedServer(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadTrajectories(const QString &routeDir)
+{
+    trajectrories.clear();
+
+    QString traj_dir_path = routeDir + QDir::separator() +
+                            "topology" + QDir::separator() +
+                            "trajectories";
+
+    QDir traj_dir(traj_dir_path);
+    QDirIterator traj_files(traj_dir.path(), QStringList() << "*.traj", QDir::NoDotAndDotDot | QDir::Files);
+    while (traj_files.hasNext())
+    {
+        trajectory_info_t traj_info;
+        QString fullPath = traj_files.next();
+        QFileInfo fileInfo(fullPath);
+        traj_info.name = fileInfo.baseName();
+        trajectrories.push_back(traj_info);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadTrainPositions(const QString &routeDir)
+{
+    fwd_train_positions.clear();
+    bwd_train_positions.clear();
+
+    QString path = routeDir + QDir::separator() +
+                   "topology" + QDir::separator() +
+                   "waypoints.conf";
+
+    QFile waypoints_file(path);
+
+    if (!waypoints_file.open(QIODevice::ReadOnly))
+    {
+        return;
+    }
+
+    QTextStream stream(&waypoints_file);
+
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine();
+        QStringList tokens = line.split('\t');
+
+        train_position_t tp;
+        tp.name = tokens[0];
+        tp.trajectory_name = tokens[1];
+        tp.direction = tokens[2].toInt();
+        tp.traj_coord = tokens[3].toDouble();
+        tp.railway_coord = tokens[4].toDouble();
+
+        if (tp.direction > 0)
+        {
+            fwd_train_positions.push_back(tp);
+        }
+        else
+        {
+            bwd_train_positions.push_back(tp);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -470,16 +532,26 @@ void MainWindow::slotRouteSelection()
     selectedRouteDirName = routes_info[item_idx].route_dir_name;
     ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
 
+    loadTrajectories(routes_info[item_idx].route_dir_full_path);
     loadTrainPositions(routes_info[item_idx].route_dir_full_path);
 
     ui->pbAddTrain->setEnabled(ui->lwTrains->currentRow() >= 0);
-
+/*
     if (active_trains.empty())
     {
         return;
     }
+*/
+//    updateActiveTrains();
+    while (ui->tbActiveTrains->count() > 0)
+        ui->tbActiveTrains->removeItem(0);
 
-    updateActiveTrains();
+    TrainWaypointWidget *tww = new TrainWaypointWidget(&trains_info,
+                                                       &trajectrories,
+                                                       &fwd_train_positions,
+                                                       &bwd_train_positions,
+                                                       this);
+    ui->tbActiveTrains->addItem(tww, tww->getTrainName());
 }
 
 //------------------------------------------------------------------------------
@@ -810,7 +882,7 @@ void MainWindow::slotApplyGraphSettings()
 
     ui->pbApply->setEnabled(false);
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -996,7 +1068,7 @@ void MainWindow::slotTrainCoordValueChanged(double value)
 
     active_trains[rowIdx].train_position.traj_coord = value;
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -1204,51 +1276,7 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
 
     editor.editFile(settings_path, "Viewer", fd_list);
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::loadTrainPositions(const QString &routeDir)
-{
-    fwd_train_positions.clear();
-    bwd_train_positions.clear();
-
-    QString path = routeDir + QDir::separator() +
-                   "topology" + QDir::separator() +
-                   "waypoints.conf";
-
-    QFile waypoints_file(path);
-
-    if (!waypoints_file.open(QIODevice::ReadOnly))
-    {
-        return;
-    }
-
-    QTextStream stream(&waypoints_file);
-
-    while (!stream.atEnd())
-    {
-        QString line = stream.readLine();
-        QStringList tokens = line.split('\t');
-
-        train_position_t tp;
-        tp.name = tokens[0];
-        tp.trajectory_name = tokens[1];
-        tp.direction = tokens[2].toInt();
-        tp.traj_coord = tokens[3].toDouble();
-        tp.railway_coord = tokens[4].toDouble();
-
-        if (tp.direction > 0)
-        {
-            fwd_train_positions.push_back(tp);
-        }
-        else
-        {
-            bwd_train_positions.push_back(tp);
-        }
-    }
-}
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -1306,3 +1334,4 @@ void MainWindow::updateActiveTrains()
         }
     }
 }
+*/

@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 struct active_train_t
 {
+    bool is_active = false;
     train_info_t train_info;
     train_position_t train_position;
 

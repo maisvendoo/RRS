@@ -18,8 +18,9 @@
 #include    <QMainWindow>
 #include    <QProcess>
 
-#include    <route-info.h>
 #include    <train-info.h>
+#include    <route-info.h>
+#include    <trajectory-info.h>
 #include    <waypoint.h>
 #include    <active-train.h>
 #include    <server_info.h>
@@ -61,10 +62,12 @@ private:
 
     Ui::MainWindow  *ui;
 
-    /// Info about installed routes
-    std::vector<route_info_t>   routes_info;
     /// Info about installed trains
     std::vector<train_info_t>   trains_info;
+    /// Info about installed routes
+    std::vector<route_info_t>   routes_info;
+    /// Info about trajectories in current selected route
+    std::vector<trajectory_info_t>   trajectrories;
 
     /// Simulation process
     QProcess        simulatorProc;
@@ -115,6 +118,12 @@ private:
     /// Loading of servers list
     void loadServersList(const std::string &cfgDir);
 
+    /// Loading of trajectories list at current selected route
+    void loadTrajectories(const QString &routeDir);
+
+    /// Loading of waypoints list at current selected route
+    void loadTrainPositions(const QString &routeDir);
+
     /// Save servers list
     void saveServersList();
 
@@ -141,13 +150,11 @@ private:
 
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
-
-    void loadTrainPositions(const QString &routeDir);
-
+/*
     int getSelectedActiveTrainIndex();
 
     void updateActiveTrains();
-
+*/
 private slots:
 
     void slotRouteSelection();
@@ -191,7 +198,7 @@ private slots:
     void slotCancelGraphSettings();
 
     void slotApplyGraphSettings();
-
+/*
     void slotAddActiveTrain();
 
     void slotDeleteActiveTrain();
@@ -202,7 +209,7 @@ private slots:
 
     void slotActiveTrainTrajectoryChange(int idx);
 
-    void slotTrainCoordValueChanged(double value);
+    void slotTrainCoordValueChanged(double value);*/
 };
 
 
