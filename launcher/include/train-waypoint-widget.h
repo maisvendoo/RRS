@@ -50,6 +50,18 @@ public:
 
     active_train_t getActiveTrainConfig();
 
+private slots:
+
+    void slotWaypointDirectionChange(int dir_idx);
+
+    void slotWaypointChange(int waypoint_idx);
+
+    void slotTrajectoryNameChange(int traj_idx);
+
+    void slotTrajectoryDirectionChange(int dir_idx);
+
+    void slotTrajectoryCoordinateChange(double coord);
+
 private:
 
     void setDirectionSelectWidget();
@@ -60,7 +72,11 @@ private:
 
     void setTrajectorySelectWidget();
 
+    void setTrajectorySelectWidgets(train_position_t tp);
+
     void resetTrajectorySelectWidgets();
+
+    bool getCurrentWaypoint(int waypoint_idx, train_position_t &tp);
 };
 
 #endif // TRAINWAYPOINTWIDGET_H
