@@ -2,6 +2,7 @@
 #define ROUTE_VIEWER_H
 
 #include "settings.h"
+#include "TrafficLightsHandler.h"
 
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/ViewMatrix.h>
@@ -86,14 +87,15 @@ private slots:
     void slotUpdateControlledVehicle();
 
 private:
-    bool is_ready;
-    bool is_route;
-    bool is_signals;
+    bool is_ready = false;
+    bool is_route = false;
+    bool is_signals = false;
 
     settings_t settings;
 
     std::unique_ptr<SoundManager> sound_manager;
     std::unique_ptr<TrainExteriorHandler> train_ext_handler;
+    std::unique_ptr<TrafficLightsHandler> traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
 
     vsg::ref_ptr<vsg::Options> options;
     vsg::ref_ptr<vsg::WindowTraits> windowTraits;

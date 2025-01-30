@@ -348,13 +348,6 @@ void RouteViewer::initScenegraph()
 
 void RouteViewer::initLights()
 {
-    // bool depthClamp = true;
-    // if (depthClamp)
-    // {
-    //     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
-    //     deviceFeatures->get().samplerAnisotropy = VK_TRUE;
-    //     deviceFeatures->get().depthClamp = VK_TRUE;
-    // }
     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
         deviceFeatures->get().samplerAnisotropy = VK_TRUE;
         deviceFeatures->get().depthClamp = VK_TRUE;
@@ -372,19 +365,18 @@ void RouteViewer::initLights()
     shadow_region->points.emplace_back();
     shadow_region->points.emplace_back();
 
-    root->addChild(shadow_region);
+    // root->addChild(shadow_region);
 
     auto ambient = vsg::AmbientLight::create();
     ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
     ambient->intensity = 0.1f;
 
     vsg::vec3 color(1.0f, 1.0f, 1.0f);
-    float power = 10000.0f;
-    float psi = 30.0f;
-    float theta = 75.0f;
+    float psi = 50.0f;
+    float theta = 30.0f;
 
     sun = vsg::DirectionalLight::create();
-    sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
+    sun->color = vsg::vec3(1.0f, 0.0f, 0.0f);
     sun->intensity = 1000.0f;
     float dist = 1000.0f;
     float rad = vsg::PIf / 180.0f;
@@ -555,7 +547,8 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     }
     is_signals = true;
 
-
+    traffic_lights_handler->deserialize(sig_data);
+    traffic_lights_handler->create_pagedLODs(settings, options);
 }
 
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
