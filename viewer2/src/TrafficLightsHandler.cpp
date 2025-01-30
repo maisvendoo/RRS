@@ -131,35 +131,38 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref
     models_path = fs.combinePath(models_path, "models");
     models_path = fs.combinePath(models_path, models_dir);
 
-    std::filesystem::directory_iterator dir_it(models_path);
-    for (auto& entry : dir_it)
-    {
-        if (entry.path().extension() == ".gltf")
-        {
-            std::string fullPath = entry.path().string();
+    // std::filesystem::directory_iterator dir_it(models_path);
+    // for (auto& entry : dir_it)
+    // {
+    //     if (entry.path().extension() == ".gltf")
+    //     {
+    //         std::string fullPath = entry.path().string();
 
-            auto pagedLOD = vsg::PagedLOD::create();
-            pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-            pagedLOD->filename = fullPath;
-            pagedLOD->options = options;
-        }
+    //         auto pagedLOD = vsg::PagedLOD::create();
+    //         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+    //         pagedLOD->filename = fullPath;
+    //         pagedLOD->options = options;
+
+    //         traffic_light_nodes->addChild(pagedLOD);
+    //     }
+    // }
+}
+
+void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
+{
+    for (auto* tl : traffic_lights_fwd)
+    {
+        loadSignalModel(tl, settings, options);
+    }
+
+    for (auto* tl :traffic_lights_bwd)
+    {
+        loadSignalModel(tl, settings, options);
     }
 }
 
 void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
 {
-    /*
-    QString msg = QString("Signal at connector %1 is initialized. Letter: %2 | position: {%3, %4, %5} | direction: %6 {%7, %8, %9}")
-                      .arg(tl->getConnectorName())
-                      .arg(tl->getLetter())
-                      .arg(tl->getPosition().x(), 8, 'f', 1)
-                      .arg(tl->getPosition().y(), 8, 'f', 1)
-                      .arg(tl->getPosition().z(), 8, 'f', 1)
-                      .arg(tl->getSignalDirection() == -1 ? "BWD" : "FWD")
-                      .arg(tl->getOrth().x(), 6, 'f', 3)
-                      .arg(tl->getOrth().y(), 6, 'f', 3)
-                      .arg(tl->getOrth().z(), 6, 'f', 3);*/
-
     LOG_INFO(
         "Signal at connector %s is initialized. Letter: %s | position: {%8.1f, %8.1f, %8.1f} | direction: %s {%6.3f %6.3f %6.3f}",
         tl->getConnectorName().toStdString().c_str(),
@@ -172,4 +175,12 @@ void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
         tl->getOrth().y,
         tl->getOrth().z
     );
+}
+
+void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
+{
+    auto pagedLOD = vsg::PagedLOD::create();
+    pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+    // pagedLOD->filename = tl.get;
+    pagedLOD->options = options;
 }

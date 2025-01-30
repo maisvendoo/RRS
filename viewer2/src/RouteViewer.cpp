@@ -3,6 +3,7 @@
 #include "CLI11.hpp"
 #include "Route.h"
 #include "RouteLoader.h"
+#include "TrafficLightsHandler.h"
 #include "simulator-info-struct.h"
 #include "ConfigReader.h"
 #include "SoundManager.h"
@@ -32,6 +33,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/RegionOfInterest.h>
+#include <vsg/utils/ShaderSet.h>
 #include <vsgXchange/all.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent)
@@ -376,8 +378,8 @@ void RouteViewer::initLights()
     float theta = 30.0f;
 
     sun = vsg::DirectionalLight::create();
-    sun->color = vsg::vec3(1.0f, 0.0f, 0.0f);
-    sun->intensity = 1000.0f;
+    sun->color = vsg::vec3(0.6f, 0.0f, 0.0f);
+    sun->intensity = 5000.0f;
     float dist = 1000.0f;
     float rad = vsg::PIf / 180.0f;
     float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
@@ -474,6 +476,8 @@ bool RouteViewer::loadRoute()
             continue;
         }
 
+        // options->shaderSets["phong"] = vsg::createPhongShaderSet
+
         auto pagedLOD = vsg::PagedLOD::create();
         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
         pagedLOD->filename = route_dir_path + found_it->second;
@@ -548,7 +552,9 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     is_signals = true;
 
     traffic_lights_handler->deserialize(sig_data);
+
     traffic_lights_handler->create_pagedLODs(settings, options);
+    root->addChild(traffic_lights_handler->traffic_light_nodes);
 }
 
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
