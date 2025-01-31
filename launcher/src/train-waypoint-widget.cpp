@@ -42,6 +42,9 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     setWaypointSelectWidget();
     setTrajectorySelectWidget();
 
+    connect(cbTrainConfigSelect, &QComboBox::currentIndexChanged,
+            this, &TrainWaypointWidget::slotTrainConfigChange);
+
     connect(cbWaypointDirectionSelect, &QComboBox::currentIndexChanged,
             this, &TrainWaypointWidget::slotWaypointDirectionChange);
 
@@ -116,7 +119,18 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
 
     at.train_position.traj_coord = dsbTrajectoryCoordinate->value();
 
+    at.is_active = true;
+
     return at;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
+{
+    (void) train_idx;
+    emit trainConfigChanged(getTrainName());
 }
 
 //------------------------------------------------------------------------------

@@ -16,6 +16,7 @@
 #define     MAINWINDOW_H
 
 #include    <QMainWindow>
+#include    <QToolBox>
 #include    <QProcess>
 
 #include    <train-info.h>
@@ -61,6 +62,7 @@ private:
     QString         selectedTrain;
 
     Ui::MainWindow  *ui;
+    QToolBox *tbActiveTrains;
 
     /// Info about installed trains
     std::vector<train_info_t>   trains_info;
@@ -161,6 +163,12 @@ private slots:
 
     void slotTrainSelection();
 
+    void slotAddActiveTrain();
+
+    void slotDeleteActiveTrain();
+
+    void slotTrainConfigChanged(QString name);
+
     void slotStartServerPressed();
 
     void slotStartViewerPressed();
@@ -198,18 +206,6 @@ private slots:
     void slotCancelGraphSettings();
 
     void slotApplyGraphSettings();
-/*
-    void slotAddActiveTrain();
-
-    void slotDeleteActiveTrain();
-
-    void slotActiveTrainCellChanged(int row, int column);
-
-    void slotActiveTrainDirectionChange(int idx);
-
-    void slotActiveTrainTrajectoryChange(int idx);
-
-    void slotTrainCoordValueChanged(double value);*/
 };
 
 

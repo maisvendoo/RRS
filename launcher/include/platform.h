@@ -3,14 +3,9 @@
 
 #include    <QString>
 
-#ifdef QT_DEBUG
-    const QString SIMULATOR_NAME = "simulator_d";
-    const QString VIEWER_NAME = "viewer_d";
-#else
     const QString SIMULATOR_NAME = "simulator";
     const QString VIEWER_NAME = "viewer";
     const QString ROUTE_MAP_NAME = "route-map";
-#endif
 
 #ifdef __WIN32__
     const QString EXE_EXP = ".exe";

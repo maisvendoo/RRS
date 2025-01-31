@@ -248,9 +248,15 @@
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <layout class="QVBoxLayout" name="vblActiveTrainsLayout">
             <item>
              <widget class="QLabel" name="label_12">
+              <property name="minimumSize">
+               <size>
+                <width>500</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="text">
                <string>Active trains</string>
               </property>
@@ -260,44 +266,18 @@
              </widget>
             </item>
             <item>
-             <widget class="QToolBox" name="tbActiveTrains">
+             <widget class="QFrame" name="frame">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
+                <verstretch>1</verstretch>
                </sizepolicy>
               </property>
               <property name="minimumSize">
                <size>
-                <width>400</width>
-                <height>120</height>
+                <width>500</width>
+                <height>0</height>
                </size>
-              </property>
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <widget class="QWidget" name="page">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>400</width>
-                 <height>85</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Page 1</string>
-               </attribute>
-              </widget>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="frame">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>1</verstretch>
-               </sizepolicy>
               </property>
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>

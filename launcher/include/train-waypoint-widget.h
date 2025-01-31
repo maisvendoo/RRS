@@ -50,7 +50,13 @@ public:
 
     active_train_t getActiveTrainConfig();
 
+signals:
+
+    void trainConfigChanged(QString train_name);
+
 private slots:
+
+    void slotTrainConfigChange(int train_idx);
 
     void slotWaypointDirectionChange(int dir_idx);
 
