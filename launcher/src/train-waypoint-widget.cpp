@@ -1,3 +1,4 @@
+#include    <qabstractitemview.h>
 #include    "train-waypoint-widget.h"
 
 //------------------------------------------------------------------------------
@@ -68,6 +69,24 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
 //------------------------------------------------------------------------------
 TrainWaypointWidget::~TrainWaypointWidget()
 {
+    disconnect(cbTrainConfigSelect, &QComboBox::currentIndexChanged,
+               this, &TrainWaypointWidget::slotTrainConfigChange);
+
+    disconnect(cbWaypointDirectionSelect, &QComboBox::currentIndexChanged,
+               this, &TrainWaypointWidget::slotWaypointDirectionChange);
+
+    disconnect(cbWaypointSelect, &QComboBox::currentIndexChanged,
+               this, &TrainWaypointWidget::slotWaypointChange);
+
+    disconnect(cbTrajectoryNameSelect, &QComboBox::currentIndexChanged,
+               this, &TrainWaypointWidget::slotTrajectoryNameChange);
+
+    disconnect(cbTrajectoryDirectionSelect, &QComboBox::currentIndexChanged,
+               this, &TrainWaypointWidget::slotTrajectoryDirectionChange);
+
+    disconnect(dsbTrajectoryCoordinate, &QDoubleSpinBox::valueChanged,
+               this, &TrainWaypointWidget::slotTrajectoryCoordinateChange);
+
     delete dsbTrajectoryCoordinate;
     delete cbTrajectoryDirectionSelect;
     delete cbTrajectoryNameSelect;
@@ -135,6 +154,13 @@ void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
     if (is_train_config_selected != is_selected)
     {
         is_train_config_selected = is_selected;
+
+        if (is_train_config_selected)
+            cbTrainConfigSelect->setStyleSheet("background-color: darkolivegreen;");
+        else
+            cbTrainConfigSelect->setStyleSheet("background-color: darkred;");
+        cbTrainConfigSelect->view()->setStyleSheet("background-color: #606060;");
+
         emit activeTrainChanged();
     }
 
@@ -171,6 +197,13 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
     if (is_trajectory_selected != is_selected)
     {
         is_trajectory_selected = is_selected;
+
+        if (is_trajectory_selected)
+            cbTrajectoryNameSelect->setStyleSheet("background-color: darkolivegreen;");
+        else
+            cbTrajectoryNameSelect->setStyleSheet("background-color: darkred;");
+        cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
+
         emit activeTrainChanged();
     }
 
@@ -182,6 +215,8 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
     if (cbTrajectoryNameSelect->currentText() != tp.trajectory_name)
     {
         cbWaypointSelect->setCurrentIndex(0);
+        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
     }
 }
 
@@ -201,6 +236,8 @@ void TrainWaypointWidget::slotTrajectoryDirectionChange(int dir_idx)
     if (dir_idx != ((tp.direction > 0) ? 0 : 1))
     {
         cbWaypointSelect->setCurrentIndex(0);
+        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
     }
 }
 
@@ -217,9 +254,11 @@ void TrainWaypointWidget::slotTrajectoryCoordinateChange(double coord)
         return;
 
     double traj_coord = dsbTrajectoryCoordinate->value();
-    if (abs(traj_coord - tp.traj_coord) > 1.0)
+    if (abs(traj_coord - tp.traj_coord) > 0.5)
     {
         cbWaypointSelect->setCurrentIndex(0);
+        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
     }
 }
 
@@ -251,6 +290,8 @@ void TrainWaypointWidget::setTrainSelectWidget()
         cbTrainConfigSelect->addItem(train.train_title);
     }
     cbTrainConfigSelect->setCurrentIndex(0);
+    cbTrainConfigSelect->setStyleSheet("background-color: darkred;");
+    cbTrainConfigSelect->view()->setStyleSheet("background-color: #606060;");
 
     if (is_train_config_selected)
     {
@@ -282,6 +323,8 @@ void TrainWaypointWidget::setWaypointSelectWidget()
         }
     }
     cbWaypointSelect->setCurrentIndex(0);
+    cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+    cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
 }
 
 //------------------------------------------------------------------------------
@@ -297,6 +340,9 @@ void TrainWaypointWidget::setTrajectorySelectWidget()
         cbTrajectoryNameSelect->addItem(traj.name);
     }
     cbTrajectoryNameSelect->setCurrentIndex(0);
+    cbTrajectoryNameSelect->setStyleSheet("background-color: darkred;");
+    cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
+
     if (is_trajectory_selected)
     {
         is_trajectory_selected = false;
@@ -316,6 +362,9 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     {
         cbTrajectoryNameSelect->setCurrentIndex(0);
 
+        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+
         if (is_trajectory_selected)
         {
             is_trajectory_selected = false;
@@ -328,9 +377,14 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     cbTrajectoryDirectionSelect->setCurrentIndex((tp.direction > 0) ? 0 : 1);
     dsbTrajectoryCoordinate->setValue(tp.traj_coord);
 
+    cbWaypointSelect->setStyleSheet("background-color: darkolivegreen;");
+    cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+
     if (!is_trajectory_selected)
     {
         is_trajectory_selected = true;
+        cbTrajectoryNameSelect->setStyleSheet("background-color: darkolivegreen;");
+        cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
         emit activeTrainChanged();
     }
 
@@ -348,6 +402,8 @@ void TrainWaypointWidget::resetTrajectorySelectWidgets()
     if (is_trajectory_selected)
     {
         is_trajectory_selected = false;
+        cbTrajectoryNameSelect->setStyleSheet("background-color: darkred;");
+        cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
         emit activeTrainChanged();
     }
 }
@@ -358,7 +414,11 @@ void TrainWaypointWidget::resetTrajectorySelectWidgets()
 bool TrainWaypointWidget::getCurrentWaypoint(int waypoint_idx, train_position_t &tp)
 {
     if (waypoint_idx <= 0)
+    {
+        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
         return false;
+    }
 
     int dir_idx = cbWaypointDirectionSelect->currentIndex();
     std::vector<train_position_t> *train_positions =
@@ -369,6 +429,8 @@ bool TrainWaypointWidget::getCurrentWaypoint(int waypoint_idx, train_position_t 
     if (waypoint_idx > train_positions->size())
     {
         cbWaypointSelect->setCurrentIndex(0);
+        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
+        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
         return false;
     }
 
