@@ -16,6 +16,7 @@
 #define     MAINWINDOW_H
 
 #include    <QMainWindow>
+#include    <QIcon>
 #include    <QToolBox>
 #include    <QProcess>
 
@@ -68,6 +69,15 @@ private:
     /// Info about installed routes
     std::vector<route_info_t>   routes_info;
 
+    /// Info about trajectories in current selected route
+    std::vector<trajectory_info_t>  *trajectrories;
+    /// Info about waypoints in current selected route
+    std::vector<train_position_t>   *fwd_train_positions;
+    /// Info about waypoints in current selected route
+    std::vector<train_position_t>   *bwd_train_positions;
+
+    std::vector<active_train_t> active_trains;
+
     /// Simulation process
     QProcess        simulatorProc;
     /// Visaulization process
@@ -95,16 +105,11 @@ private:
     QString settings_path;
     QString saved_servers_path;
 
-    /// Info about trajectories in current selected route
-    std::vector<trajectory_info_t>  *trajectrories;
-    /// Info about waypoints in current selected route
-    std::vector<train_position_t>   *fwd_train_positions;
-    /// Info about waypoints in current selected route
-    std::vector<train_position_t>   *bwd_train_positions;
-
-    std::vector<active_train_t> active_trains;
-
     QMap<QString, server_info_t> saved_servers;
+
+    QIcon icon_ok = QIcon(QString(":/images/images/1_ok.png"));
+    QIcon icon_cancel = QIcon(QString(":/images/images/2_cancel.png"));
+    QIcon icon_warn = QIcon(QString(":/images/images/3_warn.png"));
 
     /// Launcer initialization
     void init();

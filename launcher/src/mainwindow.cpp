@@ -767,7 +767,14 @@ void MainWindow::slotUpdateActiveTrains()
         {
             active_train_t at = tww->getActiveTrainConfig();
             if (at.is_active)
+            {
                 active_trains.push_back(at);
+                tbActiveTrains->setItemIcon(i, icon_ok);
+            }
+            else
+            {
+                tbActiveTrains->setItemIcon(i, icon_warn);
+            }
         }
     }
 
