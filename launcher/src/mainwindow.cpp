@@ -216,6 +216,9 @@ void MainWindow::loadRoutesList(const std::string &routesDir)
             cfg.getString(secName, "Description", route_info.route_description);
         }
 
+        loadTrajectories(route_info);
+        loadTrainPositions(route_info);
+
         routes_info.push_back(route_info);
     }
 
@@ -306,11 +309,11 @@ void MainWindow::loadServersList(const std::string &cfgDir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::loadTrajectories(const QString &routeDir)
+void MainWindow::loadTrajectories(route_info_t &route_info)
 {
-    trajectrories.clear();
+    route_info.trajectrories.clear();
 
-    QString traj_dir_path = routeDir + QDir::separator() +
+    QString traj_dir_path = route_info.route_dir_full_path + QDir::separator() +
                             "topology" + QDir::separator() +
                             "trajectories";
 
@@ -322,19 +325,19 @@ void MainWindow::loadTrajectories(const QString &routeDir)
         QString fullPath = traj_files.next();
         QFileInfo fileInfo(fullPath);
         traj_info.name = fileInfo.baseName();
-        trajectrories.push_back(traj_info);
+        route_info.trajectrories.push_back(traj_info);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::loadTrainPositions(const QString &routeDir)
+void MainWindow::loadTrainPositions(route_info_t &route_info)
 {
-    fwd_train_positions.clear();
-    bwd_train_positions.clear();
+    route_info.fwd_train_positions.clear();
+    route_info.bwd_train_positions.clear();
 
-    QString path = routeDir + QDir::separator() +
+    QString path = route_info.route_dir_full_path + QDir::separator() +
                    "topology" + QDir::separator() +
                    "waypoints.conf";
 
@@ -361,13 +364,98 @@ void MainWindow::loadTrainPositions(const QString &routeDir)
 
         if (tp.direction > 0)
         {
-            fwd_train_positions.push_back(tp);
+            route_info.fwd_train_positions.push_back(tp);
         }
         else
         {
-            bwd_train_positions.push_back(tp);
+            route_info.bwd_train_positions.push_back(tp);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::saveActiveTrainsList()
+{
+    if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
+    {
+        return;
+    }
+
+    routes_info[selected_route_idx].last_train_waypoints.clear();
+
+    int active_trains_count = tbActiveTrains->count();
+    if (active_trains_count <= 0)
+    {
+        return;
+    }
+
+    for (int i = 0; i < active_trains_count; ++i)
+    {
+        TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(i));
+        if (tww)
+        {
+            routes_info[selected_route_idx].last_train_waypoints.push_back(tww);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::clearActiveTrainsList()
+{
+    if (!is_start_button_to_stop_server)
+        ui->pbStartServer->setEnabled(false);
+
+    ui->pbDeleteTrain->setEnabled(false);
+
+    active_trains.clear();
+
+    while (tbActiveTrains->count() > 0)
+    {
+        TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(0));
+        disconnect(tww, &TrainWaypointWidget::activeTrainChanged,
+                   this, &MainWindow::slotUpdateActiveTrains);
+        disconnect(tww, &TrainWaypointWidget::trainConfigChanged,
+                   this, &MainWindow::slotTrainConfigChanged);
+
+        tbActiveTrains->removeItem(0);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadActiveTrainsList()
+{
+    if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
+    {
+        return;
+    }
+
+    int active_trains_count = routes_info[selected_route_idx].last_train_waypoints.size();
+    if (active_trains_count <= 0)
+    {
+        return;
+    }
+
+    for (int i = 0; i < active_trains_count; ++i)
+    {
+        TrainWaypointWidget *tww = routes_info[selected_route_idx].last_train_waypoints[i];
+        if (tww)
+        {
+            int new_item_idx = tbActiveTrains->addItem(tww, tww->getTrainName());
+            tbActiveTrains->setCurrentIndex(new_item_idx);
+            connect(tww, &TrainWaypointWidget::activeTrainChanged,
+                       this, &MainWindow::slotUpdateActiveTrains);
+            connect(tww, &TrainWaypointWidget::trainConfigChanged,
+                    this, &MainWindow::slotTrainConfigChanged);
+        }
+    }
+
+    slotUpdateActiveTrains();
 }
 
 //------------------------------------------------------------------------------
@@ -380,24 +468,7 @@ void MainWindow::startSimulator()
         return;
     }
 
-    int active_trains_count = tbActiveTrains->count();
-    if (active_trains_count <= 0)
-    {
-        return;
-    }
-
-    active_trains.clear();
-    for (int i = 0; i < active_trains_count; ++i)
-    {
-        TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(i));
-        if (tww)
-        {
-            active_train_t at = tww->getActiveTrainConfig();
-            if (at.is_active)
-                active_trains.push_back(at);
-        }
-    }
-
+    slotUpdateActiveTrains();
     if (active_trains.empty())
     {
         return;
@@ -553,23 +624,38 @@ void MainWindow::loadTheme()
 //------------------------------------------------------------------------------
 void MainWindow::slotRouteSelection()
 {
-    size_t item_idx = static_cast<size_t>(ui->lwRoutes->currentRow());
+    int route_idx = ui->lwRoutes->currentRow();
+    if (selected_route_idx == route_idx)
+        return;
 
-    ui->ptRouteDescription->clear();
-    selectedRouteDirName = routes_info[item_idx].route_dir_name;
-    ui->ptRouteDescription->appendPlainText(routes_info[item_idx].route_description);
-
-    loadTrajectories(routes_info[item_idx].route_dir_full_path);
-    loadTrainPositions(routes_info[item_idx].route_dir_full_path);
-
-    ui->pbAddTrain->setEnabled(ui->lwTrains->currentRow() >= 0);
-/*
-    if (active_trains.empty())
+    // Сохранение выбранных активных поездов в предыдущий выбранный маршрут
+    if ((selected_route_idx >= 0) && (selected_route_idx < routes_info.size()))
     {
+        saveActiveTrainsList();
+    }
+
+    // Очистка выбранных активных поездов
+    clearActiveTrainsList();
+    ui->ptRouteDescription->clear();
+
+    if (route_idx == -1)
+    {
+        selected_route_idx = -1;
         return;
     }
-*/
-//    updateActiveTrains();
+
+    // Загрузка предыдущих выбранных активных поездов
+    selected_route_idx = route_idx;
+    loadActiveTrainsList();
+
+    selectedRouteDirName = routes_info[route_idx].route_dir_name;
+    ui->ptRouteDescription->appendPlainText(routes_info[route_idx].route_description);
+
+    trajectrories = &routes_info[route_idx].trajectrories;
+    fwd_train_positions = &routes_info[route_idx].fwd_train_positions;
+    bwd_train_positions = &routes_info[route_idx].bwd_train_positions;
+
+    ui->pbAddTrain->setEnabled(ui->lwTrains->currentRow() >= 0);
 }
 
 //------------------------------------------------------------------------------
@@ -599,22 +685,21 @@ void MainWindow::slotAddActiveTrain()
         return;
 
     TrainWaypointWidget *tww = new TrainWaypointWidget(&trains_info,
-                                                       &trajectrories,
-                                                       &fwd_train_positions,
-                                                       &bwd_train_positions,
+                                                       trajectrories,
+                                                       fwd_train_positions,
+                                                       bwd_train_positions,
                                                        this);
     if (tww->cbTrainConfigSelect->count() > train_idx)
         tww->cbTrainConfigSelect->setCurrentIndex(train_idx + 1);
 
     int new_item_idx = tbActiveTrains->addItem(tww, tww->getTrainName());
     tbActiveTrains->setCurrentIndex(new_item_idx);
+    connect(tww, &TrainWaypointWidget::activeTrainChanged,
+               this, &MainWindow::slotUpdateActiveTrains);
     connect(tww, &TrainWaypointWidget::trainConfigChanged,
             this, &MainWindow::slotTrainConfigChanged);
 
-    if (!is_start_button_to_stop_server)
-        ui->pbStartServer->setEnabled(true);
-
-    ui->pbDeleteTrain->setEnabled(true);
+    slotUpdateActiveTrains();
 }
 
 //------------------------------------------------------------------------------
@@ -630,18 +715,14 @@ void MainWindow::slotDeleteActiveTrain()
     if (tww)
     {
         tbActiveTrains->removeItem(cur);
+        disconnect(tww, &TrainWaypointWidget::activeTrainChanged,
+                   this, &MainWindow::slotUpdateActiveTrains);
         disconnect(tww, &TrainWaypointWidget::trainConfigChanged,
                    this, &MainWindow::slotTrainConfigChanged);
         delete tww;
     }
 
-    if (tbActiveTrains->count() <= 0)
-    {
-        if (!is_start_button_to_stop_server)
-            ui->pbStartServer->setEnabled(false);
-
-        ui->pbDeleteTrain->setEnabled(false);
-    }
+    slotUpdateActiveTrains();
 }
 
 //------------------------------------------------------------------------------
@@ -658,6 +739,40 @@ void MainWindow::slotTrainConfigChanged(QString name)
 
         tbActiveTrains->setItemText(idx, name);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotUpdateActiveTrains()
+{
+    active_trains.clear();
+    int active_trains_count = tbActiveTrains->count();
+    if (active_trains_count <= 0)
+    {
+        if (!is_start_button_to_stop_server)
+            ui->pbStartServer->setEnabled(false);
+
+        ui->pbDeleteTrain->setEnabled(false);
+
+        return;
+    }
+
+    ui->pbDeleteTrain->setEnabled(true);
+
+    for (int i = 0; i < active_trains_count; ++i)
+    {
+        TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(i));
+        if (tww)
+        {
+            active_train_t at = tww->getActiveTrainConfig();
+            if (at.is_active)
+                active_trains.push_back(at);
+        }
+    }
+
+    if (!is_start_button_to_stop_server)
+        ui->pbStartServer->setEnabled(!active_trains.empty());
 }
 
 //------------------------------------------------------------------------------

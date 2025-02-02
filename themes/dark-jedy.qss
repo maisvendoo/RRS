@@ -3,21 +3,6 @@ QWidget {
     color: #ffffff;
 }
 
-QTableWidget {
-    background-color: #606060;
-    color: #ffffff;
-}
-
-QHeaderView::section:horizontal {
-    background-color: #606060;
-    color: #ffffff;
-}
-
-QHeaderView::section:vertical {
-    background-color: #606060;
-    color: #ffffff;
-}
-
 QPushButton {
 	background-color: #00aa00;
 }
@@ -42,11 +27,27 @@ QPlainTextEdit {
 	background-color: #606060;
 }
 
-QTabBar::tab:selected {
+QLineEdit {
+	background-color: #606060;
+}
+
+QSpinBox {
+	background-color: #606060;
+}
+
+QDoubleSpinBox {
+	background-color: #606060;
+}
+
+QTabBar::tab::selected {
     background: #ffb140;
 }
 
-QTabBar::tab:!selected {
+QTabBar::tab::!selected {
+    background: #606060;
+}
+
+QToolBox::tab {
     background: #606060;
 }
 
@@ -54,12 +55,6 @@ QTabWidget::pane {
 	border: 0; 
 }
 
-QTableView::item::selected
-{
-    background-color: #ffb140;
-}
-
-QComboBox::item::selected
-{
-    background-color: #ffb140;
+QComboBox {
+    background-color: #606060;
 }

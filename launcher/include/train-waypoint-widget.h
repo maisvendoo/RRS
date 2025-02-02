@@ -54,6 +54,8 @@ signals:
 
     void trainConfigChanged(QString train_name);
 
+    void activeTrainChanged();
+
 private slots:
 
     void slotTrainConfigChange(int train_idx);
@@ -69,6 +71,9 @@ private slots:
     void slotTrajectoryCoordinateChange(double coord);
 
 private:
+
+    bool is_train_config_selected = false;
+    bool is_trajectory_selected = false;
 
     void setDirectionSelectWidget();
 

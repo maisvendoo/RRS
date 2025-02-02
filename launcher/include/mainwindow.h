@@ -21,8 +21,6 @@
 
 #include    <train-info.h>
 #include    <route-info.h>
-#include    <trajectory-info.h>
-#include    <waypoint.h>
 #include    <active-train.h>
 #include    <server_info.h>
 #include    <CfgEditor.h>
@@ -63,13 +61,12 @@ private:
 
     Ui::MainWindow  *ui;
     QToolBox *tbActiveTrains;
+    int selected_route_idx = -1;
 
     /// Info about installed trains
     std::vector<train_info_t>   trains_info;
     /// Info about installed routes
     std::vector<route_info_t>   routes_info;
-    /// Info about trajectories in current selected route
-    std::vector<trajectory_info_t>   trajectrories;
 
     /// Simulation process
     QProcess        simulatorProc;
@@ -98,11 +95,12 @@ private:
     QString settings_path;
     QString saved_servers_path;
 
-    std::vector<train_position_t> fwd_train_positions;
-
-    std::vector<train_position_t> bwd_train_positions;
-
-    train_position_t selected_train_position;
+    /// Info about trajectories in current selected route
+    std::vector<trajectory_info_t>  *trajectrories;
+    /// Info about waypoints in current selected route
+    std::vector<train_position_t>   *fwd_train_positions;
+    /// Info about waypoints in current selected route
+    std::vector<train_position_t>   *bwd_train_positions;
 
     std::vector<active_train_t> active_trains;
 
@@ -121,10 +119,19 @@ private:
     void loadServersList(const std::string &cfgDir);
 
     /// Loading of trajectories list at current selected route
-    void loadTrajectories(const QString &routeDir);
+    void loadTrajectories(route_info_t &route_info);
 
     /// Loading of waypoints list at current selected route
-    void loadTrainPositions(const QString &routeDir);
+    void loadTrainPositions(route_info_t &route_info);
+
+    /// Save list with all trains and their waypoints to previous selected route
+    void saveActiveTrainsList();
+
+    /// Clear all trains and their waypoints
+    void clearActiveTrainsList();
+
+    /// Load route's last list with trains and their waypoints
+    void loadActiveTrainsList();
 
     /// Save servers list
     void saveServersList();
@@ -152,11 +159,7 @@ private:
 
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
-/*
-    int getSelectedActiveTrainIndex();
 
-    void updateActiveTrains();
-*/
 private slots:
 
     void slotRouteSelection();
@@ -168,6 +171,8 @@ private slots:
     void slotDeleteActiveTrain();
 
     void slotTrainConfigChanged(QString name);
+
+    void slotUpdateActiveTrains();
 
     void slotStartServerPressed();
 

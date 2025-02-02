@@ -19,6 +19,7 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
 
     cbTrainConfigSelect = new QComboBox(this);
     cbWaypointDirectionSelect = new QComboBox(this);
+    cbWaypointDirectionSelect->setFixedWidth(80);
     cbWaypointSelect = new QComboBox(this);
 
     hblLine1->addWidget(cbTrainConfigSelect);
@@ -28,6 +29,7 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
 
     cbTrajectoryNameSelect = new QComboBox(this);
     cbTrajectoryDirectionSelect = new QComboBox(this);
+    cbTrajectoryDirectionSelect->setFixedWidth(80);
     dsbTrajectoryCoordinate = new QDoubleSpinBox(this);
     dsbTrajectoryCoordinate->setMaximum(40000000.0);
     dsbTrajectoryCoordinate->setDecimals(2);
@@ -129,7 +131,13 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
 //------------------------------------------------------------------------------
 void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
 {
-    (void) train_idx;
+    bool is_selected = (train_idx > 0) && (train_idx <= trains_info->size());
+    if (is_train_config_selected != is_selected)
+    {
+        is_train_config_selected = is_selected;
+        emit activeTrainChanged();
+    }
+
     emit trainConfigChanged(getTrainName());
 }
 
@@ -159,7 +167,12 @@ void TrainWaypointWidget::slotWaypointChange(int waypoint_idx)
 //------------------------------------------------------------------------------
 void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
 {
-    (void) traj_idx;
+    bool is_selected = (traj_idx > 0) && (traj_idx <= trajectrories->size());
+    if (is_trajectory_selected != is_selected)
+    {
+        is_trajectory_selected = is_selected;
+        emit activeTrainChanged();
+    }
 
     int waypoint_idx = cbWaypointSelect->currentIndex();
     train_position_t tp;
@@ -238,6 +251,12 @@ void TrainWaypointWidget::setTrainSelectWidget()
         cbTrainConfigSelect->addItem(train.train_title);
     }
     cbTrainConfigSelect->setCurrentIndex(0);
+
+    if (is_train_config_selected)
+    {
+        is_train_config_selected = false;
+        emit activeTrainChanged();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -278,6 +297,11 @@ void TrainWaypointWidget::setTrajectorySelectWidget()
         cbTrajectoryNameSelect->addItem(traj.name);
     }
     cbTrajectoryNameSelect->setCurrentIndex(0);
+    if (is_trajectory_selected)
+    {
+        is_trajectory_selected = false;
+        emit activeTrainChanged();
+    }
 
     dsbTrajectoryCoordinate->setValue(0.0);
 }
@@ -291,12 +315,25 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     if (traj_idx == -1)
     {
         cbTrajectoryNameSelect->setCurrentIndex(0);
+
+        if (is_trajectory_selected)
+        {
+            is_trajectory_selected = false;
+            emit activeTrainChanged();
+        }
         return;
     }
 
     cbTrajectoryNameSelect->setCurrentIndex(traj_idx);
     cbTrajectoryDirectionSelect->setCurrentIndex((tp.direction > 0) ? 0 : 1);
     dsbTrajectoryCoordinate->setValue(tp.traj_coord);
+
+    if (!is_trajectory_selected)
+    {
+        is_trajectory_selected = true;
+        emit activeTrainChanged();
+    }
+
 }
 
 //------------------------------------------------------------------------------
@@ -307,6 +344,12 @@ void TrainWaypointWidget::resetTrajectorySelectWidgets()
     cbTrajectoryNameSelect->setCurrentIndex(0);
     cbTrajectoryDirectionSelect->setCurrentIndex(cbWaypointDirectionSelect->currentIndex());
     dsbTrajectoryCoordinate->setValue(0.0);
+
+    if (is_trajectory_selected)
+    {
+        is_trajectory_selected = false;
+        emit activeTrainChanged();
+    }
 }
 
 //------------------------------------------------------------------------------
