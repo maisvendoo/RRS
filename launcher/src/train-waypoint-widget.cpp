@@ -8,25 +8,65 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
                                          std::vector<trajectory_info_t>  *trajectrories,
                                          std::vector<train_position_t>   *fwd_train_positions,
                                          std::vector<train_position_t>   *bwd_train_positions,
-                                         QWidget *parent) : QWidget(parent)
+                                         QIcon *icon_ok,
+                                         QIcon *icon_cancel,
+                                         QIcon *icon_warn,
+                                         QWidget *parent) : QFrame(parent)
     , trains_info(trains_info)
     , trajectrories(trajectrories)
     , fwd_train_positions(fwd_train_positions)
     , bwd_train_positions(bwd_train_positions)
+    , icon_ok(icon_ok)
+    , icon_cancel(icon_cancel)
+    , icon_warn(icon_warn)
 {
+    setFrameStyle(QFrame::Panel | QFrame::Sunken);
+
     vblLines = new QVBoxLayout(this);
-    hblLine1 = new QHBoxLayout();
-    hblLine2 = new QHBoxLayout();
+    hblLine1header = new QHBoxLayout();
+    hblLine1content = new QHBoxLayout();
+    hblLine2header = new QHBoxLayout();
+    hblLine2content = new QHBoxLayout();
+
+    lTrainConfigSelectIcon = new QLabel(this);
+    lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
+    lTrainConfigSelectText = new QLabel(this);
+    lTrainConfigSelectText->setText(tr("Train selection:"));
+    sLine1headerMiddle = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+    lWaypointSelectIcon = new QLabel(this);
+    lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+    lWaypointSelectText = new QLabel(this);
+    lWaypointSelectText->setText(tr("Route's predefined start waypoints:"));
+    sLine1headerRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+
+    hblLine1header->addWidget(lTrainConfigSelectIcon);
+    hblLine1header->addWidget(lTrainConfigSelectText);
+    hblLine1header->addItem(sLine1headerMiddle);
+    hblLine1header->addWidget(lWaypointSelectIcon);
+    hblLine1header->addWidget(lWaypointSelectText);
+    hblLine1header->addItem(sLine1headerRight);
+    vblLines->addLayout(hblLine1header);
 
     cbTrainConfigSelect = new QComboBox(this);
     cbWaypointDirectionSelect = new QComboBox(this);
     cbWaypointDirectionSelect->setFixedWidth(80);
     cbWaypointSelect = new QComboBox(this);
 
-    hblLine1->addWidget(cbTrainConfigSelect);
-    hblLine1->addWidget(cbWaypointDirectionSelect);
-    hblLine1->addWidget(cbWaypointSelect);
-    vblLines->addLayout(hblLine1);
+    hblLine1content->addWidget(cbTrainConfigSelect);
+    hblLine1content->addWidget(cbWaypointDirectionSelect);
+    hblLine1content->addWidget(cbWaypointSelect);
+    vblLines->addLayout(hblLine1content);
+
+    lTrajectoryPointSelectIcon = new QLabel(this);
+    lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
+    lTrajectoryPointSelectText = new QLabel(this);
+    lTrajectoryPointSelectText->setText(tr("Configuration of the start point:"));
+    sLine2headerRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+
+    hblLine2header->addWidget(lTrajectoryPointSelectIcon);
+    hblLine2header->addWidget(lTrajectoryPointSelectText);
+    hblLine2header->addItem(sLine2headerRight);
+    vblLines->addLayout(hblLine2header);
 
     cbTrajectoryNameSelect = new QComboBox(this);
     cbTrajectoryDirectionSelect = new QComboBox(this);
@@ -35,10 +75,10 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     dsbTrajectoryCoordinate->setMaximum(40000000.0);
     dsbTrajectoryCoordinate->setDecimals(2);
 
-    hblLine2->addWidget(cbTrajectoryNameSelect);
-    hblLine2->addWidget(cbTrajectoryDirectionSelect);
-    hblLine2->addWidget(dsbTrajectoryCoordinate);
-    vblLines->addLayout(hblLine2);
+    hblLine2content->addWidget(cbTrajectoryNameSelect);
+    hblLine2content->addWidget(cbTrajectoryDirectionSelect);
+    hblLine2content->addWidget(dsbTrajectoryCoordinate);
+    vblLines->addLayout(hblLine2content);
 
     setDirectionSelectWidget();
     setTrainSelectWidget();
@@ -86,18 +126,32 @@ TrainWaypointWidget::~TrainWaypointWidget()
 
     disconnect(dsbTrajectoryCoordinate, &QDoubleSpinBox::valueChanged,
                this, &TrainWaypointWidget::slotTrajectoryCoordinateChange);
-
+/*
     delete dsbTrajectoryCoordinate;
     delete cbTrajectoryDirectionSelect;
     delete cbTrajectoryNameSelect;
+
+    delete sLine2headerRight;
+    delete lTrajectoryPointSelectText;
+    delete lTrajectoryPointSelectIcon;
 
     delete cbWaypointSelect;
     delete cbWaypointDirectionSelect;
     delete cbTrainConfigSelect;
 
-    delete hblLine2;
-    delete hblLine1;
+    delete sLine1headerRight;
+    delete lWaypointSelectText;
+    delete lWaypointSelectIcon;
+    delete sLine1headerMiddle;
+    delete lTrainConfigSelectText;
+    delete lTrainConfigSelectIcon;
+
+    delete hblLine2content;
+    delete hblLine2header;
+    delete hblLine1content;
+    delete hblLine1header;
     delete vblLines;
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -156,10 +210,9 @@ void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
         is_train_config_selected = is_selected;
 
         if (is_train_config_selected)
-            cbTrainConfigSelect->setStyleSheet("background-color: darkolivegreen;");
+            lTrainConfigSelectIcon->setPixmap(icon_ok->pixmap(16));
         else
-            cbTrainConfigSelect->setStyleSheet("background-color: darkred;");
-        cbTrainConfigSelect->view()->setStyleSheet("background-color: #606060;");
+            lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
 
         emit activeTrainChanged();
     }
@@ -199,10 +252,9 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
         is_trajectory_selected = is_selected;
 
         if (is_trajectory_selected)
-            cbTrajectoryNameSelect->setStyleSheet("background-color: darkolivegreen;");
+            lTrajectoryPointSelectIcon->setPixmap(icon_ok->pixmap(16));
         else
-            cbTrajectoryNameSelect->setStyleSheet("background-color: darkred;");
-        cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
+            lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
 
         emit activeTrainChanged();
     }
@@ -215,8 +267,7 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
     if (cbTrajectoryNameSelect->currentText() != tp.trajectory_name)
     {
         cbWaypointSelect->setCurrentIndex(0);
-        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
     }
 }
 
@@ -236,8 +287,7 @@ void TrainWaypointWidget::slotTrajectoryDirectionChange(int dir_idx)
     if (dir_idx != ((tp.direction > 0) ? 0 : 1))
     {
         cbWaypointSelect->setCurrentIndex(0);
-        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
     }
 }
 
@@ -257,8 +307,7 @@ void TrainWaypointWidget::slotTrajectoryCoordinateChange(double coord)
     if (abs(traj_coord - tp.traj_coord) > 0.5)
     {
         cbWaypointSelect->setCurrentIndex(0);
-        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
     }
 }
 
@@ -290,8 +339,7 @@ void TrainWaypointWidget::setTrainSelectWidget()
         cbTrainConfigSelect->addItem(train.train_title);
     }
     cbTrainConfigSelect->setCurrentIndex(0);
-    cbTrainConfigSelect->setStyleSheet("background-color: darkred;");
-    cbTrainConfigSelect->view()->setStyleSheet("background-color: #606060;");
+    lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
 
     if (is_train_config_selected)
     {
@@ -323,8 +371,7 @@ void TrainWaypointWidget::setWaypointSelectWidget()
         }
     }
     cbWaypointSelect->setCurrentIndex(0);
-    cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-    cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+    lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
 }
 
 //------------------------------------------------------------------------------
@@ -340,8 +387,7 @@ void TrainWaypointWidget::setTrajectorySelectWidget()
         cbTrajectoryNameSelect->addItem(traj.name);
     }
     cbTrajectoryNameSelect->setCurrentIndex(0);
-    cbTrajectoryNameSelect->setStyleSheet("background-color: darkred;");
-    cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
+    lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
 
     if (is_trajectory_selected)
     {
@@ -361,9 +407,7 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     if (traj_idx == -1)
     {
         cbTrajectoryNameSelect->setCurrentIndex(0);
-
-        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
 
         if (is_trajectory_selected)
         {
@@ -377,14 +421,12 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     cbTrajectoryDirectionSelect->setCurrentIndex((tp.direction > 0) ? 0 : 1);
     dsbTrajectoryCoordinate->setValue(tp.traj_coord);
 
-    cbWaypointSelect->setStyleSheet("background-color: darkolivegreen;");
-    cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+    lWaypointSelectIcon->setPixmap(icon_ok->pixmap(16));
 
     if (!is_trajectory_selected)
     {
         is_trajectory_selected = true;
-        cbTrajectoryNameSelect->setStyleSheet("background-color: darkolivegreen;");
-        cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
+        lTrajectoryPointSelectIcon->setPixmap(icon_ok->pixmap(16));
         emit activeTrainChanged();
     }
 
@@ -402,8 +444,7 @@ void TrainWaypointWidget::resetTrajectorySelectWidgets()
     if (is_trajectory_selected)
     {
         is_trajectory_selected = false;
-        cbTrajectoryNameSelect->setStyleSheet("background-color: darkred;");
-        cbTrajectoryNameSelect->view()->setStyleSheet("background-color: #606060;");
+        lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
         emit activeTrainChanged();
     }
 }
@@ -415,8 +456,7 @@ bool TrainWaypointWidget::getCurrentWaypoint(int waypoint_idx, train_position_t 
 {
     if (waypoint_idx <= 0)
     {
-        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
         return false;
     }
 
@@ -429,8 +469,7 @@ bool TrainWaypointWidget::getCurrentWaypoint(int waypoint_idx, train_position_t 
     if (waypoint_idx > train_positions->size())
     {
         cbWaypointSelect->setCurrentIndex(0);
-        cbWaypointSelect->setStyleSheet("background-color: darkkhaki;");
-        cbWaypointSelect->view()->setStyleSheet("background-color: #606060;");
+        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
         return false;
     }
 

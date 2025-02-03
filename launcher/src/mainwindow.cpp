@@ -688,6 +688,9 @@ void MainWindow::slotAddActiveTrain()
                                                        trajectrories,
                                                        fwd_train_positions,
                                                        bwd_train_positions,
+                                                       &icon_ok,
+                                                       &icon_cancel,
+                                                       &icon_warn,
                                                        this);
     if (tww->cbTrainConfigSelect->count() > train_idx)
         tww->cbTrainConfigSelect->setCurrentIndex(train_idx + 1);

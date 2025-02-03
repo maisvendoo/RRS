@@ -1,9 +1,10 @@
 #ifndef     TRAINWAYPOINTWIDGET_H
 #define     TRAINWAYPOINTWIDGET_H
 
-#include    <QWidget>
-#include    <QVBoxLayout>
-#include    <QHBoxLayout>
+#include    <QFrame>
+#include    <QBoxLayout>
+#include    <QSpacerItem>
+#include    <QLabel>
 #include    <QComboBox>
 #include    <QDoubleSpinBox>
 
@@ -15,7 +16,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TrainWaypointWidget : public QWidget
+class TrainWaypointWidget : public QFrame
 {
     Q_OBJECT
 
@@ -25,17 +26,33 @@ public:
                         std::vector<trajectory_info_t>  *trajectrories,
                         std::vector<train_position_t>   *fwd_train_positions,
                         std::vector<train_position_t>   *bwd_train_positions,
+                        QIcon *icon_ok,
+                        QIcon *icon_cancel,
+                        QIcon *icon_warn,
                         QWidget *parent = Q_NULLPTR);
 
     ~TrainWaypointWidget();
 
     QVBoxLayout *vblLines;
-    QHBoxLayout *hblLine1;
-    QHBoxLayout *hblLine2;
+    QHBoxLayout *hblLine1header;
+    QHBoxLayout *hblLine1content;
+    QHBoxLayout *hblLine2header;
+    QHBoxLayout *hblLine2content;
+
+    QLabel      *lTrainConfigSelectIcon;
+    QLabel      *lTrainConfigSelectText;
+    QSpacerItem *sLine1headerMiddle;
+    QLabel      *lWaypointSelectIcon;
+    QLabel      *lWaypointSelectText;
+    QSpacerItem *sLine1headerRight;
 
     QComboBox   *cbTrainConfigSelect;
     QComboBox   *cbWaypointDirectionSelect;
     QComboBox   *cbWaypointSelect;
+
+    QLabel      *lTrajectoryPointSelectIcon;
+    QLabel      *lTrajectoryPointSelectText;
+    QSpacerItem *sLine2headerRight;
 
     QComboBox   *cbTrajectoryNameSelect;
     QComboBox   *cbTrajectoryDirectionSelect;
@@ -45,6 +62,10 @@ public:
     std::vector<trajectory_info_t>  *trajectrories;
     std::vector<train_position_t>   *fwd_train_positions;
     std::vector<train_position_t>   *bwd_train_positions;
+
+    QIcon *icon_ok;
+    QIcon *icon_cancel;
+    QIcon *icon_warn;
 
     QString getTrainName();
 

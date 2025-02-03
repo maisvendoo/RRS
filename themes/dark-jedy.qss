@@ -1,6 +1,6 @@
 QWidget {
-    background-color: #404040;
-    color: #ffffff;
+	background-color: #404040;
+	color: #ffffff;
 }
 
 QPushButton {
@@ -16,11 +16,12 @@ QPushButton::disabled {
 }
 
 QListWidget {
-	background-color: #606060;	
+	background-color: #606060;
 }
 
-QListWidget::item::selected {
+QListWidget::item:selected {
 	background-color: #ffb140;
+	color: #000000;
 }
 
 QPlainTextEdit {
@@ -39,16 +40,16 @@ QDoubleSpinBox {
 	background-color: #606060;
 }
 
-QTabBar::tab::selected {
-    background: #ffb140;
+QTabBar::tab:selected {
+	background: #ffb140;
 }
 
-QTabBar::tab::!selected {
-    background: #606060;
+QTabBar::tab:!selected {
+	background: #606060;
 }
 
 QToolBox::tab {
-    background: #606060;
+	background: #606060;
 }
 
 QTabWidget::pane { 
@@ -56,5 +57,5 @@ QTabWidget::pane {
 }
 
 QComboBox {
-    background-color: #606060;
+	background-color: #606060;
 }
