@@ -11,6 +11,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/DirectionalLight.h>
+#include <vsg/lighting/ShadowSettings.h>
 #include <vsg/maths/vec4.h>
 
 #include <QObject>
@@ -110,6 +111,7 @@ private:
     vsg::ref_ptr<vsg::Viewer> viewer;
 
     TcpClient* tcp_client;
+    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
 };
 
 #endif // ROUTE_VIEWER_H

@@ -5,10 +5,16 @@
 #include "filesystem.h"
 #include <cstdint>
 #include <filesystem>
+#include <osg/MatrixTransform>
 #include <qbuffer.h>
 #include <qflags.h>
 #include <qstringview.h>
+#include <vsg/lighting/PointLight.h>
+#include <vsg/maths/mat4.h>
+#include <vsg/maths/transform.h>
+#include <vsg/nodes/CullGroup.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
 
 // TODO: remove duplication
@@ -115,8 +121,42 @@ void TrafficLightsHandler::deserialize(QByteArray& data)
 
 void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
 {
+}
+
+void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
+{
     traffic_light_nodes = vsg::Group::create();
 
+    for (auto* tl : traffic_lights_fwd)
+    {
+        loadSignalModel(tl, settings, options, shadowSettings);
+    }
+
+    for (auto* tl :traffic_lights_bwd)
+    {
+        loadSignalModel(tl, settings, options, shadowSettings);
+    }
+}
+
+void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
+{
+    LOG_INFO(
+        "Signal %s at connector %s is initialized. Letter: %s | position: {%8.1f, %8.1f, %8.1f} | direction: %s {%6.3f %6.3f %6.3f}",
+        tl->getModelName().toStdString().c_str(),
+        tl->getConnectorName().toStdString().c_str(),
+        tl->getLetter().toStdString().c_str(),
+        tl->getPosition().x,
+        tl->getPosition().y,
+        tl->getPosition().z,
+        (tl->getSignalDirection() == -1) ? "BWD" : "FDW",
+        tl->getOrth().x,
+        tl->getOrth().y,
+        tl->getOrth().z
+    );
+}
+
+void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
+{
     FileSystem& fs = FileSystem::getInstance();
 
     std::string path = fs.combinePath(settings.route_dir_full_path, "topology");
@@ -131,56 +171,44 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref
     models_path = fs.combinePath(models_path, "models");
     models_path = fs.combinePath(models_path, models_dir);
 
-    // std::filesystem::directory_iterator dir_it(models_path);
-    // for (auto& entry : dir_it)
-    // {
-    //     if (entry.path().extension() == ".gltf")
-    //     {
-    //         std::string fullPath = entry.path().string();
-
-    //         auto pagedLOD = vsg::PagedLOD::create();
-    //         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-    //         pagedLOD->filename = fullPath;
-    //         pagedLOD->options = options;
-
-    //         traffic_light_nodes->addChild(pagedLOD);
-    //     }
-    // }
-}
-
-void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
-{
-    for (auto* tl : traffic_lights_fwd)
-    {
-        loadSignalModel(tl, settings, options);
-    }
-
-    for (auto* tl :traffic_lights_bwd)
-    {
-        loadSignalModel(tl, settings, options);
-    }
-}
-
-void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
-{
-    LOG_INFO(
-        "Signal at connector %s is initialized. Letter: %s | position: {%8.1f, %8.1f, %8.1f} | direction: %s {%6.3f %6.3f %6.3f}",
-        tl->getConnectorName().toStdString().c_str(),
-        tl->getLetter().toStdString().c_str(),
-        tl->getPosition().x,
-        tl->getPosition().y,
-        tl->getPosition().z,
-        (tl->getSignalDirection() == -1) ? "BWD" : "FDW",
-        tl->getOrth().x,
-        tl->getOrth().y,
-        tl->getOrth().z
-    );
-}
-
-void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
-{
     auto pagedLOD = vsg::PagedLOD::create();
     pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-    // pagedLOD->filename = tl.get;
+    pagedLOD->filename = models_path + '/' + tl->getModelName().toStdString() + ".gltf";
     pagedLOD->options = options;
+
+    int sd = tl->getSignalDirection();
+
+    auto m1 = vsg::translate(tl->getPosition());
+
+    vsg::vec3 o = tl->getOrth();
+    vsg::vec3 r = tl->getRight();
+    vsg::vec3 u = tl->getUp();
+
+    vsg::mat4 m2(
+         r.x, -o.x, u.x, 0,
+        -r.y,  o.y, u.y, 0,
+         r.z,  o.z, u.z, 0,
+           0,    0,   0, 1
+    );
+
+    auto point_light = vsg::PointLight::create();
+    point_light->color.set(0.0f, 1.0f, 1.0f);
+    point_light->intensity = 500.0;
+    point_light->position = tl->getPosition() + vsg::vec3(0.0f, -10.0f, 20.0f);
+    point_light->shadowSettings = shadowSettings;
+
+    auto cullGroup = vsg::CullGroup::create();
+    cullGroup->bound.center = point_light->position;
+    cullGroup->bound.radius = 200.0;
+    cullGroup->addChild(point_light);
+
+    auto transform = vsg::MatrixTransform::create();
+    transform->matrix = m2 * m1;
+
+    transform->addChild(pagedLOD);
+    // transform->addChild(cullGroup);
+
+    traffic_light_nodes->addChild(transform);
+    traffic_light_nodes->addChild(cullGroup);
+    // traffic_light_nodes->addChild(point_light);
 }

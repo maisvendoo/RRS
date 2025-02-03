@@ -9,6 +9,7 @@
 #include <QString>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
+#include <vsg/lighting/ShadowSettings.h>
 #include <vsg/nodes/Group.h>
 
 class TrafficLightsHandler
@@ -18,14 +19,14 @@ public:
 
     void create_pagedLODs(const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
 
-    void loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
+    void loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings);
 
     vsg::ref_ptr<vsg::Group> traffic_light_nodes;
 
 private:
     void printSignalInfo(TrafficLight* tl);
 
-    void loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
+    void loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings);
 
 private:
     QMap<QString, TrafficLight*> traffic_lights_fwd;

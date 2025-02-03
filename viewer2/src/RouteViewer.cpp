@@ -95,7 +95,7 @@ int RouteViewer::run()
         viewer->recordAndSubmit();
         viewer->present();
 
-
+        LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
     }
 
     return 0;
@@ -355,7 +355,7 @@ void RouteViewer::initLights()
         deviceFeatures->get().depthClamp = VK_TRUE;
 
     auto numShadowMapsPerLight = 8;
-    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
+    shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
 
     shadow_region = vsg::RegionOfInterest::create();
     shadow_region->points.emplace_back();
@@ -554,7 +554,11 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     traffic_lights_handler->deserialize(sig_data);
 
     traffic_lights_handler->create_pagedLODs(settings, options);
+    traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
+
+    viewer->update();
+    viewer->compile();
 }
 
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
