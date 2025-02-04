@@ -10,12 +10,17 @@
 #include <qflags.h>
 #include <qstringview.h>
 #include <vsg/lighting/PointLight.h>
+#include <vsg/lighting/SpotLight.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/maths/vec4.h>
 #include <vsg/nodes/CullGroup.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/utils/Builder.h>
 
 // TODO: remove duplication
 void TrafficLightsHandler::deserialize(QByteArray& data)
@@ -191,24 +196,26 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
            0,    0,   0, 1
     );
 
-    auto point_light = vsg::PointLight::create();
-    point_light->color.set(0.0f, 1.0f, 1.0f);
-    point_light->intensity = 500.0;
-    point_light->position = tl->getPosition() + vsg::vec3(0.0f, -10.0f, 20.0f);
-    point_light->shadowSettings = shadowSettings;
+    auto spotlight = vsg::SpotLight::create();
+    spotlight->color.set(0.2f, 1.0f, 0.2f);
+    spotlight->intensity = 2e5f;
+    spotlight->position = vsg::vec3(0.0f, 0.0f, 5.0f);
+    spotlight->direction = -o;
+    spotlight->innerAngle = vsg::radians(15.0f);
+    spotlight->outerAngle = vsg::radians(60.0f);
+    spotlight->shadowSettings = shadowSettings;
 
     auto cullGroup = vsg::CullGroup::create();
-    cullGroup->bound.center = point_light->position;
     cullGroup->bound.radius = 200.0;
-    cullGroup->addChild(point_light);
+    cullGroup->addChild(spotlight);
 
     auto transform = vsg::MatrixTransform::create();
     transform->matrix = m2 * m1;
 
     transform->addChild(pagedLOD);
-    // transform->addChild(cullGroup);
+    transform->addChild(cullGroup);
 
     traffic_light_nodes->addChild(transform);
-    traffic_light_nodes->addChild(cullGroup);
-    // traffic_light_nodes->addChild(point_light);
+
+    // tl->setNode(pagedLOD);
 }

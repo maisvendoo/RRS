@@ -7,13 +7,16 @@
 #include <QByteArray>
 #include <QMap>
 #include <QString>
+#include <vector>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/ShadowSettings.h>
 #include <vsg/nodes/Group.h>
 
-class TrafficLightsHandler
+class TrafficLightsHandler : public QObject, public vsg::Visitor
 {
+    Q_OBJECT
+
 public:
     void deserialize(QByteArray& data);
 

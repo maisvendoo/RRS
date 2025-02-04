@@ -327,7 +327,7 @@ void RouteViewer::initWindow()
 
 void RouteViewer::initCamera()
 {
-    constexpr vsg::dvec3 center(0.0, 0.0, 0.0);
+    constexpr vsg::dvec3 center(0.0, 1100.0, 0.0);
     constexpr double radius = 100.0;
     constexpr double nearFarRatio = 0.0005;
 
@@ -373,13 +373,12 @@ void RouteViewer::initLights()
     ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
     ambient->intensity = 0.1f;
 
-    vsg::vec3 color(1.0f, 1.0f, 1.0f);
     float psi = 50.0f;
     float theta = 30.0f;
 
     sun = vsg::DirectionalLight::create();
-    sun->color = vsg::vec3(0.6f, 0.0f, 0.0f);
-    sun->intensity = 5000.0f;
+    sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
+    sun->intensity = 1000.0f;
     float dist = 1000.0f;
     float rad = vsg::PIf / 180.0f;
     float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
@@ -556,6 +555,8 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
+
+    viewer->addEventHandler(traffic_lights_handler);
 
     viewer->update();
     viewer->compile();
