@@ -17,6 +17,7 @@
 
 #include    <trajectory-info.h>
 #include    <waypoint.h>
+#include    <start-config.h>
 
 #include    "train-waypoint-widget.h"
 
@@ -40,7 +41,11 @@ struct route_info_t
     std::vector<train_position_t> bwd_train_positions;
     /// Info about trajectories in route
     std::vector<trajectory_info_t>   trajectrories;
+    /// Info about start configurations in route
+    std::vector<start_config_t>   start_configs;
 
+    /// Saved last start config index
+    int last_start_config = 0;
     /// Saved last trains and its start waypoints
     std::vector<TrainWaypointWidget *> last_train_waypoints = {};
 

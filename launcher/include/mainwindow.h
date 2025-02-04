@@ -86,6 +86,7 @@ private:
     QProcess        mapProc;
 
     bool is_start_button_to_stop_server;
+    int new_added_start_config_idx = -1;
 
     /// Viewer settings
     FieldsDataList  fd_list;
@@ -129,6 +130,9 @@ private:
     /// Loading of waypoints list at current selected route
     void loadTrainPositions(route_info_t &route_info);
 
+    /// Loading of waypoints list at current selected route
+    void loadStartConfigs(route_info_t &route_info);
+
     /// Save list with all trains and their waypoints to previous selected route
     void saveActiveTrainsList();
 
@@ -137,6 +141,9 @@ private:
 
     /// Load route's last list with trains and their waypoints
     void loadActiveTrainsList();
+
+    /// Load route's selected list with trains and their waypoints
+    void loadSelectedTrainsList();
 
     /// Save servers list
     void saveServersList();
@@ -175,9 +182,15 @@ private slots:
 
     void slotDeleteActiveTrain();
 
+    void slotSelectSavedStartConfig(int idx);
+
+    void slotChangeStartConfig();
+
+    void slotSaveStartConfig();
+
     void slotTrainConfigChanged(QString name);
 
-    void slotUpdateActiveTrains();
+    void slotUpdateActiveTrains(bool reset_start_config = true);
 
     void slotStartServerPressed();
 

@@ -75,7 +75,7 @@ signals:
 
     void trainConfigChanged(QString train_name);
 
-    void activeTrainChanged();
+    void activeTrainChanged(bool reset_start_config = true);
 
 private slots:
 

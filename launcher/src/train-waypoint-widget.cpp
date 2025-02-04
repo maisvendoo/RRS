@@ -194,6 +194,8 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
 
     at.train_position.traj_coord = dsbTrajectoryCoordinate->value();
 
+    at.train_position.name = cbWaypointSelect->currentText();
+
     at.is_active = true;
 
     return at;
@@ -205,6 +207,7 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
 void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
 {
     bool is_selected = (train_idx > 0) && (train_idx <= trains_info->size());
+
     if (is_train_config_selected != is_selected)
     {
         is_train_config_selected = is_selected;
@@ -213,10 +216,9 @@ void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
             lTrainConfigSelectIcon->setPixmap(icon_ok->pixmap(16));
         else
             lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
-
-        emit activeTrainChanged();
     }
 
+    emit activeTrainChanged();
     emit trainConfigChanged(getTrainName());
 }
 
@@ -255,8 +257,6 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
             lTrajectoryPointSelectIcon->setPixmap(icon_ok->pixmap(16));
         else
             lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
-
-        emit activeTrainChanged();
     }
 
     int waypoint_idx = cbWaypointSelect->currentIndex();
@@ -269,6 +269,8 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
         cbWaypointSelect->setCurrentIndex(0);
         lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
     }
+
+    emit activeTrainChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -289,6 +291,8 @@ void TrainWaypointWidget::slotTrajectoryDirectionChange(int dir_idx)
         cbWaypointSelect->setCurrentIndex(0);
         lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
     }
+
+    emit activeTrainChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -309,6 +313,8 @@ void TrainWaypointWidget::slotTrajectoryCoordinateChange(double coord)
         cbWaypointSelect->setCurrentIndex(0);
         lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
     }
+
+    emit activeTrainChanged();
 }
 
 //------------------------------------------------------------------------------
