@@ -7,17 +7,21 @@
 #include <QByteArray>
 #include <QMap>
 #include <QString>
+#include <qassert.h>
 #include <vector>
+#include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/ShadowSettings.h>
 #include <vsg/nodes/Group.h>
 
-class TrafficLightsHandler : public QObject, public vsg::Visitor
+class TrafficLightsHandler : public QObject
 {
     Q_OBJECT
 
 public:
+    TrafficLightsHandler(QObject* parent = Q_NULLPTR);
+
     void deserialize(QByteArray& data);
 
     void create_pagedLODs(const settings_t& settings, vsg::ref_ptr<vsg::Options> options);

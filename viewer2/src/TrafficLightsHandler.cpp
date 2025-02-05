@@ -22,6 +22,11 @@
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/utils/Builder.h>
 
+TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
+    : QObject(parent)
+{
+}
+
 // TODO: remove duplication
 void TrafficLightsHandler::deserialize(QByteArray& data)
 {
@@ -198,11 +203,11 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
     auto spotlight = vsg::SpotLight::create();
     spotlight->color.set(0.2f, 1.0f, 0.2f);
-    spotlight->intensity = 2e5f;
+    spotlight->intensity = 1.0f;
     spotlight->position = vsg::vec3(0.0f, 0.0f, 5.0f);
-    spotlight->direction = -o;
+    spotlight->direction = vsg::normalize(-o);
     spotlight->innerAngle = vsg::radians(15.0f);
-    spotlight->outerAngle = vsg::radians(60.0f);
+    spotlight->outerAngle = vsg::radians(30.0f);
     spotlight->shadowSettings = shadowSettings;
 
     auto cullGroup = vsg::CullGroup::create();
@@ -216,6 +221,4 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     transform->addChild(cullGroup);
 
     traffic_light_nodes->addChild(transform);
-
-    // tl->setNode(pagedLOD);
 }

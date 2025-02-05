@@ -96,7 +96,8 @@ private:
 
     std::unique_ptr<SoundManager> sound_manager;
     std::unique_ptr<TrainExteriorHandler> train_ext_handler;
-    vsg::ref_ptr<TrafficLightsHandler> traffic_lights_handler = TrafficLightsHandler::create();
+    // vsg::ref_ptr<TrafficLightsHandler> traffic_lights_handler = TrafficLightsHandler::create();
+    std::unique_ptr<TrafficLightsHandler> traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
 
     vsg::ref_ptr<vsg::Options> options;
     vsg::ref_ptr<vsg::WindowTraits> windowTraits;

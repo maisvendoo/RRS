@@ -66,29 +66,29 @@ int RouteViewer::run()
     {
         QApplication::processEvents();
 
-        constexpr double sideway_distance = 10.0;
-        constexpr double forward_distance = 150.0;
-        constexpr double min_z = -10.0;
-        constexpr double max_z = 100.0;
-        constexpr double angle = vsg::radians(90.0f);
-        auto dir = lookAt->center - lookAt->eye;
-        dir.z = 0.0;
-        dir = vsg::normalize(dir);
-        vsg::dvec3 left_sideway_dir;
-        left_sideway_dir.x = dir.x * std::cos(angle) - dir.y * std::sin(angle);
-        left_sideway_dir.y = dir.x * std::sin(angle) + dir.y * std::cos(angle);
-        left_sideway_dir.z = 0.0;
-        vsg::dvec3 right_sideway_dir = -left_sideway_dir;
-        auto eye = lookAt->eye;
-        eye.z = 0.0;
-        shadow_region->points[0] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        shadow_region->points[1] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        shadow_region->points[2] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        shadow_region->points[3] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        shadow_region->points[4] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        shadow_region->points[5] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        shadow_region->points[6] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        shadow_region->points[7] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        // constexpr double sideway_distance = 10.0;
+        // constexpr double forward_distance = 150.0;
+        // constexpr double min_z = -10.0;
+        // constexpr double max_z = 100.0;
+        // constexpr double angle = vsg::radians(90.0f);
+        // auto dir = lookAt->center - lookAt->eye;
+        // dir.z = 0.0;
+        // dir = vsg::normalize(dir);
+        // vsg::dvec3 left_sideway_dir;
+        // left_sideway_dir.x = dir.x * std::cos(angle) - dir.y * std::sin(angle);
+        // left_sideway_dir.y = dir.x * std::sin(angle) + dir.y * std::cos(angle);
+        // left_sideway_dir.z = 0.0;
+        // vsg::dvec3 right_sideway_dir = -left_sideway_dir;
+        // auto eye = lookAt->eye;
+        // eye.z = 0.0;
+        // shadow_region->points[0] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        // shadow_region->points[1] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        // shadow_region->points[2] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        // shadow_region->points[3] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
+        // shadow_region->points[4] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        // shadow_region->points[5] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        // shadow_region->points[6] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        // shadow_region->points[7] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
 
         viewer->handleEvents();
         viewer->update();
@@ -329,7 +329,7 @@ void RouteViewer::initCamera()
 {
     constexpr vsg::dvec3 center(0.0, 1100.0, 0.0);
     constexpr double radius = 100.0;
-    constexpr double nearFarRatio = 0.0005;
+    constexpr double nearFarRatio = 0.001;
 
     double windowWidth = static_cast<double>(window->extent2D().width);
     double windowHeight = static_cast<double>(window->extent2D().height);
@@ -354,18 +354,41 @@ void RouteViewer::initLights()
         deviceFeatures->get().samplerAnisotropy = VK_TRUE;
         deviceFeatures->get().depthClamp = VK_TRUE;
 
-    auto numShadowMapsPerLight = 8;
-    shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
+    auto numShadowMapsPerLight = 3;
+    // shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
 
-    shadow_region = vsg::RegionOfInterest::create();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
-    shadow_region->points.emplace_back();
+    auto shaderHints = vsg::ShaderCompileSettings::create();
+
+    float penumbraRadius = 0.005f;
+    shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
+
+    auto rasterizationState = vsg::RasterizationState::create();
+    rasterizationState->depthClampEnable = VK_TRUE;
+
+    auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
+    pbr->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    pbr->defaultShaderHints = shaderHints;
+    pbr->variants.clear();
+
+    auto phong = options->shaderSets["phong"] = vsg::createPhongShaderSet(options);
+    phong->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    phong->defaultShaderHints = shaderHints;
+    phong->variants.clear();
+
+    auto flat = options->shaderSets["flat"] = vsg::createPhysicsBasedRenderingShaderSet(options);
+    flat->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    flat->defaultShaderHints = shaderHints;
+    flat->variants.clear();
+
+    // shadow_region = vsg::RegionOfInterest::create();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
+    // shadow_region->points.emplace_back();
 
     // root->addChild(shadow_region);
 
@@ -378,20 +401,8 @@ void RouteViewer::initLights()
 
     sun = vsg::DirectionalLight::create();
     sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
-    sun->intensity = 1000.0f;
-    float dist = 1000.0f;
-    float rad = vsg::PIf / 180.0f;
-    float x = dist * std::cosf(theta * rad) * std::sinf(psi * rad);
-    float y = dist * std::cosf(theta * rad) * std::cosf(psi * rad);
-    float z = dist * std::sinf(theta * rad);
-
-    vsg::vec3 pos(x, y, z);
-    // sun->position.set(x, y, z);
-
-    float length = vsg::length(pos);
-    vsg::vec3 sunDir = pos;
-    sunDir *= (-1.0f / length);
-    sun->direction = sunDir;
+    sun->intensity = 1.0f;
+    sun->direction = vsg::normalize(vsg::vec3(1.0f, 1.0f, -1.0f));
     sun->shadowSettings = shadowSettings;
 
     root->addChild(ambient);
@@ -402,12 +413,12 @@ void RouteViewer::initView()
 {
     constexpr double maxShadowDistance = 1e8;
     constexpr double shadowMapBias = 0.005;
-    constexpr double lambda = 0.5;
+    constexpr double lambda = 0.25;
 
     view = vsg::View::create();
     view->camera = camera;
     view->viewDependentState->maxShadowDistance = maxShadowDistance;
-    view->viewDependentState->shadowMapBias = shadowMapBias;
+    // view->viewDependentState->shadowMapBias = shadowMapBias;
     view->viewDependentState->lambda = lambda;
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
     view->addChild(root);
@@ -556,7 +567,7 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
 
-    viewer->addEventHandler(traffic_lights_handler);
+    // viewer->addEventHandler(traffic_lights_handler);
 
     viewer->update();
     viewer->compile();
