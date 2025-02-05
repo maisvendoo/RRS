@@ -69,6 +69,7 @@ public:
     QSpacerItem *sTrajectoryHeaderRight;
     QComboBox   *cbTrajectoryNameSelect;
     QComboBox   *cbTrajectoryDirectionSelect;
+    QLabel      *lTrajectoryCoordinateText;
     QDoubleSpinBox  *dsbTrajectoryCoordinate;
 
     // Информация о поездах и маршрутах

@@ -97,12 +97,17 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     cbTrajectoryNameSelect = new QComboBox(this);
     cbTrajectoryDirectionSelect = new QComboBox(this);
     cbTrajectoryDirectionSelect->setFixedWidth(80);
+    lTrajectoryCoordinateText = new QLabel(this);
+    lTrajectoryCoordinateText->setText(tr("Trajectory coordinate:"));
+    lTrajectoryCoordinateText->setFixedWidth(120);
     dsbTrajectoryCoordinate = new QDoubleSpinBox(this);
+    dsbTrajectoryCoordinate->setFixedWidth(80);
     dsbTrajectoryCoordinate->setMaximum(40000000.0);
     dsbTrajectoryCoordinate->setDecimals(2);
 
     hblTrajpointConfig->addWidget(cbTrajectoryNameSelect);
     hblTrajpointConfig->addWidget(cbTrajectoryDirectionSelect);
+    hblTrajpointConfig->addWidget(lTrajectoryCoordinateText);
     hblTrajpointConfig->addWidget(dsbTrajectoryCoordinate);
     vblTrajpoint->addLayout(hblTrajpointConfig);
     hblLine2->addLayout(vblTrajpoint);

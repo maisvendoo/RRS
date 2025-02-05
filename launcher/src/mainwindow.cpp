@@ -852,7 +852,7 @@ void MainWindow::slotRouteSelection()
     fwd_train_positions = &routes_info[route_idx].fwd_train_positions;
     bwd_train_positions = &routes_info[route_idx].bwd_train_positions;
 
-    ui->pbAddTrain->setEnabled(ui->lwTrains->currentRow() >= 0);
+    ui->pbAddTrain->setEnabled(true);
 }
 
 //------------------------------------------------------------------------------
@@ -877,10 +877,6 @@ void MainWindow::slotAddActiveTrain()
     if (ui->lwRoutes->currentRow() < 0)
         return;
 
-    int train_idx = ui->lwTrains->currentRow();
-    if (train_idx < 0)
-        return;
-
     TrainWaypointWidget *tww = new TrainWaypointWidget(&trains_info,
                                                        trajectrories,
                                                        fwd_train_positions,
@@ -889,7 +885,9 @@ void MainWindow::slotAddActiveTrain()
                                                        &icon_cancel,
                                                        &icon_warn,
                                                        this);
-    if (tww->cbTrainConfigSelect->count() > train_idx)
+
+    int train_idx = ui->lwTrains->currentRow();
+    if ((tww->cbTrainConfigSelect->count() > train_idx) && (train_idx >= 0))
         tww->cbTrainConfigSelect->setCurrentIndex(train_idx + 1);
 
     int new_item_idx = tbActiveTrains->addItem(tww, tww->getTrainName());
