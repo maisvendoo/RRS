@@ -22,52 +22,78 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
 {
     setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
+    // Структура расположения элементов
     vblLines = new QVBoxLayout(this);
-    hblLine1header = new QHBoxLayout();
-    hblLine1content = new QHBoxLayout();
-    hblLine2header = new QHBoxLayout();
-    hblLine2content = new QHBoxLayout();
 
-    lTrainConfigSelectIcon = new QLabel(this);
-    lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
-    lTrainConfigSelectText = new QLabel(this);
-    lTrainConfigSelectText->setText(tr("Train selection:"));
-    sLine1headerMiddle = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
-    lWaypointSelectIcon = new QLabel(this);
-    lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
-    lWaypointSelectText = new QLabel(this);
-    lWaypointSelectText->setText(tr("Route's predefined start waypoints:"));
-    sLine1headerRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+    hblLine1 = new QHBoxLayout();
+    hblLine2 = new QHBoxLayout();
 
-    hblLine1header->addWidget(lTrainConfigSelectIcon);
-    hblLine1header->addWidget(lTrainConfigSelectText);
-    hblLine1header->addItem(sLine1headerMiddle);
-    hblLine1header->addWidget(lWaypointSelectIcon);
-    hblLine1header->addWidget(lWaypointSelectText);
-    hblLine1header->addItem(sLine1headerRight);
-    vblLines->addLayout(hblLine1header);
+    vblTrain = new QVBoxLayout(this);
+    vblWaypoint = new QVBoxLayout(this);
+    vblTrajpoint = new QVBoxLayout(this);
 
+    hblTrainHeader = new QHBoxLayout();
+    hblTrainConfig = new QHBoxLayout();
+    hblWaypointHeader = new QHBoxLayout();
+    hblWaypointConfig = new QHBoxLayout();
+    hblTrajpointHeader = new QHBoxLayout();
+    hblTrajpointConfig = new QHBoxLayout();
+
+    // Заголовок к настройке поезда
+    lTrainHeaderIcon = new QLabel(this);
+    lTrainHeaderIcon->setPixmap(icon_cancel->pixmap(16));
+    lTrainHeaderText = new QLabel(this);
+    lTrainHeaderText->setText(tr("Train selection:"));
+    sTrainHeaderRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+
+    hblTrainHeader->addWidget(lTrainHeaderIcon);
+    hblTrainHeader->addWidget(lTrainHeaderText);
+    hblTrainHeader->addItem(sTrainHeaderRight);
+    vblTrain->addLayout(hblTrainHeader);
+
+    // Настройка поезда
     cbTrainConfigSelect = new QComboBox(this);
+
+    hblTrainConfig->addWidget(cbTrainConfigSelect);
+    vblTrain->addLayout(hblTrainConfig);
+    hblLine1->addLayout(vblTrain);
+
+    // Заголовок к настройке предустановленных стартовых точек
+    lWaypointHeaderIcon = new QLabel(this);
+    lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
+    lWaypointHeaderText = new QLabel(this);
+    lWaypointHeaderText->setText(tr("Route's predefined start waypoints:"));
+    sWaypointHeaderRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+
+    hblWaypointHeader->addWidget(lWaypointHeaderIcon);
+    hblWaypointHeader->addWidget(lWaypointHeaderText);
+    hblWaypointHeader->addItem(sWaypointHeaderRight);
+    vblWaypoint->addLayout(hblWaypointHeader);
+
+    // Настройка предустановленных стартовых точек
     cbWaypointDirectionSelect = new QComboBox(this);
     cbWaypointDirectionSelect->setFixedWidth(80);
     cbWaypointSelect = new QComboBox(this);
 
-    hblLine1content->addWidget(cbTrainConfigSelect);
-    hblLine1content->addWidget(cbWaypointDirectionSelect);
-    hblLine1content->addWidget(cbWaypointSelect);
-    vblLines->addLayout(hblLine1content);
+    hblWaypointConfig->addWidget(cbWaypointDirectionSelect);
+    hblWaypointConfig->addWidget(cbWaypointSelect);
+    vblWaypoint->addLayout(hblWaypointConfig);
+    hblLine1->addLayout(vblWaypoint);
+    vblLines->addLayout(hblLine1);
 
-    lTrajectoryPointSelectIcon = new QLabel(this);
-    lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
-    lTrajectoryPointSelectText = new QLabel(this);
-    lTrajectoryPointSelectText->setText(tr("Configuration of the start point:"));
-    sLine2headerRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
+    // Заголовок к настройке стартовой точки на траектории
+    lTrajectoryHeaderIcon = new QLabel(this);
+    lTrajectoryHeaderIcon->setPixmap(icon_cancel->pixmap(16));
+    lTrajectoryHeaderText = new QLabel(this);
+    lTrajectoryHeaderText->setText(tr("Configuration of the start point:"));
+    sTrajectoryHeaderRight = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding);
 
-    hblLine2header->addWidget(lTrajectoryPointSelectIcon);
-    hblLine2header->addWidget(lTrajectoryPointSelectText);
-    hblLine2header->addItem(sLine2headerRight);
-    vblLines->addLayout(hblLine2header);
+    hblTrajpointHeader->addWidget(lTrajectoryHeaderIcon);
+    hblTrajpointHeader->addWidget(lTrajectoryHeaderText);
+    hblTrajpointHeader->addItem(sTrajectoryHeaderRight);
+    vblTrajpoint->addLayout(hblTrajpointHeader);
 
+    // Настройка стартовой точки на траектории
     cbTrajectoryNameSelect = new QComboBox(this);
     cbTrajectoryDirectionSelect = new QComboBox(this);
     cbTrajectoryDirectionSelect->setFixedWidth(80);
@@ -75,10 +101,12 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     dsbTrajectoryCoordinate->setMaximum(40000000.0);
     dsbTrajectoryCoordinate->setDecimals(2);
 
-    hblLine2content->addWidget(cbTrajectoryNameSelect);
-    hblLine2content->addWidget(cbTrajectoryDirectionSelect);
-    hblLine2content->addWidget(dsbTrajectoryCoordinate);
-    vblLines->addLayout(hblLine2content);
+    hblTrajpointConfig->addWidget(cbTrajectoryNameSelect);
+    hblTrajpointConfig->addWidget(cbTrajectoryDirectionSelect);
+    hblTrajpointConfig->addWidget(dsbTrajectoryCoordinate);
+    vblTrajpoint->addLayout(hblTrajpointConfig);
+    hblLine2->addLayout(vblTrajpoint);
+    vblLines->addLayout(hblLine2);
 
     setDirectionSelectWidget();
     setTrainSelectWidget();
@@ -213,9 +241,9 @@ void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
         is_train_config_selected = is_selected;
 
         if (is_train_config_selected)
-            lTrainConfigSelectIcon->setPixmap(icon_ok->pixmap(16));
+            lTrainHeaderIcon->setPixmap(icon_ok->pixmap(16));
         else
-            lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
+            lTrainHeaderIcon->setPixmap(icon_cancel->pixmap(16));
     }
 
     emit activeTrainChanged();
@@ -254,10 +282,12 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
         is_trajectory_selected = is_selected;
 
         if (is_trajectory_selected)
-            lTrajectoryPointSelectIcon->setPixmap(icon_ok->pixmap(16));
+            lTrajectoryHeaderIcon->setPixmap(icon_ok->pixmap(16));
         else
-            lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
+            lTrajectoryHeaderIcon->setPixmap(icon_cancel->pixmap(16));
     }
+
+    emit activeTrainChanged();
 
     int waypoint_idx = cbWaypointSelect->currentIndex();
     train_position_t tp;
@@ -267,10 +297,8 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
     if (cbTrajectoryNameSelect->currentText() != tp.trajectory_name)
     {
         cbWaypointSelect->setCurrentIndex(0);
-        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+        lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
     }
-
-    emit activeTrainChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -289,7 +317,7 @@ void TrainWaypointWidget::slotTrajectoryDirectionChange(int dir_idx)
     if (dir_idx != ((tp.direction > 0) ? 0 : 1))
     {
         cbWaypointSelect->setCurrentIndex(0);
-        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+        lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
     }
 
     emit activeTrainChanged();
@@ -311,7 +339,7 @@ void TrainWaypointWidget::slotTrajectoryCoordinateChange(double coord)
     if (abs(traj_coord - tp.traj_coord) > 0.5)
     {
         cbWaypointSelect->setCurrentIndex(0);
-        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+        lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
     }
 
     emit activeTrainChanged();
@@ -345,7 +373,7 @@ void TrainWaypointWidget::setTrainSelectWidget()
         cbTrainConfigSelect->addItem(train.train_title);
     }
     cbTrainConfigSelect->setCurrentIndex(0);
-    lTrainConfigSelectIcon->setPixmap(icon_cancel->pixmap(16));
+    lTrainHeaderIcon->setPixmap(icon_cancel->pixmap(16));
 
     if (is_train_config_selected)
     {
@@ -377,7 +405,7 @@ void TrainWaypointWidget::setWaypointSelectWidget()
         }
     }
     cbWaypointSelect->setCurrentIndex(0);
-    lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+    lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
 }
 
 //------------------------------------------------------------------------------
@@ -393,7 +421,7 @@ void TrainWaypointWidget::setTrajectorySelectWidget()
         cbTrajectoryNameSelect->addItem(traj.name);
     }
     cbTrajectoryNameSelect->setCurrentIndex(0);
-    lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
+    lTrajectoryHeaderIcon->setPixmap(icon_cancel->pixmap(16));
 
     if (is_trajectory_selected)
     {
@@ -413,7 +441,7 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     if (traj_idx == -1)
     {
         cbTrajectoryNameSelect->setCurrentIndex(0);
-        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+        lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
 
         if (is_trajectory_selected)
         {
@@ -427,12 +455,12 @@ void TrainWaypointWidget::setTrajectorySelectWidgets(train_position_t tp)
     cbTrajectoryDirectionSelect->setCurrentIndex((tp.direction > 0) ? 0 : 1);
     dsbTrajectoryCoordinate->setValue(tp.traj_coord);
 
-    lWaypointSelectIcon->setPixmap(icon_ok->pixmap(16));
+    lWaypointHeaderIcon->setPixmap(icon_ok->pixmap(16));
 
     if (!is_trajectory_selected)
     {
         is_trajectory_selected = true;
-        lTrajectoryPointSelectIcon->setPixmap(icon_ok->pixmap(16));
+        lTrajectoryHeaderIcon->setPixmap(icon_ok->pixmap(16));
         emit activeTrainChanged();
     }
 
@@ -450,7 +478,7 @@ void TrainWaypointWidget::resetTrajectorySelectWidgets()
     if (is_trajectory_selected)
     {
         is_trajectory_selected = false;
-        lTrajectoryPointSelectIcon->setPixmap(icon_cancel->pixmap(16));
+        lTrajectoryHeaderIcon->setPixmap(icon_cancel->pixmap(16));
         emit activeTrainChanged();
     }
 }
@@ -462,7 +490,7 @@ bool TrainWaypointWidget::getCurrentWaypoint(int waypoint_idx, train_position_t 
 {
     if (waypoint_idx <= 0)
     {
-        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+        lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
         return false;
     }
 
@@ -475,7 +503,7 @@ bool TrainWaypointWidget::getCurrentWaypoint(int waypoint_idx, train_position_t 
     if (waypoint_idx > train_positions->size())
     {
         cbWaypointSelect->setCurrentIndex(0);
-        lWaypointSelectIcon->setPixmap(icon_warn->pixmap(16));
+        lWaypointHeaderIcon->setPixmap(icon_warn->pixmap(16));
         return false;
     }
 

@@ -33,36 +33,51 @@ public:
 
     ~TrainWaypointWidget();
 
+    // Структура расположения элементов
     QVBoxLayout *vblLines;
-    QHBoxLayout *hblLine1header;
-    QHBoxLayout *hblLine1content;
-    QHBoxLayout *hblLine2header;
-    QHBoxLayout *hblLine2content;
 
-    QLabel      *lTrainConfigSelectIcon;
-    QLabel      *lTrainConfigSelectText;
-    QSpacerItem *sLine1headerMiddle;
-    QLabel      *lWaypointSelectIcon;
-    QLabel      *lWaypointSelectText;
-    QSpacerItem *sLine1headerRight;
+    QHBoxLayout *hblLine1;
+    QHBoxLayout *hblLine2;
 
+    QVBoxLayout *vblTrain;
+    QVBoxLayout *vblWaypoint;
+    QVBoxLayout *vblTrajpoint;
+
+    QHBoxLayout *hblTrainHeader;
+    QHBoxLayout *hblTrainConfig;
+    QHBoxLayout *hblWaypointHeader;
+    QHBoxLayout *hblWaypointConfig;
+    QHBoxLayout *hblTrajpointHeader;
+    QHBoxLayout *hblTrajpointConfig;
+
+    // Заголовок и настройка поезда
+    QLabel      *lTrainHeaderIcon;
+    QLabel      *lTrainHeaderText;
+    QSpacerItem *sTrainHeaderRight;
     QComboBox   *cbTrainConfigSelect;
+
+    // Заголовок и настройка предустановленных стартовых точек
+    QLabel      *lWaypointHeaderIcon;
+    QLabel      *lWaypointHeaderText;
+    QSpacerItem *sWaypointHeaderRight;
     QComboBox   *cbWaypointDirectionSelect;
     QComboBox   *cbWaypointSelect;
 
-    QLabel      *lTrajectoryPointSelectIcon;
-    QLabel      *lTrajectoryPointSelectText;
-    QSpacerItem *sLine2headerRight;
-
+    // Заголовок и настройка стартовой точки на траектории
+    QLabel      *lTrajectoryHeaderIcon;
+    QLabel      *lTrajectoryHeaderText;
+    QSpacerItem *sTrajectoryHeaderRight;
     QComboBox   *cbTrajectoryNameSelect;
     QComboBox   *cbTrajectoryDirectionSelect;
     QDoubleSpinBox  *dsbTrajectoryCoordinate;
 
+    // Информация о поездах и маршрутах
     std::vector<train_info_t>       *trains_info;
     std::vector<trajectory_info_t>  *trajectrories;
     std::vector<train_position_t>   *fwd_train_positions;
     std::vector<train_position_t>   *bwd_train_positions;
 
+    // Иконки
     QIcon *icon_ok;
     QIcon *icon_cancel;
     QIcon *icon_warn;
