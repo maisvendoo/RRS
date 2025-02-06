@@ -12,11 +12,9 @@
 //------------------------------------------------------------------------------
 struct tcp_config_t
 {
-    tcp_config_t();
-
-    QString host_addr;
-    quint16 port;
-    int reconnect_interval;
+    QString host_addr = "127.0.0.1";
+    quint16 port = 1992;
+    int reconnect_interval = 100;
 };
 
 //------------------------------------------------------------------------------

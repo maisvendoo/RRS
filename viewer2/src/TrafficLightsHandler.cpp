@@ -5,7 +5,7 @@
 #include "filesystem.h"
 #include <cstdint>
 #include <filesystem>
-#include <osg/MatrixTransform>
+// #include <osg/MatrixTransform>
 #include <qbuffer.h>
 #include <qflags.h>
 #include <qstringview.h>
