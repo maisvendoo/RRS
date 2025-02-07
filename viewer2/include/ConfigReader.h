@@ -14,11 +14,14 @@ public:
     ConfigReader(const std::string& path);
 
     void setSection(const std::string& section);
+    void setSection(const pugi::xml_node& section);
 
     void getValue(const std::string& param, std::string& value);
 
     template <typename T>
     void getValue(const std::string& param, T& value);
+
+    const pugi::xml_node& getConfigSection() const;
 
 private:
     std::string getStringValue(const std::string& param);
@@ -26,6 +29,7 @@ private:
 private:
     std::string path;
     pugi::xml_document doc;
+    pugi::xml_node config_section;
     pugi::xml_node current_section;
 };
 

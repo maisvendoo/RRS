@@ -6,24 +6,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation::ProcAnimation()
-    : pos(0.0f)
-    , duration(0.0f)
-    , signal_id(0)
-    , transform(nullptr)
-    , name("")
-{
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 ProcAnimation::ProcAnimation(const std::string& name)
-    : pos(0.0f)
-    , duration(0.0f)
-    , signal_id(0)
-    , transform(nullptr)
-    , name(name)
+    : name(name)
 {
 }
 
@@ -31,11 +15,7 @@ ProcAnimation::ProcAnimation(const std::string& name)
 //
 //------------------------------------------------------------------------------
 ProcAnimation::ProcAnimation(osg::MatrixTransform* transform)
-    : pos(0.0f)
-    , duration(0.0f)
-    , signal_id(0)
-    , transform(transform)
-    , name("")
+    : transform(transform)
     , is_fixed_signal(false)
     , fixed_signal(0.0f)
 {
@@ -113,15 +93,6 @@ void ProcAnimation::setPosition(float pos)
 size_t ProcAnimation::getSignalID() const
 {
     return signal_id;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-ProcAnimation::key_point_t::key_point_t()
-    : param(0.0f)
-    , value(0.0f)
-{
 }
 
 //------------------------------------------------------------------------------

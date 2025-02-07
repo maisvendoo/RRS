@@ -4,31 +4,27 @@
 #include <string>
 #include <vector>
 
-namespace osg
-{
-    class MatrixTransform;
-};
+#include <cstddef>
 
 class ConfigReader;
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
+namespace vsg
+{
+    class MatrixTransform;
+}
+
 class ProcAnimation
 {
 public:
-
     ProcAnimation() = default;
     ProcAnimation(const std::string& name);
-    ProcAnimation(osg::MatrixTransform* transform);
+    ProcAnimation(vsg::MatrixTransform* transform);
 
-    virtual ~ProcAnimation();
+    virtual ~ProcAnimation() = default;
 
     void step(float t, float dt);
 
-    void setName(const std::string& name);
-
-    const std::string& getName() const;
+    std::string name = "";
 
     bool load(const std::string& path);
 
@@ -36,10 +32,9 @@ public:
 
     void setPosition(float pos);
 
-    size_t getSignalID() const;
+    std::size_t getSignalID() const;
 
 protected:
-
     struct key_point_t
     {
         float param = 0.0f;
@@ -49,10 +44,9 @@ protected:
     float pos = 0.0f;
     float duration = 0.0f;
 
-    size_t signal_id = 0;
+    std::size_t signal_id = 0;
 
-    osg::MatrixTransform* transform = nullptr;
-    std::string name = "";
+    vsg::MatrixTransform* transform = nullptr;
 
     bool is_fixed_signal;
     float fixed_signal;
@@ -68,7 +62,7 @@ protected:
 private:
     bool loadKeyPoints(ConfigReader& cfg);
 
-    key_point_t findBeginKeyPoint(float value, size_t& next_idx);
+    key_point_t findBeginKeypoint(float value, std::size_t& next_idx);
 };
 
 #endif // PROC_ANIMATION_H

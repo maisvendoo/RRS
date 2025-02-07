@@ -7,8 +7,6 @@
 
 ConfigReader::ConfigReader(const std::string& path)
     : path(path)
-    , doc()
-    , current_section()
 {
     pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (!result)
@@ -16,6 +14,8 @@ ConfigReader::ConfigReader(const std::string& path)
         LOG_ERROR("Failed to open config file %s", path.c_str());
         throw 1;
     }
+
+    config_section = doc.child("Config");
 }
 
 void ConfigReader::setSection(const std::string& section)
@@ -29,6 +29,11 @@ void ConfigReader::setSection(const std::string& section)
     }
 }
 
+void ConfigReader::setSection(const pugi::xml_node& section)
+{
+    current_section = section;
+}
+
 void ConfigReader::getValue(const std::string& param, std::string& value)
 {
     std::string string_value = getStringValue(param);
@@ -36,6 +41,11 @@ void ConfigReader::getValue(const std::string& param, std::string& value)
     {
         value = string_value;
     }
+}
+
+const pugi::xml_node& ConfigReader::getConfigSection() const
+{
+    return config_section;
 }
 
 std::string ConfigReader::getStringValue(const std::string& param)

@@ -1,6 +1,7 @@
 #ifndef TRAFFIC_LIGHT_H
 #define TRAFFIC_LIGHT_H
 
+#include "animations-list.h"
 #include "signal-types.h"
 #include <qcontainerfwd.h>
 #include <QString>
@@ -26,10 +27,9 @@ public:
     const vsg::vec3& getRight() const;
     const vsg::vec3& getUp() const;
 
-    // void setNode(vsg::ref_ptr<vsg::Node> node)
-    // {
-    //     this->node = node;
-    // }
+    void setNode(vsg::ref_ptr<vsg::Node> node);
+
+    void load_animation(const std::string& animations_dir);
 
 private:
     QString connector_name = "";
@@ -44,7 +44,8 @@ private:
     vsg::vec3 right;
     vsg::vec3 up;
 
-    // vsg::ref_ptr<vsg::Node> node;
+    vsg::ref_ptr<vsg::Node> node;
+    animations_t animations;
 };
 
 #endif // TRAFFIC_LIGHT_H

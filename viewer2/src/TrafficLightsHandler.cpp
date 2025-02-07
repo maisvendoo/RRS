@@ -186,6 +186,9 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     pagedLOD->filename = models_path + '/' + tl->getModelName().toStdString() + ".gltf";
     pagedLOD->options = options;
 
+    tl->setNode(pagedLOD);
+    // tl.lo
+
     int sd = tl->getSignalDirection();
 
     auto m1 = vsg::translate(tl->getPosition());

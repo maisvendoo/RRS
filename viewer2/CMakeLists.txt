@@ -30,12 +30,11 @@ find_package(vsgXchange REQUIRED)
 
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 
-add_library(pugixml STATIC IMPORTED)
-
-if(WIN32)
+if (WIN32)
+    add_library(pugixml STATIC IMPORTED)
     set_target_properties(pugixml PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/dependencies/pugixml.lib)
 else()
-    # set_target_properties(pugixml PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/dependencies/pugixml.lib)
+    find_package(pugixml REQUIRED)
 endif()
 
 add_executable(${TARGET} ${TARGET_SOURCES})

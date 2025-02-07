@@ -72,3 +72,12 @@ const vsg::vec3& TrafficLight::getUp() const
     return up;
 }
 
+void TrafficLight::setNode(vsg::ref_ptr<vsg::Node> node)
+{
+    this->node = node;
+}
+
+void TrafficLight::load_animation(const std::string& animations_dir)
+{
+
+}
