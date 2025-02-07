@@ -1000,6 +1000,10 @@ void MainWindow::slotSaveStartConfig()
     QString start_cfg_dir_path = route_dir_path + QDir::separator() +
                                  "topology" + QDir::separator() +
                                  "start-configurations";
+    QDir start_cfg_dir(start_cfg_dir_path);
+    if (!start_cfg_dir.exists())
+        start_cfg_dir.mkpath(start_cfg_dir_path);
+
     QString start_cfg_file_path = start_cfg_dir_path + QDir::separator() +
                                   file_name + ".xml";
     CfgEditor editor;
