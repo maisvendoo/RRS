@@ -12,24 +12,22 @@
  * \date 09/01/2020
  */
 
+#include    <cstdio>
 #include    "asound-log.h"
-#include    <QDir>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LogFileHandler::LogFileHandler(const std::string &file)
+LogFileHandler::LogFileHandler(const std::string &dir, const std::string &file)
 {
-    QString logs_dir = "../logs/";
-    QString fname = QDir::toNativeSeparators(logs_dir) + QString::fromStdString(file);
+    std::string backup_prefix = "~previous-";
+    std::string log_file = dir + file;
+    std::string log_backup = dir + backup_prefix + file;
 
-    file_ = new QFile();
+    std::remove(log_backup.c_str());
+    std::rename(log_file.c_str(), log_backup.c_str());
 
-    file_->setFileName(fname);
-
-    canDo_ = file_->exists();
-
-    log_.open(fname.toStdString());
+    log_.open(log_file.c_str());
 }
 
 //------------------------------------------------------------------------------
@@ -45,6 +43,5 @@ LogFileHandler::~LogFileHandler()
 //------------------------------------------------------------------------------
 void LogFileHandler::notify(const std::string msg)
 {
-    if (canDo_)
-        log_ << msg << std::endl;
+    log_ << msg << std::endl;
 }

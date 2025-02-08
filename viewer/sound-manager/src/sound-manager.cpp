@@ -26,14 +26,14 @@ SoundManager::~SoundManager()
 void SoundManager::init()
 {
     // Инициализируем лог-файл
-    log_ = new LogFileHandler("asound.log");
+    FileSystem &fs = FileSystem::getInstance();
+    log_ = new LogFileHandler(fs.getLogsDir() + fs.separator(), "asound.log");
     log_->notify("========================== SoundManager initialization ==========================");
 
     // Загрузка конфиг-файла
     double tmp_volume = 1.0;
     int tmp_max_sources = 65535;
 
-    FileSystem &fs = FileSystem::getInstance();
     QString cfg_path = QString(fs.getConfigDir().c_str()) + fs.separator() + "sound-settings.xml";
     CfgReader cfg;
 

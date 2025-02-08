@@ -193,7 +193,7 @@ bool RouteViewer::init(int argc, char *argv[])
 
     osg::setNotifyLevel(level);
     std::string logs_path = fs.getLogsDir();
-    osg::setNotifyHandler(new ViewerLogFileHandler(logs_path + fs.separator() + "viewer.log"));
+    osg::setNotifyHandler(new ViewerLogFileHandler(logs_path + fs.separator(), "viewer.log"));
 
     OSG_FATAL << "Override settings from command line" << std::endl;
     // Parse command line

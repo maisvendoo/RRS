@@ -665,7 +665,8 @@ void MainWindow::startSimulator()
         return;
     }
 
-    slotUpdateActiveTrains();
+    bool reset_start_config = false;
+    slotUpdateActiveTrains(reset_start_config);
     if (active_trains.empty())
     {
         return;

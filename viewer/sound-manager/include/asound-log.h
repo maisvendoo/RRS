@@ -16,20 +16,20 @@
 #define ASOUNDLOG_H
 
 #include    <fstream>
-#include    <QTimer>
-#include    <QFile>
+#include    <QObject>
 
 class LogFileHandler : public QObject
 {   
 public:
 
     /// Constructor
-    LogFileHandler(const std::string &file);
+    LogFileHandler(const std::string &dir, const std::string &file);
 
     /// Destructor
     virtual ~LogFileHandler();
 
 public slots:
+
     /// Log message handler
     virtual void notify(const std::string msg);
 
@@ -37,15 +37,6 @@ protected:
 
     /// Log output stream
     std::ofstream log_;
-
-
-private:
-
-    /// File opened flag
-    bool canDo_;
-
-    /// Log file
-    QFile* file_;
 };
 
 #endif // ASOUNDLOG_H

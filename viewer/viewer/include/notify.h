@@ -30,7 +30,7 @@ class ViewerLogFileHandler : public osg::NotifyHandler
 public:
 
     /// Constructor
-    ViewerLogFileHandler(const std::string &file);
+    ViewerLogFileHandler(const std::string &dir, const std::string &file);
 
     /// Destructor
     virtual ~ViewerLogFileHandler();
