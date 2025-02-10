@@ -12,14 +12,22 @@
  * \date 12/12/2018
  */
 
+#include    <cstdio>
 #include    "notify.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ViewerLogFileHandler::ViewerLogFileHandler(const std::string &file)
+ViewerLogFileHandler::ViewerLogFileHandler(const std::string &dir, const std::string &file)
 {
-    log.open(file.c_str());
+    std::string backup_prefix = "~previous-";
+    std::string log_file = dir + file;
+    std::string log_backup = dir + backup_prefix + file;
+
+    std::remove(log_backup.c_str());
+    std::rename(log_file.c_str(), log_backup.c_str());
+
+    log.open(log_file.c_str());
 }
 
 //------------------------------------------------------------------------------

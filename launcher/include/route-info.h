@@ -15,7 +15,11 @@
 #ifndef     ROUTEINFO_H
 #define     ROUTEINFO_H
 
-#include    <QString>
+#include    <trajectory-info.h>
+#include    <waypoint.h>
+#include    <start-config.h>
+
+#include    "train-waypoint-widget.h"
 
 //------------------------------------------------------------------------------
 //
@@ -23,21 +27,37 @@
 struct route_info_t
 {
     /// Route directory path
-    QString route_dir_full_path;
+    QString route_dir_full_path = "";
     /// Route directory name
-    QString route_dir_name;
+    QString route_dir_name = "";
     /// Route name
-    QString route_title;
+    QString route_title = "";
     /// Route description
-    QString route_description;
+    QString route_description = "";
+
+    /// Info about waypoints in route
+    std::vector<train_position_t> fwd_train_positions;
+    /// Info about waypoints in route
+    std::vector<train_position_t> bwd_train_positions;
+    /// Info about trajectories in route
+    std::vector<trajectory_info_t>   trajectrories;
+    /// Info about start configurations in route
+    std::vector<start_config_t>   start_configs;
+
+    /// Saved last start config index
+    int last_start_config = 0;
+    /// Saved last trains and its start waypoints
+    std::vector<TrainWaypointWidget *> last_train_waypoints = {};
 
     route_info_t()
-        : route_dir_full_path("")
-        , route_dir_name("")
-        , route_title("")
-        , route_description("")
     {
 
+    }
+
+    ~route_info_t()
+    {
+        for (auto ltw : last_train_waypoints)
+            delete ltw;
     }
 };
 

@@ -4,6 +4,7 @@
 #include    <QMainWindow>
 #include    <QTimer>
 
+#include    "command-line.h"
 #include    <tcp-client.h>
 #include    <topology.h>
 #include    <simulator-info-struct.h>
@@ -21,13 +22,24 @@ QT_END_NAMESPACE
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct route_map_command_line_t
+{
+    /// Train configuration file name
+    option_t<QString>   host_addr;
+    /// Route directory
+    option_t<quint16>   port;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
 
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(route_map_command_line_t &cmd_line, QWidget *parent = nullptr);
 
     ~MainWindow();
 
@@ -51,22 +63,17 @@ private:
 
     std::vector<double> vehicles_half_length;
 
-    traj_list_t *traj_list = Q_NULLPTR;
-
-    conn_list_t *conn_list = Q_NULLPTR;
-
     MapWidget *map;
 
     signals_data_t *signals_data = new signals_data_t();
 
     void load_config(const QString &cfg_name);
 
-    /// Преобразование координат точки траекторри в координаты виджета
-    QPoint coord_transform(dvec3 traj_point);
+    void overrideByCommandLine(route_map_command_line_t &cmd_line);
 
     void paintEvent(QPaintEvent *event);
 
-private slots:    
+private slots:
 
     void slotConnectedToSimulator();
 

@@ -5,5 +5,8 @@
     <qresource prefix="/images">
         <file>images/RRS_logo.png</file>
         <file>images/RRS_logo.ico</file>
+        <file>images/1_ok.png</file>
+        <file>images/2_cancel.png</file>
+        <file>images/3_warn.png</file>
     </qresource>
 </RCC>

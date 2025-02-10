@@ -77,15 +77,11 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    if (folow_vehicle)
+    if (folow_vehicle && (!players_data->current_vehicles.empty()))
     {
-        int curr = 0;
-
         // Пока отслеживаем текущую ПЕ у самого первого подключенного вьювера
         // Следует придумать, как следить за ПЕ выбранного игрока, например себя
-        if (!players_data->current_vehicles.empty())
-            curr = players_data->current_vehicles[0];
-
+        int curr = players_data->current_vehicles[0];
         map_shift.setX(- train_data->vehicles[curr].position_y * scale);
         map_shift.setY(- train_data->vehicles[curr].position_x * scale);
     }
@@ -283,16 +279,16 @@ void MapWidget::drawConnector(Connector *conn)
             dvec3 fwd = center;
             QPoint fwd_point = center_point;
             track_t track_next = fwd_track;
-            size_t i = 1;
+            size_t i = 0;
             while (conn_length_fwd > 0.0)
             {
+                track_next = *(fwd_traj->getTracks().begin() + i);
                 fwd += track_next.orth * std::min(conn_length_fwd, track_next.len);
                 QPoint fwd_point_next = coord_transform(fwd);
                 painter.drawLine(fwd_point, fwd_point_next);
 
                 fwd_point = fwd_point_next;
                 conn_length_fwd = conn_length_fwd - track_next.len;
-                track_next = *(fwd_traj->getTracks().begin() + i);
                 ++i;
             }
 
@@ -340,6 +336,7 @@ void MapWidget::drawConnector(Connector *conn)
             size_t i = 1;
             while (conn_length_bwd > 0.0)
             {
+                track_next = *(bwd_traj->getTracks().end() - i);
                 bwd -= track_next.orth * std::min(conn_length_bwd, track_next.len);
                 QPoint bwd_point_next = coord_transform(bwd);
                 painter.drawLine(bwd_point, bwd_point_next);
@@ -347,14 +344,11 @@ void MapWidget::drawConnector(Connector *conn)
                 bwd_point = bwd_point_next;
                 conn_length_bwd = conn_length_bwd - track_next.len;
                 ++i;
-                track_next = *(bwd_traj->getTracks().end() - i);
             }
 
             painter.end();
         }
     }
-
-    painter.end();
 }
 
 //------------------------------------------------------------------------------

@@ -23,9 +23,7 @@ CommandLineParser::CommandLineParser(int argc, char *argv[])
 
     std::string value = "";
 
-    cmd_line.route_dir.is_present = args.read("--route", cmd_line.route_dir.value);
-    cmd_line.train_config.is_present = args.read("--train", cmd_line.train_config.value);
-    cmd_line.host_addr.is_present = args.read("--host-addr", cmd_line.host_addr.value);
+    cmd_line.host_addr.is_present = args.read("--host-address", cmd_line.host_addr.value);
 
     if (args.read("--port", value))
         cmd_line.port.is_present = getValue(value, cmd_line.port.value);
@@ -36,13 +34,7 @@ CommandLineParser::CommandLineParser(int argc, char *argv[])
     if (args.read("--height", value))
         cmd_line.height.is_present = getValue(value, cmd_line.height.value);
 
-    if (args.read("--direction", value))
-        cmd_line.direction.is_present = getValue(value, cmd_line.direction.value);
-
     cmd_line.fullscreen.is_present = cmd_line.fullscreen.value = args.read("--fullscreen", value);
-    cmd_line.localmode.is_present = cmd_line.localmode.value = args.read("--localmode", value);
-
-    cmd_line.notify_level.is_present = args.read("--notify-level", cmd_line.notify_level.value);
 }
 
 //------------------------------------------------------------------------------

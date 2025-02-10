@@ -3,7 +3,7 @@
 	<Client>
 		<HostAddr>127.0.0.1</HostAddr>
 		<port>1992</port>
-		<ReconnectInterval>100</ReconnectInterval>
+		<ReconnectInterval>500</ReconnectInterval>
 
 		<!-- Интервал обновления положений подвижного состава, мс -->
 		<VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>

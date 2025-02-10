@@ -36,6 +36,7 @@ bool TcpClient::init(const tcp_config_t &tcp_config)
 
     connect(socket, &QTcpSocket::errorOccurred, this, &TcpClient::slotAcceptError);
     connect(socket, &QTcpSocket::connected, this, &TcpClient::slotConnect);
+    connect(socket, &QTcpSocket::disconnected, this, &TcpClient::slotDisconnect);
     connect(socket, &QTcpSocket::destroyed, this, &TcpClient::slotDisconnect);
     connect(socket, &QTcpSocket::readyRead, this, &TcpClient::slotReceive);
 
@@ -235,10 +236,10 @@ void TcpClient::slotConnect()
 void TcpClient::slotDisconnect()
 {
     //Journal::instance()->info("Disconnected from the server...");
-    emit sendLogMessage("Disconnected from the server");
+    emit sendLogMessage("Disconnected from the server. Try to reconnect...");
     socket->abort();
     connectionTimer->start();
-    emit disconnect();
+    emit disconnected();
 }
 
 //------------------------------------------------------------------------------

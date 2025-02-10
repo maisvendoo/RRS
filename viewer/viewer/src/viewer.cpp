@@ -193,7 +193,7 @@ bool RouteViewer::init(int argc, char *argv[])
 
     osg::setNotifyLevel(level);
     std::string logs_path = fs.getLogsDir();
-    osg::setNotifyHandler(new ViewerLogFileHandler(logs_path + fs.separator() + "viewer.log"));
+    osg::setNotifyHandler(new ViewerLogFileHandler(logs_path + fs.separator(), "viewer.log"));
 
     OSG_FATAL << "Override settings from command line" << std::endl;
     // Parse command line
@@ -281,8 +281,7 @@ settings_t RouteViewer::loadSettings(const std::string &cfg_path) const
         int port = 0;
         if (cfg.getValue(secName, "port", port))
             settings.tcp_config.port = static_cast<quint16>(port);
-        OSG_INFO << "Host for client from setings: " << tmp << ":" << port << std::endl;
-        std::cout << "Host for client from setings: " << tmp << ":" << port << std::endl;
+
         cfg.getValue(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
         cfg.getValue(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
         cfg.getValue(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
@@ -365,15 +364,6 @@ void RouteViewer::overrideSettingsByCommandLine(const cmd_line_t &cmd_line,
 
     if (cmd_line.fullscreen.is_present)
         settings.fullscreen = cmd_line.fullscreen.value;
-
-    if (cmd_line.notify_level.is_present)
-        settings.notify_level = cmd_line.notify_level.value;
-
-    if (cmd_line.direction.is_present)
-        settings.direction = cmd_line.direction.value;
-
-    if (cmd_line.route_dir.is_present)
-        settings.route_dir_name = cmd_line.route_dir.value;
 }
 /*
 //------------------------------------------------------------------------------
