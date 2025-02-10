@@ -1,4 +1,5 @@
 #include "TrafficLight.h"
+#include "AnimTransformVisitor.h"
 #include <algorithm>
 #include <qbuffer.h>
 #include <qflags.h>
@@ -79,5 +80,6 @@ void TrafficLight::setNode(vsg::ref_ptr<vsg::Node> node)
 
 void TrafficLight::load_animation(const std::string& animations_dir)
 {
-
+    AnimTransformVisitor atv(&animations, animations_dir);
+    node->accept(atv);
 }

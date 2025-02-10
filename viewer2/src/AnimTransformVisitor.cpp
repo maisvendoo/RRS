@@ -1,4 +1,5 @@
 #include "AnimTransformVisitor.h"
+#include "AnalogRotation.h"
 #include "ConfigReader.h"
 #include "ProcAnimation.h"
 #include "filesystem.h"
@@ -42,7 +43,12 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
     auto config_section = cfg.getConfigSection();
     for (auto child : config_section)
     {
-
+        ProcAnimation* animation = nullptr;
+        std::string child_name = child.name();
+        if (child_name == "AnalogRotation")
+        {
+            animation = new AnalogRotation(transform);
+        }
     }
     return {};
 }

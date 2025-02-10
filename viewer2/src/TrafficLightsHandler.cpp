@@ -187,7 +187,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     pagedLOD->options = options;
 
     tl->setNode(pagedLOD);
-    // tl.lo
+    tl->load_animation(animations_dir);
 
     int sd = tl->getSignalDirection();
 
