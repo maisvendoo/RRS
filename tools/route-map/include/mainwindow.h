@@ -19,6 +19,8 @@ namespace Ui
 }
 QT_END_NAMESPACE
 
+class QTreeWidgetItem;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -71,6 +73,10 @@ private:
 
     void overrideByCommandLine(route_map_command_line_t &cmd_line);
 
+    void setStationsList();
+
+    void setPlayersList();
+
     void paintEvent(QPaintEvent *event);
 
 private slots:
@@ -100,6 +106,10 @@ private slots:
     void slotUpdateSignal(QByteArray signal_data);
 
     void slotRecvLogMessage(QString msg);
+
+    void slotStationClicked(QTreeWidgetItem *item, int column);
+
+    void slotPlayerClicked(QTreeWidgetItem *item, int column);
 };
 
 #endif // MAINWINDOW_H

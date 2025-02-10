@@ -47,9 +47,36 @@ void MapWidget::setSignalRadius(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::SetSignalOffset(double value)
+void MapWidget::setSignalOffset(double value)
 {
     signal_offset = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::setStationAtCenter(int idx)
+{
+    follow_player = false;
+
+    if ((idx < 0) || (idx >= stations->size()))
+        return;
+
+    map_shift.setX(- stations->at(idx).pos_y * scale);
+    map_shift.setY(- stations->at(idx).pos_x * scale);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::setPlayerAtCenter(int idx)
+{
+    follow_player = true;
+
+    if ((idx < 0) || (idx >= players_data->current_vehicles.size()))
+        return;
+
+    follow_player_idx = idx;
 }
 
 //------------------------------------------------------------------------------
@@ -77,11 +104,11 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    if (folow_vehicle && (!players_data->current_vehicles.empty()))
+    if (follow_player && (follow_player_idx < players_data->current_vehicles.size()))
     {
-        // Пока отслеживаем текущую ПЕ у самого первого подключенного вьювера
+        // В мультиплеере отслеживаем текущую ПЕ у самого первого подключенного вьювера
         // Следует придумать, как следить за ПЕ выбранного игрока, например себя
-        int curr = players_data->current_vehicles[0];
+        int curr = players_data->current_vehicles[follow_player_idx];
         map_shift.setX(- train_data->vehicles[curr].position_y * scale);
         map_shift.setY(- train_data->vehicles[curr].position_x * scale);
     }
@@ -834,9 +861,9 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        if (folow_vehicle)
+        if (follow_player)
         {
-            folow_vehicle = false;
+            follow_player = false;
             prev_map_shift = map_shift;
         }
         mouse_pos = event->pos();
@@ -844,7 +871,7 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::MiddleButton)
     {
-        folow_vehicle = true;
+        follow_player = true;
     }
 }
 

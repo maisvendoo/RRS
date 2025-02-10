@@ -21,7 +21,58 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QWidget" name="Map" native="true"/>
+       <widget class="QWidget" name="Map" native="true">
+        <widget class="QWidget" name="horizontalLayoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>-1</x>
+           <y>-1</y>
+           <width>781</width>
+           <height>441</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QTreeWidget" name="twStations">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
+border: 0;</string>
+            </property>
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <property name="headerHidden">
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text">
+              <string>1</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTreeWidget" name="twPlayers">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
+border: 0;</string>
+            </property>
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <property name="headerHidden">
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text">
+              <string>1</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </item>
       <item>
        <widget class="QPlainTextEdit" name="ptLog">
@@ -40,7 +91,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

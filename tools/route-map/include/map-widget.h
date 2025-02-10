@@ -50,7 +50,11 @@ public:
 
     void setSignalRadius(double value);
 
-    void SetSignalOffset(double value);
+    void setSignalOffset(double value);
+
+    void setStationAtCenter(int idx);
+
+    void setPlayerAtCenter(int idx);
 
     double getScale() const
     {
@@ -81,8 +85,11 @@ private:
     /// Смещение координат до движения курсора с зажатой ЛКМ
     QPoint prev_map_shift;
 
-    /// Перемещение вслед за ПЕ
-    bool folow_vehicle = true;
+    /// Перемещение вслед за игроком
+    bool follow_player = true;
+
+    /// Выбранный игрок
+    int follow_player_idx = 0;
 
     /// Длина отрисовки выбранной траектории стрелки, м
     double switch_length = 35.0;
