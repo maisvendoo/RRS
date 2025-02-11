@@ -40,6 +40,12 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="mStations">
+    <property name="title">
+     <string>Stations</string>
+    </property>
+   </widget>
+   <addaction name="mStations"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

@@ -75,6 +75,10 @@ private:
 
     void paintEvent(QPaintEvent *event);
 
+    void updateStations();
+
+    void updatePlayers();
+
 private slots:
 
     void slotConnectedToSimulator();

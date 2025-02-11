@@ -141,6 +141,42 @@ void MainWindow::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::updateStations()
+{
+    ui->mStations->clear();
+
+    int stations_size = topology->getStationsList()->size();
+    if (stations_size == 0)
+    {
+        return;
+    }
+
+    for (int i = 0; i < stations_size; ++i)
+    {
+        topology_station_t ts = topology->getStationsList()->at(i);
+
+        QAction *action_station = new QAction(ts.name);
+        ui->mStations->addAction(action_station);
+
+        MapWidget *mw = map;
+        int idx = i;
+        connect(action_station, &QAction::triggered, this, [mw, idx]{
+            mw->slotStationAtCenter(idx);
+        });
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updatePlayers()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
     players_data = simulator_update_players_t();
@@ -193,9 +229,9 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     topology->deserialize(topology_data);
     this->setWindowTitle(topology->getRouteName());
 
-    map->updateStations();
-    map->setStationAtCenter(0);
-    map->setPlayerAtCenter(0);
+    updateStations();
+    map->slotStationAtCenter(0);
+    map->slotPlayerAtCenter(0);
 
     if ( (topology->getTrajectoriesList() == Q_NULLPTR) || (topology->getConnectorsList() == Q_NULLPTR) )
     {

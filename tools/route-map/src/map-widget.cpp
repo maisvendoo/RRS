@@ -9,39 +9,7 @@
 //------------------------------------------------------------------------------
 MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
 {
-    int links_widgets_width = std::min(255, this->width() / 3);
 
-    twStations = new QTreeWidget(this);
-    twStations->setStyleSheet(
-        QString("background-color: rgba(0, 0, 0, 32);"
-                "border: 0;"));
-    twStations->setRootIsDecorated(false);
-    twStations->setHeaderHidden(true);
-    twStations->setExpandsOnDoubleClick(false);
-    twStations->setIndentation(0);
-
-    twStations->resize(links_widgets_width, link_line_height);
-    twStations->move(0, 0);
-    twStations->setVisible(false);
-
-    connect(twStations, &QTreeWidget::itemClicked,
-            this, &MapWidget::slotStationClicked);
-
-    twPlayers = new QTreeWidget(this);
-    twPlayers->setStyleSheet(
-        QString("background-color: rgba(0, 0, 0, 32);"
-                "border: 0;"));
-    twPlayers->setRootIsDecorated(false);
-    twPlayers->setHeaderHidden(true);
-    twPlayers->setExpandsOnDoubleClick(false);
-    twPlayers->setIndentation(0);
-
-    twPlayers->resize(links_widgets_width, link_line_height);
-    twPlayers->move(this->width() - links_widgets_width, 0);
-    twPlayers->setVisible(false);
-
-    connect(twPlayers, &QTreeWidget::itemClicked,
-            this, &MapWidget::slotPlayerClicked);
 }
 
 //------------------------------------------------------------------------------
@@ -58,20 +26,6 @@ MapWidget::~MapWidget()
 void MapWidget::resize(int width, int height)
 {
     QWidget::resize(width, height);
-
-    int links_widgets_width = std::min(255, this->width() / 3);
-
-    int h = link_line_height;
-    if ((twStations->topLevelItemCount() > 0) &&
-        (twStations->topLevelItem(0)->isExpanded()))
-    {
-        h = (stations->size() + 1) * link_line_height;
-    }
-    twStations->resize(links_widgets_width, std::min(h, this->height()));
-    twStations->move(0, 0);
-
-    twPlayers->resize(links_widgets_width, std::min(twPlayers->height(), this->height()));
-    twPlayers->move(this->width() - links_widgets_width, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +55,7 @@ void MapWidget::setSignalOffset(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::setStationAtCenter(int idx)
+void MapWidget::slotStationAtCenter(int idx)
 {
     follow_player = false;
 
@@ -115,7 +69,7 @@ void MapWidget::setStationAtCenter(int idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::setPlayerAtCenter(int idx)
+void MapWidget::slotPlayerAtCenter(int idx)
 {
     follow_player = true;
 
@@ -123,110 +77,6 @@ void MapWidget::setPlayerAtCenter(int idx)
         return;
 
     follow_player_idx = idx;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::updateStations()
-{
-    twStations->clear();
-
-    int stations_size = stations->size();
-    if (stations_size == 0)
-    {
-        twStations->resize(twStations->width(), link_line_height);
-        twStations->setVisible(false);
-        return;
-    }
-
-    // Header
-    QStringList text = QStringList( { tr("Stations") } );
-    int type_idx = QTreeWidgetItem::UserType + stations_size;
-    QTreeWidgetItem *header = new QTreeWidgetItem(text, type_idx);
-    twStations->addTopLevelItem(header);
-    twStations->setVisible(true);
-
-    int h = std::min(int(stations->size() + 1) * link_line_height,
-                     this->height());
-    twStations->resize(twStations->width(), h);
-
-    // Stations
-    for (int i = 0; i < stations_size; ++i)
-    {
-        topology_station_t ts = stations->at(i);
-
-        text = QStringList( { ts.name } );
-        type_idx = QTreeWidgetItem::UserType + i;
-        QTreeWidgetItem *station_item = new QTreeWidgetItem(text, type_idx);
-
-        header->addChild(station_item);
-    }
-    header->setExpanded(true);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::updatePlayers()
-{
-    twPlayers->clear();
-
-    int players_size = players_data->current_vehicles.size();
-    if (players_size == 0)
-    {
-        twPlayers->setVisible(false);
-        return;
-    }
-
-    // Header
-    QStringList text = QStringList( { tr("Players") } );
-    int type_idx = QTreeWidgetItem::UserType + players_size;
-    QTreeWidgetItem *header = new QTreeWidgetItem(text, type_idx);
-    header->setTextAlignment(0, Qt::AlignRight | Qt::AlignVCenter);
-    twPlayers->addTopLevelItem(header);
-    twPlayers->setVisible(false);// TODO
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::slotStationClicked(QTreeWidgetItem *item, int column)
-{
-    if (twStations->topLevelItemCount() <= 0)
-        return;
-
-    // Check click header
-    if (item->type() == QTreeWidgetItem::UserType + stations->size())
-    {
-        // Change header expanded state
-        if (twStations->topLevelItem(0)->isExpanded())
-        {
-            twStations->resize(twStations->width(), link_line_height);
-            twStations->topLevelItem(0)->setExpanded(false);
-        }
-        else
-        {
-            int h = std::min(int(stations->size() + 1) * link_line_height,
-                             this->height());
-            twStations->resize(twStations->width(), h);
-            twStations->topLevelItem(0)->setExpanded(true);
-        }
-        return;
-    }
-
-    int station_idx = item->type() - QTreeWidgetItem::UserType;
-    setStationAtCenter(station_idx);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::slotPlayerClicked(QTreeWidgetItem *item, int column)
-{
-    // TODO
-    (void) item;
-    (void) column;
 }
 
 //------------------------------------------------------------------------------

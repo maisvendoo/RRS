@@ -55,14 +55,6 @@ public:
 
     void setSignalOffset(double value);
 
-    void setStationAtCenter(int idx);
-
-    void setPlayerAtCenter(int idx);
-
-    void updateStations();
-
-    void updatePlayers();
-
     double getScale() const
     {
         return scale;
@@ -75,17 +67,11 @@ public:
 
 public slots:
 
-    void slotStationClicked(QTreeWidgetItem *item, int column);
+    void slotStationAtCenter(int idx);
 
-    void slotPlayerClicked(QTreeWidgetItem *item, int column);
+    void slotPlayerAtCenter(int idx);
 
 private:
-
-    /// Список ссылок на станции
-    QTreeWidget *twStations;
-
-    /// Список ссылок на игроков
-    QTreeWidget *twPlayers;
 
     /// Масштаб отображения карты
     double scale = 1.0;
