@@ -50,12 +50,6 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::sendLogMessage,
             this, &MainWindow::slotRecvLogMessage);
 
-    connect(ui->twStations, &QTreeWidget::itemClicked,
-            this, &MainWindow::slotStationClicked);
-
-    connect(ui->twPlayers, &QTreeWidget::itemClicked,
-            this, &MainWindow::slotPlayerClicked);
-
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -138,47 +132,6 @@ void MainWindow::overrideByCommandLine(route_map_command_line_t &cmd_line)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::setStationsList()
-{
-    ui->twStations->clear();
-
-    int stations_size = topology->getStationsList()->size();
-    if (stations_size == 0)
-        return;
-
-    // Header
-    QStringList text = QStringList( { tr("Stations") } );
-    int type_idx = QTreeWidgetItem::UserType + stations_size;
-    QTreeWidgetItem *header = new QTreeWidgetItem(text, type_idx);
-    ui->twStations->addTopLevelItem(header);
-
-    // Stations
-    for (int i = 0; i < stations_size; ++i)
-    {
-        topology_station_t ts = topology->getStationsList()->at(i);
-
-        text = QStringList( { ts.name } );
-        type_idx = QTreeWidgetItem::UserType + i;
-        QTreeWidgetItem *station_item = new QTreeWidgetItem(text, type_idx);
-
-        header->addChild(station_item);
-    }
-    header->setExpanded(true);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::setPlayersList()
-{
-    ui->twPlayers->clear();
-
-    ui->twPlayers->setVisible(false);// TODO
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     map->resize(ui->Map->width(), ui->Map->height());
@@ -240,7 +193,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     topology->deserialize(topology_data);
     this->setWindowTitle(topology->getRouteName());
 
-    setStationsList();
+    map->updateStations();
     map->setStationAtCenter(0);
     map->setPlayerAtCenter(0);
 
@@ -629,32 +582,4 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
 void MainWindow::slotRecvLogMessage(QString msg)
 {
     ui->ptLog->appendPlainText(msg);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotStationClicked(QTreeWidgetItem *item, int column)
-{
-    // Check click header
-    if (item->type() == QTreeWidgetItem::UserType + topology->getStationsList()->size())
-    {
-        // Change header expanded state
-        bool is_expanded = ui->twStations->topLevelItem(0)->isExpanded();
-        ui->twStations->topLevelItem(0)->setExpanded(!is_expanded);
-        return;
-    }
-
-    int station_idx = item->type() - QTreeWidgetItem::UserType;
-    map->setStationAtCenter(station_idx);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotPlayerClicked(QTreeWidgetItem *item, int column)
-{
-    // TODO
-    (void) item;
-    (void) column;
 }

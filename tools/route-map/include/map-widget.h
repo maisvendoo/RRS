@@ -2,6 +2,7 @@
 #define     MAP_WIDGET_H
 
 #include    <QMenu>
+#include    <QTreeWidget>
 #include    <QMouseEvent>
 #include    <QMap>
 #include    <topology-types.h>
@@ -10,6 +11,8 @@
 #include    <switch-label.h>
 #include    <signals-data-types.h>
 #include    <signal-label.h>
+
+const int link_line_height = 22;
 
 //------------------------------------------------------------------------------
 //
@@ -56,6 +59,10 @@ public:
 
     void setPlayerAtCenter(int idx);
 
+    void updateStations();
+
+    void updatePlayers();
+
     double getScale() const
     {
         return scale;
@@ -66,7 +73,19 @@ public:
         return mouse_pos;
     }
 
+public slots:
+
+    void slotStationClicked(QTreeWidgetItem *item, int column);
+
+    void slotPlayerClicked(QTreeWidgetItem *item, int column);
+
 private:
+
+    /// Список ссылок на станции
+    QTreeWidget *twStations;
+
+    /// Список ссылок на игроков
+    QTreeWidget *twPlayers;
 
     /// Масштаб отображения карты
     double scale = 1.0;
