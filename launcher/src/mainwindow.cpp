@@ -842,16 +842,16 @@ void MainWindow::slotRouteSelection()
         return;
     }
 
-    // Загрузка предыдущих выбранных активных поездов
-    selected_route_idx = route_idx;
-    loadActiveTrainsList();
-
     selectedRouteDirName = routes_info[route_idx].route_dir_name;
     ui->ptRouteDescription->appendPlainText(routes_info[route_idx].route_description);
 
     trajectrories = &routes_info[route_idx].trajectrories;
     fwd_train_positions = &routes_info[route_idx].fwd_train_positions;
     bwd_train_positions = &routes_info[route_idx].bwd_train_positions;
+
+    // Загрузка предыдущих выбранных активных поездов
+    selected_route_idx = route_idx;
+    loadActiveTrainsList();
 
     ui->pbAddTrain->setEnabled(true);
 }
