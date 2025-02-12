@@ -64,6 +64,7 @@ void MapWidget::slotStationAtCenter(int idx)
 
     map_shift.setX(- stations->at(idx).pos_y * scale);
     map_shift.setY(- stations->at(idx).pos_x * scale);
+    prev_map_shift = map_shift;
 }
 
 //------------------------------------------------------------------------------
