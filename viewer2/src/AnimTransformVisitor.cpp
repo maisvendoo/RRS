@@ -4,6 +4,7 @@
 #include "ConfigReader.h"
 #include "ProcAnimation.h"
 #include "filesystem.h"
+#include <iostream>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 
@@ -15,14 +16,23 @@ AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::
 
 void AnimTransformVisitor::apply(vsg::Node& node)
 {
+    std::string name;
+    if (node.getValue("name", name))
+    {
+        std::cout << name << std::endl;
+    }
     node.traverse(*this);
 }
 
 void AnimTransformVisitor::apply(vsg::Transform& transform)
 {
-    vsg::MatrixTransform* matrix_trans = static_cast<vsg::MatrixTransform*>(&transform);
     std::string name;
-    matrix_trans->getValue("name", name);
+    if (transform.getValue("name", name))
+    {
+        std::cout << name << std::endl;
+    }
+    vsg::MatrixTransform* matrix_trans = static_cast<vsg::MatrixTransform*>(&transform);
+
 
     ProcAnimation* animation = create_animation(name, matrix_trans);
 
@@ -44,28 +54,29 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         + fs.separator() + vehicle_config
         + fs.separator() + name + ".xml";
 
-    ConfigReader cfg(file_path);
-    auto config_section = cfg.getConfigSection();
-    for (auto child : config_section)
-    {
-        ProcAnimation* animation = nullptr;
-        std::string child_name = child.name();
-        if (child_name == "AnalogRotation")
-        {
-            animation = new AnalogRotation(transform);
-            animation->load(cfg);
-            return animation;
-        }
-        else if (child_name == "AnalogTranslation")
-        {
-            animation = new AnalogTranslation(transform);
-            animation->load(cfg);
-            return animation;
-        }
-        else if (child_name == "MaterialAnimation")
-        {
+    // ConfigReader cfg(file_path);
+    // auto config_section = cfg.getConfigSection();
+    // for (auto child : config_section)
+    // {
+    //     ProcAnimation* animation = nullptr;
+    //     std::string child_name = child.name();
+    //     if (child_name == "AnalogRotation")
+    //     {
+    //         animation = new AnalogRotation(transform);
+    //         animation->load(cfg);
+    //         return animation;
+    //     }
+    //     else if (child_name == "AnalogTranslation")
+    //     {
+    //         animation = new AnalogTranslation(transform);
+    //         animation->load(cfg);
+    //         return animation;
+    //     }
+    //     else if (child_name == "MaterialAnimation")
+    //     {
 
-        }
-    }
-    return {};
+    //     }
+    // }
+    // return {};
+    return nullptr;
 }

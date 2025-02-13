@@ -8,6 +8,8 @@
 #include <QMap>
 #include <QString>
 #include <qassert.h>
+#include <qcontainerfwd.h>
+#include <qmap.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
@@ -37,6 +39,8 @@ private:
 private:
     QMap<QString, TrafficLight*> traffic_lights_fwd;
     QMap<QString, TrafficLight*> traffic_lights_bwd;
+
+    QMap<QString, QString> signal_nodes_paths;
 
     std::string models_dir;
 
