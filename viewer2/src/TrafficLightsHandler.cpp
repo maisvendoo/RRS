@@ -4,8 +4,6 @@
 #include "TrafficLight.h"
 #include "filesystem.h"
 #include <cstdint>
-#include <filesystem>
-// #include <osg/MatrixTransform>
 #include <qbuffer.h>
 #include <qflags.h>
 #include <qstringview.h>
@@ -186,9 +184,6 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     pagedLOD->filename = models_path + '/' + tl->getModelName().toStdString() + ".gltf";
     pagedLOD->options = options;
 
-    tl->setNode(pagedLOD);
-    tl->load_animation(animations_dir);
-
     int sd = tl->getSignalDirection();
 
     auto m1 = vsg::translate(tl->getPosition());
@@ -219,6 +214,9 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
     auto transform = vsg::MatrixTransform::create();
     transform->matrix = m2 * m1;
+
+    tl->setNode(transform);
+    tl->load_animations(animations_dir);
 
     transform->addChild(pagedLOD);
     transform->addChild(cullGroup);

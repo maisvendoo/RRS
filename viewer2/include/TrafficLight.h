@@ -29,7 +29,7 @@ public:
 
     void setNode(vsg::ref_ptr<vsg::Node> node);
 
-    void load_animation(const std::string& animations_dir);
+    void load_animations(const std::string& animations_dir);
 
 private:
     QString connector_name = "";

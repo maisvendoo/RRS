@@ -1,11 +1,18 @@
 #ifndef ANALOG_ROTATION_H
 #define ANALOG_ROTATION_H
 
-#include "ConfigReader.h"
 #include "ProcAnimation.h"
+
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
-#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/maths/vec3.h>
+
+class ConfigReader;
+
+namespace vsg
+{
+    class MatrixTransform;
+}
 
 class AnalogRotation : public ProcAnimation
 {
@@ -24,9 +31,9 @@ private:
     vsg::dvec3 axis = vsg::dvec3(0.0, 0.0, 1.0);
     vsg::dmat4 matrix;
 
-    void anim_step(float t, float dt);
+    void anim_step(float t, float dt) override;
 
-    bool load_config(ConfigReader& cfg);
+    bool load_config(ConfigReader& cfg) override;
 
     void update();
 };

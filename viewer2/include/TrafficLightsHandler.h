@@ -8,7 +8,6 @@
 #include <QMap>
 #include <QString>
 #include <qassert.h>
-#include <vector>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>

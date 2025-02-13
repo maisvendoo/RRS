@@ -8,10 +8,14 @@
 #include <vsg/nodes/MatrixTransform.h>
 
 AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config)
-    : vsg::Visitor()
-    , animations(animations)
+    : animations(animations)
     , vehicle_config(vehicle_config)
 {
+}
+
+void AnimTransformVisitor::apply(vsg::Node& node)
+{
+    node.traverse(*this);
 }
 
 void AnimTransformVisitor::apply(vsg::Transform& transform)

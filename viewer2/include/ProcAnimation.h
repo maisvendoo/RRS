@@ -1,10 +1,9 @@
 #ifndef PROC_ANIMATION_H
 #define PROC_ANIMATION_H
 
+#include <cstddef>
 #include <string>
 #include <vector>
-
-#include <cstddef>
 
 class ConfigReader;
 
@@ -24,8 +23,6 @@ public:
 
     void step(float t, float dt);
 
-    std::string name = "";
-
     bool load(const std::string& path);
 
     bool load(ConfigReader& cfg);
@@ -33,6 +30,9 @@ public:
     void setPosition(float pos);
 
     std::size_t getSignalID() const;
+
+public:
+    std::string name = "";
 
 protected:
     struct key_point_t
@@ -48,8 +48,8 @@ protected:
 
     vsg::MatrixTransform* transform = nullptr;
 
-    bool is_fixed_signal;
-    float fixed_signal;
+    bool is_fixed_signal = false;
+    float fixed_signal = 0.0f;
 
     std::vector<key_point_t> keypoints;
 

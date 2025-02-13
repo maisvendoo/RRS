@@ -15,6 +15,7 @@
 #include "Logger.h"
 #include "tcp-client.h"
 
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -62,10 +63,10 @@ bool RouteViewer::isReady() const
 
 int RouteViewer::run()
 {
+    auto last_time = std::chrono::system_clock::now();
     while (viewer->advanceToNextFrame())
     {
         QApplication::processEvents();
-
         // constexpr double sideway_distance = 10.0;
         // constexpr double forward_distance = 150.0;
         // constexpr double min_z = -10.0;
@@ -95,7 +96,13 @@ int RouteViewer::run()
         viewer->recordAndSubmit();
         viewer->present();
 
-        LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
+        auto current_time = std::chrono::system_clock::now();
+        auto delta_time = current_time - last_time;
+        last_time = current_time;
+        double delta = std::chrono::duration_cast<std::chrono::milliseconds>(delta_time).count();
+        LOG_INFO("FPS: %f", 1.0 / delta * 1000.0);
+
+        // LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
     }
 
     return 0;
@@ -316,8 +323,8 @@ void RouteViewer::initWindowTraits()
     windowTraits->windowTitle = settings.name;
     windowTraits->decoration = settings.window_decoration;
     windowTraits->samples = settings.samples;
-    windowTraits->debugLayer = true;
-    windowTraits->debugUtils = true;
+    // windowTraits->debugLayer = true;
+    // windowTraits->debugUtils = true;
 }
 
 void RouteViewer::initWindow()
@@ -395,9 +402,6 @@ void RouteViewer::initLights()
     auto ambient = vsg::AmbientLight::create();
     ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
     ambient->intensity = 0.1f;
-
-    float psi = 50.0f;
-    float theta = 30.0f;
 
     sun = vsg::DirectionalLight::create();
     sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
@@ -485,8 +489,6 @@ bool RouteViewer::loadRoute()
         {
             continue;
         }
-
-        // options->shaderSets["phong"] = vsg::createPhongShaderSet
 
         auto pagedLOD = vsg::PagedLOD::create();
         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);

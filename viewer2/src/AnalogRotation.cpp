@@ -1,10 +1,17 @@
 #include "AnalogRotation.h"
+
 #include "ConfigReader.h"
 #include "ProcAnimation.h"
+
+#include <vsg/maths/common.h>
+#include <vsg/maths/mat4.h>
+#include <vsg/maths/transform.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
+
 #include <algorithm>
 #include <sstream>
-#include <vsg/maths/common.h>
-#include <vsg/maths/transform.h>
+#include <string>
 
 AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
     : ProcAnimation(transform)

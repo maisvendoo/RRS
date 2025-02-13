@@ -2,13 +2,11 @@
 
 #include "ConfigReader.h"
 
-
 #include <vsg/nodes/MatrixTransform.h>
 
+#include <cstddef>
 #include <string>
 #include <vector>
-
-#include <cstddef>
 
 ProcAnimation::ProcAnimation(const std::string& name)
     : name(name)
@@ -17,8 +15,6 @@ ProcAnimation::ProcAnimation(const std::string& name)
 
 ProcAnimation::ProcAnimation(vsg::MatrixTransform* transform)
     : transform(transform)
-    , is_fixed_signal(false)
-    , fixed_signal(0.0f)
 {
 }
 
@@ -90,7 +86,7 @@ bool ProcAnimation::loadKeyPoints(ConfigReader& cfg)
             cfg.setSection(child);
             cfg.getValue("Param", keypoint.param);
             cfg.getValue("Value", keypoint.value);
-            keypoints.push_back(keypoint);
+            keypoints.emplace_back(std::move(keypoint));
         }
     }
 

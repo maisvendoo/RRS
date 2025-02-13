@@ -4,16 +4,19 @@
 #include "ProcAnimation.h"
 #include "animations-list.h"
 
+#include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Transform.h>
 
-class AnimTransformVisitor : public vsg::Visitor
+class AnimTransformVisitor : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
 {
 public:
     AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config);
 
-    virtual void apply(vsg::Transform& transform);
+    void apply(vsg::Node& node) override;
+
+    void apply(vsg::Transform& transform) override;
 
 private:
     animations_t* animations;
