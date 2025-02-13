@@ -1,5 +1,6 @@
 #include "AnimTransformVisitor.h"
 #include "AnalogRotation.h"
+#include "AnalogTranslation.h"
 #include "ConfigReader.h"
 #include "ProcAnimation.h"
 #include "filesystem.h"
@@ -48,6 +49,18 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         if (child_name == "AnalogRotation")
         {
             animation = new AnalogRotation(transform);
+            animation->load(cfg);
+            return animation;
+        }
+        else if (child_name == "AnalogTranslation")
+        {
+            animation = new AnalogTranslation(transform);
+            animation->load(cfg);
+            return animation;
+        }
+        else if (child_name == "MaterialAnimation")
+        {
+
         }
     }
     return {};

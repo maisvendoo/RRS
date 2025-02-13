@@ -1,27 +1,28 @@
-#include "AnalogRotation.h"
+#include "AnalogTranslation.h"
 #include "ConfigReader.h"
 #include "ProcAnimation.h"
 #include <algorithm>
 #include <sstream>
-#include <vsg/maths/common.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
+#include <vsg/nodes/MatrixTransform.h>
 
-AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
+AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
     : ProcAnimation(transform)
     , matrix(transform->matrix)
 {
 }
 
-void AnalogRotation::anim_step(float t, float dt)
+void AnalogTranslation::anim_step(float t, float dt)
 {
     cur_pos += (pos - cur_pos) * duration * dt;
-    angle = interpolate(cur_pos);
+    motion = interpolate(cur_pos);
     update();
 }
 
-bool AnalogRotation::load_config(ConfigReader& cfg)
+bool AnalogTranslation::load_config(ConfigReader& cfg)
 {
-    cfg.setSection("AnalogRotation");
+    cfg.setSection("AnalogTranslation");
     cfg.getValue("SignalID", signal_id);
     cfg.getValue("Duration", duration);
 
@@ -35,11 +36,6 @@ bool AnalogRotation::load_config(ConfigReader& cfg)
         is_fixed_signal = false;
     }
 
-    int inf = 0;
-    cfg.getValue("Infinity", inf);
-
-    infinity = static_cast<bool>(inf);
-
     std::string tmp;
     cfg.getValue("Axis", tmp);
 
@@ -49,18 +45,15 @@ bool AnalogRotation::load_config(ConfigReader& cfg)
     return true;
 }
 
-void AnalogRotation::update()
+void AnalogTranslation::update()
 {
     if (keypoints.empty())
     {
         return;
     }
 
-    if (!infinity)
-    {
-        angle = std::clamp(angle, keypoints.front().value, keypoints.back().value);
-    }
+    motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
 
-    vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
-    transform->matrix = rotate * matrix;
+    vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));
+    transform->matrix = translate * matrix;
 }
