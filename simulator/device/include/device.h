@@ -15,18 +15,19 @@
 #ifndef     DEVICE_H
 #define     DEVICE_H
 
-#include    "device-export.h"
+#include    <device-export.h>
 
 #include    <QObject>
 #include    <QMap>
 
-#include    "solver-types.h"
-#include    "sound-signal.h"
-#include    "CfgReader.h"
+#include    <solver-types.h>
+#include    <sound-signal.h>
+#include    <CfgReader.h>
 
-#include    "control-signals.h"
-#include    "feedback-signals.h"
+#include    <control-signals.h>
+#include    <feedback-signals.h>
 
+#include    <devices-headers.h>
 
 /*!
  * \class
