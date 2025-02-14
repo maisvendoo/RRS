@@ -16,13 +16,15 @@ public:
 
     void apply(vsg::Node& node) override;
 
-    void apply(vsg::Transform& transform) override;
+    void apply(vsg::MatrixTransform& transform) override;
+
+    void apply(vsg::Group& group) override;
 
 private:
     animations_t* animations;
     std::string vehicle_config;
 
-    ProcAnimation* create_animation(const std::string& name, vsg::MatrixTransform* transform);
+    ProcAnimation* create_animation(const std::string& name, vsg::Node& node);
 };
 
 #endif // ANIM_TRANSFORM_VISITOR_H

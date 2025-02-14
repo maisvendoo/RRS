@@ -224,14 +224,14 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
         auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
 
-        TrafficLight *traffic_light = tl;
-        traffic_light->setNode(signal_node);
-        traffic_light->load_animations(animations_dir);
-
         // animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
         transform->matrix = m2 * m1;
         transform->addChild(signal_node);
+
+        TrafficLight *traffic_light = tl;
+        traffic_light->setNode(transform);
+        traffic_light->load_animations(animations_dir);
 
         traffic_light_nodes->addChild(transform);
     }

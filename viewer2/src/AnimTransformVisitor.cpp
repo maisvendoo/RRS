@@ -5,8 +5,11 @@
 #include "ProcAnimation.h"
 #include "filesystem.h"
 #include <iostream>
+#include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
+#include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/StateGroup.h>
 
 AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config)
     : animations(animations)
@@ -19,33 +22,40 @@ void AnimTransformVisitor::apply(vsg::Node& node)
     std::string name;
     if (node.getValue("name", name))
     {
-        std::cout << name << std::endl;
+        // std::cout << "Node: " << name << "    Class: " << node.className() << std::endl;
     }
+
     node.traverse(*this);
 }
 
-void AnimTransformVisitor::apply(vsg::Transform& transform)
+void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
 {
-    std::string name;
-    if (transform.getValue("name", name))
+    std::cout << "Class: " << transform.className() << std::endl;
+    for (auto child : transform.children)
     {
-        std::cout << name << std::endl;
-    }
-    vsg::MatrixTransform* matrix_trans = static_cast<vsg::MatrixTransform*>(&transform);
-
-
-    ProcAnimation* animation = create_animation(name, matrix_trans);
-
-    if (animation)
-    {
-        animation->name = name;
-        animations->insert(animation->getSignalID(), animation);
+        std::cout << "    " << child->className() << std::endl;
     }
 
-    // traverse();
+    // std::string name;
+    // transform.children[0]->getValue("name", name);
+    // transform.setValue("name", name);
+    // std::cout << "Node: " << name << "    Class: " << transform.className() << std::endl;
+
+    transform.traverse(*this);
 }
 
-ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform* transform)
+void AnimTransformVisitor::apply(vsg::Group& group)
+{
+    std::string name;
+    if (group.getValue("name", name))
+    {
+        // std::cout << "Node: " << name << "    Class: " << group.className() << std::endl;
+    }
+
+    group.traverse(*this);
+}
+
+ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Node& node)
 {
     FileSystem& fs = FileSystem::getInstance();
     std::string data_dir = fs.getDataDir();
@@ -54,29 +64,23 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         + fs.separator() + vehicle_config
         + fs.separator() + name + ".xml";
 
-    // ConfigReader cfg(file_path);
-    // auto config_section = cfg.getConfigSection();
-    // for (auto child : config_section)
-    // {
-    //     ProcAnimation* animation = nullptr;
-    //     std::string child_name = child.name();
-    //     if (child_name == "AnalogRotation")
-    //     {
-    //         animation = new AnalogRotation(transform);
-    //         animation->load(cfg);
-    //         return animation;
-    //     }
-    //     else if (child_name == "AnalogTranslation")
-    //     {
-    //         animation = new AnalogTranslation(transform);
-    //         animation->load(cfg);
-    //         return animation;
-    //     }
-    //     else if (child_name == "MaterialAnimation")
-    //     {
+    try
+    {
+        ConfigReader cfg(file_path);
+        auto config_section = cfg.getConfigSection();
+        ProcAnimation* animation = nullptr;
+        for (auto config_child : config_section.children())
+        {
+            std::string child_name = config_child.name();
+            if (child_name == "AnalogRotation")
+            {
+                // animation = new AnalogRotation(node);
+            }
+        }
+    }
+    catch (...)
+    {
+    }
 
-    //     }
-    // }
-    // return {};
     return nullptr;
 }

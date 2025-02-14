@@ -11,7 +11,7 @@ ConfigReader::ConfigReader(const std::string& path)
     pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (!result)
     {
-        LOG_ERROR("Failed to open config file %s", path.c_str());
+        // LOG_ERROR("Failed to open config file %s", path.c_str());
         throw 1;
     }
 
