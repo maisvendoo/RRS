@@ -29,8 +29,11 @@ else()
     set(SFML_STATIC_LIBRARIES FALSE)
 endif()
 
-find_package(SFML COMPONENTS system window REQUIRED)
-# find_package(SFML COMPONENTS System Window REQUIRED)
+if (WIN32)
+    find_package(SFML COMPONENTS system window REQUIRED)
+else()
+    find_package(SFML COMPONENTS System Window REQUIRED)
+endif()
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
