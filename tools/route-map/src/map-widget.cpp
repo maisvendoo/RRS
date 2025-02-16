@@ -110,8 +110,11 @@ void MapWidget::paintEvent(QPaintEvent *event)
         // В мультиплеере отслеживаем текущую ПЕ у самого первого подключенного вьювера
         // Следует придумать, как следить за ПЕ выбранного игрока, например себя
         int curr = players_data->current_vehicles[follow_player_idx];
-        map_shift.setX(- train_data->vehicles[curr].position_y * scale);
-        map_shift.setY(- train_data->vehicles[curr].position_x * scale);
+        if ((curr >= 0) && (curr < train_data->vehicles.size()))
+        {
+            map_shift.setX(- train_data->vehicles[curr].position_y * scale);
+            map_shift.setY(- train_data->vehicles[curr].position_x * scale);
+        }
     }
 
     drawTrain(train_data);
