@@ -93,6 +93,6 @@ typedef AbstractDisplay* (*GetDisplay)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT AbstractDisplay *loadDisplay(QString lib_path);
+extern "C" DISPLAY_EXPORT AbstractDisplay *loadDisplay(QString lib_path);
 
 #endif // DISPLAY_H
