@@ -852,8 +852,6 @@ void Train::slotStep(double current_time, double integration_time)
         for (auto it = begin; it != end; ++it)
         {
             Vehicle *vehicle = *it;
-            size_t model_idx = vehicle->getModelIndex();
-            size_t idx = vehicle->getStateIndex();
 
             // input
             if (i == 0)
@@ -862,9 +860,6 @@ void Train::slotStep(double current_time, double integration_time)
                 vehicle->hardwareProcess();
             }
 
-            topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
-            topology->getVehicleController(model_idx)->setCoord(y[idx]);
-            *vehicle->getProfilePoint() = topology->getVehicleController(model_idx)->getPosition();
             vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
 
             vehicle->integrationPreStep(y, t);
@@ -902,6 +897,15 @@ void Train::slotStep(double current_time, double integration_time)
         {
             Vehicle *vehicle = *it;
             vehicle->integrationPostStep(y, t);
+
+            if (i == num_step - 1)
+            {
+                size_t model_idx = vehicle->getModelIndex();
+                size_t idx = vehicle->getStateIndex();
+                topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
+                topology->getVehicleController(model_idx)->setCoord(y[idx]);
+                *vehicle->getProfilePoint() = topology->getVehicleController(model_idx)->getPosition();
+            }
         }
     }
     emit stepDone(train_idx);

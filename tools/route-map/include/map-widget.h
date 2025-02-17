@@ -2,6 +2,7 @@
 #define     MAP_WIDGET_H
 
 #include    <QMenu>
+#include    <QTreeWidget>
 #include    <QMouseEvent>
 #include    <QMap>
 #include    <topology-types.h>
@@ -10,6 +11,8 @@
 #include    <switch-label.h>
 #include    <signals-data-types.h>
 #include    <signal-label.h>
+
+const int link_line_height = 22;
 
 //------------------------------------------------------------------------------
 //
@@ -50,7 +53,7 @@ public:
 
     void setSignalRadius(double value);
 
-    void SetSignalOffset(double value);
+    void setSignalOffset(double value);
 
     double getScale() const
     {
@@ -61,6 +64,12 @@ public:
     {
         return mouse_pos;
     }
+
+public slots:
+
+    void slotStationAtCenter(int idx);
+
+    void slotPlayerAtCenter(int idx);
 
 private:
 
@@ -81,8 +90,11 @@ private:
     /// Смещение координат до движения курсора с зажатой ЛКМ
     QPoint prev_map_shift;
 
-    /// Перемещение вслед за ПЕ
-    bool folow_vehicle = true;
+    /// Перемещение вслед за игроком
+    bool follow_player = true;
+
+    /// Выбранный игрок
+    int follow_player_idx = 0;
 
     /// Длина отрисовки выбранной траектории стрелки, м
     double switch_length = 35.0;

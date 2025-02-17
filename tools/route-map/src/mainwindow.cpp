@@ -111,7 +111,7 @@ void MainWindow::load_config(const QString &cfg_name)
 
     tmp_value = 0;
     cfg.getDouble(secName, "SignalOffset", tmp_value);
-    map->SetSignalOffset(tmp_value);
+    map->setSignalOffset(tmp_value);
 }
 
 //------------------------------------------------------------------------------
@@ -136,6 +136,42 @@ void MainWindow::paintEvent(QPaintEvent *event)
 {
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updateStations()
+{
+    ui->mStations->clear();
+
+    int stations_size = topology->getStationsList()->size();
+    if (stations_size == 0)
+    {
+        return;
+    }
+
+    for (int i = 0; i < stations_size; ++i)
+    {
+        topology_station_t ts = topology->getStationsList()->at(i);
+
+        QAction *action_station = new QAction(ts.name);
+        ui->mStations->addAction(action_station);
+
+        MapWidget *mw = map;
+        int idx = i;
+        connect(action_station, &QAction::triggered, this, [mw, idx]{
+            mw->slotStationAtCenter(idx);
+        });
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updatePlayers()
+{
+
 }
 
 //------------------------------------------------------------------------------
@@ -192,6 +228,10 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 {
     topology->deserialize(topology_data);
     this->setWindowTitle(topology->getRouteName());
+
+    updateStations();
+    map->slotStationAtCenter(0);
+    map->slotPlayerAtCenter(0);
 
     if ( (topology->getTrajectoriesList() == Q_NULLPTR) || (topology->getConnectorsList() == Q_NULLPTR) )
     {
@@ -572,6 +612,9 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotRecvLogMessage(QString msg)
 {
     ui->ptLog->appendPlainText(msg);

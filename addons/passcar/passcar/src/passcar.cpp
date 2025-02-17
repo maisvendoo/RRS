@@ -62,7 +62,7 @@ void PassCar::step(double t, double dt)
 
     stepSoundsSignals(t, dt);
 
-    stepDebugMsg(t, dt);
+    //stepDebugMsg(t, dt);
 
     if (is_Registrator_on)
         stepRegistrator(t, dt);
@@ -73,7 +73,7 @@ void PassCar::step(double t, double dt)
 //------------------------------------------------------------------------------
 void PassCar::keyProcess()
 {
-
+    stepDebugMsg(0, 0);
 }
 
 //------------------------------------------------------------------------------

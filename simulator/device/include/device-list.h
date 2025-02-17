@@ -2,8 +2,7 @@
 #define     DEVICE_LIST_H
 
 #include    <vector>
-
-class Device;
+#include    <device.h>
 
 //------------------------------------------------------------------------------
 //

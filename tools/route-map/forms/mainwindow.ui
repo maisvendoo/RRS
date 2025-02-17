@@ -17,9 +17,6 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1">
-      <property name="spacing">
-       <number>6</number>
-      </property>
       <item>
        <widget class="QWidget" name="Map" native="true"/>
       </item>
@@ -40,9 +37,15 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="mStations">
+    <property name="title">
+     <string>Stations</string>
+    </property>
+   </widget>
+   <addaction name="mStations"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

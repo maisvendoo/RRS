@@ -19,6 +19,8 @@ namespace Ui
 }
 QT_END_NAMESPACE
 
+class QTreeWidgetItem;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -72,6 +74,10 @@ private:
     void overrideByCommandLine(route_map_command_line_t &cmd_line);
 
     void paintEvent(QPaintEvent *event);
+
+    void updateStations();
+
+    void updatePlayers();
 
 private slots:
 
