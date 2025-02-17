@@ -416,7 +416,7 @@ void Model::findFarthestVehicles()
 //------------------------------------------------------------------------------
 void Model::debugPrint()
 {
-    QString debug_info = QString("t = %1 realtime_delay = %2 time_step = %3 ")
+    QString debug_info = QString("t = %1    realtime_delay = %2    time_step = %3\n")
         .arg(t, 0, 'f', 3)
         .arg(realtime_delay, 2)
         .arg(integration_time_interval);

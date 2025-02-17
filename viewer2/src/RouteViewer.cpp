@@ -545,7 +545,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString();
+    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
