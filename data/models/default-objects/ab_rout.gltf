@@ -92,7 +92,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Scene Root_BOTTOM_YELLOW_Lens_BOTTOM_YELLOW_Lens-OFFSET_BOTTOM_"
+			"name":"BOTTOM_YELLOW_Lens"
 		},
 		{
 			"mesh":1,
@@ -232,7 +232,7 @@
 		},
 		{
 			"mesh":35,
-			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_TransN"
+			"name":"GREEN_Lens"
 		},
 		{
 			"mesh":36,
@@ -268,7 +268,7 @@
 		},
 		{
 			"mesh":44,
-			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNorm1_0"
+			"name":"RED_Lens"
 		},
 		{
 			"mesh":45,
@@ -276,11 +276,11 @@
 		},
 		{
 			"mesh":46,
-			"name":"Scene Root_WHITE_Lens_WHITE_Lens-OFFSET_WHITE_Lens-GEODE_TransN"
+			"name":"WHITE_Lens"
 		},
 		{
 			"mesh":47,
-			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE_Tra"
+			"name":"YELLOW_Lens"
 		},
 		{
 			"mesh":48,
@@ -399,7 +399,7 @@
 					"specularFactor":0
 				}
 			},
-			"name":"material_1.003",
+			"name":"material_1.005",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
@@ -414,7 +414,7 @@
 					"specularFactor":0
 				}
 			},
-			"name":"material_2.001",
+			"name":"material_2.003",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":1
@@ -425,7 +425,7 @@
 	],
 	"meshes":[
 		{
-			"name":"Scene Root_BOTTOM_YELLOW_Lens_BOTTOM_YELLOW_Lens-OFFSET_BOT.001",
+			"name":"Scene Root_BOTTOM_YELLOW_Lens_BOTTOM_YELLOW_Lens-OFFSET_BOT.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -439,7 +439,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box02_Box02-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box02_Box02-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -453,7 +453,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box03_Box03-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box03_Box03-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -467,7 +467,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box04_Box04-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Box04_Box04-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -481,7 +481,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box05_Box05-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Box05_Box05-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -495,7 +495,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box07_Box07-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box07_Box07-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -509,7 +509,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box09_Box09-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box09_Box09-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -523,7 +523,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box10_Box10-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box10_Box10-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -537,7 +537,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box11_Box11-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box11_Box11-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -551,7 +551,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box12_Box12-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box12_Box12-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -565,7 +565,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box17_Box17-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Box17_Box17-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -579,7 +579,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box18_Box18-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box18_Box18-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -593,7 +593,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box19_Box19-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box19_Box19-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -607,7 +607,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box20_Box20-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box20_Box20-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -621,7 +621,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box21_Box21-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box21_Box21-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -635,7 +635,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder01_Cylinder01-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Cylinder01_Cylinder01-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -649,7 +649,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder02_Cylinder02-OFFSET_Cylinder02-GEODE_Tr",
+			"name":"Scene Root_Cylinder02_Cylinder02-OFFSET_Cylinder02-GEODE_Tr.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -663,7 +663,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder03_Cylinder03-OFFSET_Cylinder03-GEODE_Tr.002",
+			"name":"Scene Root_Cylinder03_Cylinder03-OFFSET_Cylinder03-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -677,7 +677,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder05_Cylinder05-OFFSET_Cylinder05-GEODE_Tr.002",
+			"name":"Scene Root_Cylinder05_Cylinder05-OFFSET_Cylinder05-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -691,7 +691,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder06_Cylinder06-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Cylinder06_Cylinder06-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -705,7 +705,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder07_Cylinder07-OFFSET_Cylinder07-GEODE_Tr.002",
+			"name":"Scene Root_Cylinder07_Cylinder07-OFFSET_Cylinder07-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -719,7 +719,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder08_Cylinder08-OFFSET_Cylinder08-GEODE_Tr.002",
+			"name":"Scene Root_Cylinder08_Cylinder08-OFFSET_Cylinder08-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -733,7 +733,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder11_Cylinder11-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder11_Cylinder11-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -747,7 +747,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder12_Cylinder12-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder12_Cylinder12-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -761,7 +761,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder13_Cylinder13-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder13_Cylinder13-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -775,7 +775,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder14_Cylinder14-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Cylinder14_Cylinder14-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -789,7 +789,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder15_Cylinder15-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Cylinder15_Cylinder15-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -803,7 +803,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder17_Cylinder17-OFFSET_Cylinder17-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder17_Cylinder17-OFFSET_Cylinder17-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -817,7 +817,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder19_Cylinder19-OFFSET_Cylinder19-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder19_Cylinder19-OFFSET_Cylinder19-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -831,7 +831,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder20_Cylinder20-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder20_Cylinder20-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -845,7 +845,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder21_Cylinder21-OFFSET_Cylinder21-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder21_Cylinder21-OFFSET_Cylinder21-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -859,7 +859,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder22_Cylinder22-OFFSET_Cylinder22-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder22_Cylinder22-OFFSET_Cylinder22-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -873,7 +873,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder23_Cylinder23-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder23_Cylinder23-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -887,7 +887,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Green3_linzPol_Green3_linzPol-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Green3_linzPol_Green3_linzPol-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -901,7 +901,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Green3linz_Green3linz-GEODE_TransNorm2_0.001",
+			"name":"Scene Root_Green3linz_Green3linz-GEODE_TransNorm2_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -915,7 +915,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_Tr.002",
+			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -929,7 +929,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_GREEN_strip_01_GREEN_strip_01-OFFSET_GREEN_strip",
+			"name":"Scene Root_GREEN_strip_01_GREEN_strip_01-OFFSET_GREEN_strip.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -943,7 +943,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_GREEN_strip_02_GREEN_strip_02-OFFSET_GREEN_strip",
+			"name":"Scene Root_GREEN_strip_02_GREEN_strip_02-OFFSET_GREEN_strip.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -957,7 +957,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_GREEN_strip_03_GREEN_strip_03-OFFSET_GREEN_strip",
+			"name":"Scene Root_GREEN_strip_03_GREEN_strip_03-OFFSET_GREEN_strip.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -971,7 +971,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object01_Object01-OFFSET_Object01-GEODE_TransNor.001",
+			"name":"Scene Root_Object01_Object01-OFFSET_Object01-GEODE_TransNor.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -985,7 +985,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object02_Object02-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Object02_Object02-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -999,7 +999,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object03_Object03-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Object03_Object03-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1013,7 +1013,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object04_Object04-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Object04_Object04-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1027,7 +1027,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object05_Object05-OFFSET_Object05-GEODE_TransNor",
+			"name":"Scene Root_Object05_Object05-OFFSET_Object05-GEODE_TransNor.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1041,7 +1041,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNor.002",
+			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNor.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1055,7 +1055,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Signal_Signal-OFFSET_Signal-GEODE_TransNorm1_0.003",
+			"name":"Scene Root_Signal_Signal-OFFSET_Signal-GEODE_TransNorm1_0.005",
 			"primitives":[
 				{
 					"attributes":{
@@ -1069,7 +1069,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_WHITE_Lens_WHITE_Lens-OFFSET_WHITE_Lens-GEODE_Tr.001",
+			"name":"Scene Root_WHITE_Lens_WHITE_Lens-OFFSET_WHITE_Lens-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1083,7 +1083,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE.002",
+			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1097,7 +1097,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0412\u0442\u043e\u0440\u0430\u044f \u0431\u043e\u0448\u043a\u0430_\u0412\u0442\u043e\u0440\u0430\u044f \u0431\u043e\u0448\u043a\u0430-",
+			"name":"Scene Root_\u0412\u0442\u043e\u0440\u0430\u044f \u0431\u043e\u0448\u043a\u0430_\u0412\u0442\u043e\u0440\u0430\u044f \u0431\u043e\u0448\u043a\u0430-.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1111,7 +1111,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c1_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c1-GEODE_TransN.001",
+			"name":"Scene Root_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c1_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c1-GEODE_TransN.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1125,7 +1125,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c2_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c2-GEODE_TransN.001",
+			"name":"Scene Root_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c2_\u0414\u0440\u043e\u0441\u0441\u0435\u043b\u044c2-GEODE_TransN.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1139,7 +1139,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u041a\u0440\u043e\u043d\u0448\u0442\u0435\u0439\u043d \u043c\u0430\u043b\u0435\u043d\u043a\u043e\u0439 \u0431\u043e\u0448\u043a\u0438_",
+			"name":"Scene Root_\u041a\u0440\u043e\u043d\u0448\u0442\u0435\u0439\u043d \u043c\u0430\u043b\u0435\u043d\u043a\u043e\u0439 \u0431\u043e\u0448\u043a\u0438_.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1153,7 +1153,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u041c\u0430\u0440\u0448\u0440\u0443\u0442\u043d\u044b\u0439 \u0443\u043a\u0430\u0437\u0430\u0442\u0435\u043b\u044c_\u041c\u0430\u0440\u0448",
+			"name":"Scene Root_\u041c\u0430\u0440\u0448\u0440\u0443\u0442\u043d\u044b\u0439 \u0443\u043a\u0430\u0437\u0430\u0442\u0435\u043b\u044c_\u041c\u0430\u0440\u0448.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1167,7 +1167,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c01_\u0420\u0435\u043c\u0435\u043d\u044c01-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c01_\u0420\u0435\u043c\u0435\u043d\u044c01-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1181,7 +1181,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c02_\u0420\u0435\u043c\u0435\u043d\u044c02-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c02_\u0420\u0435\u043c\u0435\u043d\u044c02-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1195,7 +1195,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c03_\u0420\u0435\u043c\u0435\u043d\u044c03-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c03_\u0420\u0435\u043c\u0435\u043d\u044c03-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1209,7 +1209,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c04_\u0420\u0435\u043c\u0435\u043d\u044c04-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c04_\u0420\u0435\u043c\u0435\u043d\u044c04-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1223,7 +1223,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c05_\u0420\u0435\u043c\u0435\u043d\u044c05-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c05_\u0420\u0435\u043c\u0435\u043d\u044c05-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1237,7 +1237,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c06_\u0420\u0435\u043c\u0435\u043d\u044c06-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c06_\u0420\u0435\u043c\u0435\u043d\u044c06-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1251,7 +1251,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c07_\u0420\u0435\u043c\u0435\u043d\u044c07-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c07_\u0420\u0435\u043c\u0435\u043d\u044c07-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1265,7 +1265,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c08_\u0420\u0435\u043c\u0435\u043d\u044c08-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0420\u0435\u043c\u0435\u043d\u044c08_\u0420\u0435\u043c\u0435\u043d\u044c08-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1279,7 +1279,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0424\u043b\u0430\u0436\u043e\u043a_\u0424\u043b\u0430\u0436\u043e\u043a-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_\u0424\u043b\u0430\u0436\u043e\u043a_\u0424\u043b\u0430\u0436\u043e\u043a-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -1293,7 +1293,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043801_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043801-",
+			"name":"Scene Root_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043801_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043801-.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1307,7 +1307,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043802_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043802-",
+			"name":"Scene Root_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043802_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043802-.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1321,7 +1321,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043803_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043803-",
+			"name":"Scene Root_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043803_\u0429\u0438\u0442 \u0433\u043e\u043b\u043e\u0432\u043a\u043803-.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1335,7 +1335,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-01_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-01-OFFSET_\u043a\u043e",
+			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-01_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-01-OFFSET_\u043a\u043e.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1349,7 +1349,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-04_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-04-OFFSET_\u043a\u043e.001",
+			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-04_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-04-OFFSET_\u043a\u043e.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1363,7 +1363,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-05_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-05-OFFSET_\u043a\u043e.001",
+			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-05_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-05-OFFSET_\u043a\u043e.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1377,7 +1377,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-06_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-06-OFFSET_\u043a\u043e",
+			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-06_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-06-OFFSET_\u043a\u043e.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1391,7 +1391,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-07_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-07-OFFSET_\u043a\u043e",
+			"name":"Scene Root_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-07_\u043a\u043e\u0437\u044b\u0440\u0451\u043a-07-OFFSET_\u043a\u043e.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1405,7 +1405,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043b\u0435\u0441\u0442\u043d\u0438\u0446\u0430_\u043b\u0435\u0441\u0442\u043d\u0438\u0446\u0430-GEODE_TransNor.001",
+			"name":"Scene Root_\u043b\u0435\u0441\u0442\u043d\u0438\u0446\u0430_\u043b\u0435\u0441\u0442\u043d\u0438\u0446\u0430-GEODE_TransNor.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1419,7 +1419,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043c\u043e\u0434\u0443\u043b\u044c \u043b\u0430\u043c\u043f-3_\u043c\u043e\u0434\u0443\u043b\u044c \u043b\u0430\u043c\u043f-3-",
+			"name":"Scene Root_\u043c\u043e\u0434\u0443\u043b\u044c \u043b\u0430\u043c\u043f-3_\u043c\u043e\u0434\u0443\u043b\u044c \u043b\u0430\u043c\u043f-3-.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1433,7 +1433,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u043f\u0440\u043e\u0432\u043e\u0434-3_\u043f\u0440\u043e\u0432\u043e\u0434-3-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_\u043f\u0440\u043e\u0432\u043e\u0434-3_\u043f\u0440\u043e\u0432\u043e\u0434-3-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1447,7 +1447,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449\u0438\u043a2_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449.001",
+			"name":"Scene Root_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449\u0438\u043a2_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1461,7 +1461,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449\u0438\u043a_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449.001",
+			"name":"Scene Root_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449\u0438\u043a_\u0440\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u044f\u0449.003",
 			"primitives":[
 				{
 					"attributes":{

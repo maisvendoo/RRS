@@ -149,7 +149,7 @@
 		},
 		{
 			"mesh":22,
-			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_TransN"
+			"name":"GREEN_Lens"
 		},
 		{
 			"mesh":23,
@@ -201,7 +201,7 @@
 		},
 		{
 			"mesh":35,
-			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNorm1_0"
+			"name":"RED_Lens"
 		},
 		{
 			"mesh":36,
@@ -233,7 +233,7 @@
 		},
 		{
 			"mesh":43,
-			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE_Tra"
+			"name":"YELLOW_Lens"
 		}
 	],
 	"materials":[
@@ -244,7 +244,7 @@
 					"specularFactor":0
 				}
 			},
-			"name":"material_1.002",
+			"name":"material_1.004",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
@@ -269,7 +269,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box02_Box02-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Box02_Box02-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -283,7 +283,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box04_Box04-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box04_Box04-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -297,7 +297,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box05_Box05-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box05_Box05-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -325,7 +325,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Box17_Box17-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Box17_Box17-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -395,7 +395,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder01_Cylinder01-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder01_Cylinder01-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -409,7 +409,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder03_Cylinder03-OFFSET_Cylinder03-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder03_Cylinder03-OFFSET_Cylinder03-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -437,7 +437,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder05_Cylinder05-OFFSET_Cylinder05-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder05_Cylinder05-OFFSET_Cylinder05-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -451,7 +451,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder06_Cylinder06-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder06_Cylinder06-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -465,7 +465,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder07_Cylinder07-OFFSET_Cylinder07-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder07_Cylinder07-OFFSET_Cylinder07-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -479,7 +479,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder08_Cylinder08-OFFSET_Cylinder08-GEODE_Tr.001",
+			"name":"Scene Root_Cylinder08_Cylinder08-OFFSET_Cylinder08-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -521,7 +521,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder14_Cylinder14-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder14_Cylinder14-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -535,7 +535,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder15_Cylinder15-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Cylinder15_Cylinder15-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -563,7 +563,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_Tr.001",
+			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_Tr.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -675,7 +675,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object01_Object01-OFFSET_Object01-GEODE_TransNor",
+			"name":"Scene Root_Object01_Object01-OFFSET_Object01-GEODE_TransNor.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -689,7 +689,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object03_Object03-GEODE_TransNorm1_0.001",
+			"name":"Scene Root_Object03_Object03-GEODE_TransNorm1_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -745,7 +745,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNor.001",
+			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNor.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -773,7 +773,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Signal_Signal-OFFSET_Signal-GEODE_TransNorm1_0.002",
+			"name":"Scene Root_Signal_Signal-OFFSET_Signal-GEODE_TransNorm1_0.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -857,7 +857,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE.001",
+			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE.003",
 			"primitives":[
 				{
 					"attributes":{
