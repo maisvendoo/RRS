@@ -1,7 +1,10 @@
 #include "MaterialAnimationVisitor.h"
 #include "ConfigReader.h"
 #include "animations-list.h"
+#include <iostream>
 #include <vsg/core/Visitor.h>
+#include <vsg/maths/vec4.h>
+#include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
@@ -24,19 +27,21 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 {
     for (auto& command : stateGroup.stateCommands)
     {
-        if (auto bindDescriptorSets = command->cast<vsg::BindDescriptorSets>())
+        if (auto bindDescriptorSet = command->cast<vsg::BindDescriptorSet>())
         {
-            for (auto& descriptorSet : bindDescriptorSets->descriptorSets)
+            auto& descriptorSet = bindDescriptorSet->descriptorSet;
+            for (auto& descriptor : descriptorSet->descriptors)
             {
-                for (auto& descriptor : descriptorSet->descriptors)
+                if (auto descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
                 {
-                    if (auto descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
-                    {
-                        auto data = descriptorBuffer->bufferInfoList[0]->data;
-                        auto material = reinterpret_cast<vsg::material*>(data.get());
-                    }
+                    auto data = descriptorBuffer->bufferInfoList[0]->data;
+                    auto& material = data->cast<vsg::PbrMaterialValue>()->value();
+                    material.diffuseFactor = vsg::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    material.baseColorFactor.set(1.0f, 0.0f, 0.0f, 1.0f);
                 }
             }
         }
     }
+
+    stateGroup.traverse(*this);
 }

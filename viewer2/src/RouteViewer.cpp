@@ -100,7 +100,7 @@ int RouteViewer::run()
         auto delta_time = current_time - last_time;
         last_time = current_time;
         double delta = std::chrono::duration_cast<std::chrono::milliseconds>(delta_time).count();
-        LOG_INFO("FPS: %f", 1.0 / delta * 1000.0);
+        // LOG_INFO("FPS: %f", 1.0 / delta * 1000.0);
 
         // LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
     }
@@ -545,7 +545,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString();
+    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();

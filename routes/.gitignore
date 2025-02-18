@@ -1,3 +1,4 @@
 *
 !.gitignore
-!experimantal-polygon/
+!experimental-polygon/
+!experimental-polygon-gltf/
