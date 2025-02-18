@@ -20,7 +20,7 @@ RouteLoader::RouteLoader(const std::string& route_path)
 
 void RouteLoader::read_description()
 {
-    ConfigReader cfg(route_path + "/description.xml");
+    ConfigReader cfg(route_path + "\\description.xml");
     cfg.setSection("Route");
     cfg.getValue("RouteType", route_type);
     cfg.getValue("ObjectsRefPath", objects_ref_path);
