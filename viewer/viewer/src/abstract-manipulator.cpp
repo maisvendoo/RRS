@@ -1,13 +1,14 @@
-#include    "abstract-manipulator.h"
-#include    <osgViewer/Viewer>
+#include "abstract-manipulator.h"
+
+#include <osgViewer/Viewer>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AbstractManipulator::AbstractManipulator(QObject *parent)
-    : QObject (parent)
-    , osgGA::TrackballManipulator ()
-    , cp(camera_position_t())
+AbstractManipulator::AbstractManipulator(QObject* parent)
+    : QObject(parent)
+    , osgGA::TrackballManipulator()
+    , camera_position()
     , start_time(0.0)
     , delta_time(0.0f)
 {
@@ -17,15 +18,17 @@ AbstractManipulator::AbstractManipulator(QObject *parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AbstractManipulator::handleFrame(const osgGA::GUIEventAdapter &ea,
-                                      osgGA::GUIActionAdapter &aa)
+bool AbstractManipulator::handleFrame(
+    const osgGA::GUIEventAdapter& event_adapter,
+    osgGA::GUIActionAdapter& action_adapter
+)
 {
-    (void) ea;
-
-    osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer *>(&aa);
+    auto* viewer = dynamic_cast<osgViewer::Viewer*>(&action_adapter);
 
     if (!viewer)
+    {
         return false;
+    }
 
     double time = viewer->getFrameStamp()->getReferenceTime();
     delta_time = static_cast<float>(time - start_time);
@@ -37,25 +40,21 @@ bool AbstractManipulator::handleFrame(const osgGA::GUIEventAdapter &ea,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AbstractManipulator::~AbstractManipulator()
-{
-
-}
+AbstractManipulator::~AbstractManipulator() = default;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void AbstractManipulator::process_displays_lock()
 {
-
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AbstractManipulator::getCameraPosition(camera_position_t cp)
+void AbstractManipulator::getCameraPosition(camera_position_t camera_position)
 {
-    this->cp = cp;
+    this->camera_position = camera_position;
 
     process_displays_lock();
 }

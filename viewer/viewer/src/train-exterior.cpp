@@ -15,9 +15,7 @@
 #include    "train-exterior.h"
 
 #include    "config-reader.h"
-#include    "get-value.h"
 #include    "filesystem.h"
-#include    "math-funcs.h"
 
 #include    "vehicle-loader.h"
 
@@ -496,14 +494,17 @@ void TrainExteriorHandler::moveTrain()
             vehicles_ext[i].next_vehicle = update_data.vehicles[i].next_vehicle;
 
             // Model animations update
-            for (auto it = vehicles_ext[i].anims->begin(); it != vehicles_ext[i].anims->end(); ++it)
+            for (auto* animation : *vehicles_ext[i].anims)
             {
-                ProcAnimation *animation = it.value();
                 size_t signal_id = animation->getSignalID();
                 if (signal_id < update_data.vehicles[i].analogSignal.size())
+                {
                     animation->setPosition(update_data.vehicles[i].analogSignal[signal_id]);
+                }
                 else
+                {
                     animation->setPosition(0.0f);
+                }
             }
 
             // Sounds update
@@ -791,9 +792,9 @@ void TrainExteriorHandler::loadModelAnimations(const std::string &configDir,
 
         osgDB::XmlNode *rootNode = cfg.getConfigNode();
 
-        for (auto it = rootNode->children.begin(); it != rootNode->children.end(); ++it)
+        for (auto child_ref_ptr : rootNode->children)
         {
-            osgDB::XmlNode  *child = *it;
+            osgDB::XmlNode  *child = child_ref_ptr.get();
 
             if (child->name == "ModelAnimation")
             {
@@ -832,9 +833,9 @@ void TrainExteriorHandler::loadDisplays(const std::string &configDir,
 
     osgDB::XmlNode *config_node = displays_cfg.getConfigNode();
 
-    for (auto it = config_node->children.begin(); it != config_node->children.end(); ++it)
+    for (auto display_node_ref_ptr : config_node->children)
     {
-        osgDB::XmlNode *display_node = *it;
+        osgDB::XmlNode *display_node = display_node_ref_ptr.get();
 
         if (display_node->name == "Display")
         {
@@ -917,9 +918,8 @@ void TrainExteriorHandler::updateDisplays()
 
     for (size_t i = 0; i < vehicles_ext.size(); ++i)
     {
-        for (auto it = vehicles_ext[i].displays->begin(); it != vehicles_ext[i].displays->end(); ++it)
+        for (auto* dc : *vehicles_ext[i].displays)
         {
-            display_container_t *dc = *it;
             std::array<float, MAX_ANALOG_SIGNALS> veh_signals;
             std::fill(veh_signals.begin(), veh_signals.end(), 0.0f);
             std::copy(update_data.vehicles[i].analogSignal.begin(),

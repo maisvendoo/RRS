@@ -21,7 +21,7 @@ void StaticManipulator::init(const osgGA::GUIEventAdapter &ea,
     Q_UNUSED(ea)
     Q_UNUSED(aa)
 
-    init_pos = cp;
+    init_pos = camera_position;
 }
 
 //------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ osg::Matrixd StaticManipulator::getInverseMatrix() const
     osg::Vec3d shift = init_pos.right * dist * dir;
     shift += osg::Vec3d(0.0, 0.0, settings.stat_cam_height);
 
-    osg::Matrix invMatrix = osg::Matrix::lookAt(init_pos.viewer_pos + shift, cp.position, osg::Vec3d(osg::Z_AXIS));
+    osg::Matrix invMatrix = osg::Matrix::lookAt(init_pos.viewer_pos + shift, camera_position.position, osg::Vec3d(osg::Z_AXIS));
 
     return invMatrix;
 }

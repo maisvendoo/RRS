@@ -2,6 +2,9 @@
 #include    <QBuffer>
 #include    <anim-transform-visitor.h>
 
+#include <iostream>
+
+#include "proc-animation.h"
 
 //------------------------------------------------------------------------------
 //
@@ -43,7 +46,7 @@ void TrafficLight::deserialize(QByteArray &data)
     stream >> pos.x() >> pos.y() >> pos.z();
     stream >> orth.x() >> orth.y() >> orth.z();
     stream >> right.x() >> right.y() >> right.z();
-    stream >> up.x() >> up.y() >> up.z();    
+    stream >> up.x() >> up.y() >> up.z();
 }
 
 //------------------------------------------------------------------------------
@@ -58,16 +61,15 @@ void TrafficLight::update()
 
     if (lens_state != old_lens_state)
     {
-        for (auto animation = animations.begin(); animation != animations.end(); ++animation)
+        for (auto* anim : animations)
         {
-            ProcAnimation *anim = animation.value();
-            anim->setPosition(lens_state[animation.value()->getSignalID()]);
+            anim->setPosition(lens_state[anim->getSignalID()]);
         }
 
          std::cout << "Updated signal " << this->getConnectorName().toStdString() << std::endl;
 
          old_lens_state = lens_state;
-    }   
+    }
 }
 
 //------------------------------------------------------------------------------

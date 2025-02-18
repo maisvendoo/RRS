@@ -1,0 +1,1 @@
+--train-config=vl60k-1737-frLoads --route=experimental-polygon --traj-name=branch1_0002_2_12_22 --direction=1 --init-coord=785.00 -o

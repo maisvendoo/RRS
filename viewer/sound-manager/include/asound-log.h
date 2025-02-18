@@ -19,7 +19,7 @@
 #include    <QObject>
 
 class LogFileHandler : public QObject
-{   
+{
 public:
 
     /// Constructor

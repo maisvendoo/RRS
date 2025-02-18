@@ -2,11 +2,12 @@
 #define     ANIMATIONS_LIST_H
 
 #include    <QMap>
-#include    "proc-animation.h"
+
+class ProcAnimation;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef QMap<size_t, ProcAnimation *>  animations_t;
+using animations_t = QMap<size_t, ProcAnimation *>;
 
 #endif // ANIMATIONS_LIST_H

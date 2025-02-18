@@ -2,6 +2,8 @@
 
 #include    <osgViewer/Viewer>
 
+#include "proc-animation.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -53,9 +55,8 @@ bool AnimationManager::handle(const osgGA::GUIEventAdapter &ea,
 //------------------------------------------------------------------------------
 void AnimationManager::step(float t, float dt)
 {
-    for (auto it = animations->begin(); it != animations->end(); ++it)
+    for (auto* anim : *animations)
     {
-        ProcAnimation *anim = it.value();
         anim->step(t, dt);
     }
 }

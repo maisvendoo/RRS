@@ -1,11 +1,11 @@
-#ifndef     ABSTRACT_MANIPULATOR_H
-#define     ABSTRACT_MANIPULATOR_H
+#ifndef ABSTRACT_MANIPULATOR_H
+#define ABSTRACT_MANIPULATOR_H
 
-#include    <QObject>
+#include "camera-position.h"
 
-#include    <osgGA/TrackballManipulator>
+#include <osgGA/TrackballManipulator>
 
-#include    "camera-position.h"
+#include <QObject>
 
 //------------------------------------------------------------------------------
 //
@@ -15,28 +15,24 @@ class AbstractManipulator : public QObject, public osgGA::TrackballManipulator
     Q_OBJECT
 
 public:
+    AbstractManipulator(QObject* parent = Q_NULLPTR);
 
-    AbstractManipulator(QObject *parent = Q_NULLPTR);    
-
-    bool handleFrame(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa);
+    bool handleFrame(const osgGA::GUIEventAdapter& event_adapter, osgGA::GUIActionAdapter& action_adapter);
 
 protected:
+    camera_position_t camera_position;
 
-    camera_position_t cp;
-
-    double  start_time;
-    float   delta_time;
+    double start_time;
+    float delta_time;
 
     virtual ~AbstractManipulator();
 
     virtual void process_displays_lock();
 
 signals:
-
     void lock_displays(bool lock);
 
 public slots:
-
     void getCameraPosition(camera_position_t cp);
 };
 

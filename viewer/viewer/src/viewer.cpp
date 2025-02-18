@@ -486,8 +486,8 @@ bool RouteViewer::loadRoute()
 
     if (!stream.is_open())
     {
-        OSG_FATAL << "ERROR: Stream for route-type file is't open" << std::endl;
-        std::cout << "ERROR: Stream for route-type file is't open" << std::endl;
+        OSG_FATAL << "ERROR: Stream for route-type file is not open" << std::endl;
+        std::cout << "ERROR: Stream for route-type file is not open" << std::endl;
         return false;
     }
 
@@ -655,7 +655,7 @@ void RouteViewer::initTCPclient(const settings_t &settings)
 */
     tcp_client->init(settings.tcp_config);
 
-    OSG_FATAL << "TCP-lient is initilized...OK" << std::endl;
+    OSG_FATAL << "TCP-client is initilized...OK" << std::endl;
 }
 
 //------------------------------------------------------------------------------

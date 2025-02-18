@@ -3,10 +3,11 @@
 #include    "config-reader.h"
 #include    "analog-rotation.h"
 #include    "analog-translation.h"
-#include    "material-animation.h"
 
 #include    "material-animation-visitor.h"
 #include    "material-rgb-animation-visitor.h"
+
+#include <osg/MatrixTransform>
 
 //------------------------------------------------------------------------------
 //
@@ -61,10 +62,9 @@ ProcAnimation *AnimTransformVisitor::create_animation(const std::string &name,
 
     osgDB::XmlNode *rootNode = cfg.getConfigNode();
 
-
-    for (auto it = rootNode->children.begin(); it != rootNode->children.end(); ++it)
+    for (auto child_ref_ptr : rootNode->children)
     {
-        osgDB::XmlNode  *child = *it;
+        osgDB::XmlNode  *child = child_ref_ptr.get();
 
         ProcAnimation *animation = nullptr;
 

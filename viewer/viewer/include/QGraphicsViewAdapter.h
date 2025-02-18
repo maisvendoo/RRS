@@ -89,7 +89,7 @@ class QGraphicsViewAdapter : public QObject
         int _width;
         int _height;
 
-        typedef std::map<int, Qt::Key> KeyMap;
+        using KeyMap = std::map<int, Qt::Key>;
         KeyMap                          _keyMap;
         Qt::KeyboardModifiers           _qtKeyModifiers;
 

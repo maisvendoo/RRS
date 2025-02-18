@@ -3,6 +3,8 @@
 
 #include    <osg/Material>
 
+#include <osg/Geode>
+
 MaterialRGBAnimationVisitor::MaterialRGBAnimationVisitor(animations_t *animations,
                                                          ConfigReader *cfg)
     : osg::NodeVisitor()

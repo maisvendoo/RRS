@@ -5,7 +5,6 @@
 #include    <osgGA/GUIEventHandler>
 
 #include    "animations-list.h"
-#include    "proc-animation.h"
 
 //------------------------------------------------------------------------------
 //

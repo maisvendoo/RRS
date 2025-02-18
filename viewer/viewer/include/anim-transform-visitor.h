@@ -1,8 +1,9 @@
 #ifndef     ANIM_TRANSFORM_VISITOR_H
 #define     ANIM_TRANSFORM_VISITOR_H
 
-#include    <osg/NodeVisitor>
 #include    "animations-list.h"
+
+#include    <osg/NodeVisitor>
 
 //------------------------------------------------------------------------------
 //

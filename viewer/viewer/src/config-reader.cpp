@@ -92,11 +92,11 @@ osgDB::XmlNode *ConfigReader::findSection(osgDB::XmlNode *node, const std::strin
 {
     osg::ref_ptr<osgDB::XmlNode> secNode;
 
-    for (auto it = node->children.begin(); it != node->children.end(); ++it)
+    for (auto child : node->children)
     {
-        if ((*it)->name == section)
+        if (child->name == section)
         {
-            secNode = (*it);
+            secNode = child;
             break;
         }
     }

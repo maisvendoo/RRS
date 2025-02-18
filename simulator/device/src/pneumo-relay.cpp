@@ -1,6 +1,6 @@
 #include    "pneumo-relay.h"
 
-#include    "physics.h"
+#include    "math-funcs.h"
 
 //------------------------------------------------------------------------------
 //

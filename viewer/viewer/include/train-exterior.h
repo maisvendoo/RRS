@@ -27,11 +27,9 @@
 #include    "animation-manager.h"
 #include    "camera-position.h"
 #include    "settings.h"
-#include    "global-const.h"
+
 #include    "simulator-info-struct.h"
 #include    "simulator-update-struct.h"
-#include    "config-reader.h"
-#include    "display.h"
 
 #include    "sound-manager.h"
 

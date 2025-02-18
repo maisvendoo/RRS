@@ -29,7 +29,6 @@
 #include    <osg/AlphaFunc>
 #include    <osg/PolygonMode>
 
-#include    "model-smooth.h"
 #include    "texture-filtering.h"
 #include    "model-texturing.h"
 
@@ -61,7 +60,7 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
     {
         OSG_FATAL << "ERROR: model " << model_path << " loading failed";
         return nullptr;
-    }    
+    }
 
     ModelTextureFilter texfilter;
     model->accept(texfilter);
@@ -77,7 +76,7 @@ osg::Node *loadModel(const std::string &modelName, const std::string &textureNam
 
     // Set blend function for model
     osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA,
-                                                                osg::BlendFunc::ONE_MINUS_SRC_ALPHA);    
+                                                                osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
     ss->setAttributeAndModes(blendFunc.get());
     ss->setMode(GL_BLEND, osg::StateAttribute::ON);
     ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
@@ -136,7 +135,7 @@ osg::Group *loadVehicle(const std::string &configDir, const std::string &configN
     if (model.valid())
     {
         transShift->addChild(model.get());
-    }    
+    }
 
     group->addChild(transShift.get());
 
@@ -192,7 +191,7 @@ void loadCabine(osg::Group *vehicle,
     if (cabine_model.valid())
         transShift->addChild(cabine_model.get());
 
-    vehicle->addChild(transShift.get());    
+    vehicle->addChild(transShift.get());
 }
 
 //------------------------------------------------------------------------------

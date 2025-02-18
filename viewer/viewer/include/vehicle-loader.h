@@ -17,8 +17,6 @@
 
 #include    <osg/MatrixTransform>
 
-#include    "vehicle-exterior.h"
-
 
 /*!
  * \fn

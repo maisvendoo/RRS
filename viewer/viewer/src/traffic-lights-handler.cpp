@@ -43,15 +43,13 @@ bool TrafficLightsHandler::handle(const osgGA::GUIEventAdapter &ea,
     {
     case osgGA::GUIEventAdapter::FRAME:
         {
-            for (auto tl = traffic_lights_fwd.begin(); tl != traffic_lights_fwd.end(); ++tl)
+            for (auto* traffic_light : traffic_lights_fwd)
             {
-                TrafficLight *traffic_light = tl.value();
                 traffic_light->update();
             }
 
-            for (auto tl = traffic_lights_bwd.begin(); tl != traffic_lights_bwd.end(); ++tl)
+            for (auto* traffic_light : traffic_lights_bwd)
             {
-                TrafficLight *traffic_light = tl.value();
                 traffic_light->update();
             }
 
@@ -245,15 +243,13 @@ void TrafficLightsHandler::slotUpdateBusyData(QByteArray &data)
 //------------------------------------------------------------------------------
 void TrafficLightsHandler::load_signal_models(const settings_t &settings)
 {
-    for (auto it = traffic_lights_fwd.begin(); it != traffic_lights_fwd.end(); ++it)
+    for (auto* tl : traffic_lights_fwd)
     {
-        TrafficLight *tl = it.value();
         load_signal_model(tl, settings);
     }
 
-    for (auto it = traffic_lights_bwd.begin(); it != traffic_lights_bwd.end(); ++it)
+    for (auto* tl : traffic_lights_bwd)
     {
-        TrafficLight *tl = it.value();
         load_signal_model(tl, settings);
     }
 }

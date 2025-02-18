@@ -19,7 +19,7 @@
 #include    <osg/PagedLOD>
 #include    <osg/Texture2D>
 
-#include    "model-loader.h"
+
 
 //------------------------------------------------------------------------------
 //

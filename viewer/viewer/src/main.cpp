@@ -13,7 +13,6 @@
  */
 
 #include    "main.h"
-#include    <iostream>
 
 /*!
  * \fn

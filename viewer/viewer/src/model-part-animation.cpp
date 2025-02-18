@@ -1,5 +1,4 @@
 #include    "model-part-animation.h"
-#include    "animation-path-callback.h"
 
 //------------------------------------------------------------------------------
 //
@@ -14,7 +13,7 @@ ModelPartAnimation::ModelPartAnimation(osg::MatrixTransform *transform)
     osg::AnimationPathCallback *callback = dynamic_cast<osg::AnimationPathCallback *>(transform->getUpdateCallback());
 
     if (callback == nullptr)
-        return;    
+        return;
 
     path = callback->getAnimationPath();
 
@@ -62,7 +61,7 @@ void ModelPartAnimation::update()
     if (path == nullptr)
         return;
 
-    osg::Matrix matrix;    
+    osg::Matrix matrix;
 
     path->getMatrix(pos * path->getLastTime(), matrix);
 

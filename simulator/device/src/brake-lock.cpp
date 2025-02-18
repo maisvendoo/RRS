@@ -1,6 +1,6 @@
 #include    "brake-lock.h"
 
-#include    "physics.h"
+#include    "math-funcs.h"
 #include    "key-symbols.h"
 #include    "timer.h"
 

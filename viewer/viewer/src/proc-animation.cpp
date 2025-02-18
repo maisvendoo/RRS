@@ -1,28 +1,30 @@
 #include    "proc-animation.h"
 #include    "get-value.h"
 
+#include "config-reader.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation::ProcAnimation(osg::MatrixTransform *transform)
-    : pos(0.0f)
-    , duration(0.0f)
-    , signal_id(0)
-    , transform(transform)
-    , name("")
+ProcAnimation::ProcAnimation(const std::string& name)
+    : name(name)
+{
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ProcAnimation::ProcAnimation(osg::MatrixTransform* transform)
+    : transform(transform)
     , is_fixed_signal(false)
     , fixed_signal(0.0f)
 {
-
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation::~ProcAnimation()
-{
-
-}
+ProcAnimation::~ProcAnimation() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -43,7 +45,7 @@ void ProcAnimation::setName(const std::string &name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string ProcAnimation::getName() const
+const std::string& ProcAnimation::getName() const
 {
     return name;
 }
@@ -106,9 +108,9 @@ bool ProcAnimation::loadKeyPoints(ConfigReader &cfg)
         return false;
     }
 
-    for (auto it = config_node->children.begin(); it != config_node->children.end(); ++it)
+    for (auto child_ref_ptr : config_node->children)
     {
-        osgDB::XmlNode *child = *it;
+        osgDB::XmlNode *child = child_ref_ptr.get();
 
         if (child->name == "KeyPoint")
         {

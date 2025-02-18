@@ -96,7 +96,7 @@ void ImGuiWidgetsHandler::showQuitDialog(bool &is_show)
     {
         ImGui::SetCursorPos(ImVec2(cx, cy));
         is_show = false;
-    }    
+    }
 
     ImGui::End();
 }

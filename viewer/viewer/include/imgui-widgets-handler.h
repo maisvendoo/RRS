@@ -9,7 +9,7 @@
 //
 //------------------------------------------------------------------------------
 class ImGuiWidgetsHandler : public QObject, public OSGImGuiHandler
-{    
+{
     Q_OBJECT
 
 public:

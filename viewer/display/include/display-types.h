@@ -5,6 +5,6 @@
 
 #include    "vehicle-signals.h"
 
-typedef std::array<float, MAX_ANALOG_SIGNALS> display_signals_t;
+using display_signals_t = std::array<float, MAX_ANALOG_SIGNALS>;
 
 #endif // DISPLAY_TYPES_H

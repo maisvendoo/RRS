@@ -44,7 +44,7 @@ void initEnvironmentLight(osg::Group *root,
     sun->setDirection(sunDir);
 
     osg::ref_ptr<osg::LightSource> light0 = new osg::LightSource;
-    light0->setLight(sun);    
+    light0->setLight(sun);
 
     root->getOrCreateStateSet()->setMode(GL_LIGHT0, osg::StateAttribute::ON);
     root->addChild(light0.get());

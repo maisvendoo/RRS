@@ -22,9 +22,9 @@ osg::Matrixd TrainManipulator::getMatrix() const
 {
     osg::Matrixd matrix;
 
-    matrix *= osg::Matrixd::rotate(-cp.attitude.x(), osg::Vec3d(1.0, 0.0, 0.0));
-    matrix *= osg::Matrixd::rotate(-cp.attitude.z() + cp.is_orient_bwd * osg::PI, osg::Vec3d(0.0, 0.0, 1.0));
-    matrix *= osg::Matrixd::translate(cp.position);
+    matrix *= osg::Matrixd::rotate(-camera_position.attitude.x(), osg::Vec3d(1.0, 0.0, 0.0));
+    matrix *= osg::Matrixd::rotate(-camera_position.attitude.z() + camera_position.is_orient_bwd * osg::PI, osg::Vec3d(0.0, 0.0, 1.0));
+    matrix *= osg::Matrixd::translate(camera_position.position);
 
     return matrix;
 }

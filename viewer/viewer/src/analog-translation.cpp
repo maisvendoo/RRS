@@ -1,5 +1,11 @@
 #include    "analog-translation.h"
 
+#include    "math-funcs.h"
+
+#include "config-reader.h"
+
+#include <osg/MatrixTransform>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -44,7 +50,7 @@ bool AnalogTranslation::load_config(ConfigReader &cfg)
 {
     std::string secName = "AnalogTranslation";
 
-    cfg.getValue(secName, "SignalID", signal_id);    
+    cfg.getValue(secName, "SignalID", signal_id);
     cfg.getValue(secName, "Duration", duration);
     is_fixed_signal = cfg.getValue(secName, "FixedSignal", fixed_signal);
 
@@ -53,7 +59,7 @@ bool AnalogTranslation::load_config(ConfigReader &cfg)
 
     std::istringstream ss(tmp);
 
-    ss >> axis.x() >> axis.y() >> axis.z();   
+    ss >> axis.x() >> axis.y() >> axis.z();
 
     return true;
 }
@@ -66,7 +72,7 @@ void AnalogTranslation::update()
     if (keypoints.size() == 0)
         return;
 
-    motion = cut(motion, (*keypoints.begin()).value, (*(keypoints.end() - 1)).value);
+    motion = cut(motion, keypoints.front().value, keypoints.back().value);
 
     osg::Matrix translate = osg::Matrixf::translate(axis * motion);
     transform->setMatrix(translate * matrix);

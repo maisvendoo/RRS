@@ -1,6 +1,8 @@
 #include    <tcp-server.h>
 #include    <Journal.h>
 #include    <CfgReader.h>
+#include <QBuffer>
+#include <QTcpSocket>
 
 //------------------------------------------------------------------------------
 //

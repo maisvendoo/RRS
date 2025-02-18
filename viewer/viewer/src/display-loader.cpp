@@ -18,7 +18,7 @@ void loadDisplayModule(const display_config_t &display_config,
     {
         OSG_FATAL << "Module " << display_config.module_name.toStdString() << " is't found";
         return;
-    }    
+    }
 
     DisplayVisitor dv(dc, display_config);
     dv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);

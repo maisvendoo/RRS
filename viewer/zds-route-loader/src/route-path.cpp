@@ -163,8 +163,8 @@ bool RoutePath::load(std::istream &stream)
         tmp_data.push_back(track);
     }
 
-    track_data.push_back(*tmp_data.begin());
-    length += (*tmp_data.begin()).length;
+    track_data.push_back(tmp_data.front());
+    length += tmp_data.front().length;
 
     float rail_coord = 0.0f;
 

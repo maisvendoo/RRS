@@ -1,8 +1,8 @@
 #include    <tcp-client.h>
 #include    <CfgReader.h>
-#include    <iostream>
 #include    <QTcpSocket>
 #include    <QNetworkProxy>
+#include <QBuffer>
 
 //------------------------------------------------------------------------------
 //

@@ -65,7 +65,7 @@ osgDB::ReaderWriter::ReadResult ReaderWriterDMD::readNode(std::ifstream &stream,
 
         vertices->push_back(mesh.vertices->at(face[0]));
         vertices->push_back(mesh.vertices->at(face[1]));
-        vertices->push_back(mesh.vertices->at(face[2]));        
+        vertices->push_back(mesh.vertices->at(face[2]));
     }
 
     osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;

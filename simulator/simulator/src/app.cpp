@@ -14,10 +14,7 @@
  */
 
 #include    "app.h"
-#include    "CfgReader.h"
 #include    "global-const.h"
-
-#include    "filesystem.h"
 #include    "Journal.h"
 
 //------------------------------------------------------------------------------
@@ -166,7 +163,7 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
     QCommandLineOption debugPrint(QStringList() << "o" << "debug-print",
                                   QCoreApplication::translate("main", "Allow debug print"));
 
-    parser.addOption(debugPrint);    
+    parser.addOption(debugPrint);
 
     QCommandLineOption initCoord(QStringList() << "x" << "init-coord",
                                  QCoreApplication::translate("main", "Initial railway coordinate"),
@@ -176,7 +173,7 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
     QCommandLineOption direction(QStringList() << "d" << "direction",
                                  QCoreApplication::translate("main", "Motion's direction"),
-                                 QCoreApplication::translate("main", "direction"));    
+                                 QCoreApplication::translate("main", "direction"));
 
     parser.addOption(direction);
 

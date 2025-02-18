@@ -1,7 +1,10 @@
-#ifndef     ANALOG_TRANSLATION_H
-#define     ANALOG_TRANSLATION_H
+#ifndef ANALOG_TRANSLATION_H
+#define ANALOG_TRANSLATION_H
 
-#include    "proc-animation.h"
+#include "proc-animation.h"
+
+#include <osg/Vec3>
+#include <osg/Matrix>
 
 //------------------------------------------------------------------------------
 //
@@ -9,25 +12,23 @@
 class AnalogTranslation : public ProcAnimation
 {
 public:
-
-    AnalogTranslation(osg::MatrixTransform *transform);
+    AnalogTranslation(osg::MatrixTransform* transform);
 
     ~AnalogTranslation();
 
 private:
+    float min_motion;
+    float max_motion;
+    float motion;
 
-    float       min_motion;
-    float       max_motion;
-    float       motion;
+    float cur_pos;
 
-    float       cur_pos;
-
-    osg::Vec3   axis;
+    osg::Vec3 axis;
     osg::Matrix matrix;
 
     void anim_step(float t, float dt);
 
-    bool load_config(ConfigReader &cfg);
+    bool load_config(ConfigReader& cfg);
 
     void update();
 };

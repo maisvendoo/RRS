@@ -17,8 +17,6 @@
 
 #include    "abstract-path.h"
 
-#include    <fstream>
-
 #include    <osgDB/FileUtils>
 #include    <osgDB/FileNameUtils>
 

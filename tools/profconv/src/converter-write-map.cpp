@@ -4,7 +4,6 @@
 #include    <QVariant>
 
 #include    "path-utils.h"
-#include    "CfgEditor.h"
 
 //------------------------------------------------------------------------------
 //

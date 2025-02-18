@@ -54,17 +54,17 @@ public:
     virtual void load(std::string routeDir, float view_dist = 1000.0f) = 0;
 
     /// Get route scene group node
-    virtual osg::Group *getRoot();        
+    virtual osg::Group *getRoot();
 
     virtual MotionPath *getMotionPath(int direction) = 0;
 
-protected:    
+protected:
 
     /// Route directory
     std::string routeDir;
 
     /// Route static scene root node
-    osg::ref_ptr<osg::Group>    root;        
+    osg::ref_ptr<osg::Group>    root;
 
     /// Destructor
     virtual ~RouteLoader() {}
@@ -76,7 +76,7 @@ protected:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef RouteLoader* (*GetRouteLoader)();
+using GetRouteLoader = RouteLoader* (*)();
 
 //------------------------------------------------------------------------------
 //

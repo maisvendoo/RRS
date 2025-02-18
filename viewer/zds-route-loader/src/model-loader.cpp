@@ -19,7 +19,6 @@
 #include    <osgDB/ImageOptions>
 
 #include    "texture-loader.h"
-#include    "texture-func.h"
 
 #include    <osg/BlendFunc>
 #include    <osg/AlphaFunc>

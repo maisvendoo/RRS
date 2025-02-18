@@ -1,5 +1,4 @@
 #include    "rails-manipulator.h"
-#include    "math-funcs.h"
 
 #include    <osgViewer/Viewer>
 
@@ -21,13 +20,13 @@ RailsManipulator::RailsManipulator(settings_t settings, QObject *parent)
 //------------------------------------------------------------------------------
 osg::Matrixd RailsManipulator::getMatrix() const
 {
-    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(cp.driver_pos.x() + rel_pos.x(),
-                                                           cp.driver_pos.z() + rel_pos.z(),
-                                                           -cp.driver_pos.y() - rel_pos.y()));
+    osg::Matrix matrix = osg::Matrix::translate(osg::Vec3f(camera_position.driver_pos.x() + rel_pos.x(),
+                                                           camera_position.driver_pos.z() + rel_pos.z(),
+                                                           -camera_position.driver_pos.y() - rel_pos.y()));
 
-    matrix *= osg::Matrix::rotate(static_cast<double>(-cp.attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
-    matrix *= osg::Matrix::rotate(static_cast<double>(-cp.attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
-    matrix *= osg::Matrix::translate(cp.position);
+    matrix *= osg::Matrix::rotate(static_cast<double>(-camera_position.attitude.x()), osg::Vec3(1.0f, 0.0f, 0.0f));
+    matrix *= osg::Matrix::rotate(static_cast<double>(-camera_position.attitude.z()), osg::Vec3(0.0f, 0.0f, 1.0f));
+    matrix *= osg::Matrix::translate(camera_position.position);
 
     return matrix;
 }

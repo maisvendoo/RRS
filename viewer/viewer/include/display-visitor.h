@@ -7,6 +7,8 @@
 
 #include    "display-container.h"
 
+#include    "display-config.h"
+
 class DisplayVisitor : public osg::NodeVisitor
 {
 public:
