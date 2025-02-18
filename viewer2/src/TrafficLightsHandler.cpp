@@ -228,9 +228,10 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
         vsg::CullNode* cull_node = vsg::cast<vsg::CullNode>(signal_node);
         vsg::MatrixTransform* old_transform = vsg::cast<vsg::MatrixTransform>(cull_node->child);
         auto new_transform = vsg::MatrixTransform::create();
-        vsg::Group* group = vsg::cast<vsg::Group>(old_transform->children[0]);
+        vsg::Group* old_group = vsg::cast<vsg::Group>(old_transform->children[0]);
+        auto new_group = vsg::Group::create();
 
-        for (auto child : group->children)
+        for (auto child : old_group->children)
         {
             std::string name;
             child->getValue("name", name);
@@ -238,10 +239,13 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
             auto transform = vsg::MatrixTransform::create();
             transform->setValue("name", name);
             transform->addChild(child);
-            new_transform->addChild(transform);
+            new_group->addChild(transform);
         }
+        new_transform->addChild(new_group);
+        new_transform->matrix = vsg::rotate(vsg::radians(90.0f), vsg::vec3(1.0f, 0.0f, 0.0f));
 
         cull_node->child = new_transform;
+        // old_transform = new_transform;
 
         // animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
