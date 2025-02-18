@@ -48,7 +48,7 @@ bool RouteLoader::parse_objects_ref(Route& route)
         if (!model_path.empty()
             && is_slash(model_path.front()))
         {
-            std::replace(model_path.begin(), model_path.end(), '\\', '/');
+            std::replace(model_path.begin(), model_path.end(), '/', '\\');
             route.object_ref.insert({label, model_path});
         }
     }

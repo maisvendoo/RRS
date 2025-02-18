@@ -15,10 +15,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenAL REQUIRED CONFIG)
 
-set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
-set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
-set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
-set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
+#set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
+#set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
+#set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
+#set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
 
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
 find_package(vsg REQUIRED)
@@ -29,15 +29,16 @@ find_package(vsgXchange REQUIRED)
 # find_package(vsgQt REQUIRED)
 
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
+file(GLOB PUGIXML_SOURCES ./dependencies/pugixml/src/*.cpp)
 
-if (WIN32)
-    add_library(pugixml STATIC IMPORTED)
-    set_target_properties(pugixml PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/dependencies/pugixml.lib)
-else()
-    find_package(pugixml REQUIRED)
-endif()
+#if (WIN32)
+#    add_library(pugixml STATIC IMPORTED)
+#    set_target_properties(pugixml PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/dependencies/pugixml.lib)
+#else()
+#    find_package(pugixml REQUIRED)
+#endif()
 
-add_executable(${TARGET} ${TARGET_SOURCES})
+add_executable(${TARGET} ${TARGET_SOURCES} ${PUGIXML_SOURCES})
 
 target_link_libraries(${TARGET} PRIVATE
     OpenAL::OpenAL
@@ -47,8 +48,7 @@ target_link_libraries(${TARGET} PRIVATE
     # vsgImGui::vsgImGui
     # vsgQt::vsgQt
     filesystem
-    network
-    pugixml
+    network    
 )
 
 # message()
@@ -59,5 +59,5 @@ target_include_directories(${TARGET} PRIVATE
     ../filesystem/include
     ../network/include
     ./include
-    ./pugixml-1.15/include
+    ./dependencies/pugixml/include
 )
