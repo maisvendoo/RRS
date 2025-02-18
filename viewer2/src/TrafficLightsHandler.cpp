@@ -20,6 +20,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/CullGroup.h>
+#include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
@@ -224,13 +225,31 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
         auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
 
+        vsg::CullNode* cull_node = vsg::cast<vsg::CullNode>(signal_node);
+        vsg::MatrixTransform* old_transform = vsg::cast<vsg::MatrixTransform>(cull_node->child);
+        auto new_transform = vsg::MatrixTransform::create();
+        vsg::Group* group = vsg::cast<vsg::Group>(old_transform->children[0]);
+
+        for (auto child : group->children)
+        {
+            std::string name;
+            child->getValue("name", name);
+
+            auto transform = vsg::MatrixTransform::create();
+            transform->setValue("name", name);
+            transform->addChild(child);
+            new_transform->addChild(transform);
+        }
+
+        cull_node->child = new_transform;
+
         // animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
         transform->matrix = m2 * m1;
         transform->addChild(signal_node);
 
         TrafficLight *traffic_light = tl;
-        traffic_light->setNode(transform);
+        traffic_light->setNode(signal_node);
         traffic_light->load_animations(animations_dir);
 
         traffic_light_nodes->addChild(transform);

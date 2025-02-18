@@ -100,7 +100,7 @@ int RouteViewer::run()
         auto delta_time = current_time - last_time;
         last_time = current_time;
         double delta = std::chrono::duration_cast<std::chrono::milliseconds>(delta_time).count();
-        LOG_INFO("FPS: %f", 1.0 / delta * 1000.0);
+        // LOG_INFO("FPS: %f", 1.0 / delta * 1000.0);
 
         // LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
     }

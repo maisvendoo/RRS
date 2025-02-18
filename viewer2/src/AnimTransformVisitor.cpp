@@ -2,11 +2,14 @@
 #include "AnalogRotation.h"
 #include "AnalogTranslation.h"
 #include "ConfigReader.h"
+#include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 #include "filesystem.h"
+#include <cstring>
 #include <iostream>
 #include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
+#include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/StateGroup.h>
@@ -19,43 +22,23 @@ AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::
 
 void AnimTransformVisitor::apply(vsg::Node& node)
 {
-    std::string name;
-    if (node.getValue("name", name))
-    {
-        // std::cout << "Node: " << name << "    Class: " << node.className() << std::endl;
-    }
-
     node.traverse(*this);
 }
 
 void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
 {
-    std::cout << "Class: " << transform.className() << std::endl;
-    for (auto child : transform.children)
-    {
-        std::cout << "    " << child->className() << std::endl;
-    }
+    std::string name;
+    transform.getValue("name", name);
 
-    // std::string name;
-    // transform.children[0]->getValue("name", name);
-    // transform.setValue("name", name);
-    // std::cout << "Node: " << name << "    Class: " << transform.className() << std::endl;
+    ProcAnimation* animation = create_animation(name, transform);
+    if (animation)
+    {
+    }
 
     transform.traverse(*this);
 }
 
-void AnimTransformVisitor::apply(vsg::Group& group)
-{
-    std::string name;
-    if (group.getValue("name", name))
-    {
-        // std::cout << "Node: " << name << "    Class: " << group.className() << std::endl;
-    }
-
-    group.traverse(*this);
-}
-
-ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Node& node)
+ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
 {
     FileSystem& fs = FileSystem::getInstance();
     std::string data_dir = fs.getDataDir();
@@ -72,9 +55,30 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         for (auto config_child : config_section.children())
         {
             std::string child_name = config_child.name();
+
             if (child_name == "AnalogRotation")
             {
-                // animation = new AnalogRotation(node);
+                animation = new AnalogRotation(&transform);
+                animation->load(cfg);
+                return animation;
+            }
+
+            if (child_name == "AnalogTranslation")
+            {
+                animation = new AnalogTranslation(&transform);
+                animation->load(cfg);
+                return animation;
+            }
+
+            if (child_name == "MaterialAnimation")
+            {
+                MaterialAnimationVisitor mav(animations, &cfg);
+                transform.accept(mav);
+            }
+
+            if (child_name == "MaterialRGBAnimation")
+            {
+
             }
         }
     }

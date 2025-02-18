@@ -1,6 +1,7 @@
 #include "MaterialAnimationVisitor.h"
 #include "ConfigReader.h"
 #include "animations-list.h"
+#include <iostream>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/nodes/StateGroup.h>
@@ -17,26 +18,43 @@ MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, Con
 
 void MaterialAnimationVisitor::apply(vsg::Node& node)
 {
+//     std::string name;
+//     node.getValue("name", name);
+//     std::cout << node.className() << ' ' << name << std::endl;
+
    node.traverse(*this);
 }
 
 void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 {
+    std::string name;
+    stateGroup.getValue("name", name);
+    std::cout << stateGroup.className() << ' ' << name << std::endl;
+    std::cout << "stateCommands count: " << stateGroup.stateCommands.size() << std::endl;
     for (auto& command : stateGroup.stateCommands)
     {
-        if (auto bindDescriptorSets = command->cast<vsg::BindDescriptorSets>())
+        command->getValue("name", name);
+        std::cout << "    " << command->className() << ' ' << name << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto& command : stateGroup.stateCommands)
+    {
+        if (auto bindDescriptorSet = command->cast<vsg::BindDescriptorSet>())
         {
-            for (auto& descriptorSet : bindDescriptorSets->descriptorSets)
+            auto& descriptorSet = bindDescriptorSet->descriptorSet;
+            for (auto& descriptor : descriptorSet->descriptors)
             {
-                for (auto& descriptor : descriptorSet->descriptors)
+                if (auto descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
                 {
-                    if (auto descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
-                    {
-                        auto data = descriptorBuffer->bufferInfoList[0]->data;
-                        auto material = reinterpret_cast<vsg::material*>(data.get());
-                    }
+                    auto data = descriptorBuffer->bufferInfoList[0]->data;
+                    auto material = reinterpret_cast<vsg::material*>(data.get());
+                    vsg::material b = *material;
+                    int a = 10;
                 }
             }
         }
     }
+
+    stateGroup.traverse(*this);
 }
