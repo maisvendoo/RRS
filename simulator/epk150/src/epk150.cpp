@@ -29,6 +29,8 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     , V2(1e-3)
     , is_emergency_brake(false)
     , is_whistle_on(0.0)
+    , is_airflow_on(0.0)
+    , airflow_sound_volume(0.0)
 {
     std::fill(K.begin(), K.end(), 0.0);
 }
@@ -73,8 +75,13 @@ sound_state_t AutoTrainStopEPK150::getSoundState(size_t idx) const
 //------------------------------------------------------------------------------
 float AutoTrainStopEPK150::getSoundSignal(size_t idx) const
 {
-    (void) idx;
-    return sound_state_t::createSoundSignal(is_whistle_on > Physics::ZERO);
+    if(idx == AutoTrainStop::EPK_WHISTLE_SOUND)
+        return sound_state_t::createSoundSignal(is_whistle_on > Physics::ZERO);
+
+    if(idx == AutoTrainStop::EPK_AIRFLOW_SOUND)
+        return sound_state_t::createSoundSignal(is_airflow_on > Physics::ZERO, airflow_sound_volume);
+
+    return 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -92,7 +99,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double u2 = cut(pf(k[1] * dp1), 0.0, 1.0);
 
-    double u3 = cut(nf(k[2] * dp1), 0.0, 1.0);
+    double u3 = is_airflow_on = cut(nf(k[2] * dp1), 0.0, 1.0);
 
     double sum_p1 = Y[2] + ps1 - pBP;
 
@@ -124,8 +131,9 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
     // Поток из тормозной магистрали в камеру над срывным клапаном
     double Q_bp_1 = K[1] * (pBP - Y[2]);
 
-    // Разрядка камеры над срывным клапаном в атмосферу
-    double Q_1_atm = K[2] * Y[2] * u3;
+    // Разрядка камеры над срывным клапаном в атмосферу от срывного
+    // клапана и клапана КОН
+    double Q_1_atm = K[2] * Y[2] * u3 + K[6] * Y[2] * valve_electrical_supply;
 
     // Экстренная разрядка тормозной магистрали в атмосферу
     double Q_bp_emergency = K[3] * pBP * u4;
@@ -143,6 +151,8 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
     dYdt[2] = (Q_bp_1 - Q_1_atm) / V1;
 
     dYdt[0] = ( pk * u1 * u2 - Y[0] ) / T1;
+
+    airflow_sound_volume = cut(nf(k[2] * dp1), 0.0, 1.0);
 }
 
 //------------------------------------------------------------------------------

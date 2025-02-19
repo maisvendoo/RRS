@@ -14,8 +14,6 @@ public:
     explicit AbstractDeviceTSKBM(QObject *parent = nullptr);
     virtual ~AbstractDeviceTSKBM();
 
-    virtual bool init();
-
     void step(double t, double dt) override;
 
     /// Device model ODE system

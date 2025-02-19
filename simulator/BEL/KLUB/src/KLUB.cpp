@@ -38,16 +38,8 @@ bool KLUB::init()
 
     if(loadTSKBMDevicePlugin(plugins_dir))
     {
-        if(TSKBM->init())
-        {
-            connect(TSKBM, &AbstractDeviceTSKBM::TSKBMVigilanceCheck, this, &KLUB::onTSKBMVigilanceCheck);
-            connect(TSKBM, &AbstractDeviceTSKBM::TSKBMfailureEPK, this, &KLUB::onTSKBMfailureEPK);
-        }
-        else
-        {
-            qWarning() << "Warning: TSKBM device plugin initialization failed with an error.";
-            return false;
-        }
+        connect(TSKBM, &AbstractDeviceTSKBM::TSKBMVigilanceCheck, this, &KLUB::onTSKBMVigilanceCheck);
+        connect(TSKBM, &AbstractDeviceTSKBM::TSKBMfailureEPK, this, &KLUB::onTSKBMfailureEPK);
     }
     else
     {
@@ -338,8 +330,8 @@ int KLUB::getCodeInfoMsg() const
 
 void KLUB::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
+    (void) Y;
+    (void) t;
     // Очищаем состояние ламп
     std::fill(lamps.begin(), lamps.end(), 0.0f);
 
@@ -806,7 +798,7 @@ void KLUB::calc_speed()
 
 void KLUB::calc_acceleration(double t, double dt)
 {
-    Q_UNUSED(t)
+    (void) t;
 
     if(V_fact_ms < 1e-4)
     {

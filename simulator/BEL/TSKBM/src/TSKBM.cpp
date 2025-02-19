@@ -9,15 +9,11 @@ TSKBM::TSKBM(QObject *parent) : AbstractDeviceTSKBM(parent)
 {
     connect(safety_timer, &Timer::process, this, &TSKBM::onSafetyTimer);
     connect(failure_EPK_timer, &Timer::process, this, &TSKBM::onFailureEPKTimer);
-}
 
-bool TSKBM::init()
-{
     this->read_config(TSKBM_CFG);
 
     safety_timer->setTimeout(getSafetyTimerInterval(tskbm_cfg.min_check_interval_on_device,
                                                     tskbm_cfg.max_check_interval_on_device));
-    return true;
 }
 
 void TSKBM::step(double t, double dt)
@@ -44,9 +40,9 @@ void TSKBM::stopSafetyTimer() const
 
 void TSKBM::load_config(CfgReader &cfg)
 {
-     QString secName = "Device";
+    QString sec_name = "Device";
 
-    if(!cfg.getInt(secName, "MinVigCheckIntervalOnDevice", tskbm_cfg.min_check_interval_on_device))
+    if(!cfg.getInt(sec_name, "MinVigCheckIntervalOnDevice", tskbm_cfg.min_check_interval_on_device))
     {
         constexpr int DEFAULT_MIN_CHECK_INTERVAL_ON_DEVICE = 180;
 
@@ -58,7 +54,7 @@ void TSKBM::load_config(CfgReader &cfg)
                    << DEFAULT_MIN_CHECK_INTERVAL_ON_DEVICE;
     }
 
-    if(!cfg.getInt(secName, "MaxVigCheckIntervalOnDevice", tskbm_cfg.max_check_interval_on_device))
+    if(!cfg.getInt(sec_name, "MaxVigCheckIntervalOnDevice", tskbm_cfg.max_check_interval_on_device))
     {
         constexpr int DEFAULT_MAX_CHECK_INTERVAL_ON_DEVICE = 600;
 
@@ -70,7 +66,7 @@ void TSKBM::load_config(CfgReader &cfg)
                    << DEFAULT_MAX_CHECK_INTERVAL_ON_DEVICE;
     }
 
-    if(!cfg.getDouble(secName, "FailureEPKInterval", tskbm_cfg.failure_EPK_interval))
+    if(!cfg.getDouble(sec_name, "FailureEPKInterval", tskbm_cfg.failure_EPK_interval))
     {
         constexpr double DEFAULT_FAILURE_EPK_INTERVAL = 5.0;
 

@@ -12,6 +12,7 @@ AutoTrainStop::AutoTrainStop(QObject *parent) : BrakeDevice(parent)
   , pBP(0.0)
   , QFL(0.0)
   , QBP(0.0)
+  , valve_electrical_supply(0.0)
 {
 
 }
@@ -94,6 +95,11 @@ void AutoTrainStop::setBPpressure(double value)
 double AutoTrainStop::getBPflow() const
 {
     return QBP;
+}
+
+void AutoTrainStop::setValveElectricalSupply(bool valve_electrical_supply)
+{
+    this->valve_electrical_supply = static_cast<double>(valve_electrical_supply);
 }
 
 //------------------------------------------------------------------------------

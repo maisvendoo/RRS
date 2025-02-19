@@ -41,6 +41,16 @@ public:
     /// Поток в тормозную магистраль
     double getBPflow() const;
 
+    /// Задать электропитание вентиля КОН
+    void setValveElectricalSupply(bool valve_electrical_supply);
+
+    enum
+    {
+        NUM_SOUNDS = 2,
+        EPK_WHISTLE_SOUND = 0,
+        EPK_AIRFLOW_SOUND = 1
+    };
+
 protected:
 
     /// Наличие электропитания
@@ -58,6 +68,9 @@ protected:
     double QFL;
     /// Поток в тормозную магистраль
     double QBP;
+
+    /// Электропитание вентиля КОН
+    double valve_electrical_supply;
 };
 
 //------------------------------------------------------------------------------

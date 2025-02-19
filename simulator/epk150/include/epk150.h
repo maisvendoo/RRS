@@ -72,9 +72,17 @@ private:
     /// Признак работы свистка
     double is_whistle_on;
 
+    /// Флаг работы выпуска воздуха из полости над срывным клапаном ЭПК
+    double is_airflow_on;
+
+    /// Громкость звука выпуска воздуха из полости над срывным клапаном ЭПК
+    float airflow_sound_volume;
+
     std::array<double, MAX_FLOW_COEFFS> K;
 
     std::array<double, MAX_GIAN_COEFFS> k;
+
+    std::array<sound_state_t, NUM_SOUNDS> sound_states;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

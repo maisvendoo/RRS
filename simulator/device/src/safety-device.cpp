@@ -23,9 +23,9 @@ void SafetyDevice::step(double t, double dt)
 
 void SafetyDevice::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
+    (void) Y;
+    (void) dYdt;
+    (void) t;
 }
 
 bool SafetyDevice::isDisplayON() const
@@ -35,7 +35,7 @@ bool SafetyDevice::isDisplayON() const
 
 void SafetyDevice::setReversorDirection(int reversor_direction)
 {
-    Q_UNUSED(reversor_direction)
+    (void) reversor_direction;
 }
 
 int SafetyDevice::getStationIndex() const

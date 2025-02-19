@@ -12,8 +12,6 @@ public:
     explicit TSKBM(QObject *parent = nullptr);
     ~TSKBM() = default;
 
-    bool init() override;
-
     void step(double t, double dt) override;
 
     /// Запуск таймера периодической проверки бдительности ТСКБМ

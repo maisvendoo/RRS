@@ -11,11 +11,6 @@ AbstractDeviceTSKBM::~AbstractDeviceTSKBM()
 
 }
 
-bool AbstractDeviceTSKBM::init()
-{
-    return true;
-}
-
 void AbstractDeviceTSKBM::step(double t, double dt)
 {
     Device::step(t, dt);
@@ -23,9 +18,9 @@ void AbstractDeviceTSKBM::step(double t, double dt)
 
 void AbstractDeviceTSKBM::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
+    (void) Y;
+    (void) dYdt;
+    (void) t;
 }
 
 AbstractDeviceTSKBM *loadPluginTSKBMDevice(QString lib_path)
