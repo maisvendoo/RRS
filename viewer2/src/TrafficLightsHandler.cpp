@@ -205,7 +205,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 {
     if (!signal_nodes_paths.value(tl->getModelName(), "").isEmpty())
     {
-        auto transform = vsg::MatrixTransform::create();
+        auto global_transform = vsg::MatrixTransform::create();
 
         vsg::dmat4 m1 = vsg::translate(vsg::dvec3(tl->getPosition()));
 
@@ -249,14 +249,14 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
         // animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
 
-        transform->matrix = m2 * m1;
-        transform->addChild(signal_node);
+        global_transform->matrix = m2 * m1;
+        global_transform->addChild(signal_node);
 
         TrafficLight *traffic_light = tl;
         traffic_light->setNode(signal_node);
         traffic_light->load_animations(animations_dir);
 
-        traffic_light_nodes->addChild(transform);
+        traffic_light_nodes->addChild(global_transform);
     }
 
     // auto pagedLOD = vsg::PagedLOD::create();

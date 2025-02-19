@@ -33,6 +33,7 @@ private:
     pugi::xml_node current_section;
 };
 
+// TODO: repair
 template <typename T>
 void ConfigReader::getValue(const std::string& param, T& value)
 {
