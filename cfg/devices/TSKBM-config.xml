@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+		<!--Минимальный интервал периодической проверки бдительности ТСКБМ при работающем устройстве-->
+        <MinVigCheckIntervalOnDevice>180</MinVigCheckIntervalOnDevice>
+		<!--Максимальный интервал периодической проверки бдительности ТСКБМ при работающем устройстве-->
+        <MaxVigCheckIntervalOnDevice>600</MaxVigCheckIntervalOnDevice>
+		<!--Интервал до срыва ЭПК при периодической проверке бдительности ТСКБМ-->
+        <FailureEPKInterval>5.0</FailureEPKInterval>
+    </Device>
+</Config>

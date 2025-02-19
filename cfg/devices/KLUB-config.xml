@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+		<!--Минимальный интервал периодической проверки бдительности при К, КЖ, Ж - в режиме выключенного ТСКБМ-->
+        <MinVigCheckInterval>30</MinVigCheckInterval>
+        <!--Максимальный интервал периодической проверки бдительности при К, КЖ, Ж - в режиме выключенного ТСКБМ-->
+        <MaxVigCheckInterval>40</MaxVigCheckInterval>
+        <!--Минимальный интервал периодической проверки бдительности при З, Б - в режиме выключенного ТСКБМ-->
+        <MinGreenVigCheckInterval>60</MinGreenVigCheckInterval>
+        <!--Максимальный интервал периодической проверки бдительности при З, Б - в режиме выключенного ТСКБМ-->
+        <MaxGreenVigCheckInterval>90</MaxGreenVigCheckInterval>
+        <!--Интервал периодической проверки бдительности при прочих ситуациях - в режиме выключенного ТСКБМ-->
+        <OtherVigCheckInterval>90</OtherVigCheckInterval>
+        <!--Интервал до срыва ЭПК при периодической проверке бдительности-->
+        <FailureEPKInterval>5.0</FailureEPKInterval>
+        <!--Интервал предупреждающего звукового сигнала при превышении скорости-->
+        <BeepInterval>0.65</BeepInterval>
+        <!--Интервал до срыва ЭПК при тяговом положении контроллера и отсутствии движения-->
+        <MotionControlInterval>74</MotionControlInterval>
+        <!--Интервал таймера удержания рукояток РБ, РБС, РБП-->
+        <RBHoldInterval>1.5</RBHoldInterval>
+        <!--Допустимое время удержания рукояток РБ, РБС, РБП-->
+        <RBAcceptHoldingTime>3.0</RBAcceptHoldingTime>
+        <!--Допустимая скорость движения при жёлтом сигнале-->
+        <Vyellow>60</Vyellow>
+        <!--Ускорение для рассчёта кривой снижения скорости-->
+        <Acceleration>0.3</Acceleration>
+        <!--Погрешность ограничения скорости-->
+        <SpeedLimitError>1.0</SpeedLimitError>
+		<!--Флаг работы устройства ТСКБМ-->
+		<IsWorkingTSKBMDevice>1</IsWorkingTSKBMDevice>
+		<!--Плагин устройства ТСКБМ-->
+		<TSKBMDevicePlugin>TSKBM</TSKBMDevicePlugin>
+    </Device>
+</Config>

@@ -37,5 +37,6 @@ add_subdirectory (connector-speedmap)
 add_subdirectory (trajectory-speedmap)
 add_subdirectory (connector-ALSN)
 add_subdirectory (trajectory-ALSN)
+add_subdirectory (BEL)
 
 install(FILES ../common-headers/sound-signal.h DESTINATION sdk/include)

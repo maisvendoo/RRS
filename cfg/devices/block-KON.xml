@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+	<!--Допустимое давление в тормозных цилиндрах в случае выключения ЭПК, в МПа-->
+	<PermissiblePressureBC>0.068</PermissiblePressureBC>
+	<!--Интервал анализа величины давления после выключения ЭПК, в сек-->
+	<ControlInterval>11</ControlInterval>
+    </Device>
+</Config>
