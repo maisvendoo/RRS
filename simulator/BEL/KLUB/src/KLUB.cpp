@@ -128,11 +128,11 @@ float KLUB::getLampNum()
 {
     for(int i = 0; i <= GREEN_LAMP1; ++i)
     {
-        if(lamps[i] == 1.0f)
+        if(static_cast<bool>(lamps[i]))
             return static_cast<float>(i);
     }
 
-    return 0.0f;
+    return 7.0f;
 }
 
 double KLUB::getCurrentSpeedLimit() const
@@ -332,8 +332,6 @@ void KLUB::preStep(state_vector_t &Y, double t)
 {
     (void) Y;
     (void) t;
-    // Очищаем состояние ламп
-    std::fill(lamps.begin(), lamps.end(), 0.0f);
 
     if(turnOnDisplay())
     {
@@ -702,28 +700,28 @@ void KLUB::alsn_process(int code_alsn)
     {
         if ((old_code_alsn == ALSN::RED_YELLOW) && isMove())
         {
-            lamps[RED_LAMP] = 1.0f;
+            setLampState(RED_LAMP);
             is_red.set();
         }
         else
         {
             if (!is_red.getState())
-                lamps[WHITE_LAMP] = 1.0f;
+                setLampState(WHITE_LAMP);
         }
 
         break;
     }
 
     case ALSN::RED_YELLOW:
-        lamps[RED_YELLOW_LAMP] = 1.0f;
+        setLampState(RED_YELLOW_LAMP);
         break;
 
     case ALSN::YELLOW:
-        lamps[YELLOW_LAMP] = 1.0f;
+        setLampState(YELLOW_LAMP);
         break;
 
     case ALSN::GREEN:
-        lamps[GREEN_LAMP1] = 1.0f;
+        setLampState(GREEN_LAMP1);
         break;
 
     default:
@@ -1208,6 +1206,17 @@ void KLUB::infoMsgFailureEPK()
 {
     if(failure_EPK_state)
         code_info_msg = CodeInfoMsg::FailureEPK;
+}
+
+void KLUB::setLampState(size_t lamp_idx, bool state, bool clear_state)
+{
+    if (lamp_idx >= lamps.size())
+        return;
+
+    if (clear_state)
+        std::fill(lamps.begin(), lamps.end(), 0.0);
+
+    lamps[lamp_idx] = static_cast<float>(state);
 }
 
 void KLUB::onSafetyTimer()
