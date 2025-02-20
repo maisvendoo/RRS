@@ -10,6 +10,7 @@
 #include <qflags.h>
 #include <qstringview.h>
 #include <vsg/core/Inherit.h>
+#include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/io/read.h>
 #include <vsg/lighting/PointLight.h>
@@ -223,7 +224,8 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
         QString node_path = signal_nodes_paths.value(tl->getModelName(), "");
 
-        auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
+        auto signal_node2 = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
+        auto signal_node = signal_node2->clone().cast<vsg::Node>();
 
         vsg::CullNode* cull_node = vsg::cast<vsg::CullNode>(signal_node);
         vsg::MatrixTransform* old_transform = vsg::cast<vsg::MatrixTransform>(cull_node->child);
