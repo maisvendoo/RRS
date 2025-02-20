@@ -16,8 +16,8 @@ private:
 
     float cur_pos = 0.0f;
 
-    vsg::vec4 color;
-    vsg::vec4 emission_color;
+    vsg::vec4 color = vsg::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    vsg::vec4 emission_color = vsg::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
     void anim_step(float t, float dt);
 

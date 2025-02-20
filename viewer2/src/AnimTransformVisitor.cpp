@@ -72,9 +72,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
             if (child_name == "MaterialAnimation")
             {
-                std::string name;
-                transform.getValue("name", name);
-                std::cout << name << std::endl;
                 MaterialAnimationVisitor mav(animations, &cfg);
                 transform.accept(mav);
                 std::cout << std::endl;

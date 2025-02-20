@@ -45,6 +45,8 @@ private:
     std::string models_dir;
 
     std::string animations_dir;
+
+    std::set<std::string> handled_paths;
 };
 
 #endif // TRAFFIC_LIGHTS_HANDLER_H

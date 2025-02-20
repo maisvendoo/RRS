@@ -3,12 +3,15 @@
 #include "MaterialAnimation.h"
 #include "ProcAnimation.h"
 #include "animations-list.h"
+#include "helper.h"
 #include <iostream>
 #include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Geometry.h>
+#include <vsg/nodes/Group.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
@@ -16,8 +19,11 @@
 #include <vsg/state/BufferInfo.h>
 #include <vsg/state/Descriptor.h>
 #include <vsg/state/DescriptorBuffer.h>
+#include <vsg/state/DescriptorImage.h>
 #include <vsg/state/DescriptorSet.h>
+#include <vsg/state/StateCommand.h>
 #include <vsg/state/material.h>
+#include <vsg/vk/State.h>
 
 MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, ConfigReader* cfg)
     :vsg::Visitor()
@@ -28,59 +34,48 @@ MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, Con
 
 void MaterialAnimationVisitor::apply(vsg::Node& node)
 {
-   node.traverse(*this);
+    node.traverse(*this);
 }
 
 void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 {
-    std::cout << vsg::ref_ptr(&stateGroup) << std::endl;
     for (auto& command : stateGroup.stateCommands)
     {
         if (auto* bindDescriptorSet = command->cast<vsg::BindDescriptorSet>())
         {
+            command = bindDescriptorSet->clone()->cast<vsg::BindDescriptorSet>();
+            bindDescriptorSet = command->cast<vsg::BindDescriptorSet>();
+
             auto& descriptorSet = bindDescriptorSet->descriptorSet;
             for (auto& descriptor : descriptorSet->descriptors)
             {
-                if (auto descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
+                if (auto* descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
                 {
-                    auto data = descriptorBuffer->bufferInfoList[0]->data;
-                    auto& material = data->cast<vsg::PbrMaterialValue>()->value();
+                    descriptor = descriptorBuffer->clone()->cast<vsg::DescriptorBuffer>();
+                    descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>();
 
-                    ProcAnimation* animation = new MaterialAnimation(material);
-                    animation->load(*cfg);
-                    animations->insert(animation->getSignalID(), animation);
-                }
-            }
-        }
-    }
+                    auto material_value = vsg::PbrMaterialValue::create();
+                    auto bufferInfo = vsg::BufferInfo::create(material_value);
+                    auto& material = material_value->value();
+                    material.baseColorFactor = vsg::vec4(1.0f, 0.0f, 0.0, 0.0f);
+                    // auto bufferInfo = vsg::BufferInfo::create(descriptorBuffer->bufferInfoList[0]);
+                    descriptorBuffer->bufferInfoList.clear();
+                    descriptorBuffer->bufferInfoList.push_back(bufferInfo);
 
-    for (auto& command : stateGroup.stateCommands)
-    {
-        if (auto* bindDescriptorSet = command->cast<vsg::BindDescriptorSet>())
-        {
-            std::cout << "    " << command << std::endl;
+                    // auto& material = bufferInfo->data->cast<vsg::PbrMaterialValue>()->value();
 
-            auto& descriptorSet = bindDescriptorSet->descriptorSet;
-            std::cout << "        " << descriptorSet << std::endl;
-            for (auto& descriptor : descriptorSet->descriptors)
-            {
-                std::cout << "            " << descriptor << std::endl;
-                if (auto descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
-                {
-                    auto data = descriptorBuffer->bufferInfoList[0]->data;
-                    std::cout << "                " << data << std::endl;
-
-                    auto* v1 = data->cast<vsg::PbrMaterialValue>();
-
-                    auto& material = data->cast<vsg::PbrMaterialValue>()->value();
-
-                    // ProcAnimation* animation = new MaterialAnimation(material);
+                    // ProcAnimation *animation = new MaterialAnimation(material);
                     // animation->load(*cfg);
                     // animations->insert(animation->getSignalID(), animation);
                 }
+                else if (auto* descriptorImage = descriptor->cast<vsg::DescriptorImage>())
+                {
+                    descriptor = descriptorImage->clone()->cast<vsg::DescriptorImage>();
+                    descriptorImage = descriptor->cast<vsg::DescriptorImage>();
+                }
             }
         }
     }
-
+    print_node(vsg::ref_ptr(&stateGroup), 0);
     stateGroup.traverse(*this);
 }
