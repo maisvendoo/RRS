@@ -46,7 +46,9 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
             command = bindDescriptorSet->clone()->cast<vsg::BindDescriptorSet>();
             bindDescriptorSet = command->cast<vsg::BindDescriptorSet>();
 
-            auto& descriptorSet = bindDescriptorSet->descriptorSet;
+            vsg::ref_ptr<vsg::DescriptorSet> descriptorSet(bindDescriptorSet->descriptorSet->clone()->cast<vsg::DescriptorSet>());
+            bindDescriptorSet->descriptorSet = descriptorSet;
+
             for (auto& descriptor : descriptorSet->descriptors)
             {
                 if (auto* descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
@@ -56,26 +58,18 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 
                     auto material_value = vsg::PbrMaterialValue::create();
                     auto bufferInfo = vsg::BufferInfo::create(material_value);
-                    auto& material = material_value->value();
-                    material.baseColorFactor = vsg::vec4(1.0f, 0.0f, 0.0, 0.0f);
-                    // auto bufferInfo = vsg::BufferInfo::create(descriptorBuffer->bufferInfoList[0]);
                     descriptorBuffer->bufferInfoList.clear();
                     descriptorBuffer->bufferInfoList.push_back(bufferInfo);
 
-                    // auto& material = bufferInfo->data->cast<vsg::PbrMaterialValue>()->value();
+                    auto& material = material_value->value();
 
-                    // ProcAnimation *animation = new MaterialAnimation(material);
-                    // animation->load(*cfg);
-                    // animations->insert(animation->getSignalID(), animation);
-                }
-                else if (auto* descriptorImage = descriptor->cast<vsg::DescriptorImage>())
-                {
-                    descriptor = descriptorImage->clone()->cast<vsg::DescriptorImage>();
-                    descriptorImage = descriptor->cast<vsg::DescriptorImage>();
+                    ProcAnimation *animation = new MaterialAnimation(material);
+                    animation->load(*cfg);
+                    animations->insert(animation->getSignalID(), animation);
                 }
             }
         }
     }
-    print_node(vsg::ref_ptr(&stateGroup), 0);
+    // print_node(vsg::ref_ptr(&stateGroup), 0);
     stateGroup.traverse(*this);
 }

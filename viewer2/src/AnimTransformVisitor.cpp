@@ -33,6 +33,8 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     ProcAnimation* animation = create_animation(name, transform);
     if (animation)
     {
+        animation->name = name;
+        animations->insert(animation->getSignalID(), animation);
     }
 
     transform.traverse(*this);

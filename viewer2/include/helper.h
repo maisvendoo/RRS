@@ -65,6 +65,13 @@ inline void print_node(vsg::ref_ptr<vsg::Node> node, int indentation)
                                 std::cout << "    ";
                             }
                             std::cout << data->className() << ' ' << name << ' ' << data.get() << std::endl;
+                            // auto& buffer = child->buffer;
+                            // for (int i = 0; i < indentation + 4; ++i)
+                            // {
+                                // std::cout << "    ";
+                            // }
+                            // std::cout << buffer->className();
+                            // std::cout << ' ' << name << ' ' << buffer.get() << std::endl;
                         }
                     }
                 }

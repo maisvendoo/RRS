@@ -54,10 +54,8 @@ bool MaterialAnimation::load_config(ConfigReader& cfg)
     {
     }
 
-    material.baseColorFactor = color;
+    // material.baseColorFactor = color;
     // material.emissiveFactor = emission_color;
-
-    material.baseColorFactor.set(1.0f, 0.0f, 0.0f, 1.0f);
 
     return true;
 }
@@ -70,7 +68,6 @@ void MaterialAnimation::update()
     vsg::vec4 new_emission_color = emission_color * cur_pos;
     new_emission_color.a = 1.0f;
 
-    // material.baseColorFactor = new_color;
-    // material.emissiveFactor = new_emission_color;
-    material.baseColorFactor.set(1.0f, 0.0f, 0.0f, 1.0f);
+    material.baseColorFactor = new_color;
+    material.emissiveFactor = new_emission_color;
 }
