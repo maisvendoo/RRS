@@ -496,6 +496,8 @@ private:
     /// Информационное сообщение о срыве ЭПК
     void infoMsgFailureEPK();
 
+    void setLampState(size_t lamp_idx, bool state = true, bool clear_state = true);
+
 private slots:
     /// Обработчик таймера периодической проверки бдительности
     void onSafetyTimer();
