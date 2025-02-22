@@ -1,43 +1,23 @@
-#include "MaterialAnimationVisitor.h"
-#include "ConfigReader.h"
-#include "MaterialAnimation.h"
-#include "ProcAnimation.h"
-#include "animations-list.h"
-#include "helper.h"
-#include <iostream>
-#include <vsg/core/Object.h>
-#include <vsg/core/Visitor.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/maths/vec4.h>
-#include <vsg/nodes/Geometry.h>
-#include <vsg/nodes/Group.h>
-#include <vsg/nodes/MatrixTransform.h>
-#include <vsg/nodes/Node.h>
-#include <vsg/nodes/StateGroup.h>
+#include "MaterialRgbAnimationVisitor.h"
+#include "MaterialRgbAnimation.h"
 #include <vsg/state/BindDescriptorSet.h>
-#include <vsg/state/Buffer.h>
-#include <vsg/state/BufferInfo.h>
-#include <vsg/state/Descriptor.h>
 #include <vsg/state/DescriptorBuffer.h>
-#include <vsg/state/DescriptorImage.h>
-#include <vsg/state/DescriptorSet.h>
-#include <vsg/state/StateCommand.h>
 #include <vsg/state/material.h>
-#include <vsg/vk/State.h>
 
-MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, ConfigReader* cfg)
+MaterialRgbAnimationVisitor::MaterialRgbAnimationVisitor(animations_t* animations, ConfigReader& cfg)
     : vsg::Visitor()
     , animations(animations)
-    , cfg(cfg)
+    , cfg(&cfg)
 {
+
 }
 
-void MaterialAnimationVisitor::apply(vsg::Node& node)
+void MaterialRgbAnimationVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
 }
 
-void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
+void MaterialRgbAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 {
     for (auto& command : stateGroup.stateCommands)
     {
@@ -63,7 +43,7 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 
                     auto& material = material_value->value();
 
-                    ProcAnimation *animation = new MaterialAnimation(material);
+                    ProcAnimation *animation = new MaterialRgbAnimation(material);
                     animation->load(*cfg);
                     animations->insert(animation->getSignalID(), animation);
                 }

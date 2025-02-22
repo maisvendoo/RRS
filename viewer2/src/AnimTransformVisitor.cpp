@@ -33,6 +33,8 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     ProcAnimation* animation = create_animation(name, transform);
     if (animation)
     {
+        animation->name = name;
+        animations->insert(animation->getSignalID(), animation);
     }
 
     transform.traverse(*this);
@@ -74,6 +76,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             {
                 MaterialAnimationVisitor mav(animations, &cfg);
                 transform.accept(mav);
+                std::cout << std::endl;
             }
 
             if (child_name == "MaterialRGBAnimation")

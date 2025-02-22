@@ -27,6 +27,7 @@
 #include <string>
 #include <vsg/all.h>
 #include <vsg/app/Viewer.h>
+#include <vsg/io/read.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/lighting/PercentageCloserSoftShadows.h>
@@ -549,6 +550,13 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
+
+    // FileSystem& fs = FileSystem::getInstance();
+    // auto test_node = vsg::read_cast<vsg::Node>(fs.getRouteRootDir() + "/experimental-polygon-gltf/models/floorl.gltf", options);
+    // std::cout << "\n\n\n" << test_node.get() << "\n\n\n";
+
+    // viewer->update();
+    // viewer->compile();
 
     LOG_INFO("Send request for signals data");
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);

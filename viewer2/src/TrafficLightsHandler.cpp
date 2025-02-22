@@ -10,6 +10,7 @@
 #include <qflags.h>
 #include <qstringview.h>
 #include <vsg/core/Inherit.h>
+#include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/io/read.h>
 #include <vsg/lighting/PointLight.h>
@@ -25,6 +26,7 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/utils/Builder.h>
+#include "helper.h"
 
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
     : QObject(parent)
@@ -205,7 +207,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 {
     if (!signal_nodes_paths.value(tl->getModelName(), "").isEmpty())
     {
-        auto transform = vsg::MatrixTransform::create();
+        auto global_transform = vsg::MatrixTransform::create();
 
         vsg::dmat4 m1 = vsg::translate(vsg::dvec3(tl->getPosition()));
 
@@ -225,38 +227,47 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
         auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
 
-        vsg::CullNode* cull_node = vsg::cast<vsg::CullNode>(signal_node);
-        vsg::MatrixTransform* old_transform = vsg::cast<vsg::MatrixTransform>(cull_node->child);
-        auto new_transform = vsg::MatrixTransform::create();
-        vsg::Group* old_group = vsg::cast<vsg::Group>(old_transform->children[0]);
-        auto new_group = vsg::Group::create();
-
-        for (auto child : old_group->children)
+        if (handled_paths.find(node_path.toStdString()) == handled_paths.end())
         {
-            std::string name;
-            child->getValue("name", name);
+            if (auto* cull_node = signal_node->cast<vsg::CullNode>())
+            {
+                if (auto* old_transform = cull_node->child->cast<vsg::MatrixTransform>())
+                {
+                    if (auto* old_group = old_transform->children[0]->cast<vsg::Group>())
+                    {
+                        auto new_transform = vsg::MatrixTransform::create();
+                        auto new_group = vsg::Group::create();
 
-            auto transform = vsg::MatrixTransform::create();
-            transform->setValue("name", name);
-            transform->addChild(child);
-            new_group->addChild(transform);
+                        for (auto& child : old_group->children)
+                        {
+                            std::string name;
+                            child->getValue("name", name);
+                            auto transform = vsg::MatrixTransform::create();
+                            transform->setValue("name", name);
+                            transform->addChild(child);
+                            new_group->addChild(transform);
+                        }
+                        new_transform->addChild(new_group);
+                        new_transform->matrix = vsg::rotate(vsg::radians(90.0f), vsg::vec3(1.0f, 0.0f, 0.0f));
+
+                        cull_node->child = new_transform;
+                    }
+                }
+            }
+            handled_paths.insert(node_path.toStdString());
         }
-        new_transform->addChild(new_group);
-        new_transform->matrix = vsg::rotate(vsg::radians(90.0f), vsg::vec3(1.0f, 0.0f, 0.0f));
 
-        cull_node->child = new_transform;
-        // old_transform = new_transform;
+        // print_node(signal_node, 0);
+        // std::cout << std::endl;
 
-        // animation_mangers.push_back(new AnimationManager(traffic_light->getAnimationsListPtr()));
+        global_transform->matrix = m2 * m1;
+        global_transform->addChild(signal_node);
 
-        transform->matrix = m2 * m1;
-        transform->addChild(signal_node);
-
-        TrafficLight *traffic_light = tl;
+        TrafficLight* traffic_light = tl;
         traffic_light->setNode(signal_node);
         traffic_light->load_animations(animations_dir);
 
-        traffic_light_nodes->addChild(transform);
+        traffic_light_nodes->addChild(global_transform);
     }
 
     // auto pagedLOD = vsg::PagedLOD::create();
