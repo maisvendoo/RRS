@@ -1,15 +1,16 @@
 #ifndef MATERIAL_RGB_ANIMATION_VISITOR_H
 #define MATERIAL_RGB_ANIMATION_VISITOR_H
 
-#include "ConfigReader.h"
 #include "animations-list.h"
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/StateGroup.h>
 
+class CfgReader;
+
 class MaterialRgbAnimationVisitor : public vsg::Visitor
 {
 public:
-    MaterialRgbAnimationVisitor(animations_t* animations, ConfigReader& cfg);
+    MaterialRgbAnimationVisitor(animations_t* animations, CfgReader& cfg);
 
     virtual void apply(vsg::Node& node);
 
@@ -17,7 +18,7 @@ public:
 
 private:
     animations_t* animations;
-    ConfigReader* cfg;
+    CfgReader* cfg;
 };
 
 #endif // MATERIAL_RGB_ANIMATION_VISITOR_H

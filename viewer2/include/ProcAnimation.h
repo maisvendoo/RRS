@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-class ConfigReader;
+class CfgReader;
 
 namespace vsg
 {
@@ -25,7 +25,7 @@ public:
 
     bool load(const std::string& path);
 
-    bool load(ConfigReader& cfg);
+    bool load(CfgReader& cfg);
 
     void setPosition(float pos);
 
@@ -42,7 +42,7 @@ protected:
     };
 
     float pos = 0.0f;
-    float duration = 0.0f;
+    float duration = 1.0f;
 
     std::size_t signal_id = 0;
 
@@ -53,14 +53,14 @@ protected:
 
     std::vector<key_point_t> keypoints;
 
-    virtual bool load_config(ConfigReader& cfg) = 0;
+    virtual bool load_config(CfgReader& cfg) = 0;
 
     virtual void anim_step(float t, float dt) = 0;
 
     float interpolate(float value);
 
 private:
-    bool loadKeyPoints(ConfigReader& cfg);
+    bool loadKeyPoints(CfgReader& cfg);
 
     key_point_t findBeginKeypoint(float value, std::size_t& next_idx);
 };

@@ -1,5 +1,5 @@
 #include "TrafficLightsHandler.h"
-#include "ConfigReader.h"
+#include "CfgReader.h"
 #include "Logger.h"
 #include "TrafficLight.h"
 #include "filesystem.h"
@@ -142,15 +142,19 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref
     std::string path = fs.combinePath(settings.route_dir_full_path, "topology");
     path = fs.combinePath(path, "models-config.xml");
 
-    try
+    QString tmp_qstr = path.c_str();
+    CfgReader cfg;
+    if (cfg.load(tmp_qstr))
     {
-        ConfigReader cfg(path);
-        cfg.setSection("Models");
-        cfg.getValue("SignalModelsDir", models_dir);
-        cfg.getValue("SignalAnimationsDir", animations_dir);
-    }
-    catch (...)
-    {
+        QString sec_name = "Models";
+
+        tmp_qstr = "";
+        if (cfg.getString(sec_name, "SignalModelsDir", tmp_qstr))
+            models_dir = tmp_qstr.toStdString();
+
+        tmp_qstr = "";
+        if (cfg.getString(sec_name, "SignalAnimationsDir", tmp_qstr))
+            animations_dir = tmp_qstr.toStdString();
     }
 
     std::string models_path = fs.getDataDir();

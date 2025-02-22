@@ -1,5 +1,5 @@
 #include "SoundManager.h"
-#include "ConfigReader.h"
+#include "CfgReader.h"
 #include "Logger.h"
 #include "filesystem.h"
 #include <al.h>
@@ -33,11 +33,16 @@ void SoundManager::init()
     int tmp_max_sources = 65535;
 
     FileSystem& fs = FileSystem::getInstance();
-    std::string cfg_path = fs.getConfigDir() + fs.separator() + "sound-settings.xml";
-    ConfigReader cfg(cfg_path);
-    cfg.setSection("Settings");
-    cfg.getValue("Volume", tmp_volume);
-    cfg.getValue("MaxSources", tmp_max_sources);
+    QString cfg_path = QString(fs.getConfigDir().c_str()) + fs.separator() + "sound-settings.xml";
+    CfgReader cfg;
+
+    if (cfg.load(cfg_path))
+    {
+        QString secName = "Settings";
+
+        cfg.getDouble(secName, "Volume", tmp_volume);
+        cfg.getInt(secName, "MaxSources", tmp_max_sources);
+    }
     ALfloat volume = static_cast<ALfloat>(std::max(0.0, std::min(1.0, tmp_volume)));
     ALCint max_sources = static_cast<ALCint>(std::max(1, std::min(1000000, tmp_max_sources)));
 

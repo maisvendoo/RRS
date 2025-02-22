@@ -7,7 +7,7 @@
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 
-class ConfigReader;
+class CfgReader;
 
 namespace vsg
 {
@@ -33,7 +33,7 @@ private:
 
     void anim_step(float t, float dt) override;
 
-    bool load_config(ConfigReader& cfg) override;
+    bool load_config(CfgReader &cfg) override;
 
     void update();
 };

@@ -1,10 +1,11 @@
 #ifndef MATERIAL_ANIMATION_H
 #define MATERIAL_ANIMATION_H
 
-#include "ConfigReader.h"
 #include "ProcAnimation.h"
 #include <vsg/maths/vec4.h>
 #include <vsg/state/material.h>
+
+class CfgReader;
 
 class MaterialAnimation : public ProcAnimation
 {
@@ -21,7 +22,7 @@ private:
 
     void anim_step(float t, float dt);
 
-    bool load_config(ConfigReader& cfg);
+    bool load_config(CfgReader& cfg);
 
     void update();
 };

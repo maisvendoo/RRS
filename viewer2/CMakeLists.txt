@@ -20,7 +20,7 @@ find_package(OpenAL REQUIRED CONFIG)
 #set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
 #set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
 
-find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Widgets Xml REQUIRED)
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
 # find_package(vsgImGui REQUIRED)
@@ -29,7 +29,7 @@ find_package(vsgXchange REQUIRED)
 # find_package(vsgQt REQUIRED)
 
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
-file(GLOB PUGIXML_SOURCES ./dependencies/pugixml/src/*.cpp)
+#file(GLOB PUGIXML_SOURCES ./dependencies/pugixml/src/*.cpp)
 
 #if (WIN32)
 #    add_library(pugixml STATIC IMPORTED)
@@ -38,17 +38,20 @@ file(GLOB PUGIXML_SOURCES ./dependencies/pugixml/src/*.cpp)
 #    find_package(pugixml REQUIRED)
 #endif()
 
-add_executable(${TARGET} ${TARGET_SOURCES} ${PUGIXML_SOURCES})
+#add_executable(${TARGET} ${TARGET_SOURCES} ${PUGIXML_SOURCES})
+add_executable(${TARGET} ${TARGET_SOURCES})
 
 target_link_libraries(${TARGET} PRIVATE
     OpenAL::OpenAL
     Qt6::Widgets
+    Qt6::Xml
     vsg::vsg
     vsgXchange::vsgXchange
     # vsgImGui::vsgImGui
     # vsgQt::vsgQt
     filesystem
-    network    
+    CfgReader
+    network
 )
 
 # message()
@@ -57,6 +60,7 @@ target_include_directories(${TARGET} PRIVATE
     ../simulator/topology/include
     ../common-headers
     ../filesystem/include
+    ../CfgReader/include
     ../network/include
     ./include
     ./dependencies/pugixml/include

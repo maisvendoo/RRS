@@ -1,5 +1,5 @@
 #include "MaterialAnimationVisitor.h"
-#include "ConfigReader.h"
+#include "CfgReader.h"
 #include "MaterialAnimation.h"
 #include "ProcAnimation.h"
 #include "animations-list.h"
@@ -25,7 +25,7 @@
 #include <vsg/state/material.h>
 #include <vsg/vk/State.h>
 
-MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, ConfigReader* cfg)
+MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, CfgReader* cfg)
     : vsg::Visitor()
     , animations(animations)
     , cfg(cfg)

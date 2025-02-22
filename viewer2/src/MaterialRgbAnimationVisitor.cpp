@@ -4,7 +4,7 @@
 #include <vsg/state/DescriptorBuffer.h>
 #include <vsg/state/material.h>
 
-MaterialRgbAnimationVisitor::MaterialRgbAnimationVisitor(animations_t* animations, ConfigReader& cfg)
+MaterialRgbAnimationVisitor::MaterialRgbAnimationVisitor(animations_t* animations, CfgReader &cfg)
     : vsg::Visitor()
     , animations(animations)
     , cfg(&cfg)

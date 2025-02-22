@@ -1,9 +1,10 @@
 #ifndef MATERIAL_RGB_ANIMATION_H
 #define MATERIAL_RGB_ANIMATION_H
 
-#include "ConfigReader.h"
 #include "ProcAnimation.h"
 #include <vsg/state/material.h>
+
+class CfgReader;
 
 class MaterialRgbAnimation : public ProcAnimation
 {
@@ -26,7 +27,7 @@ private:
 
     void anim_step(float t, float dt) override;
 
-    bool load_config(ConfigReader& cfg) override;
+    bool load_config(CfgReader& cfg) override;
 
     float getChannelState(float pos, unsigned char channel);
 

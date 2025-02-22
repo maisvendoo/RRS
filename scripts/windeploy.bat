@@ -124,6 +124,8 @@ xcopy /Y /S ..\routes\experimental-polygon\*.* %RRS_DEV_ROOT%\routes\experimenta
 rmdir /S /Q %RRS_DEV_ROOT%\routes\experimental-polygon\map_editor
 del /S %RRS_DEV_ROOT%\routes\experimental-polygon\~*.*
 
+xcopy /Y /S ..\routes\experimental-polygon-gltf\*.* %RRS_DEV_ROOT%\routes\experimental-polygon-gltf\
+
 rem Копируем SDK
 
 xcopy /Y /Q ..\CfgReader\include\*.h %RRS_DEV_ROOT%\sdk\include\

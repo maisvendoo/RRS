@@ -1,6 +1,7 @@
 #include "ProcAnimation.h"
 
-#include "ConfigReader.h"
+#include "CfgReader.h"
+#include "CfgReader.h"
 
 #include <vsg/nodes/MatrixTransform.h>
 
@@ -25,11 +26,13 @@ void ProcAnimation::step(float t, float dt)
 
 bool ProcAnimation::load(const std::string& path)
 {
-    ConfigReader cfg(path);
-    return load_config(cfg);
+    CfgReader cfg;
+    if (cfg.load(path.c_str()))
+        return load_config(cfg);
+    return false;
 }
 
-bool ProcAnimation::load(ConfigReader& cfg)
+bool ProcAnimation::load(CfgReader &cfg)
 {
     loadKeyPoints(cfg);
     return load_config(cfg);
@@ -74,22 +77,24 @@ float ProcAnimation::interpolate(float param)
     return value;
 }
 
-bool ProcAnimation::loadKeyPoints(ConfigReader& cfg)
+bool ProcAnimation::loadKeyPoints(CfgReader &cfg)
 {
-    auto config_section = cfg.getConfigSection();
-    for (auto child : config_section.children())
+    QDomNode config_section = cfg.getFirstSection("KeyPoint");
+    while (!config_section.isNull())
     {
-        std::string name = child.name();
-        if (name == "KeyPoint")
-        {
-            key_point_t keypoint;
-            cfg.setSection(child);
-            cfg.getValue("Param", keypoint.param);
-            cfg.getValue("Value", keypoint.value);
-            keypoints.emplace_back(std::move(keypoint));
-        }
-    }
+        key_point_t keypoint;
 
+        double tmp = 0.0;
+        if (cfg.getDouble(config_section, "Param", tmp))
+            keypoint.param = tmp;
+
+        tmp = 0.0;
+        if (cfg.getDouble(config_section, "Value", tmp))
+            keypoint.value = tmp;
+
+        keypoints.emplace_back(std::move(keypoint));
+        config_section = cfg.getNextSection();
+    }
     return true;
 }
 

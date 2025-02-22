@@ -1,6 +1,6 @@
 #include "AnalogRotation.h"
 
-#include "ConfigReader.h"
+#include "CfgReader.h"
 #include "ProcAnimation.h"
 
 #include <vsg/maths/common.h>
@@ -26,32 +26,29 @@ void AnalogRotation::anim_step(float t, float dt)
     update();
 }
 
-bool AnalogRotation::load_config(ConfigReader& cfg)
+bool AnalogRotation::load_config(CfgReader& cfg)
 {
-    cfg.setSection("AnalogRotation");
-    cfg.getValue("SignalID", signal_id);
-    cfg.getValue("Duration", duration);
+    QString sec_name = "AnalogRotation";
 
-    try
+    int tmp_int = 0;
+    if (cfg.getInt(sec_name, "SignalID", tmp_int))
+        signal_id = tmp_int;
+
+    double tmp_dbl = 1.0;
+    if (cfg.getDouble(sec_name, "Duration", tmp_dbl))
+        duration = tmp_dbl;
+
+    cfg.getBool(sec_name, "FixedSignal", is_fixed_signal);
+
+    cfg.getBool(sec_name, "Infinity", infinity);
+
+    QString tmp_qstr = "0.0 0.0 1.0";
+    if (cfg.getString(sec_name, "Axis", tmp_qstr))
     {
-        cfg.getValue("FixedSignal", fixed_signal);
-        is_fixed_signal = true;
+        std::string tmp = tmp_qstr.toStdString();
+        std::istringstream ss(tmp);
+        ss >> axis.x >> axis.y >> axis.z;
     }
-    catch (...)
-    {
-        is_fixed_signal = false;
-    }
-
-    int inf = 0;
-    cfg.getValue("Infinity", inf);
-
-    infinity = static_cast<bool>(inf);
-
-    std::string tmp;
-    cfg.getValue("Axis", tmp);
-
-    std::istringstream ss(tmp);
-    ss >> axis.x >> axis.y >> axis.z;
 
     return true;
 }

@@ -1,7 +1,7 @@
 #include "AnimTransformVisitor.h"
 #include "AnalogRotation.h"
 #include "AnalogTranslation.h"
-#include "ConfigReader.h"
+#include "CfgReader.h"
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 #include "filesystem.h"
@@ -49,44 +49,42 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         + fs.separator() + vehicle_config
         + fs.separator() + name + ".xml";
 
-    try
+    QString tmp_qstr = file_path.c_str();
+    CfgReader cfg;
+    if (cfg.load(tmp_qstr))
     {
-        ConfigReader cfg(file_path);
-        auto config_section = cfg.getConfigSection();
+        QDomNode config_section;
         ProcAnimation* animation = nullptr;
-        for (auto config_child : config_section.children())
+
+        config_section = cfg.getFirstSection("AnalogRotation");
+        if (!config_section.isNull())
         {
-            std::string child_name = config_child.name();
-
-            if (child_name == "AnalogRotation")
-            {
-                animation = new AnalogRotation(&transform);
-                animation->load(cfg);
-                return animation;
-            }
-
-            if (child_name == "AnalogTranslation")
-            {
-                animation = new AnalogTranslation(&transform);
-                animation->load(cfg);
-                return animation;
-            }
-
-            if (child_name == "MaterialAnimation")
-            {
-                MaterialAnimationVisitor mav(animations, &cfg);
-                transform.accept(mav);
-                std::cout << std::endl;
-            }
-
-            if (child_name == "MaterialRGBAnimation")
-            {
-
-            }
+            animation = new AnalogRotation(&transform);
+            animation->load(cfg);
+            return animation;
         }
-    }
-    catch (...)
-    {
+
+        config_section = cfg.getFirstSection("AnalogTranslation");
+        if (!config_section.isNull())
+        {
+            animation = new AnalogTranslation(&transform);
+            animation->load(cfg);
+            return animation;
+        }
+
+        config_section = cfg.getFirstSection("MaterialAnimation");
+        if (!config_section.isNull())
+        {
+            MaterialAnimationVisitor mav(animations, &cfg);
+            transform.accept(mav);
+            return nullptr;
+        }
+
+        config_section = cfg.getFirstSection("MaterialRGBAnimation");
+        if (!config_section.isNull())
+        {
+            return nullptr;
+        }
     }
 
     return nullptr;

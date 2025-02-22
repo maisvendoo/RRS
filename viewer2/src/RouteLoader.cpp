@@ -1,5 +1,5 @@
 #include "RouteLoader.h"
-#include "ConfigReader.h"
+#include "CfgReader.h"
 #include "Logger.h"
 #include "Route.h"
 #include <algorithm>
@@ -20,11 +20,25 @@ RouteLoader::RouteLoader(const std::string& route_path)
 
 void RouteLoader::read_description()
 {
-    ConfigReader cfg(route_path + "\\description.xml");
-    cfg.setSection("Route");
-    cfg.getValue("RouteType", route_type);
-    cfg.getValue("ObjectsRefPath", objects_ref_path);
-    cfg.getValue("RouteMapPath", route_map_path);
+    QString tmp_qstr = (route_path + "\\description.xml").c_str();
+
+    CfgReader cfg;
+    cfg.load(tmp_qstr);
+
+    QString sec_name = "Route";
+
+    tmp_qstr = "";
+    if (cfg.getString(sec_name, "RouteType", tmp_qstr))
+        route_type = tmp_qstr.toStdString();
+
+    tmp_qstr = "";
+    if (cfg.getString(sec_name, "ObjectsRefPath", tmp_qstr))
+        objects_ref_path = tmp_qstr.toStdString();
+
+    tmp_qstr = "";
+    if (cfg.getString(sec_name, "RouteMapPath", tmp_qstr))
+        route_map_path = tmp_qstr.toStdString();
+
     objects_ref_path = route_path + objects_ref_path;
     route_map_path = route_path + route_map_path;
 }

@@ -1,3 +1,4 @@
+#include "CfgReader.h"
 #include "MaterialRgbAnimation.h"
 #include "ProcAnimation.h"
 #include <sstream>
@@ -18,27 +19,28 @@ void MaterialRgbAnimation::anim_step(float t, float dt)
     update();
 }
 
-bool MaterialRgbAnimation::load_config(ConfigReader& cfg)
+bool MaterialRgbAnimation::load_config(CfgReader &cfg)
 {
-    cfg.setSection("MaterialRGBAnimation");
-    cfg.getValue("SignalID", signal_id);
-    cfg.getValue("Duration", duration);
+    QString sec_name = "MaterialRGBAnimation";
 
-    try
+    int tmp_int = 0;
+    if (cfg.getInt(sec_name, "SignalID", tmp_int))
+        signal_id = tmp_int;
+
+    double tmp_dbl = 1.0;
+    if (cfg.getDouble(sec_name, "Duration", tmp_dbl))
+        duration = tmp_dbl;
+
+    cfg.getBool(sec_name, "FixedSignal", is_fixed_signal);
+
+    QString tmp_qstr = "0.0 0.0 0.0";
+    if (cfg.getString(sec_name, "EmissionColor", tmp_qstr))
     {
-        cfg.getValue("FixedSignal", fixed_signal);
-        is_fixed_signal = true;
-    }
-    catch (...)
-    {
-        is_fixed_signal = false;
+        std::string tmp = tmp_qstr.toStdString();
+        std::istringstream ss(tmp);
+        ss >> emission_color.x >> emission_color.y >> emission_color.z;
     }
 
-    std::string tmp;
-    cfg.getValue("EmissionColor", tmp);
-
-    std::istringstream ss(tmp);
-    ss >> emission_color.r >> emission_color.g >> emission_color.b;
     return true;
 }
 
