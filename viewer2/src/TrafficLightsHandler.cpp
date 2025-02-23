@@ -200,7 +200,7 @@ void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
         tl->getPosition().x,
         tl->getPosition().y,
         tl->getPosition().z,
-        (tl->getSignalDirection() == -1) ? "BWD" : "FDW",
+        (tl->getSignalDirection() == -1) ? "BWD" : "FWD",
         tl->getOrth().x,
         tl->getOrth().y,
         tl->getOrth().z
@@ -213,14 +213,11 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     {
         auto global_transform = vsg::MatrixTransform::create();
 
-        vsg::dmat4 m1 = vsg::translate(vsg::dvec3(tl->getPosition()));
-
-        int sd = tl->getSignalDirection();
+        vsg::dmat4 m1 = vsg::translate(tl->getPosition());
 
         vsg::dvec3 o(tl->getOrth());
         vsg::dvec3 r(tl->getRight());
         vsg::dvec3 u(tl->getUp());
-
 
         vsg::dmat4 m2(r.x,  -o.x,  u.x,  0,
                      -r.y,   o.y,  u.y,  0,
@@ -264,12 +261,11 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
         // print_node(signal_node, 0);
         // std::cout << std::endl;
 
-        global_transform->matrix = m2 * m1;
+        global_transform->matrix = m1 * m2;
         global_transform->addChild(signal_node);
 
-        TrafficLight* traffic_light = tl;
-        traffic_light->setNode(signal_node);
-        traffic_light->load_animations(animations_dir);
+        tl->setNode(signal_node);
+        tl->load_animations(animations_dir);
 
         traffic_light_nodes->addChild(global_transform);
     }

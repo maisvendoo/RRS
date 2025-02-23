@@ -22,10 +22,10 @@ public:
     int getSignalDirection() const;
     const QString& getLetter() const;
     const QString& getModelName() const;
-    const vsg::vec3& getPosition() const;
-    const vsg::vec3& getOrth() const;
-    const vsg::vec3& getRight() const;
-    const vsg::vec3& getUp() const;
+    const vsg::dvec3& getPosition() const;
+    const vsg::dvec3& getOrth() const;
+    const vsg::dvec3& getRight() const;
+    const vsg::dvec3& getUp() const;
 
     void setNode(vsg::ref_ptr<vsg::Node> node);
 
@@ -39,10 +39,10 @@ private:
     QString signal_model = "";
     lens_state_t lens_state;
     lens_state_t old_lens_state;
-    vsg::vec3 pos;
-    vsg::vec3 orth;
-    vsg::vec3 right;
-    vsg::vec3 up;
+    vsg::dvec3 pos;
+    vsg::dvec3 orth;
+    vsg::dvec3 right;
+    vsg::dvec3 up;
 
     vsg::ref_ptr<vsg::Node> node;
     animations_t animations;

@@ -53,22 +53,22 @@ const QString& TrafficLight::getModelName() const
     return signal_model;
 }
 
-const vsg::vec3& TrafficLight::getPosition() const
+const vsg::dvec3& TrafficLight::getPosition() const
 {
     return pos;
 }
 
-const vsg::vec3& TrafficLight::getOrth() const
+const vsg::dvec3& TrafficLight::getOrth() const
 {
     return orth;
 }
 
-const vsg::vec3& TrafficLight::getRight() const
+const vsg::dvec3& TrafficLight::getRight() const
 {
     return right;
 }
 
-const vsg::vec3& TrafficLight::getUp() const
+const vsg::dvec3& TrafficLight::getUp() const
 {
     return up;
 }

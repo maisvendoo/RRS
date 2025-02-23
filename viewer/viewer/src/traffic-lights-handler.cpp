@@ -271,7 +271,6 @@ void TrafficLightsHandler::load_signal_model(TrafficLight *tl, const settings_t 
         osg::Vec3d r = tl->getRight();
         osg::Vec3d u = tl->getUp();
 
-
         osg::Matrixd m2(r.x(), -o.x(), u.x(), 0,
                         -r.y(), o.y(), u.y(), 0,
                         r.z(), o.z(), u.z(), 0,
