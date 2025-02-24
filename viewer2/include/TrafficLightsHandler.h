@@ -16,6 +16,9 @@
 #include <vsg/lighting/ShadowSettings.h>
 #include <vsg/nodes/Group.h>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class TrafficLightsHandler : public QObject
 {
     Q_OBJECT
@@ -31,12 +34,15 @@ public:
 
     vsg::ref_ptr<vsg::Group> traffic_light_nodes;
 
+    void update();
+
 private:
     void printSignalInfo(TrafficLight* tl);
 
     void loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings);
 
 private:
+
     QMap<QString, TrafficLight*> traffic_lights_fwd;
     QMap<QString, TrafficLight*> traffic_lights_bwd;
 
@@ -47,6 +53,10 @@ private:
     std::string animations_dir;
 
     std::set<std::string> handled_paths;
+
+public slots:
+
+    void slotUpdateSignal(QByteArray data);
 };
 
 #endif // TRAFFIC_LIGHTS_HANDLER_H

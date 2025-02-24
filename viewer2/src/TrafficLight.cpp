@@ -1,15 +1,22 @@
-#include "TrafficLight.h"
-#include "AnimTransformVisitor.h"
-#include <algorithm>
-#include <qbuffer.h>
-#include <qflags.h>
+#include    <TrafficLight.h>
+#include    <AnimTransformVisitor.h>
+#include    <algorithm>
+#include    <qbuffer.h>
+#include    <qflags.h>
+#include    <iostream>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 TrafficLight::TrafficLight()
 {
     std::fill(lens_state.begin(), lens_state.end(), false);
     old_lens_state = lens_state;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrafficLight::deserialize(QByteArray& data)
 {
     QBuffer buff(&data);
@@ -33,53 +40,110 @@ void TrafficLight::deserialize(QByteArray& data)
     stream >> up.x >> up.y >> up.z;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const QString& TrafficLight::getConnectorName() const
 {
     return connector_name;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int TrafficLight::getSignalDirection() const
 {
     return signal_dir;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const QString& TrafficLight::getLetter() const
 {
     return letter;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const QString& TrafficLight::getModelName() const
 {
     return signal_model;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const vsg::dvec3& TrafficLight::getPosition() const
 {
     return pos;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const vsg::dvec3& TrafficLight::getOrth() const
 {
     return orth;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const vsg::dvec3& TrafficLight::getRight() const
 {
     return right;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const vsg::dvec3& TrafficLight::getUp() const
 {
     return up;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrafficLight::setNode(vsg::ref_ptr<vsg::Node> node)
 {
     this->node = node;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrafficLight::load_animations(const std::string& animations_dir)
 {
     AnimTransformVisitor atv(&animations, animations_dir);
     node->accept(atv);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLight::update()
+{
+    if (animations.isEmpty())
+    {
+        return;
+    }
+
+    if (lens_state != old_lens_state)
+    {
+        for (auto animation = animations.begin();
+             animation != animations.end();
+             ++animation)
+        {
+            ProcAnimation *anim = animation.value();
+            anim->setPosition(lens_state[animation.value()->getSignalID()]);
+        }
+
+        std::cout << "Updated signal "
+                  << this->getConnectorName().toStdString() << std::endl;
+
+        old_lens_state = lens_state;
+    }
 }

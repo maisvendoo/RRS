@@ -571,7 +571,12 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
 
-    // viewer->addEventHandler(traffic_lights_handler);
+    connect(tcp_client, &TcpClient::updateSignal,
+            traffic_lights_handler.get(), &TrafficLightsHandler::slotUpdateSignal);
+
+    traffic_lights_update_handler = TrafficLightsUpdateHandler::create(traffic_lights_handler.get());
+
+    viewer->addEventHandler(traffic_lights_update_handler);
 
     viewer->update();
     viewer->compile();

@@ -26,6 +26,8 @@ class SoundManager;
 class TcpClient;
 class TrainExteriorHandler;
 
+#include    <TrafficLightsUpdateHandler.h>
+
 namespace vsg
 {
     class Group;
@@ -113,6 +115,8 @@ private:
 
     TcpClient* tcp_client;
     vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
+
+    vsg::ref_ptr<TrafficLightsUpdateHandler> traffic_lights_update_handler;
 };
 
 #endif // ROUTE_VIEWER_H

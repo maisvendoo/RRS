@@ -190,6 +190,21 @@ void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref
     }
 }
 
+void TrafficLightsHandler::update()
+{
+    for (auto tl = traffic_lights_fwd.begin(); tl != traffic_lights_fwd.end(); ++tl)
+    {
+        TrafficLight *traffic_light = tl.value();
+        traffic_light->update();
+    }
+
+    for (auto tl = traffic_lights_bwd.begin(); tl != traffic_lights_bwd.end(); ++tl)
+    {
+        TrafficLight *traffic_light = tl.value();
+        traffic_light->update();
+    }
+}
+
 void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
 {
     LOG_INFO(
@@ -291,4 +306,33 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     // cullGroup->addChild(spotlight);
 
     // transform->addChild(cullGroup);
+}
+
+void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
+{
+    QBuffer buff(&data);
+    buff.open(QIODevice::ReadOnly);
+    QDataStream stream(&buff);
+
+    QString conn_name = "";
+    int signal_dir = 0;
+
+    stream >> conn_name;
+    stream >> signal_dir;
+
+    if (conn_name.isEmpty())
+    {
+        return;
+    }
+
+    TrafficLight *tl = (signal_dir == -1) ?
+                           traffic_lights_bwd.value(conn_name, nullptr) :
+                           traffic_lights_fwd.value(conn_name, nullptr);
+
+    if (tl == nullptr)
+    {
+        return;
+    }
+
+    tl->deserialize(data);
 }

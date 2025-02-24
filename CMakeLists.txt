@@ -13,7 +13,7 @@ add_subdirectory (network)
 
 add_subdirectory (simulator)
 
-add_subdirectory (viewer)
+#add_subdirectory (viewer)
 add_subdirectory (viewer2)
 
 add_subdirectory (addons/passcar)
