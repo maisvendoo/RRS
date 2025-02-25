@@ -10,10 +10,11 @@ class CfgReader;
 class MaterialAnimation : public ProcAnimation
 {
 public:
-    explicit MaterialAnimation(vsg::PbrMaterial& material);
+    explicit MaterialAnimation(vsg::PbrMaterialValue *data);
 
 private:
-    vsg::PbrMaterial& material;
+
+    vsg::PbrMaterialValue *material_value;
 
     float cur_pos = 0.0f;
 

@@ -131,17 +131,9 @@ void TrafficLight::step(float t, float dt)
         return;
     }
 
-    if (lens_state != old_lens_state)
+    bool changed = (old_lens_state != lens_state);
+    if (changed)
     {
-        for (auto animation = animations.begin();
-             animation != animations.end();
-             ++animation)
-        {
-            ProcAnimation *anim = animation.value();
-            anim->setPosition(lens_state[animation.value()->getSignalID()]);
-            anim->step(t, dt);
-        }
-
         std::cout << "Updated signal "
                   << this->getConnectorName().toStdString()
                   << " | lens: "
@@ -149,5 +141,13 @@ void TrafficLight::step(float t, float dt)
                   << std::endl;
 
         old_lens_state = lens_state;
+    }
+
+    for (auto animation : animations)
+    {
+        if (changed)
+            animation->setPosition(lens_state[animation->getSignalID()]);
+
+        animation->step(t, dt);
     }
 }

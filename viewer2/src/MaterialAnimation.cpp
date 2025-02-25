@@ -4,10 +4,10 @@
 #include <sstream>
 #include <vsg/maths/vec4.h>
 
-MaterialAnimation::MaterialAnimation(vsg::PbrMaterial& material)
+MaterialAnimation::MaterialAnimation(vsg::PbrMaterialValue *data)
     : ProcAnimation()
-    , material(material)
-    , color(material.baseColorFactor)
+    , material_value(data)
+    , color(data->value().baseColorFactor)
     , emission_color(0.0f, 0.0f, 0.0f, 1.0f)
 {
     pos = 0.0f;
@@ -64,6 +64,7 @@ void MaterialAnimation::update()
     vsg::vec4 new_emission_color = emission_color * cur_pos;
     new_emission_color.a = 1.0f;
 
-    material.baseColorFactor = new_color;
-    material.emissiveFactor = new_emission_color;
+    material_value->value().baseColorFactor = new_color;
+    material_value->value().emissiveFactor = new_emission_color;
+    material_value->dirty();
 }
