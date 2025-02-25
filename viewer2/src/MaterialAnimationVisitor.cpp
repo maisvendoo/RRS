@@ -57,13 +57,13 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
                     descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>();
 
                     auto material_value = vsg::PbrMaterialValue::create();
+                    material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
+
                     auto bufferInfo = vsg::BufferInfo::create(material_value);
                     descriptorBuffer->bufferInfoList.clear();
                     descriptorBuffer->bufferInfoList.push_back(bufferInfo);
 
-                    auto& material = material_value->value();
-
-                    ProcAnimation *animation = new MaterialAnimation(material);
+                    ProcAnimation *animation = new MaterialAnimation(material_value);
                     animation->load(*cfg);
                     animations->insert(animation->getSignalID(), animation);
                 }
