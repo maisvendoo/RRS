@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vsg/maths/vec4.h>
 
-MaterialAnimation::MaterialAnimation(vsg::PbrMaterialValue *data)
+MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
     : ProcAnimation()
     , material_value(data)
     , color(data->value().baseColorFactor)
