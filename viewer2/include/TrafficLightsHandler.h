@@ -34,7 +34,7 @@ public:
 
     vsg::ref_ptr<vsg::Group> traffic_light_nodes;
 
-    void update();
+    void step(float t, float dt);
 
 private:
     void printSignalInfo(TrafficLight* tl);

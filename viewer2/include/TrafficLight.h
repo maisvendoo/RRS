@@ -40,7 +40,7 @@ public:
 
     void load_animations(const std::string& animations_dir);
 
-    void update();
+    void step(float t, float dt);
 
 private:
 

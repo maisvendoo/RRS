@@ -124,7 +124,7 @@ void TrafficLight::load_animations(const std::string& animations_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLight::update()
+void TrafficLight::step(float t, float dt)
 {
     if (animations.isEmpty())
     {
@@ -139,10 +139,14 @@ void TrafficLight::update()
         {
             ProcAnimation *anim = animation.value();
             anim->setPosition(lens_state[animation.value()->getSignalID()]);
+            anim->step(t, dt);
         }
 
         std::cout << "Updated signal "
-                  << this->getConnectorName().toStdString() << std::endl;
+                  << this->getConnectorName().toStdString()
+                  << " | lens: "
+                  << lens_state[0] << lens_state[1] << lens_state[2] << lens_state[3] << lens_state[4]
+                  << std::endl;
 
         old_lens_state = lens_state;
     }
