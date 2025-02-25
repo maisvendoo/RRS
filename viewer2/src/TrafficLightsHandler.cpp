@@ -190,18 +190,18 @@ void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref
     }
 }
 
-void TrafficLightsHandler::update()
+void TrafficLightsHandler::step(float t, float dt)
 {
     for (auto tl = traffic_lights_fwd.begin(); tl != traffic_lights_fwd.end(); ++tl)
     {
         TrafficLight *traffic_light = tl.value();
-        traffic_light->update();
+        traffic_light->step(t, dt);
     }
 
     for (auto tl = traffic_lights_bwd.begin(); tl != traffic_lights_bwd.end(); ++tl)
     {
         TrafficLight *traffic_light = tl.value();
-        traffic_light->update();
+        traffic_light->step(t, dt);
     }
 }
 

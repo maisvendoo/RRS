@@ -17,6 +17,7 @@ public:
 
 private:
 
+    double prev_time = 0.0;
     TrafficLightsHandler *traffic_light_handler = nullptr;
 };
 
