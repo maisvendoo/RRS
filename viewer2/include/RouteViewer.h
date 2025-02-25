@@ -117,6 +117,10 @@ private:
     vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
 
     vsg::ref_ptr<TrafficLightsUpdateHandler> traffic_lights_update_handler;
+
+private slots:
+
+    void updateViewer();
 };
 
 #endif // ROUTE_VIEWER_H

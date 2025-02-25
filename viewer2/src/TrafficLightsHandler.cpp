@@ -335,4 +335,6 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
     }
 
     tl->deserialize(data);
+
+    emit updateViewer();
 }

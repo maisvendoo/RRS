@@ -36,6 +36,10 @@ public:
 
     void update();
 
+signals:
+
+    void updateViewer();
+
 private:
     void printSignalInfo(TrafficLight* tl);
 
