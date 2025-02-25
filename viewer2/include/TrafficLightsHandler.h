@@ -52,8 +52,6 @@ private:
 
     std::string animations_dir;
 
-    std::set<std::string> handled_paths;
-
 public slots:
 
     void slotUpdateSignal(QByteArray data);
