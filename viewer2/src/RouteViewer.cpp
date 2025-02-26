@@ -578,12 +578,17 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     */
     traffic_lights_handler->deserialize(sig_data);
 
+    options->sharedObjects = nullptr;
+
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
 
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler.get(), &TrafficLightsHandler::slotUpdateSignal);
+
+    connect(traffic_lights_handler.get(), &TrafficLightsHandler::updateViewer,
+            this, &RouteViewer::updateViewer);
 
     traffic_lights_update_handler = TrafficLightsUpdateHandler::create(traffic_lights_handler.get());
 
@@ -668,5 +673,11 @@ void RouteViewer::slotUpdateKeyboard()
 void RouteViewer::slotUpdateControlledVehicle()
 {
 
+}
+
+void RouteViewer::updateViewer()
+{
+    viewer->update();
+    viewer->compile();
 }
 

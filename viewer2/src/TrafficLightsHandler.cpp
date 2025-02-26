@@ -28,6 +28,7 @@
 #include <vsg/utils/Builder.h>
 #include "helper.h"
 
+
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
     : QObject(parent)
 {
@@ -241,7 +242,6 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
                       r.z,   o.z,  u.z,  0,
                         0,     0,    0,  1);
 
-
         auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
 
         if (auto* cull_node = signal_node->cast<vsg::CullNode>())
@@ -270,9 +270,10 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
         // std::cout << std::endl;
 
         global_transform->matrix = m1 * m2;
-        global_transform->addChild(signal_node);
 
+        global_transform->addChild(signal_node);
         tl->setNode(signal_node);
+
         tl->load_animations(animations_dir);
 
         traffic_light_nodes->addChild(global_transform);
@@ -328,4 +329,6 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
     }
 
     tl->deserialize(data);
+
+    emit updateViewer();
 }
