@@ -33,6 +33,8 @@ struct settings_t
     double fovy;        ///< Vertical view angle
     double fovy_min;    ///< Vertical view angle min
     double fovy_max;    ///< Vertical view angle max
+    double pitch_min;   ///< Vertical angle down max
+    double pitch_max;   ///< Vertical angle up max
     double zNear;
     double zFar;
 
@@ -59,17 +61,20 @@ struct settings_t
     double ext_cam_init_angle_H;    ///< External camera initial horizontal angle
     double ext_cam_init_angle_V;    ///< External camera initial vertical angle
 
-    vsg::vec3 free_cam_init_pos;    ///< Free camera initial position
-    double free_cam_rot_coeff;       ///< Free camera rotation coeff
-    double free_cam_speed;           ///< Free camera speed
-    double free_cam_speed_coeff;     ///< Free camera speed coeff
-    double free_cam_fovy_step;      ///< Free camera FovY step
+    vsg::dvec3 free_cam_init_pos;   ///< Free camera initial position
+    double free_cam_speed_keyboard; ///< Free camera initial speed
+    double free_cam_speed_mouse;    ///< Free camera initial speed
+    double free_cam_speed_coeff;    ///< Free camera speed coeff
+    double free_cam_rotate_keyboard;///< Free camera rotation initial speed
+    double free_cam_rotate_mouse;   ///< Free camera rotation initial speed
+    double free_cam_height_step;    ///< Free camera vertical shift
+    double free_cam_fovy_coeff;     ///< Free camera FovY coeff
 
-    double cabine_cam_rot_coeff;     ///< Cabine camera rotation coeff
+    double cabine_cam_rot_coeff;    ///< Cabine camera rotation coeff
     double cabine_cam_fovy_step;    ///< Cabine camera FovY step
-    double cabine_cam_speed;         ///< Cabine camera speed
-    double cabine_cam_z_min;         ///< Cabine camera relative vertical shift
-    double cabine_cam_z_max;         ///< Cabine camera relative vertical shift
+    double cabine_cam_speed;        ///< Cabine camera speed
+    double cabine_cam_z_min;        ///< Cabine camera relative vertical shift
+    double cabine_cam_z_max;        ///< Cabine camera relative vertical shift
 
     double stat_cam_dist;      ///< Static camera shift
     double stat_cam_height;    ///< Static camera height
