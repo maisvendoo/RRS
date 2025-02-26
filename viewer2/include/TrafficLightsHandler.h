@@ -33,10 +33,6 @@ public:
 
     void step(float t, float dt);
 
-signals:
-
-    void updateViewer();
-
 private:
     void printSignalInfo(TrafficLight* tl);
 

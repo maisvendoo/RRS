@@ -587,9 +587,6 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler.get(), &TrafficLightsHandler::slotUpdateSignal);
 
-    connect(traffic_lights_handler.get(), &TrafficLightsHandler::updateViewer,
-            this, &RouteViewer::updateViewer);
-
     traffic_lights_update_handler = TrafficLightsUpdateHandler::create(traffic_lights_handler.get());
 
     viewer->addEventHandler(traffic_lights_update_handler);
@@ -673,11 +670,5 @@ void RouteViewer::slotUpdateKeyboard()
 void RouteViewer::slotUpdateControlledVehicle()
 {
 
-}
-
-void RouteViewer::updateViewer()
-{
-    viewer->update();
-    viewer->compile();
 }
 
