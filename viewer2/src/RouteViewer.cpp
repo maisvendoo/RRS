@@ -567,6 +567,8 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     traffic_lights_handler->deserialize(sig_data);
 
+    options->sharedObjects = nullptr;
+
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
