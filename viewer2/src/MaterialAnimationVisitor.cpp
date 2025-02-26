@@ -65,7 +65,7 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 
                     ProcAnimation *animation = new MaterialAnimation(material_value);
                     animation->load(*cfg);
-                    animations->insert(animation->getSignalID(), animation);
+                    animations->insert({animation->getSignalID(), animation});
                 }
             }
         }

@@ -2,7 +2,6 @@
 #define ROUTE_VIEWER_H
 
 #include "settings.h"
-#include "TrafficLightsHandler.h"
 
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/ViewMatrix.h>
@@ -24,9 +23,10 @@ class QString;
 class QByteArray;
 class SoundManager;
 class TcpClient;
-class TrainExteriorHandler;
-
-#include    <TrafficLightsUpdateHandler.h>
+class TrafficLightsHandler;
+class TrafficLightsUpdateHandler;
+class VehiclesHandler;
+class VehiclesUpdateHandler;
 
 namespace vsg
 {
@@ -93,13 +93,14 @@ private:
     bool is_ready = false;
     bool is_route = false;
     bool is_signals = false;
+    bool is_vehicles = false;
 
     settings_t settings;
 
-    std::unique_ptr<SoundManager> sound_manager;
-    std::unique_ptr<TrainExteriorHandler> train_ext_handler;
-    // vsg::ref_ptr<TrafficLightsHandler> traffic_lights_handler = TrafficLightsHandler::create();
-    std::unique_ptr<TrafficLightsHandler> traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
+    TcpClient* tcp_client;
+    SoundManager *sound_manager;
+    std::unique_ptr<TrafficLightsHandler> traffic_lights_handler;
+    std::unique_ptr<VehiclesHandler> vehicles_handler;
 
     vsg::ref_ptr<vsg::Options> options;
     vsg::ref_ptr<vsg::WindowTraits> windowTraits;
@@ -113,10 +114,10 @@ private:
     vsg::ref_ptr<vsg::CommandGraph> commandGraph;
     vsg::ref_ptr<vsg::Viewer> viewer;
 
-    TcpClient* tcp_client;
     vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
 
     vsg::ref_ptr<TrafficLightsUpdateHandler> traffic_lights_update_handler;
+    vsg::ref_ptr<TrafficLightsUpdateHandler> vehicles_update_handler;
 };
 
 #endif // ROUTE_VIEWER_H

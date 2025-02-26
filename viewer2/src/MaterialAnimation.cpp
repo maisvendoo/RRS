@@ -16,8 +16,12 @@ MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
 
 void MaterialAnimation::anim_step(float t, float dt)
 {
-    cur_pos += (pos - cur_pos) * duration * dt;
-    update();
+    float delta = (pos - cur_pos);
+    if (abs(delta) > 1e-5f)
+    {
+        cur_pos += delta * duration * dt;
+        update();
+    }
 }
 
 bool MaterialAnimation::load_config(CfgReader &cfg)

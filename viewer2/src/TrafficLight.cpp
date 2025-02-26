@@ -126,7 +126,7 @@ void TrafficLight::load_animations(const std::string& animations_dir)
 //------------------------------------------------------------------------------
 void TrafficLight::step(float t, float dt)
 {
-    if (animations.isEmpty())
+    if (animations.empty())
     {
         return;
     }
@@ -146,8 +146,8 @@ void TrafficLight::step(float t, float dt)
     for (auto animation : animations)
     {
         if (changed)
-            animation->setPosition(lens_state[animation->getSignalID()]);
+            animation.second->setPosition(lens_state[animation.first]);
 
-        animation->step(t, dt);
+        animation.second->step(t, dt);
     }
 }

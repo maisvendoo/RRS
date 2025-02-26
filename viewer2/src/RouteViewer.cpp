@@ -1,19 +1,18 @@
 #include "RouteViewer.h"
 
+#include "cmd-line.h"
 #include "CLI11.hpp"
+#include "filesystem.h"
+#include "CfgReader.h"
+#include "Logger.h"
 #include "CameraFreeManipulator.h"
 #include "Route.h"
 #include "RouteLoader.h"
-#include "TrafficLightsHandler.h"
+#include "TrafficLightsUpdateHandler.h"
+#include "VehiclesUpdateHandler.h"
+
 #include "simulator-info-struct.h"
-#include "CfgReader.h"
-#include "SoundManager.h"
-#include "TrainExteriorHandler.h"
-#include "cmd-line.h"
-#include "filesystem.h"
-#include "network-data-types.h"
-#include "settings.h"
-#include "Logger.h"
+#include "sound-manager.h"
 #include "tcp-client.h"
 
 #include <chrono>
@@ -143,10 +142,12 @@ bool RouteViewer::init(int argc, char* argv[])
     LOG_INFO("Override settings from command line");
     overrideSettingsByCommandLine(argc, argv);
 
-    sound_manager = std::make_unique<SoundManager>();
+    sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
 
-    train_ext_handler = std::make_unique<TrainExteriorHandler>(settings, sound_manager);
+    traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
+
+    vehicles_handler = std::make_unique<VehiclesHandler>(settings, sound_manager);
 
     initVsgOptions();
     initWindowTraits();
@@ -571,7 +572,10 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
         return;
     }
     is_signals = true;
-
+    /*
+    QString msg = QString("Загрузка светофоров...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
     traffic_lights_handler->deserialize(sig_data);
 
     traffic_lights_handler->create_pagedLODs(settings, options);
@@ -587,10 +591,72 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     viewer->update();
     viewer->compile();
+
+    LOG_INFO("Send request for vehicles info");
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
 
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 {
+    if (is_vehicles)
+    {
+        LOG_WARN("Get vehicles info again");
+        return;
+    }
+    is_vehicles = true;
+
+    simulator_vehicles_info_t vehicles_info;
+    vehicles_info.deserialize(data);
+    int count = vehicles_info.vehicles.size();
+    if (count <= 0)
+    {
+        LOG_WARN("Server has not any vehicles");
+        is_vehicles = false;
+        return;
+    }
+
+    LOG_INFO("Get info about %u vehicles", count);
+    /*
+    QString msg = QString("Загрузка подвижного состава...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
+    vehicles_handler->load(vehicles_info);
+    /*
+    msg = QString("");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
+    connect(tcp_client, &TcpClient::setVehiclesPositions,
+            vehicles_handler.get(), &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
+
+    connect(tcp_client, &TcpClient::setVehiclesData,
+            vehicles_handler.get(), &VehiclesHandler::slotGetVehiclesStateData, Qt::DirectConnection);
+
+    connect(tcp_client, &TcpClient::setVehicleControlled,
+            vehicles_handler.get(), &VehiclesHandler::slotGetVehicleControlled, Qt::DirectConnection);
+    /*
+    vehicle_control_by_keyboard.controlled_vehicle = vehicles_handler->getControlledVehicle();
+    vehicle_control_by_keyboard.current_vehicle = vehicles_handler->getCurrentVehicle();
+    vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
+    LOG_INFO("Send keyboard control to vehicle %u", vehicle_control_by_keyboard.controlled_vehicle);
+    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+    */
+    vehicles_update_handler = TrafficLightsUpdateHandler::create(traffic_lights_handler.get());
+    viewer->addEventHandler(vehicles_update_handler);
+    /*
+    QObject::connect(vehicles_update_handler, &TrafficLightsUpdateHandler::sendControlledVehicle,
+                     this, &RouteViewer::slotUpdateControlledVehicle);
+    */
+    root->addChild(vehicles_handler->getExterior());
+    viewer->update();
+    viewer->compile();
+
+    LOG_INFO("Send request for continuous vehicles update");
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
+                            static_cast<double>(settings.vehicles_pos_update_interval) / 1000.0);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+                            static_cast<double>(settings.vehicles_state_update_interval) / 1000.0);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
+                            static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
 
 }
 

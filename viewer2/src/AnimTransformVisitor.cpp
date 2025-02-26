@@ -34,7 +34,7 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     if (animation)
     {
         animation->name = name;
-        animations->insert(animation->getSignalID(), animation);
+        animations->insert({animation->getSignalID(), animation});
     }
 
     transform.traverse(*this);

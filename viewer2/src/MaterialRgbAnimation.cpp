@@ -13,10 +13,16 @@ MaterialRgbAnimation::MaterialRgbAnimation(vsg::PbrMaterial& material)
 
 void MaterialRgbAnimation::anim_step(float t, float dt)
 {
-    cur_pos_r += (pos_r - cur_pos_r) * duration * dt;
-    cur_pos_g += (pos_g - cur_pos_g) * duration * dt;
-    cur_pos_b += (pos_b - cur_pos_b) * duration * dt;
-    update();
+    float delta_r = (pos_r - cur_pos_r);
+    float delta_g = (pos_g - cur_pos_g);
+    float delta_b = (pos_b - cur_pos_b);
+    if ((abs(delta_r) > 1e-5f) || (abs(delta_g) > 1e-5f) || (abs(delta_b) > 1e-5f))
+    {
+        cur_pos_r += delta_r * duration * dt;
+        cur_pos_g += delta_g * duration * dt;
+        cur_pos_b += delta_b * duration * dt;
+        update();
+    }
 }
 
 bool MaterialRgbAnimation::load_config(CfgReader &cfg)
