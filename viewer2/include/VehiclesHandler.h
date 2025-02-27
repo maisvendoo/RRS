@@ -45,7 +45,7 @@ public slots:
 
     void slotGetVehiclesPosData(QByteArray &data);
     void slotGetVehiclesStateData(QByteArray &data);
-    void slotGetVehicleControlled(QByteArray &data);
+    void slotGetVehicleControlled(QByteArray &data); // do it here?
 
 private:
 
@@ -61,6 +61,7 @@ private:
     short cur_data = -1;
     short old_data = -1;
     short unused_data = -1;
+    double ref_time = 0.0;
     double time_difference = 0.0;
     double settings_delay = 0.17;
 
@@ -68,9 +69,9 @@ private:
     /// Data about trains and vehicles state, received from server
     std::array<simulator_update_t, STATE_ARRAY_SIZE> update_data;
     bool is_state_updated = false;
-    short new_state = -1;
-    short unused_state = -1;
-    bool data_updated = false;
+    short new_state = 0;
+    short unused_state = 1;
+    bool is_new_state = false;
 
     /// Vehicle number which is a referenced for camera
     int cur_vehicle = 0;

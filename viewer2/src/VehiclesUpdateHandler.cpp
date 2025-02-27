@@ -14,9 +14,7 @@ void VehiclesUpdateHandler::apply(vsg::FrameEvent &event)
         double t = event.frameStamp->simulationTime;
         double dt = t - prev_time;
         prev_time = t;
-
-        if (vehicles_handler->isUpdated())
-            vehicles_handler->step(t, dt);
+        vehicles_handler->step(t, dt);
     }
 }
 

@@ -10,7 +10,7 @@
 #include <vsg/ui/TouchEvent.h>
 
 /// Trackball is an event handler that provides mouse and touch controlled 3d trackball camera view manipulation.
-class VSG_DECLSPEC CameraFreeManipulator : public vsg::Inherit<vsg::Visitor, CameraFreeManipulator>
+class CameraFreeManipulator : public vsg::Inherit<vsg::Visitor, CameraFreeManipulator>
 {
 public:
     explicit CameraFreeManipulator(vsg::ref_ptr<vsg::Camera> camera, settings_t &settings);

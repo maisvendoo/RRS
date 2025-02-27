@@ -117,7 +117,7 @@ private:
     vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
 
     vsg::ref_ptr<TrafficLightsUpdateHandler> traffic_lights_update_handler;
-    vsg::ref_ptr<TrafficLightsUpdateHandler> vehicles_update_handler;
+    vsg::ref_ptr<VehiclesUpdateHandler> vehicles_update_handler;
 };
 
 #endif // ROUTE_VIEWER_H

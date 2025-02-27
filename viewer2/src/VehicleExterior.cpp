@@ -126,7 +126,7 @@ vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string 
         return node;
     }
 
-    LOG_INFO("Fail to load model from file: %s", model_path.c_str());
+    LOG_WARN("Fail to load model from file: %s", model_path.c_str());
     return nullptr;
 }
 

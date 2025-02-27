@@ -6,6 +6,7 @@
 #include "CfgReader.h"
 #include "Logger.h"
 #include "CameraFreeManipulator.h"
+#include "SoundManagerUpdateHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
 #include "TrafficLightsUpdateHandler.h"
@@ -443,8 +444,11 @@ void RouteViewer::initViewer()
     viewer->addWindow(window);
 
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+
     //viewer->addEventHandler(vsg::Trackball::create(camera));
     viewer->addEventHandler(CameraFreeManipulator::create(camera, settings));
+
+    viewer->addEventHandler(SoundManagerUpdateHandler::create(camera, sound_manager));
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
@@ -642,10 +646,10 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     LOG_INFO("Send keyboard control to vehicle %u", vehicle_control_by_keyboard.controlled_vehicle);
     tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
     */
-    vehicles_update_handler = TrafficLightsUpdateHandler::create(traffic_lights_handler.get());
+    vehicles_update_handler = VehiclesUpdateHandler::create(vehicles_handler.get());
     viewer->addEventHandler(vehicles_update_handler);
     /*
-    QObject::connect(vehicles_update_handler, &TrafficLightsUpdateHandler::sendControlledVehicle,
+    QObject::connect(vehicles_update_handler, &VehiclesUpdateHandler::sendControlledVehicle,
                      this, &RouteViewer::slotUpdateControlledVehicle);
     */
     root->addChild(vehicles_handler->getExterior());
