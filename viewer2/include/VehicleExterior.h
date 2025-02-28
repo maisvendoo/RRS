@@ -34,11 +34,11 @@ public:
 
     void step(float t, float dt);
 
-    bool loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager *sm);
+    bool loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager *sm, vsg::ref_ptr<vsg::Options> options);
 
 private:
 
-    vsg::ref_ptr<vsg::MatrixTransform> loadModel(const std::string &modelName, const std::string &textureName);
+    vsg::ref_ptr<vsg::MatrixTransform> loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options);
 
     void load_animations(const std::string& animations_dir);
 

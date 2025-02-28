@@ -628,7 +628,8 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     QString msg = QString("Загрузка подвижного состава...");
     imguiWidgetsHandler->setLoadingStatus(msg);
     */
-    vehicles_handler->load(vehicles_info, settings);
+    options->sharedObjects = nullptr;
+    vehicles_handler->load(vehicles_info, settings, options);
     /*
     msg = QString("");
     imguiWidgetsHandler->setLoadingStatus(msg);

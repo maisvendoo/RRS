@@ -29,7 +29,7 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, SoundManager *sm)
+bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, SoundManager *sm, vsg::ref_ptr<vsg::Options> options)
 {
     // Open vehicle config file
     FileSystem &fs = FileSystem::getInstance();
@@ -60,7 +60,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     }
 
     cfg.getString(sec_name, "ExtTexturesDir", textureName);
-    auto model = loadModel(modelName.toStdString(), textureName.toStdString());
+    auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
     if (!model)
         return false;
 
@@ -83,7 +83,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     if (!modelName.isEmpty())
     {
         cfg.getString(sec_name, "CabineTexturesDir", textureName);
-        auto cabine = loadModel(modelName.toStdString(), textureName.toStdString());
+        auto cabine = loadModel(modelName.toStdString(), textureName.toStdString(), options);
         if (cabine)
         {
             if (cfg.getString(sec_name, "CabineShift", modelShift))
@@ -123,14 +123,14 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string &modelName, const std::string &textureName)
+vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options)
 {
     (void) textureName; // TODO
 
     FileSystem &fs = FileSystem::getInstance();
     std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
 
-    auto model_node = vsg::read_cast<vsg::Node>(model_path);
+    auto model_node = vsg::read_cast<vsg::Node>(model_path, options);
 
     if (model_node)
     {

@@ -40,7 +40,7 @@ public:
 
     void selectControlVehicle();
 
-    void load(simulator_vehicles_info_t vehicles_info, const settings_t& settings);
+    void load(simulator_vehicles_info_t vehicles_info, const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
 
 public slots:
 

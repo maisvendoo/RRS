@@ -2,6 +2,7 @@
 
 #include <vsg/maths/transform.h>
 #include <vsg/io/stream.h>
+#include <vsg/io/Options.h>
 
 #include "ProcAnimation.h"
 #include "VehicleExterior.h"
@@ -282,7 +283,7 @@ void VehiclesHandler::selectControlVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings)
+void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings, vsg::ref_ptr<vsg::Options> options)
 {
     int count = vehicles_info.vehicles.size();
 
@@ -299,7 +300,7 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
         VehicleExterior vehicle_ext;
         vehicle_ext.driver_pos = settings.default_driver_pos;
 
-        if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager))
+        if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {
             LOG_INFO("Loaded vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
             LOG_INFO("Vehicle %u / %u loaded", i + 1, count);
