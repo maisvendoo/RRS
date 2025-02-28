@@ -32,10 +32,10 @@ vsg::ref_ptr<vsg::Group> VehiclesHandler::getExterior()
 //------------------------------------------------------------------------------
 VehicleExterior *VehiclesHandler::getCurrentVehicle()
 {
-    if (cur_vehicle < 0)
-        return nullptr;
+    if (isUpdated())
+        return &(vehicles[cur_vehicle]);
 
-    return &(vehicles[cur_vehicle]);
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -282,7 +282,7 @@ void VehiclesHandler::selectControlVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info)
+void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings)
 {
     int count = vehicles_info.vehicles.size();
 
@@ -297,6 +297,8 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info)
         std::string cfg_file = cfg_file_tmp.toStdString();
 
         VehicleExterior vehicle_ext;
+        vehicle_ext.driver_pos = settings.default_driver_pos;
+
         if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager))
         {
             LOG_INFO("Loaded vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());

@@ -51,16 +51,6 @@ struct settings_t
 
     double view_distance;    ///< View distance
 
-    double ext_cam_init_dist;       ///< Initial distance of extrnal camera
-    double ext_cam_init_height;     ///< Initial height of extarnel camera
-    double ext_cam_init_shift;      ///< Inital shift of external camera
-    double ext_cam_rot_coeff;       ///< External camera rotation coefficient
-    double ext_cam_speed;           ///< External camera motion speed
-    double ext_cam_speed_coeff;     ///< External camera speed coeff
-    double ext_cam_min_dist;        ///< External camera minimal distance
-    double ext_cam_init_angle_H;    ///< External camera initial horizontal angle
-    double ext_cam_init_angle_V;    ///< External camera initial vertical angle
-
     vsg::dvec3 free_cam_init_pos;   ///< Free camera initial position
     double free_cam_speed_keyboard; ///< Free camera initial speed
     double free_cam_speed_mouse;    ///< Free camera initial speed
@@ -70,11 +60,26 @@ struct settings_t
     double free_cam_height_step;    ///< Free camera vertical shift
     double free_cam_fovy_coeff;     ///< Free camera FovY coeff
 
-    double cabine_cam_rot_coeff;    ///< Cabine camera rotation coeff
-    double cabine_cam_fovy_step;    ///< Cabine camera FovY step
-    double cabine_cam_speed;        ///< Cabine camera speed
-    double cabine_cam_z_min;        ///< Cabine camera relative vertical shift
-    double cabine_cam_z_max;        ///< Cabine camera relative vertical shift
+    vsg::dvec3 default_driver_pos;  ///< Cabine camera initial position
+    double cabine_speed_keyboard;   ///< Cabine camera initial speed
+    double cabine_speed_mouse;      ///< Cabine camera initial speed
+    double cabine_speed_coeff;      ///< Cabine camera speed coeff
+    double cabine_rotate_keyboard;  ///< Cabine camera rotation initial speed
+    double cabine_rotate_mouse;     ///< Cabine camera rotation initial speed
+    double cabine_height_step;      ///< Cabine camera vertical shift
+    double cabine_fovy_coeff;       ///< Cabine camera FovY coeff
+    double cabine_z_min;            ///< Cabine camera relative vertical shift limit
+    double cabine_z_max;            ///< Cabine camera relative vertical shift limit
+
+    double ext_cam_init_dist;       ///< Initial distance of extrnal camera
+    double ext_cam_init_height;     ///< Initial height of extarnel camera
+    double ext_cam_init_shift;      ///< Inital shift of external camera
+    double ext_cam_rot_coeff;       ///< External camera rotation coefficient
+    double ext_cam_speed;           ///< External camera motion speed
+    double ext_cam_speed_coeff;     ///< External camera speed coeff
+    double ext_cam_min_dist;        ///< External camera minimal distance
+    double ext_cam_init_angle_H;    ///< External camera initial horizontal angle
+    double ext_cam_init_angle_V;    ///< External camera initial vertical angle
 
     double stat_cam_dist;      ///< Static camera shift
     double stat_cam_height;    ///< Static camera height

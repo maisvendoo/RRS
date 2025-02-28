@@ -215,30 +215,6 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
             settings.notify_level = tmp_qstr.toStdString();
         }
 
-        cfg.getDouble(secName, "CabineCamRotCoeff", settings.cabine_cam_rot_coeff);
-        cfg.getDouble(secName, "CabineCamFovYStep", settings.cabine_cam_fovy_step);
-        cfg.getDouble(secName, "CabineCamSpeed", settings.cabine_cam_speed);
-
-        cfg.getDouble(secName, "ExtCamInitDist", settings.ext_cam_init_dist);
-        cfg.getDouble(secName, "ExtCamInitHeight", settings.ext_cam_init_height);
-        cfg.getDouble(secName, "ExtCamInitShift", settings.ext_cam_init_shift);
-        cfg.getDouble(secName, "ExtCamRotCoeff", settings.ext_cam_rot_coeff);
-        cfg.getDouble(secName, "ExtCamSpeed", settings.ext_cam_speed);
-        cfg.getDouble(secName, "ExtCamSpeedCoeff", settings.ext_cam_speed_coeff);
-        cfg.getDouble(secName, "ExtCamMinDist", settings.ext_cam_min_dist);
-        cfg.getDouble(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
-        cfg.getDouble(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
-
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "FreeCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.free_cam_init_pos.x
-                >> settings.free_cam_init_pos.y
-                >> settings.free_cam_init_pos.z;
-        }
-
         cfg.getDouble(secName, "FreeCamSpeedKeyboard", settings.free_cam_speed_keyboard);
         cfg.getDouble(secName, "FreeCamSpeedMouse", settings.free_cam_speed_mouse);
         double tmp_double = 1.0;
@@ -251,9 +227,43 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
         cfg.getDouble(secName, "FreeCamFovYStep", tmp_double);
         if (tmp_double > 1.01) settings.free_cam_fovy_coeff = tmp_double;
 
+        cfg.getDouble(secName, "CabineCamSpeedKeyboard", settings.cabine_speed_keyboard);
+        cfg.getDouble(secName, "CabineCamSpeedMouse", settings.cabine_speed_mouse);
+        tmp_double = 1.0;
+        cfg.getDouble(secName, "CabineCamSpeedCoeff", tmp_double);
+        if (tmp_double > 1.01) settings.cabine_speed_coeff = tmp_double;
+        cfg.getDouble(secName, "CabineCamRotKeyboard", settings.cabine_rotate_keyboard);
+        cfg.getDouble(secName, "CabineCamRotMouse", settings.cabine_rotate_keyboard);
+        cfg.getDouble(secName, "CabineCamHeightStep", settings.cabine_height_step);
+        tmp_double = 1.0;
+        cfg.getDouble(secName, "CabineCamFovYStep", tmp_double);
+        if (tmp_double > 1.01) settings.cabine_fovy_coeff = tmp_double;
+        cfg.getDouble(secName, "CabineCamVerticalShiftMin", settings.cabine_z_min);
+        cfg.getDouble(secName, "CabineCamVerticalShiftMax", settings.cabine_z_max);
+
+        cfg.getDouble(secName, "ExtCamInitDist", settings.ext_cam_init_dist);
+        cfg.getDouble(secName, "ExtCamInitHeight", settings.ext_cam_init_height);
+        cfg.getDouble(secName, "ExtCamInitShift", settings.ext_cam_init_shift);
+        cfg.getDouble(secName, "ExtCamRotCoeff", settings.ext_cam_rot_coeff);
+        cfg.getDouble(secName, "ExtCamSpeed", settings.ext_cam_speed);
+        cfg.getDouble(secName, "ExtCamSpeedCoeff", settings.ext_cam_speed_coeff);
+        cfg.getDouble(secName, "ExtCamMinDist", settings.ext_cam_min_dist);
+        cfg.getDouble(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
+        cfg.getDouble(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
+
         cfg.getDouble(secName, "StatCamDist", settings.stat_cam_dist);
         cfg.getDouble(secName, "StatCamHeight", settings.stat_cam_height);
         cfg.getDouble(secName, "StatCamShift", settings.stat_cam_shift);
+
+        tmp_qstr = "0.0 0.0 0.0";
+        if (cfg.getString(secName, "FreeCamInitPos", tmp_qstr))
+        {
+            std::string free_cam_init_pos = tmp_qstr.toStdString();
+            std::istringstream stream(free_cam_init_pos);
+            stream >> settings.free_cam_init_pos.x
+                >> settings.free_cam_init_pos.y
+                >> settings.free_cam_init_pos.z;
+        }
 
         tmp_int = 0;
         cfg.getInt(secName, "FrameDiv", tmp_int);
@@ -618,7 +628,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     QString msg = QString("Загрузка подвижного состава...");
     imguiWidgetsHandler->setLoadingStatus(msg);
     */
-    vehicles_handler->load(vehicles_info);
+    vehicles_handler->load(vehicles_info, settings);
     /*
     msg = QString("");
     imguiWidgetsHandler->setLoadingStatus(msg);

@@ -10,22 +10,24 @@ public:
                             vsg::ref_ptr<vsg::Camera> camera,
                             settings_t &settings);
 
+    virtual void resetView() override;
+    virtual void returnView() override;
     void mouseWheelEvent(vsg::vec3 delta) override;
     void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt) override;
     void touchZoomEvent(double zoomLevel) override;
     void frameEvent(double dt) override;
 
     /// Key that turns the view left around the eye points
-    vsg::KeySymbol turnLeftKey = vsg::KEY_a;
+    vsg::KeySymbol turnLeftKey = vsg::KEY_Left;
 
     /// Key that turns the view right around the eye points
-    vsg::KeySymbol turnRightKey = vsg::KEY_d;
+    vsg::KeySymbol turnRightKey = vsg::KEY_Right;
 
     /// Key that pitches up the view around the eye point
-    vsg::KeySymbol pitchUpKey = vsg::KEY_w;
+    vsg::KeySymbol pitchUpKey = vsg::KEY_Up;
 
     /// Key that pitches down the view around the eye point
-    vsg::KeySymbol pitchDownKey = vsg::KEY_s;
+    vsg::KeySymbol pitchDownKey = vsg::KEY_Down;
 
     /// Key that moves the view forward
     vsg::KeySymbol moveForwardKey = vsg::KEY_Up;
@@ -51,18 +53,28 @@ public:
     /// Button mask value used to moving camera horizontally, defaults to middle mouse button
     vsg::ButtonMask moveButtonMask = vsg::BUTTON_MASK_2;
 
-protected:
+private:
 
-    void rotate_around(double angle, const vsg::dvec3& axis);
     void rotate_view(const vsg::dvec2& delta);
     void zoom(double coeff);
     void move(const vsg::dvec3& delta);
+    void calc_view();
 
     bool _prevCtrl = false;
     bool _prevShift = false;
     double _cameraMoveCoeff = 1.0;
     double _pitch_min = vsg::radians(-70.0);
     double _pitch_max = vsg::radians(70.0);
+
+    vsg::dvec3 _position_shift = {0.0, 0.0, 0.0};
+    double _angle_right = 0.0;
+    double _angle_up = 0.0;
+
+    bool is_reset = true;
+    vsg::dvec3 _last_position_shift = {0.0, 0.0, 0.0};
+    double _last_angle_right = 0.0;
+    double _last_angle_up = 0.0;
+    double _last_fov = 55.0;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H

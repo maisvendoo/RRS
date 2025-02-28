@@ -97,6 +97,13 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
         }
     }
 
+    modelShift = "";
+    if (cfg.getString(sec_name, "DriverPos", modelShift))
+    {
+        std::istringstream ss(modelShift.toStdString());
+        ss >> driver_pos.x >> driver_pos.y >> driver_pos.z;
+    }
+
     QString animationsDir = "";
     cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
     load_animations(animationsDir.toStdString());

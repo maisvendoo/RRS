@@ -7,6 +7,51 @@ CameraCabineManipulator::CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> key
 {
     _pitch_min = vsg::radians(_settings.pitch_min);
     _pitch_max = vsg::radians(_settings.pitch_max);
+    _last_fov = _settings.fovy;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraCabineManipulator::resetView()
+{
+    if (!is_reset)
+    {
+        is_reset = true;
+
+        _last_position_shift = _position_shift;
+        _last_angle_right = _angle_right;
+        _last_angle_up = _angle_up;
+        _last_fov = _perspective->fieldOfViewY;
+    }
+
+    _position_shift = {0.0, 0.0, 0.0};
+    _angle_right = 0.0;
+    _angle_up = 0.0;
+    _perspective->fieldOfViewY = _settings.fovy;
+
+    calc_view();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraCabineManipulator::returnView()
+{
+    if (!is_reset)
+    {
+        resetView();
+        return;
+    }
+
+    is_reset = false;
+
+    _position_shift = _last_position_shift;
+    _angle_right = _last_angle_right;
+    _angle_up = _last_angle_up;
+    _perspective->fieldOfViewY = _last_fov;
+
+    calc_view();
 }
 
 //------------------------------------------------------------------------------
@@ -17,16 +62,16 @@ void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
     if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_L))
     {
         if (delta.y > 0.0)
-            move(vsg::dvec3(0.0, 0.0, _settings.free_cam_height_step));
+            move(vsg::dvec3(0.0, 0.0, _settings.cabine_height_step));
         else if (delta.y < 0.0)
-            move(vsg::dvec3(0.0, 0.0, -_settings.free_cam_height_step));
+            move(vsg::dvec3(0.0, 0.0, -_settings.cabine_height_step));
         return;
     }
 
     if (delta.y > 0.0)
-        zoom(1 / _settings.free_cam_fovy_coeff);
+        zoom(1 / _settings.cabine_fovy_coeff);
     else if (delta.y < 0.0)
-        zoom(_settings.free_cam_fovy_coeff);
+        zoom(_settings.cabine_fovy_coeff);
 }
 
 //------------------------------------------------------------------------------
@@ -36,10 +81,10 @@ void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::d
 {
     if (button_mask & moveButtonMask)
     {
-        vsg::dvec3 move_delta(delta.x, delta.y, 0.0);
+        vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
 
         if (move_delta)
-            move(move_delta * dt * _cameraMoveCoeff * _settings.free_cam_speed_mouse);
+            move(move_delta * dt * _cameraMoveCoeff * _settings.cabine_speed_mouse);
 
         return;
     }
@@ -47,7 +92,7 @@ void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::d
     if (button_mask & rotateButtonMask)
     {
         if (delta)
-            rotate_view(-delta * dt * (20.0 + _perspective->fieldOfViewY) * _settings.free_cam_rotate_mouse);
+            rotate_view(-delta * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
     }
 }
 
@@ -93,14 +138,14 @@ void CameraCabineManipulator::frameEvent(double dt)
 
         if (rot_speed)
         {
-            rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.free_cam_rotate_keyboard);
+            rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_keyboard);
         }
         return;
     }
 
     vsg::dvec3 move_speed(0.0, 0.0, 0.0);
-    if ((speed = times2speed(_keyboard->times(moveRightKey))) != 0.0) move_speed.x += -speed;
-    if ((speed = times2speed(_keyboard->times(moveLeftKey))) != 0.0) move_speed.x += speed;
+    if ((speed = times2speed(_keyboard->times(moveRightKey))) != 0.0) move_speed.x += speed;
+    if ((speed = times2speed(_keyboard->times(moveLeftKey))) != 0.0) move_speed.x += -speed;
     if ((speed = times2speed(_keyboard->times(moveForwardKey))) != 0.0) move_speed.y += speed;
     if ((speed = times2speed(_keyboard->times(moveBackwardKey))) != 0.0) move_speed.y += -speed;
     //if ((speed = times2speed(_keyboard->times(moveUpKey))) != 0.0) move_speed.z += speed;
@@ -110,15 +155,15 @@ void CameraCabineManipulator::frameEvent(double dt)
     {
         bool isCtrl = (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R));
         if (!_prevCtrl && isCtrl)
-            _cameraMoveCoeff = _cameraMoveCoeff / _settings.free_cam_speed_coeff;
+            _cameraMoveCoeff = _cameraMoveCoeff / _settings.cabine_speed_coeff;
         _prevCtrl = isCtrl;
 
         bool isShift = (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
         if (!_prevShift && isShift)
-            _cameraMoveCoeff = _cameraMoveCoeff * _settings.free_cam_speed_coeff;
+            _cameraMoveCoeff = _cameraMoveCoeff * _settings.cabine_speed_coeff;
         _prevShift = isShift;
 
-        move(move_speed * dt * _cameraMoveCoeff * _settings.free_cam_speed_keyboard);
+        move(move_speed * dt * _cameraMoveCoeff * _settings.cabine_speed_keyboard);
     }
     else
     {
@@ -131,48 +176,16 @@ void CameraCabineManipulator::frameEvent(double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraCabineManipulator::rotate_around(double angle, const vsg::dvec3& axis)
-{
-    vsg::dmat4 rotation = vsg::rotate(angle, axis);
-    vsg::dmat4 lv = vsg::lookAt(_lookAt->eye, _lookAt->center, _lookAt->up);
-    vsg::dvec3 centerEyeSpace = (lv * _lookAt->center);
-
-    vsg::dmat4 matrix = vsg::inverse(lv) * vsg::translate(centerEyeSpace) * rotation * vsg::translate(-centerEyeSpace) * lv;
-
-    _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
-    _lookAt->center = matrix * _lookAt->center;
-    _lookAt->eye = matrix * _lookAt->eye;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void CameraCabineManipulator::rotate_view(const vsg::dvec2& delta)
 {
-    vsg::dvec3 lookNormal = vsg::normalize(_lookAt->center - _lookAt->eye);
-    vsg::dvec3 forwardNormal = vsg::normalize(vsg::dvec3(lookNormal.x, lookNormal.y, 0.0));
-    //vsg::dvec3 upNormal = normalize(_lookAt->up);
-    vsg::dvec3 upNormal = vsg::dvec3(0.0, 0.0, 1.0);
-    //vsg::dvec3 sideNormal = cross(forwardNormal, _lookAt->up);
-    vsg::dvec3 sideNormal = vsg::dvec3(forwardNormal.y, -forwardNormal.x, 0.0);
+    _angle_right += delta.x;
+    _angle_up += delta.y;
+    _angle_up = std::max(_pitch_min, std::min(_pitch_max, _angle_up));
 
-    double sideAngle = delta.x;
-    double upAngle = delta.y;
+    if ((abs(_angle_right) > 1e-5) || (abs(_angle_up) > 1e-5))
+        is_reset = false;
 
-    double curUpAngle = asin(lookNormal.z);
-    if ((curUpAngle + upAngle) > _pitch_max)
-        upAngle = _pitch_max - curUpAngle;
-    if ((curUpAngle + upAngle) < _pitch_min)
-        upAngle = _pitch_min - curUpAngle;
-
-    vsg::dmat4 matrix = vsg::translate(_lookAt->eye) *
-                        vsg::rotate(sideAngle, upNormal) *
-                        vsg::rotate(upAngle, sideNormal) *
-                        vsg::translate(-_lookAt->eye);
-
-    _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
-    _lookAt->center = matrix * _lookAt->center;
-    _lookAt->eye = matrix * _lookAt->eye;
+    calc_view();
 }
 
 //------------------------------------------------------------------------------
@@ -186,6 +199,9 @@ void CameraCabineManipulator::zoom(double coeff)
     if ((new_fovy > _settings.fovy_max) || (new_fovy < _settings.fovy_min))
         return;
 
+    if (abs(new_fovy - _settings.fovy) > 5.0)
+        is_reset = false;
+
     _perspective->fieldOfViewY = new_fovy;
 }
 
@@ -194,17 +210,41 @@ void CameraCabineManipulator::zoom(double coeff)
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::move(const vsg::dvec3 &delta)
 {
-    vsg::dvec3 lookNormal = vsg::normalize(_lookAt->center - _lookAt->eye);
-    vsg::dvec3 forwardNormal = vsg::normalize(vsg::dvec3(lookNormal.x, lookNormal.y, 0.0));
-    //vsg::dvec3 upNormal = normalize(_lookAt->up);
-    vsg::dvec3 upNormal = vsg::dvec3(0.0, 0.0, 1.0);
-    //vsg::dvec3 sideNormal = cross(forwardNormal, _lookAt->up);
-    vsg::dvec3 sideNormal = vsg::dvec3(forwardNormal.y, -forwardNormal.x, 0.0);
+    _position_shift += delta;
+    _position_shift.z = std::max(_settings.cabine_z_min, std::min(_settings.cabine_z_max, _position_shift.z));
 
-    vsg::dvec3 translation = sideNormal * (-delta.x) +
-                             forwardNormal * (delta.y) +
-                             upNormal * (delta.z);
+    if (length2(_position_shift) > 1e-5)
+        is_reset = false;
 
-    _lookAt->eye = _lookAt->eye + translation;
-    _lookAt->center = _lookAt->center + translation;
+    calc_view();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraCabineManipulator::calc_view()
+{
+    if (!_current_vehicle)
+        return;
+
+    vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos + _position_shift;
+
+    _lookAt->eye = _current_vehicle->position +
+                   _current_vehicle->right * local_eye_pos.x +
+                   _current_vehicle->orth * local_eye_pos.y +
+                   _current_vehicle->up * local_eye_pos.z;
+
+    _lookAt->center = _lookAt->eye + _current_vehicle->orth;
+    _lookAt->up = _current_vehicle->up;
+
+    if ((abs(_angle_right) > 1e-5) || (abs(_angle_up) > 1e-5))
+    {
+        vsg::dmat4 matrix = vsg::translate(_lookAt->eye) *
+                            vsg::rotate(_angle_right, _current_vehicle->up) *
+                            vsg::rotate(_angle_up, _current_vehicle->right) *
+                            vsg::translate(-_lookAt->eye);
+
+        _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
+        _lookAt->center = matrix * _lookAt->center;
+    }
 }
