@@ -1,17 +1,14 @@
-#ifndef CAMERA_FREE_MANIPULATOR_H
-#define CAMERA_FREE_MANIPULATOR_H
+#ifndef CAMERA_CABINE_MANIPULATOR_H
+#define CAMERA_CABINE_MANIPULATOR_H
 
 #include "CameraAbstract.h"
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-class CameraFreeManipulator : public CameraAbstract
+class CameraCabineManipulator : public CameraAbstract
 {
 public:
-    CameraFreeManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
-                          vsg::ref_ptr<vsg::Camera> camera,
-                          settings_t &settings);
+    CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
+                            vsg::ref_ptr<vsg::Camera> camera,
+                            settings_t &settings);
 
     void mouseWheelEvent(vsg::vec3 delta) override;
     void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt) override;
@@ -19,16 +16,16 @@ public:
     void frameEvent(double dt) override;
 
     /// Key that turns the view left around the eye points
-    vsg::KeySymbol turnLeftKey = vsg::KEY_Left;
+    vsg::KeySymbol turnLeftKey = vsg::KEY_a;
 
     /// Key that turns the view right around the eye points
-    vsg::KeySymbol turnRightKey = vsg::KEY_Right;
+    vsg::KeySymbol turnRightKey = vsg::KEY_d;
 
     /// Key that pitches up the view around the eye point
-    vsg::KeySymbol pitchUpKey = vsg::KEY_Up;
+    vsg::KeySymbol pitchUpKey = vsg::KEY_w;
 
     /// Key that pitches down the view around the eye point
-    vsg::KeySymbol pitchDownKey = vsg::KEY_Down;
+    vsg::KeySymbol pitchDownKey = vsg::KEY_s;
 
     /// Key that moves the view forward
     vsg::KeySymbol moveForwardKey = vsg::KEY_Up;
@@ -41,7 +38,7 @@ public:
 
     /// Key that moves the view right
     vsg::KeySymbol moveRightKey = vsg::KEY_Right;
-/*
+    /*
     /// Key that moves the view upward
     vsg::KeySymbol moveUpKey = vsg::KEY_Up;
 
@@ -56,6 +53,7 @@ public:
 
 protected:
 
+    void rotate_around(double angle, const vsg::dvec3& axis);
     void rotate_view(const vsg::dvec2& delta);
     void zoom(double coeff);
     void move(const vsg::dvec3& delta);
@@ -67,4 +65,4 @@ protected:
     double _pitch_max = vsg::radians(70.0);
 };
 
-#endif // CAMERA_FREE_MANIPULATOR_H
+#endif // CAMERA_CABINE_MANIPULATOR_H

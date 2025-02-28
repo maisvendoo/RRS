@@ -4,29 +4,22 @@
 #include "settings.h"
 
 #include <vsg/app/CommandGraph.h>
-#include <vsg/app/ViewMatrix.h>
-#include <vsg/app/Window.h>
-#include <vsg/app/WindowTraits.h>
-#include <vsg/core/ref_ptr.h>
+#include <vsg/app/View.h>
+#include <vsg/app/Viewer.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/DirectionalLight.h>
 #include <vsg/lighting/ShadowSettings.h>
-#include <vsg/maths/vec4.h>
-
-#include <QObject>
-
-#include <memory>
-#include <string>
+#include <vsg/nodes/Group.h>
 #include <vsg/nodes/RegionOfInterest.h>
 
-class QString;
+#include <string>
+
 class QByteArray;
 class SoundManager;
 class TcpClient;
 class TrafficLightsHandler;
-class TrafficLightsUpdateHandler;
 class VehiclesHandler;
-class VehiclesUpdateHandler;
+//class InputHandler;
 
 namespace vsg
 {
@@ -99,8 +92,10 @@ private:
 
     TcpClient* tcp_client;
     SoundManager *sound_manager;
-    std::unique_ptr<TrafficLightsHandler> traffic_lights_handler;
-    std::unique_ptr<VehiclesHandler> vehicles_handler;
+    TrafficLightsHandler *traffic_lights_handler;
+    VehiclesHandler *vehicles_handler;
+
+    //vsg::ref_ptr<InputHandler> vehicles_update_handler;
 
     vsg::ref_ptr<vsg::Options> options;
     vsg::ref_ptr<vsg::WindowTraits> windowTraits;
@@ -109,15 +104,11 @@ private:
     vsg::ref_ptr<vsg::Camera> camera;
     vsg::ref_ptr<vsg::Group> root;
     vsg::ref_ptr<vsg::DirectionalLight> sun;
+    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
     vsg::ref_ptr<vsg::RegionOfInterest> shadow_region;
     vsg::ref_ptr<vsg::View> view;
     vsg::ref_ptr<vsg::CommandGraph> commandGraph;
     vsg::ref_ptr<vsg::Viewer> viewer;
-
-    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
-
-    vsg::ref_ptr<TrafficLightsUpdateHandler> traffic_lights_update_handler;
-    vsg::ref_ptr<VehiclesUpdateHandler> vehicles_update_handler;
 };
 
 #endif // ROUTE_VIEWER_H

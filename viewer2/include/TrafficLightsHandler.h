@@ -49,6 +49,8 @@ private:
 
     std::string animations_dir;
 
+    bool loaded = false;
+
 public slots:
 
     void slotUpdateSignal(QByteArray data);

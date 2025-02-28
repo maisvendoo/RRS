@@ -1,9 +1,6 @@
-#include "CameraFreeManipulator.h"
+#include "CameraVehicleManipulator.h"
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-CameraFreeManipulator::CameraFreeManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
+CameraVehicleManipulator::CameraVehicleManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
                                              vsg::ref_ptr<vsg::Camera> camera,
                                              settings_t &settings)
     : CameraAbstract(keyboard, camera, settings)
@@ -15,7 +12,7 @@ CameraFreeManipulator::CameraFreeManipulator(vsg::ref_ptr<vsg::Keyboard> keyboar
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::mouseWheelEvent(vsg::vec3 delta)
+void CameraVehicleManipulator::mouseWheelEvent(vsg::vec3 delta)
 {
     if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_L))
     {
@@ -35,7 +32,7 @@ void CameraFreeManipulator::mouseWheelEvent(vsg::vec3 delta)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt)
+void CameraVehicleManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt)
 {
     if (button_mask & moveButtonMask)
     {
@@ -57,7 +54,7 @@ void CameraFreeManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dve
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::touchZoomEvent(double zoomLevel)
+void CameraVehicleManipulator::touchZoomEvent(double zoomLevel)
 {
     zoom(zoomLevel);
 }
@@ -65,7 +62,7 @@ void CameraFreeManipulator::touchZoomEvent(double zoomLevel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::frameEvent(double dt)
+void CameraVehicleManipulator::frameEvent(double dt)
 {
     auto times2speed = [](std::pair<double, double> duration) -> double {
         if (duration.first <= 0.0) return 0.0;
@@ -85,22 +82,6 @@ void CameraFreeManipulator::frameEvent(double dt)
     };
 
     double speed = 0.0;
-
-    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_L))
-    {
-        vsg::dvec2 rot_speed(0.0, 0.0);
-        if ((speed = times2speed(_keyboard->times(turnRightKey))) != 0.0) rot_speed.x += -speed;
-        if ((speed = times2speed(_keyboard->times(turnLeftKey))) != 0.0) rot_speed.x += speed;
-        if ((speed = times2speed(_keyboard->times(pitchUpKey))) != 0.0) rot_speed.y += speed;
-        if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
-
-        if (rot_speed)
-        {
-            rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.free_cam_rotate_keyboard);
-        }
-        return;
-    }
-
     vsg::dvec3 move_speed(0.0, 0.0, 0.0);
     if ((speed = times2speed(_keyboard->times(moveRightKey))) != 0.0) move_speed.x += -speed;
     if ((speed = times2speed(_keyboard->times(moveLeftKey))) != 0.0) move_speed.x += speed;
@@ -129,12 +110,39 @@ void CameraFreeManipulator::frameEvent(double dt)
         _prevCtrl = false;
         _prevShift = false;
     }
+
+    vsg::dvec2 rot_speed(0.0, 0.0);
+    if ((speed = times2speed(_keyboard->times(turnRightKey))) != 0.0) rot_speed.x += -speed;
+    if ((speed = times2speed(_keyboard->times(turnLeftKey))) != 0.0) rot_speed.x += speed;
+    if ((speed = times2speed(_keyboard->times(pitchUpKey))) != 0.0) rot_speed.y += speed;
+    if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
+
+    if (rot_speed)
+    {
+        rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.free_cam_rotate_keyboard);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::rotate_view(const vsg::dvec2& delta)
+void CameraVehicleManipulator::rotate_around(double angle, const vsg::dvec3& axis)
+{
+    vsg::dmat4 rotation = vsg::rotate(angle, axis);
+    vsg::dmat4 lv = vsg::lookAt(_lookAt->eye, _lookAt->center, _lookAt->up);
+    vsg::dvec3 centerEyeSpace = (lv * _lookAt->center);
+
+    vsg::dmat4 matrix = vsg::inverse(lv) * vsg::translate(centerEyeSpace) * rotation * vsg::translate(-centerEyeSpace) * lv;
+
+    _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
+    _lookAt->center = matrix * _lookAt->center;
+    _lookAt->eye = matrix * _lookAt->eye;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraVehicleManipulator::rotate_view(const vsg::dvec2& delta)
 {
     vsg::dvec3 lookNormal = vsg::normalize(_lookAt->center - _lookAt->eye);
     vsg::dvec3 forwardNormal = vsg::normalize(vsg::dvec3(lookNormal.x, lookNormal.y, 0.0));
@@ -165,13 +173,13 @@ void CameraFreeManipulator::rotate_view(const vsg::dvec2& delta)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::zoom(double coeff)
+void CameraVehicleManipulator::zoom(double coeff)
 {
     double new_fovy = _perspective->fieldOfViewY;
 
     new_fovy = new_fovy * coeff;
     if ((new_fovy > _settings.fovy_max) || (new_fovy < _settings.fovy_min))
-            return;
+        return;
 
     _perspective->fieldOfViewY = new_fovy;
 }
@@ -179,7 +187,7 @@ void CameraFreeManipulator::zoom(double coeff)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::move(const vsg::dvec3 &delta)
+void CameraVehicleManipulator::move(const vsg::dvec3 &delta)
 {
     vsg::dvec3 lookNormal = vsg::normalize(_lookAt->center - _lookAt->eye);
     vsg::dvec3 forwardNormal = vsg::normalize(vsg::dvec3(lookNormal.x, lookNormal.y, 0.0));

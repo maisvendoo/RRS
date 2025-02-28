@@ -26,17 +26,18 @@ public:
     /// Get scene group
     vsg::ref_ptr<vsg::Group> getExterior();
 
-    /// Info about vehicles exterior
-    std::vector<VehicleExterior> *getVehicles();
+    /// Info about current vehicle exterior
+    VehicleExterior *getCurrentVehicle();
 
     bool isUpdated();
 
     void step(double t, double dt);
 
-    void selectNextTrain();
-    void selectPrevTrain();
-    void selectNextVehicle();
-    void selectPrevVehicle();
+    bool selectNextTrain();
+    bool selectPrevTrain();
+    bool selectNextVehicle();
+    bool selectPrevVehicle();
+
     void selectControlVehicle();
 
     void load(simulator_vehicles_info_t vehicles_info);

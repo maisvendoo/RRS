@@ -30,9 +30,12 @@ vsg::ref_ptr<vsg::Group> VehiclesHandler::getExterior()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<VehicleExterior> *VehiclesHandler::getVehicles()
+VehicleExterior *VehiclesHandler::getCurrentVehicle()
 {
-    return &vehicles;
+    if (cur_vehicle < 0)
+        return nullptr;
+
+    return &(vehicles[cur_vehicle]);
 }
 
 //------------------------------------------------------------------------------
@@ -49,7 +52,7 @@ bool VehiclesHandler::isUpdated()
 void VehiclesHandler::step(double t, double dt)
 {
     ref_time = t;
-    if (!is_pos_updated || !is_state_updated)
+    if (!isUpdated())
         return;
 
     double client_time = ref_time + time_difference;
@@ -187,8 +190,10 @@ void VehiclesHandler::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::selectNextTrain()
+bool VehiclesHandler::selectNextTrain()
 {
+    int prev_cur_vehicle = cur_vehicle;
+
     // Переключаем на первый вагон предыдущего поезда
     if (vehicles[cur_vehicle].train_id <= 0)
     {
@@ -200,13 +205,16 @@ void VehiclesHandler::selectNextTrain()
         int new_train_id = vehicles[cur_vehicle].train_id - 1;
         cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
     }
+    return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::selectPrevTrain()
+bool VehiclesHandler::selectPrevTrain()
 {
+    int prev_cur_vehicle = cur_vehicle;
+
     // Переключаем на первый вагон следующего поезда
     if (vehicles[cur_vehicle].train_id >= (update_data[new_state].trains.size() - 1))
     {
@@ -217,13 +225,16 @@ void VehiclesHandler::selectPrevTrain()
         int new_train_id = vehicles[cur_vehicle].train_id + 1;
         cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
     }
+    return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::selectNextVehicle()
+bool VehiclesHandler::selectNextVehicle()
 {
+    int prev_cur_vehicle = cur_vehicle;
+
     // Переключение по вагонам поезда вперёд
     if (vehicles[cur_vehicle].prev_vehicle >= 0)
     {
@@ -235,13 +246,16 @@ void VehiclesHandler::selectNextVehicle()
         int cur_train_id = vehicles[cur_vehicle].train_id;
         cur_vehicle = update_data[new_state].trains[cur_train_id].last_vehicle_id;
     }
+    return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::selectPrevVehicle()
+bool VehiclesHandler::selectPrevVehicle()
 {
+    int prev_cur_vehicle = cur_vehicle;
+
     // Переключение по вагонам поезда назад
     if (vehicles[cur_vehicle].next_vehicle >= 0)
     {
@@ -253,6 +267,7 @@ void VehiclesHandler::selectPrevVehicle()
         int cur_train_id = vehicles[cur_vehicle].train_id;
         cur_vehicle = update_data[new_state].trains[cur_train_id].first_vehicle_id;
     }
+    return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
