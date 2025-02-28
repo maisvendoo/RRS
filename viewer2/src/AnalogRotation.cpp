@@ -21,9 +21,12 @@ AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
 
 void AnalogRotation::anim_step(float t, float dt)
 {
-    cur_pos += (pos - cur_pos) * duration * dt;
-    angle = interpolate(cur_pos);
-    update();
+    float delta = (pos - cur_pos);
+    if (abs(delta) > 1e-5f)
+    {
+        cur_pos += delta * duration * dt;
+        update();
+    }
 }
 
 bool AnalogRotation::load_config(CfgReader& cfg)
@@ -59,6 +62,8 @@ void AnalogRotation::update()
     {
         return;
     }
+
+    angle = interpolate(cur_pos);
 
     if (!infinity)
     {

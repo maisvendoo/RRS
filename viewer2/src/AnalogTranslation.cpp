@@ -20,9 +20,12 @@ AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
 
 void AnalogTranslation::anim_step(float t, float dt)
 {
-    cur_pos += (pos - cur_pos) * duration * dt;
-    motion = interpolate(cur_pos);
-    update();
+    float delta = (pos - cur_pos);
+    if (abs(delta) > 1e-5f)
+    {
+        cur_pos += delta * duration * dt;
+        update();
+    }
 }
 
 bool AnalogTranslation::load_config(CfgReader &cfg)
@@ -57,6 +60,7 @@ void AnalogTranslation::update()
         return;
     }
 
+    motion = interpolate(cur_pos);
     motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
 
     vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));

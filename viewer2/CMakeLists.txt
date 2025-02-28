@@ -13,8 +13,6 @@ set (EXECUTABLE_OUTPUT_PATH "../../bin")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(OpenAL REQUIRED CONFIG)
-
 #set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
 #set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
 #set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
@@ -42,7 +40,6 @@ file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 add_executable(${TARGET} ${TARGET_SOURCES})
 
 target_link_libraries(${TARGET} PRIVATE
-    OpenAL::OpenAL
     Qt6::Widgets
     Qt6::Xml
     vsg::vsg
@@ -52,6 +49,7 @@ target_link_libraries(${TARGET} PRIVATE
     filesystem
     CfgReader
     network
+    sound-manager
 )
 
 # message()
@@ -62,6 +60,6 @@ target_include_directories(${TARGET} PRIVATE
     ../filesystem/include
     ../CfgReader/include
     ../network/include
+    ../sound-manager/include
     ./include
-    ./dependencies/pugixml/include
 )

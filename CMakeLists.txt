@@ -13,7 +13,7 @@ add_subdirectory (network)
 
 add_subdirectory (simulator)
 
-#add_subdirectory (viewer)
+add_subdirectory (sound-manager)
 add_subdirectory (viewer2)
 
 add_subdirectory (addons/passcar)
@@ -28,4 +28,3 @@ add_subdirectory (tools/offset-parallel-gen)
 add_subdirectory (tools/offset-spline-gen)
 add_subdirectory (tools/routeconv)
 add_subdirectory (tools/route-map)
-

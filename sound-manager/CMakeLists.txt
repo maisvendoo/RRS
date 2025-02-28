@@ -33,10 +33,10 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
-target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
+target_include_directories (${TARGET} PRIVATE ../common-headers)
+target_include_directories (${TARGET} PRIVATE ../CfgReader/include)
+target_include_directories (${TARGET} PRIVATE ../filesystem/include)
+target_include_directories (${TARGET} PRIVATE ../libJournal/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)

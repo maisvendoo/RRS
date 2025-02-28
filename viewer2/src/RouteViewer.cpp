@@ -1,18 +1,19 @@
 #include "RouteViewer.h"
 
+#include "cmd-line.h"
 #include "CLI11.hpp"
+#include "filesystem.h"
+#include "CfgReader.h"
+#include "Logger.h"
+#include "CameraFreeManipulator.h"
+#include "SoundManagerUpdateHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
-#include "TrafficLightsHandler.h"
+#include "TrafficLightsUpdateHandler.h"
+#include "VehiclesUpdateHandler.h"
+
 #include "simulator-info-struct.h"
-#include "CfgReader.h"
-#include "SoundManager.h"
-#include "TrainExteriorHandler.h"
-#include "cmd-line.h"
-#include "filesystem.h"
-#include "network-data-types.h"
-#include "settings.h"
-#include "Logger.h"
+#include "sound-manager.h"
 #include "tcp-client.h"
 
 #include <chrono>
@@ -142,10 +143,12 @@ bool RouteViewer::init(int argc, char* argv[])
     LOG_INFO("Override settings from command line");
     overrideSettingsByCommandLine(argc, argv);
 
-    sound_manager = std::make_unique<SoundManager>();
+    sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
 
-    train_ext_handler = std::make_unique<TrainExteriorHandler>(settings, sound_manager);
+    traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
+
+    vehicles_handler = std::make_unique<VehiclesHandler>(settings, sound_manager);
 
     initVsgOptions();
     initWindowTraits();
@@ -237,10 +240,17 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
                 >> settings.free_cam_init_pos.z;
         }
 
-        cfg.getDouble(secName, "FreeCamRotCoeff", settings.free_cam_rot_coeff);
-        cfg.getDouble(secName, "FreeCamSpeed", settings.free_cam_speed);
-        cfg.getDouble(secName, "FreeCamSpeedCoeff", settings.free_cam_speed_coeff);
-        cfg.getDouble(secName, "FreeCamFovY", settings.free_cam_fovy_step);
+        cfg.getDouble(secName, "FreeCamSpeedKeyboard", settings.free_cam_speed_keyboard);
+        cfg.getDouble(secName, "FreeCamSpeedMouse", settings.free_cam_speed_mouse);
+        double tmp_double = 1.0;
+        cfg.getDouble(secName, "FreeCamSpeedCoeff", tmp_double);
+        if (tmp_double > 1.01) settings.free_cam_speed_coeff = tmp_double;
+        cfg.getDouble(secName, "FreeCamRotKeyboard", settings.free_cam_rotate_keyboard);
+        cfg.getDouble(secName, "FreeCamRotMouse", settings.free_cam_rotate_keyboard);
+        cfg.getDouble(secName, "FreeCamHeightStep", settings.free_cam_height_step);
+        tmp_double = 1.0;
+        cfg.getDouble(secName, "FreeCamFovYStep", tmp_double);
+        if (tmp_double > 1.01) settings.free_cam_fovy_coeff = tmp_double;
 
         cfg.getDouble(secName, "StatCamDist", settings.stat_cam_dist);
         cfg.getDouble(secName, "StatCamHeight", settings.stat_cam_height);
@@ -329,17 +339,15 @@ void RouteViewer::initWindow()
 
 void RouteViewer::initCamera()
 {
-    constexpr vsg::dvec3 center(0.0, 1100.0, 0.0);
-    constexpr double radius = 100.0;
-    constexpr double nearFarRatio = 0.001;
-
     double windowWidth = static_cast<double>(window->extent2D().width);
     double windowHeight = static_cast<double>(window->extent2D().height);
     double aspectRatio = windowWidth / windowHeight;
 
-    auto perspective = vsg::Perspective::create(settings.fovy, aspectRatio, nearFarRatio * radius, radius * 4.5);
+    auto perspective = vsg::Perspective::create(settings.fovy, aspectRatio, settings.zNear, settings.zFar);
 
-    vsg::dvec3 eye = center + vsg::dvec3(0.0, -radius * 3.5, 20.0);
+    vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
+    vsg::dvec3 eye = route_start_point + settings.free_cam_init_pos;
+    vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
 
     camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
@@ -436,7 +444,11 @@ void RouteViewer::initViewer()
     viewer->addWindow(window);
 
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
-    viewer->addEventHandler(vsg::Trackball::create(camera));
+
+    //viewer->addEventHandler(vsg::Trackball::create(camera));
+    viewer->addEventHandler(CameraFreeManipulator::create(camera, settings));
+
+    viewer->addEventHandler(SoundManagerUpdateHandler::create(camera, sound_manager));
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
@@ -564,8 +576,13 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
         return;
     }
     is_signals = true;
-
+    /*
+    QString msg = QString("Загрузка светофоров...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
     traffic_lights_handler->deserialize(sig_data);
+
+    options->sharedObjects = nullptr;
 
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
@@ -574,19 +591,79 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler.get(), &TrafficLightsHandler::slotUpdateSignal);
 
-    connect(traffic_lights_handler.get(), &TrafficLightsHandler::updateViewer,
-            this, &RouteViewer::updateViewer);
-
     traffic_lights_update_handler = TrafficLightsUpdateHandler::create(traffic_lights_handler.get());
 
     viewer->addEventHandler(traffic_lights_update_handler);
 
     viewer->update();
     viewer->compile();
+
+    LOG_INFO("Send request for vehicles info");
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
 
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 {
+    if (is_vehicles)
+    {
+        LOG_WARN("Get vehicles info again");
+        return;
+    }
+    is_vehicles = true;
+
+    simulator_vehicles_info_t vehicles_info;
+    vehicles_info.deserialize(data);
+    int count = vehicles_info.vehicles.size();
+    if (count <= 0)
+    {
+        LOG_WARN("Server has not any vehicles");
+        is_vehicles = false;
+        return;
+    }
+
+    LOG_INFO("Get info about %u vehicles", count);
+    /*
+    QString msg = QString("Загрузка подвижного состава...");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
+    options->sharedObjects = nullptr;
+    vehicles_handler->load(vehicles_info, options);
+    /*
+    msg = QString("");
+    imguiWidgetsHandler->setLoadingStatus(msg);
+    */
+    connect(tcp_client, &TcpClient::setVehiclesPositions,
+            vehicles_handler.get(), &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
+
+    connect(tcp_client, &TcpClient::setVehiclesData,
+            vehicles_handler.get(), &VehiclesHandler::slotGetVehiclesStateData, Qt::DirectConnection);
+
+    connect(tcp_client, &TcpClient::setVehicleControlled,
+            vehicles_handler.get(), &VehiclesHandler::slotGetVehicleControlled, Qt::DirectConnection);
+    /*
+    vehicle_control_by_keyboard.controlled_vehicle = vehicles_handler->getControlledVehicle();
+    vehicle_control_by_keyboard.current_vehicle = vehicles_handler->getCurrentVehicle();
+    vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
+    LOG_INFO("Send keyboard control to vehicle %u", vehicle_control_by_keyboard.controlled_vehicle);
+    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
+    */
+    vehicles_update_handler = VehiclesUpdateHandler::create(vehicles_handler.get());
+    viewer->addEventHandler(vehicles_update_handler);
+    /*
+    QObject::connect(vehicles_update_handler, &VehiclesUpdateHandler::sendControlledVehicle,
+                     this, &RouteViewer::slotUpdateControlledVehicle);
+    */
+    root->addChild(vehicles_handler->getExterior());
+    viewer->update();
+    viewer->compile();
+
+    LOG_INFO("Send request for continuous vehicles update");
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
+                            static_cast<double>(settings.vehicles_pos_update_interval) / 1000.0);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+                            static_cast<double>(settings.vehicles_state_update_interval) / 1000.0);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
+                            static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
 
 }
 
@@ -598,11 +675,5 @@ void RouteViewer::slotUpdateKeyboard()
 void RouteViewer::slotUpdateControlledVehicle()
 {
 
-}
-
-void RouteViewer::updateViewer()
-{
-    viewer->update();
-    viewer->compile();
 }
 

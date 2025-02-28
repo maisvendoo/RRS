@@ -1,6 +1,7 @@
 #ifndef     TRAFFIC_LIHGT_UPDATE_HANDLER_H
 #define     TRAFFIC_LIHGT_UPDATE_HANDLER_H
 
+#include    <vsg/core/Inherit.h>
 #include    <vsg/core/Visitor.h>
 #include    <TrafficLightsHandler.h>
 

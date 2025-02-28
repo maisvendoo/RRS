@@ -8,9 +8,6 @@
 #include <QMap>
 #include <QString>
 #include <qassert.h>
-#include <qcontainerfwd.h>
-#include <qmap.h>
-#include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/ShadowSettings.h>
@@ -36,10 +33,6 @@ public:
 
     void step(float t, float dt);
 
-signals:
-
-    void updateViewer();
-
 private:
     void printSignalInfo(TrafficLight* tl);
 
@@ -55,8 +48,6 @@ private:
     std::string models_dir;
 
     std::string animations_dir;
-
-    std::set<std::string> handled_paths;
 
 public slots:
 
