@@ -19,7 +19,7 @@ private:
     SoundManager *_sound_manager;
     vsg::ref_ptr<vsg::LookAt> _lookAt = nullptr;
     vsg::dvec3 _prev_camera_pos = {0.0, 0.0, 0.0};
-    double _previous_time;
+    double _previousTime;
 };
 
 #endif // SOUND_MANAGER_UPDATE_HANDLER_H

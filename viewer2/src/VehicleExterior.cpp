@@ -44,18 +44,24 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     }
 
     LOG_INFO("Opened config file: %s", cfg_path.c_str());
+    QString sec_name = "Vehicle";
 
     // Reading data about body's 3D-model and texture
-    QString sec_name = "Vehicle";
     QString modelName = "";
     QString textureName = "";
     QString modelShift = "";
     vsg::dvec3 shift(0.0, 0.0, 0.0);
 
     cfg.getString(sec_name, "ExtModelName", modelName);
-    cfg.getString(sec_name, "ExtTexturesDir", textureName);
+    if (modelName.isEmpty())
+    {
+        LOG_WARN("Fail to read parameter <ExtModelName> in config file: %s", cfg_path.c_str());
+        return false;
+    }
 
+    cfg.getString(sec_name, "ExtTexturesDir", textureName);
     auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
+
     if (!model)
         return false;
 
@@ -68,7 +74,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 
     transform->addChild(model);
 
-    // cabine
+    // Reading data about cabine's 3D-model and texture
     modelName = "";
     textureName = "";
     modelShift = "";
@@ -77,17 +83,21 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     cfg.getString(sec_name, "CabineModel", modelName);
     cfg.getString(sec_name, "CabineTexturesDir", textureName);
 
-    auto cabine = loadModel(modelName.toStdString(), textureName.toStdString(), options);
-    if (cabine)
+    if (!modelName.isEmpty())
     {
-        if (cfg.getString(sec_name, "CabineShift", modelShift))
+        cfg.getString(sec_name, "CabineTexturesDir", textureName);
+        auto cabine = loadModel(modelName.toStdString(), textureName.toStdString(), options);
+        if (cabine)
         {
-            std::istringstream ss(modelShift.toStdString());
-            ss >> shift.x >> shift.y >> shift.z;
-            cabine->matrix = vsg::translate(shift);
-        }
+            if (cfg.getString(sec_name, "CabineShift", modelShift))
+            {
+                std::istringstream ss(modelShift.toStdString());
+                ss >> shift.x >> shift.y >> shift.z;
+                cabine->matrix = vsg::translate(shift);
+            }
 
-        transform->addChild(cabine);
+            transform->addChild(cabine);
+        }
     }
 
     QString animationsDir = "";

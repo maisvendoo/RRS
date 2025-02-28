@@ -20,7 +20,7 @@ SoundManagerUpdateHandler::SoundManagerUpdateHandler(vsg::ref_ptr<vsg::Camera> c
 void SoundManagerUpdateHandler::apply(vsg::FrameEvent& frame)
 {
     double t = frame.frameStamp->simulationTime;
-    double dt = t - _previous_time;
+    double dt = t - _previousTime;
 
     if (dt < 1e-5)
         return;
@@ -34,6 +34,6 @@ void SoundManagerUpdateHandler::apply(vsg::FrameEvent& frame)
     _sound_manager->setListenerVelocity(velocity.x, velocity.y, velocity.z);
     _sound_manager->setListenerOrientation(front.x, front.y, front.z, up.x, up.y, up.z);
 
-    _previous_time = t;
+    _previousTime = t;
     _prev_camera_pos = _lookAt->eye;
 }

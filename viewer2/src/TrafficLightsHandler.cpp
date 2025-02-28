@@ -189,10 +189,15 @@ void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref
     {
         loadSignalModel(tl, settings, options, shadowSettings);
     }
+
+    loaded = true;
 }
 
 void TrafficLightsHandler::step(float t, float dt)
 {
+    if (!loaded)
+        return;
+
     for (auto tl = traffic_lights_fwd.begin(); tl != traffic_lights_fwd.end(); ++tl)
     {
         TrafficLight *traffic_light = tl.value();

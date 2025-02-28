@@ -2,7 +2,6 @@
 #define VEHICLE_EXTERIOR_H
 
 #include "animations-list.h"
-#include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/maths/vec3.h>
 
