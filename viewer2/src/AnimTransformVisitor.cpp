@@ -27,8 +27,18 @@ void AnimTransformVisitor::apply(vsg::Node& node)
 
 void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
 {
-    std::string name;
+    std::string name = "";
     transform.getValue("name", name);
+    if (name.empty())
+    {
+        transform.getValue("Name", name);
+    }
+
+    if (name.empty())
+    {
+        transform.traverse(*this);
+        return;
+    }
 
     ProcAnimation* animation = create_animation(name, transform);
     if (animation)

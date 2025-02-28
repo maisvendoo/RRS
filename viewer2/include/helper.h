@@ -10,13 +10,17 @@
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/DescriptorBuffer.h>
 
-inline void print_node(vsg::ref_ptr<vsg::Node> node, int indentation)
+inline void print_node(vsg::ref_ptr<vsg::Node> node, int indentation = 0)
 {
     std::string name;
     node->getValue("name", name);
+    if (name.empty())
+        node->getValue("Name", name);
+    if (name.empty())
+        name = "<EMPTY_NAME>";
     for (int i = 0; i < indentation; ++i)
     {
-        std::cout << "    ";
+        std::cout << "\t";
     }
     std::cout << node->className() << ' ' << name << ' ' << node.get() << std::endl;
 
@@ -44,7 +48,7 @@ inline void print_node(vsg::ref_ptr<vsg::Node> node, int indentation)
                     descriptor->getValue("name", name);
                     for (int i = 0; i < indentation + 2; ++i)
                     {
-                        std::cout << "    ";
+                        std::cout << "\t";
                     }
                     std::cout << descriptor->className() << ' ' << name << ' ' << descriptor.get() << std::endl;
 
@@ -55,20 +59,20 @@ inline void print_node(vsg::ref_ptr<vsg::Node> node, int indentation)
                             child->getValue("name", name);
                             for (int i = 0; i < indentation + 3; ++i)
                             {
-                                std::cout << "    ";
+                                std::cout << "\t";
                             }
                             std::cout << child->className() << ' ' << name << ' ' << child.get() << std::endl;
                             auto& data = child->data;
                             data->getValue("name", name);
                             for (int i = 0; i < indentation + 4; ++i)
                             {
-                                std::cout << "    ";
+                                std::cout << "\t";
                             }
                             std::cout << data->className() << ' ' << name << ' ' << data.get() << std::endl;
                             // auto& buffer = child->buffer;
                             // for (int i = 0; i < indentation + 4; ++i)
                             // {
-                                // std::cout << "    ";
+                                // std::cout << "\t";
                             // }
                             // std::cout << buffer->className();
                             // std::cout << ' ' << name << ' ' << buffer.get() << std::endl;
