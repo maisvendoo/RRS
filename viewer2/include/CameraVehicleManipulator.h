@@ -10,33 +10,35 @@ public:
                              vsg::ref_ptr<vsg::Camera> camera,
                              settings_t &settings);
 
+    void resetView() override;
+    void returnView() override;
     void mouseWheelEvent(vsg::vec3 delta) override;
-    void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt) override;
+    void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) override;
     void touchZoomEvent(double zoomLevel) override;
     void frameEvent(double dt) override;
 
-    /// Key that turns the view left around the eye points
-    vsg::KeySymbol turnLeftKey = vsg::KEY_a;
+    /// Key that turns the view left around the center points
+    vsg::KeySymbol turnLeftKey = vsg::KEY_Left;
 
-    /// Key that turns the view right around the eye points
-    vsg::KeySymbol turnRightKey = vsg::KEY_d;
+    /// Key that turns the view right around the center points
+    vsg::KeySymbol turnRightKey = vsg::KEY_Right;
 
-    /// Key that pitches up the view around the eye point
-    vsg::KeySymbol pitchUpKey = vsg::KEY_w;
+    /// Key that pitches up the view around the center point
+    vsg::KeySymbol pitchUpKey = vsg::KEY_Up;
 
-    /// Key that pitches down the view around the eye point
-    vsg::KeySymbol pitchDownKey = vsg::KEY_s;
+    /// Key that pitches down the view around the center point
+    vsg::KeySymbol pitchDownKey = vsg::KEY_Down;
 
-    /// Key that moves the view forward
+    /// Key that moves the center forward
     vsg::KeySymbol moveForwardKey = vsg::KEY_Up;
 
-    /// Key that moves the view backwards
+    /// Key that moves the center backwards
     vsg::KeySymbol moveBackwardKey = vsg::KEY_Down;
 
-    /// Key that moves the view left
+    /// Key that moves the center left
     vsg::KeySymbol moveLeftKey = vsg::KEY_Left;
 
-    /// Key that moves the view right
+    /// Key that moves the center right
     vsg::KeySymbol moveRightKey = vsg::KEY_Right;
     /*
     /// Key that moves the view upward
@@ -53,16 +55,29 @@ public:
 
 private:
 
-    void rotate_around(double angle, const vsg::dvec3& axis);
-    void rotate_view(const vsg::dvec2& delta);
+    void rotate_around(const vsg::dvec2& delta);
     void zoom(double coeff);
     void move(const vsg::dvec3& delta);
+    void calc_view();
 
     bool _prevCtrl = false;
     bool _prevShift = false;
-    double _cameraMoveCoeff = 1.0;
+    double _centerMoveCoeff = 1.0;
     double _pitch_min = vsg::radians(-70.0);
     double _pitch_max = vsg::radians(70.0);
+    double _default_right = vsg::radians(-45.0);
+    double _default_up = -vsg::radians(10.0);
+
+    vsg::dvec3 _position_shift = {0.0, 0.0, 0.0};
+    double _distance = 50.0;
+    double _angle_right = 0.0;
+    double _angle_up = 0.0;
+
+    bool is_reset = true;
+    vsg::dvec3 _last_position_shift = {0.0, 0.0, 0.0};
+    double _last_angle_right = 0.0;
+    double _last_angle_up = 0.0;
+    double _last_distance = 16.0 / sqrt(2.0);
 };
 
 #endif // CAMERA_VEHICLE_MANIPULATOR_H

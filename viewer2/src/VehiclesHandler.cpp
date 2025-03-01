@@ -283,6 +283,18 @@ void VehiclesHandler::selectControlVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool VehiclesHandler::returnToControlledVehicle()
+{
+    int prev_cur_vehicle = cur_vehicle;
+
+    // Возврат к управляемому вагону
+    cur_vehicle = controlled_vehicle;
+    return (cur_vehicle != prev_cur_vehicle);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings, vsg::ref_ptr<vsg::Options> options)
 {
     int count = vehicles_info.vehicles.size();
@@ -298,7 +310,7 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
         std::string cfg_file = cfg_file_tmp.toStdString();
 
         VehicleExterior vehicle_ext;
-        vehicle_ext.driver_pos = settings.default_driver_pos;
+        vehicle_ext.driver_pos = settings.cabine_default_pos;
 
         if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {

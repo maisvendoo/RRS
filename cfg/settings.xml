@@ -26,15 +26,15 @@
 		<VSync>1</VSync>
 		<FovY>55</FovY>
 		<zNear>0.1</zNear>
-		<zFar>1000</zFar>
-		<ScreenNumber>1</ScreenNumber>
+		<zFar>2000</zFar>
+		<ScreenNumber>0</ScreenNumber>
 		<Name>viewer</Name>
 		<WindowDecoration>1</WindowDecoration>
 		<DoubleBuffer>1</DoubleBuffer>
 		<Samples>16</Samples>
 		<MotionBlur>0.05</MotionBlur>
 		<NotifyLevel>INFO</NotifyLevel>
-		<ViewDistance>1000</ViewDistance>
+		<ViewDistance>2000</ViewDistance>
 		<FrameDiv>50</FrameDiv>
 	</Viewer>
 </Config>

@@ -59,7 +59,7 @@ void CameraCabineManipulator::returnView()
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
 {
-    if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_L))
+    if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R))
     {
         if (delta.y > 0.0)
             move(vsg::dvec3(0.0, 0.0, _settings.cabine_height_step));
@@ -77,14 +77,14 @@ void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt)
+void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta)
 {
     if (button_mask & moveButtonMask)
     {
         vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
 
         if (move_delta)
-            move(move_delta * dt * _cameraMoveCoeff * _settings.cabine_speed_mouse);
+            move(move_delta * _cameraMoveCoeff * _settings.cabine_speed_mouse);
 
         return;
     }
@@ -92,7 +92,7 @@ void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::d
     if (button_mask & rotateButtonMask)
     {
         if (delta)
-            rotate_view(-delta * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
+            rotate_view(-delta * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
     }
 }
 
@@ -128,7 +128,7 @@ void CameraCabineManipulator::frameEvent(double dt)
 
     double speed = 0.0;
 
-    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_L))
+    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R))
     {
         vsg::dvec2 rot_speed(0.0, 0.0);
         if ((speed = times2speed(_keyboard->times(turnRightKey))) != 0.0) rot_speed.x += -speed;
@@ -179,6 +179,9 @@ void CameraCabineManipulator::frameEvent(double dt)
 void CameraCabineManipulator::rotate_view(const vsg::dvec2& delta)
 {
     _angle_right += delta.x;
+    if (_angle_right > vsg::PI) _angle_right += -2.0 * vsg::PI;
+    if (_angle_right < -vsg::PI) _angle_right += 2.0 * vsg::PI;
+
     _angle_up += delta.y;
     _angle_up = std::max(_pitch_min, std::min(_pitch_max, _angle_up));
 

@@ -1,91 +1,84 @@
 #ifndef VIEWER_SETTINGS_H
 #define VIEWER_SETTINGS_H
 
+#include <string>
+#include <vsg/maths/vec3.h>
 #include "tcp-client.h"
 
-#include <vsg/maths/vec3.h>
-
-#include <string>
 
 struct settings_t
 {
-    settings_t();
+    settings_t(){}
+    tcp_config_t tcp_config = tcp_config_t();   ///< TCP-Client settings
 
-    tcp_config_t tcp_config;    ///< TCP-Client settings
+    int vehicles_pos_update_interval = 70;      ///< Interval for vehicles positions update, ms
+    int vehicles_state_update_interval = 100;   ///< Interval for vehicles states update, ms
+    int vehicle_controled_update_interval = 70; ///< Interval for vehicle controlled debug strings update, ms
+    int client_delay = 100;                     ///< Client delay for smoothing network's delays
 
-    int vehicles_pos_update_interval;         ///< Interval for vehicles positions update, ms
-    int vehicles_state_update_interval;       ///< Interval for vehicles states update, ms
-    int vehicle_controled_update_interval;    ///< Interval for vehicle controlled debug strings update, ms
-    int client_delay;                         ///< Client delay for smoothing network's delays
+    std::string route_dir_name = "";        ///< Route directory name
+    std::string route_dir_full_path = "";   ///< Route directory path
 
-    std::string route_dir_name;    ///< Route directory name
+    std::string notify_level = "INFO";      ///< Notify level
 
-    /// Route directory
-    std::string route_dir_full_path; // Temporary for displays with route map
+    std::string name = "viewer";///< Window title
+    int x = 50;                 ///< Window horizontal position
+    int y = 50;                 ///< Window vertical position
+    int width = 1280;           ///< Window width
+    int height = 720;           ///< Window height
+    int screen_number = 0;      ///< Screen number
+    bool fullscreen = false;    ///< Fullscreen flag
+    bool vsync = true;          ///< Vertical sync flag
+    bool window_decoration = true;  ///< Set/unset window decorations
 
-    int x;              ///< Window horizontal position
-    int y;              ///< Window vertical position
-    int width;          ///< Window width
-    int height;         ///< Window height
-    bool fullscreen;    ///< Fullscreen flag
-    bool vsync;         ///< Vertical sync flag
+    bool double_buffer = true;  ///< Set/unset double buffering
+    int samples = 1;            ///< Set number of anialiasing samples
 
-    double fovy;        ///< Vertical view angle
-    double fovy_min;    ///< Vertical view angle min
-    double fovy_max;    ///< Vertical view angle max
-    double pitch_min;   ///< Vertical angle down max
-    double pitch_max;   ///< Vertical angle up max
-    double zNear;
-    double zFar;
+    double view_distance = 2000.0;  ///< View distance
+    double zNear = 0.1;
+    double zFar = 2000.0;
+    double fovy = 64.0;         ///< Vertical view angle
+    double fovy_min = 2.0;      ///< Vertical view angle min
+    double fovy_max = 100.0;    ///< Vertical view angle max
+    double pitch_min = -70.0;   ///< Vertical angle down max
+    double pitch_max = 70.0;    ///< Vertical angle up max
 
-    unsigned int screen_number;    ///< Screen number
+    vsg::dvec3 free_cam_init_pos = {2.5, 0.0, 1.75};///< Free camera initial position
+    double free_cam_speed_keyboard = 5.0;           ///< Free camera initial speed
+    double free_cam_speed_mouse = 5.0;              ///< Free camera initial speed
+    double free_cam_speed_coeff = sqrt(2.0);        ///< Free camera speed coeff
+    double free_cam_rotate_keyboard = 0.01;         ///< Free camera rotation initial speed
+    double free_cam_rotate_mouse = 0.01;            ///< Free camera rotation initial speed
+    double free_cam_height_step = 0.2;              ///< Free camera vertical shift step
+    double free_cam_fovy_coeff = cbrt(2.0);         ///< Free camera FovY coeff
 
-    std::string name;    ///< Client name for server autorization
+    vsg::dvec3 cabine_default_pos = {0.0, 0.0, 3.5};///< Driver initial position
+    double cabine_speed_keyboard = 0.5;             ///< Cabine camera initial speed
+    double cabine_speed_mouse = 0.5;                ///< Cabine camera initial speed
+    double cabine_speed_coeff = sqrt(2.0);          ///< Cabine camera speed coeff
+    double cabine_rotate_keyboard = 0.01;           ///< Cabine camera rotation initial speed
+    double cabine_rotate_mouse = 0.01;              ///< Cabine camera rotation initial speed
+    double cabine_height_step = 0.1;                ///< Cabine camera vertical shift
+    double cabine_fovy_coeff = cbrt(2.0);           ///< Cabine camera FovY coeff
+    double cabine_z_min = -1.0;                     ///< Cabine camera relative vertical shift limit
+    double cabine_z_max = 0.5;                      ///< Cabine camera relative vertical shift limit
 
-    bool window_decoration;    ///< Set/unset window decorations
-    bool double_buffer;        ///< Set/unset double buffering
-    bool samples;              ///< Set number of anialiasing samples
-    double persistence;        ///< Motion blur persistence
+    vsg::dvec3 ext_cam_init_pos = {0.0, 0.0, 1.75}; ///< External camera initial position
+    double ext_cam_init_angle_H = -45.0;            ///< External camera initial horizontal angle
+    double ext_cam_init_angle_V = 10.0;             ///< External camera initial vertical angle
+    double ext_cam_init_distance = 20.0;            ///< External camera initial distance
+    double ext_cam_speed_keyboard = 2.0;            ///< External camera initial speed
+    double ext_cam_speed_mouse = 2.0;               ///< External camera initial speed
+    double ext_cam_speed_coeff = sqrt(2.0);         ///< External camera speed coeff
+    double ext_cam_rotate_keyboard = 1.0;           ///< External camera rotation initial speed
+    double ext_cam_rotate_mouse = 1.0;              ///< External camera rotation initial speed
+    double ext_cam_height_step = 0.1;               ///< External camera vertical shift
+    double ext_cam_dist_coeff = cbrt(2.0);          ///< External camera distance coeff
+    double ext_cam_dist_min = 1.0;                  ///< External camera minimal distance
 
-    std::string notify_level;    ///< Notify level
-
-    double view_distance;    ///< View distance
-
-    vsg::dvec3 free_cam_init_pos;   ///< Free camera initial position
-    double free_cam_speed_keyboard; ///< Free camera initial speed
-    double free_cam_speed_mouse;    ///< Free camera initial speed
-    double free_cam_speed_coeff;    ///< Free camera speed coeff
-    double free_cam_rotate_keyboard;///< Free camera rotation initial speed
-    double free_cam_rotate_mouse;   ///< Free camera rotation initial speed
-    double free_cam_height_step;    ///< Free camera vertical shift
-    double free_cam_fovy_coeff;     ///< Free camera FovY coeff
-
-    vsg::dvec3 default_driver_pos;  ///< Cabine camera initial position
-    double cabine_speed_keyboard;   ///< Cabine camera initial speed
-    double cabine_speed_mouse;      ///< Cabine camera initial speed
-    double cabine_speed_coeff;      ///< Cabine camera speed coeff
-    double cabine_rotate_keyboard;  ///< Cabine camera rotation initial speed
-    double cabine_rotate_mouse;     ///< Cabine camera rotation initial speed
-    double cabine_height_step;      ///< Cabine camera vertical shift
-    double cabine_fovy_coeff;       ///< Cabine camera FovY coeff
-    double cabine_z_min;            ///< Cabine camera relative vertical shift limit
-    double cabine_z_max;            ///< Cabine camera relative vertical shift limit
-
-    double ext_cam_init_dist;       ///< Initial distance of extrnal camera
-    double ext_cam_init_height;     ///< Initial height of extarnel camera
-    double ext_cam_init_shift;      ///< Inital shift of external camera
-    double ext_cam_rot_coeff;       ///< External camera rotation coefficient
-    double ext_cam_speed;           ///< External camera motion speed
-    double ext_cam_speed_coeff;     ///< External camera speed coeff
-    double ext_cam_min_dist;        ///< External camera minimal distance
-    double ext_cam_init_angle_H;    ///< External camera initial horizontal angle
-    double ext_cam_init_angle_V;    ///< External camera initial vertical angle
-
-    double stat_cam_dist;      ///< Static camera shift
-    double stat_cam_height;    ///< Static camera height
-    double stat_cam_shift;     ///< Static camera shift
-
-    unsigned int interval;
+    double stat_cam_dist = 8.0;     ///< Static camera distance
+    double stat_cam_height = 1.75;  ///< Static camera height
+    double stat_cam_shift = 150.0;  ///< Static camera shift
 };
 
 #endif // VIEWER_SETTINGS_H

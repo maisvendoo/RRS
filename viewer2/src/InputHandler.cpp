@@ -42,13 +42,13 @@ void InputHandler::apply(vsg::FrameEvent& frame)
         double dt = t - _previousTime;
         _previousTime = t;
 
-        _current_manipulator->frameEvent(dt);
-
         if (_sig_handler)
             _sig_handler->step(static_cast<float>(t), static_cast<float>(dt));
 
         if (_vehicles_handler)
             _vehicles_handler->step(t, dt);
+
+        _current_manipulator->frameEvent(dt);
     }
 }
 
@@ -61,10 +61,9 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
 
     _current_manipulator->keyboardPressEvent(keyPress.keyBase, true);
 
+    // Пока не загрузились и не подключились к серверу - только свободная камера
     if ((!_vehicles_handler) || (!_vehicles_handler->isUpdated()))
     {
-        _current_manipulator = _free_manipulator;
-        _current_manipulator->setCurrentVehicle(nullptr);
         if (keyPress.keyBase == vsg::KEY_F4)
         {
             _current_manipulator->returnView();
@@ -72,101 +71,124 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    if (keyPress.keyBase == vsg::KEY_Home)
+    // Управление текущим выбранным вагоном только с камер, привязанных к вагону
+    if ((_current_manipulator == _vehicle_manipulator) ||
+        (_current_manipulator == _cabine_manipulator))
     {
-        if (_vehicles_handler->selectNextTrain())
+        // Home - первый вагон следующего поезда на сервере
+        if (keyPress.keyBase == vsg::KEY_Home)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectNextTrain() && (_current_manipulator != _vehicle_manipulator))
+            {
+                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                _current_manipulator->resetView();
+            }
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_End)
-    {
-        if (_vehicles_handler->selectPrevTrain())
+        // End - первый вагон предыдущего поезда на сервере
+        if (keyPress.keyBase == vsg::KEY_End)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectPrevTrain() && (_current_manipulator != _vehicle_manipulator))
+            {
+                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                _current_manipulator->resetView();
+            }
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_Page_Up)
-    {
-        if (_vehicles_handler->selectNextVehicle())
+        // Page Up - следующий вагон поезда
+        if (keyPress.keyBase == vsg::KEY_Page_Up)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectNextVehicle() && (_current_manipulator != _vehicle_manipulator))
+            {
+                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                _current_manipulator->resetView();
+            }
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_Page_Down)
-    {
-        if (_vehicles_handler->selectPrevVehicle())
+        // Page Down - предыдущий вагон поезда
+        if (keyPress.keyBase == vsg::KEY_Page_Down)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectPrevVehicle() && (_current_manipulator != _vehicle_manipulator))
+            {
+                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                _current_manipulator->resetView();
+            }
+            return;
         }
-        return;
-    }
 
-    if ((keyPress.keyBase == vsg::KEY_KP_Enter) || (keyPress.keyBase == vsg::KEY_Return))
-    {
-        _vehicles_handler->selectControlVehicle();
-        return;
-    }
-
-    // Переключение камер только по F-клавишам без Shift и Ctrl
-    if (isCtrl() || isShift())
-    {
-        return;
-    }
-
-    if (keyPress.keyBase == vsg::KEY_F2)
-    {
-        if (_current_manipulator == _cabine_manipulator)
+        // Enter - взять управление текущим вагоном
+        if ((keyPress.keyBase == vsg::KEY_KP_Enter) || (keyPress.keyBase == vsg::KEY_Return))
         {
+            _vehicles_handler->selectControlVehicle();
+            return;
+        }
+    }
+
+    // Переключение камер по F-клавишам только без Shift и Ctrl
+    if (!isCtrl() && !isShift())
+    {
+        // F1 - камера из кабины управляемой ПЕ
+        if (keyPress.keyBase == vsg::KEY_F1)
+        {
+            if (_vehicles_handler->returnToControlledVehicle() || (_current_manipulator != _cabine_manipulator))
+            {
+                _current_manipulator = _cabine_manipulator;
+                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                _current_manipulator->resetView();
+                return;
+            }
+
             _current_manipulator->returnView();
+            return;
         }
-        else
+
+        // F2 - камера из кабины текущей ПЕ
+        if (keyPress.keyBase == vsg::KEY_F2)
         {
+            if (_current_manipulator == _cabine_manipulator)
+            {
+                _current_manipulator->returnView();
+                return;
+            }
+
             _current_manipulator = _cabine_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_F3)
-    {
-        if (_current_manipulator == _vehicle_manipulator)
+        // F3 - внешняя камера текущей ПЕ
+        if (keyPress.keyBase == vsg::KEY_F3)
         {
-            _current_manipulator->returnView();
-        }
-        else
-        {
+            if (_current_manipulator == _vehicle_manipulator)
+            {
+                _current_manipulator->returnView();
+                return;
+            }
+
             _current_manipulator = _vehicle_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_F4)
-    {
-        if (_current_manipulator == _free_manipulator)
+        // F4 - свободная камера
+        if (keyPress.keyBase == vsg::KEY_F4)
         {
-            _current_manipulator->returnView();
-        }
-        else
-        {
+            if (_current_manipulator == _free_manipulator)
+            {
+                _current_manipulator->returnView();
+                return;
+            }
+
             _current_manipulator = _free_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
         }
-        return;
     }
 }
 
@@ -246,9 +268,7 @@ void InputHandler::apply(vsg::MoveEvent& moveEvent)
     {
         vsg::dvec2 new_ndc = ndc(moveEvent);
         vsg::dvec2 prev_ndc = ndc(*_previousPointerEvent);
-
-        double dt = std::chrono::duration<double, std::chrono::seconds::period>(moveEvent.time - _previousPointerEvent->time).count();
-        _current_manipulator->mouseMoveEvent(moveEvent.mask, (new_ndc - prev_ndc), dt);
+        _current_manipulator->mouseMoveEvent(moveEvent.mask, (new_ndc - prev_ndc));
     }
 
     _previousPointerEvent = &moveEvent;

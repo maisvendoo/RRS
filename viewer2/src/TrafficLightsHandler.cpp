@@ -37,6 +37,7 @@ TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
 // TODO: remove duplication
 void TrafficLightsHandler::deserialize(QByteArray& data)
 {
+    loaded = false;
     QBuffer buff(&data);
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
@@ -248,6 +249,11 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
                         0,     0,    0,  1);
 
         auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
+
+        if (signal_node)
+            LOG_INFO("Loaded model from file: %s", node_path.toStdString().c_str());
+        else
+            LOG_INFO("Fail to load model from file: %s", node_path.toStdString().c_str());
 
         if (auto* cull_node = signal_node->cast<vsg::CullNode>())
         {

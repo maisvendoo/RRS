@@ -13,7 +13,7 @@ public:
     virtual void resetView() override;
     virtual void returnView() override;
     void mouseWheelEvent(vsg::vec3 delta) override;
-    void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt) override;
+    void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) override;
     void touchZoomEvent(double zoomLevel) override;
     void frameEvent(double dt) override;
 

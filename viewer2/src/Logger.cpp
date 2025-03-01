@@ -96,8 +96,10 @@ void Logger::log_message(LogLevel level, const char* file, int line, const char*
     }
 }
 
-void Logger::openFile(const std::string& path)
+void Logger::openFile(const std::string& path, const std::string &backup_path)
 {
+    std::remove(backup_path.c_str());
+    std::rename(path.c_str(), backup_path.c_str());
     file = fopen(path.c_str(), "w");
 }
 

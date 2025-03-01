@@ -15,9 +15,60 @@ CameraFreeManipulator::CameraFreeManipulator(vsg::ref_ptr<vsg::Keyboard> keyboar
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void CameraFreeManipulator::resetView()
+{
+    if (!is_reset)
+    {
+        is_reset = true;
+
+        _last_lookAt = vsg::LookAt::create(*_lookAt);
+        _last_fov = _perspective->fieldOfViewY;
+    }
+
+    if (_current_vehicle)
+    {
+        _lookAt->eye = _current_vehicle->position + _settings.free_cam_init_pos;
+        _lookAt->center = _lookAt->eye + normalize(vsg::dvec3(_current_vehicle->orth.x,
+                                                              _current_vehicle->orth.y,
+                                                              0.0));
+        _lookAt->up = vsg::dvec3(0.0, 0.0, 1.0);
+        _perspective->fieldOfViewY = _settings.fovy;
+        return;
+    }
+
+    _lookAt->eye = _settings.free_cam_init_pos;
+    _lookAt->center = _lookAt->eye + vsg::dvec3(0.0, 1.0, 0.0);
+    _lookAt->up = vsg::dvec3(0.0, 0.0, 1.0);
+    _perspective->fieldOfViewY = _settings.fovy;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraFreeManipulator::returnView()
+{
+    if (!is_reset)
+    {
+        resetView();
+        return;
+    }
+    is_reset = false;
+
+    _lookAt->eye = _last_lookAt->eye;
+    _lookAt->center = _last_lookAt->center;
+    _lookAt->up = _last_lookAt->up;
+    _perspective->fieldOfViewY = _last_fov;
+
+    _last_lookAt = nullptr;
+    _last_fov = _settings.fovy;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void CameraFreeManipulator::mouseWheelEvent(vsg::vec3 delta)
 {
-    if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_L))
+    if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R))
     {
         if (delta.y > 0.0)
             move(vsg::dvec3(0.0, 0.0, _settings.free_cam_height_step));
@@ -35,14 +86,14 @@ void CameraFreeManipulator::mouseWheelEvent(vsg::vec3 delta)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraFreeManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt)
+void CameraFreeManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta)
 {
     if (button_mask & moveButtonMask)
     {
         vsg::dvec3 move_delta(delta.x, delta.y, 0.0);
 
         if (move_delta)
-            move(move_delta * dt * _cameraMoveCoeff * _settings.free_cam_speed_mouse);
+            move(move_delta * _cameraMoveCoeff * _settings.free_cam_speed_mouse);
 
         return;
     }
@@ -50,7 +101,7 @@ void CameraFreeManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dve
     if (button_mask & rotateButtonMask)
     {
         if (delta)
-            rotate_view(-delta * dt * (20.0 + _perspective->fieldOfViewY) * _settings.free_cam_rotate_mouse);
+            rotate_view(-delta * (20.0 + _perspective->fieldOfViewY) * _settings.free_cam_rotate_mouse);
     }
 }
 
@@ -86,7 +137,7 @@ void CameraFreeManipulator::frameEvent(double dt)
 
     double speed = 0.0;
 
-    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_L))
+    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R))
     {
         vsg::dvec2 rot_speed(0.0, 0.0);
         if ((speed = times2speed(_keyboard->times(turnRightKey))) != 0.0) rot_speed.x += -speed;
@@ -136,6 +187,8 @@ void CameraFreeManipulator::frameEvent(double dt)
 //------------------------------------------------------------------------------
 void CameraFreeManipulator::rotate_view(const vsg::dvec2& delta)
 {
+    is_reset = false;
+
     vsg::dvec3 lookNormal = vsg::normalize(_lookAt->center - _lookAt->eye);
     vsg::dvec3 forwardNormal = vsg::normalize(vsg::dvec3(lookNormal.x, lookNormal.y, 0.0));
     //vsg::dvec3 upNormal = normalize(_lookAt->up);
@@ -167,11 +220,11 @@ void CameraFreeManipulator::rotate_view(const vsg::dvec2& delta)
 //------------------------------------------------------------------------------
 void CameraFreeManipulator::zoom(double coeff)
 {
-    double new_fovy = _perspective->fieldOfViewY;
+    is_reset = false;
 
-    new_fovy = new_fovy * coeff;
+    double new_fovy = _perspective->fieldOfViewY * coeff;
     if ((new_fovy > _settings.fovy_max) || (new_fovy < _settings.fovy_min))
-            return;
+        return;
 
     _perspective->fieldOfViewY = new_fovy;
 }
@@ -181,6 +234,8 @@ void CameraFreeManipulator::zoom(double coeff)
 //------------------------------------------------------------------------------
 void CameraFreeManipulator::move(const vsg::dvec3 &delta)
 {
+    is_reset = false;
+
     vsg::dvec3 lookNormal = vsg::normalize(_lookAt->center - _lookAt->eye);
     vsg::dvec3 forwardNormal = vsg::normalize(vsg::dvec3(lookNormal.x, lookNormal.y, 0.0));
     //vsg::dvec3 upNormal = normalize(_lookAt->up);
