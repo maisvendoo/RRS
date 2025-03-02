@@ -12,7 +12,7 @@ struct controlled_t
 {
     int controlled_vehicle = -1;
     int current_vehicle = -1;
-    std::vector<int> pressed_keys;
+    std::vector<uint16_t> pressed_keys = {};
 
     controlled_t()
     {
@@ -53,7 +53,7 @@ struct controlled_t
         pressed_keys.clear();
         pressed_keys.resize(num);
 
-        for (uint32_t i = 0; i < pressed_keys.size(); ++i)
+        for (uint32_t i = 0; i < num; ++i)
         {
             stream >> pressed_keys[i];
         }

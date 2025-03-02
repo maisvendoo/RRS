@@ -42,6 +42,22 @@ VehicleExterior *VehiclesHandler::getCurrentVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int VehiclesHandler::getCurrentVehicleIndex()
+{
+    return cur_vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int VehiclesHandler::getControlledVehicleIndex()
+{
+    return controlled_vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool VehiclesHandler::isUpdated()
 {
     return is_pos_updated && is_state_updated;
@@ -136,13 +152,9 @@ void VehiclesHandler::step(double t, double dt)
             {
                 size_t signal_id = animation.first;
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
-                {
                     animation.second->setPosition(update_data[new_state].vehicles[i].analogSignal[signal_id]);
-                }
                 else
-                {
                     animation.second->setPosition(0.0f);
-                }
             }
 
             // Sounds update
@@ -150,7 +162,7 @@ void VehiclesHandler::step(double t, double dt)
                 (update_pos_data[cur_data].vehicles[i].position_x - update_pos_data[old_data].vehicles[i].position_x),
                 (update_pos_data[cur_data].vehicles[i].position_y - update_pos_data[old_data].vehicles[i].position_y),
                 (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z));
-            vsg::dvec3 velocity = offset / dt;
+            vsg::dvec3 velocity = offset / upd_dt;
 
             for (auto sound_id : vehicles[i].sounds_id)
             {

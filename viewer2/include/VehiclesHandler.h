@@ -28,6 +28,8 @@ public:
 
     /// Info about current vehicle exterior
     VehicleExterior *getCurrentVehicle();
+    int getCurrentVehicleIndex();
+    int getControlledVehicleIndex();
 
     bool isUpdated();
 

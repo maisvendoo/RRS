@@ -136,9 +136,10 @@ void CameraCabineManipulator::frameEvent(double dt)
         if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
 
         if (rot_speed)
-        {
             rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_keyboard);
-        }
+        else
+            calc_view();
+
         return;
     }
 
@@ -169,6 +170,7 @@ void CameraCabineManipulator::frameEvent(double dt)
         _cameraMoveCoeff = 1.0;
         _prevCtrl = false;
         _prevShift = false;
+        calc_view();
     }
 }
 

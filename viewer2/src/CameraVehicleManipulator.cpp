@@ -141,9 +141,10 @@ void CameraVehicleManipulator::frameEvent(double dt)
         if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
 
         if (rot_speed)
-        {
             rotate_around(rot_speed * dt * _settings.ext_cam_rotate_keyboard);
-        }
+        else
+            calc_view();
+
         return;
     }
 
@@ -174,6 +175,7 @@ void CameraVehicleManipulator::frameEvent(double dt)
         _centerMoveCoeff = 1.0;
         _prevCtrl = false;
         _prevShift = false;
+        calc_view();
     }
 }
 

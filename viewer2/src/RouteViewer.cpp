@@ -506,9 +506,11 @@ void RouteViewer::initViewer()
     viewer = vsg::Viewer::create();
     viewer->addWindow(window);
 
-    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
-    viewer->addEventHandler(UpdateViewerHandler::create(camera, traffic_lights_handler, vehicles_handler, settings));
+    auto ref_upd_control = UpdateControlToServerHandler::create(tcp_client);
+    viewer->addEventHandler(ref_upd_control);
+    viewer->addEventHandler(UpdateViewerHandler::create(ref_upd_control, camera, traffic_lights_handler, vehicles_handler, settings));
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
+    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});

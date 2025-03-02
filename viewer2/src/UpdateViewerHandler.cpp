@@ -12,13 +12,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<vsg::Camera> camera,
+UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
+                                         vsg::ref_ptr<vsg::Camera> camera,
                                          TrafficLightsHandler *sig_handler,
                                          VehiclesHandler *veh_handler,
                                          settings_t &settings)
     : Inherit()
     , _settings(settings)
     , _keyboard(vsg::Keyboard::create())
+    , _upd_server_control(upd_server_control)
     , _camera(camera)
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
@@ -79,7 +81,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         if (keyPress.keyBase == vsg::KEY_Home)
         {
             if (_vehicles_handler->selectNextTrain())
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                changeCurrentVehicle();
 
             return;
         }
@@ -88,7 +90,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         if (keyPress.keyBase == vsg::KEY_End)
         {
             if (_vehicles_handler->selectPrevTrain())
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                changeCurrentVehicle();
 
             return;
         }
@@ -97,7 +99,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         if (keyPress.keyBase == vsg::KEY_Page_Up)
         {
             if (_vehicles_handler->selectNextVehicle())
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                changeCurrentVehicle();
 
             return;
         }
@@ -106,7 +108,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         if (keyPress.keyBase == vsg::KEY_Page_Down)
         {
             if (_vehicles_handler->selectPrevVehicle())
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                changeCurrentVehicle();
 
             return;
         }
@@ -115,6 +117,8 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         if ((keyPress.keyBase == vsg::KEY_KP_Enter) || (keyPress.keyBase == vsg::KEY_Return))
         {
             _vehicles_handler->selectControlVehicle();
+            _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
+                                                      _vehicles_handler->getControlledVehicleIndex());
             return;
         }
     }
@@ -441,4 +445,15 @@ bool UpdateViewerHandler::isCtrl()
 bool UpdateViewerHandler::isShift()
 {
     return (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::changeCurrentVehicle()
+{
+    _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+
+    _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
+                                              _vehicles_handler->getControlledVehicleIndex());
 }

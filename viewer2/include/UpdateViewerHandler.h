@@ -1,8 +1,9 @@
-#ifndef INPUT_HANDLER_H
-#define INPUT_HANDLER_H
+#ifndef UPDATE_VIEWER_HANDLER_H
+#define UPDATE_VIEWER_HANDLER_H
 
 #include "settings.h"
 #include "CameraAbstract.h"
+#include "UpdateControlToServerHandler.h"
 
 class CameraFreeManipulator;
 class CameraVehicleManipulator;
@@ -16,7 +17,8 @@ class VehiclesHandler;
 class UpdateViewerHandler : public vsg::Inherit<vsg::Visitor, UpdateViewerHandler>
 {
 public:
-    explicit UpdateViewerHandler(vsg::ref_ptr<vsg::Camera> camera,
+    explicit UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
+                                 vsg::ref_ptr<vsg::Camera> camera,
                                  TrafficLightsHandler *sig_handler,
                                  VehiclesHandler *veh_handler,
                                  settings_t &settings);
@@ -47,8 +49,11 @@ private:
     bool isCtrl();
     bool isShift();
 
+    void changeCurrentVehicle();
+
     settings_t& _settings;
     vsg::ref_ptr<vsg::Keyboard> _keyboard = nullptr;
+    vsg::ref_ptr<UpdateControlToServerHandler> _upd_server_control = nullptr;
     vsg::ref_ptr<vsg::Camera> _camera = nullptr;
 
     bool _hasKeyboardFocus = false;
@@ -68,4 +73,4 @@ private:
     VehiclesHandler *_vehicles_handler = nullptr;
 };
 
-#endif // INPUT_HANDLER_H
+#endif // UPDATE_VIEWER_HANDLER_H
