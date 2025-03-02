@@ -247,3 +247,11 @@ void CameraVehicleManipulator::calc_view()
     _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _current_vehicle->up) - matrix * _lookAt->eye);
     _lookAt->eye = matrix * (_lookAt->eye);
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraVehicleManipulator::currentVehicleChanged()
+{
+    calc_view();
+}

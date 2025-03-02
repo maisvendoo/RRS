@@ -7,7 +7,6 @@ CameraCabineManipulator::CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> key
 {
     _pitch_min = vsg::radians(_settings.pitch_min);
     _pitch_max = vsg::radians(_settings.pitch_max);
-    _last_fov = _settings.fovy;
 }
 
 //------------------------------------------------------------------------------
@@ -19,10 +18,10 @@ void CameraCabineManipulator::resetView()
     {
         is_reset = true;
 
-        _last_position_shift = _position_shift;
-        _last_angle_right = _angle_right;
-        _last_angle_up = _angle_up;
-        _last_fov = _perspective->fieldOfViewY;
+        _current_vehicle->saved_cabine_cam_shift = _position_shift;
+        _current_vehicle->saved_cabine_cam_right = _angle_right;
+        _current_vehicle->saved_cabine_cam_up = _angle_up;
+        _current_vehicle->saved_cabine_cam_fov = _perspective->fieldOfViewY;
     }
 
     _position_shift = {0.0, 0.0, 0.0};
@@ -46,10 +45,10 @@ void CameraCabineManipulator::returnView()
 
     is_reset = false;
 
-    _position_shift = _last_position_shift;
-    _angle_right = _last_angle_right;
-    _angle_up = _last_angle_up;
-    _perspective->fieldOfViewY = _last_fov;
+    _position_shift = _current_vehicle->saved_cabine_cam_shift;
+    _angle_right = _current_vehicle->saved_cabine_cam_right;
+    _angle_up = _current_vehicle->saved_cabine_cam_up;
+    _perspective->fieldOfViewY = _current_vehicle->saved_cabine_cam_fov;
 
     calc_view();
 }
@@ -249,5 +248,30 @@ void CameraCabineManipulator::calc_view()
 
         _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
         _lookAt->center = matrix * _lookAt->center;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraCabineManipulator::currentVehicleChanged()
+{
+    if (_prev_current_vehicle == _current_vehicle)
+        return;
+
+    if (_prev_current_vehicle)
+    {
+        _prev_current_vehicle->saved_cabine_cam_shift = _position_shift;
+        _prev_current_vehicle->saved_cabine_cam_right = _angle_right;
+        _prev_current_vehicle->saved_cabine_cam_up = _angle_up;
+        _prev_current_vehicle->saved_cabine_cam_fov = _perspective->fieldOfViewY;
+    }
+
+    if (_current_vehicle)
+    {
+        _prev_current_vehicle = _current_vehicle;
+
+        is_reset = true;
+        returnView();
     }
 }

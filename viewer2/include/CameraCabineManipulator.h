@@ -60,6 +60,8 @@ private:
     void move(const vsg::dvec3& delta);
     void calc_view();
 
+    void currentVehicleChanged() override;
+
     bool _prevCtrl = false;
     bool _prevShift = false;
     double _cameraMoveCoeff = 1.0;
@@ -71,10 +73,7 @@ private:
     double _angle_up = 0.0;
 
     bool is_reset = true;
-    vsg::dvec3 _last_position_shift = {0.0, 0.0, 0.0};
-    double _last_angle_right = 0.0;
-    double _last_angle_up = 0.0;
-    double _last_fov = 55.0;
+    VehicleExterior *_prev_current_vehicle = nullptr;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H

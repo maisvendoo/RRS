@@ -60,6 +60,8 @@ private:
     void move(const vsg::dvec3& delta);
     void calc_view();
 
+    void currentVehicleChanged() override;
+
     bool _prevCtrl = false;
     bool _prevShift = false;
     double _centerMoveCoeff = 1.0;

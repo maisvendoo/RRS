@@ -78,44 +78,36 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         // Home - первый вагон следующего поезда на сервере
         if (keyPress.keyBase == vsg::KEY_Home)
         {
-            if (_vehicles_handler->selectNextTrain() && (_current_manipulator != _vehicle_manipulator))
-            {
+            if (_vehicles_handler->selectNextTrain())
                 _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-            }
+
             return;
         }
 
         // End - первый вагон предыдущего поезда на сервере
         if (keyPress.keyBase == vsg::KEY_End)
         {
-            if (_vehicles_handler->selectPrevTrain() && (_current_manipulator != _vehicle_manipulator))
-            {
+            if (_vehicles_handler->selectPrevTrain())
                 _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-            }
+
             return;
         }
 
         // Page Up - следующий вагон поезда
         if (keyPress.keyBase == vsg::KEY_Page_Up)
         {
-            if (_vehicles_handler->selectNextVehicle() && (_current_manipulator != _vehicle_manipulator))
-            {
+            if (_vehicles_handler->selectNextVehicle())
                 _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-            }
+
             return;
         }
 
         // Page Down - предыдущий вагон поезда
         if (keyPress.keyBase == vsg::KEY_Page_Down)
         {
-            if (_vehicles_handler->selectPrevVehicle() && (_current_manipulator != _vehicle_manipulator))
-            {
+            if (_vehicles_handler->selectPrevVehicle())
                 _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-            }
+
             return;
         }
 

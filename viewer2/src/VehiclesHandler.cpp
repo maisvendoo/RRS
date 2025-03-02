@@ -301,8 +301,6 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
 
     for (int i = 0; i < count; ++i)
     {
-        LOG_INFO("Vehicle %u / %u loading", i + 1, count);
-
         QString cfg_dir_tmp = vehicles_info.vehicles[i].vehicle_config_dir;
         std::string cfg_dir = cfg_dir_tmp.toStdString();
 
@@ -311,6 +309,7 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
 
         VehicleExterior vehicle_ext;
         vehicle_ext.driver_pos = settings.cabine_default_pos;
+        vehicle_ext.saved_cabine_cam_fov = settings.fovy;
 
         if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {

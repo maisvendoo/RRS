@@ -32,11 +32,17 @@ public:
     virtual void touchZoomEvent(double zoomLevel) {}
     virtual void frameEvent(double dt) {}
 
-    void setCurrentVehicle(VehicleExterior *cv) {_current_vehicle = cv;}
+    void setCurrentVehicle(VehicleExterior *cv)
+    {
+        _current_vehicle = cv;
+        currentVehicleChanged();
+    }
 
     vsg::ButtonMask getTouchToButtonMask() {return touchToButtonMask;}
 
 protected:
+
+    virtual void currentVehicleChanged() {}
 
     /// Button mask value used for touch events
     vsg::ButtonMask touchToButtonMask = vsg::BUTTON_MASK_3;
