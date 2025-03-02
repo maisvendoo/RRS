@@ -159,7 +159,7 @@ void CameraFreeManipulator::rotate_view(const vsg::dvec2& delta)
 
     _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
     _lookAt->center = matrix * _lookAt->center;
-    _lookAt->eye = matrix * _lookAt->eye;
+    //_lookAt->eye = matrix * _lookAt->eye;
 }
 
 //------------------------------------------------------------------------------

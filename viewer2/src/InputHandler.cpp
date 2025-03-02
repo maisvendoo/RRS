@@ -77,6 +77,7 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         if (_vehicles_handler->selectNextTrain())
         {
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView();
         }
         return;
     }
@@ -86,6 +87,7 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         if (_vehicles_handler->selectPrevTrain())
         {
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView();
         }
         return;
     }
@@ -95,6 +97,7 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         if (_vehicles_handler->selectNextVehicle())
         {
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView();
         }
         return;
     }
@@ -104,6 +107,7 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         if (_vehicles_handler->selectPrevVehicle())
         {
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView();
         }
         return;
     }

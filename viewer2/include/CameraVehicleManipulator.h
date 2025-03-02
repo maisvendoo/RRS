@@ -51,7 +51,7 @@ public:
     /// Button mask value used to moving camera horizontally, defaults to middle mouse button
     vsg::ButtonMask moveButtonMask = vsg::BUTTON_MASK_2;
 
-protected:
+private:
 
     void rotate_around(double angle, const vsg::dvec3& axis);
     void rotate_view(const vsg::dvec2& delta);

@@ -40,7 +40,7 @@ public:
 
     void selectControlVehicle();
 
-    void load(simulator_vehicles_info_t vehicles_info, vsg::ref_ptr<vsg::Options> options);
+    void load(simulator_vehicles_info_t vehicles_info, const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
 
 public slots:
 
@@ -76,11 +76,9 @@ private:
 
     /// Vehicle number which is a referenced for camera
     int cur_vehicle = 0;
-    int prev_cur_vehicle = -1;
 
     /// Vehicle number which is contorolled by user
     int controlled_vehicle = 0;
-    int prev_controlled_vehicle = -1;
 
     /// Train exterior scene group
     vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
