@@ -19,7 +19,6 @@ class SoundManager;
 class TcpClient;
 class TrafficLightsHandler;
 class VehiclesHandler;
-//class InputHandler;
 
 namespace vsg
 {
@@ -48,7 +47,7 @@ private:
 
     void initVsgOptions();
     void initWindowTraits();
-    void initWindow();
+    void initWindow(bool try_screenNum_exception = true);
     void initCamera();
     void initScenegraph();
     void initLights();
@@ -88,27 +87,25 @@ private:
     bool is_signals = false;
     bool is_vehicles = false;
 
-    settings_t settings;
+    settings_t settings = settings_t();
 
-    TcpClient* tcp_client;
-    SoundManager *sound_manager;
-    TrafficLightsHandler *traffic_lights_handler;
-    VehiclesHandler *vehicles_handler;
+    TcpClient *tcp_client = nullptr;
+    SoundManager *sound_manager = nullptr;
+    TrafficLightsHandler *traffic_lights_handler = nullptr;
+    VehiclesHandler *vehicles_handler = nullptr;
 
-    //vsg::ref_ptr<InputHandler> vehicles_update_handler;
-
-    vsg::ref_ptr<vsg::Options> options;
-    vsg::ref_ptr<vsg::WindowTraits> windowTraits;
-    vsg::ref_ptr<vsg::Window> window;
-    vsg::ref_ptr<vsg::LookAt> lookAt;
-    vsg::ref_ptr<vsg::Camera> camera;
-    vsg::ref_ptr<vsg::Group> root;
-    vsg::ref_ptr<vsg::DirectionalLight> sun;
-    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings;
-    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region;
-    vsg::ref_ptr<vsg::View> view;
-    vsg::ref_ptr<vsg::CommandGraph> commandGraph;
-    vsg::ref_ptr<vsg::Viewer> viewer;
+    vsg::ref_ptr<vsg::Options> options = nullptr;
+    vsg::ref_ptr<vsg::WindowTraits> windowTraits = nullptr;
+    vsg::ref_ptr<vsg::Window> window = nullptr;
+    vsg::ref_ptr<vsg::LookAt> lookAt = nullptr;
+    vsg::ref_ptr<vsg::Camera> camera = nullptr;
+    vsg::ref_ptr<vsg::Group> root = nullptr;
+    vsg::ref_ptr<vsg::DirectionalLight> sun = nullptr;
+    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings = nullptr;
+    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region = nullptr;
+    vsg::ref_ptr<vsg::View> view = nullptr;
+    vsg::ref_ptr<vsg::CommandGraph> commandGraph = nullptr;
+    vsg::ref_ptr<vsg::Viewer> viewer = nullptr;
 };
 
 #endif // ROUTE_VIEWER_H

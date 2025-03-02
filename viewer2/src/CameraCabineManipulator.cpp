@@ -7,7 +7,6 @@ CameraCabineManipulator::CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> key
 {
     _pitch_min = vsg::radians(_settings.pitch_min);
     _pitch_max = vsg::radians(_settings.pitch_max);
-    _last_fov = _settings.fovy;
 }
 
 //------------------------------------------------------------------------------
@@ -19,10 +18,10 @@ void CameraCabineManipulator::resetView()
     {
         is_reset = true;
 
-        _last_position_shift = _position_shift;
-        _last_angle_right = _angle_right;
-        _last_angle_up = _angle_up;
-        _last_fov = _perspective->fieldOfViewY;
+        _current_vehicle->saved_cabine_cam_shift = _position_shift;
+        _current_vehicle->saved_cabine_cam_right = _angle_right;
+        _current_vehicle->saved_cabine_cam_up = _angle_up;
+        _current_vehicle->saved_cabine_cam_fov = _perspective->fieldOfViewY;
     }
 
     _position_shift = {0.0, 0.0, 0.0};
@@ -46,10 +45,10 @@ void CameraCabineManipulator::returnView()
 
     is_reset = false;
 
-    _position_shift = _last_position_shift;
-    _angle_right = _last_angle_right;
-    _angle_up = _last_angle_up;
-    _perspective->fieldOfViewY = _last_fov;
+    _position_shift = _current_vehicle->saved_cabine_cam_shift;
+    _angle_right = _current_vehicle->saved_cabine_cam_right;
+    _angle_up = _current_vehicle->saved_cabine_cam_up;
+    _perspective->fieldOfViewY = _current_vehicle->saved_cabine_cam_fov;
 
     calc_view();
 }
@@ -59,7 +58,7 @@ void CameraCabineManipulator::returnView()
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
 {
-    if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_L))
+    if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R))
     {
         if (delta.y > 0.0)
             move(vsg::dvec3(0.0, 0.0, _settings.cabine_height_step));
@@ -77,14 +76,14 @@ void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt)
+void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta)
 {
     if (button_mask & moveButtonMask)
     {
         vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
 
         if (move_delta)
-            move(move_delta * dt * _cameraMoveCoeff * _settings.cabine_speed_mouse);
+            move(move_delta * _cameraMoveCoeff * _settings.cabine_speed_mouse);
 
         return;
     }
@@ -92,7 +91,7 @@ void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::d
     if (button_mask & rotateButtonMask)
     {
         if (delta)
-            rotate_view(-delta * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
+            rotate_view(-delta * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
     }
 }
 
@@ -128,7 +127,7 @@ void CameraCabineManipulator::frameEvent(double dt)
 
     double speed = 0.0;
 
-    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_L))
+    if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R))
     {
         vsg::dvec2 rot_speed(0.0, 0.0);
         if ((speed = times2speed(_keyboard->times(turnRightKey))) != 0.0) rot_speed.x += -speed;
@@ -137,9 +136,10 @@ void CameraCabineManipulator::frameEvent(double dt)
         if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
 
         if (rot_speed)
-        {
             rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_keyboard);
-        }
+        else
+            calc_view();
+
         return;
     }
 
@@ -170,6 +170,7 @@ void CameraCabineManipulator::frameEvent(double dt)
         _cameraMoveCoeff = 1.0;
         _prevCtrl = false;
         _prevShift = false;
+        calc_view();
     }
 }
 
@@ -179,6 +180,9 @@ void CameraCabineManipulator::frameEvent(double dt)
 void CameraCabineManipulator::rotate_view(const vsg::dvec2& delta)
 {
     _angle_right += delta.x;
+    if (_angle_right > vsg::PI) _angle_right += -2.0 * vsg::PI;
+    if (_angle_right < -vsg::PI) _angle_right += 2.0 * vsg::PI;
+
     _angle_up += delta.y;
     _angle_up = std::max(_pitch_min, std::min(_pitch_max, _angle_up));
 
@@ -246,5 +250,30 @@ void CameraCabineManipulator::calc_view()
 
         _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
         _lookAt->center = matrix * _lookAt->center;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CameraCabineManipulator::currentVehicleChanged()
+{
+    if (_prev_current_vehicle == _current_vehicle)
+        return;
+
+    if (_prev_current_vehicle)
+    {
+        _prev_current_vehicle->saved_cabine_cam_shift = _position_shift;
+        _prev_current_vehicle->saved_cabine_cam_right = _angle_right;
+        _prev_current_vehicle->saved_cabine_cam_up = _angle_up;
+        _prev_current_vehicle->saved_cabine_cam_fov = _perspective->fieldOfViewY;
+    }
+
+    if (_current_vehicle)
+    {
+        _prev_current_vehicle = _current_vehicle;
+
+        is_reset = true;
+        returnView();
     }
 }

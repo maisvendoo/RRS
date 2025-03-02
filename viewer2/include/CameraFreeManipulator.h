@@ -13,8 +13,10 @@ public:
                           vsg::ref_ptr<vsg::Camera> camera,
                           settings_t &settings);
 
+    void resetView() override;
+    void returnView() override;
     void mouseWheelEvent(vsg::vec3 delta) override;
-    void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt) override;
+    void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) override;
     void touchZoomEvent(double zoomLevel) override;
     void frameEvent(double dt) override;
 
@@ -65,6 +67,10 @@ private:
     double _cameraMoveCoeff = 1.0;
     double _pitch_min = vsg::radians(-70.0);
     double _pitch_max = vsg::radians(70.0);
+
+    bool is_reset = true;
+    vsg::ref_ptr<vsg::LookAt> _last_lookAt = nullptr;
+    double _last_fov = 55.0;
 };
 
 #endif // CAMERA_FREE_MANIPULATOR_H

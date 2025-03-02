@@ -42,6 +42,22 @@ VehicleExterior *VehiclesHandler::getCurrentVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int VehiclesHandler::getCurrentVehicleIndex()
+{
+    return cur_vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int VehiclesHandler::getControlledVehicleIndex()
+{
+    return controlled_vehicle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool VehiclesHandler::isUpdated()
 {
     return is_pos_updated && is_state_updated;
@@ -136,13 +152,9 @@ void VehiclesHandler::step(double t, double dt)
             {
                 size_t signal_id = animation.first;
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
-                {
                     animation.second->setPosition(update_data[new_state].vehicles[i].analogSignal[signal_id]);
-                }
                 else
-                {
                     animation.second->setPosition(0.0f);
-                }
             }
 
             // Sounds update
@@ -150,7 +162,7 @@ void VehiclesHandler::step(double t, double dt)
                 (update_pos_data[cur_data].vehicles[i].position_x - update_pos_data[old_data].vehicles[i].position_x),
                 (update_pos_data[cur_data].vehicles[i].position_y - update_pos_data[old_data].vehicles[i].position_y),
                 (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z));
-            vsg::dvec3 velocity = offset / dt;
+            vsg::dvec3 velocity = offset / upd_dt;
 
             for (auto sound_id : vehicles[i].sounds_id)
             {
@@ -283,14 +295,24 @@ void VehiclesHandler::selectControlVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool VehiclesHandler::returnToControlledVehicle()
+{
+    int prev_cur_vehicle = cur_vehicle;
+
+    // Возврат к управляемому вагону
+    cur_vehicle = controlled_vehicle;
+    return (cur_vehicle != prev_cur_vehicle);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings, vsg::ref_ptr<vsg::Options> options)
 {
     int count = vehicles_info.vehicles.size();
 
     for (int i = 0; i < count; ++i)
     {
-        LOG_INFO("Vehicle %u / %u loading", i + 1, count);
-
         QString cfg_dir_tmp = vehicles_info.vehicles[i].vehicle_config_dir;
         std::string cfg_dir = cfg_dir_tmp.toStdString();
 
@@ -298,7 +320,8 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
         std::string cfg_file = cfg_file_tmp.toStdString();
 
         VehicleExterior vehicle_ext;
-        vehicle_ext.driver_pos = settings.default_driver_pos;
+        vehicle_ext.driver_pos = settings.cabine_default_pos;
+        vehicle_ext.saved_cabine_cam_fov = settings.fovy;
 
         if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {

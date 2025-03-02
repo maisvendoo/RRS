@@ -119,6 +119,11 @@ void TrafficLight::load_animations(const std::string& animations_dir)
 {
     AnimTransformVisitor atv(&animations, animations_dir);
     node->accept(atv);
+    for (auto animation : animations)
+    {
+        animation.second->setPosition(lens_state[animation.first]);
+    }
+    old_lens_state = lens_state;
 }
 
 //------------------------------------------------------------------------------

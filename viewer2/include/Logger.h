@@ -41,7 +41,7 @@ public:
 
     void log_message(LogLevel level, const char* file, int line, const char* format, ...);
 
-    void openFile(const std::string& path);
+    void openFile(const std::string& path, const std::string& backup_path);
 
 private:
     Logger();

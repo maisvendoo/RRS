@@ -28,15 +28,21 @@ public:
     virtual void keyboardPressEvent(vsg::KeySymbol key, bool pressed) {}
     virtual void mouseButtonPressEvent(uint32_t button, vsg::ButtonMask button_mask, bool pressed) {}
     virtual void mouseWheelEvent(vsg::vec3 delta) {}
-    virtual void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta, double dt) {}
+    virtual void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) {}
     virtual void touchZoomEvent(double zoomLevel) {}
     virtual void frameEvent(double dt) {}
 
-    void setCurrentVehicle(VehicleExterior *cv) {_current_vehicle = cv;}
+    void setCurrentVehicle(VehicleExterior *cv)
+    {
+        _current_vehicle = cv;
+        currentVehicleChanged();
+    }
 
     vsg::ButtonMask getTouchToButtonMask() {return touchToButtonMask;}
 
 protected:
+
+    virtual void currentVehicleChanged() {}
 
     /// Button mask value used for touch events
     vsg::ButtonMask touchToButtonMask = vsg::BUTTON_MASK_3;
@@ -49,7 +55,7 @@ protected:
 
     settings_t& _settings;
 
-    VehicleExterior *_current_vehicle;
+    VehicleExterior *_current_vehicle = nullptr;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H

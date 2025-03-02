@@ -30,6 +30,11 @@ public:
     //displays_t   *displays = new displays_t();
     std::vector<size_t> sounds_id = {};
 
+    vsg::dvec3  saved_cabine_cam_shift = vsg::dvec3(0.0, 0.0, 0.0);
+    double      saved_cabine_cam_right = 0.0;
+    double      saved_cabine_cam_up = 0.0;
+    double      saved_cabine_cam_fov = 64.0;
+
     VehicleExterior(){};
 
     void step(float t, float dt);

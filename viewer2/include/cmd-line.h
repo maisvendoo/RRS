@@ -10,7 +10,7 @@ struct cmd_line_t
     std::optional<int> port;
     std::optional<int> width;
     std::optional<int> height;
-    bool fullscreen;
+    std::optional<bool> fullscreen;
     std::optional<std::string> notify_level;
 };
 

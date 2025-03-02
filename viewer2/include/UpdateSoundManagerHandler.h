@@ -1,5 +1,5 @@
-#ifndef SOUND_MANAGER_UPDATE_HANDLER_H
-#define SOUND_MANAGER_UPDATE_HANDLER_H
+#ifndef UPDATE_SOUND_MANAGER_HANDLER_H
+#define UPDATE_SOUND_MANAGER_HANDLER_H
 
 #include "sound-manager.h"
 #include <vsg/app/Camera.h>
@@ -7,10 +7,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class SoundManagerUpdateHandler : public vsg::Inherit<vsg::Visitor, SoundManagerUpdateHandler>
+class UpdateSoundManagerHandler : public vsg::Inherit<vsg::Visitor, UpdateSoundManagerHandler>
 {
 public:
-    explicit SoundManagerUpdateHandler(vsg::ref_ptr<vsg::Camera> camera, SoundManager *sm);
+    explicit UpdateSoundManagerHandler(vsg::ref_ptr<vsg::Camera> camera, SoundManager *sm);
 
     void apply(vsg::FrameEvent& frame) override;
 
@@ -22,4 +22,4 @@ private:
     double _previousTime;
 };
 
-#endif // SOUND_MANAGER_UPDATE_HANDLER_H
+#endif // UPDATE_SOUND_MANAGER_HANDLER_H

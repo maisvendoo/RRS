@@ -28,6 +28,8 @@ public:
 
     /// Info about current vehicle exterior
     VehicleExterior *getCurrentVehicle();
+    int getCurrentVehicleIndex();
+    int getControlledVehicleIndex();
 
     bool isUpdated();
 
@@ -39,6 +41,7 @@ public:
     bool selectPrevVehicle();
 
     void selectControlVehicle();
+    bool returnToControlledVehicle();
 
     void load(simulator_vehicles_info_t vehicles_info, const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
 

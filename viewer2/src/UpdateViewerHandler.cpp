@@ -1,4 +1,4 @@
-#include "InputHandler.h"
+#include "UpdateViewerHandler.h"
 
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
@@ -12,13 +12,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-InputHandler::InputHandler(vsg::ref_ptr<vsg::Camera> camera,
-                           TrafficLightsHandler *sig_handler,
-                            VehiclesHandler *veh_handler,
-                            settings_t &settings)
+UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
+                                         vsg::ref_ptr<vsg::Camera> camera,
+                                         TrafficLightsHandler *sig_handler,
+                                         VehiclesHandler *veh_handler,
+                                         settings_t &settings)
     : Inherit()
     , _settings(settings)
     , _keyboard(vsg::Keyboard::create())
+    , _upd_server_control(upd_server_control)
     , _camera(camera)
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
@@ -34,7 +36,7 @@ InputHandler::InputHandler(vsg::ref_ptr<vsg::Camera> camera,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::FrameEvent& frame)
+void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
     if (frame.frameStamp->frameCount)
     {
@@ -42,29 +44,28 @@ void InputHandler::apply(vsg::FrameEvent& frame)
         double dt = t - _previousTime;
         _previousTime = t;
 
-        _current_manipulator->frameEvent(dt);
-
         if (_sig_handler)
             _sig_handler->step(static_cast<float>(t), static_cast<float>(dt));
 
         if (_vehicles_handler)
             _vehicles_handler->step(t, dt);
+
+        _current_manipulator->frameEvent(dt);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::KeyPressEvent& keyPress)
+void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     if (_keyboard) keyPress.accept(*_keyboard);
 
     _current_manipulator->keyboardPressEvent(keyPress.keyBase, true);
 
+    // Пока не загрузились и не подключились к серверу - только свободная камера
     if ((!_vehicles_handler) || (!_vehicles_handler->isUpdated()))
     {
-        _current_manipulator = _free_manipulator;
-        _current_manipulator->setCurrentVehicle(nullptr);
         if (keyPress.keyBase == vsg::KEY_F4)
         {
             _current_manipulator->returnView();
@@ -72,108 +73,125 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    if (keyPress.keyBase == vsg::KEY_Home)
+    // Управление текущим выбранным вагоном только с камер, привязанных к вагону
+    if ((_current_manipulator == _vehicle_manipulator) ||
+        (_current_manipulator == _cabine_manipulator))
     {
-        if (_vehicles_handler->selectNextTrain())
+        // Home - первый вагон следующего поезда на сервере
+        if (keyPress.keyBase == vsg::KEY_Home)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectNextTrain())
+                changeCurrentVehicle();
+
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_End)
-    {
-        if (_vehicles_handler->selectPrevTrain())
+        // End - первый вагон предыдущего поезда на сервере
+        if (keyPress.keyBase == vsg::KEY_End)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectPrevTrain())
+                changeCurrentVehicle();
+
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_Page_Up)
-    {
-        if (_vehicles_handler->selectNextVehicle())
+        // Page Up - следующий вагон поезда
+        if (keyPress.keyBase == vsg::KEY_Page_Up)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectNextVehicle())
+                changeCurrentVehicle();
+
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_Page_Down)
-    {
-        if (_vehicles_handler->selectPrevVehicle())
+        // Page Down - предыдущий вагон поезда
+        if (keyPress.keyBase == vsg::KEY_Page_Down)
         {
-            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-            _current_manipulator->resetView();
+            if (_vehicles_handler->selectPrevVehicle())
+                changeCurrentVehicle();
+
+            return;
         }
-        return;
-    }
 
-    if ((keyPress.keyBase == vsg::KEY_KP_Enter) || (keyPress.keyBase == vsg::KEY_Return))
-    {
-        _vehicles_handler->selectControlVehicle();
-        return;
-    }
-
-    // Переключение камер только по F-клавишам без Shift и Ctrl
-    if (isCtrl() || isShift())
-    {
-        return;
-    }
-
-    if (keyPress.keyBase == vsg::KEY_F2)
-    {
-        if (_current_manipulator == _cabine_manipulator)
+        // Enter - взять управление текущим вагоном
+        if ((keyPress.keyBase == vsg::KEY_KP_Enter) || (keyPress.keyBase == vsg::KEY_Return))
         {
+            _vehicles_handler->selectControlVehicle();
+            _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
+                                                      _vehicles_handler->getControlledVehicleIndex());
+            return;
+        }
+    }
+
+    // Переключение камер по F-клавишам только без Shift и Ctrl
+    if (!isCtrl() && !isShift())
+    {
+        // F1 - камера из кабины управляемой ПЕ
+        if (keyPress.keyBase == vsg::KEY_F1)
+        {
+            if (_vehicles_handler->returnToControlledVehicle() || (_current_manipulator != _cabine_manipulator))
+            {
+                _current_manipulator = _cabine_manipulator;
+                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                _current_manipulator->resetView();
+                return;
+            }
+
             _current_manipulator->returnView();
+            return;
         }
-        else
+
+        // F2 - камера из кабины текущей ПЕ
+        if (keyPress.keyBase == vsg::KEY_F2)
         {
+            if (_current_manipulator == _cabine_manipulator)
+            {
+                _current_manipulator->returnView();
+                return;
+            }
+
             _current_manipulator = _cabine_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_F3)
-    {
-        if (_current_manipulator == _vehicle_manipulator)
+        // F3 - внешняя камера текущей ПЕ
+        if (keyPress.keyBase == vsg::KEY_F3)
         {
-            _current_manipulator->returnView();
-        }
-        else
-        {
+            if (_current_manipulator == _vehicle_manipulator)
+            {
+                _current_manipulator->returnView();
+                return;
+            }
+
             _current_manipulator = _vehicle_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
         }
-        return;
-    }
 
-    if (keyPress.keyBase == vsg::KEY_F4)
-    {
-        if (_current_manipulator == _free_manipulator)
+        // F4 - свободная камера
+        if (keyPress.keyBase == vsg::KEY_F4)
         {
-            _current_manipulator->returnView();
-        }
-        else
-        {
+            if (_current_manipulator == _free_manipulator)
+            {
+                _current_manipulator->returnView();
+                return;
+            }
+
             _current_manipulator = _free_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
         }
-        return;
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::KeyReleaseEvent& keyRelease)
+void UpdateViewerHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     if (_keyboard) keyRelease.accept(*_keyboard);
 
@@ -184,7 +202,7 @@ void InputHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::FocusInEvent& focusIn)
+void UpdateViewerHandler::apply(vsg::FocusInEvent& focusIn)
 {
     if (_keyboard) focusIn.accept(*_keyboard);
 }
@@ -192,7 +210,7 @@ void InputHandler::apply(vsg::FocusInEvent& focusIn)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::FocusOutEvent& focusOut)
+void UpdateViewerHandler::apply(vsg::FocusOutEvent& focusOut)
 {
     if (_keyboard) focusOut.accept(*_keyboard);
 }
@@ -200,7 +218,7 @@ void InputHandler::apply(vsg::FocusOutEvent& focusOut)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::ButtonPressEvent& buttonPress)
+void UpdateViewerHandler::apply(vsg::ButtonPressEvent& buttonPress)
 {
     if (buttonPress.handled)
     {
@@ -221,7 +239,7 @@ void InputHandler::apply(vsg::ButtonPressEvent& buttonPress)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+void UpdateViewerHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
     if (buttonRelease.handled) return;
 
@@ -236,7 +254,7 @@ void InputHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::MoveEvent& moveEvent)
+void UpdateViewerHandler::apply(vsg::MoveEvent& moveEvent)
 {
     _lastPointerEventWithinRenderArea = withinRenderArea(moveEvent);
 
@@ -246,9 +264,7 @@ void InputHandler::apply(vsg::MoveEvent& moveEvent)
     {
         vsg::dvec2 new_ndc = ndc(moveEvent);
         vsg::dvec2 prev_ndc = ndc(*_previousPointerEvent);
-
-        double dt = std::chrono::duration<double, std::chrono::seconds::period>(moveEvent.time - _previousPointerEvent->time).count();
-        _current_manipulator->mouseMoveEvent(moveEvent.mask, (new_ndc - prev_ndc), dt);
+        _current_manipulator->mouseMoveEvent(moveEvent.mask, (new_ndc - prev_ndc));
     }
 
     _previousPointerEvent = &moveEvent;
@@ -258,7 +274,7 @@ void InputHandler::apply(vsg::MoveEvent& moveEvent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+void UpdateViewerHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 {
     if (scrollWheel.handled || !_lastPointerEventWithinRenderArea) return;
 
@@ -270,7 +286,7 @@ void InputHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::TouchDownEvent& touchDown)
+void UpdateViewerHandler::apply(vsg::TouchDownEvent& touchDown)
 {
     _previousTouches[touchDown.id] = &touchDown;
     switch (touchDown.id)
@@ -309,7 +325,7 @@ void InputHandler::apply(vsg::TouchDownEvent& touchDown)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::TouchUpEvent& touchUp)
+void UpdateViewerHandler::apply(vsg::TouchUpEvent& touchUp)
 {
     if (touchUp.id == 0 && _previousTouches.size() == 1)
     {
@@ -329,7 +345,7 @@ void InputHandler::apply(vsg::TouchUpEvent& touchUp)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::TouchMoveEvent& touchMove)
+void UpdateViewerHandler::apply(vsg::TouchMoveEvent& touchMove)
 {
     vsg::ref_ptr<vsg::Window> w = touchMove.window;
     switch (_previousTouches.size())
@@ -375,7 +391,7 @@ void InputHandler::apply(vsg::TouchMoveEvent& touchMove)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::dvec2 InputHandler::ndc(const vsg::PointerEvent& event)
+vsg::dvec2 UpdateViewerHandler::ndc(const vsg::PointerEvent& event)
 {
     auto renderArea = _camera->getRenderArea();
     auto [x, y] = cameraRenderAreaCoordinates(event);
@@ -390,7 +406,7 @@ vsg::dvec2 InputHandler::ndc(const vsg::PointerEvent& event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::pair<int32_t, int32_t> InputHandler::cameraRenderAreaCoordinates(const vsg::PointerEvent& pointerEvent) const
+std::pair<int32_t, int32_t> UpdateViewerHandler::cameraRenderAreaCoordinates(const vsg::PointerEvent& pointerEvent) const
 {
     return {pointerEvent.x, pointerEvent.y};
 }
@@ -398,7 +414,7 @@ std::pair<int32_t, int32_t> InputHandler::cameraRenderAreaCoordinates(const vsg:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent) const
+bool UpdateViewerHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent) const
 {
     auto renderArea = _camera->getRenderArea();
     auto [x, y] = cameraRenderAreaCoordinates(pointerEvent);
@@ -410,7 +426,7 @@ bool InputHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::isAlt()
+bool UpdateViewerHandler::isAlt()
 {
     return (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R));
 }
@@ -418,7 +434,7 @@ bool InputHandler::isAlt()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::isCtrl()
+bool UpdateViewerHandler::isCtrl()
 {
     return (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R));
 }
@@ -426,7 +442,18 @@ bool InputHandler::isCtrl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::isShift()
+bool UpdateViewerHandler::isShift()
 {
     return (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::changeCurrentVehicle()
+{
+    _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+
+    _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
+                                              _vehicles_handler->getControlledVehicleIndex());
 }

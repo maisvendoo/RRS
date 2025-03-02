@@ -1,10 +1,10 @@
-#include "SoundManagerUpdateHandler.h"
+#include "UpdateSoundManagerHandler.h"
 #include "vsg/ui/ApplicationEvent.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-SoundManagerUpdateHandler::SoundManagerUpdateHandler(vsg::ref_ptr<vsg::Camera> camera, SoundManager *sm)
+UpdateSoundManagerHandler::UpdateSoundManagerHandler(vsg::ref_ptr<vsg::Camera> camera, SoundManager *sm)
     : _lookAt(camera->viewMatrix.cast<vsg::LookAt>())
     , _sound_manager(sm)
 {
@@ -17,7 +17,7 @@ SoundManagerUpdateHandler::SoundManagerUpdateHandler(vsg::ref_ptr<vsg::Camera> c
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SoundManagerUpdateHandler::apply(vsg::FrameEvent& frame)
+void UpdateSoundManagerHandler::apply(vsg::FrameEvent& frame)
 {
     double t = frame.frameStamp->simulationTime;
     double dt = t - _previousTime;
