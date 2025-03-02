@@ -12,7 +12,7 @@ struct controlled_t
 {
     int controlled_vehicle = -1;
     int current_vehicle = -1;
-    std::vector<uint16_t> pressed_keys = {};
+    std::vector<int> pressed_keys = {};
 
     controlled_t()
     {

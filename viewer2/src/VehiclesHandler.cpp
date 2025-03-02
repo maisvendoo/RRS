@@ -111,6 +111,12 @@ void VehiclesHandler::step(double t, double dt)
     double r = (client_time - update_pos_data[old_data].time) / upd_dt;
     double k = (1.0 - r);
 
+    // Отладка
+    LOG_INFO("FRAME:t=%6.4f(%6.4f+%6.4f)|SERVER: newt=%6.4f oldt=%6.4f|upd:%i|r=%2.6f|k=%2.6f",
+             client_time, ref_time, time_difference,
+             update_pos_data[new_data].time, update_pos_data[old_data].time,
+             is_update, r, k);
+
     for (size_t i = 0; i < vehicles.size(); ++i)
     {
         vehicles[i].position = vsg::dvec3(
