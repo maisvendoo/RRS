@@ -1,4 +1,4 @@
-#include "InputHandler.h"
+#include "UpdateViewerHandler.h"
 
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
@@ -12,10 +12,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-InputHandler::InputHandler(vsg::ref_ptr<vsg::Camera> camera,
-                           TrafficLightsHandler *sig_handler,
-                            VehiclesHandler *veh_handler,
-                            settings_t &settings)
+UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<vsg::Camera> camera,
+                                         TrafficLightsHandler *sig_handler,
+                                         VehiclesHandler *veh_handler,
+                                         settings_t &settings)
     : Inherit()
     , _settings(settings)
     , _keyboard(vsg::Keyboard::create())
@@ -34,7 +34,7 @@ InputHandler::InputHandler(vsg::ref_ptr<vsg::Camera> camera,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::FrameEvent& frame)
+void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
     if (frame.frameStamp->frameCount)
     {
@@ -55,7 +55,7 @@ void InputHandler::apply(vsg::FrameEvent& frame)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::KeyPressEvent& keyPress)
+void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     if (_keyboard) keyPress.accept(*_keyboard);
 
@@ -187,7 +187,7 @@ void InputHandler::apply(vsg::KeyPressEvent& keyPress)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::KeyReleaseEvent& keyRelease)
+void UpdateViewerHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     if (_keyboard) keyRelease.accept(*_keyboard);
 
@@ -198,7 +198,7 @@ void InputHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::FocusInEvent& focusIn)
+void UpdateViewerHandler::apply(vsg::FocusInEvent& focusIn)
 {
     if (_keyboard) focusIn.accept(*_keyboard);
 }
@@ -206,7 +206,7 @@ void InputHandler::apply(vsg::FocusInEvent& focusIn)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::FocusOutEvent& focusOut)
+void UpdateViewerHandler::apply(vsg::FocusOutEvent& focusOut)
 {
     if (_keyboard) focusOut.accept(*_keyboard);
 }
@@ -214,7 +214,7 @@ void InputHandler::apply(vsg::FocusOutEvent& focusOut)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::ButtonPressEvent& buttonPress)
+void UpdateViewerHandler::apply(vsg::ButtonPressEvent& buttonPress)
 {
     if (buttonPress.handled)
     {
@@ -235,7 +235,7 @@ void InputHandler::apply(vsg::ButtonPressEvent& buttonPress)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+void UpdateViewerHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
     if (buttonRelease.handled) return;
 
@@ -250,7 +250,7 @@ void InputHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::MoveEvent& moveEvent)
+void UpdateViewerHandler::apply(vsg::MoveEvent& moveEvent)
 {
     _lastPointerEventWithinRenderArea = withinRenderArea(moveEvent);
 
@@ -270,7 +270,7 @@ void InputHandler::apply(vsg::MoveEvent& moveEvent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+void UpdateViewerHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 {
     if (scrollWheel.handled || !_lastPointerEventWithinRenderArea) return;
 
@@ -282,7 +282,7 @@ void InputHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::TouchDownEvent& touchDown)
+void UpdateViewerHandler::apply(vsg::TouchDownEvent& touchDown)
 {
     _previousTouches[touchDown.id] = &touchDown;
     switch (touchDown.id)
@@ -321,7 +321,7 @@ void InputHandler::apply(vsg::TouchDownEvent& touchDown)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::TouchUpEvent& touchUp)
+void UpdateViewerHandler::apply(vsg::TouchUpEvent& touchUp)
 {
     if (touchUp.id == 0 && _previousTouches.size() == 1)
     {
@@ -341,7 +341,7 @@ void InputHandler::apply(vsg::TouchUpEvent& touchUp)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputHandler::apply(vsg::TouchMoveEvent& touchMove)
+void UpdateViewerHandler::apply(vsg::TouchMoveEvent& touchMove)
 {
     vsg::ref_ptr<vsg::Window> w = touchMove.window;
     switch (_previousTouches.size())
@@ -387,7 +387,7 @@ void InputHandler::apply(vsg::TouchMoveEvent& touchMove)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::dvec2 InputHandler::ndc(const vsg::PointerEvent& event)
+vsg::dvec2 UpdateViewerHandler::ndc(const vsg::PointerEvent& event)
 {
     auto renderArea = _camera->getRenderArea();
     auto [x, y] = cameraRenderAreaCoordinates(event);
@@ -402,7 +402,7 @@ vsg::dvec2 InputHandler::ndc(const vsg::PointerEvent& event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::pair<int32_t, int32_t> InputHandler::cameraRenderAreaCoordinates(const vsg::PointerEvent& pointerEvent) const
+std::pair<int32_t, int32_t> UpdateViewerHandler::cameraRenderAreaCoordinates(const vsg::PointerEvent& pointerEvent) const
 {
     return {pointerEvent.x, pointerEvent.y};
 }
@@ -410,7 +410,7 @@ std::pair<int32_t, int32_t> InputHandler::cameraRenderAreaCoordinates(const vsg:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent) const
+bool UpdateViewerHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent) const
 {
     auto renderArea = _camera->getRenderArea();
     auto [x, y] = cameraRenderAreaCoordinates(pointerEvent);
@@ -422,7 +422,7 @@ bool InputHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::isAlt()
+bool UpdateViewerHandler::isAlt()
 {
     return (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R));
 }
@@ -430,7 +430,7 @@ bool InputHandler::isAlt()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::isCtrl()
+bool UpdateViewerHandler::isCtrl()
 {
     return (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R));
 }
@@ -438,7 +438,7 @@ bool InputHandler::isCtrl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool InputHandler::isShift()
+bool UpdateViewerHandler::isShift()
 {
     return (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
 }

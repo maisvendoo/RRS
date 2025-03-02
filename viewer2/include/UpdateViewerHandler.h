@@ -13,13 +13,13 @@ class VehiclesHandler;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class InputHandler : public vsg::Inherit<vsg::Visitor, InputHandler>
+class UpdateViewerHandler : public vsg::Inherit<vsg::Visitor, UpdateViewerHandler>
 {
 public:
-    explicit InputHandler(vsg::ref_ptr<vsg::Camera> camera,
-                          TrafficLightsHandler *sig_handler,
-                          VehiclesHandler *veh_handler,
-                          settings_t &settings);
+    explicit UpdateViewerHandler(vsg::ref_ptr<vsg::Camera> camera,
+                                 TrafficLightsHandler *sig_handler,
+                                 VehiclesHandler *veh_handler,
+                                 settings_t &settings);
 
     void apply(vsg::FrameEvent& frame) override;
     void apply(vsg::KeyPressEvent& keyPress) override;

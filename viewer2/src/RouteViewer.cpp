@@ -5,10 +5,10 @@
 #include "filesystem.h"
 #include "CfgReader.h"
 #include "Logger.h"
-#include "InputHandler.h"
+#include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
 #include "TrafficLightsHandler.h"
-#include "SoundManagerUpdateHandler.h"
+#include "UpdateSoundManagerHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
 
@@ -507,8 +507,8 @@ void RouteViewer::initViewer()
     viewer->addWindow(window);
 
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
-    viewer->addEventHandler(InputHandler::create(camera, traffic_lights_handler, vehicles_handler, settings));
-    viewer->addEventHandler(SoundManagerUpdateHandler::create(camera, sound_manager));
+    viewer->addEventHandler(UpdateViewerHandler::create(camera, traffic_lights_handler, vehicles_handler, settings));
+    viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});

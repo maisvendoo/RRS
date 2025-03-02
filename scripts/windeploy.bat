@@ -128,9 +128,10 @@ xcopy /Y /S ..\routes\experimental-polygon-gltf\*.* %RRS_DEV_ROOT%\routes\experi
 
 rem Копируем SDK
 
+xcopy /Y /Q ..\common-headers\key-symbols.h %RRS_DEV_ROOT%\sdk\include\
+xcopy /Y /Q ..\common-headers\sound-signal.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Y /Q ..\CfgReader\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Y /Q ..\filesystem\include\*.h %RRS_DEV_ROOT%\sdk\include\
-xcopy /Y /Q ..\common-headers\sound-signal.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Y /Q ..\simulator\solver\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Y /Q ..\simulator\physics\include\*.h %RRS_DEV_ROOT%\sdk\include\
 xcopy /Y /Q ..\simulator\vehicle\include\*.h %RRS_DEV_ROOT%\sdk\include\
