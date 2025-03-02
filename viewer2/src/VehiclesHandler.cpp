@@ -378,8 +378,7 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
             {
                 double r = 0.5;
                 time_difference = time_difference * (1.0 - r) +
-                                  (update_pos_data[new_data].time - ref_time) * r -
-                                  settings_delay;
+                    (update_pos_data[new_data].time - ref_time - settings_delay) * r;
             }
             else
             {
@@ -406,8 +405,7 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
 
             double r = 0.25;
             time_difference = time_difference * (1.0 - r) +
-                              (update_pos_data[new_data].time - ref_time) * r -
-                              settings_delay;
+                (update_pos_data[new_data].time - ref_time - settings_delay) * r;
         }
         else
         {
@@ -441,8 +439,7 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
     {
         double r = 0.05;
         time_difference = time_difference * (1.0 - r) +
-                          (update_pos_data[new_data].time - ref_time) * r -
-                          settings_delay;
+            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
     }
     else
     {
