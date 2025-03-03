@@ -61,6 +61,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 
     cfg.getString(sec_name, "ExtTexturesDir", textureName);
     auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
+
     if (!model)
         return false;
 
@@ -80,6 +81,8 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     shift = {0.0, 0.0, 0.0};
 
     cfg.getString(sec_name, "CabineModel", modelName);
+    cfg.getString(sec_name, "CabineTexturesDir", textureName);
+
     if (!modelName.isEmpty())
     {
         cfg.getString(sec_name, "CabineTexturesDir", textureName);

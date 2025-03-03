@@ -43,7 +43,7 @@ RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(pare
     if (init(argc, argv))
     {
         LOG_INFO("Viewer is initialized succesfully");
-        is_ready = true;
+        //is_ready = true;
     }
     else
     {
@@ -61,6 +61,12 @@ bool RouteViewer::isReady() const
 int RouteViewer::run()
 {
     auto last_time = std::chrono::system_clock::now();
+
+    while (!is_ready)
+    {
+        QApplication::processEvents();
+    }
+
     while (viewer->advanceToNextFrame())
     {
         QApplication::processEvents();
@@ -86,7 +92,7 @@ int RouteViewer::run()
         // shadow_region->points[4] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
         // shadow_region->points[5] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
         // shadow_region->points[6] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        // shadow_region->points[7] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
+        // shadow_region->points[7] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);        
 
         viewer->handleEvents();
         viewer->update();
@@ -722,6 +728,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
                             static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
 
+    is_ready = true;
 }
 
 void RouteViewer::slotUpdateKeyboard()
