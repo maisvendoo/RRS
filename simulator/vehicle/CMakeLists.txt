@@ -48,7 +48,7 @@ target_link_libraries (${TARGET} device)
 target_link_libraries (${TARGET} Journal)
 target_link_libraries (${TARGET} physics)
 
-if (WIN32)
+#if (WIN32)
 
     install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets
@@ -74,6 +74,6 @@ if (WIN32)
 
     install(FILES ${INCLUDES} DESTINATION sdk/include)
 
-else()
+#else()
 
-endif()
+#endif()

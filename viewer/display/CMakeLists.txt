@@ -42,7 +42,7 @@ target_link_libraries (${TARGET} Qt6::Gui)
 target_link_libraries (${TARGET} Qt6::Widgets)
 target_link_libraries (${TARGET} Qt6::OpenGL)
 
-if (WIN32)
+#if (WIN32)
 
     install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets
@@ -68,6 +68,6 @@ if (WIN32)
 
     install(FILES ${INCLUDES} DESTINATION sdk/include)
 
-else()
+#else()
 
-endif()
+#endif()

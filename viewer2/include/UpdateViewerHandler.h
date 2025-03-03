@@ -8,6 +8,7 @@
 class CameraFreeManipulator;
 class CameraVehicleManipulator;
 class CameraCabineManipulator;
+class CameraFollowManipulator;
 class TrafficLightsHandler;
 class VehiclesHandler;
 
@@ -69,6 +70,7 @@ private:
     CameraFreeManipulator *_free_manipulator = nullptr;
     CameraVehicleManipulator *_vehicle_manipulator = nullptr;
     CameraCabineManipulator *_cabine_manipulator = nullptr;
+    CameraFollowManipulator *_follow_manipulator = nullptr;
     TrafficLightsHandler *_sig_handler = nullptr;
     VehiclesHandler *_vehicles_handler = nullptr;
 };

@@ -267,9 +267,18 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
         if (tmp_double > 1.01) settings.ext_cam_dist_coeff = tmp_double;
         cfg.getDouble(secName, "ExtCamDistMin", settings.ext_cam_dist_min);
 
-        cfg.getDouble(secName, "StatCamDist", settings.stat_cam_dist);
-        cfg.getDouble(secName, "StatCamHeight", settings.stat_cam_height);
-        cfg.getDouble(secName, "StatCamShift", settings.stat_cam_shift);
+        // Настройки следящей камеры
+        cfg.getDouble(secName, "FollowCamShiftRight", settings.follow_cam_init_shift_right);
+        cfg.getDouble(secName, "FollowCamShiftUp", settings.follow_cam_init_shift_up);
+        cfg.getDouble(secName, "FollowCamFwdVelocityCoeff", settings.follow_cam_fwd_velocity_coeff);
+        cfg.getDouble(secName, "FollowCamSpeedKeyboard", settings.follow_cam_speed_keyboard);
+        cfg.getDouble(secName, "FollowCamSpeedMouse", settings.follow_cam_speed_mouse);
+        tmp_double = 1.0;
+        cfg.getDouble(secName, "FollowCamSpeedCoeff", tmp_double);
+        if (tmp_double > 1.01) settings.follow_cam_speed_coeff = tmp_double;
+        tmp_double = 1.0;
+        cfg.getDouble(secName, "FollowCamFovYCoeff", tmp_double);
+        if (tmp_double > 1.01) settings.follow_cam_fovy_coeff = tmp_double;
     }
 }
 

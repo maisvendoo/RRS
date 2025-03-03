@@ -52,7 +52,7 @@ struct settings_t
     double free_cam_height_step = 0.2;              ///< Free camera vertical shift step
     double free_cam_fovy_coeff = cbrt(2.0);         ///< Free camera FovY coeff
 
-    vsg::dvec3 cabine_default_pos = {0.0, 0.0, 3.5};///< Driver initial position
+    vsg::dvec3 cabine_default_pos = {0.0, 0.0, 3.5};///< Driver default initial position
     double cabine_speed_keyboard = 0.5;             ///< Cabine camera initial speed
     double cabine_speed_mouse = 0.5;                ///< Cabine camera initial speed
     double cabine_speed_coeff = sqrt(2.0);          ///< Cabine camera speed coeff
@@ -73,12 +73,17 @@ struct settings_t
     double ext_cam_rotate_keyboard = 1.0;           ///< External camera rotation initial speed
     double ext_cam_rotate_mouse = 1.0;              ///< External camera rotation initial speed
     double ext_cam_height_step = 0.1;               ///< External camera vertical shift
-    double ext_cam_dist_coeff = cbrt(2.0);          ///< External camera distance coeff
+    double ext_cam_dist_coeff = cbrt(cbrt(2.0));    ///< External camera distance coeff
     double ext_cam_dist_min = 1.0;                  ///< External camera minimal distance
 
-    double stat_cam_dist = 8.0;     ///< Static camera distance
-    double stat_cam_height = 1.75;  ///< Static camera height
-    double stat_cam_shift = 150.0;  ///< Static camera shift
+    double follow_cam_init_shift_right = 10.0;      ///< Follow camera initial position right shift
+    double follow_cam_init_shift_up = 1.75;         ///< Follow camera initial position height shift
+    double follow_cam_fwd_velocity_coeff = 4.0;     ///< Follow camera initial position forward shift coeff
+    double follow_cam_speed_keyboard = 2.0;         ///< Follow camera initial speed
+    double follow_cam_speed_mouse = 2.0;            ///< Follow camera initial speed
+    double follow_cam_speed_coeff = sqrt(2.0);      ///< Follow camera speed coeff
+    double follow_cam_height_step = 0.1;            ///< Follow camera vertical shift
+    double follow_cam_fovy_coeff = cbrt(2.0);       ///< Follow camera FovY coeff
 };
 
 #endif // VIEWER_SETTINGS_H
