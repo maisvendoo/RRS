@@ -57,11 +57,16 @@ bool MaterialAnimation::load_config(CfgReader &cfg)
     // material.baseColorFactor = color;
     // material.emissiveFactor = emission_color;
 
+    update();
     return true;
 }
 
 void MaterialAnimation::update()
 {
+    if (keypoints.empty())
+    {
+        return;
+    }
     vsg::vec4 new_color = color * interpolate(cur_pos);
     new_color.a = 1.0f;
 

@@ -53,6 +53,7 @@ bool AnalogRotation::load_config(CfgReader& cfg)
         ss >> axis.x >> axis.y >> axis.z;
     }
 
+    update();
     return true;
 }
 
@@ -71,5 +72,5 @@ void AnalogRotation::update()
     }
 
     vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
-    transform->matrix = rotate * matrix;
+    transform->matrix = matrix * rotate;
 }

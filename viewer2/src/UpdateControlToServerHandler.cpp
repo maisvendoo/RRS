@@ -51,17 +51,30 @@ void UpdateControlToServerHandler::changeCurrentVehicle(int current_idx, int con
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void UpdateControlToServerHandler::apply(vsg::FocusInEvent& focusIn)
+{
+    sendControlToServer();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateControlToServerHandler::apply(vsg::FocusOutEvent& focusOut)
+{
+    sendEmptyControlToServer();
+    _pressed_keys.clear();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void UpdateControlToServerHandler::sendControlToServer()
 {
-    controlled_t c;
-    c.current_vehicle = _current_idx;
-    c.controlled_vehicle = _controlled_idx;
-
     // Если массив нажатых клавиш пустой
     // отправляем пустое управление
     if (_pressed_keys.empty())
     {
-        _tcp_client->sendVehicleControl(c.serialize());
+        sendEmptyControlToServer();
         return;
     }
 
@@ -77,13 +90,31 @@ void UpdateControlToServerHandler::sendControlToServer()
     }
     if (_pressed_keys.size() == modifiers_size)
     {
-        _tcp_client->sendVehicleControl(c.serialize());
+        sendEmptyControlToServer();
         return;
     }
+
+    controlled_t c;
+    c.current_vehicle = _current_idx;
+    c.controlled_vehicle = _controlled_idx;
 
     // Отправляем массив управляющих клавиш
     for (auto key : _pressed_keys)
         c.pressed_keys.push_back(key);
+
+    _tcp_client->sendVehicleControl(c.serialize());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateControlToServerHandler::sendEmptyControlToServer()
+{
+    // Отправляем пустой пустой массив управляющих клавиш
+    controlled_t c;
+    c.current_vehicle = _current_idx;
+    c.controlled_vehicle = _controlled_idx;
+    c.pressed_keys.clear();
 
     _tcp_client->sendVehicleControl(c.serialize());
 }
