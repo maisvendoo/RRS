@@ -7,8 +7,11 @@ CameraVehicleManipulator::CameraVehicleManipulator(vsg::ref_ptr<vsg::Keyboard> k
 {
     _pitch_min = vsg::radians(_settings.pitch_min);
     _pitch_max = vsg::radians(_settings.pitch_max);
-    _default_right = vsg::radians(_settings.ext_cam_init_angle_H);
-    _default_up = -vsg::radians(_settings.ext_cam_init_angle_V);
+    _last_angle_right = vsg::radians(_settings.ext_cam_init_angle_H);
+    _last_angle_up = -vsg::radians(_settings.ext_cam_init_angle_V);
+    _last_distance = _settings.ext_cam_init_distance;
+    _default_right = _last_angle_right;
+    _default_up = _last_angle_up;
 }
 
 //------------------------------------------------------------------------------
@@ -131,6 +134,15 @@ void CameraVehicleManipulator::frameEvent(double dt)
     };
 
     double speed = 0.0;
+    bool isCtrl = (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R));
+    if (!_prevCtrl && isCtrl)
+        _centerMoveCoeff = _centerMoveCoeff / _settings.ext_cam_speed_coeff;
+    _prevCtrl = isCtrl;
+
+    bool isShift = (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
+    if (!_prevShift && isShift)
+        _centerMoveCoeff = _centerMoveCoeff * _settings.ext_cam_speed_coeff;
+    _prevShift = isShift;
 
     if (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R))
     {
@@ -141,9 +153,16 @@ void CameraVehicleManipulator::frameEvent(double dt)
         if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
 
         if (rot_speed)
-            rotate_around(rot_speed * dt * _settings.ext_cam_rotate_keyboard);
+        {
+            rotate_around(rot_speed * dt * _centerMoveCoeff * _settings.ext_cam_rotate_keyboard);
+        }
         else
+        {
+            _centerMoveCoeff = 1.0;
+            _prevCtrl = false;
+            _prevShift = false;
             calc_view();
+        }
 
         return;
     }
@@ -158,17 +177,7 @@ void CameraVehicleManipulator::frameEvent(double dt)
 
     if (move_speed)
     {
-        bool isCtrl = (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R));
-        if (!_prevCtrl && isCtrl)
-            _centerMoveCoeff = _centerMoveCoeff / _settings.ext_cam_speed_coeff;
-        _prevCtrl = isCtrl;
-
-        bool isShift = (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
-        if (!_prevShift && isShift)
-            _centerMoveCoeff = _centerMoveCoeff * _settings.ext_cam_speed_coeff;
-        _prevShift = isShift;
-
-        move(move_speed * dt * _centerMoveCoeff * _settings.ext_cam_speed_keyboard);
+        move(move_speed * dt * _settings.ext_cam_speed_keyboard);
     }
     else
     {

@@ -147,6 +147,14 @@ void VehiclesHandler::step(double t, double dt)
             vsg::rotate(-vehicles[i].attitude.z, vsg::dvec3(0.0, 0.0, 1.0)) *
             vsg::rotate(vehicles[i].attitude.x, vsg::dvec3(1.0, 0.0, 0.0));
 
+        if (is_update)
+        {
+            vehicles[i].velocity = vsg::dvec3(
+                (update_pos_data[cur_data].vehicles[i].position_x - update_pos_data[old_data].vehicles[i].position_x) / upd_dt,
+                (update_pos_data[cur_data].vehicles[i].position_y - update_pos_data[old_data].vehicles[i].position_y) / upd_dt,
+                (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z) / upd_dt);
+        }
+
         if (update_state)
         {
             vehicles[i].train_id = update_data[new_state].vehicles[i].train_id;
@@ -165,12 +173,6 @@ void VehiclesHandler::step(double t, double dt)
             }
 
             // Sounds update
-            vsg::dvec3 offset = vsg::dvec3(
-                (update_pos_data[cur_data].vehicles[i].position_x - update_pos_data[old_data].vehicles[i].position_x),
-                (update_pos_data[cur_data].vehicles[i].position_y - update_pos_data[old_data].vehicles[i].position_y),
-                (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z));
-            vsg::dvec3 velocity = offset / upd_dt;
-
             for (auto sound_id : vehicles[i].sounds_id)
             {
                 vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
@@ -178,7 +180,7 @@ void VehiclesHandler::step(double t, double dt)
                                 vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
                                 vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
                 sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
-                sound_manager->setVelocity(sound_id, velocity.x, velocity.y, velocity.z);
+                sound_manager->setVelocity(sound_id, vehicles[i].velocity.x, vehicles[i].velocity.y, vehicles[i].velocity.z);
 
                 size_t signal_id = sound_manager->getSignalID(sound_id);
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())

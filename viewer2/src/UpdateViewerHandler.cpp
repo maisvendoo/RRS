@@ -6,6 +6,7 @@
 #include "CameraFreeManipulator.h"
 #include "CameraVehicleManipulator.h"
 #include "CameraCabineManipulator.h"
+#include "CameraFollowManipulator.h"
 #include "TrafficLightsHandler.h"
 #include "VehiclesHandler.h"
 
@@ -28,6 +29,7 @@ UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandl
     _free_manipulator = new CameraFreeManipulator(_keyboard, _camera, _settings);
     _vehicle_manipulator = new CameraVehicleManipulator(_keyboard, _camera, _settings);
     _cabine_manipulator = new CameraCabineManipulator(_keyboard, _camera, _settings);
+    _follow_manipulator = new CameraFollowManipulator(_keyboard, _camera, _settings);
 
     _current_manipulator = _free_manipulator;
     _current_manipulator->resetView();
@@ -73,9 +75,8 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    // Управление текущим выбранным вагоном только с камер, привязанных к вагону
-    if ((_current_manipulator == _vehicle_manipulator) ||
-        (_current_manipulator == _cabine_manipulator))
+    // Запрещаем управление выбором текущего вагона со свободной камеры
+    if (_current_manipulator != _free_manipulator)
     {
         // Home - первый вагон следующего поезда на сервере
         if (keyPress.keyBase == vsg::KEY_Home)
@@ -117,8 +118,8 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         if ((keyPress.keyBase == vsg::KEY_KP_Enter) || (keyPress.keyBase == vsg::KEY_Return))
         {
             _vehicles_handler->selectControlVehicle();
-            _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
-                                                      _vehicles_handler->getControlledVehicleIndex());
+            changeCurrentVehicle();
+
             return;
         }
     }
@@ -183,6 +184,24 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             _current_manipulator = _free_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->resetView();
+            return;
+        }
+
+        // F5 - следящая камера справа по ходу поезда
+        if (keyPress.keyBase == vsg::KEY_F5)
+        {
+            _current_manipulator = _follow_manipulator;
+            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView(); // Камера справа инициализируется в resetView
+            return;
+        }
+
+        // F6 - следящая камера слева по ходу поезда
+        if (keyPress.keyBase == vsg::KEY_F6)
+        {
+            _current_manipulator = _follow_manipulator;
+            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->returnView(); // Камера слева инициализируется в returnView
             return;
         }
     }
