@@ -102,9 +102,16 @@ void VehiclesHandler::step(double t, double dt)
         }
     }
 
-    // Swap indexes of states info array
-    if (is_new_state)
+    // Save state update flag for this frame update
+    bool update_state = is_new_state;
+    if (update_state)
+    {
+        // Swap indexes of states info array
         std::swap(new_state, unused_state);
+
+        // Reset state update flag
+        is_new_state = false;
+    }
 
     // Interframe coordinate
     double upd_dt = update_pos_data[cur_data].time - update_pos_data[old_data].time;
@@ -140,7 +147,7 @@ void VehiclesHandler::step(double t, double dt)
             vsg::rotate(-vehicles[i].attitude.z, vsg::dvec3(0.0, 0.0, 1.0)) *
             vsg::rotate(vehicles[i].attitude.x, vsg::dvec3(1.0, 0.0, 0.0));
 
-        if (is_new_state)
+        if (update_state)
         {
             vehicles[i].train_id = update_data[new_state].vehicles[i].train_id;
             vehicles[i].orientation = update_data[new_state].vehicles[i].orientation;
@@ -195,9 +202,6 @@ void VehiclesHandler::step(double t, double dt)
         // Model animations step
         vehicles[i].step(static_cast<float>(t), static_cast<float>(dt));
     }
-
-    // Reset state update
-    is_new_state = false;
 }
 
 //------------------------------------------------------------------------------
@@ -454,6 +458,9 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehiclesStateData(QByteArray &data)
 {
+    if (is_new_state)
+        return;
+
     update_data[unused_state].deserialize(data);
     if (update_data[unused_state].vehicles.size() == vehicles.size())
     {

@@ -47,6 +47,7 @@ bool MaterialRgbAnimation::load_config(CfgReader &cfg)
         ss >> emission_color.x >> emission_color.y >> emission_color.z;
     }
 
+    update();
     return true;
 }
 
@@ -60,6 +61,10 @@ float MaterialRgbAnimation::getChannelState(float pos, unsigned char channel)
 
 void MaterialRgbAnimation::update()
 {
+    if (keypoints.empty())
+    {
+        return;
+    }
     pos_r = getChannelState(pos, 0);
     pos_g = getChannelState(pos, 1);
     pos_b = getChannelState(pos, 2);

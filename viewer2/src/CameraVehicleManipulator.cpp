@@ -239,7 +239,7 @@ void CameraVehicleManipulator::calc_view()
 
     vsg::dvec3 view_direction = vsg::rotate(_angle_right, _current_vehicle->up) *
                                 _current_vehicle->orth *
-                                _distance;
+                                (_distance * _current_vehicle->orientation);
     vsg::dvec3 view_right_axis = normalize(vsg::cross(-view_direction, _current_vehicle->up));
     vsg::dmat4 matrix = vsg::translate(_lookAt->center) *
                         vsg::rotate(_angle_up, view_right_axis) *
