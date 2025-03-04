@@ -9,6 +9,7 @@
 #include    "ProcAnimation.h"
 #include    "sound-manager.h"
 #include    "Logger.h"
+#include    "helper.h"
 
 //------------------------------------------------------------------------------
 //
@@ -120,6 +121,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
     load_displays(cfg_path);
 
+    print_node(transform);
     return true;
 }
 
