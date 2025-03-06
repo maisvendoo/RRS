@@ -20,7 +20,7 @@ RouteLoader::RouteLoader(const std::string& route_path)
 
 void RouteLoader::read_description()
 {
-    QString tmp_qstr = (route_path + "\\description.xml").c_str();
+    QString tmp_qstr = (route_path + "/description.xml").c_str();
 
     CfgReader cfg;
     cfg.load(tmp_qstr);
@@ -62,7 +62,7 @@ bool RouteLoader::parse_objects_ref(Route& route)
         if (!model_path.empty()
             && is_slash(model_path.front()))
         {
-            std::replace(model_path.begin(), model_path.end(), '/', '\\');
+            // std::replace(model_path.begin(), model_path.end(), '/', '\\');
             route.object_ref.insert({label, model_path});
         }
     }

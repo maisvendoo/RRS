@@ -68,17 +68,17 @@ int RouteViewer::run()
     while (!isReady())
     {
         QApplication::processEvents();
-    }    
+    }
 
     // Главный цикл рендеринга
     while (viewer->advanceToNextFrame())
     {
-        QApplication::processEvents();                
+        QApplication::processEvents();
 
         viewer->handleEvents();
         viewer->update();
         viewer->recordAndSubmit();
-        viewer->present();        
+        viewer->present();
     }
 
     return 0;
@@ -89,7 +89,7 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char* argv[])
 {
-    FileSystem& fs = FileSystem::getInstance();   
+    FileSystem& fs = FileSystem::getInstance();
 
     loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
     LOG_INFO("Loaded settings from settings.xml");
@@ -649,10 +649,10 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
+    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
-    loadRoute();    
+    loadRoute();
 
     LOG_INFO("Send request for signals data");
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
