@@ -7,6 +7,7 @@
 #include "CameraVehicleManipulator.h"
 #include "CameraCabineManipulator.h"
 #include "CameraFollowManipulator.h"
+#include "ScreenshotWriter.h"
 #include "TrafficLightsHandler.h"
 #include "VehiclesHandler.h"
 
@@ -15,6 +16,7 @@
 //------------------------------------------------------------------------------
 UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
                                          vsg::ref_ptr<vsg::Camera> camera,
+                                         ScreenshotWriter *screenshot_writer,
                                          TrafficLightsHandler *sig_handler,
                                          VehiclesHandler *veh_handler,
                                          settings_t &settings)
@@ -23,6 +25,7 @@ UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandl
     , _keyboard(vsg::Keyboard::create())
     , _upd_server_control(upd_server_control)
     , _camera(camera)
+    , _screenshot_writer(screenshot_writer)
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
 {
@@ -46,11 +49,9 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
         double dt = t - _previousTime;
         _previousTime = t;
 
-        if (_sig_handler)
-            _sig_handler->step(static_cast<float>(t), static_cast<float>(dt));
+        _sig_handler->step(static_cast<float>(t), static_cast<float>(dt));
 
-        if (_vehicles_handler)
-            _vehicles_handler->step(t, dt);
+        _vehicles_handler->step(t, dt);
 
         _current_manipulator->frameEvent(dt);
     }
@@ -66,7 +67,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
     _current_manipulator->keyboardPressEvent(keyPress.keyBase, true);
 
     // Пока не загрузились и не подключились к серверу - только свободная камера
-    if ((!_vehicles_handler) || (!_vehicles_handler->isUpdated()))
+    if (!_vehicles_handler->isUpdated())
     {
         if (keyPress.keyBase == vsg::KEY_F4)
         {
@@ -124,7 +125,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         }
     }
 
-    // Переключение камер по F-клавишам только без Shift и Ctrl
+    // Управеление F-клавишами только без Shift и Ctrl
     if (!isCtrl() && !isShift())
     {
         // F1 - камера из кабины управляемой ПЕ
@@ -202,6 +203,13 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             _current_manipulator = _follow_manipulator;
             _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
             _current_manipulator->returnView(); // Камера слева инициализируется в returnView
+            return;
+        }
+
+        // F12 - скриншот
+        if (keyPress.keyBase == vsg::KEY_F12)
+        {
+            _screenshot_writer->setScreenshot();
             return;
         }
     }

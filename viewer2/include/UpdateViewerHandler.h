@@ -9,6 +9,7 @@ class CameraFreeManipulator;
 class CameraVehicleManipulator;
 class CameraCabineManipulator;
 class CameraFollowManipulator;
+class ScreenshotWriter;
 class TrafficLightsHandler;
 class VehiclesHandler;
 
@@ -20,6 +21,7 @@ class UpdateViewerHandler : public vsg::Inherit<vsg::Visitor, UpdateViewerHandle
 public:
     explicit UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
                                  vsg::ref_ptr<vsg::Camera> camera,
+                                 ScreenshotWriter *screenshot_writer,
                                  TrafficLightsHandler *sig_handler,
                                  VehiclesHandler *veh_handler,
                                  settings_t &settings);
@@ -71,6 +73,7 @@ private:
     CameraVehicleManipulator *_vehicle_manipulator = nullptr;
     CameraCabineManipulator *_cabine_manipulator = nullptr;
     CameraFollowManipulator *_follow_manipulator = nullptr;
+    ScreenshotWriter *_screenshot_writer = nullptr;
     TrafficLightsHandler *_sig_handler = nullptr;
     VehiclesHandler *_vehicles_handler = nullptr;
 };

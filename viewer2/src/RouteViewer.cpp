@@ -5,9 +5,10 @@
 #include "filesystem.h"
 #include "CfgReader.h"
 #include "Logger.h"
-#include "UpdateViewerHandler.h"
-#include "VehiclesHandler.h"
+#include "ScreenshotWriter.h"
 #include "TrafficLightsHandler.h"
+#include "VehiclesHandler.h"
+#include "UpdateViewerHandler.h"
 #include "UpdateSoundManagerHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
@@ -96,6 +97,10 @@ int RouteViewer::run()
 
         viewer->handleEvents();
         viewer->update();
+
+        if (screenshot_writer->isScreeenshot())
+            screenshot_writer->doScreeenshot(window, options);
+
         viewer->recordAndSubmit();
         viewer->present();
 
@@ -147,6 +152,8 @@ bool RouteViewer::init(int argc, char* argv[])
 
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
+
+    screenshot_writer = new ScreenshotWriter("screenshot.png");
 
     traffic_lights_handler = new TrafficLightsHandler();
 
@@ -523,7 +530,8 @@ void RouteViewer::initViewer()
 
     auto ref_upd_control = UpdateControlToServerHandler::create(tcp_client);
     viewer->addEventHandler(ref_upd_control);
-    viewer->addEventHandler(UpdateViewerHandler::create(ref_upd_control, camera, traffic_lights_handler, vehicles_handler, settings));
+    viewer->addEventHandler(UpdateViewerHandler::create(
+        ref_upd_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings));
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
 
@@ -633,13 +641,6 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
-
-    // FileSystem& fs = FileSystem::getInstance();
-    // auto test_node = vsg::read_cast<vsg::Node>(fs.getRouteRootDir() + "/experimental-polygon-gltf/models/floorl.gltf", options);
-    // std::cout << "\n\n\n" << test_node.get() << "\n\n\n";
-
-    // viewer->update();
-    // viewer->compile();
 
     LOG_INFO("Send request for signals data");
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);

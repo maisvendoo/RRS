@@ -17,6 +17,7 @@
 class QByteArray;
 class SoundManager;
 class TcpClient;
+class ScreenshotWriter;
 class TrafficLightsHandler;
 class VehiclesHandler;
 
@@ -91,6 +92,7 @@ private:
 
     TcpClient *tcp_client = nullptr;
     SoundManager *sound_manager = nullptr;
+    ScreenshotWriter *screenshot_writer = nullptr;
     TrafficLightsHandler *traffic_lights_handler = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
 
