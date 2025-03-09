@@ -99,7 +99,7 @@
                     "texCoord": 0
                 }
             },
-            "alphaMode": "MASK"
+            "alphaMode": "BLEND"
         }
     ],
     "meshes": [
