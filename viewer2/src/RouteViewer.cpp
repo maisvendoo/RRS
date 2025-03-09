@@ -438,7 +438,7 @@ void RouteViewer::initLights()
         deviceFeatures->get().samplerAnisotropy = VK_TRUE;
         deviceFeatures->get().depthClamp = VK_TRUE;
 
-    auto numShadowMapsPerLight = 3;
+    auto numShadowMapsPerLight = 1;
     // shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
 
     auto shaderHints = vsg::ShaderCompileSettings::create();
@@ -663,6 +663,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 //------------------------------------------------------------------------------
 void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
+    LOG_INFO("Got signals data from server");
     if (is_signals)
     {
         LOG_WARN("Get signals data again");
@@ -675,7 +676,7 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     */
     traffic_lights_handler->deserialize(sig_data);
 
-    options->sharedObjects = nullptr;
+    // options->sharedObjects = nullptr;
 
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);

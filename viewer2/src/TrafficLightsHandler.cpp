@@ -253,9 +253,14 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
         auto signal_node = vsg::read_cast<vsg::Node>(node_path.toStdString(), options);
 
         if (signal_node)
+        {
             LOG_INFO("Loaded model from file: %s", node_path.toStdString().c_str());
+        }
         else
+        {
             LOG_INFO("Fail to load model from file: %s", node_path.toStdString().c_str());
+            return;
+        }
 
         if (auto* cull_node = signal_node->cast<vsg::CullNode>())
         {
@@ -278,6 +283,9 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
                 }
             }
         }
+
+        print_object(signal_node, 0);
+        std::cout << std::endl;
 
         global_transform->matrix = m1 * m2;
 

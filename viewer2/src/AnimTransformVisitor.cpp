@@ -87,8 +87,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
         {
-            print_object(vsg::ref_ptr(&transform), 0);
-            std::cout << std::endl;
             MaterialAnimationVisitor mav(animations, &cfg);
             transform.accept(mav);
             return nullptr;
