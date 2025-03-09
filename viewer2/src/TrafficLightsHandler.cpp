@@ -179,6 +179,7 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref
 
 void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
 {
+    LOG_INFO("Start loading signal models");
     traffic_light_nodes = vsg::Group::create();
 
     for (auto* tl : traffic_lights_fwd)
@@ -190,6 +191,7 @@ void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref
     {
         loadSignalModel(tl, settings, options, shadowSettings);
     }
+    LOG_INFO("Finished loading signal models");
 
     loaded = true;
 }
@@ -277,9 +279,6 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
             }
         }
 
-        // print_node(signal_node, 0);
-        // std::cout << std::endl;
-
         global_transform->matrix = m1 * m2;
 
         global_transform->addChild(signal_node);
@@ -292,8 +291,10 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
     // auto pagedLOD = vsg::PagedLOD::create();
     // pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-    // pagedLOD->filename = models_path + '/' + tl->getModelName().toStdString() + ".gltf";
+    // pagedLOD->filename = node_path.toStdString();
     // pagedLOD->options = options;
+
+    // traffic_light_nodes->addChild(pagedLOD);
 
     // int sd = tl->getSignalDirection();
 

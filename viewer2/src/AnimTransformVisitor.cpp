@@ -5,10 +5,12 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 #include "filesystem.h"
+#include "helper.h"
 #include <cstring>
 #include <iostream>
 #include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
@@ -85,6 +87,8 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
         {
+            print_object(vsg::ref_ptr(&transform), 0);
+            std::cout << std::endl;
             MaterialAnimationVisitor mav(animations, &cfg);
             transform.accept(mav);
             return nullptr;

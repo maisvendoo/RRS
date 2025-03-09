@@ -12,9 +12,9 @@ class MaterialAnimationVisitor : public vsg::Visitor
 public:
     MaterialAnimationVisitor(animations_t* animations, CfgReader* cfg);
 
-    virtual void apply(vsg::Node& node);
+    void apply(vsg::Node& node) override;
 
-    virtual void apply(vsg::StateGroup& stateGroup);
+    void apply(vsg::StateGroup& stateGroup) override;
 
 private:
     animations_t* animations;
