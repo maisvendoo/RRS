@@ -43,25 +43,27 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
     {
         if (auto* bindDescriptorSet = command->cast<vsg::BindDescriptorSet>())
         {
-            command = bindDescriptorSet->clone()->cast<vsg::BindDescriptorSet>();
-            bindDescriptorSet = command->cast<vsg::BindDescriptorSet>();
+            // command = bindDescriptorSet->clone()->cast<vsg::BindDescriptorSet>();
+            // bindDescriptorSet = command->cast<vsg::BindDescriptorSet>();
 
-            vsg::ref_ptr<vsg::DescriptorSet> descriptorSet(bindDescriptorSet->descriptorSet->clone()->cast<vsg::DescriptorSet>());
-            bindDescriptorSet->descriptorSet = descriptorSet;
+            // vsg::ref_ptr<vsg::DescriptorSet> descriptorSet(bindDescriptorSet->descriptorSet->clone()->cast<vsg::DescriptorSet>());
+            // bindDescriptorSet->descriptorSet = descriptorSet;
 
-            for (auto& descriptor : descriptorSet->descriptors)
+            // for (auto& descriptor : descriptorSet->descriptors)
+            for (auto& descriptor : bindDescriptorSet->descriptorSet->descriptors)
             {
                 if (auto* descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
                 {
-                    descriptor = descriptorBuffer->clone()->cast<vsg::DescriptorBuffer>();
-                    descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>();
+                    // descriptor = descriptorBuffer->clone()->cast<vsg::DescriptorBuffer>();
+                    // descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>();
 
-                    auto material_value = vsg::PbrMaterialValue::create();
+                    vsg::ref_ptr<vsg::PbrMaterialValue> material_value(descriptorBuffer->bufferInfoList[0]->data->cast<vsg::PbrMaterialValue>());
+                    // auto material_value = vsg::PbrMaterialValue::create();
                     material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
 
-                    auto bufferInfo = vsg::BufferInfo::create(material_value);
-                    descriptorBuffer->bufferInfoList.clear();
-                    descriptorBuffer->bufferInfoList.push_back(bufferInfo);
+                    // auto bufferInfo = vsg::BufferInfo::create(material_value);
+                    // descriptorBuffer->bufferInfoList.clear();
+                    // descriptorBuffer->bufferInfoList.push_back(bufferInfo);
 
                     ProcAnimation *animation = new MaterialAnimation(material_value);
                     animation->load(*cfg);
