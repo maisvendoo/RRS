@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QString>
 #include <qassert.h>
+#include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/ShadowSettings.h>
@@ -50,6 +51,8 @@ private:
     std::string animations_dir;
 
     bool loaded = false;
+
+    vsg::CopyOp copy_op;
 
 public slots:
 

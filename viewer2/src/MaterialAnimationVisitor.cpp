@@ -50,6 +50,8 @@ void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
             // bindDescriptorSet->descriptorSet = descriptorSet;
 
             // for (auto& descriptor : descriptorSet->descriptors)
+            // print_object(vsg::ref_ptr<vsg::StateGroup>(&stateGroup));
+            std::cout << std::endl;
             for (auto& descriptor : bindDescriptorSet->descriptorSet->descriptors)
             {
                 if (auto* descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
