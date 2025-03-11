@@ -1,13 +1,20 @@
 #ifndef ANIM_TRANSFORM_VISITOR_H
 #define ANIM_TRANSFORM_VISITOR_H
 
-#include "ProcAnimation.h"
 #include "animations-list.h"
+#include "ProcAnimation.h"
 
 #include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/nodes/MatrixTransform.h>
-#include <vsg/nodes/Transform.h>
+#include <vsg/nodes/Node.h>
+
+#include <string>
+
+namespace vsg
+{
+    class MatrixTransform;
+}
 
 class AnimTransformVisitor : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
 {
@@ -23,10 +30,10 @@ private:
     std::string vehicle_config;
     vsg::ref_ptr<vsg::Node> main_node;
 
-    ProcAnimation* create_animation(const std::string& name, vsg::MatrixTransform& transform);
+    ProcAnimation* create_animation(const std::string& name, vsg::ref_ptr<vsg::MatrixTransform> transform);
 
     // TODO: change name
-    void copy_nodes();
+    void copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transform);
 };
 
 #endif // ANIM_TRANSFORM_VISITOR_H

@@ -1,4 +1,3 @@
-#include "helper.h"
 #include    <TrafficLight.h>
 #include    <AnimTransformVisitor.h>
 #include    <algorithm>
@@ -124,7 +123,6 @@ void TrafficLight::load_animations(const std::string& animations_dir)
     {
         animation.second->setPosition(lens_state[animation.first]);
     }
-    print_object(node);
     old_lens_state = lens_state;
 }
 

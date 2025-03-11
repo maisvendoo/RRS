@@ -16,7 +16,6 @@
 #include "sound-manager.h"
 #include "tcp-client.h"
 
-#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -676,8 +675,6 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     */
     traffic_lights_handler->deserialize(sig_data);
 
-    // options->sharedObjects = nullptr;
-
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
@@ -719,7 +716,6 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     QString msg = QString("Загрузка подвижного состава...");
     imguiWidgetsHandler->setLoadingStatus(msg);
     */
-    options->sharedObjects = nullptr;
     vehicles_handler->load(vehicles_info, settings, options);
     /*
     msg = QString("");
