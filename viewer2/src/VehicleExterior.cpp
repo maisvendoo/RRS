@@ -1,5 +1,6 @@
 #include    "VehicleExterior.h"
 
+#include <iostream>
 #include    <vsg/maths/transform.h>
 #include    <vsg/io/read.h>
 

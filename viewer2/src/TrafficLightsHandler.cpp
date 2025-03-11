@@ -171,7 +171,7 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref
     models_path = fs.combinePath(models_path, models_dir);
 
     QDir models(QString(models_path.c_str()));
-    QDirIterator models_files(models.path(), QStringList() <<"*.gltf",QDir::NoDotAndDotDot | QDir::Files);
+    QDirIterator models_files(models.path(), QStringList() << "*.gltf", QDir::NoDotAndDotDot | QDir::Files);
 
     while (models_files.hasNext())
     {
