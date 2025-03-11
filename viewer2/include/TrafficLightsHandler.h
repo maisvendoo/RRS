@@ -52,8 +52,6 @@ private:
 
     bool loaded = false;
 
-    vsg::CopyOp copy_op;
-
 public slots:
 
     void slotUpdateSignal(QByteArray data);

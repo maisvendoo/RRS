@@ -15,6 +15,7 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/io/read.h>
 #include <vsg/lighting/PointLight.h>
 #include <vsg/lighting/SpotLight.h>
@@ -37,7 +38,7 @@
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
     : QObject(parent)
 {
-    copy_op.duplicate = new vsg::Duplicate;
+    // copy_op.duplicate = new vsg::Duplicate;
 }
 
 // TODO: remove duplication
@@ -239,88 +240,78 @@ void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
 
 void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
 {
+    static std::map<std::string, vsg::ref_ptr<vsg::Node>> loaded_nodes;
+
     std::string node_path = signal_nodes_paths.value(tl->getModelName(), "").toStdString();
-
-    if (!node_path.empty())
+    if (node_path.empty())
     {
-        auto global_transform = vsg::MatrixTransform::create();
+        return;
+    }
 
-        vsg::dmat4 m1 = vsg::translate(tl->getPosition());
 
-        vsg::dvec3 o(tl->getOrth());
-        vsg::dvec3 r(tl->getRight());
-        vsg::dvec3 u(tl->getUp());
+    vsg::dmat4 m1 = vsg::translate(tl->getPosition());
 
-        vsg::dmat4 m2(r.x,  -o.x,  u.x,  0,
-                     -r.y,   o.y,  u.y,  0,
-                      r.z,   o.z,  u.z,  0,
-                        0,     0,    0,  1);
+    vsg::dvec3 o(tl->getOrth());
+    vsg::dvec3 r(tl->getRight());
+    vsg::dvec3 u(tl->getUp());
 
-        auto signal_node = vsg::read_cast<vsg::Node>(node_path, options);
+    vsg::dmat4 m2(r.x,  -o.x,  u.x,  0,
+        -r.y,   o.y,  u.y,  0,
+        r.z,   o.z,  u.z,  0,
+        0,     0,    0,  1);
 
-        if (signal_node)
+    auto global_transform = vsg::MatrixTransform::create();
+    global_transform->matrix = m1 * m2;
+
+    vsg::ref_ptr<vsg::Node> signal_node;
+    if (loaded_nodes.count(node_path))
+    {
+        signal_node = loaded_nodes[node_path];
+    }
+    else
+    {
+        signal_node = vsg::read_cast<vsg::Node>(node_path, options);
+        loaded_nodes.emplace(node_path, signal_node);
+        if (!signal_node)
         {
-            LOG_INFO("Loaded model from file: %s", node_path.c_str());
-        }
-        else
-        {
-            LOG_INFO("Fail to load model from file: %s", node_path.c_str());
+            LOG_INFO("Failed to load model from %s", node_path.c_str());
             return;
         }
 
-        auto& m = copy_op.duplicate->duplicates;
-
-        if (auto* cull_node = signal_node->cast<vsg::CullNode>())
+        if (auto cull_node = vsg::ref_ptr(signal_node->cast<vsg::CullNode>()))
         {
-            if (auto* outer_transform = cull_node->child->cast<vsg::MatrixTransform>())
+            if (auto outer_transform = vsg::ref_ptr(cull_node->child->cast<vsg::MatrixTransform>()))
             {
-                if (auto* old_group = outer_transform->children[0]->cast<vsg::Group>())
+                if (auto old_outer_group = vsg::ref_ptr(outer_transform->children[0]->cast<vsg::Group>()))
                 {
-                    if (!copy_op.duplicate->contains(signal_node))
+                    auto new_outer_group = vsg::Group::create();
+
+                    for (auto& child : old_outer_group->children)
                     {
-                        auto new_group = vsg::Group::create();
+                        std::string name;
+                        child->getValue("name", name);
 
-                        for (auto& child : old_group->children)
-                        {
-                            std::string name;
-                            child->getValue("name", name);
-                            auto transform = vsg::MatrixTransform::create();
-                            transform->setValue("name", name);
-                            transform->addChild(child);
-                            new_group->addChild(transform);
-
-                            vsg::ref_ptr<vsg::Group> group(child->cast<vsg::Group>());
-                            if (auto* stateGroup = group->children[0]->cast<vsg::StateGroup>())
-                            {
-                                copy_op.duplicate->insert(child->cast<vsg::Group>()->children[0]);
-                            }
-
-                            copy_op.duplicate->insert(child);
-                            copy_op.duplicate->insert(transform);
-                        }
-                        outer_transform->children[0] = new_group;
-
-                        copy_op.duplicate->insert(signal_node);
-                        copy_op.duplicate->insert(outer_transform);
-                        copy_op.duplicate->insert(new_group);
+                        auto transform = vsg::MatrixTransform::create();
+                        transform->setValue("name", name);
+                        transform->addChild(child);
+                        new_outer_group->addChild(transform);
                     }
+
+                    outer_transform->children[0] = new_outer_group;
                 }
             }
         }
-
-        signal_node = signal_node->clone(copy_op)->cast<vsg::Node>();
-
-        print_object(signal_node);
-
-        global_transform->matrix = m1 * m2;
-
-        global_transform->addChild(signal_node);
-        tl->setNode(signal_node);
-
-        tl->load_animations(animations_dir);
-
-        traffic_light_nodes->addChild(global_transform);
     }
+
+    global_transform->addChild(signal_node);
+    tl->setNode(global_transform);
+
+    tl->load_animations(animations_dir);
+
+    traffic_light_nodes->addChild(global_transform);
+
+    // print_object(global_transform);
+    // std::cout << std::endl;
 
     // auto pagedLOD = vsg::PagedLOD::create();
     // pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);

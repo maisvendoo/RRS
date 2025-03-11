@@ -45,7 +45,7 @@ inline void print_object(vsg::ref_ptr<vsg::Object> object, int indentation = 0)
     {
         for (auto& state : bind_graphics_pipeline->pipeline->pipelineStates)
         {
-            print_object(state, indentation + 1);
+            // print_object(state, indentation + 1);
         }
     }
     else if (auto* bind_descriptor_set = object->cast<vsg::BindDescriptorSet>())

@@ -1,6 +1,7 @@
 #include "MaterialAnimation.h"
 #include "CfgReader.h"
 #include "ProcAnimation.h"
+#include <iostream>
 #include <sstream>
 #include <vsg/maths/vec4.h>
 
@@ -54,10 +55,24 @@ bool MaterialAnimation::load_config(CfgReader &cfg)
         ss >> color.x >> color.y >> color.z;
     }
 
+    static int i = 0;
+    ++i;
+    if (i % 2 == 1)
+    {
+        material_value->value().baseColorFactor = vsg::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    }
+    else
+    {
+        material_value->value().baseColorFactor = vsg::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    }
+
+    // material_value->value().baseColorFactor = color;
+    material_value->dirty();
+    // material_value->value().emissiveFactor = emission_color;
     // material.baseColorFactor = color;
     // material.emissiveFactor = emission_color;
 
-    update();
+    // update();
     return true;
 }
 

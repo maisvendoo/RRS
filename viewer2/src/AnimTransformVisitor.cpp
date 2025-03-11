@@ -16,9 +16,10 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/StateGroup.h>
 
-AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config)
+AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config, vsg::ref_ptr<vsg::Node> main_node)
     : animations(animations)
     , vehicle_config(vehicle_config)
+    , main_node(main_node)
 {
 }
 
@@ -71,6 +72,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
         {
+            copy_nodes();
             animation = new AnalogRotation(&transform);
             animation->load(cfg);
             return animation;
@@ -79,6 +81,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("AnalogTranslation");
         if (!config_section.isNull())
         {
+            copy_nodes();
             animation = new AnalogTranslation(&transform);
             animation->load(cfg);
             return animation;
@@ -87,7 +90,8 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
         {
-            MaterialAnimationVisitor mav(animations, &cfg);
+            copy_nodes();
+            MaterialAnimationVisitor mav(animations, &cfg, main_node);
             transform.accept(mav);
             return nullptr;
         }
@@ -95,9 +99,31 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("MaterialRGBAnimation");
         if (!config_section.isNull())
         {
+            copy_nodes();
             return nullptr;
         }
     }
 
     return nullptr;
+}
+
+void AnimTransformVisitor::copy_nodes()
+{
+    if (auto global_transform = vsg::ref_ptr(main_node->cast<vsg::MatrixTransform>()))
+    {
+        if (auto cull_node = vsg::ref_ptr(global_transform->children[0]->clone()->cast<vsg::CullNode>()))
+        {
+            global_transform->children[0] = cull_node;
+            if (auto outer_transform = vsg::ref_ptr(cull_node->child->clone()->cast<vsg::MatrixTransform>()))
+            {
+                cull_node->child = outer_transform;
+                if (auto outer_group = vsg::ref_ptr(outer_transform->children[0]->clone()->cast<vsg::Group>()))
+                {
+                    outer_transform->children[0] = outer_group;
+
+                    main_node = outer_group;
+                }
+            }
+        }
+    }
 }

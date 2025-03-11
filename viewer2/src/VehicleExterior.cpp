@@ -153,8 +153,8 @@ vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string 
 void VehicleExterior::load_animations(const std::string& animations_dir)
 {
     int old_size = animations.size();
-    AnimTransformVisitor atv(&animations, animations_dir);
-    transform->accept(atv);
+    // AnimTransformVisitor atv(&animations, animations_dir);
+    // transform->accept(atv);
     LOG_INFO("Loaded %u custom animations", animations.size() - old_size);
 }
 

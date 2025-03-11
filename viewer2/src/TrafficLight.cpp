@@ -1,3 +1,4 @@
+#include "helper.h"
 #include    <TrafficLight.h>
 #include    <AnimTransformVisitor.h>
 #include    <algorithm>
@@ -117,12 +118,13 @@ void TrafficLight::setNode(vsg::ref_ptr<vsg::Node> node)
 //------------------------------------------------------------------------------
 void TrafficLight::load_animations(const std::string& animations_dir)
 {
-    AnimTransformVisitor atv(&animations, animations_dir);
+    AnimTransformVisitor atv(&animations, animations_dir, node);
     node->accept(atv);
     for (auto animation : animations)
     {
         animation.second->setPosition(lens_state[animation.first]);
     }
+    print_object(node);
     old_lens_state = lens_state;
 }
 
