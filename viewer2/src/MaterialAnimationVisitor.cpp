@@ -60,6 +60,8 @@ void MaterialAnimationVisitor::apply(vsg::MatrixTransform& transform)
                             descriptor = descriptor_buffer;
 
                             auto material = vsg::ref_ptr(descriptor_buffer->bufferInfoList[0]->data->clone()->cast<vsg::PbrMaterialValue>());
+                            material->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
+
                             auto buffer_info = vsg::BufferInfo::create(material);
                             descriptor_buffer->bufferInfoList = {buffer_info};
 
