@@ -222,7 +222,7 @@
 		},
 		{
 			"mesh":27,
-			"name":"Scene Root_GV_GV-GEODE_02 - Default_0"
+			"name":"GV"
 		},
 		{
 			"mesh":28,
@@ -470,27 +470,27 @@
 		},
 		{
 			"mesh":89,
-			"name":"Scene Root_Wheel-1_Wheel-1-GEODE_02 - Default_0"
+			"name":"Wheel-1"
 		},
 		{
 			"mesh":90,
-			"name":"Scene Root_Wheel-2_Wheel-2-GEODE_02 - Default_0"
+			"name":"Wheel-2"
 		},
 		{
 			"mesh":91,
-			"name":"Scene Root_Wheel-3_Wheel-3-GEODE_02 - Default_0"
+			"name":"Wheel-3"
 		},
 		{
 			"mesh":92,
-			"name":"Scene Root_Wheel-4_Wheel-4-GEODE_02 - Default_0"
+			"name":"Wheel-4"
 		},
 		{
 			"mesh":93,
-			"name":"Scene Root_Wheel-5_Wheel-5-GEODE_02 - Default_0"
+			"name":"Wheel-5"
 		},
 		{
 			"mesh":94,
-			"name":"Scene Root_Wheel-6_Wheel-6-GEODE_02 - Default_0"
+			"name":"Wheel-6"
 		},
 		{
 			"mesh":95,

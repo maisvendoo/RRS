@@ -43,7 +43,7 @@ struct settings_t
     double pitch_min = -70.0;   ///< Vertical angle down max
     double pitch_max = 70.0;    ///< Vertical angle up max
 
-    vsg::dvec3 free_cam_init_pos = {2.5, 0.0, 1.75};///< Free camera initial position
+    vsg::dvec3 free_cam_init_pos = {2.5, 1750.0, 3.75};///< Free camera initial position
     double free_cam_speed_keyboard = 5.0;           ///< Free camera initial speed
     double free_cam_speed_mouse = 5.0;              ///< Free camera initial speed
     double free_cam_speed_coeff = sqrt(2.0);        ///< Free camera speed coeff
