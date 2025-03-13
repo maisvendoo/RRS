@@ -225,7 +225,7 @@ float getLength(const std::string &configDir, const std::string &configName)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-osg::Vec3 getDirverPosition(const std::string &configDir, const std::string &configName)
+osg::Vec3 getDriverPosition(const std::string &configDir, const std::string &configName)
 {
     osg::Vec3 position(0.9255f, 9.0172f, 3.75f);
 

@@ -345,7 +345,7 @@ void TrainExteriorHandler::load(const simulator_vehicles_info_t &info_data)
         osg::ref_ptr<osg::Node> cabine;
         loadCabine(vehicle_model.get(), cfg_dir, cfg_file, cabine);
 
-        osg::Vec3 driver_pos = getDirverPosition(cfg_dir, cfg_file);
+        osg::Vec3 driver_pos = getDriverPosition(cfg_dir, cfg_file);
 
         vehicle_exterior_t vehicle_ext = vehicle_exterior_t();
         vehicle_ext.transform->addChild(vehicle_model.get());
@@ -795,6 +795,8 @@ void TrainExteriorHandler::loadModelAnimations(const std::string &configDir,
         for (auto child_ref_ptr : rootNode->children)
         {
             osgDB::XmlNode  *child = child_ref_ptr.get();
+
+            // qDebug() << child->name << animation_name;
 
             if (child->name == "ModelAnimation")
             {

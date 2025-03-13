@@ -40,7 +40,7 @@ target_include_directories (${TARGET} PRIVATE ../route-loader/include)
 target_include_directories (${TARGET} PRIVATE ../library/include)
 target_include_directories (${TARGET} PRIVATE ../display/include)
 
-target_include_directories (${TARGET} PRIVATE ../sound-manager/include)
+target_include_directories (${TARGET} PRIVATE ../../sound-manager/include)
 target_include_directories (${TARGET} PRIVATE ../../asound/include)
 
 target_include_directories (${TARGET} PRIVATE ../imgui/include)
