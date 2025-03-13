@@ -12,6 +12,7 @@
 		<WheelInertia>100.0</WheelInertia>
 
 		<ExtModelName>FrWag_hopper_1/Fr_hopper-1.osgt</ExtModelName>
+		<!-- <ExtModelName>FrWag_hopper_1/Fr_hopper-1.gltf</ExtModelName> -->
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 
 		<BrakepipeLeak>3e-6</BrakepipeLeak>
