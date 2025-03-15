@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<ControlPanel>
-		<Allow>1</Allow>
+		<Allow>0</Allow>
 		<Plugin>freejoy</Plugin>
 		<ConfigDir>devices/freejoy</ConfigDir>
 		<RequestInterval>10</RequestInterval>
