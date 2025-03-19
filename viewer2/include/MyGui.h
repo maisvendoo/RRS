@@ -6,6 +6,7 @@
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
+#include <vsg/nodes/Group.h>
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/vk/Context.h>
 
@@ -13,6 +14,7 @@ struct Params : public vsg::Inherit<vsg::Object, Params>
 {
     bool showGui = true;
     bool showDemoWindow = false;
+    vsg::Group::Children route_models;
 };
 
 class MyGui : public vsg::Inherit<vsg::Command, MyGui>

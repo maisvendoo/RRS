@@ -1,5 +1,6 @@
 #include "MyGui.h"
 
+#include <vsg/nodes/PagedLOD.h>
 #include <vsgImGui/imgui.h>
 
 #include <vsg/commands/Command.h>
@@ -24,8 +25,41 @@ void MyGui::record(vsg::CommandBuffer& cb) const
 {
     if (params->showGui)
     {
-        ImGui::Begin("Parameters");
-        ImGui::Text("Test text");
-        ImGui::End();
+        if (ImGui::Begin("Statistics"))
+        {
+            // if (ImGui::TreeNode("Route PagedLODs"))
+            // {
+            //     if (params->route_models.empty())
+            //     {
+            //         ImGui::Text("Empty");
+            //     }
+            //     else
+            //     {
+            //         if (ImGui::BeginTable("PagedLODs", 2))
+            //         {
+            //             for (const auto node : params->route_models)
+            //             {
+            //                 vsg::ref_ptr<vsg::PagedLOD> pagedLod = vsg::ref_ptr(node->cast<vsg::PagedLOD>());
+            //                 ImGui::TableNextRow();
+            //                 ImGui::TableNextColumn();
+            //                 ImGui::Text("%s", pagedLod->filename.c_str());
+            //                 ImGui::TableNextColumn();
+            //                 // ImGui::Text("%s", std::to_string(pagedLod->requestStatus).c_str());
+            //             }
+
+            //             ImGui::EndTable();
+            //         }
+            //     }
+
+            //     ImGui::TreePop();
+            // }
+
+            ImGui::End();
+        }
+    }
+
+    if (params->showDemoWindow)
+    {
+        ImGui::ShowDemoWindow();
     }
 }

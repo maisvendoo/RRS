@@ -25,7 +25,6 @@
 
 #include <QApplication>
 
-//#include <vsg/all.h>
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>
@@ -414,14 +413,17 @@ void RouteViewer::initCamera()
     double windowHeight = static_cast<double>(window->extent2D().height);
     double aspectRatio = windowWidth / windowHeight;
 
-    auto perspective = vsg::Perspective::create(settings.fovy, aspectRatio, settings.zNear, settings.zFar);
+    auto perspective = vsg::Perspective::create(settings.fovy,
+        aspectRatio, settings.zNear, settings.zFar);
 
     vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
     vsg::dvec3 eye = route_start_point + settings.free_cam_init_pos;
     vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
+
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
 
-    camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
+    camera = vsg::Camera::create(perspective, lookAt,
+        vsg::ViewportState::create(window->extent2D()));
 }
 
 //------------------------------------------------------------------------------
@@ -438,8 +440,8 @@ void RouteViewer::initScenegraph()
 void RouteViewer::initLights()
 {
     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
-        deviceFeatures->get().samplerAnisotropy = VK_TRUE;
-        deviceFeatures->get().depthClamp = VK_TRUE;
+    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+    deviceFeatures->get().depthClamp = VK_TRUE;
 
     auto numShadowMapsPerLight = 1;
     // shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
@@ -511,7 +513,7 @@ void RouteViewer::initView()
     view->addChild(root);
     auto renderGraph = vsg::RenderGraph::create(window, view);
 
-    auto params = Params::create();
+    params = Params::create();
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(params, options));
     renderGraph->addChild(renderImGui);
 
@@ -614,6 +616,8 @@ bool RouteViewer::loadRoute()
 
         root->addChild(matrix);
     }
+
+    params->route_models = root->children;
 
     viewer->update();
     viewer->compile();
