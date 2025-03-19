@@ -21,7 +21,7 @@ set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
 find_package(Qt6 COMPONENTS Widgets Xml REQUIRED)
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
-# find_package(vsgImGui REQUIRED)
+find_package(vsgImGui REQUIRED)
 # find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets REQUIRED)
 # find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
 # find_package(vsgQt REQUIRED)
@@ -44,7 +44,7 @@ target_link_libraries(${TARGET} PRIVATE
     Qt6::Xml
     vsg::vsg
     vsgXchange::vsgXchange
-    # vsgImGui::vsgImGui
+    vsgImGui::vsgImGui
     # vsgQt::vsgQt
     filesystem
     CfgReader
