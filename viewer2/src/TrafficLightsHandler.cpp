@@ -1,11 +1,10 @@
 #include "TrafficLightsHandler.h"
 #include "CfgReader.h"
 #include "Logger.h"
+#include "MyGui.h"
 #include "TrafficLight.h"
 #include "filesystem.h"
 #include <cstdint>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <qbuffer.h>
 #include <qdiriterator.h>
@@ -32,7 +31,6 @@
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/utils/Builder.h>
-#include "helper.h"
 
 
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
@@ -305,6 +303,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
     global_transform->addChild(signal_node);
     tl->setNode(global_transform);
+    Params::nodes.emplace_back(global_transform);
 
     tl->load_animations(animations_dir);
 

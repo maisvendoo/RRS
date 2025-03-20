@@ -74,6 +74,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
         model->matrix = vsg::translate(shift);
     }
 
+    model->setValue("name", "model");
     transform->addChild(model);
 
     // Reading data about cabine's 3D-model and texture
@@ -98,8 +99,14 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
                 cabine->matrix = vsg::translate(shift);
             }
 
+            cabine->setValue("name", "cabine");
             transform->addChild(cabine);
+            transform->setValue("name", "model + cabine");
         }
+    }
+    else
+    {
+        transform->setValue("name", "only model");
     }
 
     Params::nodes.emplace_back(transform);
@@ -157,8 +164,8 @@ vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string 
 void VehicleExterior::load_animations(const std::string& animations_dir)
 {
     int old_size = animations.size();
-    // AnimTransformVisitor atv(&animations, animations_dir);
-    // transform->accept(atv);
+    AnimTransformVisitor atv(&animations, animations_dir, transform);
+    transform->accept(atv);
     LOG_INFO("Loaded %u custom animations", animations.size() - old_size);
 }
 
