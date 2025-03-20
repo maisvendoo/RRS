@@ -26,6 +26,9 @@ find_package(vsgImGui REQUIRED)
 # find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
 # find_package(vsgQt REQUIRED)
 
+set(FONT_PATH ${PROJECT_SOURCE_DIR}/JetBrainsMono-Regular.ttf)
+configure_file(${PROJECT_SOURCE_DIR}/cmake_defines.h.in ${PROJECT_SOURCE_DIR}/include/cmake_defines.h)
+
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 #file(GLOB PUGIXML_SOURCES ./dependencies/pugixml/src/*.cpp)
 

@@ -4,6 +4,7 @@
 #include    <vsg/maths/transform.h>
 #include    <vsg/io/read.h>
 
+#include "MyGui.h"
 #include    "filesystem.h"
 #include    "CfgReader.h"
 #include    "AnimTransformVisitor.h"
@@ -100,6 +101,8 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
             transform->addChild(cabine);
         }
     }
+
+    Params::nodes.emplace_back(transform);
 
     modelShift = "";
     if (cfg.getString(sec_name, "DriverPos", modelShift))

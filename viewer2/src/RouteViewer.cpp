@@ -1,5 +1,6 @@
 #include "RouteViewer.h"
 
+#include "cmake_defines.h"
 #include "MyGui.h"
 #include "cmd-line.h"
 #include "CLI11.hpp"
@@ -37,6 +38,7 @@
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/ShaderSet.h>
 
+#include <vsgImGui/imgui.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 
@@ -616,8 +618,6 @@ bool RouteViewer::loadRoute()
 
         root->addChild(matrix);
     }
-
-    params->route_models = root->children;
 
     viewer->update();
     viewer->compile();

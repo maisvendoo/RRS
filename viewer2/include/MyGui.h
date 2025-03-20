@@ -5,16 +5,24 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/io/Options.h>
-#include <vsg/nodes/Group.h>
-#include <vsg/vk/CommandBuffer.h>
-#include <vsg/vk/Context.h>
+
+#include <vector>
+
+namespace vsg
+{
+    class CommandBuffer;
+    class Context;
+    class Node;
+    class Options;
+};
 
 struct Params : public vsg::Inherit<vsg::Object, Params>
 {
-    bool showGui = true;
-    bool showDemoWindow = false;
-    vsg::Group::Children route_models;
+    Params();
+
+    bool showGui;
+    bool showDemoWindow;
+    static std::vector<vsg::ref_ptr<vsg::Node>> nodes;
 };
 
 class MyGui : public vsg::Inherit<vsg::Command, MyGui>
@@ -27,6 +35,9 @@ public:
     void compile(vsg::Context& context) override;
 
     void record(vsg::CommandBuffer& cb) const override;
+
+private:
+    void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 };
 
 #endif // MY_GUI_H
