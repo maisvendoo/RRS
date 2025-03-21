@@ -47,6 +47,15 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
         return;
     }
 
+    if (name == "vehicle")
+    {
+        main_node = transform_ptr;
+    }
+    else if (name == "cabine")
+    {
+        main_node = transform_ptr;
+    }
+
     ProcAnimation* animation = create_animation(name, transform_ptr);
     if (animation)
     {

@@ -67,7 +67,9 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
 
     if (!model)
+    {
         return false;
+    }
 
     if (cfg.getString(sec_name, "ModelShift", modelShift))
     {
@@ -76,7 +78,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
         model->matrix = vsg::translate(shift);
     }
 
-    model->setValue("name", "model");
+    model->setValue("name", "vehicle");
     transform->addChild(model);
 
     // Reading data about cabine's 3D-model and texture
@@ -103,12 +105,12 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 
             cabine->setValue("name", "cabine");
             transform->addChild(cabine);
-            transform->setValue("name", "model + cabine");
+            transform->setValue("name", "vehicle + cabine");
         }
     }
     else
     {
-        transform->setValue("name", "only model");
+        transform->setValue("name", "only vehicle");
     }
 
     Params::nodes.emplace_back(transform);
