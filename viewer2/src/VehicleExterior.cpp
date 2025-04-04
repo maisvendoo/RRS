@@ -113,7 +113,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
         transform->setValue("name", "only vehicle");
     }
 
-    Params::nodes.emplace_back(transform);
+    // Params::nodes.emplace_back(transform);
 
     modelShift = "";
     if (cfg.getString(sec_name, "DriverPos", modelShift))

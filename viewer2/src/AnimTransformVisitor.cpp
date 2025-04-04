@@ -134,8 +134,9 @@ void AnimTransformVisitor::copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transf
                 {
                     outer_transform->children = {outer_group};
                     auto transform_it = std::find(outer_group->children.begin(), outer_group->children.end(), transform);
-                    transform = vsg::ref_ptr(transform->clone()->cast<vsg::MatrixTransform>());
-                    *transform_it = transform;
+                    auto new_transform = vsg::ref_ptr(transform->clone()->cast<vsg::MatrixTransform>());
+                    outer_group->children.erase(transform_it);
+                    outer_group->children.emplace_back(new_transform);
                 }
             }
         }

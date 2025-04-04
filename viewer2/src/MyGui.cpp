@@ -63,6 +63,11 @@ void MyGui::record(vsg::CommandBuffer& cb) const
 
 void MyGui::printObject(const vsg::ref_ptr<vsg::Object>& object) const
 {
+    if (!object)
+    {
+        return;
+    }
+
     std::string name;
     object->getValue("name", name);
     if (name.empty())
