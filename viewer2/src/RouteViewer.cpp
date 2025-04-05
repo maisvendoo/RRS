@@ -1,7 +1,6 @@
 #include "RouteViewer.h"
 
 #include "cmake_defines.h"
-#include "MyGui.h"
 #include "cmd-line.h"
 #include "CLI11.hpp"
 #include "filesystem.h"
@@ -532,8 +531,8 @@ void RouteViewer::initView()
     view->addChild(root);
     auto renderGraph = vsg::RenderGraph::create(window, view);
 
-    params = Params::create();
-    auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(params, options));
+    GUIparams = GUIParams::create();
+    auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
 
     commandGraph = vsg::CommandGraph::create(window, renderGraph);
@@ -553,6 +552,9 @@ void RouteViewer::initCommandGraph()
 void RouteViewer::initViewer()
 {
     viewer = vsg::Viewer::create();
+    GUIparams->viewer = viewer;
+    GUIparams->vehicles_handler = vehicles_handler;
+
     viewer->addWindow(window);
 
     auto ref_upd_control = UpdateControlToServerHandler::create(tcp_client);
@@ -560,7 +562,6 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(UpdateViewerHandler::create(
         ref_upd_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings));
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
-    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);

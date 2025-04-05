@@ -66,6 +66,14 @@ bool VehiclesHandler::isUpdated()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QString VehiclesHandler::getDebugMsg()
+{
+    return debug_msg;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehiclesHandler::step(double t, double dt)
 {
     ref_time = t;
@@ -485,5 +493,73 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray &data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehicleControlled(QByteArray &data)
 {
-// deserialize and update debug interface here?
+    if (!is_pos_updated || !is_state_updated)
+        return;
+
+    vehicle_controlled.deserialize(data);
+    if ((vehicle_controlled.controlled_vehicle >= 0) &&
+        (vehicle_controlled.controlled_vehicle < vehicles.size()) &&
+        (vehicle_controlled.current_vehicle >= 0) &&
+        (vehicle_controlled.current_vehicle < vehicles.size()))
+    {
+        updateDebugString();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::updateDebugString()
+{
+    int seconds = static_cast<int>(std::floor(update_pos_data[new_data].time));
+    int hours = seconds / 3600;
+    int minutes = seconds / 60 % 60;
+    seconds = seconds % 60;
+    debug_msg = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
+                        .arg(update_pos_data[new_data].time, 8, 'f', 1)
+                        .arg(hours, 2)
+                        .arg(minutes, 2)
+                        .arg(seconds, 2);
+
+    int curr = vehicle_controlled.current_vehicle;
+    if (curr >= 0)
+    {
+        int curr_train = update_data[new_state].vehicles[curr].train_id;
+        debug_msg += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+                        .arg(curr, 3)
+                        .arg(curr_train, 3)
+                        .arg(update_pos_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
+
+        debug_msg += vehicle_controlled.currentDebugMsg + QString("\n");
+    }
+    else
+    {
+        debug_msg += QString("\n\n");
+    }
+
+    int control = vehicle_controlled.controlled_vehicle;
+    if (control >= 0)
+    {
+        int control_train = update_data[new_state].vehicles[control].train_id;
+        debug_msg += QString("Управляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+                        .arg(control, 3)
+                        .arg(control_train, 3)
+                        .arg(update_pos_data[new_data].vehicles[control].position_x, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[control].position_y, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[control].position_z, 8, 'f', 1)
+                        .arg(update_pos_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
+                        .arg(update_pos_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
+
+        debug_msg += vehicle_controlled.controlledDebugMsg;
+    }
+    else
+    {
+        debug_msg += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
+    }
 }

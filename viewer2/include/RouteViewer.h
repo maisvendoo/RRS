@@ -22,12 +22,6 @@ class ScreenshotWriter;
 class TrafficLightsHandler;
 class VehiclesHandler;
 
-namespace vsg
-{
-    class Group;
-    class Viewer;
-}
-
 class RouteViewer : public QObject
 {
     Q_OBJECT
@@ -87,7 +81,7 @@ private:
 
     settings_t settings = settings_t();
 
-    vsg::ref_ptr<Params> params = nullptr;
+    vsg::ref_ptr<GUIParams> GUIparams = nullptr;
 
     TcpClient *tcp_client = nullptr;
     SoundManager *sound_manager = nullptr;

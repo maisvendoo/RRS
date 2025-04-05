@@ -33,6 +33,8 @@ public:
 
     bool isUpdated();
 
+    QString getDebugMsg();
+
     void step(double t, double dt);
 
     bool selectNextTrain();
@@ -49,7 +51,7 @@ public slots:
 
     void slotGetVehiclesPosData(QByteArray &data);
     void slotGetVehiclesStateData(QByteArray &data);
-    void slotGetVehicleControlled(QByteArray &data); // do it here?
+    void slotGetVehicleControlled(QByteArray &data);
 
 private:
 
@@ -77,17 +79,25 @@ private:
     short unused_state = 1;
     bool is_new_state = false;
 
+    /// Debug strings for controlled and current vehicles
+    simulator_vehicle_controlled_update_t vehicle_controlled;
+
     /// Vehicle number which is a referenced for camera
     int cur_vehicle = 0;
 
     /// Vehicle number which is contorolled by user
     int controlled_vehicle = 0;
 
+    /// Debug message for current and controlled vehicles from server
+    QString debug_msg = "";
+
     /// Train exterior scene group
     vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
 
     /// Info about vehicles exterior
     std::vector<VehicleExterior> vehicles;
+
+    void updateDebugString();
 };
 
 #endif // VEHICLES_HANDLER_H
