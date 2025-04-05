@@ -206,6 +206,16 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
         cfg.getDouble(secName, "PitchMin", settings.pitch_min);
         cfg.getDouble(secName, "PitchMax", settings.pitch_max);
 
+        // Положение свободной камеры при запуске
+        tmp_qstr = "0.0 0.0 0.0";
+        if (cfg.getString(secName, "FreeCamStart", tmp_qstr))
+        {
+            std::string free_cam_start = tmp_qstr.toStdString();
+            std::istringstream stream(free_cam_start);
+            stream >> settings.free_cam_start.x
+                >> settings.free_cam_start.y
+                >> settings.free_cam_start.z;
+        }
         // Настройки свободной камеры
         tmp_qstr = "0.0 0.0 0.0";
         if (cfg.getString(secName, "FreeCamInitPos", tmp_qstr))
@@ -426,7 +436,7 @@ void RouteViewer::initCamera()
         aspectRatio, settings.zNear, settings.zFar);
 
     vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
-    vsg::dvec3 eye = route_start_point + settings.free_cam_init_pos;
+    vsg::dvec3 eye = route_start_point + settings.free_cam_start;
     vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
 
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
@@ -670,7 +680,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
+    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
@@ -751,18 +761,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     connect(tcp_client, &TcpClient::setVehicleControlled,
             vehicles_handler, &VehiclesHandler::slotGetVehicleControlled, Qt::DirectConnection);
-    /*
-    vehicle_control_by_keyboard.controlled_vehicle = vehicles_handler->getControlledVehicle();
-    vehicle_control_by_keyboard.current_vehicle = vehicles_handler->getCurrentVehicle();
-    vehicle_control_by_keyboard.pressed_keys = keyboard->getPressedKeys();
-    LOG_INFO("Send keyboard control to vehicle %u", vehicle_control_by_keyboard.controlled_vehicle);
-    tcp_client->sendVehicleControl(vehicle_control_by_keyboard.serialize());
-    */
 
-    /*
-    QObject::connect(vehicles_update_handler, &VehiclesUpdateHandler::sendControlledVehicle,
-                     this, &RouteViewer::slotUpdateControlledVehicle);
-    */
     root->addChild(vehicles_handler->getExterior());
 
     viewer->update();
