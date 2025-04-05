@@ -23,17 +23,17 @@ add_definitions(-DDEVICE_LIB)
 # Ищем зависимости Qt6
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 
-if(WIN32)
+# if(WIN32)
     set(SFML_STATIC_LIBRARIES TRUE)
-else()
-    set(SFML_STATIC_LIBRARIES FALSE)
-endif()
+# else()
+    # set(SFML_STATIC_LIBRARIES FALSE)
+# endif()
 
-if (WIN32)
-    find_package(SFML COMPONENTS system window REQUIRED)
-else()
+# if (WIN32)
+    # find_package(SFML COMPONENTS system window REQUIRED)
+# else()
     find_package(SFML COMPONENTS System Window REQUIRED)
-endif()
+# endif()
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")

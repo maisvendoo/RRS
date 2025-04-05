@@ -3,8 +3,8 @@
 #include "MaterialAnimation.h"
 #include "ProcAnimation.h"
 #include "animations-list.h"
-#include "helper.h"
-#include <iostream>
+
+#include <vsg/core/Data.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -37,39 +37,43 @@ void MaterialAnimationVisitor::apply(vsg::Node& node)
     node.traverse(*this);
 }
 
-void MaterialAnimationVisitor::apply(vsg::StateGroup& stateGroup)
+void MaterialAnimationVisitor::apply(vsg::MatrixTransform& transform)
 {
-    for (auto& command : stateGroup.stateCommands)
+    auto transform_ptr = vsg::ref_ptr(&transform);
+
+    if (auto group = vsg::ref_ptr(transform_ptr->children[0]->clone()->cast<vsg::Group>()))
     {
-        if (auto* bindDescriptorSet = command->cast<vsg::BindDescriptorSet>())
+        transform_ptr->children = {group};
+        if (auto state_group = vsg::ref_ptr(group->children[0]->clone()->cast<vsg::StateGroup>()))
         {
-            command = bindDescriptorSet->clone()->cast<vsg::BindDescriptorSet>();
-            bindDescriptorSet = command->cast<vsg::BindDescriptorSet>();
-
-            vsg::ref_ptr<vsg::DescriptorSet> descriptorSet(bindDescriptorSet->descriptorSet->clone()->cast<vsg::DescriptorSet>());
-            bindDescriptorSet->descriptorSet = descriptorSet;
-
-            for (auto& descriptor : descriptorSet->descriptors)
+            group->children = {state_group};
+            for (auto& commands : state_group->stateCommands)
             {
-                if (auto* descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>())
+                if (auto bind_descriptor_set = vsg::ref_ptr(commands->clone()->cast<vsg::BindDescriptorSet>()))
                 {
-                    descriptor = descriptorBuffer->clone()->cast<vsg::DescriptorBuffer>();
-                    descriptorBuffer = descriptor->cast<vsg::DescriptorBuffer>();
+                    commands = bind_descriptor_set;
+                    bind_descriptor_set->descriptorSet = vsg::ref_ptr(bind_descriptor_set->descriptorSet->clone()->cast<vsg::DescriptorSet>());
+                    for (auto& descriptor : bind_descriptor_set->descriptorSet->descriptors)
+                    {
+                        if (auto descriptor_buffer = vsg::ref_ptr(descriptor->clone()->cast<vsg::DescriptorBuffer>()))
+                        {
+                            descriptor = descriptor_buffer;
 
-                    auto material_value = vsg::PbrMaterialValue::create();
-                    material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
+                            auto material = vsg::ref_ptr(descriptor_buffer->bufferInfoList[0]->data->clone()->cast<vsg::PbrMaterialValue>());
+                            material->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
 
-                    auto bufferInfo = vsg::BufferInfo::create(material_value);
-                    descriptorBuffer->bufferInfoList.clear();
-                    descriptorBuffer->bufferInfoList.push_back(bufferInfo);
+                            auto buffer_info = vsg::BufferInfo::create(material);
+                            descriptor_buffer->bufferInfoList = {buffer_info};
 
-                    ProcAnimation *animation = new MaterialAnimation(material_value);
-                    animation->load(*cfg);
-                    animations->insert({animation->getSignalID(), animation});
+                            ProcAnimation *animation = new MaterialAnimation(material);
+                            animation->load(*cfg);
+                            animations->insert({animation->getSignalID(), animation});
+                        }
+                    }
                 }
             }
         }
     }
-    // print_node(vsg::ref_ptr(&stateGroup), 0);
-    stateGroup.traverse(*this);
+
+    transform.traverse(*this);
 }

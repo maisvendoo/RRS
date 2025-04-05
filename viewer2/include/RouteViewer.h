@@ -1,6 +1,7 @@
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 
+#include "MyGui.h"
 #include "settings.h"
 
 #include <vsg/app/CommandGraph.h>
@@ -89,6 +90,8 @@ private:
     bool is_vehicles = false;
 
     settings_t settings = settings_t();
+
+    vsg::ref_ptr<Params> params = nullptr;
 
     TcpClient *tcp_client = nullptr;
     SoundManager *sound_manager = nullptr;

@@ -1,5 +1,7 @@
 #include "RouteViewer.h"
 
+#include "cmake_defines.h"
+#include "MyGui.h"
 #include "cmd-line.h"
 #include "CLI11.hpp"
 #include "filesystem.h"
@@ -17,7 +19,6 @@
 #include "sound-manager.h"
 #include "tcp-client.h"
 
-#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -26,7 +27,6 @@
 
 #include <QApplication>
 
-//#include <vsg/all.h>
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>
@@ -38,6 +38,10 @@
 #include <vsg/state/ViewDependentState.h>
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/ShaderSet.h>
+
+#include <vsgImGui/imgui.h>
+#include <vsgImGui/RenderImGui.h>
+#include <vsgImGui/SendEventsToImGui.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(parent)
 {
@@ -59,41 +63,22 @@ bool RouteViewer::isReady() const
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int RouteViewer::run()
 {
-    auto last_time = std::chrono::system_clock::now();
-
-    while (!is_ready)
+    // Обрабатываем события сетевой подсистемы, дожидаемся загрузки и
+    // инициализации все объектов
+    while (!isReady())
     {
         QApplication::processEvents();
     }
 
+    // Главный цикл рендеринга
     while (viewer->advanceToNextFrame())
     {
         QApplication::processEvents();
-        // constexpr double sideway_distance = 10.0;
-        // constexpr double forward_distance = 150.0;
-        // constexpr double min_z = -10.0;
-        // constexpr double max_z = 100.0;
-        // constexpr double angle = vsg::radians(90.0f);
-        // auto dir = lookAt->center - lookAt->eye;
-        // dir.z = 0.0;
-        // dir = vsg::normalize(dir);
-        // vsg::dvec3 left_sideway_dir;
-        // left_sideway_dir.x = dir.x * std::cos(angle) - dir.y * std::sin(angle);
-        // left_sideway_dir.y = dir.x * std::sin(angle) + dir.y * std::cos(angle);
-        // left_sideway_dir.z = 0.0;
-        // vsg::dvec3 right_sideway_dir = -left_sideway_dir;
-        // auto eye = lookAt->eye;
-        // eye.z = 0.0;
-        // shadow_region->points[0] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        // shadow_region->points[1] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        // shadow_region->points[2] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        // shadow_region->points[3] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, min_z);
-        // shadow_region->points[4] = eye + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        // shadow_region->points[5] = eye + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        // shadow_region->points[6] = eye + dir * forward_distance + right_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);
-        // shadow_region->points[7] = eye + dir * forward_distance + left_sideway_dir * sideway_distance + vsg::dvec3(0.0, 0.0, max_z);        
 
         viewer->handleEvents();
         viewer->update();
@@ -103,26 +88,17 @@ int RouteViewer::run()
 
         viewer->recordAndSubmit();
         viewer->present();
-
-        auto current_time = std::chrono::system_clock::now();
-        auto delta_time = current_time - last_time;
-        last_time = current_time;
-        double delta = std::chrono::duration_cast<std::chrono::milliseconds>(delta_time).count();
-        // LOG_INFO("FPS: %f", 1.0 / delta * 1000.0);
-
-        // LOG_INFO("%f %f %f", lookAt->eye.x, lookAt->eye.y, lookAt->eye.z);
     }
 
     return 0;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char* argv[])
 {
     FileSystem& fs = FileSystem::getInstance();
-
-    // osgDB::DatabasePager *dp = viewer.getDatabasePager();
-    // dp->setDoPreCompile(true);
-    // dp->setTargetMaximumNumberOfPageLOD(1000);
 
     loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
     LOG_INFO("Loaded settings from settings.xml");
@@ -176,6 +152,9 @@ bool RouteViewer::init(int argc, char* argv[])
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadSettings(const std::string& cfg_path)
 {
     CfgReader cfg;
@@ -314,6 +293,9 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
 {
     cmd_line_t cmd_line;
@@ -363,6 +345,9 @@ int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
     return 0;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initVsgOptions()
 {
     options = vsg::Options::create();
@@ -372,6 +357,9 @@ void RouteViewer::initVsgOptions()
     options->add(vsgXchange::all::create());
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initWindowTraits()
 {
     auto samples_bit_flag = [](int s) -> VkSampleCountFlags
@@ -398,6 +386,9 @@ void RouteViewer::initWindowTraits()
     // windowTraits->debugUtils = true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initWindow(bool try_screenNum_exception)
 {
     try
@@ -422,34 +413,46 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initCamera()
 {
     double windowWidth = static_cast<double>(window->extent2D().width);
     double windowHeight = static_cast<double>(window->extent2D().height);
     double aspectRatio = windowWidth / windowHeight;
 
-    auto perspective = vsg::Perspective::create(settings.fovy, aspectRatio, settings.zNear, settings.zFar);
+    auto perspective = vsg::Perspective::create(settings.fovy,
+        aspectRatio, settings.zNear, settings.zFar);
 
     vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
     vsg::dvec3 eye = route_start_point + settings.free_cam_init_pos;
     vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
+
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
 
-    camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
+    camera = vsg::Camera::create(perspective, lookAt,
+        vsg::ViewportState::create(window->extent2D()));
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initScenegraph()
 {
     root = vsg::Group::create();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
-        deviceFeatures->get().samplerAnisotropy = VK_TRUE;
-        deviceFeatures->get().depthClamp = VK_TRUE;
+    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+    deviceFeatures->get().depthClamp = VK_TRUE;
 
-    auto numShadowMapsPerLight = 3;
+    auto numShadowMapsPerLight = 1;
     // shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
 
     auto shaderHints = vsg::ShaderCompileSettings::create();
@@ -501,6 +504,9 @@ void RouteViewer::initLights()
     root->addChild(sun);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initView()
 {
     constexpr double maxShadowDistance = 1e8;
@@ -515,14 +521,25 @@ void RouteViewer::initView()
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
     view->addChild(root);
     auto renderGraph = vsg::RenderGraph::create(window, view);
+
+    params = Params::create();
+    auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(params, options));
+    renderGraph->addChild(renderImGui);
+
     commandGraph = vsg::CommandGraph::create(window, renderGraph);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initCommandGraph()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initViewer()
 {
     viewer = vsg::Viewer::create();
@@ -534,12 +551,16 @@ void RouteViewer::initViewer()
         ref_upd_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings));
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initTCPclient()
 {
     LOG_INFO("Starting init TCP-client");
@@ -555,6 +576,9 @@ void RouteViewer::initTCPclient()
     LOG_INFO("TCP-client is initialized...OK");
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool RouteViewer::loadRoute()
 {
     if (settings.route_dir_name.empty())
@@ -609,11 +633,17 @@ bool RouteViewer::loadRoute()
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotRecvLogMessage(QString msg)
 {
     LOG_INFO("%s", msg.toStdString().c_str());
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotConnectedToSimulator()
 {
     LOG_INFO("Connected to server...OK");
@@ -621,6 +651,9 @@ void RouteViewer::slotConnectedToSimulator()
     tcp_client->sendRequest(STYPE_REQUEST_ROUTE_INFO);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 {
     if (is_route)
@@ -637,7 +670,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
+    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
@@ -646,8 +679,12 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
+    LOG_INFO("Got signals data from server");
     if (is_signals)
     {
         LOG_WARN("Get signals data again");
@@ -659,8 +696,6 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     imguiWidgetsHandler->setLoadingStatus(msg);
     */
     traffic_lights_handler->deserialize(sig_data);
-
-    options->sharedObjects = nullptr;
 
     traffic_lights_handler->create_pagedLODs(settings, options);
     traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
@@ -676,6 +711,9 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 {
     if (is_vehicles)
@@ -700,7 +738,6 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     QString msg = QString("Загрузка подвижного состава...");
     imguiWidgetsHandler->setLoadingStatus(msg);
     */
-    options->sharedObjects = nullptr;
     vehicles_handler->load(vehicles_info, settings, options);
     /*
     msg = QString("");
@@ -727,6 +764,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
                      this, &RouteViewer::slotUpdateControlledVehicle);
     */
     root->addChild(vehicles_handler->getExterior());
+
     viewer->update();
     viewer->compile();
 
@@ -741,11 +779,17 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     is_ready = true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotUpdateKeyboard()
 {
 
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotUpdateControlledVehicle()
 {
 

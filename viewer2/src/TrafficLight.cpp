@@ -117,7 +117,7 @@ void TrafficLight::setNode(vsg::ref_ptr<vsg::Node> node)
 //------------------------------------------------------------------------------
 void TrafficLight::load_animations(const std::string& animations_dir)
 {
-    AnimTransformVisitor atv(&animations, animations_dir);
+    AnimTransformVisitor atv(&animations, animations_dir, node);
     node->accept(atv);
     for (auto animation : animations)
     {

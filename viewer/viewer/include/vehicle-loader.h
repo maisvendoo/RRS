@@ -48,6 +48,6 @@ void loadCabine(osg::Group *vehicle,
 //------------------------------------------------------------------------------
 float getLength(const std::string &configDir, const std::string &configName);
 
-osg::Vec3 getDirverPosition(const std::string &configDir, const std::string &configName);
+osg::Vec3 getDriverPosition(const std::string &configDir, const std::string &configName);
 
 #endif // VEHICLE_LOADER_H

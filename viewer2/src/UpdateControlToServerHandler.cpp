@@ -18,7 +18,7 @@ UpdateControlToServerHandler::UpdateControlToServerHandler(TcpClient *tc)
 void UpdateControlToServerHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     // Массив нажатых клавиш для сервера
-    if (KeySymolsRRS.count(keyPress.keyBase))
+    if (KeySymbolsRRS.count(keyPress.keyBase))
     {
         auto result = _pressed_keys.insert(keyPress.keyBase);
         if (result.second)

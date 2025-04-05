@@ -13,18 +13,21 @@ set (EXECUTABLE_OUTPUT_PATH "../../bin")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
-#set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
-#set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
-#set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
+set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
+set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
+set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
+set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
 
 find_package(Qt6 COMPONENTS Widgets Xml REQUIRED)
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
-# find_package(vsgImGui REQUIRED)
+find_package(vsgImGui REQUIRED)
 # find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets REQUIRED)
 # find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
 # find_package(vsgQt REQUIRED)
+
+set(FONT_PATH ${PROJECT_SOURCE_DIR}/JetBrainsMono-Regular.ttf)
+configure_file(${PROJECT_SOURCE_DIR}/cmake_defines.h.in ${PROJECT_SOURCE_DIR}/include/cmake_defines.h)
 
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 #file(GLOB PUGIXML_SOURCES ./dependencies/pugixml/src/*.cpp)
@@ -44,7 +47,7 @@ target_link_libraries(${TARGET} PRIVATE
     Qt6::Xml
     vsg::vsg
     vsgXchange::vsgXchange
-    # vsgImGui::vsgImGui
+    vsgImGui::vsgImGui
     # vsgQt::vsgQt
     filesystem
     CfgReader

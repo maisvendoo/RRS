@@ -1,8 +1,12 @@
 #include    "VehicleExterior.h"
 
+#include <iostream>
 #include    <vsg/maths/transform.h>
 #include    <vsg/io/read.h>
+#include <vsg/nodes/CullNode.h>
+#include <vsg/nodes/MatrixTransform.h>
 
+#include "MyGui.h"
 #include    "filesystem.h"
 #include    "CfgReader.h"
 #include    "AnimTransformVisitor.h"
@@ -64,7 +68,9 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
 
     if (!model)
+    {
         return false;
+    }
 
     if (cfg.getString(sec_name, "ModelShift", modelShift))
     {
@@ -73,6 +79,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
         model->matrix = vsg::translate(shift);
     }
 
+    model->setValue("name", "vehicle");
     transform->addChild(model);
 
     // Reading data about cabine's 3D-model and texture
@@ -97,9 +104,17 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
                 cabine->matrix = vsg::translate(shift);
             }
 
+            cabine->setValue("name", "cabine");
             transform->addChild(cabine);
+            transform->setValue("name", "vehicle + cabine");
         }
     }
+    else
+    {
+        transform->setValue("name", "only vehicle");
+    }
+
+    // Params::nodes.emplace_back(transform);
 
     modelShift = "";
     if (cfg.getString(sec_name, "DriverPos", modelShift))
@@ -130,18 +145,55 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 //------------------------------------------------------------------------------
 vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options)
 {
+    static std::map<std::string, vsg::ref_ptr<vsg::Node>> loaded_nodes;
     (void) textureName; // TODO
 
     FileSystem &fs = FileSystem::getInstance();
     std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
 
-    auto model_node = vsg::read_cast<vsg::Node>(model_path, options);
+    vsg::ref_ptr<vsg::Node> model_node;
+
+    if (loaded_nodes.count(model_path))
+    {
+        model_node = loaded_nodes[model_path];
+    }
+    else
+    {
+        model_node = vsg::read_cast<vsg::Node>(model_path, options);
+
+        if (auto cull_node = vsg::ref_ptr(model_node->cast<vsg::CullNode>()))
+        {
+            if (auto mt = vsg::ref_ptr(cull_node->child->cast<vsg::MatrixTransform>()))
+            {
+                if (auto old_outer_group = vsg::ref_ptr(mt->children[0]->cast<vsg::Group>()))
+                {
+                    auto new_outer_group = vsg::Group::create();
+
+                    for (auto& child : old_outer_group->children)
+                    {
+                        std::string name;
+                        child->getValue("name", name);
+
+                        auto transform = vsg::MatrixTransform::create();
+                        transform->setValue("name", name);
+                        transform->addChild(child);
+                        new_outer_group->addChild(transform);
+                    }
+
+                    mt->children[0] = new_outer_group;
+                }
+            }
+        }
+
+        loaded_nodes.emplace(model_path, model_node);
+    }
 
     if (model_node)
     {
         LOG_INFO("Loaded model from file: %s", model_path.c_str());
         vsg::ref_ptr<vsg::MatrixTransform> node = vsg::MatrixTransform::create();
         node->addChild(model_node);
+
         return node;
     }
 
@@ -155,7 +207,7 @@ vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string 
 void VehicleExterior::load_animations(const std::string& animations_dir)
 {
     int old_size = animations.size();
-    AnimTransformVisitor atv(&animations, animations_dir);
+    AnimTransformVisitor atv(&animations, animations_dir, transform);
     transform->accept(atv);
     LOG_INFO("Loaded %u custom animations", animations.size() - old_size);
 }

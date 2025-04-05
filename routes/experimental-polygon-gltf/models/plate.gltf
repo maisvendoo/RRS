@@ -1,107 +1,131 @@
 {
-  "accessors": [
-    {
-      "bufferView": 0,
-      "componentType": 5126,
-      "count": 8,
-      "type": "VEC3"
+    "asset": {
+        "version": "2.0"
     },
-    {
-      "bufferView": 1,
-      "componentType": 5126,
-      "count": 8,
-      "type": "VEC2"
-    },
-    {
-      "bufferView": 2,
-      "componentType": 5125,
-      "count": 12,
-      "type": "SCALAR"
-    }
-  ],
-  "asset": {
-    "version": "2.0"
-  },
-  "bufferViews": [
-    {
-      "buffer": 0,
-      "byteLength": 96,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteLength": 64,
-      "byteOffset": 96,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteLength": 48,
-      "byteOffset": 160,
-      "target": 34963
-    }
-  ],
-  "buffers": [
-    {
-      "byteLength": 208,
-      "uri": "plate.bin"
-    }
-  ],
-  "images": [
-    {
-      "uri": "ab_signals.bmp"
-    }
-  ],
-  "materials": [
-    {
-      "pbrMetallicRoughness": {
-        "baseColorTexture": {
-          "index": 0
-        }
-      }
-    }
-  ],
-  "meshes": [
-    {
-      "primitives": [
+    "buffers": [
         {
-          "attributes": {
-            "POSITION": 0,
-            "TEXCOORD_0": 1
-          },
-          "indices": 2,
-          "material": 0,
-          "mode": 4
+            "uri": "bin/plate.bin",
+            "byteLength": 208
         }
-      ]
-    }
-  ],
-  "nodes": [
-    {
-      "mesh": 0,
-      "name": "plate"
-    }
-  ],
-  "samplers": [
-    {
-      "magFilter": 9729,
-      "minFilter": 9987,
-      "wrapS": 10497,
-      "wrapT": 10497
-    }
-  ],
-  "scene": 0,
-  "scenes": [
-    {
-      "nodes": [
-        0
-      ]
-    }
-  ],
-  "textures": [
-    {
-      "sampler": 0,
-      "source": 0
-    }
-  ]
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 96,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 96,
+            "byteLength": 64,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 160,
+            "byteLength": 48,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 8,
+            "type": "VEC3",
+            "max": [
+                0.172427,
+                0.237394,
+                0.00804964
+            ],
+            "min": [
+                -0.0355481,
+                -0.0522914,
+                0.00562184
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 8,
+            "type": "VEC2",
+            "max": [
+                0.135672,
+                0.635639
+            ],
+            "min": [
+                0.0501118,
+                0.555103
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5125,
+            "count": 12,
+            "type": "SCALAR",
+            "max": [
+                7
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/ab_signals.bmp"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            },
+            "alphaMode": "BLEND"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "TEXCOORD_0": 1
+                    },
+                    "indices": 2,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
 }

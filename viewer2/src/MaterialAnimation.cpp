@@ -1,6 +1,8 @@
 #include "MaterialAnimation.h"
 #include "CfgReader.h"
 #include "ProcAnimation.h"
+
+#include <iostream>
 #include <sstream>
 #include <vsg/maths/vec4.h>
 
@@ -54,8 +56,8 @@ bool MaterialAnimation::load_config(CfgReader &cfg)
         ss >> color.x >> color.y >> color.z;
     }
 
-    // material.baseColorFactor = color;
-    // material.emissiveFactor = emission_color;
+    // material_value->value().baseColorFactor = color;
+    // material_value->value().emissiveFactor = emission_color;
 
     update();
     return true;
