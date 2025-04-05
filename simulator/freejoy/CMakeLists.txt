@@ -29,11 +29,11 @@ find_package(Qt6 COMPONENTS Xml REQUIRED)
     # set(SFML_STATIC_LIBRARIES FALSE)
 # endif()
 
-# if (WIN32)
-    # find_package(SFML COMPONENTS system window REQUIRED)
-# else()
+if (WIN32)
+    find_package(SFML COMPONENTS system window REQUIRED)
+else()
     find_package(SFML COMPONENTS System Window REQUIRED)
-# endif()
+endif()
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
