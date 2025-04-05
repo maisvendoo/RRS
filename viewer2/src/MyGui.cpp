@@ -49,6 +49,12 @@ void MyGui::record(vsg::CommandBuffer& cb) const
                            ImGui::IsKeyPressed(ImGuiKey_LeftAlt) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightAlt);
 
+    // Статус вьювера
+    if (!params->status.isEmpty())
+    {
+        showStatus();
+    }
+
     // Подтверждение выхода по Esc
     if (ImGui::IsKeyPressed(ImGuiKey_Escape) && !params->prev_Esc)
     {
@@ -114,6 +120,29 @@ void MyGui::record(vsg::CommandBuffer& cb) const
     {
         ImGui::ShowDemoWindow();
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showStatus() const
+{
+    int w = 400;
+    int h = 150;
+
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiIO &io = ImGui::GetIO();
+
+    ImVec2 content_size = io.DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Загрузка... Пожалуйста, подождите...");
+    ImGui::PopStyleColor();
+    ImGui::Text(u8"%s", params->status.toStdString().c_str());
+    ImGui::End();
 }
 
 //------------------------------------------------------------------------------

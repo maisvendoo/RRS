@@ -650,6 +650,7 @@ bool RouteViewer::loadRoute()
 void RouteViewer::slotRecvLogMessage(QString msg)
 {
     LOG_INFO("%s", msg.toStdString().c_str());
+    GUIparams->status = msg;
 }
 
 //------------------------------------------------------------------------------
@@ -674,10 +675,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
     }
     is_route = true;
 
-    /*
-    QString msg = QString("Загрузка маршрута...");
-    imguiWidgetsHandler->setLoadingStatus(msg);
-    */
+    GUIparams->status = QString("Загрузка маршрута...");
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
@@ -702,10 +700,9 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
         return;
     }
     is_signals = true;
-    /*
-    QString msg = QString("Загрузка светофоров...");
-    imguiWidgetsHandler->setLoadingStatus(msg);
-    */
+
+    GUIparams->status = QString("Загрузка светофоров...");
+
     traffic_lights_handler->deserialize(sig_data);
 
     traffic_lights_handler->create_pagedLODs(settings, options);
@@ -745,15 +742,13 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     }
 
     LOG_INFO("Get info about %u vehicles", count);
-    /*
-    QString msg = QString("Загрузка подвижного состава...");
-    imguiWidgetsHandler->setLoadingStatus(msg);
-    */
+
+    GUIparams->status = QString("Загрузка подвижного состава...");
+
     vehicles_handler->load(vehicles_info, settings, options);
-    /*
-    msg = QString("");
-    imguiWidgetsHandler->setLoadingStatus(msg);
-    */
+
+    GUIparams->status = QString("");
+
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             vehicles_handler, &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
 
