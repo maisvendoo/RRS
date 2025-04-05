@@ -21,6 +21,7 @@ class TcpClient;
 class ScreenshotWriter;
 class TrafficLightsHandler;
 class VehiclesHandler;
+class UpdateViewerHandler;
 
 class RouteViewer : public QObject
 {
@@ -73,6 +74,8 @@ private slots:
 
     void slotGetVehicleInfoData(QByteArray &data);
 
+    void slotUpdated();
+
 private:
     bool is_ready = false;
     bool is_route = false;
@@ -82,6 +85,7 @@ private:
     settings_t settings = settings_t();
 
     vsg::ref_ptr<GUIParams> GUIparams = nullptr;
+    vsg::ref_ptr<UpdateViewerHandler> upd_viewer_handler;
 
     TcpClient *tcp_client = nullptr;
     SoundManager *sound_manager = nullptr;

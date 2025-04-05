@@ -53,6 +53,10 @@ public slots:
     void slotGetVehiclesStateData(QByteArray &data);
     void slotGetVehicleControlled(QByteArray &data);
 
+signals:
+
+    void updated();
+
 private:
 
     /// Sound manager
@@ -81,6 +85,9 @@ private:
 
     /// Debug strings for controlled and current vehicles
     simulator_vehicle_controlled_update_t vehicle_controlled;
+
+    /// Updated status
+    bool is_updated = false;
 
     /// Vehicle number which is a referenced for camera
     int cur_vehicle = 0;

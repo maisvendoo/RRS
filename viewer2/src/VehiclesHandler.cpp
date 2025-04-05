@@ -77,8 +77,19 @@ QString VehiclesHandler::getDebugMsg()
 void VehiclesHandler::step(double t, double dt)
 {
     ref_time = t;
-    if (!isUpdated())
+    if (isUpdated())
+    {
+        if (!is_updated)
+        {
+            is_updated = true;
+            emit updated();
+        }
+    }
+    else
+    {
+        is_updated = false;
         return;
+    }
 
     double client_time = ref_time + time_difference;
     bool is_update = (client_time >= update_pos_data[cur_data].time);

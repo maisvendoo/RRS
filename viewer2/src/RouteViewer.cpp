@@ -557,10 +557,12 @@ void RouteViewer::initViewer()
 
     viewer->addWindow(window);
 
-    auto ref_upd_control = UpdateControlToServerHandler::create(tcp_client);
-    viewer->addEventHandler(ref_upd_control);
-    viewer->addEventHandler(UpdateViewerHandler::create(
-        ref_upd_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings));
+    auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
+    upd_viewer_handler = UpdateViewerHandler::create(
+        upd_server_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+
+    viewer->addEventHandler(upd_server_control);
+    viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
 
@@ -758,6 +760,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     connect(tcp_client, &TcpClient::setVehicleControlled,
             vehicles_handler, &VehiclesHandler::slotGetVehicleControlled, Qt::DirectConnection);
 
+    connect(vehicles_handler, &VehiclesHandler::updated,
+            this, &RouteViewer::slotUpdated, Qt::DirectConnection);
+
     root->addChild(vehicles_handler->getExterior());
 
     viewer->update();
@@ -772,4 +777,14 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
                             static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
 
     is_ready = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotUpdated()
+{
+    // Камера в кабину ПЕ через фиктивное нажатие F1
+    vsg::KeyPressEvent keyPress(window, viewer->getFrameStamp()->time, vsg::KEY_F1, vsg::KEY_F1, vsg::MODKEY_OFF);
+    upd_viewer_handler->apply(keyPress);
 }
