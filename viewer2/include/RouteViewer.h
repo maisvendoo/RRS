@@ -79,10 +79,6 @@ private slots:
 
     void slotGetVehicleInfoData(QByteArray &data);
 
-    void slotUpdateKeyboard();
-
-    void slotUpdateControlledVehicle();
-
 private:
     bool is_ready = false;
     bool is_route = false;
