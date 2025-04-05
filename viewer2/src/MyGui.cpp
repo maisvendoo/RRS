@@ -26,7 +26,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, vsg::ref_ptr<vsg::Options> optio
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF(FONT_PATH, font_size);
+    io.Fonts->AddFontFromFileTTF(FONT_PATH, font_size, NULL, io.Fonts->GetGlyphRangesCyrillic());
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 }
 
