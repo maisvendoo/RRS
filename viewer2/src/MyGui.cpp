@@ -138,8 +138,15 @@ void MyGui::showStatus() const
 
     ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
 
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+
+    bool open_ptr = true;
+
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
-    ImGui::Begin(u8"Загрузка... Пожалуйста, подождите...");
+    ImGui::Begin(u8"Загрузка... Пожалуйста, подождите...", &open_ptr, window_flags);
     ImGui::PopStyleColor();
     ImGui::Text(u8"%s", params->status.toStdString().c_str());
     ImGui::End();
@@ -164,7 +171,13 @@ void MyGui::showQuitDialog() const
 
     ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
 
-    ImGui::Begin(u8"Вы действительно хотите выйти?");
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+
+    bool open_ptr = true;
+
+    ImGui::Begin(u8"Вы действительно хотите выйти?", &open_ptr, window_flags);
 
     int bw = w / 4;
     int bh = h / 4;
@@ -220,6 +233,9 @@ void MyGui::showDebugMsg() const
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
 
     bool open_ptr = true;
 
@@ -243,6 +259,9 @@ void MyGui::showNoControlled() const
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
 
     bool open_ptr = true;
 
