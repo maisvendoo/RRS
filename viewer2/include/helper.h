@@ -4,7 +4,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
-#include <vsg/nodes/Node.h>
+#include <vsg/nodes/PagedLOD.h>
 
 #include <iostream>
 #include <vsg/nodes/StateGroup.h>
@@ -40,6 +40,13 @@ inline void print_object(vsg::ref_ptr<vsg::Object> object, int indentation = 0)
         {
             print_object(child, indentation + 1);
         }
+    }
+    else if (auto* pLOD = object->cast<vsg::PagedLOD>())
+    {
+        if (pLOD->children[0].node)
+            print_object(pLOD->children[0].node, indentation + 1);
+        else
+            std::cout << pLOD->filename.string() << std::endl;
     }
     else if (auto* bind_graphics_pipeline = object->cast<vsg::BindGraphicsPipeline>())
     {

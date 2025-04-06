@@ -560,11 +560,14 @@ void RouteViewer::initViewer()
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+    auto close_viewer_handler = vsg::CloseHandler::create(viewer);
+    close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
+    viewer->addEventHandler(close_viewer_handler);
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
@@ -636,6 +639,7 @@ bool RouteViewer::loadRoute()
         matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
 
         matrix->addChild(pagedLOD);
+        //GUIParams::nodes.emplace_back(matrix);
 
         root->addChild(matrix);
     }

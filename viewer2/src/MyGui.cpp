@@ -299,6 +299,13 @@ void MyGui::printObject(const vsg::ref_ptr<vsg::Object>& object) const
                 printObject(child);
             }
         }
+        else if (auto pLOD = vsg::ref_ptr(object->cast<vsg::PagedLOD>()))
+        {
+            if (pLOD->children[0].node)
+                printObject(pLOD->children[0].node);
+            else
+                ImGui::Text("%s", pLOD->filename.string().c_str());
+        }
         else if (auto cullNode = vsg::ref_ptr(object->cast<vsg::CullNode>()))
         {
             printObject(cullNode->child);
