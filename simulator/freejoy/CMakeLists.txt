@@ -23,17 +23,9 @@ add_definitions(-DDEVICE_LIB)
 # Ищем зависимости Qt6
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 
-# if(WIN32)
-    set(SFML_STATIC_LIBRARIES TRUE)
-# else()
-    # set(SFML_STATIC_LIBRARIES FALSE)
-# endif()
-
-if (WIN32)
-    find_package(SFML COMPONENTS system window REQUIRED)
-else()
-    find_package(SFML COMPONENTS System Window REQUIRED)
-endif()
+# Ищем SFML
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML COMPONENTS System Window REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
@@ -53,8 +45,8 @@ target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
-target_link_libraries (${TARGET} sfml-window)
-target_link_libraries (${TARGET} sfml-system)
+target_link_libraries (${TARGET} SFML::Window)
+target_link_libraries (${TARGET} SFML::System)
 target_link_libraries (${TARGET} physics)
 target_link_libraries (${TARGET} device)
 target_link_libraries (${TARGET} filesystem)
