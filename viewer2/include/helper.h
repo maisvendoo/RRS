@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vsg/commands/Commands.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/CullNode.h>
@@ -118,3 +119,15 @@ inline void print_object(vsg::ref_ptr<vsg::Object> object, int indentation = 0)
     }
 }
 
+void set_parent_recursively(vsg::ref_ptr<vsg::Node>& node, vsg::ref_ptr<vsg::Node> parent)
+{
+    node->setValue("parent", parent);
+
+    if (auto commands = node->cast<vsg::Commands>())
+    {
+        for (auto& command : commands->children)
+        {
+            // set_parent_recursively(command, node);
+        }
+    }
+}
