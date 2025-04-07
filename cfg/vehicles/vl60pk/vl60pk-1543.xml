@@ -17,7 +17,8 @@
 		<ExtModelName>VL60pk-1543/VL60pk-1543.osgt</ExtModelName>
 		<ModelShift>0.0 0.0 0.312</ModelShift>
 
-		<CabineModel>VL60pk-1543/VL60pk-cabview.osgt</CabineModel>
+		<!-- <CabineModel>VL60pk-1543/VL60pk-cabview.osgt</CabineModel> -->
+		<CabineModel>VL60pk-1543/VL60pk-cabview.gltf</CabineModel>
 		<CabineShift>0.0 0.0 0.317</CabineShift>
 
 		<CouplingModule>sa3</CouplingModule>

@@ -8,6 +8,7 @@
 #include "filesystem.h"
 #include "ProcAnimation.h"
 
+#include <vsg/core/Auxiliary.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
@@ -15,6 +16,7 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 
+#include <iostream>
 #include <string>
 
 AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config, vsg::ref_ptr<vsg::Node> main_node)
@@ -134,9 +136,8 @@ void AnimTransformVisitor::copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transf
                 {
                     outer_transform->children = {outer_group};
                     auto transform_it = std::find(outer_group->children.begin(), outer_group->children.end(), transform);
-                    auto new_transform = vsg::ref_ptr(transform->clone()->cast<vsg::MatrixTransform>());
-                    outer_group->children.erase(transform_it);
-                    outer_group->children.emplace_back(new_transform);
+                    transform = vsg::ref_ptr(transform->clone()->cast<vsg::MatrixTransform>());
+                    *transform_it = transform;
                 }
             }
         }

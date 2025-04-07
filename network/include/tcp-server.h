@@ -3,6 +3,7 @@
 
 #include    <QTcpServer>
 #include    <QMap>
+#include    <QSet>
 #include    <network-export.h>
 #include    <network-data-types.h>
 
