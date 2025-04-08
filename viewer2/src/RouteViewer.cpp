@@ -37,6 +37,7 @@
 #include <vsg/state/ViewDependentState.h>
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/ShaderSet.h>
+#include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <vsgImGui/imgui.h>
 #include <vsgImGui/RenderImGui.h>
@@ -127,14 +128,15 @@ bool RouteViewer::init(int argc, char* argv[])
 
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
-
+    
+    initVsgOptions();
+    
     screenshot_writer = new ScreenshotWriter("screenshot.png");
 
-    traffic_lights_handler = new TrafficLightsHandler();
+    traffic_lights_handler = new TrafficLightsHandler(nullptr, options);
 
     vehicles_handler = new VehiclesHandler(settings, sound_manager);
 
-    initVsgOptions();
     initWindowTraits();
     initWindow();
     initCamera();
@@ -363,6 +365,7 @@ void RouteViewer::initVsgOptions()
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
+    options->propagateDynamicObjects = vsg::PropagateDynamicObjects::create();
     options->add(vsgXchange::all::create());
 }
 
@@ -685,7 +688,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
+    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
@@ -711,8 +714,8 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     traffic_lights_handler->deserialize(sig_data);
 
-    traffic_lights_handler->create_pagedLODs(settings, options);
-    traffic_lights_handler->loadSignalModels(settings, options, shadowSettings);
+    traffic_lights_handler->create_pagedLODs(settings);
+    traffic_lights_handler->loadSignalModels(settings, shadowSettings);
     root->addChild(traffic_lights_handler->traffic_light_nodes);
 
     connect(tcp_client, &TcpClient::updateSignal,

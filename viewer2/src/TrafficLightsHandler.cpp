@@ -1,42 +1,30 @@
 #include "TrafficLightsHandler.h"
+
 #include "CfgReader.h"
-#include "Logger.h"
-#include "MyGui.h"
-#include "TrafficLight.h"
 #include "filesystem.h"
-#include <cstdint>
-#include <map>
-#include <qbuffer.h>
-#include <qdiriterator.h>
-#include <qflags.h>
-#include <qstringview.h>
-#include <string>
-#include <vsg/core/Inherit.h>
-#include <vsg/core/Object.h>
-#include <vsg/core/Visitor.h>
+#include "Logger.h"
+#include "settings.h"
+
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/read.h>
-#include <vsg/lighting/PointLight.h>
-#include <vsg/lighting/SpotLight.h>
-#include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/maths/vec4.h>
-#include <vsg/nodes/CullGroup.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
-#include <vsg/nodes/PagedLOD.h>
-#include <vsg/nodes/StateGroup.h>
-#include <vsg/utils/Builder.h>
 
+#include <QBuffer>
+#include <QDir>
+#include <QDirIterator>
 
-TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
+#include <cstdint>
+
+TrafficLightsHandler::TrafficLightsHandler(QObject* parent, vsg::ref_ptr<vsg::Options> options)
     : QObject(parent)
+    , options(options)
 {
-    // copy_op.duplicate = new vsg::Duplicate;
 }
 
 // TODO: remove duplication
@@ -142,7 +130,7 @@ void TrafficLightsHandler::deserialize(QByteArray& data)
     }
 }
 
-void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
+void TrafficLightsHandler::create_pagedLODs(const settings_t& settings)
 {
     FileSystem& fs =FileSystem::getInstance();
 
@@ -182,19 +170,19 @@ void TrafficLightsHandler::create_pagedLODs(const settings_t& settings, vsg::ref
     }
 }
 
-void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
+void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
 {
     LOG_INFO("Start loading signal models");
     traffic_light_nodes = vsg::Group::create();
 
     for (auto* tl : traffic_lights_fwd)
     {
-        loadSignalModel(tl, settings, options, shadowSettings);
+        loadSignalModel(tl, settings, shadowSettings);
     }
 
     for (auto* tl :traffic_lights_bwd)
     {
-        loadSignalModel(tl, settings, options, shadowSettings);
+        loadSignalModel(tl, settings, shadowSettings);
     }
     LOG_INFO("Finished loading signal models");
 
@@ -236,7 +224,7 @@ void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
     );
 }
 
-void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
+void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
 {
     static std::map<std::string, vsg::ref_ptr<vsg::Node>> loaded_nodes;
 

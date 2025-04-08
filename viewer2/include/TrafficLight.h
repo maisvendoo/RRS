@@ -3,11 +3,16 @@
 
 #include "animations-list.h"
 #include "signal-types.h"
-#include <qcontainerfwd.h>
-#include <QString>
+
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
+
+#include <QString>
+
+#include <string>
+
+class QByteArray;
 
 //------------------------------------------------------------------------------
 //
@@ -15,26 +20,19 @@
 class TrafficLight
 {
 public:
-
     TrafficLight();
 
     void deserialize(QByteArray& data);
 
-    const QString& getConnectorName() const;
+    const QString&    getConnectorName()      const;
+    int               getSignalDirection()    const;
+    const QString&    getLetter()             const;
+    const QString&    getModelName()          const;
 
-    int getSignalDirection() const;
-
-    const QString& getLetter() const;
-
-    const QString& getModelName() const;
-
-    const vsg::dvec3& getPosition() const;
-
-    const vsg::dvec3& getOrth() const;
-
-    const vsg::dvec3& getRight() const;
-
-    const vsg::dvec3& getUp() const;
+    const vsg::dvec3&    getPosition()    const;
+    const vsg::dvec3&    getOrth()        const;
+    const vsg::dvec3&    getRight()       const;
+    const vsg::dvec3&    getUp()          const;
 
     void setNode(vsg::ref_ptr<vsg::Node> node);
 
@@ -44,27 +42,19 @@ public:
 
 private:
 
-    QString connector_name = "";
+    QString    connector_name = "";
+    int        signal_dir = 0;
+    bool       is_busy = false;
+    QString    letter = "";
+    QString    signal_model = "";
 
-    int signal_dir = 0;
+    lens_state_t    lens_state;
+    lens_state_t    old_lens_state;
 
-    bool is_busy = false;
-
-    QString letter = "";
-
-    QString signal_model = "";
-
-    lens_state_t lens_state;
-
-    lens_state_t old_lens_state;
-
-    vsg::dvec3 pos;
-
-    vsg::dvec3 orth;
-
-    vsg::dvec3 right;
-
-    vsg::dvec3 up;
+    vsg::dvec3    pos;
+    vsg::dvec3    orth;
+    vsg::dvec3    right;
+    vsg::dvec3    up;
 
     vsg::ref_ptr<vsg::Node> node;
 

@@ -85,7 +85,7 @@ private:
     settings_t settings = settings_t();
 
     vsg::ref_ptr<GUIParams> GUIparams = nullptr;
-    vsg::ref_ptr<UpdateViewerHandler> upd_viewer_handler;
+    vsg::ref_ptr<UpdateViewerHandler> upd_viewer_handler = nullptr;
 
     TcpClient *tcp_client = nullptr;
     SoundManager *sound_manager = nullptr;
