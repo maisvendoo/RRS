@@ -20,6 +20,7 @@
 #include <QDirIterator>
 
 #include <cstdint>
+#include <vsg/utils/SharedObjects.h>
 
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent, vsg::ref_ptr<vsg::Options> options)
     : QObject(parent)

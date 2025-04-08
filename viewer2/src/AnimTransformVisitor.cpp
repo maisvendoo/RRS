@@ -8,6 +8,7 @@
 #include "filesystem.h"
 #include "ProcAnimation.h"
 
+#include <mutex>
 #include <vsg/core/Auxiliary.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
@@ -118,9 +119,10 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
 void AnimTransformVisitor::copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transform)
 {
+    std::scoped_lock<std::mutex> pdo_lock(options->propagateDynamicObjects->mutex);
     options->propagateDynamicObjects->dynamicObjects.clear();
     options->propagateDynamicObjects->tag(transform);
-    root_node->accept(*options->propagateDynamicObjects);
+    root_node->accept(*(options->propagateDynamicObjects));
 
     vsg::CopyOp copyop;
     auto duplicate = copyop.duplicate = new vsg::Duplicate;
