@@ -48,27 +48,27 @@ void MaterialAnimationVisitor::apply(vsg::Node& node)
 //         {
 //             for (auto& bufferInfo : descriptorBuffer->bufferInfoList)
 //             {
-//                 auto& pbrValue = bufferInfo->data;
-//                 pbrValue->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
-//                 if (pbrValue->cast<vsg::PbrMaterialValue>())
+//                 if (bufferInfo->data->cast<vsg::PbrMaterialValue>())
 //                 {
+//                     auto pbrValue = (vsg::ref_ptr<vsg::PbrMaterialValue>*)(&bufferInfo->data);
+//                     (*pbrValue)->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
+
+//                     std::scoped_lock<std::mutex> pdo_lock(options->propagateDynamicObjects->mutex);
 //                     options->propagateDynamicObjects->dynamicObjects.clear();
-//                     options->propagateDynamicObjects->tag(pbrValue);
+//                     options->propagateDynamicObjects->tag((*pbrValue));
 //                     root_node->accept(*options->propagateDynamicObjects);
                 
 //                     vsg::CopyOp copyop;
 //                     auto duplicate = copyop.duplicate = new vsg::Duplicate;
 //                     for (auto& object : options->propagateDynamicObjects->dynamicObjects)
 //                     {
-//                         std::cout << object->className() << std::endl;
 //                         duplicate->insert(object);
 //                     }
-//                     std::cout << "\n\n";
                 
-//                     pbrValue = copyop(pbrValue);
+//                     *pbrValue = copyop(*pbrValue);
 //                     root_node = copyop(root_node);
 
-//                     ProcAnimation *animation = new MaterialAnimation(vsg::ref_ptr(pbrValue->cast<vsg::PbrMaterialValue>()));
+//                     ProcAnimation *animation = new MaterialAnimation((*pbrValue));
 //                     animation->load(*cfg);
 //                     animations->insert({animation->getSignalID(), animation});
 //                 }

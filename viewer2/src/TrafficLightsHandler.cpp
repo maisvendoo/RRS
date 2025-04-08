@@ -3,6 +3,7 @@
 #include "CfgReader.h"
 #include "filesystem.h"
 #include "Logger.h"
+#include "MyGui.h"
 #include "settings.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -292,7 +293,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
 
     global_transform->addChild(signal_node);
     tl->setNode(global_transform);
-    // Params::nodes.emplace_back(global_transform);
+    // GUIParams::nodes.emplace_back(global_transform);
 
     tl->load_animations(animations_dir, options);
 
