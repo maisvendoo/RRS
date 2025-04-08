@@ -16,6 +16,8 @@
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/vk/Context.h>
 
+#include <filesystem.h>
+
 std::vector<vsg::ref_ptr<vsg::Node>> GUIParams::nodes;
 
 //------------------------------------------------------------------------------
@@ -26,7 +28,16 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, vsg::ref_ptr<vsg::Options> optio
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF(FONT_PATH, font_size, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
+    FileSystem &fs = FileSystem::getInstance();
+
+    std::string font_path = fs.getFontsDir() + fs.separator() + "JetBrainsMono-Regular.ttf";
+
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(),
+                                 font_size,
+                                 NULL,
+                                 io.Fonts->GetGlyphRangesCyrillic());
+
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 }
 
