@@ -100,7 +100,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         if (!config_section.isNull())
         {
             copy_nodes(transform);
-            MaterialAnimationVisitor mav(animations, &cfg);
+            MaterialAnimationVisitor mav(animations, &cfg, options, root_node);
             transform->accept(mav);
             return nullptr;
         }

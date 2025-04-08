@@ -24,9 +24,12 @@
 #include <vsg/state/StateCommand.h>
 #include <vsg/state/material.h>
 #include <vsg/vk/State.h>
+#include <vsg/utils/PropagateDynamicObjects.h>
 
-MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, CfgReader* cfg)
+MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t* animations, CfgReader* cfg, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::MatrixTransform>& root_node)
     : vsg::Visitor()
+    , options(options)
+    , root_node(root_node)
     , animations(animations)
     , cfg(cfg)
 {
@@ -36,6 +39,43 @@ void MaterialAnimationVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
 }
+
+// void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
+// {
+//     for (auto& descriptor : bindDescriptorSet.descriptorSet->descriptors)
+//     {
+//         if (auto descriptorBuffer = descriptor.cast<vsg::DescriptorBuffer>())
+//         {
+//             for (auto& bufferInfo : descriptorBuffer->bufferInfoList)
+//             {
+//                 auto& pbrValue = bufferInfo->data;
+//                 pbrValue->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
+//                 if (pbrValue->cast<vsg::PbrMaterialValue>())
+//                 {
+//                     options->propagateDynamicObjects->dynamicObjects.clear();
+//                     options->propagateDynamicObjects->tag(pbrValue);
+//                     root_node->accept(*options->propagateDynamicObjects);
+                
+//                     vsg::CopyOp copyop;
+//                     auto duplicate = copyop.duplicate = new vsg::Duplicate;
+//                     for (auto& object : options->propagateDynamicObjects->dynamicObjects)
+//                     {
+//                         std::cout << object->className() << std::endl;
+//                         duplicate->insert(object);
+//                     }
+//                     std::cout << "\n\n";
+                
+//                     pbrValue = copyop(pbrValue);
+//                     root_node = copyop(root_node);
+
+//                     ProcAnimation *animation = new MaterialAnimation(vsg::ref_ptr(pbrValue->cast<vsg::PbrMaterialValue>()));
+//                     animation->load(*cfg);
+//                     animations->insert({animation->getSignalID(), animation});
+//                 }
+//             }
+//         }
+//     }
+// }
 
 void MaterialAnimationVisitor::apply(vsg::MatrixTransform& transform)
 {
