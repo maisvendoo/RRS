@@ -125,7 +125,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 
     QString animationsDir = "";
     cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
-    load_animations(animationsDir.toStdString());
+    load_animations(animationsDir.toStdString(), options);
     load_model_animations(animationsDir.toStdString());
 
     QString soundsDir = "";
@@ -204,10 +204,10 @@ vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleExterior::load_animations(const std::string& animations_dir)
+void VehicleExterior::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options)
 {
     int old_size = animations.size();
-    AnimTransformVisitor atv(&animations, animations_dir, transform);
+    AnimTransformVisitor atv(&animations, animations_dir, transform, options);
     transform->accept(atv);
     LOG_INFO("Loaded %u custom animations", animations.size() - old_size);
 }

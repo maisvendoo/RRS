@@ -10,19 +10,22 @@
 
 #include <vsg/core/Auxiliary.h>
 #include <vsg/core/Inherit.h>
+#include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 
-#include <iostream>
 #include <string>
+#include <vsg/utils/PropagateDynamicObjects.h>
+#include <vsg/utils/SharedObjects.h>
 
-AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config, vsg::ref_ptr<vsg::Node> main_node)
+AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config, vsg::ref_ptr<vsg::MatrixTransform>& root_node, vsg::ref_ptr<vsg::Options> options)
     : animations(animations)
     , vehicle_config(vehicle_config)
-    , main_node(main_node)
+    , root_node(root_node)
+    , options(options)
 {
 }
 
@@ -47,15 +50,6 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     {
         transform.traverse(*this);
         return;
-    }
-
-    if (name == "vehicle")
-    {
-        main_node = transform_ptr;
-    }
-    else if (name == "cabine")
-    {
-        main_node = transform_ptr;
     }
 
     ProcAnimation* animation = create_animation(name, transform_ptr);
@@ -124,22 +118,17 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
 void AnimTransformVisitor::copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transform)
 {
-    if (auto global_transform = vsg::ref_ptr(main_node->cast<vsg::MatrixTransform>()))
+    options->propagateDynamicObjects->dynamicObjects.clear();
+    options->propagateDynamicObjects->tag(transform);
+    root_node->accept(*options->propagateDynamicObjects);
+
+    vsg::CopyOp copyop;
+    auto duplicate = copyop.duplicate = new vsg::Duplicate;
+    for (auto& object : options->propagateDynamicObjects->dynamicObjects)
     {
-        if (auto cull_node = vsg::ref_ptr(global_transform->children[0]->clone()->cast<vsg::CullNode>()))
-        {
-            global_transform->children = {cull_node};
-            if (auto outer_transform = vsg::ref_ptr(cull_node->child->clone()->cast<vsg::MatrixTransform>()))
-            {
-                cull_node->child = outer_transform;
-                if (auto outer_group = vsg::ref_ptr(outer_transform->children[0]->clone()->cast<vsg::Group>()))
-                {
-                    outer_transform->children = {outer_group};
-                    auto transform_it = std::find(outer_group->children.begin(), outer_group->children.end(), transform);
-                    transform = vsg::ref_ptr(transform->clone()->cast<vsg::MatrixTransform>());
-                    *transform_it = transform;
-                }
-            }
-        }
+        duplicate->insert(object);
     }
+
+    transform = copyop(transform);
+    root_node = copyop(root_node);
 }

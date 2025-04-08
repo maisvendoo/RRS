@@ -46,7 +46,7 @@ private:
 
     vsg::ref_ptr<vsg::MatrixTransform> loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options);
 
-    void load_animations(const std::string& animations_dir);
+    void load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options);
 
     void load_model_animations(const std::string& animations_dir);
 

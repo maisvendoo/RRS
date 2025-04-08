@@ -293,7 +293,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     tl->setNode(global_transform);
     // Params::nodes.emplace_back(global_transform);
 
-    tl->load_animations(animations_dir);
+    tl->load_animations(animations_dir, options);
 
     traffic_light_nodes->addChild(global_transform);
 

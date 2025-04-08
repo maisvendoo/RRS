@@ -5,7 +5,9 @@
 #include "signal-types.h"
 
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 
 #include <QString>
@@ -34,9 +36,9 @@ public:
     const vsg::dvec3&    getRight()       const;
     const vsg::dvec3&    getUp()          const;
 
-    void setNode(vsg::ref_ptr<vsg::Node> node);
+    void setNode(vsg::ref_ptr<vsg::MatrixTransform>& node);
 
-    void load_animations(const std::string& animations_dir);
+    void load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options);
 
     void step(float t, float dt);
 
@@ -56,7 +58,7 @@ private:
     vsg::dvec3    right;
     vsg::dvec3    up;
 
-    vsg::ref_ptr<vsg::Node> node;
+    vsg::ref_ptr<vsg::MatrixTransform>* node = nullptr;
 
     animations_t animations;
 };

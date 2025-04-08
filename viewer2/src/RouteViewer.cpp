@@ -26,6 +26,7 @@
 
 #include <QApplication>
 
+#include <vsg/io/Options.h>
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>

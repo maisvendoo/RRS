@@ -4,6 +4,7 @@
 #include    <qbuffer.h>
 #include    <qflags.h>
 #include    <iostream>
+#include <vsg/utils/PropagateDynamicObjects.h>
 
 //------------------------------------------------------------------------------
 //
@@ -107,22 +108,24 @@ const vsg::dvec3& TrafficLight::getUp() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLight::setNode(vsg::ref_ptr<vsg::Node> node)
+void TrafficLight::setNode(vsg::ref_ptr<vsg::MatrixTransform>& node)
 {
-    this->node = node;
+    this->node = &node;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLight::load_animations(const std::string& animations_dir)
+void TrafficLight::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options)
 {
-    AnimTransformVisitor atv(&animations, animations_dir, node);
-    node->accept(atv);
+    AnimTransformVisitor atv(&animations, animations_dir, *node, options);
+    (*node)->accept(atv);
+
     for (auto animation : animations)
     {
         animation.second->setPosition(lens_state[animation.first]);
     }
+    
     old_lens_state = lens_state;
 }
 
