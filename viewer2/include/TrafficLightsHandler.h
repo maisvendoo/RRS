@@ -22,9 +22,10 @@ class TrafficLightsHandler : public QObject
     Q_OBJECT
 
 public:
-    TrafficLightsHandler(QObject* parent = Q_NULLPTR, vsg::ref_ptr<vsg::Options> options = {});
+    TrafficLightsHandler(QObject* parent = nullptr, vsg::ref_ptr<vsg::Options> options = {});
 
     void deserialize(QByteArray& data);
+    void deserialize_signals(const char* signals_type, QDataStream& data_stream);
 
     void create_pagedLODs(const settings_t& settings);
 

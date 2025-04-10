@@ -19,7 +19,7 @@ public:
 private:
 
     animations_t *animations;
-    std::string vehicle_config;
+    std::string animations_dir;
 
     ProcAnimation *create_animation(const std::string &name, osg::MatrixTransform *transform);
 };

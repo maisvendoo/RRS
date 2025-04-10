@@ -16,7 +16,7 @@ public:
 
 private:
     animations_t *animations;
-    ConfigReader *cfg;
+    ConfigReader *cfg_reader;
 };
 
 #endif // MATERIAL_ANIMATION_VISITOR_H

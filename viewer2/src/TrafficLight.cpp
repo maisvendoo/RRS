@@ -1,10 +1,15 @@
-#include    <TrafficLight.h>
-#include    <AnimTransformVisitor.h>
-#include    <algorithm>
-#include    <qbuffer.h>
-#include    <qflags.h>
-#include    <iostream>
+#include "TrafficLight.h"
+
+#include "AnimTransformVisitor.h"
+#include "ProcAnimation.h"
+
 #include <vsg/utils/PropagateDynamicObjects.h>
+
+#include <QBuffer>
+#include <QFlags>
+
+#include <algorithm>
+#include <iostream>
 
 //------------------------------------------------------------------------------
 //
@@ -108,18 +113,25 @@ const vsg::dvec3& TrafficLight::getUp() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLight::setNode(vsg::ref_ptr<vsg::MatrixTransform>& node)
+void TrafficLight::set_node(vsg::ref_ptr<vsg::Node> node)
 {
-    this->node = &node;
+    this->node = node;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLight::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options)
+void TrafficLight::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo, vsg::ref_ptr<vsg::Duplicate> duplicate)
 {
-    AnimTransformVisitor atv(&animations, animations_dir, *node, options);
-    (*node)->accept(atv);
+    AnimTransformVisitorCreateInfo atv_create_info = {
+        .pdo = pdo,
+        .duplicate = duplicate,
+        .animations_dir = animations_dir,
+        .animations = &animations
+    };
+
+    AnimTransformVisitor atv(atv_create_info);
+    node->accept(atv);
 
     for (auto animation : animations)
     {
@@ -154,7 +166,9 @@ void TrafficLight::step(float t, float dt)
     for (auto animation : animations)
     {
         if (changed)
+        {
             animation.second->setPosition(lens_state[animation.first]);
+        }
 
         animation.second->step(t, dt);
     }

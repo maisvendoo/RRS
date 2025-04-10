@@ -2,31 +2,30 @@
 
 #include "AnalogRotation.h"
 #include "AnalogTranslation.h"
-#include "MaterialAnimationVisitor.h"
 #include "animations-list.h"
 #include "CfgReader.h"
 #include "filesystem.h"
+#include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
-#include <mutex>
-#include <vsg/core/Auxiliary.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/utils/PropagateDynamicObjects.h>
+
+#include <QDomNode>
+#include <QString>
 
 #include <string>
-#include <vsg/utils/PropagateDynamicObjects.h>
-#include <vsg/utils/SharedObjects.h>
 
-AnimTransformVisitor::AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config, vsg::ref_ptr<vsg::MatrixTransform>& root_node, vsg::ref_ptr<vsg::Options> options)
-    : animations(animations)
-    , vehicle_config(vehicle_config)
-    , root_node(root_node)
-    , options(options)
+AnimTransformVisitor::AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info)
+    : pdo(create_info.pdo)
+    , duplicate(create_info.duplicate)
+    , animations_dir(create_info.animations_dir)
+    , animations(create_info.animations)
 {
 }
 
@@ -37,14 +36,12 @@ void AnimTransformVisitor::apply(vsg::Node& node)
 
 void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
 {
-    auto transform_ptr = vsg::ref_ptr(&transform);
-
-    std::string name = "";
-    transform_ptr->getValue("name", name);
+    std::string name;
+    transform.getValue("name", name);
 
     if (name.empty())
     {
-        transform_ptr->getValue("Name", name);
+        transform.getValue("Name", name);
     }
 
     if (name.empty())
@@ -53,7 +50,7 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
         return;
     }
 
-    ProcAnimation* animation = create_animation(name, transform_ptr);
+    ProcAnimation* animation = create_animation(name, transform);
     if (animation)
     {
         animation->name = name;
@@ -63,13 +60,13 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     transform.traverse(*this);
 }
 
-ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::ref_ptr<vsg::MatrixTransform> transform)
+ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
 {
     FileSystem& fs = FileSystem::getInstance();
     std::string data_dir = fs.getDataDir();
     std::string file_path = data_dir
         + fs.separator() + "animations"
-        + fs.separator() + vehicle_config
+        + fs.separator() + animations_dir
         + fs.separator() + name + ".xml";
 
     QString tmp_qstr = file_path.c_str();
@@ -82,55 +79,83 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
         {
-            copy_nodes(transform);
-            animation = new AnalogRotation(transform);
+            animation = new AnalogRotation(&transform);
             animation->load(cfg);
+            
+            vsg::CopyOp copyop;
+            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+            pdo->tag(&transform);
+            auto new_transform = copyop(vsg::ref_ptr(&transform));
+            duplicate->insert(&transform, new_transform);
+
             return animation;
         }
 
         config_section = cfg.getFirstSection("AnalogTranslation");
         if (!config_section.isNull())
         {
-            copy_nodes(transform);
-            animation = new AnalogTranslation(transform);
+            animation = new AnalogTranslation(&transform);
             animation->load(cfg);
+
+            vsg::CopyOp copyop;
+            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+            pdo->tag(&transform);
+            auto new_transform = copyop(vsg::ref_ptr(&transform));
+            duplicate->insert(&transform, new_transform);
+
             return animation;
         }
 
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
         {
-            copy_nodes(transform);
-            MaterialAnimationVisitor mav(animations, &cfg, options, root_node);
-            transform->accept(mav);
+            auto inner_pdo = vsg::PropagateDynamicObjects::create();
+            vsg::CopyOp copyop;
+            auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
+
+            MaterialAnimationVisitorCreateInfo mav_create_info = {
+                .pdo = inner_pdo,
+                .duplicate = inner_duplicate,
+                .animations = animations,
+                .cfg_reader = &cfg
+            };
+
+            MaterialAnimationVisitor mav(mav_create_info);
+            transform.accept(mav);
+            transform.accept(*inner_pdo);
+
+            if (!inner_pdo->dynamicObjects.empty())
+            {
+                for (auto& object : inner_pdo->dynamicObjects)
+                {
+                    if (!inner_duplicate->contains(object))
+                    {
+                        inner_duplicate->insert(object);
+                    }
+                }
+
+                std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                pdo->tag(&transform);
+
+                auto new_transform = copyop(vsg::ref_ptr(&transform));
+                duplicate->insert(&transform, new_transform);
+            }
+
             return nullptr;
         }
 
         config_section = cfg.getFirstSection("MaterialRGBAnimation");
         if (!config_section.isNull())
         {
-            copy_nodes(transform);
+            vsg::CopyOp copyop;
+            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+            pdo->tag(&transform);
+            auto new_transform = copyop(vsg::ref_ptr(&transform));
+            duplicate->insert(&transform, new_transform);
+
             return nullptr;
         }
     }
 
     return nullptr;
-}
-
-void AnimTransformVisitor::copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transform)
-{
-    std::scoped_lock<std::mutex> pdo_lock(options->propagateDynamicObjects->mutex);
-    options->propagateDynamicObjects->dynamicObjects.clear();
-    options->propagateDynamicObjects->tag(transform);
-    root_node->accept(*(options->propagateDynamicObjects));
-
-    vsg::CopyOp copyop;
-    auto duplicate = copyop.duplicate = new vsg::Duplicate;
-    for (auto& object : options->propagateDynamicObjects->dynamicObjects)
-    {
-        duplicate->insert(object);
-    }
-
-    transform = copyop(transform);
-    root_node = copyop(root_node);
 }

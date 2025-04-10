@@ -1,11 +1,15 @@
 #include "TrafficLightsHandler.h"
 
 #include "CfgReader.h"
+#include "TrafficLight.h"
 #include "filesystem.h"
 #include "Logger.h"
 #include "MyGui.h"
 #include "settings.h"
 
+#include <iostream>
+#include <qcontainerfwd.h>
+#include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/read.h>
 #include <vsg/maths/mat4.h>
@@ -21,6 +25,7 @@
 #include <QDirIterator>
 
 #include <cstdint>
+#include <vsg/utils/PropagateDynamicObjects.h>
 #include <vsg/utils/SharedObjects.h>
 
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent, vsg::ref_ptr<vsg::Options> options)
@@ -29,105 +34,50 @@ TrafficLightsHandler::TrafficLightsHandler(QObject* parent, vsg::ref_ptr<vsg::Op
 {
 }
 
-// TODO: remove duplication
 void TrafficLightsHandler::deserialize(QByteArray& data)
 {
-    loaded = false;
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
-
-    std::uint32_t line_signals_size = 0;
-    stream >> line_signals_size;
-
-    LOG_INFO("Line signals: %u", line_signals_size);
-
     // Очищаем список сигналов
     traffic_lights_fwd.clear();
     traffic_lights_bwd.clear();
 
-    for (std::uint32_t i = 0; i < line_signals_size; ++i)
+    loaded = false;
+    QBuffer buffer(&data);
+    buffer.open(QIODevice::ReadOnly);
+    QDataStream stream(&buffer);
+
+    deserialize_signals("Line", stream);
+    deserialize_signals("Enter", stream);
+    deserialize_signals("Exit", stream);
+}
+
+void TrafficLightsHandler::deserialize_signals(const char* signals_type, QDataStream& data_stream)
+{
+    std::uint32_t signal_count;
+    data_stream >> signal_count;
+    LOG_INFO("%s signals: %u", signals_type, signal_count);
+
+    for (std::uint32_t i = 0; i < signal_count; ++i)
     {
-        QByteArray tmp_data;
-        stream >> tmp_data;
+        QByteArray data;
+        data_stream >> data;
 
-        TrafficLight* tl = new TrafficLight;
-        tl->deserialize(tmp_data);
+        TrafficLight* traffic_light = new TrafficLight;
+        traffic_light->deserialize(data);
 
-        if (tl->getConnectorName().isEmpty())
+        if (traffic_light->getConnectorName().isEmpty())
         {
             continue;
         }
 
-        printSignalInfo(tl);
+        printSignalInfo(traffic_light);
 
-        if (tl->getSignalDirection() == -1)
+        if (traffic_light->getSignalDirection() == -1)
         {
-            traffic_lights_bwd.insert(tl->getConnectorName(), tl);
+            traffic_lights_bwd.insert(traffic_light->getConnectorName(), traffic_light);
         }
         else
         {
-            traffic_lights_fwd.insert(tl->getConnectorName(), tl);
-        }
-    }
-
-    std::uint32_t enter_signals_size = 0;
-    stream >> enter_signals_size;
-
-    LOG_INFO("Enter signals: %u", enter_signals_size);
-
-    for (std::uint32_t i = 0; i < enter_signals_size; ++i)
-    {
-        QByteArray tmp_data;
-        stream >> tmp_data;
-
-        TrafficLight* tl = new TrafficLight;
-        tl->deserialize(tmp_data);
-
-        if (tl->getConnectorName().isEmpty())
-        {
-            continue;
-        }
-
-        printSignalInfo(tl);
-
-        if (tl->getSignalDirection() == -1)
-        {
-            traffic_lights_bwd.insert(tl->getConnectorName(), tl);
-        }
-        else
-        {
-            traffic_lights_fwd.insert(tl->getConnectorName(), tl);
-        }
-    }
-
-    std::uint32_t exit_signals_size = 0;
-    stream >> exit_signals_size;
-
-    LOG_INFO("Exit signals: %u", exit_signals_size);
-
-    for (std::uint32_t i = 0; i < exit_signals_size; ++i)
-    {
-        QByteArray tmp_data;
-        stream >> tmp_data;
-
-        TrafficLight* tl = new TrafficLight;
-        tl->deserialize(tmp_data);
-
-        if (tl->getConnectorName().isEmpty())
-        {
-            continue;
-        }
-
-        printSignalInfo(tl);
-
-        if (tl->getSignalDirection() == -1)
-        {
-            traffic_lights_bwd.insert(tl->getConnectorName(), tl);
-        }
-        else
-        {
-            traffic_lights_fwd.insert(tl->getConnectorName(), tl);
+            traffic_lights_fwd.insert(traffic_light->getConnectorName(), traffic_light);
         }
     }
 }
@@ -177,14 +127,14 @@ void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref
     LOG_INFO("Start loading signal models");
     traffic_light_nodes = vsg::Group::create();
 
-    for (auto* tl : traffic_lights_fwd)
+    for (auto* traffic_light : traffic_lights_fwd)
     {
-        loadSignalModel(tl, settings, shadowSettings);
+        loadSignalModel(traffic_light, settings, shadowSettings);
     }
 
-    for (auto* tl :traffic_lights_bwd)
+    for (auto* traffic_light :traffic_lights_bwd)
     {
-        loadSignalModel(tl, settings, shadowSettings);
+        loadSignalModel(traffic_light, settings, shadowSettings);
     }
     LOG_INFO("Finished loading signal models");
 
@@ -194,17 +144,17 @@ void TrafficLightsHandler::loadSignalModels(const settings_t& settings, vsg::ref
 void TrafficLightsHandler::step(float t, float dt)
 {
     if (!loaded)
-        return;
-
-    for (auto tl = traffic_lights_fwd.begin(); tl != traffic_lights_fwd.end(); ++tl)
     {
-        TrafficLight *traffic_light = tl.value();
+        return;
+    }
+
+    for (auto* traffic_light : traffic_lights_fwd)
+    {
         traffic_light->step(t, dt);
     }
 
-    for (auto tl = traffic_lights_bwd.begin(); tl != traffic_lights_bwd.end(); ++tl)
+    for (auto* traffic_light : traffic_lights_bwd)
     {
-        TrafficLight *traffic_light = tl.value();
         traffic_light->step(t, dt);
     }
 }
@@ -226,27 +176,28 @@ void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
     );
 }
 
-void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& settings, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
+void TrafficLightsHandler::loadSignalModel(TrafficLight* traffic_light, const settings_t& settings, vsg::ref_ptr<vsg::ShadowSettings> shadowSettings)
 {
     static std::map<std::string, vsg::ref_ptr<vsg::Node>> loaded_nodes;
 
-    std::string node_path = signal_nodes_paths.value(tl->getModelName(), "").toStdString();
+    std::string node_path = signal_nodes_paths.value(traffic_light->getModelName(), "").toStdString();
     if (node_path.empty())
     {
         return;
     }
 
+    vsg::dmat4 m1 = vsg::translate(traffic_light->getPosition());
 
-    vsg::dmat4 m1 = vsg::translate(tl->getPosition());
+    vsg::dvec3 o(traffic_light->getOrth());
+    vsg::dvec3 r(traffic_light->getRight());
+    vsg::dvec3 u(traffic_light->getUp());
 
-    vsg::dvec3 o(tl->getOrth());
-    vsg::dvec3 r(tl->getRight());
-    vsg::dvec3 u(tl->getUp());
-
-    vsg::dmat4 m2(r.x,  -o.x,  u.x,  0,
+    vsg::dmat4 m2(
+        r.x,  -o.x,  u.x,  0,
         -r.y,   o.y,  u.y,  0,
         r.z,   o.z,  u.z,  0,
-        0,     0,    0,  1);
+        0,     0,    0,  1
+    );
 
     auto global_transform = vsg::MatrixTransform::create();
     global_transform->matrix = m1 * m2;
@@ -292,15 +243,35 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* tl, const settings_t& s
     }
 
     global_transform->addChild(signal_node);
-    tl->setNode(global_transform);
+
+    auto pdo = vsg::PropagateDynamicObjects::create();
+    vsg::CopyOp copyop;
+    auto duplicate = copyop.duplicate = new vsg::Duplicate;
+
+    traffic_light->set_node(global_transform);
+    traffic_light->load_animations(animations_dir, options, pdo, duplicate);
+
+    // global_transform->addChild(signal_node);
+    global_transform->traverse(*pdo);
+
+    if (!pdo->dynamicObjects.empty())
+    {
+        for (auto& object : pdo->dynamicObjects)
+        {
+            if (!duplicate->contains(object))
+            {
+                duplicate->insert(object);
+            }
+        }
+
+        signal_node = copyop(signal_node);
+    }
+
+    global_transform->children = {signal_node};
+
     GUIParams::nodes.emplace_back(global_transform);
 
-    tl->load_animations(animations_dir, options);
-
     traffic_light_nodes->addChild(global_transform);
-
-    // print_object(global_transform);
-    // std::cout << std::endl;
 
     // auto pagedLOD = vsg::PagedLOD::create();
     // pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
@@ -333,25 +304,23 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
     buff.open(QIODevice::ReadOnly);
     QDataStream stream(&buff);
 
-    QString conn_name = "";
+    QString connector_name = "";
     int signal_dir = 0;
 
-    stream >> conn_name;
+    stream >> connector_name;
     stream >> signal_dir;
 
-    if (conn_name.isEmpty())
+    if (connector_name.isEmpty())
     {
         return;
     }
 
-    TrafficLight *tl = (signal_dir == -1) ?
-                           traffic_lights_bwd.value(conn_name, nullptr) :
-                           traffic_lights_fwd.value(conn_name, nullptr);
+    TrafficLight* traffic_light = (signal_dir == -1) ?
+        traffic_lights_bwd.value(connector_name, nullptr) :
+        traffic_lights_fwd.value(connector_name, nullptr);
 
-    if (tl == nullptr)
+    if (traffic_light)
     {
-        return;
+        traffic_light->deserialize(data);
     }
-
-    tl->deserialize(data);
 }

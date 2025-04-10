@@ -8,7 +8,7 @@
 MaterialAnimationVisitor::MaterialAnimationVisitor(animations_t *animations, ConfigReader *cfg)
     : osg::NodeVisitor()
     , animations(animations)
-    , cfg(cfg)
+    , cfg_reader(cfg)
 {
 
 }
@@ -31,7 +31,7 @@ void MaterialAnimationVisitor::apply(osg::Geode &geode)
             continue;
 
         ProcAnimation *animation = new MaterialAnimation(mat, drawable);
-        animation->load(*cfg);
+        animation->load(*cfg_reader);
         animations->insert(animation->getSignalID(), animation);
     }
 

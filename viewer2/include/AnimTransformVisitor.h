@@ -2,41 +2,48 @@
 #define ANIM_TRANSFORM_VISITOR_H
 
 #include "animations-list.h"
-#include "ProcAnimation.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/io/Options.h>
-#include <vsg/nodes/Node.h>
 
 #include <string>
 
+class ProcAnimation;
+
 namespace vsg
 {
+    class Duplicate;
     class MatrixTransform;
+    class Node;
+    class PropagateDynamicObjects;
 }
+
+struct AnimTransformVisitorCreateInfo
+{
+    vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
+    vsg::ref_ptr<vsg::Duplicate> duplicate;
+    std::string animations_dir;
+    animations_t* animations;
+};
 
 class AnimTransformVisitor : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
 {
 public:
-    AnimTransformVisitor(animations_t* animations, const std::string& vehicle_config, vsg::ref_ptr<vsg::MatrixTransform>& root_node, vsg::ref_ptr<vsg::Options> options);
+    explicit AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info);
 
     void apply(vsg::Node& node) override;
-
     void apply(vsg::MatrixTransform& transform) override;
 
 private:
-    vsg::ref_ptr<vsg::Options> options;
+    ProcAnimation* create_animation(const std::string& name, vsg::MatrixTransform& transform);
 
+private:
+    vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
+    vsg::ref_ptr<vsg::Duplicate> duplicate;
+    std::string animations_dir;
     animations_t* animations;
-    std::string vehicle_config;
-    vsg::ref_ptr<vsg::MatrixTransform>& root_node;
 
-    ProcAnimation* create_animation(const std::string& name, vsg::ref_ptr<vsg::MatrixTransform> transform);
-
-    // TODO: change name
-    void copy_nodes(vsg::ref_ptr<vsg::MatrixTransform>& transform);
 };
 
 #endif // ANIM_TRANSFORM_VISITOR_H
