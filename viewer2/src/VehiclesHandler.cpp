@@ -348,8 +348,6 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
         vehicle_ext.driver_pos = settings.cabine_default_pos;
         vehicle_ext.saved_cabine_cam_fov = settings.fovy;
 
-        
-
         if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {
             LOG_INFO("Loaded vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());

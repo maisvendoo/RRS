@@ -81,13 +81,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         {
             animation = new AnalogRotation(&transform);
             animation->load(cfg);
-            
-            vsg::CopyOp copyop;
-            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&transform);
-            auto new_transform = copyop(vsg::ref_ptr(&transform));
-            duplicate->insert(&transform, new_transform);
-
             return animation;
         }
 
@@ -96,13 +89,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         {
             animation = new AnalogTranslation(&transform);
             animation->load(cfg);
-
-            vsg::CopyOp copyop;
-            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&transform);
-            auto new_transform = copyop(vsg::ref_ptr(&transform));
-            duplicate->insert(&transform, new_transform);
-
             return animation;
         }
 
@@ -147,12 +133,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("MaterialRGBAnimation");
         if (!config_section.isNull())
         {
-            vsg::CopyOp copyop;
-            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&transform);
-            auto new_transform = copyop(vsg::ref_ptr(&transform));
-            duplicate->insert(&transform, new_transform);
-
             return nullptr;
         }
     }

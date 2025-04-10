@@ -269,7 +269,7 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* traffic_light, const se
 
     global_transform->children = {signal_node};
 
-    GUIParams::nodes.emplace_back(global_transform);
+    // GUIParams::nodes.emplace_back(global_transform);
 
     traffic_light_nodes->addChild(global_transform);
 
