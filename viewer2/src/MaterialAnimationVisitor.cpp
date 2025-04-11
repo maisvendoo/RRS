@@ -3,6 +3,7 @@
 #include "animations-list.h"
 #include "MaterialAnimation.h"
 
+#include <vsg/core/Data.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -40,12 +41,11 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
             {
                 if (auto* pbr_material_value = buffer_info->data->cast<vsg::PbrMaterialValue>())
                 {
-                    pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
-
                     std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
                     pdo->tag(pbr_material_value);
 
                     auto new_pbr_material_value = vsg::PbrMaterialValue::create(*pbr_material_value);
+                    new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
                     duplicate->insert(pbr_material_value, new_pbr_material_value);
 
                     ProcAnimation* animation = new MaterialAnimation(new_pbr_material_value);
