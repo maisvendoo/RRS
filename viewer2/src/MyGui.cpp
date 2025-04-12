@@ -4,7 +4,6 @@
 
 #include <vsgImGui/imgui.h>
 
-#include "cmake_defines.h"
 #include "vsg/app/Viewer.h"
 #include <vsg/io/Options.h>
 #include <vsg/nodes/CullNode.h>
