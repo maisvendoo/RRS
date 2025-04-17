@@ -251,7 +251,6 @@ void TrafficLightsHandler::loadSignalModel(TrafficLight* traffic_light, const se
     traffic_light->set_node(global_transform);
     traffic_light->load_animations(animations_dir, options, pdo, duplicate);
 
-    // global_transform->addChild(signal_node);
     global_transform->traverse(*pdo);
 
     if (!pdo->dynamicObjects.empty())

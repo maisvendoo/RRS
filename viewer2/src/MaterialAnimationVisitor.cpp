@@ -2,6 +2,7 @@
 
 #include "animations-list.h"
 #include "MaterialAnimation.h"
+#include "ProcAnimation.h"
 
 #include <vsg/core/Data.h>
 #include <vsg/core/Inherit.h>

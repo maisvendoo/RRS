@@ -44,17 +44,14 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
         transform.getValue("Name", name);
     }
 
-    if (name.empty())
+    if (!name.empty())
     {
-        transform.traverse(*this);
-        return;
-    }
-
-    ProcAnimation* animation = create_animation(name, transform);
-    if (animation)
-    {
-        animation->name = name;
-        animations->insert({animation->getSignalID(), animation});
+        ProcAnimation* animation = create_animation(name, transform);
+        if (animation)
+        {
+            animation->name = name;
+            animations->insert({animation->getSignalID(), animation});
+        }
     }
 
     transform.traverse(*this);

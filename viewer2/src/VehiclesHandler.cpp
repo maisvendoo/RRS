@@ -3,6 +3,7 @@
 #include <vsg/maths/transform.h>
 #include <vsg/io/stream.h>
 #include <vsg/io/Options.h>
+#include <vsg/utils/PropagateDynamicObjects.h>
 
 #include "ProcAnimation.h"
 #include "VehicleExterior.h"

@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <vsg/core/Object.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/maths/common.h>
 #include    <vsg/maths/transform.h>
 #include    <vsg/io/read.h>
 #include <vsg/nodes/CullNode.h>
@@ -108,6 +110,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
             cabine->setValue("name", "cabine");
             transform->addChild(cabine);
             transform->setValue("name", "vehicle + cabine");
+            cabine->matrix = cabine->transform(vsg::rotate(vsg::radians(90.0), -1.0, 0.0, 0.0));
         }
     }
     else
@@ -124,10 +127,45 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
         ss >> driver_pos.x >> driver_pos.y >> driver_pos.z;
     }
 
+    auto pdo = vsg::PropagateDynamicObjects::create();
+    vsg::CopyOp copyop;
+    auto duplicate = copyop.duplicate = new vsg::Duplicate;
+
     QString animationsDir = "";
     cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
-    load_animations(animationsDir.toStdString(), options);
+    load_animations(animationsDir.toStdString(), options, pdo, duplicate);
     load_model_animations(animationsDir.toStdString());
+
+    transform->traverse(*pdo);
+
+    vsg::ref_ptr<vsg::MatrixTransform> cabine = nullptr;
+    if (!pdo->dynamicObjects.empty())
+    {
+        for (auto& object : pdo->dynamicObjects)
+        {
+            if (!duplicate->contains(object))
+            {
+                duplicate->insert(object);
+            }
+        }
+
+        model = copyop(model);
+
+        
+        if (transform->children.size() == 2)
+        {
+            cabine = copyop(vsg::ref_ptr(transform->children[1]->cast<vsg::MatrixTransform>()));
+        }
+    }
+
+    if (cabine)
+    {
+        transform->children = {model, cabine};
+    }
+    else
+    {
+        transform->children = {model};
+    }
 
     QString soundsDir = "";
     cfg.getString(sec_name, "SoundDir", soundsDir);
@@ -207,13 +245,9 @@ vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleExterior::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options)
+void VehicleExterior::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo, vsg::ref_ptr<vsg::Duplicate> duplicate)
 {
     int old_size = animations.size();
-
-    auto pdo = vsg::PropagateDynamicObjects::create();
-    vsg::CopyOp copyop;
-    auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
     AnimTransformVisitorCreateInfo atv_create_info = {
         .pdo = pdo,
@@ -221,6 +255,7 @@ void VehicleExterior::load_animations(const std::string& animations_dir, vsg::re
         .animations_dir = animations_dir,
         .animations = &animations
     };
+
     AnimTransformVisitor atv(atv_create_info);
     transform->accept(atv);
     LOG_INFO("Loaded %u custom animations", animations.size() - old_size);
