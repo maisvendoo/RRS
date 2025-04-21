@@ -3,6 +3,7 @@
 #include "CfgReader.h"
 #include "ProcAnimation.h"
 
+#include <iostream>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
@@ -16,7 +17,43 @@
 AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
     : ProcAnimation(transform)
     , matrix(transform->matrix)
+    , translation(transform->matrix[3][0], transform->matrix[3][1], transform->matrix[3][2])
 {
+    std::cout << "Complex matrix = {\n";
+    for (int i = 0; i < 4; ++i)
+    {
+        std::cout << "    ";
+        for (int j = 0; j < 4; ++j)
+        {
+            std::cout << matrix[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+    std::cout << "}\n";
+
+    std::cout << "Translation: " << translation[0] << ' ' << translation[1] << ' ' << translation[2] << '\n';
+    std::cout << "Rotation matrix = {\n";
+    for (int i = 0; i < 4; ++i)
+    {
+        std::cout << "    ";
+        for (int j = 0; j < 4; ++j)
+        {
+            std::cout << rotation[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+    std::cout << "}\n";
+    std::cout << "Scale matrix = {\n";
+    for (int i = 0; i < 4; ++i)
+    {
+        std::cout << "    ";
+        for (int j = 0; j < 4; ++j)
+        {
+            std::cout << scale[i][j] << ' ';
+        }
+        std::cout << '\n';
+    }
+    std::cout << "}\n\n";
 }
 
 void AnalogRotation::anim_step(float t, float dt)
@@ -73,4 +110,7 @@ void AnalogRotation::update()
 
     vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
     transform->matrix = matrix * rotate;
+    // transform->matrix = vsg::translate(translation) * vsg::dmat4(1.0) * rotate;
+    // transform->matrix = vsg::translate(translation) * rotate * vsg::dmat4(1.0);
+    // transform->matrix = rotate * vsg::transpose(matrix);
 }

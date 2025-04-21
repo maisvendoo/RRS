@@ -110,7 +110,7 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
             cabine->setValue("name", "cabine");
             transform->addChild(cabine);
             transform->setValue("name", "vehicle + cabine");
-            cabine->matrix = cabine->transform(vsg::rotate(vsg::radians(90.0), -1.0, 0.0, 0.0));
+            // cabine->matrix = cabine->transform(vsg::rotate(vsg::radians(90.0), -1.0, 0.0, 0.0));
         }
     }
     else

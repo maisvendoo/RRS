@@ -31,6 +31,10 @@ private:
     vsg::dvec3 axis = vsg::dvec3(0.0, 0.0, 1.0);
     vsg::dmat4 matrix;
 
+    vsg::dvec3 translation;
+    vsg::dmat4 rotation;
+    vsg::dmat4 scale;
+
     void anim_step(float t, float dt) override;
 
     bool load_config(CfgReader &cfg) override;
