@@ -59,6 +59,17 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
 
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
 {
+    // std::cout << name << std::endl;
+    // for (int i = 0; i < 4; ++i)
+    // {
+    //     for (int j = 0; j < 4; ++j)
+    //     {
+    //         std::cout << transform.matrix[i][j] << '\t';
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // std::cout << std::endl;
+
     FileSystem& fs = FileSystem::getInstance();
     std::string data_dir = fs.getDataDir();
     std::string file_path = data_dir

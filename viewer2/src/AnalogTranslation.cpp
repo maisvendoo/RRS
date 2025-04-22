@@ -48,6 +48,9 @@ bool AnalogTranslation::load_config(CfgReader &cfg)
         std::string tmp = tmp_qstr.toStdString();
         std::istringstream ss(tmp);
         ss >> axis.x >> axis.y >> axis.z;
+
+        // TODO: Возможно раскомментировать
+        // axis = vsg::normalize(axis);
     }
 
     update();
