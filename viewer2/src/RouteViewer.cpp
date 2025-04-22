@@ -444,8 +444,7 @@ void RouteViewer::initCamera()
 
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
 
-    camera = vsg::Camera::create(perspective, lookAt,
-        vsg::ViewportState::create(window->extent2D()));
+    camera = vsg::Camera::create(perspective, lookAt, vsg::ViewportState::create(window->extent2D()));
 }
 
 //------------------------------------------------------------------------------
@@ -777,12 +776,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     viewer->compile();
 
     LOG_INFO("Send request for continuous vehicles update");
-    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
-                            static_cast<double>(settings.vehicles_pos_update_interval) / 1000.0);
-    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
-                            static_cast<double>(settings.vehicles_state_update_interval) / 1000.0);
-    tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE,
-                            static_cast<double>(settings.vehicle_controled_update_interval) / 1000.0);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE, static_cast<double>(settings.vehicle_controled_update_interval) * 0.001);
 
     is_ready = true;
 }
