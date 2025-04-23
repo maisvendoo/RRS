@@ -23,14 +23,14 @@
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt)
 {
-    if (animations.empty())
-    {
-        return;
-    }
+    // if (animations.empty())
+    // {
+    //     return;
+    // }
 
-    for (auto animation : animations)
+    for (auto& [signal_id, animation] : animations)
     {
-        animation.second->step(t, dt);
+        animation->step(t, dt);
     }
 }
 
