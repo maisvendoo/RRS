@@ -151,7 +151,6 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
 
         model = copyop(model);
 
-        
         if (transform->children.size() == 2)
         {
             cabine = copyop(vsg::ref_ptr(transform->children[1]->cast<vsg::MatrixTransform>()));
