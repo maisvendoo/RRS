@@ -14,14 +14,12 @@
 
 		<ReductorCoeff>3.83</ReductorCoeff>
 
-		<ExtModelName>VL60k-1737/VL60k-1737.osgt</ExtModelName>
-		<!-- <ExtModelName>VL60k-1737/VL60k-1737.gltf</ExtModelName> -->
+		<!-- <ExtModelName>VL60k-1737/VL60k-1737.osgt</ExtModelName> -->
+		<ExtModelName>VL60k-1737/VL60k-1737.gltf</ExtModelName>
 		<ModelShift>0.0 0.0 0.312</ModelShift>
 
 		<!-- <CabineModel>VL60k-1737/VL60k-cabview.osgt</CabineModel> -->
-		<CabineModel>VL60k-1737/qwe.gltf</CabineModel>
-		<!-- <CabineModel>VL60k-1737/qwr.gltf</CabineModel> -->
-		<!-- <CabineModel>VL60k-1737/VL60k-cabview.gltf</CabineModel> -->
+		<CabineModel>VL60k-1737/VL60k-cabview.gltf</CabineModel>
 		<CabineShift>0.0 0.0 0.317</CabineShift>
 
 		<CouplingModule>sa3</CouplingModule>
