@@ -21,13 +21,6 @@
 #include <iostream>
 #include <map>
 
-struct VehicleInfo
-{
-    vsg::ref_ptr<vsg::MatrixTransform> transform = nullptr;
-    vsg::CopyOp copy_op;
-    vsg::dvec3 driver_pos = vsg::dvec3(0.0, 0.0, 0.0);
-};
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -44,29 +37,10 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Options> options)
 {
-    // static std::map<std::string, VehicleInfo> loaded_vehicles;
-
     // Open vehicle config file
     FileSystem& fs = FileSystem::getInstance();
     std::string relative_config_path = cfg_dir + fs.separator() + cfg_file + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
-
-    // if (loaded_vehicles.count(cfg_path))
-    // {
-    //     const auto& vehicle_info = loaded_vehicles[cfg_path];
-    //     driver_pos = vehicle_info.driver_pos;
-    //     if (vehicle_info.transform)
-    //     {
-    //         transform = vehicle_info.copy_op(vehicle_info.transform);
-    //         return true;
-    //     }
-    //     else
-    //     {
-    //         return false;
-    //     }
-    // }
-
-    // auto& vehicle_info = loaded_vehicles[cfg_path] = {.transform = transform};
 
     CfgReader cfg;
     if (!cfg.load(cfg_path.c_str()))
@@ -134,7 +108,6 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
             cabine->setValue("name", "cabine");
             transform->addChild(cabine);
             transform->setValue("name", "vehicle + cabine");
-            // cabine->matrix = cabine->transform(vsg::rotate(vsg::radians(90.0), -1.0, 0.0, 0.0));
         }
         else
         {
@@ -166,7 +139,6 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
 
     transform->traverse(*pdo);
 
-    vsg::ref_ptr<vsg::MatrixTransform> cabine = nullptr;
     if (!pdo->dynamicObjects.empty())
     {
         for (auto& object : pdo->dynamicObjects)
@@ -193,7 +165,6 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
     cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
     load_displays(cfg_path);
 
-    // print_object(transform);
     return true;
 }
 

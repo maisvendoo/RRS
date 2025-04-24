@@ -8,7 +8,6 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
-#include <iostream>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
