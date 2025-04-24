@@ -8,6 +8,7 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
+#include <iostream>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -78,24 +79,28 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
         {
-            animation = new AnalogRotation(&transform);
+            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+            pdo->tag(&transform);
+            auto new_transform = vsg::ref_ptr(transform.clone()->cast<vsg::MatrixTransform>());
+            duplicate->insert(&transform, new_transform);
+
+            animation = new AnalogRotation(new_transform.get());
             animation->load(cfg);
-            // pdo->tag(&transform);
-            // vsg::MatrixTransform* new_transform = transform.clone()->cast<vsg::MatrixTransform>();
-            // animation->setTransform(new_transform);
-            // duplicate->insert(&transform, vsg::ref_ptr(new_transform));
+
             return animation;
         }
 
         config_section = cfg.getFirstSection("AnalogTranslation");
         if (!config_section.isNull())
         {
-            animation = new AnalogTranslation(&transform);
+            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+            pdo->tag(&transform);
+            auto new_transform = vsg::ref_ptr(transform.clone()->cast<vsg::MatrixTransform>());
+            duplicate->insert(&transform, new_transform);
+
+            animation = new AnalogTranslation(new_transform.get());
             animation->load(cfg);
-            // pdo->tag(&transform);
-            // vsg::MatrixTransform* new_transform = transform.clone()->cast<vsg::MatrixTransform>();
-            // animation->setTransform(new_transform);
-            // duplicate->insert(&transform, vsg::ref_ptr(new_transform));
+
             return animation;
         }
 
