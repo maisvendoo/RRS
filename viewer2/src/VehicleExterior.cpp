@@ -1,33 +1,38 @@
-#include    "VehicleExterior.h"
+#include "VehicleExterior.h"
 
-#include <iostream>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
-#include    <vsg/maths/transform.h>
-#include    <vsg/io/read.h>
+#include <vsg/maths/transform.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/io/read.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
+#include "AnimTransformVisitor.h"
+#include "CfgReader.h"
+#include "filesystem.h"
+#include "Logger.h"
 #include "MyGui.h"
-#include    "filesystem.h"
-#include    "CfgReader.h"
-#include    "AnimTransformVisitor.h"
-#include    "ProcAnimation.h"
-#include    "sound-manager.h"
-#include    "Logger.h"
+#include "ProcAnimation.h"
+#include "sound-manager.h"
+
+#include <iostream>
+#include <map>
+
+struct VehicleInfo
+{
+    vsg::ref_ptr<vsg::MatrixTransform> transform = nullptr;
+    vsg::CopyOp copy_op;
+    vsg::dvec3 driver_pos = vsg::dvec3(0.0, 0.0, 0.0);
+};
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt)
 {
-    // if (animations.empty())
-    // {
-    //     return;
-    // }
-
     for (auto& [signal_id, animation] : animations)
     {
         animation->step(t, dt);
@@ -37,12 +42,31 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, SoundManager *sm, vsg::ref_ptr<vsg::Options> options)
+bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Options> options)
 {
+    // static std::map<std::string, VehicleInfo> loaded_vehicles;
+
     // Open vehicle config file
-    FileSystem &fs = FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
     std::string relative_config_path = cfg_dir + fs.separator() + cfg_file + ".xml";
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
+
+    // if (loaded_vehicles.count(cfg_path))
+    // {
+    //     const auto& vehicle_info = loaded_vehicles[cfg_path];
+    //     driver_pos = vehicle_info.driver_pos;
+    //     if (vehicle_info.transform)
+    //     {
+    //         transform = vehicle_info.copy_op(vehicle_info.transform);
+    //         return true;
+    //     }
+    //     else
+    //     {
+    //         return false;
+    //     }
+    // }
+
+    // auto& vehicle_info = loaded_vehicles[cfg_path] = {.transform = transform};
 
     CfgReader cfg;
     if (!cfg.load(cfg_path.c_str()))
@@ -68,8 +92,8 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
     }
 
     cfg.getString(sec_name, "ExtTexturesDir", textureName);
+    
     auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
-
     if (!model)
     {
         return false;
@@ -112,6 +136,10 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
             transform->setValue("name", "vehicle + cabine");
             // cabine->matrix = cabine->transform(vsg::rotate(vsg::radians(90.0), -1.0, 0.0, 0.0));
         }
+        else
+        {
+            transform->setValue("name", "only vehicle");
+        }
     }
     else
     {
@@ -149,21 +177,12 @@ bool VehicleExterior::loadVehicle(std::string &cfg_dir, std::string &cfg_file, S
             }
         }
 
-        model = copyop(model);
+        transform->children[0] = copyop(model);
 
         if (transform->children.size() == 2)
         {
-            cabine = copyop(vsg::ref_ptr(transform->children[1]->cast<vsg::MatrixTransform>()));
+            transform->children[1] = copyop(vsg::ref_ptr(transform->children[1]->cast<vsg::MatrixTransform>()));
         }
-    }
-
-    if (cabine)
-    {
-        transform->children = {model, cabine};
-    }
-    else
-    {
-        transform->children = {model};
     }
 
     QString soundsDir = "";

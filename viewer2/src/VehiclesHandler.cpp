@@ -1,5 +1,7 @@
 #include "VehiclesHandler.h"
 
+#include <cstddef>
+#include <string>
 #include <vsg/maths/transform.h>
 #include <vsg/io/stream.h>
 #include <vsg/io/Options.h>
@@ -342,35 +344,32 @@ bool VehiclesHandler::returnToControlledVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings, vsg::ref_ptr<vsg::Options> options)
+void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
 {
-    int count = vehicles_info.vehicles.size();
+    std::size_t vehicle_count = vehicles_info.vehicles.size();
 
-    for (int i = 0; i < count; ++i)
+    for (std::size_t i = 0; i < vehicle_count; ++i)
     {
-        QString cfg_dir_tmp = vehicles_info.vehicles[i].vehicle_config_dir;
-        std::string cfg_dir = cfg_dir_tmp.toStdString();
+        std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
+        std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
 
-        QString cfg_file_tmp = vehicles_info.vehicles[i].vehicle_config_file;
-        std::string cfg_file = cfg_file_tmp.toStdString();
+        VehicleExterior vehicle_exterior;
+        vehicle_exterior.driver_pos = settings.cabine_default_pos;
+        vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
-        VehicleExterior vehicle_ext;
-        vehicle_ext.driver_pos = settings.cabine_default_pos;
-        vehicle_ext.saved_cabine_cam_fov = settings.fovy;
-
-        if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
+        if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {
             LOG_INFO("Loaded vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_INFO("Vehicle %u / %u loaded", i + 1, count);
+            LOG_INFO("Vehicle %u / %u loaded", i + 1, vehicle_count);
         }
         else
         {
             LOG_WARN("Fail to load vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_WARN("Vehicle %u / %u added with empty model", i + 1, count);
+            LOG_WARN("Vehicle %u / %u added with empty model", i + 1, vehicle_count);
         }
 
-        vehicles.push_back(vehicle_ext);
-        vehicles_node->addChild(vehicle_ext.transform);
+        vehicles.push_back(vehicle_exterior);
+        vehicles_node->addChild(vehicle_exterior.transform);
     }
 }
 
