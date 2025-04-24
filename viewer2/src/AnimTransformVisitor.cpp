@@ -44,14 +44,17 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
         transform.getValue("Name", name);
     }
 
-    if (!name.empty())
+    if (name.empty())
     {
-        ProcAnimation* animation = create_animation(name, transform);
-        if (animation)
-        {
-            animation->name = name;
-            animations->insert({animation->getSignalID(), animation});
-        }
+        transform.traverse(*this);
+        return;
+    }
+
+    ProcAnimation* animation = create_animation(name, transform);
+    if (animation)
+    {
+        animation->name = name;
+        animations->insert({animation->getSignalID(), animation});
     }
 
     transform.traverse(*this);
@@ -59,17 +62,6 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
 
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
 {
-    // std::cout << name << std::endl;
-    // for (int i = 0; i < 4; ++i)
-    // {
-    //     for (int j = 0; j < 4; ++j)
-    //     {
-    //         std::cout << transform.matrix[i][j] << '\t';
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
-
     FileSystem& fs = FileSystem::getInstance();
     std::string data_dir = fs.getDataDir();
     std::string file_path = data_dir
@@ -77,9 +69,8 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         + fs.separator() + animations_dir
         + fs.separator() + name + ".xml";
 
-    QString tmp_qstr = file_path.c_str();
     CfgReader cfg;
-    if (cfg.load(tmp_qstr))
+    if (cfg.load(file_path.c_str()))
     {
         QDomNode config_section;
         ProcAnimation* animation = nullptr;
@@ -89,6 +80,10 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         {
             animation = new AnalogRotation(&transform);
             animation->load(cfg);
+            // pdo->tag(&transform);
+            // vsg::MatrixTransform* new_transform = transform.clone()->cast<vsg::MatrixTransform>();
+            // animation->setTransform(new_transform);
+            // duplicate->insert(&transform, vsg::ref_ptr(new_transform));
             return animation;
         }
 
@@ -97,6 +92,10 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         {
             animation = new AnalogTranslation(&transform);
             animation->load(cfg);
+            // pdo->tag(&transform);
+            // vsg::MatrixTransform* new_transform = transform.clone()->cast<vsg::MatrixTransform>();
+            // animation->setTransform(new_transform);
+            // duplicate->insert(&transform, vsg::ref_ptr(new_transform));
             return animation;
         }
 
@@ -130,19 +129,17 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
                 std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
                 pdo->tag(&transform);
-
-                auto new_transform = copyop(vsg::ref_ptr(&transform));
-                duplicate->insert(&transform, new_transform);
+                duplicate->insert(&transform, copyop(vsg::ref_ptr(&transform)));
             }
 
             return nullptr;
         }
-
-        config_section = cfg.getFirstSection("MaterialRGBAnimation");
-        if (!config_section.isNull())
-        {
-            return nullptr;
-        }
+        
+        // config_section = cfg.getFirstSection("MaterialRGBAnimation");
+        // if (!config_section.isNull())
+        // {
+        //     return nullptr;
+        // }
     }
 
     return nullptr;

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ANIM_TRANSFORM_VISITOR_H
 #define ANIM_TRANSFORM_VISITOR_H
 
@@ -43,7 +44,6 @@ private:
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
     animations_t* animations;
-
 };
 
 #endif // ANIM_TRANSFORM_VISITOR_H

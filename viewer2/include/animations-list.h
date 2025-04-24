@@ -1,8 +1,8 @@
 #ifndef ANIMATIONS_LIST_H
 #define ANIMATIONS_LIST_H
 
-#include <map>
 #include <cstddef>
+#include <map>
 
 class ProcAnimation;
 

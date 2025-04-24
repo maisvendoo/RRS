@@ -5095,6 +5095,9 @@
 				"baseColorTexture":{
 					"index":6
 				}
+			},
+			"emissiveTexture":  {
+				"index": 6
 			}
 		},
 		{
