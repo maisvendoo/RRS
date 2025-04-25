@@ -2,8 +2,11 @@
 #define VEHICLE_EXTERIOR_H
 
 #include "animations-list.h"
+#include <vsg/core/Object.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/utils/PropagateDynamicObjects.h>
 
 class SoundManager;
 
@@ -46,7 +49,7 @@ private:
 
     vsg::ref_ptr<vsg::MatrixTransform> loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options);
 
-    void load_animations(const std::string& animations_dir);
+    void load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo, vsg::ref_ptr<vsg::Duplicate> duplicate);
 
     void load_model_animations(const std::string& animations_dir);
 

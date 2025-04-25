@@ -29,6 +29,8 @@ public:
 
     void setPosition(float pos);
 
+    void setTransform(vsg::MatrixTransform* transform);
+
     std::size_t getSignalID() const;
 
 public:

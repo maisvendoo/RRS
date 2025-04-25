@@ -3,6 +3,7 @@
 #include "CfgReader.h"
 #include "ProcAnimation.h"
 
+#include <iostream>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
@@ -21,7 +22,7 @@ AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
 
 void AnalogRotation::anim_step(float t, float dt)
 {
-    float delta = (pos - cur_pos);
+    float delta = pos - cur_pos;
     if (abs(delta) > 1e-5f)
     {
         cur_pos += delta * duration * dt;
@@ -35,11 +36,15 @@ bool AnalogRotation::load_config(CfgReader& cfg)
 
     int tmp_int = 0;
     if (cfg.getInt(sec_name, "SignalID", tmp_int))
+    {
         signal_id = tmp_int;
+    }
 
     double tmp_dbl = 1.0;
     if (cfg.getDouble(sec_name, "Duration", tmp_dbl))
+    {
         duration = tmp_dbl;
+    }
 
     cfg.getBool(sec_name, "FixedSignal", is_fixed_signal);
 
@@ -51,6 +56,7 @@ bool AnalogRotation::load_config(CfgReader& cfg)
         std::string tmp = tmp_qstr.toStdString();
         std::istringstream ss(tmp);
         ss >> axis.x >> axis.y >> axis.z;
+        axis = vsg::normalize(axis);
     }
 
     update();

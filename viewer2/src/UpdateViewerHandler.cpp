@@ -125,7 +125,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         }
     }
 
-    // Управеление F-клавишами только без Shift и Ctrl
+    // Управление F-клавишами только без Shift и Ctrl
     if (!isCtrl() && !isShift())
     {
         // F1 - камера из кабины управляемой ПЕ
