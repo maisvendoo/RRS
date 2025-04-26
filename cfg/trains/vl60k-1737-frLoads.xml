@@ -18,7 +18,8 @@
 		<ModuleConfigDir>vl60k</ModuleConfigDir>
 		<ModuleConfig>vl60k-1737</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
-		<Count>1</Count>
+		<!-- <Count>1</Count> -->
+		<Count>2</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 

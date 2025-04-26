@@ -1,8 +1,11 @@
 #include "VehiclesHandler.h"
 
+#include <cstddef>
+#include <string>
 #include <vsg/maths/transform.h>
 #include <vsg/io/stream.h>
 #include <vsg/io/Options.h>
+#include <vsg/utils/PropagateDynamicObjects.h>
 
 #include "ProcAnimation.h"
 #include "VehicleExterior.h"
@@ -13,7 +16,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VehiclesHandler::VehiclesHandler(const settings_t& settings, SoundManager *sm, QObject *parent)
+VehiclesHandler::VehiclesHandler(const settings_t& settings, SoundManager* sm, QObject* parent)
     : QObject(parent)
     , sound_manager(sm)
 {
@@ -31,12 +34,9 @@ vsg::ref_ptr<vsg::Group> VehiclesHandler::getExterior()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VehicleExterior *VehiclesHandler::getCurrentVehicle()
+VehicleExterior* VehiclesHandler::getCurrentVehicle()
 {
-    if (isUpdated())
-        return &(vehicles[cur_vehicle]);
-
-    return nullptr;
+    return isUpdated() ? &(vehicles[cur_vehicle]) : nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -142,24 +142,28 @@ void VehiclesHandler::step(double t, double dt)
         vehicles[i].position = vsg::dvec3(
             k * update_pos_data[old_data].vehicles[i].position_x + r * update_pos_data[cur_data].vehicles[i].position_x,
             k * update_pos_data[old_data].vehicles[i].position_y + r * update_pos_data[cur_data].vehicles[i].position_y,
-            k * update_pos_data[old_data].vehicles[i].position_z + r * update_pos_data[cur_data].vehicles[i].position_z);
+            k * update_pos_data[old_data].vehicles[i].position_z + r * update_pos_data[cur_data].vehicles[i].position_z
+        );
 
         vehicles[i].orth = normalize(vsg::dvec3(
             k * update_pos_data[old_data].vehicles[i].orth_x + r * update_pos_data[cur_data].vehicles[i].orth_x,
             k * update_pos_data[old_data].vehicles[i].orth_y + r * update_pos_data[cur_data].vehicles[i].orth_y,
-            k * update_pos_data[old_data].vehicles[i].orth_z + r * update_pos_data[cur_data].vehicles[i].orth_z));
+            k * update_pos_data[old_data].vehicles[i].orth_z + r * update_pos_data[cur_data].vehicles[i].orth_z
+        ));
 
         vehicles[i].up = normalize(vsg::dvec3(
             k * update_pos_data[old_data].vehicles[i].up_x + r * update_pos_data[cur_data].vehicles[i].up_x,
             k * update_pos_data[old_data].vehicles[i].up_y + r * update_pos_data[cur_data].vehicles[i].up_y,
-            k * update_pos_data[old_data].vehicles[i].up_z + r * update_pos_data[cur_data].vehicles[i].up_z));
+            k * update_pos_data[old_data].vehicles[i].up_z + r * update_pos_data[cur_data].vehicles[i].up_z
+        ));
 
         vehicles[i].right = cross(vehicles[i].orth, vehicles[i].up);
 
         vehicles[i].attitude = vsg::dvec3(
             asin(vehicles[i].orth.z),
             0.0,
-            (vehicles[i].orth.x > 0.0) ? acos(vehicles[i].orth.y) : - acos(vehicles[i].orth.y) );
+            (vehicles[i].orth.x > 0.0) ? acos(vehicles[i].orth.y) : -acos(vehicles[i].orth.y)
+        );
 
         // Apply vehicle body matrix transform
         vehicles[i].transform->matrix = vsg::translate(vehicles[i].position) *
@@ -171,7 +175,8 @@ void VehiclesHandler::step(double t, double dt)
             vehicles[i].velocity = vsg::dvec3(
                 (update_pos_data[cur_data].vehicles[i].position_x - update_pos_data[old_data].vehicles[i].position_x) / upd_dt,
                 (update_pos_data[cur_data].vehicles[i].position_y - update_pos_data[old_data].vehicles[i].position_y) / upd_dt,
-                (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z) / upd_dt);
+                (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z) / upd_dt
+            );
         }
 
         if (update_state)
@@ -182,13 +187,16 @@ void VehiclesHandler::step(double t, double dt)
             vehicles[i].next_vehicle = update_data[new_state].vehicles[i].next_vehicle;
 
             // Model animations update
-            for (auto animation : vehicles[i].animations)
+            for (auto& [signal_id, animation] : vehicles[i].animations)
             {
-                size_t signal_id = animation.first;
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
-                    animation.second->setPosition(update_data[new_state].vehicles[i].analogSignal[signal_id]);
+                {
+                    animation->setPosition(update_data[new_state].vehicles[i].analogSignal[signal_id]);
+                }
                 else
-                    animation.second->setPosition(0.0f);
+                {
+                    animation->setPosition(0.0f);
+                }
             }
 
             // Sounds update
@@ -203,9 +211,13 @@ void VehiclesHandler::step(double t, double dt)
 
                 size_t signal_id = sound_manager->getSignalID(sound_id);
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
+                {
                     sound_manager->setSoundSignal(sound_id, update_data[new_state].vehicles[i].analogSignal[signal_id]);
+                }
                 else
+                {
                     sound_manager->setSoundSignal(sound_id, 0.0f);
+                }
             }
         }
         else
@@ -332,35 +344,32 @@ bool VehiclesHandler::returnToControlledVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t &settings, vsg::ref_ptr<vsg::Options> options)
+void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
 {
-    int count = vehicles_info.vehicles.size();
+    std::size_t vehicle_count = vehicles_info.vehicles.size();
 
-    for (int i = 0; i < count; ++i)
+    for (std::size_t i = 0; i < vehicle_count; ++i)
     {
-        QString cfg_dir_tmp = vehicles_info.vehicles[i].vehicle_config_dir;
-        std::string cfg_dir = cfg_dir_tmp.toStdString();
+        std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
+        std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
 
-        QString cfg_file_tmp = vehicles_info.vehicles[i].vehicle_config_file;
-        std::string cfg_file = cfg_file_tmp.toStdString();
+        VehicleExterior vehicle_exterior;
+        vehicle_exterior.driver_pos = settings.cabine_default_pos;
+        vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
-        VehicleExterior vehicle_ext;
-        vehicle_ext.driver_pos = settings.cabine_default_pos;
-        vehicle_ext.saved_cabine_cam_fov = settings.fovy;
-
-        if (vehicle_ext.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
+        if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {
             LOG_INFO("Loaded vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_INFO("Vehicle %u / %u loaded", i + 1, count);
+            LOG_INFO("Vehicle %u / %u loaded", i + 1, vehicle_count);
         }
         else
         {
             LOG_WARN("Fail to load vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_WARN("Vehicle %u / %u added with empty model", i + 1, count);
+            LOG_WARN("Vehicle %u / %u added with empty model", i + 1, vehicle_count);
         }
 
-        vehicles.push_back(vehicle_ext);
-        vehicles_node->addChild(vehicle_ext.transform);
+        vehicles.push_back(vehicle_exterior);
+        vehicles_node->addChild(vehicle_exterior.transform);
     }
 }
 
@@ -380,8 +389,7 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
             update_pos_data[new_data].deserialize(data);
             if (update_pos_data[new_data].vehicles.size() == vehicles.size())
             {
-                time_difference = update_pos_data[new_data].time - ref_time -
-                                  settings_delay;
+                time_difference = update_pos_data[new_data].time - ref_time - settings_delay;
             }
             else
             {
@@ -480,7 +488,9 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
 void VehiclesHandler::slotGetVehiclesStateData(QByteArray &data)
 {
     if (is_new_state)
+    {
         return;
+    }
 
     update_data[unused_state].deserialize(data);
     if (update_data[unused_state].vehicles.size() == vehicles.size())
@@ -505,7 +515,9 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray &data)
 void VehiclesHandler::slotGetVehicleControlled(QByteArray &data)
 {
     if (!is_pos_updated || !is_state_updated)
+    {
         return;
+    }
 
     vehicle_controlled.deserialize(data);
     if ((vehicle_controlled.controlled_vehicle >= 0) &&

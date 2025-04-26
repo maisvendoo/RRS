@@ -16,7 +16,7 @@ AnimTransformVisitor::AnimTransformVisitor(animations_t *animations,
                                            const std::string &vehicle_config)
     : osg::NodeVisitor ()
     , animations(animations)
-    , vehicle_config(vehicle_config)
+    , animations_dir(vehicle_config)
 {
 
 }
@@ -50,7 +50,7 @@ ProcAnimation *AnimTransformVisitor::create_animation(const std::string &name,
     std::string data_dir = fs.getDataDir();
     std::string file_path = data_dir + fs.separator()
             + "animations" + fs.separator()
-            + vehicle_config + fs.separator()
+            + animations_dir + fs.separator()
             + name + ".xml";
 
     ConfigReader cfg(file_path);

@@ -50,6 +50,11 @@ void ProcAnimation::setPosition(float pos)
     }
 }
 
+void ProcAnimation::setTransform(vsg::MatrixTransform* transform)
+{
+    this->transform = transform;
+}
+
 std::size_t ProcAnimation::getSignalID() const
 {
     return signal_id;

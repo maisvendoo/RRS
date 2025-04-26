@@ -405,6 +405,9 @@
 					"index":0
 				},
 				"metallicFactor":0
+			},
+			"emissiveTexture": {
+				"index": 0
 			}
 		},
 		{
@@ -420,6 +423,9 @@
 					"index":1
 				},
 				"metallicFactor":0
+			},
+			"emissiveTexture": {
+				"index": 1
 			}
 		}
 	],

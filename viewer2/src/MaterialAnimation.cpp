@@ -69,6 +69,7 @@ void MaterialAnimation::update()
     {
         return;
     }
+
     vsg::vec4 new_color = color * interpolate(cur_pos);
     new_color.a = 1.0f;
 
@@ -77,5 +78,6 @@ void MaterialAnimation::update()
 
     material_value->value().baseColorFactor = new_color;
     material_value->value().emissiveFactor = new_emission_color;
+    // material_value->value().diffuseFactor = new_color;
     material_value->dirty();
 }

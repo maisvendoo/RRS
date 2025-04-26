@@ -2,11 +2,13 @@
 
 #include "VehiclesHandler.h"
 
+#include <vsg/app/RecordTraversal.h>
 #include <vsgImGui/imgui.h>
 
 #include "vsg/app/Viewer.h"
 #include <vsg/io/Options.h>
 #include <vsg/nodes/CullNode.h>
+#include <vsg/nodes/DepthSorted.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
@@ -370,6 +372,10 @@ void MyGui::printObject(const vsg::ref_ptr<vsg::Object>& object) const
         else if (auto bufferInfo = vsg::ref_ptr(object->cast<vsg::BufferInfo>()))
         {
             printObject(bufferInfo->data);
+        }
+        else if (auto depthSorted = vsg::ref_ptr(object->cast<vsg::DepthSorted>()))
+        {
+            printObject(depthSorted->child);
         }
 
         ImGui::PushID(id);

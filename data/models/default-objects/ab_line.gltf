@@ -250,6 +250,9 @@
 					"index":0
 				},
 				"metallicFactor":0
+			},
+			"emissiveTexture": {
+				"index": 0
 			}
 		}
 	],
