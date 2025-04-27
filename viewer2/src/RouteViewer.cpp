@@ -17,7 +17,6 @@
 #include "sound-manager.h"
 #include "tcp-client.h"
 
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -147,8 +146,6 @@ bool RouteViewer::init(int argc, char* argv[])
     initViewer();
 
     initTCPclient();
-
-    // TODO: Скриншоты
 
     return true;
 }
@@ -565,10 +562,10 @@ void RouteViewer::initViewer()
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
+    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
-    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(close_viewer_handler);
 
     // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);

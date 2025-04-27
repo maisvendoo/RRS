@@ -2,6 +2,7 @@
 #define ROUTE_VIEWER_H
 
 #include "MyGui.h"
+#include "UpdateViewerHandler.h"
 #include "settings.h"
 
 #include <vsg/app/CommandGraph.h>
