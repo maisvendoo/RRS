@@ -26,6 +26,7 @@
 
 #include <QApplication>
 
+#include <vsg/app/CommandGraph.h>
 #include <vsg/io/Options.h>
 #include <vsgXchange/all.h>
 
@@ -43,6 +44,7 @@
 #include <vsgImGui/imgui.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
+#include <vulkan/vulkan_core.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(parent)
 {
@@ -57,7 +59,14 @@ RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(pare
     }
 }
 
-RouteViewer::~RouteViewer() = default;
+RouteViewer::~RouteViewer()
+{
+    delete vehicles_handler;
+    delete traffic_lights_handler;
+    delete screenshot_writer;
+    delete sound_manager;
+    delete tcp_client;
+}
 
 bool RouteViewer::isReady() const
 {
@@ -474,21 +483,26 @@ void RouteViewer::initLights()
 
     auto rasterizationState = vsg::RasterizationState::create();
     rasterizationState->depthClampEnable = VK_TRUE;
+    // rasterizationState->cullMode = VK_CULL_MODE_NONE;
 
-    auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    pbr->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    pbr->defaultShaderHints = shaderHints;
-    pbr->variants.clear();
+    // auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // pbr->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // pbr->defaultShaderHints = shaderHints;
+    // pbr->variants.clear();
 
-    auto phong = options->shaderSets["phong"] = vsg::createPhongShaderSet(options);
-    phong->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    phong->defaultShaderHints = shaderHints;
-    phong->variants.clear();
+    // auto phong = options->shaderSets["phong"] = vsg::createPhongShaderSet(options);
+    // phong->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phong->defaultShaderHints = shaderHints;
+    // phong->variants.clear();
 
-    auto flat = options->shaderSets["flat"] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    flat->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    flat->defaultShaderHints = shaderHints;
-    flat->variants.clear();
+    // auto flat = options->shaderSets["flat"] = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // flat->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // flat->defaultShaderHints = shaderHints;
+    // flat->variants.clear();
+
+    // options->shaderSets.erase("flat");
+    // options->shaderSets.erase("pbr");
+    // options->shaderSets.erase("phong");
 
     // shadow_region = vsg::RegionOfInterest::create();
     // shadow_region->points.emplace_back();
@@ -532,13 +546,6 @@ void RouteViewer::initView()
     view->viewDependentState->lambda = lambda;
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
     view->addChild(root);
-    auto renderGraph = vsg::RenderGraph::create(window, view);
-
-    GUIparams = GUIParams::create();
-    auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
-    renderGraph->addChild(renderImGui);
-
-    commandGraph = vsg::CommandGraph::create(window, renderGraph);
 }
 
 //------------------------------------------------------------------------------
@@ -546,7 +553,13 @@ void RouteViewer::initView()
 //------------------------------------------------------------------------------
 void RouteViewer::initCommandGraph()
 {
+    auto renderGraph = vsg::RenderGraph::create(window, view);
 
+    GUIparams = GUIParams::create();
+    auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
+    renderGraph->addChild(renderImGui);
+
+    commandGraph = vsg::CommandGraph::create(window, renderGraph);
 }
 
 //------------------------------------------------------------------------------
@@ -572,7 +585,6 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(close_viewer_handler);
 
-    // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
 }
