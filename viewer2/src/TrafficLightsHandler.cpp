@@ -4,10 +4,10 @@
 #include "TrafficLight.h"
 #include "filesystem.h"
 #include "Logger.h"
-#include "MyGui.h"
+// #include "MyGui.h"
 #include "settings.h"
 
-#include <iostream>
+// #include <iostream>
 #include <qcontainerfwd.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>

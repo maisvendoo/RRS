@@ -1,6 +1,5 @@
 #include "RouteViewer.h"
 
-#include "cmake_defines.h"
 #include "cmd-line.h"
 #include "CLI11.hpp"
 #include "filesystem.h"
@@ -18,15 +17,14 @@
 #include "sound-manager.h"
 #include "tcp-client.h"
 
-#include <cmath>
 #include <cstdlib>
-#include <iostream>
 #include <sstream>
 #include <string>
 
 #include <QApplication>
 
 #include <vsg/app/CommandGraph.h>
+#include <vsg/core/ConstVisitor.h>
 #include <vsg/io/Options.h>
 #include <vsgXchange/all.h>
 
@@ -38,7 +36,7 @@
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ViewDependentState.h>
 #include <vsg/utils/SharedObjects.h>
-#include <vsg/utils/ShaderSet.h>
+#include <vsg/utils/ShaderSet.h> 
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <vsgImGui/imgui.h>
@@ -157,8 +155,6 @@ bool RouteViewer::init(int argc, char* argv[])
     initViewer();
 
     initTCPclient();
-
-    // TODO: Скриншоты
 
     return true;
 }
@@ -394,6 +390,7 @@ void RouteViewer::initWindowTraits()
         if (s > 1) return VK_SAMPLE_COUNT_2_BIT;
         return VK_SAMPLE_COUNT_1_BIT;
     };
+
     windowTraits = vsg::WindowTraits::create();
     windowTraits->x = settings.x;
     windowTraits->y = settings.y;
@@ -628,6 +625,16 @@ bool RouteViewer::loadRoute()
     loader.read_description();
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
+
+    // auto z = vsg::read_cast<vsg::Data>(settings.route_dir_full_path + "/textures/TrackSections.tga", options);
+    // options->sharedObjects->share(z);
+
+    // auto x = vsg::External::create();
+    // x->add("/home/ksv/work-ANI/Projects/ANI/RRS/routes/experimental-polygon-gltf/textures/TrackSections.tga", z);
+    // x->options = options;
+
+    // root->setObject("external", x);
+    // root->setValue("external", x);
 
     for (auto& [label, transform] : route.transforms)
     {
