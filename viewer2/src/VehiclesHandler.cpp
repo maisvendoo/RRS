@@ -6,7 +6,6 @@
 #include <vsg/maths/transform.h>
 #include <vsg/io/stream.h>
 #include <vsg/io/Options.h>
-#include <vsg/utils/PropagateDynamicObjects.h>
 
 #include "ProcAnimation.h"
 #include "VehicleExterior.h"
@@ -345,12 +344,21 @@ bool VehiclesHandler::returnToControlledVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info,
-                           const settings_t& settings,
+bool VehiclesHandler::load(QByteArray &data,
+                           const settings_t &settings,
                            vsg::ref_ptr<vsg::Viewer> viewer,
                            vsg::ref_ptr<vsg::Options> options)
 {
+    simulator_vehicles_info_t vehicles_info;
+    vehicles_info.deserialize(data);
+
     std::size_t vehicle_count = vehicles_info.vehicles.size();
+    if (vehicle_count == 0)
+    {
+        LOG_WARN("Server has not any vehicles");
+        return false;
+    }
+    LOG_INFO("Got info about %u vehicles from server", vehicle_count);
 
     for (std::size_t i = 0; i < vehicle_count; ++i)
     {
@@ -364,17 +372,19 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info,
         if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, viewer, options))
         {
             LOG_INFO("Added vehicle model from %s / %s.xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_INFO("Vehicle %u / %u loaded", i + 1, vehicle_count);
+            LOG_INFO("Vehicle %u / %u added", i + 1, vehicle_count);
         }
         else
         {
-            LOG_WARN("Fail to load vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
+            LOG_WARN("Fail to load vehicle model from %s / %s.xml", cfg_dir.c_str(), cfg_file.c_str());
             LOG_WARN("Vehicle %u / %u added with empty model", i + 1, vehicle_count);
         }
 
         vehicles.push_back(vehicle_exterior);
         vehicles_node->addChild(vehicle_exterior.transform);
     }
+
+    return true;
 }
 
 //------------------------------------------------------------------------------

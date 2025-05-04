@@ -1,9 +1,11 @@
 #include "TrafficLight.h"
 
-#include "AnimTransformVisitor.h"
 #include "ProcAnimation.h"
+#include "filesystem.h"
+#include "LoadModelOperation.h"
 
 #include <vsg/utils/PropagateDynamicObjects.h>
+#include <vsg/threading/OperationThreads.h>
 
 #include <QBuffer>
 #include <QFlags>
@@ -18,6 +20,39 @@ TrafficLight::TrafficLight()
 {
     std::fill(lens_state.begin(), lens_state.end(), false);
     old_lens_state = lens_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrafficLight::step(float t, float dt)
+{
+    if (animations.empty())
+    {
+        return;
+    }
+
+    bool changed = (old_lens_state != lens_state);
+    if (changed)
+    {
+        std::cout << "Updated signal "
+                  << this->getConnectorName().toStdString()
+                  << " | lens: "
+                  << lens_state[0] << lens_state[1] << lens_state[2] << lens_state[3] << lens_state[4]
+                  << std::endl;
+
+        old_lens_state = lens_state;
+    }
+
+    for (auto animation : animations)
+    {
+        if (changed)
+        {
+            animation.second->setPosition(lens_state[animation.first]);
+        }
+
+        animation.second->step(t, dt);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -40,7 +75,7 @@ void TrafficLight::deserialize(QByteArray& data)
         stream >> lens_state[i];
     }
 
-    stream >> pos.x >> pos.y >> pos.z;
+    stream >> position.x >> position.y >> position.z;
     stream >> orth.x >> orth.y >> orth.z;
     stream >> right.x >> right.y >> right.z;
     stream >> up.x >> up.y >> up.z;
@@ -81,35 +116,44 @@ const QString& TrafficLight::getModelName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const vsg::dvec3& TrafficLight::getPosition() const
+bool TrafficLight::loadSignal(std::string &models_dir_path,
+                              std::string &animations_dir,
+                              vsg::ref_ptr<vsg::Viewer> viewer,
+                              vsg::ref_ptr<vsg::Options> options)
 {
-    return pos;
+    if (signal_model.isEmpty())
+        return false;
+
+    old_lens_state = lens_state;
+
+    vsg::dmat4 m1 = vsg::translate(position);
+
+    vsg::dmat4 m2(
+        right.x,    -orth.x,    up.x,   0,
+        -right.y,   orth.y,     up.y,   0,
+        right.z,    orth.z,     up.z,   0,
+        0,          0,          0,      1
+    );
+
+    transform->matrix = m1 * m2;
+
+    FileSystem& fs = FileSystem::getInstance();
+    std::string model_filename_path = fs.combinePath(models_dir_path, signal_model.toStdString());
+    model_filename_path += ".gltf";
+    std::string textures_dir = "";
+
+    // Load model
+    options->operationThreads->add(LoadModelOperation::create(viewer,
+                                                              transform,
+                                                              model_filename_path,
+                                                              animations_dir,
+                                                              textures_dir, // TODO
+                                                              options,
+                                                              animations));
+    return true;
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-const vsg::dvec3& TrafficLight::getOrth() const
-{
-    return orth;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-const vsg::dvec3& TrafficLight::getRight() const
-{
-    return right;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-const vsg::dvec3& TrafficLight::getUp() const
-{
-    return up;
-}
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -140,36 +184,4 @@ void TrafficLight::load_animations(const std::string& animations_dir, vsg::ref_p
     
     old_lens_state = lens_state;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrafficLight::step(float t, float dt)
-{
-    if (animations.empty())
-    {
-        return;
-    }
-
-    bool changed = (old_lens_state != lens_state);
-    if (changed)
-    {
-        std::cout << "Updated signal "
-                  << this->getConnectorName().toStdString()
-                  << " | lens: "
-                  << lens_state[0] << lens_state[1] << lens_state[2] << lens_state[3] << lens_state[4]
-                  << std::endl;
-
-        old_lens_state = lens_state;
-    }
-
-    for (auto animation : animations)
-    {
-        if (changed)
-        {
-            animation.second->setPosition(lens_state[animation.first]);
-        }
-
-        animation.second->step(t, dt);
-    }
-}
+*/

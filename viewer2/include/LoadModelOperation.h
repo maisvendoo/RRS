@@ -54,7 +54,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
                        const std::string& in_animations_dir,
                        const std::string& in_textures_dir, // TODO
                        vsg::ref_ptr<vsg::Options> in_options,
-                       animations_t* in_animations)
+                       animations_t& in_animations)
         : viewer(in_viewer)
         , attachment_point(in_attachment_point)
         , model_filename_path(in_model_filename_path)
@@ -67,70 +67,76 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     }
 
     vsg::observer_ptr<vsg::Viewer> viewer;
-    vsg::ref_ptr<vsg::Group> attachment_point;
-    std::string model_filename_path;
-    std::string animations_dir;
-    std::string textures_dir; // TODO
-    vsg::ref_ptr<vsg::Options> options;
-    animations_t* animations;
+    vsg::ref_ptr<vsg::Group> attachment_point = nullptr;
+    std::string model_filename_path = "";
+    std::string animations_dir = "";
+    std::string textures_dir = ""; // TODO
+    vsg::ref_ptr<vsg::Options> options = nullptr;
+    animations_t& animations;
 
     void run() override
     {
         // Try to load model
-        if (vsg::ref_ptr<vsg::Node> node = vsg::read_cast<vsg::Node>(model_filename_path, options))
-        {
-            LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
-
-            // Custom animations for model
-            vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo = vsg::PropagateDynamicObjects::create();
-            vsg::CopyOp copyop;
-            copyop.duplicate = new vsg::Duplicate;
-            vsg::ref_ptr<vsg::Duplicate> duplicate = copyop.duplicate;
-            int old_size = animations->size();
-
-            AnimTransformVisitorCreateInfo atv_create_info = {
-                .pdo = pdo,
-                .duplicate = duplicate,
-                .animations_dir = animations_dir,
-                .animations = animations
-            };
-
-            AnimTransformVisitor atv(atv_create_info);
-            node->accept(atv);
-            LOG_INFO("Operation: loaded %u custom animations", animations->size() - old_size);
-
-            node->traverse(*pdo);
-
-            // Copy all animated parts of model for independent behaviour
-            if (!pdo->dynamicObjects.empty())
-            {
-                for (auto& object : pdo->dynamicObjects)
-                {
-                    if (!duplicate->contains(object))
-                    {
-                        duplicate->insert(object);
-                    }
-                }
-
-                node = copyop(node);
-            }
-
-            // Compile loaded model and add it to viewer
-            vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
-            if (ref_viewer && ref_viewer->compileManager)
-            {
-                if (auto compile_result = ref_viewer->compileManager->compile(node))
-                {
-                    ref_viewer->addUpdateOperation(MergeToScene::create(viewer,
-                                                                        attachment_point,
-                                                                        node,
-                                                                        compile_result));
-                }
-            }
-        }
-        else
+        vsg::ref_ptr<vsg::Node> node = vsg::read_cast<vsg::Node>(model_filename_path, options);
+        if (!node)
         {
             LOG_WARN("Operation: fail to load model from file: %s", model_filename_path.c_str());
+            return;
+        }
+
+        LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
+
+        // Custom animations for model
+        vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo = vsg::PropagateDynamicObjects::create();
+
+        vsg::CopyOp copyop;
+        copyop.duplicate = new vsg::Duplicate;
+        vsg::ref_ptr<vsg::Duplicate> duplicate = copyop.duplicate;
+
+        int old_size = animations.size();
+
+        AnimTransformVisitorCreateInfo atv_create_info = {
+            .pdo = pdo,
+            .duplicate = duplicate,
+            .animations_dir = animations_dir,
+            .animations = animations
+        };
+
+        AnimTransformVisitor atv(atv_create_info);
+        node->accept(atv);
+        LOG_INFO("Operation: loaded %u (total: %u) custom animations from %s",
+                 animations.size() - old_size,
+                 animations.size(),
+                 animations_dir.c_str());
+
+        node->traverse(*pdo);
+
+        // Copy all animated parts of shared model for independent behaviour
+        if (!pdo->dynamicObjects.empty())
+        {
+            for (auto& object : pdo->dynamicObjects)
+            {
+                if (!duplicate->contains(object))
+                {
+                    duplicate->insert(object);
+                }
+            }
+
+            duplicate->insert(node);
+            node = copyop(node);
+        }
+
+        // Compile loaded model and add it to viewer
+        vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
+        if (ref_viewer && ref_viewer->compileManager)
+        {
+            if (auto compile_result = ref_viewer->compileManager->compile(node))
+            {
+                ref_viewer->addUpdateOperation(MergeToScene::create(viewer,
+                                                                    attachment_point,
+                                                                    node,
+                                                                    compile_result));
+            }
         }
     }
 };

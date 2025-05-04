@@ -26,7 +26,7 @@ struct AnimTransformVisitorCreateInfo
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
-    animations_t* animations;
+    animations_t& animations;
 };
 
 class AnimTransformVisitor : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
@@ -36,16 +36,18 @@ public:
 
     void apply(vsg::Node& node) override;
     void apply(vsg::MatrixTransform& transform) override;
+    void apply(vsg::Group& group) override;
     void apply(vsg::StateGroup& stateGroup) override;
 
 private:
     ProcAnimation* create_animation(const std::string& name, vsg::MatrixTransform& transform);
+    ProcAnimation* create_animation(const std::string& name, vsg::Group& group);
 
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
-    animations_t* animations;
+    animations_t& animations;
 };
 
 #endif // ANIM_TRANSFORM_VISITOR_H

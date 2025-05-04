@@ -13,7 +13,6 @@
 #include "Route.h"
 #include "RouteLoader.h"
 
-#include "simulator-info-struct.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
 
@@ -138,14 +137,12 @@ bool RouteViewer::init(int argc, char* argv[])
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
     
-    initVsgOptions();
-    
     screenshot_writer = new ScreenshotWriter("screenshot.png");
 
-    traffic_lights_handler = new TrafficLightsHandler(nullptr, options);
-
+    traffic_lights_handler = new TrafficLightsHandler(settings);
     vehicles_handler = new VehiclesHandler(settings, sound_manager);
 
+    initVsgOptions();
     initWindowTraits();
     initWindow();
     initCamera();
@@ -734,18 +731,16 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     GUIparams->status = QString("Загрузка светофоров...");
 
-    traffic_lights_handler->deserialize(sig_data);
+    is_signals = traffic_lights_handler->load(sig_data, settings, viewer, options);
 
-    traffic_lights_handler->create_pagedLODs(settings);
-    traffic_lights_handler->loadSignalModels(settings, shadowSettings);
-    root->addChild(traffic_lights_handler->traffic_light_nodes);
+    root->addChild(traffic_lights_handler->getNode());
 
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal);
-
+/*
     viewer->update();
     viewer->compile();
-
+*/
     LOG_INFO("Send request for vehicles info");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
@@ -760,25 +755,15 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
         LOG_WARN("Get vehicles info again");
         return;
     }
-    is_vehicles = true;
-
-    simulator_vehicles_info_t vehicles_info;
-    vehicles_info.deserialize(data);
-    int count = vehicles_info.vehicles.size();
-    if (count <= 0)
-    {
-        LOG_WARN("Server has not any vehicles");
-        is_vehicles = false;
-        return;
-    }
-
-    LOG_INFO("Get info about %u vehicles", count);
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    vehicles_handler->load(vehicles_info, settings, viewer, options);
+    is_vehicles = vehicles_handler->load(data, settings, viewer, options);
 
     GUIparams->status = QString("");
+
+    if (!is_vehicles)
+        return;
 
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             vehicles_handler, &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
@@ -793,10 +778,10 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
             this, &RouteViewer::slotUpdated, Qt::DirectConnection);
 
     root->addChild(vehicles_handler->getExterior());
-
+/*
     viewer->update();
     viewer->compile();
-
+*/
     LOG_INFO("Send request for continuous vehicles update");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);

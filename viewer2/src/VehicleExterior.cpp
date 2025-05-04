@@ -4,7 +4,6 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/CullNode.h>
-#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/threading/OperationThreads.h>
 
 #include "CfgReader.h"
@@ -96,7 +95,7 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
                                                               animations_dir,
                                                               textures_dir, // TODO
                                                               options,
-                                                              &animations));
+                                                              animations));
 
     // Reading data about cabine's 3D-model and texture
     modelName = "";
@@ -134,7 +133,7 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
                                                                       animations_dir,
                                                                       textures_dir, // TODO
                                                                       options,
-                                                                      &animations));
+                                                                      animations));
 /*
         }
         else
@@ -193,7 +192,7 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
 
     return true;
 }
-
+/*
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -285,7 +284,7 @@ void VehicleExterior::load_model_animations(const std::string &animations_dir)
     // TODO
     LOG_INFO("Loaded %u model animations", animations.size() - old_size);
 }
-
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
