@@ -14,12 +14,14 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/state/RasterizationState.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <QDomNode>
 #include <QString>
 
 #include <string>
+#include <vulkan/vulkan_core.h>
 
 AnimTransformVisitor::AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info)
     : pdo(create_info.pdo)
@@ -58,6 +60,32 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     }
 
     transform.traverse(*this);
+}
+
+void AnimTransformVisitor::apply(vsg::StateGroup& stateGroup)
+{
+    // vsg::RasterizationState* rasterState = nullptr;
+    // for (auto& stateCommand : stateGroup.stateCommands)
+    // {
+    //     rasterState = dynamic_cast<vsg::RasterizationState*>(stateCommand.get());
+    //     if (rasterState)
+    //     {
+    //         break;
+    //     }
+    // }
+
+    // if (rasterState)
+    // {
+    //     rasterState->cullMode = VK_CULL_MODE_NONE;
+    // }
+    // else
+    // {
+    //     auto newRasterState = vsg::RasterizationState::create();
+    //     newRasterState->cullMode = VK_CULL_MODE_NONE;
+    //     stateGroup.add(newRasterState);
+    // }
+
+    stateGroup.traverse(*this);
 }
 
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
