@@ -79,7 +79,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
         // Try to load model
         if (vsg::ref_ptr<vsg::Node> node = vsg::read_cast<vsg::Node>(model_filename_path, options))
         {
-            LOG_INFO("Loaded model from file: %s", model_filename_path.c_str());
+            LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
             // Custom animations for model
             vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo = vsg::PropagateDynamicObjects::create();
@@ -97,7 +97,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
 
             AnimTransformVisitor atv(atv_create_info);
             node->accept(atv);
-            LOG_INFO("Loaded %u custom animations", animations->size() - old_size);
+            LOG_INFO("Operation: loaded %u custom animations", animations->size() - old_size);
 
             node->traverse(*pdo);
 
@@ -130,7 +130,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
         }
         else
         {
-            LOG_WARN("Fail to load model from file: %s", model_filename_path.c_str());
+            LOG_WARN("Operation: fail to load model from file: %s", model_filename_path.c_str());
         }
     }
 };

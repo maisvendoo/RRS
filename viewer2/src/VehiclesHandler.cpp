@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <string>
+#include <vsg/app/Viewer.h>
 #include <vsg/maths/transform.h>
 #include <vsg/io/stream.h>
 #include <vsg/io/Options.h>
@@ -344,7 +345,10 @@ bool VehiclesHandler::returnToControlledVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settings_t& settings, vsg::ref_ptr<vsg::Options> options)
+void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info,
+                           const settings_t& settings,
+                           vsg::ref_ptr<vsg::Viewer> viewer,
+                           vsg::ref_ptr<vsg::Options> options)
 {
     std::size_t vehicle_count = vehicles_info.vehicles.size();
 
@@ -357,9 +361,9 @@ void VehiclesHandler::load(simulator_vehicles_info_t vehicles_info, const settin
         vehicle_exterior.driver_pos = settings.cabine_default_pos;
         vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
-        if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
+        if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, viewer, options))
         {
-            LOG_INFO("Loaded vehicle model from %s / %s .xml", cfg_dir.c_str(), cfg_file.c_str());
+            LOG_INFO("Added vehicle model from %s / %s.xml", cfg_dir.c_str(), cfg_file.c_str());
             LOG_INFO("Vehicle %u / %u loaded", i + 1, vehicle_count);
         }
         else

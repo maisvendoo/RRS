@@ -35,6 +35,7 @@
 #include <vsg/maths/sphere.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ViewDependentState.h>
+#include <vsg/threading/OperationThreads.h>
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/ShaderSet.h> 
 #include <vsg/utils/PropagateDynamicObjects.h>
@@ -78,7 +79,7 @@ int RouteViewer::run()
 {
     // Обрабатываем события сетевой подсистемы, дожидаемся загрузки и
     // инициализации все объектов
-    while (!isReady())
+    while (!is_ready)
     {
         QApplication::processEvents();
     }
@@ -584,6 +585,8 @@ void RouteViewer::initViewer()
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
+
+    options->operationThreads = vsg::OperationThreads::create(1, viewer->status);
 }
 
 //------------------------------------------------------------------------------
@@ -773,7 +776,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    vehicles_handler->load(vehicles_info, settings, options);
+    vehicles_handler->load(vehicles_info, settings, viewer, options);
 
     GUIparams->status = QString("");
 

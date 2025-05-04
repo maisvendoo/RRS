@@ -1,20 +1,16 @@
 #include "VehicleExterior.h"
 
-#include <vsg/core/Object.h>
-#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/io/read.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
-#include <vsg/utils/PropagateDynamicObjects.h>
+#include <vsg/threading/OperationThreads.h>
 
-#include "AnimTransformVisitor.h"
 #include "CfgReader.h"
 #include "filesystem.h"
-#include "Logger.h"
 #include "MyGui.h"
+#include "LoadModelOperation.h"
 #include "ProcAnimation.h"
 #include "sound-manager.h"
 
@@ -35,7 +31,7 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Options> options)
+bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
 {
     // Open vehicle config file
     FileSystem& fs = FileSystem::getInstance();
@@ -54,9 +50,6 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
 
     // Reading data about body's 3D-model and texture
     QString modelName = "";
-    QString textureName = "";
-    QString modelShift = "";
-    vsg::dvec3 shift(0.0, 0.0, 0.0);
 
     cfg.getString(sec_name, "ExtModelName", modelName);
     if (modelName.isEmpty())
@@ -64,55 +57,91 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
         LOG_WARN("Fail to read parameter <ExtModelName> in config file: %s", cfg_path.c_str());
         return false;
     }
-
-    cfg.getString(sec_name, "ExtTexturesDir", textureName);
     
-    auto model = loadModel(modelName.toStdString(), textureName.toStdString(), options);
-    if (!model)
-    {
-        return false;
-    }
+    QString animationsDir = "";
+    QString textureDir = "";
+    QString soundsDir = "";
+    QString modelShift = "";
+    vsg::dvec3 shift(0.0, 0.0, 0.0);
 
+    cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
+    cfg.getString(sec_name, "ExtTexturesDir", textureDir);
+    cfg.getString(sec_name, "SoundDir", soundsDir);
     if (cfg.getString(sec_name, "ModelShift", modelShift))
     {
         std::istringstream ss(modelShift.toStdString());
         ss >> shift.x >> shift.y >> shift.z;
-        model->matrix = vsg::translate(shift);
     }
+/*
+    auto model = loadModel(modelName.toStdString(), textureDir.toStdString(), options);
+    if (!model)
+    {
+        return false;
+    }
+*/
+    vsg::ref_ptr<vsg::MatrixTransform> vehicle_node = vsg::MatrixTransform::create();
+    vehicle_node->matrix = vsg::translate(shift);
+    vehicle_node->setValue("name", "vehicle");
+    transform->addChild(vehicle_node);
 
-    model->setValue("name", "vehicle");
-    transform->addChild(model);
+    std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
+    std::string animations_dir = animationsDir.toStdString();
+    std::string textures_dir = textureDir.toStdString();
+    std::string sounds_dir = soundsDir.toStdString();
+
+    // Load model
+    options->operationThreads->add(LoadModelOperation::create(viewer,
+                                                              vehicle_node,
+                                                              model_filename_path,
+                                                              animations_dir,
+                                                              textures_dir, // TODO
+                                                              options,
+                                                              &animations));
 
     // Reading data about cabine's 3D-model and texture
     modelName = "";
-    textureName = "";
+    textureDir = "";
     modelShift = "";
     shift = {0.0, 0.0, 0.0};
 
     cfg.getString(sec_name, "CabineModel", modelName);
-    cfg.getString(sec_name, "CabineTexturesDir", textureName);
 
     if (!modelName.isEmpty())
     {
-        cfg.getString(sec_name, "CabineTexturesDir", textureName);
-        auto cabine = loadModel(modelName.toStdString(), textureName.toStdString(), options);
+        cfg.getString(sec_name, "CabineTexturesDir", textureDir);
+/*
+        auto cabine = loadModel(modelName.toStdString(), textureDir.toStdString(), options);
         if (cabine)
         {
+*/
             if (cfg.getString(sec_name, "CabineShift", modelShift))
             {
                 std::istringstream ss(modelShift.toStdString());
                 ss >> shift.x >> shift.y >> shift.z;
-                cabine->matrix = vsg::translate(shift);
             }
-
-            cabine->setValue("name", "cabine");
-            transform->addChild(cabine);
+            vsg::ref_ptr<vsg::MatrixTransform> cabine_node = vsg::MatrixTransform::create();
+            cabine_node->matrix = vsg::translate(shift);
+            cabine_node->setValue("name", "cabine");
+            transform->addChild(cabine_node);
             transform->setValue("name", "vehicle + cabine");
+
+            model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
+
+            // Load model
+            options->operationThreads->add(LoadModelOperation::create(viewer,
+                                                                      cabine_node,
+                                                                      model_filename_path,
+                                                                      animations_dir,
+                                                                      textures_dir, // TODO
+                                                                      options,
+                                                                      &animations));
+/*
         }
         else
         {
             transform->setValue("name", "only vehicle");
         }
+*/
     }
     else
     {
@@ -127,13 +156,11 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
         std::istringstream ss(modelShift.toStdString());
         ss >> driver_pos.x >> driver_pos.y >> driver_pos.z;
     }
-
+/*
     auto pdo = vsg::PropagateDynamicObjects::create();
     vsg::CopyOp copyop;
     auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
-    QString animationsDir = "";
-    cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
     load_animations(animationsDir.toStdString(), options, pdo, duplicate);
     load_model_animations(animationsDir.toStdString());
 
@@ -156,11 +183,10 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
             transform->children[1] = copyop(vsg::ref_ptr(transform->children[1]->cast<vsg::MatrixTransform>()));
         }
     }
+*/
+    load_sounds(sounds_dir, sm);
 
-    QString soundsDir = "";
-    cfg.getString(sec_name, "SoundDir", soundsDir);
-    load_sounds(soundsDir.toStdString(), sm);
-
+    // TODO
     relative_config_path = cfg_dir + fs.separator() + "displays.xml";
     cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
     load_displays(cfg_path);
@@ -274,5 +300,5 @@ void VehicleExterior::load_sounds(const std::string &sounds_dir, SoundManager *s
 //------------------------------------------------------------------------------
 void VehicleExterior::load_displays(const std::string &cfg_path)
 {
-
+// TODO
 }
