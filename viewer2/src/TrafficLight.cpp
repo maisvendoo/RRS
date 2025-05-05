@@ -27,7 +27,7 @@ TrafficLight::TrafficLight()
 //------------------------------------------------------------------------------
 void TrafficLight::step(float t, float dt)
 {
-    if (animations.empty())
+    if (transform->children.empty() || animations.empty())
     {
         return;
     }
@@ -35,23 +35,17 @@ void TrafficLight::step(float t, float dt)
     bool changed = (old_lens_state != lens_state);
     if (changed)
     {
-        std::cout << "Updated signal "
-                  << this->getConnectorName().toStdString()
-                  << " | lens: "
-                  << lens_state[0] << lens_state[1] << lens_state[2] << lens_state[3] << lens_state[4]
-                  << std::endl;
-
         old_lens_state = lens_state;
     }
 
-    for (auto animation : animations)
+    for (auto& [signal_id, animation] : animations)
     {
         if (changed)
         {
-            animation.second->setPosition(lens_state[animation.first]);
+            animation->setPosition(lens_state[signal_id]);
         }
 
-        animation.second->step(t, dt);
+        animation->step(t, dt);
     }
 }
 
@@ -123,8 +117,6 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
 {
     if (signal_model.isEmpty())
         return false;
-
-    old_lens_state = lens_state;
 
     vsg::dmat4 m1 = vsg::translate(position);
 
