@@ -5,9 +5,7 @@
 #include "signal-types.h"
 
 #include <vsg/core/Object.h>
-#include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
-#include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 
 #include <QString>
@@ -39,19 +37,13 @@ public:
     int getSignalDirection() const;
     const QString& getLetter() const;
     const QString& getModelName() const;
-/*
-    const vsg::dvec3& getPosition() const;
-    const vsg::dvec3& getOrth() const;
-    const vsg::dvec3& getRight() const;
-    const vsg::dvec3& getUp() const;
-*/
+
     bool loadSignal(std::string& models_dir_path,
                     std::string& animations_dir,
                     vsg::ref_ptr<vsg::Viewer> viewer,
                     vsg::ref_ptr<vsg::Options> options);
 
 private:
-//    vsg::ref_ptr<vsg::Node> node;
 
     QString connector_name = "";
     int signal_dir = 0;

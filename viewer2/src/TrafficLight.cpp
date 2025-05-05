@@ -4,14 +4,9 @@
 #include "filesystem.h"
 #include "LoadModelOperation.h"
 
-#include <vsg/utils/PropagateDynamicObjects.h>
 #include <vsg/threading/OperationThreads.h>
 
 #include <QBuffer>
-#include <QFlags>
-
-#include <algorithm>
-#include <iostream>
 
 //------------------------------------------------------------------------------
 //
@@ -144,36 +139,3 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
                                                               animations));
     return true;
 }
-
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrafficLight::set_node(vsg::ref_ptr<vsg::Node> node)
-{
-    this->node = node;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrafficLight::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo, vsg::ref_ptr<vsg::Duplicate> duplicate)
-{
-    AnimTransformVisitorCreateInfo atv_create_info = {
-        .pdo = pdo,
-        .duplicate = duplicate,
-        .animations_dir = animations_dir,
-        .animations = &animations
-    };
-
-    AnimTransformVisitor atv(atv_create_info);
-    node->accept(atv);
-
-    for (auto animation : animations)
-    {
-        animation.second->setPosition(lens_state[animation.first]);
-    }
-    
-    old_lens_state = lens_state;
-}
-*/
