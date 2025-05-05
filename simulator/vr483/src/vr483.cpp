@@ -70,7 +70,7 @@ void AirDist483::load_config(CfgReader &cfg)
         QString coeff = QString("p%1").arg(i);
         cfg.getDouble(secName, coeff, p[i]);
     }
-    for (size_t i = 0; i < p.size(); ++i)
+    for (size_t i = 0; i < A.size(); ++i)
     {
         QString coeff = QString("A%1").arg(i);
         cfg.getDouble(secName, coeff, A[i]);
