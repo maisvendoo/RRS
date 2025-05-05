@@ -10,7 +10,6 @@
 
 #include <QBuffer>
 
-#include <cstdint>
 
 TrafficLightsHandler::TrafficLightsHandler(const settings_t &settings, QObject* parent)
     : QObject(parent)

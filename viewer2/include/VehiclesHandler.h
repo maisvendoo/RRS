@@ -2,7 +2,6 @@
 #define VEHICLES_HANDLER_H
 
 #include <QObject>
-#include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Group.h>
 
 #include "simulator-info-struct.h"
@@ -85,6 +84,9 @@ private:
     short new_state = 0;
     short unused_state = 1;
     bool is_new_state = false;
+
+    /// Data about vehicles, received from server
+    simulator_vehicles_info_t vehicles_info;
 
     /// Debug strings for controlled and current vehicles
     simulator_vehicle_controlled_update_t vehicle_controlled;

@@ -1,7 +1,7 @@
 #include "TrafficLight.h"
 
-#include "ProcAnimation.h"
 #include "filesystem.h"
+#include "ProcAnimation.h"
 #include "LoadModelOperation.h"
 
 #include <vsg/threading/OperationThreads.h>

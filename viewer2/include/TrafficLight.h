@@ -5,7 +5,6 @@
 #include "signal-types.h"
 
 #include <vsg/core/Object.h>
-#include <vsg/io/Options.h>
 #include <vsg/nodes/MatrixTransform.h>
 
 #include <QString>

@@ -1,17 +1,11 @@
 #include "VehiclesHandler.h"
 
-#include <cstddef>
-#include <string>
-#include <vsg/app/Viewer.h>
-#include <vsg/maths/transform.h>
-#include <vsg/io/stream.h>
-#include <vsg/io/Options.h>
-
-#include "ProcAnimation.h"
-#include "VehicleExterior.h"
 #include "settings.h"
-#include "sound-manager.h"
 #include "Logger.h"
+#include "ProcAnimation.h"
+#include "sound-manager.h"
+
+#include <vsg/app/Viewer.h>
 
 //------------------------------------------------------------------------------
 //
@@ -349,9 +343,7 @@ bool VehiclesHandler::load(QByteArray &data,
                            vsg::ref_ptr<vsg::Viewer> viewer,
                            vsg::ref_ptr<vsg::Options> options)
 {
-    simulator_vehicles_info_t vehicles_info;
     vehicles_info.deserialize(data);
-
     std::size_t vehicle_count = vehicles_info.vehicles.size();
     if (vehicle_count == 0)
     {

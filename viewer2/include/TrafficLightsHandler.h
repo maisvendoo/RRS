@@ -3,7 +3,6 @@
 
 #include "settings.h"
 
-#include <vsg/io/Options.h>
 #include <vsg/nodes/Group.h>
 
 #include <QObject>

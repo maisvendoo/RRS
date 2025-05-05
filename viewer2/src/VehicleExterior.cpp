@@ -1,20 +1,13 @@
 #include "VehicleExterior.h"
 
-#include <vsg/maths/common.h>
-#include <vsg/maths/transform.h>
-#include <vsg/maths/vec3.h>
-#include <vsg/nodes/CullNode.h>
-#include <vsg/threading/OperationThreads.h>
-
-#include "CfgReader.h"
 #include "filesystem.h"
-#include "MyGui.h"
+#include "CfgReader.h"
 #include "LoadModelOperation.h"
 #include "ProcAnimation.h"
 #include "sound-manager.h"
+// #include "MyGui.h"
 
-#include <iostream>
-#include <map>
+#include <vsg/threading/OperationThreads.h>
 
 //------------------------------------------------------------------------------
 //
@@ -71,13 +64,7 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
         std::istringstream ss(modelShift.toStdString());
         ss >> shift.x >> shift.y >> shift.z;
     }
-/*
-    auto model = loadModel(modelName.toStdString(), textureDir.toStdString(), options);
-    if (!model)
-    {
-        return false;
-    }
-*/
+
     vsg::ref_ptr<vsg::MatrixTransform> vehicle_node = vsg::MatrixTransform::create();
     vehicle_node->matrix = vsg::translate(shift);
     vehicle_node->setValue("name", "vehicle");
@@ -108,12 +95,8 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
     if (!modelName.isEmpty())
     {
         cfg.getString(sec_name, "CabineTexturesDir", textureDir);
-/*
-        auto cabine = loadModel(modelName.toStdString(), textureDir.toStdString(), options);
-        if (cabine)
-        {
-*/
-            if (cfg.getString(sec_name, "CabineShift", modelShift))
+
+        if (cfg.getString(sec_name, "CabineShift", modelShift))
             {
                 std::istringstream ss(modelShift.toStdString());
                 ss >> shift.x >> shift.y >> shift.z;
@@ -134,13 +117,6 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
                                                                       textures_dir, // TODO
                                                                       options,
                                                                       animations));
-/*
-        }
-        else
-        {
-            transform->setValue("name", "only vehicle");
-        }
-*/
     }
     else
     {
@@ -155,34 +131,7 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
         std::istringstream ss(modelShift.toStdString());
         ss >> driver_pos.x >> driver_pos.y >> driver_pos.z;
     }
-/*
-    auto pdo = vsg::PropagateDynamicObjects::create();
-    vsg::CopyOp copyop;
-    auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
-    load_animations(animationsDir.toStdString(), options, pdo, duplicate);
-    load_model_animations(animationsDir.toStdString());
-
-    transform->traverse(*pdo);
-
-    if (!pdo->dynamicObjects.empty())
-    {
-        for (auto& object : pdo->dynamicObjects)
-        {
-            if (!duplicate->contains(object))
-            {
-                duplicate->insert(object);
-            }
-        }
-
-        transform->children[0] = copyop(model);
-
-        if (transform->children.size() == 2)
-        {
-            transform->children[1] = copyop(vsg::ref_ptr(transform->children[1]->cast<vsg::MatrixTransform>()));
-        }
-    }
-*/
     load_sounds(sounds_dir, sm);
 
     // TODO
@@ -192,99 +141,7 @@ bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, S
 
     return true;
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-vsg::ref_ptr<vsg::MatrixTransform> VehicleExterior::loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options)
-{
-    static std::map<std::string, vsg::ref_ptr<vsg::Node>> loaded_nodes;
-    (void) textureName; // TODO
 
-    FileSystem &fs = FileSystem::getInstance();
-    std::string model_path = fs.combinePath(fs.getVehicleModelsDir(), modelName);
-
-    vsg::ref_ptr<vsg::Node> model_node;
-
-    if (loaded_nodes.count(model_path))
-    {
-        model_node = loaded_nodes[model_path];
-    }
-    else
-    {
-        model_node = vsg::read_cast<vsg::Node>(model_path, options);
-
-        // if (auto cull_node = vsg::ref_ptr(model_node->cast<vsg::CullNode>()))
-        // {
-        //     if (auto mt = vsg::ref_ptr(cull_node->child->cast<vsg::MatrixTransform>()))
-        //     {
-        //         if (auto old_outer_group = vsg::ref_ptr(mt->children[0]->cast<vsg::Group>()))
-        //         {
-        //             auto new_outer_group = vsg::Group::create();
-
-        //             for (auto& child : old_outer_group->children)
-        //             {
-        //                 std::string name;
-        //                 child->getValue("name", name);
-
-        //                 auto transform = vsg::MatrixTransform::create();
-        //                 transform->setValue("name", name);
-        //                 transform->addChild(child);
-        //                 new_outer_group->addChild(transform);
-        //             }
-
-        //             mt->children[0] = new_outer_group;
-        //         }
-        //     }
-        // }
-
-        loaded_nodes.emplace(model_path, model_node);
-    }
-
-    if (model_node)
-    {
-        LOG_INFO("Loaded model from file: %s", model_path.c_str());
-        vsg::ref_ptr<vsg::MatrixTransform> node = vsg::MatrixTransform::create();
-        node->addChild(model_node);
-
-        GUIParams::nodes.emplace_back(model_node);
-
-        return node;
-    }
-
-    LOG_WARN("Fail to load model from file: %s", model_path.c_str());
-    return nullptr;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VehicleExterior::load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo, vsg::ref_ptr<vsg::Duplicate> duplicate)
-{
-    int old_size = animations.size();
-
-    AnimTransformVisitorCreateInfo atv_create_info = {
-        .pdo = pdo,
-        .duplicate = duplicate,
-        .animations_dir = animations_dir,
-        .animations = &animations
-    };
-
-    AnimTransformVisitor atv(atv_create_info);
-    transform->accept(atv);
-    LOG_INFO("Loaded %u custom animations", animations.size() - old_size);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VehicleExterior::load_model_animations(const std::string &animations_dir)
-{
-    int old_size = animations.size();
-    // TODO
-    LOG_INFO("Loaded %u model animations", animations.size() - old_size);
-}
-*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
