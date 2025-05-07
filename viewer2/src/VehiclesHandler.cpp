@@ -1,20 +1,42 @@
 #include "VehiclesHandler.h"
 
-#include "settings.h"
 #include "Logger.h"
 #include "ProcAnimation.h"
+#include "settings.h"
+#include "simulator-info-struct.h"
+#include "simulator-update-struct.h"
 #include "sound-manager.h"
+#include "VehicleExterior.h"
 
 #include <vsg/app/Viewer.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
+#include <vsg/maths/transform.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/nodes/Group.h>
+
+#include <QObject>
+#include <QString>
+
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <functional>
+#include <string>
+#include <utility>
+#include <vector>
+
+class QByteArray;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VehiclesHandler::VehiclesHandler(const settings_t& settings, SoundManager* sm, QObject* parent)
+VehiclesHandler::VehiclesHandler(const settings_t& settings, SoundManager* sound_manager, QObject* parent)
     : QObject(parent)
-    , sound_manager(sm)
+    , sound_manager(sound_manager)
 {
     settings_delay = (settings.vehicle_controled_update_interval + settings.client_delay) * 0.001;
+    current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
 }
 
 //------------------------------------------------------------------------------
@@ -79,9 +101,9 @@ bool VehiclesHandler::isUpdated()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString VehiclesHandler::getDebugMsg()
+QString VehiclesHandler::getDebugMessage()
 {
-    return debug_msg;
+    return debug_message;
 }
 
 //------------------------------------------------------------------------------
@@ -150,7 +172,7 @@ void VehiclesHandler::step(double t, double dt)
     double r = (client_time - update_pos_data[old_data].time) / upd_dt;
     double k = (1.0 - r);
 
-    for (size_t i = 0; i < vehicles.size(); ++i)
+    for (std::size_t i = 0; i < vehicles.size(); ++i)
     {
         vehicles[i].position = vsg::dvec3(
             k * update_pos_data[old_data].vehicles[i].position_x + r * update_pos_data[cur_data].vehicles[i].position_x,
@@ -158,24 +180,24 @@ void VehiclesHandler::step(double t, double dt)
             k * update_pos_data[old_data].vehicles[i].position_z + r * update_pos_data[cur_data].vehicles[i].position_z
         );
 
-        vehicles[i].orth = normalize(vsg::dvec3(
+        vehicles[i].orth = vsg::normalize(vsg::dvec3(
             k * update_pos_data[old_data].vehicles[i].orth_x + r * update_pos_data[cur_data].vehicles[i].orth_x,
             k * update_pos_data[old_data].vehicles[i].orth_y + r * update_pos_data[cur_data].vehicles[i].orth_y,
             k * update_pos_data[old_data].vehicles[i].orth_z + r * update_pos_data[cur_data].vehicles[i].orth_z
         ));
 
-        vehicles[i].up = normalize(vsg::dvec3(
+        vehicles[i].up = vsg::normalize(vsg::dvec3(
             k * update_pos_data[old_data].vehicles[i].up_x + r * update_pos_data[cur_data].vehicles[i].up_x,
             k * update_pos_data[old_data].vehicles[i].up_y + r * update_pos_data[cur_data].vehicles[i].up_y,
             k * update_pos_data[old_data].vehicles[i].up_z + r * update_pos_data[cur_data].vehicles[i].up_z
         ));
 
-        vehicles[i].right = cross(vehicles[i].orth, vehicles[i].up);
+        vehicles[i].right = vsg::cross(vehicles[i].orth, vehicles[i].up);
 
         vehicles[i].attitude = vsg::dvec3(
-            asin(vehicles[i].orth.z),
+            std::asin(vehicles[i].orth.z),
             0.0,
-            (vehicles[i].orth.x > 0.0) ? acos(vehicles[i].orth.y) : -acos(vehicles[i].orth.y)
+            (vehicles[i].orth.x > 0.0) ? std::acos(vehicles[i].orth.y) : -std::acos(vehicles[i].orth.y)
         );
 
         // Apply vehicle body matrix transform
@@ -222,7 +244,7 @@ void VehiclesHandler::step(double t, double dt)
                 sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
                 sound_manager->setVelocity(sound_id, vehicles[i].velocity.x, vehicles[i].velocity.y, vehicles[i].velocity.z);
 
-                size_t signal_id = sound_manager->getSignalID(sound_id);
+                std::size_t signal_id = sound_manager->getSignalID(sound_id);
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
                 {
                     sound_manager->setSoundSignal(sound_id, update_data[new_state].vehicles[i].analogSignal[signal_id]);
@@ -357,24 +379,27 @@ bool VehiclesHandler::returnToControlledVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::load(QByteArray &data,
-                           const settings_t &settings,
-                           vsg::ref_ptr<vsg::Viewer> viewer,
-                           vsg::ref_ptr<vsg::Options> options)
+bool VehiclesHandler::load(
+    QByteArray& data,
+    const settings_t& settings,
+    vsg::ref_ptr<vsg::Viewer> viewer,
+    vsg::ref_ptr<vsg::Options> options
+)
 {
     vehicles_info.deserialize(data);
-    std::size_t vehicle_count = vehicles_info.vehicles.size();
-    if (vehicle_count == 0)
+    if (vehicles_info.vehicles.empty())
     {
         LOG_WARN("Server has not any vehicles");
         return false;
     }
+    
+    const std::size_t vehicle_count = vehicles_info.vehicles.size();
     LOG_INFO("Got info about %u vehicles from server", vehicle_count);
 
     for (std::size_t i = 0; i < vehicle_count; ++i)
     {
-        std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
-        std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
+        const std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
+        const std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
 
         VehicleExterior vehicle_exterior;
         vehicle_exterior.driver_pos = settings.cabine_default_pos;
@@ -401,11 +426,13 @@ bool VehiclesHandler::load(QByteArray &data,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
+void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
 {
     if (unused_data < 0)
     {
         is_pos_updated = false;
+
+        // current_get_vehicles_pos_data_function(data);
 
         if (new_data < 0)
         {
@@ -510,7 +537,7 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::slotGetVehiclesStateData(QByteArray &data)
+void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
 {
     if (is_new_state)
     {
@@ -537,7 +564,7 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::slotGetVehicleControlled(QByteArray &data)
+void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 {
     if (!is_pos_updated || !is_state_updated)
     {
@@ -555,59 +582,97 @@ void VehiclesHandler::slotGetVehicleControlled(QByteArray &data)
 }
 
 //------------------------------------------------------------------------------
+// TODO: заменить проверки в slotGetVehiclesPosData через std::function
+//------------------------------------------------------------------------------
+void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
+{
+    new_data = DATA_ARRAY_SIZE - 3;
+    update_pos_data[new_data].deserialize(data);
+    if (update_pos_data[new_data].vehicles.size() == vehicles.size())
+    {
+        time_difference = update_pos_data[new_data].time - ref_time - settings_delay;
+        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData2(data); };
+    }
+    else
+    {
+        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
+                 update_pos_data[new_data].vehicles.size(),
+                 vehicles.size());
+        new_data = -1;
+    }
+    return;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
+{
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::getVehiclesPosData3(QByteArray& data)
+{
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void VehiclesHandler::updateDebugString()
 {
-    int seconds = static_cast<int>(std::floor(update_pos_data[new_data].time));
-    int hours = seconds / 3600;
-    int minutes = seconds / 60 % 60;
-    seconds = seconds % 60;
-    debug_msg = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
-                        .arg(update_pos_data[new_data].time, 8, 'f', 1)
-                        .arg(hours, 2)
-                        .arg(minutes, 2)
-                        .arg(seconds, 2);
+    const int total_seconds = static_cast<int>(std::floor(update_pos_data[new_data].time));
+    const int hours = total_seconds / 3600;
+    const int minutes = total_seconds / 60 % 60;
+    const int seconds = total_seconds % 60;
+    debug_message = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
+        .arg(update_pos_data[new_data].time, 8, 'f', 1)
+        .arg(hours, 2)
+        .arg(minutes, 2)
+        .arg(seconds, 2);
 
-    int curr = vehicle_controlled.current_vehicle;
-    if (curr >= 0)
+    const int current_vehicle = vehicle_controlled.current_vehicle;
+    if (current_vehicle >= 0)
     {
-        int curr_train = update_data[new_state].vehicles[curr].train_id;
-        debug_msg += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
-                        .arg(curr, 3)
-                        .arg(curr_train, 3)
-                        .arg(update_pos_data[new_data].vehicles[curr].position_x, 8, 'f', 1)
-                        .arg(update_pos_data[new_data].vehicles[curr].position_y, 8, 'f', 1)
-                        .arg(update_pos_data[new_data].vehicles[curr].position_z, 8, 'f', 1)
-                        .arg(update_pos_data[new_data].vehicles[curr].orth_x, 6, 'f', 3)
-                        .arg(update_pos_data[new_data].vehicles[curr].orth_y, 6, 'f', 3)
-                        .arg(update_pos_data[new_data].vehicles[curr].orth_z, 6, 'f', 3);
+        const int current_train = update_data[new_state].vehicles[current_vehicle].train_id;
+        const auto& new_pos_data = update_pos_data[new_data].vehicles[current_vehicle];
+        debug_message += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+            .arg(current_vehicle, 3)
+            .arg(current_train, 3)
+            .arg(new_pos_data.position_x, 8, 'f', 1)
+            .arg(new_pos_data.position_y, 8, 'f', 1)
+            .arg(new_pos_data.position_z, 8, 'f', 1)
+            .arg(new_pos_data.orth_x, 6, 'f', 3)
+            .arg(new_pos_data.orth_y, 6, 'f', 3)
+            .arg(new_pos_data.orth_z, 6, 'f', 3);
 
-        debug_msg += vehicle_controlled.currentDebugMsg + QString("\n");
+        debug_message += vehicle_controlled.currentDebugMsg + QString("\n");
     }
     else
     {
-        debug_msg += QString("\n\n");
+        debug_message += QString("\n\n");
     }
 
-    int control = vehicle_controlled.controlled_vehicle;
+    const int control = vehicle_controlled.controlled_vehicle;
     if (control >= 0)
     {
-        int control_train = update_data[new_state].vehicles[control].train_id;
-        debug_msg += QString("Управляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
-                        .arg(control, 3)
-                        .arg(control_train, 3)
-                        .arg(update_pos_data[new_data].vehicles[control].position_x, 8, 'f', 1)
-                        .arg(update_pos_data[new_data].vehicles[control].position_y, 8, 'f', 1)
-                        .arg(update_pos_data[new_data].vehicles[control].position_z, 8, 'f', 1)
-                        .arg(update_pos_data[new_data].vehicles[control].orth_x, 6, 'f', 3)
-                        .arg(update_pos_data[new_data].vehicles[control].orth_y, 6, 'f', 3)
-                        .arg(update_pos_data[new_data].vehicles[control].orth_z, 6, 'f', 3);
+        const int control_train = update_data[new_state].vehicles[control].train_id;
+        const auto& new_pos_data = update_pos_data[new_data].vehicles[control];
+        debug_message += QString("Управляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+            .arg(control, 3)
+            .arg(control_train, 3)
+            .arg(new_pos_data.position_x, 8, 'f', 1)
+            .arg(new_pos_data.position_y, 8, 'f', 1)
+            .arg(new_pos_data.position_z, 8, 'f', 1)
+            .arg(new_pos_data.orth_x, 6, 'f', 3)
+            .arg(new_pos_data.orth_y, 6, 'f', 3)
+            .arg(new_pos_data.orth_z, 6, 'f', 3);
 
-        debug_msg += vehicle_controlled.controlledDebugMsg;
+        debug_message += vehicle_controlled.controlledDebugMsg;
     }
     else
     {
-        debug_msg += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
+        debug_message += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
     }
 }

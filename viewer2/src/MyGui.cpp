@@ -233,7 +233,7 @@ void MyGui::showStatistics() const
 //------------------------------------------------------------------------------
 void MyGui::showDebugMsg() const
 {
-    QString debugMsg = params->vehicles_handler->getDebugMsg();
+    QString debugMsg = params->vehicles_handler->getDebugMessage();
     QStringList lines = debugMsg.split('\n');
     float h = font_size * (lines.count() + 1);
 

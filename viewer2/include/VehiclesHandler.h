@@ -1,15 +1,31 @@
+#pragma once
 #ifndef VEHICLES_HANDLER_H
 #define VEHICLES_HANDLER_H
-
-#include <QObject>
-#include <vsg/nodes/Group.h>
 
 #include "simulator-info-struct.h"
 #include "simulator-update-struct.h"
 #include "VehicleExterior.h"
 
+#include <vsg/core/ref_ptr.h>
+#include <vsg/nodes/Group.h>
+
+#include <QObject>
+#include <QString>
+
+#include <array>
+#include <functional>
+#include <vector>
+
 struct settings_t;
 class SoundManager;
+
+class QByteArray;
+
+namespace vsg
+{
+    class Options;
+    class Viewer;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -19,20 +35,19 @@ class VehiclesHandler : public QObject
     Q_OBJECT
 
 public:
-
-    VehiclesHandler(const settings_t& settings, SoundManager *sm, QObject* parent = nullptr);
+    VehiclesHandler(const settings_t& settings, SoundManager* sound_manager, QObject* parent = nullptr);
 
     /// Get scene group
     vsg::ref_ptr<vsg::Group> getExterior();
 
     /// Info about current vehicle exterior
-    VehicleExterior *getCurrentVehicle();
+    VehicleExterior* getCurrentVehicle();
     int getCurrentVehicleIndex();
     int getControlledVehicleIndex();
 
     bool isUpdated();
 
-    QString getDebugMsg();
+    QString getDebugMessage();
 
     void step(double t, double dt);
 
@@ -44,25 +59,30 @@ public:
     void selectControlVehicle();
     bool returnToControlledVehicle();
 
-    bool load(QByteArray &data,
-              const settings_t &settings,
-              vsg::ref_ptr<vsg::Viewer> viewer,
-              vsg::ref_ptr<vsg::Options> options);
+    bool load(
+        QByteArray& data,
+        const settings_t& settings,
+        vsg::ref_ptr<vsg::Viewer> viewer,
+        vsg::ref_ptr<vsg::Options> options
+    );
 
 public slots:
-
-    void slotGetVehiclesPosData(QByteArray &data);
-    void slotGetVehiclesStateData(QByteArray &data);
-    void slotGetVehicleControlled(QByteArray &data);
+    void slotGetVehiclesPosData(QByteArray& data);
+    void slotGetVehiclesStateData(QByteArray& data);
+    void slotGetVehicleControlled(QByteArray& data);
 
 signals:
-
     void updated();
 
 private:
+    void getVehiclesPosData1(QByteArray& data);
+    void getVehiclesPosData2(QByteArray& data);
+    void getVehiclesPosData3(QByteArray& data);
 
-    /// Sound manager
-    SoundManager *sound_manager;
+    void updateDebugString();
+
+private:
+    SoundManager* sound_manager;
 
     /// Data about vehicles positions, received from server
     static constexpr int DATA_ARRAY_SIZE = 5;
@@ -101,7 +121,7 @@ private:
     int controlled_vehicle = 0;
 
     /// Debug message for current and controlled vehicles from server
-    QString debug_msg = "";
+    QString debug_message = "";
 
     /// Train exterior scene group
     vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
@@ -109,7 +129,7 @@ private:
     /// Info about vehicles exterior
     std::vector<VehicleExterior> vehicles;
 
-    void updateDebugString();
+    std::function<void(QByteArray&)> current_get_vehicles_pos_data_function;
 };
 
 #endif // VEHICLES_HANDLER_H

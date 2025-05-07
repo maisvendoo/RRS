@@ -23,7 +23,7 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehicleExterior::loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
+bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
 {
     // Open vehicle config file
     FileSystem& fs = FileSystem::getInstance();
