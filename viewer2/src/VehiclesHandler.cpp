@@ -632,7 +632,9 @@ void VehiclesHandler::updateDebugString()
     }
 
     const int control = vehicle_controlled.controlled_vehicle;
-    if (control >= 0)
+    if (control >= 0
+        && control < update_data[new_state].vehicles.size()
+        && control < update_pos_data[new_data].vehicles.size())
     {
         const int control_train = update_data[new_state].vehicles[control].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[control];
