@@ -428,110 +428,7 @@ bool VehiclesHandler::load(
 //------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
 {
-    if (unused_data < 0)
-    {
-        is_pos_updated = false;
-
-        // current_get_vehicles_pos_data_function(data);
-
-        if (new_data < 0)
-        {
-            // Первое получение данных
-            new_data = DATA_ARRAY_SIZE - 3;
-            update_pos_data[new_data].deserialize(data);
-            if (update_pos_data[new_data].vehicles.size() == vehicles.size())
-            {
-                time_difference = update_pos_data[new_data].time - ref_time - settings_delay;
-            }
-            else
-            {
-                LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                         update_pos_data[new_data].vehicles.size(),
-                         vehicles.size());
-                new_data = -1;
-            }
-            return;
-        }
-
-        if (delay_data < 0)
-        {
-            // Второе получение данных
-            delay_data = new_data;
-            new_data = DATA_ARRAY_SIZE - 2;
-            update_pos_data[new_data].deserialize(data);
-            if (update_pos_data[new_data].vehicles.size() == vehicles.size())
-            {
-                double r = 0.5;
-                time_difference = time_difference * (1.0 - r) +
-                    (update_pos_data[new_data].time - ref_time - settings_delay) * r;
-            }
-            else
-            {
-                LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                         update_pos_data[new_data].vehicles.size(),
-                         vehicles.size());
-                new_data = -1;
-                delay_data = -1;
-            }
-            return;
-        }
-
-        // Третье получение данных
-        new_data = DATA_ARRAY_SIZE - 1;
-        update_pos_data[new_data].deserialize(data);
-
-        is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles.size());
-        if (is_pos_updated)
-        {
-            unused_data = DATA_ARRAY_SIZE - 4;
-            old_data = DATA_ARRAY_SIZE - 3;
-            cur_data = DATA_ARRAY_SIZE - 2;
-            delay_data = DATA_ARRAY_SIZE - 1;
-
-            double r = 0.25;
-            time_difference = time_difference * (1.0 - r) +
-                (update_pos_data[new_data].time - ref_time - settings_delay) * r;
-        }
-        else
-        {
-            LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                     update_pos_data[new_data].vehicles.size(),
-                     vehicles.size());
-            new_data = -1;
-            delay_data = -1;
-        }
-        return;
-    }
-
-    // Обновление данных по очереди
-    ++new_data;
-    if (new_data >= DATA_ARRAY_SIZE)
-    {
-        new_data = 0;
-    }
-
-    // Не даём обновлениям догнать цикл сзади
-    if (new_data == old_data)
-    {
-        new_data = unused_data;
-    }
-
-    update_pos_data[new_data].deserialize(data);
-
-    is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles.size());
-
-    if (is_pos_updated)
-    {
-        double r = 0.05;
-        time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
-    }
-    else
-    {
-        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                 update_pos_data[new_data].vehicles.size(),
-                 vehicles.size());
-    }
+    current_get_vehicles_pos_data_function(data);
 }
 
 //------------------------------------------------------------------------------
@@ -586,6 +483,9 @@ void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
 {
+    is_pos_updated = false;
+
+    // Первое получение данных
     new_data = DATA_ARRAY_SIZE - 3;
     update_pos_data[new_data].deserialize(data);
     if (update_pos_data[new_data].vehicles.size() == vehicles.size())
@@ -596,11 +496,10 @@ void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
     else
     {
         LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                 update_pos_data[new_data].vehicles.size(),
-                 vehicles.size());
+                    update_pos_data[new_data].vehicles.size(),
+                    vehicles.size());
         new_data = -1;
     }
-    return;
 }
 
 //------------------------------------------------------------------------------
@@ -608,6 +507,28 @@ void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
 {
+    is_pos_updated = false;
+
+    // Второе получение данных
+    delay_data = new_data;
+    new_data = DATA_ARRAY_SIZE - 2;
+    update_pos_data[new_data].deserialize(data);
+    if (update_pos_data[new_data].vehicles.size() == vehicles.size())
+    {
+        double r = 0.5;
+        time_difference = time_difference * (1.0 - r) +
+            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
+        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData3(data); };
+    }
+    else
+    {
+        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
+                    update_pos_data[new_data].vehicles.size(),
+                    vehicles.size());
+        new_data = -1;
+        delay_data = -1;
+        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -615,6 +536,69 @@ void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData3(QByteArray& data)
 {
+    // Третье получение данных
+    new_data = DATA_ARRAY_SIZE - 1;
+    update_pos_data[new_data].deserialize(data);
+
+    is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles.size());
+    if (is_pos_updated)
+    {
+        unused_data = DATA_ARRAY_SIZE - 4;
+        old_data = DATA_ARRAY_SIZE - 3;
+        cur_data = DATA_ARRAY_SIZE - 2;
+        delay_data = DATA_ARRAY_SIZE - 1;
+
+        double r = 0.25;
+        time_difference = time_difference * (1.0 - r) +
+            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
+        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData4(data); };
+    }
+    else
+    {
+        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
+                 update_pos_data[new_data].vehicles.size(),
+                 vehicles.size());
+        new_data = -1;
+        delay_data = -1;
+        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
+    }
+    return;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::getVehiclesPosData4(QByteArray& data)
+{
+    // Обновление данных по очереди
+    ++new_data;
+    if (new_data >= DATA_ARRAY_SIZE)
+    {
+        new_data = 0;
+    }
+
+    // Не даём обновлениям догнать цикл сзади
+    if (new_data == old_data)
+    {
+        new_data = unused_data;
+    }
+
+    update_pos_data[new_data].deserialize(data);
+
+    is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles.size());
+
+    if (is_pos_updated)
+    {
+        double r = 0.05;
+        time_difference = time_difference * (1.0 - r) +
+            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
+    }
+    else
+    {
+        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
+                 update_pos_data[new_data].vehicles.size(),
+                 vehicles.size());
+    }
 }
 
 //------------------------------------------------------------------------------

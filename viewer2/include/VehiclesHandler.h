@@ -78,6 +78,7 @@ private:
     void getVehiclesPosData1(QByteArray& data);
     void getVehiclesPosData2(QByteArray& data);
     void getVehiclesPosData3(QByteArray& data);
+    void getVehiclesPosData4(QByteArray& data);
 
     void updateDebugString();
 
