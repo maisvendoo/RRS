@@ -30,7 +30,26 @@ vsg::ref_ptr<vsg::Group> VehiclesHandler::getExterior()
 //------------------------------------------------------------------------------
 VehicleExterior* VehiclesHandler::getCurrentVehicle()
 {
+#ifndef NDEBUG
+    if (isUpdated())
+    {
+        if (cur_vehicle >= 0 && cur_vehicle < vehicles.size())
+        {
+            return &(vehicles[cur_vehicle]);
+        }
+        else
+        {
+            LOG_WARN("cur_vehicle(%d) is not in range of vehicles.size(%d)", cur_vehicle, vehicles.size());
+            return nullptr;
+        }
+    }
+    else
+    {
+        return nullptr;
+    }
+#else
     return isUpdated() ? &(vehicles[cur_vehicle]) : nullptr;
+#endif
 }
 
 //------------------------------------------------------------------------------

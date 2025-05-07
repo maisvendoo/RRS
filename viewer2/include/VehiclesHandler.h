@@ -20,7 +20,7 @@ class VehiclesHandler : public QObject
 
 public:
 
-    VehiclesHandler(const settings_t& settings, SoundManager *sm, QObject* parent = Q_NULLPTR);
+    VehiclesHandler(const settings_t& settings, SoundManager *sm, QObject* parent = nullptr);
 
     /// Get scene group
     vsg::ref_ptr<vsg::Group> getExterior();
@@ -64,8 +64,8 @@ private:
     /// Sound manager
     SoundManager *sound_manager;
 
-    enum {DATA_ARRAY_SIZE = 5};
     /// Data about vehicles positions, received from server
+    static constexpr int DATA_ARRAY_SIZE = 5;
     std::array<simulator_update_pos_t, DATA_ARRAY_SIZE> update_pos_data;
     bool is_pos_updated = false;
     short new_data = -1;
@@ -77,8 +77,8 @@ private:
     double time_difference = 0.0;
     double settings_delay = 0.17;
 
-    enum {STATE_ARRAY_SIZE = 2};
     /// Data about trains and vehicles state, received from server
+    static constexpr int STATE_ARRAY_SIZE = 2;
     std::array<simulator_update_t, STATE_ARRAY_SIZE> update_data;
     bool is_state_updated = false;
     short new_state = 0;
