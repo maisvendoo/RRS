@@ -463,7 +463,7 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 {
-    if (!is_pos_updated || !is_state_updated)
+    if (!isUpdated())
     {
         return;
     }
@@ -479,13 +479,10 @@ void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 }
 
 //------------------------------------------------------------------------------
-// TODO: заменить проверки в slotGetVehiclesPosData через std::function
+// Первое получение данных
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
 {
-    is_pos_updated = false;
-
-    // Первое получение данных
     new_data = DATA_ARRAY_SIZE - 3;
     update_pos_data[new_data].deserialize(data);
     if (update_pos_data[new_data].vehicles.size() == vehicles.size())
@@ -503,13 +500,10 @@ void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
 }
 
 //------------------------------------------------------------------------------
-//
+// Второе получение данных
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
 {
-    is_pos_updated = false;
-
-    // Второе получение данных
     delay_data = new_data;
     new_data = DATA_ARRAY_SIZE - 2;
     update_pos_data[new_data].deserialize(data);
@@ -532,11 +526,10 @@ void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
 }
 
 //------------------------------------------------------------------------------
-//
+// Третье получение данных
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData3(QByteArray& data)
 {
-    // Третье получение данных
     new_data = DATA_ARRAY_SIZE - 1;
     update_pos_data[new_data].deserialize(data);
 
@@ -562,15 +555,13 @@ void VehiclesHandler::getVehiclesPosData3(QByteArray& data)
         delay_data = -1;
         current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
     }
-    return;
 }
 
 //------------------------------------------------------------------------------
-//
+// Обновление данных по очереди
 //------------------------------------------------------------------------------
 void VehiclesHandler::getVehiclesPosData4(QByteArray& data)
 {
-    // Обновление данных по очереди
     ++new_data;
     if (new_data >= DATA_ARRAY_SIZE)
     {
@@ -617,7 +608,9 @@ void VehiclesHandler::updateDebugString()
         .arg(seconds, 2);
 
     const int current_vehicle = vehicle_controlled.current_vehicle;
-    if (current_vehicle >= 0)
+    if (current_vehicle >= 0
+        && current_vehicle < update_data[new_state].vehicles.size()
+        && current_vehicle < update_pos_data[new_data].vehicles.size())
     {
         const int current_train = update_data[new_state].vehicles[current_vehicle].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[current_vehicle];
