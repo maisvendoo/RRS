@@ -61,7 +61,7 @@ void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
     if (animation)
     {
         animation->name = name;
-        animations.insert({animation->getSignalID(), animation});
+        animations->thread_safe_insert({animation->getSignalID(), animation});
     }
 
     transform.traverse(*this);
@@ -87,7 +87,7 @@ void AnimTransformVisitor::apply(vsg::Group& group)
     if (animation)
     {
         animation->name = name;
-        animations.insert({animation->getSignalID(), animation});
+        animations->thread_safe_insert({animation->getSignalID(), animation});
     }
 
     group.traverse(*this);

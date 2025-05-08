@@ -53,7 +53,7 @@ private:
     lens_state_t lens_state;
     lens_state_t old_lens_state;
 
-    animations_t animations = {};
+    animations_t* animations = new animations_t();
 };
 
 #endif // TRAFFIC_LIGHT_H

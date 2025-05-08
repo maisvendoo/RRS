@@ -51,7 +51,7 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
 
                     ProcAnimation* animation = new MaterialAnimation(new_pbr_material_value);
                     animation->load(cfg_reader);
-                    animations.insert({animation->getSignalID(), animation});
+                    animations->thread_safe_insert({animation->getSignalID(), animation});
                 }
             }
         }

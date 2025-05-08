@@ -26,7 +26,7 @@ struct AnimTransformVisitorCreateInfo
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
-    animations_t& animations;
+    animations_t* animations;
 };
 
 class AnimTransformVisitor : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
@@ -47,7 +47,7 @@ private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
-    animations_t& animations;
+    animations_t* animations;
 };
 
 #endif // ANIM_TRANSFORM_VISITOR_H

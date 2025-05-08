@@ -22,7 +22,7 @@ TrafficLight::TrafficLight()
 //------------------------------------------------------------------------------
 void TrafficLight::step(float t, float dt)
 {
-    if (transform->children.empty() || animations.empty())
+    if (transform->children.empty() || animations->animations.empty())
     {
         return;
     }
@@ -33,7 +33,7 @@ void TrafficLight::step(float t, float dt)
         old_lens_state = lens_state;
     }
 
-    for (auto& [signal_id, animation] : animations)
+    for (auto& [signal_id, animation] : animations->animations)
     {
         if (changed)
         {

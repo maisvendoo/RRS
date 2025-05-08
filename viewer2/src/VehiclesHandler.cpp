@@ -222,7 +222,7 @@ void VehiclesHandler::step(double t, double dt)
             vehicles[i].next_vehicle = update_data[new_state].vehicles[i].next_vehicle;
 
             // Model animations update
-            for (auto& [signal_id, animation] : vehicles[i].animations)
+            for (auto& [signal_id, animation] : vehicles[i].animations->animations)
             {
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
                 {

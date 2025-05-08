@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt)
 {
-    for (auto& [signal_id, animation] : animations)
+    for (auto& [signal_id, animation] : animations->animations)
     {
         animation->step(t, dt);
     }

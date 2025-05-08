@@ -54,7 +54,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
                        const std::string& in_animations_dir,
                        const std::string& in_textures_dir, // TODO
                        vsg::ref_ptr<vsg::Options> in_options,
-                       animations_t& in_animations)
+                       animations_t* in_animations)
         : viewer(in_viewer)
         , attachment_point(in_attachment_point)
         , model_filename_path(in_model_filename_path)
@@ -72,7 +72,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     std::string animations_dir = "";
     std::string textures_dir = ""; // TODO
     vsg::ref_ptr<vsg::Options> options = nullptr;
-    animations_t& animations;
+    animations_t* animations;
 
     void run() override
     {
@@ -93,7 +93,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
         copyop.duplicate = new vsg::Duplicate;
         vsg::ref_ptr<vsg::Duplicate> duplicate = copyop.duplicate;
 
-        int old_size = animations.size();
+        int old_size = animations->animations.size();
 
         AnimTransformVisitorCreateInfo atv_create_info = {
             .pdo = pdo,
@@ -105,8 +105,8 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
         AnimTransformVisitor atv(atv_create_info);
         node->accept(atv);
         LOG_INFO("Operation: loaded %u (total: %u) custom animations from %s",
-                 animations.size() - old_size,
-                 animations.size(),
+                 animations->animations.size() - old_size,
+                 animations->animations.size(),
                  animations_dir.c_str());
 
         node->traverse(*pdo);
