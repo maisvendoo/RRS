@@ -369,7 +369,6 @@ void RouteViewer::initVsgOptions()
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
-    options->propagateDynamicObjects = vsg::PropagateDynamicObjects::create();
     options->add(vsgXchange::all::create());
 }
 
@@ -667,7 +666,10 @@ bool RouteViewer::loadRoute()
     }
 
     viewer->update();
-    viewer->compile();
+
+    vsg::ref_ptr<vsg::ResourceHints> hints = vsg::ResourceHints::create();
+    hints->numDatabasePagerReadThreads = 1;
+    viewer->compile(hints);
 
     return true;
 }
