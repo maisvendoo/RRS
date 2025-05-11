@@ -16,6 +16,7 @@
 //------------------------------------------------------------------------------
 UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
                                          vsg::ref_ptr<vsg::Camera> camera,
+                                         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
                                          ScreenshotWriter *screenshot_writer,
                                          TrafficLightsHandler *sig_handler,
                                          VehiclesHandler *veh_handler,
@@ -25,6 +26,7 @@ UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandl
     , _keyboard(vsg::Keyboard::create())
     , _upd_server_control(upd_server_control)
     , _camera(camera)
+    , _shadow_region(shadow_region)
     , _screenshot_writer(screenshot_writer)
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
@@ -54,6 +56,8 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
         _vehicles_handler->step(t, dt);
 
         _current_manipulator->frameEvent(dt);
+
+        updateShadowRegion();
     }
 }
 
@@ -483,4 +487,32 @@ void UpdateViewerHandler::changeCurrentVehicle()
 
     _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
                                               _vehicles_handler->getControlledVehicleIndex());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::updateShadowRegion()
+{
+    // Текущий вид из камеры
+    vsg::ref_ptr<vsg::LookAt> lookAt = _camera->viewMatrix.cast<vsg::LookAt>();
+
+    // Еденичные векторы вперёд, вверх, вправо
+    vsg::dvec3 orth = vsg::normalize(lookAt->center - lookAt->eye);
+    vsg::dvec3 up = vsg::normalize(lookAt->up);
+    vsg::dvec3 right = vsg::cross(orth, up);
+
+    // Пересчитываем векторы, чтобы из них легко составить
+    // квадрат, расположенный впереди на дистанции отрисовки теней
+    orth = lookAt->eye +
+           orth * _settings.shadow_distance;
+    up = up * (_settings.shadow_distance / 2.0);
+    right = right * (_settings.shadow_distance / 2.0);
+
+    // Создаём пирамиду вида из камеры, в пределах которой будут рисоваться тени
+    _shadow_region->points[0] = lookAt->eye;
+    _shadow_region->points[1] = orth + up + right;
+    _shadow_region->points[2] = orth + up - right;
+    _shadow_region->points[3] = orth - up + right;
+    _shadow_region->points[4] = orth - up - right;
 }

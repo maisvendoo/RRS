@@ -31,7 +31,6 @@
 #include <vsg/app/CloseHandler.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/lighting/HardShadows.h>
-#include <vsg/lighting/PercentageCloserSoftShadows.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ViewDependentState.h>
@@ -204,6 +203,7 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
         cfg.getInt(secName, "Samples", settings.samples);
 
         cfg.getDouble(secName, "ViewDistance", settings.view_distance);
+        cfg.getDouble(secName, "ShadowDistance", settings.shadow_distance);
         cfg.getDouble(secName, "zNear", settings.zNear);
         cfg.getDouble(secName, "zFar", settings.zFar);
         cfg.getDouble(secName, "FovY", settings.fovy);
@@ -472,13 +472,23 @@ void RouteViewer::initLights()
     deviceFeatures->get().samplerAnisotropy = VK_TRUE;
     deviceFeatures->get().depthClamp = VK_TRUE;
 
-    auto numShadowMapsPerLight = 1;
-    // shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
+    if (settings.shadow_distance > 0.1)
+    {
+        auto countNumShadowMaps = [](double dist) -> uint32_t
+        {
+            if (dist > 256.0) return 3;
+            if (dist > 64.0) return 2;
+            return 1;
+        };
+
+        if (settings.shadow_distance > 1000.0)
+            settings.shadow_distance = 1000.0;
+
+        uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
+        shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
+    }
 
     auto shaderHints = vsg::ShaderCompileSettings::create();
-
-    float penumbraRadius = 0.005f;
-    shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
 
     auto rasterizationState = vsg::RasterizationState::create();
     rasterizationState->depthClampEnable = VK_TRUE;
@@ -503,17 +513,9 @@ void RouteViewer::initLights()
     // options->shaderSets.erase("pbr");
     // options->shaderSets.erase("phong");
 
-    // shadow_region = vsg::RegionOfInterest::create();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-
-    // root->addChild(shadow_region);
+    shadow_region = vsg::RegionOfInterest::create();
+    shadow_region->points.resize(5);
+    root->addChild(shadow_region);
 
     auto ambient = vsg::AmbientLight::create();
     ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
@@ -572,7 +574,7 @@ void RouteViewer::initViewer()
 
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
     upd_viewer_handler = UpdateViewerHandler::create(
-        upd_server_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+        upd_server_control, camera, shadow_region, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
     auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(camera, sound_manager);
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
@@ -676,6 +678,7 @@ bool RouteViewer::loadRoute()
 
     vsg::ref_ptr<vsg::ResourceHints> hints = vsg::ResourceHints::create();
     hints->numDatabasePagerReadThreads = 1;
+    hints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
     viewer->compile(hints);
 
     return true;
