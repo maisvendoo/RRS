@@ -37,7 +37,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         return false;
     }
 
-    LOG_INFO("Opened config file: %s", cfg_path.c_str());
     QString sec_name = "Vehicle";
 
     // Reading data about body's 3D-model and texture

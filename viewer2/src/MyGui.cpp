@@ -13,7 +13,9 @@
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/BufferInfo.h>
+#include <vsg/state/ImageInfo.h>
 #include <vsg/state/DescriptorBuffer.h>
+#include "vsg/state/DescriptorImage.h"
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/vk/Context.h>
 
@@ -369,9 +371,28 @@ void MyGui::printObject(const vsg::ref_ptr<vsg::Object>& object) const
                 printObject(bufferInfo);
             }
         }
+        else if (auto descriptorImage = vsg::ref_ptr(object->cast<vsg::DescriptorImage>()))
+        {
+            for (const auto& imageInfo : descriptorImage->imageInfoList)
+            {
+                printObject(imageInfo);
+            }
+        }
         else if (auto bufferInfo = vsg::ref_ptr(object->cast<vsg::BufferInfo>()))
         {
             printObject(bufferInfo->data);
+        }
+        else if (auto imageInfo = vsg::ref_ptr(object->cast<vsg::ImageInfo>()))
+        {
+            printObject(imageInfo->imageView);
+        }
+        else if (auto imageView = vsg::ref_ptr(object->cast<vsg::ImageView>()))
+        {
+            printObject(imageView->image);
+        }
+        else if (auto image = vsg::ref_ptr(object->cast<vsg::Image>()))
+        {
+            printObject(image->data);
         }
         else if (auto depthSorted = vsg::ref_ptr(object->cast<vsg::DepthSorted>()))
         {

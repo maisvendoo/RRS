@@ -76,11 +76,21 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
 
     void run() override
     {
-        // Try to load model
-        vsg::ref_ptr<vsg::Node> node = vsg::read_cast<vsg::Node>(model_filename_path, options);
+        if (!vsg::fileExists(model_filename_path))
+        {
+            LOG_WARN("Operation: fail to find file: %s", model_filename_path.c_str());
+            return;
+        }
+
+        vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_filename_path, options);
+        vsg::ref_ptr<vsg::Node> node = loaded.cast<vsg::Node>();
         if (!node)
         {
             LOG_WARN("Operation: fail to load model from file: %s", model_filename_path.c_str());
+
+            vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
+            if (error)
+                LOG_WARN(error->message.c_str());
             return;
         }
 

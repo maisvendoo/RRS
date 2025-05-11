@@ -4,7 +4,6 @@
 #include "CfgReader.h"
 #include "filesystem.h"
 #include "Logger.h"
-// #include "MyGui.h"
 
 #include <vsg/app/Viewer.h>
 
@@ -91,8 +90,6 @@ bool TrafficLightsHandler::load(QByteArray &data, const settings_t &settings, vs
         traffic_light_nodes->addChild(traffic_light->transform);
     }
     LOG_INFO("Finished adding signal models");
-
-    //GUIParams::nodes.emplace_back(traffic_light_nodes);
 
     return true;
 }

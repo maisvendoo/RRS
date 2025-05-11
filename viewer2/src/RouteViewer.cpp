@@ -370,6 +370,10 @@ void RouteViewer::initVsgOptions()
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
     options->add(vsgXchange::all::create());
+
+    // Отключаем автоматическое создание узла CullNode в загружаемых моделях
+    bool value = false;
+    options->setValue("culling", value);
 }
 
 //------------------------------------------------------------------------------
@@ -625,16 +629,6 @@ bool RouteViewer::loadRoute()
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
-    // auto z = vsg::read_cast<vsg::Data>(settings.route_dir_full_path + "/textures/TrackSections.tga", options);
-    // options->sharedObjects->share(z);
-
-    // auto x = vsg::External::create();
-    // x->add("/home/ksv/work-ANI/Projects/ANI/RRS/routes/experimental-polygon-gltf/textures/TrackSections.tga", z);
-    // x->options = options;
-
-    // root->setObject("external", x);
-    // root->setValue("external", x);
-
     for (auto& [label, transform] : route.transforms)
     {
         auto found_it = route.object_ref.find(label);
@@ -643,9 +637,16 @@ bool RouteViewer::loadRoute()
             continue;
         }
 
+        std::string model_filename_path = route_dir_path + found_it->second;
+        if (!vsg::fileExists(model_filename_path))
+        {
+            LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
+            continue;
+        }
+
         auto pagedLOD = vsg::PagedLOD::create();
         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-        pagedLOD->filename = route_dir_path + found_it->second;
+        pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
         auto matrix = vsg::MatrixTransform::create();

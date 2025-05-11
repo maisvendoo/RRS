@@ -407,13 +407,13 @@ bool VehiclesHandler::load(
 
         if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, viewer, options))
         {
-            LOG_INFO("Added vehicle model from %s / %s.xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_INFO("Vehicle %u / %u added", i + 1, vehicle_count);
+            LOG_INFO("Added vehicle %u / %u with model from %s / %s.xml",
+                     i + 1, vehicle_count, cfg_dir.c_str(), cfg_file.c_str());
         }
         else
         {
-            LOG_WARN("Fail to load vehicle model from %s / %s.xml", cfg_dir.c_str(), cfg_file.c_str());
-            LOG_WARN("Vehicle %u / %u added with empty model", i + 1, vehicle_count);
+            LOG_WARN("Added vehicle %u / %u. Fail to load model from %s / %s.xml",
+                     i + 1, vehicle_count, cfg_dir.c_str(), cfg_file.c_str());
         }
 
         vehicles.push_back(vehicle_exterior);
