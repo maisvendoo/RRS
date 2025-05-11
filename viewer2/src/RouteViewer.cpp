@@ -10,6 +10,7 @@
 #include "VehiclesHandler.h"
 #include "UpdateViewerHandler.h"
 #include "UpdateSoundManagerHandler.h"
+#include "UpdateStatisticsHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
 
@@ -566,27 +567,32 @@ void RouteViewer::initCommandGraph()
 void RouteViewer::initViewer()
 {
     viewer = vsg::Viewer::create();
-    GUIparams->viewer = viewer;
-    GUIparams->vehicles_handler = vehicles_handler;
 
     viewer->addWindow(window);
 
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+    auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(camera, sound_manager);
+    auto upd_statistis_handler = UpdateStatisticsHandler::create();
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
-    viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
+    viewer->addEventHandler(upd_soundmanager_handler);
+    viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
 
     options->operationThreads = vsg::OperationThreads::create(1, viewer->status);
+
+    GUIparams->viewer = viewer;
+    GUIparams->vehicles_handler = vehicles_handler;
+    GUIparams->statistics_handler = upd_statistis_handler.get();
 }
 
 //------------------------------------------------------------------------------

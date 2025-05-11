@@ -11,6 +11,7 @@
 #include <vector>
 
 class VehiclesHandler;
+class UpdateStatisticsHandler;
 
 struct GUIParams : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -18,6 +19,7 @@ struct GUIParams : public vsg::Inherit<vsg::Object, GUIParams>
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     VehiclesHandler *vehicles_handler = nullptr;
+    UpdateStatisticsHandler *statistics_handler = nullptr;
     bool prev_Esc = false;
     bool is_show_quit_dialog = false;
     bool prev_F11 = false;

@@ -1,5 +1,6 @@
 #include "MyGui.h"
 
+#include "UpdateStatisticsHandler.h"
 #include "VehiclesHandler.h"
 
 #include <vsg/app/RecordTraversal.h>
@@ -220,6 +221,33 @@ void MyGui::showQuitDialog() const
 //------------------------------------------------------------------------------
 void MyGui::showStatistics() const
 {
+    QString text = QString("FPS:%1 (lowest:%2)")
+                       .arg(params->statistics_handler->getAverageFPS(), 6, 'f', 1)
+                       .arg(params->statistics_handler->getLowestFPS(), 6, 'f', 1);
+    ImVec2 text_size = ImGui::CalcTextSize(text.toStdString().c_str());
+
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 content_size = io.DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2(content_size.x - text_size.x - 20, 0));
+    ImGui::SetNextWindowSize(ImVec2(text_size.x + 20, text_size.y + 20));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Статистика", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+    ImGui::Text(u8"%s", text.toStdString().c_str());
+    ImGui::PopStyleColor();
+    ImGui::End();
+
     ImGui::Begin("Statistics");
 
     for (const auto& node : params->nodes)
