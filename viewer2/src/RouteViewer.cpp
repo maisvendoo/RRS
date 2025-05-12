@@ -370,11 +370,13 @@ void RouteViewer::initVsgOptions()
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
+    options->operationThreads = vsg::OperationThreads::create(4);
+
     options->add(vsgXchange::all::create());
 
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
-    bool value = false;
-    options->setValue("culling", value);
+    bool culling = false;
+    options->setValue("culling", culling);
 }
 
 //------------------------------------------------------------------------------
@@ -393,11 +395,16 @@ void RouteViewer::initWindowTraits()
         return VK_SAMPLE_COUNT_1_BIT;
     };
 
+    uint32_t vulkan_version;
+    vkEnumerateInstanceVersion(&vulkan_version);
+
     windowTraits = vsg::WindowTraits::create();
     windowTraits->x = settings.x;
     windowTraits->y = settings.y;
     windowTraits->width = settings.width;
     windowTraits->height = settings.height;
+    windowTraits->vulkanVersion = vulkan_version;
+    // windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_MAILBOX_KHR; ???
     windowTraits->screenNum = settings.screen_number;
     windowTraits->fullscreen = settings.fullscreen;
     windowTraits->windowTitle = settings.name;
@@ -488,10 +495,15 @@ void RouteViewer::initLights()
         shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
     }
 
-    auto shaderHints = vsg::ShaderCompileSettings::create();
+    uint32_t vulkan_version;
+    vkEnumerateInstanceVersion(&vulkan_version);
 
-    auto rasterizationState = vsg::RasterizationState::create();
-    rasterizationState->depthClampEnable = VK_TRUE;
+    auto shaderHints = vsg::ShaderCompileSettings::create();
+    shaderHints->vulkanVersion = vulkan_version;
+    shaderHints->optimize = true; // ???
+
+    // auto rasterizationState = vsg::RasterizationState::create();
+    // rasterizationState->depthClampEnable = VK_TRUE;
     // rasterizationState->cullMode = VK_CULL_MODE_NONE;
 
     // auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
@@ -543,8 +555,11 @@ void RouteViewer::initView()
     view = vsg::View::create();
     view->camera = camera;
     view->viewDependentState->maxShadowDistance = maxShadowDistance;
-    // view->viewDependentState->shadowMapBias = shadowMapBias;
+    view->viewDependentState->shadowMapBias = shadowMapBias;
     view->viewDependentState->lambda = lambda;
+    // view->viewDependentState->shaderSet = options->shaderSets["phong"];
+    // view->viewDependentState->ambientLights.emplace_back(vsg::dmat4(), ambient);
+    // view->viewDependentState->directionalLights.emplace_back(vsg::dmat4(), sun);
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
     view->addChild(root);
 }
