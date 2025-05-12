@@ -22,7 +22,7 @@ struct MaterialAnimationVisitorCreateInfo
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     animations_t* animations;
-    CfgReader* cfg_reader;
+    CfgReader& cfg_reader;
 };
 
 class MaterialAnimationVisitor : public vsg::Inherit<vsg::Visitor, MaterialAnimationVisitor>
@@ -37,7 +37,7 @@ private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     animations_t* animations;
-    CfgReader* cfg_reader;
+    CfgReader& cfg_reader;
 };
 
 #endif // MATERIAL_ANIMATION_VISITOR_H

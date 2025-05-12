@@ -5,6 +5,8 @@
 #include "CameraAbstract.h"
 #include "UpdateControlToServerHandler.h"
 
+#include <vsg/nodes/RegionOfInterest.h>
+
 class CameraFreeManipulator;
 class CameraVehicleManipulator;
 class CameraCabineManipulator;
@@ -21,6 +23,7 @@ class UpdateViewerHandler : public vsg::Inherit<vsg::Visitor, UpdateViewerHandle
 public:
     explicit UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
                                  vsg::ref_ptr<vsg::Camera> camera,
+                                 vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
                                  ScreenshotWriter *screenshot_writer,
                                  TrafficLightsHandler *sig_handler,
                                  VehiclesHandler *veh_handler,
@@ -54,10 +57,13 @@ private:
 
     void changeCurrentVehicle();
 
+    void updateShadowRegion();
+
     settings_t& _settings;
     vsg::ref_ptr<vsg::Keyboard> _keyboard = nullptr;
     vsg::ref_ptr<UpdateControlToServerHandler> _upd_server_control = nullptr;
     vsg::ref_ptr<vsg::Camera> _camera = nullptr;
+    vsg::ref_ptr<vsg::RegionOfInterest> _shadow_region = nullptr;
 
     bool _hasKeyboardFocus = false;
     bool _hasPointerFocus = false;

@@ -2,10 +2,26 @@
 #define ANIMATIONS_LIST_H
 
 #include <cstddef>
+#include <mutex>
 #include <map>
 
 class ProcAnimation;
 
-using animations_t = std::multimap<std::size_t, ProcAnimation*>;
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct animations_t
+{
+    animations_t(){}
+
+    std::mutex mutex;
+    std::multimap<std::size_t, ProcAnimation*> animations = {};
+
+    void thread_safe_insert(std::pair<std::size_t, ProcAnimation*> id_and_animation)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        animations.insert(id_and_animation);
+    }
+};
 
 #endif // ANIMATIONS_LIST_H

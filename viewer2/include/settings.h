@@ -35,6 +35,7 @@ struct settings_t
     int samples = 1;            ///< Set number of anialiasing samples
 
     double view_distance = 2000.0;  ///< View distance
+    double shadow_distance = 0.0;   ///< Shadow compute distance
     double zNear = 0.1;
     double zFar = 2000.0;
     double fovy = 64.0;         ///< Vertical view angle

@@ -2,6 +2,7 @@
 #define ROUTE_VIEWER_H
 
 #include "MyGui.h"
+#include "UpdateViewerHandler.h"
 #include "settings.h"
 
 #include <vsg/app/CommandGraph.h>
@@ -87,6 +88,7 @@ private:
     vsg::ref_ptr<GUIParams> GUIparams = nullptr;
     vsg::ref_ptr<UpdateViewerHandler> upd_viewer_handler = nullptr;
 
+    // Replace by smart pointers?
     TcpClient *tcp_client = nullptr;
     SoundManager *sound_manager = nullptr;
     ScreenshotWriter *screenshot_writer = nullptr;

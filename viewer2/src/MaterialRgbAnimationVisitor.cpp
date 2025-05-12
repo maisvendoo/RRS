@@ -45,11 +45,11 @@ void MaterialRgbAnimationVisitor::apply(vsg::StateGroup& stateGroup)
 
                     ProcAnimation *animation = new MaterialRgbAnimation(material);
                     animation->load(*cfg);
-                    animations->insert({animation->getSignalID(), animation});
+                    animations->thread_safe_insert({animation->getSignalID(), animation});
                 }
             }
         }
     }
-    // print_node(vsg::ref_ptr(&stateGroup), 0);
+
     stateGroup.traverse(*this);
 }

@@ -2,11 +2,9 @@
 #define VEHICLE_EXTERIOR_H
 
 #include "animations-list.h"
+
 #include <vsg/core/Object.h>
-#include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/MatrixTransform.h>
-#include <vsg/maths/vec3.h>
-#include <vsg/utils/PropagateDynamicObjects.h>
 
 class SoundManager;
 
@@ -19,9 +17,9 @@ public:
 
     vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
     vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
-    vsg::dvec3  orth = vsg::dvec3(0.0, 0.0, 0.0);
+    vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
     vsg::dvec3  up = vsg::dvec3(0.0, 0.0, 1.0);
-    vsg::dvec3  right = vsg::dvec3(0.0, 0.0, 0.0);
+    vsg::dvec3  right = vsg::dvec3(1.0, 0.0, 0.0);
     vsg::dvec3  attitude = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  velocity = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  driver_pos = vsg::dvec3(0.0, 0.0, 0.0);
@@ -30,7 +28,7 @@ public:
     int         prev_vehicle = -1;
     int         next_vehicle = -1;
 
-    animations_t animations = {};
+    animations_t* animations = new animations_t();
     //displays_t   *displays = new displays_t();
     std::vector<size_t> sounds_id = {};
 
@@ -43,15 +41,13 @@ public:
 
     void step(float t, float dt);
 
-    bool loadVehicle(std::string& cfg_dir, std::string& cfg_file, SoundManager *sm, vsg::ref_ptr<vsg::Options> options);
+    bool loadVehicle(const std::string& cfg_dir,
+                     const std::string& cfg_file,
+                     SoundManager *sm,
+                     vsg::ref_ptr<vsg::Viewer> viewer,
+                     vsg::ref_ptr<vsg::Options> options);
 
 private:
-
-    vsg::ref_ptr<vsg::MatrixTransform> loadModel(const std::string &modelName, const std::string &textureName, vsg::ref_ptr<vsg::Options> options);
-
-    void load_animations(const std::string& animations_dir, vsg::ref_ptr<vsg::Options> options, vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo, vsg::ref_ptr<vsg::Duplicate> duplicate);
-
-    void load_model_animations(const std::string& animations_dir);
 
     void load_sounds(const std::string& sounds_dir, SoundManager *sm);
 

@@ -1,6 +1,5 @@
 #include "RouteViewer.h"
 
-#include "cmake_defines.h"
 #include "cmd-line.h"
 #include "CLI11.hpp"
 #include "filesystem.h"
@@ -11,38 +10,39 @@
 #include "VehiclesHandler.h"
 #include "UpdateViewerHandler.h"
 #include "UpdateSoundManagerHandler.h"
+#include "UpdateStatisticsHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
 
-#include "simulator-info-struct.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
 
-#include <cmath>
 #include <cstdlib>
-#include <iostream>
 #include <sstream>
 #include <string>
 
 #include <QApplication>
 
+#include <vsg/app/CommandGraph.h>
+#include <vsg/core/ConstVisitor.h>
 #include <vsg/io/Options.h>
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/lighting/HardShadows.h>
-#include <vsg/lighting/PercentageCloserSoftShadows.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ViewDependentState.h>
+#include <vsg/threading/OperationThreads.h>
 #include <vsg/utils/SharedObjects.h>
-#include <vsg/utils/ShaderSet.h>
+#include <vsg/utils/ShaderSet.h> 
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <vsgImGui/imgui.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
+#include <vulkan/vulkan_core.h>
 
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(parent)
 {
@@ -57,7 +57,14 @@ RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(pare
     }
 }
 
-RouteViewer::~RouteViewer() = default;
+RouteViewer::~RouteViewer()
+{
+    delete vehicles_handler;
+    delete traffic_lights_handler;
+    delete screenshot_writer;
+    delete sound_manager;
+    delete tcp_client;
+}
 
 bool RouteViewer::isReady() const
 {
@@ -71,7 +78,7 @@ int RouteViewer::run()
 {
     // Обрабатываем события сетевой подсистемы, дожидаемся загрузки и
     // инициализации все объектов
-    while (!isReady())
+    while (!is_ready)
     {
         QApplication::processEvents();
     }
@@ -130,14 +137,12 @@ bool RouteViewer::init(int argc, char* argv[])
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
     
-    initVsgOptions();
-    
     screenshot_writer = new ScreenshotWriter("screenshot.png");
 
-    traffic_lights_handler = new TrafficLightsHandler(nullptr, options);
-
+    traffic_lights_handler = new TrafficLightsHandler(settings);
     vehicles_handler = new VehiclesHandler(settings, sound_manager);
 
+    initVsgOptions();
     initWindowTraits();
     initWindow();
     initCamera();
@@ -148,8 +153,6 @@ bool RouteViewer::init(int argc, char* argv[])
     initViewer();
 
     initTCPclient();
-
-    // TODO: Скриншоты
 
     return true;
 }
@@ -200,6 +203,7 @@ void RouteViewer::loadSettings(const std::string& cfg_path)
         cfg.getInt(secName, "Samples", settings.samples);
 
         cfg.getDouble(secName, "ViewDistance", settings.view_distance);
+        cfg.getDouble(secName, "ShadowDistance", settings.shadow_distance);
         cfg.getDouble(secName, "zNear", settings.zNear);
         cfg.getDouble(secName, "zFar", settings.zFar);
         cfg.getDouble(secName, "FovY", settings.fovy);
@@ -366,8 +370,11 @@ void RouteViewer::initVsgOptions()
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
-    options->propagateDynamicObjects = vsg::PropagateDynamicObjects::create();
     options->add(vsgXchange::all::create());
+
+    // Отключаем автоматическое создание узла CullNode в загружаемых моделях
+    bool value = false;
+    options->setValue("culling", value);
 }
 
 //------------------------------------------------------------------------------
@@ -385,6 +392,7 @@ void RouteViewer::initWindowTraits()
         if (s > 1) return VK_SAMPLE_COUNT_2_BIT;
         return VK_SAMPLE_COUNT_1_BIT;
     };
+
     windowTraits = vsg::WindowTraits::create();
     windowTraits->x = settings.x;
     windowTraits->y = settings.y;
@@ -464,43 +472,50 @@ void RouteViewer::initLights()
     deviceFeatures->get().samplerAnisotropy = VK_TRUE;
     deviceFeatures->get().depthClamp = VK_TRUE;
 
-    auto numShadowMapsPerLight = 1;
-    // shadowSettings = vsg::PercentageCloserSoftShadows::create(numShadowMapsPerLight);
+    if (settings.shadow_distance > 0.1)
+    {
+        auto countNumShadowMaps = [](double dist) -> uint32_t
+        {
+            if (dist > 256.0) return 3;
+            if (dist > 64.0) return 2;
+            return 1;
+        };
+
+        if (settings.shadow_distance > 1000.0)
+            settings.shadow_distance = 1000.0;
+
+        uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
+        shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
+    }
 
     auto shaderHints = vsg::ShaderCompileSettings::create();
 
-    float penumbraRadius = 0.005f;
-    shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
-
     auto rasterizationState = vsg::RasterizationState::create();
     rasterizationState->depthClampEnable = VK_TRUE;
+    // rasterizationState->cullMode = VK_CULL_MODE_NONE;
 
-    auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    pbr->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    pbr->defaultShaderHints = shaderHints;
-    pbr->variants.clear();
+    // auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // pbr->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // pbr->defaultShaderHints = shaderHints;
+    // pbr->variants.clear();
 
-    auto phong = options->shaderSets["phong"] = vsg::createPhongShaderSet(options);
-    phong->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    phong->defaultShaderHints = shaderHints;
-    phong->variants.clear();
+    // auto phong = options->shaderSets["phong"] = vsg::createPhongShaderSet(options);
+    // phong->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phong->defaultShaderHints = shaderHints;
+    // phong->variants.clear();
 
-    auto flat = options->shaderSets["flat"] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    flat->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    flat->defaultShaderHints = shaderHints;
-    flat->variants.clear();
+    // auto flat = options->shaderSets["flat"] = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // flat->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // flat->defaultShaderHints = shaderHints;
+    // flat->variants.clear();
 
-    // shadow_region = vsg::RegionOfInterest::create();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
-    // shadow_region->points.emplace_back();
+    // options->shaderSets.erase("flat");
+    // options->shaderSets.erase("pbr");
+    // options->shaderSets.erase("phong");
 
-    // root->addChild(shadow_region);
+    shadow_region = vsg::RegionOfInterest::create();
+    shadow_region->points.resize(5);
+    root->addChild(shadow_region);
 
     auto ambient = vsg::AmbientLight::create();
     ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
@@ -532,6 +547,13 @@ void RouteViewer::initView()
     view->viewDependentState->lambda = lambda;
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
     view->addChild(root);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::initCommandGraph()
+{
     auto renderGraph = vsg::RenderGraph::create(window, view);
 
     GUIparams = GUIParams::create();
@@ -544,37 +566,35 @@ void RouteViewer::initView()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void RouteViewer::initCommandGraph()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void RouteViewer::initViewer()
 {
     viewer = vsg::Viewer::create();
-    GUIparams->viewer = viewer;
-    GUIparams->vehicles_handler = vehicles_handler;
 
     viewer->addWindow(window);
 
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
     upd_viewer_handler = UpdateViewerHandler::create(
-        upd_server_control, camera, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+        upd_server_control, camera, shadow_region, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+    auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(camera, sound_manager);
+    auto upd_statistis_handler = UpdateStatisticsHandler::create();
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
+    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
-    viewer->addEventHandler(UpdateSoundManagerHandler::create(camera, sound_manager));
-    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
+    viewer->addEventHandler(upd_soundmanager_handler);
+    viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
 
-    // auto commandGraph = vsg::createCommandGraphForView(window, camera, root);
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
+
+    options->operationThreads = vsg::OperationThreads::create(1, viewer->status);
+
+    GUIparams->viewer = viewer;
+    GUIparams->vehicles_handler = vehicles_handler;
+    GUIparams->statistics_handler = upd_statistis_handler.get();
 }
 
 //------------------------------------------------------------------------------
@@ -625,9 +645,16 @@ bool RouteViewer::loadRoute()
             continue;
         }
 
+        std::string model_filename_path = route_dir_path + found_it->second;
+        if (!vsg::fileExists(model_filename_path))
+        {
+            LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
+            continue;
+        }
+
         auto pagedLOD = vsg::PagedLOD::create();
         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-        pagedLOD->filename = route_dir_path + found_it->second;
+        pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
         auto matrix = vsg::MatrixTransform::create();
@@ -648,7 +675,11 @@ bool RouteViewer::loadRoute()
     }
 
     viewer->update();
-    viewer->compile();
+
+    vsg::ref_ptr<vsg::ResourceHints> hints = vsg::ResourceHints::create();
+    hints->numDatabasePagerReadThreads = 1;
+    hints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
+    viewer->compile(hints);
 
     return true;
 }
@@ -688,7 +719,7 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
+    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
@@ -712,18 +743,16 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     GUIparams->status = QString("Загрузка светофоров...");
 
-    traffic_lights_handler->deserialize(sig_data);
+    is_signals = traffic_lights_handler->load(sig_data, settings, viewer, options);
 
-    traffic_lights_handler->create_pagedLODs(settings);
-    traffic_lights_handler->loadSignalModels(settings, shadowSettings);
-    root->addChild(traffic_lights_handler->traffic_light_nodes);
+    root->addChild(traffic_lights_handler->getNode());
 
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal);
-
+/*
     viewer->update();
     viewer->compile();
-
+*/
     LOG_INFO("Send request for vehicles info");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
@@ -738,25 +767,15 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
         LOG_WARN("Get vehicles info again");
         return;
     }
-    is_vehicles = true;
-
-    simulator_vehicles_info_t vehicles_info;
-    vehicles_info.deserialize(data);
-    int count = vehicles_info.vehicles.size();
-    if (count <= 0)
-    {
-        LOG_WARN("Server has not any vehicles");
-        is_vehicles = false;
-        return;
-    }
-
-    LOG_INFO("Get info about %u vehicles", count);
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    vehicles_handler->load(vehicles_info, settings, options);
+    is_vehicles = vehicles_handler->load(data, settings, viewer, options);
 
     GUIparams->status = QString("");
+
+    if (!is_vehicles)
+        return;
 
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             vehicles_handler, &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
@@ -771,10 +790,10 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
             this, &RouteViewer::slotUpdated, Qt::DirectConnection);
 
     root->addChild(vehicles_handler->getExterior());
-
+/*
     viewer->update();
     viewer->compile();
-
+*/
     LOG_INFO("Send request for continuous vehicles update");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);

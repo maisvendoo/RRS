@@ -50,8 +50,8 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
                     duplicate->insert(pbr_material_value, new_pbr_material_value);
 
                     ProcAnimation* animation = new MaterialAnimation(new_pbr_material_value);
-                    animation->load(*cfg_reader);
-                    animations->insert({animation->getSignalID(), animation});
+                    animation->load(cfg_reader);
+                    animations->thread_safe_insert({animation->getSignalID(), animation});
                 }
             }
         }
