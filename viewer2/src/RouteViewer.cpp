@@ -370,7 +370,6 @@ void RouteViewer::initVsgOptions()
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
-    options->operationThreads = vsg::OperationThreads::create(4);
 
     options->add(vsgXchange::all::create());
 
@@ -502,6 +501,17 @@ void RouteViewer::initLights()
     shaderHints->vulkanVersion = vulkan_version;
     shaderHints->optimize = true; // ???
 
+    // auto shaderSet = vsg::createPhongShaderSet(options);
+    // shaderSet->defaultShaderHints = shaderHints;
+
+    // auto rasterizationState = vsg::RasterizationState::create();
+    // rasterizationState->cullMode = VK_CULL_MODE_NONE;
+    // rasterizationState->frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    // shaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // // options->shaderSets["pbr"] = shaderSet;
+    // options->shaderSets["phong"] = shaderSet;
+    // // options->shaderSets["flat"] = shaderSet;
+
     // auto rasterizationState = vsg::RasterizationState::create();
     // rasterizationState->depthClampEnable = VK_TRUE;
     // rasterizationState->cullMode = VK_CULL_MODE_NONE;
@@ -605,7 +615,7 @@ void RouteViewer::initViewer()
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
 
-    options->operationThreads = vsg::OperationThreads::create(1, viewer->status);
+    options->operationThreads = vsg::OperationThreads::create(4, viewer->status); // ???
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler;
@@ -689,6 +699,9 @@ bool RouteViewer::loadRoute()
         root->addChild(matrix);
     }
 
+    route.object_ref.clear();
+    route.transforms.clear();
+
     viewer->update();
 
     vsg::ref_ptr<vsg::ResourceHints> hints = vsg::ResourceHints::create();
@@ -734,7 +747,8 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
+    settings.route_dir_name = route_info.route_dir_name.toStdString();
+    // settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
