@@ -494,19 +494,39 @@ void RouteViewer::initLights()
         shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
     }
 
-    uint32_t vulkan_version;
-    vkEnumerateInstanceVersion(&vulkan_version);
+    // uint32_t vulkan_version;
+    // vkEnumerateInstanceVersion(&vulkan_version);
 
-    auto shaderHints = vsg::ShaderCompileSettings::create();
-    shaderHints->vulkanVersion = vulkan_version;
-    shaderHints->optimize = true; // ???
-
-    // auto shaderSet = vsg::createPhongShaderSet(options);
-    // shaderSet->defaultShaderHints = shaderHints;
+    // auto shaderHints = vsg::ShaderCompileSettings::create();
+    // shaderHints->vulkanVersion = vulkan_version;
+    // shaderHints->optimize = true; // ???
 
     // auto rasterizationState = vsg::RasterizationState::create();
+    // rasterizationState->depthClampEnable = VK_TRUE;
     // rasterizationState->cullMode = VK_CULL_MODE_NONE;
     // rasterizationState->frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+
+    // auto phongShaderSet = vsg::createPhongShaderSet(options);
+    // phongShaderSet->defaultShaderHints = shaderHints;
+    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phongShaderSet->variants.clear();
+
+    // auto pbrShaderSet = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // pbrShaderSet->defaultShaderHints = shaderHints;
+    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phongShaderSet->variants.clear();
+
+    // auto flatShaderSet = vsg::createFlatShadedShaderSet(options);
+    // flatShaderSet->defaultShaderHints = shaderHints;
+    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phongShaderSet->variants.clear();
+
+    // options->shaderSets.clear();
+
+    // options->shaderSets["pbr"] = pbrShaderSet;
+    // options->shaderSets["phong"] = phongShaderSet;
+    // options->shaderSets["flat"] = flatShaderSet;
+
     // shaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
     // // options->shaderSets["pbr"] = shaderSet;
     // options->shaderSets["phong"] = shaderSet;
