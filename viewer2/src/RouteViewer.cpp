@@ -36,7 +36,7 @@
 #include <vsg/state/ViewDependentState.h>
 #include <vsg/threading/OperationThreads.h>
 #include <vsg/utils/SharedObjects.h>
-#include <vsg/utils/ShaderSet.h> 
+#include <vsg/utils/ShaderSet.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <vsgImGui/imgui.h>
@@ -106,27 +106,10 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char* argv[])
 {
-    FileSystem& fs = FileSystem::getInstance();
-
-    loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
+    loadSettings();
     LOG_INFO("Loaded settings from settings.xml");
 
-    LogLevel level = LOG_LEVEL_INFO;
-
-    if (settings.notify_level == "INFO")
-    {
-        level = LOG_LEVEL_INFO;
-    }
-    else if (settings.notify_level == "WARN")
-    {
-        level = LOG_LEVEL_WARN;
-    }
-    else if (settings.notify_level == "FATAL")
-    {
-        level = LOG_LEVEL_FATAL;
-    }
-
-    Logger::instance().level = level;
+    configureLogLevel();
 
     LOG_INFO("Override settings from command line");
     overrideSettingsByCommandLine(argc, argv);
@@ -136,7 +119,7 @@ bool RouteViewer::init(int argc, char* argv[])
 
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
-    
+
     screenshot_writer = new ScreenshotWriter("screenshot.png");
 
     traffic_lights_handler = new TrafficLightsHandler(settings);
@@ -160,153 +143,272 @@ bool RouteViewer::init(int argc, char* argv[])
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void RouteViewer::loadSettings(const std::string& cfg_path)
+void RouteViewer::loadSettings()
 {
+    FileSystem& fs = FileSystem::getInstance();
+    const std::string cfg_path = fs.getConfigDir() + fs.separator() + "settings.xml";
+
     CfgReader cfg;
     if (cfg.load(cfg_path.c_str()))
     {
-        QString secName = "Client";
-        cfg.getString(secName, "HostAddr", settings.tcp_config.host_addr);
+        QString section = "Client";
+        loadNetworkSettings(cfg, section);
 
-        int tmp_int = 0;
-        if (cfg.getInt(secName, "port", tmp_int))
-            settings.tcp_config.port = static_cast<quint16>(tmp_int);
-
-        cfg.getInt(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
-        cfg.getInt(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
-        cfg.getInt(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
-        cfg.getInt(secName, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
-        cfg.getInt(secName, "ClientDelay", settings.client_delay);
-
-        secName = "Viewer";
-
-        QString tmp_qstr = "INFO";
-        if (cfg.getString(secName, "NotifyLevel", tmp_qstr))
-            settings.notify_level = tmp_qstr.toStdString();
-
-        tmp_qstr = "viewer";
-        if (cfg.getString(secName, "Name", tmp_qstr))
-            settings.name = tmp_qstr.toStdString();
-
-        cfg.getInt(secName, "posX", settings.x);
-        cfg.getInt(secName, "posY", settings.y);
-        cfg.getInt(secName, "Width", settings.width);
-        cfg.getInt(secName, "Height", settings.height);
-        tmp_int = 0;
-        cfg.getInt(secName, "ScreenNumber", tmp_int);
-        if (tmp_int >= 0) settings.screen_number = tmp_int;
-        cfg.getBool(secName, "FullScreen", settings.fullscreen);
-        cfg.getBool(secName, "VSync", settings.vsync);
-        cfg.getBool(secName, "WindowDecoration", settings.window_decoration);
-
-        cfg.getBool(secName, "DoubleBuffer", settings.double_buffer);
-        cfg.getInt(secName, "Samples", settings.samples);
-
-        cfg.getDouble(secName, "ViewDistance", settings.view_distance);
-        cfg.getDouble(secName, "ShadowDistance", settings.shadow_distance);
-        cfg.getDouble(secName, "zNear", settings.zNear);
-        cfg.getDouble(secName, "zFar", settings.zFar);
-        cfg.getDouble(secName, "FovY", settings.fovy);
-        cfg.getDouble(secName, "FovYMin", settings.fovy_min);
-        cfg.getDouble(secName, "FovYMax", settings.fovy_max);
-        cfg.getDouble(secName, "PitchMin", settings.pitch_min);
-        cfg.getDouble(secName, "PitchMax", settings.pitch_max);
-
-        // Положение свободной камеры при запуске
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "FreeCamStart", tmp_qstr))
-        {
-            std::string free_cam_start = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_start);
-            stream >> settings.free_cam_start.x
-                >> settings.free_cam_start.y
-                >> settings.free_cam_start.z;
-        }
-        // Настройки свободной камеры
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "FreeCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.free_cam_init_pos.x
-                >> settings.free_cam_init_pos.y
-                >> settings.free_cam_init_pos.z;
-        }
-        cfg.getDouble(secName, "FreeCamSpeedKeyboard", settings.free_cam_speed_keyboard);
-        cfg.getDouble(secName, "FreeCamSpeedMouse", settings.free_cam_speed_mouse);
-        double tmp_double = 1.0;
-        cfg.getDouble(secName, "FreeCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.free_cam_speed_coeff = tmp_double;
-        cfg.getDouble(secName, "FreeCamRotKeyboard", settings.free_cam_rotate_keyboard);
-        cfg.getDouble(secName, "FreeCamRotMouse", settings.free_cam_rotate_keyboard);
-        cfg.getDouble(secName, "FreeCamHeightStep", settings.free_cam_height_step);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "FreeCamFovYCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.free_cam_fovy_coeff = tmp_double;
-
-        // Настройки камеры в кабине
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "CabineCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.cabine_default_pos.x
-                >> settings.cabine_default_pos.y
-                >> settings.cabine_default_pos.z;
-        }
-        cfg.getDouble(secName, "CabineCamSpeedKeyboard", settings.cabine_speed_keyboard);
-        cfg.getDouble(secName, "CabineCamSpeedMouse", settings.cabine_speed_mouse);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "CabineCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.cabine_speed_coeff = tmp_double;
-        cfg.getDouble(secName, "CabineCamRotKeyboard", settings.cabine_rotate_keyboard);
-        cfg.getDouble(secName, "CabineCamRotMouse", settings.cabine_rotate_mouse);
-        cfg.getDouble(secName, "CabineCamHeightStep", settings.cabine_height_step);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "CabineCamFovYCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.cabine_fovy_coeff = tmp_double;
-        cfg.getDouble(secName, "CabineCamVerticalShiftMin", settings.cabine_z_min);
-        cfg.getDouble(secName, "CabineCamVerticalShiftMax", settings.cabine_z_max);
-
-        // Настройки внешней камеры
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "ExtCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.ext_cam_init_pos.x
-                >> settings.ext_cam_init_pos.y
-                >> settings.ext_cam_init_pos.z;
-        }
-        cfg.getDouble(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
-        cfg.getDouble(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
-        cfg.getDouble(secName, "ExtCamInitDist", settings.ext_cam_init_distance);
-        cfg.getDouble(secName, "ExtCamSpeedKeyboard", settings.ext_cam_speed_keyboard);
-        cfg.getDouble(secName, "ExtCamSpeedMouse", settings.ext_cam_speed_mouse);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "ExtCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.ext_cam_speed_coeff = tmp_double;
-        cfg.getDouble(secName, "ExtCamRotKeyboard", settings.ext_cam_rotate_keyboard);
-        cfg.getDouble(secName, "ExtCamRotMouse", settings.ext_cam_rotate_mouse);
-        cfg.getDouble(secName, "ExtCamHeightStep", settings.ext_cam_height_step);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "ExtCamDistCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.ext_cam_dist_coeff = tmp_double;
-        cfg.getDouble(secName, "ExtCamDistMin", settings.ext_cam_dist_min);
-
-        // Настройки следящей камеры
-        cfg.getDouble(secName, "FollowCamShiftRight", settings.follow_cam_init_shift_right);
-        cfg.getDouble(secName, "FollowCamShiftUp", settings.follow_cam_init_shift_up);
-        cfg.getDouble(secName, "FollowCamFwdVelocityCoeff", settings.follow_cam_fwd_velocity_coeff);
-        cfg.getDouble(secName, "FollowCamSpeedKeyboard", settings.follow_cam_speed_keyboard);
-        cfg.getDouble(secName, "FollowCamSpeedMouse", settings.follow_cam_speed_mouse);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "FollowCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.follow_cam_speed_coeff = tmp_double;
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "FollowCamFovYCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.follow_cam_fovy_coeff = tmp_double;
+        section = "Viewer";
+        loadLoggerSettings(cfg, section);
+        loadWindowSettings(cfg, section);
+        loadCameraSettings(cfg, section);
+        loadFreeCameraSettings(cfg, section);
+        loadCabineCameraSettings(cfg, section);
+        loadExternalCameraSettings(cfg, section);
+        loadFollowCameraSettings(cfg, section);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadNetworkSettings(CfgReader& cfg, const QString& section)
+{
+    cfg.getString(section, "HostAddr", settings.tcp_config.host_addr);
+
+    int port = 0;
+    if (cfg.getInt(section, "port", port))
+    {
+        settings.tcp_config.port = static_cast<quint16>(port);
+    }
+
+    cfg.getInt(section, "ReconnectInteval", settings.tcp_config.reconnect_interval);
+    cfg.getInt(section, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
+    cfg.getInt(section, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
+    cfg.getInt(section, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
+    cfg.getInt(section, "ClientDelay", settings.client_delay);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadLoggerSettings(CfgReader& cfg, const QString& section)
+{
+    QString notifyLevel = "INFO";
+    if (cfg.getString(section, "NotifyLevel", notifyLevel))
+    {
+        settings.notify_level = notifyLevel.toStdString();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
+{
+    QString name = "viewer";
+    if (cfg.getString(section, "Name", name))
+    {
+        settings.name = name.toStdString();
+    }
+
+    cfg.getInt(section, "posX", settings.x);
+    cfg.getInt(section, "posY", settings.y);
+    cfg.getInt(section, "Width", settings.width);
+    cfg.getInt(section, "Height", settings.height);
+
+    int screenNumber = 0;
+    cfg.getInt(section, "ScreenNumber", screenNumber);
+    if (screenNumber >= 0)
+    {
+        settings.screen_number = screenNumber;
+    }
+
+    cfg.getBool(section, "FullScreen", settings.fullscreen);
+    cfg.getBool(section, "VSync", settings.vsync);
+    cfg.getBool(section, "WindowDecoration", settings.window_decoration);
+
+    cfg.getBool(section, "DoubleBuffer", settings.double_buffer);
+    cfg.getInt(section, "Samples", settings.samples);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadCameraSettings(CfgReader& cfg, const QString& section)
+{
+    cfg.getDouble(section, "ViewDistance", settings.view_distance);
+    cfg.getDouble(section, "ShadowDistance", settings.shadow_distance);
+    cfg.getDouble(section, "zNear", settings.zNear);
+    cfg.getDouble(section, "zFar", settings.zFar);
+    cfg.getDouble(section, "FovY", settings.fovy);
+    cfg.getDouble(section, "FovYMin", settings.fovy_min);
+    cfg.getDouble(section, "FovYMax", settings.fovy_max);
+    cfg.getDouble(section, "PitchMin", settings.pitch_min);
+    cfg.getDouble(section, "PitchMax", settings.pitch_max);
+}
+
+//------------------------------------------------------------------------------
+// Настройки свободной камеры
+//------------------------------------------------------------------------------
+void RouteViewer::loadFreeCameraSettings(CfgReader& cfg, const QString& section)
+{
+    // Положение свободной камеры при запуске
+    QString freeCamStart = "0.0 0.0 0.0";
+    if (cfg.getString(section, "FreeCamStart", freeCamStart))
+    {
+        std::istringstream stream(freeCamStart.toStdString());
+        stream >> settings.free_cam_start.x
+            >> settings.free_cam_start.y
+            >> settings.free_cam_start.z;
+    }
+
+    QString freeCamInitPos = "0.0 0.0 0.0";
+    if (cfg.getString(section, "FreeCamInitPos", freeCamInitPos))
+    {
+        std::istringstream stream(freeCamInitPos.toStdString());
+        stream >> settings.free_cam_init_pos.x
+            >> settings.free_cam_init_pos.y
+            >> settings.free_cam_init_pos.z;
+    }
+
+    cfg.getDouble(section, "FreeCamSpeedKeyboard", settings.free_cam_speed_keyboard);
+    cfg.getDouble(section, "FreeCamSpeedMouse", settings.free_cam_speed_mouse);
+
+    double freeCamSpeedCoeff = 1.0;
+    cfg.getDouble(section, "FreeCamSpeedCoeff", freeCamSpeedCoeff);
+    if (freeCamSpeedCoeff > 1.01)
+    {
+        settings.free_cam_speed_coeff = freeCamSpeedCoeff;
+    }
+
+    cfg.getDouble(section, "FreeCamRotKeyboard", settings.free_cam_rotate_keyboard);
+    cfg.getDouble(section, "FreeCamRotMouse", settings.free_cam_rotate_keyboard);
+    cfg.getDouble(section, "FreeCamHeightStep", settings.free_cam_height_step);
+
+    double freeCamFovYCoeff = 1.0;
+    cfg.getDouble(section, "FreeCamFovYCoeff", freeCamFovYCoeff);
+    if (freeCamSpeedCoeff > 1.01)
+    {
+        settings.free_cam_fovy_coeff = freeCamFovYCoeff;
+    }
+}
+
+//------------------------------------------------------------------------------
+// Настройки камеры в кабине
+//------------------------------------------------------------------------------
+void RouteViewer::loadCabineCameraSettings(CfgReader& cfg, const QString& section)
+{
+    QString cabineCamInitPos = "0.0 0.0 0.0";
+    if (cfg.getString(section, "CabineCamInitPos", cabineCamInitPos))
+    {
+        std::istringstream stream(cabineCamInitPos.toStdString());
+        stream >> settings.cabine_default_pos.x
+            >> settings.cabine_default_pos.y
+            >> settings.cabine_default_pos.z;
+    }
+
+    cfg.getDouble(section, "CabineCamSpeedKeyboard", settings.cabine_speed_keyboard);
+    cfg.getDouble(section, "CabineCamSpeedMouse", settings.cabine_speed_mouse);
+
+    double cabineCamSpeedCoeff = 1.0;
+    cfg.getDouble(section, "CabineCamSpeedCoeff", cabineCamSpeedCoeff);
+    if (cabineCamSpeedCoeff > 1.01)
+    {
+        settings.cabine_speed_coeff = cabineCamSpeedCoeff;
+    }
+
+    cfg.getDouble(section, "CabineCamRotKeyboard", settings.cabine_rotate_keyboard);
+    cfg.getDouble(section, "CabineCamRotMouse", settings.cabine_rotate_mouse);
+    cfg.getDouble(section, "CabineCamHeightStep", settings.cabine_height_step);
+
+    double cabineCamFovYCoeff = 1.0;
+    cfg.getDouble(section, "CabineCamFovYCoeff", cabineCamFovYCoeff);
+    if (cabineCamFovYCoeff > 1.01)
+    {
+        settings.cabine_fovy_coeff = cabineCamFovYCoeff;
+    }
+
+    cfg.getDouble(section, "CabineCamVerticalShiftMin", settings.cabine_z_min);
+    cfg.getDouble(section, "CabineCamVerticalShiftMax", settings.cabine_z_max);
+}
+
+//------------------------------------------------------------------------------
+// Настройки внешней камеры
+//------------------------------------------------------------------------------
+void RouteViewer::loadExternalCameraSettings(CfgReader& cfg, const QString& section)
+{
+    QString extCamInitPos = "0.0 0.0 0.0";
+    if (cfg.getString(section, "ExtCamInitPos", extCamInitPos))
+    {
+        std::istringstream stream(extCamInitPos.toStdString());
+        stream >> settings.ext_cam_init_pos.x
+            >> settings.ext_cam_init_pos.y
+            >> settings.ext_cam_init_pos.z;
+    }
+
+    cfg.getDouble(section, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
+    cfg.getDouble(section, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
+    cfg.getDouble(section, "ExtCamInitDist", settings.ext_cam_init_distance);
+    cfg.getDouble(section, "ExtCamSpeedKeyboard", settings.ext_cam_speed_keyboard);
+    cfg.getDouble(section, "ExtCamSpeedMouse", settings.ext_cam_speed_mouse);
+
+    double extCamSpeedCoeff = 1.0;
+    cfg.getDouble(section, "ExtCamSpeedCoeff", extCamSpeedCoeff);
+    if (extCamSpeedCoeff > 1.01)
+    {
+        settings.ext_cam_speed_coeff = extCamSpeedCoeff;
+    }
+
+    cfg.getDouble(section, "ExtCamRotKeyboard", settings.ext_cam_rotate_keyboard);
+    cfg.getDouble(section, "ExtCamRotMouse", settings.ext_cam_rotate_mouse);
+    cfg.getDouble(section, "ExtCamHeightStep", settings.ext_cam_height_step);
+
+    double extCamDistCoeff = 1.0;
+    cfg.getDouble(section, "ExtCamDistCoeff", extCamDistCoeff);
+    if (extCamDistCoeff > 1.01)
+    {
+        settings.ext_cam_dist_coeff = extCamDistCoeff;
+    }
+
+    cfg.getDouble(section, "ExtCamDistMin", settings.ext_cam_dist_min);
+}
+
+//------------------------------------------------------------------------------
+// Настройки следящей камеры
+//------------------------------------------------------------------------------
+void RouteViewer::loadFollowCameraSettings(CfgReader& cfg, const QString& section)
+{
+    cfg.getDouble(section, "FollowCamShiftRight", settings.follow_cam_init_shift_right);
+    cfg.getDouble(section, "FollowCamShiftUp", settings.follow_cam_init_shift_up);
+    cfg.getDouble(section, "FollowCamFwdVelocityCoeff", settings.follow_cam_fwd_velocity_coeff);
+    cfg.getDouble(section, "FollowCamSpeedKeyboard", settings.follow_cam_speed_keyboard);
+    cfg.getDouble(section, "FollowCamSpeedMouse", settings.follow_cam_speed_mouse);
+
+    double followCamSpeedCoeff = 1.0;
+    cfg.getDouble(section, "FollowCamSpeedCoeff", followCamSpeedCoeff);
+    if (followCamSpeedCoeff > 1.01)
+    {
+        settings.follow_cam_speed_coeff = followCamSpeedCoeff;
+    }
+
+    double followCamFovYCoeff = 1.0;
+    cfg.getDouble(section, "FollowCamFovYCoeff", followCamFovYCoeff);
+    if (followCamFovYCoeff > 1.01)
+    {
+        settings.follow_cam_fovy_coeff = followCamFovYCoeff;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::configureLogLevel()
+{
+    const std::map<std::string, LogLevel> levels = {
+        {"INFO", LOG_LEVEL_INFO},
+        {"WARN", LOG_LEVEL_WARN},
+        {"FATAL", LOG_LEVEL_FATAL}
+    };
+
+    const auto found = levels.find(settings.notify_level);
+    Logger::instance().level = (found != levels.end()) ? found->second : LOG_LEVEL_INFO;
 }
 
 //------------------------------------------------------------------------------
@@ -370,7 +472,6 @@ void RouteViewer::initVsgOptions()
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
     options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
     options->sharedObjects = vsg::SharedObjects::create();
-
     options->add(vsgXchange::all::create());
 
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
@@ -394,7 +495,7 @@ void RouteViewer::initWindowTraits()
         return VK_SAMPLE_COUNT_1_BIT;
     };
 
-    uint32_t vulkan_version;
+    std::uint32_t vulkan_version;
     vkEnumerateInstanceVersion(&vulkan_version);
 
     windowTraits = vsg::WindowTraits::create();
@@ -411,6 +512,10 @@ void RouteViewer::initWindowTraits()
     windowTraits->samples = samples_bit_flag(settings.samples);
     // windowTraits->debugLayer = true;
     // windowTraits->debugUtils = true;
+
+    auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
+    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+    deviceFeatures->get().depthClamp = VK_TRUE;
 }
 
 //------------------------------------------------------------------------------
@@ -422,18 +527,18 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
     {
         window = vsg::Window::create(windowTraits);
     }
-    catch (const vsg::Exception e)
+    catch (const vsg::Exception& exception)
     {
-        if ((e.result == VK_ERROR_INVALID_EXTERNAL_HANDLE) && try_screenNum_exception)
+        if ((exception.result == VK_ERROR_INVALID_EXTERNAL_HANDLE) && try_screenNum_exception)
         {
-            LOG_WARN(e.message.c_str());
+            LOG_WARN(exception.message.c_str());
             LOG_WARN("Try to use default display...");
             windowTraits->screenNum = -1;
             initWindow(false);
         }
         else
         {
-            LOG_FATAL(e.message.c_str());
+            LOG_FATAL(exception.message.c_str());
             LOG_FATAL("Fail to create window");
             exit(1);
         }
@@ -445,16 +550,20 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
 //------------------------------------------------------------------------------
 void RouteViewer::initCamera()
 {
-    double windowWidth = static_cast<double>(window->extent2D().width);
-    double windowHeight = static_cast<double>(window->extent2D().height);
-    double aspectRatio = windowWidth / windowHeight;
+    const double windowWidth = static_cast<double>(window->extent2D().width);
+    const double windowHeight = static_cast<double>(window->extent2D().height);
+    const double aspectRatio = windowWidth / windowHeight;
 
-    auto perspective = vsg::Perspective::create(settings.fovy,
-        aspectRatio, settings.zNear, settings.zFar);
+    auto perspective = vsg::Perspective::create(
+        settings.fovy,
+        aspectRatio,
+        settings.zNear,
+        settings.zFar
+    );
 
-    vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
-    vsg::dvec3 eye = route_start_point + settings.free_cam_start;
-    vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
+    const vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
+    const vsg::dvec3 eye = route_start_point + settings.free_cam_start;
+    const vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
 
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
 
@@ -474,13 +583,9 @@ void RouteViewer::initScenegraph()
 //------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
-    auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
-    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
-    deviceFeatures->get().depthClamp = VK_TRUE;
-
     if (settings.shadow_distance > 0.1)
     {
-        auto countNumShadowMaps = [](double dist) -> uint32_t
+        auto countNumShadowMaps = [](double dist) -> std::uint32_t
         {
             if (dist > 256.0) return 3;
             if (dist > 64.0) return 2;
@@ -488,9 +593,11 @@ void RouteViewer::initLights()
         };
 
         if (settings.shadow_distance > 1000.0)
+        {
             settings.shadow_distance = 1000.0;
+        }
 
-        uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
+        const std::uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
         shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
     }
 
@@ -618,10 +725,20 @@ void RouteViewer::initViewer()
     viewer->addWindow(window);
 
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
+
     upd_viewer_handler = UpdateViewerHandler::create(
-        upd_server_control, camera, shadow_region, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+        upd_server_control,
+        camera,
+        shadow_region,
+        screenshot_writer,
+        traffic_lights_handler,
+        vehicles_handler,
+        settings
+    );
+
     auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(camera, sound_manager);
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
+
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
@@ -672,7 +789,7 @@ bool RouteViewer::loadRoute()
     }
 
     FileSystem& fs = FileSystem::getInstance();
-    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
+    const std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
     settings.route_dir_full_path = route_dir_path;
 
     Route route;
@@ -690,7 +807,7 @@ bool RouteViewer::loadRoute()
             continue;
         }
 
-        std::string model_filename_path = route_dir_path + found_it->second;
+        const std::string model_filename_path = route_dir_path + found_it->second;
         if (!vsg::fileExists(model_filename_path))
         {
             LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
@@ -724,10 +841,10 @@ bool RouteViewer::loadRoute()
 
     viewer->update();
 
-    vsg::ref_ptr<vsg::ResourceHints> hints = vsg::ResourceHints::create();
-    hints->numDatabasePagerReadThreads = 1;
-    hints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
-    viewer->compile(hints);
+    auto resourceHints = vsg::ResourceHints::create();
+    resourceHints->numDatabasePagerReadThreads = 1;
+    resourceHints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
+    viewer->compile(resourceHints);
 
     return true;
 }

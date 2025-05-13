@@ -14,8 +14,7 @@
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/RegionOfInterest.h>
 
-#include <string>
-
+class CfgReader;
 class QByteArray;
 class SoundManager;
 class TcpClient;
@@ -39,7 +38,17 @@ public:
 private:
     bool init(int argc, char* argv[]);
 
-    void loadSettings(const std::string& cfg_path);
+    void loadSettings();
+    void loadNetworkSettings(CfgReader& cfg, const QString& section);
+    void loadLoggerSettings(CfgReader& cfg, const QString& section);
+    void loadWindowSettings(CfgReader& cfg, const QString& section);
+    void loadCameraSettings(CfgReader& cfg, const QString& section);
+    void loadFreeCameraSettings(CfgReader& cfg, const QString& section);
+    void loadCabineCameraSettings(CfgReader& cfg, const QString& section);
+    void loadExternalCameraSettings(CfgReader& cfg, const QString& section);
+    void loadFollowCameraSettings(CfgReader& cfg, const QString& section);
+
+    void configureLogLevel();
 
     int overrideSettingsByCommandLine(int argc, char* argv[]);
 
