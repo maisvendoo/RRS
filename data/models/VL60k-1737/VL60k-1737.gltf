@@ -758,45 +758,30 @@
 		},
 		{
 			"mesh":21,
-			"name":"02 - Default.079",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"02 - Default.079"
 		},
 		{
 			"children":[
 				74
 			],
-			"name":"Cab_Korpus-1-GEODE",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Cab_Korpus-1-GEODE"
 		},
 		{
 			"children":[
 				75
 			],
 			"name":"Cab_Korpus-1-OFFSET",
-			"scale":[
-				0,
-				0,
-				0
+			"translation":[
+				0.017016999423503876,
+				8.76239013671875,
+				2.8550899028778076
 			]
 		},
 		{
 			"children":[
 				76
 			],
-			"name":"Cab_Korpus-1",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Cab_Korpus-1"
 		},
 		{
 			"mesh":22,
@@ -833,12 +818,7 @@
 		},
 		{
 			"mesh":23,
-			"name":"01 - Default.001",
-			"translation":[
-				0,
-				-2.0594566194631625e-06,
-				0
-			]
+			"name":"01 - Default.001"
 		},
 		{
 			"children":[
