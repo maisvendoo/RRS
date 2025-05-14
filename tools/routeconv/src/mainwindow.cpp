@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->pbConvert, &QPushButton::released, this, &MainWindow::slotConvert);
     connect(&pathconvProc, &QProcess::finished, this, &MainWindow::slotIsPathconvFinished);
     connect(&profconvProc, &QProcess::finished, this, &MainWindow::slotIsProfconvFinished);
+    connect(&dmd2gltfProc, &QProcess::finished, this, &MainWindow::slotIsDmd2gltfFinished);
 
     connect(ui->pbGenParallel, &QPushButton::released, this, &MainWindow::slotGenerateParallel);
     connect(ui->pbGenSpline, &QPushButton::released, this, &MainWindow::slotGenerateSpline);
@@ -113,6 +114,22 @@ void MainWindow::startProfConverter(QString routeDir)
 
     profconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     profconvProc.start(profconv_path, args);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::startDmd2gltfConverter(QString routeDir)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString dmd2gltf_path = DMD2GLTF + EXE_EXP;
+
+    QStringList args;
+    args << "--input-route" << routeDir;
+    args << "--output-route" << routeDir;
+
+    dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    dmd2gltfProc.start(dmd2gltf_path, args);
 }
 
 //------------------------------------------------------------------------------
@@ -294,6 +311,16 @@ void MainWindow::slotIsPathconvFinished(int error_code, QProcess::ExitStatus exi
 //
 //------------------------------------------------------------------------------
 void MainWindow::slotIsProfconvFinished(int error_code, QProcess::ExitStatus exitstatus)
+{
+    Q_UNUSED(error_code)
+
+    startDmd2gltfConverter(routeDir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotIsDmd2gltfFinished(int error_code, QProcess::ExitStatus exitstatus)
 {
     Q_UNUSED(error_code)
 

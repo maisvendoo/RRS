@@ -101,33 +101,36 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
         return false;
     }
 
-    // Создаем каталог под новый маршрут
-    fs::create_directories(out_gltf_route_path);
-    // Создаем каталог под текстуры
-    fs::create_directory(combine_path(out_gltf_route_path, "textures"));
+    if (in_dmd_route_path != out_gltf_route_path)
+    {
+        // Создаем каталог под новый маршрут
+        fs::create_directories(out_gltf_route_path);
+        // Создаем каталог под текстуры
+        fs::create_directory(combine_path(out_gltf_route_path, "textures"));
 
-    // Копируем топологию
-    try
-    {
-        fs::copy(combine_path(in_dmd_route_path, "topology"),
-                 combine_path(out_gltf_route_path, "topology"),
-                 fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what();
-    }
+        // Копируем топологию
+        try
+        {
+            fs::copy(combine_path(in_dmd_route_path, "topology"),
+                     combine_path(out_gltf_route_path, "topology"),
+                     fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << e.what();
+        }
 
-    try
-    {
-        fs::copy(combine_path(in_dmd_route_path, "description.xml"),
-                 combine_path(out_gltf_route_path, "description.xml"),
-                 fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+        try
+        {
+            fs::copy(combine_path(in_dmd_route_path, "description.xml"),
+                     combine_path(out_gltf_route_path, "description.xml"),
+                     fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << e.what();
+        }
     }
-    catch (std::exception &e)
-    {
-        std::cerr << e.what();
-    }    
 
     std::map<Label, RelativePath> new_objects;
 
@@ -179,7 +182,7 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
 
     for (const auto& [label, path] : new_objects)
     {
-        new_objects_ref << label << "    " << path << '\n';
+        new_objects_ref << label << "\t" << path << '\n';
     }
 
     return true;

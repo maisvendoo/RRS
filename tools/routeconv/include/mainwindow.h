@@ -37,6 +37,7 @@ private:
 
     QProcess    pathconvProc;
     QProcess    profconvProc;
+    QProcess    dmd2gltfProc;
     QProcess    parallelGenProc;
     QProcess    splineGenProc;
 
@@ -47,6 +48,8 @@ private:
     void startPathConverter(QString routeDir);
 
     void startProfConverter(QString routeDir);
+
+    void startDmd2gltfConverter(QString routeDir);
 
     void startParallelGenerator(QString routeDir);
 
@@ -61,6 +64,8 @@ private slots:
     void slotIsPathconvFinished(int error_code, QProcess::ExitStatus exitstatus);
 
     void slotIsProfconvFinished(int error_code, QProcess::ExitStatus exitstatus);
+
+    void slotIsDmd2gltfFinished(int error_code, QProcess::ExitStatus exitstatus);
 
     void slotGenerateParallel();
 
