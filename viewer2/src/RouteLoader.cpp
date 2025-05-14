@@ -73,7 +73,7 @@ bool RouteLoader::parse_objects_ref(Route& route)
 
 bool RouteLoader::parse_route_map(Route& route)
 {
-    std::ifstream route_map(route_path + "/route1.map");
+    std::ifstream route_map(route_path + "/topology/map/route1.map");
     if (!route_map)
     {
         LOG_ERROR("Failed to open %s", route_map_path.c_str());
