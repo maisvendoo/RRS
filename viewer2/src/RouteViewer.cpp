@@ -23,6 +23,8 @@
 #include <vsg/app/CommandGraph.h>
 #include <vsg/core/ConstVisitor.h>
 #include <vsg/io/Options.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/state/GraphicsPipeline.h>
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>
@@ -31,7 +33,9 @@
 #include <vsg/maths/sphere.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ViewDependentState.h>
+#include <vsg/state/ColorBlendState.h>
 #include <vsg/threading/OperationThreads.h>
+#include <vsg/nodes/DepthSorted.h>
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/ShaderSet.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
@@ -412,6 +416,32 @@ void RouteViewer::initView()
     // view->viewDependentState->ambientLights.emplace_back(vsg::dmat4(), ambient);
     // view->viewDependentState->directionalLights.emplace_back(vsg::dmat4(), sun);
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
+
+    auto rasterizationState = vsg::RasterizationState::create();
+    rasterizationState->cullMode = VK_CULL_MODE_NONE;
+
+    auto colorBlendState = vsg::ColorBlendState::create();
+    // colorBlendState->logicOpEnable = VK_TRUE;
+    // colorBlendState->logicOp = ;
+    colorBlendState->attachments = {
+        {
+            true,                               // blending enabled
+            VK_BLEND_FACTOR_SRC_ALPHA,          // srcColorBlendFactor
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,// dstColorBlendFactor
+            VK_BLEND_OP_ADD,                    // colorBlendOp
+            VK_BLEND_FACTOR_ONE,                // srcAlphaBlendFactor
+            VK_BLEND_FACTOR_ZERO,               // dstAlphaBlendFactor
+            VK_BLEND_OP_ADD,                    // alphaBlendOp
+            VK_COLOR_COMPONENT_R_BIT |
+            VK_COLOR_COMPONENT_G_BIT |
+            VK_COLOR_COMPONENT_B_BIT |
+            VK_COLOR_COMPONENT_A_BIT
+        }
+    };
+
+
+    view->overridePipelineStates = {rasterizationState, colorBlendState};
+
     view->addChild(root);
 }
 
@@ -544,7 +574,11 @@ bool RouteViewer::loadRoute()
         auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
         matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
 
-        matrix->addChild(pagedLOD);
+        // Нужен ли depthSorted?
+        auto depthSorted = vsg::DepthSorted::create();
+        depthSorted->child = pagedLOD;
+
+        matrix->addChild(depthSorted);
         //GUIParams::nodes.emplace_back(matrix);
 
         root->addChild(matrix);

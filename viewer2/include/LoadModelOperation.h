@@ -3,6 +3,7 @@
 
 #include <vsg/app/Viewer.h>
 #include <vsg/io/read.h>
+// #include <vsg/nodes/DepthSorted.h>
 #include <vsgXchange/all.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
@@ -38,6 +39,11 @@ struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
         {
             // Add compiled model to viewer and scene graph
             updateViewer(*ref_viewer, compileResult);
+
+            // auto depthSorted = vsg::DepthSorted::create();
+            // depthSorted->child = node;
+
+            // attachment_point->addChild(depthSorted);
             attachment_point->addChild(node);
         }
     }
