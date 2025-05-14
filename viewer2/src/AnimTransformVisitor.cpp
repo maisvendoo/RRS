@@ -8,12 +8,14 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
+#include <iostream>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/state/GraphicsPipeline.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
@@ -95,26 +97,30 @@ void AnimTransformVisitor::apply(vsg::Group& group)
 
 void AnimTransformVisitor::apply(vsg::StateGroup& stateGroup)
 {
-    // vsg::RasterizationState* rasterState = nullptr;
-    // for (auto& stateCommand : stateGroup.stateCommands)
-    // {
-    //     rasterState = dynamic_cast<vsg::RasterizationState*>(stateCommand.get());
-    //     if (rasterState)
-    //     {
-    //         break;
-    //     }
-    // }
-
-    // if (rasterState)
-    // {
-    //     rasterState->cullMode = VK_CULL_MODE_NONE;
-    // }
-    // else
-    // {
-    //     auto newRasterState = vsg::RasterizationState::create();
-    //     newRasterState->cullMode = VK_CULL_MODE_NONE;
-    //     stateGroup.add(newRasterState);
-    // }
+    for (auto& stateCommand : stateGroup.stateCommands)
+    {
+        std::cout << stateCommand << std::endl;
+        if (auto* bindGraphicsPipeline = stateCommand->cast<vsg::BindGraphicsPipeline>())
+        {
+            vsg::RasterizationState* rasterizationState = nullptr;
+            for (auto& pipelineState : bindGraphicsPipeline->pipeline->pipelineStates)
+            {
+                std::cout << "    " << pipelineState << std::endl;
+                rasterizationState = pipelineState->cast<vsg::RasterizationState>();
+                if (rasterizationState)
+                {
+                    rasterizationState->cullMode = VK_CULL_MODE_NONE;
+                    break;
+                }
+            }
+            if (!rasterizationState)
+            {
+                auto newRasterizationState = vsg::RasterizationState::create();
+                newRasterizationState->cullMode = VK_CULL_MODE_NONE;
+                bindGraphicsPipeline->pipeline->pipelineStates.emplace_back(newRasterizationState);
+            }
+        }
+    }
 
     stateGroup.traverse(*this);
 }
@@ -192,7 +198,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
             return nullptr;
         }
-        
+
         // config_section = cfg.getFirstSection("MaterialRGBAnimation");
         // if (!config_section.isNull())
         // {

@@ -1,7 +1,5 @@
 #include "RouteViewer.h"
 
-#include "cmd-line.h"
-#include "CLI11.hpp"
 #include "filesystem.h"
 #include "CfgReader.h"
 #include "Logger.h"
@@ -18,7 +16,6 @@
 #include "tcp-client.h"
 
 #include <cstdlib>
-#include <sstream>
 #include <string>
 
 #include <QApplication>
@@ -36,7 +33,7 @@
 #include <vsg/state/ViewDependentState.h>
 #include <vsg/threading/OperationThreads.h>
 #include <vsg/utils/SharedObjects.h>
-#include <vsg/utils/ShaderSet.h> 
+#include <vsg/utils/ShaderSet.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <vsgImGui/imgui.h>
@@ -106,27 +103,10 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 bool RouteViewer::init(int argc, char* argv[])
 {
-    FileSystem& fs = FileSystem::getInstance();
-
-    loadSettings(fs.getConfigDir() + fs.separator() + "settings.xml");
+    loadSettings();
     LOG_INFO("Loaded settings from settings.xml");
 
-    LogLevel level = LOG_LEVEL_INFO;
-
-    if (settings.notify_level == "INFO")
-    {
-        level = LOG_LEVEL_INFO;
-    }
-    else if (settings.notify_level == "WARN")
-    {
-        level = LOG_LEVEL_WARN;
-    }
-    else if (settings.notify_level == "FATAL")
-    {
-        level = LOG_LEVEL_FATAL;
-    }
-
-    Logger::instance().level = level;
+    configureLogLevel();
 
     LOG_INFO("Override settings from command line");
     overrideSettingsByCommandLine(argc, argv);
@@ -136,7 +116,7 @@ bool RouteViewer::init(int argc, char* argv[])
 
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
-    
+
     screenshot_writer = new ScreenshotWriter("screenshot.png");
 
     traffic_lights_handler = new TrafficLightsHandler(settings);
@@ -160,205 +140,41 @@ bool RouteViewer::init(int argc, char* argv[])
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void RouteViewer::loadSettings(const std::string& cfg_path)
+void RouteViewer::loadSettings()
 {
+    FileSystem& fs = FileSystem::getInstance();
+    const std::string cfg_path = fs.getConfigDir() + fs.separator() + "settings.xml";
+
     CfgReader cfg;
     if (cfg.load(cfg_path.c_str()))
     {
-        QString secName = "Client";
-        cfg.getString(secName, "HostAddr", settings.tcp_config.host_addr);
+        QString section = "Client";
+        loadNetworkSettings(cfg, section);
 
-        int tmp_int = 0;
-        if (cfg.getInt(secName, "port", tmp_int))
-            settings.tcp_config.port = static_cast<quint16>(tmp_int);
-
-        cfg.getInt(secName, "ReconnectInteval", settings.tcp_config.reconnect_interval);
-        cfg.getInt(secName, "VehiclesPosUpdateInterval", settings.vehicles_pos_update_interval);
-        cfg.getInt(secName, "VehiclesStateUpdateInterval", settings.vehicles_state_update_interval);
-        cfg.getInt(secName, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
-        cfg.getInt(secName, "ClientDelay", settings.client_delay);
-
-        secName = "Viewer";
-
-        QString tmp_qstr = "INFO";
-        if (cfg.getString(secName, "NotifyLevel", tmp_qstr))
-            settings.notify_level = tmp_qstr.toStdString();
-
-        tmp_qstr = "viewer";
-        if (cfg.getString(secName, "Name", tmp_qstr))
-            settings.name = tmp_qstr.toStdString();
-
-        cfg.getInt(secName, "posX", settings.x);
-        cfg.getInt(secName, "posY", settings.y);
-        cfg.getInt(secName, "Width", settings.width);
-        cfg.getInt(secName, "Height", settings.height);
-        tmp_int = 0;
-        cfg.getInt(secName, "ScreenNumber", tmp_int);
-        if (tmp_int >= 0) settings.screen_number = tmp_int;
-        cfg.getBool(secName, "FullScreen", settings.fullscreen);
-        cfg.getBool(secName, "VSync", settings.vsync);
-        cfg.getBool(secName, "WindowDecoration", settings.window_decoration);
-
-        cfg.getBool(secName, "DoubleBuffer", settings.double_buffer);
-        cfg.getInt(secName, "Samples", settings.samples);
-
-        cfg.getDouble(secName, "ViewDistance", settings.view_distance);
-        cfg.getDouble(secName, "ShadowDistance", settings.shadow_distance);
-        cfg.getDouble(secName, "zNear", settings.zNear);
-        cfg.getDouble(secName, "zFar", settings.zFar);
-        cfg.getDouble(secName, "FovY", settings.fovy);
-        cfg.getDouble(secName, "FovYMin", settings.fovy_min);
-        cfg.getDouble(secName, "FovYMax", settings.fovy_max);
-        cfg.getDouble(secName, "PitchMin", settings.pitch_min);
-        cfg.getDouble(secName, "PitchMax", settings.pitch_max);
-
-        // Положение свободной камеры при запуске
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "FreeCamStart", tmp_qstr))
-        {
-            std::string free_cam_start = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_start);
-            stream >> settings.free_cam_start.x
-                >> settings.free_cam_start.y
-                >> settings.free_cam_start.z;
-        }
-        // Настройки свободной камеры
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "FreeCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.free_cam_init_pos.x
-                >> settings.free_cam_init_pos.y
-                >> settings.free_cam_init_pos.z;
-        }
-        cfg.getDouble(secName, "FreeCamSpeedKeyboard", settings.free_cam_speed_keyboard);
-        cfg.getDouble(secName, "FreeCamSpeedMouse", settings.free_cam_speed_mouse);
-        double tmp_double = 1.0;
-        cfg.getDouble(secName, "FreeCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.free_cam_speed_coeff = tmp_double;
-        cfg.getDouble(secName, "FreeCamRotKeyboard", settings.free_cam_rotate_keyboard);
-        cfg.getDouble(secName, "FreeCamRotMouse", settings.free_cam_rotate_keyboard);
-        cfg.getDouble(secName, "FreeCamHeightStep", settings.free_cam_height_step);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "FreeCamFovYCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.free_cam_fovy_coeff = tmp_double;
-
-        // Настройки камеры в кабине
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "CabineCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.cabine_default_pos.x
-                >> settings.cabine_default_pos.y
-                >> settings.cabine_default_pos.z;
-        }
-        cfg.getDouble(secName, "CabineCamSpeedKeyboard", settings.cabine_speed_keyboard);
-        cfg.getDouble(secName, "CabineCamSpeedMouse", settings.cabine_speed_mouse);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "CabineCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.cabine_speed_coeff = tmp_double;
-        cfg.getDouble(secName, "CabineCamRotKeyboard", settings.cabine_rotate_keyboard);
-        cfg.getDouble(secName, "CabineCamRotMouse", settings.cabine_rotate_mouse);
-        cfg.getDouble(secName, "CabineCamHeightStep", settings.cabine_height_step);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "CabineCamFovYCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.cabine_fovy_coeff = tmp_double;
-        cfg.getDouble(secName, "CabineCamVerticalShiftMin", settings.cabine_z_min);
-        cfg.getDouble(secName, "CabineCamVerticalShiftMax", settings.cabine_z_max);
-
-        // Настройки внешней камеры
-        tmp_qstr = "0.0 0.0 0.0";
-        if (cfg.getString(secName, "ExtCamInitPos", tmp_qstr))
-        {
-            std::string free_cam_init_pos = tmp_qstr.toStdString();
-            std::istringstream stream(free_cam_init_pos);
-            stream >> settings.ext_cam_init_pos.x
-                >> settings.ext_cam_init_pos.y
-                >> settings.ext_cam_init_pos.z;
-        }
-        cfg.getDouble(secName, "ExtCamInitAngleH", settings.ext_cam_init_angle_H);
-        cfg.getDouble(secName, "ExtCamInitAngleV", settings.ext_cam_init_angle_V);
-        cfg.getDouble(secName, "ExtCamInitDist", settings.ext_cam_init_distance);
-        cfg.getDouble(secName, "ExtCamSpeedKeyboard", settings.ext_cam_speed_keyboard);
-        cfg.getDouble(secName, "ExtCamSpeedMouse", settings.ext_cam_speed_mouse);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "ExtCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.ext_cam_speed_coeff = tmp_double;
-        cfg.getDouble(secName, "ExtCamRotKeyboard", settings.ext_cam_rotate_keyboard);
-        cfg.getDouble(secName, "ExtCamRotMouse", settings.ext_cam_rotate_mouse);
-        cfg.getDouble(secName, "ExtCamHeightStep", settings.ext_cam_height_step);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "ExtCamDistCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.ext_cam_dist_coeff = tmp_double;
-        cfg.getDouble(secName, "ExtCamDistMin", settings.ext_cam_dist_min);
-
-        // Настройки следящей камеры
-        cfg.getDouble(secName, "FollowCamShiftRight", settings.follow_cam_init_shift_right);
-        cfg.getDouble(secName, "FollowCamShiftUp", settings.follow_cam_init_shift_up);
-        cfg.getDouble(secName, "FollowCamFwdVelocityCoeff", settings.follow_cam_fwd_velocity_coeff);
-        cfg.getDouble(secName, "FollowCamSpeedKeyboard", settings.follow_cam_speed_keyboard);
-        cfg.getDouble(secName, "FollowCamSpeedMouse", settings.follow_cam_speed_mouse);
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "FollowCamSpeedCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.follow_cam_speed_coeff = tmp_double;
-        tmp_double = 1.0;
-        cfg.getDouble(secName, "FollowCamFovYCoeff", tmp_double);
-        if (tmp_double > 1.01) settings.follow_cam_fovy_coeff = tmp_double;
+        section = "Viewer";
+        loadLoggerSettings(cfg, section);
+        loadWindowSettings(cfg, section);
+        loadCameraSettings(cfg, section);
+        loadFreeCameraSettings(cfg, section);
+        loadCabineCameraSettings(cfg, section);
+        loadExternalCameraSettings(cfg, section);
+        loadFollowCameraSettings(cfg, section);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
+void RouteViewer::configureLogLevel()
 {
-    cmd_line_t cmd_line;
+    const std::map<std::string, LogLevel> levels = {
+        {"INFO", LOG_LEVEL_INFO},
+        {"WARN", LOG_LEVEL_WARN},
+        {"FATAL", LOG_LEVEL_FATAL}
+    };
 
-    CLI::App app("Viewer");
-    argv = app.ensure_utf8(argv);
-
-    app.add_option("--host-addr", cmd_line.host_addr);
-    app.add_option("--port", cmd_line.port);
-    app.add_option("--width", cmd_line.width);
-    app.add_option("--height", cmd_line.height);
-    app.add_option("--fullscreen", cmd_line.fullscreen);
-    app.add_option("--notify-level", cmd_line.notify_level);
-
-    CLI11_PARSE(app, argc, argv);
-
-    if (cmd_line.host_addr)
-    {
-        settings.tcp_config.host_addr = cmd_line.host_addr->c_str();
-    }
-
-    if (cmd_line.port)
-    {
-        settings.tcp_config.port = static_cast<quint16>(cmd_line.port.value());
-    }
-
-    if (cmd_line.width)
-    {
-        settings.width = cmd_line.width.value();
-    }
-
-    if (cmd_line.height)
-    {
-        settings.height = cmd_line.height.value();
-    }
-
-    if (cmd_line.fullscreen)
-    {
-        settings.fullscreen = cmd_line.fullscreen.value();
-    }
-
-    if (cmd_line.notify_level)
-    {
-        settings.notify_level = cmd_line.notify_level.value();
-    }
-
-    return 0;
+    const auto found = levels.find(settings.notify_level);
+    Logger::instance().level = (found != levels.end()) ? found->second : LOG_LEVEL_INFO;
 }
 
 //------------------------------------------------------------------------------
@@ -373,8 +189,8 @@ void RouteViewer::initVsgOptions()
     options->add(vsgXchange::all::create());
 
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
-    bool value = false;
-    options->setValue("culling", value);
+    bool culling = false;
+    options->setValue("culling", culling);
 }
 
 //------------------------------------------------------------------------------
@@ -393,11 +209,16 @@ void RouteViewer::initWindowTraits()
         return VK_SAMPLE_COUNT_1_BIT;
     };
 
+    std::uint32_t vulkan_version;
+    vkEnumerateInstanceVersion(&vulkan_version);
+
     windowTraits = vsg::WindowTraits::create();
     windowTraits->x = settings.x;
     windowTraits->y = settings.y;
     windowTraits->width = settings.width;
     windowTraits->height = settings.height;
+    windowTraits->vulkanVersion = vulkan_version;
+    // windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_MAILBOX_KHR; ???
     windowTraits->screenNum = settings.screen_number;
     windowTraits->fullscreen = settings.fullscreen;
     windowTraits->windowTitle = settings.name;
@@ -405,6 +226,10 @@ void RouteViewer::initWindowTraits()
     windowTraits->samples = samples_bit_flag(settings.samples);
     // windowTraits->debugLayer = true;
     // windowTraits->debugUtils = true;
+
+    auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
+    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+    deviceFeatures->get().depthClamp = VK_TRUE;
 }
 
 //------------------------------------------------------------------------------
@@ -416,18 +241,18 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
     {
         window = vsg::Window::create(windowTraits);
     }
-    catch (const vsg::Exception e)
+    catch (const vsg::Exception& exception)
     {
-        if ((e.result == VK_ERROR_INVALID_EXTERNAL_HANDLE) && try_screenNum_exception)
+        if ((exception.result == VK_ERROR_INVALID_EXTERNAL_HANDLE) && try_screenNum_exception)
         {
-            LOG_WARN(e.message.c_str());
+            LOG_WARN(exception.message.c_str());
             LOG_WARN("Try to use default display...");
             windowTraits->screenNum = -1;
             initWindow(false);
         }
         else
         {
-            LOG_FATAL(e.message.c_str());
+            LOG_FATAL(exception.message.c_str());
             LOG_FATAL("Fail to create window");
             exit(1);
         }
@@ -439,16 +264,20 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
 //------------------------------------------------------------------------------
 void RouteViewer::initCamera()
 {
-    double windowWidth = static_cast<double>(window->extent2D().width);
-    double windowHeight = static_cast<double>(window->extent2D().height);
-    double aspectRatio = windowWidth / windowHeight;
+    const double windowWidth = static_cast<double>(window->extent2D().width);
+    const double windowHeight = static_cast<double>(window->extent2D().height);
+    const double aspectRatio = windowWidth / windowHeight;
 
-    auto perspective = vsg::Perspective::create(settings.fovy,
-        aspectRatio, settings.zNear, settings.zFar);
+    auto perspective = vsg::Perspective::create(
+        settings.fovy,
+        aspectRatio,
+        settings.zNear,
+        settings.zFar
+    );
 
-    vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
-    vsg::dvec3 eye = route_start_point + settings.free_cam_start;
-    vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
+    const vsg::dvec3 route_start_point(0.0, 750.0, 0.0);
+    const vsg::dvec3 eye = route_start_point + settings.free_cam_start;
+    const vsg::dvec3 center = eye + vsg::dvec3(0.0, 1.0, 0.0);
 
     lookAt = vsg::LookAt::create(eye, center, vsg::dvec3(0.0, 0.0, 1.0));
 
@@ -468,13 +297,9 @@ void RouteViewer::initScenegraph()
 //------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
-    auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
-    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
-    deviceFeatures->get().depthClamp = VK_TRUE;
-
     if (settings.shadow_distance > 0.1)
     {
-        auto countNumShadowMaps = [](double dist) -> uint32_t
+        auto countNumShadowMaps = [](double dist) -> std::uint32_t
         {
             if (dist > 256.0) return 3;
             if (dist > 64.0) return 2;
@@ -482,16 +307,54 @@ void RouteViewer::initLights()
         };
 
         if (settings.shadow_distance > 1000.0)
+        {
             settings.shadow_distance = 1000.0;
+        }
 
-        uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
+        const std::uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
         shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
     }
 
-    auto shaderHints = vsg::ShaderCompileSettings::create();
+    // uint32_t vulkan_version;
+    // vkEnumerateInstanceVersion(&vulkan_version);
 
-    auto rasterizationState = vsg::RasterizationState::create();
-    rasterizationState->depthClampEnable = VK_TRUE;
+    // auto shaderHints = vsg::ShaderCompileSettings::create();
+    // shaderHints->vulkanVersion = vulkan_version;
+    // shaderHints->optimize = true; // ???
+
+    // auto rasterizationState = vsg::RasterizationState::create();
+    // rasterizationState->depthClampEnable = VK_TRUE;
+    // rasterizationState->cullMode = VK_CULL_MODE_NONE;
+    // rasterizationState->frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+
+    // auto phongShaderSet = vsg::createPhongShaderSet(options);
+    // phongShaderSet->defaultShaderHints = shaderHints;
+    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phongShaderSet->variants.clear();
+
+    // auto pbrShaderSet = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // pbrShaderSet->defaultShaderHints = shaderHints;
+    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phongShaderSet->variants.clear();
+
+    // auto flatShaderSet = vsg::createFlatShadedShaderSet(options);
+    // flatShaderSet->defaultShaderHints = shaderHints;
+    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // phongShaderSet->variants.clear();
+
+    // options->shaderSets.clear();
+
+    // options->shaderSets["pbr"] = pbrShaderSet;
+    // options->shaderSets["phong"] = phongShaderSet;
+    // options->shaderSets["flat"] = flatShaderSet;
+
+    // shaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
+    // // options->shaderSets["pbr"] = shaderSet;
+    // options->shaderSets["phong"] = shaderSet;
+    // // options->shaderSets["flat"] = shaderSet;
+
+    // auto rasterizationState = vsg::RasterizationState::create();
+    // rasterizationState->depthClampEnable = VK_TRUE;
     // rasterizationState->cullMode = VK_CULL_MODE_NONE;
 
     // auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
@@ -543,8 +406,11 @@ void RouteViewer::initView()
     view = vsg::View::create();
     view->camera = camera;
     view->viewDependentState->maxShadowDistance = maxShadowDistance;
-    // view->viewDependentState->shadowMapBias = shadowMapBias;
+    view->viewDependentState->shadowMapBias = shadowMapBias;
     view->viewDependentState->lambda = lambda;
+    // view->viewDependentState->shaderSet = options->shaderSets["phong"];
+    // view->viewDependentState->ambientLights.emplace_back(vsg::dmat4(), ambient);
+    // view->viewDependentState->directionalLights.emplace_back(vsg::dmat4(), sun);
     // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
     view->addChild(root);
 }
@@ -573,10 +439,20 @@ void RouteViewer::initViewer()
     viewer->addWindow(window);
 
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client);
+
     upd_viewer_handler = UpdateViewerHandler::create(
-        upd_server_control, camera, shadow_region, screenshot_writer, traffic_lights_handler, vehicles_handler, settings);
+        upd_server_control,
+        camera,
+        shadow_region,
+        screenshot_writer,
+        traffic_lights_handler,
+        vehicles_handler,
+        settings
+    );
+
     auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(camera, sound_manager);
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
+
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
@@ -590,7 +466,7 @@ void RouteViewer::initViewer()
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
 
-    options->operationThreads = vsg::OperationThreads::create(1, viewer->status);
+    options->operationThreads = vsg::OperationThreads::create(4, viewer->status); // ???
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler;
@@ -627,7 +503,7 @@ bool RouteViewer::loadRoute()
     }
 
     FileSystem& fs = FileSystem::getInstance();
-    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
+    const std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
     settings.route_dir_full_path = route_dir_path;
 
     Route route;
@@ -645,7 +521,7 @@ bool RouteViewer::loadRoute()
             continue;
         }
 
-        std::string model_filename_path = route_dir_path + found_it->second;
+        const std::string model_filename_path = route_dir_path + found_it->second;
         if (!vsg::fileExists(model_filename_path))
         {
             LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
@@ -674,12 +550,15 @@ bool RouteViewer::loadRoute()
         root->addChild(matrix);
     }
 
+    route.object_ref.clear();
+    route.transforms.clear();
+
     viewer->update();
 
-    vsg::ref_ptr<vsg::ResourceHints> hints = vsg::ResourceHints::create();
-    hints->numDatabasePagerReadThreads = 1;
-    hints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
-    viewer->compile(hints);
+    auto resourceHints = vsg::ResourceHints::create();
+    resourceHints->numDatabasePagerReadThreads = 1;
+    resourceHints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
+    viewer->compile(resourceHints);
 
     return true;
 }
@@ -719,7 +598,8 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 
     simulator_route_info_t route_info;
     route_info.deserialize(data);
-    settings.route_dir_name = route_info.route_dir_name.toStdString()/* + "-gltf"*/;
+    settings.route_dir_name = route_info.route_dir_name.toStdString();
+    // settings.route_dir_name = route_info.route_dir_name.toStdString() + "-gltf";
     LOG_INFO("Get route directory name: %s", settings.route_dir_name.c_str());
 
     loadRoute();
