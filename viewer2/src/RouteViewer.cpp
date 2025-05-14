@@ -529,7 +529,7 @@ bool RouteViewer::loadRoute()
         }
 
         auto pagedLOD = vsg::PagedLOD::create();
-        pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+        pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
         pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
