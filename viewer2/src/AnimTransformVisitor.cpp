@@ -217,7 +217,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
     if (cfg.load(file_path.c_str()))
     {
         QDomNode config_section;
-        ProcAnimation* animation = nullptr;
 
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
