@@ -33,6 +33,7 @@
 #include <vsg/maths/sphere.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ViewDependentState.h>
+#include <vsg/state/DepthStencilState.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/threading/OperationThreads.h>
 #include <vsg/nodes/DepthSorted.h>
@@ -223,13 +224,14 @@ void RouteViewer::initWindowTraits()
     windowTraits->height = settings.height;
     windowTraits->vulkanVersion = vulkan_version;
     // windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_MAILBOX_KHR; ???
+    // windowTraits->swapchainPreferences.imageCount = 3;
     windowTraits->screenNum = settings.screen_number;
     windowTraits->fullscreen = settings.fullscreen;
     windowTraits->windowTitle = settings.name;
     windowTraits->decoration = settings.window_decoration;
     windowTraits->samples = samples_bit_flag(settings.samples);
-    // windowTraits->debugLayer = true;
-    // windowTraits->debugUtils = true;
+    windowTraits->debugLayer = true;
+    windowTraits->debugUtils = true;
 
     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
     deviceFeatures->get().samplerAnisotropy = VK_TRUE;
@@ -419,10 +421,15 @@ void RouteViewer::initView()
 
     auto rasterizationState = vsg::RasterizationState::create();
     rasterizationState->cullMode = VK_CULL_MODE_NONE;
+    rasterizationState->depthClampEnable = VK_TRUE;
+
+    auto depthStencilState = vsg::DepthStencilState::create();
+    // depthStencilState->depthBoundsTestEnable = VK_TRUE;
+    // depthStencilState->depthTestEnable = VK_TRUE;
+    // depthStencilState->depthWriteEnable = VK_TRUE;
+    // depthStencilState->depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 
     auto colorBlendState = vsg::ColorBlendState::create();
-    // colorBlendState->logicOpEnable = VK_TRUE;
-    // colorBlendState->logicOp = ;
     colorBlendState->attachments = {
         {
             true,                               // blending enabled
@@ -439,8 +446,7 @@ void RouteViewer::initView()
         }
     };
 
-
-    view->overridePipelineStates = {rasterizationState, colorBlendState};
+    view->overridePipelineStates = {rasterizationState, colorBlendState, depthStencilState};
 
     view->addChild(root);
 }
