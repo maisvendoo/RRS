@@ -75,21 +75,49 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
     }
 
     using Label = std::string;
-    using RelativePath = std::string;
-    std::map<Label, std::pair<RelativePath, RelativePath>> objects;
+    using RelativeModelPath = std::string;
+    using RelativeTexturePath = std::string;
+    // Список моделей, и списки сокращённых имён и текстур к этим моделям
+    std::map<RelativeModelPath, std::map<Label, RelativeTexturePath>> objects;
 
     std::string buffer;
     while (std::getline(objects_ref, buffer))
     {
         std::istringstream ss(buffer);
+        if (!ss)
+        {
+            continue;
+        }
+
         std::string label, relative_dmd_model_path, relative_texture_path;
         ss >> label >> relative_dmd_model_path >> relative_texture_path;
-        if (ss && !is_slash(label.front()) && is_slash(relative_dmd_model_path.front()) && is_slash(relative_texture_path.front()))
+        if (objects.find(label) != objects.end())
         {
-            std::replace(relative_dmd_model_path.begin(), relative_dmd_model_path.end(), '\\', '/');
-            std::replace(relative_texture_path.begin(), relative_texture_path.end(), '\\', '/');
+            continue;
+        }
 
-            objects.insert({label, {relative_dmd_model_path, relative_texture_path}});
+        if (is_slash(label.front()) || !is_slash(relative_dmd_model_path.front()) || !is_slash(relative_texture_path.front()))
+        {
+            continue;
+        }
+
+        std::replace(relative_dmd_model_path.begin(), relative_dmd_model_path.end(), '\\', '/');
+        std::replace(relative_texture_path.begin(), relative_texture_path.end(), '\\', '/');
+
+        auto it = objects.find(relative_dmd_model_path);
+        if (it == objects.end())
+        {
+            // Добавляем файл модели, её сокращённое наименование и текстуру
+            objects.insert({relative_dmd_model_path, {{label, relative_texture_path}} });
+        }
+        else
+        {
+            auto it2 = it->second.find(label);
+            if (it2 == it->second.end())
+            {
+                // К уже добавленой модели ещё вариант наименования и текстуры
+                it->second.insert({label, relative_texture_path});
+            }
         }
     }
 
@@ -101,13 +129,13 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
         return false;
     }
 
+    // Создаем каталог под новый маршрут
+    fs::create_directories(out_gltf_route_path);
+    // Создаем каталог под текстуры
+    fs::create_directory(combine_path(out_gltf_route_path, "textures"));
+
     if (in_dmd_route_path != out_gltf_route_path)
     {
-        // Создаем каталог под новый маршрут
-        fs::create_directories(out_gltf_route_path);
-        // Создаем каталог под текстуры
-        fs::create_directory(combine_path(out_gltf_route_path, "textures"));
-
         // Копируем топологию
         try
         {
@@ -132,45 +160,88 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
         }
     }
 
-    std::map<Label, RelativePath> new_objects;
+    std::map<Label, RelativeModelPath> new_objects;
 
-    for (const auto& [label, paths] : objects)
+    for (const auto& [relative_model_path, labels_textures] : objects)
     {
-        std::string in_dmd_model_path = in_dmd_route_path + paths.first;
+        fs::path model_path = relative_model_path;
+
+        // Путь к исходной модели
+        std::string in_dmd_model_path =
+            in_dmd_route_path + relative_model_path;
         path_to_native_separator(in_dmd_model_path);
-        std::string in_texture_path = in_dmd_route_path + paths.second;
-        path_to_native_separator(in_texture_path);
 
-        fs::path model_path = paths.first;
-        fs::path texture_path = paths.second;
+        // Путь к папке с новым файлом модели
+        std::string out_gltf_model_dir =
+            out_gltf_route_path + model_path.parent_path().string();
 
-        fs::create_directories(out_gltf_route_path + model_path.parent_path().string() + "/bin");
-
-        std::string out_gltf_model_path = out_gltf_route_path + model_path.parent_path().string() + '/' + model_path.stem().string() + ".gltf";
-        path_to_native_separator(out_gltf_model_path);
-
-        std::string out_relative_bin_path = "bin/"s + model_path.stem().string() + ".bin";
-
+        // Относительный путь к папке с файлами текстур
         std::string mps = model_path.string();
         auto slash_count = std::count(mps.begin(), mps.end(), '/');
 
-        std::string out_relative_texture_path = "";
+        std::string out_relative_texture_dir = "";
 
         for (int i = 1; i < slash_count; ++i)
         {
-            out_relative_texture_path += "../";
+            out_relative_texture_dir += "../";
         }
+        out_relative_texture_dir += "textures/";
 
-        out_relative_texture_path += "textures/" + texture_path.filename().string();
+        // Относительный путь к файлу с информацией о модели в формате bin
+        fs::create_directories(out_gltf_route_path + model_path.parent_path().string() + "/bin");
+        std::string out_relative_bin_path = "bin/"s + model_path.stem().string() + ".bin";
 
-        if (convert_model(in_dmd_model_path,
-                          in_texture_path,
-                          out_gltf_model_path,
-                          out_relative_bin_path,
-                          out_relative_texture_path))
+        // Создаём модели для всех вариантов текстур
+        bool add_texture_name = (labels_textures.size() > 1);
+        for (const auto& [label, relative_texture_path] : labels_textures)
         {
-            new_objects.insert({label, model_path.parent_path().string() + '/' + model_path.stem().string() + ".gltf"});
-        }        
+            // Путь к текстуре
+            std::string in_texture_path =
+                in_dmd_route_path + relative_texture_path;
+            path_to_native_separator(in_texture_path);
+
+            fs::path texture_path = relative_texture_path;
+            std::string out_relative_texture_path =
+                out_relative_texture_dir + texture_path.filename().string();
+
+            std::ifstream texture(in_texture_path, std::ios::in);
+            if (!texture.is_open())
+            {
+                std::cerr << "Failed to open " << in_texture_path << std::endl;
+                continue;
+            }
+
+            // Читаем файл модели
+            Geometry model_data;
+            std::string texture_ext = fs::path(in_texture_path).extension().string();
+            model_data.is_TGA_texture = texture_ext == ".tga";
+            if (!get_dmd_model_data(in_dmd_model_path, model_data))
+            {
+                std::cerr << "Failed to open " << in_dmd_model_path << std::endl;
+                continue;
+            }
+
+            // Путь к новому файлу модели
+            std::string out_gltf_model_name;
+            if (add_texture_name)
+            {
+                out_gltf_model_name = model_path.stem().string() + '_' + texture_path.stem().string();
+            }
+            else
+            {
+                out_gltf_model_name = '_' + model_path.stem().string();
+            }
+            model_data.model_file_name = out_gltf_model_name;
+
+            if (generate_gltf_model(model_data,
+                                    in_texture_path,
+                                    out_gltf_model_dir,
+                                    out_relative_bin_path,
+                                    out_relative_texture_path))
+            {
+                new_objects.insert({label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf"});
+            }
+        }
     }
 
     std::ofstream new_objects_ref(combine_path(out_gltf_route_path, "objects.ref"), std::ios::out);
@@ -207,7 +278,7 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     }
 
     std::string texture_ext = fs::path(in_texture_path).extension().string();
-    model_data.is_TGA_texture =  texture_ext == ".tga";
+    model_data.is_TGA_texture = texture_ext == ".tga";
 
     auto last_slash_pos = out_gltf_model_path.find_last_of(separator());
 
