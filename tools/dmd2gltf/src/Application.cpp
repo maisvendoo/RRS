@@ -8,6 +8,7 @@
 #include    <fstream>
 #include    <iostream>
 #include    <map>
+#include    <set>
 #include    <string>
 #include    <utility>
 #include    <vector>
@@ -66,6 +67,75 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
     path_to_native_separator(in_dmd_route_path);
     path_to_native_separator(out_gltf_route_path);
 
+    using Label = std::string;
+    using RelativeModelPath = std::string;
+    using RelativeTexturePath = std::string;
+    std::string line_buffer;
+
+    // Ищем расположение объектов маршрута - файл route1.map
+    std::ifstream route1_map = std::ifstream();
+    bool is_map = false;
+
+    // Сначала пробуем конвертированный .map
+    std::string map_path = combine_path(out_gltf_route_path, "topology");
+    map_path = combine_path(map_path, "map");
+    map_path = combine_path(map_path, "route1.map");
+    route1_map.open(map_path, std::ios::in);
+    if (route1_map.is_open())
+    {
+        std::cout << "Info: opened converted route1.map: " << map_path << std::endl;
+        is_map = true;
+    }
+    else
+    {
+        std::cout << "Warn: failed to open converted route1.map: " << map_path << std::endl;
+
+        // Пробуем оригинальный .map
+        map_path = combine_path(in_dmd_route_path, "route1.map");
+        route1_map.open(map_path, std::ios::in);
+        if (route1_map.is_open())
+        {
+            std::cout << "Info: opened route1.map: " << map_path << std::endl;
+            is_map = true;
+        }
+        else
+        {
+            std::cerr << "Failed to open route1.map: " << map_path << std::endl;
+        }
+    }
+
+    // Читаем список объектов, используемых в .map маршрута - лишнего не надо
+    std::set<Label> map_objects;
+    if (is_map)
+    {
+        while (std::getline(route1_map, line_buffer))
+        {
+            // Пустое название объекта
+            if (line_buffer.empty() || (*(line_buffer.begin()) == ',') )
+            {
+                continue;
+            }
+            // Строка с объектом должна заканчиваться точкой с запятой
+            if (*(line_buffer.end() - 1) != ';')
+            {
+                continue;
+            }
+            // Строка с объектом должна содержать шесть запятых - разделителей
+            if (std::count(line_buffer.begin(), line_buffer.end(), ',') != 6)
+            {
+                continue;
+            }
+
+            // Читаем первый элемент в строке - сокращённое название объекта
+            std::string label = "";
+            std::istringstream ss(line_buffer);
+            if (std::getline(ss, label, ','))
+            {
+                map_objects.insert(label);
+            }
+        }
+    }
+
     // Читаем список объектов из базы маршрута
     std::ifstream objects_ref(combine_path(in_dmd_route_path, "objects.ref"), std::ios::in);
     if (!objects_ref.is_open())
@@ -73,30 +143,29 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
         std::cerr << "Failed to open objects.ref" << std::endl;
         return false;
     }
+    std::cout << "Info: opened objects.ref: " << combine_path(in_dmd_route_path, "objects.ref") << std::endl;
 
-    using Label = std::string;
-    using RelativeModelPath = std::string;
-    using RelativeTexturePath = std::string;
     // Список моделей, и списки сокращённых имён и текстур к этим моделям
     std::map<RelativeModelPath, std::map<Label, RelativeTexturePath>> objects;
 
-    std::string buffer;
-    while (std::getline(objects_ref, buffer))
+    while (std::getline(objects_ref, line_buffer))
     {
-        std::istringstream ss(buffer);
+        std::istringstream ss(line_buffer);
         if (!ss)
         {
             continue;
         }
 
+        // Исходная информация - сокращённое имя, путь к модели, путь к текстуре
         std::string label, relative_dmd_model_path, relative_texture_path;
         ss >> label >> relative_dmd_model_path >> relative_texture_path;
-        if (objects.find(label) != objects.end())
+        if (is_slash(label.front()) || !is_slash(relative_dmd_model_path.front()) || !is_slash(relative_texture_path.front()))
         {
             continue;
         }
 
-        if (is_slash(label.front()) || !is_slash(relative_dmd_model_path.front()) || !is_slash(relative_texture_path.front()))
+        // Если прочтён файл .map - проверяем что сокращённое имя используется
+        if (is_map && (map_objects.find(label) == map_objects.end()))
         {
             continue;
         }
@@ -222,14 +291,10 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
             }
 
             // Путь к новому файлу модели
-            std::string out_gltf_model_name;
+            std::string out_gltf_model_name = model_path.stem().string();
             if (add_texture_name)
             {
-                out_gltf_model_name = model_path.stem().string() + '_' + texture_path.stem().string();
-            }
-            else
-            {
-                out_gltf_model_name = '_' + model_path.stem().string();
+                out_gltf_model_name += '_' + texture_path.stem().string();
             }
             model_data.model_file_name = out_gltf_model_name;
 
@@ -743,6 +808,7 @@ bool Application::set_convert_mode(const cmd_line_t &cmd_line,
         else
         {
             std::cerr << "ERROR: Missing route output path" << std::endl;
+            return false;
         }
     }
 
@@ -767,7 +833,7 @@ bool Application::set_convert_mode(const cmd_line_t &cmd_line,
     }
     else
     {
-        std::cerr << "ERROR: Missing input DMD model path" << std::endl;
+        std::cerr << "ERROR: Missing input route path or DMD model path" << std::endl;
     }
 
     return false;
