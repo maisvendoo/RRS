@@ -207,7 +207,7 @@ private:
 
     bool calcBranchTrack2(zds_branch_track_t* branch_track);
 
-    void calcBranch22(zds_branch_2_2_t* branch22);
+    void calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2);
 
     void findSplitsMainTrajectory1();
 

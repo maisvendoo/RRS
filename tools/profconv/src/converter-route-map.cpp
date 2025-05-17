@@ -403,6 +403,7 @@ void ZDSimConverter::writeSignalsForDebug()
     file_t.close();
     file_p.close();
     file_m.close();
+    file_n.close();
 }
 
 //------------------------------------------------------------------------------

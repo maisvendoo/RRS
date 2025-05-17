@@ -115,11 +115,11 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
                 addOrCreateSplit(split_data2, split2);
 
-                // Добавляем съезд в массив траекторий съездов
+                // Добавляем съезд "2-2" в массив траекторий съездов
                 zds_branch_2_2_t branch2minus2 = zds_branch_2_2_t();
                 branch2minus2.id1 = id;
                 branch2minus2.id2 = id2;
-                calcBranch22(&branch2minus2);
+                calcBranch22(&branch2minus2, true);
                 branch_2minus2_data.push_back(new zds_branch_2_2_t(branch2minus2));
             }
         }
@@ -218,11 +218,11 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 split2.split_type.push_back(split_zds_trajectory_t::SPLIT_2MINUS2);
                 addOrCreateSplit(split_data2, split2);
 
-                // Добавляем съезд в массив траекторий съездов
+                // Добавляем съезд "2+2" в массив траекторий съездов
                 zds_branch_2_2_t branch2plus2 = zds_branch_2_2_t();
                 branch2plus2.id1 = id + 1;
                 branch2plus2.id2 = id2;
-                calcBranch22(&branch2plus2);
+                calcBranch22(&branch2plus2, false);
                 branch_2plus2_data.push_back(new zds_branch_2_2_t(branch2plus2));
             }
         }

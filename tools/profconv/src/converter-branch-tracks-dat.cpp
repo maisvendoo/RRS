@@ -353,7 +353,7 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t* branch_point, bool i
         branch_2minus2.is_fwd = true;
         branch_2minus2.id1 = id1;
         branch_2minus2.id2 = id2;
-        calcBranch22(&branch_2minus2);
+        calcBranch22(&branch_2minus2, true);
         branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
     else
@@ -374,7 +374,7 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t* branch_point, bool i
         branch_2minus2.is_bwd = true;
         branch_2minus2.id1 = id1;
         branch_2minus2.id2 = id2;
-        calcBranch22(&branch_2minus2);
+        calcBranch22(&branch_2minus2, true);
         branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
     return true;
@@ -410,6 +410,7 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
 
     bool near_end = (coord > (track.route_coord + 0.5 * track.length));
 
+    // Создаём съезд "2+2"
     zds_branch_2_2_t branch_2plus2 = zds_branch_2_2_t();
     if (dir > 0)
     {
@@ -426,7 +427,7 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
         branch_2plus2.is_fwd = true;
         branch_2plus2.id1 = id1;
         branch_2plus2.id2 = id2;
-        calcBranch22(&branch_2plus2);
+        calcBranch22(&branch_2plus2, false);
         branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
     else
@@ -450,7 +451,7 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
         branch_2plus2.is_bwd = true;
         branch_2plus2.id1 = id1;
         branch_2plus2.id2 = id2;
-        calcBranch22(&branch_2plus2);
+        calcBranch22(&branch_2plus2, false);
         branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
 }
@@ -834,7 +835,7 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::calcBranch22(zds_branch_2_2_t* branch22)
+void ZDSimConverter::calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2)
 {
     // Первая точка
     point_t point_begin;
@@ -849,12 +850,16 @@ void ZDSimConverter::calcBranch22(zds_branch_2_2_t* branch22)
     point_end.point = tracks_data2[branch22->id2].begin_point;
     point_end.railway_coord = tracks_data2[branch22->id2].railway_coord;
 
+    // В съезде "2+2" берём вектор по главному пути с предыдущего трека
+    int id1_add = (is_2minus2 ? 0 : -1);
+    // В съезде "2-2" берём вектор по второму пути с предыдущего трека
+    int id2_add = (is_2minus2 ? -1 : 0);
     // Параметры отклонения
     dvec3 begin_to_end = point_end.point - point_begin.point;
-    dvec3 mean_orth = normalize(tracks_data1[branch22->id1].orth +
-                                tracks_data2[branch22->id2].orth);
-    dvec3 mean_right = normalize(tracks_data1[branch22->id1].right +
-                                 tracks_data2[branch22->id2].right);
+    dvec3 mean_orth = normalize(tracks_data1[branch22->id1 + id1_add].orth +
+                                tracks_data2[branch22->id2 + id2_add].orth);
+    dvec3 mean_right = normalize(tracks_data1[branch22->id1 + id1_add].right +
+                                 tracks_data2[branch22->id2 + id2_add].right);
     double coord_length = dot(begin_to_end, mean_orth);
     double bias = dot(begin_to_end, mean_right);
     double railway_coord_length = point_end.railway_coord - point_begin.railway_coord;
