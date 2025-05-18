@@ -127,6 +127,7 @@ void MainWindow::startDmd2gltfConverter(QString routeDir)
     QStringList args;
     args << "--input-route" << routeDir;
     args << "--output-route" << routeDir;
+    args << "--only-used";
 
     dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     dmd2gltfProc.start(dmd2gltf_path, args);

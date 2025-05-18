@@ -45,7 +45,8 @@ bool Application::convert()
     if (convert_mode == CONVERT_ROUTE)
     {
         return convert_route(cmd_line.input_route_path.value,
-                             cmd_line.output_route_path.value);
+                             cmd_line.output_route_path.value,
+                             cmd_line.input_only_used_at_map.isPresent());
     }
 
     if (convert_mode == CONVERT_MODEL)
@@ -61,7 +62,9 @@ bool Application::convert()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Application::convert_route(std::string &in_dmd_route_path, std::string &out_gltf_route_path)
+bool Application::convert_route(std::string &in_dmd_route_path,
+                                std::string &out_gltf_route_path,
+                                bool only_used_at_map)
 {
     // Преобразуем пути к платформоспецифичному виду
     path_to_native_separator(in_dmd_route_path);
@@ -72,68 +75,78 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
     using RelativeTexturePath = std::string;
     std::string line_buffer;
 
-    // Ищем расположение объектов маршрута - файл route1.map
-    std::ifstream route1_map = std::ifstream();
-    bool is_map = false;
+    // Список объектов, используемых в .map маршрута
+    std::set<Label> map_objects;
 
-    // Сначала пробуем конвертированный .map
-    std::string map_path = combine_path(out_gltf_route_path, "topology");
-    map_path = combine_path(map_path, "map");
-    map_path = combine_path(map_path, "route1.map");
-    route1_map.open(map_path, std::ios::in);
-    if (route1_map.is_open())
+    if (only_used_at_map)
     {
-        std::cout << "Info: opened converted route1.map: " << map_path << std::endl;
-        is_map = true;
-    }
-    else
-    {
-        std::cout << "Warn: failed to open converted route1.map: " << map_path << std::endl;
+        // Ищем расположение объектов маршрута - файл route1.map
+        std::ifstream route1_map = std::ifstream();
 
-        // Пробуем оригинальный .map
-        map_path = combine_path(in_dmd_route_path, "route1.map");
+        // Сначала пробуем найти конвертированный .map
+        std::string map_path = combine_path(out_gltf_route_path, "topology");
+        map_path = combine_path(map_path, "map");
+        map_path = combine_path(map_path, "route1.map");
         route1_map.open(map_path, std::ios::in);
         if (route1_map.is_open())
         {
-            std::cout << "Info: opened route1.map: " << map_path << std::endl;
-            is_map = true;
+            std::cout << "Info: opened converted route1.map: " << map_path << std::endl;
         }
         else
         {
-            std::cerr << "Failed to open route1.map: " << map_path << std::endl;
-        }
-    }
+            std::cout << "Warn: failed to open converted route1.map: " << map_path << std::endl;
 
-    // Читаем список объектов, используемых в .map маршрута - лишнего не надо
-    std::set<Label> map_objects;
-    if (is_map)
-    {
-        while (std::getline(route1_map, line_buffer))
+            // Пробуем найти оригинальный .map
+            map_path = combine_path(in_dmd_route_path, "route1.map");
+            route1_map.open(map_path, std::ios::in);
+            if (route1_map.is_open())
+            {
+                std::cout << "Info: opened route1.map: " << map_path << std::endl;
+            }
+            else
+            {
+                std::cerr << "Failed to open route1.map: " << map_path << std::endl;
+                return false;
+            }
+        }
+
+        if (only_used_at_map)
         {
-            // Пустое название объекта
-            if (line_buffer.empty() || (*(line_buffer.begin()) == ',') )
+            while (std::getline(route1_map, line_buffer))
             {
-                continue;
-            }
-            // Строка с объектом должна заканчиваться точкой с запятой
-            if (*(line_buffer.end() - 1) != ';')
-            {
-                continue;
-            }
-            // Строка с объектом должна содержать шесть запятых - разделителей
-            if (std::count(line_buffer.begin(), line_buffer.end(), ',') != 6)
-            {
-                continue;
+                // Пустое название объекта
+                if (line_buffer.empty() || (*(line_buffer.begin()) == ',') )
+                {
+                    continue;
+                }
+                // Строка с объектом должна заканчиваться точкой с запятой
+                if (*(line_buffer.end() - 1) != ';')
+                {
+                    continue;
+                }
+                // Строка с объектом должна содержать шесть запятых - разделителей
+                if (std::count(line_buffer.begin(), line_buffer.end(), ',') != 6)
+                {
+                    continue;
+                }
+
+                // Читаем первый элемент в строке - сокращённое название объекта
+                std::string label = "";
+                std::istringstream ss(line_buffer);
+                if (std::getline(ss, label, ','))
+                {
+                    map_objects.insert(label);
+                }
             }
 
-            // Читаем первый элемент в строке - сокращённое название объекта
-            std::string label = "";
-            std::istringstream ss(line_buffer);
-            if (std::getline(ss, label, ','))
+            if (map_objects.empty())
             {
-                map_objects.insert(label);
+                std::cerr << "Failed to find objects in route1.map" << std::endl;
+                return false;
             }
         }
+
+        route1_map.close();
     }
 
     // Читаем список объектов из базы маршрута
@@ -165,7 +178,7 @@ bool Application::convert_route(std::string &in_dmd_route_path, std::string &out
         }
 
         // Если прочтён файл .map - проверяем что сокращённое имя используется
-        if (is_map && (map_objects.find(label) == map_objects.end()))
+        if (only_used_at_map && (map_objects.find(label) == map_objects.end()))
         {
             continue;
         }
@@ -760,6 +773,10 @@ void Application::configure_parser(cli::Parser &parser)
                                      "",
                                      "Input DMD route path");
 
+    parser.set_optional<bool>("u", "only-used",
+                              false,
+                              "Convert only models used at map");
+
     parser.set_optional<std::string>("o", "output-route",
                                      "",
                                      "Output GLTF route path");
@@ -786,6 +803,7 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
 {
     parser.run_and_exit_if_error();
     cmd_line.input_route_path = parser.get<std::string>("i");
+    cmd_line.input_only_used_at_map = parser.get<bool>("u");
     cmd_line.output_route_path = parser.get<std::string>("o");
     cmd_line.input_model_path = parser.get<std::string>("m");
     cmd_line.input_texture_path = parser.get<std::string>("t");
