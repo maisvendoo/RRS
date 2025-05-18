@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     routesRootDir = QString(fs.getRouteRootDir().c_str());
 
     connect(ui->pbOpenRoute, &QPushButton::released, this, &MainWindow::slotOpenRoute);
+    connect(ui->pbSelectOutputPath, &QPushButton::released, this, &MainWindow::slotSelectOutputPath);
     connect(ui->pbConvert, &QPushButton::released, this, &MainWindow::slotConvert);
     connect(&pathconvProc, &QProcess::finished, this, &MainWindow::slotIsPathconvFinished);
     connect(&profconvProc, &QProcess::finished, this, &MainWindow::slotIsProfconvFinished);
@@ -127,7 +128,11 @@ void MainWindow::startDmd2gltfConverter(QString routeDir)
     QStringList args;
     args << "--input-route" << routeDir;
     args << "--output-route" << routeDir;
-    args << "--only-used";
+//    args << "--output-route" << outputDir;
+    if (ui->cbOnlyUsedModels)
+    {
+        args << "--only-used";
+    }
 
     dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     dmd2gltfProc.start(dmd2gltf_path, args);
@@ -203,6 +208,10 @@ void MainWindow::slotOpenRoute()
     ui->lCurrentRouteDir->setText(relPath);
     ui->lStatus->setText(tr("Route opened succesfully"));
 
+    outputDir = routeDir;
+    relPath = dir.relativeFilePath(outputDir);
+    ui->lOutputPath->setText(relPath);
+
     CfgReader cfg;
     if (cfg.load(routeDir + QDir::separator() + "description.xml"))
     {
@@ -218,6 +227,21 @@ void MainWindow::slotOpenRoute()
         cfg.getString(secName, fieldName, fieldValue);
         ui->teRouteDescription->setText(fieldValue);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSelectOutputPath()
+{
+    outputDir = QFileDialog::getExistingDirectory(this, tr("Select converted route path"),
+                                                  routesRootDir,
+                                                  QFileDialog::ShowDirsOnly |
+                                                  QFileDialog::DontResolveSymlinks);
+
+    QDir dir(routesRootDir);
+    QString relPath = dir.relativeFilePath(outputDir);
+    ui->lOutputPath->setText(relPath);
 }
 
 //------------------------------------------------------------------------------

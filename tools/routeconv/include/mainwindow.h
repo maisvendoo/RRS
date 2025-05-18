@@ -35,6 +35,8 @@ private:
 
     QString routeDir;
 
+    QString outputDir;
+
     QProcess    pathconvProc;
     QProcess    profconvProc;
     QProcess    dmd2gltfProc;
@@ -58,6 +60,8 @@ private:
 private slots:
 
     void slotOpenRoute();
+
+    void slotSelectOutputPath();
 
     void slotConvert();
 
