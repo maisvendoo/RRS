@@ -105,6 +105,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         QDomNode config_section;
         ProcAnimation* animation = nullptr;
 
+        // Вылет где-то тут!!!!!!
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
         {
@@ -118,6 +119,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
             return animation;
         }
+        // !!!!!!!!!!!!!!!!!
 
         config_section = cfg.getFirstSection("AnalogTranslation");
         if (!config_section.isNull())
