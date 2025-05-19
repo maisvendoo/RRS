@@ -565,7 +565,7 @@ bool RouteViewer::loadRoute()
         }
 
         auto pagedLOD = vsg::PagedLOD::create();
-        pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+        pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
         pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
@@ -579,12 +579,15 @@ bool RouteViewer::loadRoute()
         auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
         auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
         matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
-
-        // Нужен ли depthSorted?
+/*
+        // Нужен ли depthSorted? Нет, не нужен!
         auto depthSorted = vsg::DepthSorted::create();
+        depthSorted->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 1.0);
         depthSorted->child = pagedLOD;
 
         matrix->addChild(depthSorted);
+*/
+        matrix->addChild(pagedLOD);
         //GUIParams::nodes.emplace_back(matrix);
 
         root->addChild(matrix);

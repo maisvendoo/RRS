@@ -1,0 +1,131 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/2track2-2.bin",
+            "byteLength": 168816
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 75024,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 75024,
+            "byteLength": 50016,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 125040,
+            "byteLength": 43776,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 6252,
+            "type": "VEC3",
+            "max": [
+                19.1913,
+                0.577428,
+                1.00014
+            ],
+            "min": [
+                -19.1916,
+                -10.051,
+                -101
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 6252,
+            "type": "VEC2",
+            "max": [
+                0.999923,
+                6.99963
+            ],
+            "min": [
+                0,
+                -4.21504
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5125,
+            "count": 10944,
+            "type": "SCALAR",
+            "max": [
+                6251
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../../textures/TrackSections.tga"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            },
+            "alphaMode": "BLEND"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "TEXCOORD_0": 1
+                    },
+                    "indices": 2,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}
