@@ -37,7 +37,6 @@ public:
     void apply(vsg::Node& node) override;
     void apply(vsg::MatrixTransform& transform) override;
     void apply(vsg::Group& group) override;
-    void apply(vsg::StateGroup& stateGroup) override;
 
 private:
     ProcAnimation* create_animation(const std::string& name, vsg::MatrixTransform& transform);

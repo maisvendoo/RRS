@@ -95,36 +95,6 @@ void AnimTransformVisitor::apply(vsg::Group& group)
     group.traverse(*this);
 }
 
-void AnimTransformVisitor::apply(vsg::StateGroup& stateGroup)
-{
-    // for (auto& stateCommand : stateGroup.stateCommands)
-    // {
-    //     std::cout << stateCommand << std::endl;
-    //     if (auto* bindGraphicsPipeline = stateCommand->cast<vsg::BindGraphicsPipeline>())
-    //     {
-    //         vsg::RasterizationState* rasterizationState = nullptr;
-    //         for (auto& pipelineState : bindGraphicsPipeline->pipeline->pipelineStates)
-    //         {
-    //             std::cout << "    " << pipelineState << std::endl;
-    //             rasterizationState = pipelineState->cast<vsg::RasterizationState>();
-    //             if (rasterizationState)
-    //             {
-    //                 rasterizationState->cullMode = VK_CULL_MODE_NONE;
-    //                 break;
-    //             }
-    //         }
-    //         if (!rasterizationState)
-    //         {
-    //             auto newRasterizationState = vsg::RasterizationState::create();
-    //             newRasterizationState->cullMode = VK_CULL_MODE_NONE;
-    //             bindGraphicsPipeline->pipeline->pipelineStates.emplace_back(newRasterizationState);
-    //         }
-    //     }
-    // }
-
-    stateGroup.traverse(*this);
-}
-
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
 {
     std::string file_path = animations_dir + name + ".xml";
