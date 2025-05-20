@@ -49,9 +49,9 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
                     new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
                     duplicate->insert(pbr_material_value, new_pbr_material_value);
 
-                    ProcAnimation* animation = new MaterialAnimation(new_pbr_material_value);
+                    animation = new MaterialAnimation(new_pbr_material_value);
                     animation->load(cfg_reader);
-                    animations->thread_safe_insert({animation->getSignalID(), animation});
+                    // animations->thread_safe_insert({animation->getSignalID(), animation});
                 }
             }
         }

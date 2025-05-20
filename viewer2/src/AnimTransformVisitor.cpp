@@ -168,7 +168,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
                 duplicate->insert(&transform, copyop(vsg::ref_ptr(&transform)));
             }
 
-            return nullptr;
+            return mav.get_animation();
         }
 
         // config_section = cfg.getFirstSection("MaterialRGBAnimation");
@@ -223,7 +223,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
                 duplicate->insert(&group, copyop(vsg::ref_ptr(&group)));
             }
 
-            return nullptr;
+            return mav.get_animation();
         }
 
         // config_section = cfg.getFirstSection("MaterialRGBAnimation");

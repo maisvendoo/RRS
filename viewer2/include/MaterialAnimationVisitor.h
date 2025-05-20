@@ -1,6 +1,7 @@
 #ifndef MATERIAL_ANIMATION_VISITOR_H
 #define MATERIAL_ANIMATION_VISITOR_H
 
+#include "ProcAnimation.h"
 #include "animations-list.h"
 
 #include <vsg/core/Inherit.h>
@@ -33,11 +34,14 @@ public:
     void apply(vsg::Node& node) override;
     void apply(vsg::BindDescriptorSet& bindDescriptorSet) override;
 
+    ProcAnimation* get_animation() { return animation; }
+
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     animations_t* animations;
     CfgReader& cfg_reader;
+    ProcAnimation* animation = nullptr;
 };
 
 #endif // MATERIAL_ANIMATION_VISITOR_H
