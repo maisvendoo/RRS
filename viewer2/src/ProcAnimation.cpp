@@ -114,7 +114,7 @@ ProcAnimation::key_point_t ProcAnimation::findBeginKeypoint(float param, std::si
 
     std::size_t left_idx = 0;
     std::size_t right_idx = keypoints.size() - 1;
-    std::size_t idx = (left_idx + right_idx) * 0.5;
+    std::size_t idx = (left_idx + right_idx) / 2;
 
     while (idx != left_idx)
     {
@@ -128,7 +128,7 @@ ProcAnimation::key_point_t ProcAnimation::findBeginKeypoint(float param, std::si
             left_idx = idx;
         }
 
-        idx = (left_idx + right_idx) * 0.5;
+        idx = (left_idx + right_idx) / 2;
     }
 
     key_point = keypoints.at(idx);
