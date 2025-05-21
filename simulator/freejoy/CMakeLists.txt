@@ -24,7 +24,9 @@ add_definitions(-DDEVICE_LIB)
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 
 # Ищем SFML
-set(SFML_STATIC_LIBRARIES TRUE)
+if (WIN32)
+	set(SFML_STATIC_LIBRARIES TRUE)
+endif()
 find_package(SFML COMPONENTS System Window REQUIRED)
 
 # Пути к заголовкам и сорцам
