@@ -110,40 +110,38 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             }
         }
 
-        if (only_used_at_map)
+        while (std::getline(route1_map, line_buffer))
         {
-            while (std::getline(route1_map, line_buffer))
+            // Пустое название объекта
+            if (line_buffer.empty() || (*(line_buffer.begin()) == ',') )
             {
-                // Пустое название объекта
-                if (line_buffer.empty() || (*(line_buffer.begin()) == ',') )
-                {
-                    continue;
-                }
-                // Строка с объектом должна заканчиваться точкой с запятой
-                if (*(line_buffer.end() - 1) != ';')
-                {
-                    continue;
-                }
-                // Строка с объектом должна содержать шесть запятых - разделителей
-                if (std::count(line_buffer.begin(), line_buffer.end(), ',') != 6)
-                {
-                    continue;
-                }
-
-                // Читаем первый элемент в строке - сокращённое название объекта
-                std::string label = "";
-                std::istringstream ss(line_buffer);
-                if (std::getline(ss, label, ','))
-                {
-                    map_objects.insert(label);
-                }
+                continue;
+            }
+            // Строка с объектом должна заканчиваться точкой с запятой
+            if (*(line_buffer.end() - 1) != ';')
+            {
+                continue;
+            }
+            // Строка с объектом должна содержать шесть запятых - разделителей
+            if (std::count(line_buffer.begin(), line_buffer.end(), ',') != 6)
+            {
+                continue;
             }
 
-            if (map_objects.empty())
+            // Читаем первый элемент в строке - сокращённое название объекта
+            std::string label = "";
+            std::istringstream ss(line_buffer);
+            if (std::getline(ss, label, ','))
             {
-                std::cerr << "Failed to find objects in route1.map" << std::endl;
-                return false;
+                map_objects.insert(label);
             }
+        }
+
+        if (map_objects.empty())
+        {
+            std::cerr << "Failed to find objects in route1.map" << std::endl;
+            route1_map.close();
+            return false;
         }
 
         route1_map.close();
