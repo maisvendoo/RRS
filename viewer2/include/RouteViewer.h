@@ -9,8 +9,9 @@
 #include <vsg/app/View.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/io/Options.h>
-#include <vsg/lighting/DirectionalLight.h>
 #include <vsg/lighting/ShadowSettings.h>
+#include <vsg/lighting/AmbientLight.h>
+#include <vsg/lighting/DirectionalLight.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/RegionOfInterest.h>
 
@@ -109,13 +110,15 @@ private:
     vsg::ref_ptr<vsg::Window> window = nullptr;
     vsg::ref_ptr<vsg::LookAt> lookAt = nullptr;
     vsg::ref_ptr<vsg::Camera> camera = nullptr;
-    vsg::ref_ptr<vsg::Group> root = nullptr;
-    vsg::ref_ptr<vsg::DirectionalLight> sun = nullptr;
-    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings = nullptr;
-    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region = nullptr;
     vsg::ref_ptr<vsg::View> view = nullptr;
     vsg::ref_ptr<vsg::CommandGraph> commandGraph = nullptr;
     vsg::ref_ptr<vsg::Viewer> viewer = nullptr;
+
+    vsg::ref_ptr<vsg::Group> root = nullptr;
+    vsg::ref_ptr<vsg::AmbientLight> ambient = nullptr;
+    vsg::ref_ptr<vsg::DirectionalLight> sun = nullptr;
+    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings = nullptr;
+    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region = nullptr;
 };
 
 #endif // ROUTE_VIEWER_H

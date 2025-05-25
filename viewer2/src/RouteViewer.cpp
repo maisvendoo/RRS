@@ -28,13 +28,15 @@
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>
-#include <vsg/lighting/AmbientLight.h>
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/maths/sphere.h>
+#include <vsg/state/VertexInputState.h>
+#include <vsg/state/InputAssemblyState.h>
 #include <vsg/state/RasterizationState.h>
-#include <vsg/state/ViewDependentState.h>
-#include <vsg/state/DepthStencilState.h>
 #include <vsg/state/ColorBlendState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/ViewDependentState.h>
 #include <vsg/threading/OperationThreads.h>
 #include <vsg/nodes/DepthSorted.h>
 #include <vsg/utils/SharedObjects.h>
@@ -303,6 +305,107 @@ void RouteViewer::initScenegraph()
 //------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
+    vsg::ref_ptr<vsg::ShaderSet> flat_shader;
+    vsg::ref_ptr<vsg::ShaderSet> pbr_shader;
+    vsg::ref_ptr<vsg::ShaderSet> phong_shader;
+
+    // Загружаем свои шейдеры
+    FileSystem& fs = FileSystem::getInstance();
+    std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+
+    std::string flat_path = shaders_dir_path + fs.separator() + "standard_flat_shaded.spv";
+    vsg::ref_ptr<vsg::ShaderStage> flat_shader_stage =
+        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", flat_path, options);
+    if (flat_shader_stage)
+    {
+        LOG_INFO("Loaded flat shader: %s", flat_path.c_str());
+        flat_shader = vsg::ShaderSet::create();
+        flat_shader->stages.push_back(flat_shader_stage);
+    }
+    else
+    {
+        LOG_WARN("Fail to load flat shader: %s", flat_path.c_str());
+        LOG_INFO("Using default flat shader");
+        flat_shader = vsg::createFlatShadedShaderSet(options);
+    }
+
+    std::string pbr_path = shaders_dir_path + fs.separator() + "standard_pbr.spv";
+    vsg::ref_ptr<vsg::ShaderStage> pbr_shader_stage =
+        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", pbr_path, options);
+    if (pbr_shader_stage)
+    {
+        LOG_INFO("Loaded PBR shader: %s", pbr_path.c_str());
+        pbr_shader = vsg::ShaderSet::create();
+        pbr_shader->stages.push_back(pbr_shader_stage);
+    }
+    else
+    {
+        LOG_WARN("Fail to load PBR shader: %s", pbr_path.c_str());
+        LOG_INFO("Using default PBR shader");
+        pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
+    }
+
+    std::string phong_path = shaders_dir_path + fs.separator() + "standard_phong.spv";
+    vsg::ref_ptr<vsg::ShaderStage> phong_shader_stage =
+        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", phong_path);
+    if (phong_shader_stage)
+    {
+        LOG_INFO("Loaded Phong shader: %s", phong_path.c_str());
+        phong_shader = vsg::ShaderSet::create();
+        phong_shader->stages.push_back(phong_shader_stage);
+    }
+    else
+    {
+        LOG_WARN("Fail to load Phong shader: %s", phong_path.c_str());
+        LOG_INFO("Using default Phong shader");
+        phong_shader = vsg::createPhongShaderSet(options);
+    }
+
+    // Можем по своему настроить стадии графического конвейера
+    vsg::ref_ptr<vsg::VertexInputState> vertexInputState = vsg::VertexInputState::create();
+    vsg::ref_ptr<vsg::InputAssemblyState> inputAssemblyState = vsg::InputAssemblyState::create();
+    vsg::ref_ptr<vsg::RasterizationState> rasterizationState = vsg::RasterizationState::create();
+    vsg::ref_ptr<vsg::ColorBlendState> colorBlendState = vsg::ColorBlendState::create();
+    vsg::ref_ptr<vsg::DepthStencilState> depthStencilState = vsg::DepthStencilState::create();
+    vsg::ref_ptr<vsg::MultisampleState> multisampleState = vsg::MultisampleState::create();
+
+    rasterizationState->cullMode = VK_CULL_MODE_NONE;
+
+    colorBlendState->attachments = {
+        {
+            true,                               // blending enabled
+            VK_BLEND_FACTOR_SRC_ALPHA,          // srcColorBlendFactor
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,// dstColorBlendFactor
+            VK_BLEND_OP_ADD,                    // colorBlendOp
+            VK_BLEND_FACTOR_ONE,                // srcAlphaBlendFactor
+            VK_BLEND_FACTOR_ZERO,               // dstAlphaBlendFactor
+            VK_BLEND_OP_ADD,                    // alphaBlendOp
+            VK_COLOR_COMPONENT_R_BIT |
+                VK_COLOR_COMPONENT_G_BIT |
+                VK_COLOR_COMPONENT_B_BIT |
+                VK_COLOR_COMPONENT_A_BIT
+        }
+    };
+
+    vsg::GraphicsPipelineStates defaultGraphicsPipelineStates =
+    {   vertexInputState,
+        inputAssemblyState,
+        rasterizationState,
+        colorBlendState,
+        depthStencilState,
+        multisampleState };
+
+    flat_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+    pbr_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+    phong_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+
+    // Добавляем шейдеры в стандартные опции
+    options->shaderSets.clear();
+    options->shaderSets["flat"] = flat_shader;
+    options->shaderSets["pbr"] = pbr_shader;
+    options->shaderSets["phong"] = phong_shader;
+
+    // Если у теней включена дальности прорисовки, настраиваем каскад теней
     if (settings.shadow_distance > 0.1)
     {
         auto countNumShadowMaps = [](double dist) -> std::uint32_t
@@ -321,82 +424,23 @@ void RouteViewer::initLights()
         shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
     }
 
-    // uint32_t vulkan_version;
-    // vkEnumerateInstanceVersion(&vulkan_version);
-
-    // auto shaderHints = vsg::ShaderCompileSettings::create();
-    // shaderHints->vulkanVersion = vulkan_version;
-    // shaderHints->optimize = true; // ???
-
-    // auto rasterizationState = vsg::RasterizationState::create();
-    // rasterizationState->depthClampEnable = VK_TRUE;
-    // rasterizationState->cullMode = VK_CULL_MODE_NONE;
-    // rasterizationState->frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-
-    // auto phongShaderSet = vsg::createPhongShaderSet(options);
-    // phongShaderSet->defaultShaderHints = shaderHints;
-    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // phongShaderSet->variants.clear();
-
-    // auto pbrShaderSet = vsg::createPhysicsBasedRenderingShaderSet(options);
-    // pbrShaderSet->defaultShaderHints = shaderHints;
-    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // phongShaderSet->variants.clear();
-
-    // auto flatShaderSet = vsg::createFlatShadedShaderSet(options);
-    // flatShaderSet->defaultShaderHints = shaderHints;
-    // phongShaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // phongShaderSet->variants.clear();
-
-    // options->shaderSets.clear();
-
-    // options->shaderSets["pbr"] = pbrShaderSet;
-    // options->shaderSets["phong"] = phongShaderSet;
-    // options->shaderSets["flat"] = flatShaderSet;
-
-    // shaderSet->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // // options->shaderSets["pbr"] = shaderSet;
-    // options->shaderSets["phong"] = shaderSet;
-    // // options->shaderSets["flat"] = shaderSet;
-
-    // auto rasterizationState = vsg::RasterizationState::create();
-    // rasterizationState->depthClampEnable = VK_TRUE;
-    // rasterizationState->cullMode = VK_CULL_MODE_NONE;
-
-    // auto pbr = options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    // pbr->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // pbr->defaultShaderHints = shaderHints;
-    // pbr->variants.clear();
-
-    // auto phong = options->shaderSets["phong"] = vsg::createPhongShaderSet(options);
-    // phong->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // phong->defaultShaderHints = shaderHints;
-    // phong->variants.clear();
-
-    // auto flat = options->shaderSets["flat"] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    // flat->defaultGraphicsPipelineStates.push_back(rasterizationState);
-    // flat->defaultShaderHints = shaderHints;
-    // flat->variants.clear();
-
-    // options->shaderSets.erase("flat");
-    // options->shaderSets.erase("pbr");
-    // options->shaderSets.erase("phong");
-
+    // Настраиваем область отрисовки теней
     shadow_region = vsg::RegionOfInterest::create();
     shadow_region->points.resize(5);
     root->addChild(shadow_region);
 
-    auto ambient = vsg::AmbientLight::create();
+    // Настраиваем общее освещение
+    ambient = vsg::AmbientLight::create();
     ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
     ambient->intensity = 0.1f;
+    root->addChild(ambient);
 
+    // Настраиваем солнечное освещение
     sun = vsg::DirectionalLight::create();
     sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
     sun->intensity = 1.0f;
     sun->direction = vsg::normalize(vsg::vec3(1.0f, 1.0f, -1.0f));
     sun->shadowSettings = shadowSettings;
-
-    root->addChild(ambient);
     root->addChild(sun);
 }
 
@@ -414,40 +458,6 @@ void RouteViewer::initView()
     view->viewDependentState->maxShadowDistance = maxShadowDistance;
     view->viewDependentState->shadowMapBias = shadowMapBias;
     view->viewDependentState->lambda = lambda;
-    // view->viewDependentState->shaderSet = options->shaderSets["phong"];
-    // view->viewDependentState->ambientLights.emplace_back(vsg::dmat4(), ambient);
-    // view->viewDependentState->directionalLights.emplace_back(vsg::dmat4(), sun);
-    // view->viewDependentState->shadowSettingsOverride[{}] = vsg::HardShadows::create(1);
-
-    auto rasterizationState = vsg::RasterizationState::create();
-    rasterizationState->cullMode = VK_CULL_MODE_NONE;
-    rasterizationState->depthClampEnable = VK_TRUE;
-
-    auto depthStencilState = vsg::DepthStencilState::create();
-    // depthStencilState->depthBoundsTestEnable = VK_TRUE;
-    // depthStencilState->depthTestEnable = VK_TRUE;
-    // depthStencilState->depthWriteEnable = VK_TRUE;
-    // depthStencilState->depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-
-    auto colorBlendState = vsg::ColorBlendState::create();
-    colorBlendState->attachments = {
-        {
-            true,                               // blending enabled
-            VK_BLEND_FACTOR_SRC_ALPHA,          // srcColorBlendFactor
-            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,// dstColorBlendFactor
-            VK_BLEND_OP_ADD,                    // colorBlendOp
-            VK_BLEND_FACTOR_ONE,                // srcAlphaBlendFactor
-            VK_BLEND_FACTOR_ZERO,               // dstAlphaBlendFactor
-            VK_BLEND_OP_ADD,                    // alphaBlendOp
-            VK_COLOR_COMPONENT_R_BIT |
-            VK_COLOR_COMPONENT_G_BIT |
-            VK_COLOR_COMPONENT_B_BIT |
-            VK_COLOR_COMPONENT_A_BIT
-        }
-    };
-
-    view->overridePipelineStates = {rasterizationState, colorBlendState, depthStencilState};
-
     view->addChild(root);
 }
 
