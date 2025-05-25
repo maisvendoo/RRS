@@ -306,11 +306,12 @@ void RouteViewer::initScenegraph()
 //------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
-    vsg::ref_ptr<vsg::ShaderSet> flat_shader;
-    vsg::ref_ptr<vsg::ShaderSet> pbr_shader;
-    vsg::ref_ptr<vsg::ShaderSet> phong_shader;
+    // За основу берём встроенные комплекты вершинного и фрагментного шейдера
+    vsg::ref_ptr<vsg::ShaderSet> flat_shader = vsg::createFlatShadedShaderSet(options);
+    vsg::ref_ptr<vsg::ShaderSet> pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
+    vsg::ref_ptr<vsg::ShaderSet> phong_shader = vsg::createPhongShaderSet(options);
 
-    // Загружаем свои шейдеры
+    // Загружаем свои варианты фрагментного шейдера вместо встроенного
     FileSystem& fs = FileSystem::getInstance();
     std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
@@ -320,14 +321,12 @@ void RouteViewer::initLights()
     if (flat_shader_stage)
     {
         LOG_INFO("Loaded flat shader: %s", flat_path.c_str());
-        flat_shader = vsg::ShaderSet::create();
-        flat_shader->stages.push_back(flat_shader_stage);
+        flat_shader->stages.back() = flat_shader_stage;
     }
     else
     {
         LOG_WARN("Fail to load flat shader: %s", flat_path.c_str());
         LOG_INFO("Using default flat shader");
-        flat_shader = vsg::createFlatShadedShaderSet(options);
     }
 
     std::string pbr_path = shaders_dir_path + fs.separator() + "standard_pbr.spv";
@@ -336,14 +335,12 @@ void RouteViewer::initLights()
     if (pbr_shader_stage)
     {
         LOG_INFO("Loaded PBR shader: %s", pbr_path.c_str());
-        pbr_shader = vsg::ShaderSet::create();
-        pbr_shader->stages.push_back(pbr_shader_stage);
+        pbr_shader->stages.back() = pbr_shader_stage;
     }
     else
     {
         LOG_WARN("Fail to load PBR shader: %s", pbr_path.c_str());
         LOG_INFO("Using default PBR shader");
-        pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
     }
 
     std::string phong_path = shaders_dir_path + fs.separator() + "standard_phong.spv";
@@ -352,14 +349,12 @@ void RouteViewer::initLights()
     if (phong_shader_stage)
     {
         LOG_INFO("Loaded Phong shader: %s", phong_path.c_str());
-        phong_shader = vsg::ShaderSet::create();
-        phong_shader->stages.push_back(phong_shader_stage);
+        phong_shader->stages.back() = phong_shader_stage;
     }
     else
     {
         LOG_WARN("Fail to load Phong shader: %s", phong_path.c_str());
         LOG_INFO("Using default Phong shader");
-        phong_shader = vsg::createPhongShaderSet(options);
     }
 
     // Можем по своему настроить стадии графического конвейера
