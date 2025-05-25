@@ -23,6 +23,7 @@
 #include <vsg/app/CommandGraph.h>
 #include <vsg/core/ConstVisitor.h>
 #include <vsg/io/Options.h>
+#include <vsg/io/write.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/state/GraphicsPipeline.h>
 #include <vsgXchange/all.h>
@@ -398,6 +399,27 @@ void RouteViewer::initLights()
     flat_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
     pbr_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
     phong_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+
+#if 0
+        // запись шейдеров в файл
+        std::string file;
+        file = shaders_dir_path + fs.separator() + "~standard_flat.vsgt";
+        vsg::write(flat_shader, file, options);
+        file = shaders_dir_path + fs.separator() + "~standard_pbr.vsgt";
+        vsg::write(pbr_shader, file, options);
+        file = shaders_dir_path + fs.separator() + "~standard_phong.vsgt";
+        vsg::write(phong_shader, file, options);
+        file = shaders_dir_path + fs.separator() + "~default_flat.vsgt";
+        vsg::ref_ptr<vsg::ShaderSet> flat_default = vsg::createFlatShadedShaderSet(options);
+        vsg::write(flat_default, file, options);
+        file = shaders_dir_path + fs.separator() + "~default_pbr.vsgt";
+        vsg::ref_ptr<vsg::ShaderSet> pbr_default = vsg::createPhysicsBasedRenderingShaderSet(options);
+        vsg::write(pbr_default, file, options);
+        file = shaders_dir_path + fs.separator() + "~default_phong.vsgt";
+        vsg::ref_ptr<vsg::ShaderSet> phong_default = vsg::createPhongShaderSet(options);
+        vsg::write(phong_default, file, options);
+        exit(0);
+#endif
 
     // Добавляем шейдеры в стандартные опции
     options->shaderSets.clear();
