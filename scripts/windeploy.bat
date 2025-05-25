@@ -87,6 +87,9 @@ xcopy /Y %OPENAL_BIN%\*.dll %RRS_DEV_ROOT%\bin\
 xcopy /Y %FREETYPE_LIBRARY% %RRS_DEV_ROOT%\bin\
 xcopy /Y %ZLIB_LIBRARY% %RRS_DEV_ROOT%\bin\
 
+rem Копируем шейдеры
+xcopy /Y /S %DATA_PATH%\shaders\*.spv %RRS_DEV_ROOT%\data\shaders\
+
 rem Копируем данные игры (модели, звуки, конфиги анимаций, шрифты)
 
 rem ВЛ60пк
