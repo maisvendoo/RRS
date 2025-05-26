@@ -26,6 +26,7 @@
 #include <vsg/io/write.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/state/GraphicsPipeline.h>
+#include <vsg/state/ShaderStage.h>
 #include <vsgXchange/all.h>
 
 #include <vsg/app/CloseHandler.h>
@@ -233,8 +234,8 @@ void RouteViewer::initWindowTraits()
     windowTraits->windowTitle = settings.name;
     windowTraits->decoration = settings.window_decoration;
     windowTraits->samples = samples_bit_flag(settings.samples);
-    windowTraits->debugLayer = true;
-    windowTraits->debugUtils = true;
+    // windowTraits->debugLayer = true;
+    // windowTraits->debugUtils = true;
 
     auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
     deviceFeatures->get().samplerAnisotropy = VK_TRUE;
@@ -315,47 +316,24 @@ void RouteViewer::initLights()
     FileSystem& fs = FileSystem::getInstance();
     std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
-    std::string flat_path = shaders_dir_path + fs.separator() + "standard_flat_shaded.spv";
-    vsg::ref_ptr<vsg::ShaderStage> flat_shader_stage =
-        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", flat_path, options);
-    if (flat_shader_stage)
-    {
-        LOG_INFO("Loaded flat shader: %s", flat_path.c_str());
-        flat_shader->stages.back() = flat_shader_stage;
-    }
-    else
-    {
-        LOG_WARN("Fail to load flat shader: %s", flat_path.c_str());
-        LOG_INFO("Using default flat shader");
-    }
+    auto load_custom_shader = [&](const char* shader_filename, const char* shader_name, vsg::ref_ptr<vsg::ShaderSet> shader_set) {
+        std::string shader_path = shaders_dir_path + fs.separator() + shader_filename;
+        vsg::ref_ptr<vsg::ShaderStage> shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", shader_path, options);
+        if (shader_stage)
+        {
+            LOG_INFO("Loaded %s shader: %s", shader_name, shader_path.c_str());
+            shader_set->stages.back() = shader_stage;
+        }
+        else
+        {
+            LOG_WARN("Fail to load %s shader: %s", shader_path.c_str());
+            LOG_INFO("Using default %s shader", shader_name);
+        }
+    };
 
-    std::string pbr_path = shaders_dir_path + fs.separator() + "standard_pbr.spv";
-    vsg::ref_ptr<vsg::ShaderStage> pbr_shader_stage =
-        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", pbr_path, options);
-    if (pbr_shader_stage)
-    {
-        LOG_INFO("Loaded PBR shader: %s", pbr_path.c_str());
-        pbr_shader->stages.back() = pbr_shader_stage;
-    }
-    else
-    {
-        LOG_WARN("Fail to load PBR shader: %s", pbr_path.c_str());
-        LOG_INFO("Using default PBR shader");
-    }
-
-    std::string phong_path = shaders_dir_path + fs.separator() + "standard_phong.spv";
-    vsg::ref_ptr<vsg::ShaderStage> phong_shader_stage =
-        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", phong_path);
-    if (phong_shader_stage)
-    {
-        LOG_INFO("Loaded Phong shader: %s", phong_path.c_str());
-        phong_shader->stages.back() = phong_shader_stage;
-    }
-    else
-    {
-        LOG_WARN("Fail to load Phong shader: %s", phong_path.c_str());
-        LOG_INFO("Using default Phong shader");
-    }
+    load_custom_shader("standard_flat_shaded.spv", "flat", flat_shader);
+    load_custom_shader("standard_pbr.spv", "PBR", pbr_shader);
+    load_custom_shader("standard_phong.spv", "Phong", phong_shader);
 
     // Можем по своему настроить стадии графического конвейера
     vsg::ref_ptr<vsg::VertexInputState> vertexInputState = vsg::VertexInputState::create();
