@@ -11,7 +11,7 @@ MaterialRgbAnimation::MaterialRgbAnimation(vsg::PbrMaterial& material)
 {
 }
 
-void MaterialRgbAnimation::anim_step(float t, float dt)
+void MaterialRgbAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta_r = (pos_r - cur_pos_r);
     float delta_g = (pos_g - cur_pos_g);

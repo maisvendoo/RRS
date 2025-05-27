@@ -22,7 +22,6 @@ class CfgReader;
 MaterialAnimationVisitor::MaterialAnimationVisitor(const MaterialAnimationVisitorCreateInfo& create_info)
     : pdo(create_info.pdo)
     , duplicate(create_info.duplicate)
-    , animations(create_info.animations)
     , cfg_reader(create_info.cfg_reader)
 {
 }

@@ -55,7 +55,7 @@ VehicleExterior* VehiclesHandler::getCurrentVehicle()
 #ifndef NDEBUG
     if (isUpdated())
     {
-        if (cur_vehicle >= 0 && cur_vehicle < vehicles.size())
+        if (cur_vehicle >= 0 && static_cast<std::size_t>(cur_vehicle) < vehicles.size())
         {
             return &(vehicles[cur_vehicle]);
         }
@@ -301,7 +301,7 @@ bool VehiclesHandler::selectPrevTrain()
     int prev_cur_vehicle = cur_vehicle;
 
     // Переключаем на первый вагон следующего поезда
-    if (vehicles[cur_vehicle].train_id >= (update_data[new_state].trains.size() - 1))
+    if (static_cast<std::size_t>(vehicles[cur_vehicle].train_id) >= (update_data[new_state].trains.size() - 1))
     {
         cur_vehicle = update_data[new_state].trains[0].first_vehicle_id;
     }
@@ -392,7 +392,7 @@ bool VehiclesHandler::load(
         LOG_WARN("Server has not any vehicles");
         return false;
     }
-    
+
     const std::size_t vehicle_count = vehicles_info.vehicles.size();
     LOG_INFO("Got info about %u vehicles from server", vehicle_count);
 
@@ -470,9 +470,9 @@ void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 
     vehicle_controlled.deserialize(data);
     if ((vehicle_controlled.controlled_vehicle >= 0) &&
-        (vehicle_controlled.controlled_vehicle < vehicles.size()) &&
+        (static_cast<std::size_t>(vehicle_controlled.controlled_vehicle) < vehicles.size()) &&
         (vehicle_controlled.current_vehicle >= 0) &&
-        (vehicle_controlled.current_vehicle < vehicles.size()))
+        (static_cast<std::size_t>(vehicle_controlled.current_vehicle) < vehicles.size()))
     {
         updateDebugString();
     }
@@ -609,8 +609,8 @@ void VehiclesHandler::updateDebugString()
 
     const int current_vehicle = vehicle_controlled.current_vehicle;
     if (current_vehicle >= 0
-        && current_vehicle < update_data[new_state].vehicles.size()
-        && current_vehicle < update_pos_data[new_data].vehicles.size())
+        && static_cast<std::size_t>(current_vehicle) < update_data[new_state].vehicles.size()
+        && static_cast<std::size_t>(current_vehicle) < update_pos_data[new_data].vehicles.size())
     {
         const int current_train = update_data[new_state].vehicles[current_vehicle].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[current_vehicle];
@@ -633,8 +633,8 @@ void VehiclesHandler::updateDebugString()
 
     const int control = vehicle_controlled.controlled_vehicle;
     if (control >= 0
-        && control < update_data[new_state].vehicles.size()
-        && control < update_pos_data[new_data].vehicles.size())
+        && static_cast<std::size_t>(control) < update_data[new_state].vehicles.size()
+        && static_cast<std::size_t>(control) < update_pos_data[new_data].vehicles.size())
     {
         const int control_train = update_data[new_state].vehicles[control].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[control];

@@ -111,12 +111,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
 
         int old_size = animations->animations.size();
 
-        AnimTransformVisitorCreateInfo atv_create_info = {
-            .pdo = pdo,
-            .duplicate = duplicate,
-            .animations_dir = animations_dir,
-            .animations = animations
-        };
+        AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, animations};
 
         AnimTransformVisitor atv(atv_create_info);
         node->accept(atv);

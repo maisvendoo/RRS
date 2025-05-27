@@ -18,7 +18,7 @@ AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
 {
 }
 
-void AnalogTranslation::anim_step(float t, float dt)
+void AnalogTranslation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
     if (abs(delta) > 1e-5f)

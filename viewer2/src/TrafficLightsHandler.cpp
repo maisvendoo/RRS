@@ -10,7 +10,7 @@
 #include <QBuffer>
 
 
-TrafficLightsHandler::TrafficLightsHandler(const settings_t &settings, QObject* parent)
+TrafficLightsHandler::TrafficLightsHandler([[maybe_unused]] const settings_t &settings, QObject* parent)
     : QObject(parent)
 {
 }

@@ -16,7 +16,7 @@ MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
     duration = 0.0f;
 }
 
-void MaterialAnimation::anim_step(float t, float dt)
+void MaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
     if (abs(delta) > 1e-5f)

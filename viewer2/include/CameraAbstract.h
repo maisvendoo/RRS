@@ -25,12 +25,12 @@ public:
 
     virtual void resetView() {}
     virtual void returnView() {}
-    virtual void keyboardPressEvent(vsg::KeySymbol key, bool pressed) {}
-    virtual void mouseButtonPressEvent(uint32_t button, vsg::ButtonMask button_mask, bool pressed) {}
-    virtual void mouseWheelEvent(vsg::vec3 delta) {}
-    virtual void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) {}
-    virtual void touchZoomEvent(double zoomLevel) {}
-    virtual void frameEvent(double dt) {}
+    virtual void keyboardPressEvent([[maybe_unused]] vsg::KeySymbol key, [[maybe_unused]] bool pressed) {}
+    virtual void mouseButtonPressEvent([[maybe_unused]] uint32_t button, [[maybe_unused]] vsg::ButtonMask button_mask, [[maybe_unused]] bool pressed) {}
+    virtual void mouseWheelEvent([[maybe_unused]] vsg::vec3 delta) {}
+    virtual void mouseMoveEvent([[maybe_unused]] vsg::ButtonMask button_mask, [[maybe_unused]] vsg::dvec2 delta) {}
+    virtual void touchZoomEvent([[maybe_unused]] double zoomLevel) {}
+    virtual void frameEvent([[maybe_unused]] double dt) {}
 
     void setCurrentVehicle(VehicleExterior *cv)
     {

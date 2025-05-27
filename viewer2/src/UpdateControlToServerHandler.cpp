@@ -2,6 +2,7 @@
 #include "tcp-client.h"
 #include "key-symbols.h"
 #include "controlled-struct.h"
+#include <cstddef>
 
 //------------------------------------------------------------------------------
 //
@@ -57,7 +58,7 @@ void UpdateControlToServerHandler::changeCurrentVehicle(int current_idx, int con
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void UpdateControlToServerHandler::apply(vsg::FocusInEvent& focusIn)
+void UpdateControlToServerHandler::apply([[maybe_unused]] vsg::FocusInEvent& focusIn)
 {
     sendControlToServer();
 }
@@ -65,7 +66,7 @@ void UpdateControlToServerHandler::apply(vsg::FocusInEvent& focusIn)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void UpdateControlToServerHandler::apply(vsg::FocusOutEvent& focusOut)
+void UpdateControlToServerHandler::apply([[maybe_unused]] vsg::FocusOutEvent& focusOut)
 {
     sendEmptyControlToServer();
     _pressed_keys.clear();
@@ -87,7 +88,7 @@ void UpdateControlToServerHandler::sendControlToServer()
     // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
     // отправляем пустое управление
     constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
-    int modifiers_size = 0;
+    std::size_t modifiers_size = 0;
     for (uint16_t key : modifier_keys)
     {
         if (_pressed_keys.count(key))

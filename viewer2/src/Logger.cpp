@@ -1,14 +1,8 @@
 #include "Logger.h"
 
-#include <cstring>
-#include <string>
-#include <cstdarg>
 #include <cstdio>
-
-#define ANSI_ESCAPE_CODE_RED "\033[31m"
-#define ANSI_ESCAPE_CODE_GREEN "\033[32m"
-#define ANSI_ESCAPE_CODE_YELLOW "\033[33m"
-#define ANSI_ESCAPE_CODE_BLUE "\033[34m"
+#include <map>
+#include <string>
 
 Logger& Logger::instance()
 {
@@ -24,54 +18,16 @@ Logger::~Logger()
     }
 }
 
-void Logger::log_message(LogLevel level, const char* file, int line, const char* format, ...)
+void Logger::log_message(LogLevel level, const char* file, int line, const char* message)
 {
     if (this->level > level)
     {
         return;
     }
 
-    char ansi_escape_code[16];
+    print_ansi_escape_code(level);
 
-    switch (level)
-    {
-    case LOG_LEVEL_DEBUG:
-    {
-        std::strcpy(ansi_escape_code, ANSI_ESCAPE_CODE_GREEN);
-        break;
-    }
-    case LOG_LEVEL_INFO:
-    {
-        std::strcpy(ansi_escape_code, ANSI_ESCAPE_CODE_BLUE);
-        break;
-    }
-    case LOG_LEVEL_WARN:
-    {
-        std::strcpy(ansi_escape_code, ANSI_ESCAPE_CODE_YELLOW);
-        break;
-    }
-    case LOG_LEVEL_ERROR:
-    {
-        std::strcpy(ansi_escape_code, ANSI_ESCAPE_CODE_RED);
-        break;
-    }
-    case LOG_LEVEL_FATAL:
-    {
-        std::strcpy(ansi_escape_code, ANSI_ESCAPE_CODE_RED);
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-
-    std::fprintf(stderr, "%s", ansi_escape_code);
-
-    std::va_list args;
-    va_start(args, format);
-    std::vfprintf(stderr, format, args);
-    va_end(args);
+    std::fprintf(stderr, "%s", message);
 
     if (level > LOG_LEVEL_INFO)
     {
@@ -82,9 +38,7 @@ void Logger::log_message(LogLevel level, const char* file, int line, const char*
         std::fprintf(stderr, "\033[0m\n");
     }
 
-    va_start(args, format);
-    std::vfprintf(this->file, format, args);
-    va_end(args);
+    std::fprintf(this->file, "%s", message);
 
     if (level > LOG_LEVEL_INFO)
     {
@@ -103,8 +57,18 @@ void Logger::openFile(const std::string& path, const std::string &backup_path)
     file = fopen(path.c_str(), "w");
 }
 
-Logger::Logger()
-    : level(LOG_LEVEL_INFO)
-    , file(nullptr)
+void Logger::print_ansi_escape_code(LogLevel level)
 {
+    const std::map<LogLevel, const char*> level_map = {
+        {LOG_LEVEL_DEBUG, ANSI_ESCAPE_CODE_GREEN},
+        {LOG_LEVEL_INFO, ANSI_ESCAPE_CODE_BLUE},
+        {LOG_LEVEL_WARN, ANSI_ESCAPE_CODE_YELLOW},
+        {LOG_LEVEL_ERROR, ANSI_ESCAPE_CODE_RED},
+        {LOG_LEVEL_FATAL, ANSI_ESCAPE_CODE_RED}
+    };
+
+    if (level_map.count(level))
+    {
+        std::fprintf(stderr, "%s", level_map.at(level));
+    }
 }

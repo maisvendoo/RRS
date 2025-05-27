@@ -48,7 +48,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         LOG_WARN("Fail to read parameter <ExtModelName> in config file: %s", cfg_path.c_str());
         return false;
     }
-    
+
     QString animationsDir = "";
     QString textureDir = "";
     QString soundsDir = "";
@@ -153,7 +153,7 @@ void VehicleExterior::load_sounds(const std::string &sounds_dir, SoundManager *s
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleExterior::load_displays(const std::string &cfg_path)
+void VehicleExterior::load_displays([[maybe_unused]] const std::string &cfg_path)
 {
 // TODO
 }

@@ -5,8 +5,8 @@
 //
 //------------------------------------------------------------------------------
 UpdateSoundManagerHandler::UpdateSoundManagerHandler(vsg::ref_ptr<vsg::Camera> camera, SoundManager *sm)
-    : _lookAt(camera->viewMatrix.cast<vsg::LookAt>())
-    , _sound_manager(sm)
+    : _sound_manager(sm)
+    , _lookAt(camera->viewMatrix.cast<vsg::LookAt>())
 {
     if (!_lookAt)
     {

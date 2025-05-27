@@ -20,7 +20,7 @@ AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
 {
 }
 
-void AnalogRotation::anim_step(float t, float dt)
+void AnalogRotation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = pos - cur_pos;
     if (abs(delta) > 1e-5f)

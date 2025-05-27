@@ -8,7 +8,6 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
-#include <iostream>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -142,12 +141,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             vsg::CopyOp copyop;
             auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
 
-            MaterialAnimationVisitorCreateInfo mav_create_info = {
-                .pdo = inner_pdo,
-                .duplicate = inner_duplicate,
-                .animations = animations,
-                .cfg_reader = cfg
-            };
+            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, animations, cfg};
 
             MaterialAnimationVisitor mav(mav_create_info);
             transform.accept(mav);
@@ -197,12 +191,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             vsg::CopyOp copyop;
             auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
 
-            MaterialAnimationVisitorCreateInfo mav_create_info = {
-                .pdo = inner_pdo,
-                .duplicate = inner_duplicate,
-                .animations = animations,
-                .cfg_reader = cfg
-            };
+            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, animations, cfg};
 
             MaterialAnimationVisitor mav(mav_create_info);
             group.accept(mav);

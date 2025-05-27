@@ -27,7 +27,7 @@ std::vector<vsg::ref_ptr<vsg::Node>> GUIParams::nodes;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, vsg::ref_ptr<vsg::Options> options)
+MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vsg::Options> options)
     : params(in_params)
 {
     ImGui::CreateContext();
@@ -48,14 +48,14 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, vsg::ref_ptr<vsg::Options> optio
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MyGui::compile(vsg::Context& context)
+void MyGui::compile([[maybe_unused]] vsg::Context& context)
 {
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MyGui::record(vsg::CommandBuffer& cb) const
+void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 {
     bool is_modified_key = ImGui::IsKeyPressed(ImGuiKey_LeftShift) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightShift) ||
@@ -197,7 +197,7 @@ void MyGui::showQuitDialog() const
     int bw = w / 4;
     int bh = h / 4;
 
-    ImGui::SetCursorPos(ImVec2(cx - 3 * bw / 2, cy - bh / 2));
+    ImGui::SetCursorPos(ImVec2(static_cast<int>(cx - 3 * bw / 2), static_cast<int>(cy - bh / 2)));
     if (ImGui::Button(u8"Да", ImVec2(bw, bh)))
     {
         ImGui::SetCursorPos(ImVec2(cx, cy));
@@ -206,7 +206,7 @@ void MyGui::showQuitDialog() const
             viewer->close();
     }
 
-    ImGui::SetCursorPos(ImVec2(cx + bw / 2, cy - bh / 2));
+    ImGui::SetCursorPos(ImVec2(static_cast<int>(cx + bw / 2), static_cast<int>(cy - bh / 2)));
     if (ImGui::Button(u8"Нет", ImVec2(bw, bh)))
     {
         ImGui::SetCursorPos(ImVec2(cx, cy));
@@ -347,7 +347,7 @@ void MyGui::printObject(const vsg::ref_ptr<vsg::Object>& object) const
     }
 
     ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%p", object.get());
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%p", reinterpret_cast<void*>(object.get()));
 
     if (show_tree_node)
     {

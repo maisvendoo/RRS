@@ -20,8 +20,6 @@ public:
     AnalogRotation(vsg::MatrixTransform* transform);
 
 private:
-    float min_angle = 0.0f;
-    float max_angle = vsg::PIf;
     float angle = 0.0f;
 
     float cur_pos = 0.0f;
