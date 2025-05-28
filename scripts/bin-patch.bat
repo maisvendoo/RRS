@@ -16,7 +16,7 @@ xcopy /F /Y ..\..\modules\freightcar\*.dll %RRS_DEV_ROOT%\modules\freightcar\
 xcopy /F /Y ..\..\plugins\*.dll %RRS_DEV_ROOT%\plugins
 
 rem Копируем шейдеры
-xcopy /Y /S %DATA_PATH%\shaders\*.spv %RRS_DEV_ROOT%\data\shaders\
+xcopy /Y /S %DATA_PATH%\shaders\*.* %RRS_DEV_ROOT%\data\shaders\
 
 rem Копируем конфиги
 
