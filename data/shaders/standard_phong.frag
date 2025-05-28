@@ -147,8 +147,17 @@ void main()
     float ambientOcclusion = 1.0;
 
 #ifdef VSG_ALPHA_TEST
-    if (material.alphaMask == 1.0f && diffuseColor.a < material.alphaMaskCutoff) discard;
+    if (material.alphaMask == 1.0f && diffuseColor.a < material.alphaMaskCutoff)
+#else
+    if (baseColor.a < 0.04)
 #endif
+    {
+        gl_FragDepth = 0.0f;
+        outColor = vec4(0.0, 0.0, 0.0, 0.0);
+        return;
+    }
+
+    gl_FragDepth = gl_FragCoord.z;
 
 #ifdef VSG_EMISSIVE_MAP
     emissiveColor *= texture(emissiveMap, texCoord0.st);
