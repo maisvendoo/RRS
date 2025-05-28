@@ -63,13 +63,6 @@ private:
     void initCommandGraph();
     void initViewer();
 
-    // bool initEngineSettings();
-
-    // void initEnvironmentLight(vsg::vec4 color, float power, float psi, float theta);
-
-    // bool initDisplay();
-
-
     void initTCPclient();
 
     bool loadRoute();

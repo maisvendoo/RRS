@@ -218,15 +218,15 @@ void RouteViewer::initWindowTraits()
         return VK_SAMPLE_COUNT_1_BIT;
     };
 
-    std::uint32_t vulkan_version;
-    vkEnumerateInstanceVersion(&vulkan_version);
+    // std::uint32_t vulkan_version;
+    // vkEnumerateInstanceVersion(&vulkan_version);
 
     windowTraits = vsg::WindowTraits::create();
     windowTraits->x = settings.x;
     windowTraits->y = settings.y;
     windowTraits->width = settings.width;
     windowTraits->height = settings.height;
-    windowTraits->vulkanVersion = vulkan_version;
+    // windowTraits->vulkanVersion = vulkan_version; // vsg и так берет самую новую версию
     // windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_MAILBOX_KHR; ???
     // windowTraits->swapchainPreferences.imageCount = 3;
     windowTraits->screenNum = settings.screen_number;
@@ -237,8 +237,9 @@ void RouteViewer::initWindowTraits()
     // windowTraits->debugLayer = true;
     // windowTraits->debugUtils = true;
 
-    auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create();
-    deviceFeatures->get().samplerAnisotropy = VK_TRUE;
+    // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // vsg и так создает deviceFeatures по умолчанию
+    // deviceFeatures->get().samplerAnisotropy = VK_TRUE; // и выставляет это свойство в true
+    auto deviceFeatures = windowTraits->deviceFeatures;
     deviceFeatures->get().depthClamp = VK_TRUE;
 }
 
@@ -326,7 +327,7 @@ void RouteViewer::initLights()
         }
         else
         {
-            LOG_WARN("Fail to load %s shader: %s", shader_path.c_str());
+            LOG_WARN("Fail to load %s shader: %s", shader_name, shader_path.c_str());
             LOG_INFO("Using default %s shader", shader_name);
         }
     };
