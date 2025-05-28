@@ -324,6 +324,9 @@ void RouteViewer::initLights()
         {
             LOG_INFO("Loaded %s shader: %s", shader_name, shader_path.c_str());
             shader_set->stages.back() = shader_stage;
+
+            // Очищаем все встроенные сохранённые варианты настроек
+            shader_set->variants.clear();
         }
         else
         {
@@ -332,9 +335,9 @@ void RouteViewer::initLights()
         }
     };
 
-    load_custom_shader("standard_flat_shaded.spv", "flat", flat_shader);
-    load_custom_shader("standard_pbr.spv", "PBR", pbr_shader);
-    load_custom_shader("standard_phong.spv", "Phong", phong_shader);
+    load_custom_shader("standard_flat_shaded.frag", "flat", flat_shader);
+    load_custom_shader("standard_pbr.frag", "PBR", pbr_shader);
+    load_custom_shader("standard_phong.frag", "Phong", phong_shader);
 
     // Можем по своему настроить стадии графического конвейера
     vsg::ref_ptr<vsg::VertexInputState> vertexInputState = vsg::VertexInputState::create();
@@ -375,22 +378,23 @@ void RouteViewer::initLights()
     phong_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
 
 #if 0
-        // запись шейдеров в файл
+    // запись шейдеров в файл
         std::string file;
-        file = shaders_dir_path + fs.separator() + "~standard_flat.vsgt";
+        file = shaders_dir_path + fs.separator() + "~custom_flat.vsgt";
         vsg::write(flat_shader, file, options);
-        file = shaders_dir_path + fs.separator() + "~standard_pbr.vsgt";
+        file = shaders_dir_path + fs.separator() + "~custom_pbr.vsgt";
         vsg::write(pbr_shader, file, options);
-        file = shaders_dir_path + fs.separator() + "~standard_phong.vsgt";
+        file = shaders_dir_path + fs.separator() + "~custom_phong.vsgt";
         vsg::write(phong_shader, file, options);
+
         file = shaders_dir_path + fs.separator() + "~default_flat.vsgt";
-        vsg::ref_ptr<vsg::ShaderSet> flat_default = vsg::createFlatShadedShaderSet(options);
+        vsg::ref_ptr<vsg::ShaderSet> flat_default = vsg::createFlatShadedShaderSet();
         vsg::write(flat_default, file, options);
         file = shaders_dir_path + fs.separator() + "~default_pbr.vsgt";
-        vsg::ref_ptr<vsg::ShaderSet> pbr_default = vsg::createPhysicsBasedRenderingShaderSet(options);
+        vsg::ref_ptr<vsg::ShaderSet> pbr_default = vsg::createPhysicsBasedRenderingShaderSet();
         vsg::write(pbr_default, file, options);
         file = shaders_dir_path + fs.separator() + "~default_phong.vsgt";
-        vsg::ref_ptr<vsg::ShaderSet> phong_default = vsg::createPhongShaderSet(options);
+        vsg::ref_ptr<vsg::ShaderSet> phong_default = vsg::createPhongShaderSet();
         vsg::write(phong_default, file, options);
         exit(0);
 #endif
