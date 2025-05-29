@@ -209,6 +209,12 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         return false;
     }
 
+    // Добавляем в список для конвертации модель неба
+    Label skybox_label = "sky";
+    RelativeModelPath skybox_model_path = "/models/sky.dmd";
+    RelativeTexturePath skybox_texture_path = "/textures/sky_day.bmp";
+    objects.insert({ skybox_model_path, {{skybox_label, skybox_texture_path}} });
+
     // Создаем каталог под новый маршрут
     fs::create_directories(out_gltf_route_path);
     // Создаем каталог под текстуры
@@ -315,7 +321,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                                     out_relative_bin_path,
                                     out_relative_texture_path))
             {
-                new_objects.insert({label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf"});
+                // Записываем новые модели, кроме неба
+                if (label != skybox_label)
+                {
+                    new_objects.insert({label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf"});
+                }
             }
         }
     }
