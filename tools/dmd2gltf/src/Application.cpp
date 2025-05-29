@@ -300,7 +300,8 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             // Читаем файл модели
             Geometry model_data;
             std::string texture_ext = fs::path(in_texture_path).extension().string();
-            model_data.is_TGA_texture = texture_ext == ".tga";
+            model_data.is_reversed_texture_coord = (texture_ext != ".tga");
+            model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
             if (!get_dmd_model_data(in_dmd_model_path, model_data))
             {
                 std::cerr << "Failed to open " << in_dmd_model_path << std::endl;
@@ -364,7 +365,9 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     }
 
     std::string texture_ext = fs::path(in_texture_path).extension().string();
-    model_data.is_TGA_texture = texture_ext == ".tga";
+    model_data.is_reversed_texture_coord = (texture_ext != ".tga");
+    model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
+//    model_data.is_TGA_texture = texture_ext == ".tga";
 
     auto last_slash_pos = out_gltf_model_path.find_last_of(separator());
 
@@ -486,7 +489,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     {
         model_file >> tex_coord.x >> tex_coord.y >> buffer;
 
-        if (!model_data.is_TGA_texture)
+        if (model_data.is_reversed_texture_coord)
         {
             tex_coord.y = 1.0f - tex_coord.y;
         }
@@ -623,6 +626,12 @@ bool Application::generate_gltf_model(Geometry& model_data,
         return false;
     }
 
+    std::string blend = "";
+    if (model_data.is_blend_material)
+    {
+        blend = ",\n            \"alphaMode\": \"BLEND\"";
+    }
+
     gltf_file << "{\n"
         "    \"asset\": {\n"
         "        \"version\": \"2.0\"\n"
@@ -723,8 +732,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "                    \"index\": 0,\n"
         "                    \"texCoord\": 0\n"
         "                }\n"
-        "            },\n"
-        "            \"alphaMode\": \"BLEND\"\n"
+        "            }" << blend <<"\n"
         "        }\n"
         "    ],\n"
         "    \"meshes\": [\n"

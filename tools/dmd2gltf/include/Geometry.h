@@ -27,7 +27,8 @@ struct Vertex
 struct Geometry
 {
     std::string model_file_name = "";
-    bool is_TGA_texture = false;
+    bool is_reversed_texture_coord = false;
+    bool is_blend_material = false;
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
 };
