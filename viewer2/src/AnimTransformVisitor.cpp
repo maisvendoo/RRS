@@ -8,6 +8,7 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
+#include <iostream>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -104,31 +105,35 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         QDomNode config_section;
         ProcAnimation* animation = nullptr;
 
-        // Вылет где-то тут!!!!!!
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
         {
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&transform);
+
             auto new_transform = vsg::ref_ptr(transform.clone()->cast<vsg::MatrixTransform>());
             duplicate->insert(&transform, new_transform);
 
             animation = new AnalogRotation(new_transform.get());
+            std::cout << name << "    " << vsg::ref_ptr(&transform) << std::endl;
+            std::cout << "animation on: " << new_transform << std::endl;
             animation->load(cfg);
 
             return animation;
         }
-        // !!!!!!!!!!!!!!!!!
 
         config_section = cfg.getFirstSection("AnalogTranslation");
         if (!config_section.isNull())
         {
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&transform);
+
             auto new_transform = vsg::ref_ptr(transform.clone()->cast<vsg::MatrixTransform>());
             duplicate->insert(&transform, new_transform);
 
             animation = new AnalogTranslation(new_transform.get());
+            std::cout << name << "    " << vsg::ref_ptr(&transform) << std::endl;
+            std::cout << "animation on: " << new_transform << std::endl;
             animation->load(cfg);
 
             return animation;

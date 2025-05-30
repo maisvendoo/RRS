@@ -1,7 +1,9 @@
 #ifndef LOAD_MODEL_OPERATION_H
 #define LOAD_MODEL_OPERATION_H
 
+#include <iostream>
 #include <vsg/app/Viewer.h>
+#include <vsg/core/Object.h>
 #include <vsg/io/read.h>
 // #include <vsg/nodes/DepthSorted.h>
 #include <vsgXchange/all.h>
@@ -103,11 +105,10 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
         LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
         // Custom animations for model
-        vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo = vsg::PropagateDynamicObjects::create();
+        auto pdo = vsg::PropagateDynamicObjects::create();
 
         vsg::CopyOp copyop;
-        copyop.duplicate = new vsg::Duplicate;
-        vsg::ref_ptr<vsg::Duplicate> duplicate = copyop.duplicate;
+        auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
         int old_size = animations->animations.size();
 
@@ -134,8 +135,19 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
             }
 
             duplicate->insert(node);
+
+            for (auto& [o, n] : duplicate->duplicates)
+            {
+                std::cout << "before: " << o << " -> " << n << std::endl;
+            }
+
             node = copyop(node);
         }
+
+        for (auto& [o, n] : duplicate->duplicates)
+            {
+                std::cout << "after: " << o << " -> " << n << std::endl;
+            }
 
         // Compile loaded model and add it to viewer
         vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
