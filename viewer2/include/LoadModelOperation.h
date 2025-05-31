@@ -8,8 +8,10 @@
 // #include <vsg/nodes/DepthSorted.h>
 #include <vsgXchange/all.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
+#include <vsg/animation/FindAnimations.h>
 
 #include "AnimTransformVisitor.h"
+#include "FindModelAnimation.h"
 #include "Logger.h"
 
 //------------------------------------------------------------------------------
@@ -104,13 +106,24 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
 
         LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
+        int old_size = animations->animations.size();
+        {
+            // Model's animations
+            FindModelAnimationsCreateInfo fma_create_info = {node, animations, animations_dir};
+            vsg::ref_ptr<FindModelAnimations> find_model_animations = FindModelAnimations::create(fma_create_info);
+            LOG_INFO("Operation: loaded %u (total: %u) model animations from %s",
+                     animations->animations.size() - old_size,
+                     animations->animations.size(),
+                     animations_dir.c_str());
+        }
+
+        old_size = animations->animations.size();
+
         // Custom animations for model
         auto pdo = vsg::PropagateDynamicObjects::create();
 
         vsg::CopyOp copyop;
         auto duplicate = copyop.duplicate = new vsg::Duplicate;
-
-        int old_size = animations->animations.size();
 
         AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, animations};
 
