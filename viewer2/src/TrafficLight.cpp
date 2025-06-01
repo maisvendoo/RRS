@@ -135,7 +135,6 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
                                                               transform,
                                                               model_filename_path,
                                                               animations_dir,
-                                                              textures_dir, // TODO
                                                               options,
                                                               animations));
 //    GUIParams::nodes.emplace_back(transform);

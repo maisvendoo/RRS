@@ -62,14 +62,12 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
                        vsg::ref_ptr<vsg::Group> in_attachment_point,
                        const std::string& in_model_filename_path,
                        const std::string& in_animations_dir,
-                       const std::string& in_textures_dir, // TODO
                        vsg::ref_ptr<vsg::Options> in_options,
                        animations_t* in_animations)
         : viewer(in_viewer)
         , attachment_point(in_attachment_point)
         , model_filename_path(in_model_filename_path)
         , animations_dir(in_animations_dir)
-        , textures_dir(in_textures_dir) // TODO
         , options(in_options)
         , animations(in_animations)
     {
@@ -80,7 +78,6 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     vsg::ref_ptr<vsg::Group> attachment_point = nullptr;
     std::string model_filename_path = "";
     std::string animations_dir = "";
-    std::string textures_dir = ""; // TODO
     vsg::ref_ptr<vsg::Options> options = nullptr;
     animations_t* animations;
 
