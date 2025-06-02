@@ -10,8 +10,10 @@
 #include <vsg/nodes/Node.h>
 #include <vsgXchange/all.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
+#include <vsg/animation/FindAnimations.h>
 
 #include "AnimTransformVisitor.h"
+#include "FindModelAnimation.h"
 #include "Logger.h"
 
 //------------------------------------------------------------------------------
@@ -62,14 +64,12 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
                        vsg::ref_ptr<vsg::Group> in_attachment_point,
                        const std::string& in_model_filename_path,
                        const std::string& in_animations_dir,
-                       const std::string& in_textures_dir, // TODO
                        vsg::ref_ptr<vsg::Options> in_options,
                        animations_t* in_animations)
         : viewer(in_viewer)
         , attachment_point(in_attachment_point)
         , model_filename_path(in_model_filename_path)
         , animations_dir(in_animations_dir)
-        , textures_dir(in_textures_dir) // TODO
         , options(in_options)
         , animations(in_animations)
     {
@@ -80,7 +80,6 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     vsg::ref_ptr<vsg::Group> attachment_point = nullptr;
     std::string model_filename_path = "";
     std::string animations_dir = "";
-    std::string textures_dir = ""; // TODO
     vsg::ref_ptr<vsg::Options> options = nullptr;
     animations_t* animations;
 
@@ -106,13 +105,24 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
 
         LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
+        int old_size = animations->animations.size();
+        {
+            // Model's animations
+            FindModelAnimationsCreateInfo fma_create_info = {node, animations, animations_dir};
+            vsg::ref_ptr<FindModelAnimations> find_model_animations = FindModelAnimations::create(fma_create_info);
+            LOG_INFO("Operation: loaded %u (total: %u) model animations from %s",
+                     animations->animations.size() - old_size,
+                     animations->animations.size(),
+                     animations_dir.c_str());
+        }
+
+        old_size = animations->animations.size();
+
         // Custom animations for model
         auto pdo = vsg::PropagateDynamicObjects::create();
 
         vsg::CopyOp copyop;
         auto duplicate = copyop.duplicate = new vsg::Duplicate;
-
-        int old_size = animations->animations.size();
 
         AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, animations};
 

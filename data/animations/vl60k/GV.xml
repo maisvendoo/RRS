@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<ModelAnimation>
+	<AnalogRotation>
 		<SignalID>42</SignalID>
-		<Time>0.1</Time>
-	</ModelAnimation>
+		<Duration>10.0</Duration>
+		<Axis>0.0 0.0 1.0</Axis>
+	</AnalogRotation>
+
+	<KeyPoint>
+		<Param>0.0</Param>
+		<Value>0.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>1.0</Param>
+		<Value>60.0</Value>
+	</KeyPoint>
+
 </Config>

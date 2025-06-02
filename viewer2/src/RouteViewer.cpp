@@ -11,6 +11,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
+#include "Skybox.h"
 
 #include "sound-manager.h"
 #include "tcp-client.h"
@@ -552,6 +553,20 @@ bool RouteViewer::loadRoute()
     const std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
     settings.route_dir_full_path = route_dir_path;
 
+    // Модель неба
+    std::string skybox_model_filepath = fs.combinePath(route_dir_path, "models");
+    skybox_model_filepath = fs.combinePath(skybox_model_filepath, "sky.gltf");
+
+    Skybox skybox(skybox_model_filepath, options);
+    root->addChild(skybox.getNode());
+#if 1
+        // запись неба в файл
+        std::string file;
+        file = route_dir_path + fs.separator() + "~loaded_skybox.vsgt";
+        vsg::write(skybox.getNode(), file, options);
+#endif
+
+    // Загрузка информации о моделях в маршруте
     Route route;
 
     RouteLoader loader(settings.route_dir_full_path);
@@ -559,6 +574,7 @@ bool RouteViewer::loadRoute()
     loader.parse_objects_ref(route);
     loader.parse_route_map(route);
 
+    // Создание PagedLOD для моделей в маршруте
     for (auto& [label, transform] : route.transforms)
     {
         auto found_it = route.object_ref.find(label);
@@ -589,14 +605,7 @@ bool RouteViewer::loadRoute()
         auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
         auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
         matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
-/*
-        // Нужен ли depthSorted? Нет, не нужен!
-        auto depthSorted = vsg::DepthSorted::create();
-        depthSorted->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 1.0);
-        depthSorted->child = pagedLOD;
 
-        matrix->addChild(depthSorted);
-*/
         matrix->addChild(pagedLOD);
         //GUIParams::nodes.emplace_back(matrix);
 
@@ -608,6 +617,7 @@ bool RouteViewer::loadRoute()
 
     viewer->update();
 
+    // Указываем грузить модели в один поток, иначе будут дубликаты в памяти
     auto resourceHints = vsg::ResourceHints::create();
     resourceHints->numDatabasePagerReadThreads = 1;
     resourceHints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию

@@ -40,7 +40,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     QString sec_name = "Vehicle";
 
-    // Reading data about body's 3D-model and texture
+    // Reading data about body's 3D-model
     QString modelName = "";
 
     cfg.getString(sec_name, "ExtModelName", modelName);
@@ -51,13 +51,11 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     }
 
     QString animationsDir = "";
-    QString textureDir = "";
     QString soundsDir = "";
     QString modelShift = "";
     vsg::dvec3 shift(0.0, 0.0, 0.0);
 
     cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
-    cfg.getString(sec_name, "ExtTexturesDir", textureDir);
     cfg.getString(sec_name, "SoundDir", soundsDir);
     if (cfg.getString(sec_name, "ModelShift", modelShift))
     {
@@ -72,7 +70,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
     std::string animations_dir = animationsDir.toStdString();
-    std::string textures_dir = textureDir.toStdString();
     std::string sounds_dir = soundsDir.toStdString();
 
     // Load model
@@ -80,13 +77,11 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
                                                               vehicle_node,
                                                               model_filename_path,
                                                               animations_dir,
-                                                              textures_dir, // TODO
                                                               options,
                                                               animations));
 
-    // Reading data about cabine's 3D-model and texture
+    // Reading data about cabine's 3D-model
     modelName = "";
-    textureDir = "";
     modelShift = "";
     shift = {0.0, 0.0, 0.0};
 
@@ -94,8 +89,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     if (!modelName.isEmpty())
     {
-        cfg.getString(sec_name, "CabineTexturesDir", textureDir);
-
         if (cfg.getString(sec_name, "CabineShift", modelShift))
             {
                 std::istringstream ss(modelShift.toStdString());
@@ -114,7 +107,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
                                                                       cabine_node,
                                                                       model_filename_path,
                                                                       animations_dir,
-                                                                      textures_dir, // TODO
                                                                       options,
                                                                       animations));
     }

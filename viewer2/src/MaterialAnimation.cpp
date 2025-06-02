@@ -38,7 +38,12 @@ bool MaterialAnimation::load_config(CfgReader &cfg)
     if (cfg.getDouble(sec_name, "Duration", tmp_dbl))
         duration = tmp_dbl;
 
-    cfg.getBool(sec_name, "FixedSignal", is_fixed_signal);
+    tmp_dbl = 0.0;
+    if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
+    {
+        fixed_signal = static_cast<float>(tmp_dbl);
+        is_fixed_signal = true;
+    }
 
     QString tmp_qstr = "0.0 0.0 0.0";
     if (cfg.getString(sec_name, "EmissionColor", tmp_qstr))
