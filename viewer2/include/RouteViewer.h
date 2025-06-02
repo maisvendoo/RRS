@@ -43,6 +43,7 @@ private:
     void loadNetworkSettings(CfgReader& cfg, const QString& section);
     void loadLoggerSettings(CfgReader& cfg, const QString& section);
     void loadWindowSettings(CfgReader& cfg, const QString& section);
+    void loadLightSettings(CfgReader& cfg, const QString& section);
     void loadCameraSettings(CfgReader& cfg, const QString& section);
     void loadFreeCameraSettings(CfgReader& cfg, const QString& section);
     void loadCabineCameraSettings(CfgReader& cfg, const QString& section);
