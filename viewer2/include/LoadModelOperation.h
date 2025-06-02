@@ -1,11 +1,13 @@
 #ifndef LOAD_MODEL_OPERATION_H
 #define LOAD_MODEL_OPERATION_H
 
-#include <iostream>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Object.h>
+#include <vsg/io/Options.h>
 #include <vsg/io/read.h>
 // #include <vsg/nodes/DepthSorted.h>
+#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/Node.h>
 #include <vsgXchange/all.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 #include <vsg/animation/FindAnimations.h>
@@ -145,19 +147,9 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
             }
 
             duplicate->insert(node);
-
-            for (auto& [o, n] : duplicate->duplicates)
-            {
-                std::cout << "before: " << o << " -> " << n << std::endl;
-            }
-
             node = copyop(node);
+            atv.reconfigure_animations();
         }
-
-        for (auto& [o, n] : duplicate->duplicates)
-            {
-                std::cout << "after: " << o << " -> " << n << std::endl;
-            }
 
         // Compile loaded model and add it to viewer
         vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
