@@ -1,5 +1,6 @@
 #include "VehicleExterior.h"
 
+#include "MyGui.h"
 #include "filesystem.h"
 #include "CfgReader.h"
 #include "LoadModelOperation.h"
@@ -122,7 +123,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         transform->setValue("name", "only vehicle");
     }
 
-    // GUIParams::nodes.emplace_back(transform);
+    GUIParams::nodes.emplace_back(transform);
 
     modelShift = "";
     if (cfg.getString(sec_name, "DriverPos", modelShift))

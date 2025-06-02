@@ -4,8 +4,11 @@
 #include <iostream>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Object.h>
+#include <vsg/io/Options.h>
 #include <vsg/io/read.h>
 // #include <vsg/nodes/DepthSorted.h>
+#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/Node.h>
 #include <vsgXchange/all.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
@@ -121,33 +124,65 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
                  animations->animations.size(),
                  animations_dir.c_str());
 
+        std::cout << "animations:" << std::endl;
+
         node->traverse(*pdo);
 
         // Copy all animated parts of shared model for independent behaviour
         if (!pdo->dynamicObjects.empty())
         {
+            std::cout << "pdo:" << std::endl;
             for (auto& object : pdo->dynamicObjects)
             {
+                std::string name;
+                object->getValue("name", name);
+                std::cout << "    " << object->className() << " " << name << " - " << object << std::endl;
                 if (!duplicate->contains(object))
                 {
                     duplicate->insert(object);
                 }
             }
 
-            duplicate->insert(node);
-
+            std::cout << "before:" << std::endl;
             for (auto& [o, n] : duplicate->duplicates)
             {
-                std::cout << "before: " << o << " -> " << n << std::endl;
+                std::string name;
+                o->getValue("name", name);
+                if (name.empty())
+                {
+                    std::cout << "    " << o->className() << " - " << o << " -> " << n << std::endl;
+                }
+                else
+                {
+                    std::cout << "    " << o->className() << " " << name << " - " << o << " -> " << n << std::endl;
+                }
+                if (auto t = o->cast<vsg::MatrixTransform>())
+                {
+                    std::cout << "    children:" << std::endl;
+                    for (const auto& child : t->children)
+                    {
+                        std::cout << "        " << child << std::endl;
+                    }
+                }
             }
 
-            node = copyop(node);
+            node = vsg::ref_ptr(node->clone(copyop)->cast<vsg::Node>());
         }
 
+        std::cout << "after:" << std::endl;
         for (auto& [o, n] : duplicate->duplicates)
+        {
+            std::cout << "    " << o << " -> " << n << std::endl;
+
+            if (auto t = n->cast<vsg::MatrixTransform>())
             {
-                std::cout << "after: " << o << " -> " << n << std::endl;
+                std::cout << "    children:" << std::endl;
+                for (const auto& child : t->children)
+                {
+                    std::cout << "        " << child << std::endl;
+                }
             }
+        }
 
         // Compile loaded model and add it to viewer
         vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
