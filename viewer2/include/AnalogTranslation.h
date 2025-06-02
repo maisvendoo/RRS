@@ -18,6 +18,8 @@ class AnalogTranslation : public ProcAnimation
 public:
     AnalogTranslation(vsg::MatrixTransform* transform);
 
+    void update();
+
 private:
     float motion = 0.0f;
 
@@ -29,8 +31,6 @@ private:
     void anim_step(float t, float dt) override;
 
     bool load_config(CfgReader& cfg) override;
-
-    void update();
 };
 
 #endif // ANALOG_TRANSLATION_H

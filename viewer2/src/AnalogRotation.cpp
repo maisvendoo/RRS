@@ -20,6 +20,24 @@ AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
 {
 }
 
+void AnalogRotation::update()
+{
+    if (keypoints.empty())
+    {
+        return;
+    }
+
+    angle = interpolate(cur_pos);
+
+    if (!infinity)
+    {
+        angle = std::clamp(angle, keypoints.front().value, keypoints.back().value);
+    }
+
+    vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
+    transform->matrix = matrix * rotate;
+}
+
 void AnalogRotation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = pos - cur_pos;
@@ -64,24 +82,6 @@ bool AnalogRotation::load_config(CfgReader& cfg)
         axis = vsg::normalize(axis);
     }
 
-    update();
+    // update();
     return true;
-}
-
-void AnalogRotation::update()
-{
-    if (keypoints.empty())
-    {
-        return;
-    }
-
-    angle = interpolate(cur_pos);
-
-    if (!infinity)
-    {
-        angle = std::clamp(angle, keypoints.front().value, keypoints.back().value);
-    }
-
-    vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
-    transform->matrix = matrix * rotate;
 }
