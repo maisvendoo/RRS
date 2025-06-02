@@ -8,7 +8,6 @@
 #include "MaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 
-#include <iostream>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -95,6 +94,15 @@ void AnimTransformVisitor::apply(vsg::Group& group)
     group.traverse(*this);
 }
 
+void AnimTransformVisitor::reconfigure_animations()
+{
+    for (const auto& deferred_animation : deferred_animations)
+    {
+        auto new_transform = duplicate->duplicates[deferred_animation.node]->cast<vsg::MatrixTransform>();
+        deferred_animation.animation->setTransform(new_transform);
+    }
+}
+
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
 {
     std::string file_path = animations_dir + name + ".xml";
@@ -111,13 +119,10 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&transform);
 
-            auto new_transform = vsg::ref_ptr(transform.clone()->cast<vsg::MatrixTransform>());
-            duplicate->insert(&transform, new_transform);
-
-            animation = new AnalogRotation(new_transform.get());
-            std::cout << name << "    " << vsg::ref_ptr(&transform) << std::endl;
-            std::cout << "animation on: " << new_transform << std::endl;
+            animation = new AnalogRotation(&transform);
             animation->load(cfg);
+
+            deferred_animations.emplace_back(DeferredAnimation{&transform, animation});
 
             return animation;
         }
@@ -128,13 +133,10 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&transform);
 
-            auto new_transform = vsg::ref_ptr(transform.clone()->cast<vsg::MatrixTransform>());
-            duplicate->insert(&transform, new_transform);
-
-            animation = new AnalogTranslation(new_transform.get());
-            std::cout << name << "    " << vsg::ref_ptr(&transform) << std::endl;
-            std::cout << "animation on: " << new_transform << std::endl;
+            animation = new AnalogTranslation(&transform);
             animation->load(cfg);
+
+            deferred_animations.emplace_back(DeferredAnimation{&transform, animation});
 
             return animation;
         }
@@ -169,12 +171,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
             return mav.get_animation();
         }
-
-        // config_section = cfg.getFirstSection("MaterialRGBAnimation");
-        // if (!config_section.isNull())
-        // {
-        //     return nullptr;
-        // }
     }
 
     return nullptr;
@@ -219,12 +215,6 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
             return mav.get_animation();
         }
-
-        // config_section = cfg.getFirstSection("MaterialRGBAnimation");
-        // if (!config_section.isNull())
-        // {
-        //     return nullptr;
-        // }
     }
 
     return nullptr;
