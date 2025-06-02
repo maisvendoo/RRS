@@ -100,6 +100,15 @@ void AnimTransformVisitor::reconfigure_animations()
     {
         auto new_transform = duplicate->duplicates[deferred_animation.node]->cast<vsg::MatrixTransform>();
         deferred_animation.animation->setTransform(new_transform);
+
+        if (auto* rotation = dynamic_cast<AnalogRotation*>(deferred_animation.animation))
+        {
+            rotation->update();
+        }
+        else if (auto* translation = dynamic_cast<AnalogTranslation*>(deferred_animation.animation))
+        {
+            translation->update();
+        }
     }
 }
 

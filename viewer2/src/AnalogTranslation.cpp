@@ -18,6 +18,20 @@ AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
 {
 }
 
+void AnalogTranslation::update()
+{
+    if (keypoints.empty())
+    {
+        return;
+    }
+
+    motion = interpolate(cur_pos);
+    motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
+
+    vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));
+    transform->matrix = matrix * translate;
+}
+
 void AnalogTranslation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
@@ -57,20 +71,6 @@ bool AnalogTranslation::load_config(CfgReader &cfg)
         // axis = vsg::normalize(axis);
     }
 
-    update();
+    // update();
     return true;
-}
-
-void AnalogTranslation::update()
-{
-    if (keypoints.empty())
-    {
-        return;
-    }
-
-    motion = interpolate(cur_pos);
-    motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
-
-    vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));
-    transform->matrix = matrix * translate;
 }

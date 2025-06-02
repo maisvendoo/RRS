@@ -19,6 +19,8 @@ class AnalogRotation : public ProcAnimation
 public:
     AnalogRotation(vsg::MatrixTransform* transform);
 
+    void update();
+
 private:
     float angle = 0.0f;
 
@@ -32,8 +34,6 @@ private:
     void anim_step(float t, float dt) override;
 
     bool load_config(CfgReader &cfg) override;
-
-    void update();
 };
 
 #endif // ANALOG_ROTATION_H
