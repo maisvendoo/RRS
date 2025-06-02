@@ -7022,7 +7022,7 @@
 		},
 		{
 			"sampler":0,
-			"source":3
+			"source":0
 		},
 		{
 			"sampler":0,
@@ -7030,11 +7030,15 @@
 		},
 		{
 			"sampler":0,
-			"source":4
+			"source":3
 		},
 		{
 			"sampler":0,
-			"source":4
+			"source":3
+		},
+		{
+			"sampler":0,
+			"source":3
 		},
 		{
 			"sampler":0,
@@ -7054,11 +7058,7 @@
 		},
 		{
 			"sampler":0,
-			"source":8
-		},
-		{
-			"sampler":0,
-			"source":8
+			"source":7
 		}
 	],
 	"images":[
@@ -7076,11 +7076,6 @@
 			"mimeType":"image/png",
 			"name":"_367",
 			"uri":"textures/_367.png"
-		},
-		{
-			"mimeType":"image/png",
-			"name":"alsn",
-			"uri":"textures/alsn-1.png"
 		},
 		{
 			"mimeType":"image/png",
