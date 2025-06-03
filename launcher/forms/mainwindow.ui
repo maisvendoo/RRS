@@ -30,7 +30,7 @@
      </sizepolicy>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_local_server">
      <attribute name="title">
@@ -840,6 +840,16 @@
           <widget class="QCheckBox" name="cbDoubleBuffer">
            <property name="text">
             <string>Double buffering</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbVSync">
+           <property name="text">
+            <string>VSync</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
            </property>
           </widget>
          </item>

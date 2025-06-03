@@ -127,6 +127,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->cbDoubleBuffer, QOverload<int>::of(&QCheckBox::stateChanged),
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
 
+    connect(ui->cbVSync, QOverload<int>::of(&QCheckBox::stateChanged),
+            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
+
     connect(ui->cbWindowDecoration, QOverload<int>::of(&QCheckBox::stateChanged),
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
 
@@ -1423,6 +1426,7 @@ const   QString MainWindow::ZFAR = "zFar";
 const   QString MainWindow::SCREEN_NUM = "ScreenNumber";
 const   QString MainWindow::WIN_DECOR = "WindowDecoration";
 const   QString MainWindow::DOUBLE_BUFF = "DoubleBuffer";
+const   QString MainWindow::VSYNC = "VSync";
 const   QString MainWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString MainWindow::VIEW_DIST = "ViewDistance";
 
@@ -1477,6 +1481,10 @@ void MainWindow::loadGraphicsSettings(QString file_name)
         int double_buff = 0;
         cfg.getInt(secName, DOUBLE_BUFF, double_buff);
         fd_list.append(QPair<QString, QVariant>(DOUBLE_BUFF, double_buff));
+
+        int vsync = 0;
+        cfg.getInt(secName, VSYNC, vsync);
+        fd_list.append(QPair<QString, QVariant>(VSYNC, vsync));
 
         double view_dist = 0;
         cfg.getDouble(secName, VIEW_DIST, view_dist);
@@ -1540,6 +1548,10 @@ void MainWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui
                 ui->cbDoubleBuffer->setCheckState(Qt::CheckState::Checked) :
                 ui->cbDoubleBuffer->setCheckState(Qt::CheckState::Unchecked);
 
+    findSetting(VSYNC, fd_list).second == 1 ?
+        ui->cbVSync->setCheckState(Qt::CheckState::Checked) :
+        ui->cbVSync->setCheckState(Qt::CheckState::Unchecked);
+
     ui->spScreenNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
     ui->dspFovY->setValue(findSetting(FOV_Y, fd_list).second.toDouble());
     ui->dspNear->setValue(findSetting(ZNEAR, fd_list).second.toDouble());
@@ -1581,6 +1593,16 @@ void MainWindow::applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
     else
     {
         fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 0);
+    }
+
+    findSetting(VSYNC, fd_list, idx);
+    if (ui->cbVSync->checkState() == Qt::CheckState::Checked)
+    {
+        fd_list[idx] = QPair<QString, QVariant>(VSYNC, 1);
+    }
+    else
+    {
+        fd_list[idx] = QPair<QString, QVariant>(VSYNC, 0);
     }
 
     findSetting(WIN_DECOR, fd_list, idx);
