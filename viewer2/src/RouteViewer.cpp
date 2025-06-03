@@ -164,6 +164,7 @@ void RouteViewer::loadSettings()
         section = "Viewer";
         loadLoggerSettings(cfg, section);
         loadWindowSettings(cfg, section);
+        loadLightSettings(cfg, section);
         loadCameraSettings(cfg, section);
         loadFreeCameraSettings(cfg, section);
         loadCabineCameraSettings(cfg, section);
@@ -432,15 +433,15 @@ void RouteViewer::initLights()
 
     // Настраиваем общее освещение
     ambient = vsg::AmbientLight::create();
-    ambient->color = vsg::vec3(1.0f, 1.0f, 1.0f);
-    ambient->intensity = 0.1f;
+    ambient->color = vsg::vec3(settings.ambient_color);
+    ambient->intensity = static_cast<float>(settings.ambient_intensity);
     root->addChild(ambient);
 
     // Настраиваем солнечное освещение
     sun = vsg::DirectionalLight::create();
-    sun->color = vsg::vec3(1.0f, 1.0f, 1.0f);
-    sun->intensity = 1.0f;
-    sun->direction = vsg::normalize(vsg::vec3(1.0f, 1.0f, -1.0f));
+    sun->color = vsg::vec3(settings.sun_color);
+    sun->intensity = static_cast<float>(settings.sun_intensity);
+    sun->direction = vsg::normalize(settings.sun_direction);
     sun->shadowSettings = shadowSettings;
     root->addChild(sun);
 }

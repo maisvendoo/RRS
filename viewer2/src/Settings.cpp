@@ -74,10 +74,49 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadLightSettings(CfgReader& cfg, const QString& section)
+{
+    cfg.getDouble(section, "ShadowDistance", settings.shadow_distance);
+
+    cfg.getDouble(section, "AmbientIntensity", settings.ambient_intensity);
+
+    QString ambientColor = "1.0 1.0 1.0";
+    if (cfg.getString(section, "AmbientColor", ambientColor))
+    {
+        std::istringstream stream(ambientColor.toStdString());
+        stream >> settings.ambient_color.x
+            >> settings.ambient_color.y
+            >> settings.ambient_color.z;
+    }
+
+    cfg.getDouble(section, "SunIntensity", settings.sun_intensity);
+
+    QString sunColor = "1.0 1.0 1.0";
+    if (cfg.getString(section, "SunColor", sunColor))
+    {
+        std::istringstream stream(sunColor.toStdString());
+        stream >> settings.sun_color.x
+            >> settings.sun_color.y
+            >> settings.sun_color.z;
+    }
+
+    QString sunDirection = "1.0 1.0 -1.0";
+    if (cfg.getString(section, "SunDirection", sunDirection))
+    {
+        std::istringstream stream(sunDirection.toStdString());
+        stream >> settings.sun_direction.x
+            >> settings.sun_direction.y
+            >> settings.sun_direction.z;
+    }
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadCameraSettings(CfgReader& cfg, const QString& section)
 {
     cfg.getDouble(section, "ViewDistance", settings.view_distance);
-    cfg.getDouble(section, "ShadowDistance", settings.shadow_distance);
     cfg.getDouble(section, "zNear", settings.zNear);
     cfg.getDouble(section, "zFar", settings.zFar);
     cfg.getDouble(section, "FovY", settings.fovy);
