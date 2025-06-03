@@ -249,6 +249,8 @@ void RouteViewer::initWindowTraits()
         windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
     }
 
+
+
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // vsg и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE; // и выставляет это свойство в true
     auto deviceFeatures = windowTraits->deviceFeatures;
@@ -295,7 +297,7 @@ void RouteViewer::initCamera()
         settings.fovy,
         aspectRatio,
         settings.zNear,
-        settings.zFar
+        settings.view_distance
     );
 
     const vsg::dvec3 route_start_point(0.0, 750.0, 0.0);

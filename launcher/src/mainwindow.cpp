@@ -139,8 +139,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->dspNear, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
 
-    connect(ui->dspFar, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
+    //connect(ui->dspFar, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+    //        this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
 
     connect(ui->spViewDist, QOverload<int>::of(&QSpinBox::valueChanged),
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
@@ -1555,7 +1555,7 @@ void MainWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui
     ui->spScreenNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
     ui->dspFovY->setValue(findSetting(FOV_Y, fd_list).second.toDouble());
     ui->dspNear->setValue(findSetting(ZNEAR, fd_list).second.toDouble());
-    ui->dspFar->setValue(findSetting(ZFAR, fd_list).second.toDouble());
+    //ui->dspFar->setValue(findSetting(ZFAR, fd_list).second.toDouble());
 
     ui->spViewDist->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());
 
@@ -1624,8 +1624,8 @@ void MainWindow::applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
     findSetting(ZNEAR, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(ZNEAR, ui->dspNear->value());
 
-    findSetting(ZFAR, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(ZFAR, ui->dspFar->value());
+    //findSetting(ZFAR, fd_list, idx);
+    //fd_list[idx] = QPair<QString, QVariant>(ZFAR, ui->dspFar->value());
 
     findSetting(VIEW_DIST, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->spViewDist->value());
