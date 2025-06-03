@@ -82,7 +82,7 @@ void MaterialAnimation::update()
     new_emission_color.a = 1.0f;
 
     material_value->value().baseColorFactor = new_color;
-    material_value->value().emissiveFactor = new_emission_color;
+    material_value->value().emissiveFactor = new_emission_color;    
     // material_value->value().diffuseFactor = new_color;
     material_value->dirty();
 }
