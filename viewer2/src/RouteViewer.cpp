@@ -239,6 +239,16 @@ void RouteViewer::initWindowTraits()
     // windowTraits->debugLayer = true;
     // windowTraits->debugUtils = true;
 
+    // Настройка вертикальной синхронизации (упрощенно - вкл/выкл)
+    if (settings.vsync)
+    {
+        windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    }
+    else
+    {
+        windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+    }
+
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // vsg и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE; // и выставляет это свойство в true
     auto deviceFeatures = windowTraits->deviceFeatures;
