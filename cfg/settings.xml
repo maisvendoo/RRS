@@ -12,7 +12,7 @@
         <VehiclesStateUpdateInterval>100</VehiclesStateUpdateInterval>
         <!-- Интервал обновления отладочной строки, мс -->
         <VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
-        <!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов -->
+        <!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов, мс -->
         <ClientDelay>100</ClientDelay>
     </Client>
     <Viewer>
@@ -46,7 +46,7 @@
         <ViewDistance>2000</ViewDistance>
         <!-- Тени: 1 - включены; 0 - отключены -->
         <Shadow>0</Shadow>
-        <!-- Дальностьть прорисовки теней, м -->
+        <!-- Дальность прорисовки теней, м -->
         <ShadowDistance>50.0</ShadowDistance>
         <!-- Количество каскадных карт теней -->
         <ShadowCascade>1</ShadowCascade>
