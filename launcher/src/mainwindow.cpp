@@ -21,7 +21,6 @@
 #include    <QDirIterator>
 #include    <QStringList>
 #include    <QTextStream>
-// #include <thread>
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
@@ -139,9 +138,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->dspNear, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
 
-    //connect(ui->dspFar, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-    //        this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
-
     connect(ui->spViewDist, QOverload<int>::of(&QSpinBox::valueChanged),
             this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
 
@@ -153,24 +149,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbAddTrain, &QPushButton::released, this, &MainWindow::slotAddActiveTrain);
     connect(ui->pbDeleteTrain, &QPushButton::released, this, &MainWindow::slotDeleteActiveTrain);
-/*
-    connect(ui->twActiveTrains, &QTableWidget::cellChanged, this, &MainWindow::slotActiveTrainCellChanged);
-*/
+
     setCentralWidget(ui->twMain);
 
     setFocusPolicy(Qt::ClickFocus);
 
     loadTheme();
-/*
-    ui->twActiveTrains->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->twActiveTrains->horizontalHeader()->setSelectionMode(QAbstractItemView::NoSelection);
-    ui->twActiveTrains->horizontalHeader()->setSectionsClickable(false);
-    ui->twActiveTrains->verticalHeader()->setDefaultSectionSize(18);
-    ui->twActiveTrains->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->twActiveTrains->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->twActiveTrains->setCornerButtonEnabled(false);
-    ui->twActiveTrains->verticalHeader()->setVisible(false);
-*/
+
     QIcon icon(":/images/images/RRS_logo.png");
     setWindowIcon(icon);
 
@@ -1117,14 +1102,7 @@ void MainWindow::slotStartServerPressed()
     {
         return;
     }
-/*
-    // Check are active trains selected
-    if (active_trains.empty())
-    {
-        return;
-    }
-*/
-    //ui->pbStartServer->setEnabled(false);
+
     startSimulator();
 }
 
@@ -1153,8 +1131,6 @@ void MainWindow::slotSimulatorStarted()
     ui->pbStartServer->setStyleSheet("background-color: red;");
     ui->pbStartServer->setText(tr("Stop server"));
     ui->pbStartServer->setEnabled(true);
-
-    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     if (ui->cbAutostartViewer->isChecked())
         startViewer();
@@ -1555,7 +1531,6 @@ void MainWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui
     ui->spScreenNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
     ui->dspFovY->setValue(findSetting(FOV_Y, fd_list).second.toDouble());
     ui->dspNear->setValue(findSetting(ZNEAR, fd_list).second.toDouble());
-    //ui->dspFar->setValue(findSetting(ZFAR, fd_list).second.toDouble());
 
     ui->spViewDist->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());
 
@@ -1624,9 +1599,6 @@ void MainWindow::applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
     findSetting(ZNEAR, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(ZNEAR, ui->dspNear->value());
 
-    //findSetting(ZFAR, fd_list, idx);
-    //fd_list[idx] = QPair<QString, QVariant>(ZFAR, ui->dspFar->value());
-
     findSetting(VIEW_DIST, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->spViewDist->value());
 }
@@ -1640,62 +1612,3 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
 
     editor.editFile(settings_path, "Viewer", fd_list);
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-int MainWindow::getSelectedActiveTrainIndex()
-{
-    QModelIndexList selection = ui->twActiveTrains->selectionModel()->selectedRows();
-
-    if (selection.empty())
-        return -1;
-
-    QModelIndex index = *(selection.end() - 1);
-
-    return index.row();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::updateActiveTrains()
-{
-    for (int i = 0; i < ui->twActiveTrains->rowCount(); ++i)
-    {
-        QComboBox *dir = dynamic_cast<QComboBox *>(ui->twActiveTrains->cellWidget(i, 1));
-        QComboBox *waypoints = dynamic_cast<QComboBox *>(ui->twActiveTrains->cellWidget(i, 2));
-        QDoubleSpinBox *dist = dynamic_cast<QDoubleSpinBox *>(ui->twActiveTrains->cellWidget(i, 3));
-
-        waypoints->clear();
-        if (dir->currentIndex() == 0)
-        {
-            for (auto tp = fwd_train_positions.begin(); tp != fwd_train_positions.end(); ++tp)
-            {
-                waypoints->addItem((*tp).name);
-            }
-
-            if (waypoints->count() != 0)
-            {
-                waypoints->setCurrentIndex(0);
-                active_trains[i].train_position = fwd_train_positions[waypoints->currentIndex()];
-                dist->setValue(fwd_train_positions[waypoints->currentIndex()].traj_coord);
-            }
-        }
-        else
-        {
-            for (auto tp = bwd_train_positions.begin(); tp != bwd_train_positions.end(); ++tp)
-            {
-                waypoints->addItem((*tp).name);
-            }
-
-            if (waypoints->count() != 0)
-            {
-                waypoints->setCurrentIndex(0);
-                active_trains[i].train_position = bwd_train_positions[waypoints->currentIndex()];
-                dist->setValue(bwd_train_positions[waypoints->currentIndex()].traj_coord);
-            }
-        }
-    }
-}
-*/
