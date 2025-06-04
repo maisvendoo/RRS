@@ -36,19 +36,17 @@ struct DeferredAnimation
     ProcAnimation* animation;
 };
 
-class AnimTransformVisitor : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
+class AnimTransformVisitor final : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
 {
 public:
     explicit AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info);
 
     void apply(vsg::Node& node) override;
-    void apply(vsg::MatrixTransform& transform) override;
     void apply(vsg::Group& group) override;
 
     void reconfigure_animations();
 
 private:
-    ProcAnimation* create_animation(const std::string& name, vsg::MatrixTransform& transform);
     ProcAnimation* create_animation(const std::string& name, vsg::Group& group);
 
 private:

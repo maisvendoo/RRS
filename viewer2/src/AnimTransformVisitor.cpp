@@ -42,32 +42,6 @@ void AnimTransformVisitor::apply(vsg::Node& node)
     node.traverse(*this);
 }
 
-void AnimTransformVisitor::apply(vsg::MatrixTransform& transform)
-{
-    std::string name;
-    transform.getValue("name", name);
-
-    if (name.empty())
-    {
-        transform.getValue("Name", name);
-    }
-
-    if (name.empty())
-    {
-        transform.traverse(*this);
-        return;
-    }
-
-    ProcAnimation* animation = create_animation(name, transform);
-    if (animation)
-    {
-        animation->name = name;
-        animations->thread_safe_insert({animation->getSignalID(), animation});
-    }
-
-    transform.traverse(*this);
-}
-
 void AnimTransformVisitor::apply(vsg::Group& group)
 {
     std::string name;
@@ -112,7 +86,7 @@ void AnimTransformVisitor::reconfigure_animations()
     }
 }
 
-ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::MatrixTransform& transform)
+ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
 {
     std::string file_path = animations_dir + name + ".xml";
 
@@ -126,12 +100,12 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         if (!config_section.isNull())
         {
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&transform);
+            pdo->tag(&group);
 
-            animation = new AnalogRotation(&transform);
+            animation = new AnalogRotation(group.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
-            deferred_animations.emplace_back(DeferredAnimation{&transform, animation});
+            deferred_animations.emplace_back(DeferredAnimation{&group, animation});
 
             return animation;
         }
@@ -140,59 +114,15 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
         if (!config_section.isNull())
         {
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&transform);
+            pdo->tag(&group);
 
-            animation = new AnalogTranslation(&transform);
+            animation = new AnalogTranslation(group.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
-            deferred_animations.emplace_back(DeferredAnimation{&transform, animation});
+            deferred_animations.emplace_back(DeferredAnimation{&group, animation});
 
             return animation;
         }
-
-        config_section = cfg.getFirstSection("MaterialAnimation");
-        if (!config_section.isNull())
-        {
-            auto inner_pdo = vsg::PropagateDynamicObjects::create();
-            vsg::CopyOp copyop;
-            auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
-
-            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, cfg};
-
-            MaterialAnimationVisitor mav(mav_create_info);
-            transform.accept(mav);
-            transform.accept(*inner_pdo);
-
-            if (!inner_pdo->dynamicObjects.empty())
-            {
-                for (auto& object : inner_pdo->dynamicObjects)
-                {
-                    if (!inner_duplicate->contains(object))
-                    {
-                        inner_duplicate->insert(object);
-                    }
-                }
-
-                std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-                pdo->tag(&transform);
-                duplicate->insert(&transform, copyop(vsg::ref_ptr(&transform)));
-            }
-
-            return mav.get_animation();
-        }
-    }
-
-    return nullptr;
-}
-
-ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
-{
-    const std::string file_path = animations_dir + name + ".xml";
-
-    CfgReader cfg;
-    if (cfg.load(file_path.c_str()))
-    {
-        QDomNode config_section;
 
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
