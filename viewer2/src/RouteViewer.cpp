@@ -229,7 +229,6 @@ void RouteViewer::initWindowTraits()
     windowTraits->width = settings.width;
     windowTraits->height = settings.height;
     // windowTraits->vulkanVersion = vulkan_version; // vsg и так берет самую новую версию
-    // windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_MAILBOX_KHR; ???
     // windowTraits->swapchainPreferences.imageCount = 3;
     windowTraits->screenNum = settings.screen_number;
     windowTraits->fullscreen = settings.fullscreen;
@@ -361,7 +360,11 @@ void RouteViewer::initLights()
     vsg::ref_ptr<vsg::DepthStencilState> depthStencilState = vsg::DepthStencilState::create();
     vsg::ref_ptr<vsg::MultisampleState> multisampleState = vsg::MultisampleState::create();
 
+    // Рисуем текстуры на обеих сторонах
     rasterizationState->cullMode = VK_CULL_MODE_NONE;
+    // Включаем отображение объектов за плоскостями отсечения
+    // для корректной работы теней от объектов за пределами вида камеры
+    rasterizationState->depthClampEnable = settings.shadow ? VK_TRUE : VK_FALSE;
 
     colorBlendState->attachments = {
         {
@@ -419,23 +422,20 @@ void RouteViewer::initLights()
     options->shaderSets["pbr"] = pbr_shader;
     options->shaderSets["phong"] = phong_shader;
 
-    // Если у теней включена дальности прорисовки, настраиваем каскад теней
-    if (settings.shadow_distance > 0.1)
+    // Если тени включены, создаём настройки с количеством каскадов
+    if (settings.shadow)
     {
-        auto countNumShadowMaps = [](double dist) -> std::uint32_t
-        {
-            if (dist > 256.0) return 3;
-            if (dist > 64.0) return 2;
-            return 1;
-        };
+        shadowSettings = vsg::HardShadows::create(settings.shadow_cascade);
 
-        if (settings.shadow_distance > 1000.0)
+        // Округляем разрешение карт теней до степени двойки
+        // в разумных пределах от 2^8 (256x256) до 2^16 (65536x65536)
+        int power_of_two = 8;
+        while ((power_of_two < 16) &&
+               (settings.shadow_resolution > std::pow(2, power_of_two)))
         {
-            settings.shadow_distance = 1000.0;
+            ++power_of_two;
         }
-
-        const std::uint32_t numShadowMapsPerLight = countNumShadowMaps(settings.shadow_distance);
-        shadowSettings = vsg::HardShadows::create(numShadowMapsPerLight);
+        settings.shadow_resolution = std::pow(2, power_of_two);
     }
 
     // Настраиваем область отрисовки теней
@@ -630,10 +630,13 @@ bool RouteViewer::loadRoute()
 
     viewer->update();
 
-    // Указываем грузить модели в один поток, иначе будут дубликаты в памяти
+    // Перед компиляцией вьювера применяем некоторые настройки
     auto resourceHints = vsg::ResourceHints::create();
+    // Указываем грузить модели в один поток, иначе будут дубликаты в памяти
     resourceHints->numDatabasePagerReadThreads = 1;
-    resourceHints->shadowMapSize = {4096, 4096}; // 2048 по умолчанию
+    // Указываем разрешение карты теней
+    resourceHints->shadowMapSize = {static_cast<uint32_t>(settings.shadow_resolution),
+                                    static_cast<uint32_t>(settings.shadow_resolution)};
     viewer->compile(resourceHints);
 
     return true;

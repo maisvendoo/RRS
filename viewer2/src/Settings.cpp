@@ -76,8 +76,20 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 //------------------------------------------------------------------------------
 void RouteViewer::loadLightSettings(CfgReader& cfg, const QString& section)
 {
+    // Настройки теней
+    cfg.getBool(section, "Shadow", settings.shadow);
     cfg.getDouble(section, "ShadowDistance", settings.shadow_distance);
+    cfg.getInt(section, "ShadowCascade", settings.shadow_cascade);
+    cfg.getInt(section, "ShadowResolution", settings.shadow_resolution);
+    // Корректность значений
+    if ((settings.shadow_distance < 0.5) ||
+        (settings.shadow_cascade < 1) ||
+        (settings.shadow_resolution < 1))
+    {
+        settings.shadow = false;
+    }
 
+    // Настройки освещения
     cfg.getDouble(section, "AmbientIntensity", settings.ambient_intensity);
 
     QString ambientColor = "1.0 1.0 1.0";
@@ -118,7 +130,7 @@ void RouteViewer::loadCameraSettings(CfgReader& cfg, const QString& section)
 {
     cfg.getDouble(section, "ViewDistance", settings.view_distance);
     cfg.getDouble(section, "zNear", settings.zNear);
-    cfg.getDouble(section, "zFar", settings.zFar);
+//    cfg.getDouble(section, "zFar", settings.zFar);
     cfg.getDouble(section, "FovY", settings.fovy);
     cfg.getDouble(section, "FovYMin", settings.fovy_min);
     cfg.getDouble(section, "FovYMax", settings.fovy_max);

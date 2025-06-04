@@ -34,7 +34,10 @@ struct settings_t
     bool double_buffer = true;  ///< Set/unset double buffering
     int samples = 1;            ///< Set number of anialiasing samples
 
-    double shadow_distance = 0.0;               ///< Shadow compute distance
+    bool shadow = false;                        ///< Shadow flag
+    double shadow_distance = 50.0;              ///< Shadow compute distance
+    int shadow_cascade = 1;                     ///< Shadow cascade
+    int shadow_resolution = 4096;               ///< Shadow map resolution
     double ambient_intensity = 1.0;             ///< Ambient light intensity
     vsg::dvec3 ambient_color = {1.0, 1.0, 1.0}; ///< Ambient light color
     double sun_intensity = 1.0;                 ///< Directional light intensity
@@ -43,7 +46,7 @@ struct settings_t
 
     double view_distance = 2000.0;  ///< View distance
     double zNear = 0.1;
-    double zFar = 2000.0;
+//    double zFar = 2000.0;
     double fovy = 64.0;         ///< Vertical view angle
     double fovy_min = 2.0;      ///< Vertical view angle min
     double fovy_max = 100.0;    ///< Vertical view angle max
