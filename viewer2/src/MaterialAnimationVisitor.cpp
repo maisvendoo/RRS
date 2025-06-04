@@ -35,11 +35,11 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
 {
     for (auto& descriptor : bindDescriptorSet.descriptorSet->descriptors)
     {
-        if (auto* descriptor_buffer = descriptor->cast<vsg::DescriptorBuffer>())
+        if (auto descriptor_buffer = descriptor.cast<vsg::DescriptorBuffer>())
         {
             for (auto& buffer_info : descriptor_buffer->bufferInfoList)
             {
-                if (auto* pbr_material_value = buffer_info->data->cast<vsg::PbrMaterialValue>())
+                if (auto pbr_material_value = buffer_info->data.cast<vsg::PbrMaterialValue>())
                 {
                     std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
                     pdo->tag(pbr_material_value);
