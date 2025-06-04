@@ -1,45 +1,66 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <Config>
-	<Client>
-		<HostAddr>127.0.0.1</HostAddr>
-		<port>1992</port>
-		<ReconnectInterval>500</ReconnectInterval>
-
-		<!-- Интервал обновления положений подвижного состава, мс -->
-		<VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>
-
-		<!-- Интервал обновления состояний подвижного состава, мс -->
-		<VehiclesStateUpdateInterval>100</VehiclesStateUpdateInterval>
-
-		<!-- Интервал обновления отладочной строки, мс -->
-		<VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
-
-		<!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов -->
-		<ClientDelay>100</ClientDelay>
-	</Client>
-	<Viewer>
-		<posX>50</posX>
-		<posY>50</posY>
-		<Width>1280</Width>
-		<Height>720</Height>
-		<FullScreen>0</FullScreen>
-		<VSync>1</VSync>
-		<FovY>55</FovY>
-		<zNear>0.1</zNear>
-		<zFar>2000</zFar>
-		<ScreenNumber>0</ScreenNumber>
-		<Name>viewer</Name>
-		<WindowDecoration>1</WindowDecoration>
-		<DoubleBuffer>1</DoubleBuffer>
-		<Samples>16</Samples>
-		<MotionBlur>0.05</MotionBlur>
-		<NotifyLevel>INFO</NotifyLevel>
-		<ViewDistance>2000</ViewDistance>
-		<ShadowDistance>0.0</ShadowDistance>
-		<AmbientIntensity>1.0</AmbientIntensity>
-		<AmbientColor>1.0 1.0 1.0</AmbientColor>
-		<SunIntensity>1.0</SunIntensity>
-		<SunColor>1.0 1.0 1.0</SunColor>
-		<SunDirection>1.0 1.0 -1.0</SunDirection>
-	</Viewer>
+    <Client>
+        <!-- ip-адрес, порт сервера -->
+        <HostAddr>127.0.0.1</HostAddr>
+        <port>1992</port>
+        <!-- Интервал попыток подключения к серверу, мс -->
+        <ReconnectInterval>500</ReconnectInterval>
+        <!-- Интервал обновления положений подвижного состава, мс -->
+        <VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>
+        <!-- Интервал обновления состояний подвижного состава, мс -->
+        <VehiclesStateUpdateInterval>100</VehiclesStateUpdateInterval>
+        <!-- Интервал обновления отладочной строки, мс -->
+        <VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
+        <!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов -->
+        <ClientDelay>100</ClientDelay>
+    </Client>
+    <Viewer>
+        <!-- Запись в лог-файл: INFO - все сообщения, WARN - только ошибки, FATAL - только критические ошибки -->
+        <NotifyLevel>INFO</NotifyLevel>
+        <!-- Заголовок окна -->
+        <Name>viewer</Name>
+        <!-- Оформление окна: 1 - отображение рамки и заголовка; 0 - режим окна без рамки -->
+        <WindowDecoration>1</WindowDecoration>
+        <!-- Положение окна, пикс. -->
+        <posX>50</posX>
+        <posY>50</posY>
+        <!-- Размер окна, пикс. -->
+        <Width>1280</Width>
+        <Height>720</Height>
+        <!-- Номер монитора; 0 для монитора по умолчанию -->
+        <ScreenNumber>0</ScreenNumber>
+        <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
+        <FullScreen>0</FullScreen>
+        <!-- Вертикальная синхронизация: 1 - включена; 0 - отключена -->
+        <VSync>1</VSync>
+        <!-- Двойная буферизация: 1 - включена; 0 - отключена -->
+        <DoubleBuffer>1</DoubleBuffer>
+        <!-- Мультисемплирование (сглаживание) -->
+        <Samples>1</Samples>
+        <!-- Угол поля зрения по умолчанию, град. -->
+        <FovY>55</FovY>
+        <!-- Ближняя плоскость отсечения, м -->
+        <zNear>0.1</zNear>
+        <!-- Дальняя плоскость отсечения (дальность видимости), м -->
+        <ViewDistance>2000</ViewDistance>
+        <!-- Тени: 1 - включены; 0 - отключены -->
+        <Shadow>0</Shadow>
+        <!-- Дальностьть прорисовки теней, м -->
+        <ShadowDistance>50.0</ShadowDistance>
+        <!-- Количество каскадных карт теней -->
+        <ShadowCascade>1</ShadowCascade>
+        <!-- Разрешение карт теней -->
+        <ShadowResolution>4096</ShadowResolution>
+        <!-- Яркость общего освещения -->
+        <AmbientIntensity>0.5</AmbientIntensity>
+        <!-- Цвет общего освещения (RGB, 0.0 - 1.0) -->
+        <AmbientColor>1.0 1.0 1.0</AmbientColor>
+        <!-- Яркость солнечного освещения -->
+        <SunIntensity>5.0</SunIntensity>
+        <!-- Цвет солнечного освещения (RGB, 0.0 - 1.0) -->
+        <SunColor>1.0 1.0 1.0</SunColor>
+        <!-- Направление солнечного освещения (XYZ) -->
+        <SunDirection>1.0 1.0 -1.0</SunDirection>
+    </Viewer>
 </Config>
