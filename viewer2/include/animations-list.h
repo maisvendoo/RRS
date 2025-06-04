@@ -2,8 +2,8 @@
 #define ANIMATIONS_LIST_H
 
 #include <cstddef>
-#include <mutex>
 #include <map>
+#include <mutex>
 
 class ProcAnimation;
 

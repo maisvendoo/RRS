@@ -2,7 +2,6 @@
 #define MATERIAL_ANIMATION_VISITOR_H
 
 #include "ProcAnimation.h"
-#include "animations-list.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>

@@ -1,5 +1,6 @@
 #include "VehicleExterior.h"
 
+#include "Logger.h"
 #include "MyGui.h"
 #include "filesystem.h"
 #include "CfgReader.h"

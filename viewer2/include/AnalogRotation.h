@@ -3,7 +3,6 @@
 
 #include "ProcAnimation.h"
 
-#include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 
@@ -17,7 +16,7 @@ namespace vsg
 class AnalogRotation : public ProcAnimation
 {
 public:
-    AnalogRotation(vsg::MatrixTransform* transform);
+    explicit AnalogRotation(vsg::MatrixTransform* transform);
 
     void update();
 

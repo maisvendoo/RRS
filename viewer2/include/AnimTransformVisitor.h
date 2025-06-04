@@ -5,7 +5,6 @@
 
 #include "animations-list.h"
 #include "ProcAnimation.h"
-#include <vsg/nodes/StateGroup.h>
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>

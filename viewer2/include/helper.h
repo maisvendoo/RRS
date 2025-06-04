@@ -1,20 +1,18 @@
 #pragma once
 
-#include <vsg/commands/Commands.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
-
-#include <iostream>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/BufferInfo.h>
 #include <vsg/state/Descriptor.h>
 #include <vsg/state/DescriptorBuffer.h>
 #include <vsg/state/GraphicsPipeline.h>
-#include <vsg/state/ViewDependentState.h>
+
+#include <iostream>
 
 inline void print_object(vsg::ref_ptr<vsg::Object> object, int indentation = 0)
 {
@@ -115,19 +113,6 @@ inline void print_object(vsg::ref_ptr<vsg::Object> object, int indentation = 0)
         for (auto& child : group->children)
         {
             print_object(child, indentation + 1);
-        }
-    }
-}
-
-void set_parent_recursively(vsg::ref_ptr<vsg::Node>& node, vsg::ref_ptr<vsg::Node> parent)
-{
-    node->setValue("parent", parent);
-
-    if (auto commands = node->cast<vsg::Commands>())
-    {
-        for (auto& command : commands->children)
-        {
-            // set_parent_recursively(command, node);
         }
     }
 }

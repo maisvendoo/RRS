@@ -33,16 +33,15 @@ struct FindModelAnimationsCreateInfo
 class FindModelAnimations : public vsg::Inherit<vsg::Object, FindModelAnimations>
 {
 public:
-
     FindModelAnimations(const FindModelAnimationsCreateInfo& create_info);
 
 private:
-
     vsg::ref_ptr<vsg::Node> node;
     std::string animations_dir;
     animations_t* animations;
 
     void find_animations();
+
     ProcAnimation* create_animation(vsg::ref_ptr<vsg::Animation> model_animation);
 };
 

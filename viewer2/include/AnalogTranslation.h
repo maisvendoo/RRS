@@ -16,7 +16,7 @@ namespace vsg
 class AnalogTranslation : public ProcAnimation
 {
 public:
-    AnalogTranslation(vsg::MatrixTransform* transform);
+    explicit AnalogTranslation(vsg::MatrixTransform* transform);
 
     void update();
 
