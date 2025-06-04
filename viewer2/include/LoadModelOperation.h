@@ -1,58 +1,34 @@
 #ifndef LOAD_MODEL_OPERATION_H
 #define LOAD_MODEL_OPERATION_H
 
-#include <vsg/app/Viewer.h>
-#include <vsg/core/Object.h>
-#include <vsg/io/Options.h>
-#include <vsg/io/read.h>
-// #include <vsg/nodes/DepthSorted.h>
-#include <vsg/nodes/MatrixTransform.h>
-#include <vsg/nodes/Node.h>
-#include <vsgXchange/all.h>
-#include <vsg/utils/PropagateDynamicObjects.h>
-#include <vsg/animation/FindAnimations.h>
+#include "animations-list.h"
 
-#include "AnimTransformVisitor.h"
-#include "FindModelAnimation.h"
-#include "Logger.h"
+#include <vsg/app/CompileManager.h>
+#include <vsg/app/Viewer.h>
+#include <vsg/core/Inherit.h>
+#include <vsg/core/observer_ptr.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
+#include <vsg/nodes/Group.h>
+#include <vsg/nodes/Node.h>
+#include <vsg/threading/OperationQueue.h>
+
+#include <string>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
 {
-    MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer,
-                 vsg::ref_ptr<vsg::Group> in_attachment_point,
-                 vsg::ref_ptr<vsg::Node> in_node,
-                 const vsg::CompileResult& in_compileResult)
-        : viewer(in_viewer)
-        , attachment_point(in_attachment_point)
-        , node(in_node)
-        , compileResult(in_compileResult)
-    {
-
-    }
+    MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
+        vsg::ref_ptr<vsg::Node> in_node, const vsg::CompileResult& in_compileResult) noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::Group> attachment_point;
     vsg::ref_ptr<vsg::Node> node;
     vsg::CompileResult compileResult;
 
-    void run() override
-    {
-        vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
-        if (ref_viewer && attachment_point)
-        {
-            // Add compiled model to viewer and scene graph
-            updateViewer(*ref_viewer, compileResult);
-
-            // auto depthSorted = vsg::DepthSorted::create();
-            // depthSorted->child = node;
-
-            // attachment_point->addChild(depthSorted);
-            attachment_point->addChild(node);
-        }
-    }
+    void run() override;
 };
 
 //------------------------------------------------------------------------------
@@ -60,21 +36,9 @@ struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
 //------------------------------------------------------------------------------
 struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperation>
 {
-    LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer,
-                       vsg::ref_ptr<vsg::Group> in_attachment_point,
-                       const std::string& in_model_filename_path,
-                       const std::string& in_animations_dir,
-                       vsg::ref_ptr<vsg::Options> in_options,
-                       animations_t* in_animations)
-        : viewer(in_viewer)
-        , attachment_point(in_attachment_point)
-        , model_filename_path(in_model_filename_path)
-        , animations_dir(in_animations_dir)
-        , options(in_options)
-        , animations(in_animations)
-    {
-
-    }
+    LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
+        const std::string& in_model_filename_path, const std::string& in_animations_dir,
+        vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations) noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::Group> attachment_point = nullptr;
@@ -83,87 +47,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     vsg::ref_ptr<vsg::Options> options = nullptr;
     animations_t* animations;
 
-    void run() override
-    {
-        if (!vsg::fileExists(model_filename_path))
-        {
-            LOG_WARN("Operation: fail to find file: %s", model_filename_path.c_str());
-            return;
-        }
-
-        vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_filename_path, options);
-        vsg::ref_ptr<vsg::Node> node = loaded.cast<vsg::Node>();
-        if (!node)
-        {
-            LOG_WARN("Operation: fail to load model from file: %s", model_filename_path.c_str());
-
-            vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
-            if (error)
-                LOG_WARN(error->message.c_str());
-            return;
-        }
-
-        LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
-
-        int old_size = animations->animations.size();
-        {
-            // Model's animations
-            FindModelAnimationsCreateInfo fma_create_info = {node, animations, animations_dir};
-            vsg::ref_ptr<FindModelAnimations> find_model_animations = FindModelAnimations::create(fma_create_info);
-            LOG_INFO("Operation: loaded %u (total: %u) model animations from %s",
-                     animations->animations.size() - old_size,
-                     animations->animations.size(),
-                     animations_dir.c_str());
-        }
-
-        old_size = animations->animations.size();
-
-        // Custom animations for model
-        auto pdo = vsg::PropagateDynamicObjects::create();
-
-        vsg::CopyOp copyop;
-        auto duplicate = copyop.duplicate = new vsg::Duplicate;
-
-        AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, animations};
-
-        AnimTransformVisitor atv(atv_create_info);
-        node->accept(atv);
-        LOG_INFO("Operation: loaded %u (total: %u) custom animations from %s",
-                 animations->animations.size() - old_size,
-                 animations->animations.size(),
-                 animations_dir.c_str());
-
-        node->traverse(*pdo);
-
-        // Copy all animated parts of shared model for independent behaviour
-        if (!pdo->dynamicObjects.empty())
-        {
-            for (auto& object : pdo->dynamicObjects)
-            {
-                if (!duplicate->contains(object))
-                {
-                    duplicate->insert(object);
-                }
-            }
-
-            duplicate->insert(node);
-            node = copyop(node);
-            atv.reconfigure_animations();
-        }
-
-        // Compile loaded model and add it to viewer
-        vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
-        if (ref_viewer && ref_viewer->compileManager)
-        {
-            if (auto compile_result = ref_viewer->compileManager->compile(node))
-            {
-                ref_viewer->addUpdateOperation(MergeToScene::create(viewer,
-                                                                    attachment_point,
-                                                                    node,
-                                                                    compile_result));
-            }
-        }
-    }
+    void run() override;
 };
 
 #endif // LOAD_MODEL_OPERATION_H
