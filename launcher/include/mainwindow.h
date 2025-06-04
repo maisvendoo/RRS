@@ -100,6 +100,7 @@ private:
     static const   QString SCREEN_NUM;
     static const   QString WIN_DECOR;
     static const   QString DOUBLE_BUFF;
+    static const   QString VSYNC;
     static const   QString NOTIFY_LEVEL;
     static const   QString VIEW_DIST;
 

@@ -844,6 +844,16 @@
           </widget>
          </item>
          <item>
+          <widget class="QCheckBox" name="cbVSync">
+           <property name="text">
+            <string>VSync</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="5,1">
            <item>
             <widget class="QLabel" name="label_11">
@@ -929,30 +939,6 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="5,2">
-           <item>
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Far clip plane</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="dspFar">
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="minimum">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>10000.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QLabel" name="label_13">
@@ -970,7 +956,7 @@
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="maximum">
-              <number>10000</number>
+              <number>1000000</number>
              </property>
              <property name="singleStep">
               <number>100</number>
