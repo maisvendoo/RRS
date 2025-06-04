@@ -50,7 +50,6 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
 
                     animation = new MaterialAnimation(new_pbr_material_value);
                     animation->load(cfg_reader);
-                    // animations->thread_safe_insert({animation->getSignalID(), animation});
                 }
             }
         }

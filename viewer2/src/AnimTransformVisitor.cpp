@@ -157,7 +157,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             vsg::CopyOp copyop;
             auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
 
-            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, animations, cfg};
+            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, cfg};
 
             MaterialAnimationVisitor mav(mav_create_info);
             transform.accept(mav);
@@ -187,7 +187,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
 
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
 {
-    std::string file_path = animations_dir + name + ".xml";
+    const std::string file_path = animations_dir + name + ".xml";
 
     CfgReader cfg;
     if (cfg.load(file_path.c_str()))
@@ -201,7 +201,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             vsg::CopyOp copyop;
             auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
 
-            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, animations, cfg};
+            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, cfg};
 
             MaterialAnimationVisitor mav(mav_create_info);
             group.accept(mav);
