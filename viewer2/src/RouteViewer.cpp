@@ -588,11 +588,16 @@ bool RouteViewer::loadRoute()
     loader.parse_route_map(route);
 
     // Создание PagedLOD для моделей в маршруте
-    for (auto& [label, transform] : route.transforms)
+    auto current = route.transforms.begin();
+    while (current != route.transforms.end())
     {
+        std::string label = current->first;
+        auto range = route.transforms.equal_range(label);
+
         auto found_it = route.object_ref.find(label);
         if (found_it == route.object_ref.end())
         {
+            current = range.second;
             continue;
         }
 
@@ -600,6 +605,7 @@ bool RouteViewer::loadRoute()
         if (!vsg::fileExists(model_filename_path))
         {
             LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
+            current = range.second;
             continue;
         }
 
@@ -608,21 +614,29 @@ bool RouteViewer::loadRoute()
         pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
-        auto matrix = vsg::MatrixTransform::create();
-        transform.r_x = -vsg::radians(transform.r_x);
-        transform.r_y = -vsg::radians(transform.r_y);
-        transform.r_z = -vsg::radians(transform.r_z);
+        auto transforms = vsg::MatrixTransform::create();
+        for (auto it = range.first; it != range.second; ++it)
+        {
+            auto& transform = it->second;
 
-        auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
-        auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
-        auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
-        auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
-        matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
+            auto matrix = vsg::MatrixTransform::create();
+            transform.r_x = -vsg::radians(transform.r_x);
+            transform.r_y = -vsg::radians(transform.r_y);
+            transform.r_z = -vsg::radians(transform.r_z);
 
-        matrix->addChild(pagedLOD);
-        //GUIParams::nodes.emplace_back(matrix);
+            auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
+            auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
+            auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
+            auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
 
-        root->addChild(matrix);
+            matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
+            matrix->addChild(pagedLOD);
+            transforms->addChild(matrix);
+        }
+
+        root->addChild(transforms);
+
+        current = range.second;
     }
 
     route.object_ref.clear();
