@@ -211,12 +211,13 @@ void RouteViewer::initWindowTraits()
 {
     auto samples_bit_flag = [](int s) -> VkSampleCountFlags
     {
-        if (s > 63) return VK_SAMPLE_COUNT_64_BIT;
-        if (s > 31) return VK_SAMPLE_COUNT_32_BIT;
-        if (s > 15) return VK_SAMPLE_COUNT_16_BIT;
-        if (s > 7) return VK_SAMPLE_COUNT_8_BIT;
-        if (s > 3) return VK_SAMPLE_COUNT_4_BIT;
-        if (s > 1) return VK_SAMPLE_COUNT_2_BIT;
+        if (s > 7)
+            return VK_SAMPLE_COUNT_8_BIT;
+        if (s > 3)
+            return VK_SAMPLE_COUNT_4_BIT;
+        if (s > 1)
+            return VK_SAMPLE_COUNT_2_BIT;
+
         return VK_SAMPLE_COUNT_1_BIT;
     };
 
