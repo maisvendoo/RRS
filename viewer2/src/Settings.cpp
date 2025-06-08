@@ -1,10 +1,9 @@
 #include "RouteViewer.h"
 
 #include "CfgReader.h"
-#include "CLI11.hpp"
-#include "cmd-line.h"
 
-#include <QString>
+#include <iostream>
+#include <vsg/utils/CommandLine.h>
 
 #include <sstream>
 
@@ -291,53 +290,28 @@ void RouteViewer::loadFollowCameraSettings(CfgReader& cfg, const QString& sectio
 }
 
 //------------------------------------------------------------------------------
-//
+// Парсер командной строки
 //------------------------------------------------------------------------------
-int RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
+void RouteViewer::overrideSettingsByCommandLine(int argc, char* argv[])
 {
-    cmd_line_t cmd_line;
+    vsg::CommandLine arguments(&argc, argv);
 
-    CLI::App app("Viewer");
-    argv = app.ensure_utf8(argv);
-
-    app.add_option("--host-addr", cmd_line.host_addr);
-    app.add_option("--port", cmd_line.port);
-    app.add_option("--width", cmd_line.width);
-    app.add_option("--height", cmd_line.height);
-    app.add_option("--fullscreen", cmd_line.fullscreen);
-    app.add_option("--notify-level", cmd_line.notify_level);
-
-    CLI11_PARSE(app, argc, argv);
-
-    if (cmd_line.host_addr)
+    // В парсере VSG нет встроенного help, напишем справку об опциях вручную
+    if (arguments.read({"-?", "-h", "--help"}))
     {
-        settings.tcp_config.host_addr = cmd_line.host_addr->c_str();
+        std::cout << "Usage: viewer [options]"  << std::endl << std::endl;
+
+        std::cout << "Options:" << std::endl;
+        std::cout << "  -?, -h, --help                  Displays help on commandline options"   << std::endl;
+        std::cout << "  -a, -host, --host-address <ip>  Host address, default: 127.0.0.1"       << std::endl;
+        std::cout << "  -p, --port <port>               Port, default: 1992"                    << std::endl;
+        exit(0);
     }
 
-    if (cmd_line.port)
-    {
-        settings.tcp_config.port = static_cast<quint16>(cmd_line.port.value());
-    }
-
-    if (cmd_line.width)
-    {
-        settings.width = cmd_line.width.value();
-    }
-
-    if (cmd_line.height)
-    {
-        settings.height = cmd_line.height.value();
-    }
-
-    if (cmd_line.fullscreen)
-    {
-        settings.fullscreen = cmd_line.fullscreen.value();
-    }
-
-    if (cmd_line.notify_level)
-    {
-        settings.notify_level = cmd_line.notify_level.value();
-    }
-
-    return 0;
+    std::string host_address = settings.tcp_config.host_addr.toStdString();
+    uint16_t port = settings.tcp_config.port;
+    if (arguments.read({"-a", "-host", "--host-address"}, host_address))
+        settings.tcp_config.host_addr = host_address.c_str();
+    if (arguments.read({"-p", "--port"}, port))
+        settings.tcp_config.port = port;
 }

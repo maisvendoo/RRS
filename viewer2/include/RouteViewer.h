@@ -52,7 +52,7 @@ private:
 
     void configureLogLevel();
 
-    int overrideSettingsByCommandLine(int argc, char* argv[]);
+    void overrideSettingsByCommandLine(int argc, char* argv[]);
 
     void initVsgOptions();
     void initWindowTraits();
