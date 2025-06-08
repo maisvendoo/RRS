@@ -34,6 +34,7 @@ private:
 
     QCommandLineParser parser;
 
+    QString ZDSrouteDir = "";
     QString routeDir = "";
     QString filename = "";
     QString trkfile = "";

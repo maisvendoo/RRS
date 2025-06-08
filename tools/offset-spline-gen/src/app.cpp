@@ -72,6 +72,14 @@ Application::CommandLineResult Application::parseCommandLine(QString &errorMessa
                                    QCoreApplication::translate("main", "Path to route's directory"),
                                    QCoreApplication::translate("main", "route directory path"));
 
+    QCommandLineOption optInputDir(QStringList() << "i" << "input-route",
+                                   QCoreApplication::translate("main", "Path to input ZDS route's directory"),
+                                   QCoreApplication::translate("main", "route directory path"));
+
+    QCommandLineOption optOutputDir(QStringList() << "o" << "output-route",
+                                    QCoreApplication::translate("main", "Path to output RRS route's directory"),
+                                    QCoreApplication::translate("main", "route directory path"));
+
     QCommandLineOption optFile(QStringList() << "f" << "file",
                                QCoreApplication::translate("main", "Output filename, default: trajectory"),
                                QCoreApplication::translate("main", "filename"),
@@ -82,7 +90,7 @@ Application::CommandLineResult Application::parseCommandLine(QString &errorMessa
                                       QCoreApplication::translate("main", "1 or 2"),
                                       QString("1"));
 
-    QCommandLineOption optTrack(QStringList() << "i" << "id",
+    QCommandLineOption optTrack(QStringList() << "n" << "num-track",
                                      QCoreApplication::translate("main", "Number of track"),
                                      QCoreApplication::translate("main", "track"));
 
@@ -102,6 +110,8 @@ Application::CommandLineResult Application::parseCommandLine(QString &errorMessa
                                   QString("7.5"));
 
     parser.addOption(optRouteDir);
+    parser.addOption(optInputDir);
+    parser.addOption(optOutputDir);
     parser.addOption(optFile);
     parser.addOption(optRouteTrkNum);
     parser.addOption(optTrack);
@@ -123,9 +133,25 @@ Application::CommandLineResult Application::parseCommandLine(QString &errorMessa
 
     if (parser.isSet(optRouteDir))
     {
-        routeDir = parser.value(optRouteDir);
-        std::cout << "route: " << routeDir.toStdString() << std::endl;
+        ZDSrouteDir = parser.value(optRouteDir);
+        routeDir = ZDSrouteDir;
     }
+    else
+    {
+        if ((parser.isSet(optInputDir)) && (parser.isSet(optOutputDir)))
+        {
+            ZDSrouteDir = parser.value(optInputDir);
+            routeDir = parser.value(optOutputDir);
+        }
+        else
+        {
+            std::cout << "ERROR: Missing input route path" << std::endl;
+            return CommandLineError;
+        }
+    }
+
+    std::cout << "Input route: " << ZDSrouteDir.toStdString() << std::endl;
+    std::cout << "Output route: " << routeDir.toStdString() << std::endl;
 
     if (parser.isSet(optFile))
     {
@@ -379,7 +405,7 @@ void Application::generate_topology(const QString &route_dir)
 {
     create_directories(route_dir);
 
-    QString full_path = route_dir + QDir::separator() + trkfile;
+    QString full_path = ZDSrouteDir + QDir::separator() + trkfile;
 
     std::vector<zds_track_t> zds_tracks;
 

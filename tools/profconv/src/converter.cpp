@@ -48,7 +48,7 @@ void ZDSimConverter::configure_parser(cli::Parser &parser)
 {
     parser.set_optional<std::string>("r", "route",
                                      "",
-                                     "Input ZDS route path, using as output too");
+                                     "Input ZDS route path, used as output too");
 
     parser.set_optional<std::string>("i", "input-route",
                                      "",

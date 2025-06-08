@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbGenParallel, &QPushButton::released, this, &MainWindow::slotGenerateParallel);
     connect(ui->pbGenSpline, &QPushButton::released, this, &MainWindow::slotGenerateSpline);
+
+    ui->pbSelectOutputPath->setEnabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -111,7 +113,6 @@ void MainWindow::startProfConverter(QString routeDir)
     QString profconv_path = PROFCONV + EXE_EXP;
 
     QStringList args;
-//    args << "--route" << routeDir;
     args << "--input-route" << routeDir;
     args << "--output-route" << outputDir;
 
@@ -129,7 +130,6 @@ void MainWindow::startDmd2gltfConverter(QString routeDir)
 
     QStringList args;
     args << "--input-route" << routeDir;
-//    args << "--output-route" << routeDir;
     args << "--output-route" << outputDir;
     if (ui->cbOnlyUsedModels->checkState())
     {
@@ -155,15 +155,16 @@ void MainWindow::startParallelGenerator(QString routeDir)
     double bias = ui->dsbParallelOffset->value();
 
     QStringList args;
-    args << "-r" << routeDir;
+    args << "-i" << routeDir;
+    args << "-o" << outputDir;
     args << "-f" << filename;
     args << "-t" << QString("%1").arg(trkfile);
     args << "-b" << QString("%1").arg(begin_track);
     args << "-e" << QString("%1").arg(end_track);
     args << "-d" << QString("%1").arg(bias, 0, 'f', 2);
 
-    pathconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    pathconvProc.start(pathconv_path, args);
+    parallelGenProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    parallelGenProc.start(pathconv_path, args);
 }
 
 //------------------------------------------------------------------------------
@@ -182,16 +183,17 @@ void MainWindow::startSplineGenerator(QString routeDir)
     double end_bias = ui->dsbSplineOffsetEnd->value();
 
     QStringList args;
-    args << "-r" << routeDir;
+    args << "-i" << routeDir;
+    args << "-o" << outputDir;
     args << "-f" << filename;
     args << "-t" << QString("%1").arg(trkfile);
-    args << "-i" << QString("%1").arg(track);
+    args << "-n" << QString("%1").arg(track);
     args << "-l" << QString("%1").arg(len);
     args << "-d" << QString("%1").arg(begin_bias, 0, 'f', 2);
     args << "-e" << QString("%1").arg(end_bias, 0, 'f', 2);
 
-    pathconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    pathconvProc.start(pathconv_path, args);
+    splineGenProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    splineGenProc.start(pathconv_path, args);
 }
 
 //------------------------------------------------------------------------------
@@ -209,9 +211,12 @@ void MainWindow::slotOpenRoute()
         ui->lStatus->setText(tr("Route does not selected. Please choose route"));
         ui->lCurrentRouteDir->setText("");
         ui->lOutputPath->setText("");
+
+        ui->pbSelectOutputPath->setEnabled(false);
         return;
     }
 
+    ui->pbSelectOutputPath->setEnabled(true);
     ui->lStatus->setText(tr("Route opened succesfully"));
 
     QDir dir(routesRootDir);
@@ -258,7 +263,7 @@ void MainWindow::slotSelectOutputPath()
         }
         else
         {
-            ui->lStatus->setText(tr("Output does not selected. Using selected"));
+            ui->lStatus->setText(tr("Output does not selected. Using selected route as output"));
             outputDir = routeDir;
         }
     }
