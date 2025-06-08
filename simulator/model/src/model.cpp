@@ -1127,12 +1127,12 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client
     controlled_clients.insert(client_id, c);
 /*
     QString msg = "Get keyboard: controlled ";
-    msg += QString::number(vehicle_control_by_keyboard.controlled_vehicle);
+    msg += QString::number(c.vehicle_control_by_keyboard.controlled_vehicle);
     msg += " | current ";
-    msg += QString::number(vehicle_control_by_keyboard.current_vehicle);
+    msg += QString::number(c.vehicle_control_by_keyboard.current_vehicle);
     msg += " | keys: ";
-    msg += QString::number(vehicle_control_by_keyboard.pressed_keys.size());
-    for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
+    msg += QString::number(c.vehicle_control_by_keyboard.pressed_keys.size());
+    for (auto key_id : c.vehicle_control_by_keyboard.pressed_keys)
     {
         msg += " | ";
         msg += QString::number(key_id);
