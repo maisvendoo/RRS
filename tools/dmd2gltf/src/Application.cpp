@@ -46,7 +46,7 @@ bool Application::convert()
     {
         return convert_route(cmd_line.input_route_path.value,
                              cmd_line.output_route_path.value,
-                             cmd_line.input_only_used_at_map.isPresent());
+                             cmd_line.input_only_used_at_map.value);
     }
 
     if (convert_mode == CONVERT_MODEL)
@@ -789,7 +789,7 @@ void Application::configure_parser(cli::Parser &parser)
                                      "",
                                      "Input DMD route path");
 
-    parser.set_optional<bool>("u", "only-used",
+    parser.set_optional<bool>("u", "used-only",
                               false,
                               "Convert only models used at map");
 

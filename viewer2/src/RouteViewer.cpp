@@ -573,7 +573,7 @@ bool RouteViewer::loadRoute()
 
     Skybox skybox(skybox_model_filepath, options);
     root->addChild(skybox.getNode());
-#if 1
+#if 0
         // запись неба в файл
         std::string file;
         file = route_dir_path + fs.separator() + "~loaded_skybox.vsgt";

@@ -52,7 +52,7 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 bool MainWindow::createRouteTypeFile()
 {
-    QFile file(routeDir + QDir::separator() + "route-type");
+    QFile file(outputDir + QDir::separator() + "route-type");
 
     if (file.open(QIODevice::WriteOnly))
     {
@@ -73,7 +73,7 @@ bool MainWindow::createDescriptionFile(QString title, QString description)
 {
     CfgEditor editor;
 
-    editor.openFileForWrite(routeDir + QDir::separator() + "description.xml");
+    editor.openFileForWrite(outputDir + QDir::separator() + "description.xml");
     editor.setIndentationFormat(-1);
 
     FieldsDataList flist;
@@ -111,7 +111,9 @@ void MainWindow::startProfConverter(QString routeDir)
     QString profconv_path = PROFCONV + EXE_EXP;
 
     QStringList args;
-    args << "--route=" + routeDir;
+//    args << "--route" << routeDir;
+    args << "--input-route" << routeDir;
+    args << "--output-route" << outputDir;
 
     profconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     profconvProc.start(profconv_path, args);
@@ -127,11 +129,11 @@ void MainWindow::startDmd2gltfConverter(QString routeDir)
 
     QStringList args;
     args << "--input-route" << routeDir;
-    args << "--output-route" << routeDir;
-//    args << "--output-route" << outputDir;
-    if (ui->cbOnlyUsedModels)
+//    args << "--output-route" << routeDir;
+    args << "--output-route" << outputDir;
+    if (ui->cbOnlyUsedModels->checkState())
     {
-        args << "--only-used";
+        args << "--used-only";
     }
 
     dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
@@ -202,14 +204,21 @@ void MainWindow::slotOpenRoute()
                                                  QFileDialog::ShowDirsOnly |
                                                  QFileDialog::DontResolveSymlinks);
 
-    QDir dir(routesRootDir);
-    QString relPath = dir.relativeFilePath(routeDir);
+    if (routeDir.isEmpty())
+    {
+        ui->lStatus->setText(tr("Route does not selected. Please choose route"));
+        ui->lCurrentRouteDir->setText("");
+        ui->lOutputPath->setText("");
+        return;
+    }
 
-    ui->lCurrentRouteDir->setText(relPath);
     ui->lStatus->setText(tr("Route opened succesfully"));
 
+    QDir dir(routesRootDir);
+    QString relPath = dir.relativeFilePath(routeDir);
+    ui->lCurrentRouteDir->setText(relPath);
+
     outputDir = routeDir;
-    relPath = dir.relativeFilePath(outputDir);
     ui->lOutputPath->setText(relPath);
 
     CfgReader cfg;
@@ -238,6 +247,25 @@ void MainWindow::slotSelectOutputPath()
                                                   routesRootDir,
                                                   QFileDialog::ShowDirsOnly |
                                                   QFileDialog::DontResolveSymlinks);
+
+    if (outputDir.isEmpty())
+    {
+        if (routeDir.isEmpty())
+        {
+            ui->lStatus->setText(tr("Route does not selected. Please choose route"));
+            ui->lOutputPath->setText("");
+            return;
+        }
+        else
+        {
+            ui->lStatus->setText(tr("Output does not selected. Using selected"));
+            outputDir = routeDir;
+        }
+    }
+    else
+    {
+        ui->lStatus->setText(tr("Output selected succesfully"));
+    }
 
     QDir dir(routesRootDir);
     QString relPath = dir.relativeFilePath(outputDir);
