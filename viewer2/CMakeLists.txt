@@ -1,4 +1,4 @@
-set (TARGET viewer2)
+set (TARGET viewer)
 
 project (${TARGET})
 
@@ -7,13 +7,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 set (EXECUTABLE_OUTPUT_PATH "../../bin")
-
-if (UNIX)
-    set(vsg_DIR /home/ksv/Install/lib/cmake/vsg)
-    set(vsgXchange_DIR /home/ksv/Install/lib/cmake/vsgXchange)
-    set(vsgImGui_DIR /home/ksv/Install/lib/cmake/vsgImGui)
-    set(vsgQt_DIR /home/ksv/Install/lib/cmake/vsgQt)
-endif()
 
 find_package(Qt6 COMPONENTS Widgets Xml REQUIRED)
 find_package(vsg REQUIRED)
@@ -29,8 +22,7 @@ target_link_libraries(${TARGET} PRIVATE
     Qt6::Xml
     vsg::vsg
     vsgXchange::vsgXchange
-    vsgImGui::vsgImGui
-    # vsgQt::vsgQt
+    vsgImGui::vsgImGui    
     filesystem
     CfgReader
     network

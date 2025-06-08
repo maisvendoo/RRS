@@ -1,6 +1,6 @@
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET viewer)
+set (TARGET viewer_osg)
 
 # Задаем имя проекта
 project (${TARGET})
@@ -27,36 +27,36 @@ file (GLOB IMGUI_INCLUDES "../imgui/include/*.h")
 file (GLOB IMGUI_SOURCES "../imgui/src/*.cpp")
 
 # Компиляция библиотеке
-add_executable (${TARGET} ${SOURCES} ${INCLUDES} ${IMGUI_SOURCES} ${IMGUI_INCLUDES})
+#add_executable (${TARGET} ${SOURCES} ${INCLUDES} ${IMGUI_SOURCES} ${IMGUI_INCLUDES})
 
 # Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ${OPENSCENEGRAPH_INCLUDE_DIRS})
-target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
-target_include_directories (${TARGET} PRIVATE ../../network/include)
-target_include_directories (${TARGET} PRIVATE ../route-loader/include)
-target_include_directories (${TARGET} PRIVATE ../library/include)
-target_include_directories (${TARGET} PRIVATE ../display/include)
+#target_include_directories (${TARGET} PRIVATE ${OPENSCENEGRAPH_INCLUDE_DIRS})
+#target_include_directories (${TARGET} PRIVATE ../../common-headers)
+#target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
+#target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
+#target_include_directories (${TARGET} PRIVATE ./include/)
+#target_include_directories (${TARGET} PRIVATE ../../network/include)
+#target_include_directories (${TARGET} PRIVATE ../route-loader/include)
+#target_include_directories (${TARGET} PRIVATE ../library/include)
+#target_include_directories (${TARGET} PRIVATE ../display/include)
 
-target_include_directories (${TARGET} PRIVATE ../../sound-manager/include)
-target_include_directories (${TARGET} PRIVATE ../../asound/include)
+#target_include_directories (${TARGET} PRIVATE ../../sound-manager/include)
+#target_include_directories (${TARGET} PRIVATE ../../asound/include)
 
-target_include_directories (${TARGET} PRIVATE ../imgui/include)
+#target_include_directories (${TARGET} PRIVATE ../imgui/include)
 
-target_include_directories (${TARGET} PRIVATE ../../simulator/topology/include)
+#target_include_directories (${TARGET} PRIVATE ../../simulator/topology/include)
 
 # Компонуемся с библиотеками Qt6
-target_link_libraries (${TARGET} Qt6::Gui)
-target_link_libraries (${TARGET} Qt6::Widgets)
-target_link_libraries (${TARGET} Qt6::Network)
-target_link_libraries (${TARGET} Qt::OpenGLWidgetsPrivate)
-target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
-target_link_libraries (${TARGET} route-loader)
-target_link_libraries (${TARGET} library)
-target_link_libraries (${TARGET} filesystem)
-target_link_libraries (${TARGET} network)
-target_link_libraries (${TARGET} display)
-target_link_libraries (${TARGET} sound-manager)
+#target_link_libraries (${TARGET} Qt6::Gui)
+#target_link_libraries (${TARGET} Qt6::Widgets)
+#target_link_libraries (${TARGET} Qt6::Network)
+#target_link_libraries (${TARGET} Qt::OpenGLWidgetsPrivate)
+#target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
+#target_link_libraries (${TARGET} route-loader)
+#target_link_libraries (${TARGET} library)
+#target_link_libraries (${TARGET} filesystem)
+#target_link_libraries (${TARGET} network)
+#target_link_libraries (${TARGET} display)
+#target_link_libraries (${TARGET} sound-manager)
 
