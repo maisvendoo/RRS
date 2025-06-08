@@ -19,17 +19,17 @@ file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
 # Компиляция библиотеке
-add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
+#add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ${OPENSCENEGRAPH_INCLUDE_DIRS})
-target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
-target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../route-loader/include)
+#target_include_directories (${TARGET} PRIVATE ./include/)
+#target_include_directories (${TARGET} PRIVATE ${OPENSCENEGRAPH_INCLUDE_DIRS})
+#target_include_directories (${TARGET} PRIVATE ../../common-headers)
+#target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
+#target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
+#target_include_directories (${TARGET} PRIVATE ../route-loader/include)
 
-target_link_libraries (${TARGET} Qt6::Core)
-target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
-target_link_libraries (${TARGET} filesystem)
-target_link_libraries (${TARGET} route-loader)
+#target_link_libraries (${TARGET} Qt6::Core)
+#target_link_libraries (${TARGET} ${OPENSCENEGRAPH_LIBRARIES})
+#target_link_libraries (${TARGET} filesystem)
+#target_link_libraries (${TARGET} route-loader)

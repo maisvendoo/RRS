@@ -1,5 +1,6 @@
 rem Определяем необходимые переменные окружения
 
+set OSG_PLUGINS_DIR=osgPlugins-3.6.5
 set DATA_PATH=..\data
 
 rem Создаем структуру каталогов игры
@@ -25,22 +26,18 @@ mkdir %RRS_DEV_ROOT%\themes
 
 rem Копируем бинарные файлы
 
-xcopy /Y  ..\..\bin\*.exe %RRS_DEV_ROOT%\bin\
-xcopy /Y  ..\..\lib\*.dll %RRS_DEV_ROOT%\bin\
-move %RRS_DEV_ROOT%\bin\rkf5.dll %RRS_DEV_ROOT%\lib\
-move %RRS_DEV_ROOT%\bin\rk4.dll %RRS_DEV_ROOT%\lib\
-move %RRS_DEV_ROOT%\bin\euler2.dll %RRS_DEV_ROOT%\lib\
-move %RRS_DEV_ROOT%\bin\euler.dll %RRS_DEV_ROOT%\lib\
-
-rem Копируем модули
+xcopy /Y /F  ..\..\bin\*.exe %RRS_DEV_ROOT%\bin\
+xcopy /Y /F ..\..\lib\*.dll %RRS_DEV_ROOT%\bin\
+move %RRS_DEV_ROOT%\bin\rkf5.dll %RRS_DEV_ROOT%\lib\rkf5.dll
+move %RRS_DEV_ROOT%\bin\rk4.dll %RRS_DEV_ROOT%\lib\rk4.dll
+move %RRS_DEV_ROOT%\bin\euler2.dll %RRS_DEV_ROOT%\lib\euler2.dll
+move %RRS_DEV_ROOT%\bin\euler.dll %RRS_DEV_ROOT%\lib\euler.dll
 
 xcopy /Y ..\..\modules\*.dll %RRS_DEV_ROOT%\modules
 xcopy /Y ..\..\modules\vl60k\*.dll %RRS_DEV_ROOT%\modules\vl60k\
 xcopy /Y ..\..\modules\vl60pk\*.dll %RRS_DEV_ROOT%\modules\vl60pk\
 xcopy /Y ..\..\modules\passcar\*.dll %RRS_DEV_ROOT%\modules\passcar\
 xcopy /Y ..\..\modules\freightcar\*.dll %RRS_DEV_ROOT%\modules\freightcar\
-
-rem Копируем плагины
 
 xcopy /Y ..\..\plugins\*.dll %RRS_DEV_ROOT%\plugins
 
@@ -62,14 +59,33 @@ xcopy /Y ..\cfg\vehicles\vl60k\*.* %RRS_DEV_ROOT%\cfg\vehicles\vl60k\
 xcopy /Y ..\cfg\vehicles\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\cfg\vehicles\IMR_pass_rzd\
 xcopy /Y ..\cfg\vehicles\Fr_hopper_RZD\*.* %RRS_DEV_ROOT%\cfg\vehicles\Fr_hopper_RZD\
 
-rem xcopy /Y ..\cfg\trains\vl60pk-1543-T65_17.xml %RRS_DEV_ROOT%\cfg\trains\
-rem xcopy /Y ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\
+xcopy /Y ..\cfg\trains\vl60pk-1543-T65_17.xml %RRS_DEV_ROOT%\cfg\trains\
+xcopy /Y ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy /Y ..\cfg\trains\VL60k-1737.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy /Y ..\cfg\trains\vl60k-1737-frEmpties.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy /Y ..\cfg\trains\vl60k-1737-frLoads.xml %RRS_DEV_ROOT%\cfg\trains\
+
+rem Копируем движок OSG
+
+xcopy /Y %OSG_BIN_PATH%\libOpenThreads.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosg.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosgAnimation.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosgDB.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosgGA.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosgText.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosgUtil.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %OSG_BIN_PATH%\libosgViewer.dll %RRS_DEV_ROOT%\bin\
+
+xcopy /Y %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
+del /S %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\*d.dll
+rem xcopy /Y %OSG_BIN_PATH%\%OSG_PLUGINS_DIR%\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
+xcopy /Y ..\..\plugins\*dmd.dll %RRS_DEV_ROOT%\bin\%OSG_PLUGINS_DIR%\
+
 rem Копируем прочие необходимые DLL
 
 xcopy /Y %OPENAL_BIN%\*.dll %RRS_DEV_ROOT%\bin\
+xcopy /Y %FREETYPE_LIBRARY% %RRS_DEV_ROOT%\bin\
+xcopy /Y %ZLIB_LIBRARY% %RRS_DEV_ROOT%\bin\
 
 rem Копируем шейдеры
 xcopy /Y /S %DATA_PATH%\shaders\*.* %RRS_DEV_ROOT%\data\shaders\
@@ -77,9 +93,9 @@ xcopy /Y /S %DATA_PATH%\shaders\*.* %RRS_DEV_ROOT%\data\shaders\
 rem Копируем данные игры (модели, звуки, конфиги анимаций, шрифты)
 
 rem ВЛ60пк
-rem xcopy /Y /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
-rem xcopy /Y /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
-rem xcopy /Y /S %DATA_PATH%\animations\vl60pk\*.* %RRS_DEV_ROOT%\data\animations\vl60pk\
+xcopy /Y /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
+xcopy /Y /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
+xcopy /Y /S %DATA_PATH%\animations\vl60pk\*.* %RRS_DEV_ROOT%\data\animations\vl60pk\
 
 rem ВЛ60к
 xcopy /Y /S %DATA_PATH%\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
@@ -107,11 +123,11 @@ xcopy /Y ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты
 
-rem xcopy /Y /S ..\routes\experimental-polygon\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
-rem rmdir /S /Q %RRS_DEV_ROOT%\routes\experimental-polygon\map_editor
-rem del /S %RRS_DEV_ROOT%\routes\experimental-polygon\~*.*
+xcopy /Y /S ..\routes\experimental-polygon\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
+rmdir /S /Q %RRS_DEV_ROOT%\routes\experimental-polygon\map_editor
+del /S %RRS_DEV_ROOT%\routes\experimental-polygon\~*.*
 
-xcopy /Y /S ..\routes\experimental-polygon-gltf\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
+xcopy /Y /S ..\routes\experimental-polygon-gltf\*.* %RRS_DEV_ROOT%\routes\experimental-polygon-gltf\
 
 rem Копируем SDK
 
