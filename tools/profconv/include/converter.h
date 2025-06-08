@@ -17,7 +17,9 @@
 
 #include    <vector>
 
+#include    "cmdparser.hpp"
 //#include    "zds-profile-dat-struct.h"
+#include    "zds-objects-ref-struct.h"
 #include    "zds-route-map-struct.h"
 #include    "zds-route-trk-struct.h"
 #include    "zds-signals-at-route-map-struct.h"
@@ -28,7 +30,6 @@
 #include    "trajectory_struct.h"
 #include    "power_line_element.h"
 #include    "neutral_insertion.h"
-#include    "cmd-line.h"
 
 #include    <fstream>
 #include    <QTextStream>
@@ -73,17 +74,21 @@ private:
 
     size_t railway_coord_sections2 = 0;
 
-    std::string         routeDir;
+    std::string ZDSrouteDir = "";
 
-    std::string         topologyDir;
+    std::string routeDir = "";
 
-    std::string         trajectoriesDir;
+    std::string topologyDir = "";
 
-    std::string         route1mapDir;
+    std::string trajectoriesDir = "";
 
-    std::string         ALSN_Dir;
+    std::string route1mapDir = "";
 
-    std::string         speedmapDir;
+    std::string ALSN_Dir = "";
+
+    std::string speedmapDir = "";
+
+    zds_objects_ref_data_t  objects_data;
 
     zds_route_map_data_t    route_map_data;
 
@@ -147,11 +152,15 @@ private:
 
     std::vector<neutral_insertion_t> neutral_insertions;
 
-    CmdLineParseResult parseCommandLine(int argc, char *argv[]);
+    void configure_parser(cli::Parser &parser);
+
+    void parse_command_line(cli::Parser &parser);
+
+    void configure_path(const std::string &input_path, const std::string &output_path);
 
     QString fileToQString(const std::string &path);
 
-    bool conversion(const std::string &routeDir);
+    bool conversion();
 
     zds_track_t getNearestTrack(dvec3 point, const zds_trajectory_data_t &tracks_data, float &coord);
 
@@ -162,6 +171,10 @@ private:
     bool readRouteMAP(const std::string &path, zds_route_map_data_t &map_data);
 
     bool readRouteMAP(QTextStream &stream, zds_route_map_data_t &map_data);
+
+    bool readObjectsRef(const std::string &path, zds_objects_ref_data_t &objects_data);
+
+    bool readObjectsRef(QTextStream &stream, zds_objects_ref_data_t &objects_data);
 
     void findSignalsAtMap();
 
