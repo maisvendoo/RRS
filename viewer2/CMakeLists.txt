@@ -22,11 +22,12 @@ target_link_libraries(${TARGET} PRIVATE
     Qt6::Xml
     vsg::vsg
     vsgXchange::vsgXchange
-    vsgImGui::vsgImGui    
+    vsgImGui::vsgImGui
     filesystem
     CfgReader
     network
     sound-manager
+    display
 )
 
 target_include_directories(${TARGET} PRIVATE
@@ -36,5 +37,6 @@ target_include_directories(${TARGET} PRIVATE
     ../CfgReader/include
     ../network/include
     ../sound-manager/include
+    ../viewer/display/include
     ./include
 )

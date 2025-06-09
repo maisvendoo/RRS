@@ -2,6 +2,7 @@
 #define VEHICLE_EXTERIOR_H
 
 #include "animations-list.h"
+#include "display-container.h"
 
 #include <vsg/core/Object.h>
 #include <vsg/nodes/MatrixTransform.h>
@@ -29,7 +30,7 @@ public:
     int         next_vehicle = -1;
 
     animations_t* animations = new animations_t();
-    //displays_t   *displays = new displays_t();
+    displays_t* displays = new displays_t();
     std::vector<size_t> sounds_id = {};
 
     vsg::dvec3  saved_cabine_cam_shift = vsg::dvec3(0.0, 0.0, 0.0);

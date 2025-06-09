@@ -29,6 +29,7 @@
 #include <vsg/state/GraphicsPipeline.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsgXchange/all.h>
+// #include <vsg/ui/PrintEvents.h>
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/lighting/HardShadows.h>
@@ -523,6 +524,8 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(upd_soundmanager_handler);
     viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
+    // auto printEvents = vsg::PrintEvents::create(vsg::clock::now());
+    // viewer->addEventHandler(printEvents);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();

@@ -149,5 +149,14 @@ void VehicleExterior::load_sounds(const std::string &sounds_dir, SoundManager *s
 //------------------------------------------------------------------------------
 void VehicleExterior::load_displays([[maybe_unused]] const std::string &cfg_path)
 {
-// TODO
+    CfgReader cfg;
+    if (cfg.load(cfg_path.c_str()))
+    {
+        LOG_INFO("Loaded file %s", cfg_path.c_str());
+    }
+    else
+    {
+        LOG_WARN("File %s is not found", cfg_path.c_str());
+        return;
+    }
 }
