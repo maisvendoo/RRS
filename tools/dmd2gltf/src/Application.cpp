@@ -242,32 +242,6 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     // Создаем каталог под текстуры
     fs::create_directory(combine_path(out_gltf_route_path, "textures"));
 
-    if (in_dmd_route_path != out_gltf_route_path)
-    {
-        // Копируем топологию
-        try
-        {
-            fs::copy(combine_path(in_dmd_route_path, "topology"),
-                     combine_path(out_gltf_route_path, "topology"),
-                     fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << e.what();
-        }
-
-        try
-        {
-            fs::copy(combine_path(in_dmd_route_path, "description.xml"),
-                     combine_path(out_gltf_route_path, "description.xml"),
-                     fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << e.what();
-        }
-    }
-
     std::map<Label, RelativeModelPath> new_objects;
 
     for (const auto& [relative_model_path, labels_textures] : objects)
