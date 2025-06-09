@@ -1,10 +1,8 @@
 #include    "converter.h"
-
-#include    <QFile>
-#include    <iostream>
-
+#include    "Logger.h"
 #include    "path-utils.h"
 
+#include    <QFile>
 
 void add_element(float x, std::vector<float> &array)
 {
@@ -35,9 +33,10 @@ bool ZDSimConverter::readRouteMAP(const std::string &path, zds_route_map_data_t 
     QString data = fileToQString(path);
     if (data.isEmpty())
     {
-        std::cout << "File " << path << " not opened" << std::endl;
+        LOG_WARN("Warn: failed to open file: %s", path.c_str());
         return false;
     }
+    LOG_INFO("Info: opened file: %s", path.c_str());
 
     QTextStream stream(&data);
     return readRouteMAP(stream, map_data);
@@ -87,7 +86,8 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
             it = objects_data.find(object_20symb.toStdString());
             if (it == objects_data.end())
             {
-                std::cout << "Warning: invalid object with name=" << tokens[0].toStdString() << std::endl;
+                LOG_WARN("Warn: <route1.map> invalid object: %s", line.toStdString().c_str());
+                LOG_WARN("      object.ref does not contain object with name: %s", tokens[0].toStdString().c_str());
                 continue;
             }
         }

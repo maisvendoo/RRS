@@ -1,9 +1,8 @@
 #include    "converter.h"
-
-#include    <iostream>
-#include    <QFile>
-
+#include    "Logger.h"
 #include    "path-utils.h"
+
+#include    <QFile>
 
 //------------------------------------------------------------------------------
 //
@@ -16,9 +15,10 @@ bool ZDSimConverter::readSpeedsDAT(const std::string &path, zds_speeds_data_t &s
     QString data = fileToQString(path);
     if (data.isEmpty())
     {
-        std::cout << "File " << path << " not opened" << std::endl;
+        LOG_WARN("Warn: failed to open file: %s", path.c_str());
         return false;
     }
+    LOG_INFO("Info: opened file: %s", path.c_str());
 
     QTextStream stream(&data);
     return readSpeedsDAT(stream, speeds_data, dir);
@@ -31,8 +31,10 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
 {
     zds_trajectory_data_t* td = dir > 0 ? &tracks_data1 : &tracks_data2;
     int last_id = -1;
+    int line_num = 0;
     while (!stream.atEnd())
     {
+        ++line_num;
         QString line = stream.readLine();
 
         if (line.isEmpty())
@@ -86,10 +88,14 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
             {
                 if (speed_point.end_track_id <= last_id + 1)
                 {
+                    LOG_INFO("Warn: <speeds1.dat> intersection of permissions at line %u", line_num);
+                    LOG_INFO("      permission ends at track[%u], but previous ends at track[%u]", speed_point.end_track_id, last_id);
                     continue;
                 }
                 if (speed_point.begin_track_id <= last_id)
                 {
+                    LOG_INFO("Warn: <speeds1.dat> intersection of permissions at line %u", line_num);
+                    LOG_INFO("      permission begins at track[%u], but previous ends at track[%u]", speed_point.end_track_id, last_id);
                     speed_point.begin_track_id = last_id + 1;
                 }
                 last_id = speed_point.end_track_id;
@@ -98,10 +104,14 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
             {
                 if (speed_point.begin_track_id >= last_id - 1)
                 {
+                    LOG_INFO("Warn: <speeds2.dat> intersection of permissions at line %u", line_num);
+                    LOG_INFO("      permission begins at track[%u], but previous begins at track[%u]", speed_point.end_track_id, last_id);
                     continue;
                 }
                 if (speed_point.end_track_id >= last_id)
                 {
+                    LOG_INFO("Warn: <speeds2.dat> intersection of permissions at line %u", line_num);
+                    LOG_INFO("      permission ends at track[%u], but previous begins at track[%u]", speed_point.end_track_id, last_id);
                     speed_point.end_track_id = last_id - 1;
                 }
                 last_id = speed_point.begin_track_id;

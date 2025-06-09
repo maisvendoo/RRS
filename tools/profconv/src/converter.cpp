@@ -1,9 +1,9 @@
 #include    "converter.h"
 #include    "command-line.h"
+#include    "path-utils.h"
+#include    "Logger.h"
 
 #include    <cstdlib>
-
-#include    "path-utils.h"
 
 #include    <QFile>
 #include    <QDir>
@@ -38,7 +38,7 @@ int ZDSimConverter::run(int argc, char *argv[])
 
     bool result = conversion();
 
-    return !result;
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ void ZDSimConverter::parse_command_line(cli::Parser &parser)
         return;
     }
 
-    std::cerr << "ERROR: Missing route path" << std::endl;
+    LOG_WARN("ERROR: Missing route path");
     exit(0);
 }
 

@@ -16,5 +16,8 @@ file(GLOB SOURCES "./src/*.cpp")
 add_executable(${TARGET} ${INCLUDES} ${SOURCES})
 
 # Указываем пути поиска заголовков
-#target_include_directories(${TARGET} PRIVATE ../CmdParser)
 target_include_directories(${TARGET} PRIVATE ./include)
+target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
+
+# Компонуемся с библиотеками
+target_link_libraries (${TARGET} filesystem)

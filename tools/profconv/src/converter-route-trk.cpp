@@ -1,10 +1,9 @@
 #include    "converter.h"
+#include    "Logger.h"
+#include    "path-utils.h"
 
-#include    <iostream>
 #include    <sstream>
 #include    <QFile>
-
-#include    "path-utils.h"
 
 //------------------------------------------------------------------------------
 //
@@ -20,9 +19,11 @@ bool ZDSimConverter::readRouteTRK(const std::string &path,
 
     if (!stream.is_open())
     {
+        LOG_WARN("Warn: failed to open file: %s", path.c_str());
         std::cout << "File " << path << " not opened" << std::endl;
         return false;
     }
+    LOG_INFO("Info: opened file: %s", path.c_str());
 
     return readRouteTRK(stream, track_data, dir);
 }
@@ -180,6 +181,12 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
                     // Если разница велика, считаем,
                     // что со следующего трека начался новый пикетаж
                     ++railway_coord_section;
+                    LOG_INFO("Info: <route%u.trk> begin of new railway coordinates: track[%u] is %u, track[%u] is %u",
+                             (dir > 0) ? 1 : 2,
+                             cur_track.next_uid - 1,
+                             railway_coord_recalc_begin,
+                             cur_track.next_uid,
+                             cur_track.railway_coord_end);
 
                     // А определённое по этой разнице
                     // направление увеличения координаты не имеет смысла,
