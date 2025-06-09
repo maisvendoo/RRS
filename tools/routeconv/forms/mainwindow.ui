@@ -56,7 +56,51 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="hlOutputPath">
+        <item>
+         <widget class="QLabel" name="lOutputPathLabel">
+          <property name="text">
+           <string>Converted route path:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lOutputPath">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="hsOutputPath">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbSelectOutputPath">
+          <property name="text">
+           <string>Select path</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>1</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -64,559 +108,509 @@
          <attribute name="title">
           <string>Route converter</string>
          </attribute>
-         <widget class="QWidget" name="verticalLayoutWidget_3">
-          <property name="geometry">
-           <rect>
-            <x>9</x>
-            <y>9</y>
-            <width>631</width>
-            <height>321</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="vlConverter">
-           <item>
-            <widget class="QLabel" name="lRouteTitleLabel">
-             <property name="text">
-              <string>Route title</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="leRouteTitle"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="lRouteDescriptionLabel">
-             <property name="text">
-              <string>Route description</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTextEdit" name="teRouteDescription"/>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="cbOnlyUsedModels">
-             <property name="text">
-              <string>Convert only used models</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="hlOutputPath">
-             <item>
-              <widget class="QLabel" name="lOutputPathLabel">
-               <property name="text">
-                <string>Converted route path:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="lOutputPath">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="hsOutputPath">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pbSelectOutputPath">
-               <property name="text">
-                <string>Select path</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="hlStatus">
-             <item>
-              <widget class="QLabel" name="lStatusLabel">
-               <property name="text">
-                <string>Status:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="lStatus">
-               <property name="text">
-                <string>Route is not opened</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="hsStatus">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pbConvert">
-               <property name="text">
-                <string>Convert</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QVBoxLayout" name="vlConverter">
+            <item>
+             <widget class="QLabel" name="lRouteTitleLabel">
+              <property name="text">
+               <string>Route title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="leRouteTitle"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="lRouteDescriptionLabel">
+              <property name="text">
+               <string>Route description</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTextEdit" name="teRouteDescription"/>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="cbOnlyUsedModels">
+              <property name="text">
+               <string>Convert only used models</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="hlStatus">
+              <item>
+               <widget class="QLabel" name="lStatusLabel">
+                <property name="text">
+                 <string>Status:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lStatus">
+                <property name="text">
+                 <string>Route is not opened</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="hsStatus">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pbConvert">
+                <property name="text">
+                 <string>Convert</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="tabUtilites">
          <attribute name="title">
           <string>Utilites</string>
          </attribute>
-         <widget class="QWidget" name="verticalLayoutWidget_4">
-          <property name="geometry">
-           <rect>
-            <x>9</x>
-            <y>9</y>
-            <width>621</width>
-            <height>231</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="vlUtilites">
-           <item>
-            <widget class="QLabel" name="lParallelTitle">
-             <property name="text">
-              <string>Generate parallel trajectory for topology</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="vblParallel">
-             <item>
-              <layout class="QHBoxLayout" name="hblParallel1">
-               <item>
-                <widget class="QComboBox" name="cbDataParallel">
-                 <property name="minimumSize">
-                  <size>
-                   <width>75</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maxCount">
-                  <number>2</number>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string notr="true">route1.trk</string>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QVBoxLayout" name="vlUtilites">
+            <item>
+             <widget class="QLabel" name="lParallelTitle">
+              <property name="text">
+               <string>Generate parallel trajectory for topology</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="vblParallel">
+              <item>
+               <layout class="QHBoxLayout" name="hblParallel1">
+                <item>
+                 <widget class="QComboBox" name="cbDataParallel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>75</width>
+                    <height>0</height>
+                   </size>
                   </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string notr="true">route2.trk</string>
+                  <property name="maxCount">
+                   <number>2</number>
                   </property>
-                 </item>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerParallelTop2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="lTrackBegin">
-                 <property name="text">
-                  <string>Begin track:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="sbTrackBegin">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>99999</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerParallelTop1">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="lTrackEnd">
-                 <property name="text">
-                  <string>End track:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="sbTrackEnd">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>99999</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerParallelTop3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="lOffset">
-                 <property name="text">
-                  <string>Offset:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="dsbParallelOffset">
-                 <property name="decimals">
-                  <number>1</number>
-                 </property>
-                 <property name="minimum">
-                  <double>-50.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>50.000000000000000</double>
-                 </property>
-                 <property name="singleStep">
-                  <double>0.500000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>7.500000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="hblParallel2">
-               <item>
-                <widget class="QLabel" name="label_7">
-                 <property name="text">
-                  <string>Output filename:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="leFileParallel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>trajectory</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_8">
-                 <property name="text">
-                  <string>.traj</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pbGenParallel">
-                 <property name="text">
-                  <string>Generate parallel trajectory</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <spacer name="vsUtilites">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="lSplineTitle">
-             <property name="text">
-              <string>Generate spline trajectory for topology</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="vblSpline">
-             <item>
-              <layout class="QHBoxLayout" name="hblSpline1">
-               <item>
-                <widget class="QComboBox" name="cbDataSpline">
-                 <property name="minimumSize">
-                  <size>
-                   <width>75</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maxCount">
-                  <number>2</number>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string notr="true">route1.trk</string>
+                  <item>
+                   <property name="text">
+                    <string notr="true">route1.trk</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string notr="true">route2.trk</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerParallelTop2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string notr="true">route2.trk</string>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
                   </property>
-                 </item>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerSplineTop1">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="lTrack">
-                 <property name="text">
-                  <string>Track:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="sbSplineTrack">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>99999</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerSplineTop3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="lLength">
-                 <property name="text">
-                  <string>Length:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSpinBox" name="sbSplineLength">
-                 <property name="minimum">
-                  <number>20</number>
-                 </property>
-                 <property name="maximum">
-                  <number>500</number>
-                 </property>
-                 <property name="singleStep">
-                  <number>20</number>
-                 </property>
-                 <property name="value">
-                  <number>100</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerSplineTop2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QLabel" name="lOffsetBegin">
-                 <property name="text">
-                  <string>Offset at begin:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="dsbSplineOffsetBegin">
-                 <property name="decimals">
-                  <number>1</number>
-                 </property>
-                 <property name="minimum">
-                  <double>-50.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>50.000000000000000</double>
-                 </property>
-                 <property name="singleStep">
-                  <double>0.500000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="lOffestEnd">
-                 <property name="text">
-                  <string>end:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="dsbSplineOffsetEnd">
-                 <property name="decimals">
-                  <number>1</number>
-                 </property>
-                 <property name="minimum">
-                  <double>-50.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>50.000000000000000</double>
-                 </property>
-                 <property name="singleStep">
-                  <double>0.500000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>7.500000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="hblSpline2">
-               <item>
-                <widget class="QLabel" name="lOutputFile">
-                 <property name="text">
-                  <string>Output filename:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="leFileSpline">
-                 <property name="text">
-                  <string>trajectory</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="lExtension">
-                 <property name="text">
-                  <string>.traj</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="hSpacerSplineBottom">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pbGenSpline">
-                 <property name="text">
-                  <string>Generate spline trajectory</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lTrackBegin">
+                  <property name="text">
+                   <string>Begin track:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="sbTrackBegin">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>99999</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerParallelTop1">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lTrackEnd">
+                  <property name="text">
+                   <string>End track:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="sbTrackEnd">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>99999</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerParallelTop3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lOffset">
+                  <property name="text">
+                   <string>Offset:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="dsbParallelOffset">
+                  <property name="decimals">
+                   <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-50.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>50.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.500000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>7.500000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="hblParallel2">
+                <item>
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Output filename:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="leFileParallel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>trajectory</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>.traj</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pbGenParallel">
+                  <property name="text">
+                   <string>Generate parallel trajectory</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="vsUtilites">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="lSplineTitle">
+              <property name="text">
+               <string>Generate spline trajectory for topology</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="vblSpline">
+              <item>
+               <layout class="QHBoxLayout" name="hblSpline1">
+                <item>
+                 <widget class="QComboBox" name="cbDataSpline">
+                  <property name="minimumSize">
+                   <size>
+                    <width>75</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maxCount">
+                   <number>2</number>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string notr="true">route1.trk</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string notr="true">route2.trk</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerSplineTop1">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lTrack">
+                  <property name="text">
+                   <string>Track:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="sbSplineTrack">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>99999</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerSplineTop3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lLength">
+                  <property name="text">
+                   <string>Length:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="sbSplineLength">
+                  <property name="minimum">
+                   <number>20</number>
+                  </property>
+                  <property name="maximum">
+                   <number>500</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>20</number>
+                  </property>
+                  <property name="value">
+                   <number>100</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerSplineTop2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lOffsetBegin">
+                  <property name="text">
+                   <string>Offset at begin:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="dsbSplineOffsetBegin">
+                  <property name="decimals">
+                   <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-50.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>50.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.500000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lOffestEnd">
+                  <property name="text">
+                   <string>end:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="dsbSplineOffsetEnd">
+                  <property name="decimals">
+                   <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-50.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>50.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.500000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>7.500000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="hblSpline2">
+                <item>
+                 <widget class="QLabel" name="lOutputFile">
+                  <property name="text">
+                   <string>Output filename:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="leFileSpline">
+                  <property name="text">
+                   <string>trajectory</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lExtension">
+                  <property name="text">
+                   <string>.traj</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="hSpacerSplineBottom">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pbGenSpline">
+                  <property name="text">
+                   <string>Generate spline trajectory</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>

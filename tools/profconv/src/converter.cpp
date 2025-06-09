@@ -1,4 +1,5 @@
 #include    "converter.h"
+#include    "command-line.h"
 
 #include    <cstdlib>
 
@@ -12,7 +13,6 @@
 //
 //------------------------------------------------------------------------------
 ZDSimConverter::ZDSimConverter()
-    : routeDir("")
 {
 
 }
@@ -30,102 +30,72 @@ ZDSimConverter::~ZDSimConverter()
 //------------------------------------------------------------------------------
 int ZDSimConverter::run(int argc, char *argv[])
 {
-    switch (parseCommandLine(argc, argv))
-    {
-    case RESULT_OK:
+    cli::Parser parser(argc, argv);
 
-        if ( !conversion(toNativeSeparators(routeDir)) )
-            return -1;
+    configure_parser(parser);
 
-        break;
+    parse_command_line(parser);
 
-    case RESULT_HELP:
+    bool result = conversion();
 
-        break;
-
-    case RESULT_VERSION:
-
-        break;
-
-    case RESULT_ERROR:
-
-        return -1;
-    }
-
-    return 0;
+    return !result;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool parse_arg(const std::string &arg, cmd_param_t &cmd_param)
+void ZDSimConverter::configure_parser(cli::Parser &parser)
 {
-    if (arg.empty())
-        return false;
+    parser.set_optional<std::string>("r", "route",
+                                     "",
+                                     "Input ZDS route path, used as output too");
 
-    char delimiter = '=';
-    std::string tmp = arg + delimiter;
-    std::vector<std::string> tokens;
+    parser.set_optional<std::string>("i", "input-route",
+                                     "",
+                                     "Input ZDS route path");
 
-    size_t pos = 0;
+    parser.set_optional<std::string>("o", "output-route",
+                                     "",
+                                     "Output RRS route path");
 
-    while ( (pos = tmp.find(delimiter)) != std::string::npos )
-    {
-        std::string token = tmp.substr(0, pos);
-        tmp.erase(0, pos + 1);
-        tokens.push_back(token);
-    }
-
-    switch (tokens.size())
-    {
-    case 1:
-
-        cmd_param.key = tokens[0];
-        break;
-
-    case 2:
-
-        cmd_param.key = tokens[0];
-        cmd_param.value = tokens[1];
-        break;
-
-    default:
-
-        return false;
-    }
-
-    return true;
+    parser.enable_help();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
+void ZDSimConverter::parse_command_line(cli::Parser &parser)
 {
-    std::vector<std::string> cmd_line;
+    parser.run_and_exit_if_error();
 
-    for (int i = 0; i < argc; ++i)
-        cmd_line.push_back(argv[i]);
+    cmd_line_t cmd_line;
+    cmd_line.route_path = parser.get<std::string>("r");
+    cmd_line.input_route_path = parser.get<std::string>("i");
+    cmd_line.output_route_path = parser.get<std::string>("o");
 
-    for (auto it = cmd_line.begin() + 1; it != cmd_line.end(); ++it)
+    if (cmd_line.route_path.isPresent())
     {
-        cmd_param_t param;
-
-        if (parse_arg(*it, param))
-        {
-            if (param.key == "--route")
-                routeDir = param.value;
-
-            if (param.key == "--help")
-                return RESULT_HELP;
-
-            if (param.key == "--version")
-                return RESULT_VERSION;
-        }
+        configure_path(cmd_line.route_path.value, cmd_line.route_path.value);
+        return;
     }
 
-    if (routeDir.empty())
-        return RESULT_ERROR;
+    if (cmd_line.input_route_path.isPresent() && cmd_line.output_route_path.isPresent())
+    {
+        configure_path(cmd_line.input_route_path.value, cmd_line.output_route_path.value);
+        return;
+    }
+
+    std::cerr << "ERROR: Missing route path" << std::endl;
+    exit(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ZDSimConverter::configure_path(const std::string &input_path, const std::string &output_path)
+{
+    ZDSrouteDir = input_path;
+    routeDir = output_path;
 
     QDir route(routeDir.c_str());
 
@@ -191,8 +161,6 @@ CmdLineParseResult ZDSimConverter::parseCommandLine(int argc, char *argv[])
     }
     speedmapDir = toNativeSeparators(compinePath(topologyDir, DIR_SPEEDMAP));
     topology.mkpath(speedmapDir.c_str());
-
-    return RESULT_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -220,19 +188,21 @@ QString ZDSimConverter::fileToQString(const std::string &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ZDSimConverter::conversion(const std::string &routeDir)
+bool ZDSimConverter::conversion()
 {
-    std::string trk1_path = compinePath(routeDir, "route1.trk");
-    std::string trk2_path = compinePath(routeDir, "route2.trk");
-    std::string map_path = compinePath(routeDir, "route1.map");
-    std::string start_km_path = compinePath(routeDir, "start_kilometers.dat");
-    std::string speeds1_path = compinePath(routeDir, "speeds1.dat");
-    std::string speeds2_path = compinePath(routeDir, "speeds2.dat");
-    std::string signals1_path = compinePath(routeDir, "svetofor1.dat");
-    std::string signals2_path = compinePath(routeDir, "svetofor2.dat");
-    std::string branch1_path = compinePath(routeDir, "branch_tracks1.dat");
-    std::string branch2_path = compinePath(routeDir, "branch_tracks2.dat");
+    std::string trk1_path = compinePath(ZDSrouteDir, "route1.trk");
+    std::string trk2_path = compinePath(ZDSrouteDir, "route2.trk");
+    std::string objects_path = compinePath(ZDSrouteDir, "objects.ref");
+    std::string map_path = compinePath(ZDSrouteDir, "route1.map");
+    std::string start_km_path = compinePath(ZDSrouteDir, "start_kilometers.dat");
+    std::string speeds1_path = compinePath(ZDSrouteDir, "speeds1.dat");
+    std::string speeds2_path = compinePath(ZDSrouteDir, "speeds2.dat");
+    std::string signals1_path = compinePath(ZDSrouteDir, "svetofor1.dat");
+    std::string signals2_path = compinePath(ZDSrouteDir, "svetofor2.dat");
+    std::string branch1_path = compinePath(ZDSrouteDir, "branch_tracks1.dat");
+    std::string branch2_path = compinePath(ZDSrouteDir, "branch_tracks2.dat");
 
+/*  Устаревший формат
     std::string traj_file1 = "route1.trj";
     std::string traj_file2 = "route2.trj";
 
@@ -240,11 +210,11 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
     std::string stations_file = "stations.conf";
     std::string speeds1_file = "speeds1.conf";
     std::string speeds2_file = "speeds2.conf";
-
-    // Создаваемые специально для конвертации файлы
+*/
+    // Костыль - создаваемые специально для конвертации файлы
     // со светофорами по главным путям в неправильном направлении
-    std::string signals1_reverse_path = compinePath(routeDir, "svetofor1_reverse.dat");
-    std::string signals2_reverse_path = compinePath(routeDir, "svetofor2_reverse.dat");
+    std::string signals1_reverse_path = compinePath(ZDSrouteDir, "svetofor1_reverse.dat");
+    std::string signals2_reverse_path = compinePath(ZDSrouteDir, "svetofor2_reverse.dat");
 
     int dir = 1;
     bool is_1 = readRouteTRK(trk1_path, tracks_data1, dir);
@@ -258,6 +228,7 @@ bool ZDSimConverter::conversion(const std::string &routeDir)
         //writeProfileData(tracks_data1, "profile1.conf");
 
         //createPowerLine(tracks_data1, power_line1);
+        readObjectsRef(objects_path, objects_data);
         readRouteMAP(map_path, route_map_data);
         findNeutralInsertions(neutral_insertions);
 

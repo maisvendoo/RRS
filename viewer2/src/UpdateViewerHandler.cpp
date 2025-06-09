@@ -138,7 +138,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             if (_vehicles_handler->returnToControlledVehicle() || (_current_manipulator != _cabine_manipulator))
             {
                 _current_manipulator = _cabine_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+                changeCurrentVehicle();
                 _current_manipulator->resetView();
                 return;
             }

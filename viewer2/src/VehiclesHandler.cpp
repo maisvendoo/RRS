@@ -444,6 +444,38 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
     update_data[unused_state].deserialize(data);
     if (update_data[unused_state].vehicles.size() == vehicles.size())
     {
+/*
+        QString msg = "";
+        msg += "\nTrains(";
+        msg += QString::number(update_data[unused_state].trains.size());
+        msg += "):";
+        for (size_t i = 0; i < update_data[unused_state].trains.size(); ++i)
+        {
+            msg += QString::number(update_data[unused_state].trains[i].first_vehicle_id);
+            msg += ",";
+            msg += QString::number(update_data[unused_state].trains[i].last_vehicle_id);
+            msg += "|";
+        }
+        msg += "\nVehicles(";
+        msg += QString::number(update_data[unused_state].vehicles.size());
+        msg += "):";
+        for (size_t i = 0; i < update_data[unused_state].vehicles.size(); ++i)
+        {
+            msg += "\n(";
+            msg += QString::number(update_data[unused_state].vehicles[i].train_id);
+            msg += ")";
+            msg += QString::number(i);
+            msg += "(";
+            msg += QString::number(update_data[unused_state].vehicles[i].analogSignal.size());
+            msg += "):";
+            for (auto s : update_data[unused_state].vehicles[i].analogSignal)
+            {
+                msg += QString::number(s);
+                msg += "|";
+            }
+        }
+        LOG_INFO("%s", msg.toStdString().c_str());
+*/
         is_state_updated = true;
         is_new_state = true;
     }

@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbGenParallel, &QPushButton::released, this, &MainWindow::slotGenerateParallel);
     connect(ui->pbGenSpline, &QPushButton::released, this, &MainWindow::slotGenerateSpline);
+
+    ui->pbSelectOutputPath->setEnabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -52,7 +54,7 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 bool MainWindow::createRouteTypeFile()
 {
-    QFile file(routeDir + QDir::separator() + "route-type");
+    QFile file(outputDir + QDir::separator() + "route-type");
 
     if (file.open(QIODevice::WriteOnly))
     {
@@ -73,7 +75,7 @@ bool MainWindow::createDescriptionFile(QString title, QString description)
 {
     CfgEditor editor;
 
-    editor.openFileForWrite(routeDir + QDir::separator() + "description.xml");
+    editor.openFileForWrite(outputDir + QDir::separator() + "description.xml");
     editor.setIndentationFormat(-1);
 
     FieldsDataList flist;
@@ -111,7 +113,8 @@ void MainWindow::startProfConverter(QString routeDir)
     QString profconv_path = PROFCONV + EXE_EXP;
 
     QStringList args;
-    args << "--route=" + routeDir;
+    args << "--input-route" << routeDir;
+    args << "--output-route" << outputDir;
 
     profconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     profconvProc.start(profconv_path, args);
@@ -127,11 +130,10 @@ void MainWindow::startDmd2gltfConverter(QString routeDir)
 
     QStringList args;
     args << "--input-route" << routeDir;
-    args << "--output-route" << routeDir;
-//    args << "--output-route" << outputDir;
-    if (ui->cbOnlyUsedModels)
+    args << "--output-route" << outputDir;
+    if (ui->cbOnlyUsedModels->checkState())
     {
-        args << "--only-used";
+        args << "--used-only";
     }
 
     dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
@@ -153,15 +155,16 @@ void MainWindow::startParallelGenerator(QString routeDir)
     double bias = ui->dsbParallelOffset->value();
 
     QStringList args;
-    args << "-r" << routeDir;
+    args << "-i" << routeDir;
+    args << "-o" << outputDir;
     args << "-f" << filename;
     args << "-t" << QString("%1").arg(trkfile);
     args << "-b" << QString("%1").arg(begin_track);
     args << "-e" << QString("%1").arg(end_track);
     args << "-d" << QString("%1").arg(bias, 0, 'f', 2);
 
-    pathconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    pathconvProc.start(pathconv_path, args);
+    parallelGenProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    parallelGenProc.start(pathconv_path, args);
 }
 
 //------------------------------------------------------------------------------
@@ -180,16 +183,17 @@ void MainWindow::startSplineGenerator(QString routeDir)
     double end_bias = ui->dsbSplineOffsetEnd->value();
 
     QStringList args;
-    args << "-r" << routeDir;
+    args << "-i" << routeDir;
+    args << "-o" << outputDir;
     args << "-f" << filename;
     args << "-t" << QString("%1").arg(trkfile);
-    args << "-i" << QString("%1").arg(track);
+    args << "-n" << QString("%1").arg(track);
     args << "-l" << QString("%1").arg(len);
     args << "-d" << QString("%1").arg(begin_bias, 0, 'f', 2);
     args << "-e" << QString("%1").arg(end_bias, 0, 'f', 2);
 
-    pathconvProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
-    pathconvProc.start(pathconv_path, args);
+    splineGenProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    splineGenProc.start(pathconv_path, args);
 }
 
 //------------------------------------------------------------------------------
@@ -202,14 +206,24 @@ void MainWindow::slotOpenRoute()
                                                  QFileDialog::ShowDirsOnly |
                                                  QFileDialog::DontResolveSymlinks);
 
-    QDir dir(routesRootDir);
-    QString relPath = dir.relativeFilePath(routeDir);
+    if (routeDir.isEmpty())
+    {
+        ui->lStatus->setText(tr("Route does not selected. Please choose route"));
+        ui->lCurrentRouteDir->setText("");
+        ui->lOutputPath->setText("");
 
-    ui->lCurrentRouteDir->setText(relPath);
+        ui->pbSelectOutputPath->setEnabled(false);
+        return;
+    }
+
+    ui->pbSelectOutputPath->setEnabled(true);
     ui->lStatus->setText(tr("Route opened succesfully"));
 
+    QDir dir(routesRootDir);
+    QString relPath = dir.relativeFilePath(routeDir);
+    ui->lCurrentRouteDir->setText(relPath);
+
     outputDir = routeDir;
-    relPath = dir.relativeFilePath(outputDir);
     ui->lOutputPath->setText(relPath);
 
     CfgReader cfg;
@@ -238,6 +252,25 @@ void MainWindow::slotSelectOutputPath()
                                                   routesRootDir,
                                                   QFileDialog::ShowDirsOnly |
                                                   QFileDialog::DontResolveSymlinks);
+
+    if (outputDir.isEmpty())
+    {
+        if (routeDir.isEmpty())
+        {
+            ui->lStatus->setText(tr("Route does not selected. Please choose route"));
+            ui->lOutputPath->setText("");
+            return;
+        }
+        else
+        {
+            ui->lStatus->setText(tr("Output does not selected. Using selected route as output"));
+            outputDir = routeDir;
+        }
+    }
+    else
+    {
+        ui->lStatus->setText(tr("Output selected succesfully"));
+    }
 
     QDir dir(routesRootDir);
     QString relPath = dir.relativeFilePath(outputDir);

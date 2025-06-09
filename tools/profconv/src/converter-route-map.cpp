@@ -77,17 +77,35 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
         if (tokens.size() < 7)
             continue;
 
-        // Читаем информацию об объекте
-        zds_object_position_t zds_object = zds_object_position_t();
-        zds_object.obj_name = tokens[0].toStdString();
-        zds_object.position.x = tokens[1].toDouble();
-        zds_object.position.y = tokens[2].toDouble();
-        zds_object.position.z = tokens[3].toDouble();
-        zds_object.attitude.x = tokens[4].toDouble();
-        zds_object.attitude.y = tokens[5].toDouble();
-        zds_object.attitude.z = tokens[6].toDouble();
+        // Проверяем, что есть запись об этом объекте в objects.ref
+        auto it = objects_data.find(tokens[0].toStdString());
+        if (it == objects_data.end())
+        {
+            // Проверяем запись, обрезанную до 20 символов (привет Славе Усову!)
+            QString object_20symb = tokens[0];
+            object_20symb.truncate(20);
+            it = objects_data.find(object_20symb.toStdString());
+            if (it == objects_data.end())
+            {
+                std::cout << "Warning: invalid object with name=" << tokens[0].toStdString() << std::endl;
+                continue;
+            }
+        }
 
-        map_data.push_back(new zds_object_position_t(zds_object));
+        zds_object_position_t* zds_object = new zds_object_position_t();
+
+        // Восстанавливаем имя объекта такое же, как в objects.ref
+        zds_object->obj_name = it->second->object_name;
+
+        // Читаем информацию об объекте
+        zds_object->position.x = tokens[1].toDouble();
+        zds_object->position.y = tokens[2].toDouble();
+        zds_object->position.z = tokens[3].toDouble();
+        zds_object->attitude.x = tokens[4].toDouble();
+        zds_object->attitude.y = tokens[5].toDouble();
+        zds_object->attitude.z = tokens[6].toDouble();
+
+        map_data.push_back(zds_object);
         may_add_info_to_last = true;
     }
 

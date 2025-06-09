@@ -11,7 +11,7 @@
 		<SoundDir>pass</SoundDir>
 		<WheelInertia>100.0</WheelInertia>
 
-		<ExtModelName>IMR_pass_rzd/Pass_CupAmm1.osgt</ExtModelName>
+		<ExtModelName>IMR_pass_rzd/Pass_CupAmm1.gltf</ExtModelName>
 		<AnimationsConfigDir>passcar-oy</AnimationsConfigDir>
 
 		<BrakepipeLeak>3e-6</BrakepipeLeak>

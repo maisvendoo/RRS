@@ -1,4 +1,5 @@
 #include "UpdateControlToServerHandler.h"
+//#include "Logger.h"
 #include "tcp-client.h"
 #include "key-symbols.h"
 #include "controlled-struct.h"
@@ -18,6 +19,7 @@ UpdateControlToServerHandler::UpdateControlToServerHandler(TcpClient* tc)
 //------------------------------------------------------------------------------
 void UpdateControlToServerHandler::apply(vsg::KeyPressEvent& keyPress)
 {
+//    LOG_INFO("press %u", keyPress.keyBase);
     // Массив нажатых клавиш для сервера
     if (KeySymbolsRRS.count(keyPress.keyBase))
     {
@@ -34,6 +36,7 @@ void UpdateControlToServerHandler::apply(vsg::KeyPressEvent& keyPress)
 //------------------------------------------------------------------------------
 void UpdateControlToServerHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
+//    LOG_INFO("release %u", keyRelease.keyBase);
     if (_pressed_keys.erase(keyRelease.keyBase))
     {
         sendControlToServer();

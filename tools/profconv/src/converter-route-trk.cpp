@@ -224,7 +224,7 @@ bool ZDSimConverter::readRouteTRK(std::ifstream &stream,
 
                     // Стрелки, которые завершаются в конце трека,
                     // сохраняем у последнего подтрека (текущего)
-                    bool is_last = ((cur_track.arrows  == "2+2") ||
+                    bool is_last = ((cur_track.arrows == "2+2") ||
                                     (cur_track.arrows == "2+") ||
                                     (cur_track.arrows == "2-"));
 

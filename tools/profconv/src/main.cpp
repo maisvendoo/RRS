@@ -19,7 +19,6 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
     ZDSimConverter conv;
 
     return conv.run(argc, argv);
