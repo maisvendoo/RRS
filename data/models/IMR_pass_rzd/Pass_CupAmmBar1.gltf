@@ -3,1487 +3,313 @@
 		"generator":"Khronos glTF Blender I/O v4.4.56",
 		"version":"2.0"
 	},
+	"extensionsUsed":[
+		"KHR_materials_specular"
+	],
 	"scene":0,
 	"scenes":[
 		{
 			"name":"Scene",
 			"nodes":[
-				166
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45
 			]
 		}
 	],
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"02 - Default.014",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				0
-			],
-			"name":"AB-GEODE",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				1
-			],
-			"name":"AB-OFFSET",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				2
-			],
-			"name":"AB",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Scene Root_AB_AB-OFFSET_AB-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":1,
-			"name":"02 - Default.032"
-		},
-		{
-			"children":[
-				4
-			],
-			"name":"Avtotormoz292-GEODE"
-		},
-		{
-			"children":[
-				5
-			],
-			"name":"Avtotormoz292-OFFSET",
-			"translation":[
-				0.19335895776748657,
-				1.1774799823760986,
-				-0.1868160367012024
-			]
-		},
-		{
-			"children":[
-				6
-			],
-			"name":"Avtotormoz292",
-			"translation":[
-				-0.6273549795150757,
-				-0.3425840139389038,
-				1.139009952545166
-			]
+			"name":"Scene Root_Avtotormoz292_Avtotormoz292-OFFSET_Avtotormoz292-GEO"
 		},
 		{
 			"mesh":2,
-			"name":"02 - Default.035"
-		},
-		{
-			"children":[
-				8
-			],
-			"name":"Body-GEODE"
-		},
-		{
-			"children":[
-				9
-			],
-			"name":"Body-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
+			"name":"Scene Root_Body_Body-OFFSET_Body-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":3,
-			"name":"02 - Default.039"
-		},
-		{
-			"children":[
-				11
-			],
-			"name":"Boige-1-GEODE"
+			"name":"Scene Root_Body_Boige-1_Boige-1-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":4,
-			"name":"02 - Default.041"
-		},
-		{
-			"children":[
-				13
-			],
-			"name":"Wheel-1-GEODE"
-		},
-		{
-			"children":[
-				14
-			],
-			"name":"Wheel-1-OFFSET",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"translation":[
-				0,
-				1.1999998092651367,
-				-0.7862361073493958
-			]
-		},
-		{
-			"children":[
-				15
-			],
 			"name":"Wheel-1",
 			"translation":[
-				0,
-				-1.1999999284744263,
-				0.7862359881401062
+				-0.000371308415196836,
+				0.7861886620521545,
+				9.900015830993652
 			]
 		},
 		{
 			"mesh":5,
-			"name":"02 - Default.040"
-		},
-		{
-			"children":[
-				17
-			],
-			"name":"Wheel-2-GEODE"
-		},
-		{
-			"children":[
-				18
-			],
-			"name":"Wheel-2-OFFSET",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"translation":[
-				0,
-				-1.200000286102295,
-				-0.786236047744751
-			]
-		},
-		{
-			"children":[
-				19
-			],
 			"name":"Wheel-2",
 			"translation":[
-				0,
-				1.2000001668930054,
-				0.7862359881401062
-			]
-		},
-		{
-			"children":[
-				12,
-				16,
-				20
-			],
-			"name":"Boige-1",
-			"translation":[
-				0,
-				-8.699999809265137,
-				0
+				-0.0003634359163697809,
+				0.7861772179603577,
+				7.500026226043701
 			]
 		},
 		{
 			"mesh":6,
-			"name":"02 - Default.042"
-		},
-		{
-			"children":[
-				22
-			],
-			"name":"Boige-2-GEODE"
+			"name":"Scene Root_Body_Boige-2_Boige-2-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":7,
-			"name":"02 - Default.043"
-		},
-		{
-			"children":[
-				24
-			],
-			"name":"Wheel-3-GEODE"
-		},
-		{
-			"children":[
-				25
-			],
-			"name":"Wheel-3-OFFSET",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"translation":[
-				0,
-				1.200000286102295,
-				-0.786236047744751
-			]
-		},
-		{
-			"children":[
-				26
-			],
 			"name":"Wheel-3",
 			"translation":[
-				0,
-				-1.2000004053115845,
-				0.7862359881401062
+				-0.00037148306728340685,
+				0.7861886024475098,
+				-7.499985694885254
 			]
 		},
 		{
 			"mesh":8,
-			"name":"02 - Default.044"
-		},
-		{
-			"children":[
-				28
-			],
-			"name":"Wheel-4-GEODE"
-		},
-		{
-			"children":[
-				29
-			],
-			"name":"Wheel-4-OFFSET",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"translation":[
-				0,
-				1.1999998092651367,
-				-0.786236047744751
-			]
-		},
-		{
-			"children":[
-				30
-			],
 			"name":"Wheel-4",
 			"translation":[
-				0,
-				1.1999996900558472,
-				0.7862359881401062
-			]
-		},
-		{
-			"children":[
-				23,
-				27,
-				31
-			],
-			"name":"Boige-2",
-			"translation":[
-				0,
-				8.699999809265137,
-				0
+				-0.00037138364859856665,
+				0.786188542842865,
+				-9.89998722076416
 			]
 		},
 		{
 			"mesh":9,
-			"name":"02 - Default.036"
-		},
-		{
-			"children":[
-				33
-			],
-			"name":"DCG-4435-GEODE"
+			"name":"Scene Root_Body_DCG-4435_DCG-4435-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":10,
-			"name":"02 - Default.038"
-		},
-		{
-			"children":[
-				35
-			],
-			"name":"Gen_Kardan-GEODE"
-		},
-		{
-			"children":[
-				36
-			],
-			"name":"Gen_Kardan-OFFSET",
-			"rotation":[
-				0.02181469276547432,
-				0,
-				0,
-				0.9997620582580566
-			],
-			"translation":[
-				0,
-				0.7605538368225098,
-				0
-			]
-		},
-		{
-			"children":[
-				37
-			],
 			"name":"Gen_Kardan",
 			"rotation":[
-				0.022687338292598724,
+				-0.6916242241859436,
 				0,
 				0,
-				0.9997426867485046
+				0.7222574949264526
 			],
 			"translation":[
-				-0.0022869999520480633,
-				-2.0853500366210938,
-				-0.09601908922195435
+				-0.0011820680228993297,
+				0.8140935301780701,
+				6.359710693359375
 			]
 		},
 		{
 			"mesh":11,
-			"name":"02 - Default.037"
-		},
-		{
-			"children":[
-				39
-			],
-			"name":"Gen_Mufta1-GEODE"
-		},
-		{
-			"children":[
-				40
-			],
 			"name":"Gen_Mufta1",
-			"translation":[
-				-0.00011999998241662979,
-				-0.49527275562286377,
-				-0.024896113201975822
-			]
-		},
-		{
-			"children":[
-				34,
-				38,
-				41
+			"rotation":[
+				-0.7071068286895752,
+				0,
+				0,
+				0.7071068286895752
 			],
-			"name":"DCG-4435",
 			"translation":[
-				0.0010849999962374568,
-				-5.036719799041748,
-				0.8748959898948669
+				0.0008727312670089304,
+				0.8500000834465027,
+				5.524901866912842
 			]
-		},
-		{
-			"children":[
-				10,
-				21,
-				32,
-				42
-			],
-			"name":"Body"
 		},
 		{
 			"mesh":12,
-			"name":"02 - Default.031"
-		},
-		{
-			"children":[
-				44
-			],
-			"name":"Bufera-GEODE"
-		},
-		{
-			"children":[
-				45
-			],
-			"name":"Bufera",
-			"translation":[
-				5.900000178371556e-05,
-				0,
-				0
-			]
+			"name":"Scene Root_Bufera_Bufera-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":13,
-			"name":"02 - Default.020"
-		},
-		{
-			"children":[
-				47
-			],
-			"name":"Chep_otpuskVR-GEODE"
-		},
-		{
-			"children":[
-				48
-			],
-			"name":"Chep_otpuskVR-OFFSET",
-			"translation":[
-				0.24731700122356415,
-				-0.983485996723175,
-				0.9090129733085632
-			]
-		},
-		{
-			"children":[
-				49
-			],
-			"name":"Chep_otpuskVR"
+			"name":"Scene Root_Chep_otpuskVR_Chep_otpuskVR-OFFSET_Chep_otpuskVR-GEO"
 		},
 		{
 			"mesh":14,
-			"name":"02 - Default.017",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				51
-			],
-			"name":"Deflektor-GEODE",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				52
-			],
-			"name":"Deflektor-OFFSET",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				53
-			],
-			"name":"Deflektor",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Scene Root_Deflektor_Deflektor-OFFSET_Deflektor-GEODE_02 - Defa"
 		},
 		{
 			"mesh":15,
-			"name":"02 - Default.027",
-			"translation":[
-				0,
-				-8.35206446936354e-06,
-				0
-			]
-		},
-		{
-			"children":[
-				55
-			],
-			"name":"FanTrub-GEODE",
-			"translation":[
-				0,
-				-8.35206446936354e-06,
-				0
-			]
-		},
-		{
-			"children":[
-				56
-			],
-			"name":"FanTrub-OFFSET",
-			"translation":[
-				0.27711009979248047,
-				-55.13479995727539,
-				-1.5201398134231567
-			]
-		},
-		{
-			"children":[
-				57
-			],
-			"name":"FanTrub",
-			"scale":[
-				0.1948850005865097,
-				0.1948850005865097,
-				0.1948850005865097
-			],
-			"translation":[
-				-1.3464800119400024,
-				0.1668190062046051,
-				1.3444700241088867
-			]
+			"name":"Scene Root_FanTrub_FanTrub-OFFSET_FanTrub-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":16,
-			"name":"02 - Default.015"
-		},
-		{
-			"children":[
-				59
-			],
-			"name":"Fartuki-GEODE"
-		},
-		{
-			"children":[
-				60
-			],
-			"name":"Fartuki-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				61
-			],
-			"name":"Fartuki"
+			"name":"Scene Root_Fartuki_Fartuki-OFFSET_Fartuki-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":17,
-			"name":"02 - Default.011"
-		},
-		{
-			"children":[
-				63
-			],
-			"name":"Hvost_signal-GEODE"
-		},
-		{
-			"children":[
-				64
-			],
-			"name":"Hvost_signal"
+			"name":"Scene Root_Hvost_signal_Hvost_signal-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":18,
-			"name":"02 - Default.019"
-		},
-		{
-			"children":[
-				66
-			],
-			"name":"Kabel_G-GEODE"
-		},
-		{
-			"children":[
-				67
-			],
-			"name":"Kabel_G-OFFSET",
-			"translation":[
-				0.26623404026031494,
-				0.20145592093467712,
-				-0.14190086722373962
-			]
-		},
-		{
-			"children":[
-				68
-			],
-			"name":"Kabel_G",
-			"translation":[
-				-0.41878101229667664,
-				-4.390369892120361,
-				1.2763299942016602
-			]
+			"name":"Scene Root_Kabel_G_Kabel_G-OFFSET_Kabel_G-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":19,
-			"name":"02 - Default.004"
-		},
-		{
-			"children":[
-				70
-			],
-			"name":"KoncevoyRuk_1-GEODE"
-		},
-		{
-			"children":[
-				71
-			],
-			"name":"KoncevoyRuk_1",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
+			"name":"Scene Root_KoncevoyRuk_1_KoncevoyRuk_1-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":20,
-			"name":"02 - Default.005"
-		},
-		{
-			"children":[
-				73
-			],
-			"name":"KoncevoyRuk_2-GEODE"
-		},
-		{
-			"children":[
-				74
-			],
-			"name":"KoncevoyRuk_2",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
+			"name":"Scene Root_KoncevoyRuk_2_KoncevoyRuk_2-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":21,
-			"name":"02 - Default.028"
-		},
-		{
-			"children":[
-				76
-			],
-			"name":"Kronsht_gerlic-GEODE"
-		},
-		{
-			"children":[
-				77
-			],
-			"name":"Kronsht_gerlic",
-			"translation":[
-				-0.00022499999613501132,
-				0.00016500000492669642,
-				1.3544100522994995
-			]
+			"name":"Scene Root_Kronsht_gerlic_Kronsht_gerlic-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":22,
-			"name":"02 - Default.030"
-		},
-		{
-			"children":[
-				79
-			],
-			"name":"LestnicaKrisha-GEODE"
-		},
-		{
-			"children":[
-				80
-			],
-			"name":"LestnicaKrisha"
+			"name":"Scene Root_LestnicaKrisha_LestnicaKrisha-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":23,
-			"name":"02 - Default.033"
-		},
-		{
-			"children":[
-				82
-			],
-			"name":"MAB-II-GEODE"
-		},
-		{
-			"children":[
-				83
-			],
-			"name":"MAB-II",
-			"translation":[
-				1.0056699514389038,
-				-2.329819917678833,
-				1.005139946937561
-			]
+			"name":"Scene Root_MAB-II_MAB-II-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":24,
-			"name":"02 - Default.016"
-		},
-		{
-			"children":[
-				85
-			],
-			"name":"Perehod_det-GEODE"
-		},
-		{
-			"children":[
-				86
-			],
-			"name":"Perehod_det",
-			"translation":[
-				4.8999998398358e-05,
-				0,
-				0
-			]
+			"name":"Scene Root_Perehod_det_Perehod_det-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":25,
-			"name":"02 - Default.025"
-		},
-		{
-			"children":[
-				88
-			],
-			"name":"PinchOFF_2-GEODE"
-		},
-		{
-			"children":[
-				89
-			],
-			"name":"PinchOFF_2-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				90
-			],
-			"name":"PinchOFF_2",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			]
+			"name":"Scene Root_PinchOFF_2_PinchOFF_2-OFFSET_PinchOFF_2-GEODE_02 - D"
 		},
 		{
 			"mesh":26,
-			"name":"02 - Default.006"
-		},
-		{
-			"children":[
-				92
-			],
-			"name":"PinchON-GEODE"
-		},
-		{
-			"children":[
-				93
-			],
-			"name":"PinchON",
-			"translation":[
-				0.9007580280303955,
-				-12.500300407409668,
-				0.6508380174636841
-			]
+			"name":"Scene Root_PinchON_PinchON-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":27,
-			"name":"02 - Default.012"
-		},
-		{
-			"children":[
-				95
-			],
-			"name":"Podtambur-GEODE"
-		},
-		{
-			"children":[
-				96
-			],
-			"name":"Podtambur-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				97
-			],
-			"name":"Podtambur"
+			"name":"Scene Root_Podtambur_Podtambur-OFFSET_Podtambur-GEODE_02 - Defa"
 		},
 		{
 			"mesh":28,
-			"name":"02 - Default.007"
-		},
-		{
-			"children":[
-				99
-			],
-			"name":"Podveska_ConcRuk-GEODE"
-		},
-		{
-			"children":[
-				100
-			],
-			"name":"Podveska_ConcRuk-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				101
-			],
-			"name":"Podveska_ConcRuk"
+			"name":"Scene Root_Podveska_ConcRuk_Podveska_ConcRuk-OFFSET_Podveska_Co"
 		},
 		{
 			"mesh":29,
-			"name":"02 - Default.029"
-		},
-		{
-			"children":[
-				103
-			],
-			"name":"Poruchny_ut-GEODE"
-		},
-		{
-			"children":[
-				104
-			],
-			"name":"Poruchny_ut",
-			"translation":[
-				0.0001990000018849969,
-				0,
-				2.3505001068115234
-			]
+			"name":"Scene Root_Poruchny_ut_Poruchny_ut-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":30,
-			"name":"02 - Default.018"
-		},
-		{
-			"children":[
-				106
-			],
-			"name":"PredohrKV-GEODE"
-		},
-		{
-			"children":[
-				107
-			],
-			"name":"PredohrKV-OFFSET",
-			"translation":[
-				-4.199997056275606e-05,
-				2.513899380574003e-05,
-				-0.033442962914705276
-			]
-		},
-		{
-			"children":[
-				108
-			],
-			"name":"PredohrKV",
-			"translation":[
-				0.0010229999898001552,
-				-6.13755989074707,
-				1.0261199474334717
-			]
+			"name":"Scene Root_PredohrKV_PredohrKV-OFFSET_PredohrKV-GEODE_02 - Defa"
 		},
 		{
 			"mesh":31,
-			"name":"02 - Default.003",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				110
-			],
-			"name":"PredohrSkob-GEODE",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				111
-			],
-			"name":"PredohrSkob",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Scene Root_PredohrSkob_PredohrSkob-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":32,
-			"name":"02 - Default.010"
-		},
-		{
-			"children":[
-				113
-			],
-			"name":"Rascep-GEODE"
-		},
-		{
-			"children":[
-				114
-			],
-			"name":"Rascep-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				115
-			],
-			"name":"Rascep"
+			"name":"Scene Root_Rascep_Rascep-OFFSET_Rascep-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":33,
-			"name":"02 - Default.045"
-		},
-		{
-			"children":[
-				117
-			],
-			"name":"RezinaPerehod-GEODE"
-		},
-		{
-			"children":[
-				118
-			],
-			"name":"RezinaPerehod",
-			"translation":[
-				0.0002849999873433262,
-				0,
-				0
-			]
+			"name":"Scene Root_RezinaPerehod_RezinaPerehod-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":34,
-			"name":"02 - Default.009"
-		},
-		{
-			"children":[
-				120
-			],
-			"name":"RozetkiOT-GEODE"
-		},
-		{
-			"children":[
-				121
-			],
-			"name":"RozetkiOT-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				122
-			],
-			"name":"RozetkiOT"
+			"name":"Scene Root_RozetkiOT_RozetkiOT-OFFSET_RozetkiOT-GEODE_02 - Defa"
 		},
 		{
 			"mesh":35,
-			"name":"02 - Default.023",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				124
-			],
-			"name":"SA-3-1-GEODE",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				125
-			],
-			"name":"SA-3-1-OFFSET",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				126
-			],
-			"name":"SA-3-1",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Scene Root_SA-3-1_SA-3-1-OFFSET_SA-3-1-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":36,
-			"name":"02 - Default.024"
-		},
-		{
-			"children":[
-				128
-			],
-			"name":"SA-3-2-GEODE"
-		},
-		{
-			"children":[
-				129
-			],
-			"name":"SA-3-2-OFFSET",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"translation":[
-				-0.0800430029630661,
-				-7.995269775390625,
-				1.2864199876785278
-			]
-		},
-		{
-			"children":[
-				130
-			],
-			"name":"SA-3-2",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			]
+			"name":"Scene Root_SA-3-2_SA-3-2-OFFSET_SA-3-2-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":37,
-			"name":"02 - Default"
-		},
-		{
-			"children":[
-				132
-			],
-			"name":"Stupenky-GEODE"
-		},
-		{
-			"children":[
-				133
-			],
-			"name":"Stupenky-OFFSET",
-			"translation":[
-				0,
-				0,
-				0.06753399968147278
-			]
-		},
-		{
-			"children":[
-				134
-			],
-			"name":"Stupenky"
+			"name":"Scene Root_Stupenky_Stupenky-OFFSET_Stupenky-GEODE_02 - Default"
 		},
 		{
 			"mesh":38,
-			"name":"02 - Default.026",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				136
-			],
-			"name":"TehLuk-GEODE",
-			"scale":[
-				0,
-				0,
-				0
-			]
-		},
-		{
-			"children":[
-				137
-			],
-			"name":"TehLuk",
-			"scale":[
-				0,
-				0,
-				0
-			]
+			"name":"Scene Root_TehLuk_TehLuk-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":39,
-			"name":"02 - Default.002",
-			"rotation":[
-				0,
-				0,
-				0.37951675057411194,
-				0.925184965133667
-			],
-			"scale":[
-				1.4045331478118896,
-				0,
-				0
-			],
-			"translation":[
-				0,
-				0.00014379620552062988,
-				0
-			]
-		},
-		{
-			"children":[
-				139
-			],
-			"name":"TRP-GEODE",
-			"rotation":[
-				0,
-				0,
-				0.37951675057411194,
-				0.925184965133667
-			],
-			"scale":[
-				1.4045331478118896,
-				0,
-				0
-			],
-			"translation":[
-				0,
-				0.00014379620552062988,
-				0
-			]
-		},
-		{
-			"children":[
-				140
-			],
-			"name":"TRP-OFFSET",
-			"rotation":[
-				0,
-				0,
-				0.37951675057411194,
-				0.925184965133667
-			],
-			"scale":[
-				1.4045331478118896,
-				0,
-				0
-			],
-			"translation":[
-				-0.48486149311065674,
-				-0.478515625,
-				0
-			]
-		},
-		{
-			"children":[
-				141
-			],
-			"name":"TRP",
-			"rotation":[
-				0,
-				-0.3796622157096863,
-				0,
-				0.9251251816749573
-			],
-			"scale":[
-				0.0002163792960345745,
-				0,
-				0
-			]
+			"name":"Scene Root_TRP_TRP-OFFSET_TRP-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":40,
-			"name":"02 - Default.034"
-		},
-		{
-			"children":[
-				143
-			],
-			"name":"Truby_kotla-GEODE"
-		},
-		{
-			"children":[
-				144
-			],
-			"name":"Truby_kotla",
-			"translation":[
-				1.0334399938583374,
-				-9.830050468444824,
-				4.634580135345459
-			]
+			"name":"Scene Root_Truby_kotla_Truby_kotla-GEODE_02 - Default_0"
 		},
 		{
 			"mesh":41,
-			"name":"02 - Default.013"
-		},
-		{
-			"children":[
-				146
-			],
-			"name":"Yashik_3000Kv-GEODE"
-		},
-		{
-			"children":[
-				147
-			],
-			"name":"Yashik_3000Kv-OFFSET",
-			"translation":[
-				-0.01332998275756836,
-				-0.016434865072369576,
-				0.3789089620113373
-			]
-		},
-		{
-			"children":[
-				148
-			],
-			"name":"Yashik_3000Kv",
-			"translation":[
-				1.1018699407577515,
-				-5.523640155792236,
-				1.0704100131988525
-			]
+			"name":"Scene Root_Yashik_3000Kv_Yashik_3000Kv-OFFSET_Yashik_3000Kv-GEO"
 		},
 		{
 			"mesh":42,
-			"name":"02 - Default.021"
-		},
-		{
-			"children":[
-				150
-			],
-			"name":"Yashik_KU-GEODE"
-		},
-		{
-			"children":[
-				151
-			],
-			"name":"Yashik_KU-OFFSET",
-			"translation":[
-				0,
-				0.10923728346824646,
-				-0.24624399840831757
-			]
-		},
-		{
-			"children":[
-				152
-			],
-			"name":"Yashik_KU",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"scale":[
-				1.1548000574111938,
-				1.1548000574111938,
-				1.1548000574111938
-			],
-			"translation":[
-				-1.0770000219345093,
-				-2.350219964981079,
-				1.0836199522018433
-			]
+			"name":"Scene Root_Yashik_KU_Yashik_KU-OFFSET_Yashik_KU-GEODE_02 - Defa"
 		},
 		{
 			"mesh":43,
-			"name":"02 - Default.001"
-		},
-		{
-			"children":[
-				154
-			],
-			"name":"Yashik_RSH-GEODE"
-		},
-		{
-			"children":[
-				155
-			],
-			"name":"Yashik_RSH-OFFSET",
-			"translation":[
-				0,
-				1.6542295217514038,
-				-0.002203987678512931
-			]
-		},
-		{
-			"children":[
-				156
-			],
-			"name":"Yashik_RSH",
-			"translation":[
-				-1.1072399616241455,
-				-5.547379970550537,
-				1.0995800495147705
-			]
+			"name":"Scene Root_Yashik_RSH_Yashik_RSH-OFFSET_Yashik_RSH-GEODE_02 - D"
 		},
 		{
 			"mesh":44,
-			"name":"02 - Default.022"
-		},
-		{
-			"children":[
-				158
-			],
-			"name":"Yashik_VU-GEODE"
-		},
-		{
-			"children":[
-				159
-			],
-			"name":"Yashik_VU-OFFSET",
-			"translation":[
-				-0.049140095710754395,
-				0.10473883152008057,
-				-0.4454180598258972
-			]
-		},
-		{
-			"children":[
-				160
-			],
-			"name":"Yashik_VU",
-			"rotation":[
-				0,
-				0,
-				-1,
-				0
-			],
-			"scale":[
-				0.7124509811401367,
-				0.8680350184440613,
-				0.7271010279655457
-			],
-			"translation":[
-				-1.1303900480270386,
-				-3.4974300861358643,
-				1.0704100131988525
-			]
+			"name":"Scene Root_Yashik_VU_Yashik_VU-OFFSET_Yashik_VU-GEODE_02 - Defa"
 		},
 		{
 			"mesh":45,
-			"name":"02 - Default.008"
-		},
-		{
-			"children":[
-				162
-			],
-			"name":"ZaglushkaPinch-GEODE"
-		},
-		{
-			"children":[
-				163
-			],
-			"name":"ZaglushkaPinch-OFFSET",
-			"translation":[
-				-1.328660011291504,
-				12.319899559020996,
-				1.990049958229065
-			]
-		},
-		{
-			"children":[
-				164
-			],
-			"name":"ZaglushkaPinch"
-		},
-		{
-			"children":[
-				3,
-				7,
-				43,
-				46,
-				50,
-				54,
-				58,
-				62,
-				65,
-				69,
-				72,
-				75,
-				78,
-				81,
-				84,
-				87,
-				91,
-				94,
-				98,
-				102,
-				105,
-				109,
-				112,
-				116,
-				119,
-				123,
-				127,
-				131,
-				135,
-				138,
-				142,
-				145,
-				149,
-				153,
-				157,
-				161,
-				165
-			],
-			"name":"Scene Root",
-			"rotation":[
-				-0.70710688829422,
-				0,
-				0,
-				0.7071066498756409
-			]
+			"name":"Scene Root_ZaglushkaPinch_ZaglushkaPinch-OFFSET_ZaglushkaPinch-"
 		}
 	],
 	"materials":[
 		{
 			"alphaMode":"BLEND",
-			"name":"02 - Default",
+			"doubleSided":true,
+			"extensions":{
+				"KHR_materials_specular":{
+					"specularFactor":0
+				}
+			},
+			"name":"material_1.003",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
-				}
+				},
+				"metallicFactor":0,
+				"roughnessFactor":0.6837722063064575
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"02 - Default.014",
+			"name":"Scene Root_AB_AB-OFFSET_AB-GEODE_02 - Default_0.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -1497,7 +323,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.032",
+			"name":"Scene Root_Avtotormoz292_Avtotormoz292-OFFSET_Avtotormoz292-GEO",
 			"primitives":[
 				{
 					"attributes":{
@@ -1511,7 +337,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.035",
+			"name":"Scene Root_Body_Body-OFFSET_Body-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1525,7 +351,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.039",
+			"name":"Scene Root_Body_Boige-1_Boige-1-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1539,7 +365,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.041",
+			"name":"Scene Root_Body_Boige-1_Wheel-1_Wheel-1-OFFSET_Wheel-1-GEOD.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1553,7 +379,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.040",
+			"name":"Scene Root_Body_Boige-1_Wheel-2_Wheel-2-OFFSET_Wheel-2-GEOD.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1567,7 +393,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.042",
+			"name":"Scene Root_Body_Boige-2_Boige-2-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1581,7 +407,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.043",
+			"name":"Scene Root_Body_Boige-2_Wheel-3_Wheel-3-OFFSET_Wheel-3-GEOD.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1595,7 +421,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.044",
+			"name":"Scene Root_Body_Boige-2_Wheel-4_Wheel-4-OFFSET_Wheel-4-GEOD.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1609,7 +435,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.036",
+			"name":"Scene Root_Body_DCG-4435_DCG-4435-GEODE_02 - Default_0.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -1623,7 +449,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.038",
+			"name":"Scene Root_Body_DCG-4435_Gen_Kardan_Gen_Kardan-OFFSET_Gen_K",
 			"primitives":[
 				{
 					"attributes":{
@@ -1637,7 +463,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.037",
+			"name":"Scene Root_Body_DCG-4435_Gen_Mufta1_Gen_Mufta1-GEODE_02 - D",
 			"primitives":[
 				{
 					"attributes":{
@@ -1651,7 +477,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.031",
+			"name":"Scene Root_Bufera_Bufera-GEODE_02 - Default_0.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1665,7 +491,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.020",
+			"name":"Scene Root_Chep_otpuskVR_Chep_otpuskVR-OFFSET_Chep_otpuskVR.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -1679,7 +505,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.017",
+			"name":"Scene Root_Deflektor_Deflektor-OFFSET_Deflektor-GEODE_02 - .002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1693,7 +519,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.027",
+			"name":"Scene Root_FanTrub_FanTrub-OFFSET_FanTrub-GEODE_02 - Defaul",
 			"primitives":[
 				{
 					"attributes":{
@@ -1707,7 +533,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.015",
+			"name":"Scene Root_Fartuki_Fartuki-OFFSET_Fartuki-GEODE_02 - Defaul.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1721,7 +547,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.011",
+			"name":"Scene Root_Hvost_signal_Hvost_signal-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1735,7 +561,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.019",
+			"name":"Scene Root_Kabel_G_Kabel_G-OFFSET_Kabel_G-GEODE_02 - Defaul.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -1749,7 +575,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.004",
+			"name":"Scene Root_KoncevoyRuk_1_KoncevoyRuk_1-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1763,7 +589,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.005",
+			"name":"Scene Root_KoncevoyRuk_2_KoncevoyRuk_2-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1777,7 +603,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.028",
+			"name":"Scene Root_Kronsht_gerlic_Kronsht_gerlic-GEODE_02 - Default_0",
 			"primitives":[
 				{
 					"attributes":{
@@ -1791,7 +617,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.030",
+			"name":"Scene Root_LestnicaKrisha_LestnicaKrisha-GEODE_02 - Default.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1805,7 +631,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.033",
+			"name":"Scene Root_MAB-II_MAB-II-GEODE_02 - Default_0.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -1819,7 +645,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.016",
+			"name":"Scene Root_Perehod_det_Perehod_det-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1833,7 +659,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.025",
+			"name":"Scene Root_PinchOFF_2_PinchOFF_2-OFFSET_PinchOFF_2-GEODE_02.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1847,7 +673,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.006",
+			"name":"Scene Root_PinchON_PinchON-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1861,7 +687,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.012",
+			"name":"Scene Root_Podtambur_Podtambur-OFFSET_Podtambur-GEODE_02 - .002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1875,7 +701,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.007",
+			"name":"Scene Root_Podveska_ConcRuk_Podveska_ConcRuk-OFFSET_Podvesk.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1889,7 +715,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.029",
+			"name":"Scene Root_Poruchny_ut_Poruchny_ut-GEODE_02 - Default_0.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1903,7 +729,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.018",
+			"name":"Scene Root_PredohrKV_PredohrKV-OFFSET_PredohrKV-GEODE_02 - .001",
 			"primitives":[
 				{
 					"attributes":{
@@ -1917,7 +743,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.003",
+			"name":"Scene Root_PredohrSkob_PredohrSkob-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1931,7 +757,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.010",
+			"name":"Scene Root_Rascep_Rascep-OFFSET_Rascep-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1945,7 +771,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.045",
+			"name":"Scene Root_RezinaPerehod_RezinaPerehod-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1959,7 +785,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.009",
+			"name":"Scene Root_RozetkiOT_RozetkiOT-OFFSET_RozetkiOT-GEODE_02 - .002",
 			"primitives":[
 				{
 					"attributes":{
@@ -1973,7 +799,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.023",
+			"name":"Scene Root_SA-3-1_SA-3-1-OFFSET_SA-3-1-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -1987,7 +813,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.024",
+			"name":"Scene Root_SA-3-2_SA-3-2-OFFSET_SA-3-2-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -2001,7 +827,7 @@
 			]
 		},
 		{
-			"name":"02 - Default",
+			"name":"Scene Root_Stupenky_Stupenky-OFFSET_Stupenky-GEODE_02 - Def.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -2015,7 +841,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.026",
+			"name":"Scene Root_TehLuk_TehLuk-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -2029,7 +855,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.002",
+			"name":"Scene Root_TRP_TRP-OFFSET_TRP-GEODE_02 - Default_0.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -2043,7 +869,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.034",
+			"name":"Scene Root_Truby_kotla_Truby_kotla-GEODE_02 - Default_0.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -2057,7 +883,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.013",
+			"name":"Scene Root_Yashik_3000Kv_Yashik_3000Kv-OFFSET_Yashik_3000Kv.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -2071,7 +897,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.021",
+			"name":"Scene Root_Yashik_KU_Yashik_KU-OFFSET_Yashik_KU-GEODE_02 - .001",
 			"primitives":[
 				{
 					"attributes":{
@@ -2085,7 +911,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.001",
+			"name":"Scene Root_Yashik_RSH_Yashik_RSH-OFFSET_Yashik_RSH-GEODE_02.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -2099,7 +925,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.022",
+			"name":"Scene Root_Yashik_VU_Yashik_VU-OFFSET_Yashik_VU-GEODE_02 - .001",
 			"primitives":[
 				{
 					"attributes":{
@@ -2113,7 +939,7 @@
 			]
 		},
 		{
-			"name":"02 - Default.008",
+			"name":"Scene Root_ZaglushkaPinch_ZaglushkaPinch-OFFSET_ZaglushkaPi.002",
 			"primitives":[
 				{
 					"attributes":{
@@ -2136,8 +962,8 @@
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"pass_rzd-17669",
-			"uri":"T_pass_rzd-17669/pass_rzd-17669.png"
+			"name":"pass_rzd-17669.tga",
+			"uri":"T_pass_rzd-17669/pass_rzd-17669_tga.png"
 		}
 	],
 	"accessors":[
@@ -2146,14 +972,14 @@
 			"componentType":5126,
 			"count":852,
 			"max":[
-				2.6959500312805176,
-				2.531909942626953,
-				0.37657201290130615
+				1.5354000329971313,
+				1.4895620346069336,
+				-1.0672800540924072
 			],
 			"min":[
-				-0.37485501170158386,
-				-2.531909942626953,
-				-0.37657299637794495
+				-1.5354050397872925,
+				0.7364169955253601,
+				-6.131100177764893
 			],
 			"type":"VEC3"
 		},
@@ -2180,14 +1006,14 @@
 			"componentType":5126,
 			"count":1494,
 			"max":[
-				0.9462000131607056,
-				0.06463120132684708,
-				0.6215680241584778
+				0.5122040510177612,
+				1.573762059211731,
+				1.584704041481018
 			],
 			"min":[
-				-0.7087460160255432,
-				-2.419600009918213,
-				-0.17605799436569214
+				-1.1427420377731323,
+				0.7761359810829163,
+				-0.8995271921157837
 			],
 			"type":"VEC3"
 		},
@@ -2215,13 +1041,13 @@
 			"count":981,
 			"max":[
 				1.5293200016021729,
-				12.211299896240234,
-				4.601019859313965
+				4.668553829193115,
+				12.211299896240234
 			],
 			"min":[
 				-1.529579997062683,
-				-12.211299896240234,
-				1.0750399827957153
+				1.1425739526748657,
+				-12.211299896240234
 			],
 			"type":"VEC3"
 		},
@@ -2249,13 +1075,13 @@
 			"count":13764,
 			"max":[
 				1.594249963760376,
-				1.9498499631881714,
-				1.3840199708938599
+				1.3840199708938599,
+				10.649849891662598
 			],
 			"min":[
 				-1.594249963760376,
-				-1.9498499631881714,
-				0.5048949718475342
+				0.5048949718475342,
+				6.750150203704834
 			],
 			"type":"VEC3"
 		},
@@ -2282,14 +1108,14 @@
 			"componentType":5126,
 			"count":732,
 			"max":[
-				0.8512399792671204,
-				1.709089994430542,
-				1.3031799793243408
+				0.8516115546226501,
+				0.5169913172721863,
+				0.5090742111206055
 			],
 			"min":[
-				-0.8512399792671204,
-				0.6909070014953613,
-				0.2692900002002716
+				-0.8508685231208801,
+				-0.5168986916542053,
+				-0.5091085433959961
 			],
 			"type":"VEC3"
 		},
@@ -2316,14 +1142,14 @@
 			"componentType":5126,
 			"count":900,
 			"max":[
-				0.8512399792671204,
-				-0.6909070014953613,
-				1.3031799793243408
+				0.8516032695770264,
+				0.5170027613639832,
+				0.5090670585632324
 			],
 			"min":[
-				-0.8512399792671204,
-				-1.709089994430542,
-				0.2692900002002716
+				-0.8508768081665039,
+				-0.5168872475624084,
+				-0.5091161727905273
 			],
 			"type":"VEC3"
 		},
@@ -2351,13 +1177,13 @@
 			"count":13248,
 			"max":[
 				1.594249963760376,
-				1.9498499631881714,
-				1.3840199708938599
+				1.3840199708938599,
+				-6.750150203704834
 			],
 			"min":[
 				-1.594249963760376,
-				-1.9498499631881714,
-				0.5048949718475342
+				0.5048949718475342,
+				-10.649849891662598
 			],
 			"type":"VEC3"
 		},
@@ -2384,14 +1210,14 @@
 			"componentType":5126,
 			"count":732,
 			"max":[
-				0.8512399792671204,
-				1.709089994430542,
-				1.3031799793243408
+				0.8516116738319397,
+				0.516991376876831,
+				0.5090756416320801
 			],
 			"min":[
-				-0.8512399792671204,
-				0.6909070014953613,
-				0.2692900002002716
+				-0.8508684039115906,
+				-0.5168986320495605,
+				-0.5091075897216797
 			],
 			"type":"VEC3"
 		},
@@ -2412,14 +1238,14 @@
 			"componentType":5126,
 			"count":732,
 			"max":[
-				0.8512399792671204,
-				1.709089994430542,
-				1.3031799793243408
+				0.8516116142272949,
+				0.5169914364814758,
+				0.5090770721435547
 			],
 			"min":[
-				-0.8512399792671204,
-				0.6909070014953613,
-				0.2692900002002716
+				-0.8508684635162354,
+				-0.5168985724449158,
+				-0.5091056823730469
 			],
 			"type":"VEC3"
 		},
@@ -2440,14 +1266,14 @@
 			"componentType":5126,
 			"count":936,
 			"max":[
-				0.3901129961013794,
-				0.7896980047225952,
-				0.6311550140380859
+				0.3911975622177124,
+				1.5060510635375977,
+				5.602386951446533
 			],
 			"min":[
-				-0.3905490040779114,
-				-0.5656669735908508,
-				-0.3490990102291107
+				-0.3894645571708679,
+				0.5257970094680786,
+				4.2470221519470215
 			],
 			"type":"VEC3"
 		},
@@ -2474,14 +1300,14 @@
 			"componentType":5126,
 			"count":180,
 			"max":[
-				0.05197279900312424,
-				0.7666190266609192,
-				0.09320119768381119
+				0.051952067762613297,
+				0.7622392177581787,
+				0.0625457912683487
 			],
 			"min":[
-				-0.051972199231386185,
-				-0.7623999714851379,
-				-0.09170930087566376
+				-0.05199366435408592,
+				-0.76332688331604,
+				-0.06206914037466049
 			],
 			"type":"VEC3"
 		},
@@ -2508,14 +1334,14 @@
 			"componentType":5126,
 			"count":132,
 			"max":[
-				0.1289529949426651,
-				0.11028999835252762,
-				0.1353899985551834
+				0.12904441356658936,
+				0.10319995880126953,
+				0.1353898048400879
 			],
 			"min":[
-				-0.1289529949426651,
-				-0.06861510127782822,
-				-0.1353899985551834
+				-0.12886156141757965,
+				-0.07570505142211914,
+				-0.13539016246795654
 			],
 			"type":"VEC3"
 		},
@@ -2542,14 +1368,14 @@
 			"componentType":5126,
 			"count":2256,
 			"max":[
-				1.2317099571228027,
-				12.496600151062012,
-				1.5712900161743164
+				1.2317689657211304,
+				1.5712900161743164,
+				12.496600151062012
 			],
 			"min":[
-				-1.2317099571228027,
-				-12.496600151062012,
-				1.1801600456237793
+				-1.231650948524475,
+				1.1801600456237793,
+				-12.496600151062012
 			],
 			"type":"VEC3"
 		},
@@ -2576,14 +1402,14 @@
 			"componentType":5126,
 			"count":144,
 			"max":[
-				1.2023500204086304,
-				0.025004999712109566,
-				0.529338002204895
+				1.44966721534729,
+				1.4383509159088135,
+				1.0458451509475708
 			],
 			"min":[
-				-1.6041300296783447,
-				-0.062359098345041275,
-				-0.11391100287437439
+				-1.356812834739685,
+				0.7951019406318665,
+				0.9584810137748718
 			],
 			"type":"VEC3"
 		},
@@ -2610,14 +1436,14 @@
 			"componentType":5126,
 			"count":252,
 			"max":[
-				0.4824559986591339,
-				0.42509201169013977,
-				0.21535299718379974
+				-0.6658239960670471,
+				4.694353103637695,
+				10.639899253845215
 			],
 			"min":[
-				-0.13689200580120087,
-				-21.822799682617188,
-				-0.06489589810371399
+				-1.2851719856262207,
+				4.414103984832764,
+				-11.607992172241211
 			],
 			"type":"VEC3"
 		},
@@ -2644,14 +1470,14 @@
 			"componentType":5126,
 			"count":36,
 			"max":[
-				0.40303799510002136,
-				0.6361079812049866,
-				2.3607099056243896
+				-1.2139291763305664,
+				1.5082844495773315,
+				10.635552406311035
 			],
 			"min":[
-				-0.957260012626648,
-				-0.2946679890155792,
-				0.6795759797096252
+				-1.4790308475494385,
+				1.1806566715240479,
+				10.454158782958984
 			],
 			"type":"VEC3"
 		},
@@ -2679,13 +1505,13 @@
 			"count":12,
 			"max":[
 				0.4108690023422241,
-				12.346199989318848,
-				2.161720037460327
+				2.2292540073394775,
+				12.346199989318848
 			],
 			"min":[
 				-0.4108709990978241,
-				-12.346199989318848,
-				1.6443599462509155
+				1.711893916130066,
+				-12.346199989318848
 			],
 			"type":"VEC3"
 		},
@@ -2713,13 +1539,13 @@
 			"count":288,
 			"max":[
 				1.374709963798523,
-				12.254500389099121,
-				3.90228009223938
+				3.90228009223938,
+				12.254500389099121
 			],
 			"min":[
 				-1.374709963798523,
-				-12.254500389099121,
-				1.9956799745559692
+				1.9956799745559692,
+				-12.254500389099121
 			],
 			"type":"VEC3"
 		},
@@ -2746,14 +1572,14 @@
 			"componentType":5126,
 			"count":204,
 			"max":[
-				0.021338699385523796,
-				0.5362910032272339,
-				0.3684160113334656
+				-0.1312084197998047,
+				1.502845048904419,
+				5.128117084503174
 			],
 			"min":[
-				-0.5538070201873779,
-				-0.9392030239105225,
-				-0.08461440354585648
+				-0.7063539028167725,
+				1.0498145818710327,
+				3.652622938156128
 			],
 			"type":"VEC3"
 		},
@@ -2781,13 +1607,13 @@
 			"count":636,
 			"max":[
 				0.4727019965648651,
-				-9.935600280761719,
-				1.2484999895095825
+				1.316033959388733,
+				12.563699722290039
 			],
 			"min":[
 				-0.06939209997653961,
-				-12.563699722290039,
-				0.6183840036392212
+				0.6859180331230164,
+				9.935600280761719
 			],
 			"type":"VEC3"
 		},
@@ -2815,13 +1641,13 @@
 			"count":636,
 			"max":[
 				0.0693902000784874,
-				12.563699722290039,
-				1.2484999895095825
+				1.316033959388733,
+				-9.935600280761719
 			],
 			"min":[
 				-0.4727030098438263,
-				9.935600280761719,
-				0.6183840036392212
+				0.6859180331230164,
+				-12.563699722290039
 			],
 			"type":"VEC3"
 		},
@@ -2842,14 +1668,14 @@
 			"componentType":5126,
 			"count":456,
 			"max":[
-				1.4765900373458862,
-				10.885199546813965,
-				0.059424400329589844
+				1.4763652086257935,
+				1.4138344526290894,
+				10.885034561157227
 			],
 			"min":[
-				-1.4765900373458862,
-				-10.885199546813965,
-				-0.05942479893565178
+				-1.476814866065979,
+				1.2949851751327515,
+				-10.885364532470703
 			],
 			"type":"VEC3"
 		},
@@ -2877,13 +1703,13 @@
 			"count":1020,
 			"max":[
 				1.4115300178527832,
-				12.332200050354004,
-				4.744810104370117
+				4.744810104370117,
+				12.332200050354004
 			],
 			"min":[
 				-1.4115300178527832,
-				-12.332200050354004,
-				1.5372300148010254
+				1.5372300148010254,
+				-12.332200050354004
 			],
 			"type":"VEC3"
 		},
@@ -2910,14 +1736,14 @@
 			"componentType":5126,
 			"count":2529,
 			"max":[
-				0.48949599266052246,
-				3.2520699501037598,
-				0.454679012298584
+				1.4951659440994263,
+				1.459818959236145,
+				3.4453399181365967
 			],
 			"min":[
-				-1.8460400104522705,
-				-1.1155200004577637,
-				-0.4312320053577423
+				-0.8403699994087219,
+				0.5739079713821411,
+				-0.922249972820282
 			],
 			"type":"VEC3"
 		},
@@ -2944,14 +1770,14 @@
 			"componentType":5126,
 			"count":288,
 			"max":[
-				0.49732398986816406,
-				12.203399658203125,
-				3.6603100299835205
+				0.4973732531070709,
+				3.6603100299835205,
+				12.203399658203125
 			],
 			"min":[
-				-0.49732598662376404,
-				-12.203399658203125,
-				2.641319990158081
+				-0.4972767233848572,
+				2.641319990158081,
+				-12.203399658203125
 			],
 			"type":"VEC3"
 		},
@@ -2972,14 +1798,14 @@
 			"componentType":5126,
 			"count":306,
 			"max":[
-				1.3628100156784058,
-				-12.071200370788574,
-				1.799239993095398
+				-0.8865818381309509,
+				1.8667739629745483,
+				-12.071200370788574
 			],
 			"min":[
-				0.8865799903869629,
-				-12.34529972076416,
-				0.6773719787597656
+				-1.3628119230270386,
+				0.7449060082435608,
+				-12.34529972076416
 			],
 			"type":"VEC3"
 		},
@@ -3006,14 +1832,14 @@
 			"componentType":5126,
 			"count":306,
 			"max":[
-				0.02435619942843914,
-				0.4291459918022156,
-				0.43904000520706177
+				0.9251142144203186,
+				1.089877963066101,
+				12.883536338806152
 			],
 			"min":[
-				-0.11347900331020355,
-				-0.38323599100112915,
-				-0.08132319897413254
+				0.7872790098190308,
+				0.569514811038971,
+				12.07115364074707
 			],
 			"type":"VEC3"
 		},
@@ -3035,13 +1861,13 @@
 			"count":528,
 			"max":[
 				1.5294500589370728,
-				11.928400039672852,
-				1.5616899728775024
+				1.6292239427566528,
+				11.928400039672852
 			],
 			"min":[
 				-1.5288900136947632,
-				-11.928400039672852,
-				1.3462200164794922
+				1.4137539863586426,
+				-11.928400039672852
 			],
 			"type":"VEC3"
 		},
@@ -3069,13 +1895,13 @@
 			"count":24,
 			"max":[
 				0.0971062034368515,
-				11.900899887084961,
-				1.236649990081787
+				1.3041839599609375,
+				11.900899887084961
 			],
 			"min":[
 				-0.09710799902677536,
-				-11.900899887084961,
-				0.5932940244674683
+				0.6608280539512634,
+				-11.900899887084961
 			],
 			"type":"VEC3"
 		},
@@ -3102,14 +1928,14 @@
 			"componentType":5126,
 			"count":2016,
 			"max":[
-				1.5689599514007568,
-				12.07610034942627,
-				0.6447539925575256
+				1.5691584348678589,
+				2.9952540397644043,
+				12.07610034942627
 			],
 			"min":[
-				-1.5689599514007568,
-				-12.07610034942627,
-				-0.6447539925575256
+				-1.5687614679336548,
+				1.705746054649353,
+				-12.07610034942627
 			],
 			"type":"VEC3"
 		},
@@ -3136,14 +1962,14 @@
 			"componentType":5126,
 			"count":288,
 			"max":[
-				0.3269270062446594,
-				0.38788101077079773,
-				0.5075759887695312
+				0.327908992767334,
+				1.5002527236938477,
+				6.52546501159668
 			],
 			"min":[
-				-0.3268440067768097,
-				-0.3879300057888031,
-				-0.44068899750709534
+				-0.3258621394634247,
+				0.5519877672195435,
+				5.749654293060303
 			],
 			"type":"VEC3"
 		},
@@ -3165,13 +1991,13 @@
 			"count":216,
 			"max":[
 				0.6742200255393982,
-				6.5474700927734375,
-				1.511240005493164
+				1.511240005493164,
+				6.547369956970215
 			],
 			"min":[
 				-0.6876260042190552,
-				-6.547369956970215,
-				1.2046699523925781
+				1.2046699523925781,
+				-6.5474700927734375
 			],
 			"type":"VEC3"
 		},
@@ -3199,13 +2025,13 @@
 			"count":786,
 			"max":[
 				1.3588299751281738,
-				12.365400314331055,
-				1.285580039024353
+				1.3531140089035034,
+				12.365400314331055
 			],
 			"min":[
 				-1.3588299751281738,
-				-12.365400314331055,
-				0.6909899711608887
+				0.7585240006446838,
+				-12.365400314331055
 			],
 			"type":"VEC3"
 		},
@@ -3232,14 +2058,14 @@
 			"componentType":5126,
 			"count":408,
 			"max":[
-				0.8903020024299622,
-				12.505800247192383,
-				4.101940155029297
+				0.8905868530273438,
+				4.101940155029297,
+				12.505800247192383
 			],
 			"min":[
-				-0.8903030157089233,
-				-12.505800247192383,
-				1.7067099809646606
+				-0.8900181651115417,
+				1.7067099809646606,
+				-12.505800247192383
 			],
 			"type":"VEC3"
 		},
@@ -3267,13 +2093,13 @@
 			"count":558,
 			"max":[
 				0.9393069744110107,
-				12.14579963684082,
-				1.4429700374603271
+				1.5105040073394775,
+				12.14579963684082
 			],
 			"min":[
 				-0.9393090009689331,
-				-12.14579963684082,
-				0.909292995929718
+				0.9768270254135132,
+				-12.14579963684082
 			],
 			"type":"VEC3"
 		},
@@ -3300,14 +2126,14 @@
 			"componentType":5126,
 			"count":606,
 			"max":[
-				0.18972399830818176,
-				4.639949798583984,
-				0.3130069971084595
+				0.2796057164669037,
+				1.5994269847869873,
+				12.63521957397461
 			],
 			"min":[
-				-0.3596470057964325,
-				3.6667399406433105,
-				-0.14067499339580536
+				-0.26976561546325684,
+				1.145745038986206,
+				11.662010192871094
 			],
 			"type":"VEC3"
 		},
@@ -3334,14 +2160,14 @@
 			"componentType":5126,
 			"count":606,
 			"max":[
-				0.18972399830818176,
-				4.639949798583984,
-				0.3130069971084595
+				0.2697637975215912,
+				1.5994269847869873,
+				-11.662010192871094
 			],
 			"min":[
-				-0.3596470057964325,
-				3.6667399406433105,
-				-0.14067499339580536
+				-0.2796076238155365,
+				1.145745038986206,
+				-12.63521957397461
 			],
 			"type":"VEC3"
 		},
@@ -3363,13 +2189,13 @@
 			"count":756,
 			"max":[
 				1.5850199460983276,
-				11.92080020904541,
-				1.435770034790039
+				1.5033040046691895,
+				11.95479965209961
 			],
 			"min":[
 				-1.5850199460983276,
-				-11.95479965209961,
-				0.6944040060043335
+				0.7619380354881287,
+				-11.92080020904541
 			],
 			"type":"VEC3"
 		},
@@ -3397,13 +2223,13 @@
 			"count":168,
 			"max":[
 				0.7940530180931091,
-				11.958600044250488,
-				4.707910060882568
+				4.707910060882568,
+				11.96090030670166
 			],
 			"min":[
 				-0.808555006980896,
-				-11.96090030670166,
-				4.581600189208984
+				4.581600189208984,
+				-11.958600044250488
 			],
 			"type":"VEC3"
 		},
@@ -3430,14 +2256,14 @@
 			"componentType":5126,
 			"count":354,
 			"max":[
-				1.1653599739074707,
-				6.752399921417236,
-				0.2790899872779846
+				0.6804669499397278,
+				1.5175399780273438,
+				7.133760929107666
 			],
 			"min":[
-				-0.19557300209999084,
-				-7.524569988250732,
-				-0.05139390006661415
+				-0.6804659962654114,
+				1.187056064605713,
+				-7.143208980560303
 			],
 			"type":"VEC3"
 		},
@@ -3464,14 +2290,14 @@
 			"componentType":5126,
 			"count":561,
 			"max":[
-				0.3672420084476471,
-				0.9045519828796387,
-				0.2381030023097992
+				1.400681972503662,
+				4.872683048248291,
+				10.734602928161621
 			],
 			"min":[
-				-0.3672420084476471,
-				-0.9045529961585999,
-				-0.2381030023097992
+				0.6661980152130127,
+				4.396477222442627,
+				8.925498008728027
 			],
 			"type":"VEC3"
 		},
@@ -3498,14 +2324,14 @@
 			"componentType":5126,
 			"count":24,
 			"max":[
-				0.28075599670410156,
-				0.5106760263442993,
-				-0.0011148500489071012
+				1.3692959547042847,
+				1.4482041597366333,
+				6.017881870269775
 			],
 			"min":[
-				-0.25409600138664246,
-				-0.47780799865722656,
-				-0.7567030191421509
+				0.834443986415863,
+				0.6926159858703613,
+				5.029397487640381
 			],
 			"type":"VEC3"
 		},
@@ -3526,14 +2352,14 @@
 			"componentType":5126,
 			"count":72,
 			"max":[
-				0.24624399840831757,
-				0.30949199199676514,
-				0.5613980293273926
+				-0.7926373481750488,
+				1.4475598335266113,
+				2.833768367767334
 			],
 			"min":[
-				-0.24624399840831757,
-				-0.6794350147247314,
-				-0.055378299206495285
+				-1.3613626956939697,
+				0.7353065609931946,
+				1.6917552947998047
 			],
 			"type":"VEC3"
 		},
@@ -3560,14 +2386,14 @@
 			"componentType":5126,
 			"count":816,
 			"max":[
-				0.3120270073413849,
-				-0.17667700350284576,
-				0.4098699986934662
+				-0.795212984085083,
+				1.5072461366653442,
+				7.024940013885498
 			],
 			"min":[
-				-0.3120270073413849,
-				-3.1317899227142334,
-				-0.40546199679374695
+				-1.4192670583724976,
+				0.6919142007827759,
+				4.069827079772949
 			],
 			"type":"VEC3"
 		},
@@ -3594,14 +2420,14 @@
 			"componentType":5126,
 			"count":60,
 			"max":[
-				0.45493099093437195,
-				0.6268730163574219,
-				0.9650070071220398
+				-0.8412835597991943,
+				1.448203682899475,
+				4.132494926452637
 			],
 			"min":[
-				-0.3566510081291199,
-				-0.8363509774208069,
-				-0.07417169958353043
+				-1.4194961786270142,
+				0.692615807056427,
+				2.862365245819092
 			],
 			"type":"VEC3"
 		},
@@ -3628,14 +2454,14 @@
 			"componentType":5126,
 			"count":696,
 			"max":[
-				2.7482800483703613,
-				0.10718200355768204,
-				0.13470999896526337
+				1.419619083404541,
+				2.1247599124908447,
+				12.427102088928223
 			],
 			"min":[
-				-0.09096360206604004,
-				-24.746999740600586,
-				-0.13470999896526337
+				-1.4196245670318604,
+				1.8553400039672852,
+				-12.427080154418945
 			],
 			"type":"VEC3"
 		},
