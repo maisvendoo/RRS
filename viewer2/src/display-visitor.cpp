@@ -36,6 +36,7 @@
 
 #include "display-config.h"
 #include "Logger.h"
+#include "display-surface-visitor.h"
 
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
@@ -61,6 +62,9 @@ void DisplayVisitor::apply(vsg::Node& transform)
     }
 
     LOG_INFO("Found node for display with name: %s", name.c_str());
+
+    DisplaySurfaceVisitor dsv(dc, display_config);
+    transform.accept(dsv);
 
     transform.traverse(*this);
 }
