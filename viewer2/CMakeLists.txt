@@ -32,11 +32,12 @@ target_link_libraries(${TARGET} PRIVATE
 
 target_include_directories(${TARGET} PRIVATE
     ../simulator/topology/include
+    ../simulator/vehicle/include
     ../common-headers
     ../filesystem/include
     ../CfgReader/include
     ../network/include
     ../sound-manager/include
-    ../viewer/display/include
+    display/include
     ./include
 )

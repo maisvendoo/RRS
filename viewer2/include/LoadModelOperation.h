@@ -38,7 +38,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
 {
     LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
         const std::string& in_model_filename_path, const std::string& in_animations_dir,
-        vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations) noexcept;
+        vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations, const std::string& cfg_dir = "") noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::Group> attachment_point = nullptr;
@@ -46,8 +46,11 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     std::string animations_dir = "";
     vsg::ref_ptr<vsg::Options> options = nullptr;
     animations_t* animations;
+    std::string cfg_dir;
 
     void run() override;
+
+    void load_displays(vsg::ref_ptr<vsg::Node> model);
 };
 
 #endif // LOAD_MODEL_OPERATION_H

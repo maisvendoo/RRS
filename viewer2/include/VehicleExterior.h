@@ -51,8 +51,6 @@ public:
 private:
 
     void load_sounds(const std::string& sounds_dir, SoundManager *sm);
-
-    void load_displays(const std::string& cfg_path);
 };
 
 #endif // VEHICLE_EXTERIOR_H

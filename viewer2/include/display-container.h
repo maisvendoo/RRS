@@ -39,10 +39,13 @@
 #ifndef DISPLAY_CONTAINER_H
 #define DISPLAY_CONTAINER_H
 
+#include "display.h"
+
 #include <vector>
 
 struct display_container_t
 {
+    AbstractDisplay* display;
 };
 
 using displays_t = std::vector<display_container_t*>;

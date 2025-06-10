@@ -29,8 +29,17 @@
 #ifndef DISPLAY_CONFIG_H
 #define DISPLAY_CONFIG_H
 
+#include <vsg/core/Array.h>
+#include <vsg/core/ref_ptr.h>
+
+#include <QString>
+
 struct display_config_t
 {
+    QString module_name = "";
+    QString surface_name = "";
+    double update_interval = 0.5;
+    vsg::ref_ptr<vsg::vec2Array> texcoord;
 };
 
 #endif // DISPLAY_CONFIG_H

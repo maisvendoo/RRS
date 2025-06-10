@@ -9,6 +9,13 @@
 #include "sound-manager.h"
 // #include "MyGui.h"
 
+#include <iostream>
+#include <qdom.h>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <vsg/core/Array.h>
+#include <vsg/maths/vec2.h>
 #include <vsg/threading/OperationThreads.h>
 
 //------------------------------------------------------------------------------
@@ -104,12 +111,15 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
             model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
 
             // Load model
-            options->operationThreads->add(LoadModelOperation::create(viewer,
-                                                                      cabine_node,
-                                                                      model_filename_path,
-                                                                      animations_dir,
-                                                                      options,
-                                                                      animations));
+            options->operationThreads->add(LoadModelOperation::create(
+                viewer,
+                cabine_node,
+                model_filename_path,
+                animations_dir,
+                options,
+                animations,
+                cfg_dir
+            ));
     }
     else
     {
@@ -127,11 +137,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     load_sounds(sounds_dir, sm);
 
-    // TODO
-    relative_config_path = cfg_dir + fs.separator() + "displays.xml";
-    cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
-    load_displays(cfg_path);
-
     return true;
 }
 
@@ -142,21 +147,4 @@ void VehicleExterior::load_sounds(const std::string &sounds_dir, SoundManager *s
 {
     sounds_id = sm->loadVehicleSounds(QString(sounds_dir.c_str()));
     LOG_INFO("Loaded %u sounds", sounds_id.size());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VehicleExterior::load_displays([[maybe_unused]] const std::string &cfg_path)
-{
-    CfgReader cfg;
-    if (cfg.load(cfg_path.c_str()))
-    {
-        LOG_INFO("Loaded file %s", cfg_path.c_str());
-    }
-    else
-    {
-        LOG_WARN("File %s is not found", cfg_path.c_str());
-        return;
-    }
 }

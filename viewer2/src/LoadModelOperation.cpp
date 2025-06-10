@@ -1,9 +1,14 @@
 #include "LoadModelOperation.h"
 
+#include "CfgReader.h"
 #include "animations-list.h"
 #include "AnimTransformVisitor.h"
 #include "FindModelAnimation.h"
 #include "Logger.h"
+#include "display-config.h"
+#include "display-container.h"
+#include "display-loader.h"
+#include "filesystem.h"
 
 #include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
@@ -43,13 +48,14 @@ void MergeToScene::run()
 
 LoadModelOperation::LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
     const std::string& in_model_filename_path, const std::string& in_animations_dir,
-    vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations) noexcept
+    vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations, const std::string& cfg_dir) noexcept
     : viewer(in_viewer)
     , attachment_point(in_attachment_point)
     , model_filename_path(in_model_filename_path)
     , animations_dir(in_animations_dir)
     , options(in_options)
     , animations(in_animations)
+    , cfg_dir(cfg_dir)
 {
 }
 
@@ -74,6 +80,11 @@ void LoadModelOperation::run()
         }
 
         return;
+    }
+
+    if (!cfg_dir.empty())
+    {
+        load_displays(node);
     }
 
     LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
@@ -134,5 +145,57 @@ void LoadModelOperation::run()
         {
             ref_viewer->addUpdateOperation(MergeToScene::create(viewer, attachment_point, node, compile_result));
         }
+    }
+}
+
+void LoadModelOperation::load_displays(vsg::ref_ptr<vsg::Node> model)
+{
+    FileSystem& fs = FileSystem::getInstance();
+
+    std::string relative_config_path = cfg_dir + fs.separator() + "displays.xml";
+    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
+
+    CfgReader cfg;
+    if (cfg.load(cfg_path.c_str()))
+    {
+        LOG_INFO("Loaded file %s", cfg_path.c_str());
+    }
+    else
+    {
+        LOG_WARN("File %s is not found", cfg_path.c_str());
+        return;
+    }
+
+    QDomNode config_section = cfg.getFirstSection("Display");
+    while (!config_section.isNull())
+    {
+        display_config_t display_config;
+
+        QString module_dir_name;
+        cfg.getString(config_section, "ModuleDir", module_dir_name);
+        std::string module_dir = fs.combinePath(fs.getModulesDir(), module_dir_name.toStdString());
+
+        QString module_name;
+        cfg.getString(config_section, "Module", module_name);
+        display_config.module_name = fs.combinePath(module_dir, module_name.toStdString()).c_str();
+
+        cfg.getString(config_section, "SurfaceName", display_config.surface_name);
+        cfg.getDouble(config_section, "UpdateInterval", display_config.update_interval);
+
+        std::vector<vsg::vec2> texcoord;
+        QString corner_string;
+        for (std::size_t i = 0; cfg.getString(config_section, QString("Corner%1").arg(i + 1), corner_string); ++i)
+        {
+            std::stringstream ss(corner_string.toStdString());
+            float x, y;
+            ss >> x >> y;
+            texcoord.emplace_back(vsg::vec2(x, y));
+        }
+        display_config.texcoord = vsg::vec2Array::create(texcoord.size(), texcoord.data());
+
+        display_container_t* dc = new display_container_t;
+        loadDisplayModule(display_config, dc, model);
+
+        config_section = cfg.getNextSection();
     }
 }
