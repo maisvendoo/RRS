@@ -91,7 +91,20 @@ void TopologyCheck::parse_command_line(cli::Parser &parser)
 //------------------------------------------------------------------------------
 void TopologyCheck::find_ends_without_connector(Trajectory *traj)
 {
-    // TODO
+    if (traj->getBwdConnector() == nullptr)
+    {
+        dvec3 end_point = traj->getFirstTrack().begin_point;
+        ends_without_connector.push_back({end_point, traj});
+        LOG_INFO("Info: no connector at begin {%8.3f; %8.3f; %8.3f} of trajectory %s",
+                 end_point.x, end_point.y, end_point.z, traj->getName().toStdString().c_str());
+    }
+    if (traj->getFwdConnector() == nullptr)
+    {
+        dvec3 end_point = traj->getLastTrack().end_point;
+        ends_without_connector.push_back({end_point, traj});
+        LOG_INFO("Info: no connector at end {%8.3f; %8.3f; %8.3f} of trajectory %s",
+                 end_point.x, end_point.y, end_point.z, traj->getName().toStdString().c_str());
+    }
 }
 
 //------------------------------------------------------------------------------
