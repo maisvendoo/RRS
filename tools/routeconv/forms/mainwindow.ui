@@ -200,7 +200,43 @@
                </widget>
               </item>
               <item>
-               <spacer name="hSpacerTopologyChecker">
+               <spacer name="hSpacerTopologyChecker1">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="lMinimumRadius">
+                <property name="text">
+                 <string>Minimum radius:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="dsbMinimumRadius">
+                <property name="decimals">
+                 <number>1</number>
+                </property>
+                <property name="minimum">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>10000.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>150.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="hSpacerTopologyChecker2">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>

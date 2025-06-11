@@ -149,8 +149,11 @@ void MainWindow::startTopologyChecker()
     FileSystem &fs = FileSystem::getInstance();
     QString topologycheck_path = TOPOLOGYCHECK + EXE_EXP;
 
+    double curve_min_radius = ui->dsbMinimumRadius->value();
+
     QStringList args;
     args << "--route" << routeDir;
+    args << "--curve" << QString("%1").arg(curve_min_radius, 0, 'f', 2);
 
     topologyCheckProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     topologyCheckProc.start(topologycheck_path, args);

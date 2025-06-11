@@ -26,6 +26,8 @@ private:
 
     std::vector<std::pair<dvec3, Trajectory *>> ends_without_connector = {};
 
+    double maximum_curvature = 1.0 / 150.0;
+
     void configure_parser(cli::Parser &parser);
 
     void parse_command_line(cli::Parser &parser);

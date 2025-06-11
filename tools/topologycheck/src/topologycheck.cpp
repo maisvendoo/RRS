@@ -29,6 +29,7 @@ int TopologyCheck::run(int argc, char *argv[])
         return false;
     }
     LOG_INFO("Info: load topology from route %s", route_path.c_str());
+    LOG_INFO("================================================================================");
 
     traj_list_t *traj_list = topology->getTrajectoriesList();
 
@@ -41,6 +42,7 @@ int TopologyCheck::run(int argc, char *argv[])
     {
         check_trajectory((*traj));
     }
+    LOG_INFO("================================================================================");
 
     conn_list_t *switches = topology->getConnectorsList();
     for (auto conn = switches->begin(); conn != switches->end(); ++conn)
@@ -51,6 +53,7 @@ int TopologyCheck::run(int argc, char *argv[])
             check_connector_point(sw);
         }
     }
+    LOG_INFO("================================================================================");
 
     return true;
 }
@@ -63,6 +66,9 @@ void TopologyCheck::configure_parser(cli::Parser &parser)
     parser.set_optional<std::string>("r", "route",
                                      "",
                                      "Input RRS route path");
+    parser.set_optional<double>("c", "curve",
+                                150.0,
+                                "Minimum curve radius, m");
     parser.enable_help();
 }
 
@@ -75,6 +81,12 @@ void TopologyCheck::parse_command_line(cli::Parser &parser)
 
     cmd_line_t cmd_line;
     cmd_line.route_path = parser.get<std::string>("r");
+    cmd_line.minimum_curve_radius = parser.get<double>("c");
+
+    if (cmd_line.minimum_curve_radius.isPresent())
+    {
+        maximum_curvature = 1.0 / cmd_line.minimum_curve_radius.value;
+    }
 
     if (cmd_line.route_path.isPresent())
     {
@@ -119,6 +131,19 @@ void TopologyCheck::check_trajectory(Trajectory *traj)
     int point_num = 1;
     for (auto& track : traj->getTracks())
     {
+        if (point_num > 1)
+        {
+            auto prev_track = traj->getTracks().at(point_num - 2);
+            double curvature = calcCurvature(prev_track, track);
+            if (curvature > maximum_curvature)
+            {
+                LOG_WARN("Warn: curve at points %u, %u, %u at trajectory %s with very small radius %5.1f m",
+                         point_num - 1, point_num, point_num + 1,
+                         traj->getName().toStdString().c_str(),
+                         1.0 / curvature);
+            }
+        }
+
         if (track.len < 0.01)
         {
             LOG_WARN("Warn: points %u {%12.3f;%12.3f;%8.3f} and %u {%12.3f;%12.3f;%8.3f} match in trajectory %s",
@@ -150,8 +175,21 @@ void TopologyCheck::check_connector_point(Switch *sw)
         sw->setStateFwd(state_fwd);
         if (sw->getBwdTraj() && sw->getFwdTraj())
         {
-            dvec3 bwd_end = sw->getBwdTraj()->getLastTrack().end_point;
-            dvec3 fwd_begin = sw->getFwdTraj()->getFirstTrack().begin_point;
+            auto bwd_track = sw->getBwdTraj()->getLastTrack();
+            auto fwd_track = sw->getFwdTraj()->getFirstTrack();
+
+            double curvature = calcCurvature(bwd_track, fwd_track);
+            if (curvature > maximum_curvature)
+            {
+                LOG_WARN("Warn: bwd_trajectory %s and fwd_trajectory %s of connector %s create curve with very small radius %5.1f m",
+                         sw->getBwdTraj()->getName().toStdString().c_str(),
+                         sw->getFwdTraj()->getName().toStdString().c_str(),
+                         sw->getName().toStdString().c_str(),
+                         1.0 / curvature);
+            }
+
+            dvec3 bwd_end = bwd_track.end_point;
+            dvec3 fwd_begin = fwd_track.begin_point;
             if (length(bwd_end - fwd_begin) >= 0.01)
             {
                 LOG_WARN("Warn: point at end {%12.3f;%12.3f;%8.3f} of trajectory %s is far away from point at begin {%12.3f;%12.3f;%8.3f} of trajectory %s in connector %s",
@@ -199,6 +237,12 @@ void TopologyCheck::check_ends_and_point(Trajectory *traj, dvec3 point, int poin
 //------------------------------------------------------------------------------
 double TopologyCheck::calcCurvature(const track_t &track0, const track_t &track1)
 {
+    if (track0.len < 0.01)
+        return 0.0;
+
+    if (track1.len < 0.01)
+        return 0.0;
+
     // Направление первого трека
     double A0 = track0.orth.x;
     double B0 = track0.orth.y;
