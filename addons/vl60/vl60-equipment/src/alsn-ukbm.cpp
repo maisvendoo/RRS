@@ -63,12 +63,13 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
 
     if (is_lamp_on(WHITE_LAMP))
     {
-        if (v_kmh > 40.0)
+        // Отключено до выяснения реальной логики работы
+        /*if (v_kmh > 40.0)
         {
             setPSS();
             epk_state.reset();
             return;
-        }
+        }*/
 
         if (!safety_timer->isStarted())
         {
