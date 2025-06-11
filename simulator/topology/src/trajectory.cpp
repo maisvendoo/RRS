@@ -27,7 +27,8 @@ Trajectory::~Trajectory()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Trajectory::load(const QString &route_dir, const QString &traj_name, std::vector<module_cfg_t> modules)
+bool Trajectory::load(const QString &route_dir, const QString &traj_name,
+                      std::vector<module_cfg_t> modules, bool solve_errors)
 {
     QString path = QDir::toNativeSeparators(route_dir) +
                    QDir::separator() + "topology" +
@@ -78,7 +79,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name, std::v
         dvec3 dp = p1 - p0;
 
         // Откидываем сантиметровые треки и меньше
-        if (length(dp) <= 0.01)
+        if (solve_errors && (length(dp) <= 0.01))
         {
             QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
                               .arg(i, 4)

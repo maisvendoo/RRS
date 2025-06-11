@@ -27,7 +27,7 @@ public:
     ~Topology();
 
     /// Загрузка топологии ж/д полигона
-    bool load(QString route_dir);
+    bool load(QString route_dir, bool solve_errors = true);
 
     /// Инициализация поезда
     bool addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles);

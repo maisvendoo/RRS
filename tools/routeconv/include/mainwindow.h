@@ -40,6 +40,7 @@ private:
     QProcess    pathconvProc;
     QProcess    profconvProc;
     QProcess    dmd2gltfProc;
+    QProcess    topologyCheckProc;
     QProcess    parallelGenProc;
     QProcess    splineGenProc;
 
@@ -47,15 +48,17 @@ private:
 
     bool createDescriptionFile(QString title, QString description);
 
-    void startPathConverter(QString routeDir);
+    void startPathConverter();
 
-    void startProfConverter(QString routeDir);
+    void startProfConverter();
 
-    void startDmd2gltfConverter(QString routeDir);
+    void startDmd2gltfConverter();
 
-    void startParallelGenerator(QString routeDir);
+    void startTopologyChecker();
 
-    void startSplineGenerator(QString routeDir);
+    void startParallelGenerator();
+
+    void startSplineGenerator();
 
 private slots:
 
@@ -70,6 +73,8 @@ private slots:
     void slotIsProfconvFinished(int error_code, QProcess::ExitStatus exitstatus);
 
     void slotIsDmd2gltfFinished(int error_code, QProcess::ExitStatus exitstatus);
+
+    void slotCheckTopology();
 
     void slotGenerateParallel();
 
