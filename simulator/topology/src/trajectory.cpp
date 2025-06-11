@@ -74,6 +74,15 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name, std::v
 
         ss_end >> p1.x >> p1.y >> p1.z >> railway_coord1;
 
+        // Проверка совпадения точек p0 и p1
+        dvec3 dp = p1 - p0;
+
+        // Откидываем сантиметровые треки и меньше
+        if (length(dp) <= 0.01)
+        {
+            continue;
+        }
+
         // Конструируем трек
         track_t track(p0, p1);
 
