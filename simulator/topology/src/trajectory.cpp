@@ -80,6 +80,12 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name, std::v
         // Откидываем сантиметровые треки и меньше
         if (length(dp) <= 0.01)
         {
+            QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
+                              .arg(i, 4)
+                              .arg(i+1, 4)
+                              .arg(traj_name);
+
+            Journal::instance()->error(msg);
             continue;
         }
 
