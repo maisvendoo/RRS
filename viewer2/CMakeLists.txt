@@ -17,6 +17,9 @@ file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 
 add_executable(${TARGET} ${TARGET_SOURCES})
 
+add_subdirectory (display)
+add_subdirectory (display-player)
+
 target_link_libraries(${TARGET} PRIVATE
     Qt6::Widgets
     Qt6::Xml

@@ -68,8 +68,9 @@
 #include <vsg/state/Sampler.h>
 #include <vulkan/vulkan_core.h>
 
-DisplaySurfaceVisitor::DisplaySurfaceVisitor(display_container_t* dc, const display_config_t& display_config)
-    : dc(dc)
+DisplaySurfaceVisitor::DisplaySurfaceVisitor(display_container_t* dc, const display_config_t& display_config, QObject* parent)
+    : QObject(parent)
+    , dc(dc)
     , display_config(display_config)
 {
 }
@@ -81,8 +82,40 @@ void DisplaySurfaceVisitor::apply(vsg::Node& node)
 
 void DisplaySurfaceVisitor::apply(vsg::StateGroup& stateGroup)
 {
-    WidgetRenderer* widgetRenderer = new WidgetRenderer(dc->display);
-    QImage image = widgetRenderer->renderToImage();
+    QImage image = dc->display->renderToImage();
+    /*
+    QMetaObject::invokeMethod(qApp, [&]() {
+        std::cout << vsg::ref_ptr(&stateGroup) << std::endl;
+
+        QImage image(dc->display->size(), QImage::Format_RGBA8888_Premultiplied);
+        image.fill(Qt::transparent);
+
+        QPainter painter(&image);
+        dc->display->moveToThread(QThread::currentThread());
+        dc->display->render(&painter);
+        painter.end();
+
+        vsg::ref_ptr<vsg::Data> vsgData;
+        if (image.format() == QImage::Format_RGBA8888_Premultiplied)
+        {
+            vsgData = vsg::ubvec4Array2D::create(
+                image.width(),
+                image.height(),
+                reinterpret_cast<vsg::ubvec4*>(image.bits()),
+                vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+            );
+        }
+        else
+        {
+            QImage converted = image.convertToFormat(QImage::Format_RGBA8888);
+            vsgData = vsg::ubvec4Array2D::create(
+                converted.width(),
+                converted.height(),
+                reinterpret_cast<vsg::ubvec4*>(converted.bits()),
+                vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+            );
+        }
+    }, Qt::BlockingQueuedConnection);
 
     // auto texture = vsg::DescriptorImage::create(
     //     vsg::Sampler::create(),
@@ -105,4 +138,5 @@ void DisplaySurfaceVisitor::apply(vsg::StateGroup& stateGroup)
     // auto bindDescriptorSets = vsg::BindDescriptorSets::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, vsg::DescriptorSets{descriptorSet});
 
     // stateGroup.add(bindDescriptorSets);
+    */
 }

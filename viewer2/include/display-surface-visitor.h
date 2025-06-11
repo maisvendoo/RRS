@@ -40,13 +40,17 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/nodes/StateGroup.h>
 
-class DisplaySurfaceVisitor final : public vsg::Inherit<vsg::Visitor, DisplaySurfaceVisitor>
+class DisplaySurfaceVisitor : public QObject, public vsg::Inherit<vsg::Visitor, DisplaySurfaceVisitor>
 {
+Q_OBJECT
 public:
-    DisplaySurfaceVisitor(display_container_t* dc, const display_config_t& display_config);
+    DisplaySurfaceVisitor(display_container_t* dc, const display_config_t& display_config, QObject* parent = nullptr);
 
     void apply(vsg::Node& node) override;
     void apply(vsg::StateGroup& stateGroup) override;
+
+signals:
+    void stateGroupFound();
 
 private:
     display_container_t* dc;
