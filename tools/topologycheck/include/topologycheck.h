@@ -36,6 +36,8 @@ private:
 
     void check_connector_point(Switch *sw);
 
+    void check_ends_and_point(Trajectory *traj, dvec3 point, int point_num);
+
     double calcCurvature(const track_t &track0, const track_t &track1);
 };
 
