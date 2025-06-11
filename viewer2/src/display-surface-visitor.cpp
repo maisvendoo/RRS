@@ -43,6 +43,7 @@
 //------------------------------------------------------------------------------
 
 #include "display-surface-visitor.h"
+#include "WidgetRenderer.h"
 #include "display-config.h"
 
 #include <iostream>
@@ -80,38 +81,8 @@ void DisplaySurfaceVisitor::apply(vsg::Node& node)
 
 void DisplaySurfaceVisitor::apply(vsg::StateGroup& stateGroup)
 {
-    QMetaObject::invokeMethod(qApp, [&]() {
-        std::cout << vsg::ref_ptr(&stateGroup) << std::endl;
-
-        QImage image(dc->display->size(), QImage::Format_RGBA8888_Premultiplied);
-        image.fill(Qt::transparent);
-
-        QPainter painter(&image);
-        dc->display->moveToThread(QThread::currentThread());
-        dc->display->render(&painter);
-        painter.end();
-
-        vsg::ref_ptr<vsg::Data> vsgData;
-        if (image.format() == QImage::Format_RGBA8888_Premultiplied)
-        {
-            vsgData = vsg::ubvec4Array2D::create(
-                image.width(),
-                image.height(),
-                reinterpret_cast<vsg::ubvec4*>(image.bits()),
-                vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-            );
-        }
-        else
-        {
-            QImage converted = image.convertToFormat(QImage::Format_RGBA8888);
-            vsgData = vsg::ubvec4Array2D::create(
-                converted.width(),
-                converted.height(),
-                reinterpret_cast<vsg::ubvec4*>(converted.bits()),
-                vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-            );
-        }
-    }, Qt::BlockingQueuedConnection);
+    WidgetRenderer* widgetRenderer = new WidgetRenderer(dc->display);
+    QImage image = widgetRenderer->renderToImage();
 
     // auto texture = vsg::DescriptorImage::create(
     //     vsg::Sampler::create(),
