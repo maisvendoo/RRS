@@ -45,6 +45,9 @@
 #include "display-surface-visitor.h"
 #include "display-config.h"
 
+#include <iostream>
+#include <qobjectdefs.h>
+#include <qthread.h>
 #include <vsg/core/Array2D.h>
 #include <vsg/core/Data.h>
 #include <vsg/core/ref_ptr.h>
@@ -52,6 +55,7 @@
 
 #include <QImage>
 #include <QPainter>
+#include <QApplication>
 
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/DescriptorImage.h>
@@ -76,33 +80,38 @@ void DisplaySurfaceVisitor::apply(vsg::Node& node)
 
 void DisplaySurfaceVisitor::apply(vsg::StateGroup& stateGroup)
 {
-    QImage image(dc->display->size(), QImage::Format_RGBA8888_Premultiplied);
-    image.fill(Qt::transparent);
+    QMetaObject::invokeMethod(qApp, [&]() {
+        std::cout << vsg::ref_ptr(&stateGroup) << std::endl;
 
-    QPainter painter(&image);
-    dc->display->render(&painter);
-    painter.end();
+        QImage image(dc->display->size(), QImage::Format_RGBA8888_Premultiplied);
+        image.fill(Qt::transparent);
 
-    vsg::ref_ptr<vsg::Data> vsgData;
-    if (image.format() == QImage::Format_RGBA8888_Premultiplied)
-    {
-        vsgData = vsg::ubvec4Array2D::create(
-            image.width(),
-            image.height(),
-            reinterpret_cast<vsg::ubvec4*>(image.bits()),
-            vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-        );
-    }
-    else
-    {
-        QImage converted = image.convertToFormat(QImage::Format_RGBA8888);
-        vsgData = vsg::ubvec4Array2D::create(
-            converted.width(),
-            converted.height(),
-            reinterpret_cast<vsg::ubvec4*>(converted.bits()),
-            vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-        );
-    }
+        QPainter painter(&image);
+        dc->display->moveToThread(QThread::currentThread());
+        dc->display->render(&painter);
+        painter.end();
+
+        vsg::ref_ptr<vsg::Data> vsgData;
+        if (image.format() == QImage::Format_RGBA8888_Premultiplied)
+        {
+            vsgData = vsg::ubvec4Array2D::create(
+                image.width(),
+                image.height(),
+                reinterpret_cast<vsg::ubvec4*>(image.bits()),
+                vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+            );
+        }
+        else
+        {
+            QImage converted = image.convertToFormat(QImage::Format_RGBA8888);
+            vsgData = vsg::ubvec4Array2D::create(
+                converted.width(),
+                converted.height(),
+                reinterpret_cast<vsg::ubvec4*>(converted.bits()),
+                vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+            );
+        }
+    }, Qt::BlockingQueuedConnection);
 
     // auto texture = vsg::DescriptorImage::create(
     //     vsg::Sampler::create(),
