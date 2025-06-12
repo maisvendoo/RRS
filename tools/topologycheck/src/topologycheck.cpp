@@ -85,7 +85,7 @@ void TopologyCheck::parse_command_line(cli::Parser &parser)
 
     if (cmd_line.minimum_curve_radius.isPresent())
     {
-        maximum_curvature = 1.0 / cmd_line.minimum_curve_radius.value;
+        maximum_curvature = 1.0 / max(1.0, cmd_line.minimum_curve_radius.value);
     }
 
     if (cmd_line.route_path.isPresent())
