@@ -18,9 +18,19 @@
 //
 //------------------------------------------------------------------------------
 AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
-    : ProcAnimation(transform)
+    : ProcAnimation()
     , matrix(transform->matrix)
+    , transform_node(transform)
 {
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnalogRotation::setTransform(vsg::MatrixTransform *transform)
+{
+    transform_node = transform;
+    update();
 }
 
 //------------------------------------------------------------------------------
@@ -41,7 +51,7 @@ void AnalogRotation::update()
     }
 
     vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
-    transform->matrix = matrix * rotate;
+    transform_node->matrix = matrix * rotate;
 }
 
 //------------------------------------------------------------------------------

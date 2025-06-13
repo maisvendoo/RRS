@@ -7,11 +7,6 @@
 
 class CfgReader;
 
-namespace vsg
-{
-    class MatrixTransform;
-}
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -20,19 +15,14 @@ class ProcAnimation
 public:
     ProcAnimation() = default;
     ProcAnimation(const std::string& name);
-    ProcAnimation(vsg::MatrixTransform* transform);
 
     virtual ~ProcAnimation() = default;
 
     void step(float t, float dt);
 
-    bool load(const std::string& path);
-
     bool load(CfgReader& cfg);
 
     void setPosition(float pos);
-
-    void setTransform(vsg::MatrixTransform* transform);
 
     std::size_t getSignalID() const;
 
@@ -50,9 +40,6 @@ protected:
     float duration = 1.0f;
 
     std::size_t signal_id = 0;
-
-    vsg::MatrixTransform* transform = nullptr;
-
     bool is_fixed_signal = false;
     float fixed_signal = 0.0f;
 

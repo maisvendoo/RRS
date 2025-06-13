@@ -16,9 +16,19 @@
 //
 //------------------------------------------------------------------------------
 AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
-    : ProcAnimation(transform)
+    : ProcAnimation()
     , matrix(transform->matrix)
+    , transform_node(transform)
 {
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnalogTranslation::setTransform(vsg::MatrixTransform *transform)
+{
+    transform_node = transform;
+    update();
 }
 
 //------------------------------------------------------------------------------
@@ -35,7 +45,7 @@ void AnalogTranslation::update()
     motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
 
     vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));
-    transform->matrix = matrix * translate;
+    transform_node->matrix = matrix * translate;
 }
 
 //------------------------------------------------------------------------------

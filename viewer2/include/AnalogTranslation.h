@@ -21,7 +21,7 @@ class AnalogTranslation : public ProcAnimation
 public:
     explicit AnalogTranslation(vsg::MatrixTransform* transform);
 
-    void update();
+    void setTransform(vsg::MatrixTransform* transform);
 
 private:
     float motion = 0.0f;
@@ -30,6 +30,10 @@ private:
 
     vsg::dvec3 axis = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dmat4 matrix;
+
+    vsg::MatrixTransform* transform_node = nullptr;
+
+    void update();
 
     void anim_step(float t, float dt) override;
 
