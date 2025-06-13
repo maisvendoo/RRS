@@ -14,7 +14,6 @@ class ProcAnimation
 {
 public:
     ProcAnimation() = default;
-    ProcAnimation(const std::string& name);
 
     virtual ~ProcAnimation() = default;
 

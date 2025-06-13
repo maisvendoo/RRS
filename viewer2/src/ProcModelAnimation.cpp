@@ -12,7 +12,7 @@
 //
 //------------------------------------------------------------------------------
 ProcModelAnimation::ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation)
-    : ProcAnimation(in_animation->name)
+    : ProcAnimation()
     , animation(in_animation)
 {
 }
@@ -25,7 +25,7 @@ void ProcModelAnimation::anim_step([[maybe_unused]] float t, float dt)
     float delta = (pos - cur_pos);
     if (abs(delta) > 1e-5f)
     {
-        cur_pos += delta * duration * dt;
+        cur_pos += delta * fmin(duration * dt, 1.0f);
         update();
     }
 }

@@ -44,6 +44,7 @@ void FindModelAnimations::find_animations()
         ProcAnimation* animation = create_animation(model_animation);
         if (animation)
         {
+            animation->name = model_animation->name;
             animations->thread_safe_insert({animation->getSignalID(), animation});
         }
     }
