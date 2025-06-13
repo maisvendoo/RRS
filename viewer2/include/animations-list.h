@@ -5,12 +5,15 @@
 #include <map>
 #include <mutex>
 
+#include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
+
 class ProcAnimation;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct animations_t
+struct animations_t : public vsg::Inherit<vsg::Object, animations_t>
 {
     animations_t(){}
 

@@ -23,7 +23,7 @@ namespace vsg
 struct FindModelAnimationsCreateInfo
 {
     vsg::ref_ptr<vsg::Node> node;
-    animations_t* animations;
+    vsg::ref_ptr<animations_t> animations;
     std::string animations_dir;
 };
 
@@ -38,7 +38,7 @@ public:
 private:
     vsg::ref_ptr<vsg::Node> node;
     std::string animations_dir;
-    animations_t* animations;
+    vsg::ref_ptr<animations_t> animations;
 
     void find_animations();
 

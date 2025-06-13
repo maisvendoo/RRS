@@ -20,8 +20,10 @@
 //------------------------------------------------------------------------------
 struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
 {
-    MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
-        vsg::ref_ptr<vsg::Node> in_node, const vsg::CompileResult& in_compileResult) noexcept;
+    MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer,
+                 vsg::ref_ptr<vsg::Group> in_attachment_point,
+                 vsg::ref_ptr<vsg::Node> in_node,
+                 const vsg::CompileResult& in_compileResult) noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::Group> attachment_point;
@@ -36,16 +38,19 @@ struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
 //------------------------------------------------------------------------------
 struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperation>
 {
-    LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
-        const std::string& in_model_filename_path, const std::string& in_animations_dir,
-        vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations) noexcept;
+    LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer,
+                       vsg::ref_ptr<vsg::Group> in_attachment_point,
+                       const std::string& in_model_filename_path,
+                       const std::string& in_animations_dir,
+                       vsg::ref_ptr<vsg::Options> in_options,
+                       vsg::ref_ptr<animations_t> in_animations) noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::Group> attachment_point = nullptr;
     std::string model_filename_path = "";
     std::string animations_dir = "";
     vsg::ref_ptr<vsg::Options> options = nullptr;
-    animations_t* animations;
+    vsg::observer_ptr<animations_t> animations;
 
     void run() override;
 };

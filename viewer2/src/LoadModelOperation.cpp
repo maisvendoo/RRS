@@ -21,8 +21,13 @@
 #include <cstddef>
 #include <string>
 
-MergeToScene::MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
-    vsg::ref_ptr<vsg::Node> in_node, const vsg::CompileResult& in_compileResult) noexcept
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+MergeToScene::MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer,
+                           vsg::ref_ptr<vsg::Group> in_attachment_point,
+                           vsg::ref_ptr<vsg::Node> in_node,
+                           const vsg::CompileResult& in_compileResult) noexcept
     : viewer(in_viewer)
     , attachment_point(in_attachment_point)
     , node(in_node)
@@ -30,6 +35,9 @@ MergeToScene::MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer, vsg::ref_pt
 {
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MergeToScene::run()
 {
     vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
@@ -41,9 +49,16 @@ void MergeToScene::run()
     }
 }
 
-LoadModelOperation::LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer, vsg::ref_ptr<vsg::Group> in_attachment_point,
-    const std::string& in_model_filename_path, const std::string& in_animations_dir,
-    vsg::ref_ptr<vsg::Options> in_options, animations_t* in_animations) noexcept
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+LoadModelOperation::LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer,
+                                       vsg::ref_ptr<vsg::Group> in_attachment_point,
+                                       const std::string& in_model_filename_path,
+                                       const std::string& in_animations_dir,
+                                       vsg::ref_ptr<vsg::Options> in_options,
+                                       vsg::ref_ptr<animations_t> in_animations) noexcept
     : viewer(in_viewer)
     , attachment_point(in_attachment_point)
     , model_filename_path(in_model_filename_path)
@@ -53,6 +68,9 @@ LoadModelOperation::LoadModelOperation(vsg::ref_ptr<vsg::Viewer> in_viewer, vsg:
 {
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void LoadModelOperation::run()
 {
     if (!vsg::fileExists(model_filename_path))
@@ -78,19 +96,20 @@ void LoadModelOperation::run()
 
     LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
-    std::size_t old_size = animations->animations.size();
+    vsg::ref_ptr<animations_t> ref_animations = vsg::ref_ptr<animations_t>(animations);
+    std::size_t old_size = ref_animations->animations.size();
     {
         // Model's animations
-        FindModelAnimationsCreateInfo fma_create_info = {node, animations, animations_dir};
+        FindModelAnimationsCreateInfo fma_create_info = {node, ref_animations, animations_dir};
         auto find_model_animations = FindModelAnimations::create(fma_create_info);
         LOG_INFO("Operation: loaded %zu (total: %zu) model animations from %s",
-            animations->animations.size() - old_size,
-            animations->animations.size(),
+            ref_animations->animations.size() - old_size,
+            ref_animations->animations.size(),
             animations_dir.c_str()
         );
     }
 
-    old_size = animations->animations.size();
+    old_size = ref_animations->animations.size();
 
     // Custom animations for model
     auto pdo = vsg::PropagateDynamicObjects::create();
@@ -98,13 +117,13 @@ void LoadModelOperation::run()
     vsg::CopyOp copyop;
     auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
-    AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, animations};
+    AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, ref_animations};
 
     AnimTransformVisitor atv(atv_create_info);
     node->accept(atv);
     LOG_INFO("Operation: loaded %zu (total: %zu) custom animations from %s",
-        animations->animations.size() - old_size,
-        animations->animations.size(),
+        ref_animations->animations.size() - old_size,
+        ref_animations->animations.size(),
         animations_dir.c_str()
     );
 

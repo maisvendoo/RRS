@@ -27,7 +27,7 @@ struct AnimTransformVisitorCreateInfo
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
-    animations_t* animations;
+    vsg::ref_ptr<animations_t> animations;
 };
 
 struct DeferredAnimation
@@ -53,7 +53,7 @@ private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     std::string animations_dir;
-    animations_t* animations;
+    vsg::ref_ptr<animations_t> animations;
     std::vector<DeferredAnimation> deferred_animations;
 };
 
