@@ -5,6 +5,7 @@
 
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/core/ref_ptr.h>
 
 class CfgReader;
 
@@ -19,9 +20,9 @@ namespace vsg
 class AnalogTranslation : public ProcAnimation
 {
 public:
-    explicit AnalogTranslation(vsg::MatrixTransform* transform);
+    explicit AnalogTranslation(vsg::ref_ptr<vsg::MatrixTransform> transform);
 
-    void setTransform(vsg::MatrixTransform* transform);
+    void setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform);
 
 private:
     float motion = 0.0f;
@@ -31,7 +32,7 @@ private:
     vsg::dvec3 axis = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dmat4 matrix;
 
-    vsg::MatrixTransform* transform_node = nullptr;
+    vsg::ref_ptr<vsg::MatrixTransform> transform_node = nullptr;
 
     void update();
 

@@ -84,7 +84,8 @@ void AnimTransformVisitor::reconfigure_animations()
 {
     for (const auto& deferred_animation : deferred_animations)
     {
-        auto new_transform = duplicate->duplicates[deferred_animation.node]->cast<vsg::MatrixTransform>();
+        vsg::ref_ptr<vsg::Object> new_object = duplicate->duplicates[deferred_animation.node];
+        vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
 
         if (auto* rotation = dynamic_cast<AnalogRotation*>(deferred_animation.animation))
         {
@@ -109,6 +110,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
     {
         QDomNode config_section;
         ProcAnimation* animation = nullptr;
+        vsg::ref_ptr<vsg::Group> group_node = vsg::ref_ptr<vsg::Group>(&group);
 
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
@@ -116,7 +118,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&group);
 
-            animation = new AnalogRotation(group.cast<vsg::MatrixTransform>());
+            animation = new AnalogRotation(group_node.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
             deferred_animations.emplace_back(DeferredAnimation{&group, animation});
@@ -130,7 +132,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&group);
 
-            animation = new AnalogTranslation(group.cast<vsg::MatrixTransform>());
+            animation = new AnalogTranslation(group_node.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
             deferred_animations.emplace_back(DeferredAnimation{&group, animation});

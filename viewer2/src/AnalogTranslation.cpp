@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
+AnalogTranslation::AnalogTranslation(vsg::ref_ptr<vsg::MatrixTransform> transform)
     : ProcAnimation()
     , matrix(transform->matrix)
     , transform_node(transform)
@@ -25,7 +25,7 @@ AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogTranslation::setTransform(vsg::MatrixTransform *transform)
+void AnalogTranslation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 {
     transform_node = transform;
     update();

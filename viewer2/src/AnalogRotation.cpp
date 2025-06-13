@@ -17,7 +17,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
+AnalogRotation::AnalogRotation(vsg::ref_ptr<vsg::MatrixTransform> transform)
     : ProcAnimation()
     , matrix(transform->matrix)
     , transform_node(transform)
@@ -27,7 +27,7 @@ AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogRotation::setTransform(vsg::MatrixTransform *transform)
+void AnalogRotation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 {
     transform_node = transform;
     update();
