@@ -6,6 +6,9 @@
 #include <sstream>
 #include <vsg/maths/vec4.h>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
     : ProcAnimation()
     , material_value(data)
@@ -16,6 +19,9 @@ MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
     duration = 0.0f;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
@@ -26,6 +32,9 @@ void MaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool MaterialAnimation::load_config(CfgReader &cfg)
 {
     QString sec_name = "MaterialAnimation";
@@ -68,6 +77,9 @@ bool MaterialAnimation::load_config(CfgReader &cfg)
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MaterialAnimation::update()
 {
     if (keypoints.empty())

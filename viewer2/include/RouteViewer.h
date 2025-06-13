@@ -24,6 +24,9 @@ class TrafficLightsHandler;
 class VehiclesHandler;
 class UpdateViewerHandler;
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class RouteViewer : public QObject
 {
     Q_OBJECT

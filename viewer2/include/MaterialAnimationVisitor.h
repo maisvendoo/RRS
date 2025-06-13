@@ -24,6 +24,9 @@ struct MaterialAnimationVisitorCreateInfo
     CfgReader& cfg_reader;
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class MaterialAnimationVisitor : public vsg::Inherit<vsg::Visitor, MaterialAnimationVisitor>
 {
 public:

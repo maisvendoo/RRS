@@ -24,6 +24,9 @@
 #include <string>
 #include <vulkan/vulkan_core.h>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AnimTransformVisitor::AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info)
     : pdo(create_info.pdo)
     , duplicate(create_info.duplicate)
@@ -37,11 +40,17 @@ AnimTransformVisitor::AnimTransformVisitor(const AnimTransformVisitorCreateInfo&
     animations_dir = animations_dir_path;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnimTransformVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnimTransformVisitor::apply(vsg::Group& group)
 {
     std::string name;
@@ -68,6 +77,9 @@ void AnimTransformVisitor::apply(vsg::Group& group)
     group.traverse(*this);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnimTransformVisitor::reconfigure_animations()
 {
     for (const auto& deferred_animation : deferred_animations)
@@ -86,6 +98,9 @@ void AnimTransformVisitor::reconfigure_animations()
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
 {
     std::string file_path = animations_dir + name + ".xml";

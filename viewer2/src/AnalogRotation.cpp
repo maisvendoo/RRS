@@ -14,12 +14,18 @@
 #include <sstream>
 #include <string>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AnalogRotation::AnalogRotation(vsg::MatrixTransform* transform)
     : ProcAnimation(transform)
     , matrix(transform->matrix)
 {
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnalogRotation::update()
 {
     if (keypoints.empty())
@@ -38,6 +44,9 @@ void AnalogRotation::update()
     transform->matrix = matrix * rotate;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnalogRotation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = pos - cur_pos;
@@ -48,6 +57,9 @@ void AnalogRotation::anim_step([[maybe_unused]] float t, float dt)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool AnalogRotation::load_config(CfgReader& cfg)
 {
     QString sec_name = "AnalogRotation";

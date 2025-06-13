@@ -36,6 +36,9 @@ struct DeferredAnimation
     ProcAnimation* animation;
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class AnimTransformVisitor final : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
 {
 public:

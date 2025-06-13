@@ -12,12 +12,18 @@
 #include <string>
 #include <sstream>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 AnalogTranslation::AnalogTranslation(vsg::MatrixTransform* transform)
     : ProcAnimation(transform)
     , matrix(transform->matrix)
 {
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnalogTranslation::update()
 {
     if (keypoints.empty())
@@ -32,6 +38,9 @@ void AnalogTranslation::update()
     transform->matrix = matrix * translate;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnalogTranslation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
@@ -42,6 +51,9 @@ void AnalogTranslation::anim_step([[maybe_unused]] float t, float dt)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool AnalogTranslation::load_config(CfgReader &cfg)
 {
     QString sec_name = "AnalogTranslation";

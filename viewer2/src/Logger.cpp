@@ -4,12 +4,18 @@
 #include <map>
 #include <string>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Logger& Logger::instance()
 {
     static Logger logger;
     return logger;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Logger::~Logger()
 {
     if (file)
@@ -18,6 +24,9 @@ Logger::~Logger()
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Logger::log_message(LogLevel level, const char* file, int line, const char* message)
 {
     if (this->level > level)
@@ -50,6 +59,9 @@ void Logger::log_message(LogLevel level, const char* file, int line, const char*
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Logger::openFile(const std::string& path, const std::string &backup_path)
 {
     std::remove(backup_path.c_str());
@@ -57,6 +69,9 @@ void Logger::openFile(const std::string& path, const std::string &backup_path)
     file = fopen(path.c_str(), "w");
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Logger::print_ansi_escape_code(LogLevel level)
 {
     const std::map<LogLevel, const char*> level_map = {
