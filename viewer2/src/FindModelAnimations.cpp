@@ -17,13 +17,12 @@
 //------------------------------------------------------------------------------
 FindModelAnimations::FindModelAnimations(const FindModelAnimationsCreateInfo& create_info)
     : node(create_info.node)
-    , animations_dir(create_info.animations_dir)
     , animations(create_info.animations)
 {
     FileSystem& fs = FileSystem::getInstance();
     std::string animations_dir_path = fs.getDataDir() + fs.separator()
                                       + "animations" + fs.separator()
-                                      + animations_dir + fs.separator();
+                                      + create_info.animations_dir + fs.separator();
     animations_dir = animations_dir_path;
 
     find_animations();

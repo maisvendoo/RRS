@@ -1,7 +1,5 @@
-#pragma once
-
-#ifndef ANIM_TRANSFORM_VISITOR_H
-#define ANIM_TRANSFORM_VISITOR_H
+#ifndef FIND_CUSTOM_ANIMATIONS_VISITOR_H
+#define FIND_CUSTOM_ANIMATIONS_VISITOR_H
 
 #include "animations-list.h"
 #include "ProcAnimation.h"
@@ -22,7 +20,7 @@ namespace vsg
     class PropagateDynamicObjects;
 }
 
-struct AnimTransformVisitorCreateInfo
+struct FindCustomAnimationsVisitorCreateInfo
 {
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
@@ -39,10 +37,10 @@ struct DeferredAnimation
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class AnimTransformVisitor final : public vsg::Inherit<vsg::Visitor, AnimTransformVisitor>
+class FindCustomAnimationsVisitor final : public vsg::Inherit<vsg::Visitor, FindCustomAnimationsVisitor>
 {
 public:
-    explicit AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info);
+    explicit FindCustomAnimationsVisitor(const FindCustomAnimationsVisitorCreateInfo& create_info);
 
     void apply(vsg::Node& node) override;
     void apply(vsg::Group& group) override;
@@ -60,4 +58,4 @@ private:
     std::vector<DeferredAnimation> deferred_animations;
 };
 
-#endif // ANIM_TRANSFORM_VISITOR_H
+#endif // FIND_CUSTOM_ANIMATIONS_VISITOR_H

@@ -21,7 +21,7 @@ class CfgReader;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MaterialAnimationVisitor::MaterialAnimationVisitor(const MaterialAnimationVisitorCreateInfo& create_info)
+FindMaterialAnimationVisitor::FindMaterialAnimationVisitor(const FindMaterialAnimationVisitorCreateInfo& create_info)
     : pdo(create_info.pdo)
     , duplicate(create_info.duplicate)
     , cfg_reader(create_info.cfg_reader)
@@ -31,7 +31,7 @@ MaterialAnimationVisitor::MaterialAnimationVisitor(const MaterialAnimationVisito
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MaterialAnimationVisitor::apply(vsg::Node& node)
+void FindMaterialAnimationVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
 }
@@ -39,7 +39,7 @@ void MaterialAnimationVisitor::apply(vsg::Node& node)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
+void FindMaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
 {
     for (auto& descriptor : bindDescriptorSet.descriptorSet->descriptors)
     {

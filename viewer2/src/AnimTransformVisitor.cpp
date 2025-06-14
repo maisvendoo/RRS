@@ -1,12 +1,12 @@
 #include "AnimTransformVisitor.h"
 
+#include "filesystem.h"
+#include "CfgReader.h"
+#include "animations-list.h"
+#include "ProcAnimation.h"
 #include "AnalogRotation.h"
 #include "AnalogTranslation.h"
-#include "animations-list.h"
-#include "CfgReader.h"
-#include "filesystem.h"
 #include "MaterialAnimationVisitor.h"
-#include "ProcAnimation.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
@@ -14,36 +14,31 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
-#include <vsg/state/GraphicsPipeline.h>
-#include <vsg/state/RasterizationState.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <QDomNode>
-#include <QString>
 
 #include <string>
-#include <vulkan/vulkan_core.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AnimTransformVisitor::AnimTransformVisitor(const AnimTransformVisitorCreateInfo& create_info)
+FindCustomAnimationsVisitor::FindCustomAnimationsVisitor(const FindCustomAnimationsVisitorCreateInfo& create_info)
     : pdo(create_info.pdo)
     , duplicate(create_info.duplicate)
-    , animations_dir(create_info.animations_dir)
     , animations(create_info.animations)
 {
     FileSystem& fs = FileSystem::getInstance();
     std::string animations_dir_path = fs.getDataDir() + fs.separator()
                                       + "animations" + fs.separator()
-                                      + animations_dir + fs.separator();
+                                      + create_info.animations_dir + fs.separator();
     animations_dir = animations_dir_path;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnimTransformVisitor::apply(vsg::Node& node)
+void FindCustomAnimationsVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
 }
@@ -51,7 +46,7 @@ void AnimTransformVisitor::apply(vsg::Node& node)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnimTransformVisitor::apply(vsg::Group& group)
+void FindCustomAnimationsVisitor::apply(vsg::Group& group)
 {
     std::string name;
     group.getValue("name", name);
@@ -80,7 +75,7 @@ void AnimTransformVisitor::apply(vsg::Group& group)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnimTransformVisitor::reconfigure_animations()
+void FindCustomAnimationsVisitor::reconfigure_animations()
 {
     for (const auto& deferred_animation : deferred_animations)
     {
@@ -105,7 +100,7 @@ void AnimTransformVisitor::reconfigure_animations()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::ref_ptr<ProcAnimation> AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const std::string& name, vsg::Group& group)
 {
     std::string file_path = animations_dir + name + ".xml";
 
@@ -151,10 +146,10 @@ vsg::ref_ptr<ProcAnimation> AnimTransformVisitor::create_animation(const std::st
             vsg::CopyOp copyop;
             auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
 
-            MaterialAnimationVisitorCreateInfo mav_create_info = {inner_pdo, inner_duplicate, cfg};
+            FindMaterialAnimationVisitorCreateInfo fmav_create_info = {inner_pdo, inner_duplicate, cfg};
 
-            MaterialAnimationVisitor mav(mav_create_info);
-            group.accept(mav);
+            FindMaterialAnimationVisitor fmav(fmav_create_info);
+            group.accept(fmav);
             group.accept(*inner_pdo);
 
             if (!inner_pdo->dynamicObjects.empty())
@@ -172,7 +167,7 @@ vsg::ref_ptr<ProcAnimation> AnimTransformVisitor::create_animation(const std::st
                 duplicate->insert(&group, copyop(vsg::ref_ptr(&group)));
             }
 
-            return mav.get_animation();
+            return fmav.get_animation();
         }
     }
 

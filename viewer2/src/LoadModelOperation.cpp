@@ -117,10 +117,10 @@ void LoadModelOperation::run()
     vsg::CopyOp copyop;
     auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
-    AnimTransformVisitorCreateInfo atv_create_info = {pdo, duplicate, animations_dir, ref_animations};
+    FindCustomAnimationsVisitorCreateInfo fcav_create_info = {pdo, duplicate, animations_dir, ref_animations};
 
-    AnimTransformVisitor atv(atv_create_info);
-    node->accept(atv);
+    FindCustomAnimationsVisitor fcav(fcav_create_info);
+    node->accept(fcav);
     LOG_INFO("Operation: loaded %zu (total: %zu) custom animations from %s",
         ref_animations->animations.size() - old_size,
         ref_animations->animations.size(),
@@ -142,7 +142,7 @@ void LoadModelOperation::run()
 
         duplicate->insert(node);
         node = copyop(node);
-        atv.reconfigure_animations();
+        fcav.reconfigure_animations();
     }
 
     // Compile loaded model and add it to viewer

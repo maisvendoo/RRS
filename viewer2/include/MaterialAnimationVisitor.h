@@ -1,5 +1,5 @@
-#ifndef MATERIAL_ANIMATION_VISITOR_H
-#define MATERIAL_ANIMATION_VISITOR_H
+#ifndef FIND_MATERIAL_ANIMATION_H
+#define FIND_MATERIAL_ANIMATION_H
 
 #include "ProcAnimation.h"
 
@@ -17,7 +17,7 @@ namespace vsg
     class PropagateDynamicObjects;
 }
 
-struct MaterialAnimationVisitorCreateInfo
+struct FindMaterialAnimationVisitorCreateInfo
 {
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
@@ -27,10 +27,10 @@ struct MaterialAnimationVisitorCreateInfo
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class MaterialAnimationVisitor : public vsg::Inherit<vsg::Visitor, MaterialAnimationVisitor>
+class FindMaterialAnimationVisitor : public vsg::Inherit<vsg::Visitor, FindMaterialAnimationVisitor>
 {
 public:
-    explicit MaterialAnimationVisitor(const MaterialAnimationVisitorCreateInfo& create_info);
+    explicit FindMaterialAnimationVisitor(const FindMaterialAnimationVisitorCreateInfo& create_info);
 
     void apply(vsg::Node& node) override;
     void apply(vsg::BindDescriptorSet& bindDescriptorSet) override;
