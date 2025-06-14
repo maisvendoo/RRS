@@ -2,7 +2,9 @@
 #define MATERIAL_ANIMATION_H
 
 #include "ProcAnimation.h"
+
 #include <vsg/maths/vec4.h>
+#include <vsg/core/Value.h>
 #include <vsg/state/material.h>
 
 class CfgReader;
@@ -10,7 +12,7 @@ class CfgReader;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class MaterialAnimation : public ProcAnimation
+class MaterialAnimation : public vsg::Inherit<ProcAnimation, MaterialAnimation>
 {
 public:
     explicit MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data);

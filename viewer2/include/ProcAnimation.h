@@ -5,12 +5,15 @@
 #include <string>
 #include <vector>
 
+#include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
+
 class CfgReader;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProcAnimation
+class ProcAnimation : public vsg::Inherit<vsg::Object, ProcAnimation>
 {
 public:
     ProcAnimation() = default;

@@ -42,7 +42,7 @@ private:
 
     void find_animations();
 
-    ProcAnimation* create_animation(vsg::ref_ptr<vsg::Animation> model_animation);
+    vsg::ref_ptr<ProcAnimation> create_animation(vsg::ref_ptr<vsg::Animation> model_animation);
 };
 
 #endif // FIND_MODEL_ANIMATIONS_H

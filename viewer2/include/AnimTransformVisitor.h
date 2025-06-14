@@ -33,7 +33,7 @@ struct AnimTransformVisitorCreateInfo
 struct DeferredAnimation
 {
     vsg::Node* node;
-    ProcAnimation* animation;
+    vsg::ref_ptr<ProcAnimation> animation;
 };
 
 //------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public:
     void reconfigure_animations();
 
 private:
-    ProcAnimation* create_animation(const std::string& name, vsg::Group& group);
+    vsg::ref_ptr<ProcAnimation> create_animation(const std::string& name, vsg::Group& group);
 
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;

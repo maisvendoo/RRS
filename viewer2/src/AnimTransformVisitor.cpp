@@ -67,7 +67,7 @@ void AnimTransformVisitor::apply(vsg::Group& group)
         return;
     }
 
-    ProcAnimation* animation = create_animation(name, group);
+    vsg::ref_ptr<ProcAnimation> animation = create_animation(name, group);
     if (animation)
     {
         animation->name = name;
@@ -84,16 +84,20 @@ void AnimTransformVisitor::reconfigure_animations()
 {
     for (const auto& deferred_animation : deferred_animations)
     {
+        vsg::ref_ptr<ProcAnimation> animation = deferred_animation.animation;
+
         vsg::ref_ptr<vsg::Object> new_object = duplicate->duplicates[deferred_animation.node];
         vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
 
-        if (auto* rotation = dynamic_cast<AnalogRotation*>(deferred_animation.animation))
+        if (vsg::ref_ptr<AnalogRotation> rotation = animation.cast<AnalogRotation>())
         {
             rotation->setTransform(new_transform);
+            continue;
         }
-        else if (auto* translation = dynamic_cast<AnalogTranslation*>(deferred_animation.animation))
+        if (vsg::ref_ptr<AnalogTranslation> translation = animation.cast<AnalogTranslation>())
         {
             translation->setTransform(new_transform);
+            continue;
         }
     }
 }
@@ -101,7 +105,7 @@ void AnimTransformVisitor::reconfigure_animations()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
+vsg::ref_ptr<ProcAnimation> AnimTransformVisitor::create_animation(const std::string& name, vsg::Group& group)
 {
     std::string file_path = animations_dir + name + ".xml";
 
@@ -109,7 +113,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
     if (cfg.load(file_path.c_str()))
     {
         QDomNode config_section;
-        ProcAnimation* animation = nullptr;
+        vsg::ref_ptr<ProcAnimation> animation = nullptr;
         vsg::ref_ptr<vsg::Group> group_node = vsg::ref_ptr<vsg::Group>(&group);
 
         config_section = cfg.getFirstSection("AnalogRotation");
@@ -118,7 +122,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&group);
 
-            animation = new AnalogRotation(group_node.cast<vsg::MatrixTransform>());
+            animation = AnalogRotation::create(group_node.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
             deferred_animations.emplace_back(DeferredAnimation{&group, animation});
@@ -132,7 +136,7 @@ ProcAnimation* AnimTransformVisitor::create_animation(const std::string& name, v
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&group);
 
-            animation = new AnalogTranslation(group_node.cast<vsg::MatrixTransform>());
+            animation = AnalogTranslation::create(group_node.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
             deferred_animations.emplace_back(DeferredAnimation{&group, animation});

@@ -1,6 +1,5 @@
 #include "MaterialAnimationVisitor.h"
 
-#include "animations-list.h"
 #include "MaterialAnimation.h"
 #include "ProcAnimation.h"
 
@@ -57,7 +56,7 @@ void MaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorSet)
                     new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
                     duplicate->insert(pbr_material_value, new_pbr_material_value);
 
-                    animation = new MaterialAnimation(new_pbr_material_value);
+                    animation = MaterialAnimation::create(new_pbr_material_value);
                     animation->load(cfg_reader);
                 }
             }

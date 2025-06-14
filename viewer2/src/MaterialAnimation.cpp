@@ -1,22 +1,18 @@
 #include "MaterialAnimation.h"
-#include "CfgReader.h"
-#include "ProcAnimation.h"
 
-#include <iostream>
+#include "CfgReader.h"
+
 #include <sstream>
-#include <vsg/maths/vec4.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
-    : ProcAnimation()
+    : Inherit()
     , material_value(data)
     , color(data->value().baseColorFactor)
     , emission_color(0.0f, 0.0f, 0.0f, 1.0f)
 {
-    pos = 0.0f;
-    duration = 0.0f;
 }
 
 //------------------------------------------------------------------------------

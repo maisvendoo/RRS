@@ -18,7 +18,7 @@
 //
 //------------------------------------------------------------------------------
 AnalogRotation::AnalogRotation(vsg::ref_ptr<vsg::MatrixTransform> transform)
-    : ProcAnimation()
+    : Inherit()
     , matrix(transform->matrix)
     , transform_node(transform)
 {

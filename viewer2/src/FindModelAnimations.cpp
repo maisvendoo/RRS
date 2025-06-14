@@ -41,7 +41,7 @@ void FindModelAnimations::find_animations()
     for (auto& model_animation : findAnimations.animations)
     {
         // Пытаемся подключить анимацию к сигналу из движка
-        ProcAnimation* animation = create_animation(model_animation);
+        vsg::ref_ptr<ProcAnimation> animation = create_animation(model_animation);
         if (animation)
         {
             animation->name = model_animation->name;
@@ -53,7 +53,7 @@ void FindModelAnimations::find_animations()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation* FindModelAnimations::create_animation(vsg::ref_ptr<vsg::Animation> model_animation)
+vsg::ref_ptr<ProcAnimation> FindModelAnimations::create_animation(vsg::ref_ptr<vsg::Animation> model_animation)
 {
     // Пытаемся найти конфиг к анимации
     std::string file_path = animations_dir + model_animation->name + ".xml";
@@ -65,7 +65,7 @@ ProcAnimation* FindModelAnimations::create_animation(vsg::ref_ptr<vsg::Animation
         if (!config_section.isNull())
         {
             // Создаём и настраиваем управление анимацией по сигналу из движка
-            ProcAnimation* animation = new ProcModelAnimation(model_animation);
+            vsg::ref_ptr<ProcAnimation> animation = ProcModelAnimation::create(model_animation);
             animation->load(cfg);
             return animation;
         }

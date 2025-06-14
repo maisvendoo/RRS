@@ -35,13 +35,13 @@ public:
     void apply(vsg::Node& node) override;
     void apply(vsg::BindDescriptorSet& bindDescriptorSet) override;
 
-    ProcAnimation* get_animation() { return animation; }
+    vsg::ref_ptr<ProcAnimation> get_animation() { return animation; }
 
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
     CfgReader& cfg_reader;
-    ProcAnimation* animation = nullptr;
+    vsg::ref_ptr<ProcAnimation> animation = nullptr;
 };
 
 #endif // MATERIAL_ANIMATION_VISITOR_H

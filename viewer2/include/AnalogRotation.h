@@ -5,7 +5,6 @@
 
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/core/ref_ptr.h>
 
 class CfgReader;
 
@@ -17,7 +16,7 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class AnalogRotation : public ProcAnimation
+class AnalogRotation : public vsg::Inherit<ProcAnimation, AnalogRotation>
 {
 public:
     explicit AnalogRotation(vsg::ref_ptr<vsg::MatrixTransform> transform);

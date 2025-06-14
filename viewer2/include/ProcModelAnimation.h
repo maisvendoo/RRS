@@ -3,8 +3,6 @@
 
 #include "ProcAnimation.h"
 
-#include <vsg/animation/Animation.h>
-
 class CfgReader;
 
 namespace vsg
@@ -15,13 +13,12 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProcModelAnimation : public ProcAnimation
+class ProcModelAnimation : public vsg::Inherit<ProcAnimation, ProcModelAnimation>
 {
 public:
-    ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation);
+    explicit ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation);
 
 private:
-
     vsg::ref_ptr<vsg::Animation> animation;
 
     float cur_pos = 0.0;

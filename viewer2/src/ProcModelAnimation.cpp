@@ -1,18 +1,14 @@
 #include "ProcModelAnimation.h"
 
 #include "CfgReader.h"
-#include "ProcAnimation.h"
 
-#include <vsg/maths/mat4.h>
-#include <vsg/maths/transform.h>
-#include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/animation/Animation.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 ProcModelAnimation::ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation)
-    : ProcAnimation()
+    : Inherit()
     , animation(in_animation)
 {
 }
