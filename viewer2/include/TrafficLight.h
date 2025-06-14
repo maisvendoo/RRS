@@ -54,6 +54,8 @@ private:
     lens_state_t old_lens_state;
 
     vsg::ref_ptr<animations_t> animations = animations_t::create();
+
+    std::vector<float> server_signals;
 };
 
 #endif // TRAFFIC_LIGHT_H

@@ -18,14 +18,24 @@ ProcMaterialAnimation::ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue>
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcMaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
+void ProcMaterialAnimation::update(float current_signal)
 {
-    float delta = (pos - cur_pos);
-    if (abs(delta) > 1e-5f)
+    if (keypoints.empty())
     {
-        cur_pos += delta * fmin(duration * dt, 1.0f);
-        update();
+        return;
     }
+
+    intensity = interpolate(current_signal);
+    vsg::vec4 new_color = color * intensity;
+    new_color.a = 1.0f;
+
+    vsg::vec4 new_emission_color = emission_color * intensity;
+    new_emission_color.a = 1.0f;
+
+    material_value->value().baseColorFactor = new_color;
+    material_value->value().emissiveFactor = new_emission_color;
+    // material_value->value().diffuseFactor = new_color;
+    material_value->dirty();
 }
 
 //------------------------------------------------------------------------------
@@ -46,7 +56,7 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
     tmp_dbl = 0.0;
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
     {
-        fixed_signal = static_cast<float>(tmp_dbl);
+        cur_signal = static_cast<float>(tmp_dbl);
         is_fixed_signal = true;
     }
 
@@ -69,28 +79,6 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
     // material_value->value().baseColorFactor = color;
     // material_value->value().emissiveFactor = emission_color;
 
-    update();
+    update(cur_signal);
     return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcMaterialAnimation::update()
-{
-    if (keypoints.empty())
-    {
-        return;
-    }
-
-    vsg::vec4 new_color = color * interpolate(cur_pos);
-    new_color.a = 1.0f;
-
-    vsg::vec4 new_emission_color = emission_color * cur_pos;
-    new_emission_color.a = 1.0f;
-
-    material_value->value().baseColorFactor = new_color;
-    material_value->value().emissiveFactor = new_emission_color;    
-    // material_value->value().diffuseFactor = new_color;
-    material_value->dirty();
 }

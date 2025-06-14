@@ -21,13 +21,9 @@ public:
 private:
     vsg::ref_ptr<vsg::Animation> animation;
 
-    float cur_pos = 0.0;
-
-    void anim_step(float t, float dt) override;
+    void update(float current_signal) override;
 
     bool load_config(CfgReader& cfg) override;
-
-    void update();
 };
 
 #endif // PROC_MODEL_ANIMATION_H

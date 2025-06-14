@@ -30,20 +30,26 @@ ProcRotationAnimation::ProcRotationAnimation(vsg::ref_ptr<vsg::MatrixTransform> 
 void ProcRotationAnimation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 {
     transform_node = transform;
-    update();
+
+    if (!is_fixed_signal)
+    {
+        cur_signal = 0.0f;
+    }
+
+    update(cur_signal);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcRotationAnimation::update()
+void ProcRotationAnimation::update(float current_signal)
 {
     if (keypoints.empty())
     {
         return;
     }
 
-    angle = interpolate(cur_pos);
+    angle = interpolate(current_signal);
 
     if (!infinity)
     {
@@ -52,19 +58,6 @@ void ProcRotationAnimation::update()
 
     vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
     transform_node->matrix = matrix * rotate;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcRotationAnimation::anim_step([[maybe_unused]] float t, float dt)
-{
-    float delta = pos - cur_pos;
-    if (abs(delta) > 1e-5f)
-    {
-        cur_pos += delta * fmin(duration * dt, 1.0f);
-        update();
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -89,7 +82,7 @@ bool ProcRotationAnimation::load_config(CfgReader& cfg)
     tmp_dbl = 0.0;
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
     {
-        fixed_signal = static_cast<float>(tmp_dbl);
+        cur_signal = static_cast<float>(tmp_dbl);
         is_fixed_signal = true;
     }
 

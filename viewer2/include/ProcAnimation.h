@@ -24,32 +24,34 @@ public:
 
     bool load(CfgReader& cfg);
 
-    void setPosition(float pos);
+    void setSignals(std::vector<float>* in_signals);
 
-    std::size_t getSignalID() const;
+    virtual std::size_t getSignalID() const;
 
 public:
     std::string name = "";
 
 protected:
+    std::size_t signal_id = 0;
+    bool is_fixed_signal = false;
+    float cur_signal = 0.0f;
+    float duration = 1.0f;
+
     struct key_point_t
     {
         float param = 0.0f;
         float value = 0.0f;
     };
 
-    float pos = 0.0f;
-    float duration = 1.0f;
-
-    std::size_t signal_id = 0;
-    bool is_fixed_signal = false;
-    float fixed_signal = 0.0f;
-
     std::vector<key_point_t> keypoints;
 
-    virtual bool load_config(CfgReader& cfg) = 0;
+    std::vector<float>* server_signals = nullptr;
 
-    virtual void anim_step(float t, float dt) = 0;
+    virtual bool load_config(CfgReader& cfg);
+
+    virtual void anim_step(float t, float dt);
+
+    virtual void update(float current_signal);
 
     float interpolate(float value);
 

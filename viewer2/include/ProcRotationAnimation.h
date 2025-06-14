@@ -25,9 +25,6 @@ public:
 
 private:
     float angle = 0.0f;
-
-    float cur_pos = 0.0f;
-
     bool infinity = false;
 
     vsg::dvec3 axis = vsg::dvec3(0.0, 0.0, 1.0);
@@ -35,9 +32,7 @@ private:
 
     vsg::ref_ptr<vsg::MatrixTransform> transform_node = nullptr;
 
-    void update();
-
-    void anim_step(float t, float dt) override;
+    void update(float current_signal) override;
 
     bool load_config(CfgReader &cfg) override;
 };

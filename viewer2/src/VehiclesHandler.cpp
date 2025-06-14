@@ -224,14 +224,7 @@ void VehiclesHandler::step(double t, double dt)
             // Model animations update
             for (auto& [signal_id, animation] : vehicles[i].animations->animations)
             {
-                if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
-                {
-                    animation->setPosition(update_data[new_state].vehicles[i].analogSignal[signal_id]);
-                }
-                else
-                {
-                    animation->setPosition(0.0f);
-                }
+                animation->setSignals(&(update_data[new_state].vehicles[i].analogSignal));
             }
 
             // Sounds update

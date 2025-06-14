@@ -28,37 +28,30 @@ ProcTranslationAnimation::ProcTranslationAnimation(vsg::ref_ptr<vsg::MatrixTrans
 void ProcTranslationAnimation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 {
     transform_node = transform;
-    update();
+
+    if (!is_fixed_signal)
+    {
+        cur_signal = 0.0f;
+    }
+
+    update(cur_signal);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcTranslationAnimation::update()
+void ProcTranslationAnimation::update(float current_signal)
 {
     if (keypoints.empty())
     {
         return;
     }
 
-    motion = interpolate(cur_pos);
+    motion = interpolate(current_signal);
     motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
 
     vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));
     transform_node->matrix = matrix * translate;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcTranslationAnimation::anim_step([[maybe_unused]] float t, float dt)
-{
-    float delta = (pos - cur_pos);
-    if (abs(delta) > 1e-5f)
-    {
-        cur_pos += delta * fmin(duration * dt, 1.0f);
-        update();
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -83,7 +76,7 @@ bool ProcTranslationAnimation::load_config(CfgReader &cfg)
     tmp_dbl = 0.0;
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
     {
-        fixed_signal = static_cast<float>(tmp_dbl);
+        cur_signal = static_cast<float>(tmp_dbl);
         is_fixed_signal = true;
     }
 
@@ -93,9 +86,7 @@ bool ProcTranslationAnimation::load_config(CfgReader &cfg)
         std::string tmp = tmp_qstr.toStdString();
         std::istringstream ss(tmp);
         ss >> axis.x >> axis.y >> axis.z;
-
-        // TODO: Возможно нужно раскомментировать
-        // axis = vsg::normalize(axis);
+        axis = vsg::normalize(axis);
     }
 
     // update();

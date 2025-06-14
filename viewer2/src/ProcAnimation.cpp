@@ -27,16 +27,9 @@ bool ProcAnimation::load(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcAnimation::setPosition(float pos)
+void ProcAnimation::setSignals(std::vector<float> *in_signals)
 {
-    if (is_fixed_signal)
-    {
-        this->pos = fixed_signal;
-    }
-    else
-    {
-        this->pos = pos;
-    }
+    server_signals = in_signals;
 }
 
 //------------------------------------------------------------------------------
@@ -45,6 +38,44 @@ void ProcAnimation::setPosition(float pos)
 std::size_t ProcAnimation::getSignalID() const
 {
     return signal_id;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ProcAnimation::load_config(CfgReader &cfg)
+{
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcAnimation::anim_step([[maybe_unused]] float t, float dt)
+{
+    if (is_fixed_signal)
+        return;
+
+    float server_signal = 0.0f;
+    if (server_signals && (signal_id < server_signals->size()))
+    {
+        server_signal = (*server_signals)[signal_id];
+    }
+
+    float delta = server_signal - cur_signal;
+    if (abs(delta) > 1e-5f)
+    {
+        cur_signal += delta * fmin(duration * dt, 1.0f);
+        update(cur_signal);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcAnimation::update([[maybe_unused]] float current_signal)
+{
+    return;
 }
 
 //------------------------------------------------------------------------------

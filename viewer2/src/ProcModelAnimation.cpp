@@ -16,13 +16,12 @@ ProcModelAnimation::ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcModelAnimation::anim_step([[maybe_unused]] float t, float dt)
+void ProcModelAnimation::update(float current_signal)
 {
-    float delta = (pos - cur_pos);
-    if (abs(delta) > 1e-5f)
+    // Применяем управлящий сигнал ко всем анимируемым элементам
+    for (auto& sampler : animation->samplers)
     {
-        cur_pos += delta * fmin(duration * dt, 1.0f);
-        update();
+        sampler->update(static_cast<double>(current_signal));
     }
 }
 
@@ -48,22 +47,10 @@ bool ProcModelAnimation::load_config(CfgReader &cfg)
     tmp_dbl = 0.0;
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
     {
-        fixed_signal = static_cast<float>(tmp_dbl);
+        cur_signal = static_cast<float>(tmp_dbl);
         is_fixed_signal = true;
     }
 
-    update();
+    update(cur_signal);
     return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcModelAnimation::update()
-{
-    // Применяем управлящий сигнал ко всем анимируемым элементам
-    for (auto& sampler : animation->samplers)
-    {
-        sampler->update(static_cast<double>(cur_pos));
-    }
 }
