@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AnalogTranslation::AnalogTranslation(vsg::ref_ptr<vsg::MatrixTransform> transform)
+ProcTranslationAnimation::ProcTranslationAnimation(vsg::ref_ptr<vsg::MatrixTransform> transform)
     : Inherit()
     , matrix(transform->matrix)
     , transform_node(transform)
@@ -25,7 +25,7 @@ AnalogTranslation::AnalogTranslation(vsg::ref_ptr<vsg::MatrixTransform> transfor
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogTranslation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
+void ProcTranslationAnimation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 {
     transform_node = transform;
     update();
@@ -34,7 +34,7 @@ void AnalogTranslation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transfor
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogTranslation::update()
+void ProcTranslationAnimation::update()
 {
     if (keypoints.empty())
     {
@@ -51,7 +51,7 @@ void AnalogTranslation::update()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogTranslation::anim_step([[maybe_unused]] float t, float dt)
+void ProcTranslationAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
     if (abs(delta) > 1e-5f)
@@ -64,7 +64,7 @@ void AnalogTranslation::anim_step([[maybe_unused]] float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AnalogTranslation::load_config(CfgReader &cfg)
+bool ProcTranslationAnimation::load_config(CfgReader &cfg)
 {
     QString sec_name = "AnalogTranslation";
 

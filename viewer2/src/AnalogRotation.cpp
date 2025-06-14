@@ -17,7 +17,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AnalogRotation::AnalogRotation(vsg::ref_ptr<vsg::MatrixTransform> transform)
+ProcRotationAnimation::ProcRotationAnimation(vsg::ref_ptr<vsg::MatrixTransform> transform)
     : Inherit()
     , matrix(transform->matrix)
     , transform_node(transform)
@@ -27,7 +27,7 @@ AnalogRotation::AnalogRotation(vsg::ref_ptr<vsg::MatrixTransform> transform)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogRotation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
+void ProcRotationAnimation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 {
     transform_node = transform;
     update();
@@ -36,7 +36,7 @@ void AnalogRotation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogRotation::update()
+void ProcRotationAnimation::update()
 {
     if (keypoints.empty())
     {
@@ -57,7 +57,7 @@ void AnalogRotation::update()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnalogRotation::anim_step([[maybe_unused]] float t, float dt)
+void ProcRotationAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = pos - cur_pos;
     if (abs(delta) > 1e-5f)
@@ -70,7 +70,7 @@ void AnalogRotation::anim_step([[maybe_unused]] float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AnalogRotation::load_config(CfgReader& cfg)
+bool ProcRotationAnimation::load_config(CfgReader& cfg)
 {
     QString sec_name = "AnalogRotation";
 

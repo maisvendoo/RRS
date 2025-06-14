@@ -16,10 +16,10 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class AnalogRotation : public vsg::Inherit<ProcAnimation, AnalogRotation>
+class ProcRotationAnimation : public vsg::Inherit<ProcAnimation, ProcRotationAnimation>
 {
 public:
-    explicit AnalogRotation(vsg::ref_ptr<vsg::MatrixTransform> transform);
+    explicit ProcRotationAnimation(vsg::ref_ptr<vsg::MatrixTransform> transform);
 
     void setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform);
 

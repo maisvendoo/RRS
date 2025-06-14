@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
+ProcMaterialAnimation::ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
     : Inherit()
     , material_value(data)
     , color(data->value().baseColorFactor)
@@ -18,7 +18,7 @@ MaterialAnimation::MaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
+void ProcMaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     float delta = (pos - cur_pos);
     if (abs(delta) > 1e-5f)
@@ -31,7 +31,7 @@ void MaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool MaterialAnimation::load_config(CfgReader &cfg)
+bool ProcMaterialAnimation::load_config(CfgReader &cfg)
 {
     QString sec_name = "MaterialAnimation";
 
@@ -76,7 +76,7 @@ bool MaterialAnimation::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MaterialAnimation::update()
+void ProcMaterialAnimation::update()
 {
     if (keypoints.empty())
     {

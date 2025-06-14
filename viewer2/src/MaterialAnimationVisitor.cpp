@@ -56,7 +56,7 @@ void FindMaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorS
                     new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
                     duplicate->insert(pbr_material_value, new_pbr_material_value);
 
-                    animation = MaterialAnimation::create(new_pbr_material_value);
+                    animation = ProcMaterialAnimation::create(new_pbr_material_value);
                     animation->load(cfg_reader);
                 }
             }

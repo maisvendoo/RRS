@@ -84,12 +84,12 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
         vsg::ref_ptr<vsg::Object> new_object = duplicate->duplicates[deferred_animation.node];
         vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
 
-        if (vsg::ref_ptr<AnalogRotation> rotation = animation.cast<AnalogRotation>())
+        if (vsg::ref_ptr<ProcRotationAnimation> rotation = animation.cast<ProcRotationAnimation>())
         {
             rotation->setTransform(new_transform);
             continue;
         }
-        if (vsg::ref_ptr<AnalogTranslation> translation = animation.cast<AnalogTranslation>())
+        if (vsg::ref_ptr<ProcTranslationAnimation> translation = animation.cast<ProcTranslationAnimation>())
         {
             translation->setTransform(new_transform);
             continue;
@@ -117,7 +117,7 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&group);
 
-            animation = AnalogRotation::create(group_node.cast<vsg::MatrixTransform>());
+            animation = ProcRotationAnimation::create(group_node.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
             deferred_animations.emplace_back(DeferredAnimation{&group, animation});
@@ -131,7 +131,7 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
             pdo->tag(&group);
 
-            animation = AnalogTranslation::create(group_node.cast<vsg::MatrixTransform>());
+            animation = ProcTranslationAnimation::create(group_node.cast<vsg::MatrixTransform>());
             animation->load(cfg);
 
             deferred_animations.emplace_back(DeferredAnimation{&group, animation});
