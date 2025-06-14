@@ -1,7 +1,7 @@
-#include "MaterialAnimationVisitor.h"
+#include "FindMaterialAnimationVisitor.h"
 
-#include "MaterialAnimation.h"
 #include "ProcAnimation.h"
+#include "ProcMaterialAnimation.h"
 
 #include <vsg/core/Data.h>
 #include <vsg/core/Inherit.h>

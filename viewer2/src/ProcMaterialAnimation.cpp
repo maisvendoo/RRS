@@ -1,4 +1,4 @@
-#include "MaterialAnimation.h"
+#include "ProcMaterialAnimation.h"
 
 #include "CfgReader.h"
 

@@ -1,4 +1,4 @@
-#include "FindModelAnimation.h"
+#include "FindModelAnimations.h"
 
 #include "CfgReader.h"
 #include "filesystem.h"

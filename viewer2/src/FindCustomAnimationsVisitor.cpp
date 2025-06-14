@@ -1,12 +1,12 @@
-#include "AnimTransformVisitor.h"
+#include "FindCustomAnimationsVisitor.h"
 
 #include "filesystem.h"
 #include "CfgReader.h"
 #include "animations-list.h"
 #include "ProcAnimation.h"
-#include "AnalogRotation.h"
-#include "AnalogTranslation.h"
-#include "MaterialAnimationVisitor.h"
+#include "ProcRotationAnimation.h"
+#include "ProcTranslationAnimation.h"
+#include "FindMaterialAnimationVisitor.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>

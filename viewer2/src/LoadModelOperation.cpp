@@ -1,8 +1,8 @@
 #include "LoadModelOperation.h"
 
 #include "animations-list.h"
-#include "AnimTransformVisitor.h"
-#include "FindModelAnimation.h"
+#include "FindModelAnimations.h"
+#include "FindCustomAnimationsVisitor.h"
 #include "Logger.h"
 
 #include <vsg/app/CompileManager.h>

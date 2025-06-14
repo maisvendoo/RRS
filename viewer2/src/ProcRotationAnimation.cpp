@@ -1,4 +1,4 @@
-#include "AnalogRotation.h"
+#include "ProcRotationAnimation.h"
 
 #include "CfgReader.h"
 #include "ProcAnimation.h"

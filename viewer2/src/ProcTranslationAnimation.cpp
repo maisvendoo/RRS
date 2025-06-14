@@ -1,4 +1,4 @@
-#include "AnalogTranslation.h"
+#include "ProcTranslationAnimation.h"
 
 #include "CfgReader.h"
 #include "ProcAnimation.h"
