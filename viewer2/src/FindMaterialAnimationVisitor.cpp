@@ -1,6 +1,5 @@
 #include "FindMaterialAnimationVisitor.h"
 
-#include "ProcAnimation.h"
 #include "ProcMaterialAnimation.h"
 
 #include <vsg/core/Data.h>
@@ -16,15 +15,13 @@
 
 #include <mutex>
 
-class CfgReader;
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-FindMaterialAnimationVisitor::FindMaterialAnimationVisitor(const FindMaterialAnimationVisitorCreateInfo& create_info)
-    : pdo(create_info.pdo)
-    , duplicate(create_info.duplicate)
-    , cfg_reader(create_info.cfg_reader)
+FindMaterialAnimationVisitor::FindMaterialAnimationVisitor(vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
+                                                           vsg::ref_ptr<vsg::Duplicate> in_duplicate)
+    : pdo(in_pdo)
+    , duplicate(in_duplicate)
 {
 }
 
@@ -49,15 +46,17 @@ void FindMaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorS
             {
                 if (auto pbr_material_value = buffer_info->data.cast<vsg::PbrMaterialValue>())
                 {
-                    std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-                    pdo->tag(pbr_material_value);
-
+                    // Новый материал
                     auto new_pbr_material_value = vsg::PbrMaterialValue::create(*pbr_material_value);
-                    new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA_TRANSFER_AFTER_RECORD;
-                    duplicate->insert(pbr_material_value, new_pbr_material_value);
+                    new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
                     animation = ProcMaterialAnimation::create(new_pbr_material_value);
-                    animation->load(cfg_reader);
+                    if (animation)
+                    {
+                        std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                        pdo->tag(pbr_material_value);
+                        duplicate->insert(pbr_material_value, new_pbr_material_value);
+                    }
                 }
             }
         }

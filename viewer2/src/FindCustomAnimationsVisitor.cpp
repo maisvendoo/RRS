@@ -7,6 +7,7 @@
 #include "ProcRotationAnimation.h"
 #include "ProcTranslationAnimation.h"
 #include "FindMaterialAnimationVisitor.h"
+#include "FindDisplayAnimationVisitor.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
@@ -114,60 +115,70 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
         config_section = cfg.getFirstSection("AnalogRotation");
         if (!config_section.isNull())
         {
-            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&group);
+            if (auto transform_node = group_node.cast<vsg::MatrixTransform>())
+            {
+                animation = ProcRotationAnimation::create(transform_node);
+                if (animation && animation->load(cfg))
+                {
+                    std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                    pdo->tag(&group);
+                    deferred_animations.emplace_back(DeferredAnimation{&group, animation});
 
-            animation = ProcRotationAnimation::create(group_node.cast<vsg::MatrixTransform>());
-            animation->load(cfg);
-
-            deferred_animations.emplace_back(DeferredAnimation{&group, animation});
-
-            return animation;
+                    return animation;
+                }
+                animation = nullptr;
+            }
         }
 
         config_section = cfg.getFirstSection("AnalogTranslation");
         if (!config_section.isNull())
         {
-            std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-            pdo->tag(&group);
+            if (auto transform_node = group_node.cast<vsg::MatrixTransform>())
+            {
+                animation = ProcTranslationAnimation::create(transform_node);
+                if (animation && animation->load(cfg))
+                {
+                    std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                    pdo->tag(&group);
+                    deferred_animations.emplace_back(DeferredAnimation{&group, animation});
 
-            animation = ProcTranslationAnimation::create(group_node.cast<vsg::MatrixTransform>());
-            animation->load(cfg);
-
-            deferred_animations.emplace_back(DeferredAnimation{&group, animation});
-
-            return animation;
+                    return animation;
+                }
+                animation = nullptr;
+            }
         }
 
         config_section = cfg.getFirstSection("MaterialAnimation");
         if (!config_section.isNull())
         {
             auto inner_pdo = vsg::PropagateDynamicObjects::create();
-            vsg::CopyOp copyop;
-            auto inner_duplicate = copyop.duplicate = new vsg::Duplicate;
+            vsg::CopyOp inner_copyop;
+            inner_copyop.duplicate = new vsg::Duplicate;
 
-            FindMaterialAnimationVisitorCreateInfo fmav_create_info = {inner_pdo, inner_duplicate, cfg};
-
-            FindMaterialAnimationVisitor fmav(fmav_create_info);
+            FindMaterialAnimationVisitor fmav(inner_pdo, inner_copyop.duplicate);
             group.accept(fmav);
-            group.accept(*inner_pdo);
 
-            if (!inner_pdo->dynamicObjects.empty())
+            animation = fmav.get_animation();
+            if (animation && animation->load(cfg))
             {
-                for (auto& object : inner_pdo->dynamicObjects)
+                group.accept(*inner_pdo);
+                if (!inner_pdo->dynamicObjects.empty())
                 {
-                    if (!inner_duplicate->contains(object))
+                    for (auto& object : inner_pdo->dynamicObjects)
                     {
-                        inner_duplicate->insert(object);
+                        if (!inner_copyop.duplicate->contains(object))
+                        {
+                            inner_copyop.duplicate->insert(object);
+                        }
                     }
+
+                    std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                    pdo->tag(&group);
+                    duplicate->insert(&group, inner_copyop(vsg::ref_ptr(&group)));
                 }
-
-                std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
-                pdo->tag(&group);
-                duplicate->insert(&group, copyop(vsg::ref_ptr(&group)));
+                return animation;
             }
-
-            return fmav.get_animation();
+            animation = nullptr;
         }
     }
 

@@ -7,11 +7,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcMaterialAnimation::ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> data)
+ProcMaterialAnimation::ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data)
     : Inherit()
-    , material_value(data)
-    , color(data->value().baseColorFactor)
-    , emission_color(0.0f, 0.0f, 0.0f, 1.0f)
+    , material_value(in_material_data)
+    , base_color(in_material_data->value().baseColorFactor)
+    , emission_color(in_material_data->value().emissiveFactor)
 {
 }
 
@@ -20,21 +20,17 @@ ProcMaterialAnimation::ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue>
 //------------------------------------------------------------------------------
 void ProcMaterialAnimation::update(float current_signal)
 {
-    if (keypoints.empty())
+    if (!keypoints.empty())
     {
-        return;
+        float color_factor = interpolate(current_signal);
+        vsg::vec4 new_color = base_color * color_factor;
+        new_color.a = 1.0f;
+        material_value->value().baseColorFactor = new_color;
     }
 
-    intensity = interpolate(current_signal);
-    vsg::vec4 new_color = color * intensity;
-    new_color.a = 1.0f;
-
-    vsg::vec4 new_emission_color = emission_color * intensity;
+    vsg::vec4 new_emission_color = emission_color * current_signal;
     new_emission_color.a = 1.0f;
-
-    material_value->value().baseColorFactor = new_color;
     material_value->value().emissiveFactor = new_emission_color;
-    // material_value->value().diffuseFactor = new_color;
     material_value->dirty();
 }
 
@@ -60,12 +56,12 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
         is_fixed_signal = true;
     }
 
-    QString tmp_qstr = "0.0 0.0 0.0";
+    QString tmp_qstr = "1.0 1.0 1.0";
     if (cfg.getString(sec_name, "EmissionColor", tmp_qstr))
     {
         std::string tmp = tmp_qstr.toStdString();
         std::istringstream ss(tmp);
-        ss >> emission_color.x >> emission_color.y >> emission_color.z;
+        ss >> emission_color.r >> emission_color.g >> emission_color.b;
     }
 
     tmp_qstr = "1.0 1.0 1.0";
@@ -73,11 +69,10 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
     {
         std::string tmp = tmp_qstr.toStdString();
         std::istringstream ss(tmp);
-        ss >> color.x >> color.y >> color.z;
+        vsg::vec4 config_color_limit = {1.0f, 1.0f, 1.0f, 1.0f};
+        ss >> config_color_limit.r >> config_color_limit.g >> config_color_limit.b;
+        base_color *= config_color_limit;
     }
-
-    // material_value->value().baseColorFactor = color;
-    // material_value->value().emissiveFactor = emission_color;
 
     update(cur_signal);
     return true;
