@@ -180,6 +180,39 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             }
             animation = nullptr;
         }
+
+        config_section = cfg.getFirstSection("Display");
+        if (!config_section.isNull())
+        {
+            auto inner_pdo = vsg::PropagateDynamicObjects::create();
+            vsg::CopyOp inner_copyop;
+            auto inner_duplicate = inner_copyop.duplicate = new vsg::Duplicate;
+
+            FindDisplayAnimationVisitor fdav(inner_pdo, inner_copyop.duplicate);
+            group.accept(fdav);
+
+            animation = fdav.get_animation();
+            if (animation && animation->load(cfg))
+            {
+                group.accept(*inner_pdo);
+                if (!inner_pdo->dynamicObjects.empty())
+                {
+                    for (auto& object : inner_pdo->dynamicObjects)
+                    {
+                        if (!inner_copyop.duplicate->contains(object))
+                        {
+                            inner_copyop.duplicate->insert(object);
+                        }
+                    }
+
+                    std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                    pdo->tag(&group);
+                    duplicate->insert(&group, inner_copyop(vsg::ref_ptr(&group)));
+                }
+                return animation;
+            }
+            animation = nullptr;
+        }
     }
 
     return nullptr;
