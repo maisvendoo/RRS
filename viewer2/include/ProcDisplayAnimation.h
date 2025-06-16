@@ -2,6 +2,7 @@
 #define DISPLAY_ANIMATION_H
 
 #include "ProcAnimation.h"
+#include "display.h"
 
 #include <vsg/maths/vec4.h>
 #include <vsg/core/Value.h>
@@ -37,6 +38,10 @@ private:
     void update(float current_signal) override;
 
     bool load_config(CfgReader& cfg) override;
+
+    //------------------------------------------------------------------------------
+
+    AbstractDisplay* display = nullptr;
 };
 
 #endif // DISPLAY_ANIMATION_H

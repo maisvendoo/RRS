@@ -1,6 +1,11 @@
 #include "ProcDisplayAnimation.h"
 
 #include "CfgReader.h"
+#include "Logger.h"
+#include "filesystem.h"
+
+#include <QApplication>
+#include <QPainter>
 
 #include <sstream>
 #include <vsg/state/Image.h>
@@ -31,30 +36,68 @@ std::size_t ProcDisplayAnimation::getSignalID() const
 //------------------------------------------------------------------------------
 void ProcDisplayAnimation::anim_step(float t, float dt)
 {
-    if ((sin(t) > 0.0f))
+    if (!display)
     {
-        if (!prev_sin_t_positive)
-        {
-            prev_sin_t_positive = true;
+        return;
+    }
 
-            vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-            for (auto it = pixels->begin(); it != pixels->end(); ++it)
-                (*it) = vsg::ubvec4(255, 0, 0, 255); // Красный
-            image_data->data->dirty();
-        }
+    QImage image(display->size(), QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+
+    QMetaObject::invokeMethod(qApp, [&]() {
+        QPainter painter(&image);
+        display->render(&painter);
+        painter.end();
+    }, Qt::BlockingQueuedConnection);
+
+    vsg::ref_ptr<vsg::Data> vsgData;
+    if (image.format() == QImage::Format_ARGB32_Premultiplied)
+    {
+        vsgData = vsg::ubvec4Array2D::create(
+            image.width(),
+            image.height(),
+            reinterpret_cast<vsg::ubvec4*>(image.bits()),
+            vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+        );
     }
     else
     {
-        if (prev_sin_t_positive)
-        {
-            prev_sin_t_positive = false;
-
-            vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-            for (auto it = pixels->begin(); it != pixels->end(); ++it)
-                (*it) = vsg::ubvec4(0, 255, 0, 255); // Зелёный
-            image_data->data->dirty();
-        }
+        QImage converted = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+        vsgData = vsg::ubvec4Array2D::create(
+            converted.width(),
+            converted.height(),
+            reinterpret_cast<vsg::ubvec4*>(converted.bits()),
+            vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+        );
     }
+
+    image_data->data = vsgData;
+    image_data->data->dirty();
+
+    // if ((sin(t) > 0.0f))
+    // {
+    //     if (!prev_sin_t_positive)
+    //     {
+    //         prev_sin_t_positive = true;
+
+    //         vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+    //         for (auto it = pixels->begin(); it != pixels->end(); ++it)
+    //             (*it) = vsg::ubvec4(255, 0, 0, 255); // Красный
+    //         image_data->data->dirty();
+    //     }
+    // }
+    // else
+    // {
+    //     if (prev_sin_t_positive)
+    //     {
+    //         prev_sin_t_positive = false;
+
+    //         vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+    //         for (auto it = pixels->begin(); it != pixels->end(); ++it)
+    //             (*it) = vsg::ubvec4(0, 255, 0, 255); // Зелёный
+    //         image_data->data->dirty();
+    //     }
+    // }
 
     // Яркость дисплея
     if (is_fixed_signal)
@@ -98,6 +141,8 @@ void ProcDisplayAnimation::update(float current_signal)
 //------------------------------------------------------------------------------
 bool ProcDisplayAnimation::load_config(CfgReader &cfg)
 {
+    FileSystem& fs = FileSystem::getInstance();
+
     QString sec_name = "Display";
 
     int tmp_int = 0;
@@ -143,6 +188,16 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     if (cfg.getString(sec_name, "Module", tmp_qstr))
     {
         module_name = tmp_qstr.toStdString();
+    }
+
+    module_dir = fs.combinePath(fs.getModulesDir(), module_dir);
+    module_name = fs.combinePath(module_dir, module_name);
+
+    display = loadDisplay(module_name.c_str());
+    if (!display)
+    {
+        LOG_WARN("Module %s is not found", module_name.c_str());
+        return false;
     }
 
     update(cur_signal);
