@@ -4,13 +4,16 @@
 //
 //
 //------------------------------------------------------------------------------
-#ifndef     DISPLAY_H
-#define     DISPLAY_H
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
-#include    <QWidget>
+#include "display-export.h"
+#include "display-types.h"
 
-#include    "display-export.h"
-#include    "display-types.h"
+#include <QString>
+#include <QWidget>
+
+#include <cstddef>
 
 //------------------------------------------------------------------------------
 //
@@ -18,35 +21,33 @@
 class DISPLAY_EXPORT AbstractDisplay : public QWidget
 {
 public:
+    AbstractDisplay(QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
 
-    AbstractDisplay(QWidget *parent = Q_NULLPTR,
-                    Qt::WindowFlags f = Qt::WindowFlags());
-
-    virtual ~AbstractDisplay();
+    virtual ~AbstractDisplay() = default;
 
     /// Инициализация дисплея
-    virtual void init();
+    virtual void init() = 0;
 
     /// Обновление дисплея
-    virtual void update(double t, double dt);
+    virtual void update(double t, double dt) = 0;
 
     /// Задать входной сигнал
-    void setInputSignal(size_t index, float value);
+    void setInputSignal(std::size_t index, float value);
 
     /// Задать массив входных сигналов
-    void setInputSignals(const display_signals_t &input_signals);
+    void setInputSignals(const display_signals_t& input_signals) { this->input_signals = input_signals; }
 
     /// Получить выходной сигнал
-    float getOutputSignal(size_t index);
+    float getOutputSignal(std::size_t index);
 
     /// Получить массив выходных сигналов
-    display_signals_t getOutputSignals();
+    display_signals_t getOutputSignals() { return output_signals; }
 
-    /// Задать каталог с конфигруционными файлами
-    void setConfigDir(QString config_dir);
+    /// Задать каталог с конфигурационными файлами
+    void setConfigDir(QString config_dir) { this->config_dir = config_dir; }
 
     /// Получить путь к каталогу с конфигами
-    QString getConfigDir() const;
+    QString getConfigDir() const { return this->config_dir; }
 
     /// Задать путь к каталогу с маршрутом
     void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
@@ -54,18 +55,17 @@ public:
     void setUpdateInterval(double upd_interval) { this->upd_interval = upd_interval; }
 
 protected:
-
     /// Входные сигналы, отображаемые на интерфейсе дисплея и управляющие его поведением
-    display_signals_t   input_signals;
+    display_signals_t input_signals = display_signals_t();
 
     /// Выходные (командные) сигналы, передаваемые с дисплея
-    display_signals_t   output_signals;
+    display_signals_t output_signals = display_signals_t();
 
     /// Путь к каталогу конфигурации
-    QString             config_dir;
+    QString config_dir = "";
 
     /// Путь к каталогу с текущим маршрутом
-    QString             route_dir;
+    QString route_dir = "";
 
     /// Интервал обновления
     double upd_interval = 0.5;
@@ -79,20 +79,20 @@ protected:
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-using GetDisplay = AbstractDisplay* (*)();
+using GetDisplay = AbstractDisplay*(*)();
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 #define GET_DISPLAY(ClassName) \
-    extern "C" DISPLAY_EXPORT AbstractDisplay *getDisplay() \
-    {\
+    extern "C" DISPLAY_EXPORT AbstractDisplay* getDisplay() \
+    { \
         return new (ClassName)(); \
     }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" DISPLAY_EXPORT AbstractDisplay *loadDisplay(QString lib_path);
+extern "C" DISPLAY_EXPORT AbstractDisplay* loadDisplay(QString lib_path);
 
 #endif // DISPLAY_H
