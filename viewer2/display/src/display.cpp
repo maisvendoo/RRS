@@ -2,6 +2,7 @@
 
 #include "display-types.h"
 
+#include <QApplication>
 #include <QLibrary>
 #include <QString>
 #include <QWidget>
@@ -56,7 +57,9 @@ AbstractDisplay* loadDisplay(QString lib_path)
         GetDisplay getDisplay = reinterpret_cast<GetDisplay>(lib.resolve("getDisplay"));
         if (getDisplay)
         {
-            display = getDisplay();
+            QMetaObject::invokeMethod(qApp, [&]() {
+                display = getDisplay();
+            }, Qt::BlockingQueuedConnection);
         }
     }
 

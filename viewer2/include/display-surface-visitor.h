@@ -38,7 +38,7 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/Node.h>
-#include <vsg/nodes/StateGroup.h>
+#include <vsg/state/BindDescriptorSet.h>
 
 class DisplaySurfaceVisitor : public QObject, public vsg::Inherit<vsg::Visitor, DisplaySurfaceVisitor>
 {
@@ -47,7 +47,7 @@ public:
     DisplaySurfaceVisitor(display_container_t* dc, const display_config_t& display_config, QObject* parent = nullptr);
 
     void apply(vsg::Node& node) override;
-    void apply(vsg::StateGroup& stateGroup) override;
+    void apply(vsg::BindDescriptorSet& bindDescriptorSet) override;
 
 signals:
     void stateGroupFound();
