@@ -22,6 +22,7 @@ public:
 
 private:
     vsg::ref_ptr<vsg::Image> image_data;
+    bool prev_sin_t_positive = true;
 
     std::string module_dir = "";
     std::string module_name = "";

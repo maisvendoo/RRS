@@ -32,7 +32,7 @@ public:
     std::string name = "";
 
 protected:
-    std::size_t signal_id = 0;
+    int signal_id = 0;
     bool is_fixed_signal = false;
     float cur_signal = 0.0f;
     float duration = 1.0f;

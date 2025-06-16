@@ -31,11 +31,37 @@ std::size_t ProcDisplayAnimation::getSignalID() const
 //------------------------------------------------------------------------------
 void ProcDisplayAnimation::anim_step(float t, float dt)
 {
-    image_data->data->dirty();
+    if ((sin(t) > 0.0f))
+    {
+        if (!prev_sin_t_positive)
+        {
+            prev_sin_t_positive = true;
+
+            vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+            for (auto it = pixels->begin(); it != pixels->end(); ++it)
+                (*it) = vsg::ubvec4(255, 0, 0, 255); // Красный
+            image_data->data->dirty();
+        }
+    }
+    else
+    {
+        if (prev_sin_t_positive)
+        {
+            prev_sin_t_positive = false;
+
+            vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+            for (auto it = pixels->begin(); it != pixels->end(); ++it)
+                (*it) = vsg::ubvec4(0, 255, 0, 255); // Зелёный
+            image_data->data->dirty();
+        }
+    }
 
     // Яркость дисплея
-    float server_signal = is_fixed_signal ? cur_signal : 0.0f;
-    if (!is_fixed_signal && server_signals && (signal_id < server_signals->size()))
+    if (is_fixed_signal)
+        return;
+
+    float server_signal = 0.0f;
+    if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))
     {
         server_signal = (*server_signals)[signal_id];
     }

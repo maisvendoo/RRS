@@ -57,7 +57,7 @@ void ProcAnimation::anim_step([[maybe_unused]] float t, float dt)
         return;
 
     float server_signal = 0.0f;
-    if (server_signals && (signal_id < server_signals->size()))
+    if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))
     {
         server_signal = (*server_signals)[signal_id];
     }
