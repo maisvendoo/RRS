@@ -44,8 +44,7 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
         const std::string& in_model_filename_path,
         const std::string& in_animations_dir,
         vsg::ref_ptr<vsg::Options> in_options,
-        vsg::ref_ptr<animations_t> in_animations,
-        const std::string& cfg_dir = ""
+        vsg::ref_ptr<animations_t> in_animations
     ) noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
@@ -54,7 +53,6 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     std::string animations_dir = "";
     vsg::ref_ptr<vsg::Options> options = nullptr;
     vsg::observer_ptr<animations_t> animations;
-    std::string cfg_dir;
 
     void run() override;
 

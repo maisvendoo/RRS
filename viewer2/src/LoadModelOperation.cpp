@@ -64,8 +64,7 @@ LoadModelOperation::LoadModelOperation(
     const std::string& in_model_filename_path,
     const std::string& in_animations_dir,
     vsg::ref_ptr<vsg::Options> in_options,
-    vsg::ref_ptr<animations_t> in_animations,
-    const std::string& cfg_dir
+    vsg::ref_ptr<animations_t> in_animations
 ) noexcept
     : viewer(in_viewer)
     , attachment_point(in_attachment_point)
@@ -73,7 +72,6 @@ LoadModelOperation::LoadModelOperation(
     , animations_dir(in_animations_dir)
     , options(in_options)
     , animations(in_animations)
-    , cfg_dir(cfg_dir)
 {
 }
 
@@ -103,10 +101,10 @@ void LoadModelOperation::run()
         return;
     }
 
-    if (!cfg_dir.empty())
-    {
-        load_displays(node);
-    }
+    // if (!cfg_dir.empty())
+    // {
+    //     load_displays(node);
+    // }
 
     LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
@@ -174,7 +172,8 @@ void LoadModelOperation::load_displays(vsg::ref_ptr<vsg::Node> model)
 {
     FileSystem& fs = FileSystem::getInstance();
 
-    std::string relative_config_path = cfg_dir + fs.separator() + "displays.xml";
+    // std::string relative_config_path = cfg_dir + fs.separator() + "displays.xml";
+    std::string relative_config_path;
     std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
 
     CfgReader cfg;

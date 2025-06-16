@@ -117,8 +117,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
                 model_filename_path,
                 animations_dir,
                 options,
-                animations,
-                cfg_dir
+                animations
             ));
     }
     else
