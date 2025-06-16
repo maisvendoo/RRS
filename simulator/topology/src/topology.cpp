@@ -31,7 +31,7 @@ Topology::~Topology()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::load(QString route_dir)
+bool Topology::load(QString route_dir, bool solve_errors)
 {
     FileSystem &fs = FileSystem::getInstance();
 
@@ -67,7 +67,7 @@ bool Topology::load(QString route_dir)
             }
         }
 
-        if (traj->load(route_path, name, modules))
+        if (traj->load(route_path, name, modules, solve_errors))
         {
             Journal::instance()->info("Loaded trajectory: " + name);
         }

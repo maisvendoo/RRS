@@ -191,6 +191,89 @@
           <item>
            <layout class="QVBoxLayout" name="vlUtilites">
             <item>
+             <layout class="QHBoxLayout" name="hblTopologyChecker">
+              <item>
+               <widget class="QLabel" name="lTopologyChecker">
+                <property name="text">
+                 <string>Topology errors checker</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="hSpacerTopologyChecker1">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="lMinimumRadius">
+                <property name="text">
+                 <string>Minimum radius:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="dsbMinimumRadius">
+                <property name="decimals">
+                 <number>1</number>
+                </property>
+                <property name="minimum">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>10000.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>150.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="hSpacerTopologyChecker2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pbCheckTopology">
+                <property name="text">
+                 <string>Check topology</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="vsUtilites1">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QLabel" name="lParallelTitle">
               <property name="text">
                <string>Generate parallel trajectory for topology</string>
@@ -328,7 +411,7 @@
               <item>
                <layout class="QHBoxLayout" name="hblParallel2">
                 <item>
-                 <widget class="QLabel" name="label_7">
+                 <widget class="QLabel" name="lOutputFileParallel">
                   <property name="text">
                    <string>Output filename:</string>
                   </property>
@@ -351,14 +434,14 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_8">
+                 <widget class="QLabel" name="lExtensionParallel">
                   <property name="text">
                    <string>.traj</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="horizontalSpacer_3">
+                 <spacer name="hSpacerParallelBottom">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
@@ -382,7 +465,7 @@
              </layout>
             </item>
             <item>
-             <spacer name="vsUtilites">
+             <spacer name="vsUtilites2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -561,7 +644,7 @@
               <item>
                <layout class="QHBoxLayout" name="hblSpline2">
                 <item>
-                 <widget class="QLabel" name="lOutputFile">
+                 <widget class="QLabel" name="lOutputFileSpline">
                   <property name="text">
                    <string>Output filename:</string>
                   </property>
@@ -578,7 +661,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="lExtension">
+                 <widget class="QLabel" name="lExtensionSpline">
                   <property name="text">
                    <string>.traj</string>
                   </property>

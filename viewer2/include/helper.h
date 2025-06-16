@@ -14,6 +14,9 @@
 
 #include <iostream>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 inline void print_object(vsg::ref_ptr<vsg::Object> object, int indentation = 0)
 {
     std::string name;

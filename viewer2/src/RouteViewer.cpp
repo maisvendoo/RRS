@@ -52,6 +52,9 @@
 #include <vsgImGui/SendEventsToImGui.h>
 #include <vulkan/vulkan_core.h>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(parent)
 {
     if (init(argc, argv))
@@ -65,6 +68,9 @@ RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(pare
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 RouteViewer::~RouteViewer()
 {
     delete vehicles_handler;
@@ -74,6 +80,9 @@ RouteViewer::~RouteViewer()
     delete tcp_client;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool RouteViewer::isReady() const
 {
     return true;

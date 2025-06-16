@@ -1,6 +1,7 @@
 #include    <Application.h>
 #include    <Geometry.h>
 #include    <filesystem-utils.h>
+#include    <Logger.h>
 
 #include    <algorithm>
 #include    <cstdint>
@@ -90,22 +91,22 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         route1_map.open(map_path, std::ios::in);
         if (route1_map.is_open())
         {
-            std::cout << "Info: opened converted route1.map: " << map_path << std::endl;
+            LOG_INFO("Info: opened converted route1.map: %s", map_path.c_str());
         }
         else
         {
-            std::cout << "Warn: failed to open converted route1.map: " << map_path << std::endl;
+            LOG_WARN("Warn: failed to open converted route1.map: %s", map_path.c_str());
 
             // Пробуем найти оригинальный .map
             map_path = combine_path(in_dmd_route_path, "route1.map");
             route1_map.open(map_path, std::ios::in);
             if (route1_map.is_open())
             {
-                std::cout << "Info: opened route1.map: " << map_path << std::endl;
+                LOG_INFO("Info: opened ZDSimulator's route1.map: %s", map_path.c_str());
             }
             else
             {
-                std::cerr << "Failed to open route1.map: " << map_path << std::endl;
+                LOG_WARN("Warn: failed to open ZDSimulator's route1.map: %s", map_path.c_str());
                 return false;
             }
         }
@@ -139,7 +140,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
 
         if (map_objects.empty())
         {
-            std::cerr << "Failed to find objects in route1.map" << std::endl;
+            LOG_WARN("Warn: failed to find any objects in route1.map");
             route1_map.close();
             return false;
         }
@@ -148,16 +149,18 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     }
 
     // Читаем список объектов из базы маршрута
-    std::ifstream objects_ref(combine_path(in_dmd_route_path, "objects.ref"), std::ios::in);
+    std::string ref_path = combine_path(in_dmd_route_path, "objects.ref");
+    std::ifstream objects_ref(ref_path, std::ios::in);
     if (!objects_ref.is_open())
     {
-        std::cerr << "Failed to open objects.ref" << std::endl;
+        LOG_WARN("Warn: failed to open ZDSimulator's objects.ref: %s", ref_path.c_str());
         return false;
     }
-    std::cout << "Info: opened objects.ref: " << combine_path(in_dmd_route_path, "objects.ref") << std::endl;
+    LOG_INFO("Info: opened ZDSimulator's objects.ref: %s", ref_path.c_str());
 
     // Список моделей, и списки сокращённых имён и текстур к этим моделям
     std::map<RelativeModelPath, std::map<Label, RelativeTexturePath>> objects;
+    std::set<Label> unique_refs;
 
     while (std::getline(objects_ref, line_buffer))
     {
@@ -175,9 +178,23 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             continue;
         }
 
+        // Проверяем что сокращённое имя уникально
+        if (unique_refs.find(label) == unique_refs.end())
+        {
+            unique_refs.insert(label);
+        }
+        else
+        {
+            LOG_WARN("Warn: ref \"%s\":", line_buffer.c_str());
+            LOG_WARN("      name \"%s\" is written already. This ref will be ignored", label.c_str());
+            continue;
+        }
+
         // Если прочтён файл .map - проверяем что сокращённое имя используется
         if (only_used_at_map && (map_objects.find(label) == map_objects.end()))
         {
+            LOG_WARN("Warn: ref \"%s\":", line_buffer.c_str());
+            LOG_WARN("      name \"%s\" does not used at map. Model will not be converted", label.c_str());
             continue;
         }
 
@@ -198,6 +215,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                 // К уже добавленой модели ещё вариант наименования и текстуры
                 it->second.insert({label, relative_texture_path});
             }
+            else
+            {
+                LOG_WARN("Warn: ref \"%s\":", line_buffer.c_str());
+                LOG_WARN("      this combination of model and texture is written several times. This ref will be ignored", label.c_str());
+            }
         }
     }
 
@@ -205,7 +227,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
 
     if (objects.empty())
     {
-        std::cerr << "Failed to find objects in objects.ref" << std::endl;
+        LOG_WARN("Warn: failed to find any objects in objects.ref");
         return false;
     }
 
@@ -219,32 +241,6 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     fs::create_directories(out_gltf_route_path);
     // Создаем каталог под текстуры
     fs::create_directory(combine_path(out_gltf_route_path, "textures"));
-
-    if (in_dmd_route_path != out_gltf_route_path)
-    {
-        // Копируем топологию
-        try
-        {
-            fs::copy(combine_path(in_dmd_route_path, "topology"),
-                     combine_path(out_gltf_route_path, "topology"),
-                     fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << e.what();
-        }
-
-        try
-        {
-            fs::copy(combine_path(in_dmd_route_path, "description.xml"),
-                     combine_path(out_gltf_route_path, "description.xml"),
-                     fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << e.what();
-        }
-    }
 
     std::map<Label, RelativeModelPath> new_objects;
 
@@ -293,9 +289,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             std::ifstream texture(in_texture_path, std::ios::in);
             if (!texture.is_open())
             {
-                std::cerr << "Failed to open " << in_texture_path << std::endl;
+                LOG_WARN("Warn: failed to open texture file: %s", in_texture_path.c_str());
+                LOG_WARN("      model with name \"%s\" will not be converted", label.c_str());
                 continue;
             }
+            texture.close();
 
             // Читаем файл модели
             Geometry model_data;
@@ -304,7 +302,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
             if (!get_dmd_model_data(in_dmd_model_path, model_data))
             {
-                std::cerr << "Failed to open " << in_dmd_model_path << std::endl;
+                LOG_WARN("      model with name \"%s\" will not be converted", label.c_str());
                 continue;
             }
 
@@ -334,7 +332,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     std::ofstream new_objects_ref(combine_path(out_gltf_route_path, "objects.ref"), std::ios::out);
     if (!new_objects_ref.is_open())
     {
-        std::cerr << "Failed to create new objects.ref" << std::endl;
+        LOG_WARN("Warn: failed to create new objects.ref: %s", combine_path(out_gltf_route_path, "objects.ref").c_str());
         return false;
     }
 
@@ -360,14 +358,14 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     std::ifstream texture(in_texture_path, std::ios::in);
     if (!texture.is_open())
     {
-        std::cerr << "Failed to open " << in_texture_path << std::endl;
+        LOG_WARN("Warn: failed to open texture file: %s", in_texture_path.c_str());
         return false;
     }
+    texture.close();
 
     std::string texture_ext = fs::path(in_texture_path).extension().string();
     model_data.is_reversed_texture_coord = (texture_ext != ".tga");
     model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
-//    model_data.is_TGA_texture = texture_ext == ".tga";
 
     auto last_slash_pos = out_gltf_model_path.find_last_of(separator());
 
@@ -408,7 +406,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     std::ifstream model_file(in_dmd_model_path, std::ios::in);
     if (!model_file.is_open())
     {
-        std::cerr << "Failed to open " << in_dmd_model_path << std::endl;
+        LOG_WARN("Warn: failed to open model file: %s", in_dmd_model_path.c_str());
         return false;
     }
 
@@ -421,7 +419,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         model_file >> buffer;
         if (!model_file)
         {
-            std::cerr << "Failed to find \"TriMesh()\" in " << in_dmd_model_path << std::endl;
+            LOG_WARN("Warn: failed to find \"TriMesh()\" in file: %s", in_dmd_model_path.c_str());
             return false;
         }
     }
@@ -441,7 +439,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     if (!model_file)
     {
-        std::cerr << "Failed to read positions from " << in_dmd_model_path << std::endl;
+        LOG_WARN("Warn: failed to read positions from file: %s", in_dmd_model_path.c_str());
     }
 
     model_file >> buffer >> buffer >> buffer >> buffer;
@@ -455,7 +453,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     if (!model_file)
     {
-        std::cerr << "Failed to read position indices from " << in_dmd_model_path << std::endl;
+        LOG_WARN("Warn: failed to read position indices from file: %s", in_dmd_model_path.c_str());
         return false;
     }
 
@@ -464,7 +462,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         model_file >> buffer;
         if (!model_file)
         {
-            std::cerr << "Failed to find \"Texture:\" in " << in_dmd_model_path << std::endl;
+            LOG_WARN("Warn: failed to find \"Texture:\" in file: %s", in_dmd_model_path.c_str());
             return false;
         }
     }
@@ -476,7 +474,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     if (pos_face_count != tex_face_count)
     {
-        std::cerr << "Position face count is not equal to texture face count in " << in_dmd_model_path << std::endl;
+        LOG_WARN("Warn: position face count is not equal to texture face count in file: %s", in_dmd_model_path.c_str());
         return false;
     }
 
@@ -497,6 +495,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     if (!model_file)
     {
+        LOG_WARN("Warn: failed to read texture coordinates from file: %s", in_dmd_model_path.c_str());
         std::cerr << "Failed to read texture coordinates from " << in_dmd_model_path << std::endl;
         return false;
     }
@@ -512,7 +511,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     if (!model_file)
     {
-        std::cerr << "Failed to read texture indices from " << in_dmd_model_path << std::endl;
+        LOG_WARN("Warn: failed to read texture indices from file: %s", in_dmd_model_path.c_str());
         return false;
     }
 
@@ -568,7 +567,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
     std::ofstream bin_file(full_bin_path, std::ios::binary | std::ios::out);
     if (!bin_file.is_open())
     {
-        std::cerr << "Failed to open " << full_bin_path << std::endl;
+        LOG_WARN("Warn: failed to create and open bin file: %s", full_bin_path.c_str());
         return false;
     }
 
@@ -622,7 +621,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
     std::ofstream gltf_file(gltf_path, std::ios::out);
     if (!gltf_file.is_open())
     {
-        std::cerr << "Failed to open " << gltf_path << std::endl;
+        LOG_WARN("Warn: failed to create and open gltf file: %s", gltf_path.c_str());
         return false;
     }
 
@@ -773,7 +772,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
         }
         catch (std::exception &e)
         {
-            std::cerr << e.what() << std::endl;
+            LOG_INFO("Info: %s", e.what());
         }
     }
 
@@ -841,7 +840,7 @@ bool Application::set_convert_mode(const cmd_line_t &cmd_line,
         }
         else
         {
-            std::cerr << "ERROR: Missing route output path" << std::endl;
+            LOG_WARN("ERROR: Missing route output path");
             return false;
         }
     }
@@ -857,17 +856,17 @@ bool Application::set_convert_mode(const cmd_line_t &cmd_line,
             }
             else
             {
-                std::cerr << "ERROR: Missing output GLTF model path" << std::endl;
+                LOG_WARN("ERROR: Missing output GLTF model path");
             }
         }
         else
         {
-            std::cerr << "ERROR: Missing input DMD texture path" << std::endl;
+            LOG_WARN("ERROR: Missing input DMD texture path");
         }
     }
     else
     {
-        std::cerr << "ERROR: Missing input route path or DMD model path" << std::endl;
+        LOG_WARN("ERROR: Missing input route path or DMD model path");
     }
 
     return false;

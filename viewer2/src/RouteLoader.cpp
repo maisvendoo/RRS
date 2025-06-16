@@ -14,11 +14,17 @@ bool is_slash(char ch)
     return ch == '/' || ch == '\\';
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 RouteLoader::RouteLoader(const std::string& route_path)
     : route_path(route_path)
 {
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteLoader::read_description()
 {
     QString tmp_qstr = (route_path + "/description.xml").c_str();
@@ -44,6 +50,9 @@ void RouteLoader::read_description()
     route_map_path = route_path + route_map_path;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool RouteLoader::parse_objects_ref(Route& route)
 {
     std::ifstream objects_ref(route_path + "/objects.ref");
@@ -71,6 +80,9 @@ bool RouteLoader::parse_objects_ref(Route& route)
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool RouteLoader::parse_route_map(Route& route)
 {
     std::ifstream route_map(route_path + "/topology/map/route1.map");

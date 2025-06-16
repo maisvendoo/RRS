@@ -1,0 +1,61 @@
+#ifndef FIND_CUSTOM_ANIMATIONS_VISITOR_H
+#define FIND_CUSTOM_ANIMATIONS_VISITOR_H
+
+#include "animations-list.h"
+#include "ProcAnimation.h"
+
+#include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/core/Visitor.h>
+
+#include <string>
+
+class ProcAnimation;
+
+namespace vsg
+{
+    class Duplicate;
+    class MatrixTransform;
+    class Node;
+    class PropagateDynamicObjects;
+}
+
+struct FindCustomAnimationsVisitorCreateInfo
+{
+    vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
+    vsg::ref_ptr<vsg::Duplicate> duplicate;
+    std::string animations_dir;
+    vsg::ref_ptr<animations_t> animations;
+};
+
+struct DeferredAnimation
+{
+    vsg::Node* node;
+    vsg::ref_ptr<ProcAnimation> animation;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class FindCustomAnimationsVisitor final : public vsg::Inherit<vsg::Visitor, FindCustomAnimationsVisitor>
+{
+public:
+    explicit FindCustomAnimationsVisitor(const FindCustomAnimationsVisitorCreateInfo& create_info);
+
+    void apply(vsg::Node& node) override;
+    void apply(vsg::Group& group) override;
+
+    void reconfigure_animations();
+
+private:
+    vsg::ref_ptr<ProcAnimation> create_animation(const std::string& name, vsg::Group& group);
+
+private:
+    vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
+    vsg::ref_ptr<vsg::Duplicate> duplicate;
+    std::string animations_dir;
+    vsg::ref_ptr<animations_t> animations;
+    std::vector<DeferredAnimation> deferred_animations;
+};
+
+#endif // FIND_CUSTOM_ANIMATIONS_VISITOR_H

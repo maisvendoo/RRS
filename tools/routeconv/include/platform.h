@@ -6,6 +6,7 @@
 const QString PATHCONV = "pathconv";
 const QString PROFCONV = "profconv";
 const QString DMD2GLTF = "dmd2gltf";
+const QString TOPOLOGYCHECK = "topologycheck";
 const QString PARALLELGEN = "offset-parallel-gen";
 const QString SPLINEGEN = "offset-spline-gen";
 

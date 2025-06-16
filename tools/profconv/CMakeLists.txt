@@ -28,9 +28,11 @@ add_executable (${TARGET} ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../simulator/physics/include)
 target_include_directories (${TARGET} PRIVATE ../../CfgEditor/include)
+target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Core)
 # и со своими не забываем
 target_link_libraries (${TARGET} physics)
 target_link_libraries (${TARGET} CfgEditor)
+target_link_libraries (${TARGET} filesystem)

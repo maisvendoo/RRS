@@ -1,65 +1,86 @@
 #include "ProcAnimation.h"
 
 #include "CfgReader.h"
-#include "CfgReader.h"
 
 #include <vsg/nodes/MatrixTransform.h>
 
 #include <cstddef>
-#include <string>
 #include <vector>
 
-ProcAnimation::ProcAnimation(const std::string& name)
-    : name(name)
-{
-}
-
-ProcAnimation::ProcAnimation(vsg::MatrixTransform* transform)
-    : transform(transform)
-{
-}
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ProcAnimation::step(float t, float dt)
 {
     anim_step(t, dt);
 }
 
-bool ProcAnimation::load(const std::string& path)
-{
-    CfgReader cfg;
-    if (cfg.load(path.c_str()))
-        return load_config(cfg);
-    return false;
-}
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ProcAnimation::load(CfgReader &cfg)
 {
     loadKeyPoints(cfg);
     return load_config(cfg);
 }
 
-void ProcAnimation::setPosition(float pos)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcAnimation::setSignals(std::vector<float> *in_signals)
 {
-    if (is_fixed_signal)
-    {
-        this->pos = fixed_signal;
-    }
-    else
-    {
-        this->pos = pos;
-    }
+    server_signals = in_signals;
 }
 
-void ProcAnimation::setTransform(vsg::MatrixTransform* transform)
-{
-    this->transform = transform;
-}
-
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::size_t ProcAnimation::getSignalID() const
 {
     return signal_id;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ProcAnimation::load_config(CfgReader &cfg)
+{
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcAnimation::anim_step([[maybe_unused]] float t, float dt)
+{
+    if (is_fixed_signal)
+        return;
+
+    float server_signal = 0.0f;
+    if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))
+    {
+        server_signal = (*server_signals)[signal_id];
+    }
+
+    float delta = server_signal - cur_signal;
+    if (abs(delta) > 1e-5f)
+    {
+        cur_signal += delta * fmin(duration * dt, 1.0f);
+        update(cur_signal);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcAnimation::update([[maybe_unused]] float current_signal)
+{
+    return;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 float ProcAnimation::interpolate(float param)
 {
     if (keypoints.size() <= 1)
@@ -82,6 +103,9 @@ float ProcAnimation::interpolate(float param)
     return value;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ProcAnimation::loadKeyPoints(CfgReader &cfg)
 {
     QDomNode config_section = cfg.getFirstSection("KeyPoint");
@@ -103,6 +127,9 @@ bool ProcAnimation::loadKeyPoints(CfgReader &cfg)
     return true;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ProcAnimation::key_point_t ProcAnimation::findBeginKeypoint(float param, std::size_t& next_idx)
 {
     key_point_t key_point;

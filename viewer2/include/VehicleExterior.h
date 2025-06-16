@@ -29,8 +29,8 @@ public:
     int         prev_vehicle = -1;
     int         next_vehicle = -1;
 
-    animations_t* animations = new animations_t();
-    displays_t* displays = new displays_t();
+    vsg::ref_ptr<animations_t> animations = animations_t::create();
+    //displays_t   *displays = new displays_t();
     std::vector<size_t> sounds_id = {};
 
     vsg::dvec3  saved_cabine_cam_shift = vsg::dvec3(0.0, 0.0, 0.0);

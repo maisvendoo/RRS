@@ -14,6 +14,9 @@
 //------------------------------------------------------------------------------
 TrafficLight::TrafficLight()
 {
+    server_signals.resize(lens_state.size());
+    std::fill(server_signals.begin(), server_signals.end(), 0.0f);
+
     std::fill(lens_state.begin(), lens_state.end(), false);
     old_lens_state = lens_state;
 }
@@ -32,15 +35,16 @@ void TrafficLight::step(float t, float dt)
     if (changed)
     {
         old_lens_state = lens_state;
+
+        for (size_t i = 0; i < lens_state.size(); ++i)
+        {
+            server_signals[i] = static_cast<float>(lens_state[i]);
+        }
     }
 
     for (auto& [signal_id, animation] : animations->animations)
     {
-        if (changed)
-        {
-            animation->setPosition(lens_state[signal_id]);
-        }
-
+        animation->setSignals(&(server_signals));
         animation->step(t, dt);
     }
 }
@@ -137,6 +141,12 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
                                                               animations_dir,
                                                               options,
                                                               animations));
+
+    for (auto& [signal_id, animation] : animations->animations)
+    {
+        animation->setSignals(&(server_signals));
+    }
+
 //    GUIParams::nodes.emplace_back(transform);
     return true;
 }

@@ -1,18 +1,14 @@
 #include "ProcModelAnimation.h"
 
 #include "CfgReader.h"
-#include "ProcAnimation.h"
 
-#include <vsg/maths/mat4.h>
-#include <vsg/maths/transform.h>
-#include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/animation/Animation.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 ProcModelAnimation::ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation)
-    : ProcAnimation(in_animation->name)
+    : Inherit()
     , animation(in_animation)
 {
 }
@@ -20,13 +16,12 @@ ProcModelAnimation::ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcModelAnimation::anim_step([[maybe_unused]] float t, float dt)
+void ProcModelAnimation::update(float current_signal)
 {
-    float delta = (pos - cur_pos);
-    if (abs(delta) > 1e-5f)
+    // Применяем управлящий сигнал ко всем анимируемым элементам
+    for (auto& sampler : animation->samplers)
     {
-        cur_pos += delta * duration * dt;
-        update();
+        sampler->update(static_cast<double>(current_signal));
     }
 }
 
@@ -52,22 +47,10 @@ bool ProcModelAnimation::load_config(CfgReader &cfg)
     tmp_dbl = 0.0;
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
     {
-        fixed_signal = static_cast<float>(tmp_dbl);
+        cur_signal = static_cast<float>(tmp_dbl);
         is_fixed_signal = true;
     }
 
-    update();
+    update(cur_signal);
     return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcModelAnimation::update()
-{
-    // Применяем управлящий сигнал ко всем анимируемым элементам
-    for (auto& sampler : animation->samplers)
-    {
-        sampler->update(static_cast<double>(cur_pos));
-    }
 }

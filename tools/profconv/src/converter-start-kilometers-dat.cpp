@@ -1,9 +1,8 @@
 #include    "converter.h"
-
-#include    <iostream>
-#include    <QFile>
-
+#include    "Logger.h"
 #include    "path-utils.h"
+
+#include    <QFile>
 
 //------------------------------------------------------------------------------
 //
@@ -17,9 +16,10 @@ bool ZDSimConverter::readStartKilometersDAT(const std::string &path,
     QString data = fileToQString(path);
     if (data.isEmpty())
     {
-        std::cout << "File " << path << " not opened" << std::endl;
+        LOG_WARN("Warn: failed to open file: %s", path.c_str());
         return false;
     }
+    LOG_INFO("Info: opened file: %s", path.c_str());
 
     QTextStream stream(&data);
     return readStartKilometersDAT(stream, waypoints);

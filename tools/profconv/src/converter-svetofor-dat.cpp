@@ -1,6 +1,6 @@
 #include    "converter.h"
+#include    "Logger.h"
 
-#include    <iostream>
 #include    <QFile>
 
 //------------------------------------------------------------------------------
@@ -14,9 +14,10 @@ bool ZDSimConverter::readSvetoforDAT(const std::string &path, zds_signals_data_t
     QString data = fileToQString(path);
     if (data.isEmpty())
     {
-        std::cout << "File " << path << " not opened" << std::endl;
+        LOG_WARN("Warn: failed to open file: %s", path.c_str());
         return false;
     }
+    LOG_INFO("Info: opened file: %s", path.c_str());
 
     QTextStream stream(&data);
     return readSvetoforDAT(stream, signals_data, dir);

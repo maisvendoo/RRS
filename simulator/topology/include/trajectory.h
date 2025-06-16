@@ -35,7 +35,8 @@ public:
 
     ~Trajectory();
 
-    bool load(const QString &route_dir, const QString &traj_name, std::vector<module_cfg_t> modules);
+    bool load(const QString &route_dir, const QString &traj_name,
+              std::vector<module_cfg_t> modules, bool solve_errors = true);
 
     QString getName() const
     {
