@@ -55,6 +55,8 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
     //     std::cout << image.bits()[i] << std::endl;
     // }
     image.save("test.png");
+    // auto width = image.width();
+    // auto height = image.height();
 
     vsg::ref_ptr<vsg::Data> vsgData;
     if (image.format() == QImage::Format_ARGB32_Premultiplied)
@@ -79,6 +81,9 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
 
     auto pixels = image_data->data.cast<vsg::ubvec4Array2D>();
     auto new_pixels = vsgData.cast<vsg::ubvec4Array2D>();
+    // auto min_size = (pixels->size() < new_pixels->size()) ? pixels->size() : new_pixels->size();
+    // auto pixels_size = pixels->size();
+    // auto new_pixels_size = new_pixels->size();
 
     if (pixels->size() != new_pixels->size())
     {
@@ -94,6 +99,12 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
             image_data->data->dirty();
         }
     }
+
+    // for (std::size_t i = 0; i < pixels_size; ++i)
+    // {
+    //     pixels->at(i) = new_pixels->at(i);
+    //     image_data->data->dirty();
+    // }
 
     // if ((sin(t) > 0.0f))
     // {
@@ -123,6 +134,13 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
     // Яркость дисплея
     if (is_fixed_signal)
         return;
+
+    // qDebug() << server_signals->size();
+    // for (int i = 0; i < server_signals->size(); ++i)
+    // {
+    //     qDebug() << server_signals[i];
+    // }
+    // qDebug() << signal_id;
 
     float server_signal = 0.0f;
     if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))

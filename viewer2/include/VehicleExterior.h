@@ -48,9 +48,13 @@ public:
                      vsg::ref_ptr<vsg::Viewer> viewer,
                      vsg::ref_ptr<vsg::Options> options);
 
+    void set_server_signals(const std::vector<float>& server_signals) { this->server_signals = server_signals; }
+
 private:
 
     void load_sounds(const std::string& sounds_dir, SoundManager *sm);
+
+    std::vector<float> server_signals;
 };
 
 #endif // VEHICLE_EXTERIOR_H

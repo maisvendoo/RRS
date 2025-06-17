@@ -25,6 +25,7 @@ void VehicleExterior::step(float t, float dt)
 {
     for (auto& [signal_id, animation] : animations->animations)
     {
+        animation->setSignals(&server_signals);
         animation->step(t, dt);
     }
 }

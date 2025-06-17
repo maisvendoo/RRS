@@ -7,7 +7,9 @@
 #include "simulator-update-struct.h"
 #include "sound-manager.h"
 #include "VehicleExterior.h"
+#include "vehicle-signals.h"
 
+#include <algorithm>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
@@ -259,6 +261,15 @@ void VehiclesHandler::step(double t, double dt)
                 sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
             }
         }
+
+        std::vector<float> veh_signals(MAX_ANALOG_SIGNALS);
+        std::fill(veh_signals.begin(), veh_signals.end(), 0.0f);
+        std::copy(
+            update_data[new_state].vehicles[i].analogSignal.begin(),
+            update_data[new_state].vehicles[i].analogSignal.end(),
+            veh_signals.begin()
+        );
+        vehicles[i].set_server_signals(veh_signals);
 
         // Model animations step
         vehicles[i].step(static_cast<float>(t), static_cast<float>(dt));
