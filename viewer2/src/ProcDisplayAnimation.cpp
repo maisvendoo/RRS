@@ -44,11 +44,11 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
     QImage image(display->size(), QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::transparent);
 
-    QMetaObject::invokeMethod(qApp, [&]() {
+    // QMetaObject::invokeMethod(qApp, [&]() {
         QPainter painter(&image);
         display->render(&painter);
         painter.end();
-    }, Qt::BlockingQueuedConnection);
+    // }, Qt::BlockingQueuedConnection);
 
     vsg::ref_ptr<vsg::Data> vsgData;
     if (image.format() == QImage::Format_ARGB32_Premultiplied)
@@ -71,8 +71,23 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
         );
     }
 
-    image_data->data = vsgData;
-    image_data->data->dirty();
+    auto pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+    auto new_pixels = vsgData.cast<vsg::ubvec4Array2D>();
+
+    if (pixels->size() != new_pixels->size())
+    {
+        image_data->data = vsgData;
+        image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
+        image_data->data->dirty();
+    }
+    else
+    {
+        for (std::size_t i = 0; i < pixels->size(); ++i)
+        {
+            pixels->at(i) = new_pixels->at(i);
+            image_data->data->dirty();
+        }
+    }
 
     // if ((sin(t) > 0.0f))
     // {
