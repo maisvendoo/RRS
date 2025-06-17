@@ -50,6 +50,12 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
         painter.end();
     // }, Qt::BlockingQueuedConnection);
 
+    // for (int i = 0; i < image.width() * image.height(); ++i)
+    // {
+    //     std::cout << image.bits()[i] << std::endl;
+    // }
+    image.save("test.png");
+
     vsg::ref_ptr<vsg::Data> vsgData;
     if (image.format() == QImage::Format_ARGB32_Premultiplied)
     {
