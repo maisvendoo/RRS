@@ -549,7 +549,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     model_data.vertices.shrink_to_fit();
 
-    for (std::uint32_t i = 0; i < face_count; i += 3)
+    for (std::uint32_t i = 0; i < face_count * 3; i += 3)
     {
         const std::uint32_t i1 = model_data.indices[i];
         const std::uint32_t i2 = model_data.indices[i + 1];
