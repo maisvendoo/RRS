@@ -174,7 +174,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         // Исходная информация - сокращённое имя, путь к модели, путь к текстуре
         std::string label, relative_dmd_model_path, relative_texture_path;
         ss >> label >> relative_dmd_model_path >> relative_texture_path;
-        if (is_slash(label.front()) || !is_slash(relative_dmd_model_path.front()) || !is_slash(relative_texture_path.front()))
+        if (is_slash(label.front())
+            || relative_dmd_model_path.empty()
+            || !is_slash(relative_dmd_model_path.front())
+            || relative_texture_path.empty()
+            || !is_slash(relative_texture_path.front()))
         {
             continue;
         }
@@ -572,6 +576,14 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         v1.normal.x += n.x;
         v1.normal.y += n.y;
         v1.normal.z += n.z;
+
+        v2.normal.x += n.x;
+        v2.normal.y += n.y;
+        v2.normal.z += n.z;
+
+        v3.normal.x += n.x;
+        v3.normal.y += n.y;
+        v3.normal.z += n.z;
     }
 
     for (auto& vertex : model_data.vertices)
@@ -597,6 +609,8 @@ bool Application::generate_gltf_model(Geometry& model_data,
     {
         std::swap(vertex.pos.y, vertex.pos.z);
         vertex.pos.z = -vertex.pos.z;
+        std::swap(vertex.normal.y, vertex.normal.z);
+        vertex.normal.z = -vertex.normal.z;
     }
 
     std::string full_bin_path = combine_path(gltf_directory_path, out_relative_bin_path);
