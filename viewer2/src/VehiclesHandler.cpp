@@ -269,7 +269,6 @@ void VehiclesHandler::step(double t, double dt)
             update_data[new_state].vehicles[i].analogSignal.end(),
             veh_signals.begin()
         );
-        vehicles[i].set_server_signals(veh_signals);
 
         // Model animations step
         vehicles[i].step(static_cast<float>(t), static_cast<float>(dt));

@@ -142,13 +142,6 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
     if (is_fixed_signal)
         return;
 
-    // qDebug() << server_signals->size();
-    // for (int i = 0; i < server_signals->size(); ++i)
-    // {
-    //     qDebug() << server_signals[i];
-    // }
-    // qDebug() << signal_id;
-
     float server_signal = 0.0f;
     if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))
     {
