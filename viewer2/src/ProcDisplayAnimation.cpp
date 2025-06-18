@@ -5,10 +5,8 @@
 #include "display-types.h"
 #include "filesystem.h"
 
-#include <QApplication>
 #include <QPainter>
 
-#include <algorithm>
 #include <sstream>
 #include <vsg/state/Image.h>
 
@@ -43,10 +41,14 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
         return;
     }
 
-    display_signals_t display_signals;
-    std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
-
-    display->setInputSignals(display_signals);
+    static std::vector<float>* prev_signals = nullptr;
+    if (server_signals != prev_signals)
+    {
+        display_signals_t display_signals;
+        std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
+        display->setInputSignals(display_signals);
+        prev_signals = server_signals;
+    }
 
     QImage image(display->size(), QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::transparent);
