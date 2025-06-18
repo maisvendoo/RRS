@@ -268,6 +268,7 @@ void RouteViewer::loadExternalCameraSettings(CfgReader& cfg, const QString& sect
 //------------------------------------------------------------------------------
 void RouteViewer::loadFollowCameraSettings(CfgReader& cfg, const QString& section)
 {
+    cfg.getDouble(section, "FollowCamShiftForward", settings.follow_cam_init_shift_forward);
     cfg.getDouble(section, "FollowCamShiftRight", settings.follow_cam_init_shift_right);
     cfg.getDouble(section, "FollowCamShiftUp", settings.follow_cam_init_shift_up);
     cfg.getDouble(section, "FollowCamFwdVelocityCoeff", settings.follow_cam_fwd_velocity_coeff);

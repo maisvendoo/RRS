@@ -89,9 +89,10 @@ struct settings_t
     double ext_cam_dist_coeff = cbrt(cbrt(2.0));    ///< External camera distance coeff
     double ext_cam_dist_min = 1.0;                  ///< External camera minimal distance
 
+    double follow_cam_init_shift_forward = 15.0;    ///< Follow camera initial position forward shift
     double follow_cam_init_shift_right = 10.0;      ///< Follow camera initial position right shift
     double follow_cam_init_shift_up = 1.75;         ///< Follow camera initial position height shift
-    double follow_cam_fwd_velocity_coeff = 4.0;     ///< Follow camera initial position forward shift coeff
+    double follow_cam_fwd_velocity_coeff = 4.0;     ///< Follow camera forward shift by velocity coeff
     double follow_cam_speed_keyboard = 2.0;         ///< Follow camera initial speed
     double follow_cam_speed_mouse = 2.0;            ///< Follow camera initial speed
     double follow_cam_speed_coeff = sqrt(2.0);      ///< Follow camera speed coeff

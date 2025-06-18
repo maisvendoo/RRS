@@ -177,16 +177,33 @@ void CameraFollowManipulator::set_view()
     _perspective->fieldOfViewY = _settings.fovy;
 
     vsg::dvec3 shift(_settings.follow_cam_init_shift_right * (_is_right ? 1.0 : -1.0),
-                     _settings.follow_cam_fwd_velocity_coeff,
+                     _settings.follow_cam_init_shift_forward,
                      _settings.follow_cam_init_shift_up);
     if (_current_vehicle)
     {
-        vsg::dvec3 v = _current_vehicle->velocity;
-        v += vsg::dvec3(cbrt(v.x), cbrt(v.y), cbrt(v.z)) * 5.0;
+        double v = vsg::length(_current_vehicle->velocity);
+        if (v > 0.01)
+        {
+            shift.y += _settings.follow_cam_fwd_velocity_coeff * v;
+
+            if (vsg::dot(_current_vehicle->velocity, _current_vehicle->orth) < 0.0)
+            {
+                shift.x = -shift.x;
+                shift.y = -shift.y;
+            }
+        }
+        else
+        {
+            if (_current_vehicle->orientation < 0)
+            {
+                shift.x = -shift.x;
+                shift.y = -shift.y;
+            }
+        }
 
         shift = _current_vehicle->position +
                 _current_vehicle->right * shift.x +
-                v * shift.y +
+                _current_vehicle->orth * shift.y +
                 _current_vehicle->up * shift.z;
     }
 
@@ -199,7 +216,7 @@ void CameraFollowManipulator::set_view()
 //------------------------------------------------------------------------------
 void CameraFollowManipulator::calc_view()
 {
-    _lookAt->center = {0.0, 0.0, 0.0};
+    _lookAt->center = {0.0, 0.0, _settings.follow_cam_init_shift_up};
     _lookAt->up = {0.0, 0.0, 1.0};
     if (_current_vehicle)
     {
@@ -211,7 +228,7 @@ void CameraFollowManipulator::calc_view()
     vsg::dvec3 view = _lookAt->center - _lookAt->eye;
 
     // Check there is no divide by zero
-    if (length2(view) < 1.0)
+    if (vsg::length2(view) < 1.0)
     {
         set_view();
         return;
