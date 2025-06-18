@@ -4,6 +4,7 @@
 #include    <Logger.h>
 
 #include    <algorithm>
+#include    <cmath>
 #include    <cstdint>
 #include    <filesystem>
 #include    <fstream>
@@ -35,7 +36,7 @@ bool Application::parse_args(int argc, char* argv[])
 
     parse_command_line(parser, cmd_line);
 
-    return set_convert_mode(cmd_line, convert_mode);    
+    return set_convert_mode(cmd_line, convert_mode);
 }
 
 //------------------------------------------------------------------------------
@@ -530,7 +531,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         auto found_it = unique_indices.find({pos_index, tex_index});
         if (found_it == unique_indices.end())
         {
-            model_data.vertices.emplace_back(Vertex{positions[pos_index], tex_coords[tex_index]});
+            model_data.vertices.emplace_back(Vertex{positions[pos_index], Vec3{0.0f, 0.0f, 0.0f}, tex_coords[tex_index]});
 
             VertexIndex new_vertex_index = model_data.vertices.size() - 1;
             model_data.indices[i] = new_vertex_index;
@@ -543,6 +544,42 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     }
 
     model_data.vertices.shrink_to_fit();
+
+    for (std::uint32_t i = 0; i < face_count; i += 3)
+    {
+        const std::uint32_t i1 = model_data.indices[i];
+        const std::uint32_t i2 = model_data.indices[i + 1];
+        const std::uint32_t i3 = model_data.indices[i + 2];
+
+        auto& v1 = model_data.vertices[i1];
+        auto& v2 = model_data.vertices[i2];
+        auto& v3 = model_data.vertices[i3];
+
+        const auto& p1 = v1.pos;
+        const auto& p2 = v2.pos;
+        const auto& p3 = v3.pos;
+
+        const Vec3 v12 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z};
+        const Vec3 v13 = {p3.x - p1.x, p3.y - p1.y, p3.z - p1.z};
+        Vec3 n = {
+            v12.y * v13.z - v12.z * v13.y,
+            v12.z * v13.x - v12.x * v13.z,
+            v12.x * v13.y - v12.y * v13.x
+        };
+        float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+        n = {n.x / length, n.y / length, n.z / length};
+
+        v1.normal.x += n.x;
+        v1.normal.y += n.y;
+        v1.normal.z += n.z;
+    }
+
+    for (auto& vertex : model_data.vertices)
+    {
+        auto& n = vertex.normal;
+        float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+        n = {n.x / length, n.y / length, n.z / length};
+    }
 
     return true;
 }
@@ -580,23 +617,32 @@ bool Application::generate_gltf_model(Geometry& model_data,
 
     for (const auto& vertex : model_data.vertices)
     {
+        bin_file.write(reinterpret_cast<const char*>(&vertex.normal), sizeof(vertex.normal));
+    }
+
+    auto normals_byte_length = bin_file.tellp() - positions_byte_length;
+
+    for (const auto& vertex : model_data.vertices)
+    {
         bin_file.write(reinterpret_cast<const char*>(&vertex.tex_coord), sizeof(vertex.tex_coord));
     }
 
-    auto tex_coords_byte_length = bin_file.tellp() - positions_byte_length;
+    auto tex_coords_byte_length = bin_file.tellp() - normals_byte_length - positions_byte_length;
 
     for (auto index : model_data.indices)
     {
         bin_file.write(reinterpret_cast<const char*>(&index), sizeof(index));
     }
 
-    auto indices_byte_length = bin_file.tellp() - tex_coords_byte_length - positions_byte_length;
+    auto indices_byte_length = bin_file.tellp() - tex_coords_byte_length - normals_byte_length - positions_byte_length;
 
     bin_file.close();
 
     Vec3 min_pos, max_pos;
+    Vec3 min_norm, max_norm;
     Vec2 min_tex, max_tex;
     min_pos = max_pos = model_data.vertices[0].pos;
+    min_norm = max_norm = model_data.vertices[0].normal;
     min_tex = max_tex = model_data.vertices[0].tex_coord;
 
     for (const auto& vertex : model_data.vertices)
@@ -608,6 +654,14 @@ bool Application::generate_gltf_model(Geometry& model_data,
         max_pos.x = std::max(max_pos.x, vertex.pos.x);
         max_pos.y = std::max(max_pos.y, vertex.pos.y);
         max_pos.z = std::max(max_pos.z, vertex.pos.z);
+
+        min_norm.x = std::min(min_norm.x, vertex.normal.x);
+        min_norm.y = std::min(min_norm.y, vertex.normal.y);
+        min_norm.z = std::min(min_norm.z, vertex.normal.z);
+
+        max_norm.x = std::max(max_norm.x, vertex.normal.x);
+        max_norm.y = std::max(max_norm.y, vertex.normal.y);
+        max_norm.z = std::max(max_norm.z, vertex.normal.z);
 
         min_tex.x = std::min(min_tex.x, vertex.tex_coord.x);
         min_tex.y = std::min(min_tex.y, vertex.tex_coord.y);
@@ -638,7 +692,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "    \"buffers\": [\n"
         "        {\n"
         "            \"uri\": \"" << out_relative_bin_path << "\",\n"
-        "            \"byteLength\": " << positions_byte_length + tex_coords_byte_length + indices_byte_length << "\n"
+        "            \"byteLength\": " << positions_byte_length + normals_byte_length  + tex_coords_byte_length + indices_byte_length << "\n"
         "        }\n"
         "    ],\n"
         "    \"bufferViews\": [\n"
@@ -651,12 +705,18 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "        {\n"
         "            \"buffer\": 0,\n"
         "            \"byteOffset\": " << positions_byte_length << ",\n"
+        "            \"byteLength\": " << normals_byte_length << ",\n"
+        "            \"target\": 34962\n"
+        "        },\n"
+        "        {\n"
+        "            \"buffer\": 0,\n"
+        "            \"byteOffset\": " << positions_byte_length + normals_byte_length << ",\n"
         "            \"byteLength\": " << tex_coords_byte_length << ",\n"
         "            \"target\": 34962\n"
         "        },\n"
         "        {\n"
         "            \"buffer\": 0,\n"
-        "            \"byteOffset\": " << positions_byte_length + tex_coords_byte_length << ",\n"
+        "            \"byteOffset\": " << positions_byte_length + normals_byte_length + tex_coords_byte_length << ",\n"
         "            \"byteLength\": " << indices_byte_length << ",\n"
         "            \"target\": 34963\n"
         "        }\n"
@@ -682,6 +742,22 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "            \"bufferView\": 1,\n"
         "            \"componentType\": 5126,\n"
         "            \"count\": " << model_data.vertices.size() << ",\n"
+        "            \"type\": \"VEC3\",\n"
+        "            \"max\": [\n"
+        "                " << max_norm.x << ",\n"
+        "                " << max_norm.y << ",\n"
+        "                " << max_norm.z << "\n"
+        "            ],\n"
+        "            \"min\": [\n"
+        "                " << min_norm.x << ",\n"
+        "                " << min_norm.y << ",\n"
+        "                " << min_norm.z << "\n"
+        "            ]\n"
+        "        },\n"
+        "        {\n"
+        "            \"bufferView\": 2,\n"
+        "            \"componentType\": 5126,\n"
+        "            \"count\": " << model_data.vertices.size() << ",\n"
         "            \"type\": \"VEC2\",\n"
         "            \"max\": [\n"
         "                " << max_tex.x << ",\n"
@@ -693,7 +769,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "            ]\n"
         "        },\n"
         "        {\n"
-        "            \"bufferView\": 2,\n"
+        "            \"bufferView\": 3,\n"
         "            \"componentType\": 5125,\n"
         "            \"count\": " << model_data.indices.size() << ",\n"
         "            \"type\": \"SCALAR\",\n"
@@ -740,9 +816,10 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "                {\n"
         "                    \"attributes\": {\n"
         "                        \"POSITION\": 0,\n"
-        "                        \"TEXCOORD_0\": 1\n"
+        "                        \"NORMAL\": 1,\n"
+        "                        \"TEXCOORD_0\": 2\n"
         "                    },\n"
-        "                    \"indices\": 2,\n"
+        "                    \"indices\": 3,\n"
         "                    \"material\": 0,\n"
         "                    \"mode\": 4\n"
         "                }\n"
@@ -822,7 +899,7 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
     cmd_line.output_route_path = parser.get<std::string>("o");
     cmd_line.input_model_path = parser.get<std::string>("m");
     cmd_line.input_texture_path = parser.get<std::string>("t");
-    cmd_line.output_model_path = parser.get<std::string>("g");    
+    cmd_line.output_model_path = parser.get<std::string>("g");
 }
 
 //------------------------------------------------------------------------------
