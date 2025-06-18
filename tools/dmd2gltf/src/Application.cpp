@@ -571,6 +571,10 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
             v12.x * v13.y - v12.y * v13.x
         };
         float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+        if (length < 1e-5)
+        {
+            LOG_WARN("Wrong normals: %s, %e", in_dmd_model_path.c_str(), length);
+        }
         n = {n.x / length, n.y / length, n.z / length};
 
         v1.normal.x += n.x;
@@ -590,6 +594,10 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     {
         auto& n = vertex.normal;
         float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+        if (length < 1e-5)
+        {
+            LOG_WARN("Wrong result normals: %s, %e", in_dmd_model_path.c_str(), length);
+        }
         n = {n.x / length, n.y / length, n.z / length};
     }
 
