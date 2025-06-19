@@ -27,6 +27,7 @@ private:
 
     std::string module_dir = "";
     std::string module_name = "";
+    std::string module_path = "";
 
     vsg::ref_ptr<vsg::PbrMaterialValue> material_value;
 
@@ -41,7 +42,10 @@ private:
 
     //------------------------------------------------------------------------------
 
+    std::vector<float>* prev_signals = nullptr;
+
     AbstractDisplay* display = nullptr;
+    QImage qimage;
 };
 
 #endif // DISPLAY_ANIMATION_H

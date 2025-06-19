@@ -5,6 +5,8 @@
 #include "display-types.h"
 #include "filesystem.h"
 
+#include <QApplication>
+#include <QThread>
 #include <QPainter>
 
 #include <sstream>
@@ -39,122 +41,40 @@ std::size_t ProcDisplayAnimation::getSignalID() const
 //------------------------------------------------------------------------------
 void ProcDisplayAnimation::anim_step(float t, float dt)
 {
-    // const int w = 1024;
-    // const int h = 1024;
-    // unsigned char test_data[w][h][4];
-    // for (int i = 0; i < w; ++i)
-    // {
-    //     for (int j = 0; j < h; ++j)
-    //     {
-    //         test_data[i][j][0] = 255;
-    //         test_data[i][j][1] = 255;
-    //         test_data[i][j][2] = 255;
-    //         test_data[i][j][3] = 255;
-    //     }
-    // }
-
-    if (!display)
+    if (display)
     {
-        return;
+        // Обновляем сигналы внутри дисплейного модуля
+        if (server_signals != prev_signals)
+        {
+            display_signals_t display_signals;
+            std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
+            display->setInputSignals(display_signals);
+            prev_signals = server_signals;
+        }
+
+        // Обновляем дисплейный модуль
+        display->update(t, dt);
+
+        // Рендер дисплея
+        qimage.fill(Qt::blue);
+        if (QThread::currentThread() != qApp->thread())
+        {
+            QMetaObject::invokeMethod(qApp, [&]() {
+                    QPainter painter(&qimage);
+                    display->render(&painter);
+                    painter.end();
+                }, Qt::BlockingQueuedConnection);
+        }
+        else
+        {
+            QPainter painter(&qimage);
+            display->render(&painter);
+            painter.end();
+        }
+
+        // Указываем VSG обновить текстуру, data уже указывает на пиксели в qimage
+        image_data->data->dirty();
     }
-
-    // static std::vector<float>* prev_signals = nullptr;
-    // if (server_signals != prev_signals)
-    // {
-    //     display_signals_t display_signals;
-    //     std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
-    //     display->setInputSignals(display_signals);
-    //     prev_signals = server_signals;
-    // }
-
-    // QImage image(display->size(), QImage::Format_ARGB32_Premultiplied);
-    // image.fill(Qt::transparent);
-
-    // // QMetaObject::invokeMethod(qApp, [&]() {
-    //     QPainter painter(&image);
-    //     display->render(&painter);
-    //     painter.end();
-    // // }, Qt::BlockingQueuedConnection);
-
-    // // for (int i = 0; i < image.width() * image.height(); ++i)
-    // // {
-    // //     std::cout << image.bits()[i] << std::endl;
-    // // }
-    // image.save("test.png");
-
-    // vsg::ref_ptr<vsg::Data> vsgData;
-    // if (image.format() == QImage::Format_ARGB32_Premultiplied)
-    // {
-    //     vsgData = vsg::ubvec4Array2D::create(
-    //         128,
-    //         128,
-    //         reinterpret_cast<vsg::ubvec4*>(&(test_data[0][0][0])),
-    //         vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-    //     );
-    // }
-    // else
-    // {
-    //     QImage converted = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    //     vsgData = vsg::ubvec4Array2D::create(
-    //         converted.width(),
-    //         converted.height(),
-    //         reinterpret_cast<vsg::ubvec4*>(converted.bits()),
-    //         vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-    //     );
-    // }
-
-    // auto pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-    // auto new_pixels = vsgData.cast<vsg::ubvec4Array2D>();
-    // auto min_size = (pixels->size() < new_pixels->size()) ? pixels->size() : new_pixels->size();
-    // auto pixels_size = pixels->size();
-    // auto new_pixels_size = new_pixels->size();
-
-    // image_data->data = vsgData;
-    //     image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
-    //     // image_data->data->dirty();
-    // if (pixels->size() != new_pixels->size())
-    // {
-
-    // }
-    // else
-    // {
-    //     for (std::size_t i = 0; i < pixels->size(); ++i)
-    //     {
-    //         // i
-    //         // image_data->data->dirty();
-    //     }
-    // }
-
-    // for (std::size_t i = 0; i < min_size; ++i)
-    // {
-    //     pixels->at(i) = new_pixels->at(i);
-    //     image_data->data->dirty();
-    // }
-
-    // if ((sin(t) > 0.0f))
-    // {
-    //     if (!prev_sin_t_positive)
-    //     {
-    //         prev_sin_t_positive = true;
-
-    //         vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-    //         for (auto it = pixels->begin(); it != pixels->end(); ++it)
-    //             (*it) = vsg::ubvec4(255, 0, 0, 255); // Красный
-    //         image_data->data->dirty();
-    //     }
-    // }
-    // else
-    // {
-    //     if (prev_sin_t_positive)
-    //     {
-    //         prev_sin_t_positive = false;
-
-    //         vsg::ref_ptr<vsg::ubvec4Array2D> pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-    //         for (auto it = pixels->begin(); it != pixels->end(); ++it)
-    //             (*it) = vsg::ubvec4(0, 255, 0, 255); // Зелёный
-    //         image_data->data->dirty();
-    //     }
-    // }
 
     // Яркость дисплея
     if (is_fixed_signal)
@@ -253,16 +173,57 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
         module_name = tmp_qstr.toStdString();
     }
 
-    module_dir = fs.combinePath(fs.getModulesDir(), module_dir);
-    module_name = fs.combinePath(module_dir, module_name);
+    module_path = fs.combinePath(fs.getModulesDir(), module_dir);
+    module_path = fs.combinePath(module_path, module_name);
 
-    display = loadDisplay(module_name.c_str());
+    // Загрузка дисплея
+    display = loadDisplay(module_path.c_str());
     if (!display)
     {
-        LOG_WARN("Module %s is not found", module_name.c_str());
+        LOG_WARN("Fail to load display module: %s", module_path.c_str());
         return false;
     }
+    LOG_INFO("Loaded display module: %s", module_path.c_str());
 
+    // Передать каким-то образом папку с конфигом ПЕ из VehicleHandler или VehicleExterior?
+    // Или конфигурировать полностью из конфига с анимацией?
+    // TODO // display->setConfigDir(QString(""));
+
+    // Инициализация дисплейного модуля
+    display->init();
+
+    // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
+    qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);
+    qimage.fill(Qt::blue);
+    if (QThread::currentThread() != qApp->thread())
+    {
+        QMetaObject::invokeMethod(qApp, [&]() {
+            QPainter painter(&qimage);
+            display->render(&painter);
+            painter.end();
+        }, Qt::BlockingQueuedConnection);
+    }
+    else
+    {
+        QPainter painter(&qimage);
+        display->render(&painter);
+        painter.end();
+    }
+
+    // Задаём текстуре пиксели экземпляра QImage как источник данных
+    vsg::ref_ptr<vsg::ubvec4Array2D> texture_pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+    vsg::ubvec4* qimage_pixels = reinterpret_cast<vsg::ubvec4*>(qimage.bits());
+    texture_pixels->assign(qimage.width(), qimage.height(), qimage_pixels, texture_pixels->properties);
+
+    // Задаём текстуре новый размер
+    uint32_t width = image_data->data->width() * image_data->data->properties.blockWidth;
+    uint32_t height = image_data->data->height() * image_data->data->properties.blockHeight;
+    uint32_t depth = image_data->data->depth() * image_data->data->properties.blockDepth;
+    image_data->extent = VkExtent3D{width, height, depth};
+
+    image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
+
+    // Обновляем яркость дисплея
     update(cur_signal);
     return true;
 }
