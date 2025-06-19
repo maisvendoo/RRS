@@ -24,25 +24,78 @@ AbstractDisplay::AbstractDisplay(QWidget* parent, Qt::WindowFlags flags)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AbstractDisplay::setInputSignal(std::size_t index, float value)
+AbstractDisplay::~AbstractDisplay()
 {
-    if (index < input_signals.size())
-    {
-        input_signals[index] = value;
-    }
+
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float AbstractDisplay::getOutputSignal(std::size_t index)
+void AbstractDisplay::setInputSignal(size_t index, float value)
+{
+    if (index < input_signals.size())
+        input_signals[index] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float AbstractDisplay::getOutputSignal(size_t index)
 {
     if (index < output_signals.size())
-    {
         return output_signals[index];
-    }
 
     return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::setInputSignals(const display_signals_t &input_signals)
+{
+    this->input_signals = input_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+display_signals_t AbstractDisplay::getOutputSignals()
+{
+    return output_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::setConfigDir(QString config_dir)
+{
+    this->config_dir = config_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString AbstractDisplay::getConfigDir() const
+{
+    return this->config_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::init()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::update(double t, double dt)
+{
+    (void) t;
+    (void) dt;
 }
 
 //------------------------------------------------------------------------------
@@ -58,16 +111,7 @@ AbstractDisplay* loadDisplay(QString lib_path)
         GetDisplay getDisplay = reinterpret_cast<GetDisplay>(lib.resolve("getDisplay"));
         if (getDisplay)
         {
-            if (QThread::currentThread() != qApp->thread())
-            {
-                QMetaObject::invokeMethod(qApp, [&]() {
-                    display = getDisplay();
-                }, Qt::BlockingQueuedConnection);
-            }
-            else
-            {
-                display = getDisplay();
-            }
+            display = getDisplay();
         }
     }
 
