@@ -158,10 +158,12 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
 
     // Яркость дисплея
     if (is_fixed_signal)
+    {
         return;
+    }
 
     float server_signal = 0.0f;
-    if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))
+    if (server_signals && (signal_id >= 0) && (static_cast<std::size_t>(signal_id) < server_signals->size()))
     {
         server_signal = (*server_signals)[signal_id];
     }
@@ -204,11 +206,15 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
 
     int tmp_int = 0;
     if (cfg.getInt(sec_name, "SignalID", tmp_int))
+    {
         signal_id = tmp_int;
+    }
 
     double tmp_dbl = 1.0;
     if (cfg.getDouble(sec_name, "Duration", tmp_dbl))
+    {
         duration = tmp_dbl;
+    }
 
     tmp_dbl = 0.0;
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))

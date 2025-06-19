@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QLibrary>
 #include <QString>
+#include <QThread>
 #include <QWidget>
 
 #include <algorithm>
@@ -57,9 +58,16 @@ AbstractDisplay* loadDisplay(QString lib_path)
         GetDisplay getDisplay = reinterpret_cast<GetDisplay>(lib.resolve("getDisplay"));
         if (getDisplay)
         {
-            QMetaObject::invokeMethod(qApp, [&]() {
+            if (QThread::currentThread() != qApp->thread())
+            {
+                QMetaObject::invokeMethod(qApp, [&]() {
+                    display = getDisplay();
+                }, Qt::BlockingQueuedConnection);
+            }
+            else
+            {
                 display = getDisplay();
-            }, Qt::BlockingQueuedConnection);
+            }
         }
     }
 
