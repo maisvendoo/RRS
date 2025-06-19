@@ -44,7 +44,7 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
     if (display)
     {
         // Обновляем сигналы внутри дисплейного модуля
-        if (server_signals != prev_signals)
+        if (server_signals && (server_signals != prev_signals))
         {
             display_signals_t display_signals;
             std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
