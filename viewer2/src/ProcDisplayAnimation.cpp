@@ -8,13 +8,16 @@
 #include <QPainter>
 
 #include <sstream>
+#include <vsg/maths/vec4.h>
 #include <vsg/state/Image.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcDisplayAnimation::ProcDisplayAnimation(vsg::ref_ptr<vsg::Image> in_image_data,
-                                           vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data)
+ProcDisplayAnimation::ProcDisplayAnimation(
+    vsg::ref_ptr<vsg::Image> in_image_data,
+    vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data
+)
     : Inherit()
     , image_data(in_image_data)
     , material_value(in_material_data)
@@ -36,80 +39,93 @@ std::size_t ProcDisplayAnimation::getSignalID() const
 //------------------------------------------------------------------------------
 void ProcDisplayAnimation::anim_step(float t, float dt)
 {
+    // const int w = 1024;
+    // const int h = 1024;
+    // unsigned char test_data[w][h][4];
+    // for (int i = 0; i < w; ++i)
+    // {
+    //     for (int j = 0; j < h; ++j)
+    //     {
+    //         test_data[i][j][0] = 255;
+    //         test_data[i][j][1] = 255;
+    //         test_data[i][j][2] = 255;
+    //         test_data[i][j][3] = 255;
+    //     }
+    // }
+
     if (!display)
     {
         return;
     }
 
-    static std::vector<float>* prev_signals = nullptr;
-    if (server_signals != prev_signals)
-    {
-        display_signals_t display_signals;
-        std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
-        display->setInputSignals(display_signals);
-        prev_signals = server_signals;
-    }
-
-    QImage image(display->size(), QImage::Format_ARGB32_Premultiplied);
-    image.fill(Qt::transparent);
-
-    // QMetaObject::invokeMethod(qApp, [&]() {
-        QPainter painter(&image);
-        display->render(&painter);
-        painter.end();
-    // }, Qt::BlockingQueuedConnection);
-
-    // for (int i = 0; i < image.width() * image.height(); ++i)
+    // static std::vector<float>* prev_signals = nullptr;
+    // if (server_signals != prev_signals)
     // {
-    //     std::cout << image.bits()[i] << std::endl;
+    //     display_signals_t display_signals;
+    //     std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
+    //     display->setInputSignals(display_signals);
+    //     prev_signals = server_signals;
     // }
-    image.save("test.png");
-    // auto width = image.width();
-    // auto height = image.height();
 
-    vsg::ref_ptr<vsg::Data> vsgData;
-    if (image.format() == QImage::Format_ARGB32_Premultiplied)
-    {
-        vsgData = vsg::ubvec4Array2D::create(
-            image.width(),
-            image.height(),
-            reinterpret_cast<vsg::ubvec4*>(image.bits()),
-            vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-        );
-    }
-    else
-    {
-        QImage converted = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-        vsgData = vsg::ubvec4Array2D::create(
-            converted.width(),
-            converted.height(),
-            reinterpret_cast<vsg::ubvec4*>(converted.bits()),
-            vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
-        );
-    }
+    // QImage image(display->size(), QImage::Format_ARGB32_Premultiplied);
+    // image.fill(Qt::transparent);
 
-    auto pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-    auto new_pixels = vsgData.cast<vsg::ubvec4Array2D>();
+    // // QMetaObject::invokeMethod(qApp, [&]() {
+    //     QPainter painter(&image);
+    //     display->render(&painter);
+    //     painter.end();
+    // // }, Qt::BlockingQueuedConnection);
+
+    // // for (int i = 0; i < image.width() * image.height(); ++i)
+    // // {
+    // //     std::cout << image.bits()[i] << std::endl;
+    // // }
+    // image.save("test.png");
+
+    // vsg::ref_ptr<vsg::Data> vsgData;
+    // if (image.format() == QImage::Format_ARGB32_Premultiplied)
+    // {
+    //     vsgData = vsg::ubvec4Array2D::create(
+    //         128,
+    //         128,
+    //         reinterpret_cast<vsg::ubvec4*>(&(test_data[0][0][0])),
+    //         vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+    //     );
+    // }
+    // else
+    // {
+    //     QImage converted = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    //     vsgData = vsg::ubvec4Array2D::create(
+    //         converted.width(),
+    //         converted.height(),
+    //         reinterpret_cast<vsg::ubvec4*>(converted.bits()),
+    //         vsg::Data::Layout{VK_FORMAT_R8G8B8A8_UNORM}
+    //     );
+    // }
+
+    // auto pixels = image_data->data.cast<vsg::ubvec4Array2D>();
+    // auto new_pixels = vsgData.cast<vsg::ubvec4Array2D>();
     // auto min_size = (pixels->size() < new_pixels->size()) ? pixels->size() : new_pixels->size();
     // auto pixels_size = pixels->size();
     // auto new_pixels_size = new_pixels->size();
 
-    if (pixels->size() != new_pixels->size())
-    {
-        image_data->data = vsgData;
-        image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
-        image_data->data->dirty();
-    }
-    else
-    {
-        for (std::size_t i = 0; i < pixels->size(); ++i)
-        {
-            pixels->at(i) = new_pixels->at(i);
-            image_data->data->dirty();
-        }
-    }
+    // image_data->data = vsgData;
+    //     image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
+    //     // image_data->data->dirty();
+    // if (pixels->size() != new_pixels->size())
+    // {
 
-    // for (std::size_t i = 0; i < pixels_size; ++i)
+    // }
+    // else
+    // {
+    //     for (std::size_t i = 0; i < pixels->size(); ++i)
+    //     {
+    //         // i
+    //         // image_data->data->dirty();
+    //     }
+    // }
+
+    // for (std::size_t i = 0; i < min_size; ++i)
     // {
     //     pixels->at(i) = new_pixels->at(i);
     //     image_data->data->dirty();
@@ -165,7 +181,7 @@ void ProcDisplayAnimation::update(float current_signal)
 {
     if (!keypoints.empty())
     {
-        float color_factor = interpolate(current_signal);
+        const float color_factor = interpolate(current_signal);
         vsg::vec4 new_color = base_color * color_factor;
         new_color.a = 1.0f;
         material_value->value().baseColorFactor = new_color;
