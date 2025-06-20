@@ -1,56 +1,50 @@
 #include "RouteViewer.h"
 
-#include "filesystem.h"
 #include "CfgReader.h"
+#include "filesystem.h"
 #include "Logger.h"
-#include "ScreenshotWriter.h"
-#include "TrafficLightsHandler.h"
-#include "VehiclesHandler.h"
-#include "UpdateViewerHandler.h"
-#include "UpdateSoundManagerHandler.h"
-#include "UpdateStatisticsHandler.h"
 #include "Route.h"
 #include "RouteLoader.h"
+#include "ScreenshotWriter.h"
 #include "Skybox.h"
-
 #include "sound-manager.h"
 #include "tcp-client.h"
+#include "TrafficLightsHandler.h"
+#include "UpdateSoundManagerHandler.h"
+#include "UpdateStatisticsHandler.h"
+#include "UpdateViewerHandler.h"
+#include "VehiclesHandler.h"
 
-#include <cstdlib>
-#include <string>
+#include <vsg/app/CloseHandler.h>
+#include <vsg/app/CommandGraph.h>
+#include <vsg/app/RenderGraph.h>
+#include <vsg/core/ConstVisitor.h>
+#include <vsg/io/Options.h>
+#include <vsg/lighting/HardShadows.h>
+#include <vsg/maths/sphere.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/state/ColorBlendState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/GraphicsPipeline.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/RasterizationState.h>
+#include <vsg/state/ShaderStage.h>
+#include <vsg/state/VertexInputState.h>
+#include <vsg/state/ViewDependentState.h>
+#include <vsg/threading/OperationThreads.h>
+#include <vsg/utils/ShaderSet.h>
+#include <vsg/utils/SharedObjects.h>
+#include <vsgImGui/RenderImGui.h>
+#include <vsgImGui/SendEventsToImGui.h>
+#include <vsgXchange/all.h>
 
 #include <QApplication>
 
-#include <vsg/app/CommandGraph.h>
-#include <vsg/core/ConstVisitor.h>
-#include <vsg/io/Options.h>
-#include <vsg/io/write.h>
-#include <vsg/maths/vec3.h>
-#include <vsg/state/GraphicsPipeline.h>
-#include <vsg/state/ShaderStage.h>
-#include <vsgXchange/all.h>
-// #include <vsg/ui/PrintEvents.h>
-
-#include <vsg/app/CloseHandler.h>
-#include <vsg/lighting/HardShadows.h>
-#include <vsg/maths/sphere.h>
-#include <vsg/state/VertexInputState.h>
-#include <vsg/state/InputAssemblyState.h>
-#include <vsg/state/RasterizationState.h>
-#include <vsg/state/ColorBlendState.h>
-#include <vsg/state/MultisampleState.h>
-#include <vsg/state/DepthStencilState.h>
-#include <vsg/state/ViewDependentState.h>
-#include <vsg/threading/OperationThreads.h>
-#include <vsg/nodes/DepthSorted.h>
-#include <vsg/utils/SharedObjects.h>
-#include <vsg/utils/ShaderSet.h>
-#include <vsg/utils/PropagateDynamicObjects.h>
-
-#include <vsgImGui/imgui.h>
-#include <vsgImGui/RenderImGui.h>
-#include <vsgImGui/SendEventsToImGui.h>
 #include <vulkan/vulkan_core.h>
+
+#include <cstdlib>
+#include <string>
 
 //------------------------------------------------------------------------------
 //
