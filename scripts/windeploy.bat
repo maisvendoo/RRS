@@ -77,9 +77,9 @@ xcopy /Y /S %DATA_PATH%\shaders\*.* %RRS_DEV_ROOT%\data\shaders\
 rem Копируем данные игры (модели, звуки, конфиги анимаций, шрифты)
 
 rem ВЛ60пк
-rem xcopy /Y /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
-rem xcopy /Y /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
-rem xcopy /Y /S %DATA_PATH%\animations\vl60pk\*.* %RRS_DEV_ROOT%\data\animations\vl60pk\
+xcopy /Y /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
+xcopy /Y /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
+xcopy /Y /S %DATA_PATH%\animations\vl60pk\*.* %RRS_DEV_ROOT%\data\animations\vl60pk\
 
 rem ВЛ60к
 xcopy /Y /S %DATA_PATH%\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
