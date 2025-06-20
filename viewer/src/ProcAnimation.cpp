@@ -2,8 +2,6 @@
 
 #include "CfgReader.h"
 
-#include <vsg/nodes/MatrixTransform.h>
-
 #include <cstddef>
 #include <vector>
 
@@ -43,39 +41,25 @@ std::size_t ProcAnimation::getSignalID() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ProcAnimation::load_config(CfgReader &cfg)
-{
-    return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void ProcAnimation::anim_step([[maybe_unused]] float t, float dt)
 {
     if (is_fixed_signal)
+    {
         return;
+    }
 
     float server_signal = 0.0f;
-    if (server_signals && (signal_id >= 0) && (signal_id < server_signals->size()))
+    if (server_signals && (signal_id >= 0) && (static_cast<std::size_t>(signal_id) < server_signals->size()))
     {
         server_signal = (*server_signals)[signal_id];
     }
 
-    float delta = server_signal - cur_signal;
-    if (abs(delta) > 1e-5f)
+    const float delta = server_signal - cur_signal;
+    if (std::abs(delta) > 1e-5f)
     {
-        cur_signal += delta * fmin(duration * dt, 1.0f);
+        cur_signal += delta * std::min(duration * dt, 1.0f);
         update(cur_signal);
     }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcAnimation::update([[maybe_unused]] float current_signal)
-{
-    return;
 }
 
 //------------------------------------------------------------------------------
@@ -92,14 +76,14 @@ float ProcAnimation::interpolate(float param)
     key_point_t begin_point = findBeginKeypoint(param, next_idx);
     key_point_t next_point = keypoints.at(next_idx);
 
-    float range = next_point.param - begin_point.param;
+    const float range = next_point.param - begin_point.param;
 
     if (range < 1e-6f)
     {
         return 0.0f;
     }
 
-    float value = begin_point.value + (param - begin_point.param) * (next_point.value - begin_point.value) / range;
+    const float value = begin_point.value + (param - begin_point.param) * (next_point.value - begin_point.value) / range;
     return value;
 }
 
@@ -115,11 +99,15 @@ bool ProcAnimation::loadKeyPoints(CfgReader &cfg)
 
         double tmp = 0.0;
         if (cfg.getDouble(config_section, "Param", tmp))
+        {
             keypoint.param = tmp;
+        }
 
         tmp = 0.0;
         if (cfg.getDouble(config_section, "Value", tmp))
+        {
             keypoint.value = tmp;
+        }
 
         keypoints.emplace_back(std::move(keypoint));
         config_section = cfg.getNextSection();

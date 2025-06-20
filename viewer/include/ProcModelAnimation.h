@@ -13,7 +13,7 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProcModelAnimation : public vsg::Inherit<ProcAnimation, ProcModelAnimation>
+class ProcModelAnimation final : public vsg::Inherit<ProcAnimation, ProcModelAnimation>
 {
 public:
     explicit ProcModelAnimation(vsg::ref_ptr<vsg::Animation> in_animation);

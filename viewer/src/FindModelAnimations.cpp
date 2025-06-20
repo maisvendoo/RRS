@@ -1,16 +1,13 @@
 #include "FindModelAnimations.h"
 
+#include "animations-list.h"
 #include "CfgReader.h"
 #include "filesystem.h"
-
-#include "animations-list.h"
 #include "ProcModelAnimation.h"
 
-#include <vsg/nodes/Node.h>
 #include <vsg/animation/FindAnimations.h>
 
 #include <QDomNode>
-#include <QString>
 
 //------------------------------------------------------------------------------
 //

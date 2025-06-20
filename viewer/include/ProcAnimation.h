@@ -1,12 +1,12 @@
 #ifndef PROC_ANIMATION_H
 #define PROC_ANIMATION_H
 
+#include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
+
 #include <cstddef>
 #include <string>
 #include <vector>
-
-#include <vsg/core/Inherit.h>
-#include <vsg/core/ref_ptr.h>
 
 class CfgReader;
 
@@ -47,11 +47,11 @@ protected:
 
     std::vector<float>* server_signals = nullptr;
 
-    virtual bool load_config(CfgReader& cfg);
+    virtual bool load_config(CfgReader& cfg) = 0;
 
     virtual void anim_step(float t, float dt);
 
-    virtual void update(float current_signal);
+    virtual void update(float current_signal) = 0;
 
     float interpolate(float value);
 

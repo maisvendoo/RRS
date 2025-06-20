@@ -12,7 +12,7 @@ class CfgReader;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProcMaterialAnimation : public vsg::Inherit<ProcAnimation, ProcMaterialAnimation>
+class ProcMaterialAnimation final : public vsg::Inherit<ProcAnimation, ProcMaterialAnimation>
 {
 public:
     explicit ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data);

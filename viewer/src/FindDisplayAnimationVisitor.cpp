@@ -1,20 +1,15 @@
 #include "FindDisplayAnimationVisitor.h"
 
-#include "ProcAnimation.h"
+#include "Logger.h"
 #include "ProcDisplayAnimation.h"
 
-#include "Logger.h"
-
-#include <vsg/nodes/VertexDraw.h>
-#include <vsg/nodes/VertexIndexDraw.h>
-#include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/DescriptorBuffer.h>
-#include <vsg/state/material.h>
 #include <vsg/state/DescriptorImage.h>
+#include <vsg/state/material.h>
+#include <vsg/state/Image.h>
 #include <vsg/state/ImageInfo.h>
 #include <vsg/state/ImageView.h>
-#include <vsg/state/Image.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <mutex>

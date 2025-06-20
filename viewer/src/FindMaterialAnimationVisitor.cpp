@@ -3,10 +3,8 @@
 #include "ProcMaterialAnimation.h"
 
 #include <vsg/core/Data.h>
-#include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/core/Visitor.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/DescriptorBuffer.h>
@@ -53,7 +51,7 @@ void FindMaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorS
                     animation = ProcMaterialAnimation::create(new_pbr_material_value);
                     if (animation)
                     {
-                        std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
+                        std::scoped_lock pdo_lock(pdo->mutex);
                         pdo->tag(pbr_material_value);
                         duplicate->insert(pbr_material_value, new_pbr_material_value);
                     }

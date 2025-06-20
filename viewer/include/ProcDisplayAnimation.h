@@ -13,7 +13,7 @@ class CfgReader;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProcDisplayAnimation : public vsg::Inherit<ProcAnimation, ProcDisplayAnimation>
+class ProcDisplayAnimation final : public vsg::Inherit<ProcAnimation, ProcDisplayAnimation>
 {
 public:
     explicit ProcDisplayAnimation(vsg::ref_ptr<vsg::Image> in_image_data,

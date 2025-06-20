@@ -1,23 +1,19 @@
 #include "FindCustomAnimationsVisitor.h"
 
-#include "filesystem.h"
 #include "CfgReader.h"
-#include "animations-list.h"
+#include "filesystem.h"
+#include "FindDisplayAnimationVisitor.h"
+#include "FindMaterialAnimationVisitor.h"
 #include "ProcAnimation.h"
 #include "ProcRotationAnimation.h"
 #include "ProcTranslationAnimation.h"
-#include "FindMaterialAnimationVisitor.h"
-#include "FindDisplayAnimationVisitor.h"
 
-#include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
-
-#include <QDomNode>
 
 #include <string>
 

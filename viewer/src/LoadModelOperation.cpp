@@ -1,8 +1,8 @@
 #include "LoadModelOperation.h"
 
 #include "animations-list.h"
-#include "FindModelAnimations.h"
 #include "FindCustomAnimationsVisitor.h"
+#include "FindModelAnimations.h"
 #include "Logger.h"
 
 #include <vsg/app/CompileManager.h>
@@ -12,8 +12,8 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
-#include <vsg/io/ReaderWriter.h>
 #include <vsg/io/read.h>
+#include <vsg/io/ReaderWriter.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/utils/PropagateDynamicObjects.h>

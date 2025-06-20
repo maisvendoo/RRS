@@ -1,12 +1,12 @@
 #include "MyGui.h"
 
+#include "filesystem.h"
+
 #include "UpdateStatisticsHandler.h"
 #include "VehiclesHandler.h"
 
 #include <vsg/app/RecordTraversal.h>
-#include <vsgImGui/imgui.h>
-
-#include "vsg/app/Viewer.h"
+#include <vsg/app/Viewer.h>
 #include <vsg/io/Options.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/DepthSorted.h>
@@ -14,13 +14,12 @@
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/BufferInfo.h>
-#include <vsg/state/ImageInfo.h>
 #include <vsg/state/DescriptorBuffer.h>
 #include "vsg/state/DescriptorImage.h"
+#include <vsg/state/ImageInfo.h>
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/vk/Context.h>
-
-#include <filesystem.h>
+#include <vsgImGui/imgui.h>
 
 std::vector<vsg::ref_ptr<vsg::Node>> GUIParams::nodes;
 

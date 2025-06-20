@@ -16,7 +16,7 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ProcTranslationAnimation  : public vsg::Inherit<ProcAnimation, ProcTranslationAnimation>
+class ProcTranslationAnimation final : public vsg::Inherit<ProcAnimation, ProcTranslationAnimation>
 {
 public:
     explicit ProcTranslationAnimation(vsg::ref_ptr<vsg::MatrixTransform> transform);
