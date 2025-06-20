@@ -75,24 +75,20 @@ void readNextMesh(std::ifstream &stream, dmd_multimesh_t &multimesh)
     line = getLine(stream);
 
     // Читаем массив вершин
-    mesh.vertices = new osg::Vec3Array;
-
-    for (unsigned int i = 0; i < mesh.vertex_count; ++i)
+   for (unsigned int i = 0; i < mesh.vertex_count; ++i)
     {
         line = getLine(stream);
         line = delete_symbol(line, '\t');
-        osg::Vec3 point;
+        Vec3 point;
 
         std::istringstream ss(line);
-        ss >> point.x() >> point.y() >> point.z();
+        ss >> point.x >> point.y >> point.z;
 
-        mesh.vertices->push_back(point);
+        mesh.vertices.push_back(point);
     }
 
     std::string empty_line = getLine(stream);
     line = getLine(stream);
-
-    mesh.vertex_normals = new osg::Vec3Array;
 
     for (unsigned int i = 0; i < mesh.faces_count; ++i)
     {
@@ -112,10 +108,10 @@ void readNextMesh(std::ifstream &stream, dmd_multimesh_t &multimesh)
 
         mesh.faces.push_back(face);
 
-        osg::Vec3 normal = mesh.calcFaceNormal(face);
+        Vec3 normal = mesh.calcFaceNormal(face);
 
         for (size_t j = 0; j < face.size(); ++j)
-            mesh.vertex_normals->push_back(normal);
+            mesh.vertex_normals.push_back(normal);
     }
 
     multimesh.meshes.push_back(mesh);
@@ -143,20 +139,18 @@ void readTextureBlock(std::ifstream &stream, dmd_multimesh_t &multimesh)
     multimesh.is_texture_present = true;
 
     // Текстурные координаты
-    multimesh.texvrtices = new osg::Vec2Array;
-
     for (unsigned int i = 0; i < multimesh.tex_v_count; ++i)
     {
         line = delete_symbol(getLine(stream), '\t');
         std::istringstream ss(line);
 
-        osg::Vec2 texel;
+        Vec2 texel;
         float z = 0;
-        ss >> texel.x() >> texel.y() >> z;
+        ss >> texel.x >> texel.y >> z;
 
-        texel.y() = 1.0f - texel.y();
+        texel.y = 1.0f - texel.y;
 
-        multimesh.texvrtices->push_back(texel);
+        multimesh.texvrtices.push_back(texel);
     }
 
     line = getLine(stream);
