@@ -1,17 +1,19 @@
 #include "UpdateSoundManagerHandler.h"
-#include "vsg/ui/ApplicationEvent.h"
+
+#include "sound-manager.h"
+
+#include <vsg/app/ViewMatrix.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/ui/ApplicationEvent.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-UpdateSoundManagerHandler::UpdateSoundManagerHandler(vsg::ref_ptr<vsg::Camera> camera, SoundManager *sm)
-    : _sound_manager(sm)
-    , _lookAt(camera->viewMatrix.cast<vsg::LookAt>())
+UpdateSoundManagerHandler::UpdateSoundManagerHandler(vsg::ref_ptr<vsg::LookAt> look_at, SoundManager* sound_manager)
+    : sound_manager(sound_manager)
+    , look_at(look_at)
 {
-    if (!_lookAt)
-    {
-        _lookAt = new vsg::LookAt;
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -19,21 +21,23 @@ UpdateSoundManagerHandler::UpdateSoundManagerHandler(vsg::ref_ptr<vsg::Camera> c
 //------------------------------------------------------------------------------
 void UpdateSoundManagerHandler::apply(vsg::FrameEvent& frame)
 {
-    double t = frame.frameStamp->simulationTime;
-    double dt = t - _previousTime;
+    const double t = frame.frameStamp->simulationTime;
+    const double dt = t - prev_time;
 
     if (dt < 1e-5)
+    {
         return;
+    }
 
-    vsg::vec3 pos = vsg::vec3(_lookAt->eye);
-    vsg::vec3 velocity = vsg::vec3((_lookAt->eye - _prev_camera_pos) / dt);
-    vsg::vec3 front = vsg::normalize(vsg::vec3(_lookAt->center - _lookAt->eye));
-    vsg::vec3 up = vsg::vec3(_lookAt->up);
+    const vsg::vec3 pos = vsg::vec3(look_at->eye);
+    const vsg::vec3 velocity = vsg::vec3((look_at->eye - prev_camera_pos) / dt);
+    const vsg::vec3 front = vsg::normalize(vsg::vec3(look_at->center - look_at->eye));
+    const vsg::vec3 up = vsg::vec3(look_at->up);
 
-    _sound_manager->setListenerPosition(pos.x, pos.y, pos.z);
-    _sound_manager->setListenerVelocity(velocity.x, velocity.y, velocity.z);
-    _sound_manager->setListenerOrientation(front.x, front.y, front.z, up.x, up.y, up.z);
+    sound_manager->setListenerPosition(pos.x, pos.y, pos.z);
+    sound_manager->setListenerVelocity(velocity.x, velocity.y, velocity.z);
+    sound_manager->setListenerOrientation(front.x, front.y, front.z, up.x, up.y, up.z);
 
-    _previousTime = t;
-    _prev_camera_pos = _lookAt->eye;
+    prev_time = t;
+    prev_camera_pos = look_at->eye;
 }

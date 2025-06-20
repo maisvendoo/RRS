@@ -525,7 +525,7 @@ void RouteViewer::initViewer()
         settings
     );
 
-    auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(camera, sound_manager);
+    auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(lookAt, sound_manager);
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
 
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
