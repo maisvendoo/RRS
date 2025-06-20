@@ -177,7 +177,17 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     module_path = fs.combinePath(module_path, module_name);
 
     // Загрузка дисплея
-    display = loadDisplay(module_path.c_str());
+    if (QThread::currentThread() != qApp->thread())
+    {
+        QMetaObject::invokeMethod(qApp, [&]() {
+            display = loadDisplay(module_path.c_str());
+        }, Qt::BlockingQueuedConnection);
+    }
+    else
+    {
+        display = loadDisplay(module_path.c_str());
+    }
+
     if (!display)
     {
         LOG_WARN("Fail to load display module: %s", module_path.c_str());
@@ -190,7 +200,16 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     // TODO // display->setConfigDir(QString(""));
 
     // Инициализация дисплейного модуля
-    display->init();
+    if (QThread::currentThread() != qApp->thread())
+    {
+        QMetaObject::invokeMethod(qApp, [&]() {
+            display->init();
+        }, Qt::BlockingQueuedConnection);
+    }
+    else
+    {
+        display->init();
+    }
 
     // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
     qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);
