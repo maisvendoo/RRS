@@ -140,7 +140,7 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_transform_animat
     const auto config_section = cfg.getFirstSection(type);
     if (!config_section.isNull())
     {
-        if (const auto transform_node = group_node.cast<vsg::MatrixTransform>())
+        if (const auto transform_node = group_node.template cast<vsg::MatrixTransform>())
         {
             const auto animation = AnimationClass::create(transform_node);
             if (animation && animation->load(cfg))
