@@ -14,7 +14,6 @@ add_subdirectory (model)
 add_subdirectory (simulator)
 
 add_subdirectory (modbus)
-add_subdirectory (freejoy)
 
 add_subdirectory (krm395)
 add_subdirectory (krm130)
@@ -38,4 +37,15 @@ add_subdirectory (trajectory-speedmap)
 add_subdirectory (connector-ALSN)
 add_subdirectory (trajectory-ALSN)
 
+# Ищем SFML
+if (WIN32)
+        set(SFML_STATIC_LIBRARIES TRUE)
+endif()
+find_package(SFML QUIET)
+# Если нашли добавляем плагин для управления с джойстика
+if (SFML_FOUND)
+    add_subdirectory (freejoy)
+endif()
+
 install(FILES ../common-headers/sound-signal.h DESTINATION sdk/include)
+install(FILES ../common-headers/key-symbols.h DESTINATION sdk/include)
