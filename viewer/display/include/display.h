@@ -82,7 +82,7 @@ using GetDisplay = AbstractDisplay*(*)();
 //
 //------------------------------------------------------------------------------
 #define GET_DISPLAY(ClassName) \
-    extern "C" DISPLAY_EXPORT AbstractDisplay* getDisplay() \
+    extern "C" AbstractDisplay* getDisplay() \
     { \
         return new (ClassName)(); \
     }
