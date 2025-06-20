@@ -118,6 +118,11 @@ public:
 
     bool calcPosition(dvec3 &pos);
 
+    QString getSignalModel() const
+    {
+        return this->signal_model;
+    }
+
     void allowTransmitALSN(bool is_allow);
 
 signals:
