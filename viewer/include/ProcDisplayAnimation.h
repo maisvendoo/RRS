@@ -1,11 +1,10 @@
 #ifndef DISPLAY_ANIMATION_H
 #define DISPLAY_ANIMATION_H
 
-#include "ProcAnimation.h"
 #include "display.h"
+#include "ProcAnimation.h"
 
 #include <vsg/maths/vec4.h>
-#include <vsg/core/Value.h>
 #include <vsg/state/material.h>
 
 class CfgReader;
@@ -23,11 +22,6 @@ public:
 
 private:
     vsg::ref_ptr<vsg::Image> image_data;
-    bool prev_sin_t_positive = true;
-
-    std::string module_dir = "";
-    std::string module_name = "";
-    std::string module_path = "";
 
     vsg::ref_ptr<vsg::PbrMaterialValue> material_value;
 

@@ -120,6 +120,10 @@ void ProcDisplayAnimation::update(float current_signal)
 //------------------------------------------------------------------------------
 bool ProcDisplayAnimation::load_config(CfgReader &cfg)
 {
+    std::string module_dir;
+    std::string module_name;
+    std::string module_path;
+
     FileSystem& fs = FileSystem::getInstance();
 
     QString sec_name = "Display";
