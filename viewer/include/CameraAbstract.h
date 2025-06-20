@@ -1,12 +1,12 @@
 #ifndef CAMERA_ABSTRACT_H
 #define CAMERA_ABSTRACT_H
 
-#include <vsg/ui/Keyboard.h>
-#include <vsg/ui/PointerEvent.h>
-#include <vsg/maths/transform.h>
-#include <vsg/app/Camera.h>
 #include "settings.h"
 #include "VehicleExterior.h"
+
+#include <vsg/app/Camera.h>
+#include <vsg/ui/Keyboard.h>
+#include <vsg/ui/PointerEvent.h>
 
 //------------------------------------------------------------------------------
 //
@@ -21,27 +21,30 @@ public:
         , _camera(camera)
         , _lookAt(camera->viewMatrix.cast<vsg::LookAt>())
         , _perspective(camera->projectionMatrix.cast<vsg::Perspective>())
-        , _settings(settings) {}
+        , _settings(settings)
+    {
+    }
 
-    virtual void resetView() {}
-    virtual void returnView() {}
+    virtual void resetView() = 0;
+    virtual void returnView() = 0;
+
     virtual void keyboardPressEvent([[maybe_unused]] vsg::KeySymbol key, [[maybe_unused]] bool pressed) {}
     virtual void mouseButtonPressEvent([[maybe_unused]] uint32_t button, [[maybe_unused]] vsg::ButtonMask button_mask, [[maybe_unused]] bool pressed) {}
-    virtual void mouseWheelEvent([[maybe_unused]] vsg::vec3 delta) {}
-    virtual void mouseMoveEvent([[maybe_unused]] vsg::ButtonMask button_mask, [[maybe_unused]] vsg::dvec2 delta) {}
-    virtual void touchZoomEvent([[maybe_unused]] double zoomLevel) {}
-    virtual void frameEvent([[maybe_unused]] double dt) {}
 
-    void setCurrentVehicle(VehicleExterior *cv)
+    virtual void mouseWheelEvent(vsg::vec3 delta) = 0;
+    virtual void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) = 0;
+    virtual void touchZoomEvent(double zoomLevel) = 0;
+    virtual void frameEvent(double dt) = 0;
+
+    void setCurrentVehicle(VehicleExterior* current_vehicle)
     {
-        _current_vehicle = cv;
+        _current_vehicle = current_vehicle;
         currentVehicleChanged();
     }
 
-    vsg::ButtonMask getTouchToButtonMask() {return touchToButtonMask;}
+    vsg::ButtonMask getTouchToButtonMask() const { return touchToButtonMask; }
 
 protected:
-
     virtual void currentVehicleChanged() {}
 
     /// Button mask value used for touch events
@@ -55,7 +58,7 @@ protected:
 
     settings_t& _settings;
 
-    VehicleExterior *_current_vehicle = nullptr;
+    VehicleExterior* _current_vehicle = nullptr;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H

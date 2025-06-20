@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class CameraFreeManipulator : public CameraAbstract
+class CameraFreeManipulator final : public CameraAbstract
 {
 public:
     CameraFreeManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,

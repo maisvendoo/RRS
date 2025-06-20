@@ -3,7 +3,7 @@
 
 #include "CameraAbstract.h"
 
-class CameraCabineManipulator : public CameraAbstract
+class CameraCabineManipulator final : public CameraAbstract
 {
 public:
     CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
