@@ -154,6 +154,8 @@ bool RouteViewer::init(int argc, char* argv[])
     initCommandGraph();
     initViewer();
 
+    vehicles_handler->set_camera_pos(&lookAt->eye);
+
     initTCPclient();
 
     return true;

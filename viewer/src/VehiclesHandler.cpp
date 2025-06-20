@@ -271,7 +271,7 @@ void VehiclesHandler::step(double t, double dt)
         );
 
         // Model animations step
-        vehicles[i].step(static_cast<float>(t), static_cast<float>(dt));
+        vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), camera_pos);
     }
 }
 

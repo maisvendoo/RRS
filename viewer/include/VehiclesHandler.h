@@ -66,6 +66,8 @@ public:
         vsg::ref_ptr<vsg::Options> options
     );
 
+    void set_camera_pos(const vsg::dvec3* camera_pos) { this->camera_pos = camera_pos; }
+
 public slots:
     void slotGetVehiclesPosData(QByteArray& data);
     void slotGetVehiclesStateData(QByteArray& data);
@@ -84,6 +86,7 @@ private:
 
 private:
     SoundManager* sound_manager;
+    const vsg::dvec3* camera_pos;
 
     /// Data about vehicles positions, received from server
     static constexpr int DATA_ARRAY_SIZE = 5;

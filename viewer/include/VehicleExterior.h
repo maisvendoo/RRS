@@ -39,7 +39,7 @@ public:
 
     VehicleExterior(){};
 
-    void step(float t, float dt);
+    void step(float t, float dt, const vsg::dvec3* camera_pos);
 
     bool loadVehicle(const std::string& cfg_dir,
                      const std::string& cfg_file,

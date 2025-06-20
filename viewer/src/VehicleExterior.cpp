@@ -21,11 +21,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleExterior::step(float t, float dt)
+void VehicleExterior::step(float t, float dt, const vsg::dvec3* camera_pos)
 {
-    for (auto& [signal_id, animation] : animations->animations)
+    const double distance_to_vehicle = vsg::length(*camera_pos - position);
+    if (distance_to_vehicle < 200.0)
     {
-        animation->step(t, dt);
+        for (auto& [signal_id, animation] : animations->animations)
+        {
+            animation->step(t, dt);
+        }
     }
 }
 
