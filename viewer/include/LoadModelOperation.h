@@ -55,8 +55,6 @@ struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperati
     vsg::observer_ptr<animations_t> animations;
 
     void run() override;
-
-    void load_displays(vsg::ref_ptr<vsg::Node> model);
 };
 
 #endif // LOAD_MODEL_OPERATION_H

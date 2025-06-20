@@ -2,7 +2,6 @@
 #define VEHICLE_EXTERIOR_H
 
 #include "animations-list.h"
-#include "display-container.h"
 
 #include <vsg/core/Object.h>
 #include <vsg/nodes/MatrixTransform.h>
