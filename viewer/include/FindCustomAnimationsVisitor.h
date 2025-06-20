@@ -50,6 +50,12 @@ public:
 private:
     vsg::ref_ptr<ProcAnimation> create_animation(const std::string& name, vsg::Group& group);
 
+    template <typename AnimationClass>
+    vsg::ref_ptr<ProcAnimation> create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
+
+    template <typename VisitorClass>
+    vsg::ref_ptr<ProcAnimation> create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
+
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
