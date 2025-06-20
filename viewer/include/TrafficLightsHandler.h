@@ -1,11 +1,11 @@
 #ifndef TRAFFIC_LIGHTS_HANDLER_H
 #define TRAFFIC_LIGHTS_HANDLER_H
 
-#include "settings.h"
-
 #include <vsg/nodes/Group.h>
 
+#include <QMap>
 #include <QObject>
+#include <QString>
 
 #include <string>
 
@@ -20,7 +20,7 @@ class TrafficLightsHandler : public QObject
     Q_OBJECT
 
 public:
-    TrafficLightsHandler(const settings_t& settings, QObject* parent = nullptr);
+    TrafficLightsHandler(QObject* parent = nullptr);
 
     /// Get scene group
     vsg::ref_ptr<vsg::Group> getNode();
@@ -28,7 +28,7 @@ public:
     void step(float t, float dt);
 
     bool load(QByteArray &data,
-              const settings_t& settings,
+              const std::string& route_dir_full_path,
               vsg::ref_ptr<vsg::Viewer> viewer,
               vsg::ref_ptr<vsg::Options> options);
 

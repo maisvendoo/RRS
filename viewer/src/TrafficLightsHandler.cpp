@@ -1,16 +1,16 @@
 #include "TrafficLightsHandler.h"
-#include "TrafficLight.h"
 
 #include "CfgReader.h"
 #include "filesystem.h"
 #include "Logger.h"
+#include "TrafficLight.h"
 
 #include <vsg/app/Viewer.h>
 
 #include <QBuffer>
 
 
-TrafficLightsHandler::TrafficLightsHandler([[maybe_unused]] const settings_t &settings, QObject* parent)
+TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
     : QObject(parent)
 {
 }
@@ -42,12 +42,12 @@ void TrafficLightsHandler::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool TrafficLightsHandler::load(QByteArray &data, const settings_t &settings, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
+bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_full_path, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
 {
     deserialize(data);
 
     FileSystem& fs =FileSystem::getInstance();
-    std::string path = fs.combinePath(settings.route_dir_full_path, "topology");
+    std::string path = fs.combinePath(route_dir_full_path, "topology");
     path = fs.combinePath(path, "models-config.xml");
 
     QString tmp_qstr = path.c_str();
