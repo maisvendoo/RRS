@@ -16,15 +16,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcDisplayAnimation::ProcDisplayAnimation(
-    vsg::ref_ptr<vsg::Image> in_image_data,
-    vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data
-)
+ProcDisplayAnimation::ProcDisplayAnimation(vsg::ref_ptr<vsg::Image> in_image_color,
+                                           vsg::ref_ptr<vsg::Image> in_image_emissive,
+                                           vsg::ref_ptr<vsg::PbrMaterialValue> in_material_value)
     : Inherit()
-    , image_data(in_image_data)
-    , material_value(in_material_data)
-    , base_color(in_material_data->value().baseColorFactor)
-    , emission_color(in_material_data->value().emissiveFactor)
+    , image_color(in_image_color)
+    , image_emissive(in_image_emissive)
+    , material_value(in_material_value)
+    , base_color(in_material_value->value().baseColorFactor)
+    , emission_color(in_material_value->value().emissiveFactor)
 {
 }
 
@@ -73,7 +73,14 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
         }
 
         // Указываем VSG обновить текстуру, data уже указывает на пиксели в qimage
-        image_data->data->dirty();
+        if (is_color_repaint)
+        {
+            image_color->data->dirty();
+        }
+        if (is_emissive_repaint)
+        {
+            image_emissive->data->dirty();
+        }
     }
 
     // Яркость дисплея
@@ -120,13 +127,37 @@ void ProcDisplayAnimation::update(float current_signal)
 //------------------------------------------------------------------------------
 bool ProcDisplayAnimation::load_config(CfgReader &cfg)
 {
-    std::string module_dir;
-    std::string module_name;
-    std::string module_path;
-
-    FileSystem& fs = FileSystem::getInstance();
+    if (!material_value)
+    {
+        LOG_WARN("Fail to create display animation: no material value");
+        return false;
+    }
 
     QString sec_name = "Display";
+
+    if (cfg.getBool(sec_name, "RepaintColor", is_color_repaint))
+    {
+        if (is_color_repaint && (!image_color))
+        {
+            LOG_WARN("Fail to configure display animation: no color texture to repaint");
+            return false;
+        }
+    }
+
+    if (cfg.getBool(sec_name, "RepaintEmissive", is_emissive_repaint))
+    {
+        if (is_emissive_repaint && (!image_emissive))
+        {
+            LOG_WARN("Fail to configure display animation: no emissive texture to repaint");
+            return false;
+        }
+    }
+
+    if (!(is_color_repaint || is_emissive_repaint))
+    {
+        LOG_WARN("Fail to configure display animation: no repaint needed");
+        return false;
+    }
 
     int tmp_int = 0;
     if (cfg.getInt(sec_name, "SignalID", tmp_int))
@@ -165,20 +196,33 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
         base_color *= config_color_limit;
     }
 
+    FileSystem& fs = FileSystem::getInstance();
+    std::string module_path = fs.getModulesDir();
+    std::string cfgdir_path = fs.getConfigDir();
+
     tmp_qstr = "";
     if (cfg.getString(sec_name, "ModuleDir", tmp_qstr))
     {
-        module_dir = tmp_qstr.toStdString();
+        module_path = fs.combinePath(module_path, tmp_qstr.toStdString());
     }
 
     tmp_qstr = "";
     if (cfg.getString(sec_name, "Module", tmp_qstr))
     {
-        module_name = tmp_qstr.toStdString();
+        module_path = fs.combinePath(module_path, tmp_qstr.toStdString());
     }
 
-    module_path = fs.combinePath(fs.getModulesDir(), module_dir);
-    module_path = fs.combinePath(module_path, module_name);
+    tmp_qstr = "";
+    if (cfg.getString(sec_name, "ModuleConfigDir", tmp_qstr))
+    {
+        cfgdir_path = fs.combinePath(cfgdir_path, tmp_qstr.toStdString());
+    }
+
+    tmp_qstr = "";
+    if (cfg.getString(sec_name, "ModuleConfigSubDir", tmp_qstr))
+    {
+        cfgdir_path = fs.combinePath(cfgdir_path, tmp_qstr.toStdString());
+    }
 
     // Загрузка дисплея
     if (QThread::currentThread() != qApp->thread())
@@ -199,9 +243,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     }
     LOG_INFO("Loaded display module: %s", module_path.c_str());
 
-    // Передать каким-то образом папку с конфигом ПЕ из VehicleHandler или VehicleExterior?
-    // Или конфигурировать полностью из конфига с анимацией?
-    // TODO // display->setConfigDir(QString(""));
+    display->setConfigDir(QString(cfgdir_path.c_str()));
 
     // Инициализация дисплейного модуля
     if (QThread::currentThread() != qApp->thread())
@@ -214,6 +256,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     {
         display->init();
     }
+    LOG_INFO("Initialized display module with config: %s", cfgdir_path.c_str());
 
     // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
     qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);
@@ -234,19 +277,32 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     }
 
     // Задаём текстуре пиксели экземпляра QImage как источник данных
-    vsg::ref_ptr<vsg::ubvec4Array2D> texture_pixels = image_data->data.cast<vsg::ubvec4Array2D>();
     vsg::ubvec4* qimage_pixels = reinterpret_cast<vsg::ubvec4*>(qimage.bits());
-    texture_pixels->assign(qimage.width(), qimage.height(), qimage_pixels, texture_pixels->properties);
+    if (is_color_repaint)
+    {
+        image_color->data = vsg::ubvec4Array2D::create(qimage.width(), qimage.height(), qimage_pixels, image_color->data->properties);
+        image_color->data->properties.dataVariance = vsg::DYNAMIC_DATA;
 
-    // Задаём текстуре новый размер
-    uint32_t width = image_data->data->width() * image_data->data->properties.blockWidth;
-    uint32_t height = image_data->data->height() * image_data->data->properties.blockHeight;
-    uint32_t depth = image_data->data->depth() * image_data->data->properties.blockDepth;
-    image_data->extent = VkExtent3D{width, height, depth};
+        // Задаём текстуре новый размер
+        uint32_t width = image_color->data->width() * image_color->data->properties.blockWidth;
+        uint32_t height = image_color->data->height() * image_color->data->properties.blockHeight;
+        uint32_t depth = image_color->data->depth() * image_color->data->properties.blockDepth;
+        image_color->extent = VkExtent3D{width, height, depth};
+    }
+    if (is_emissive_repaint)
+    {
+        image_emissive->data = vsg::ubvec4Array2D::create(qimage.width(), qimage.height(), qimage_pixels, image_emissive->data->properties);
+        image_emissive->data->properties.dataVariance = vsg::DYNAMIC_DATA;
 
-    image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
+        // Задаём текстуре новый размер
+        uint32_t width = image_emissive->data->width() * image_emissive->data->properties.blockWidth;
+        uint32_t height = image_emissive->data->height() * image_emissive->data->properties.blockHeight;
+        uint32_t depth = image_emissive->data->depth() * image_emissive->data->properties.blockDepth;
+        image_emissive->extent = VkExtent3D{width, height, depth};
+    }
 
     // Обновляем яркость дисплея
+    material_value->properties.dataVariance = vsg::DYNAMIC_DATA;
     update(cur_signal);
     return true;
 }

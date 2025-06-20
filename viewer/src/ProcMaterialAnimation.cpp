@@ -74,6 +74,7 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
         base_color *= config_color_limit;
     }
 
+    material_value->properties.dataVariance = vsg::DYNAMIC_DATA;
     update(cur_signal);
     return true;
 }

@@ -40,8 +40,8 @@ void FindDisplayAnimationVisitor::apply(vsg::BindDescriptorSet &bindDescriptorSe
     LOG_INFO("Found bindDescriptorSet for display");
 
     // Контейнеры с текстурами
-    vsg::ref_ptr<vsg::DescriptorImage> color_data_descriptor = nullptr;
-    vsg::ref_ptr<vsg::DescriptorImage> emissive_data_descriptor = nullptr;
+    vsg::ref_ptr<vsg::DescriptorImage> color_descriptor = nullptr;
+    vsg::ref_ptr<vsg::DescriptorImage> emissive_descriptor = nullptr;
     // Материал
     vsg::ref_ptr<vsg::PbrMaterialValue> material_data = nullptr;
 
@@ -52,12 +52,12 @@ void FindDisplayAnimationVisitor::apply(vsg::BindDescriptorSet &bindDescriptorSe
             if (descriptor_image->dstBinding == 0)
             {
                 // Нашли контейнер с текстурой базвого цвета
-                color_data_descriptor = descriptor_image;
+                color_descriptor = descriptor_image;
             }
             if (descriptor_image->dstBinding == 4)
             {
                 // Нашли контейнер с текстурой цвета эмиссии
-                emissive_data_descriptor = descriptor_image;
+                emissive_descriptor = descriptor_image;
             }
         }
         if (auto descriptor_buffer = descriptor.cast<vsg::DescriptorBuffer>())
@@ -73,119 +73,121 @@ void FindDisplayAnimationVisitor::apply(vsg::BindDescriptorSet &bindDescriptorSe
         }
     }
 
-    if (!(color_data_descriptor || emissive_data_descriptor) || !material_data)
+    if (!(color_descriptor || emissive_descriptor) || !material_data)
     {
-        if (!color_data_descriptor)
+        if (!color_descriptor)
             LOG_WARN("Not found base color descriptor for display");
-        if (!emissive_data_descriptor)
+        if (!emissive_descriptor)
             LOG_WARN("Not found emissive color descriptor for display");
         if (!material_data)
             LOG_WARN("Not found material for display");
         return;
     }
 
-    // Текстура
-    vsg::ref_ptr<vsg::Image> image_data = nullptr;
-    vsg::ref_ptr<vsg::ubvec4Array2D> pixels = nullptr;
-
-    bool is_color_image = false;
-    if (color_data_descriptor && (color_data_descriptor->imageInfoList.size() > 0))
+    // Текстура цвета
+    vsg::ref_ptr<vsg::Image> color_image = nullptr;
+    vsg::ref_ptr<vsg::ubvec4Array2D> color_pixels = nullptr;
+    if (color_descriptor && (color_descriptor->imageInfoList.size() > 0))
     {
-        if (auto image_info = color_data_descriptor->imageInfoList[0])
+        if (auto image_info = color_descriptor->imageInfoList[0])
         {
             if (auto image_view = image_info->imageView)
             {
                 if (auto image = image_view->image)
                 {
-                    is_color_image = true;
-                    image_data = image;
+                    color_image = image;
+                    color_pixels = image->data.cast<vsg::ubvec4Array2D>();
                 }
             }
         }
     }
 
-    bool is_emissive_image = false;
-    if (emissive_data_descriptor && (emissive_data_descriptor->imageInfoList.size() > 0))
+    // Текстура эмиссии
+    vsg::ref_ptr<vsg::Image> emissive_image = nullptr;
+    vsg::ref_ptr<vsg::ubvec4Array2D> emissive_pixels = nullptr;
+    if (emissive_descriptor && (emissive_descriptor->imageInfoList.size() > 0))
     {
-        if (auto image_info = emissive_data_descriptor->imageInfoList[0])
+        if (auto image_info = emissive_descriptor->imageInfoList[0])
         {
             if (auto image_view = image_info->imageView)
             {
                 if (auto image = image_view->image)
                 {
-                    is_emissive_image = true;
-                    if (image_data)
-                    {
-                        if (image_data != image)
-                        {
-                            LOG_WARN("Emissive texture is different from base color texture");
-                        }
-                    }
-                    else
-                    {
-                        image_data = image;
-                        LOG_WARN("Base color texture is not found. Using emissive texture");
-                    }
+                    emissive_image = image;
+                    emissive_pixels = image->data.cast<vsg::ubvec4Array2D>();
                 }
             }
         }
     }
 
-    pixels = image_data->data.cast<vsg::ubvec4Array2D>();
-
-    if (!image_data || !pixels)
+    if (!(color_image && color_pixels))
     {
-        if (!image_data)
-            LOG_WARN("Not found image for display");
-        if (!pixels)
-            LOG_WARN("Not found RGBA pixels for display");
+        LOG_WARN("Not found color image for display");
+        color_image = nullptr;
+    }
+    if (!(emissive_image && emissive_pixels))
+    {
+        LOG_WARN("Not found emissive image for display");
+        emissive_image = nullptr;
+    }
+    if (!(color_image || emissive_image))
+    {
         return;
     }
 
-    // Новая текстура
-    vsg::ref_ptr<vsg::Image> new_image_data = vsg::Image::create(*image_data);
-    new_image_data->data = vsg::ubvec4Array2D::create(*pixels);
-    new_image_data->data->properties.dataVariance = vsg::DYNAMIC_DATA;
+    // Создаём дубликаты для анимации
+    // Новая текстура цвета
+    vsg::ref_ptr<vsg::Image> new_color_image = nullptr;
+    if (color_image)
+    {
+        new_color_image = vsg::Image::create(*color_image);
+    }
+    // Новая текстура эмиссии
+    vsg::ref_ptr<vsg::Image> new_emissive_image = nullptr;
+    if (emissive_image)
+    {
+        new_emissive_image = vsg::Image::create(*emissive_image);
+    }
     // Новый материал
     vsg::ref_ptr<vsg::PbrMaterialValue> new_material_data = vsg::PbrMaterialValue::create(*material_data);
-    new_material_data->properties.dataVariance = vsg::DYNAMIC_DATA;
 
-    animation = ProcDisplayAnimation::create(new_image_data, new_material_data);
+    // Создаём анимацию
+    animation = ProcDisplayAnimation::create(new_color_image, new_emissive_image, new_material_data);
     if (animation)
     {
         std::scoped_lock<std::mutex> pdo_lock(pdo->mutex);
 
-        if (is_color_image)
+        if (new_color_image)
         {
-            vsg::ref_ptr<vsg::ImageView> new_color_data_image_view = vsg::ImageView::create(*(color_data_descriptor->imageInfoList[0]->imageView));
-            new_color_data_image_view->image = new_image_data;
+            vsg::ref_ptr<vsg::ImageView> new_color_image_view = vsg::ImageView::create(*(color_descriptor->imageInfoList[0]->imageView));
+            new_color_image_view->image = new_color_image;
 
             // ImageInfo has deleted copy constructor
-            vsg::ref_ptr<vsg::ImageInfo> new_color_data_image_info = vsg::ImageInfo::create(color_data_descriptor->imageInfoList[0]->sampler,
-                                                                                            new_color_data_image_view,
-                                                                                            color_data_descriptor->imageInfoList[0]->imageLayout);
+            vsg::ref_ptr<vsg::ImageInfo> new_color_image_info = vsg::ImageInfo::create(color_descriptor->imageInfoList[0]->sampler,
+                                                                                       new_color_image_view,
+                                                                                       color_descriptor->imageInfoList[0]->imageLayout);
 
-            vsg::ref_ptr<vsg::DescriptorImage> new_color_data_descriptor = vsg::DescriptorImage::create(*color_data_descriptor);
-            new_color_data_descriptor->imageInfoList[0] = new_color_data_image_info;
+            vsg::ref_ptr<vsg::DescriptorImage> new_color_descriptor = vsg::DescriptorImage::create(*color_descriptor);
+            new_color_descriptor->imageInfoList[0] = new_color_image_info;
 
-            pdo->tag(color_data_descriptor);
-            duplicate->insert(color_data_descriptor, new_color_data_descriptor);
+            pdo->tag(color_descriptor);
+            duplicate->insert(color_descriptor, new_color_descriptor);
         }
-        if (is_emissive_image)
+        if (new_emissive_image)
         {
-            vsg::ref_ptr<vsg::ImageView> new_emissive_data_image_view = vsg::ImageView::create(*(emissive_data_descriptor->imageInfoList[0]->imageView));
-            new_emissive_data_image_view->image = new_image_data;
+            vsg::ref_ptr<vsg::ImageView> new_emissive_image_view = vsg::ImageView::create(*(emissive_descriptor->imageInfoList[0]->imageView));
+            new_emissive_image_view->image = emissive_image;
 
             // ImageInfo has deleted copy constructor
-            vsg::ref_ptr<vsg::ImageInfo> new_emissive_data_image_info = vsg::ImageInfo::create(emissive_data_descriptor->imageInfoList[0]->sampler,
-                                                                                               new_emissive_data_image_view,
-                                                                                               emissive_data_descriptor->imageInfoList[0]->imageLayout);
+            vsg::ref_ptr<vsg::ImageInfo> new_emissive_image_info = vsg::ImageInfo::create(emissive_descriptor->imageInfoList[0]->sampler,
+                                                                                          new_emissive_image_view,
+                                                                                          emissive_descriptor->imageInfoList[0]->imageLayout);
 
-            vsg::ref_ptr<vsg::DescriptorImage> new_emissive_data_descriptor = vsg::DescriptorImage::create(*emissive_data_descriptor);
-            new_emissive_data_descriptor->imageInfoList[0] = new_emissive_data_image_info;
+            vsg::ref_ptr<vsg::DescriptorImage> new_emissive_descriptor = vsg::DescriptorImage::create(*emissive_descriptor);
+            new_emissive_descriptor->imageInfoList[0] = new_emissive_image_info;
 
-            pdo->tag(emissive_data_descriptor);
-            duplicate->insert(emissive_data_descriptor, new_emissive_data_descriptor);
+            pdo->tag(emissive_descriptor);
+            duplicate->insert(emissive_descriptor, new_emissive_descriptor);
         }
 
         pdo->tag(material_data);

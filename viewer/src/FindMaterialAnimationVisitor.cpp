@@ -46,7 +46,6 @@ void FindMaterialAnimationVisitor::apply(vsg::BindDescriptorSet& bindDescriptorS
                 {
                     // Нашли материал, создаём новый
                     auto new_pbr_material_value = vsg::PbrMaterialValue::create(*pbr_material_value);
-                    new_pbr_material_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
                     animation = ProcMaterialAnimation::create(new_pbr_material_value);
                     if (animation)
