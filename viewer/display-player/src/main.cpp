@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    app.setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
+
     MainWindow w(get_module_path(app.arguments()));
 
     w.show();

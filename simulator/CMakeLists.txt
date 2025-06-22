@@ -41,7 +41,7 @@ add_subdirectory (trajectory-ALSN)
 if (WIN32)
         set(SFML_STATIC_LIBRARIES TRUE)
 endif()
-find_package(SFML QUIET)
+find_package(SFML COMPONENTS System Window)
 # Если нашли добавляем плагин для управления с джойстика
 if (SFML_FOUND)
     add_subdirectory (freejoy)
