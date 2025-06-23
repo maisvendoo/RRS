@@ -693,6 +693,11 @@ void MapWidget::drawLineSignal(Signal *signal)
         return;
     }
 
+    if (signal->getSignalModel() == "empty_line")
+    {
+        return;
+    }
+
     Connector *conn = signal->getConnector();
 
     if (conn == Q_NULLPTR)
