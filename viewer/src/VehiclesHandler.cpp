@@ -670,10 +670,10 @@ void VehiclesHandler::updateDebugString()
         debug_message += QString("\n\n");
     }
 
-    const int control = vehicle_controlled.controlled_vehicle;
+    const std::size_t control = vehicle_controlled.controlled_vehicle;
     if (control >= 0
-        && static_cast<std::size_t>(control) < update_data[new_state].vehicles.size()
-        && static_cast<std::size_t>(control) < update_pos_data[new_data].vehicles.size())
+        && control < update_data[new_state].vehicles.size()
+        && control < update_pos_data[new_data].vehicles.size())
     {
         const int control_train = update_data[new_state].vehicles[control].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[control];
