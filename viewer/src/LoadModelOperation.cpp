@@ -81,7 +81,7 @@ void LoadModelOperation::run()
         return;
     }
 
-    auto loaded = vsg::read(model_filename_path, options);
+    vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_filename_path, options);
     auto node = loaded.cast<vsg::Node>();
     if (!node)
     {
@@ -98,7 +98,7 @@ void LoadModelOperation::run()
 
     LOG_INFO("Operation: loaded model from file: %s", model_filename_path.c_str());
 
-    vsg::ref_ptr<animations_t> ref_animations = vsg::ref_ptr<animations_t>(animations);
+    auto ref_animations = vsg::ref_ptr<animations_t>(animations);
     std::size_t old_size = ref_animations->animations.size();
     {
         // Model's animations
