@@ -211,6 +211,10 @@ void RouteViewer::initVsgOptions()
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
     bool culling = false;
     options->setValue("culling", culling);
+
+    // Отключение нативного загрузчика .gltf в VSG, чтобы использовать assimp
+    //bool disable_vsg_loader_gltf = true;
+    //options->setValue("disable_gltf", disable_vsg_loader_gltf);
 }
 
 //------------------------------------------------------------------------------
