@@ -54,15 +54,19 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
     CfgReader cfg;
     if (cfg.load(tmp_qstr))
     {
-        QString sec_name = "Models";
+        const QString sec_name = "Models";
 
         tmp_qstr = "";
         if (cfg.getString(sec_name, "SignalModelsDir", tmp_qstr))
+        {
             models_dir = tmp_qstr.toStdString();
+        }
 
         tmp_qstr = "";
         if (cfg.getString(sec_name, "SignalAnimationsDir", tmp_qstr))
+        {
             animations_dir = tmp_qstr.toStdString();
+        }
     }
 
     std::string models_dir_path = fs.getDataDir();
@@ -71,6 +75,8 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
 
     LOG_INFO("Signals directory: %s ", models_dir_path.c_str());
     LOG_INFO("Start adding signal models");
+
+    traffic_light_nodes->children.reserve(traffic_lights_fwd.size() + traffic_lights_bwd.size());
 
     for (auto* traffic_light : traffic_lights_fwd)
     {
