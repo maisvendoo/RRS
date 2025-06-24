@@ -128,8 +128,8 @@ void VehiclesHandler::step(double t, double dt)
         return;
     }
 
-    double client_time = ref_time + time_difference;
-    bool is_update = (client_time >= update_pos_data[cur_data].time);
+    const double client_time = ref_time + time_difference;
+    const bool is_update = (client_time >= update_pos_data[cur_data].time);
 
     // Swap indexes of positions info array
     while (is_update)
@@ -159,7 +159,7 @@ void VehiclesHandler::step(double t, double dt)
     }
 
     // Save state update flag for this frame update
-    bool update_state = is_new_state;
+    const bool update_state = is_new_state;
     if (update_state)
     {
         // Swap indexes of states info array
@@ -170,9 +170,9 @@ void VehiclesHandler::step(double t, double dt)
     }
 
     // Interframe coordinate
-    double upd_dt = update_pos_data[cur_data].time - update_pos_data[old_data].time;
-    double r = (client_time - update_pos_data[old_data].time) / upd_dt;
-    double k = (1.0 - r);
+    const double upd_dt = update_pos_data[cur_data].time - update_pos_data[old_data].time;
+    const double r = (client_time - update_pos_data[old_data].time) / upd_dt;
+    const double k = (1.0 - r);
 
     for (std::size_t i = 0; i < vehicles.size(); ++i)
     {
@@ -232,14 +232,14 @@ void VehiclesHandler::step(double t, double dt)
             // Sounds update
             for (auto sound_id : vehicles[i].sounds_id)
             {
-                vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
-                                vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
-                                vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
-                                vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
+                const vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
+                                      vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
+                                      vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
+                                      vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
                 sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
                 sound_manager->setVelocity(sound_id, vehicles[i].velocity.x, vehicles[i].velocity.y, vehicles[i].velocity.z);
 
-                std::size_t signal_id = sound_manager->getSignalID(sound_id);
+                const std::size_t signal_id = sound_manager->getSignalID(sound_id);
                 if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
                 {
                     sound_manager->setSoundSignal(sound_id, update_data[new_state].vehicles[i].analogSignal[signal_id]);
@@ -254,10 +254,10 @@ void VehiclesHandler::step(double t, double dt)
         {
             for (auto sound_id : vehicles[i].sounds_id)
             {
-                vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
-                                vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
-                                vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
-                                vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
+                const vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
+                                      vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
+                                      vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
+                                      vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
                 sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
             }
         }
@@ -399,6 +399,9 @@ bool VehiclesHandler::load(
     const std::size_t vehicle_count = vehicles_info.vehicles.size();
     LOG_INFO("Got info about %u vehicles from server", vehicle_count);
 
+    vehicles.reserve(vehicle_count);
+    vehicles_node->children.reserve(vehicle_count);
+
     for (std::size_t i = 0; i < vehicle_count; ++i)
     {
         const std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
@@ -419,8 +422,9 @@ bool VehiclesHandler::load(
                      i + 1, vehicle_count, cfg_dir.c_str(), cfg_file.c_str());
         }
 
-        vehicles.push_back(vehicle_exterior);
-        vehicles_node->addChild(vehicle_exterior.transform);
+        auto vehicle_exterior_transform = vehicle_exterior.transform;
+        vehicles.emplace_back(std::move(vehicle_exterior));
+        vehicles_node->addChild(vehicle_exterior_transform);
     }
 
     return true;
@@ -666,10 +670,10 @@ void VehiclesHandler::updateDebugString()
         debug_message += QString("\n\n");
     }
 
-    const int control = vehicle_controlled.controlled_vehicle;
+    const std::size_t control = vehicle_controlled.controlled_vehicle;
     if (control >= 0
-        && static_cast<std::size_t>(control) < update_data[new_state].vehicles.size()
-        && static_cast<std::size_t>(control) < update_pos_data[new_data].vehicles.size())
+        && control < update_data[new_state].vehicles.size()
+        && control < update_pos_data[new_data].vehicles.size())
     {
         const int control_train = update_data[new_state].vehicles[control].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[control];

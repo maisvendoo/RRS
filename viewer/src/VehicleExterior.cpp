@@ -40,8 +40,8 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 {
     // Open vehicle config file
     FileSystem& fs = FileSystem::getInstance();
-    std::string relative_config_path = cfg_dir + fs.separator() + cfg_file + ".xml";
-    std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
+    const std::string relative_config_path = cfg_dir + fs.separator() + cfg_file + ".xml";
+    const std::string cfg_path = fs.combinePath(fs.getVehiclesDir(), relative_config_path);
 
     CfgReader cfg;
     if (!cfg.load(cfg_path.c_str()))
@@ -50,7 +50,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         return false;
     }
 
-    QString sec_name = "Vehicle";
+    const QString sec_name = "Vehicle";
 
     // Reading data about body's 3D-model
     QString modelName = "";
@@ -75,22 +75,24 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         ss >> shift.x >> shift.y >> shift.z;
     }
 
-    vsg::ref_ptr<vsg::MatrixTransform> vehicle_node = vsg::MatrixTransform::create();
+    auto vehicle_node = vsg::MatrixTransform::create();
     vehicle_node->matrix = vsg::translate(shift);
     vehicle_node->setValue("name", "vehicle");
     transform->addChild(vehicle_node);
 
     std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
-    std::string animations_dir = animationsDir.toStdString();
-    std::string sounds_dir = soundsDir.toStdString();
+    const std::string animations_dir = animationsDir.toStdString();
+    const std::string sounds_dir = soundsDir.toStdString();
 
     // Load model
-    options->operationThreads->add(LoadModelOperation::create(viewer,
-                                                              vehicle_node,
-                                                              model_filename_path,
-                                                              animations_dir,
-                                                              options,
-                                                              animations));
+    options->operationThreads->add(LoadModelOperation::create(
+        viewer,
+        vehicle_node,
+        model_filename_path,
+        animations_dir,
+        options,
+        animations
+    ));
 
     // Reading data about cabine's 3D-model
     modelName = "";
@@ -106,7 +108,8 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
                 std::istringstream ss(modelShift.toStdString());
                 ss >> shift.x >> shift.y >> shift.z;
             }
-            vsg::ref_ptr<vsg::MatrixTransform> cabine_node = vsg::MatrixTransform::create();
+
+            auto cabine_node = vsg::MatrixTransform::create();
             cabine_node->matrix = vsg::translate(shift);
             cabine_node->setValue("name", "cabine");
             transform->addChild(cabine_node);
