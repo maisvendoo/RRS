@@ -256,11 +256,11 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     {
         display->init();
     }
-    LOG_INFO("Initialized display module with config: %s", cfgdir_path.c_str());
+    LOG_INFO("Initialized display module with config's directory: %s", cfgdir_path.c_str());
 
     // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
     qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);
-    qimage.fill(Qt::blue);
+    qimage.fill(Qt::black);
     if (QThread::currentThread() != qApp->thread())
     {
         QMetaObject::invokeMethod(qApp, [&]() {

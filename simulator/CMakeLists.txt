@@ -37,13 +37,8 @@ add_subdirectory (trajectory-speedmap)
 add_subdirectory (connector-ALSN)
 add_subdirectory (trajectory-ALSN)
 
-# Ищем SFML
-if (WIN32)
-        set(SFML_STATIC_LIBRARIES TRUE)
-endif()
-find_package(SFML COMPONENTS System Window QUIET)
-# Если нашли добавляем плагин для управления с джойстика
-if (SFML_FOUND)
+# Подключаем только в релиз, чтобы не собирать отладочные библиотеки движка SFML
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_subdirectory (freejoy)
 endif()
 

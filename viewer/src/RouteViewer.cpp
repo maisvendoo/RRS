@@ -211,6 +211,10 @@ void RouteViewer::initVsgOptions()
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
     bool culling = false;
     options->setValue("culling", culling);
+
+    // Отключение нативного загрузчика .gltf в VSG, чтобы использовать assimp
+    //bool disable_vsg_loader_gltf = true;
+    //options->setValue("disable_gltf", disable_vsg_loader_gltf);
 }
 
 //------------------------------------------------------------------------------
@@ -363,12 +367,12 @@ void RouteViewer::initLights()
     load_custom_shader("standard_phong.frag", "Phong", phong_shader);
 
     // Можем по своему настроить стадии графического конвейера
-    vsg::ref_ptr<vsg::VertexInputState> vertexInputState = vsg::VertexInputState::create();
-    vsg::ref_ptr<vsg::InputAssemblyState> inputAssemblyState = vsg::InputAssemblyState::create();
-    vsg::ref_ptr<vsg::RasterizationState> rasterizationState = vsg::RasterizationState::create();
-    vsg::ref_ptr<vsg::ColorBlendState> colorBlendState = vsg::ColorBlendState::create();
-    vsg::ref_ptr<vsg::DepthStencilState> depthStencilState = vsg::DepthStencilState::create();
-    vsg::ref_ptr<vsg::MultisampleState> multisampleState = vsg::MultisampleState::create();
+    auto vertexInputState = vsg::VertexInputState::create();
+    auto inputAssemblyState = vsg::InputAssemblyState::create();
+    auto rasterizationState = vsg::RasterizationState::create();
+    auto colorBlendState = vsg::ColorBlendState::create();
+    auto depthStencilState = vsg::DepthStencilState::create();
+    auto multisampleState = vsg::MultisampleState::create();
 
     // Рисуем текстуры на обеих сторонах
     rasterizationState->cullMode = VK_CULL_MODE_NONE;
@@ -392,13 +396,14 @@ void RouteViewer::initLights()
         }
     };
 
-    vsg::GraphicsPipelineStates defaultGraphicsPipelineStates =
-    {   vertexInputState,
+    vsg::GraphicsPipelineStates defaultGraphicsPipelineStates = {
+        vertexInputState,
         inputAssemblyState,
         rasterizationState,
         colorBlendState,
         depthStencilState,
-        multisampleState };
+        multisampleState
+    };
 
     flat_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
     pbr_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
@@ -532,13 +537,11 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(upd_soundmanager_handler);
     viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
-    // auto printEvents = vsg::PrintEvents::create(vsg::clock::now());
-    // viewer->addEventHandler(printEvents);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
     viewer->compile();
 
-    options->operationThreads = vsg::OperationThreads::create(4, viewer->status); // ???
+    options->operationThreads = vsg::OperationThreads::create(4, viewer->status);
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler;
