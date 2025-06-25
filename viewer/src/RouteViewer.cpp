@@ -106,7 +106,9 @@ int RouteViewer::run()
         viewer->update();
 
         if (screenshot_writer->isScreeenshot())
+        {
             screenshot_writer->doScreeenshot(window, options);
+        }
 
         viewer->recordAndSubmit();
         viewer->present();
@@ -258,8 +260,6 @@ void RouteViewer::initWindowTraits()
         windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
     }
 
-
-
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // vsg и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE; // и выставляет это свойство в true
     auto deviceFeatures = windowTraits->deviceFeatures;
@@ -338,10 +338,10 @@ void RouteViewer::initLights()
 
     // Загружаем свои варианты фрагментного шейдера вместо встроенного
     FileSystem& fs = FileSystem::getInstance();
-    std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+    const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
     auto load_custom_shader = [&](const char* shader_filename, const char* shader_name, vsg::ref_ptr<vsg::ShaderSet> shader_set) {
-        std::string shader_path = shaders_dir_path + fs.separator() + shader_filename;
+        const std::string shader_path = shaders_dir_path + fs.separator() + shader_filename;
         vsg::ref_ptr<vsg::ShaderStage> shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", shader_path, options);
         if (shader_stage)
         {
@@ -515,6 +515,7 @@ void RouteViewer::initViewer()
         upd_server_control,
         camera,
         shadow_region,
+        sun,
         screenshot_writer,
         traffic_lights_handler,
         vehicles_handler,

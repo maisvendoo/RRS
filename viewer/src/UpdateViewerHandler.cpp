@@ -8,6 +8,7 @@
 #include "TrafficLightsHandler.h"
 #include "VehiclesHandler.h"
 
+#include <vsg/lighting/DirectionalLight.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
@@ -20,6 +21,7 @@
 UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
                                          vsg::ref_ptr<vsg::Camera> camera,
                                          vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
+                                         vsg::ref_ptr<vsg::DirectionalLight> sun,
                                          ScreenshotWriter *screenshot_writer,
                                          TrafficLightsHandler *sig_handler,
                                          VehiclesHandler *veh_handler,
@@ -30,6 +32,7 @@ UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandl
     , _upd_server_control(upd_server_control)
     , _camera(camera)
     , _shadow_region(shadow_region)
+    , _sun(sun)
     , _screenshot_writer(screenshot_writer)
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
@@ -59,6 +62,10 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
         _vehicles_handler->step(t, dt);
 
         _current_manipulator->frameEvent(dt);
+
+        // _sun->direction = {1, 0, 0}; Светит слева направо
+        // _sun->direction = {0, 1, 0}; Светит сзади вперед
+        // _sun->direction = {0, 0, -1}; Светит сверху вниз
 
         updateShadowRegion();
     }
