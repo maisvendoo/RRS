@@ -14,6 +14,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
+#include "UpdateControlToServerHandler.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>

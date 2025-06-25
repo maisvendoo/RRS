@@ -1,35 +1,66 @@
+#pragma once
 #ifndef UPDATE_VIEWER_HANDLER_H
 #define UPDATE_VIEWER_HANDLER_H
 
-#include "settings.h"
-#include "CameraAbstract.h"
-#include "UpdateControlToServerHandler.h"
+#include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/core/Visitor.h>
+#include <vsg/maths/vec2.h>
 
-#include <vsg/lighting/DirectionalLight.h>
-#include <vsg/nodes/RegionOfInterest.h>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <utility>
 
-class CameraFreeManipulator;
-class CameraVehicleManipulator;
+class CameraAbstract;
 class CameraCabineManipulator;
 class CameraFollowManipulator;
+class CameraFreeManipulator;
+class CameraVehicleManipulator;
 class ScreenshotWriter;
+struct settings_t;
 class TrafficLightsHandler;
+class UpdateControlToServerHandler;
 class VehiclesHandler;
+
+namespace vsg
+{
+    class ButtonPressEvent;
+    class ButtonReleaseEvent;
+    class Camera;
+    class DirectionalLight;
+    class FocusInEvent;
+    class FocusOutEvent;
+    class FrameEvent;
+    class Keyboard;
+    class KeyPressEvent;
+    class KeyReleaseEvent;
+    class MoveEvent;
+    class PointerEvent;
+    class RegionOfInterest;
+    class ScrollWheelEvent;
+    class TouchDownEvent;
+    class TouchEvent;
+    class TouchMoveEvent;
+    class TouchUpEvent;
+}
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class UpdateViewerHandler : public vsg::Inherit<vsg::Visitor, UpdateViewerHandler>
+class UpdateViewerHandler final : public vsg::Inherit<vsg::Visitor, UpdateViewerHandler>
 {
 public:
-    explicit UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
-                                 vsg::ref_ptr<vsg::Camera> camera,
-                                 vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
-                                 vsg::ref_ptr<vsg::DirectionalLight> sun,
-                                 ScreenshotWriter *screenshot_writer,
-                                 TrafficLightsHandler *sig_handler,
-                                 VehiclesHandler *veh_handler,
-                                 settings_t &settings);
+    UpdateViewerHandler(
+        vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
+        vsg::ref_ptr<vsg::Camera> camera,
+        vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
+        vsg::ref_ptr<vsg::DirectionalLight> sun,
+        ScreenshotWriter* screenshot_writer,
+        TrafficLightsHandler* sig_handler,
+        VehiclesHandler* veh_handler,
+        settings_t& settings
+    );
 
     void apply(vsg::FrameEvent& frame) override;
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -45,17 +76,16 @@ public:
     void apply(vsg::TouchMoveEvent& touchMove) override;
 
 private:
+    /// compute non-dimensional window coordinate (-1, 1) from event coords
+    vsg::dvec2 ndc(const vsg::PointerEvent& event) const;
 
-    /// compute non dimensional window coordinate (-1,1) from event coords
-    vsg::dvec2 ndc(const vsg::PointerEvent& event);
-
-    std::pair<int32_t, int32_t> cameraRenderAreaCoordinates(const vsg::PointerEvent& pointerEvent) const;
+    std::pair<std::int32_t, std::int32_t> cameraRenderAreaCoordinates(const vsg::PointerEvent& pointerEvent) const;
 
     bool withinRenderArea(const vsg::PointerEvent& pointerEvent) const;
 
-    bool isAlt();
-    bool isCtrl();
-    bool isShift();
+    bool isAlt() const;
+    bool isCtrl() const;
+    bool isShift() const;
 
     void changeCurrentVehicle();
 
@@ -72,19 +102,20 @@ private:
     bool _hasPointerFocus = false;
     bool _lastPointerEventWithinRenderArea = false;
     double _previousTime = 0.0;
-    vsg::ref_ptr<vsg::PointerEvent> _previousPointerEvent;
-    std::map<uint32_t, vsg::ref_ptr<vsg::TouchEvent>> _previousTouches;
+    vsg::ref_ptr<vsg::PointerEvent> _previousPointerEvent = nullptr;
+    std::map<std::uint32_t, vsg::ref_ptr<vsg::TouchEvent>> _previousTouches;
     double _prevZoomTouchDistance = 0.0;
 
-    CameraAbstract *_current_manipulator = nullptr;
+    std::shared_ptr<CameraAbstract> _current_manipulator = nullptr;
 
-    CameraFreeManipulator *_free_manipulator = nullptr;
-    CameraVehicleManipulator *_vehicle_manipulator = nullptr;
-    CameraCabineManipulator *_cabine_manipulator = nullptr;
-    CameraFollowManipulator *_follow_manipulator = nullptr;
-    ScreenshotWriter *_screenshot_writer = nullptr;
-    TrafficLightsHandler *_sig_handler = nullptr;
-    VehiclesHandler *_vehicles_handler = nullptr;
+    std::shared_ptr<CameraFreeManipulator> _free_manipulator = nullptr;
+    std::shared_ptr<CameraVehicleManipulator> _vehicle_manipulator = nullptr;
+    std::shared_ptr<CameraCabineManipulator> _cabine_manipulator = nullptr;
+    std::shared_ptr<CameraFollowManipulator> _follow_manipulator = nullptr;
+
+    ScreenshotWriter* _screenshot_writer = nullptr;
+    TrafficLightsHandler* _sig_handler = nullptr;
+    VehiclesHandler* _vehicles_handler = nullptr;
 };
 
 #endif // UPDATE_VIEWER_HANDLER_H

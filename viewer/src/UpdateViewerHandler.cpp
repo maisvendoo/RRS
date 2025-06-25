@@ -1,5 +1,7 @@
 #include "UpdateViewerHandler.h"
 
+#include "UpdateControlToServerHandler.h"
+
 #include "CameraCabineManipulator.h"
 #include "CameraFollowManipulator.h"
 #include "CameraFreeManipulator.h"
@@ -12,20 +14,22 @@
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
-
+#include <vsg/nodes/RegionOfInterest.h>
 
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
-                                         vsg::ref_ptr<vsg::Camera> camera,
-                                         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
-                                         vsg::ref_ptr<vsg::DirectionalLight> sun,
-                                         ScreenshotWriter *screenshot_writer,
-                                         TrafficLightsHandler *sig_handler,
-                                         VehiclesHandler *veh_handler,
-                                         settings_t &settings)
+UpdateViewerHandler::UpdateViewerHandler(
+    vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
+    vsg::ref_ptr<vsg::Camera> camera,
+    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
+    vsg::ref_ptr<vsg::DirectionalLight> sun,
+    ScreenshotWriter *screenshot_writer,
+    TrafficLightsHandler *sig_handler,
+    VehiclesHandler *veh_handler,
+    settings_t &settings
+)
     : Inherit()
     , _settings(settings)
     , _keyboard(vsg::Keyboard::create())
@@ -37,10 +41,10 @@ UpdateViewerHandler::UpdateViewerHandler(vsg::ref_ptr<UpdateControlToServerHandl
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
 {
-    _free_manipulator = new CameraFreeManipulator(_keyboard, _camera, _settings);
-    _vehicle_manipulator = new CameraVehicleManipulator(_keyboard, _camera, _settings);
-    _cabine_manipulator = new CameraCabineManipulator(_keyboard, _camera, _settings);
-    _follow_manipulator = new CameraFollowManipulator(_keyboard, _camera, _settings);
+    _free_manipulator = std::make_shared<CameraFreeManipulator>(_keyboard, _camera, _settings);
+    _vehicle_manipulator = std::make_shared<CameraVehicleManipulator>(_keyboard, _camera, _settings);
+    _cabine_manipulator = std::make_shared<CameraCabineManipulator>(_keyboard, _camera, _settings);
+    _follow_manipulator = std::make_shared<CameraFollowManipulator>(_keyboard, _camera, _settings);
 
     _current_manipulator = _free_manipulator;
     _current_manipulator->resetView();
@@ -480,7 +484,7 @@ void UpdateViewerHandler::apply(vsg::TouchMoveEvent& touchMove)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::dvec2 UpdateViewerHandler::ndc(const vsg::PointerEvent& event)
+vsg::dvec2 UpdateViewerHandler::ndc(const vsg::PointerEvent& event) const
 {
     auto renderArea = _camera->getRenderArea();
     auto [x, y] = cameraRenderAreaCoordinates(event);
@@ -515,7 +519,7 @@ bool UpdateViewerHandler::withinRenderArea(const vsg::PointerEvent& pointerEvent
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool UpdateViewerHandler::isAlt()
+bool UpdateViewerHandler::isAlt() const
 {
     return (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R));
 }
@@ -523,7 +527,7 @@ bool UpdateViewerHandler::isAlt()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool UpdateViewerHandler::isCtrl()
+bool UpdateViewerHandler::isCtrl() const
 {
     return (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R));
 }
@@ -531,7 +535,7 @@ bool UpdateViewerHandler::isCtrl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool UpdateViewerHandler::isShift()
+bool UpdateViewerHandler::isShift() const
 {
     return (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R));
 }
