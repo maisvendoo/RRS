@@ -629,7 +629,6 @@ bool RouteViewer::loadRoute()
         pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
-        auto transforms = vsg::MatrixTransform::create();
         for (auto it = range.first; it != range.second; ++it)
         {
             auto& transform = it->second;
@@ -646,13 +645,13 @@ bool RouteViewer::loadRoute()
 
             matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
             matrix->addChild(pagedLOD);
-            transforms->addChild(matrix);
+            root->addChild(matrix);
         }
-
-        root->addChild(transforms);
 
         current = range.second;
     }
+
+    root->children.shrink_to_fit();
 
     route.object_ref.clear();
     route.transforms.clear();
