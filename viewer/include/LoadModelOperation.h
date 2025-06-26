@@ -2,29 +2,35 @@
 #ifndef LOAD_MODEL_OPERATION_H
 #define LOAD_MODEL_OPERATION_H
 
-#include "animations-list.h"
-
 #include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/io/Options.h>
-#include <vsg/nodes/Group.h>
-#include <vsg/nodes/Node.h>
 #include <vsg/threading/OperationQueue.h>
 
 #include <string>
+
+struct animations_t;
+
+namespace vsg
+{
+    class Group;
+    class Node;
+    class Options;
+}
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct MergeToScene final : public vsg::Inherit<vsg::Operation, MergeToScene>
 {
-    MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer,
-                 vsg::ref_ptr<vsg::Group> in_attachment_point,
-                 vsg::ref_ptr<vsg::Node> in_node,
-                 const vsg::CompileResult& in_compileResult) noexcept;
+    MergeToScene(
+        vsg::observer_ptr<vsg::Viewer> in_viewer,
+        vsg::ref_ptr<vsg::Group> in_attachment_point,
+        vsg::ref_ptr<vsg::Node> in_node,
+        const vsg::CompileResult& in_compileResult
+    ) noexcept;
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<vsg::Group> attachment_point;
