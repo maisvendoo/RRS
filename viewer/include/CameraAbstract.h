@@ -25,6 +25,8 @@ public:
     {
     }
 
+    virtual ~CameraAbstract() noexcept = default;
+
     virtual void resetView() = 0;
     virtual void returnView() = 0;
 

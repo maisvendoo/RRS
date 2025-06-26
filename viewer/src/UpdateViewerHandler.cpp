@@ -25,10 +25,10 @@ UpdateViewerHandler::UpdateViewerHandler(
     vsg::ref_ptr<vsg::Camera> camera,
     vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
     vsg::ref_ptr<vsg::DirectionalLight> sun,
-    ScreenshotWriter *screenshot_writer,
-    TrafficLightsHandler *sig_handler,
-    VehiclesHandler *veh_handler,
-    settings_t &settings
+    ScreenshotWriter* screenshot_writer,
+    TrafficLightsHandler* sig_handler,
+    VehiclesHandler* veh_handler,
+    settings_t& settings
 )
     : Inherit()
     , _settings(settings)
@@ -41,13 +41,24 @@ UpdateViewerHandler::UpdateViewerHandler(
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
 {
-    _free_manipulator = std::make_shared<CameraFreeManipulator>(_keyboard, _camera, _settings);
-    _vehicle_manipulator = std::make_shared<CameraVehicleManipulator>(_keyboard, _camera, _settings);
-    _cabine_manipulator = std::make_shared<CameraCabineManipulator>(_keyboard, _camera, _settings);
-    _follow_manipulator = std::make_shared<CameraFollowManipulator>(_keyboard, _camera, _settings);
+    _free_manipulator = new CameraFreeManipulator(_keyboard, _camera, _settings);
+    _vehicle_manipulator = new CameraVehicleManipulator(_keyboard, _camera, _settings);
+    _cabine_manipulator = new CameraCabineManipulator(_keyboard, _camera, _settings);
+    _follow_manipulator = new CameraFollowManipulator(_keyboard, _camera, _settings);
 
     _current_manipulator = _free_manipulator;
     _current_manipulator->resetView();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+UpdateViewerHandler::~UpdateViewerHandler() noexcept
+{
+    delete _follow_manipulator;
+    delete _cabine_manipulator;
+    delete _vehicle_manipulator;
+    delete _free_manipulator;
 }
 
 //------------------------------------------------------------------------------
@@ -57,8 +68,8 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
     if (frame.frameStamp->frameCount)
     {
-        double t = frame.frameStamp->simulationTime;
-        double dt = t - _previousTime;
+        const double t = frame.frameStamp->simulationTime;
+        const double dt = t - _previousTime;
         _previousTime = t;
 
         _sig_handler->step(static_cast<float>(t), static_cast<float>(dt));
@@ -352,8 +363,8 @@ void UpdateViewerHandler::apply(vsg::MoveEvent& moveEvent)
 
     if (_previousPointerEvent)
     {
-        vsg::dvec2 new_ndc = ndc(moveEvent);
-        vsg::dvec2 prev_ndc = ndc(*_previousPointerEvent);
+        const vsg::dvec2 new_ndc = ndc(moveEvent);
+        const vsg::dvec2 prev_ndc = ndc(*_previousPointerEvent);
         _current_manipulator->mouseMoveEvent(moveEvent.mask, (new_ndc - prev_ndc));
     }
 
@@ -387,15 +398,16 @@ void UpdateViewerHandler::apply(vsg::TouchDownEvent& touchDown)
     case 0: {
         if (_previousTouches.size() == 1)
         {
-            vsg::ref_ptr<vsg::Window> w = touchDown.window;
-            vsg::ref_ptr<vsg::ButtonPressEvent> evt = vsg::ButtonPressEvent::create(
-                w,
+            const vsg::ref_ptr<vsg::Window> window = touchDown.window;
+            const vsg::ref_ptr<vsg::ButtonPressEvent> event = vsg::ButtonPressEvent::create(
+                window,
                 touchDown.time,
                 touchDown.x,
                 touchDown.y,
                 _current_manipulator->getTouchToButtonMask(),
-                touchDown.id);
-            apply(*evt.get());
+                touchDown.id
+            );
+            apply(*event);
         }
         return;
     }
@@ -404,10 +416,12 @@ void UpdateViewerHandler::apply(vsg::TouchDownEvent& touchDown)
         if (touchDown.id == 0 && _previousTouches.count(1))
         {
             const auto& prevTouch1 = _previousTouches[1];
-            auto a = std::abs(static_cast<double>(prevTouch1->x) - touchDown.x);
-            auto b = std::abs(static_cast<double>(prevTouch1->y) - touchDown.y);
-            if (a > 0 || b > 0)
-                _prevZoomTouchDistance = sqrt(a * a + b * b);
+            const double x = std::abs(static_cast<double>(prevTouch1->x) - touchDown.x);
+            const double y = std::abs(static_cast<double>(prevTouch1->y) - touchDown.y);
+            if (x > 0 || y > 0)
+            {
+                _prevZoomTouchDistance = std::sqrt(x * x + y * y);
+            }
         }
         return;
     }
@@ -422,15 +436,16 @@ void UpdateViewerHandler::apply(vsg::TouchUpEvent& touchUp)
 {
     if (touchUp.id == 0 && _previousTouches.size() == 1)
     {
-        vsg::ref_ptr<vsg::Window> w = touchUp.window;
-        vsg::ref_ptr<vsg::ButtonReleaseEvent> evt = vsg::ButtonReleaseEvent::create(
-            w,
+        const vsg::ref_ptr<vsg::Window> window = touchUp.window;
+        const vsg::ref_ptr<vsg::ButtonReleaseEvent> event = vsg::ButtonReleaseEvent::create(
+            window,
             touchUp.time,
             touchUp.x,
             touchUp.y,
             _current_manipulator->getTouchToButtonMask(),
-            touchUp.id);
-        apply(*evt.get());
+            touchUp.id
+        );
+        apply(*event);
     }
     _previousTouches.erase(touchUp.id);
 }
@@ -440,18 +455,19 @@ void UpdateViewerHandler::apply(vsg::TouchUpEvent& touchUp)
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::apply(vsg::TouchMoveEvent& touchMove)
 {
-    vsg::ref_ptr<vsg::Window> w = touchMove.window;
+    vsg::ref_ptr<vsg::Window> window = touchMove.window;
     switch (_previousTouches.size())
     {
     case 1: {
         // Rotate
-        vsg::ref_ptr<vsg::MoveEvent> evt = vsg::MoveEvent::create(
-            w,
+        const vsg::ref_ptr<vsg::MoveEvent> event = vsg::MoveEvent::create(
+            window,
             touchMove.time,
             touchMove.x,
             touchMove.y,
-            _current_manipulator->getTouchToButtonMask());
-        apply(*evt.get());
+            _current_manipulator->getTouchToButtonMask()
+        );
+        apply(*event);
         break;
     }
     case 2: {
@@ -459,16 +475,18 @@ void UpdateViewerHandler::apply(vsg::TouchMoveEvent& touchMove)
         {
             // Zoom
             const auto& prevTouch1 = _previousTouches[1];
-            auto a = std::abs(static_cast<double>(prevTouch1->x) - touchMove.x);
-            auto b = std::abs(static_cast<double>(prevTouch1->y) - touchMove.y);
-            if (a > 0 || b > 0)
+            const double x = std::abs(static_cast<double>(prevTouch1->x) - touchMove.x);
+            const double y = std::abs(static_cast<double>(prevTouch1->y) - touchMove.y);
+            if (x > 0 || y > 0)
             {
-                auto touchZoomDistance = sqrt(a * a + b * b);
+                const double touchZoomDistance = std::sqrt(x * x + y * y);
                 if (_prevZoomTouchDistance && touchZoomDistance > 0)
                 {
-                    auto zoomLevel = touchZoomDistance / _prevZoomTouchDistance;
-                    if (zoomLevel < 1)
-                        zoomLevel = -(1 / zoomLevel);
+                    double zoomLevel = touchZoomDistance / _prevZoomTouchDistance;
+                    if (zoomLevel < 1.0)
+                    {
+                        zoomLevel = -(1.0 / zoomLevel);
+                    }
                     zoomLevel *= 0.1;
                     _current_manipulator->touchZoomEvent(zoomLevel);
                 }

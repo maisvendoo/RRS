@@ -9,14 +9,9 @@
 
 #include <cstdint>
 #include <map>
-#include <memory>
 #include <utility>
 
 class CameraAbstract;
-class CameraCabineManipulator;
-class CameraFollowManipulator;
-class CameraFreeManipulator;
-class CameraVehicleManipulator;
 class ScreenshotWriter;
 struct settings_t;
 class TrafficLightsHandler;
@@ -62,6 +57,8 @@ public:
         settings_t& settings
     );
 
+    ~UpdateViewerHandler() noexcept;
+
     void apply(vsg::FrameEvent& frame) override;
     void apply(vsg::KeyPressEvent& keyPress) override;
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
@@ -106,12 +103,12 @@ private:
     std::map<std::uint32_t, vsg::ref_ptr<vsg::TouchEvent>> _previousTouches;
     double _prevZoomTouchDistance = 0.0;
 
-    std::shared_ptr<CameraAbstract> _current_manipulator = nullptr;
+    CameraAbstract* _current_manipulator = nullptr;
 
-    std::shared_ptr<CameraFreeManipulator> _free_manipulator = nullptr;
-    std::shared_ptr<CameraVehicleManipulator> _vehicle_manipulator = nullptr;
-    std::shared_ptr<CameraCabineManipulator> _cabine_manipulator = nullptr;
-    std::shared_ptr<CameraFollowManipulator> _follow_manipulator = nullptr;
+    CameraAbstract* _free_manipulator = nullptr;
+    CameraAbstract* _vehicle_manipulator = nullptr;
+    CameraAbstract* _cabine_manipulator = nullptr;
+    CameraAbstract* _follow_manipulator = nullptr;
 
     ScreenshotWriter* _screenshot_writer = nullptr;
     TrafficLightsHandler* _sig_handler = nullptr;
