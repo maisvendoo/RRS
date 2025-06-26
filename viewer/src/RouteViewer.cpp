@@ -24,6 +24,7 @@
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/PagedLOD.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/GraphicsPipeline.h>
@@ -624,6 +625,7 @@ bool RouteViewer::loadRoute()
 
         auto pagedLOD = vsg::PagedLOD::create();
         pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
+        pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
         pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
