@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SCREENSHOT_WRITER_H
 #define SCREENSHOT_WRITER_H
 
@@ -6,10 +7,9 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ScreenshotWriter
+class ScreenshotWriter final
 {
 public:
-
     ScreenshotWriter(std::string filename);
     ~ScreenshotWriter() = default;
 
@@ -18,7 +18,6 @@ public:
     void doScreeenshot(vsg::ref_ptr<vsg::Window> window, vsg::ref_ptr<vsg::Options> options);
 
 private:
-
     bool _is_screenshot = false;
 
     std::string _filename = "";

@@ -1,5 +1,8 @@
 #include "CameraCabineManipulator.h"
 
+#include "settings.h"
+#include "VehicleExterior.h"
+
 CameraCabineManipulator::CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
                                                  vsg::ref_ptr<vsg::Camera> camera,
                                                  settings_t &settings)

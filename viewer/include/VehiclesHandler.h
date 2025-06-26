@@ -30,7 +30,7 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class VehiclesHandler : public QObject
+class VehiclesHandler final : public QObject
 {
     Q_OBJECT
 

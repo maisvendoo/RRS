@@ -9,6 +9,7 @@
 #include "ScreenshotWriter.h"
 #include "TrafficLightsHandler.h"
 #include "VehiclesHandler.h"
+#include "settings.h"
 
 #include <vsg/lighting/DirectionalLight.h>
 #include <vsg/ui/KeyEvent.h>

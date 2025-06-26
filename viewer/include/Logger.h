@@ -1,3 +1,4 @@
+#pragma once
 #ifndef VIEWER_LOGGER_H
 #define VIEWER_LOGGER_H
 
@@ -37,7 +38,7 @@ enum LogLevel
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Logger
+class Logger final
 {
 public:
     static Logger& instance();

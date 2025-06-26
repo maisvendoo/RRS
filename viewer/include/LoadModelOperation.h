@@ -1,3 +1,4 @@
+#pragma once
 #ifndef LOAD_MODEL_OPERATION_H
 #define LOAD_MODEL_OPERATION_H
 
@@ -18,7 +19,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
+struct MergeToScene final : public vsg::Inherit<vsg::Operation, MergeToScene>
 {
     MergeToScene(vsg::observer_ptr<vsg::Viewer> in_viewer,
                  vsg::ref_ptr<vsg::Group> in_attachment_point,
@@ -36,7 +37,7 @@ struct MergeToScene : public vsg::Inherit<vsg::Operation, MergeToScene>
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct LoadModelOperation : public vsg::Inherit<vsg::Operation, LoadModelOperation>
+struct LoadModelOperation final : public vsg::Inherit<vsg::Operation, LoadModelOperation>
 {
     LoadModelOperation(
         vsg::ref_ptr<vsg::Viewer> in_viewer,

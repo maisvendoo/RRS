@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MY_GUI_H
 #define MY_GUI_H
 
@@ -13,7 +14,7 @@
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 
-struct GUIParams : public vsg::Inherit<vsg::Object, GUIParams>
+struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
     GUIParams() {}
 
@@ -36,10 +37,9 @@ struct GUIParams : public vsg::Inherit<vsg::Object, GUIParams>
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class MyGui : public vsg::Inherit<vsg::Command, MyGui>
+class MyGui final : public vsg::Inherit<vsg::Command, MyGui>
 {
 public:
-
     MyGui(vsg::ref_ptr<GUIParams> in_params, vsg::ref_ptr<vsg::Options> options = {});
 
     void compile(vsg::Context& context) override;
@@ -47,7 +47,6 @@ public:
     void record(vsg::CommandBuffer& cb) const override;
 
 private:
-
     vsg::ref_ptr<GUIParams> params;
 
     float font_size = 20.0f;

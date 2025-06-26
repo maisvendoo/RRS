@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UPDATE_SOUND_MANAGER_HANDLER_H
 #define UPDATE_SOUND_MANAGER_HANDLER_H
 

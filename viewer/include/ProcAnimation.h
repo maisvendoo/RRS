@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PROC_ANIMATION_H
 #define PROC_ANIMATION_H
 
@@ -18,7 +19,7 @@ class ProcAnimation : public vsg::Inherit<vsg::Object, ProcAnimation>
 public:
     ProcAnimation() = default;
 
-    virtual ~ProcAnimation() = default;
+    virtual ~ProcAnimation() noexcept = default;
 
     void step(float t, float dt);
 

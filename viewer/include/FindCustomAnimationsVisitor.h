@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FIND_CUSTOM_ANIMATIONS_VISITOR_H
 #define FIND_CUSTOM_ANIMATIONS_VISITOR_H
 
@@ -20,7 +21,7 @@ namespace vsg
     class PropagateDynamicObjects;
 }
 
-struct FindCustomAnimationsVisitorCreateInfo
+struct FindCustomAnimationsVisitorCreateInfo final
 {
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;
@@ -28,7 +29,7 @@ struct FindCustomAnimationsVisitorCreateInfo
     vsg::ref_ptr<animations_t> animations;
 };
 
-struct DeferredAnimation
+struct DeferredAnimation final
 {
     vsg::Node* node;
     vsg::ref_ptr<ProcAnimation> animation;

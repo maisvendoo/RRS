@@ -1,3 +1,4 @@
+#pragma once
 #ifndef VEHICLE_EXTERIOR_H
 #define VEHICLE_EXTERIOR_H
 
@@ -11,7 +12,7 @@ class SoundManager;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class VehicleExterior
+class VehicleExterior final
 {
 public:
 

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef DISPLAY_ANIMATION_H
 #define DISPLAY_ANIMATION_H
 
@@ -15,8 +16,10 @@ class CfgReader;
 class ProcDisplayAnimation final : public vsg::Inherit<ProcAnimation, ProcDisplayAnimation>
 {
 public:
-    explicit ProcDisplayAnimation(vsg::ref_ptr<vsg::Image> in_image_data,
-                                  vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data);
+    ProcDisplayAnimation(
+        vsg::ref_ptr<vsg::Image> in_image_data,
+        vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data
+    );
 
     std::size_t getSignalID() const override;
 

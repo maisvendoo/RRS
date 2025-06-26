@@ -1,12 +1,15 @@
+#pragma once
 #ifndef CAMERA_ABSTRACT_H
 #define CAMERA_ABSTRACT_H
 
-#include "settings.h"
-#include "VehicleExterior.h"
-
 #include <vsg/app/Camera.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/ui/Keyboard.h>
+#include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/PointerEvent.h>
+
+struct settings_t;
+class VehicleExterior;
 
 //------------------------------------------------------------------------------
 //
