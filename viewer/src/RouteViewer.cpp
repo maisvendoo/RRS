@@ -651,8 +651,6 @@ bool RouteViewer::loadRoute()
         current = range.second;
     }
 
-    root->children.shrink_to_fit();
-
     route.object_ref.clear();
     route.transforms.clear();
 

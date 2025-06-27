@@ -19,8 +19,9 @@ int main(int argc, char* argv[])
         std::string log_filename = "viewer.log";
         std::string log_backup = "~previous-" + log_filename;
 
-        Logger::instance().openFile((fs.getLogsDir() + fs.separator() + log_filename),
-                                    (fs.getLogsDir() + fs.separator() + log_backup));
+        std::string new_log_file = fs.getLogsDir() + fs.separator() + log_filename;
+        std::string old_log_file = fs.getLogsDir() + fs.separator() + log_backup;
+        Logger::instance().openFile(new_log_file.c_str(), old_log_file.c_str());
         LOG_INFO("================================================================================");
         LOG_INFO("Logger initialized succesfully");
     }
