@@ -89,17 +89,17 @@ private:
     void updateShadowRegion();
 
     settings_t& _settings;
-    vsg::ref_ptr<vsg::Keyboard> _keyboard = nullptr;
-    vsg::ref_ptr<UpdateControlToServerHandler> _upd_server_control = nullptr;
-    vsg::ref_ptr<vsg::Camera> _camera = nullptr;
-    vsg::ref_ptr<vsg::RegionOfInterest> _shadow_region = nullptr;
-    vsg::ref_ptr<vsg::DirectionalLight> _sun = nullptr;
+    vsg::ref_ptr<vsg::Keyboard> _keyboard;
+    vsg::ref_ptr<UpdateControlToServerHandler> _upd_server_control;
+    vsg::ref_ptr<vsg::Camera> _camera;
+    vsg::ref_ptr<vsg::RegionOfInterest> _shadow_region;
+    vsg::ref_ptr<vsg::DirectionalLight> _sun;
 
     bool _hasKeyboardFocus = false;
     bool _hasPointerFocus = false;
     bool _lastPointerEventWithinRenderArea = false;
     double _previousTime = 0.0;
-    vsg::ref_ptr<vsg::PointerEvent> _previousPointerEvent = nullptr;
+    vsg::ref_ptr<vsg::PointerEvent> _previousPointerEvent;
     std::map<std::uint32_t, vsg::ref_ptr<vsg::TouchEvent>> _previousTouches;
     double _prevZoomTouchDistance = 0.0;
 
