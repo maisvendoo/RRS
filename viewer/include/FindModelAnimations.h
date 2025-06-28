@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FIND_MODEL_ANIMATIONS_H
 #define FIND_MODEL_ANIMATIONS_H
 
@@ -20,7 +21,7 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct FindModelAnimationsCreateInfo
+struct FindModelAnimationsCreateInfo final
 {
     vsg::ref_ptr<vsg::Node> node;
     vsg::ref_ptr<animations_t> animations;
@@ -30,10 +31,10 @@ struct FindModelAnimationsCreateInfo
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class FindModelAnimations : public vsg::Inherit<vsg::Object, FindModelAnimations>
+class FindModelAnimations final : public vsg::Inherit<vsg::Object, FindModelAnimations>
 {
 public:
-    FindModelAnimations(const FindModelAnimationsCreateInfo& create_info);
+    explicit FindModelAnimations(const FindModelAnimationsCreateInfo& create_info);
 
 private:
     vsg::ref_ptr<vsg::Node> node;

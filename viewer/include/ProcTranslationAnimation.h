@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ANALOG_TRANSLATION_H
 #define ANALOG_TRANSLATION_H
 

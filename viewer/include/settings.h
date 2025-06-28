@@ -1,3 +1,4 @@
+#pragma once
 #ifndef VIEWER_SETTINGS_H
 #define VIEWER_SETTINGS_H
 
@@ -8,7 +9,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct settings_t
+struct settings_t final
 {
     settings_t(){}
     tcp_config_t tcp_config = tcp_config_t();   ///< TCP-Client settings

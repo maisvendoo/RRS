@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 
@@ -27,7 +28,7 @@ class UpdateViewerHandler;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class RouteViewer : public QObject
+class RouteViewer final : public QObject
 {
     Q_OBJECT
 

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CAMERA_FOLLOW_MANIPULATOR_H
 #define CAMERA_FOLLOW_MANIPULATOR_H
 

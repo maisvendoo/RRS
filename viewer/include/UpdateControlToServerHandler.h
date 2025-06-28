@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UPDATE_CONTROL_TO_SERVER_HANDLER_H
 #define UPDATE_CONTROL_TO_SERVER_HANDLER_H
 
@@ -10,7 +11,7 @@ class TcpClient;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class UpdateControlToServerHandler : public vsg::Inherit<vsg::Visitor, UpdateControlToServerHandler>
+class UpdateControlToServerHandler final : public vsg::Inherit<vsg::Visitor, UpdateControlToServerHandler>
 {
 public:
     explicit UpdateControlToServerHandler(TcpClient *tc);

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ANALOG_ROTATION_H
 #define ANALOG_ROTATION_H
 

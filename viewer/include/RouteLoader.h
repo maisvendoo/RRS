@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ROUTE_LOADER_H
 #define ROUTE_LOADER_H
 
@@ -8,7 +9,7 @@ struct Route;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class RouteLoader
+class RouteLoader final
 {
 public:
     RouteLoader(const std::string& route_path);

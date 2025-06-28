@@ -1,3 +1,4 @@
+#pragma once
 #ifndef DISPLAY_ANIMATION_H
 #define DISPLAY_ANIMATION_H
 
@@ -15,15 +16,16 @@ class CfgReader;
 class ProcDisplayAnimation final : public vsg::Inherit<ProcAnimation, ProcDisplayAnimation>
 {
 public:
-    explicit ProcDisplayAnimation(vsg::ref_ptr<vsg::Image> in_image_color,
-                                  vsg::ref_ptr<vsg::Image> in_image_emissive,
-                                  vsg::ref_ptr<vsg::PbrMaterialValue> in_material_value);
+    ProcDisplayAnimation(
+        vsg::ref_ptr<vsg::Image> in_image_data,
+        vsg::ref_ptr<vsg::PbrMaterialValue> in_material_data
+    );
 
     std::size_t getSignalID() const override;
 
 private:
-    vsg::ref_ptr<vsg::Image> image_color;
-    vsg::ref_ptr<vsg::Image> image_emissive;
+    vsg::ref_ptr<vsg::Image> image_data;
+
     vsg::ref_ptr<vsg::PbrMaterialValue> material_value;
 
     vsg::vec4 base_color = vsg::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -41,8 +43,6 @@ private:
 
     AbstractDisplay* display = nullptr;
     QImage qimage;
-    bool is_color_repaint = true;
-    bool is_emissive_repaint = true;
 };
 
 #endif // DISPLAY_ANIMATION_H

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef TRAFFIC_LIGHT_H
 #define TRAFFIC_LIGHT_H
 
@@ -16,10 +17,9 @@ class QByteArray;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TrafficLight
+class TrafficLight final
 {
 public:
-
     vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
     vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
@@ -43,7 +43,6 @@ public:
                     vsg::ref_ptr<vsg::Options> options);
 
 private:
-
     QString connector_name = "";
     int signal_dir = 0;
     bool is_busy = false;

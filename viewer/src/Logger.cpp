@@ -1,13 +1,20 @@
 #include "Logger.h"
 
+#include <cstdarg>
 #include <cstdio>
-#include <map>
-#include <string>
+
+#define ANSI_ESCAPE_CODE_RESET "\033[0m"
+#define ANSI_ESCAPE_CODE_RED "\033[31m"
+#define ANSI_ESCAPE_CODE_GREEN "\033[32m"
+#define ANSI_ESCAPE_CODE_YELLOW "\033[33m"
+#define ANSI_ESCAPE_CODE_BLUE "\033[34m"
+
+#define IS_TEXT_COLORED 0
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Logger& Logger::instance()
+Logger& Logger::instance() noexcept
 {
     static Logger logger;
     return logger;
@@ -16,74 +23,90 @@ Logger& Logger::instance()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Logger::~Logger()
+Logger::~Logger() noexcept
 {
     if (file)
     {
-        fclose(file);
+        std::fclose(file);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Logger::log_message(LogLevel level, const char* file, int line, const char* message)
+void Logger::openFile(const char* path, const char* backup_path)
+{
+    std::remove(backup_path);
+    std::rename(path, backup_path);
+    file = std::fopen(path, "w");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Logger::log_message(LogLevel level, const char* file, int line, const char* format, ...) const
 {
     if (this->level > level)
     {
         return;
     }
 
-    print_ansi_escape_code(level);
-
-    std::fprintf(stderr, "%s", message);
-
-    if (level > LOG_LEVEL_INFO)
+    std::FILE* const streams[2] = {stderr, this->file};
+    for (int i = 0; i < 2; ++i)
     {
-        std::fprintf(stderr, " | %s (%d)\033[0m\n", file, line);
-    }
-    else
-    {
-        std::fprintf(stderr, "\033[0m\n");
-    }
+#if IS_TEXT_COLORED
+        print_ansi_escape_code(level, streams[i]);
+#endif
 
-    std::fprintf(this->file, "%s", message);
+        std::va_list args;
+        va_start(args, format);
+        std::vfprintf(streams[i], format, args);
+        va_end(args);
 
-    if (level > LOG_LEVEL_INFO)
-    {
-        std::fprintf(this->file, " | %s (%d)\n", file, line);
-    }
-    else
-    {
-        std::fprintf(this->file, "\n");
+        if (level > LOG_LEVEL_INFO)
+        {
+            std::fprintf(streams[i], " | %s (%d)", file, line);
+        }
+
+#if IS_TEXT_COLORED
+        std::fputs(ANSI_ESCAPE_CODE_RESET, streams[i]);
+#endif
+
+        std::fputs("\n", streams[i]);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Logger::openFile(const std::string& path, const std::string &backup_path)
+void Logger::print_ansi_escape_code(LogLevel level, std::FILE* stream) const
 {
-    std::remove(backup_path.c_str());
-    std::rename(path.c_str(), backup_path.c_str());
-    file = fopen(path.c_str(), "w");
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Logger::print_ansi_escape_code(LogLevel level)
-{
-    const std::map<LogLevel, const char*> level_map = {
-        {LOG_LEVEL_DEBUG, ANSI_ESCAPE_CODE_GREEN},
-        {LOG_LEVEL_INFO, ANSI_ESCAPE_CODE_BLUE},
-        {LOG_LEVEL_WARN, ANSI_ESCAPE_CODE_YELLOW},
-        {LOG_LEVEL_ERROR, ANSI_ESCAPE_CODE_RED},
-        {LOG_LEVEL_FATAL, ANSI_ESCAPE_CODE_RED}
-    };
-
-    if (level_map.count(level))
+    switch (level)
     {
-        std::fprintf(stderr, "%s", level_map.at(level));
+        case LOG_LEVEL_DEBUG:
+        {
+            std::fputs(ANSI_ESCAPE_CODE_GREEN, stream);
+            return;
+        }
+        case LOG_LEVEL_INFO:
+        {
+            std::fputs(ANSI_ESCAPE_CODE_BLUE, stream);
+            return;
+        }
+        case LOG_LEVEL_WARN:
+        {
+            std::fputs(ANSI_ESCAPE_CODE_YELLOW, stream);
+            return;
+        }
+        case LOG_LEVEL_ERROR:
+        case LOG_LEVEL_FATAL:
+        {
+            std::fputs(ANSI_ESCAPE_CODE_RED, stream);
+            return;
+        }
+        default:
+        {
+            return;
+        }
     }
 }
