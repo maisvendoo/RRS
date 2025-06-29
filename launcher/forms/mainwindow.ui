@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1165</width>
-    <height>724</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QTabWidget" name="twMain">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>30</y>
-      <width>1051</width>
-      <height>641</height>
+      <x>10</x>
+      <y>10</y>
+      <width>1260</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -40,11 +40,11 @@
       <item row="0" column="0">
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,0,5">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,4">
+             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout">
                 <item>
@@ -129,7 +129,7 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,4">
+             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
