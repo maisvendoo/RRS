@@ -252,7 +252,7 @@ void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
     }
 
     emit activeTrainChanged();
-    emit trainConfigChanged(getTrainName());
+    emit trainConfigChanged();
 }
 
 //------------------------------------------------------------------------------
