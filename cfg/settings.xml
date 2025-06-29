@@ -18,6 +18,12 @@
     <Viewer>
         <!-- Запись в лог-файл: INFO - все сообщения, WARN - только ошибки, FATAL - только критические ошибки -->
         <NotifyLevel>INFO</NotifyLevel>
+        <!-- Отключение дополнительной проверки моделей на видимость из камеры -->
+        <DisableCullNode>1</DisableCullNode>
+        <!-- Отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->
+        <DisableNativeGLTF>1</DisableNativeGLTF>
+        <!-- Отрисовка всех полигонов моделей с обеих сторон -->
+        <DrawModelsTwoSided>0</DrawModelsTwoSided>
         <!-- Заголовок окна -->
         <Name>viewer</Name>
         <!-- Оформление окна: 1 - отображение рамки и заголовка; 0 - режим окна без рамки -->

@@ -176,6 +176,7 @@ void RouteViewer::loadSettings()
 
         section = "Viewer";
         loadLoggerSettings(cfg, section);
+        loadModelsSettings(cfg, section);
         loadWindowSettings(cfg, section);
         loadLightSettings(cfg, section);
         loadCameraSettings(cfg, section);
@@ -213,12 +214,18 @@ void RouteViewer::initVsgOptions()
     options->add(vsgXchange::all::create());
 
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
-    bool culling = false;
-    options->setValue("culling", culling);
+    if (settings.disable_culling_node)
+    {
+        bool culling = false;
+        options->setValue("culling", culling);
+    }
 
     // Отключение нативного загрузчика .gltf в VSG, чтобы использовать assimp
-    //bool disable_vsg_loader_gltf = true;
-    //options->setValue("disable_gltf", disable_vsg_loader_gltf);
+    if (settings.disable_culling_node)
+    {
+        bool disable_vsg_loader_gltf = true;
+        options->setValue("disable_gltf", disable_vsg_loader_gltf);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -376,11 +383,18 @@ void RouteViewer::initLights()
     auto depthStencilState = vsg::DepthStencilState::create();
     auto multisampleState = vsg::MultisampleState::create();
 
-    // Рисуем текстуры на обеих сторонах
-    rasterizationState->cullMode = VK_CULL_MODE_NONE;
+    // Рисуем текстуры на обеих сторонах полигонов
+    if (settings.draw_models_two_sided)
+    {
+        rasterizationState->cullMode = VK_CULL_MODE_NONE;
+    }
+
     // Включаем отображение объектов за плоскостями отсечения
     // для корректной работы теней от объектов за пределами вида камеры
-    rasterizationState->depthClampEnable = settings.shadow ? VK_TRUE : VK_FALSE;
+    if (settings.shadow)
+    {
+        rasterizationState->depthClampEnable = VK_TRUE;
+    }
 
     colorBlendState->attachments = {
         {
