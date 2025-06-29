@@ -3,7 +3,6 @@
 #include "filesystem.h"
 #include "ProcAnimation.h"
 #include "LoadModelOperation.h"
-// #include "MyGui.h"
 
 #include <vsg/threading/OperationThreads.h>
 
@@ -147,6 +146,5 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
         animation->setSignals(&(server_signals));
     }
 
-//    GUIParams::nodes.emplace_back(transform);
     return true;
 }

@@ -5,23 +5,11 @@
 #include "UpdateStatisticsHandler.h"
 #include "VehiclesHandler.h"
 
-#include <vsg/app/RecordTraversal.h>
-#include <vsg/app/Viewer.h>
 #include <vsg/io/Options.h>
-#include <vsg/nodes/CullNode.h>
-#include <vsg/nodes/DepthSorted.h>
-#include <vsg/nodes/MatrixTransform.h>
-#include <vsg/nodes/StateGroup.h>
-#include <vsg/state/BindDescriptorSet.h>
-#include <vsg/state/BufferInfo.h>
-#include <vsg/state/DescriptorBuffer.h>
-#include "vsg/state/DescriptorImage.h"
-#include <vsg/state/ImageInfo.h>
-#include <vsg/vk/CommandBuffer.h>
 #include <vsg/vk/Context.h>
+#include <vsg/vk/CommandBuffer.h>
+#include <vsg/app/Viewer.h>
 #include <vsgImGui/imgui.h>
-
-std::vector<vsg::ref_ptr<vsg::Node>> GUIParams::nodes;
 
 //------------------------------------------------------------------------------
 //
@@ -122,17 +110,6 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (params->is_no_controlled)
     {
         showNoControlled();
-    }
-
-    // Демо ImGui
-    if (ImGui::IsKeyPressed(ImGuiKey_F10) && !params->prev_F10 && !is_modified_key)
-    {
-        params->showDemoWindow = !params->showDemoWindow;
-    }
-    params->prev_F10 = ImGui::IsKeyPressed(ImGuiKey_F10);
-    if (params->showDemoWindow)
-    {
-        ImGui::ShowDemoWindow();
     }
 }
 
@@ -246,15 +223,6 @@ void MyGui::showStatistics() const
     ImGui::Text(u8"%s", text.toStdString().c_str());
     ImGui::PopStyleColor();
     ImGui::End();
-
-    ImGui::Begin("Statistics");
-
-    for (const auto& node : params->nodes)
-    {
-        printObject(node);
-    }
-
-    ImGui::End();
 }
 
 //------------------------------------------------------------------------------
@@ -313,120 +281,4 @@ void MyGui::showNoControlled() const
     ImGui::Text(u8"%s", text);
     ImGui::PopStyleColor();
     ImGui::End();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MyGui::printObject(const vsg::ref_ptr<vsg::Object>& object) const
-{
-    if (!object)
-    {
-        return;
-    }
-
-    std::string name;
-    object->getValue("name", name);
-    if (name.empty())
-    {
-        object->getValue("Name", name);
-    }
-
-    ImGuiID id = ImGui::GetID(object.get());
-
-    ImGui::PushStyleColor(0, ImVec4(1.0f, 0.5f, 0.5f, 1.0f));
-    bool show_tree_node = ImGui::TreeNodeEx(object.get(),
-        ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanFullWidth, "%s", object->className());
-    ImGui::PopStyleColor();
-
-    if (!name.empty())
-    {
-        ImGui::SameLine();
-        ImGui::Text("%s", name.c_str());
-    }
-
-    ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%p", reinterpret_cast<void*>(object.get()));
-
-    if (show_tree_node)
-    {
-        ImGui::PopID();
-
-        if (auto transform = vsg::ref_ptr(object->cast<vsg::MatrixTransform>()))
-        {
-            for (const auto& child : transform->children)
-            {
-                printObject(child);
-            }
-        }
-        else if (auto pLOD = vsg::ref_ptr(object->cast<vsg::PagedLOD>()))
-        {
-            if (pLOD->children[0].node)
-                printObject(pLOD->children[0].node);
-            else
-                ImGui::Text("%s", pLOD->filename.string().c_str());
-        }
-        else if (auto cullNode = vsg::ref_ptr(object->cast<vsg::CullNode>()))
-        {
-            printObject(cullNode->child);
-        }
-        else if (auto stateGroup = vsg::ref_ptr(object->cast<vsg::StateGroup>()))
-        {
-            for (const auto& command : stateGroup->stateCommands)
-            {
-                printObject(command);
-            }
-        }
-        else if (auto group = vsg::ref_ptr(object->cast<vsg::Group>()))
-        {
-            for (const auto& child : group->children)
-            {
-                printObject(child);
-            }
-        }
-        else if (auto bindDescriptorSet = vsg::ref_ptr(object->cast<vsg::BindDescriptorSet>()))
-        {
-            for (const auto& descriptor : bindDescriptorSet->descriptorSet->descriptors)
-            {
-                printObject(descriptor);
-            }
-        }
-        else if (auto descriptorBuffer = vsg::ref_ptr(object->cast<vsg::DescriptorBuffer>()))
-        {
-            for (const auto& bufferInfo : descriptorBuffer->bufferInfoList)
-            {
-                printObject(bufferInfo);
-            }
-        }
-        else if (auto descriptorImage = vsg::ref_ptr(object->cast<vsg::DescriptorImage>()))
-        {
-            for (const auto& imageInfo : descriptorImage->imageInfoList)
-            {
-                printObject(imageInfo);
-            }
-        }
-        else if (auto bufferInfo = vsg::ref_ptr(object->cast<vsg::BufferInfo>()))
-        {
-            printObject(bufferInfo->data);
-        }
-        else if (auto imageInfo = vsg::ref_ptr(object->cast<vsg::ImageInfo>()))
-        {
-            printObject(imageInfo->imageView);
-        }
-        else if (auto imageView = vsg::ref_ptr(object->cast<vsg::ImageView>()))
-        {
-            printObject(imageView->image);
-        }
-        else if (auto image = vsg::ref_ptr(object->cast<vsg::Image>()))
-        {
-            printObject(image->data);
-        }
-        else if (auto depthSorted = vsg::ref_ptr(object->cast<vsg::DepthSorted>()))
-        {
-            printObject(depthSorted->child);
-        }
-
-        ImGui::PushID(id);
-        ImGui::TreePop();
-    }
 }

@@ -9,8 +9,6 @@
 #include <vsg/core/observer_ptr.h>
 #include <QString>
 
-#include <vector>
-
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 
@@ -28,10 +26,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F9 = false;
     bool is_show_debug_msg = false;
     bool is_no_controlled = false;
-    bool showDemoWindow = false;
-    bool prev_F10 = false;
     QString status = "";
-    static std::vector<vsg::ref_ptr<vsg::Node>> nodes;
 };
 
 //------------------------------------------------------------------------------
