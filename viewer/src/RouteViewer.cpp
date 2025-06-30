@@ -51,17 +51,9 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-RouteViewer::RouteViewer(int argc, char* argv[], QObject* parent) : QObject(parent)
+RouteViewer::RouteViewer(QObject* parent)
+    : QObject(parent)
 {
-    if (init(argc, argv))
-    {
-        LOG_INFO("Viewer is initialized succesfully");
-        //is_ready = true;
-    }
-    else
-    {
-        LOG_FATAL("Fail to initialize viewer");
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -74,6 +66,47 @@ RouteViewer::~RouteViewer()
     delete screenshot_writer;
     delete sound_manager;
     delete tcp_client;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::initialize(int argc, char* argv[])
+{
+    loadSettings();
+    LOG_INFO("Loaded settings from settings.xml");
+
+    configureLogLevel();
+
+    LOG_INFO("Override settings from command line");
+    overrideSettingsByCommandLine(argc, argv);
+
+    tcp_client = new TcpClient(this);
+    LOG_INFO("Created TcpClient");
+
+    sound_manager = new SoundManager();
+    LOG_INFO("Created SoundManager");
+
+    screenshot_writer = new ScreenshotWriter("screenshot.png");
+
+    traffic_lights_handler = new TrafficLightsHandler();
+    vehicles_handler = new VehiclesHandler(settings, sound_manager);
+
+    initVsgOptions();
+    initWindowTraits();
+    initWindow();
+    initCamera();
+    initScenegraph();
+    initLights();
+    initView();
+    initCommandGraph();
+    initViewer();
+
+    vehicles_handler->set_camera_pos(&lookAt->eye);
+
+    initTCPclient();
+
+    LOG_INFO("Viewer is initialized succesfully");
 }
 
 //------------------------------------------------------------------------------
@@ -109,47 +142,6 @@ int RouteViewer::run()
     }
 
     return 0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool RouteViewer::init(int argc, char* argv[])
-{
-    loadSettings();
-    LOG_INFO("Loaded settings from settings.xml");
-
-    configureLogLevel();
-
-    LOG_INFO("Override settings from command line");
-    overrideSettingsByCommandLine(argc, argv);
-
-    tcp_client = new TcpClient(this);
-    LOG_INFO("Created TcpClient");
-
-    sound_manager = new SoundManager();
-    LOG_INFO("Created SoundManager");
-
-    screenshot_writer = new ScreenshotWriter("screenshot.png");
-
-    traffic_lights_handler = new TrafficLightsHandler();
-    vehicles_handler = new VehiclesHandler(settings, sound_manager);
-
-    initVsgOptions();
-    initWindowTraits();
-    initWindow();
-    initCamera();
-    initScenegraph();
-    initLights();
-    initView();
-    initCommandGraph();
-    initViewer();
-
-    vehicles_handler->set_camera_pos(&lookAt->eye);
-
-    initTCPclient();
-
-    return true;
 }
 
 //------------------------------------------------------------------------------

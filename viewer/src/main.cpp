@@ -8,7 +8,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <memory>
 #include <exception>
 #include <string>
 
@@ -34,8 +33,9 @@ int main(int argc, char* argv[])
 
         QApplication application(argc, argv);
 
-        auto viewer = std::make_unique<RouteViewer>(argc, argv);
-        return viewer->run();
+        RouteViewer viewer;
+        viewer.initialize(argc, argv);
+        return viewer.run();
     }
     catch (const vsg::Exception& exception)
     {

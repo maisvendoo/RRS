@@ -33,14 +33,14 @@ class RouteViewer final : public QObject
     Q_OBJECT
 
 public:
-    RouteViewer(int argc, char* argv[], QObject* parent = Q_NULLPTR);
+    explicit RouteViewer(QObject* parent = nullptr);
     ~RouteViewer();
+
+    void initialize(int argc, char* argv[]);
 
     int run();
 
 private:
-    bool init(int argc, char* argv[]);
-
     void loadSettings();
     void loadNetworkSettings(CfgReader& cfg, const QString& section);
     void loadLoggerSettings(CfgReader& cfg, const QString& section);
