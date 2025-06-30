@@ -19,13 +19,21 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     vsg::observer_ptr<vsg::Viewer> viewer;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
+
     bool prev_Esc = false;
     bool is_show_quit_dialog = false;
+
     bool prev_F11 = false;
     bool is_show_statistics = false;
+
+    bool prev_F10 = false;
+    bool is_show_settings = false;
+
     bool prev_F9 = false;
     bool is_show_debug_msg = false;
+
     bool is_no_controlled = false;
+
     QString status = "";
 
     float* ambient_color = nullptr;
@@ -58,6 +66,8 @@ private:
     void showQuitDialog() const;
 
     void showStatistics() const;
+
+    void showSettings() const;
 
     void showDebugMsg() const;
 

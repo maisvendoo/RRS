@@ -88,6 +88,18 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         showStatistics();
     }
 
+    // Отображение настроек
+    if (ImGui::IsKeyPressed(ImGuiKey_F10) && !params->prev_F10 && !is_modified_key)
+    {
+        params->is_show_settings = !params->is_show_settings;
+    }
+    params->prev_F10 = ImGui::IsKeyPressed(ImGuiKey_F10);
+
+    if (params->is_show_settings)
+    {
+        showSettings();
+    }
+
     if (params->vehicles_handler)
     {
         // Отображение дебаг-строки подвижного состава
@@ -230,7 +242,13 @@ void MyGui::showStatistics() const
     ImGui::Text(u8"%s", text.toStdString().c_str());
     ImGui::PopStyleColor();
     ImGui::End();
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showSettings() const
+{
     ImGui::Begin("Light settings");
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 0.1f);
