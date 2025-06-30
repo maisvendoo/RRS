@@ -6,62 +6,89 @@
 
 #include <QApplication>
 
-#include <exception>
+#include <cstdio>
+#include <cstdlib>
 #include <memory>
+#include <exception>
+#include <string>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+static void initialize_logger();
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+static void print_command_line_arguments(int argc, char* argv[]);
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-    {
-        FileSystem& fs = FileSystem::getInstance();
-        std::string log_filename = "viewer.log";
-        std::string log_backup = "~previous-" + log_filename;
-
-        std::string new_log_file = fs.getLogsDir() + fs.separator() + log_filename;
-        std::string old_log_file = fs.getLogsDir() + fs.separator() + log_backup;
-        Logger::instance().openFile(new_log_file.c_str(), old_log_file.c_str());
-        LOG_INFO("================================================================================");
-        LOG_INFO("Logger initialized succesfully");
-    }
-
-    {
-        std::string command_line = "";
-        for (int i = 0; i < argc; ++i)
-        {
-            command_line += " ";
-            command_line += argv[i];
-        }
-        LOG_INFO("Process started with command line:%s", command_line.c_str());
-        LOG_INFO("================================================================================");
-    }
+    initialize_logger();
+    print_command_line_arguments(argc, argv);
 
     try
     {
         QApplication application(argc, argv);
 
         auto viewer = std::make_unique<RouteViewer>(argc, argv);
-        if (viewer->isReady())
-        {
-            return viewer->run();
-        }
+        return viewer->run();
     }
     catch (const vsg::Exception& exception)
     {
         LOG_FATAL("%s", exception.message.c_str());
-        return 1;
+        return EXIT_FAILURE;
     }
     catch (const std::exception& exception)
     {
         LOG_FATAL("%s", exception.what());
-        return 1;
+        return EXIT_FAILURE;
     }
     catch (const char* exception)
     {
         LOG_FATAL("%s", exception);
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+static void initialize_logger()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+
+    constexpr const char* log_filename = "viewer.log";
+
+    char log_backup[64];
+    std::sprintf(log_backup, "~previous-%s", log_filename);
+
+    const std::string new_log_file = fs.getLogsDir() + fs.separator() + log_filename;
+    const std::string old_log_file = fs.getLogsDir() + fs.separator() + log_backup;
+
+    Logger::instance().openFile(new_log_file.c_str(), old_log_file.c_str());
+
+    LOG_INFO("================================================================================");
+    LOG_INFO("Logger initialized succesfully");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+static void print_command_line_arguments(int argc, char* argv[])
+{
+    std::string command_line = "";
+    for (int i = 0; i < argc; ++i)
+    {
+        command_line += " ";
+        command_line += argv[i];
+    }
+
+    LOG_INFO("Process started with command line: %s", command_line.c_str());
+    LOG_INFO("================================================================================");
 }

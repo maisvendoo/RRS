@@ -79,14 +79,6 @@ RouteViewer::~RouteViewer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool RouteViewer::isReady() const
-{
-    return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 int RouteViewer::run()
 {
     // Обрабатываем события сетевой подсистемы, дожидаемся загрузки и
@@ -192,14 +184,18 @@ void RouteViewer::loadSettings()
 //------------------------------------------------------------------------------
 void RouteViewer::configureLogLevel()
 {
-    const std::map<std::string, LogLevel> levels = {
-        {"INFO", LOG_LEVEL_INFO},
-        {"WARN", LOG_LEVEL_WARN},
-        {"FATAL", LOG_LEVEL_FATAL}
-    };
-
-    const auto found = levels.find(settings.notify_level);
-    Logger::instance().level = (found != levels.end()) ? found->second : LOG_LEVEL_INFO;
+    if (settings.notify_level == "INFO")
+    {
+        Logger::instance().level = LOG_LEVEL_INFO;
+    }
+    else if (settings.notify_level == "WARN")
+    {
+        Logger::instance().level = LOG_LEVEL_WARN;
+    }
+    else if (settings.notify_level == "FATAL")
+    {
+        Logger::instance().level = LOG_LEVEL_FATAL;
+    }
 }
 
 //------------------------------------------------------------------------------

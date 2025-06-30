@@ -36,8 +36,6 @@ public:
     RouteViewer(int argc, char* argv[], QObject* parent = Q_NULLPTR);
     ~RouteViewer();
 
-    bool isReady() const;
-
     int run();
 
 private:
