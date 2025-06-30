@@ -27,6 +27,13 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool is_show_debug_msg = false;
     bool is_no_controlled = false;
     QString status = "";
+
+    float* ambient_color = nullptr;
+    float* ambient_intensity = nullptr;
+    float* sun_color = nullptr;
+    double* sun_direction_d = nullptr;
+    float sun_direction_f[3] = {1.0f, 1.0f, -1.0f};
+    float* sun_intensity = nullptr;
 };
 
 //------------------------------------------------------------------------------

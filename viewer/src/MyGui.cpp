@@ -44,6 +44,11 @@ void MyGui::compile([[maybe_unused]] vsg::Context& context)
 //------------------------------------------------------------------------------
 void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 {
+    for (int i = 0; i < 3; ++i)
+    {
+        params->sun_direction_d[i] = params->sun_direction_f[i];
+    }
+
     bool is_modified_key = ImGui::IsKeyPressed(ImGuiKey_LeftShift) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightShift) ||
                            ImGui::IsKeyPressed(ImGuiKey_LeftCtrl) ||
@@ -222,6 +227,14 @@ void MyGui::showStatistics() const
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     ImGui::Text(u8"%s", text.toStdString().c_str());
     ImGui::PopStyleColor();
+    ImGui::End();
+
+    ImGui::Begin("Light settings");
+    ImGui::ColorEdit3("Ambient color", params->ambient_color);
+    ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 0.1f);
+    ImGui::ColorEdit3("Sun color", params->sun_color);
+    ImGui::SliderFloat3("Sun direction", params->sun_direction_f, -1.0f, 1.0f);
+    ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 3.0f);
     ImGui::End();
 }
 
