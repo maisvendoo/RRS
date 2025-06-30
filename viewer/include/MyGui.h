@@ -40,8 +40,10 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     float* ambient_intensity = nullptr;
     float* sun_color = nullptr;
     vsg::dvec3* sun_direction_d = nullptr;
-    float sun_direction_f[3] = {1.0f, 1.0f, -1.0f};
     float* sun_intensity = nullptr;
+
+    float sun_azimuth_degrees = 45.0f;
+    float sun_altitude_degrees = 45.0f;
 };
 
 //------------------------------------------------------------------------------

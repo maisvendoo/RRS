@@ -7,6 +7,8 @@
 
 #include <vsg/io/Options.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/maths/mat4.h>
+#include <vsg/maths/transform.h>
 #include <vsg/vk/Context.h>
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/app/Viewer.h>
@@ -45,12 +47,6 @@ void MyGui::compile([[maybe_unused]] vsg::Context& context)
 //------------------------------------------------------------------------------
 void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        (*params->sun_direction_d)[i] = params->sun_direction_f[i];
-    }
-    *params->sun_direction_d = vsg::normalize(*params->sun_direction_d);
-
     bool is_modified_key = ImGui::IsKeyPressed(ImGuiKey_LeftShift) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightShift) ||
                            ImGui::IsKeyPressed(ImGuiKey_LeftCtrl) ||
@@ -251,11 +247,18 @@ void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
-    ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 0.1f);
+    ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
     ImGui::ColorEdit3("Sun color", params->sun_color);
-    ImGui::SliderFloat3("Sun direction", params->sun_direction_f, -1.0f, 1.0f);
-    ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 3.0f);
+    ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 5.0f);
+    ImGui::SliderFloat("Sun azimuth", &params->sun_azimuth_degrees, 0.0f, 360.0f, "%.1f");
+    ImGui::SliderFloat("Sun altitude", &params->sun_altitude_degrees, -90.0f, 90.0f, "%.1f");
     ImGui::End();
+
+    vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
+    vsg::mat4 rotate_azimuth = vsg::rotate(vsg::radians(params->sun_azimuth_degrees), 0.0f, 0.0f, 1.0f);
+    vsg::mat4 rotate_altitude = vsg::rotate(vsg::radians(params->sun_altitude_degrees), 1.0f, 0.0f, 0.0f);
+    sun_direction = sun_direction * rotate_azimuth * rotate_altitude;
+    *params->sun_direction_d = vsg::dvec3(vsg::normalize(sun_direction));
 }
 
 //------------------------------------------------------------------------------
