@@ -38,26 +38,26 @@ public:
     VehiclesHandler(const settings_t& settings, SoundManager* sound_manager, QObject* parent = nullptr);
 
     /// Get scene group
-    vsg::ref_ptr<vsg::Group> getExterior();
+    vsg::ref_ptr<vsg::Group> getExterior() const noexcept;
 
     /// Info about current vehicle exterior
     VehicleExterior* getCurrentVehicle();
-    int getCurrentVehicleIndex();
-    int getControlledVehicleIndex();
+    int getCurrentVehicleIndex() const noexcept;
+    int getControlledVehicleIndex() const noexcept;
 
-    bool isUpdated();
+    bool isUpdated() const noexcept;
 
-    QString getDebugMessage();
+    QString getDebugMessage() const noexcept;
 
     void step(double t, double dt);
 
-    bool selectNextTrain();
-    bool selectPrevTrain();
-    bool selectNextVehicle();
-    bool selectPrevVehicle();
+    bool selectNextTrain() noexcept;
+    bool selectPrevTrain() noexcept;
+    bool selectNextVehicle() noexcept;
+    bool selectPrevVehicle() noexcept;
 
-    void selectControlVehicle();
-    bool returnToControlledVehicle();
+    void selectControlVehicle() noexcept;
+    bool returnToControlledVehicle() noexcept;
 
     bool load(
         QByteArray& data,

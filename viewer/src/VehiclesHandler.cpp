@@ -44,7 +44,7 @@ VehiclesHandler::VehiclesHandler(const settings_t& settings, SoundManager* sound
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::ref_ptr<vsg::Group> VehiclesHandler::getExterior()
+vsg::ref_ptr<vsg::Group> VehiclesHandler::getExterior() const noexcept
 {
     return vehicles_node;
 }
@@ -79,7 +79,7 @@ VehicleExterior* VehiclesHandler::getCurrentVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int VehiclesHandler::getCurrentVehicleIndex()
+int VehiclesHandler::getCurrentVehicleIndex() const noexcept
 {
     return cur_vehicle;
 }
@@ -87,7 +87,7 @@ int VehiclesHandler::getCurrentVehicleIndex()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int VehiclesHandler::getControlledVehicleIndex()
+int VehiclesHandler::getControlledVehicleIndex() const noexcept
 {
     return controlled_vehicle;
 }
@@ -95,7 +95,7 @@ int VehiclesHandler::getControlledVehicleIndex()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::isUpdated()
+bool VehiclesHandler::isUpdated() const noexcept
 {
     return is_pos_updated && is_state_updated;
 }
@@ -103,7 +103,7 @@ bool VehiclesHandler::isUpdated()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString VehiclesHandler::getDebugMessage()
+QString VehiclesHandler::getDebugMessage() const noexcept
 {
     return debug_message;
 }
@@ -278,30 +278,31 @@ void VehiclesHandler::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::selectNextTrain()
+bool VehiclesHandler::selectNextTrain() noexcept
 {
-    int prev_cur_vehicle = cur_vehicle;
+    const int prev_cur_vehicle = cur_vehicle;
 
     // Переключаем на первый вагон предыдущего поезда
     if (vehicles[cur_vehicle].train_id <= 0)
     {
-        int new_train_id = update_data[new_state].trains.size() - 1;
+        const int new_train_id = update_data[new_state].trains.size() - 1;
         cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
     }
     else
     {
-        int new_train_id = vehicles[cur_vehicle].train_id - 1;
+        const int new_train_id = vehicles[cur_vehicle].train_id - 1;
         cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
     }
+
     return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::selectPrevTrain()
+bool VehiclesHandler::selectPrevTrain() noexcept
 {
-    int prev_cur_vehicle = cur_vehicle;
+    const int prev_cur_vehicle = cur_vehicle;
 
     // Переключаем на первый вагон следующего поезда
     if (static_cast<std::size_t>(vehicles[cur_vehicle].train_id) >= (update_data[new_state].trains.size() - 1))
@@ -310,18 +311,19 @@ bool VehiclesHandler::selectPrevTrain()
     }
     else
     {
-        int new_train_id = vehicles[cur_vehicle].train_id + 1;
+        const int new_train_id = vehicles[cur_vehicle].train_id + 1;
         cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
     }
+
     return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::selectNextVehicle()
+bool VehiclesHandler::selectNextVehicle() noexcept
 {
-    int prev_cur_vehicle = cur_vehicle;
+    const int prev_cur_vehicle = cur_vehicle;
 
     // Переключение по вагонам поезда вперёд
     if (vehicles[cur_vehicle].prev_vehicle >= 0)
@@ -331,18 +333,19 @@ bool VehiclesHandler::selectNextVehicle()
     else
     {
         // С первого вагона переключаемся на последний
-        int cur_train_id = vehicles[cur_vehicle].train_id;
+        const int cur_train_id = vehicles[cur_vehicle].train_id;
         cur_vehicle = update_data[new_state].trains[cur_train_id].last_vehicle_id;
     }
+
     return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::selectPrevVehicle()
+bool VehiclesHandler::selectPrevVehicle() noexcept
 {
-    int prev_cur_vehicle = cur_vehicle;
+    const int prev_cur_vehicle = cur_vehicle;
 
     // Переключение по вагонам поезда назад
     if (vehicles[cur_vehicle].next_vehicle >= 0)
@@ -352,16 +355,17 @@ bool VehiclesHandler::selectPrevVehicle()
     else
     {
         // С последнего вагона переключаемся на первый
-        int cur_train_id = vehicles[cur_vehicle].train_id;
+        const int cur_train_id = vehicles[cur_vehicle].train_id;
         cur_vehicle = update_data[new_state].trains[cur_train_id].first_vehicle_id;
     }
+
     return (cur_vehicle != prev_cur_vehicle);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::selectControlVehicle()
+void VehiclesHandler::selectControlVehicle() noexcept
 {
     // Берём контроль над данным вагоном
     controlled_vehicle = cur_vehicle;
@@ -370,12 +374,13 @@ void VehiclesHandler::selectControlVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::returnToControlledVehicle()
+bool VehiclesHandler::returnToControlledVehicle() noexcept
 {
-    int prev_cur_vehicle = cur_vehicle;
+    const int prev_cur_vehicle = cur_vehicle;
 
     // Возврат к управляемому вагону
     cur_vehicle = controlled_vehicle;
+
     return (cur_vehicle != prev_cur_vehicle);
 }
 

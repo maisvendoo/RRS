@@ -15,7 +15,6 @@ class SoundManager;
 class VehicleExterior final
 {
 public:
-
     vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
     vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
@@ -30,7 +29,6 @@ public:
     int         next_vehicle = -1;
 
     vsg::ref_ptr<animations_t> animations = animations_t::create();
-    //displays_t   *displays = new displays_t();
     std::vector<size_t> sounds_id = {};
 
     vsg::dvec3  saved_cabine_cam_shift = vsg::dvec3(0.0, 0.0, 0.0);
@@ -38,7 +36,7 @@ public:
     double      saved_cabine_cam_up = 0.0;
     double      saved_cabine_cam_fov = 64.0;
 
-    VehicleExterior(){};
+    VehicleExterior() = default;
 
     void step(float t, float dt, const vsg::dvec3* camera_pos);
 
