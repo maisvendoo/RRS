@@ -27,11 +27,11 @@ static void print_command_line_arguments(int argc, char* argv[]);
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-    initialize_logger();
-    print_command_line_arguments(argc, argv);
-
     try
     {
+        initialize_logger();
+        print_command_line_arguments(argc, argv);
+
         QApplication application(argc, argv);
 
         auto viewer = std::make_unique<RouteViewer>(argc, argv);

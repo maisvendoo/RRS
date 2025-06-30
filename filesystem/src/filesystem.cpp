@@ -16,126 +16,33 @@ FileSystem::FileSystem()
 {
     std::string workDir = QDir::currentPath().toStdString();
     std::string tmp = getLevelUpDirectory(workDir, 1);
-    setBinaryDir(workDir);
-    setRouteRootDir(tmp + "routes");
-    setConfigDir(tmp + "cfg");
-    setLogsDir(tmp + "logs");
-    setLibraryDir(tmp + "lib");
-    setTrainsDir(getConfigDir() + separator() + "trains");
-    setModulesDir(tmp + "modules");
-    setVehiclesDir(getConfigDir() + separator() + "vehicles");
-    setCouplingsDir(getConfigDir()+ separator() + "couplings");
-    setDevicesDir(getConfigDir()+ separator() + "devices");
-    setDataDir(tmp + "data");
-    setVehicleModelsDir(combinePath(getDataDir(), "models"));
-    setVehicleTexturesDir(combinePath(getDataDir(), "textures"));
-    setPluginsDir(tmp + "plugins");
-    setScreenshotsDir(tmp + "screenshots");
-    setFontsDir(tmp + "fonts");
-    setSoundsDir(combinePath(getDataDir(), "sounds"));
-    setThemeDir(tmp + "themes");
+
+    setDir(binDir, workDir);
+    setDir(routeRootDir, tmp + "routes");
+    setDir(configDir, tmp + "cfg");
+    setDir(logsDir, tmp + "logs");
+    setDir(libraryDir, tmp + "lib");
+    setDir(trainsDir, configDir + separator() + "trains");
+    setDir(modulesDir, tmp + "modules");
+    setDir(vehiclesDir, configDir + separator() + "vehicles");
+    setDir(couplingsDir, configDir + separator() + "couplings");
+    setDir(devicesDir, configDir + separator() + "devices");
+    setDir(dataDir, tmp + "data");
+    setDir(vehicleModelsDir, combinePath(dataDir, "models"));
+    setDir(vehicleTexturesDir, combinePath(dataDir, "textures"));
+    setDir(pluginsDir, tmp + "plugins");
+    setDir(screenshotsDir, tmp + "screenshots");
+    setDir(fontsDir, tmp + "fonts");
+    setDir(soundsDir, combinePath(dataDir, "sounds"));
+    setDir(themeDir, tmp + "themes");
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FileSystem::setRouteRootDir(const std::string &path)
+void FileSystem::setDir(std::string& dir, const std::string& path)
 {
-    routeRootDir = getNativePath(path);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void FileSystem::setConfigDir(const std::string &path)
-{
-    configDir = getNativePath(path);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void FileSystem::setLogsDir(const std::string &path)
-{
-    logsDir = getNativePath(path);
-}
-
-void FileSystem::setLibraryDir(const std::string &path)
-{
-    libraryDir = getNativePath(path);
-}
-
-void FileSystem::setTrainsDir(const std::string &path)
-{
-    trainsDir = getNativePath(path);
-}
-
-void FileSystem::setModulesDir(const std::string &path)
-{
-    modulesDir = getNativePath(path);
-}
-
-void FileSystem::setVehiclesDir(const std::string &path)
-{
-    vehiclesDir = getNativePath(path);
-}
-
-void FileSystem::setCouplingsDir(const std::string &path)
-{
-    couplingsDir = getNativePath(path);
-}
-
-void FileSystem::setDevicesDir(const std::string &path)
-{
-    devicesDir = getNativePath(path);
-}
-
-void FileSystem::setBinaryDir(const std::string &path)
-{
-    binDir = getNativePath(path);
-}
-
-void FileSystem::setPluginsDir(const std::string &path)
-{
-    pluginsDir = getNativePath(path);
-}
-
-void FileSystem::setDataDir(const std::string &path)
-{
-    dataDir = getNativePath(path);
-}
-
-void FileSystem::setVehicleModelsDir(const std::string &path)
-{
-    vehicleModelsDir = getNativePath(path);
-}
-
-void FileSystem::setVehicleTexturesDir(const std::string &path)
-{
-    vehicleTexturesDir = getNativePath(path);
-}
-
-void FileSystem::setScreenshotsDir(const std::string &path)
-{
-    screenshotsDir = getNativePath(path);
-}
-
-void FileSystem::setFontsDir(const std::string &path)
-{
-    fontsDir = getNativePath(path);
-}
-
-void FileSystem::setSoundsDir(const std::string &path)
-{
-    soundsDir = getNativePath(path);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void FileSystem::setThemeDir(const std::string &path)
-{
-    themeDir = getNativePath(path);
+    dir = getNativePath(path);
 }
 
 //------------------------------------------------------------------------------

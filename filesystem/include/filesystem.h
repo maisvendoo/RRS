@@ -97,43 +97,8 @@ private:
     FileSystem(const FileSystem &) = delete;
     FileSystem &operator=(FileSystem &) = delete;
 
-    /// Set route direcory path in paltform native format
-    void setRouteRootDir(const std::string &path);
-
-    /// Set config directory path
-    void setConfigDir(const std::string &path);
-
-    void setLogsDir(const std::string &path);
-
-    void setLibraryDir(const std::string &path);
-
-    void setTrainsDir(const std::string &path);
-
-    void setModulesDir(const std::string &path);
-
-    void setVehiclesDir(const std::string &path);
-
-    void setCouplingsDir(const std::string &path);
-
-    void setDevicesDir(const std::string &path);
-
-    void setBinaryDir(const std::string &path);
-
-    void setPluginsDir(const std::string &path);
-
-    void setDataDir(const std::string &path);
-
-    void setVehicleModelsDir(const std::string &path);
-
-    void setVehicleTexturesDir(const std::string &path);
-
-    void setScreenshotsDir(const std::string &path);
-
-    void setFontsDir(const std::string &path);
-
-    void setSoundsDir(const std::string &path);
-
-    void setThemeDir(const std::string &path);
+    /// Set directory path in platform native format
+    void setDir(std::string& dir, const std::string& path);
 };
 
 #endif
