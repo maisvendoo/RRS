@@ -12,7 +12,7 @@ struct Route;
 class RouteLoader final
 {
 public:
-    RouteLoader(const std::string& route_path);
+    explicit RouteLoader(const std::string& route_path);
 
     void read_description();
     bool parse_objects_ref(Route& route);

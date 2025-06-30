@@ -6,6 +6,7 @@
 #include "VehiclesHandler.h"
 
 #include <vsg/io/Options.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/vk/Context.h>
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/app/Viewer.h>
@@ -46,8 +47,9 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 {
     for (int i = 0; i < 3; ++i)
     {
-        params->sun_direction_d[i] = params->sun_direction_f[i];
+        (*params->sun_direction_d)[i] = params->sun_direction_f[i];
     }
+    *params->sun_direction_d = vsg::normalize(*params->sun_direction_d);
 
     bool is_modified_key = ImGui::IsKeyPressed(ImGuiKey_LeftShift) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightShift) ||

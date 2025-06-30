@@ -66,7 +66,7 @@ public:
         vsg::ref_ptr<vsg::Options> options
     );
 
-    void set_camera_pos(const vsg::dvec3* camera_pos) { this->camera_pos = camera_pos; }
+    void set_camera_pos(const vsg::dvec3* camera_pos) noexcept { this->camera_pos = camera_pos; }
 
 public slots:
     void slotGetVehiclesPosData(QByteArray& data);

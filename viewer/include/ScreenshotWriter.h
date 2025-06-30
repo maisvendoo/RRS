@@ -10,11 +10,11 @@
 class ScreenshotWriter final
 {
 public:
-    ScreenshotWriter(std::string filename);
-    ~ScreenshotWriter() = default;
+    explicit ScreenshotWriter(const std::string& filename);
+    ~ScreenshotWriter() noexcept = default;
 
-    void setScreenshot(bool screenshot_needed = true);
-    bool isScreeenshot();
+    void setScreenshot(bool screenshot_needed = true) noexcept;
+    bool isScreeenshot() const noexcept;
     void doScreeenshot(vsg::ref_ptr<vsg::Window> window, vsg::ref_ptr<vsg::Options> options);
 
 private:

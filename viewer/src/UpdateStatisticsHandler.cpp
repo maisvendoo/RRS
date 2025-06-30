@@ -42,7 +42,7 @@ void UpdateStatisticsHandler::apply(vsg::FrameEvent& frame)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double UpdateStatisticsHandler::getAverageFPS() const
+double UpdateStatisticsHandler::getAverageFPS() const noexcept
 {
     return average_FPS;
 }
@@ -50,7 +50,7 @@ double UpdateStatisticsHandler::getAverageFPS() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double UpdateStatisticsHandler::getLowestFPS() const
+double UpdateStatisticsHandler::getLowestFPS() const noexcept
 {
     return lowest_FPS;
 }

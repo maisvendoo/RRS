@@ -16,8 +16,8 @@ public:
 
     void apply(vsg::FrameEvent& frame) override;
 
-    double getAverageFPS() const;
-    double getLowestFPS() const;
+    double getAverageFPS() const noexcept;
+    double getLowestFPS() const noexcept;
 
 private:
 
