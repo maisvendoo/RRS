@@ -20,7 +20,7 @@ Skybox::Skybox(std::string& skybox_model_filepath, vsg::ref_ptr<vsg::Options> op
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::ref_ptr<vsg::Node> Skybox::getNode()
+vsg::ref_ptr<vsg::Node> Skybox::getNode() const noexcept
 {
     return node;
 }

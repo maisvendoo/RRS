@@ -77,7 +77,7 @@ void TrafficLight::deserialize(QByteArray& data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QString& TrafficLight::getConnectorName() const
+const QString& TrafficLight::getConnectorName() const noexcept
 {
     return connector_name;
 }
@@ -85,7 +85,7 @@ const QString& TrafficLight::getConnectorName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int TrafficLight::getSignalDirection() const
+int TrafficLight::getSignalDirection() const noexcept
 {
     return signal_dir;
 }
@@ -93,7 +93,7 @@ int TrafficLight::getSignalDirection() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QString& TrafficLight::getLetter() const
+const QString& TrafficLight::getLetter() const noexcept
 {
     return letter;
 }
@@ -101,7 +101,7 @@ const QString& TrafficLight::getLetter() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QString& TrafficLight::getModelName() const
+const QString& TrafficLight::getModelName() const noexcept
 {
     return signal_model;
 }

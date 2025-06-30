@@ -32,10 +32,10 @@ public:
 
     void deserialize(QByteArray& data);
 
-    const QString& getConnectorName() const;
-    int getSignalDirection() const;
-    const QString& getLetter() const;
-    const QString& getModelName() const;
+    const QString& getConnectorName() const noexcept;
+    int getSignalDirection() const noexcept;
+    const QString& getLetter() const noexcept;
+    const QString& getModelName() const noexcept;
 
     bool loadSignal(std::string& models_dir_path,
                     std::string& animations_dir,

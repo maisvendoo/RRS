@@ -37,7 +37,7 @@ private:
     void deserialize(QByteArray& data);
     void deserialize_signals(const char* signals_type, QDataStream& data_stream);
 
-    void printSignalInfo(TrafficLight* tl);
+    void printSignalInfo(const TrafficLight* tl) const;
 
     vsg::ref_ptr<vsg::Group> traffic_light_nodes = vsg::Group::create();
 

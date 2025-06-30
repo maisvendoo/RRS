@@ -156,7 +156,7 @@ void TrafficLightsHandler::deserialize_signals(const char* signals_type, QDataSt
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrafficLightsHandler::printSignalInfo(TrafficLight* tl)
+void TrafficLightsHandler::printSignalInfo(const TrafficLight* tl) const
 {
     LOG_INFO(
         "Signal %s at connector %s is initialized. Letter: %s | position: {%8.1f, %8.1f, %8.1f} | direction: %s {%6.3f %6.3f %6.3f}",
