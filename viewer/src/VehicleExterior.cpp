@@ -7,7 +7,6 @@
 #include "LoadModelOperation.h"
 #include "ProcAnimation.h"
 #include "sound-manager.h"
-// #include "MyGui.h"
 
 #include <iostream>
 #include <qdom.h>
@@ -131,8 +130,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     {
         transform->setValue("name", "only vehicle");
     }
-
-    GUIParams::nodes.emplace_back(transform);
 
     modelShift = "";
     if (cfg.getString(sec_name, "DriverPos", modelShift))

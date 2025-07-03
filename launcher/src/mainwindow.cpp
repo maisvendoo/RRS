@@ -584,14 +584,15 @@ void MainWindow::loadSelectedTrainsList()
         {
             if (trains_info[i].train_config_path == at.train_info.train_config_path)
             {
-                train_idx = i;
+                train_idx = i + 1;
                 break;
             }
         }
-        if (tww->cbTrainConfigSelect->count() > train_idx)
-            tww->cbTrainConfigSelect->setCurrentIndex(train_idx + 1);
+        if ((train_idx > 0) && (train_idx < tww->cbTrainConfigSelect->count()))
+        {
+            tww->cbTrainConfigSelect->setCurrentIndex(train_idx);
+        }
 
-        int waypoint_idx = -1;
         std::vector<train_position_t> *waypoints;
         if (at.train_position.direction > 0)
         {
@@ -606,28 +607,33 @@ void MainWindow::loadSelectedTrainsList()
             waypoints = bwd_train_positions;
         }
 
+        int waypoint_idx = -1;
         for (int i = 0; i < waypoints->size(); ++i)
         {
             if (waypoints->at(i).name == at.train_position.name)
             {
-                waypoint_idx = i;
+                waypoint_idx = i + 1;
                 break;
             }
         }
-        if (tww->cbWaypointSelect->count() > waypoint_idx)
-            tww->cbWaypointSelect->setCurrentIndex(waypoint_idx + 1);
+        if ((waypoint_idx > 0) && (waypoint_idx < tww->cbWaypointSelect->count()))
+        {
+            tww->cbWaypointSelect->setCurrentIndex(waypoint_idx);
+        }
 
         int traj_idx = -1;
         for (int i = 0; i < trajectrories->size(); ++i)
         {
             if (trajectrories->at(i).name == at.train_position.trajectory_name)
             {
-                traj_idx = i;
+                traj_idx = i + 1;
                 break;
             }
         }
-        if (tww->cbTrajectoryNameSelect->count() > traj_idx)
-            tww->cbTrajectoryNameSelect->setCurrentIndex(traj_idx + 1);
+        if ((traj_idx > 0) && (traj_idx < tww->cbTrajectoryNameSelect->count()))
+        {
+            tww->cbTrajectoryNameSelect->setCurrentIndex(traj_idx);
+        }
 
         tww->dsbTrajectoryCoordinate->setValue(at.train_position.traj_coord);
 
@@ -1025,7 +1031,7 @@ void MainWindow::slotSaveStartConfig()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotTrainConfigChanged(QString name)
+void MainWindow::slotTrainConfigChanged()
 {
     TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(sender());
     if (tww)
@@ -1034,7 +1040,13 @@ void MainWindow::slotTrainConfigChanged(QString name)
         if (idx == -1)
             return;
 
-        tbActiveTrains->setItemText(idx, name);
+        tbActiveTrains->setItemText(idx, tww->getTrainName());
+
+        int train_idx = tww->cbTrainConfigSelect->currentIndex() - 1;
+        if ((train_idx >= 0) && (train_idx < trains_info.size()))
+        {
+            ui->lwTrains->setCurrentRow(train_idx, QItemSelectionModel::ClearAndSelect);
+        }
     }
 }
 

@@ -3,7 +3,6 @@
 #include "filesystem.h"
 #include "ProcAnimation.h"
 #include "LoadModelOperation.h"
-// #include "MyGui.h"
 
 #include <vsg/threading/OperationThreads.h>
 
@@ -78,7 +77,7 @@ void TrafficLight::deserialize(QByteArray& data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QString& TrafficLight::getConnectorName() const
+const QString& TrafficLight::getConnectorName() const noexcept
 {
     return connector_name;
 }
@@ -86,7 +85,7 @@ const QString& TrafficLight::getConnectorName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int TrafficLight::getSignalDirection() const
+int TrafficLight::getSignalDirection() const noexcept
 {
     return signal_dir;
 }
@@ -94,7 +93,7 @@ int TrafficLight::getSignalDirection() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QString& TrafficLight::getLetter() const
+const QString& TrafficLight::getLetter() const noexcept
 {
     return letter;
 }
@@ -102,7 +101,7 @@ const QString& TrafficLight::getLetter() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QString& TrafficLight::getModelName() const
+const QString& TrafficLight::getModelName() const noexcept
 {
     return signal_model;
 }
@@ -147,6 +146,5 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
         animation->setSignals(&(server_signals));
     }
 
-//    GUIParams::nodes.emplace_back(transform);
     return true;
 }

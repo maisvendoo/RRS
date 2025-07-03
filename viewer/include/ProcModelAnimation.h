@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PROC_MODEL_ANIMATION_H
 #define PROC_MODEL_ANIMATION_H
 

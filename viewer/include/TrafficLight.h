@@ -1,3 +1,4 @@
+#pragma once
 #ifndef TRAFFIC_LIGHT_H
 #define TRAFFIC_LIGHT_H
 
@@ -16,10 +17,9 @@ class QByteArray;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TrafficLight
+class TrafficLight final
 {
 public:
-
     vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
     vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
@@ -32,10 +32,10 @@ public:
 
     void deserialize(QByteArray& data);
 
-    const QString& getConnectorName() const;
-    int getSignalDirection() const;
-    const QString& getLetter() const;
-    const QString& getModelName() const;
+    const QString& getConnectorName() const noexcept;
+    int getSignalDirection() const noexcept;
+    const QString& getLetter() const noexcept;
+    const QString& getModelName() const noexcept;
 
     bool loadSignal(std::string& models_dir_path,
                     std::string& animations_dir,
@@ -43,7 +43,6 @@ public:
                     vsg::ref_ptr<vsg::Options> options);
 
 private:
-
     QString connector_name = "";
     int signal_dir = 0;
     bool is_busy = false;

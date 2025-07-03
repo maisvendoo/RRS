@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FIND_DISPLAY_ANIMATION_H
 #define FIND_DISPLAY_ANIMATION_H
 
@@ -18,11 +19,13 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class FindDisplayAnimationVisitor : public vsg::Inherit<vsg::Visitor, FindDisplayAnimationVisitor>
+class FindDisplayAnimationVisitor final : public vsg::Inherit<vsg::Visitor, FindDisplayAnimationVisitor>
 {
 public:
-    explicit FindDisplayAnimationVisitor(vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
-                                         vsg::ref_ptr<vsg::Duplicate> in_duplicate);
+    FindDisplayAnimationVisitor(
+        vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
+        vsg::ref_ptr<vsg::Duplicate> in_duplicate
+    );
 
     void apply(vsg::Node& node) override;
     void apply(vsg::BindDescriptorSet& bindDescriptorSet) override;

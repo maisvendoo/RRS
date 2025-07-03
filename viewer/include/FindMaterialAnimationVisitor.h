@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FIND_MATERIAL_ANIMATION_H
 #define FIND_MATERIAL_ANIMATION_H
 
@@ -18,11 +19,13 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class FindMaterialAnimationVisitor : public vsg::Inherit<vsg::Visitor, FindMaterialAnimationVisitor>
+class FindMaterialAnimationVisitor final : public vsg::Inherit<vsg::Visitor, FindMaterialAnimationVisitor>
 {
 public:
-    explicit FindMaterialAnimationVisitor(vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
-                                          vsg::ref_ptr<vsg::Duplicate> in_duplicate);
+    FindMaterialAnimationVisitor(
+        vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
+        vsg::ref_ptr<vsg::Duplicate> in_duplicate
+    );
 
     void apply(vsg::Node& node) override;
     void apply(vsg::BindDescriptorSet& bindDescriptorSet) override;

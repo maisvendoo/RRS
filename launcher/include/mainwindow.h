@@ -189,7 +189,7 @@ private slots:
 
     void slotSaveStartConfig();
 
-    void slotTrainConfigChanged(QString name);
+    void slotTrainConfigChanged();
 
     void slotUpdateActiveTrains(bool reset_start_config = true);
 

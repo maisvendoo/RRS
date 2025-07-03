@@ -89,7 +89,7 @@ public:
 
 signals:
 
-    void trainConfigChanged(QString train_name);
+    void trainConfigChanged();
 
     void activeTrainChanged(bool reset_start_config = true);
 

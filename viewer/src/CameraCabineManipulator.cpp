@@ -1,8 +1,16 @@
 #include "CameraCabineManipulator.h"
 
-CameraCabineManipulator::CameraCabineManipulator(vsg::ref_ptr<vsg::Keyboard> keyboard,
-                                                 vsg::ref_ptr<vsg::Camera> camera,
-                                                 settings_t &settings)
+#include "settings.h"
+#include "VehicleExterior.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+CameraCabineManipulator::CameraCabineManipulator(
+    vsg::ref_ptr<vsg::Keyboard> keyboard,
+    vsg::ref_ptr<vsg::Camera> camera,
+    settings_t& settings
+)
     : CameraAbstract(keyboard, camera, settings)
 {
     _pitch_min = vsg::radians(_settings.pitch_min);
@@ -61,16 +69,24 @@ void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
     if (_keyboard->pressed(vsg::KEY_Control_L) || _keyboard->pressed(vsg::KEY_Control_R))
     {
         if (delta.y > 0.0)
+        {
             move(vsg::dvec3(0.0, 0.0, _settings.cabine_height_step));
+        }
         else if (delta.y < 0.0)
+        {
             move(vsg::dvec3(0.0, 0.0, -_settings.cabine_height_step));
+        }
         return;
     }
 
     if (delta.y > 0.0)
-        zoom(1 / _settings.cabine_fovy_coeff);
+    {
+        zoom(1.0 / _settings.cabine_fovy_coeff);
+    }
     else if (delta.y < 0.0)
+    {
         zoom(_settings.cabine_fovy_coeff);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -78,20 +94,21 @@ void CameraCabineManipulator::mouseWheelEvent(vsg::vec3 delta)
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta)
 {
+    if (!delta)
+    {
+        return;
+    }
+
     if (button_mask & moveButtonMask)
     {
-        vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
-
-        if (move_delta)
-            move(move_delta * _cameraMoveCoeff * _settings.cabine_speed_mouse);
-
+        const vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
+        move(move_delta * _cameraMoveCoeff * _settings.cabine_speed_mouse);
         return;
     }
 
     if (button_mask & rotateButtonMask)
     {
-        if (delta)
-            rotate_view(-delta * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
+        rotate_view(-delta * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_mouse);
     }
 }
 
@@ -136,9 +153,13 @@ void CameraCabineManipulator::frameEvent(double dt)
         if ((speed = times2speed(_keyboard->times(pitchDownKey))) != 0.0) rot_speed.y += -speed;
 
         if (rot_speed)
+        {
             rotate_view(rot_speed * dt * (20.0 + _perspective->fieldOfViewY) * _settings.cabine_rotate_keyboard);
+        }
         else
+        {
             calc_view();
+        }
 
         return;
     }

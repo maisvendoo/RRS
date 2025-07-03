@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UPDATE_STATISTICS_HANDLER_H
 #define UPDATE_STATISTICS_HANDLER_H
 
@@ -8,15 +9,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class UpdateStatisticsHandler : public vsg::Inherit<vsg::Visitor, UpdateStatisticsHandler>
+class UpdateStatisticsHandler final : public vsg::Inherit<vsg::Visitor, UpdateStatisticsHandler>
 {
 public:
-    explicit UpdateStatisticsHandler();
+    UpdateStatisticsHandler();
 
     void apply(vsg::FrameEvent& frame) override;
 
-    double getAverageFPS() const;
-    double getLowestFPS() const;
+    double getAverageFPS() const noexcept;
+    double getLowestFPS() const noexcept;
 
 private:
 

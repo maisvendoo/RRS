@@ -1,3 +1,4 @@
+#pragma once
 #ifndef TRAFFIC_LIGHTS_HANDLER_H
 #define TRAFFIC_LIGHTS_HANDLER_H
 
@@ -15,12 +16,12 @@ class QByteArray;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TrafficLightsHandler : public QObject
+class TrafficLightsHandler final : public QObject
 {
     Q_OBJECT
 
 public:
-    TrafficLightsHandler(QObject* parent = nullptr);
+    explicit TrafficLightsHandler(QObject* parent = nullptr);
 
     /// Get scene group
     vsg::ref_ptr<vsg::Group> getNode();
@@ -33,11 +34,10 @@ public:
               vsg::ref_ptr<vsg::Options> options);
 
 private:
-
     void deserialize(QByteArray& data);
     void deserialize_signals(const char* signals_type, QDataStream& data_stream);
 
-    void printSignalInfo(TrafficLight* tl);
+    void printSignalInfo(const TrafficLight* tl) const;
 
     vsg::ref_ptr<vsg::Group> traffic_light_nodes = vsg::Group::create();
 

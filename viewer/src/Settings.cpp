@@ -42,6 +42,16 @@ void RouteViewer::loadLoggerSettings(CfgReader& cfg, const QString& section)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
+{
+    cfg.getBool(section, "DisableCullNode", settings.disable_culling_node);
+    cfg.getBool(section, "DisableNativeGLTF", settings.disable_native_gltf_loader);
+    cfg.getBool(section, "DrawModelsTwoSided", settings.draw_models_two_sided);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 {
     QString name = "viewer";

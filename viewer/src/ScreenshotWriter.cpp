@@ -9,13 +9,17 @@
 #include "vsg/commands/CopyImage.h"
 #include "vsg/vk/SubmitCommands.h"
 #include "vsg/io/write.h"
+#include <cstdint>
+#include <vsg/vk/Device.h>
+#include <vsg/vk/PhysicalDevice.h>
+#include <vsg/vk/Swapchain.h>
 #include <vsgXchange/all.h>
 #include <QDateTime>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ScreenshotWriter::ScreenshotWriter(std::string filename)
+ScreenshotWriter::ScreenshotWriter(const std::string& filename)
     : _filename(filename)
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -25,7 +29,7 @@ ScreenshotWriter::ScreenshotWriter(std::string filename)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScreenshotWriter::setScreenshot(bool screenshot_needed)
+void ScreenshotWriter::setScreenshot(bool screenshot_needed) noexcept
 {
     _is_screenshot = screenshot_needed;
 }
@@ -33,7 +37,7 @@ void ScreenshotWriter::setScreenshot(bool screenshot_needed)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ScreenshotWriter::isScreeenshot()
+bool ScreenshotWriter::isScreeenshot() const noexcept
 {
     return _is_screenshot;
 }
@@ -47,17 +51,17 @@ void ScreenshotWriter::doScreeenshot(vsg::ref_ptr<vsg::Window> window, vsg::ref_
 
     _is_screenshot = false;
 
-    auto width = window->extent2D().width;
-    auto height = window->extent2D().height;
+    const std::uint32_t width = window->extent2D().width;
+    const std::uint32_t height = window->extent2D().height;
 
-    auto device = window->getDevice();
-    auto physicalDevice = window->getPhysicalDevice();
-    auto swapchain = window->getSwapchain();
+    const vsg::ref_ptr<vsg::Device> device = window->getDevice();
+    const vsg::ref_ptr<vsg::PhysicalDevice> physicalDevice = window->getPhysicalDevice();
+    const vsg::ref_ptr<vsg::Swapchain> swapchain = window->getSwapchain();
 
-    // get the colour buffer image of the previous rendered frame as the current frame hasn't been rendered yet.  The 1 in window->imageIndex(1) means image from 1 frame ago.
-    auto sourceImage = window->imageView(window->imageIndex(1))->image;
+    // get the color buffer image of the previous rendered frame as the current frame hasn't been rendered yet.  The 1 in window->imageIndex(1) means image from 1 frame ago
+    const vsg::ref_ptr<vsg::Image> sourceImage = window->imageView(window->imageIndex(1))->image;
 
-    VkFormat sourceImageFormat = swapchain->getImageFormat();
+    const VkFormat sourceImageFormat = swapchain->getImageFormat();
     VkFormat targetImageFormat = sourceImageFormat;
 
     //
@@ -69,8 +73,8 @@ void ScreenshotWriter::doScreeenshot(vsg::ref_ptr<vsg::Window> window, vsg::ref_
     VkFormatProperties destFormatProperties;
     vkGetPhysicalDeviceFormatProperties(*(physicalDevice), VK_FORMAT_R8G8B8A8_SRGB, &destFormatProperties);
 
-    bool supportsBlit = ((srcFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) != 0) &&
-                        ((destFormatProperties.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) != 0);
+    const bool supportsBlit = ((srcFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) != 0)
+                              && ((destFormatProperties.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) != 0);
 
     if (supportsBlit)
     {
@@ -253,11 +257,16 @@ void ScreenshotWriter::doScreeenshot(vsg::ref_ptr<vsg::Window> window, vsg::ref_
         }
     }
 
-    std::string path = _screenshot_path +
-                       QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss_").toStdString() +
-                       _filename;
+    const std::string current_date_time = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss_").toStdString();
+
+    const std::string path = _screenshot_path + current_date_time + _filename;
+
     if (vsg::write(imageData, path, options))
+    {
         LOG_INFO("Write screenchot: %s", path.c_str());
+    }
     else
+    {
         LOG_WARN("Fail to write screenchot");
+    }
 }

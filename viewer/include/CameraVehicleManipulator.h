@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CAMERA_VEHICLE_MANIPULATOR_H
 #define CAMERA_VEHICLE_MANIPULATOR_H
 

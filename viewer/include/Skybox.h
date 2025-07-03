@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
@@ -12,17 +13,15 @@ namespace vsg
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class Skybox
+class Skybox final
 {
 public:
-
     Skybox(std::string& skybox_model_filepath, vsg::ref_ptr<vsg::Options> options = {});
 
     /// Get scene node
-    vsg::ref_ptr<vsg::Node> getNode();
+    vsg::ref_ptr<vsg::Node> getNode() const noexcept;
 
 private:
-
     vsg::ref_ptr<vsg::Node> node = nullptr;
 
     void init(std::string& skybox_model_filepath, vsg::ref_ptr<vsg::Options> options);

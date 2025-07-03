@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 
@@ -27,24 +28,23 @@ class UpdateViewerHandler;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class RouteViewer : public QObject
+class RouteViewer final : public QObject
 {
     Q_OBJECT
 
 public:
-    RouteViewer(int argc, char* argv[], QObject* parent = Q_NULLPTR);
+    explicit RouteViewer(QObject* parent = nullptr);
     ~RouteViewer();
 
-    bool isReady() const;
+    void initialize(int argc, char* argv[]);
 
     int run();
 
 private:
-    bool init(int argc, char* argv[]);
-
     void loadSettings();
     void loadNetworkSettings(CfgReader& cfg, const QString& section);
     void loadLoggerSettings(CfgReader& cfg, const QString& section);
+    void loadModelsSettings(CfgReader& cfg, const QString& section);
     void loadWindowSettings(CfgReader& cfg, const QString& section);
     void loadLightSettings(CfgReader& cfg, const QString& section);
     void loadCameraSettings(CfgReader& cfg, const QString& section);
