@@ -262,14 +262,6 @@ void VehiclesHandler::step(double t, double dt)
             }
         }
 
-        std::vector<float> veh_signals(MAX_ANALOG_SIGNALS);
-        std::fill(veh_signals.begin(), veh_signals.end(), 0.0f);
-        std::copy(
-            update_data[new_state].vehicles[i].analogSignal.begin(),
-            update_data[new_state].vehicles[i].analogSignal.end(),
-            veh_signals.begin()
-        );
-
         // Model animations step
         vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), camera_pos);
     }
