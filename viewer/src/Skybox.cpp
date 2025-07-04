@@ -1,20 +1,29 @@
 #include "Skybox.h"
 
+#include <vsgXchange/all.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/io/read.h>
-#include <vsgXchange/all.h>
+#include <vsg/core/Array2D.h>
+#include <vsg/state/BindDescriptorSet.h>
+#include <vsg/state/DescriptorImage.h>
+#include <vsg/state/Image.h>
+#include <vsg/state/ImageInfo.h>
+#include <vsg/state/ImageView.h>
+#include "vsg/state/GraphicsPipeline.h"
+#include "vsg/state/DepthStencilState.h"
 
 #include "filesystem.h"
 #include "Logger.h"
-#include "vsg/state/GraphicsPipeline.h"
-#include "vsg/state/DepthStencilState.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Skybox::Skybox(std::string& skybox_model_filepath, vsg::ref_ptr<vsg::Options> options)
+Skybox::Skybox(std::string& skybox_model_filepath,
+               std::vector<std::string> skybox_texture_filepath,
+               vsg::ref_ptr<vsg::Options> options)
 {
-    init(skybox_model_filepath, options);
+    init_model(skybox_model_filepath, options);
+    init_textures(skybox_texture_filepath, options);
 }
 
 //------------------------------------------------------------------------------
@@ -28,7 +37,23 @@ vsg::ref_ptr<vsg::Node> Skybox::getNode() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Skybox::init(std::string &skybox_model_filepath, vsg::ref_ptr<vsg::Options> options)
+vsg::ref_ptr<vsg::ubvec4Array2D> Skybox::getDefaultTexture() const noexcept
+{
+    return texture;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> Skybox::getTextures() const noexcept
+{
+    return textures;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Skybox::init_model(std::string &skybox_model_filepath, vsg::ref_ptr<vsg::Options> options)
 {
     if (!vsg::fileExists(skybox_model_filepath))
     {
@@ -99,4 +124,98 @@ void Skybox::init(std::string &skybox_model_filepath, vsg::ref_ptr<vsg::Options>
     } change_pipeline(shader_vert_stage);
 
     node->accept(change_pipeline);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Skybox::init_textures(std::vector<std::string> skybox_texture_filepath, vsg::ref_ptr<vsg::Options> options)
+{
+    if (!node)
+    {
+        return;
+    }
+
+    // Находим дефолтную текстуру в модели
+    struct findTexture : public vsg::Visitor
+    {
+        vsg::ref_ptr<vsg::ubvec4Array2D> texture = nullptr;
+        findTexture()
+        {}
+
+        void apply(vsg::Object& object)
+        {
+            object.traverse(*this);
+        }
+
+        void apply(vsg::BindDescriptorSet &bindDescriptorSet)
+        {
+            for (auto& descriptor : bindDescriptorSet.descriptorSet->descriptors)
+            {
+                if (auto descriptor_image = descriptor.cast<vsg::DescriptorImage>())
+                {
+                    if ((descriptor_image->dstBinding == 0) && (descriptor_image->imageInfoList.size() > 0))
+                    {
+                        if (auto image_info = descriptor_image->imageInfoList[0])
+                        {
+                            if (auto image_view = image_info->imageView)
+                            {
+                                if (auto image = image_view->image)
+                                {
+                                    texture = image->data.cast<vsg::ubvec4Array2D>();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } find_texture;
+
+    node->accept(find_texture);
+    texture = find_texture.texture;
+
+    if (!texture)
+    {
+        LOG_WARN("Fail to find default skybox texture in model");
+        return;
+    }
+
+    // Загружаем варианты текстур
+    for (auto& path : skybox_texture_filepath)
+    {
+        if (!vsg::fileExists(path))
+        {
+            LOG_WARN("Fail to find skybox texture file: %s", path.c_str());
+            continue;
+        }
+
+        vsg::ref_ptr<vsg::Object> loaded = vsg::read(path, options);
+        vsg::ref_ptr<vsg::ubvec4Array2D> data = loaded.cast<vsg::ubvec4Array2D>();
+        if (!data)
+        {
+            LOG_WARN("Fail to load skybox texture from file: %s", path.c_str());
+
+            vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
+            if (error)
+                LOG_WARN(error->message.c_str());
+            continue;
+        }
+
+        // Проверяем, что новая текстура совпадает по размеру с дефолтной
+        if ((data->width() == texture->width()) && data->height() == texture->height())
+        {
+            textures.push_back(data);
+        }
+        else
+        {
+            LOG_WARN("Fail to apply skybox texture from file: %s", path.c_str());
+        }
+    }
+
+    // Указываем vsg что возможна подмена текстуры скайбокса
+    if (!textures.empty())
+    {
+        texture->properties.dataVariance = vsg::DYNAMIC_DATA;
+    }
 }

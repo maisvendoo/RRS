@@ -44,6 +44,11 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     float sun_azimuth_degrees = 45.0f;
     float sun_altitude_degrees = 45.0f;
+
+    int skybox_texture_index = 1;
+    int prev_skybox_texture_index = 1;
+    vsg::ref_ptr<vsg::ubvec4Array2D> skybox_texture_data;
+    std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> skybox_textures;
 };
 
 //------------------------------------------------------------------------------

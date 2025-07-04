@@ -605,7 +605,17 @@ bool RouteViewer::loadRoute()
     std::string skybox_model_filepath = fs.combinePath(route_dir_path, "models");
     skybox_model_filepath = fs.combinePath(skybox_model_filepath, "sky.gltf");
 
-    Skybox skybox(skybox_model_filepath, options);
+    std::vector<std::string> skybox_texture_filepath;
+    for (auto& filename : settings.skybox_textures)
+    {
+        std::string texture_filepath = fs.combinePath(route_dir_path, "textures");
+        texture_filepath = fs.combinePath(texture_filepath, filename);
+        skybox_texture_filepath.push_back(texture_filepath);
+    }
+
+    Skybox skybox(skybox_model_filepath, skybox_texture_filepath, options);
+    GUIparams->skybox_texture_data = skybox.getDefaultTexture();
+    GUIparams->skybox_textures = skybox.getTextures();
     root->addChild(skybox.getNode());
 #if 0
         // запись неба в файл

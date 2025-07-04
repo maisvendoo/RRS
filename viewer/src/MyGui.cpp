@@ -252,6 +252,10 @@ void MyGui::showSettings() const
     ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 5.0f);
     ImGui::SliderFloat("Sun azimuth", &params->sun_azimuth_degrees, 0.0f, 360.0f, "%.1f");
     ImGui::SliderFloat("Sun altitude", &params->sun_altitude_degrees, -90.0f, 90.0f, "%.1f");
+    if (params->skybox_textures.size() > 0)
+    {
+        ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
+    }
     ImGui::End();
 
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
@@ -259,6 +263,24 @@ void MyGui::showSettings() const
     vsg::mat4 rotate_altitude = vsg::rotate(vsg::radians(params->sun_altitude_degrees), 1.0f, 0.0f, 0.0f);
     sun_direction = sun_direction * rotate_azimuth * rotate_altitude;
     *params->sun_direction_d = vsg::dvec3(vsg::normalize(sun_direction));
+
+    if (params->prev_skybox_texture_index == params->skybox_texture_index)
+        return;
+
+    params->prev_skybox_texture_index = params->skybox_texture_index;
+    if ((params->skybox_textures.size() > 0) && (params->skybox_texture_index > 0) && (params->skybox_texture_index <= params->skybox_textures.size()))
+    {
+        vsg::ref_ptr<vsg::ubvec4Array2D> selected_data = params->skybox_textures[params->skybox_texture_index - 1];
+        auto selected_data_pixel = selected_data->begin();
+        auto texture_pixel = params->skybox_texture_data->begin();
+        while (texture_pixel != params->skybox_texture_data->end())
+        {
+            *texture_pixel = *selected_data_pixel;
+            ++selected_data_pixel;
+            ++texture_pixel;
+        }
+        params->skybox_texture_data->dirty();
+    }
 }
 
 //------------------------------------------------------------------------------
