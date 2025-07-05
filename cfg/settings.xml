@@ -18,11 +18,11 @@
     <Viewer>
         <!-- Запись в лог-файл: INFO - все сообщения, WARN - только ошибки, FATAL - только критические ошибки -->
         <NotifyLevel>INFO</NotifyLevel>
-        <!-- Отключение дополнительной проверки моделей на видимость из камеры -->
+        <!-- 1 - отключение дополнительной проверки моделей на видимость из камеры -->
         <DisableCullNode>1</DisableCullNode>
-        <!-- Отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->
-        <DisableNativeGLTF>1</DisableNativeGLTF>
-        <!-- Отрисовка всех полигонов моделей с обеих сторон -->
+        <!-- 1 - отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->
+        <DisableNativeGLTF>0</DisableNativeGLTF>
+        <!-- 1 - отрисовка всех полигонов моделей с обеих сторон -->
         <DrawModelsTwoSided>0</DrawModelsTwoSided>
         <!-- Заголовок окна -->
         <Name>viewer</Name>
