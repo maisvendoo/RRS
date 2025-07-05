@@ -176,7 +176,7 @@ void FindDisplayAnimationVisitor::apply(vsg::BindDescriptorSet &bindDescriptorSe
         if (new_emissive_image)
         {
             vsg::ref_ptr<vsg::ImageView> new_emissive_image_view = vsg::ImageView::create(*(emissive_descriptor->imageInfoList[0]->imageView));
-            new_emissive_image_view->image = emissive_image;
+            new_emissive_image_view->image = new_emissive_image;
 
             // ImageInfo has deleted copy constructor
             vsg::ref_ptr<vsg::ImageInfo> new_emissive_image_info = vsg::ImageInfo::create(emissive_descriptor->imageInfoList[0]->sampler,
