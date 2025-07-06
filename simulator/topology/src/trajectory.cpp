@@ -247,6 +247,8 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         // Проверяем переход на предыдущую траекторию
         if (coord_begin < 0.0)
         {
+            distance = distance + coord_end;
+
             if (bwd_connector == Q_NULLPTR)
                 return -1;
 
@@ -254,7 +256,6 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
             if (traj == Q_NULLPTR)
                 return -1;
 
-            distance = distance + coord_end;
             return traj->getBusyVehicle(distance, traj->getLength(), -coord_begin, -1);
         }
     }
@@ -287,6 +288,8 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         // Проверяем переход на следующую траекторию
         if (coord_end > len)
         {
+            distance = distance + len - coord_begin;
+
             if (fwd_connector == Q_NULLPTR)
                 return -1;
 
@@ -294,11 +297,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
             if (traj == Q_NULLPTR)
                 return -1;
 
-            distance = distance + len - coord_begin;
             return traj->getBusyVehicle(distance, 0.0, coord_end - len, 1);
         }
     }
 
+    distance = distance + search_distance;
     return -1;
 }
 
