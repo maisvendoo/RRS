@@ -124,6 +124,9 @@ bool Train::init(const solver_config_t &solver_config, int direction, std::vecto
 
     for (auto vehicle : this->vehicles)
     {
+        trainMass += vehicle->getMass();
+        trainLength += vehicle->getLength();
+
         vehicle->setStateIndex(ode_order);
         ode_order += 2 * vehicle->getDegressOfFreedom();
     }
@@ -533,6 +536,9 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         y.insert(y.end(), new_y.begin(), new_y.end());
     }
 
+    trainMass += other_train->getMass();
+    trainLength += other_train->getLength();
+
     ode_order = y.size();
     train_motion_solver->setODEsize(ode_order);
     dydt.resize(ode_order);
@@ -582,7 +588,7 @@ Train *Train::uncouple(double uncoupling_distance)
         if (distance < uncoupling_distance)
             continue;
 
-        Journal::instance()->info(QString("Train %1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
+        Journal::instance()->info(QString("Train #%1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
                                       .arg(train_idx, 3)
                                       .arg(i - 1, 3)
                                       .arg(vehicles[i - 1]->getModelIndex(), 4)
@@ -638,6 +644,14 @@ Train *Train::uncouple(double uncoupling_distance)
         }
 
         vehicles.resize(i);
+
+        trainMass = 0.0;
+        trainLength = 0.0;
+        for (auto vehicle : vehicles)
+        {
+            trainMass += vehicle->getMass();
+            trainLength += vehicle->getLength();
+        }
 
         ode_order = idx;
         y.resize(ode_order);
