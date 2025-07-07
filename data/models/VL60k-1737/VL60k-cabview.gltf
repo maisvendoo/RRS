@@ -10075,7 +10075,6 @@
 			}
 		},
 		{
-			"alphaMode":"BLEND",
 			"name":"02 - Default.003",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
@@ -10112,7 +10111,6 @@
 			}
 		},
 		{
-			"alphaMode":"BLEND",
 			"name":"01 - Default.003",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
