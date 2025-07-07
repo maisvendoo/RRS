@@ -2,6 +2,6 @@
 <Config>
 	<ModelAnimation>
 		<SignalID>40</SignalID>
-		<Time>1.33</Time>
+		<Duration>1.33</Duration>
 	</ModelAnimation>
 </Config>
