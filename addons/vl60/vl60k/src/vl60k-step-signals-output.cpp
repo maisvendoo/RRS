@@ -123,4 +123,6 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[LS_R] = safety_device->getRedLamp();
     analogSignal[LS_Y] = safety_device->getYellowLamp();
     analogSignal[LS_G] = safety_device->getGreenLamp();
+
+    analogSignal[KLUCH_EPK] = static_cast<float>(key_epk.getState());
 }
