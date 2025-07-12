@@ -123,6 +123,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     // Лампы предварительной световой сигнализации УКБМ
     analogSignal[SIG_LIGHT_PSS_L] = safety_device->getStatePSS();
     analogSignal[SIG_LIGHT_PSS_R] = safety_device->getStatePSS();
+    analogSignal[SIG_LIGHT_PSS_PROPUSK] = 0.0f;
 
     // Лампы локомотивного светофора
     analogSignal[LS_W] = safety_device->getWhiteLamp();

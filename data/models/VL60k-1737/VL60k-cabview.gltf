@@ -13934,42 +13934,42 @@
 		{
 			"mimeType":"image/png",
 			"name":"alsn",
-			"uri":"alsn.png"
+			"uri":"textures/alsn.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"kab",
-			"uri":"kab.png"
+			"uri":"textures/kab.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_367",
-			"uri":"_367.png"
+			"uri":"textures/_367.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pult",
-			"uri":"pult.png"
+			"uri":"textures/pult.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_epk",
-			"uri":"_epk.png"
+			"uri":"textures/_epk.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_254_395",
-			"uri":"_254_395.png"
+			"uri":"textures/_254_395.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"RS_Transp",
-			"uri":"RS_Transp.png"
+			"uri":"textures/RS_Transp.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Skor_SL2m",
-			"uri":"Skor_SL2m.png"
+			"uri":"textures/Skor_SL2m.png"
 		}
 	],
 	"accessors":[
@@ -14854,14 +14854,14 @@
 			"componentType":5126,
 			"count":55,
 			"max":[
-				0.005754020065069199,
+				0.005753662437200546,
 				0.03979039937257767,
-				0.03123369999229908
+				0.031233353540301323
 			],
 			"min":[
-				-0.005754140205681324,
+				-0.005754497833549976,
 				-7.23152988939546e-05,
-				-0.03123380057513714
+				-0.031234147027134895
 			],
 			"type":"VEC3"
 		},

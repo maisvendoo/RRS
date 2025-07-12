@@ -87,7 +87,7 @@ void RouteViewer::initialize(int argc, char* argv[])
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
 
-    screenshot_writer = new ScreenshotWriter("screenshot.png");
+    screenshot_writer = new ScreenshotWriter("screenshot.jpg");
 
     traffic_lights_handler = new TrafficLightsHandler();
     vehicles_handler = new VehiclesHandler(settings, sound_manager);
