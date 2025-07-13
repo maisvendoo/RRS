@@ -86,6 +86,8 @@ private:
 
     void changeCurrentVehicle();
 
+    void changeCurrentCabine();
+
     void updateShadowRegion();
 
     settings_t& _settings;

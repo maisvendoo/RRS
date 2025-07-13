@@ -264,6 +264,12 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 return;
             }
 
+            case vsg::KEY_Tab:
+            {
+                changeCurrentCabine();
+                return;
+            }
+
             default:
             {
                 break;
@@ -568,6 +574,21 @@ void UpdateViewerHandler::changeCurrentVehicle()
 
     _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
                                               _vehicles_handler->getControlledVehicleIndex());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::changeCurrentCabine()
+{
+    auto vehicle = _vehicles_handler->getCurrentVehicle();
+
+    vehicle->cabine_idx++;
+
+    if (vehicle->cabine_idx == vehicle->driver_pos.size())
+    {
+        vehicle->cabine_idx = 0;
+    }
 }
 
 //------------------------------------------------------------------------------

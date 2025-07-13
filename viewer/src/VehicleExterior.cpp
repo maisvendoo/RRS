@@ -135,11 +135,16 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     if (cfg.getString(sec_name, "DriverPos", modelShift))
     {
-        std::istringstream ss(modelShift.toStdString());
+        QStringList driverPos = modelShift.split(';');
 
-        size_t dp_idx = 0;
+        driver_pos.clear();
 
-        ss >> driver_pos[dp_idx].x >> driver_pos[dp_idx].y >> driver_pos[dp_idx].z;
+        for (int dp_idx = 0; dp_idx < driverPos.size(); ++dp_idx)
+        {
+            std::istringstream ss(driverPos[dp_idx].toStdString());
+            driver_pos.push_back(vsg::dvec3(0.0, 0.0, 0.0));
+            ss >> driver_pos[dp_idx].x >> driver_pos[dp_idx].y >> driver_pos[dp_idx].z;
+        }
     }
 
     load_sounds(sounds_dir, sm);
