@@ -252,7 +252,7 @@ void CameraCabineManipulator::calc_view()
     if (!_current_vehicle)
         return;
 
-    vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos + _position_shift;
+    vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos[_current_vehicle->cabine_idx] + _position_shift;
 
     _lookAt->eye = _current_vehicle->position +
                    _current_vehicle->right * local_eye_pos.x +

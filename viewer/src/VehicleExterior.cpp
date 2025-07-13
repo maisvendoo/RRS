@@ -132,10 +132,14 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     }
 
     modelShift = "";
+
     if (cfg.getString(sec_name, "DriverPos", modelShift))
     {
         std::istringstream ss(modelShift.toStdString());
-        ss >> driver_pos.x >> driver_pos.y >> driver_pos.z;
+
+        size_t dp_idx = 0;
+
+        ss >> driver_pos[dp_idx].x >> driver_pos[dp_idx].y >> driver_pos[dp_idx].z;
     }
 
     load_sounds(sounds_dir, sm);

@@ -22,7 +22,7 @@ public:
     vsg::dvec3  right = vsg::dvec3(1.0, 0.0, 0.0);
     vsg::dvec3  attitude = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  velocity = vsg::dvec3(0.0, 0.0, 0.0);
-    vsg::dvec3  driver_pos = vsg::dvec3(0.0, 0.0, 0.0);
+    std::vector<vsg::dvec3>  driver_pos;
     int         train_id = 0;
     int         orientation = 1;
     int         prev_vehicle = -1;
@@ -35,6 +35,8 @@ public:
     double      saved_cabine_cam_right = 0.0;
     double      saved_cabine_cam_up = 0.0;
     double      saved_cabine_cam_fov = 64.0;
+
+    size_t cabine_idx = 0;
 
     VehicleExterior() = default;
 
