@@ -50,6 +50,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::sendLogMessage,
             this, &MainWindow::slotRecvLogMessage);
 
+    connect(ui->actionShowTrajName, &QAction::triggered,
+            this, &MainWindow::slotSetShowTrajStatus);
+
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -249,6 +252,20 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     {
         ui->ptLog->appendPlainText(tr("Connectors list is empty"));
         return;
+    }
+
+    for (auto tl : map->traj_labels)
+    {
+        delete tl;
+    }
+    map->traj_labels.clear();
+
+    for (auto traj : *topology->getTrajectoriesList())
+    {
+        QLabel *traj_label = new QLabel(map);
+        traj_label->setText(traj->getName());
+        traj_label->setVisible(false);
+        map->traj_labels.insert(traj->getName(), traj_label);
     }
 
     for (auto sl : map->switch_labels)
@@ -618,4 +635,17 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
 void MainWindow::slotRecvLogMessage(QString msg)
 {
     ui->ptLog->appendPlainText(msg);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSetShowTrajStatus(bool is_show)
+{
+    map->showTrajNames(is_show);
+
+    if (is_show)
+        slotRecvLogMessage("Showed traj names");
+    else
+        slotRecvLogMessage("Hided traj names");
 }

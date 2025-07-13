@@ -106,6 +106,8 @@ private slots:
     void slotUpdateSignal(QByteArray signal_data);
 
     void slotRecvLogMessage(QString msg);
+
+    void slotSetShowTrajStatus(bool is_show);
 };
 
 #endif // MAINWINDOW_H

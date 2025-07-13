@@ -47,6 +47,8 @@ public:
 
     QMap<QString, SignalLabel *> signal_labels_bwd;
 
+    QMap<QString, QLabel *> traj_labels;
+
     void resize(int width, int height);
 
     void setSwitchLength(double value);
@@ -63,6 +65,11 @@ public:
     QPoint getMousePos() const
     {
         return mouse_pos;
+    }
+
+    void showTrajNames(bool is_show)
+    {
+        show_traj_names = is_show;
     }
 
 public slots:
@@ -104,6 +111,9 @@ private:
 
     /// Смещение схематичного светофора вправо от оси пути, м
     double signal_offset = 2.5;
+
+    /// Флаг отображения имен траекторий
+    bool show_traj_names = false;
 
     void paintEvent(QPaintEvent *event);
 

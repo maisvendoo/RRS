@@ -152,6 +152,21 @@ void MapWidget::drawTrajectory(Trajectory *traj)
         painter.drawLine(p0, p1);
     }
 
+    dvec3 mp = (traj->getFirstTrack().begin_point + traj->getLastTrack().end_point) * 0.5;
+    QPoint pt = coord_transform(mp);
+
+    QLabel *traj_label = traj_labels.value(traj->getName());
+
+    if (traj_label != Q_NULLPTR)
+    {
+        traj_label->move(pt);
+
+        if (show_traj_names)
+            traj_label->show();
+        else
+            traj_label->hide();
+    }
+
     painter.end();
 }
 
