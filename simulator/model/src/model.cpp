@@ -275,7 +275,9 @@ void Model::findNearestVehicles()
     {
         Train* train = trains[train_idx];
         if (train == nullptr)
+        {
             continue;
+        }
 
         int train_dir = train->getDirection();
 
@@ -294,7 +296,12 @@ void Model::findNearestVehicles()
 
             // Если ничего не нашли - дальше делать нечего
             if (nearest_idx == -1)
+            {
+                train->setDistanceToEndOfTrajectory(dir_it, current_distance);
                 continue;
+            }
+
+            train->setDistanceToEndOfTrajectory(dir_it, DISTANCE_TO_COUPLE_TRAINS);
 
             // Создаём число из индексов найденной пары ПЕ, в порядке возрастания
             size_t idx_pair = (idx < nearest_idx) ?

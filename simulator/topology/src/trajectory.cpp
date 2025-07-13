@@ -161,7 +161,7 @@ std::vector<TrajectoryDevice *> Trajectory::getTrajectoryDevices()
 //------------------------------------------------------------------------------
 void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 {
-    if ((coord_begin >= 0.0) && (coord_end <= len))
+    if ((coord_begin < len) && (coord_end > 0.0) && (coord_begin < coord_end))
         vehicles_coords.insert(idx, {coord_begin, coord_end});
     else
         vehicles_coords.remove(idx);
