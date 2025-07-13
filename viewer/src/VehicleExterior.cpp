@@ -131,20 +131,30 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         transform->setValue("name", "only vehicle");
     }
 
-    modelShift = "";
+    QDomNode secNode = cfg.getFirstSection("Cabine");
 
-    if (cfg.getString(sec_name, "DriverPos", modelShift))
+    driver_pos.clear();
+    driver_dir.clear();
+
+    while (!secNode.isNull())
     {
-        QStringList driverPos = modelShift.split(';');
+        QString DriverPos = "";
+        cfg.getString(secNode, "DriverPos", DriverPos);
 
-        driver_pos.clear();
+        vsg::dvec3 dp;
+        std::istringstream ss(DriverPos.toStdString());
+        ss >> dp.x >> dp.y >> dp.z;
+        driver_pos.push_back(dp);
 
-        for (int dp_idx = 0; dp_idx < driverPos.size(); ++dp_idx)
-        {
-            std::istringstream ss(driverPos[dp_idx].toStdString());
-            driver_pos.push_back(vsg::dvec3(0.0, 0.0, 0.0));
-            ss >> driver_pos[dp_idx].x >> driver_pos[dp_idx].y >> driver_pos[dp_idx].z;
-        }
+        QString DriverDir = "";
+        cfg.getString(secNode, "DriverDir", DriverDir);
+
+        vsg::dvec3 dd;
+        std::istringstream ss2(DriverDir.toStdString());
+        ss2 >> dd.x >> dd.y >> dd.z;
+        driver_dir.push_back(dd);
+
+        secNode = cfg.getNextSection();
     }
 
     load_sounds(sounds_dir, sm);
