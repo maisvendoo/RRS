@@ -40,12 +40,12 @@
 
 	<Cabine>
 		<DriverPos>0.8 8.4 3.6</DriverPos>
-		<DriverDir>0.0 1.0 0.0</DriverDir>
+		<DriverDir>0.0</DriverDir>
 	</Cabine>
 
 	<Cabine>
 		<DriverPos>-0.8 -8.4 3.6</DriverPos>
-		<DriverDir>0.0 -1.0 0.0</DriverDir>
+		<DriverDir>180.0</DriverDir>
 	</Cabine>
 
 </Config>

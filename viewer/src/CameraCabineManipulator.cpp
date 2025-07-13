@@ -33,7 +33,7 @@ void CameraCabineManipulator::resetView()
     }
 
     _position_shift = {0.0, 0.0, 0.0};
-    _angle_right = 0.0;
+    _angle_right =  _current_vehicle->driver_dir[_current_vehicle->cabine_idx];
     _angle_up = 0.0;
     _perspective->fieldOfViewY = _settings.fovy;
 

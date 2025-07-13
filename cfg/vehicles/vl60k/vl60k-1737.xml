@@ -36,4 +36,15 @@
 
 		<DriverPos>0.8 8.4 3.6</DriverPos>
 	</Vehicle>
+
+	<Cabine>
+		<DriverPos>0.8 8.4 3.6</DriverPos>
+		<DriverDir>0.0</DriverDir>
+	</Cabine>
+
+	<Cabine>
+		<DriverPos>-0.8 -8.4 3.6</DriverPos>
+		<DriverDir>180.0</DriverDir>
+	</Cabine>
+
 </Config>

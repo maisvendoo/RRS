@@ -146,13 +146,9 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         ss >> dp.x >> dp.y >> dp.z;
         driver_pos.push_back(dp);
 
-        QString DriverDir = "";
-        cfg.getString(secNode, "DriverDir", DriverDir);
-
-        vsg::dvec3 dd;
-        std::istringstream ss2(DriverDir.toStdString());
-        ss2 >> dd.x >> dd.y >> dd.z;
-        driver_dir.push_back(dd);
+        double dd = 0.0;
+        cfg.getDouble(secNode, "DriverDir", dd);
+        driver_dir.push_back(vsg::radians(dd));
 
         secNode = cfg.getNextSection();
     }

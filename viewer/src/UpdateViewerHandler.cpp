@@ -267,6 +267,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             case vsg::KEY_Tab:
             {
                 changeCurrentCabine();
+                _current_manipulator->resetView();
                 return;
             }
 
