@@ -152,7 +152,12 @@ void MapWidget::drawTrajectory(Trajectory *traj)
         painter.drawLine(p0, p1);
     }
 
-    dvec3 mp = (traj->getFirstTrack().begin_point + traj->getLastTrack().end_point) * 0.5;
+
+    std::vector<track_t> tracs = traj->getTracks();
+    track_t middle_track = tracs[tracs.size() / 2];
+
+    dvec3 mp = (middle_track.begin_point + middle_track.end_point) * 0.5;
+
     QPoint pt = coord_transform(mp);
 
     QLabel *traj_label = traj_labels.value(traj->getName());
