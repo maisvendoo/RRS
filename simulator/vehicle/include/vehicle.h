@@ -192,6 +192,11 @@ public:
 
     void resetKeysData();
 
+    void setCabineIndex(uint32_t cabine_idx)
+    {
+        this->cabine_idx = cabine_idx;
+    }
+
 public slots:
 
     void getControlSignals(control_signals_t control_signals);
@@ -325,6 +330,8 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
+
+    uint32_t cabine_idx = 0;
 
     /// User defined initialization
     virtual void initialization();

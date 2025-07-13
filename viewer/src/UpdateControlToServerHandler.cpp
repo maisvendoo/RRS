@@ -61,6 +61,15 @@ void UpdateControlToServerHandler::changeCurrentVehicle(int current_idx, int con
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void UpdateControlToServerHandler::changeCurrentCabine(size_t cabine_idx)
+{
+    _cabine_idx = cabine_idx;
+    sendControlToServer();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void UpdateControlToServerHandler::apply([[maybe_unused]] vsg::FocusInEvent& focusIn)
 {
     sendControlToServer();
@@ -109,6 +118,7 @@ void UpdateControlToServerHandler::sendControlToServer()
     controlled_t controlled;
     controlled.current_vehicle = _current_idx;
     controlled.controlled_vehicle = _controlled_idx;
+    controlled.cabine_idx = _cabine_idx;
 
     // Отправляем массив управляющих клавиш
     for (auto key : _pressed_keys)

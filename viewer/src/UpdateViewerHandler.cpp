@@ -590,6 +590,8 @@ void UpdateViewerHandler::changeCurrentCabine()
     {
         vehicle->cabine_idx = 0;
     }
+
+    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx);
 }
 
 //------------------------------------------------------------------------------

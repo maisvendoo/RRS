@@ -21,6 +21,7 @@ public:
     void apply(vsg::FocusInEvent& focusIn) override;
     void apply(vsg::FocusOutEvent& focusOut) override;
     void changeCurrentVehicle(int current_idx, int controlled_idx);
+    void changeCurrentCabine(size_t cabine_idx);
 
 private:
 
@@ -31,6 +32,7 @@ private:
 
     uint16_t _current_idx = 0;
     uint16_t _controlled_idx = 0;
+    uint32_t _cabine_idx = 0;
     std::set<uint16_t> _pressed_keys = {};
 };
 

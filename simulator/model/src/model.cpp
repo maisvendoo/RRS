@@ -980,7 +980,7 @@ void Model::controlStep()
         int id = c.prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            vehicles[id]->resetKeysData();
+            vehicles[id]->resetKeysData();            
         }
     }
 
@@ -998,6 +998,8 @@ void Model::controlStep()
                 keys_data.insert(key_id, true);
 
             pressed_keys_by_vehicle.insert(id, keys_data);
+
+            vehicles[id]->setCabineIndex(c.vehicle_control_by_keyboard.cabine_idx);
         }
     }
 

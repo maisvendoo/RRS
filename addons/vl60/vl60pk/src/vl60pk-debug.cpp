@@ -52,6 +52,8 @@ void VL60pk::debugPrint(double t, double dt)
         DebugMsg += QString("| Radius: inf");
     }
 
+    DebugMsg += QString("| Кабина: %1").arg(cabine_idx + 1, 2);
+
     DebugMsg += QString("\n");
     DebugMsg += QString("%1%2%3-%4-couplings-%5-%6%7%8")
                     .arg(coupling_fwd->isLinked() ? "=" : " ")
