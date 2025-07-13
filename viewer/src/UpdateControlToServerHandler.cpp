@@ -138,6 +138,7 @@ void UpdateControlToServerHandler::sendEmptyControlToServer()
     controlled_t controlled;
     controlled.current_vehicle = _current_idx;
     controlled.controlled_vehicle = _controlled_idx;
+    controlled.cabine_idx = _cabine_idx;
     controlled.pressed_keys.clear();
 
     _tcp_client->sendVehicleControl(controlled.serialize());
