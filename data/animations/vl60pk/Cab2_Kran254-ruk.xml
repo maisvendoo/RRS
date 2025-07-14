@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<AnalogTranslation>
-		<SignalID>353</SignalID>
+		<SignalID>360</SignalID>
 		<Duration>10.0</Duration>		
 		<Axis>0.0 -1.0 0.0</Axis>
 	</AnalogTranslation>
