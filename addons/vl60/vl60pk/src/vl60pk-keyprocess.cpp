@@ -47,16 +47,16 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_P))
     {
         if (isShift())
-            gv_tumbler.set();
+            gv_tumbler[cabine_idx].set();
         else
-            gv_tumbler.reset();
+            gv_tumbler[cabine_idx].reset();
     }
 
     // Возврат защиты
     if (getKeyState(KEY_K))
-        gv_return_tumbler.set();
+        gv_return_tumbler[cabine_idx].set();
     else
-        gv_return_tumbler.reset();
+        gv_return_tumbler[cabine_idx].reset();
 
     // Включение/выключение расщепителя фаз
     if (getKeyState(KEY_T))

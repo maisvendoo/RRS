@@ -37,8 +37,11 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[CAB2_TUMBLER_PNT1] = static_cast<float>(pant1_tumbler[CAB2].getState());
     analogSignal[CAB2_TUMBLER_PNT2] = static_cast<float>(pant2_tumbler[CAB2].getState());
 
-    analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler.getState());
-    analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
+    analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler[CAB1].getState());
+    analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler[CAB1].getState());
+
+    analogSignal[CAB2_TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler[CAB2].getState());
+    analogSignal[CAB2_TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler[CAB2].getState());
 
     analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler.getState());
 
@@ -55,6 +58,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
 
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
+    analogSignal[CAB2_STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
 
     // Вольтметр ТЭД
     analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);

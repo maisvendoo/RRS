@@ -2559,7 +2559,7 @@
 		},
 		{
 			"mesh":197,
-			"name":"Cab2_Strelka_Kv1",
+			"name":"Cab2_Strelka_Kv2",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2574,7 +2574,7 @@
 		},
 		{
 			"mesh":198,
-			"name":"Cab2_Strelka_Kv2",
+			"name":"Cab2_Strelka_Kv1",
 			"rotation":[
 				0,
 				-0.5512638688087463,

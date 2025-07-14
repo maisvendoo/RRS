@@ -29,11 +29,11 @@ void VL60pk::slotAutoStart()
         triggers[start_count]->set();
 
         if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
-                (triggers[start_count] == &gv_tumbler))
+                (triggers[start_count] == &gv_tumbler[cabine_idx]))
             return;
 
         if (main_switch->getState())
-            gv_return_tumbler.reset();
+            gv_return_tumbler[cabine_idx].reset();
 
         start_count++;
     }
@@ -80,8 +80,8 @@ void VL60pk::stepMainSwitchControl(double t, double dt)
     main_switch->setU_in(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
 
     // Задаем состояние органов управления ГВ
-    main_switch->setState(gv_tumbler.getState());
-    main_switch->setReturn(gv_return_tumbler.getState());
+    main_switch->setState(gv_tumbler[CAB1].getState() || gv_tumbler[CAB2].getState());
+    main_switch->setReturn(gv_return_tumbler[CAB1].getState() || gv_return_tumbler[CAB2].getState());
 
     // Подаем питание на удерживающую катушку ГВ
     main_switch->setHoldingCoilState(getHoldingCoilState());

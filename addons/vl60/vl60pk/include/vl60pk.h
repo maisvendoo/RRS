@@ -160,9 +160,9 @@ private:
     /// Тригер тумблера "Токоприемники"
     Trigger pants_tumbler[CABS_NUM];
     /// Тригер тумблена "ГВ вкл. Возврат защиты"
-    Trigger gv_return_tumbler;
+    Trigger gv_return_tumbler[CABS_NUM];
     /// Триггер тумблера "ГВ вкл/выкл"
-    Trigger gv_tumbler;
+    Trigger gv_tumbler[CABS_NUM];
 
     // Ближний ряд тумблеров приборной панели машиниста
     enum

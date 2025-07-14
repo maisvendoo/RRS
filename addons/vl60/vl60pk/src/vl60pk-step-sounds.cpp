@@ -104,8 +104,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_PANT_BWD_ON] = pant2_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_FWD_ON] = pant1_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PANTS_ON] = pants_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler.getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_GV_ON] = gv_tumbler.getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_GV_ON] = gv_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
 
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = proj2_tumbler.getSoundSignal(Trigger::OFF_SOUND);
 //    analogSignal[SOUND_TUMBLER_PROJECTOR1_OFF] = proj1_tumbler.getSoundSignal(Trigger::OFF_SOUND);
@@ -114,8 +114,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_PANT_BWD_OFF] = pant2_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_FWD_OFF] = pant1_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANTS_OFF] = pants_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_GV_RETURN_OFF] = gv_return_tumbler.getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_GV_OFF] = gv_tumbler.getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_GV_RETURN_OFF] = gv_return_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_GV_OFF] = gv_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
 
     // Ближний ряд тумблеров приборной панели машиниста
 //    analogSignal[SOUND_TUMBLER_AUTOSAND_ON] = autosand_tumbler.getSoundSignal(Trigger::ON_SOUND);
