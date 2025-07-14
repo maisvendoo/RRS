@@ -2151,7 +2151,7 @@
 		},
 		{
 			"mesh":163,
-			"name":"Knopka-RBS.001",
+			"name":"Cab2_Knopka-RBS",
 			"rotation":[
 				-0.70710688829422,
 				0,
@@ -2474,7 +2474,7 @@
 		},
 		{
 			"mesh":191,
-			"name":"Scene Root_Strelka_ampEPT_Strelka_ampEPT-OFFSET_Strelka_amp",
+			"name":"Cab2_Strelka_ampEPT",
 			"rotation":[
 				0,
 				-1,
@@ -2529,7 +2529,7 @@
 		},
 		{
 			"mesh":195,
-			"name":"Strelka_Amp1.001",
+			"name":"Cab2_Strelka_Amp1",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2544,7 +2544,7 @@
 		},
 		{
 			"mesh":196,
-			"name":"Strelka_Amp2.001",
+			"name":"Cab2_Strelka_Amp2",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2559,7 +2559,7 @@
 		},
 		{
 			"mesh":197,
-			"name":"Strelka_Kv1.001",
+			"name":"Cab2_Strelka_Kv1",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2574,7 +2574,7 @@
 		},
 		{
 			"mesh":198,
-			"name":"Strelka_Kv2.001",
+			"name":"Cab2_Strelka_Kv2",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2589,7 +2589,7 @@
 		},
 		{
 			"mesh":199,
-			"name":"Strelka_Speed.001",
+			"name":"Cab2_Strelka_Speed",
 			"rotation":[
 				-0.17078964412212372,
 				0.686171293258667,
@@ -2604,7 +2604,7 @@
 		},
 		{
 			"mesh":200,
-			"name":"Strelka_UCU.001",
+			"name":"Cab2_Strelka_UCU",
 			"rotation":[
 				0,
 				-0.8644306063652039,
@@ -2634,7 +2634,7 @@
 		},
 		{
 			"mesh":202,
-			"name":"Strelka_m-CU.001",
+			"name":"Cab2_Strelka_m-CU",
 			"rotation":[
 				0,
 				-0.8644306063652039,
@@ -2649,7 +2649,7 @@
 		},
 		{
 			"mesh":203,
-			"name":"Strelka_m-HM.001",
+			"name":"Cab2_Strelka_m-HM",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2664,7 +2664,7 @@
 		},
 		{
 			"mesh":204,
-			"name":"Strelka_m-TC.001",
+			"name":"Cab2_Strelka_m-TC",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2679,7 +2679,7 @@
 		},
 		{
 			"mesh":205,
-			"name":"Strelka_m-TM.001",
+			"name":"Cab2_Strelka_m-TM",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2694,7 +2694,7 @@
 		},
 		{
 			"mesh":206,
-			"name":"Strelka_m-UR.001",
+			"name":"Cab2_Strelka_m-UR",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2709,7 +2709,7 @@
 		},
 		{
 			"mesh":207,
-			"name":"Strelka_selsin.001",
+			"name":"Cab2_Strelka_selsin",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2724,7 +2724,7 @@
 		},
 		{
 			"mesh":208,
-			"name":"Tumbl_BF-color_L.001",
+			"name":"Cab2_Tumbl_BF-color_L",
 			"rotation":[
 				0,
 				-1,
@@ -2739,7 +2739,7 @@
 		},
 		{
 			"mesh":209,
-			"name":"Tumbl_BF-color_R.001",
+			"name":"Cab2_Tumbl_BF-color_R",
 			"rotation":[
 				0,
 				-1,
@@ -2754,7 +2754,7 @@
 		},
 		{
 			"mesh":210,
-			"name":"Tumbler_APP.001",
+			"name":"Cab2_Tumbler_APP",
 			"rotation":[
 				0,
 				-1,
@@ -2769,7 +2769,7 @@
 		},
 		{
 			"mesh":211,
-			"name":"Tumbler_CU.001",
+			"name":"Cab2_Tumbler_CU",
 			"rotation":[
 				0,
 				-1,
@@ -2784,7 +2784,7 @@
 		},
 		{
 			"mesh":212,
-			"name":"Tumbler_FR.001",
+			"name":"Cab2_Tumbler_FR",
 			"rotation":[
 				0,
 				-1,
@@ -2799,7 +2799,7 @@
 		},
 		{
 			"mesh":213,
-			"name":"Tumbler_GVon.001",
+			"name":"Cab2_Tumbler_GVon",
 			"rotation":[
 				0,
 				-1,
@@ -2814,7 +2814,7 @@
 		},
 		{
 			"mesh":214,
-			"name":"Tumbler_GVonoff.001",
+			"name":"Cab2_Tumbler_GVonoff",
 			"rotation":[
 				0,
 				-1,
@@ -2829,7 +2829,7 @@
 		},
 		{
 			"mesh":215,
-			"name":"Tumbler_MK.001",
+			"name":"Cab2_Tumbler_MK",
 			"rotation":[
 				0,
 				-1,
@@ -2844,7 +2844,7 @@
 		},
 		{
 			"mesh":216,
-			"name":"Tumbler_MV1.001",
+			"name":"Cab2_Tumbler_MV1",
 			"rotation":[
 				0,
 				-1,
@@ -2859,7 +2859,7 @@
 		},
 		{
 			"mesh":217,
-			"name":"Tumbler_MV2.001",
+			"name":"Cab2_Tumbler_MV2",
 			"rotation":[
 				0,
 				-1,
@@ -2874,7 +2874,7 @@
 		},
 		{
 			"mesh":218,
-			"name":"Tumbler_MV3.001",
+			"name":"Cab2_Tumbler_MV3",
 			"rotation":[
 				0,
 				-1,
@@ -2889,7 +2889,7 @@
 		},
 		{
 			"mesh":219,
-			"name":"Tumbler_MV4.001",
+			"name":"Cab2_Tumbler_MV4",
 			"rotation":[
 				0,
 				-1,
@@ -2904,7 +2904,7 @@
 		},
 		{
 			"mesh":220,
-			"name":"Tumbler_MV5.001",
+			"name":"Cab2_Tumbler_MV5",
 			"rotation":[
 				0,
 				-1,
@@ -2919,7 +2919,7 @@
 		},
 		{
 			"mesh":221,
-			"name":"Tumbler_MV6.001",
+			"name":"Cab2_Tumbler_MV6",
 			"rotation":[
 				0,
 				-1,
@@ -2934,7 +2934,7 @@
 		},
 		{
 			"mesh":222,
-			"name":"Tumbler_PRG1.001",
+			"name":"Cab2_Tumbler_PRG1",
 			"rotation":[
 				0,
 				-1,
@@ -2949,7 +2949,7 @@
 		},
 		{
 			"mesh":223,
-			"name":"Tumbler_PRG2.001",
+			"name":"Cab2_Tumbler_PRG2",
 			"rotation":[
 				0,
 				-1,
@@ -3009,7 +3009,7 @@
 		},
 		{
 			"mesh":227,
-			"name":"Tumbler_Radio.001",
+			"name":"Cab2_Tumbler_Radio",
 			"rotation":[
 				0,
 				-1,
@@ -3024,7 +3024,7 @@
 		},
 		{
 			"mesh":228,
-			"name":"Tumbler_Rez-ar1.001",
+			"name":"Cab2_Tumbler_Rez-ar1",
 			"rotation":[
 				0,
 				-0.7071068286895752,
@@ -3039,7 +3039,7 @@
 		},
 		{
 			"mesh":229,
-			"name":"Tumbler_Rez-ar2.001",
+			"name":"Cab2_Tumbler_Rez-ar2",
 			"rotation":[
 				0,
 				-0.7071068286895752,
@@ -3054,7 +3054,7 @@
 		},
 		{
 			"mesh":230,
-			"name":"Tumbler_Rez-ar3.001",
+			"name":"Cab2_Tumbler_Rez-ar3",
 			"rotation":[
 				0,
 				-0.7071068286895752,
@@ -3069,7 +3069,7 @@
 		},
 		{
 			"mesh":231,
-			"name":"Tumbler_Rez-ar4.001",
+			"name":"Cab2_Tumbler_Rez-ar4",
 			"rotation":[
 				0,
 				-0.7071068286895752,
@@ -3084,7 +3084,7 @@
 		},
 		{
 			"mesh":232,
-			"name":"Tumbler_alsn.001",
+			"name":"Cab2_Tumbler_alsn",
 			"rotation":[
 				0,
 				-1,
@@ -3099,7 +3099,7 @@
 		},
 		{
 			"mesh":233,
-			"name":"Tumbler_buferL.001",
+			"name":"Cab2_Tumbler_buferL",
 			"rotation":[
 				0,
 				-1,
@@ -3114,7 +3114,7 @@
 		},
 		{
 			"mesh":234,
-			"name":"Tumbler_buferR.001",
+			"name":"Cab2_Tumbler_buferR",
 			"rotation":[
 				0,
 				-1,
@@ -3129,7 +3129,7 @@
 		},
 		{
 			"mesh":235,
-			"name":"Tumbler_pechi1.001",
+			"name":"Cab2_Tumbler_pechi1",
 			"rotation":[
 				0,
 				-1,
@@ -3144,7 +3144,7 @@
 		},
 		{
 			"mesh":236,
-			"name":"Tumbler_svet1.001",
+			"name":"Cab2_Tumbler_svet1",
 			"rotation":[
 				0,
 				-1,
@@ -3159,7 +3159,7 @@
 		},
 		{
 			"mesh":237,
-			"name":"Tumbler_svet2.001",
+			"name":"Cab2_Tumbler_svet2",
 			"rotation":[
 				0,
 				-1,
@@ -3174,7 +3174,7 @@
 		},
 		{
 			"mesh":238,
-			"name":"Tumbler_svetHod.001",
+			"name":"Cab2_Tumbler_svetHod",
 			"rotation":[
 				0,
 				-1,
@@ -3189,7 +3189,7 @@
 		},
 		{
 			"mesh":239,
-			"name":"Tumbler_svetPribor.001",
+			"name":"Cab2_Tumbler_svetPribor",
 			"rotation":[
 				0,
 				-1,
@@ -3204,7 +3204,7 @@
 		},
 		{
 			"mesh":240,
-			"name":"Tumbler_svistok.001",
+			"name":"Cab2_Tumbler_svistok",
 			"rotation":[
 				0,
 				-1,
@@ -3219,7 +3219,7 @@
 		},
 		{
 			"mesh":241,
-			"name":"Tumbler_tifon.001",
+			"name":"Cab2_Tumbler_tifon",
 			"rotation":[
 				0,
 				-1,
@@ -3234,7 +3234,7 @@
 		},
 		{
 			"mesh":242,
-			"name":"Tumbler_x3.001",
+			"name":"Cab2_Tumbler_x3",
 			"rotation":[
 				0,
 				-0.7071068286895752,
@@ -3249,7 +3249,7 @@
 		},
 		{
 			"mesh":243,
-			"name":"Tumbler_x4.001",
+			"name":"Cab2_Tumbler_x4",
 			"rotation":[
 				0,
 				-1,
@@ -3264,7 +3264,7 @@
 		},
 		{
 			"mesh":244,
-			"name":"Tumbler_x5.001",
+			"name":"Cab2_Tumbler_x5",
 			"rotation":[
 				0,
 				-1,
@@ -3349,7 +3349,7 @@
 		},
 		{
 			"mesh":249,
-			"name":"revers.001",
+			"name":"Cab2_revers",
 			"rotation":[
 				0,
 				-0.7071066498756409,
@@ -3364,7 +3364,7 @@
 		},
 		{
 			"mesh":250,
-			"name":"sigLight_0HP.001",
+			"name":"Cab2_sigLight_0HP",
 			"rotation":[
 				0,
 				-1,
@@ -3379,7 +3379,7 @@
 		},
 		{
 			"mesh":251,
-			"name":"sigLight_FR.001",
+			"name":"Cab2_sigLight_FR",
 			"rotation":[
 				0,
 				-1,
@@ -3394,7 +3394,7 @@
 		},
 		{
 			"mesh":252,
-			"name":"sigLight_GU.001",
+			"name":"Cab2_sigLight_GU",
 			"rotation":[
 				0,
 				-1,
@@ -3409,7 +3409,7 @@
 		},
 		{
 			"mesh":253,
-			"name":"sigLight_GV.001",
+			"name":"Cab2_sigLight_GV",
 			"rotation":[
 				0,
 				-1,
@@ -3424,7 +3424,7 @@
 		},
 		{
 			"mesh":254,
-			"name":"sigLight_O.001",
+			"name":"Cab2_sigLight_O",
 			"rotation":[
 				0,
 				-1,
@@ -3439,7 +3439,7 @@
 		},
 		{
 			"mesh":255,
-			"name":"sigLight_P.001",
+			"name":"Cab2_sigLight_P",
 			"rotation":[
 				0,
 				-1,
@@ -3454,7 +3454,7 @@
 		},
 		{
 			"mesh":256,
-			"name":"sigLight_PSS-Propusk.001",
+			"name":"Cab2_sigLight_PSS-Propusk",
 			"rotation":[
 				0,
 				-1,
@@ -3474,7 +3474,7 @@
 		},
 		{
 			"mesh":257,
-			"name":"sigLight_PSS_L.001",
+			"name":"Cab2_sigLight_PSS_L",
 			"rotation":[
 				0,
 				-1,
@@ -3494,7 +3494,7 @@
 		},
 		{
 			"mesh":258,
-			"name":"sigLight_PSS_R.001",
+			"name":"Cab2_sigLight_PSS_R",
 			"rotation":[
 				0,
 				-1,
@@ -3514,7 +3514,7 @@
 		},
 		{
 			"mesh":259,
-			"name":"sigLight_RB.001",
+			"name":"Cab2_sigLight_RB",
 			"rotation":[
 				0,
 				-1,
@@ -3529,7 +3529,7 @@
 		},
 		{
 			"mesh":260,
-			"name":"sigLight_RP.001",
+			"name":"Cab2_sigLight_RP",
 			"rotation":[
 				0,
 				-1,
@@ -3544,7 +3544,7 @@
 		},
 		{
 			"mesh":261,
-			"name":"sigLight_RPO.001",
+			"name":"Cab2_sigLight_RPO",
 			"rotation":[
 				0,
 				-1,
@@ -3559,7 +3559,7 @@
 		},
 		{
 			"mesh":262,
-			"name":"sigLight_RZ-RKZ.001",
+			"name":"Cab2_sigLight_RZ-RKZ",
 			"rotation":[
 				0,
 				-1,
@@ -3574,7 +3574,7 @@
 		},
 		{
 			"mesh":263,
-			"name":"sigLight_T.001",
+			"name":"Cab2_sigLight_T",
 			"rotation":[
 				0,
 				-1,
@@ -3589,7 +3589,7 @@
 		},
 		{
 			"mesh":264,
-			"name":"sigLight_TD.001",
+			"name":"Cab2_sigLight_TD",
 			"rotation":[
 				0,
 				-1,
@@ -3604,7 +3604,7 @@
 		},
 		{
 			"mesh":265,
-			"name":"sigLight_TR.001",
+			"name":"Cab2_sigLight_TR",
 			"rotation":[
 				0,
 				-1,
@@ -3619,7 +3619,7 @@
 		},
 		{
 			"mesh":266,
-			"name":"sigLight_VU1.001",
+			"name":"Cab2_sigLight_VU1",
 			"rotation":[
 				0,
 				-1,
@@ -3634,7 +3634,7 @@
 		},
 		{
 			"mesh":267,
-			"name":"sigLight_VU2.001",
+			"name":"Cab2_sigLight_VU2",
 			"rotation":[
 				0,
 				-1,
