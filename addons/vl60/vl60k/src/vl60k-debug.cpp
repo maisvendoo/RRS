@@ -32,9 +32,9 @@ void VL60k::debugPrint(double t, double dt)
                     .arg(10.0 * supply_reservoir->getPressure(), 6, 'f', 2);
     DebugMsg += QString("pFL%1|pER%2|395:%3|254:%4%|")
                     .arg(10.0 * main_reservoir->getPressure(), 6, 'f', 2)
-                    .arg(10.0 * brake_crane->getERpressure(), 6, 'f', 2)
-                    .arg(brake_crane->getPositionName(), 3)
-                    .arg(loco_crane->getHandlePosition() * 100.0, 3, 'f', 0);
+                    .arg(10.0 * brake_crane[cabine_idx]->getERpressure(), 6, 'f', 2)
+                    .arg(brake_crane[cabine_idx]->getPositionName(), 3)
+                    .arg(loco_crane[cabine_idx]->getHandlePosition() * 100.0, 3, 'f', 0);
     DebugMsg += QString("Rev%1|Pos %2%3|I%4 A|")
                     .arg(controller->getReversHandlePos() * 4.0, 2, 'f', 0)
                     .arg(main_controller->getPosition(), 2)

@@ -15,67 +15,71 @@
 //------------------------------------------------------------------------
 void VL60k::stepBrakesControl(double t, double dt)
 {
-    // Блокировочное устройство
-    brake_lock->setFLpressure(main_reservoir->getPressure());
-    brake_lock->setBPpressure(brakepipe->getPressure());
-    brake_lock->setBCpressure(bc_splitter->getInputPressure());
-    brake_lock->setCraneFLflow(brake_crane->getFLflow() + loco_crane->getFLflow());
-    brake_lock->setCraneBPflow(brake_crane->getBPflow());
-    brake_lock->setCraneBCflow(loco_crane->getBCflow());
-    brake_lock->setControl(keys);
-    brake_lock->step(t, dt);
-
-    // Поездной кран машиниста
-    brake_crane->setFLpressure(brake_lock->getCraneFLpressure());
-    brake_crane->setBPpressure(brake_lock->getCraneBPpressure());
+    // Управляем блокировкой тормозов
+    brake_lock[cabine_idx]->setControl(keys);
 
     // Управляем краном, учитывая возможное наличие внешнего пульта
     if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
     {
         int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
-        brake_crane->setHandlePosition(brake_crane_pos);
+        brake_crane[cabine_idx]->setHandlePosition(brake_crane_pos);
     }
     else
     {
-        brake_crane->setControl(keys);
+        brake_crane[cabine_idx]->setControl(keys);
     }
 
-    brake_crane->step(t, dt);
-
-    // Кран вспомогательного тормоза
-    loco_crane->setFLpressure(brake_lock->getCraneFLpressure());
-    loco_crane->setBCpressure(brake_lock->getCraneBCpressure());
-    loco_crane->setILpressure(impulse_line->getPressure());
-
-    // Управляем, с учетом возможного наличия пульта
+    // Управляем краном, учитывая возможное наличие внешнего пульта
     if (control_signals.analogSignal[CS_LOCO_CRANE].is_active)
     {
         double pos = 0.0;
 
         if (static_cast<bool>(control_signals.analogSignal[CS_RELEASE_VALVE].cur_value))
         {
-            loco_crane->release(true);
+            loco_crane[cabine_idx]->release(true);
             pos = -1.0;
         }
         else
         {
-            loco_crane->release(false);
+            loco_crane[cabine_idx]->release(false);
             pos = control_signals.analogSignal[CS_LOCO_CRANE].cur_value;
         }
 
-        loco_crane->setHandlePosition(pos);
+        loco_crane[cabine_idx]->setHandlePosition(pos);
     }
     else
     {
-        loco_crane->setControl(keys);
+        loco_crane[cabine_idx]->setControl(keys);
     }
 
-    loco_crane->step(t, dt);
+    for (size_t cab_idx : {CAB1, CAB2})
+    {
+        // Блокировочное устройство
+        brake_lock[cab_idx]->setFLpressure(main_reservoir->getPressure());
+        brake_lock[cab_idx]->setBPpressure(brakepipe->getPressure());
+        brake_lock[cab_idx]->setBCpressure(bc_splitter->getInputPressure());
+        brake_lock[cab_idx]->setCraneFLflow(brake_crane[cab_idx]->getFLflow() + loco_crane[cab_idx]->getFLflow());
+        brake_lock[cab_idx]->setCraneBPflow(brake_crane[cab_idx]->getBPflow());
+        brake_lock[cab_idx]->setCraneBCflow(loco_crane[cab_idx]->getBCflow());
+        brake_lock[cab_idx]->step(t, dt);
+
+        // Поездной кран машиниста
+        brake_crane[cab_idx]->setFLpressure(brake_lock[cab_idx]->getCraneFLpressure());
+        brake_crane[cab_idx]->setBPpressure(brake_lock[cab_idx]->getCraneBPpressure());
+        brake_crane[cab_idx]->step(t, dt);
+
+        // Кран вспомогательного тормоза
+        loco_crane[cab_idx]->setFLpressure(brake_lock[cab_idx]->getCraneFLpressure());
+        loco_crane[cab_idx]->setBCpressure(brake_lock[cab_idx]->getCraneBCpressure());
+        loco_crane[cab_idx]->setILpressure(impulse_line->getPressure());
+        loco_crane[cab_idx]->step(t, dt);
+    }
 
     // Импульсная магистраль
     double il_flow = 0.0;
     il_flow += air_dist->getBCflow();
-    il_flow += loco_crane->getILflow();
+    il_flow += loco_crane[CAB1]->getILflow();
+    il_flow += loco_crane[CAB2]->getILflow();
     if (bc_hose_to_impulse_line)
     {
         anglecock_bc_fwd->setHoseFlow(hose_bc_fwd->getFlow());
@@ -89,7 +93,8 @@ void VL60k::stepBrakesControl(double t, double dt)
 
     // Тройник подключения тележек к магистрали тормозных цилиндров
     double bc_flow = 0.0;
-    bc_flow += brake_lock->getBCflow();
+    bc_flow += brake_lock[CAB1]->getBCflow();
+    bc_flow += brake_lock[CAB2]->getBCflow();
     if (!bc_hose_to_impulse_line)
     {
         anglecock_bc_fwd->setHoseFlow(hose_bc_fwd->getFlow());

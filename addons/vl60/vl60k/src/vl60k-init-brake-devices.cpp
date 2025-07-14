@@ -1,11 +1,12 @@
 #include    "vl60k.h"
 
-#include    <QDir>
+#include    "filesystem.h"
 
 #include "airdistributor.h"
 #include "brake-crane.h"
 #include "brake-lock.h"
 #include "loco-crane.h"
+#include "automatic-train-stop.h"
 #include "pneumo-anglecock.h"
 #include "pneumo-hose.h"
 #include "reservoir.h"
@@ -23,14 +24,19 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     hose_fl_bwd->setPressure(pFL);
 
     // Инициализация давления в приборах управления тормозами
-    brake_lock->setState(true);
-    brake_lock->setCombineCranePosition(0);
-
     charge_press = p0;
-    brake_crane->init(pBP, pFL);
-    brake_crane->setChargePressure(charge_press);
+    for (size_t cab_idx : {CAB1, CAB2})
+    {
+        brake_lock[cab_idx]->setState(true);
+        brake_lock[cab_idx]->setCombineCranePosition(0);
 
-    loco_crane->init(pBP, pFL);
+        brake_crane[cab_idx]->init(pBP, pFL);
+        brake_crane[cab_idx]->setChargePressure(charge_press);
+
+        loco_crane[cab_idx]->init(pBP, pFL);
+
+        epk[cab_idx]->init(pBP, pFL);
+    }
 
     // Инициализация давления в тормозной магистрали
     brakepipe->setY(0, pBP);
@@ -44,7 +50,10 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     supply_reservoir->setY(0, pBP);
 
     // Загрузка состояния тормозного оборудования из собственного конфига
-    load_brakes_config(config_dir + QDir::separator() + "brakes-init.xml");
+    FileSystem &fs = FileSystem::getInstance();
+    QString custom_cfg_dir(fs.getVehiclesDir().c_str());
+    custom_cfg_dir += QDir::separator() + config_dir;
+    load_brakes_config(custom_cfg_dir + QDir::separator() + "brakes-init.xml");
 
     // Состояние рукавов и концевых кранов магистрали тормозных цилиндров
     if (hose_bc_fwd->isLinked())

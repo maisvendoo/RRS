@@ -189,17 +189,17 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_V))
     {
         if (isShift())
-            epb_switch.set();
+            epb_switch[cabine_idx].set();
         else
-            epb_switch.reset();
+            epb_switch[cabine_idx].reset();
     }
 
     // Включение/выключение ЭПK
     if (getKeyState(KEY_N))
     {
         if (isShift())
-            key_epk.set();
+            key_epk[cabine_idx].set();
         else
-            key_epk.reset();
+            key_epk[cabine_idx].reset();
     }
 }
