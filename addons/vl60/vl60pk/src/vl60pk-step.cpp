@@ -111,7 +111,7 @@ void VL60pk::stepTracTransformer(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepPhaseSplitter(double t, double dt)
 {
-    double U_power = trac_trans->getU_sn() * static_cast<double>(fr_tumbler.getState());
+    double U_power = trac_trans->getU_sn() * static_cast<double>(fr_tumbler[CAB1].getState() || fr_tumbler[CAB2].getState());
     phase_spliter->setU_power(U_power);
 
     phase_spliter->step(t, dt);

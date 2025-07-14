@@ -62,9 +62,9 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_T))
     {
         if (isShift())
-            fr_tumbler.set();
+            fr_tumbler[cabine_idx].set();
         else
-            fr_tumbler.reset();
+            fr_tumbler[cabine_idx].reset();
     }
 
     // Включение/выключение мотор-верниляторов
@@ -127,9 +127,9 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_E))
     {
         if (isShift())
-            mk_tumbler.set();
+            mk_tumbler[cabine_idx].set();
         else
-            mk_tumbler.reset();
+            mk_tumbler[cabine_idx].reset();
     }
 
     // Включение/выключение цепей управления

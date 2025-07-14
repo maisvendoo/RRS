@@ -181,9 +181,9 @@ private:
     /// Триггеры тумблеров "Вентилятор 1-6"
     std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
     /// Тригер тумблера "Компрессор"
-    Trigger mk_tumbler;
+    Trigger mk_tumbler[CABS_NUM];
     /// Тригер тумблера "Фазорасщепитель"
-    Trigger fr_tumbler;
+    Trigger fr_tumbler[CABS_NUM];
 
     enum
     {

@@ -43,7 +43,8 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[CAB2_TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler[CAB2].getState());
     analogSignal[CAB2_TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler[CAB2].getState());
 
-    analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler.getState());
+    analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB1].getState());
+    analogSignal[CAB2_TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB2].getState());
 
     analogSignal[TUMBLER_MV1] = static_cast<float>(mv_tumblers[MV1].getState());
     analogSignal[TUMBLER_MV2] = static_cast<float>(mv_tumblers[MV2].getState());
@@ -52,7 +53,8 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[MV5].getState());
     analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[MV6].getState());
 
-    analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler.getState());
+    analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB1].getState());
+    analogSignal[CAB2_TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB2].getState());
 
     analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler.getState());
 
@@ -96,12 +98,15 @@ void VL60pk::stepSignalsOutput(double t, double dt)
 
     // Манометр питательной магистрали
     analogSignal[STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
+    analogSignal[CAB2_STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
     // Манометр тормозной магистрали
     analogSignal[STRELKA_M_TM] = static_cast<float>(brakepipe->getPressure() / 1.0);
+    analogSignal[CAB2_STRELKA_M_TM] = static_cast<float>(brakepipe->getPressure() / 1.0);
     // Манометр уравнительного резервуара
     analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getERpressure() / 1.0);
     // Манометр давления в ТЦ
     analogSignal[STRELKA_M_TC] = static_cast<float>(brake_mech[TROLLEY_BWD]->getBCpressure() / 1.0);
+    analogSignal[CAB2_STRELKA_M_TC] = static_cast<float>(brake_mech[TROLLEY_BWD]->getBCpressure() / 1.0);
 
     // Положение рукоятки КрМ
     analogSignal[KRAN395_RUK] = static_cast<float>(brake_crane->getHandlePosition());
