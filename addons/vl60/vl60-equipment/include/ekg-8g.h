@@ -17,7 +17,7 @@ public:
 
     ~EKG_8G();
 
-    void setKMstate(const km_state_t &km_state);
+    void setKMstate(const km_state_t &km1_state, const km_state_t &km2_state);
 
     float getSelsinPosition() const;
 
@@ -85,8 +85,9 @@ private:
     /// Таймер управления переключением позиций
     Timer   pos_switcher;
 
-    /// Состояние контроллера машиниста
-    km_state_t  km_state;
+    /// Состояние контроллеров машиниста
+    km_state_t  km1_state;
+    km_state_t  km2_state;
 
     /// Тригер для фиксации пуска
     Trigger      fix_start;

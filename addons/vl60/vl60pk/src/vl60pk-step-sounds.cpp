@@ -30,8 +30,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TIFON] = horn->getSoundSignal(TrainHorn::TIFON_SOUND);
 
     // Реверсор и контроллер
-    analogSignal[SOUND_REVERSOR] = controller->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
-    analogSignal[SOUND_CONTROLLER] = controller->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
+    analogSignal[SOUND_REVERSOR] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
+    analogSignal[SOUND_CONTROLLER] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
 
     // Серводвигатель ЭКГ, ручное и автоматическое движение
     analogSignal[SOUND_EKG_ONE] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_ONE_SOUND);

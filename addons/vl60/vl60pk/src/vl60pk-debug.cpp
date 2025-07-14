@@ -36,7 +36,7 @@ void VL60pk::debugPrint(double t, double dt)
                     .arg(brake_crane[cabine_idx]->getPositionName(), 3)
                     .arg(loco_crane[cabine_idx]->getHandlePosition() * 100.0, 3, 'f', 0);
     DebugMsg += QString("Rev%1|Pos %2%3|I%4 A|")
-                    .arg(controller->getReversHandlePos() * 4.0, 2, 'f', 0)
+                    .arg(controller[cabine_idx]->getReversHandlePos() * 4.0, 2, 'f', 0)
                     .arg(main_controller->getPosition(), 2)
                     .arg(main_controller->isLongMotionPos() ? "*" : " ")
                     .arg(motor[TED1]->getIa(), 6, 'f', 1);

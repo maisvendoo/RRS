@@ -144,12 +144,12 @@ void VL60pk::keyProcess()
     // Нажатие РБ-1
     if (getKeyState(KEY_Z))
     {
-        rb[RB_1].set();
+        rb[cabine_idx][RB_1].set();
         Journal::instance()->info("RB-1 pressed");
     }
     else
     {
-        rb[RB_1].reset();
+        rb[cabine_idx][RB_1].reset();
         //Journal::instance()->info("RB-1 released");
     }
 
@@ -160,24 +160,24 @@ void VL60pk::keyProcess()
     {
         // реагируем на состояние РБС на внешнем пульте
         if (static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value))
-            rb[RBS].set();
+            rb[cabine_idx][RBS].set();
         else
-            rb[RBS].reset();
+            rb[cabine_idx][RBS].reset();
     }
     else // иначе
     {
         // обрабатываем клавиши
         if (getKeyState(KEY_M))
-            rb[RBS].set();
+            rb[cabine_idx][RBS].set();
         else
-            rb[RBS].reset();
+            rb[cabine_idx][RBS].reset();
     }
 
     // Нажатие РБП
     if (getKeyState(KEY_Q))
-        rb[RBP].set();
+        rb[cabine_idx][RBP].set();
     else
-        rb[RBP].reset();
+        rb[cabine_idx][RBP].reset();
 
     if (getKeyState(KEY_R))
     {

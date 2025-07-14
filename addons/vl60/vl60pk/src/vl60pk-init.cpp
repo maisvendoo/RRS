@@ -70,7 +70,10 @@ void VL60pk::initTractionControl(const QString &modules_dir, const QString &cust
 {
     (void) modules_dir;
 
-    controller = new ControllerKME_60_044();
+    for (size_t i : {CAB1, CAB2})
+    {
+        controller[i] = new ControllerKME_60_044();
+    }
 
     main_controller = new EKG_8G();
     main_controller->read_config("ekg-8g", custom_cfg_dir);

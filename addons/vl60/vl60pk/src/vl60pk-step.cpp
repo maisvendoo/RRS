@@ -40,7 +40,7 @@ void VL60pk::slotAutoStart()
     else
     {
         autoStartTimer->stop();
-        controller->setReversPos(REVERS_FORWARD);
+        controller[cabine_idx]->setReversPos(REVERS_FORWARD);
         start_count = 0;
     }
 }
@@ -135,11 +135,15 @@ void VL60pk::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepTractionControl(double t, double dt)
 {
-    controller->setControl(keys);
-    controller->step(t, dt);
+    controller[cabine_idx]->setControl(keys);
+
+    for (size_t i : {CAB1, CAB2})
+    {
+        controller[i]->step(t, dt);
+    }
 
     main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB2]->isUnlocked()));
-    main_controller->setKMstate(controller->getState());
+    main_controller->setKMstate(controller[CAB1]->getState(), controller[CAB2]->getState());
     main_controller->step(t, dt);
 
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
@@ -153,15 +157,16 @@ void VL60pk::stepTractionControl(double t, double dt)
     motor[TED5]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED5]->getContactState(LC_TED)));
     motor[TED6]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED6]->getContactState(LC_TED)));
 
-    km_state_t km_state = controller->getState();
+    // Полярность включения ТЭД
+    int motor_dir = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
 
     double I_vu = 0;
 
     for (size_t i = 0; i < motor.size(); ++i)
     {
-        motor[i]->setDirection(km_state.revers_ref_state);
+        motor[i]->setDirection(motor_dir);
         motor[i]->setOmega(ip * wheel_omega[i]);
-        motor[i]->setBetaStep(km_state.field_loosen_pos);
+        motor[i]->setBetaStep(controller[cabine_idx]->getState().field_loosen_pos);
         motor[i]->step(t, dt);
         Q_a[i+1] = motor[i]->getTorque() * ip;
 
@@ -186,7 +191,9 @@ void VL60pk::stepLineContactors(double t, double dt)
     (void) t;
     (void) dt;
 
-    km_state_t km_state = controller->getState();
+    int revers_state = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
+
+    bool is_KM_ZERO = controller[CAB1]->getState().pos_state[POS_ZERO] && controller[CAB2]->getState().pos_state[POS_ZERO];
 
     bool motor_fans_state = true;
 
@@ -203,8 +210,8 @@ void VL60pk::stepLineContactors(double t, double dt)
     bool is_H6_ON = (cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState())  &&
                     (key_epk[CAB1].getState() || key_epk[CAB2].getState()) &&
                     is_BP_released &&
-                    (km_state.revers_ref_state != 0) &&
-                    (!km_state.pos_state[POS_ZERO]) &&
+                    (revers_state != 0) &&
+                    (!is_KM_ZERO) &&
                     motor_fans_state;
 
     for (auto lc : linear_contactor)
@@ -298,7 +305,7 @@ double VL60pk::getTractionForce()
 //------------------------------------------------------------------------------
 bool VL60pk::getHoldingCoilState() const
 {
-    km_state_t km_state = controller->getState();
+    km_state_t km_state = controller[cabine_idx]->getState();
 
     bool overload = false;
 

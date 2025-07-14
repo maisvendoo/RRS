@@ -194,7 +194,7 @@ private:
     };
 
     /// Триггеры рукояток бдительности
-    std::array<Trigger, NUM_RB>  rb;
+    Trigger rb[CABS_NUM][NUM_RB];
 
     enum
     {
@@ -313,7 +313,7 @@ private:
     EPBControl  *epb_control = Q_NULLPTR;
 
     /// Контроллер машиниста
-    ControllerKME_60_044    *controller = Q_NULLPTR;
+    ControllerKME_60_044    *controller[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR,};
 
     /// Главный контроллер (переключение обмоток тягового трансформатора)
     EKG_8G                  *main_controller = Q_NULLPTR;

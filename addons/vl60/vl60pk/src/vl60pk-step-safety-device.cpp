@@ -26,8 +26,8 @@ void VL60pk::stepSafetyDevices(double t, double dt)
 
     // УКБМ
     safety_device->setAlsnCode(alsn_decoder->getCode());
-    safety_device->setRBstate(rb[RB_1].getState());
-    safety_device->setRBSstate(rb[RBS].getState());
+    safety_device->setRBstate(rb[CAB1][RB_1].getState() || rb[CAB2][RB_1].getState());
+    safety_device->setRBSstate(rb[CAB1][RBS].getState() || rb[CAB2][RBS].getState());
     safety_device->setKeyEPK(epk[CAB1]->isKeyOn() || epk[CAB2]->isKeyOn());
     safety_device->setVelocity(speed_meter->getVelocity());
     safety_device->step(t, dt);

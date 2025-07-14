@@ -72,6 +72,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
 
     // Вольтметр ТЭД
     analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
+    analogSignal[CAB2_STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
 
     // Состояние главного выключателя
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
@@ -89,9 +90,12 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[SIG_LIGHT_VU2] = static_cast<float>(!motor_fans[MV5]->isReady() || !motor_fans[MV6]->isReady());
     analogSignal[SIG_LIGHT_TD] = isLineContactorsOff();
 
-    analogSignal[KONTROLLER] = controller->getMainHandlePos();
-    analogSignal[REVERS] = controller->getReversHandlePos();
-    analogSignal[STRELKA_SELSIN] = main_controller->getSelsinPosition();
+    analogSignal[KONTROLLER] = controller[CAB1]->getMainHandlePos();
+    analogSignal[REVERS] = controller[CAB1]->getReversHandlePos();
+    analogSignal[CAB2_KONTROLLER] = controller[CAB2]->getMainHandlePos();
+    analogSignal[CAB2_REVERS] = controller[CAB2]->getReversHandlePos();
+
+    analogSignal[STRELKA_SELSIN] = analogSignal[CAB2_STRELKA_SELSIN] = main_controller->getSelsinPosition();
 
     // Положение рукоятки комбинированного крана
     analogSignal[KRAN_KOMBIN] = brake_lock[CAB1]->getCombCranePosition();
@@ -130,14 +134,20 @@ void VL60pk::stepSignalsOutput(double t, double dt)
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
     analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
+    analogSignal[CAB2_STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
+    analogSignal[CAB2_STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
 
     analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
     analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
 
-    analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[RB_1].getState());
-    analogSignal[KNOPKA_RBS] = static_cast<float>(rb[RBS].getState());
-    analogSignal[KNOPKA_RBP] = static_cast<float>(rb[RBP].getState());
+    analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[CAB1][RB_1].getState());
+    analogSignal[KNOPKA_RBS] = static_cast<float>(rb[CAB1][RBS].getState());
+    analogSignal[KNOPKA_RBP] = static_cast<float>(rb[CAB1][RBP].getState());
+
+    analogSignal[CAB2_KNOPKA_RB_1] = static_cast<float>(rb[CAB2][RB_1].getState());
+    analogSignal[CAB2_KNOPKA_RBS] = static_cast<float>(rb[CAB2][RBS].getState());
+    analogSignal[CAB2_KNOPKA_RBP] = static_cast<float>(rb[CAB2][RBP].getState());
 
     analogSignal[WHEEL_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
     analogSignal[WHEEL_2] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
