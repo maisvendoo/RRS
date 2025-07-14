@@ -38,9 +38,12 @@ void VL60pk::initSafetyDevices(const QString &modules_dir, const QString &custom
     speed_meter->setWheelDiameter(wheel_diameter[0]);
     speed_meter->read_config("3SL-2M", custom_cfg_dir);
 
-    // ЭПК автостопа
-    epk = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
-    epk->read_config("epk150");
+    for (size_t cab_idx : {CAB1, CAB2})
+    {
+        // ЭПК автостопа
+        epk[cab_idx] = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
+        epk[cab_idx]->read_config("epk150");
+    }
 
     // УКБМ
     safety_device = new SafetyDevice;

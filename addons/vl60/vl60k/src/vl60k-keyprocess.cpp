@@ -179,8 +179,8 @@ void VL60k::keyProcess()
     if (getKeyState(KEY_N))
     {
         if (isShift())
-            key_epk.set();
+            key_epk[cabine_idx].set();
         else
-            key_epk.reset();
+            key_epk[cabine_idx].reset();
     }
 }

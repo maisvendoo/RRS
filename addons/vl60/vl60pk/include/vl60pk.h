@@ -242,13 +242,13 @@ private:
     PneumoHose      *hose_fl_bwd = Q_NULLPTR;
 
     /// Блокировочное устройство УБТ усл.№367м
-    BrakeLock   *brake_lock = Q_NULLPTR;
+    BrakeLock   *brake_lock[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Поездной кран машиниста усл.№395
-    BrakeCrane  *brake_crane = Q_NULLPTR;
+    BrakeCrane  *brake_crane[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Кран впомогательного тормоза усл.№254
-    LocoCrane   *loco_crane = Q_NULLPTR;
+    LocoCrane   *loco_crane[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Тормозная магистраль
     Reservoir   *brakepipe = Q_NULLPTR;
@@ -304,7 +304,7 @@ private:
     PneumoHose  *hose_bc_bwd = Q_NULLPTR;
 
     /// Тумблер включения ЭПТ
-    Trigger         epb_switch;
+    Trigger         epb_switch[CABS_NUM];
 
     /// Источник питания ЭПТ
     EPBConverter    *epb_converter = Q_NULLPTR;
@@ -374,10 +374,14 @@ private:
     Timer   *autoStartTimer = Q_NULLPTR;
     size_t  start_count = 0;
 
-    AutoTrainStop *epk = Q_NULLPTR;
+    /// Устройство безопасности УКБМ
     SafetyDevice *safety_device = Q_NULLPTR;
 
-    Trigger key_epk;
+    /// Электропневматический клапан автостопа
+    AutoTrainStop *epk[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
+
+    /// Ключ ЭПК
+    Trigger key_epk[CABS_NUM];
 
     enum
     {
@@ -389,10 +393,6 @@ private:
 
     /// Линейные контакторы тяговых двигателей
     std::array<Relay *, NUM_MOTORS> linear_contactor;
-
-    bool is_LC_ON = false;
-
-    bool is_H6_ON = false;
 
     DecoderALSN *alsn_decoder = Q_NULLPTR;
 

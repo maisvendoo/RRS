@@ -75,25 +75,25 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[STRELKA_SELSIN] = main_controller->getSelsinPosition();
 
     // Положение рукоятки комбинированного крана
-    analogSignal[KRAN_KOMBIN] = brake_lock->getCombCranePosition();
+    analogSignal[KRAN_KOMBIN] = brake_lock[CAB1]->getCombCranePosition();
     // Положение рукоятки УБТ
-    analogSignal[KLUCH_367] = brake_lock->getMainHandlePosition();
+    analogSignal[KLUCH_367] = brake_lock[CAB1]->getMainHandlePosition();
 
     // Манометр питательной магистрали
     analogSignal[STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
     // Манометр тормозной магистрали
     analogSignal[STRELKA_M_TM] = static_cast<float>(brakepipe->getPressure() / 1.0);
     // Манометр уравнительного резервуара
-    analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane->getERpressure() / 1.0);
+    analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane[CAB1]->getERpressure() / 1.0);
     // Манометр давления в ТЦ
     analogSignal[STRELKA_M_TC] = static_cast<float>(bc_splitter->getInputPressure() / 1.0);
 
     // Положение рукоятки КрМ
-    analogSignal[KRAN395_RUK] = static_cast<float>(brake_crane->getHandlePosition());
+    analogSignal[KRAN395_RUK] = static_cast<float>(brake_crane[CAB1]->getHandlePosition());
 
     // Положение рукоятки КВТ
-    analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane->getHandlePosition());
-    analogSignal[KRAN254_SHIFT] = static_cast<float>(loco_crane->getHandleShift());
+    analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane[CAB1]->getHandlePosition());
+    analogSignal[KRAN254_SHIFT] = static_cast<float>(loco_crane[CAB1]->getHandleShift());
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
     analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
@@ -125,5 +125,5 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[LS_Y] = safety_device->getYellowLamp();
     analogSignal[LS_G] = safety_device->getGreenLamp();
 
-    analogSignal[KLUCH_EPK] = static_cast<float>(key_epk.getState());
+    analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
 }

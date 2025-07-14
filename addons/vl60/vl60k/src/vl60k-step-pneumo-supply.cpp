@@ -1,6 +1,7 @@
 #include    "vl60k.h"
 
 #include "brake-lock.h"
+#include "automatic-train-stop.h"
 #include "motor-compressor-ac.h"
 #include "phase-splitter.h"
 #include "pneumo-anglecock.h"
@@ -30,13 +31,17 @@ void VL60k::stepPneumoSupply(double t, double dt)
     FL_flow += motor_compressor->getFLflow();
     FL_flow += horn->getFLflow();
     FL_flow += sand_system->getFLflow();
-    FL_flow += brake_lock->getFLflow();
+    FL_flow += brake_lock[CAB1]->getFLflow();
+    FL_flow += brake_lock[CAB1]->getFLflow();
 
     anglecock_fl_fwd->setHoseFlow(hose_fl_fwd->getFlow());
     FL_flow += anglecock_fl_fwd->getFlowToPipe();
 
     anglecock_fl_bwd->setHoseFlow(hose_fl_bwd->getFlow());
     FL_flow += anglecock_fl_bwd->getFlowToPipe();
+
+    FL_flow += epk[CAB1]->getFLflow();
+    FL_flow += epk[CAB2]->getFLflow();
 
     main_reservoir->setFlow(FL_flow);
     main_reservoir->step(t, dt);

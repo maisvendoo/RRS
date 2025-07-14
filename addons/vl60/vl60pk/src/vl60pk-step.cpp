@@ -138,7 +138,7 @@ void VL60pk::stepTractionControl(double t, double dt)
     controller->setControl(keys);
     controller->step(t, dt);
 
-    main_controller->enable(cu_tumbler.getState() && brake_lock->isUnlocked());
+    main_controller->enable(cu_tumbler.getState() && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB1]->isUnlocked()));
     main_controller->setKMstate(controller->getState());
     main_controller->step(t, dt);
 
@@ -198,26 +198,18 @@ void VL60pk::stepLineContactors(double t, double dt)
     // Подготовка цепей линейных контакторов
 
     // Состояние провода Н6
-    bool is_H6_ON_old = is_H6_ON;
-
     bool is_BP_released = brakepipe->getPressure() > 0.3;
 
-    is_H6_ON = cu_tumbler.getState() && key_epk.getState() &&
+    bool is_H6_ON = cu_tumbler.getState() &&
+                    (key_epk[CAB1].getState() || key_epk[CAB2].getState()) &&
                     is_BP_released &&
                     (km_state.revers_ref_state != 0) &&
-                    (!km_state.pos_state[POS_ZERO]) && motor_fans_state;
-
-    if (is_H6_ON != is_H6_ON_old)
-    {
-        if (is_H6_ON)
-            Journal::instance()->info("Wire H6 is ON");
-        else
-            Journal::instance()->info("Wire H6 is OFF");
-    }
+                    (!km_state.pos_state[POS_ZERO]) &&
+                    motor_fans_state;
 
     for (auto lc : linear_contactor)
     {
-        is_LC_ON = is_H6_ON &&
+        bool is_LC_ON = is_H6_ON &&
                         (main_controller->isZeroPosition() || lc->getContactState(LC_SELF));
 
         lc->setVoltage(U_bat * static_cast<double>(is_LC_ON));

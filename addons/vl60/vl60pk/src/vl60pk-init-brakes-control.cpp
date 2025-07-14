@@ -16,19 +16,22 @@
 //------------------------------------------------------------------------
 void VL60pk::initBrakesControl(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    // Блокировочное устройство
-    brake_lock = new BrakeLock();
-    brake_lock->read_config("ubt367m");
+    for (size_t cab_idx : {CAB1, CAB2})
+    {
+        // Блокировочное устройство
+        brake_lock[cab_idx] = new BrakeLock();
+        brake_lock[cab_idx]->read_config("ubt367m");
 
-    // Поездной кран машиниста
-    brake_crane = loadBrakeCrane(
-                modules_dir + QDir::separator() + brake_crane_module_name);
-    brake_crane->read_config(brake_crane_config_name);
+        // Поездной кран машиниста
+        brake_crane[cab_idx] = loadBrakeCrane(
+            modules_dir + QDir::separator() + brake_crane_module_name);
+        brake_crane[cab_idx]->read_config(brake_crane_config_name);
 
-    // Кран вспомогательного тормоза
-    loco_crane = loadLocoCrane(
-                modules_dir + QDir::separator() + loco_crane_module_name);
-    loco_crane->read_config(loco_crane_config_name);
+        // Кран вспомогательного тормоза
+        loco_crane[cab_idx] = loadLocoCrane(
+            modules_dir + QDir::separator() + loco_crane_module_name);
+        loco_crane[cab_idx]->read_config(loco_crane_config_name);
+    }
 
     // Переключательный клапан магистрали тормозных цилиндров
     bc_switch_valve = new SwitchingValve();

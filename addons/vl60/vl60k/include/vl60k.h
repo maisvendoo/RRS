@@ -94,6 +94,13 @@ private:
     /// Передаточное число редуктора
     double  ip = 3.83;
 
+    enum
+    {
+        CABS_NUM = 2,
+        CAB1 = 0,
+        CAB2 = 1
+    };
+
     /// Подключение рукавов магистрали тормозных цилиндров к импульсной магистрали
     bool bc_hose_to_impulse_line = true;
 
@@ -225,13 +232,13 @@ private:
     PneumoHose      *hose_fl_bwd = Q_NULLPTR;
 
     /// Блокировочное устройство УБТ усл.№367м
-    BrakeLock   *brake_lock = Q_NULLPTR;
+    BrakeLock   *brake_lock[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Поездной кран машиниста усл.№395
-    BrakeCrane  *brake_crane = Q_NULLPTR;
+    BrakeCrane  *brake_crane[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Кран впомогательного тормоза усл.№254
-    LocoCrane   *loco_crane = Q_NULLPTR;
+    LocoCrane   *loco_crane[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Тормозная магистраль
     Reservoir   *brakepipe = Q_NULLPTR;
@@ -349,10 +356,10 @@ private:
     SafetyDevice *safety_device = Q_NULLPTR;
 
     /// Электропневматический клапан автостопа
-    AutoTrainStop *epk = Q_NULLPTR;
+    AutoTrainStop *epk[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Ключ ЭПК
-    Trigger key_epk;
+    Trigger key_epk[CABS_NUM];
 
     enum
     {
