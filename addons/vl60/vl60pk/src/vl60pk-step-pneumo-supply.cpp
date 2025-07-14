@@ -33,7 +33,7 @@ void VL60pk::stepPneumoSupply(double t, double dt)
     FL_flow += horn->getFLflow();
     FL_flow += sand_system->getFLflow();
     FL_flow += brake_lock[CAB1]->getFLflow();
-    FL_flow += brake_lock[CAB1]->getFLflow();
+    FL_flow += brake_lock[CAB2]->getFLflow();
     FL_flow += bc_pressure_relay->getFLflow();
 
     anglecock_fl_fwd->setHoseFlow(hose_fl_fwd->getFlow());
