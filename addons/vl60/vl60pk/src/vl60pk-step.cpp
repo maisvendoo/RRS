@@ -50,8 +50,16 @@ void VL60pk::slotAutoStart()
 //------------------------------------------------------------------------------
 void VL60pk::stepPantographsControl(double t, double dt)
 {
-    pantographs[0]->setState(pant1_tumbler.getState() && pants_tumbler.getState());
-    pantographs[1]->setState(pant2_tumbler.getState() && pants_tumbler.getState());
+    // Подъем переднего токоприемника
+    bool is_PANT1_ON = (pants_tumbler[CAB1].getState() || pants_tumbler[CAB2].getState()) &&
+                       (pant1_tumbler[CAB1].getState() || pant2_tumbler[CAB2].getState());
+
+    // Подъем заднего токоприемника
+    bool is_PANT2_ON = (pants_tumbler[CAB1].getState() || pants_tumbler[CAB2].getState()) &&
+                       (pant1_tumbler[CAB2].getState() || pant2_tumbler[CAB1].getState());
+
+    pantographs[0]->setState(is_PANT1_ON);
+    pantographs[1]->setState(is_PANT2_ON);
 
     for (auto pant : pantographs)
     {

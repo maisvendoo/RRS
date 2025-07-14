@@ -103,6 +103,13 @@ private:
     /// Передаточное число редуктора
     double  ip = 2.73;
 
+    enum
+    {
+        CABS_NUM = 2,
+        CAB1 = 0,
+        CAB2 = 1
+    };
+
     /// Имя модуля сцепного устройства
     QString coupling_module_name = "sa3";
     /// Имя конфига сцепного устройства
@@ -147,11 +154,11 @@ private:
     /// Триггер тумблера "Цепи управления"
     Trigger cu_tumbler;
     /// Триггер тумблера "Токоприемник передний"
-    Trigger pant1_tumbler;
+    Trigger pant1_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник задний"
-    Trigger pant2_tumbler;
+    Trigger pant2_tumbler[CABS_NUM];
     /// Тригер тумблера "Токоприемники"
-    Trigger pants_tumbler;
+    Trigger pants_tumbler[CABS_NUM];
     /// Тригер тумблена "ГВ вкл. Возврат защиты"
     Trigger gv_return_tumbler;
     /// Триггер тумблера "ГВ вкл/выкл"

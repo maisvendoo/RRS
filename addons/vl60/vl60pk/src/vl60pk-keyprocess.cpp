@@ -17,9 +17,9 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_U))
     {
         if (isShift())
-            pants_tumbler.set();
+            pants_tumbler[cabine_idx].set();
         else
-            pants_tumbler.reset();
+            pants_tumbler[cabine_idx].reset();
     }
 
     // Подъем/опускание переднего токоприемника
@@ -27,9 +27,9 @@ void VL60pk::keyProcess()
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())
-            pant1_tumbler.set();
+            pant1_tumbler[cabine_idx].set();
         else
-            pant1_tumbler.reset();
+            pant1_tumbler[cabine_idx].reset();
     }
 
     // Подъем/опускание заднего токоприемника
@@ -37,9 +37,9 @@ void VL60pk::keyProcess()
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())
-            pant2_tumbler.set();
+            pant2_tumbler[cabine_idx].set();
         else
-            pant2_tumbler.reset();
+            pant2_tumbler[cabine_idx].reset();
 
     }
 

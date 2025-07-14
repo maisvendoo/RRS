@@ -29,9 +29,9 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[PANT2_POS] = static_cast<float>(pantographs[1]->getHeight());
 
     // Состояние тумблеров на пульте машиниста
-    analogSignal[TUMBLER_PNT] = static_cast<float>(pants_tumbler.getState());
-    analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler.getState());
-    analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler.getState());
+    analogSignal[TUMBLER_PNT] = static_cast<float>(pants_tumbler[CAB1].getState());
+    analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler[CAB1].getState());
+    analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler[CAB1].getState());
 
     analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler.getState());
     analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());

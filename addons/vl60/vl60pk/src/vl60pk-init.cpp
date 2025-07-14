@@ -128,8 +128,8 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
 //------------------------------------------------------------------------------
 void VL60pk::initTriggers()
 {
-    triggers.push_back(&pants_tumbler);
-    triggers.push_back(&pant2_tumbler);
+    triggers.push_back(&pants_tumbler[CAB1]);
+    triggers.push_back(&pant2_tumbler[CAB1]);
     triggers.push_back(&gv_tumbler);
     triggers.push_back(&gv_return_tumbler);
     triggers.push_back(&fr_tumbler);
