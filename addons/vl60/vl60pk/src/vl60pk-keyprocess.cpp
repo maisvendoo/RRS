@@ -73,54 +73,54 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_R))
     {
         if (isShift())
-            mv_tumblers[MV1].set();
+            mv_tumblers[cabine_idx][MV1].set();
         else
-            mv_tumblers[MV1].reset();
+            mv_tumblers[cabine_idx][MV1].reset();
     }
 
     // МВ2
     if (getKeyState(KEY_F))
     {
         if (isShift())
-            mv_tumblers[MV2].set();
+            mv_tumblers[cabine_idx][MV2].set();
         else
-            mv_tumblers[MV2].reset();
+            mv_tumblers[cabine_idx][MV2].reset();
     }
 
     // МВ3
     if (getKeyState(KEY_Y))
     {
         if (isShift())
-            mv_tumblers[MV3].set();
+            mv_tumblers[cabine_idx][MV3].set();
         else
-            mv_tumblers[MV3].reset();
+            mv_tumblers[cabine_idx][MV3].reset();
     }
 
     // МВ4
     if (getKeyState(KEY_5) && !isAlt())
     {
         if (isShift())
-            mv_tumblers[MV4].set();
+            mv_tumblers[cabine_idx][MV4].set();
         else
-            mv_tumblers[MV4].reset();
+            mv_tumblers[cabine_idx][MV4].reset();
     }
 
     // МВ5
     if (getKeyState(KEY_6) && !isAlt())
     {
         if (isShift())
-            mv_tumblers[MV5].set();
+            mv_tumblers[cabine_idx][MV5].set();
         else
-            mv_tumblers[MV5].reset();
+            mv_tumblers[cabine_idx][MV5].reset();
     }
 
     // МВ6
     if (getKeyState(KEY_7) && !isAlt())
     {
         if (isShift())
-            mv_tumblers[MV6].set();
+            mv_tumblers[cabine_idx][MV6].set();
         else
-            mv_tumblers[MV6].reset();
+            mv_tumblers[cabine_idx][MV6].reset();
     }
 
     // Включение/выключение мотор-компрессора

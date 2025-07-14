@@ -46,12 +46,19 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB1].getState());
     analogSignal[CAB2_TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB2].getState());
 
-    analogSignal[TUMBLER_MV1] = static_cast<float>(mv_tumblers[MV1].getState());
-    analogSignal[TUMBLER_MV2] = static_cast<float>(mv_tumblers[MV2].getState());
-    analogSignal[TUMBLER_MV3] = static_cast<float>(mv_tumblers[MV3].getState());
-    analogSignal[TUMBLER_MV4] = static_cast<float>(mv_tumblers[MV4].getState());
-    analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[MV5].getState());
-    analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[MV6].getState());
+    analogSignal[TUMBLER_MV1] = static_cast<float>(mv_tumblers[CAB1][MV1].getState());
+    analogSignal[TUMBLER_MV2] = static_cast<float>(mv_tumblers[CAB1][MV2].getState());
+    analogSignal[TUMBLER_MV3] = static_cast<float>(mv_tumblers[CAB1][MV3].getState());
+    analogSignal[TUMBLER_MV4] = static_cast<float>(mv_tumblers[CAB1][MV4].getState());
+    analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[CAB1][MV5].getState());
+    analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[CAB1][MV6].getState());
+
+    analogSignal[CAB2_TUMBLER_MV1] = static_cast<float>(mv_tumblers[CAB2][MV1].getState());
+    analogSignal[CAB2_TUMBLER_MV2] = static_cast<float>(mv_tumblers[CAB2][MV2].getState());
+    analogSignal[CAB2_TUMBLER_MV3] = static_cast<float>(mv_tumblers[CAB2][MV3].getState());
+    analogSignal[CAB2_TUMBLER_MV4] = static_cast<float>(mv_tumblers[CAB2][MV4].getState());
+    analogSignal[CAB2_TUMBLER_MV5] = static_cast<float>(mv_tumblers[CAB2][MV5].getState());
+    analogSignal[CAB2_TUMBLER_MV6] = static_cast<float>(mv_tumblers[CAB2][MV6].getState());
 
     analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB1].getState());
     analogSignal[CAB2_TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB2].getState());

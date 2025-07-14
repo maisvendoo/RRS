@@ -125,7 +125,7 @@ void VL60pk::stepMotorFans(double t, double dt)
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
     {
         ACMotorFan *mf = motor_fans[i];
-        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[i].getState()));
+        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[CAB1][i].getState() || mv_tumblers[CAB2][i].getState()));
         mf->step(t, dt);
     }
 }

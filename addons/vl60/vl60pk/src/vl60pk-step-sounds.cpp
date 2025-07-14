@@ -119,22 +119,22 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
 
     // Ближний ряд тумблеров приборной панели машиниста
 //    analogSignal[SOUND_TUMBLER_AUTOSAND_ON] = autosand_tumbler.getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN6_ON] = mv_tumblers[MV6].getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN5_ON] = mv_tumblers[MV5].getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN4_ON] = mv_tumblers[MV4].getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN3_ON] = mv_tumblers[MV3].getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN2_ON] = mv_tumblers[MV2].getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN1_ON] = mv_tumblers[MV1].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN6_ON] = mv_tumblers[CAB1][MV6].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN5_ON] = mv_tumblers[CAB1][MV5].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN4_ON] = mv_tumblers[CAB1][MV4].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN3_ON] = mv_tumblers[CAB1][MV3].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN2_ON] = mv_tumblers[CAB1][MV2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN1_ON] = mv_tumblers[CAB1][MV1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_COMPRESSOR_ON] = mk_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PHASESPLITTER_ON] = fr_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
 
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = autosand_tumbler.getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN6_OFF] = mv_tumblers[MV6].getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN5_OFF] = mv_tumblers[MV5].getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN4_OFF] = mv_tumblers[MV4].getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN3_OFF] = mv_tumblers[MV3].getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN2_OFF] = mv_tumblers[MV2].getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_FAN1_OFF] = mv_tumblers[MV1].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN6_OFF] = mv_tumblers[CAB1][MV6].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN5_OFF] = mv_tumblers[CAB1][MV5].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN4_OFF] = mv_tumblers[CAB1][MV4].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN3_OFF] = mv_tumblers[CAB1][MV3].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN2_OFF] = mv_tumblers[CAB1][MV2].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_FAN1_OFF] = mv_tumblers[CAB1][MV1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_COMPRESSOR_OFF] = mk_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PHASESPLITTER_OFF] = fr_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
 

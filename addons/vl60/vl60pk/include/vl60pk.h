@@ -179,7 +179,7 @@ private:
 //    /// Тригер тумблера "Автоматическая подача песка"
 //    Trigger autosand_tumbler;
     /// Триггеры тумблеров "Вентилятор 1-6"
-    std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
+    Trigger mv_tumblers[CABS_NUM][NUM_MOTOR_FANS];
     /// Тригер тумблера "Компрессор"
     Trigger mk_tumbler[CABS_NUM];
     /// Тригер тумблера "Фазорасщепитель"

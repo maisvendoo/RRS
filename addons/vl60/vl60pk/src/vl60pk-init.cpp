@@ -135,8 +135,8 @@ void VL60pk::initTriggers()
     triggers.push_back(&fr_tumbler[cabine_idx]);
     triggers.push_back(&mk_tumbler[cabine_idx]);
 
-    for (size_t i = 0; i < mv_tumblers.size(); ++i)
-        triggers.push_back(&mv_tumblers[i]);
+    for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
+        triggers.push_back(&mv_tumblers[cabine_idx][i]);
 
     triggers.push_back(&cu_tumbler);
 
