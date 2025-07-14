@@ -138,7 +138,7 @@ void VL60pk::initTriggers()
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
         triggers.push_back(&mv_tumblers[cabine_idx][i]);
 
-    triggers.push_back(&cu_tumbler);
+    triggers.push_back(&cu_tumbler[cabine_idx]);
 
     autoStartTimer = new Timer(0.5);
     connect(autoStartTimer, &Timer::process, this, &VL60pk::slotAutoStart);

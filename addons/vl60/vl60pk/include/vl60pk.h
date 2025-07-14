@@ -152,7 +152,7 @@ private:
 //    /// Тригер тумблера "Радиостанция"
 //    Trigger radio_tumbler;
     /// Триггер тумблера "Цепи управления"
-    Trigger cu_tumbler;
+    Trigger cu_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник передний"
     Trigger pant1_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник задний"

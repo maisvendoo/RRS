@@ -138,7 +138,7 @@ void VL60pk::stepTractionControl(double t, double dt)
     controller->setControl(keys);
     controller->step(t, dt);
 
-    main_controller->enable(cu_tumbler.getState() && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB1]->isUnlocked()));
+    main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB2]->isUnlocked()));
     main_controller->setKMstate(controller->getState());
     main_controller->step(t, dt);
 
@@ -200,7 +200,7 @@ void VL60pk::stepLineContactors(double t, double dt)
     // Состояние провода Н6
     bool is_BP_released = brakepipe->getPressure() > 0.3;
 
-    bool is_H6_ON = cu_tumbler.getState() &&
+    bool is_H6_ON = (cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState())  &&
                     (key_epk[CAB1].getState() || key_epk[CAB2].getState()) &&
                     is_BP_released &&
                     (km_state.revers_ref_state != 0) &&

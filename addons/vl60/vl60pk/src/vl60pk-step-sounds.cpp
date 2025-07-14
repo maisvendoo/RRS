@@ -100,7 +100,7 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_ON] = proj2_tumbler.getSoundSignal(Trigger::ON_SOUND);
 //    analogSignal[SOUND_TUMBLER_PROJECTOR1_ON] = proj1_tumbler.getSoundSignal(Trigger::ON_SOUND);
 //    analogSignal[SOUND_TUMBLER_RADIO_ON] = radio_tumbler.getSoundSignal(Trigger::ON_SOUND);
-    analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_ON] = cu_tumbler.getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_ON] = cu_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_BWD_ON] = pant2_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_FWD_ON] = pant1_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PANTS_ON] = pants_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
@@ -110,7 +110,7 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = proj2_tumbler.getSoundSignal(Trigger::OFF_SOUND);
 //    analogSignal[SOUND_TUMBLER_PROJECTOR1_OFF] = proj1_tumbler.getSoundSignal(Trigger::OFF_SOUND);
 //    analogSignal[SOUND_TUMBLER_RADIO_OFF] = radio_tumbler.getSoundSignal(Trigger::OFF_SOUND);
-    analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_OFF] = cu_tumbler.getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_OFF] = cu_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_BWD_OFF] = pant2_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_FWD_OFF] = pant1_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANTS_OFF] = pants_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);

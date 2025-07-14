@@ -63,7 +63,8 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB1].getState());
     analogSignal[CAB2_TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB2].getState());
 
-    analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler.getState());
+    analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler[CAB1].getState());
+    analogSignal[CAB2_TUMBLER_CU] = static_cast<float>(cu_tumbler[CAB2].getState());
 
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);

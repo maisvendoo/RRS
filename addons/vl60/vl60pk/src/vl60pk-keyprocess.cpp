@@ -136,9 +136,9 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_J))
     {
         if (isShift())
-            cu_tumbler.set();
+            cu_tumbler[cabine_idx].set();
         else
-            cu_tumbler.reset();
+            cu_tumbler[cabine_idx].reset();
     }
 
     // Нажатие РБ-1
