@@ -33,6 +33,10 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler[CAB1].getState());
     analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler[CAB1].getState());
 
+    analogSignal[CAB2_TUMBLER_PNT] = static_cast<float>(pants_tumbler[CAB2].getState());
+    analogSignal[CAB2_TUMBLER_PNT1] = static_cast<float>(pant1_tumbler[CAB2].getState());
+    analogSignal[CAB2_TUMBLER_PNT2] = static_cast<float>(pant2_tumbler[CAB2].getState());
+
     analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler.getState());
     analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler.getState());
 
