@@ -13,6 +13,7 @@
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
 #include "speedmap.h"
+#include "pneumo-switching-valve.h"
 
 //------------------------------------------------------------------------------
 //
@@ -53,6 +54,11 @@ void VL60pk::debugPrint(double t, double dt)
     }
 
     DebugMsg += QString("| Кабина: %1").arg(cabine_idx + 1, 2);
+
+    DebugMsg += QString("| ПК p1: %1 | p2 %2 | x: %3")
+                    .arg(bc_switch_valve->getPressure1(), 4, 'f', 2)
+                    .arg(bc_switch_valve->getPressure2(), 4, 'f', 2)
+                    .arg(bc_switch_valve->getY(0), 6, 'f', 3);
 
     DebugMsg += QString("\n");
     DebugMsg += QString("%1%2%3-%4-couplings-%5-%6%7%8")
