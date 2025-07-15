@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<MaterialAnimation>
-		<SignalID>60</SignalID>
+		<SignalID>364</SignalID>
 		<Duration>10.0</Duration>
 		<EmissionColor>0.0 1.0 0.0</EmissionColor>		
 	</MaterialAnimation>

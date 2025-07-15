@@ -141,6 +141,10 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
 
+    analogSignal[CAB2_STRELKA_SPEED] = speed_meter->getArrowPos();
+    analogSignal[CAB2_VAL_PR_SKOR1] = speed_meter->getShaftPos();
+    analogSignal[CAB2_VAL_PR_SKOR2] = speed_meter->getShaftPos();
+
     analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[CAB1][RB_1].getState());
     analogSignal[KNOPKA_RBS] = static_cast<float>(rb[CAB1][RBS].getState());
     analogSignal[KNOPKA_RBP] = static_cast<float>(rb[CAB1][RBP].getState());
@@ -157,17 +161,26 @@ void VL60pk::stepSignalsOutput(double t, double dt)
     analogSignal[WHEEL_6] = static_cast<float>(wheel_rotation_angle[5] / 2.0 / Physics::PI);
 
     // Лампы предварительной световой сигнализации УКБМ
-    analogSignal[SIG_LIGHT_PSS_L] = safety_device->getStatePSS();
-    analogSignal[SIG_LIGHT_PSS_R] = safety_device->getStatePSS();
+    analogSignal[SIG_LIGHT_PSS_L] = safety_device[CAB1]->getStatePSS();
+    analogSignal[SIG_LIGHT_PSS_R] = safety_device[CAB1]->getStatePSS();
     analogSignal[SIG_LIGHT_PSS_PROPUSK] = 0.0f;
+    analogSignal[CAB2_SIG_LIGHT_PSS_L] = safety_device[CAB2]->getStatePSS();
+    analogSignal[CAB2_SIG_LIGHT_PSS_R] = safety_device[CAB2]->getStatePSS();
+    //analogSignal[CAB2_SIG_LIGHT_PSS_PROPUSK] = 0.0f;
 
     // Лампы локомотивного светофора
-    analogSignal[LS_W] = safety_device->getWhiteLamp();
-    analogSignal[LS_YK] = safety_device->getRedYellowLamp();
-    analogSignal[LS_R] = safety_device->getRedLamp();
-    analogSignal[LS_Y] = safety_device->getYellowLamp();
-    analogSignal[LS_G] = safety_device->getGreenLamp();
+    analogSignal[LS_W] = safety_device[CAB1]->getWhiteLamp();
+    analogSignal[LS_YK] = safety_device[CAB1]->getRedYellowLamp();
+    analogSignal[LS_R] = safety_device[CAB1]->getRedLamp();
+    analogSignal[LS_Y] = safety_device[CAB1]->getYellowLamp();
+    analogSignal[LS_G] = safety_device[CAB1]->getGreenLamp();
+
+    analogSignal[CAB2_LS_W] = safety_device[CAB2]->getWhiteLamp();
+    analogSignal[CAB2_LS_YK] = safety_device[CAB2]->getRedYellowLamp();
+    analogSignal[CAB2_LS_R] = safety_device[CAB2]->getRedLamp();
+    analogSignal[CAB2_LS_Y] = safety_device[CAB2]->getYellowLamp();
+    analogSignal[CAB2_LS_G] = safety_device[CAB2]->getGreenLamp();
 
     analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
-    //analogSignal[CAB2_KLUCH_EPK] = static_cast<float>(key_epk[CAB2].getState());
+    analogSignal[CAB2_KLUCH_EPK] = static_cast<float>(key_epk[CAB2].getState());
 }

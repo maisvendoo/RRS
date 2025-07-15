@@ -3279,7 +3279,7 @@
 		},
 		{
 			"mesh":245,
-			"name":"Val_prSkor-1.001",
+			"name":"Cab2_Val_prSkor-1",
 			"rotation":[
 				0,
 				-0.7071066498756409,
@@ -3299,7 +3299,7 @@
 		},
 		{
 			"mesh":246,
-			"name":"Val_prSkor-2.001",
+			"name":"Cab2_Val_prSkor-2",
 			"rotation":[
 				0,
 				-0.7071066498756409,

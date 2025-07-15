@@ -44,11 +44,12 @@ void VL60pk::initSafetyDevices(const QString &modules_dir, const QString &custom
         epk[cab_idx] = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
         epk[cab_idx]->read_config("epk150");
     }
-
-    // УКБМ
-    safety_device = new SafetyDevice;
-
-    // Дешифратор АЛСН
-    alsn_decoder = new DecoderALSN();
-    alsn_decoder->read_config("ALSN-decoder");
+    for (auto i : {CAB1, CAB2})
+    {
+        // Дешифратор АЛСН
+        alsn_decoder[i] = new DecoderALSN();
+        alsn_decoder[i]->read_config("ALSN-decoder");
+        // УКБМ
+        safety_device[i] = new SafetyDevice;
+    }
 }

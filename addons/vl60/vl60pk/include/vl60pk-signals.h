@@ -255,7 +255,17 @@ enum
 
     CAB2_EPT_ON_OFF = 359,
 
-    CAB2_KRAN254_SHIFT = 360
+    CAB2_KRAN254_SHIFT = 360,
+    CAB2_KLUCH_EPK = 361,
+
+    CAB2_SIG_LIGHT_PSS_L = 362,
+    CAB2_SIG_LIGHT_PSS_R = 363,
+
+    CAB2_LS_G = 364,
+    CAB2_LS_R = 365,
+    CAB2_LS_W = 366,
+    CAB2_LS_Y = 367,
+    CAB2_LS_YK = 368
 };
 
 #endif // VL60PK_SIGNALS_H

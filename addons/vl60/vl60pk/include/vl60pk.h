@@ -375,7 +375,7 @@ private:
     size_t  start_count = 0;
 
     /// Устройство безопасности УКБМ
-    SafetyDevice *safety_device = Q_NULLPTR;
+    SafetyDevice *safety_device[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Электропневматический клапан автостопа
     AutoTrainStop *epk[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
@@ -394,7 +394,7 @@ private:
     /// Линейные контакторы тяговых двигателей
     std::array<Relay *, NUM_MOTORS> linear_contactor;
 
-    DecoderALSN *alsn_decoder = Q_NULLPTR;
+    DecoderALSN *alsn_decoder[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Общая инициализация локомотива
     void initialization();
