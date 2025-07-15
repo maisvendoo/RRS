@@ -198,8 +198,8 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
             process();
         else
         {
-            // Устанавливаем готовность по состоянию рукоятки КМ положению вала ЭКГ
-            is_ready = km1_state.pos_state[POS_ZERO] && km2_state.pos_state[POS_ZERO] && (position == LM_POS0);
+            // Устанавливаем готовность по состоянию рукоятки КМ
+            is_ready = km1_state.pos_state[POS_ZERO] && km2_state.pos_state[POS_ZERO];
         }
     }
     else
