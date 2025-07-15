@@ -51,10 +51,21 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_BRAKE_CRANE_ER_DRAIN_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::ER_DRAIN_FLOW_SOUND);
     analogSignal[SOUND_BRAKE_CRANE_BP_FILL_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::BP_FILL_FLOW_SOUND);
     analogSignal[SOUND_BRAKE_CRANE_BP_DRAIN_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::BP_DRAIN_FLOW_SOUND);
+
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_CHANGE_POS] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::CHANGE_POS_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_ER_STAB_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::ER_STAB_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_ER_FILL_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::ER_FILL_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_ER_DRAIN_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::ER_DRAIN_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_BP_FILL_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::BP_FILL_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_BP_DRAIN_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::BP_DRAIN_FLOW_SOUND);
     // Кран локомотивного тормоза
     analogSignal[SOUND_LOCO_CRANE_CHANGE_POS] = loco_crane[CAB1]->getSoundSignal(LocoCrane::CHANGE_POS_SOUND);
     analogSignal[SOUND_LOCO_CRANE_BC_FILL_FLOW] = loco_crane[CAB1]->getSoundSignal(LocoCrane::BC_FILL_FLOW_SOUND);
     analogSignal[SOUND_LOCO_CRANE_BC_DRAIN_FLOW] = loco_crane[CAB1]->getSoundSignal(LocoCrane::BC_DRAIN_FLOW_SOUND);
+
+    analogSignal[CAB2_SOUND_LOCO_CRANE_CHANGE_POS] = loco_crane[CAB2]->getSoundSignal(LocoCrane::CHANGE_POS_SOUND);
+    analogSignal[CAB2_SOUND_LOCO_CRANE_BC_FILL_FLOW] = loco_crane[CAB2]->getSoundSignal(LocoCrane::BC_FILL_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_LOCO_CRANE_BC_DRAIN_FLOW] = loco_crane[CAB2]->getSoundSignal(LocoCrane::BC_DRAIN_FLOW_SOUND);
 
     // Звуки в движении
     double Vkmh = abs(velocity) * Physics::kmh;
