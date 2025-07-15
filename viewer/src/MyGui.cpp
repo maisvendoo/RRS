@@ -126,6 +126,11 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     {
         showNoControlled();
     }
+
+    if (params->is_no_cabine_control)
+    {
+        showNoCabineControl();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -297,6 +302,34 @@ void MyGui::showDebugMsg() const
 void MyGui::showNoControlled() const
 {
     const char *text = "Нажмите Enter для управления данной ПЕ";
+    ImVec2 text_size = ImGui::CalcTextSize(text);
+
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(text_size.x + 20, text_size.y + 20));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Состояние управления", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::Text(u8"%s", text);
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showNoCabineControl() const
+{
+    const char *text = "Нажмите Enter для управления из данной кабины";
     ImVec2 text_size = ImGui::CalcTextSize(text);
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));

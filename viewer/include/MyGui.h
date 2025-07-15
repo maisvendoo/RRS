@@ -34,6 +34,8 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     bool is_no_controlled = false;
 
+    bool is_no_cabine_control = false;
+
     QString status = "";
 
     float* ambient_color = nullptr;
@@ -74,6 +76,8 @@ private:
     void showDebugMsg() const;
 
     void showNoControlled() const;
+
+    void showNoCabineControl() const;
 
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 };
