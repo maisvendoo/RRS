@@ -164,6 +164,15 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             {
                 _vehicles_handler->selectControlVehicle();
                 changeCurrentVehicle();
+
+                auto vehicle = _vehicles_handler->getCurrentVehicle();
+
+                if (vehicle->cabine_idx != vehicle->cabine_idx_ref)
+                {
+                    vehicle->cabine_idx = vehicle->cabine_idx_ref;
+                    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx_ref);
+                }
+
                 return;
             }
 
@@ -584,14 +593,12 @@ void UpdateViewerHandler::changeCurrentCabine()
 {
     auto vehicle = _vehicles_handler->getCurrentVehicle();
 
-    vehicle->cabine_idx++;
+    vehicle->cabine_idx_ref++;
 
-    if (vehicle->cabine_idx == vehicle->driver_pos.size())
+    if (vehicle->cabine_idx_ref == vehicle->driver_pos.size())
     {
-        vehicle->cabine_idx = 0;
-    }
-
-    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx);
+        vehicle->cabine_idx_ref = 0;
+    }   
 }
 
 //------------------------------------------------------------------------------

@@ -405,7 +405,7 @@ bool VehiclesHandler::load(
         const std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
 
         VehicleExterior vehicle_exterior;
-        vehicle_exterior.driver_pos[vehicle_exterior.cabine_idx] = settings.cabine_default_pos;
+        vehicle_exterior.driver_pos[vehicle_exterior.cabine_idx_ref] = settings.cabine_default_pos;
         vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
         if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, viewer, options))

@@ -109,6 +109,9 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         params->is_no_controlled =
                         (params->vehicles_handler->getCurrentVehicleIndex() !=
                         params->vehicles_handler->getControlledVehicleIndex());
+
+        params->is_no_cabine_control = params->vehicles_handler->getCurrentVehicle()->cabine_idx !=
+                                       params->vehicles_handler->getCurrentVehicle()->cabine_idx_ref;
     }
     else
     {

@@ -130,7 +130,7 @@ void VL60k::stepTractionControl(double t, double dt)
     controller->step(t, dt);
 
     main_controller->enable(cu_tumbler.getState() && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB1]->isUnlocked()));
-    main_controller->setKMstate(controller->getState());
+    main_controller->setKMstate(controller->getState(), controller->getState());
     main_controller->step(t, dt);
 
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
