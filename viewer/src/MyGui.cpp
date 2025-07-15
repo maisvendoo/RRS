@@ -332,7 +332,8 @@ void MyGui::showNoControlled() const
 //------------------------------------------------------------------------------
 void MyGui::showNoCabineControl() const
 {
-    const char *text = "Нажмите Enter для управления из данной кабины";
+    QString msg = QString("Нажмите Enter для управления из кабины %1").arg(params->vehicles_handler->getCurrentVehicle()->cabine_idx_ref + 1);
+    const char *text = msg.toStdString().c_str();
     ImVec2 text_size = ImGui::CalcTextSize(text);
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));

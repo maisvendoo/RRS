@@ -170,7 +170,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 if (vehicle->cabine_idx != vehicle->cabine_idx_ref)
                 {
                     vehicle->cabine_idx = vehicle->cabine_idx_ref;
-                    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx_ref);
+                    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx);
                 }
 
                 return;
