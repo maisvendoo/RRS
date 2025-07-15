@@ -13,10 +13,10 @@
 		<AnimationsConfigDir>vl60pk</AnimationsConfigDir>
 
 		<ReductorCoeff>2.73</ReductorCoeff>
-		
+
 		<ExtModelName>VL60pk-1543/VL60pk-1543.gltf</ExtModelName>
 		<ModelShift>0.0 0.0 0.312</ModelShift>
-		
+
 		<CabineModel>VL60pk-1543/VL60pk-cabview.gltf</CabineModel>
 		<CabineShift>0.0 0.0 0.317</CabineShift>
 
@@ -34,8 +34,6 @@
 
 		<ElectroAirDistModule>evr305</ElectroAirDistModule>
 		<ElectroAirDistConfig>evr305</ElectroAirDistConfig>
-
-		<DriverPos>0.8 8.4 3.6;-0.8 -8.4 3.6</DriverPos>
 	</Vehicle>
 
 	<Cabine>

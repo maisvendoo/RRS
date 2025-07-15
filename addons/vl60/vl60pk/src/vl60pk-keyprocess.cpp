@@ -1,9 +1,7 @@
 #include    "vl60pk.h"
-#include    <Journal.h>
 
 #include    "key-symbols.h"
-
-#include "timer.h"
+#include    "timer.h"
 
 //------------------------------------------------------------------------------
 //
@@ -12,6 +10,13 @@ void VL60pk::keyProcess()
 {
     if (autoStartTimer->isStarted())
         return;
+
+    if (getKeyState(KEY_R) && isAlt())
+    {
+        initTriggers();
+        autoStartTimer->start();
+        return;
+    }
 
     // Управление тумблером "Токоприемники"
     if (getKeyState(KEY_U))
@@ -67,8 +72,7 @@ void VL60pk::keyProcess()
             fr_tumbler[cabine_idx].reset();
     }
 
-    // Включение/выключение мотор-верниляторов
-
+    // Включение/выключение мотор-вентиляторов
     // МВ1
     if (getKeyState(KEY_R))
     {
@@ -143,18 +147,11 @@ void VL60pk::keyProcess()
 
     // Нажатие РБ-1
     if (getKeyState(KEY_Z))
-    {
         rb[cabine_idx][RB_1].set();
-        Journal::instance()->info("RB-1 pressed");
-    }
     else
-    {
         rb[cabine_idx][RB_1].reset();
-        //Journal::instance()->info("RB-1 released");
-    }
 
     // Нажатие РБС
-
     // Если активна РБС на внешнем пульте
     if (control_signals.analogSignal[CS_RBS].is_active)
     {
@@ -174,15 +171,18 @@ void VL60pk::keyProcess()
     }
 
     // Нажатие РБП
-    if (getKeyState(KEY_Q))
+    if (getKeyState(KEY_Tilde))
         rb[cabine_idx][RBP].set();
     else
         rb[cabine_idx][RBP].reset();
 
-    if (getKeyState(KEY_R))
+    // Включение/выключение ЭПK
+    if (getKeyState(KEY_N))
     {
-        if (isAlt() && !autoStartTimer->isStarted())
-            autoStartTimer->start();
+        if (isShift())
+            key_epk[cabine_idx].set();
+        else
+            key_epk[cabine_idx].reset();
     }
 
     // Включение/выключение ЭПТ
@@ -192,14 +192,5 @@ void VL60pk::keyProcess()
             epb_switch[cabine_idx].set();
         else
             epb_switch[cabine_idx].reset();
-    }
-
-    // Включение/выключение ЭПK
-    if (getKeyState(KEY_N))
-    {
-        if (isShift())
-            key_epk[cabine_idx].set();
-        else
-            key_epk[cabine_idx].reset();
     }
 }

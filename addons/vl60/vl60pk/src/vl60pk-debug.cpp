@@ -42,24 +42,13 @@ void VL60pk::debugPrint(double t, double dt)
                     .arg(main_controller->isLongMotionPos() ? "*" : " ")
                     .arg(motor[TED1]->getIa(), 6, 'f', 1);
 
-    DebugMsg += QString("| Curvature: %1").arg(profile_point_data.curvature, 8, 'f', 6);
-
-    if (profile_point_data.curvature > Physics::ZERO)
-    {
-        DebugMsg += QString("| Radius: %1").arg(1.0 / profile_point_data.curvature, 8, 'f', 1);
-    }
-    else
-    {
-        DebugMsg += QString("| Radius: inf");
-    }
-
     DebugMsg += QString("| Кабина: %1").arg(cabine_idx + 1, 2);
-
+/*
     DebugMsg += QString("| ПК p1: %1 | p2 %2 | x: %3")
                     .arg(bc_switch_valve->getPressure1(), 4, 'f', 2)
                     .arg(bc_switch_valve->getPressure2(), 4, 'f', 2)
                     .arg(bc_switch_valve->getY(0), 6, 'f', 3);
-
+*/
     DebugMsg += QString("\n");
     DebugMsg += QString("%1%2%3-%4-couplings-%5-%6%7%8")
                     .arg(coupling_fwd->isLinked() ? "=" : " ")

@@ -14,11 +14,9 @@
 
 		<ReductorCoeff>3.83</ReductorCoeff>
 
-		<!-- <ExtModelName>VL60k-1737/VL60k-1737.osgt</ExtModelName> -->
 		<ExtModelName>VL60k-1737/VL60k-1737.gltf</ExtModelName>
 		<ModelShift>0.0 0.0 0.312</ModelShift>
 
-		<!-- <CabineModel>VL60k-1737/VL60k-cabview.osgt</CabineModel> -->
 		<CabineModel>VL60k-1737/VL60k-cabview.gltf</CabineModel>
 		<CabineShift>0.0 0.0 0.317</CabineShift>
 
@@ -33,8 +31,6 @@
 
 		<AirDistModule>vr483</AirDistModule>
 		<AirDistConfig>vr483</AirDistConfig>
-
-		<DriverPos>0.8 8.4 3.6</DriverPos>
 	</Vehicle>
 
 	<Cabine>

@@ -29,18 +29,18 @@ void VL60pk::slotAutoStart()
         triggers[start_count]->set();
 
         if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
-                (triggers[start_count] == &gv_tumbler[cabine_idx]))
+                (triggers[start_count] == &gv_tumbler[autostart_cab]))
             return;
 
         if (main_switch->getState())
-            gv_return_tumbler[cabine_idx].reset();
+            gv_return_tumbler[autostart_cab].reset();
 
         start_count++;
     }
     else
     {
         autoStartTimer->stop();
-        controller[cabine_idx]->setReversPos(REVERS_FORWARD);
+        controller[autostart_cab]->setReversPos(REVERS_FORWARD);
         start_count = 0;
     }
 }
@@ -111,8 +111,8 @@ void VL60pk::stepTracTransformer(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepPhaseSplitter(double t, double dt)
 {
-    double U_power = trac_trans->getU_sn() * static_cast<double>(fr_tumbler[CAB1].getState() || fr_tumbler[CAB2].getState());
-    phase_spliter->setU_power(U_power);
+    bool is_FR_ON = fr_tumbler[CAB1].getState() || fr_tumbler[CAB2].getState();
+    phase_spliter->setU_power(trac_trans->getU_sn() * static_cast<double>(is_FR_ON));
 
     phase_spliter->step(t, dt);
 }
@@ -122,10 +122,12 @@ void VL60pk::stepPhaseSplitter(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepMotorFans(double t, double dt)
 {
+    bool is_MV_ON;
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
     {
         ACMotorFan *mf = motor_fans[i];
-        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[CAB1][i].getState() || mv_tumblers[CAB2][i].getState()));
+        is_MV_ON = mv_tumblers[CAB1][i].getState() || mv_tumblers[CAB2][i].getState();
+        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(is_MV_ON));
         mf->step(t, dt);
     }
 }
@@ -142,7 +144,8 @@ void VL60pk::stepTractionControl(double t, double dt)
         controller[i]->step(t, dt);
     }
 
-    main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB2]->isUnlocked()));
+    main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) &&
+                            (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB2]->isUnlocked()));
     main_controller->setKMstate(controller[CAB1]->getState(), controller[CAB2]->getState());
     main_controller->step(t, dt);
 
@@ -160,7 +163,7 @@ void VL60pk::stepTractionControl(double t, double dt)
     // Полярность включения ТЭД
     int motor_dir = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
 
-    double I_vu = 0;
+    double I_vu = 0.0;
 
     for (size_t i = 0; i < motor.size(); ++i)
     {
@@ -305,8 +308,6 @@ double VL60pk::getTractionForce()
 //------------------------------------------------------------------------------
 bool VL60pk::getHoldingCoilState() const
 {
-    km_state_t km_state = controller[cabine_idx]->getState();
-
     bool overload = false;
 
     for (auto ov_relay : overload_relay)
@@ -314,7 +315,7 @@ bool VL60pk::getHoldingCoilState() const
         overload |= ov_relay->getState();
     }
 
-    bool state = !km_state.pos_state[POS_BV] && (!overload);
+    bool state = (!controller[cabine_idx]->getState().pos_state[POS_BV]) && (!overload);
 
     return state;
 }

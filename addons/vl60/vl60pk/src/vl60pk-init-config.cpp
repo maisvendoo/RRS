@@ -19,7 +19,7 @@ void VL60pk::load_brakes_config(QString path)
         int tmp_int;
 
         tmp_dbl = 1.0e-4;
-        if (cfg.getDouble(secName, "MainReservoirFlow", tmp_dbl))
+        if (cfg.getDouble(secName, "MainReservoirLeak", tmp_dbl))
         {
             main_reservoir->setLeakCoeff(tmp_dbl);
         }

@@ -20,7 +20,7 @@ void VL60k::stepPneumoSupply(double t, double dt)
     press_reg->step(t, dt);
 
     double U_power = phase_spliter->getU_out()
-                    * static_cast<double>(mk_tumbler.getState())
+                    * static_cast<double>(mk_tumbler[CAB1].getState() || mk_tumbler[CAB2].getState())
                     * press_reg->getState();
     motor_compressor->setFLpressure(main_reservoir->getPressure());
     motor_compressor->setPowerVoltage(U_power);

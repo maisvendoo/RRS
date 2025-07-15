@@ -131,19 +131,26 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
 //------------------------------------------------------------------------------
 void VL60pk::initTriggers()
 {
-    triggers.push_back(&pants_tumbler[cabine_idx]);
-    triggers.push_back(&pant2_tumbler[cabine_idx]);
-    triggers.push_back(&gv_tumbler[cabine_idx]);
-    triggers.push_back(&gv_return_tumbler[cabine_idx]);
-    triggers.push_back(&fr_tumbler[cabine_idx]);
-    triggers.push_back(&mk_tumbler[cabine_idx]);
+    if (autoStartTimer->isStarted())
+        return;
+
+    if ((cabine_idx != CAB1) && (cabine_idx != CAB2))
+        return;
+
+    autostart_cab = cabine_idx;
+    start_count = 0;
+    triggers.clear();
+    triggers.push_back(&pants_tumbler[autostart_cab]);
+    triggers.push_back(&pant2_tumbler[autostart_cab]);
+    triggers.push_back(&gv_tumbler[autostart_cab]);
+    triggers.push_back(&gv_return_tumbler[autostart_cab]);
+    triggers.push_back(&fr_tumbler[autostart_cab]);
+    triggers.push_back(&mk_tumbler[autostart_cab]);
 
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
-        triggers.push_back(&mv_tumblers[cabine_idx][i]);
+        triggers.push_back(&mv_tumblers[autostart_cab][i]);
 
-    triggers.push_back(&cu_tumbler[cabine_idx]);
-
-    autoStartTimer = new Timer(0.5);
-    connect(autoStartTimer, &Timer::process, this, &VL60pk::slotAutoStart);
-    start_count = 0;
+    triggers.push_back(&cu_tumbler[autostart_cab]);
+    triggers.push_back(&key_epk[autostart_cab]);
+    triggers.push_back(&rb[autostart_cab][RBS]);
 }

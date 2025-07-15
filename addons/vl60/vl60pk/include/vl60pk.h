@@ -146,11 +146,11 @@ private:
 
     // Дальний ряд тумблеров приборной панели машиниста
 //    /// Тригер тумблера "Прожектор яркий"
-//    Trigger proj2_tumbler;
+//    Trigger proj2_tumbler[CABS_NUM];
 //    /// Тригер тумблера "Прожектор тусклый"
-//    Trigger proj1_tumbler;
+//    Trigger proj1_tumbler[CABS_NUM];
 //    /// Тригер тумблера "Радиостанция"
-//    Trigger radio_tumbler;
+//    Trigger radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
     Trigger cu_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник передний"
@@ -313,7 +313,7 @@ private:
     EPBControl  *epb_control = Q_NULLPTR;
 
     /// Контроллер машиниста
-    ControllerKME_60_044    *controller[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR,};
+    ControllerKME_60_044    *controller[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Главный контроллер (переключение обмоток тягового трансформатора)
     EKG_8G                  *main_controller = Q_NULLPTR;
@@ -373,6 +373,7 @@ private:
     std::vector<Trigger *> triggers;
     Timer   *autoStartTimer = Q_NULLPTR;
     size_t  start_count = 0;
+    size_t  autostart_cab = 0;
 
     /// Устройство безопасности УКБМ
     SafetyDevice *safety_device[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};

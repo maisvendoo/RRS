@@ -28,18 +28,18 @@ void VL60k::slotAutoStart()
         triggers[start_count]->set();
 
         if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
-                (triggers[start_count] == &gv_tumbler))
+                (triggers[start_count] == &gv_tumbler[cabine_idx]))
             return;
 
         if (main_switch->getState())
-            gv_return_tumbler.reset();
+            gv_return_tumbler[cabine_idx].reset();
 
         start_count++;
     }
     else
     {
         autoStartTimer->stop();
-        controller->setReversPos(REVERS_FORWARD);
+        controller[cabine_idx]->setReversPos(REVERS_FORWARD);
         start_count = 0;
     }
 }
@@ -49,8 +49,16 @@ void VL60k::slotAutoStart()
 //------------------------------------------------------------------------------
 void VL60k::stepPantographsControl(double t, double dt)
 {
-    pantographs[0]->setState(pant1_tumbler.getState() && pants_tumbler.getState());
-    pantographs[1]->setState(pant2_tumbler.getState() && pants_tumbler.getState());
+    // Подъем переднего токоприемника
+    bool is_PANT1_ON = (pants_tumbler[CAB1].getState() || pants_tumbler[CAB2].getState()) &&
+                       (pant1_tumbler[CAB1].getState() || pant2_tumbler[CAB2].getState());
+
+    // Подъем заднего токоприемника
+    bool is_PANT2_ON = (pants_tumbler[CAB1].getState() || pants_tumbler[CAB2].getState()) &&
+                       (pant1_tumbler[CAB2].getState() || pant2_tumbler[CAB1].getState());
+
+    pantographs[0]->setState(is_PANT1_ON);
+    pantographs[1]->setState(is_PANT2_ON);
 
     for (auto pant : pantographs)
     {
@@ -71,8 +79,8 @@ void VL60k::stepMainSwitchControl(double t, double dt)
     main_switch->setU_in(max(pantographs[0]->getUout(), pantographs[1]->getUout()));
 
     // Задаем состояние органов управления ГВ
-    main_switch->setState(gv_tumbler.getState());
-    main_switch->setReturn(gv_return_tumbler.getState());
+    main_switch->setState(gv_tumbler[CAB1].getState() || gv_tumbler[CAB2].getState());
+    main_switch->setReturn(gv_return_tumbler[CAB1].getState() || gv_return_tumbler[CAB2].getState());
 
     // Подаем питание на удерживающую катушку ГВ
     main_switch->setHoldingCoilState(getHoldingCoilState());
@@ -102,8 +110,8 @@ void VL60k::stepTracTransformer(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60k::stepPhaseSplitter(double t, double dt)
 {
-    double U_power = trac_trans->getU_sn() * static_cast<double>(fr_tumbler.getState());
-    phase_spliter->setU_power(U_power);
+    bool is_FR_ON = fr_tumbler[CAB1].getState() || fr_tumbler[CAB2].getState();
+    phase_spliter->setU_power(trac_trans->getU_sn() * static_cast<double>(is_FR_ON));
 
     phase_spliter->step(t, dt);
 }
@@ -113,10 +121,12 @@ void VL60k::stepPhaseSplitter(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60k::stepMotorFans(double t, double dt)
 {
+    bool is_MV_ON;
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
     {
         ACMotorFan *mf = motor_fans[i];
-        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(mv_tumblers[i].getState()));
+        is_MV_ON = mv_tumblers[CAB1][i].getState() || mv_tumblers[CAB2][i].getState();
+        mf->setPowerVoltage(phase_spliter->getU_out() * static_cast<double>(is_MV_ON));
         mf->step(t, dt);
     }
 }
@@ -126,11 +136,15 @@ void VL60k::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60k::stepTractionControl(double t, double dt)
 {
-    controller->setControl(keys);
-    controller->step(t, dt);
+    controller[cabine_idx]->setControl(keys);
+    for (size_t i : {CAB1, CAB2})
+    {
+        controller[i]->step(t, dt);
+    }
 
-    main_controller->enable(cu_tumbler.getState() && (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB1]->isUnlocked()));
-    main_controller->setKMstate(controller->getState(), controller->getState());
+    main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) &&
+                            (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB2]->isUnlocked()));
+    main_controller->setKMstate(controller[CAB1]->getState(), controller[CAB2]->getState());
     main_controller->step(t, dt);
 
     gauge_KV_motors->setInput(vu[VU1]->getU_out());
@@ -144,15 +158,16 @@ void VL60k::stepTractionControl(double t, double dt)
     motor[TED5]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED5]->getContactState(LC_TED)));
     motor[TED6]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED6]->getContactState(LC_TED)));
 
-    km_state_t km_state = controller->getState();
+    // Полярность включения ТЭД
+    int motor_dir = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
 
-    double I_vu = 0;
+    double I_vu = 0.0;
 
     for (size_t i = 0; i < motor.size(); ++i)
     {
-        motor[i]->setDirection(km_state.revers_ref_state);
+        motor[i]->setDirection(motor_dir);
         motor[i]->setOmega(ip * wheel_omega[i]);
-        motor[i]->setBetaStep(km_state.field_loosen_pos);
+        motor[i]->setBetaStep(controller[cabine_idx]->getState().field_loosen_pos);
         motor[i]->step(t, dt);
         Q_a[i+1] = motor[i]->getTorque() * ip;
 
@@ -177,7 +192,9 @@ void VL60k::stepLineContactors(double t, double dt)
     (void) t;
     (void) dt;
 
-    km_state_t km_state = controller->getState();
+    int revers_state = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
+
+    bool is_KM_ZERO = controller[CAB1]->getState().pos_state[POS_ZERO] && controller[CAB2]->getState().pos_state[POS_ZERO];
 
     bool motor_fans_state = true;
 
@@ -191,11 +208,11 @@ void VL60k::stepLineContactors(double t, double dt)
     // Состояние провода Н6
     bool is_BP_released = brakepipe->getPressure() > 0.3;
 
-    bool is_H6_ON = cu_tumbler.getState() &&
+    bool is_H6_ON = (cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState())  &&
                     (key_epk[CAB1].getState() || key_epk[CAB2].getState()) &&
                     is_BP_released &&
-                    (km_state.revers_ref_state != 0) &&
-                    (!km_state.pos_state[POS_ZERO]) &&
+                    (revers_state != 0) &&
+                    (!is_KM_ZERO) &&
                     motor_fans_state;
 
     for (auto lc : linear_contactor)
@@ -289,8 +306,6 @@ double VL60k::getTractionForce()
 //------------------------------------------------------------------------------
 bool VL60k::getHoldingCoilState() const
 {
-    km_state_t km_state = controller->getState();
-
     bool overload = false;
 
     for (auto ov_relay : overload_relay)
@@ -298,7 +313,7 @@ bool VL60k::getHoldingCoilState() const
         overload |= ov_relay->getState();
     }
 
-    bool state = !km_state.pos_state[POS_BV] && (!overload);
+    bool state = (!controller[cabine_idx]->getState().pos_state[POS_BV]) && (!overload);
 
     return state;
 }
