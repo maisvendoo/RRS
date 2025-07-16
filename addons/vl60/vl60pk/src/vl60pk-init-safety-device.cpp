@@ -34,9 +34,13 @@ void VL60pk::initSafetyDevices(const QString &modules_dir, const QString &custom
     addRailwayConnector(coil_ALSN_bwd, -length / 2.0);
 
     // Скоростемер
-    speed_meter = new SL2M();
-    speed_meter->setWheelDiameter(wheel_diameter[0]);
-    speed_meter->read_config("3SL-2M", custom_cfg_dir);
+    for (auto i : {CAB1, CAB2})
+    {
+        speed_meter[i] = new SL2M();
+        speed_meter[i]->read_config("3SL-2M", custom_cfg_dir);
+    }
+    speed_meter[CAB1]->setWheelDiameter(wheel_diameter[TED1]);
+    speed_meter[CAB2]->setWheelDiameter(wheel_diameter[TED6]);
 
     for (size_t cab_idx : {CAB1, CAB2})
     {

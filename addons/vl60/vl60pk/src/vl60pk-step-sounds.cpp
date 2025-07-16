@@ -44,8 +44,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_EKG_AUTO] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_AUTO_SOUND);
 
     // Скоростемер
-    analogSignal[SOUND_SPEED_METER_SL2M] = speed_meter->getSoundSignal();
-    analogSignal[CAB2_SOUND_SPEED_METER_SL2M] = speed_meter->getSoundSignal();
+    analogSignal[SOUND_SPEED_METER_SL2M] = speed_meter[CAB1]->getSoundSignal();
+    analogSignal[CAB2_SOUND_SPEED_METER_SL2M] = speed_meter[CAB2]->getSoundSignal();
 
     // Устройство блокировки тормозов
     analogSignal[SOUND_BRAKE_LOCK_CHANGE_LOCK_POS] = brake_lock[CAB1]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND);
