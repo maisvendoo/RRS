@@ -205,4 +205,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_EPK_ON] = key_epk[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_EPK_OFF] = key_epk[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_EPK] = epk[CAB1]->getSoundSignal();
+
+    analogSignal[CAB2_SOUND_EPK_ON] = key_epk[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_EPK_OFF] = key_epk[CAB2].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_EPK] = epk[CAB2]->getSoundSignal();
 }
