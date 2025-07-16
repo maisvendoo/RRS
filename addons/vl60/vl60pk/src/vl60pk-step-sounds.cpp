@@ -33,12 +33,16 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_REVERSOR] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
     analogSignal[SOUND_CONTROLLER] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
 
+    analogSignal[CAB2_SOUND_REVERSOR] = controller[CAB2]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
+    analogSignal[CAB2_SOUND_CONTROLLER] = controller[CAB2]->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
+
     // Серводвигатель ЭКГ, ручное и автоматическое движение
     analogSignal[SOUND_EKG_ONE] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_ONE_SOUND);
     analogSignal[SOUND_EKG_AUTO] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_AUTO_SOUND);
 
     // Скоростемер
     analogSignal[SOUND_SPEED_METER_SL2M] = speed_meter->getSoundSignal();
+    analogSignal[CAB2_SOUND_SPEED_METER_SL2M] = speed_meter->getSoundSignal();
 
     // Устройство блокировки тормозов
     analogSignal[SOUND_BRAKE_LOCK_CHANGE_LOCK_POS] = brake_lock[CAB1]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND);
