@@ -1769,6 +1769,7 @@
 		<LocalPosition>-1.23 -9.02 2.5</LocalPosition>
 	</Sound>
 
+	<!-- Свисток ЭПК -->
 	<Sound>
 		<SignalID>424</SignalID>
 		<Filename>epk.wav</Filename>
@@ -1778,6 +1779,30 @@
 		<Loop>1</Loop>
 		<PlayOnStart>0</PlayOnStart>
 		<LocalPosition>-1.23 -9.02 2.5</LocalPosition>
+	</Sound>
+
+	<!-- Свисток -->
+	<Sound>
+		<SignalID>425</SignalID>
+		<Filename>VL60-svistok.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.8 -8.6 4.6</LocalPosition>
+	</Sound>
+
+	<!-- Тифон -->
+	<Sound>
+		<SignalID>426</SignalID>
+		<Filename>VL60-tifon.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.8 -8.6 4.6</LocalPosition>
 	</Sound>
 
 </Config>

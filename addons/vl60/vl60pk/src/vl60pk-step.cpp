@@ -261,9 +261,11 @@ float VL60pk::isLineContactorsOff()
 //------------------------------------------------------------------------------
 void VL60pk::stepOtherEquipment(double t, double dt)
 {
-    horn->setFLpressure(main_reservoir->getPressure());
-    horn->setControl(keys);
-    horn->step(t, dt);
+    horn[cabine_idx]->setControl(keys);
+    horn[CAB1]->setFLpressure(main_reservoir->getPressure());
+    horn[CAB1]->step(t, dt);
+    horn[CAB2]->setFLpressure(main_reservoir->getPressure());
+    horn[CAB2]->step(t, dt);
 
     // Система подачи песка
     sand_system->setFLpressure(main_reservoir->getPressure());

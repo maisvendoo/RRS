@@ -365,7 +365,7 @@ private:
     SL2M    *speed_meter = Q_NULLPTR;
 
     /// Свисток и тифон
-    TrainHorn   *horn = Q_NULLPTR;
+    TrainHorn   *horn[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Система подачи песка
     SandingSystem   *sand_system = Q_NULLPTR;
