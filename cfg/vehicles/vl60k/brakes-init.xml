@@ -2,31 +2,29 @@
 <Config>
 	<BrakesState>
 
-		<!-- Давление в главных резервуарах, МПа -->
-		<!-- <MainReservoirPressure>0.9</MainReservoirPressure> -->
-
 		<!-- Темп утечек из ГР -->
-		<MainReservoirFlow>1.1e-4</MainReservoirFlow>
-
-		<!-- Зарядное давление, МПа -->
-		<!-- <ChargingPressure>0.5</ChargingPressure> -->
+		<MainReservoirLeak>1.1e-4</MainReservoirLeak>
 
 		<!-- Положение рукоятки крана машиниста
 		(1 - I Отпуск, 2 - II Поездное, 3 - III Перекрыша, 4 - IV Перекрыша с питанием,
 		 5 - Va Торможение замедленным темпом, 6 - V Служебное торможение, 7 - VI Экстренное торможение) -->
-		<TrainCranePos>2</TrainCranePos>
+		<TrainCranePosCab1>2</TrainCranePosCab1>
+		<TrainCranePosCab2>7</TrainCranePosCab2>
 
 		<!-- Положение рукоятки крана вспомогательного тормоза
 		(от 0.0 - тормоз отпущен  до 1.0 - тормоз применён полностью -->
-		<LocoCranePos>1.0</LocoCranePos>
+		<LocoCranePosCab1>1.0</LocoCranePosCab1>
+		<LocoCranePosCab2>1.0</LocoCranePosCab2>
 
 		<!-- Состояние устройства блокировки тормозов 
 		(1 - разблокирована, 0 - заблокирована) -->
-		<BrakeLockDevice>1</BrakeLockDevice>
+		<BrakeLockDeviceCab1>1</BrakeLockDeviceCab1>
+		<BrakeLockDeviceCab2>0</BrakeLockDeviceCab2>
 
 		<!-- Положение комбинированного крана
 		( -1 - положение двойной тяги, 0 - поездное, 1 - экстренное торможение -->
-		<CombineCranePos>0</CombineCranePos>
+		<CombineCranePosCab1>0</CombineCranePosCab1>
+		<CombineCranePosCab2>0</CombineCranePosCab2>
 
 	</BrakesState>
 </Config>

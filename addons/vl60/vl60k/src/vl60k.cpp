@@ -65,7 +65,8 @@ void VL60k::initialization()
 
     initOtherEquipment(modules_dir, custom_cfg_dir);
 
-    initTriggers();
+    autoStartTimer = new Timer(0.5);
+    connect(autoStartTimer, &Timer::process, this, &VL60k::slotAutoStart);
 }
 
 //------------------------------------------------------------------------------

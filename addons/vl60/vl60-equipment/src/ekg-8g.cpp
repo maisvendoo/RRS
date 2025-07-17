@@ -45,9 +45,10 @@ EKG_8G::~EKG_8G()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EKG_8G::setKMstate(const km_state_t &km_state)
+void EKG_8G::setKMstate(const km_state_t &km1_state, const km_state_t &km2_state)
 {
-    this->km_state = km_state;
+    this->km1_state = km1_state;
+    this->km2_state = km2_state;
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +102,9 @@ bool EKG_8G::isLKallow() const
 void EKG_8G::process()
 {
     // Нулевая позиция
-    if (km_state.pos_state[POS_ZERO] && (position != 0) && !is_auto)
+    bool is_KM_ZERO = km1_state.pos_state[POS_ZERO] && km2_state.pos_state[POS_ZERO];
+
+    if (is_KM_ZERO && (position != 0) && !is_auto)
     {
         is_sound_one_or_auto = SOUND_AUTO;
         pos_switcher.start();
@@ -109,7 +112,7 @@ void EKG_8G::process()
     }
 
     // Фиксация пуска
-    if (km_state.pos_state[POS_FP])
+    if (km1_state.pos_state[POS_FP] || km2_state.pos_state[POS_FP])
     {
         is_sound_one_or_auto = NO_SOUND;
         is_fix_start = true;
@@ -117,7 +120,7 @@ void EKG_8G::process()
     }
 
     // Ручной пуск
-    if (km_state.pos_state[POS_RP] && is_fix_start)
+    if ( (km1_state.pos_state[POS_RP] || km2_state.pos_state[POS_RP])  && is_fix_start)
     {
         is_sound_one_or_auto = SOUND_ONE;
         is_fix_start = false;
@@ -125,7 +128,7 @@ void EKG_8G::process()
     }
 
     // Фиксация выключения
-    if (km_state.pos_state[POS_FV])
+    if (km1_state.pos_state[POS_FV] || km2_state.pos_state[POS_FV])
     {
         is_sound_one_or_auto = NO_SOUND;
         is_fix_off = true;
@@ -133,7 +136,7 @@ void EKG_8G::process()
     }
 
     // Ручное выключение
-    if (km_state.pos_state[POS_RV] && is_fix_off)
+    if ((km1_state.pos_state[POS_RV] || km2_state.pos_state[POS_RV]) && is_fix_off)
     {
         is_sound_one_or_auto = SOUND_ONE;
         is_fix_off = false;
@@ -141,7 +144,7 @@ void EKG_8G::process()
     }
 
     // Автоматический пуск
-    if (km_state.pos_state[POS_AP] && !is_auto)
+    if ((km1_state.pos_state[POS_AP] || km2_state.pos_state[POS_AP]) && !is_auto)
     {
         is_sound_one_or_auto = SOUND_AUTO;
         pos_switcher.start();
@@ -149,14 +152,15 @@ void EKG_8G::process()
     }
 
     // Автоматическое выключение
-    if (km_state.pos_state[POS_AV] && !is_auto)
+    if ((km1_state.pos_state[POS_AV] || km2_state.pos_state[POS_AV]) && !is_auto)
     {
         is_sound_one_or_auto = SOUND_AUTO;
         pos_switcher.start();
         dir = -1;
     }
 
-    is_auto = km_state.pos_state[POS_AV] || km_state.pos_state[POS_AP] || km_state.pos_state[POS_ZERO];
+    is_auto = km1_state.pos_state[POS_AV] || km1_state.pos_state[POS_AP] ||
+        km2_state.pos_state[POS_AV] || km2_state.pos_state[POS_AP] || is_KM_ZERO;
 }
 
 //------------------------------------------------------------------------------
@@ -194,8 +198,8 @@ void EKG_8G::preStep(state_vector_t &Y, double t)
             process();
         else
         {
-            // Устанавливаем готовность по состоянию рукоятки КМ положению вала ЭКГ
-            is_ready = km_state.pos_state[POS_ZERO] && (position == LM_POS0);
+            // Устанавливаем готовность по состоянию рукоятки КМ
+            is_ready = km1_state.pos_state[POS_ZERO] && km2_state.pos_state[POS_ZERO];
         }
     }
     else

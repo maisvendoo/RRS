@@ -250,9 +250,11 @@ void TcpClient::slotOnConnectionTimeout()
     this->connectToServer(tcp_config);
     //Journal::instance()->info("Try connect to server...");
 
-    emit sendLogMessage("Try connect to server " +
+    /*emit sendLogMessage("Try connect to server..." +
                         tcp_config.host_addr + ":" +
-                        QString::number(tcp_config.port));
+                        QString::number(tcp_config.port));*/
+
+    emit sendLogMessage("Try connect to server...");
 }
 
 //------------------------------------------------------------------------------

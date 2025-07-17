@@ -164,6 +164,15 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             {
                 _vehicles_handler->selectControlVehicle();
                 changeCurrentVehicle();
+
+                auto vehicle = _vehicles_handler->getCurrentVehicle();
+
+                if (vehicle->cabine_idx != vehicle->cabine_idx_ref)
+                {
+                    vehicle->cabine_idx = vehicle->cabine_idx_ref;
+                    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx);
+                }
+
                 return;
             }
 
@@ -261,6 +270,13 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             case vsg::KEY_F12:
             {
                 _screenshot_writer->setScreenshot();
+                return;
+            }
+
+            case vsg::KEY_Tab:
+            {
+                changeCurrentCabine();
+                _current_manipulator->resetView();
                 return;
             }
 
@@ -568,6 +584,21 @@ void UpdateViewerHandler::changeCurrentVehicle()
 
     _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
                                               _vehicles_handler->getControlledVehicleIndex());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::changeCurrentCabine()
+{
+    auto vehicle = _vehicles_handler->getCurrentVehicle();
+
+    vehicle->cabine_idx_ref++;
+
+    if (vehicle->cabine_idx_ref == vehicle->driver_pos.size())
+    {
+        vehicle->cabine_idx_ref = 0;
+    }   
 }
 
 //------------------------------------------------------------------------------

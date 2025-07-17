@@ -1,5 +1,6 @@
 #include    "vl60pk.h"
 
+#include "brake-lock.h"
 #include "brake-crane.h"
 #include "electro-airdistributor.h"
 #include "epb-2line-control.h"
@@ -26,12 +27,15 @@ void VL60pk::stepEPB(double t, double dt)
     epb_converter->step(t, dt);
 
     // Контроллер двухпроводного ЭПТ
-    epb_control->setInputVoltage(epb_converter->getOutputVoltage()
-                                 * static_cast<double>(epb_switch.getState()) );
-    epb_control->setHoldState(brake_crane->isHold());
-    epb_control->setBrakeState(brake_crane->isBrake());
-    epb_control->setControlVoltage(  hose_bp_fwd->getVoltage(1)
-                                      + hose_bp_bwd->getVoltage(1) );
+    bool cab1_on = brake_lock[CAB1]->isUnlocked() && epb_switch[CAB1].getState();
+    bool cab2_on = brake_lock[CAB2]->isUnlocked() && epb_switch[CAB2].getState();
+    epb_control->setInputVoltage(epb_converter->getOutputVoltage() *
+                                 static_cast<double>(cab1_on || cab2_on) );
+    epb_control->setHoldState((cab1_on && brake_crane[CAB1]->isHold()) ||
+                              (cab2_on && brake_crane[CAB2]->isHold()));
+    epb_control->setBrakeState((cab1_on && brake_crane[CAB1]->isBrake()) ||
+                               (cab2_on && brake_crane[CAB2]->isBrake()));
+    epb_control->setControlVoltage(hose_bp_fwd->getVoltage(1) + hose_bp_bwd->getVoltage(1));
     epb_control->step(t, dt);
     double epb_work_U = epb_control->getWorkVoltage();
     double epb_work_f = epb_control->getWorkFrequency();

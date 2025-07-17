@@ -34,18 +34,25 @@ void VL60pk::initSafetyDevices(const QString &modules_dir, const QString &custom
     addRailwayConnector(coil_ALSN_bwd, -length / 2.0);
 
     // Скоростемер
-    speed_meter = new SL2M();
-    speed_meter->setWheelDiameter(wheel_diameter[0]);
-    speed_meter->read_config("3SL-2M", custom_cfg_dir);
+    for (auto i : {CAB1, CAB2})
+    {
+        speed_meter[i] = new SL2M();
+        speed_meter[i]->read_config("3SL-2M", custom_cfg_dir);
+    }
+    speed_meter[CAB1]->setWheelDiameter(wheel_diameter[TED1]);
+    speed_meter[CAB2]->setWheelDiameter(wheel_diameter[TED6]);
 
-    // ЭПК автостопа
-    epk = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
-    epk->read_config("epk150");
+    for (size_t cab_idx : {CAB1, CAB2})
+    {
+        // ЭПК автостопа
+        epk[cab_idx] = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
+        epk[cab_idx]->read_config("epk150");
 
-    // УКБМ
-    safety_device = new SafetyDevice;
+        // Дешифратор АЛСН
+        alsn_decoder[cab_idx] = new DecoderALSN();
+        alsn_decoder[cab_idx]->read_config("ALSN-decoder");
 
-    // Дешифратор АЛСН
-    alsn_decoder = new DecoderALSN();
-    alsn_decoder->read_config("ALSN-decoder");
+        // УКБМ
+        safety_device[cab_idx] = new SafetyDevice;
+    }
 }

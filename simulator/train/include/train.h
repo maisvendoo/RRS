@@ -16,7 +16,7 @@
 #ifndef     TRAIN_H
 #define     TRAIN_H
 
-#include    "filesystem.h"
+#include    "global-const.h"
 #include    "init_data.h"
 #include    "ode-system.h"
 #include    "vehicle.h"
@@ -64,6 +64,9 @@ public:
 
     /// Train uncoupling
     Train *uncouple(double uncoupling_distance);
+
+    /// Set distance to stop the train before end of trajectory
+    void setDistanceToEndOfTrajectory(int direction, double distance);
 
     /// Set train index
     void setTrainIndex(size_t idx);
@@ -123,6 +126,11 @@ private:
     /// Train length
     double          trainLength = 0.0;
 
+    /// Distance to stop the head of train before end of trajectory
+    double      distance_to_stop_head = DISTANCE_TO_COUPLE_TRAINS;
+    /// Distance to stop the tail of train before end of trajectory
+    double      distance_to_stop_tail = DISTANCE_TO_COUPLE_TRAINS;
+
     /// Order of system ODE motion
     size_t          ode_order = 0;
 
@@ -175,6 +183,9 @@ private:
 
     /// Initialization of vehicles brakes
     void initVehiclesBrakes();
+
+    /// Set initial conditions
+    double calcStopForce(double distance, double veh_velocity, double veh_mass, double dt);
 };
 
 #endif // TRAIN_H

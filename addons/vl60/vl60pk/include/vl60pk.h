@@ -103,6 +103,13 @@ private:
     /// Передаточное число редуктора
     double  ip = 2.73;
 
+    enum
+    {
+        CABS_NUM = 2,
+        CAB1 = 0,
+        CAB2 = 1
+    };
+
     /// Имя модуля сцепного устройства
     QString coupling_module_name = "sa3";
     /// Имя конфига сцепного устройства
@@ -139,23 +146,23 @@ private:
 
     // Дальний ряд тумблеров приборной панели машиниста
 //    /// Тригер тумблера "Прожектор яркий"
-//    Trigger proj2_tumbler;
+//    Trigger proj2_tumbler[CABS_NUM];
 //    /// Тригер тумблера "Прожектор тусклый"
-//    Trigger proj1_tumbler;
+//    Trigger proj1_tumbler[CABS_NUM];
 //    /// Тригер тумблера "Радиостанция"
-//    Trigger radio_tumbler;
+//    Trigger radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
-    Trigger cu_tumbler;
+    Trigger cu_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник передний"
-    Trigger pant1_tumbler;
+    Trigger pant1_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник задний"
-    Trigger pant2_tumbler;
+    Trigger pant2_tumbler[CABS_NUM];
     /// Тригер тумблера "Токоприемники"
-    Trigger pants_tumbler;
+    Trigger pants_tumbler[CABS_NUM];
     /// Тригер тумблена "ГВ вкл. Возврат защиты"
-    Trigger gv_return_tumbler;
+    Trigger gv_return_tumbler[CABS_NUM];
     /// Триггер тумблера "ГВ вкл/выкл"
-    Trigger gv_tumbler;
+    Trigger gv_tumbler[CABS_NUM];
 
     // Ближний ряд тумблеров приборной панели машиниста
     enum
@@ -172,11 +179,11 @@ private:
 //    /// Тригер тумблера "Автоматическая подача песка"
 //    Trigger autosand_tumbler;
     /// Триггеры тумблеров "Вентилятор 1-6"
-    std::array<Trigger, NUM_MOTOR_FANS> mv_tumblers;
+    Trigger mv_tumblers[CABS_NUM][NUM_MOTOR_FANS];
     /// Тригер тумблера "Компрессор"
-    Trigger mk_tumbler;
+    Trigger mk_tumbler[CABS_NUM];
     /// Тригер тумблера "Фазорасщепитель"
-    Trigger fr_tumbler;
+    Trigger fr_tumbler[CABS_NUM];
 
     enum
     {
@@ -187,7 +194,7 @@ private:
     };
 
     /// Триггеры рукояток бдительности
-    std::array<Trigger, NUM_RB>  rb;
+    Trigger rb[CABS_NUM][NUM_RB];
 
     enum
     {
@@ -235,13 +242,13 @@ private:
     PneumoHose      *hose_fl_bwd = Q_NULLPTR;
 
     /// Блокировочное устройство УБТ усл.№367м
-    BrakeLock   *brake_lock = Q_NULLPTR;
+    BrakeLock   *brake_lock[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Поездной кран машиниста усл.№395
-    BrakeCrane  *brake_crane = Q_NULLPTR;
+    BrakeCrane  *brake_crane[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Кран впомогательного тормоза усл.№254
-    LocoCrane   *loco_crane = Q_NULLPTR;
+    LocoCrane   *loco_crane[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Тормозная магистраль
     Reservoir   *brakepipe = Q_NULLPTR;
@@ -297,7 +304,7 @@ private:
     PneumoHose  *hose_bc_bwd = Q_NULLPTR;
 
     /// Тумблер включения ЭПТ
-    Trigger         epb_switch;
+    Trigger         epb_switch[CABS_NUM];
 
     /// Источник питания ЭПТ
     EPBConverter    *epb_converter = Q_NULLPTR;
@@ -306,7 +313,7 @@ private:
     EPBControl  *epb_control = Q_NULLPTR;
 
     /// Контроллер машиниста
-    ControllerKME_60_044    *controller = Q_NULLPTR;
+    ControllerKME_60_044    *controller[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Главный контроллер (переключение обмоток тягового трансформатора)
     EKG_8G                  *main_controller = Q_NULLPTR;
@@ -355,10 +362,10 @@ private:
     CoilALSN    *coil_ALSN_bwd = Q_NULLPTR;
 
     /// Локомотивный скоростемер
-    SL2M    *speed_meter = Q_NULLPTR;
+    SL2M    *speed_meter[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Свисток и тифон
-    TrainHorn   *horn = Q_NULLPTR;
+    TrainHorn   *horn[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Система подачи песка
     SandingSystem   *sand_system = Q_NULLPTR;
@@ -366,11 +373,16 @@ private:
     std::vector<Trigger *> triggers;
     Timer   *autoStartTimer = Q_NULLPTR;
     size_t  start_count = 0;
+    size_t  autostart_cab = 0;
 
-    AutoTrainStop *epk = Q_NULLPTR;
-    SafetyDevice *safety_device = Q_NULLPTR;
+    /// Устройство безопасности УКБМ
+    SafetyDevice *safety_device[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
-    Trigger key_epk;
+    /// Электропневматический клапан автостопа
+    AutoTrainStop *epk[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
+
+    /// Ключ ЭПК
+    Trigger key_epk[CABS_NUM];
 
     enum
     {
@@ -383,11 +395,7 @@ private:
     /// Линейные контакторы тяговых двигателей
     std::array<Relay *, NUM_MOTORS> linear_contactor;
 
-    bool is_LC_ON = false;
-
-    bool is_H6_ON = false;
-
-    DecoderALSN *alsn_decoder = Q_NULLPTR;
+    DecoderALSN *alsn_decoder[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Общая инициализация локомотива
     void initialization();

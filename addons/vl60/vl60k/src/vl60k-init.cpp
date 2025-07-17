@@ -70,7 +70,10 @@ void VL60k::initTractionControl(const QString &modules_dir, const QString &custo
 {
     (void) modules_dir;
 
-    controller = new ControllerKME_60_044();
+    for (size_t i : {CAB1, CAB2})
+    {
+        controller[i] = new ControllerKME_60_044();
+    }
 
     main_controller = new EKG_8G();
     main_controller->read_config("ekg-8g", custom_cfg_dir);
@@ -128,19 +131,26 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
 //------------------------------------------------------------------------------
 void VL60k::initTriggers()
 {
-    triggers.push_back(&pants_tumbler);
-    triggers.push_back(&pant2_tumbler);
-    triggers.push_back(&gv_tumbler);
-    triggers.push_back(&gv_return_tumbler);
-    triggers.push_back(&fr_tumbler);
-    triggers.push_back(&mk_tumbler);
+    if (autoStartTimer->isStarted())
+        return;
 
-    for (size_t i = 0; i < mv_tumblers.size(); ++i)
-        triggers.push_back(&mv_tumblers[i]);
+    if ((cabine_idx != CAB1) && (cabine_idx != CAB2))
+        return;
 
-    triggers.push_back(&cu_tumbler);
-
-    autoStartTimer = new Timer(0.5);
-    connect(autoStartTimer, &Timer::process, this, &VL60k::slotAutoStart);
+    autostart_cab = cabine_idx;
     start_count = 0;
+    triggers.clear();
+    triggers.push_back(&pants_tumbler[autostart_cab]);
+    triggers.push_back(&pant2_tumbler[autostart_cab]);
+    triggers.push_back(&gv_tumbler[autostart_cab]);
+    triggers.push_back(&gv_return_tumbler[autostart_cab]);
+    triggers.push_back(&fr_tumbler[autostart_cab]);
+    triggers.push_back(&mk_tumbler[autostart_cab]);
+
+    for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
+        triggers.push_back(&mv_tumblers[autostart_cab][i]);
+
+    triggers.push_back(&cu_tumbler[autostart_cab]);
+    triggers.push_back(&key_epk[autostart_cab]);
+    triggers.push_back(&rb[autostart_cab][RBS]);
 }

@@ -1,6 +1,7 @@
 #include    "vl60pk.h"
 
 #include "brake-lock.h"
+#include "automatic-train-stop.h"
 #include "motor-compressor-ac.h"
 #include "phase-splitter.h"
 #include "pneumo-anglecock.h"
@@ -20,7 +21,7 @@ void VL60pk::stepPneumoSupply(double t, double dt)
     press_reg->step(t, dt);
 
     double U_power = phase_spliter->getU_out()
-                    * static_cast<double>(mk_tumbler.getState())
+                    * static_cast<double>(mk_tumbler[CAB1].getState() || mk_tumbler[CAB2].getState())
                     * press_reg->getState();
     motor_compressor->setFLpressure(main_reservoir->getPressure());
     motor_compressor->setPowerVoltage(U_power);
@@ -29,9 +30,10 @@ void VL60pk::stepPneumoSupply(double t, double dt)
     // Питательная магистраль
     double FL_flow = 0.0;
     FL_flow += motor_compressor->getFLflow();
-    FL_flow += horn->getFLflow();
+    FL_flow += horn[CAB1]->getFLflow() + horn[CAB2]->getFLflow();
     FL_flow += sand_system->getFLflow();
-    FL_flow += brake_lock->getFLflow();
+    FL_flow += brake_lock[CAB1]->getFLflow();
+    FL_flow += brake_lock[CAB2]->getFLflow();
     FL_flow += bc_pressure_relay->getFLflow();
 
     anglecock_fl_fwd->setHoseFlow(hose_fl_fwd->getFlow());
@@ -39,6 +41,9 @@ void VL60pk::stepPneumoSupply(double t, double dt)
 
     anglecock_fl_bwd->setHoseFlow(hose_fl_bwd->getFlow());
     FL_flow += anglecock_fl_bwd->getFlowToPipe();
+
+    FL_flow += epk[CAB1]->getFLflow();
+    FL_flow += epk[CAB2]->getFLflow();
 
     main_reservoir->setFlow(FL_flow);
     main_reservoir->step(t, dt);

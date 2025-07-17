@@ -33,7 +33,7 @@ void CameraCabineManipulator::resetView()
     }
 
     _position_shift = {0.0, 0.0, 0.0};
-    _angle_right = 0.0;
+    _angle_right =  _current_vehicle->driver_dir[_current_vehicle->cabine_idx_ref];
     _angle_up = 0.0;
     _perspective->fieldOfViewY = _settings.fovy;
 
@@ -252,7 +252,7 @@ void CameraCabineManipulator::calc_view()
     if (!_current_vehicle)
         return;
 
-    vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos + _position_shift;
+    vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos[_current_vehicle->cabine_idx_ref] + _position_shift;
 
     _lookAt->eye = _current_vehicle->position +
                    _current_vehicle->right * local_eye_pos.x +

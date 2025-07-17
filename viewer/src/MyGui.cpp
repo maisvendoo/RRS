@@ -109,6 +109,10 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         params->is_no_controlled =
                         (params->vehicles_handler->getCurrentVehicleIndex() !=
                         params->vehicles_handler->getControlledVehicleIndex());
+
+        VehicleExterior* cur_vehicle = params->vehicles_handler->getCurrentVehicle();
+        params->is_no_cabine_control = ((cur_vehicle != nullptr) &&
+                                        (cur_vehicle->cabine_idx != cur_vehicle->cabine_idx_ref));
     }
     else
     {
@@ -125,6 +129,11 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (params->is_no_controlled)
     {
         showNoControlled();
+    }
+
+    if (params->is_no_cabine_control)
+    {
+        showNoCabineControl();
     }
 }
 
@@ -319,6 +328,35 @@ void MyGui::showDebugMsg() const
 void MyGui::showNoControlled() const
 {
     const char *text = "Нажмите Enter для управления данной ПЕ";
+    ImVec2 text_size = ImGui::CalcTextSize(text);
+
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(text_size.x + 20, text_size.y + 20));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Состояние управления", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::Text(u8"%s", text);
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showNoCabineControl() const
+{
+    QString msg = QString("Нажмите Enter для управления из кабины %1").arg(params->vehicles_handler->getCurrentVehicle()->cabine_idx_ref + 1);
+    const char *text = msg.toStdString().c_str();
     ImVec2 text_size = ImGui::CalcTextSize(text);
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));

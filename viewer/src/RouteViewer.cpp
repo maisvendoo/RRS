@@ -31,7 +31,6 @@
 #include <vsg/state/InputAssemblyState.h>
 #include <vsg/state/MultisampleState.h>
 #include <vsg/state/RasterizationState.h>
-#include <vsg/state/ShaderModule.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/state/VertexInputState.h>
 #include <vsg/state/ViewDependentState.h>
@@ -88,7 +87,7 @@ void RouteViewer::initialize(int argc, char* argv[])
     sound_manager = new SoundManager();
     LOG_INFO("Created SoundManager");
 
-    screenshot_writer = new ScreenshotWriter("screenshot.png");
+    screenshot_writer = new ScreenshotWriter("screenshot.jpg");
 
     traffic_lights_handler = new TrafficLightsHandler();
     vehicles_handler = new VehiclesHandler(settings, sound_manager);
@@ -333,10 +332,6 @@ void RouteViewer::initScenegraph()
 //------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
-    auto shaderHints = vsg::ShaderCompileSettings::create();
-    shaderHints->defines.insert("VSG_SHADOWS_HARD");
-    shaderHints->defines.insert("VSG_ALPHA_TEST");
-
     // За основу берём встроенные комплекты вершинного и фрагментного шейдера
     vsg::ref_ptr<vsg::ShaderSet> flat_shader = vsg::createFlatShadedShaderSet(options);
     vsg::ref_ptr<vsg::ShaderSet> pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
@@ -417,10 +412,6 @@ void RouteViewer::initLights()
     flat_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
     pbr_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
     phong_shader->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
-
-    flat_shader->defaultShaderHints = shaderHints;
-    pbr_shader->defaultShaderHints = shaderHints;
-    phong_shader->defaultShaderHints = shaderHints;
 
 #if 0
     // запись шейдеров в файл
@@ -728,7 +719,6 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
         LOG_WARN("Get route info again");
         return;
     }
-
     is_route = true;
 
     GUIparams->status = QString("Загрузка маршрута...");
@@ -751,13 +741,11 @@ void RouteViewer::slotGetRouteInfoData(QByteArray &data)
 void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 {
     LOG_INFO("Got signals data from server");
-
     if (is_signals)
     {
         LOG_WARN("Get signals data again");
         return;
     }
-
     is_signals = true;
 
     GUIparams->status = QString("Загрузка светофоров...");
@@ -768,10 +756,10 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal);
-
-    // viewer->update();
-    // viewer->compile();
-
+/*
+    viewer->update();
+    viewer->compile();
+*/
     LOG_INFO("Send request for vehicles info");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
@@ -794,9 +782,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     GUIparams->status = QString("");
 
     if (!is_vehicles)
-    {
         return;
-    }
 
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             vehicles_handler, &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
@@ -811,10 +797,10 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
             this, &RouteViewer::slotUpdated, Qt::DirectConnection);
 
     root->addChild(vehicles_handler->getExterior());
-
-    // viewer->update();
-    // viewer->compile();
-
+/*
+    viewer->update();
+    viewer->compile();
+*/
     LOG_INFO("Send request for continuous vehicles update");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);

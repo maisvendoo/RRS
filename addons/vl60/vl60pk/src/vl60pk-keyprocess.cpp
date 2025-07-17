@@ -1,9 +1,7 @@
 #include    "vl60pk.h"
-#include    <Journal.h>
 
 #include    "key-symbols.h"
-
-#include "timer.h"
+#include    "timer.h"
 
 //------------------------------------------------------------------------------
 //
@@ -13,13 +11,20 @@ void VL60pk::keyProcess()
     if (autoStartTimer->isStarted())
         return;
 
+    if (getKeyState(KEY_R) && isAlt())
+    {
+        initTriggers();
+        autoStartTimer->start();
+        return;
+    }
+
     // Управление тумблером "Токоприемники"
     if (getKeyState(KEY_U))
     {
         if (isShift())
-            pants_tumbler.set();
+            pants_tumbler[cabine_idx].set();
         else
-            pants_tumbler.reset();
+            pants_tumbler[cabine_idx].reset();
     }
 
     // Подъем/опускание переднего токоприемника
@@ -27,9 +32,9 @@ void VL60pk::keyProcess()
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())
-            pant1_tumbler.set();
+            pant1_tumbler[cabine_idx].set();
         else
-            pant1_tumbler.reset();
+            pant1_tumbler[cabine_idx].reset();
     }
 
     // Подъем/опускание заднего токоприемника
@@ -37,9 +42,9 @@ void VL60pk::keyProcess()
     {
         // Переводим тумблер в нужное фиксированное положение
         if (isShift())
-            pant2_tumbler.set();
+            pant2_tumbler[cabine_idx].set();
         else
-            pant2_tumbler.reset();
+            pant2_tumbler[cabine_idx].reset();
 
     }
 
@@ -47,159 +52,145 @@ void VL60pk::keyProcess()
     if (getKeyState(KEY_P))
     {
         if (isShift())
-            gv_tumbler.set();
+            gv_tumbler[cabine_idx].set();
         else
-            gv_tumbler.reset();
+            gv_tumbler[cabine_idx].reset();
     }
 
     // Возврат защиты
     if (getKeyState(KEY_K))
-        gv_return_tumbler.set();
+        gv_return_tumbler[cabine_idx].set();
     else
-        gv_return_tumbler.reset();
+        gv_return_tumbler[cabine_idx].reset();
 
     // Включение/выключение расщепителя фаз
     if (getKeyState(KEY_T))
     {
         if (isShift())
-            fr_tumbler.set();
+            fr_tumbler[cabine_idx].set();
         else
-            fr_tumbler.reset();
+            fr_tumbler[cabine_idx].reset();
     }
 
-    // Включение/выключение мотор-верниляторов
-
+    // Включение/выключение мотор-вентиляторов
     // МВ1
     if (getKeyState(KEY_R))
     {
         if (isShift())
-            mv_tumblers[MV1].set();
+            mv_tumblers[cabine_idx][MV1].set();
         else
-            mv_tumblers[MV1].reset();
+            mv_tumblers[cabine_idx][MV1].reset();
     }
 
     // МВ2
     if (getKeyState(KEY_F))
     {
         if (isShift())
-            mv_tumblers[MV2].set();
+            mv_tumblers[cabine_idx][MV2].set();
         else
-            mv_tumblers[MV2].reset();
+            mv_tumblers[cabine_idx][MV2].reset();
     }
 
     // МВ3
     if (getKeyState(KEY_Y))
     {
         if (isShift())
-            mv_tumblers[MV3].set();
+            mv_tumblers[cabine_idx][MV3].set();
         else
-            mv_tumblers[MV3].reset();
+            mv_tumblers[cabine_idx][MV3].reset();
     }
 
     // МВ4
     if (getKeyState(KEY_5) && !isAlt())
     {
         if (isShift())
-            mv_tumblers[MV4].set();
+            mv_tumblers[cabine_idx][MV4].set();
         else
-            mv_tumblers[MV4].reset();
+            mv_tumblers[cabine_idx][MV4].reset();
     }
 
     // МВ5
     if (getKeyState(KEY_6) && !isAlt())
     {
         if (isShift())
-            mv_tumblers[MV5].set();
+            mv_tumblers[cabine_idx][MV5].set();
         else
-            mv_tumblers[MV5].reset();
+            mv_tumblers[cabine_idx][MV5].reset();
     }
 
     // МВ6
     if (getKeyState(KEY_7) && !isAlt())
     {
         if (isShift())
-            mv_tumblers[MV6].set();
+            mv_tumblers[cabine_idx][MV6].set();
         else
-            mv_tumblers[MV6].reset();
+            mv_tumblers[cabine_idx][MV6].reset();
     }
 
     // Включение/выключение мотор-компрессора
     if (getKeyState(KEY_E))
     {
         if (isShift())
-            mk_tumbler.set();
+            mk_tumbler[cabine_idx].set();
         else
-            mk_tumbler.reset();
+            mk_tumbler[cabine_idx].reset();
     }
 
     // Включение/выключение цепей управления
     if (getKeyState(KEY_J))
     {
         if (isShift())
-            cu_tumbler.set();
+            cu_tumbler[cabine_idx].set();
         else
-            cu_tumbler.reset();
+            cu_tumbler[cabine_idx].reset();
     }
 
     // Нажатие РБ-1
     if (getKeyState(KEY_Z))
-    {
-        rb[RB_1].set();
-        Journal::instance()->info("RB-1 pressed");
-    }
+        rb[cabine_idx][RB_1].set();
     else
-    {
-        rb[RB_1].reset();
-        //Journal::instance()->info("RB-1 released");
-    }
+        rb[cabine_idx][RB_1].reset();
 
     // Нажатие РБС
-
     // Если активна РБС на внешнем пульте
     if (control_signals.analogSignal[CS_RBS].is_active)
     {
         // реагируем на состояние РБС на внешнем пульте
         if (static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value))
-            rb[RBS].set();
+            rb[cabine_idx][RBS].set();
         else
-            rb[RBS].reset();
+            rb[cabine_idx][RBS].reset();
     }
     else // иначе
     {
         // обрабатываем клавиши
         if (getKeyState(KEY_M))
-            rb[RBS].set();
+            rb[cabine_idx][RBS].set();
         else
-            rb[RBS].reset();
+            rb[cabine_idx][RBS].reset();
     }
 
     // Нажатие РБП
-    if (getKeyState(KEY_Q))
-        rb[RBP].set();
+    if (getKeyState(KEY_Tilde))
+        rb[cabine_idx][RBP].set();
     else
-        rb[RBP].reset();
+        rb[cabine_idx][RBP].reset();
 
-    if (getKeyState(KEY_R))
+    // Включение/выключение ЭПK
+    if (getKeyState(KEY_N))
     {
-        if (isAlt() && !autoStartTimer->isStarted())
-            autoStartTimer->start();
+        if (isShift())
+            key_epk[cabine_idx].set();
+        else
+            key_epk[cabine_idx].reset();
     }
 
     // Включение/выключение ЭПТ
     if (getKeyState(KEY_V))
     {
         if (isShift())
-            epb_switch.set();
+            epb_switch[cabine_idx].set();
         else
-            epb_switch.reset();
-    }
-
-    // Включение/выключение ЭПK
-    if (getKeyState(KEY_N))
-    {
-        if (isShift())
-            key_epk.set();
-        else
-            key_epk.reset();
+            epb_switch[cabine_idx].reset();
     }
 }

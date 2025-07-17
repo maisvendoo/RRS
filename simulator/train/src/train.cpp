@@ -1,5 +1,6 @@
 #include    "train.h"
 
+#include    "filesystem.h"
 #include    "CfgReader.h"
 #include    "physics.h"
 #include    "Journal.h"
@@ -124,6 +125,9 @@ bool Train::init(const solver_config_t &solver_config, int direction, std::vecto
 
     for (auto vehicle : this->vehicles)
     {
+        trainMass += vehicle->getMass();
+        trainLength += vehicle->getLength();
+
         vehicle->setStateIndex(ode_order);
         ode_order += 2 * vehicle->getDegressOfFreedom();
     }
@@ -533,6 +537,9 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         y.insert(y.end(), new_y.begin(), new_y.end());
     }
 
+    trainMass += other_train->getMass();
+    trainLength += other_train->getLength();
+
     ode_order = y.size();
     train_motion_solver->setODEsize(ode_order);
     dydt.resize(ode_order);
@@ -582,7 +589,7 @@ Train *Train::uncouple(double uncoupling_distance)
         if (distance < uncoupling_distance)
             continue;
 
-        Journal::instance()->info(QString("Train %1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
+        Journal::instance()->info(QString("Train #%1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
                                       .arg(train_idx, 3)
                                       .arg(i - 1, 3)
                                       .arg(vehicles[i - 1]->getModelIndex(), 4)
@@ -639,6 +646,14 @@ Train *Train::uncouple(double uncoupling_distance)
 
         vehicles.resize(i);
 
+        trainMass = 0.0;
+        trainLength = 0.0;
+        for (auto vehicle : vehicles)
+        {
+            trainMass += vehicle->getMass();
+            trainLength += vehicle->getLength();
+        }
+
         ode_order = idx;
         y.resize(ode_order);
         dydt.resize(ode_order);
@@ -679,6 +694,17 @@ Train *Train::uncouple(double uncoupling_distance)
         return nullptr;
     }
     return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::setDistanceToEndOfTrajectory(int direction, double distance)
+{
+    if (direction == dir)
+        distance_to_stop_head = distance;
+    else
+        distance_to_stop_tail = distance;
 }
 
 //------------------------------------------------------------------------------
@@ -840,11 +866,26 @@ void Train::slotStep(double current_time, double integration_time)
 {
     auto begin = vehicles.begin();
     auto end = vehicles.end();
+    Vehicle* first = *begin;
+    Vehicle* last = *(end - 1);
 
     double t = current_time;
     double num_sub_step = ceil(integration_time / solver_config.step);
     double dt = integration_time / num_sub_step;
     size_t num_step = static_cast<size_t>(num_sub_step);
+
+    double head_stop_coord;
+    double tail_stop_coord;
+    bool stop_head = (DISTANCE_TO_COUPLE_TRAINS - distance_to_stop_head > Physics::ZERO);
+    bool stop_tail = (DISTANCE_TO_COUPLE_TRAINS - distance_to_stop_tail > Physics::ZERO);
+    if (stop_head)
+    {
+        head_stop_coord = y[first->getStateIndex()] + dir * distance_to_stop_head;
+    }
+    if (stop_tail)
+    {
+        tail_stop_coord = y[last->getStateIndex()] - dir * distance_to_stop_tail;
+    }
 
     for (size_t i = 0; i < num_step; ++i)
     {
@@ -884,6 +925,46 @@ void Train::slotStep(double current_time, double integration_time)
 
             Vehicle *vehicle = *it;
             vehicle->integrationStep(y, t, dt);
+        }
+
+        if (stop_head)
+        {
+            double distance = head_stop_coord - y[first->getStateIndex()];
+            double velocity = y[first->getStateIndex() + first->getDegressOfFreedom()];
+            double force = calcStopForce(dir * distance, dir * velocity, first->getMass(), dt);
+            if (force != 0.0)
+            {
+                (first->getOrientation() == -1) ?
+                    first->addBackwardForce(-force) :
+                    first->addForwardForce(-force);
+                // ОТЛАДКА
+                Journal::instance()->info(QString("Train #%1: Head (#%2) with velocity%3km/h should stop at distance%4m by force%5kN")
+                                          .arg(train_idx, 3)
+                                          .arg(first->getModelIndex(), 3)
+                                          .arg(dir * velocity * Physics::kmh, 7, 'f', 1)
+                                          .arg(dir * distance, 7, 'f', 3)
+                                          .arg(force / 1000.0, 12, 'f', 1));
+            }
+        }
+
+        if (stop_tail)
+        {
+            double distance = y[last->getStateIndex()] - tail_stop_coord;
+            double velocity = y[last->getStateIndex() + last->getDegressOfFreedom()];
+            double force = calcStopForce(dir * distance, -dir * velocity, last->getMass(), dt);
+            if (force != 0.0)
+            {
+                (last->getOrientation() == -1) ?
+                    last->addForwardForce(-force) :
+                    last->addBackwardForce(-force);
+                // ОТЛАДКА
+                Journal::instance()->info(QString("Train #%1: Tail (#%2) with velocity%3km/h should stop at distance%4m by force%5kN")
+                                          .arg(train_idx, 3)
+                                          .arg(last->getModelIndex(), 3)
+                                          .arg(-dir * velocity * Physics::kmh, 7, 'f', 1)
+                                          .arg(dir * distance, 7, 'f', 3)
+                                          .arg(force / 1000.0, 12, 'f', 1));
+            }
         }
 
         // solver step
@@ -1362,4 +1443,63 @@ void Train::initVehiclesBrakes()
             vehicles[i]->initBrakeDevices(charging_pressure, pBP, init_main_res_pressure);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::calcStopForce(double distance, double veh_velocity, double veh_mass, double dt)
+{
+    // Если отъехали далеко от тупика - не вмешиваемся
+    if (distance > DISTANCE_TO_COUPLE_TRAINS)
+    {
+        return 0.0;
+    }
+
+    // Приближение к тупиковому упору
+    if (distance >= 0.0)
+    {
+        // Для торможения к тупику условно зададим ограничение скорости,
+        // пропорциональное расстоянию до тупика
+        const double over_velocity = veh_velocity - distance;
+
+        // В движение с меньшей скоростью, в т.ч. обратно от тупика, не вмешиваемся
+        if (over_velocity < Physics::ZERO)
+        {
+            return 0.0;
+        }
+
+        // Отталкивание от тупика до некоторой маленькой скорости
+        const double revert_velocity = 0.25;
+
+        // Рассчитываем силу, необходимую для снижения скорости ПЕ до ограничения
+        const double force = veh_mass * (revert_velocity + over_velocity) / dt;
+
+        // Коэффициент из расстояния от точки начала торможения перед тупиковым упором
+        // для плавного возрастания тормозного услилия по мере приближения к тупику
+        const double k = 1.0 - distance / DISTANCE_TO_COUPLE_TRAINS;
+
+        // Для мягкости торможения применяем меньшее усилие
+        return k * force * 0.25;
+    }
+
+    // После проезда тупика стремимся вытолкнуть состав обратно с небольшой скоростью
+    const double diff_velocity = veh_velocity - tanh(distance * 0.25) * 4.0;
+
+    // Отталкивание от тупика до некоторой маленькой скорости
+    const double revert_velocity = 0.25;
+
+    // Рассчитываем силу, необходимую для изменения скорости ПЕ
+    // до скорости выталкивания из тупика
+    const double force = veh_mass * (revert_velocity + diff_velocity) / dt;
+
+    // Для поглощения энергии слишком быстрому выталкиванию из тупика
+    // сопротивляемся полным усилием
+    if (diff_velocity < revert_velocity)
+    {
+        return force;
+    }
+
+    // Для мягкости торможения применяем меньшее усилие
+    return force * 0.25;
 }

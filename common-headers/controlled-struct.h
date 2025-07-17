@@ -12,6 +12,7 @@ struct controlled_t
 {
     int controlled_vehicle = -1;
     int current_vehicle = -1;
+    uint32_t cabine_idx = 0;
     std::vector<int> pressed_keys = {};
 
     controlled_t()
@@ -28,6 +29,7 @@ struct controlled_t
 
         stream << controlled_vehicle;
         stream << current_vehicle;
+        stream << cabine_idx;
         stream << static_cast<uint32_t>(pressed_keys.size());
 
         for (auto key_id : pressed_keys)
@@ -46,6 +48,7 @@ struct controlled_t
 
         stream >> controlled_vehicle;
         stream >> current_vehicle;
+        stream >> cabine_idx;
 
         uint32_t num;
         stream >> num;

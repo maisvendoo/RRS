@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.3.47",
+		"generator":"Khronos glTF Blender I/O v4.4.56",
 		"version":"2.0"
 	},
 	"extensionsUsed":[
@@ -239,6 +239,9 @@
 	"materials":[
 		{
 			"doubleSided":true,
+			"emissiveTexture":{
+				"index":0
+			},
 			"extensions":{
 				"KHR_materials_specular":{
 					"specularFactor":0
@@ -247,12 +250,9 @@
 			"name":"material_1.004",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
-					"index":0
+					"index":1
 				},
 				"metallicFactor":0
-			},
-			"emissiveTexture": {
-				"index": 0
 			}
 		}
 	],
@@ -412,7 +412,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder03_Cylinder03-OFFSET_Cylinder03-GEODE_Tr.003",
+			"name":"Scene Root_Cylinder03_Cylinder03-OFFSET_Cylinder03-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -440,7 +440,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder05_Cylinder05-OFFSET_Cylinder05-GEODE_Tr.003",
+			"name":"Scene Root_Cylinder05_Cylinder05-OFFSET_Cylinder05-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -468,7 +468,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder07_Cylinder07-OFFSET_Cylinder07-GEODE_Tr.003",
+			"name":"Scene Root_Cylinder07_Cylinder07-OFFSET_Cylinder07-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -482,7 +482,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Cylinder08_Cylinder08-OFFSET_Cylinder08-GEODE_Tr.003",
+			"name":"Scene Root_Cylinder08_Cylinder08-OFFSET_Cylinder08-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -566,7 +566,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_Tr.003",
+			"name":"Scene Root_GREEN_Lens_GREEN_Lens-OFFSET_GREEN_Lens-GEODE_Tr.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -678,7 +678,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_Object01_Object01-OFFSET_Object01-GEODE_TransNor.002",
+			"name":"Scene Root_Object01_Object01-OFFSET_Object01-GEODE_TransNor.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -748,7 +748,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNor.003",
+			"name":"Scene Root_RED_Lens_RED_Lens-OFFSET_RED_Lens-GEODE_TransNor.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -860,7 +860,7 @@
 			]
 		},
 		{
-			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE.003",
+			"name":"Scene Root_YELLOW_Lens_YELLOW_Lens-OFFSET_YELLOW_Lens-GEODE.004",
 			"primitives":[
 				{
 					"attributes":{
@@ -878,13 +878,17 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":0,
+			"source":0
 		}
 	],
 	"images":[
 		{
 			"mimeType":"image/png",
 			"name":"IMRsvetofor",
-			"uri":"IMRsvetofor.png"
+			"uri":"textures/IMRsvetofor.png"
 		}
 	],
 	"accessors":[

@@ -131,11 +131,26 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         transform->setValue("name", "only vehicle");
     }
 
-    modelShift = "";
-    if (cfg.getString(sec_name, "DriverPos", modelShift))
+    QDomNode secNode = cfg.getFirstSection("Cabine");
+
+    driver_pos.clear();
+    driver_dir.clear();
+
+    while (!secNode.isNull())
     {
-        std::istringstream ss(modelShift.toStdString());
-        ss >> driver_pos.x >> driver_pos.y >> driver_pos.z;
+        QString DriverPos = "";
+        cfg.getString(secNode, "DriverPos", DriverPos);
+
+        vsg::dvec3 dp;
+        std::istringstream ss(DriverPos.toStdString());
+        ss >> dp.x >> dp.y >> dp.z;
+        driver_pos.push_back(dp);
+
+        double dd = 0.0;
+        cfg.getDouble(secNode, "DriverDir", dd);
+        driver_dir.push_back(vsg::radians(dd));
+
+        secNode = cfg.getNextSection();
     }
 
     load_sounds(sounds_dir, sm);

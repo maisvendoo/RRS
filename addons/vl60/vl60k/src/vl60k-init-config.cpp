@@ -15,55 +15,61 @@ void VL60k::load_brakes_config(QString path)
     if (cfg.load(path))
     {
         QString secName = "BrakesState";
+        double tmp_dbl;
+        int tmp_int;
 
-        double pFL = 0.0;
-
-        if (cfg.getDouble(secName, "MainReservoirPressure", pFL))
+        tmp_dbl = 1.0e-4;
+        if (cfg.getDouble(secName, "MainReservoirLeak", tmp_dbl))
         {
-            main_reservoir->setY(0, pFL);
+            main_reservoir->setLeakCoeff(tmp_dbl);
         }
 
-        double k_flow = 0.0;
-
-        if (cfg.getDouble(secName, "MainReservoirFlow", k_flow))
+        tmp_int = 2;
+        if (cfg.getInt(secName, "TrainCranePosCab1", tmp_int))
         {
-            main_reservoir->setLeakCoeff(k_flow);
+            brake_crane[CAB1]->setHandlePosition(tmp_int - 1);
         }
 
-        double ch_press = 0.0;
-
-        if (cfg.getDouble(secName, "ChargingPressure", ch_press))
+        tmp_int = 7;
+        if (cfg.getInt(secName, "TrainCranePosCab2", tmp_int))
         {
-            charge_press = ch_press;
-            brake_crane->init(charge_press, pFL);
-            supply_reservoir->setY(0, charge_press);
+            brake_crane[CAB2]->setHandlePosition(tmp_int - 1);
         }
 
-        int train_crane_pos = 7;
-
-        if (cfg.getInt(secName, "TrainCranePos", train_crane_pos))
+        tmp_dbl = 1.0;
+        if (cfg.getDouble(secName, "LocoCranePosCab1", tmp_dbl))
         {
-            brake_crane->setHandlePosition(train_crane_pos - 1);
+            loco_crane[CAB1]->setHandlePosition(tmp_dbl);
         }
 
-        double loco_crane_pos = 0.0;
-
-        if (cfg.getDouble(secName, "LocoCranePos", loco_crane_pos))
+        tmp_dbl = 1.0;
+        if (cfg.getDouble(secName, "LocoCranePosCab2", tmp_dbl))
         {
-            loco_crane->setHandlePosition(loco_crane_pos);
+            loco_crane[CAB2]->setHandlePosition(tmp_dbl);
         }
 
-        int combine_crane_pos = 0;
-        int brake_lock_state = 0;
-
-        if (cfg.getInt(secName, "CombineCranePos", combine_crane_pos))
+        tmp_int = 0;
+        if (cfg.getInt(secName, "CombineCranePosCab1", tmp_int))
         {
-            brake_lock->setCombineCranePosition(combine_crane_pos);
+            brake_lock[CAB1]->setCombineCranePosition(tmp_int);
         }
 
-        if (cfg.getInt(secName, "BrakeLockDevice", brake_lock_state))
+        tmp_int = 0;
+        if (cfg.getInt(secName, "CombineCranePosCab2", tmp_int))
         {
-            brake_lock->setState(brake_lock_state);
+            brake_lock[CAB2]->setCombineCranePosition(tmp_int);
+        }
+
+        tmp_int = 1;
+        if (cfg.getInt(secName, "BrakeLockDeviceCab1", tmp_int))
+        {
+            brake_lock[CAB1]->setState(tmp_int);
+        }
+
+        tmp_int = 0;
+        if (cfg.getInt(secName, "BrakeLockDeviceCab2", tmp_int))
+        {
+            brake_lock[CAB2]->setState(tmp_int);
         }
     }
 }
