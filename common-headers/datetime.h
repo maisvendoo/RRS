@@ -2,14 +2,15 @@
 #define     RRS_DATE_TIME_H
 
 #include    <cstdint>
+#include    <ctime>
 
 // Храним время суток в 10-тысячных долях секунды от полуночи
 #define TIMEUNIT_MULTIPLIER         10000
-#define TIMEUNIT_MULTIPLIER_DAY     TIMEUNIT_MULTIPLIER * 60 * 60 * 24
-#define TIMEUNIT_MULTIPLIER_HOUR    TIMEUNIT_MULTIPLIER * 60 * 60
-#define TIMEUNIT_MULTIPLIER_MIN     TIMEUNIT_MULTIPLIER * 60
-#define TIMEUNIT_MULTIPLIER_SEC     TIMEUNIT_MULTIPLIER
-#define TIMEUNIT_MULTIPLIER_MSEC    TIMEUNIT_MULTIPLIER / 1000
+#define TIMEUNIT_MULTIPLIER_DAY     (TIMEUNIT_MULTIPLIER * 60 * 60 * 24)
+#define TIMEUNIT_MULTIPLIER_HOUR    (TIMEUNIT_MULTIPLIER * 60 * 60)
+#define TIMEUNIT_MULTIPLIER_MIN     (TIMEUNIT_MULTIPLIER * 60)
+#define TIMEUNIT_MULTIPLIER_SEC     (TIMEUNIT_MULTIPLIER)
+#define TIMEUNIT_MULTIPLIER_MSEC    (TIMEUNIT_MULTIPLIER / 1000)
 
 //------------------------------------------------------------------------------
 // Структура для хранения даты сервера RRS
@@ -124,6 +125,20 @@ public:
         ++d;
         return;
     }
+
+    /// Задать дату, по умолчанию из текущей системной
+    static server_date_t dateNow(std::tm* std_tm_now = nullptr)
+    {
+        if (!std_tm_now)
+        {
+            std::time_t system_time = std::time(nullptr);
+            std_tm_now = std::localtime(&system_time);
+        }
+        server_date_t date{static_cast<int16_t>(std_tm_now->tm_year + 1900),
+                           static_cast<uint8_t>(std_tm_now->tm_mon + 1),
+                           static_cast<uint8_t>(std_tm_now->tm_mday)};
+        return date;
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -148,21 +163,25 @@ public:
         time_unit_since_midnight += TIMEUNIT_MULTIPLIER_HOUR * ((hour < 24) ? hour : 23);
     }
 
+    /// Час
     uint8_t hour() const
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_HOUR;
     }
 
+    /// Минута
     uint8_t minute() const
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_MIN % 60;
     }
 
+    /// Секунда
     uint8_t sec() const
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_SEC % 60;
     }
 
+    /// Миллисекунда
     uint16_t msec() const
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_MSEC % 1000;
@@ -182,6 +201,20 @@ public:
 
         time_unit_since_midnight = time_unit_since_midnight - TIMEUNIT_MULTIPLIER_DAY;
         return true;
+    }
+
+    /// Задать время, по умолчанию из текущего системного
+    static server_time_t timeNow(std::tm* std_tm_now = nullptr)
+    {
+        if (!std_tm_now)
+        {
+            std::time_t system_time = std::time(nullptr);
+            std_tm_now = std::localtime(&system_time);
+        }
+        server_time_t time{static_cast<uint8_t>(std_tm_now->tm_hour),
+                           static_cast<uint8_t>(std_tm_now->tm_min),
+                           static_cast<uint8_t>(std_tm_now->tm_sec)};
+        return time;
     }
 };
 
