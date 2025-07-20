@@ -43,6 +43,7 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[CAB2_TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler[CAB2].getState());
 
     analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB1].getState());
+    analogSignal[CAB2_TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB2].getState());
 
     analogSignal[TUMBLER_MV1] = static_cast<float>(mv_tumblers[CAB1][MV1].getState());
     analogSignal[TUMBLER_MV2] = static_cast<float>(mv_tumblers[CAB1][MV2].getState());
@@ -51,16 +52,26 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[CAB1][MV5].getState());
     analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[CAB1][MV6].getState());
 
+    analogSignal[CAB2_TUMBLER_MV1] = static_cast<float>(mv_tumblers[CAB2][MV1].getState());
+    analogSignal[CAB2_TUMBLER_MV2] = static_cast<float>(mv_tumblers[CAB2][MV2].getState());
+    analogSignal[CAB2_TUMBLER_MV3] = static_cast<float>(mv_tumblers[CAB2][MV3].getState());
+    analogSignal[CAB2_TUMBLER_MV4] = static_cast<float>(mv_tumblers[CAB2][MV4].getState());
+    analogSignal[CAB2_TUMBLER_MV5] = static_cast<float>(mv_tumblers[CAB2][MV5].getState());
+    analogSignal[CAB2_TUMBLER_MV6] = static_cast<float>(mv_tumblers[CAB2][MV6].getState());
+
     analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB1].getState());
+    analogSignal[CAB2_TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB2].getState());
 
     analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler[CAB1].getState());
     analogSignal[CAB2_TUMBLER_CU] = static_cast<float>(cu_tumbler[CAB2].getState());
 
     // Вольтметр КС
     analogSignal[STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
+    analogSignal[CAB2_STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
 
     // Вольтметр ТЭД
     analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
+    analogSignal[CAB2_STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
 
     // Состояние главного выключателя
     analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
@@ -121,6 +132,9 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
     analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
 
+    analogSignal[CAB2_STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
+    analogSignal[CAB2_STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
+
     analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
     analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
     analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
@@ -157,6 +171,12 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[LS_R] = safety_device[CAB1]->getRedLamp();
     analogSignal[LS_Y] = safety_device[CAB1]->getYellowLamp();
     analogSignal[LS_G] = safety_device[CAB1]->getGreenLamp();
+
+    analogSignal[CAB2_LS_W] = safety_device[CAB2]->getWhiteLamp();
+    analogSignal[CAB2_LS_YK] = safety_device[CAB2]->getRedYellowLamp();
+    analogSignal[CAB2_LS_R] = safety_device[CAB2]->getRedLamp();
+    analogSignal[CAB2_LS_Y] = safety_device[CAB2]->getYellowLamp();
+    analogSignal[CAB2_LS_G] = safety_device[CAB2]->getGreenLamp();
 
     analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
 }
