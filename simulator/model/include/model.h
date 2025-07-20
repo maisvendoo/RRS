@@ -93,6 +93,8 @@ public slots:
 private:
 
     /// Current simulation time
+    simulator_time_t sim_time = simulator_time_t::timeNow();
+    /// Current simulation time
     double      t = 0.0;
     /// Simulation start time
     double      start_time = 0.0;

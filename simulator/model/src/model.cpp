@@ -1056,6 +1056,18 @@ void Model::process()
     // Debug print, is allowed
     if (is_debug_print)
         debugPrint();
+
+    sim_time.addTime(integration_time);
+    QString msg = QString("%1-%2-%3 %4:%5:%6.%7 sim=%8")
+                      .arg(sim_time.date.year(), 4, 10, QChar('0'))
+                      .arg(sim_time.date.month(), 2, 10, QChar('0'))
+                      .arg(sim_time.date.day(), 2, 10, QChar('0'))
+                      .arg(sim_time.time.hour(), 2, 10, QChar('0'))
+                      .arg(sim_time.time.minute(), 2, 10, QChar('0'))
+                      .arg(sim_time.time.sec(), 2, 10, QChar('0'))
+                      .arg(sim_time.time.msec(), 3, 10, QChar('0'))
+                      .arg(sim_time.simulation_seconds, 15, 'f', 5);
+    Journal::instance()->info(msg);
 }
 
 //------------------------------------------------------------------------------

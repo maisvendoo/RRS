@@ -218,4 +218,50 @@ public:
     }
 };
 
+//------------------------------------------------------------------------------
+// Структура для хранения времени симуляции сервера RRS
+//------------------------------------------------------------------------------
+struct simulator_time_t final
+{
+    server_date_t date;
+    server_time_t time;
+    double simulation_seconds;
+
+    simulator_time_t()
+        : date(server_date_t())
+        , time(server_time_t())
+        , simulation_seconds(0.0)
+    {
+    }
+
+    simulator_time_t(server_date_t in_date, server_time_t in_time, double in_simulation_seconds = 0.0)
+        : date(in_date)
+        , time(in_time)
+        , simulation_seconds(in_simulation_seconds)
+    {
+    }
+
+    /// Интегрирование времени
+    void addTime(double add_sec)
+    {
+        simulation_seconds += add_sec;
+
+        if (time.addTime(add_sec))
+            date.nextDay();
+    }
+
+    /// Задать время, по умолчанию из текущего системного
+    static simulator_time_t timeNow(std::tm* std_tm_now = nullptr)
+    {
+        if (!std_tm_now)
+        {
+            std::time_t system_time = std::time(nullptr);
+            std_tm_now = std::localtime(&system_time);
+        }
+        simulator_time_t sim_time{server_date_t::dateNow(std_tm_now),
+                                  server_time_t::timeNow(std_tm_now)};
+        return sim_time;
+    }
+};
+
 #endif // RRS_DATE_TIME_H
