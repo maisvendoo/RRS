@@ -53,6 +53,12 @@ public:
         return d;
     }
 
+    /// Високосный год
+    static bool isLeapYear(const int16_t& year)
+    {
+        return ((year % 4 == 0) && (year % 100 > 0)) || (year % 400 == 0);
+    }
+
     /// Переход к следующему дню
     void nextDay()
     {
@@ -74,8 +80,8 @@ public:
         // Февраль
         if (m == 2)
         {
-            // 28-е - конец месяца
-            if (d >= 28)
+            // 28-е или 29-е - конец месяца
+            if (isLeapYear(y) ? (d >= 29) : (d >= 28))
             {
                 ++m;
                 d = 1;
