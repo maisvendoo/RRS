@@ -104,9 +104,9 @@ void RouteViewer::initialize(int argc, char* argv[])
 
     if (vsg::ref_ptr<vsg::Device> vulkan_device = window->getDevice())
     {
-        if (vsg::PhysicalDevice* phys_device = vulkan_device->getPhysicalDevice())
+        if (const vsg::PhysicalDevice* phys_device = vulkan_device->getPhysicalDevice())
         {
-            VkPhysicalDeviceProperties propeties = phys_device->getProperties();
+            const VkPhysicalDeviceProperties& propeties = phys_device->getProperties();
             auto device_type_to_string = [](VkPhysicalDeviceType device_type) -> std::string {
                 if (device_type == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
                     return "discrete";
