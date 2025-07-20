@@ -28,6 +28,7 @@
 #include    <elapsed-timer.h>
 
 #include    <global-const.h>
+#include    <datetime.h>
 #include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
 #include    <controlled-struct.h>
