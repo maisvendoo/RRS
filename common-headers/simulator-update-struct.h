@@ -1,6 +1,8 @@
 #ifndef     SIMULATOR_UPDATE_STRUCT_H
 #define     SIMULATOR_UPDATE_STRUCT_H
 
+#include    <datetime.h>
+
 #include    <QString>
 #include    <QByteArray>
 #include    <QBuffer>
@@ -154,7 +156,7 @@ struct simulator_vehicle_pos_update_t
 //------------------------------------------------------------------------------
 struct simulator_update_pos_t
 {
-    double time = 0.0;
+    simulator_time_t sim_time = simulator_time_t();
     std::vector<simulator_vehicle_pos_update_t> vehicles;
 
     simulator_update_pos_t()
@@ -169,7 +171,7 @@ struct simulator_update_pos_t
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << time;
+        stream << sim_time.serialize();
 
         stream << static_cast<uint32_t>(vehicles.size());
         for (auto veh_pos : vehicles)
@@ -186,7 +188,9 @@ struct simulator_update_pos_t
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        stream >> time;
+        QByteArray sim_time_data;
+        stream >> sim_time_data;
+        sim_time.deserialize(sim_time_data);
 
         uint32_t num;
 

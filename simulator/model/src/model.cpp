@@ -803,7 +803,7 @@ void Model::prepareFeedBack()
     update_data.vehicles.resize(vehicles.size());
     update_data.trains.resize(trains.size());
 
-    update_pos_data.time = sim_time.simulation_seconds;
+    update_pos_data.sim_time = sim_time;
 
     int i = 0;
     for (auto train : trains)

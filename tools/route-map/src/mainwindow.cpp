@@ -461,15 +461,14 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
 
-    int seconds = static_cast<int>(std::floor(train_data.time));
-    int hours = seconds / 3600;
-    int minutes = seconds / 60 % 60;
-    seconds = seconds % 60;
-    QString time_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)")
-                           .arg(train_data.time, 8, 'f', 1)
-                           .arg(hours, 2)
-                           .arg(minutes, 2)
-                           .arg(seconds, 2);
+    QString time_text =  QString("Время сервера: %1-%2-%3 %4:%5:%6 (%7 с)\n")
+                        .arg(train_data.sim_time.date.year(), 4, 10, QChar('0'))
+                        .arg(train_data.sim_time.date.month(), 2, 10, QChar('0'))
+                        .arg(train_data.sim_time.date.day(), 2, 10, QChar('0'))
+                        .arg(train_data.sim_time.time.hour(), 2, 10, QChar('0'))
+                        .arg(train_data.sim_time.time.minute(), 2, 10, QChar('0'))
+                        .arg(train_data.sim_time.time.sec(), 2, 10, QChar('0'))
+                        .arg(train_data.sim_time.simulation_seconds, 3, 'f', 1);
     ui->statusbar->showMessage(time_text);
 }
 

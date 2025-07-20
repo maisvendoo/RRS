@@ -4,6 +4,10 @@
 #include    <cstdint>
 #include    <ctime>
 
+#include    <QByteArray>
+#include    <QBuffer>
+#include    <QDataStream>
+
 // Храним время суток в 10-тысячных долях секунды от полуночи
 #define TIMEUNIT_MULTIPLIER         10000
 #define TIMEUNIT_MULTIPLIER_DAY     (TIMEUNIT_MULTIPLIER * 60 * 60 * 24)
@@ -139,6 +143,26 @@ public:
                            static_cast<uint8_t>(std_tm_now->tm_mday)};
         return date;
     }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << date_data;
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> date_data;
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -216,6 +240,26 @@ public:
                            static_cast<uint8_t>(std_tm_now->tm_sec)};
         return time;
     }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << time_unit_since_midnight;
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        stream >> time_unit_since_midnight;
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -261,6 +305,39 @@ struct simulator_time_t final
         simulator_time_t sim_time{server_date_t::dateNow(std_tm_now),
                                   server_time_t::timeNow(std_tm_now)};
         return sim_time;
+    }
+
+    QByteArray serialize()
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << date.serialize();
+
+        stream << time.serialize();
+
+        stream << simulation_seconds;
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray &data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        QByteArray date_data;
+        stream >> date_data;
+        date.deserialize(date_data);
+
+        QByteArray time_data;
+        stream >> time_data;
+        time.deserialize(time_data);
+
+        stream >> simulation_seconds;
     }
 };
 
