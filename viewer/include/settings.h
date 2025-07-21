@@ -2,25 +2,28 @@
 #ifndef VIEWER_SETTINGS_H
 #define VIEWER_SETTINGS_H
 
-#include <string>
-#include <vsg/maths/vec3.h>
 #include "tcp-client.h"
+
+#include <vsg/maths/vec3.h>
+
+#include <cmath>
+#include <string>
+#include <vector>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct settings_t final
 {
-    settings_t(){}
-    tcp_config_t tcp_config = tcp_config_t();   ///< TCP-Client settings
+    tcp_config_t tcp_config;   ///< TCP-Client settings
 
     int vehicles_pos_update_interval = 70;      ///< Interval for vehicles positions update, ms
     int vehicles_state_update_interval = 100;   ///< Interval for vehicles states update, ms
     int vehicle_controled_update_interval = 70; ///< Interval for vehicle controlled debug strings update, ms
     int client_delay = 100;                     ///< Client delay for smoothing network's delays
 
-    std::string route_dir_name = "";        ///< Route directory name
-    std::string route_dir_full_path = "";   ///< Route directory path
+    std::string route_dir_name;        ///< Route directory name
+    std::string route_dir_full_path;   ///< Route directory path
     std::vector<std::string> skybox_textures =
         { "sky_day.bmp"
         , "sky_night.bmp"
@@ -70,35 +73,35 @@ struct settings_t final
     vsg::dvec3 free_cam_init_pos = {2.5, 0.0, 1.75};///< Free camera initial position
     double free_cam_speed_keyboard = 5.0;           ///< Free camera initial speed
     double free_cam_speed_mouse = 5.0;              ///< Free camera initial speed
-    double free_cam_speed_coeff = sqrt(2.0);        ///< Free camera speed coeff
+    double free_cam_speed_coeff = std::sqrt(2.0);   ///< Free camera speed coeff
     double free_cam_rotate_keyboard = 0.01;         ///< Free camera rotation initial speed
     double free_cam_rotate_mouse = 0.01;            ///< Free camera rotation initial speed
     double free_cam_height_step = 0.2;              ///< Free camera vertical shift step
-    double free_cam_fovy_coeff = cbrt(2.0);         ///< Free camera FovY coeff
+    double free_cam_fovy_coeff = std::cbrt(2.0);    ///< Free camera FovY coeff
 
     vsg::dvec3 cabine_default_pos = {0.0, 0.0, 3.5};///< Driver default initial position
     double cabine_speed_keyboard = 0.5;             ///< Cabine camera initial speed
     double cabine_speed_mouse = 0.5;                ///< Cabine camera initial speed
-    double cabine_speed_coeff = sqrt(2.0);          ///< Cabine camera speed coeff
+    double cabine_speed_coeff = std::sqrt(2.0);     ///< Cabine camera speed coeff
     double cabine_rotate_keyboard = 0.01;           ///< Cabine camera rotation initial speed
     double cabine_rotate_mouse = 0.01;              ///< Cabine camera rotation initial speed
     double cabine_height_step = 0.1;                ///< Cabine camera vertical shift
-    double cabine_fovy_coeff = cbrt(2.0);           ///< Cabine camera FovY coeff
+    double cabine_fovy_coeff = std::cbrt(2.0);      ///< Cabine camera FovY coeff
     double cabine_z_min = -1.0;                     ///< Cabine camera relative vertical shift limit
     double cabine_z_max = 0.5;                      ///< Cabine camera relative vertical shift limit
 
-    vsg::dvec3 ext_cam_init_pos = {0.0, 0.0, 1.75}; ///< External camera initial position
-    double ext_cam_init_angle_H = -45.0;            ///< External camera initial horizontal angle
-    double ext_cam_init_angle_V = 10.0;             ///< External camera initial vertical angle
-    double ext_cam_init_distance = 20.0;            ///< External camera initial distance
-    double ext_cam_speed_keyboard = 2.0;            ///< External camera initial speed
-    double ext_cam_speed_mouse = 2.0;               ///< External camera initial speed
-    double ext_cam_speed_coeff = sqrt(2.0);         ///< External camera speed coeff
-    double ext_cam_rotate_keyboard = 1.0;           ///< External camera rotation initial speed
-    double ext_cam_rotate_mouse = 1.0;              ///< External camera rotation initial speed
-    double ext_cam_height_step = 0.1;               ///< External camera vertical shift
-    double ext_cam_dist_coeff = cbrt(cbrt(2.0));    ///< External camera distance coeff
-    double ext_cam_dist_min = 1.0;                  ///< External camera minimal distance
+    vsg::dvec3 ext_cam_init_pos = {0.0, 0.0, 1.75};         ///< External camera initial position
+    double ext_cam_init_angle_H = -45.0;                    ///< External camera initial horizontal angle
+    double ext_cam_init_angle_V = 10.0;                     ///< External camera initial vertical angle
+    double ext_cam_init_distance = 20.0;                    ///< External camera initial distance
+    double ext_cam_speed_keyboard = 2.0;                    ///< External camera initial speed
+    double ext_cam_speed_mouse = 2.0;                       ///< External camera initial speed
+    double ext_cam_speed_coeff = std::sqrt(2.0);            ///< External camera speed coeff
+    double ext_cam_rotate_keyboard = 1.0;                   ///< External camera rotation initial speed
+    double ext_cam_rotate_mouse = 1.0;                      ///< External camera rotation initial speed
+    double ext_cam_height_step = 0.1;                       ///< External camera vertical shift
+    double ext_cam_dist_coeff = std::cbrt(std::cbrt(2.0));  ///< External camera distance coeff
+    double ext_cam_dist_min = 1.0;                          ///< External camera minimal distance
 
     double follow_cam_init_shift_forward = 15.0;    ///< Follow camera initial position forward shift
     double follow_cam_init_shift_right = 10.0;      ///< Follow camera initial position right shift
@@ -106,9 +109,9 @@ struct settings_t final
     double follow_cam_fwd_velocity_coeff = 4.0;     ///< Follow camera forward shift by velocity coeff
     double follow_cam_speed_keyboard = 2.0;         ///< Follow camera initial speed
     double follow_cam_speed_mouse = 2.0;            ///< Follow camera initial speed
-    double follow_cam_speed_coeff = sqrt(2.0);      ///< Follow camera speed coeff
+    double follow_cam_speed_coeff = std::sqrt(2.0); ///< Follow camera speed coeff
     double follow_cam_height_step = 0.1;            ///< Follow camera vertical shift
-    double follow_cam_fovy_coeff = cbrt(2.0);       ///< Follow camera FovY coeff
+    double follow_cam_fovy_coeff = std::cbrt(2.0);  ///< Follow camera FovY coeff
 };
 
 #endif // VIEWER_SETTINGS_H
