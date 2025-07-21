@@ -2,9 +2,12 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
+#include "datetime.h"
+
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Node.h>
 
+class CfgReader;
 namespace vsg
 {
     class Options;
@@ -16,8 +19,7 @@ namespace vsg
 class Skybox final
 {
 public:
-    Skybox(std::string& skybox_model_filepath,
-           std::vector<std::string> skybox_texture_filepath = {},
+    Skybox(const std::string& skybox_config_filepath,
            vsg::ref_ptr<vsg::Options> options = {});
 
     /// Get scene node
@@ -31,12 +33,30 @@ public:
 
 private:
     vsg::ref_ptr<vsg::Node> node = nullptr;
-    vsg::ref_ptr<vsg::ubvec4Array2D> texture = {};
-    std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> textures = {};
+    vsg::ref_ptr<vsg::ubvec4Array2D> texture = nullptr;
 
-    void init_model(std::string& skybox_model_filepath,
+    struct season_time_texture_t
+    {
+        struct season_date_t {uint8_t month; uint8_t day;};
+        season_date_t date_season_begin = {1, 1};
+        season_date_t date_season_end = {12, 31};
+        bool is_season_trough_new_year = false;
+
+        server_time_t time_appear_begin = {0, 0, 0};
+        server_time_t time_appear_end = {0, 0, 0};
+        server_time_t time_disappear_begin = {0, 0, 0};
+        server_time_t time_disappear_end = {0, 0, 0};
+        bool is_time_trough_midhight = false;
+
+        vsg::ref_ptr<vsg::ubvec4Array2D> texture = nullptr;
+        std::string filename = "";
+    };
+
+    std::vector<season_time_texture_t> textures = {};
+
+    void init_model(CfgReader &cfg,
                     vsg::ref_ptr<vsg::Options> options);
-    void init_textures(std::vector<std::string> skybox_texture_filepath,
+    void init_textures(CfgReader &cfg,
                        vsg::ref_ptr<vsg::Options> options);
 };
 

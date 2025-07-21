@@ -8,7 +8,6 @@
 
 #include <cmath>
 #include <string>
-#include <vector>
 
 //------------------------------------------------------------------------------
 //
@@ -24,13 +23,6 @@ struct settings_t final
 
     std::string route_dir_name;        ///< Route directory name
     std::string route_dir_full_path;   ///< Route directory path
-    std::vector<std::string> skybox_textures =
-        { "sky_day.bmp"
-        , "sky_night.bmp"
-        , "sky_sunrise.bmp"
-        , "sky_sunriseDawn.bmp"
-        , "sky_sunset.bmp"
-        , "sky_sunsetTwilight.bmp" }; ///< Skybox textures filenames
 
     std::string notify_level = "INFO";      ///< Notify level
     bool disable_culling_node = true;       ///< Disable automatic cullnode for models

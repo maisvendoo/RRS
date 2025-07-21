@@ -48,7 +48,7 @@ public:
     {
     }
 
-    int32_t data() const
+    constexpr int32_t data() const
     {
         return date_data;
     }
@@ -222,7 +222,7 @@ public:
         time_unit_since_midnight += TIMEUNIT_MULTIPLIER_HOUR * ((hour < 24) ? hour : 23);
     }
 
-    int32_t data() const
+    constexpr int32_t data() const
     {
         return time_unit_since_midnight;
     }

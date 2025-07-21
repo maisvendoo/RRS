@@ -13,17 +13,25 @@
 #include "vsg/state/DepthStencilState.h"
 
 #include "filesystem.h"
+#include "CfgReader.h"
 #include "Logger.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Skybox::Skybox(std::string& skybox_model_filepath,
-               std::vector<std::string> skybox_texture_filepath,
+Skybox::Skybox(const std::string& skybox_config_filepath,
                vsg::ref_ptr<vsg::Options> options)
 {
-    init_model(skybox_model_filepath, options);
-    init_textures(skybox_texture_filepath, options);
+    CfgReader cfg;
+    if (cfg.load(skybox_config_filepath.c_str()))
+    {
+        init_model(cfg, options);
+        init_textures(cfg, options);
+    }
+    else
+    {
+        LOG_WARN("Fail to open skybox config: %s", skybox_config_filepath.c_str());
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -47,25 +55,37 @@ vsg::ref_ptr<vsg::ubvec4Array2D> Skybox::getDefaultTexture() const noexcept
 //------------------------------------------------------------------------------
 std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> Skybox::getTextures() const noexcept
 {
-    return textures;
+    std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> all_textures;
+    for (const season_time_texture_t& stt : textures)
+        all_textures.emplace_back(stt.texture);
+    return all_textures;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Skybox::init_model(std::string &skybox_model_filepath, vsg::ref_ptr<vsg::Options> options)
+void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 {
-    if (!vsg::fileExists(skybox_model_filepath))
+    QString model_filename = "sky.gltf";
+    cfg.getString("Model", "Filename", model_filename);
+
+    FileSystem& fs = FileSystem::getInstance();
+    std::string model_path = fs.getDataDir();
+    model_path = fs.combinePath(model_path, "models");
+    model_path = fs.combinePath(model_path, "default-objects");
+    model_path = fs.combinePath(model_path, model_filename.toStdString());
+
+    if (!vsg::fileExists(model_path))
     {
-        LOG_WARN("Fail to find skybox file: %s", skybox_model_filepath.c_str());
+        LOG_WARN("Fail to find skybox file: %s", model_path.c_str());
         return;
     }
 
-    vsg::ref_ptr<vsg::Object> loaded = vsg::read(skybox_model_filepath, options);
+    vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_path, options);
     node = loaded.cast<vsg::Node>();
     if (!node)
     {
-        LOG_WARN("Fail to load skybox model from file: %s", skybox_model_filepath.c_str());
+        LOG_WARN("Fail to load skybox model from file: %s", model_path.c_str());
 
         vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
         if (error)
@@ -73,9 +93,8 @@ void Skybox::init_model(std::string &skybox_model_filepath, vsg::ref_ptr<vsg::Op
         return;
     }
 
-    LOG_INFO("Loaded skybox model from file: %s", skybox_model_filepath.c_str());
+    LOG_INFO("Loaded skybox model from file: %s", model_path.c_str());
 
-    FileSystem& fs = FileSystem::getInstance();
     std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
     // Загружаем свой вариант вершинного шейдера вместо встроенного
@@ -129,7 +148,7 @@ void Skybox::init_model(std::string &skybox_model_filepath, vsg::ref_ptr<vsg::Op
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Skybox::init_textures(std::vector<std::string> skybox_texture_filepath, vsg::ref_ptr<vsg::Options> options)
+void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 {
     if (!node)
     {
@@ -182,38 +201,66 @@ void Skybox::init_textures(std::vector<std::string> skybox_texture_filepath, vsg
     }
 
     // Загружаем варианты текстур
-    for (auto& path : skybox_texture_filepath)
+    FileSystem& fs = FileSystem::getInstance();
+    std::string textures_dir_path = fs.getDataDir();
+    textures_dir_path = fs.combinePath(textures_dir_path, "models");
+    textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
+    textures_dir_path = fs.combinePath(textures_dir_path, "textures");
+
+    // Читаем из конфига имена файлов текстур и их сезон, время суток
+    QDomNode secNode = cfg.getFirstSection("Texture");
+    while (!secNode.isNull())
     {
-        if (!vsg::fileExists(path))
+        QString texture_filename = "sky_day.bmp";
+        cfg.getString(secNode, "Filename", texture_filename);
+        std::string texture_path = fs.combinePath(textures_dir_path, texture_filename.toStdString());
+
+        // Ищем файл текстуры
+        if (!vsg::fileExists(texture_path))
         {
-            LOG_WARN("Fail to find skybox texture file: %s", path.c_str());
+            LOG_WARN("Fail to find skybox texture file: %s", texture_path.c_str());
+
+            secNode = cfg.getNextSection();
             continue;
         }
 
-        vsg::ref_ptr<vsg::Object> loaded = vsg::read(path, options);
+        // Загружаем файл текстуры
+        vsg::ref_ptr<vsg::Object> loaded = vsg::read(texture_path, options);
         vsg::ref_ptr<vsg::ubvec4Array2D> data = loaded.cast<vsg::ubvec4Array2D>();
         if (!data)
         {
-            LOG_WARN("Fail to load skybox texture from file: %s", path.c_str());
+            LOG_WARN("Fail to load skybox texture from file: %s", texture_path.c_str());
 
             vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
             if (error)
                 LOG_WARN(error->message.c_str());
+
+            secNode = cfg.getNextSection();
             continue;
         }
 
         // Проверяем, что новая текстура совпадает по размеру с дефолтной
-        if ((data->width() == texture->width()) && data->height() == texture->height())
+        if ((data->width() != texture->width()) || (data->height() != texture->height()))
         {
-            textures.push_back(data);
+            LOG_WARN("Fail to apply skybox texture from file: %s", texture_path.c_str());
+
+            secNode = cfg.getNextSection();
+            continue;
         }
-        else
-        {
-            LOG_WARN("Fail to apply skybox texture from file: %s", path.c_str());
-        }
+
+        LOG_INFO("Loaded skybox texture from file: %s", texture_path.c_str());
+        season_time_texture_t stt = season_time_texture_t();
+        stt.texture = data;
+
+        //
+        // TODO // Прочитать из конфига сезон и время суток
+        //
+
+        textures.emplace_back(stt);
+        secNode = cfg.getNextSection();
     }
 
-    // Указываем vsg что возможна подмена текстуры скайбокса
+    // Указываем vsg, что возможна подмена текстуры скайбокса
     if (!textures.empty())
     {
         texture->properties.dataVariance = vsg::DYNAMIC_DATA;
