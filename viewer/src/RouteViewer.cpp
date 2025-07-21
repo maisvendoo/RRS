@@ -505,7 +505,12 @@ void RouteViewer::initLights()
     sun = vsg::DirectionalLight::create();
     sun->color = vsg::vec3(settings.sun_color);
     sun->intensity = static_cast<float>(settings.sun_intensity);
-    sun->direction = vsg::normalize(settings.sun_direction);
+    vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
+    float azimuth_radian = vsg::radians(static_cast<float>(settings.sun_azimuth));
+    float altitude_radian = vsg::radians(static_cast<float>(settings.sun_altitude));
+    vsg::mat4 rotate_azimuth = vsg::rotate(azimuth_radian, 0.0f, 0.0f, 1.0f);
+    vsg::mat4 rotate_altitude = vsg::rotate(altitude_radian, 1.0f, 0.0f, 0.0f);
+    sun->direction = vsg::normalize(sun_direction * rotate_azimuth * rotate_altitude);
     sun->shadowSettings = shadowSettings;
     root->addChild(sun);
 }
@@ -540,6 +545,8 @@ void RouteViewer::initCommandGraph()
     GUIparams->sun_color = sun->color.data();
     GUIparams->sun_direction_d = &sun->direction;
     GUIparams->sun_intensity = &sun->intensity;
+    GUIparams->sun_azimuth_degrees = static_cast<float>(settings.sun_azimuth);
+    GUIparams->sun_altitude_degrees = static_cast<float>(settings.sun_altitude);
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
