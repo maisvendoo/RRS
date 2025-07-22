@@ -52,8 +52,10 @@ void Logger::log_message(LogLevel level, const char* file, int line, const char*
     }
 
     std::FILE* const streams[2] = {stderr, this->file};
-    for (int i = 0; i < 2; ++i)
+    const int stream_count = this->file ? 2 : 1;
+    for (int i = 0; i < stream_count; ++i)
     {
+
 #if IS_TEXT_COLORED
         print_ansi_escape_code(level, streams[i]);
 #endif
