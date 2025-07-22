@@ -3,13 +3,7 @@
 
 #include    "brake-device.h"
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-enum
-{
-    ER_PRESSURE = 0 ///< Давление в уравнительном резервуаре
-};
+static constexpr int ER_PRESSURE = 0; ///< Давление в уравнительном резервуаре
 
 //------------------------------------------------------------------------------
 //
@@ -31,28 +25,28 @@ public:
     virtual double getHandlePosition() const = 0;
 
     /// Признак положения перекрыши
-    bool isHold() const;
+    bool isHold() const noexcept;
 
     /// Признак положения торможения
-    bool isBrake() const;
+    bool isBrake() const noexcept;
 
     /// Задать зарядное давление
-    void setChargePressure(double value);
+    void setChargePressure(double value) noexcept;
 
     /// Задать давление от питательной магистрали
-    void setFLpressure(double value);
+    void setFLpressure(double value) noexcept;
 
     /// Поток в питательную магистраль
-    double getFLflow() const;
+    double getFLflow() const noexcept;
 
     /// Задать давление от тормозной магистрали
-    void setBPpressure(double value);
+    void setBPpressure(double value) noexcept;
 
     /// Поток в тормозную магистраль
-    double getBPflow() const;
+    double getBPflow() const noexcept;
 
     /// Задать поток в уравнительный резервуар
-    void setERflow(double value);
+    void setERflow(double value) noexcept;
 
     /// Давление в уравнительном резервуаре
     double getERpressure() const;
