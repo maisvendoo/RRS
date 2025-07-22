@@ -59,7 +59,7 @@ struct sound_state_t final
 
         // Сигнал: скорость воспроизведения в процентах - целая часть,
         // уровень громкости - дробная часть
-        const float signal = std::floorf(100.0f * p) + v;
+        const float signal = std::floor(100.0f * p) + v;
 
         // Сигнал при выключенном звуке - отрицательный
         if (state <= 0)
@@ -109,7 +109,7 @@ struct sound_state_t final
         }
 
         // Расшифровка скорости воспроизведения и громкости
-        const float tmp_pitch = floorf(tmp_signal);
+        const float tmp_pitch = std::floor(tmp_signal);
         volume = tmp_signal - tmp_pitch;
         pitch = tmp_pitch / 100.0f;
         return *this;
