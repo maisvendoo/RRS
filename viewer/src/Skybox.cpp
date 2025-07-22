@@ -252,9 +252,71 @@ void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
         season_time_texture_t stt = season_time_texture_t();
         stt.texture = data;
 
-        //
-        // TODO // Прочитать из конфига сезон и время суток
-        //
+        auto read_season_date = [](CfgReader& cfg, QDomNode& secNode, const char* section,
+                                   season_time_texture_t::season_date_t& sd) -> bool
+        {
+            QString tmp;
+            if (!cfg.getString(secNode, section, tmp))
+                return false;
+
+            QStringList tokens = tmp.split("-");
+            if (tokens.size() != 2)
+                return false;
+
+            sd.month = tokens[0].toInt();
+            if ((sd.month < 1) ||  (sd.month > 12))
+                return false;
+
+            sd.day = tokens[1].toInt();
+            if ((sd.day < 1) ||  (sd.day > 31))
+                return false;
+
+            return true;
+        };
+
+        auto read_time = [](CfgReader& cfg, QDomNode& secNode, const char* section,
+                            server_time_t& st) -> bool
+        {
+            QString tmp;
+            if (!cfg.getString(secNode, section, tmp))
+                return false;
+
+            QStringList tokens = tmp.split(":");
+            if (tokens.size() != 3)
+                return false;
+
+            st = server_time_t(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt());
+            return true;
+        };
+
+        if (!read_season_date(cfg, secNode, "SeasonBegin", stt.date_season_begin) ||
+            !read_season_date(cfg, secNode, "SeasonEnd", stt.date_season_end) ||
+            !read_time(cfg, secNode, "TimeAppearBegin", stt.time_appear_begin) ||
+            !read_time(cfg, secNode, "TimeAppearEnd", stt.time_appear_end) ||
+            !read_time(cfg, secNode, "TimeDisappearBegin", stt.time_disappear_begin) ||
+            !read_time(cfg, secNode, "TimeDisappearEnd", stt.time_disappear_end))
+        {
+            LOG_WARN("Fail to read season or time from config for skybox texture: %s", texture_path.c_str());
+
+            secNode = cfg.getNextSection();
+            continue;
+        }
+
+        stt.is_season_trough_new_year = (stt.date_season_begin.month > stt.date_season_end.month) ||
+                                        ( (stt.date_season_begin.month == stt.date_season_end.month) &&
+                                          (stt.date_season_begin.day > stt.date_season_end.day) );
+
+        int trough_midhight_count = (stt.time_appear_begin > stt.time_appear_end) +
+                                    (stt.time_appear_end > stt.time_disappear_begin) +
+                                    (stt.time_disappear_begin > stt.time_disappear_end);
+        if (trough_midhight_count > 1)
+        {
+            LOG_WARN("Invalid time for skybox texture: %s", texture_path.c_str());
+
+            secNode = cfg.getNextSection();
+            continue;
+        }
+        stt.is_time_trough_midhight = trough_midhight_count;
 
         textures.emplace_back(stt);
         secNode = cfg.getNextSection();
