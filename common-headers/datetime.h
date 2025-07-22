@@ -4,8 +4,8 @@
 #include    <cstdint>
 #include    <ctime>
 
-#include    <QByteArray>
 #include    <QBuffer>
+#include    <QByteArray>
 #include    <QDataStream>
 
 // Храним время суток в 10-тысячных долях секунды от полуночи
@@ -38,12 +38,12 @@ struct server_date_t final
 private:
     union
     {
-        int32_t date_data;
+        std::int32_t date_data;
         struct
         {
-            int16_t y;
-            uint8_t m;
-            uint8_t d;
+            std::int16_t y;
+            std::uint8_t m;
+            std::uint8_t d;
         };
     };
 
@@ -55,7 +55,7 @@ public:
     {
     }
 
-    server_date_t(int16_t year, uint8_t month, uint8_t day)
+    server_date_t(std::int16_t year, std::uint8_t month, std::uint8_t day)
         : y(year)
         , m(month)
         , d(day)
@@ -63,38 +63,38 @@ public:
     }
 
     /// Год
-    int16_t year() const
+    std::int16_t year() const noexcept
     {
         return y;
     }
 
     /// Месяц
-    uint8_t month() const
+    std::uint8_t month() const noexcept
     {
         return m;
     }
 
     /// День
-    uint8_t day() const
+    std::uint8_t day() const noexcept
     {
         return d;
     }
 
     /// Високосный год
-    static bool isLeapYear(const int16_t& year)
+    static bool isLeapYear(std::int16_t year) noexcept
     {
         return ((year % 4 == 0) && (year % 100 > 0)) || (year % 400 == 0);
     }
 
     /// Переход к следующему дню
-    void nextDay()
+    void nextDay() noexcept
     {
         const std::uint8_t* const days_in_month = isLeapYear(y) ? days_in_month_leap : days_in_month_nleap;
 
-        if (d >= days_in_month[m + 1])
+        if (d >= days_in_month[m - 1])
         {
             d = 1;
-            if (m >= 12) // Декабрь
+            if (m == 12) // Декабрь
             {
                 m = 1;
                 ++y;
@@ -111,20 +111,20 @@ public:
     }
 
     /// Задать дату, по умолчанию из текущей системной
-    static server_date_t dateNow(std::tm* std_tm_now = nullptr)
+    static server_date_t dateNow(std::tm* std_tm_now = nullptr) noexcept
     {
         if (!std_tm_now)
         {
             const std::time_t system_time = std::time(nullptr);
             std_tm_now = std::localtime(&system_time);
         }
-        server_date_t date{static_cast<int16_t>(std_tm_now->tm_year + 1900),
-                           static_cast<uint8_t>(std_tm_now->tm_mon + 1),
-                           static_cast<uint8_t>(std_tm_now->tm_mday)};
+        server_date_t date{static_cast<std::int16_t>(std_tm_now->tm_year + 1900),
+                           static_cast<std::uint8_t>(std_tm_now->tm_mon + 1),
+                           static_cast<std::uint8_t>(std_tm_now->tm_mday)};
         return date;
     }
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
@@ -135,7 +135,7 @@ public:
         return buff.data();
     }
 
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
@@ -151,15 +151,12 @@ public:
 struct server_time_t final
 {
 private:
-    uint32_t time_unit_since_midnight;
+    std::uint32_t time_unit_since_midnight = 0;
 
 public:
-    server_time_t()
-        : time_unit_since_midnight(0)
-    {
-    }
+    server_time_t() noexcept = default;
 
-    server_time_t(uint8_t hour, uint8_t minute, uint8_t sec, uint16_t msec = 0)
+    server_time_t(std::uint8_t hour, std::uint8_t minute, std::uint8_t sec, std::uint16_t msec = 0) noexcept
     {
         time_unit_since_midnight = TIMEUNIT_MULTIPLIER_MSEC * ((msec < 1000) ? msec : 999);
         time_unit_since_midnight += TIMEUNIT_MULTIPLIER_SEC * ((sec < 60) ? sec : 59);
@@ -168,60 +165,64 @@ public:
     }
 
     /// Час
-    uint8_t hour() const
+    std::uint8_t hour() const noexcept
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_HOUR;
     }
 
     /// Минута
-    uint8_t minute() const
+    std::uint8_t minute() const noexcept
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_MIN % 60;
     }
 
     /// Секунда
-    uint8_t sec() const
+    std::uint8_t sec() const noexcept
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_SEC % 60;
     }
 
     /// Миллисекунда
-    uint16_t msec() const
+    std::uint16_t msec() const noexcept
     {
         return time_unit_since_midnight / TIMEUNIT_MULTIPLIER_MSEC % 1000;
     }
 
     /// Интегрирование времени, возвращает true если нужен переход к следующему дню
-    bool addTime(double add_sec)
+    bool addTime(double add_sec) noexcept
     {
         if (add_sec < 0.0)
+        {
             return false;
+        }
 
-        uint32_t add_timeunit = add_sec * TIMEUNIT_MULTIPLIER_SEC;
+        const std::uint32_t add_timeunit = add_sec * TIMEUNIT_MULTIPLIER_SEC;
         time_unit_since_midnight += add_timeunit;
 
         if (time_unit_since_midnight < TIMEUNIT_MULTIPLIER_DAY)
+        {
             return false;
+        }
 
         time_unit_since_midnight = time_unit_since_midnight - TIMEUNIT_MULTIPLIER_DAY;
         return true;
     }
 
     /// Задать время, по умолчанию из текущего системного
-    static server_time_t timeNow(std::tm* std_tm_now = nullptr)
+    static server_time_t timeNow(std::tm* std_tm_now = nullptr) noexcept
     {
         if (!std_tm_now)
         {
-            std::time_t system_time = std::time(nullptr);
+            const std::time_t system_time = std::time(nullptr);
             std_tm_now = std::localtime(&system_time);
         }
-        server_time_t time{static_cast<uint8_t>(std_tm_now->tm_hour),
-                           static_cast<uint8_t>(std_tm_now->tm_min),
-                           static_cast<uint8_t>(std_tm_now->tm_sec)};
+        server_time_t time{static_cast<std::uint8_t>(std_tm_now->tm_hour),
+                           static_cast<std::uint8_t>(std_tm_now->tm_min),
+                           static_cast<std::uint8_t>(std_tm_now->tm_sec)};
         return time;
     }
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
@@ -249,16 +250,11 @@ struct simulator_time_t final
 {
     server_date_t date;
     server_time_t time;
-    double simulation_seconds;
+    double simulation_seconds = 0.0;
 
-    simulator_time_t()
-        : date(server_date_t())
-        , time(server_time_t())
-        , simulation_seconds(0.0)
-    {
-    }
+    simulator_time_t() noexcept = default;
 
-    simulator_time_t(server_date_t in_date, server_time_t in_time, double in_simulation_seconds = 0.0)
+    simulator_time_t(server_date_t in_date, server_time_t in_time, double in_simulation_seconds = 0.0) noexcept
         : date(in_date)
         , time(in_time)
         , simulation_seconds(in_simulation_seconds)
@@ -266,20 +262,22 @@ struct simulator_time_t final
     }
 
     /// Интегрирование времени
-    void addTime(double add_sec)
+    void addTime(double add_sec) noexcept
     {
         simulation_seconds += add_sec;
 
         if (time.addTime(add_sec))
+        {
             date.nextDay();
+        }
     }
 
     /// Задать время, по умолчанию из текущего системного
-    static simulator_time_t timeNow(std::tm* std_tm_now = nullptr)
+    static simulator_time_t timeNow(std::tm* std_tm_now = nullptr) noexcept
     {
         if (!std_tm_now)
         {
-            std::time_t system_time = std::time(nullptr);
+            const std::time_t system_time = std::time(nullptr);
             std_tm_now = std::localtime(&system_time);
         }
         simulator_time_t sim_time{server_date_t::dateNow(std_tm_now),
@@ -287,7 +285,7 @@ struct simulator_time_t final
         return sim_time;
     }
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
@@ -303,7 +301,7 @@ struct simulator_time_t final
         return buff.data();
     }
 
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
