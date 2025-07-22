@@ -19,7 +19,7 @@ class SOUND_MANAGER_EXPORT SoundManager : public QObject
 
 public:
 
-    SoundManager(QObject *parent = Q_NULLPTR);
+    SoundManager(QObject *parent = nullptr);
 
     ~SoundManager();
 

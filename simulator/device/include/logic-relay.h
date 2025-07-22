@@ -12,7 +12,7 @@ class DEVICE_EXPORT LogicRelay : public Device
 
 public:
 
-    LogicRelay(size_t num_contacts = 1, QObject *parent = Q_NULLPTR);
+    LogicRelay(size_t num_contacts = 1, QObject *parent = nullptr);
 
     ~LogicRelay();
 

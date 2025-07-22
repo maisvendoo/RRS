@@ -11,7 +11,7 @@ class TrajectoryALSN : public TrajectoryDevice
 {
 public:
 
-    TrajectoryALSN(QObject *parent = Q_NULLPTR);
+    TrajectoryALSN(QObject *parent = nullptr);
 
     ~TrajectoryALSN();
 

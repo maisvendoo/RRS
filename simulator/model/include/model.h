@@ -59,7 +59,7 @@ class MODEL_EXPORT Model : public QObject
 public:
 
     /// Constructor
-    explicit Model(QObject *parent = Q_NULLPTR);
+    explicit Model(QObject *parent = nullptr);
     /// Destructor
     virtual ~Model();
 

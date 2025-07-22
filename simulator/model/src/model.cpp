@@ -623,11 +623,11 @@ void Model::initControlPanel(QString cfg_path)
         if (!cfg.getString(secName, "Plugin", module_name))
             return;
 
-        control_panel = Q_NULLPTR;
+        control_panel = nullptr;
         QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
         control_panel = loadInterfaceDevice(module_path);
 
-        if (control_panel == Q_NULLPTR)
+        if (control_panel == nullptr)
             return;
 
         QString config_dir = "";
@@ -947,7 +947,7 @@ void Model::controlStep()
         int id = c.prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            vehicles[id]->resetKeysData();            
+            vehicles[id]->resetKeysData();
         }
     }
 

@@ -11,7 +11,7 @@ class DEVICE_EXPORT OperatingRod : public Device
 public:
 
     /// Конструктор
-    OperatingRod(int key_code = 0, QObject *parent = Q_NULLPTR);
+    OperatingRod(int key_code = 0, QObject *parent = nullptr);
 
     /// Деструктор
     virtual ~OperatingRod();

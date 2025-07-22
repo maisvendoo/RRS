@@ -10,7 +10,7 @@ class DEVICE_EXPORT SandingSystem : public Device
 {
 public:
 
-    SandingSystem(QObject *parent = Q_NULLPTR);
+    SandingSystem(QObject *parent = nullptr);
 
     virtual ~SandingSystem();
 

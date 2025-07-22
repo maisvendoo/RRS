@@ -23,7 +23,7 @@ class LocoCrane224 : public LocoCrane
 {
 public:
 
-    LocoCrane224(QObject *parent = Q_NULLPTR);
+    LocoCrane224(QObject *parent = nullptr);
 
     ~LocoCrane224();
 

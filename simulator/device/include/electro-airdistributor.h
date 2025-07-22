@@ -10,7 +10,7 @@ class DEVICE_EXPORT ElectroAirDistributor : public BrakeDevice
 {
 public:
 
-    ElectroAirDistributor(QObject *parent = Q_NULLPTR);
+    ElectroAirDistributor(QObject *parent = nullptr);
 
     ~ElectroAirDistributor();
 

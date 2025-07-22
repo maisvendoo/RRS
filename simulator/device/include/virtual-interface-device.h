@@ -26,7 +26,7 @@ class DEVICE_EXPORT VirtualInterfaceDevice : public QObject
 
 public:
 
-    VirtualInterfaceDevice(QObject *parent = Q_NULLPTR);
+    VirtualInterfaceDevice(QObject *parent = nullptr);
 
     ~VirtualInterfaceDevice() = default;
 

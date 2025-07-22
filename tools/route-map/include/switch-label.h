@@ -13,17 +13,17 @@ class SwitchLabel : public QLabel
 
 public:
 
-    SwitchLabel(QWidget *parent = Q_NULLPTR);
+    SwitchLabel(QWidget *parent = nullptr);
 
     ~SwitchLabel();
 
     Connector *conn;
 
-    QMenu *menu = Q_NULLPTR;
+    QMenu *menu = nullptr;
 
-    QAction *action_switch_fwd = Q_NULLPTR;
+    QAction *action_switch_fwd = nullptr;
 
-    QAction *action_switch_bwd = Q_NULLPTR;
+    QAction *action_switch_bwd = nullptr;
 
 signals:
 

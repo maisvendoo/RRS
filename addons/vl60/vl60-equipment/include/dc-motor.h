@@ -12,7 +12,7 @@ class DCMotor : public Device
 {
 public:
 
-    DCMotor(QObject *parent = Q_NULLPTR);
+    DCMotor(QObject *parent = nullptr);
 
     ~DCMotor();
 

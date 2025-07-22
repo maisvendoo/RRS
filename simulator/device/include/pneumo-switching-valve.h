@@ -9,7 +9,7 @@ public:
 
     SwitchingValve(double working_volume_1 = 1e-3,
                    double working_volume_2 = 1e-3,
-                   QObject *parent = Q_NULLPTR);
+                   QObject *parent = nullptr);
 
     virtual ~SwitchingValve();
 

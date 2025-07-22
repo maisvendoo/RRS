@@ -14,7 +14,7 @@ public:
     PolarHysteresis(double min_value = 0.1,
                     double max_value = 0.9,
                     int init_state = 0,
-                    QObject *parent = Q_NULLPTR);
+                    QObject *parent = nullptr);
 
     ~PolarHysteresis();
 

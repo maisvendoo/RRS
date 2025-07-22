@@ -51,7 +51,7 @@ ASound::ASound(QString soundname, LogFileHandler *log, QObject *parent): QObject
     // Загружаем звук
     loadSound_(soundname);
 
-    timerControl_ = Q_NULLPTR;
+    timerControl_ = nullptr;
 }
 
 
@@ -808,7 +808,7 @@ void ASound::play()
             if (canLABL_)
             {
                 // Таймер управления циклом
-                if (timerControl_ == Q_NULLPTR)
+                if (timerControl_ == nullptr)
                 {
                     timerControl_ = new QTimer(this);
                     connect(timerControl_, SIGNAL(timeout()),
@@ -862,7 +862,7 @@ void ASound::stop()
                       static_cast<ALint>(blockSize_[0] + num_cycle_blocks_ * blockSize_[1]));
 
             // Таймер контроля цикла больше не нужен
-            if (timerControl_ != Q_NULLPTR)
+            if (timerControl_ != nullptr)
                 if (timerControl_->isActive())
                     timerControl_->stop();
 //            emit notify(QString("STOP:offset:%1").arg(blockSize_[0] + blockSize_[1] + blockSize_[1], 8).toStdString());

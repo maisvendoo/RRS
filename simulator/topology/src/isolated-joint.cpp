@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-IsolatedJoint::IsolatedJoint(QObject *parent) : Connector(parent)  
+IsolatedJoint::IsolatedJoint(QObject *parent) : Connector(parent)
 {
 
 }
@@ -28,13 +28,13 @@ void IsolatedJoint::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &tra
 
     QString fwd_name;
     cfg.getString(secNode, "fwdTraj", fwd_name);
-    fwdTraj = traj_list.value(fwd_name, Q_NULLPTR);
+    fwdTraj = traj_list.value(fwd_name, nullptr);
 
     QString bwd_name;
     cfg.getString(secNode, "bwdTraj", bwd_name);
-    bwdTraj = traj_list.value(bwd_name, Q_NULLPTR);
+    bwdTraj = traj_list.value(bwd_name, nullptr);
 
-    if (fwdTraj != Q_NULLPTR)
+    if (fwdTraj != nullptr)
     {
         fwdTraj->setBwdConnector(this);
         Journal::instance()->info("Forward trajectory: " + fwdTraj->getName());
@@ -44,7 +44,7 @@ void IsolatedJoint::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &tra
         Journal::instance()->info("Joint " + name + " has't incomming trajectory");
     }
 
-    if (bwdTraj != Q_NULLPTR)
+    if (bwdTraj != nullptr)
     {
         bwdTraj->setFwdConnector(this);
         Journal::instance()->info("Backward trajectory: " + bwdTraj->getName());

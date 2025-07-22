@@ -17,7 +17,7 @@ class DEVICE_EXPORT ConnectorDevice : public QObject
 public:
 
     /// Constructor
-    ConnectorDevice(QObject *parent = Q_NULLPTR);
+    ConnectorDevice(QObject *parent = nullptr);
 
     /// Destructor
     virtual ~ConnectorDevice();

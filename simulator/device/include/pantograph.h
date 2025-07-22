@@ -13,7 +13,7 @@ class DEVICE_EXPORT Pantograph : public Device
 public:
 
     /// Конструктор
-    Pantograph(QObject *parent = Q_NULLPTR);
+    Pantograph(QObject *parent = nullptr);
 
     /// Деструктор
     ~Pantograph();

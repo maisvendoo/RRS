@@ -15,7 +15,7 @@ class DEVICE_EXPORT EPBConverter  : public Device
 {
 public:
 
-    EPBConverter(QObject *parent = Q_NULLPTR);
+    EPBConverter(QObject *parent = nullptr);
 
     ~EPBConverter();
 

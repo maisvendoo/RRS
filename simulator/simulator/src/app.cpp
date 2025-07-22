@@ -89,7 +89,7 @@ bool AppCore::init()
 //------------------------------------------------------------------------------
 int AppCore::exec()
 {
-    if (model != Q_NULLPTR)
+    if (model != nullptr)
         model->start();
 
     return QCoreApplication::exec();

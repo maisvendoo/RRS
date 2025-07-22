@@ -31,7 +31,7 @@ class TOPOLOGY_EXPORT Trajectory : public QObject
 
 public:
 
-    Trajectory(QObject *parent = Q_NULLPTR);
+    Trajectory(QObject *parent = nullptr);
 
     ~Trajectory();
 
@@ -135,9 +135,9 @@ private:
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 
-    Connector *fwd_connector = Q_NULLPTR;
+    Connector *fwd_connector = nullptr;
 
-    Connector *bwd_connector = Q_NULLPTR;
+    Connector *bwd_connector = nullptr;
 
     std::vector<track_t>    tracks;
 

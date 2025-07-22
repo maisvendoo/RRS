@@ -12,7 +12,7 @@ class DEVICE_EXPORT EPBControl : public Device
 {
 public:
 
-    EPBControl(QObject *parent = Q_NULLPTR);
+    EPBControl(QObject *parent = nullptr);
 
     ~EPBControl();
 

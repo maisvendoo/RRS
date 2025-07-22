@@ -29,7 +29,7 @@ public:
                         QIcon *icon_ok,
                         QIcon *icon_cancel,
                         QIcon *icon_warn,
-                        QWidget *parent = Q_NULLPTR);
+                        QWidget *parent = nullptr);
 
     ~TrainWaypointWidget();
 

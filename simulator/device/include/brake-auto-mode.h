@@ -20,7 +20,7 @@ class DEVICE_EXPORT BrakeAutoMode : public BrakeDevice
 {
 public:
 
-    BrakeAutoMode(QObject *parent = Q_NULLPTR);
+    BrakeAutoMode(QObject *parent = nullptr);
 
     virtual ~BrakeAutoMode();
 

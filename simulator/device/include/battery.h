@@ -10,7 +10,7 @@ class DEVICE_EXPORT Battery : public Device
 {
 public:
 
-    Battery(QObject *parent = Q_NULLPTR);
+    Battery(QObject *parent = nullptr);
 
     ~Battery();
 

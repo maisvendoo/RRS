@@ -38,7 +38,7 @@ bool Train::init(const init_data_t &init_data)
 
     train_motion_solver = loadSolver(solver_path);
 
-    if (train_motion_solver == Q_NULLPTR)
+    if (train_motion_solver == nullptr)
     {
         Journal::instance()->error("Solver " + solver_path + " is't found");
         return false;
@@ -109,7 +109,7 @@ bool Train::init(const solver_config_t &solver_config, int direction, std::vecto
 
     train_motion_solver = loadSolver(solver_path);
 
-    if (train_motion_solver == Q_NULLPTR)
+    if (train_motion_solver == nullptr)
     {
         Journal::instance()->error("Solver " + solver_path + " is't found");
         return false;
@@ -1111,7 +1111,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
                                                fs.separator() +
                                                relModulePath);
 
-                if (vehicle == Q_NULLPTR)
+                if (vehicle == nullptr)
                 {
                     Journal::instance()->error("Vehicle " + module_lib_name + " is't loaded");
                     break;
@@ -1369,7 +1369,7 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
 
     Joint *joint = loadJoint(QString(joint_module_dir +
                              fs.separator() + joint_module_name));
-    if (joint == Q_NULLPTR)
+    if (joint == nullptr)
         return;
 
     Journal::instance()->info("Loaded joint model from: " + joint_module_name + ".dll");

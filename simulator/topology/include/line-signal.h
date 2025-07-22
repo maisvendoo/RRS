@@ -12,7 +12,7 @@ class TOPOLOGY_EXPORT LineSignal : public Signal
 {
 public:
 
-    LineSignal(QObject *parent = Q_NULLPTR);
+    LineSignal(QObject *parent = nullptr);
 
     ~LineSignal();
 
@@ -66,7 +66,7 @@ private:
     bool blink_contact = true;
 
     /// Напряжение путевой батареи
-    double U_bat = 12.0;    
+    double U_bat = 12.0;
 
     void preStep(state_vector_t &Y, double t) override;
 

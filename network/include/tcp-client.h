@@ -26,7 +26,7 @@ class NETWORK_EXPORT TcpClient : public QObject
 
 public:
 
-    TcpClient(QObject *parent = Q_NULLPTR);
+    TcpClient(QObject *parent = nullptr);
 
     ~TcpClient();
 
@@ -80,9 +80,9 @@ signals:
 
 private:
 
-    QTcpSocket *socket = Q_NULLPTR;
+    QTcpSocket *socket = nullptr;
 
-    QTimer *connectionTimer = Q_NULLPTR;
+    QTimer *connectionTimer = nullptr;
 
     tcp_config_t tcp_config;
 

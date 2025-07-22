@@ -18,7 +18,7 @@ class TOPOLOGY_EXPORT Signal : public Device
 
 public:
 
-    Signal(QObject *parent = Q_NULLPTR);
+    Signal(QObject *parent = nullptr);
 
     virtual ~Signal();
 
@@ -188,7 +188,7 @@ protected:
     dvec3 pos;
 
     /// Коннектор, с которым связан сигнал
-    Connector *conn = Q_NULLPTR;
+    Connector *conn = nullptr;
 
     /// Имя коннектора, с которым связан сигнал (для десериализации)
     QString conn_name = "";

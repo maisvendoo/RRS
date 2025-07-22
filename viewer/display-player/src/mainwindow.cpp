@@ -3,7 +3,7 @@
 #include    <QVBoxLayout>
 
 MainWindow::MainWindow(QString module_path, QWidget *parent) : QWidget(parent)
-    , display(Q_NULLPTR)
+    , display(nullptr)
 {
     display = loadDisplay(module_path);
     display->init();

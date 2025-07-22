@@ -43,7 +43,7 @@ class DEVICE_EXPORT Device : public QObject
 public:
 
     /// Constructor
-    Device(QObject *parent = Q_NULLPTR);
+    Device(QObject *parent = nullptr);
 
     /// Destructor
     virtual ~Device();

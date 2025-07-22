@@ -139,7 +139,7 @@ void EnterSignal::lens_control()
     {
         emit sendDataUpdate(this->serialize());
         Journal::instance()->info("Signal " + letter + ": Updated lens status");
-    }    
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ Signal * EnterSignal::route_control()
     // Собираем цепь контрольного маршрутного реле
     bool is_RCR_ON_old = is_RCR_ON;
 
-    Signal *next_signal = Q_NULLPTR;
+    Signal *next_signal = nullptr;
 
     is_RCR_ON = is_route_free(conn, &next_signal);
 
@@ -308,7 +308,7 @@ void EnterSignal::signal_relays_control()
 void EnterSignal::exit_signal_control(Signal *next_signal)
 {
     // Питание указательного реле выходного сигнала
-    if (next_signal != Q_NULLPTR)
+    if (next_signal != nullptr)
         exit_signal_relay->setVoltage(next_signal->getVoltageDSR());
     else
         exit_signal_relay->setVoltage(0.0);
@@ -338,7 +338,7 @@ void EnterSignal::allow_signal_control()
 void EnterSignal::blink_control(Signal *next_signal)
 {
     // Питание реле мигания от бокового реле предыдущего сигнала
-    if (next_signal != Q_NULLPTR)
+    if (next_signal != nullptr)
         blink_relay->setVoltage(next_signal->getVoltageDSR());
     else
         blink_relay->setVoltage(0.0);
@@ -415,7 +415,7 @@ void EnterSignal::relay_control()
     // Контроль мигания
     blink_control(next_signal);
 
-    if (is_RCR_ON && (next_signal != Q_NULLPTR))
+    if (is_RCR_ON && (next_signal != nullptr))
     {
         next_signal->allowTransmitALSN(!lens_state[RED_LENS]);
     }
@@ -428,7 +428,7 @@ void EnterSignal::relay_control()
 //------------------------------------------------------------------------------
 bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return false;
     }
@@ -441,7 +441,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
     while (true)
     {
         // Смотрим траекторию за текущим коннектором
-        Trajectory *traj = Q_NULLPTR;
+        Trajectory *traj = nullptr;
 
         if (this->getDirection() == 1)
         {
@@ -453,7 +453,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         }
 
         // Выходим, если за конектором нет валидной траектории - ехать некуда
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             return false;
         }
@@ -472,13 +472,13 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         }
 
         // Если его нет, выходим стекущим результатом
-        if (cur_conn == Q_NULLPTR)
+        if (cur_conn == nullptr)
         {
             break;
         }
 
         // Контроль вреза стрелки
-        Trajectory *prev_traj = Q_NULLPTR;
+        Trajectory *prev_traj = nullptr;
 
         // Берем "заднюю" траекторию следующего коннектора
         if (this->getDirection() == 1)
@@ -492,7 +492,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
 
         // Данная проверка не бессмыслена - стрелка может стоять
         // не по маршруту и вдруг там нет траектории!
-        if (prev_traj == Q_NULLPTR)
+        if (prev_traj == nullptr)
         {
             return false;
         }
@@ -511,12 +511,12 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
         *signal = cur_conn->getSignalFwd();
 
         // Продолжаем цикл, возможно попалась стрелка
-        if (*signal == Q_NULLPTR)
+        if (*signal == nullptr)
         {
             *signal = cur_conn->getSignalBwd();
         }
 
-        if (*signal == Q_NULLPTR)
+        if (*signal == nullptr)
         {
             continue;
         }
@@ -537,7 +537,7 @@ bool EnterSignal::is_route_free(Connector *conn, Signal **signal)
 //------------------------------------------------------------------------------
 bool EnterSignal::is_switch_minus(Connector *conn)
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return false;
     }
@@ -548,7 +548,7 @@ bool EnterSignal::is_switch_minus(Connector *conn)
 
     while (true)
     {
-        if (cur_sw == Q_NULLPTR)
+        if (cur_sw == nullptr)
         {
             return is_minus;
         }
@@ -565,7 +565,7 @@ bool EnterSignal::is_switch_minus(Connector *conn)
         }
 
         // проверяем, есть ли траектория дальше
-        Trajectory *traj = Q_NULLPTR;
+        Trajectory *traj = nullptr;
 
         if (this->getDirection() == 1)
         {
@@ -576,7 +576,7 @@ bool EnterSignal::is_switch_minus(Connector *conn)
             traj = cur_sw->getBwdTraj();
         }
 
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             break;
         }
@@ -591,19 +591,19 @@ bool EnterSignal::is_switch_minus(Connector *conn)
             cur_sw = dynamic_cast<Switch *>(traj->getBwdConnector());
         }
 
-        if (cur_sw == Q_NULLPTR)
+        if (cur_sw == nullptr)
         {
             continue;
         }
 
         Signal *signal = cur_sw->getSignalFwd();
 
-        if (signal == Q_NULLPTR)
+        if (signal == nullptr)
         {
             signal = cur_sw->getSignalBwd();
         }
 
-        if (signal == Q_NULLPTR)
+        if (signal == nullptr)
         {
             continue;
         }

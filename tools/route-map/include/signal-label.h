@@ -13,7 +13,7 @@ class SignalLabel : public QLabel
 
 public:
 
-    SignalLabel(QWidget *parent = Q_NULLPTR);
+    SignalLabel(QWidget *parent = nullptr);
 
     ~SignalLabel();
 

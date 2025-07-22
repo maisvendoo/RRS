@@ -16,7 +16,7 @@ public:
     Hysteresis(double min_value = 0.1,
                double max_value = 0.9,
                bool init_state = false,
-               QObject *parent = Q_NULLPTR);
+               QObject *parent = nullptr);
 
     ~Hysteresis();
 

@@ -9,7 +9,7 @@ class DEVICE_EXPORT Oscillator : public Device
 {
 public:
 
-    Oscillator(QObject *parent = Q_NULLPTR);
+    Oscillator(QObject *parent = nullptr);
 
     ~Oscillator();
 

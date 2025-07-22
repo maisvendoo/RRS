@@ -19,7 +19,7 @@ class DEVICE_EXPORT TrajectoryDevice : public QObject
 public:
 
     /// Constructor
-    TrajectoryDevice(QObject *parent = Q_NULLPTR);
+    TrajectoryDevice(QObject *parent = nullptr);
 
     /// Destructor
     virtual ~TrajectoryDevice();

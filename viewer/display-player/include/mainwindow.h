@@ -12,7 +12,7 @@ class MainWindow : public QWidget
 {
 public:
 
-    MainWindow(QString module_path, QWidget *parent = Q_NULLPTR);
+    MainWindow(QString module_path, QWidget *parent = nullptr);
 
     ~MainWindow();
 

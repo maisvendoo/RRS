@@ -10,7 +10,7 @@ class SL2M : public Device
 {
 public:
 
-    SL2M(QObject *parent = Q_NULLPTR);
+    SL2M(QObject *parent = nullptr);
 
     ~SL2M();
 

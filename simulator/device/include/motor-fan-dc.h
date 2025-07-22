@@ -10,7 +10,7 @@ class DEVICE_EXPORT DCMotorFan : public Device
 {
 public:
 
-    DCMotorFan(QObject *parent = Q_NULLPTR);
+    DCMotorFan(QObject *parent = nullptr);
 
     ~DCMotorFan();
 

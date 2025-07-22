@@ -10,7 +10,7 @@ class DEVICE_EXPORT AutoTrainStop : public BrakeDevice
 {
 public:
 
-    AutoTrainStop(QObject *parent = Q_NULLPTR);
+    AutoTrainStop(QObject *parent = nullptr);
 
     virtual ~AutoTrainStop();
 

@@ -13,7 +13,7 @@ class FreeJoy : public VirtualInterfaceDevice
 {
 public:
 
-    FreeJoy(QObject *parent = Q_NULLPTR);
+    FreeJoy(QObject *parent = nullptr);
 
     ~FreeJoy() = default;
 

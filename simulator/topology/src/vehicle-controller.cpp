@@ -61,7 +61,7 @@ void VehicleController::setCoord(double x)
         Connector *conn = current_traj->getFwdConnector();
 
         // Если коннектора нет, останавливаемся на месте
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             x_off = traj_coord - current_traj->getLength();
             traj_coord = current_traj->getLength();
@@ -74,7 +74,7 @@ void VehicleController::setCoord(double x)
 
         // Если за коннектором нет траектории,
         // возвращаемся к исходной траектории и останавливаемся на месте
-        if (current_traj == Q_NULLPTR)
+        if (current_traj == nullptr)
         {
             current_traj = prev_traj;
             x_off = traj_coord - current_traj->getLength();
@@ -95,7 +95,7 @@ void VehicleController::setCoord(double x)
         Connector *conn = current_traj->getBwdConnector();
 
         // Если коннектора нет, останавливаемся на месте
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             x_off = traj_coord;
             traj_coord = 0.0;
@@ -108,7 +108,7 @@ void VehicleController::setCoord(double x)
 
         // Если за коннектором нет траектории,
         // возвращаемся к исходной траектории и останавливаемся на месте
-        if (current_traj == Q_NULLPTR)
+        if (current_traj == nullptr)
         {
             current_traj = prev_traj;
             x_off = traj_coord;
@@ -188,7 +188,7 @@ int VehicleController::getNearestVehicle(double &distance, double search_distanc
         {
             // Получаем указатель на коннектор сзади
             Connector *conn = next_traj->getBwdConnector();
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 distance = coord;
                 return -1;
@@ -197,7 +197,7 @@ int VehicleController::getNearestVehicle(double &distance, double search_distanc
             // Получаем указатель на траекторию сзади,
             // с которой нас соединяет коннектор сзади
             next_traj = conn->getBwdTraj();
-            if (next_traj == Q_NULLPTR)
+            if (next_traj == nullptr)
             {
                 distance = coord;
                 return -1;
@@ -218,7 +218,7 @@ int VehicleController::getNearestVehicle(double &distance, double search_distanc
         {
             // Получаем указатель на коннектор спереди
             Connector *conn = next_traj->getFwdConnector();
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 distance = next_traj->getLength() - coord;
                 return -1;
@@ -231,7 +231,7 @@ int VehicleController::getNearestVehicle(double &distance, double search_distanc
             // Получаем указатель на траекторию впереди,
             // с которой нас соединяет коннектор спереди
             next_traj = conn->getFwdTraj();
-            if (next_traj == Q_NULLPTR)
+            if (next_traj == nullptr)
             {
                 distance = -coord;
                 return -1;
@@ -274,7 +274,7 @@ void VehicleController::updateTrajectories()
     {
         // Получаем указатель на коннектор спереди
         Connector *conn = next_traj->getFwdConnector();
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
             break;
 
         // Вычитаем из траекторной координаты длину предыдущей траектории,
@@ -284,7 +284,7 @@ void VehicleController::updateTrajectories()
         // Получаем указатель на траекторию впереди,
         // с которой нас соединяет коннектор спереди
         next_traj = conn->getFwdTraj();
-        if (next_traj == Q_NULLPTR)
+        if (next_traj == nullptr)
             break;
 
         // Занятость пути
@@ -298,13 +298,13 @@ void VehicleController::updateTrajectories()
     {
         // Получаем указатель на коннектор сзади
         Connector *conn = next_traj->getBwdConnector();
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
             break;
 
         // Получаем указатель на траекторию сзади,
         // с которой нас соединяет коннектор сзади
         next_traj = conn->getBwdTraj();
-        if (next_traj == Q_NULLPTR)
+        if (next_traj == nullptr)
             break;
 
         // Добавляем к траекторной координате длину новой траектории,
@@ -328,16 +328,16 @@ void VehicleController::updateTrajectories()
         while (veh_device.coord > next_traj->getLength())
         {
             Connector *conn = next_traj->getFwdConnector();
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
-                next_traj = Q_NULLPTR;
+                next_traj = nullptr;
                 break;
             }
 
             veh_device.coord = veh_device.coord - next_traj->getLength();
 
             next_traj = conn->getFwdTraj();
-            if (next_traj == Q_NULLPTR)
+            if (next_traj == nullptr)
             {
                 break;
             }
@@ -346,14 +346,14 @@ void VehicleController::updateTrajectories()
         while (veh_device.coord < 0.0)
         {
             Connector *conn = next_traj->getBwdConnector();
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
-                next_traj = Q_NULLPTR;
+                next_traj = nullptr;
                 break;
             }
 
             next_traj = conn->getBwdTraj();
-            if (next_traj == Q_NULLPTR)
+            if (next_traj == nullptr)
             {
                 break;
             }
@@ -361,7 +361,7 @@ void VehicleController::updateTrajectories()
             veh_device.coord = veh_device.coord + next_traj->getLength();
         }
 
-        if (next_traj == Q_NULLPTR)
+        if (next_traj == nullptr)
             continue;
 
         for (auto traj_device : next_traj->getTrajectoryDevices())

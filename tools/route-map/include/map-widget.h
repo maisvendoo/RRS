@@ -23,25 +23,25 @@ class MapWidget : public QWidget
 
 public:
 
-    MapWidget(QWidget *parent = Q_NULLPTR);
+    MapWidget(QWidget *parent = nullptr);
 
     ~MapWidget();
 
-    traj_list_t *traj_list = Q_NULLPTR;
+    traj_list_t *traj_list = nullptr;
 
-    conn_list_t *conn_list = Q_NULLPTR;
+    conn_list_t *conn_list = nullptr;
 
-    simulator_update_players_t *players_data = Q_NULLPTR;
+    simulator_update_players_t *players_data = nullptr;
 
-    simulator_update_pos_t *train_data = Q_NULLPTR;
+    simulator_update_pos_t *train_data = nullptr;
 
-    std::vector<double> *vehicles_half_length = Q_NULLPTR;
+    std::vector<double> *vehicles_half_length = nullptr;
 
-    topology_stations_list_t *stations = Q_NULLPTR;
+    topology_stations_list_t *stations = nullptr;
 
     QMap<QString, SwitchLabel *> switch_labels;
 
-    signals_data_t *signals_data = Q_NULLPTR;
+    signals_data_t *signals_data = nullptr;
 
     QMap<QString, SignalLabel *> signal_labels_fwd;
 

@@ -18,7 +18,7 @@ class DEVICE_EXPORT BrakeCrane : public BrakeDevice
 {
 public:
 
-    BrakeCrane(QObject *parent = Q_NULLPTR);
+    BrakeCrane(QObject *parent = nullptr);
 
     ~BrakeCrane();
 

@@ -49,7 +49,7 @@ class TRAIN_EXPORT Train : public OdeSystem
 public:
 
     /// Constructor
-    explicit Train(QObject *parent = Q_NULLPTR);
+    explicit Train(QObject *parent = nullptr);
     /// Destructor
     virtual ~Train();
 
@@ -167,7 +167,7 @@ private:
     /// Solver's configuration
     solver_config_t solver_config;
 
-    Topology *topology = Q_NULLPTR;
+    Topology *topology = nullptr;
 
     /// Train's loading
     bool loadTrain(QString cfg_path, const init_data_t &init_data);

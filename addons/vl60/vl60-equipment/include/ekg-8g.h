@@ -13,7 +13,7 @@ class EKG_8G : public Device
 {
 public:
 
-    EKG_8G(QObject *parent = Q_NULLPTR);
+    EKG_8G(QObject *parent = nullptr);
 
     ~EKG_8G();
 

@@ -10,7 +10,7 @@ class CouplingSA3 : public Coupling
 {
 public:
 
-    CouplingSA3(QObject *parent = Q_NULLPTR);
+    CouplingSA3(QObject *parent = nullptr);
 
     ~CouplingSA3();
 

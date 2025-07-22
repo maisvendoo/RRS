@@ -85,12 +85,12 @@ void MapWidget::slotPlayerAtCenter(int idx)
 //------------------------------------------------------------------------------
 void MapWidget::paintEvent(QPaintEvent *event)
 {
-    if (traj_list == Q_NULLPTR)
+    if (traj_list == nullptr)
     {
         return;
     }
 
-    if (conn_list == Q_NULLPTR)
+    if (conn_list == nullptr)
     {
         return;
     }
@@ -100,7 +100,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         drawTrajectory(traj);
     }
 
-    if (train_data == Q_NULLPTR)
+    if (train_data == nullptr)
     {
         return;
     }
@@ -123,7 +123,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     drawSignals(signals_data);
 
-    if (stations == Q_NULLPTR)
+    if (stations == nullptr)
     {
         return;
     }
@@ -162,7 +162,7 @@ void MapWidget::drawTrajectory(Trajectory *traj)
 
     QLabel *traj_label = traj_labels.value(traj->getName());
 
-    if (traj_label != Q_NULLPTR)
+    if (traj_label != nullptr)
     {
         traj_label->move(pt);
 
@@ -249,7 +249,7 @@ void MapWidget::drawConnectors(conn_list_t *conn_list)
 //------------------------------------------------------------------------------
 void MapWidget::drawConnector(Connector *conn)
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
@@ -257,7 +257,7 @@ void MapWidget::drawConnector(Connector *conn)
     Trajectory *fwd_traj = conn->getFwdTraj();
     Trajectory *bwd_traj = conn->getBwdTraj();
 
-    if ( (fwd_traj == Q_NULLPTR) || (bwd_traj == Q_NULLPTR) )
+    if ( (fwd_traj == nullptr) || (bwd_traj == nullptr) )
     {
         return;
     }
@@ -282,16 +282,16 @@ void MapWidget::drawConnector(Connector *conn)
     painter.drawEllipse(center_point, r, r);
     painter.end();
 
-    SwitchLabel *sw_label = switch_labels.value(conn->getName(), Q_NULLPTR);
+    SwitchLabel *sw_label = switch_labels.value(conn->getName(), nullptr);
 
-    if (sw_label != Q_NULLPTR)
+    if (sw_label != nullptr)
     {
         sw_label->move(center_point);
         sw_label->show();
     }
 
     Switch *sw = dynamic_cast<Switch *>(conn);
-    if (sw != Q_NULLPTR)
+    if (sw != nullptr)
     {
         if (sw->getStateFwd() != 0)
         {
@@ -300,16 +300,16 @@ void MapWidget::drawConnector(Connector *conn)
             {
                 color = QColor(96, 96, 96);
 
-                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
-                    (sw_label->action_switch_fwd != Q_NULLPTR))
+                if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
+                    (sw_label->action_switch_fwd != nullptr))
                 {
                     sw_label->action_switch_fwd->setEnabled(false);
                 }
             }
             else
             {
-                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
-                    (sw_label->action_switch_fwd != Q_NULLPTR))
+                if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
+                    (sw_label->action_switch_fwd != nullptr))
                 {
                     sw_label->action_switch_fwd->setEnabled(true);
 
@@ -353,16 +353,16 @@ void MapWidget::drawConnector(Connector *conn)
             {
                 color = QColor(96, 96, 96);
 
-                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
-                    (sw_label->action_switch_bwd != Q_NULLPTR))
+                if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
+                    (sw_label->action_switch_bwd != nullptr))
                 {
                     sw_label->action_switch_bwd->setEnabled(false);
                 }
             }
             else
             {
-                if ((sw_label != Q_NULLPTR) && (sw_label->menu != Q_NULLPTR) &&
-                    (sw_label->action_switch_bwd != Q_NULLPTR))
+                if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
+                    (sw_label->action_switch_bwd != nullptr))
                 {
                     sw_label->action_switch_bwd->setEnabled(true);
 
@@ -428,7 +428,7 @@ void MapWidget::drawStations(topology_stations_list_t *stations)
 //------------------------------------------------------------------------------
 void MapWidget::drawSignals(signals_data_t *signals_data)
 {
-    if (signals_data == Q_NULLPTR)
+    if (signals_data == nullptr)
     {
         return;
     }
@@ -454,21 +454,21 @@ void MapWidget::drawSignals(signals_data_t *signals_data)
 //------------------------------------------------------------------------------
 void MapWidget::drawEnterSignal(Signal *signal)
 {
-    if (signal == Q_NULLPTR)
+    if (signal == nullptr)
     {
         return;
     }
 
     Connector *conn = signal->getConnector();
 
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
 
     dvec3 bottom_signal_pos;
     track_t track;
-    Trajectory *traj = Q_NULLPTR;
+    Trajectory *traj = nullptr;
 
     if (signal->getDirection() == 1)
     {
@@ -479,23 +479,23 @@ void MapWidget::drawEnterSignal(Signal *signal)
         traj = conn->getFwdTraj();
     }
 
-    if (traj == Q_NULLPTR)
+    if (traj == nullptr)
     {
         return;
     }
 
-    SignalLabel *signal_label = Q_NULLPTR;
+    SignalLabel *signal_label = nullptr;
     if (signal->getDirection() == 1)
     {
         track = traj->getLastTrack();
         bottom_signal_pos = track.end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), Q_NULLPTR);
+        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
     }
     else
     {
         track = traj->getFirstTrack();
         bottom_signal_pos = track.begin_point;
-        signal_label = signal_labels_bwd.value(conn->getName(), Q_NULLPTR);
+        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
     }
 
     double radius = signal_radius;
@@ -523,7 +523,7 @@ void MapWidget::drawEnterSignal(Signal *signal)
     QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
     QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
 
-    if (signal_label != Q_NULLPTR)
+    if (signal_label != nullptr)
     {
         QPoint label_p = coord_transform(label_pos);
         label_p.setX(label_p.x() - signal_label->width() / 2);
@@ -591,21 +591,21 @@ void MapWidget::drawEnterSignal(Signal *signal)
 //------------------------------------------------------------------------------
 void MapWidget::drawExitSignal(Signal *signal)
 {
-    if (signal == Q_NULLPTR)
+    if (signal == nullptr)
     {
         return;
     }
 
     Connector *conn = signal->getConnector();
 
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
 
     dvec3 bottom_signal_pos;
     track_t track;
-    Trajectory *traj = Q_NULLPTR;
+    Trajectory *traj = nullptr;
 
     if (signal->getDirection() == 1)
     {
@@ -616,23 +616,23 @@ void MapWidget::drawExitSignal(Signal *signal)
         traj = conn->getFwdTraj();
     }
 
-    if (traj == Q_NULLPTR)
+    if (traj == nullptr)
     {
         return;
     }
 
-    SignalLabel *signal_label = Q_NULLPTR;
+    SignalLabel *signal_label = nullptr;
     if (signal->getDirection() == 1)
     {
         track = traj->getLastTrack();
         bottom_signal_pos = track.end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), Q_NULLPTR);
+        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
     }
     else
     {
         track = traj->getFirstTrack();
         bottom_signal_pos = track.begin_point;
-        signal_label = signal_labels_bwd.value(conn->getName(), Q_NULLPTR);
+        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
     }
 
     double radius = signal_radius;
@@ -656,7 +656,7 @@ void MapWidget::drawExitSignal(Signal *signal)
     QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
     QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
 
-    if (signal_label != Q_NULLPTR)
+    if (signal_label != nullptr)
     {
         QPoint label_p = coord_transform(label_pos);
         label_p.setX(label_p.x() - signal_label->width() / 2);
@@ -708,7 +708,7 @@ void MapWidget::drawExitSignal(Signal *signal)
 //------------------------------------------------------------------------------
 void MapWidget::drawLineSignal(Signal *signal)
 {
-    if (signal == Q_NULLPTR)
+    if (signal == nullptr)
     {
         return;
     }
@@ -720,14 +720,14 @@ void MapWidget::drawLineSignal(Signal *signal)
 
     Connector *conn = signal->getConnector();
 
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
 
     dvec3 bottom_signal_pos;
     track_t track;
-    Trajectory *traj = Q_NULLPTR;
+    Trajectory *traj = nullptr;
 
     if (signal->getDirection() == 1)
     {
@@ -738,23 +738,23 @@ void MapWidget::drawLineSignal(Signal *signal)
         traj = conn->getFwdTraj();
     }
 
-    if (traj == Q_NULLPTR)
+    if (traj == nullptr)
     {
         return;
     }
 
-    SignalLabel *signal_label = Q_NULLPTR;
+    SignalLabel *signal_label = nullptr;
     if (signal->getDirection() == 1)
     {
         track = traj->getLastTrack();
         bottom_signal_pos = track.end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), Q_NULLPTR);
+        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
     }
     else
     {
         track = traj->getFirstTrack();
         bottom_signal_pos = track.begin_point;
-        signal_label = signal_labels_bwd.value(conn->getName(), Q_NULLPTR);
+        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
     }
 
     double radius = signal_radius;
@@ -778,7 +778,7 @@ void MapWidget::drawLineSignal(Signal *signal)
     QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
     QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
 
-    if (signal_label != Q_NULLPTR)
+    if (signal_label != nullptr)
     {
         QPoint label_p = coord_transform(label_pos);
         label_p.setX(label_p.x() - signal_label->width() / 2);

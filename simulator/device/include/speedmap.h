@@ -11,7 +11,7 @@ class DEVICE_EXPORT SpeedMap : public Device
 public:
 
     /// Конструктор
-    SpeedMap(QObject *parent = Q_NULLPTR);
+    SpeedMap(QObject *parent = nullptr);
 
     /// Деструктор
     ~SpeedMap();

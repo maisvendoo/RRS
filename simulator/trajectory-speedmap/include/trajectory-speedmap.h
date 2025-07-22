@@ -10,7 +10,7 @@ class TrajectorySpeedMap : public TrajectoryDevice
 {
 public:
 
-    TrajectorySpeedMap(QObject *parent = Q_NULLPTR);
+    TrajectorySpeedMap(QObject *parent = nullptr);
 
     ~TrajectorySpeedMap();
 

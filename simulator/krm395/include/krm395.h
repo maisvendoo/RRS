@@ -32,7 +32,7 @@ class BrakeCrane395 : public BrakeCrane
 
 public:
 
-    BrakeCrane395(QObject *parent = Q_NULLPTR);
+    BrakeCrane395(QObject *parent = nullptr);
 
     ~BrakeCrane395();
 
