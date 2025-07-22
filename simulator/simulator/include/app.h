@@ -62,7 +62,7 @@ private:
 
 
     /// Command line parsing
-    CommandLineParesrResult parseCommandLine(QCommandLineParser &parser,
+    CommandLineParserResult parseCommandLine(QCommandLineParser &parser,
                                              simulator_command_line_t &command_line,
                                              QString &errorMessage);
 };

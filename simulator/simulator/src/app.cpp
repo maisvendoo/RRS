@@ -132,7 +132,7 @@ bool AppCore::notify(QObject *receiver, QEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
+CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
                                                   simulator_command_line_t &command_line,
                                                   QString &errorMessage)
 {

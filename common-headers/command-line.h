@@ -13,10 +13,8 @@
  * \date 01/09/2018
  */
 
-#ifndef     COMMAND_LINE_H
-#define     COMMAND_LINE_H
-
-#include    <QString>
+#ifndef COMMAND_LINE_H
+#define COMMAND_LINE_H
 
 /*!
  * \struct
@@ -26,15 +24,10 @@
 //
 //------------------------------------------------------------------------------
 template <class T>
-struct option_t
+struct option_t final
 {
     T value = T();
     bool is_present = false;
-
-    option_t()
-    {
-
-    }
 };
 
 /*!
@@ -44,7 +37,7 @@ struct option_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-enum CommandLineParesrResult
+enum CommandLineParserResult
 {
     CommandLineOk,
     CommandLineError,

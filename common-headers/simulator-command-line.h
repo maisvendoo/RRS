@@ -1,12 +1,16 @@
-#ifndef		SIMULATOR_COMMAND_LINE
-#define		SIMULATOR_COMMAND_LINE
+#ifndef SIMULATOR_COMMAND_LINE
+#define SIMULATOR_COMMAND_LINE
 
-#include    "command-line.h"
+#include "command-line.h"
+
+#include <QString>
+
+#include <vector>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_command_line_t
+struct simulator_command_line_t final
 {
     /// Route directory
     option_t<QString>   route_dir;

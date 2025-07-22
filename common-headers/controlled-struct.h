@@ -1,26 +1,23 @@
-#ifndef     CLIENT_CONTROL_STRUCT_H
-#define     CLIENT_CONTROL_STRUCT_H
+#ifndef CLIENT_CONTROL_STRUCT_H
+#define CLIENT_CONTROL_STRUCT_H
 
-#include    <QByteArray>
-#include    <QBuffer>
-#include    <QDataStream>
+#include <QBuffer>
+#include <QByteArray>
+#include <QDataStream>
+
+#include <cstdint>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct controlled_t
+struct controlled_t final
 {
     int controlled_vehicle = -1;
     int current_vehicle = -1;
-    uint32_t cabine_idx = 0;
-    std::vector<int> pressed_keys = {};
+    std::uint32_t cabine_idx = 0;
+    std::vector<int> pressed_keys;
 
-    controlled_t()
-    {
-
-    }
-
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
@@ -30,7 +27,7 @@ struct controlled_t
         stream << controlled_vehicle;
         stream << current_vehicle;
         stream << cabine_idx;
-        stream << static_cast<uint32_t>(pressed_keys.size());
+        stream << static_cast<std::uint32_t>(pressed_keys.size());
 
         for (auto key_id : pressed_keys)
         {
@@ -40,7 +37,7 @@ struct controlled_t
         return buff.data();
     }
 
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
@@ -50,13 +47,13 @@ struct controlled_t
         stream >> current_vehicle;
         stream >> cabine_idx;
 
-        uint32_t num;
+        std::uint32_t num;
         stream >> num;
 
         pressed_keys.clear();
         pressed_keys.resize(num);
 
-        for (uint32_t i = 0; i < num; ++i)
+        for (std::uint32_t i = 0; i < num; ++i)
         {
             stream >> pressed_keys[i];
         }

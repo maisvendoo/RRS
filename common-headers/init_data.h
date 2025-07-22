@@ -16,9 +16,9 @@
 #ifndef     INIT_DATA_H
 #define     INIT_DATA_H
 
-#include    <QString>
-
 #include    "solver-config.h"
+
+#include    <QString>
 
 /*!
  * \struct
@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct init_data_t
+struct init_data_t final
 {
     QString route_dir_name = "experimental-polygon";
     QString train_config = "vl60pk-1543";
@@ -39,7 +39,7 @@ struct init_data_t
     int     integration_time_interval = 15;
     int     control_time_interval = 15;
     bool    debug_print = false;
-    solver_config_t solver_config = solver_config_t();
+    solver_config_t solver_config;
 };
 
 #endif // INIT_DATA_H

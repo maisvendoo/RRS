@@ -9,16 +9,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_route_info_t
+struct simulator_route_info_t final
 {
-    QString route_dir_name = "";
+    QString route_dir_name;
 
-    simulator_route_info_t()
-    {
-
-    }
-
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
@@ -30,7 +25,7 @@ struct simulator_route_info_t
         return buff.data();
     }
 
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
@@ -46,15 +41,10 @@ struct simulator_route_info_t
 struct simulator_vehicle_info_t
 {
     double vehicle_length = 10.0;
-    QString vehicle_config_dir = "";
-    QString vehicle_config_file = "";
+    QString vehicle_config_dir;
+    QString vehicle_config_file;
 
-    simulator_vehicle_info_t()
-    {
-
-    }
-
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
@@ -68,7 +58,7 @@ struct simulator_vehicle_info_t
         return buff.data();
     }
 
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
         QBuffer buff(&data);
         buff.open(QIODevice::ReadOnly);
@@ -83,27 +73,22 @@ struct simulator_vehicle_info_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_vehicles_info_t
+struct simulator_vehicles_info_t final
 {
     std::vector<simulator_vehicle_info_t> vehicles;
 
-    simulator_vehicles_info_t()
-    {
-
-    }
-
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << static_cast<uint32_t>(vehicles.size());
+        stream << static_cast<std::uint32_t>(vehicles.size());
 
-        for (auto veh : vehicles)
+        for (const auto& vehicle : vehicles)
         {
-            stream << veh.serialize();
+            stream << vehicle.serialize();
         }
 
         return buff.data();
@@ -121,7 +106,7 @@ struct simulator_vehicles_info_t
         vehicles.clear();
         vehicles.resize(num);
 
-        for (uint32_t i = 0; i < vehicles.size(); ++i)
+        for (std::uint32_t i = 0; i < vehicles.size(); ++i)
         {
             QByteArray vehicle_data;
             stream >> vehicle_data;
