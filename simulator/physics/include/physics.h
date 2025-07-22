@@ -35,23 +35,23 @@ class PHYSICS_EXPORT Physics
 public:
 
     /// Earth gravity acceleration
-    static const double g;
+    static constexpr double g = 9.81;
     /// Normal atmosphere pressure
-    static const double pA;
+    static constexpr double pA = 101325.0;
     /// Kilometers per hour coefficient
-    static const double kmh;
+    static constexpr double kmh = 3.6;
     /// PI number
-    static const double PI;
+    static constexpr double PI = 3.1415926;
     /// Megapascales coefficient
-    static const double MPa;
+    static constexpr double MPa = 1.0e6;
     /// Universal gas constant
-    static const double Rmu;
+    static constexpr double Rmu = 8.31;
     /// Molar mass of air
-    static const double Mair;
+    static constexpr double Mair = 0.029;
     /// Sound speed
-    static const double c;
+    static constexpr double c = 340.0;
     /// Zero equivalent
-    static const double ZERO;
+    static constexpr double ZERO = 1.0e-10;
 
     /*!
      * \brief Signum function
@@ -72,14 +72,8 @@ public:
 
     static double gapMotion(double x, double a);
 
-    /// Constructor
-    Physics(){}
-    /// Destructor
-    ~Physics(){}
-
 private:
-
-    static const double FricApproxCoeff;
+    static constexpr double FricApproxCoeff = 100.0;
 };
 
 #endif // PHYSICS_H
