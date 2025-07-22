@@ -5,29 +5,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDistributor::AirDistributor(QObject *parent) : BrakeDevice(parent)
-  , pBP(0.0)
-  , pBC(0.0)
-  , pSR(0.0)
-  , QBP(0.0)
-  , QBC(0.0)
-  , QSR(0.0)
+AirDistributor::AirDistributor(QObject* parent) : BrakeDevice(parent)
 {
-
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDistributor::~AirDistributor()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void AirDistributor::setBPpressure(double value)
+void AirDistributor::setBPpressure(double value) noexcept
 {
     pBP = value;
 }
@@ -35,7 +20,7 @@ void AirDistributor::setBPpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AirDistributor::getBPflow() const
+double AirDistributor::getBPflow() const noexcept
 {
     return QBP;
 }
@@ -43,7 +28,7 @@ double AirDistributor::getBPflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDistributor::setBCpressure(double value)
+void AirDistributor::setBCpressure(double value) noexcept
 {
     pBC = value;
 }
@@ -51,7 +36,7 @@ void AirDistributor::setBCpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AirDistributor::getBCflow() const
+double AirDistributor::getBCflow() const noexcept
 {
     return QBC;
 }
@@ -59,7 +44,7 @@ double AirDistributor::getBCflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDistributor::setSRpressure(double value)
+void AirDistributor::setSRpressure(double value) noexcept
 {
     pSR = value;
 }
@@ -67,7 +52,7 @@ void AirDistributor::setSRpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AirDistributor::getSRflow() const
+double AirDistributor::getSRflow() const noexcept
 {
     return QSR;
 }
@@ -75,9 +60,9 @@ double AirDistributor::getSRflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDistributor *loadAirDistributor(QString lib_path)
+AirDistributor* loadAirDistributor(QString lib_path)
 {
-    AirDistributor *airdist = nullptr;
+    AirDistributor* airdist = nullptr;
 
     QLibrary lib(lib_path);
 

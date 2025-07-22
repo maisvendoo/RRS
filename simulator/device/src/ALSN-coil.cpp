@@ -7,9 +7,9 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CoilALSN::CoilALSN(QObject *parent) : Device(parent)
+CoilALSN::CoilALSN(QObject* parent) : Device(parent)
 {
-    name = QString("ALSN");
+    name = "ALSN";
 
     input_signals.resize(SIZE_OF_INPUTS);
     output_signals.resize(SIZE_OF_OUTPUTS);
@@ -24,20 +24,16 @@ CoilALSN::CoilALSN(QObject *parent) : Device(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CoilALSN::~CoilALSN()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void CoilALSN::setDirection(int direction)
 {
     if (direction == 1)
+    {
         output_signals[OUTPUT_DIRECTION] = 1.0;
-    if (direction == -1)
+    }
+    else if (direction == -1)
+    {
         output_signals[OUTPUT_DIRECTION] = -1.0;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -45,11 +41,8 @@ void CoilALSN::setDirection(int direction)
 //------------------------------------------------------------------------------
 double CoilALSN::getFrequency() const
 {
-    if (is_linked)
-        return input_signals[INPUT_FREQUENCY];
-
     // Если нет рельсовой цепи АЛСН, возвращаем 0
-    return 0.0;
+    return is_linked ? input_signals[INPUT_FREQUENCY] : 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -60,11 +53,19 @@ ALSN CoilALSN::getCode() const
     if (is_linked)
     {
         if (input_signals[INPUT_CODE] == static_cast<double>(ALSN::RED_YELLOW))
+        {
             return ALSN::RED_YELLOW;
+        }
+
         if (input_signals[INPUT_CODE] == static_cast<double>(ALSN::YELLOW))
+        {
             return ALSN::YELLOW;
+        }
         if (input_signals[INPUT_CODE] == static_cast<double>(ALSN::GREEN))
+        {
             return ALSN::GREEN;
+        }
+
         return ALSN::NO_CODE;
     }
 
@@ -77,17 +78,14 @@ ALSN CoilALSN::getCode() const
 //------------------------------------------------------------------------------
 double CoilALSN::getNextSignalDistance() const
 {
-    if (is_linked)
-        return input_signals[INPUT_NEXT_DISTANCE];
-
     // Если нет рельсовой цепи АЛСН, возвращаем 0
-    return 0.0;
+    return is_linked ? input_signals[INPUT_NEXT_DISTANCE] : 0.0;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString CoilALSN::getNextSignalLiter() const
+QString CoilALSN::getNextSignalLiter() const noexcept
 {
     return next_liter;
 }

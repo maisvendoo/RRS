@@ -6,16 +6,11 @@
 class DEVICE_EXPORT BrakeDevice : public Device
 {
 public:
+    BrakeDevice(QObject* parent = nullptr);
 
-    BrakeDevice(QObject *parent = Q_NULLPTR);
-
-    virtual ~BrakeDevice();
+    virtual ~BrakeDevice() noexcept = default;
 
     virtual void init(double pBP, double pFL);
-
-protected:
-
-
 };
 
 #endif // BRAKE_DEVICE_H

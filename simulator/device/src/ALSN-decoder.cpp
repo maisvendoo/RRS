@@ -3,15 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-DecoderALSN::DecoderALSN(QObject *parent) : Device(parent)
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-DecoderALSN::~DecoderALSN()
+DecoderALSN::DecoderALSN(QObject* parent) : Device(parent)
 {
 
 }
@@ -29,7 +21,7 @@ void DecoderALSN::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void DecoderALSN::setCoilSignal(ALSN code)
+void DecoderALSN::setCoilSignal(ALSN code) noexcept
 {
     last_code = code;
 }
@@ -76,19 +68,19 @@ void DecoderALSN::slotOnUpdateTimer()
     // Полученный с катушки код отличается от текущего
     if (current_code != last_code)
     {
-        for (size_t i = 0; i < recv_codes.size() - 1; ++i)
+        for (std::size_t i = 0; i < recv_codes.size() - 1; ++i)
         {
             // Сдвигаем ранее принятые значения
             recv_codes[i] = recv_codes[i+1];
         }
 
         // Записываем в хвост массива новое значение
-        *(recv_codes.end() - 1) = last_code;
+        recv_codes.back() = last_code;
     }
 
-    if ( *(recv_codes.end() - 1) ==  *(recv_codes.end() - 2))
+    if ( recv_codes.back() ==  *(recv_codes.end() - 2))
     {
-        current_code = *(recv_codes.end() - 1);
+        current_code = recv_codes.back();
     }
 }
 
