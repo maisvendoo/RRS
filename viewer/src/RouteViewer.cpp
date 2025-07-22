@@ -505,7 +505,12 @@ void RouteViewer::initLights()
     sun = vsg::DirectionalLight::create();
     sun->color = vsg::vec3(settings.sun_color);
     sun->intensity = static_cast<float>(settings.sun_intensity);
-    sun->direction = vsg::normalize(settings.sun_direction);
+    vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
+    float azimuth_radian = vsg::radians(static_cast<float>(settings.sun_azimuth));
+    float altitude_radian = vsg::radians(static_cast<float>(settings.sun_altitude));
+    vsg::mat4 rotate_azimuth = vsg::rotate(azimuth_radian, 0.0f, 0.0f, 1.0f);
+    vsg::mat4 rotate_altitude = vsg::rotate(altitude_radian, 1.0f, 0.0f, 0.0f);
+    sun->direction = vsg::normalize(sun_direction * rotate_azimuth * rotate_altitude);
     sun->shadowSettings = shadowSettings;
     root->addChild(sun);
 }
@@ -540,6 +545,8 @@ void RouteViewer::initCommandGraph()
     GUIparams->sun_color = sun->color.data();
     GUIparams->sun_direction_d = &sun->direction;
     GUIparams->sun_intensity = &sun->intensity;
+    GUIparams->sun_azimuth_degrees = static_cast<float>(settings.sun_azimuth);
+    GUIparams->sun_altitude_degrees = static_cast<float>(settings.sun_altitude);
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
@@ -626,27 +633,20 @@ bool RouteViewer::loadRoute()
     settings.route_dir_full_path = route_dir_path;
 
     // Модель неба
-    std::string skybox_model_filepath = fs.combinePath(route_dir_path, "models");
-    skybox_model_filepath = fs.combinePath(skybox_model_filepath, "sky.gltf");
-
-    std::vector<std::string> skybox_texture_filepath;
-    for (auto& filename : settings.skybox_textures)
-    {
-        std::string texture_filepath = fs.combinePath(route_dir_path, "textures");
-        texture_filepath = fs.combinePath(texture_filepath, filename);
-        skybox_texture_filepath.push_back(texture_filepath);
-    }
-
-    Skybox skybox(skybox_model_filepath, skybox_texture_filepath, options);
+    const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
+    Skybox skybox(cfg_path, options);
     GUIparams->skybox_texture_data = skybox.getDefaultTexture();
     GUIparams->skybox_textures = skybox.getTextures();
-    root->addChild(skybox.getNode());
+    if (skybox.getNode())
+    {
+        root->addChild(skybox.getNode());
 #if 0
         // запись неба в файл
         std::string file;
         file = route_dir_path + fs.separator() + "~loaded_skybox.vsgt";
         vsg::write(skybox.getNode(), file, options);
 #endif
+    }
 
     // Загрузка информации о моделях в маршруте
     Route route;

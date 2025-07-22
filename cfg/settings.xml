@@ -66,7 +66,9 @@
         <SunIntensity>5.0</SunIntensity>
         <!-- Цвет солнечного освещения (RGB, 0.0 - 1.0) -->
         <SunColor>1.0 1.0 1.0</SunColor>
-        <!-- Направление солнечного освещения (XYZ) -->
-        <SunDirection>1.0 1.0 -1.0</SunDirection>
+        <!-- Направление (азимут) солнечного освещения, град. -->
+        <SunAzimuth>45</SunAzimuth>
+        <!-- Высота солнечного освещения над горизонтом, град. -->
+        <SunAltitude>45</SunAltitude>
     </Viewer>
 </Config>

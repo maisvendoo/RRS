@@ -62,6 +62,11 @@ public:
     {
     }
 
+    constexpr int32_t data() const
+    {
+        return date_data;
+    }
+
     /// Год
     std::int16_t year() const noexcept
     {
@@ -145,6 +150,36 @@ public:
     }
 };
 
+constexpr bool operator==(const server_date_t& lhs, const server_date_t& rhs)
+{
+    return lhs.data() == rhs.data();
+}
+
+constexpr bool operator!=(const server_date_t& lhs, const server_date_t& rhs)
+{
+    return lhs.data() != rhs.data();
+}
+
+constexpr bool operator>(const server_date_t& lhs, const server_date_t& rhs)
+{
+    return lhs.data() > rhs.data();
+}
+
+constexpr bool operator>=(const server_date_t& lhs, const server_date_t& rhs)
+{
+    return lhs.data() >= rhs.data();
+}
+
+constexpr bool operator<(const server_date_t& lhs, const server_date_t& rhs)
+{
+    return lhs.data() < rhs.data();
+}
+
+constexpr bool operator<=(const server_date_t& lhs, const server_date_t& rhs)
+{
+    return lhs.data() <= rhs.data();
+}
+
 //------------------------------------------------------------------------------
 // Структура для хранения времени суток сервера RRS
 //------------------------------------------------------------------------------
@@ -162,6 +197,11 @@ public:
         time_unit_since_midnight += TIMEUNIT_MULTIPLIER_SEC * ((sec < 60) ? sec : 59);
         time_unit_since_midnight += TIMEUNIT_MULTIPLIER_MIN * ((minute < 60) ? minute : 59);
         time_unit_since_midnight += TIMEUNIT_MULTIPLIER_HOUR * ((hour < 24) ? hour : 23);
+    }
+
+    constexpr int32_t data() const
+    {
+        return time_unit_since_midnight;
     }
 
     /// Час
@@ -242,6 +282,36 @@ public:
         stream >> time_unit_since_midnight;
     }
 };
+
+constexpr bool operator==(const server_time_t& lhs, const server_time_t& rhs)
+{
+    return lhs.data() == rhs.data();
+}
+
+constexpr bool operator!=(const server_time_t& lhs, const server_time_t& rhs)
+{
+    return lhs.data() != rhs.data();
+}
+
+constexpr bool operator>(const server_time_t& lhs, const server_time_t& rhs)
+{
+    return lhs.data() > rhs.data();
+}
+
+constexpr bool operator>=(const server_time_t& lhs, const server_time_t& rhs)
+{
+    return lhs.data() >= rhs.data();
+}
+
+constexpr bool operator<(const server_time_t& lhs, const server_time_t& rhs)
+{
+    return lhs.data() < rhs.data();
+}
+
+constexpr bool operator<=(const server_time_t& lhs, const server_time_t& rhs)
+{
+    return lhs.data() <= rhs.data();
+}
 
 //------------------------------------------------------------------------------
 // Структура для хранения времени симуляции сервера RRS
