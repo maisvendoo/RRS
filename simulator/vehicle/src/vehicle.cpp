@@ -191,7 +191,7 @@ void Vehicle::setReactiveCommonForce(size_t idx, double value)
 //------------------------------------------------------------------------------
 void Vehicle::setPayloadCoeff(double payload_coeff)
 {
-    this->payload_coeff = Physics::cut(payload_coeff, 0.0, 1.0);
+    this->payload_coeff = std::clamp(payload_coeff, 0.0, 1.0);
     full_mass = empty_mass + payload_mass * this->payload_coeff;
 }
 
@@ -870,7 +870,7 @@ void Vehicle::addRailwayConnector(Device *device, double distance_from_center)
 {
     device_coord_t dc;
     dc.device = device;
-    dc.coord = cut(distance_from_center, -length / 2.0, length / 2.0);
+    dc.coord = std::clamp(distance_from_center, -length / 2.0, length / 2.0);
     railway_connectors.push_back(dc);
 }
 

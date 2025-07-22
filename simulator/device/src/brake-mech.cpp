@@ -170,7 +170,7 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Рассчитываем положение штока
-    stock_out_coeff = cut((Y[0] - p_begin) / (p_end - p_begin), 0.0, 1.0);
+    stock_out_coeff = std::clamp((Y[0] - p_begin) / (p_end - p_begin), 0.0, 1.0);
     stock_out_cur = stock_out_coeff * stock_out_max;
 
     // Если шток вышел полностью - считаем тормозное нажатие

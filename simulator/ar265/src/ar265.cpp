@@ -46,16 +46,16 @@ void AutoMode265::preStep(state_vector_t &Y, double t)
     // Y[1] - положение демпферного поршня
 
     // Положение демпферного поршня относительно пределов чувствительности
-    double poz = cut((Y[DEMPFER_LEVEL] - payload_min) / (payload_max - payload_min), 0.0, 1.0);
+    double poz = std::clamp((Y[DEMPFER_LEVEL] - payload_min) / (payload_max - payload_min), 0.0, 1.0);
     // Коэффициент уменьшения давления в ТЦ
     double red_coeff = reduction_min + (reduction_max - reduction_min) * poz;
 
     // Разница давления в ТЦ и требуемого давления в ТЦ
     double bc_diff = A * (red_coeff * Y[AUTO_MODE_WORK_PRESSURE] - pBC);
     // Расход воздуха из камеры в ТЦ
-    double Qto_bc = cut(bc_diff, 0.0, coeffAirFlow) * pf(Y[AUTO_MODE_WORK_PRESSURE] - pBC);
+    double Qto_bc = std::clamp(bc_diff, 0.0, coeffAirFlow) * pf(Y[AUTO_MODE_WORK_PRESSURE] - pBC);
     // Расход воздуха из ТЦ в атмосферу
-    double Qfrom_bc = cut(-bc_diff, 0.0, coeffAirFlow) * pBC;
+    double Qfrom_bc = std::clamp(-bc_diff, 0.0, coeffAirFlow) * pBC;
 
     // Итоговый расход воздуха в ТЦ
     QBC = Qto_bc - Qfrom_bc;

@@ -57,7 +57,7 @@ void Battery::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    Y[0] = cut(Y[0], 0.0, Emax);
+    Y[0] = std::clamp(Y[0], 0.0, Emax);
 
     if (U_gen <= Y[0])
     {

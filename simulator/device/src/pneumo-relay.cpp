@@ -118,10 +118,10 @@ void PneumoRelay::preStep(state_vector_t &Y, double t)
     double s1 = A1 * dead_zone(Y[0] - pPIPE, -eps, eps);
 
     // Поток из питательной магистрали в управляемую
-    double Q_fl_pipe = cut(s1, 0.0, K1) * (pFL - pPIPE);
+    double Q_fl_pipe = std::clamp(s1, 0.0, K1) * (pFL - pPIPE);
 
     // Разрядка управляемой магистрали в атмосферу
-    double Q_pipe_atm = cut(-s1, 0.0, K2) * pPIPE;
+    double Q_pipe_atm = std::clamp(-s1, 0.0, K2) * pPIPE;
 
     // Поток в питательную магистраль
     QFL = - Q_fl_pipe;

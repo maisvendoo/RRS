@@ -91,7 +91,7 @@ void PneumoReducer::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
 
     // Клапан наполнения управляемой камеры
-    double v = cut(kv * (pREF - Y[0]), 0.0, Kflow);
+    double v = std::clamp(kv * (pREF - Y[0]), 0.0, Kflow);
 
     // Поток из входящей магистрали в управляемую камеру
     QIN = -v * (pIN - Y[0]);

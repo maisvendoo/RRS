@@ -159,7 +159,7 @@ void VL60k::stepTractionControl(double t, double dt)
     motor[TED6]->setU(vu[VU2]->getU_out() * static_cast<double>(linear_contactor[TED6]->getContactState(LC_TED)));
 
     // Полярность включения ТЭД
-    int motor_dir = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
+    int motor_dir = std::clamp(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
 
     double I_vu = 0.0;
 
@@ -192,7 +192,7 @@ void VL60k::stepLineContactors(double t, double dt)
     (void) t;
     (void) dt;
 
-    int revers_state = cut(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
+    int revers_state = std::clamp(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
 
     bool is_KM_ZERO = controller[CAB1]->getState().pos_state[POS_ZERO] && controller[CAB2]->getState().pos_state[POS_ZERO];
 

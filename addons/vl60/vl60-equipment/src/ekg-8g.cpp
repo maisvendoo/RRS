@@ -254,7 +254,7 @@ void EKG_8G::slotPosSwitch()
     // Набирам/сбрасываем позицию
     position += dir;
 
-    position = cut(position, 0, static_cast<int>(NUM_POSITIONS - 1));
+    position = std::clamp(position, 0, static_cast<int>(NUM_POSITIONS - 1));
 
     // Озвучка
     if ( (position != 0) && (position != NUM_POSITIONS - 1) )

@@ -51,16 +51,16 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     double s1 = dead_zone((pSR - pBP), s1_min, s1_max);
 
     // Отжатие полого стержня от уплотнения на выпускном клапане (наполнение ТЦ)
-    double v11 = cut(A[1] * s1, 0.0, 1.0);
+    double v11 = std::clamp(A[1] * s1, 0.0, 1.0);
 
     // Открытие клапана дополнительной разрядки тормозной магистрали
-    double v12 = cut(A[2] * s1, 0.0, 1.0);
+    double v12 = std::clamp(A[2] * s1, 0.0, 1.0);
 
     // Открытие выпускного клапана
-    double v1 = cut(-A[3] * s1, 0.0, 1.0);
+    double v1 = std::clamp(-A[3] * s1, 0.0, 1.0);
 
     // Клапаны поршня в камере У2
-    double v2 = cut(A[4] * (pu2 - pBC), 0.0, 1.0);
+    double v2 = std::clamp(A[4] * (pu2 - pBC), 0.0, 1.0);
 
     // Тормозной клапан с учётом режимов торможения/отпуска "К" и "Д"
     double vb = static_cast<double>((!long_train_mode) || (pBC < pbv));

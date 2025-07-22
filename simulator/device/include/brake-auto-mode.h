@@ -20,12 +20,12 @@ class DEVICE_EXPORT BrakeAutoMode : public BrakeDevice
 {
 public:
 
-    BrakeAutoMode(QObject *parent = nullptr);
+    BrakeAutoMode(QObject *parent = Q_NULLPTR);
 
     virtual ~BrakeAutoMode();
 
     /// Задать уровень сжатия штока авторежима (уровень загрузки вагона), 0..1
-    void setPayloadCoeff(double value) { payload_coeff = cut(value, 0.0, 1.0); }
+    void setPayloadCoeff(double value) { payload_coeff = std::clamp(value, 0.0, 1.0); }
 
     /// Задать поток от воздухораспределителя
     void setAirDistBCflow(double value);

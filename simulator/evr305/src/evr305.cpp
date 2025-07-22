@@ -47,9 +47,9 @@ void EVR305::ode_system(const state_vector_t &Y,
     double ut = static_cast<double>(valve_state[BRAKE_VALVE]);
 
     // Поток воздуха из ЗР в РК (включены оба вентиля)
-    double Q_sr_work = up * ut * cut(A[1] * (pSR - Y[WORK_PRESSURE]), 0.0, K[1]);
+    double Q_sr_work = up * ut * std::clamp(A[1] * (pSR - Y[WORK_PRESSURE]), 0.0, K[1]);
     // Поток воздуха из РК в атмосферу (отпускной вентиль выключен)
-    double Q_work_atm = (1.0 - up) * cut(A[1] * (Y[WORK_PRESSURE]), 0.0, K[2]);
+    double Q_work_atm = (1.0 - up) * std::clamp(A[1] * (Y[WORK_PRESSURE]), 0.0, K[2]);
 
     // Давления на переключательном клапане
     double p1 = zpk->getPressure1();
@@ -59,9 +59,9 @@ void EVR305::ode_system(const state_vector_t &Y,
     double s = A[2] * (Y[WORK_PRESSURE] - p1);
 
     // Поток воздуха на заполнение ТЦ
-    double Q_sr_bc = cut(s, 0.0, K[3]) * (pSR - p1);
+    double Q_sr_bc = std::clamp(s, 0.0, K[3]) * (pSR - p1);
     // Поток воздуха на опорожнение ТЦ
-    double Q_bc_atm = cut(-s, 0.0, K[4]) * p1;
+    double Q_bc_atm = std::clamp(-s, 0.0, K[4]) * p1;
 
     // Работа с ТЦ через переключательный клапан
     zpk->setInputFlow1(Q_sr_bc - Q_bc_atm);

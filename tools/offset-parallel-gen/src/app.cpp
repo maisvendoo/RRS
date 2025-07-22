@@ -403,8 +403,8 @@ void Application::generate_topology(const QString &route_dir)
         return;
     }
 
-    begin_track = cut(begin_track, 0, static_cast<int>(zds_tracks.size()) - 1);
-    end_track = cut(end_track, 0, static_cast<int>(zds_tracks.size()) - 1);
+    begin_track = std::clamp(begin_track, 0, static_cast<int>(zds_tracks.size()) - 1);
+    end_track = std::clamp(end_track, 0, static_cast<int>(zds_tracks.size()) - 1);
     if (begin_track > end_track)
     {
         int tmp = begin_track;

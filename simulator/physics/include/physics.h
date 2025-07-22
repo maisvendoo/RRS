@@ -61,22 +61,6 @@ public:
     static double sign(double x);
 
     /*!
-     * \fn
-     * \brief Cut value by range
-     */
-    template <typename T>
-    static T cut(T value, T min, T max)
-    {
-        if (value < min)
-            return min;
-
-        if (value > max)
-            return max;
-
-        return value;
-    }
-
-    /*!
      * \brief Calculate friction force as active force
      * \param Fmax - maximal friction force value
      * \param v - relative slip velocity
