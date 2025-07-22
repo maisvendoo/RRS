@@ -16,6 +16,20 @@
 #define TIMEUNIT_MULTIPLIER_SEC     (TIMEUNIT_MULTIPLIER)
 #define TIMEUNIT_MULTIPLIER_MSEC    (TIMEUNIT_MULTIPLIER / 1000)
 
+static constexpr std::uint8_t days_in_month_nleap[12] = {
+    31, 28, 31,
+    30, 31, 30,
+    31, 31, 30,
+    31, 30, 31
+};
+
+static constexpr std::uint8_t days_in_month_leap[12] = {
+    31, 29, 31,
+    30, 31, 30,
+    31, 31, 30,
+    31, 30, 31
+};
+
 //------------------------------------------------------------------------------
 // Структура для хранения даты сервера RRS
 //------------------------------------------------------------------------------
@@ -75,59 +89,25 @@ public:
     /// Переход к следующему дню
     void nextDay()
     {
-        // Декабрь
-        if (m >= 12)
-        {
-            // 31-е - конец месяца и года
-            if (d >= 31)
-            {
-                ++y;
-                m = 1;
-                d = 1;
-                return;
-            }
-            ++d;
-            return;
-        }
+        const std::uint8_t* const days_in_month = isLeapYear(y) ? days_in_month_leap : days_in_month_nleap;
 
-        // Февраль
-        if (m == 2)
+        if (d >= days_in_month[m + 1])
         {
-            // 28-е или 29-е - конец месяца
-            if (isLeapYear(y) ? (d >= 29) : (d >= 28))
-            {
-                ++m;
-                d = 1;
-                return;
-            }
-            ++d;
-            return;
-        }
-
-        // Апрель, июнь, сентябрь, ноябрь
-        if ((m == 4) || (m == 6) || (m == 9) || (m == 11))
-        {
-            // 30-е - конец месяца
-            if (d >= 30)
-            {
-                ++m;
-                d = 1;
-                return;
-            }
-            ++d;
-            return;
-        }
-
-        // Январь, март, май, июль, август, октябрь
-        // 31-е - конец месяца
-        if (d >= 31)
-        {
-            ++m;
             d = 1;
-            return;
+            if (m >= 12) // Декабрь
+            {
+                m = 1;
+                ++y;
+            }
+            else
+            {
+                ++m;
+            }
         }
-        ++d;
-        return;
+        else
+        {
+            ++d;
+        }
     }
 
     /// Задать дату, по умолчанию из текущей системной
@@ -135,7 +115,7 @@ public:
     {
         if (!std_tm_now)
         {
-            std::time_t system_time = std::time(nullptr);
+            const std::time_t system_time = std::time(nullptr);
             std_tm_now = std::localtime(&system_time);
         }
         server_date_t date{static_cast<int16_t>(std_tm_now->tm_year + 1900),
