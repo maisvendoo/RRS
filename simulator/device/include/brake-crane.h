@@ -17,10 +17,9 @@ enum
 class DEVICE_EXPORT BrakeCrane : public BrakeDevice
 {
 public:
+    BrakeCrane(QObject* parent = nullptr);
 
-    BrakeCrane(QObject *parent = nullptr);
-
-    ~BrakeCrane();
+    virtual ~BrakeCrane() = default;
 
     /// Задать позицию крана
     virtual void setHandlePosition(int position) = 0;

@@ -5,19 +5,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BrakeAutoMode::BrakeAutoMode(QObject *parent) : BrakeDevice(parent)
-  , payload_coeff(0.0)
-  , pBC(0.0)
-  , QadBC(0.0)
-  , QBC(0.0)
+BrakeAutoMode::BrakeAutoMode(QObject* parent) : BrakeDevice(parent)
 {
-
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeAutoMode::setAirDistBCflow(double value)
+void BrakeAutoMode::setAirDistBCflow(double value) noexcept
 {
     QadBC = value;
 }
@@ -33,7 +28,7 @@ double BrakeAutoMode::getAirDistBCpressure() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeAutoMode::setBCpressure(double value)
+void BrakeAutoMode::setBCpressure(double value) noexcept
 {
     pBC = value;
 }
@@ -44,14 +39,6 @@ void BrakeAutoMode::setBCpressure(double value)
 double BrakeAutoMode::getBCflow() const
 {
     return QBC;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-BrakeAutoMode::~BrakeAutoMode()
-{
-
 }
 
 //------------------------------------------------------------------------------
