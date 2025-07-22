@@ -10,66 +10,65 @@ class DEVICE_EXPORT AutoTrainStop : public BrakeDevice
 {
 public:
 
-    AutoTrainStop(QObject *parent = nullptr);
+    AutoTrainStop(QObject* parent = nullptr);
 
-    virtual ~AutoTrainStop();
+    virtual ~AutoTrainStop() = default;
 
     /// Задать состояние ключа включения-выключения
-    void setKeyOn(bool state);
+    void setKeyOn(bool state) noexcept;
 
     /// Состояние ключа включения-выключения
-    bool isKeyOn() const;
+    bool isKeyOn() const noexcept;
 
     /// Задать подачу электропитания
-    void setPowered(bool state);
+    void setPowered(bool state) noexcept;
 
     /// Наличие электропитания
-    bool isPowered() const;
+    bool isPowered() const noexcept;
 
     /// Автостопное экстренное торможение
     virtual bool getEmergencyBrakeContact() const;
 
     /// Задать давление от питательной магистрали
-    void setFLpressure(double value);
+    void setFLpressure(double value) noexcept;
 
     /// Поток в питательную магистраль
-    double getFLflow() const;
+    double getFLflow() const noexcept;
 
     /// Задать давление от тормозной магистрали
-    void setBPpressure(double value);
+    void setBPpressure(double value) noexcept;
 
     /// Поток в тормозную магистраль
-    double getBPflow() const;
+    double getBPflow() const noexcept;
 
 protected:
-
     /// Наличие электропитания
-    double is_powered;
+    double is_powered = 0.0;
 
     /// Состояние ключа включения-выключения
-    double is_key_on;
+    double is_key_on = 0.0;
 
     /// Давление питательной магистрали
-    double pFL;
+    double pFL = 0.0;
     /// Давление тормозной магистрали
-    double pBP;
+    double pBP = 0.0;
 
     /// Поток в питательную магистраль
-    double QFL;
+    double QFL = 0.0;
     /// Поток в тормозную магистраль
-    double QBP;
+    double QBP = 0.0;
 };
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef AutoTrainStop* (*GetAutoTrainStop)();
+using GetAutoTrainStop = AutoTrainStop*(*)();
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 #define GET_AUTO_TRAIN_STOP(ClassName) \
-    extern "C" AutoTrainStop *getAutoTrainStop() \
+    extern "C" AutoTrainStop* getAutoTrainStop() \
     { \
         return new (ClassName) (); \
     }
@@ -77,6 +76,6 @@ typedef AutoTrainStop* (*GetAutoTrainStop)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT AutoTrainStop *loadAutoTrainStop(QString lib_path);
+extern "C" DEVICE_EXPORT AutoTrainStop* loadAutoTrainStop(QString lib_path);
 
 #endif // AUTOMATIC_TRAIN_STOP_H

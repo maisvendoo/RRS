@@ -5,16 +5,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Battery::Battery(QObject *parent) : Device(parent)
-  , r(1.0)
-  , Rd(1.0)
-  , In(0.0)
-  , Is(0.0)
-  , Ib(0.0)
-  , Emax(96.0)
-  , Emin(84.0)
-  , C(450.0)
-  , U_gen(0.0)
+Battery::Battery(QObject* parent) : Device(parent)
 {
 
 }
@@ -22,15 +13,7 @@ Battery::Battery(QObject *parent) : Device(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Battery::~Battery()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Battery::setChargeVoltage(double U)
+void Battery::setChargeVoltage(double U) noexcept
 {
     U_gen = U;
 }
@@ -38,7 +21,7 @@ void Battery::setChargeVoltage(double U)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Battery::setLoadCurrent(double I)
+void Battery::setLoadCurrent(double I) noexcept
 {
     In = I;
 }
@@ -46,7 +29,7 @@ void Battery::setLoadCurrent(double I)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Battery::setStarterCurrent(double I)
+void Battery::setStarterCurrent(double I) noexcept
 {
     Is = I;
 }
@@ -62,7 +45,7 @@ double Battery::getVoltage() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Battery::getChargeCurrent() const
+double Battery::getChargeCurrent() const noexcept
 {
     return Ib;
 }

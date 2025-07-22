@@ -5,29 +5,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AutoTrainStop::AutoTrainStop(QObject *parent) : BrakeDevice(parent)
-  , is_powered(0.0)
-  , is_key_on(0.0)
-  , pFL(0.0)
-  , pBP(0.0)
-  , QFL(0.0)
-  , QBP(0.0)
+AutoTrainStop::AutoTrainStop(QObject* parent) : BrakeDevice(parent)
 {
-
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AutoTrainStop::~AutoTrainStop()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void AutoTrainStop::setKeyOn(bool state)
+void AutoTrainStop::setKeyOn(bool state) noexcept
 {
     is_key_on = static_cast<double>(state);
 }
@@ -35,7 +20,7 @@ void AutoTrainStop::setKeyOn(bool state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AutoTrainStop::isKeyOn() const
+bool AutoTrainStop::isKeyOn() const noexcept
 {
     return static_cast<bool>(is_key_on);
 }
@@ -43,7 +28,7 @@ bool AutoTrainStop::isKeyOn() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setPowered(bool state)
+void AutoTrainStop::setPowered(bool state) noexcept
 {
     is_powered = static_cast<double>(state);
 }
@@ -51,7 +36,7 @@ void AutoTrainStop::setPowered(bool state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AutoTrainStop::isPowered() const
+bool AutoTrainStop::isPowered() const noexcept
 {
     return static_cast<bool>(is_powered);
 }
@@ -67,7 +52,7 @@ bool AutoTrainStop::getEmergencyBrakeContact() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setFLpressure(double value)
+void AutoTrainStop::setFLpressure(double value) noexcept
 {
     pFL = value;
 }
@@ -75,7 +60,7 @@ void AutoTrainStop::setFLpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AutoTrainStop::getFLflow() const
+double AutoTrainStop::getFLflow() const noexcept
 {
     return QFL;
 }
@@ -83,7 +68,7 @@ double AutoTrainStop::getFLflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setBPpressure(double value)
+void AutoTrainStop::setBPpressure(double value) noexcept
 {
     pBP = value;
 }
@@ -91,7 +76,7 @@ void AutoTrainStop::setBPpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AutoTrainStop::getBPflow() const
+double AutoTrainStop::getBPflow() const noexcept
 {
     return QBP;
 }
@@ -99,9 +84,9 @@ double AutoTrainStop::getBPflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AutoTrainStop *loadAutoTrainStop(QString lib_path)
+AutoTrainStop* loadAutoTrainStop(QString lib_path)
 {
-    AutoTrainStop *autostop = nullptr;
+    AutoTrainStop* autostop = nullptr;
 
     QLibrary lib(lib_path);
 
