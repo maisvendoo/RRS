@@ -129,6 +129,15 @@ public:
         return date;
     }
 
+    /// Вывод даты сервера в строку
+    QString getString()
+    {
+        return QString("%1-%2-%3")
+            .arg(year(), 4, 10, QChar('0'))
+            .arg(month(), 2, 10, QChar('0'))
+            .arg(day(), 2, 10, QChar('0'));
+    }
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -248,6 +257,15 @@ public:
         return true;
     }
 
+    /// Вывод времени сервера в строку
+    QString getString()
+    {
+        return QString("%1:%2:%3")
+            .arg(hour(), 2, 10, QChar('0'))
+            .arg(minute(), 2, 10, QChar('0'))
+            .arg(sec(), 2, 10, QChar('0'));
+    }
+
     /// Задать время, по умолчанию из текущего системного
     static server_time_t timeNow(std::tm* std_tm_now = nullptr) noexcept
     {
@@ -353,6 +371,15 @@ struct simulator_time_t final
         simulator_time_t sim_time{server_date_t::dateNow(std_tm_now),
                                   server_time_t::timeNow(std_tm_now)};
         return sim_time;
+    }
+
+    /// Вывод даты, времени суток и времени симуляции сервера в строку
+    QString getString()
+    {
+        return QString("Время сервера: %1 %2 (%3 с)")
+            .arg(date.getString())
+            .arg(time.getString())
+            .arg(simulation_seconds, 3, 'f', 1);
     }
 
     QByteArray serialize() const

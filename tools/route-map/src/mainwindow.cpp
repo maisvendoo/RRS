@@ -461,15 +461,8 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
 
-    QString time_text =  QString("Время сервера: %1-%2-%3 %4:%5:%6 (%7 с)\n")
-                        .arg(train_data.sim_time.date.year(), 4, 10, QChar('0'))
-                        .arg(train_data.sim_time.date.month(), 2, 10, QChar('0'))
-                        .arg(train_data.sim_time.date.day(), 2, 10, QChar('0'))
-                        .arg(train_data.sim_time.time.hour(), 2, 10, QChar('0'))
-                        .arg(train_data.sim_time.time.minute(), 2, 10, QChar('0'))
-                        .arg(train_data.sim_time.time.sec(), 2, 10, QChar('0'))
-                        .arg(train_data.sim_time.simulation_seconds, 3, 'f', 1);
-    ui->statusbar->showMessage(time_text);
+    // Дата-время сервера в статусной строке внизу
+    ui->statusbar->showMessage(train_data.sim_time.getString());
 }
 
 //------------------------------------------------------------------------------
