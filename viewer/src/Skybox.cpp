@@ -1,5 +1,9 @@
 #include "Skybox.h"
 
+#include "CfgReader.h"
+#include "filesystem.h"
+#include "Logger.h"
+
 #include <vsgXchange/all.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/io/read.h>
@@ -11,10 +15,6 @@
 #include <vsg/state/ImageView.h>
 #include "vsg/state/GraphicsPipeline.h"
 #include "vsg/state/DepthStencilState.h"
-
-#include "filesystem.h"
-#include "CfgReader.h"
-#include "Logger.h"
 
 //------------------------------------------------------------------------------
 //
@@ -56,8 +56,11 @@ vsg::ref_ptr<vsg::ubvec4Array2D> Skybox::getDefaultTexture() const noexcept
 std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> Skybox::getTextures() const noexcept
 {
     std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> all_textures;
+    all_textures.reserve(textures.size());
     for (const season_time_texture_t& stt : textures)
+    {
         all_textures.emplace_back(stt.texture);
+    }
     return all_textures;
 }
 
@@ -69,7 +72,7 @@ void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
     QString model_filename = "sky.gltf";
     cfg.getString("Model", "Filename", model_filename);
 
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
     std::string model_path = fs.getDataDir();
     model_path = fs.combinePath(model_path, "models");
     model_path = fs.combinePath(model_path, "default-objects");
@@ -81,7 +84,7 @@ void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
         return;
     }
 
-    vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_path, options);
+    const vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_path, options);
     node = loaded.cast<vsg::Node>();
     if (!node)
     {
@@ -89,17 +92,20 @@ void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 
         vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
         if (error)
+        {
             LOG_WARN(error->message.c_str());
+        }
+
         return;
     }
 
     LOG_INFO("Loaded skybox model from file: %s", model_path.c_str());
 
-    std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+    const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
     // Загружаем свой вариант вершинного шейдера вместо встроенного
-    std::string shader_vert_path = shaders_dir_path + fs.separator() + "skybox_vert.vert";
-    vsg::ref_ptr<vsg::ShaderStage> shader_vert_stage =
+    const std::string shader_vert_path = shaders_dir_path + fs.separator() + "skybox_vert.vert";
+    const vsg::ref_ptr<vsg::ShaderStage> shader_vert_stage =
         vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", shader_vert_path, options);
     if (shader_vert_stage)
     {
@@ -148,7 +154,7 @@ void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
+void Skybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
 {
     if (!node)
     {
@@ -158,9 +164,7 @@ void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
     // Находим дефолтную текстуру в модели
     struct findTexture : public vsg::Visitor
     {
-        vsg::ref_ptr<vsg::ubvec4Array2D> texture = nullptr;
-        findTexture()
-        {}
+        vsg::ref_ptr<vsg::ubvec4Array2D> texture;
 
         void apply(vsg::Object& object)
         {
@@ -201,7 +205,7 @@ void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
     }
 
     // Загружаем варианты текстур
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
     std::string textures_dir_path = fs.getDataDir();
     textures_dir_path = fs.combinePath(textures_dir_path, "models");
     textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
@@ -249,7 +253,7 @@ void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
         }
 
         LOG_INFO("Loaded skybox texture from file: %s", texture_path.c_str());
-        season_time_texture_t stt = season_time_texture_t();
+        season_time_texture_t stt {};
         stt.texture = data;
 
         auto read_season_date = [](CfgReader& cfg, QDomNode& secNode, const char* section,
@@ -257,19 +261,27 @@ void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
         {
             QString tmp;
             if (!cfg.getString(secNode, section, tmp))
+            {
                 return false;
+            }
 
             QStringList tokens = tmp.split("-");
             if (tokens.size() != 2)
+            {
                 return false;
+            }
 
             sd.month = tokens[0].toInt();
             if ((sd.month < 1) ||  (sd.month > 12))
+            {
                 return false;
+            }
 
             sd.day = tokens[1].toInt();
             if ((sd.day < 1) ||  (sd.day > 31))
+            {
                 return false;
+            }
 
             return true;
         };
@@ -279,11 +291,15 @@ void Skybox::init_textures(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
         {
             QString tmp;
             if (!cfg.getString(secNode, section, tmp))
+            {
                 return false;
+            }
 
             QStringList tokens = tmp.split(":");
             if (tokens.size() != 3)
+            {
                 return false;
+            }
 
             st = server_time_t(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt());
             return true;
