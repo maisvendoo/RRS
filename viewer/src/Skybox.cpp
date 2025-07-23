@@ -72,7 +72,7 @@ void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
     QString model_filename = "sky.gltf";
     cfg.getString("Model", "Filename", model_filename);
 
-    const FileSystem& fs = FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
     std::string model_path = fs.getDataDir();
     model_path = fs.combinePath(model_path, "models");
     model_path = fs.combinePath(model_path, "default-objects");
@@ -205,7 +205,7 @@ void Skybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     }
 
     // Загружаем варианты текстур
-    const FileSystem& fs = FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
     std::string textures_dir_path = fs.getDataDir();
     textures_dir_path = fs.combinePath(textures_dir_path, "models");
     textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
