@@ -69,7 +69,111 @@ std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> Skybox::getTextures() const noexce
 //------------------------------------------------------------------------------
 void Skybox::setDateTime(simulator_time_t sim_time)
 {
+    LOG_INFO("Skybox::SetDateTime()");
+    // Временно для теста перерисовки: 10 секунд день - 10 секунд ночь
+    float msec20 = (1000.0f * (sim_time.time.sec() % 20) + sim_time.time.msec());
+    float w_day = abs(1.0f - msec20 / 10000.0f);
+    float w_night = 1.0f - w_day;
 
+    std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights;
+    for (const season_time_texture_t& stt : textures)
+    {
+        // Дневная текстура
+        server_time_t day_time(12, 0, 0);
+        if ((stt.time_appear_end < day_time) && (stt.time_disappear_begin > day_time))
+        {
+            textures_and_weights[stt.texture] = w_day;
+        }
+
+        // Ночная текстура
+        if (stt.is_time_trough_midhight)
+        {
+            textures_and_weights[stt.texture] = w_night;
+        }
+    }
+    setActiveTextures(textures_and_weights);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Skybox::setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights)
+{
+    LOG_INFO("Skybox::setActiveTextures()");
+    bool repaint = false;
+
+    for (auto& [texture, weight] : textures_and_weights)
+    {
+        // Добавляем текстуры, которые не были активны
+        if ((weight > 1.0e-5f) && !active_textures_and_weights.count(texture))
+        {
+            active_textures_and_weights[texture] = textures_and_weights[texture];
+            repaint = true;
+            continue;
+        }
+    }
+
+    for (auto& [texture, weight] : active_textures_and_weights)
+    {
+        // Убираем текстуры, которые стали не активны
+        if (!textures_and_weights.count(texture))
+        {
+            active_textures_and_weights.erase(texture);
+            repaint = true;
+            continue;
+        }
+
+        constexpr float eps = 1.0f / 256.0f;
+        if (abs(textures_and_weights[texture] - weight) > eps)
+        {
+            active_textures_and_weights[texture] = textures_and_weights[texture];
+            repaint = true;
+            continue;
+        }
+    }
+
+    if (repaint)
+    {
+        update_skybox();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Skybox::update_skybox()
+{
+    LOG_INFO("Skybox::update_skybox()");
+    // Собираем итераторы по пикселям активных текстур
+    float sum_weights = 0.0f;
+    std::vector<std::pair<vsg::stride_iterator<vsg::ubvec4>, float>> active_pixels;
+    for (const auto& [texture, weight] : active_textures_and_weights)
+    {
+        if (weight > 1.0e-5f)
+        {
+            active_pixels.push_back({texture->begin(), weight});
+            sum_weights += weight;
+        }
+    }
+
+    // Попиксельно перекрашиваем основную текстуру
+    vsg::stride_iterator<vsg::ubvec4> texture_pixel = texture->begin();
+    while (texture_pixel != texture->end())
+    {
+        // Закрашиваем чёрным
+        *texture_pixel = vsg::ubvec4{0, 0, 0, 255};
+        for (auto& [pixel, weight] : active_pixels)
+        {
+            // Добавляем цвет из каждой активной текстуры
+            const float k = (sum_weights > 1.0f) ? (weight / sum_weights) : weight;
+            const vsg::ubvec4 color(k * pixel->r, k * pixel->g, k * pixel->b, 0);
+            *texture_pixel += color;
+
+            ++pixel;
+        }
+        ++texture_pixel;
+    }
+    texture->dirty();
 }
 
 //------------------------------------------------------------------------------

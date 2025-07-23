@@ -37,9 +37,13 @@ public:
     /// Set date and time
     void setDateTime(simulator_time_t sim_time);
 
+    /// Set active textures and their weights
+    void setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights);
+
 private:
     vsg::ref_ptr<vsg::Node> node;
     vsg::ref_ptr<vsg::ubvec4Array2D> texture;
+    std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> active_textures_and_weights;
 
     struct season_time_texture_t
     {
@@ -60,6 +64,7 @@ private:
 
     std::vector<season_time_texture_t> textures;
 
+    void update_skybox();
     void init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
     void init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
 };

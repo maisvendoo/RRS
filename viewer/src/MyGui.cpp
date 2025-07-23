@@ -1,8 +1,9 @@
 #include "MyGui.h"
 
-#include "Skybox.h"
+#include "datetime.h"
 #include "filesystem.h"
 
+#include "Skybox.h"
 #include "UpdateStatisticsHandler.h"
 #include "VehiclesHandler.h"
 
@@ -99,6 +100,12 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 
     if (params->vehicles_handler)
     {
+        params->sim_time = params->vehicles_handler->getDateTime();
+        if (params->sim_time)
+        {
+            params->skybox->setDateTime(*(params->sim_time));
+        }
+
         // Отображение дебаг-строки подвижного состава
         if (ImGui::IsKeyPressed(ImGuiKey_F9) && !params->prev_F9)
         {
@@ -257,17 +264,9 @@ void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
 
-    simulator_time_t* time = params->vehicles_handler->getDateTime();
-    std::string text;
-    if (time)
-    {
-        text = time->getString().toStdString();
-        params->skybox->setDateTime(*time);
-    }
-    else
-    {
-        text = "Время сервера: недоступно";
-    }
+    std::string text = (params->sim_time) ?
+                            params->sim_time->getString().toStdString() :
+                            "Время сервера: недоступно";
     ImGui::Text(u8"%s", text.c_str());
 
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
@@ -276,10 +275,10 @@ void MyGui::showSettings() const
     ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 5.0f);
     ImGui::SliderFloat("Sun azimuth", &params->sun_azimuth_degrees, 0.0f, 360.0f, "%.1f");
     ImGui::SliderFloat("Sun altitude", &params->sun_altitude_degrees, -90.0f, 90.0f, "%.1f");
-    if (params->skybox_textures.size() > 0)
+/*    if (params->skybox_textures.size() > 0)
     {
         ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
-    }
+    }*/
     ImGui::End();
 
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
@@ -290,7 +289,7 @@ void MyGui::showSettings() const
 
     if (params->prev_skybox_texture_index == params->skybox_texture_index)
         return;
-
+/*
     params->prev_skybox_texture_index = params->skybox_texture_index;
     if ((params->skybox_textures.size() > 0) && (params->skybox_texture_index > 0) && (params->skybox_texture_index <= params->skybox_textures.size()))
     {
@@ -304,7 +303,7 @@ void MyGui::showSettings() const
             ++texture_pixel;
         }
         params->skybox_texture_data->dirty();
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
