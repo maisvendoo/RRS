@@ -179,4 +179,5 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[CAB2_LS_G] = safety_device[CAB2]->getGreenLamp();
 
     analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
+    analogSignal[CAB2_KLUCH_EPK] = static_cast<float>(key_epk[CAB2].getState());
 }

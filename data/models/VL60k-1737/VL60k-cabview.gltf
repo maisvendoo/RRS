@@ -2572,53 +2572,6 @@
 		},
 		{
 			"mesh":74,
-			"name":"map-2.046",
-			"translation":[
-				0,
-				6.312176992651075e-06,
-				-1.507728302385658e-05
-			]
-		},
-		{
-			"children":[
-				269
-			],
-			"name":"Cab1_Tumbler_alsn-GEODE",
-			"translation":[
-				0,
-				6.312176992651075e-06,
-				-1.507728302385658e-05
-			]
-		},
-		{
-			"children":[
-				270
-			],
-			"name":"Cab1_Tumbler_alsn-OFFSET",
-			"translation":[
-				0,
-				0.036505334079265594,
-				1.6342928409576416
-			]
-		},
-		{
-			"children":[
-				271
-			],
-			"name":"Cab1_Tumbler_alsn",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.7246420383453369,
-				-0.5350406765937805,
-				-0.08336534351110458
-			]
-		},
-		{
-			"mesh":75,
 			"name":"map-2.021",
 			"translation":[
 				0,
@@ -2628,7 +2581,7 @@
 		},
 		{
 			"children":[
-				273
+				269
 			],
 			"name":"Cab1_Tumbler_APP-GEODE",
 			"translation":[
@@ -2639,7 +2592,7 @@
 		},
 		{
 			"children":[
-				274
+				270
 			],
 			"name":"Cab1_Tumbler_APP-OFFSET",
 			"translation":[
@@ -2650,7 +2603,7 @@
 		},
 		{
 			"children":[
-				275
+				271
 			],
 			"name":"Cab1_Tumbler_APP",
 			"scale":[
@@ -2665,7 +2618,7 @@
 			]
 		},
 		{
-			"mesh":76,
+			"mesh":75,
 			"name":"map-2.015",
 			"translation":[
 				0,
@@ -2675,7 +2628,7 @@
 		},
 		{
 			"children":[
-				277
+				273
 			],
 			"name":"Cab1_Tumbler_CU-GEODE",
 			"translation":[
@@ -2686,7 +2639,7 @@
 		},
 		{
 			"children":[
-				278
+				274
 			],
 			"name":"Cab1_Tumbler_CU-OFFSET",
 			"translation":[
@@ -2697,7 +2650,7 @@
 		},
 		{
 			"children":[
-				279
+				275
 			],
 			"name":"Cab1_Tumbler_CU",
 			"scale":[
@@ -2712,7 +2665,7 @@
 			]
 		},
 		{
-			"mesh":77,
+			"mesh":76,
 			"name":"map-2.029",
 			"translation":[
 				0,
@@ -2722,7 +2675,7 @@
 		},
 		{
 			"children":[
-				281
+				277
 			],
 			"name":"Cab1_Tumbler_FR-GEODE",
 			"translation":[
@@ -2733,7 +2686,7 @@
 		},
 		{
 			"children":[
-				282
+				278
 			],
 			"name":"Cab1_Tumbler_FR-OFFSET",
 			"translation":[
@@ -2744,7 +2697,7 @@
 		},
 		{
 			"children":[
-				283
+				279
 			],
 			"name":"Cab1_Tumbler_FR",
 			"scale":[
@@ -2759,7 +2712,7 @@
 			]
 		},
 		{
-			"mesh":78,
+			"mesh":77,
 			"name":"map-2.019",
 			"translation":[
 				0,
@@ -2769,7 +2722,7 @@
 		},
 		{
 			"children":[
-				285
+				281
 			],
 			"name":"Cab1_Tumbler_GVon-GEODE",
 			"translation":[
@@ -2780,7 +2733,7 @@
 		},
 		{
 			"children":[
-				286
+				282
 			],
 			"name":"Cab1_Tumbler_GVon-OFFSET",
 			"translation":[
@@ -2791,7 +2744,7 @@
 		},
 		{
 			"children":[
-				287
+				283
 			],
 			"name":"Cab1_Tumbler_GVon",
 			"scale":[
@@ -2806,7 +2759,7 @@
 			]
 		},
 		{
-			"mesh":79,
+			"mesh":78,
 			"name":"map-2.020",
 			"translation":[
 				0,
@@ -2816,7 +2769,7 @@
 		},
 		{
 			"children":[
-				289
+				285
 			],
 			"name":"Cab1_Tumbler_GVonoff-GEODE",
 			"translation":[
@@ -2827,7 +2780,7 @@
 		},
 		{
 			"children":[
-				290
+				286
 			],
 			"name":"Cab1_Tumbler_GVonoff-OFFSET",
 			"translation":[
@@ -2838,7 +2791,7 @@
 		},
 		{
 			"children":[
-				291
+				287
 			],
 			"name":"Cab1_Tumbler_GVonoff",
 			"scale":[
@@ -2853,7 +2806,7 @@
 			]
 		},
 		{
-			"mesh":80,
+			"mesh":79,
 			"name":"map-2.028",
 			"translation":[
 				7.62939453125e-06,
@@ -2863,7 +2816,7 @@
 		},
 		{
 			"children":[
-				293
+				289
 			],
 			"name":"Cab1_Tumbler_MK-GEODE",
 			"translation":[
@@ -2874,7 +2827,7 @@
 		},
 		{
 			"children":[
-				294
+				290
 			],
 			"name":"Cab1_Tumbler_MK-OFFSET",
 			"translation":[
@@ -2885,7 +2838,7 @@
 		},
 		{
 			"children":[
-				295
+				291
 			],
 			"name":"Cab1_Tumbler_MK",
 			"scale":[
@@ -2900,7 +2853,7 @@
 			]
 		},
 		{
-			"mesh":81,
+			"mesh":80,
 			"name":"map-2.027",
 			"translation":[
 				3.814697265625e-06,
@@ -2910,7 +2863,7 @@
 		},
 		{
 			"children":[
-				297
+				293
 			],
 			"name":"Cab1_Tumbler_MV1-GEODE",
 			"translation":[
@@ -2921,7 +2874,7 @@
 		},
 		{
 			"children":[
-				298
+				294
 			],
 			"name":"Cab1_Tumbler_MV1-OFFSET",
 			"translation":[
@@ -2932,7 +2885,7 @@
 		},
 		{
 			"children":[
-				299
+				295
 			],
 			"name":"Cab1_Tumbler_MV1",
 			"scale":[
@@ -2947,7 +2900,7 @@
 			]
 		},
 		{
-			"mesh":82,
+			"mesh":81,
 			"name":"map-2.026",
 			"translation":[
 				-3.814697265625e-06,
@@ -2957,7 +2910,7 @@
 		},
 		{
 			"children":[
-				301
+				297
 			],
 			"name":"Cab1_Tumbler_MV2-GEODE",
 			"translation":[
@@ -2968,7 +2921,7 @@
 		},
 		{
 			"children":[
-				302
+				298
 			],
 			"name":"Cab1_Tumbler_MV2-OFFSET",
 			"translation":[
@@ -2979,7 +2932,7 @@
 		},
 		{
 			"children":[
-				303
+				299
 			],
 			"name":"Cab1_Tumbler_MV2",
 			"scale":[
@@ -2994,7 +2947,7 @@
 			]
 		},
 		{
-			"mesh":83,
+			"mesh":82,
 			"name":"map-2.025",
 			"translation":[
 				3.814697265625e-06,
@@ -3004,7 +2957,7 @@
 		},
 		{
 			"children":[
-				305
+				301
 			],
 			"name":"Cab1_Tumbler_MV3-GEODE",
 			"translation":[
@@ -3015,7 +2968,7 @@
 		},
 		{
 			"children":[
-				306
+				302
 			],
 			"name":"Cab1_Tumbler_MV3-OFFSET",
 			"translation":[
@@ -3026,7 +2979,7 @@
 		},
 		{
 			"children":[
-				307
+				303
 			],
 			"name":"Cab1_Tumbler_MV3",
 			"scale":[
@@ -3041,7 +2994,7 @@
 			]
 		},
 		{
-			"mesh":84,
+			"mesh":83,
 			"name":"map-2.024",
 			"translation":[
 				7.62939453125e-06,
@@ -3051,7 +3004,7 @@
 		},
 		{
 			"children":[
-				309
+				305
 			],
 			"name":"Cab1_Tumbler_MV4-GEODE",
 			"translation":[
@@ -3062,7 +3015,7 @@
 		},
 		{
 			"children":[
-				310
+				306
 			],
 			"name":"Cab1_Tumbler_MV4-OFFSET",
 			"translation":[
@@ -3073,7 +3026,7 @@
 		},
 		{
 			"children":[
-				311
+				307
 			],
 			"name":"Cab1_Tumbler_MV4",
 			"scale":[
@@ -3088,7 +3041,7 @@
 			]
 		},
 		{
-			"mesh":85,
+			"mesh":84,
 			"name":"map-2.023",
 			"translation":[
 				3.814697265625e-06,
@@ -3098,7 +3051,7 @@
 		},
 		{
 			"children":[
-				313
+				309
 			],
 			"name":"Cab1_Tumbler_MV5-GEODE",
 			"translation":[
@@ -3109,7 +3062,7 @@
 		},
 		{
 			"children":[
-				314
+				310
 			],
 			"name":"Cab1_Tumbler_MV5-OFFSET",
 			"translation":[
@@ -3120,7 +3073,7 @@
 		},
 		{
 			"children":[
-				315
+				311
 			],
 			"name":"Cab1_Tumbler_MV5",
 			"scale":[
@@ -3135,7 +3088,7 @@
 			]
 		},
 		{
-			"mesh":86,
+			"mesh":85,
 			"name":"map-2.022",
 			"translation":[
 				3.814697265625e-06,
@@ -3145,7 +3098,7 @@
 		},
 		{
 			"children":[
-				317
+				313
 			],
 			"name":"Cab1_Tumbler_MV6-GEODE",
 			"translation":[
@@ -3156,7 +3109,7 @@
 		},
 		{
 			"children":[
-				318
+				314
 			],
 			"name":"Cab1_Tumbler_MV6-OFFSET",
 			"translation":[
@@ -3167,7 +3120,7 @@
 		},
 		{
 			"children":[
-				319
+				315
 			],
 			"name":"Cab1_Tumbler_MV6",
 			"scale":[
@@ -3182,7 +3135,7 @@
 			]
 		},
 		{
-			"mesh":87,
+			"mesh":86,
 			"name":"map-2.018",
 			"translation":[
 				7.62939453125e-06,
@@ -3192,7 +3145,7 @@
 		},
 		{
 			"children":[
-				321
+				317
 			],
 			"name":"Cab1_Tumbler_Pnt-GEODE",
 			"translation":[
@@ -3203,7 +3156,7 @@
 		},
 		{
 			"children":[
-				322
+				318
 			],
 			"name":"Cab1_Tumbler_Pnt-OFFSET",
 			"translation":[
@@ -3214,7 +3167,7 @@
 		},
 		{
 			"children":[
-				323
+				319
 			],
 			"name":"Cab1_Tumbler_Pnt",
 			"scale":[
@@ -3229,7 +3182,7 @@
 			]
 		},
 		{
-			"mesh":88,
+			"mesh":87,
 			"name":"map-2.017",
 			"translation":[
 				3.814697265625e-06,
@@ -3239,7 +3192,7 @@
 		},
 		{
 			"children":[
-				325
+				321
 			],
 			"name":"Cab1_Tumbler_Pnt1-GEODE",
 			"translation":[
@@ -3250,7 +3203,7 @@
 		},
 		{
 			"children":[
-				326
+				322
 			],
 			"name":"Cab1_Tumbler_Pnt1-OFFSET",
 			"translation":[
@@ -3261,7 +3214,7 @@
 		},
 		{
 			"children":[
-				327
+				323
 			],
 			"name":"Cab1_Tumbler_Pnt1",
 			"scale":[
@@ -3276,7 +3229,7 @@
 			]
 		},
 		{
-			"mesh":89,
+			"mesh":88,
 			"name":"map-2.016",
 			"translation":[
 				-3.814697265625e-06,
@@ -3286,7 +3239,7 @@
 		},
 		{
 			"children":[
-				329
+				325
 			],
 			"name":"Cab1_Tumbler_Pnt2-GEODE",
 			"translation":[
@@ -3297,7 +3250,7 @@
 		},
 		{
 			"children":[
-				330
+				326
 			],
 			"name":"Cab1_Tumbler_Pnt2-OFFSET",
 			"translation":[
@@ -3308,7 +3261,7 @@
 		},
 		{
 			"children":[
-				331
+				327
 			],
 			"name":"Cab1_Tumbler_Pnt2",
 			"scale":[
@@ -3323,7 +3276,7 @@
 			]
 		},
 		{
-			"mesh":90,
+			"mesh":89,
 			"name":"map-2.013",
 			"translation":[
 				3.814697265625e-06,
@@ -3333,7 +3286,7 @@
 		},
 		{
 			"children":[
-				333
+				329
 			],
 			"name":"Cab1_Tumbler_PRG1-GEODE",
 			"translation":[
@@ -3344,7 +3297,7 @@
 		},
 		{
 			"children":[
-				334
+				330
 			],
 			"name":"Cab1_Tumbler_PRG1-OFFSET",
 			"translation":[
@@ -3355,7 +3308,7 @@
 		},
 		{
 			"children":[
-				335
+				331
 			],
 			"name":"Cab1_Tumbler_PRG1",
 			"scale":[
@@ -3370,7 +3323,7 @@
 			]
 		},
 		{
-			"mesh":91,
+			"mesh":90,
 			"name":"map-2.012",
 			"translation":[
 				0,
@@ -3380,7 +3333,7 @@
 		},
 		{
 			"children":[
-				337
+				333
 			],
 			"name":"Cab1_Tumbler_PRG2-GEODE",
 			"translation":[
@@ -3391,7 +3344,7 @@
 		},
 		{
 			"children":[
-				338
+				334
 			],
 			"name":"Cab1_Tumbler_PRG2-OFFSET",
 			"translation":[
@@ -3402,7 +3355,7 @@
 		},
 		{
 			"children":[
-				339
+				335
 			],
 			"name":"Cab1_Tumbler_PRG2",
 			"scale":[
@@ -3417,7 +3370,7 @@
 			]
 		},
 		{
-			"mesh":92,
+			"mesh":91,
 			"name":"map-2.014",
 			"translation":[
 				3.814697265625e-06,
@@ -3427,7 +3380,7 @@
 		},
 		{
 			"children":[
-				341
+				337
 			],
 			"name":"Cab1_Tumbler_Radio-GEODE",
 			"translation":[
@@ -3438,7 +3391,7 @@
 		},
 		{
 			"children":[
-				342
+				338
 			],
 			"name":"Cab1_Tumbler_Radio-OFFSET",
 			"translation":[
@@ -3449,7 +3402,7 @@
 		},
 		{
 			"children":[
-				343
+				339
 			],
 			"name":"Cab1_Tumbler_Radio",
 			"scale":[
@@ -3464,7 +3417,7 @@
 			]
 		},
 		{
-			"mesh":93,
+			"mesh":92,
 			"name":"map-2.050",
 			"translation":[
 				0,
@@ -3474,7 +3427,7 @@
 		},
 		{
 			"children":[
-				345
+				341
 			],
 			"name":"Cab1_Tumbler_Rez-ar1-GEODE",
 			"translation":[
@@ -3485,7 +3438,7 @@
 		},
 		{
 			"children":[
-				346
+				342
 			],
 			"name":"Cab1_Tumbler_Rez-ar1-OFFSET",
 			"translation":[
@@ -3496,7 +3449,7 @@
 		},
 		{
 			"children":[
-				347
+				343
 			],
 			"name":"Cab1_Tumbler_Rez-ar1",
 			"scale":[
@@ -3511,7 +3464,7 @@
 			]
 		},
 		{
-			"mesh":94,
+			"mesh":93,
 			"name":"map-2.049",
 			"translation":[
 				0,
@@ -3521,7 +3474,7 @@
 		},
 		{
 			"children":[
-				349
+				345
 			],
 			"name":"Cab1_Tumbler_Rez-ar2-GEODE",
 			"translation":[
@@ -3532,7 +3485,7 @@
 		},
 		{
 			"children":[
-				350
+				346
 			],
 			"name":"Cab1_Tumbler_Rez-ar2-OFFSET",
 			"translation":[
@@ -3543,7 +3496,7 @@
 		},
 		{
 			"children":[
-				351
+				347
 			],
 			"name":"Cab1_Tumbler_Rez-ar2",
 			"scale":[
@@ -3558,7 +3511,7 @@
 			]
 		},
 		{
-			"mesh":95,
+			"mesh":94,
 			"name":"map-2.048",
 			"translation":[
 				0,
@@ -3568,7 +3521,7 @@
 		},
 		{
 			"children":[
-				353
+				349
 			],
 			"name":"Cab1_Tumbler_Rez-ar3-GEODE",
 			"translation":[
@@ -3579,7 +3532,7 @@
 		},
 		{
 			"children":[
-				354
+				350
 			],
 			"name":"Cab1_Tumbler_Rez-ar3-OFFSET",
 			"translation":[
@@ -3590,7 +3543,7 @@
 		},
 		{
 			"children":[
-				355
+				351
 			],
 			"name":"Cab1_Tumbler_Rez-ar3",
 			"scale":[
@@ -3605,7 +3558,7 @@
 			]
 		},
 		{
-			"mesh":96,
+			"mesh":95,
 			"name":"map-2.047",
 			"translation":[
 				0,
@@ -3615,7 +3568,7 @@
 		},
 		{
 			"children":[
-				357
+				353
 			],
 			"name":"Cab1_Tumbler_Rez-ar4-GEODE",
 			"translation":[
@@ -3626,7 +3579,7 @@
 		},
 		{
 			"children":[
-				358
+				354
 			],
 			"name":"Cab1_Tumbler_Rez-ar4-OFFSET",
 			"translation":[
@@ -3637,7 +3590,7 @@
 		},
 		{
 			"children":[
-				359
+				355
 			],
 			"name":"Cab1_Tumbler_Rez-ar4",
 			"scale":[
@@ -3649,6 +3602,53 @@
 				-0.7246420383453369,
 				-0.5869320034980774,
 				-0.08336535841226578
+			]
+		},
+		{
+			"mesh":96,
+			"name":"map-2.046",
+			"translation":[
+				0,
+				6.312176992651075e-06,
+				-1.507728302385658e-05
+			]
+		},
+		{
+			"children":[
+				357
+			],
+			"name":"Cab1_Tumbler_alsn-GEODE",
+			"translation":[
+				0,
+				6.312176992651075e-06,
+				-1.507728302385658e-05
+			]
+		},
+		{
+			"children":[
+				358
+			],
+			"name":"Cab1_Tumbler_alsn-OFFSET",
+			"translation":[
+				0,
+				0.036505334079265594,
+				1.6342928409576416
+			]
+		},
+		{
+			"children":[
+				359
+			],
+			"name":"Cab1_Tumbler_x3",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.7246420383453369,
+				-0.5350406765937805,
+				-0.08336534351110458
 			]
 		},
 		{
@@ -3740,27 +3740,655 @@
 		},
 		{
 			"mesh":99,
-			"name":"map-2.052"
+			"name":"map-2.067"
 		},
 		{
 			"children":[
 				366
 			],
-			"name":"Pult_TCHPM-GEODE"
+			"name":"Tumbl_BF-color_L-GEODE"
 		},
 		{
-			"mesh":100,
-			"name":"map-2.065"
+			"children":[
+				367
+			],
+			"name":"Tumbl_BF-color_L-OFFSET",
+			"translation":[
+				0.2295159101486206,
+				0.08127032220363617,
+				-0.1479225605726242
+			]
 		},
 		{
 			"children":[
 				368
 			],
+			"name":"Cab1_Tumbl_BF-color_L",
+			"translation":[
+				-0.22951602935791016,
+				-0.08126920461654663,
+				0.14792340993881226
+			]
+		},
+		{
+			"mesh":100,
+			"name":"map-2.068"
+		},
+		{
+			"children":[
+				370
+			],
+			"name":"Tumbl_BF-color_R-GEODE"
+		},
+		{
+			"children":[
+				371
+			],
+			"name":"Tumbl_BF-color_R-OFFSET",
+			"translation":[
+				0.2295159101486206,
+				0.08127032220363617,
+				-0.1479225605726242
+			]
+		},
+		{
+			"children":[
+				372
+			],
+			"name":"Cab1_Tumbl_BF-color_R",
+			"translation":[
+				-0.19274497032165527,
+				-0.08126920461654663,
+				0.14792340993881226
+			]
+		},
+		{
+			"mesh":101,
+			"name":"map-2.064",
+			"translation":[
+				-3.814697265625e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				374
+			],
+			"name":"Tumbler_alsn-GEODE",
+			"translation":[
+				-3.814697265625e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				375
+			],
+			"name":"Tumbler_alsn-OFFSET",
+			"translation":[
+				-3.814697265625e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				376
+			],
+			"name":"Cab1_Tumbler_alsn",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				0.15468406677246094,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":102,
+			"name":"map-2.061",
+			"translation":[
+				-3.814697265625e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				378
+			],
+			"name":"Tumbler_buferL-GEODE",
+			"translation":[
+				-3.814697265625e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				379
+			],
+			"name":"Tumbler_buferL-OFFSET",
+			"translation":[
+				-3.814697265625e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				380
+			],
+			"name":"Cab1_Tumbler_buferL",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				0.003679037094116211,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":103,
+			"name":"map-2.062",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				382
+			],
+			"name":"Tumbler_buferR-GEODE",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				383
+			],
+			"name":"Tumbler_buferR-OFFSET",
+			"translation":[
+				0,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				384
+			],
+			"name":"Cab1_Tumbler_buferR",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				0.05436307191848755,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":104,
+			"name":"map-2.055",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				386
+			],
+			"name":"Tumbler_pechi1-GEODE",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				387
+			],
+			"name":"Tumbler_pechi1-OFFSET",
+			"translation":[
+				-7.62939453125e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				388
+			],
+			"name":"Cab1_Tumbler_pechi1",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.29796886444091797,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":105,
+			"name":"map-2.056",
+			"translation":[
+				7.62939453125e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				390
+			],
+			"name":"Tumbler_svet1-GEODE",
+			"translation":[
+				7.62939453125e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				391
+			],
+			"name":"Tumbler_svet1-OFFSET",
+			"translation":[
+				7.62939453125e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				392
+			],
+			"name":"Cab1_Tumbler_svet1",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.24752497673034668,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":106,
+			"name":"map-2.057",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				394
+			],
+			"name":"Tumbler_svet2-GEODE",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				395
+			],
+			"name":"Tumbler_svet2-OFFSET",
+			"translation":[
+				-7.62939453125e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				396
+			],
+			"name":"Cab1_Tumbler_svet2",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.19717097282409668,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":107,
+			"name":"map-2.059",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				398
+			],
+			"name":"Tumbler_svetHod-GEODE",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				399
+			],
+			"name":"Tumbler_svetHod-OFFSET",
+			"translation":[
+				0,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				400
+			],
+			"name":"Cab1_Tumbler_svetHod",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.0972939133644104,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":108,
+			"name":"map-2.060",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				402
+			],
+			"name":"Tumbler_svetPribor-GEODE",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				403
+			],
+			"name":"Tumbler_svetPribor-OFFSET",
+			"translation":[
+				0,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				404
+			],
+			"name":"Cab1_Tumbler_svetPribor",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.0467989444732666,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":109,
+			"name":"map-2.054",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				406
+			],
+			"name":"Tumbler_svistok-GEODE",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				407
+			],
+			"name":"Tumbler_svistok-OFFSET",
+			"translation":[
+				-7.62939453125e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				408
+			],
+			"name":"Cab1_Tumbler_svistok",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.34782886505126953,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":110,
+			"name":"map-2.053",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				410
+			],
+			"name":"Tumbler_tifon-GEODE",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				411
+			],
+			"name":"Tumbler_tifon-OFFSET",
+			"translation":[
+				-7.62939453125e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				412
+			],
+			"name":"Cab1_Tumbler_tifon",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.397662878036499,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":111,
+			"name":"map-2.058",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				414
+			],
+			"name":"Tumbler_x4-GEODE",
+			"translation":[
+				-7.62939453125e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				415
+			],
+			"name":"Tumbler_x4-OFFSET",
+			"translation":[
+				-7.62939453125e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				416
+			],
+			"name":"Cab1_Tumbler_x4",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.14729595184326172,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":112,
+			"name":"map-2.063",
+			"translation":[
+				0,
+				6.37453340459615e-05,
+				1.7451908206567168e-05
+			]
+		},
+		{
+			"children":[
+				418
+			],
+			"name":"Tumbler_x5-GEODE",
+			"translation":[
+				-3.814697265625e-06,
+				6.37453340459615e-05,
+				1.745189365465194e-05
+			]
+		},
+		{
+			"children":[
+				419
+			],
+			"name":"Tumbler_x5-OFFSET",
+			"translation":[
+				-3.814697265625e-06,
+				0.03656277060508728,
+				1.634340524673462
+			]
+		},
+		{
+			"children":[
+				420
+			],
+			"name":"Cab1_Tumbler_x5",
+			"scale":[
+				0.014832000248134136,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				0.1042790412902832,
+				-0.24787607789039612,
+				0.037815459072589874
+			]
+		},
+		{
+			"mesh":113,
+			"name":"map-2.052"
+		},
+		{
+			"children":[
+				422
+			],
+			"name":"Pult_TCHPM-GEODE"
+		},
+		{
+			"mesh":114,
+			"name":"map-2.065"
+		},
+		{
+			"children":[
+				424
+			],
 			"name":"Strelka_m-CU-GEODE"
 		},
 		{
 			"children":[
-				369
+				425
 			],
 			"name":"Strelka_m-CU",
 			"rotation":[
@@ -3776,18 +4404,18 @@
 			]
 		},
 		{
-			"mesh":101,
+			"mesh":115,
 			"name":"map-2.066"
 		},
 		{
 			"children":[
-				371
+				427
 			],
 			"name":"Strelka_UCU-GEODE"
 		},
 		{
 			"children":[
-				372
+				428
 			],
 			"name":"Strelka_UCU-OFFSET",
 			"translation":[
@@ -3798,7 +4426,7 @@
 		},
 		{
 			"children":[
-				373
+				429
 			],
 			"name":"Strelka_UCU",
 			"rotation":[
@@ -3814,650 +4442,22 @@
 			]
 		},
 		{
-			"mesh":102,
-			"name":"map-2.067"
-		},
-		{
 			"children":[
-				375
-			],
-			"name":"Tumbl_BF-color_L-GEODE"
-		},
-		{
-			"children":[
-				376
-			],
-			"name":"Tumbl_BF-color_L-OFFSET",
-			"translation":[
-				0.2295159101486206,
-				0.08127032220363617,
-				-0.1479225605726242
-			]
-		},
-		{
-			"children":[
-				377
-			],
-			"name":"Tumbl_BF-color_L",
-			"translation":[
-				-0.22951602935791016,
-				-0.08126920461654663,
-				0.14792340993881226
-			]
-		},
-		{
-			"mesh":103,
-			"name":"map-2.068"
-		},
-		{
-			"children":[
-				379
-			],
-			"name":"Tumbl_BF-color_R-GEODE"
-		},
-		{
-			"children":[
-				380
-			],
-			"name":"Tumbl_BF-color_R-OFFSET",
-			"translation":[
-				0.2295159101486206,
-				0.08127032220363617,
-				-0.1479225605726242
-			]
-		},
-		{
-			"children":[
-				381
-			],
-			"name":"Tumbl_BF-color_R",
-			"translation":[
-				-0.19274497032165527,
-				-0.08126920461654663,
-				0.14792340993881226
-			]
-		},
-		{
-			"mesh":104,
-			"name":"map-2.064",
-			"translation":[
-				-3.814697265625e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				383
-			],
-			"name":"Tumbler_alsn-GEODE",
-			"translation":[
-				-3.814697265625e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				384
-			],
-			"name":"Tumbler_alsn-OFFSET",
-			"translation":[
-				-3.814697265625e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				385
-			],
-			"name":"Tumbler_alsn",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				0.15468406677246094,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":105,
-			"name":"map-2.061",
-			"translation":[
-				-3.814697265625e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				387
-			],
-			"name":"Tumbler_buferL-GEODE",
-			"translation":[
-				-3.814697265625e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				388
-			],
-			"name":"Tumbler_buferL-OFFSET",
-			"translation":[
-				-3.814697265625e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				389
-			],
-			"name":"Tumbler_buferL",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				0.003679037094116211,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":106,
-			"name":"map-2.062",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				391
-			],
-			"name":"Tumbler_buferR-GEODE",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				392
-			],
-			"name":"Tumbler_buferR-OFFSET",
-			"translation":[
-				0,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				393
-			],
-			"name":"Tumbler_buferR",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				0.05436307191848755,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":107,
-			"name":"map-2.055",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				395
-			],
-			"name":"Tumbler_pechi1-GEODE",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				396
-			],
-			"name":"Tumbler_pechi1-OFFSET",
-			"translation":[
-				-7.62939453125e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				397
-			],
-			"name":"Tumbler_pechi1",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.29796886444091797,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":108,
-			"name":"map-2.056",
-			"translation":[
-				7.62939453125e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				399
-			],
-			"name":"Tumbler_svet1-GEODE",
-			"translation":[
-				7.62939453125e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				400
-			],
-			"name":"Tumbler_svet1-OFFSET",
-			"translation":[
-				7.62939453125e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				401
-			],
-			"name":"Tumbler_svet1",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.24752497673034668,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":109,
-			"name":"map-2.057",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				403
-			],
-			"name":"Tumbler_svet2-GEODE",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				404
-			],
-			"name":"Tumbler_svet2-OFFSET",
-			"translation":[
-				-7.62939453125e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				405
-			],
-			"name":"Tumbler_svet2",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.19717097282409668,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":110,
-			"name":"map-2.059",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				407
-			],
-			"name":"Tumbler_svetHod-GEODE",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				408
-			],
-			"name":"Tumbler_svetHod-OFFSET",
-			"translation":[
-				0,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				409
-			],
-			"name":"Tumbler_svetHod",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.0972939133644104,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":111,
-			"name":"map-2.060",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				411
-			],
-			"name":"Tumbler_svetPribor-GEODE",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				412
-			],
-			"name":"Tumbler_svetPribor-OFFSET",
-			"translation":[
-				0,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				413
-			],
-			"name":"Tumbler_svetPribor",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.0467989444732666,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":112,
-			"name":"map-2.054",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				415
-			],
-			"name":"Tumbler_svistok-GEODE",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				416
-			],
-			"name":"Tumbler_svistok-OFFSET",
-			"translation":[
-				-7.62939453125e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				417
-			],
-			"name":"Tumbler_svistok",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.34782886505126953,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":113,
-			"name":"map-2.053",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				419
-			],
-			"name":"Tumbler_tifon-GEODE",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				420
-			],
-			"name":"Tumbler_tifon-OFFSET",
-			"translation":[
-				-7.62939453125e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				421
-			],
-			"name":"Tumbler_tifon",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.397662878036499,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":114,
-			"name":"map-2.058",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				423
-			],
-			"name":"Tumbler_x4-GEODE",
-			"translation":[
-				-7.62939453125e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				424
-			],
-			"name":"Tumbler_x4-OFFSET",
-			"translation":[
-				-7.62939453125e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				425
-			],
-			"name":"Tumbler_x4",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.14729595184326172,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"mesh":115,
-			"name":"map-2.063",
-			"translation":[
-				0,
-				6.37453340459615e-05,
-				1.7451908206567168e-05
-			]
-		},
-		{
-			"children":[
-				427
-			],
-			"name":"Tumbler_x5-GEODE",
-			"translation":[
-				-3.814697265625e-06,
-				6.37453340459615e-05,
-				1.745189365465194e-05
-			]
-		},
-		{
-			"children":[
-				428
-			],
-			"name":"Tumbler_x5-OFFSET",
-			"translation":[
-				-3.814697265625e-06,
-				0.03656277060508728,
-				1.634340524673462
-			]
-		},
-		{
-			"children":[
-				429
-			],
-			"name":"Tumbler_x5",
-			"scale":[
-				0.014832000248134136,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				0.1042790412902832,
-				-0.24787607789039612,
-				0.037815459072589874
-			]
-		},
-		{
-			"children":[
-				367,
-				370,
-				374,
-				378,
-				382,
-				386,
-				390,
-				394,
-				398,
-				402,
-				406,
-				410,
-				414,
-				418,
-				422,
+				369,
+				373,
+				377,
+				381,
+				385,
+				389,
+				393,
+				397,
+				401,
+				405,
+				409,
+				413,
+				417,
+				421,
+				423,
 				426,
 				430
 			],
@@ -5158,7 +5158,7 @@
 			"children":[
 				502
 			],
-			"name":"Cab1_Kluch_367.001",
+			"name":"Cab2_Kluch_367",
 			"rotation":[
 				0,
 				0,
@@ -5197,7 +5197,7 @@
 			"children":[
 				506
 			],
-			"name":"Cab1_Kran_kombin.001",
+			"name":"Cab2_Kran_kombin",
 			"rotation":[
 				0,
 				0,
@@ -7489,13 +7489,13 @@
 		},
 		{
 			"mesh":202,
-			"name":"map-2.098"
+			"name":"map-2.099"
 		},
 		{
 			"children":[
 				745
 			],
-			"name":"Cab1_Strelka_Kv1-GEODE.001"
+			"name":"Cab1_Strelka_Kv2-GEODE.001"
 		},
 		{
 			"children":[
@@ -7509,20 +7509,20 @@
 				0.9797635674476624
 			],
 			"translation":[
-				-0.5091059803962708,
-				-0.2381831407546997,
-				0.06864137202501297
+				-0.27368006110191345,
+				-0.18062704801559448,
+				0.20398351550102234
 			]
 		},
 		{
 			"mesh":203,
-			"name":"map-2.099"
+			"name":"map-2.098"
 		},
 		{
 			"children":[
 				748
 			],
-			"name":"Cab1_Strelka_Kv2-GEODE.001"
+			"name":"Cab1_Strelka_Kv1-GEODE.001"
 		},
 		{
 			"children":[
@@ -7536,9 +7536,9 @@
 				0.9797635674476624
 			],
 			"translation":[
-				-0.27368006110191345,
-				-0.18062704801559448,
-				0.20398351550102234
+				-0.5091059803962708,
+				-0.2381831407546997,
+				0.06864137202501297
 			]
 		},
 		{
@@ -7689,53 +7689,6 @@
 		},
 		{
 			"mesh":209,
-			"name":"map-2.105",
-			"translation":[
-				0,
-				-6.431992005673237e-06,
-				0
-			]
-		},
-		{
-			"children":[
-				767
-			],
-			"name":"Cab1_Tumbler_alsn-GEODE.001",
-			"translation":[
-				0,
-				-6.431992005673237e-06,
-				0
-			]
-		},
-		{
-			"children":[
-				768
-			],
-			"name":"Cab1_Tumbler_alsn-OFFSET.001",
-			"translation":[
-				0,
-				0.036492589861154556,
-				1.634308099746704
-			]
-		},
-		{
-			"children":[
-				769
-			],
-			"name":"Cab2_Tumbler_alsn",
-			"scale":[
-				0.01483200117945671,
-				0.01483200117945671,
-				0.01483200117945671
-			],
-			"translation":[
-				-0.7246419787406921,
-				-0.5350409150123596,
-				-0.08336534351110458
-			]
-		},
-		{
-			"mesh":210,
 			"name":"map-2.106",
 			"translation":[
 				0,
@@ -7745,7 +7698,7 @@
 		},
 		{
 			"children":[
-				771
+				767
 			],
 			"name":"Cab1_Tumbler_APP-GEODE.001",
 			"translation":[
@@ -7756,7 +7709,7 @@
 		},
 		{
 			"children":[
-				772
+				768
 			],
 			"name":"Cab1_Tumbler_APP-OFFSET.001",
 			"translation":[
@@ -7767,7 +7720,7 @@
 		},
 		{
 			"children":[
-				773
+				769
 			],
 			"name":"Cab2_Tumbler_APP",
 			"scale":[
@@ -7782,7 +7735,7 @@
 			]
 		},
 		{
-			"mesh":211,
+			"mesh":210,
 			"name":"map-2.107",
 			"translation":[
 				0,
@@ -7792,7 +7745,7 @@
 		},
 		{
 			"children":[
-				775
+				771
 			],
 			"name":"Cab1_Tumbler_CU-GEODE.001",
 			"translation":[
@@ -7803,7 +7756,7 @@
 		},
 		{
 			"children":[
-				776
+				772
 			],
 			"name":"Cab1_Tumbler_CU-OFFSET.001",
 			"translation":[
@@ -7814,7 +7767,7 @@
 		},
 		{
 			"children":[
-				777
+				773
 			],
 			"name":"Cab2_Tumbler_CU",
 			"scale":[
@@ -7829,7 +7782,7 @@
 			]
 		},
 		{
-			"mesh":212,
+			"mesh":211,
 			"name":"map-2.108",
 			"translation":[
 				7.62092486183974e-06,
@@ -7839,7 +7792,7 @@
 		},
 		{
 			"children":[
-				779
+				775
 			],
 			"name":"Cab1_Tumbler_FR-GEODE.001",
 			"translation":[
@@ -7850,7 +7803,7 @@
 		},
 		{
 			"children":[
-				780
+				776
 			],
 			"name":"Cab1_Tumbler_FR-OFFSET.001",
 			"translation":[
@@ -7861,7 +7814,7 @@
 		},
 		{
 			"children":[
-				781
+				777
 			],
 			"name":"Cab2_Tumbler_FR",
 			"scale":[
@@ -7876,7 +7829,7 @@
 			]
 		},
 		{
-			"mesh":213,
+			"mesh":212,
 			"name":"map-2.109",
 			"translation":[
 				0,
@@ -7886,7 +7839,7 @@
 		},
 		{
 			"children":[
-				783
+				779
 			],
 			"name":"Cab1_Tumbler_GVon-GEODE.001",
 			"translation":[
@@ -7897,7 +7850,7 @@
 		},
 		{
 			"children":[
-				784
+				780
 			],
 			"name":"Cab1_Tumbler_GVon-OFFSET.001",
 			"translation":[
@@ -7908,7 +7861,7 @@
 		},
 		{
 			"children":[
-				785
+				781
 			],
 			"name":"Cab2_Tumbler_GVon",
 			"scale":[
@@ -7923,7 +7876,7 @@
 			]
 		},
 		{
-			"mesh":214,
+			"mesh":213,
 			"name":"map-2.110",
 			"translation":[
 				0,
@@ -7933,7 +7886,7 @@
 		},
 		{
 			"children":[
-				787
+				783
 			],
 			"name":"Cab1_Tumbler_GVonoff-GEODE.001",
 			"translation":[
@@ -7944,7 +7897,7 @@
 		},
 		{
 			"children":[
-				788
+				784
 			],
 			"name":"Cab1_Tumbler_GVonoff-OFFSET.001",
 			"translation":[
@@ -7955,7 +7908,7 @@
 		},
 		{
 			"children":[
-				789
+				785
 			],
 			"name":"Cab2_Tumbler_GVonoff",
 			"scale":[
@@ -7970,7 +7923,7 @@
 			]
 		},
 		{
-			"mesh":215,
+			"mesh":214,
 			"name":"map-2.111",
 			"translation":[
 				7.62092486183974e-06,
@@ -7980,7 +7933,7 @@
 		},
 		{
 			"children":[
-				791
+				787
 			],
 			"name":"Cab1_Tumbler_MK-GEODE.001",
 			"translation":[
@@ -7991,7 +7944,7 @@
 		},
 		{
 			"children":[
-				792
+				788
 			],
 			"name":"Cab1_Tumbler_MK-OFFSET.001",
 			"translation":[
@@ -8002,7 +7955,7 @@
 		},
 		{
 			"children":[
-				793
+				789
 			],
 			"name":"Cab2_Tumbler_MK",
 			"scale":[
@@ -8017,7 +7970,7 @@
 			]
 		},
 		{
-			"mesh":216,
+			"mesh":215,
 			"name":"map-2.112",
 			"translation":[
 				3.8062275962147396e-06,
@@ -8027,7 +7980,7 @@
 		},
 		{
 			"children":[
-				795
+				791
 			],
 			"name":"Cab1_Tumbler_MV1-GEODE.001",
 			"translation":[
@@ -8038,7 +7991,7 @@
 		},
 		{
 			"children":[
-				796
+				792
 			],
 			"name":"Cab1_Tumbler_MV1-OFFSET.001",
 			"translation":[
@@ -8049,7 +8002,7 @@
 		},
 		{
 			"children":[
-				797
+				793
 			],
 			"name":"Cab2_Tumbler_MV1",
 			"scale":[
@@ -8064,7 +8017,7 @@
 			]
 		},
 		{
-			"mesh":217,
+			"mesh":216,
 			"name":"map-2.113",
 			"translation":[
 				0,
@@ -8074,7 +8027,7 @@
 		},
 		{
 			"children":[
-				799
+				795
 			],
 			"name":"Cab1_Tumbler_MV2-GEODE.001",
 			"translation":[
@@ -8085,7 +8038,7 @@
 		},
 		{
 			"children":[
-				800
+				796
 			],
 			"name":"Cab1_Tumbler_MV2-OFFSET.001",
 			"translation":[
@@ -8096,7 +8049,7 @@
 		},
 		{
 			"children":[
-				801
+				797
 			],
 			"name":"Cab2_Tumbler_MV2",
 			"scale":[
@@ -8111,7 +8064,7 @@
 			]
 		},
 		{
-			"mesh":218,
+			"mesh":217,
 			"name":"map-2.114",
 			"translation":[
 				3.8062275962147396e-06,
@@ -8121,7 +8074,7 @@
 		},
 		{
 			"children":[
-				803
+				799
 			],
 			"name":"Cab1_Tumbler_MV3-GEODE.001",
 			"translation":[
@@ -8132,7 +8085,7 @@
 		},
 		{
 			"children":[
-				804
+				800
 			],
 			"name":"Cab1_Tumbler_MV3-OFFSET.001",
 			"translation":[
@@ -8143,7 +8096,7 @@
 		},
 		{
 			"children":[
-				805
+				801
 			],
 			"name":"Cab2_Tumbler_MV3",
 			"scale":[
@@ -8158,7 +8111,7 @@
 			]
 		},
 		{
-			"mesh":219,
+			"mesh":218,
 			"name":"map-2.115",
 			"translation":[
 				3.8062275962147396e-06,
@@ -8168,7 +8121,7 @@
 		},
 		{
 			"children":[
-				807
+				803
 			],
 			"name":"Cab1_Tumbler_MV4-GEODE.001",
 			"translation":[
@@ -8179,7 +8132,7 @@
 		},
 		{
 			"children":[
-				808
+				804
 			],
 			"name":"Cab1_Tumbler_MV4-OFFSET.001",
 			"translation":[
@@ -8190,7 +8143,7 @@
 		},
 		{
 			"children":[
-				809
+				805
 			],
 			"name":"Cab2_Tumbler_MV4",
 			"scale":[
@@ -8205,7 +8158,7 @@
 			]
 		},
 		{
-			"mesh":220,
+			"mesh":219,
 			"name":"map-2.116",
 			"translation":[
 				3.8062275962147396e-06,
@@ -8215,7 +8168,7 @@
 		},
 		{
 			"children":[
-				811
+				807
 			],
 			"name":"Cab1_Tumbler_MV5-GEODE.001",
 			"translation":[
@@ -8226,7 +8179,7 @@
 		},
 		{
 			"children":[
-				812
+				808
 			],
 			"name":"Cab1_Tumbler_MV5-OFFSET.001",
 			"translation":[
@@ -8237,7 +8190,7 @@
 		},
 		{
 			"children":[
-				813
+				809
 			],
 			"name":"Cab2_Tumbler_MV5",
 			"scale":[
@@ -8252,7 +8205,7 @@
 			]
 		},
 		{
-			"mesh":221,
+			"mesh":220,
 			"name":"map-2.117",
 			"translation":[
 				3.8062275962147396e-06,
@@ -8262,7 +8215,7 @@
 		},
 		{
 			"children":[
-				815
+				811
 			],
 			"name":"Cab1_Tumbler_MV6-GEODE.001",
 			"translation":[
@@ -8273,7 +8226,7 @@
 		},
 		{
 			"children":[
-				816
+				812
 			],
 			"name":"Cab1_Tumbler_MV6-OFFSET.001",
 			"translation":[
@@ -8284,7 +8237,7 @@
 		},
 		{
 			"children":[
-				817
+				813
 			],
 			"name":"Cab2_Tumbler_MV6",
 			"scale":[
@@ -8299,7 +8252,7 @@
 			]
 		},
 		{
-			"mesh":222,
+			"mesh":221,
 			"name":"map-2.118",
 			"translation":[
 				8.142730621329974e-06,
@@ -8309,7 +8262,7 @@
 		},
 		{
 			"children":[
-				819
+				815
 			],
 			"name":"Cab1_Tumbler_Pnt-GEODE.001",
 			"translation":[
@@ -8320,7 +8273,7 @@
 		},
 		{
 			"children":[
-				820
+				816
 			],
 			"name":"Cab1_Tumbler_Pnt-OFFSET.001",
 			"translation":[
@@ -8331,7 +8284,7 @@
 		},
 		{
 			"children":[
-				821
+				817
 			],
 			"name":"Cab2_Tumbler_Pnt",
 			"scale":[
@@ -8346,7 +8299,7 @@
 			]
 		},
 		{
-			"mesh":223,
+			"mesh":222,
 			"name":"map-2.119",
 			"translation":[
 				8.142730621329974e-06,
@@ -8356,7 +8309,7 @@
 		},
 		{
 			"children":[
-				823
+				819
 			],
 			"name":"Cab1_Tumbler_Pnt1-GEODE.001",
 			"translation":[
@@ -8367,7 +8320,7 @@
 		},
 		{
 			"children":[
-				824
+				820
 			],
 			"name":"Cab1_Tumbler_Pnt1-OFFSET.001",
 			"translation":[
@@ -8378,7 +8331,7 @@
 		},
 		{
 			"children":[
-				825
+				821
 			],
 			"name":"Cab2_Tumbler_Pnt1",
 			"scale":[
@@ -8393,7 +8346,7 @@
 			]
 		},
 		{
-			"mesh":224,
+			"mesh":223,
 			"name":"map-2.120",
 			"translation":[
 				0,
@@ -8403,7 +8356,7 @@
 		},
 		{
 			"children":[
-				827
+				823
 			],
 			"name":"Cab1_Tumbler_Pnt2-GEODE.001",
 			"translation":[
@@ -8414,7 +8367,7 @@
 		},
 		{
 			"children":[
-				828
+				824
 			],
 			"name":"Cab1_Tumbler_Pnt2-OFFSET.001",
 			"translation":[
@@ -8425,7 +8378,7 @@
 		},
 		{
 			"children":[
-				829
+				825
 			],
 			"name":"Cab2_Tumbler_Pnt2",
 			"scale":[
@@ -8440,7 +8393,7 @@
 			]
 		},
 		{
-			"mesh":225,
+			"mesh":224,
 			"name":"map-2.121",
 			"translation":[
 				4.328033810452325e-06,
@@ -8450,7 +8403,7 @@
 		},
 		{
 			"children":[
-				831
+				827
 			],
 			"name":"Cab1_Tumbler_PRG1-GEODE.001",
 			"translation":[
@@ -8461,7 +8414,7 @@
 		},
 		{
 			"children":[
-				832
+				828
 			],
 			"name":"Cab1_Tumbler_PRG1-OFFSET.001",
 			"translation":[
@@ -8472,7 +8425,7 @@
 		},
 		{
 			"children":[
-				833
+				829
 			],
 			"name":"Cab2_Tumbler_PRG1",
 			"scale":[
@@ -8487,7 +8440,7 @@
 			]
 		},
 		{
-			"mesh":226,
+			"mesh":225,
 			"name":"map-2.122",
 			"translation":[
 				0,
@@ -8497,7 +8450,7 @@
 		},
 		{
 			"children":[
-				835
+				831
 			],
 			"name":"Cab1_Tumbler_PRG2-GEODE.001",
 			"translation":[
@@ -8508,7 +8461,7 @@
 		},
 		{
 			"children":[
-				836
+				832
 			],
 			"name":"Cab1_Tumbler_PRG2-OFFSET.001",
 			"translation":[
@@ -8519,7 +8472,7 @@
 		},
 		{
 			"children":[
-				837
+				833
 			],
 			"name":"Cab2_Tumbler_PRG2",
 			"scale":[
@@ -8534,7 +8487,7 @@
 			]
 		},
 		{
-			"mesh":227,
+			"mesh":226,
 			"name":"map-2.123",
 			"translation":[
 				4.328033810452325e-06,
@@ -8544,7 +8497,7 @@
 		},
 		{
 			"children":[
-				839
+				835
 			],
 			"name":"Cab1_Tumbler_Radio-GEODE.001",
 			"translation":[
@@ -8555,7 +8508,7 @@
 		},
 		{
 			"children":[
-				840
+				836
 			],
 			"name":"Cab1_Tumbler_Radio-OFFSET.001",
 			"translation":[
@@ -8566,7 +8519,7 @@
 		},
 		{
 			"children":[
-				841
+				837
 			],
 			"name":"Cab2_Tumbler_Radio",
 			"scale":[
@@ -8581,7 +8534,7 @@
 			]
 		},
 		{
-			"mesh":228,
+			"mesh":227,
 			"name":"map-2.124",
 			"translation":[
 				0,
@@ -8591,7 +8544,7 @@
 		},
 		{
 			"children":[
-				843
+				839
 			],
 			"name":"Cab1_Tumbler_Rez-ar1-GEODE.001",
 			"translation":[
@@ -8602,7 +8555,7 @@
 		},
 		{
 			"children":[
-				844
+				840
 			],
 			"name":"Cab1_Tumbler_Rez-ar1-OFFSET.001",
 			"translation":[
@@ -8613,7 +8566,7 @@
 		},
 		{
 			"children":[
-				845
+				841
 			],
 			"name":"Cab2_Tumbler_Rez-ar1",
 			"scale":[
@@ -8628,7 +8581,7 @@
 			]
 		},
 		{
-			"mesh":229,
+			"mesh":228,
 			"name":"map-2.125",
 			"translation":[
 				0,
@@ -8638,7 +8591,7 @@
 		},
 		{
 			"children":[
-				847
+				843
 			],
 			"name":"Cab1_Tumbler_Rez-ar2-GEODE.001",
 			"translation":[
@@ -8649,7 +8602,7 @@
 		},
 		{
 			"children":[
-				848
+				844
 			],
 			"name":"Cab1_Tumbler_Rez-ar2-OFFSET.001",
 			"translation":[
@@ -8660,7 +8613,7 @@
 		},
 		{
 			"children":[
-				849
+				845
 			],
 			"name":"Cab2_Tumbler_Rez-ar2",
 			"scale":[
@@ -8675,7 +8628,7 @@
 			]
 		},
 		{
-			"mesh":230,
+			"mesh":229,
 			"name":"map-2.126",
 			"translation":[
 				0,
@@ -8685,7 +8638,7 @@
 		},
 		{
 			"children":[
-				851
+				847
 			],
 			"name":"Cab1_Tumbler_Rez-ar3-GEODE.001",
 			"translation":[
@@ -8696,7 +8649,7 @@
 		},
 		{
 			"children":[
-				852
+				848
 			],
 			"name":"Cab1_Tumbler_Rez-ar3-OFFSET.001",
 			"translation":[
@@ -8707,7 +8660,7 @@
 		},
 		{
 			"children":[
-				853
+				849
 			],
 			"name":"Cab2_Tumbler_Rez-ar3",
 			"scale":[
@@ -8722,7 +8675,7 @@
 			]
 		},
 		{
-			"mesh":231,
+			"mesh":230,
 			"name":"map-2.127",
 			"translation":[
 				0,
@@ -8732,7 +8685,7 @@
 		},
 		{
 			"children":[
-				855
+				851
 			],
 			"name":"Cab1_Tumbler_Rez-ar4-GEODE.001",
 			"translation":[
@@ -8743,7 +8696,7 @@
 		},
 		{
 			"children":[
-				856
+				852
 			],
 			"name":"Cab1_Tumbler_Rez-ar4-OFFSET.001",
 			"translation":[
@@ -8754,7 +8707,7 @@
 		},
 		{
 			"children":[
-				857
+				853
 			],
 			"name":"Cab2_Tumbler_Rez-ar4",
 			"scale":[
@@ -8766,6 +8719,53 @@
 				-0.7246419787406921,
 				-0.5869322419166565,
 				-0.08336535841226578
+			]
+		},
+		{
+			"mesh":231,
+			"name":"map-2.105",
+			"translation":[
+				0,
+				-6.431992005673237e-06,
+				0
+			]
+		},
+		{
+			"children":[
+				855
+			],
+			"name":"Cab1_Tumbler_alsn-GEODE.001",
+			"translation":[
+				0,
+				-6.431992005673237e-06,
+				0
+			]
+		},
+		{
+			"children":[
+				856
+			],
+			"name":"Cab1_Tumbler_alsn-OFFSET.001",
+			"translation":[
+				0,
+				0.036492589861154556,
+				1.634308099746704
+			]
+		},
+		{
+			"children":[
+				857
+			],
+			"name":"Cab2_Tumbler_x3",
+			"scale":[
+				0.01483200117945671,
+				0.01483200117945671,
+				0.01483200117945671
+			],
+			"translation":[
+				-0.7246419787406921,
+				-0.5350409150123596,
+				-0.08336534351110458
 			]
 		},
 		{
@@ -9029,7 +9029,7 @@
 			"children":[
 				883
 			],
-			"name":"Cab2_Tumbler_alsn.001",
+			"name":"Cab2_Tumbler_alsn",
 			"scale":[
 				0.01483200117945671,
 				0.01483200117945671,
@@ -9405,7 +9405,7 @@
 			"children":[
 				915
 			],
-			"name":"Cab2_Tumbler_svistok.",
+			"name":"Cab2_Tumbler_svistok",
 			"scale":[
 				0.01483200117945671,
 				0.01483200117945671,
@@ -11214,7 +11214,7 @@
 			]
 		},
 		{
-			"name":"map-2.046",
+			"name":"map-2.021",
 			"primitives":[
 				{
 					"attributes":{
@@ -11228,7 +11228,7 @@
 			]
 		},
 		{
-			"name":"map-2.021",
+			"name":"map-2.015",
 			"primitives":[
 				{
 					"attributes":{
@@ -11242,7 +11242,7 @@
 			]
 		},
 		{
-			"name":"map-2.015",
+			"name":"map-2.029",
 			"primitives":[
 				{
 					"attributes":{
@@ -11256,7 +11256,7 @@
 			]
 		},
 		{
-			"name":"map-2.029",
+			"name":"map-2.019",
 			"primitives":[
 				{
 					"attributes":{
@@ -11270,7 +11270,7 @@
 			]
 		},
 		{
-			"name":"map-2.019",
+			"name":"map-2.020",
 			"primitives":[
 				{
 					"attributes":{
@@ -11284,7 +11284,7 @@
 			]
 		},
 		{
-			"name":"map-2.020",
+			"name":"map-2.028",
 			"primitives":[
 				{
 					"attributes":{
@@ -11298,7 +11298,7 @@
 			]
 		},
 		{
-			"name":"map-2.028",
+			"name":"map-2.027",
 			"primitives":[
 				{
 					"attributes":{
@@ -11312,7 +11312,7 @@
 			]
 		},
 		{
-			"name":"map-2.027",
+			"name":"map-2.026",
 			"primitives":[
 				{
 					"attributes":{
@@ -11326,7 +11326,7 @@
 			]
 		},
 		{
-			"name":"map-2.026",
+			"name":"map-2.025",
 			"primitives":[
 				{
 					"attributes":{
@@ -11340,7 +11340,7 @@
 			]
 		},
 		{
-			"name":"map-2.025",
+			"name":"map-2.024",
 			"primitives":[
 				{
 					"attributes":{
@@ -11354,7 +11354,7 @@
 			]
 		},
 		{
-			"name":"map-2.024",
+			"name":"map-2.023",
 			"primitives":[
 				{
 					"attributes":{
@@ -11368,7 +11368,7 @@
 			]
 		},
 		{
-			"name":"map-2.023",
+			"name":"map-2.022",
 			"primitives":[
 				{
 					"attributes":{
@@ -11382,7 +11382,7 @@
 			]
 		},
 		{
-			"name":"map-2.022",
+			"name":"map-2.018",
 			"primitives":[
 				{
 					"attributes":{
@@ -11396,7 +11396,7 @@
 			]
 		},
 		{
-			"name":"map-2.018",
+			"name":"map-2.017",
 			"primitives":[
 				{
 					"attributes":{
@@ -11410,7 +11410,7 @@
 			]
 		},
 		{
-			"name":"map-2.017",
+			"name":"map-2.016",
 			"primitives":[
 				{
 					"attributes":{
@@ -11424,7 +11424,7 @@
 			]
 		},
 		{
-			"name":"map-2.016",
+			"name":"map-2.013",
 			"primitives":[
 				{
 					"attributes":{
@@ -11438,7 +11438,7 @@
 			]
 		},
 		{
-			"name":"map-2.013",
+			"name":"map-2.012",
 			"primitives":[
 				{
 					"attributes":{
@@ -11452,7 +11452,7 @@
 			]
 		},
 		{
-			"name":"map-2.012",
+			"name":"map-2.014",
 			"primitives":[
 				{
 					"attributes":{
@@ -11466,7 +11466,7 @@
 			]
 		},
 		{
-			"name":"map-2.014",
+			"name":"map-2.050",
 			"primitives":[
 				{
 					"attributes":{
@@ -11480,7 +11480,7 @@
 			]
 		},
 		{
-			"name":"map-2.050",
+			"name":"map-2.049",
 			"primitives":[
 				{
 					"attributes":{
@@ -11494,7 +11494,7 @@
 			]
 		},
 		{
-			"name":"map-2.049",
+			"name":"map-2.048",
 			"primitives":[
 				{
 					"attributes":{
@@ -11508,7 +11508,7 @@
 			]
 		},
 		{
-			"name":"map-2.048",
+			"name":"map-2.047",
 			"primitives":[
 				{
 					"attributes":{
@@ -11522,7 +11522,7 @@
 			]
 		},
 		{
-			"name":"map-2.047",
+			"name":"map-2.046",
 			"primitives":[
 				{
 					"attributes":{
@@ -11564,7 +11564,7 @@
 			]
 		},
 		{
-			"name":"map-2.052",
+			"name":"map-2.067",
 			"primitives":[
 				{
 					"attributes":{
@@ -11578,7 +11578,7 @@
 			]
 		},
 		{
-			"name":"map-2.065",
+			"name":"map-2.068",
 			"primitives":[
 				{
 					"attributes":{
@@ -11586,49 +11586,7 @@
 						"NORMAL":350,
 						"TEXCOORD_0":351
 					},
-					"indices":253,
-					"material":6
-				}
-			]
-		},
-		{
-			"name":"map-2.066",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":352,
-						"NORMAL":353,
-						"TEXCOORD_0":354
-					},
-					"indices":355,
-					"material":6
-				}
-			]
-		},
-		{
-			"name":"map-2.067",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":356,
-						"NORMAL":357,
-						"TEXCOORD_0":358
-					},
-					"indices":359,
-					"material":6
-				}
-			]
-		},
-		{
-			"name":"map-2.068",
-			"primitives":[
-				{
-					"attributes":{
-						"POSITION":360,
-						"NORMAL":361,
-						"TEXCOORD_0":362
-					},
-					"indices":359,
+					"indices":348,
 					"material":6
 				}
 			]
@@ -11638,9 +11596,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":363,
-						"NORMAL":364,
-						"TEXCOORD_0":365
+						"POSITION":352,
+						"NORMAL":353,
+						"TEXCOORD_0":354
 					},
 					"indices":270,
 					"material":6
@@ -11652,9 +11610,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":366,
-						"NORMAL":367,
-						"TEXCOORD_0":368
+						"POSITION":355,
+						"NORMAL":356,
+						"TEXCOORD_0":357
 					},
 					"indices":270,
 					"material":6
@@ -11666,9 +11624,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":369,
-						"NORMAL":370,
-						"TEXCOORD_0":371
+						"POSITION":358,
+						"NORMAL":359,
+						"TEXCOORD_0":360
 					},
 					"indices":270,
 					"material":6
@@ -11680,9 +11638,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":372,
-						"NORMAL":373,
-						"TEXCOORD_0":374
+						"POSITION":361,
+						"NORMAL":362,
+						"TEXCOORD_0":363
 					},
 					"indices":270,
 					"material":6
@@ -11694,9 +11652,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":375,
-						"NORMAL":376,
-						"TEXCOORD_0":377
+						"POSITION":364,
+						"NORMAL":365,
+						"TEXCOORD_0":366
 					},
 					"indices":270,
 					"material":6
@@ -11708,9 +11666,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":378,
-						"NORMAL":379,
-						"TEXCOORD_0":380
+						"POSITION":367,
+						"NORMAL":368,
+						"TEXCOORD_0":369
 					},
 					"indices":270,
 					"material":6
@@ -11722,9 +11680,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":381,
-						"NORMAL":382,
-						"TEXCOORD_0":383
+						"POSITION":370,
+						"NORMAL":371,
+						"TEXCOORD_0":372
 					},
 					"indices":270,
 					"material":6
@@ -11736,9 +11694,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":384,
-						"NORMAL":385,
-						"TEXCOORD_0":386
+						"POSITION":373,
+						"NORMAL":374,
+						"TEXCOORD_0":375
 					},
 					"indices":270,
 					"material":6
@@ -11750,9 +11708,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":387,
-						"NORMAL":388,
-						"TEXCOORD_0":389
+						"POSITION":376,
+						"NORMAL":377,
+						"TEXCOORD_0":378
 					},
 					"indices":270,
 					"material":6
@@ -11764,9 +11722,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":390,
-						"NORMAL":391,
-						"TEXCOORD_0":392
+						"POSITION":379,
+						"NORMAL":380,
+						"TEXCOORD_0":381
 					},
 					"indices":270,
 					"material":6
@@ -11778,9 +11736,9 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":393,
-						"NORMAL":394,
-						"TEXCOORD_0":395
+						"POSITION":382,
+						"NORMAL":383,
+						"TEXCOORD_0":384
 					},
 					"indices":270,
 					"material":6
@@ -11792,11 +11750,53 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":396,
-						"NORMAL":397,
-						"TEXCOORD_0":398
+						"POSITION":385,
+						"NORMAL":386,
+						"TEXCOORD_0":387
 					},
 					"indices":270,
+					"material":6
+				}
+			]
+		},
+		{
+			"name":"map-2.052",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":388,
+						"NORMAL":389,
+						"TEXCOORD_0":390
+					},
+					"indices":391,
+					"material":6
+				}
+			]
+		},
+		{
+			"name":"map-2.065",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":392,
+						"NORMAL":393,
+						"TEXCOORD_0":394
+					},
+					"indices":253,
+					"material":6
+				}
+			]
+		},
+		{
+			"name":"map-2.066",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":395,
+						"NORMAL":396,
+						"TEXCOORD_0":397
+					},
+					"indices":398,
 					"material":6
 				}
 			]
@@ -13006,7 +13006,7 @@
 			]
 		},
 		{
-			"name":"map-2.098",
+			"name":"map-2.099",
 			"primitives":[
 				{
 					"attributes":{
@@ -13020,7 +13020,7 @@
 			]
 		},
 		{
-			"name":"map-2.099",
+			"name":"map-2.098",
 			"primitives":[
 				{
 					"attributes":{
@@ -13104,7 +13104,7 @@
 			]
 		},
 		{
-			"name":"map-2.105",
+			"name":"map-2.106",
 			"primitives":[
 				{
 					"attributes":{
@@ -13118,7 +13118,7 @@
 			]
 		},
 		{
-			"name":"map-2.106",
+			"name":"map-2.107",
 			"primitives":[
 				{
 					"attributes":{
@@ -13132,7 +13132,7 @@
 			]
 		},
 		{
-			"name":"map-2.107",
+			"name":"map-2.108",
 			"primitives":[
 				{
 					"attributes":{
@@ -13146,7 +13146,7 @@
 			]
 		},
 		{
-			"name":"map-2.108",
+			"name":"map-2.109",
 			"primitives":[
 				{
 					"attributes":{
@@ -13160,7 +13160,7 @@
 			]
 		},
 		{
-			"name":"map-2.109",
+			"name":"map-2.110",
 			"primitives":[
 				{
 					"attributes":{
@@ -13174,7 +13174,7 @@
 			]
 		},
 		{
-			"name":"map-2.110",
+			"name":"map-2.111",
 			"primitives":[
 				{
 					"attributes":{
@@ -13188,7 +13188,7 @@
 			]
 		},
 		{
-			"name":"map-2.111",
+			"name":"map-2.112",
 			"primitives":[
 				{
 					"attributes":{
@@ -13202,7 +13202,7 @@
 			]
 		},
 		{
-			"name":"map-2.112",
+			"name":"map-2.113",
 			"primitives":[
 				{
 					"attributes":{
@@ -13216,7 +13216,7 @@
 			]
 		},
 		{
-			"name":"map-2.113",
+			"name":"map-2.114",
 			"primitives":[
 				{
 					"attributes":{
@@ -13230,7 +13230,7 @@
 			]
 		},
 		{
-			"name":"map-2.114",
+			"name":"map-2.115",
 			"primitives":[
 				{
 					"attributes":{
@@ -13244,7 +13244,7 @@
 			]
 		},
 		{
-			"name":"map-2.115",
+			"name":"map-2.116",
 			"primitives":[
 				{
 					"attributes":{
@@ -13258,7 +13258,7 @@
 			]
 		},
 		{
-			"name":"map-2.116",
+			"name":"map-2.117",
 			"primitives":[
 				{
 					"attributes":{
@@ -13272,7 +13272,7 @@
 			]
 		},
 		{
-			"name":"map-2.117",
+			"name":"map-2.118",
 			"primitives":[
 				{
 					"attributes":{
@@ -13286,7 +13286,7 @@
 			]
 		},
 		{
-			"name":"map-2.118",
+			"name":"map-2.119",
 			"primitives":[
 				{
 					"attributes":{
@@ -13300,7 +13300,7 @@
 			]
 		},
 		{
-			"name":"map-2.119",
+			"name":"map-2.120",
 			"primitives":[
 				{
 					"attributes":{
@@ -13314,7 +13314,7 @@
 			]
 		},
 		{
-			"name":"map-2.120",
+			"name":"map-2.121",
 			"primitives":[
 				{
 					"attributes":{
@@ -13328,7 +13328,7 @@
 			]
 		},
 		{
-			"name":"map-2.121",
+			"name":"map-2.122",
 			"primitives":[
 				{
 					"attributes":{
@@ -13342,7 +13342,7 @@
 			]
 		},
 		{
-			"name":"map-2.122",
+			"name":"map-2.123",
 			"primitives":[
 				{
 					"attributes":{
@@ -13356,7 +13356,7 @@
 			]
 		},
 		{
-			"name":"map-2.123",
+			"name":"map-2.124",
 			"primitives":[
 				{
 					"attributes":{
@@ -13370,7 +13370,7 @@
 			]
 		},
 		{
-			"name":"map-2.124",
+			"name":"map-2.125",
 			"primitives":[
 				{
 					"attributes":{
@@ -13384,7 +13384,7 @@
 			]
 		},
 		{
-			"name":"map-2.125",
+			"name":"map-2.126",
 			"primitives":[
 				{
 					"attributes":{
@@ -13398,7 +13398,7 @@
 			]
 		},
 		{
-			"name":"map-2.126",
+			"name":"map-2.127",
 			"primitives":[
 				{
 					"attributes":{
@@ -13412,7 +13412,7 @@
 			]
 		},
 		{
-			"name":"map-2.127",
+			"name":"map-2.105",
 			"primitives":[
 				{
 					"attributes":{
@@ -13462,7 +13462,7 @@
 						"NORMAL":770,
 						"TEXCOORD_0":771
 					},
-					"indices":348,
+					"indices":391,
 					"material":6
 				}
 			]
@@ -13490,7 +13490,7 @@
 						"NORMAL":776,
 						"TEXCOORD_0":777
 					},
-					"indices":355,
+					"indices":398,
 					"material":6
 				}
 			]
@@ -13504,7 +13504,7 @@
 						"NORMAL":779,
 						"TEXCOORD_0":780
 					},
-					"indices":359,
+					"indices":348,
 					"material":6
 				}
 			]
@@ -13518,7 +13518,7 @@
 						"NORMAL":782,
 						"TEXCOORD_0":783
 					},
-					"indices":359,
+					"indices":348,
 					"material":6
 				}
 			]
@@ -13936,42 +13936,42 @@
 		{
 			"mimeType":"image/png",
 			"name":"alsn",
-			"uri":"alsn.png"
+			"uri":"textures/alsn.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"kab",
-			"uri":"kab.png"
+			"uri":"textures/kab.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_367",
-			"uri":"_367.png"
+			"uri":"textures/_367.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pult",
-			"uri":"pult.png"
+			"uri":"textures/pult.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_epk",
-			"uri":"_epk.png"
+			"uri":"textures/_epk.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_254_395",
-			"uri":"_254_395.png"
+			"uri":"textures/_254_395.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"RS_Transp",
-			"uri":"RS_Transp.png"
+			"uri":"textures/RS_Transp.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Skor_SL2m",
-			"uri":"Skor_SL2m.png"
+			"uri":"textures/Skor_SL2m.png"
 		}
 	],
 	"accessors":[
@@ -17038,6 +17038,404 @@
 		{
 			"bufferView":345,
 			"componentType":5126,
+			"count":34,
+			"max":[
+				-0.22326600551605225,
+				-0.0745702013373375,
+				0.17787399888038635
+			],
+			"min":[
+				-0.2358659952878952,
+				-0.08546900004148483,
+				0.1475840061903
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":346,
+			"componentType":5126,
+			"count":34,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":347,
+			"componentType":5126,
+			"count":34,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":348,
+			"componentType":5123,
+			"count":120,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":349,
+			"componentType":5126,
+			"count":34,
+			"max":[
+				-0.22326600551605225,
+				-0.0745702013373375,
+				0.17787399888038635
+			],
+			"min":[
+				-0.2358659952878952,
+				-0.08546900004148483,
+				0.1475840061903
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":350,
+			"componentType":5126,
+			"count":34,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":351,
+			"componentType":5126,
+			"count":34,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":352,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":353,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":354,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":355,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":356,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":357,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":358,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":359,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":360,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":361,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":362,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":363,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":364,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":365,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":366,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":367,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":368,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":369,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":370,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":371,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":372,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":373,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":374,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":375,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":376,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":377,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":378,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":379,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":380,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":381,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":382,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":383,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":384,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":385,
+			"componentType":5126,
+			"count":36,
+			"max":[
+				0.7969679832458496,
+				0.684037983417511,
+				2.1812000274658203
+			],
+			"min":[
+				-0.7969679832458496,
+				-0.9176740050315857,
+				-1.8960100412368774
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":386,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":387,
+			"componentType":5126,
+			"count":36,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":388,
+			"componentType":5126,
 			"count":357,
 			"max":[
 				0.46538299322128296,
@@ -17052,25 +17450,25 @@
 			"type":"VEC3"
 		},
 		{
-			"bufferView":346,
+			"bufferView":389,
 			"componentType":5126,
 			"count":357,
 			"type":"VEC3"
 		},
 		{
-			"bufferView":347,
+			"bufferView":390,
 			"componentType":5126,
 			"count":357,
 			"type":"VEC2"
 		},
 		{
-			"bufferView":348,
+			"bufferView":391,
 			"componentType":5123,
 			"count":828,
 			"type":"SCALAR"
 		},
 		{
-			"bufferView":349,
+			"bufferView":392,
 			"componentType":5126,
 			"count":27,
 			"max":[
@@ -17086,19 +17484,19 @@
 			"type":"VEC3"
 		},
 		{
-			"bufferView":350,
+			"bufferView":393,
 			"componentType":5126,
 			"count":27,
 			"type":"VEC3"
 		},
 		{
-			"bufferView":351,
+			"bufferView":394,
 			"componentType":5126,
 			"count":27,
 			"type":"VEC2"
 		},
 		{
-			"bufferView":352,
+			"bufferView":395,
 			"componentType":5126,
 			"count":4,
 			"max":[
@@ -17114,420 +17512,22 @@
 			"type":"VEC3"
 		},
 		{
-			"bufferView":353,
-			"componentType":5126,
-			"count":4,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":354,
-			"componentType":5126,
-			"count":4,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":355,
-			"componentType":5123,
-			"count":6,
-			"type":"SCALAR"
-		},
-		{
-			"bufferView":356,
-			"componentType":5126,
-			"count":34,
-			"max":[
-				-0.22326600551605225,
-				-0.0745702013373375,
-				0.17787399888038635
-			],
-			"min":[
-				-0.2358659952878952,
-				-0.08546900004148483,
-				0.1475840061903
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":357,
-			"componentType":5126,
-			"count":34,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":358,
-			"componentType":5126,
-			"count":34,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":359,
-			"componentType":5123,
-			"count":120,
-			"type":"SCALAR"
-		},
-		{
-			"bufferView":360,
-			"componentType":5126,
-			"count":34,
-			"max":[
-				-0.22326600551605225,
-				-0.0745702013373375,
-				0.17787399888038635
-			],
-			"min":[
-				-0.2358659952878952,
-				-0.08546900004148483,
-				0.1475840061903
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":361,
-			"componentType":5126,
-			"count":34,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":362,
-			"componentType":5126,
-			"count":34,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":363,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":364,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":365,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":366,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":367,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":368,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":369,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":370,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":371,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":372,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":373,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":374,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":375,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":376,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":377,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":378,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":379,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":380,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":381,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":382,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":383,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":384,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":385,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":386,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":387,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":388,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":389,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":390,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":391,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":392,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
-			"bufferView":393,
-			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
-			"type":"VEC3"
-		},
-		{
-			"bufferView":394,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":395,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
-		},
-		{
 			"bufferView":396,
 			"componentType":5126,
-			"count":36,
-			"max":[
-				0.7969679832458496,
-				0.684037983417511,
-				2.1812000274658203
-			],
-			"min":[
-				-0.7969679832458496,
-				-0.9176740050315857,
-				-1.8960100412368774
-			],
+			"count":4,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":397,
 			"componentType":5126,
-			"count":36,
-			"type":"VEC3"
+			"count":4,
+			"type":"VEC2"
 		},
 		{
 			"bufferView":398,
-			"componentType":5126,
-			"count":36,
-			"type":"VEC2"
+			"componentType":5123,
+			"count":6,
+			"type":"SCALAR"
 		},
 		{
 			"bufferView":399,
@@ -23843,327 +23843,327 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":4284,
+			"byteLength":408,
 			"byteOffset":790996,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":4284,
-			"byteOffset":795280,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":2856,
-			"byteOffset":799564,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":1656,
-			"byteOffset":802420,
-			"target":34963
-		},
-		{
-			"buffer":0,
-			"byteLength":324,
-			"byteOffset":804076,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":324,
-			"byteOffset":804400,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":216,
-			"byteOffset":804724,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":48,
-			"byteOffset":804940,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":48,
-			"byteOffset":804988,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":32,
-			"byteOffset":805036,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":12,
-			"byteOffset":805068,
-			"target":34963
-		},
-		{
-			"buffer":0,
 			"byteLength":408,
-			"byteOffset":805080,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":408,
-			"byteOffset":805488,
+			"byteOffset":791404,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":272,
-			"byteOffset":805896,
+			"byteOffset":791812,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":240,
-			"byteOffset":806168,
+			"byteOffset":792084,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":408,
-			"byteOffset":806408,
+			"byteOffset":792324,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":408,
-			"byteOffset":806816,
+			"byteOffset":792732,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":272,
-			"byteOffset":807224,
+			"byteOffset":793140,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":807496,
+			"byteOffset":793412,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":807928,
+			"byteOffset":793844,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":808360,
+			"byteOffset":794276,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":808648,
+			"byteOffset":794564,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":809080,
+			"byteOffset":794996,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":809512,
+			"byteOffset":795428,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":809800,
+			"byteOffset":795716,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":810232,
+			"byteOffset":796148,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":810664,
+			"byteOffset":796580,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":810952,
+			"byteOffset":796868,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":811384,
+			"byteOffset":797300,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":811816,
+			"byteOffset":797732,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":812104,
+			"byteOffset":798020,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":812536,
+			"byteOffset":798452,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":812968,
+			"byteOffset":798884,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":813256,
+			"byteOffset":799172,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":813688,
+			"byteOffset":799604,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":814120,
+			"byteOffset":800036,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":814408,
+			"byteOffset":800324,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":814840,
+			"byteOffset":800756,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":815272,
+			"byteOffset":801188,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":815560,
+			"byteOffset":801476,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":815992,
+			"byteOffset":801908,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":816424,
+			"byteOffset":802340,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":816712,
+			"byteOffset":802628,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":817144,
+			"byteOffset":803060,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":817576,
+			"byteOffset":803492,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":817864,
+			"byteOffset":803780,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":818296,
+			"byteOffset":804212,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":818728,
+			"byteOffset":804644,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":819016,
+			"byteOffset":804932,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":819448,
+			"byteOffset":805364,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":819880,
+			"byteOffset":805796,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":820168,
+			"byteOffset":806084,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":432,
-			"byteOffset":820600,
+			"byteOffset":806516,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":821032,
+			"byteOffset":806948,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":4284,
+			"byteOffset":807236,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":4284,
+			"byteOffset":811520,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":2856,
+			"byteOffset":815804,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":1656,
+			"byteOffset":818660,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":324,
+			"byteOffset":820316,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":324,
+			"byteOffset":820640,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":216,
+			"byteOffset":820964,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":821180,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":821228,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":821276,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":12,
+			"byteOffset":821308,
+			"target":34963
 		},
 		{
 			"buffer":0,
