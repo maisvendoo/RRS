@@ -5158,7 +5158,7 @@
 			"children":[
 				502
 			],
-			"name":"Cab1_Kluch_367.001",
+			"name":"Cab2_Kluch_367",
 			"rotation":[
 				0,
 				0,
@@ -5197,7 +5197,7 @@
 			"children":[
 				506
 			],
-			"name":"Cab1_Kran_kombin.001",
+			"name":"Cab2_Kran_kombin",
 			"rotation":[
 				0,
 				0,
@@ -13936,42 +13936,42 @@
 		{
 			"mimeType":"image/png",
 			"name":"alsn",
-			"uri":"alsn.png"
+			"uri":"textures/alsn.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"kab",
-			"uri":"kab.png"
+			"uri":"textures/kab.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_367",
-			"uri":"_367.png"
+			"uri":"textures/_367.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"pult",
-			"uri":"pult.png"
+			"uri":"textures/pult.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_epk",
-			"uri":"_epk.png"
+			"uri":"textures/_epk.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"_254_395",
-			"uri":"_254_395.png"
+			"uri":"textures/_254_395.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"RS_Transp",
-			"uri":"RS_Transp.png"
+			"uri":"textures/RS_Transp.png"
 		},
 		{
 			"mimeType":"image/png",
 			"name":"Skor_SL2m",
-			"uri":"Skor_SL2m.png"
+			"uri":"textures/Skor_SL2m.png"
 		}
 	],
 	"accessors":[
