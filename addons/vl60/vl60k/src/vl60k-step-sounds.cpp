@@ -27,8 +27,11 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     (void) t;
     (void) dt;
     // Свисток и тифон
-    analogSignal[SOUND_SVISTOK] = horn->getSoundSignal(TrainHorn::SVISTOK_SOUND);
-    analogSignal[SOUND_TIFON] = horn->getSoundSignal(TrainHorn::TIFON_SOUND);
+    analogSignal[SOUND_SVISTOK] = horn[CAB1]->getSoundSignal(TrainHorn::SVISTOK_SOUND);
+    analogSignal[SOUND_TIFON] = horn[CAB1]->getSoundSignal(TrainHorn::TIFON_SOUND);
+
+    analogSignal[CAB2_SOUND_SVISTOK] = horn[CAB2]->getSoundSignal(TrainHorn::SVISTOK_SOUND);
+    analogSignal[CAB2_SOUND_TIFON] = horn[CAB2]->getSoundSignal(TrainHorn::TIFON_SOUND);
 
     // Реверсор и контроллер
     analogSignal[SOUND_REVERSOR] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
