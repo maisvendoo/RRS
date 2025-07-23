@@ -34,6 +34,9 @@ public:
     /// Get textures array
     std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> getTextures() const noexcept;
 
+    /// Set date and time
+    void setDateTime(simulator_time_t sim_time);
+
 private:
     vsg::ref_ptr<vsg::Node> node;
     vsg::ref_ptr<vsg::ubvec4Array2D> texture;

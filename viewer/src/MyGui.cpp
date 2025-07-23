@@ -1,5 +1,6 @@
 #include "MyGui.h"
 
+#include "Skybox.h"
 #include "filesystem.h"
 
 #include "UpdateStatisticsHandler.h"
@@ -255,6 +256,20 @@ void MyGui::showStatistics() const
 void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
+
+    simulator_time_t* time = params->vehicles_handler->getDateTime();
+    std::string text;
+    if (time)
+    {
+        text = time->getString().toStdString();
+        params->skybox->setDateTime(*time);
+    }
+    else
+    {
+        text = "Время сервера: недоступно";
+    }
+    ImGui::Text(u8"%s", text.c_str());
+
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
     ImGui::ColorEdit3("Sun color", params->sun_color);

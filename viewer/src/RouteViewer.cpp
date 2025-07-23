@@ -634,17 +634,18 @@ bool RouteViewer::loadRoute()
 
     // Модель неба
     const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
-    Skybox skybox(cfg_path, options);
-    GUIparams->skybox_texture_data = skybox.getDefaultTexture();
-    GUIparams->skybox_textures = skybox.getTextures();
-    if (skybox.getNode())
+    Skybox* skybox = new Skybox(cfg_path, options);
+    GUIparams->skybox = skybox;
+    GUIparams->skybox_texture_data = skybox->getDefaultTexture();
+    GUIparams->skybox_textures = skybox->getTextures();
+    if (skybox->getNode())
     {
-        root->addChild(skybox.getNode());
+        root->addChild(skybox->getNode());
 #if 0
         // запись неба в файл
         std::string file;
         file = route_dir_path + fs.separator() + "~loaded_skybox.vsgt";
-        vsg::write(skybox.getNode(), file, options);
+        vsg::write(skybox->getNode(), file, options);
 #endif
     }
 

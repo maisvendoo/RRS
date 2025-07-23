@@ -67,6 +67,14 @@ std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> Skybox::getTextures() const noexce
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Skybox::setDateTime(simulator_time_t sim_time)
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 {
     QString model_filename = "sky.gltf";

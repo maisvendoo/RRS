@@ -9,6 +9,7 @@
 #include <vsg/core/observer_ptr.h>
 #include <QString>
 
+class Skybox;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 
@@ -17,6 +18,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     GUIParams() {}
 
     vsg::observer_ptr<vsg::Viewer> viewer;
+    Skybox *skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
 

@@ -102,6 +102,14 @@ bool VehiclesHandler::isUpdated() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+simulator_time_t *VehiclesHandler::getDateTime()
+{
+    return isUpdated() ? &(update_pos_data[cur_data].sim_time) : nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString VehiclesHandler::getDebugMessage() const noexcept
 {
     return debug_message;

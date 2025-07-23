@@ -47,6 +47,8 @@ public:
 
     bool isUpdated() const noexcept;
 
+    simulator_time_t* getDateTime();
+
     QString getDebugMessage() const noexcept;
 
     void step(double t, double dt);
