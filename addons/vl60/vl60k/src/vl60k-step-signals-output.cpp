@@ -135,13 +135,13 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[CAB2_STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
     analogSignal[CAB2_STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
 
-    analogSignal[STRELKA_SPEED] = speed_meter->getArrowPos();
-    analogSignal[VAL_PR_SKOR1] = speed_meter->getShaftPos();
-    analogSignal[VAL_PR_SKOR2] = speed_meter->getShaftPos();
+    analogSignal[STRELKA_SPEED] = speed_meter[CAB1]->getArrowPos();
+    analogSignal[VAL_PR_SKOR1] = speed_meter[CAB1]->getShaftPos();
+    analogSignal[VAL_PR_SKOR2] = speed_meter[CAB1]->getShaftPos();
 
-    analogSignal[CAB2_STRELKA_SPEED] = speed_meter->getArrowPos();
-    analogSignal[CAB2_VAL_PR_SKOR1] = speed_meter->getShaftPos();
-    analogSignal[CAB2_VAL_PR_SKOR2] = speed_meter->getShaftPos();
+    analogSignal[CAB2_STRELKA_SPEED] = speed_meter[CAB2]->getArrowPos();
+    analogSignal[CAB2_VAL_PR_SKOR1] = speed_meter[CAB2]->getShaftPos();
+    analogSignal[CAB2_VAL_PR_SKOR2] = speed_meter[CAB2]->getShaftPos();
 
     analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[CAB1][RB_1].getState());
     analogSignal[KNOPKA_RBS] = static_cast<float>(rb[CAB1][RBS].getState());

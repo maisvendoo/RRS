@@ -340,7 +340,7 @@ private:
     CoilALSN    *coil_ALSN_bwd = Q_NULLPTR;
 
     /// Локомотивный скоростемер
-    SL2M    *speed_meter = Q_NULLPTR;
+    SL2M    *speed_meter[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Свисток и тифон
     TrainHorn   *horn[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
