@@ -254,7 +254,9 @@ enum
     CAB2_STRELKA_AMP1 = 341, //
     CAB2_STRELKA_AMP2 = 342, //
     CAB2_STRELKA_KV1 = 343, //
-    CAB2_STRELKA_KV2 = 344 //
+    CAB2_STRELKA_KV2 = 344, //
+
+    CAB2_KLUCH_EPK = 365
 };
 
 #endif // VL60K_SIGNALS_H
