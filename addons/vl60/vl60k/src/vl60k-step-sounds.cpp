@@ -34,6 +34,9 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_REVERSOR] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
     analogSignal[SOUND_CONTROLLER] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
 
+    analogSignal[CAB2_SOUND_REVERSOR] = controller[CAB2]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
+    analogSignal[CAB2_SOUND_CONTROLLER] = controller[CAB2]->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
+
     // Серводвигатель ЭКГ, ручное и автоматическое движение
     analogSignal[SOUND_EKG_ONE] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_ONE_SOUND);
     analogSignal[SOUND_EKG_AUTO] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_AUTO_SOUND);
@@ -45,6 +48,10 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_BRAKE_LOCK_CHANGE_LOCK_POS] = brake_lock[CAB1]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND);
     analogSignal[SOUND_BRAKE_LOCK_CHANGE_COMB_POS] = brake_lock[CAB1]->getSoundSignal(BrakeLock::CHANGE_COMB_POS_SOUND);
     analogSignal[SOUND_BRAKE_LOCK_BP_DRAIN_FLOW] = brake_lock[CAB1]->getSoundSignal(BrakeLock::BP_DRAIN_FLOW_SOUND);
+
+    analogSignal[CAB2_SOUND_BRAKE_LOCK_CHANGE_LOCK_POS] = brake_lock[CAB2]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_LOCK_CHANGE_COMB_POS] = brake_lock[CAB2]->getSoundSignal(BrakeLock::CHANGE_COMB_POS_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_LOCK_BP_DRAIN_FLOW] = brake_lock[CAB2]->getSoundSignal(BrakeLock::BP_DRAIN_FLOW_SOUND);
     // Кран поездного тормоза
     analogSignal[SOUND_BRAKE_CRANE_CHANGE_POS] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::CHANGE_POS_SOUND);
     analogSignal[SOUND_BRAKE_CRANE_ER_STAB_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::ER_STAB_SOUND);
@@ -52,10 +59,21 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_BRAKE_CRANE_ER_DRAIN_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::ER_DRAIN_FLOW_SOUND);
     analogSignal[SOUND_BRAKE_CRANE_BP_FILL_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::BP_FILL_FLOW_SOUND);
     analogSignal[SOUND_BRAKE_CRANE_BP_DRAIN_FLOW] = brake_crane[CAB1]->getSoundSignal(BrakeCrane::BP_DRAIN_FLOW_SOUND);
+
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_CHANGE_POS] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::CHANGE_POS_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_ER_STAB_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::ER_STAB_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_ER_FILL_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::ER_FILL_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_ER_DRAIN_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::ER_DRAIN_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_BP_FILL_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::BP_FILL_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_BRAKE_CRANE_BP_DRAIN_FLOW] = brake_crane[CAB2]->getSoundSignal(BrakeCrane::BP_DRAIN_FLOW_SOUND);
     // Кран локомотивного тормоза
     analogSignal[SOUND_LOCO_CRANE_CHANGE_POS] = loco_crane[CAB1]->getSoundSignal(LocoCrane::CHANGE_POS_SOUND);
     analogSignal[SOUND_LOCO_CRANE_BC_FILL_FLOW] = loco_crane[CAB1]->getSoundSignal(LocoCrane::BC_FILL_FLOW_SOUND);
     analogSignal[SOUND_LOCO_CRANE_BC_DRAIN_FLOW] = loco_crane[CAB1]->getSoundSignal(LocoCrane::BC_DRAIN_FLOW_SOUND);
+
+    analogSignal[CAB2_SOUND_LOCO_CRANE_CHANGE_POS] = loco_crane[CAB2]->getSoundSignal(LocoCrane::CHANGE_POS_SOUND);
+    analogSignal[CAB2_SOUND_LOCO_CRANE_BC_FILL_FLOW] = loco_crane[CAB2]->getSoundSignal(LocoCrane::BC_FILL_FLOW_SOUND);
+    analogSignal[CAB2_SOUND_LOCO_CRANE_BC_DRAIN_FLOW] = loco_crane[CAB2]->getSoundSignal(LocoCrane::BC_DRAIN_FLOW_SOUND);
 
     // Звуки в движении
     double Vkmh = abs(velocity) * Physics::kmh;
@@ -108,15 +126,30 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_GV_ON] = gv_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
 
+    analogSignal[CAB2_SOUND_TUMBLER_CTRL_CIRCUIT_ON] = cu_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PANT_BWD_ON] = pant2_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PANT_FWD_ON] = pant1_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PANTS_ON] = pants_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_GV_ON] = gv_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = proj2_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
 //    analogSignal[SOUND_TUMBLER_PROJECTOR1_OFF] = proj1_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
 //    analogSignal[SOUND_TUMBLER_RADIO_OFF] = radio_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
+
     analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_OFF] = cu_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_BWD_OFF] = pant2_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_FWD_OFF] = pant1_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANTS_OFF] = pants_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_GV_RETURN_OFF] = gv_return_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_GV_OFF] = gv_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
+
+    analogSignal[CAB2_SOUND_TUMBLER_CTRL_CIRCUIT_ON] = cu_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PANT_BWD_ON] = pant2_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PANT_FWD_ON] = pant1_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PANTS_ON] = pants_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_GV_ON] = gv_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
 
     // Ближний ряд тумблеров приборной панели машиниста
 //    analogSignal[SOUND_TUMBLER_AUTOSAND_ON] = autosand_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
@@ -129,6 +162,15 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_COMPRESSOR_ON] = mk_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PHASESPLITTER_ON] = fr_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
 
+    analogSignal[CAB2_SOUND_TUMBLER_FAN6_ON] = mv_tumblers[CAB2][MV6].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN5_ON] = mv_tumblers[CAB2][MV5].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN4_ON] = mv_tumblers[CAB2][MV4].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN3_ON] = mv_tumblers[CAB2][MV3].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN2_ON] = mv_tumblers[CAB2][MV2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN1_ON] = mv_tumblers[CAB2][MV1].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_COMPRESSOR_ON] = mk_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PHASESPLITTER_ON] = fr_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+
 //    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = autosand_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_FAN6_OFF] = mv_tumblers[CAB1][MV6].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_FAN5_OFF] = mv_tumblers[CAB1][MV5].getSoundSignal(Trigger::OFF_SOUND);
@@ -138,6 +180,15 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_FAN1_OFF] = mv_tumblers[CAB1][MV1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_COMPRESSOR_OFF] = mk_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PHASESPLITTER_OFF] = fr_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
+
+    analogSignal[CAB2_SOUND_TUMBLER_FAN6_OFF] = mv_tumblers[CAB2][MV6].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN5_OFF] = mv_tumblers[CAB2][MV5].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN4_OFF] = mv_tumblers[CAB2][MV4].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN3_OFF] = mv_tumblers[CAB2][MV3].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN2_OFF] = mv_tumblers[CAB2][MV2].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_FAN1_OFF] = mv_tumblers[CAB2][MV1].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_COMPRESSOR_OFF] = mk_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PHASESPLITTER_OFF] = fr_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
 
     // Тяговые электродвигатели
     analogSignal[SOUND_TRACTION_ELETROENGINE_1] = motor[TED1]->getSoundSignal();
@@ -151,4 +202,8 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_EPK_ON] = key_epk[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_EPK_OFF] = key_epk[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_EPK] = epk[CAB1]->getSoundSignal();
+
+    analogSignal[CAB2_SOUND_EPK_ON] = key_epk[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_EPK_OFF] = key_epk[CAB2].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_EPK] = epk[CAB2]->getSoundSignal();
 }
