@@ -119,10 +119,10 @@ void Skybox::setDateTime(simulator_time_t sim_time)
         {
             textures_and_weights[stt.texture] = 1.0f;
         }
-        if (time_in_interval(sim_time.time, stt.time_appear_begin, stt.time_appear_end))
+        if (time_in_interval(sim_time.time, stt.time_disappear_begin, stt.time_disappear_end))
         {
-            textures_and_weights[stt.texture] = static_cast<float>(stt.time_appear_end.data() - sim_time.time.data()) /
-                                                static_cast<float>(stt.time_appear_end.data() - stt.time_appear_begin.data());
+            textures_and_weights[stt.texture] = static_cast<float>(stt.time_disappear_end.data() - sim_time.time.data()) /
+                                                static_cast<float>(stt.time_disappear_end.data() - stt.time_disappear_begin.data());
         }
     }
     setActiveTextures(textures_and_weights);

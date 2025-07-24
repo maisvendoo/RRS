@@ -44,3 +44,4 @@ endif()
 
 install(FILES ../common-headers/sound-signal.h DESTINATION sdk/include)
 install(FILES ../common-headers/key-symbols.h DESTINATION sdk/include)
+install(FILES ../common-headers/datetime.h DESTINATION sdk/include)
