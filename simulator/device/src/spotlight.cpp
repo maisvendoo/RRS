@@ -3,9 +3,28 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SpotLight::preStep(state_vector_t &Y, double t)
+SpotLight::SpotLight(QObject *parent) : Device(parent)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+SpotLight::~SpotLight()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void SpotLight::preStep(state_vector_t &Y, double t)
+{
+    double u1 = static_cast<double>(is_low);
+    double u2 = static_cast<double>(is_high);
+
+    intensity = u1 * low_level + u1 * u2 * (1.0 - low_level);
 }
 
 //------------------------------------------------------------------------------
@@ -23,5 +42,9 @@ void SpotLight::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void SpotLight::load_config(CfgReader &cfg)
 {
+    QString secName = "Device";
 
+    cfg.getDouble(secName, "LowLevel", low_level);
+
+    low_level = cut(low_level, 0.0, 1.0);
 }

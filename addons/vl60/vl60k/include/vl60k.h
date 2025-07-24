@@ -55,6 +55,8 @@ class SpeedMap;
 class TracTransformer;
 class TrainHorn;
 
+#include    <spotlight.h>
+
 /*!
  * \class
  * \brief Основной класс, описывающий весь электровоз
@@ -376,6 +378,12 @@ private:
     double U_bat = 55.0;
 
     DecoderALSN *alsn_decoder[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
+
+    Trigger tumbler_spotlight_low[CABS_NUM];
+
+    Trigger tumbler_spotlight_high[CABS_NUM];
+
+    SpotLight *spotlight[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Общая инициализация локомотива
     void initialization();

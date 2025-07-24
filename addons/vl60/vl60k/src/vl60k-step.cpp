@@ -278,6 +278,14 @@ void VL60k::stepOtherEquipment(double t, double dt)
     payload_coeff = sand_system->getSandLevel();
     setPayloadCoeff(payload_coeff);
 
+    // Управление прожекторами
+    for (auto i : {CAB1, CAB2})
+    {
+        spotlight[i]->setState(tumbler_spotlight_low[i].getState(),
+                               tumbler_spotlight_high[i].getState());
+        spotlight[i]->step(t, dt);
+    }
+
     if (reg == nullptr)
         return;
 

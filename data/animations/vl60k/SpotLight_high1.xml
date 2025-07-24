@@ -4,8 +4,7 @@
 		<SignalID>430</SignalID>
 		<Duration>1.33</Duration>
 		<Color>1.0 1.0 1.0</Color>
-		<MaxIntensity>5000.0</MaxIntensity>
-		<FixedSignal>0.5</FixedSignal>
+		<MaxIntensity>5000.0</MaxIntensity>		
 	</LightAnimation>
 
 	<KeyPoint>
