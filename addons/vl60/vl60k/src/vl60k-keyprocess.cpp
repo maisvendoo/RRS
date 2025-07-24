@@ -183,4 +183,22 @@ void VL60k::keyProcess()
         else
             key_epk[cabine_idx].reset();
     }
+
+    // Прожектор "Тускло"
+    if (getKeyState(KEY_G))
+    {
+        if (isShift())
+            tumbler_spotlight_low[cabine_idx].set();
+        else
+            tumbler_spotlight_low[cabine_idx].reset();
+    }
+
+    // Прожектор "Ярко"
+    if (getKeyState(KEY_H))
+    {
+        if (isShift())
+            tumbler_spotlight_high[cabine_idx].set();
+        else
+            tumbler_spotlight_high[cabine_idx].reset();
+    }
 }
