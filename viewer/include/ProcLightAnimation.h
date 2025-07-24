@@ -22,6 +22,10 @@ private:
 
     vsg::ref_ptr<vsg::Light> light;
 
+    vsg::vec3 light_color = vsg::vec3(1.0, 1.0, 1.0);
+
+    double max_intensity = 1.0;
+
     void update(float current_signal) override;
 
     bool load_config(CfgReader &cfg) override;

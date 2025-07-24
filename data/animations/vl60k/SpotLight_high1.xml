@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<LightAnimation>
+		<SignalID>430</SignalID>
+		<Duration>1.33</Duration>
+		<Color>1.0 1.0 0.0</Color>
+		<MaxIntesity>200.0</MaxIntesity>
+		<FixedSignal>0.0</FixedSignal>
+	</LightAnimation>
+
+	<KeyPoint>
+		<Param>0.0</Param>
+		<Value>0.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>1.0</Param>
+		<Value>1.0</Value>
+	</KeyPoint>
+
+</Config>

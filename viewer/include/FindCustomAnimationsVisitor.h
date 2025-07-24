@@ -57,6 +57,9 @@ private:
     template <typename VisitorClass>
     vsg::ref_ptr<ProcAnimation> create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
 
+    template <typename AnimationClass>
+    vsg::ref_ptr<ProcAnimation> create_light_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
+
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
     vsg::ref_ptr<vsg::Duplicate> duplicate;

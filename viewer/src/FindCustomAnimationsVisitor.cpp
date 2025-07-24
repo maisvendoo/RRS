@@ -7,6 +7,7 @@
 #include "ProcAnimation.h"
 #include "ProcRotationAnimation.h"
 #include "ProcTranslationAnimation.h"
+#include "ProcLightAnimation.h"
 
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -16,6 +17,7 @@
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <string>
+#include <iostream>
 
 //------------------------------------------------------------------------------
 //
@@ -127,6 +129,12 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
         {
             return animation;
         }
+
+        animation = create_light_animation<ProcLightAnimation>("LightAnimation", cfg, &group);
+        if (animation)
+        {
+            return animation;
+        }
     }
 
     return nullptr;
@@ -190,6 +198,36 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animati
             }
 
             return animation;
+        }
+    }
+
+    return nullptr;
+}
+
+template<typename AnimationClass>
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(const char *type, CfgReader &cfg, vsg::Group *group_ptr)
+{
+    std::cout << "Find config " << type << std::endl;
+    const auto group_node = vsg::ref_ptr(group_ptr);
+
+    const auto config_section = cfg.getFirstSection(type);
+    if (!config_section.isNull())
+    {
+        if (const auto light_node = group_node.template cast<vsg::Light>())
+        {
+            const auto animation = AnimationClass::create(light_node);
+            if (animation && animation->load(cfg))
+            {
+                const std::scoped_lock pdo_lock(pdo->mutex);
+                pdo->tag(group_ptr);
+                deferred_animations.emplace_back(DeferredAnimation{group_ptr, animation});
+
+                return animation;
+            }
+        }
+        else
+        {
+            std::cout << "EE: Can't convert Group node to Light node!!!" << std::endl;
         }
     }
 
