@@ -17,7 +17,7 @@
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <string>
-#include <iostream>
+#include <Logger.h>
 
 //------------------------------------------------------------------------------
 //
@@ -69,6 +69,34 @@ void FindCustomAnimationsVisitor::apply(vsg::Group& group)
     }
 
     group.traverse(*this);
+}
+
+void FindCustomAnimationsVisitor::apply(vsg::Light &light)
+{
+    std::string name;
+    light.getValue("name", name);
+
+    if (name.empty())
+    {
+        light.getValue("Name", name);
+    }
+
+    if (name.empty())
+    {
+        light.traverse(*this);
+        return;
+    }
+
+    LOG_INFO(name.data());
+
+    vsg::ref_ptr<ProcAnimation> animation = create_animation(name, light);
+    if (animation)
+    {
+        animation->name = name;
+        animations->thread_safe_insert({animation->getSignalID(), animation});
+    }
+
+    light.traverse(*this);
 }
 
 //------------------------------------------------------------------------------
@@ -128,9 +156,20 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
         if (animation)
         {
             return animation;
-        }
+        }        
+    }
 
-        animation = create_light_animation<ProcLightAnimation>("LightAnimation", cfg, &group);
+    return nullptr;
+}
+
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const std::string &name, vsg::Light &light)
+{
+    std::string file_path = animations_dir + name + ".xml";
+
+    CfgReader cfg;
+    if (cfg.load(file_path.c_str()))
+    {
+        auto animation = create_light_animation("LightAnimation", cfg, &light);
         if (animation)
         {
             return animation;
@@ -204,31 +243,28 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animati
     return nullptr;
 }
 
-template<typename AnimationClass>
-vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(const char *type, CfgReader &cfg, vsg::Group *group_ptr)
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(const char *type, CfgReader &cfg, vsg::Light *light_ptr)
 {
-    std::cout << "Find config " << type << std::endl;
-    const auto group_node = vsg::ref_ptr(group_ptr);
+    const auto light_node = vsg::ref_ptr(light_ptr);
 
     const auto config_section = cfg.getFirstSection(type);
     if (!config_section.isNull())
     {
-        if (const auto light_node = group_node.template cast<vsg::Light>())
+        const auto animation = ProcLightAnimation::create(light_node);
+        if (animation && animation->load(cfg))
         {
-            const auto animation = AnimationClass::create(light_node);
-            if (animation && animation->load(cfg))
-            {
-                const std::scoped_lock pdo_lock(pdo->mutex);
-                pdo->tag(group_ptr);
-                deferred_animations.emplace_back(DeferredAnimation{group_ptr, animation});
+            LOG_INFO("Loaded light config");
+            const std::scoped_lock pdo_lock(pdo->mutex);
+            pdo->tag(light_ptr);
+            deferred_animations.emplace_back(DeferredAnimation{light_ptr, animation});
 
-                return animation;
-            }
+            return animation;
         }
-        else
-        {
-            std::cout << "EE: Can't convert Group node to Light node!!!" << std::endl;
-        }
+
+    }
+    else
+    {
+        LOG_ERROR("Section LightAnimation is't found");
     }
 
     return nullptr;

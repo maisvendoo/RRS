@@ -45,11 +45,14 @@ public:
 
     void apply(vsg::Node& node) override;
     void apply(vsg::Group& group) override;
+    void apply(vsg::Light& light) override;
 
     void reconfigure_animations();
 
 private:
     vsg::ref_ptr<ProcAnimation> create_animation(const std::string& name, vsg::Group& group);
+
+    vsg::ref_ptr<ProcAnimation> create_animation(const std::string& name, vsg::Light& light);
 
     template <typename AnimationClass>
     vsg::ref_ptr<ProcAnimation> create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
@@ -57,8 +60,7 @@ private:
     template <typename VisitorClass>
     vsg::ref_ptr<ProcAnimation> create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
 
-    template <typename AnimationClass>
-    vsg::ref_ptr<ProcAnimation> create_light_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
+    vsg::ref_ptr<ProcAnimation> create_light_animation(const char* type, CfgReader& cfg, vsg::Light* light_ptr);
 
 private:
     vsg::ref_ptr<vsg::PropagateDynamicObjects> pdo;
