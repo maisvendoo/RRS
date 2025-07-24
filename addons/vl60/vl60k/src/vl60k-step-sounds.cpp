@@ -27,8 +27,11 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     (void) t;
     (void) dt;
     // Свисток и тифон
-    analogSignal[SOUND_SVISTOK] = horn->getSoundSignal(TrainHorn::SVISTOK_SOUND);
-    analogSignal[SOUND_TIFON] = horn->getSoundSignal(TrainHorn::TIFON_SOUND);
+    analogSignal[SOUND_SVISTOK] = horn[CAB1]->getSoundSignal(TrainHorn::SVISTOK_SOUND);
+    analogSignal[SOUND_TIFON] = horn[CAB1]->getSoundSignal(TrainHorn::TIFON_SOUND);
+
+    analogSignal[CAB2_SOUND_SVISTOK] = horn[CAB2]->getSoundSignal(TrainHorn::SVISTOK_SOUND);
+    analogSignal[CAB2_SOUND_TIFON] = horn[CAB2]->getSoundSignal(TrainHorn::TIFON_SOUND);
 
     // Реверсор и контроллер
     analogSignal[SOUND_REVERSOR] = controller[CAB1]->getSoundSignal(ControllerKME_60_044::REVERS_CHANGE_POS_SOUND);
@@ -42,7 +45,8 @@ void VL60k::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_EKG_AUTO] = main_controller->getSoundSignal(EKG_8G::CHANGE_POS_AUTO_SOUND);
 
     // Скоростемер
-    analogSignal[SOUND_SPEED_METER_SL2M] = speed_meter->getSoundSignal();
+    analogSignal[SOUND_SPEED_METER_SL2M] = speed_meter[CAB1]->getSoundSignal();
+    analogSignal[CAB2_SOUND_SPEED_METER_SL2M] = speed_meter[CAB2]->getSoundSignal();
 
     // Устройство блокировки тормозов
     analogSignal[SOUND_BRAKE_LOCK_CHANGE_LOCK_POS] = brake_lock[CAB1]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND);
