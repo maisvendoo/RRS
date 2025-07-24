@@ -2,6 +2,8 @@
 #ifndef MY_GUI_H
 #define MY_GUI_H
 
+#include "datetime.h"
+
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
@@ -19,10 +21,15 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     GUIParams() {}
 
     vsg::observer_ptr<vsg::Viewer> viewer;
-    simulator_time_t* sim_time;
+    simulator_time_t* sim_time = nullptr;
+    server_date_t local_date = server_date_t();
+    server_time_t local_time = server_time_t();
     Skybox *skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
+
+    int use_server_time = true;
+    bool was_server_time_unavailable = true;
 
     bool prev_Esc = false;
     bool is_show_quit_dialog = false;

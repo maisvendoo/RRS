@@ -1,6 +1,5 @@
 #include "MyGui.h"
 
-#include "datetime.h"
 #include "filesystem.h"
 
 #include "Skybox.h"
@@ -264,10 +263,21 @@ void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
 
-    std::string text = (params->sim_time) ?
-                            params->sim_time->getString().toStdString() :
-                            "Время сервера: недоступно";
-    ImGui::Text(u8"%s", text.c_str());
+    if (params->sim_time)
+    {
+        std::string text_server_datetime = params->sim_time->getString().toStdString();
+        ImGui::RadioButton(text_server_datetime.c_str(), &(params->use_server_time), 1);
+    }
+    else
+    {
+        ImGui::RadioButton("Время сервера: недоступно", false);
+    }
+
+    std::string text_use_local = "Использовать локальное время:";
+    ImGui::RadioButton(text_use_local.c_str(), &(params->use_server_time), 0);
+    std::string text_local_datetime =
+        (params->local_date.getString() + " " + params->local_time.getString()).toStdString();
+    ImGui::Text(u8"%s", text_local_datetime.c_str());
 
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
