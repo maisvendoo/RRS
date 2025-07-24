@@ -73,26 +73,16 @@ void FindCustomAnimationsVisitor::apply(vsg::Group& group)
 
 void FindCustomAnimationsVisitor::apply(vsg::Light &light)
 {
-    std::string name;
-    light.getValue("name", name);
-
-    if (name.empty())
-    {
-        light.getValue("Name", name);
-    }
-
-    if (name.empty())
+    if (light.name.empty())
     {
         light.traverse(*this);
         return;
-    }
+    }    
 
-    LOG_INFO(name.data());
-
-    vsg::ref_ptr<ProcAnimation> animation = create_animation(name, light);
+    vsg::ref_ptr<ProcAnimation> animation = create_animation(light.name, light);
     if (animation)
     {
-        animation->name = name;
+        animation->name = light.name;
         animations->thread_safe_insert({animation->getSignalID(), animation});
     }
 

@@ -5,7 +5,7 @@
 		<Duration>1.33</Duration>
 		<Color>1.0 1.0 0.0</Color>
 		<MaxIntesity>200.0</MaxIntesity>
-		<FixedSignal>0.0</FixedSignal>
+		<FixedSignal>0.5</FixedSignal>
 	</LightAnimation>
 
 	<KeyPoint>
