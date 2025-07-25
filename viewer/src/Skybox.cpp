@@ -181,14 +181,17 @@ void Skybox::setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float>
 //------------------------------------------------------------------------------
 void Skybox::update_skybox()
 {
-    // Собираем итераторы по пикселям активных текстур
     float sum_weights = 0.0f;
+
+    // Собираем итераторы по пикселям активных текстур
     std::vector<std::pair<vsg::stride_iterator<vsg::ubvec4>, float>> active_pixels;
+    active_pixels.reserve(active_textures_and_weights.size());
+
     for (const auto& [texture, weight] : active_textures_and_weights)
     {
         if (weight > 1.0e-5f)
         {
-            active_pixels.push_back({texture->begin(), weight});
+            active_pixels.emplace_back(texture->begin(), weight);
             sum_weights += weight;
         }
     }
@@ -198,7 +201,7 @@ void Skybox::update_skybox()
     while (texture_pixel != texture->end())
     {
         // Закрашиваем чёрным
-        *texture_pixel = vsg::ubvec4{0, 0, 0, 255};
+        texture_pixel->set(0, 0, 0, 255);
         for (auto& [pixel, weight] : active_pixels)
         {
             // Добавляем цвет из каждой активной текстуры

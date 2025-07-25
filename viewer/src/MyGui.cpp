@@ -325,6 +325,27 @@ void MyGui::showSettings() const
         params->sec = day_seconds % 60;
     }
 
+    // Calculate sun position from latitude, longitude, date and time
+    //--------------------------------------------------------------------------
+    // Координаты РГУПСа (для теста)
+    static constexpr double latitude = 47.2510;
+    static constexpr double longitude = 39.6984;
+
+
+
+
+    double azimuth = 0.0;
+    double altitude = 0.0;
+
+    // params->sun_azimuth_degrees = azimuth;
+    // params->sun_altitude_degrees = altitude;
+
+    ImGui::Text("latitude: %f", latitude);
+    ImGui::Text("longitude: %f", longitude);
+    ImGui::Text("azimuth: %f", azimuth);
+    ImGui::Text("elevation: %f", altitude);
+    //--------------------------------------------------------------------------
+
     ImGui::PushItemWidth(300);
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
