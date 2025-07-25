@@ -13,7 +13,7 @@ class DEVICE_EXPORT Coupling : public Device
 public:
 
     /// Конструктор
-    Coupling(QObject *parent = Q_NULLPTR);
+    Coupling(QObject *parent = nullptr);
 
     /// Деструктор
     ~Coupling();

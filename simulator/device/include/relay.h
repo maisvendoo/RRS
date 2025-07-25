@@ -12,7 +12,7 @@ class DEVICE_EXPORT Relay : public Device
 {
 public:
 
-    Relay(size_t num_contacts = 1, QObject *parent = Q_NULLPTR);
+    Relay(size_t num_contacts = 1, QObject *parent = nullptr);
 
     ~Relay();
 

@@ -159,19 +159,19 @@ void Signal::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return false;
     }
 
-    Trajectory *traj = Q_NULLPTR;
+    Trajectory *traj = nullptr;
     dvec3 pos;
 
     if (signal_dir == 1)
     {
         traj = conn->getBwdTraj();
 
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             return false;
         }
@@ -186,7 +186,7 @@ bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
     {
         traj = conn->getFwdTraj();
 
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             return false;
         }

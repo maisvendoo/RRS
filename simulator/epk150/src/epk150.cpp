@@ -93,13 +93,13 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double dp1 = Y[1] - ps2;
 
-    double u2 = cut(pf(k[1] * dp1), 0.0, 1.0);
+    double u2 = std::clamp(pf(k[1] * dp1), 0.0, 1.0);
 
-    double u3 = cut(nf(k[2] * dp1), 0.0, 1.0);
+    double u3 = std::clamp(nf(k[2] * dp1), 0.0, 1.0);
 
     double sum_p1 = Y[2] + ps1 - pBP;
 
-    double u4 = cut(nf(k[3] * sum_p1), 0.0, 1.0);
+    double u4 = std::clamp(nf(k[3] * sum_p1), 0.0, 1.0);
 
     bool old_emergency_brake = is_emergency_brake;
 
@@ -116,7 +116,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
 
     double sum_p2 = Y[0] + pk * (1.0 - is_key_on) - pd;
 
-    is_whistle_on = cut(nf(k[4] * sum_p2), 0.0, 1.0);
+    is_whistle_on = std::clamp(nf(k[4] * sum_p2), 0.0, 1.0);
 
     // Поток из питательной магистрали в камеру выдержки времени
     double Q_fl_2 = K[4] * (pFL - Y[1]) * hs_p(sum_p2);

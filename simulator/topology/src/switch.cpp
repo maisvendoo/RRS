@@ -27,15 +27,15 @@ Switch::~Switch()
 Trajectory *Switch::getFwdTraj() const
 {
     // Если траектория вперёд единственная - делать дальше нечего
-    if (fwdMinusTraj == Q_NULLPTR)
+    if (fwdMinusTraj == nullptr)
     {
-        if (fwdPlusTraj == Q_NULLPTR)
+        if (fwdPlusTraj == nullptr)
         {
-            return Q_NULLPTR;
+            return nullptr;
         }
         return fwdPlusTraj;
     }
-    if (fwdPlusTraj == Q_NULLPTR)
+    if (fwdPlusTraj == nullptr)
     {
         return fwdMinusTraj;
     }
@@ -52,7 +52,7 @@ Trajectory *Switch::getFwdTraj() const
         return fwdMinusTraj;
     }
 
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -61,15 +61,15 @@ Trajectory *Switch::getFwdTraj() const
 Trajectory *Switch::getBwdTraj() const
 {
     // Если траектория вперёд единственная - делать дальше нечего
-    if (bwdMinusTraj == Q_NULLPTR)
+    if (bwdMinusTraj == nullptr)
     {
-        if (bwdPlusTraj == Q_NULLPTR)
+        if (bwdPlusTraj == nullptr)
         {
-            return Q_NULLPTR;
+            return nullptr;
         }
         return bwdPlusTraj;
     }
-    if (bwdPlusTraj == Q_NULLPTR)
+    if (bwdPlusTraj == nullptr)
     {
         return bwdMinusTraj;
     }
@@ -86,7 +86,7 @@ Trajectory *Switch::getBwdTraj() const
         return bwdMinusTraj;
     }
 
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -103,24 +103,24 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
     QString fwd_minus_name;
     cfg.getString(secNode, "fwdMinusTraj", fwd_minus_name);
-    fwdMinusTraj = traj_list.value(fwd_minus_name, Q_NULLPTR);
+    fwdMinusTraj = traj_list.value(fwd_minus_name, nullptr);
 
     QString bwd_minus_name;
     cfg.getString(secNode, "bwdMinusTraj", bwd_minus_name);
-    bwdMinusTraj = traj_list.value(bwd_minus_name, Q_NULLPTR);
+    bwdMinusTraj = traj_list.value(bwd_minus_name, nullptr);
 
     QString fwd_plus_name;
     cfg.getString(secNode, "fwdPlusTraj", fwd_plus_name);
-    fwdPlusTraj = traj_list.value(fwd_plus_name, Q_NULLPTR);
+    fwdPlusTraj = traj_list.value(fwd_plus_name, nullptr);
 
     QString bwd_plus_name;
     cfg.getString(secNode, "bwdPlusTraj", bwd_plus_name);
-    bwdPlusTraj = traj_list.value(bwd_plus_name, Q_NULLPTR);
+    bwdPlusTraj = traj_list.value(bwd_plus_name, nullptr);
 
     size_t inputs_count = 0;
     size_t outputs_count = 0;
 
-    if (bwdMinusTraj != Q_NULLPTR)
+    if (bwdMinusTraj != nullptr)
     {
         bwdMinusTraj->setFwdConnector(this);
         Journal::instance()->info("Backward minus traj: " + bwdMinusTraj->getName());
@@ -131,7 +131,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         Journal::instance()->info("Backward minus traj: NONE");
     }
 
-    if (bwdPlusTraj != Q_NULLPTR)
+    if (bwdPlusTraj != nullptr)
     {
         bwdPlusTraj->setFwdConnector(this);
         Journal::instance()->info("Backward plus traj: " + bwdPlusTraj->getName());
@@ -142,7 +142,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         Journal::instance()->info("Backward plus traj: NONE");
     }
 
-    if (fwdMinusTraj != Q_NULLPTR)
+    if (fwdMinusTraj != nullptr)
     {
         fwdMinusTraj->setBwdConnector(this);
         Journal::instance()->info("Forward minus traj: " + fwdMinusTraj->getName());
@@ -153,7 +153,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         Journal::instance()->info("Forward minus traj: NONE");
     }
 
-    if (fwdPlusTraj != Q_NULLPTR)
+    if (fwdPlusTraj != nullptr)
     {
         fwdPlusTraj->setBwdConnector(this);
         Journal::instance()->info("Forward plus traj: " + fwdPlusTraj->getName());
@@ -347,7 +347,7 @@ void Switch::step(double t, double dt)
     int prev_state_bwd = state_bwd;
 
     // Если траектория вперёд единственная - делать дальше нечего
-    if ((fwdMinusTraj == Q_NULLPTR) || (fwdPlusTraj == Q_NULLPTR))
+    if ((fwdMinusTraj == nullptr) || (fwdPlusTraj == nullptr))
     {
         state_fwd = 0;
     }
@@ -375,7 +375,7 @@ void Switch::step(double t, double dt)
 
 
     // Если траектория назад единственная - делать дальше нечего
-    if ((bwdMinusTraj == Q_NULLPTR) || (bwdPlusTraj == Q_NULLPTR))
+    if ((bwdMinusTraj == nullptr) || (bwdPlusTraj == nullptr))
     {
         state_bwd = 0;
     }
@@ -550,7 +550,7 @@ void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *tra
     // Анализирум наличие траектории на каждом из ответвлений,
     // пишем в буфер признак присутствия, и если она присутствует,
     // далее пишем имя этой траектории
-    bool has_traj = traj != Q_NULLPTR;
+    bool has_traj = traj != nullptr;
     stream << has_traj;
 
     if (has_traj)
@@ -582,7 +582,7 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
         }
     }
 
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------

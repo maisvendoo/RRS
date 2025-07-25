@@ -10,7 +10,7 @@ class ConnectorSpeedMap : public ConnectorDevice
 {
 public:
 
-    ConnectorSpeedMap(QObject *parent = Q_NULLPTR);
+    ConnectorSpeedMap(QObject *parent = nullptr);
 
     ~ConnectorSpeedMap();
 

@@ -14,7 +14,7 @@ public:
 
     PressureRegulator(double min_pressure = 0.75,
                       double max_pressure = 0.9,
-                      QObject *parent = Q_NULLPTR);
+                      QObject *parent = nullptr);
 
     ~PressureRegulator();
 

@@ -13,7 +13,7 @@
 //
 //------------------------------------------------------------------------------
 Master::Master(QObject *parent) : QObject(parent)
-  , modbusDevice(Q_NULLPTR)
+  , modbusDevice(nullptr)
 {
 
 }
@@ -38,11 +38,11 @@ bool Master::init(QString cfg_path)
         return false;
     }
 
-    if (modbusDevice != Q_NULLPTR)
+    if (modbusDevice != nullptr)
     {
         modbusDevice->disconnectDevice();
         delete modbusDevice;
-        modbusDevice = Q_NULLPTR;
+        modbusDevice = nullptr;
     }
 
     try
@@ -144,7 +144,7 @@ bool Master::loadNetworkMap(const QString &path)
 //------------------------------------------------------------------------------
 bool Master::serialConnection(port_config_t port_config)
 {
-    if (modbusDevice == Q_NULLPTR)
+    if (modbusDevice == nullptr)
     {
 
         return false;
@@ -184,7 +184,7 @@ void Master::readDiscreteInputsRequest(Slave *slave)
 
     QModbusReply *reply = modbusDevice->sendReadRequest(unit, slave->id);
 
-    if (reply != Q_NULLPTR)
+    if (reply != nullptr)
     {
         if (!reply->isFinished())
         {
@@ -199,7 +199,7 @@ void Master::readDiscreteInputsRequest(Slave *slave)
     }
     else
     {
-        slave->incErrosCount();        
+        slave->incErrosCount();
     }
 }
 
@@ -216,7 +216,7 @@ void Master::readInputRegistersRequest(Slave *slave)
 
     QModbusReply *reply = modbusDevice->sendReadRequest(unit, slave->id);
 
-    if (reply != Q_NULLPTR)
+    if (reply != nullptr)
     {
         if (!reply->isFinished())
         {
@@ -253,7 +253,7 @@ void Master::writeCoils(Slave *slave)
 
     QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
 
-    if (reply != Q_NULLPTR)
+    if (reply != nullptr)
     {
         if (!reply->isFinished())
         {
@@ -285,7 +285,7 @@ void Master::writeCoil(Slave* slave, slave_data_t coil)
 
     QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
 
-    if (reply != Q_NULLPTR)
+    if (reply != nullptr)
     {
         if (!reply->isFinished())
         {
@@ -322,7 +322,7 @@ void Master::writeHoldingRegisters(Slave *slave)
 
     QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
 
-    if (reply != Q_NULLPTR)
+    if (reply != nullptr)
     {
         if (!reply->isFinished())
         {
@@ -352,7 +352,7 @@ void Master::writeHoldingRegister(Slave *slave, slave_data_t hreg)
 
     QModbusReply *reply = modbusDevice->sendWriteRequest(unit, slave->id);
 
-    if (reply != Q_NULLPTR)
+    if (reply != nullptr)
     {
         if (!reply->isFinished())
         {

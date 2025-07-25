@@ -172,7 +172,7 @@ void ExitSignal::lens_control()
 //------------------------------------------------------------------------------
 void ExitSignal::fwd_way_busy_control()
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
@@ -181,7 +181,7 @@ void ExitSignal::fwd_way_busy_control()
     {
         Trajectory *traj = conn->getFwdTraj();
 
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             return;
         }
@@ -193,7 +193,7 @@ void ExitSignal::fwd_way_busy_control()
     {
         Trajectory *traj = conn->getBwdTraj();
 
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             return;
         }
@@ -209,7 +209,7 @@ void ExitSignal::fwd_way_busy_control()
 //------------------------------------------------------------------------------
 void ExitSignal::removal_area_control()
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
@@ -228,7 +228,7 @@ void ExitSignal::removal_area_control()
     yellow_relay->setVoltage(U_bat * static_cast<double>(is_YR_ON && line_relay->getContactState(LINE_N_YELLOW)));
     green_relay->setVoltage(U_bat * static_cast<double>(is_GR_ON && line_relay->getPlusContactState(LINE_PLUS_GREEN)));
 
-    if (yellow_relay->getContactState(YR_ALSN_CTRL) && (next_signal != Q_NULLPTR))
+    if (yellow_relay->getContactState(YR_ALSN_CTRL) && (next_signal != nullptr))
     {
         next_signal->allowTransmitALSN(!lens_state[RED_LENS]);
     }
@@ -239,7 +239,7 @@ void ExitSignal::removal_area_control()
 //------------------------------------------------------------------------------
 Connector *ExitSignal::check_path_free(Connector *cur_conn, bool &is_free)
 {
-    if (cur_conn == Q_NULLPTR)
+    if (cur_conn == nullptr)
     {
         is_free = false;
         return cur_conn;
@@ -249,7 +249,7 @@ Connector *ExitSignal::check_path_free(Connector *cur_conn, bool &is_free)
 
     while (true)
     {
-        Trajectory *traj = Q_NULLPTR;
+        Trajectory *traj = nullptr;
 
         if (this->getDirection() == 1)
         {
@@ -261,10 +261,10 @@ Connector *ExitSignal::check_path_free(Connector *cur_conn, bool &is_free)
             traj = cur_conn->getBwdTraj();
         }
 
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             is_free = false;
-            return Q_NULLPTR;
+            return nullptr;
         }
 
         is_free = is_free && (!traj->isBusy());
@@ -279,12 +279,12 @@ Connector *ExitSignal::check_path_free(Connector *cur_conn, bool &is_free)
             cur_conn = traj->getBwdConnector();
         }
 
-        if (cur_conn == Q_NULLPTR)
+        if (cur_conn == nullptr)
         {
-            return Q_NULLPTR;
+            return nullptr;
         }
 
-        Signal *signal = Q_NULLPTR;
+        Signal *signal = nullptr;
 
         if (this->getDirection() == 1)
         {
@@ -296,7 +296,7 @@ Connector *ExitSignal::check_path_free(Connector *cur_conn, bool &is_free)
             signal = cur_conn->getSignalBwd();
         }
 
-        if (signal == Q_NULLPTR)
+        if (signal == nullptr)
         {
             continue;
         }
@@ -312,7 +312,7 @@ Connector *ExitSignal::check_path_free(Connector *cur_conn, bool &is_free)
 //------------------------------------------------------------------------------
 void ExitSignal::route_control(Signal **next_signal)
 {
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
@@ -328,7 +328,7 @@ void ExitSignal::route_control(Signal **next_signal)
     while (true)
     {
         // Смотрим следующую за сигналом траекторию
-        Trajectory *traj = Q_NULLPTR;
+        Trajectory *traj = nullptr;
 
         if (this->getDirection() == 1)
         {
@@ -340,7 +340,7 @@ void ExitSignal::route_control(Signal **next_signal)
         }
 
         // её нет - делать больше нечего
-        if (traj == Q_NULLPTR)
+        if (traj == nullptr)
         {
             is_free = false;
             break;
@@ -367,14 +367,14 @@ void ExitSignal::route_control(Signal **next_signal)
 
         // Нет коннектора - ехать некуда, нет стрелки,
         // значит она - явно не по маршруту
-        if (cur_conn == Q_NULLPTR)
+        if (cur_conn == nullptr)
         {
             is_switches_correct = false;
             break;
         }
 
         // Контроль вреза стрелки
-        Trajectory *prev_traj = Q_NULLPTR;
+        Trajectory *prev_traj = nullptr;
 
         // Берем "заднюю" траекторию следующего коннектора
         if (this->getDirection() == 1)
@@ -388,7 +388,7 @@ void ExitSignal::route_control(Signal **next_signal)
 
         // Данная проверка не бессмыслена - стрелка может стоять
         // не по маршруту и вдруг там нет траектории!
-        if (prev_traj == Q_NULLPTR)
+        if (prev_traj == nullptr)
         {
             return;
         }
@@ -399,12 +399,12 @@ void ExitSignal::route_control(Signal **next_signal)
 
         // Стрелка не по маршруту? Ловить нечего - выходим из поиска
         if (!is_switches_correct)
-        {            
+        {
             break;
         }
 
         // Проверяем, дошли ли до сигнала
-        Signal *signal = Q_NULLPTR;
+        Signal *signal = nullptr;
 
         if (this->getDirection() == 1)
         {
@@ -417,7 +417,7 @@ void ExitSignal::route_control(Signal **next_signal)
         }
 
         // если нет - это стык или стрелка, продолжаем поиск
-        if (signal == Q_NULLPTR)
+        if (signal == nullptr)
         {
             continue;
         }
@@ -514,7 +514,7 @@ void ExitSignal::relay_control()
     // Напряжение, даваемое в линию входному
     double U_line_old = U_line_prev;
 
-    U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));    
+    U_dsr = U_bat * static_cast<double>(allow_relay->getContactState(AR_OPEN));
 
     // Линейное напряжение для следующего сигнала
     double is_line_ON = static_cast<double>(fwd_way_relay->getContactState(FWD_BUSY));
@@ -536,11 +536,11 @@ void ExitSignal::relay_control()
     else
     {
         blink_timer->stop();
-    }    
+    }
 
     // Динамическая передача линейного напряжения, так как заранее не ясно
     // какой сигнал будет следующим
-    if (next_signal != Q_NULLPTR)
+    if (next_signal != nullptr)
         line_relay->setVoltage(next_signal->getLineVoltage());
     else
         line_relay->setVoltage(0.0);

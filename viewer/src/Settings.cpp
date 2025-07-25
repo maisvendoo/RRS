@@ -121,15 +121,8 @@ void RouteViewer::loadLightSettings(CfgReader& cfg, const QString& section)
             >> settings.sun_color.z;
     }
 
-    QString sunDirection = "1.0 1.0 -1.0";
-    if (cfg.getString(section, "SunDirection", sunDirection))
-    {
-        std::istringstream stream(sunDirection.toStdString());
-        stream >> settings.sun_direction.x
-            >> settings.sun_direction.y
-            >> settings.sun_direction.z;
-    }
-
+    cfg.getDouble(section, "SunAzimuth", settings.sun_azimuth);
+    cfg.getDouble(section, "SunAltitude", settings.sun_altitude);
 }
 
 //------------------------------------------------------------------------------

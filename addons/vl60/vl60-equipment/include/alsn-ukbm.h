@@ -24,7 +24,7 @@ class SafetyDevice : public Device
 {
 public:
 
-    SafetyDevice(QObject *parent = Q_NULLPTR);
+    SafetyDevice(QObject *parent = nullptr);
 
     ~SafetyDevice();
 

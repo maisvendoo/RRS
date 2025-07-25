@@ -12,7 +12,7 @@ class DEVICE_EXPORT  Trigger : public QObject
 
 public:
 
-    Trigger(QObject *parent = Q_NULLPTR);
+    Trigger(QObject *parent = nullptr);
 
     ~Trigger();
 

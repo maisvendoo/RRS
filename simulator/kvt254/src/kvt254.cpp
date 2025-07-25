@@ -42,7 +42,7 @@ LocoCrane254::~LocoCrane254()
 //------------------------------------------------------------------------------
 void LocoCrane254::setHandlePosition(double position)
 {
-    pos = cut(position, min_pos, max_pos);
+    pos = std::clamp(position, min_pos, max_pos);
     int new_pos_num = getPositionNumber();
     if (pos_num == new_pos_num)
         return;
@@ -55,7 +55,7 @@ void LocoCrane254::setHandlePosition(double position)
 //------------------------------------------------------------------------------
 double LocoCrane254::getHandlePosition() const
 {
-    return cut(pos, min_pos, max_pos);
+    return std::clamp(pos, min_pos, max_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ double LocoCrane254::getHandlePosition() const
 //------------------------------------------------------------------------------
 double LocoCrane254::getHandleShift() const
 {
-    return cut(pos, 0.0, max_pos);
+    return std::clamp(pos, 0.0, max_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -92,10 +92,10 @@ void LocoCrane254::ode_system(const state_vector_t &Y,
     double dp_ur = k[2] * (p_ur - pBC);
 
     // Поток из питательной магистрали в магистраль тормозных цилиндров
-    double Q_fl_bc = K[1] * cut(dp_ur, 0.0, 1.0) * pf(pFL - pBC);
+    double Q_fl_bc = K[1] * std::clamp(dp_ur, 0.0, 1.0) * pf(pFL - pBC);
 
     // Разрядка магистрали тормозных цилиндров в атмосферу
-    double Q_bc_atm = K[2] * cut(-dp_ur, 0.0, 1.0) * pBC;
+    double Q_bc_atm = K[2] * std::clamp(-dp_ur, 0.0, 1.0) * pBC;
 
     // Работа повторительной схемы
     double dp_1 = pIL - Y[P1_PRESSURE];

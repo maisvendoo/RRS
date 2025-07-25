@@ -15,7 +15,7 @@ public:
     TimeRelay(size_t num_contacts = 1,
               double delay_on = 0.0,
               double delay_off = 0.0,
-              QObject *parent = Q_NULLPTR);
+              QObject *parent = nullptr);
 
     ~TimeRelay();
 

@@ -10,7 +10,7 @@ class DEVICE_EXPORT  TractionController : public Device
 {
 public:
 
-    TractionController(QObject *parent = Q_NULLPTR);
+    TractionController(QObject *parent = nullptr);
 
     virtual ~TractionController();
 

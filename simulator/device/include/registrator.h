@@ -14,7 +14,7 @@ class DEVICE_EXPORT Registrator : public QObject
 
 public:
 
-    Registrator(double interval = 0.0, QObject *parent = Q_NULLPTR);
+    Registrator(double interval = 0.0, QObject *parent = nullptr);
 
     ~Registrator();
 

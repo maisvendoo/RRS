@@ -2,28 +2,38 @@
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 
-#include "MyGui.h"
-#include "UpdateViewerHandler.h"
 #include "settings.h"
 
-#include <vsg/app/CommandGraph.h>
-#include <vsg/app/View.h>
-#include <vsg/app/Viewer.h>
-#include <vsg/io/Options.h>
-#include <vsg/lighting/ShadowSettings.h>
-#include <vsg/lighting/AmbientLight.h>
-#include <vsg/lighting/DirectionalLight.h>
-#include <vsg/nodes/Group.h>
-#include <vsg/nodes/RegionOfInterest.h>
+#include <vsg/core/ref_ptr.h>
 
 class CfgReader;
+struct GUIParams;
 class QByteArray;
+class ScreenshotWriter;
 class SoundManager;
 class TcpClient;
-class ScreenshotWriter;
 class TrafficLightsHandler;
-class VehiclesHandler;
 class UpdateViewerHandler;
+class VehiclesHandler;
+
+namespace vsg
+{
+
+class AmbientLight;
+class Camera;
+class CommandGraph;
+class DirectionalLight;
+class Group;
+class LookAt;
+class Options;
+class RegionOfInterest;
+class ShadowSettings;
+class View;
+class Viewer;
+class Window;
+class WindowTraits;
+
+}
 
 //------------------------------------------------------------------------------
 //
@@ -53,7 +63,7 @@ private:
     void loadExternalCameraSettings(CfgReader& cfg, const QString& section);
     void loadFollowCameraSettings(CfgReader& cfg, const QString& section);
 
-    void configureLogLevel();
+    void configureLogLevel() const;
 
     void overrideSettingsByCommandLine(int argc, char* argv[]);
 
@@ -67,7 +77,7 @@ private:
     void initCommandGraph();
     void initViewer();
 
-    void initTCPclient();
+    void initTcpClient();
 
     bool loadRoute();
 
@@ -85,37 +95,37 @@ private slots:
     void slotUpdated();
 
 private:
-    bool is_ready = false;
-    bool is_route = false;
-    bool is_signals = false;
-    bool is_vehicles = false;
+    bool  is_ready = false;
+    bool  is_route = false;
+    bool  is_signals = false;
+    bool  is_vehicles = false;
 
-    settings_t settings = settings_t();
+    settings_t settings;
 
-    vsg::ref_ptr<GUIParams> GUIparams = nullptr;
-    vsg::ref_ptr<UpdateViewerHandler> upd_viewer_handler = nullptr;
+    vsg::ref_ptr<GUIParams>            GUIparams;
+    vsg::ref_ptr<UpdateViewerHandler>  upd_viewer_handler;
 
     // Replace by smart pointers?
-    TcpClient *tcp_client = nullptr;
-    SoundManager *sound_manager = nullptr;
-    ScreenshotWriter *screenshot_writer = nullptr;
-    TrafficLightsHandler *traffic_lights_handler = nullptr;
-    VehiclesHandler *vehicles_handler = nullptr;
+    TcpClient*             tcp_client = nullptr;
+    SoundManager*          sound_manager = nullptr;
+    ScreenshotWriter*      screenshot_writer = nullptr;
+    TrafficLightsHandler*  traffic_lights_handler = nullptr;
+    VehiclesHandler*       vehicles_handler = nullptr;
 
-    vsg::ref_ptr<vsg::Options> options = nullptr;
-    vsg::ref_ptr<vsg::WindowTraits> windowTraits = nullptr;
-    vsg::ref_ptr<vsg::Window> window = nullptr;
-    vsg::ref_ptr<vsg::LookAt> lookAt = nullptr;
-    vsg::ref_ptr<vsg::Camera> camera = nullptr;
-    vsg::ref_ptr<vsg::View> view = nullptr;
-    vsg::ref_ptr<vsg::CommandGraph> commandGraph = nullptr;
-    vsg::ref_ptr<vsg::Viewer> viewer = nullptr;
+    vsg::ref_ptr<vsg::Options>       options;
+    vsg::ref_ptr<vsg::WindowTraits>  windowTraits;
+    vsg::ref_ptr<vsg::Window>        window;
+    vsg::ref_ptr<vsg::LookAt>        lookAt;
+    vsg::ref_ptr<vsg::Camera>        camera;
+    vsg::ref_ptr<vsg::View>          view;
+    vsg::ref_ptr<vsg::CommandGraph>  commandGraph;
+    vsg::ref_ptr<vsg::Viewer>        viewer;
 
-    vsg::ref_ptr<vsg::Group> root = nullptr;
-    vsg::ref_ptr<vsg::AmbientLight> ambient = nullptr;
-    vsg::ref_ptr<vsg::DirectionalLight> sun = nullptr;
-    vsg::ref_ptr<vsg::ShadowSettings> shadowSettings = nullptr;
-    vsg::ref_ptr<vsg::RegionOfInterest> shadow_region = nullptr;
+    vsg::ref_ptr<vsg::Group>             root;
+    vsg::ref_ptr<vsg::AmbientLight>      ambient;
+    vsg::ref_ptr<vsg::DirectionalLight>  sun;
+    vsg::ref_ptr<vsg::ShadowSettings>    shadowSettings;
+    vsg::ref_ptr<vsg::RegionOfInterest>  shadow_region;
 };
 
 #endif // ROUTE_VIEWER_H

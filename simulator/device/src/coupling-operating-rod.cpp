@@ -62,7 +62,7 @@ bool OperatingRod::isFixedUncoupled() const
 void OperatingRod::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
-    Y[0] = cut(Y[0], -1.0, 1.0);
+    Y[0] = std::clamp(Y[0], -1.0, 1.0);
 }
 
 //------------------------------------------------------------------------------

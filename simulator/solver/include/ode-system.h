@@ -35,7 +35,7 @@ class SOLVER_EXPORT OdeSystem : public QObject
 public:
 
     /// Constructor
-    explicit OdeSystem(QObject *parent = Q_NULLPTR);
+    explicit OdeSystem(QObject *parent = nullptr);
     /// Destructor
     virtual ~OdeSystem();
     /// Calculation of right part ODE system

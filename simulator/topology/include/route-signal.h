@@ -10,7 +10,7 @@ class TOPOLOGY_EXPORT RouteSignal : public EnterSignal
 {
 public:
 
-    RouteSignal(QObject *parent = Q_NULLPTR);
+    RouteSignal(QObject *parent = nullptr);
 
     ~RouteSignal();
 

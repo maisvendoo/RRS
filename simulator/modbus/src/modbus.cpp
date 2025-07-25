@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------------------------------
 Modbus::Modbus(QObject *parent) : VirtualInterfaceDevice(parent)
-  , master(Q_NULLPTR)
+  , master(nullptr)
   , is_transmit(false)
 {
     cfg_dir = "modbus";
@@ -64,7 +64,7 @@ void Modbus::controlSignalsProcess()
     {
         // Послыаем запрос на чтение дискретных входов
         master->readDiscreteInputsRequest(slave);
-        // Передаем значение дискретных входов        
+        // Передаем значение дискретных входов
         for (slave_data_t data : slave->discrete_input)
         {
             control_signals.analogSignal[data.index].is_active = true;
@@ -116,7 +116,7 @@ void Modbus::feedbackSignalsProcess()
                 master->writeHoldingRegister(slave, *holding_reg);
                 holding_reg->prev_value = holding_reg->cur_value;
             }
-        }        
+        }
     }
 }
 

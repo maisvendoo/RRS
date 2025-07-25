@@ -10,7 +10,7 @@ class ConnectorALSN : public ConnectorDevice
 {
 public:
 
-    ConnectorALSN(QObject *parent = Q_NULLPTR);
+    ConnectorALSN(QObject *parent = nullptr);
 
     ~ConnectorALSN();
 

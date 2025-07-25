@@ -24,7 +24,7 @@ struct sound_config_t
     QString filename;       ///< Файл звука
 
     sound_config_t()
-        : sound(Q_NULLPTR)
+        : sound(nullptr)
         , prev_state(0)
         , signal_id(0)
         , local_pos_x(0.0f)

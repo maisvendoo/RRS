@@ -12,7 +12,7 @@ class Modbus : public VirtualInterfaceDevice
 {
 public:
 
-    Modbus(QObject *parent = Q_NULLPTR);
+    Modbus(QObject *parent = nullptr);
 
     ~Modbus() = default;
 

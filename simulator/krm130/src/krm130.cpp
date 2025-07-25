@@ -116,10 +116,10 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
     double Q_charge_er = pos[POS_I] * k_charge * (pFL - Y[ER_PRESSURE]);
 
     // Зарядка УР из ГР до зарядного давления в II положении
-    double Q_train_er = pos[POS_II] * cut(p0 - Y[ER_PRESSURE], 0.0, k_charge) * (pFL - Y[ER_PRESSURE]);
+    double Q_train_er = pos[POS_II] * std::clamp(p0 - Y[ER_PRESSURE], 0.0, k_charge) * (pFL - Y[ER_PRESSURE]);
 
     // Разрядка УР через стабилизатор
-    double Q_stab_er = - pos[POS_II] * cut(Y[ER_PRESSURE], 0.0, k_stab);
+    double Q_stab_er = - pos[POS_II] * std::clamp(Y[ER_PRESSURE], 0.0, k_stab);
 
     // Разрядка УР в тормозных положениях
     double Q_brake_er = - pos[POS_Va] * k_Va * Y[ER_PRESSURE]
@@ -137,10 +137,10 @@ void BrakeCrane130::ode_system(const state_vector_t &Y,
     double is_245a5 = pos[POS_II] + pos[POS_IV] + pos[POS_Va] + pos[POS_V];
 
     // Подзарядка ТМ из ГР от реле давления
-    double Q_train_bp = is_245a5 * cut(s1, 0.0, K_feed) * (pFL - pBP);
+    double Q_train_bp = is_245a5 * std::clamp(s1, 0.0, K_feed) * (pFL - pBP);
 
     // Разрядка ТМ от реле давления
-    double Q_brake_bp = is_245a5 * cut(s1, - K_atm, 0.0) * pBP;
+    double Q_brake_bp = is_245a5 * std::clamp(s1, - K_atm, 0.0) * pBP;
 
     // Экстренная разрядка ТМ в VI положении
     double Q_emerg_bp = - K_VI * pBP * pos[POS_VI];

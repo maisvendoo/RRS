@@ -12,7 +12,7 @@ class TOPOLOGY_EXPORT Switch : public Connector
 
 public:
 
-    Switch(QObject *parent = Q_NULLPTR);
+    Switch(QObject *parent = nullptr);
 
     ~Switch();
 
@@ -53,13 +53,13 @@ signals:
 
 private:
 
-    Trajectory *fwdMinusTraj = Q_NULLPTR;
+    Trajectory *fwdMinusTraj = nullptr;
 
-    Trajectory *fwdPlusTraj = Q_NULLPTR;
+    Trajectory *fwdPlusTraj = nullptr;
 
-    Trajectory *bwdMinusTraj = Q_NULLPTR;
+    Trajectory *bwdMinusTraj = nullptr;
 
-    Trajectory *bwdPlusTraj = Q_NULLPTR;
+    Trajectory *bwdPlusTraj = nullptr;
 
     /// Состояние стрелки впереди: 0 - вперёд единственная траектория,
     /// >0 - в плюсовом положении, <0 - в минусовом положении,

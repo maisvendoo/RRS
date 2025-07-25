@@ -236,7 +236,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     map->slotStationAtCenter(0);
     map->slotPlayerAtCenter(0);
 
-    if ( (topology->getTrajectoriesList() == Q_NULLPTR) || (topology->getConnectorsList() == Q_NULLPTR) )
+    if ( (topology->getTrajectoriesList() == nullptr) || (topology->getConnectorsList() == nullptr) )
     {
         ui->ptLog->appendPlainText(tr("Toplology loading FAILED!!!"));
         return;
@@ -345,9 +345,9 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     for (auto signal : signals_data->line_signals)
     {
-        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), Q_NULLPTR);
+        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
 
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             continue;
         }
@@ -375,9 +375,9 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     for (auto signal : signals_data->enter_signals)
     {
-        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), Q_NULLPTR);
+        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
 
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             continue;
         }
@@ -407,9 +407,9 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     for (auto signal : signals_data->exit_signals)
     {
-        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), Q_NULLPTR);
+        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
 
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             continue;
         }
@@ -461,16 +461,8 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
 
-    int seconds = static_cast<int>(std::floor(train_data.time));
-    int hours = seconds / 3600;
-    int minutes = seconds / 60 % 60;
-    seconds = seconds % 60;
-    QString time_text = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)")
-                           .arg(train_data.time, 8, 'f', 1)
-                           .arg(hours, 2)
-                           .arg(minutes, 2)
-                           .arg(seconds, 2);
-    ui->statusbar->showMessage(time_text);
+    // Дата-время сервера в статусной строке внизу
+    ui->statusbar->showMessage(train_data.sim_time.getString());
 }
 
 //------------------------------------------------------------------------------
@@ -562,9 +554,9 @@ void MainWindow::slotGetSwitchState(QByteArray &sw_state)
     switch_state_t switch_state;
     switch_state.deserialize(sw_state);
 
-    Switch *sw = dynamic_cast<Switch *>(topology->getConnectorsList()->value(switch_state.name, Q_NULLPTR));
+    Switch *sw = dynamic_cast<Switch *>(topology->getConnectorsList()->value(switch_state.name, nullptr));
 
-    if (sw == Q_NULLPTR)
+    if (sw == nullptr)
     {
         return;
     }
@@ -581,9 +573,9 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
     traj_busy_state_t busy_state;
     busy_state.deserialize(busy_data);
 
-    Trajectory *traj = (topology->getTrajectoriesList()->value(busy_state.name, Q_NULLPTR));
+    Trajectory *traj = (topology->getTrajectoriesList()->value(busy_state.name, nullptr));
 
-    if (traj == Q_NULLPTR)
+    if (traj == nullptr)
     {
         return;
     }
@@ -611,9 +603,9 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
         return;
     }
 
-    Connector *conn = topology->getConnectorsList()->value(conn_name, Q_NULLPTR);
+    Connector *conn = topology->getConnectorsList()->value(conn_name, nullptr);
 
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }

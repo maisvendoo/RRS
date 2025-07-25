@@ -10,7 +10,7 @@ class DEVICE_EXPORT PneumoRelay : public BrakeDevice
 {
 public:
 
-    PneumoRelay(double work_volume = 1e-3, QObject *parent = Q_NULLPTR);
+    PneumoRelay(double work_volume = 1e-3, QObject *parent = nullptr);
 
     virtual ~PneumoRelay();
 

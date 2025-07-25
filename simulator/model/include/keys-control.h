@@ -13,7 +13,7 @@ class KeysControl : public QObject
 
 public:
 
-    KeysControl(QObject *parent = Q_NULLPTR);
+    KeysControl(QObject *parent = nullptr);
 
     ~KeysControl();
 

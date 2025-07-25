@@ -81,7 +81,7 @@ void JointCouplingSA3::step(double t, double dt)
         // Расчёт усилия в сцепке
         force = calc_force(ds, dv);
         // Зазор в сцепках в данный момент, у СА-3 зазор внутрь от оси автосцепки
-        ds_delta = cut(ds, -delta, 0.0);
+        ds_delta = std::clamp(ds, -delta, 0.0);
         // Смещение сцепок и поглощающих аппаратов в данный момент
         ds_shift = dead_zone(ds, -delta, 0.0);
     }
@@ -133,14 +133,14 @@ double JointCouplingSA3::calc_force(double ds, double dv)
     double x = dead_zone(ds, -delta, 0.0);
 
     // Деформация до начала сжатия поглощающего аппарата
-    double x_t0 = cut(x, -dx_t0, dx_t0);
+    double x_t0 = std::clamp(x, -dx_t0, dx_t0);
     // Усилие от упругости конструкций до начала сжатия поглощающих аппаратов
     double force_t0 = x_t0 * ck;
     // Вычитание деформаций до начала сжатия поглощающих аппаратов
     x = dead_zone(x, -dx_t0, dx_t0);
 
     // Сжатие поглощающих аппаратов
-    double x_c = cut(x, -lambda * 2.0, lambda * 2.0);
+    double x_c = std::clamp(x, -lambda * 2.0, lambda * 2.0);
     // Усилие упругих элементов в поглощающих аппаратах
     double force_c = x_c * c;
     // Сила трения фрикционных элементов в поглощающих аппаратах

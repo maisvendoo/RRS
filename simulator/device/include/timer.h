@@ -21,7 +21,7 @@ class DEVICE_EXPORT Timer : public QObject
 
 public:
 
-    Timer(double timeout = 0.1, bool first_process = true, QObject *parent = Q_NULLPTR);
+    Timer(double timeout = 0.1, bool first_process = true, QObject *parent = nullptr);
 
     ~Timer();
 

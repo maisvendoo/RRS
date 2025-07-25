@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Config>
+
+	<Model>
+		<Filename>sky.gltf</Filename>
+	</Model>
+
+	<!-- Лето - день -->
+	<Texture>
+		<Filename>sky_day.bmp</Filename>
+		<SeasonBegin>04-01</SeasonBegin>
+		<SeasonEnd>9-30</SeasonEnd>
+		<TimeAppearBegin>7:00:00</TimeAppearBegin>
+		<TimeAppearEnd>8:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>17:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>18:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Лето - закат -->
+	<Texture>
+		<Filename>sky_sunset.bmp</Filename>
+		<SeasonBegin>04-01</SeasonBegin>
+		<SeasonEnd>9-30</SeasonEnd>
+		<TimeAppearBegin>17:00:00</TimeAppearBegin>
+		<TimeAppearEnd>18:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>19:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>20:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Лето - сумерки -->
+	<Texture>
+		<Filename>sky_sunsetTwilight.bmp</Filename>
+		<SeasonBegin>04-01</SeasonBegin>
+		<SeasonEnd>9-30</SeasonEnd>
+		<TimeAppearBegin>19:00:00</TimeAppearBegin>
+		<TimeAppearEnd>20:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>21:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>22:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Лето - ночь -->
+	<Texture>
+		<Filename>sky_night.bmp</Filename>
+		<SeasonBegin>04-01</SeasonBegin>
+		<SeasonEnd>9-30</SeasonEnd>
+		<TimeAppearBegin>21:00:00</TimeAppearBegin>
+		<TimeAppearEnd>22:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>3:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>4:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Лето - рассвет -->
+	<Texture>
+		<Filename>sky_sunriseDawn.bmp</Filename>
+		<SeasonBegin>04-01</SeasonBegin>
+		<SeasonEnd>9-30</SeasonEnd>
+		<TimeAppearBegin>3:00:00</TimeAppearBegin>
+		<TimeAppearEnd>4:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>5:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>6:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Лето - восход -->
+	<Texture>
+		<Filename>sky_sunrise.bmp</Filename>
+		<SeasonBegin>04-01</SeasonBegin>
+		<SeasonEnd>9-30</SeasonEnd>
+		<TimeAppearBegin>5:00:00</TimeAppearBegin>
+		<TimeAppearEnd>6:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>7:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>8:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Зима - день -->
+	<Texture>
+		<Filename>sky_day_snow.bmp</Filename>
+		<SeasonBegin>10-01</SeasonBegin>
+		<SeasonEnd>03-31</SeasonEnd>
+		<TimeAppearBegin>10:00:00</TimeAppearBegin>
+		<TimeAppearEnd>11:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>15:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>16:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Зима - закат -->
+	<Texture>
+		<Filename>sky_sunset_snow.bmp</Filename>
+		<SeasonBegin>10-01</SeasonBegin>
+		<SeasonEnd>03-31</SeasonEnd>
+		<TimeAppearBegin>15:00:00</TimeAppearBegin>
+		<TimeAppearEnd>16:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>17:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>18:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Зима - сумерки -->
+	<Texture>
+		<Filename>sky_sunsetTwilight_snow.bmp</Filename>
+		<SeasonBegin>10-01</SeasonBegin>
+		<SeasonEnd>03-31</SeasonEnd>
+		<TimeAppearBegin>17:00:00</TimeAppearBegin>
+		<TimeAppearEnd>18:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>19:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>20:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Зима - ночь -->
+	<Texture>
+		<Filename>sky_night_snow.bmp</Filename>
+		<SeasonBegin>10-01</SeasonBegin>
+		<SeasonEnd>03-31</SeasonEnd>
+		<TimeAppearBegin>19:00:00</TimeAppearBegin>
+		<TimeAppearEnd>20:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>6:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>7:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Зима - рассвет -->
+	<Texture>
+		<Filename>sky_sunriseDawn_snow.bmp</Filename>
+		<SeasonBegin>10-01</SeasonBegin>
+		<SeasonEnd>03-31</SeasonEnd>
+		<TimeAppearBegin>6:00:00</TimeAppearBegin>
+		<TimeAppearEnd>7:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>8:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>9:00:00</TimeDisappearEnd>
+	</Texture>
+
+	<!-- Зима - восход -->
+	<Texture>
+		<Filename>sky_sunrise_snow.bmp</Filename>
+		<SeasonBegin>10-01</SeasonBegin>
+		<SeasonEnd>03-31</SeasonEnd>
+		<TimeAppearBegin>8:00:00</TimeAppearBegin>
+		<TimeAppearEnd>9:00:00</TimeAppearEnd>
+		<TimeDisappearBegin>10:00:00</TimeDisappearBegin>
+		<TimeDisappearEnd>11:00:00</TimeDisappearEnd>
+	</Texture>
+
+</Config>

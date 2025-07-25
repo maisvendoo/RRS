@@ -15,7 +15,7 @@ struct TrafficMachine : public QObject
 {
 public:
 
-    TrafficMachine(QObject *parent = Q_NULLPTR);
+    TrafficMachine(QObject *parent = nullptr);
 
     ~TrafficMachine();
 

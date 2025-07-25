@@ -10,7 +10,7 @@ class PhaseSplitter : public Device
 {
 public:
 
-    PhaseSplitter(QObject *parent = Q_NULLPTR);
+    PhaseSplitter(QObject *parent = nullptr);
 
     ~PhaseSplitter();
 

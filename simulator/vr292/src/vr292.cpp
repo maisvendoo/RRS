@@ -45,13 +45,13 @@ void AirDist292::preStep(state_vector_t &Y, double t)
 
     // Условное положение магистрального поршня и отсекательного золотника
     // с учётом трения
-    disjunction_z_pos = cut(disjunction_z_pos,
+    disjunction_z_pos = std::clamp(disjunction_z_pos,
                             pSR - pBP - (disjunction_z_eps / 2.0),
                             pSR - pBP + (disjunction_z_eps / 2.0));
 
     // Условное положение главного золотника
     // с учётом зазора
-    main_z_pos = cut(main_z_pos,
+    main_z_pos = std::clamp(main_z_pos,
                      disjunction_z_pos - (main_z_eps / 2.0),
                      disjunction_z_pos + (main_z_eps / 2.0));
 
@@ -62,7 +62,7 @@ void AirDist292::preStep(state_vector_t &Y, double t)
     if (disjunction_z_pos < p[1])
     {
         // Коэффициент перетока через зазор между пояском поршня и втулкой
-        double K_2 = K[2] * cut(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0);
+        double K_2 = K[2] * std::clamp(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0);
         // Поток из тормозной магистрали в запасный резервуар
         Q_bp_sr = (K[1] + K_2) * (pBP - pSR);
     }
@@ -86,13 +86,13 @@ void AirDist292::preStep(state_vector_t &Y, double t)
             double z_diff = disjunction_z_pos - main_z_pos;
 
             // Поток из запасного резервуара в магистраль тормозных цилиндров
-            Q_sr_bc = K[5] * cut(A[2] * z_diff, 0.0, 1.0) * (pSR - pBC);
+            Q_sr_bc = K[5] * std::clamp(A[2] * z_diff, 0.0, 1.0) * (pSR - pBC);
 
             // Управление камерой КДР с небольшой мёртвой зоной
             z_diff = dead_zone(z_diff, -p[5], p[5]);
 
             // Поток из тормозной магистрали в камеру дополнительной разрядки ТМ
-            Q_bp_kd = K[3] * cut(A[2] * z_diff, 0.0, 1.0) * (pBP - Y[KDR]);
+            Q_bp_kd = K[3] * std::clamp(A[2] * z_diff, 0.0, 1.0) * (pBP - Y[KDR]);
             // Поток из камеры дополнительной разрядки ТМ в атмосферу
             Q_kd_atm = K[4] * nf(z_diff) * Y[KDR];
         }
@@ -102,7 +102,7 @@ void AirDist292::preStep(state_vector_t &Y, double t)
             case 0:
             {
                 // Открытие срывного клапана экстренного торможения
-                double v_emerg = cut(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
+                double v_emerg = std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
                 // Поток экстренной разрядки тормозной магистрали
                 Q_bp_atm = K[0] * v_emerg * pBP;
 
@@ -113,7 +113,7 @@ void AirDist292::preStep(state_vector_t &Y, double t)
             case 1:
             {
                 // Открытие срывного клапана экстренного торможения
-                double v_emerg = cut(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
+                double v_emerg = std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
                 // Поток экстренной разрядки тормозной магистрали
                 Q_bp_atm = K[0] * v_emerg * pBP;
 
@@ -170,9 +170,9 @@ void AirDist292::preStep(state_vector_t &Y, double t)
             .arg(main_z_pos, 8, 'f', 5)     //%12
             .arg(disjunction_z_pos, 8, 'f', 5)
             .arg(disjunction_z_pos - main_z_pos, 8, 'f', 5)
-            .arg(cut(A[2] * (disjunction_z_pos - main_z_pos), -1.0, 1.0), 6, 'f', 3) //%15
-            .arg(cut(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0), 6, 'f', 3)
-            .arg((main_z_pos > p[4])*cut(A[0] * (pBP - pBC - p[0]), 0.0, 1.0), 6, 'f', 3);
+            .arg(std::clamp(A[2] * (disjunction_z_pos - main_z_pos), -1.0, 1.0), 6, 'f', 3) //%15
+            .arg(std::clamp(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0), 6, 'f', 3)
+            .arg((main_z_pos > p[4])*std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0), 6, 'f', 3);
 */
 }
 

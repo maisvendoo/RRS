@@ -26,7 +26,7 @@ class AutoTrainStopEPK150 : public AutoTrainStop
 {
 public:
 
-    AutoTrainStopEPK150(QObject *parent = Q_NULLPTR);
+    AutoTrainStopEPK150(QObject *parent = nullptr);
 
     ~AutoTrainStopEPK150();
 

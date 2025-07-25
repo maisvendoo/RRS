@@ -184,7 +184,7 @@ public:
      * \brief Конструктор
      * \param soundname - имя аудиофайла
      */
-    ASound(QString soundname, LogFileHandler *log, QObject* parent = Q_NULLPTR);
+    ASound(QString soundname, LogFileHandler *log, QObject* parent = nullptr);
     /// Деструктор
     ~ASound();
 

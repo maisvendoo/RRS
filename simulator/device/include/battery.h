@@ -10,21 +10,21 @@ class DEVICE_EXPORT Battery : public Device
 {
 public:
 
-    Battery(QObject *parent = Q_NULLPTR);
+    Battery(QObject* parent = nullptr);
 
-    ~Battery();
+    ~Battery() = default;
 
     /// Задать напряжение заряда
-    void setChargeVoltage(double U);
+    void setChargeVoltage(double U) noexcept;
 
     /// Задать ток, потребляемый нагрузкой
-    void setLoadCurrent(double I);
+    void setLoadCurrent(double I) noexcept;
 
     /// Задать ток на якоре стартера-генератора дизеля
-    void setStarterCurrent(double I);
+    void setStarterCurrent(double I) noexcept;
 
     /// Ток заряда/разряда
-    double getChargeCurrent() const;
+    double getChargeCurrent() const noexcept;
 
     /// Напряжение на выходе
     double getVoltage() const;
@@ -32,31 +32,31 @@ public:
 private:
 
     /// Внутреннее сопротивление батареи
-    double  r;
+    double  r = 1.0;
 
     /// Добавочное сопротивление в цепи заряда
-    double  Rd;
+    double  Rd = 1.0;
 
     /// Ток, потребляемый нагрузкой
-    double  In;
+    double  In = 0.0;
 
     /// Ток, потребляемый стартером дизеля
-    double  Is;
+    double  Is = 0.0;
 
     /// Ток заряда/разряда
-    double  Ib;
+    double  Ib = 0.0;
 
     /// Максимальная ЭДС
-    double  Emax;
+    double  Emax = 96.0;
 
     /// Минимальная ЭДС
-    double  Emin;
+    double  Emin = 84.0;
 
     /// Емкость, А*ч
-    double  C;
+    double  C = 450.0;
 
     /// Напряжение заряда
-    double  U_gen;
+    double  U_gen = 0.0;
 
     void preStep(state_vector_t &Y, double t);
 

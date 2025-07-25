@@ -12,7 +12,7 @@ class TrafficTrain : public QObject
 {
 public:
 
-    TrafficTrain(QObject *parent = Q_NULLPTR);
+    TrafficTrain(QObject *parent = nullptr);
 
     ~TrafficTrain();
 

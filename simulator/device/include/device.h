@@ -43,7 +43,7 @@ class DEVICE_EXPORT Device : public QObject
 public:
 
     /// Constructor
-    Device(QObject *parent = Q_NULLPTR);
+    Device(QObject *parent = nullptr);
 
     /// Destructor
     virtual ~Device();
@@ -76,7 +76,7 @@ public:
     void setY(size_t i, double value);
 
     /// Get state variable
-    double getY(size_t i) const;
+    double getY(size_t i) const noexcept;
 
     /// Read device config file
     virtual void read_config(const QString &filename, const QString &dir_path = "");

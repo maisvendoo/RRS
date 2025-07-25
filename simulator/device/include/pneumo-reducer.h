@@ -10,7 +10,7 @@ class DEVICE_EXPORT PneumoReducer : public BrakeDevice
 {
 public:
 
-    PneumoReducer(double ref_pressure = 0.5, QObject *parent = Q_NULLPTR);
+    PneumoReducer(double ref_pressure = 0.5, QObject *parent = nullptr);
 
     ~PneumoReducer();
 

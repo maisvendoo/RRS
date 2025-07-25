@@ -14,7 +14,7 @@ class TOPOLOGY_EXPORT EnterSignal : public Signal
 {
 public:
 
-    EnterSignal(QObject *parent = Q_NULLPTR);
+    EnterSignal(QObject *parent = nullptr);
 
     ~EnterSignal();
 

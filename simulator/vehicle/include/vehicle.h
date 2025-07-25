@@ -47,7 +47,7 @@ class VEHICLE_EXPORT Vehicle : public QObject
 public:
 
     /// Constructor
-    explicit Vehicle(QObject *parent = Q_NULLPTR);
+    explicit Vehicle(QObject *parent = nullptr);
     /// Destructor
     virtual ~Vehicle();
 

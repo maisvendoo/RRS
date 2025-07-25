@@ -22,15 +22,7 @@ BrakeCrane::BrakeCrane(QObject *parent) : BrakeDevice (parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-BrakeCrane::~BrakeCrane()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool BrakeCrane::isHold() const
+bool BrakeCrane::isHold() const noexcept
 {
     return is_hold;
 }
@@ -38,7 +30,7 @@ bool BrakeCrane::isHold() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool BrakeCrane::isBrake() const
+bool BrakeCrane::isBrake() const noexcept
 {
     return is_brake;
 }
@@ -46,7 +38,7 @@ bool BrakeCrane::isBrake() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setChargePressure(double value)
+void BrakeCrane::setChargePressure(double value) noexcept
 {
     p0 = value;
 }
@@ -54,7 +46,7 @@ void BrakeCrane::setChargePressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setFLpressure(double value)
+void BrakeCrane::setFLpressure(double value) noexcept
 {
     pFL = value;
 }
@@ -62,7 +54,7 @@ void BrakeCrane::setFLpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double BrakeCrane::getFLflow() const
+double BrakeCrane::getFLflow() const noexcept
 {
     return QFL;
 }
@@ -70,7 +62,7 @@ double BrakeCrane::getFLflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setBPpressure(double value)
+void BrakeCrane::setBPpressure(double value) noexcept
 {
     pBP = value;
 }
@@ -78,7 +70,7 @@ void BrakeCrane::setBPpressure(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double BrakeCrane::getBPflow() const
+double BrakeCrane::getBPflow() const noexcept
 {
     return QBP;
 }
@@ -86,7 +78,7 @@ double BrakeCrane::getBPflow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BrakeCrane::setERflow(double Qer)
+void BrakeCrane::setERflow(double Qer) noexcept
 {
     this->Qer = Qer;
 }

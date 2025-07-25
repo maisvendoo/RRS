@@ -139,7 +139,7 @@ enum KeySymbol
     KEY_Super_R         = 0xFFEC, ///< Right super, Right Win
 };
 
-const std::set<uint16_t> KeySymbolsRRS =
+const std::set<std::uint16_t> KeySymbolsRRS =
     { KEY_Space
     , KEY_Quote
     , KEY_Comma

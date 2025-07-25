@@ -1,21 +1,21 @@
-#ifndef		SIMULATOR_COMMAND_LINE
-#define		SIMULATOR_COMMAND_LINE
+#ifndef SIMULATOR_COMMAND_LINE
+#define SIMULATOR_COMMAND_LINE
 
-#include    "command-line.h"
+#include "command-line.h"
+
+#include <QString>
+
+#include <vector>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_command_line_t
+struct simulator_command_line_t final
 {
-    /// Train configuration file name
-    option_t<std::vector<QString>>   train_config;
     /// Route directory
     option_t<QString>   route_dir;
-    /// Clear simulator log file
-    option_t<bool>      clear_log;
-    /// Debug print in simulation loop
-    option_t<bool>      debug_print;
+    /// Train configuration file name
+    option_t<std::vector<QString>>   train_config;
     /// Initial railway coordinate
     option_t<std::vector<double>>    init_coord;
     /// Initial direction

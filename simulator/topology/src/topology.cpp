@@ -116,14 +116,14 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
     }
 
     // Находим уазатель на стартовую траекторию
-    Trajectory *cur_traj = traj_list.value(tp.traj_name, Q_NULLPTR);
-    if (cur_traj == Q_NULLPTR)
+    Trajectory *cur_traj = traj_list.value(tp.traj_name, nullptr);
+    if (cur_traj == nullptr)
     {
         Journal::instance()->critical("INVALID INITIAL TRAJECTORY!!!");
         return false;
     }
 
-    double traj_coord = cut(tp.traj_coord, 0.0, cur_traj->getLength());
+    double traj_coord = std::clamp(tp.traj_coord, 0.0, cur_traj->getLength());
 
     for (size_t i = 0; i < vehicles->size(); ++i)
     {
@@ -143,7 +143,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         {
             // Получаем указатель на коннектор спереди
             Connector *conn = cur_traj->getFwdConnector();
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't forward connector");
                 return false;
@@ -151,7 +151,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
             // Получаем указатель на следующую траекторию спереди
             Trajectory *next_traj = conn->getFwdTraj();
-            if (next_traj == Q_NULLPTR)
+            if (next_traj == nullptr)
             {
                 Journal::instance()->error("Connector " + conn->getName() + " has't forward trajectory");
                 return false;
@@ -172,7 +172,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         {
             // Получаем указатель на коннектор сзади
             Connector *conn = cur_traj->getBwdConnector();
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
                 return false;
@@ -180,7 +180,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
             // Получаем указатель на следующую траекторию сзади
             Trajectory *next_traj = conn->getBwdTraj();
-            if (next_traj == Q_NULLPTR)
+            if (next_traj == nullptr)
             {
                 Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
                 return false;
@@ -244,7 +244,7 @@ void Topology::line_signals_step(double t, double dt)
         {
             Connector *conn = line_signal->getConnector();
 
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 continue;
 
@@ -252,7 +252,7 @@ void Topology::line_signals_step(double t, double dt)
 
             Trajectory *traj = conn->getBwdTraj();
 
-            if (traj == Q_NULLPTR)
+            if (traj == nullptr)
             {
                 continue;
             }
@@ -264,14 +264,14 @@ void Topology::line_signals_step(double t, double dt)
         {
             Connector *conn = line_signal->getConnector();
 
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 continue;
             }
 
             Trajectory *traj = conn->getFwdTraj();
 
-            if (traj == Q_NULLPTR)
+            if (traj == nullptr)
             {
                 continue;
             }
@@ -293,7 +293,7 @@ void Topology::enter_signals_step(double t, double dt)
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 
-        if (es == Q_NULLPTR)
+        if (es == nullptr)
         {
             continue;
         }
@@ -302,7 +302,7 @@ void Topology::enter_signals_step(double t, double dt)
         {
             Connector *conn = es->getConnector();
 
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 continue;
 
@@ -311,7 +311,7 @@ void Topology::enter_signals_step(double t, double dt)
             Trajectory *bwd_traj = conn->getBwdTraj();
             Trajectory *fwd_traj = conn->getFwdTraj();
 
-            if ( (bwd_traj == Q_NULLPTR) || (fwd_traj == Q_NULLPTR) )
+            if ( (bwd_traj == nullptr) || (fwd_traj == nullptr) )
             {
                 continue;
             }
@@ -324,7 +324,7 @@ void Topology::enter_signals_step(double t, double dt)
         {
             Connector *conn = es->getConnector();
 
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 continue;
 
@@ -333,7 +333,7 @@ void Topology::enter_signals_step(double t, double dt)
             Trajectory *bwd_traj = conn->getFwdTraj();
             Trajectory *fwd_traj = conn->getBwdTraj();
 
-            if ( (bwd_traj == Q_NULLPTR) || (fwd_traj == Q_NULLPTR) )
+            if ( (bwd_traj == nullptr) || (fwd_traj == nullptr) )
             {
                 continue;
             }
@@ -353,7 +353,7 @@ void Topology::exit_signals_step(double t, double dt)
 {
     for (auto signal : signals_data.exit_signals)
     {
-        if (signal == Q_NULLPTR)
+        if (signal == nullptr)
         {
             continue;
         }
@@ -854,7 +854,7 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
     {
         Connector *conn = signal->getConnector();
 
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             Journal::instance()->error("Failed connector for signal " + signal->getLetter());
             continue;
@@ -864,7 +864,7 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
 
         while (is_not_found)
         {
-            Trajectory *traj = Q_NULLPTR;
+            Trajectory *traj = nullptr;
 
             if (signal->getDirection() == 1)
             {
@@ -876,7 +876,7 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 traj = conn->getFwdTraj();
             }
 
-            if (traj == Q_NULLPTR)
+            if (traj == nullptr)
             {
                 is_not_found = false;
                 continue;
@@ -892,13 +892,13 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 conn = traj->getFwdConnector();
             }
 
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 is_not_found = false;
                 continue;
             }
 
-            Signal *prev_signal = Q_NULLPTR;
+            Signal *prev_signal = nullptr;
 
             if (signal->getDirection() == 1)
             {
@@ -910,7 +910,7 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
                 prev_signal = conn->getSignalBwd();
             }
 
-            if (prev_signal != Q_NULLPTR)
+            if (prev_signal != nullptr)
             {
                 connect(signal, &Signal::sendLineVoltage,
                         prev_signal, &Signal::slotRecvLineVoltage);
@@ -930,7 +930,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
     {
         Connector *conn = signal->getConnector();
 
-        if (conn == Q_NULLPTR)
+        if (conn == nullptr)
         {
             Journal::instance()->error("Failed connector for signal " + signal->getLetter());
             continue;
@@ -940,7 +940,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
 
         while (is_not_found)
         {
-            Trajectory *traj = Q_NULLPTR;
+            Trajectory *traj = nullptr;
 
             if (signal->getDirection() == 1)
             {
@@ -952,7 +952,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
                 traj = conn->getFwdTraj();
             }
 
-            if (traj == Q_NULLPTR)
+            if (traj == nullptr)
             {
                 is_not_found = false;
                 continue;
@@ -968,13 +968,13 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
                 conn = traj->getFwdConnector();
             }
 
-            if (conn == Q_NULLPTR)
+            if (conn == nullptr)
             {
                 is_not_found = false;
                 continue;
             }
 
-            Signal *prev_signal = Q_NULLPTR;
+            Signal *prev_signal = nullptr;
 
             if (signal->getDirection() == 1)
             {
@@ -986,7 +986,7 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
                 prev_signal = conn->getSignalBwd();
             }
 
-            if (prev_signal != Q_NULLPTR)
+            if (prev_signal != nullptr)
             {
                 connect(signal, &Signal::sendLineVoltage,
                         prev_signal, &Signal::slotRecvLineVoltage);
@@ -1065,7 +1065,7 @@ void Topology::get_route_name(QString route_dir)
 //------------------------------------------------------------------------------
 void Topology::serialize_connector_name(QDataStream &stream, Connector *conn)
 {
-    if (bool has_conn = conn != Q_NULLPTR)
+    if (bool has_conn = conn != nullptr)
     {
         stream << has_conn;
         stream << conn->getName();
@@ -1089,10 +1089,10 @@ Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_
         QString conn_name = "";
         stream >> conn_name;
 
-        return conn_list.value(conn_name, Q_NULLPTR);
+        return conn_list.value(conn_name, nullptr);
     }
 
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -1103,9 +1103,9 @@ void Topology::getSwitchState(QByteArray &switch_data)
     switch_state_t sw_state;
     sw_state.deserialize(switch_data);
 
-    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, Q_NULLPTR));
+    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, nullptr));
 
-    if (sw == Q_NULLPTR)
+    if (sw == nullptr)
     {
         return;
     }
@@ -1142,14 +1142,14 @@ void Topology::slotOpenSignal(QByteArray signal_data)
         return;
     }
 
-    Connector *conn = switches.value(conn_name, Q_NULLPTR);
+    Connector *conn = switches.value(conn_name, nullptr);
 
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
 
-    Signal *signal = Q_NULLPTR;
+    Signal *signal = nullptr;
 
     if (sig_dir == 1)
     {
@@ -1161,7 +1161,7 @@ void Topology::slotOpenSignal(QByteArray signal_data)
         signal = conn->getSignalBwd();
     }
 
-    if (signal == Q_NULLPTR)
+    if (signal == nullptr)
     {
         return;
     }
@@ -1170,7 +1170,7 @@ void Topology::slotOpenSignal(QByteArray signal_data)
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 
-        if (es == Q_NULLPTR)
+        if (es == nullptr)
         {
             return;
         }
@@ -1182,7 +1182,7 @@ void Topology::slotOpenSignal(QByteArray signal_data)
     {
         ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
 
-        if (es == Q_NULLPTR)
+        if (es == nullptr)
         {
             return;
         }
@@ -1219,14 +1219,14 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         return;
     }
 
-    Connector *conn = switches.value(conn_name, Q_NULLPTR);
+    Connector *conn = switches.value(conn_name, nullptr);
 
-    if (conn == Q_NULLPTR)
+    if (conn == nullptr)
     {
         return;
     }
 
-    Signal *signal = Q_NULLPTR;
+    Signal *signal = nullptr;
 
     if (sig_dir == 1)
     {
@@ -1238,7 +1238,7 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         signal = conn->getSignalBwd();
     }
 
-    if (signal == Q_NULLPTR)
+    if (signal == nullptr)
     {
         return;
     }
@@ -1247,7 +1247,7 @@ void Topology::slotCloseSignal(QByteArray signal_data)
     {
         EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
 
-        if (es == Q_NULLPTR)
+        if (es == nullptr)
         {
             return;
         }
@@ -1259,7 +1259,7 @@ void Topology::slotCloseSignal(QByteArray signal_data)
     {
         ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
 
-        if (es == Q_NULLPTR)
+        if (es == nullptr)
         {
             return;
         }

@@ -3,6 +3,7 @@
 #include "CfgReader.h"
 #include "filesystem.h"
 #include "Logger.h"
+#include "MyGui.h"
 #include "Route.h"
 #include "RouteLoader.h"
 #include "ScreenshotWriter.h"
@@ -19,12 +20,16 @@
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/RenderGraph.h>
+#include <vsg/app/View.h>
 #include <vsg/core/ConstVisitor.h>
 #include <vsg/io/Options.h>
+#include <vsg/lighting/AmbientLight.h>
+#include <vsg/lighting/DirectionalLight.h>
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/RegionOfInterest.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/GraphicsPipeline.h>
@@ -37,6 +42,7 @@
 #include <vsg/threading/OperationThreads.h>
 #include <vsg/utils/ShaderSet.h>
 #include <vsg/utils/SharedObjects.h>
+#include <vsg/vk/DeviceFeatures.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 #include <vsgXchange/all.h>
@@ -104,31 +110,33 @@ void RouteViewer::initialize(int argc, char* argv[])
 
     if (vsg::ref_ptr<vsg::Device> vulkan_device = window->getDevice())
     {
-        if (vsg::PhysicalDevice* phys_device = vulkan_device->getPhysicalDevice())
+        if (const vsg::PhysicalDevice* phys_device = vulkan_device->getPhysicalDevice())
         {
-            VkPhysicalDeviceProperties propeties = phys_device->getProperties();
-            auto device_type_to_string = [](VkPhysicalDeviceType device_type) -> std::string {
-                if (device_type == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-                    return "discrete";
-                if (device_type == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
-                    return "integrated";
-                if (device_type == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU)
-                    return "virtual";
-                if (device_type == VK_PHYSICAL_DEVICE_TYPE_CPU)
-                    return "CPU";
-                return "<other_type>";
+            const VkPhysicalDeviceProperties& propeties = phys_device->getProperties();
+            auto device_type_to_string = [](VkPhysicalDeviceType device_type) -> const char* {
+                switch (device_type)
+                {
+                    case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:    return "discrete";
+                    case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:  return "integrated";
+                    case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:     return "virtual";
+                    case VK_PHYSICAL_DEVICE_TYPE_CPU:             return "CPU";
+                    default:                                      return "<other_type>";
+                }
             };
+
             LOG_INFO("Using %s device: %s",
-                     device_type_to_string(propeties.deviceType).c_str(),
+                     device_type_to_string(propeties.deviceType),
                      propeties.deviceName);
 
             VkPhysicalDeviceMemoryProperties memory_properties;
             vkGetPhysicalDeviceMemoryProperties(*phys_device, &memory_properties);
-            for (uint32_t heap_idx = 0; heap_idx < VK_MAX_MEMORY_HEAPS; ++heap_idx)
+            for (std::uint32_t heap_idx = 0; heap_idx < VK_MAX_MEMORY_HEAPS; ++heap_idx)
             {
-                uint64_t memory_size = memory_properties.memoryHeaps[heap_idx].size;
+                const std::uint64_t memory_size = memory_properties.memoryHeaps[heap_idx].size;
                 if (memory_size > 0)
+                {
                     LOG_INFO("Device's memory[%u] size = %u MB", heap_idx, memory_size / 1024 / 1024);
+                }
             }
         }
         else
@@ -143,7 +151,7 @@ void RouteViewer::initialize(int argc, char* argv[])
 
     vehicles_handler->set_camera_pos(&lookAt->eye);
 
-    initTCPclient();
+    initTcpClient();
 
     LOG_INFO("Viewer is initialized succesfully");
 }
@@ -188,7 +196,7 @@ int RouteViewer::run()
 //------------------------------------------------------------------------------
 void RouteViewer::loadSettings()
 {
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
     const std::string cfg_path = fs.getConfigDir() + fs.separator() + "settings.xml";
 
     CfgReader cfg;
@@ -213,7 +221,7 @@ void RouteViewer::loadSettings()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void RouteViewer::configureLogLevel()
+void RouteViewer::configureLogLevel() const
 {
     if (settings.notify_level == "INFO")
     {
@@ -241,18 +249,10 @@ void RouteViewer::initVsgOptions()
     options->add(vsgXchange::all::create());
 
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
-    if (settings.disable_culling_node)
-    {
-        bool culling = false;
-        options->setValue("culling", culling);
-    }
+    options->setValue("culling", !settings.disable_culling_node);
 
     // Отключение нативного загрузчика .gltf в VSG, чтобы использовать assimp
-    if (settings.disable_culling_node)
-    {
-        bool disable_vsg_loader_gltf = true;
-        options->setValue("disable_gltf", disable_vsg_loader_gltf);
-    }
+    options->setValue("disable_gltf", settings.disable_native_gltf_loader);
 }
 
 //------------------------------------------------------------------------------
@@ -291,18 +291,12 @@ void RouteViewer::initWindowTraits()
     // windowTraits->debugUtils = true;
 
     // Настройка вертикальной синхронизации (упрощенно - вкл/выкл)
-    if (settings.vsync)
-    {
-        windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_FIFO_KHR;
-    }
-    else
-    {
-        windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-    }
+    windowTraits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_FIFO_KHR
+                                                                    : VK_PRESENT_MODE_IMMEDIATE_KHR;
 
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // vsg и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE; // и выставляет это свойство в true
-    auto deviceFeatures = windowTraits->deviceFeatures;
+    const vsg::ref_ptr<vsg::DeviceFeatures> deviceFeatures = windowTraits->deviceFeatures;
     deviceFeatures->get().depthClamp = VK_TRUE;
 }
 
@@ -511,7 +505,12 @@ void RouteViewer::initLights()
     sun = vsg::DirectionalLight::create();
     sun->color = vsg::vec3(settings.sun_color);
     sun->intensity = static_cast<float>(settings.sun_intensity);
-    sun->direction = vsg::normalize(settings.sun_direction);
+    vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
+    float azimuth_radian = vsg::radians(static_cast<float>(settings.sun_azimuth));
+    float altitude_radian = vsg::radians(static_cast<float>(settings.sun_altitude));
+    vsg::mat4 rotate_azimuth = vsg::rotate(azimuth_radian, 0.0f, 0.0f, 1.0f);
+    vsg::mat4 rotate_altitude = vsg::rotate(altitude_radian, 1.0f, 0.0f, 0.0f);
+    sun->direction = vsg::normalize(sun_direction * rotate_azimuth * rotate_altitude);
     sun->shadowSettings = shadowSettings;
     root->addChild(sun);
 }
@@ -546,6 +545,8 @@ void RouteViewer::initCommandGraph()
     GUIparams->sun_color = sun->color.data();
     GUIparams->sun_direction_d = &sun->direction;
     GUIparams->sun_intensity = &sun->intensity;
+    GUIparams->sun_azimuth_degrees = static_cast<float>(settings.sun_azimuth);
+    GUIparams->sun_altitude_degrees = static_cast<float>(settings.sun_altitude);
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
@@ -601,7 +602,7 @@ void RouteViewer::initViewer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void RouteViewer::initTCPclient()
+void RouteViewer::initTcpClient()
 {
     LOG_INFO("Starting init TCP-client");
 
@@ -632,17 +633,21 @@ bool RouteViewer::loadRoute()
     settings.route_dir_full_path = route_dir_path;
 
     // Модель неба
-    std::string skybox_model_filepath = fs.combinePath(route_dir_path, "models");
-    skybox_model_filepath = fs.combinePath(skybox_model_filepath, "sky.gltf");
-
-    Skybox skybox(skybox_model_filepath, options);
-    root->addChild(skybox.getNode());
+    const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
+    Skybox* skybox = new Skybox(cfg_path, options);
+    GUIparams->skybox = skybox;
+    GUIparams->skybox_texture_data = skybox->getDefaultTexture();
+    GUIparams->skybox_textures = skybox->getTextures();
+    if (skybox->getNode())
+    {
+        root->addChild(skybox->getNode());
 #if 0
         // запись неба в файл
         std::string file;
         file = route_dir_path + fs.separator() + "~loaded_skybox.vsgt";
-        vsg::write(skybox.getNode(), file, options);
+        vsg::write(skybox->getNode(), file, options);
 #endif
+    }
 
     // Загрузка информации о моделях в маршруте
     Route route;

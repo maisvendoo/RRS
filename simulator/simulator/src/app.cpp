@@ -89,7 +89,7 @@ bool AppCore::init()
 //------------------------------------------------------------------------------
 int AppCore::exec()
 {
-    if (model != Q_NULLPTR)
+    if (model != nullptr)
         model->start();
 
     return QCoreApplication::exec();
@@ -132,19 +132,12 @@ bool AppCore::notify(QObject *receiver, QEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
+CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
                                                   simulator_command_line_t &command_line,
                                                   QString &errorMessage)
 {
     QCommandLineOption help = parser.addHelpOption();
     QCommandLineOption version = parser.addVersionOption();
-
-    // Train config file
-    QCommandLineOption trainConfig(QStringList() << "t" << "train-config",
-                                   QCoreApplication::translate("main", "Train configuration"),
-                                   QCoreApplication::translate("main", "train-config-file"));
-
-    parser.addOption(trainConfig);
 
     // Route directory
     QCommandLineOption routeDir(QStringList() << "r" << "route",
@@ -153,17 +146,12 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
     parser.addOption(routeDir);
 
-    // Clear simulator log
-    QCommandLineOption clearLog(QStringList() << "c" << "clear-log",
-                                QCoreApplication::translate("main", "Clear simulator's log"));
+    // Train config file
+    QCommandLineOption trainConfig(QStringList() << "t" << "train-config",
+                                   QCoreApplication::translate("main", "Train configuration"),
+                                   QCoreApplication::translate("main", "train-config-file"));
 
-    parser.addOption(clearLog);
-
-    // Allow debug print
-    QCommandLineOption debugPrint(QStringList() << "o" << "debug-print",
-                                  QCoreApplication::translate("main", "Allow debug print"));
-
-    parser.addOption(debugPrint);
+    parser.addOption(trainConfig);
 
     QCommandLineOption initCoord(QStringList() << "x" << "init-coord",
                                  QCoreApplication::translate("main", "Initial railway coordinate"),
@@ -200,6 +188,12 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
         return CommandLineHelpRequired;
     }
 
+    if (parser.isSet(routeDir))
+    {
+        command_line.route_dir.is_present = true;
+        command_line.route_dir.value = parser.value(routeDir);
+    }
+
     if (parser.isSet(trainConfig))
     {
         command_line.train_config.is_present = true;
@@ -215,22 +209,6 @@ CommandLineParesrResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
             command_line.train_config.value.push_back(token);
         }
-    }
-
-    if (parser.isSet(routeDir))
-    {
-        command_line.route_dir.is_present = true;
-        command_line.route_dir.value = parser.value(routeDir);
-    }
-
-    if (parser.isSet(clearLog))
-    {
-        command_line.clear_log.is_present = command_line.clear_log.value = true;
-    }
-
-    if (parser.isSet(debugPrint))
-    {
-        command_line.debug_print.is_present = command_line.debug_print.value = true;
     }
 
     if (parser.isSet(initCoord))

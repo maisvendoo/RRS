@@ -38,7 +38,7 @@ void TrainHorn::step(double t, double dt)
     // Расчёт коэффициента расхода воздуха в атмосферу при работе звуковых сигналов
     double k = 0.0;
     // Расчёт громкости звуковых сигналов
-    float volume_level = cut(static_cast<float>(pFL / p_nom), 0.0f, 1.0f);
+    float volume_level = std::clamp(static_cast<float>(pFL / p_nom), 0.0f, 1.0f);
     sounds[SVISTOK_SOUND].volume = volume_level;
     sounds[TIFON_SOUND].volume = volume_level;
 

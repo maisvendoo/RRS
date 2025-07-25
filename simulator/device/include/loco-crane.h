@@ -10,7 +10,7 @@ class DEVICE_EXPORT LocoCrane : public BrakeDevice
 {
 public:
 
-    LocoCrane(QObject *parent = Q_NULLPTR);
+    LocoCrane(QObject *parent = nullptr);
 
     virtual ~LocoCrane();
 

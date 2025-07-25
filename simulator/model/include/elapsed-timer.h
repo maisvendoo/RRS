@@ -9,7 +9,7 @@ class ElapsedTimer : public QObject
 
 public:
 
-    ElapsedTimer(QObject *parent = Q_NULLPTR);
+    ElapsedTimer(QObject *parent = nullptr);
 
     ~ElapsedTimer();
 

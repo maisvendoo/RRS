@@ -10,7 +10,7 @@ class Rectifier : public Device
 {
 public:
 
-    Rectifier(QObject *parent = Q_NULLPTR);
+    Rectifier(QObject *parent = nullptr);
 
     ~Rectifier();
 
@@ -37,7 +37,7 @@ private:
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 
-    void load_config(CfgReader &cfg);    
+    void load_config(CfgReader &cfg);
 };
 
 #endif // RECTIFIER_H

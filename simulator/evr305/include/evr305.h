@@ -26,7 +26,7 @@ class EVR305 : public ElectroAirDistributor
 {
 public:
 
-    EVR305(QObject *parent = Q_NULLPTR);
+    EVR305(QObject *parent = nullptr);
 
     ~EVR305();
 

@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 TrafficTrain::TrafficTrain(QObject *parent)
     : QObject(parent)
-    , stations(Q_NULLPTR)
+    , stations(nullptr)
     , is_ready(false)
 {
 

@@ -12,7 +12,7 @@ class ControllerKME_60_044 : public TractionController
 {
 public:
 
-    ControllerKME_60_044(QObject *parent = Q_NULLPTR);
+    ControllerKME_60_044(QObject *parent = nullptr);
 
     ~ControllerKME_60_044();
 

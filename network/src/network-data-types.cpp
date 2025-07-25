@@ -49,7 +49,7 @@ client_data_t::client_data_t()
     , controlled_update_prev_time(0.0)
     , players_update_interval(0.0)
     , players_update_prev_time(0.0)
-    , socket(Q_NULLPTR)
+    , socket(nullptr)
     , received_data()
 {
 }

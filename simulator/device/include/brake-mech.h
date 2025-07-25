@@ -28,7 +28,7 @@ class DEVICE_EXPORT BrakeMech : public Device
 {
 public:
 
-    BrakeMech(size_t axis_num = 4, QObject *parent = Q_NULLPTR);
+    BrakeMech(size_t axis_num = 4, QObject *parent = nullptr);
 
     ~BrakeMech();
 

@@ -10,7 +10,7 @@ class DEVICE_EXPORT Reservoir : public BrakeDevice
 {
 public:
 
-    Reservoir(double volume, QObject *parent = Q_NULLPTR);
+    Reservoir(double volume, QObject *parent = nullptr);
 
     ~Reservoir();
 

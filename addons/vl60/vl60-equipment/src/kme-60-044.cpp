@@ -103,7 +103,7 @@ void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
     std::fill(state.pos_state.begin(), state.pos_state.end(), false);
     state.pos_state[static_cast<size_t>(main_pos)] = true;
 
-    state.revers_ref_state = cut(revers_pos - 1, -1, 1);
+    state.revers_ref_state = std::clamp(revers_pos - 1, -1, 1);
 
     state.field_loosen_pos = pf(revers_pos - 2);
 
@@ -239,7 +239,7 @@ void ControllerKME_60_044::incMain()
 
     main_pos++;
 
-    main_pos = cut(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
+    main_pos = std::clamp(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
 
     if (main_pos_old != main_pos)
         soundMainChangePos();
@@ -257,7 +257,7 @@ void ControllerKME_60_044::decMain()
 
     main_pos--;
 
-    main_pos = cut(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
+    main_pos = std::clamp(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
 
     if (main_pos_old != main_pos)
         soundMainChangePos();
@@ -275,7 +275,7 @@ void ControllerKME_60_044::incRevers()
 
     revers_pos++;
 
-    revers_pos = cut(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
+    revers_pos = std::clamp(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
 
     if (revers_pos_old != revers_pos)
         soundReversChangePos();
@@ -293,7 +293,7 @@ void ControllerKME_60_044::decRevers()
 
     revers_pos--;
 
-    revers_pos = cut(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
+    revers_pos = std::clamp(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
 
     if (revers_pos_old != revers_pos)
         soundReversChangePos();

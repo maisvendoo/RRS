@@ -12,7 +12,7 @@ class DEVICE_EXPORT PneumoAngleCock : public Device
 public:
 
     /// Конструктор
-    PneumoAngleCock(int key_code = 0, QObject *parent = Q_NULLPTR);
+    PneumoAngleCock(int key_code = 0, QObject *parent = nullptr);
 
     /// Деструктор
     virtual ~PneumoAngleCock();

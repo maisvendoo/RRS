@@ -11,7 +11,7 @@ class DEVICE_EXPORT ProtectiveDevice : public Device
 {
 public:
 
-    ProtectiveDevice(QObject *parent = Q_NULLPTR);
+    ProtectiveDevice(QObject *parent = nullptr);
 
     ~ProtectiveDevice();
 

@@ -18,7 +18,7 @@ class TOPOLOGY_EXPORT VehicleController : public QObject
 
 public:
 
-    VehicleController(QObject *parent = Q_NULLPTR);
+    VehicleController(QObject *parent = nullptr);
 
     virtual ~VehicleController();
 
@@ -83,10 +83,10 @@ protected:
     double traj_coord = 0.0;
 
     /// Текущая траектория ПЕ
-    Trajectory *current_traj = Q_NULLPTR;
+    Trajectory *current_traj = nullptr;
 
     /// Предыдущая траектория ПЕ (за коннектором сзади по ходу движения)
-    Trajectory *prev_traj = Q_NULLPTR;
+    Trajectory *prev_traj = nullptr;
 
     /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой,
     /// и его текущие траекторные координаты

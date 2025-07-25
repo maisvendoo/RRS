@@ -15,7 +15,7 @@ public:
                     bool init_state = false,
                     bool is_active = true,
                     bool is_locked = false,
-                    QObject *parent = Q_NULLPTR);
+                    QObject *parent = nullptr);
 
     virtual ~HysteresisRelay();
 

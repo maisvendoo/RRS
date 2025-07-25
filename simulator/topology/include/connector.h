@@ -20,7 +20,7 @@ class TOPOLOGY_EXPORT Connector : public QObject
 
 public:
 
-    Connector(QObject *parent = Q_NULLPTR);
+    Connector(QObject *parent = nullptr);
 
     virtual ~Connector();
 
@@ -67,9 +67,9 @@ public:
 
 protected:
 
-    Trajectory *fwdTraj = Q_NULLPTR;
+    Trajectory *fwdTraj = nullptr;
 
-    Trajectory *bwdTraj = Q_NULLPTR;
+    Trajectory *bwdTraj = nullptr;
 
     int state = 1;
 
@@ -78,9 +78,9 @@ protected:
     /// Связи путевой инфраструктуры
     std::vector<ConnectorDevice *> devices;
 
-    Signal *signal_fwd = Q_NULLPTR;
+    Signal *signal_fwd = nullptr;
 
-    Signal *signal_bwd = Q_NULLPTR;
+    Signal *signal_bwd = nullptr;
 };
 
 #endif

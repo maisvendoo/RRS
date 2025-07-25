@@ -14,7 +14,7 @@ class TOPOLOGY_EXPORT ExitSignal : public Signal
 {
 public:
 
-    ExitSignal(QObject *parent = Q_NULLPTR);
+    ExitSignal(QObject *parent = nullptr);
 
     ~ExitSignal();
 
@@ -165,7 +165,7 @@ private:
                                                 NUM_LINE_PLUS_CONTACTS,
                                                 NUM_LINE_MINUS_CONTACTS);
 
-    Signal *next_signal = Q_NULLPTR;
+    Signal *next_signal = nullptr;
 
     void preStep(state_vector_t &Y, double t) override;
 

@@ -22,7 +22,7 @@ class TOPOLOGY_EXPORT Topology : public QObject
 
 public:
 
-    Topology(QObject *parent = Q_NULLPTR);
+    Topology(QObject *parent = nullptr);
 
     ~Topology();
 
@@ -112,7 +112,7 @@ private:
     void line_signals_connect(std::vector<Signal *> &line_signals);
 
     /// Сзязывание входных сигналов с проходными на перегонах
-    void enter_signal_connect(std::vector<Signal *> &enter_signals);    
+    void enter_signal_connect(std::vector<Signal *> &enter_signals);
 
     /// Загрузка списка станций
     bool load_stations(QString route_dir);

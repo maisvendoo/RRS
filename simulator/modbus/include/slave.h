@@ -18,7 +18,7 @@ class Slave : public QObject
 {
 public:
 
-    Slave(QObject *parent = Q_NULLPTR);
+    Slave(QObject *parent = nullptr);
 
     ~Slave();
 

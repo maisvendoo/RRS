@@ -9,6 +9,8 @@
 #include <vsg/core/observer_ptr.h>
 #include <QString>
 
+class simulator_time_t;
+class Skybox;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 
@@ -17,8 +19,20 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     GUIParams() {}
 
     vsg::observer_ptr<vsg::Viewer> viewer;
+    simulator_time_t* sim_time = nullptr;
+    simulator_time_t* local_time = nullptr;
+    Skybox *skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
+
+    int use_server_time = true;
+    bool was_server_time_unavailable = true;
+    int16_t year = 2000;
+    int16_t month = 1;
+    int16_t day = 1;
+    int16_t hour = 0;
+    int16_t minute = 0;
+    int16_t sec = 0;
 
     bool prev_Esc = false;
     bool is_show_quit_dialog = false;
@@ -46,6 +60,11 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     float sun_azimuth_degrees = 45.0f;
     float sun_altitude_degrees = 45.0f;
+
+    int skybox_texture_index = 1;
+    int prev_skybox_texture_index = 1;
+    vsg::ref_ptr<vsg::ubvec4Array2D> skybox_texture_data;
+    std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> skybox_textures;
 };
 
 //------------------------------------------------------------------------------
@@ -80,6 +99,8 @@ private:
     void showNoCabineControl() const;
 
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
+
+    void check_date_time() const;
 };
 
 #endif // MY_GUI_H

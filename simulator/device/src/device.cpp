@@ -153,18 +153,17 @@ QString Device::getName() const
 void Device::setY(size_t i, double value)
 {
     if (i < y.size())
+    {
         y[i] = value;
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Device::getY(size_t i) const
+double Device::getY(size_t i) const noexcept
 {
-    if (i < y.size())
-        return y[i];
-
-    return 0.0;
+    return (i < y.size()) ? y[i] : 0.0;
 }
 
 //------------------------------------------------------------------------------

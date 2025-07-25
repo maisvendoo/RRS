@@ -10,7 +10,7 @@ class DEVICE_EXPORT TrainHorn : public Device
 {
 public:
 
-    TrainHorn(QObject *parent = Q_NULLPTR);
+    TrainHorn(QObject *parent = nullptr);
 
     virtual ~TrainHorn();
 

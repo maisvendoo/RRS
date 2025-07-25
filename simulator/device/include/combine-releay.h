@@ -14,7 +14,7 @@ public:
     CombineRelay(size_t num_neutral_contacts = 1,
                  size_t num_plus_contacts = 1,
                  size_t num_minus_contscts = 1,
-                 QObject *parent = Q_NULLPTR);
+                 QObject *parent = nullptr);
 
     ~CombineRelay();
 

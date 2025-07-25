@@ -15,18 +15,6 @@
 
 #include    "physics.h"
 
-const double Physics::g = 9.81;
-const double Physics::kmh = 3.6;
-const double Physics::pA = 101325.0;
-const double Physics::PI = 3.1415926;
-const double Physics::MPa = 1e6;
-const double Physics::Rmu = 8.31;
-const double Physics::Mair = 0.029;
-const double Physics::c = 340.0;
-const double Physics::ZERO = 1e-10;
-
-const double Physics::FricApproxCoeff = 100.0;
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------

@@ -128,7 +128,7 @@ void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 //------------------------------------------------------------------------------
 bool TcpClient::isConnected() const
 {
-    if (socket == Q_NULLPTR)
+    if (socket == nullptr)
     {
         return false;
     }

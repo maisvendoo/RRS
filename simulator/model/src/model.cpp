@@ -129,9 +129,6 @@ Model::~Model()
 //------------------------------------------------------------------------------
 bool Model::init(const simulator_command_line_t &command_line)
 {
-    // Check is debug print allowed
-    is_debug_print = command_line.debug_print.is_present;
-
     init_data_t init_data;
 
     // Load initial data configuration
@@ -173,7 +170,6 @@ bool Model::init(const simulator_command_line_t &command_line)
     //initTraffic(init_data);
 
     start_time = init_data.solver_config.start_time;
-    stop_time = init_data.solver_config.stop_time;
     integration_time_interval = init_data.integration_time_interval;
 
     Journal::instance()->info("==== Info to server ====");
@@ -210,7 +206,7 @@ void Model::start()
     if (!isStarted())
     {
         is_simulation_started = true;
-        t = start_time;
+        sim_time.simulation_seconds = start_time;
 
         connect(&simTimer, &ElapsedTimer::process, this, &Model::process, Qt::DirectConnection);
         simTimer.setInterval(static_cast<quint64>(integration_time_interval));
@@ -323,13 +319,13 @@ void Model::findNearestVehicles()
                 }
 
                 Journal::instance()->info(QString("t = %1s Founded vehicles #%2 and #%3 at distance %4 (%5) m")
-                                              .arg(t)
+                                              .arg(sim_time.simulation_seconds, 10, 'f', 3)
                                               .arg(idx)
                                               .arg(nearest_idx)
                                               .arg(fd.distance, 7, 'f', 3)
                                               .arg(current_distance, 7, 'f', 3));
                 Journal::instance()->info(QString("t = %1s Connect trains #%2 (from %3) and #%4 (from %5)")
-                                              .arg(t)
+                                              .arg(sim_time.simulation_seconds, 10, 'f', 3)
                                               .arg(fd.train_idx)
                                               .arg(fd.from_head ? "head" : "tail")
                                               .arg(train_idx)
@@ -421,19 +417,6 @@ void Model::findFarthestVehicles()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::debugPrint()
-{
-    QString debug_info = QString("t = %1    realtime_delay = %2    time_step = %3\n")
-        .arg(t, 0, 'f', 3)
-        .arg(realtime_delay, 2)
-        .arg(integration_time_interval);
-
-    fputs(qPrintable(debug_info), stdout);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Model::loadInitData(init_data_t &init_data)
 {
     Journal::instance()->info("==== Init data loading ====");
@@ -512,11 +495,6 @@ void Model::overrideByCommandLine(init_data_t &init_data,
         init_data.route_dir_name = command_line.route_dir.value;
     }
 
-    if (command_line.debug_print.is_present)
-    {
-        init_data.debug_print = command_line.debug_print.value;
-    }
-
     if (!command_line.train_config.is_present)
     {
         Journal::instance()->info("Command line is empty. Apply init_data.xml config");
@@ -529,11 +507,6 @@ void Model::overrideByCommandLine(init_data_t &init_data,
     if (command_line.route_dir.is_present)
     {
         init_data.route_dir_name = command_line.route_dir.value;
-    }
-
-    if (command_line.debug_print.is_present)
-    {
-        init_data.debug_print = command_line.debug_print.value;
     }
 
     if (!command_line.train_config.is_present)
@@ -588,12 +561,6 @@ void Model::configSolver(solver_config_t &solver_config)
             solver_config.start_time = 0;
         }
         Journal::instance()->info("Start time: " + QString("%1").arg(solver_config.start_time));
-
-        if (!cfg.getDouble(secName, "StopTime", solver_config.stop_time))
-        {
-            solver_config.stop_time = 10.0;
-        }
-        Journal::instance()->info("Stop time: " + QString("%1").arg(solver_config.stop_time));
 
         if (!cfg.getDouble(secName, "InitStep", solver_config.step))
         {
@@ -656,11 +623,11 @@ void Model::initControlPanel(QString cfg_path)
         if (!cfg.getString(secName, "Plugin", module_name))
             return;
 
-        control_panel = Q_NULLPTR;
+        control_panel = nullptr;
         QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
         control_panel = loadInterfaceDevice(module_path);
 
-        if (control_panel == Q_NULLPTR)
+        if (control_panel == nullptr)
             return;
 
         QString config_dir = "";
@@ -836,7 +803,7 @@ void Model::prepareFeedBack()
     update_data.vehicles.resize(vehicles.size());
     update_data.trains.resize(trains.size());
 
-    update_pos_data.time = t;
+    update_pos_data.sim_time = sim_time;
 
     int i = 0;
     for (auto train : trains)
@@ -924,16 +891,16 @@ void Model::prepareFeedBack()
 //------------------------------------------------------------------------------
 void Model::tcpFeedBack()
 {
-    tcp_server->updateVehiclesPos(update_pos_data.serialize(), t);
+    tcp_server->updateVehiclesPos(update_pos_data.serialize(), sim_time.simulation_seconds);
     update_pos_data = simulator_update_pos_t();
-    tcp_server->updateVehiclesState(update_data.serialize(), t);
+    tcp_server->updateVehiclesState(update_data.serialize(), sim_time.simulation_seconds);
     update_data = simulator_update_t();
-    tcp_server->updatePlayers(update_players.serialize(), t);
+    tcp_server->updatePlayers(update_players.serialize(), sim_time.simulation_seconds);
     update_players = simulator_update_players_t();
 
     for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {
-        tcp_server->updateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(), (*с_id), t);
+        tcp_server->updateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(), (*с_id), sim_time.simulation_seconds);
         controlled_clients[*с_id].vehicle_controlled = simulator_vehicle_controlled_update_t();
     }
 }
@@ -980,7 +947,7 @@ void Model::controlStep()
         int id = c.prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            vehicles[id]->resetKeysData();            
+            vehicles[id]->resetKeysData();
         }
     }
 
@@ -1033,7 +1000,7 @@ void Model::process()
 
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
 
-    topology->step(t, integration_time);
+    topology->step(sim_time.simulation_seconds, integration_time);
 
     findNearestVehicles();
 
@@ -1043,7 +1010,7 @@ void Model::process()
 
     controlStep();
 
-    emit step(t, integration_time);
+    emit step(sim_time.simulation_seconds, integration_time);
 /*
     // Feedback to viewer
     sharedMemoryFeedback();
@@ -1051,11 +1018,8 @@ void Model::process()
     // Update server feedback
     tcpFeedBack();
 
-    t += integration_time;
-
-    // Debug print, is allowed
-    if (is_debug_print)
-        debugPrint();
+    sim_time.addTime(integration_time);
+    //Journal::instance()->info(sim_time.getString());
 }
 
 //------------------------------------------------------------------------------
@@ -1078,7 +1042,7 @@ void Model::slotTrainStepDone(int idx)
         if (realtime_delay > 0)
         {
             QString msg = QString("t = %1 | simulation of %2ms take %3ms | slowest train #%4 | WARNING: realtime delay!")
-                              .arg(t, 8, 'f', 3)
+                              .arg(sim_time.simulation_seconds, 10, 'f', 3)
                               .arg(integration_time_interval)
                               .arg(realtime_delay + integration_time_interval)
                               .arg(idx);
@@ -1088,7 +1052,7 @@ void Model::slotTrainStepDone(int idx)
         else
         {
             QString msg = QString("t = %1 | simulation of %2ms take %3ms | slowest train #%4 ")
-                              .arg(t, 8, 'f', 3)
+                              .arg(sim_time.simulation_seconds, 10, 'f', 3)
                               .arg(integration_time_interval)
                               .arg(realtime_delay + integration_time_interval)
                               .arg(idx);
@@ -1099,7 +1063,7 @@ void Model::slotTrainStepDone(int idx)
     else
     {
         Journal::instance()->critical(QString("t = %1 | wait to step: %2/%3 trains done | last #%4")
-                                          .arg(t, 8, 'f', 3)
+                                          .arg(sim_time.simulation_seconds, 10, 'f', 3)
                                           .arg(count_trains_done_its_step)
                                           .arg(trains.size())
                                           .arg(idx));

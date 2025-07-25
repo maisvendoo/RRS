@@ -11,7 +11,7 @@ class IsolatedJoint : public Connector
 {
 public:
 
-    IsolatedJoint(QObject *parent = Q_NULLPTR);
+    IsolatedJoint(QObject *parent = nullptr);
 
     ~IsolatedJoint();
 
@@ -20,7 +20,7 @@ public:
 private:
 
     /// Сигнал, установленный у данного изостыка
-    Signal  *signal = Q_NULLPTR;
+    Signal  *signal = nullptr;
 };
 
 #endif // ISOLATED_JOINT_H

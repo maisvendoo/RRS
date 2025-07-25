@@ -10,12 +10,11 @@
 class DEVICE_EXPORT CoilALSN : public Device
 {
 public:
-
     /// Конструктор
-    CoilALSN(QObject *parent = Q_NULLPTR);
+    CoilALSN(QObject* parent = nullptr);
 
     /// Деструктор
-    ~CoilALSN();
+    ~CoilALSN() = default;
 
     /// Задать направление:
     /// 1 - вперёд по траектории, -1 - назад  по траектории
@@ -31,7 +30,7 @@ public:
     double getNextSignalDistance() const;
 
     /// Литер следующего светофора
-    QString getNextSignalLiter() const;
+    QString getNextSignalLiter() const noexcept;
 
     virtual void step(double t, double dt);
 
@@ -54,7 +53,7 @@ public:
 
 private:
 
-    QString next_liter = "";
+    QString next_liter;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,

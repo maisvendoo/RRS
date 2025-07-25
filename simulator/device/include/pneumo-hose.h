@@ -13,7 +13,7 @@ class DEVICE_EXPORT PneumoHose : public Device
 public:
 
     /// Конструктор
-    PneumoHose(int key_code = 0, QObject *parent = Q_NULLPTR);
+    PneumoHose(int key_code = 0, QObject *parent = nullptr);
 
     /// Деструктор
     ~PneumoHose();

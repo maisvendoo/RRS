@@ -12,7 +12,7 @@ class DEVICE_EXPORT BrakeLock : public BrakeDevice
 {
 public:
 
-    BrakeLock(QObject *parent = Q_NULLPTR);
+    BrakeLock(QObject *parent = nullptr);
 
     ~BrakeLock();
 

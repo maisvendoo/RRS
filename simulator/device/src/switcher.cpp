@@ -58,7 +58,7 @@ void Switcher::setSpringLast(bool is_spring)
 void Switcher::setState(int value)
 {
     int old_pos = state;
-    state = cut(value, 0, num_states - 1);
+    state = std::clamp(value, 0, num_states - 1);
     if (state != old_pos)
         switch_sound.play();
 }

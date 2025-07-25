@@ -83,7 +83,7 @@ void JointCoupling::step(double t, double dt)
         // Расчёт усилия в сцепке
         force = calc_force(ds, dv);
         // Зазор в сцепках в данный момент
-        ds_delta = cut(ds, -delta / 2.0, delta / 2.0);
+        ds_delta = std::clamp(ds, -delta / 2.0, delta / 2.0);
         // Смещение сцепок и поглощающих аппаратов в данный момент
         ds_shift = dead_zone(ds, -delta / 2.0, delta / 2.0);
     }
@@ -135,7 +135,7 @@ double JointCoupling::calc_force(double ds, double dv)
     // Вычитание зазора в сцепке
     double x = dead_zone(ds, -delta / 2.0, delta / 2.0);
     // Сжатие поглощающих аппаратов
-    double x_c = cut(x, -lambda * 2.0, lambda * 2.0);
+    double x_c = std::clamp(x, -lambda * 2.0, lambda * 2.0);
     // Усилие упругих элементов в поглощающих аппаратах
     double force_c = x_c * c;
     // Сила трения фрикционных элементов в поглощающих аппаратах

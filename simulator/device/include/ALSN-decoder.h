@@ -12,18 +12,18 @@ class DEVICE_EXPORT DecoderALSN : public Device
 {
 public:
 
-    DecoderALSN(QObject *parent = Q_NULLPTR);
+    DecoderALSN(QObject* parent = nullptr);
 
-    ~DecoderALSN();
+    ~DecoderALSN() = default;
 
     void step(double t, double dt) override;
 
-    ALSN getCode() const
+    ALSN getCode() const noexcept
     {
         return current_code;
     }
 
-    void setCoilSignal(ALSN code);
+    void setCoilSignal(ALSN code) noexcept;
 
 protected:
 
@@ -32,16 +32,13 @@ protected:
 
     ALSN last_code = ALSN::NO_CODE;
 
-    enum
-    {
-        NUM_VALUES = 3
-    };
+    static constexpr int NUM_VALUES = 3;
 
     /// Принятый от катушек код АЛСН
     std::array<ALSN, NUM_VALUES> recv_codes = { ALSN::NO_CODE };
 
     /// Таймер для обновления текущего кода
-    Timer *update_timer = Q_NULLPTR;
+    Timer* update_timer = nullptr;
 
     void preStep(state_vector_t &Y, double t) override;
 

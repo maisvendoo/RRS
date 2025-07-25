@@ -28,7 +28,7 @@ class TracTransformer : public Device
 {
 public:
 
-    TracTransformer(QObject *parent = Q_NULLPTR);
+    TracTransformer(QObject *parent = nullptr);
 
     ~TracTransformer();
 
@@ -55,7 +55,7 @@ public:
 private:
 
     /// Напряжение на первичной обмотке
-    double  U1;    
+    double  U1;
 
     /// Коэффициент трансформации обмотки СН
     double  K_sn;

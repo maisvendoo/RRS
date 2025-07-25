@@ -10,7 +10,7 @@ class DEVICE_EXPORT KeyTrigger : public Device
 {
 public:
 
-    KeyTrigger(int key_code = 0, double timeout_on = 0.0, double timeout_off = 0.0, QObject *parent = Q_NULLPTR);
+    KeyTrigger(int key_code = 0, double timeout_on = 0.0, double timeout_off = 0.0, QObject *parent = nullptr);
 
     ~KeyTrigger();
 

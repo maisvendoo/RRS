@@ -416,8 +416,8 @@ void Application::generate_topology(const QString &route_dir)
         return;
     }
 
-    track = cut(track, 0, static_cast<int>(zds_tracks.size()) - 1);
-    len = cut(len, 20.0, 500.0);
+    track = std::clamp(track, 0, static_cast<int>(zds_tracks.size()) - 1);
+    len = std::clamp(len, 20.0, 500.0);
 
     QString traj_path = trajDir + QDir::separator() +
                         filename + FILE_EXTENTION.c_str();

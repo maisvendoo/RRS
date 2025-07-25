@@ -7,7 +7,6 @@
 #include "simulator-update-struct.h"
 #include "sound-manager.h"
 #include "VehicleExterior.h"
-#include "vehicle-signals.h"
 
 #include <algorithm>
 #include <vsg/app/Viewer.h>
@@ -103,6 +102,14 @@ bool VehiclesHandler::isUpdated() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+simulator_time_t *VehiclesHandler::getDateTime()
+{
+    return isUpdated() ? &(update_pos_data[cur_data].sim_time) : nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString VehiclesHandler::getDebugMessage() const noexcept
 {
     return debug_message;
@@ -129,7 +136,7 @@ void VehiclesHandler::step(double t, double dt)
     }
 
     const double client_time = ref_time + time_difference;
-    const bool is_update = (client_time >= update_pos_data[cur_data].time);
+    const bool is_update = (client_time >= update_pos_data[cur_data].sim_time.simulation_seconds);
 
     // Swap indexes of positions info array
     while (is_update)
@@ -152,7 +159,7 @@ void VehiclesHandler::step(double t, double dt)
         cur_data = delay_data;
         delay_data = new_data;
 
-        if (client_time < update_pos_data[cur_data].time)
+        if (client_time < update_pos_data[cur_data].sim_time.simulation_seconds)
         {
             break;
         }
@@ -170,8 +177,8 @@ void VehiclesHandler::step(double t, double dt)
     }
 
     // Interframe coordinate
-    const double upd_dt = update_pos_data[cur_data].time - update_pos_data[old_data].time;
-    const double r = (client_time - update_pos_data[old_data].time) / upd_dt;
+    const double upd_dt = update_pos_data[cur_data].sim_time.simulation_seconds - update_pos_data[old_data].sim_time.simulation_seconds;
+    const double r = (client_time - update_pos_data[old_data].sim_time.simulation_seconds) / upd_dt;
     const double k = (1.0 - r);
 
     for (std::size_t i = 0; i < vehicles.size(); ++i)
@@ -523,7 +530,7 @@ void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
     update_pos_data[new_data].deserialize(data);
     if (update_pos_data[new_data].vehicles.size() == vehicles.size())
     {
-        time_difference = update_pos_data[new_data].time - ref_time - settings_delay;
+        time_difference = update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay;
         current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData2(data); };
     }
     else
@@ -547,7 +554,7 @@ void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
     {
         double r = 0.5;
         time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
+            (update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay) * r;
         current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData3(data); };
     }
     else
@@ -579,7 +586,7 @@ void VehiclesHandler::getVehiclesPosData3(QByteArray& data)
 
         double r = 0.25;
         time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
+            (update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay) * r;
         current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData4(data); };
     }
     else
@@ -618,7 +625,7 @@ void VehiclesHandler::getVehiclesPosData4(QByteArray& data)
     {
         double r = 0.05;
         time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].time - ref_time - settings_delay) * r;
+            (update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay) * r;
     }
     else
     {
@@ -633,15 +640,8 @@ void VehiclesHandler::getVehiclesPosData4(QByteArray& data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::updateDebugString()
 {
-    const int total_seconds = static_cast<int>(std::floor(update_pos_data[new_data].time));
-    const int hours = total_seconds / 3600;
-    const int minutes = total_seconds / 60 % 60;
-    const int seconds = total_seconds % 60;
-    debug_message = QString("Время от начала симуляции: %1 сек (%2 ч %3 м %4 c)\n")
-        .arg(update_pos_data[new_data].time, 8, 'f', 1)
-        .arg(hours, 2)
-        .arg(minutes, 2)
-        .arg(seconds, 2);
+    // Дата-время сервера
+    debug_message = update_pos_data[new_data].sim_time.getString() + "\n";
 
     const int current_vehicle = vehicle_controlled.current_vehicle;
     if (current_vehicle >= 0

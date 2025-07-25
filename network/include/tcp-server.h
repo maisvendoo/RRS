@@ -16,7 +16,7 @@ class NETWORK_EXPORT TcpServer : public QObject
 
 public:
 
-    TcpServer(QObject *parent = Q_NULLPTR);
+    TcpServer(QObject *parent = nullptr);
 
     ~TcpServer();
 
@@ -59,7 +59,7 @@ private:
 
     quint16 port = 1992;
 
-    QTcpServer *server = Q_NULLPTR;
+    QTcpServer *server = nullptr;
 
     int clients_last_id = 0;
 

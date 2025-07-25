@@ -28,6 +28,7 @@
 #include    <elapsed-timer.h>
 
 #include    <global-const.h>
+#include    <datetime.h>
 #include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
 #include    <controlled-struct.h>
@@ -58,7 +59,7 @@ class MODEL_EXPORT Model : public QObject
 public:
 
     /// Constructor
-    explicit Model(QObject *parent = Q_NULLPTR);
+    explicit Model(QObject *parent = nullptr);
     /// Destructor
     virtual ~Model();
 
@@ -92,11 +93,9 @@ public slots:
 private:
 
     /// Current simulation time
-    double      t = 0.0;
+    simulator_time_t sim_time = simulator_time_t::timeNow();
     /// Simulation start time
     double      start_time = 0.0;
-    /// Simulation stop time
-    double      stop_time = 1000.0;
     /// Flag of integration step is correct
     bool        is_step_correct = true;
     /// Flag is simulation thread started
@@ -105,8 +104,6 @@ private:
     int         realtime_delay = 0;
     /// Minimal intergation interval
     int         integration_time_interval = 100;
-    /// Flag, which allow debug print
-    bool        is_debug_print = false;
 
     int count_trains_done_its_step = -1;
     int realtime_at_step_begin = 0;
@@ -171,9 +168,6 @@ private:
 
     /// Find trains which have distances between its vehicles and uncouple them
     void findFarthestVehicles();
-
-    /// Debug print to stdout
-    void debugPrint();
 
     /// Initial data loading
     void loadInitData(init_data_t &init_data);

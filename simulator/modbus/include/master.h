@@ -15,7 +15,7 @@ class Master : public QObject
 {
 public:
 
-    Master(QObject *parent = Q_NULLPTR);
+    Master(QObject *parent = nullptr);
 
     ~Master();
 
@@ -50,7 +50,7 @@ private:
         MASTER_INFO = 0,
         MASTER_WARNING = 1,
         MASTER_ERROR = 2
-    };    
+    };
 
 
     bool loadPortConfig(const QString &path, port_config_t &port_config);

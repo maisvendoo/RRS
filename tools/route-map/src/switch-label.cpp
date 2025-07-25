@@ -22,9 +22,9 @@ SwitchLabel::~SwitchLabel()
 //------------------------------------------------------------------------------
 void SwitchLabel::resetMenu()
 {
-    menu = Q_NULLPTR;
-    action_switch_fwd = Q_NULLPTR;
-    action_switch_bwd = Q_NULLPTR;
+    menu = nullptr;
+    action_switch_fwd = nullptr;
+    action_switch_bwd = nullptr;
 }
 
 //------------------------------------------------------------------------------

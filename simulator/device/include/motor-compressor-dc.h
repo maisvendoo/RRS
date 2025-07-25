@@ -10,7 +10,7 @@ class DEVICE_EXPORT DCMotorCompressor : public Device
 {
 public:
 
-    DCMotorCompressor(QObject *parent = Q_NULLPTR);
+    DCMotorCompressor(QObject *parent = nullptr);
 
     ~DCMotorCompressor();
 
