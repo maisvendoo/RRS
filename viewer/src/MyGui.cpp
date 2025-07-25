@@ -1,7 +1,7 @@
 #include "MyGui.h"
 
-#include "datetime.h"
 #include "filesystem.h"
+#include "datetime.h"
 
 #include "Skybox.h"
 #include "UpdateStatisticsHandler.h"
@@ -101,9 +101,18 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (params->vehicles_handler)
     {
         params->sim_time = params->vehicles_handler->getDateTime();
-        if (params->sim_time)
+        if (params->sim_time && params->use_server_time)
         {
-            params->skybox->setDateTime(*(params->sim_time));
+            params->year = params->sim_time->date.year();
+            params->month = params->sim_time->date.month();
+            params->day = params->sim_time->date.day();
+            params->hour = params->sim_time->time.hour();
+            params->minute = params->sim_time->time.minute();
+            params->sec = params->sim_time->time.sec();
+        }
+        else
+        {
+            check_date_time();
         }
 
         // Отображение дебаг-строки подвижного состава
@@ -127,7 +136,19 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         params->prev_F9 = false;
         params->is_show_debug_msg = false;
         params->is_no_controlled = false;
+
+        check_date_time();
     }
+
+    simulator_time_t datetime({static_cast<int16_t>(params->year), static_cast<uint8_t>(params->month), static_cast<uint8_t>(params->day)},
+                              {static_cast<uint8_t>(params->hour), static_cast<uint8_t>(params->minute), static_cast<uint8_t>(params->sec)});
+    params->skybox->setDateTime(datetime);
+    params->year = datetime.date.year();
+    params->month = datetime.date.month();
+    params->day = datetime.date.day();
+    params->hour = datetime.time.hour();
+    params->minute = datetime.time.minute();
+    params->sec = datetime.time.sec();
 
     if (params->is_show_debug_msg)
     {
@@ -264,11 +285,38 @@ void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
 
-    std::string text = (params->sim_time) ?
-                            params->sim_time->getString().toStdString() :
-                            "Время сервера: недоступно";
-    ImGui::Text(u8"%s", text.c_str());
+    if (params->sim_time)
+    {
+        ImGui::RadioButton("Время сервера: ", &(params->use_server_time), 1);
+        ImGui::SameLine();
+        std::string text_server_datetime = params->sim_time->getString(false).toStdString();
+        ImGui::Text(u8"%s", text_server_datetime.c_str());
+    }
+    else
+    {
+        ImGui::RadioButton("Время сервера: недоступно", false);
+    }
 
+    ImGui::RadioButton("Использовать локальное время:", &(params->use_server_time), 0);
+    ImGuiInputTextFlags flags = params->use_server_time ? ImGuiInputTextFlags_ReadOnly : 0;
+
+    constexpr int16_t one = 1;
+
+    ImGui::PushItemWidth(100);
+    ImGui::InputScalar("year", ImGuiDataType_S16, &params->year, &one, NULL, NULL, flags);
+    ImGui::SameLine();
+    ImGui::InputScalar("month ", ImGuiDataType_S16, &params->month, &one, NULL, NULL, flags);
+    ImGui::SameLine();
+    ImGui::InputScalar("day", ImGuiDataType_S16, &params->day, &one, NULL, NULL, flags);
+
+    ImGui::InputScalar("hour", ImGuiDataType_S16, &params->hour, &one, NULL, NULL, flags);
+    ImGui::SameLine();
+    ImGui::InputScalar("minute", ImGuiDataType_S16, &params->minute, &one, NULL, NULL, flags);
+    ImGui::SameLine();
+    ImGui::InputScalar("sec", ImGuiDataType_S16, &params->sec, &one, NULL, NULL, flags);
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(300);
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
     ImGui::ColorEdit3("Sun color", params->sun_color);
@@ -279,6 +327,7 @@ void MyGui::showSettings() const
     {
         ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
     }*/
+    ImGui::PopItemWidth();
     ImGui::End();
 
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
@@ -391,4 +440,65 @@ void MyGui::showNoCabineControl() const
     ImGui::Text(u8"%s", text);
     ImGui::PopStyleColor();
     ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::check_date_time() const
+{
+    if (params->sec > 59)
+    {
+        ++params->minute;
+        params->sec = 0;
+    }
+    else if (params->sec < 0)
+    {
+        --params->minute;
+        params->sec = 59;
+    }
+    if (params->minute > 59)
+    {
+        ++params->hour;
+        params->minute = 0;
+    }
+    else if (params->minute < 0)
+    {
+        --params->hour;
+        params->minute = 59;
+    }
+    if (params->hour > 23)
+    {
+        ++params->day;
+        params->hour = 0;
+    }
+    else if (params->hour < 0)
+    {
+        --params->day;
+        params->hour = 23;
+    }
+    if (params->day > (server_date_t::isLeapYear(params->year) ?
+                           days_in_month_leap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1] :
+                           days_in_month_nleap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1]))
+    {
+        ++params->month;
+        params->day = 1;
+    }
+    else if (params->day < 1)
+    {
+        --params->month;
+        params->day = (server_date_t::isLeapYear(params->year) ?
+                           days_in_month_leap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1] :
+                           days_in_month_nleap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1]);
+    }
+    if (params->month > 12)
+    {
+        ++params->year;
+        params->month = 1;
+    }
+    else if (params->month < 1)
+    {
+        --params->year;
+        params->month = 12;
+    }
 }

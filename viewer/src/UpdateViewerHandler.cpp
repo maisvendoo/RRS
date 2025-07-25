@@ -79,10 +79,6 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 
         _current_manipulator->frameEvent(dt);
 
-        // _sun->direction = {1, 0, 0}; Светит слева направо
-        // _sun->direction = {0, 1, 0}; Светит сзади вперед
-        // _sun->direction = {0, 0, -1}; Светит сверху вниз
-
         updateShadowRegion();
     }
 }

@@ -122,6 +122,14 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
     sand_system->read_config("sanding-system");
     sand_system->setSandMassMax(payload_mass);
     sand_system->setSandLevel(payload_coeff);
+
+    // Прожекторы
+    for (auto i : {CAB1, CAB2})
+    {
+        spotlight[i] = new SpotLight();
+        spotlight[i]->read_config("spotlight");
+    }
+
 /*
     reg = new Registrator();
     reg->setFileName("vl60k-motor");

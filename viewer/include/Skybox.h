@@ -48,18 +48,16 @@ private:
     struct season_time_texture_t
     {
         struct season_date_t {std::uint8_t month; std::uint8_t day;};
-        season_date_t date_season_begin = {1, 1};
-        season_date_t date_season_end = {12, 31};
-        bool is_season_trough_new_year = false;
+        season_date_t date_season_begin = {1, 1};       ///< День начала сезона применения данной текстуры (включительно)
+        season_date_t date_season_end = {12, 31};       ///< День окончания сезона применения данной текстуры (включительно)
 
-        server_time_t time_appear_begin = {0, 0, 0};
-        server_time_t time_appear_end = {0, 0, 0};
-        server_time_t time_disappear_begin = {0, 0, 0};
-        server_time_t time_disappear_end = {0, 0, 0};
-        bool is_time_trough_midhight = false;
+        server_time_t time_appear_begin = {0, 0, 0};    ///< Время начала плавного появления данной текстуры
+        server_time_t time_appear_end = {0, 0, 0};      ///< Время окончания плавного появления данной текстуры
+        server_time_t time_disappear_begin = {0, 0, 0}; ///< Время начала плавного исчезновения данной текстуры
+        server_time_t time_disappear_end = {0, 0, 0};   ///< Время окончания плавного исчезновения данной текстуры
 
-        vsg::ref_ptr<vsg::ubvec4Array2D> texture;
-        std::string filename;
+        vsg::ref_ptr<vsg::ubvec4Array2D> texture;       ///< Указатель на загруженную текстуру
+        std::string filename;   ///< Имя файла текстуры
     };
 
     std::vector<season_time_texture_t> textures;

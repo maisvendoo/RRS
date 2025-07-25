@@ -69,26 +69,60 @@ std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> Skybox::getTextures() const noexce
 //------------------------------------------------------------------------------
 void Skybox::setDateTime(simulator_time_t sim_time)
 {
-    LOG_INFO("Skybox::SetDateTime()");
-    // Временно для теста перерисовки: 10 секунд день - 10 секунд ночь
-    float msec20 = (1000.0f * (sim_time.time.sec() % 20) + sim_time.time.msec());
-    float w_day = abs(1.0f - msec20 / 10000.0f);
-    float w_night = 1.0f - w_day;
-
     std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights;
+
+    server_date_t date_begin;
+    server_date_t date_end;
     for (const season_time_texture_t& stt : textures)
     {
-        // Дневная текстура
-        server_time_t day_time(12, 0, 0);
-        if ((stt.time_appear_end < day_time) && (stt.time_disappear_begin > day_time))
+        // Проверяем, что дата попадет в сезон применения текстуры
+        date_begin = server_date_t(sim_time.date.year(),
+                                   stt.date_season_begin.month,
+                                   stt.date_season_begin.day);
+        bool is_after_season_begin = (sim_time.date >= date_begin);
+
+        date_end = server_date_t(sim_time.date.year(),
+                                 stt.date_season_end.month,
+                                 stt.date_season_end.day);
+        bool is_before_season_end = (sim_time.date <= date_end);
+
+        bool is_season = (date_end > date_begin) ?
+            (is_after_season_begin || is_before_season_end) :
+            (is_after_season_begin && is_before_season_end);
+
+        if (!is_season)
         {
-            textures_and_weights[stt.texture] = w_day;
+            continue;
         }
 
-        // Ночная текстура
-        if (stt.is_time_trough_midhight)
+        // Проверяем, что время попадет в интервал применения текстуры
+        auto time_in_interval = [](const server_time_t& time,
+                                   const server_time_t& begin,
+                                   const server_time_t& end) -> bool
         {
-            textures_and_weights[stt.texture] = w_night;
+            if (begin > end)
+            {
+                return (time >= begin) || (time < end);
+            }
+            else
+            {
+                return (time >= begin) && (time < end);
+            }
+        };
+
+        if (time_in_interval(sim_time.time, stt.time_appear_begin, stt.time_appear_end))
+        {
+            textures_and_weights[stt.texture] = static_cast<float>(sim_time.time.data() - stt.time_appear_begin.data()) /
+                                                static_cast<float>(stt.time_appear_end.data() - stt.time_appear_begin.data());
+        }
+        if (time_in_interval(sim_time.time, stt.time_appear_end, stt.time_disappear_begin))
+        {
+            textures_and_weights[stt.texture] = 1.0f;
+        }
+        if (time_in_interval(sim_time.time, stt.time_disappear_begin, stt.time_disappear_end))
+        {
+            textures_and_weights[stt.texture] = static_cast<float>(stt.time_disappear_end.data() - sim_time.time.data()) /
+                                                static_cast<float>(stt.time_disappear_end.data() - stt.time_disappear_begin.data());
         }
     }
     setActiveTextures(textures_and_weights);
@@ -99,15 +133,14 @@ void Skybox::setDateTime(simulator_time_t sim_time)
 //------------------------------------------------------------------------------
 void Skybox::setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights)
 {
-    LOG_INFO("Skybox::setActiveTextures()");
     bool repaint = false;
 
     for (auto& [texture, weight] : textures_and_weights)
     {
         // Добавляем текстуры, которые не были активны
-        if ((weight > 1.0e-5f) && !active_textures_and_weights.count(texture))
+        if (!active_textures_and_weights.count(texture))
         {
-            active_textures_and_weights[texture] = textures_and_weights[texture];
+            active_textures_and_weights[texture] = weight;
             repaint = true;
             continue;
         }
@@ -143,7 +176,6 @@ void Skybox::setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float>
 //------------------------------------------------------------------------------
 void Skybox::update_skybox()
 {
-    LOG_INFO("Skybox::update_skybox()");
     // Собираем итераторы по пикселям активных текстур
     float sum_weights = 0.0f;
     std::vector<std::pair<vsg::stride_iterator<vsg::ubvec4>, float>> active_pixels;
@@ -430,9 +462,6 @@ void Skybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
             continue;
         }
 
-        stt.is_season_trough_new_year = (stt.date_season_begin.month > stt.date_season_end.month) ||
-                                        ( (stt.date_season_begin.month == stt.date_season_end.month) &&
-                                          (stt.date_season_begin.day > stt.date_season_end.day) );
 
         int trough_midhight_count = (stt.time_appear_begin > stt.time_appear_end) +
                                     (stt.time_appear_end > stt.time_disappear_begin) +
@@ -444,7 +473,6 @@ void Skybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
             secNode = cfg.getNextSection();
             continue;
         }
-        stt.is_time_trough_midhight = trough_midhight_count;
 
         textures.emplace_back(stt);
         secNode = cfg.getNextSection();

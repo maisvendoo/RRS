@@ -4,8 +4,33 @@
 		"version":"2.0"
 	},
 	"extensionsUsed":[
-		"KHR_materials_specular"
+		"KHR_materials_specular",
+		"KHR_lights_punctual"
 	],
+	"extensionsRequired":[
+		"KHR_lights_punctual"
+	],
+	"extensions":{
+		"KHR_lights_punctual":{
+			"lights":[
+				{
+					"color":[
+						1,
+						1,
+						1
+					],
+					"intensity":5435.141306588225,
+					"spot":{
+						"innerConeAngle":0,
+						"outerConeAngle":0.39269909262657166
+					},
+					"type":"spot",
+					"range":200,
+					"name":"SpotLight_high1"
+				}
+			]
+		}
+	},
 	"scene":0,
 	"scenes":[
 		{
@@ -17,7 +42,8 @@
 				335,
 				336,
 				337,
-				338
+				338,
+				339
 			]
 		}
 	],
@@ -3197,6 +3223,19 @@
 		{
 			"mesh":99,
 			"name":"Scene Root_Zerkala_Zerkala-GEODE_02 - Default_0"
+		},
+		{
+			"extensions":{
+				"KHR_lights_punctual":{
+					"light":0
+				}
+			},
+			"name":"SpotLight_high1",
+			"translation":[
+				0,
+				4.156067848205566,
+				-9.415040969848633
+			]
 		}
 	],
 	"animations":[

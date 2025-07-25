@@ -57,8 +57,8 @@ public:
 
     server_date_t(std::int16_t year, std::uint8_t month, std::uint8_t day)
         : y(year)
-        , m(month)
-        , d(day)
+        , m(std::clamp(month, std::uint8_t(1), std::uint8_t(12)))
+        , d(std::clamp(day, std::uint8_t(1), isLeapYear(y) ? days_in_month_leap[m - 1] : days_in_month_nleap[m - 1]))
     {
     }
 
@@ -374,9 +374,10 @@ struct simulator_time_t final
     }
 
     /// Вывод даты, времени суток и времени симуляции сервера в строку
-    QString getString()
+    QString getString(bool prefix = true)
     {
-        return QString("Время сервера: %1 %2 (%3 с)")
+        return QString("%1%2 %3 (%4 с)")
+            .arg(prefix ? "Время сервера: " : "")
             .arg(date.getString())
             .arg(time.getString())
             .arg(simulation_seconds, 3, 'f', 1);

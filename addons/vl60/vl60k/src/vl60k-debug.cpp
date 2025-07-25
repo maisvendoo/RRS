@@ -46,6 +46,8 @@ void VL60k::debugPrint(double t, double dt)
 
     DebugMsg += QString("| Кабина: %1").arg(cabine_idx + 1, 2);
 
+    DebugMsg += QString("| Прожектор: %1").arg(spotlight[cabine_idx]->getIntensity(), 4, 'f', 1);
+
     DebugMsg += QString("\n");
     DebugMsg += QString("%1%2%3-%4-couplings-%5-%6%7%8")
                     .arg(coupling_fwd->isLinked() ? "=" : " ")
