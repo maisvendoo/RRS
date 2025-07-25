@@ -146,20 +146,25 @@ void Skybox::setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float>
         }
     }
 
-    for (auto& [texture, weight] : active_textures_and_weights)
+    for (auto it = active_textures_and_weights.begin(); it != active_textures_and_weights.end();)
     {
+        auto texture = it->first;
+        float& weight = it->second;
+
         // Убираем текстуры, которые стали не активны
         if (!textures_and_weights.count(texture))
         {
-            active_textures_and_weights.erase(texture);
+            it = active_textures_and_weights.erase(it);
             repaint = true;
             continue;
         }
 
+        ++it;
+
         constexpr float eps = 1.0f / 256.0f;
-        if (abs(textures_and_weights[texture] - weight) > eps)
+        if (std::abs(textures_and_weights[texture] - weight) > eps)
         {
-            active_textures_and_weights[texture] = textures_and_weights[texture];
+            weight = textures_and_weights[texture];
             repaint = true;
             continue;
         }
