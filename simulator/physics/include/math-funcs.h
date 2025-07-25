@@ -2,6 +2,7 @@
 #define     MATH_FUNCS_H
 
 #include    <cmath>
+#include    <algorithm>
 
 //------------------------------------------------------------------------------
 //
@@ -75,6 +76,15 @@ T dead_zone(T x, T min, T max)
         return x - min;
 
     return static_cast<T>(0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+template <typename T>
+T cut(T x, T min, T max)
+{
+    return std::clamp(x, min, max);
 }
 
 #endif // MATH_FUNCS_H

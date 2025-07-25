@@ -46,5 +46,5 @@ void SpotLight::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "LowLevel", low_level);
 
-    low_level = cut(low_level, 0.0, 1.0);
+    low_level = std::clamp(low_level, 0.0, 1.0);
 }
