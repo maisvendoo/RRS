@@ -14,6 +14,7 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/lighting/SpotLight.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <string>
@@ -100,6 +101,7 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
 
         vsg::ref_ptr<vsg::Object> new_object = duplicate->duplicates[deferred_animation.node];
         vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
+        vsg::ref_ptr<vsg::Light> new_light = new_object.cast<vsg::Light>();
 
         if (vsg::ref_ptr<ProcRotationAnimation> rotation = animation.cast<ProcRotationAnimation>())
         {
@@ -109,6 +111,11 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
         if (vsg::ref_ptr<ProcTranslationAnimation> translation = animation.cast<ProcTranslationAnimation>())
         {
             translation->setTransform(new_transform);
+            continue;
+        }
+        if (vsg::ref_ptr<ProcLightAnimation> light_anim = animation.cast<ProcLightAnimation>())
+        {
+            light_anim->setLight(new_light);
             continue;
         }
     }

@@ -18,6 +18,18 @@ public:
 
     explicit ProcLightAnimation(vsg::ref_ptr<vsg::Light> in_light);
 
+    void setLight(vsg::ref_ptr<vsg::Light> light)
+    {
+        this->light = light;
+
+        if (!is_fixed_signal)
+        {
+            cur_signal = 0.0f;
+        }
+
+        update(cur_signal);
+    }
+
 private:
 
     vsg::ref_ptr<vsg::Light> light;

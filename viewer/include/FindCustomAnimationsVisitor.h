@@ -45,7 +45,7 @@ public:
 
     void apply(vsg::Node& node) override;
     void apply(vsg::Group& group) override;
-    void apply(vsg::Light& light) override;
+    void apply(vsg::Light &light) override;
 
     void reconfigure_animations();
 
