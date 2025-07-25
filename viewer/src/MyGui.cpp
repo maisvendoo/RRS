@@ -316,6 +316,15 @@ void MyGui::showSettings() const
     ImGui::InputScalar("sec", ImGuiDataType_S16, &params->sec, &one, NULL, NULL, flags);
     ImGui::PopItemWidth();
 
+    static int day_seconds;
+    day_seconds = params->hour * 3600 + params->minute * 60 + params->sec;
+    if (ImGui::SliderInt("Day seconds", &day_seconds, 0, 86400))
+    {
+        params->hour = day_seconds / 3600;
+        params->minute = (day_seconds - params->hour * 3600) / 60;
+        params->sec = day_seconds % 60;
+    }
+
     ImGui::PushItemWidth(300);
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
