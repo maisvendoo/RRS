@@ -27,6 +27,21 @@
 					"type":"spot",
 					"range":200,
 					"name":"SpotLight_high1"
+				},
+				{
+					"color":[
+						1,
+						1,
+						1
+					],
+					"intensity":5435.141306588225,
+					"spot":{
+						"innerConeAngle":0.3337942263919169,
+						"outerConeAngle":0.39269909262657166
+					},
+					"type":"spot",
+					"range":200,
+					"name":"SpotLight_high2"
 				}
 			]
 		}
@@ -43,7 +58,8 @@
 				336,
 				337,
 				338,
-				339
+				339,
+				340
 			]
 		}
 	],
@@ -3235,6 +3251,25 @@
 				0,
 				4.156067848205566,
 				-9.415040969848633
+			]
+		},
+		{
+			"extensions":{
+				"KHR_lights_punctual":{
+					"light":1
+				}
+			},
+			"name":"SpotLight_high2",
+			"rotation":[
+				1,
+				0,
+				0,
+				4.7414219217500886e-09
+			],
+			"translation":[
+				0,
+				4.222810745239258,
+				9.367691040039062
 			]
 		}
 	],

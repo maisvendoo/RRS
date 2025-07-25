@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<LightAnimation>
-		<SignalID>430</SignalID>
+		<SignalID>431</SignalID>
 		<Duration>10.0</Duration>
 		<Color>1.0 1.0 1.0</Color>
 		<MaxIntensity>5000.0</MaxIntensity>		
