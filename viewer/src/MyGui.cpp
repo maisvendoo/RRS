@@ -299,10 +299,9 @@ void MyGui::showSettings() const
 
     ImGui::RadioButton("Использовать локальное время:", &(params->use_server_time), 0);
     ImGuiInputTextFlags flags = params->use_server_time ? ImGuiInputTextFlags_ReadOnly : 0;
-
+    ImGui::PushItemWidth((ImGui::CalcItemWidth() - 2 * ImGui::GetStyle().ItemSpacing.x) / 3);
     constexpr int16_t one = 1;
 
-    ImGui::PushItemWidth(100);
     ImGui::InputScalar("year", ImGuiDataType_S16, &params->year, &one, NULL, NULL, flags);
     ImGui::SameLine();
     ImGui::InputScalar("month ", ImGuiDataType_S16, &params->month, &one, NULL, NULL, flags);
@@ -314,6 +313,7 @@ void MyGui::showSettings() const
     ImGui::InputScalar("minute", ImGuiDataType_S16, &params->minute, &one, NULL, NULL, flags);
     ImGui::SameLine();
     ImGui::InputScalar("sec", ImGuiDataType_S16, &params->sec, &one, NULL, NULL, flags);
+
     ImGui::PopItemWidth();
 
     static int day_seconds;
@@ -346,7 +346,6 @@ void MyGui::showSettings() const
     ImGui::Text("elevation: %f", altitude);
     //--------------------------------------------------------------------------
 
-    ImGui::PushItemWidth(300);
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
     ImGui::ColorEdit3("Sun color", params->sun_color);
@@ -357,7 +356,6 @@ void MyGui::showSettings() const
     {
         ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
     }*/
-    ImGui::PopItemWidth();
     ImGui::End();
 
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
