@@ -23,8 +23,10 @@ void VL60k::stepSafetyDevices(double t, double dt)
     alsn_decoder[CAB2]->step(t, dt);
 
     // Скоростемер
-    speed_meter->setOmega(wheel_omega[TED1]);
-    speed_meter->step(t, dt);
+    speed_meter[CAB1]->setOmega(wheel_omega[TED1]);
+    speed_meter[CAB1]->step(t, dt);
+    speed_meter[CAB2]->setOmega(wheel_omega[TED6]);
+    speed_meter[CAB2]->step(t, dt);
 
     for (size_t cab_idx : {CAB1, CAB2})
     {
@@ -33,7 +35,7 @@ void VL60k::stepSafetyDevices(double t, double dt)
         safety_device[cab_idx]->setRBstate(rb[cab_idx][RB_1].getState());
         safety_device[cab_idx]->setRBSstate(rb[cab_idx][RBS].getState());
         safety_device[cab_idx]->setKeyEPK(epk[cab_idx]->isKeyOn());
-        safety_device[cab_idx]->setVelocity(speed_meter->getVelocity());
+        safety_device[cab_idx]->setVelocity(speed_meter[cab_idx]->getVelocity());
         safety_device[cab_idx]->step(t, dt);
 
         // Электропневматический клапан автостопа

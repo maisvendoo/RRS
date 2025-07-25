@@ -340,10 +340,10 @@ private:
     CoilALSN    *coil_ALSN_bwd = nullptr;
 
     /// Локомотивный скоростемер
-    SL2M    *speed_meter = nullptr;
+    SL2M    *speed_meter[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Свисток и тифон
-    TrainHorn   *horn = nullptr;
+    TrainHorn   *horn[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Система подачи песка
     SandingSystem   *sand_system = nullptr;
