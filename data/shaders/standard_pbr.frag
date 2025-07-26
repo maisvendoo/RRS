@@ -441,9 +441,6 @@ void main()
 
             float brightness = lightColor.a;
 
-            // if light is too dim to effect the rendering skip it
-            if (brightness <= brightnessCutoff ) continue;
-
             int shadowMapCount = int(lightData.values[lightDataIndex].r);
             if (shadowMapCount > 0)
             {
@@ -506,9 +503,6 @@ void main()
             vec4 lightDirection_cosOuterAngle = lightData.values[lightDataIndex++];
 
             float brightness = lightColor.a;
-
-            // if light is too dim to effect the rendering skip it
-            if (brightness <= brightnessCutoff ) continue;
 
             vec3 delta = position_cosInnerAngle.xyz - eyePos;
             float distance2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;

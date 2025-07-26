@@ -114,7 +114,7 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
                               vsg::ref_ptr<vsg::Viewer> viewer,
                               vsg::ref_ptr<vsg::Options> options)
 {
-    if (signal_model.isEmpty())
+    if (signal_model.isEmpty() || (signal_model == "empty_line"))
         return false;
 
     vsg::dmat4 m1 = vsg::translate(position);
