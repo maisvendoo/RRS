@@ -12,6 +12,7 @@
 #include "rectifier.h"
 #include "relay.h"
 #include "sanding-system.h"
+#include "spotlight.h"
 #include "trac-transformer.h"
 #include "train-horn.h"
 

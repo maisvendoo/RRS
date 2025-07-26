@@ -13,6 +13,7 @@
 #include "pneumo-hose.h"
 #include "reservoir.h"
 #include "speedmap.h"
+#include "spotlight.h"
 
 //------------------------------------------------------------------------------
 //

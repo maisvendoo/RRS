@@ -56,6 +56,7 @@ class SafetyDevice;
 class SandingSystem;
 class SL2M;
 class SpeedMap;
+class SpotLight;
 class SwitchingValve;
 class Timer;
 class TracTransformer;
@@ -145,10 +146,10 @@ private:
     OperatingRod *oper_rod_bwd = nullptr;
 
     // Дальний ряд тумблеров приборной панели машиниста
-//    /// Тригер тумблера "Прожектор яркий"
-//    Trigger proj2_tumbler[CABS_NUM];
-//    /// Тригер тумблера "Прожектор тусклый"
-//    Trigger proj1_tumbler[CABS_NUM];
+    /// Тригер тумблера "Прожектор яркий"
+    Trigger spotlight_high_tumbler[CABS_NUM];
+    /// Тригер тумблера "Прожектор тусклый"
+    Trigger spotlight_low_tumbler[CABS_NUM];
 //    /// Тригер тумблера "Радиостанция"
 //    Trigger radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
@@ -396,6 +397,8 @@ private:
     std::array<Relay *, NUM_MOTORS> linear_contactor;
 
     DecoderALSN *alsn_decoder[CABS_NUM] = {nullptr, nullptr};
+
+    SpotLight *spotlight[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
     /// Общая инициализация локомотива
     void initialization();

@@ -1,5 +1,7 @@
 #include    "vl60pk.h"
 
+#include "vl60pk-signals.h"
+
 #include "alsn-ukbm.h"
 #include "brake-crane.h"
 #include "brake-lock.h"
@@ -17,7 +19,7 @@
 #include "protective-device.h"
 #include "reservoir.h"
 #include "sl2m.h"
-#include "vl60pk-signals.h"
+#include "spotlight.h"
 
 //------------------------------------------------------------------------------
 //
@@ -183,4 +185,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
 
     analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
     analogSignal[CAB2_KLUCH_EPK] = static_cast<float>(key_epk[CAB2].getState());
+
+    analogSignal[CAB1_SPOTLIGHT] = static_cast<float>(spotlight[CAB1]->getIntensity());
+    analogSignal[CAB2_SPOTLIGHT] = static_cast<float>(spotlight[CAB2]->getIntensity());
 }

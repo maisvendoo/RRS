@@ -185,6 +185,24 @@ void VL60pk::keyProcess()
             key_epk[cabine_idx].reset();
     }
 
+    // Прожектор "Тускло"
+    if (getKeyState(KEY_G))
+    {
+        if (isShift())
+            spotlight_low_tumbler[cabine_idx].set();
+        else
+            spotlight_low_tumbler[cabine_idx].reset();
+    }
+
+    // Прожектор "Ярко"
+    if (getKeyState(KEY_H))
+    {
+        if (isShift())
+            spotlight_high_tumbler[cabine_idx].set();
+        else
+            spotlight_high_tumbler[cabine_idx].reset();
+    }
+
     // Включение/выключение ЭПТ
     if (getKeyState(KEY_V))
     {

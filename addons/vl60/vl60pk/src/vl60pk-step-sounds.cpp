@@ -119,8 +119,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_PHASESPLITTER] = phase_spliter->getSoundSignal();
 
     // Дальний ряд тумблеров приборной панели машиниста
-//    analogSignal[SOUND_TUMBLER_PROJECTOR2_ON] = proj2_tumbler.getSoundSignal(Trigger::ON_SOUND);
-//    analogSignal[SOUND_TUMBLER_PROJECTOR1_ON] = proj1_tumbler.getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_PROJECTOR2_ON] = spotlight_high_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[SOUND_TUMBLER_PROJECTOR1_ON] = spotlight_low_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
 //    analogSignal[SOUND_TUMBLER_RADIO_ON] = radio_tumbler.getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_ON] = cu_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_BWD_ON] = pant2_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
@@ -129,6 +129,9 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[SOUND_TUMBLER_GV_ON] = gv_tumbler[CAB1].getSoundSignal(Trigger::ON_SOUND);
 
+    analogSignal[CAB2_SOUND_TUMBLER_PROJECTOR2_ON] = spotlight_high_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PROJECTOR1_ON] = spotlight_low_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
+//    analogSignal[CAB2_SOUND_TUMBLER_RADIO_ON] = radio_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_CTRL_CIRCUIT_ON] = cu_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_PANT_BWD_ON] = pant2_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_PANT_FWD_ON] = pant1_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
@@ -136,8 +139,8 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[CAB2_SOUND_TUMBLER_GV_RETURN_ON] = gv_return_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_GV_ON] = gv_tumbler[CAB2].getSoundSignal(Trigger::ON_SOUND);
 
-//    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = proj2_tumbler.getSoundSignal(Trigger::OFF_SOUND);
-//    analogSignal[SOUND_TUMBLER_PROJECTOR1_OFF] = proj1_tumbler.getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_PROJECTOR2_OFF] = spotlight_high_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[SOUND_TUMBLER_PROJECTOR1_OFF] = spotlight_low_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
 //    analogSignal[SOUND_TUMBLER_RADIO_OFF] = radio_tumbler.getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_CTRL_CIRCUIT_OFF] = cu_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_PANT_BWD_OFF] = pant2_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
@@ -146,6 +149,9 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
     analogSignal[SOUND_TUMBLER_GV_RETURN_OFF] = gv_return_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[SOUND_TUMBLER_GV_OFF] = gv_tumbler[CAB1].getSoundSignal(Trigger::OFF_SOUND);
 
+    analogSignal[CAB2_SOUND_TUMBLER_PROJECTOR2_OFF] = spotlight_high_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
+    analogSignal[CAB2_SOUND_TUMBLER_PROJECTOR1_OFF] = spotlight_low_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
+//    analogSignal[CAB2_SOUND_TUMBLER_RADIO_OFF] = radio_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_CTRL_CIRCUIT_OFF] = cu_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_PANT_BWD_OFF] = pant2_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);
     analogSignal[CAB2_SOUND_TUMBLER_PANT_FWD_OFF] = pant1_tumbler[CAB2].getSoundSignal(Trigger::OFF_SOUND);

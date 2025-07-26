@@ -12,6 +12,7 @@
 #include "rectifier.h"
 #include "relay.h"
 #include "sanding-system.h"
+#include "spotlight.h"
 #include "trac-transformer.h"
 #include "train-horn.h"
 
@@ -122,6 +123,13 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
     sand_system->read_config("sanding-system");
     sand_system->setSandMassMax(payload_mass);
     sand_system->setSandLevel(payload_coeff);
+
+    // Прожекторы
+    for (auto i : {CAB1, CAB2})
+    {
+        spotlight[i] = new SpotLight();
+        spotlight[i]->read_config("spotlight");
+    }
 /*
     reg = new Registrator();
     reg->setFileName("vl60pk-motor");

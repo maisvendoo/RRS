@@ -52,10 +52,9 @@ class SafetyDevice;
 class SandingSystem;
 class SL2M;
 class SpeedMap;
+class SpotLight;
 class TracTransformer;
 class TrainHorn;
-
-#include    <spotlight.h>
 
 /*!
  * \class
@@ -137,10 +136,10 @@ private:
     OperatingRod *oper_rod_bwd = Q_NULLPTR;
 
     // Дальний ряд тумблеров приборной панели машиниста
-//    /// Тригер тумблера "Прожектор яркий"
-//    Trigger proj2_tumbler[CABS_NUM];
-//    /// Тригер тумблера "Прожектор тусклый"
-//    Trigger proj1_tumbler[CABS_NUM];
+    /// Тригер тумблера "Прожектор яркий"
+    Trigger spotlight_high_tumbler[CABS_NUM];
+    /// Тригер тумблера "Прожектор тусклый"
+    Trigger spotlight_low_tumbler[CABS_NUM];
 //    /// Тригер тумблера "Радиостанция"
 //    Trigger radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
@@ -378,10 +377,6 @@ private:
     double U_bat = 55.0;
 
     DecoderALSN *alsn_decoder[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
-
-    Trigger tumbler_spotlight_low[CABS_NUM];
-
-    Trigger tumbler_spotlight_high[CABS_NUM];
 
     SpotLight *spotlight[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 

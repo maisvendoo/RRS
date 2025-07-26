@@ -17,6 +17,7 @@
 #include "protective-device.h"
 #include "reservoir.h"
 #include "sl2m.h"
+#include "spotlight.h"
 
 //------------------------------------------------------------------------------
 //

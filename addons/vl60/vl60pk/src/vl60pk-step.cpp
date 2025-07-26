@@ -18,6 +18,7 @@
 #include "sanding-system.h"
 #include "trac-transformer.h"
 #include "train-horn.h"
+#include "spotlight.h"
 
 //------------------------------------------------------------------------------
 //
@@ -279,6 +280,14 @@ void VL60pk::stepOtherEquipment(double t, double dt)
     // Пересчёт массы локомотива
     payload_coeff = sand_system->getSandLevel();
     setPayloadCoeff(payload_coeff);
+
+    // Управление прожекторами
+    for (auto i : {CAB1, CAB2})
+    {
+        spotlight[i]->setState(spotlight_low_tumbler[i].getState(),
+                               spotlight_high_tumbler[i].getState());
+        spotlight[i]->step(t, dt);
+    }
 
     if (reg == nullptr)
         return;

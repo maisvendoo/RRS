@@ -188,17 +188,17 @@ void VL60k::keyProcess()
     if (getKeyState(KEY_G))
     {
         if (isShift())
-            tumbler_spotlight_low[cabine_idx].set();
+            spotlight_low_tumbler[cabine_idx].set();
         else
-            tumbler_spotlight_low[cabine_idx].reset();
+            spotlight_low_tumbler[cabine_idx].reset();
     }
 
     // Прожектор "Ярко"
     if (getKeyState(KEY_H))
     {
         if (isShift())
-            tumbler_spotlight_high[cabine_idx].set();
+            spotlight_high_tumbler[cabine_idx].set();
         else
-            tumbler_spotlight_high[cabine_idx].reset();
+            spotlight_high_tumbler[cabine_idx].reset();
     }
 }
