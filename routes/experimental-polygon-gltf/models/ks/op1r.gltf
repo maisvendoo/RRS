@@ -5,7 +5,7 @@
     "buffers": [
         {
             "uri": "bin/op1r.bin",
-            "byteLength": 62352
+            "byteLength": 88416
         }
     ],
     "bufferViews": [
@@ -18,12 +18,18 @@
         {
             "buffer": 0,
             "byteOffset": 26064,
+            "byteLength": 26064,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 52128,
             "byteLength": 17376,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 43440,
+            "byteOffset": 69504,
             "byteLength": 18912,
             "target": 34963
         }
@@ -49,6 +55,22 @@
             "bufferView": 1,
             "componentType": 5126,
             "count": 2172,
+            "type": "VEC3",
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 2172,
             "type": "VEC2",
             "max": [
                 0.999351,
@@ -60,7 +82,7 @@
             ]
         },
         {
-            "bufferView": 2,
+            "bufferView": 3,
             "componentType": 5125,
             "count": 4728,
             "type": "SCALAR",
@@ -108,9 +130,10 @@
                 {
                     "attributes": {
                         "POSITION": 0,
-                        "TEXCOORD_0": 1
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
                     },
-                    "indices": 2,
+                    "indices": 3,
                     "material": 0,
                     "mode": 4
                 }

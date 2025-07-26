@@ -5,7 +5,7 @@
     "buffers": [
         {
             "uri": "bin/opkl.bin",
-            "byteLength": 62944
+            "byteLength": 89968
         }
     ],
     "bufferViews": [
@@ -18,12 +18,18 @@
         {
             "buffer": 0,
             "byteOffset": 27024,
+            "byteLength": 27024,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 54048,
             "byteLength": 18016,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 45040,
+            "byteOffset": 72064,
             "byteLength": 17904,
             "target": 34963
         }
@@ -49,6 +55,22 @@
             "bufferView": 1,
             "componentType": 5126,
             "count": 2252,
+            "type": "VEC3",
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 2252,
             "type": "VEC2",
             "max": [
                 0.999579,
@@ -60,7 +82,7 @@
             ]
         },
         {
-            "bufferView": 2,
+            "bufferView": 3,
             "componentType": 5125,
             "count": 4476,
             "type": "SCALAR",
@@ -108,9 +130,10 @@
                 {
                     "attributes": {
                         "POSITION": 0,
-                        "TEXCOORD_0": 1
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
                     },
-                    "indices": 2,
+                    "indices": 3,
                     "material": 0,
                     "mode": 4
                 }

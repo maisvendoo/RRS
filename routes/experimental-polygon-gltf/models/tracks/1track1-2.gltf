@@ -5,7 +5,7 @@
     "buffers": [
         {
             "uri": "bin/1track1-2.bin",
-            "byteLength": 107744
+            "byteLength": 155348
         }
     ],
     "bufferViews": [
@@ -18,12 +18,18 @@
         {
             "buffer": 0,
             "byteOffset": 47604,
+            "byteLength": 47604,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 95208,
             "byteLength": 31736,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 79340,
+            "byteOffset": 126944,
             "byteLength": 28404,
             "target": 34963
         }
@@ -49,6 +55,22 @@
             "bufferView": 1,
             "componentType": 5126,
             "count": 3967,
+            "type": "VEC3",
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 3967,
             "type": "VEC2",
             "max": [
                 0.999923,
@@ -60,7 +82,7 @@
             ]
         },
         {
-            "bufferView": 2,
+            "bufferView": 3,
             "componentType": 5125,
             "count": 7101,
             "type": "SCALAR",
@@ -108,9 +130,10 @@
                 {
                     "attributes": {
                         "POSITION": 0,
-                        "TEXCOORD_0": 1
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
                     },
-                    "indices": 2,
+                    "indices": 3,
                     "material": 0,
                     "mode": 4
                 }

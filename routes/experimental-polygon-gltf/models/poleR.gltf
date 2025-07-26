@@ -5,7 +5,7 @@
     "buffers": [
         {
             "uri": "bin/poleR.bin",
-            "byteLength": 4748
+            "byteLength": 6200
         }
     ],
     "bufferViews": [
@@ -18,12 +18,18 @@
         {
             "buffer": 0,
             "byteOffset": 1452,
+            "byteLength": 1452,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2904,
             "byteLength": 968,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 2420,
+            "byteOffset": 3872,
             "byteLength": 2328,
             "target": 34963
         }
@@ -49,6 +55,22 @@
             "bufferView": 1,
             "componentType": 5126,
             "count": 121,
+            "type": "VEC3",
+            "max": [
+                0.00640593,
+                1,
+                0.782671
+            ],
+            "min": [
+                -0.872257,
+                0.45085,
+                -0.782675
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 121,
             "type": "VEC2",
             "max": [
                 0.995884,
@@ -60,7 +82,7 @@
             ]
         },
         {
-            "bufferView": 2,
+            "bufferView": 3,
             "componentType": 5125,
             "count": 582,
             "type": "SCALAR",
@@ -98,8 +120,7 @@
                     "index": 0,
                     "texCoord": 0
                 }
-            },
-            "alphaMode": "BLEND"
+            }
         }
     ],
     "meshes": [
@@ -108,9 +129,10 @@
                 {
                     "attributes": {
                         "POSITION": 0,
-                        "TEXCOORD_0": 1
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
                     },
-                    "indices": 2,
+                    "indices": 3,
                     "material": 0,
                     "mode": 4
                 }

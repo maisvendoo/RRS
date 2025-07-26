@@ -5,7 +5,7 @@
     "buffers": [
         {
             "uri": "bin/sky.bin",
-            "byteLength": 3848
+            "byteLength": 5120
         }
     ],
     "bufferViews": [
@@ -18,12 +18,18 @@
         {
             "buffer": 0,
             "byteOffset": 1272,
+            "byteLength": 1272,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2544,
             "byteLength": 848,
             "target": 34962
         },
         {
             "buffer": 0,
-            "byteOffset": 2120,
+            "byteOffset": 3392,
             "byteLength": 1728,
             "target": 34963
         }
@@ -49,6 +55,22 @@
             "bufferView": 1,
             "componentType": 5126,
             "count": 106,
+            "type": "VEC3",
+            "max": [
+                0.962638,
+                0.191483,
+                0.962638
+            ],
+            "min": [
+                -0.962638,
+                -0.980048,
+                -0.962638
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 106,
             "type": "VEC2",
             "max": [
                 0.999,
@@ -60,7 +82,7 @@
             ]
         },
         {
-            "bufferView": 2,
+            "bufferView": 3,
             "componentType": 5125,
             "count": 432,
             "type": "SCALAR",
@@ -107,9 +129,10 @@
                 {
                     "attributes": {
                         "POSITION": 0,
-                        "TEXCOORD_0": 1
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
                     },
-                    "indices": 2,
+                    "indices": 3,
                     "material": 0,
                     "mode": 4
                 }
