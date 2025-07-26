@@ -188,4 +188,10 @@ void VL60pk::stepSignalsOutput(double t, double dt)
 
     analogSignal[CAB1_SPOTLIGHT] = static_cast<float>(spotlight[CAB1]->getIntensity());
     analogSignal[CAB2_SPOTLIGHT] = static_cast<float>(spotlight[CAB2]->getIntensity());
+
+    analogSignal[CAB1_TUMBLER_PRG1] = static_cast<float>(spotlight_low_tumbler[CAB1].getState());
+    analogSignal[CAB1_TUMBLER_PRG2] = static_cast<float>(spotlight_high_tumbler[CAB1].getState());
+
+    analogSignal[CAB2_TUMBLER_PRG1] = static_cast<float>(spotlight_low_tumbler[CAB2].getState());
+    analogSignal[CAB2_TUMBLER_PRG2] = static_cast<float>(spotlight_high_tumbler[CAB2].getState());
 }
