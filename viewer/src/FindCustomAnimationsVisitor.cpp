@@ -100,21 +100,25 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
         vsg::ref_ptr<ProcAnimation> animation = deferred_animation.animation;
 
         vsg::ref_ptr<vsg::Object> new_object = duplicate->duplicates[deferred_animation.node];
-        vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
-        vsg::ref_ptr<vsg::Light> new_light = new_object.cast<vsg::Light>();
+
 
         if (vsg::ref_ptr<ProcRotationAnimation> rotation = animation.cast<ProcRotationAnimation>())
         {
+            vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
             rotation->setTransform(new_transform);
             continue;
         }
+
         if (vsg::ref_ptr<ProcTranslationAnimation> translation = animation.cast<ProcTranslationAnimation>())
         {
+            vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
             translation->setTransform(new_transform);
             continue;
         }
+
         if (vsg::ref_ptr<ProcLightAnimation> light_anim = animation.cast<ProcLightAnimation>())
         {
+            vsg::ref_ptr<vsg::Light> new_light = new_object.cast<vsg::Light>();
             light_anim->setLight(new_light);
             continue;
         }
