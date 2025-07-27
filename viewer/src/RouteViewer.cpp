@@ -590,7 +590,18 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
-    viewer->compile();
+
+    // Перед компиляцией вьювера применяем некоторые настройки
+    auto resourceHints = vsg::ResourceHints::create();
+    // Указываем грузить модели в один поток, иначе будут дубликаты в памяти
+    resourceHints->numDatabasePagerReadThreads = 1;
+    // Указываем разрешение карты теней
+    resourceHints->shadowMapSize = {static_cast<uint32_t>(settings.shadow_resolution),
+                                    static_cast<uint32_t>(settings.shadow_resolution)};
+    // Указываем допустимое количество источников света
+    resourceHints->numLightsRange = {static_cast<uint32_t>(settings.num_lights),
+                                     static_cast<uint32_t>(settings.num_lights + 1)};
+    viewer->compile(resourceHints);
 
     options->operationThreads = vsg::OperationThreads::create(4, viewer->status);
 
@@ -658,6 +669,7 @@ bool RouteViewer::loadRoute()
     loader.parse_route_map(route);
 
     // Создание PagedLOD для моделей в маршруте
+    vsg::ref_ptr<vsg::Group> route_root = vsg::Group::create();
     auto current = route.transforms.begin();
     while (current != route.transforms.end())
     {
@@ -701,7 +713,7 @@ bool RouteViewer::loadRoute()
 
             matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
             matrix->addChild(pagedLOD);
-            root->addChild(matrix);
+            route_root->addChild(matrix);
         }
 
         current = range.second;
@@ -710,6 +722,7 @@ bool RouteViewer::loadRoute()
     route.object_ref.clear();
     route.transforms.clear();
 
+    root->addChild(route_root);
     viewer->update();
 
     // Перед компиляцией вьювера применяем некоторые настройки
@@ -719,6 +732,9 @@ bool RouteViewer::loadRoute()
     // Указываем разрешение карты теней
     resourceHints->shadowMapSize = {static_cast<uint32_t>(settings.shadow_resolution),
                                     static_cast<uint32_t>(settings.shadow_resolution)};
+    // Указываем допустимое количество источников света
+    resourceHints->numLightsRange = {static_cast<uint32_t>(settings.num_lights),
+                                     static_cast<uint32_t>(settings.num_lights + 1)};
     viewer->compile(resourceHints);
 
     return true;

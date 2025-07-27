@@ -99,6 +99,8 @@ void RouteViewer::loadLightSettings(CfgReader& cfg, const QString& section)
     }
 
     // Настройки освещения
+    cfg.getInt(section, "NumLights", settings.num_lights);
+
     cfg.getDouble(section, "AmbientIntensity", settings.ambient_intensity);
 
     QString ambientColor = "1.0 1.0 1.0";
