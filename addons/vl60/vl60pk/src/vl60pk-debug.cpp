@@ -45,7 +45,7 @@ void VL60pk::debugPrint(double t, double dt)
 
     DebugMsg += QString("| Кабина: %1").arg(cabine_idx + 1, 2);
 
-    DebugMsg += QString("| Прожектор: %1").arg(spotlight[cabine_idx]->getIntensity(), 4, 'f', 1);
+    DebugMsg += QString("| Прожектор: %1").arg(spotlight[cabine_idx]->getIntensityHigh(), 4, 'f', 1);
 /*
     DebugMsg += QString("| ПК p1: %1 | p2 %2 | x: %3")
                     .arg(bc_switch_valve->getPressure1(), 4, 'f', 2)

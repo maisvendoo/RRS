@@ -18,12 +18,13 @@
 						1,
 						1
 					],
-					"intensity":5435.141306588225,
+					"intensity":54351.41306588226,
 					"spot":{
-						"innerConeAngle":0.3337942263919169,
-						"outerConeAngle":0.39269909262657166
+						"innerConeAngle":0,
+						"outerConeAngle":0.02617993950843811
 					},
 					"type":"spot",
+					"range":400,
 					"name":"SpotLight_high1"
 				},
 				{
@@ -32,14 +33,44 @@
 						1,
 						1
 					],
-					"intensity":5435.141306588225,
+					"intensity":54351.41306588226,
 					"spot":{
-						"innerConeAngle":0.3337942263919169,
+						"innerConeAngle":0,
 						"outerConeAngle":0.39269909262657166
 					},
 					"type":"spot",
 					"range":200,
+					"name":"SpotLight_low1"
+				},
+				{
+					"color":[
+						1,
+						1,
+						1
+					],
+					"intensity":54351.41306588226,
+					"spot":{
+						"innerConeAngle":0,
+						"outerConeAngle":0.02617993950843811
+					},
+					"type":"spot",
+					"range":400,
 					"name":"SpotLight_high2"
+				},
+				{
+					"color":[
+						1,
+						1,
+						1
+					],
+					"intensity":54351.41306588226,
+					"spot":{
+						"innerConeAngle":0,
+						"outerConeAngle":0.39269909262657166
+					},
+					"type":"spot",
+					"range":200,
+					"name":"SpotLight_low2"
 				}
 			]
 		}
@@ -140,7 +171,9 @@
 				102,
 				117,
 				118,
-				119
+				119,
+				120,
+				121
 			]
 		}
 	],
@@ -1104,8 +1137,8 @@
 			"name":"SpotLight_high1",
 			"translation":[
 				0,
-				4.182713985443115,
-				-9.42112922668457
+				4.194591999053955,
+				-9.391432762145996
 			]
 		},
 		{
@@ -1114,17 +1147,55 @@
 					"light":1
 				}
 			},
-			"name":"SpotLight_high2",
+			"name":"SpotLight_low1",
 			"rotation":[
-				1,
+				0.0006912144017405808,
 				0,
 				0,
-				4.7414219217500886e-09
+				1
 			],
 			"translation":[
 				0,
-				4.196077346801758,
-				9.407766342163086
+				4.185312271118164,
+				-9.354312896728516
+			]
+		},
+		{
+			"extensions":{
+				"KHR_lights_punctual":{
+					"light":2
+				}
+			},
+			"name":"SpotLight_high2",
+			"rotation":[
+				0,
+				-1,
+				0,
+				1.6292068494294654e-07
+			],
+			"translation":[
+				0,
+				4.194591999053955,
+				9.2794771194458
+			]
+		},
+		{
+			"extensions":{
+				"KHR_lights_punctual":{
+					"light":3
+				}
+			},
+			"name":"SpotLight_low2",
+			"rotation":[
+				0,
+				-0.9999997615814209,
+				0.0006912144017405808,
+				1.629206423103824e-07
+			],
+			"translation":[
+				0,
+				4.185312271118164,
+				9.24235725402832
 			]
 		}
 	],

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<LightAnimation>
-		<SignalID>430</SignalID>
+	<MaterialAnimation>
+		<SignalID>2</SignalID>
 		<Duration>10.0</Duration>
-		<Color>1.0 1.0 1.0</Color>
-		<MaxIntensity>100000.0</MaxIntensity>		
-	</LightAnimation>
+		<EmissionColor>0.0 1.0 0.0</EmissionColor>
+		<Color>0.0 1.0 0.0</Color>
+	</MaterialAnimation>
 
 	<KeyPoint>
 		<Param>0.0</Param>
@@ -16,5 +16,4 @@
 		<Param>1.0</Param>
 		<Value>1.0</Value>
 	</KeyPoint>
-
 </Config>

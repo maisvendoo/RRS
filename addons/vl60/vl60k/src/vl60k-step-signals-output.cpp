@@ -182,8 +182,8 @@ void VL60k::stepSignalsOutput(double t, double dt)
     analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
     analogSignal[CAB2_KLUCH_EPK] = static_cast<float>(key_epk[CAB2].getState());
 
-    analogSignal[CAB1_SPOTLIGHT] = static_cast<float>(spotlight[CAB1]->getIntensity());
-    analogSignal[CAB2_SPOTLIGHT] = static_cast<float>(spotlight[CAB2]->getIntensity());
+    analogSignal[CAB1_SPOTLIGHT] = static_cast<float>(spotlight[CAB1]->getIntensityHigh());
+    analogSignal[CAB2_SPOTLIGHT] = static_cast<float>(spotlight[CAB2]->getIntensityHigh());
 
     analogSignal[CAB1_TUMBLER_PRG1] = static_cast<float>(spotlight_low_tumbler[CAB1].getState());
     analogSignal[CAB1_TUMBLER_PRG2] = static_cast<float>(spotlight_high_tumbler[CAB1].getState());

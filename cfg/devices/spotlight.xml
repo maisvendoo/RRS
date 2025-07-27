@@ -4,8 +4,5 @@
         <Order>1</Order>
         <SubStepNum>1</SubStepNum>
         <Solver>euler</Solver>
-
-        <LowLevel>0.5</LowLevel>
-
     </Device>
 </Config>

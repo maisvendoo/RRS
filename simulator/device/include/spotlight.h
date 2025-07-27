@@ -20,17 +20,25 @@ public:
         this->is_high = is_high;
     }
 
-    double getIntensity() const
+    double getIntensityHigh() const
     {
-        return intensity;
+        return intensity_high;
+    }
+
+    double getIntensityLow() const
+    {
+        return intensity_low;
     }
 
 private:
 
-    /// Общий уровень интенсивности свечения
-    double intensity = 0.0;
+    /// Уровень интенсивности свечения "Ярко"
+    double intensity_high = 0.0;
 
-    /// Уровень интенсивности "Тускло"
+    /// Уровень интенсивности свечения "Ярко"
+    double intensity_low = 0.0;
+
+    /// Максимальный уровень интенсивности "Тускло"
     double low_level = 0.5;
 
     bool is_low = false;
