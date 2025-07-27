@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<LightAnimation>
-		<SignalID>430</SignalID>
+		<SignalID>432</SignalID>
 		<Duration>10.0</Duration>
 		<Color>1.0 1.0 1.0</Color>
-		<MaxIntensity>100000.0</MaxIntensity>		
+		<MaxIntensity>500.0</MaxIntensity>		
 	</LightAnimation>
 
 	<KeyPoint>
