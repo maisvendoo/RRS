@@ -7,6 +7,7 @@
 		<MaxIntensity>500.0</MaxIntensity>
 		<InnerAngle>0.0</InnerAngle>
 		<OuterAngle>45.0</OuterAngle>
+		<Radius>0.0</Radius>
 		<VRotation>0.0</VRotation>
 		<HRotation>0.0</HRotation>		
 	</LightAnimation>

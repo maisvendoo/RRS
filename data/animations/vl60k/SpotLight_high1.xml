@@ -6,6 +6,7 @@
 		<Color>1.0 1.0 1.0</Color>
 		<MaxIntensity>100000.0</MaxIntensity>
 		<InnerAngle>0.0</InnerAngle>
+		<Radius>0.0</Radius>
 		<OuterAngle>3.0</OuterAngle>
 		<VRotation>0.0</VRotation>
 		<HRotation>0.0</HRotation>		
