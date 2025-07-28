@@ -59,7 +59,7 @@
         <!-- Разрешение карт теней -->
         <ShadowResolution>4096</ShadowResolution>
         <!-- Допустимое количество источников света в сцене -->
-        <NumLights>20</NumLights>
+        <NumLights>200</NumLights>
         <!-- Яркость общего освещения -->
         <AmbientIntensity>0.5</AmbientIntensity>
         <!-- Цвет общего освещения (RGB, 0.0 - 1.0) -->
