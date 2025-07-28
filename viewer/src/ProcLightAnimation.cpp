@@ -2,6 +2,8 @@
 #include    <CfgReader.h>
 
 #include    <vsg/lighting/SpotLight.h>
+#include    <vsg/lighting/DirectionalLight.h>
+#include    <vsg/lighting/PointLight.h>
 
 //------------------------------------------------------------------------------
 //
@@ -35,6 +37,11 @@ bool ProcLightAnimation::load_config(CfgReader &cfg)
     if (auto spotlight = light.cast<vsg::SpotLight>())
     {
         load_spotlight_settings(spotlight.get(), cfg);
+    }
+
+    if (auto pointLight = light.cast<vsg::PointLight>())
+    {
+        load_pointlight_settings(pointLight.get(), cfg);
     }
 
     return true;
@@ -85,7 +92,8 @@ void ProcLightAnimation::load_common_settings(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcLightAnimation::load_spotlight_settings(vsg::SpotLight *sl, CfgReader &cfg)
+void ProcLightAnimation::load_spotlight_settings(vsg::SpotLight *sl,
+                                                 CfgReader &cfg)
 {
     QString sec_name = "LightAnimation";
 
@@ -123,4 +131,19 @@ void ProcLightAnimation::load_spotlight_settings(vsg::SpotLight *sl, CfgReader &
     direction.z = -cos(vrot) * cos(hrot);
 
     sl->direction = direction;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcLightAnimation::load_pointlight_settings(vsg::PointLight *pl,
+                                                  CfgReader &cfg)
+{
+    QString sec_name = "LightAnimation";
+
+    double radius = pl->radius;
+    if (cfg.getDouble(sec_name, "Radius", radius))
+    {
+        pl->radius = radius;
+    }
 }

@@ -45,6 +45,8 @@ private:
     void load_common_settings(CfgReader &cfg);
 
     void load_spotlight_settings(vsg::SpotLight *sl, CfgReader &cfg);
+
+    void load_pointlight_settings(vsg::PointLight *pl, CfgReader &cfg);
  };
 
 #endif // LIGHT_ANIMATION_H
