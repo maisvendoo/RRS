@@ -41,6 +41,10 @@ private:
     void update(float current_signal) override;
 
     bool load_config(CfgReader &cfg) override;
+
+    void load_common_settings(CfgReader &cfg);
+
+    void load_spotlight_settings(vsg::SpotLight *sl, CfgReader &cfg);
  };
 
 #endif // LIGHT_ANIMATION_H

@@ -1,6 +1,8 @@
 #include    <ProcLightAnimation.h>
 #include    <CfgReader.h>
 
+#include    <vsg/lighting/SpotLight.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -27,6 +29,21 @@ void ProcLightAnimation::update(float current_signal)
 //
 //------------------------------------------------------------------------------
 bool ProcLightAnimation::load_config(CfgReader &cfg)
+{
+    load_common_settings(cfg);
+
+    if (auto spotlight = light.cast<vsg::SpotLight>())
+    {
+        load_spotlight_settings(spotlight.get(), cfg);
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcLightAnimation::load_common_settings(CfgReader &cfg)
 {
     QString sec_name = "LightAnimation";
 
@@ -63,6 +80,47 @@ bool ProcLightAnimation::load_config(CfgReader &cfg)
 
     light->color = light_color;
     light->intensity = cur_signal * max_intensity;
+}
 
-    return true;
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcLightAnimation::load_spotlight_settings(vsg::SpotLight *sl, CfgReader &cfg)
+{
+    QString sec_name = "LightAnimation";
+
+    double innerAngle = vsg::degrees(sl->innerAngle);
+    if (cfg.getDouble(sec_name, "InnerAngle", innerAngle))
+    {
+        sl->innerAngle = vsg::radians(innerAngle);
+    }
+
+    double outerAngle = vsg::degrees(sl->outerAngle);
+    if (cfg.getDouble(sec_name, "OuterAngle", outerAngle))
+    {
+        sl->outerAngle = vsg::radians(outerAngle);
+    }
+
+    double radius = sl->radius;
+    if (cfg.getDouble(sec_name, "Radius", radius))
+    {
+        sl->radius = radius;
+    }
+
+    vsg::dvec3 direction = sl->direction;
+
+    double hrot = 0.0;
+    double vrot = 0.0;
+
+    cfg.getDouble(sec_name, "HRotation", hrot);
+    cfg.getDouble(sec_name, "VRotation", vrot);
+
+    hrot = vsg::radians(hrot);
+    vrot = vsg::radians(vrot);
+
+    direction.x = cos(vrot) * sin(hrot);
+    direction.y = sin(vrot);
+    direction.z = -cos(vrot) * cos(hrot);
+
+    sl->direction = direction;
 }
