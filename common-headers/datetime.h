@@ -8,6 +8,12 @@
 #include    <QByteArray>
 #include    <QDataStream>
 
+// Храним дату в виде 32-битного числа, где год - число в первых 16 битах,
+// месяц - число в следующих 8 битах и день - число в последних 8 битах
+#define DATEUNIT_MULTIPLIER_YEAR    65536
+#define DATEUNIT_MULTIPLIER_MONTH   256
+#define DATEUNIT_MULTIPLIER_DAY     1
+
 // Храним время суток в 10-тысячных долях секунды от полуночи
 #define TIMEUNIT_MULTIPLIER         10000
 #define TIMEUNIT_MULTIPLIER_DAY     (TIMEUNIT_MULTIPLIER * 60 * 60 * 24)
@@ -36,70 +42,62 @@ static constexpr std::uint8_t days_in_month_leap[12] = {
 struct server_date_t final
 {
 private:
-    union
-    {
-        std::int32_t date_data;
-        struct
-        {
-            std::int16_t y;
-            std::uint8_t m;
-            std::uint8_t d;
-        };
-    };
+    std::int32_t date_data = (2000 * DATEUNIT_MULTIPLIER_YEAR + 1 * DATEUNIT_MULTIPLIER_MONTH + 1 * DATEUNIT_MULTIPLIER_DAY);
 
 public:
-    server_date_t()
-        : y(2000)
-        , m(1)
-        , d(1)
+    server_date_t() noexcept = default;
+
+    server_date_t(std::int16_t year, std::uint8_t month, std::uint8_t day) noexcept
     {
+        std::uint8_t m = std::clamp(month, std::uint8_t(1), std::uint8_t(12));
+        std::uint8_t d = std::clamp(day, std::uint8_t(1), isLeapYear(year) ? days_in_month_leap[m - 1] : days_in_month_nleap[m - 1]);
+
+        date_data = year * DATEUNIT_MULTIPLIER_YEAR;
+        date_data += m * DATEUNIT_MULTIPLIER_MONTH;
+        date_data += d * DATEUNIT_MULTIPLIER_DAY;
     }
 
-    server_date_t(std::int16_t year, std::uint8_t month, std::uint8_t day)
-        : y(year)
-        , m(std::clamp(month, std::uint8_t(1), std::uint8_t(12)))
-        , d(std::clamp(day, std::uint8_t(1), isLeapYear(y) ? days_in_month_leap[m - 1] : days_in_month_nleap[m - 1]))
-    {
-    }
-
-    constexpr int32_t data() const
+    constexpr std::int32_t data() const noexcept
     {
         return date_data;
     }
 
     /// Год
-    std::int16_t year() const noexcept
+    constexpr std::int16_t year() const noexcept
     {
-        return y;
+        return date_data / DATEUNIT_MULTIPLIER_YEAR;
     }
 
     /// Месяц
-    std::uint8_t month() const noexcept
+    constexpr std::uint8_t month() const noexcept
     {
-        return m;
+        return date_data / DATEUNIT_MULTIPLIER_MONTH % 256;
     }
 
     /// День
-    std::uint8_t day() const noexcept
+    constexpr std::uint8_t day() const noexcept
     {
-        return d;
+        return date_data % 256;
     }
 
     /// Високосный год
-    static bool isLeapYear(std::int16_t year) noexcept
+    static constexpr bool isLeapYear(std::int16_t year) noexcept
     {
         return ((year % 4 == 0) && (year % 100 > 0)) || (year % 400 == 0);
     }
 
     /// Переход к следующему дню
-    void nextDay() noexcept
+    constexpr void nextDay() noexcept
     {
-        const std::uint8_t* const days_in_month = isLeapYear(y) ? days_in_month_leap : days_in_month_nleap;
+        std::int16_t y = year();
+        std::uint8_t m = month();
+        std::uint8_t d = day();
+        const std::uint8_t* const days_in_month = isLeapYear(year()) ? days_in_month_leap : days_in_month_nleap;
 
         if (d >= days_in_month[m - 1])
         {
             d = 1;
-            if (m == 12) // Декабрь
+            if (m >= 12) // Декабрь
             {
                 m = 1;
                 ++y;
@@ -113,6 +111,9 @@ public:
         {
             ++d;
         }
+        date_data = y * DATEUNIT_MULTIPLIER_YEAR;
+        date_data += m * DATEUNIT_MULTIPLIER_MONTH;
+        date_data += d * DATEUNIT_MULTIPLIER_DAY;
     }
 
     /// Задать дату, по умолчанию из текущей системной
