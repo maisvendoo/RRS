@@ -3,12 +3,19 @@
 	<LightAnimation>
 		<SignalID>432</SignalID>
 		<Duration>10.0</Duration>
+		<!-- Цвет источника -->
 		<Color>1.0 1.0 1.0</Color>
+		<!-- Максимальная яркость -->
 		<MaxIntensity>500.0</MaxIntensity>
+		<!-- Угол внутреннего конуса -->
 		<InnerAngle>0.0</InnerAngle>
+		<!-- Угол внешенего конуса -->
 		<OuterAngle>45.0</OuterAngle>
+		<!-- Радиус (???) -->
 		<Radius>0.0</Radius>
+		<!-- Угол поворота луча по вертикали -->
 		<VRotation>0.0</VRotation>
+		<!-- Угол поворота луча по горизонтали -->
 		<HRotation>0.0</HRotation>		
 	</LightAnimation>
 
