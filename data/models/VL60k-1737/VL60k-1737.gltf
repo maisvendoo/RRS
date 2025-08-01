@@ -4,78 +4,8 @@
 		"version":"2.0"
 	},
 	"extensionsUsed":[
-		"KHR_materials_specular",
-		"KHR_lights_punctual"
+		"KHR_materials_specular"
 	],
-	"extensionsRequired":[
-		"KHR_lights_punctual"
-	],
-	"extensions":{
-		"KHR_lights_punctual":{
-			"lights":[
-				{
-					"color":[
-						1,
-						1,
-						1
-					],
-					"intensity":5435.141306588225,
-					"spot":{
-						"innerConeAngle":0,
-						"outerConeAngle":0.02617993950843811
-					},
-					"type":"spot",
-					"range":200,
-					"name":"SpotLight_high1"
-				},
-				{
-					"color":[
-						1,
-						1,
-						1
-					],
-					"intensity":5435.141306588225,
-					"spot":{
-						"innerConeAngle":0,
-						"outerConeAngle":0.39269909262657166
-					},
-					"type":"spot",
-					"range":200,
-					"name":"SpotLight_low1"
-				},
-				{
-					"color":[
-						1,
-						1,
-						1
-					],
-					"intensity":5435.141306588225,
-					"spot":{
-						"innerConeAngle":0,
-						"outerConeAngle":0.02617993950843811
-					},
-					"type":"spot",
-					"range":200,
-					"name":"SpotLight_high2"
-				},
-				{
-					"color":[
-						1,
-						1,
-						1
-					],
-					"intensity":5435.141306588225,
-					"spot":{
-						"innerConeAngle":0,
-						"outerConeAngle":0.39269909262657166
-					},
-					"type":"spot",
-					"range":200,
-					"name":"SpotLight_low2"
-				}
-			]
-		}
-	},
 	"scene":0,
 	"scenes":[
 		{
@@ -87,11 +17,7 @@
 				335,
 				336,
 				337,
-				338,
-				339,
-				340,
-				341,
-				342
+				338
 			]
 		}
 	],
@@ -3271,70 +3197,6 @@
 		{
 			"mesh":99,
 			"name":"Scene Root_Zerkala_Zerkala-GEODE_02 - Default_0"
-		},
-		{
-			"extensions":{
-				"KHR_lights_punctual":{
-					"light":0
-				}
-			},
-			"name":"SpotLight_high1",
-			"translation":[
-				0,
-				4.156067848205566,
-				-9.415040969848633
-			]
-		},
-		{
-			"extensions":{
-				"KHR_lights_punctual":{
-					"light":1
-				}
-			},
-			"name":"SpotLight_low1",
-			"translation":[
-				0,
-				4.156067848205566,
-				-9.415040969848633
-			]
-		},
-		{
-			"extensions":{
-				"KHR_lights_punctual":{
-					"light":2
-				}
-			},
-			"name":"SpotLight_high2",
-			"rotation":[
-				0,
-				-1,
-				0,
-				1.6292068494294654e-07
-			],
-			"translation":[
-				0,
-				4.156067848205566,
-				9.373794555664062
-			]
-		},
-		{
-			"extensions":{
-				"KHR_lights_punctual":{
-					"light":3
-				}
-			},
-			"name":"SpotLight_low2",
-			"rotation":[
-				0,
-				-1,
-				0,
-				1.6292068494294654e-07
-			],
-			"translation":[
-				0,
-				4.156067848205566,
-				9.373794555664062
-			]
 		}
 	],
 	"animations":[
@@ -5350,34 +5212,6 @@
 			"mimeType":"image/png",
 			"name":"okna",
 			"uri":"textures/okna.png"
-		}
-	],
-	"skins":[
-		{
-			"inverseBindMatrices":424,
-			"joints":[
-				310,
-				308,
-				306,
-				318,
-				316,
-				314,
-				312
-			],
-			"name":"Armature"
-		},
-		{
-			"inverseBindMatrices":425,
-			"joints":[
-				325,
-				323,
-				321,
-				333,
-				331,
-				329,
-				327
-			],
-			"name":"Armature.001"
 		}
 	],
 	"accessors":[
@@ -8936,18 +8770,6 @@
 			"componentType":5126,
 			"count":2,
 			"type":"VEC3"
-		},
-		{
-			"bufferView":424,
-			"componentType":5126,
-			"count":7,
-			"type":"MAT4"
-		},
-		{
-			"bufferView":425,
-			"componentType":5126,
-			"count":7,
-			"type":"MAT4"
 		}
 	],
 	"bufferViews":[
@@ -11450,16 +11272,6 @@
 			"buffer":0,
 			"byteLength":24,
 			"byteOffset":2534048
-		},
-		{
-			"buffer":0,
-			"byteLength":448,
-			"byteOffset":2534072
-		},
-		{
-			"buffer":0,
-			"byteLength":448,
-			"byteOffset":2534520
 		}
 	],
 	"samplers":[
@@ -11470,7 +11282,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":2534968,
+			"byteLength":2534072,
 			"uri":"VL60k-1737.bin"
 		}
 	]
