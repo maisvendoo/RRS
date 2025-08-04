@@ -69,18 +69,21 @@ float ProcAnimation::interpolate(float param)
 {
     if (keypoints.size() <= 1)
     {
+        if (keypoints.size() == 1)
+            return keypoints.front().value;
+
         return 0.0f;
     }
 
-    std::size_t next_idx = 0;
-    key_point_t begin_point = findBeginKeypoint(param, next_idx);
-    key_point_t next_point = keypoints.at(next_idx);
+    key_point_t begin_point;
+    key_point_t next_point;
+    findBeginKeypoint(param, begin_point, next_point);
 
     const float range = next_point.param - begin_point.param;
 
     if (range < 1e-6f)
     {
-        return 0.0f;
+        return begin_point.value;
     }
 
     const float value = begin_point.value + (param - begin_point.param) * (next_point.value - begin_point.value) / range;
@@ -112,29 +115,23 @@ bool ProcAnimation::loadKeyPoints(CfgReader &cfg)
         keypoints.emplace_back(std::move(keypoint));
         config_section = cfg.getNextSection();
     }
+
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcAnimation::key_point_t ProcAnimation::findBeginKeypoint(float param, std::size_t& next_idx)
+void ProcAnimation::findBeginKeypoint(float param, key_point_t& begin_point, key_point_t& next_point)
 {
-    key_point_t key_point;
-
-    if (keypoints.empty())
-    {
-        return key_point;
-    }
-
     std::size_t left_idx = 0;
     std::size_t right_idx = keypoints.size() - 1;
     std::size_t idx = (left_idx + right_idx) / 2;
 
     while (idx != left_idx)
     {
-        key_point = keypoints.at(idx);
-        if (param <= key_point.param)
+        begin_point = keypoints.at(idx);
+        if (param <= begin_point.param)
         {
             right_idx = idx;
         }
@@ -146,8 +143,14 @@ ProcAnimation::key_point_t ProcAnimation::findBeginKeypoint(float param, std::si
         idx = (left_idx + right_idx) / 2;
     }
 
-    key_point = keypoints.at(idx);
-    next_idx = idx + 1;
-
-    return key_point;
+    if (idx == (keypoints.size() - 1))
+    {
+        begin_point = keypoints.at(idx - 1);
+        next_point = keypoints.at(idx);
+    }
+    else
+    {
+        begin_point = keypoints.at(idx);
+        next_point = keypoints.at(idx + 1);
+    }
 }

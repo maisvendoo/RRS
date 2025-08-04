@@ -33,7 +33,7 @@ public:
     std::string name = "";
 
 protected:
-    int signal_id = 0;
+    std::int32_t signal_id = -1;
     bool is_fixed_signal = false;
     float cur_signal = 0.0f;
     float duration = 1.0f;
@@ -59,7 +59,7 @@ protected:
 private:
     bool loadKeyPoints(CfgReader& cfg);
 
-    key_point_t findBeginKeypoint(float value, std::size_t& next_idx);
+    void findBeginKeypoint(float param, key_point_t& begin_point, key_point_t& next_point);
 };
 
 #endif // PROC_ANIMATION_H
