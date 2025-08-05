@@ -18,19 +18,59 @@ ProcMaterialAnimation::ProcMaterialAnimation(vsg::ref_ptr<vsg::PbrMaterialValue>
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcMaterialAnimation::update(float current_signal)
+void ProcMaterialAnimation::anim_step([[maybe_unused]] float t, float dt)
+{
+    if (is_fixed_signal)
+    {
+        return;
+    }
+
+    float server_signal = 0.0f;
+    if (server_signals && (signal_id >= 0) && (static_cast<std::size_t>(signal_id) < server_signals->size()))
+    {
+        server_signal = (*server_signals)[signal_id];
+    }
+    const float delta = server_signal - cur_signal;
+
+    server_signal = 0.0f;
+    if (server_signals && (signal_id2 >= 0) && (static_cast<std::size_t>(signal_id2) < server_signals->size()))
+    {
+        server_signal = (*server_signals)[signal_id2];
+    }
+    const float delta2 = server_signal - cur_signal2;
+
+    server_signal = 0.0f;
+    if (server_signals && (signal_id3 >= 0) && (static_cast<std::size_t>(signal_id3) < server_signals->size()))
+    {
+        server_signal = (*server_signals)[signal_id3];
+    }
+    const float delta3 = server_signal - cur_signal3;
+
+    if ((std::abs(delta) > 1e-5f) || (std::abs(delta2) > 1e-5f) || (std::abs(delta3) > 1e-5f))
+    {
+        const float delta_dt = std::min(duration * dt, 1.0f);
+        cur_signal += delta * delta_dt;
+        cur_signal2 += delta2 * delta_dt;
+        cur_signal3 += delta3 * delta_dt;
+        update(cur_signal);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcMaterialAnimation::update([[maybe_unused]] float current_signal)
 {
     if (!keypoints.empty())
     {
-        float color_factor = interpolate(current_signal);
-        vsg::vec4 new_color = base_color * color_factor;
-        new_color.a = 1.0f;
-        material_value->value().baseColorFactor = new_color;
+        material_value->value().baseColorFactor.r = base_color.r * interpolate(cur_signal);
+        material_value->value().baseColorFactor.g = base_color.g * interpolate(cur_signal2);
+        material_value->value().baseColorFactor.b = base_color.b * interpolate(cur_signal3);
     }
 
-    vsg::vec4 new_emission_color = emission_color * current_signal;
-    new_emission_color.a = 1.0f;
-    material_value->value().emissiveFactor = new_emission_color;
+    material_value->value().emissiveFactor.r = emission_color.r * cur_signal;
+    material_value->value().emissiveFactor.g = emission_color.g * cur_signal2;
+    material_value->value().emissiveFactor.b = emission_color.b * cur_signal3;
     material_value->dirty();
 }
 
@@ -41,9 +81,21 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
 {
     QString sec_name = "MaterialAnimation";
 
-    int tmp_int = 0;
+    int tmp_int = -1;
     if (cfg.getInt(sec_name, "SignalID", tmp_int))
         signal_id = tmp_int;
+
+    tmp_int = -1;
+    if (cfg.getInt(sec_name, "SignalID2", tmp_int))
+        signal_id2 = tmp_int;
+    else
+        signal_id2 = signal_id;
+
+    tmp_int = -1;
+    if (cfg.getInt(sec_name, "SignalID3", tmp_int))
+        signal_id3 = tmp_int;
+    else
+        signal_id3 = signal_id;
 
     double tmp_dbl = 1.0;
     if (cfg.getDouble(sec_name, "Duration", tmp_dbl))
@@ -53,6 +105,8 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
     if (cfg.getDouble(sec_name, "FixedSignal", tmp_dbl))
     {
         cur_signal = static_cast<float>(tmp_dbl);
+        cur_signal2 = static_cast<float>(tmp_dbl);
+        cur_signal3 = static_cast<float>(tmp_dbl);
         is_fixed_signal = true;
     }
 
@@ -74,6 +128,8 @@ bool ProcMaterialAnimation::load_config(CfgReader &cfg)
         base_color *= config_color_limit;
     }
 
+    emission_color.a = 1.0f;
+    base_color.a = 1.0f;
     material_value->properties.dataVariance = vsg::DYNAMIC_DATA;
     update(cur_signal);
     return true;

@@ -214,13 +214,13 @@ private:
 
     bool checkIsToOtherMain(zds_branch_point_t* branch_point, bool is_add_2minus2);
 
-    void findFromOtherMain(zds_branch_point_t* branch_point);
+    bool findFromOtherMain(zds_branch_point_t* branch_point);
 
     bool calcBranchTrack1(zds_branch_track_t* branch_track);
 
     bool calcBranchTrack2(zds_branch_track_t* branch_track);
 
-    void calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2);
+    bool calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2);
 
     void findSplitsMainTrajectory1();
 
