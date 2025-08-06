@@ -16,7 +16,7 @@
 void VL60k::stepBrakesControl(double t, double dt)
 {
     // Управляем блокировкой тормозов
-    brake_lock[cabine_idx]->setControl(keys);
+    brake_lock[cabine_idx]->setControl(&keys);
 
     // Управляем краном, учитывая возможное наличие внешнего пульта
     if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
@@ -26,7 +26,7 @@ void VL60k::stepBrakesControl(double t, double dt)
     }
     else
     {
-        brake_crane[cabine_idx]->setControl(keys);
+        brake_crane[cabine_idx]->setControl(&keys);
     }
 
     // Управляем краном, учитывая возможное наличие внешнего пульта
@@ -49,7 +49,7 @@ void VL60k::stepBrakesControl(double t, double dt)
     }
     else
     {
-        loco_crane[cabine_idx]->setControl(keys);
+        loco_crane[cabine_idx]->setControl(&keys);
     }
 
     for (size_t cab_idx : {CAB1, CAB2})
@@ -119,9 +119,9 @@ void VL60k::stepBrakesControl(double t, double dt)
         anglecock_bc_fwd->setPipePressure(bc_splitter->getInputPressure());
         anglecock_bc_bwd->setPipePressure(bc_splitter->getInputPressure());
     }
-    anglecock_bc_fwd->setControl(keys);
+    anglecock_bc_fwd->setControl(&keys);
     anglecock_bc_fwd->step(t, dt);
-    anglecock_bc_bwd->setControl(keys);
+    anglecock_bc_bwd->setControl(&keys);
     anglecock_bc_bwd->step(t, dt);
 
     // Рукава магистрали тормозных цилиндров
@@ -129,13 +129,13 @@ void VL60k::stepBrakesControl(double t, double dt)
     hose_bc_fwd->setFlowCoeff(anglecock_bc_fwd->getFlowCoeff());
     hose_bc_fwd->setCoord(train_coord + dir * orient * (length / 2.0 - anglecock_bc_fwd->getShiftCoord()));
     hose_bc_fwd->setShiftSide(anglecock_bc_fwd->getShiftSide());
-    hose_bc_fwd->setControl(keys);
+    hose_bc_fwd->setControl(&keys);
     hose_bc_fwd->step(t, dt);
 
     hose_bc_bwd->setPressure(anglecock_bc_bwd->getPressureToHose());
     hose_bc_bwd->setFlowCoeff(anglecock_bc_bwd->getFlowCoeff());
     hose_bc_bwd->setCoord(train_coord - dir * orient * (length / 2.0 - anglecock_bc_bwd->getShiftCoord()));
     hose_bc_bwd->setShiftSide(anglecock_bc_bwd->getShiftSide());
-    hose_bc_bwd->setControl(keys);
+    hose_bc_bwd->setControl(&keys);
     hose_bc_bwd->step(t, dt);
 }

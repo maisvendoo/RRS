@@ -292,10 +292,10 @@ QString Device::getDebugMsg() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Device::setControl(QMap<int, bool> keys,
-                        control_signals_t control_signals)
+void Device::setControl(QMap<int, bool> *keys,
+                        control_signals_t *control_signals)
 {
-    this->keys = QMap<int, bool>(keys);
+    this->keys = keys;
     this->control_signals = control_signals;
 }
 
@@ -428,12 +428,17 @@ void Device::stepDiscrete(double t, double dt)
 //------------------------------------------------------------------------------
 bool Device::getKeyState(int key) const
 {
-    if (keys.size() == 0)
+    if (keys == nullptr)
+    {
+        return false;
+    }
+
+    if (keys->size() == 0)
         return false;
 
-    auto it = keys.find(key);
+    auto it = keys->find(key);
 
-    if ( it != keys.end() )
+    if ( it != keys->end() )
         return it.value();
 
     return false;

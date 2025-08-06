@@ -138,7 +138,7 @@ void VL60pk::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepTractionControl(double t, double dt)
 {
-    controller[cabine_idx]->setControl(keys);
+    controller[cabine_idx]->setControl(&keys);
 
     for (size_t i : {CAB1, CAB2})
     {
@@ -262,7 +262,7 @@ float VL60pk::isLineContactorsOff()
 //------------------------------------------------------------------------------
 void VL60pk::stepOtherEquipment(double t, double dt)
 {
-    horn[cabine_idx]->setControl(keys);
+    horn[cabine_idx]->setControl(&keys);
     horn[CAB1]->setFLpressure(main_reservoir->getPressure());
     horn[CAB1]->step(t, dt);
     horn[CAB2]->setFLpressure(main_reservoir->getPressure());
@@ -270,7 +270,7 @@ void VL60pk::stepOtherEquipment(double t, double dt)
 
     // Система подачи песка
     sand_system->setFLpressure(main_reservoir->getPressure());
-    sand_system->setControl(keys);
+    sand_system->setControl(&keys);
     sand_system->step(t, dt);
     for (size_t i = 0; i < num_axis; ++i)
     {
