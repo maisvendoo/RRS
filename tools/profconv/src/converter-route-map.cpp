@@ -88,6 +88,9 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
             {
                 LOG_WARN("Warn: <route1.map> invalid object: %s", line.toStdString().c_str());
                 LOG_WARN("      object.ref does not contain object with name: %s", tokens[0].toStdString().c_str());
+
+                // Для несуществующей модельки и информация из следующей строки не нужна
+                may_add_info_to_last = false;
                 continue;
             }
         }

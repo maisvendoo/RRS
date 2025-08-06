@@ -341,50 +341,42 @@ bool ZDSimConverter::checkIsToOtherMain(zds_branch_point_t* branch_point, bool i
     zds_branch_2_2_t branch_2minus2 = zds_branch_2_2_t();
     if (dir > 0)
     {
-        int id1 = id_begin;
-        int id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        branch_2minus2.id1 = id_begin;
+        branch_2minus2.id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
         for (auto exist_branch : branch_2minus2_data)
         {
-            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            if ((exist_branch->id1 == branch_2minus2.id1) && (exist_branch->id2 == branch_2minus2.id2))
             {
                 return true;
             }
         }
-        branch_2minus2.branch_point_fwd = *branch_point;
-        branch_2minus2.is_fwd = true;
-        branch_2minus2.id1 = id1;
-        branch_2minus2.id2 = id2;
-        calcBranch22(&branch_2minus2, true);
-        branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
     else
     {
-        int id1 = near_end ? track.prev_uid + 1 : track.prev_uid;
-        int id2 = id_begin + 1;
+        branch_2minus2.id1 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        branch_2minus2.id2 = id_begin + 1;
         for (auto exist_branch : branch_2minus2_data)
         {
-            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            if ((exist_branch->id1 == branch_2minus2.id1) && (exist_branch->id2 == branch_2minus2.id2))
             {
                 exist_branch->branch_point_bwd = *branch_point;
                 exist_branch->is_bwd = true;
                 return true;
             }
         }
-
-        branch_2minus2.branch_point_bwd = *branch_point;
-        branch_2minus2.is_bwd = true;
-        branch_2minus2.id1 = id1;
-        branch_2minus2.id2 = id2;
-        calcBranch22(&branch_2minus2, true);
-        branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
     }
+    branch_2minus2.branch_point_fwd = *branch_point;
+    branch_2minus2.is_fwd = true;
+    if (calcBranch22(&branch_2minus2, true))
+        branch_2minus2_data.push_back(new zds_branch_2_2_t(branch_2minus2));
+
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
+bool ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
 {
     size_t id_end = branch_point->main_track_id;
     int dir = branch_point->dir;
@@ -415,46 +407,39 @@ void ZDSimConverter::findFromOtherMain(zds_branch_point_t* branch_point)
     zds_branch_2_2_t branch_2plus2 = zds_branch_2_2_t();
     if (dir > 0)
     {
-        int id1 = id_end + 1;
-        int id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        branch_2plus2.id1 = id_end + 1;
+        branch_2plus2.id2 = near_end ? track.prev_uid + 1 : track.prev_uid;
         for (auto exist_branch : branch_2plus2_data)
         {
-            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            if ((exist_branch->id1 == branch_2plus2.id1) && (exist_branch->id2 == branch_2plus2.id2))
             {
-                return;
+                return true;
             }
         }
-        branch_2plus2.branch_point_fwd = *branch_point;
-        branch_2plus2.is_fwd = true;
-        branch_2plus2.id1 = id1;
-        branch_2plus2.id2 = id2;
-        calcBranch22(&branch_2plus2, false);
-        branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
     else
     {
-        int id1 = near_end ? track.prev_uid + 1 : track.prev_uid;
-        int id2 = id_end;
+        branch_2plus2.id1 = near_end ? track.prev_uid + 1 : track.prev_uid;
+        branch_2plus2.id2 = id_end;
         for (auto exist_branch : branch_2plus2_data)
         {
-            if ((exist_branch->id1 == id1) && (exist_branch->id2 == id2))
+            if ((exist_branch->id1 == branch_2plus2.id1) && (exist_branch->id2 == branch_2plus2.id2))
             {
                 if (branch_point->is_signal)
                 {
                     exist_branch->branch_point_bwd = *branch_point;
                     exist_branch->is_bwd = true;
                 }
-                return;
+                return true;
             }
         }
-
-        branch_2plus2.branch_point_bwd = *branch_point;
-        branch_2plus2.is_bwd = true;
-        branch_2plus2.id1 = id1;
-        branch_2plus2.id2 = id2;
-        calcBranch22(&branch_2plus2, false);
-        branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
     }
+    branch_2plus2.branch_point_fwd = *branch_point;
+    branch_2plus2.is_fwd = true;
+    if (calcBranch22(&branch_2plus2, false))
+        branch_2plus2_data.push_back(new zds_branch_2_2_t(branch_2plus2));
+
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -836,20 +821,40 @@ bool ZDSimConverter::calcBranchTrack2(zds_branch_track_t* branch_track)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ZDSimConverter::calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2)
+bool ZDSimConverter::calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2)
 {
     // Первая точка
     point_t point_begin;
     point_begin.point = tracks_data1[branch22->id1].begin_point;
     point_begin.railway_coord = tracks_data1[branch22->id1].railway_coord;
-    // Добавляем первую точку
-    point_begin.trajectory_coord = 0.0;
-    branch22->trajectory.points.push_back(point_begin);
 
     // Последняя точка
     point_t point_end;
     point_end.point = tracks_data2[branch22->id2].begin_point;
     point_end.railway_coord = tracks_data2[branch22->id2].railway_coord;
+
+    float coord;
+    zds_track_t track;
+    bool near_end;
+    dvec3 point_other_track;
+
+    // Проверяем, что это отклонение не совпадает с концом однопутного участка
+    track = getNearestTrack(point_begin.point, tracks_data2, coord);
+    near_end = (coord > (track.route_coord + 0.5 * track.length));
+    point_other_track = near_end ? track.end_point : track.begin_point;
+    if (length2(point_other_track - point_begin.point) < 1.0)
+        return false;
+
+    // Проверяем, что это отклонение не совпадает с началом однопутного участка
+    track = getNearestTrack(point_end.point, tracks_data1, coord);
+    near_end = (coord > (track.route_coord + 0.5 * track.length));
+    point_other_track = near_end ? track.end_point : track.begin_point;
+    if (length2(point_other_track - point_end.point) < 1.0)
+        return false;
+
+    // Добавляем первую точку
+    point_begin.trajectory_coord = 0.0;
+    branch22->trajectory.points.push_back(point_begin);
 
     // В съезде "2+2" берём вектор по главному пути с предыдущего трека
     int id1_add = (is_2minus2 ? 0 : -1);
@@ -885,6 +890,7 @@ void ZDSimConverter::calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2)
     point_end.trajectory_coord = branch22->trajectory.points.back().trajectory_coord + l;
     // Добавляем точку траектории
     branch22->trajectory.points.push_back(point_end);
+    return true;
 }
 
 //------------------------------------------------------------------------------
