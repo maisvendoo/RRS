@@ -18,8 +18,7 @@
 
 #include    <QObject>
 #include    <QtGlobal>
-#include    <QMap>
-#include    <QMutex>
+#include    <mutex>
 
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
@@ -188,14 +187,9 @@ public:
 
     void setCurrentKind(int value);
 
-    void setKeysData(QByteArray data);
+    void setKeyboardControl(const uint8_t& cab_num, const std::vector<uint16_t>& pressed_keys);
 
-    void resetKeysData();
-
-    void setCabineIndex(uint32_t cabine_idx)
-    {
-        this->cabine_idx = cabine_idx;
-    }
+    void resetKeyboardControl(const uint8_t& cab_num);
 
 public slots:
 
@@ -314,8 +308,9 @@ protected:
     state_vector_t  acceleration = {0.0, 0.0, 0.0, 0.0, 0.0};
 
     /// Keyboard state
-    QMap<int, bool> keys;
-    QMutex          keys_mutex;
+    std::set<uint16_t> pressed_keys = {KEY_Undefined};
+    std::vector<std::set<uint16_t>> pressed_keys_by_cabine = {{KEY_Undefined}};
+    std::mutex keyboard_mutex;
 
     /// Analog signals for output
     std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
@@ -330,8 +325,6 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
-
-    uint32_t cabine_idx = 0;
 
     /// User defined initialization
     virtual void initialization();
@@ -368,13 +361,13 @@ protected:
 
     /* Modkeys extended functions */
 
-    bool isShift() const;
+    bool isShift(int cab_num = -1) const;
 
-    bool isControl() const;
+    bool isControl(int cab_num = -1) const;
 
-    bool isAlt() const;
+    bool isAlt(int cab_num = -1) const;
 
-    bool getKeyState(int key) const;
+    bool getKeyState(uint16_t key, int cab_num = -1) const;
 
 private:
 

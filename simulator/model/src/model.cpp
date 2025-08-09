@@ -942,42 +942,30 @@ void Model::sharedMemoryFeedback()
 //------------------------------------------------------------------------------
 void Model::controlStep()
 {
-    for (auto c : controlled_clients)
+    for (const auto& c : controlled_clients)
     {
         int id = c.prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            vehicles[id]->resetKeysData();
+            int cab_id = c.prev_cab_controlled;
+            if (cab_id >= 0)
+            {
+                vehicles[id]->resetKeyboardControl(cab_id);
+            }
         }
     }
 
-    QMap<int, QMap<int, bool>> pressed_keys_by_vehicle;
-    for (auto c : controlled_clients)
+    for (const auto& c : controlled_clients)
     {
         int id = c.vehicle_control_by_keyboard.controlled_vehicle;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            QMap<int, bool> keys_data;
-            if (pressed_keys_by_vehicle.contains(id))
-                keys_data = pressed_keys_by_vehicle[id];
-
-            for (auto key_id : c.vehicle_control_by_keyboard.pressed_keys)
-                keys_data.insert(key_id, true);
-
-            pressed_keys_by_vehicle.insert(id, keys_data);
-
-            vehicles[id]->setCabineIndex(c.vehicle_control_by_keyboard.cabine_idx);
+            int cab_id = c.vehicle_control_by_keyboard.cabine_idx;
+            if (cab_id >= 0)
+            {
+                vehicles[id]->setKeyboardControl(cab_id, c.vehicle_control_by_keyboard.pressed_keys);
+            }
         }
-    }
-
-    for (auto id = pressed_keys_by_vehicle.keyBegin(); id != pressed_keys_by_vehicle.keyEnd(); ++id)
-    {
-        QByteArray data;
-        QDataStream stream(&data, QDataStream::WriteOnly);
-
-        stream << pressed_keys_by_vehicle[*id];
-
-        vehicles[*id]->setKeysData(data);
     }
 }
 
@@ -1096,6 +1084,7 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client
     if (controlled_clients.contains(client_id))
     {
         c.prev_vehicle_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_vehicle;
+        c.prev_cab_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.cabine_idx;
     }
     controlled_clients.insert(client_id, c);
 /*
@@ -1103,6 +1092,8 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client
     msg += QString::number(c.vehicle_control_by_keyboard.controlled_vehicle);
     msg += " | current ";
     msg += QString::number(c.vehicle_control_by_keyboard.current_vehicle);
+    msg += " | cabine ";
+    msg += QString::number(c.vehicle_control_by_keyboard.cabine_idx);
     msg += " | keys: ";
     msg += QString::number(c.vehicle_control_by_keyboard.pressed_keys.size());
     for (auto key_id : c.vehicle_control_by_keyboard.pressed_keys)
@@ -1123,7 +1114,11 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
     {
         int id = controlled_clients[client_id].prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
-            vehicles[id]->resetKeysData();
+        {
+            int cab_id = controlled_clients[client_id].prev_cab_controlled;
+            if (cab_id >= 0)
+                vehicles[id]->resetKeyboardControl(cab_id);
+        }
 
         controlled_clients.remove(client_id);
     }

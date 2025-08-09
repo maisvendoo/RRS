@@ -14,8 +14,8 @@ struct controlled_t final
 {
     int controlled_vehicle = -1;
     int current_vehicle = -1;
-    std::uint32_t cabine_idx = 0;
-    std::vector<int> pressed_keys;
+    int cabine_idx = -1;
+    std::vector<std::uint16_t> pressed_keys;
 
     QByteArray serialize() const
     {

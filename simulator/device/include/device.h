@@ -84,8 +84,8 @@ public:
     QString getDebugMsg() const;
 
     ///
-    void setControl(QMap<int, bool> *keys,
-                    control_signals_t *control_signals = nullptr);
+    void setControl(std::set<uint16_t>* keys = nullptr,
+                    control_signals_t* control_signals = nullptr);
 
     ///
     feedback_signals_t getFeedback() const;
@@ -137,8 +137,8 @@ protected:
 
     QString DebugMsg;
 
-    QMap<int, bool>     *keys = nullptr;
-    control_signals_t   *control_signals = nullptr;
+    std::set<uint16_t>*  pressed_keys = nullptr;
+    control_signals_t*   control_signals = nullptr;
 
     feedback_signals_t  feedback;
 

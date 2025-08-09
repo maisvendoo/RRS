@@ -118,6 +118,7 @@ private:
     struct controlled_client_t
     {
         int prev_vehicle_controlled = -1;
+        int prev_cab_controlled = -1;
         controlled_t vehicle_control_by_keyboard = controlled_t();
         simulator_vehicle_controlled_update_t vehicle_controlled = simulator_vehicle_controlled_update_t();
     };
