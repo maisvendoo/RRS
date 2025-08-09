@@ -96,24 +96,62 @@ void VL60k::keyProcess()
         horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
     }
 
-    // На пульты в кабинах отдельный цикл, с проверкой на невмешательство программы автозапуска
+    // Автозапуск
+    if (autoStartTimer->isStarted())
+    {
+        return;
+    }
+
+    if (getKeyState(KEY_R, CAB1) && isAlt(CAB1))
+    {
+        initTriggers(CAB1);
+        autoStartTimer->start();
+        return;
+    }
+
+    if (getKeyState(KEY_R, CAB2) && isAlt(CAB2))
+    {
+        initTriggers(CAB2);
+        autoStartTimer->start();
+        return;
+    }
+
+    // Контроллер машиниста
+    if (controller[CAB1]->isReversHandle())
+    {
+        if (controller[CAB2]->isReversHandle())
+        {
+            // Не допускаем двух реверсивных рукояток
+            controller[CAB2]->setMainHandlePos(POS_ZERO);
+            controller[CAB2]->setReversHandlePos(REVERS_ZERO);
+            controller[CAB2]->insertReversHandle(false);
+        }
+        controller[CAB2]->setControl();
+    }
+    else
+    {
+        controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+    }
+
+    if (controller[CAB2]->isReversHandle())
+    {
+        if (controller[CAB1]->isReversHandle())
+        {
+            // Не допускаем двух реверсивных рукояток
+            controller[CAB1]->setMainHandlePos(POS_ZERO);
+            controller[CAB1]->setReversHandlePos(REVERS_ZERO);
+            controller[CAB1]->insertReversHandle(false);
+        }
+        controller[CAB1]->setControl();
+    }
+    else
+    {
+        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+    }
+
+    // Пульты в кабинах обрабатываем уже после проверки на невмешательство программы автозапуска
     for (auto cabine_idx : {CAB1, CAB2})
     {
-        if (autoStartTimer->isStarted())
-        {
-            continue;
-        }
-
-        if (getKeyState(KEY_R, cabine_idx) && isAlt(cabine_idx))
-        {
-            initTriggers(cabine_idx);
-            autoStartTimer->start();
-            continue;
-        }
-
-        // Контроллер машиниста
-        controller[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
-
         // Управление тумблером "Токоприемники"
         if (getKeyState(KEY_U, cabine_idx))
         {

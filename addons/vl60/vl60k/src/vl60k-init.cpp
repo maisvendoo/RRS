@@ -146,8 +146,16 @@ void VL60k::initTriggers(int cab_autostart_request)
     if (autoStartTimer->isStarted())
         return;
 
+    if ((cab_autostart_request == CAB1) && (controller[CAB2]->isReversHandle()))
+        return;
+
+    if ((cab_autostart_request == CAB2) && (controller[CAB1]->isReversHandle()))
+        return;
+
     if ((cab_autostart_request != CAB1) && (cab_autostart_request != CAB2))
         return;
+
+    controller[autostart_cab]->insertReversHandle(true);
 
     autostart_cab = cab_autostart_request;
     start_count = 0;

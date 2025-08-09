@@ -41,7 +41,7 @@ void VL60pk::slotAutoStart()
     else
     {
         autoStartTimer->stop();
-        controller[autostart_cab]->setReversPos(REVERS_FORWARD);
+        controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
         start_count = 0;
     }
 }
