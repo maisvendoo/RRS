@@ -364,10 +364,24 @@ bool VehiclesHandler::selectPrevVehicle() noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehiclesHandler::selectControlVehicle() noexcept
+bool VehiclesHandler::selectControlVehicle() noexcept
 {
-    // Берём контроль над данным вагоном
-    controlled_vehicle = cur_vehicle;
+    auto vehicle = getCurrentVehicle();
+
+    if (vehicle)
+    {
+        const int prev_contr_vehicle = controlled_vehicle;
+        const int prev_contr_cabine = vehicle->controlled_cabine_idx;
+
+        // Берём контроль над данным вагоном
+        controlled_vehicle = cur_vehicle;
+        // Берём контроль над данной кабиной
+        vehicle->controlled_cabine_idx = vehicle->current_cabine_idx;
+
+        return (controlled_vehicle != prev_contr_vehicle) ||
+               (vehicle->controlled_cabine_idx != prev_contr_cabine);
+    }
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -412,7 +426,7 @@ bool VehiclesHandler::load(
         const std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
 
         VehicleExterior vehicle_exterior;
-        vehicle_exterior.driver_pos[vehicle_exterior.cabine_idx_ref] = settings.cabine_default_pos;
+        vehicle_exterior.driver_pos[vehicle_exterior.current_cabine_idx] = settings.cabine_default_pos;
         vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
         if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, viewer, options))
@@ -643,15 +657,15 @@ void VehiclesHandler::updateDebugString()
     // Дата-время сервера
     debug_message = update_pos_data[new_data].sim_time.getString() + "\n";
 
-    const int current_vehicle = vehicle_controlled.current_vehicle;
-    if (current_vehicle >= 0
-        && static_cast<std::size_t>(current_vehicle) < update_data[new_state].vehicles.size()
-        && static_cast<std::size_t>(current_vehicle) < update_pos_data[new_data].vehicles.size())
+    const int current = vehicle_controlled.current_vehicle;
+    if (current >= 0
+        && static_cast<std::size_t>(current) < update_data[new_state].vehicles.size()
+        && static_cast<std::size_t>(current) < update_pos_data[new_data].vehicles.size())
     {
-        const int current_train = update_data[new_state].vehicles[current_vehicle].train_id;
-        const auto& new_pos_data = update_pos_data[new_data].vehicles[current_vehicle];
+        const int current_train = update_data[new_state].vehicles[current].train_id;
+        const auto& new_pos_data = update_pos_data[new_data].vehicles[current];
         debug_message += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
-            .arg(current_vehicle, 3)
+            .arg(current, 3)
             .arg(current_train, 3)
             .arg(new_pos_data.position_x, 8, 'f', 1)
             .arg(new_pos_data.position_y, 8, 'f', 1)
@@ -667,7 +681,7 @@ void VehiclesHandler::updateDebugString()
         debug_message += QString("\n\n");
     }
 
-    const std::size_t control = vehicle_controlled.controlled_vehicle;
+    const int control = vehicle_controlled.controlled_vehicle;
     if (control >= 0
         && control < update_data[new_state].vehicles.size()
         && control < update_pos_data[new_data].vehicles.size())

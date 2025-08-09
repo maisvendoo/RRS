@@ -108,6 +108,8 @@ public:
     void setPrevVehicle(Vehicle *vehicle);
     void setNextVehicle(Vehicle *vehicle);
 
+    void setNeedDebugMsg(bool is_needed);
+
     /// Get vehicle module directory
     QString getModuleDir() const;
     /// Get Vehicle module name
@@ -290,6 +292,7 @@ protected:
     int     orient = 1;
 
     QString DebugMsg = "";
+    bool needDebugMsg = false;
 
     Vehicle *prev_vehicle = nullptr;
     Vehicle *next_vehicle = nullptr;

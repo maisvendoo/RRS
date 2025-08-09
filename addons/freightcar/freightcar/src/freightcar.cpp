@@ -77,6 +77,9 @@ void FreightCar::step(double t, double dt)
 //------------------------------------------------------------------------------
 void FreightCar::keyProcess()
 {
+    if (needDebugMsg)
+        debugPrint();
+
     // Сцепные устройства
     oper_rod_fwd->setControl(&pressed_keys);
     oper_rod_bwd->setControl(&pressed_keys);
@@ -86,8 +89,6 @@ void FreightCar::keyProcess()
     anglecock_bp_bwd->setControl(&pressed_keys);
     hose_bp_fwd->setControl(&pressed_keys);
     hose_bp_bwd->setControl(&pressed_keys);
-
-    stepDebugMsg(0, 0);
 }
 
 //------------------------------------------------------------------------------

@@ -20,8 +20,8 @@ public:
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
     void apply(vsg::FocusInEvent& focusIn) override;
     void apply(vsg::FocusOutEvent& focusOut) override;
-    void changeCurrentVehicle(int current_idx, int controlled_idx);
-    void changeCurrentCabine(size_t cabine_idx);
+    void changeCurrentVehicle(int current_idx, int controlled_idx, int cabine_idx);
+    void setNeedDebugMsg(bool is_needed);
 
 private:
 
@@ -30,10 +30,11 @@ private:
 
     TcpClient *_tcp_client = nullptr;
 
-    uint16_t _current_idx = 0;
-    uint16_t _controlled_idx = 0;
-    uint32_t _cabine_idx = 0;
-    std::set<uint16_t> _pressed_keys = {};
+    std::uint16_t _current_idx = 0;
+    std::uint16_t _controlled_idx = 0;
+    std::uint16_t _controlled_cabine_idx = 0;
+    bool _is_needed_debug_msg = false;
+    std::set<std::uint16_t> _pressed_keys = {};
 };
 
 #endif // UPDATE_CONTROL_TO_SERVER_HANDLER_H

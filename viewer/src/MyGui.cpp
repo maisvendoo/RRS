@@ -5,6 +5,7 @@
 
 #include "Skybox.h"
 #include "UpdateStatisticsHandler.h"
+#include "UpdateControlToServerHandler.h"
 #include "VehiclesHandler.h"
 
 #include <vsg/io/Options.h>
@@ -119,6 +120,7 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         if (ImGui::IsKeyPressed(ImGuiKey_F9) && !params->prev_F9)
         {
             params->is_show_debug_msg = !params->is_show_debug_msg;
+            params->controls_handler->setNeedDebugMsg(params->is_show_debug_msg);
         }
         params->prev_F9 = ImGui::IsKeyPressed(ImGuiKey_F9);
 
@@ -129,7 +131,7 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 
         VehicleExterior* cur_vehicle = params->vehicles_handler->getCurrentVehicle();
         params->is_no_cabine_control = ((cur_vehicle != nullptr) &&
-                                        (cur_vehicle->cabine_idx != cur_vehicle->cabine_idx_ref));
+                                        (cur_vehicle->controlled_cabine_idx != cur_vehicle->current_cabine_idx));
     }
     else
     {
@@ -446,8 +448,10 @@ void MyGui::showNoControlled() const
 //------------------------------------------------------------------------------
 void MyGui::showNoCabineControl() const
 {
-    QString msg = QString("Нажмите Enter для управления из кабины %1").arg(params->vehicles_handler->getCurrentVehicle()->cabine_idx_ref + 1);
-    const char *text = msg.toStdString().c_str();
+    std::string msg = QString("Нажмите Enter для управления из кабины %1")
+                            .arg(params->vehicles_handler->getCurrentVehicle()->current_cabine_idx + 1)
+                            .toStdString();
+    const char *text = msg.c_str();
     ImVec2 text_size = ImGui::CalcTextSize(text);
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));

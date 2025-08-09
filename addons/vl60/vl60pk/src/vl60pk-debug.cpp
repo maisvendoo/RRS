@@ -13,17 +13,12 @@
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
 #include "speedmap.h"
-#include "spotlight.h"
-//#include "pneumo-switching-valve.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::debugPrint(double t, double dt)
+void VL60pk::debugPrint()
 {
-    (void) t;
-    (void) dt;
-
     DebugMsg = "";
     DebugMsg += QString("x%1 km|V%2 km/h|")
                     .arg(profile_point_data.railway_coord / 1000.0, 10, 'f', 3)

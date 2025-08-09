@@ -154,21 +154,22 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 return;
             }
 
-            // Enter - взять управление текущим вагоном
+            // Tab - взять управление текущим вагоном
+            case vsg::KEY_Tab:
+            {
+                changeCurrentCabine();
+                _current_manipulator->resetView();
+                return;
+            }
+
+            // Enter - взять управление текущим вагоном и кабиной
             case vsg::KEY_KP_Enter:
             case vsg::KEY_Return:
             {
-                _vehicles_handler->selectControlVehicle();
-                changeCurrentVehicle();
-
-                auto vehicle = _vehicles_handler->getCurrentVehicle();
-
-                if (vehicle->cabine_idx != vehicle->cabine_idx_ref)
-                {
-                    vehicle->cabine_idx = vehicle->cabine_idx_ref;
-                    _upd_server_control->changeCurrentCabine(vehicle->cabine_idx);
-                }
-
+                if (_vehicles_handler->selectControlVehicle())
+                    _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
+                                                              _vehicles_handler->getControlledVehicleIndex(),
+                                                              _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx);
                 return;
             }
 
@@ -266,13 +267,6 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             case vsg::KEY_F12:
             {
                 _screenshot_writer->setScreenshot();
-                return;
-            }
-
-            case vsg::KEY_Tab:
-            {
-                changeCurrentCabine();
-                _current_manipulator->resetView();
                 return;
             }
 
@@ -579,7 +573,8 @@ void UpdateViewerHandler::changeCurrentVehicle()
     _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
 
     _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
-                                              _vehicles_handler->getControlledVehicleIndex());
+                                              _vehicles_handler->getControlledVehicleIndex(),
+                                              _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -589,11 +584,11 @@ void UpdateViewerHandler::changeCurrentCabine()
 {
     auto vehicle = _vehicles_handler->getCurrentVehicle();
 
-    vehicle->cabine_idx_ref++;
+    vehicle->current_cabine_idx++;
 
-    if (vehicle->cabine_idx_ref == vehicle->driver_pos.size())
+    if (vehicle->current_cabine_idx == vehicle->driver_pos.size())
     {
-        vehicle->cabine_idx_ref = 0;
+        vehicle->current_cabine_idx = 0;
     }   
 }
 

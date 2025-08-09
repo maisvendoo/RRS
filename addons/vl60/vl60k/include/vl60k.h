@@ -469,7 +469,7 @@ private:
     /// Обработка нажатий клавиш
     void keyProcess();
 
-    void debugPrint(double t, double dt);
+    void debugPrint();
 
     void load_brakes_config(QString path);
 

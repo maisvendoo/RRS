@@ -12,9 +12,10 @@
 //------------------------------------------------------------------------------
 struct controlled_t final
 {
-    int controlled_vehicle = -1;
-    int current_vehicle = -1;
-    int cabine_idx = -1;
+    std::uint16_t controlled_vehicle = 0;
+    std::uint16_t current_vehicle = 0;
+    std::uint16_t controlled_cabine_idx = 0;
+    bool need_debug_msg = false;
     std::vector<std::uint16_t> pressed_keys;
 
     QByteArray serialize() const
@@ -26,8 +27,9 @@ struct controlled_t final
 
         stream << controlled_vehicle;
         stream << current_vehicle;
-        stream << cabine_idx;
-        stream << static_cast<std::uint32_t>(pressed_keys.size());
+        stream << controlled_cabine_idx;
+        stream << need_debug_msg;
+        stream << static_cast<std::uint16_t>(pressed_keys.size());
 
         for (auto key_id : pressed_keys)
         {
@@ -45,15 +47,16 @@ struct controlled_t final
 
         stream >> controlled_vehicle;
         stream >> current_vehicle;
-        stream >> cabine_idx;
+        stream >> controlled_cabine_idx;
+        stream >> need_debug_msg;
 
-        std::uint32_t num;
+        std::uint16_t num;
         stream >> num;
 
         pressed_keys.clear();
         pressed_keys.resize(num);
 
-        for (std::uint32_t i = 0; i < num; ++i)
+        for (std::uint16_t i = 0; i < num; ++i)
         {
             stream >> pressed_keys[i];
         }

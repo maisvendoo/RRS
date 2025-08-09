@@ -19,6 +19,9 @@
 //------------------------------------------------------------------------------
 void VL60pk::keyProcess()
 {
+    if (needDebugMsg)
+        debugPrint();
+
     // Сцепные устройства
     oper_rod_fwd->setControl(&pressed_keys);
     oper_rod_bwd->setControl(&pressed_keys);

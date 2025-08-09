@@ -117,8 +117,6 @@ void VL60pk::step(double t, double dt)
 
     stepSignalsOutput(t, dt);
 
-    debugPrint(t, dt);
-
     autoStartTimer->step(t, dt);
 }
 

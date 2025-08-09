@@ -38,10 +38,10 @@ public:
     double      saved_cabine_cam_fov = 64.0;
 
     /// Заданный индекс кабины
-    size_t cabine_idx_ref = 0;
+    size_t current_cabine_idx = 0;
 
     /// Фактический индекс кабины
-    size_t cabine_idx = 0;
+    size_t controlled_cabine_idx = 0;
 
     VehicleExterior() = default;
 
