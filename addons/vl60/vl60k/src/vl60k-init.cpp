@@ -141,19 +141,19 @@ void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::initTriggers(int cab_autostart_request)
+bool VL60k::initTriggers(int cab_autostart_request)
 {
     if (autoStartTimer->isStarted())
-        return;
+        return false;
 
     if ((cab_autostart_request == CAB1) && (controller[CAB2]->isReversHandle()))
-        return;
+        return false;
 
     if ((cab_autostart_request == CAB2) && (controller[CAB1]->isReversHandle()))
-        return;
+        return false;
 
     if ((cab_autostart_request != CAB1) && (cab_autostart_request != CAB2))
-        return;
+        return false;
 
     controller[autostart_cab]->insertReversHandle(true);
 
@@ -173,4 +173,5 @@ void VL60k::initTriggers(int cab_autostart_request)
     triggers.push_back(&cu_tumbler[autostart_cab]);
     triggers.push_back(&key_epk[autostart_cab]);
     triggers.push_back(&rb[autostart_cab][RBS]);
+    return true;
 }

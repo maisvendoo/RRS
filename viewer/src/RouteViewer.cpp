@@ -608,6 +608,7 @@ void RouteViewer::initViewer()
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler;
     GUIparams->statistics_handler = upd_statistis_handler.get();
+    GUIparams->controls_handler = upd_server_control.get();
 }
 
 //------------------------------------------------------------------------------

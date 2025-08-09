@@ -688,7 +688,7 @@ void VehiclesHandler::updateDebugString()
     {
         const int control_train = update_data[new_state].vehicles[control].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[control];
-        debug_message += QString("Управляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
+        debug_message += QString("\nУправляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
             .arg(control, 3)
             .arg(control_train, 3)
             .arg(new_pos_data.position_x, 8, 'f', 1)
@@ -702,6 +702,6 @@ void VehiclesHandler::updateDebugString()
     }
     else
     {
-        debug_message += QString("Управляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
+        debug_message += QString("\nУправляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
     }
 }

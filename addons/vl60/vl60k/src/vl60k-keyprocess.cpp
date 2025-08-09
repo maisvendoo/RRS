@@ -99,20 +99,26 @@ void VL60k::keyProcess()
     // Автозапуск
     if (autoStartTimer->isStarted())
     {
+        controller[CAB1]->setControl();
+        controller[CAB2]->setControl();
         return;
     }
 
-    if (getKeyState(KEY_R, CAB1) && isAlt(CAB1))
+    if (getKeyState(KEY_R, CAB1) && isAlt(CAB1) && initTriggers(CAB1))
     {
-        initTriggers(CAB1);
         autoStartTimer->start();
+
+        controller[CAB1]->setControl();
+        controller[CAB2]->setControl();
         return;
     }
 
-    if (getKeyState(KEY_R, CAB2) && isAlt(CAB2))
+    if (getKeyState(KEY_R, CAB2) && isAlt(CAB2) && initTriggers(CAB2))
     {
-        initTriggers(CAB2);
         autoStartTimer->start();
+
+        controller[CAB1]->setControl();
+        controller[CAB2]->setControl();
         return;
     }
 

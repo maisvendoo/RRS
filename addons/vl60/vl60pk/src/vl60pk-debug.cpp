@@ -1,7 +1,9 @@
 #include    "vl60pk.h"
 
+#include "alsn-ukbm.h"
 #include "ALSN-coil.h"
 #include "brake-crane.h"
+#include "brake-lock.h"
 #include "brake-mech.h"
 #include "coupling.h"
 #include "coupling-operating-rod.h"
@@ -20,27 +22,70 @@
 void VL60pk::debugPrint()
 {
     DebugMsg = "";
+
+    DebugMsg += QString("CABINE 1|");
+    if (brake_lock[CAB1]->isUnlocked())
+    {
+        DebugMsg += QString("367comb:%1|395:%2|pER%3|254:%4%|")
+                        .arg(brake_lock[CAB1]->getCombCranePosition(), 2, 'f', 0)
+                        .arg(brake_crane[CAB1]->getPositionName(), 3)
+                        .arg(10.0 * brake_crane[CAB1]->getERpressure(), 6, 'f', 2)
+                        .arg(loco_crane[CAB1]->getHandlePosition() * 100.0, 3, 'f', 0);
+    }
+    else
+    {
+        DebugMsg += QString("367comb:%1| BRAKE CRANES ARE LOCKED  |")
+                        .arg(brake_lock[CAB1]->getCombCranePosition(), 2, 'f', 0);
+    }
+
+    if (controller[CAB1]->isReversHandle())
+    {
+        DebugMsg += QString("rev:%1|main: %2 |")
+                        .arg(controller[CAB1]->getReversHandlePos() * 4.0, 2, 'f', 0)
+                        .arg(controller[CAB1]->getMainHandlePosName());
+    }
+    else
+    {
+        DebugMsg += QString("NO REVERS HANDLE|");
+    }
+    DebugMsg += QString("Limit %1km/h(%2km/h|%3m)|")
+                    .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0)
+                    .arg(speedmap_fwd->getNextLimit(), 3, 'f', 0)
+                    .arg(speedmap_fwd->getNextLimitDistance(), 6, 'f', 1);
+    DebugMsg += QString("Code %1 (%2 Hz)| %3 (%4 m)")
+                    .arg(coil_ALSN_fwd->getCode(), 1)
+                    .arg(coil_ALSN_fwd->getFrequency(), 3, 'f', 0)
+                    .arg(coil_ALSN_fwd->getNextSignalLiter())
+                    .arg(coil_ALSN_fwd->getNextSignalDistance(), 6, 'f', 1);
+
+    if (key_epk[CAB1].getState())
+    {
+        if (safety_device[CAB1]->getEPKstate())
+            DebugMsg += QString(" EPK on");
+        else
+            DebugMsg += QString(" EPK WHISTLE");
+    }
+    else
+    {
+        DebugMsg += QString(" EPK off");
+    }
+
+    DebugMsg += QString("\n");
     DebugMsg += QString("x%1 km|V%2 km/h|")
                     .arg(profile_point_data.railway_coord / 1000.0, 10, 'f', 3)
                     .arg(velocity * Physics::kmh, 6, 'f', 1);
-    DebugMsg += QString("pBP%1|pBC%2|pSR%3|")
+    DebugMsg += QString("pBP%1|pBC%2|pSR%3|pFL%4|")
                     .arg(10.0 * brakepipe->getPressure(), 6, 'f', 2)
                     .arg(10.0 * brake_mech[TROLLEY_FWD]->getBCpressure(), 6, 'f', 2)
-                    .arg(10.0 * supply_reservoir->getPressure(), 6, 'f', 2);
-    DebugMsg += QString("pFL%1|pER%2|395:%3|254:%4%|")
-                    .arg(10.0 * main_reservoir->getPressure(), 6, 'f', 2)
-                    .arg(10.0 * brake_crane[0]->getERpressure(), 6, 'f', 2)
-                    .arg(brake_crane[0]->getPositionName(), 3)
-                    .arg(loco_crane[0]->getHandlePosition() * 100.0, 3, 'f', 0);
-    DebugMsg += QString("Rev%1|Contr %2|Pos %3%4|I%5 A|")
-                    .arg(controller[0]->getReversHandlePos() * 4.0, 2, 'f', 0)
-                    .arg(controller[0]->getMainHandlePosName())
+                    .arg(10.0 * supply_reservoir->getPressure(), 6, 'f', 2)
+                    .arg(10.0 * main_reservoir->getPressure(), 6, 'f', 2);
+    DebugMsg += QString("Pos %1%2|I%3 A")
                     .arg(main_controller->getPosition(), 2)
                     .arg(main_controller->isLongMotionPos() ? "*" : " ")
                     .arg(motor[TED1]->getIa(), 6, 'f', 1);
 
-    DebugMsg += QString("\n");
-    DebugMsg += QString("%1%2%3-%4-couplings-%5-%6%7%8")
+    DebugMsg += QString("  |  ");
+    DebugMsg += QString("%1%2%3-%4-coupl-%5-%6%7%8")
                     .arg(coupling_fwd->isLinked() ? "=" : " ")
                     .arg(coupling_fwd->isCoupled() ? "=" : " ")
                     .arg((coupling_fwd->getOutputSignal(COUPL_OUTPUT_REF_STATE) > -0.5) ? "=" : ">")
@@ -75,26 +120,51 @@ void VL60pk::debugPrint()
                     .arg(hose_bc_bwd->isLinked() ? "/" : " ");
 
     DebugMsg += QString("\n");
-    DebugMsg += QString("FWD Speed limit %1 km/h | Next %2 km/h (%3 m)")
-                    .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0)
-                    .arg(speedmap_fwd->getNextLimit(), 3, 'f', 0)
-                    .arg(speedmap_fwd->getNextLimitDistance(), 6, 'f', 1);
-    DebugMsg += QString("  |  ");
-    DebugMsg += QString("BWD Speed limit %1 km/h | Next %2 km/h (%3 m)")
+    DebugMsg += QString("CABINE 2|");
+    if (brake_lock[CAB2]->isUnlocked())
+    {
+        DebugMsg += QString("367comb:%1|395:%2|pER%3|254:%4%|")
+                        .arg(brake_lock[CAB2]->getCombCranePosition(), 2, 'f', 0)
+                        .arg(brake_crane[CAB2]->getPositionName(), 3)
+                        .arg(10.0 * brake_crane[CAB2]->getERpressure(), 6, 'f', 2)
+                        .arg(loco_crane[CAB2]->getHandlePosition() * 100.0, 3, 'f', 0);
+    }
+    else
+    {
+        DebugMsg += QString("367comb:%1| BRAKE CRANES ARE LOCKED  |")
+                        .arg(brake_lock[CAB2]->getCombCranePosition(), 2, 'f', 0);
+    }
+
+    if (controller[CAB2]->isReversHandle())
+    {
+        DebugMsg += QString("rev:%1|main: %2 |")
+                        .arg(controller[CAB2]->getReversHandlePos() * 4.0, 2, 'f', 0)
+                        .arg(controller[CAB2]->getMainHandlePosName());
+    }
+    else
+    {
+        DebugMsg += QString("NO REVERS HANDLE|");
+    }
+
+    DebugMsg += QString("Limit %1km/h(%2km/h|%3m)|")
                     .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0)
                     .arg(speedmap_bwd->getNextLimit(), 3, 'f', 0)
                     .arg(speedmap_bwd->getNextLimitDistance(), 6, 'f', 1);
-
-    DebugMsg += QString("\n");
-    DebugMsg += QString("FWD Signal code %1 (%2 Hz) | Next %3 (%4 m)")
-                    .arg(coil_ALSN_fwd->getCode(), 1)
-                    .arg(coil_ALSN_fwd->getFrequency(), 3, 'f', 0)
-                    .arg(coil_ALSN_fwd->getNextSignalLiter())
-                    .arg(coil_ALSN_fwd->getNextSignalDistance(), 6, 'f', 1);
-    DebugMsg += QString("  |  ");
-    DebugMsg += QString("BWD Signal code %1 (%2 Hz) | Next %3 (%4 m)")
+    DebugMsg += QString("Code %1 (%2 Hz)| %3 (%4 m)")
                     .arg(coil_ALSN_bwd->getCode(), 1)
                     .arg(coil_ALSN_bwd->getFrequency(), 3, 'f', 0)
                     .arg(coil_ALSN_bwd->getNextSignalLiter())
                     .arg(coil_ALSN_bwd->getNextSignalDistance(), 6, 'f', 1);
+
+    if (key_epk[CAB2].getState())
+    {
+        if (safety_device[CAB2]->getEPKstate())
+            DebugMsg += QString(" EPK on");
+        else
+            DebugMsg += QString(" EPK WHISTLE");
+    }
+    else
+    {
+        DebugMsg += QString(" EPK off");
+    }
 }
