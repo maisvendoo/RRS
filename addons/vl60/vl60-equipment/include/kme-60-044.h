@@ -18,6 +18,8 @@ public:
 
     km_state_t getState() const;
 
+    QString getMainHandlePosName() const;
+
     float getMainHandlePos() const;
 
     float getReversHandlePos() const;
@@ -38,9 +40,9 @@ public:
 private:
 
     /// Состояние главного вала
-    int         main_pos;
+    std::uint8_t main_pos;
     /// Состояние реверсивного вала
-    int         revers_pos;
+    std::uint8_t revers_pos;
 
     /// Положение главной рукоятки
     float       main_handle_pos;
@@ -64,6 +66,8 @@ private:
 
     Timer       *incReversPos;
     Timer       *decReversPos;
+
+    QStringList positions_names;
 
     void preStep(state_vector_t &Y, double t);
 

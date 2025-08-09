@@ -26,6 +26,8 @@ ControllerKME_60_044::ControllerKME_60_044(QObject *parent)
 
     decReversPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
     connect(decReversPos, &Timer::process, this, &ControllerKME_60_044::decRevers);
+
+    positions_names << "GV" << " 0" << "AV" << "RV" << "FV" << "FP" << "RP" << "AP";
 }
 
 //------------------------------------------------------------------------------
@@ -42,6 +44,14 @@ ControllerKME_60_044::~ControllerKME_60_044()
 km_state_t ControllerKME_60_044::getState() const
 {
     return state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString ControllerKME_60_044::getMainHandlePosName() const
+{
+    return positions_names[main_pos];
 }
 
 //------------------------------------------------------------------------------
@@ -239,7 +249,7 @@ void ControllerKME_60_044::incMain()
 
     main_pos++;
 
-    main_pos = std::clamp(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
+    main_pos = std::clamp(main_pos, static_cast<std::uint8_t>(POS_BV), static_cast<std::uint8_t>(POS_AP));
 
     if (main_pos_old != main_pos)
         soundMainChangePos();
@@ -257,7 +267,7 @@ void ControllerKME_60_044::decMain()
 
     main_pos--;
 
-    main_pos = std::clamp(main_pos, static_cast<int>(POS_BV), static_cast<int>(POS_AP));
+    main_pos = std::clamp(main_pos, static_cast<std::uint8_t>(POS_BV), static_cast<std::uint8_t>(POS_AP));
 
     if (main_pos_old != main_pos)
         soundMainChangePos();
@@ -275,7 +285,7 @@ void ControllerKME_60_044::incRevers()
 
     revers_pos++;
 
-    revers_pos = std::clamp(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
+    revers_pos = std::clamp(revers_pos, static_cast<std::uint8_t>(REVERS_BACKWARD), static_cast<std::uint8_t>(REVERS_OP3));
 
     if (revers_pos_old != revers_pos)
         soundReversChangePos();
@@ -293,7 +303,7 @@ void ControllerKME_60_044::decRevers()
 
     revers_pos--;
 
-    revers_pos = std::clamp(revers_pos, static_cast<int>(REVERS_BACKWARD), static_cast<int>(REVERS_OP3));
+    revers_pos = std::clamp(revers_pos, static_cast<std::uint8_t>(REVERS_BACKWARD), static_cast<std::uint8_t>(REVERS_OP3));
 
     if (revers_pos_old != revers_pos)
         soundReversChangePos();

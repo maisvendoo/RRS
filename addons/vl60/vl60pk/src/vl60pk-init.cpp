@@ -140,15 +140,15 @@ void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custo
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initTriggers()
+void VL60pk::initTriggers(int cab_autostart_request)
 {
     if (autoStartTimer->isStarted())
         return;
 
-    if ((cabine_idx != CAB1) && (cabine_idx != CAB2))
+    if ((cab_autostart_request != CAB1) && (cab_autostart_request != CAB2))
         return;
 
-    autostart_cab = cabine_idx;
+    autostart_cab = cab_autostart_request;
     start_count = 0;
     triggers.clear();
     triggers.push_back(&pants_tumbler[autostart_cab]);

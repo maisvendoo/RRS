@@ -13,7 +13,6 @@
 #include "pneumo-hose.h"
 #include "reservoir.h"
 #include "speedmap.h"
-#include "spotlight.h"
 
 //------------------------------------------------------------------------------
 //
@@ -33,21 +32,15 @@ void VL60k::debugPrint(double t, double dt)
                     .arg(10.0 * supply_reservoir->getPressure(), 6, 'f', 2);
     DebugMsg += QString("pFL%1|pER%2|395:%3|254:%4%|")
                     .arg(10.0 * main_reservoir->getPressure(), 6, 'f', 2)
-                    .arg(10.0 * brake_crane[cabine_idx]->getERpressure(), 6, 'f', 2)
-                    .arg(brake_crane[cabine_idx]->getPositionName(), 3)
-                    .arg(loco_crane[cabine_idx]->getHandlePosition() * 100.0, 3, 'f', 0);
-    DebugMsg += QString("Rev%1|Pos %2%3|I%4 A|")
-                    .arg(controller[cabine_idx]->getReversHandlePos() * 4.0, 2, 'f', 0)
+                    .arg(10.0 * brake_crane[0]->getERpressure(), 6, 'f', 2)
+                    .arg(brake_crane[0]->getPositionName(), 3)
+                    .arg(loco_crane[0]->getHandlePosition() * 100.0, 3, 'f', 0);
+    DebugMsg += QString("Rev%1|Contr %2|Pos %3%4|I%5 A|")
+                    .arg(controller[0]->getReversHandlePos() * 4.0, 2, 'f', 0)
+                    .arg(controller[0]->getMainHandlePosName())
                     .arg(main_controller->getPosition(), 2)
                     .arg(main_controller->isLongMotionPos() ? "*" : " ")
                     .arg(motor[TED1]->getIa(), 6, 'f', 1);
-    DebugMsg += QString("F%1|B%2|")
-                    .arg(oper_rod_fwd->getOperatingState(), 5, 'f', 2)
-                    .arg(oper_rod_bwd->getOperatingState(), 5, 'f', 2);
-
-    DebugMsg += QString("| Кабина: %1").arg(cabine_idx + 1, 2);
-
-    DebugMsg += QString("| Прожектор: %1").arg(spotlight[cabine_idx]->getIntensityHigh(), 4, 'f', 1);
 
     DebugMsg += QString("\n");
     DebugMsg += QString("%1%2%3-%4-couplings-%5-%6%7%8")

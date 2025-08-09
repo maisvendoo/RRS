@@ -412,7 +412,7 @@ private:
 
     void initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
 
-    void initTriggers();
+    void initTriggers(int cab_autostart_request);
 
     /// Предварительные расчёты перед симуляцией
     void preStep(double t);

@@ -138,8 +138,6 @@ void VL60pk::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepTractionControl(double t, double dt)
 {
-    controller[cabine_idx]->setControl(&keys);
-
     for (size_t i : {CAB1, CAB2})
     {
         controller[i]->step(t, dt);
@@ -163,6 +161,8 @@ void VL60pk::stepTractionControl(double t, double dt)
 
     // Полярность включения ТЭД
     int motor_dir = std::clamp(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
+    // Ступень ослабления возбуждения
+    int motor_field_loosen_pos = std::max(controller[CAB1]->getState().field_loosen_pos, controller[CAB2]->getState().field_loosen_pos);
 
     double I_vu = 0.0;
 
@@ -170,7 +170,7 @@ void VL60pk::stepTractionControl(double t, double dt)
     {
         motor[i]->setDirection(motor_dir);
         motor[i]->setOmega(ip * wheel_omega[i]);
-        motor[i]->setBetaStep(controller[cabine_idx]->getState().field_loosen_pos);
+        motor[i]->setBetaStep(motor_field_loosen_pos);
         motor[i]->step(t, dt);
         Q_a[i+1] = motor[i]->getTorque() * ip;
 
@@ -262,7 +262,6 @@ float VL60pk::isLineContactorsOff()
 //------------------------------------------------------------------------------
 void VL60pk::stepOtherEquipment(double t, double dt)
 {
-    horn[cabine_idx]->setControl(&keys);
     horn[CAB1]->setFLpressure(main_reservoir->getPressure());
     horn[CAB1]->step(t, dt);
     horn[CAB2]->setFLpressure(main_reservoir->getPressure());
@@ -270,7 +269,6 @@ void VL60pk::stepOtherEquipment(double t, double dt)
 
     // Система подачи песка
     sand_system->setFLpressure(main_reservoir->getPressure());
-    sand_system->setControl(&keys);
     sand_system->step(t, dt);
     for (size_t i = 0; i < num_axis; ++i)
     {
@@ -326,7 +324,9 @@ bool VL60pk::getHoldingCoilState() const
         overload |= ov_relay->getState();
     }
 
-    bool state = (!controller[cabine_idx]->getState().pos_state[POS_BV]) && (!overload);
+    bool state_off = overload ||
+                     controller[CAB1]->getState().pos_state[POS_BV] ||
+                     controller[CAB2]->getState().pos_state[POS_BV];
 
-    return state;
+    return !state_off;
 }
