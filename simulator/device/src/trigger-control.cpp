@@ -5,7 +5,8 @@
 //------------------------------------------------------------------------------
 TriggerControl::TriggerControl(std::uint16_t key_code) : Trigger()
 {
-    keyCode = key_code;
+    if (key_code)
+        setKeyCode(key_code);
 }
 
 //------------------------------------------------------------------------------
@@ -19,7 +20,7 @@ void TriggerControl::setKeyCode(std::uint16_t key_code)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TriggerControl::setControl(std::set<uint16_t> *keys)
+void TriggerControl::setControl(std::set<uint16_t>* keys)
 {
     pressed_keys = keys;
 }
@@ -35,10 +36,12 @@ void TriggerControl::step(double t, double dt)
     if (getKeyState(keyCode))
     {
         if (getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R))
+        {
             return;
+        }
 
-        bool is_ctrl = getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
-        bool is_shift = getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
+        const bool is_ctrl = getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
+        const bool is_shift = getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
         if (is_shift && (!is_ctrl))
         {
             set();

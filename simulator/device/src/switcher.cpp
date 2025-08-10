@@ -1,72 +1,67 @@
 #include "switcher.h"
 
-#include    "math-funcs.h"
+#include <algorithm>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Switcher::Switcher(QObject* parent, int key_code, int kol_states) : Device(parent)
+Switcher::Switcher(std::uint16_t num_positions)
 {
-    setNumPositions(kol_states);
-    setKeyCode(key_code);
+    setNumPositions(num_positions);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Switcher::~Switcher()
+void Switcher::setNumPositions(std::uint16_t num_positions)
 {
-
+    if (num_positions)
+        num_states = num_positions;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::setKeyCode(int key_code)
+void Switcher::setInitPosition(std::uint16_t position)
 {
-    keyCode = key_code;
+    state = std::clamp(position, static_cast<std::uint16_t>(0), static_cast<std::uint16_t>(num_states - 1));
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::setNumPositions(int value)
+void Switcher::setPosition(std::uint16_t position)
 {
-    if (value > 0)
-        num_states = value;
+    position = std::clamp(position, static_cast<std::uint16_t>(0), static_cast<std::uint16_t>(num_states - 1));
+    if (state == position)
+    {
+        return;
+    }
+
+    state = position;
+    switch_sound.play();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::setSpringFirst(bool is_spring)
+void Switcher::incPos()
 {
-    is_spring_first = is_spring;
+    setPosition(state + 1);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::setSpringLast(bool is_spring)
+void Switcher::decPos()
 {
-    is_spring_last = is_spring;
+    setPosition(state - 1);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::setState(int value)
-{
-    int old_pos = state;
-    state = std::clamp(value, 0, num_states - 1);
-    if (state != old_pos)
-        switch_sound.play();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-int Switcher::getNumPositions() const
+std::uint16_t Switcher::getNumPositions() const
 {
     return num_states;
 }
@@ -74,7 +69,7 @@ int Switcher::getNumPositions() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Switcher::getPosition() const
+std::uint16_t Switcher::getPosition() const
 {
     return state;
 }
@@ -90,7 +85,7 @@ float Switcher::getHandlePosition() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Switcher::isSwitched(int pos) const
+bool Switcher::isSwitched(std::uint16_t pos) const
 {
     return pos == state;
 }
@@ -111,80 +106,4 @@ float Switcher::getSoundSignal(size_t idx) const
 {
     (void) idx;
     return switch_sound.createSoundSignal();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Switcher::step(double t, double dt)
-{
-    stepKeysControl(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Switcher::ode_system(const state_vector_t &Y,
-                          state_vector_t &dYdt,
-                          double t)
-{
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Switcher::stepKeysControl(double t, double dt)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
-
-    bool allow_spring_first = is_spring_first;
-    bool allow_spring_last = is_spring_last;
-
-    if (getKeyState(keyCode) && !isAlt())
-    {
-        if (isShift() && (!isControl()))
-        {
-            if (ableToPress)
-            {
-                // Переключение вперёд
-                setState(state + 1);
-                // Запрещаем переключать дальше до отпускания клавиши
-                ableToPress = false;
-            }
-            // Запрет автовозврата назад
-            allow_spring_last = false;
-        }
-        else
-        {
-            if (isControl())
-            {
-                if (ableToPress)
-                {
-                    // Переключение назад
-                    setState(state - 1);
-                    // Запрещаем переключать дальше до отпускания клавиши
-                    ableToPress = false;
-                }
-                // Запрет автовозврата вперёд
-                allow_spring_first = false;
-            }
-        }
-    }
-    else
-    {
-        // Разрешаем переключение следующим нажатием клавиши
-        ableToPress = true;
-    }
-
-    // Автовозврат вперёд
-    if (allow_spring_first && (state == 0))
-        setState(state + 1);
-
-    // Автовозврат назад
-    if (allow_spring_last && (state == (num_states - 1)))
-        setState(state - 1);
 }

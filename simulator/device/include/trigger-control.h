@@ -26,7 +26,7 @@ protected:
     /// Управляющая клавиша
     std::uint16_t keyCode = KEY_Undefined;
 
-    std::set<uint16_t>*  pressed_keys = nullptr;
+    std::set<uint16_t>* pressed_keys = nullptr;
 
     bool getKeyState(std::uint16_t key) const;
 };
