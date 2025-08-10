@@ -14,10 +14,9 @@ public:
                     double max_value = 0.9,
                     bool init_state = false,
                     bool is_active = true,
-                    bool is_locked = false,
-                    QObject *parent = nullptr);
+                    bool is_locked = false);
 
-    virtual ~HysteresisRelay();
+    ~HysteresisRelay() = default;
 
     void setActive(bool is_active);
 

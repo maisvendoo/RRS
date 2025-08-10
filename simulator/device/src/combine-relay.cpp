@@ -1,4 +1,4 @@
-#include    <combine-releay.h>
+#include    <combine-relay.h>
 
 //------------------------------------------------------------------------------
 //
@@ -17,7 +17,7 @@ CombineRelay::CombineRelay(size_t num_neutral_contacts,
     minus_contact.resize(num_minus_contscts);
     std::fill(minus_contact.begin(), minus_contact.end(), false);
 
-    polar_hysteresis = new PolarHysteresis(level_off * U_nom / R, level_on * U_nom / R, 0);
+    polar_hysteresis = new HysteresisPolar(level_off * U_nom / R, level_on * U_nom / R, 0);
 }
 
 //------------------------------------------------------------------------------

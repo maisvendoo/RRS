@@ -35,7 +35,7 @@ private:
     std::vector<bool> minus_contact;
 
     /// Двухсторонний гистерези с центральной симметрией
-    PolarHysteresis *polar_hysteresis;
+    HysteresisPolar *polar_hysteresis;
 
     /// Пердыдущее состояние поляризованного якоря
     int polar_ancor_state_prev = 0;

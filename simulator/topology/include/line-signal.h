@@ -2,7 +2,7 @@
 #define     LINE_SIGNAL_H
 
 #include    <rail-signal.h>
-#include    <combine-releay.h>
+#include    <combine-relay.h>
 #include    <timer.h>
 
 //------------------------------------------------------------------------------

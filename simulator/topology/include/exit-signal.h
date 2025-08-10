@@ -1,9 +1,8 @@
 #ifndef     EXIT_SIGNAL_H
 #define     EXIT_SIGNAL_H
 
-#include    <trigger-counter.h>
 #include    <rail-signal.h>
-#include    <combine-releay.h>
+#include    <combine-relay.h>
 #include    <timer.h>
 #include    "trigger.h"
 
