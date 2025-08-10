@@ -6,21 +6,25 @@
 #include    "device-export.h"
 #include    "sound-signal.h"
 
-class DEVICE_EXPORT  Trigger : public QObject
+class DEVICE_EXPORT Trigger
 {
-    Q_OBJECT
-
 public:
 
-    Trigger(QObject *parent = nullptr);
+    Trigger() = default;
 
-    ~Trigger();
+    ~Trigger() = default;
 
-    void set();
+    /// Задать начальное состояние (без озвучки)
+    void setInitState(bool is_state_true);
 
-    void reset();
+    /// Включить триггер
+    virtual void set();
 
-    bool getState() const;
+    /// Отключить триггер
+    virtual void reset();
+
+    /// Состояние триггера
+    virtual bool getState() const;
 
     enum {
         NUM_SOUNDS = 3,
@@ -28,19 +32,16 @@ public:
         ON_SOUND = 1,       ///< Звук включения
         OFF_SOUND = 2       ///< Звук выключения
     };
-    /// Sound state
+    /// Состояние звука
     virtual sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const;
 
-    /// Sound state (as a single float value, see common-headers/sound-signal.h)
+    /// Сигнал состояния звука
     virtual float getSoundSignal(size_t idx = CHANGE_SOUND) const;
 
 private:
 
     /// Состояние триггера
     bool state = false;
-
-    /// Не создаём звук выключения при инициализации
-    bool was_first_reset = false;
 
     /// Звук переключения (со счётчиком включений звука)
     sound_state_t sound_change_state = sound_state_t();
