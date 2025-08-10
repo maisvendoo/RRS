@@ -146,7 +146,7 @@ void Switcher::stepKeysControl(double t, double dt)
 
     if (getKeyState(keyCode) && !isAlt())
     {
-        if(isShift())
+        if (isShift() && (!isControl()))
         {
             if (ableToPress)
             {
@@ -160,15 +160,18 @@ void Switcher::stepKeysControl(double t, double dt)
         }
         else
         {
-            if (ableToPress)
+            if (isControl())
             {
-                // Переключение назад
-                setState(state - 1);
-                // Запрещаем переключать дальше до отпускания клавиши
-                ableToPress = false;
+                if (ableToPress)
+                {
+                    // Переключение назад
+                    setState(state - 1);
+                    // Запрещаем переключать дальше до отпускания клавиши
+                    ableToPress = false;
+                }
+                // Запрет автовозврата вперёд
+                allow_spring_first = false;
             }
-            // Запрет автовозврата вперёд
-            allow_spring_first = false;
         }
     }
     else

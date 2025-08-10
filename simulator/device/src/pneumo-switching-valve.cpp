@@ -80,6 +80,33 @@ double SwitchingValve::getOutputFlow() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void SwitchingValve::preStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(t)
+
+    if (Y[0] > Physics::ZERO)
+    {
+        Y[0] = std::min(Y[0], 1.0);
+
+        const double u = Y[0];
+        const double r = 1.0 - u;
+        Y[1] = r * Y[1] + u * pOUT;
+        return;
+    }
+    if (Y[0] < -Physics::ZERO)
+    {
+        Y[0] = std::max(Y[0], -1.0);
+
+        const double u = -Y[0];
+        const double r = 1.0 - u;
+        Y[2] = r * Y[2] + u * pOUT;
+        return;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SwitchingValve::ode_system(const state_vector_t &Y,
                                 state_vector_t &dYdt,
                                 double t)
@@ -87,37 +114,43 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
     Q_UNUSED(t)
 
     // Перемещение клапана
-    double v = A1 * (Y[1] - Y[2]);
+    dYdt[0] = (Y[1] - Y[2]) * A1;
 
-    double u1 = pf(Y[0]);
+    // Клапан открыт со стороны первого входа
+    if (Y[0] > Physics::ZERO)
+    {
+        // Переток через первую камеру
+        const double u = Y[0];
+        const double r = 1.0 - u;
+        const double Q1 = r * u * (pOUT - Y[1]) * K1;
 
-    double u2 = nf(Y[0]);
+        dYdt[1] = (r * QIN1 + Q1) / V1;
+        QOUT = u * QIN1 - Q1;
 
-    // Исходящий поток из первой камеры
-    double Q1 = K1 * (Y[1] - pOUT) * u1;
+        // Поток во вторую камеру
+        dYdt[2] = QIN2 / V2;
+        return;
+    }
 
-    // Исходящий поток из второй камеры
-    double Q2 = K1 * (Y[2] - pOUT) * u2;
+    // Клапан открыт со стороны второго входа
+    if (Y[0] < -Physics::ZERO)
+    {
+        // Поток в первую камеру
+        dYdt[1] = QIN1 / V2;
 
-    QOUT = Q1 + Q2;
+        // Переток через вторую камеру
+        const double u = -Y[0];
+        const double r = 1.0 - u;
+        const double Q2 = r * u * (pOUT - Y[2]) * K1;
 
-    dYdt[0] = v;
+        dYdt[2] = (r * QIN2 + Q2) / V1;
+        QOUT = u * QIN2 - Q2;
+        return;
+    }
 
-    dYdt[1] = (QIN1 - Q1) / V1;
-
-    dYdt[2] = (QIN2 - Q2) / V2;
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void SwitchingValve::preStep(state_vector_t &Y, double t)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(Y)
-
-    Y[0] = std::clamp(Y[0], -1.0, 1.0);
+    dYdt[1] = QIN1 / V1;
+    dYdt[2] = QIN2 / V2;
+    QOUT = 0.0;
 }
 
 //------------------------------------------------------------------------------
