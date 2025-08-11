@@ -3,18 +3,37 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TriggerControl::TriggerControl(std::uint16_t key_code) : Trigger()
+void TriggerControl::setKeySymbolOn(std::uint16_t key_symbol)
 {
-    if (key_code)
-        setKeyCode(key_code);
+    key_symbol_on = key_symbol;
+    checkModeByKeys();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TriggerControl::setKeyCode(std::uint16_t key_code)
+void TriggerControl::setKeyModifierOn(std::uint16_t key_modifier)
 {
-    keyCode = key_code;
+    key_modifier_on = key_modifier;
+    checkModeByKeys();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TriggerControl::setKeySymbolOff(std::uint16_t key_symbol)
+{
+    key_symbol_off = key_symbol;
+    checkModeByKeys();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TriggerControl::setKeyModifierOff(std::uint16_t key_modifier)
+{
+    key_modifier_off = key_modifier;
+    checkModeByKeys();
 }
 
 //------------------------------------------------------------------------------
@@ -33,25 +52,50 @@ void TriggerControl::step(double t, double dt)
     (void) t;
     (void) dt;
 
-    if (getKeyState(keyCode))
+    // Режим "кнопка" (не задана клавиша отключения)
+    if (is_button)
     {
-        if (getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R))
+        if ((getKeyState(pressed_keys, key_symbol_on) && isModifier(pressed_keys, key_modifier_on)))
         {
-            return;
-        }
-
-        const bool is_ctrl = getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
-        const bool is_shift = getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
-        if (is_shift && (!is_ctrl))
-        {
-            set();
+            set(); // Нажимаем кнопку вместе с клавишей
         }
         else
         {
-            if (is_ctrl)
+            reset(); // Отпускаем кнопку вместе с клавишей
+        }
+
+        return;
+    }
+
+    // Режим "переключатель" (клавиши включения и отключения совпадают)
+    if (is_toogle)
+    {
+        if ((getKeyState(pressed_keys, key_symbol_on) && isModifier(pressed_keys, key_modifier_on)))
+        {
+            if (!prev_key)
             {
-                reset();
+                state ? reset() : set(); // Переключаем новым нажатием на клавишу
             }
+            prev_key = true; // Запоминаем, что клавиша нажата
+        }
+        else
+        {
+            prev_key = false; // Запоминаем, что клавиша отпущена
+        }
+
+        return;
+    }
+
+    // Режим "тумблер" - включение и отключение на разные клавиши
+    if ((getKeyState(*pressed_keys, key_symbol_off) && isModifier(*pressed_keys, key_modifier_off)))
+    {
+        reset(); // Отключаем триггер
+    }
+    else
+    {
+        if ((getKeyState(*pressed_keys, key_symbol_on) && isModifier(*pressed_keys, key_modifier_on)))
+        {
+            set(); // Включаем триггер
         }
     }
 }
@@ -59,11 +103,11 @@ void TriggerControl::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool TriggerControl::getKeyState(std::uint16_t key) const
+void TriggerControl::checkModeByKeys()
 {
-    if (pressed_keys && key)
-    {
-        return pressed_keys->count(key);
-    }
-    return false;
+    prev_key = false;
+    // Режим "кнопка" (не задана клавиша отключения)
+    is_button = ((key_symbol_on != KEY_Undefined) && (key_symbol_off == KEY_Undefined));
+    // Режим "переключатель" (клавиши включения и отключения совпадают)
+    is_toogle = ((key_symbol_on != KEY_Undefined) && (key_symbol_off == key_symbol_on) && (key_modifier_off == key_modifier_on));
 }

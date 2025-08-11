@@ -5,18 +5,29 @@
 #include    "key-symbols.h"
 
 //------------------------------------------------------------------------------
-//
+// Многопозиционный переключатель с управлением по сигналам от клавиатуры
+// Коды управляющих клавиш и модификаторы см. в файле key-symbols.h
+// Также с возможностью задать автовозврат из крайних положений
 //------------------------------------------------------------------------------
 class DEVICE_EXPORT SwitcherControl : public Switcher
 {
 public:
 
-    SwitcherControl(std::uint16_t key_code = KEY_Undefined, std::uint16_t num_positions = 3);
+    SwitcherControl(std::uint16_t num_positions = 3);
 
     ~SwitcherControl() = default;
 
-    /// Задать управляющую клавишу
-    void setKeyCode(std::uint16_t key_code);
+    /// Задать управляющую клавишу для переключения в следующую позицию
+    void setKeySymbolIncrease(std::uint16_t key_symbol);
+
+    /// Задать клавишу-модификатор для переключения в следующую позицию
+    void setKeyModifierIncrease(std::uint16_t key_modifier);
+
+    /// Задать управляющую клавишу для переключения в предыдущую позицию
+    void setKeySymbolDecrease(std::uint16_t key_symbol);
+
+    /// Задать клавишу-модификатор для переключения в предыдущую позицию
+    void setKeyModifierDecrease(std::uint16_t key_modifier);
 
     /// Управляющие сигналы
     void setControl(std::set<uint16_t>* keys = nullptr);
@@ -32,8 +43,17 @@ public:
 
 protected:
 
-    /// Управляющая клавиша
-    std::uint16_t keyCode = 0;
+    /// Управляющая клавиша переключения в следующую позицию
+    std::uint16_t key_symbol_inc = KEY_Undefined;
+
+    /// Клавиша-модификатор переключения в следующую позицию
+    std::uint16_t key_modifier_inc = KEY_Undefined;
+
+    /// Управляющая клавиша переключения в предыдущую позицию
+    std::uint16_t key_symbol_dec = KEY_Undefined;
+
+    /// Клавиша-модификатор переключения в предыдущую позицию
+    std::uint16_t key_modifier_dec = KEY_Undefined;
 
     /// Признак подпружиненного автовозврата из первой позиции в следующую
     bool is_spring_first = false;
@@ -41,12 +61,13 @@ protected:
     /// Признак подпружиненного автовозврата из последней позиции в предыдущую
     bool is_spring_last = false;
 
-    /// Признак возможности однократного переключения по следующему нажатию клавиши
-    bool no_prev_keyCode = false;
+    /// Предыдущее состояние клавиши переключения в следующую позицию
+    bool prev_key_inc = false;
+
+    /// Предыдущее состояние клавиши переключения в предыдущую позицию
+    bool prev_key_dec = false;
 
     std::set<uint16_t>* pressed_keys = nullptr;
-
-    bool getKeyState(std::uint16_t key) const;
 };
 
 #endif // SWITCHER_CONTROL_H

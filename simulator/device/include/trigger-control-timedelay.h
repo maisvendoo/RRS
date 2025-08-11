@@ -6,21 +6,18 @@
 
 class Timer;
 
+//------------------------------------------------------------------------------
+// Триггер с управлением по сигналам от клавиатуры,
+// с возможностью задать задержку срабатывания
+//------------------------------------------------------------------------------
 class DEVICE_EXPORT TriggerControlTimedelay final : public TriggerControl, public QObject
 {
 public:
 
-    TriggerControlTimedelay(std::uint16_t key_code = KEY_Undefined,
-                            double timeout_on = 0.0,
+    TriggerControlTimedelay(double timeout_on = 0.0,
                             double timeout_off = 0.0);
 
     ~TriggerControlTimedelay();
-
-    /// Включить триггер
-    void set() override;
-
-    /// Отключить триггер
-    void reset() override;
 
     /// Задать время поддержания сигнала для включения, с
     void setTimeoutOn(double timeout);
@@ -37,6 +34,11 @@ protected:
 
     Timer* timer_on = nullptr;
     Timer* timer_off = nullptr;
+
+private:
+
+    void setAfterDelay();
+    void resetAfterDelay();
 
 private slots:
 

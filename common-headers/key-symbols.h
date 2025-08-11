@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-enum KeySymbol
+enum KeySymbol : std::uint16_t
 {
     KEY_Undefined = 0x0,
 
@@ -139,7 +139,25 @@ enum KeySymbol
     KEY_Super_R         = 0xFFEC, ///< Right super, Right Win
 };
 
-const std::set<std::uint16_t> KeySymbolsRRS =
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+enum KeyModifier : std::uint16_t
+{
+    ANY_MODIFIERS       = 0xFFF0,
+    NO_MODIFIERS        = 0xFFF1,
+    MODIFIER_Shift      = 0xFFF2,
+    MODIFIER_Control    = 0xFFF3,
+    MODIFIER_Alt        = 0xFFF4,
+    MODIFIER_OnlyShift  = 0xFFF5,
+    MODIFIER_OnlyControl= 0xFFF6,
+    MODIFIER_OnlyAlt    = 0xFFF7,
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+static const std::set<std::uint16_t> KeySymbolsRRS =
     { KEY_Space
     , KEY_Quote
     , KEY_Comma
@@ -241,5 +259,96 @@ const std::set<std::uint16_t> KeySymbolsRRS =
 //    , KEY_Super_R
     , KEY_Delete
 };
+
+//------------------------------------------------------------------------------
+static bool getKeyState(const std::set<std::uint16_t>& keys, const std::uint16_t key)
+{
+    return key && keys.count(key);
+}
+
+//------------------------------------------------------------------------------
+static bool getKeyState(const std::set<std::uint16_t>* keys, const std::uint16_t key)
+{
+    if (keys)
+        return getKeyState(*keys, key);
+    return false;
+}
+
+//------------------------------------------------------------------------------
+static bool isShift(const std::set<std::uint16_t>& keys)
+{
+    return keys.count(KEY_Shift_L) || keys.count(KEY_Shift_R);
+}
+
+//------------------------------------------------------------------------------
+static bool isShift(const std::set<std::uint16_t>* keys)
+{
+    if (keys)
+        return isShift(*keys);
+    return false;
+}
+
+//------------------------------------------------------------------------------
+static bool isControl(const std::set<std::uint16_t>& keys)
+{
+    return keys.count(KEY_Control_L) || keys.count(KEY_Control_R);
+}
+
+//------------------------------------------------------------------------------
+static bool isControl(const std::set<std::uint16_t>* keys)
+{
+    if (keys)
+        return isControl(*keys);
+    return false;
+}
+
+//------------------------------------------------------------------------------
+static bool isAlt(const std::set<std::uint16_t>& keys)
+{
+    return keys.count(KEY_Alt_L) || keys.count(KEY_Alt_R);
+}
+
+//------------------------------------------------------------------------------
+static bool isAlt(const std::set<std::uint16_t>* keys)
+{
+    if (keys)
+        return isAlt(*keys);
+    return false;
+}
+
+//------------------------------------------------------------------------------
+static bool isModifier(const std::set<std::uint16_t>& keys, const std::uint16_t key_modifier)
+{
+    switch (key_modifier)
+    {
+    case KEY_Undefined:
+    case ANY_MODIFIERS:
+        return true;
+    case NO_MODIFIERS:
+        return !(isShift(keys) || isControl(keys) || isAlt(keys));
+    case MODIFIER_Shift:
+        return isShift(keys);
+    case MODIFIER_Control:
+        return isControl(keys);
+    case MODIFIER_Alt:
+        return isAlt(keys);
+    case MODIFIER_OnlyShift:
+        return (isShift(keys) && (!isControl(keys)) && (!isAlt(keys)));
+    case MODIFIER_OnlyControl:
+        return (isControl(keys) && (!isShift(keys)) && (!isAlt(keys)));
+    case MODIFIER_OnlyAlt:
+        return (isAlt(keys) && (!isShift(keys)) && (!isControl(keys)));
+    default:
+        return getKeyState(keys, key_modifier);
+    }
+}
+
+//------------------------------------------------------------------------------
+static bool isModifier(const std::set<std::uint16_t>* keys, const std::uint16_t key_modifier)
+{
+    if (keys)
+        return isModifier(*keys, key_modifier);
+    return false;
+}
 
 #endif // KEY_SYMBOLS_H

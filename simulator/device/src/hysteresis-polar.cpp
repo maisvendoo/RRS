@@ -1,4 +1,4 @@
-#include    <polar-hysteresis.h>
+#include "hysteresis-polar.h"
 
 //------------------------------------------------------------------------------
 //

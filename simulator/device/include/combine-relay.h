@@ -2,7 +2,7 @@
 #define     COMBINE_RELAY_H
 
 #include    <relay.h>
-#include    <polar-hysteresis.h>
+#include    <hysteresis-polar.h>
 
 //------------------------------------------------------------------------------
 //

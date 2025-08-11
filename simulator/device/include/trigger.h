@@ -6,6 +6,9 @@
 #include    "device-export.h"
 #include    "sound-signal.h"
 
+//------------------------------------------------------------------------------
+// Триггер - логический элемент, с сигналом для озвучки смены состояния
+//------------------------------------------------------------------------------
 class DEVICE_EXPORT Trigger
 {
 public:
@@ -18,10 +21,10 @@ public:
     void setInitState(bool is_state_true);
 
     /// Включить триггер
-    virtual void set();
+    void set();
 
     /// Отключить триггер
-    virtual void reset();
+    void reset();
 
     /// Состояние триггера
     virtual bool getState() const;
@@ -38,10 +41,15 @@ public:
     /// Сигнал состояния звука
     virtual float getSoundSignal(size_t idx = CHANGE_SOUND) const;
 
-private:
+protected:
 
     /// Состояние триггера
     bool state = false;
+
+    // Переменные для наследника TriggerControl, поскольку всё равно выравнивание до 4х байт
+    bool prev_key = false;  ///< Предыдущее состояние клавиши включения
+    bool is_button = false; ///< Режим "кнопка" (не задана клавиша отключения) - триггер включен, пока зажата клавиша включения
+    bool is_toogle = false; ///< Режим "переключатель" (клавиши включения и отключения совпадают) - нажатие на клавишу переключает триггер
 
     /// Звук переключения (со счётчиком включений звука)
     sound_state_t sound_change_state = sound_state_t();
