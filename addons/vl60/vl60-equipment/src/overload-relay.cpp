@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-OverloadRelay::OverloadRelay(QObject *parent) : Trigger(parent)
+OverloadRelay::OverloadRelay() : Trigger()
   , current(0.0)
   , trig_current(800.0)
 {
@@ -44,7 +44,7 @@ void OverloadRelay::read_config(const QString &filename, const QString &dir_path
     QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
     if (cfg.load(cfg_path))
     {
-        cfg.getDouble("Device", "TrigCurren", trig_current);
+        cfg.getDouble("Device", "TrigCurrent", trig_current);
         return;
     }
 
@@ -53,6 +53,6 @@ void OverloadRelay::read_config(const QString &filename, const QString &dir_path
 
     if (cfg.load(cfg_path))
     {
-        cfg.getDouble("Device", "TrigCurren", trig_current);
+        cfg.getDouble("Device", "TrigCurrent", trig_current);
     }
 }

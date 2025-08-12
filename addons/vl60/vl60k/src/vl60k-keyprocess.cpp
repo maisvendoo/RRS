@@ -49,10 +49,10 @@ void VL60k::keyProcess()
 
 
     // Управление оборудованием в кабинах
-    for (auto cabine_idx : {CAB1, CAB2})
+    for (auto cab_idx : {CAB1, CAB2})
     {
         // Управляем блокировкой тормозов
-        brake_lock[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+        brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Управляем краном, учитывая возможное наличие внешнего пульта
         // TODO // перенести freejoy во вьювер, его команды передавать по сети,
@@ -60,11 +60,11 @@ void VL60k::keyProcess()
         if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
         {
             int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
-            brake_crane[cabine_idx]->setHandlePosition(brake_crane_pos);
+            brake_crane[cab_idx]->setHandlePosition(brake_crane_pos);
         }
         else
         {
-            brake_crane[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+            brake_crane[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
         }
 
         // Управляем краном, учитывая возможное наличие внешнего пульта
@@ -76,24 +76,24 @@ void VL60k::keyProcess()
 
             if (static_cast<bool>(control_signals.analogSignal[CS_RELEASE_VALVE].cur_value))
             {
-                loco_crane[cabine_idx]->release(true);
+                loco_crane[cab_idx]->release(true);
                 pos = -1.0;
             }
             else
             {
-                loco_crane[cabine_idx]->release(false);
+                loco_crane[cab_idx]->release(false);
                 pos = control_signals.analogSignal[CS_LOCO_CRANE].cur_value;
             }
 
-            loco_crane[cabine_idx]->setHandlePosition(pos);
+            loco_crane[cab_idx]->setHandlePosition(pos);
         }
         else
         {
-            loco_crane[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+            loco_crane[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
         }
 
         // Тифон и свисток
-        horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+        horn[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
     }
 
     // Автозапуск
@@ -104,7 +104,7 @@ void VL60k::keyProcess()
         return;
     }
 
-    if (getKeyState(KEY_R, CAB1) && isAlt(CAB1) && initTriggers(CAB1))
+    if (getKeyState(KEY_R, CAB1) && isAlt(CAB1) && initAutostartProgram(CAB1))
     {
         autoStartTimer->start();
 
@@ -113,7 +113,7 @@ void VL60k::keyProcess()
         return;
     }
 
-    if (getKeyState(KEY_R, CAB2) && isAlt(CAB2) && initTriggers(CAB2))
+    if (getKeyState(KEY_R, CAB2) && isAlt(CAB2) && initAutostartProgram(CAB2))
     {
         autoStartTimer->start();
 
@@ -122,7 +122,7 @@ void VL60k::keyProcess()
         return;
     }
 
-    // Контроллер машиниста
+    // Контроллер машиниста обрабатываем уже после проверки на невмешательство программы автозапуска
     if (controller[CAB1]->isReversHandle())
     {
         if (controller[CAB2]->isReversHandle())
@@ -156,139 +156,45 @@ void VL60k::keyProcess()
     }
 
     // Пульты в кабинах обрабатываем уже после проверки на невмешательство программы автозапуска
-    for (auto cabine_idx : {CAB1, CAB2})
+    for (auto cab_idx : {CAB1, CAB2})
     {
-        // Управление тумблером "Токоприемники"
-        if (getKeyState(KEY_U, cabine_idx))
-        {
-            if (isShift())
-                pants_tumbler[cabine_idx].set();
-            else
-                pants_tumbler[cabine_idx].reset();
-        }
+        // Дальний ряд тумблеров приборной панели машиниста
+        spotlight_high_tumbler[cab_idx].step();
+        spotlight_low_tumbler[cab_idx].step();
+//        radio_tumbler[cabine_idx].step();
+        cu_tumbler[cab_idx].step();
+        pant2_tumbler[cab_idx].step();
+        pant1_tumbler[cab_idx].step();
+        pants_tumbler[cab_idx].step();
+        gv_return_tumbler[cab_idx].step();
+        gv_tumbler[cab_idx].step();
 
-        // Подъем/опускание переднего токоприемника
-        if (getKeyState(KEY_I, cabine_idx))
-        {
-            // Переводим тумблер в нужное фиксированное положение
-            if (isShift())
-                pant1_tumbler[cabine_idx].set();
-            else
-                pant1_tumbler[cabine_idx].reset();
-        }
+        // Ближний ряд тумблеров приборной панели машиниста
+//        autosand_tumbler[cab_idx].step();
+        mv_tumblers[cab_idx][MV1].step();
+        mv_tumblers[cab_idx][MV2].step();
+        mv_tumblers[cab_idx][MV3].step();
+        mv_tumblers[cab_idx][MV4].step();
+        mv_tumblers[cab_idx][MV5].step();
+        mv_tumblers[cab_idx][MV6].step();
+        mk_tumbler[cab_idx].step();
+        fr_tumbler[cab_idx].step();
 
-        // Подъем/опускание заднего токоприемника
-        if (getKeyState(KEY_O, cabine_idx))
-        {
-            // Переводим тумблер в нужное фиксированное положение
-            if (isShift())
-                pant2_tumbler[cabine_idx].set();
-            else
-                pant2_tumbler[cabine_idx].reset();
-        }
-
-        // Включение/выключение ГВ
-        if (getKeyState(KEY_P, cabine_idx))
-        {
-            if (isShift())
-                gv_tumbler[cabine_idx].set();
-            else
-                gv_tumbler[cabine_idx].reset();
-        }
-
-        // Возврат защиты
-        if (getKeyState(KEY_K, cabine_idx))
-            gv_return_tumbler[cabine_idx].set();
-        else
-            gv_return_tumbler[cabine_idx].reset();
-
-        // Включение/выключение расщепителя фаз
-        if (getKeyState(KEY_T, cabine_idx))
-        {
-            if (isShift())
-                fr_tumbler[cabine_idx].set();
-            else
-                fr_tumbler[cabine_idx].reset();
-        }
-
-        // Включение/выключение мотор-вентиляторов
-        // МВ1
-        if (getKeyState(KEY_R, cabine_idx))
-        {
-            if (isShift())
-                mv_tumblers[cabine_idx][MV1].set();
-            else
-                mv_tumblers[cabine_idx][MV1].reset();
-        }
-
-        // МВ2
-        if (getKeyState(KEY_F, cabine_idx))
-        {
-            if (isShift())
-                mv_tumblers[cabine_idx][MV2].set();
-            else
-                mv_tumblers[cabine_idx][MV2].reset();
-        }
-
-        // МВ3
-        if (getKeyState(KEY_Y, cabine_idx))
-        {
-            if (isShift())
-                mv_tumblers[cabine_idx][MV3].set();
-            else
-                mv_tumblers[cabine_idx][MV3].reset();
-        }
-
-        // МВ4
-        if (getKeyState(KEY_5, cabine_idx) && !isAlt())
-        {
-            if (isShift())
-                mv_tumblers[cabine_idx][MV4].set();
-            else
-                mv_tumblers[cabine_idx][MV4].reset();
-        }
-
-        // МВ5
-        if (getKeyState(KEY_6, cabine_idx) && !isAlt())
-        {
-            if (isShift())
-                mv_tumblers[cabine_idx][MV5].set();
-            else
-                mv_tumblers[cabine_idx][MV5].reset();
-        }
-
-        // МВ6
-        if (getKeyState(KEY_7, cabine_idx) && !isAlt())
-        {
-            if (isShift())
-                mv_tumblers[cabine_idx][MV6].set();
-            else
-                mv_tumblers[cabine_idx][MV6].reset();
-        }
-
-        // Включение/выключение мотор-компрессора
-        if (getKeyState(KEY_E, cabine_idx))
-        {
-            if (isShift())
-                mk_tumbler[cabine_idx].set();
-            else
-                mk_tumbler[cabine_idx].reset();
-        }
-
-        // Включение/выключение цепей управления
-        if (getKeyState(KEY_J, cabine_idx))
-        {
-            if (isShift())
-                cu_tumbler[cabine_idx].set();
-            else
-                cu_tumbler[cabine_idx].reset();
-        }
-
-        // Нажатие РБ-1
-        if (getKeyState(KEY_Z, cabine_idx))
-            rb[cabine_idx][RB_1].set();
-        else
-            rb[cabine_idx][RB_1].reset();
+        // Ряд тумблеров на приборной панели помощника машиниста
+//        P_tifon_tumbler[cab_idx].step();
+//        P_whistle_tumbler[cab_idx].step();
+//        P_cab_heat_tumbler[cab_idx].step();
+        P_cab_light_low_tumbler[cab_idx].step();
+        P_cab_light_high_tumbler[cab_idx].step();
+//        P_reserv1_tumbler[cab_idx].step();
+//        P_light_chassis_tumbler[cab_idx].step();
+        P_light_devices_tumbler[cab_idx].step();
+        P_bufferlight_L_tumbler[cab_idx].step();
+        P_bufferlight_R_tumbler[cab_idx].step();
+//        P_reserv2_tumbler[cab_idx].step();
+//        P_ALSN_check_tumbler[cab_idx].step();
+        P_buffercolor_L_tumbler[cab_idx].step();
+        P_buffercolor_R_tumbler[cab_idx].step();
 
         // Нажатие РБС
         // Если активна РБС на внешнем пульте
@@ -298,50 +204,17 @@ void VL60k::keyProcess()
         {
             // реагируем на состояние РБС на внешнем пульте
             if (static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value))
-                rb[cabine_idx][RBS].set();
+                rb[cab_idx][RBS].set();
             else
-                rb[cabine_idx][RBS].reset();
+                rb[cab_idx][RBS].reset();
         }
         else // иначе
         {
             // обрабатываем клавиши
-            if (getKeyState(KEY_M, cabine_idx))
-                rb[cabine_idx][RBS].set();
-            else
-                rb[cabine_idx][RBS].reset();
+            rb[cab_idx][RBS].step();
         }
-
-        // Нажатие РБП
-        if (getKeyState(KEY_Tilde, cabine_idx))
-            rb[cabine_idx][RBP].set();
-        else
-            rb[cabine_idx][RBP].reset();
-
-        // Включение/выключение ЭПK
-        if (getKeyState(KEY_N, cabine_idx))
-        {
-            if (isShift())
-                key_epk[cabine_idx].set();
-            else
-                key_epk[cabine_idx].reset();
-        }
-
-        // Прожектор "Тускло"
-        if (getKeyState(KEY_G, cabine_idx))
-        {
-            if (isShift())
-                spotlight_low_tumbler[cabine_idx].set();
-            else
-                spotlight_low_tumbler[cabine_idx].reset();
-        }
-
-        // Прожектор "Ярко"
-        if (getKeyState(KEY_H, cabine_idx))
-        {
-            if (isShift())
-                spotlight_high_tumbler[cabine_idx].set();
-            else
-                spotlight_high_tumbler[cabine_idx].reset();
-        }
+        rb[cab_idx][RB_1].step();
+        rb[cab_idx][RBP].step();
+        key_epk[cab_idx].step();
     }
 }

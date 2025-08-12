@@ -87,6 +87,37 @@ void TriggerControl::step(double t, double dt)
     }
 
     // Режим "тумблер" - включение и отключение на разные клавиши
+    // Если разные только модификаторы, а управляющая клавиша одинаковая,
+    // проверяем новое нажатие на клавишу
+    if (key_symbol_off == key_symbol_on)
+    {
+        if (getKeyState(*pressed_keys, key_symbol_on))
+        {
+            if (!prev_key)
+            {
+                if (isModifier(*pressed_keys, key_modifier_off))
+                {
+                    reset(); // Отключаем триггер новым нажатием на клавишу
+                    prev_key = true; // Запоминаем, что клавиша нажата
+                }
+                else
+                {
+                    if (isModifier(*pressed_keys, key_modifier_on))
+                    {
+                        set(); // Включаем триггер новым нажатием на клавишу
+                        prev_key = true; // Запоминаем, что клавиша нажата
+                    }
+                }
+            }
+        }
+        else
+        {
+            prev_key = false; // Запоминаем, что клавиша отпущена
+        }
+        return;
+    }
+
+    // Обычная логика в режиме тумблер
     if ((getKeyState(*pressed_keys, key_symbol_off) && isModifier(*pressed_keys, key_modifier_off)))
     {
         reset(); // Отключаем триггер

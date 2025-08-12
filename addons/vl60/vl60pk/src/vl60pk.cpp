@@ -48,6 +48,8 @@ void VL60pk::initialization()
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
 
+    initTumblers(modules_dir, custom_cfg_dir);
+
     initCouplings(modules_dir, custom_cfg_dir);
 
     initPantographs(modules_dir, custom_cfg_dir);
