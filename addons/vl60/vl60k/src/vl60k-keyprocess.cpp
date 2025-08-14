@@ -193,8 +193,8 @@ void VL60k::keyProcess()
         P_bufferlight_R_tumbler[cab_idx].step();
 //        P_reserv2_tumbler[cab_idx].step();
 //        P_ALSN_check_tumbler[cab_idx].step();
-        P_buffercolor_L_tumbler[cab_idx].step();
-        P_buffercolor_R_tumbler[cab_idx].step();
+        P_buffercolor_L_toogle[cab_idx].step();
+        P_buffercolor_R_toogle[cab_idx].step();
 
         // Нажатие РБС
         // Если активна РБС на внешнем пульте

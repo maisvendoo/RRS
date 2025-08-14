@@ -203,9 +203,9 @@ private:
 //    TriggerControl P_ALSN_check_tumbler[CABS_NUM];
 
     /// Триггер тумблера "Левый буферный белый/красный"
-    TriggerControl P_buffercolor_L_tumbler[CABS_NUM];
+    TriggerControl P_buffercolor_L_toogle[CABS_NUM];
     /// Триггер тумблера "Правый буферный белый/красный"
-    TriggerControl P_buffercolor_R_tumbler[CABS_NUM];
+    TriggerControl P_buffercolor_R_toogle[CABS_NUM];
 
     enum
     {

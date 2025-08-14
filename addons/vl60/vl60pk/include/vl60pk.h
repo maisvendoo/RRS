@@ -146,11 +146,11 @@ private:
     OperatingRod *oper_rod_bwd = nullptr;
 
     // Дальний ряд тумблеров приборной панели машиниста
-    /// Тригер тумблера "Прожектор яркий"
+    /// Триггер тумблера "Прожектор яркий"
     TriggerControl spotlight_high_tumbler[CABS_NUM];
-    /// Тригер тумблера "Прожектор тусклый"
+    /// Триггер тумблера "Прожектор тусклый"
     TriggerControl spotlight_low_tumbler[CABS_NUM];
-//    /// Тригер тумблера "Радиостанция"
+//    /// Триггер тумблера "Радиостанция"
 //    TriggerControl radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
     TriggerControl cu_tumbler[CABS_NUM];
@@ -158,9 +158,9 @@ private:
     TriggerControl pant1_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник задний"
     TriggerControl pant2_tumbler[CABS_NUM];
-    /// Тригер тумблера "Токоприемники"
+    /// Триггер тумблера "Токоприемники"
     TriggerControl pants_tumbler[CABS_NUM];
-    /// Тригер тумблена "ГВ вкл. Возврат защиты"
+    /// Триггер тумблера "ГВ вкл. Возврат защиты"
     TriggerControl gv_return_tumbler[CABS_NUM];
     /// Триггер тумблера "ГВ вкл/выкл"
     TriggerControl gv_tumbler[CABS_NUM];
@@ -212,10 +212,10 @@ private:
 //    /// Триггер тумблера "Проверка АЛСН"
 //    TriggerControl P_ALSN_check_tumbler[CABS_NUM];
 
-    /// Триггер тумблера "Левый буферный белый/красный"
-    TriggerControl P_buffercolor_L_tumbler[CABS_NUM];
-    /// Триггер тумблера "Правый буферный белый/красный"
-    TriggerControl P_buffercolor_R_tumbler[CABS_NUM];
+    /// Триггер переключателя "Левый буферный белый/красный"
+    TriggerControl P_buffercolor_L_toogle[CABS_NUM];
+    /// Триггер переключателя "Правый буферный белый/красный"
+    TriggerControl P_buffercolor_R_toogle[CABS_NUM];
 
     enum
     {

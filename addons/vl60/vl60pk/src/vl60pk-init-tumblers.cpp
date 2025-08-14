@@ -185,18 +185,18 @@ void VL60pk::initTumblers(const QString &modules_dir, const QString &custom_cfg_
 //        P_ALSN_check_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Левый буферный белый/красный"
-        P_buffercolor_L_tumbler[cab_idx].setKeySymbolOn(KEY_G);
-        P_buffercolor_L_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-        P_buffercolor_L_tumbler[cab_idx].setKeySymbolOff(KEY_G);
-        P_buffercolor_L_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-        P_buffercolor_L_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        P_buffercolor_L_toogle[cab_idx].setKeySymbolOn(KEY_G);
+        P_buffercolor_L_toogle[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+        P_buffercolor_L_toogle[cab_idx].setKeySymbolOff(KEY_G);
+        P_buffercolor_L_toogle[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+        P_buffercolor_L_toogle[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Правый буферный белый/красный"
-        P_buffercolor_R_tumbler[cab_idx].setKeySymbolOn(KEY_J);
-        P_buffercolor_R_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-        P_buffercolor_R_tumbler[cab_idx].setKeySymbolOff(KEY_J);
-        P_buffercolor_R_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-        P_buffercolor_R_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        P_buffercolor_R_toogle[cab_idx].setKeySymbolOn(KEY_J);
+        P_buffercolor_R_toogle[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+        P_buffercolor_R_toogle[cab_idx].setKeySymbolOff(KEY_J);
+        P_buffercolor_R_toogle[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+        P_buffercolor_R_toogle[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
 
         // Триггеры рукояток бдительности

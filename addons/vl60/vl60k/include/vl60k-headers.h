@@ -3,7 +3,7 @@
 
 #include    <vehicle-api.h>
 
-#include    <vl60k-signals.h>
+#include    <vl60-signals.h>
 #include    <trac-transformer.h>
 #include    <phase-splitter.h>
 #include    <kme-60-044.h>
@@ -13,6 +13,5 @@
 #include    <overload-relay.h>
 #include    <sl2m.h>
 #include    <alsn-ukbm.h>
-#include    <ALSN-decoder.h>
 
 #endif // VL60K_HEADERS_H

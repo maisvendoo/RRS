@@ -109,6 +109,8 @@ void VL60k::step(double t, double dt)
 
     stepOtherEquipment(t, dt);
 
+    stepSafetyDevices(t, dt);
+
     stepSoundSignalsOutput(t, dt);
 
     stepSignalsOutput(t, dt);

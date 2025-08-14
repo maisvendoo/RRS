@@ -878,7 +878,10 @@ void Model::prepareFeedBack()
         controlled_clients[*с_id].vehicle_controlled.current_vehicle = id;
 
         if (controlled_clients[*с_id].vehicle_control_by_keyboard.need_debug_msg)
+        {
             controlled_clients[*с_id].vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
+            vehicles[id]->setNeedDebugMsg(false);
+        }
 
         id = controlled_clients[*с_id].vehicle_control_by_keyboard.controlled_vehicle;
         update_players.controlled_vehicles.push_back(id);
@@ -886,7 +889,10 @@ void Model::prepareFeedBack()
         controlled_clients[*с_id].vehicle_controlled.controlled_vehicle = id;
 
         if (controlled_clients[*с_id].vehicle_control_by_keyboard.need_debug_msg)
+        {
             controlled_clients[*с_id].vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
+            vehicles[id]->setNeedDebugMsg(false);
+        }
     }
 }
 
@@ -966,6 +972,11 @@ void Model::controlStep()
         {
             std::uint16_t cab_id = c.vehicle_control_by_keyboard.controlled_cabine_idx;
             vehicles[id]->setKeyboardControl(cab_id, c.vehicle_control_by_keyboard.pressed_keys);
+            vehicles[id]->setNeedDebugMsg(c.vehicle_control_by_keyboard.need_debug_msg);
+        }
+        id = c.vehicle_control_by_keyboard.current_vehicle;
+        if (id < vehicles.size())
+        {
             vehicles[id]->setNeedDebugMsg(c.vehicle_control_by_keyboard.need_debug_msg);
         }
     }

@@ -1,6 +1,6 @@
 #include    "vl60pk.h"
 
-#include "vl60pk-signals.h"
+#include "vl60-signals.h"
 
 #include "alsn-ukbm.h"
 #include "brake-crane.h"
@@ -19,181 +19,253 @@
 #include "protective-device.h"
 #include "reservoir.h"
 #include "sl2m.h"
-#include "spotlight.h"
+#include "sanding-system.h"
+#include "train-horn.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void VL60pk::stepSignalsOutput(double t, double dt)
 {
+    analogSignal[SERIAL_NUMBER] = 1543.0f;
+
+    // Вращение колёсных пар
+    analogSignal[WHEELSET_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
+    analogSignal[WHEELSET_2] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
+    analogSignal[WHEELSET_3] = static_cast<float>(wheel_rotation_angle[2] / 2.0 / Physics::PI);
+    analogSignal[WHEELSET_4] = static_cast<float>(wheel_rotation_angle[3] / 2.0 / Physics::PI);
+    analogSignal[WHEELSET_5] = static_cast<float>(wheel_rotation_angle[4] / 2.0 / Physics::PI);
+    analogSignal[WHEELSET_6] = static_cast<float>(wheel_rotation_angle[5] / 2.0 / Physics::PI);
+
+    // Состояние главного выключателя
+    analogSignal[MAIN_SWITCH_POS] = static_cast<float>(main_switch->getKnifePos());
+
     // Состояние токоприемников
     analogSignal[PANT1_POS] = static_cast<float>(pantographs[0]->getHeight());
     analogSignal[PANT2_POS] = static_cast<float>(pantographs[1]->getHeight());
 
-    // Состояние тумблеров на пульте машиниста
-    analogSignal[TUMBLER_PNT] = static_cast<float>(pants_tumbler[CAB1].getState());
-    analogSignal[TUMBLER_PNT1] = static_cast<float>(pant1_tumbler[CAB1].getState());
-    analogSignal[TUMBLER_PNT2] = static_cast<float>(pant2_tumbler[CAB1].getState());
+    // Кабины
+    for (auto cab_idx : {CAB1, CAB2})
+    {
+        std::uint16_t d = (SPOTLIGHT_BWD - SPOTLIGHT_FWD) * cab_idx;
 
-    analogSignal[CAB2_TUMBLER_PNT] = static_cast<float>(pants_tumbler[CAB2].getState());
-    analogSignal[CAB2_TUMBLER_PNT1] = static_cast<float>(pant1_tumbler[CAB2].getState());
-    analogSignal[CAB2_TUMBLER_PNT2] = static_cast<float>(pant2_tumbler[CAB2].getState());
+        // Освещение
+        bool is_power = (U_bat > 0.9 * 50.0);
+        if (is_power)
+        {
+            // Прожектор
+            if (spotlight_low_tumbler[cab_idx].getState())
+            {
+                std::uint8_t intensity = 1 + spotlight_high_tumbler[cab_idx].getState();
+                analogSignal[SPOTLIGHT_FWD + d] = static_cast<float>(intensity) / 2.0f;
+            }
+            else
+            {
+                analogSignal[SPOTLIGHT_FWD + d] = 0.0f;
+            }
 
-    analogSignal[TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler[CAB1].getState());
-    analogSignal[TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler[CAB1].getState());
+            // Левый буферный
+            if (P_bufferlight_L_tumbler[cab_idx].getState())
+            {
+                analogSignal[BUFFERLIGHT_FWD_L_WHITE + d] = static_cast<float>(P_buffercolor_L_toogle[cab_idx].getState());
+                analogSignal[BUFFERLIGHT_FWD_L_RED + d] = static_cast<float>(!P_buffercolor_L_toogle[cab_idx].getState());
+            }
+            else
+            {
+                analogSignal[BUFFERLIGHT_FWD_L_WHITE + d] = 0.0f;
+                analogSignal[BUFFERLIGHT_FWD_L_RED + d] = 0.0f;
+            }
 
-    analogSignal[CAB2_TUMBLER_GV_ON] = static_cast<float>(gv_return_tumbler[CAB2].getState());
-    analogSignal[CAB2_TUMBLER_GV_ON_OFF] = static_cast<float>(gv_tumbler[CAB2].getState());
+            // Правый буферный
+            if (P_bufferlight_R_tumbler[cab_idx].getState())
+            {
+                analogSignal[BUFFERLIGHT_FWD_R_WHITE + d] = static_cast<float>(P_buffercolor_R_toogle[cab_idx].getState());
+                analogSignal[BUFFERLIGHT_FWD_R_RED + d] = static_cast<float>(!P_buffercolor_R_toogle[cab_idx].getState());
+            }
+            else
+            {
+                analogSignal[BUFFERLIGHT_FWD_R_WHITE + d] = 0.0f;
+                analogSignal[BUFFERLIGHT_FWD_R_RED + d] = 0.0f;
+            }
 
-    analogSignal[TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB1].getState());
-    analogSignal[CAB2_TUMBLER_FR] = static_cast<float>(fr_tumbler[CAB2].getState());
+            // Освещение кабины
+            if (P_cab_light_low_tumbler[cab_idx].getState())
+            {
+                std::uint8_t intensity = 1 + P_cab_light_high_tumbler[cab_idx].getState();
+                analogSignal[CAB1_LIGHT_CABINE + d] = static_cast<float>(intensity) / 2.0f;
+            }
+            else
+            {
+                analogSignal[CAB1_LIGHT_CABINE + d] = 0.0f;
+            }
 
-    analogSignal[TUMBLER_MV1] = static_cast<float>(mv_tumblers[CAB1][MV1].getState());
-    analogSignal[TUMBLER_MV2] = static_cast<float>(mv_tumblers[CAB1][MV2].getState());
-    analogSignal[TUMBLER_MV3] = static_cast<float>(mv_tumblers[CAB1][MV3].getState());
-    analogSignal[TUMBLER_MV4] = static_cast<float>(mv_tumblers[CAB1][MV4].getState());
-    analogSignal[TUMBLER_MV5] = static_cast<float>(mv_tumblers[CAB1][MV5].getState());
-    analogSignal[TUMBLER_MV6] = static_cast<float>(mv_tumblers[CAB1][MV6].getState());
+            // Подсветка приборов
+            analogSignal[CAB1_LIGHT_DEVICES + d] = static_cast<float>(P_light_devices_tumbler[cab_idx].getState());
 
-    analogSignal[CAB2_TUMBLER_MV1] = static_cast<float>(mv_tumblers[CAB2][MV1].getState());
-    analogSignal[CAB2_TUMBLER_MV2] = static_cast<float>(mv_tumblers[CAB2][MV2].getState());
-    analogSignal[CAB2_TUMBLER_MV3] = static_cast<float>(mv_tumblers[CAB2][MV3].getState());
-    analogSignal[CAB2_TUMBLER_MV4] = static_cast<float>(mv_tumblers[CAB2][MV4].getState());
-    analogSignal[CAB2_TUMBLER_MV5] = static_cast<float>(mv_tumblers[CAB2][MV5].getState());
-    analogSignal[CAB2_TUMBLER_MV6] = static_cast<float>(mv_tumblers[CAB2][MV6].getState());
+            // Локомотивный светофор
+            analogSignal[CAB1_LS_WHITE + d] = safety_device[cab_idx]->getWhiteLamp();
+            analogSignal[CAB1_LS_RED + d] = safety_device[cab_idx]->getRedLamp();
+            analogSignal[CAB1_LS_REDYELLOW + d] = safety_device[cab_idx]->getRedYellowLamp();
+            analogSignal[CAB1_LS_YELLOW + d] = safety_device[cab_idx]->getYellowLamp();
+            analogSignal[CAB1_LS_GREEN + d] = safety_device[cab_idx]->getGreenLamp();
+            // Приборы безопасности
+            analogSignal[CAB1_SIGLIGHT_PSS + d] = safety_device[cab_idx]->getStatePSS();
+            analogSignal[CAB1_SIGLIGHT_PROPUSK + d] = 0.0f;
 
-    analogSignal[TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB1].getState());
-    analogSignal[CAB2_TUMBLER_MK] = static_cast<float>(mk_tumbler[CAB2].getState());
+            // Сигнальные лампы
+            analogSignal[CAB1_SIGLIGHT_TR + d] = static_cast<float>(!motor_fans[MV3]->isReady() || !motor_fans[MV4]->isReady());
+            analogSignal[CAB1_SIGLIGHT_TD + d] = isLineContactorsOff();
+            analogSignal[CAB1_SIGLIGHT_0HP + d] = static_cast<float>(main_controller->isLongMotionPos());
+            analogSignal[CAB1_SIGLIGHT_VU1 + d] = static_cast<float>(!motor_fans[MV1]->isReady() || !motor_fans[MV2]->isReady());
+            analogSignal[CAB1_SIGLIGHT_VU2 + d] = static_cast<float>(!motor_fans[MV5]->isReady() || !motor_fans[MV6]->isReady());
 
-    analogSignal[TUMBLER_CU] = static_cast<float>(cu_tumbler[CAB1].getState());
-    analogSignal[CAB2_TUMBLER_CU] = static_cast<float>(cu_tumbler[CAB2].getState());
+            if (brake_lock[cab_idx]->isUnlocked())
+            {
+                analogSignal[CAB1_SIGLIGHT_EPB_CONTROL + d] = static_cast<float>(epb_control->stateReleaseLamp());
+                analogSignal[CAB1_SIGLIGHT_EPB_HOLD + d] = static_cast<float>(epb_control->stateHoldLamp());
+                analogSignal[CAB1_SIGLIGHT_EPB_BRAKE + d] = static_cast<float>(epb_control->stateBrakeLamp());
+            }
+            else
+            {
+                analogSignal[CAB1_SIGLIGHT_EPB_CONTROL + d] = 0.0f;
+                analogSignal[CAB1_SIGLIGHT_EPB_HOLD + d] = 0.0f;
+                analogSignal[CAB1_SIGLIGHT_EPB_BRAKE + d] = 0.0f;
+            }
+            analogSignal[CAB1_EPB_AMPERMETER + d] = static_cast<float>(abs(epb_converter->getOutputCurrent()) / 10.0);
 
-    // Вольтметр КС
-    analogSignal[STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
-    analogSignal[CAB2_STRELKA_KV2] = static_cast<float>(main_switch->getU_out() / 30000.0);
+            analogSignal[CAB1_SIGLIGHT_FR + d] = phase_spliter->isNotReady();
+            analogSignal[CAB1_SIGLIGHT_GU + d] = phase_spliter->isNotReady();
+            analogSignal[CAB1_SIGLIGHT_RB + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_GV + d] = main_switch->getLampState();
+            analogSignal[CAB1_SIGLIGHT_RZ_RKZ + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_RP + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_RPO + d] = 0.0f;
+        }
+        else
+        {
+            analogSignal[SPOTLIGHT_FWD + d] = 0.0f;
+            analogSignal[BUFFERLIGHT_FWD_L_WHITE + d] = 0.0f;
+            analogSignal[BUFFERLIGHT_FWD_L_RED + d] = 0.0f;
+            analogSignal[BUFFERLIGHT_FWD_R_WHITE + d] = 0.0f;
+            analogSignal[BUFFERLIGHT_FWD_R_RED + d] = 0.0f;
+            analogSignal[CAB1_LIGHT_CABINE + d] = 0.0f;
+            analogSignal[CAB1_LIGHT_DEVICES + d] = 0.0f;
 
-    // Вольтметр ТЭД
-    analogSignal[STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
-    analogSignal[CAB2_STRELKA_KV1] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
+            analogSignal[CAB1_LS_WHITE + d] = 0.0f;
+            analogSignal[CAB1_LS_RED + d] = 0.0f;
+            analogSignal[CAB1_LS_REDYELLOW + d] = 0.0f;
+            analogSignal[CAB1_LS_YELLOW + d] = 0.0f;
+            analogSignal[CAB1_LS_GREEN + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_PSS + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_PROPUSK + d] = 0.0f;
 
-    // Состояние главного выключателя
-    analogSignal[GV_POS] = static_cast<float>(main_switch->getKnifePos());
+            analogSignal[CAB1_SIGLIGHT_TR + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_TD + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_0HP + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_VU1 + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_VU2 + d] = 0.0f;
 
-    // Состояние локомотивного светофора
-    stepSafetyDevices(t, dt);
+            analogSignal[CAB1_SIGLIGHT_EPB_CONTROL + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_EPB_HOLD + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_EPB_BRAKE + d] = 0.0f;
+            analogSignal[CAB1_EPB_AMPERMETER + d] = 0.0f;
 
-    // Состояние контрольных ламп
-    analogSignal[SIG_LIGHT_GV] = main_switch->getLampState();
-    analogSignal[SIG_LIGHT_GU] = phase_spliter->isNotReady();
-    analogSignal[SIG_LIGHT_FR] = phase_spliter->isNotReady();
-    analogSignal[SIG_LIGHT_0HP] = static_cast<float>(main_controller->isLongMotionPos());
-    analogSignal[SIG_LIGHT_TR] = static_cast<float>(!motor_fans[MV3]->isReady() || !motor_fans[MV4]->isReady());
-    analogSignal[SIG_LIGHT_VU1] = static_cast<float>(!motor_fans[MV1]->isReady() || !motor_fans[MV2]->isReady());
-    analogSignal[SIG_LIGHT_VU2] = static_cast<float>(!motor_fans[MV5]->isReady() || !motor_fans[MV6]->isReady());
-    analogSignal[SIG_LIGHT_TD] = isLineContactorsOff();
+            analogSignal[CAB1_SIGLIGHT_FR + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_GU + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_RB + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_GV + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_RZ_RKZ + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_RP + d] = 0.0f;
+            analogSignal[CAB1_SIGLIGHT_RPO + d] = 0.0f;
+        }
 
-    analogSignal[KONTROLLER] = controller[CAB1]->getMainHandlePos();
-    analogSignal[REVERS] = controller[CAB1]->getReversHandlePos();
-    analogSignal[CAB2_KONTROLLER] = controller[CAB2]->getMainHandlePos();
-    analogSignal[CAB2_REVERS] = controller[CAB2]->getReversHandlePos();
+        // Скоростемер
+        analogSignal[CAB1_3SL2M_SPEED + d] = speed_meter[cab_idx]->getArrowPos();
+        analogSignal[CAB1_3SL2M_SHAFT + d] = speed_meter[cab_idx]->getShaftPos();
 
-    analogSignal[STRELKA_SELSIN] = analogSignal[CAB2_STRELKA_SELSIN] = main_controller->getSelsinPosition();
+        // Циферблаты
+        analogSignal[CAB1_P_BATTERY_AMPERMETER + d] = 0.0f;
+        analogSignal[CAB1_P_BATTERY_VOLTMETER + d] = static_cast<float>(U_bat);
+        analogSignal[CAB1_INPUT_VOLTAGE + d] = static_cast<float>(main_switch->getU_out() / 30000.0);
+        analogSignal[CAB1_ENGINE_VOLTAGE + d] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
+        if (cab_idx == CAB1)
+        {
+            analogSignal[CAB1_ENGINE_CURRENT_FWD + d] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
+            analogSignal[CAB1_ENGINE_CURRENT_BWD + d] = static_cast<float>(motor[TED4]->getIa() / 1500.0);
+        }
+        else
+        {
+            analogSignal[CAB1_ENGINE_CURRENT_FWD + d] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
+            analogSignal[CAB1_ENGINE_CURRENT_BWD + d] = static_cast<float>(motor[TED3]->getIa() / 1500.0);
+        }
+        analogSignal[CAB1_SELSIN_EKG_POS + d] = main_controller->getSelsinPosition();
+        analogSignal[CAB1_PRESSURE_BC + d] = static_cast<float>(brake_mech[TROLLEY_BWD]->getBCpressure() / 1.0);
+        analogSignal[CAB1_PRESSURE_FL + d] = static_cast<float>(main_reservoir->getPressure() / 1.6);
+        analogSignal[CAB1_PRESSURE_BP + d] = static_cast<float>(brakepipe->getPressure() / 1.0);
+        analogSignal[CAB1_PRESSURE_ER + d] = static_cast<float>(brake_crane[cab_idx]->getERpressure() / 1.0);
 
-    // Положение рукоятки комбинированного крана
-    analogSignal[KRAN_KOMBIN] = brake_lock[CAB1]->getCombCranePosition();
-    analogSignal[CAB2_KRAN_KOMBIN] = brake_lock[CAB2]->getCombCranePosition();
-    // Положение рукоятки УБТ
-    analogSignal[KLUCH_367] = brake_lock[CAB1]->getMainHandlePosition();
-    analogSignal[CAB2_KLUCH_367] = brake_lock[CAB2]->getMainHandlePosition();
+        // Контроллер машиниста
+        analogSignal[CAB1_KM_IS_REVERS_HANDLE + d] = static_cast<float>(controller[cab_idx]->isReversHandle());
+        analogSignal[CAB1_KM_REVERS_HANDLE_POS + d] = controller[cab_idx]->getReversHandlePos();
+        analogSignal[CAB1_KM_MAIN_HANDLE_POS + d] = controller[cab_idx]->getMainHandlePos();
 
-    analogSignal[STRELKA_AMP_EPT] = static_cast<float>(abs(epb_converter->getOutputCurrent()) / 10.0);
-    analogSignal[SIG_LIGHT_O] = static_cast<float>(epb_control->stateReleaseLamp());
-    analogSignal[SIG_LIGHT_P] = static_cast<float>(epb_control->stateHoldLamp());
-    analogSignal[SIG_LIGHT_T] = static_cast<float>(epb_control->stateBrakeLamp());
-    analogSignal[EPT_ON_OFF] = static_cast<float>(epb_switch[CAB1].getState());
-    analogSignal[CAB2_EPT_ON_OFF] = static_cast<float>(epb_switch[CAB2].getState());
+        // Рукоятка УБТ, комбинированный кран, поездной кран, локомотивный кран
+        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isUnlocked());
+        analogSignal[CAB1_UBT_KEY_HANDLE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getMainHandlePosition());
+        analogSignal[CAB1_UBT_COMBINE_CRANE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getCombCranePosition());
+        analogSignal[CAB1_BRAKE_CRANE_HANDLE_POS + d] = static_cast<float>(brake_crane[cab_idx]->getHandlePosition());
+        analogSignal[CAB1_LOCO_CRANE_HANDLE_POS + d] = static_cast<float>(loco_crane[cab_idx]->getHandlePosition());
 
-    // Манометр питательной магистрали
+        // ЭПК
+        analogSignal[CAB1_AUTOSTOP_SHUTOFF_POS + d] = 1.0f;
+        analogSignal[CAB1_AUTOSTOP_KEY_POS + d] = static_cast<float>(key_epk[cab_idx].getState());
 
-    analogSignal[STRELKA_M_HM] = analogSignal[CAB2_STRELKA_M_HM] = static_cast<float>(main_reservoir->getPressure() / 1.6);
-    // Манометр тормозной магистрали
-    analogSignal[STRELKA_M_TM] = analogSignal[CAB2_STRELKA_M_TM] = static_cast<float>(brakepipe->getPressure() / 1.0);
-    // Манометр уравнительного резервуара
-    analogSignal[STRELKA_M_UR] = static_cast<float>(brake_crane[CAB1]->getERpressure() / 1.0);
-    analogSignal[CAB2_STRELKA_M_UR] = static_cast<float>(brake_crane[CAB2]->getERpressure() / 1.0);
-    // Манометр давления в ТЦ
-    analogSignal[STRELKA_M_TC] = analogSignal[CAB2_STRELKA_M_TC] = static_cast<float>(brake_mech[TROLLEY_BWD]->getBCpressure() / 1.0);
+        // Дальний ряд тумблеров пульта машиниста
+        analogSignal[CAB1_TUMBLER_SPOTLIGHT_HIGH + d] = static_cast<float>(spotlight_high_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_SPOTLIGHT_LOW + d] = static_cast<float>(spotlight_low_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_RADIO + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_CONTROL_LINES + d] = static_cast<float>(cu_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_PANT1 + d] = static_cast<float>(pant1_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_PANT2 + d] = static_cast<float>(pant2_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_PANTS + d] = static_cast<float>(pants_tumbler[cab_idx].getState());
+        analogSignal[CAB1_RETURN_MAIN_SWITCH + d] = static_cast<float>(gv_return_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_MAIN_SWITCH + d] = static_cast<float>(gv_tumbler[cab_idx].getState());
 
-    // Положение рукоятки КрМ
-    analogSignal[KRAN395_RUK] = static_cast<float>(brake_crane[CAB1]->getHandlePosition());
-    analogSignal[CAB2_KRAN395_RUK] = static_cast<float>(brake_crane[CAB2]->getHandlePosition());
+        // Тумблер ЭПТ
+        analogSignal[CAB1_TUMBLER_EPB + d] = static_cast<float>(epb_switch[cab_idx].getState());
 
-    // Положение рукоятки КВТ
-    analogSignal[KRAN254_RUK] = static_cast<float>(loco_crane[CAB1]->getHandlePosition());
-    analogSignal[KRAN254_SHIFT] = static_cast<float>(loco_crane[CAB1]->getHandleShift());
-    analogSignal[CAB2_KRAN254_RUK] = static_cast<float>(loco_crane[CAB2]->getHandlePosition());
-    analogSignal[CAB2_KRAN254_SHIFT] = static_cast<float>(loco_crane[CAB2]->getHandleShift());
+        // Ближний ряд тумблеров пульта машиниста
+        analogSignal[CAB1_TUMBLER_AUTOSAND + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_FAN6 + d] = static_cast<float>(mv_tumblers[cab_idx][MV6].getState());
+        analogSignal[CAB1_TUMBLER_FAN5 + d] = static_cast<float>(mv_tumblers[cab_idx][MV5].getState());
+        analogSignal[CAB1_TUMBLER_FAN4 + d] = static_cast<float>(mv_tumblers[cab_idx][MV4].getState());
+        analogSignal[CAB1_TUMBLER_FAN3 + d] = static_cast<float>(mv_tumblers[cab_idx][MV3].getState());
+        analogSignal[CAB1_TUMBLER_FAN2 + d] = static_cast<float>(mv_tumblers[cab_idx][MV2].getState());
+        analogSignal[CAB1_TUMBLER_FAN1 + d] = static_cast<float>(mv_tumblers[cab_idx][MV1].getState());
+        analogSignal[CAB1_TUMBLER_COMPRESSOR + d] = static_cast<float>(mk_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_PHASESPLITTER + d] = static_cast<float>(fr_tumbler[cab_idx].getState());
 
-    analogSignal[STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
-    analogSignal[STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
-    analogSignal[CAB2_STRELKA_AMP1] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
-    analogSignal[CAB2_STRELKA_AMP2] = static_cast<float>(motor[TED6]->getIa() / 1500.0);
+        // Ряд тумблеров на приборной панели помощника машиниста
+        analogSignal[CAB1_TUMBLER_P_TIFON + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_WHISTLE + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_CAB_HEAT + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_CAB_LIGHT_LOW + d] = static_cast<float>(P_cab_light_low_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_CAB_LIGHT_HIGH + d] = static_cast<float>(P_cab_light_high_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_RESERVE1 + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_SHASSIS_LIGHT + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_DEVICES_LIGHT + d] = static_cast<float>(P_light_devices_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_BUFFERLIGHT_L + d] = static_cast<float>(P_bufferlight_L_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_BUFFERLIGHT_R + d] = static_cast<float>(P_bufferlight_R_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_RESERVE2 + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_ALSN_CHECK + d] = 0.0f;
+        analogSignal[CAB1_TOOGLE_P_BUFFERCOLOR_L + d] = static_cast<float>(P_buffercolor_L_toogle[cab_idx].getState());
+        analogSignal[CAB1_TOOGLE_P_BUFFERCOLOR_R + d] = static_cast<float>(P_buffercolor_R_toogle[cab_idx].getState());
 
-    analogSignal[STRELKA_SPEED] = speed_meter[CAB1]->getArrowPos();
-    analogSignal[VAL_PR_SKOR1] = speed_meter[CAB1]->getShaftPos();
-    analogSignal[VAL_PR_SKOR2] = speed_meter[CAB1]->getShaftPos();
-
-    analogSignal[CAB2_STRELKA_SPEED] = speed_meter[CAB2]->getArrowPos();
-    analogSignal[CAB2_VAL_PR_SKOR1] = speed_meter[CAB2]->getShaftPos();
-    analogSignal[CAB2_VAL_PR_SKOR2] = speed_meter[CAB2]->getShaftPos();
-
-    analogSignal[KNOPKA_RB_1] = static_cast<float>(rb[CAB1][RB_1].getState());
-    analogSignal[KNOPKA_RBS] = static_cast<float>(rb[CAB1][RBS].getState());
-    analogSignal[KNOPKA_RBP] = static_cast<float>(rb[CAB1][RBP].getState());
-
-    analogSignal[CAB2_KNOPKA_RB_1] = static_cast<float>(rb[CAB2][RB_1].getState());
-    analogSignal[CAB2_KNOPKA_RBS] = static_cast<float>(rb[CAB2][RBS].getState());
-    analogSignal[CAB2_KNOPKA_RBP] = static_cast<float>(rb[CAB2][RBP].getState());
-
-    analogSignal[WHEEL_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_2] = static_cast<float>(wheel_rotation_angle[1] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_3] = static_cast<float>(wheel_rotation_angle[2] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_4] = static_cast<float>(wheel_rotation_angle[3] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_5] = static_cast<float>(wheel_rotation_angle[4] / 2.0 / Physics::PI);
-    analogSignal[WHEEL_6] = static_cast<float>(wheel_rotation_angle[5] / 2.0 / Physics::PI);
-
-    // Лампы предварительной световой сигнализации УКБМ
-    analogSignal[SIG_LIGHT_PSS_L] = safety_device[CAB1]->getStatePSS();
-    analogSignal[SIG_LIGHT_PSS_R] = safety_device[CAB1]->getStatePSS();
-    analogSignal[SIG_LIGHT_PSS_PROPUSK] = 0.0f;
-    analogSignal[CAB2_SIG_LIGHT_PSS_L] = safety_device[CAB2]->getStatePSS();
-    analogSignal[CAB2_SIG_LIGHT_PSS_R] = safety_device[CAB2]->getStatePSS();
-    //analogSignal[CAB2_SIG_LIGHT_PSS_PROPUSK] = 0.0f;
-
-    // Лампы локомотивного светофора
-    analogSignal[LS_W] = safety_device[CAB1]->getWhiteLamp();
-    analogSignal[LS_YK] = safety_device[CAB1]->getRedYellowLamp();
-    analogSignal[LS_R] = safety_device[CAB1]->getRedLamp();
-    analogSignal[LS_Y] = safety_device[CAB1]->getYellowLamp();
-    analogSignal[LS_G] = safety_device[CAB1]->getGreenLamp();
-
-    analogSignal[CAB2_LS_W] = safety_device[CAB2]->getWhiteLamp();
-    analogSignal[CAB2_LS_YK] = safety_device[CAB2]->getRedYellowLamp();
-    analogSignal[CAB2_LS_R] = safety_device[CAB2]->getRedLamp();
-    analogSignal[CAB2_LS_Y] = safety_device[CAB2]->getYellowLamp();
-    analogSignal[CAB2_LS_G] = safety_device[CAB2]->getGreenLamp();
-
-    analogSignal[KLUCH_EPK] = static_cast<float>(key_epk[CAB1].getState());
-    analogSignal[CAB2_KLUCH_EPK] = static_cast<float>(key_epk[CAB2].getState());
-
-    analogSignal[CAB1_SPOTLIGHT] = static_cast<float>(spotlight[CAB1]->getIntensityHigh());
-    analogSignal[CAB1_SPOTLIGHT_LOW] = static_cast<float>(spotlight[CAB1]->getIntensityLow());
-    analogSignal[CAB2_SPOTLIGHT] = static_cast<float>(spotlight[CAB2]->getIntensityHigh());
-    analogSignal[CAB2_SPOTLIGHT_LOW] = static_cast<float>(spotlight[CAB2]->getIntensityLow());
-
-    analogSignal[CAB1_TUMBLER_PRG1] = static_cast<float>(spotlight_low_tumbler[CAB1].getState());
-    analogSignal[CAB1_TUMBLER_PRG2] = static_cast<float>(spotlight_high_tumbler[CAB1].getState());
-
-    analogSignal[CAB2_TUMBLER_PRG1] = static_cast<float>(spotlight_low_tumbler[CAB2].getState());
-    analogSignal[CAB2_TUMBLER_PRG2] = static_cast<float>(spotlight_high_tumbler[CAB2].getState());
+        analogSignal[CAB1_RBS + d] = static_cast<float>(rb[cab_idx][RBS].getState());
+        analogSignal[CAB1_RB_1 + d] = static_cast<float>(rb[cab_idx][RB_1].getState());
+        analogSignal[CAB1_RBP + d] = static_cast<float>(rb[cab_idx][RBP].getState());
+        analogSignal[CAB1_TIFON + d] = static_cast<float>(horn[cab_idx]->isTifon());
+        analogSignal[CAB1_WHISTLE + d] = static_cast<float>(horn[cab_idx]->isSvistok());
+        analogSignal[CAB1_SAND + d] = static_cast<float>(sand_system->isSandDelivery());
+    }
 }
