@@ -1020,7 +1020,7 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
                 vehicles[id]->setNeedDebugMsg(false);
         }
 
-        int id = controlled_clients[client_id].prev_vehicle_current;
+        id = controlled_clients[client_id].prev_vehicle_current;
         if ((id >= 0) && (id < vehicles.size()))
         {
             if (controlled_clients[client_id].vehicle_control_by_keyboard.need_debug_msg)

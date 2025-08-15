@@ -2,9 +2,9 @@
 <Config>
 	
 	<AnalogRotation>
-		<SignalID>303</SignalID>
-		<Duration>10.0</Duration>		
-		<Axis>1.0 0.0 0.0</Axis>
+		<SignalID>156</SignalID>
+		<Duration>10.0</Duration>
+		<Axis>0.1 0.0 0.0</Axis>
 	</AnalogRotation>
 
 	<KeyPoint>
@@ -21,6 +21,5 @@
 		<Param>1.0</Param>
 		<Value>63.0</Value>
 	</KeyPoint>
-
 
 </Config>

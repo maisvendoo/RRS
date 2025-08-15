@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<ModelAnimation>
-		<SignalID>40</SignalID>
+		<SignalID>101</SignalID>
 		<Duration>1.33</Duration>
 	</ModelAnimation>
 </Config>

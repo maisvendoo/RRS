@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 void VL60k::stepSignalsOutput(double t, double dt)
 {
-    analogSignal[SERIAL_NUMBER] = 1543.0f;
+    analogSignal[SERIAL_NUMBER] = 1737.0f;
 
     // Вращение колёсных пар
     analogSignal[WHEELSET_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);

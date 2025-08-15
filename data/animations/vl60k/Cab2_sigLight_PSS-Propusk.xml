@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<MaterialAnimation>
-		<SignalID>31</SignalID>
-		<Duration>3.0</Duration>
-		<EmissionColor>1.0 0.0 0.0</EmissionColor>
+		<SignalID>120</SignalID>
+		<Duration>1.0</Duration>
+		<EmissionColor>1.0 1.0 1.0</EmissionColor>
 	</MaterialAnimation>
 
 	<KeyPoint>
