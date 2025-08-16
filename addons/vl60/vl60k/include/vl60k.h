@@ -140,8 +140,8 @@ private:
     TriggerControl spotlight_high_tumbler[CABS_NUM];
     /// Триггер тумблера "Прожектор тусклый"
     TriggerControl spotlight_low_tumbler[CABS_NUM];
-//    /// Триггер тумблера "Радиостанция"
-//    TriggerControl radio_tumbler[CABS_NUM];
+    /// Триггер тумблера "Радиостанция"
+    TriggerControl radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
     TriggerControl cu_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник задний"
@@ -167,8 +167,8 @@ private:
         MV6 = 5
     };
 
-//    /// Тригер тумблера "Автоматическая подача песка"
-//    TriggerControl autosand_tumbler[CABS_NUM];
+    /// Тригер тумблера "Автоматическая подача песка"
+    TriggerControl autosand_tumbler[CABS_NUM];
     /// Триггеры тумблеров "Вентилятор 1-6"
     TriggerControl mv_tumblers[CABS_NUM][NUM_MOTOR_FANS];
     /// Триггер тумблера "Компрессор"
@@ -177,30 +177,30 @@ private:
     TriggerControl fr_tumbler[CABS_NUM];
 
     // Ряд тумблеров на приборной панели помощника машиниста
-//    /// Триггер тумблера "Тифон"
-//    TriggerControl P_tifon_tumbler[CABS_NUM];
-//    /// Триггер тумблера "Свисток"
-//    TriggerControl P_whistle_tumbler[CABS_NUM];
-//    /// Триггер тумблера "Обогрев кабины"
-//    TriggerControl P_cab_heat_tumbler[CABS_NUM];
+    /// Триггер тумблера "Тифон"
+    TriggerControl P_tifon_tumbler[CABS_NUM];
+    /// Триггер тумблера "Свисток"
+    TriggerControl P_whistle_tumbler[CABS_NUM];
+    /// Триггер тумблера "Обогрев кабины"
+    TriggerControl P_cab_heat_tumbler[CABS_NUM];
     /// Триггер тумблера "Тусклое освещение кабины"
     TriggerControl P_cab_light_low_tumbler[CABS_NUM];
     /// Триггер тумблера "Яркое освещение кабины"
     TriggerControl P_cab_light_high_tumbler[CABS_NUM];
-//    /// Триггер тумблера в резерве
-//    TriggerControl P_reserv1_tumbler[CABS_NUM];
-//    /// Триггер тумблера "Освещение ходовой"
-//    TriggerControl P_light_chassis_tumbler[CABS_NUM];
+    /// Триггер тумблера в резерве
+    TriggerControl P_reserv1_tumbler[CABS_NUM];
+    /// Триггер тумблера "Освещение ходовой"
+    TriggerControl P_light_chassis_tumbler[CABS_NUM];
     /// Триггер тумблера "Освещение приборов"
     TriggerControl P_light_devices_tumbler[CABS_NUM];
     /// Триггер тумблера "Фонарь левый буферный"
     TriggerControl P_bufferlight_L_tumbler[CABS_NUM];
     /// Триггер тумблера "Фонарь правый буферный"
     TriggerControl P_bufferlight_R_tumbler[CABS_NUM];
-//    /// Триггер тумблера в резерве
-//    TriggerControl P_reserv2_tumbler[CABS_NUM];
-//    /// Триггер тумблера "Проверка АЛСН"
-//    TriggerControl P_ALSN_check_tumbler[CABS_NUM];
+    /// Триггер тумблера в резерве
+    TriggerControl P_reserv2_tumbler[CABS_NUM];
+    /// Триггер тумблера "Проверка АЛСН"
+    TriggerControl P_ALSN_check_tumbler[CABS_NUM];
 
     /// Триггер тумблера "Левый буферный белый/красный"
     TriggerControl P_buffercolor_L_toogle[CABS_NUM];

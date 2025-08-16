@@ -223,7 +223,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
         // Дальний ряд тумблеров пульта машиниста
         analogSignal[CAB1_TUMBLER_SPOTLIGHT_HIGH + d] = static_cast<float>(spotlight_high_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_SPOTLIGHT_LOW + d] = static_cast<float>(spotlight_low_tumbler[cab_idx].getState());
-        analogSignal[CAB1_TUMBLER_RADIO + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_RADIO + d] = static_cast<float>(radio_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_CONTROL_LINES + d] = static_cast<float>(cu_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_PANT1 + d] = static_cast<float>(pant1_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_PANT2 + d] = static_cast<float>(pant2_tumbler[cab_idx].getState());
@@ -235,7 +235,7 @@ void VL60pk::stepSignalsOutput(double t, double dt)
         analogSignal[CAB1_TUMBLER_EPB + d] = static_cast<float>(epb_switch[cab_idx].getState());
 
         // Ближний ряд тумблеров пульта машиниста
-        analogSignal[CAB1_TUMBLER_AUTOSAND + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_AUTOSAND + d] = static_cast<float>(autosand_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_FAN6 + d] = static_cast<float>(mv_tumblers[cab_idx][MV6].getState());
         analogSignal[CAB1_TUMBLER_FAN5 + d] = static_cast<float>(mv_tumblers[cab_idx][MV5].getState());
         analogSignal[CAB1_TUMBLER_FAN4 + d] = static_cast<float>(mv_tumblers[cab_idx][MV4].getState());
@@ -246,18 +246,18 @@ void VL60pk::stepSignalsOutput(double t, double dt)
         analogSignal[CAB1_TUMBLER_PHASESPLITTER + d] = static_cast<float>(fr_tumbler[cab_idx].getState());
 
         // Ряд тумблеров на приборной панели помощника машиниста
-        analogSignal[CAB1_TUMBLER_P_TIFON + d] = 0.0f;
-        analogSignal[CAB1_TUMBLER_P_WHISTLE + d] = 0.0f;
-        analogSignal[CAB1_TUMBLER_P_CAB_HEAT + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_TIFON + d] = static_cast<float>(P_tifon_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_WHISTLE + d] = static_cast<float>(P_whistle_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_CAB_HEAT + d] = static_cast<float>(P_cab_heat_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_P_CAB_LIGHT_LOW + d] = static_cast<float>(P_cab_light_low_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_P_CAB_LIGHT_HIGH + d] = static_cast<float>(P_cab_light_high_tumbler[cab_idx].getState());
-        analogSignal[CAB1_TUMBLER_P_RESERVE1 + d] = 0.0f;
-        analogSignal[CAB1_TUMBLER_P_SHASSIS_LIGHT + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_RESERVE1 + d] = static_cast<float>(P_reserv1_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_SHASSIS_LIGHT + d] = static_cast<float>(P_light_chassis_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_P_DEVICES_LIGHT + d] = static_cast<float>(P_light_devices_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_P_BUFFERLIGHT_L + d] = static_cast<float>(P_bufferlight_L_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_P_BUFFERLIGHT_R + d] = static_cast<float>(P_bufferlight_R_tumbler[cab_idx].getState());
-        analogSignal[CAB1_TUMBLER_P_RESERVE2 + d] = 0.0f;
-        analogSignal[CAB1_TUMBLER_P_ALSN_CHECK + d] = 0.0f;
+        analogSignal[CAB1_TUMBLER_P_RESERVE2 + d] = static_cast<float>(P_reserv2_tumbler[cab_idx].getState());
+        analogSignal[CAB1_TUMBLER_P_ALSN_CHECK + d] = static_cast<float>(P_ALSN_check_tumbler[cab_idx].getState());
         analogSignal[CAB1_TOOGLE_P_BUFFERCOLOR_L + d] = static_cast<float>(P_buffercolor_L_toogle[cab_idx].getState());
         analogSignal[CAB1_TOOGLE_P_BUFFERCOLOR_R + d] = static_cast<float>(P_buffercolor_R_toogle[cab_idx].getState());
 

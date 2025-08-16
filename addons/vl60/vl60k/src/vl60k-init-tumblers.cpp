@@ -27,8 +27,8 @@ void VL60k::initTumblers(const QString &modules_dir, const QString &custom_cfg_d
         spotlight_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
         spotlight_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-//        // Триггер тумблера "Радиостанция"
-//        radio_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Радиостанция"
+        radio_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Цепи управления"
         cu_tumbler[cab_idx].setKeySymbolOn(KEY_Y);
@@ -73,8 +73,8 @@ void VL60k::initTumblers(const QString &modules_dir, const QString &custom_cfg_d
         gv_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Ближний ряд тумблеров приборной панели машиниста
-//        // Тригер тумблера "Автоматическая подача песка"
-//        autosand_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Автоматическая подача песка"
+        autosand_tumbler[cab_idx].setInitState(false);
 
         // Триггеры тумблеров "Вентилятор 1-6"
         mv_tumblers[cab_idx][MV1].setKeySymbolOn(KEY_1);
@@ -128,14 +128,14 @@ void VL60k::initTumblers(const QString &modules_dir, const QString &custom_cfg_d
         fr_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Ряд тумблеров на приборной панели помощника машиниста
-//        // Триггер тумблера "Тифон"
-//        P_tifon_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Тифон"
+        P_tifon_tumbler[cab_idx].setInitState(false);
 
-//        // Триггер тумблера "Свисток"
-//        P_whistle_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Свисток"
+        P_whistle_tumbler[cab_idx].setInitState(false);
 
-//        // Триггер тумблера "Обогрев кабины"
-//        P_cab_heat_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Обогрев кабины"
+        P_cab_heat_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Тусклое освещение кабины"
         P_cab_light_low_tumbler[cab_idx].setKeySymbolOn(KEY_K);
@@ -151,11 +151,11 @@ void VL60k::initTumblers(const QString &modules_dir, const QString &custom_cfg_d
         P_cab_light_high_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
         P_cab_light_high_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-//        // Триггер тумблера в резерве
-//        P_reserv1_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера в резерве
+        P_reserv1_tumbler[cab_idx].setInitState(false);
 
-//        // Триггер тумблера "Освещение ходовой"
-//        P_light_chassis_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Освещение ходовой"
+        P_light_chassis_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Освещение приборов"
         P_light_devices_tumbler[cab_idx].setKeySymbolOn(KEY_L);
@@ -178,11 +178,11 @@ void VL60k::initTumblers(const QString &modules_dir, const QString &custom_cfg_d
         P_bufferlight_R_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
         P_bufferlight_R_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-//        // Триггер тумблера в резерве
-//        P_reserv2_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера в резерве
+        P_reserv2_tumbler[cab_idx].setInitState(false);
 
-//        // Триггер тумблера "Проверка АЛСН"
-//        P_ALSN_check_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Триггер тумблера "Проверка АЛСН"
+        P_ALSN_check_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Левый буферный белый/красный"
         P_buffercolor_L_toogle[cab_idx].setKeySymbolOn(KEY_G);

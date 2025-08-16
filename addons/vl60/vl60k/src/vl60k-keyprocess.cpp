@@ -161,7 +161,7 @@ void VL60k::keyProcess()
         // Дальний ряд тумблеров приборной панели машиниста
         spotlight_high_tumbler[cab_idx].step();
         spotlight_low_tumbler[cab_idx].step();
-//        radio_tumbler[cabine_idx].step();
+        radio_tumbler[cab_idx].step();
         cu_tumbler[cab_idx].step();
         pant2_tumbler[cab_idx].step();
         pant1_tumbler[cab_idx].step();
@@ -170,7 +170,7 @@ void VL60k::keyProcess()
         gv_tumbler[cab_idx].step();
 
         // Ближний ряд тумблеров приборной панели машиниста
-//        autosand_tumbler[cab_idx].step();
+        autosand_tumbler[cab_idx].step();
         mv_tumblers[cab_idx][MV1].step();
         mv_tumblers[cab_idx][MV2].step();
         mv_tumblers[cab_idx][MV3].step();
@@ -181,18 +181,18 @@ void VL60k::keyProcess()
         fr_tumbler[cab_idx].step();
 
         // Ряд тумблеров на приборной панели помощника машиниста
-//        P_tifon_tumbler[cab_idx].step();
-//        P_whistle_tumbler[cab_idx].step();
-//        P_cab_heat_tumbler[cab_idx].step();
+        P_tifon_tumbler[cab_idx].step();
+        P_whistle_tumbler[cab_idx].step();
+        P_cab_heat_tumbler[cab_idx].step();
         P_cab_light_low_tumbler[cab_idx].step();
         P_cab_light_high_tumbler[cab_idx].step();
-//        P_reserv1_tumbler[cab_idx].step();
-//        P_light_chassis_tumbler[cab_idx].step();
+        P_reserv1_tumbler[cab_idx].step();
+        P_light_chassis_tumbler[cab_idx].step();
         P_light_devices_tumbler[cab_idx].step();
         P_bufferlight_L_tumbler[cab_idx].step();
         P_bufferlight_R_tumbler[cab_idx].step();
-//        P_reserv2_tumbler[cab_idx].step();
-//        P_ALSN_check_tumbler[cab_idx].step();
+        P_reserv2_tumbler[cab_idx].step();
+        P_ALSN_check_tumbler[cab_idx].step();
         P_buffercolor_L_toogle[cab_idx].step();
         P_buffercolor_R_toogle[cab_idx].step();
 
