@@ -77,7 +77,7 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
         analogSignal[CAB1_SOUND_TUMBLER_MAIN_SWITCH_ON + d] = gv_tumbler[cab_idx].getSoundSignal(Trigger::ON_SOUND);
 
         // Тумблер ЭПТ
-        analogSignal[CAB1_SOUND_TUMBLER_EPB_ON + d] = gv_tumbler[cab_idx].getSoundSignal(Trigger::ON_SOUND);
+        analogSignal[CAB1_SOUND_TUMBLER_EPB_ON + d] = epb_switch[cab_idx].getSoundSignal(Trigger::ON_SOUND);
 
         // Ближний ряд тумблеров приборной панели машиниста
         analogSignal[CAB1_SOUND_TUMBLER_AUTOSAND_ON + d] = autosand_tumbler[cab_idx].getSoundSignal(Trigger::ON_SOUND);
@@ -122,7 +122,7 @@ void VL60pk::stepSoundSignalsOutput(double t, double dt)
         analogSignal[CAB1_SOUND_TUMBLER_MAIN_SWITCH_OFF + d] = gv_tumbler[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
 
         // Тумблер ЭПТ
-        analogSignal[CAB1_SOUND_TUMBLER_EPB_OFF + d] = gv_tumbler[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
+        analogSignal[CAB1_SOUND_TUMBLER_EPB_OFF + d] = epb_switch[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
 
         // Ближний ряд тумблеров приборной панели машиниста
         analogSignal[CAB1_SOUND_TUMBLER_AUTOSAND_OFF + d] = autosand_tumbler[cab_idx].getSoundSignal(Trigger::OFF_SOUND);

@@ -184,14 +184,14 @@ void VL60pk::stepSignalsOutput(double t, double dt)
         analogSignal[CAB1_3SL2M_SHAFT + d] = speed_meter[cab_idx]->getShaftPos();
 
         // Циферблаты
-        analogSignal[CAB1_P_BATTERY_AMPERMETER + d] = 0.0f;
-        analogSignal[CAB1_P_BATTERY_VOLTMETER + d] = static_cast<float>(U_bat);
+        analogSignal[CAB1_P_AUX_PRESSURE + d] = 0.0f;
+        analogSignal[CAB1_P_BATTERY_VOLTMETER + d] = static_cast<float>(U_bat / 150.0);
         analogSignal[CAB1_INPUT_VOLTAGE + d] = static_cast<float>(main_switch->getU_out() / 30000.0);
         analogSignal[CAB1_ENGINE_VOLTAGE + d] = static_cast<float>(gauge_KV_motors->getOutput() / 3000.0);
         if (cab_idx == CAB1)
         {
-            analogSignal[CAB1_ENGINE_CURRENT_FWD + d] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
-            analogSignal[CAB1_ENGINE_CURRENT_BWD + d] = static_cast<float>(motor[TED4]->getIa() / 1500.0);
+            analogSignal[CAB1_ENGINE_CURRENT_FWD] = static_cast<float>(motor[TED1]->getIa() / 1500.0);
+            analogSignal[CAB1_ENGINE_CURRENT_BWD] = static_cast<float>(motor[TED4]->getIa() / 1500.0);
         }
         else
         {
