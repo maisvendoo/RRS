@@ -4,13 +4,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TriggerControlTimedelay::TriggerControlTimedelay(double timeout_on,
-                                                 double timeout_off) : TriggerControl(), QObject()
+TriggerControlTimedelay::TriggerControlTimedelay(double timeout_on, double timeout_off) : TriggerControl()
 {
     timer_on = new Timer(timeout_on, false);
     timer_off = new Timer(timeout_off, false);
-    connect(timer_on, &Timer::process, this, &TriggerControlTimedelay::slotTimeoutProcessOn);
-    connect(timer_off, &Timer::process, this, &TriggerControlTimedelay::slotTimeoutProcessOff);
 }
 
 //------------------------------------------------------------------------------
@@ -43,7 +40,7 @@ void TriggerControlTimedelay::setTimeoutOff(double timeout)
 //------------------------------------------------------------------------------
 bool TriggerControlTimedelay::getRefState() const
 {
-    return (timer_on->isStarted() || (!timer_off->isStarted() && getState()));
+    return (timer_on->isStarted() || (!timer_off->isStarted() && state));
 }
 
 //------------------------------------------------------------------------------
@@ -51,8 +48,17 @@ bool TriggerControlTimedelay::getRefState() const
 //------------------------------------------------------------------------------
 void TriggerControlTimedelay::step(double t, double dt)
 {
-    timer_on->step(t, dt);
-    timer_off->step(t, dt);
+    if (timer_on->step(t, dt))
+    {
+        set();
+        timer_on->stop();
+    }
+
+    if (timer_off->step(t, dt))
+    {
+        reset();
+        timer_off->stop();
+    }
 
     // Режим "кнопка" (не задана клавиша отключения)
     if (is_button)
@@ -128,22 +134,4 @@ void TriggerControlTimedelay::resetAfterDelay()
     // Команда отпустить кнопку
     if (!timer_off->isStarted())
         timer_off->start();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TriggerControlTimedelay::slotTimeoutProcessOn()
-{
-    set();
-    timer_on->stop();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TriggerControlTimedelay::slotTimeoutProcessOff()
-{
-    reset();
-    timer_off->stop();
 }

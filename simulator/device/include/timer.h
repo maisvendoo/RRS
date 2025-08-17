@@ -25,8 +25,9 @@ public:
 
     ~Timer();
 
-    /// Step (excecuted in integraion step)
-    void step(double t, double dt);
+    /// Step (excecuted in integraion step).
+    /// When timeout is reached, emit process() and return true
+    bool step(double t, double dt);
 
     /// Start timer
     void start();

@@ -10,7 +10,7 @@ class Timer;
 // Триггер с управлением по сигналам от клавиатуры,
 // с возможностью задать задержку срабатывания
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT TriggerControlTimedelay final : public TriggerControl, public QObject
+class DEVICE_EXPORT TriggerControlTimedelay final : public TriggerControl
 {
 public:
 
@@ -40,10 +40,6 @@ private:
     void setAfterDelay();
     void resetAfterDelay();
 
-private slots:
-
-    void slotTimeoutProcessOn();
-    void slotTimeoutProcessOff();
 };
 
 #endif // TRIGGER_CONTROL_TIMEDELAY_H
