@@ -3,33 +3,39 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trigger::setInitState(bool is_state_true)
+bool Trigger::setInitState(bool is_state_true)
 {
+    if (state == is_state_true)
+        return false;
+
     state = is_state_true;
+    return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trigger::set()
+bool Trigger::set()
 {
     if (state)
-        return;
+        return false;
 
     state = true;
     sound_change_state.play(); // Изменяем счётчик включений звука
+    return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trigger::reset()
+bool Trigger::reset()
 {
     if (!state)
-        return;
+        return false;
 
     state = false;
     sound_change_state.play(); // Изменяем счётчик включений звука
+    return true;
 }
 
 //------------------------------------------------------------------------------

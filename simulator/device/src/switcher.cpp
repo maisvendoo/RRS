@@ -20,19 +20,7 @@ void Switcher::setNumPositions(std::uint16_t num_positions)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::setInitPosition(std::uint16_t position)
-{
-    if (position >= num_states)
-    {
-        position = (position > num_states) ? 0 : (num_states - 1);
-    }
-    state = position;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Switcher::setPosition(std::uint16_t position)
+bool Switcher::setInitPosition(std::uint16_t position)
 {
     if (position >= num_states)
     {
@@ -41,35 +29,59 @@ void Switcher::setPosition(std::uint16_t position)
 
     if (state == position)
     {
-        return;
+        return false;
     }
 
     state = position;
-    switch_sound.play();
+    return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::incPos()
+bool Switcher::setPosition(std::uint16_t position)
+{
+    if (position >= num_states)
+    {
+        position = (position > num_states) ? 0 : (num_states - 1);
+    }
+
+    if (state == position)
+    {
+        return false;
+    }
+
+    state = position;
+    switch_sound.play();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Switcher::incPos()
 {
     if (state < (num_states - 1))
     {
         ++state;
         switch_sound.play();
+        return true;
     }
+    return false;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switcher::decPos()
+bool Switcher::decPos()
 {
     if (state)
     {
         --state;
         switch_sound.play();
+        return true;
     }
+    return false;
 }
 
 //------------------------------------------------------------------------------

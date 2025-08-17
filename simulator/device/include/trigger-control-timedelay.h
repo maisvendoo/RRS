@@ -28,7 +28,7 @@ public:
     /// Целевое состояние (полезно для анимаций кнопок)
     bool getRefState() const;
 
-    void step(double t, double dt) override;
+    bool step(double t, double dt) override;
 
 protected:
 

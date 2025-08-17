@@ -21,17 +21,17 @@ public:
     /// Задать количество позиций
     void setNumPositions(std::uint16_t num_positions);
 
-    /// Задать начальную позицию (без озвучки)
-    void setInitPosition(std::uint16_t position);
+    /// Задать начальную позицию (без озвучки), возвращает true если состояние изменилось
+    bool setInitPosition(std::uint16_t position);
 
-    /// Задать позицию
-    void setPosition(std::uint16_t position);
+    /// Задать позицию, возвращает true если состояние изменилось
+    bool setPosition(std::uint16_t position);
 
-    /// Следующая позиция
-    void incPos();
+    /// Следующая позиция, возвращает true если состояние изменилось
+    bool incPos();
 
-    /// Предыдущая позиция
-    void decPos();
+    /// Предыдущая позиция, возвращает true если состояние изменилось
+    bool decPos();
 
     /// Количество позиций
     std::uint16_t getNumPositions() const;

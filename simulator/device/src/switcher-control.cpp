@@ -67,7 +67,7 @@ void SwitcherControl::setSpringLast(bool is_spring)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SwitcherControl::step(double t, double dt)
+bool SwitcherControl::step(double t, double dt)
 {
     (void) t;
     (void) dt;
@@ -76,17 +76,18 @@ void SwitcherControl::step(double t, double dt)
     // для переключения в следующую/предыдущую позицию, ничего не делаем
     if ((!pressed_keys) || pressed_keys->empty())
     {
+        prev_key_dec = false;
+        prev_key_inc = false;
+
         // Автовозврат вперёд
         if (is_spring_first && (state == 0))
-            incPos();
+            return incPos();
 
         // Автовозврат назад
         if (is_spring_last && (state == (num_states - 1)))
-            decPos();
+            return decPos();
 
-        prev_key_dec = false;
-        prev_key_inc = false;
-        return;
+        return false;
     }
 
     bool allow_spring_first = is_spring_first;
@@ -94,10 +95,12 @@ void SwitcherControl::step(double t, double dt)
 
     if ((getKeyState(pressed_keys, key_symbol_dec) && isModifier(pressed_keys, key_modifier_dec)))
     {
+        prev_key_inc = false;
+
         if (!prev_key_dec)
         {
-            decPos(); // Переключение назад новым нажатием на клавишу
             prev_key_dec = true; // Запоминаем, что клавиша назад нажата
+            return decPos(); // Переключение назад новым нажатием на клавишу
         }
         // Запрет автовозврата вперёд
         allow_spring_first = false;
@@ -110,8 +113,8 @@ void SwitcherControl::step(double t, double dt)
         {
             if (!prev_key_inc)
             {
-                incPos(); // Переключение вперёд новым нажатием на клавишу
                 prev_key_inc = true; // Запоминаем, что клавиша вперёд нажата
+                return incPos(); // Переключение вперёд новым нажатием на клавишу
             }
             // Запрет автовозврата назад
             allow_spring_last = false;
@@ -124,9 +127,11 @@ void SwitcherControl::step(double t, double dt)
 
     // Автовозврат вперёд
     if (allow_spring_first && (state == 0))
-        incPos();
+        return incPos();
 
     // Автовозврат назад
     if (allow_spring_last && (state == (num_states - 1)))
-        decPos();
+        return decPos();
+
+    return false;
 }

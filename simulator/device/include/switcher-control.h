@@ -38,8 +38,8 @@ public:
     /// Задать подпружиненный автовозврат из последней позиции в предыдущую
     void setSpringLast(bool is_spring = true);
 
-    /// Шаг симуляции для управления триггером
-    virtual void step(double t = 0.0, double dt = 0.0);
+    /// Шаг симуляции для управления триггером, возвращает true если состояние изменилось
+    virtual bool step(double t = 0.0, double dt = 0.0);
 
 protected:
 

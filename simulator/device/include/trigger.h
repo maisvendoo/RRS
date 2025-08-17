@@ -17,14 +17,14 @@ public:
 
     ~Trigger() = default;
 
-    /// Задать начальное состояние (без озвучки)
-    void setInitState(bool is_state_true);
+    /// Задать начальное состояние (без озвучки), возвращает true если состояние изменилось
+    bool setInitState(bool is_state_true);
 
-    /// Включить триггер
-    void set();
+    /// Включить триггер, возвращает true если состояние изменилось
+    bool set();
 
-    /// Отключить триггер
-    void reset();
+    /// Отключить триггер, возвращает true если состояние изменилось
+    bool reset();
 
     /// Состояние триггера
     virtual bool getState() const;
