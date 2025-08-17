@@ -78,12 +78,14 @@ void SwitcherControl::step(double t, double dt)
     {
         // Автовозврат вперёд
         if (is_spring_first && (state == 0))
-            setPosition(state + 1);
+            incPos();
 
         // Автовозврат назад
         if (is_spring_last && (state == (num_states - 1)))
-            setPosition(state - 1);
+            decPos();
 
+        prev_key_dec = false;
+        prev_key_inc = false;
         return;
     }
 
@@ -94,8 +96,8 @@ void SwitcherControl::step(double t, double dt)
     {
         if (!prev_key_dec)
         {
-            setPosition(state - 1); // Переключение назад новым нажатием на клавишу
-            prev_key_dec = true;    // Запоминаем, что клавиша назад нажата
+            decPos(); // Переключение назад новым нажатием на клавишу
+            prev_key_dec = true; // Запоминаем, что клавиша назад нажата
         }
         // Запрет автовозврата вперёд
         allow_spring_first = false;
@@ -108,8 +110,8 @@ void SwitcherControl::step(double t, double dt)
         {
             if (!prev_key_inc)
             {
-                setPosition(state + 1); // Переключение вперёд новым нажатием на клавишу
-                prev_key_inc = true;    // Запоминаем, что клавиша вперёд нажата
+                incPos(); // Переключение вперёд новым нажатием на клавишу
+                prev_key_inc = true; // Запоминаем, что клавиша вперёд нажата
             }
             // Запрет автовозврата назад
             allow_spring_last = false;
@@ -122,9 +124,9 @@ void SwitcherControl::step(double t, double dt)
 
     // Автовозврат вперёд
     if (allow_spring_first && (state == 0))
-        setPosition(state + 1);
+        incPos();
 
     // Автовозврат назад
     if (allow_spring_last && (state == (num_states - 1)))
-        setPosition(state - 1);
+        decPos();
 }

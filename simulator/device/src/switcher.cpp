@@ -1,7 +1,5 @@
 #include "switcher.h"
 
-#include <algorithm>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -15,7 +13,7 @@ Switcher::Switcher(std::uint16_t num_positions)
 //------------------------------------------------------------------------------
 void Switcher::setNumPositions(std::uint16_t num_positions)
 {
-    if (num_positions)
+    if (num_positions > 1)
         num_states = num_positions;
 }
 
@@ -24,7 +22,11 @@ void Switcher::setNumPositions(std::uint16_t num_positions)
 //------------------------------------------------------------------------------
 void Switcher::setInitPosition(std::uint16_t position)
 {
-    state = std::clamp(position, static_cast<std::uint16_t>(0), static_cast<std::uint16_t>(num_states - 1));
+    if (position >= num_states)
+    {
+        position = (position > num_states) ? 0 : (num_states - 1);
+    }
+    state = position;
 }
 
 //------------------------------------------------------------------------------
@@ -32,7 +34,11 @@ void Switcher::setInitPosition(std::uint16_t position)
 //------------------------------------------------------------------------------
 void Switcher::setPosition(std::uint16_t position)
 {
-    position = std::clamp(position, static_cast<std::uint16_t>(0), static_cast<std::uint16_t>(num_states - 1));
+    if (position >= num_states)
+    {
+        position = (position > num_states) ? 0 : (num_states - 1);
+    }
+
     if (state == position)
     {
         return;
@@ -47,7 +53,11 @@ void Switcher::setPosition(std::uint16_t position)
 //------------------------------------------------------------------------------
 void Switcher::incPos()
 {
-    setPosition(state + 1);
+    if (state < (num_states - 1))
+    {
+        ++state;
+        switch_sound.play();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -55,7 +65,11 @@ void Switcher::incPos()
 //------------------------------------------------------------------------------
 void Switcher::decPos()
 {
-    setPosition(state - 1);
+    if (state)
+    {
+        --state;
+        switch_sound.play();
+    }
 }
 
 //------------------------------------------------------------------------------

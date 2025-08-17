@@ -57,7 +57,7 @@ protected:
     std::uint16_t state = 0;
 
     /// Количество позиций переключателя
-    std::uint16_t num_states = 1;
+    std::uint16_t num_states = 2;
 
     /// Звук переключения позиции
     sound_state_t switch_sound = sound_state_t();

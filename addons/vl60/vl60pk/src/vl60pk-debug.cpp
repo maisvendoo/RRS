@@ -2,6 +2,7 @@
 
 #include "alsn-ukbm.h"
 #include "ALSN-coil.h"
+#include "automatic-train-stop.h"
 #include "brake-crane.h"
 #include "brake-lock.h"
 #include "brake-mech.h"
@@ -48,26 +49,36 @@ void VL60pk::debugPrint()
     {
         DebugMsg += QString("NO REVERS HANDLE|");
     }
-    DebugMsg += QString("Limit %1km/h(%2km/h|%3m)|")
-                    .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0)
-                    .arg(speedmap_fwd->getNextLimit(), 3, 'f', 0)
-                    .arg(speedmap_fwd->getNextLimitDistance(), 6, 'f', 1);
-    DebugMsg += QString("Code %1 (%2 Hz)| %3 (%4 m)")
-                    .arg(coil_ALSN_fwd->getCode(), 1)
-                    .arg(coil_ALSN_fwd->getFrequency(), 3, 'f', 0)
-                    .arg(coil_ALSN_fwd->getNextSignalLiter())
-                    .arg(coil_ALSN_fwd->getNextSignalDistance(), 6, 'f', 1);
 
     if (key_epk[CAB1].getState())
     {
         if (safety_device[CAB1]->getEPKstate())
-            DebugMsg += QString(" EPK on");
+        {
+            DebugMsg += QString("EPK on|");
+            DebugMsg += QString("limit %1km/h(%2km/h|%3m)|")
+                            .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0)
+                            .arg(speedmap_fwd->getNextLimit(), 3, 'f', 0)
+                            .arg(speedmap_fwd->getNextLimitDistance(), 6, 'f', 1);
+        }
         else
-            DebugMsg += QString(" EPK WHISTLE");
+        {
+            if (epk[CAB1]->getEmergencyBrakeContact())
+                DebugMsg += QString("EPK EMERGENCY |");
+            else
+                DebugMsg += QString("EPK  WHISTLE  |");
+
+            DebugMsg += QString("limit %1km/h|")
+                            .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0);
+        }
+        DebugMsg += QString("Code %1 (%2 Hz)| %3 (%4 m)")
+                        .arg(coil_ALSN_fwd->getCode(), 1)
+                        .arg(coil_ALSN_fwd->getFrequency(), 3, 'f', 0)
+                        .arg(coil_ALSN_fwd->getNextSignalLiter())
+                        .arg(coil_ALSN_fwd->getNextSignalDistance(), 6, 'f', 1);
     }
     else
     {
-        DebugMsg += QString(" EPK off");
+        DebugMsg += QString("EPK off");
     }
 
     DebugMsg += QString("\n");
@@ -146,22 +157,31 @@ void VL60pk::debugPrint()
         DebugMsg += QString("NO REVERS HANDLE|");
     }
 
-    DebugMsg += QString("Limit %1km/h(%2km/h|%3m)|")
-                    .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0)
-                    .arg(speedmap_bwd->getNextLimit(), 3, 'f', 0)
-                    .arg(speedmap_bwd->getNextLimitDistance(), 6, 'f', 1);
-    DebugMsg += QString("Code %1 (%2 Hz)| %3 (%4 m)")
-                    .arg(coil_ALSN_bwd->getCode(), 1)
-                    .arg(coil_ALSN_bwd->getFrequency(), 3, 'f', 0)
-                    .arg(coil_ALSN_bwd->getNextSignalLiter())
-                    .arg(coil_ALSN_bwd->getNextSignalDistance(), 6, 'f', 1);
-
     if (key_epk[CAB2].getState())
     {
         if (safety_device[CAB2]->getEPKstate())
-            DebugMsg += QString(" EPK on");
+        {
+            DebugMsg += QString(" EPK on|");
+            DebugMsg += QString("limit %1km/h(%2km/h|%3m)|")
+                            .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0)
+                            .arg(speedmap_bwd->getNextLimit(), 3, 'f', 0)
+                            .arg(speedmap_bwd->getNextLimitDistance(), 6, 'f', 1);
+        }
         else
-            DebugMsg += QString(" EPK WHISTLE");
+        {
+            if (epk[CAB2]->getEmergencyBrakeContact())
+                DebugMsg += QString(" EPK EMERGENCY |");
+            else
+                DebugMsg += QString(" EPK  WHISTLE  |");
+
+            DebugMsg += QString("limit %1km/h|")
+                            .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0);
+        }
+        DebugMsg += QString("Code %1 (%2 Hz)| %3 (%4 m)")
+                        .arg(coil_ALSN_bwd->getCode(), 1)
+                        .arg(coil_ALSN_bwd->getFrequency(), 3, 'f', 0)
+                        .arg(coil_ALSN_bwd->getNextSignalLiter())
+                        .arg(coil_ALSN_bwd->getNextSignalDistance(), 6, 'f', 1);
     }
     else
     {
