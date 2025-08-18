@@ -311,16 +311,14 @@ void BrakeLock::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void BrakeLock::stepKeysControl(double t, double dt)
 {
-    // Управление ручкой блокировочного устройства
+    incCombCrane->step(t, dt);
+    decCombCrane->step(t, dt);
+
+    // Управление блокировочным устройством и комбинированным краном
     if (getKeyState(KEY_BackSpace))
     {
-        setState(isShift());
-    }
-
-    // Управление комбинированным краном
-    if (getKeyState(KEY_L))
-    {
-        if (isShift())
+        // Shift - комбинированный кран по часовой стрелке
+        if (isShift() && (!isControl()) && (!isAlt()))
         {
             decCombCrane->stop();
 
@@ -331,8 +329,19 @@ void BrakeLock::stepKeysControl(double t, double dt)
         {
             incCombCrane->stop();
 
-            if (!decCombCrane->isStarted())
-                decCombCrane->start();
+            // Ctrl - комбинированный кран против часовой стрелки
+            if (isControl() && (!isAlt()))
+            {
+                if (!decCombCrane->isStarted())
+                    decCombCrane->start();
+            }
+            else
+            {
+                decCombCrane->stop();
+
+                // Alt - разблокировать, без модификаторов - заблокировать
+                setState(isAlt());
+            }
         }
     }
     else
@@ -340,9 +349,6 @@ void BrakeLock::stepKeysControl(double t, double dt)
         incCombCrane->stop();
         decCombCrane->stop();
     }
-
-    incCombCrane->step(t, dt);
-    decCombCrane->step(t, dt);
 }
 
 //------------------------------------------------------------------------------

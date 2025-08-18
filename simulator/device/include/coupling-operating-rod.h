@@ -26,7 +26,7 @@ public:
     /// от 1.0 (нормальное), 0.0 (натянутая цепочка) до -1.0 (расцепляющее)
     double getOperatingState() const;
 
-    /// /TODO/ Признак фиксации расцепного рычага в расцепляющем положении
+    /// Признак фиксации расцепного рычага в расцепляющем положении
     bool isFixedUncoupled() const;
 
 protected:
@@ -35,19 +35,21 @@ protected:
     int keyCode;
 
     /// Целевое положение рычага: 1.0 - нормальное; -1.0 - расцепляющее
-    double ref_operating_state;
+    double ref_operating_state = 1.0;
 
-    /// /TODO/ Признак фиксации расцепного рычага в расцепляющем положении
-    bool is_fixed_uncoupling;
+    /// Признак фиксации расцепного рычага в расцепляющем положении
+    bool is_fixed_uncoupling = false;
 
     /// Усилие в сцепке
-    double coupling_force;
+    double coupling_force = 0.0;
 
     /// Максимальное усилие в сцепке, при котором возможно управление сцепным устройством, Н
-    double max_operating_force;
+    double max_operating_force = Physics::ZERO;
 
     /// Время движения расцепного рычага между положениями, с
-    double motion_time;
+    double motion_time = 0.1;
+
+    bool was_keyCode = false;
 
     void preStep(state_vector_t &Y, double t);
 

@@ -13,8 +13,7 @@
 #ifndef     VL60K_H
 #define     VL60K_H
 
-#include "ALSN-decoder.h"
-#include "trigger.h"
+#include "trigger-control.h"
 #include "vehicle.h"
 
 #include <QString>
@@ -32,6 +31,7 @@ class CoilALSN;
 class ControllerKME_60_044;
 class Coupling;
 class DCMotor;
+class DecoderALSN;
 class EKG_8G;
 class LocoCrane;
 class OperatingRod;
@@ -136,24 +136,24 @@ private:
     OperatingRod *oper_rod_bwd = Q_NULLPTR;
 
     // Дальний ряд тумблеров приборной панели машиниста
-    /// Тригер тумблера "Прожектор яркий"
-    Trigger spotlight_high_tumbler[CABS_NUM];
-    /// Тригер тумблера "Прожектор тусклый"
-    Trigger spotlight_low_tumbler[CABS_NUM];
-//    /// Тригер тумблера "Радиостанция"
-//    Trigger radio_tumbler[CABS_NUM];
+    /// Триггер тумблера "Прожектор яркий"
+    TriggerControl spotlight_high_tumbler[CABS_NUM];
+    /// Триггер тумблера "Прожектор тусклый"
+    TriggerControl spotlight_low_tumbler[CABS_NUM];
+    /// Триггер тумблера "Радиостанция"
+    TriggerControl radio_tumbler[CABS_NUM];
     /// Триггер тумблера "Цепи управления"
-    Trigger cu_tumbler[CABS_NUM];
+    TriggerControl cu_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник задний"
-    Trigger pant2_tumbler[CABS_NUM];
+    TriggerControl pant2_tumbler[CABS_NUM];
     /// Триггер тумблера "Токоприемник передний"
-    Trigger pant1_tumbler[CABS_NUM];
-    /// Тригер тумблера "Токоприемники"
-    Trigger pants_tumbler[CABS_NUM];
-    /// Тригер тумблена "ГВ вкл. Возврат защиты"
-    Trigger gv_return_tumbler[CABS_NUM];
+    TriggerControl pant1_tumbler[CABS_NUM];
+    /// Триггер тумблера "Токоприемники"
+    TriggerControl pants_tumbler[CABS_NUM];
+    /// Триггер тумблера "ГВ вкл. Возврат защиты"
+    TriggerControl gv_return_tumbler[CABS_NUM];
     /// Триггер тумблера "ГВ вкл/выкл"
-    Trigger gv_tumbler[CABS_NUM];
+    TriggerControl gv_tumbler[CABS_NUM];
 
     // Ближний ряд тумблеров приборной панели машиниста
     enum
@@ -167,25 +167,59 @@ private:
         MV6 = 5
     };
 
-//    /// Тригер тумблера "Автоматическая подача песка"
-//    Trigger autosand_tumbler[CABS_NUM];
+    /// Тригер тумблера "Автоматическая подача песка"
+    TriggerControl autosand_tumbler[CABS_NUM];
     /// Триггеры тумблеров "Вентилятор 1-6"
-    Trigger mv_tumblers[CABS_NUM][NUM_MOTOR_FANS];
-    /// Тригер тумблера "Компрессор"
-    Trigger mk_tumbler[CABS_NUM];
-    /// Тригер тумблера "Фазорасщепитель"
-    Trigger fr_tumbler[CABS_NUM];
+    TriggerControl mv_tumblers[CABS_NUM][NUM_MOTOR_FANS];
+    /// Триггер тумблера "Компрессор"
+    TriggerControl mk_tumbler[CABS_NUM];
+    /// Триггер тумблера "Фазорасщепитель"
+    TriggerControl fr_tumbler[CABS_NUM];
+
+    // Ряд тумблеров на приборной панели помощника машиниста
+    /// Триггер тумблера "Тифон"
+    TriggerControl P_tifon_tumbler[CABS_NUM];
+    /// Триггер тумблера "Свисток"
+    TriggerControl P_whistle_tumbler[CABS_NUM];
+    /// Триггер тумблера "Обогрев кабины"
+    TriggerControl P_cab_heat_tumbler[CABS_NUM];
+    /// Триггер тумблера "Тусклое освещение кабины"
+    TriggerControl P_cab_light_low_tumbler[CABS_NUM];
+    /// Триггер тумблера "Яркое освещение кабины"
+    TriggerControl P_cab_light_high_tumbler[CABS_NUM];
+    /// Триггер тумблера в резерве
+    TriggerControl P_reserv1_tumbler[CABS_NUM];
+    /// Триггер тумблера "Освещение ходовой"
+    TriggerControl P_light_chassis_tumbler[CABS_NUM];
+    /// Триггер тумблера "Освещение приборов"
+    TriggerControl P_light_devices_tumbler[CABS_NUM];
+    /// Триггер тумблера "Фонарь левый буферный"
+    TriggerControl P_bufferlight_L_tumbler[CABS_NUM];
+    /// Триггер тумблера "Фонарь правый буферный"
+    TriggerControl P_bufferlight_R_tumbler[CABS_NUM];
+    /// Триггер тумблера в резерве
+    TriggerControl P_reserv2_tumbler[CABS_NUM];
+    /// Триггер тумблера "Проверка АЛСН"
+    TriggerControl P_ALSN_check_tumbler[CABS_NUM];
+
+    /// Триггер тумблера "Левый буферный белый/красный"
+    TriggerControl P_buffercolor_L_toogle[CABS_NUM];
+    /// Триггер тумблера "Правый буферный белый/красный"
+    TriggerControl P_buffercolor_R_toogle[CABS_NUM];
 
     enum
     {
         NUM_RB = 3,
-        RB_1 = 0,
-        RBP = 1,
-        RBS = 2
+        RBS = 0,
+        RB_1 = 1,
+        RBP = 2
     };
 
     /// Триггеры рукояток бдительности
-    Trigger rb[CABS_NUM][NUM_RB];
+    TriggerControl rb[CABS_NUM][NUM_RB];
+
+    /// Ключ ЭПК
+    TriggerControl key_epk[CABS_NUM];
 
     enum
     {
@@ -360,9 +394,6 @@ private:
     /// Электропневматический клапан автостопа
     AutoTrainStop *epk[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
-    /// Ключ ЭПК
-    Trigger key_epk[CABS_NUM];
-
     enum
     {
         NUM_LC_CONTACTS = 3,
@@ -382,6 +413,9 @@ private:
 
     /// Общая инициализация локомотива
     void initialization();
+
+    /// Инициализация управления тумблерами
+    void initTumblers(const QString &modules_dir, const QString &custom_cfg_dir);
 
     /// Инициализация сцепных устройств
     void initCouplings(const QString &modules_dir, const QString &custom_cfg_dir);
@@ -412,7 +446,7 @@ private:
 
     void initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
 
-    void initTriggers();
+    bool initAutostartProgram(int cab_autostart_request);
 
     /// Предварительные расчёты перед симуляцией
     void preStep(double t);
@@ -469,7 +503,7 @@ private:
     /// Обработка нажатий клавиш
     void keyProcess();
 
-    void debugPrint(double t, double dt);
+    void debugPrint();
 
     void load_brakes_config(QString path);
 

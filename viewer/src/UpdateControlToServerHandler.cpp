@@ -46,7 +46,7 @@ void UpdateControlToServerHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void UpdateControlToServerHandler::changeCurrentVehicle(int current_idx, int controlled_idx)
+void UpdateControlToServerHandler::changeCurrentVehicle(int current_idx, int controlled_idx, int cabine_idx)
 {
     if ((current_idx < 0) || (controlled_idx < 0))
     {
@@ -55,15 +55,16 @@ void UpdateControlToServerHandler::changeCurrentVehicle(int current_idx, int con
 
     _current_idx = current_idx;
     _controlled_idx = controlled_idx;
+    _controlled_cabine_idx = cabine_idx;
     sendControlToServer();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void UpdateControlToServerHandler::changeCurrentCabine(size_t cabine_idx)
+void UpdateControlToServerHandler::setNeedDebugMsg(bool is_needed)
 {
-    _cabine_idx = cabine_idx;
+    _is_needed_debug_msg = is_needed;
     sendControlToServer();
 }
 
@@ -101,7 +102,7 @@ void UpdateControlToServerHandler::sendControlToServer()
     // отправляем пустое управление
     constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
     std::size_t modifiers_size = 0;
-    for (uint16_t key : modifier_keys)
+    for (std::uint16_t key : modifier_keys)
     {
         if (_pressed_keys.count(key))
         {
@@ -118,11 +119,17 @@ void UpdateControlToServerHandler::sendControlToServer()
     controlled_t controlled;
     controlled.current_vehicle = _current_idx;
     controlled.controlled_vehicle = _controlled_idx;
-    controlled.cabine_idx = _cabine_idx;
+    controlled.controlled_cabine_idx = _controlled_cabine_idx;
+    controlled.need_debug_msg = _is_needed_debug_msg;
 
     // Отправляем массив управляющих клавиш
     for (auto key : _pressed_keys)
     {
+        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
+        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+        {
+            continue;
+        }
         controlled.pressed_keys.push_back(key);
     }
 
@@ -138,7 +145,8 @@ void UpdateControlToServerHandler::sendEmptyControlToServer()
     controlled_t controlled;
     controlled.current_vehicle = _current_idx;
     controlled.controlled_vehicle = _controlled_idx;
-    controlled.cabine_idx = _cabine_idx;
+    controlled.controlled_cabine_idx = _controlled_cabine_idx;
+    controlled.need_debug_msg = _is_needed_debug_msg;
     controlled.pressed_keys.clear();
 
     _tcp_client->sendVehicleControl(controlled.serialize());

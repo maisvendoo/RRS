@@ -3,6 +3,10 @@
 
 #include "CfgReader.h"
 
+#include "coupling-operating-rod.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose-epb.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -73,7 +77,18 @@ void PassCar::step(double t, double dt)
 //------------------------------------------------------------------------------
 void PassCar::keyProcess()
 {
-    stepDebugMsg(0, 0);
+    if (needDebugMsg)
+        debugPrint();
+
+    // Сцепные устройства
+    oper_rod_fwd->setControl(&pressed_keys);
+    oper_rod_bwd->setControl(&pressed_keys);
+
+    // Концевые краны и рукава тормозной магистрали
+    anglecock_bp_fwd->setControl(&pressed_keys);
+    anglecock_bp_bwd->setControl(&pressed_keys);
+    hose_bp_fwd->setControl(&pressed_keys);
+    hose_bp_bwd->setControl(&pressed_keys);
 }
 
 //------------------------------------------------------------------------------

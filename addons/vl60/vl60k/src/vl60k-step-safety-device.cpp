@@ -1,6 +1,7 @@
 #include    "vl60k.h"
 
 #include "ALSN-coil.h"
+#include "ALSN-decoder.h"
 #include "alsn-ukbm.h"
 #include "automatic-train-stop.h"
 #include "reservoir.h"

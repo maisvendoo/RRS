@@ -131,7 +131,7 @@ private:
     virtual void stepSoundsSignals(double t, double dt);
 
     /// Отладочная строка
-    void stepDebugMsg(double t, double dt);
+    void debugPrint();
 
     void keyProcess();
 

@@ -1,17 +1,10 @@
 #include    "coupling-operating-rod.h"
 
-#include    "physics.h"
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 OperatingRod::OperatingRod(int key_code, QObject *parent) : Device(parent)
   , keyCode(key_code)
-  , ref_operating_state(1.0)
-  , is_fixed_uncoupling(false)
-  , coupling_force(0.0)
-  , max_operating_force(Physics::ZERO)
-  , motion_time(0.1)
 {
 
 }
@@ -84,20 +77,68 @@ void OperatingRod::stepKeysControl(double t, double dt)
     Q_UNUSED(t)
     Q_UNUSED(dt)
 
-    //TODO// фиксация расцепного рычага в расцепляющем положении
-
-    // Проверяем управляющий сигнал
-    if (getKeyState(keyCode) && isShift())
-        // Проверяем натяжение сцепок
-        if (coupling_force <= max_operating_force)
-            // Расцепляющее положение
-            ref_operating_state = -1.0;
+    // Проверяем управляющий сигнал от заданной клавиши
+    if (getKeyState(keyCode))
+    {
+        // Проверяем фиксацию расцепляющего положения
+        if (is_fixed_uncoupling)
+        {
+            // Сбрасывает фиксацию повторное нажатие клавиши без Ctrl и Shift
+            if (!(was_keyCode || isShift() || isControl()))
+            {
+                // Нормальное положение
+                ref_operating_state = 1.0;
+                is_fixed_uncoupling = false;
+            }
+            else
+            {
+                ref_operating_state = -1.0;
+            }
+        }
         else
-            // Положение натянутой цепочки, но расцепление невозможно
-            ref_operating_state = min(0.0, getY(0));
+        {
+            // Shift - команда на расцепление
+            if (isShift())
+            {
+                // Если ещё и Ctrl - фиксируем рычаг в расцепляющем положении
+                if (isControl())
+                {
+                    ref_operating_state = -1.0;
+                    if ((getY(0) + 1.0) <= Physics::ZERO)
+                        is_fixed_uncoupling = true;
+                }
+                else
+                {
+                    // Проверяем натяжение сцепок
+                    if (coupling_force <= max_operating_force)
+                    {
+                        // Расцепляющее положение
+                        ref_operating_state = -1.0;
+                    }
+                    else
+                    {
+                        // Положение натянутой цепочки, но расцепление невозможно
+                        ref_operating_state = min(0.0, getY(0));
+                    }
+                }
+            }
+            else
+            {
+                // Нормальное положение
+                ref_operating_state = 1.0;
+            }
+        }
+        was_keyCode = true;
+    }
     else
-        // Нормальное положение
-        ref_operating_state = 1.0;
+    {
+        if (!is_fixed_uncoupling)
+        {
+            // Нормальное положение
+            ref_operating_state = 1.0;
+        }
+        was_keyCode = false;
+    }
 }
 
 //------------------------------------------------------------------------------

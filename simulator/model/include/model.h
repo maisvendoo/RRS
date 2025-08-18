@@ -33,8 +33,6 @@
 #include    <simulator-update-struct.h>
 #include    <controlled-struct.h>
 
-//#include    <keys-control.h>
-
 #include    <virtual-interface-device.h>
 
 #include    <traffic-machine.h>
@@ -78,8 +76,6 @@ signals:
 
     void sendDataToServer(QByteArray data);
 
-    //void getRecvData(sim_dispatcher_data_t &disp_data);
-
 public slots:
 
     /// Messages output
@@ -117,7 +113,9 @@ private:
     /// Vehicle control and feedback with debug message
     struct controlled_client_t
     {
+        int prev_vehicle_current = -1;
         int prev_vehicle_controlled = -1;
+        int prev_cab_controlled = -1;
         controlled_t vehicle_control_by_keyboard = controlled_t();
         simulator_vehicle_controlled_update_t vehicle_controlled = simulator_vehicle_controlled_update_t();
     };
@@ -144,16 +142,7 @@ private:
     /// Simulation thread
     QThread     model_thread;
 
-//    KeysControl keys_control;
-/*
-    QSharedMemory   memory_sim_info;
-    QSharedMemory   memory_sim_update;
-    QSharedMemory   memory_controlled;
-    QSharedMemory   keys_data;
-    QByteArray      data;
-*/
     QTimer          controlTimer;
-    QTimer          networkTimer;
 
     ElapsedTimer    simTimer;
 
@@ -197,10 +186,7 @@ private:
 
     /// TCP feedback
     void tcpFeedBack();
-/*
-    /// Shered memory feedback
-    void sharedMemoryFeedback();
-*/
+
     void controlStep();
 
 private slots:

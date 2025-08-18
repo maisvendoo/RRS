@@ -58,7 +58,7 @@ public:
     bool selectNextVehicle() noexcept;
     bool selectPrevVehicle() noexcept;
 
-    void selectControlVehicle() noexcept;
+    bool selectControlVehicle() noexcept;
     bool returnToControlledVehicle() noexcept;
 
     bool load(

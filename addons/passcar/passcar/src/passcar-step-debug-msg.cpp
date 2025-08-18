@@ -10,11 +10,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::stepDebugMsg(double t, double dt)
+void PassCar::debugPrint()
 {
-    (void) t;
-    (void) dt;
-
     DebugMsg = "";
     DebugMsg += QString("x%1 km|V%2 km/h|")
                     .arg(profile_point_data.railway_coord / 1000.0, 10, 'f', 3)

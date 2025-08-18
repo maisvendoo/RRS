@@ -3,6 +3,7 @@
 
 #include    "vehicle.h"
 #include    "physics.h"
+#include    "datetime.h"
 #include    "sound-signal.h"
 
 #include    "airdistributor.h"
@@ -14,6 +15,7 @@
 #include    "brake-crane.h"
 #include    "brake-lock.h"
 #include    "brake-mech.h"
+#include    "combine-relay.h"
 #include    "coupling.h"
 #include    "coupling-operating-rod.h"
 #include    "electro-airdistributor.h"
@@ -39,7 +41,6 @@
 #include    "reservoir.h"
 #include    "sanding-system.h"
 #include    "speedmap.h"
-#include    "switcher.h"
 #include    "time-relay.h"
 #include    "traction-controller.h"
 #include    "train-horn.h"

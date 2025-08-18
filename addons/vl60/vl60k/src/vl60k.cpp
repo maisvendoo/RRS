@@ -21,7 +21,8 @@
 //------------------------------------------------------------------------------
 VL60k::VL60k() : Vehicle ()  
 {
-
+    pressed_keys_by_cabine.resize(CABS_NUM);
+    pressed_keys_by_cabine.shrink_to_fit();
 }
 
 //------------------------------------------------------------------------------
@@ -45,6 +46,8 @@ void VL60k::initialization()
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
 
+    initTumblers(modules_dir, custom_cfg_dir);
+
     initCouplings(modules_dir, custom_cfg_dir);
 
     initPantographs(modules_dir, custom_cfg_dir);
@@ -65,7 +68,7 @@ void VL60k::initialization()
 
     initOtherEquipment(modules_dir, custom_cfg_dir);
 
-    autoStartTimer = new Timer(0.5);
+    autoStartTimer = new Timer(0.5, false);
     connect(autoStartTimer, &Timer::process, this, &VL60k::slotAutoStart);
 }
 
@@ -106,11 +109,11 @@ void VL60k::step(double t, double dt)
 
     stepOtherEquipment(t, dt);
 
+    stepSafetyDevices(t, dt);
+
     stepSoundSignalsOutput(t, dt);
 
     stepSignalsOutput(t, dt);
-
-    debugPrint(t, dt);
 
     autoStartTimer->step(t, dt);
 }

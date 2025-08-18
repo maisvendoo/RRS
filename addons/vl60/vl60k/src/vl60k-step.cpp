@@ -29,18 +29,18 @@ void VL60k::slotAutoStart()
         triggers[start_count]->set();
 
         if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
-                (triggers[start_count] == &gv_tumbler[cabine_idx]))
+                (triggers[start_count] == &gv_tumbler[autostart_cab]))
             return;
 
         if (main_switch->getState())
-            gv_return_tumbler[cabine_idx].reset();
+            gv_return_tumbler[autostart_cab].reset();
 
         start_count++;
     }
     else
     {
         autoStartTimer->stop();
-        controller[cabine_idx]->setReversPos(REVERS_FORWARD);
+        controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
         start_count = 0;
     }
 }
@@ -137,7 +137,6 @@ void VL60k::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60k::stepTractionControl(double t, double dt)
 {
-    controller[cabine_idx]->setControl(keys);
     for (size_t i : {CAB1, CAB2})
     {
         controller[i]->step(t, dt);
@@ -161,6 +160,8 @@ void VL60k::stepTractionControl(double t, double dt)
 
     // Полярность включения ТЭД
     int motor_dir = std::clamp(controller[CAB1]->getState().revers_ref_state - controller[CAB2]->getState().revers_ref_state, -1, 1);
+    // Ступень ослабления возбуждения
+    int motor_field_loosen_pos = std::max(controller[CAB1]->getState().field_loosen_pos, controller[CAB2]->getState().field_loosen_pos);
 
     double I_vu = 0.0;
 
@@ -168,7 +169,7 @@ void VL60k::stepTractionControl(double t, double dt)
     {
         motor[i]->setDirection(motor_dir);
         motor[i]->setOmega(ip * wheel_omega[i]);
-        motor[i]->setBetaStep(controller[cabine_idx]->getState().field_loosen_pos);
+        motor[i]->setBetaStep(motor_field_loosen_pos);
         motor[i]->step(t, dt);
         Q_a[i+1] = motor[i]->getTorque() * ip;
 
@@ -264,11 +265,9 @@ void VL60k::stepOtherEquipment(double t, double dt)
     horn[CAB1]->step(t, dt);
     horn[CAB2]->setFLpressure(main_reservoir->getPressure());
     horn[CAB2]->step(t, dt);
-    horn[cabine_idx]->setControl(keys);
 
     // Система подачи песка
     sand_system->setFLpressure(main_reservoir->getPressure());
-    sand_system->setControl(keys);
     sand_system->step(t, dt);
     for (size_t i = 0; i < num_axis; ++i)
     {
@@ -324,7 +323,9 @@ bool VL60k::getHoldingCoilState() const
         overload |= ov_relay->getState();
     }
 
-    bool state = (!controller[cabine_idx]->getState().pos_state[POS_BV]) && (!overload);
+    bool state_off = overload ||
+                     controller[CAB1]->getState().pos_state[POS_BV] ||
+                     controller[CAB2]->getState().pos_state[POS_BV];
 
-    return state;
+    return !state_off;
 }

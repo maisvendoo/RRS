@@ -25,7 +25,7 @@ Timer::~Timer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Timer::step(double t, double dt)
+bool Timer::step(double t, double dt)
 {
     Q_UNUSED(t)
 
@@ -36,11 +36,12 @@ void Timer::step(double t, double dt)
             emit process();
             tau = 0;
             first_process = false;
-            return;
+            return true;
         }
 
         tau += dt;
     }
+    return false;
 }
 
 //------------------------------------------------------------------------------

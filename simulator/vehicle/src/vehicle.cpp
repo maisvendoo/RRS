@@ -248,6 +248,14 @@ void Vehicle::setNextVehicle(Vehicle *vehicle)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::setNeedDebugMsg(bool is_needed)
+{
+    needDebugMsg = is_needed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QString Vehicle::getConfigDir() const
 {
     return config_dir;
@@ -642,6 +650,15 @@ void Vehicle::integrationPreStep(state_vector_t &Y, double t)
         }
     }
 
+    {
+        std::lock_guard lock(keyboard_mutex);
+        pressed_keys.clear();
+        for (const auto& pressed_keys_at_cab : pressed_keys_by_cabine)
+        {
+            pressed_keys.insert(pressed_keys_at_cab.begin(), pressed_keys_at_cab.end());
+        }
+    }
+
     preStep(t);
 }
 
@@ -691,29 +708,25 @@ QString Vehicle::getDebugMsg() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setKeysData(QByteArray data)
+void Vehicle::setKeyboardControl(const uint8_t& cab_num, const std::vector<uint16_t>& pressed_keys)
 {
-    if (data.size() == 0)
+    if (cab_num >= pressed_keys_by_cabine.size())
         return;
 
-    keys_mutex.lock();
-
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    stream >> keys;
-
-    keys_mutex.unlock();
+    std::lock_guard lock(keyboard_mutex);
+    pressed_keys_by_cabine[cab_num].insert(pressed_keys.begin(), pressed_keys.end());
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::resetKeysData()
+void Vehicle::resetKeyboardControl(const uint8_t& cab_num)
 {
-    keys_mutex.lock();
+    if (cab_num >= pressed_keys_by_cabine.size())
+        return;
 
-    keys.clear();
-
-    keys_mutex.unlock();
+    std::lock_guard lock(keyboard_mutex);
+    pressed_keys_by_cabine[cab_num].clear();
 }
 
 //------------------------------------------------------------------------------
@@ -782,26 +795,33 @@ void Vehicle::loadConfiguration(QString cfg_path)
             num_axis = static_cast<size_t>(axis);
 
             wheel_rotation_angle.resize(num_axis);
+            wheel_rotation_angle.shrink_to_fit();
             std::fill(wheel_rotation_angle.begin(), wheel_rotation_angle.end(), 0.0);
 
             wheel_omega.resize(num_axis);
+            wheel_omega.shrink_to_fit();
             std::fill(wheel_omega.begin(), wheel_omega.end(), 0.0);
 
             wheel_diameter.resize(num_axis);
+            wheel_diameter.shrink_to_fit();
             std::fill(wheel_diameter.begin(), wheel_diameter.end(), diameter);
 
             double tmp = diameter / 2.0;
             rk.resize(num_axis);
+            rk.shrink_to_fit();
             std::fill(rk.begin(), rk.end(), tmp);
 
             J_axis.resize(num_axis);
+            J_axis.shrink_to_fit();
             std::fill(J_axis.begin(), J_axis.end(), J);
 
             tmp = full_mass * Physics::g / static_cast<double>(num_axis);
             axis_load.resize(num_axis);
+            axis_load.shrink_to_fit();
             std::fill(axis_load.begin(), axis_load.end(), tmp);
 
             psi.resize(num_axis);
+            psi.shrink_to_fit();
             std::fill(psi.begin(), psi.end(), 0.30);
 
             Journal::instance()->info(QString("NumAxis: %1").arg(num_axis));
@@ -832,10 +852,15 @@ void Vehicle::loadConfiguration(QString cfg_path)
     }
 
     Q_a.resize(s);
-    Q_r.resize(s);
-    acceleration.resize(s);
+    Q_a.shrink_to_fit();
     std::fill(Q_a.begin(), Q_a.end(), 0.0);
+
+    Q_r.resize(s);
+    Q_r.shrink_to_fit();
     std::fill(Q_r.begin(), Q_r.end(), 0.0);
+
+    acceleration.resize(s);
+    acceleration.shrink_to_fit();
     std::fill(acceleration.begin(), acceleration.end(), 0.0);
 }
 
@@ -1018,38 +1043,43 @@ double Vehicle::wheelrailFriction(double velocity)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Vehicle::isShift() const
+bool Vehicle::isShift(int cab_num) const
 {
-    return getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
+    return getKeyState(KEY_Shift_L, cab_num) || getKeyState(KEY_Shift_R, cab_num);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Vehicle::isControl() const
+bool Vehicle::isControl(int cab_num) const
 {
-    return getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
+    return getKeyState(KEY_Control_L, cab_num) || getKeyState(KEY_Control_R, cab_num);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Vehicle::isAlt() const
+bool Vehicle::isAlt(int cab_num) const
 {
-    return getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R);
+    return getKeyState(KEY_Alt_L, cab_num) || getKeyState(KEY_Alt_R, cab_num);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Vehicle::getKeyState(int key) const
+bool Vehicle::getKeyState(uint16_t key, int cab_num) const
 {
-    auto it = keys.find(key);
+    if (cab_num < 0)
+    {
+        return pressed_keys.count(key);
+    }
 
-    if ( it != keys.end() )
-        return it.value();
+    if (cab_num >= pressed_keys_by_cabine.size())
+    {
+        return false;
+    }
 
-    return false;
+    return pressed_keys_by_cabine[cab_num].count(key);
 }
 
 //------------------------------------------------------------------------------

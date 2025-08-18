@@ -25,103 +25,16 @@
 //
 //------------------------------------------------------------------------------
 Model::Model(QObject *parent) : QObject(parent)
-{/*
-    simulator_info_t tmp_si = simulator_info_t();
-    memory_sim_info.setKey(SHARED_MEMORY_SIM_INFO);
-    memory_sim_update.setKey(SHARED_MEMORY_SIM_UPDATE);
-    memory_controlled.setKey(SHARED_MEMORY_CONTROLLED);
-    keys_data.setKey(SHARED_MEMORY_KEYS_DATA);
+{
 
-    // Обход ошибок с QSharedMemory в случае сбоя
-    memory_sim_info.attach();
-    memory_sim_info.detach();
-    memory_sim_update.attach();
-    memory_sim_update.detach();
-    memory_controlled.attach();
-    memory_controlled.detach();
-    keys_data.attach();
-    keys_data.detach();
-
-    simulator_info_t tmp_si = simulator_info_t();
-    if (memory_sim_info.create(sizeof(simulator_info_t)))
-    {
-        Journal::instance()->info("Created shared memory for simulator info");
-        memcpy(memory_sim_info.data(), &tmp_si, sizeof (simulator_info_t));
-    }
-    else
-    {
-        if (memory_sim_info.attach())
-        {
-            Journal::instance()->info("Attach to shared memory for simulator info");
-            memcpy(memory_sim_info.data(), &tmp_si, sizeof (simulator_info_t));
-        }
-        else
-        {
-            Journal::instance()->error("No shared memory for simulator info");
-        }
-    }
-
-    if (memory_sim_update.create(sizeof(simulator_update_t)))
-    {
-        Journal::instance()->info("Created shared memory for simulator update data");
-    }
-    else
-    {
-        if (memory_sim_update.attach())
-        {
-            Journal::instance()->info("Attach to shared memory for simulator update data");
-        }
-        else
-        {
-            Journal::instance()->error("No shared memory for simulator update data");
-        }
-    }*/
-/*
-    controlled_t tmp_c = controlled_t();
-    if (memory_controlled.create(sizeof(controlled_t)))
-    {
-        Journal::instance()->info("Created shared memory for info about controlled vehicle");
-        memcpy(memory_controlled.data(), &tmp_c, sizeof (controlled_t));
-    }
-    else
-    {
-        if (memory_controlled.attach())
-        {
-            Journal::instance()->info("Attach to shared memory for info about controlled vehicle");
-            memcpy(memory_controlled.data(), &tmp_c, sizeof (controlled_t));
-        }
-        else
-        {
-            Journal::instance()->error("No shared memory for info about controlled vehicle");
-        }
-    }
-
-    if (keys_data.create(sizeof(KEYS_DATA_BYTEARRAY_SIZE)))
-    {
-        Journal::instance()->info("Created shared memory for keysboard processing");
-    }
-    else
-    {
-        if (keys_data.attach())
-        {
-            Journal::instance()->info("Attach to shared memory for keysboard processing");
-        }
-        else
-        {
-            Journal::instance()->error("No shared memory for keyboard data. Unable process keyboard");
-        }
-    }*/
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Model::~Model()
-{/*
-    memory_sim_info.detach();
-    memory_sim_update.detach();
-    memory_controlled.detach();
-    keys_data.detach();*/
+{
+
 }
 
 //------------------------------------------------------------------------------
@@ -876,13 +789,21 @@ void Model::prepareFeedBack()
         update_players.current_vehicles.push_back(id);
 
         controlled_clients[*с_id].vehicle_controlled.current_vehicle = id;
-        controlled_clients[*с_id].vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
+
+        if (controlled_clients[*с_id].vehicle_control_by_keyboard.need_debug_msg)
+        {
+            controlled_clients[*с_id].vehicle_controlled.currentDebugMsg = vehicles[id]->getDebugMsg();
+        }
 
         id = controlled_clients[*с_id].vehicle_control_by_keyboard.controlled_vehicle;
         update_players.controlled_vehicles.push_back(id);
 
         controlled_clients[*с_id].vehicle_controlled.controlled_vehicle = id;
-        controlled_clients[*с_id].vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
+
+        if (controlled_clients[*с_id].vehicle_control_by_keyboard.need_debug_msg)
+        {
+            controlled_clients[*с_id].vehicle_controlled.controlledDebugMsg = vehicles[id]->getDebugMsg();
+        }
     }
 }
 
@@ -904,80 +825,47 @@ void Model::tcpFeedBack()
         controlled_clients[*с_id].vehicle_controlled = simulator_vehicle_controlled_update_t();
     }
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::sharedMemoryFeedback()
-{
-    int i = 0;
-    for (auto vehicle : vehicles)
-    {
-        if (vehicle_control_by_keyboard.controlled_vehicle == i)
-        {
-            QMap<int, bool> keys_data;
-            for (auto key_id : vehicle_control_by_keyboard.pressed_keys)
-                keys_data.insert(key_id, true);
 
-            QByteArray data;
-            QDataStream stream(&data, QDataStream::WriteOnly);
-
-            stream << keys_data;
-            vehicle->setKeysData(data);
-        }
-        else
-        {
-            if (prev_controlled_vehicle == i)
-            {
-                vehicle->resetKeysData();
-                prev_controlled_vehicle = vehicle_control_by_keyboard.controlled_vehicle;
-            }
-        }
-        ++i;
-    }
-}
-*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void Model::controlStep()
 {
-    for (auto c : controlled_clients)
+    for (const auto& c : controlled_clients)
     {
         int id = c.prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            vehicles[id]->resetKeysData();
-        }
-    }
+            int cab_id = c.prev_cab_controlled;
+            if (cab_id >= 0)
+            {
+                vehicles[id]->resetKeyboardControl(cab_id);
+            }
 
-    QMap<int, QMap<int, bool>> pressed_keys_by_vehicle;
-    for (auto c : controlled_clients)
-    {
-        int id = c.vehicle_control_by_keyboard.controlled_vehicle;
+            vehicles[id]->setNeedDebugMsg(false);
+        }
+
+        id = c.prev_vehicle_current;
         if ((id >= 0) && (id < vehicles.size()))
         {
-            QMap<int, bool> keys_data;
-            if (pressed_keys_by_vehicle.contains(id))
-                keys_data = pressed_keys_by_vehicle[id];
-
-            for (auto key_id : c.vehicle_control_by_keyboard.pressed_keys)
-                keys_data.insert(key_id, true);
-
-            pressed_keys_by_vehicle.insert(id, keys_data);
-
-            vehicles[id]->setCabineIndex(c.vehicle_control_by_keyboard.cabine_idx);
+            vehicles[id]->setNeedDebugMsg(false);
         }
     }
 
-    for (auto id = pressed_keys_by_vehicle.keyBegin(); id != pressed_keys_by_vehicle.keyEnd(); ++id)
+    for (const auto& c : controlled_clients)
     {
-        QByteArray data;
-        QDataStream stream(&data, QDataStream::WriteOnly);
-
-        stream << pressed_keys_by_vehicle[*id];
-
-        vehicles[*id]->setKeysData(data);
+        std::uint16_t id = c.vehicle_control_by_keyboard.controlled_vehicle;
+        if (id < vehicles.size())
+        {
+            std::uint16_t cab_id = c.vehicle_control_by_keyboard.controlled_cabine_idx;
+            vehicles[id]->setKeyboardControl(cab_id, c.vehicle_control_by_keyboard.pressed_keys);
+            vehicles[id]->setNeedDebugMsg(c.vehicle_control_by_keyboard.need_debug_msg);
+        }
+        id = c.vehicle_control_by_keyboard.current_vehicle;
+        if (id < vehicles.size())
+        {
+            vehicles[id]->setNeedDebugMsg(c.vehicle_control_by_keyboard.need_debug_msg);
+        }
     }
 }
 
@@ -1011,10 +899,7 @@ void Model::process()
     controlStep();
 
     emit step(sim_time.simulation_seconds, integration_time);
-/*
-    // Feedback to viewer
-    sharedMemoryFeedback();
-*/
+
     // Update server feedback
     tcpFeedBack();
 
@@ -1096,6 +981,7 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client
     if (controlled_clients.contains(client_id))
     {
         c.prev_vehicle_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_vehicle;
+        c.prev_cab_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_cabine_idx;
     }
     controlled_clients.insert(client_id, c);
 /*
@@ -1103,6 +989,8 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client
     msg += QString::number(c.vehicle_control_by_keyboard.controlled_vehicle);
     msg += " | current ";
     msg += QString::number(c.vehicle_control_by_keyboard.current_vehicle);
+    msg += " | cabine ";
+    msg += QString::number(c.vehicle_control_by_keyboard.controlled_cabine_idx);
     msg += " | keys: ";
     msg += QString::number(c.vehicle_control_by_keyboard.pressed_keys.size());
     for (auto key_id : c.vehicle_control_by_keyboard.pressed_keys)
@@ -1123,7 +1011,21 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
     {
         int id = controlled_clients[client_id].prev_vehicle_controlled;
         if ((id >= 0) && (id < vehicles.size()))
-            vehicles[id]->resetKeysData();
+        {
+            int cab_id = controlled_clients[client_id].prev_cab_controlled;
+            if (cab_id >= 0)
+                vehicles[id]->resetKeyboardControl(cab_id);
+
+            if (controlled_clients[client_id].vehicle_control_by_keyboard.need_debug_msg)
+                vehicles[id]->setNeedDebugMsg(false);
+        }
+
+        id = controlled_clients[client_id].prev_vehicle_current;
+        if ((id >= 0) && (id < vehicles.size()))
+        {
+            if (controlled_clients[client_id].vehicle_control_by_keyboard.need_debug_msg)
+                vehicles[id]->setNeedDebugMsg(false);
+        }
 
         controlled_clients.remove(client_id);
     }

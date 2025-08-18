@@ -11,7 +11,7 @@ class OverloadRelay : public Trigger
 {
 public:
 
-    OverloadRelay(QObject *parent = nullptr);
+    OverloadRelay();
 
     ~OverloadRelay();
 

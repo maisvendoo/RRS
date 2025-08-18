@@ -13,6 +13,7 @@ class simulator_time_t;
 class Skybox;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
+class UpdateControlToServerHandler;
 
 struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -24,6 +25,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     Skybox *skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
+    UpdateControlToServerHandler *controls_handler = nullptr;
 
     int use_server_time = true;
     bool was_server_time_unavailable = true;

@@ -7,19 +7,10 @@ HysteresisRelay::HysteresisRelay(double min_value,
                                  double max_value,
                                  bool init_state,
                                  bool is_active,
-                                 bool is_locked,
-                                 QObject *parent)
-  : Hysteresis(min_value, max_value, init_state, parent)
+                                 bool is_locked)
+  : Hysteresis(min_value, max_value, init_state)
   , is_active(is_active)
   , is_locked(is_locked)
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-HysteresisRelay::~HysteresisRelay()
 {
 
 }
@@ -47,21 +38,21 @@ void HysteresisRelay::setValue(double value)
 {
     if (!is_active)
     {
-        state.reset();
+        reset();
         return;
     }
 
     if (is_locked)
     {
-        state.set();
+        set();
         return;
     }
 
     if (value <= min)
-        state.reset();
+        reset();
 
     if (value >= max)
-        state.set();
+        set();
 }
 
 //------------------------------------------------------------------------------
