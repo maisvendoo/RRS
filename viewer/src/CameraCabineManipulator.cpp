@@ -33,7 +33,7 @@ void CameraCabineManipulator::resetView()
     }
 
     _position_shift = {0.0, 0.0, 0.0};
-    _angle_right =  _current_vehicle->driver_dir[_current_vehicle->current_cabine_idx];
+    _angle_right =  0.0;
     _angle_up = 0.0;
     _perspective->fieldOfViewY = _settings.fovy;
 
@@ -201,8 +201,11 @@ void CameraCabineManipulator::frameEvent(double dt)
 void CameraCabineManipulator::rotate_view(const vsg::dvec2& delta)
 {
     _angle_right += delta.x;
-    if (_angle_right > vsg::PI) _angle_right += -2.0 * vsg::PI;
-    if (_angle_right < -vsg::PI) _angle_right += 2.0 * vsg::PI;
+
+    if (_angle_right > vsg::PI)
+        _angle_right += -2.0 * vsg::PI;
+    if (_angle_right < -vsg::PI)
+        _angle_right += 2.0 * vsg::PI;
 
     _angle_up += delta.y;
     _angle_up = std::max(_pitch_min, std::min(_pitch_max, _angle_up));
@@ -235,10 +238,16 @@ void CameraCabineManipulator::zoom(double coeff)
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::move(const vsg::dvec3 &delta)
 {
-    _position_shift += delta;
+    const double angle_r = _current_vehicle->driver_dir[_current_vehicle->current_cabine_idx] + _angle_right;
+    const double c = std::cos(angle_r);
+    const double s = std::sin(angle_r);
+    vsg::dvec3 delta_rotated = vsg::dvec3(delta.x * c - delta.y * s,
+                                          delta.y * c + delta.x * s,
+                                          delta.z);
+    _position_shift += delta_rotated;
     _position_shift.z = std::max(_settings.cabine_z_min, std::min(_settings.cabine_z_max, _position_shift.z));
 
-    if (length2(_position_shift) > 1e-5)
+    if (vsg::length2(_position_shift) > 1e-5)
         is_reset = false;
 
     calc_view();
@@ -252,7 +261,7 @@ void CameraCabineManipulator::calc_view()
     if (!_current_vehicle)
         return;
 
-    vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos[_current_vehicle->current_cabine_idx] + _position_shift;
+    const vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos[_current_vehicle->current_cabine_idx] + _position_shift;
 
     _lookAt->eye = _current_vehicle->position +
                    _current_vehicle->right * local_eye_pos.x +
@@ -262,10 +271,11 @@ void CameraCabineManipulator::calc_view()
     _lookAt->center = _lookAt->eye + _current_vehicle->orth;
     _lookAt->up = _current_vehicle->up;
 
-    if ((abs(_angle_right) > 1e-5) || (abs(_angle_up) > 1e-5))
+    const double angle_r = _current_vehicle->driver_dir[_current_vehicle->current_cabine_idx] + _angle_right;
+    if ((abs(angle_r) > 1e-5) || (abs(_angle_up) > 1e-5))
     {
         vsg::dmat4 matrix = vsg::translate(_lookAt->eye) *
-                            vsg::rotate(_angle_right, _current_vehicle->up) *
+                            vsg::rotate(angle_r, _current_vehicle->up) *
                             vsg::rotate(_angle_up, _current_vehicle->right) *
                             vsg::translate(-_lookAt->eye);
 
