@@ -154,7 +154,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 return;
             }
 
-            // Tab - взять управление текущим вагоном
+            // Tab - сменить кабину
             case vsg::KEY_Tab:
             {
                 changeCurrentCabine();
