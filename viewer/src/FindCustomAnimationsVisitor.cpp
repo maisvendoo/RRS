@@ -7,6 +7,7 @@
 #include "ProcAnimation.h"
 #include "ProcRotationAnimation.h"
 #include "ProcTranslationAnimation.h"
+#include "ProcVisibleAnimation.h"
 #include "ProcLightAnimation.h"
 
 #include <vsg/core/Object.h>
@@ -72,6 +73,9 @@ void FindCustomAnimationsVisitor::apply(vsg::Group& group)
     group.traverse(*this);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void FindCustomAnimationsVisitor::apply(vsg::Light &light)
 {
     if (light.name.empty())
@@ -116,6 +120,13 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
             continue;
         }
 
+        if (vsg::ref_ptr<ProcVisibleAnimation> visible = animation.cast<ProcVisibleAnimation>())
+        {
+            vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
+            visible->setTransform(new_transform);
+            continue;
+        }
+
         if (vsg::ref_ptr<ProcLightAnimation> light_anim = animation.cast<ProcLightAnimation>())
         {
             vsg::ref_ptr<vsg::Light> new_light = new_object.cast<vsg::Light>();
@@ -147,6 +158,12 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             return animation;
         }
 
+        animation = create_transform_animation<ProcVisibleAnimation>("VisibleAnimation", cfg, &group);
+        if (animation)
+        {
+            return animation;
+        }
+
         animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group);
         if (animation)
         {
@@ -163,6 +180,9 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
     return nullptr;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const std::string &name, vsg::Light &light)
 {
     std::string file_path = animations_dir + name + ".xml";
@@ -180,6 +200,9 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
     return nullptr;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 template <typename AnimationClass>
 vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr)
 {
@@ -205,6 +228,9 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_transform_animat
     return nullptr;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 template <typename VisitorClass>
 vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr)
 {
@@ -244,6 +270,9 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animati
     return nullptr;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(const char *type, CfgReader &cfg, vsg::Light *light_ptr)
 {
     const auto light_node = vsg::ref_ptr(light_ptr);
@@ -261,7 +290,6 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(
 
             return animation;
         }
-
     }
     else
     {
