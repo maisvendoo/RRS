@@ -79,7 +79,7 @@ rem Копируем данные игры (модели, звуки, конфи
 rem ВЛ60пк
 xcopy /Y /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
 xcopy /Y /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
-xcopy /Y /S %DATA_PATH%\animations\vl60\*.* %RRS_DEV_ROOT%\data\animations\vl60pk\
+xcopy /Y /S %DATA_PATH%\animations\vl60\*.* %RRS_DEV_ROOT%\data\animations\vl60\
 
 rem ВЛ60к
 xcopy /Y /S %DATA_PATH%\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\

@@ -21,7 +21,7 @@ public:
 
     double getValue(double parameter);
 
-private:
+protected:
 
     struct point_t
     {

@@ -49,10 +49,7 @@ void LinearInterpolation::load(const std::string &path)
 //------------------------------------------------------------------------------
 double LinearInterpolation::getValue(double parameter)
 {
-    if (parameter >= 0)
-        return interpolate(parameter);
-    else
-        return -interpolate(-parameter);
+    return interpolate(parameter);
 }
 
 //------------------------------------------------------------------------------
