@@ -253,6 +253,8 @@ void RouteViewer::initVsgOptions()
 
     // Отключение нативного загрузчика .gltf в VSG, чтобы использовать assimp
     options->setValue("disable_gltf", settings.disable_native_gltf_loader);
+
+    GUIparams = GUIParams::create();
 }
 
 //------------------------------------------------------------------------------
@@ -358,6 +360,20 @@ void RouteViewer::initCamera()
 void RouteViewer::initScenegraph()
 {
     root = vsg::Group::create();
+
+    // Модель неба - создаём в первую очередь,
+    // до всего остального в сцене и до компиляции вьювера
+    FileSystem& fs = FileSystem::getInstance();
+    const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
+    Skybox* skybox = new Skybox(cfg_path, options);
+    GUIparams->skybox = skybox;
+    GUIparams->skybox_texture_data = skybox->getDefaultTexture();
+    GUIparams->skybox_textures = skybox->getTextures();
+
+    if (skybox->getNode())
+    {
+        root->addChild(skybox->getNode());
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -548,7 +564,6 @@ void RouteViewer::initCommandGraph()
 {
     auto renderGraph = vsg::RenderGraph::create(window, view);
 
-    GUIparams = GUIParams::create();
     GUIparams->ambient_color = ambient->color.data();
     GUIparams->ambient_intensity = &ambient->intensity;
     GUIparams->sun_color = sun->color.data();
@@ -599,6 +614,11 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
+    vsg::ref_ptr<vsg::DatabasePager> databasePager = vsg::DatabasePager::create();
+    for (auto& task : viewer->recordAndSubmitTasks)
+    {
+        task->databasePager = databasePager;
+    }
 
     // Перед компиляцией вьювера применяем некоторые настройки
     auto resourceHints = vsg::ResourceHints::create();
@@ -618,6 +638,8 @@ void RouteViewer::initViewer()
     GUIparams->vehicles_handler = vehicles_handler;
     GUIparams->statistics_handler = upd_statistis_handler.get();
     GUIparams->controls_handler = upd_server_control.get();
+
+    is_ready = true;
 }
 
 //------------------------------------------------------------------------------
@@ -652,23 +674,6 @@ bool RouteViewer::loadRoute()
     FileSystem& fs = FileSystem::getInstance();
     const std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), settings.route_dir_name);
     settings.route_dir_full_path = route_dir_path;
-
-    // Модель неба
-    const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
-    Skybox* skybox = new Skybox(cfg_path, options);
-    GUIparams->skybox = skybox;
-    GUIparams->skybox_texture_data = skybox->getDefaultTexture();
-    GUIparams->skybox_textures = skybox->getTextures();
-    if (skybox->getNode())
-    {
-        root->addChild(skybox->getNode());
-#if 0
-        // запись неба в файл
-        std::string file;
-        file = route_dir_path + fs.separator() + "~loaded_skybox.vsgt";
-        vsg::write(skybox->getNode(), file, options);
-#endif
-    }
 
     // Загрузка информации о моделях в маршруте
     Route route;
@@ -733,19 +738,6 @@ bool RouteViewer::loadRoute()
     route.transforms.clear();
 
     root->addChild(route_root);
-    viewer->update();
-
-    // Перед компиляцией вьювера применяем некоторые настройки
-    auto resourceHints = vsg::ResourceHints::create();
-    // Указываем грузить модели в один поток, иначе будут дубликаты в памяти
-    resourceHints->numDatabasePagerReadThreads = 1;
-    // Указываем разрешение карты теней
-    resourceHints->shadowMapSize = {static_cast<uint32_t>(settings.shadow_resolution),
-                                    static_cast<uint32_t>(settings.shadow_resolution)};
-    // Указываем допустимое количество источников света
-    resourceHints->numLightsRange = {static_cast<uint32_t>(settings.num_lights),
-                                     static_cast<uint32_t>(settings.num_lights + 1)};
-    viewer->compile(resourceHints);
 
     return true;
 }
@@ -816,10 +808,7 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     connect(tcp_client, &TcpClient::updateSignal,
             traffic_lights_handler, &TrafficLightsHandler::slotUpdateSignal);
-/*
-    viewer->update();
-    viewer->compile();
-*/
+
     LOG_INFO("Send request for vehicles info");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
 }
@@ -857,16 +846,11 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
             this, &RouteViewer::slotUpdated, Qt::DirectConnection);
 
     root->addChild(vehicles_handler->getExterior());
-/*
-    viewer->update();
-    viewer->compile();
-*/
+
     LOG_INFO("Send request for continuous vehicles update");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE, static_cast<double>(settings.vehicle_controled_update_interval) * 0.001);
-
-    is_ready = true;
 }
 
 //------------------------------------------------------------------------------
