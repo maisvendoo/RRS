@@ -95,7 +95,7 @@ void Skybox::setDateTime(simulator_time_t sim_time)
                                  stt.date_season_end.day);
         bool is_before_season_end = (sim_time.date <= date_end);
 
-        bool is_season = (date_end > date_begin) ?
+        bool is_season = (date_begin > date_end) ?
             (is_after_season_begin || is_before_season_end) :
             (is_after_season_begin && is_before_season_end);
 
@@ -440,6 +440,7 @@ void Skybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
         LOG_INFO("Loaded skybox texture from file: %s", texture_path.c_str());
         season_time_texture_t stt {};
         stt.texture = data;
+        stt.filename = texture_filename.toStdString();
 
         auto read_season_date = [](CfgReader& cfg, QDomNode& secNode, const char* section,
                                    season_time_texture_t::season_date_t& sd) -> bool

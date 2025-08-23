@@ -370,31 +370,40 @@ void RouteViewer::initLights()
     vsg::ref_ptr<vsg::ShaderSet> pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
     vsg::ref_ptr<vsg::ShaderSet> phong_shader = vsg::createPhongShaderSet(options);
 
-    // Загружаем свои варианты фрагментного шейдера вместо встроенного
+    // Загружаем свои варианты вершинного и фрагментного шейдера вместо встроенного
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
-    auto load_custom_shader = [&](const char* shader_filename, const char* shader_name, vsg::ref_ptr<vsg::ShaderSet> shader_set) {
-        const std::string shader_path = shaders_dir_path + fs.separator() + shader_filename;
-        vsg::ref_ptr<vsg::ShaderStage> shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", shader_path, options);
-        if (shader_stage)
+    auto load_custom_shader = [&](const char* vert_shader_filename,
+                                  const char* frag_shader_filename,
+                                  const char* shader_set_name,
+                                  vsg::ref_ptr<vsg::ShaderSet> shader_set) {
+        const std::string vert_shader_path = shaders_dir_path + fs.separator() + vert_shader_filename;
+        vsg::ref_ptr<vsg::ShaderStage> vert_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", vert_shader_path, options);
+        const std::string frag_shader_path = shaders_dir_path + fs.separator() + frag_shader_filename;
+        vsg::ref_ptr<vsg::ShaderStage> frag_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", frag_shader_path, options);
+        if (vert_shader_stage && frag_shader_stage)
         {
-            LOG_INFO("Loaded %s shader: %s", shader_name, shader_path.c_str());
-            shader_set->stages.back() = shader_stage;
+            LOG_INFO("Loaded custom %s shader set: %s, %s", shader_set_name, vert_shader_path.c_str(), frag_shader_path.c_str());
+            shader_set->stages.front() = vert_shader_stage;
+            shader_set->stages.back() = frag_shader_stage;
 
             // Очищаем все встроенные сохранённые варианты настроек
             shader_set->variants.clear();
         }
         else
         {
-            LOG_WARN("Fail to load %s shader: %s", shader_name, shader_path.c_str());
-            LOG_INFO("Using default %s shader", shader_name);
+            if (!vert_shader_stage)
+                LOG_WARN("Fail to load vertex shader: %s", vert_shader_path.c_str());
+            if (!frag_shader_stage)
+                LOG_WARN("Fail to load fragment shader: %s", frag_shader_path.c_str());
+            LOG_INFO("Using default %s shader set", shader_set_name);
         }
     };
 
-    load_custom_shader("standard_flat_shaded.frag", "flat", flat_shader);
-    load_custom_shader("standard_pbr.frag", "PBR", pbr_shader);
-    load_custom_shader("standard_phong.frag", "Phong", phong_shader);
+    load_custom_shader("standard.vert", "standard_flat_shaded.frag", "flat", flat_shader);
+    load_custom_shader("standard.vert", "standard_pbr.frag", "PBR", pbr_shader);
+    load_custom_shader("standard.vert", "standard_phong.frag", "Phong", phong_shader);
 
     // Можем по своему настроить стадии графического конвейера
     auto vertexInputState = vsg::VertexInputState::create();
@@ -603,7 +612,7 @@ void RouteViewer::initViewer()
                                      static_cast<uint32_t>(settings.num_lights + 1)};
     viewer->compile(resourceHints);
 
-    options->operationThreads = vsg::OperationThreads::create(4, viewer->status);
+    options->operationThreads = vsg::OperationThreads::create(1, viewer->status);
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler;
