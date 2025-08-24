@@ -58,7 +58,7 @@ private:
     vsg::ref_ptr<ProcAnimation> create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
 
     template <typename VisitorClass>
-    vsg::ref_ptr<ProcAnimation> create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
+    vsg::ref_ptr<ProcAnimation> create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr, const std::string& name);
 
     vsg::ref_ptr<ProcAnimation> create_light_animation(const char* type, CfgReader& cfg, vsg::Light* light_ptr);
 

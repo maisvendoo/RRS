@@ -2,10 +2,7 @@
 
 #include "ProcMaterialAnimation.h"
 
-#include <vsg/core/Data.h>
-#include <vsg/core/Object.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Node.h>
+#include <vsg/nodes/Group.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/DescriptorBuffer.h>
 #include <vsg/state/material.h>
@@ -17,9 +14,11 @@
 //
 //------------------------------------------------------------------------------
 FindMaterialAnimationVisitor::FindMaterialAnimationVisitor(vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
-                                                           vsg::ref_ptr<vsg::Duplicate> in_duplicate)
+                                                           vsg::ref_ptr<vsg::Duplicate> in_duplicate,
+                                                           const std::string &in_node_name)
     : pdo(in_pdo)
     , duplicate(in_duplicate)
+    , node_name(in_node_name)
 {
 }
 
@@ -29,6 +28,22 @@ FindMaterialAnimationVisitor::FindMaterialAnimationVisitor(vsg::ref_ptr<vsg::Pro
 void FindMaterialAnimationVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void FindMaterialAnimationVisitor::apply(vsg::Group& group)
+{
+    std::string name;
+    group.getValue("name", name);
+
+    // Если наткнулись на дочерний элемент с таким же именем - останавливаемся,
+    // проход по нему будет ещё раз
+    if (name == node_name)
+        return;
+
+    group.traverse(*this);
 }
 
 //------------------------------------------------------------------------------

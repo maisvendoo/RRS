@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "ProcDisplayAnimation.h"
 
+#include <vsg/nodes/Group.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/DescriptorBuffer.h>
 #include <vsg/state/DescriptorImage.h>
@@ -18,9 +19,11 @@
 //
 //------------------------------------------------------------------------------
 FindDisplayAnimationVisitor::FindDisplayAnimationVisitor(vsg::ref_ptr<vsg::PropagateDynamicObjects> in_pdo,
-                                                         vsg::ref_ptr<vsg::Duplicate> in_duplicate)
+                                                         vsg::ref_ptr<vsg::Duplicate> in_duplicate,
+                                                         const std::string& in_node_name)
     : pdo(in_pdo)
     , duplicate(in_duplicate)
+    , node_name(in_node_name)
 {
 }
 
@@ -30,6 +33,22 @@ FindDisplayAnimationVisitor::FindDisplayAnimationVisitor(vsg::ref_ptr<vsg::Propa
 void FindDisplayAnimationVisitor::apply(vsg::Node& node)
 {
     node.traverse(*this);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void FindDisplayAnimationVisitor::apply(vsg::Group& group)
+{
+    std::string name;
+    group.getValue("name", name);
+
+    // Если наткнулись на дочерний элемент с таким же именем - останавливаемся,
+    // проход по нему будет ещё раз
+    if (name == node_name)
+        return;
+
+    group.traverse(*this);
 }
 
 //------------------------------------------------------------------------------

@@ -164,17 +164,17 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             return animation;
         }
 
-        animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group);
+        animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group, name);
         if (animation)
         {
             return animation;
         }
 
-        animation = create_material_animation<FindDisplayAnimationVisitor>("Display", cfg, &group);
+        animation = create_material_animation<FindDisplayAnimationVisitor>("Display", cfg, &group, name);
         if (animation)
         {
             return animation;
-        }        
+        }
     }
 
     return nullptr;
@@ -232,7 +232,7 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_transform_animat
 //
 //------------------------------------------------------------------------------
 template <typename VisitorClass>
-vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr)
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr, const std::string& name)
 {
     const auto config_section = cfg.getFirstSection(type);
     if (!config_section.isNull())
@@ -241,8 +241,8 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animati
         const vsg::CopyOp inner_copyop;
         inner_copyop.duplicate = new vsg::Duplicate;
 
-        VisitorClass animation_visitor(inner_pdo, inner_copyop.duplicate);
-        group_ptr->accept(animation_visitor);
+        VisitorClass animation_visitor(inner_pdo, inner_copyop.duplicate, name);
+        group_ptr->traverse(animation_visitor);
 
         const auto animation = animation_visitor.get_animation();
         if (animation && animation->load(cfg))
