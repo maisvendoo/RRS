@@ -27,7 +27,7 @@ public:
 
     std::string animations_dir;
 
-    vsg::ref_ptr<animations_t> animations = animations_t::create();
+    vsg::ref_ptr<animations_t> animations_map = animations_t::create();
 
 protected:
     ~AnimatedPagedLOD() = default;

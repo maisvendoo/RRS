@@ -21,7 +21,8 @@ protected:
 
 private:
 
-    void loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> node);
+    vsg::ref_ptr<vsg::Node> loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> aplod,
+                                           vsg::ref_ptr<vsg::Node> node);
 };
 
 #endif // ANIMATED_DATABASE_PAGER_H

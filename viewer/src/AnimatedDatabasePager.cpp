@@ -37,7 +37,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 
                 vsg::ref_ptr<vsg::Object> loaded = vsg::read(plod->filename, plod->options);
 
-                auto node = loaded.cast<vsg::Node>();
+                vsg::ref_ptr<vsg::Node> node = loaded.cast<vsg::Node>();
                 if (!node)
                 {
                     LOG_WARN("AnimatedDatabasePager: fail to load model from file: %s", plod->filename.c_str());
@@ -58,14 +58,14 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                     {
                         node = cullnode->child;
                     }
-                    if (auto transform = node.cast<vsg::Transform>())
+                    /*if (auto transform = node.cast<vsg::Transform>())
                     {
                         transform->subgraphRequiresLocalFrustum = false;
-                    }
+                    }*/
 
                     if (auto aplod = plod.cast<AnimatedPagedLOD>())
                     {
-                        animatedDatabasePager.loadAnimations(aplod);
+                        node = animatedDatabasePager.loadAnimations(aplod, node);
                     }
 
                     {
@@ -80,10 +80,12 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 
                         // move to the merge queue;
                         animatedDatabasePager._toMergeQueue->add(plod, result);
+
+                        LOG_INFO("AnimatedDatabasePager: load model from file: %s", plod->filename.c_str());
                     }
                     else
                     {
-                        LOG_WARN("Failed to compile model from file: %s", plod->filename.c_str());
+                        LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.c_str());
                         animatedDatabasePager.requestDiscarded(plod);
                     }
                 }
@@ -116,19 +118,20 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> node)
+vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> aplod,
+                                           vsg::ref_ptr<vsg::Node> node)
 {
-    node->animations->thread_safe_clear();
+    aplod->animations_map->thread_safe_clear();
 
-    if (node->animations_dir.empty())
-        return;
+    if (aplod->animations_dir.empty())
+        return node;
 
     {
         // Model's animations
-        FindModelAnimationsCreateInfo fma_create_info = {node, node->animations, node->animations_dir};
+        FindModelAnimationsCreateInfo fma_create_info = {node, aplod->animations_map, aplod->animations_dir};
         auto find_model_animations = FindModelAnimations::create(fma_create_info);
     }
-    std::size_t old_size = node->animations->animations.size();
+    std::size_t old_size = aplod->animations_map->animations.size();
 
     // Custom animations for model
     auto pdo = vsg::PropagateDynamicObjects::create();
@@ -136,16 +139,16 @@ void AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> node)
     vsg::CopyOp copyop;
     auto duplicate = copyop.duplicate = new vsg::Duplicate;
 
-    FindCustomAnimationsVisitorCreateInfo fcav_create_info = {pdo, duplicate, node->animations_dir, node->animations};
+    FindCustomAnimationsVisitorCreateInfo fcav_create_info = {pdo, duplicate, aplod->animations_dir, aplod->animations_map};
 
     FindCustomAnimationsVisitor fcav(fcav_create_info);
     node->accept(fcav);
     LOG_INFO("AnimatedDatabasePager: loaded %zu model and %zu custom (total: %zu) animations from %s for model %s",
              old_size,
-             node->animations->animations.size() - old_size,
-             node->animations->animations.size(),
-             node->animations_dir.c_str(),
-             node->filename.c_str());
+             aplod->animations_map->animations.size() - old_size,
+             aplod->animations_map->animations.size(),
+             aplod->animations_dir.c_str(),
+             aplod->filename.string().c_str());
 
     node->traverse(*pdo);
 
@@ -164,4 +167,5 @@ void AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> node)
         node = copyop(node);
         fcav.reconfigure_animations();
     }
+    return node;
 }

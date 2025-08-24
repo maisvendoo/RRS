@@ -241,7 +241,6 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
         LOG_WARN("Fail to load display module: %s", module_path.c_str());
         return false;
     }
-    LOG_INFO("Loaded display module: %s", module_path.c_str());
 
     display->setConfigDir(QString(cfgdir_path.c_str()));
 
@@ -256,7 +255,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     {
         display->init();
     }
-    LOG_INFO("Initialized display module with config's directory: %s", cfgdir_path.c_str());
+    LOG_INFO("Config's directory %s for display module %s ", cfgdir_path.c_str(), module_path.c_str());
 
     // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
     qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);

@@ -37,8 +37,6 @@ void FindDisplayAnimationVisitor::apply(vsg::Node& node)
 //------------------------------------------------------------------------------
 void FindDisplayAnimationVisitor::apply(vsg::BindDescriptorSet &bindDescriptorSet)
 {
-    LOG_INFO("Found bindDescriptorSet for display");
-
     // Контейнеры с текстурами
     vsg::ref_ptr<vsg::DescriptorImage> color_descriptor = nullptr;
     vsg::ref_ptr<vsg::DescriptorImage> emissive_descriptor = nullptr;

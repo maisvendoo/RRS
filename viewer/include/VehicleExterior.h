@@ -2,12 +2,12 @@
 #ifndef VEHICLE_EXTERIOR_H
 #define VEHICLE_EXTERIOR_H
 
-#include "animations-list.h"
-
 #include <vsg/core/Object.h>
 #include <vsg/nodes/MatrixTransform.h>
 
 class SoundManager;
+//class AnimatedPagedLOD;       // Forward declare не работает,
+#include "AnimatedPagedLOD.h"   // VehiclesHandler ругается на incomplete use
 
 //------------------------------------------------------------------------------
 //
@@ -29,8 +29,8 @@ public:
     int         prev_vehicle = -1;
     int         next_vehicle = -1;
 
-    vsg::ref_ptr<animations_t> animations = animations_t::create();
     std::vector<size_t> sounds_id = {};
+    std::vector<vsg::ref_ptr<AnimatedPagedLOD>> animated_nodes;
 
     vsg::dvec3  saved_cabine_cam_shift = vsg::dvec3(0.0, 0.0, 0.0);
     double      saved_cabine_cam_right = 0.0;
@@ -45,7 +45,8 @@ public:
 
     VehicleExterior() = default;
 
-    void step(float t, float dt, const vsg::dvec3* camera_pos);
+    void step(float t, float dt);
+    void step(float t, float dt, std::vector<float> *server_signals);
 
     bool loadVehicle(const std::string& cfg_dir,
                      const std::string& cfg_file,
@@ -54,7 +55,7 @@ public:
                      vsg::ref_ptr<vsg::Options> options);
 
 private:
-    void load_sounds(const std::string& sounds_dir, SoundManager *sm);
+    void load_sounds(const std::string& sounds_dir, SoundManager* sm);
 };
 
 #endif // VEHICLE_EXTERIOR_H

@@ -230,11 +230,8 @@ void VehiclesHandler::step(double t, double dt)
             vehicles[i].prev_vehicle = update_data[new_state].vehicles[i].prev_vehicle;
             vehicles[i].next_vehicle = update_data[new_state].vehicles[i].next_vehicle;
 
-            // Model animations update
-            for (auto& [signal_id, animation] : vehicles[i].animations->animations)
-            {
-                animation->setSignals(&(update_data[new_state].vehicles[i].analogSignal));
-            }
+            // Model animations update and step
+            vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(update_data[new_state].vehicles[i].analogSignal));
 
             // Sounds update
             for (auto sound_id : vehicles[i].sounds_id)
@@ -259,6 +256,10 @@ void VehiclesHandler::step(double t, double dt)
         }
         else
         {
+            // Model animations step
+            vehicles[i].step(static_cast<float>(t), static_cast<float>(dt));
+
+            // Sounds update
             for (auto sound_id : vehicles[i].sounds_id)
             {
                 const vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
@@ -268,9 +269,6 @@ void VehiclesHandler::step(double t, double dt)
                 sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
             }
         }
-
-        // Model animations step
-        vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), camera_pos);
     }
 }
 
