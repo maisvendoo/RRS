@@ -1,5 +1,6 @@
 #include "RouteViewer.h"
 
+#include "AnimatedDatabasePager.h"
 #include "CfgReader.h"
 #include "filesystem.h"
 #include "Logger.h"
@@ -614,7 +615,7 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
-    vsg::ref_ptr<vsg::DatabasePager> databasePager = vsg::DatabasePager::create();
+    vsg::ref_ptr<vsg::DatabasePager> databasePager = AnimatedDatabasePager::create();
     for (auto& task : viewer->recordAndSubmitTasks)
     {
         task->databasePager = databasePager;

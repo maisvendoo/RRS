@@ -21,6 +21,7 @@ struct animations_t final : public vsg::Inherit<vsg::Object, animations_t>
     std::multimap<std::int32_t, vsg::ref_ptr<ProcAnimation>> animations;
 
     void thread_safe_insert(std::pair<std::int32_t, vsg::ref_ptr<ProcAnimation>> id_and_animation);
+    void thread_safe_clear();
 };
 
 #endif // ANIMATIONS_LIST_H
