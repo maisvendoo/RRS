@@ -142,17 +142,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     vehicle_pagedLOD->options = options;
     vehicle_node->addChild(vehicle_pagedLOD);
     animated_nodes.push_back(vehicle_pagedLOD);
-/*
-    // Load model
-    options->operationThreads->add(LoadModelOperation::create(
-        viewer,
-        vehicle_node,
-        model_filename_path,
-        animations_dir,
-        options,
-        animations
-    ));
-*/
+
     // Reading data about cabine's 3D-model
     modelName = "";
 

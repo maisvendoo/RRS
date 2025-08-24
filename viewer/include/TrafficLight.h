@@ -13,6 +13,7 @@
 #include <string>
 
 class QByteArray;
+class AnimatedPagedLOD;
 
 //------------------------------------------------------------------------------
 //
@@ -52,7 +53,7 @@ private:
     lens_state_t lens_state;
     lens_state_t old_lens_state;
 
-    vsg::ref_ptr<animations_t> animations = animations_t::create();
+    vsg::ref_ptr<AnimatedPagedLOD> animated_pagedLOD;
 
     std::vector<float> server_signals;
 };

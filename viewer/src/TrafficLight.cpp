@@ -1,8 +1,9 @@
 #include "TrafficLight.h"
 
 #include "filesystem.h"
+#include "AnimatedPagedLOD.h"
 #include "ProcAnimation.h"
-#include "LoadModelOperation.h"
+#include "Logger.h"
 
 #include <vsg/threading/OperationThreads.h>
 
@@ -18,6 +19,8 @@ TrafficLight::TrafficLight()
 
     std::fill(lens_state.begin(), lens_state.end(), false);
     old_lens_state = lens_state;
+
+    animated_pagedLOD = AnimatedPagedLOD::create();
 }
 
 //------------------------------------------------------------------------------
@@ -25,7 +28,9 @@ TrafficLight::TrafficLight()
 //------------------------------------------------------------------------------
 void TrafficLight::step(float t, float dt)
 {
-    if (transform->children.empty() || animations->animations.empty())
+    if (transform->children.empty() ||
+        (!animated_pagedLOD->children[0].node) ||
+        animated_pagedLOD->animations_map->animations.empty())
     {
         return;
     }
@@ -41,7 +46,7 @@ void TrafficLight::step(float t, float dt)
         }
     }
 
-    for (auto& [signal_id, animation] : animations->animations)
+    for (const auto& [signal_id, animation] : animated_pagedLOD->animations_map->animations)
     {
         animation->setSignals(&(server_signals));
         animation->step(t, dt);
@@ -115,7 +120,19 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
                               vsg::ref_ptr<vsg::Options> options)
 {
     if (signal_model.isEmpty() || (signal_model == "empty_line"))
+    {
         return false;
+    }
+
+    FileSystem& fs = FileSystem::getInstance();
+    std::string model_filename_path = fs.combinePath(models_dir_path, signal_model.toStdString());
+    model_filename_path += ".gltf";
+
+    if (!vsg::fileExists(model_filename_path))
+    {
+        LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
+        return false;
+    }
 
     vsg::dmat4 m1 = vsg::translate(position);
 
@@ -128,23 +145,13 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
 
     transform->matrix = m1 * m2;
 
-    FileSystem& fs = FileSystem::getInstance();
-    std::string model_filename_path = fs.combinePath(models_dir_path, signal_model.toStdString());
-    model_filename_path += ".gltf";
-    std::string textures_dir = "";
-
     // Load model
-    options->operationThreads->add(LoadModelOperation::create(viewer,
-                                                              transform,
-                                                              model_filename_path,
-                                                              animations_dir,
-                                                              options,
-                                                              animations));
-
-    for (auto& [signal_id, animation] : animations->animations)
-    {
-        animation->setSignals(&(server_signals));
-    }
+    animated_pagedLOD->animations_dir = animations_dir;
+    animated_pagedLOD->filename = model_filename_path;
+    animated_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+    animated_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+    animated_pagedLOD->options = options;
+    transform->addChild(animated_pagedLOD);
 
     return true;
 }

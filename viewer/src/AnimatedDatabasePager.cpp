@@ -40,7 +40,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                 vsg::ref_ptr<vsg::Node> node = loaded.cast<vsg::Node>();
                 if (!node)
                 {
-                    LOG_WARN("AnimatedDatabasePager: fail to load model from file: %s", plod->filename.c_str());
+                    LOG_WARN("AnimatedDatabasePager: fail to load model from file: %s", plod->filename.string().c_str());
 
                     auto error = loaded.cast<vsg::ReadError>();
                     if (error)
@@ -81,11 +81,11 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                         // move to the merge queue;
                         animatedDatabasePager._toMergeQueue->add(plod, result);
 
-                        LOG_INFO("AnimatedDatabasePager: load model from file: %s", plod->filename.c_str());
+                        //LOG_INFO("AnimatedDatabasePager: load and compiled model from file: %s", plod->filename.string().c_str());
                     }
                     else
                     {
-                        LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.c_str());
+                        LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.string().c_str());
                         animatedDatabasePager.requestDiscarded(plod);
                     }
                 }
