@@ -9,7 +9,7 @@
 #include <vsg/core/observer_ptr.h>
 #include <QString>
 
-class simulator_time_t;
+struct simulator_time_t;
 class Skybox;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
