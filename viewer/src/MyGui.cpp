@@ -7,6 +7,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "VehiclesHandler.h"
+#include "spa.h"
 
 #include <vsg/io/Options.h>
 #include <vsg/maths/vec3.h>
@@ -330,30 +331,64 @@ void MyGui::showSettings() const
     // Calculate sun position from latitude, longitude, date and time
     //--------------------------------------------------------------------------
     // Координаты РГУПСа (для теста)
-    static constexpr double latitude = 47.2510;
-    static constexpr double longitude = 39.6984;
+    static constexpr double latitude = 47.2504559;
+    static constexpr double longitude = 39.6982501;
 
+    static float delta_ut1 = 0.0;
+    static float delta_t = 0.0;
+    static float elevation = 0.0;
+    static float pressure = 0.0;
+    static float temperature = 0.0;
+    static float slope = 0.0;
+    static float azm_rotation = 0.0;
+    static float atmos_refract = 0.0;
 
+    ImGui::SliderFloat("delta_ut1", &delta_ut1, -1.0f, 1.0f);
+    ImGui::SliderFloat("delta_t", &delta_t, -8000.0f, 8000.0f);
+    // ImGui::SliderFloat("elevation", &elevation, -100.0f, 100.0f);
+    ImGui::SliderFloat("pressure", &pressure, 0.0f, 5000.0f);
+    ImGui::SliderFloat("temperature", &temperature, -30.0f, 100.0f);
+    ImGui::SliderFloat("slope", &slope, -360.0f, 360.0f);
+    ImGui::SliderFloat("azm_rotation", &azm_rotation, -360.0f, 360.0f);
+    // ImGui::SliderFloat("atmos_refract", &atmos_refract, -5.0f, 5.0f);
 
+    spa_data spa;
+    spa.year = params->year;
+    spa.month = params->month;
+    spa.day = params->day;
+    spa.hour = params->hour - 1;
+    spa.minute = params->minute;
+    spa.second = params->sec;
+    spa.delta_ut1 = delta_ut1;
+    spa.delta_t = delta_t;
+    spa.timezone = 3.0;
+    spa.longitude = longitude;
+    spa.latitude = latitude;
+    spa.elevation = elevation;
+    spa.pressure = pressure;
+    spa.temperature = temperature;
+    spa.slope = slope;
+    spa.azm_rotation = azm_rotation;
+    spa.atmos_refract = atmos_refract;
+    spa.function = SPA_ALL;
 
-    double azimuth = 0.0;
-    double altitude = 0.0;
+    spa_calculate(&spa);
 
-    // params->sun_azimuth_degrees = azimuth;
-    // params->sun_altitude_degrees = altitude;
+    params->sun_azimuth_degrees = spa.azimuth;
+    params->sun_altitude_degrees = spa.incidence;
 
     ImGui::Text("latitude: %f", latitude);
     ImGui::Text("longitude: %f", longitude);
-    ImGui::Text("azimuth: %f", azimuth);
-    ImGui::Text("elevation: %f", altitude);
+    ImGui::Text("azimuth: %f", spa.azimuth);
+    ImGui::Text("incidence: %f", spa.incidence);
     //--------------------------------------------------------------------------
 
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
     ImGui::ColorEdit3("Sun color", params->sun_color);
     ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 5.0f);
-    ImGui::SliderFloat("Sun azimuth", &params->sun_azimuth_degrees, 0.0f, 360.0f, "%.1f");
-    ImGui::SliderFloat("Sun altitude", &params->sun_altitude_degrees, -90.0f, 90.0f, "%.1f");
+    // ImGui::SliderFloat("Sun azimuth", &params->sun_azimuth_degrees, 0.0f, 360.0f, "%.1f");
+    // ImGui::SliderFloat("Sun altitude", &params->sun_altitude_degrees, -90.0f, 90.0f, "%.1f");
 /*    if (params->skybox_textures.size() > 0)
     {
         ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
