@@ -8,7 +8,7 @@
 #include <vsg/io/ReaderWriter.h>
 #include <vsg/io/read.h>
 #include <vsg/nodes/Transform.h>
-#include <vsg/nodes/Cullnode.h>
+#include <vsg/nodes/CullNode.h>
 #include <vsg/threading/atomics.h>
 #include <vsg/ui/ApplicationEvent.h>
 #include <vsg/utils/SharedObjects.h>
