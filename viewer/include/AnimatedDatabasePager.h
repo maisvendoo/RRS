@@ -3,7 +3,7 @@
 
 #include <vsg/io/DatabasePager.h>
 
-class animations_t;
+struct animations_t;
 class AnimatedPagedLOD;
 
 //------------------------------------------------------------------------------
