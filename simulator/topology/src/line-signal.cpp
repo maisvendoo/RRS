@@ -169,6 +169,9 @@ void LineSignal::alsn_control()
 //------------------------------------------------------------------------------
 void LineSignal::preStep(state_vector_t &Y, double t)
 {
+    (void)Y;
+    (void)t;
+
     lens_state_control();
 
     relay_control();
@@ -183,7 +186,9 @@ void LineSignal::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void LineSignal::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-
+    (void)Y;
+    (void)dYdt;
+    (void)t;
 }
 
 //------------------------------------------------------------------------------

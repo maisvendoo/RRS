@@ -31,7 +31,8 @@ void DecoderALSN::setCoilSignal(ALSN code) noexcept
 //------------------------------------------------------------------------------
 void DecoderALSN::preStep(state_vector_t &Y, double t)
 {
-
+    (void)Y;
+    (void)t;
 }
 
 //------------------------------------------------------------------------------
@@ -41,7 +42,9 @@ void DecoderALSN::ode_system(const state_vector_t &Y,
                              state_vector_t &dYdt,
                              double t)
 {
-
+    (void)Y;
+    (void)dYdt;
+    (void)t;
 }
 
 //------------------------------------------------------------------------------

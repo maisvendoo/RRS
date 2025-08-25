@@ -19,8 +19,8 @@ public:
     T       value;
 
     option_t()
-        : value(T())
-        , is_present(false)
+        : is_present(false)
+        , value(T())
     {
 
     }

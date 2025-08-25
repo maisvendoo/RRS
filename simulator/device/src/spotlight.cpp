@@ -21,6 +21,9 @@ SpotLight::~SpotLight()
 //------------------------------------------------------------------------------
 void SpotLight::preStep(state_vector_t &Y, double t)
 {
+    (void)Y;
+    (void)t;
+
     double u1 = static_cast<double>(is_low);
     double u2 = static_cast<double>(is_high);
 
@@ -36,7 +39,9 @@ void SpotLight::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)
 {
-
+    (void)Y;
+    (void)dYdt;
+    (void)t;
 }
 
 //------------------------------------------------------------------------------
@@ -44,5 +49,7 @@ void SpotLight::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 void SpotLight::load_config(CfgReader &cfg)
 {
-    QString secName = "Device";    
+    (void)cfg;
+
+    QString secName = "Device";
 }

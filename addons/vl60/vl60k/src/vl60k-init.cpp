@@ -110,7 +110,8 @@ void VL60k::initTractionControl(const QString &modules_dir, const QString &custo
 //------------------------------------------------------------------------------
 void VL60k::initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir)
 {
-    (void) modules_dir;
+    (void)modules_dir;
+    (void)custom_cfg_dir;
 
     for (auto i : {CAB1, CAB2})
     {

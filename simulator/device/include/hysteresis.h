@@ -15,7 +15,7 @@ public:
                double max_value = 0.9,
                bool init_state = false);
 
-    ~Hysteresis() = default;
+    virtual ~Hysteresis() = default;
 
     void setRange(double min_value, double max_value);
 

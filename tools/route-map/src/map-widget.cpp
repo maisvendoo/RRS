@@ -85,6 +85,8 @@ void MapWidget::slotPlayerAtCenter(int idx)
 //------------------------------------------------------------------------------
 void MapWidget::paintEvent(QPaintEvent *event)
 {
+    (void)event;
+
     if (traj_list == nullptr)
     {
         return;

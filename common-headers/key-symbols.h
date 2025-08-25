@@ -261,13 +261,13 @@ static const std::set<std::uint16_t> KeySymbolsRRS =
 };
 
 //------------------------------------------------------------------------------
-static bool getKeyState(const std::set<std::uint16_t>& keys, const std::uint16_t key)
+inline bool getKeyState(const std::set<std::uint16_t>& keys, const std::uint16_t key)
 {
     return key && keys.count(key);
 }
 
 //------------------------------------------------------------------------------
-static bool getKeyState(const std::set<std::uint16_t>* keys, const std::uint16_t key)
+inline bool getKeyState(const std::set<std::uint16_t>* keys, const std::uint16_t key)
 {
     if (keys)
         return getKeyState(*keys, key);
@@ -275,13 +275,13 @@ static bool getKeyState(const std::set<std::uint16_t>* keys, const std::uint16_t
 }
 
 //------------------------------------------------------------------------------
-static bool isShift(const std::set<std::uint16_t>& keys)
+inline bool isShift(const std::set<std::uint16_t>& keys)
 {
     return keys.count(KEY_Shift_L) || keys.count(KEY_Shift_R);
 }
 
 //------------------------------------------------------------------------------
-static bool isShift(const std::set<std::uint16_t>* keys)
+inline bool isShift(const std::set<std::uint16_t>* keys)
 {
     if (keys)
         return isShift(*keys);
@@ -289,13 +289,13 @@ static bool isShift(const std::set<std::uint16_t>* keys)
 }
 
 //------------------------------------------------------------------------------
-static bool isControl(const std::set<std::uint16_t>& keys)
+inline bool isControl(const std::set<std::uint16_t>& keys)
 {
     return keys.count(KEY_Control_L) || keys.count(KEY_Control_R);
 }
 
 //------------------------------------------------------------------------------
-static bool isControl(const std::set<std::uint16_t>* keys)
+inline bool isControl(const std::set<std::uint16_t>* keys)
 {
     if (keys)
         return isControl(*keys);
@@ -303,13 +303,13 @@ static bool isControl(const std::set<std::uint16_t>* keys)
 }
 
 //------------------------------------------------------------------------------
-static bool isAlt(const std::set<std::uint16_t>& keys)
+inline bool isAlt(const std::set<std::uint16_t>& keys)
 {
     return keys.count(KEY_Alt_L) || keys.count(KEY_Alt_R);
 }
 
 //------------------------------------------------------------------------------
-static bool isAlt(const std::set<std::uint16_t>* keys)
+inline bool isAlt(const std::set<std::uint16_t>* keys)
 {
     if (keys)
         return isAlt(*keys);
@@ -317,7 +317,7 @@ static bool isAlt(const std::set<std::uint16_t>* keys)
 }
 
 //------------------------------------------------------------------------------
-static bool isModifier(const std::set<std::uint16_t>& keys, const std::uint16_t key_modifier)
+inline bool isModifier(const std::set<std::uint16_t>& keys, const std::uint16_t key_modifier)
 {
     switch (key_modifier)
     {
@@ -344,7 +344,7 @@ static bool isModifier(const std::set<std::uint16_t>& keys, const std::uint16_t 
 }
 
 //------------------------------------------------------------------------------
-static bool isModifier(const std::set<std::uint16_t>* keys, const std::uint16_t key_modifier)
+inline bool isModifier(const std::set<std::uint16_t>* keys, const std::uint16_t key_modifier)
 {
     if (keys)
         return isModifier(*keys, key_modifier);

@@ -137,6 +137,8 @@ void MainWindow::overrideByCommandLine(route_map_command_line_t &cmd_line)
 //------------------------------------------------------------------------------
 void MainWindow::paintEvent(QPaintEvent *event)
 {
+    (void)event;
+
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
 }

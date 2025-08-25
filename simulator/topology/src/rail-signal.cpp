@@ -151,7 +151,7 @@ void Signal::allowTransmitALSN(bool is_allow)
 //------------------------------------------------------------------------------
 void Signal::load_config(CfgReader &cfg)
 {
-
+    (void)cfg;
 }
 
 //------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
     }
 
     Trajectory *traj = nullptr;
-    dvec3 pos;
+    // dvec3 pos;
 
     if (signal_dir == 1)
     {

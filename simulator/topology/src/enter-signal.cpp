@@ -624,6 +624,9 @@ bool EnterSignal::is_switch_minus(Connector *conn)
 //------------------------------------------------------------------------------
 void EnterSignal::preStep(state_vector_t &Y, double t)
 {
+    (void)Y;
+    (void)t;
+
     lens_control();
 
     busy_control();
@@ -638,7 +641,9 @@ void EnterSignal::ode_system(const state_vector_t &Y,
                              state_vector_t &dYdt,
                              double t)
 {
-
+    (void)Y;
+    (void)dYdt;
+    (void)t;
 }
 
 //------------------------------------------------------------------------------

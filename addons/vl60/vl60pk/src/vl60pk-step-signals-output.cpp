@@ -27,6 +27,9 @@
 //------------------------------------------------------------------------------
 void VL60pk::stepSignalsOutput(double t, double dt)
 {
+    (void)t;
+    (void)dt;
+
     analogSignal[SERIAL_NUMBER] = 1543.0f;
 
     // Вращение колёсных пар

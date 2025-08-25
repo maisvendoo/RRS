@@ -121,6 +121,9 @@ void ExitSignal::slotPressClose()
 //------------------------------------------------------------------------------
 void ExitSignal::preStep(state_vector_t &Y, double t)
 {
+    (void)Y;
+    (void)t;
+
     lens_control();
 
     fwd_way_busy_control();
@@ -141,7 +144,9 @@ void ExitSignal::ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t)
 {
-
+    (void)Y;
+    (void)dYdt;
+    (void)t;
 }
 
 //------------------------------------------------------------------------------
