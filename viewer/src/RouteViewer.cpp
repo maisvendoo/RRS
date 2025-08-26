@@ -570,8 +570,6 @@ void RouteViewer::initCommandGraph()
     GUIparams->sun_color = sun->color.data();
     GUIparams->sun_direction_d = &sun->direction;
     GUIparams->sun_intensity = &sun->intensity;
-    GUIparams->sun_azimuth_degrees = static_cast<float>(settings.sun_azimuth);
-    GUIparams->sun_altitude_degrees = static_cast<float>(settings.sun_altitude);
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
