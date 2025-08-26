@@ -334,24 +334,6 @@ void MyGui::showSettings() const
     static constexpr double latitude = 47.2504559;
     static constexpr double longitude = 39.6982501;
 
-    static float delta_ut1 = 0.0;
-    static float delta_t = 0.0;
-    static float elevation = 0.0;
-    static float pressure = 0.0;
-    static float temperature = 0.0;
-    static float slope = 0.0;
-    static float azm_rotation = 0.0;
-    static float atmos_refract = 0.0;
-
-    ImGui::SliderFloat("delta_ut1", &delta_ut1, -1.0f, 1.0f);
-    ImGui::SliderFloat("delta_t", &delta_t, -8000.0f, 8000.0f);
-    // ImGui::SliderFloat("elevation", &elevation, -100.0f, 100.0f);
-    ImGui::SliderFloat("pressure", &pressure, 0.0f, 5000.0f);
-    ImGui::SliderFloat("temperature", &temperature, -30.0f, 100.0f);
-    ImGui::SliderFloat("slope", &slope, -360.0f, 360.0f);
-    ImGui::SliderFloat("azm_rotation", &azm_rotation, -360.0f, 360.0f);
-    // ImGui::SliderFloat("atmos_refract", &atmos_refract, -5.0f, 5.0f);
-
     spa_data spa;
     spa.year = params->year;
     spa.month = params->month;
@@ -359,28 +341,28 @@ void MyGui::showSettings() const
     spa.hour = params->hour - 1;
     spa.minute = params->minute;
     spa.second = params->sec;
-    spa.delta_ut1 = delta_ut1;
-    spa.delta_t = delta_t;
+    spa.delta_ut1 = 0.0;
+    spa.delta_t = 0.0;
     spa.timezone = 3.0;
     spa.longitude = longitude;
     spa.latitude = latitude;
-    spa.elevation = elevation;
-    spa.pressure = pressure;
-    spa.temperature = temperature;
-    spa.slope = slope;
-    spa.azm_rotation = azm_rotation;
-    spa.atmos_refract = atmos_refract;
+    spa.elevation = 0.0;
+    spa.pressure = 0.0;
+    spa.temperature = 0.0;
+    spa.slope = 0.0;
+    spa.azm_rotation = 0.0;
+    spa.atmos_refract = 0.5667;
     spa.function = SPA_ALL;
 
     spa_calculate(&spa);
 
     params->sun_azimuth_degrees = spa.azimuth;
-    params->sun_altitude_degrees = spa.incidence;
+    params->sun_altitude_degrees = spa.e;
 
     ImGui::Text("latitude: %f", latitude);
     ImGui::Text("longitude: %f", longitude);
     ImGui::Text("azimuth: %f", spa.azimuth);
-    ImGui::Text("incidence: %f", spa.incidence);
+    ImGui::Text("altitude: %f", spa.e);
     //--------------------------------------------------------------------------
 
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
@@ -393,6 +375,7 @@ void MyGui::showSettings() const
     {
         ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
     }*/
+
     ImGui::End();
 
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
