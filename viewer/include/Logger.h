@@ -1,23 +1,15 @@
-#pragma once
 #ifndef VIEWER_LOGGER_H
 #define VIEWER_LOGGER_H
 
 #include <cstdio>
 
-#define LOG_DEBUG(...) \
-    Logger::instance().log_message(LOG_LEVEL_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_DEBUG(...) LOG_MESSAGE(LOG_LEVEL_DEBUG, __VA_ARGS__)
+#define LOG_INFO(...)  LOG_MESSAGE(LOG_LEVEL_INFO,  __VA_ARGS__)
+#define LOG_WARN(...)  LOG_MESSAGE(LOG_LEVEL_WARN,  __VA_ARGS__)
+#define LOG_ERROR(...) LOG_MESSAGE(LOG_LEVEL_ERROR, __VA_ARGS__)
+#define LOG_FATAL(...) LOG_MESSAGE(LOG_LEVEL_FATAL, __VA_ARGS__)
 
-#define LOG_INFO(...) \
-    Logger::instance().log_message(LOG_LEVEL_INFO, __FILE__, __LINE__, __VA_ARGS__)
-
-#define LOG_WARN(...) \
-    Logger::instance().log_message(LOG_LEVEL_WARN, __FILE__, __LINE__, __VA_ARGS__)
-
-#define LOG_ERROR(...) \
-    Logger::instance().log_message(LOG_LEVEL_ERROR, __FILE__, __LINE__, __VA_ARGS__)
-
-#define LOG_FATAL(...) \
-    Logger::instance().log_message(LOG_LEVEL_FATAL, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_MESSAGE(log_level, ...) Logger::instance().log_message(log_level, __FILE__, __LINE__, __VA_ARGS__)
 
 //------------------------------------------------------------------------------
 //

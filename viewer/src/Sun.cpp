@@ -2,6 +2,9 @@
 
 #include "spa.h"
 
+#include <vsg/core/ref_ptr.h>
+#include <vsg/lighting/DirectionalLight.h>
+
 static spa_data default_spa()
 {
     spa_data spa;
@@ -18,7 +21,7 @@ static spa_data default_spa()
     return spa;
 }
 
-void Sun::calculate_position(
+void Sun::calculate_direction(
     int year, int month, int day,
     int hour, int minute, double second,
     double timezone,
@@ -37,17 +40,4 @@ void Sun::calculate_position(
     spa.latitude = latitude;
 
     spa_calculate(&spa);
-
-    azimuth = spa.azimuth;
-    altitude = spa.e;
-}
-
-double Sun::get_azimuth() const
-{
-    return azimuth;
-}
-
-double Sun::get_altitude() const
-{
-    return altitude;
 }
