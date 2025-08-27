@@ -1,14 +1,12 @@
 #include "VehiclesHandler.h"
 
 #include "Logger.h"
-#include "ProcAnimation.h"
 #include "settings.h"
 #include "simulator-info-struct.h"
 #include "simulator-update-struct.h"
 #include "sound-manager.h"
 #include "VehicleExterior.h"
 
-#include <algorithm>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
@@ -19,6 +17,7 @@
 #include <QObject>
 #include <QString>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -401,7 +400,6 @@ bool VehiclesHandler::returnToControlledVehicle() noexcept
 bool VehiclesHandler::load(
     QByteArray& data,
     const settings_t& settings,
-    vsg::ref_ptr<vsg::Viewer> viewer,
     vsg::ref_ptr<vsg::Options> options
 )
 {
@@ -427,7 +425,7 @@ bool VehiclesHandler::load(
         vehicle_exterior.driver_pos[vehicle_exterior.current_cabine_idx] = settings.cabine_default_pos;
         vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
-        if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, viewer, options))
+        if (vehicle_exterior.loadVehicle(cfg_dir, cfg_file, sound_manager, options))
         {
             LOG_INFO("Added vehicle %u / %u with model from %s / %s.xml",
                      i + 1, vehicle_count, cfg_dir.c_str(), cfg_file.c_str());

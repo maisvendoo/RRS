@@ -5,9 +5,9 @@
 #include "ProcAnimation.h"
 #include "Logger.h"
 
-#include <vsg/threading/OperationThreads.h>
-
 #include <QBuffer>
+
+#include <algorithm>
 
 //------------------------------------------------------------------------------
 //
@@ -116,7 +116,6 @@ const QString& TrafficLight::getModelName() const noexcept
 //------------------------------------------------------------------------------
 bool TrafficLight::loadSignal(std::string &models_dir_path,
                               std::string &animations_dir,
-                              vsg::ref_ptr<vsg::Viewer> viewer,
                               vsg::ref_ptr<vsg::Options> options)
 {
     if (signal_model.isEmpty() || (signal_model == "empty_line"))

@@ -2,7 +2,6 @@
 #ifndef TRAFFIC_LIGHT_H
 #define TRAFFIC_LIGHT_H
 
-#include "animations-list.h"
 #include "signal-types.h"
 
 #include <vsg/core/Object.h>
@@ -40,7 +39,6 @@ public:
 
     bool loadSignal(std::string& models_dir_path,
                     std::string& animations_dir,
-                    vsg::ref_ptr<vsg::Viewer> viewer,
                     vsg::ref_ptr<vsg::Options> options);
 
 private:

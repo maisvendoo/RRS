@@ -101,6 +101,8 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                            vsg::ref_ptr<vsg::ActivityStatus> status,
                            const AnimatedDatabasePager& databasePager)
     {
+        (void)databasePager;
+
         while (status->active())
         {
             deleteQueue->wait_then_clear();

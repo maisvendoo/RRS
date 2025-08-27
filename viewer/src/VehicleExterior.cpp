@@ -1,21 +1,22 @@
 #include "VehicleExterior.h"
 
 #include "AnimatedPagedLOD.h"
-#include "Logger.h"
-#include "MyGui.h"
-#include "filesystem.h"
 #include "CfgReader.h"
+#include "filesystem.h"
+#include "Logger.h"
 #include "ProcAnimation.h"
 #include "sound-manager.h"
 
-#include <iostream>
-#include <qdom.h>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <vsg/core/Array.h>
 #include <vsg/maths/vec2.h>
 #include <vsg/threading/OperationThreads.h>
+
+#include <QDomNode>
+
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 //------------------------------------------------------------------------------
 //
@@ -55,7 +56,7 @@ void VehicleExterior::step(float t, float dt, std::vector<float>* server_signals
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
+bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string& cfg_file, SoundManager* sm, vsg::ref_ptr<vsg::Options> options)
 {
     // Open vehicle config file
     FileSystem& fs = FileSystem::getInstance();

@@ -30,7 +30,6 @@ public:
 
     bool load(QByteArray &data,
               const std::string& route_dir_full_path,
-              vsg::ref_ptr<vsg::Viewer> viewer,
               vsg::ref_ptr<vsg::Options> options);
 
 private:

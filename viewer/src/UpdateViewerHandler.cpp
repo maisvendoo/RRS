@@ -597,7 +597,7 @@ void UpdateViewerHandler::updateShadowRegion()
     // Текущий вид из камеры
     vsg::ref_ptr<vsg::LookAt> lookAt = _camera->viewMatrix.cast<vsg::LookAt>();
 
-    // Еденичные векторы вперёд, вверх, вправо
+    // Единичные векторы вперёд, вверх, вправо
     vsg::dvec3 orth = vsg::normalize(lookAt->center - lookAt->eye);
     vsg::dvec3 up = vsg::normalize(lookAt->up);
     vsg::dvec3 right = vsg::cross(orth, up);

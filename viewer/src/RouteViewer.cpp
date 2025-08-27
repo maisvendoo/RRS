@@ -805,7 +805,7 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     GUIparams->status = QString("Загрузка светофоров...");
 
-    is_signals = traffic_lights_handler->load(sig_data, settings.route_dir_full_path, viewer, options);
+    is_signals = traffic_lights_handler->load(sig_data, settings.route_dir_full_path, options);
 
     root->addChild(traffic_lights_handler->getNode());
 
@@ -829,7 +829,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    is_vehicles = vehicles_handler->load(data, settings, viewer, options);
+    is_vehicles = vehicles_handler->load(data, settings, options);
 
     GUIparams->status = QString("");
 

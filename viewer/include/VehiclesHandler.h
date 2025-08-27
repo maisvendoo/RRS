@@ -64,7 +64,6 @@ public:
     bool load(
         QByteArray& data,
         const settings_t& settings,
-        vsg::ref_ptr<vsg::Viewer> viewer,
         vsg::ref_ptr<vsg::Options> options
     );
 

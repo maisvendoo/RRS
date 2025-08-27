@@ -3,18 +3,20 @@
 #include "Logger.h"
 #include "filesystem.h"
 
-#include "vsg/commands/Commands.h"
-#include "vsg/commands/PipelineBarrier.h"
 #include "vsg/commands/BlitImage.h"
+#include "vsg/commands/Commands.h"
 #include "vsg/commands/CopyImage.h"
-#include "vsg/vk/SubmitCommands.h"
+#include "vsg/commands/PipelineBarrier.h"
 #include "vsg/io/write.h"
-#include <cstdint>
 #include <vsg/vk/Device.h>
 #include <vsg/vk/PhysicalDevice.h>
+#include "vsg/vk/SubmitCommands.h"
 #include <vsg/vk/Swapchain.h>
 #include <vsgXchange/all.h>
+
 #include <QDateTime>
+
+#include <cstdint>
 
 //------------------------------------------------------------------------------
 //

@@ -42,7 +42,7 @@ void TrafficLightsHandler::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_full_path, vsg::ref_ptr<vsg::Viewer> viewer, vsg::ref_ptr<vsg::Options> options)
+bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_full_path, vsg::ref_ptr<vsg::Options> options)
 {
     deserialize(data);
 
@@ -82,7 +82,6 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
     {
         traffic_light->loadSignal(models_dir_path,
                                   animations_dir,
-                                  viewer,
                                   options);
         traffic_light_nodes->addChild(traffic_light->transform);
     }
@@ -91,7 +90,6 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
     {
         traffic_light->loadSignal(models_dir_path,
                                   animations_dir,
-                                  viewer,
                                   options);
         traffic_light_nodes->addChild(traffic_light->transform);
     }
