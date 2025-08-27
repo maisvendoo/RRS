@@ -15,6 +15,8 @@ class SoundManager;
 class VehicleExterior final
 {
 public:
+    VehicleExterior() = default;
+
     vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
     vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
@@ -43,7 +45,6 @@ public:
     /// Фактический индекс кабины
     size_t controlled_cabine_idx = 0;
 
-    VehicleExterior() = default;
 
     void step(float t, float dt);
     void step(float t, float dt, std::vector<float> *server_signals);

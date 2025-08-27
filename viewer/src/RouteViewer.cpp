@@ -171,8 +171,8 @@ int RouteViewer::run()
         QApplication::processEvents();
     }
 
-    // Вызывает ошибку на выходе из вьювера
     // viewer->setupThreading(); // Эта функция была в одном из vsgExamples
+                                 // Вызывает ошибку на выходе из вьювера
 
     // Главный цикл рендеринга
     while (viewer->advanceToNextFrame())
