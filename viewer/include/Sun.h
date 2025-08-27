@@ -1,16 +1,10 @@
 #ifndef SUN_H
 #define SUN_H
 
-#include <vsg/core/ref_ptr.h>
+#include <vsg/core/Inherit.h>
+#include <vsg/lighting/DirectionalLight.h>
 
-namespace vsg
-{
-
-class DirectionalLight;
-
-}
-
-class Sun
+class Sun : public vsg::Inherit<vsg::DirectionalLight, Sun>
 {
 public:
     void calculate_direction(
@@ -19,9 +13,6 @@ public:
         double timezone,
         double latitude, double longitude
     );
-
-private:
-    vsg::ref_ptr<vsg::DirectionalLight> light;
 };
 
 #endif // SUN_H

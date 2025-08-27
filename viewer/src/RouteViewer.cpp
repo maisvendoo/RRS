@@ -10,6 +10,7 @@
 #include "ScreenshotWriter.h"
 #include "Skybox.h"
 #include "sound-manager.h"
+#include "Sun.h"
 #include "tcp-client.h"
 #include "TrafficLightsHandler.h"
 #include "UpdateSoundManagerHandler.h"
@@ -528,7 +529,7 @@ void RouteViewer::initLights()
     root->addChild(ambient);
 
     // Настраиваем солнечное освещение
-    sun = vsg::DirectionalLight::create();
+    sun = Sun::create();
     sun->color = vsg::vec3(settings.sun_color);
     sun->intensity = static_cast<float>(settings.sun_intensity);
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
@@ -592,14 +593,13 @@ void RouteViewer::initViewer()
         upd_server_control,
         camera,
         shadow_region,
-        sun,
         screenshot_writer,
         traffic_lights_handler,
         vehicles_handler,
         settings
     );
 
-    auto upd_soundmanager_handler = UpdateSoundManagerHandler::create(lookAt, sound_manager);
+    auto upd_sound_manager_handler = UpdateSoundManagerHandler::create(lookAt, sound_manager);
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
 
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
@@ -608,7 +608,7 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
-    viewer->addEventHandler(upd_soundmanager_handler);
+    viewer->addEventHandler(upd_sound_manager_handler);
     viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
 
@@ -830,7 +830,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     GUIparams->status = QString("");
 
     if (!is_vehicles)
+    {
         return;
+    }
 
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             vehicles_handler, &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);

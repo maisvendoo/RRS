@@ -2,8 +2,10 @@
 
 #include "spa.h"
 
-#include <vsg/core/ref_ptr.h>
-#include <vsg/lighting/DirectionalLight.h>
+#include <vsg/maths/common.h>
+#include <vsg/maths/vec3.h>
+
+#include <cmath>
 
 static spa_data default_spa()
 {
@@ -40,4 +42,12 @@ void Sun::calculate_direction(
     spa.latitude = latitude;
 
     spa_calculate(&spa);
+
+    const double azimuth_rad = vsg::radians(spa.azimuth);
+    const double altitude_rad = vsg::radians(spa.e);
+
+    direction.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
+    direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
+    direction.z = -std::sin(altitude_rad);
+    direction = vsg::normalize(direction);
 }

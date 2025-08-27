@@ -6,15 +6,16 @@
 
 #include <vsg/core/ref_ptr.h>
 
-class CfgReader;
+class  CfgReader;
 struct GUIParams;
-class QByteArray;
-class ScreenshotWriter;
-class SoundManager;
-class TcpClient;
-class TrafficLightsHandler;
-class UpdateViewerHandler;
-class VehiclesHandler;
+class  QByteArray;
+class  ScreenshotWriter;
+class  SoundManager;
+class  Sun;
+class  TcpClient;
+class  TrafficLightsHandler;
+class  UpdateViewerHandler;
+class  VehiclesHandler;
 
 namespace vsg
 {
@@ -22,7 +23,6 @@ namespace vsg
 class AmbientLight;
 class Camera;
 class CommandGraph;
-class DirectionalLight;
 class Group;
 class LookAt;
 class Options;
@@ -105,7 +105,6 @@ private:
     vsg::ref_ptr<GUIParams>            GUIparams;
     vsg::ref_ptr<UpdateViewerHandler>  upd_viewer_handler;
 
-    // Replace by smart pointers?
     TcpClient*             tcp_client = nullptr;
     SoundManager*          sound_manager = nullptr;
     ScreenshotWriter*      screenshot_writer = nullptr;
@@ -123,7 +122,7 @@ private:
 
     vsg::ref_ptr<vsg::Group>             root;
     vsg::ref_ptr<vsg::AmbientLight>      ambient;
-    vsg::ref_ptr<vsg::DirectionalLight>  sun;
+    vsg::ref_ptr<Sun>                    sun;
     vsg::ref_ptr<vsg::ShadowSettings>    shadowSettings;
     vsg::ref_ptr<vsg::RegionOfInterest>  shadow_region;
 };

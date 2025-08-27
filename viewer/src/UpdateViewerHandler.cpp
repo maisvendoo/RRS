@@ -11,7 +11,6 @@
 #include "VehiclesHandler.h"
 #include "settings.h"
 
-#include <vsg/lighting/DirectionalLight.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
@@ -25,7 +24,6 @@ UpdateViewerHandler::UpdateViewerHandler(
     vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
     vsg::ref_ptr<vsg::Camera> camera,
     vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
-    vsg::ref_ptr<vsg::DirectionalLight> sun,
     ScreenshotWriter* screenshot_writer,
     TrafficLightsHandler* sig_handler,
     VehiclesHandler* veh_handler,
@@ -37,7 +35,6 @@ UpdateViewerHandler::UpdateViewerHandler(
     , _upd_server_control(upd_server_control)
     , _camera(camera)
     , _shadow_region(shadow_region)
-    , _sun(sun)
     , _screenshot_writer(screenshot_writer)
     , _sig_handler(sig_handler)
     , _vehicles_handler(veh_handler)
@@ -589,7 +586,7 @@ void UpdateViewerHandler::changeCurrentCabine()
     if (vehicle->current_cabine_idx == vehicle->driver_pos.size())
     {
         vehicle->current_cabine_idx = 0;
-    }   
+    }
 }
 
 //------------------------------------------------------------------------------

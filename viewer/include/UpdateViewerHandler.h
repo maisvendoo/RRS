@@ -23,7 +23,6 @@ namespace vsg
     class ButtonPressEvent;
     class ButtonReleaseEvent;
     class Camera;
-    class DirectionalLight;
     class FocusInEvent;
     class FocusOutEvent;
     class FrameEvent;
@@ -50,7 +49,6 @@ public:
         vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
         vsg::ref_ptr<vsg::Camera> camera,
         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
-        vsg::ref_ptr<vsg::DirectionalLight> sun,
         ScreenshotWriter* screenshot_writer,
         TrafficLightsHandler* sig_handler,
         VehiclesHandler* veh_handler,
@@ -95,7 +93,6 @@ private:
     vsg::ref_ptr<UpdateControlToServerHandler> _upd_server_control;
     vsg::ref_ptr<vsg::Camera> _camera;
     vsg::ref_ptr<vsg::RegionOfInterest> _shadow_region;
-    vsg::ref_ptr<vsg::DirectionalLight> _sun;
 
     bool _hasKeyboardFocus = false;
     bool _hasPointerFocus = false;
