@@ -13,6 +13,7 @@
 #include "Sun.h"
 #include "tcp-client.h"
 #include "TrafficLightsHandler.h"
+#include "UpdateLightingHandler.h"
 #include "UpdateSoundManagerHandler.h"
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
@@ -605,11 +606,14 @@ void RouteViewer::initViewer()
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
+    auto upd_lighting_handler = UpdateLightingHandler::create(sun, vehicles_handler);
+
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(upd_sound_manager_handler);
     viewer->addEventHandler(upd_statistis_handler);
+    viewer->addEventHandler(upd_lighting_handler);
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
