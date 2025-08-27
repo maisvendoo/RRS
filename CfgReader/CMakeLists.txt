@@ -38,7 +38,7 @@ target_link_libraries (${TARGET} Qt6::Xml)
 
 #if (WIN32)
 
-    install(TARGETS ${TARGET}        
+    install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets
     FILE_SET HEADERS
     LIBRARY DESTINATION sdk/lib
