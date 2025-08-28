@@ -3,16 +3,24 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/lighting/DirectionalLight.h>
+#include <vsg/maths/vec3.h>
 
 class Sun : public vsg::Inherit<vsg::DirectionalLight, Sun>
 {
 public:
+    Sun(const vsg::dvec3& camera_pos);
+
     void calculate_direction(
         int year, int month, int day,
         int hour, int minute, double second,
-        double timezone,
-        double latitude, double longitude
+        double timezone
     );
+
+private:
+    void decart_to_geo(double& latitude, double& longitude, double& elevation);
+
+private:
+    const vsg::dvec3& camera_pos;
 };
 
 #endif // SUN_H
