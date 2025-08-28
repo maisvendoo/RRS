@@ -530,7 +530,7 @@ void RouteViewer::initLights()
     root->addChild(ambient);
 
     // Настраиваем солнечное освещение
-    sun = Sun::create();
+    sun = Sun::create(lookAt->eye);
     sun->color = vsg::vec3(settings.sun_color);
     sun->intensity = static_cast<float>(settings.sun_intensity);
     vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
