@@ -22,6 +22,11 @@ static spa_data default_spa()
     return spa;
 }
 
+static double rad_to_deg(double rad)
+{
+    return rad * 180.0 / M_PI;
+}
+
 Sun::Sun(const vsg::dvec3& camera_pos)
     : camera_pos(camera_pos)
 {
@@ -41,7 +46,7 @@ void Sun::calculate_direction(
     spa.minute = minute;
     spa.second = second;
     spa.timezone = timezone;
-    decart_to_geo(spa.latitude, spa.longitude, spa.elevation);
+    ecef_to_latlong(spa.latitude, spa.longitude, spa.elevation);
 
     spa_calculate(&spa);
 
@@ -54,39 +59,34 @@ void Sun::calculate_direction(
     direction = vsg::normalize(direction);
 }
 
-void Sun::decart_to_geo(double& latitude, double& longitude, double& elevation)
+void Sun::ecef_to_latlong(double& latitude, double& longitude, double& elevation)
 {
-    // const double x = camera_pos.x;
-    // const double y = camera_pos.y;
-    // const double z = camera_pos.z;
+    const double x = camera_pos.x;
+    const double y = camera_pos.y;
+    const double z = camera_pos.z;
 
-    // /// Большая полуось (экваториальный радиус) (в метрах)
-    // constexpr double a = 6'378'137.0;
+    constexpr double a = 6'378'137.0;
+    constexpr double b = 6'356'752.3142;
+    constexpr double e_sq = (a * a - b * b) / (a * a);
+    constexpr double e_sq2 = (a * a - b * b) / (b * b);
 
-    // /// Малая полуось (полярный радиус) (в метрах)
-    // constexpr double b = 6'356'752.3142;
+    const double p = std::sqrt(x * x + y * y);
+    const double F = 54.0 * b * b * z * z;
+    const double G = p * p + (1.0 - e_sq) * z * z - e_sq * (a * a - b * b);
+    const double c = e_sq * e_sq * F * p * p / (G * G * G);
+    const double s = std::cbrt(1.0 + c + std::sqrt(c * c + 2.0 * c));
+    const double k = s + 1.0 + 1.0 / s;
+    const double P = F / (3.0 * k * k * G * G);
+    const double Q = std::sqrt(1.0 + 2.0 * e_sq * e_sq * P);
+    const double r_0 = (-P * e_sq * p) / (1.0 + Q) + std::sqrt(0.5 * a * a * (1.0 + 1.0 / Q) - (P * (1.0 - e_sq) * z * z) / (Q * (1.0 + Q)) - 0.5 * P * p * p);
+    const double U = std::sqrt(std::pow((p - e_sq * r_0), 2) + z * z);
+    const double V = std::sqrt(std::pow((p - e_sq * r_0), 2) + (1.0 - e_sq) * z * z);
+    const double z_0 = (b * b * z) / (a * V);
 
-    // /// Сжатие эллипсоида
-    // constexpr double f = (a - b) / a;
+    double lat_rad = std::atan((z + e_sq2 * z_0) / p);
+    double lon_rad = std::atan2(y, x);
 
-    // /// Первый эксцентриситет
-    // constexpr double e_sq = 2.0 * f - f * f;
-
-    // longitude = std::atan2(y, x);
-
-    // /// Расстояние от точки до оси Z
-    // const double p = std::sqrt(x * x + y * z);
-
-    // double latitude_prev = std::atan2(z, (p * (1.0 - e_sq)));
-    // latitude = latitude_prev + 1.0;
-
-    // while (std::abs(latitude - latitude_prev) > 1.0e-12)
-    // {
-    //     /// Радиус кривизны первого вертикала
-    //     const double N_i = a / std::sqrt(1.0 - e_sq * std::pow(std::sin(latitude_prev), 2));
-
-    //     elevation = p / std::cos(latitude_prev) - N_i;
-
-    //     latitude = std::atan((z / p) / (1.0 - e_sq * (N_i / (N_i + elevation))));
-    // }
+    elevation = U * (1.0 - (b * b) / (a * V));
+    latitude = rad_to_deg(lat_rad);
+    longitude = rad_to_deg(lon_rad);
 }

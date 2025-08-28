@@ -17,7 +17,7 @@ public:
     );
 
 private:
-    void decart_to_geo(double& latitude, double& longitude, double& elevation);
+    void ecef_to_latlong(double& latitude, double& longitude, double& elevation);
 
 private:
     const vsg::dvec3& camera_pos;
