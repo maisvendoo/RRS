@@ -55,17 +55,6 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
         // Обновляем дисплейный модуль
         display->update(t, dt);
 
-        // Рендер дисплея
-        qimage.fill(Qt::blue);
-        if (QThread::currentThread() != qApp->thread())
-        {
-            QMetaObject::invokeMethod(qApp, [&]() {
-                    QPainter painter(&qimage);
-                    display->render(&painter);
-                    painter.end();
-                }, Qt::BlockingQueuedConnection);
-        }
-        else
         {
             QPainter painter(&qimage);
             display->render(&painter);
@@ -224,17 +213,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
         cfgdir_path = fs.combinePath(cfgdir_path, tmp_qstr.toStdString());
     }
 
-    // Загрузка дисплея
-    if (QThread::currentThread() != qApp->thread())
-    {
-        QMetaObject::invokeMethod(qApp, [&]() {
-            display = loadDisplay(module_path.c_str());
-        }, Qt::BlockingQueuedConnection);
-    }
-    else
-    {
-        display = loadDisplay(module_path.c_str());
-    }
+    display = loadDisplay(module_path.c_str());
 
     if (!display)
     {
@@ -243,32 +222,12 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     }
 
     display->setConfigDir(QString(cfgdir_path.c_str()));
-
-    // Инициализация дисплейного модуля
-    if (QThread::currentThread() != qApp->thread())
-    {
-        QMetaObject::invokeMethod(qApp, [&]() {
-            display->init();
-        }, Qt::BlockingQueuedConnection);
-    }
-    else
-    {
-        display->init();
-    }
-    LOG_INFO("Config's directory %s for display module %s ", cfgdir_path.c_str(), module_path.c_str());
+    display->init();
+    LOG_INFO("Config's directory %s for loaded display module %s ", cfgdir_path.c_str(), module_path.c_str());
 
     // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
     qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);
     qimage.fill(Qt::black);
-    if (QThread::currentThread() != qApp->thread())
-    {
-        QMetaObject::invokeMethod(qApp, [&]() {
-            QPainter painter(&qimage);
-            display->render(&painter);
-            painter.end();
-        }, Qt::BlockingQueuedConnection);
-    }
-    else
     {
         QPainter painter(&qimage);
         display->render(&painter);

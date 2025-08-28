@@ -248,16 +248,16 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animati
         if (animation && animation->load(cfg))
         {
             group_ptr->accept(*inner_pdo);
-            if (!inner_pdo->dynamicObjects.empty())
+            for (auto& object : inner_pdo->dynamicObjects)
             {
-                for (auto& object : inner_pdo->dynamicObjects)
+                if (!inner_copyop.duplicate->contains(object))
                 {
-                    if (!inner_copyop.duplicate->contains(object))
-                    {
-                        inner_copyop.duplicate->insert(object);
-                    }
+                    inner_copyop.duplicate->insert(object);
                 }
+            }
 
+            if (!inner_copyop.duplicate->duplicates.empty())
+            {
                 const std::scoped_lock pdo_lock(pdo->mutex);
                 pdo->tag(group_ptr);
                 duplicate->insert(group_ptr, inner_copyop(vsg::ref_ptr(group_ptr)));
