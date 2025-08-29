@@ -94,7 +94,9 @@ void Sun::update(
 
             constexpr double I_0 = 1353.0;
 
-            intensity = 1.1 * I_0 * std::pow(0.7, std::pow(AM, 0.678));
+            constexpr double lower_coef = 0.003;
+
+            intensity = lower_coef * 1.1 * I_0 * std::pow(0.7, std::pow(AM, 0.678));
         }
         else
         {
