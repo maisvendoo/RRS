@@ -7,6 +7,8 @@
 
 #include <cmath>
 
+using Meters = double;
+
 static spa_data default_spa()
 {
     spa_data spa;
@@ -32,12 +34,16 @@ Sun::Sun(const vsg::dvec3& camera_pos)
 {
 }
 
-void Sun::calculate_direction(
+void Sun::update(
     int year, int month, int day,
     int hour, int minute, double second,
     double timezone
 )
 {
+    constexpr Meters ecef_x0 = 2'849'494.463'270'107;
+    constexpr Meters ecef_y0 = 2'196'239.724'320'043;
+    constexpr Meters ecef_z0 = 5'248'968.407'733'058;
+
     static spa_data spa = default_spa();
     spa.year = year;
     spa.month = month;
@@ -46,7 +52,7 @@ void Sun::calculate_direction(
     spa.minute = minute;
     spa.second = second;
     spa.timezone = timezone;
-    ecef_to_latlong(spa.latitude, spa.longitude, spa.elevation);
+    ecef_to_latlong(camera_pos.x + ecef_x0, camera_pos.y + ecef_y0, camera_pos.z + ecef_z0, spa.latitude, spa.longitude, spa.elevation);
 
     spa_calculate(&spa);
 
@@ -57,16 +63,17 @@ void Sun::calculate_direction(
     direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
     direction.z = -std::sin(altitude_rad);
     direction = vsg::normalize(direction);
+
+    intensity = std::max(2.5 * std::sin(altitude_rad), 0.0);
 }
 
-void Sun::ecef_to_latlong(double& latitude, double& longitude, double& elevation)
+void Sun::ecef_to_latlong(
+    double x, double y, double z,
+    double& latitude, double& longitude, double& elevation
+)
 {
-    const double x = camera_pos.x;
-    const double y = camera_pos.y;
-    const double z = camera_pos.z;
-
-    constexpr double a = 6'378'137.0;
-    constexpr double b = 6'356'752.3142;
+    constexpr Meters a = 6'378'137.0;
+    constexpr Meters b = 6'356'752.3142;
     constexpr double e_sq = (a * a - b * b) / (a * a);
     constexpr double e_sq2 = (a * a - b * b) / (b * b);
 

@@ -532,14 +532,14 @@ void RouteViewer::initLights()
     // Настраиваем солнечное освещение
     sun = Sun::create(lookAt->eye);
     sun->color = vsg::vec3(settings.sun_color);
-    sun->intensity = static_cast<float>(settings.sun_intensity);
-    vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
-    float azimuth_radian = vsg::radians(static_cast<float>(settings.sun_azimuth));
-    float altitude_radian = vsg::radians(static_cast<float>(settings.sun_altitude));
-    vsg::mat4 rotate_azimuth = vsg::rotate(azimuth_radian, 0.0f, 0.0f, 1.0f);
-    vsg::mat4 rotate_altitude = vsg::rotate(altitude_radian, 1.0f, 0.0f, 0.0f);
-    sun->direction = vsg::normalize(sun_direction * rotate_azimuth * rotate_altitude);
     sun->shadowSettings = shadowSettings;
+    sun->intensity = static_cast<float>(settings.sun_intensity);
+    // vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
+    // float azimuth_radian = vsg::radians(static_cast<float>(settings.sun_azimuth));
+    // float altitude_radian = vsg::radians(static_cast<float>(settings.sun_altitude));
+    // vsg::mat4 rotate_azimuth = vsg::rotate(azimuth_radian, 0.0f, 0.0f, 1.0f);
+    // vsg::mat4 rotate_altitude = vsg::rotate(altitude_radian, 1.0f, 0.0f, 0.0f);
+    // sun->direction = vsg::normalize(sun_direction * rotate_azimuth * rotate_altitude);
     root->addChild(sun);
 }
 

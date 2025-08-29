@@ -10,14 +10,17 @@ class Sun : public vsg::Inherit<vsg::DirectionalLight, Sun>
 public:
     Sun(const vsg::dvec3& camera_pos);
 
-    void calculate_direction(
+    void update(
         int year, int month, int day,
         int hour, int minute, double second,
         double timezone
     );
 
 private:
-    void ecef_to_latlong(double& latitude, double& longitude, double& elevation);
+    void ecef_to_latlong(
+        double x, double y, double z,
+        double& latitude, double& longitude, double& elevation
+    );
 
 private:
     const vsg::dvec3& camera_pos;

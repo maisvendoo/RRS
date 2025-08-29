@@ -14,25 +14,17 @@ UpdateLightingHandler::UpdateLightingHandler(vsg::ref_ptr<Sun> sun, VehiclesHand
 
 void UpdateLightingHandler::apply(vsg::FrameEvent& frame)
 {
-    const double t = frame.frameStamp->simulationTime;
-    const double dt = t - prev_time;
-    prev_time = t;
+    (void)frame;
 
-    if (dt < 1e-5)
-    {
-        return;
-    }
-
-    const simulator_time_t* const sim_time = vehicles_handler->getDateTime();
+    simulator_time_t* const sim_time = vehicles_handler->getDateTime();
     if (sim_time == nullptr)
     {
         return;
     }
 
-    // sun->calculate_direction(
-        // sim_time->date.year(), sim_time->date.month(), sim_time->date.day(),
-        // sim_time->time.hour(), sim_time->time.minute(), sim_time->time.sec(),
-        // 3.0,
-        // 0.0, 0.0
-    // );
+    sun->update(
+        sim_time->date.year(), sim_time->date.month(), sim_time->date.day(),
+        sim_time->time.hour(), sim_time->time.minute(), sim_time->time.sec() + sim_time->time.msec() / 1000.0,
+        3.0
+    );
 }

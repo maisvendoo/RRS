@@ -25,7 +25,6 @@ public:
 private:
     vsg::ref_ptr<Sun> sun;
     VehiclesHandler* vehicles_handler = nullptr;
-    double prev_time = 0.0;
 };
 
 #endif // UPDATE_LIGHTING_HANDLER_H
