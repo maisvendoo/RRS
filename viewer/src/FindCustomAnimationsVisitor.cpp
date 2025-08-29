@@ -82,7 +82,7 @@ void FindCustomAnimationsVisitor::apply(vsg::Light &light)
     {
         light.traverse(*this);
         return;
-    }    
+    }
 
     vsg::ref_ptr<ProcAnimation> animation = create_animation(light.name, light);
     if (animation)

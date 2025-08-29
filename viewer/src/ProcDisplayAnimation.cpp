@@ -1,5 +1,6 @@
 #include "ProcDisplayAnimation.h"
 
+#include "display.h"
 #include "CfgReader.h"
 #include "Logger.h"
 #include "display-types.h"

@@ -22,7 +22,10 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     simulator_time_t* sim_time = nullptr;
+
+    // TODO: Нигде не используется
     simulator_time_t* local_time = nullptr;
+
     Skybox *skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
