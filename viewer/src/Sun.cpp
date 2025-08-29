@@ -83,7 +83,17 @@ void Sun::update(
     }
     else
     {
-        intensity = std::max(2.5 * std::sin(altitude_rad), 0.0);
+        constexpr Meters R_e = 6'378'137.0;
+        constexpr Meters y_atm = 9000.0;
+        constexpr double r = R_e / y_atm;
+
+        const double z_deg = (altitude_deg > 0.0) ? (90.0 - altitude_deg) : 90.0;
+        const double z = vsg::radians(z_deg);
+        const double AM = std::sqrt(std::pow((r * std::cos(z)), 2) + 2.0 * r + 1.0) - r * std::cos(z);
+
+        constexpr double I_0 = 1353.0;
+
+        intensity = 1.1 * I_0 * std::pow(0.7, std::pow(AM, 0.678));
     }
 }
 
