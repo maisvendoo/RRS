@@ -11,6 +11,7 @@
 
 struct simulator_time_t;
 class Skybox;
+class Sun;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
@@ -56,9 +57,8 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     float* ambient_color = nullptr;
     float* ambient_intensity = nullptr;
-    float* sun_color = nullptr;
-    vsg::dvec3* sun_direction_d = nullptr;
-    float* sun_intensity = nullptr;
+
+    vsg::ref_ptr<Sun> sun;
 
     int skybox_texture_index = 1;
     int prev_skybox_texture_index = 1;

@@ -16,7 +16,7 @@ void UpdateLightingHandler::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    simulator_time_t* const sim_time = vehicles_handler->getDateTime();
+    const simulator_time_t* const sim_time = vehicles_handler->getDateTime();
     if (sim_time == nullptr)
     {
         return;

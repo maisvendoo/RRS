@@ -40,6 +40,16 @@ void Sun::update(
     double timezone
 )
 {
+    if (use_gui_time)
+    {
+        year = gui_time.date.year();
+        month = gui_time.date.month();
+        day = gui_time.date.day();
+        hour = gui_time.time.hour();
+        minute = gui_time.time.minute();
+        second = gui_time.time.sec() + gui_time.time.msec();
+    }
+
     constexpr Meters ecef_x0 = 2'849'494.463'270'107;
     constexpr Meters ecef_y0 = 2'196'239.724'320'043;
     constexpr Meters ecef_z0 = 5'248'968.407'733'058;
@@ -56,15 +66,25 @@ void Sun::update(
 
     spa_calculate(&spa);
 
-    const double azimuth_rad = vsg::radians(spa.azimuth);
-    const double altitude_rad = vsg::radians(spa.e);
+    azimuth_deg = spa.azimuth;
+    altitude_deg = spa.e;
+
+    const double azimuth_rad = vsg::radians(azimuth_deg);
+    const double altitude_rad = vsg::radians(altitude_deg);
 
     direction.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
     direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
     direction.z = -std::sin(altitude_rad);
     direction = vsg::normalize(direction);
 
-    intensity = std::max(2.5 * std::sin(altitude_rad), 0.0);
+    if (use_gui_intensity)
+    {
+        intensity = gui_intensity;
+    }
+    else
+    {
+        intensity = std::max(2.5 * std::sin(altitude_rad), 0.0);
+    }
 }
 
 void Sun::ecef_to_latlong(

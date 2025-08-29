@@ -4,10 +4,10 @@
 #include "datetime.h"
 
 #include "Skybox.h"
+#include "Sun.h"
 #include "UpdateStatisticsHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "VehiclesHandler.h"
-#include "spa.h"
 
 #include <vsg/io/Options.h>
 #include <vsg/maths/common.h>
@@ -329,44 +329,28 @@ void MyGui::showSettings() const
         params->sec = day_seconds % 60;
     }
 
-    // Calculate sun position from latitude, longitude, date and time
-    //--------------------------------------------------------------------------
-    // Координаты РГУПСа (для теста)
-    static constexpr double latitude = 47.2504559;
-    static constexpr double longitude = 39.6982501;
-
-    spa_data spa;
-    spa.year = params->year;
-    spa.month = params->month;
-    spa.day = params->day;
-    spa.hour = params->hour - 1;
-    spa.minute = params->minute;
-    spa.second = params->sec;
-    spa.delta_ut1 = 0.0;
-    spa.delta_t = 0.0;
-    spa.timezone = 3.0;
-    spa.longitude = longitude;
-    spa.latitude = latitude;
-    spa.elevation = 0.0;
-    spa.pressure = 0.0;
-    spa.temperature = 0.0;
-    spa.slope = 0.0;
-    spa.azm_rotation = 0.0;
-    spa.atmos_refract = 0.5667;
-    spa.function = SPA_ALL;
-
-    spa_calculate(&spa);
-
-    ImGui::Text("latitude: %f", latitude);
-    ImGui::Text("longitude: %f", longitude);
-    ImGui::Text("azimuth: %f", spa.azimuth);
-    ImGui::Text("altitude: %f", spa.e);
-    //--------------------------------------------------------------------------
-
     ImGui::ColorEdit3("Ambient color", params->ambient_color);
     ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
-    ImGui::ColorEdit3("Sun color", params->sun_color);
-    ImGui::SliderFloat("Sun intensity", params->sun_intensity, 0.0f, 5.0f);
+
+    if (ImGui::CollapsingHeader("Sun parameters"))
+    {
+        ImGui::Text("azimuth: %f", params->sun->get_azimuth_deg());
+        ImGui::Text("altitude: %f", params->sun->get_altitude_deg());
+        ImGui::Text("intensity: %f", params->sun->intensity);
+
+        ImGui::ColorEdit3("color", params->sun->color.data());
+        ImGui::Checkbox("use gui intensity", &params->sun->use_gui_intensity);
+        if (params->sun->use_gui_intensity)
+        {
+            ImGui::SliderFloat("gui intensity", &params->sun->gui_intensity, 0.0f, 5.0f);
+        }
+
+        ImGui::Checkbox("use gui time", &params->sun->use_gui_time);
+        if (params->sun->use_gui_time)
+        {
+            params->sun->gui_time = {server_date_t(params->year, params->month, params->day), server_time_t(params->hour, params->minute, params->sec)};
+        }
+    }
 
     // if (params->skybox_textures.size() > 0)
     // {
@@ -374,16 +358,6 @@ void MyGui::showSettings() const
     // }
 
     ImGui::End();
-
-    const double azimuth_rad = vsg::radians(spa.azimuth);
-    const double altitude_rad = vsg::radians(spa.e);
-
-    vsg::dvec3 sun_dir;
-    sun_dir.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
-    sun_dir.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
-    sun_dir.z = -std::sin(altitude_rad);
-    sun_dir = vsg::normalize(sun_dir);
-    *params->sun_direction_d = sun_dir;
 
     if (params->prev_skybox_texture_index == params->skybox_texture_index)
     {

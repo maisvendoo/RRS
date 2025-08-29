@@ -569,9 +569,8 @@ void RouteViewer::initCommandGraph()
 
     GUIparams->ambient_color = ambient->color.data();
     GUIparams->ambient_intensity = &ambient->intensity;
-    GUIparams->sun_color = sun->color.data();
-    GUIparams->sun_direction_d = &sun->direction;
-    GUIparams->sun_intensity = &sun->intensity;
+
+    GUIparams->sun = sun;
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
