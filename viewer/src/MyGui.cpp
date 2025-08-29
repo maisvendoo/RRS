@@ -302,6 +302,12 @@ void MyGui::showSettings() const
     }
 
     ImGui::RadioButton("Использовать локальное время:", &(params->use_server_time), 0);
+    params->sun->use_gui_time = !params->use_server_time;
+    if (params->sun->use_gui_time)
+    {
+        params->sun->gui_time = {server_date_t(params->year, params->month, params->day), server_time_t(params->hour, params->minute, params->sec)};
+    }
+
     ImGuiInputTextFlags flags = params->use_server_time ? ImGuiInputTextFlags_ReadOnly : 0;
     ImGui::PushItemWidth((ImGui::CalcItemWidth() - 2 * ImGui::GetStyle().ItemSpacing.x) / 3);
     constexpr int16_t one = 1;
@@ -343,12 +349,6 @@ void MyGui::showSettings() const
         if (params->sun->use_gui_intensity)
         {
             ImGui::SliderFloat("gui intensity", &params->sun->gui_intensity, 0.0f, 5.0f);
-        }
-
-        ImGui::Checkbox("use gui time", &params->sun->use_gui_time);
-        if (params->sun->use_gui_time)
-        {
-            params->sun->gui_time = {server_date_t(params->year, params->month, params->day), server_time_t(params->hour, params->minute, params->sec)};
         }
     }
 
