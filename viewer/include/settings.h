@@ -46,7 +46,7 @@ struct settings_t final
     double shadow_distance = 50.0;              ///< Shadow compute distance
     int shadow_cascade = 1;                     ///< Shadow cascade
     int shadow_resolution = 4096;               ///< Shadow map resolution
-    int num_lights = 200;                        ///< Maximum lights in scene
+    int num_lights = 200;                       ///< Maximum lights in scene
     double ambient_intensity = 0.5;             ///< Ambient light intensity
     vsg::dvec3 ambient_color = {1.0, 1.0, 1.0}; ///< Ambient light color
     double sun_intensity = 5.0;                 ///< Directional light intensity

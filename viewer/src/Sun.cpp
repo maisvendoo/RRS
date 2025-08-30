@@ -57,7 +57,7 @@ void Sun::update(
         constexpr double altitude_coeff = (90.0 - deg_under_horizont) / 90.0;
         const double ambient_altitude_deg = deg_under_horizont + altitude_coeff * altitude_deg;
 
-        ambient->intensity = 0.02 + calc_intensity(ambient_altitude_deg, ambient_max_intensity);
+        ambient->intensity = std::fmax(0.01f, calc_intensity(ambient_altitude_deg, ambient_max_intensity));
     }
 
     if (!use_gui_sun_intensity)
