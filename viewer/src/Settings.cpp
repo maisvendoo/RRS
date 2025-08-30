@@ -122,9 +122,6 @@ void RouteViewer::loadLightSettings(CfgReader& cfg, const QString& section)
             >> settings.sun_color.y
             >> settings.sun_color.z;
     }
-
-    cfg.getDouble(section, "SunAzimuth", settings.sun_azimuth);
-    cfg.getDouble(section, "SunAltitude", settings.sun_altitude);
 }
 
 //------------------------------------------------------------------------------

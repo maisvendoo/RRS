@@ -301,7 +301,7 @@ void MyGui::showSettings() const
         ImGui::RadioButton("Время сервера: недоступно", false);
     }
 
-    ImGui::RadioButton("Использовать локальное время:", &(params->use_server_time), 0);
+    ImGui::RadioButton("Задать время вручную:", &(params->use_server_time), 0);
     params->sun->use_gui_time = !params->use_server_time;
     if (params->sun->use_gui_time)
     {
@@ -328,7 +328,7 @@ void MyGui::showSettings() const
 
     static int day_seconds;
     day_seconds = params->hour * 3600 + params->minute * 60 + params->sec;
-    if (ImGui::SliderInt("Day seconds", &day_seconds, 0, 86400))
+    if (ImGui::SliderInt("Day seconds", &day_seconds, 0, 86399))
     {
         params->hour = day_seconds / 3600;
         params->minute = (day_seconds - params->hour * 3600) / 60;
