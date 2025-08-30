@@ -335,20 +335,40 @@ void MyGui::showSettings() const
         params->sec = day_seconds % 60;
     }
 
-    ImGui::ColorEdit3("Ambient color", params->ambient_color);
-    ImGui::SliderFloat("Ambient intensity", params->ambient_intensity, 0.0f, 1.0f);
-
     if (ImGui::CollapsingHeader("Sun parameters"))
     {
-        ImGui::Text("azimuth: %f", params->sun->get_azimuth_deg());
-        ImGui::Text("altitude: %f", params->sun->get_altitude_deg());
-        ImGui::Text("intensity: %f", params->sun->intensity);
-
-        ImGui::ColorEdit3("color", params->sun->color.data());
-        ImGui::Checkbox("use gui intensity", &params->sun->use_gui_intensity);
-        if (params->sun->use_gui_intensity)
+        ImGui::ColorEdit3("Ambient color", params->sun->ambient->color.data());
+        ImGui::Checkbox("Set ambient intensity manually", &(params->sun->use_gui_ambient_intensity));
+        if (params->sun->use_gui_ambient_intensity)
         {
-            ImGui::SliderFloat("gui intensity", &params->sun->gui_intensity, 0.0f, 5.0f);
+            ImGui::SliderFloat("Ambient intensity", &(params->sun->ambient->intensity), 0.0f, 1.0f, "%.3f");
+        }
+        else
+        {
+            ImGui::Text("Ambient intensity: %.3f", params->sun->ambient->intensity);
+        }
+
+        ImGui::ColorEdit3("color", params->sun->sun->color.data());
+        ImGui::Checkbox("Set sun intensity manually", &(params->sun->use_gui_sun_intensity));
+        if (params->sun->use_gui_sun_intensity)
+        {
+            ImGui::SliderFloat("Sun intensity", &(params->sun->sun->intensity), 0.0f, 10.0f, "%.3f");
+        }
+        else
+        {
+            ImGui::Text("Sun intensity: %.3f", params->sun->sun->intensity);
+        }
+
+        ImGui::Checkbox("Set sun direction manually", &(params->sun->use_gui_sun_direction));
+        if (params->sun->use_gui_sun_direction)
+        {
+            ImGui::SliderFloat("Sun azimuth", &(params->sun->azimuth_deg), 0.0f, 360.0f, "%.3f");
+            ImGui::SliderFloat("Sun altitude", &(params->sun->azimuth_deg), 0.0f, 360.0f, "%.3f");
+        }
+        else
+        {
+            ImGui::Text("Sun azimuth: %.3f", params->sun->azimuth_deg);
+            ImGui::Text("Sun altitude: %.3f", params->sun->altitude_deg);
         }
     }
 

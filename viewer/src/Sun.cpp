@@ -29,38 +29,84 @@ static double rad_to_deg(double rad)
     return rad * 180.0 / M_PI;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 Sun::Sun(const vsg::dvec3& camera_pos)
     : camera_pos(camera_pos)
 {
+    addChild(sun);
+    addChild(ambient);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Sun::update(
     int year, int month, int day,
     int hour, int minute, double second,
     double timezone
 )
 {
-    if (use_gui_time)
+    if (!use_gui_sun_direction)
     {
-        year = gui_time.date.year();
-        month = gui_time.date.month();
-        day = gui_time.date.day();
-        hour = gui_time.time.hour();
-        minute = gui_time.time.minute();
-        second = gui_time.time.sec() + gui_time.time.msec();
+        update_sun_direction_degrees(year, month, day, hour, minute, second, timezone);
     }
 
+    const double azimuth_rad = vsg::radians(azimuth_deg);
+    const double altitude_rad = vsg::radians(altitude_deg);
+
+    sun->direction.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
+    sun->direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
+    sun->direction.z = -std::sin(altitude_rad);
+    sun->direction = vsg::normalize(sun->direction);
+
+    if (!use_gui_ambient_intensity)
+    {
+        // Для утренних/вечерних сумерек условно поднимаем солнце из-под горизонта на 15 градусов
+        constexpr double deg_under_horizont = 15.0;
+        constexpr double altitude_coeff = (90.0 - deg_under_horizont) / 90.0;
+        const double ambient_altitude = deg_under_horizont + altitude_coeff * altitude_deg;
+
+        const double ambient_max_intensity = 0.5;
+        ambient->intensity = 0.02 + calc_intensity(ambient_altitude, ambient_max_intensity);
+    }
+
+    if (!use_gui_sun_intensity)
+    {
+        const double sun_max_intensity = 5.0;
+        sun->intensity = calc_intensity(altitude_deg, sun_max_intensity);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Sun::update_sun_direction_degrees(int year, int month, int day, int hour, int minute, double second, double timezone)
+{
     constexpr Meters ecef_x0 = 2'849'494.463'270'107;
     constexpr Meters ecef_y0 = 2'196'239.724'320'043;
     constexpr Meters ecef_z0 = 5'248'968.407'733'058;
 
     static spa_data spa = default_spa();
-    spa.year = year;
-    spa.month = month;
-    spa.day = day;
-    spa.hour = hour;
-    spa.minute = minute;
-    spa.second = second;
+    if (use_gui_time)
+    {
+        spa.year = gui_time.date.year();
+        spa.month = gui_time.date.month();
+        spa.day = gui_time.date.day();
+        spa.hour = gui_time.time.hour();
+        spa.minute = gui_time.time.minute();
+        spa.second = gui_time.time.sec() + gui_time.time.msec();
+    }
+    else
+    {
+        spa.year = year;
+        spa.month = month;
+        spa.day = day;
+        spa.hour = hour;
+        spa.minute = minute;
+        spa.second = second;
+    }
     spa.timezone = timezone;
     ecef_to_latlong(camera_pos.x + ecef_x0, camera_pos.y + ecef_y0, camera_pos.z + ecef_z0, spa.latitude, spa.longitude, spa.elevation);
 
@@ -68,43 +114,11 @@ void Sun::update(
 
     azimuth_deg = spa.azimuth;
     altitude_deg = spa.e;
-
-    const double azimuth_rad = vsg::radians(azimuth_deg);
-    const double altitude_rad = vsg::radians(altitude_deg);
-
-    direction.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
-    direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
-    direction.z = -std::sin(altitude_rad);
-    direction = vsg::normalize(direction);
-
-    if (use_gui_intensity)
-    {
-        intensity = gui_intensity;
-    }
-    else
-    {
-        if (altitude_deg >= 0.0)
-        {
-            constexpr Meters R_e = 6'378'137.0;
-            constexpr Meters y_atm = 9000.0;
-            constexpr double r = R_e / y_atm;
-
-            const double z = vsg::radians(90.0 - altitude_deg);
-            const double AM = std::sqrt(std::pow((r * std::cos(z)), 2) + 2.0 * r + 1.0) - r * std::cos(z);
-
-            constexpr double I_0 = 1353.0;
-
-            constexpr double lower_coef = 0.003;
-
-            intensity = lower_coef * 1.1 * I_0 * std::pow(0.7, std::pow(AM, 0.678));
-        }
-        else
-        {
-            intensity = 0.0;
-        }
-    }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Sun::ecef_to_latlong(
     double x, double y, double z,
     double& latitude, double& longitude, double& elevation
@@ -134,4 +148,32 @@ void Sun::ecef_to_latlong(
     elevation = U * (1.0 - (b * b) / (a * V));
     latitude = rad_to_deg(lat_rad);
     longitude = rad_to_deg(lon_rad);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float Sun::calc_intensity(double altitude_deg, float max_intencity)
+{
+    if (altitude_deg <= 0.0)
+    {
+        return 0.0;
+    }
+
+    // Радиус Земли, высота атмосферы
+    constexpr Meters R_e = 6'378'137.0;
+    constexpr Meters y_atm = 9000.0;
+    constexpr double r = R_e / y_atm;
+
+    // Расчёт относительного увелечения толщины атмосферы
+    const double z = vsg::radians(altitude_deg);
+    const double AM = std::sqrt(std::pow((r * std::sin(z)), 2) + 2.0 * r + 1.0) - r * std::sin(z);
+
+    // Расчёт относительного ослабления солнечного света
+    constexpr double empiric_exponent_base = 0.7;
+    constexpr double empiric_exponent_power = 0.678;
+    constexpr double intensity_normalize = 1.0 / empiric_exponent_base;
+    const double intensity_coeff = intensity_normalize * std::pow(empiric_exponent_base, std::pow(AM, empiric_exponent_power));
+
+    return max_intencity * intensity_coeff;
 }

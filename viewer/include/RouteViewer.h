@@ -121,10 +121,9 @@ private:
     vsg::ref_ptr<vsg::Viewer>        viewer;
 
     vsg::ref_ptr<vsg::Group>             root;
-    vsg::ref_ptr<vsg::AmbientLight>      ambient;
-    vsg::ref_ptr<Sun>                    sun;
     vsg::ref_ptr<vsg::ShadowSettings>    shadowSettings;
     vsg::ref_ptr<vsg::RegionOfInterest>  shadow_region;
+    vsg::ref_ptr<Sun>                    sun;
 };
 
 #endif // ROUTE_VIEWER_H

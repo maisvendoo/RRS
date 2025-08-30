@@ -521,26 +521,20 @@ void RouteViewer::initLights()
     // Настраиваем область отрисовки теней
     shadow_region = vsg::RegionOfInterest::create();
     shadow_region->points.resize(5);
+
     root->addChild(shadow_region);
 
+    // Освещение
+    sun = Sun::create(lookAt->eye);
+    root->addChild(sun);
+    GUIparams->sun = sun;
+
     // Настраиваем общее освещение
-    ambient = vsg::AmbientLight::create();
-    ambient->color = vsg::vec3(settings.ambient_color);
-    ambient->intensity = static_cast<float>(settings.ambient_intensity);
-    root->addChild(ambient);
+    sun->ambient->color = vsg::vec3(settings.ambient_color);
 
     // Настраиваем солнечное освещение
-    sun = Sun::create(lookAt->eye);
-    sun->color = vsg::vec3(settings.sun_color);
-    sun->shadowSettings = shadowSettings;
-    sun->intensity = static_cast<float>(settings.sun_intensity);
-    // vsg::vec3 sun_direction = {0.0, 1.0, 0.0};
-    // float azimuth_radian = vsg::radians(static_cast<float>(settings.sun_azimuth));
-    // float altitude_radian = vsg::radians(static_cast<float>(settings.sun_altitude));
-    // vsg::mat4 rotate_azimuth = vsg::rotate(azimuth_radian, 0.0f, 0.0f, 1.0f);
-    // vsg::mat4 rotate_altitude = vsg::rotate(altitude_radian, 1.0f, 0.0f, 0.0f);
-    // sun->direction = vsg::normalize(sun_direction * rotate_azimuth * rotate_altitude);
-    root->addChild(sun);
+    sun->sun->color = vsg::vec3(settings.sun_color);
+    sun->sun->shadowSettings = shadowSettings;
 }
 
 //------------------------------------------------------------------------------
@@ -566,11 +560,6 @@ void RouteViewer::initView()
 void RouteViewer::initCommandGraph()
 {
     auto renderGraph = vsg::RenderGraph::create(window, view);
-
-    GUIparams->ambient_color = ambient->color.data();
-    GUIparams->ambient_intensity = &ambient->intensity;
-
-    GUIparams->sun = sun;
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
@@ -616,6 +605,8 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
+
+    // Перед компиляцией вьювера подсовываем ему наш кастомный DatabasePager
     vsg::ref_ptr<vsg::DatabasePager> databasePager = AnimatedDatabasePager::create();
     for (auto& task : viewer->recordAndSubmitTasks)
     {

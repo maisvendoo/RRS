@@ -58,9 +58,6 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     QString status = "";
 
-    float* ambient_color = nullptr;
-    float* ambient_intensity = nullptr;
-
     vsg::ref_ptr<Sun> sun;
 
     int skybox_texture_index = 1;
