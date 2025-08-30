@@ -63,6 +63,19 @@ void FindCustomAnimationsVisitor::apply(vsg::Group& group)
         return;
     }
 
+    // Некоторые варианты экспорта в .gltf присваивают имя источника света
+    // родительскому узлу, а сам свет оставляют безымянным, исправляем это
+    for (vsg::ref_ptr<vsg::Node>& child : group.children)
+    {
+        if (auto light = child.cast<vsg::Light>())
+        {
+            if (light->name.empty())
+            {
+                light->name = name;
+            }
+        }
+    }
+
     vsg::ref_ptr<ProcAnimation> animation = create_animation(name, group);
     if (animation)
     {
