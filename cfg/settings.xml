@@ -61,11 +61,11 @@
         <!-- Допустимое количество источников света в сцене -->
         <NumLights>200</NumLights>
         <!-- Яркость общего освещения -->
-        <AmbientIntensity>0.01</AmbientIntensity>
+        <AmbientIntensity>0.5</AmbientIntensity>
         <!-- Цвет общего освещения (RGB, 0.0 - 1.0) -->
         <AmbientColor>1.0 1.0 1.0</AmbientColor>
         <!-- Яркость солнечного освещения -->
-        <SunIntensity>2.5</SunIntensity>
+        <SunIntensity>5.0</SunIntensity>
         <!-- Цвет солнечного освещения (RGB, 0.0 - 1.0) -->
         <SunColor>1.0 1.0 1.0</SunColor>
         <!-- Направление (азимут) солнечного освещения, град. -->
