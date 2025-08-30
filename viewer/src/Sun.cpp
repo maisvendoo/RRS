@@ -32,8 +32,10 @@ static double rad_to_deg(double rad)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Sun::Sun(const vsg::dvec3& camera_pos)
+Sun::Sun(const vsg::dvec3& camera_pos, double ambient_intensity, double sun_intensity)
     : camera_pos(camera_pos)
+    , ambient_max_intensity(ambient_intensity)
+    , sun_max_intensity(sun_intensity)
 {
     addChild(sun);
     addChild(ambient);
@@ -48,6 +50,21 @@ void Sun::update(
     double timezone
 )
 {
+    if (!use_gui_ambient_intensity)
+    {
+        // Для утренних/вечерних сумерек условно поднимаем солнце из-под горизонта на 15 градусов
+        constexpr double deg_under_horizont = 15.0;
+        constexpr double altitude_coeff = (90.0 - deg_under_horizont) / 90.0;
+        const double ambient_altitude_deg = deg_under_horizont + altitude_coeff * altitude_deg;
+
+        ambient->intensity = 0.02 + calc_intensity(ambient_altitude_deg, ambient_max_intensity);
+    }
+
+    if (!use_gui_sun_intensity)
+    {
+        sun->intensity = calc_intensity(altitude_deg, sun_max_intensity);
+    }
+
     if (!use_gui_sun_direction)
     {
         update_sun_direction_degrees(year, month, day, hour, minute, second, timezone);
@@ -60,23 +77,6 @@ void Sun::update(
     sun->direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
     sun->direction.z = -std::sin(altitude_rad);
     sun->direction = vsg::normalize(sun->direction);
-
-    if (!use_gui_ambient_intensity)
-    {
-        // Для утренних/вечерних сумерек условно поднимаем солнце из-под горизонта на 15 градусов
-        constexpr double deg_under_horizont = 15.0;
-        constexpr double altitude_coeff = (90.0 - deg_under_horizont) / 90.0;
-        const double ambient_altitude = deg_under_horizont + altitude_coeff * altitude_deg;
-
-        const double ambient_max_intensity = 0.5;
-        ambient->intensity = 0.02 + calc_intensity(ambient_altitude, ambient_max_intensity);
-    }
-
-    if (!use_gui_sun_intensity)
-    {
-        const double sun_max_intensity = 5.0;
-        sun->intensity = calc_intensity(altitude_deg, sun_max_intensity);
-    }
 }
 
 //------------------------------------------------------------------------------

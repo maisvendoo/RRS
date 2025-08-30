@@ -51,8 +51,6 @@ struct settings_t final
     vsg::dvec3 ambient_color = {1.0, 1.0, 1.0}; ///< Ambient light color
     double sun_intensity = 5.0;                 ///< Directional light intensity
     vsg::dvec3 sun_color = {1.0, 1.0, 1.0};     ///< Directional light color
-    double sun_azimuth = 45.0;                  ///< Directional light azimuth
-    double sun_altitude = 45.0;                 ///< Directional light altitude
 
     double view_distance = 2000.0;  ///< View distance
     double zNear = 0.1;

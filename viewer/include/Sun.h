@@ -15,7 +15,7 @@
 class Sun : public vsg::Inherit<vsg::Group, Sun>
 {
 public:
-    Sun(const vsg::dvec3& camera_pos);
+    Sun(const vsg::dvec3& camera_pos, double ambient_intensity, double sun_intensity);
 
     void update(
         int year, int month, int day,
@@ -27,9 +27,9 @@ public:
     float azimuth_deg = 0.0;
     float altitude_deg = 0.0;
 
-    bool use_gui_sun_intensity = false;
-
     bool use_gui_ambient_intensity = false;
+
+    bool use_gui_sun_intensity = false;
 
     bool use_gui_time = false;
     simulator_time_t gui_time;
@@ -53,6 +53,8 @@ private:
 
 private:
     const vsg::dvec3& camera_pos;
+    double ambient_max_intensity = 0.5;
+    double sun_max_intensity = 5.0;
 };
 
 #endif // SUN_H

@@ -525,7 +525,7 @@ void RouteViewer::initLights()
     root->addChild(shadow_region);
 
     // Освещение
-    sun = Sun::create(lookAt->eye);
+    sun = Sun::create(lookAt->eye, settings.ambient_intensity, settings.sun_intensity);
     root->addChild(sun);
     GUIparams->sun = sun;
 
