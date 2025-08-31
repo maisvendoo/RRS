@@ -56,21 +56,7 @@ public:
 
     /// Device configuration
     virtual void load_config(CfgReader &cfg);
-/*
-    ///
-    void setControl(control_signals_t control_signals = control_signals_t());
 
-    ///
-    feedback_signals_t getFeedback() const;
-*/
-
-/*
-    /// Device's sound state
-    virtual sound_state_t getSoundState(size_t idx = 0) const;
-
-    /// Device's sound state (as a single float value, see common-headers/sound-signal.h)
-    virtual float getSoundSignal(size_t idx = 0) const;
-*/
 protected:
 
     Trajectory *trajectory = nullptr;
@@ -88,11 +74,6 @@ protected:
     state_vector_t input_signals = {};
     /// Output signals
     state_vector_t output_signals = {};
-/*
-    control_signals_t   control_signals;
-
-    feedback_signals_t  feedback;
-*/
 };
 
 

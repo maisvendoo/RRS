@@ -88,7 +88,7 @@ public:
                     control_signals_t* control_signals = nullptr);
 
     ///
-    feedback_signals_t getFeedback() const;
+    void setFeedbackPointer(feedback_signals_t* feedback_ptr);
 
     /// Device's sound state
     virtual sound_state_t getSoundState(size_t idx = 0) const;
@@ -140,7 +140,7 @@ protected:
     std::set<uint16_t>*  pressed_keys = nullptr;
     control_signals_t*   control_signals = nullptr;
 
-    feedback_signals_t  feedback;
+    feedback_signals_t*  feedback;
 
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;

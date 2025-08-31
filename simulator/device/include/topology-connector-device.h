@@ -42,21 +42,7 @@ public:
 
     /// Device configuration loading
     virtual void load_config(CfgReader &cfg);
-/*
-    ///
-    void setControl(QMap<int, bool> keys,
-                    control_signals_t control_signals = control_signals_t());
 
-    ///
-    feedback_signals_t getFeedback() const;
-*/
-/*
-    /// Device's sound state
-    virtual sound_state_t getSoundState(size_t idx = 0) const;
-
-    /// Device's sound state (as a single float value, see common-headers/sound-signal.h)
-    virtual float getSoundSignal(size_t idx = 0) const;
-*/
 protected:
 
     Connector *connector = nullptr;
@@ -67,11 +53,6 @@ protected:
 
     /// Name of this device
     QString name = "";
-/*
-    control_signals_t   control_signals;
-
-    feedback_signals_t  feedback;
-*/
 };
 
 

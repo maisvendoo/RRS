@@ -145,44 +145,6 @@ void TrajectoryDevice::load_config(CfgReader &cfg)
 {
     (void) cfg;
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrajectoryDevice::setControl(QMap<int, bool> keys,
-                        control_signals_t control_signals)
-{
-    this->keys = QMap<int, bool>(keys);
-    this->control_signals = control_signals;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-feedback_signals_t TrajectoryDevice::getFeedback() const
-{
-    return feedback;
-}
-*/
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-sound_state_t TrajectoryDevice::getSoundState(size_t idx) const
-{
-    (void) idx;
-    return sound_state_t();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float TrajectoryDevice::getSoundSignal(size_t idx) const
-{
-    (void) idx;
-    return sound_state_t::createSoundSignal(false);
-}
-*/
 
 //------------------------------------------------------------------------------
 //

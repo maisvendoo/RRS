@@ -302,9 +302,9 @@ void Device::setControl(std::set<uint16_t>* keys,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-feedback_signals_t Device::getFeedback() const
+void Device::setFeedbackPointer(feedback_signals_t* feedback_ptr)
 {
-    return feedback;
+    feedback = feedback_ptr;
 }
 
 //------------------------------------------------------------------------------

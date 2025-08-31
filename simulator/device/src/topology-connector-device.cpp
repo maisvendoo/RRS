@@ -98,44 +98,6 @@ void ConnectorDevice::load_config(CfgReader &cfg)
 {
     (void) cfg;
 }
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ConnectorDevice::setControl(QMap<int, bool> keys,
-                        control_signals_t control_signals)
-{
-    this->keys = QMap<int, bool>(keys);
-    this->control_signals = control_signals;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-feedback_signals_t ConnectorDevice::getFeedback() const
-{
-    return feedback;
-}
-*/
-/*
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-sound_state_t ConnectorDevice::getSoundState(size_t idx) const
-{
-    (void) idx;
-    return sound_state_t();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float ConnectorDevice::getSoundSignal(size_t idx) const
-{
-    (void) idx;
-    return sound_state_t::createSoundSignal(false);
-}
-*/
 
 //------------------------------------------------------------------------------
 //
