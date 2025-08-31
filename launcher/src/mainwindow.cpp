@@ -57,6 +57,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
             this, &MainWindow::slotTrainSelection);
 
+    connect(ui->cbStartDateManually, &QCheckBox::stateChanged,
+            this, &MainWindow::slotStartDateManuallyChanged);
+
+    connect(ui->cbStartTimeManually, &QCheckBox::stateChanged,
+            this, &MainWindow::slotStartTimeManuallyChanged);
+
     connect(ui->pbStartServer, &QPushButton::pressed,
             this, &MainWindow::slotStartServerPressed);
 
@@ -159,6 +165,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QIcon icon(":/images/images/RRS_logo.png");
     setWindowIcon(icon);
 
+    QTimeZone local_zone = QTimeZone::systemTimeZone();
+    QDateTime current = QDateTime::currentDateTime(local_zone);
+    ui->dteStartDate->setDateTime(current);
+    ui->dteStartDate->setTimeZone(local_zone);
+    ui->dteStartTime->setDateTime(current);
+    ui->dteStartTime->setTimeZone(local_zone);
+
+    ui->dteStartDate->setEnabled(false);
+    ui->dteStartTime->setEnabled(false);
     ui->pbAddTrain->setEnabled(false);
     ui->pbDeleteTrain->setEnabled(false);
     ui->pbSaveStartConfig->setEnabled(false);
@@ -1094,6 +1109,22 @@ void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
         ui->pbStartServer->setEnabled(!active_trains.empty());
 
     slotChangeStartConfig();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotStartDateManuallyChanged()
+{
+    ui->dteStartDate->setEnabled(ui->cbStartDateManually->isChecked());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotStartTimeManuallyChanged()
+{
+    ui->dteStartTime->setEnabled(ui->cbStartTimeManually->isChecked());
 }
 
 //------------------------------------------------------------------------------

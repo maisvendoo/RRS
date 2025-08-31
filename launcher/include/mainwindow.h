@@ -193,6 +193,10 @@ private slots:
 
     void slotUpdateActiveTrains(bool reset_start_config = true);
 
+    void slotStartDateManuallyChanged();
+
+    void slotStartTimeManuallyChanged();
+
     void slotStartServerPressed();
 
     void slotStartViewerPressed();
