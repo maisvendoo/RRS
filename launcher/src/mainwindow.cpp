@@ -13,6 +13,7 @@
  */
 
 #include    "mainwindow.h"
+#include    "datetime.h"
 #include    "train-waypoint-widget.h"
 #include    "ui_mainwindow.h"
 
@@ -313,7 +314,7 @@ void MainWindow::loadServersList(const std::string &cfgDir)
         saved_servers.insert(local_server.server_name, local_server);
     }
 
-    for (auto ss : saved_servers)
+    for (auto& ss : saved_servers)
     {
         ui->cbSavedServers->addItem(ss.server_name + " (" + ss.getHostAddressAndPort() + ")");
     }
@@ -514,7 +515,7 @@ void MainWindow::loadActiveTrainsList()
 
     ui->cbStartConfigs->clear();
     ui->cbStartConfigs->addItem("<Not_selected>");
-    for (auto sc : routes_info[selected_route_idx].start_configs)
+    for (auto& sc : routes_info[selected_route_idx].start_configs)
     {
         ui->cbStartConfigs->addItem(sc.start_config_name);
     }
@@ -583,7 +584,7 @@ void MainWindow::loadSelectedTrainsList()
         return;
     }
 
-    for (auto at : sc.trains)
+    for (auto& at : sc.trains)
     {
         TrainWaypointWidget *tww = new TrainWaypointWidget(&trains_info,
                                                            trajectrories,
@@ -681,10 +682,16 @@ void MainWindow::startSimulator()
         return;
     }
 
-    FileSystem &fs = FileSystem::getInstance();
-    QString simPath = SIMULATOR_NAME + EXE_EXP;
-
-    QStringList args;
+    server_date_t start_date = server_date_t(
+        static_cast<int16_t>(ui->dteStartDate->dateTime().date().year()),
+        static_cast<uint8_t>(ui->dteStartDate->dateTime().date().month()),
+        static_cast<uint8_t>(ui->dteStartDate->dateTime().date().day()));
+    server_time_t start_time = server_time_t(
+        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().hour()),
+        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().minute()),
+        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().second()),
+        static_cast<uint16_t>(ui->dteStartTime->dateTime().time().msec()));
+    std::int64_t start_datetime = simulator_time_t(start_date, start_time).data();
 
     QString selected_trains = "";
     QString traj_names = "";
@@ -707,11 +714,16 @@ void MainWindow::startSimulator()
         }
     }
 
-    args << "--train-config=" + selected_trains;
+    QStringList args;
+    args << "--start=" + QString::number(start_datetime);
     args << "--route=" + selectedRouteDirName;
+    args << "--train-config=" + selected_trains;
     args << "--traj-name=" + traj_names;
     args << "--direction=" + directions;
     args << "--init-coord=" + init_coords;
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString simPath = SIMULATOR_NAME + EXE_EXP;
 
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     simulatorProc.start(QString::fromStdString(fs.getBinaryDir()) + '/' + simPath, args);
@@ -722,9 +734,6 @@ void MainWindow::startSimulator()
 //------------------------------------------------------------------------------
 void MainWindow::startViewer(bool local)
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString viewerPath = VIEWER_NAME + EXE_EXP;
-
     server_info_t server;
     if (local)
     {
@@ -742,6 +751,9 @@ void MainWindow::startViewer(bool local)
     QStringList args;
     args << "--host-address" << server.getHostAddress();
     args << "--port" << QString::number(server.ipv4_port);
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     if (local)
     {
@@ -762,9 +774,6 @@ void MainWindow::startViewer(bool local)
 //------------------------------------------------------------------------------
 void MainWindow::startMap(bool local)
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString mapPath = ROUTE_MAP_NAME + EXE_EXP;
-
     server_info_t server;
     if (local)
     {
@@ -782,6 +791,9 @@ void MainWindow::startMap(bool local)
     QStringList args;
     args << "--host-address" << server.getHostAddress();
     args << "--port" << QString::number(server.ipv4_port);
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString mapPath = ROUTE_MAP_NAME + EXE_EXP;
 
     if (local)
     {
@@ -1020,7 +1032,7 @@ void MainWindow::slotSaveStartConfig()
     editor.openFileForWrite(start_cfg_file_path);
     editor.setIndentationFormat(-1);
 
-    for (auto at : active_trains)
+    for (auto& at : active_trains)
     {
         active_train_t new_at = active_train_t();
         new_at.is_active = true;
@@ -1291,7 +1303,7 @@ void MainWindow::slotSelectSavedServer(int idx)
 {
     server_info_t server = server_info_t();
     int i = 0;
-    for (auto ss : saved_servers)
+    for (auto& ss : saved_servers)
     {
         if (i == idx)
         {

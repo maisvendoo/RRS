@@ -12,6 +12,8 @@
 //------------------------------------------------------------------------------
 struct simulator_command_line_t final
 {
+    /// Start date and time struct serialized to 64-bit value
+    option_t<std::int64_t> start_datetime;
     /// Route directory
     option_t<QString>   route_dir;
     /// Train configuration file name

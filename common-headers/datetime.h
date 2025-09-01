@@ -47,6 +47,11 @@ private:
 public:
     server_date_t() noexcept = default;
 
+    server_date_t(std::int32_t data) noexcept
+        : date_data(data)
+    {
+    }
+
     server_date_t(std::int16_t year, std::uint8_t month, std::uint8_t day) noexcept
     {
         std::uint8_t m = std::clamp(month, std::uint8_t(1), std::uint8_t(12));
@@ -201,6 +206,11 @@ private:
 public:
     server_time_t() noexcept = default;
 
+    server_time_t(std::uint32_t data) noexcept
+        : time_unit_since_midnight(data)
+    {
+    }
+
     server_time_t(std::uint8_t hour, std::uint8_t minute, std::uint8_t sec, std::uint16_t msec = 0) noexcept
     {
         time_unit_since_midnight = TIMEUNIT_MULTIPLIER_MSEC * ((msec < 1000) ? msec : 999);
@@ -343,11 +353,22 @@ struct simulator_time_t final
 
     simulator_time_t() noexcept = default;
 
+    simulator_time_t(std::int64_t data) noexcept
+        : date{static_cast<int32_t>(data / 4294967296)}
+        , time{static_cast<uint32_t>(data % 4294967296)}
+    {
+    }
+
     simulator_time_t(server_date_t in_date, server_time_t in_time, double in_simulation_seconds = 0.0) noexcept
         : date(in_date)
         , time(in_time)
         , simulation_seconds(in_simulation_seconds)
     {
+    }
+
+    constexpr int64_t data() const
+    {
+        return date.data() * 4294967296 + time.data();
     }
 
     /// Интегрирование времени
