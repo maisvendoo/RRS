@@ -150,14 +150,6 @@ void Model::outMessage(QString msg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::controlProcess()
-{
-    control_panel->process();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Model::deleteFinishedThread()
 {
     QThread *thread = dynamic_cast<QThread *>(sender());
@@ -166,6 +158,27 @@ void Model::deleteFinishedThread()
 
     Journal::instance()->info(QString("Delete finished thread at address: %1")
                                   .arg(reinterpret_cast<quint64>(thread), 0, 16));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::controlProcess()
+{
+    if (vehicle_controlled_by_panel && control_panel)
+    {
+        emit sendSignalsToControlPanel(vehicle_controlled_by_panel->getFeedBackSignals());
+        control_panel->process();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::receiveSignalsFromControlPanel(const control_signals_t &control_signals)
+{
+    if (vehicle_controlled_by_panel)
+        vehicle_controlled_by_panel->setControlSignals(control_signals);
 }
 
 //------------------------------------------------------------------------------
@@ -520,59 +533,59 @@ void Model::initControlPanel(QString cfg_path)
     if (cfg.load(full_path))
     {
         QString secName = "ControlPanel";
-        QString module_name = "";
 
         bool is_allow = true;
-
         cfg.getBool(secName, "Allow", is_allow);
-
         if (!is_allow)
         {
             return;
         }
 
-        if (!cfg.getString(secName, "Plugin", module_name))
+        int v_idx = 0;
+        cfg.getInt(secName, "Vehicle", v_idx);
+        if ((v_idx < 0) || v_idx >= vehicles.size())
+        {
             return;
+        }
+
+        QString module_name = "";
+        if (!cfg.getString(secName, "Plugin", module_name))
+        {
+            return;
+        }
 
         control_panel = nullptr;
         QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
         control_panel = loadInterfaceDevice(module_path);
-
         if (control_panel == nullptr)
+        {
             return;
+        }
 
         QString config_dir = "";
-
-        if (!cfg.getString(secName, "ConfigDir", config_dir))
-            return;
-
+        cfg.getString(secName, "ConfigDir", config_dir);
         config_dir = QString(fs.toNativeSeparators(config_dir.toStdString()).c_str());
-
-        if (!control_panel->init(QString(fs.getConfigDir().c_str()) + fs.separator() + config_dir))
+        config_dir = QString(fs.getConfigDir().c_str()) + fs.separator() + config_dir;
+        if (!control_panel->init(config_dir))
+        {
             return;
+        }
 
         int request_interval = 0;
-
         if (!cfg.getInt(secName, "RequestInterval", request_interval))
             request_interval = 100;
 
         controlTimer.setInterval(request_interval);
         connect(&controlTimer, &QTimer::timeout, this, &Model::controlProcess);
+        controlTimer.start();
 
-        int v_idx = 0;
-
-        if (!cfg.getInt(secName, "Vehicle", v_idx))
-            v_idx = 0;
-
-        Vehicle *vehicle = trains[0]->getVehicles()->at(static_cast<size_t>(v_idx));
-
-        connect(vehicle, &Vehicle::sendFeedBackSignals,
+        connect(this, &Model::sendSignalsToControlPanel,
                 control_panel, &VirtualInterfaceDevice::receiveFeedback);
 
         connect(control_panel, &VirtualInterfaceDevice::sendControlSignals,
-                vehicle, &Vehicle::getControlSignals);
+                this, &Model::receiveSignalsFromControlPanel);
 
-        controlTimer.start();
+        vehicle_controlled_by_panel = vehicles[v_idx];
     }
 }
 

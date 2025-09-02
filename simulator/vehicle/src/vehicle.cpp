@@ -676,7 +676,6 @@ void Vehicle::keyProcess()
 void Vehicle::hardwareProcess()
 {
     hardwareOutput();
-    emit sendFeedBackSignals(feedback_signals);
 }
 
 //------------------------------------------------------------------------------
@@ -732,9 +731,17 @@ void Vehicle::resetKeyboardControl(const uint8_t& cab_num)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::getControlSignals(control_signals_t control_signals)
+void Vehicle::setControlSignals(const control_signals_t& control_signals)
 {
     this->control_signals = control_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+feedback_signals_t& Vehicle::getFeedBackSignals()
+{
+    return feedback_signals;
 }
 
 //------------------------------------------------------------------------------

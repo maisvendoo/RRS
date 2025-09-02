@@ -41,8 +41,6 @@
 //------------------------------------------------------------------------------
 class VEHICLE_EXPORT Vehicle : public QObject
 {
-    Q_OBJECT
-
 public:
 
     /// Constructor
@@ -193,13 +191,9 @@ public:
 
     void resetKeyboardControl(const uint8_t& cab_num);
 
-public slots:
+    void setControlSignals(const control_signals_t& control_signals);
 
-    void getControlSignals(control_signals_t control_signals);
-
-signals:
-
-    void sendFeedBackSignals(feedback_signals_t feedback_signals);
+    feedback_signals_t& getFeedBackSignals();
 
 protected:
 
