@@ -163,6 +163,9 @@ public:
     device_list_t* getBwdConnectors();
     device_coord_list_t* getRailwayConnectors();
 
+    /// Init vehicle brake devices
+    virtual void initBrakeDevices(double p0, double pTM, double pFL);
+
     /// Common acceleration calculation
     virtual state_vector_t getAcceleration(state_vector_t& Y, const double& t, const double& dt);
 
@@ -170,18 +173,11 @@ public:
 
     void integrationPreStep(state_vector_t& Y, const double& t);
 
-    virtual void keyProcess();
-
-    virtual void hardwareProcess();
-
     void integrationStep(state_vector_t& Y, const double& t, const double& dt);
 
     void integrationPostStep(state_vector_t& Y, const double& t);
 
     QString getDebugMsg() const;
-
-    /// Init vehicle brake devices
-    virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
     void setUks(double value);
 
@@ -329,13 +325,6 @@ protected:
     /// User defined configuration load
     virtual void loadConfig(QString cfg_path);
 
-    /// Add device to forward connectors
-    void addFwdConnector(Device* device);
-    /// Add device to backward connectors
-    void addBwdConnector(Device* device);
-    /// Add device to railway connectors
-    void addRailwayConnector(Device* device, double distance_from_center = 0.0);
-
     /// User defined simulation process
     virtual void process(const simulator_time_t& t, const double& dt);
 
@@ -348,8 +337,6 @@ protected:
     /// User define step result processing
     virtual void postStep(const double& t);
 
-    virtual void hardwareOutput();
-
     /// Recalculate coefficients for default main resistant formula
     virtual void mainResistCoeffs();
 
@@ -358,6 +345,13 @@ protected:
 
     /// Calculate wheel-rail friction coefficient
     virtual double wheelrailFriction(double velocity);
+
+    /// Add device to forward connectors
+    void addFwdConnector(Device* device);
+    /// Add device to backward connectors
+    void addBwdConnector(Device* device);
+    /// Add device to railway connectors
+    void addRailwayConnector(Device* device, double distance_from_center = 0.0);
 
     /* Modkeys extended functions */
 

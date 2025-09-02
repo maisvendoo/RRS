@@ -468,6 +468,16 @@ device_coord_list_t* Vehicle::getRailwayConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
+{
+    (void) p0;
+    (void) pTM;
+    (void) pFL;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 state_vector_t Vehicle::getAcceleration(state_vector_t& Y, const double& t, const double& dt)
 {
     (void) t;
@@ -673,22 +683,6 @@ void Vehicle::integrationPreStep(state_vector_t& Y, const double& t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::keyProcess()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::hardwareProcess()
-{
-    hardwareOutput();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Vehicle::integrationStep(state_vector_t& Y, const double& t, const double& dt)
 {
     (void) Y;
@@ -773,7 +767,163 @@ void Vehicle::setUks(double value)
 //------------------------------------------------------------------------------
 void Vehicle::initialization()
 {
+    // This code may be overrided in child class
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::loadConfig(QString cfg_path)
+{
+    (void) cfg_path;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::process(const simulator_time_t &t, const double &dt)
+{
+    (void) t;
+    (void) dt;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::preStep(const double& t)
+{
+    (void) t;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::step(const double& t, const double& dt)
+{
+    (void) t;
+    (void) dt;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::postStep(const double& t)
+{
+    (void) t;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::mainResistCoeffs()
+{
+    double q = 1.0;
+    if ((q0 > 1.0) && (num_axis > 0))
+        q = full_mass / (1000.0 * static_cast<double>(num_axis));
+
+    W_coef = (b0 + b1 / q) * Physics::g / 1000.0;
+    W_coef_v = (b2 / q) * Physics::g * Physics::kmh / 1000.0;
+    W_coef_v2 = (b3 / q) * Physics::g * Physics::kmh * Physics::kmh / 1000.0;
+    W_coef_curv = 700.0 * Physics::g / 1000.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::mainResist(double velocity)
+{
+    return full_mass * (  W_coef
+                        + W_coef_v * abs(velocity)
+                        + W_coef_v2 * velocity * velocity
+                        + W_coef_curv * abs(profile_point_data.curvature)  );
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::wheelrailFriction(double velocity)
+{
+    double abs_V = abs(velocity) * Physics::kmh;
+    return psi_a + (psi_b / (psi_c + psi_d * abs_V)) + psi_e * abs_V;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::addFwdConnector(Device* device)
+{
+    forward_connectors.push_back(device);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::addBwdConnector(Device* device)
+{
+    backward_connectors.push_back(device);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::addRailwayConnector(Device* device, double distance_from_center)
+{
+    device_coord_t dc;
+    dc.device = device;
+    dc.coord = std::clamp(distance_from_center, -length / 2.0, length / 2.0);
+    railway_connectors.push_back(dc);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isShift(int cab_num) const
+{
+    return getKeyState(KEY_Shift_L, cab_num) || getKeyState(KEY_Shift_R, cab_num);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isControl(int cab_num) const
+{
+    return getKeyState(KEY_Control_L, cab_num) || getKeyState(KEY_Control_R, cab_num);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isAlt(int cab_num) const
+{
+    return getKeyState(KEY_Alt_L, cab_num) || getKeyState(KEY_Alt_R, cab_num);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::getKeyState(uint16_t key, int cab_num) const
+{
+    if (cab_num < 0)
+    {
+        return pressed_keys.count(key);
+    }
+
+    if (cab_num >= pressed_keys_by_cabine.size())
+    {
+        return false;
+    }
+
+    return pressed_keys_by_cabine[cab_num].count(key);
 }
 
 //------------------------------------------------------------------------------
@@ -859,6 +1009,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         s = 1 + num_axis;
 
+        // User defined configuration load
         loadConfig(cfg_path);
     }
     else
@@ -882,41 +1033,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::loadConfig(QString cfg_path)
-{
-    (void) cfg_path;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::addFwdConnector(Device* device)
-{
-    forward_connectors.push_back(device);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::addBwdConnector(Device* device)
-{
-    backward_connectors.push_back(device);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::addRailwayConnector(Device* device, double distance_from_center)
-{
-    device_coord_t dc;
-    dc.device = device;
-    dc.coord = std::clamp(distance_from_center, -length / 2.0, length / 2.0);
-    railway_connectors.push_back(dc);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
 {
     QFileInfo info(cfg_path);
@@ -924,8 +1040,8 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
     dir.cdUp();
     dir.cdUp();
     QString file_path = dir.path() + QDir::separator() +
-            "main-resist" + QDir::separator() +
-            main_resist_cfg + ".xml";
+                        "main-resist" + QDir::separator() +
+                        main_resist_cfg + ".xml";
 
     CfgReader cfg;
 
@@ -946,7 +1062,7 @@ void Vehicle::loadMainResist(QString cfg_path, QString main_resist_cfg)
         Journal::instance()->error("File " + file_path + " is't found");
     }
     Journal::instance()->info("Main resist formula: " + QString("w = %1 + (%2 + %3 * V + %4 * V^2) / %5")
-                              .arg(b0).arg(b1).arg(b2).arg(b3).arg(q0));
+                                                            .arg(b0).arg(b1).arg(b2).arg(b3).arg(q0));
 }
 
 //------------------------------------------------------------------------------
@@ -959,8 +1075,8 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
     dir.cdUp();
     dir.cdUp();
     QString file_path = dir.path() + QDir::separator() +
-            "wheel-rail-friction" + QDir::separator() +
-            wheel_cfg + ".xml";
+                        "wheel-rail-friction" + QDir::separator() +
+                        wheel_cfg + ".xml";
 
     CfgReader cfg;
 
@@ -975,151 +1091,14 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
         cfg.getDouble(secName, "e", psi_e);
 
         Journal::instance()->info("Wheel model config: " + QString("%1")
-                                  .arg(file_path));
+                                                               .arg(file_path));
     }
     else
     {
         Journal::instance()->error("File " + file_path + " is't found");
     }
     Journal::instance()->info("Wheel friction coefficient formula: " + QString("psi = %1 + (%2 / (%3 + %4 * V)) + %5 * V")
-                              .arg(psi_a).arg(psi_b).arg(psi_c).arg(psi_d).arg(psi_e));
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::process(const simulator_time_t &t, const double &dt)
-{
-    (void) t;
-    (void) dt;
-
-    // This code may be overrided in child class
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::preStep(const double& t)
-{
-    (void) t;
-
-    // This code may be overrided in child class
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::step(const double& t, const double& dt)
-{
-    (void) t;
-    (void) dt;
-
-    // This code may be overrided in child class
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::postStep(const double& t)
-{
-    (void) t;
-
-    // This code may be overrided in child class
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::hardwareOutput()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::mainResistCoeffs()
-{
-    double q = 1.0;
-    if ((q0 > 1.0) && (num_axis > 0))
-        q = full_mass / (1000.0 * static_cast<double>(num_axis));
-
-    W_coef = (b0 + b1 / q) * Physics::g / 1000.0;
-    W_coef_v = (b2 / q) * Physics::g * Physics::kmh / 1000.0;
-    W_coef_v2 = (b3 / q) * Physics::g * Physics::kmh * Physics::kmh / 1000.0;
-    W_coef_curv = 700.0 * Physics::g / 1000.0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double Vehicle::mainResist(double velocity)
-{
-    return full_mass * (  W_coef
-                        + W_coef_v * abs(velocity)
-                        + W_coef_v2 * velocity * velocity
-                        + W_coef_curv * abs(profile_point_data.curvature)  );
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double Vehicle::wheelrailFriction(double velocity)
-{
-    double abs_V = abs(velocity) * Physics::kmh;
-    return psi_a + (psi_b / (psi_c + psi_d * abs_V)) + psi_e * abs_V;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Vehicle::isShift(int cab_num) const
-{
-    return getKeyState(KEY_Shift_L, cab_num) || getKeyState(KEY_Shift_R, cab_num);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Vehicle::isControl(int cab_num) const
-{
-    return getKeyState(KEY_Control_L, cab_num) || getKeyState(KEY_Control_R, cab_num);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Vehicle::isAlt(int cab_num) const
-{
-    return getKeyState(KEY_Alt_L, cab_num) || getKeyState(KEY_Alt_R, cab_num);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Vehicle::getKeyState(uint16_t key, int cab_num) const
-{
-    if (cab_num < 0)
-    {
-        return pressed_keys.count(key);
-    }
-
-    if (cab_num >= pressed_keys_by_cabine.size())
-    {
-        return false;
-    }
-
-    return pressed_keys_by_cabine[cab_num].count(key);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
-{
-    Q_UNUSED(p0)
-    Q_UNUSED(pTM)
-    Q_UNUSED(pFL)
+                                                                           .arg(psi_a).arg(psi_b).arg(psi_c).arg(psi_d).arg(psi_e));
 }
 
 //------------------------------------------------------------------------------
