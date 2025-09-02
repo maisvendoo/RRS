@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::stepBrakesControl(double t, double dt)
+void VL60pk::stepBrakesControl(const double& t, const double& dt)
 {
     for (size_t cab_idx : {CAB1, CAB2})
     {

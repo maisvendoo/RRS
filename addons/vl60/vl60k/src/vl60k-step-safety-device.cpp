@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::stepSafetyDevices(double t, double dt)
+void VL60k::stepSafetyDevices(const double& t, const double& dt)
 {
     // Приёмные катушки АЛСН
     coil_ALSN_fwd->step(t, dt);

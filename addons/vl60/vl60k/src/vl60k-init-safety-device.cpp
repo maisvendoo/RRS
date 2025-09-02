@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::initSafetyDevices(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60k::initSafetyDevices(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
 

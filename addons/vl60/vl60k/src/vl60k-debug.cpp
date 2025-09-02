@@ -21,8 +21,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::debugPrint()
+void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
 {
+    (void) t;
+    (void) dt;
+
     DebugMsg = "";
 
     DebugMsg += QString("CABINE 1|");

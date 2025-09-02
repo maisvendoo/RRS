@@ -115,7 +115,7 @@ void PassCar::preStep(const double& t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::step(const double &t, const double &dt)
+void PassCar::step(const double& t, const double& dt)
 {
     stepCouplings(t, dt);
 

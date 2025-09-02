@@ -17,11 +17,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::keyProcess()
+void VL60k::keyProcess(const simulator_time_t& t, const double& dt)
 {
-    if (needDebugMsg)
-        debugPrint();
-
     // Сцепные устройства
     oper_rod_fwd->setControl(&pressed_keys);
     oper_rod_bwd->setControl(&pressed_keys);

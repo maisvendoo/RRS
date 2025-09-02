@@ -23,10 +23,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::stepSignalsOutput(double t, double dt)
+void VL60k::signalsOutput(const simulator_time_t& t, const double& dt)
 {
-    (void)t;
-    (void)dt;
+    (void) t;
+    (void) dt;
 
     analogSignal[SERIAL_NUMBER] = 1737.0f;
 

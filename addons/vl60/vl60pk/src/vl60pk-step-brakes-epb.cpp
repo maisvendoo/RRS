@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::stepEPB(double t, double dt)
+void VL60pk::stepEPB(const double& t, const double& dt)
 {
     // Потребляемый ток в рабочей линии ЭПТ
     double evr_current = electro_air_dist->getCurrent(0);
