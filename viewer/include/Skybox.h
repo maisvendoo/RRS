@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vsg/nodes/StateGroup.h>
 
 class CfgReader;
 
@@ -28,6 +29,11 @@ public:
     /// Get scene node
     vsg::ref_ptr<vsg::Node> getNode() const noexcept;
 
+//------------------------------------------------------------------------------
+    /// Get scene node
+    vsg::ref_ptr<vsg::StateGroup> getNode2() const noexcept;
+//------------------------------------------------------------------------------
+
     /// Get default texture
     vsg::ref_ptr<vsg::ubvec4Array2D> getDefaultTexture() const noexcept;
 
@@ -41,6 +47,11 @@ public:
     void setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights);
 
 private:
+
+//------------------------------------------------------------------------------
+    vsg::ref_ptr<vsg::StateGroup> node2;
+//------------------------------------------------------------------------------
+
     vsg::ref_ptr<vsg::Node> node;
     vsg::ref_ptr<vsg::ubvec4Array2D> texture;
     std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> active_textures_and_weights;

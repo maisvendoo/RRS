@@ -4,8 +4,20 @@
 #include "filesystem.h"
 #include "Logger.h"
 
+#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/app/RecordTraversal.h>
 #include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
 #include <vsg/core/Value.h>
+#include <vsg/io/Options.h>
+#include <vsg/state/Descriptor.h>
+#include <vsg/state/DescriptorBuffer.h>
+#include <vsg/state/DescriptorSet.h>
+#include <vsg/state/DescriptorSetLayout.h>
+#include <vsg/state/PipelineLayout.h>
+#include <vsg/state/Sampler.h>
+#include <vsg/state/ShaderModule.h>
 #include <vsgXchange/all.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/io/read.h>
@@ -52,6 +64,14 @@ Skybox::Skybox(const std::string& skybox_config_filepath,
 vsg::ref_ptr<vsg::Node> Skybox::getNode() const noexcept
 {
     return node;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vsg::ref_ptr<vsg::StateGroup> Skybox::getNode2() const noexcept
+{
+    return node2;
 }
 
 //------------------------------------------------------------------------------
@@ -233,11 +253,13 @@ void Skybox::update_skybox()
 //------------------------------------------------------------------------------
 void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 {
+    // Получаем пути к шейдерам скайбокса
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
     const std::string shader_vert_path = shaders_dir_path + fs.separator() + "new_skybox.vert";
     const std::string shader_frag_path = shaders_dir_path + fs.separator() + "new_skybox.frag";
 
+    // Читаем шейдеры из соответствующих путей
     auto vertex_shader = vsg::read_cast<vsg::ShaderStage>(shader_vert_path, options);
     auto fragment_shader = vsg::read_cast<vsg::ShaderStage>(shader_frag_path, options);
 
@@ -247,20 +269,60 @@ void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
         return;
     }
 
-    auto shaderSet = vsg::ShaderSet::create(vsg::ShaderStages{vertex_shader, fragment_shader});
+    // Настраиваем пайплайн скайбокса
+    vsg::DescriptorSetLayoutBindings descriptor_bindings = {
+        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}, // { binding, descriptorType, descriptorCount, stageFlags, pImmutableSamplers}
+        {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+    };
 
-    shaderSet->addAttributeBinding("inPosition", "", 0, VK_FORMAT_R32G32B32_SFLOAT, vsg::vec3Array::create(1));
-    shaderSet->addAttributeBinding("inTexCoord", "", 1, VK_FORMAT_R32G32_SFLOAT, vsg::vec3Array::create(1));
+    auto descriptor_set_layout = vsg::DescriptorSetLayout::create(descriptor_bindings);
 
-    shaderSet->addDescriptorBinding("prev_texture", "", 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, vsg::ubvec4Array2D::create(1, 1, vsg::Data::Properties{VK_FORMAT_R8G8B8A8_UNORM}));
-    shaderSet->addDescriptorBinding("curr_texture", "", 0, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, vsg::ubvec4Array2D::create(1, 1, vsg::Data::Properties{VK_FORMAT_R8G8B8A8_UNORM}));
-    shaderSet->addDescriptorBinding("mix_value", "", 0, 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, vsg::floatValue::create(0.0f));
+    vsg::PushConstantRanges push_constant_ranges = {
+        {VK_SHADER_STAGE_VERTEX_BIT, 0, 128} // projection, view, and model matrices, actual push constant calls automatically provided by the VSG's RecordTraversal
+    };
 
-    shaderSet->addPushConstantRange("pc", "", VK_SHADER_STAGE_ALL, 0, 128);
+    vsg::VertexInputState::Bindings vertex_bindings_descriptions = {
+        VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}, // vertex data
+        VkVertexInputBindingDescription{1, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}  // tex coord data
+    };
 
-    // auto vertex_shader = vsg::ShaderSt
+    vsg::VertexInputState::Attributes vertex_attribute_descriptions = {
+        VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0}, // vertex data
+        VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}     // tex coord data
+    };
 
+    auto depth_stencil_state = vsg::DepthStencilState::create();
+    depth_stencil_state->depthTestEnable = VK_FALSE;
 
+    vsg::GraphicsPipelineStates pipeline_states = {
+        vsg::VertexInputState::create(vertex_bindings_descriptions, vertex_attribute_descriptions),
+        vsg::InputAssemblyState::create(),
+        vsg::RasterizationState::create(),
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        depth_stencil_state
+    };
+
+    auto pipeline_layout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, push_constant_ranges);
+    auto graphics_pipeline = vsg::GraphicsPipeline::create(pipeline_layout, vsg::ShaderStages{vertex_shader, fragment_shader}, pipeline_states);
+    auto bind_graphics_pipeline = vsg::BindGraphicsPipeline::create(graphics_pipeline);
+
+    auto prev_texture = vsg::DescriptorImage::create(vsg::Sampler::create(), vsg::Data::create(), 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+    auto curr_texture = vsg::DescriptorImage::create(vsg::Sampler::create(), vsg::Data::create(), 1, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+
+    auto uniform_value = vsg::floatValue::create(0.0f);
+    auto uniform = vsg::DescriptorBuffer::create(uniform_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+
+    auto descriptor_set = vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{texture});
+    auto bind_descriptor_set = vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set);
+
+    node2 = vsg::StateGroup::create();
+    node2->add(bind_graphics_pipeline);
+    node2->add(bind_descriptor_set);
+
+    auto transform = vsg::MatrixTransform::create();
+    node2->addChild(transform);
 
 
 

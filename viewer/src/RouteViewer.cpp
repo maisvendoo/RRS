@@ -368,6 +368,7 @@ void RouteViewer::initScenegraph()
     // до всего остального в сцене и до компиляции вьювера
     FileSystem& fs = FileSystem::getInstance();
     const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
+
     Skybox* skybox = new Skybox(cfg_path, options);
     GUIparams->skybox = skybox;
     GUIparams->skybox_texture_data = skybox->getDefaultTexture();
