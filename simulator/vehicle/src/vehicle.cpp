@@ -29,7 +29,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Vehicle::Vehicle(QObject *parent) : QObject(parent)
+Vehicle::Vehicle(QObject* parent) : QObject(parent)
 {
     std::fill(analogSignal.begin(), analogSignal.end(), 0.0f);
 }
@@ -232,7 +232,7 @@ void Vehicle::setWheelOmega(size_t i, double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setPrevVehicle(Vehicle *vehicle)
+void Vehicle::setPrevVehicle(Vehicle* vehicle)
 {
     prev_vehicle = vehicle;
 }
@@ -240,7 +240,7 @@ void Vehicle::setPrevVehicle(Vehicle *vehicle)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setNextVehicle(Vehicle *vehicle)
+void Vehicle::setNextVehicle(Vehicle* vehicle)
 {
     next_vehicle = vehicle;
 }
@@ -312,7 +312,7 @@ size_t Vehicle::getStateIndex() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t *Vehicle::getProfilePoint()
+profile_point_t* Vehicle::getProfilePoint()
 {
     return &profile_point_data;
 }
@@ -409,7 +409,7 @@ double Vehicle::getWheelOmega(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Vehicle *Vehicle::getPrevVehicle()
+Vehicle* Vehicle::getPrevVehicle()
 {
     return prev_vehicle;
 }
@@ -417,7 +417,7 @@ Vehicle *Vehicle::getPrevVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Vehicle *Vehicle::getNextVehicle()
+Vehicle* Vehicle::getNextVehicle()
 {
     return next_vehicle;
 }
@@ -444,7 +444,7 @@ std::array<float, MAX_ANALOG_SIGNALS> Vehicle::getAnalogSignals()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-device_list_t *Vehicle::getFwdConnectors()
+device_list_t* Vehicle::getFwdConnectors()
 {
     return &forward_connectors;
 }
@@ -452,7 +452,7 @@ device_list_t *Vehicle::getFwdConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-device_list_t *Vehicle::getBwdConnectors()
+device_list_t* Vehicle::getBwdConnectors()
 {
     return &backward_connectors;
 }
@@ -460,7 +460,7 @@ device_list_t *Vehicle::getBwdConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-device_coord_list_t *Vehicle::getRailwayConnectors()
+device_coord_list_t* Vehicle::getRailwayConnectors()
 {
     return &railway_connectors;
 }
@@ -468,7 +468,7 @@ device_coord_list_t *Vehicle::getRailwayConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t, double dt)
+state_vector_t Vehicle::getAcceleration(state_vector_t& Y, double t, double dt)
 {
     (void) t;
 
@@ -623,7 +623,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPreStep(state_vector_t &Y, double t)
+void Vehicle::integrationPreStep(state_vector_t& Y, double t)
 {
     train_coord = Y[state_idx];
     velocity = dir * orient * Y[state_idx + s];
@@ -682,7 +682,7 @@ void Vehicle::hardwareProcess()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
+void Vehicle::integrationStep(state_vector_t& Y, double t, double dt)
 {
     (void) Y;
     step(t, dt);
@@ -691,7 +691,7 @@ void Vehicle::integrationStep(state_vector_t &Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPostStep(state_vector_t &Y, double t)
+void Vehicle::integrationPostStep(state_vector_t& Y, double t)
 {
     (void) Y;
     postStep(t);
@@ -875,7 +875,7 @@ void Vehicle::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::addFwdConnector(Device *device)
+void Vehicle::addFwdConnector(Device* device)
 {
     forward_connectors.push_back(device);
 }
@@ -883,7 +883,7 @@ void Vehicle::addFwdConnector(Device *device)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::addBwdConnector(Device *device)
+void Vehicle::addBwdConnector(Device* device)
 {
     backward_connectors.push_back(device);
 }
@@ -891,7 +891,7 @@ void Vehicle::addBwdConnector(Device *device)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::addRailwayConnector(Device *device, double distance_from_center)
+void Vehicle::addRailwayConnector(Device* device, double distance_from_center)
 {
     device_coord_t dc;
     dc.device = device;
@@ -1095,9 +1095,9 @@ void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Vehicle *loadVehicle(QString lib_path)
+Vehicle* loadVehicle(QString lib_path)
 {
-    Vehicle *vehicle = nullptr;
+    Vehicle* vehicle = nullptr;
 
     QLibrary lib(lib_path);
 

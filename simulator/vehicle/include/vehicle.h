@@ -46,7 +46,7 @@ class VEHICLE_EXPORT Vehicle : public QObject
 public:
 
     /// Constructor
-    explicit Vehicle(QObject *parent = nullptr);
+    explicit Vehicle(QObject* parent = nullptr);
     /// Destructor
     virtual ~Vehicle();
 
@@ -105,8 +105,8 @@ public:
     void setWheelAngle(size_t i, double value);
     void setWheelOmega(size_t i, double value);
 
-    void setPrevVehicle(Vehicle *vehicle);
-    void setNextVehicle(Vehicle *vehicle);
+    void setPrevVehicle(Vehicle* vehicle);
+    void setNextVehicle(Vehicle* vehicle);
 
     void setNeedDebugMsg(bool is_needed);
 
@@ -126,7 +126,7 @@ public:
     /// Get vehicle state index
     size_t getStateIndex() const;
 
-    profile_point_t *getProfilePoint();
+    profile_point_t* getProfilePoint();
 
     /// Get orientation
     int getOrientation() const;
@@ -154,31 +154,31 @@ public:
 
     double getWheelOmega(size_t i);
 
-    Vehicle *getPrevVehicle();
-    Vehicle *getNextVehicle();
+    Vehicle* getPrevVehicle();
+    Vehicle* getNextVehicle();
 
     float getAnalogSignal(size_t i);
     std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
 
-    device_list_t *getFwdConnectors();
-    device_list_t *getBwdConnectors();
-    device_coord_list_t *getRailwayConnectors();
+    device_list_t* getFwdConnectors();
+    device_list_t* getBwdConnectors();
+    device_coord_list_t* getRailwayConnectors();
 
     /// Common acceleration calculation
-    virtual state_vector_t getAcceleration(state_vector_t &Y, double t, double dt);
+    virtual state_vector_t getAcceleration(state_vector_t& Y, double t, double dt);
 
     ///
-    void integrationPreStep(state_vector_t &Y, double t);
+    void integrationPreStep(state_vector_t& Y, double t);
 
     virtual void keyProcess();
 
     virtual void hardwareProcess();
 
     ///
-    void integrationStep(state_vector_t &Y, double t, double dt);
+    void integrationStep(state_vector_t& Y, double t, double dt);
 
     ///
-    void integrationPostStep(state_vector_t &Y, double t);
+    void integrationPostStep(state_vector_t& Y, double t);
 
     QString getDebugMsg() const;
 
@@ -294,8 +294,8 @@ protected:
     QString DebugMsg = "";
     bool needDebugMsg = false;
 
-    Vehicle *prev_vehicle = nullptr;
-    Vehicle *next_vehicle = nullptr;
+    Vehicle* prev_vehicle = nullptr;
+    Vehicle* next_vehicle = nullptr;
 
     /// Напряжение в КС
     double      Uks = 25000.0;
@@ -336,11 +336,11 @@ protected:
     virtual void loadConfig(QString cfg_path);
 
     /// Add device to forward connectors
-    void addFwdConnector(Device *device);
+    void addFwdConnector(Device* device);
     /// Add device to backward connectors
-    void addBwdConnector(Device *device);
+    void addBwdConnector(Device* device);
     /// Add device to railway connectors
-    void addRailwayConnector(Device *device, double distance_from_center = 0.0);
+    void addRailwayConnector(Device* device, double distance_from_center = 0.0);
 
     /// User defined step prepare
     virtual void preStep(double t);
@@ -400,7 +400,7 @@ typedef Vehicle* (*GetVehicle)();
 //
 //------------------------------------------------------------------------------
 #define GET_VEHICLE(ClassName) \
-    extern "C" Vehicle *getVehicle() \
+    extern "C" Vehicle* getVehicle() \
     {\
         return new (ClassName)(); \
     }
@@ -412,6 +412,6 @@ typedef Vehicle* (*GetVehicle)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" VEHICLE_EXPORT Vehicle *loadVehicle(QString lib_path);
+extern "C" VEHICLE_EXPORT Vehicle* loadVehicle(QString lib_path);
 
 #endif // VEHICLE_H
