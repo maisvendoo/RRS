@@ -4,6 +4,8 @@
 #include "filesystem.h"
 #include "Logger.h"
 
+#include <vsg/core/Array.h>
+#include <vsg/core/Value.h>
 #include <vsgXchange/all.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/io/read.h>
@@ -24,6 +26,7 @@
 #include <vsg/state/VertexInputState.h>
 #include <vsg/utils/ShaderSet.h>
 #include <vsg/utils/SharedObjects.h>
+#include <vulkan/vulkan_core.h>
 
 //------------------------------------------------------------------------------
 //
@@ -230,110 +233,142 @@ void Skybox::update_skybox()
 //------------------------------------------------------------------------------
 void Skybox::init_model(CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 {
-    vsg::ref_ptr<vsg::Options> skybox_options = options ? vsg::Options::create(*options) : vsg::Options::create();
-    skybox_options->sharedObjects = {};
-
-    // За основу берём встроенные комплекты вершинного и фрагментного шейдера
-    skybox_options->shaderSets["flat"] = vsg::createFlatShadedShaderSet();
-    skybox_options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet();
-    skybox_options->shaderSets["phong"] = vsg::createPhongShaderSet();
-
-    // Очищаем все встроенные сохранённые варианты настроек
-    skybox_options->shaderSets["flat"]->variants.clear();
-    skybox_options->shaderSets["pbr"]->variants.clear();
-    skybox_options->shaderSets["phong"]->variants.clear();
-
-    auto vertexInputState = vsg::VertexInputState::create();
-    auto inputAssemblyState = vsg::InputAssemblyState::create();
-    auto rasterizationState = vsg::RasterizationState::create();
-    auto colorBlendState = vsg::ColorBlendState::create();
-    auto depthStencilState = vsg::DepthStencilState::create();
-    auto multisampleState = vsg::MultisampleState::create();
-
-    // Отключаем проверку на глубину сцены
-    depthStencilState->depthTestEnable = VK_FALSE;
-
-    vsg::GraphicsPipelineStates defaultGraphicsPipelineStates = {
-        vertexInputState,
-        inputAssemblyState,
-        rasterizationState,
-        colorBlendState,
-        depthStencilState,
-        multisampleState
-    };
-
-    skybox_options->shaderSets["flat"]->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
-    skybox_options->shaderSets["pbr"]->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
-    skybox_options->shaderSets["phong"]->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
-
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+    const std::string shader_vert_path = shaders_dir_path + fs.separator() + "new_skybox.vert";
+    const std::string shader_frag_path = shaders_dir_path + fs.separator() + "new_skybox.frag";
 
-    // Загружаем свой вариант вершинного шейдера вместо встроенного
-    const std::string shader_vert_path = shaders_dir_path + fs.separator() + "skybox_vert.vert";
-    const vsg::ref_ptr<vsg::ShaderStage> shader_vert_stage =
-        vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", shader_vert_path, skybox_options);
-    if (shader_vert_stage)
-    {
-        LOG_INFO("Loaded vertex shader for skybox: %s", shader_vert_path.c_str());
-        skybox_options->shaderSets["flat"]->stages.front() = shader_vert_stage;
-        skybox_options->shaderSets["pbr"]->stages.front() = shader_vert_stage;
-        skybox_options->shaderSets["phong"]->stages.front() = shader_vert_stage;
-    }
-    else
-    {
-        LOG_WARN("Fail to load vertex shader for skybox: %s", shader_vert_path.c_str());
-        LOG_INFO("Using default vertex shader");
-    }
+    auto vertex_shader = vsg::read_cast<vsg::ShaderStage>(shader_vert_path, options);
+    auto fragment_shader = vsg::read_cast<vsg::ShaderStage>(shader_frag_path, options);
 
-    // Загружаем свой вариант фрагментного шейдера вместо встроенного
-    const std::string shader_frag_path = shaders_dir_path + fs.separator() + "skybox_frag.frag";
-    const vsg::ref_ptr<vsg::ShaderStage> shader_frag_stage =
-        vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", shader_frag_path, skybox_options);
-    if (shader_frag_stage)
+    if (!vertex_shader || !fragment_shader)
     {
-        LOG_INFO("Loaded fragment shader for skybox: %s", shader_frag_path.c_str());
-        skybox_options->shaderSets["flat"]->stages.back() = shader_frag_stage;
-        skybox_options->shaderSets["pbr"]->stages.back() = shader_frag_stage;
-        skybox_options->shaderSets["phong"]->stages.back() = shader_frag_stage;
-    }
-    else
-    {
-        LOG_WARN("Fail to load fragment shader for skybox: %s", shader_frag_path.c_str());
-        LOG_INFO("Using default fragment shader");
-    }
-
-    // Загружаем модель скайбокса
-    QString model_filename = "sky.gltf";
-    cfg.getString("Model", "Filename", model_filename);
-
-    std::string model_path = fs.getDataDir();
-    model_path = fs.combinePath(model_path, "models");
-    model_path = fs.combinePath(model_path, "default-objects");
-    model_path = fs.combinePath(model_path, model_filename.toStdString());
-
-    if (!vsg::fileExists(model_path))
-    {
-        LOG_WARN("Fail to find skybox file: %s", model_path.c_str());
+        LOG_ERROR("Could not create shaders");
         return;
     }
 
-    const vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_path, skybox_options);
-    node = loaded.cast<vsg::Node>();
-    if (!node)
-    {
-        LOG_WARN("Fail to load skybox model from file: %s", model_path.c_str());
+    auto shaderSet = vsg::ShaderSet::create(vsg::ShaderStages{vertex_shader, fragment_shader});
 
-        vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
-        if (error)
-        {
-            LOG_WARN(error->message.c_str());
-        }
+    shaderSet->addAttributeBinding("inPosition", "", 0, VK_FORMAT_R32G32B32_SFLOAT, vsg::vec3Array::create(1));
+    shaderSet->addAttributeBinding("inTexCoord", "", 1, VK_FORMAT_R32G32_SFLOAT, vsg::vec3Array::create(1));
 
-        return;
-    }
+    shaderSet->addDescriptorBinding("prev_texture", "", 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, vsg::ubvec4Array2D::create(1, 1, vsg::Data::Properties{VK_FORMAT_R8G8B8A8_UNORM}));
+    shaderSet->addDescriptorBinding("curr_texture", "", 0, 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, vsg::ubvec4Array2D::create(1, 1, vsg::Data::Properties{VK_FORMAT_R8G8B8A8_UNORM}));
+    shaderSet->addDescriptorBinding("mix_value", "", 0, 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, vsg::floatValue::create(0.0f));
 
-    LOG_INFO("Loaded skybox model from file: %s", model_path.c_str());
+    shaderSet->addPushConstantRange("pc", "", VK_SHADER_STAGE_ALL, 0, 128);
+
+    // auto vertex_shader = vsg::ShaderSt
+
+
+
+
+
+
+    // vsg::ref_ptr<vsg::Options> skybox_options = options ? vsg::Options::create(*options) : vsg::Options::create();
+    // skybox_options->sharedObjects = {};
+
+    // // За основу берём встроенные комплекты вершинного и фрагментного шейдера
+    // skybox_options->shaderSets["flat"] = vsg::createFlatShadedShaderSet();
+    // skybox_options->shaderSets["pbr"] = vsg::createPhysicsBasedRenderingShaderSet();
+    // skybox_options->shaderSets["phong"] = vsg::createPhongShaderSet();
+
+    // // Очищаем все встроенные сохранённые варианты настроек
+    // skybox_options->shaderSets["flat"]->variants.clear();
+    // skybox_options->shaderSets["pbr"]->variants.clear();
+    // skybox_options->shaderSets["phong"]->variants.clear();
+
+    // auto vertexInputState = vsg::VertexInputState::create();
+    // auto inputAssemblyState = vsg::InputAssemblyState::create();
+    // auto rasterizationState = vsg::RasterizationState::create();
+    // auto colorBlendState = vsg::ColorBlendState::create();
+    // auto depthStencilState = vsg::DepthStencilState::create();
+    // auto multisampleState = vsg::MultisampleState::create();
+
+    // // Отключаем проверку на глубину сцены
+    // depthStencilState->depthTestEnable = VK_FALSE;
+
+    // vsg::GraphicsPipelineStates defaultGraphicsPipelineStates = {
+    //     vertexInputState,
+    //     inputAssemblyState,
+    //     rasterizationState,
+    //     colorBlendState,
+    //     depthStencilState,
+    //     multisampleState
+    // };
+
+    // skybox_options->shaderSets["flat"]->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+    // skybox_options->shaderSets["pbr"]->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+    // skybox_options->shaderSets["phong"]->defaultGraphicsPipelineStates = defaultGraphicsPipelineStates;
+
+    // FileSystem& fs = FileSystem::getInstance();
+    // const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+
+    // // Загружаем свой вариант вершинного шейдера вместо встроенного
+    // const std::string shader_vert_path = shaders_dir_path + fs.separator() + "skybox_vert.vert";
+    // const vsg::ref_ptr<vsg::ShaderStage> shader_vert_stage =
+    //     vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", shader_vert_path, skybox_options);
+    // if (shader_vert_stage)
+    // {
+    //     LOG_INFO("Loaded vertex shader for skybox: %s", shader_vert_path.c_str());
+    //     skybox_options->shaderSets["flat"]->stages.front() = shader_vert_stage;
+    //     skybox_options->shaderSets["pbr"]->stages.front() = shader_vert_stage;
+    //     skybox_options->shaderSets["phong"]->stages.front() = shader_vert_stage;
+    // }
+    // else
+    // {
+    //     LOG_WARN("Fail to load vertex shader for skybox: %s", shader_vert_path.c_str());
+    //     LOG_INFO("Using default vertex shader");
+    // }
+
+    // // Загружаем свой вариант фрагментного шейдера вместо встроенного
+    // const std::string shader_frag_path = shaders_dir_path + fs.separator() + "skybox_frag.frag";
+    // const vsg::ref_ptr<vsg::ShaderStage> shader_frag_stage =
+    //     vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", shader_frag_path, skybox_options);
+    // if (shader_frag_stage)
+    // {
+    //     LOG_INFO("Loaded fragment shader for skybox: %s", shader_frag_path.c_str());
+    //     skybox_options->shaderSets["flat"]->stages.back() = shader_frag_stage;
+    //     skybox_options->shaderSets["pbr"]->stages.back() = shader_frag_stage;
+    //     skybox_options->shaderSets["phong"]->stages.back() = shader_frag_stage;
+    // }
+    // else
+    // {
+    //     LOG_WARN("Fail to load fragment shader for skybox: %s", shader_frag_path.c_str());
+    //     LOG_INFO("Using default fragment shader");
+    // }
+
+    // // Загружаем модель скайбокса
+    // QString model_filename = "sky.gltf";
+    // cfg.getString("Model", "Filename", model_filename);
+
+    // std::string model_path = fs.getDataDir();
+    // model_path = fs.combinePath(model_path, "models");
+    // model_path = fs.combinePath(model_path, "default-objects");
+    // model_path = fs.combinePath(model_path, model_filename.toStdString());
+
+    // if (!vsg::fileExists(model_path))
+    // {
+    //     LOG_WARN("Fail to find skybox file: %s", model_path.c_str());
+    //     return;
+    // }
+
+    // const vsg::ref_ptr<vsg::Object> loaded = vsg::read(model_path, skybox_options);
+    // node = loaded.cast<vsg::Node>();
+    // if (!node)
+    // {
+    //     LOG_WARN("Fail to load skybox model from file: %s", model_path.c_str());
+
+    //     vsg::ref_ptr<vsg::ReadError> error = loaded.cast<vsg::ReadError>();
+    //     if (error)
+    //     {
+    //         LOG_WARN(error->message.c_str());
+    //     }
+
+    //     return;
+    // }
+
+    // LOG_INFO("Loaded skybox model from file: %s", model_path.c_str());
 }
 
 //------------------------------------------------------------------------------

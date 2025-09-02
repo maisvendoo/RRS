@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
@@ -11,6 +10,7 @@
 #include <string>
 
 class CfgReader;
+
 namespace vsg
 {
     class Options;
