@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void PassCar::preStepCouplings(double t)
+void PassCar::preStepCouplings(const double& t)
 {
     (void) t;
 
@@ -22,7 +22,7 @@ void PassCar::preStepCouplings(double t)
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void PassCar::stepCouplings(double t, double dt)
+void PassCar::stepCouplings(const double& t, const double& dt)
 {
     // Управление передним сцепным устройством
     oper_rod_fwd->setCouplingForce(coupling_fwd->getCurrentForce());

@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void FreightCar::preStepCouplings(double t)
+void FreightCar::preStepCouplings(const double& t)
 {
     (void) t;
 
@@ -22,7 +22,7 @@ void FreightCar::preStepCouplings(double t)
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void FreightCar::stepCouplings(double t, double dt)
+void FreightCar::stepCouplings(const double& t, const double& dt)
 {
     // Управление передним сцепным устройством
     oper_rod_fwd->setCouplingForce(coupling_fwd->getCurrentForce());

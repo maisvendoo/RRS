@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void FreightCar::stepBrakesEquipment(double t, double dt)
+void FreightCar::stepBrakesEquipment(const double& t, const double& dt)
 {
     // Тормозная магистраль
     double BP_flow = 0.0;

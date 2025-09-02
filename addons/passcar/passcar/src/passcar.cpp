@@ -26,74 +26,6 @@ PassCar::~PassCar()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::initialization()
-{
-    FileSystem &fs = FileSystem::getInstance();
-    QString modules_dir(fs.getModulesDir().c_str());
-    QString custom_cfg_dir(fs.getVehiclesDir().c_str());
-    custom_cfg_dir += fs.separator() + config_dir;
-
-    initCouplings(modules_dir, custom_cfg_dir);
-
-    initBrakesEquipment(modules_dir, custom_cfg_dir);
-
-    initEPB(modules_dir, custom_cfg_dir);
-
-    if (is_Registrator_on)
-        initRegistrator(modules_dir, custom_cfg_dir);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PassCar::preStep(double t)
-{
-    preStepCouplings(t);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PassCar::step(double t, double dt)
-{
-    stepCouplings(t, dt);
-
-    stepBrakesEquipment(t, dt);
-
-    stepEPB(t, dt);
-
-    stepSignalsOutput();
-
-    stepSoundsSignals(t, dt);
-
-    //stepDebugMsg(t, dt);
-
-    if (is_Registrator_on)
-        stepRegistrator(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PassCar::keyProcess()
-{
-    if (needDebugMsg)
-        debugPrint();
-
-    // Сцепные устройства
-    oper_rod_fwd->setControl(&pressed_keys);
-    oper_rod_bwd->setControl(&pressed_keys);
-
-    // Концевые краны и рукава тормозной магистрали
-    anglecock_bp_fwd->setControl(&pressed_keys);
-    anglecock_bp_bwd->setControl(&pressed_keys);
-    hose_bp_fwd->setControl(&pressed_keys);
-    hose_bp_bwd->setControl(&pressed_keys);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void PassCar::loadConfig(QString cfg_path)
 {
     CfgReader cfg;
@@ -127,6 +59,72 @@ void PassCar::loadConfig(QString cfg_path)
 
         cfg.getBool(secName, "isRegistratorOn", is_Registrator_on);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PassCar::initialization()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString modules_dir(fs.getModulesDir().c_str());
+    QString custom_cfg_dir(fs.getVehiclesDir().c_str());
+    custom_cfg_dir += fs.separator() + config_dir;
+
+    initCouplings(modules_dir, custom_cfg_dir);
+
+    initBrakesEquipment(modules_dir, custom_cfg_dir);
+
+    initEPB(modules_dir, custom_cfg_dir);
+
+    if (is_Registrator_on)
+        initRegistrator(modules_dir, custom_cfg_dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PassCar::process(const simulator_time_t& t, const double& dt)
+{
+    if (needDebugMsg)
+        debugPrint(t, dt);
+
+    signalsOutput(t, dt);
+
+    soundsOutput(t, dt);
+
+    // Сцепные устройства
+    oper_rod_fwd->setControl(&pressed_keys);
+    oper_rod_bwd->setControl(&pressed_keys);
+
+    // Концевые краны и рукава тормозной магистрали
+    anglecock_bp_fwd->setControl(&pressed_keys);
+    anglecock_bp_bwd->setControl(&pressed_keys);
+    hose_bp_fwd->setControl(&pressed_keys);
+    hose_bp_bwd->setControl(&pressed_keys);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PassCar::preStep(const double& t)
+{
+    preStepCouplings(t);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PassCar::step(const double &t, const double &dt)
+{
+    stepCouplings(t, dt);
+
+    stepBrakesEquipment(t, dt);
+
+    stepEPB(t, dt);
+
+    if (is_Registrator_on)
+        stepRegistrator(t, dt);
 }
 
 GET_VEHICLE(PassCar)

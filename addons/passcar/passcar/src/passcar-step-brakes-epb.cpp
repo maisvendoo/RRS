@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void PassCar::stepEPB(double t, double dt)
+void PassCar::stepEPB(const double& t, const double& dt)
 {
     (void) t;
     (void) dt;

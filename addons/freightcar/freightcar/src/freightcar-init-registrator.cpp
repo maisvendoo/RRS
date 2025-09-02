@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreightCar::initRegistrator(const QString &modules_dir, const QString &custom_cfg_dir)
+void FreightCar::initRegistrator(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
 

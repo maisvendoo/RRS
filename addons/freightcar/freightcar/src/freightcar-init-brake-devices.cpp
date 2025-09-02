@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------
 void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
 {
-    Q_UNUSED(p0)
+    (void) p0;
 
     // Инициализация давления в тормозной магистрали
     brakepipe->setY(0, pBP);
