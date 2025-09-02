@@ -909,7 +909,7 @@ void Model::process()
 
     controlStep();
 
-    emit step(sim_time.simulation_seconds, integration_time);
+    emit step(sim_time, integration_time);
 
     // Update server feedback
     tcpFeedBack();

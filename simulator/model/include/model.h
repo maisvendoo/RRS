@@ -88,7 +88,7 @@ signals:
 
     void sendDataToServer(QByteArray data);
 
-    void step(double t, double dt);
+    void step(const simulator_time_t& current_time, const double& integration_time);
 
 private:
 

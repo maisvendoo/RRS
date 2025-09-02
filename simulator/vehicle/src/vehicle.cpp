@@ -468,7 +468,7 @@ device_coord_list_t* Vehicle::getRailwayConnectors()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-state_vector_t Vehicle::getAcceleration(state_vector_t& Y, double t, double dt)
+state_vector_t Vehicle::getAcceleration(state_vector_t& Y, const double& t, const double& dt)
 {
     (void) t;
 
@@ -623,7 +623,24 @@ state_vector_t Vehicle::getAcceleration(state_vector_t& Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPreStep(state_vector_t& Y, double t)
+void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
+{
+    {
+        std::lock_guard lock(keyboard_mutex);
+        pressed_keys.clear();
+        for (const auto& pressed_keys_at_cab : pressed_keys_by_cabine)
+        {
+            pressed_keys.insert(pressed_keys_at_cab.begin(), pressed_keys_at_cab.end());
+        }
+    }
+
+    process(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::integrationPreStep(state_vector_t& Y, const double& t)
 {
     train_coord = Y[state_idx];
     velocity = dir * orient * Y[state_idx + s];
@@ -650,15 +667,6 @@ void Vehicle::integrationPreStep(state_vector_t& Y, double t)
         }
     }
 
-    {
-        std::lock_guard lock(keyboard_mutex);
-        pressed_keys.clear();
-        for (const auto& pressed_keys_at_cab : pressed_keys_by_cabine)
-        {
-            pressed_keys.insert(pressed_keys_at_cab.begin(), pressed_keys_at_cab.end());
-        }
-    }
-
     preStep(t);
 }
 
@@ -681,7 +689,7 @@ void Vehicle::hardwareProcess()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationStep(state_vector_t& Y, double t, double dt)
+void Vehicle::integrationStep(state_vector_t& Y, const double& t, const double& dt)
 {
     (void) Y;
     step(t, dt);
@@ -690,7 +698,7 @@ void Vehicle::integrationStep(state_vector_t& Y, double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::integrationPostStep(state_vector_t& Y, double t)
+void Vehicle::integrationPostStep(state_vector_t& Y, const double& t)
 {
     (void) Y;
     postStep(t);
@@ -980,15 +988,7 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::preStep(double t)
-{
-    (void) t;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::step(double t, double dt)
+void Vehicle::process(const simulator_time_t &t, const double &dt)
 {
     (void) t;
     (void) dt;
@@ -999,9 +999,32 @@ void Vehicle::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::postStep(double t)
+void Vehicle::preStep(const double& t)
 {
     (void) t;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::step(const double& t, const double& dt)
+{
+    (void) t;
+    (void) dt;
+
+    // This code may be overrided in child class
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::postStep(const double& t)
+{
+    (void) t;
+
+    // This code may be overrided in child class
 }
 
 //------------------------------------------------------------------------------

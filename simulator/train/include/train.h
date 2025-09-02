@@ -17,6 +17,7 @@
 #define     TRAIN_H
 
 #include    "global-const.h"
+#include    "datetime.h"
 #include    "init_data.h"
 #include    "ode-system.h"
 #include    "vehicle.h"
@@ -109,7 +110,7 @@ public:
 public slots:
 
     /// Integration step
-    void slotStep(double current_time, double integration_time);
+    void slotStep(const simulator_time_t& current_time, const double& integration_time);
 
 signals:
 

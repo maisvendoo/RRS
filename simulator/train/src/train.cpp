@@ -862,14 +862,14 @@ void Train::setTopology(Topology* topology)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::slotStep(double current_time, double integration_time)
+void Train::slotStep(const simulator_time_t& current_time, const double& integration_time)
 {
     auto begin = vehicles.begin();
     auto end = vehicles.end();
     Vehicle* first = *begin;
     Vehicle* last = *(end - 1);
 
-    double t = current_time;
+    double t = current_time.simulation_seconds;
     double num_sub_step = ceil(integration_time / solver_config.step);
     double dt = integration_time / num_sub_step;
     size_t num_step = static_cast<size_t>(num_sub_step);
@@ -894,11 +894,9 @@ void Train::slotStep(double current_time, double integration_time)
         {
             Vehicle* vehicle = *it;
 
-            // input
             if (i == 0)
             {
-                vehicle->keyProcess();
-                vehicle->hardwareProcess();
+                vehicle->integrationProcess(current_time, integration_time);
             }
 
             vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);

@@ -20,6 +20,7 @@
 #include    <QtGlobal>
 #include    <mutex>
 
+#include    "datetime.h"
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
@@ -163,20 +164,19 @@ public:
     device_coord_list_t* getRailwayConnectors();
 
     /// Common acceleration calculation
-    virtual state_vector_t getAcceleration(state_vector_t& Y, double t, double dt);
+    virtual state_vector_t getAcceleration(state_vector_t& Y, const double& t, const double& dt);
 
-    ///
-    void integrationPreStep(state_vector_t& Y, double t);
+    void integrationProcess(const simulator_time_t& t, const double& dt);
+
+    void integrationPreStep(state_vector_t& Y, const double& t);
 
     virtual void keyProcess();
 
     virtual void hardwareProcess();
 
-    ///
-    void integrationStep(state_vector_t& Y, double t, double dt);
+    void integrationStep(state_vector_t& Y, const double& t, const double& dt);
 
-    ///
-    void integrationPostStep(state_vector_t& Y, double t);
+    void integrationPostStep(state_vector_t& Y, const double& t);
 
     QString getDebugMsg() const;
 
@@ -336,14 +336,17 @@ protected:
     /// Add device to railway connectors
     void addRailwayConnector(Device* device, double distance_from_center = 0.0);
 
-    /// User defined step prepare
-    virtual void preStep(double t);
+    /// User defined simulation process
+    virtual void process(const simulator_time_t& t, const double& dt);
 
-    /// Internal ODE integration step
-    virtual void step(double t, double dt);
+    /// User defined step prepare
+    virtual void preStep(const double& t);
+
+    /// User defined ODE integration step
+    virtual void step(const double& t, const double& dt);
 
     /// User define step result processing
-    virtual void postStep(double t);
+    virtual void postStep(const double& t);
 
     virtual void hardwareOutput();
 
