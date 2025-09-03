@@ -172,6 +172,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ui->dteStartDate->setTimeZone(local_zone);
     ui->dteStartTime->setDateTime(current);
     ui->dteStartTime->setTimeZone(local_zone);
+    connect(&update_datetime_timer, &QTimer::timeout, this, &MainWindow::slotUpdateDateTime);
+    update_datetime_timer.start(300);
 
     ui->dteStartDate->setEnabled(false);
     ui->dteStartTime->setEnabled(false);
@@ -1137,6 +1139,20 @@ void MainWindow::slotStartDateManuallyChanged()
 void MainWindow::slotStartTimeManuallyChanged()
 {
     ui->dteStartTime->setEnabled(ui->cbStartTimeManually->isChecked());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotUpdateDateTime()
+{
+    QDateTime current = QDateTime::currentDateTime(QTimeZone::systemTimeZone());
+
+    if (!ui->cbStartDateManually->isChecked())
+        ui->dteStartDate->setDateTime(current);
+
+    if (!ui->cbStartTimeManually->isChecked())
+        ui->dteStartTime->setDateTime(current);
 }
 
 //------------------------------------------------------------------------------
