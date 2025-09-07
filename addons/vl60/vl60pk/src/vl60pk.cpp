@@ -40,7 +40,7 @@ VL60pk::~VL60pk()
 //------------------------------------------------------------------------------
 void VL60pk::initialization()
 {
-    FileSystem &fs = FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
     QString modules_dir = QString(fs.getModulesDir().c_str());
     QString custom_cfg_dir(fs.getVehiclesDir().c_str());
     custom_cfg_dir += fs.separator() + config_dir;

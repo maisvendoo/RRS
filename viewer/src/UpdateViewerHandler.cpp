@@ -579,11 +579,19 @@ void UpdateViewerHandler::changeCurrentVehicle()
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::changeCurrentCabine()
 {
-    auto vehicle = _vehicles_handler->getCurrentVehicle();
+    VehicleExterior* vehicle = _vehicles_handler->getCurrentVehicle();
+
+    size_t cabs_num = vehicle->driver_pos.size();
+
+    if (cabs_num < 2)
+    {
+        vehicle->current_cabine_idx = 0;
+        return;
+    }
 
     vehicle->current_cabine_idx++;
 
-    if (vehicle->current_cabine_idx == vehicle->driver_pos.size())
+    if (vehicle->current_cabine_idx == cabs_num)
     {
         vehicle->current_cabine_idx = 0;
     }
