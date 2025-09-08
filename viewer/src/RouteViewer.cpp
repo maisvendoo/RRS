@@ -2,6 +2,7 @@
 
 #include "AnimatedDatabasePager.h"
 #include "CfgReader.h"
+#include "NewSkybox.h"
 #include "filesystem.h"
 #include "Logger.h"
 #include "MyGui.h"
@@ -373,6 +374,9 @@ void RouteViewer::initScenegraph()
     GUIparams->skybox = skybox;
     GUIparams->skybox_texture_data = skybox->getDefaultTexture();
     GUIparams->skybox_textures = skybox->getTextures();
+
+    NewSkybox* nsb = new NewSkybox(cfg_path, options);
+    delete nsb;
 
     if (skybox->getNode())
     {

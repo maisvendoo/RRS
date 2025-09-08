@@ -1,51 +1,41 @@
-#ifndef SKYBOX_H
-#define SKYBOX_H
+#ifndef NEW_SKYBOX_H
+#define NEW_SKYBOX_H
 
 #include "datetime.h"
 
+#include <vsg/core/Array2D.h>
+#include <vsg/core/Value.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Node.h>
 
 #include <cstdint>
 #include <string>
-#include <vsg/nodes/StateGroup.h>
+#include <vector>
 
 class CfgReader;
 
 namespace vsg
 {
-    class Options;
+
+class Data;
+class Options;
+class StateGroup;
+
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-class Skybox final
+class NewSkybox
 {
 public:
-    Skybox(const std::string& skybox_config_filepath,
-           vsg::ref_ptr<vsg::Options> options = {});
+    NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg::Options> options = {});
 
-    /// Get scene node
-    vsg::ref_ptr<vsg::Node> getNode() const noexcept;
+    vsg::ref_ptr<vsg::StateGroup> get_state_group() const;
 
-    /// Get default texture
-    vsg::ref_ptr<vsg::ubvec4Array2D> getDefaultTexture() const noexcept;
-
-    /// Get textures array
-    std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> getTextures() const noexcept;
-
-    /// Set date and time
-    void setDateTime(simulator_time_t sim_time);
-
-    /// Set active textures and their weights
-    void setActiveTextures(std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> textures_and_weights);
+    void set_date_time(const simulator_time_t& sim_time);
 
 private:
-    vsg::ref_ptr<vsg::Node> node;
-    vsg::ref_ptr<vsg::ubvec4Array2D> texture;
-    std::map<vsg::ref_ptr<vsg::ubvec4Array2D>, float> active_textures_and_weights;
+    void init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
+    void init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
 
+private:
     struct season_time_texture_t
     {
         struct season_date_t {std::uint8_t month; std::uint8_t day;};
@@ -58,14 +48,14 @@ private:
         server_time_t time_disappear_end = {0, 0, 0};   ///< Время окончания плавного исчезновения данной текстуры
 
         vsg::ref_ptr<vsg::ubvec4Array2D> texture;       ///< Указатель на загруженную текстуру
-        std::string filename;   ///< Имя файла текстуры
+        std::string filename;                           ///< Имя файла текстуры
     };
 
     std::vector<season_time_texture_t> textures;
-
-    void update_skybox();
-    void init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
-    void init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
+    vsg::ref_ptr<vsg::StateGroup> state_group;
+    vsg::ref_ptr<vsg::Data> texture1_data;
+    vsg::ref_ptr<vsg::Data> texture2_data;
+    vsg::ref_ptr<vsg::floatValue> mix_value;
 };
 
-#endif // SKYBOX_H
+#endif // NEW_SKYBOX_H
