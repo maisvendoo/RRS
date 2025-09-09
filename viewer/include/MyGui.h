@@ -1,4 +1,3 @@
-#pragma once
 #ifndef MY_GUI_H
 #define MY_GUI_H
 
@@ -10,6 +9,7 @@
 #include <QString>
 
 struct simulator_time_t;
+class NewSkybox;
 class Skybox;
 class Sun;
 class VehiclesHandler;
@@ -26,7 +26,8 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     // TODO: Нигде не используется
     simulator_time_t* local_time = nullptr;
 
-    Skybox *skybox = nullptr;
+    // Skybox *skybox = nullptr;
+    NewSkybox* new_skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;

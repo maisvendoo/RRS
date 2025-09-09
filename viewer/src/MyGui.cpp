@@ -3,7 +3,8 @@
 #include "filesystem.h"
 #include "datetime.h"
 
-#include "Skybox.h"
+#include "NewSkybox.h"
+// #include "Skybox.h"
 #include "Sun.h"
 #include "UpdateStatisticsHandler.h"
 #include "UpdateControlToServerHandler.h"
@@ -146,7 +147,8 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 
     simulator_time_t datetime({static_cast<int16_t>(params->year), static_cast<uint8_t>(params->month), static_cast<uint8_t>(params->day)},
                               {static_cast<uint8_t>(params->hour), static_cast<uint8_t>(params->minute), static_cast<uint8_t>(params->sec)});
-    params->skybox->setDateTime(datetime);
+    // params->skybox->setDateTime(datetime);
+    params->new_skybox->set_date_time(datetime);
     params->year = datetime.date.year();
     params->month = datetime.date.month();
     params->day = datetime.date.day();

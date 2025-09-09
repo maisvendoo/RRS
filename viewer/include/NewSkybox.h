@@ -38,6 +38,14 @@ private:
 private:
     struct season_time_texture_t
     {
+        enum class State
+        {
+            ACTIVE,
+            INACTIVE,
+            APPEARING,
+            DISAPPEARING
+        } state;
+
         struct season_date_t {std::uint8_t month; std::uint8_t day;};
         season_date_t date_season_begin = {1, 1};       ///< День начала сезона применения данной текстуры (включительно)
         season_date_t date_season_end = {12, 31};       ///< День окончания сезона применения данной текстуры (включительно)

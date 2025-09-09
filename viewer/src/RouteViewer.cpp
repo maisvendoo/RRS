@@ -370,21 +370,22 @@ void RouteViewer::initScenegraph()
     FileSystem& fs = FileSystem::getInstance();
     const std::string cfg_path = fs.getConfigDir() + fs.separator() + "skybox.xml";
 
-    Skybox* skybox = new Skybox(cfg_path, options);
-    GUIparams->skybox = skybox;
-    GUIparams->skybox_texture_data = skybox->getDefaultTexture();
-    GUIparams->skybox_textures = skybox->getTextures();
+    // Skybox* skybox = new Skybox(cfg_path, options);
+    // GUIparams->skybox = skybox;
+    // GUIparams->skybox_texture_data = skybox->getDefaultTexture();
+    // GUIparams->skybox_textures = skybox->getTextures();
+
+    // if (skybox->getNode())
+    // {
+    //     // root->addChild(skybox->getNode());
+    // }
 
     NewSkybox* nsb = new NewSkybox(cfg_path, options);
+    GUIparams->new_skybox = nsb;
+
     if (nsb->get_state_group())
     {
         root->addChild(nsb->get_state_group());
-    }
-    // delete nsb;
-
-    if (skybox->getNode())
-    {
-        // root->addChild(skybox->getNode());
     }
 }
 
