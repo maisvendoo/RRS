@@ -5,16 +5,28 @@
 #include "datetime.h"
 #include "filesystem.h"
 
+#include <vsg/app/RecordTraversal.h>
+#include <vsg/commands/BindIndexBuffer.h>
+#include <vsg/commands/BindVertexBuffers.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/commands/DrawIndexed.h>
+#include <vsg/core/Array.h>
 #include <vsg/core/Array2D.h>
+#include <vsg/core/ConstVisitor.h>
 #include <vsg/core/Data.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/Value.h>
+#include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/ReaderWriter.h>
 #include <vsg/io/read.h>
+#include <vsg/maths/common.h>
+#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
@@ -36,7 +48,6 @@
 #include <QString>
 #include <QStringList>
 
-#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -87,6 +98,38 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
     // uniform_value->dirty();
 }
 
+class FindArraysVisitor : public vsg::Visitor
+{
+public:
+    void apply(vsg::Object& object) override
+    {
+        object.traverse(*this);
+    }
+
+    void apply(vsg::VertexIndexDraw& vid) override
+    {
+        for (auto buffer_info : vid.arrays)
+        {
+            auto data = buffer_info->data;
+            if (auto array = data.cast<vsg::vec3Array>())
+            {
+                positions = array;
+            }
+            else if (auto array = data.cast<vsg::vec2Array>())
+            {
+                tex_coords = array;
+            }
+        }
+
+        indices = vid.indices->data->cast<vsg::uintArray>();
+    }
+
+public:
+    vsg::ref_ptr<vsg::vec3Array> positions;
+    vsg::ref_ptr<vsg::vec2Array> tex_coords;
+    vsg::ref_ptr<vsg::uintArray> indices;
+};
+
 void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
 {
     // Получаем пути к шейдерам скайбокса
@@ -130,9 +173,6 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
         VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}
     };
 
-    auto raster_state = vsg::RasterizationState::create();
-    raster_state->cullMode = VK_CULL_MODE_FRONT_BIT;
-
     auto depth_state = vsg::DepthStencilState::create();
     depth_state->depthTestEnable = VK_TRUE;
     depth_state->depthWriteEnable = VK_FALSE;
@@ -141,7 +181,7 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     vsg::GraphicsPipelineStates pipeline_states = {
         vsg::VertexInputState::create(vertex_bindings_descriptions, vertex_attribute_descriptions),
         vsg::InputAssemblyState::create(),
-        raster_state,
+        vsg::RasterizationState::create(),
         vsg::MultisampleState::create(),
         vsg::ColorBlendState::create(),
         depth_state
@@ -175,86 +215,49 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     state_group->add(bind_graphics_pipeline);
     state_group->add(bind_descriptor_set);
 
+    // Загружаем модель скайбокса
+    QString model_filename = "sky.gltf";
+    cfg.getString("Model", "Filename", model_filename);
 
+    std::string model_path = fs.getDataDir();
+    model_path = fs.combinePath(model_path, "models");
+    model_path = fs.combinePath(model_path, "default-objects");
+    model_path = fs.combinePath(model_path, model_filename.toStdString());
 
-    // node2 = vsg::StateGroup::create();
-    // node2->add(bind_graphics_pipeline);
-    // node2->add(bind_descriptor_set);
+    if (!vsg::fileExists(model_path))
+    {
+        LOG_WARN("Failed to find skybox file: %s", model_path.c_str());
+        return;
+    }
 
-    // auto transform = vsg::MatrixTransform::create();
-    // node2->addChild(transform);
+    auto loaded = vsg::read(model_path, options);
+    auto node = loaded.cast<vsg::Node>();
+    if (!node)
+    {
+        LOG_WARN("Failed to load skybox model from file: %s", model_path.c_str());
 
-    // // Загружаем модель скайбокса
-    // QString model_filename = "sky.gltf";
-    // cfg.getString("Model", "Filename", model_filename);
+        auto error = loaded.cast<vsg::ReadError>();
+        if (error)
+        {
+            LOG_WARN(error->message.c_str());
+        }
 
-    // std::string model_path = fs.getDataDir();
-    // model_path = fs.combinePath(model_path, "models");
-    // model_path = fs.combinePath(model_path, "default-objects");
-    // model_path = fs.combinePath(model_path, model_filename.toStdString());
+        return;
+    }
 
-    // if (!vsg::fileExists(model_path))
-    // {
-    //     LOG_WARN("Fail to find skybox file: %s", model_path.c_str());
-    //     return;
-    // }
+    FindArraysVisitor fav;
+    node->accept(fav);
 
-    // tinygltf::Model model;
-    // tinygltf::TinyGLTF loader;
-    // std::string err;
-    // std::string warn;
-    // bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, model_path);
+    auto draw_commands = vsg::Commands::create();
+    draw_commands->addChild(vsg::BindVertexBuffers::create(0, vsg::DataList{fav.positions, fav.tex_coords}));
+    draw_commands->addChild(vsg::BindIndexBuffer::create(fav.indices));
+    draw_commands->addChild(vsg::DrawIndexed::create(fav.indices->size(), 1, 0, 0, 0));
 
-    // if (!ret)
-    // {
-    //     LOG_ERROR("Fail");
-    // }
+    auto transform = vsg::MatrixTransform::create();
+    transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0});
 
-    // int vertex_count = model.accessors[0].count;
-
-    // auto positions = vsg::vec3Array::create(vertex_count);
-    // auto tex_coords = vsg::vec2Array::create(vertex_count);
-
-    // int positions_buffer_view = model.accessors[0].bufferView;
-    // int tex_coords_buffer_view = model.accessors[1].bufferView;
-
-    // std::size_t positions_byte_offset = model.bufferViews[positions_buffer_view].byteOffset;
-    // std::size_t tex_coords_byte_offset = model.bufferViews[tex_coords_buffer_view].byteOffset;
-
-    // for (int i = 0; i < vertex_count; ++i)
-    // {
-    //     float x, y, z;
-    //     float u, v;
-
-    //     std::memcpy(&x, model.buffers[0].data.data() + positions_byte_offset + i * 3 * sizeof(float) + 0 * sizeof(float), sizeof(float));
-    //     std::memcpy(&y, model.buffers[0].data.data() + positions_byte_offset + i * 3 * sizeof(float) + 1 * sizeof(float), sizeof(float));
-    //     std::memcpy(&z, model.buffers[0].data.data() + positions_byte_offset + i * 3 * sizeof(float) + 2 * sizeof(float), sizeof(float));
-
-    //     std::memcpy(&u, model.buffers[0].data.data() + tex_coords_byte_offset + i * 2 * sizeof(float) + 0 * sizeof(float), sizeof(float));
-    //     std::memcpy(&v, model.buffers[0].data.data() + tex_coords_byte_offset + i * 2 * sizeof(float) + 1 * sizeof(float), sizeof(float));
-
-    //     positions->at(i).set(x, y, z);
-    //     tex_coords->at(i).set(u, v);
-    // }
-
-    // int index_count = model.accessors[2].count;
-    // int indices_buffer_view = model.accessors[2].bufferView;
-    // std::size_t indices_byte_offset = model.bufferViews[indices_buffer_view].byteOffset;
-
-    // auto indices = vsg::ushortArray::create(index_count);
-    // for (int i = 0; i < index_count; ++i)
-    // {
-    //     std::memcpy(&indices->at(i), model.buffers[0].data.data() + indices_byte_offset + i * sizeof(unsigned short), sizeof(unsigned short));
-    // }
-
-    // // setup geometry
-    // auto drawCommands = vsg::Commands::create();
-
-    // drawCommands->addChild(vsg::BindVertexBuffers::create(0, vsg::DataList{positions, tex_coords}));
-    // drawCommands->addChild(vsg::BindIndexBuffer::create(indices));
-    // drawCommands->addChild(vsg::DrawIndexed::create(index_count, 1, 0, 0, 0));
-
-    // transform->addChild(drawCommands);
+    transform->addChild(draw_commands);
+    state_group->addChild(transform);
 }
 
 void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)

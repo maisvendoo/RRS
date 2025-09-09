@@ -376,11 +376,15 @@ void RouteViewer::initScenegraph()
     GUIparams->skybox_textures = skybox->getTextures();
 
     NewSkybox* nsb = new NewSkybox(cfg_path, options);
-    delete nsb;
+    if (nsb->get_state_group())
+    {
+        root->addChild(nsb->get_state_group());
+    }
+    // delete nsb;
 
     if (skybox->getNode())
     {
-        root->addChild(skybox->getNode());
+        // root->addChild(skybox->getNode());
     }
 }
 

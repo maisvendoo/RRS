@@ -17,9 +17,11 @@ out gl_PerVertex {
 
 void main() {
     // Remove translation
-    mat4 modeView = pc.modelView;
+    mat4 modelView = pc.modelView;
     modelView[3] = vec4(0.0, 0.0, 0.0, 1.0);
 
     vec4 pos = pc.projection * modelView * vec4(inPosition, 1.0);
     gl_Position = vec4(pos.xy, 0.0, pos.w);
+
+    fragTexCoord = inTexCoord;
 }
