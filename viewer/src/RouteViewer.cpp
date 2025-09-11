@@ -2,24 +2,24 @@
 
 #include "AnimatedDatabasePager.h"
 #include "CfgReader.h"
-#include "NewSkybox.h"
-#include "filesystem.h"
 #include "Logger.h"
 #include "MyGui.h"
+#include "NewSkybox.h"
 #include "Route.h"
 #include "RouteLoader.h"
 #include "ScreenshotWriter.h"
-#include "Skybox.h"
-#include "sound-manager.h"
+// #include "Skybox.h"
 #include "Sun.h"
-#include "tcp-client.h"
 #include "TrafficLightsHandler.h"
 #include "UpdateLightingHandler.h"
+#include "UpdateControlToServerHandler.h"
 #include "UpdateSoundManagerHandler.h"
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
-#include "UpdateControlToServerHandler.h"
+#include "filesystem.h"
+#include "sound-manager.h"
+#include "tcp-client.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
@@ -52,8 +52,6 @@
 #include <vsgXchange/all.h>
 
 #include <QApplication>
-
-#include <vulkan/vulkan_core.h>
 
 #include <cstdlib>
 #include <string>
@@ -269,13 +267,21 @@ void RouteViewer::initWindowTraits()
     auto samples_bit_flag = [](int s) -> VkSampleCountFlags
     {
         if (s > 7)
+        {
             return VK_SAMPLE_COUNT_8_BIT;
-        if (s > 3)
+        }
+        else if (s > 3)
+        {
             return VK_SAMPLE_COUNT_4_BIT;
-        if (s > 1)
+        }
+        else if (s > 1)
+        {
             return VK_SAMPLE_COUNT_2_BIT;
-
-        return VK_SAMPLE_COUNT_1_BIT;
+        }
+        else
+        {
+            return VK_SAMPLE_COUNT_1_BIT;
+        }
     };
 
     // std::uint32_t vulkan_version;
@@ -286,7 +292,7 @@ void RouteViewer::initWindowTraits()
     windowTraits->y = settings.y;
     windowTraits->width = settings.width;
     windowTraits->height = settings.height;
-    // windowTraits->vulkanVersion = vulkan_version; // vsg и так берет самую новую версию
+    // windowTraits->vulkanVersion = vulkan_version; // VSG и так берет самую новую версию
     // windowTraits->swapchainPreferences.imageCount = 3;
     windowTraits->screenNum = settings.screen_number;
     windowTraits->fullscreen = settings.fullscreen;
@@ -300,9 +306,10 @@ void RouteViewer::initWindowTraits()
     windowTraits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_FIFO_KHR
                                                                     : VK_PRESENT_MODE_IMMEDIATE_KHR;
 
-    // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // vsg и так создает deviceFeatures по умолчанию
-    // deviceFeatures->get().samplerAnisotropy = VK_TRUE; // и выставляет это свойство в true
-    const vsg::ref_ptr<vsg::DeviceFeatures> deviceFeatures = windowTraits->deviceFeatures;
+    // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // VSG и так создает deviceFeatures по умолчанию
+    // deviceFeatures->get().samplerAnisotropy = VK_TRUE;                                  // и выставляет samplerAnisotropy в true
+
+    auto deviceFeatures = windowTraits->deviceFeatures;
     deviceFeatures->get().depthClamp = VK_TRUE;
 }
 

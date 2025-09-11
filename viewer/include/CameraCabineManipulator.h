@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CAMERA_CABINE_MANIPULATOR_H
 #define CAMERA_CABINE_MANIPULATOR_H
 

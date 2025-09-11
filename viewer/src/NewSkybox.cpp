@@ -141,7 +141,7 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
             }
 
             mix_value->set(1.0f - static_cast<float>(stt.time_disappear_end.data() - sim_time.time.data())
-                                                     / static_cast<float>(stt.time_disappear_end.data() - stt.time_disappear_begin.data()));
+                                  / static_cast<float>(stt.time_disappear_end.data() - stt.time_disappear_begin.data()));
             mix_value->dirty();
         }
         else

@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CAMERA_FREE_MANIPULATOR_H
 #define CAMERA_FREE_MANIPULATOR_H
 
