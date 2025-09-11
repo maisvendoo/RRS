@@ -15,26 +15,22 @@
 #ifndef ASOUNDLOG_H
 #define ASOUNDLOG_H
 
-#include    <fstream>
-#include    <QObject>
+#include <QObject>
+
+#include <fstream>
 
 class LogFileHandler : public QObject
 {
 public:
+    LogFileHandler(const std::string& dir, const std::string& file);
 
-    /// Constructor
-    LogFileHandler(const std::string &dir, const std::string &file);
-
-    /// Destructor
     virtual ~LogFileHandler();
 
 public slots:
-
     /// Log message handler
-    virtual void notify(const std::string msg);
+    virtual void notify(const std::string& msg);
 
 protected:
-
     /// Log output stream
     std::ofstream log_;
 };

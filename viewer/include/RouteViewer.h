@@ -1,4 +1,3 @@
-#pragma once
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 

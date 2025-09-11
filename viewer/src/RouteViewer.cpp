@@ -34,6 +34,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/RegionOfInterest.h>
+#include <vsg/nodes/StateGroup.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/GraphicsPipeline.h>

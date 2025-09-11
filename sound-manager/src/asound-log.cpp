@@ -18,11 +18,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LogFileHandler::LogFileHandler(const std::string &dir, const std::string &file)
+LogFileHandler::LogFileHandler(const std::string& dir, const std::string& file)
 {
-    std::string backup_prefix = "~previous-";
-    std::string log_file = dir + file;
-    std::string log_backup = dir + backup_prefix + file;
+    const char* const backup_prefix = "~previous-";
+    const std::string log_file = dir + file;
+    const std::string log_backup = dir + backup_prefix + file;
 
     std::remove(log_backup.c_str());
     std::rename(log_file.c_str(), log_backup.c_str());
@@ -41,7 +41,7 @@ LogFileHandler::~LogFileHandler()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LogFileHandler::notify(const std::string msg)
+void LogFileHandler::notify(const std::string& msg)
 {
     log_ << msg << std::endl;
 }

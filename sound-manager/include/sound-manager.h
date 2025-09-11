@@ -1,14 +1,15 @@
-#ifndef		SOUND_MANAGER_H
-#define		SOUND_MANAGER_H
+#ifndef SOUND_MANAGER_H
+#define SOUND_MANAGER_H
 
-#include    "sound-export.h"
+#include "asound-log.h"
+#include "sound-config.h"
+#include "sound-export.h"
+#include "sound-signal.h"
 
-#include    <QObject>
-#include    <vector>
+#include <QObject>
 
-#include    "sound-signal.h"
-#include    "sound-config.h"
-#include    "asound-log.h"
+#include <cstddef>
+#include <vector>
 
 //------------------------------------------------------------------------------
 //
@@ -18,33 +19,30 @@ class SOUND_MANAGER_EXPORT SoundManager : public QObject
     Q_OBJECT
 
 public:
-
-    SoundManager(QObject *parent = nullptr);
-
+    SoundManager(QObject* parent = nullptr);
     ~SoundManager();
 
     /// Загрузка звуков для единицы подвижного состава.
     /// Возвращает список порядковых номеров загруженных звуков
-    std::vector<size_t> loadVehicleSounds(const QString &sounddir);
+    std::vector<std::size_t> loadVehicleSounds(const QString& sound_dir);
 
     /// Номер управляющего сигнала от единицы подвижного состава для звука #idx
-    size_t getSignalID(size_t idx);
+    std::size_t getSignalID(std::size_t idx);
 
     /// Локальные координаты звука #idx относительно единицы подвижного состава
-    float getLocalPositionX(size_t idx);
-    float getLocalPositionY(size_t idx);
-    float getLocalPositionZ(size_t idx);
+    float getLocalPositionX(std::size_t idx);
+    float getLocalPositionY(std::size_t idx);
+    float getLocalPositionZ(std::size_t idx);
 
     /// Лог-файл
-    LogFileHandler *log_;
+    LogFileHandler* log_ = nullptr;
 
 private:
-
     /// Аудиоустройство
-    ALCdevice* device_;
+    ALCdevice* device_ = nullptr;
 
     /// Контекст OpenAL
-    ALCcontext* context_;
+    ALCcontext* context_ = nullptr;
 
     /// Массив звуков OpenAL и их параметров
     std::vector<sound_config_t> sounds;

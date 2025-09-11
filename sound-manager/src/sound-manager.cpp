@@ -1,12 +1,14 @@
-#include    <sstream>
-#include	"sound-manager.h"
-#include    "CfgReader.h"
-#include    "filesystem.h"
+#include "CfgReader.h"
+#include "filesystem.h"
+#include "sound-manager.h"
+
+#include <algorithm>
+#include <sstream>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-SoundManager::SoundManager(QObject *parent) : QObject(parent)
+SoundManager::SoundManager(QObject* parent) : QObject(parent)
 {
     init();
 }
@@ -44,23 +46,28 @@ void SoundManager::init()
         cfg.getDouble(secName, "Volume", tmp_volume);
         cfg.getInt(secName, "MaxSources", tmp_max_sources);
     }
-    ALfloat volume = static_cast<ALfloat>( std::max( 0.0, std::min(1.0, tmp_volume) ) );
-    ALCint max_sources = static_cast<ALCint>( std::max( 1, std::min(1000000, tmp_max_sources) ) );
+
+    ALfloat volume = std::clamp(tmp_volume, 0.0, 1.0);
+    ALCint max_sources = std::clamp(tmp_max_sources, 1, 1000000);
 
     // Открываем устройство
     device_ = alcOpenDevice(nullptr);
+
     // Создаём контекст, задаём максимальное количество источников звука
     ALCint context_atrribute_list[2] = {ALC_MONO_SOURCES, max_sources};
     context_ = alcCreateContext(device_, context_atrribute_list);
+
     // Устанавливаем текущий контекст
     alcMakeContextCurrent(context_);
 
     // Устанавливаем положение слушателя в начале координат
     ALfloat pos[3] = {0.0f, 0.0f, 0.0f};
     alListenerfv(AL_POSITION, pos);
+
     // Устанавливаем нулевой вектор скорости слушателя
     ALfloat vel[3] = {0.0f, 0.0f, 0.0f};
     alListenerfv(AL_VELOCITY, vel);
+
     // Устанавливаем направление слушателя вперёд по Oy, вверх по Oz
     ALfloat ori[6] = {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     alListenerfv(AL_ORIENTATION, ori);
@@ -79,8 +86,7 @@ void SoundManager::init()
 std::vector<size_t> SoundManager::loadVehicleSounds(const QString &sounddir)
 {
     FileSystem &fs = FileSystem::getInstance();
-    std::string dirPath = fs.getSoundsDir() + fs.separator()
-                            + sounddir.toStdString();
+    std::string dirPath = fs.getSoundsDir() + fs.separator() + sounddir.toStdString();
     std::string cfgPath = dirPath + fs.separator() + "sounds.xml";
 
     log_->notify("Sound Manager: Start loading sounds from " + dirPath + " directory");
@@ -139,10 +145,10 @@ std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const 
 
             cfg.getString(secNode, "Filename", sound_config.filename);
 
-            sound_config.sound = new ASound(QString(dir_path.c_str()) +
-                                                    QDir::separator() +
-                                                    sound_config.filename
-                                            , log_);
+            sound_config.sound = new ASound(
+                QString(dir_path.c_str()) + QDir::separator() + sound_config.filename,
+                log_
+            );
 
             QString tmp_error = sound_config.sound->getLastError();
             if (tmp_error.isEmpty())
@@ -152,7 +158,9 @@ std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const 
                 sound_config.sound->setLoop(sound_config.loop);
 
                 if (sound_config.play_on_start)
+                {
                     sound_config.sound->play();
+                }
 
                 sounds_id.push_back(sounds.size());
                 sounds.push_back(sound_config);
@@ -165,8 +173,10 @@ std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const 
             secNode = cfg.getNextSection();
         }
     }
+
     log_->notify("Sound Manager: Loaded " + QString("%1").arg(sounds_id.size()).toStdString() + " sounds from " + dir_path + " directory");
     log_->notify("========================== Total loaded sounds: "+ QString("%1").arg(sounds.size(), 5).toStdString() + " ==========================");
+
     return sounds_id;
 }
 
@@ -176,7 +186,9 @@ std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const 
 size_t SoundManager::getSignalID(size_t idx)
 {
     if (idx >= sounds.size())
+    {
         return 0;
+    }
 
     return sounds[idx].signal_id;
 }
@@ -187,7 +199,9 @@ size_t SoundManager::getSignalID(size_t idx)
 float SoundManager::getLocalPositionX(size_t idx)
 {
     if (idx >= sounds.size())
+    {
         return 0.0f;
+    }
 
     return sounds[idx].local_pos_x;
 }
@@ -198,7 +212,9 @@ float SoundManager::getLocalPositionX(size_t idx)
 float SoundManager::getLocalPositionY(size_t idx)
 {
     if (idx >= sounds.size())
+    {
         return 0.0f;
+    }
 
     return sounds[idx].local_pos_y;
 }
@@ -209,7 +225,9 @@ float SoundManager::getLocalPositionY(size_t idx)
 float SoundManager::getLocalPositionZ(size_t idx)
 {
     if (idx >= sounds.size())
+    {
         return 0.0f;
+    }
 
     return sounds[idx].local_pos_z;
 }
@@ -248,7 +266,9 @@ void SoundManager::setListenerOrientation(float at_x, float at_y, float at_z, fl
 void SoundManager::setPosition(size_t idx, float x, float y, float z)
 {
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     sounds[idx].sound->setPosition(x, y, z);
 }
@@ -259,7 +279,9 @@ void SoundManager::setPosition(size_t idx, float x, float y, float z)
 void SoundManager::setVelocity(size_t idx, float x, float y, float z)
 {
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     sounds[idx].sound->setVelocity(x, y, z);
 }
@@ -280,7 +302,9 @@ void SoundManager::setSoundState(size_t idx, sound_state_t ss)
 {
     //log_->notify(QString("State for sound [%1]: play %2 | volume %3 | pitch %4").arg(idx).arg(static_cast<int>(ss.state)).arg(ss.volume, 5, 'f', 3).arg(ss.pitch, 5, 'f', 3).toStdString());
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     if (ss.volume == 0.0f)
     {
@@ -292,6 +316,7 @@ void SoundManager::setSoundState(size_t idx, sound_state_t ss)
         sounds[idx].sound->setVolume(0.0f);
         return;
     }
+
     sounds[idx].sound->setVolume(ss.volume * sounds[idx].max_volume);
 
     if (ss.pitch < 0.5f)
@@ -304,6 +329,7 @@ void SoundManager::setSoundState(size_t idx, sound_state_t ss)
         sounds[idx].sound->setPitch(0.5f);
         return;
     }
+
     sounds[idx].sound->setPitch(ss.pitch);
 
     if (ss.state == 0)
@@ -330,7 +356,9 @@ void SoundManager::setSoundState(size_t idx, sound_state_t ss)
 void SoundManager::play(size_t idx)
 {
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     if (sounds[idx].prev_state == 0)
     {
@@ -345,7 +373,9 @@ void SoundManager::play(size_t idx)
 void SoundManager::stop(size_t idx)
 {
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     if (sounds[idx].prev_state > 0)
     {
@@ -360,7 +390,9 @@ void SoundManager::stop(size_t idx)
 void SoundManager::setVolume(size_t idx, float volume)
 {
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     if (volume <= 0.0f)
     {
@@ -396,7 +428,9 @@ void SoundManager::setVolume(size_t idx, float volume)
 void SoundManager::setPitch(size_t idx, float pitch)
 {
     if (idx >= sounds.size())
+    {
         return;
+    }
 
     if (pitch < 0.5f)
     {
