@@ -63,15 +63,15 @@ ASound::ASound(QString soundname, LogFileHandler* log, QObject* parent) : QObjec
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-ASound::ASound(const ASound& other, QObject* parent) : QObject(parent)
+ASound::ASound(const ASound& other, LogFileHandler* log, QObject* parent) : QObject(parent)
 {
-    canDo_ = other.canDo_;
-    canPlay_ = other.canPlay_;
+    connect(this, &ASound::notify, log, &LogFileHandler::notify);
+    connect(this, &ASound::lastErrorChanged_, log, &LogFileHandler::notify);
+
     hasCUE_ = other.hasCUE_;
     hasLABL_ = other.hasLABL_;
     DATA_CHUNK_SIZE = other.DATA_CHUNK_SIZE;
     soundName_ = other.soundName_;
-    lastError_ = other.lastError_;
 
     wave_info_header_ = other.wave_info_header_;
     wave_info_ = other.wave_info_;
@@ -90,7 +90,7 @@ ASound::ASound(const ASound& other, QObject* parent) : QObject(parent)
     }
 
     num_cycle_blocks_ = other.num_cycle_blocks_;
-    source_ = other.source_;
+
     format_ = other.format_;
     sourceVolume_ = other.sourceVolume_;
     sourcePitch_ = other.sourcePitch_;
@@ -102,7 +102,20 @@ ASound::ASound(const ASound& other, QObject* parent) : QObject(parent)
         sourceVelocity_[i] = other.sourceVelocity_[i];
     }
 
-    LastError_ = other.LastError_;
+    canDo_ = true;
+
+    // Генерируем источник
+    alGenSources(1, &source_);
+    AL_CHECK_ERROR("CANT_GENERATE_SOURCE");
+
+    // Настраиваем источник
+    configureSource_();
+
+    // Можно играть звук
+    if (canDo_)
+    {
+        canPlay_ = true;
+    }
 }
 
 //-----------------------------------------------------------------------------

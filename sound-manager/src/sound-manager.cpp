@@ -148,7 +148,7 @@ std::vector<size_t> SoundManager::loadSounds(const std::string& dir_path, const 
             auto found_sound_it = loaded_sounds.find(sound_config.filename.toStdString());
             if (found_sound_it != loaded_sounds.end())
             {
-                sound_config.sound = new ASound(*found_sound_it->second);
+                sound_config.sound = new ASound(*found_sound_it->second, log_);
                 sound_config.sound->setVolume(sound_config.init_volume * sound_config.max_volume);
                 sound_config.sound->setPitch(sound_config.init_pitch);
                 sound_config.sound->setLoop(sound_config.loop);
