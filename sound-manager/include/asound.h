@@ -149,6 +149,7 @@ public:
      * \param soundname - имя аудиофайла
      */
     ASound(QString soundname, LogFileHandler* log, QObject* parent = nullptr);
+    ASound(const ASound& other, QObject* parent = nullptr);
 
     ~ASound();
 

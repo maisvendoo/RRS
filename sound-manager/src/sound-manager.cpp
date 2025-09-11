@@ -97,9 +97,9 @@ std::vector<size_t> SoundManager::loadVehicleSounds(const QString &sounddir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const std::string &cfg_path)
+std::vector<size_t> SoundManager::loadSounds(const std::string& dir_path, const std::string& cfg_path)
 {
-    std::vector<size_t> sounds_id;
+    std::vector<std::size_t> sounds_id;
 
     CfgReader cfg;
     if (cfg.load(QString(cfg_path.c_str())))
@@ -145,14 +145,10 @@ std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const 
 
             cfg.getString(secNode, "Filename", sound_config.filename);
 
-            sound_config.sound = new ASound(
-                QString(dir_path.c_str()) + QDir::separator() + sound_config.filename,
-                log_
-            );
-
-            QString tmp_error = sound_config.sound->getLastError();
-            if (tmp_error.isEmpty())
+            auto found_sound_it = loaded_sounds.find(sound_config.filename.toStdString());
+            if (found_sound_it != loaded_sounds.end())
             {
+                sound_config.sound = new ASound(*found_sound_it->second);
                 sound_config.sound->setVolume(sound_config.init_volume * sound_config.max_volume);
                 sound_config.sound->setPitch(sound_config.init_pitch);
                 sound_config.sound->setLoop(sound_config.loop);
@@ -167,7 +163,31 @@ std::vector<size_t> SoundManager::loadSounds(const std::string &dir_path, const 
             }
             else
             {
-                log_->notify(QString("Sound Manager: can't load sound #%1(total #%2): ").arg(sounds_id.size()).arg(sounds.size()).toStdString() + tmp_error.toStdString());
+                const QString sound_name = QString(dir_path.c_str()) + QDir::separator() + sound_config.filename;
+                sound_config.sound = new ASound(sound_name, log_);
+
+                const QString tmp_error = sound_config.sound->getLastError();
+                if (tmp_error.isEmpty())
+                {
+                    sound_config.sound->setVolume(sound_config.init_volume * sound_config.max_volume);
+                    sound_config.sound->setPitch(sound_config.init_pitch);
+                    sound_config.sound->setLoop(sound_config.loop);
+
+                    if (sound_config.play_on_start)
+                    {
+                        sound_config.sound->play();
+                    }
+
+                    sounds_id.push_back(sounds.size());
+                    sounds.push_back(sound_config);
+                    loaded_sounds.emplace(sound_config.filename.toStdString(), sound_config.sound);
+                }
+                else
+                {
+                    log_->notify(QString("Sound Manager: can't load sound #%1(total #%2): ")
+                        .arg(sounds_id.size())
+                        .arg(sounds.size()).toStdString() + tmp_error.toStdString());
+                }
             }
 
             secNode = cfg.getNextSection();

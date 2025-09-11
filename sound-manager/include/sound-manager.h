@@ -9,6 +9,7 @@
 #include <QObject>
 
 #include <cstddef>
+#include <map>
 #include <vector>
 
 //------------------------------------------------------------------------------
@@ -46,6 +47,9 @@ private:
 
     /// Массив звуков OpenAL и их параметров
     std::vector<sound_config_t> sounds;
+
+    /// Уже загруженные звуки
+    std::map<std::string, ASound*> loaded_sounds;
 
     /// Инициализация
     void init();

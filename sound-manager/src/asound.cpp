@@ -61,6 +61,51 @@ ASound::ASound(QString soundname, LogFileHandler* log, QObject* parent) : QObjec
 }
 
 //-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+ASound::ASound(const ASound& other, QObject* parent) : QObject(parent)
+{
+    canDo_ = other.canDo_;
+    canPlay_ = other.canPlay_;
+    hasCUE_ = other.hasCUE_;
+    hasLABL_ = other.hasLABL_;
+    DATA_CHUNK_SIZE = other.DATA_CHUNK_SIZE;
+    soundName_ = other.soundName_;
+    lastError_ = other.lastError_;
+
+    wave_info_header_ = other.wave_info_header_;
+    wave_info_ = other.wave_info_;
+    wave_info_file_data_ = other.wave_info_file_data_;
+    cue_head_ = other.cue_head_;
+    cue_data_ = other.cue_data_;
+    list_head_ = other.list_head_;
+    wave_labels_ = other.wave_labels_;
+
+    for (int i = 0; i < BUFFER_BLOCKS; ++i)
+    {
+        wavData_[i] = other.wavData_[i];
+        blockSize_[i] = other.blockSize_[i];
+        blockDuration_[i] = other.blockDuration_[i];
+        buffer_[i] = other.buffer_[i];
+    }
+
+    num_cycle_blocks_ = other.num_cycle_blocks_;
+    source_ = other.source_;
+    format_ = other.format_;
+    sourceVolume_ = other.sourceVolume_;
+    sourcePitch_ = other.sourcePitch_;
+    sourceLoop_ = other.sourceLoop_;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        sourcePosition_[i] = other.sourcePosition_[i];
+        sourceVelocity_[i] = other.sourceVelocity_[i];
+    }
+
+    LastError_ = other.LastError_;
+}
+
+//-----------------------------------------------------------------------------
 // ДЕСТРУКТОР
 //-----------------------------------------------------------------------------
 ASound::~ASound()
