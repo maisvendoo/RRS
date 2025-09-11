@@ -46,7 +46,7 @@ bool AppCore::init()
     QString errorMessage = "";
 
     QString cmd_line = "";
-    for (QString s : this->arguments())
+    for (QString& s : this->arguments())
         cmd_line += " " + s;
 
     Journal::instance()->info("Process " + APPLICATION_NAME + " started with command line: " + cmd_line);
@@ -139,6 +139,13 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
     QCommandLineOption help = parser.addHelpOption();
     QCommandLineOption version = parser.addVersionOption();
 
+    // Start date and time struct serialized to 64-bit value
+    QCommandLineOption startDatetime(QStringList() << "s" << "start",
+                                      QCoreApplication::translate("main", "Start date and time"),
+                                      QCoreApplication::translate("main", "start-time"));
+
+    parser.addOption(startDatetime);
+
     // Route directory
     QCommandLineOption routeDir(QStringList() << "r" << "route",
                                 QCoreApplication::translate("main", "Route directory"),
@@ -188,6 +195,12 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
         return CommandLineHelpRequired;
     }
 
+    if (parser.isSet(startDatetime))
+    {
+        command_line.start_datetime.is_present = true;
+        command_line.start_datetime.value = parser.value(startDatetime).toLongLong();
+    }
+
     if (parser.isSet(routeDir))
     {
         command_line.route_dir.is_present = true;
@@ -202,7 +215,7 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
         QStringList tokens = parser.value(trainConfig).split(',');
 
         // Перебираем все конфиги, помещаяя в параметры командной строки
-        for (QString token: tokens)
+        for (QString& token: tokens)
         {
             if (token.isEmpty())
                 continue;
@@ -216,7 +229,7 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
         command_line.init_coord.is_present = true;
         QStringList tokens = parser.value(initCoord).split(',');
 
-        for (auto token : tokens)
+        for (QString& token : tokens)
         {
             if (token.isEmpty())
                 continue;
@@ -231,7 +244,7 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
         command_line.direction.is_present = true;
         QStringList tokens = parser.value(direction).split(',');
 
-        for (auto token : tokens)
+        for (QString& token : tokens)
         {
             if (token.isEmpty())
                 continue;
@@ -246,7 +259,7 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
         command_line.trajectory_name.is_present = true;
         QStringList tokens = parser.value(trajectory_name).split(',');
 
-        for (auto token : tokens)
+        for (QString& token : tokens)
         {
             if (token.isEmpty())
                 continue;

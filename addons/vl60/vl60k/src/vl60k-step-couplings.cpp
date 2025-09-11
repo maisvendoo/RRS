@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60k::preStepCouplings(double t)
+void VL60k::preStepCouplings(const double& t)
 {
     (void) t;
 
@@ -22,7 +22,7 @@ void VL60k::preStepCouplings(double t)
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60k::stepCouplings(double t, double dt)
+void VL60k::stepCouplings(const double& t, const double& dt)
 {
     // Управление передним сцепным устройством
     oper_rod_fwd->setCouplingForce(coupling_fwd->getCurrentForce());

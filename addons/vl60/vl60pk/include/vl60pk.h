@@ -80,7 +80,7 @@ public:
     ~VL60pk();
 
     /// Инициализация тормозных приборов
-    void initBrakeDevices(double p0, double pBP, double pFL);
+    void initBrakeDevices(double p0, double pBP, double pFL) override;
 
 private:
 
@@ -431,109 +431,121 @@ private:
 
     SpotLight *spotlight[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
+
+    /// Чтение конфигурационного файла
+    void loadConfig(QString cfg_path) override;
+
+
     /// Общая инициализация локомотива
-    void initialization();
+    void initialization() override;
 
     /// Инициализация управления тумблерами
-    void initTumblers(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initTumblers(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация сцепных устройств
-    void initCouplings(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initCouplings(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация токоприемников
-    void initPantographs(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initPantographs(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Иницаализация высоковольтной части схемы (ГВ, тяговый трансформатор)
-    void initHighVoltageScheme(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initHighVoltageScheme(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация вспомогательных машин (ФР, МК, МВ1 - МВ6)
-    void initSupplyMachines(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initSupplyMachines(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация питательной магистрали
-    void initPneumoSupply(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initPneumoSupply(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация приборов управления тормозами
-    void initBrakesControl(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initBrakesControl(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация тормозного оборудования
-    void initBrakesEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initBrakesEquipment(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация ЭПТ
-    void initEPB(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initEPB(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация схемы управления тягой
-    void initTractionControl(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initTractionControl(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация приборов безопасности
-    void initSafetyDevices(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initSafetyDevices(const QString& modules_dir, const QString& custom_cfg_dir);
 
-    void initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initOtherEquipment(const QString& modules_dir, const QString& custom_cfg_dir);
 
     bool initAutostartProgram(int cab_autostart_request);
 
+
+    /// Процесс симуляции
+    void process(const simulator_time_t& t, const double& dt) override;
+
+    /// Управление
+    void keyProcess(const simulator_time_t& t, const double& dt);
+
+    /// Отладочная строка
+    void debugPrint(const simulator_time_t& t, const double& dt);
+
+    /// Сигналы для анимации
+    void signalsOutput(const simulator_time_t& t, const double& dt);
+
+    /// Сигналы для озвучки
+    void soundsOutput(const simulator_time_t& t, const double& dt);
+
+
     /// Предварительные расчёты перед симуляцией
-    void preStep(double t);
+    void preStep(const double& t) override;
 
     /// Предварительный расчёт координат сцепных устройств
-    void preStepCouplings(double t);
+    void preStepCouplings(const double& t);
+
 
     /// Шаг симуляции всех систем электровоза
-    void step(double t, double dt);
+    void step(const double& t, const double& dt) override;
 
     /// Моделирование сцепных устройств
-    void stepCouplings(double t, double dt);
+    void stepCouplings(const double& t, const double& dt);
 
-    void stepPantographsControl(double t, double dt);
+    void stepPantographsControl(const double& t, const double& dt);
 
-    void stepMainSwitchControl(double t, double dt);
+    void stepMainSwitchControl(const double& t, const double& dt);
 
-    void stepTracTransformer(double t, double dt);
+    void stepTracTransformer(const double& t, const double& dt);
 
-    void stepPhaseSplitter(double t, double dt);
+    void stepPhaseSplitter(const double& t, const double& dt);
 
-    void stepMotorFans(double t, double dt);
+    void stepMotorFans(const double& t, const double& dt);
 
     /// Моделирование питательной магистрали
-    void stepPneumoSupply(double t, double dt);
+    void stepPneumoSupply(const double& t, const double& dt);
 
     /// Моделирование приборов управления тормозами
-    void stepBrakesControl(double t, double dt);
+    void stepBrakesControl(const double& t, const double& dt);
 
     /// Моделирование тормозного оборудования
-    void stepBrakesEquipment(double t, double dt);
+    void stepBrakesEquipment(const double& t, const double& dt);
 
     /// Моделирование ЭПТ
-    void stepEPB(double t, double dt);
+    void stepEPB(const double& t, const double& dt);
 
-    void stepTractionControl(double t, double dt);
+    void stepTractionControl(const double& t, const double& dt);
 
-    void stepLineContactors(double t, double dt);
+    void stepLineContactors(const double& t, const double& dt);
 
-    void stepOtherEquipment(double t, double dt);
+    void stepOtherEquipment(const double& t, const double& dt);
 
-    void stepSoundSignalsOutput(double t, double dt);
+    /// Моделирование приборов безопасности
+    void stepSafetyDevices(const double& t, const double& dt);
 
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
 
-    void stepSignalsOutput(double t, double dt);
-
-    /// Моделирование приборов безопасности
-    void stepSafetyDevices(double t, double dt);
-
     double getTractionForce();
 
     bool getHoldingCoilState() const;
 
-    /// Обработка нажатий клавиш
-    void keyProcess();
-
-    void debugPrint();
-
     void load_brakes_config(QString path);
-
-    void loadConfig(QString cfg_path);
 
 private slots:
 

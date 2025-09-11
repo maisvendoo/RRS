@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PassCar::stepRegistrator(double t, double dt)
+void PassCar::stepRegistrator(const double& t, const double& dt)
 {
     (void) t;
     (void) dt;

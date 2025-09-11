@@ -19,6 +19,7 @@
 #include    <QIcon>
 #include    <QToolBox>
 #include    <QProcess>
+#include    <QTimer>
 
 #include    <train-info.h>
 #include    <route-info.h>
@@ -113,6 +114,8 @@ private:
     QIcon icon_cancel = QIcon(QString(":/images/images/2_cancel.png"));
     QIcon icon_warn = QIcon(QString(":/images/images/3_warn.png"));
 
+    QTimer update_datetime_timer;
+
     /// Launcer initialization
     void init();
 
@@ -196,6 +199,8 @@ private slots:
     void slotStartDateManuallyChanged();
 
     void slotStartTimeManuallyChanged();
+
+    void slotUpdateDateTime();
 
     void slotStartServerPressed();
 

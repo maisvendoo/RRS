@@ -59,3 +59,7 @@ QTabWidget::pane {
 QComboBox {
 	background-color: #606060;
 }
+
+QDateTimeEdit::disabled {
+	color: #888888;
+}

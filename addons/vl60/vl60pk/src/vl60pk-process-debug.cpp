@@ -1,4 +1,4 @@
-#include    "vl60k.h"
+#include    "vl60pk.h"
 
 #include "alsn-ukbm.h"
 #include "ALSN-coil.h"
@@ -6,7 +6,6 @@
 #include "brake-crane.h"
 #include "brake-lock.h"
 #include "brake-mech.h"
-#include "ALSN-coil.h"
 #include "coupling.h"
 #include "coupling-operating-rod.h"
 #include "dc-motor.h"
@@ -14,21 +13,24 @@
 #include "kme-60-044.h"
 #include "loco-crane.h"
 #include "pneumo-anglecock.h"
-#include "pneumo-hose.h"
+#include "pneumo-hose-epb.h"
 #include "reservoir.h"
 #include "speedmap.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::debugPrint()
+void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
 {
+    (void) t;
+    (void) dt;
+
     DebugMsg = "";
 
     DebugMsg += QString("CABINE 1|");
     if (brake_lock[CAB1]->isUnlocked())
     {
-        DebugMsg += QString("367comb:%1|394:%2|pER%3|254:%4%|")
+        DebugMsg += QString("367comb:%1|395:%2|pER%3|254:%4%|")
                         .arg(brake_lock[CAB1]->getCombCranePosition(), 2, 'f', 0)
                         .arg(brake_crane[CAB1]->getPositionName(), 3)
                         .arg(10.0 * brake_crane[CAB1]->getERpressure(), 6, 'f', 2)
@@ -135,7 +137,7 @@ void VL60k::debugPrint()
     DebugMsg += QString("CABINE 2|");
     if (brake_lock[CAB2]->isUnlocked())
     {
-        DebugMsg += QString("367comb:%1|394:%2|pER%3|254:%4%|")
+        DebugMsg += QString("367comb:%1|395:%2|pER%3|254:%4%|")
                         .arg(brake_lock[CAB2]->getCombCranePosition(), 2, 'f', 0)
                         .arg(brake_crane[CAB2]->getPositionName(), 3)
                         .arg(10.0 * brake_crane[CAB2]->getERpressure(), 6, 'f', 2)

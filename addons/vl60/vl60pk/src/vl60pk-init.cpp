@@ -19,7 +19,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initPantographs(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initPantographs(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
 
@@ -33,7 +33,7 @@ void VL60pk::initPantographs(const QString &modules_dir, const QString &custom_c
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initHighVoltageScheme(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initHighVoltageScheme(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
 
@@ -50,7 +50,7 @@ void VL60pk::initHighVoltageScheme(const QString &modules_dir, const QString &cu
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initSupplyMachines(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initSupplyMachines(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
 
@@ -67,7 +67,7 @@ void VL60pk::initSupplyMachines(const QString &modules_dir, const QString &custo
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initTractionControl(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initTractionControl(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
 
@@ -108,7 +108,7 @@ void VL60pk::initTractionControl(const QString &modules_dir, const QString &cust
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::initOtherEquipment(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initOtherEquipment(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void)modules_dir;
     (void)custom_cfg_dir;

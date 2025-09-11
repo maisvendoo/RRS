@@ -4,8 +4,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreightCar::stepSignalsOutput()
+void FreightCar::signalsOutput(const simulator_time_t& t, const double& dt)
 {
+    (void) t;
+    (void) dt;
+
     // Углы поворота колёсных пар для анимаций
     for(size_t i = 0; i < wheel_rotation_angle.size(); ++i)
         analogSignal[WHEEL_1 + i] =

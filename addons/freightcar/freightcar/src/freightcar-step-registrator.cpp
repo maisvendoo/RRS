@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreightCar::stepRegistrator(double t, double dt)
+void FreightCar::stepRegistrator(const double& t, const double& dt)
 {
     (void) t;
     (void) dt;

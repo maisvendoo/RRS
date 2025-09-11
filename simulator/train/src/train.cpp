@@ -24,7 +24,7 @@ Train::~Train()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Train::init(const init_data_t &init_data)
+bool Train::init(const init_data_t& init_data)
 {
     solver_config = init_data.solver_config;
 
@@ -97,7 +97,7 @@ bool Train::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Train::init(const solver_config_t &solver_config, int direction, std::vector<Vehicle *> &vehicles, state_vector_t &state_vector, std::vector<std::vector<Joint *>> &joints_list)
+bool Train::init(const solver_config_t& solver_config, int direction, std::vector<Vehicle*>& vehicles, state_vector_t& state_vector, std::vector<std::vector<Joint*>>& joints_list)
 {
     this->solver_config = solver_config;
 
@@ -158,13 +158,13 @@ bool Train::init(const solver_config_t &solver_config, int direction, std::vecto
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::couple(double current_distance, bool is_coupling_to_head, bool is_other_coupled_by_head, Train *other_train)
+void Train::couple(double current_distance, bool is_coupling_to_head, bool is_other_coupled_by_head, Train* other_train)
 {
     if (other_train == nullptr)
         return;
 
     // ПЕ поезда, с которым сцепляемся
-    std::vector<Vehicle *> other_vehicles = *(other_train->getVehicles());
+    std::vector<Vehicle*> other_vehicles = *(other_train->getVehicles());
 
     // Вектор состояния поезда, с которым сцепляемся
     state_vector_t other_y = other_train->getStateVector();
@@ -213,15 +213,15 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
     }
 
     // Массив межвагонных связей поезда, с которым сцепляемся
-    std::vector<std::vector<Joint *>> other_joints_list = other_train->getJoints();
+    std::vector<std::vector<Joint*>> other_joints_list = other_train->getJoints();
 
-    Vehicle *veh;
-    device_list_t *cons;
-    Vehicle *other_veh;
-    device_list_t *other_cons;
+    Vehicle* veh;
+    device_list_t* cons;
+    Vehicle* other_veh;
+    device_list_t* other_cons;
 
-    std::vector<Vehicle *> new_vehicles;
-    std::vector<std::vector<Joint *>> new_joints_list;
+    std::vector<Vehicle*> new_vehicles;
+    std::vector<std::vector<Joint*>> new_joints_list;
     state_vector_t new_y;
     size_t new_ode_order = 0;
 
@@ -249,7 +249,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
             for (size_t i = other_vehicles.size(); i > 0; --i)
             {
-                Vehicle *vehicle = other_vehicles[i - 1];
+                Vehicle* vehicle = other_vehicles[i - 1];
                 new_vehicles.push_back(vehicle);
 
                 size_t old_idx = vehicle->getStateIndex();
@@ -272,7 +272,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             other_veh_distances.insert(other_veh_distances.begin(), distance);
             for (size_t i = 0; i < other_vehicles.size(); ++i)
             {
-                Vehicle *vehicle = other_vehicles[i];
+                Vehicle* vehicle = other_vehicles[i];
                 vehicle->setTrainIndex(train_idx);
 
                 size_t model_idx = vehicle->getModelIndex();
@@ -326,7 +326,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             other_veh_distances.push_back(distance);
             for (size_t i = other_vehicles.size(); i > 0; --i)
             {
-                Vehicle *vehicle = other_vehicles[i - 1];
+                Vehicle* vehicle = other_vehicles[i - 1];
                 vehicle->setTrainIndex(train_idx);
 
                 size_t model_idx = vehicle->getModelIndex();
@@ -346,7 +346,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         }
 
         // Создаём новый массив межвагонных связей между крайними ПЕ сцепляемых поездов
-        std::vector<Joint *> joints;
+        std::vector<Joint*> joints;
 
         if ((cons->empty()) || (other_cons->empty()))
         {
@@ -379,7 +379,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         // Задаём для ПЕ данного поезда новые индексы в векторе состояния
         for (size_t i = 0; i < vehicles.size(); ++i)
         {
-            Vehicle *vehicle = vehicles[i];
+            Vehicle* vehicle = vehicles[i];
 
             size_t new_idx = vehicle->getStateIndex() + new_ode_order;
             vehicle->setStateIndex(new_idx);
@@ -419,7 +419,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             other_veh_distances.insert(other_veh_distances.begin(), distance);
             for (size_t i = 0; i < other_vehicles.size(); ++i)
             {
-                Vehicle *vehicle = other_vehicles[i];
+                Vehicle* vehicle = other_vehicles[i];
                 vehicle->setTrainIndex(train_idx);
 
                 size_t model_idx = vehicle->getModelIndex();
@@ -458,7 +458,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             other_veh_distances.push_back(distance);
             for (size_t i = other_vehicles.size(); i > 0; --i)
             {
-                Vehicle *vehicle = other_vehicles[i - 1];
+                Vehicle* vehicle = other_vehicles[i - 1];
                 new_vehicles.push_back(vehicle);
 
                 vehicle->setDirection(dir);
@@ -570,7 +570,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Train *Train::uncouple(double uncoupling_distance)
+Train* Train::uncouple(double uncoupling_distance)
 {
     if (vehicles.size() < 2)
         return nullptr;
@@ -613,7 +613,7 @@ Train *Train::uncouple(double uncoupling_distance)
                                           .arg(coord, 7, 'f', 3));
         }
 
-        Train *new_train = new Train();
+        Train* new_train = new Train();
         new_train->setTopology(topology);
 
         (vehicles[i - 1]->getOrientation() == -1) ?
@@ -623,7 +623,7 @@ Train *Train::uncouple(double uncoupling_distance)
             vehicles[i]->setNextVehicle(nullptr) :
             vehicles[i]->setPrevVehicle(nullptr);
 
-        std::vector<Vehicle *> new_vehicles;
+        std::vector<Vehicle*> new_vehicles;
         for (size_t j = i; j < vehicles.size(); ++j)
         {
             new_vehicles.push_back(vehicles[j]);
@@ -635,7 +635,7 @@ Train *Train::uncouple(double uncoupling_distance)
             new_y.push_back(y[j]);
         }
 
-        std::vector<std::vector<Joint *>> new_joints_list;
+        std::vector<std::vector<Joint*>> new_joints_list;
         if (i < vehicles.size() - 1)
         {
             for (size_t j = i; j < joints_list.size(); ++j)
@@ -737,7 +737,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 
     for (auto it = begin; it != end; ++it)
     {
-        Vehicle *vehicle = *it;
+        Vehicle* vehicle = *it;
         size_t idx = vehicle->getStateIndex();
         size_t s = vehicle->getDegressOfFreedom();
 
@@ -751,7 +751,7 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Vehicle *Train::getFirstVehicle() const
+Vehicle* Train::getFirstVehicle() const
 {
     return *vehicles.begin();
 }
@@ -759,7 +759,7 @@ Vehicle *Train::getFirstVehicle() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Vehicle *Train::getLastVehicle() const
+Vehicle* Train::getLastVehicle() const
 {
     return *(vehicles.end() - 1);
 }
@@ -775,7 +775,7 @@ state_vector_t Train::getStateVector()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<std::vector<Joint *> > Train::getJoints()
+std::vector<std::vector<Joint*>> Train::getJoints()
 {
     return joints_list;
 }
@@ -846,7 +846,7 @@ int Train::getDirection() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<Vehicle *> *Train::getVehicles()
+std::vector<Vehicle*>* Train::getVehicles()
 {
     return &vehicles;
 }
@@ -854,7 +854,7 @@ std::vector<Vehicle *> *Train::getVehicles()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::setTopology(Topology *topology)
+void Train::setTopology(Topology* topology)
 {
     this->topology = topology;
 }
@@ -862,14 +862,14 @@ void Train::setTopology(Topology *topology)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::slotStep(double current_time, double integration_time)
+void Train::slotStep(const simulator_time_t& current_time, const double& integration_time)
 {
     auto begin = vehicles.begin();
     auto end = vehicles.end();
     Vehicle* first = *begin;
     Vehicle* last = *(end - 1);
 
-    double t = current_time;
+    double t = current_time.simulation_seconds;
     double num_sub_step = ceil(integration_time / solver_config.step);
     double dt = integration_time / num_sub_step;
     size_t num_step = static_cast<size_t>(num_sub_step);
@@ -892,13 +892,11 @@ void Train::slotStep(double current_time, double integration_time)
         // prestep
         for (auto it = begin; it != end; ++it)
         {
-            Vehicle *vehicle = *it;
+            Vehicle* vehicle = *it;
 
-            // input
             if (i == 0)
             {
-                vehicle->keyProcess();
-                vehicle->hardwareProcess();
+                vehicle->integrationProcess(current_time, integration_time);
             }
 
             vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
@@ -912,7 +910,7 @@ void Train::slotStep(double current_time, double integration_time)
         {
             if (joints_it != joints_list.end())
             {
-                std::vector<Joint *> joints = *joints_it;
+                std::vector<Joint*> joints = *joints_it;
                 if (!joints.empty())
                 {
                     for (auto joint : joints)
@@ -923,7 +921,7 @@ void Train::slotStep(double current_time, double integration_time)
                 ++joints_it;
             }
 
-            Vehicle *vehicle = *it;
+            Vehicle* vehicle = *it;
             vehicle->integrationStep(y, t, dt);
         }
 
@@ -976,7 +974,7 @@ void Train::slotStep(double current_time, double integration_time)
         // poststep
         for (auto it = begin; it != end; ++it)
         {
-            Vehicle *vehicle = *it;
+            Vehicle* vehicle = *it;
             vehicle->integrationPostStep(y, t);
 
             if (i == num_step - 1)
@@ -985,7 +983,7 @@ void Train::slotStep(double current_time, double integration_time)
                 size_t idx = vehicle->getStateIndex();
                 topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
                 topology->getVehicleController(model_idx)->setCoord(y[idx]);
-                *vehicle->getProfilePoint() = topology->getVehicleController(model_idx)->getPosition();
+                *(vehicle->getProfilePoint()) = topology->getVehicleController(model_idx)->getPosition();
             }
         }
     }
@@ -995,10 +993,10 @@ void Train::slotStep(double current_time, double integration_time)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
+bool Train::loadTrain(QString cfg_path, const init_data_t& init_data)
 {
     CfgReader cfg;
-    FileSystem &fs = FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
 
     Journal::instance()->info("==== Train loading ====");
 
@@ -1141,7 +1139,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
                 if (vehicles.size() !=0)
                 {
-                    Vehicle *prev =  *(vehicles.end() - 1);
+                    Vehicle* prev =  *(vehicles.end() - 1);
                     if (prev->getOrientation() > 0)
                         prev->setNextVehicle(vehicle);
                     else
@@ -1157,13 +1155,6 @@ bool Train::loadTrain(QString cfg_path, const init_data_t &init_data)
 
             vehicle_node = cfg.getNextSection();
         }
-/*
-        for (auto it = vehicles.begin(); it != vehicles.end(); ++it)
-        {
-            Vehicle *vehicle = *it;
-            connect(this, &Train::sendDataToVehicle,
-                    vehicle, &Vehicle::receiveData, Qt::DirectConnection);
-        }*/
     }
     else
     {
@@ -1214,21 +1205,21 @@ bool Train::loadTrainJoints()
         }
 
         // Get connectors list from ahead vehicle
-        device_list_t *cons_fwd;
+        device_list_t* cons_fwd;
         if (dir * veh_fwd->getOrientation() > 0)
             cons_fwd = veh_fwd->getBwdConnectors();
         else
             cons_fwd = veh_fwd->getFwdConnectors();
 
         // Get connectors list from behind vehicle
-        device_list_t *cons_bwd;
+        device_list_t* cons_bwd;
         if (dir * veh_bwd->getOrientation() > 0)
             cons_bwd = veh_bwd->getFwdConnectors();
         else
             cons_bwd = veh_bwd->getBwdConnectors();
 
         // Create array with joints between these two vehicle
-        std::vector<Joint *> joints;
+        std::vector<Joint*> joints;
 
         if ((cons_fwd->empty()) || (cons_bwd->empty()))
         {
@@ -1266,17 +1257,17 @@ bool Train::loadTrainJoints()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::loadJoints(device_list_t *cons_fwd, device_list_t *cons_bwd, std::vector<Joint *> &joints)
+void Train::loadJoints(device_list_t* cons_fwd, device_list_t* cons_bwd, std::vector<Joint*>& joints)
 {
     // First try link connectors with the same name
     for (auto con_fwd_it = cons_fwd->begin(); con_fwd_it != cons_fwd->end(); ++con_fwd_it)
     {
-        Device *con_fwd = *con_fwd_it;
+        Device* con_fwd = *con_fwd_it;
         QString name_fwd = con_fwd->getName();
 
         for (auto con_bwd_it = cons_bwd->begin(); con_bwd_it != cons_bwd->end(); ++con_bwd_it)
         {
-            Device *con_bwd = *con_bwd_it;
+            Device* con_bwd = *con_bwd_it;
             QString name_bwd = con_bwd->getName();
 
             if (name_fwd == name_bwd)
@@ -1290,13 +1281,13 @@ void Train::loadJoints(device_list_t *cons_fwd, device_list_t *cons_bwd, std::ve
     // Try link any connectors
     for (auto con_fwd_it = cons_fwd->begin(); con_fwd_it != cons_fwd->end(); ++con_fwd_it)
     {
-        Device *con_fwd = *con_fwd_it;
+        Device* con_fwd = *con_fwd_it;
         if (con_fwd->isLinked())
             continue;
 
         for (auto con_bwd_it = cons_bwd->begin(); con_bwd_it != cons_bwd->end(); ++con_bwd_it)
         {
-            Device *con_bwd = *con_bwd_it;
+            Device* con_bwd = *con_bwd_it;
             if (con_bwd->isLinked())
                 continue;
 
@@ -1311,10 +1302,10 @@ void Train::loadJoints(device_list_t *cons_fwd, device_list_t *cons_bwd, std::ve
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint *> &joints)
+void Train::loadJointModule(Device* con_fwd, Device* con_bwd, std::vector<Joint*>& joints)
 {
     CfgReader cfg;
-    FileSystem &fs = FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
 
     QString name_fwd = con_fwd->getName();
     QString name_bwd = con_bwd->getName();
@@ -1367,7 +1358,7 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
     QString joint_module_name = "";
     cfg.getString(secName, "ModuleName", joint_module_name);
 
-    Joint *joint = loadJoint(QString(joint_module_dir +
+    Joint* joint = loadJoint(QString(joint_module_dir +
                              fs.separator() + joint_module_name));
     if (joint == nullptr)
         return;
@@ -1384,11 +1375,11 @@ void Train::loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Train::setInitConditions(const init_data_t &init_data)
+void Train::setInitConditions(const init_data_t& init_data)
 {
     for (size_t i = 0; i < vehicles.size(); i++)
     {
-        Vehicle *vehicle = vehicles[i];
+        Vehicle* vehicle = vehicles[i];
 
         size_t s = vehicle->getDegressOfFreedom();
         size_t idx = vehicle->getStateIndex();
@@ -1416,7 +1407,7 @@ void Train::setInitConditions(const init_data_t &init_data)
         double Li = vehicles[i]->getLength();
         size_t idxi = vehicles[i]->getStateIndex();
 
-        y[idxi] = y[idxi_1] - dir *(Li + Li_1) / 2;
+        y[idxi] = y[idxi_1] - dir * (Li + Li_1) / 2;
 
         vehicles[i]->setTrainCoord(y[idxi]);
 

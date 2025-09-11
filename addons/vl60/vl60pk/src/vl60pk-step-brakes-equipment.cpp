@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::stepBrakesEquipment(double t, double dt)
+void VL60pk::stepBrakesEquipment(const double& t, const double& dt)
 {
     // Тормозная магистраль
     double BP_flow = 0.0;

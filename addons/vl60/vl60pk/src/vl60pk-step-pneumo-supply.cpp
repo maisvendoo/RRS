@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::stepPneumoSupply(double t, double dt)
+void VL60pk::stepPneumoSupply(const double& t, const double& dt)
 {
     press_reg->setFLpressure(main_reservoir->getPressure());
     press_reg->step(t, dt);

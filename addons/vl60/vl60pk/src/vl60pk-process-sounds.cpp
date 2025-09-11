@@ -22,7 +22,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepSoundSignalsOutput(double t, double dt)
+void VL60pk::soundsOutput(const simulator_time_t& t, const double& dt)
 {
     (void) t;
     (void) dt;

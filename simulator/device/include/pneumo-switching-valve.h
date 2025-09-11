@@ -33,20 +33,27 @@ public:
 
 protected:
 
+    /// Игнорировать условный объём камеры со стороны, куда открыт клапан,
+    /// напрямую передавая поток и давление в смежное оборудование без задержек
+    bool ignore_volume1 = false;
+    bool ignore_volume2 = false;
+
     /// Объём рабочей камеры 1
-    double V1;
+    double V1 = 1.0e-3;
     /// Объём рабочей камеры 2
-    double V2;
+    double V2 = 1.0e-3;
 
-    double pOUT;
+    double pOUT = 0.0;
 
-    double QIN1;
-    double QIN2;
-    double QOUT;
+    double QIN1 = 0.0;
+    double QIN2 = 0.0;
+    double QOUT = 0.0;
 
-    double K1;
+    /// Коэффициент перетока к выходу из рабочей камеры со стороны, куда открыт клапан
+    double K1 = 5.0e-2;
 
-    double A1;
+    /// Коэффициент к скорости переключенияs
+    double A1 = 100.0;
 
     virtual void preStep(state_vector_t &Y, double t);
 

@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60k::initCouplings(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60k::initCouplings(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) custom_cfg_dir;
 

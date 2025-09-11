@@ -17,6 +17,7 @@
 #define     TRAIN_H
 
 #include    "global-const.h"
+#include    "datetime.h"
 #include    "init_data.h"
 #include    "ode-system.h"
 #include    "vehicle.h"
@@ -49,21 +50,21 @@ class TRAIN_EXPORT Train : public OdeSystem
 public:
 
     /// Constructor
-    explicit Train(QObject *parent = nullptr);
+    explicit Train(QObject* parent = nullptr);
     /// Destructor
     virtual ~Train();
 
     /// Train initialization
-    bool init(const init_data_t &init_data);
+    bool init(const init_data_t& init_data);
 
     /// Train initialization
-    bool init(const solver_config_t &solver_config, int direction, std::vector<Vehicle *> &vehicles, state_vector_t &state_vector, std::vector<std::vector<Joint *>> &joints_list);
+    bool init(const solver_config_t& solver_config, int direction, std::vector<Vehicle*>& vehicles, state_vector_t& state_vector, std::vector<std::vector<Joint*>>& joints_list);
 
     /// Train coupling
-    void couple(double current_distance, bool is_coupling_to_head, bool is_other_coupled_by_head, Train *other_train = nullptr);
+    void couple(double current_distance, bool is_coupling_to_head, bool is_other_coupled_by_head, Train* other_train = nullptr);
 
     /// Train uncoupling
-    Train *uncouple(double uncoupling_distance);
+    Train* uncouple(double uncoupling_distance);
 
     /// Set distance to stop the train before end of trajectory
     void setDistanceToEndOfTrajectory(int direction, double distance);
@@ -78,14 +79,14 @@ public:
     void calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, double dt);
 
     /// Get first vehicle
-    Vehicle *getFirstVehicle() const;
+    Vehicle* getFirstVehicle() const;
 
     /// Get last vehicle
-    Vehicle *getLastVehicle() const;
+    Vehicle* getLastVehicle() const;
 
     state_vector_t getStateVector();
 
-    std::vector<std::vector<Joint *>> getJoints();
+    std::vector<std::vector<Joint*>> getJoints();
 
     double getVelocity(size_t i = 0) const;
 
@@ -102,14 +103,14 @@ public:
 
     int getDirection() const;
 
-    std::vector<Vehicle *> *getVehicles();
+    std::vector<Vehicle*>* getVehicles();
 
-    void setTopology(Topology *topology);
+    void setTopology(Topology* topology);
 
 public slots:
 
     /// Integration step
-    void slotStep(double current_time, double integration_time);
+    void slotStep(const simulator_time_t& current_time, const double& integration_time);
 
 signals:
 
@@ -119,12 +120,12 @@ signals:
 private:
 
     /// Train index
-    size_t          train_idx = 0;
+    size_t      train_idx = 0;
 
     /// Train mass
-    double          trainMass = 0.0;
+    double      trainMass = 0.0;
     /// Train length
-    double          trainLength = 0.0;
+    double      trainLength = 0.0;
 
     /// Distance to stop the head of train before end of trajectory
     double      distance_to_stop_head = DISTANCE_TO_COUPLE_TRAINS;
@@ -132,10 +133,10 @@ private:
     double      distance_to_stop_tail = DISTANCE_TO_COUPLE_TRAINS;
 
     /// Order of system ODE motion
-    size_t          ode_order = 0;
+    size_t      ode_order = 0;
 
     /// Direction of motion on railway
-    int             dir = 1;
+    int         dir = 1;
 
     /// Coefficient to friction between wheel and rail
     double      coeff_to_wheel_rail_friction = 1.0;
@@ -150,7 +151,7 @@ private:
     double      init_main_res_pressure = 0.0;
 
     /// Motion ODE's solver
-    Solver      *train_motion_solver = nullptr;
+    Solver*     train_motion_solver = nullptr;
 
     /// Имя сетевого клиента для ВЖД
     QString     client_name;
@@ -159,24 +160,24 @@ private:
     QString     train_id;
 
     /// All train's vehicles
-    std::vector<Vehicle *> vehicles;
+    std::vector<Vehicle*> vehicles;
 
     /// All joints between neighbor vehicles
-    std::vector<std::vector<Joint *>> joints_list;
+    std::vector<std::vector<Joint*>> joints_list;
 
     /// Solver's configuration
     solver_config_t solver_config;
 
-    Topology *topology = nullptr;
+    Topology* topology = nullptr;
 
     /// Train's loading
     bool loadTrain(QString cfg_path, const init_data_t &init_data);
     /// Joints loading
     bool loadTrainJoints();
     /// Joints loading
-    void loadJoints(device_list_t *cons_fwd, device_list_t *cons_bwd, std::vector<Joint *> &joints);
+    void loadJoints(device_list_t* cons_fwd, device_list_t* cons_bwd, std::vector<Joint*>& joints);
     /// Joint module loading
-    void loadJointModule(Device *con_fwd, Device *con_bwd, std::vector<Joint *> &joints);
+    void loadJointModule(Device* con_fwd, Device* con_bwd, std::vector<Joint*>& joints);
 
     /// Set initial conditions
     void setInitConditions(const init_data_t &init_data);

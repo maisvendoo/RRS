@@ -70,21 +70,25 @@ public:
     /// Check is simulation started
     bool isStarted() const;
 
-signals:
-
-    void step(double t, double dt);
-
-    void sendDataToServer(QByteArray data);
-
 public slots:
 
     /// Messages output
     void outMessage(QString msg);
 
+    void deleteFinishedThread();
+
     ///
     void controlProcess();
 
-    void deleteFinishedThread();
+    void receiveSignalsFromControlPanel(const control_signals_t& control_signals);
+
+signals:
+
+    void sendSignalsToControlPanel(feedback_signals_t feedback_signals);
+
+    void sendDataToServer(QByteArray data);
+
+    void step(const simulator_time_t& current_time, const double& integration_time);
 
 private:
 
@@ -132,6 +136,8 @@ private:
 
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
+
+    Vehicle* vehicle_controlled_by_panel = nullptr;
 
     /// Система трафика
     TrafficMachine  *traffic_machine = nullptr;

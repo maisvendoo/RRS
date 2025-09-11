@@ -1,19 +1,21 @@
-#include    "vl60k.h"
+#include    "vl60pk.h"
 
 #include "vl60-signals.h"
 
 #include "alsn-ukbm.h"
 #include "brake-crane.h"
 #include "brake-lock.h"
+#include "brake-mech.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
+#include "epb-2line-control.h"
+#include "epb-converter.h"
 #include "kme-60-044.h"
 #include "loco-crane.h"
 #include "motor-fan-ac.h"
 #include "oscillator.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
-#include "pneumo-splitter.h"
 #include "protective-device.h"
 #include "reservoir.h"
 #include "sl2m.h"
@@ -23,12 +25,12 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60k::stepSignalsOutput(double t, double dt)
+void VL60pk::signalsOutput(const simulator_time_t& t, const double& dt)
 {
-    (void)t;
-    (void)dt;
+    (void) t;
+    (void) dt;
 
-    analogSignal[SERIAL_NUMBER] = 1737.0f;
+    analogSignal[SERIAL_NUMBER] = 1543.0f;
 
     // Вращение колёсных пар
     analogSignal[WHEELSET_1] = static_cast<float>(wheel_rotation_angle[0] / 2.0 / Physics::PI);
@@ -120,11 +122,19 @@ void VL60k::stepSignalsOutput(double t, double dt)
             analogSignal[CAB1_SIGLIGHT_VU1 + d] = static_cast<float>(!motor_fans[MV1]->isReady() || !motor_fans[MV2]->isReady());
             analogSignal[CAB1_SIGLIGHT_VU2 + d] = static_cast<float>(!motor_fans[MV5]->isReady() || !motor_fans[MV6]->isReady());
 
-            analogSignal[CAB1_SIGLIGHT_TR_SME + d] = 0.0f;
-            analogSignal[CAB1_SIGLIGHT_TD_SME + d] = 0.0f;
-            analogSignal[CAB1_SIGLIGHT_0HP_SME + d] = 0.0f;
-            analogSignal[CAB1_SIGLIGHT_VU1_SME + d] = 0.0f;
-            analogSignal[CAB1_SIGLIGHT_VU2_SME + d] = 0.0f;
+            if (brake_lock[cab_idx]->isUnlocked())
+            {
+                analogSignal[CAB1_SIGLIGHT_EPB_CONTROL + d] = static_cast<float>(epb_control->stateReleaseLamp());
+                analogSignal[CAB1_SIGLIGHT_EPB_HOLD + d] = static_cast<float>(epb_control->stateHoldLamp());
+                analogSignal[CAB1_SIGLIGHT_EPB_BRAKE + d] = static_cast<float>(epb_control->stateBrakeLamp());
+            }
+            else
+            {
+                analogSignal[CAB1_SIGLIGHT_EPB_CONTROL + d] = 0.0f;
+                analogSignal[CAB1_SIGLIGHT_EPB_HOLD + d] = 0.0f;
+                analogSignal[CAB1_SIGLIGHT_EPB_BRAKE + d] = 0.0f;
+            }
+            analogSignal[CAB1_EPB_AMPERMETER + d] = static_cast<float>(abs(epb_converter->getOutputCurrent()) / 10.0);
 
             analogSignal[CAB1_SIGLIGHT_FR + d] = phase_spliter->isNotReady();
             analogSignal[CAB1_SIGLIGHT_GU + d] = phase_spliter->isNotReady();
@@ -192,7 +202,7 @@ void VL60k::stepSignalsOutput(double t, double dt)
             analogSignal[CAB1_ENGINE_CURRENT_BWD + d] = static_cast<float>(motor[TED3]->getIa() / 1500.0);
         }
         analogSignal[CAB1_SELSIN_EKG_POS + d] = main_controller->getSelsinPosition();
-        analogSignal[CAB1_PRESSURE_BC + d] = static_cast<float>(bc_splitter->getInputPressure() / 1.0);
+        analogSignal[CAB1_PRESSURE_BC + d] = static_cast<float>(brake_mech[TROLLEY_BWD]->getBCpressure() / 1.0);
         analogSignal[CAB1_PRESSURE_FL + d] = static_cast<float>(main_reservoir->getPressure() / 1.6);
         analogSignal[CAB1_PRESSURE_BP + d] = static_cast<float>(brakepipe->getPressure() / 1.0);
         analogSignal[CAB1_PRESSURE_ER + d] = static_cast<float>(brake_crane[cab_idx]->getERpressure() / 1.0);
@@ -223,6 +233,9 @@ void VL60k::stepSignalsOutput(double t, double dt)
         analogSignal[CAB1_TUMBLER_PANTS + d] = static_cast<float>(pants_tumbler[cab_idx].getState());
         analogSignal[CAB1_RETURN_MAIN_SWITCH + d] = static_cast<float>(gv_return_tumbler[cab_idx].getState());
         analogSignal[CAB1_TUMBLER_MAIN_SWITCH + d] = static_cast<float>(gv_tumbler[cab_idx].getState());
+
+        // Тумблер ЭПТ
+        analogSignal[CAB1_TUMBLER_EPB + d] = static_cast<float>(epb_switch[cab_idx].getState());
 
         // Ближний ряд тумблеров пульта машиниста
         analogSignal[CAB1_TUMBLER_AUTOSAND + d] = static_cast<float>(autosand_tumbler[cab_idx].getState());

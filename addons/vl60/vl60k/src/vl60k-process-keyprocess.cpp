@@ -1,4 +1,4 @@
-#include    "vl60pk.h"
+#include    "vl60k.h"
 
 #include    "key-symbols.h"
 #include    "timer.h"
@@ -8,7 +8,7 @@
 #include "brake-lock.h"
 #include "loco-crane.h"
 #include "pneumo-anglecock.h"
-#include "pneumo-hose-epb.h"
+#include "pneumo-hose.h"
 #include "sanding-system.h"
 #include "train-horn.h"
 
@@ -17,11 +17,8 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::keyProcess()
+void VL60k::keyProcess(const simulator_time_t& t, const double& dt)
 {
-    if (needDebugMsg)
-        debugPrint();
-
     // Сцепные устройства
     oper_rod_fwd->setControl(&pressed_keys);
     oper_rod_bwd->setControl(&pressed_keys);
@@ -47,11 +44,12 @@ void VL60pk::keyProcess()
     // Песочница
     sand_system->setControl(&pressed_keys);
 
-    // Управление тормозным оборудованием в кабинах
-    for (auto cabine_idx : {CAB1, CAB2})
+
+    // Управление оборудованием в кабинах
+    for (auto cab_idx : {CAB1, CAB2})
     {
         // Управляем блокировкой тормозов
-        brake_lock[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+        brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Управляем краном, учитывая возможное наличие внешнего пульта
         // TODO // перенести freejoy во вьювер, его команды передавать по сети,
@@ -59,11 +57,11 @@ void VL60pk::keyProcess()
         if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
         {
             int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
-            brake_crane[cabine_idx]->setHandlePosition(brake_crane_pos);
+            brake_crane[cab_idx]->setHandlePosition(brake_crane_pos);
         }
         else
         {
-            brake_crane[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+            brake_crane[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
         }
 
         // Управляем краном, учитывая возможное наличие внешнего пульта
@@ -75,24 +73,24 @@ void VL60pk::keyProcess()
 
             if (static_cast<bool>(control_signals.analogSignal[CS_RELEASE_VALVE].cur_value))
             {
-                loco_crane[cabine_idx]->release(true);
+                loco_crane[cab_idx]->release(true);
                 pos = -1.0;
             }
             else
             {
-                loco_crane[cabine_idx]->release(false);
+                loco_crane[cab_idx]->release(false);
                 pos = control_signals.analogSignal[CS_LOCO_CRANE].cur_value;
             }
 
-            loco_crane[cabine_idx]->setHandlePosition(pos);
+            loco_crane[cab_idx]->setHandlePosition(pos);
         }
         else
         {
-            loco_crane[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+            loco_crane[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
         }
 
         // Тифон и свисток
-        horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+        horn[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
     }
 
     // Автозапуск
@@ -121,7 +119,7 @@ void VL60pk::keyProcess()
         return;
     }
 
-    // Контроллер машиниста
+    // Контроллер машиниста обрабатываем уже после проверки на невмешательство программы автозапуска
     if (controller[CAB1]->isReversHandle())
     {
         if (controller[CAB2]->isReversHandle())
@@ -215,6 +213,5 @@ void VL60pk::keyProcess()
         rb[cab_idx][RB_1].step();
         rb[cab_idx][RBP].step();
         key_epk[cab_idx].step();
-        epb_switch[cab_idx].step();
     }
 }

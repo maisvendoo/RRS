@@ -32,7 +32,7 @@ public:
 
     ~PassCar();
 
-    void initBrakeDevices(double p0, double pTM, double pFL);
+    void initBrakeDevices(double p0, double pTM, double pFL) override;
 
 private:
 
@@ -92,53 +92,61 @@ private:
     /// Признак включения регистрации
     bool is_Registrator_on = false;
 
-    void initialization();
+
+    /// Чтение конфигурационного файла
+    void loadConfig(QString cfg_path) override;
+
+
+    /// Инициализация
+    void initialization() override;
 
     /// Инициализация сцепных устройств
-    void initCouplings(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initCouplings(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация тормозного оборудования
-    void initBrakesEquipment(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initBrakesEquipment(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация ЭПТ
-    void initEPB(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initEPB(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Инициализация регистратора параметров в лог-файл
-    void initRegistrator(const QString &modules_dir, const QString &custom_cfg_dir);
+    void initRegistrator(const QString& modules_dir, const QString& custom_cfg_dir);
 
-    /// Предварительные расчёты перед симуляцией
-    void preStep(double t);
 
-    /// Предварительный расчёт координат сцепных устройств
-    void preStepCouplings(double t);
-
-    /// Шаг моделирования
-    void step(double t, double dt);
-
-    /// Моделирование сцепных устройств
-    void stepCouplings(double t, double dt);
-
-    /// Моделирование тормозного оборудования
-    void stepBrakesEquipment(double t, double dt);
-
-    /// Моделирование ЭПТ
-    void stepEPB(double t, double dt);
-
-    /// Вывод параметров в лог-файл
-    void stepRegistrator(double t, double dt);
-
-    /// Сигналы для анимации
-    void stepSignalsOutput();
-
-    /// Сигналы для звуков
-    void stepSoundsSignals(double t, double dt);
+    /// Процесс симуляции
+    void process(const simulator_time_t& t, const double& dt) override;
 
     /// Отладочная строка
-    void debugPrint();
+    void debugPrint(const simulator_time_t& t, const double& dt);
 
-    void keyProcess();
+    /// Сигналы для анимации
+    void signalsOutput(const simulator_time_t& t, const double& dt);
 
-    void loadConfig(QString cfg_path);
+    /// Сигналы для озвучки
+    void soundsOutput(const simulator_time_t& t, const double& dt);
+
+
+    /// Предварительные расчёты перед симуляцией
+    void preStep(const double& t) override;
+
+    /// Предварительный расчёт координат сцепных устройств
+    void preStepCouplings(const double& t);
+
+
+    /// Шаг моделирования
+    void step(const double& t, const double& dt) override;
+
+    /// Моделирование сцепных устройств
+    void stepCouplings(const double& t, const double& dt);
+
+    /// Моделирование тормозного оборудования
+    void stepBrakesEquipment(const double& t, const double& dt);
+
+    /// Моделирование ЭПТ
+    void stepEPB(const double& t, const double& dt);
+
+    /// Вывод параметров в лог-файл
+    void stepRegistrator(const double& t, const double& dt);
 };
 
 #endif // PASSCAR_H

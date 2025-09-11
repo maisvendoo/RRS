@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void FreightCar::stepEPB(double t, double dt)
+void FreightCar::stepEPB(const double& t, const double& dt)
 {
     (void) t;
     (void) dt;

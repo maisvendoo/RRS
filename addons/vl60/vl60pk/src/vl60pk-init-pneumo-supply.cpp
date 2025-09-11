@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::initPneumoSupply(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initPneumoSupply(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     (void) modules_dir;
     (void) custom_cfg_dir;

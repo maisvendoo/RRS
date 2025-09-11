@@ -49,7 +49,7 @@ void VL60pk::slotAutoStart()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepPantographsControl(double t, double dt)
+void VL60pk::stepPantographsControl(const double& t, const double& dt)
 {
     // Подъем переднего токоприемника
     bool is_PANT1_ON = (pants_tumbler[CAB1].getState() || pants_tumbler[CAB2].getState()) &&
@@ -74,7 +74,7 @@ void VL60pk::stepPantographsControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepMainSwitchControl(double t, double dt)
+void VL60pk::stepMainSwitchControl(const double& t, const double& dt)
 {
     // Подаем на вход напряжение с крышевой шины, на которую включены
     // оба токоприемника
@@ -98,7 +98,7 @@ void VL60pk::stepMainSwitchControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepTracTransformer(double t, double dt)
+void VL60pk::stepTracTransformer(const double& t, const double& dt)
 {
     // Задаем напряжение на первичной обмотке (с выхода ГВ)
     trac_trans->setU1(main_switch->getU_out());
@@ -110,7 +110,7 @@ void VL60pk::stepTracTransformer(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepPhaseSplitter(double t, double dt)
+void VL60pk::stepPhaseSplitter(const double& t, const double& dt)
 {
     bool is_FR_ON = fr_tumbler[CAB1].getState() || fr_tumbler[CAB2].getState();
     phase_spliter->setU_power(trac_trans->getU_sn() * static_cast<double>(is_FR_ON));
@@ -121,7 +121,7 @@ void VL60pk::stepPhaseSplitter(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepMotorFans(double t, double dt)
+void VL60pk::stepMotorFans(const double& t, const double& dt)
 {
     bool is_MV_ON;
     for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
@@ -136,7 +136,7 @@ void VL60pk::stepMotorFans(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepTractionControl(double t, double dt)
+void VL60pk::stepTractionControl(const double& t, const double& dt)
 {
     for (size_t i : {CAB1, CAB2})
     {
@@ -190,7 +190,7 @@ void VL60pk::stepTractionControl(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepLineContactors(double t, double dt)
+void VL60pk::stepLineContactors(const double& t, const double& dt)
 {
     (void) t;
     (void) dt;
@@ -260,7 +260,7 @@ float VL60pk::isLineContactorsOff()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::stepOtherEquipment(double t, double dt)
+void VL60pk::stepOtherEquipment(const double& t, const double& dt)
 {
     horn[CAB1]->setFLpressure(main_reservoir->getPressure());
     horn[CAB1]->step(t, dt);

@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
-void VL60pk::initBrakesControl(const QString &modules_dir, const QString &custom_cfg_dir)
+void VL60pk::initBrakesControl(const QString& modules_dir, const QString& custom_cfg_dir)
 {
     for (size_t cab_idx : {CAB1, CAB2})
     {

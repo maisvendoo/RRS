@@ -84,6 +84,11 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     start_time = init_data.solver_config.start_time;
     integration_time_interval = init_data.integration_time_interval;
+    if (init_data.start_datetime > 0)
+    {
+        sim_time = simulator_time_t(init_data.start_datetime);
+    }
+    sim_time.simulation_seconds = start_time;
 
     Journal::instance()->info("==== Info to server ====");
     simulator_route_info_t route_info;
@@ -119,7 +124,6 @@ void Model::start()
     if (!isStarted())
     {
         is_simulation_started = true;
-        sim_time.simulation_seconds = start_time;
 
         connect(&simTimer, &ElapsedTimer::process, this, &Model::process, Qt::DirectConnection);
         simTimer.setInterval(static_cast<quint64>(integration_time_interval));
@@ -146,14 +150,6 @@ void Model::outMessage(QString msg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::controlProcess()
-{
-    control_panel->process();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Model::deleteFinishedThread()
 {
     QThread *thread = dynamic_cast<QThread *>(sender());
@@ -162,6 +158,27 @@ void Model::deleteFinishedThread()
 
     Journal::instance()->info(QString("Delete finished thread at address: %1")
                                   .arg(reinterpret_cast<quint64>(thread), 0, 16));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::controlProcess()
+{
+    if (vehicle_controlled_by_panel && control_panel)
+    {
+        emit sendSignalsToControlPanel(vehicle_controlled_by_panel->getFeedBackSignals());
+        control_panel->process();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::receiveSignalsFromControlPanel(const control_signals_t &control_signals)
+{
+    if (vehicle_controlled_by_panel)
+        vehicle_controlled_by_panel->setControlSignals(control_signals);
 }
 
 //------------------------------------------------------------------------------
@@ -403,6 +420,11 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 {
     Journal::instance()->info("==== Command line processing ====");
 
+    if (command_line.start_datetime.is_present)
+    {
+        init_data.start_datetime = command_line.start_datetime.value;
+    }
+
     if (command_line.route_dir.is_present)
     {
         init_data.route_dir_name = command_line.route_dir.value;
@@ -416,17 +438,6 @@ void Model::overrideByCommandLine(init_data_t &init_data,
 
     init_data_t id;
     init_datas.clear();
-
-    if (command_line.route_dir.is_present)
-    {
-        init_data.route_dir_name = command_line.route_dir.value;
-    }
-
-    if (!command_line.train_config.is_present)
-    {
-        Journal::instance()->info("Command line is empty. Apply init_data.xml config");
-        return;
-    }
 
     for (size_t i = 0; i < command_line.train_config.value.size(); ++i)
     {
@@ -522,59 +533,59 @@ void Model::initControlPanel(QString cfg_path)
     if (cfg.load(full_path))
     {
         QString secName = "ControlPanel";
-        QString module_name = "";
 
         bool is_allow = true;
-
         cfg.getBool(secName, "Allow", is_allow);
-
         if (!is_allow)
         {
             return;
         }
 
-        if (!cfg.getString(secName, "Plugin", module_name))
+        int v_idx = 0;
+        cfg.getInt(secName, "Vehicle", v_idx);
+        if ((v_idx < 0) || v_idx >= vehicles.size())
+        {
             return;
+        }
+
+        QString module_name = "";
+        if (!cfg.getString(secName, "Plugin", module_name))
+        {
+            return;
+        }
 
         control_panel = nullptr;
         QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
         control_panel = loadInterfaceDevice(module_path);
-
         if (control_panel == nullptr)
+        {
             return;
+        }
 
         QString config_dir = "";
-
-        if (!cfg.getString(secName, "ConfigDir", config_dir))
-            return;
-
+        cfg.getString(secName, "ConfigDir", config_dir);
         config_dir = QString(fs.toNativeSeparators(config_dir.toStdString()).c_str());
-
-        if (!control_panel->init(QString(fs.getConfigDir().c_str()) + fs.separator() + config_dir))
+        config_dir = QString(fs.getConfigDir().c_str()) + fs.separator() + config_dir;
+        if (!control_panel->init(config_dir))
+        {
             return;
+        }
 
         int request_interval = 0;
-
         if (!cfg.getInt(secName, "RequestInterval", request_interval))
             request_interval = 100;
 
         controlTimer.setInterval(request_interval);
         connect(&controlTimer, &QTimer::timeout, this, &Model::controlProcess);
+        controlTimer.start();
 
-        int v_idx = 0;
-
-        if (!cfg.getInt(secName, "Vehicle", v_idx))
-            v_idx = 0;
-
-        Vehicle *vehicle = trains[0]->getVehicles()->at(static_cast<size_t>(v_idx));
-
-        connect(vehicle, &Vehicle::sendFeedBackSignals,
+        connect(this, &Model::sendSignalsToControlPanel,
                 control_panel, &VirtualInterfaceDevice::receiveFeedback);
 
         connect(control_panel, &VirtualInterfaceDevice::sendControlSignals,
-                vehicle, &Vehicle::getControlSignals);
+                this, &Model::receiveSignalsFromControlPanel);
 
-        controlTimer.start();
+        vehicle_controlled_by_panel = vehicles[v_idx];
     }
 }
 
@@ -898,7 +909,7 @@ void Model::process()
 
     controlStep();
 
-    emit step(sim_time.simulation_seconds, integration_time);
+    emit step(sim_time, integration_time);
 
     // Update server feedback
     tcpFeedBack();

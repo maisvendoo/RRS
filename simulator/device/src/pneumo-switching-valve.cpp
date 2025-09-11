@@ -82,24 +82,30 @@ double SwitchingValve::getOutputFlow() const
 //------------------------------------------------------------------------------
 void SwitchingValve::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(t)
+    (void) t;
 
     if (Y[0] > Physics::ZERO)
     {
         Y[0] = std::min(Y[0], 1.0);
 
-        const double u = Y[0];
-        const double r = 1.0 - u;
-        Y[1] = r * Y[1] + u * pOUT;
+        if (ignore_volume1)
+        {
+            const double u = Y[0];
+            const double r = 1.0 - u;
+            Y[1] = r * Y[1] + u * pOUT;
+        }
         return;
     }
     if (Y[0] < -Physics::ZERO)
     {
         Y[0] = std::max(Y[0], -1.0);
 
-        const double u = -Y[0];
-        const double r = 1.0 - u;
-        Y[2] = r * Y[2] + u * pOUT;
+        if (ignore_volume2)
+        {
+            const double u = -Y[0];
+            const double r = 1.0 - u;
+            Y[2] = r * Y[2] + u * pOUT;
+        }
         return;
     }
 }
@@ -111,7 +117,7 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
                                 state_vector_t &dYdt,
                                 double t)
 {
-    Q_UNUSED(t)
+    (void) t;
 
     // Перемещение клапана
     dYdt[0] = (Y[1] - Y[2]) * A1;
@@ -121,11 +127,11 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
     {
         // Переток через первую камеру
         const double u = Y[0];
-        const double r = 1.0 - u;
+        const double r = ignore_volume1 ? (1.0 - u) : 1.0;
         const double Q1 = r * u * (pOUT - Y[1]) * K1;
 
         dYdt[1] = (r * QIN1 + Q1) / V1;
-        QOUT = u * QIN1 - Q1;
+        QOUT = (ignore_volume1 ? (u * QIN1) : 0.0) - Q1;
 
         // Поток во вторую камеру
         dYdt[2] = QIN2 / V2;
@@ -140,11 +146,11 @@ void SwitchingValve::ode_system(const state_vector_t &Y,
 
         // Переток через вторую камеру
         const double u = -Y[0];
-        const double r = 1.0 - u;
+        const double r = ignore_volume2 ? (1.0 - u) : 1.0;
         const double Q2 = r * u * (pOUT - Y[2]) * K1;
 
         dYdt[2] = (r * QIN2 + Q2) / V1;
-        QOUT = u * QIN2 - Q2;
+        QOUT = (ignore_volume2 ? (u * QIN2) : 0.0) - Q2;
         return;
     }
 
@@ -172,4 +178,7 @@ void SwitchingValve::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "K1", K1);
     cfg.getDouble(secName, "A1", A1);
+
+    cfg.getBool(secName, "IgnoreVolume1", ignore_volume1);
+    cfg.getBool(secName, "IgnoreVolume2", ignore_volume2);
 }

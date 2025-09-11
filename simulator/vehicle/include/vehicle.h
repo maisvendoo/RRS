@@ -20,6 +20,7 @@
 #include    <QtGlobal>
 #include    <mutex>
 
+#include    "datetime.h"
 #include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
@@ -41,12 +42,10 @@
 //------------------------------------------------------------------------------
 class VEHICLE_EXPORT Vehicle : public QObject
 {
-    Q_OBJECT
-
 public:
 
     /// Constructor
-    explicit Vehicle(QObject *parent = nullptr);
+    explicit Vehicle(QObject* parent = nullptr);
     /// Destructor
     virtual ~Vehicle();
 
@@ -105,8 +104,8 @@ public:
     void setWheelAngle(size_t i, double value);
     void setWheelOmega(size_t i, double value);
 
-    void setPrevVehicle(Vehicle *vehicle);
-    void setNextVehicle(Vehicle *vehicle);
+    void setPrevVehicle(Vehicle* vehicle);
+    void setNextVehicle(Vehicle* vehicle);
 
     void setNeedDebugMsg(bool is_needed);
 
@@ -126,7 +125,7 @@ public:
     /// Get vehicle state index
     size_t getStateIndex() const;
 
-    profile_point_t *getProfilePoint();
+    profile_point_t* getProfilePoint();
 
     /// Get orientation
     int getOrientation() const;
@@ -154,36 +153,31 @@ public:
 
     double getWheelOmega(size_t i);
 
-    Vehicle *getPrevVehicle();
-    Vehicle *getNextVehicle();
+    Vehicle* getPrevVehicle();
+    Vehicle* getNextVehicle();
 
     float getAnalogSignal(size_t i);
     std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
 
-    device_list_t *getFwdConnectors();
-    device_list_t *getBwdConnectors();
-    device_coord_list_t *getRailwayConnectors();
-
-    /// Common acceleration calculation
-    virtual state_vector_t getAcceleration(state_vector_t &Y, double t, double dt);
-
-    ///
-    void integrationPreStep(state_vector_t &Y, double t);
-
-    virtual void keyProcess();
-
-    virtual void hardwareProcess();
-
-    ///
-    void integrationStep(state_vector_t &Y, double t, double dt);
-
-    ///
-    void integrationPostStep(state_vector_t &Y, double t);
-
-    QString getDebugMsg() const;
+    device_list_t* getFwdConnectors();
+    device_list_t* getBwdConnectors();
+    device_coord_list_t* getRailwayConnectors();
 
     /// Init vehicle brake devices
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
+
+    /// Common acceleration calculation
+    virtual state_vector_t getAcceleration(state_vector_t& Y, const double& t, const double& dt);
+
+    void integrationProcess(const simulator_time_t& t, const double& dt);
+
+    void integrationPreStep(state_vector_t& Y, const double& t);
+
+    void integrationStep(state_vector_t& Y, const double& t, const double& dt);
+
+    void integrationPostStep(state_vector_t& Y, const double& t);
+
+    QString getDebugMsg() const;
 
     void setUks(double value);
 
@@ -193,13 +187,9 @@ public:
 
     void resetKeyboardControl(const uint8_t& cab_num);
 
-public slots:
+    void setControlSignals(const control_signals_t& control_signals);
 
-    void getControlSignals(control_signals_t control_signals);
-
-signals:
-
-    void sendFeedBackSignals(feedback_signals_t feedback_signals);
+    feedback_signals_t& getFeedBackSignals();
 
 protected:
 
@@ -294,8 +284,8 @@ protected:
     QString DebugMsg = "";
     bool needDebugMsg = false;
 
-    Vehicle *prev_vehicle = nullptr;
-    Vehicle *next_vehicle = nullptr;
+    Vehicle* prev_vehicle = nullptr;
+    Vehicle* next_vehicle = nullptr;
 
     /// Напряжение в КС
     double      Uks = 25000.0;
@@ -335,23 +325,17 @@ protected:
     /// User defined configuration load
     virtual void loadConfig(QString cfg_path);
 
-    /// Add device to forward connectors
-    void addFwdConnector(Device *device);
-    /// Add device to backward connectors
-    void addBwdConnector(Device *device);
-    /// Add device to railway connectors
-    void addRailwayConnector(Device *device, double distance_from_center = 0.0);
+    /// User defined simulation process
+    virtual void process(const simulator_time_t& t, const double& dt);
 
     /// User defined step prepare
-    virtual void preStep(double t);
+    virtual void preStep(const double& t);
 
-    /// Internal ODE integration step
-    virtual void step(double t, double dt);
+    /// User defined ODE integration step
+    virtual void step(const double& t, const double& dt);
 
     /// User define step result processing
-    virtual void postStep(double t);
-
-    virtual void hardwareOutput();
+    virtual void postStep(const double& t);
 
     /// Recalculate coefficients for default main resistant formula
     virtual void mainResistCoeffs();
@@ -361,6 +345,13 @@ protected:
 
     /// Calculate wheel-rail friction coefficient
     virtual double wheelrailFriction(double velocity);
+
+    /// Add device to forward connectors
+    void addFwdConnector(Device* device);
+    /// Add device to backward connectors
+    void addBwdConnector(Device* device);
+    /// Add device to railway connectors
+    void addRailwayConnector(Device* device, double distance_from_center = 0.0);
 
     /* Modkeys extended functions */
 
@@ -400,7 +391,7 @@ typedef Vehicle* (*GetVehicle)();
 //
 //------------------------------------------------------------------------------
 #define GET_VEHICLE(ClassName) \
-    extern "C" Vehicle *getVehicle() \
+    extern "C" Vehicle* getVehicle() \
     {\
         return new (ClassName)(); \
     }
@@ -412,6 +403,6 @@ typedef Vehicle* (*GetVehicle)();
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-extern "C" VEHICLE_EXPORT Vehicle *loadVehicle(QString lib_path);
+extern "C" VEHICLE_EXPORT Vehicle* loadVehicle(QString lib_path);
 
 #endif // VEHICLE_H
