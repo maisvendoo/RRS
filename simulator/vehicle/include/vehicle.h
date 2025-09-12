@@ -167,7 +167,7 @@ public:
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
     /// Common acceleration calculation
-    virtual state_vector_t getAcceleration(state_vector_t& Y, const double& t, const double& dt);
+    virtual void getAcceleration(state_vector_t& Y, state_vector_t &dYdt, double t, double dt);
 
     void integrationProcess(const simulator_time_t& t, const double& dt);
 

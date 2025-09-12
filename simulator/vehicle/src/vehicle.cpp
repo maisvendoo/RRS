@@ -478,7 +478,7 @@ void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-state_vector_t Vehicle::getAcceleration(state_vector_t& Y, const double& t, const double& dt)
+void Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
 {
     (void) t;
 
@@ -570,7 +570,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t& Y, const double& t, cons
             R_wheels_bwd += min(potential_r + tmp_r, potential_f + tmp_f) / rk[i];
 
             // Calculate and apply wheel angle acceleration
-            *a_it = (wheel_a - wheel_r - wheel_f) / J_axis[i];
+            dYdt[state_idx + s + 1 + i] = (wheel_a - wheel_r - wheel_f) / J_axis[i];
         }
     }
 
@@ -625,9 +625,7 @@ state_vector_t Vehicle::getAcceleration(state_vector_t& Y, const double& t, cons
     }
 
     // Vehicle body's acceleration
-    *acceleration.begin() = d * (force_a - force_r) / full_mass;
-
-    return acceleration;
+    dYdt[state_idx + s + 0] = d * (force_a - force_r) / full_mass;
 }
 
 //------------------------------------------------------------------------------

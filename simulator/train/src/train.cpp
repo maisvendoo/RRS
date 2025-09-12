@@ -741,10 +741,11 @@ void Train::calcDerivative(state_vector_t &Y, state_vector_t &dYdt, double t, do
         size_t idx = vehicle->getStateIndex();
         size_t s = vehicle->getDegressOfFreedom();
 
-        state_vector_t a = vehicle->getAcceleration(Y, t, dt);
+        vehicle->getAcceleration(Y, dYdt, t, dt);
 
-        memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
-        memcpy(dYdt.data() + idx + s, a.data(), sizeof(double) * s);
+        //memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
+        //memcpy(dYdt.data() + idx + s, a.data(), sizeof(double) * s);
+        std::memcpy(dYdt.data() + idx, Y.data() + idx + s, sizeof(double) * s);
     }
 }
 
