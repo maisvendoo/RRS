@@ -6,6 +6,7 @@
 #include <vsg/core/ref_ptr.h>
 
 class  CfgReader;
+class  FileSystem;
 struct GUIParams;
 class  QByteArray;
 class  ScreenshotWriter;
@@ -26,6 +27,7 @@ class Group;
 class LookAt;
 class Options;
 class RegionOfInterest;
+class ShaderSet;
 class ShadowSettings;
 class View;
 class Viewer;
@@ -71,7 +73,18 @@ private:
     void initWindow(bool try_screenNum_exception = true);
     void initCamera();
     void initScenegraph();
+
     void initLights();
+    void configureShaders();
+    void loadCustomShader(
+        FileSystem& fs,
+        const std::string& shaders_dir_path,
+        const char* vert_shader_filename,
+        const char* frag_shader_filename,
+        const char* shader_set_name,
+        vsg::ref_ptr<vsg::ShaderSet> shader_set
+    );
+
     void initView();
     void initCommandGraph();
     void initViewer();

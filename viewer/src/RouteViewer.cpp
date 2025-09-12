@@ -402,45 +402,60 @@ void RouteViewer::initScenegraph()
 //------------------------------------------------------------------------------
 void RouteViewer::initLights()
 {
+    configureShaders();
+
+    // Если тени включены, создаём настройки с количеством каскадов
+    if (settings.shadow)
+    {
+        shadowSettings = vsg::HardShadows::create(settings.shadow_cascade);
+
+        // Округляем разрешение карт теней до степени двойки
+        // в разумных пределах от 2^8 (256x256) до 2^16 (65536x65536)
+        int power_of_two = 8;
+        while ((power_of_two < 16)
+               && (settings.shadow_resolution > std::pow(2, power_of_two)))
+        {
+            ++power_of_two;
+        }
+        settings.shadow_resolution = std::pow(2, power_of_two);
+    }
+
+    // Настраиваем область отрисовки теней
+    shadow_region = vsg::RegionOfInterest::create();
+    shadow_region->points.resize(5);
+
+    root->addChild(shadow_region);
+
+    // Освещение
+    sun = Sun::create(lookAt->eye, settings.ambient_intensity, settings.sun_intensity);
+    root->addChild(sun);
+    GUIparams->sun = sun;
+
+    // Настраиваем общее освещение
+    sun->ambient->color = vsg::vec3(settings.ambient_color);
+
+    // Настраиваем солнечное освещение
+    sun->sun->color = vsg::vec3(settings.sun_color);
+    sun->sun->shadowSettings = shadowSettings;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::configureShaders()
+{
     // За основу берём встроенные комплекты вершинного и фрагментного шейдера
-    vsg::ref_ptr<vsg::ShaderSet> flat_shader = vsg::createFlatShadedShaderSet(options);
-    vsg::ref_ptr<vsg::ShaderSet> pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
-    vsg::ref_ptr<vsg::ShaderSet> phong_shader = vsg::createPhongShaderSet(options);
+    auto flat_shader = vsg::createFlatShadedShaderSet(options);
+    auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
+    auto phong_shader = vsg::createPhongShaderSet(options);
 
     // Загружаем свои варианты вершинного и фрагментного шейдера вместо встроенного
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
-    auto load_custom_shader = [&](const char* vert_shader_filename,
-                                  const char* frag_shader_filename,
-                                  const char* shader_set_name,
-                                  vsg::ref_ptr<vsg::ShaderSet> shader_set) {
-        const std::string vert_shader_path = shaders_dir_path + fs.separator() + vert_shader_filename;
-        vsg::ref_ptr<vsg::ShaderStage> vert_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", vert_shader_path, options);
-        const std::string frag_shader_path = shaders_dir_path + fs.separator() + frag_shader_filename;
-        vsg::ref_ptr<vsg::ShaderStage> frag_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", frag_shader_path, options);
-        if (vert_shader_stage && frag_shader_stage)
-        {
-            LOG_INFO("Loaded custom %s shader set: %s, %s", shader_set_name, vert_shader_path.c_str(), frag_shader_path.c_str());
-            shader_set->stages.front() = vert_shader_stage;
-            shader_set->stages.back() = frag_shader_stage;
-
-            // Очищаем все встроенные сохранённые варианты настроек
-            shader_set->variants.clear();
-        }
-        else
-        {
-            if (!vert_shader_stage)
-                LOG_WARN("Fail to load vertex shader: %s", vert_shader_path.c_str());
-            if (!frag_shader_stage)
-                LOG_WARN("Fail to load fragment shader: %s", frag_shader_path.c_str());
-            LOG_INFO("Using default %s shader set", shader_set_name);
-        }
-    };
-
-    load_custom_shader("standard.vert", "standard_flat_shaded.frag", "flat", flat_shader);
-    load_custom_shader("standard.vert", "standard_pbr.frag", "PBR", pbr_shader);
-    load_custom_shader("standard.vert", "standard_phong.frag", "Phong", phong_shader);
+    loadCustomShader(fs, shaders_dir_path, "standard.vert", "standard_flat_shaded.frag", "flat", flat_shader);
+    loadCustomShader(fs, shaders_dir_path, "standard.vert", "standard_pbr.frag", "PBR", pbr_shader);
+    loadCustomShader(fs, shaders_dir_path, "standard.vert", "standard_phong.frag", "Phong", phong_shader);
 
     // Можем по своему настроить стадии графического конвейера
     auto vertexInputState = vsg::VertexInputState::create();
@@ -495,22 +510,28 @@ void RouteViewer::initLights()
 #if 0
     // запись шейдеров в файл
         std::string file;
+
         file = shaders_dir_path + fs.separator() + "~custom_flat.vsgt";
         vsg::write(flat_shader, file, options);
+
         file = shaders_dir_path + fs.separator() + "~custom_pbr.vsgt";
         vsg::write(pbr_shader, file, options);
+
         file = shaders_dir_path + fs.separator() + "~custom_phong.vsgt";
         vsg::write(phong_shader, file, options);
 
         file = shaders_dir_path + fs.separator() + "~default_flat.vsgt";
         vsg::ref_ptr<vsg::ShaderSet> flat_default = vsg::createFlatShadedShaderSet();
         vsg::write(flat_default, file, options);
+
         file = shaders_dir_path + fs.separator() + "~default_pbr.vsgt";
         vsg::ref_ptr<vsg::ShaderSet> pbr_default = vsg::createPhysicsBasedRenderingShaderSet();
         vsg::write(pbr_default, file, options);
+
         file = shaders_dir_path + fs.separator() + "~default_phong.vsgt";
         vsg::ref_ptr<vsg::ShaderSet> phong_default = vsg::createPhongShaderSet();
         vsg::write(phong_default, file, options);
+
         exit(0);
 #endif
 
@@ -519,40 +540,47 @@ void RouteViewer::initLights()
     options->shaderSets["flat"] = flat_shader;
     options->shaderSets["pbr"] = pbr_shader;
     options->shaderSets["phong"] = phong_shader;
+}
 
-    // Если тени включены, создаём настройки с количеством каскадов
-    if (settings.shadow)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadCustomShader(
+    FileSystem& fs,
+    const std::string& shaders_dir_path,
+    const char* vert_shader_filename,
+    const char* frag_shader_filename,
+    const char* shader_set_name,
+    vsg::ref_ptr<vsg::ShaderSet> shader_set
+)
+{
+    auto vert_shader_path = shaders_dir_path + fs.separator() + vert_shader_filename;
+    auto vert_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", vert_shader_path, options);
+
+    auto frag_shader_path = shaders_dir_path + fs.separator() + frag_shader_filename;
+    auto frag_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", frag_shader_path, options);
+
+    if (!vert_shader_stage)
     {
-        shadowSettings = vsg::HardShadows::create(settings.shadow_cascade);
-
-        // Округляем разрешение карт теней до степени двойки
-        // в разумных пределах от 2^8 (256x256) до 2^16 (65536x65536)
-        int power_of_two = 8;
-        while ((power_of_two < 16) &&
-               (settings.shadow_resolution > std::pow(2, power_of_two)))
-        {
-            ++power_of_two;
-        }
-        settings.shadow_resolution = std::pow(2, power_of_two);
+        LOG_WARN("Failed to load vertex shader: %s", vert_shader_path.c_str());
+        LOG_INFO("Using default %s shader set", shader_set_name);
+        return;
     }
 
-    // Настраиваем область отрисовки теней
-    shadow_region = vsg::RegionOfInterest::create();
-    shadow_region->points.resize(5);
+    if (!frag_shader_stage)
+    {
+        LOG_WARN("Failed to load fragment shader: %s", frag_shader_path.c_str());
+        LOG_INFO("Using default %s shader set", shader_set_name);
+        return;
+    }
 
-    root->addChild(shadow_region);
+    LOG_INFO("Loaded custom %s shader set: %s, %s", shader_set_name, vert_shader_path.c_str(), frag_shader_path.c_str());
 
-    // Освещение
-    sun = Sun::create(lookAt->eye, settings.ambient_intensity, settings.sun_intensity);
-    root->addChild(sun);
-    GUIparams->sun = sun;
+    shader_set->stages.front() = vert_shader_stage;
+    shader_set->stages.back() = frag_shader_stage;
 
-    // Настраиваем общее освещение
-    sun->ambient->color = vsg::vec3(settings.ambient_color);
-
-    // Настраиваем солнечное освещение
-    sun->sun->color = vsg::vec3(settings.sun_color);
-    sun->sun->shadowSettings = shadowSettings;
+    // Очищаем все встроенные сохранённые варианты настроек
+    shader_set->variants.clear();
 }
 
 //------------------------------------------------------------------------------
