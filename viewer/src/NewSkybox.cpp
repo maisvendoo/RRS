@@ -119,6 +119,7 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
             {
                 std::memcpy(texture2_data->dataPointer(), stt.texture->dataPointer(), stt.texture->dataSize());
                 texture2_data->dirty();
+
                 stt.state = season_time_texture_t::State::APPEARING;
             }
         }
@@ -126,8 +127,12 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
         {
             if (stt.state != season_time_texture_t::State::ACTIVE)
             {
+                std::memcpy(texture2_data->dataPointer(), stt.texture->dataPointer(), stt.texture->dataSize());
+                texture2_data->dirty();
+
                 mix_value->set(1.0f);
                 mix_value->dirty();
+
                 stt.state = season_time_texture_t::State::ACTIVE;
             }
         }
@@ -137,6 +142,7 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
             {
                 std::memcpy(texture1_data->dataPointer(), stt.texture->dataPointer(), stt.texture->dataSize());
                 texture1_data->dirty();
+
                 stt.state = season_time_texture_t::State::DISAPPEARING;
             }
 
