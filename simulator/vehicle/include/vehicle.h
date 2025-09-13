@@ -297,8 +297,6 @@ protected:
     state_vector_t  Q_a = {0.0, 0.0, 0.0, 0.0, 0.0};
     /// Reactive common forces
     state_vector_t  Q_r = {0.0, 0.0, 0.0, 0.0, 0.0};
-    /// Vehicle common acceleration
-    state_vector_t  acceleration = {0.0, 0.0, 0.0, 0.0, 0.0};
 
     /// Keyboard state
     std::set<uint16_t> pressed_keys = {KEY_Undefined};

@@ -495,12 +495,10 @@ void Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t,
     double R_wheels_bwd = 0.0;
     if (num_axis > 0)
     {
-        auto a_it = acceleration.begin();
         auto Qa_it = Q_a.begin();
         auto Qr_it = Q_r.begin();
         for (size_t i = 0; i < num_axis; ++i)
         {
-            ++a_it;
             ++Qa_it;
             ++Qr_it;
             // Wheel's angular velocity
@@ -1022,10 +1020,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
     Q_r.resize(s);
     Q_r.shrink_to_fit();
     std::fill(Q_r.begin(), Q_r.end(), 0.0);
-
-    acceleration.resize(s);
-    acceleration.shrink_to_fit();
-    std::fill(acceleration.begin(), acceleration.end(), 0.0);
 }
 
 //------------------------------------------------------------------------------
