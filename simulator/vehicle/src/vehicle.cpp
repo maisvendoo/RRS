@@ -478,7 +478,7 @@ void Vehicle::initBrakeDevices(double p0, double pTM, double pFL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t, double dt)
+void Vehicle::getAcceleration(state_vector_t& Y, state_vector_t& dYdt, const double& t, const double& dt)
 {
     (void) t;
 
@@ -507,8 +507,6 @@ void Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t,
             // Wheel's slip velocity
             double slip = w * rk[i] - v;
             double abs_slip = abs(slip);
-            // Reduce friction coefficient between wheel and rail when it slips
-            double psi_slip = psi[i] / (1.0 + abs_slip);
 
             // Active torque
             double wheel_a = *Qa_it;
@@ -535,7 +533,7 @@ void Vehicle::getAcceleration(state_vector_t &Y, state_vector_t &dYdt, double t,
             }
 
             // Friction torque
-            double potential_f = psi_slip * axis_load[i] * rk[i];
+            double potential_f = wheelrailFrictionReducedBySlip(psi[i], abs_slip) * axis_load[i] * rk[i];
             double wheel_f = 0.0;
             if (abs_slip > Physics::ZERO)
             {
@@ -836,21 +834,29 @@ void Vehicle::mainResistCoeffs()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Vehicle::mainResist(double velocity)
+double Vehicle::mainResist(const double& velocity)
 {
     return full_mass * (  W_coef
-                        + W_coef_v * abs(velocity)
+                        + W_coef_v * std::abs(velocity)
                         + W_coef_v2 * velocity * velocity
-                        + W_coef_curv * abs(profile_point_data.curvature)  );
+                        + W_coef_curv * std::abs(profile_point_data.curvature));
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Vehicle::wheelrailFriction(double velocity)
+double Vehicle::wheelrailFriction(const double& velocity)
 {
-    double abs_V = abs(velocity) * Physics::kmh;
+    double abs_V = std::abs(velocity) * Physics::kmh;
     return psi_a + (psi_b / (psi_c + psi_d * abs_V)) + psi_e * abs_V;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::wheelrailFrictionReducedBySlip(const double &psi, const double& slip_velocity)
+{
+    return psi / (1.0 + std::tanh(slip_velocity));
 }
 
 //------------------------------------------------------------------------------

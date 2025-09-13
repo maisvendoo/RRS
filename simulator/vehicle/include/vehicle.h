@@ -167,7 +167,7 @@ public:
     virtual void initBrakeDevices(double p0, double pTM, double pFL);
 
     /// Common acceleration calculation
-    virtual void getAcceleration(state_vector_t& Y, state_vector_t &dYdt, double t, double dt);
+    virtual void getAcceleration(state_vector_t& Y, state_vector_t& dYdt, const double& t, const double& dt);
 
     void integrationProcess(const simulator_time_t& t, const double& dt);
 
@@ -339,10 +339,13 @@ protected:
     virtual void mainResistCoeffs();
 
     /// Calculate main resistant to motion
-    virtual double mainResist(double velocity);
+    virtual double mainResist(const double& velocity);
 
     /// Calculate wheel-rail friction coefficient
-    virtual double wheelrailFriction(double velocity);
+    virtual double wheelrailFriction(const double& velocity);
+
+    /// Calculate reduced wheel-rail friction coefficient when wheel slips
+    virtual double wheelrailFrictionReducedBySlip(const double& psi, const double& slip_velocity);
 
     /// Add device to forward connectors
     void addFwdConnector(Device* device);
