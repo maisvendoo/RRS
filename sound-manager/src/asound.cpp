@@ -104,6 +104,25 @@ ASound::ASound(const ASound& other, LogFileHandler* log, QObject* parent) : QObj
 
     canDo_ = true;
 
+    int32_t i = 0;
+    for (uint64_t size : blockSize_)
+    {
+        if (size > 0)
+        {
+            ++i;
+        }
+    }
+
+    emit notify("T Reusing sound: " + soundName_.toStdString());
+    emit notify("| - Buffer blocks: " + QString::number(i).toStdString());
+
+    for (int j = 0; j < std::min(BUFFER_BLOCKS, i); ++j)
+    {
+        emit notify("| - Block #" + QString::number(j).toStdString()
+                    + " size: " + QString::number(blockSize_[j]).toStdString()
+                    + " (" + QString::number(blockDuration_[j]).toStdString() + " ms)");
+    }
+
     // Генерируем источник
     alGenSources(1, &source_);
     AL_CHECK_ERROR("CANT_GENERATE_SOURCE");

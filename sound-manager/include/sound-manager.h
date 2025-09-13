@@ -25,7 +25,7 @@ public:
 
     /// Загрузка звуков для единицы подвижного состава.
     /// Возвращает список порядковых номеров загруженных звуков
-    std::vector<std::size_t> loadVehicleSounds(const QString& sound_dir);
+    std::vector<std::size_t> loadVehicleSounds(const std::string& sound_dir);
 
     /// Номер управляющего сигнала от единицы подвижного состава для звука #idx
     std::size_t getSignalID(std::size_t idx);

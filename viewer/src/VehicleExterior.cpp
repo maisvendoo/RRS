@@ -197,6 +197,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 //------------------------------------------------------------------------------
 void VehicleExterior::load_sounds(const std::string& sounds_dir, SoundManager* sm)
 {
-    sounds_id = sm->loadVehicleSounds(QString(sounds_dir.c_str()));
+    sounds_id = sm->loadVehicleSounds(sounds_dir);
     LOG_INFO("Loaded %u sounds from %s", sounds_id.size(), sounds_dir.c_str());
 }

@@ -83,10 +83,10 @@ void SoundManager::init()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<size_t> SoundManager::loadVehicleSounds(const QString &sounddir)
+std::vector<size_t> SoundManager::loadVehicleSounds(const std::string& sounddir)
 {
     FileSystem &fs = FileSystem::getInstance();
-    std::string dirPath = fs.getSoundsDir() + fs.separator() + sounddir.toStdString();
+    std::string dirPath = fs.getSoundsDir() + fs.separator() + sounddir;
     std::string cfgPath = dirPath + fs.separator() + "sounds.xml";
 
     log_->notify("Sound Manager: Start loading sounds from " + dirPath + " directory");
@@ -145,7 +145,8 @@ std::vector<size_t> SoundManager::loadSounds(const std::string& dir_path, const 
 
             cfg.getString(secNode, "Filename", sound_config.filename);
 
-            auto found_sound_it = loaded_sounds.find(sound_config.filename.toStdString());
+            const QString sound_name = QString(dir_path.c_str()) + QDir::separator() + sound_config.filename;
+            auto found_sound_it = loaded_sounds.find(sound_name.toStdString());
             if (found_sound_it != loaded_sounds.end())
             {
                 sound_config.sound = new ASound(*found_sound_it->second, log_);
@@ -163,7 +164,6 @@ std::vector<size_t> SoundManager::loadSounds(const std::string& dir_path, const 
             }
             else
             {
-                const QString sound_name = QString(dir_path.c_str()) + QDir::separator() + sound_config.filename;
                 sound_config.sound = new ASound(sound_name, log_);
 
                 const QString tmp_error = sound_config.sound->getLastError();
@@ -180,7 +180,7 @@ std::vector<size_t> SoundManager::loadSounds(const std::string& dir_path, const 
 
                     sounds_id.push_back(sounds.size());
                     sounds.push_back(sound_config);
-                    loaded_sounds.emplace(sound_config.filename.toStdString(), sound_config.sound);
+                    loaded_sounds.emplace(sound_name.toStdString(), sound_config.sound);
                 }
                 else
                 {
