@@ -1,9 +1,11 @@
-#include    "pneumo-shutoff-valve.h"
+#include    "pneumo-combine-crane.h"
+
+#include    "math-funcs.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoShutoffValve::PneumoShutoffValve(QObject *parent) : Device(parent)
+PneumoCombineCrane::PneumoCombineCrane(QObject *parent) : Device(parent)
 {
 
 }
@@ -11,7 +13,7 @@ PneumoShutoffValve::PneumoShutoffValve(QObject *parent) : Device(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoShutoffValve::~PneumoShutoffValve()
+PneumoCombineCrane::~PneumoCombineCrane()
 {
 
 }
@@ -19,39 +21,39 @@ PneumoShutoffValve::~PneumoShutoffValve()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setKeySymbolOpen(std::uint16_t key_symbol)
+void PneumoCombineCrane::setKeySymbolIncrease(std::uint16_t key_symbol)
 {
-    ref_state.setKeySymbolOn(key_symbol);
+    ref_state.setKeySymbolIncrease(key_symbol);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setKeyModifierOpen(std::uint16_t key_modifier)
+void PneumoCombineCrane::setKeyModifierIncrease(std::uint16_t key_modifier)
 {
-    ref_state.setKeyModifierOn(key_modifier);
+    ref_state.setKeyModifierIncrease(key_modifier);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setKeySymbolClose(std::uint16_t key_symbol)
+void PneumoCombineCrane::setKeySymbolDecrease(std::uint16_t key_symbol)
 {
-    ref_state.setKeySymbolOff(key_symbol);
+    ref_state.setKeySymbolDecrease(key_symbol);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setKeyModifierClose(std::uint16_t key_modifier)
+void PneumoCombineCrane::setKeyModifierDecrease(std::uint16_t key_modifier)
 {
-    ref_state.setKeyModifierOff(key_modifier);
+    ref_state.setKeyModifierDecrease(key_modifier);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setControl(std::set<uint16_t>* keys,
+void PneumoCombineCrane::setControl(std::set<uint16_t>* keys,
                                     control_signals_t* control_signals)
 {
     Device::setControl(keys, control_signals);
@@ -61,31 +63,15 @@ void PneumoShutoffValve::setControl(std::set<uint16_t>* keys,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::close()
+void PneumoCombineCrane::setCombineCranePosition(int pos)
 {
-    ref_state.reset();
+    ref_state.setPosition(pos + 1);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::open()
-{
-    ref_state.set();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool PneumoShutoffValve::isOpened() const
-{
-    return is_opened;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoShutoffValve::getHandlePosition() const
+double PneumoCombineCrane::getHandlePosition() const
 {
     return getY(HANDLE_POS);
 }
@@ -93,23 +79,15 @@ double PneumoShutoffValve::getHandlePosition() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setPipePressure(double value)
+void PneumoCombineCrane::setBPpressure(double value)
 {
-    p = value;
+    pBP = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::setDeviceFlow(double value)
-{
-    Q = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoShutoffValve::getPressureToDevice() const
+double PneumoCombineCrane::getCraneBPpressure() const
 {
     return getY(PRESSURE);
 }
@@ -117,66 +95,84 @@ double PneumoShutoffValve::getPressureToDevice() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoShutoffValve::getFlowToPipe() const
+void PneumoCombineCrane::setCraneBPflow(double value)
 {
-    if (is_opened)
-        return Q;
-    return 0.0;
+    Q = value;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-sound_state_t PneumoShutoffValve::getSoundState(size_t idx) const
+double PneumoCombineCrane::getBPflow() const
 {
-    if (idx == DRAIN_FLOW_SOUND)
-        return atm_flow_sound;
+    return QBP;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t PneumoCombineCrane::getSoundState(size_t idx) const
+{
+    if (idx == BP_DRAIN_FLOW_SOUND)
+    {
+        return emergency_flow_sound;
+    }
+
     return ref_state.getSoundState(idx);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float PneumoShutoffValve::getSoundSignal(size_t idx) const
+float PneumoCombineCrane::getSoundSignal(size_t idx) const
 {
-    if (idx == DRAIN_FLOW_SOUND)
-        return atm_flow_sound.createSoundSignal();
+    if (idx == BP_DRAIN_FLOW_SOUND)
+    {
+        return emergency_flow_sound.createSoundSignal();
+    }
+
     return ref_state.getSoundSignal(idx);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::preStep(state_vector_t &Y, double t)
+void PneumoCombineCrane::preStep(state_vector_t &Y, double t)
 {
     (void) t;
 
-    if (Y[HANDLE_POS] > 0.05)
+    if (getY(HANDLE_POS) > 0.5)
     {
-        is_opened = true;
-        Q_atm = 0.0;
-        atm_flow_sound.state = 0;
-        atm_flow_sound.volume = 0.0f;
+        emergency_flow_sound.state = 1;
+        emergency_flow_sound.volume = K_sound * cbrt(abs(QBP));
+
+        QBP = -K_emergency * pBP;
+        return;
+    }
+
+    emergency_flow_sound.state = 0;
+    emergency_flow_sound.volume = 0.0f;
+
+    if (getY(HANDLE_POS) < -0.5)
+    {
+        QBP = 0.0;
     }
     else
     {
-        is_opened = false;
-        Q_atm = K_atm * Y[PRESSURE];
-        atm_flow_sound.state = 1;
-        atm_flow_sound.volume = K_sound * cbrt(Q_atm);
+        QBP = Q;
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::ode_system(const state_vector_t &Y,
+void PneumoCombineCrane::ode_system(const state_vector_t &Y,
                                     state_vector_t &dYdt,
                                     double t)
 {
     (void) t;
 
-    const double ref_pos = static_cast<double>(ref_state.getState());
+    const double ref_pos = static_cast<double>(ref_state.getPosition()) - 1.0;
     const double delta = ref_pos - Y[HANDLE_POS];
     if (abs(delta) > 0.05)
     {
@@ -187,27 +183,23 @@ void PneumoShutoffValve::ode_system(const state_vector_t &Y,
         dYdt[HANDLE_POS] = 20.0 * delta / switch_time;
     }
 
-    if (is_opened)
+    if (abs(Y[HANDLE_POS]) < 0.5)
     {
-        setY(PRESSURE, p);
+        setY(PRESSURE, pBP);
         dYdt[PRESSURE] = 0.0;
     }
     else
     {
-        dYdt[PRESSURE] = (Q - Q_atm) / V0;
+        dYdt[PRESSURE] = QBP / V0;
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::load_config(CfgReader &cfg)
+void PneumoCombineCrane::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
-
-    bool state = false;
-    cfg.getBool(secName, "IsOpened", state);
-    state ? ref_state.set() : ref_state.reset();
 
     double tmp = 0.0;
     cfg.getDouble(secName, "SwitchTime", tmp);
@@ -219,15 +211,15 @@ void PneumoShutoffValve::load_config(CfgReader &cfg)
     if (tmp > 1e-3)
         V0 = tmp;
 
-    cfg.getDouble(secName, "Katm", K_atm);
+    cfg.getDouble(secName, "K_emergency", K_emergency);
 
-    cfg.getDouble(secName, "Ksound", K_sound);
+    cfg.getDouble(secName, "K_sound", K_sound);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoShutoffValve::stepKeysControl(double t, double dt)
+void PneumoCombineCrane::stepKeysControl(double t, double dt)
 {
     ref_state.step(t, dt);
 }

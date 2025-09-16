@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 // Электромагнитный пневматический вентиль
 //------------------------------------------------------------------------------
-class /*DEVICE_EXPORT*/ PneumoElectroValve : public Device
+class DEVICE_EXPORT PneumoElectroValve : public Device
 {
 public:
 

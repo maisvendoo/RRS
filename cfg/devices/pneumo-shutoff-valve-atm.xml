@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Device>
-		<Order>1</Order>
+		<Order>2</Order>
 		<SubStepNum>1</SubStepNum>
 		<Solver>euler</Solver>
 
 		<!-- Начальное состояние разобщительного крана: 0 - закрыт, 1 - открыт -->
 		<IsOpened>1</IsOpened>
 
-		<!-- Время переключения концевого крана, с -->
+		<!-- Время переключения разобщительного крана, с -->
 		<SwitchTime>0.2</SwitchTime>
 
 		<!-- Условный объём труб между разобщительным краном и оборудованием, м^3 -->
