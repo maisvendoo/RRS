@@ -84,8 +84,8 @@ public:
     QString getDebugMsg() const;
 
     ///
-    void setControl(std::set<uint16_t>* keys = nullptr,
-                    control_signals_t* control_signals = nullptr);
+    virtual void setControl(std::set<uint16_t>* keys = nullptr,
+                            control_signals_t* control_signals = nullptr);
 
     ///
     void setFeedbackPointer(feedback_signals_t* feedback_ptr);
