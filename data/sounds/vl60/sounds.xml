@@ -28,7 +28,7 @@
 	<!-- TODO Вставить реверсивку -->
 	<Sound>
 		<SignalID>202</SignalID>
-		<Filename>revers.wav</Filename>
+		<Filename>revers_input.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
@@ -40,7 +40,7 @@
 	<!-- TODO Извлечь реверсивку -->
 	<Sound>
 		<SignalID>203</SignalID>
-		<Filename>revers.wav</Filename>
+		<Filename>revers_output.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
@@ -1115,7 +1115,7 @@
 	<!-- TODO Вставить реверсивку -->
 	<Sound>
 		<SignalID>302</SignalID>
-		<Filename>revers.wav</Filename>
+		<Filename>revers_input.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
@@ -1127,7 +1127,7 @@
 	<!-- TODO Извлечь реверсивку -->
 	<Sound>
 		<SignalID>303</SignalID>
-		<Filename>revers.wav</Filename>
+		<Filename>revers_output.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
 		<InitPitch>1.0</InitPitch>
