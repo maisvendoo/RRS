@@ -10,8 +10,6 @@
 //
 //------------------------------------------------------------------------------
 PneumoHose::PneumoHose(int key_code, QObject *parent) : Device(parent)
-  , keyCode(key_code)
-  , is_ref_state_command(false)
 {
     name = QString("BP");
 
@@ -20,6 +18,10 @@ PneumoHose::PneumoHose(int key_code, QObject *parent) : Device(parent)
 
     std::fill(input_signals.begin(), input_signals.end(), 0.0);
     std::fill(output_signals.begin(), output_signals.end(), 0.0);
+
+    ref_state.setSpringFirst();
+    ref_state.setSpringLast();
+    ref_state.setInitPosition(1);
 }
 
 //------------------------------------------------------------------------------
@@ -33,9 +35,43 @@ PneumoHose::~PneumoHose()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setKeyCode(int key_code)
+void PneumoHose::setKeySymbolConnect(std::uint16_t key_symbol)
 {
-    keyCode = key_code;
+    ref_state.setKeySymbolIncrease(key_symbol);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setKeyModifierConnect(std::uint16_t key_modifier)
+{
+    ref_state.setKeyModifierIncrease(key_modifier);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setKeySymbolDisconnect(std::uint16_t key_symbol)
+{
+    ref_state.setKeySymbolDecrease(key_symbol);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setKeyModifierDisconnect(std::uint16_t key_modifier)
+{
+    ref_state.setKeyModifierDecrease(key_modifier);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setControl(std::set<uint16_t>* keys,
+                                 control_signals_t* control_signals)
+{
+    Device::setControl(keys, control_signals);
+    ref_state.setControl(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
@@ -43,8 +79,10 @@ void PneumoHose::setKeyCode(int key_code)
 //------------------------------------------------------------------------------
 void PneumoHose::connect()
 {
-    output_signals[HOSE_OUTPUT_REF_STATE] = 1.0;
-    is_ref_state_command = true;
+    ref_state.setPosition(2);
+
+    // После вызова команды напрямую на один шаг отключаем управление с клавиатуры
+    ref_state.setControl();
 }
 
 //------------------------------------------------------------------------------
@@ -52,8 +90,10 @@ void PneumoHose::connect()
 //------------------------------------------------------------------------------
 void PneumoHose::disconnect()
 {
-    output_signals[HOSE_OUTPUT_REF_STATE] = -1.0;
-    is_ref_state_command = true;
+    ref_state.setPosition(0);
+
+    // После вызова команды напрямую на один шаг отключаем управление с клавиатуры
+    ref_state.setControl();
 }
 
 //------------------------------------------------------------------------------
@@ -172,22 +212,15 @@ float PneumoHose::getSoundSignal(size_t idx) const
 //------------------------------------------------------------------------------
 void PneumoHose::step(double t, double dt)
 {
-    // Проверяем, вызывались ли методы управления рукавами на данном шаге
-    if (is_ref_state_command)
-    {
-        // Сбрасываем флаг, чтобы обнулить управляющий сигнал на следующем шаге
-        is_ref_state_command = false;
-    }
-    else
-    {
-        // Если не вызывались, обнуляем управляющий сигнал
-        output_signals[HOSE_OUTPUT_REF_STATE] = 0.0f;
-    }
+    ref_state.step(t, dt);
+    output_signals[HOSE_OUTPUT_REF_STATE] = static_cast<double>(ref_state.getPosition()) - 1.0;
+
+    // Возвращаем управление с клавиатуры, на случай если
+    // оно было отключено прямыми вызовами connect()/disconnect()
+    ref_state.setControl(pressed_keys);
 
     atm_flow_sound.state = !isConnected();
     atm_flow_sound.volume = K_sound * cbrt(getFlow());
-
-    Device::step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -200,31 +233,6 @@ void PneumoHose::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(dYdt)
     Q_UNUSED(t)
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PneumoHose::stepKeysControl(double t, double dt)
-{
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
-
-    // Проверяем управляющий сигнал
-    if (getKeyState(keyCode))
-    {
-        if (isShift() && (!isControl()))
-        {
-            // Соединяем рукава
-            connect();
-        }
-        else
-        {
-            if (isControl())
-                // Разъединяем рукава
-                disconnect();
-        }
-    }
 }
 
 //------------------------------------------------------------------------------

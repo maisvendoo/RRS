@@ -8,7 +8,6 @@
 #include "pneumo-anglecock.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
-#include    "key-symbols.h"
 
 //------------------------------------------------------------------------
 //
@@ -57,7 +56,6 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
                 modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_fwd == nullptr)
         hose_bp_fwd = new PneumoHoseEPB();
-    hose_bp_fwd->setKeyCode(KEY_F1);
     hose_bp_fwd->read_config(hose_bp_config);
     forward_connectors.push_back(hose_bp_fwd);
 
@@ -65,7 +63,6 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
                 modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_bwd == nullptr)
         hose_bp_bwd = new PneumoHoseEPB();
-    hose_bp_bwd->setKeyCode(KEY_F4);
     hose_bp_bwd->read_config(hose_bp_config);
     backward_connectors.push_back(hose_bp_bwd);
 }

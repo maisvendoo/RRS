@@ -55,7 +55,7 @@ void PneumoShutoffValve::setControl(std::set<uint16_t>* keys,
                                     control_signals_t* control_signals)
 {
     Device::setControl(keys, control_signals);
-    ref_state.setControl(keys);
+    ref_state.setControl(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
