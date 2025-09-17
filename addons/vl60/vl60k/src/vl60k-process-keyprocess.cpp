@@ -3,12 +3,9 @@
 #include    "key-symbols.h"
 #include    "timer.h"
 
-#include "coupling-operating-rod.h"
 #include "brake-crane.h"
 #include "brake-lock.h"
 #include "loco-crane.h"
-#include "pneumo-anglecock.h"
-#include "pneumo-hose.h"
 #include "sanding-system.h"
 #include "train-horn.h"
 
@@ -19,28 +16,6 @@
 //------------------------------------------------------------------------------
 void VL60k::keyProcess(const simulator_time_t& t, const double& dt)
 {
-    // Сцепные устройства
-    oper_rod_fwd->setControl(&pressed_keys);
-    oper_rod_bwd->setControl(&pressed_keys);
-
-    // Концевые краны и рукава тормозной магистрали
-    anglecock_bp_fwd->setControl(&pressed_keys);
-    anglecock_bp_bwd->setControl(&pressed_keys);
-    hose_bp_fwd->setControl(&pressed_keys);
-    hose_bp_bwd->setControl(&pressed_keys);
-
-    // Концевые краны и рукава питательной магистрали
-    anglecock_fl_fwd->setControl(&pressed_keys);
-    anglecock_fl_bwd->setControl(&pressed_keys);
-    hose_fl_fwd->setControl(&pressed_keys);
-    hose_fl_bwd->setControl(&pressed_keys);
-
-    // Концевые краны и рукава магистрали тормозных цилиндров
-    anglecock_bc_fwd->setControl(&pressed_keys);
-    anglecock_bc_bwd->setControl(&pressed_keys);
-    hose_bc_fwd->setControl(&pressed_keys);
-    hose_bc_bwd->setControl(&pressed_keys);
-
     // Песочница
     sand_system->setControl(&pressed_keys);
 

@@ -419,9 +419,6 @@ private:
     /// Общая инициализация локомотива
     void initialization() override;
 
-    /// Инициализация управления тумблерами
-    void initTumblers(const QString& modules_dir, const QString& custom_cfg_dir);
-
     /// Инициализация сцепных устройств
     void initCouplings(const QString& modules_dir, const QString& custom_cfg_dir);
 
@@ -449,7 +446,11 @@ private:
     /// Инициализация приборов безопасности
     void initSafetyDevices(const QString& modules_dir, const QString& custom_cfg_dir);
 
+    /// Инициализация прочего оборудования
     void initOtherEquipment(const QString& modules_dir, const QString& custom_cfg_dir);
+
+    /// Инициализация управления
+    void initControl(const QString& modules_dir, const QString& custom_cfg_dir);
 
     bool initAutostartProgram(int cab_autostart_request);
 

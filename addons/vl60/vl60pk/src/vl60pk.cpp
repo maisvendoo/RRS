@@ -48,8 +48,6 @@ void VL60pk::initialization()
     Uks = WIRE_VOLTAGE;
     current_kind = 1;
 
-    initTumblers(modules_dir, custom_cfg_dir);
-
     initCouplings(modules_dir, custom_cfg_dir);
 
     initPantographs(modules_dir, custom_cfg_dir);
@@ -71,6 +69,8 @@ void VL60pk::initialization()
     initSafetyDevices(modules_dir, custom_cfg_dir);
 
     initOtherEquipment(modules_dir, custom_cfg_dir);
+
+    initControl(modules_dir, custom_cfg_dir);
 
     autoStartTimer = new Timer(0.5, false);
     connect(autoStartTimer, &Timer::process, this, &VL60pk::slotAutoStart);

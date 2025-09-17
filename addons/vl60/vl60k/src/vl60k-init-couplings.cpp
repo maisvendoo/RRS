@@ -22,8 +22,8 @@ void VL60k::initCouplings(const QString& modules_dir, const QString& custom_cfg_
     backward_connectors.push_back(coupling_bwd);
 
     // Расцепные рычаги
-    oper_rod_fwd = new OperatingRod(KEY_X);
+    oper_rod_fwd = new OperatingRod();
     oper_rod_fwd->read_config("coupling-operating-rod");
-    oper_rod_bwd = new OperatingRod(KEY_C);
+    oper_rod_bwd = new OperatingRod();
     oper_rod_bwd->read_config("coupling-operating-rod");
 }
