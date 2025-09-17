@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoHose::PneumoHose(int key_code, QObject *parent) : Device(parent)
+PneumoHose::PneumoHose(QObject *parent) : Device(parent)
 {
     name = QString("BP");
 
@@ -230,9 +230,9 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
+    (void) Y;
+    (void) dYdt;
+    (void) t;
 }
 
 //------------------------------------------------------------------------------

@@ -95,11 +95,6 @@ void FreightCar::process(const simulator_time_t& t, const double& dt)
     signalsOutput(t, dt);
 
     soundsOutput(t, dt);
-
-    // Сцепные устройства
-    oper_rod_fwd->setControl(&pressed_keys);
-    oper_rod_bwd->setControl(&pressed_keys);
-
 }
 
 //------------------------------------------------------------------------------

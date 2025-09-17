@@ -11,7 +11,7 @@ class DEVICE_EXPORT PneumoHoseEPB : public PneumoHose
 public:
 
     /// Конструктор
-    PneumoHoseEPB(int key_code = 0, QObject *parent = nullptr);
+    PneumoHoseEPB(QObject *parent = nullptr);
 
     /// Деструктор
     ~PneumoHoseEPB();

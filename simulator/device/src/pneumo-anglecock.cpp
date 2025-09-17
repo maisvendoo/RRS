@@ -203,7 +203,8 @@ float PneumoAngleCock::getSoundSignal(size_t idx) const
 //------------------------------------------------------------------------------
 void PneumoAngleCock::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(t)
+    (void) t;
+
     if (Y[HANDLE_POS] < 0.05)
     {
         is_opened = false;
@@ -223,7 +224,7 @@ void PneumoAngleCock::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void PneumoAngleCock::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
 {
-    Q_UNUSED(t)
+    (void) t;
 
     double ref_pos = static_cast<double>(ref_state.getState());
     double delta = ref_pos - Y[HANDLE_POS];

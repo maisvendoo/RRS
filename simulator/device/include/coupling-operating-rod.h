@@ -11,13 +11,13 @@ class DEVICE_EXPORT OperatingRod : public Device
 public:
 
     /// Конструктор
-    OperatingRod(int key_code = 0, QObject *parent = nullptr);
+    OperatingRod(QObject *parent = nullptr);
 
     /// Деструктор
     virtual ~OperatingRod();
 
     /// Задать управляющую клавишу
-    void setKeyCode(int key_code);
+    void setKeySymbol(std::uint16_t key_symbol);
 
     /// Задать усилия в сцепке, Н
     void setCouplingForce(double force);
@@ -32,13 +32,15 @@ public:
 protected:
 
     /// Код управляющей клавиши
-    int keyCode;
+    std::uint16_t keyCode;
 
-    /// Целевое положение рычага: 1.0 - нормальное; -1.0 - расцепляющее
-    double ref_operating_state = 1.0;
+    bool was_keyCode = false;
 
     /// Признак фиксации расцепного рычага в расцепляющем положении
     bool is_fixed_uncoupling = false;
+
+    /// Целевое положение рычага: 1.0 - нормальное; -1.0 - расцепляющее
+    double ref_operating_state = 1.0;
 
     /// Усилие в сцепке
     double coupling_force = 0.0;
@@ -48,8 +50,6 @@ protected:
 
     /// Время движения расцепного рычага между положениями, с
     double motion_time = 0.1;
-
-    bool was_keyCode = false;
 
     void preStep(state_vector_t &Y, double t);
 

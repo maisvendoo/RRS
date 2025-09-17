@@ -13,6 +13,13 @@ void PassCar::initControl(const QString& modules_dir, const QString& custom_cfg_
     (void) modules_dir;
     (void) custom_cfg_dir;
 
+    // Расцепные рычаги
+    oper_rod_fwd->setKeySymbol(KEY_X);
+    oper_rod_fwd->setControl(&pressed_keys);
+
+    oper_rod_bwd->setKeySymbol(KEY_C);
+    oper_rod_bwd->setControl(&pressed_keys);
+
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd->setKeySymbolOpen(KEY_F2);
     anglecock_bp_fwd->setKeyModifierOpen(MODIFIER_OnlyShift);
