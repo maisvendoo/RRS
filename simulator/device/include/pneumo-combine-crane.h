@@ -16,17 +16,17 @@ public:
 
     ~PneumoCombineCrane();
 
-    /// Задать управляющую клавишу для переключения в следующую позицию
-    void setKeySymbolIncrease(std::uint16_t key_symbol);
+    /// Задать управляющую клавишу для переключения по часовой стрелке
+    void setKeySymbolCombineCraneClockwise(std::uint16_t key_symbol);
 
-    /// Задать клавишу-модификатор для переключения в следующую позицию
-    void setKeyModifierIncrease(std::uint16_t key_modifier);
+    /// Задать клавишу-модификатор для переключения по часовой стрелке
+    void setKeyModifierCombineCraneClockwise(std::uint16_t key_modifier);
 
     /// Задать управляющую клавишу для переключения в предыдущую позицию
-    void setKeySymbolDecrease(std::uint16_t key_symbol);
+    void setKeySymbolCombineCraneCounterclockwise(std::uint16_t key_symbol);
 
     /// Задать клавишу-модификатор для переключения в предыдущую позицию
-    void setKeyModifierDecrease(std::uint16_t key_modifier);
+    void setKeyModifierCombineCraneCounterclockwise(std::uint16_t key_modifier);
 
     void setControl(std::set<uint16_t>* keys = nullptr,
                     control_signals_t* control_signals = nullptr) override;
@@ -37,7 +37,7 @@ public:
 
     /// Положение рукоятки комбинированного крана:
     /// -1.0 - положение двойной тяги, 0.0 - поездное положение, 1.0 - экстренное торможение
-    double getHandlePosition() const;
+    double getCombineCraneHandlePosition() const;
 
     /// Задать давление от тормозной магистрали
     void setBPpressure(double value);
@@ -52,9 +52,8 @@ public:
     double getBPflow() const;
 
     enum {
-        NUM_SOUNDS = 2,
         CHANGE_COMB_POS_SOUND = 0,  ///< Звук переключения комбинированного крана
-        BP_DRAIN_FLOW_SOUND = 1,    ///< Звук опорожнения тормозной магистрали
+        BP_DRAIN_FLOW_SOUND = 1     ///< Звук опорожнения тормозной магистрали
     };
     /// Состояние звука
     virtual sound_state_t getSoundState(size_t idx = CHANGE_COMB_POS_SOUND) const override;

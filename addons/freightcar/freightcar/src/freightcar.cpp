@@ -78,6 +78,8 @@ void FreightCar::initialization()
 
     initEPB(modules_dir, custom_cfg_dir);
 
+    initControl(modules_dir, custom_cfg_dir);
+
     if (is_Registrator_on)
         initRegistrator(modules_dir, custom_cfg_dir);
 }
@@ -99,8 +101,6 @@ void FreightCar::process(const simulator_time_t& t, const double& dt)
     oper_rod_bwd->setControl(&pressed_keys);
 
     // Концевые краны и рукава тормозной магистрали
-    anglecock_bp_fwd->setControl(&pressed_keys);
-    anglecock_bp_bwd->setControl(&pressed_keys);
     hose_bp_fwd->setControl(&pressed_keys);
     hose_bp_bwd->setControl(&pressed_keys);
 }

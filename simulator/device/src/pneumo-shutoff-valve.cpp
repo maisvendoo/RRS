@@ -211,7 +211,7 @@ void PneumoShutoffValve::load_config(CfgReader &cfg)
 
     double tmp = 0.0;
     cfg.getDouble(secName, "SwitchTime", tmp);
-    if (tmp > 0.1)
+    if (tmp > 0.01)
         switch_time = tmp;
 
     tmp = 0.0;

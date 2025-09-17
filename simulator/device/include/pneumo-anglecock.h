@@ -12,13 +12,25 @@ class DEVICE_EXPORT PneumoAngleCock : public Device
 public:
 
     /// Конструктор
-    PneumoAngleCock(int key_code = 0, QObject *parent = nullptr);
+    PneumoAngleCock(QObject *parent = nullptr);
 
     /// Деструктор
     virtual ~PneumoAngleCock();
 
-    /// Задать управляющую клавишу
-    void setKeyCode(int key_code);
+    /// Задать управляющую клавишу для открытия крана
+    void setKeySymbolOpen(std::uint16_t key_symbol);
+
+    /// Задать клавишу-модификатор для открытия крана
+    void setKeyModifierOpen(std::uint16_t key_modifier);
+
+    /// Задать управляющую клавишу для закрытия крана
+    void setKeySymbolClose(std::uint16_t key_symbol);
+
+    /// Задать клавишу-модификатор для закрытия крана
+    void setKeyModifierClose(std::uint16_t key_modifier);
+
+    void setControl(std::set<uint16_t>* keys = nullptr,
+                    control_signals_t* control_signals = nullptr) override;
 
     /// Закрыть концевой кран
     void close();
@@ -68,18 +80,19 @@ public:
         CHANGE_SOUND = 0,   ///< Звук переключения концевого крана
         OPEN_SOUND = 1,     ///< Звук открытия концевого крана
         CLOSE_SOUND = 2,    ///< Звук перекрытия концевого крана
-        PIPE_DRAIN_FLOW_SOUND = 3 ///< Звук опорожнения рукава через атмосферное отверстие
+        DRAIN_FLOW_SOUND = 3 ///< Звук опорожнения рукава через атмосферное отверстие
     };
     /// Состояние звука
-    virtual sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const;
+    virtual sound_state_t getSoundState(size_t idx = CHANGE_SOUND) const override;
 
     /// Сигнал состояния звука
-    virtual float getSoundSignal(size_t idx = CHANGE_SOUND) const;
+    virtual float getSoundSignal(size_t idx = CHANGE_SOUND) const override;
 
 protected:
 
-    /// Код управляющей клавиши
-    int keyCode = 0;
+    enum {
+        HANDLE_POS = 0  ///< Y[0] - Положение рукоятки: от 0.0 (закрыт) до 1.0 (открыт)
+    };
 
     /// Время переключения концевого крана, с
     double switch_time = 0.2;
@@ -116,19 +129,19 @@ protected:
     double K_sound = 2.5;
 
     /// Заданное состояние крана: 0 - закрыт, 1 - открыт
-    Trigger ref_state;
+    TriggerControl ref_state;
 
     /// Звук потока опорожнения рукава через атмосферное отверстие
     sound_state_t atm_flow_sound = sound_state_t();
 
-    virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    virtual void preStep(state_vector_t &Y, double t) override;
 
-    virtual void preStep(state_vector_t &Y, double t);
+    virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
 
-    virtual void stepKeysControl(double t, double dt);
+    virtual void stepKeysControl(double t, double dt) override;
 
     /// Загрузка параметров из конфигурационного файла
-    virtual void load_config(CfgReader &cfg);
+    virtual void load_config(CfgReader &cfg) override;
 };
 
 #endif // PNEUMO_ANGLECOCK_H

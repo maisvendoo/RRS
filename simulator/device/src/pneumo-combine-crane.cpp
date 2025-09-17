@@ -21,7 +21,7 @@ PneumoCombineCrane::~PneumoCombineCrane()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoCombineCrane::setKeySymbolIncrease(std::uint16_t key_symbol)
+void PneumoCombineCrane::setKeySymbolCombineCraneClockwise(std::uint16_t key_symbol)
 {
     ref_state.setKeySymbolIncrease(key_symbol);
 }
@@ -29,7 +29,7 @@ void PneumoCombineCrane::setKeySymbolIncrease(std::uint16_t key_symbol)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoCombineCrane::setKeyModifierIncrease(std::uint16_t key_modifier)
+void PneumoCombineCrane::setKeyModifierCombineCraneClockwise(std::uint16_t key_modifier)
 {
     ref_state.setKeyModifierIncrease(key_modifier);
 }
@@ -37,7 +37,7 @@ void PneumoCombineCrane::setKeyModifierIncrease(std::uint16_t key_modifier)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoCombineCrane::setKeySymbolDecrease(std::uint16_t key_symbol)
+void PneumoCombineCrane::setKeySymbolCombineCraneCounterclockwise(std::uint16_t key_symbol)
 {
     ref_state.setKeySymbolDecrease(key_symbol);
 }
@@ -45,7 +45,7 @@ void PneumoCombineCrane::setKeySymbolDecrease(std::uint16_t key_symbol)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoCombineCrane::setKeyModifierDecrease(std::uint16_t key_modifier)
+void PneumoCombineCrane::setKeyModifierCombineCraneCounterclockwise(std::uint16_t key_modifier)
 {
     ref_state.setKeyModifierDecrease(key_modifier);
 }
@@ -71,7 +71,7 @@ void PneumoCombineCrane::setCombineCranePosition(int pos)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoCombineCrane::getHandlePosition() const
+double PneumoCombineCrane::getCombineCraneHandlePosition() const
 {
     return getY(HANDLE_POS);
 }
