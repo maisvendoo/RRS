@@ -222,6 +222,10 @@ void PneumoCombineCrane::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
 
+    int pos = -1;
+    cfg.getInt(secName, "CombineCranePos", pos);
+    setCombineCranePosition(pos);
+
     double tmp = 0.0;
     cfg.getDouble(secName, "SwitchTime", tmp);
     if (tmp > 0.1)
