@@ -1,20 +1,20 @@
 #ifndef     PNEUMO_COMBINE_CRANE_H
 #define     PNEUMO_COMBINE_CRANE_H
 
-#include    "device.h"
-
-class Timer;
+#include    "brake-device.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class DEVICE_EXPORT PneumoCombineCrane : public Device
+class DEVICE_EXPORT PneumoCombineCrane : public BrakeDevice
 {
 public:
 
     PneumoCombineCrane(QObject *parent = nullptr);
 
     ~PneumoCombineCrane();
+
+    void init(double pBP, double pFL) override;
 
     /// Задать управляющую клавишу для переключения по часовой стрелке
     void setKeySymbolCombineCraneClockwise(std::uint16_t key_symbol);
@@ -61,11 +61,11 @@ public:
     /// Сигнал состояния звука
     virtual float getSoundSignal(size_t idx = CHANGE_COMB_POS_SOUND) const override;
 
-private:
+protected:
 
     enum {
-        HANDLE_POS = 0, ///< Y[0] - Положение рукоятки: от 0.0 (закрыт) до 1.0 (открыт)
-        PRESSURE = 1,   ///< Y[1] - Давление для оборудования за комбинированным краном
+        HANDLE_POS = 0, ///< Y[0] - Положение рукоятки: от -1.0 до 1.0
+        PRESSURE_BP = 1,///< Y[1] - Давление для оборудования за комбинированным краном
 
         NUM_POSITIONS = 3   ///< Количество положений у комбинированного крана
     };
@@ -74,36 +74,36 @@ private:
     double switch_time = 0.2;
 
     /// Давление от тормозной магистрали
-    double pBP;
+    double pBP = 0.0;
 
     /// Поток в тормозную магистраль
-    double QBP;
+    double QBP = 0.0;
 
-    /// Поток из оборудования
-    double Q;
+    /// Поток из оборудования к тормозной магистрали
+    double QBPcrane = 0.0;
 
     /// Условный объём труб между комбинированным краном и оборудованием за ним
-    double  V0;
+    double  V0 = 1.0e-3;
 
     /// Коэффициент потока - разрядки ТМ при экстренном торможении
-    double K_emergency;
+    double K_emergency = 0.1;
 
     /// Коэффициент громкости озвучки к потоку разрядки ТМ комбинированным краном
-    double K_sound;
+    double K_sound = 3.0;
 
-    /// Состояние комбинированного крана
+    /// Требуемое состояние комбинированного крана
     SwitcherControl ref_state = SwitcherControl(NUM_POSITIONS);
 
     /// Звук выхода воздуха из ТМ при экстренном торможении
     sound_state_t emergency_flow_sound = sound_state_t();
 
-    void preStep(state_vector_t &Y, double t) override;
+    virtual void preStep(state_vector_t &Y, double t) override;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
+    virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
 
-    void load_config(CfgReader &cfg) override;
+    virtual void load_config(CfgReader &cfg) override;
 
-    void stepKeysControl(double t, double dt) override;
+    virtual void stepKeysControl(double t, double dt) override;
 };
 
 #endif // PNEUMO_COMBINE_CRANE_H

@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PneumoCombineCrane::PneumoCombineCrane(QObject *parent) : Device(parent)
+PneumoCombineCrane::PneumoCombineCrane(QObject *parent) : BrakeDevice(parent)
 {
 
 }
@@ -16,6 +16,16 @@ PneumoCombineCrane::PneumoCombineCrane(QObject *parent) : Device(parent)
 PneumoCombineCrane::~PneumoCombineCrane()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoCombineCrane::init(double pBP, double pFL)
+{
+    (void) pFL;
+    setY(HANDLE_POS, static_cast<double>(ref_state.getPosition()) - 1.0);
+    setY(PRESSURE_BP, pBP);
 }
 
 //------------------------------------------------------------------------------
@@ -89,7 +99,7 @@ void PneumoCombineCrane::setBPpressure(double value)
 //------------------------------------------------------------------------------
 double PneumoCombineCrane::getCraneBPpressure() const
 {
-    return getY(PRESSURE);
+    return getY(PRESSURE_BP);
 }
 
 //------------------------------------------------------------------------------
@@ -97,7 +107,7 @@ double PneumoCombineCrane::getCraneBPpressure() const
 //------------------------------------------------------------------------------
 void PneumoCombineCrane::setCraneBPflow(double value)
 {
-    Q = value;
+    QBPcrane = value;
 }
 
 //------------------------------------------------------------------------------
@@ -141,8 +151,9 @@ void PneumoCombineCrane::preStep(state_vector_t &Y, double t)
 {
     (void) t;
 
-    if (getY(HANDLE_POS) > 0.5)
+    if (Y[HANDLE_POS] > 0.5)
     {
+        // Экстренное торможение комбинированным краном - выпуск воздуха из ТМ
         emergency_flow_sound.state = 1;
         emergency_flow_sound.volume = K_sound * cbrt(abs(QBP));
 
@@ -153,13 +164,16 @@ void PneumoCombineCrane::preStep(state_vector_t &Y, double t)
     emergency_flow_sound.state = 0;
     emergency_flow_sound.volume = 0.0f;
 
-    if (getY(HANDLE_POS) < -0.5)
+    if (Y[HANDLE_POS] > -0.5)
     {
-        QBP = 0.0;
+        // Поездное положение комбинированного крана - пропуск воздуха в ТМ
+        QBP = QBPcrane;
+        Y[PRESSURE_BP] = pBP;
     }
     else
     {
-        QBP = Q;
+        // Комбинированный кран в положении двойной тяги отключает поток воздуха
+        QBP = 0.0;
     }
 }
 
@@ -172,6 +186,7 @@ void PneumoCombineCrane::ode_system(const state_vector_t &Y,
 {
     (void) t;
 
+    // Поворот рукоятки комбинированного крана
     const double ref_pos = static_cast<double>(ref_state.getPosition()) - 1.0;
     const double delta = ref_pos - Y[HANDLE_POS];
     if (abs(delta) > 0.05)
@@ -185,12 +200,15 @@ void PneumoCombineCrane::ode_system(const state_vector_t &Y,
 
     if (abs(Y[HANDLE_POS]) < 0.5)
     {
-        setY(PRESSURE, pBP);
-        dYdt[PRESSURE] = 0.0;
+        // Поездное положение комбинированного крана - оборудование соединено с ТМ,
+        // моделировать условный объём в трубопроводах за краном не нужно
+        dYdt[PRESSURE_BP] = 0.0;
     }
     else
     {
-        dYdt[PRESSURE] = QBP / V0;
+        // Прочие положения комбинированного крана - оборудование отключено от ТМ
+        // и взаимодействует только с условным объёмом в трубопроводах за краном
+        dYdt[PRESSURE_BP] = QBP / V0;
     }
 }
 
