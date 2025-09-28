@@ -7,7 +7,10 @@
 //------------------------------------------------------------------------------
 PneumoCombineCrane::PneumoCombineCrane(QObject *parent) : BrakeDevice(parent)
 {
-
+    setKeySymbolCombineCraneClockwise(KEY_BackSpace);
+    setKeyModifierCombineCraneClockwise(MODIFIER_OnlyShift);
+    setKeySymbolCombineCraneCounterclockwise(KEY_BackSpace);
+    setKeyModifierCombineCraneCounterclockwise(MODIFIER_OnlyControl);
 }
 
 //------------------------------------------------------------------------------

@@ -8,7 +8,8 @@
 //------------------------------------------------------------------------------
 PneumoBrakeLock::PneumoBrakeLock(QObject *parent) : PneumoCombineCrane(parent)
 {
-
+    setKeySymbolChangeLockState(KEY_BackSpace);
+    setKeyModifierChangeLockState(MODIFIER_OnlyAlt);
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +102,19 @@ bool PneumoBrakeLock::isLockHandle() const
 //------------------------------------------------------------------------------
 void PneumoBrakeLock::setStateOn(bool state)
 {
-    ref_lock_state = state;
+    if (state)
+    {
+        insertLockHandle(true);
+
+        if (isLockHandle())
+        {
+            ref_lock_state = true;
+        }
+    }
+    else
+    {
+        ref_lock_state = false;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -347,7 +360,18 @@ void PneumoBrakeLock::ode_system(const state_vector_t &Y,
     }
     else
     {
-        ref_pos = static_cast<double>(ref_lock_state);
+        if (ref_lock_state)
+        {
+            ref_pos = 1.0;
+            // Озвучка
+            lock_state.set();
+        }
+        else
+        {
+            ref_pos = 0.0;
+            // Озвучка
+            lock_state.reset();
+        }
         delta = ref_pos - Y[LOCK_POS];
     }
 
@@ -422,18 +446,7 @@ void PneumoBrakeLock::stepKeysControl(double t, double dt)
         // Переключаем новым нажатием на клавишу
         if (!prev_key)
         {
-            if (ref_lock_state)
-            {
-                ref_lock_state = false;
-            }
-            else
-            {
-                insertLockHandle(true);
-                if (isLockHandle())
-                {
-                    ref_lock_state = true;
-                }
-            }
+            setStateOn(!ref_lock_state);
         }
         prev_key = true; // Запоминаем, что клавиша нажата
     }
