@@ -251,7 +251,7 @@ void PneumoBrakeLock::preStep(state_vector_t &Y, double t)
     is_handle_locked = (pBP > p_lock);
 
     // Убираем рукоятку, когда блокировка выключена
-    if (!ref_lock_state && (Y[LOCK_POS] < 0.01))
+    if (!ref_lock_state && (Y[LOCK_POS] < Physics::ZERO))
     {
         is_lock_handle.reset();
     }

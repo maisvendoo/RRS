@@ -49,11 +49,13 @@ void ProcRotationAnimation::update(float current_signal)
         return;
     }
 
-    angle = interpolate(current_signal);
-
-    if (!infinity)
+    if (infinity)
     {
-        angle = std::clamp(angle, keypoints.front().value, keypoints.back().value);
+        angle = interpolate(current_signal);
+    }
+    else
+    {
+        angle = interpolate(std::clamp(current_signal, keypoints.front().param, keypoints.back().param));
     }
 
     vsg::dmat4 rotate = vsg::rotate(static_cast<double>(vsg::radians(angle)), axis);
