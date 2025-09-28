@@ -25,7 +25,7 @@ class ACMotorFan;
 class AirDistributor;
 class AutoTrainStop;
 class BrakeCrane;
-class BrakeLock;
+class PneumoBrakeLock;
 class BrakeMech;
 class CoilALSN;
 class ControllerKME_60_044;
@@ -280,7 +280,7 @@ private:
     PneumoHose      *hose_fl_bwd = nullptr;
 
     /// Блокировочное устройство УБТ усл.№367м
-    BrakeLock   *brake_lock[CABS_NUM] = {nullptr, nullptr};
+    PneumoBrakeLock *brake_lock[CABS_NUM] = {nullptr, nullptr};
 
     /// Поездной кран машиниста усл.№395
     BrakeCrane  *brake_crane[CABS_NUM] = {nullptr, nullptr};

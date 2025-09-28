@@ -1,10 +1,10 @@
 #include    "vl60pk.h"
 
-#include "brake-lock.h"
 #include "brake-crane.h"
 #include "electro-airdistributor.h"
 #include "epb-2line-control.h"
 #include "epb-converter.h"
+#include "pneumo-brake-lock.h"
 #include "pneumo-hose-epb.h"
 
 //------------------------------------------------------------------------
@@ -27,8 +27,8 @@ void VL60pk::stepEPB(const double& t, const double& dt)
     epb_converter->step(t, dt);
 
     // Контроллер двухпроводного ЭПТ
-    bool cab1_on = brake_lock[CAB1]->isUnlocked() && epb_switch[CAB1].getState();
-    bool cab2_on = brake_lock[CAB2]->isUnlocked() && epb_switch[CAB2].getState();
+    bool cab1_on = brake_lock[CAB1]->isStateOn() && epb_switch[CAB1].getState();
+    bool cab2_on = brake_lock[CAB2]->isStateOn() && epb_switch[CAB2].getState();
     epb_control->setInputVoltage(epb_converter->getOutputVoltage() *
                                  static_cast<double>(cab1_on || cab2_on) );
     epb_control->setHoldState((cab1_on && brake_crane[CAB1]->isHold()) ||

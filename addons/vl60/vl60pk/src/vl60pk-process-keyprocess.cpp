@@ -4,8 +4,8 @@
 #include    "timer.h"
 
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "loco-crane.h"
+#include "pneumo-brake-lock.h"
 #include "sanding-system.h"
 #include "train-horn.h"
 
@@ -19,12 +19,13 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
     // Песочница
     sand_system->setControl(&pressed_keys);
 
+    // Не допускаем двух рукояток в устройствах блокировки тормозов
+    brake_lock[CAB2]->allowLockHandle(!(brake_lock[CAB1]->isLockHandle()));
+    brake_lock[CAB1]->allowLockHandle(!(brake_lock[CAB2]->isLockHandle()));
+
     // Управление тормозным оборудованием в кабинах
     for (auto cabine_idx : {CAB1, CAB2})
     {
-        // Управляем блокировкой тормозов
-        brake_lock[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
-
         // Управляем краном, учитывая возможное наличие внешнего пульта
         // TODO // перенести freejoy во вьювер, его команды передавать по сети,
         // TODO // и также указывая индекс кабины

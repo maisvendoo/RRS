@@ -4,7 +4,6 @@
 
 #include "alsn-ukbm.h"
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "brake-mech.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
@@ -16,6 +15,7 @@
 #include "oscillator.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
+#include "pneumo-brake-lock.h"
 #include "protective-device.h"
 #include "reservoir.h"
 #include "sl2m.h"
@@ -122,7 +122,7 @@ void VL60pk::signalsOutput(const simulator_time_t& t, const double& dt)
             analogSignal[CAB1_SIGLIGHT_VU1 + d] = static_cast<float>(!motor_fans[MV1]->isReady() || !motor_fans[MV2]->isReady());
             analogSignal[CAB1_SIGLIGHT_VU2 + d] = static_cast<float>(!motor_fans[MV5]->isReady() || !motor_fans[MV6]->isReady());
 
-            if (brake_lock[cab_idx]->isUnlocked())
+            if (brake_lock[cab_idx]->isStateOn())
             {
                 analogSignal[CAB1_SIGLIGHT_EPB_CONTROL + d] = static_cast<float>(epb_control->stateReleaseLamp());
                 analogSignal[CAB1_SIGLIGHT_EPB_HOLD + d] = static_cast<float>(epb_control->stateHoldLamp());
@@ -213,9 +213,9 @@ void VL60pk::signalsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_KM_MAIN_HANDLE_POS + d] = controller[cab_idx]->getMainHandlePos();
 
         // Рукоятка УБТ, комбинированный кран, поездной кран, локомотивный кран
-        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isUnlocked());
+        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isStateOn());
         analogSignal[CAB1_UBT_KEY_HANDLE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getMainHandlePosition());
-        analogSignal[CAB1_UBT_COMBINE_CRANE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getCombCranePosition());
+        analogSignal[CAB1_UBT_COMBINE_CRANE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getCombineCraneHandlePosition());
         analogSignal[CAB1_BRAKE_CRANE_HANDLE_POS + d] = static_cast<float>(brake_crane[cab_idx]->getHandlePosition());
         analogSignal[CAB1_LOCO_CRANE_HANDLE_POS + d] = static_cast<float>(loco_crane[cab_idx]->getHandlePosition());
 

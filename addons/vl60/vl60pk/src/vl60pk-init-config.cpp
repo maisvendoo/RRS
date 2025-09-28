@@ -1,8 +1,8 @@
 #include    "vl60pk.h"
 
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "loco-crane.h"
+#include "pneumo-brake-lock.h"
 #include "reservoir.h"
 
 //------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ void VL60pk::load_brakes_config(QString path)
             brake_lock[CAB1]->setCombineCranePosition(tmp_int);
         }
 
-        tmp_int = 0;
+        tmp_int = -1;
         if (cfg.getInt(secName, "CombineCranePosCab2", tmp_int))
         {
             brake_lock[CAB2]->setCombineCranePosition(tmp_int);
@@ -63,14 +63,18 @@ void VL60pk::load_brakes_config(QString path)
         tmp_int = 1;
         if (cfg.getInt(secName, "BrakeLockDeviceCab1", tmp_int))
         {
-            brake_lock[CAB1]->setState(tmp_int);
+            brake_lock[CAB1]->setStateOn(tmp_int);
         }
+        // Не допускаем двух рукояток в устройствах блокировки тормозов
+        brake_lock[CAB2]->allowLockHandle(!(brake_lock[CAB1]->isLockHandle()));
 
         tmp_int = 0;
         if (cfg.getInt(secName, "BrakeLockDeviceCab2", tmp_int))
         {
-            brake_lock[CAB2]->setState(tmp_int);
+            brake_lock[CAB2]->setStateOn(tmp_int);
         }
+        // Не допускаем двух рукояток в устройствах блокировки тормозов
+        brake_lock[CAB1]->allowLockHandle(!(brake_lock[CAB2]->isLockHandle()));
     }
 }
 

@@ -29,6 +29,7 @@ void PneumoCombineCrane::init(double pBP, double pFL)
     (void) pFL;
     setY(HANDLE_POS, static_cast<double>(ref_state.getPosition()) - 1.0);
     setY(PRESSURE_BP, pBP);
+    this->pBP = pBP;
 }
 
 //------------------------------------------------------------------------------

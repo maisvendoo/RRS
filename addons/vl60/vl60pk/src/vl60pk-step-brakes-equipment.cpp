@@ -2,9 +2,9 @@
 
 #include "airdistributor.h"
 #include "automatic-train-stop.h"
-#include "brake-lock.h"
 #include "brake-mech.h"
 #include "electro-airdistributor.h"
+#include "pneumo-brake-lock.h"
 #include "pneumo-anglecock.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"

@@ -27,6 +27,8 @@ void PneumoBrakeLock::init(double pBP, double pFL)
 {
     PneumoCombineCrane::init(pBP, pFL);
 
+    is_handle_locked = (pBP > p_lock);
+
     if (!is_handle_allowed)
     {
         ref_lock_state = false;
@@ -35,6 +37,7 @@ void PneumoBrakeLock::init(double pBP, double pFL)
     setY(LOCK_POS, static_cast<double>(ref_lock_state));
     setY(PRESSURE_FL, pFL);
     setY(PRESSURE_BC, 0.0);
+    this->pFL = pFL;
 }
 
 //------------------------------------------------------------------------------
