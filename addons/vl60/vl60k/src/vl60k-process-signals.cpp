@@ -4,7 +4,6 @@
 
 #include "alsn-ukbm.h"
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
 #include "kme-60-044.h"
@@ -13,6 +12,7 @@
 #include "oscillator.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
+#include "pneumo-brake-lock.h"
 #include "pneumo-splitter.h"
 #include "protective-device.h"
 #include "reservoir.h"
@@ -203,9 +203,9 @@ void VL60k::signalsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_KM_MAIN_HANDLE_POS + d] = controller[cab_idx]->getMainHandlePos();
 
         // Рукоятка УБТ, комбинированный кран, поездной кран, локомотивный кран
-        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isUnlocked());
+        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isStateOn());
         analogSignal[CAB1_UBT_KEY_HANDLE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getMainHandlePosition());
-        analogSignal[CAB1_UBT_COMBINE_CRANE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getCombCranePosition());
+        analogSignal[CAB1_UBT_COMBINE_CRANE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getCombineCraneHandlePosition());
         analogSignal[CAB1_BRAKE_CRANE_HANDLE_POS + d] = static_cast<float>(brake_crane[cab_idx]->getHandlePosition());
         analogSignal[CAB1_LOCO_CRANE_HANDLE_POS + d] = static_cast<float>(loco_crane[cab_idx]->getHandlePosition());
 

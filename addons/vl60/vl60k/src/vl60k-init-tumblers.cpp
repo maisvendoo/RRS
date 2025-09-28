@@ -2,6 +2,7 @@
 
 #include    "key-symbols.h"
 #include    "coupling-operating-rod.h"
+#include    "pneumo-brake-lock.h"
 #include    "pneumo-anglecock.h"
 #include    "pneumo-hose.h"
 
@@ -101,6 +102,9 @@ void VL60k::initControl(const QString& modules_dir, const QString& custom_cfg_di
 
     for (auto cab_idx : {CAB1, CAB2})
     {
+        // Устройство блокировки тормозов усл.№ 367
+        brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+
         // Дальний ряд тумблеров приборной панели машиниста
         // Триггер тумблера "Прожектор яркий"
         spotlight_high_tumbler[cab_idx].setKeySymbolOn(KEY_H);

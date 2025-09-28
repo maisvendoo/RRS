@@ -4,7 +4,6 @@
 
 #include "automatic-train-stop.h"
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
 #include "kme-60-044.h"
@@ -13,6 +12,7 @@
 #include "motor-fan-ac.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
+#include "pneumo-brake-lock.h"
 #include "protective-device.h"
 #include "sanding-system.h"
 #include "sl2m.h"
@@ -43,11 +43,11 @@ void VL60k::soundsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_SOUND_CHANGE_MAIN_POS + d] = controller[cab_idx]->getSoundSignal(ControllerKME_60_044::MAIN_CHANGE_POS_SOUND);
 
         // Устройство блокировки тормозов
-        analogSignal[CAB1_SOUND_INSERT_BRAKE_LOCK_HANDLE + d] = -1.0f /*brake_lock[cab_idx]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND)*/;
-        analogSignal[CAB1_SOUND_REMOVE_BRAKE_LOCK_HANDLE + d] = -1.0f /*brake_lock[cab_idx]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND)*/;
-        analogSignal[CAB1_SOUND_BRAKE_LOCK_CHANGE_LOCK_POS + d] = brake_lock[cab_idx]->getSoundSignal(BrakeLock::CHANGE_LOCK_POS_SOUND);
-        analogSignal[CAB1_SOUND_BRAKE_LOCK_CHANGE_COMB_POS + d] = brake_lock[cab_idx]->getSoundSignal(BrakeLock::CHANGE_COMB_POS_SOUND);
-        analogSignal[CAB1_SOUND_BRAKE_LOCK_BP_DRAIN_FLOW + d] = brake_lock[cab_idx]->getSoundSignal(BrakeLock::BP_DRAIN_FLOW_SOUND);
+        analogSignal[CAB1_SOUND_INSERT_BRAKE_LOCK_HANDLE + d] = brake_lock[cab_idx]->getSoundSignal(PneumoBrakeLock::LOCK_HANDLE_INSERTED);
+        analogSignal[CAB1_SOUND_REMOVE_BRAKE_LOCK_HANDLE + d] = brake_lock[cab_idx]->getSoundSignal(PneumoBrakeLock::LOCK_HANDLE_REMOVED);
+        analogSignal[CAB1_SOUND_BRAKE_LOCK_CHANGE_LOCK_POS + d] = brake_lock[cab_idx]->getSoundSignal(PneumoBrakeLock::LOCK_STATE_CHANGED);
+        analogSignal[CAB1_SOUND_BRAKE_LOCK_CHANGE_COMB_POS + d] = brake_lock[cab_idx]->getSoundSignal(PneumoCombineCrane::CHANGE_COMB_POS_SOUND);
+        analogSignal[CAB1_SOUND_BRAKE_LOCK_BP_DRAIN_FLOW + d] = brake_lock[cab_idx]->getSoundSignal(PneumoCombineCrane::BP_DRAIN_FLOW_SOUND);
 
         // Поездной кран
         analogSignal[CAB1_SOUND_BRAKE_CRANE_CHANGE_POS + d] = brake_crane[cab_idx]->getSoundSignal(BrakeCrane::CHANGE_POS_SOUND);

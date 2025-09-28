@@ -2,9 +2,9 @@
 
 #include "airdistributor.h"
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "brake-mech.h"
 #include "loco-crane.h"
+#include "pneumo-brake-lock.h"
 #include "pneumo-anglecock.h"
 #include "pneumo-hose.h"
 #include "pneumo-splitter.h"

@@ -1,9 +1,9 @@
 #include    "vl60k.h"
 
-#include "brake-lock.h"
 #include "automatic-train-stop.h"
 #include "motor-compressor-ac.h"
 #include "phase-splitter.h"
+#include "pneumo-brake-lock.h"
 #include "pneumo-anglecock.h"
 #include "pneumo-hose.h"
 #include "pressure-regulator.h"

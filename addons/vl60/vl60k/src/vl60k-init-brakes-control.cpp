@@ -3,8 +3,8 @@
 #include    <QDir>
 
 #include "brake-crane.h"
-#include "brake-lock.h"
 #include "loco-crane.h"
+#include "pneumo-brake-lock.h"
 #include "pneumo-anglecock.h"
 #include "pneumo-hose.h"
 #include "pneumo-splitter.h"
@@ -20,7 +20,7 @@ void VL60k::initBrakesControl(const QString& modules_dir, const QString& custom_
     for (size_t cab_idx : {CAB1, CAB2})
     {
         // Блокировочное устройство
-        brake_lock[cab_idx] = new BrakeLock();
+        brake_lock[cab_idx] = new PneumoBrakeLock();
         brake_lock[cab_idx]->read_config("ubt367m");
 
         // Поездной кран машиниста

@@ -1,6 +1,5 @@
 #include    "vl60k.h"
 
-#include "brake-lock.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
 #include "kme-60-044.h"
@@ -9,6 +8,7 @@
 #include "overload-relay.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
+#include "pneumo-brake-lock.h"
 #include "protective-device.h"
 #include "rectifier.h"
 #include "registrator.h"
@@ -143,7 +143,7 @@ void VL60k::stepTractionControl(const double& t, const double& dt)
     }
 
     main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) &&
-                            (brake_lock[CAB1]->isUnlocked() || brake_lock[CAB2]->isUnlocked()));
+                            (brake_lock[CAB1]->isStateOn() || brake_lock[CAB2]->isStateOn()));
     main_controller->setKMstate(controller[CAB1]->getState(), controller[CAB2]->getState());
     main_controller->step(t, dt);
 
