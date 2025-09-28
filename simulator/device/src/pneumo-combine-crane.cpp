@@ -212,7 +212,7 @@ void PneumoCombineCrane::ode_system(const state_vector_t &Y,
     {
         // Прочие положения комбинированного крана - оборудование отключено от ТМ
         // и взаимодействует только с условным объёмом в трубопроводах за краном
-        dYdt[PRESSURE_BP] = QBP / V0;
+        dYdt[PRESSURE_BP] = QBPcrane / V0;
     }
 }
 

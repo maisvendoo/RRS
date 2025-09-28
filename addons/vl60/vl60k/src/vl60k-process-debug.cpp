@@ -189,6 +189,6 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
     }
     else
     {
-        DebugMsg += QString(" EPK off");
+        DebugMsg += QString("EPK off");
     }
 }

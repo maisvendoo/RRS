@@ -203,8 +203,8 @@ void VL60k::signalsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_KM_MAIN_HANDLE_POS + d] = controller[cab_idx]->getMainHandlePos();
 
         // Рукоятка УБТ, комбинированный кран, поездной кран, локомотивный кран
-        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isStateOn());
-        analogSignal[CAB1_UBT_KEY_HANDLE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getMainHandlePosition());
+        analogSignal[CAB1_UBT_IS_KEY_HANDLE + d] = static_cast<float>(brake_lock[cab_idx]->isLockHandle());
+        analogSignal[CAB1_UBT_KEY_HANDLE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getLockHandlePosition());
         analogSignal[CAB1_UBT_COMBINE_CRANE_POS + d] = static_cast<float>(brake_lock[cab_idx]->getCombineCraneHandlePosition());
         analogSignal[CAB1_BRAKE_CRANE_HANDLE_POS + d] = static_cast<float>(brake_crane[cab_idx]->getHandlePosition());
         analogSignal[CAB1_LOCO_CRANE_HANDLE_POS + d] = static_cast<float>(loco_crane[cab_idx]->getHandlePosition());

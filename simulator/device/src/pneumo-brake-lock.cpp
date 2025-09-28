@@ -139,7 +139,7 @@ bool PneumoBrakeLock::isStateLockedByBPpressure() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double PneumoBrakeLock::getMainHandlePosition() const
+double PneumoBrakeLock::getLockHandlePosition() const
 {
     return getY(LOCK_POS);
 }
@@ -344,7 +344,7 @@ void PneumoBrakeLock::ode_system(const state_vector_t &Y,
         {
             ref_pos = 0.2; // Дёргаем - поворот 0.0-0.2 вместо 0.0-1.0
             delta = ref_pos - Y[LOCK_POS];
-            if (delta < 0.01)
+            if (delta < Physics::ZERO)
             {
                 // Когда дёрнули - сбрасываем необходимость переключения
                 ref_lock_state = false;
@@ -354,7 +354,7 @@ void PneumoBrakeLock::ode_system(const state_vector_t &Y,
         {
             ref_pos = 0.8; // Дёргаем - поворот 1.0-0.8 вместо 1.0-0.0
             delta = ref_pos - Y[LOCK_POS];
-            if (delta > 0.01)
+            if (delta > -Physics::ZERO)
             {
                 // Когда дёрнули - сбрасываем необходимость переключения
                 ref_lock_state = true;
@@ -400,7 +400,7 @@ void PneumoBrakeLock::ode_system(const state_vector_t &Y,
         {
             // Прочие положения комбинированного крана - оборудование отключено от ТМ
             // и взаимодействует только с условным объёмом в трубопроводах за блокировкой
-            dYdt[PneumoCombineCrane::PRESSURE_BP] = QBP / V0;
+            dYdt[PneumoCombineCrane::PRESSURE_BP] = QBPcrane / V0;
         }
 
         // Блокировка включена - оборудование подключено к магистралям,
@@ -412,9 +412,9 @@ void PneumoBrakeLock::ode_system(const state_vector_t &Y,
     {
         // Блокировка выключена - оборудование отключено от магистралей
         // и взаимодействует только с условным объёмом в трубопроводах за блокировкой
-        dYdt[PneumoCombineCrane::PRESSURE_BP] = QBP / V0;
-        dYdt[PRESSURE_FL] = QFL / V0;
-        dYdt[PRESSURE_BC] = QBC / V0;
+        dYdt[PneumoCombineCrane::PRESSURE_BP] = QBPcrane / V0;
+        dYdt[PRESSURE_FL] = QFLcrane / V0;
+        dYdt[PRESSURE_BC] = QBCcrane / V0;
     }
 }
 
