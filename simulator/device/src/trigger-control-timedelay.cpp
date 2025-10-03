@@ -81,10 +81,11 @@ bool TriggerControlTimedelay::step(double t, double dt)
         {
             if (!prev_key)
             {
+                prev_key = true; // Запоминаем, что клавиша нажата
+
                 // Команда переключить новым нажатием на клавишу
                 state ? resetAfterDelay() : setAfterDelay();
             }
-            prev_key = true; // Запоминаем, что клавиша нажата
         }
         else
         {

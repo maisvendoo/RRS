@@ -70,13 +70,14 @@ bool TriggerControl::step(double t, double dt)
         {
             if (!prev_key)
             {
+                prev_key = true; // Запоминаем, что клавиша нажата
+
                 // Переключаем новым нажатием на клавишу
                 if (state)
                     return reset();
                 else
                     return set();
             }
-            prev_key = true; // Запоминаем, что клавиша нажата
         }
         else
         {

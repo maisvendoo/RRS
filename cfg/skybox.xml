@@ -73,7 +73,7 @@
 
 	<!-- Зима - день -->
 	<Texture>
-		<Filename>sky_day_snow.bmp</Filename>
+		<Filename>sky_day.bmp</Filename>
 		<SeasonBegin>10-01</SeasonBegin>
 		<SeasonEnd>03-31</SeasonEnd>
 		<TimeAppearBegin>10:00:00</TimeAppearBegin>
@@ -84,7 +84,7 @@
 
 	<!-- Зима - закат -->
 	<Texture>
-		<Filename>sky_sunset_snow.bmp</Filename>
+		<Filename>sky_sunset.bmp</Filename>
 		<SeasonBegin>10-01</SeasonBegin>
 		<SeasonEnd>03-31</SeasonEnd>
 		<TimeAppearBegin>15:00:00</TimeAppearBegin>
@@ -95,7 +95,7 @@
 
 	<!-- Зима - сумерки -->
 	<Texture>
-		<Filename>sky_sunsetTwilight_snow.bmp</Filename>
+		<Filename>sky_sunsetTwilight.bmp</Filename>
 		<SeasonBegin>10-01</SeasonBegin>
 		<SeasonEnd>03-31</SeasonEnd>
 		<TimeAppearBegin>17:00:00</TimeAppearBegin>
@@ -106,7 +106,7 @@
 
 	<!-- Зима - ночь -->
 	<Texture>
-		<Filename>sky_night_snow.bmp</Filename>
+		<Filename>sky_night.bmp</Filename>
 		<SeasonBegin>10-01</SeasonBegin>
 		<SeasonEnd>03-31</SeasonEnd>
 		<TimeAppearBegin>19:00:00</TimeAppearBegin>
@@ -117,7 +117,7 @@
 
 	<!-- Зима - рассвет -->
 	<Texture>
-		<Filename>sky_sunriseDawn_snow.bmp</Filename>
+		<Filename>sky_sunriseDawn.bmp</Filename>
 		<SeasonBegin>10-01</SeasonBegin>
 		<SeasonEnd>03-31</SeasonEnd>
 		<TimeAppearBegin>6:00:00</TimeAppearBegin>
@@ -128,7 +128,7 @@
 
 	<!-- Зима - восход -->
 	<Texture>
-		<Filename>sky_sunrise_snow.bmp</Filename>
+		<Filename>sky_sunrise.bmp</Filename>
 		<SeasonBegin>10-01</SeasonBegin>
 		<SeasonEnd>03-31</SeasonEnd>
 		<TimeAppearBegin>8:00:00</TimeAppearBegin>
