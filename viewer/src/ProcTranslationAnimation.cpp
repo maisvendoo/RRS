@@ -47,28 +47,7 @@ void ProcTranslationAnimation::update(float current_signal)
         return;
     }
 
-    motion = interpolate(current_signal);
-
-    //--------------------------------------------------------------------------
-    // Костыль на случай, если keypoints.front.value() > keypoints.back.value()
-    // (в std::clamp тогда провалится assert)
-    //--------------------------------------------------------------------------
-    // float min, max;
-    // if (keypoints.front().value > keypoints.back().value)
-    // {
-    //     max = keypoints.front().value;
-    //     min = keypoints.back().value;
-    // }
-    // else
-    // {
-    //     max = keypoints.back().value;
-    //     min = keypoints.front().value;
-    // }
-
-    // motion = std::clamp(motion, min, max);
-    //--------------------------------------------------------------------------
-
-    motion = std::clamp(motion, keypoints.front().value, keypoints.back().value);
+    motion = interpolate(std::clamp(current_signal, keypoints.front().param, keypoints.back().param));
 
     vsg::dmat4 translate = vsg::translate(axis * static_cast<double>(motion));
     transform_node->matrix = matrix * translate;
