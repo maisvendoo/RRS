@@ -6,7 +6,7 @@
 		<!-- Цвет источника (RGB, 0.0 - 1.0) -->
 		<Color>1.0 0.8 0.5</Color>
 		<!-- Максимальная яркость -->
-		<MaxIntensity>8.0</MaxIntensity>
+		<MaxIntensity>5.0</MaxIntensity>
 		<!-- Угол внутреннего конуса (до него максимальная яркость), 0 - 90 град. -->
 		<InnerAngle>0.0</InnerAngle>
 		<!-- Угол внешнего конуса (после него нулевая яркость), 0 - 90 град. -->
@@ -26,7 +26,7 @@
 
 	<KeyPoint>
 		<Param>0.5</Param>
-		<Value>0.5</Value>
+		<Value>0.4</Value>
 	</KeyPoint>
 
 	<KeyPoint>
