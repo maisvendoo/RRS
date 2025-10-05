@@ -20,13 +20,13 @@ enum
     PANT1_POS = 101,
     PANT2_POS = 102,
 
-    // Резерв сигналов под поворот тележек в кривых
-    //TROLLEY_FWD_ANGLE = 103,
-    //TROLLEY_BWD_ANGLE = 104,
-
     // Резерв сигналов под штоки ТЦ и рычажные передачи
-    //TROLLEY_FWD_BRAKE_MECH = 105,
-    //TROLLEY_BWD_BRAKE_MECH = 106,
+    //TROLLEY_FWD_BRAKE_MECH = 103,
+    //TROLLEY_BWD_BRAKE_MECH = 104,
+
+    // Поворот часовой и минутной стрелки на скоростемерах
+    TIME_3SL2M_HOUR = 105,
+    TIME_3SL2M_MINUTE = 106,
 
     // Кабина 1
     // Освещение

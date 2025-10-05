@@ -47,6 +47,10 @@ void VL60pk::signalsOutput(const simulator_time_t& t, const double& dt)
     analogSignal[PANT1_POS] = static_cast<float>(pantographs[0]->getHeight());
     analogSignal[PANT2_POS] = static_cast<float>(pantographs[1]->getHeight());
 
+    // Поворот часовой и минутной стрелки на скоростемерах
+    analogSignal[TIME_3SL2M_HOUR] = static_cast<float>(t.time.hour()) + static_cast<float>(t.time.minute()) / 60.0f;
+    analogSignal[TIME_3SL2M_MINUTE] = static_cast<float>(t.time.minute()) + static_cast<float>(t.time.sec()) / 60.0f;
+
     // Кабины
     for (auto cab_idx : {CAB1, CAB2})
     {
