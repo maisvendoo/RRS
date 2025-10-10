@@ -14,39 +14,92 @@ public:
 
     virtual ~AutoTrainStop() = default;
 
-    /// Задать состояние ключа включения-выключения
-    void setKeyOn(bool state) noexcept;
+    /// Задать управляющую клавишу ключа автостопа
+    void setKeySymbol(std::uint16_t key_symbol);
 
-    /// Состояние ключа включения-выключения
-    bool isKeyOn() const noexcept;
+    /// Разрешить установить ключ (для реализации одного ключа на несколько кабин)
+    void allowKey(bool allow);
 
-    /// Задать подачу электропитания
-    void setPowered(bool state) noexcept;
+    /// Разрешение установить ключ (для реализации одного ключа на несколько кабин)
+    bool isKeyAllowed() const;
 
-    /// Наличие электропитания
-    bool isPowered() const noexcept;
+    /// Вставить/извлечь ключ
+    void insertKey(bool insert);
 
-    /// Автостопное экстренное торможение
-    virtual bool getEmergencyBrakeContact() const;
+    /// Признак установленного ключа
+    bool isKey() const;
+
+    /// Переключить ключ: false - отключить автостоп, true - включить автостоп;
+    void setKeyOn(bool state);
+
+    /// Состояние ключа: false - автостоп отключен, true - автостоп включен
+    bool isKeyOn() const;
+
+    /// Задать подачу электропитания на удерживающую катушку
+    void setPowered(bool powered);
+
+    /// Наличие электропитания на удерживающей катушке
+    bool isPowered() const;
 
     /// Задать давление от питательной магистрали
-    void setFLpressure(double value) noexcept;
+    void setFLpressure(double pressure);
 
     /// Поток в питательную магистраль
-    double getFLflow() const noexcept;
+    double getFLflow() const;
 
     /// Задать давление от тормозной магистрали
-    void setBPpressure(double value) noexcept;
+    void setBPpressure(double pressure);
 
     /// Поток в тормозную магистраль
-    double getBPflow() const noexcept;
+    double getBPflow() const;
+
+    /// Задать поток в камеру над срывным клапаном (для реализации КОН)
+    void setFlowAboveFailureValve(double flow);
+
+    /// Давление в камере над срывным клапаном (для реализации КОН)
+    virtual double getPressureAboveFailureValve() const;
+
+    /// Предупреждающий свисток
+    bool isWhistle() const;
+
+    /// Автостопное экстренное торможение
+    bool getEmergencyBrakeContact() const;
+
+    enum {
+        AUTOSTOP_WHISTLE = 0,                           ///< Звук свистка автостопа
+        BP_DRAIN_FLOW_SOUND = 1,                        ///< // TODO // Звук опорожнения тормозной магистрали
+        KEY_CHANGED = 2 + Trigger::CHANGE_SOUND,        ///< Звук установки/извлечения ключа
+        KEY_INSERTED = 2 + Trigger::ON_SOUND,           ///< Звук установки ключа
+        KEY_REMOVED = 2 + Trigger::OFF_SOUND,           ///< Звук извлечения ключа
+        KEY_STATE_CHANGED = 5 + Trigger::CHANGE_SOUND,  ///< Звук поворота ключа
+        KEY_STATE_ON = 5 + Trigger::ON_SOUND,           ///< Звук поворота во включенное положение
+        KEY_STATE_OFF = 5 + Trigger::OFF_SOUND          ///< Звук поворота в выключенное положение
+    };
+    /// Состояние звуков автостопа
+    virtual sound_state_t getSoundState(size_t idx = 0) const override;
+
+    /// Сигнал состояния звуков автостопа
+    virtual float getSoundSignal(size_t idx = 0) const override;
 
 protected:
-    /// Наличие электропитания
-    double is_powered = 0.0;
 
-    /// Состояние ключа включения-выключения
-    double is_key_on = 0.0;
+    /// Управляющая клавиша ключа
+    std::uint16_t key_symbol = KEY_Undefined;
+
+    /// Предыдущее состояние управляющей клавиши
+    bool prev_key = false;
+
+    /// Разрешение установить ключ (для реализации одного ключа на несколько кабин)
+    bool is_key_allowed = true;
+
+    /// Наличие электропитания
+    bool is_powered = false;
+
+    /// Признак работы предупреждающего свистка
+    bool is_whistle = false;
+
+    /// Автостопное экстренное торможение
+    bool is_emergency_brake = false;
 
     /// Давление питательной магистрали
     double pFL = 0.0;
@@ -57,6 +110,17 @@ protected:
     double QFL = 0.0;
     /// Поток в тормозную магистраль
     double QBP = 0.0;
+
+    /// Поток в камеру над срывным клапаном
+    double Qabove_failure_valve = 0.0;
+
+    /// Признак установленного ключа
+    Trigger is_key = Trigger();
+
+    /// Состояние ключа: false - отключено, true - включено
+    Trigger key_state = Trigger();
+
+    virtual void stepKeysControl(double t, double dt) override;
 };
 
 //------------------------------------------------------------------------------

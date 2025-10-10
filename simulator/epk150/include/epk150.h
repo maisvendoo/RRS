@@ -30,57 +30,49 @@ public:
 
     ~AutoTrainStopEPK150();
 
-    void init(double pBP, double pFL);
+    void init(double pBP, double pFL) override;
 
-    bool getEmergencyBrakeContact() const;
-
-    /// Состояние звука свистка ЭПК
-    virtual sound_state_t getSoundState(size_t idx = 0) const;
-
-    /// Сигнал состояния звука свистка ЭПК
-    virtual float getSoundSignal(size_t idx = 0) const;
+    double getPressureAboveFailureValve() const override;
 
 private:
 
-    /// Постоянная времени срабатывание электромеханической части (катушки)
-    double T1;
+    enum {
+        COIL_FORCE = 0,             ///< Y[0] - Усилие от катушки ЭПК
+        P_ABOVE_FAILURE_VALVE = 1,  ///< Y[1] - Давление над срывным клапаном
+        P_TIME_DELAY = 2            ///< Y[2] - Давление в камере выдержки времени
+    };
+
+    /// Постоянная времени срабатывания электромеханической части (катушки)
+    double T1 = 0.1;
 
     /// Усилие от диафрагмы плунжера
-    double pd;
+    double pd = 0.2;
 
     /// Усилие, развиваемое электромагнитом катушки
-    double pk;
+    double pk = 0.4;
 
     /// Усилие от ключа
-    double p_key;
+    double p_key = 10.0;
 
     /// Усилие пружины срывного клапана
-    double ps1;
+    double ps1 = 0.1;
 
     /// Усилие от пружины мембраны камеры выдежки времени
-    double ps2;
+    double ps2 = 0.15;
 
     /// Объем камеры над срывным клапаном
-    double V1;
+    double V1 = 1.0e-4;
 
     /// Объем камеры выдержки времени
-    double V2;
-
-    /// Признак экстренного торможения
-    bool is_emergency_brake;
-
-    /// Признак работы свистка
-    double is_whistle_on;
+    double V2 = 1.0e-3;
 
     std::array<double, MAX_FLOW_COEFFS> K;
 
-    std::array<double, MAX_GIAN_COEFFS> k;
+    std::array<double, MAX_GIAN_COEFFS> A;
 
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
+    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
 
-    void load_config(CfgReader &cfg);
-
-    void stepKeysControl(double t, double dt);
+    void load_config(CfgReader &cfg) override;
 };
 
 #endif // EPK150_H

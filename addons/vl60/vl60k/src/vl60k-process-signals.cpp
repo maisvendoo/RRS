@@ -3,6 +3,7 @@
 #include "vl60-signals.h"
 
 #include "alsn-ukbm.h"
+#include "automatic-train-stop.h"
 #include "brake-crane.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
@@ -213,8 +214,8 @@ void VL60k::signalsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_LOCO_CRANE_HANDLE_POS + d] = static_cast<float>(loco_crane[cab_idx]->getHandlePosition());
 
         // ЭПК
-        analogSignal[CAB1_AUTOSTOP_SHUTOFF_POS + d] = 1.0f;
-        analogSignal[CAB1_AUTOSTOP_KEY_POS + d] = static_cast<float>(key_epk[cab_idx].getState());
+        analogSignal[CAB1_AUTOSTOP_IS_KEY + d] = static_cast<float>(epk[cab_idx]->isKey());
+        analogSignal[CAB1_AUTOSTOP_KEY_POS + d] = static_cast<float>(epk[cab_idx]->isKeyOn());
 
         // Дальний ряд тумблеров пульта машиниста
         analogSignal[CAB1_TUMBLER_SPOTLIGHT_HIGH + d] = static_cast<float>(spotlight_high_tumbler[cab_idx].getState());

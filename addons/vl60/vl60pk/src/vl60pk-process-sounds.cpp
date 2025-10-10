@@ -63,7 +63,7 @@ void VL60pk::soundsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_SOUND_LOCO_CRANE_BC_DRAIN_FLOW + d] = loco_crane[cab_idx]->getSoundSignal(LocoCrane::BC_DRAIN_FLOW_SOUND);
 
         // ЭПК
-        analogSignal[CAB1_SOUND_AUTOSTOP_WHISTLE + d] = epk[cab_idx]->getSoundSignal();
+        analogSignal[CAB1_SOUND_AUTOSTOP_WHISTLE + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::AUTOSTOP_WHISTLE);
 
         // Дальний ряд тумблеров приборной панели машиниста
         analogSignal[CAB1_SOUND_TUMBLER_PROJECTOR2_ON + d] = spotlight_high_tumbler[cab_idx].getSoundSignal(Trigger::ON_SOUND);
@@ -105,7 +105,9 @@ void VL60pk::soundsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_SOUND_TUMBLER_P_ALSN_CHECK_ON + d] = P_ALSN_check_tumbler[cab_idx].getSoundSignal(Trigger::ON_SOUND);
         analogSignal[CAB1_SOUND_TOOGLE_P_BUFFERCOLOR_L_UP + d] = P_buffercolor_L_toogle[cab_idx].getSoundSignal(Trigger::ON_SOUND);
         analogSignal[CAB1_SOUND_TOOGLE_P_BUFFERCOLOR_R_UP + d] = P_buffercolor_R_toogle[cab_idx].getSoundSignal(Trigger::ON_SOUND);
-        analogSignal[CAB1_SOUND_EPK_ON + d] = key_epk[cab_idx].getSoundSignal(Trigger::ON_SOUND);
+
+        analogSignal[CAB1_SOUND_EPK_INSERT_KEY + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::KEY_INSERTED);
+        analogSignal[CAB1_SOUND_EPK_KEY_ON + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::KEY_STATE_ON);
 
         // Скоростемер
         analogSignal[CAB1_SOUND_SPEED_METER_SL2M + d] = speed_meter[cab_idx]->getSoundSignal();
@@ -150,7 +152,9 @@ void VL60pk::soundsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_SOUND_TUMBLER_P_ALSN_CHECK_OFF + d] = P_ALSN_check_tumbler[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
         analogSignal[CAB1_SOUND_TOOGLE_P_BUFFERCOLOR_L_DOWN + d] = P_buffercolor_L_toogle[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
         analogSignal[CAB1_SOUND_TOOGLE_P_BUFFERCOLOR_R_DOWN + d] = P_buffercolor_R_toogle[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
-        analogSignal[CAB1_SOUND_EPK_OFF + d] = key_epk[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
+
+        analogSignal[CAB1_SOUND_EPK_REMOVE_KEY + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::KEY_REMOVED);
+        analogSignal[CAB1_SOUND_EPK_KEY_OFF + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::KEY_STATE_OFF);
     }
 
     // Звуки в движении

@@ -171,7 +171,7 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
         triggers.push_back(&mv_tumblers[autostart_cab][i]);
 
     triggers.push_back(&cu_tumbler[autostart_cab]);
-    triggers.push_back(&key_epk[autostart_cab]);
-    triggers.push_back(&rb[autostart_cab][RBS]);
+/*    triggers.push_back(&key_epk[autostart_cab]);
+    triggers.push_back(&rb[autostart_cab][RBS]);*/
     return true;
 }

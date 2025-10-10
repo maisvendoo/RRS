@@ -7,60 +7,117 @@
 //------------------------------------------------------------------------------
 AutoTrainStop::AutoTrainStop(QObject* parent) : BrakeDevice(parent)
 {
+    setKeySymbol(KEY_N);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setKeyOn(bool state) noexcept
+void AutoTrainStop::setKeySymbol(std::uint16_t key_symbol)
 {
-    is_key_on = static_cast<double>(state);
+    this->key_symbol = key_symbol;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AutoTrainStop::isKeyOn() const noexcept
+void AutoTrainStop::allowKey(bool allow)
 {
-    return static_cast<bool>(is_key_on);
+    is_key_allowed = allow;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setPowered(bool state) noexcept
+bool AutoTrainStop::isKeyAllowed() const
 {
-    is_powered = static_cast<double>(state);
+    return is_key_allowed;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AutoTrainStop::isPowered() const noexcept
+void AutoTrainStop::insertKey(bool insert)
 {
-    return static_cast<bool>(is_powered);
+    insert = insert && is_key_allowed;
+
+    if (insert)
+    {
+        is_key.set();
+    }
+    else
+    {
+        if (!isKeyOn())
+        {
+            is_key.reset();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool AutoTrainStop::getEmergencyBrakeContact() const
+bool AutoTrainStop::isKey() const
 {
-    return false;
+    return is_key.getState();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setFLpressure(double value) noexcept
+void AutoTrainStop::setKeyOn(bool state)
 {
-    pFL = value;
+    if (state)
+    {
+//        insertKey(true);
+
+        if (isKey())
+        {
+            key_state.set();
+        }
+    }
+    else
+    {
+        key_state.reset();
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AutoTrainStop::getFLflow() const noexcept
+bool AutoTrainStop::isKeyOn() const
+{
+    return key_state.getState();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutoTrainStop::setPowered(bool powered)
+{
+    is_powered = powered;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AutoTrainStop::isPowered() const
+{
+    return is_powered;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutoTrainStop::setFLpressure(double pressure)
+{
+    pFL = pressure;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double AutoTrainStop::getFLflow() const
 {
     return QFL;
 }
@@ -68,17 +125,131 @@ double AutoTrainStop::getFLflow() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutoTrainStop::setBPpressure(double value) noexcept
+void AutoTrainStop::setBPpressure(double pressure)
 {
-    pBP = value;
+    pBP = pressure;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double AutoTrainStop::getBPflow() const noexcept
+double AutoTrainStop::getBPflow() const
 {
     return QBP;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutoTrainStop::setFlowAboveFailureValve(double flow)
+{
+    Qabove_failure_valve = flow;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double AutoTrainStop::getPressureAboveFailureValve() const
+{
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AutoTrainStop::isWhistle() const
+{
+    return is_whistle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AutoTrainStop::getEmergencyBrakeContact() const
+{
+    return is_emergency_brake;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t AutoTrainStop::getSoundState(size_t idx) const
+{
+    if (idx == AUTOSTOP_WHISTLE)
+    {
+        return sound_state_t(is_whistle);
+    }
+    if (idx == BP_DRAIN_FLOW_SOUND)
+    {
+        // TODO //
+        return sound_state_t(false);
+    }
+    if (idx >= 5)
+    {
+        return key_state.getSoundState(idx - 5);
+    }
+    return is_key.getSoundState(idx - 2);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float AutoTrainStop::getSoundSignal(size_t idx) const
+{
+    if (idx == AUTOSTOP_WHISTLE)
+    {
+        return sound_state_t::createSoundSignal(is_whistle);
+    }
+    if (idx == BP_DRAIN_FLOW_SOUND)
+    {
+        // TODO //
+        return sound_state_t::createSoundSignal(false);
+    }
+    if (idx >= 5)
+    {
+        return key_state.getSoundSignal(idx - 5);
+    }
+    return is_key.getSoundSignal(idx - 2);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutoTrainStop::stepKeysControl(double t, double dt)
+{
+    if (::getKeyState(pressed_keys, key_symbol))
+    {
+        // Управляем новым нажатием на клавишу
+        if (!prev_key)
+        {
+            prev_key = true; // Запоминаем, что клавиша нажата
+
+            // Alt - вставляем/извлекаем ключ
+            if (isModifier(pressed_keys, MODIFIER_OnlyAlt))
+            {
+                insertKey(!isKey());
+                return;
+            }
+
+            // Ctrl - отключаем ключ
+            if (isModifier(*pressed_keys, MODIFIER_OnlyControl))
+            {
+                setKeyOn(false);
+                return;
+            }
+
+            // Shift - включаем ключ
+            if (isModifier(*pressed_keys, MODIFIER_OnlyShift))
+            {
+                setKeyOn(true);
+                return;
+            }
+        }
+    }
+    else
+    {
+        prev_key = false; // Запоминаем, что клавиша отпущена
+    }
 }
 
 //------------------------------------------------------------------------------

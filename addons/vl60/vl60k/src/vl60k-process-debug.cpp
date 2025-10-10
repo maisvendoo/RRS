@@ -54,7 +54,7 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
         DebugMsg += QString("NO REVERS HANDLE|");
     }
 
-    if (key_epk[CAB1].getState())
+    if (epk[CAB1]->isKeyOn())
     {
         if (safety_device[CAB1]->getEPKstate())
         {
@@ -161,7 +161,7 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
         DebugMsg += QString("NO REVERS HANDLE|");
     }
 
-    if (key_epk[CAB2].getState())
+    if (epk[CAB2]->isKeyOn())
     {
         if (safety_device[CAB2]->getEPKstate())
         {

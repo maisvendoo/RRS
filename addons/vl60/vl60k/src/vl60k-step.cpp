@@ -1,5 +1,6 @@
 #include    "vl60k.h"
 
+#include "automatic-train-stop.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
 #include "kme-60-044.h"
@@ -211,7 +212,7 @@ void VL60k::stepLineContactors(const double& t, const double& dt)
     bool is_BP_released = brakepipe->getPressure() > 0.3;
 
     bool is_H6_ON = (cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState())  &&
-                    (key_epk[CAB1].getState() || key_epk[CAB2].getState()) &&
+                    (epk[CAB1]->isKeyOn() || epk[CAB2]->isKeyOn()) &&
                     is_BP_released &&
                     (revers_state != 0) &&
                     (!is_KM_ZERO) &&

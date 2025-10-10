@@ -187,7 +187,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         }
         rb[cab_idx][RB_1].step();
         rb[cab_idx][RBP].step();
-        key_epk[cab_idx].step();
+//        key_epk[cab_idx].step();
         epb_switch[cab_idx].step();
     }
 }
