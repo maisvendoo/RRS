@@ -316,12 +316,5 @@ void VL60k::initControl(const QString& modules_dir, const QString& custom_cfg_di
         rb[cab_idx][RBP].setKeySymbolOff(KEY_Undefined);
         rb[cab_idx][RBP].setKeyModifierOff(KEY_Undefined);
         rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
-/*
-        // Ключ ЭПК
-        key_epk[cab_idx].setKeySymbolOn(KEY_N);
-        key_epk[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        key_epk[cab_idx].setKeySymbolOff(KEY_N);
-        key_epk[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        key_epk[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
     }
 }

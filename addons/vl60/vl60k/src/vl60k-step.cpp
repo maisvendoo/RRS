@@ -27,22 +27,38 @@ void VL60k::slotAutoStart()
 {
     if (start_count < triggers.size())
     {
-        triggers[start_count]->set();
-
-        if (!pantographs[0]->isUp() && !pantographs[1]->isUp() &&
-                (triggers[start_count] == &gv_tumbler[autostart_cab]))
+        if ((triggers[start_count] == &gv_tumbler[autostart_cab]) &&
+            !pantographs[0]->isUp() && !pantographs[1]->isUp())
+        {
             return;
+        }
 
         if (main_switch->getState())
+        {
             gv_return_tumbler[autostart_cab].reset();
+        }
 
+        if ((triggers[start_count] == &rb[autostart_cab][RBS]) &&
+            !epk[autostart_cab]->isKeyOn())
+        {
+            epk[autostart_cab]->setKeyOn(true);
+            return;
+        }
+
+        triggers[start_count]->set();
         start_count++;
     }
     else
     {
         autoStartTimer->stop();
-        controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
         start_count = 0;
+        controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
+
+        controller[autostart_cab]->setControl(&pressed_keys_by_cabine[autostart_cab]);
+        brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
     }
 }
 

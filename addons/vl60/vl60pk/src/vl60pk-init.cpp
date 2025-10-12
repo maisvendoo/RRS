@@ -1,5 +1,6 @@
 #include    "vl60pk.h"
 
+#include "automatic-train-stop.h"
 #include "dc-motor.h"
 #include "ekg-8g.h"
 #include "kme-60-044.h"
@@ -8,6 +9,7 @@
 #include "overload-relay.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
+#include "pneumo-brake-lock.h"
 #include "protective-device.h"
 #include "rectifier.h"
 #include "relay.h"
@@ -146,20 +148,33 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
     if (autoStartTimer->isStarted())
         return false;
 
-    if ((cab_autostart_request == CAB1) && (controller[CAB2]->isReversHandle()))
-        return false;
-
-    if ((cab_autostart_request == CAB2) && (controller[CAB1]->isReversHandle()))
-        return false;
-
     if ((cab_autostart_request != CAB1) && (cab_autostart_request != CAB2))
+        return false;
+
+    if (controller[(cab_autostart_request == CAB1) ? CAB2 : CAB1]->isReversHandle())
+        return false;
+
+    if (!brake_lock[cab_autostart_request]->isLockHandleAllowed())
+        return false;
+
+    if (!epk[cab_autostart_request]->isKeyAllowed())
         return false;
 
     autostart_cab = cab_autostart_request;
     controller[autostart_cab]->insertReversHandle(true);
+    brake_lock[autostart_cab]->setStateOn(true);
+    epk[autostart_cab]->insertKey(true);
+
+    controller[CAB1]->setControl();
+    controller[CAB2]->setControl();
+    brake_lock[CAB1]->setControl();
+    brake_lock[CAB2]->setControl();
+    epk[CAB1]->setControl();
+    epk[CAB2]->setControl();
 
     start_count = 0;
     triggers.clear();
+    triggers.reserve(15);
     triggers.push_back(&pants_tumbler[autostart_cab]);
     triggers.push_back(&pant2_tumbler[autostart_cab]);
     triggers.push_back(&gv_tumbler[autostart_cab]);
@@ -171,7 +186,9 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
         triggers.push_back(&mv_tumblers[autostart_cab][i]);
 
     triggers.push_back(&cu_tumbler[autostart_cab]);
-/*    triggers.push_back(&key_epk[autostart_cab]);
-    triggers.push_back(&rb[autostart_cab][RBS]);*/
+
+    if (!epk[autostart_cab]->isKeyOn())
+        triggers.push_back(&rb[autostart_cab][RBS]);
+
     return true;
 }

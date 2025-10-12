@@ -58,7 +58,7 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
     {
         if (safety_device[CAB1]->getEPKstate())
         {
-            DebugMsg += QString("EPK on|");
+            DebugMsg += QString("EPK:on|");
             DebugMsg += QString("limit %1km/h(%2km/h|%3m)|")
                             .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0)
                             .arg(speedmap_fwd->getNextLimit(), 3, 'f', 0)
@@ -67,9 +67,9 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
         else
         {
             if (epk[CAB1]->getEmergencyBrakeContact())
-                DebugMsg += QString("EPK EMERGENCY |");
+                DebugMsg += QString("EPK:EMERGENCY |");
             else
-                DebugMsg += QString("EPK  WHISTLE  |");
+                DebugMsg += QString("EPK: WHISTLE  |");
 
             DebugMsg += QString("limit %1km/h|")
                             .arg(speedmap_fwd->getCurrentLimit(), 3, 'f', 0);
@@ -82,7 +82,14 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
     }
     else
     {
-        DebugMsg += QString("EPK off");
+        if (epk[CAB1]->isKey())
+        {
+            DebugMsg += QString("EPK:OFF");
+        }
+        else
+        {
+            DebugMsg += QString("EPK:NO KEY");
+        }
     }
 
     DebugMsg += QString("\n");
@@ -165,7 +172,7 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
     {
         if (safety_device[CAB2]->getEPKstate())
         {
-            DebugMsg += QString(" EPK on|");
+            DebugMsg += QString("EPK:on|");
             DebugMsg += QString("limit %1km/h(%2km/h|%3m)|")
                             .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0)
                             .arg(speedmap_bwd->getNextLimit(), 3, 'f', 0)
@@ -174,9 +181,9 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
         else
         {
             if (epk[CAB2]->getEmergencyBrakeContact())
-                DebugMsg += QString(" EPK EMERGENCY |");
+                DebugMsg += QString("EPK:EMERGENCY |");
             else
-                DebugMsg += QString(" EPK  WHISTLE  |");
+                DebugMsg += QString("EPK: WHISTLE  |");
 
             DebugMsg += QString("limit %1km/h|")
                             .arg(speedmap_bwd->getCurrentLimit(), 3, 'f', 0);
@@ -189,6 +196,13 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
     }
     else
     {
-        DebugMsg += QString("EPK off");
+        if (epk[CAB2]->isKey())
+        {
+            DebugMsg += QString("EPK:OFF");
+        }
+        else
+        {
+            DebugMsg += QString("EPK:NO KEY");
+        }
     }
 }

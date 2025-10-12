@@ -3,6 +3,7 @@
 #include    "key-symbols.h"
 #include    "timer.h"
 
+#include "automatic-train-stop.h"
 #include "brake-crane.h"
 #include "loco-crane.h"
 #include "pneumo-brake-lock.h"
@@ -22,6 +23,10 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
     // Не допускаем двух рукояток в устройствах блокировки тормозов
     brake_lock[CAB2]->allowLockHandle(!(brake_lock[CAB1]->isLockHandle()));
     brake_lock[CAB1]->allowLockHandle(!(brake_lock[CAB2]->isLockHandle()));
+
+    // Не допускаем двух ключей в электропневматических клапанах автостопа
+    epk[CAB2]->allowKey(!(epk[CAB1]->isKey()));
+    epk[CAB1]->allowKey(!(epk[CAB2]->isKey()));
 
     // Управление тормозным оборудованием в кабинах
     for (auto cabine_idx : {CAB1, CAB2})
@@ -71,26 +76,18 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
     // Автозапуск
     if (autoStartTimer->isStarted())
     {
-        controller[CAB1]->setControl();
-        controller[CAB2]->setControl();
         return;
     }
 
     if (getKeyState(KEY_R, CAB1) && isAlt(CAB1) && initAutostartProgram(CAB1))
     {
         autoStartTimer->start();
-
-        controller[CAB1]->setControl();
-        controller[CAB2]->setControl();
         return;
     }
 
     if (getKeyState(KEY_R, CAB2) && isAlt(CAB2) && initAutostartProgram(CAB2))
     {
         autoStartTimer->start();
-
-        controller[CAB1]->setControl();
-        controller[CAB2]->setControl();
         return;
     }
 
@@ -187,7 +184,6 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         }
         rb[cab_idx][RB_1].step();
         rb[cab_idx][RBP].step();
-//        key_epk[cab_idx].step();
         epb_switch[cab_idx].step();
     }
 }

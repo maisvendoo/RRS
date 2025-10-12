@@ -1,5 +1,6 @@
 #include    "vl60k.h"
 
+#include "automatic-train-stop.h"
 #include "brake-crane.h"
 #include "loco-crane.h"
 #include "pneumo-brake-lock.h"
@@ -75,6 +76,58 @@ void VL60k::load_brakes_config(QString path)
         }
         // Не допускаем двух рукояток в устройствах блокировки тормозов
         brake_lock[CAB1]->allowLockHandle(!(brake_lock[CAB2]->isLockHandle()));
+
+        tmp_int = 1;
+        if (cfg.getInt(secName, "EPKCab1", tmp_int))
+        {
+            switch (tmp_int) {
+            case 2:
+            {
+                epk[CAB1]->insertKey(true);
+                epk[CAB1]->setKeyOn(true);
+                break;
+            }
+            case 1:
+            {
+                epk[CAB1]->insertKey(true);
+                epk[CAB1]->setKeyOn(false);
+                break;
+            }
+            case 0:
+            default:
+            {
+                epk[CAB1]->insertKey(false);
+                break;
+            } }
+        }
+        // Не допускаем двух ключей в электропневматических клапанах автостопа
+        epk[CAB2]->allowKey(!(epk[CAB1]->isKey()));
+
+        tmp_int = 0;
+        if (cfg.getInt(secName, "EPKCab2", tmp_int))
+        {
+            switch (tmp_int) {
+            case 2:
+            {
+                epk[CAB2]->insertKey(true);
+                epk[CAB2]->setKeyOn(true);
+                break;
+            }
+            case 1:
+            {
+                epk[CAB2]->insertKey(true);
+                epk[CAB2]->setKeyOn(false);
+                break;
+            }
+            case 0:
+            default:
+            {
+                epk[CAB2]->insertKey(false);
+                break;
+            } }
+        }
+        // Не допускаем двух ключей в электропневматических клапанах автостопа
+        epk[CAB1]->allowKey(!(epk[CAB2]->isKey()));
     }
 }
 

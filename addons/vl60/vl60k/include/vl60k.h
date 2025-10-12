@@ -217,10 +217,7 @@ private:
 
     /// Триггеры рукояток бдительности
     TriggerControl rb[CABS_NUM][NUM_RB];
-/*
-    /// Ключ ЭПК
-    TriggerControl key_epk[CABS_NUM];
-*/
+
     enum
     {
         NUM_PANTOGRAPHS = 2,

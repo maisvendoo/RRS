@@ -26,5 +26,10 @@
 		<CombineCranePosCab1>0</CombineCranePosCab1>
 		<CombineCranePosCab2>-1</CombineCranePosCab2>
 
+		<!-- Ключ электропневматического клапана автостопа
+		( 0 - извлечён, 1 - вставлен, ЭПК выключен, 2 - вставлен, ЭПК включён -->
+		<EPKCab1>1</EPKCab1>
+		<EPKCab2>0</EPKCab2>
+
 	</BrakesState>
 </Config>
