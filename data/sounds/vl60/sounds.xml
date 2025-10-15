@@ -25,7 +25,7 @@
 		<LocalPosition>0.8 8.6 4.6</LocalPosition>
 	</Sound>
 
-	<!-- TODO Вставить реверсивку -->
+	<!-- Вставить реверсивку -->
 	<Sound>
 		<SignalID>202</SignalID>
 		<Filename>revers_input.wav</Filename>
@@ -37,7 +37,7 @@
 		<LocalPosition>0.3 9.0 2.6</LocalPosition>
 	</Sound>
 
-	<!-- TODO Извлечь реверсивку -->
+	<!-- Извлечь реверсивку -->
 	<Sound>
 		<SignalID>203</SignalID>
 		<Filename>revers_output.wav</Filename>
@@ -652,9 +652,21 @@
 		<LocalPosition>-1.05 9.25 2.90</LocalPosition>
 	</Sound>
 
-	<!-- Ключ ЭПК вкл. -->
+	<!-- TODO Ключ ЭПК вставить -->
 	<Sound>
 		<SignalID>254</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 8.2 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК вкл. -->
+	<Sound>
+		<SignalID>255</SignalID>
 		<Filename>epk_vkl.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -1075,9 +1087,21 @@
 		<LocalPosition>-1.05 9.25 2.90</LocalPosition>
 	</Sound>
 
-	<!-- Ключ ЭПК выкл. -->
+	<!-- TODO Ключ ЭПК извлечь -->
 	<Sound>
 		<SignalID>294</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 8.2 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК выкл. -->
+	<Sound>
+		<SignalID>295</SignalID>
 		<Filename>epk_vkl.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>

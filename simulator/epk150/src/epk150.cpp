@@ -110,7 +110,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
     dYdt[COIL_FORCE] = ( static_cast<double>(is_powered) * pk * u1 - Y[COIL_FORCE] ) / T1;
 
     // Поток в камеру над срывным клапаном
-    dYdt[P_ABOVE_FAILURE_VALVE] = (Q_bp_1 - Q_1_atm) / V1;
+    dYdt[P_ABOVE_FAILURE_VALVE] = (Qabove_failure_valve + Q_bp_1 - Q_1_atm) / V1;
 
     // Поток в камеру выдержки времени
     dYdt[P_TIME_DELAY] = (Q_fl_2 - Q_2_atm) / V2;
