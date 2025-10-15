@@ -191,7 +191,7 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
 {
     Q_UNUSED(t)
 
-    if (getKeyState(KEY_Semicolon))
+    if (getKeyState(pressed_keys, KEY_Semicolon))
     {
         if (!decTimer->isStarted())
             decTimer->start();
@@ -201,11 +201,11 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
         decTimer->stop();
 
         // Возврат ручки из сверхзарядки в поездное
-        if ( (handle_pos == POS_I) && !(isAlt() && getKeyState(KEY_1)) )
+        if ( (handle_pos == POS_I) && !(isModifier(pressed_keys, MODIFIER_Alt) && getKeyState(pressed_keys, KEY_1)) )
             setHandlePosition(POS_II);
     }
 
-    if (getKeyState(KEY_Quote))
+    if (getKeyState(pressed_keys, KEY_Quote))
     {
         if (!incTimer->isStarted())
             incTimer->start();
@@ -218,39 +218,39 @@ void BrakeCrane130::stepKeysControl(double t, double dt)
     incTimer->step(t, dt);
     decTimer->step(t, dt);
 
-    if (isAlt())
+    if (isModifier(pressed_keys, MODIFIER_OnlyAlt))
     {
-        if (getKeyState(KEY_1))
+        if (getKeyState(pressed_keys, KEY_1))
         {
             setHandlePosition(POS_I);
         }
 
-        if (getKeyState(KEY_2))
+        if (getKeyState(pressed_keys, KEY_2))
         {
             setHandlePosition(POS_II);
         }
 
-        if (getKeyState(KEY_3))
+        if (getKeyState(pressed_keys, KEY_3))
         {
             setHandlePosition(POS_III);
         }
 
-        if (getKeyState(KEY_4))
+        if (getKeyState(pressed_keys, KEY_4))
         {
             setHandlePosition(POS_IV);
         }
 
-        if (getKeyState(KEY_5))
+        if (getKeyState(pressed_keys, KEY_5))
         {
             setHandlePosition(POS_Va);
         }
 
-        if (getKeyState(KEY_6))
+        if (getKeyState(pressed_keys, KEY_6))
         {
             setHandlePosition(POS_V);
         }
 
-        if (getKeyState(KEY_7))
+        if (getKeyState(pressed_keys, KEY_7))
         {
             setHandlePosition(POS_VI);
         }

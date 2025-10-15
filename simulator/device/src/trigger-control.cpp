@@ -92,16 +92,16 @@ bool TriggerControl::step(double t, double dt)
     // проверяем новое нажатие на клавишу
     if (key_symbol_off == key_symbol_on)
     {
-        if (getKeyState(*pressed_keys, key_symbol_on))
+        if (getKeyState(pressed_keys, key_symbol_on))
         {
             if (!prev_key)
             {
-                if (isModifier(*pressed_keys, key_modifier_off))
+                if (isModifier(pressed_keys, key_modifier_off))
                 {
                     prev_key = true; // Запоминаем, что клавиша нажата
                     return reset(); // Отключаем триггер новым нажатием на клавишу
                 }
-                if (isModifier(*pressed_keys, key_modifier_on))
+                if (isModifier(pressed_keys, key_modifier_on))
                 {
                     prev_key = true; // Запоминаем, что клавиша нажата
                     return set(); // Включаем триггер новым нажатием на клавишу
@@ -116,11 +116,11 @@ bool TriggerControl::step(double t, double dt)
     }
 
     // Обычная логика в режиме тумблер
-    if ((getKeyState(*pressed_keys, key_symbol_off) && isModifier(*pressed_keys, key_modifier_off)))
+    if ((getKeyState(pressed_keys, key_symbol_off) && isModifier(pressed_keys, key_modifier_off)))
     {
         return reset(); // Отключаем триггер
     }
-    if ((getKeyState(*pressed_keys, key_symbol_on) && isModifier(*pressed_keys, key_modifier_on)))
+    if ((getKeyState(pressed_keys, key_symbol_on) && isModifier(pressed_keys, key_modifier_on)))
     {
         return set(); // Включаем триггер
     }

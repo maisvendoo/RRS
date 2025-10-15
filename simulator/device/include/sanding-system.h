@@ -14,6 +14,9 @@ public:
 
     virtual ~SandingSystem();
 
+    /// Задать управляющую клавишу
+    void setKeySymbol(std::uint16_t key_symbol);
+
     /// Задать состояние подачи песка
     void setSandDeliveryOn(bool state);
 
@@ -55,32 +58,35 @@ public:
 
 protected:
 
+    /// Код управляющей клавиши
+    std::uint16_t key_symbol_operate = KEY_Undefined;
+
     /// Состояние подачи песка
-    bool is_sand;
+    bool is_sand = false;
 
     /// Максимальная вместимость бункера для песка, кг
-    double sand_mass_max;
+    double sand_mass_max = 2000.0;
 
     /// Номинальный расход песка, кг/мин
-    double sand_flow_nom;
+    double sand_flow_nom = 2.0;
 
     /// Расход песка, кг/мин
-    double sand_flow;
+    double sand_flow = 2.0;
 
     /// Давление питательной магистрали, МПа
-    double pFL;
+    double pFL = 0.0;
 
     /// Поток в питательную магистраль
-    double QFL;
+    double QFL = 0.0;
 
     /// Номинальное давление для пневмоподачи песка, МПа
-    double p_nom;
+    double p_nom = 0.9;
 
     /// Коэффициент потока - расхода воздуха для подачи песка
-    double k_air;
+    double k_air = 5.0e-4;
 
     /// Коэффициент изменения трения колесо-рельс
-    double k_friction;
+    double k_friction = 1.3;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

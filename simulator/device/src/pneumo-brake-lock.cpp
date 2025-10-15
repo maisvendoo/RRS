@@ -457,7 +457,7 @@ void PneumoBrakeLock::stepKeysControl(double t, double dt)
 {
     PneumoCombineCrane::stepKeysControl(t, dt);
 
-    if ((::getKeyState(pressed_keys, key_symbol_change_state) && isModifier(pressed_keys, key_modifier_change_state)))
+    if ((getKeyState(pressed_keys, key_symbol_change_state) && isModifier(pressed_keys, key_modifier_change_state)))
     {
         // Переключаем новым нажатием на клавишу
         if (!prev_key)

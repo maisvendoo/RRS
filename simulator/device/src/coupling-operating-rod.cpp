@@ -21,7 +21,7 @@ OperatingRod::~OperatingRod()
 //------------------------------------------------------------------------------
 void OperatingRod::setKeySymbol(std::uint16_t key_symbol)
 {
-    keyCode = key_symbol;
+    key_symbol_operate = key_symbol;
 }
 
 //------------------------------------------------------------------------------
@@ -77,13 +77,13 @@ void OperatingRod::stepKeysControl(double t, double dt)
     (void) dt;
 
     // Проверяем управляющий сигнал от заданной клавиши
-    if (getKeyState(keyCode))
+    if (pressed_keys && getKeyState(*pressed_keys, key_symbol_operate))
     {
         // Проверяем фиксацию расцепляющего положения
         if (is_fixed_uncoupling)
         {
             // Сбрасывает фиксацию повторное нажатие клавиши без Ctrl и Shift
-            if (!(was_keyCode || isShift() || isControl()))
+            if (!(prev_key || isModifier(*pressed_keys, MODIFIER_Shift) || isModifier(*pressed_keys, MODIFIER_Control)))
             {
                 // Нормальное положение
                 ref_operating_state = 1.0;
@@ -97,10 +97,10 @@ void OperatingRod::stepKeysControl(double t, double dt)
         else
         {
             // Shift - команда на расцепление
-            if (isShift())
+            if (isModifier(*pressed_keys, MODIFIER_Shift))
             {
                 // Если ещё и Ctrl - фиксируем рычаг в расцепляющем положении
-                if (isControl())
+                if (isModifier(*pressed_keys, MODIFIER_Control))
                 {
                     ref_operating_state = -1.0;
                     if ((getY(0) + 1.0) <= Physics::ZERO)
@@ -127,7 +127,7 @@ void OperatingRod::stepKeysControl(double t, double dt)
                 ref_operating_state = 1.0;
             }
         }
-        was_keyCode = true;
+        prev_key = true;
     }
     else
     {
@@ -136,7 +136,7 @@ void OperatingRod::stepKeysControl(double t, double dt)
             // Нормальное положение
             ref_operating_state = 1.0;
         }
-        was_keyCode = false;
+        prev_key = false;
     }
 }
 

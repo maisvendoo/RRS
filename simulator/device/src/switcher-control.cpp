@@ -93,7 +93,7 @@ bool SwitcherControl::step(double t, double dt)
     bool allow_spring_first = is_spring_first;
     bool allow_spring_last = is_spring_last;
 
-    if ((getKeyState(pressed_keys, key_symbol_dec) && isModifier(pressed_keys, key_modifier_dec)))
+    if ((getKeyState(*pressed_keys, key_symbol_dec) && isModifier(*pressed_keys, key_modifier_dec)))
     {
         prev_key_inc = false;
 
@@ -109,7 +109,7 @@ bool SwitcherControl::step(double t, double dt)
     {
         prev_key_dec = false; // Запоминаем, что клавиша назад отпущена
 
-        if ((getKeyState(pressed_keys, key_symbol_inc) && isModifier(pressed_keys, key_modifier_inc)))
+        if ((getKeyState(*pressed_keys, key_symbol_inc) && isModifier(*pressed_keys, key_modifier_inc)))
         {
             if (!prev_key_inc)
             {

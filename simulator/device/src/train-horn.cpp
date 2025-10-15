@@ -8,13 +8,9 @@
 //
 //------------------------------------------------------------------------------
 TrainHorn::TrainHorn(QObject *parent) : Device(parent)
-    , pFL(0.0)
-    , QFL(0.0)
-    , p_nom(0.9)
-    , k_svistok(5.0e-4)
-    , k_tifon(8.0e-4)
 {
-    std::fill(sounds.begin(), sounds.end(), sound_state_t());
+    setKeySymbolSvistok(KEY_Space);
+    setKeySymbolTifon(KEY_B);
 }
 
 //------------------------------------------------------------------------------
@@ -33,7 +29,6 @@ void TrainHorn::step(double t, double dt)
     // Переопределяем шаг, поскольку выполнение решателя не нужно
     // Нужна только обработка клавиатурного ввода
     stepKeysControl(t, dt);
-    stepExternalControl(t, dt);
 
     // Расчёт коэффициента расхода воздуха в атмосферу при работе звуковых сигналов
     double k = 0.0;
@@ -53,6 +48,22 @@ void TrainHorn::step(double t, double dt)
 
     // Расход воздуха питательной магистрали
     QFL = -k * pFL;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainHorn::setKeySymbolSvistok(std::uint16_t key_symbol)
+{
+    key_symbol_svistok = key_symbol;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainHorn::setKeySymbolTifon(std::uint16_t key_symbol)
+{
+    key_symbol_tifon = key_symbol;
 }
 
 //------------------------------------------------------------------------------
@@ -130,9 +141,9 @@ void TrainHorn::ode_system(const state_vector_t &Y,
                            state_vector_t &dYdt,
                            double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(dYdt)
-    Q_UNUSED(t)
+    (void) Y;
+    (void) dYdt;
+    (void) t;
 }
 
 //------------------------------------------------------------------------------
@@ -156,9 +167,9 @@ void TrainHorn::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void TrainHorn::stepKeysControl(double t, double dt)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
+    (void) t;
+    (void) dt;
 
-    setSvistokOn(getKeyState(KEY_Space));
-    setTifonOn(getKeyState(KEY_B));
+    setSvistokOn(getKeyState(pressed_keys, key_symbol_svistok));
+    setTifonOn(getKeyState(pressed_keys, key_symbol_tifon));
 }

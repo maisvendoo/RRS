@@ -16,6 +16,12 @@ public:
 
     void step(double t, double dt);
 
+    /// Задать управляющую клавишу для свистка
+    void setKeySymbolSvistok(std::uint16_t key_symbol);
+
+    /// Задать управляющую клавишу для тифона
+    void setKeySymbolTifon(std::uint16_t key_symbol);
+
     /// Задать состояние свистка
     void setSvistokOn(bool state);
 
@@ -47,23 +53,29 @@ public:
 
 protected:
 
+    /// Код управляющей клавиши свистка
+    std::uint16_t key_symbol_svistok = KEY_Undefined;
+
+    /// Код управляющей клавиши тифона
+    std::uint16_t key_symbol_tifon = KEY_Undefined;
+
     /// Состояние звуков
-    std::array<sound_state_t, NUM_SOUNDS> sounds;
+    std::array<sound_state_t, NUM_SOUNDS> sounds = {sound_state_t(), sound_state_t()};
 
     /// Давление питательной магистрали, МПа
-    double pFL;
+    double pFL = 0.0;
 
     /// Поток в питательную магистраль
-    double QFL;
+    double QFL = 0.0;
 
     /// Номинальное давление для работы свистка и тифона, МПа
-    double p_nom;
+    double p_nom = 0.9;
 
     /// Коэффициент потока - расхода воздуха на свисток
-    double k_svistok;
+    double k_svistok = 5.0e-4;
 
     /// Коэффициент потока - расхода воздуха на тифон
-    double k_tifon;
+    double k_tifon = 8.0e-4;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

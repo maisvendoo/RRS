@@ -225,7 +225,7 @@ void ControllerKME_60_044::load_config(CfgReader &cfg)
 void ControllerKME_60_044::stepKeysControl(double t, double dt)
 {
     // Тянем рукоятку на себя нажатием
-    if (getKeyState(KEY_A))
+    if (getKeyState(pressed_keys, KEY_A))
     {
         if (!incMainPos->isStarted())
             incMainPos->start();
@@ -240,10 +240,10 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     }
 
     // Тянем рукоятку от себя
-    if (getKeyState(KEY_D))
+    if (getKeyState(pressed_keys, KEY_D))
     {
         // Ctrl+D возвращает в нулевую позицию
-        if (getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R))
+        if (isModifier(pressed_keys, MODIFIER_OnlyControl))
         {
             setMainHandlePos(POS_ZERO);
             is_prev_KEY_D = true;
@@ -265,9 +265,9 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     }
 
     // Тянем реверсивку от себя
-    if (getKeyState(KEY_W))
+    if (getKeyState(pressed_keys, KEY_W))
     {
-        if (isShift() && (!isControl()))
+        if (isModifier(pressed_keys, MODIFIER_OnlyShift))
         {
             // Shift - вставляем реверсивку
             insertReversHandle(true);
@@ -275,7 +275,7 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
         }
         else
         {
-            if (isControl())
+            if (isModifier(pressed_keys, MODIFIER_OnlyControl))
             {
                 // Ctrl - извлекаем реверсивку
                 insertReversHandle(false);
@@ -302,10 +302,10 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     }
 
     // Тянем реверсивку на себя
-    if (getKeyState(KEY_S) && is_revers_handle.getState())
+    if (getKeyState(pressed_keys, KEY_S) && is_revers_handle.getState())
     {
         // Ctrl - быстрый возврат в нулевую позицию
-        if (isControl())
+        if (isModifier(pressed_keys, MODIFIER_OnlyControl))
         {
             setReversHandlePos(REVERS_ZERO);
             is_prev_KEY_S = true;

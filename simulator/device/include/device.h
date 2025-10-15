@@ -81,7 +81,7 @@ public:
     /// Read device config file
     virtual void read_config(const QString &filename, const QString &dir_path = "");
 
-    QString getDebugMsg() const;
+    virtual QString getDebugMsg() const;
 
     ///
     virtual void setControl(std::set<uint16_t>* keys = nullptr,
@@ -103,9 +103,12 @@ public:
 protected:
 
     /// Name of this device
-    QString name;
+    QString name = "";
     /// State of link with other device
-    bool is_linked;
+    bool is_linked = false;
+
+    int sub_step_num = 1;
+    double max_step_dt = 0.0;
 
     /// Input signals
     state_vector_t input_signals;
@@ -117,30 +120,13 @@ protected:
     /// Derivative of state vector
     state_vector_t dydt;
 
-    size_t sub_step_num;
-    size_t solver_type;
-    enum {
-        RK4 = 4,
-        EULER2 = 2,
-        EULER = 1
-    };
-
-    state_vector_t y1;
-
-    state_vector_t k1;
-    state_vector_t k2;
-    state_vector_t k3;
-    //state_vector_t k4;
-
     /// Name of directory with vehicle's custom configs
-    QString custom_cfg_dir;
+    QString custom_cfg_dir = "";
 
-    QString DebugMsg;
-
-    std::set<uint16_t>*  pressed_keys = nullptr;
+    std::set<std::uint16_t>*  pressed_keys = nullptr;
     control_signals_t*   control_signals = nullptr;
 
-    feedback_signals_t*  feedback;
+    feedback_signals_t*  feedback = nullptr;
 
     /// Device model ODE system
     virtual void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) = 0;
@@ -158,27 +144,11 @@ protected:
 
     virtual void stepDiscrete(double t, double dt);
 
-    bool getKeyState(int key) const;
-
-    bool isShift() const;
-
-    bool isControl() const;
-
-    bool isAlt() const;
-
 private:
 
     void load_configuration(CfgReader &cfg);
 
-    void step_rk4(double t, double dt);
-
-    void step_euler2(double t, double dt);
-
-    void step_euler(double t, double dt);
-
     void memory_alloc(int order);
-
-    void stepControl(double t, double dt);
 };
 
 #endif // DEVICE_H

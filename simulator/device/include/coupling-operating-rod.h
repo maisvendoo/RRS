@@ -32,9 +32,10 @@ public:
 protected:
 
     /// Код управляющей клавиши
-    std::uint16_t keyCode;
+    std::uint16_t key_symbol_operate = KEY_Undefined;
 
-    bool was_keyCode = false;
+    /// Предыдущее состояние управляющей клавиши
+    bool prev_key = false;
 
     /// Признак фиксации расцепного рычага в расцепляющем положении
     bool is_fixed_uncoupling = false;

@@ -176,39 +176,39 @@ void LocoCrane224::stepKeysControl(double t, double dt)
     double new_pos = pos;
 
     // Непрерывное движение ручки в сторону отпуска
-    if (getKeyState(KEY_Leftbracket))
+    if (getKeyState(pressed_keys, KEY_Leftbracket))
         new_pos = pos - pos_duration * dt;
     else
     {
         // Непрерывное движение ручки в сторону торможения
-        if (getKeyState(KEY_Rightbracket))
+        if (getKeyState(pressed_keys, KEY_Rightbracket))
             new_pos = pos + pos_duration * dt;
     }
 
     // Дискретное движение от кнопок
-    if (isAlt())
+    if (isModifier(pressed_keys, MODIFIER_OnlyAlt))
     {
-        if (getKeyState(KEY_8))
+        if (getKeyState(pressed_keys, KEY_8))
         {
             new_pos = fixed_pos[0];
         }
 
-        if (getKeyState(KEY_9))
+        if (getKeyState(pressed_keys, KEY_9))
         {
             new_pos = fixed_pos[1];
         }
 
-        if (getKeyState(KEY_0))
+        if (getKeyState(pressed_keys, KEY_0))
         {
             new_pos = fixed_pos[2];
         }
 
-        if (getKeyState(KEY_Minus))
+        if (getKeyState(pressed_keys, KEY_Minus))
         {
             new_pos = fixed_pos[3];
         }
 
-        if (getKeyState(KEY_Equals))
+        if (getKeyState(pressed_keys, KEY_Equals))
         {
             new_pos = fixed_pos[4];
         }

@@ -100,18 +100,18 @@ bool TriggerControlTimedelay::step(double t, double dt)
     // проверяем новое нажатие на клавишу
     if (key_symbol_off == key_symbol_on)
     {
-        if (getKeyState(*pressed_keys, key_symbol_on))
+        if (getKeyState(pressed_keys, key_symbol_on))
         {
             if (!prev_key)
             {
-                if (isModifier(*pressed_keys, key_modifier_off))
+                if (isModifier(pressed_keys, key_modifier_off))
                 {
                     prev_key = true; // Запоминаем, что клавиша нажата
                     resetAfterDelay(); // Команда отключить триггер новым нажатием на клавишу
                 }
                 else
                 {
-                    if (isModifier(*pressed_keys, key_modifier_on))
+                    if (isModifier(pressed_keys, key_modifier_on))
                     {
                         prev_key = true; // Запоминаем, что клавиша нажата
                         setAfterDelay(); // Команда включить триггер новым нажатием на клавишу
@@ -127,13 +127,13 @@ bool TriggerControlTimedelay::step(double t, double dt)
     }
 
     // Режим "тумблер" - включение и отключение на разные клавиши
-    if ((getKeyState(*pressed_keys, key_symbol_off) && isModifier(*pressed_keys, key_modifier_off)))
+    if ((getKeyState(pressed_keys, key_symbol_off) && isModifier(pressed_keys, key_modifier_off)))
     {
         resetAfterDelay(); // Команда отключить триггер
     }
     else
     {
-        if ((getKeyState(*pressed_keys, key_symbol_on) && isModifier(*pressed_keys, key_modifier_on)))
+        if ((getKeyState(pressed_keys, key_symbol_on) && isModifier(pressed_keys, key_modifier_on)))
         {
             setAfterDelay(); // Команда включить триггер
         }

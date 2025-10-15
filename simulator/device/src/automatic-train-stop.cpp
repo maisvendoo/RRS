@@ -217,7 +217,7 @@ float AutoTrainStop::getSoundSignal(size_t idx) const
 //------------------------------------------------------------------------------
 void AutoTrainStop::stepKeysControl(double t, double dt)
 {
-    if (::getKeyState(pressed_keys, key_symbol))
+    if (pressed_keys && getKeyState(*pressed_keys, key_symbol))
     {
         // Управляем новым нажатием на клавишу
         if (!prev_key)
@@ -225,21 +225,21 @@ void AutoTrainStop::stepKeysControl(double t, double dt)
             prev_key = true; // Запоминаем, что клавиша нажата
 
             // Alt - вставляем/извлекаем ключ
-            if (isModifier(pressed_keys, MODIFIER_OnlyAlt))
+            if (isModifier(*pressed_keys, MODIFIER_Alt))
             {
                 insertKey(!isKey());
                 return;
             }
 
             // Ctrl - отключаем ключ
-            if (isModifier(*pressed_keys, MODIFIER_OnlyControl))
+            if (isModifier(*pressed_keys, MODIFIER_Control))
             {
                 setKeyOn(false);
                 return;
             }
 
             // Shift - включаем ключ
-            if (isModifier(*pressed_keys, MODIFIER_OnlyShift))
+            if (isModifier(*pressed_keys, MODIFIER_Shift))
             {
                 setKeyOn(true);
                 return;

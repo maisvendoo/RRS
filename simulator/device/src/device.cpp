@@ -16,21 +16,13 @@
 
 #include    "filesystem.h"
 #include    "Journal.h"
-#include    "key-symbols.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 Device::Device(QObject *parent) : QObject(parent)
-  , name("")
-  , is_linked(false)
-  , sub_step_num(1)
-  , solver_type(EULER)
 {
     qRegisterMetaType<state_vector_t>();
-
-    custom_cfg_dir = "";
-    DebugMsg = "";
 
     memory_alloc(1);
 }
@@ -50,38 +42,34 @@ void Device::step(double t, double dt)
 {
     preStep(y, t);
 
-    stepControl(t, dt);
+    stepKeysControl(t, dt);
+
+    stepExternalControl(t, dt);
 
     stepDiscrete(t, dt);
 
-    double _dt = dt / static_cast<double>(sub_step_num);
-    switch (solver_type)
+    // Шаг решателя
+    double _dt;
+    if (max_step_dt > Physics::ZERO)
     {
-    case RK4:
-    {
-        for (size_t i = 0; i < sub_step_num; ++i)
-        {
-            step_rk4(t + static_cast<double>(i) * _dt, _dt);
-        }
-        break;
+        double min_sub_step_num = min(ceil(dt / max_step_dt), static_cast<double>(sub_step_num));
+        _dt = dt / min_sub_step_num;
+        sub_step_num = static_cast<int>(min_sub_step_num);
     }
-    case EULER2:
+    else
     {
-        for (size_t i = 0; i < sub_step_num; ++i)
-        {
-            step_euler2(t + static_cast<double>(i) * _dt, _dt);
-        }
-        break;
+        _dt = dt / static_cast<double>(sub_step_num);
     }
-    case EULER:
-    default:
+
+    // Решатель Эйлера
+    for (size_t i = 0; i < sub_step_num; ++i)
     {
-        for (size_t i = 0; i < sub_step_num; ++i)
+        ode_system(y, dydt, t + static_cast<double>(i) * _dt);
+
+        for (size_t i = 0; i < y.size(); ++i)
         {
-            step_euler(t + static_cast<double>(i) * _dt, _dt);
+            y[i] = y[i] + dydt[i] * _dt;
         }
-        break;
-    }
     }
 
     postStep(y, t + dt);
@@ -258,26 +246,10 @@ void Device::load_configuration(CfgReader &cfg)
         }
     }
 
-    solver_type = EULER;
-    QString solver_name = "";
-    if (!cfg.getString(secName, "Solver", solver_name))
+    double max_dt = 0.0;
+    if (cfg.getDouble(secName, "MaxStep", max_dt) && (max_dt > Physics::ZERO))
     {
-        solver_type = EULER;
-    }
-    else
-    {
-        if (solver_name == "rk4")
-        {
-            solver_type = RK4;
-        }
-        if (solver_name == "euler2")
-        {
-            solver_type = EULER2;
-        }
-        if (solver_name == "euler")
-        {
-            solver_type = EULER;
-        }
+        max_step_dt = max_dt;
     }
 }
 
@@ -286,7 +258,7 @@ void Device::load_configuration(CfgReader &cfg)
 //------------------------------------------------------------------------------
 QString Device::getDebugMsg() const
 {
-    return DebugMsg;
+    return QString();
 }
 
 //------------------------------------------------------------------------------
@@ -385,13 +357,6 @@ void Device::memory_alloc(int order)
     y.resize(static_cast<size_t>(order));
     dydt.resize(static_cast<size_t>(order));
 
-    y1.resize(static_cast<size_t>(order));
-
-    k1.resize(static_cast<size_t>(order));
-    k2.resize(static_cast<size_t>(order));
-    k3.resize(static_cast<size_t>(order));
-    //k4.resize(static_cast<size_t>(order));
-
     std::fill(y.begin(), y.end(), 0.0);
     std::fill(dydt.begin(), dydt.end(), 0.0);
 }
@@ -421,126 +386,4 @@ void Device::stepDiscrete(double t, double dt)
 {
     Q_UNUSED(t)
     Q_UNUSED(dt)
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Device::getKeyState(int key) const
-{
-    if (pressed_keys)
-    {
-        return pressed_keys->count(key);
-    }
-    return false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Device::isShift() const
-{
-    return getKeyState(KEY_Shift_L) || getKeyState(KEY_Shift_R);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Device::isControl() const
-{
-    return getKeyState(KEY_Control_L) || getKeyState(KEY_Control_R);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Device::isAlt() const
-{
-    return getKeyState(KEY_Alt_L) || getKeyState(KEY_Alt_R);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Device::stepControl(double t, double dt)
-{
-    stepKeysControl(t, dt);
-    stepExternalControl(t, dt);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Device::step_rk4(double t, double dt)
-{
-    ode_system(y, dydt, t);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        k1[i] = dydt[i];
-        y1[i] = y[i] + k1[i] * dt / 2.0;
-    }
-
-    ode_system(y1, dydt, t + dt / 2.0);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        k2[i] = dydt[i];
-        y1[i] = y[i] + k2[i] * dt / 2.0;
-    }
-
-    ode_system(y1, dydt, t + dt / 2.0);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        k3[i] = dydt[i];
-        y1[i] = y[i] + k3[i] * dt;
-    }
-
-    ode_system(y1, dydt, t + dt);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        //k4[i] = dydt[i];
-        //y[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dt / 6.0;
-        y[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + dydt[i]) * dt / 6.0;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Device::step_euler2(double t, double dt)
-{
-    ode_system(y, dydt, t);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        k1[i] = dydt[i];
-        y1[i] = y[i] + k1[i] * dt;
-    }
-
-    ode_system(y1, dydt, t + dt);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        //k2[i] = dydt[i];
-        //y[i] = y[i] + (k1[i] + k2[i]) * dt / 2.0;
-        y[i] = y[i] + (k1[i] + dydt[i]) * dt / 2.0;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Device::step_euler(double t, double dt)
-{
-    ode_system(y, dydt, t);
-
-    for (size_t i = 0; i < y.size(); ++i)
-    {
-        //k1[i] = dydt[i];
-        //y[i] = y[i] + k1[i] * dt;
-        y[i] = y[i] + dydt[i] * dt;
-    }
 }

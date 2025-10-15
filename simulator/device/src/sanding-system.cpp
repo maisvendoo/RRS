@@ -7,17 +7,8 @@
 //
 //------------------------------------------------------------------------------
 SandingSystem::SandingSystem(QObject *parent) : Device(parent)
-  , is_sand(false)
-  , sand_mass_max(2000.0)
-  , sand_flow_nom(2.0)
-  , sand_flow(0.0)
-  , pFL(0.0)
-  , QFL(0.0)
-  , p_nom(0.9)
-  , k_air(5.0e-4)
-  , k_friction(1.3)
 {
-
+    setKeySymbol(KEY_Delete);
 }
 
 //------------------------------------------------------------------------------
@@ -31,20 +22,17 @@ SandingSystem::~SandingSystem()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void SandingSystem::setKeySymbol(uint16_t key_symbol)
+{
+    key_symbol_operate = key_symbol;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SandingSystem::setSandDeliveryOn(bool state)
 {
-    if (is_sand != state) // Заготовка под возможность звука
-    {
-        if (state)
-        {
-            //emit soundPlay("Sand");
-        }
-        else
-        {
-            //emit soundStop("Sand");
-        }
-        is_sand = state;
-    }
+    is_sand = state;
 }
 
 //------------------------------------------------------------------------------
@@ -204,9 +192,9 @@ void SandingSystem::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void SandingSystem::stepKeysControl(double t, double dt)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
+    (void) t;
+    (void) dt;
 
-    // Активация песочницы прикручена к клавише Del
-    setSandDeliveryOn(getKeyState(KEY_Delete));
+    // Активация песочницы
+    setSandDeliveryOn(getKeyState(pressed_keys, key_symbol_operate));
 }
