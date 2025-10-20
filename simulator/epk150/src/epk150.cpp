@@ -18,6 +18,7 @@ AutoTrainStopEPK150::AutoTrainStopEPK150(QObject *parent)
     : AutoTrainStop(parent)
 {
     std::fill(K.begin(), K.end(), 0.0);
+    std::fill(A.begin(), A.end(), 0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -53,7 +54,7 @@ void AutoTrainStopEPK150::ode_system(const state_vector_t &Y,
                                      state_vector_t &dYdt,
                                      double t)
 {
-    Q_UNUSED(t)
+    (void) t;
 
     // Баланс сил на мембране камеры выдержки времени
     double dp1 = Y[P_TIME_DELAY] - ps2;

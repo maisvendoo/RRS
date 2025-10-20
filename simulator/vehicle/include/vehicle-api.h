@@ -29,6 +29,7 @@
 #include    "pantograph.h"
 #include    "pneumo-anglecock.h"
 #include    "pneumo-brake-lock.h"
+#include    "pneumo-electro-valve.h"
 #include    "pneumo-hose-epb.h"
 #include    "pneumo-hose.h"
 #include    "pneumo-reducer.h"

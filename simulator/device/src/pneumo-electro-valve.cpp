@@ -19,6 +19,14 @@ PneumoElectroValve::~PneumoElectroValve()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoElectroValve::setMode(bool normally_closed)
+{
+    mode_normally_closed = normally_closed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoElectroValve::setVoltage(double value)
 {
     U = value;
@@ -69,9 +77,7 @@ void PneumoElectroValve::setDeviceFlow(double value)
 //------------------------------------------------------------------------------
 double PneumoElectroValve::getFlowToPipe() const
 {
-    if (hysteresis.getState())
-        return Q;
-    return 0.0;
+    return Q_pipe;
 }
 
 //------------------------------------------------------------------------------
@@ -102,19 +108,6 @@ void PneumoElectroValve::preStep(state_vector_t &Y, double t)
     (void) t;
 
     hysteresis.setValue(Y[CURRENT]);
-
-    if (hysteresis.getState())
-    {
-        Q_atm = 0.0;
-        atm_flow_sound.state = 0;
-        atm_flow_sound.volume = 0.0f;
-    }
-    else
-    {
-        Q_atm = K_atm * Y[PRESSURE];
-        atm_flow_sound.state = 1;
-        atm_flow_sound.volume = K_sound * cbrt(Q_atm);
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -126,16 +119,31 @@ void PneumoElectroValve::ode_system(const state_vector_t &Y,
 {
     (void) t;
 
-    if (hysteresis.getState())
+    if (hysteresis.getState() == mode_normally_closed)
     {
+        // Вентиль открыт
+        Q_pipe = Q;
         setY(PRESSURE, p);
         dYdt[PRESSURE] = 0.0;
+
+        // Атмосферное отверстие не используется
+        atm_flow_sound.state = 0;
+        atm_flow_sound.volume = 0.0f;
     }
     else
     {
-        dYdt[PRESSURE] = (Q - Q_atm) / V0;
+        // Выпуск воздуха в атмосферу со стороны магистрали
+        Q_pipe = -K_atm_pipe * p;
+        // Поток воздуха и выпуск в атмосферу со стороны оборудования
+        double Q_atm = -K_atm_device * Y[PRESSURE];
+        dYdt[PRESSURE] = (Q + Q_atm) / V0;
+
+        // Озвучка суммы потоков в атмосферу
+        atm_flow_sound.state = 1;
+        atm_flow_sound.volume = K_sound * cbrt(- Q_pipe - Q_atm);
     }
 
+    // Ток в катушке привода пневмовентиля
     dYdt[CURRENT] = (abs(U) / R - Y[CURRENT]) / T;
 }
 
@@ -145,6 +153,8 @@ void PneumoElectroValve::ode_system(const state_vector_t &Y,
 void PneumoElectroValve::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
+
+    cfg.getBool(secName, "Mode", mode_normally_closed);
 
     cfg.getDouble(secName, "U_nom", U_nom);
 
@@ -168,7 +178,9 @@ void PneumoElectroValve::load_config(CfgReader &cfg)
     if (tmp > 1e-3)
         V0 = tmp;
 
-    cfg.getDouble(secName, "Katm", K_atm);
+    cfg.getDouble(secName, "Katm_device", K_atm_device);
+
+    cfg.getDouble(secName, "Katm_pipe", K_atm_pipe);
 
     cfg.getDouble(secName, "Ksound", K_sound);
 }
