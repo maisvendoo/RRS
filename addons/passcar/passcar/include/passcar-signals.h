@@ -23,7 +23,9 @@ enum
     SOUND_80_90 = 23,
     SOUND_90_100 = 24,
     SOUND_100_120 = 25,
-    SOUND_120_140 = 26
+    SOUND_120_140 = 26,
+
+    SIGNALS_NUM_TOTAL
 };
 
 #endif // PASSCARSIGNALS_H

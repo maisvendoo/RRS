@@ -8,7 +8,6 @@
 #include <QThread>
 #include <QWidget>
 
-#include <algorithm>
 #include <cstddef>
 
 //------------------------------------------------------------------------------
@@ -17,8 +16,6 @@
 AbstractDisplay::AbstractDisplay(QWidget* parent, Qt::WindowFlags flags)
     : QWidget(parent, flags)
 {
-    std::fill(input_signals.begin(), input_signals.end(), 0.0);
-    std::fill(output_signals.begin(), output_signals.end(), 0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -27,6 +24,31 @@ AbstractDisplay::AbstractDisplay(QWidget* parent, Qt::WindowFlags flags)
 AbstractDisplay::~AbstractDisplay()
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::init()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::update(double t, double dt)
+{
+    (void) t;
+    (void) dt;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AbstractDisplay::setAnimationSignalID(int32_t index)
+{
+    signal_id = index;
 }
 
 //------------------------------------------------------------------------------
@@ -52,7 +74,7 @@ float AbstractDisplay::getOutputSignal(size_t index)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AbstractDisplay::setInputSignals(const display_signals_t &input_signals)
+void AbstractDisplay::setInputSignals(const display_signals_t& input_signals)
 {
     this->input_signals = input_signals;
 }
@@ -84,18 +106,9 @@ QString AbstractDisplay::getConfigDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AbstractDisplay::init()
+bool AbstractDisplay::isRepaint() const
 {
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void AbstractDisplay::update(double t, double dt)
-{
-    (void) t;
-    (void) dt;
+    return need_repaint;
 }
 
 //------------------------------------------------------------------------------

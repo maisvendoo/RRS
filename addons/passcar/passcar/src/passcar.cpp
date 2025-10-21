@@ -1,18 +1,15 @@
 #include    "passcar.h"
+#include    "passcar-signals.h"
 #include    "filesystem.h"
 
-#include "CfgReader.h"
-
-#include "coupling-operating-rod.h"
-#include "pneumo-anglecock.h"
-#include "pneumo-hose-epb.h"
+#include    "CfgReader.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 PassCar::PassCar() : Vehicle ()
 {
-
+    analogSignal.resize(SIGNALS_NUM_TOTAL);
 }
 
 //------------------------------------------------------------------------------

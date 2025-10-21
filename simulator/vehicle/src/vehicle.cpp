@@ -436,9 +436,9 @@ float Vehicle::getAnalogSignal(size_t i)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::array<float, MAX_ANALOG_SIGNALS> Vehicle::getAnalogSignals()
+std::vector<float>* Vehicle::getAnalogSignals()
 {
-    return analogSignal;
+    return &analogSignal;
 }
 
 //------------------------------------------------------------------------------

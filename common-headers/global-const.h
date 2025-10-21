@@ -18,23 +18,11 @@
 
 #define     APPLICATION_NAME    QString("simulator")
 #define     APPLICATION_VERSION QString("0.1.0")
-/*
-#define     SHARED_MEMORY_SIM_INFO      QString("siminfo")
-#define     SHARED_MEMORY_SIM_UPDATE    QString("simupdate")
-#define     SHARED_MEMORY_KEYS_DATA     QString("keysdata")
-#define     SHARED_MEMORY_CONTROLLED    QString("controlled")
-*/
+
 #define     MAX_NUM_VEHICLES      65535
 #define     MAX_NUM_TRAINS        255
 
 #define     DISTANCE_TO_COUPLE_TRAINS   double(10.0)
 #define     DISTANCE_TO_UNCOUPLE_TRAINS double(12.0)
-/*
-#define     DEBUG_STRING_SIZE           512
-#define     KEYS_DATA_BYTEARRAY_SIZE    2000
 
-#define     ROUTE_DIR_NAME_SIZE             256
-#define     VEHICLE_CONFIG_DIR_NAME_SIZE    256
-#define     VEHICLE_CONFIG_FILENAME_SIZE    256
-*/
 #endif // GLOBAL_CONST_H

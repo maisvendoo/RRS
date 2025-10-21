@@ -781,12 +781,7 @@ void Model::prepareFeedBack()
                     vehicle->getPrevVehicle()->getModelIndex();
         }
 
-        size_t end = MAX_ANALOG_SIGNALS - 1;
-        while ((vehicle->getAnalogSignals()[end] == 0.0f) && (end))
-            --end;
-
-        for (size_t j = 0; j <= end; ++j)
-            update_data.vehicles[i].analogSignal.push_back(vehicle->getAnalogSignals()[j]);
+        update_data.vehicles[i].analogSignal = *(vehicle->getAnalogSignals());
 
         ++i;
     }

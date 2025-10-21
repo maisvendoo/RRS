@@ -28,6 +28,9 @@ public:
     /// Обновление дисплея
     virtual void update(double t, double dt);
 
+    /// Указать ID сигнала основной анимации текстуры
+    void setAnimationSignalID(std::int32_t index);
+
     /// Задать входной сигнал
     void setInputSignal(size_t index, float value);
 
@@ -46,10 +49,8 @@ public:
     /// Получить путь к каталогу с конфигами
     QString getConfigDir() const;
 
-    /// Задать путь к каталогу с маршрутом
-    void setRouteDir(QString route_dir) { this->route_dir = route_dir; }
-
-    void setUpdateInterval(double upd_interval) { this->upd_interval = upd_interval; }
+    /// Флаг для необходимости обновления текстуры в графическом движке
+    bool isRepaint() const;
 
 protected:
     /// Входные сигналы, отображаемые на интерфейсе дисплея и управляющие его поведением
@@ -61,11 +62,11 @@ protected:
     /// Путь к каталогу конфигурации
     QString config_dir = "";
 
-    /// Путь к каталогу с текущим маршрутом
-    QString route_dir = "";
+    /// ID сигнала основной анимации текстуры
+    std::int32_t signal_id = -1;
 
-    /// Интервал обновления
-    double upd_interval = 0.1;
+    /// Флаг для необходимости обновления текстуры в графическом движке
+    bool need_repaint = true;
 };
 
 //------------------------------------------------------------------------------

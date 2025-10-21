@@ -12,6 +12,7 @@
 //------------------------------------------------------------------------------
 
 #include    "vl60k.h"
+#include    "vl60-signals.h"
 #include    "filesystem.h"
 
 #include    <QDir>
@@ -21,6 +22,8 @@
 //------------------------------------------------------------------------------
 VL60k::VL60k() : Vehicle ()  
 {
+    analogSignal.resize(SIGNALS_NUM_TOTAL);
+
     pressed_keys_by_cabine.resize(CABS_NUM);
     pressed_keys_by_cabine.shrink_to_fit();
 }

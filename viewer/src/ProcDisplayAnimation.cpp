@@ -3,7 +3,6 @@
 #include "display.h"
 #include "CfgReader.h"
 #include "Logger.h"
-#include "display-types.h"
 #include "filesystem.h"
 
 #include <QApplication>
@@ -47,29 +46,28 @@ void ProcDisplayAnimation::anim_step(float t, float dt)
         // Обновляем сигналы внутри дисплейного модуля
         if (server_signals && (server_signals != prev_signals))
         {
-            display_signals_t display_signals;
-            std::copy(server_signals->begin(), server_signals->end(), display_signals.begin());
-            display->setInputSignals(display_signals);
+            display->setInputSignals(*server_signals);
             prev_signals = server_signals;
         }
 
         // Обновляем дисплейный модуль
         display->update(t, dt);
 
+        if (display->isRepaint())
         {
             QPainter painter(&qimage);
             display->render(&painter);
             painter.end();
-        }
 
-        // Указываем VSG обновить текстуру, data уже указывает на пиксели в qimage
-        if (is_color_repaint)
-        {
-            image_color->data->dirty();
-        }
-        if (is_emissive_repaint)
-        {
-            image_emissive->data->dirty();
+            // Указываем VSG обновить текстуру, data уже указывает на пиксели в qimage
+            if (is_color_repaint)
+            {
+                image_color->data->dirty();
+            }
+            if (is_emissive_repaint)
+            {
+                image_emissive->data->dirty();
+            }
         }
     }
 
@@ -223,6 +221,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     }
 
     display->setConfigDir(QString(cfgdir_path.c_str()));
+    display->setAnimationSignalID(signal_id);
     display->init();
     LOG_INFO("Config's directory %s for loaded display module %s ", cfgdir_path.c_str(), module_path.c_str());
 

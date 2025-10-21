@@ -14,7 +14,9 @@ enum
     SOUND_40_50 = 14,
     SOUND_50_60 = 15,
     SOUND_60_70 = 16,
-    SOUND_70_80 = 17
+    SOUND_70_80 = 17,
+
+    SIGNALS_NUM_TOTAL
 };
 
 #endif // FREIGHTCARSIGNALS_H

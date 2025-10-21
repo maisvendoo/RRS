@@ -1,10 +1,8 @@
 #ifndef DISPLAY_TYPES_H
 #define DISPLAY_TYPES_H
 
-#include "vehicle-signals.h"
+#include <vector>
 
-#include <array>
-
-using display_signals_t = std::array<float, MAX_ANALOG_SIGNALS>;
+using display_signals_t = std::vector<float>;
 
 #endif // DISPLAY_TYPES_H

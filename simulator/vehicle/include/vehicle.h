@@ -21,7 +21,6 @@
 #include    <mutex>
 
 #include    "datetime.h"
-#include    "vehicle-signals.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
@@ -157,7 +156,7 @@ public:
     Vehicle* getNextVehicle();
 
     float getAnalogSignal(size_t i);
-    std::array<float, MAX_ANALOG_SIGNALS> getAnalogSignals();
+    std::vector<float>* getAnalogSignals();
 
     device_list_t* getFwdConnectors();
     device_list_t* getBwdConnectors();
@@ -304,7 +303,7 @@ protected:
     std::mutex keyboard_mutex;
 
     /// Analog signals for output
-    std::array<float, MAX_ANALOG_SIGNALS>   analogSignal;
+    std::vector<float>  analogSignal;
 
     /// List of devices - forward connectors
     device_list_t forward_connectors;
