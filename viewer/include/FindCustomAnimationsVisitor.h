@@ -54,6 +54,8 @@ private:
 
     vsg::ref_ptr<ProcAnimation> create_animation(const std::string& name, vsg::Light& light);
 
+    vsg::ref_ptr<ProcAnimation> create_visible_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
+
     template <typename AnimationClass>
     vsg::ref_ptr<ProcAnimation> create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr);
 

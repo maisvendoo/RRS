@@ -6,29 +6,29 @@
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/Group.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ProcVisibleAnimation::ProcVisibleAnimation(vsg::ref_ptr<vsg::MatrixTransform> transform)
+ProcVisibleAnimation::ProcVisibleAnimation(vsg::ref_ptr<vsg::Group> group)
     : Inherit()
-    , transform_node(transform)
+    , group_node(group)
 {
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcVisibleAnimation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> transform)
+void ProcVisibleAnimation::setGroup(vsg::ref_ptr<vsg::Group> group)
 {
-    transform_node = transform;
+    group_node = group;
 
-    group_with_children->children = transform_node->children;
+    group_with_children->children = group_node->children;
 
     visible_switch->children = {{vsg::MASK_OFF, group_with_children}};
 
-    transform_node->children = {visible_switch};
+    group_node->children = {visible_switch};
 
     if (!is_fixed_signal)
     {

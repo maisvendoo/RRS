@@ -119,6 +119,13 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
         vsg::ref_ptr<vsg::Object> new_object = duplicate->duplicates[deferred_animation.node];
 
 
+        if (vsg::ref_ptr<ProcVisibleAnimation> visible = animation.cast<ProcVisibleAnimation>())
+        {
+            vsg::ref_ptr<vsg::Group> new_group = new_object.cast<vsg::Group>();
+            visible->setGroup(new_group);
+            continue;
+        }
+
         if (vsg::ref_ptr<ProcRotationAnimation> rotation = animation.cast<ProcRotationAnimation>())
         {
             vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
@@ -130,13 +137,6 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
         {
             vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
             translation->setTransform(new_transform);
-            continue;
-        }
-
-        if (vsg::ref_ptr<ProcVisibleAnimation> visible = animation.cast<ProcVisibleAnimation>())
-        {
-            vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
-            visible->setTransform(new_transform);
             continue;
         }
 
@@ -159,7 +159,13 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
     CfgReader cfg;
     if (cfg.load(file_path.c_str()))
     {
-        auto animation = create_transform_animation<ProcRotationAnimation>("AnalogRotation", cfg, &group);
+        auto animation = create_visible_animation("VisibleAnimation", cfg, &group);
+        if (animation)
+        {
+            return animation;
+        }
+
+        animation = create_transform_animation<ProcRotationAnimation>("AnalogRotation", cfg, &group);
         if (animation)
         {
             return animation;
@@ -171,13 +177,7 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             return animation;
         }
 
-        animation = create_transform_animation<ProcVisibleAnimation>("VisibleAnimation", cfg, &group);
-        if (animation)
-        {
-            return animation;
-        }
-
-        animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group, name);
+                animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group, name);
         if (animation)
         {
             return animation;
@@ -216,15 +216,35 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-template <typename AnimationClass>
-vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr)
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_visible_animation(const char *type, CfgReader &cfg, vsg::Group *group_ptr)
 {
-    const auto group_node = vsg::ref_ptr(group_ptr);
-
     const auto config_section = cfg.getFirstSection(type);
     if (!config_section.isNull())
     {
-        if (const auto transform_node = group_node.template cast<vsg::MatrixTransform>())
+        const auto animation = ProcVisibleAnimation::create(vsg::ref_ptr(group_ptr));
+        if (animation && animation->load(cfg))
+        {
+            const std::scoped_lock pdo_lock(pdo->mutex);
+            pdo->tag(group_ptr);
+            deferred_animations.emplace_back(DeferredAnimation{group_ptr, animation});
+
+            return animation;
+        }
+    }
+
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+template <typename AnimationClass>
+vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_transform_animation(const char* type, CfgReader& cfg, vsg::Group* group_ptr)
+{
+    const auto config_section = cfg.getFirstSection(type);
+    if (!config_section.isNull())
+    {
+        if (const auto transform_node = vsg::ref_ptr(group_ptr).template cast<vsg::MatrixTransform>())
         {
             const auto animation = AnimationClass::create(transform_node);
             if (animation && animation->load(cfg))
@@ -288,12 +308,10 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_material_animati
 //------------------------------------------------------------------------------
 vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(const char *type, CfgReader &cfg, vsg::Light *light_ptr)
 {
-    const auto light_node = vsg::ref_ptr(light_ptr);
-
     const auto config_section = cfg.getFirstSection(type);
     if (!config_section.isNull())
     {
-        const auto animation = ProcLightAnimation::create(light_node);
+        const auto animation = ProcLightAnimation::create(vsg::ref_ptr(light_ptr));
         if (animation && animation->load(cfg))
         {
             LOG_INFO("Loaded light config");
