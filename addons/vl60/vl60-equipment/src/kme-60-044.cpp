@@ -6,27 +6,15 @@
 //
 //------------------------------------------------------------------------------
 ControllerKME_60_044::ControllerKME_60_044(QObject *parent)
-    : TractionController(parent)
-    , main_pos(POS_ZERO)
-    , revers_pos(REVERS_ZERO)
-    , main_handle_pos(0.0f)
-    , revers_handle_pos(0.0f)
+    : Device(parent)
 {
-    std::fill(sounds.begin(), sounds.end(), sound_state_t());
+    connect(&incMainPos, &Timer::process, this, &ControllerKME_60_044::incMain);
 
-    incMainPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
-    connect(incMainPos, &Timer::process, this, &ControllerKME_60_044::incMain);
+    connect(&decMainPos, &Timer::process, this, &ControllerKME_60_044::decMain);
 
-    decMainPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
-    connect(decMainPos, &Timer::process, this, &ControllerKME_60_044::decMain);
+    connect(&incReversPos, &Timer::process, this, &ControllerKME_60_044::incRevers);
 
-    incReversPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
-    connect(incReversPos, &Timer::process, this, &ControllerKME_60_044::incRevers);
-
-    decReversPos = new Timer(static_cast<double>(SWITCH_TIMEOUT) / 1000.0);
-    connect(decReversPos, &Timer::process, this, &ControllerKME_60_044::decRevers);
-
-    positions_names << "BV" << " 0" << "AV" << "RV" << "FV" << "FP" << "RP" << "AP";
+    connect(&decReversPos, &Timer::process, this, &ControllerKME_60_044::decRevers);
 }
 
 //------------------------------------------------------------------------------
@@ -40,8 +28,26 @@ ControllerKME_60_044::~ControllerKME_60_044()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ControllerKME_60_044::allowReversHandle(bool allow)
+{
+    is_reverse_handle_allowed = allow;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ControllerKME_60_044::isReversHandleAllowed() const
+{
+    return is_reverse_handle_allowed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ControllerKME_60_044::insertReversHandle(bool insert)
 {
+    insert = insert && is_reverse_handle_allowed;
+
     if (insert)
     {
         // Вставляем реверсивную рукоятку
@@ -59,20 +65,9 @@ void ControllerKME_60_044::insertReversHandle(bool insert)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ControllerKME_60_044::setMainHandlePos(int pos)
+bool ControllerKME_60_044::isReversHandle() const
 {
-    if ((pos < POS_BV) || (pos > POS_AP))
-        return;
-
-    // Блокировка поворота главной рукоятки при нулевом положении реверсивной
-    if (revers_pos == REVERS_ZERO)
-        pos = POS_ZERO;
-
-    if (main_pos == pos)
-        return;
-
-    main_pos = pos;
-    sounds[MAIN_CHANGE_POS_SOUND].play();
+    return is_revers_handle.getState();
 }
 
 //------------------------------------------------------------------------------
@@ -110,25 +105,28 @@ void ControllerKME_60_044::setReversHandlePos(int pos)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ControllerKME_60_044::isReversHandle() const
+float ControllerKME_60_044::getReversHandlePos() const
 {
-    return is_revers_handle.getState();
+    return revers_handle_pos;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-km_state_t ControllerKME_60_044::getState() const
+void ControllerKME_60_044::setMainHandlePos(int pos)
 {
-    return state;
-}
+    if ((pos < POS_BV) || (pos > POS_AP))
+        return;
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString ControllerKME_60_044::getMainHandlePosName() const
-{
-    return positions_names[main_pos];
+    // Блокировка поворота главной рукоятки при нулевом положении реверсивной
+    if (revers_pos == REVERS_ZERO)
+        pos = POS_ZERO;
+
+    if (main_pos == pos)
+        return;
+
+    main_pos = pos;
+    sounds[MAIN_CHANGE_POS_SOUND].play();
 }
 
 //------------------------------------------------------------------------------
@@ -142,9 +140,17 @@ float ControllerKME_60_044::getMainHandlePos() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float ControllerKME_60_044::getReversHandlePos() const
+QString ControllerKME_60_044::getMainHandlePosName() const
 {
-    return revers_handle_pos;
+    return positions_names[main_pos];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+km_state_t ControllerKME_60_044::getState() const
+{
+    return state;
 }
 
 //------------------------------------------------------------------------------
@@ -227,12 +233,12 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
     // Тянем рукоятку на себя нажатием
     if (getKeyState(pressed_keys, KEY_A))
     {
-        if (!incMainPos->isStarted())
-            incMainPos->start();
+        if (!incMainPos.isStarted())
+            incMainPos.start();
     }
     else
     {
-        incMainPos->stop();
+        incMainPos.stop();
 
         // Автовозврат
         if (main_pos == POS_AP)
@@ -250,13 +256,13 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
         }
         else
         {
-            if ((!is_prev_KEY_D) && (!decMainPos->isStarted()))
-                decMainPos->start();
+            if ((!is_prev_KEY_D) && (!decMainPos.isStarted()))
+                decMainPos.start();
         }
     }
     else
     {
-        decMainPos->stop();
+        decMainPos.stop();
         is_prev_KEY_D = false;
 
         // Автовозврат
@@ -285,19 +291,19 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
             {
                 if (is_revers_handle.getState())
                 {
-                    if (!incReversPos->isStarted() && (!is_prev_KEY_W))
-                        incReversPos->start();
+                    if (!incReversPos.isStarted() && (!is_prev_KEY_W))
+                        incReversPos.start();
                 }
                 else
                 {
-                    incReversPos->stop();
+                    incReversPos.stop();
                 }
             }
         }
     }
     else
     {
-        incReversPos->stop();
+        incReversPos.stop();
         is_prev_KEY_W = false;
     }
 
@@ -312,20 +318,20 @@ void ControllerKME_60_044::stepKeysControl(double t, double dt)
         }
         else
         {
-            if ((!decReversPos->isStarted()) && (!is_prev_KEY_S))
-                decReversPos->start();
+            if ((!decReversPos.isStarted()) && (!is_prev_KEY_S))
+                decReversPos.start();
         }
     }
     else
     {
-        decReversPos->stop();
+        decReversPos.stop();
         is_prev_KEY_S = false;
     }
 
-    incMainPos->step(t, dt);
-    decMainPos->step(t, dt);
-    incReversPos->step(t, dt);
-    decReversPos->step(t, dt);
+    incMainPos.step(t, dt);
+    decMainPos.step(t, dt);
+    incReversPos.step(t, dt);
+    decReversPos.step(t, dt);
 }
 
 //------------------------------------------------------------------------------

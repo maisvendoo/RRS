@@ -2,6 +2,7 @@
 #define     KM_STATE_H
 
 #include    <array>
+#include    <cstdint>
 
 //------------------------------------------------------------------------------
 //
@@ -37,15 +38,15 @@ enum
 struct km_state_t
 {
     /// Заданное контроллером направление движения
-    int     revers_ref_state;
+    std::int8_t     revers_ref_state;
+
+    /// Ступень ослабления возбуждения
+    std::uint8_t     field_loosen_pos;
 
     enum
     {
         NUM_MAIN_POSITIONS = 8,
     };
-
-    /// Ступень ослабления возбуждения
-    int     field_loosen_pos;
 
     /// Состояние каждой из позиций главной рукоятки
     std::array<bool, NUM_MAIN_POSITIONS>    pos_state;
