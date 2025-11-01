@@ -3,8 +3,11 @@
 #include "automatic-train-stop.h"
 #include "brake-crane.h"
 #include "loco-crane.h"
+#include "kme-60-044.h"
 #include "pneumo-brake-lock.h"
 #include "reservoir.h"
+//#include "shield-223.h"
+//#include "shield-225.h"
 
 //------------------------------------------------------------------------------
 //
@@ -128,6 +131,87 @@ void VL60pk::load_brakes_config(QString path)
         }
         // Не допускаем двух ключей в электропневматических клапанах автостопа
         epk[CAB1]->allowKey(!(epk[CAB2]->isKey()));
+
+/*
+        tmp_int = 1;
+        if (cfg.getInt(secName, "PanelCab1", tmp_int))
+        {
+            switch (tmp_int) {
+            case 2:
+            {
+                shield223[CAB1].insertKey(true);
+                shield223[CAB1].setKeyOn(true);
+                shield225[CAB1].insertKey(true);
+                shield225[CAB1].setKeyOn(true);
+                break;
+            }
+            case 1:
+            {
+                shield223[CAB1].insertKey(true);
+                shield223[CAB1].setKeyOn(false);
+                shield225[CAB1].insertKey(true);
+                shield225[CAB1].setKeyOn(false);
+                break;
+            }
+            case 0:
+            default:
+            {
+                shield223[CAB1].insertKey(false);
+                shield225[CAB1].insertKey(false);
+                break;
+            } }
+        }
+        // Не допускаем двух ключей в панелях тумблеров
+        shield223[CAB2].allowKey(!(shield223[CAB1].isKey()));
+        shield225[CAB2].allowKey(!(shield225[CAB1].isKey()));
+
+        tmp_int = 0;
+        if (cfg.getInt(secName, "PanelCab2", tmp_int))
+        {
+            switch (tmp_int) {
+            case 2:
+            {
+                shield223[CAB2].insertKey(true);
+                shield223[CAB2].setKeyOn(true);
+                shield225[CAB2].insertKey(true);
+                shield225[CAB2].setKeyOn(true);
+                break;
+            }
+            case 1:
+            {
+                shield223[CAB2].insertKey(true);
+                shield223[CAB2].setKeyOn(false);
+                shield225[CAB2].insertKey(true);
+                shield225[CAB2].setKeyOn(false);
+                break;
+            }
+            case 0:
+            default:
+            {
+                shield223[CAB2].insertKey(false);
+                shield225[CAB2].insertKey(false);
+                break;
+            } }
+        }
+        // Не допускаем двух ключей в панелях тумблеров
+        shield223[CAB1].allowKey(!(shield223[CAB2].isKey()));
+        shield225[CAB1].allowKey(!(shield225[CAB2].isKey()));
+*/
+        tmp_int = 1;
+        if (cfg.getInt(secName, "ReversHandleCab1", tmp_int))
+        {
+            controller[CAB1]->insertReversHandle(tmp_int);
+        }
+        // Не допускаем двух реверсивных рукояток в контроллерах машиниста
+        controller[CAB2]->allowReversHandle(!(controller[CAB1]->isReversHandle()));
+
+        tmp_int = 0;
+        if (cfg.getInt(secName, "ReversHandleCab2", tmp_int))
+        {
+            controller[CAB2]->insertReversHandle(tmp_int);
+        }
+        // Не допускаем двух реверсивных рукояток в контроллерах машиниста
+        controller[CAB1]->allowReversHandle(!(controller[CAB2]->isReversHandle()));
     }
 }
 

@@ -13,7 +13,9 @@
 #ifndef     VL60PK_H
 #define     VL60PK_H
 
-#include "trigger-control.h"
+//#include "shield-223.h"
+//#include "shield-225.h"
+//#include "shield-229.h"
 #include "vehicle.h"
 
 #include <QString>
@@ -111,6 +113,17 @@ private:
         CAB2 = 1
     };
 
+    enum
+    {
+        NUM_MOTOR_FANS = 6,
+        MV1 = 0,
+        MV2 = 1,
+        MV3 = 2,
+        MV4 = 3,
+        MV5 = 4,
+        MV6 = 5
+    };
+
     /// Имя модуля сцепного устройства
     QString coupling_module_name = "sa3";
     /// Имя конфига сцепного устройства
@@ -145,7 +158,8 @@ private:
     /// Расцепной рычаг сзади
     OperatingRod *oper_rod_bwd = nullptr;
 
-    // Дальний ряд тумблеров приборной панели машиниста
+    /// Дальний ряд тумблеров приборной панели машиниста
+//    Shield_223 shield223[CABS_NUM];
     /// Триггер тумблера "Прожектор яркий"
     TriggerControl spotlight_high_tumbler[CABS_NUM];
     /// Триггер тумблера "Прожектор тусклый"
@@ -165,18 +179,8 @@ private:
     /// Триггер тумблера "ГВ вкл/выкл"
     TriggerControl gv_tumbler[CABS_NUM];
 
-    // Ближний ряд тумблеров приборной панели машиниста
-    enum
-    {
-        NUM_MOTOR_FANS = 6,
-        MV1 = 0,
-        MV2 = 1,
-        MV3 = 2,
-        MV4 = 3,
-        MV5 = 4,
-        MV6 = 5
-    };
-
+    /// Ближний ряд тумблеров приборной панели машиниста
+//    Shield_225 shield225[CABS_NUM];
     /// Тригер тумблера "Автоматическая подача песка"
     TriggerControl autosand_tumbler[CABS_NUM];
     /// Триггеры тумблеров "Вентилятор 1-6"
@@ -186,7 +190,8 @@ private:
     /// Тригер тумблера "Фазорасщепитель"
     TriggerControl fr_tumbler[CABS_NUM];
 
-    // Ряд тумблеров на приборной панели помощника машиниста
+    /// Ряд тумблеров на приборной панели помощника машиниста
+//    Shield_229 shield229[CABS_NUM];
     /// Триггер тумблера "Тифон"
     TriggerControl P_tifon_tumbler[CABS_NUM];
     /// Триггер тумблера "Свисток"

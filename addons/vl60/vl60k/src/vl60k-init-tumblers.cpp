@@ -6,6 +6,9 @@
 #include    "pneumo-brake-lock.h"
 #include    "pneumo-anglecock.h"
 #include    "pneumo-hose.h"
+//#include    "shield-223.h"
+//#include    "shield-225.h"
+//#include    "shield-229.h"
 
 //------------------------------------------------------------------------
 //
@@ -108,7 +111,14 @@ void VL60k::initControl(const QString& modules_dir, const QString& custom_cfg_di
 
         // Электропневматический клапан автостопа
         epk[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
-
+/*
+        // Дальний ряд тумблеров приборной панели машиниста
+        shield223[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Ближний ряд тумблеров приборной панели машиниста
+        shield225[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Ряд тумблеров на приборной панели помощника машиниста
+        shield229[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+*/
         // Дальний ряд тумблеров приборной панели машиниста
         // Триггер тумблера "Прожектор яркий"
         spotlight_high_tumbler[cab_idx].setKeySymbolOn(KEY_H);

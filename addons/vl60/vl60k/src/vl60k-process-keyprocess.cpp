@@ -11,6 +11,9 @@
 #include "train-horn.h"
 
 #include "kme-60-044.h"
+//#include "shield-223.h"
+//#include "shield-225.h"
+//#include "shield-229.h"
 
 //------------------------------------------------------------------------------
 //
@@ -92,41 +95,28 @@ void VL60k::keyProcess(const simulator_time_t& t, const double& dt)
     }
 
     // Контроллер машиниста обрабатываем уже после проверки на невмешательство программы автозапуска
-    if (controller[CAB1]->isReversHandle())
-    {
-        if (controller[CAB2]->isReversHandle())
-        {
-            // Не допускаем двух реверсивных рукояток
-            controller[CAB2]->setMainHandlePos(POS_ZERO);
-            controller[CAB2]->setReversHandlePos(REVERS_ZERO);
-            controller[CAB2]->insertReversHandle(false);
-        }
-        controller[CAB2]->setControl();
-    }
-    else
-    {
-        controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
-    }
-
-    if (controller[CAB2]->isReversHandle())
-    {
-        if (controller[CAB1]->isReversHandle())
-        {
-            // Не допускаем двух реверсивных рукояток
-            controller[CAB1]->setMainHandlePos(POS_ZERO);
-            controller[CAB1]->setReversHandlePos(REVERS_ZERO);
-            controller[CAB1]->insertReversHandle(false);
-        }
-        controller[CAB1]->setControl();
-    }
-    else
-    {
-        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
-    }
-
+    // Не допускаем двух реверсивных рукояток в контроллерах машиниста
+    controller[CAB2]->allowReversHandle(!(controller[CAB1]->isReversHandle()));
+    controller[CAB1]->allowReversHandle(!(controller[CAB2]->isReversHandle()));
+/*
+    // Не допускаем двух ключей в панелях тумблеров
+    shield223[CAB2].allowKey(!(shield223[CAB1].isKey()));
+    shield225[CAB2].allowKey(!(shield225[CAB1].isKey()));
+    shield223[CAB1].allowKey(!(shield223[CAB2].isKey()));
+    shield225[CAB1].allowKey(!(shield225[CAB2].isKey()));
+*/
     // Пульты в кабинах обрабатываем уже после проверки на невмешательство программы автозапуска
     for (auto cab_idx : {CAB1, CAB2})
     {
+        controller[cab_idx]->step(t.simulation_seconds, dt);
+/*
+        // Дальний ряд тумблеров приборной панели машиниста
+        shield223[cab_idx].step(t.simulation_seconds, dt);
+        // Ближний ряд тумблеров приборной панели машиниста
+        shield225[cab_idx].step(t.simulation_seconds, dt);
+        // Ряд тумблеров на приборной панели помощника машиниста
+        shield229[cab_idx].step(t.simulation_seconds, dt);
+*/
         // Дальний ряд тумблеров приборной панели машиниста
         spotlight_high_tumbler[cab_idx].step();
         spotlight_low_tumbler[cab_idx].step();

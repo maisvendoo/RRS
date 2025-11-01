@@ -24,12 +24,22 @@
 		<!-- Положение комбинированного крана
 		( -1 - положение двойной тяги, 0 - поездное, 1 - экстренное торможение -->
 		<CombineCranePosCab1>0</CombineCranePosCab1>
-		<CombineCranePosCab2>-1</CombineCranePosCab2>
+		<CombineCranePosCab2>0</CombineCranePosCab2>
 
 		<!-- Ключ электропневматического клапана автостопа
 		( 0 - извлечён, 1 - вставлен, ЭПК выключен, 2 - вставлен, ЭПК включён -->
 		<EPKCab1>1</EPKCab1>
 		<EPKCab2>0</EPKCab2>
+
+		<!-- Ключи к щиткам тумблеров на пульте машиниста
+		( 0 - извлечены, 1 - вставлены, тумблеры заблокированы, 2 - вставлены, тумблеры разблокированы -->
+		<ShieldCab1>1</ShieldCab1>
+		<ShieldCab2>0</ShieldCab2>
+
+		<!-- Реверсивная рукотка
+		( 0 - извлечена, 1 - вставлена -->
+		<ReversHandleCab1>1</ReversHandleCab1>
+		<ReversHandleCab2>0</ReversHandleCab2>
 
 	</BrakesState>
 </Config>

@@ -13,5 +13,8 @@
 #include    <overload-relay.h>
 #include    <sl2m.h>
 #include    <alsn-ukbm.h>
+//#include    <shield-223.h>
+//#include    <shield-225.h>
+//#include    <shield-229.h>
 
 #endif // VL60PK_HEADERS_H

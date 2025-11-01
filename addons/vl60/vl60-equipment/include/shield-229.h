@@ -40,7 +40,7 @@ public:
         TUMBLERS_NUMBER = 12
     };
 
-    Shield_229(QObject* parent);
+    Shield_229(QObject* parent = nullptr);
 
     ~Shield_229() = default;
 
@@ -67,8 +67,6 @@ private:
                     double t) override;
 
     void initControl();
-
-    bool isAllTumblersOff() const;
 };
 
 #endif // SHIELD_229_H

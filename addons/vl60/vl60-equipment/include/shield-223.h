@@ -34,7 +34,7 @@ public:
         TUMBLERS_NUMBER = 9
     };
 
-    Shield_223(QObject* parent);
+    Shield_223(QObject* parent = nullptr);
 
     ~Shield_223() = default;
 

@@ -155,11 +155,6 @@ void VL60pk::stepMotorFans(const double& t, const double& dt)
 //------------------------------------------------------------------------------
 void VL60pk::stepTractionControl(const double& t, const double& dt)
 {
-    for (size_t i : {CAB1, CAB2})
-    {
-        controller[i]->step(t, dt);
-    }
-
     main_controller->enable((cu_tumbler[CAB1].getState() || cu_tumbler[CAB2].getState()) &&
                             (brake_lock[CAB1]->isStateOn() || brake_lock[CAB2]->isStateOn()));
     main_controller->setKMstate(controller[CAB1]->getState(), controller[CAB2]->getState());
