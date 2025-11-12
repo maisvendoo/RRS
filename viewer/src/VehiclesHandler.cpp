@@ -202,16 +202,42 @@ void VehiclesHandler::step(double t, double dt)
 
         vehicles[i].right = vsg::cross(vehicles[i].orth, vehicles[i].up);
 
+        double attitude_z;
+        if (vehicles[i].orth.x > vehicles[i].orth.y)
+        {
+            if (vehicles[i].orth.x > -vehicles[i].orth.y)
+            {
+                attitude_z = std::acos(vehicles[i].orth.y);
+            }
+            else
+            {
+                attitude_z = vsg::numbers<double>::PI() - std::asin(vehicles[i].orth.x);
+            }
+        }
+        else
+        {
+            if (vehicles[i].orth.x > -vehicles[i].orth.y)
+            {
+                attitude_z = std::asin(vehicles[i].orth.x);
+            }
+            else
+            {
+                attitude_z = -std::acos(vehicles[i].orth.y);
+            }
+        }
+
         vehicles[i].attitude = vsg::dvec3(
             std::asin(vehicles[i].orth.z),
             0.0,
-            (vehicles[i].orth.x > 0.0) ? std::acos(vehicles[i].orth.y) : -std::acos(vehicles[i].orth.y)
+            attitude_z
         );
 
+
+        const vsg::dmat4 rotate_matrix = vsg::rotate(-vehicles[0].attitude.z, vsg::dvec3(0.0, 0.0, 1.0)) *
+                                         vsg::rotate(vehicles[0].attitude.x, vsg::dvec3(1.0, 0.0, 0.0));
+
         // Apply vehicle body matrix transform
-        vehicles[i].transform->matrix = vsg::translate(vehicles[i].position) *
-            vsg::rotate(-vehicles[i].attitude.z, vsg::dvec3(0.0, 0.0, 1.0)) *
-            vsg::rotate(vehicles[i].attitude.x, vsg::dvec3(1.0, 0.0, 0.0));
+        vehicles[i].transform->matrix = vsg::translate(vehicles[i].position) * rotate_matrix;
 
         if (is_update)
         {
@@ -269,6 +295,67 @@ void VehiclesHandler::step(double t, double dt)
             }
         }
     }
+/*  Вывод матрицы поворота первой ПЕ в каждом кадре, только во время движения
+    if (vehicles.size() && (vsg::length(vehicles[0].velocity) > 1.0))
+    {
+        vsg::dmat4 rotate_matrix = vsg::rotate(-vehicles[0].attitude.z, vsg::dvec3(0.0, 0.0, 1.0)) *
+                                   vsg::rotate(vehicles[0].attitude.x, vsg::dvec3(1.0, 0.0, 0.0));
+        QString s;
+        s = QString("%1;%2;%3;%4\t;%5;%6;%7;%8")
+                .arg(vehicles[0].right.x, 11, 'f', 8)
+                .arg(vehicles[0].right.y, 11, 'f', 8)
+                .arg(vehicles[0].right.z, 11, 'f', 8)
+                .arg(0.0, 11, 'f', 8)
+                .arg(rotate_matrix[0][0], 11, 'f', 8)
+                .arg(rotate_matrix[0][1], 11, 'f', 8)
+                .arg(rotate_matrix[0][2], 11, 'f', 8)
+                .arg(rotate_matrix[0][3], 11, 'f', 8);
+
+        LOG_INFO("%s", s.toStdString().c_str());
+
+        s = QString("%1;%2;%3;%4\t;%5;%6;%7;%8")
+                .arg(vehicles[0].orth.x, 11, 'f', 8)
+                .arg(vehicles[0].orth.y, 11, 'f', 8)
+                .arg(vehicles[0].orth.z, 11, 'f', 8)
+                .arg(0.0, 11, 'f', 8)
+                .arg(rotate_matrix[1][0], 11, 'f', 8)
+                .arg(rotate_matrix[1][1], 11, 'f', 8)
+                .arg(rotate_matrix[1][2], 11, 'f', 8)
+                .arg(rotate_matrix[1][3], 11, 'f', 8);
+
+        LOG_INFO("%s", s.toStdString().c_str());
+
+        s = QString("%1;%2;%3;%4\t;%5;%6;%7;%8")
+                .arg(vehicles[0].up.x, 11, 'f', 8)
+                .arg(vehicles[0].up.y, 11, 'f', 8)
+                .arg(vehicles[0].up.z, 11, 'f', 8)
+                .arg(0.0, 11, 'f', 8)
+                .arg(rotate_matrix[2][0], 11, 'f', 8)
+                .arg(rotate_matrix[2][1], 11, 'f', 8)
+                .arg(rotate_matrix[2][2], 11, 'f', 8)
+                .arg(rotate_matrix[2][3], 11, 'f', 8);
+
+        LOG_INFO("%s", s.toStdString().c_str());
+
+        s = QString("%1;%2;%3;%4\t;%5;%6;%7;%8")
+                .arg(0.0, 11, 'f', 8)
+                .arg(0.0, 11, 'f', 8)
+                .arg(0.0, 11, 'f', 8)
+                .arg(1.0, 11, 'f', 8)
+                .arg(rotate_matrix[3][0], 11, 'f', 8)
+                .arg(rotate_matrix[3][1], 11, 'f', 8)
+                .arg(rotate_matrix[3][2], 11, 'f', 8)
+                .arg(rotate_matrix[3][3], 11, 'f', 8);
+
+        LOG_INFO("%s", s.toStdString().c_str());
+
+        s = QString("%1;%2;%3")
+                .arg(vehicles[0].attitude.x, 11, 'f', 8)
+                .arg(vehicles[0].attitude.y, 11, 'f', 8)
+                .arg(vehicles[0].attitude.z, 11, 'f', 8);
+        LOG_INFO("%s", s.toStdString().c_str());
+    }
+*/
 }
 
 //------------------------------------------------------------------------------
