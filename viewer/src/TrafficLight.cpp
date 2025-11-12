@@ -135,12 +135,11 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
 
     vsg::dmat4 m1 = vsg::translate(position);
 
-    vsg::dmat4 m2(
-        right.x,    -orth.x,    up.x,   0,
-        -right.y,   orth.y,     up.y,   0,
-        right.z,    orth.z,     up.z,   0,
-        0,          0,          0,      1
-    );
+    vsg::dmat4 m2{
+        right.x,right.y,right.z,0.0,
+        orth.x, orth.y, orth.z, 0.0,
+        up.x,   up.y,   up.z,   0.0,
+        0.0,    0.0,    0.0,    1.0};
 
     transform->matrix = m1 * m2;
 
