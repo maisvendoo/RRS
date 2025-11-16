@@ -600,7 +600,7 @@ Train *Model::addTrain(const init_data_t &init_data)
     Journal::instance()->info(QString("Created Train object at address: 0x%1")
                                   .arg(reinterpret_cast<quint64>(train), 0, 16));
 
-    if (train->init(init_data))
+    if (train->init(init_data, vehicles.size()))
     {
         Journal::instance()->info(QString("Train #%1 initialized successfully").arg(trains.size()));
 

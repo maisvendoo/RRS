@@ -195,7 +195,7 @@ std::vector<size_t> SoundManager::loadSounds(const std::string& dir_path, const 
     }
 
     log_->notify("Sound Manager: Loaded " + QString("%1").arg(sounds_id.size()).toStdString() + " sounds from " + dir_path + " directory");
-    log_->notify("========================== Total loaded sounds: "+ QString("%1").arg(sounds.size(), 5).toStdString() + " ==========================");
+    log_->notify("=================== Total loaded sounds: "+ QString("%1 (unique:%2)").arg(sounds.size(), 5).arg(loaded_sounds.size(), 4).toStdString() + " ===================");
 
     return sounds_id;
 }

@@ -24,7 +24,7 @@ Train::~Train()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Train::init(const init_data_t& init_data)
+bool Train::init(const init_data_t& init_data, int model_vehicles_count)
 {
     solver_config = init_data.solver_config;
 
@@ -55,7 +55,7 @@ bool Train::init(const init_data_t& init_data)
     Journal::instance()->info("Train config from file: " + full_config_path);
 
     // Loading of train
-    if (!loadTrain(full_config_path, init_data))
+    if (!loadTrain(full_config_path, init_data, model_vehicles_count))
     {
         Journal::instance()->error("Train is't loaded");
         return false;
@@ -133,10 +133,11 @@ bool Train::init(const solver_config_t& solver_config, int direction, std::vecto
     }
     dydt.resize(ode_order);
 
-    Journal::instance()->info(QString("Train uncoupled! New size of vehicles %1, joints %2, state_vector %3")
+    Journal::instance()->info(QString("New uncoupled train! Ыize of vehicles %1, joints %2, state_vector %3")
                                   .arg(this->vehicles.size(), 4)
                                   .arg(this->joints_list.size(), 4)
                                   .arg(y.size(), 4));
+/*
     double train_coord_begin = y[0];
     Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
                                   .arg(vehicles.front()->getModelIndex(), 4)
@@ -152,6 +153,7 @@ bool Train::init(const solver_config_t& solver_config, int direction, std::vecto
                                       .arg(y[state_idx], 7, 'f', 3)
                                       .arg(coord, 7, 'f', 3));
     }
+*/
     return true;
 }
 
@@ -177,7 +179,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         other_veh_distances.push_back(abs(other_coord - other_begin));
         other_begin = other_coord;
     }
-
+/*
     // ОТЛАДКА
     double train1_coord_begin = y[0];
     Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
@@ -211,7 +213,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                                       .arg(other_y[state_idx], 7, 'f', 3)
                                       .arg(coord, 7, 'f', 3));
     }
-
+*/
     // Массив межвагонных связей поезда, с которым сцепляемся
     std::vector<std::vector<Joint*>> other_joints_list = other_train->getJoints();
 
@@ -550,6 +552,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                                   .arg(vehicles.size(), 4)
                                   .arg(joints_list.size(), 4)
                                   .arg(y.size(), 4));
+/*
     double train_coord_begin = y[0];
     Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
                                   .arg(vehicles.front()->getModelIndex(), 4)
@@ -565,6 +568,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                                       .arg(y[state_idx], 7, 'f', 3)
                                       .arg(coord, 7, 'f', 3));
     }
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -994,7 +998,7 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Train::loadTrain(QString cfg_path, const init_data_t& init_data)
+bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_vehicles_count)
 {
     CfgReader cfg;
     FileSystem& fs = FileSystem::getInstance();
@@ -1125,6 +1129,11 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data)
                 vehicle->setConfigName(module_cfg_name);
                 vehicle->setRouteDir(init_data.route_dir_name);
 
+                if (model_vehicles_count >= 0)
+                {
+                    vehicle->setModelIndex(model_vehicles_count);
+                    model_vehicles_count++;
+                }
                 vehicle->setStateIndex(ode_order);
                 vehicle->setPayloadCoeff(payload_coeff);
                 vehicle->setDirection(dir);

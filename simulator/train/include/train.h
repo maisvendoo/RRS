@@ -55,7 +55,7 @@ public:
     virtual ~Train();
 
     /// Train initialization
-    bool init(const init_data_t& init_data);
+    bool init(const init_data_t& init_data, int model_vehicles_count = -1);
 
     /// Train initialization
     bool init(const solver_config_t& solver_config, int direction, std::vector<Vehicle*>& vehicles, state_vector_t& state_vector, std::vector<std::vector<Joint*>>& joints_list);
@@ -171,7 +171,7 @@ private:
     Topology* topology = nullptr;
 
     /// Train's loading
-    bool loadTrain(QString cfg_path, const init_data_t &init_data);
+    bool loadTrain(QString cfg_path, const init_data_t &init_data, int model_vehicles_count = -1);
     /// Joints loading
     bool loadTrainJoints();
     /// Joints loading
