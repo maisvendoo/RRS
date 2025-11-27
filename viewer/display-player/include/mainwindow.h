@@ -12,13 +12,13 @@ class MainWindow : public QWidget
 {
 public:
 
-    MainWindow(QString module_path, QWidget *parent = nullptr);
+    MainWindow(QString& module_path, QString &config_path, QWidget* parent = nullptr);
 
-    ~MainWindow();
+    ~MainWindow() = default;
 
 private:
 
-    AbstractDisplay *display;
+    AbstractDisplay* display = nullptr;
 };
 
 #endif // MAINWINDOW_H

@@ -2,7 +2,7 @@
 #include    <QCommandLineParser>
 #include    "mainwindow.h"
 
-QString get_module_path(QStringList args)
+void parser(QStringList args, QString& module_path, QString& config_path)
 {
     QCommandLineParser parser;
     QCommandLineOption help = parser.addHelpOption();
@@ -11,7 +11,12 @@ QString get_module_path(QStringList args)
                                   QApplication::translate("main", "Display module path"),
                                   QApplication::translate("main", "module-path"));
 
+    QCommandLineOption configPath(QStringList() << "c" << "config-path",
+                                   QApplication::translate("main", "Path to folder with display config files"),
+                                   QApplication::translate("main", "signals-path"));
+
     parser.addOption(modulePath);
+    parser.addOption(configPath);
 
     if (!parser.parse(args))
     {
@@ -25,21 +30,27 @@ QString get_module_path(QStringList args)
 
     if (parser.isSet(modulePath))
     {
-        return parser.value(modulePath);
+        module_path = parser.value(modulePath);
+
+        if (parser.isSet(configPath))
+            config_path = parser.value(configPath);
+
+        return;
     }
 
     QApplication::exit(0);
-
-    return "";
 }
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    app.setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
+    //app.setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
 
-    MainWindow w(get_module_path(app.arguments()));
+    QString module_path = "";
+    QString config_path = "";
+    parser(app.arguments(), module_path, config_path);
+    MainWindow w(module_path, config_path);
 
     w.show();
 
