@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Translator::Translator(const QString &routeDir)
+Translator::Translator(const QString& routeDir)
 {
     alphabet.insert(QChar(0x410), "A");
     alphabet.insert(QChar(0x411), "B");
@@ -94,7 +94,7 @@ Translator::~Translator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Translator::process(const QString &routeDir)
+void Translator::process(const QString& routeDir)
 {
     routeDirectory = routeDir;
 
@@ -107,54 +107,102 @@ void Translator::process(const QString &routeDir)
     if (*(routeDir.end() - 1) != QDir::separator())
         routeDirectory += QDir::separator();
 
-    translateObjectsRef(routeDirectory + "objects.ref");
+    translateFileContent(routeDirectory + "objects.ref",
+                         [](QString& line) -> bool
+                         {
+                             QChar first = *(line.begin());
+                             return (first == ';') || (first == '[');
+                         } );
+
+    translateFileContent(routeDirectory + "route1.map",
+                         [](QString& line) -> bool
+                         {
+                             QChar first = *(line.begin());
+                             QChar last = *(line.end() - 1);
+                             return (first == ';') || (last != ';');
+                         } );
+
     translateFiles(routeDirectory);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Translator::translateObjectsRef(const QString &path)
+bool Translator::translateFileContent(const QString& path, std::function<bool(QString&)> check_no_transliterate)
 {
-    QFile file(path);
+    QFile old_file(path);
+    QString content = "";
 
-    QString new_data = "";
-
-    if (file.open(QIODevice::ReadOnly))
+    if (old_file.open(QIODevice::ReadOnly))
     {
-        QByteArray data = file.readAll();
-        auto toUtf8 = QStringDecoder(QStringConverter::Utf8);
-        QString tmp = toUtf8(data);
-
-        new_data = latin(tmp);
-
-        file.close();
+        QByteArray data = old_file.readAll();
+        auto fromUtf8 = QStringDecoder(QStringConverter::System);
+        content = fromUtf8(data);
+        old_file.close();
     }
 
-    QFile objRef(routeDirectory + "objects.ref");
+    QString backup_path = path + ".bak";
+    if (!QFile::exists(backup_path))
+    {
+        if (!old_file.rename(backup_path))
+        {
+            return false;
+        }
+    }
 
-    if (!objRef.open(QIODevice::WriteOnly))
+    QFile new_file(path);
+    if (!new_file.open(QIODevice::WriteOnly))
+    {
+        old_file.rename(path);
         return false;
+    }
 
-    QTextStream stream(&objRef);
+    QTextStream old_stream(&content);
+    QTextStream new_stream(&new_file);
+    new_stream.setEncoding(QStringConverter::System);
 
-    stream << new_data;
+    while (!old_stream.atEnd())
+    {
+        QString line = old_stream.readLine();
 
-    objRef.close();
+        if (line.isEmpty())
+        {
+            new_stream << "\n";
+            continue;
+        }
 
+        if (check_no_transliterate(line))
+        {
+            new_stream << line << "\n";
+            continue;
+        }
+
+        QString new_line = latin(line);
+        if (line != new_line)
+        {
+            new_stream << new_line << "\n";
+        }
+        else
+        {
+            new_stream << line << "\n";
+        }
+    }
+
+    new_file.close();
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Translator::translateFiles(const QString &routeDir)
+bool Translator::translateFiles(const QString& routeDir)
 {
     QString modelsDir = routeDir + "models";
     QString texturesDir = routeDir + "textures";
 
     QDir models(modelsDir);
-    QDirIterator model_files(models.path(), QStringList() << "*.dmd",
+    QDirIterator model_files(models.path(),
+                             QStringList() << "*.dmd",
                              QDir::NoDotAndDotDot | QDir::Files,
                              QDirIterator::Subdirectories);
 
@@ -172,7 +220,8 @@ bool Translator::translateFiles(const QString &routeDir)
     }
 
     QDir textures(texturesDir);
-    QDirIterator texture_files(textures.path(), QStringList() << "*.bmp" << "*.tga",
+    QDirIterator texture_files(textures.path(),
+                               QStringList() << "*.bmp" << "*.tga" << "*.png" << "*.jpg" << "*.jpeg",
                                QDir::NoDotAndDotDot | QDir::Files,
                                QDirIterator::Subdirectories);
 
@@ -195,7 +244,7 @@ bool Translator::translateFiles(const QString &routeDir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString Translator::latin(QString str)
+QString Translator::latin(QString& str)
 {
     QString result;
 
@@ -204,7 +253,7 @@ QString Translator::latin(QString str)
         if (alphabet.contains(ch))
             result += alphabet[ch];
         else
-            result += ch;
+            (ch.unicode() < 128) ? result += ch : result += '_';
     }
 
     return result;

@@ -33,7 +33,7 @@ int Application::exec()
     case CommandLineOK:
         {
             Translator translator(routeDir);
-            Converter converter(routeDir);
+//            Converter converter(routeDir);
             return 0;
         }
 
