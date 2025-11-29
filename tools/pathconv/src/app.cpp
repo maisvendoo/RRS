@@ -1,5 +1,4 @@
 #include        "app.h"
-#include        "converter.h"
 #include        "translator.h"
 
 //------------------------------------------------------------------------------
@@ -33,7 +32,6 @@ int Application::exec()
     case CommandLineOK:
         {
             Translator translator(routeDir);
-//            Converter converter(routeDir);
             return 0;
         }
 
